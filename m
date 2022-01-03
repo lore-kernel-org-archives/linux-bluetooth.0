@@ -2,127 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0DCC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jan 2022 17:07:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 324FFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jan 2022 22:02:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235017AbiACRHY (ORCPT
+        id S230020AbiACWCb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Jan 2022 12:07:24 -0500
-Received: from mail-il1-f198.google.com ([209.85.166.198]:46027 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231569AbiACRHX (ORCPT
+        Mon, 3 Jan 2022 17:02:31 -0500
+Received: from giacobini.uberspace.de ([185.26.156.129]:47650 "EHLO
+        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230002AbiACWCb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Jan 2022 12:07:23 -0500
-Received: by mail-il1-f198.google.com with SMTP id k14-20020a056e021a8e00b002b4b2388c48so17772639ilv.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jan 2022 09:07:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=5kB4JwrWnI9ddxNMVXxtodJTq/JfLyUnW8oK2aRYGM0=;
-        b=ImGlJrpH5JkFDXvAgohondWrsaHnZWUJF6teelUcuCHMWjovBIdMZo4t95MF2tesiU
-         j+267PlxUIFANRk8gS8girWNSRXtUFckpzwcYJ9G/b1uonC0QBo/I0TjP7oKwDzZScO9
-         bfARt1gNZDqUfns6yHOHBt+eeAPGvyGbr50ky9lwyQPkLXlARwB3WYUl1bp00wIbTFYq
-         Fe1v7LS8sim6DpldZMq4a2zt/XEia3vHyrKI+4lWa0Yt+4LpspREM3tWjPkazXTuqjUA
-         aJaDPXOU3HPRMuO8vwikM7ar24Jp9ljHgxOq1okw5yRxXW341e8kOCwewHthPG7/7OUT
-         B4MA==
-X-Gm-Message-State: AOAM530PSevDYkhbS5t1K9iYG30SxaRY8/Mx32c+jdu00YjttAcCMGCU
-        cD253elVHt1sPYdUTJIOmpRFDMovWqtdaX/8fRTvSJB4JtMg
-X-Google-Smtp-Source: ABdhPJzDaqlybMEylt1i1tatamne0ctP939e4BrjyCLYoCA+3JkBDf3Kt8suaCD9R+y7uDJ9ZxRjeYMBzEgzyukahBBsOk0xn101
+        Mon, 3 Jan 2022 17:02:31 -0500
+Received: (qmail 30180 invoked by uid 990); 3 Jan 2022 21:55:48 -0000
+Authentication-Results: giacobini.uberspace.de;
+        auth=pass (plain)
+Message-ID: <36ec2e79-7544-ba14-8bdd-d748dfad0ea7@eknoes.de>
+Date:   Mon, 3 Jan 2022 22:55:43 +0100
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:18ca:: with SMTP id s10mr21423744ilu.305.1641229642239;
- Mon, 03 Jan 2022 09:07:22 -0800 (PST)
-Date:   Mon, 03 Jan 2022 09:07:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d2127105d4b08da5@google.com>
-Subject: [syzbot] WARNING: ODEBUG bug in hci_release_dev
-From:   syzbot <syzbot+c10c909f9ddcd29c11ac@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.von.dentz@intel.com, Marcel Holtmann <marcel@holtmann.org>
+From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
+Subject: [BUG] Page Fault in hci_inquiry_result_with_rssi_evt
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Rspamd-Bar: --
+X-Rspamd-Report: BAYES_HAM(-2.999632) MIME_GOOD(-0.1) R_MIXED_CHARSET(0.714285)
+X-Rspamd-Score: -2.385347
+Received: from unknown (HELO unkown) (::1)
+        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Mon, 03 Jan 2022 22:55:48 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello,
 
-syzbot found the following issue on:
+While fuzzing bluetooth-next I found the following bug:
 
-HEAD commit:    438645193e59 Merge tag 'pinctrl-v5.16-3' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=101babebb00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=48863e33ecce99a5
-dashboard link: https://syzkaller.appspot.com/bug?extid=c10c909f9ddcd29c11ac
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+[   27.333034] BUG: unable to handle page fault for address: fffff61a1a1a1a1a
+[   27.333241] #PF: supervisor read access in kernel mode
+[   27.333241] #PF: error_code(0x0000) - not-present page
+[   27.333241] PGD 6dfd2067 P4D 6dfd2067 PUD 0 
+[   27.333241] Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
+[   27.333241] CPU: 0 PID: 45 Comm: kworker/u3:2 Not tainted 5.16.0-rc1+ #81
+[   27.333241] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[   27.333241] Workqueue: hci0 hci_rx_work
+[   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+[   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+[   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+[   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffffff834663d1
+[   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88800affb074
+[   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffffff83487b35
+[   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88800affb000
+[   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88800aae0000
+[   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+[   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 00000000000006f0
+[   27.333241] Call Trace:
+[   27.333241]  <TASK>
+[   27.333241]  ? wait_for_completion_io+0x270/0x270
+[   27.333241]  ? hci_inquiry_result_evt+0x4b0/0x4b0
+[   27.333241]  hci_event_packet+0x3b11/0x7b10
+[   27.333241]  ? lock_chain_count+0x20/0x20
+[   27.333241]  ? hci_cmd_status_evt.constprop.0+0x4ea0/0x4ea0
+[   27.333241]  ? sysvec_reboot+0x50/0xc0
+[   27.333241]  ? find_held_lock+0x2c/0x110
+[   27.333241]  ? lock_release+0x3b2/0x6f0
+[   27.333241]  ? skb_dequeue+0x110/0x1a0
+[   27.333241]  ? mark_held_locks+0x9e/0xe0
+[   27.333241]  ? lockdep_hardirqs_on_prepare+0x17b/0x400
+[   27.333241]  hci_rx_work+0x4d3/0xb90
+[   27.333241]  process_one_work+0x904/0x1590
+[   27.333241]  ? lock_release+0x6f0/0x6f0
+[   27.333241]  ? pwq_dec_nr_in_flight+0x230/0x230
+[   27.333241]  ? rwlock_bug.part.0+0x90/0x90
+[   27.333241]  ? _raw_spin_lock_irq+0x41/0x50
+[   27.333241]  worker_thread+0x578/0x1310
+[   27.333241]  ? process_one_work+0x1590/0x1590
+[   27.333241]  kthread+0x3b2/0x490
+[   27.333241]  ? _raw_spin_unlock_irq+0x1f/0x40
+[   27.333241]  ? set_kthread_struct+0x100/0x100
+[   27.333241]  ret_from_fork+0x22/0x30
+[   27.333241]  </TASK>
+[   27.333241] Modules linked in:
+[   27.333241] CR2: fffff61a1a1a1a1a
+[   27.333241] ---[ end trace 6a6825484c8fefa6 ]---
+[   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+[   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+[   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+[   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffffff834663d1
+[   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88800affb074
+[   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffffff83487b35
+[   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88800affb000
+[   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88800aae0000
+[   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+[   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 00000000000006f0
+[   27.379996] kworker/u3:2 (45) used greatest stack depth: 27736 bytes left
 
-Unfortunately, I don't have any reproducer for this issue yet.
+It occurs when sending the following frame to the kernel:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c10c909f9ddcd29c11ac@syzkaller.appspotmail.com
+$ xxd crashes/hci_inquiry_result_with_rssi_evt
+00000000: 0422 24d0 d0d0 d0d0 d0ff ff              ."$........
 
-ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x90 kernel/workqueue.c:1624
-WARNING: CPU: 1 PID: 13508 at lib/debugobjects.c:505 debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Modules linked in:
-CPU: 1 PID: 13508 Comm: syz-executor.3 Not tainted 5.16.0-rc6-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd c0 37 05 8a 4c 89 ee 48 c7 c7 c0 2b 05 8a e8 9f 20 22 05 <0f> 0b 83 05 95 c9 b1 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc90002c2fa40 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
-RDX: ffff88801c483a00 RSI: ffffffff815f1258 RDI: fffff52000585f3a
-RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815eaffe R11: 0000000000000000 R12: ffffffff89adf5e0
-R13: ffffffff8a053200 R14: ffffffff81660770 R15: dffffc0000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f9cd44481b8 CR3: 000000001838d000 CR4: 0000000000350ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-Call Trace:
- <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:992 [inline]
- debug_check_no_obj_freed+0x301/0x420 lib/debugobjects.c:1023
- slab_free_hook mm/slub.c:1698 [inline]
- slab_free_freelist_hook+0xeb/0x1c0 mm/slub.c:1749
- slab_free mm/slub.c:3513 [inline]
- kfree+0xf6/0x560 mm/slub.c:4561
- hci_release_dev+0x7a8/0xb70 net/bluetooth/hci_core.c:3970
- bt_host_release+0x73/0x90 net/bluetooth/hci_sysfs.c:88
- device_release+0x9f/0x240 drivers/base/core.c:2230
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- put_device+0x1b/0x30 drivers/base/core.c:3501
- vhci_release+0x78/0xe0 drivers/bluetooth/hci_vhci.c:463
- __fput+0x286/0x9f0 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- exit_task_work include/linux/task_work.h:32 [inline]
- do_exit+0xc14/0x2b40 kernel/exit.c:832
- do_group_exit+0x125/0x310 kernel/exit.c:929
- __do_sys_exit_group kernel/exit.c:940 [inline]
- __se_sys_exit_group kernel/exit.c:938 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:938
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7ff4b88fee99
-Code: Unable to access opcode bytes at RIP 0x7ff4b88fee6f.
-RSP: 002b:00007ffd58ed1578 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000064 RCX: 00007ff4b88fee99
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 00007ff4b89581e4 R08: 000000000000000c R09: 0000555556f033bc
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000016
-R13: 00007ffd58ed2850 R14: 0000555556f033bc R15: 00007ffd58ed3950
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+The bug was introduced with the commit "Bluetooth: HCI: Use skb_pull_data to parse Inquiry Result with RSSI event" (https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=8d08d324fdcb7).
