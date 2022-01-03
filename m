@@ -2,133 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2FA2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jan 2022 13:35:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0DCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Jan 2022 17:07:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233139AbiACNf2 (ORCPT
+        id S235017AbiACRHY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Jan 2022 08:35:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiACNf2 (ORCPT
+        Mon, 3 Jan 2022 12:07:24 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:46027 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231569AbiACRHX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Jan 2022 08:35:28 -0500
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE06C061761;
-        Mon,  3 Jan 2022 05:35:27 -0800 (PST)
-Received: by mail-wr1-x429.google.com with SMTP id v6so8238613wra.8;
-        Mon, 03 Jan 2022 05:35:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=VRK5HsxWtUBcHbxZyOm3gdgQYDUVk/y62Vk5hy/pEaU=;
-        b=eyKZl1xnowuNvg7+HosjAbAnByb/eZLfnnsxMp6IFAm6HsUe4RoXQ/I5ZdhtJW3X2N
-         ud2aKr68hafn4xuOqD4a/lc3TGpAZog+enKLGD7ftVz39Bal7XroHgrWBPGze0r40QDb
-         Ltxw55nWOvD0klWr1ubZIxSz1Hg5O8xm0E09AGWXjohGnOxmv/8qHwjpqIP3bagLsZCX
-         ORVGF2WDIhJwyJRIcS2vUsC7od83XShF4/zL1+0R6uU+oBGNaCPlXRtb5Ydxrr1lU/uc
-         2D2ayA1HAXCBIUBUPvrLN9aS5uSJIDbOsPalorYbyCWToes+oCFn2m99orzMKWoBlwlA
-         XOng==
+        Mon, 3 Jan 2022 12:07:23 -0500
+Received: by mail-il1-f198.google.com with SMTP id k14-20020a056e021a8e00b002b4b2388c48so17772639ilv.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Jan 2022 09:07:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=VRK5HsxWtUBcHbxZyOm3gdgQYDUVk/y62Vk5hy/pEaU=;
-        b=OGrjoAorLmXoOyUOIEb9m+Nt6ao4uo+nV0c1CZGGM9XPNpBu8yjkqQ6XlOMS2qboAv
-         jHerLfwjj4DF89THQy8tQeI23U4eUwHAmbwehoFshhVfXTF8WwUCpBaYay8ANi9TCER+
-         33Ixe5+5NANU0+G/aLPiXKenj9oagvJH9VC7TUpZVtN7wl8eP3XDbdG/mtap495PwvIq
-         zDennXiuczzLtlKoobUGqvBtaSUFmcb+I355S+25fNgxS5IAFZFinN4MnZJhvPGmrDKu
-         C4Er7AatI8Ro72xtBvQN3PxKwP3y3JaAsMyiLeDH/qOalRTLfja6N2rIIApkxwtW729N
-         wBDw==
-X-Gm-Message-State: AOAM531peGqsAxtOZ+UWxP8yRM6rzdP1yRERFwnmK0mFWg7AR526uUQS
-        knF76HzvxC0aIfJE2SqkF98jvdwek+0NSQ==
-X-Google-Smtp-Source: ABdhPJxJqfT+HfANXnaNQ/9KDj+8bSI9sQ/Bvqq4mY/RYpNPzJcmVnri8r/ZWrPCl6M8A49mXASl+g==
-X-Received: by 2002:a5d:64c8:: with SMTP id f8mr41754938wri.158.1641216926122;
-        Mon, 03 Jan 2022 05:35:26 -0800 (PST)
-Received: from [192.168.1.10] (4e691f2a.skybroadband.com. [78.105.31.42])
-        by smtp.googlemail.com with ESMTPSA id o3sm32930072wmr.15.2022.01.03.05.35.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jan 2022 05:35:25 -0800 (PST)
-Message-ID: <b583dc48-a6b6-f6c7-4a5a-678d985ce358@googlemail.com>
-Date:   Mon, 3 Jan 2022 13:35:23 +0000
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=5kB4JwrWnI9ddxNMVXxtodJTq/JfLyUnW8oK2aRYGM0=;
+        b=ImGlJrpH5JkFDXvAgohondWrsaHnZWUJF6teelUcuCHMWjovBIdMZo4t95MF2tesiU
+         j+267PlxUIFANRk8gS8girWNSRXtUFckpzwcYJ9G/b1uonC0QBo/I0TjP7oKwDzZScO9
+         bfARt1gNZDqUfns6yHOHBt+eeAPGvyGbr50ky9lwyQPkLXlARwB3WYUl1bp00wIbTFYq
+         Fe1v7LS8sim6DpldZMq4a2zt/XEia3vHyrKI+4lWa0Yt+4LpspREM3tWjPkazXTuqjUA
+         aJaDPXOU3HPRMuO8vwikM7ar24Jp9ljHgxOq1okw5yRxXW341e8kOCwewHthPG7/7OUT
+         B4MA==
+X-Gm-Message-State: AOAM530PSevDYkhbS5t1K9iYG30SxaRY8/Mx32c+jdu00YjttAcCMGCU
+        cD253elVHt1sPYdUTJIOmpRFDMovWqtdaX/8fRTvSJB4JtMg
+X-Google-Smtp-Source: ABdhPJzDaqlybMEylt1i1tatamne0ctP939e4BrjyCLYoCA+3JkBDf3Kt8suaCD9R+y7uDJ9ZxRjeYMBzEgzyukahBBsOk0xn101
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: 5.16.0-rc7+ Bluetooth error
-Content-Language: en-GB
-To:     "K, Kiran" <kiran.k@intel.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <02077a37-46d6-c94f-fa08-9da7ee99e42c@googlemail.com>
- <50ea1b0e-28d7-6d04-9c03-4becc4db143b@googlemail.com>
- <CABBYNZLc9Pj=LYhL5MUUVkhenHb_xfT59aDDkdk14k7+ojeUzw@mail.gmail.com>
- <DM8PR11MB55735DD3A1EA9132E1A71733F5499@DM8PR11MB5573.namprd11.prod.outlook.com>
-From:   Chris Clayton <chris2553@googlemail.com>
-In-Reply-To: <DM8PR11MB55735DD3A1EA9132E1A71733F5499@DM8PR11MB5573.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:18ca:: with SMTP id s10mr21423744ilu.305.1641229642239;
+ Mon, 03 Jan 2022 09:07:22 -0800 (PST)
+Date:   Mon, 03 Jan 2022 09:07:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d2127105d4b08da5@google.com>
+Subject: [syzbot] WARNING: ODEBUG bug in hci_release_dev
+From:   syzbot <syzbot+c10c909f9ddcd29c11ac@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    438645193e59 Merge tag 'pinctrl-v5.16-3' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=101babebb00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=48863e33ecce99a5
+dashboard link: https://syzkaller.appspot.com/bug?extid=c10c909f9ddcd29c11ac
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c10c909f9ddcd29c11ac@syzkaller.appspotmail.com
+
+ODEBUG: free active (active state 0) object type: timer_list hint: delayed_work_timer_fn+0x0/0x90 kernel/workqueue.c:1624
+WARNING: CPU: 1 PID: 13508 at lib/debugobjects.c:505 debug_print_object+0x16e/0x250 lib/debugobjects.c:505
+Modules linked in:
+CPU: 1 PID: 13508 Comm: syz-executor.3 Not tainted 5.16.0-rc6-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:505
+Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd c0 37 05 8a 4c 89 ee 48 c7 c7 c0 2b 05 8a e8 9f 20 22 05 <0f> 0b 83 05 95 c9 b1 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
+RSP: 0018:ffffc90002c2fa40 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000003 RCX: 0000000000000000
+RDX: ffff88801c483a00 RSI: ffffffff815f1258 RDI: fffff52000585f3a
+RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff815eaffe R11: 0000000000000000 R12: ffffffff89adf5e0
+R13: ffffffff8a053200 R14: ffffffff81660770 R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9cd44481b8 CR3: 000000001838d000 CR4: 0000000000350ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:992 [inline]
+ debug_check_no_obj_freed+0x301/0x420 lib/debugobjects.c:1023
+ slab_free_hook mm/slub.c:1698 [inline]
+ slab_free_freelist_hook+0xeb/0x1c0 mm/slub.c:1749
+ slab_free mm/slub.c:3513 [inline]
+ kfree+0xf6/0x560 mm/slub.c:4561
+ hci_release_dev+0x7a8/0xb70 net/bluetooth/hci_core.c:3970
+ bt_host_release+0x73/0x90 net/bluetooth/hci_sysfs.c:88
+ device_release+0x9f/0x240 drivers/base/core.c:2230
+ kobject_cleanup lib/kobject.c:705 [inline]
+ kobject_release lib/kobject.c:736 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1c8/0x540 lib/kobject.c:753
+ put_device+0x1b/0x30 drivers/base/core.c:3501
+ vhci_release+0x78/0xe0 drivers/bluetooth/hci_vhci.c:463
+ __fput+0x286/0x9f0 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xc14/0x2b40 kernel/exit.c:832
+ do_group_exit+0x125/0x310 kernel/exit.c:929
+ __do_sys_exit_group kernel/exit.c:940 [inline]
+ __se_sys_exit_group kernel/exit.c:938 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:938
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7ff4b88fee99
+Code: Unable to access opcode bytes at RIP 0x7ff4b88fee6f.
+RSP: 002b:00007ffd58ed1578 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000064 RCX: 00007ff4b88fee99
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 00007ff4b89581e4 R08: 000000000000000c R09: 0000555556f033bc
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000016
+R13: 00007ffd58ed2850 R14: 0000555556f033bc R15: 00007ffd58ed3950
+ </TASK>
 
 
-On 03/01/2022 09:55, K, Kiran wrote:
-> Hi Luiz, Chris,
-> 
->> -----Original Message-----
->> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
->> Sent: Saturday, January 1, 2022 1:23 AM
->> To: Chris Clayton <chris2553@googlemail.com>
->> Cc: LKML <linux-kernel@vger.kernel.org>; linux-bluetooth@vger.kernel.org;
->> K, Kiran <kiran.k@intel.com>
->> Subject: Re: 5.16.0-rc7+ Bluetooth error
->>
->> Hi Chris,
->>
->> On Fri, Dec 31, 2021 at 2:35 AM Chris Clayton <chris2553@googlemail.com>
->> wrote:
->>>
->>> On 30/12/2021 09:21, Chris Clayton wrote:
->>>> Hi,
->>>>
->>>> I pulled the latest changes into my clone of Linus' tree and built
->>>> and installed the kernel. (git describe gives
->>>> v5.16-rc7-9-ge7c124bd0463). I'm seeing errors reported by the
->>>> bluetooth subsystem that i don't see in 5.15.12 or 5.10.89
->>>>
->>>> The problem seems to occur twice during system startup and on each
->> occasion I see a batch of identical error messages:
->>>>
->>>> [    3.980822] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.982812] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.984812] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.986608] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.987621] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.988606] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>> [    3.989650] Bluetooth: hci0: Failed to read codec capabilities (-56)
->>>>
->>>
->>> Sorry, I should have said that despite the above errors, my bluetooth
->> devices still work fine.
->>
->> Would be great to have the HCI trace (btmon).
->>
->> @Kiran K Is this to be expected?
-> 
-> May be the BT controller here is not supporting HCI_READ_CODEC_CAPABILITIES command.
-> 
-> This has been fixed - https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=107fe0482b549a0e43a971e5fd104719c6e495ef
-> 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I've applied the patch to 5.16.0-rc8 and the error messages are no longer produced. My bluetooth devices are stiil working.
-
-Tested-By: Chris Clayton <chris2553@googlemail.com>
-
-> A check has been added to read codec capabilities only if supported.
-> 
-> Thanks,
-> Kiran
-> 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
