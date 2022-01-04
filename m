@@ -2,96 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B3FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 14:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C40C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 14:34:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233875AbiADOOx (ORCPT
+        id S234257AbiADOey (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jan 2022 09:14:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50804 "EHLO
+        Tue, 4 Jan 2022 09:34:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233807AbiADOOx (ORCPT
+        with ESMTP id S232904AbiADOey (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jan 2022 09:14:53 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF996C061761;
-        Tue,  4 Jan 2022 06:14:52 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id by39so60872992ljb.2;
-        Tue, 04 Jan 2022 06:14:52 -0800 (PST)
+        Tue, 4 Jan 2022 09:34:54 -0500
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 078A3C061761;
+        Tue,  4 Jan 2022 06:34:54 -0800 (PST)
+Received: by mail-yb1-xb29.google.com with SMTP id g80so64766074ybf.0;
+        Tue, 04 Jan 2022 06:34:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=j+KR6yo0w4DU0VDvp5TpT7prkSMR0PFKueK7Af1t9HE=;
-        b=b+m+I2UnzuJQOE/3/rp2Z70kjc2h4wsah6JeJ9AbLMEHUMT2IrKvrOu0TZA7wUZEBV
-         EkevQokctBRj4sp+MFLFheu45uGdM/rGZWmvzugt2mtt5ITiWXX4Ye/9eRnpJOYDddng
-         zeVvnTKUxMVA7B6htKhDkLnEQgw86fXtpxsE6qgWdRYyNz+iyt9NlSbbyIMYRNJJitVB
-         frKvvEvKT31eDHOIaEx0crjwqX0k+tZCSXlMZcYVqc2YzUVxUC5Q86Wzox4ujyeaioNn
-         az8C/z0Hozuw1ns2ge4vobFGiN+7Lq7ft3DRBk0lleRi4P06GLkHIKtnLAgZjnmBKcfP
-         h0xQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1I8V+uRVCFde8TDw1Syj7IYeFiqjg/uEQaa3IZgcSIM=;
+        b=mH2ASWCXNWYTYQ9alZR/1t3Wck2R+vlUTMOapZnK+hDDwBwtoyBiFWiwiY0cohppS5
+         Ram0FqKQyb1Z2kAFtxKYdjRXfbUbQkzkldOINID9arbh0Fc5QoD2V/Hux0S/mArNj3Vu
+         yN2656APixeSzZrvZNNWI9keCwx1H3TPWtNzNqjsG+F090upzaT7UP5ZTS+wUiMcy2om
+         FpfAfXD+GRv0Q8DdukycG8v59FfjH7HEJlOsoZSwBAMG3z9FFbT0CT5P6zioA0d6tX/w
+         d0Oz0mTfnEIWEN6Y/We12rGs+eOFAI5TNZEkkOqB6iMiPWH82+JdJ1KtQ6pfmHLnEv0g
+         HoZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=j+KR6yo0w4DU0VDvp5TpT7prkSMR0PFKueK7Af1t9HE=;
-        b=W8PsSr2of3lZzK7Voo88LWWfzZSIdedyyfzhHidwXN+PFjPA4dBi0DahrpkTGrNrQN
-         hi1VkyxHEC8jel3EclnrdjriIR8EhFi3DkR/4Dwg8k1YkeuvJAb1uyp6FrDc8x0kz/ER
-         6+yJHf6RaH01M6A4lID90El02l9y6SAuk3TSnBKk3f583ti1YRlXcAeTfs5V5H4e73mF
-         7eJgGIyaUfJtS+iBcOpPYGC5mjco9wFPjDCfE3icDSVxMgwZ+KPiFmCBzeN8EiPe0yWV
-         C0xJYLURu4ByvdhZONWSmTEAtiWGMUvF/s3u0Pyc/4eHcWNUArE8kdhktP0wkaZUDCc+
-         nKSw==
-X-Gm-Message-State: AOAM5314IMdcwhvi0gDPDcahrO+q2FUmlOXmJgjDIiqDyHp85nLu47Ll
-        StbanlEWoAUWX17/rEd+bYY=
-X-Google-Smtp-Source: ABdhPJylDt39BDuHM0Gi69h6JEKY1zQcf4T07X1J4U2kdHArDnWh5RDm/VhNV/dibeKJC7D+BtiN1g==
-X-Received: by 2002:a2e:854b:: with SMTP id u11mr31833344ljj.390.1641305690964;
-        Tue, 04 Jan 2022 06:14:50 -0800 (PST)
-Received: from [192.168.1.11] ([94.103.235.38])
-        by smtp.gmail.com with ESMTPSA id c37sm3814430lfv.0.2022.01.04.06.14.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jan 2022 06:14:50 -0800 (PST)
-Message-ID: <6338e7cd-80cb-11af-e3c0-edd740bb9e49@gmail.com>
-Date:   Tue, 4 Jan 2022 17:14:49 +0300
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1I8V+uRVCFde8TDw1Syj7IYeFiqjg/uEQaa3IZgcSIM=;
+        b=2kcf7sPuqUQMZpt5yYSIYaKzZVzDbeR+RBhfuHs1nSTPbddNTcxnh+1A8SgiBYhbm1
+         CnTH2/GQsfXGNEqIqnu7AcqMC3BJWHdHWHkEZaA+I0zmoIKfG4Pq5jMWF0u08ZHiB1bZ
+         uAULpmmx3Ffg6ml9fbOXFJ9B+ebY/SzrIHNJYXVzaRFuB9d24mU9k6/QUgwBT1oRJ203
+         BAZL+cRwxNSFPEwT74EVRat1RVzQawpGK4KZTGeZ1NknyPCma2fvp6V9iILT49e8mjHQ
+         b3R5nUyJC0pTsWqWWsZ0lxCPLxLzCGW+xAp5sl58e2MJeTY7YI3GNtG9uYoj6RbU+YX6
+         dgXg==
+X-Gm-Message-State: AOAM533FR46Yyn8O4WATOV3txmggO3/akpt5aL2A6x2++WNMCNvgDaME
+        f1m8FmfJYpWWrsuLrwFI2h8YHcXfc5VBnqU/xFM=
+X-Google-Smtp-Source: ABdhPJxgLTDOUdxKtPHOX3cG7eOARJMBZpSD/Q4L7hc1uYG+3yqK2qJ2ww2LO3vykV6WyzHwQ5UmTOUf/af+jbPd5mE=
+X-Received: by 2002:a25:44c5:: with SMTP id r188mr61357398yba.160.1641306893263;
+ Tue, 04 Jan 2022 06:34:53 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: INFO: trying to register non-static key in hci_uart_tx_wakeup
-Content-Language: en-US
-To:     kvartet <xyru1999@gmail.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Cc:     sunhao.th@gmail.com
 References: <CAFkrUsjA1qai+1ysWS_LEUYcMGo+ZRF3v743q6k9e4roF6PWZw@mail.gmail.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <CAFkrUsjA1qai+1ysWS_LEUYcMGo+ZRF3v743q6k9e4roF6PWZw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <6338e7cd-80cb-11af-e3c0-edd740bb9e49@gmail.com>
+In-Reply-To: <6338e7cd-80cb-11af-e3c0-edd740bb9e49@gmail.com>
+From:   kvartet <xyru1999@gmail.com>
+Date:   Tue, 4 Jan 2022 22:34:41 +0800
+Message-ID: <CAFkrUsgEJcMAdVUP3aUB7-H4YmUjFeii5754nPpOVh+vo3bnLA@mail.gmail.com>
+Subject: Re: INFO: trying to register non-static key in hci_uart_tx_wakeup
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, sunhao.th@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 1/4/22 11:49, kvartet wrote:
-> Hello,
-> 
-> When using Syzkaller to fuzz the latest Linux kernel, the following
-> crash was triggered.
-> 
-> HEAD commit: a7904a538933 Linux 5.16-rc6
-> git tree: upstream
-> console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/plain/
-> kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
-> 
+We are so sorry for that. You can try the following websites, which
+can be accessed without registration.
 
-Btw, can you, please, use plain pastbin or something else, that does not 
-require a registration? I think, most people here do not have ubuntu one 
-account and don't want to have one. I saw people using google drive for 
-these kind of things
+console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/
+kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/
+
+Sorry again and look forward to your reply!
 
 
-Thanks for your reports!
+Best Regards,
+Yiru
 
-
-
-With regards,
-Pavel Skripkin
+Pavel Skripkin <paskripkin@gmail.com> =E4=BA=8E2022=E5=B9=B41=E6=9C=884=E6=
+=97=A5=E5=91=A8=E4=BA=8C 22:14=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 1/4/22 11:49, kvartet wrote:
+> > Hello,
+> >
+> > When using Syzkaller to fuzz the latest Linux kernel, the following
+> > crash was triggered.
+> >
+> > HEAD commit: a7904a538933 Linux 5.16-rc6
+> > git tree: upstream
+> > console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/plain/
+> > kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
+> >
+>
+> Btw, can you, please, use plain pastbin or something else, that does not
+> require a registration? I think, most people here do not have ubuntu one
+> account and don't want to have one. I saw people using google drive for
+> these kind of things
+>
+>
+> Thanks for your reports!
+>
+>
+>
+> With regards,
+> Pavel Skripkin
