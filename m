@@ -2,260 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7FDC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 19:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C6CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 21:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbiADTb7 (ORCPT
+        id S233797AbiADVAz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jan 2022 14:31:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
+        Tue, 4 Jan 2022 16:00:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbiADTb7 (ORCPT
+        with ESMTP id S233786AbiADVAy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jan 2022 14:31:59 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7071C061761;
-        Tue,  4 Jan 2022 11:31:58 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id k69so95318625ybf.1;
-        Tue, 04 Jan 2022 11:31:58 -0800 (PST)
+        Tue, 4 Jan 2022 16:00:54 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34549C061761
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Jan 2022 13:00:54 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id r16-20020a17090a0ad000b001b276aa3aabso981560pje.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Jan 2022 13:00:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ZUmYnewajUUvHDk12rdHt48TosSqpa/5GnoBuuSoIB4=;
-        b=Br4tWtLeLrkstlqQrIPO2tqHJ9NB387n/tvG8oatYpD4PmEDpDDxMfZq8YLD2TGvuT
-         5UpQUl4wmsE6G4mwC7u7e+znKMiM96tbv0bMRgSimm68CV2MZBuKetH5O4lsOYtSxUqx
-         h1vFTp49QtEPgMZHrMAp4DUkv9Y+GGYMCdUwasNSctWkN0KldojsJIaRkBIJ9SX5C2wP
-         IWxYnzo+I3k9MazDiPfUuSSxxcgiI0NWhmKiElCjNozdjvQ2cYr5CgFfkxfNRxg05tPh
-         CwOrzqiWsZUEWVNFk8eeWfzel4bsM4G4ZKe5KxlMh9G5g5eiO1Gd3kU9cEE+HjJBOL37
-         WE+w==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3VZWY56Xt6CKt+/kdJXdBXHceV4AOU3kE15D/bE9RgY=;
+        b=Ug5cAojzB+oRt0shFd/TgTQEDFU6S85VY483/prXj67kHa3/nqGtLzY31FhW8l1oCd
+         NsJFk47mGetpaboBy9nJTEzrwoqBhWJ2+s3nHjhI/9SDFs5UDuTeNIFnp0IWDf6z7IJf
+         OuyWFLzsiFnR/Cpr2CxAhBVsWzUrIn75z+Yw47tLoWJXjl9SaiXxSw9mmsxeDkcohhld
+         uDowpbO7RjqAW1ADcBF+V518C1kxti9ENW6z8hvPMeeDP+3ZUJc2Ps3GB2DSDrL3cnls
+         Vue2bC7gJTuq3J2njv9qKDswAiC1wTbfjt5TCTOUUsbzdrmbMKvorys5/0JyKHxU9tsi
+         6dIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ZUmYnewajUUvHDk12rdHt48TosSqpa/5GnoBuuSoIB4=;
-        b=hxdWoj+TEEJePUnR2jh4wLOTcJ2cN/4wsuaKVMd7Pvhe0xSkwJyeaj1LRUNenZ2Qcl
-         ImY8lo8ca5N+Ouomsa6520CmgXBe99LFvQZjtyWzQh9WCqBidI1tqRmKZIXbntlmKga3
-         Xpg2MSJlPHaX7YPqBn5AZDZ1OemEHa0mS77FXm4QNR7Vnq/qhCxcbLSlOO/VkBrW/Jk+
-         9FNdMhWKoCiLPjI8GruoLi1UW3FusDDiWL0cYDhaXY/eWDBXPRTxhJT1FsqNZHLY996+
-         ezpizL36PSBOe7VkzmL1Vsp6Xxp2qCPVbh+CUojwaxwz/GUza1YHCu97G9+X+czJrevm
-         v05A==
-X-Gm-Message-State: AOAM53257wy2bVC2XotvrgRZr+PydXoekPWsVxaUBK0VwuclOgcjH/lL
-        LnPu7bMXPDxf1I2JOfdbRo0eUizyEHdcTVmtJWs=
-X-Google-Smtp-Source: ABdhPJzGkKTPjiGZXa8KTqv7wwDAr49A+dkxXNihb8pFbpigM24bqwkdF8iFdJD/KJjzbL2JfUUYrjy0j5apnlY/stQ=
-X-Received: by 2002:a25:7189:: with SMTP id m131mr67230099ybc.284.1641324717682;
- Tue, 04 Jan 2022 11:31:57 -0800 (PST)
-MIME-Version: 1.0
-References: <36ec2e79-7544-ba14-8bdd-d748dfad0ea7@eknoes.de>
- <CABBYNZJwqb0xKa+iX4zOBYpZ2j0ZFbHPRztQ1z5xJL7kq6-9Ag@mail.gmail.com> <91bface3-975d-b79c-2da0-77e24e355fa7@eknoes.de>
-In-Reply-To: <91bface3-975d-b79c-2da0-77e24e355fa7@eknoes.de>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3VZWY56Xt6CKt+/kdJXdBXHceV4AOU3kE15D/bE9RgY=;
+        b=p90+79U7dtmPlgaMv2j5E0Tu4QjOjDwC1/TUKdSH7IcQLB1jqSLXQPqoDJdYOiatH7
+         SS9yICeBdnpV3t1JSgBO/FCU26R+PX1bpE4fyE1RXIAXvvsEibgtWhiSdzSxVSo1aY1P
+         JicQ3GJSTp/G0y7bcbK0K5n7pFUv3FeQ0/A0i2LKZujNgyaiJqK1q5pxJTbkIhD2L9Nf
+         PVx82UE2EzM6CS0luA+FfnFebG7CRnEFd3glrTemzktMDpRrfhTGwQbzsst8yqc+FZNB
+         ddI/PXKiEFxClxnqsF55uj/yAdryLCp1oXR4EXxnD13w4J+4MCSxXY0CxyjAV+M7XwxV
+         BSCQ==
+X-Gm-Message-State: AOAM532AyHGNAXDpAJ/STskmkYwYWZBwmvFChUY//VSl3Skyd3tZRfYM
+        BkuN9MeRQX4ORCZuSh9fPGkb6eyR2/s=
+X-Google-Smtp-Source: ABdhPJxHcVuoDNHn6NDiPCkhtnqk1TNQ+YoT3BEzsyz58lEtJMuuHL3X1GECWuA7+kgKXlGsKq7Nfg==
+X-Received: by 2002:a17:902:6b0a:b0:149:9fb2:8631 with SMTP id o10-20020a1709026b0a00b001499fb28631mr26097711plk.73.1641330053386;
+        Tue, 04 Jan 2022 13:00:53 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id b6sm218948pjk.29.2022.01.04.13.00.52
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jan 2022 13:00:53 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 4 Jan 2022 11:31:46 -0800
-Message-ID: <CABBYNZLrXh-Zc8wHSzZkvpx0oZGLsR0r_59V2zhAmtRQXTC9yg@mail.gmail.com>
-Subject: Re: [BUG] Page Fault in hci_inquiry_result_with_rssi_evt
-To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: hci_event: Rework hci_inquiry_result_with_rssi_evt
+Date:   Tue,  4 Jan 2022 13:00:51 -0800
+Message-Id: <20220104210051.2982871-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi S=C3=B6nke,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jan 4, 2022 at 3:50 AM S=C3=B6nke Huster <soenke.huster@eknoes.de> =
-wrote:
->
-> Hi Luiz,
->
-> On 04.01.22 01:38, Luiz Augusto von Dentz wrote:
-> > Hi S=C3=B6nke,
-> >
-> > On Mon, Jan 3, 2022 at 3:41 PM S=C3=B6nke Huster <soenke.huster@eknoes.=
-de> wrote:
-> >>
-> >> Hello,
-> >>
-> >> While fuzzing bluetooth-next I found the following bug:
-> >>
-> >> [   27.333034] BUG: unable to handle page fault for address: fffff61a1=
-a1a1a1a
-> >> [   27.333241] #PF: supervisor read access in kernel mode
-> >> [   27.333241] #PF: error_code(0x0000) - not-present page
-> >> [   27.333241] PGD 6dfd2067 P4D 6dfd2067 PUD 0
-> >> [   27.333241] Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> >> [   27.333241] CPU: 0 PID: 45 Comm: kworker/u3:2 Not tainted 5.16.0-rc=
-1+ #81
-> >> [   27.333241] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), =
-BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> >> [   27.333241] Workqueue: hci0 hci_rx_work
-> >> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
-> >> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 0=
-0 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
-> >> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
-> >> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffff=
-ff834663d1
-> >> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88=
-800affb074
-> >> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffff=
-ff83487b35
-> >> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88=
-800affb000
-> >> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88=
-800aae0000
-> >> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) k=
-nlGS:0000000000000000
-> >> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 000000=
-00000006f0
-> >> [   27.333241] Call Trace:
-> >> [   27.333241]  <TASK>
-> >> [   27.333241]  ? wait_for_completion_io+0x270/0x270
-> >> [   27.333241]  ? hci_inquiry_result_evt+0x4b0/0x4b0
-> >> [   27.333241]  hci_event_packet+0x3b11/0x7b10
-> >> [   27.333241]  ? lock_chain_count+0x20/0x20
-> >> [   27.333241]  ? hci_cmd_status_evt.constprop.0+0x4ea0/0x4ea0
-> >> [   27.333241]  ? sysvec_reboot+0x50/0xc0
-> >> [   27.333241]  ? find_held_lock+0x2c/0x110
-> >> [   27.333241]  ? lock_release+0x3b2/0x6f0
-> >> [   27.333241]  ? skb_dequeue+0x110/0x1a0
-> >> [   27.333241]  ? mark_held_locks+0x9e/0xe0
-> >> [   27.333241]  ? lockdep_hardirqs_on_prepare+0x17b/0x400
-> >> [   27.333241]  hci_rx_work+0x4d3/0xb90
-> >> [   27.333241]  process_one_work+0x904/0x1590
-> >> [   27.333241]  ? lock_release+0x6f0/0x6f0
-> >> [   27.333241]  ? pwq_dec_nr_in_flight+0x230/0x230
-> >> [   27.333241]  ? rwlock_bug.part.0+0x90/0x90
-> >> [   27.333241]  ? _raw_spin_lock_irq+0x41/0x50
-> >> [   27.333241]  worker_thread+0x578/0x1310
-> >> [   27.333241]  ? process_one_work+0x1590/0x1590
-> >> [   27.333241]  kthread+0x3b2/0x490
-> >> [   27.333241]  ? _raw_spin_unlock_irq+0x1f/0x40
-> >> [   27.333241]  ? set_kthread_struct+0x100/0x100
-> >> [   27.333241]  ret_from_fork+0x22/0x30
-> >> [   27.333241]  </TASK>
-> >> [   27.333241] Modules linked in:
-> >> [   27.333241] CR2: fffff61a1a1a1a1a
-> >> [   27.333241] ---[ end trace 6a6825484c8fefa6 ]---
-> >> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
-> >> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 0=
-0 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
-> >> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
-> >> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffff=
-ff834663d1
-> >> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88=
-800affb074
-> >> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffff=
-ff83487b35
-> >> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88=
-800affb000
-> >> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88=
-800aae0000
-> >> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) k=
-nlGS:0000000000000000
-> >> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 000000=
-00000006f0
-> >> [   27.379996] kworker/u3:2 (45) used greatest stack depth: 27736 byte=
-s left
-> >>
-> >> It occurs when sending the following frame to the kernel:
-> >>
-> >> $ xxd crashes/hci_inquiry_result_with_rssi_evt
-> >> 00000000: 0422 24d0 d0d0 d0d0 d0ff ff              ."$........
-> >>
-> >> The bug was introduced with the commit "Bluetooth: HCI: Use skb_pull_d=
-ata to parse Inquiry Result with RSSI event" (https://git.kernel.org/pub/sc=
-m/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=3D8d08d324fdcb7)=
-.
-> >
-> > That is pretty weird, the data seems to be the following:
-> >
-> > 04 -> HCI_EVENT_PKT
-> > 22 -> HCI_EV_INQUIRY_RESULT_WITH_RSSI
-> > 24 -> hci_ev_inquiry_result_rssi.num
-> > d0 d0d0 d0d0 d0ff ff
-> >
-> > But this should never evaluate to true for:
-> >
-> > if (skb->len =3D=3D flex_array_size(ev, res2->info, ev->res2->num)) {
-> > ...
-> > } else if (skb->len =3D=3D flex_array_size(ev, res1->info, ev->res1->nu=
-m)) {
-> >
->
-> I'm sorry, I forgot to mention the affected source code, the check seems =
-to be too late. GDB says it is already happening in net/bluetooth/hci_event=
-.c:4519:
->
-> (gdb) list *hci_inquiry_result_with_rssi_evt+0x9b
-> 0xffffffff83470d8b is in hci_inquiry_result_with_rssi_evt (net/bluetooth/=
-hci_event.c:4519).
-> 4514            struct inquiry_data data;
-> 4515            int i;
-> 4516
-> 4517            bt_dev_dbg(hdev, "num_rsp %d", ev->res1->num);
-> 4518
-> 4519            if (!ev->res1->num) # <- page fault here
-> 4520                    return;
->
-> I just reproduced it on the HEAD of bluetooth-next (for-net-next-2021-12-=
-29).
+This rework the handling of hci_inquiry_result_with_rssi_evt to not use
+a union to represent the different inquiry responses.
 
-That would mean there is less data than the hci_ev.min_len, but that
-is checked in hci_event_func prior to calling the hci_ev.func:
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci.h |  6 +-----
+ net/bluetooth/hci_event.c   | 19 +++++++++----------
+ 2 files changed, 10 insertions(+), 15 deletions(-)
 
-if (skb->len < ev->min_len) {
-bt_dev_err(hdev, "unexpected event 0x%2.2x length: %u < %u",
-   event, skb->len, ev->min_len);
-return;
-}
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index e2b06bb79e2e..35c073d44ec5 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -2233,11 +2233,7 @@ struct inquiry_info_rssi_pscan {
+ } __packed;
+ struct hci_ev_inquiry_result_rssi {
+ 	__u8     num;
+-	struct inquiry_info_rssi info[];
+-} __packed;
+-struct hci_ev_inquiry_result_rssi_pscan {
+-	__u8     num;
+-	struct inquiry_info_rssi_pscan info[];
++	__u8     data[];
+ } __packed;
+ 
+ #define HCI_EV_REMOTE_EXT_FEATURES	0x23
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f1082b7c0218..fc30f4c03d29 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4507,16 +4507,13 @@ static void hci_pscan_rep_mode_evt(struct hci_dev *hdev, void *data,
+ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
+ 					     struct sk_buff *skb)
+ {
+-	union {
+-		struct hci_ev_inquiry_result_rssi *res1;
+-		struct hci_ev_inquiry_result_rssi_pscan *res2;
+-	} *ev = edata;
++	struct hci_ev_inquiry_result_rssi *ev = edata;
+ 	struct inquiry_data data;
+ 	int i;
+ 
+-	bt_dev_dbg(hdev, "num_rsp %d", ev->res1->num);
++	bt_dev_dbg(hdev, "num_rsp %d", ev->num);
+ 
+-	if (!ev->res1->num)
++	if (!ev->num)
+ 		return;
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
+@@ -4524,10 +4521,11 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	if (skb->len == flex_array_size(ev, res2->info, ev->res2->num)) {
++	if (skb->len == array_size(ev->num,
++				   sizeof(struct inquiry_info_rssi_pscan))) {
+ 		struct inquiry_info_rssi_pscan *info;
+ 
+-		for (i = 0; i < ev->res2->num; i++) {
++		for (i = 0; i < ev->num; i++) {
+ 			u32 flags;
+ 
+ 			info = hci_ev_skb_pull(hdev, skb,
+@@ -4554,10 +4552,11 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
+ 					  info->dev_class, info->rssi,
+ 					  flags, NULL, 0, NULL, 0);
+ 		}
+-	} else if (skb->len == flex_array_size(ev, res1->info, ev->res1->num)) {
++	} else if (skb->len == array_size(ev->num,
++					  sizeof(struct inquiry_info_rssi))) {
+ 		struct inquiry_info_rssi *info;
+ 
+-		for (i = 0; i < ev->res1->num; i++) {
++		for (i = 0; i < ev->num; i++) {
+ 			u32 flags;
+ 
+ 			info = hci_ev_skb_pull(hdev, skb,
+-- 
+2.33.1
 
->
-> > These requires the data to be multiple of sizeof(struct
-> > inquiry_info_rssi_pscan) =3D 15 bytes or sizeof(struct
-> > inquiry_info_rssi) =3D 14 bytes respectively where the data left is jus=
-t
-> > 8 bytes long, besides with the number of entries being 0x24 this shall
-> > be well beyond skb->len which shall have cause the else clause:
-> >
-> >   } else {
-> >       bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
-> >                          HCI_EV_INQUIRY_RESULT_WITH_RSSI);
-> >   }
-> >
->
-> I think prior to the commit that introduced that, the check was made befo=
-re casting it to the struct, so from the "raw" skb->data:
->
-> -       int num_rsp =3D *((__u8 *) skb->data);
-> -       if ((skb->len - 1) / num_rsp !=3D sizeof(struct inquiry_info_with=
-_rssi)) {
-
-That is still being checked, anyway that would cause a page fault when
-accessing num_rsp so I don't understand why it would cause a page
-fault now when previously it didn't even check if there were any bytes
-to be read, perhaps there is some memory alignment at play.
-
-> > Anyway the bluetooth-next has been updated since last week so I first
-> > attempt to reproduce with a fresh clone of it since we did some fixups
-> > since then.
-> >
->
-> Btw, what is the best way to provide an easily reproducible bug report he=
-re, I did not figure that out yet.
->
-> Also, when searching for bugs (to ideally provide patches), I am currentl=
-y searching on the HEAD of bluetooth-next. As far as I understood it, the t=
-ags "for-net-..." should be more or less stable, as they are merged to net-=
-next which makes its way to mainline, right?
-
-Yep, those are the tags we sent to net-next but in general
-bluetooth-next shall also be stable since we run CI on every patch
-nowadays.
-
---=20
-Luiz Augusto von Dentz
