@@ -2,180 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B73C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 08:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33BA0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 11:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234279AbiADIuI (ORCPT
+        id S232641AbiADLus (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jan 2022 03:50:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232894AbiADIuH (ORCPT
+        Tue, 4 Jan 2022 06:50:48 -0500
+Received: from giacobini.uberspace.de ([185.26.156.129]:42290 "EHLO
+        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231315AbiADLur (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jan 2022 03:50:07 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44712C061761;
-        Tue,  4 Jan 2022 00:50:07 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id d201so82127958ybc.7;
-        Tue, 04 Jan 2022 00:50:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=+gNtiVxoPcFMmHAi0IVREklEDEbSigV3EqXCOXXkxjM=;
-        b=Yzwkva2sQu6wuNDQyd6TaY043pQYr3U16bA1Qik7vfu67Wf/TDhj7W5uQRNSkFvUTC
-         meJPgXmenC1yAS7PHawaKhjPvlx2mvG59eAicRmTTAc7MI/6NwL710dtU+GO9p6C7wpH
-         rGdNXqwCYnkTJwfU8i3YhViEZSbP2z0BSfPx5iEt5qMtLO3yWzYHWwB/haCvI7mhjUJv
-         gMZvhyAmaB6S+Riqn+QJAhxZw8k9lYj0omaZxq0OrPO5bkG6pDMMMe8BmlTEugSgRYQr
-         ++REQmvXsXacXVxGVLAmhNSBP86oJj3nWhJKOWtlQZ8HNOsh8Hml5VIcsJ1VkSpp6LyY
-         4HGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=+gNtiVxoPcFMmHAi0IVREklEDEbSigV3EqXCOXXkxjM=;
-        b=m0qEOggw72ArwxNmhOuj1kbhUNkC3x0pxVXfX8SHldINdPdWmoncJGYwR4vaTBMCy7
-         0ENTOZPhlfq7lcF8CU2AQ5el23mIZPvQG78imEHW2tKwXavLOD9NTac5DrMVvUsATODL
-         d2MP2eE1T+4CF5/i1QJJ5Qip0uXINjHvwspIyV9+NCVnB8wFyWMp2SVXJDwAeXHljr8y
-         hwWpM1oK/S1kyFVx5+veXXYtg72MLnHuS1ksh2UBbuSARyUZQXqSZ3CDCpRIgfud6KNO
-         SvoQ2Om4TbGrzjy0mqt+amqv3adDkFXhcGUXXrthANx1Skiux1R+PEmuPpbfSfEUickG
-         4weA==
-X-Gm-Message-State: AOAM530UHbcryOuMAUL1bryd8DlMzmiKBN/CQ6LTR1tPUD5vlDCCCVHL
-        tHKRWh7JDgDOZjRrc+qpV8C94EyxC3VLD7PYHkHlUDh+dwYMKh/u
-X-Google-Smtp-Source: ABdhPJykcPuuEPvSYYg5wR/ziR5FoYoJSfIm+ZLkAau9PmvSUGGAWUGVTh9p0UbSyTF0OJPvx2MpP92zdqgvaC4d2fg=
-X-Received: by 2002:a25:da0e:: with SMTP id n14mr50755123ybf.35.1641286206529;
- Tue, 04 Jan 2022 00:50:06 -0800 (PST)
+        Tue, 4 Jan 2022 06:50:47 -0500
+Received: (qmail 6661 invoked by uid 990); 4 Jan 2022 11:50:45 -0000
+Authentication-Results: giacobini.uberspace.de;
+        auth=pass (plain)
+Message-ID: <91bface3-975d-b79c-2da0-77e24e355fa7@eknoes.de>
+Date:   Tue, 4 Jan 2022 12:50:44 +0100
 MIME-Version: 1.0
-From:   kvartet <xyru1999@gmail.com>
-Date:   Tue, 4 Jan 2022 16:49:55 +0800
-Message-ID: <CAFkrUsjA1qai+1ysWS_LEUYcMGo+ZRF3v743q6k9e4roF6PWZw@mail.gmail.com>
-Subject: INFO: trying to register non-static key in hci_uart_tx_wakeup
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Cc:     sunhao.th@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+References: <36ec2e79-7544-ba14-8bdd-d748dfad0ea7@eknoes.de>
+ <CABBYNZJwqb0xKa+iX4zOBYpZ2j0ZFbHPRztQ1z5xJL7kq6-9Ag@mail.gmail.com>
+From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
+Subject: Re: [BUG] Page Fault in hci_inquiry_result_with_rssi_evt
+In-Reply-To: <CABBYNZJwqb0xKa+iX4zOBYpZ2j0ZFbHPRztQ1z5xJL7kq6-9Ag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: /
+X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-2.999149) R_MIXED_CHARSET(0.625) SUSPICIOUS_RECIPS(1.5)
+X-Rspamd-Score: -0.974149
+Received: from unknown (HELO unkown) (::1)
+        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Tue, 04 Jan 2022 12:50:44 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Luiz,
 
-When using Syzkaller to fuzz the latest Linux kernel, the following
-crash was triggered.
+On 04.01.22 01:38, Luiz Augusto von Dentz wrote:
+> Hi Sönke,
+> 
+> On Mon, Jan 3, 2022 at 3:41 PM Sönke Huster <soenke.huster@eknoes.de> wrote:
+>>
+>> Hello,
+>>
+>> While fuzzing bluetooth-next I found the following bug:
+>>
+>> [   27.333034] BUG: unable to handle page fault for address: fffff61a1a1a1a1a
+>> [   27.333241] #PF: supervisor read access in kernel mode
+>> [   27.333241] #PF: error_code(0x0000) - not-present page
+>> [   27.333241] PGD 6dfd2067 P4D 6dfd2067 PUD 0
+>> [   27.333241] Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
+>> [   27.333241] CPU: 0 PID: 45 Comm: kworker/u3:2 Not tainted 5.16.0-rc1+ #81
+>> [   27.333241] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+>> [   27.333241] Workqueue: hci0 hci_rx_work
+>> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+>> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+>> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+>> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffffff834663d1
+>> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88800affb074
+>> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffffff83487b35
+>> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88800affb000
+>> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88800aae0000
+>> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+>> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 00000000000006f0
+>> [   27.333241] Call Trace:
+>> [   27.333241]  <TASK>
+>> [   27.333241]  ? wait_for_completion_io+0x270/0x270
+>> [   27.333241]  ? hci_inquiry_result_evt+0x4b0/0x4b0
+>> [   27.333241]  hci_event_packet+0x3b11/0x7b10
+>> [   27.333241]  ? lock_chain_count+0x20/0x20
+>> [   27.333241]  ? hci_cmd_status_evt.constprop.0+0x4ea0/0x4ea0
+>> [   27.333241]  ? sysvec_reboot+0x50/0xc0
+>> [   27.333241]  ? find_held_lock+0x2c/0x110
+>> [   27.333241]  ? lock_release+0x3b2/0x6f0
+>> [   27.333241]  ? skb_dequeue+0x110/0x1a0
+>> [   27.333241]  ? mark_held_locks+0x9e/0xe0
+>> [   27.333241]  ? lockdep_hardirqs_on_prepare+0x17b/0x400
+>> [   27.333241]  hci_rx_work+0x4d3/0xb90
+>> [   27.333241]  process_one_work+0x904/0x1590
+>> [   27.333241]  ? lock_release+0x6f0/0x6f0
+>> [   27.333241]  ? pwq_dec_nr_in_flight+0x230/0x230
+>> [   27.333241]  ? rwlock_bug.part.0+0x90/0x90
+>> [   27.333241]  ? _raw_spin_lock_irq+0x41/0x50
+>> [   27.333241]  worker_thread+0x578/0x1310
+>> [   27.333241]  ? process_one_work+0x1590/0x1590
+>> [   27.333241]  kthread+0x3b2/0x490
+>> [   27.333241]  ? _raw_spin_unlock_irq+0x1f/0x40
+>> [   27.333241]  ? set_kthread_struct+0x100/0x100
+>> [   27.333241]  ret_from_fork+0x22/0x30
+>> [   27.333241]  </TASK>
+>> [   27.333241] Modules linked in:
+>> [   27.333241] CR2: fffff61a1a1a1a1a
+>> [   27.333241] ---[ end trace 6a6825484c8fefa6 ]---
+>> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+>> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+>> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+>> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffffff834663d1
+>> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88800affb074
+>> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffffff83487b35
+>> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88800affb000
+>> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88800aae0000
+>> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) knlGS:0000000000000000
+>> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 00000000000006f0
+>> [   27.379996] kworker/u3:2 (45) used greatest stack depth: 27736 bytes left
+>>
+>> It occurs when sending the following frame to the kernel:
+>>
+>> $ xxd crashes/hci_inquiry_result_with_rssi_evt
+>> 00000000: 0422 24d0 d0d0 d0d0 d0ff ff              ."$........
+>>
+>> The bug was introduced with the commit "Bluetooth: HCI: Use skb_pull_data to parse Inquiry Result with RSSI event" (https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=8d08d324fdcb7).
+> 
+> That is pretty weird, the data seems to be the following:
+> 
+> 04 -> HCI_EVENT_PKT
+> 22 -> HCI_EV_INQUIRY_RESULT_WITH_RSSI
+> 24 -> hci_ev_inquiry_result_rssi.num
+> d0 d0d0 d0d0 d0ff ff
+> 
+> But this should never evaluate to true for:
+> 
+> if (skb->len == flex_array_size(ev, res2->info, ev->res2->num)) {
+> ...
+> } else if (skb->len == flex_array_size(ev, res1->info, ev->res1->num)) {
+> 
 
-HEAD commit: a7904a538933 Linux 5.16-rc6
-git tree: upstream
-console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/plain/
-kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/plain/
+I'm sorry, I forgot to mention the affected source code, the check seems to be too late. GDB says it is already happening in net/bluetooth/hci_event.c:4519:
 
-Sorry, I don't have a reproducer for this crash, hope the symbolized
-report can help.
-If you fix this issue, please add the following tag to the commit:
-Reported-by: Yiru Xu <xyru1999@gmail.com>
+(gdb) list *hci_inquiry_result_with_rssi_evt+0x9b
+0xffffffff83470d8b is in hci_inquiry_result_with_rssi_evt (net/bluetooth/hci_event.c:4519).
+4514		struct inquiry_data data;
+4515		int i;
+4516	
+4517		bt_dev_dbg(hdev, "num_rsp %d", ev->res1->num);
+4518	
+4519		if (!ev->res1->num) # <- page fault here
+4520			return;
 
-
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 2 PID: 18524 Comm: syz-executor.5 Not tainted 5.16.0-rc6 #9
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-1.13.0-1ubuntu1.1 04/01/2014
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- assign_lock_key kernel/locking/lockdep.c:951 [inline]
- register_lock_class+0x148d/0x1950 kernel/locking/lockdep.c:1263
- __lock_acquire+0x106/0x57e0 kernel/locking/lockdep.c:4906
- lock_acquire kernel/locking/lockdep.c:5637 [inline]
- lock_acquire+0x1ab/0x520 kernel/locking/lockdep.c:5602
- percpu_down_read_trylock include/linux/percpu-rwsem.h:92 [inline]
- hci_uart_tx_wakeup+0x12e/0x490 drivers/bluetooth/hci_ldisc.c:124
- h5_timed_event+0x32f/0x6a0 drivers/bluetooth/hci_h5.c:188
- call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1421
- expire_timers kernel/time/timer.c:1466 [inline]
- __run_timers.part.0+0x6b0/0xa90 kernel/time/timer.c:1734
- __run_timers kernel/time/timer.c:1715 [inline]
- run_timer_softirq+0xb6/0x1d0 kernel/time/timer.c:1747
- __do_softirq+0x1d7/0x93b kernel/softirq.c:558
- invoke_softirq kernel/softirq.c:432 [inline]
- __irq_exit_rcu kernel/softirq.c:637 [inline]
- irq_exit_rcu+0xf2/0x130 kernel/softirq.c:649
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1097
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:638
-RIP: 0010:get_current arch/x86/include/asm/current.h:15 [inline]
-RIP: 0010:__sanitizer_cov_trace_pc+0x0/0x40 kernel/kcov.c:199
-Code: 02 8b 7e 81 e2 00 01 ff 00 75 10 65 48 8b 04 25 40 70 02 00 48
-8b 80 58 15 00 00 c3 66 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 <65> 48
-8b 0c 25 40 70 02 00 bf 02 00 00 00 48 89 ce 4c 8b 04 24 e8
-RSP: 0018:ffffc90006f5f300 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: 0000000000000200 RCX: ffff888051915640
-RDX: 0000000000000000 RSI: ffff888051915640 RDI: 0000000000000002
-RBP: 0000000000000008 R08: ffffffff814c726d R09: 0000000000000000
-R10: 0000000000000007 R11: fffffbfff1b20a2a R12: 0000000000000000
-R13: 0000000000000001 R14: ffff888010c64c00 R15: ffffea0001826f00
- queue_work_on+0xb3/0x110 kernel/workqueue.c:1552
- queue_work include/linux/workqueue.h:502 [inline]
- schedule_work include/linux/workqueue.h:563 [inline]
- __vfree_deferred mm/vmalloc.c:2654 [inline]
- vfree_atomic+0xac/0xe0 mm/vmalloc.c:2672
- free_thread_stack kernel/fork.c:291 [inline]
- release_task_stack kernel/fork.c:431 [inline]
- put_task_stack+0x2a7/0x480 kernel/fork.c:442
- finish_task_switch+0x591/0x820 kernel/sched/core.c:4884
- context_switch kernel/sched/core.c:4975 [inline]
- __schedule+0xce1/0x2530 kernel/sched/core.c:6253
- preempt_schedule_common+0x4a/0xc0 kernel/sched/core.c:6419
- preempt_schedule_thunk+0x16/0x18 arch/x86/entry/thunk_64.S:35
- vprintk_emit+0x315/0x4a0 kernel/printk/printk.c:2246
- vprintk+0x80/0x90 kernel/printk/printk_safe.c:50
- _printk+0xba/0xed kernel/printk/printk.c:2266
- show_free_areas+0x762/0xff0 mm/page_alloc.c:5892
- show_mem+0x3e/0x1ab lib/show_mem.c:17
- warn_alloc_show_mem mm/page_alloc.c:4198 [inline]
- warn_alloc.cold+0x10e/0x17a mm/page_alloc.c:4221
- __vmalloc_area_node mm/vmalloc.c:2964 [inline]
- __vmalloc_node_range+0x84e/0xa30 mm/vmalloc.c:3065
- alloc_thread_stack_node kernel/fork.c:244 [inline]
- dup_task_struct kernel/fork.c:886 [inline]
- copy_process+0x911/0x73e0 kernel/fork.c:2023
- kernel_clone+0xe7/0x10c0 kernel/fork.c:2582
- __do_sys_clone+0xc8/0x110 kernel/fork.c:2699
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fd4e55d41c5
-Code: 48 85 ff 74 3d 48 85 f6 74 38 48 83 ee 10 48 89 4e 08 48 89 3e
-48 89 d7 4c 89 c2 4d 89 c8 4c 8b 54 24 08 b8 38 00 00 00 0f 05 <48> 85
-c0 7c 13 74 01 c3 31 ed 58 5f ff d0 48 89 c7 b8 3c 00 00 00
-RSP: 002b:00007fff2aaa5b78 EFLAGS: 00000202 ORIG_RAX: 0000000000000038
-RAX: ffffffffffffffda RBX: 00007fd4e3e3b700 RCX: 00007fd4e55d41c5
-RDX: 00007fd4e3e3b9d0 RSI: 00007fd4e3e3adb0 RDI: 00000000003d0f00
-RBP: 00007fff2aaa5dd0 R08: 00007fd4e3e3b700 R09: 00007fd4e3e3b700
-R10: 00007fd4e3e3b9d0 R11: 0000000000000202 R12: 00007fff2aaa5c2e
-R13: 00007fff2aaa5c2f R14: 00007fff2aaa5dd0 R15: 00007fd4e3e3adc0
- </TASK>
-----------------
-Code disassembly (best guess):
-   0: 02 8b 7e 81 e2 00     add    0xe2817e(%rbx),%cl
-   6: 01 ff                 add    %edi,%edi
-   8: 00 75 10             add    %dh,0x10(%rbp)
-   b: 65 48 8b 04 25 40 70 mov    %gs:0x27040,%rax
-  12: 02 00
-  14: 48 8b 80 58 15 00 00 mov    0x1558(%rax),%rax
-  1b: c3                   retq
-  1c: 66 66 2e 0f 1f 84 00 data16 nopw %cs:0x0(%rax,%rax,1)
-  23: 00 00 00 00
-  27: 0f 1f 00             nopl   (%rax)
-* 2a: 65 48 8b 0c 25 40 70 mov    %gs:0x27040,%rcx <-- trapping instruction
-  31: 02 00
-  33: bf 02 00 00 00       mov    $0x2,%edi
-  38: 48 89 ce             mov    %rcx,%rsi
-  3b: 4c 8b 04 24           mov    (%rsp),%r8
-  3f: e8                   .byte 0xe8
+I just reproduced it on the HEAD of bluetooth-next (for-net-next-2021-12-29).
 
 
-Best Regards,
-Yiru
+> These requires the data to be multiple of sizeof(struct
+> inquiry_info_rssi_pscan) = 15 bytes or sizeof(struct
+> inquiry_info_rssi) = 14 bytes respectively where the data left is just
+> 8 bytes long, besides with the number of entries being 0x24 this shall
+> be well beyond skb->len which shall have cause the else clause:
+> 
+>   } else {
+>       bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
+>                          HCI_EV_INQUIRY_RESULT_WITH_RSSI);
+>   }
+> 
+
+I think prior to the commit that introduced that, the check was made before casting it to the struct, so from the "raw" skb->data:
+
+-	int num_rsp = *((__u8 *) skb->data);
+-	if ((skb->len - 1) / num_rsp != sizeof(struct inquiry_info_with_rssi)) {
+
+> Anyway the bluetooth-next has been updated since last week so I first
+> attempt to reproduce with a fresh clone of it since we did some fixups
+> since then.
+> 
+
+Btw, what is the best way to provide an easily reproducible bug report here, I did not figure that out yet. 
+
+Also, when searching for bugs (to ideally provide patches), I am currently searching on the HEAD of bluetooth-next. As far as I understood it, the tags "for-net-..." should be more or less stable, as they are merged to net-next which makes its way to mainline, right?
