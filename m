@@ -2,90 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ED81C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 14:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE38C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 15:43:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231688AbiADOiT (ORCPT
+        id S233811AbiADPn7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jan 2022 09:38:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56248 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbiADOiS (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jan 2022 09:38:18 -0500
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E077C061761;
-        Tue,  4 Jan 2022 06:38:18 -0800 (PST)
-Received: by mail-lj1-x22a.google.com with SMTP id s4so42959654ljd.5;
-        Tue, 04 Jan 2022 06:38:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=QmMHi/Yre/UvJNCL2dThOVThw7jS7V0hu2mmbclV+BI=;
-        b=jtGF+2+nKOBhGZ2YSUoM0HezwC5/hUsa45eaYe/TDnRf808bphxoMVyzds73Oi1hmA
-         REKLjoxwZdEGX3ZQCTa3VzZ/ZKowsQr2j1vkVfqd5k87gw/97PK/atla+tnsEsdfl4r4
-         ugM37WDj+x0W6iJO/FeeJpC3w1fY3QzIAN/J0oeZbC73rSI7qvkE4Gp48llEn7G9/MnA
-         VqYeAiOV2tWZelm4VQT7iOvEXXUEoVT+fiYyUdA4HcIpdNhNTt/ihTgIflkMBTEobjSm
-         2hRHU1COPnFP/koFs737hCFaCsmoT1AyNOZznc6QmeleFNK9WfQWTjQmvgqHGiL3tS+w
-         uqdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QmMHi/Yre/UvJNCL2dThOVThw7jS7V0hu2mmbclV+BI=;
-        b=NF2BBub4+rl7BjbhpWA57VgCExHe/eWyPqfGStAUyESALv8wxtxxJi9xn5y/cLTJg8
-         acK+r1jOislWtMzbucq1/+kqD4Xe6Hz9uIop2Zin4HTZxmYJJxh3Y8TrCBBqndtNMxPh
-         jQLrd6yiQGCOFXKLr6AP637UE3NCec68Jeb46rWc2X5XWCcMmyIjooRLhEE8vsvgroei
-         wAY5jOA4bqDQX9BbdTxFXVicuNw3LIjOMKsYqPS+OzzNBtO0uvSUAOSpJunE/iBG0wSs
-         SAOsmL4tr3zO+nUdV8mAFUi6+60u/ywOh11cJqnoyg4OvcziWjLCc8KScEPAXnzO1EDo
-         yDQg==
-X-Gm-Message-State: AOAM5321ULtUt2MjCUQYbUcHNLpEhhSIWsyfZ5Do4lUUMplPeUmz32s4
-        tqPG4ZoUrr6P0peRrCD9gSE=
-X-Google-Smtp-Source: ABdhPJwwFTsGxRzatz9BIxV8yjARgio1lXfuEbGf1QxRZ5FV2Yu03x9GdT+vwQjYeEqYagadBvAv7w==
-X-Received: by 2002:a05:651c:98c:: with SMTP id b12mr40706698ljq.81.1641307096662;
-        Tue, 04 Jan 2022 06:38:16 -0800 (PST)
-Received: from [192.168.1.11] ([94.103.235.38])
-        by smtp.gmail.com with ESMTPSA id y20sm2468175ljn.69.2022.01.04.06.38.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jan 2022 06:38:16 -0800 (PST)
-Message-ID: <adaafb2e-ac28-5f48-eb0b-8b55560f3bed@gmail.com>
-Date:   Tue, 4 Jan 2022 17:38:14 +0300
+        Tue, 4 Jan 2022 10:43:59 -0500
+Received: from mga02.intel.com ([134.134.136.20]:10197 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232505AbiADPn6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 4 Jan 2022 10:43:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1641311038; x=1672847038;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=22y9EjrBRaMVy/mz9REdCI0A1LxLuq5BPOq8HpG1+gg=;
+  b=UnovQSwallIVIqbAQyjb9NCARDilaA1Ue7nDtEe8kXT723v2h7NU6tzj
+   LD6SUjbvz3nozkJw8+lesaECkScGnd3tq1MXNUhS6ph/dAAdDj9SGhGDW
+   t9O1lZy5P95H2zSPB49Cg2C+Q5W4gojbfFrRI+7YvtubgVf3LL17XC36p
+   iRNu6nngL5TFQCIXF/T+2ah1UzGqBz3z9U3LSSr/hy1MHXgIHwiXKsXYk
+   5KYL4R3+5otT7W3IRllPUq6NF+Cxf78guqRC8FDxs0dMLx8dPHYp6PXL/
+   QGseiTvWtgDcIgNUhUWJTKsqAffWp71R3vWF4Ng/dugEYwryWUUfNtkUd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="229559359"
+X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
+   d="scan'208";a="229559359"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 07:43:58 -0800
+X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
+   d="scan'208";a="688600650"
+Received: from smile.fi.intel.com ([10.237.72.61])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 07:43:52 -0800
+Received: from andy by smile.fi.intel.com with local (Exim 4.95)
+        (envelope-from <andriy.shevchenko@linux.intel.com>)
+        id 1n4lxK-006GMj-Qz;
+        Tue, 04 Jan 2022 17:42:34 +0200
+Date:   Tue, 4 Jan 2022 17:42:34 +0200
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Jakub Kicinski <kuba@kernel.org>, mingo@kernel.org
+Cc:     Florian Fainelli <f.fainelli@gmail.com>, ast@kernel.org,
+        daniel@iogearbox.net, bpf@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-can@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-hams@vger.kernel.org, ath11k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, bridge@lists.linux-foundation.org,
+        linux-decnet-user@lists.sourceforge.net,
+        linux-s390@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH bpf-next v2] net: don't include filter.h from net/sock.h
+Message-ID: <YdRq6vKceOqscaKK@smile.fi.intel.com>
+References: <20211229004913.513372-1-kuba@kernel.org>
+ <5a82690c-7dc0-81de-4dd6-06e26e4b9b92@gmail.com>
+ <20211229092012.635e9f2b@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: INFO: trying to register non-static key in hci_uart_tx_wakeup
-Content-Language: en-US
-To:     kvartet <xyru1999@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, sunhao.th@gmail.com
-References: <CAFkrUsjA1qai+1ysWS_LEUYcMGo+ZRF3v743q6k9e4roF6PWZw@mail.gmail.com>
- <6338e7cd-80cb-11af-e3c0-edd740bb9e49@gmail.com>
- <CAFkrUsgEJcMAdVUP3aUB7-H4YmUjFeii5754nPpOVh+vo3bnLA@mail.gmail.com>
-From:   Pavel Skripkin <paskripkin@gmail.com>
-In-Reply-To: <CAFkrUsgEJcMAdVUP3aUB7-H4YmUjFeii5754nPpOVh+vo3bnLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211229092012.635e9f2b@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 1/4/22 17:34, kvartet wrote:
-> We are so sorry for that. You can try the following websites, which
-> can be accessed without registration.
+On Wed, Dec 29, 2021 at 09:20:12AM -0800, Jakub Kicinski wrote:
+> On Tue, 28 Dec 2021 17:33:39 -0800 Florian Fainelli wrote:
+> > It would be nice if we used the number of files rebuilt because of a 
+> > header file change as another metric that the kernel is evaluated with 
+> > from release to release (or even on a commit by commit basis). Food for 
+> > thought.
 > 
-> console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/
-> kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/
-> 
-> Sorry again and look forward to your reply!
-> 
-> 
+> Maybe Andy has some thoughts, he has been working on dropping
+> unnecessary includes of kernel.h, it seems.
 
-Yeah, it works, thanks! Seems like removing "/plain/" gives an access 
-without ubuntu one account.
+With this [1] announcement I believe Ingo is the best to tell you if this is a
+right direction.
+
+> It'd be cool to plug something that'd warn us about significant
+> increases in dependencies into the patchwork build bot.
+> 
+> I have one more small series which un-includes uapi/bpf.h from
+> netdevice.h at which point I hope we'll be largely in the clear 
+> from build bot performance perspective.
+
+[1]: https://lore.kernel.org/lkml/YdIfz+LMewetSaEB@gmail.com/T/#u
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
-With regards,
-Pavel Skripkin
