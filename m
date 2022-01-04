@@ -2,93 +2,260 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE38C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 15:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7FDC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Jan 2022 19:32:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233811AbiADPn7 (ORCPT
+        id S229885AbiADTb7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Jan 2022 10:43:59 -0500
-Received: from mga02.intel.com ([134.134.136.20]:10197 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232505AbiADPn6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Jan 2022 10:43:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641311038; x=1672847038;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=22y9EjrBRaMVy/mz9REdCI0A1LxLuq5BPOq8HpG1+gg=;
-  b=UnovQSwallIVIqbAQyjb9NCARDilaA1Ue7nDtEe8kXT723v2h7NU6tzj
-   LD6SUjbvz3nozkJw8+lesaECkScGnd3tq1MXNUhS6ph/dAAdDj9SGhGDW
-   t9O1lZy5P95H2zSPB49Cg2C+Q5W4gojbfFrRI+7YvtubgVf3LL17XC36p
-   iRNu6nngL5TFQCIXF/T+2ah1UzGqBz3z9U3LSSr/hy1MHXgIHwiXKsXYk
-   5KYL4R3+5otT7W3IRllPUq6NF+Cxf78guqRC8FDxs0dMLx8dPHYp6PXL/
-   QGseiTvWtgDcIgNUhUWJTKsqAffWp71R3vWF4Ng/dugEYwryWUUfNtkUd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10216"; a="229559359"
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
-   d="scan'208";a="229559359"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 07:43:58 -0800
-X-IronPort-AV: E=Sophos;i="5.88,261,1635231600"; 
-   d="scan'208";a="688600650"
-Received: from smile.fi.intel.com ([10.237.72.61])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2022 07:43:52 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.95)
-        (envelope-from <andriy.shevchenko@linux.intel.com>)
-        id 1n4lxK-006GMj-Qz;
-        Tue, 04 Jan 2022 17:42:34 +0200
-Date:   Tue, 4 Jan 2022 17:42:34 +0200
-From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To:     Jakub Kicinski <kuba@kernel.org>, mingo@kernel.org
-Cc:     Florian Fainelli <f.fainelli@gmail.com>, ast@kernel.org,
-        daniel@iogearbox.net, bpf@vger.kernel.org, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-can@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-hams@vger.kernel.org, ath11k@lists.infradead.org,
-        linux-wireless@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, bridge@lists.linux-foundation.org,
-        linux-decnet-user@lists.sourceforge.net,
-        linux-s390@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH bpf-next v2] net: don't include filter.h from net/sock.h
-Message-ID: <YdRq6vKceOqscaKK@smile.fi.intel.com>
-References: <20211229004913.513372-1-kuba@kernel.org>
- <5a82690c-7dc0-81de-4dd6-06e26e4b9b92@gmail.com>
- <20211229092012.635e9f2b@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+        Tue, 4 Jan 2022 14:31:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39994 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229508AbiADTb7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 4 Jan 2022 14:31:59 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7071C061761;
+        Tue,  4 Jan 2022 11:31:58 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id k69so95318625ybf.1;
+        Tue, 04 Jan 2022 11:31:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ZUmYnewajUUvHDk12rdHt48TosSqpa/5GnoBuuSoIB4=;
+        b=Br4tWtLeLrkstlqQrIPO2tqHJ9NB387n/tvG8oatYpD4PmEDpDDxMfZq8YLD2TGvuT
+         5UpQUl4wmsE6G4mwC7u7e+znKMiM96tbv0bMRgSimm68CV2MZBuKetH5O4lsOYtSxUqx
+         h1vFTp49QtEPgMZHrMAp4DUkv9Y+GGYMCdUwasNSctWkN0KldojsJIaRkBIJ9SX5C2wP
+         IWxYnzo+I3k9MazDiPfUuSSxxcgiI0NWhmKiElCjNozdjvQ2cYr5CgFfkxfNRxg05tPh
+         CwOrzqiWsZUEWVNFk8eeWfzel4bsM4G4ZKe5KxlMh9G5g5eiO1Gd3kU9cEE+HjJBOL37
+         WE+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ZUmYnewajUUvHDk12rdHt48TosSqpa/5GnoBuuSoIB4=;
+        b=hxdWoj+TEEJePUnR2jh4wLOTcJ2cN/4wsuaKVMd7Pvhe0xSkwJyeaj1LRUNenZ2Qcl
+         ImY8lo8ca5N+Ouomsa6520CmgXBe99LFvQZjtyWzQh9WCqBidI1tqRmKZIXbntlmKga3
+         Xpg2MSJlPHaX7YPqBn5AZDZ1OemEHa0mS77FXm4QNR7Vnq/qhCxcbLSlOO/VkBrW/Jk+
+         9FNdMhWKoCiLPjI8GruoLi1UW3FusDDiWL0cYDhaXY/eWDBXPRTxhJT1FsqNZHLY996+
+         ezpizL36PSBOe7VkzmL1Vsp6Xxp2qCPVbh+CUojwaxwz/GUza1YHCu97G9+X+czJrevm
+         v05A==
+X-Gm-Message-State: AOAM53257wy2bVC2XotvrgRZr+PydXoekPWsVxaUBK0VwuclOgcjH/lL
+        LnPu7bMXPDxf1I2JOfdbRo0eUizyEHdcTVmtJWs=
+X-Google-Smtp-Source: ABdhPJzGkKTPjiGZXa8KTqv7wwDAr49A+dkxXNihb8pFbpigM24bqwkdF8iFdJD/KJjzbL2JfUUYrjy0j5apnlY/stQ=
+X-Received: by 2002:a25:7189:: with SMTP id m131mr67230099ybc.284.1641324717682;
+ Tue, 04 Jan 2022 11:31:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211229092012.635e9f2b@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <36ec2e79-7544-ba14-8bdd-d748dfad0ea7@eknoes.de>
+ <CABBYNZJwqb0xKa+iX4zOBYpZ2j0ZFbHPRztQ1z5xJL7kq6-9Ag@mail.gmail.com> <91bface3-975d-b79c-2da0-77e24e355fa7@eknoes.de>
+In-Reply-To: <91bface3-975d-b79c-2da0-77e24e355fa7@eknoes.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 4 Jan 2022 11:31:46 -0800
+Message-ID: <CABBYNZLrXh-Zc8wHSzZkvpx0oZGLsR0r_59V2zhAmtRQXTC9yg@mail.gmail.com>
+Subject: Re: [BUG] Page Fault in hci_inquiry_result_with_rssi_evt
+To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Dec 29, 2021 at 09:20:12AM -0800, Jakub Kicinski wrote:
-> On Tue, 28 Dec 2021 17:33:39 -0800 Florian Fainelli wrote:
-> > It would be nice if we used the number of files rebuilt because of a 
-> > header file change as another metric that the kernel is evaluated with 
-> > from release to release (or even on a commit by commit basis). Food for 
-> > thought.
-> 
-> Maybe Andy has some thoughts, he has been working on dropping
-> unnecessary includes of kernel.h, it seems.
+Hi S=C3=B6nke,
 
-With this [1] announcement I believe Ingo is the best to tell you if this is a
-right direction.
+On Tue, Jan 4, 2022 at 3:50 AM S=C3=B6nke Huster <soenke.huster@eknoes.de> =
+wrote:
+>
+> Hi Luiz,
+>
+> On 04.01.22 01:38, Luiz Augusto von Dentz wrote:
+> > Hi S=C3=B6nke,
+> >
+> > On Mon, Jan 3, 2022 at 3:41 PM S=C3=B6nke Huster <soenke.huster@eknoes.=
+de> wrote:
+> >>
+> >> Hello,
+> >>
+> >> While fuzzing bluetooth-next I found the following bug:
+> >>
+> >> [   27.333034] BUG: unable to handle page fault for address: fffff61a1=
+a1a1a1a
+> >> [   27.333241] #PF: supervisor read access in kernel mode
+> >> [   27.333241] #PF: error_code(0x0000) - not-present page
+> >> [   27.333241] PGD 6dfd2067 P4D 6dfd2067 PUD 0
+> >> [   27.333241] Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
+> >> [   27.333241] CPU: 0 PID: 45 Comm: kworker/u3:2 Not tainted 5.16.0-rc=
+1+ #81
+> >> [   27.333241] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), =
+BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+> >> [   27.333241] Workqueue: hci0 hci_rx_work
+> >> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+> >> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 0=
+0 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+> >> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+> >> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffff=
+ff834663d1
+> >> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88=
+800affb074
+> >> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffff=
+ff83487b35
+> >> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88=
+800affb000
+> >> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88=
+800aae0000
+> >> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) k=
+nlGS:0000000000000000
+> >> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 000000=
+00000006f0
+> >> [   27.333241] Call Trace:
+> >> [   27.333241]  <TASK>
+> >> [   27.333241]  ? wait_for_completion_io+0x270/0x270
+> >> [   27.333241]  ? hci_inquiry_result_evt+0x4b0/0x4b0
+> >> [   27.333241]  hci_event_packet+0x3b11/0x7b10
+> >> [   27.333241]  ? lock_chain_count+0x20/0x20
+> >> [   27.333241]  ? hci_cmd_status_evt.constprop.0+0x4ea0/0x4ea0
+> >> [   27.333241]  ? sysvec_reboot+0x50/0xc0
+> >> [   27.333241]  ? find_held_lock+0x2c/0x110
+> >> [   27.333241]  ? lock_release+0x3b2/0x6f0
+> >> [   27.333241]  ? skb_dequeue+0x110/0x1a0
+> >> [   27.333241]  ? mark_held_locks+0x9e/0xe0
+> >> [   27.333241]  ? lockdep_hardirqs_on_prepare+0x17b/0x400
+> >> [   27.333241]  hci_rx_work+0x4d3/0xb90
+> >> [   27.333241]  process_one_work+0x904/0x1590
+> >> [   27.333241]  ? lock_release+0x6f0/0x6f0
+> >> [   27.333241]  ? pwq_dec_nr_in_flight+0x230/0x230
+> >> [   27.333241]  ? rwlock_bug.part.0+0x90/0x90
+> >> [   27.333241]  ? _raw_spin_lock_irq+0x41/0x50
+> >> [   27.333241]  worker_thread+0x578/0x1310
+> >> [   27.333241]  ? process_one_work+0x1590/0x1590
+> >> [   27.333241]  kthread+0x3b2/0x490
+> >> [   27.333241]  ? _raw_spin_unlock_irq+0x1f/0x40
+> >> [   27.333241]  ? set_kthread_struct+0x100/0x100
+> >> [   27.333241]  ret_from_fork+0x22/0x30
+> >> [   27.333241]  </TASK>
+> >> [   27.333241] Modules linked in:
+> >> [   27.333241] CR2: fffff61a1a1a1a1a
+> >> [   27.333241] ---[ end trace 6a6825484c8fefa6 ]---
+> >> [   27.333241] RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x950
+> >> [   27.333241] Code: 8b 04 24 48 c1 e8 03 42 80 3c 28 00 0f 85 20 07 0=
+0 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 0
+> >> [   27.333241] RSP: 0018:ffffc900004ff9c8 EFLAGS: 00010212
+> >> [   27.333241] RAX: dffffc0000000000 RBX: 0000000000000022 RCX: ffffff=
+ff834663d1
+> >> [   27.333241] RDX: 1ffffa1a1a1a1a1a RSI: 0000000000000012 RDI: ffff88=
+800affb074
+> >> [   27.333241] RBP: ffff88800aae0000 R08: ffffffff844ef360 R09: ffffff=
+ff83487b35
+> >> [   27.333241] R10: 000000000000002c R11: 0000000000000022 R12: ffff88=
+800affb000
+> >> [   27.333241] R13: ffffd0d0d0d0d0d0 R14: 0000000000000000 R15: ffff88=
+800aae0000
+> >> [   27.333241] FS:  0000000000000000(0000) GS:ffff88806ce00000(0000) k=
+nlGS:0000000000000000
+> >> [   27.333241] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> >> [   27.333241] CR2: fffff61a1a1a1a1a CR3: 0000000004a26000 CR4: 000000=
+00000006f0
+> >> [   27.379996] kworker/u3:2 (45) used greatest stack depth: 27736 byte=
+s left
+> >>
+> >> It occurs when sending the following frame to the kernel:
+> >>
+> >> $ xxd crashes/hci_inquiry_result_with_rssi_evt
+> >> 00000000: 0422 24d0 d0d0 d0d0 d0ff ff              ."$........
+> >>
+> >> The bug was introduced with the commit "Bluetooth: HCI: Use skb_pull_d=
+ata to parse Inquiry Result with RSSI event" (https://git.kernel.org/pub/sc=
+m/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=3D8d08d324fdcb7)=
+.
+> >
+> > That is pretty weird, the data seems to be the following:
+> >
+> > 04 -> HCI_EVENT_PKT
+> > 22 -> HCI_EV_INQUIRY_RESULT_WITH_RSSI
+> > 24 -> hci_ev_inquiry_result_rssi.num
+> > d0 d0d0 d0d0 d0ff ff
+> >
+> > But this should never evaluate to true for:
+> >
+> > if (skb->len =3D=3D flex_array_size(ev, res2->info, ev->res2->num)) {
+> > ...
+> > } else if (skb->len =3D=3D flex_array_size(ev, res1->info, ev->res1->nu=
+m)) {
+> >
+>
+> I'm sorry, I forgot to mention the affected source code, the check seems =
+to be too late. GDB says it is already happening in net/bluetooth/hci_event=
+.c:4519:
+>
+> (gdb) list *hci_inquiry_result_with_rssi_evt+0x9b
+> 0xffffffff83470d8b is in hci_inquiry_result_with_rssi_evt (net/bluetooth/=
+hci_event.c:4519).
+> 4514            struct inquiry_data data;
+> 4515            int i;
+> 4516
+> 4517            bt_dev_dbg(hdev, "num_rsp %d", ev->res1->num);
+> 4518
+> 4519            if (!ev->res1->num) # <- page fault here
+> 4520                    return;
+>
+> I just reproduced it on the HEAD of bluetooth-next (for-net-next-2021-12-=
+29).
 
-> It'd be cool to plug something that'd warn us about significant
-> increases in dependencies into the patchwork build bot.
-> 
-> I have one more small series which un-includes uapi/bpf.h from
-> netdevice.h at which point I hope we'll be largely in the clear 
-> from build bot performance perspective.
+That would mean there is less data than the hci_ev.min_len, but that
+is checked in hci_event_func prior to calling the hci_ev.func:
 
-[1]: https://lore.kernel.org/lkml/YdIfz+LMewetSaEB@gmail.com/T/#u
+if (skb->len < ev->min_len) {
+bt_dev_err(hdev, "unexpected event 0x%2.2x length: %u < %u",
+   event, skb->len, ev->min_len);
+return;
+}
 
--- 
-With Best Regards,
-Andy Shevchenko
+>
+> > These requires the data to be multiple of sizeof(struct
+> > inquiry_info_rssi_pscan) =3D 15 bytes or sizeof(struct
+> > inquiry_info_rssi) =3D 14 bytes respectively where the data left is jus=
+t
+> > 8 bytes long, besides with the number of entries being 0x24 this shall
+> > be well beyond skb->len which shall have cause the else clause:
+> >
+> >   } else {
+> >       bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
+> >                          HCI_EV_INQUIRY_RESULT_WITH_RSSI);
+> >   }
+> >
+>
+> I think prior to the commit that introduced that, the check was made befo=
+re casting it to the struct, so from the "raw" skb->data:
+>
+> -       int num_rsp =3D *((__u8 *) skb->data);
+> -       if ((skb->len - 1) / num_rsp !=3D sizeof(struct inquiry_info_with=
+_rssi)) {
 
+That is still being checked, anyway that would cause a page fault when
+accessing num_rsp so I don't understand why it would cause a page
+fault now when previously it didn't even check if there were any bytes
+to be read, perhaps there is some memory alignment at play.
 
+> > Anyway the bluetooth-next has been updated since last week so I first
+> > attempt to reproduce with a fresh clone of it since we did some fixups
+> > since then.
+> >
+>
+> Btw, what is the best way to provide an easily reproducible bug report he=
+re, I did not figure that out yet.
+>
+> Also, when searching for bugs (to ideally provide patches), I am currentl=
+y searching on the HEAD of bluetooth-next. As far as I understood it, the t=
+ags "for-net-..." should be more or less stable, as they are merged to net-=
+next which makes its way to mainline, right?
+
+Yep, those are the tags we sent to net-next but in general
+bluetooth-next shall also be stable since we run CI on every patch
+nowadays.
+
+--=20
+Luiz Augusto von Dentz
