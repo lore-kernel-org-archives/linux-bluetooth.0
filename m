@@ -2,147 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 463F6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jan 2022 22:59:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2DFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jan 2022 23:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245208AbiAEW74 (ORCPT
+        id S245483AbiAEXqM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Jan 2022 17:59:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46508 "EHLO
+        Wed, 5 Jan 2022 18:46:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245153AbiAEW74 (ORCPT
+        with ESMTP id S234791AbiAEXqI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Jan 2022 17:59:56 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13485C061245
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jan 2022 14:59:56 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id o7so942174ioo.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jan 2022 14:59:56 -0800 (PST)
+        Wed, 5 Jan 2022 18:46:08 -0500
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1291CC061245
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jan 2022 15:46:08 -0800 (PST)
+Received: by mail-qt1-x832.google.com with SMTP id c15so276189qtc.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jan 2022 15:46:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MA6pGn8u6dGa04KcRjabpO7JUNe7Zhcm5vacHXBOu/Y=;
-        b=WKtOAXw4SI2/tWAcx+9r5kUW+gyS10y19qIhctzJx3fop+9z9cIPMX4W4+KGHaNtG1
-         TnOkg5rmHFx0Ds0KEA8fk5NunhHR93pTWagwX7NTzlGKnD+STtftSHw8I/f1j0oXEnyM
-         Kkooizgzskg9lAanrGlB9AUAzr0jq4grxYWM3Sh5G1wf34tsFpqBaqmnD1FsxiTEGEbJ
-         XFdSEgJkB3idASARk4Ac7XeCCPB0EoszhmCGUkwvA5nCeOeEeEQTfAvskwhST8nIm9TE
-         01K0gVIQqa4ceWRMQFQDYm0aq8kYSt+DSCPilG71H74nZpXkCOTm3wjszvLPXKcZVh3y
-         004g==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=/oVyTR6WMPUo9z9DId9TIP6J2I08aKYcssSpMIkdaVg=;
+        b=TJ2pjwjU4jxg0whohfiZyhxAlatqp9NyBGdi/ZmBosLXfUTRKnTnLMyvPUe8yUGkBP
+         zD2g1zh8201e21MsC0ohaL0LtEtE74ZD/WO5DQVgfaVvV8OxZsK6M9d5e9zriIQCq8J6
+         CAJpt8rI3axEbHo7mRS49XLrIZ/ffQPa+oWZI9BlFCQfISyODXao6sg9S/ZwAx16fUHI
+         yc7K2QtOEld5nrgZzxacm00w9BHyDFQ+d2dYFyfub8xOF+v2SVizEJmcKDhcjtV9SUdM
+         uoRW8LjmPMyiK49h/PnYAakDQCVo8s9Pfik8U48ts9i2j7/n/wYxJjJ2MD1nE07P8I//
+         hHnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=MA6pGn8u6dGa04KcRjabpO7JUNe7Zhcm5vacHXBOu/Y=;
-        b=VIjhi7MWA4yYG+veBjrXLu6n8y8YvNB7K+yavretbPIuYsMV4CZux99hv4X4Bvd6b+
-         A5aLp+DHDQzM3T3unHJxwYaECrTrJp0WoEpUEiXmecOnsZzVuAV0E86R7Z3GDnScnTts
-         NnBu8OyMtBP1fO/HzhrsAUPw26sZdzfdSpgEL1VQhG8yzaSIP654ab4LDwftRzg1Hwfq
-         tb1ZA3r6WlkBnM/axtTylmzXkB+IbYw+EKNVcHsTEqbRhTZfO0iqgtRXJsORtavrKFj0
-         R5x3dEMpDaaX8uS0cW6obnvKs6ThrsoufDnvt2H/Qf1T1soDqw9zYFYscjsVBr2gTxp9
-         JZ4w==
-X-Gm-Message-State: AOAM5325klo9hSPh/lBFmymLK5OgQ8jlEuJUw3c5xP7Je4EHfRy374R3
-        sYmmsrKuwdDTC39LYyhnViWWruE2Pjk=
-X-Google-Smtp-Source: ABdhPJxfpBsTfo2th5T5fLLQ9k/U4dpC/mlSzA97pSBPvXklPKHzZ/mvVDcXV8NTUD3XHybeKdNSLA==
-X-Received: by 2002:a05:6638:35a3:: with SMTP id v35mr9285287jal.137.1641423595178;
-        Wed, 05 Jan 2022 14:59:55 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g20sm190348iov.35.2022.01.05.14.59.54
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=/oVyTR6WMPUo9z9DId9TIP6J2I08aKYcssSpMIkdaVg=;
+        b=1CesLCkvo8JDFboIoPBeelXYdMOqesjgHNN3IklJkB8UU9YhiJ1tmX1UhoGWhEqBQe
+         XPNIHnVZZn9/UpCQl98qkt6pyr0Ap6C96mJ1DdTOYsptG1WPj/823FpqRaUL7j9erC+w
+         MdoRG/C8X3LPeLBcnALmW3wYbaRFnigK3HrEfFNYbwKXMnoX5HNmQkdnOUk4sd44txPv
+         exQ7rQ7JwFxBZsHzWE5u1uHf9lg+XvJTnGjUEyOoXu6z3E8iRQ/9Ps34pyBFkGxnUXnT
+         hgHHd2Qr6Zw5sV2CqVxmVc3L4gHJlp35E3IXrkhSVRNexHD+sgPZsAbiD83ABwMeVvAg
+         92Lw==
+X-Gm-Message-State: AOAM531lQZRdQduCrao0SWRY1YsIHWtv4R/Bfvig8qX0wzfXtIKD2S7w
+        7JDwkurGVq8ULqKnRnA9HkNr1biW6GVReg==
+X-Google-Smtp-Source: ABdhPJw5D71scsIeTgrKklWWhoy1bM1JiAja+UxW4ZVr1P9JOHs8TyeCjZR4t2oSkZ3Zr+7X0Cvipw==
+X-Received: by 2002:ac8:58ca:: with SMTP id u10mr50519740qta.44.1641426367077;
+        Wed, 05 Jan 2022 15:46:07 -0800 (PST)
+Received: from [172.17.0.2] ([20.110.122.68])
+        by smtp.gmail.com with ESMTPSA id u188sm217693qkh.30.2022.01.05.15.46.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jan 2022 14:59:54 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_event: Rework hci_inquiry_result_with_rssi_evt
-Date:   Wed,  5 Jan 2022 14:59:53 -0800
-Message-Id: <20220105225953.3240356-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Wed, 05 Jan 2022 15:46:06 -0800 (PST)
+Message-ID: <61d62dbe.1c69fb81.2987e.0ebf@mx.google.com>
+Date:   Wed, 05 Jan 2022 15:46:06 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3766730166490254362=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] configure: Fix use of obsolete macros
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220105222946.3235852-1-luiz.dentz@gmail.com>
+References: <20220105222946.3235852-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3766730166490254362==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This rework the handling of hci_inquiry_result_with_rssi_evt to not use
-a union to represent the different inquiry responses.
+This is automated email and please do not reply to this email!
 
-Tested-by: Soenke Huster <soenke.huster@eknoes.de>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=603033
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.58 seconds
+GitLint                       FAIL      1.11 seconds
+Prep - Setup ELL              PASS      43.34 seconds
+Build - Prep                  PASS      0.68 seconds
+Build - Configure             PASS      8.63 seconds
+Build - Make                  PASS      1436.54 seconds
+Make Check                    PASS      11.94 seconds
+Make Check w/Valgrind         PASS      451.87 seconds
+Make Distcheck                PASS      237.29 seconds
+Build w/ext ELL - Configure   PASS      8.83 seconds
+Build w/ext ELL - Make        PASS      1406.07 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ] configure: Fix use of obsolete macros
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#86: 
+https://www.gnu.org/software/autoconf/manual/autoconf-2.70/html_node/Obsolete-Macros.html
+
+/github/workspace/src/12704810.patch total: 0 errors, 1 warnings, 330 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12704810.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[BlueZ] configure: Fix use of obsolete macros
+13: B1 Line exceeds max length (89>80): "https://www.gnu.org/software/autoconf/manual/autoconf-2.70/html_node/Obsolete-Macros.html"
+
+
+
+
 ---
- include/net/bluetooth/hci.h |  6 +-----
- net/bluetooth/hci_event.c   | 19 +++++++++----------
- 2 files changed, 10 insertions(+), 15 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index e2b06bb79e2e..35c073d44ec5 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -2233,11 +2233,7 @@ struct inquiry_info_rssi_pscan {
- } __packed;
- struct hci_ev_inquiry_result_rssi {
- 	__u8     num;
--	struct inquiry_info_rssi info[];
--} __packed;
--struct hci_ev_inquiry_result_rssi_pscan {
--	__u8     num;
--	struct inquiry_info_rssi_pscan info[];
-+	__u8     data[];
- } __packed;
- 
- #define HCI_EV_REMOTE_EXT_FEATURES	0x23
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f1082b7c0218..fc30f4c03d29 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4507,16 +4507,13 @@ static void hci_pscan_rep_mode_evt(struct hci_dev *hdev, void *data,
- static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 					     struct sk_buff *skb)
- {
--	union {
--		struct hci_ev_inquiry_result_rssi *res1;
--		struct hci_ev_inquiry_result_rssi_pscan *res2;
--	} *ev = edata;
-+	struct hci_ev_inquiry_result_rssi *ev = edata;
- 	struct inquiry_data data;
- 	int i;
- 
--	bt_dev_dbg(hdev, "num_rsp %d", ev->res1->num);
-+	bt_dev_dbg(hdev, "num_rsp %d", ev->num);
- 
--	if (!ev->res1->num)
-+	if (!ev->num)
- 		return;
- 
- 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
-@@ -4524,10 +4521,11 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 
- 	hci_dev_lock(hdev);
- 
--	if (skb->len == flex_array_size(ev, res2->info, ev->res2->num)) {
-+	if (skb->len == array_size(ev->num,
-+				   sizeof(struct inquiry_info_rssi_pscan))) {
- 		struct inquiry_info_rssi_pscan *info;
- 
--		for (i = 0; i < ev->res2->num; i++) {
-+		for (i = 0; i < ev->num; i++) {
- 			u32 flags;
- 
- 			info = hci_ev_skb_pull(hdev, skb,
-@@ -4554,10 +4552,11 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 					  info->dev_class, info->rssi,
- 					  flags, NULL, 0, NULL, 0);
- 		}
--	} else if (skb->len == flex_array_size(ev, res1->info, ev->res1->num)) {
-+	} else if (skb->len == array_size(ev->num,
-+					  sizeof(struct inquiry_info_rssi))) {
- 		struct inquiry_info_rssi *info;
- 
--		for (i = 0; i < ev->res1->num; i++) {
-+		for (i = 0; i < ev->num; i++) {
- 			u32 flags;
- 
- 			info = hci_ev_skb_pull(hdev, skb,
--- 
-2.33.1
 
+--===============3766730166490254362==--
