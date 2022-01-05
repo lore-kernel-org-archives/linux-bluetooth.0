@@ -2,139 +2,447 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 102B7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jan 2022 21:45:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1EFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Jan 2022 22:29:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244548AbiAEVpP (ORCPT
+        id S244982AbiAEW3w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Jan 2022 16:45:15 -0500
-Received: from mail-bn8nam08on2069.outbound.protection.outlook.com ([40.107.100.69]:58848
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235053AbiAEVpM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Jan 2022 16:45:12 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Shoa8OYMu85lJphVO/X25VcDRn04yBfHSz0KbIO1zxxMOEoEWuqm19bRUqSpFa5PINNw0CFeUA7N+u63Nqs/aUhzjhvrmfRHavkDzfmg9NKBT+3BVxbFfRp7TK69P0VPe80p6V+evvA3+4AbXAnp2xqPejH2v+cNOTrFj9fqiHUjGcfk7YiTG8JIdKNbjIV9YmbOJTkc8RmG/mpmDG1XX7UcNPNWLf2HlThl7XbBXDW9nQ20p+Ssou9k1mNFOoIji2iYm2jKdcuO8Ox/PDNeVvBL8U0n73T7P3QzBWE249MUCkGLJNuP3yRgfVPwgaKXXIeMNlL7y1nWgemY7u8Ijw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1g31Gfcu8A2DfdXBgaqhmkPT8kMTVac1Ds9ftRX4Xpc=;
- b=AcVBS6JuEGBHVuXOc6y+0nV10zdZbcdz4yEUBdRXvQcBWRTopwIWRoBoPSe/6LR7DQphg9w8kyyuEia1EOcYNyR4wfqhtElt5f1AGBmLaAHXhBmMxozonR8K/OYVpyN56W5VRyIbRG7dn22cgaeK0dntCJwK2ev3wzXesJa4wvvfPmN6Ik0XhhImx65SOXvsbU7QAb6t//mYe0XDrzQp8oUB36m/yN3Tb9TDCsoCx1Tl+SoJcGxlXuvzReUIvQSpM79F1iCZNCQTMsyd05LsOScvv1+S6QM2De6VFZrbXmSCARTPcr0pifUmIk9l2dFvCIP5IpvUPz+4oxLj6mFi3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=sladewatkins.com; dmarc=pass action=none
- header.from=sladewatkins.com; dkim=pass header.d=sladewatkins.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sladewatkins.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1g31Gfcu8A2DfdXBgaqhmkPT8kMTVac1Ds9ftRX4Xpc=;
- b=lABr6J7rX3lOUtDmb8Ve3XZWc9RHy+K+fNijpFKuOGUShriiCNVAkoRnkvW00i5yyWEnln7P48Hwe+JND0huv46zBE2HAOsG3GJ+6rMx8i8wWf39wiZFUVp/v5AzwICSgDqzNGMVRwCKWgQn2//F+O4yWH1ZUN0lFtmSXw03F9fFCwL8hpDp5lcA0cu12phC/NA7us13OWaKRpXVVjhyc/QPYl9wPeA0i74RKHM1HtrUrTqO8+OydvWMlHtdg8OYmukSFKpLCtcm2lqOWDuO9/sjrHl7adl3HmnMGhWEpjlZ0ePCnNDLC8xS9ZPbleQQ8pcRb+Fvtnqi9ofkqVC6Zw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=sladewatkins.com;
-Received: from DM6PR20MB3097.namprd20.prod.outlook.com (2603:10b6:5:1d0::23)
- by DM5PR2001MB1834.namprd20.prod.outlook.com (2603:10b6:4:22::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.7; Wed, 5 Jan
- 2022 21:45:09 +0000
-Received: from DM6PR20MB3097.namprd20.prod.outlook.com
- ([fe80::1426:7c36:a8f8:5a11]) by DM6PR20MB3097.namprd20.prod.outlook.com
- ([fe80::1426:7c36:a8f8:5a11%5]) with mapi id 15.20.4844.016; Wed, 5 Jan 2022
- 21:45:09 +0000
-Message-ID: <36e53115-e9bb-f96a-ce64-dbb504f1c97d@sladewatkins.com>
-Date:   Wed, 5 Jan 2022 16:45:07 -0500
-User-Agent: Thunderbird
-Subject: Re: INFO: trying to register non-static key in hci_uart_tx_wakeup
-Content-Language: en-US
-To:     kvartet <xyru1999@gmail.com>
-Cc:     Pavel Skripkin <paskripkin@gmail.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, sunhao.th@gmail.com
-References: <CAFkrUsjA1qai+1ysWS_LEUYcMGo+ZRF3v743q6k9e4roF6PWZw@mail.gmail.com>
- <6338e7cd-80cb-11af-e3c0-edd740bb9e49@gmail.com>
- <CAFkrUsgEJcMAdVUP3aUB7-H4YmUjFeii5754nPpOVh+vo3bnLA@mail.gmail.com>
-From:   Slade Watkins <slade@sladewatkins.com>
-In-Reply-To: <CAFkrUsgEJcMAdVUP3aUB7-H4YmUjFeii5754nPpOVh+vo3bnLA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR1501CA0008.namprd15.prod.outlook.com
- (2603:10b6:207:17::21) To DM6PR20MB3097.namprd20.prod.outlook.com
- (2603:10b6:5:1d0::23)
+        Wed, 5 Jan 2022 17:29:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39190 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244956AbiAEW3s (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 Jan 2022 17:29:48 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 661FBC061245
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Jan 2022 14:29:48 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id c2so618254pfc.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Jan 2022 14:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8XjePjuhyrdXt04VoOoE7I1BSAD2Vkj8udnQDpF7lkY=;
+        b=Dh5yHXsN3x5tXsIhs+RimaKc/lROtudlIIBeGZ9lyOT9NMqqlDrdjUwJLIHTST4D2a
+         +buwg4ZpsP1HCruKhQVClXonLeb3jVlMyHkxq4mUNEP0LSBaSJODf5Zqgsn45AjIJU5o
+         QXqISuYFnD1vgXSJLO2QWXAx6O63N0v/5uw/aTl3axp45d6zmIo61m3q6sDie3hNkIg7
+         xTUV/ToIzJ6AlGqcVDdviO97+w/3WdTrK/LNV91Z+QC5c8S3B+6Ngvc3inXFj0UEkp/d
+         eq3kqXBUuQ3jP9wWlCDHo2Kr5dDw8999ehRbmytq4eCRHswWFUbcmn9gPGuiAv0PRKAy
+         JWNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=8XjePjuhyrdXt04VoOoE7I1BSAD2Vkj8udnQDpF7lkY=;
+        b=xFzf2AOC4SmD5V0bOzVDyk8VSStFWUjmmroB19Wz1IOz6MrqQFINtLhgOzbNfeeVq/
+         GDuKKRisL6QjhQAli8buvzfn4vErfdQp5Wz9iePB+Qx09eId2x1jX5qAz9x4bvYunwP7
+         sq2MFYb1O02jVfVI5c0+FFOSWvsn1aliUMYHz+1kd/0z2bF4ZmPWeKzJOkR5FZubvp5i
+         Gnbxf0XsdOFJtaBXkbmuDYJUdVIFVPP/LQamALC+HGxYn/R4/0zfHka09OhsvQx+CLcU
+         Pao+D3MFTPsy2TGsE4Zz90xH8JN4A9QyKUVXhSX6KTNq8W0zn4SzacZVLJ/D7dgRbxXb
+         dNdw==
+X-Gm-Message-State: AOAM530D3o0z7OBm5YINPl2xRlYGB59TxJjHWb+0Y0Ii/ioR2dUEpmvg
+        ilXMf4t8fp2bjwOnJHS6ZPbYb4V/8ek=
+X-Google-Smtp-Source: ABdhPJxaaM6+2BQwUEg3stLw10/7BzLTi+cCAVFJU6bW6qJEevfmLYNAd+lJICtMTBEfhvIO4Jhjqg==
+X-Received: by 2002:a63:f706:: with SMTP id x6mr50134443pgh.69.1641421787335;
+        Wed, 05 Jan 2022 14:29:47 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id l2sm126178pfc.42.2022.01.05.14.29.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jan 2022 14:29:47 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] configure: Fix use of obsolete macros
+Date:   Wed,  5 Jan 2022 14:29:46 -0800
+Message-Id: <20220105222946.3235852-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ad3bb1a1-c519-4138-2250-08d9d094a4f8
-X-MS-TrafficTypeDiagnostic: DM5PR2001MB1834:EE_
-X-Microsoft-Antispam-PRVS: <DM5PR2001MB1834ACD55D8F1311BD514DFEC84B9@DM5PR2001MB1834.namprd20.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1332;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hk1n/6cjTVFoXbiERiCtRqQhUlX8SGXr235bMsucZZ5FBEdISoOFjeExqUQhWThBPiqT6exDpNQTBAE3wxnkYSjxlrSG7NnbvF3VVX+7ZaiGyD69L1dr+kGUJ8rrz0XqPHg6jP4AnJ8OldyKepJ02A9QiQkuvJN1iyJBkD3FSSgT7rokcEZ/sIDf3W3TySOWf/Vea2H/VEpuLSTcihSi7D6p0dnfqXTvvzy5XdqO1yQBRGGOBKC7RtqylB0W1ut46bhjIkgCin+XnYRlPVLVbPJxoswRiBX/ykWXM34SU7qlOD3Ch1orMnpjj/JNXm6xT15EkotBMCdhQ6oWuofmfkNMat5S4eVIWt/0sT1JjQBQxnHKAH+SHfsnP4peBnsDeQrwNLag5UJWKLH2WLCQKVL/atEIO3U3/Z3q+rDGte8v55kVFpmI+JgYFbUZlolO74lpJs+/jZ2XNlIUBjBOEA8bcPzRiIlTvR0W9PkQI7MEFxEQHdGBdjvZhHH7xKMePtDoH7EZ7a3+WUGndqOe56+/DpVen7c4KZ2N4fdvCLe0gXdBXJdk2VSDNSnFUcaD5TSCl3mqvxPT8wggmVXTGmmC0wEbpBpCu97xtEkf7Iq8cho7IepEKo0vpGopuJXjEizRQoxmPzsoy6XYQkEJQmSRke5ORreXRjvAWDIOEZLbSynPHueK7ZMptKKz3qJ5TeurZfsTxH5WB5RP2ZUqU4G0JrXFAMNPdjUgwbIEvdnRZ+N27kdGQElBaYiy03y2v7PwrVov8OXJ1Ym2Pgv1cDZZ2PLfUbvfVqrVx4xzKLtLAWhVoA4A5ifeys7LxR6Lu704jlWas6Jc38IL7H19Lg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR20MB3097.namprd20.prod.outlook.com;PTR:;CAT:NONE;SFS:(396003)(39830400003)(136003)(376002)(346002)(366004)(8936002)(8676002)(36756003)(6916009)(966005)(508600001)(31696002)(5660300002)(4326008)(66574015)(31686004)(2906002)(66476007)(38100700002)(83380400001)(4744005)(66946007)(26005)(186003)(66556008)(53546011)(6506007)(86362001)(6512007)(6486002)(2616005)(316002)(10126625002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YU9pR1NoaHVEVEV4OTRwUGIyS2NKSE1sNXZWNTFyQldpM2Y2U0dGSi9XOFgz?=
- =?utf-8?B?bDg3VVR4N1V0cTNDRWhBOGM2NTRYbjdwYXk3YVJ0Z3dqWU1LNnoySWJCMnZs?=
- =?utf-8?B?aUttVnlwc21IUTVPVHluTldhNWx0MWR0dy92d0xsdHRNWGorb1RPMVZEVFJ6?=
- =?utf-8?B?T25sZkN1aUhjWkdEeFFaRnoxcHY1aUZaYjgyZUtsS01uWTNkaGpkeDJmek00?=
- =?utf-8?B?RWVDSlJHWVdDMW9yaTNKVnRNSnBCRXkwbG5LbFRrQlJPMEV4Q01BVlU3VDBn?=
- =?utf-8?B?Ni91WHAzZFFjbVZuMFZLVnJoSEFpRk9jc0E5THRjN0swRHVLNGY1SDViNFZI?=
- =?utf-8?B?M1dXL3Z0UFE4ZS92MEt6UkJpMmRsaGo5dTFhSTFzM3AxcVB3cTRDWXBMcjVp?=
- =?utf-8?B?SE82b3MzcURTaHFoUkdkcjFFQzlrK2JJQ09oaFVDUnlscU0wRUVRcTR3Z3cr?=
- =?utf-8?B?RjNkQ0tsZnpGQ0JMaUtpZHJQQzl0MGxXTklMY3dPUVR6VHJaR3FCNjJBZVZy?=
- =?utf-8?B?OXEwaUZXZ3dScHk4MER2c2dVYU1IWnF4NFFFMElLVWNvY0txVTF5ekdEZUgr?=
- =?utf-8?B?OUhUWDFFN2dwRUhFVmJSWG9rUjgwdFFYV3ZUSXZNbzlvcUNHNXduZUlBQWJE?=
- =?utf-8?B?RGx5L3A0QXlGMzRKYVN3dWZpTFNnTk5QRVdoRW9ETTYwYlJPMEhUc3NwMDhM?=
- =?utf-8?B?elBhTHdLZDQwZ2dackVYTmV2MWd6K0p4dWVnYkE0VjlIRGtFcVJRWnlMdllo?=
- =?utf-8?B?MTNaaGM1VTBBOFpWNGVYYXVnalg4OG43NWI5TTEyM01GemUvMkRLNGlpQ3U5?=
- =?utf-8?B?encwVXM2bkoxeU9FdTNmdWZET2tlcEtCbVdUU0MvOGRPVXF0TGFpb2c3bVZE?=
- =?utf-8?B?NmlqMHNnMU56UThkNHV6Qm5hbE0zM0YyUmEzRjNBY1p2THYyWGJabzJHaUlY?=
- =?utf-8?B?UXVvYktwbVdFYTE2ek1XTFgrbG80MkNNZnlCNjRrYWtNS216VktuMUVvS0J0?=
- =?utf-8?B?OWQxS0N6UDViU1RTRElTdGo0SGF6Rzg5U0lrbmJSVFdEMTYrNHhRRW1OTkdt?=
- =?utf-8?B?WFpjMGE3MjBKcFJIcFBrTlBGUWdvQWljR3VXQkVzYjNPNThVSDBoV2t5YWxZ?=
- =?utf-8?B?eUhyOUxybFJWamZTYWJldDloQk4vV21SQjlFZkJxdmlXR01UblI5bE44cVdP?=
- =?utf-8?B?Zk5wSkI1eUs4QlNTTXp1bjRETCtzNEdkMzhET1o2RTFHMnZIUTMxTTVIdlN0?=
- =?utf-8?B?NWpMcDgxcmFnY2NKdE5nM0tKblBOVUNaNXVMbmozeE44VE5zSVRSOSt4cWZ5?=
- =?utf-8?B?alR4YjJQN1ZsOTdieCs0YWdXc29SMUZ4YTI2TDcwM3NuQkprQXN3anVMZ0E0?=
- =?utf-8?B?ZTlsY0JDaTBiTDhDNlJ4djBIc2NqSzZ6SDFxdGxNOEl3OEN0SnBjaHEyTGhm?=
- =?utf-8?B?T3NUdEhzdUJpaUk1VmV1RXU1TFlQK21TTndNS1ZoRTA5T1VtMktoSm5hbjBS?=
- =?utf-8?B?WDlpc3h1a3ltZWVmc1hyZ3hZVkNNSjJ6VklOK1JteDIydE9Yb2FkVWNWNzdN?=
- =?utf-8?B?N21mTU9SSFZUalZvSHB5L1dVYjV2b1YrVFlBM1VhcjA0djdLcy9hbVdFaGxv?=
- =?utf-8?B?Vk9UdVJXM2t0OXZSZE9EM0l4am81VkUyeVRQcmV3SGpvaC83cm5OQzVNMWFh?=
- =?utf-8?B?YWJPTnlDSmNBR2FEeDNqemc1eHNVUmt6V0hkekpuYW5lSG5FNnZoV0l1dlgy?=
- =?utf-8?B?Q2pCY0dTNlljRTdnZml3ZWNBanF2bnYzak5sUUFrV0NhYVRxdVZqWUFIbXov?=
- =?utf-8?B?M2VnL05MdDdSUTJGTGNubVg0czVhVWdSRTBXOWVkQkFjU3NvSGNWdDBXOTRx?=
- =?utf-8?B?aHBlZ2llRGRucThCcEdpUnBsK0pQS0pnQTRadlFjYnRWdnRzdkg3SWpEVXI3?=
- =?utf-8?B?bEwydFN4aFVBTWg3SWVIVVMrRVVPQWRQNG10SDYwNm96UDd1SE9acEh3TXFP?=
- =?utf-8?B?NXhhejNhVHBOM2tKNzBVbjZNbm5nNFFFVmMvTXFNOXN3M3JtcE42b0Q1dWJT?=
- =?utf-8?B?UG5xN2tjaXFiTEdhdk8zSm5QaTFSd1lzTXc5SnV0Nm1HWUFhdEw2UkRzV29R?=
- =?utf-8?B?THFLek1ZNFBWWktncU8zU1hxWTN1SWh0N0NlK1pmMWxhKzhLVjZvS09HMTVZ?=
- =?utf-8?Q?dmHQ9FuZLp1V0Rn8oOY5HAg=3D?=
-X-OriginatorOrg: sladewatkins.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad3bb1a1-c519-4138-2250-08d9d094a4f8
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR20MB3097.namprd20.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2022 21:45:09.2816
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 369a2136-99b5-49ad-839a-ceafa92bc824
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GVSGl7NBV63+0AOG1OUUcKgz1NyFxJM1TsoueBdVogKMe1MJHbbiIo9pq4gXziwVVcCst+wnlegppX46GXCn+A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR2001MB1834
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 1/4/2022 9:34 AM, kvartet wrote:
-> We are so sorry for that. You can try the following websites, which
-> can be accessed without registration.
-> 
-> console output: https://paste.ubuntu.com/p/Bfpr8Gxtd4/
-> kernel config: https://paste.ubuntu.com/p/FDDNHDxtwz/
-> 
-> Sorry again and look forward to your reply!
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-any particular reason Pastebin[1] can't be used?
+This fixes the following warnings when using autoconf >= 2.70:
 
-[1] https://pastebin.com/
+  configure.ac:19: warning: The macro `AC_LANG_C' is obsolete.
+  configure.ac:45: warning: The macro `AC_HELP_STRING' is obsolete.
+  configure.ac:440: warning: AC_OUTPUT should be used without arguments.
 
-best,
-slade
+The macros are replacing following the autoconf documentation:
+
+https://www.gnu.org/software/autoconf/manual/autoconf-2.70/html_node/Obsolete-Macros.html
+
+Fixes: https://github.com/bluez/bluez/issues/246
+---
+ acinclude.m4 | 12 ++++----
+ configure.ac | 87 ++++++++++++++++++++++++++--------------------------
+ 2 files changed, 50 insertions(+), 49 deletions(-)
+
+diff --git a/acinclude.m4 b/acinclude.m4
+index b388dfc11..c5d6de7b3 100644
+--- a/acinclude.m4
++++ b/acinclude.m4
+@@ -71,13 +71,13 @@ AC_DEFUN([COMPILER_FLAGS], [
+ AC_DEFUN([MISC_FLAGS], [
+ 	misc_cflags=""
+ 	misc_ldflags=""
+-	AC_ARG_ENABLE(optimization, AC_HELP_STRING([--disable-optimization],
++	AC_ARG_ENABLE(optimization, AS_HELP_STRING([--disable-optimization],
+ 			[disable code optimization through compiler]), [
+ 		if (test "${enableval}" = "no"); then
+ 			misc_cflags="$misc_cflags -O0"
+ 		fi
+ 	])
+-	AC_ARG_ENABLE(asan, AC_HELP_STRING([--enable-asan],
++	AC_ARG_ENABLE(asan, AS_HELP_STRING([--enable-asan],
+ 			[enable linking with address sanitizer]), [
+ 		save_LIBS=$LIBS
+ 		AC_CHECK_LIB(asan, _init)
+@@ -90,7 +90,7 @@ AC_DEFUN([MISC_FLAGS], [
+ 			AC_SUBST([ASAN_LIB], ${ac_cv_lib_asan__init})
+ 		fi
+ 	])
+-	AC_ARG_ENABLE(lsan, AC_HELP_STRING([--enable-lsan],
++	AC_ARG_ENABLE(lsan, AS_HELP_STRING([--enable-lsan],
+ 			[enable linking with address sanitizer]), [
+ 		save_LIBS=$LIBS
+ 		AC_CHECK_LIB(lsan, _init)
+@@ -103,7 +103,7 @@ AC_DEFUN([MISC_FLAGS], [
+ 			AC_SUBST([ASAN_LIB], ${ac_cv_lib_lsan__init})
+ 		fi
+ 	])
+-	AC_ARG_ENABLE(ubsan, AC_HELP_STRING([--enable-ubsan],
++	AC_ARG_ENABLE(ubsan, AS_HELP_STRING([--enable-ubsan],
+ 			[enable linking with address sanitizer]), [
+ 		save_LIBS=$LIBS
+ 		AC_CHECK_LIB(ubsan, _init)
+@@ -115,14 +115,14 @@ AC_DEFUN([MISC_FLAGS], [
+ 			misc_ldflags="$misc_ldflags -fsanitize=undefined";
+ 		fi
+ 	])
+-	AC_ARG_ENABLE(debug, AC_HELP_STRING([--enable-debug],
++	AC_ARG_ENABLE(debug, AS_HELP_STRING([--enable-debug],
+ 			[enable compiling with debugging information]), [
+ 		if (test "${enableval}" = "yes" &&
+ 				test "${ac_cv_prog_cc_g}" = "yes"); then
+ 			misc_cflags="$misc_cflags -g"
+ 		fi
+ 	])
+-	AC_ARG_ENABLE(pie, AC_HELP_STRING([--enable-pie],
++	AC_ARG_ENABLE(pie, AS_HELP_STRING([--enable-pie],
+ 			[enable position independent executables flag]), [
+ 		if (test "${enableval}" = "yes" &&
+ 				test "${ac_cv_prog_cc_pie}" = "yes"); then
+diff --git a/configure.ac b/configure.ac
+index 849e1db46..052a1e7d1 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -16,7 +16,7 @@ PKG_PROG_PKG_CONFIG
+ 
+ COMPILER_FLAGS
+ 
+-AC_LANG_C
++AC_LANG([C])
+ 
+ AC_C_RESTRICT
+ 
+@@ -49,7 +49,7 @@ MISC_FLAGS
+ AM_CONDITIONAL(VALGRIND, test "${enable_valgrind}" = "yes" &&
+ 		test "$ASAN_LIB" != "yes" && test "LSAN_LIB" != "yes")
+ 
+-AC_ARG_ENABLE(threads, AC_HELP_STRING([--enable-threads],
++AC_ARG_ENABLE(threads, AS_HELP_STRING([--enable-threads],
+ 		[enable threading support]), [enable_threads=${enableval}])
+ 
+ AC_CHECK_FUNCS(explicit_bzero)
+@@ -88,7 +88,7 @@ PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.6, dummy=yes,
+ AC_SUBST(DBUS_CFLAGS)
+ AC_SUBST(DBUS_LIBS)
+ 
+-AC_ARG_WITH([dbusconfdir], AC_HELP_STRING([--with-dbusconfdir=DIR],
++AC_ARG_WITH([dbusconfdir], AS_HELP_STRING([--with-dbusconfdir=DIR],
+ 				[path to D-Bus configuration directory]),
+ 					[path_dbusconfdir=${withval}])
+ if (test -z "${path_dbusconfdir}"); then
+@@ -101,7 +101,7 @@ if (test -z "${path_dbusconfdir}"); then
+ fi
+ AC_SUBST(DBUS_CONFDIR, [${path_dbusconfdir}])
+ 
+-AC_ARG_WITH([dbussystembusdir], AC_HELP_STRING([--with-dbussystembusdir=DIR],
++AC_ARG_WITH([dbussystembusdir], AS_HELP_STRING([--with-dbussystembusdir=DIR],
+ 				[path to D-Bus system bus services directory]),
+ 					[path_dbussystembusdir=${withval}])
+ if (test -z "${path_dbussystembusdir}"); then
+@@ -114,7 +114,7 @@ if (test -z "${path_dbussystembusdir}"); then
+ fi
+ AC_SUBST(DBUS_SYSTEMBUSDIR, [${path_dbussystembusdir}])
+ 
+-AC_ARG_WITH([dbussessionbusdir], AC_HELP_STRING([--with-dbussessionbusdir=DIR],
++AC_ARG_WITH([dbussessionbusdir], AS_HELP_STRING([--with-dbussessionbusdir=DIR],
+ 				[path to D-Bus session bus services directory]),
+ 					[path_dbussessionbusdir=${withval}])
+ if (test -z "${path_dbussessionbusdir}"); then
+@@ -127,7 +127,7 @@ if (test -z "${path_dbussessionbusdir}"); then
+ fi
+ AC_SUBST(DBUS_SESSIONBUSDIR, [${path_dbussessionbusdir}])
+ 
+-AC_ARG_WITH([zsh-completion-dir], AC_HELP_STRING([--with-zsh-completion-dir=DIR],
++AC_ARG_WITH([zsh-completion-dir], AS_HELP_STRING([--with-zsh-completion-dir=DIR],
+ 				[path to install zsh completions]),
+ 					[path_zshcompletiondir=${withval}],
+ 						[path_zshcompletiondir="yes"])
+@@ -139,7 +139,7 @@ fi
+ AC_SUBST(ZSH_COMPLETIONDIR, [${path_zshcompletiondir}])
+ AM_CONDITIONAL(ZSH_COMPLETIONS, test "${path_zshcompletiondir}" != "no")
+ 
+-AC_ARG_ENABLE(backtrace, AC_HELP_STRING([--enable-backtrace],
++AC_ARG_ENABLE(backtrace, AS_HELP_STRING([--enable-backtrace],
+ 		[compile backtrace support]), [enable_backtrace=${enableval}])
+ 
+ if (test "${enable_backtrace}" = "yes"); then
+@@ -153,55 +153,55 @@ if (test "${enable_backtrace}" = "yes"); then
+ 	AC_SUBST(BACKTRACE_LIBS)
+ fi
+ 
+-AC_ARG_ENABLE(library, AC_HELP_STRING([--enable-library],
++AC_ARG_ENABLE(library, AS_HELP_STRING([--enable-library],
+ 		[install Bluetooth library]), [enable_library=${enableval}])
+ AM_CONDITIONAL(LIBRARY, test "${enable_library}" = "yes")
+ 
+-AC_ARG_ENABLE(test, AC_HELP_STRING([--enable-test],
++AC_ARG_ENABLE(test, AS_HELP_STRING([--enable-test],
+ 		[enable test/example scripts]), [enable_test=${enableval}])
+ AM_CONDITIONAL(TEST, test "${enable_test}" = "yes")
+ 
+-AC_ARG_ENABLE(nfc, AC_HELP_STRING([--enable-nfc],
++AC_ARG_ENABLE(nfc, AS_HELP_STRING([--enable-nfc],
+ 		[enable NFC paring]), [enable_nfc=${enableval}])
+ AM_CONDITIONAL(NFC, test "${enable_nfc}" = "yes")
+ 
+-AC_ARG_ENABLE(sap, AC_HELP_STRING([--enable-sap],
++AC_ARG_ENABLE(sap, AS_HELP_STRING([--enable-sap],
+ 		[enable SAP profile]), [enable_sap=${enableval}])
+ AM_CONDITIONAL(SAP, test "${enable_sap}" = "yes")
+ 
+-AC_ARG_ENABLE(a2dp, AC_HELP_STRING([--disable-a2dp],
++AC_ARG_ENABLE(a2dp, AS_HELP_STRING([--disable-a2dp],
+ 		[disable A2DP profile]), [enable_a2dp=${enableval}])
+ AM_CONDITIONAL(A2DP, test "${enable_a2dp}" != "no")
+ 
+-AC_ARG_ENABLE(avrcp, AC_HELP_STRING([--disable-avrcp],
++AC_ARG_ENABLE(avrcp, AS_HELP_STRING([--disable-avrcp],
+ 		[disable AVRCP profile]), [enable_avrcp=${enableval}])
+ AM_CONDITIONAL(AVRCP, test "${enable_avrcp}" != "no")
+ 
+-AC_ARG_ENABLE(network, AC_HELP_STRING([--disable-network],
++AC_ARG_ENABLE(network, AS_HELP_STRING([--disable-network],
+ 		[disable network profiles]), [enable_network=${enableval}])
+ AM_CONDITIONAL(NETWORK, test "${enable_network}" != "no")
+ 
+-AC_ARG_ENABLE(hid, AC_HELP_STRING([--disable-hid],
++AC_ARG_ENABLE(hid, AS_HELP_STRING([--disable-hid],
+ 		[disable HID profile]), [enable_hid=${enableval}])
+ AM_CONDITIONAL(HID, test "${enable_hid}" != "no")
+ 
+-AC_ARG_ENABLE(hog, AC_HELP_STRING([--disable-hog],
++AC_ARG_ENABLE(hog, AS_HELP_STRING([--disable-hog],
+ 		[disable HoG profile]), [enable_hog=${enableval}])
+ AM_CONDITIONAL(HOG, test "${enable_hog}" != "no")
+ 
+-AC_ARG_ENABLE(health, AC_HELP_STRING([--enable-health],
++AC_ARG_ENABLE(health, AS_HELP_STRING([--enable-health],
+ 		[enable health profiles]), [enable_health=${enableval}])
+ AM_CONDITIONAL(HEALTH, test "${enable_health}" = "yes")
+ 
+-AC_ARG_ENABLE(tools, AC_HELP_STRING([--disable-tools],
++AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+ 
+-AC_ARG_ENABLE(monitor, AC_HELP_STRING([--disable-monitor],
++AC_ARG_ENABLE(monitor, AS_HELP_STRING([--disable-monitor],
+ 		[disable Bluetooth monitor]), [enable_monitor=${enableval}])
+ AM_CONDITIONAL(MONITOR, test "${enable_monitor}" != "no")
+ 
+-AC_ARG_ENABLE(udev, AC_HELP_STRING([--disable-udev],
++AC_ARG_ENABLE(udev, AS_HELP_STRING([--disable-udev],
+ 		[disable udev device support]), [enable_udev=${enableval}])
+ if (test "${enable_tools}" != "no" && test "${enable_udev}" != "no"); then
+ 	PKG_CHECK_MODULES(UDEV, libudev >= 172, dummy=yes,
+@@ -214,7 +214,7 @@ if (test "${enable_tools}" != "no" && test "${enable_udev}" != "no"); then
+ fi
+ AM_CONDITIONAL(UDEV, test "${enable_udev}" != "no")
+ 
+-AC_ARG_WITH([udevdir], AC_HELP_STRING([--with-udevdir=DIR],
++AC_ARG_WITH([udevdir], AS_HELP_STRING([--with-udevdir=DIR],
+ 			[path to udev directory]), [path_udevdir=${withval}])
+ if (test "${enable_udev}" != "no" && test -z "${path_udevdir}"); then
+ 	AC_MSG_CHECKING([udev directory])
+@@ -226,11 +226,11 @@ if (test "${enable_udev}" != "no" && test -z "${path_udevdir}"); then
+ fi
+ AC_SUBST(UDEV_DIR, [${path_udevdir}])
+ 
+-AC_ARG_ENABLE(cups, AC_HELP_STRING([--disable-cups],
++AC_ARG_ENABLE(cups, AS_HELP_STRING([--disable-cups],
+                 [disable CUPS printer support]), [enable_cups=${enableval}])
+ AM_CONDITIONAL(CUPS, test "${enable_cups}" != "no")
+ 
+-AC_ARG_ENABLE(mesh, AC_HELP_STRING([--enable-mesh],
++AC_ARG_ENABLE(mesh, AS_HELP_STRING([--enable-mesh],
+ 		[enable Mesh profile support]), [enable_mesh=${enableval}])
+ AM_CONDITIONAL(MESH, test "${enable_mesh}" = "yes")
+ 
+@@ -241,7 +241,7 @@ if (test "${enable_mesh}" = "yes"); then
+ 	AC_SUBST(JSON_LIBS)
+ fi
+ 
+-AC_ARG_ENABLE(midi, AC_HELP_STRING([--enable-midi],
++AC_ARG_ENABLE(midi, AS_HELP_STRING([--enable-midi],
+                 [enable MIDI support]), [enable_midi=${enableval}])
+ AM_CONDITIONAL(MIDI, test "${enable_midi}" = "yes")
+ 
+@@ -252,7 +252,7 @@ if (test "${enable_midi}" = "yes"); then
+ 	AC_SUBST(ALSA_LIBS)
+ fi
+ 
+-AC_ARG_ENABLE(obex, AC_HELP_STRING([--disable-obex],
++AC_ARG_ENABLE(obex, AS_HELP_STRING([--disable-obex],
+ 		[disable OBEX profile support]), [enable_obex=${enableval}])
+ if (test "${enable_obex}" != "no"); then
+ 	PKG_CHECK_MODULES(ICAL, libical, dummy=yes,
+@@ -262,11 +262,11 @@ if (test "${enable_obex}" != "no"); then
+ fi
+ AM_CONDITIONAL(OBEX, test "${enable_obex}" != "no")
+ 
+-AC_ARG_ENABLE(btpclient, AC_HELP_STRING([--enable-btpclient],
++AC_ARG_ENABLE(btpclient, AS_HELP_STRING([--enable-btpclient],
+ 		[enable BTP client]), [enable_btpclient=${enableval}])
+ AM_CONDITIONAL(BTPCLIENT, test "${enable_btpclient}" = "yes")
+ 
+-AC_ARG_ENABLE([external_ell], AC_HELP_STRING([--enable-external-ell],
++AC_ARG_ENABLE([external_ell], AS_HELP_STRING([--enable-external-ell],
+ 				[enable external Embedded Linux library]),
+ 					[enable_external_ell=${enableval}])
+ if (test "${enable_external_ell}" = "yes"); then
+@@ -281,7 +281,7 @@ AM_CONDITIONAL(EXTERNAL_ELL, test "${enable_external_ell}" = "yes" ||
+ AM_CONDITIONAL(LIBSHARED_ELL, test "${enable_btpclient}" = "yes" ||
+ 						test "${enable_mesh}" = "yes")
+ 
+-AC_ARG_ENABLE(client, AC_HELP_STRING([--disable-client],
++AC_ARG_ENABLE(client, AS_HELP_STRING([--disable-client],
+ 		[disable command line client]), [enable_client=${enableval}])
+ AM_CONDITIONAL(CLIENT, test "${enable_client}" != "no")
+ 
+@@ -291,12 +291,12 @@ if (test "${enable_client}" != "no" || test "${enable_mesh}" = "yes"); then
+ fi
+ AM_CONDITIONAL(READLINE, test "${enable_readline}" = "yes")
+ 
+-AC_ARG_ENABLE(systemd, AC_HELP_STRING([--disable-systemd],
++AC_ARG_ENABLE(systemd, AS_HELP_STRING([--disable-systemd],
+ 		[disable systemd integration]), [enable_systemd=${enableval}])
+ AM_CONDITIONAL(SYSTEMD, test "${enable_systemd}" != "no")
+ 
+ AC_ARG_WITH([systemdsystemunitdir],
+-			AC_HELP_STRING([--with-systemdsystemunitdir=DIR],
++			AS_HELP_STRING([--with-systemdsystemunitdir=DIR],
+ 			[path to systemd system unit directory]),
+ 					[path_systemunitdir=${withval}])
+ if (test "${enable_systemd}" != "no" && test -z "${path_systemunitdir}"); then
+@@ -310,7 +310,7 @@ fi
+ AC_SUBST(SYSTEMD_SYSTEMUNITDIR, [${path_systemunitdir}])
+ 
+ AC_ARG_WITH([systemduserunitdir],
+-			AC_HELP_STRING([--with-systemduserunitdir=DIR],
++			AS_HELP_STRING([--with-systemduserunitdir=DIR],
+ 			[path to systemd user unit directory]),
+ 					[path_userunitdir=${withval}])
+ if (test "${enable_systemd}" != "no" && test -z "${path_userunitdir}"); then
+@@ -323,12 +323,12 @@ if (test "${enable_systemd}" != "no" && test -z "${path_userunitdir}"); then
+ fi
+ AC_SUBST(SYSTEMD_USERUNITDIR, [${path_userunitdir}])
+ 
+-AC_ARG_ENABLE(datafiles, AC_HELP_STRING([--disable-datafiles],
++AC_ARG_ENABLE(datafiles, AS_HELP_STRING([--disable-datafiles],
+ 			[do not install configuration and data files]),
+ 					[enable_datafiles=${enableval}])
+ AM_CONDITIONAL(DATAFILES, test "${enable_datafiles}" != "no")
+ 
+-AC_ARG_ENABLE(manpages, AC_HELP_STRING([--disable-manpages],
++AC_ARG_ENABLE(manpages, AS_HELP_STRING([--disable-manpages],
+ 			[disable building of manual pages]),
+ 					[enable_manpages=${enableval}])
+ if (test "${enable_manpages}" != "no"); then
+@@ -341,36 +341,36 @@ AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" != "no")
+ AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" != "no" &&
+ 				test "${RST2MAN}" != "no")
+ 
+-AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing],
++AC_ARG_ENABLE(testing, AS_HELP_STRING([--enable-testing],
+ 			[enable testing tools]),
+ 					[enable_testing=${enableval}])
+ AM_CONDITIONAL(TESTING, test "${enable_testing}" = "yes")
+ 
+-AC_ARG_ENABLE(experimental, AC_HELP_STRING([--enable-experimental],
++AC_ARG_ENABLE(experimental, AS_HELP_STRING([--enable-experimental],
+ 			[enable experimental tools]),
+ 					[enable_experimental=${enableval}])
+ AM_CONDITIONAL(EXPERIMENTAL, test "${enable_experimental}" = "yes")
+ 
+-AC_ARG_ENABLE(deprecated, AC_HELP_STRING([--enable-deprecated],
++AC_ARG_ENABLE(deprecated, AS_HELP_STRING([--enable-deprecated],
+ 			[enable deprecated tools]),
+ 					[enable_deprecated=${enableval}])
+ AM_CONDITIONAL(DEPRECATED, test "${enable_deprecated}" = "yes")
+ 
+-AC_ARG_ENABLE(sixaxis, AC_HELP_STRING([--enable-sixaxis],
++AC_ARG_ENABLE(sixaxis, AS_HELP_STRING([--enable-sixaxis],
+ 		[enable sixaxis plugin]), [enable_sixaxis=${enableval}])
+ AM_CONDITIONAL(SIXAXIS, test "${enable_sixaxis}" = "yes" &&
+ 					 test "${enable_udev}" != "no")
+ 
+-AC_ARG_ENABLE(hid2hci, AC_HELP_STRING([--enable-hid2hci],
++AC_ARG_ENABLE(hid2hci, AS_HELP_STRING([--enable-hid2hci],
+ 		[enable hid2hci tool]), [enable_hid2hci=${enableval}])
+ AM_CONDITIONAL(HID2HCI, test "${enable_hid2hci}" = "yes" &&
+ 					test "${enable_udev}" != "no")
+ 
+-AC_ARG_ENABLE(logger, AC_HELP_STRING([--enable-logger],
++AC_ARG_ENABLE(logger, AS_HELP_STRING([--enable-logger],
+ 		[enable HCI logger service]), [enable_logger=${enableval}])
+ AM_CONDITIONAL(LOGGER, test "${enable_logger}" = "yes")
+ 
+-AC_ARG_ENABLE(admin, AC_HELP_STRING([--enable-admin],
++AC_ARG_ENABLE(admin, AS_HELP_STRING([--enable-admin],
+ 		[enable admin policy plugin]), [enable_admin=${enableval}])
+ AM_CONDITIONAL(ADMIN, test "${enable_admin}" = "yes")
+ 
+@@ -404,7 +404,7 @@ AC_DEFINE_UNQUOTED(MESH_STORAGEDIR, "${storagedir}/mesh",
+ 			[Directory for the mesh daemon storage files])
+ AC_SUBST(MESH_STORAGEDIR, "${storagedir}/mesh")
+ 
+-AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
++AC_ARG_ENABLE(android, AS_HELP_STRING([--enable-android],
+ 			[enable BlueZ for Android]),
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+@@ -426,7 +426,7 @@ fi
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
+ 
+-AC_ARG_WITH([phonebook], AC_HELP_STRING([--with-phonebook=PLUGIN],
++AC_ARG_WITH([phonebook], AS_HELP_STRING([--with-phonebook=PLUGIN],
+ 			[obexd phonebook plugin (default=dummy)]),
+ 			[plugin_phonebook=${withval}])
+ if (test -z "${plugin_phonebook}"); then
+@@ -446,4 +446,5 @@ if (test "${plugin_phonebook}" = "ebook"); then
+ fi
+ AC_SUBST(PLUGIN_PHONEBOOK, [${plugin_phonebook}])
+ 
+-AC_OUTPUT(Makefile src/bluetoothd.rst lib/bluez.pc mesh/bluetooth-meshd.rst)
++AC_CONFIG_FILES(Makefile src/bluetoothd.rst lib/bluez.pc mesh/bluetooth-meshd.rst)
++AC_OUTPUT
+-- 
+2.33.1
+
