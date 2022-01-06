@@ -2,116 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99B2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 20:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2C8EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 21:01:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244011AbiAFU5Y convert rfc822-to-8bit (ORCPT
+        id S244059AbiAFVBH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jan 2022 15:57:24 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44377 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244010AbiAFU5X (ORCPT
+        Thu, 6 Jan 2022 16:01:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244010AbiAFVBG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jan 2022 15:57:23 -0500
-Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7DFCDCECDD;
-        Thu,  6 Jan 2022 21:57:22 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [RFC PATCH v2] Bluetooth: btintel: Fix broken LED quirk for
- legacy ROM devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20f68eb75538796fb0e69b45543e151b3fd04bae.camel@intel.com>
-Date:   Thu, 6 Jan 2022 21:57:21 +0100
-Cc:     "hj.tedd.an@gmail.com" <hj.tedd.an@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <56CB4500-6F81-47B4-9F80-4CB1D0B420CE@holtmann.org>
-References: <20211216210958.62129-1-hj.tedd.an@gmail.com>
- <B5187291-3173-4BFB-8465-25AB75BA328E@holtmann.org>
- <39a9b9c68cdb9fbf32f3c6023c0272b53d37d668.camel@intel.com>
- <768826DA-51CF-4EA2-B582-89BFE843EBAE@holtmann.org>
- <f1ffad7eebc385d43f4f48d138021860f8e582cd.camel@intel.com>
- <F93FE723-881E-45D6-8A43-379B0ABAC363@holtmann.org>
- <5b0ddedd9c6c119d4c3c4b65adaabe5d86bd166f.camel@intel.com>
- <6EBC0BA5-E39D-4C9F-849D-C7972BDD9582@holtmann.org>
- <20f68eb75538796fb0e69b45543e151b3fd04bae.camel@intel.com>
-To:     "An, Tedd" <tedd.an@intel.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Thu, 6 Jan 2022 16:01:06 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFA9C061245
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Jan 2022 13:01:06 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id p37so3522406pfh.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Jan 2022 13:01:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ued2tcLWPIHBn44hm+c12RNjnXbt9XW7j/xr/LhDBzE=;
+        b=G9CZxRMbAdRcTJaPaWf9Zowl1hH8ImHMZnhfrCGitTvXtvrlhbrqdUIB6/JIrhLlGF
+         NJVqenYqHpgmTvekUX/aOU/Ik9scwp3vhzvOU15yzKph/n9v+0devRMgjLxLquCfax/V
+         b47p8pDNfQuwc1BOLxikJPlI+Gu/wvKfwJe7gEjPB+/o/yLgkImVGseIU5agY0bGeRJs
+         /1uYnXdDFw5aveSZv5BgFD/2aOamcRRSXo5M+aCsMcWNQWKaxGUlC+DWZfGfDZKoNSEr
+         e70ixHJeAX2P0THGiNOxPfZZKD1dc9LNA93Soj2bLAP5LQSMt4VM45JsFlJJzYAYrRNE
+         7QIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ued2tcLWPIHBn44hm+c12RNjnXbt9XW7j/xr/LhDBzE=;
+        b=1mwPK35Nzt3VBIphiBfllLQlEuwtQZPtYxAejPflacqtJadzajoopS0eSvMZH/hGv5
+         md2RAG7SbtPdIMtYJ+Qknk3u2eZQaRQeDWBZ42SrkxFv5pJD00vIPZ54wlS926RDJj1o
+         I4GDiDtI2dSq3cQix4oLssxj6r+vcb1/ePnPj+DxSdsnr4amGT1oUwhUXJnRTF/Fmh/A
+         ZcGVZUs+vVYRZPi1QqOOp4MwYbS6c6Rfj7yvBnXmINLCN56wB3zl1uK6qJWao2vheoxn
+         2ldiGbNvW+9glofwlye1Ag3pBeDS04diSfzswsHRt8Ti09BtIu8MzVMCiAu3PANbzFVg
+         L/ig==
+X-Gm-Message-State: AOAM532laWCckMLHfIgZ6Jb59i1Mz+OpV8riwR8R9J1aDGtMSDKzlmzl
+        6A/69OdCONwDuK8X9tj4iFu25RiKBwQ=
+X-Google-Smtp-Source: ABdhPJyFw+J3oFr0iUbJPDtOLJjOA1atOKXslgHGzkhN3wcXYZsU4tleP+L4fA8uhqi/yQGKxyYnow==
+X-Received: by 2002:a63:8c49:: with SMTP id q9mr20317518pgn.425.1641502866019;
+        Thu, 06 Jan 2022 13:01:06 -0800 (PST)
+Received: from [172.17.0.2] ([20.69.156.213])
+        by smtp.gmail.com with ESMTPSA id m14sm3482581pfk.3.2022.01.06.13.01.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jan 2022 13:01:05 -0800 (PST)
+Message-ID: <61d75891.1c69fb81.1fe18.8df4@mx.google.com>
+Date:   Thu, 06 Jan 2022 13:01:05 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5633673302996302248=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ,v2] tools/mesh-cfgclient: Fix config menu help message
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220106192632.28915-1-inga.stotland@intel.com>
+References: <20220106192632.28915-1-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+--===============5633673302996302248==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
->> but we succeed with HCI_Intel_Read_Version on a cold boot. So that means it is just that we have to make this one flag persistent. So it is valid even when no HCI_Intel_Read_Version is read. Or just
->> make it a bool variable in the btintel internal struct.
->> 
-> 
-> Yes, there is no problem with cold boot. The problem is warm boot. Here are the log after making the changes with some debug messages.
-> 
-> [COLD BOOT]
-> 
-> Dec 24 16:16:27 han1-XPS-13-9350 kernel: microcode: microcode updated early to revision 0xea, date = 2021-01-25
-> Dec 24 16:16:27 han1-XPS-13-9350 kernel: Linux version 5.16.0-rc1+ (han1@han1-XPS-13-9350) (gcc (Ubuntu 11.2.0-7ubuntu2) 11.2.0, GNU ld (GNU Binutils for Ubuntu) 2.37) #1 SMP PREEMPT Thu Dec 23
-> 20:52:12 PST 2021
-> 
-> Dec 24 16:16:27 han1-XPS-13-9350 kernel: usb 1-3: new full-speed USB device number 2 using xhci_hcd
-> Dec 24 16:16:27 han1-XPS-13-9350 kernel: usb 1-3: New USB device found, idVendor=8087, idProduct=0a2a, bcdDevice= 0.01
-> Dec 24 16:16:27 han1-XPS-13-9350 kernel: usb 1-3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> 
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: Core ver 2.22
-> 
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>> btusb_probe: intf 00000000074889f5 id 00000000c09ad578
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Allocate hci_dev=00000000a477ec45
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Set hci_set_drvdata(hdev=00000000a477ec45, data=0000000077ec88bc)
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: usbcore: registered new interface driver btusb
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>> btintel_setup_combined(hdev=00000000a477ec45)
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Test flag(hdev=00000000a477ec45, INTEL_SHUTDOWN_EXECUTED)
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: >>>>>      INTEL_SHUTDOWN_EXECUTED is NOT SET
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: hci0: Intel Bluetooth firmware file: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: hci0: unexpected event 0xff length: 2 > 0
-> Dec 24 16:16:28 han1-XPS-13-9350 kernel: Bluetooth: hci0: Intel BT fw patch 0x32 completed & activated
-> 
-> [HCI DOWN]
-> 
-> Dec 24 16:17:19 han1-XPS-13-9350 kernel: Bluetooth: >>>>> btintel_shutdown_combined(hdev=00000000a477ec45)
-> Dec 24 16:17:19 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Send HCI_Intel_SWRFKILL
-> Dec 24 16:17:19 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Set INTEL_SHUTDOWN_EXECUTED
-> 
-> Dec 24 16:17:35 han1-XPS-13-9350 systemd-shutdown[1]: Sending SIGTERM to remaining processes...
-> 
-> [REBOOT...]
-> 
-> Dec 24 16:18:40 han1-XPS-13-9350 kernel: usb 1-3: new full-speed USB device number 2 using xhci_hcd
-> Dec 24 16:18:40 han1-XPS-13-9350 kernel: usb 1-3: New USB device found, idVendor=8087, idProduct=0a2a, bcdDevice= 0.01
-> Dec 24 16:18:40 han1-XPS-13-9350 kernel: usb 1-3: New USB device strings: Mfr=0, Product=0, SerialNumber=0
-> 
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: Core ver 2.22
-> 
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>> btusb_probe: intf 0000000016d7e789 id 0000000058418b5d
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Allocate hci_dev=0000000052758830
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Set hci_set_drvdata(hdev=0000000052758830, data=0000000074e43445)
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: usbcore: registered new interface driver btusb
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>> btintel_setup_combined(hdev=0000000052758830)
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>> Test flag(hdev=0000000052758830, INTEL_SHUTDOWN_EXECUTED)
-> Dec 24 16:18:41 han1-XPS-13-9350 kernel: Bluetooth: >>>>>      INTEL_SHUTDOWN_EXECUTED is NOT SET
-> 
-> Dec 24 16:18:43 han1-XPS-13-9350 kernel: Bluetooth: hci0: Reading Intel version command failed (-110)
-> Dec 24 16:18:43 han1-XPS-13-9350 kernel: Bluetooth: hci0: command tx timeout
-> 
-> 
-> After [REBOOT], the INTEL_SHUTDOWN_EXECUTED flag that was set before the reboot is gone. 
-> So, how can I make the flag persisten between rebooting the system?
+This is automated email and please do not reply to this email!
 
-thanks for being patient with me. I finally understand the issue here. The system reboots and thus we get a new hci_dev, but the controller sticks in its runtime suspend operational mode.
+Dear submitter,
 
-So yes, the only way to make this right is to list the quirk in btusb.c blacklist table. I review the original patch once again after fully groking the issue.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=603296
 
-Regards
+---Test result---
 
-Marcel
+Test Summary:
+CheckPatch                    PASS      0.60 seconds
+GitLint                       PASS      0.45 seconds
+Prep - Setup ELL              PASS      55.58 seconds
+Build - Prep                  PASS      0.62 seconds
+Build - Configure             PASS      10.79 seconds
+Build - Make                  PASS      1846.57 seconds
+Make Check                    PASS      13.03 seconds
+Make Check w/Valgrind         PASS      556.91 seconds
+Make Distcheck                PASS      295.03 seconds
+Build w/ext ELL - Configure   PASS      10.80 seconds
+Build w/ext ELL - Make        PASS      1864.09 seconds
+Incremental Build with patchesPASS      0.00 seconds
 
 
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5633673302996302248==--
