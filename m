@@ -2,88 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A28CEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 19:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E05C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 20:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243309AbiAFT2s (ORCPT
+        id S243680AbiAFUYH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jan 2022 14:28:48 -0500
-Received: from mga07.intel.com ([134.134.136.100]:64844 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243298AbiAFT2s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jan 2022 14:28:48 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641497328; x=1673033328;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=I93U42v6NThZiD4Z9hwuCScr3EhvlKyz+gS7G39Fgk4=;
-  b=U+T7X8SkZIMlPCD5U4qisLc0aLt7EGqJ1CyKRsjJY0UmrhWfUGp561YR
-   //ueqkpnDRZ2k5cKbo3l0bBmTKD318k5u/nA03J/sHPJvxiqLEY3h2T4J
-   guyYZckUrSEPeeePwmrwFqL3bpai3ay4lit+Qkr0c8WDkkLxcp5HwRisI
-   ciq/ln8x8Tj9sDdaY6BSIBTm/XTs/rEBUtzyvcTk3jwjxemifAOap+L/J
-   T2aUkP23ncITKQA6E5vnLnZ7kZWN+0Q/M/sE0ZDA35bWCN5/7QOEcevBk
-   pTPD0rAwHCnM9Oo5GE+HuPC9UwWROHa9PPUiOII9ElnRhVSyTimrTa3nv
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="306075213"
-X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="306075213"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:26:38 -0800
-X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="591480580"
-Received: from avaidyan-mobl3.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.63.113])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:26:37 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2] tools/mesh-cfgclient: Fix config menu help message
-Date:   Thu,  6 Jan 2022 11:26:32 -0800
-Message-Id: <20220106192632.28915-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 6 Jan 2022 15:24:07 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:48250 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243662AbiAFUYH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 6 Jan 2022 15:24:07 -0500
+Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 46150CECDC;
+        Thu,  6 Jan 2022 21:24:05 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v4] Bluetooth: btqca: sequential validation
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1640174444-28561-1-git-send-email-quic_saluvala@quicinc.com>
+Date:   Thu, 6 Jan 2022 21:24:04 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        quic_hemantg@quicinc.com, MSM <linux-arm-msm@vger.kernel.org>,
+        quic_bgodavar@quicinc.com, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org,
+        mcchou@chromium.org, quic_pharish@quicinc.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <3E84ACC3-BF17-4E7B-AA57-CDCA86549813@holtmann.org>
+References: <1640174444-28561-1-git-send-email-quic_saluvala@quicinc.com>
+To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-An info message suggesting to request a remote node composition
-should reference the correct menu command: "composition-get".
----
- tools/mesh/cfgcli.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Sai,
 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index f815c513c..a48eace74 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -1291,7 +1291,7 @@ static void cmd_bind(uint32_t opcode, int argc, char *argv[])
- 
- 	if (!remote_has_composition(target)) {
- 		bt_shell_printf("Node composition is unknown\n");
--		bt_shell_printf("Call \"get-composition\" first\n");
-+		bt_shell_printf("Call \"composition-get\" first\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-@@ -1493,7 +1493,7 @@ static void cmd_pub_set(int argc, char *argv[])
- 
- 	if (!remote_has_composition(target)) {
- 		bt_shell_printf("Node composition is unknown\n");
--		bt_shell_printf("Call \"get-composition\" first\n");
-+		bt_shell_printf("Call \"composition-get\" first\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
-@@ -1593,7 +1593,7 @@ static void subscription_cmd(int argc, char *argv[], uint32_t opcode)
- 
- 	if (!remote_has_composition(target)) {
- 		bt_shell_printf("Node composition is unknown\n");
--		bt_shell_printf("Call \"get-composition\" first\n");
-+		bt_shell_printf("Call \"composition-get\" first\n");
- 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
--- 
-2.31.1
+> This change will have sequential validation support
+> & patch config command is added
+> 
+> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> 
+> v4:
+> * addressed the change from u8 cmd to const u8 cmd
+> 
+> v3:
+> * removed rlen,rtype
+> * Replaced kfree with kfree_skb
+> 
+> v2:
+> * Added static declaration
+> * Addressed wrong indentation
+> * Removed EDL_PATCH_CONFIG_CMD_LEN
+> 
+> v1:
+> *Initial patch
+> ---
+> drivers/bluetooth/btqca.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btqca.h |  2 ++
+> 2 files changed, 50 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> index be04d74..9091a88 100644
+> --- a/drivers/bluetooth/btqca.c
+> +++ b/drivers/bluetooth/btqca.c
+> @@ -141,6 +141,51 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+> 	return err;
+> }
+> 
+> +static int qca_send_patch_config_cmd(struct hci_dev *hdev)
+> +{
+> +	struct sk_buff *skb;
+> +	int err = 0;
+> +	const u8 cmd[] = {EDL_PATCH_CONFIG_CMD, 0x01, 0, 0, 0};
+> +	struct edl_event_hdr *edl;
+
+I said this many times before. = {[SPACE], a, b, c[SPACE]};
+
+And I prefer the const pieces first, and int err last.
+
+> +
+> +	bt_dev_dbg(hdev, "QCA Patch config");
+> +
+> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, sizeof(cmd),
+> +				cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		err = PTR_ERR(skb);
+> +		bt_dev_err(hdev, "Sending QCA Patch config failed (%d)", err);
+> +		return err;
+> +	}
+> +
+> +	if (skb->len != 2) {
+> +		bt_dev_err(hdev, "QCA Patch config cmd size mismatch len %d", skb->len);
+> +		err = -EILSEQ;
+> +		goto out;
+> +	}
+> +
+> +	edl = (struct edl_event_hdr *)(skb->data);
+> +	if (!edl) {
+> +		bt_dev_err(hdev, "QCA Patch config with no header");
+> +		err = -EILSEQ;
+> +		goto out;
+> +	}
+> +
+> +	if (edl->cresp != EDL_PATCH_CONFIG_RES_EVT || edl->rtype != EDL_PATCH_CONFIG_CMD) {
+> +		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
+> +			   edl->rtype);
+> +		err = -EIO;
+> +		goto out;
+> +	}
+> +
+> +out:
+> +	kfree_skb(skb);
+> +	if (err)
+> +		bt_dev_err(hdev, "QCA Patch config cmd failed (%d)", err);
+
+It is rather pointless to print two error. So just scrap this one.
+
+> +
+> +	return err;
+> +}
+> +
+> static int qca_send_reset(struct hci_dev *hdev)
+> {
+> 	struct sk_buff *skb;
+> @@ -551,6 +596,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> 	 */
+> 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+> 
+> +	if (soc_type == QCA_WCN6750)
+> +		qca_send_patch_config_cmd(hdev);
+> +
+> 	/* Download rampatch file */
+> 	config.type = TLV_TYPE_PATCH;
+> 	if (qca_is_wcn399x(soc_type)) {
+> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> index 30afa77..61e9a50 100644
+> --- a/drivers/bluetooth/btqca.h
+> +++ b/drivers/bluetooth/btqca.h
+> @@ -13,6 +13,7 @@
+> #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+> #define EDL_GET_BUILD_INFO_CMD		(0x20)
+> #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
+> +#define EDL_PATCH_CONFIG_CMD		(0x28)
+> #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+> #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+> #define QCA_DISABLE_LOGGING		(0xFC17)
+> @@ -24,6 +25,7 @@
+> #define EDL_CMD_EXE_STATUS_EVT		(0x00)
+> #define EDL_SET_BAUDRATE_RSP_EVT	(0x92)
+> #define EDL_NVM_ACCESS_CODE_EVT		(0x0B)
+> +#define EDL_PATCH_CONFIG_RES_EVT	(0x00)
+> #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
+> 
+> #define EDL_TAG_ID_HCI			(17)
+
+Regards
+
+Marcel
 
