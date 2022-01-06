@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA8AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 19:23:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A28CEC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 19:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243294AbiAFTXP (ORCPT
+        id S243309AbiAFT2s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jan 2022 14:23:15 -0500
-Received: from mga11.intel.com ([192.55.52.93]:35437 "EHLO mga11.intel.com"
+        Thu, 6 Jan 2022 14:28:48 -0500
+Received: from mga07.intel.com ([134.134.136.100]:64844 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243233AbiAFTXP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jan 2022 14:23:15 -0500
+        id S243298AbiAFT2s (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 6 Jan 2022 14:28:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641496995; x=1673032995;
+  t=1641497328; x=1673033328;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
   bh=I93U42v6NThZiD4Z9hwuCScr3EhvlKyz+gS7G39Fgk4=;
-  b=V9o6IDctOhm9aNrPPQmu5p2OygZCJxAun/nTqkx456fC0GPU4xWeTbM5
-   ts5hEXEDVoNg7lqRboMZ+kx/9CnSeb5QRJgMcq5gpZyYHSG0J+v7fVOri
-   VkqaCV7ugSWCu9ChQYOPwCQPXbc0v29NJxNKnxz0kzjf7e5l/Id0021lD
-   H1cj3c7hHLcGtYQWySKIazTbX9yxaJ2Nm+oi3saWY0fTaQGXUSrpH/xUf
-   f9uznvyfRXlt2Gz0NfP//LgFtkRZ8zjtzZijuFD8wrSkcVIQFr7fzHh73
-   KMcN5AGUctw7jGW0k3LSlYP1Ao2wogTnWJv+xLI9pTjYq/ugguCIimxNk
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="240271541"
+  b=U+T7X8SkZIMlPCD5U4qisLc0aLt7EGqJ1CyKRsjJY0UmrhWfUGp561YR
+   //ueqkpnDRZ2k5cKbo3l0bBmTKD318k5u/nA03J/sHPJvxiqLEY3h2T4J
+   guyYZckUrSEPeeePwmrwFqL3bpai3ay4lit+Qkr0c8WDkkLxcp5HwRisI
+   ciq/ln8x8Tj9sDdaY6BSIBTm/XTs/rEBUtzyvcTk3jwjxemifAOap+L/J
+   T2aUkP23ncITKQA6E5vnLnZ7kZWN+0Q/M/sE0ZDA35bWCN5/7QOEcevBk
+   pTPD0rAwHCnM9Oo5GE+HuPC9UwWROHa9PPUiOII9ElnRhVSyTimrTa3nv
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10217"; a="306075213"
 X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="240271541"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:23:14 -0800
+   d="scan'208";a="306075213"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:26:38 -0800
 X-IronPort-AV: E=Sophos;i="5.88,267,1635231600"; 
-   d="scan'208";a="513511982"
+   d="scan'208";a="591480580"
 Received: from avaidyan-mobl3.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.63.113])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:23:14 -0800
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2022 11:26:37 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mesh: Fix help config menu help message
-Date:   Thu,  6 Jan 2022 11:23:06 -0800
-Message-Id: <20220106192306.28552-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2] tools/mesh-cfgclient: Fix config menu help message
+Date:   Thu,  6 Jan 2022 11:26:32 -0800
+Message-Id: <20220106192632.28915-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
