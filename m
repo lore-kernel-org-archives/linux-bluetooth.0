@@ -2,54 +2,53 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3D2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 13:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C3DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Jan 2022 13:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239764AbiAFNxU (ORCPT
+        id S239791AbiAFNyo convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Jan 2022 08:53:20 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:37982 "EHLO
+        Thu, 6 Jan 2022 08:54:44 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:58057 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239519AbiAFNxT (ORCPT
+        with ESMTP id S239519AbiAFNyo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Jan 2022 08:53:19 -0500
+        Thu, 6 Jan 2022 08:54:44 -0500
 Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CA29ECECD5;
-        Thu,  6 Jan 2022 14:53:16 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id B7A2DCECD5;
+        Thu,  6 Jan 2022 14:54:42 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: hci_bcm: Check for error irq
+Subject: Re: [PATCH] Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL check in
+ qca_serdev_probe
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211224025318.1541232-1-jiasheng@iscas.ac.cn>
-Date:   Thu, 6 Jan 2022 14:53:16 +0100
+In-Reply-To: <20211224080250.3123-1-linmq006@gmail.com>
+Date:   Thu, 6 Jan 2022 14:54:42 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rocky Liao <rjliao@codeaurora.org>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <6210F403-8749-45E1-9319-BEB911EBD096@holtmann.org>
-References: <20211224025318.1541232-1-jiasheng@iscas.ac.cn>
-To:     Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0DF6BF49-0CB4-4F07-8F82-6B66C392E25C@holtmann.org>
+References: <20211224080250.3123-1-linmq006@gmail.com>
+To:     Miaoqian Lin <linmq006@gmail.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jiasheng,
+Hi Miaoqian,
 
-> For the possible failure of the platform_get_irq(), the returned irq
-> could be error number and will finally cause the failure of the
-> request_irq().
-> Consider that platform_get_irq() can now in certain cases return
-> -EPROBE_DEFER, and the consequences of letting request_irq() effectively
-> convert that into -EINVAL, even at probe time rather than later on.
-> So it might be better to check just now.
+> The function devm_gpiod_get_index() return error pointers on error.
+> Thus devm_gpiod_get_index_optional() could return NULL and error pointers.
+> The same as devm_gpiod_get_optional() function. Using IS_ERR_OR_NULL()
+> check to catch error pointers.
 > 
-> Fixes: 0395ffc1ee05 ("Bluetooth: hci_bcm: Add PM for BCM devices")
-> Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+> Fixes: 77131dfe ("Bluetooth: hci_qca: Replace devm_gpiod_get() with devm_gpiod_get_optional()")
+> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
 > ---
-> drivers/bluetooth/hci_bcm.c | 7 ++++++-
-> 1 file changed, 6 insertions(+), 1 deletion(-)
+> drivers/bluetooth/hci_qca.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
