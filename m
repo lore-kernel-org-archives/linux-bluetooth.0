@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AAFBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 22:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E821BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 22:44:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231258AbiAGWmy (ORCPT
+        id S231249AbiAGWou (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 17:42:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43142 "EHLO
+        Fri, 7 Jan 2022 17:44:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiAGWmy (ORCPT
+        with ESMTP id S229538AbiAGWou (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 17:42:54 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2387FC061574
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 14:42:54 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id w184so20777635ybg.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 14:42:54 -0800 (PST)
+        Fri, 7 Jan 2022 17:44:50 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5031C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 14:44:49 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id m6so10426714ybc.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 14:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=v2xlVQ+fNOqalRxeRYOAMiXDkEo0Uc1EwQWTxKyTXU8=;
-        b=U4jYoZaJkDG8SHnSwyrOpY6UlRqsQcb4UDvVp4W04eXSMoSZK4HcGYPutVfjwJY/PR
-         zycIHO/he3yjLN980+YU00cBsj7I+/oaCLdxTUog14Y5zwt4lYIyGMQsjMY1iu/Vfh6T
-         zbaYWYqRx/dgETngVDf3Sp2hJFVGKkPekm8liidXaRHBx9WcS9DsOZdJg8mhex9spLZp
-         K3vsWsnFjaWy8R6bGjgH/VUqBY1dmg46hgUkxZvue+Tfj20pIaNHbRTp5y+zK22hAp2K
-         E2sRrzMvABg52MYnPmlAlJRWLS39zpL8UAsU9E0vHYiI72ClFogfOVk1cS17hqOxBEvs
-         bFiw==
+        bh=kWk3HBCHET9Y/HlimePsKZHz2DCG4MrXA+u6qUY5Vag=;
+        b=cKViLG+qj1TTkTexxVMK+jFbAXY1dbiRyAFeZkEvfB4VLmKaMMR2AHlq5XPt0qGZdg
+         yqeDZrP0++NlxGLv+6nxdVdPfOeXK6ZTFhk6B1Dnpi7Id0xlWkuroPZwENbkx+0ATnCt
+         uXZ/p4KMYI3zABcEBh2D1t/5l1bDA2ObJslbWLvjxUolb1sTbGSw5c1oSptlouXRdM2Z
+         tOigITDUShbXxRDtsZcgY4j+7ZwDCjCh5GKWIuba/cmW7fDw2HZ30kbfi2UaFR5Ab5iD
+         35HZ3X3LqKW2eBxY0y14O+cHhIU3HSXVHkKv2W0seqq+tKjUmiX0M7oJtjOYaWLqrN6B
+         pYAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to;
-        bh=v2xlVQ+fNOqalRxeRYOAMiXDkEo0Uc1EwQWTxKyTXU8=;
-        b=5TRRFN0O1vsRKtZ/AQMMzezmpibhBEw4aea5iGjP+Xltj8V5dcG14WISUU6qzzvkiR
-         RISOrpmdn7cUIhwWYugexxzXGIFnT+2NuXU0Od17V7EAxXQVUMSUoTjhEJuQzB/OaELB
-         Y0KliMGV4feY06YxyBt89NnI+81sZRVH+WV7VjzqsJeIOCOiBBG9YOawFrGEzxCdYLLp
-         qOWnx9nbGUrj20B4PQlz5h1TRSLbUghJD7OmeW5r7t8NGmr5EwOtaExlhk8kGJotKvA4
-         wbweOX+7AUHB+N8O/W2gyGfWHiufAZ+0d9Zu+viG5vs/yRfqMZ5mkh5wPv1N3cQv+Igs
-         W2Rw==
-X-Gm-Message-State: AOAM532+upNfx/Gtvd/j/itxv+FRn9sUh4Pk+N7wNP8B7Cyl21fc8gIe
-        WpkLQcPEmaGoRqWGaCebD/YKCopjfhOT8mSveYvSJrkE
-X-Google-Smtp-Source: ABdhPJycLEdHUqGZdGoue1UpZOIxUj+YwwNQBw+W/wfj48lTocGI9t5EA5X4aVhyP6Y9EgTdB5nnJMhpP2va8MTIL4Q=
-X-Received: by 2002:a25:6148:: with SMTP id v69mr71073862ybb.188.1641595373094;
- Fri, 07 Jan 2022 14:42:53 -0800 (PST)
+        bh=kWk3HBCHET9Y/HlimePsKZHz2DCG4MrXA+u6qUY5Vag=;
+        b=GG9V34+QAD3T1ww5fK48u+ef4AKxsPXzYH7OnAZkUKpO9xtTiPyRKukqquFgny8XGK
+         J7pYRn0d54EhGwoX9CdOWeXQXvZDz1w4z8Bi+dUNQ1Kw0TuDIOtpltteQ0+oXLMLIwo4
+         D8vCAAedQPT5o8akFIbO05sxww8uhOWvpMDMRSyMVunKuMv8+RppjQjAdMo46TyHBJWs
+         T2GjVBOyCTDtr7baURd3hpfPr7SWYUTy4ihwVlmzxy0ujfFRWiEuznwaluCqIl+jAbNM
+         +DIAFQSXgev+akieTuol7Ri9YvTndFJWtpJp2RPkzFTCn1ypqJARm0fe4xxW8er7OkJl
+         Sf5w==
+X-Gm-Message-State: AOAM530urvNcIhw56ZNF5G6GfedrYmNZbAENGMcDusoDMSuYjy17XX+A
+        f38xrwN6GvAgtoAAT5AD0thX75RyheGZtSNXs6ar+mhM
+X-Google-Smtp-Source: ABdhPJxTa5ucLzoUAdc/YYyxoEy2gQbrej3fHHj6gT+6ZhGNoAGGnw2zBhiAzUKc7cbC+H2JuTfcEnOVuS6/Y+DS3Is=
+X-Received: by 2002:a05:6902:72a:: with SMTP id l10mr6022574ybt.293.1641595488695;
+ Fri, 07 Jan 2022 14:44:48 -0800 (PST)
 MIME-Version: 1.0
-References: <20220106210319.3620823-1-luiz.dentz@gmail.com> <61d78648.1c69fb81.3e92.7dca@mx.google.com>
-In-Reply-To: <61d78648.1c69fb81.3e92.7dca@mx.google.com>
+References: <20220105222946.3235852-1-luiz.dentz@gmail.com> <61d62dbe.1c69fb81.2987e.0ebf@mx.google.com>
+In-Reply-To: <61d62dbe.1c69fb81.2987e.0ebf@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 7 Jan 2022 14:42:42 -0800
-Message-ID: <CABBYNZJuQuOeMs3ejvPPua6BY4DHjjxxSibf=PPhm2wEHRKF-A@mail.gmail.com>
-Subject: Re: [BlueZ,1/4] shared/util: Rename btd_malloc to util_malloc
+Date:   Fri, 7 Jan 2022 14:44:38 -0800
+Message-ID: <CABBYNZL82jC6CrLkwbZZuD9dbfY7eiTrnA-o=O+HOvujd9QGpg@mail.gmail.com>
+Subject: Re: [BlueZ] configure: Fix use of obsolete macros
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -59,7 +59,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Thu, Jan 6, 2022 at 4:16 PM <bluez.test.bot@gmail.com> wrote:
+On Wed, Jan 5, 2022 at 3:46 PM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -67,23 +67,54 @@ On Thu, Jan 6, 2022 at 4:16 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=603319
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=603033
 >
 > ---Test result---
 >
 > Test Summary:
-> CheckPatch                    PASS      2.96 seconds
-> GitLint                       PASS      1.42 seconds
-> Prep - Setup ELL              PASS      44.08 seconds
-> Build - Prep                  PASS      0.55 seconds
-> Build - Configure             PASS      9.53 seconds
-> Build - Make                  PASS      1586.93 seconds
-> Make Check                    PASS      10.98 seconds
-> Make Check w/Valgrind         PASS      454.25 seconds
-> Make Distcheck                PASS      242.18 seconds
-> Build w/ext ELL - Configure   PASS      9.33 seconds
-> Build w/ext ELL - Make        PASS      1548.57 seconds
-> Incremental Build with patchesPASS      6454.71 seconds
+> CheckPatch                    FAIL      1.58 seconds
+> GitLint                       FAIL      1.11 seconds
+> Prep - Setup ELL              PASS      43.34 seconds
+> Build - Prep                  PASS      0.68 seconds
+> Build - Configure             PASS      8.63 seconds
+> Build - Make                  PASS      1436.54 seconds
+> Make Check                    PASS      11.94 seconds
+> Make Check w/Valgrind         PASS      451.87 seconds
+> Make Distcheck                PASS      237.29 seconds
+> Build w/ext ELL - Configure   PASS      8.83 seconds
+> Build w/ext ELL - Make        PASS      1406.07 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> [BlueZ] configure: Fix use of obsolete macros
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+> #86:
+> https://www.gnu.org/software/autoconf/manual/autoconf-2.70/html_node/Obsolete-Macros.html
+>
+> /github/workspace/src/12704810.patch total: 0 errors, 1 warnings, 330 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12704810.patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint with rule in .gitlint
+> Output:
+> [BlueZ] configure: Fix use of obsolete macros
+> 13: B1 Line exceeds max length (89>80): "https://www.gnu.org/software/autoconf/manual/autoconf-2.70/html_node/Obsolete-Macros.html"
+>
 >
 >
 >
