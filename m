@@ -2,64 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B65AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 07:30:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91516C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 07:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235006AbiAGHa3 convert rfc822-to-8bit (ORCPT
+        id S235122AbiAGHbQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 02:30:29 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:55434 "EHLO
+        Fri, 7 Jan 2022 02:31:16 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52080 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234589AbiAGHa3 (ORCPT
+        with ESMTP id S234589AbiAGHbP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 02:30:29 -0500
+        Fri, 7 Jan 2022 02:31:15 -0500
 Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 11808CECE8;
-        Fri,  7 Jan 2022 08:30:28 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 66A58CECE8;
+        Fri,  7 Jan 2022 08:31:14 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: btintel: Fix broken LED quirk for legacy ROM
- devices
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for Foxconn QCA 0xe0d0
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220107003454.315475-1-hj.tedd.an@gmail.com>
-Date:   Fri, 7 Jan 2022 08:30:27 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <758313D7-B953-4334-AFC9-5423E5D634FB@holtmann.org>
-References: <20220107003454.315475-1-hj.tedd.an@gmail.com>
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+In-Reply-To: <20220107035909.14912-1-aaron.ma@canonical.com>
+Date:   Fri, 7 Jan 2022 08:31:14 +0100
+Cc:     linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Content-Transfer-Encoding: 7bit
+Message-Id: <67999A28-9971-4878-9BF3-EE16F8841B13@holtmann.org>
+References: <20211227102950.17968-1-aaron.ma@canonical.com>
+ <20220107035909.14912-1-aaron.ma@canonical.com>
+To:     Aaron Ma <aaron.ma@canonical.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Aaron,
 
-> This patch fixes the broken LED quirk for Intel legacy ROM devices.
-> To fix the LED issue that doesn't turn off immediately, the host sends
-> the SW RFKILL command while shutting down the interface and it puts the
-> devices in SW RFKILL state.
+> Add an ID of Qualcomm Bluetooth SoC WCN6855.
 > 
-> Once the device is in SW RFKILL state, it can only accept HCI_Reset to
-> exit from the SW RFKILL state. This patch checks the quirk for broken
-> LED and sends the HCI_Reset before sending the HCI_Intel_Read_Version
-> command.
+> T:  Bus=05 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e0d0 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:* If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
 > 
-> The affected legacy ROM devices are
-> - 8087:07dc
-> - 8087:0a2a
-> - 8087:0aa7
-> 
-> fixes: ffcba827c0a1d ("Bluetooth: btintel: Fix the LED is not turning off immediately")
-> 
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
 > ---
-> drivers/bluetooth/btintel.c | 20 +++++++++++---------
-> drivers/bluetooth/btintel.h |  2 +-
-> drivers/bluetooth/btusb.c   | 13 ++++++++++---
-> 3 files changed, 22 insertions(+), 13 deletions(-)
+> V1 -> V2: rebase on bluetooth-next tree.
+> 
+> drivers/bluetooth/btusb.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
