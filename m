@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A27C4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 21:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15E37C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 21:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiAGVJp (ORCPT
+        id S229894AbiAGVcT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 16:09:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50454 "EHLO
+        Fri, 7 Jan 2022 16:32:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbiAGVJo (ORCPT
+        with ESMTP id S229624AbiAGVcT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 16:09:44 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E630C061574;
-        Fri,  7 Jan 2022 13:09:44 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id z30so2953532pge.4;
-        Fri, 07 Jan 2022 13:09:44 -0800 (PST)
+        Fri, 7 Jan 2022 16:32:19 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B43A4C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 13:32:18 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id b1-20020a17090a990100b001b14bd47532so7631778pjp.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 13:32:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=XkYADB5CgWF1drM8ejpgrhca/LafZph1PQYcMctGTyY=;
-        b=kCk29wImjCjzHK6rAmmOa6qjr8RtnjMf95p5gxfADOuiwE8cCxt1jQNQqVBYgDE0JQ
-         exSWNifZSZxUfkqcR3S1r4bt7rcsIdliYEJOufZ+EJUe+3FqOzm3LRXFad0wHZCFSPj1
-         eQ4UjnAlVhpSofW/gj7XEzKf8pg8jjqUo78TFaPSyp41wA/mlu476jV9/vs7aKKNUw7i
-         HHMqRw5YWZZQvUs4JgCBSuOQN+gdXlaTt8WpVkxjLOBBSHz+9UZkUnhvxOy8NilJtiwZ
-         /FCLIo4hczxNu7f0IhVnyFNmBhPGfvUcEgnT0G73b/kzC72J1ClSYifI5HnrCcuVky90
-         9L4w==
+        bh=aubdL8fH9LEcChMAezCjyfhn6YTlYrlcqkCBSfORTi0=;
+        b=DOrZ4PshTPE5HDcXjYYIwCG0JMYG/HL565h6FdQh+VXijJ2NsTOJcbe1EmvPIwSK2x
+         NGtOdG+sXVFyY3vMW8+ltCUqx8MKH++jWCUembwcpbga6UdI6bNsz/c2g4bZez8KO9z2
+         ICsaR+/JdKZHE2MDIIqZC9A8YzVjXAhfc8t/7fmR69Fyyo3vXWrlgf5XuAvyagF8duFV
+         mP5nKcoyiWGnoLvTS49ojwK7iMCtV+BsmhbTRXXKJgSYkBGRbRAZvboQp6gYHRXZERHJ
+         UzIVOimwzB/+vMS+vLRrSMDATGzxZrxhZ+fwX9DiQdPZOXAVh9aBTbtuF3/JrDYkWBL3
+         YpZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=XkYADB5CgWF1drM8ejpgrhca/LafZph1PQYcMctGTyY=;
-        b=3Wfzl/N99gOu/HwEbLb3WhgKpyp/Dc5PX4VZ1wdezHyBPSibavMcZ5ITIaVXvp2LaU
-         HHsEV1fnbPsEFnuFkRNtBDbQeCxg0PGgmGyjwR09Ck+di7ui8oiHFZDNCN1JmYTIty3M
-         jNwq6AyQ7z1kE/jLfn8bOZjmldoGFTDCQF13swVUZyYgKZ+6ypkDHn9AeV8B/uRcM5Fi
-         3Bb17Oegx+oUTClfSnLPEu7yB+RK+pTzKr/0iKx1iQoIVotA9ePZ+vvyePJ2ITvhtxNQ
-         nMNUC91aYIuMJx4hS0sFiXt9Tz6m36X0277gai9VcGSyYXSGRHpWRiIOAasnQMkmRpvS
-         7Qbw==
-X-Gm-Message-State: AOAM532A0raLlxL2JJCLjRaQGpN04WQZ6mmpj5Ggtrul19f7Y2DhC2Ud
-        mzKpZib0vEbLcYzcewJnlT4=
-X-Google-Smtp-Source: ABdhPJzycjN36sI7wx/zmdotMqQlChYtSSDDulGWMNzoNMBtXCMwSK1M08dshrMGcji6DIBro3aS8Q==
-X-Received: by 2002:a05:6a00:22d2:b0:4b0:da80:2dac with SMTP id f18-20020a056a0022d200b004b0da802dacmr65830344pfj.66.1641589784075;
-        Fri, 07 Jan 2022 13:09:44 -0800 (PST)
+        bh=aubdL8fH9LEcChMAezCjyfhn6YTlYrlcqkCBSfORTi0=;
+        b=bmR2WFc1oSenXsEqjJc5Wpf7I3MlMSn9iVnqqTDZ6nXsdbVs+V0JQBXDzrVGLG/Ny+
+         Kf6ObR7vZTHtTPFncunaCsDOMZ++FvDBmGZDXj92ZU1Rpis021f3sAt8lb+zmTodRC+u
+         E9B/FT0sb+7lx/mtk50Lo4mM6bxMroEJZb9gXM6EoR1h8FpPfkEHU3MRui/Zd5Yfq5tu
+         L4aiP/y02dUGwb2YH4m9VbjfXbikQcHw4kmsn9Qk/Quyr/7Yr45HuuExB7qq2IfxxaL8
+         Fw925Nq1gLvoBnQxMIGx2NpTvDmJhysSZhcCZ4UHs76G8FbsOb9fMYNVkKk/94eI/qM6
+         jx3w==
+X-Gm-Message-State: AOAM533+cQN93ddrBmDh3RpnADnn6gWQMaIZgArk7oagYyRw0XpuPdP8
+        zHasFPtnpKg2Khqn/X3vArUMnwFSI6k=
+X-Google-Smtp-Source: ABdhPJydUCWW5iSZITukVgsKKJHbmjeAEBgUY/dNPTHVi9I1WpCb3/QWn7bRnzghc8qcwYzrIIxtKQ==
+X-Received: by 2002:a17:902:c410:b0:149:577c:2b08 with SMTP id k16-20020a170902c41000b00149577c2b08mr63874386plk.108.1641591137954;
+        Fri, 07 Jan 2022 13:32:17 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id hk13sm7127815pjb.35.2022.01.07.13.09.43
+        by smtp.gmail.com with ESMTPSA id g9sm7012184pfj.123.2022.01.07.13.32.17
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jan 2022 13:09:43 -0800 (PST)
+        Fri, 07 Jan 2022 13:32:17 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2022-01-07
-Date:   Fri,  7 Jan 2022 13:09:42 -0800
-Message-Id: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] avdtp: Fix runtime errors passing NULL to memcpy
+Date:   Fri,  7 Jan 2022 13:32:16 -0800
+Message-Id: <20220107213216.3754372-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,61 +62,77 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 710ad98c363a66a0cd8526465426c5c5f8377ee0:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  veth: Do not record rx queue hint in veth_xmit (2022-01-06 13:49:54 +0000)
+Passing NULL to memcpy is considered undefined behavior which leads to
+the following runtime errors:
 
-are available in the Git repository at:
+profiles/audio/avdtp.c:2709:2: runtime error: null pointer passed as
+argument 1, which is declared to never be null
+profiles/audio/avdtp.c:2709:2: runtime error: null pointer passed as
+argument 2, which is declared to never be null
+profiles/audio/avdtp.c:3326:2: runtime error: null pointer passed as
+argument 2, which is declared to never be null
+profiles/audio/avdtp.c:500:3: runtime error: null pointer passed as
+argument 2, which is declared to never be null
+---
+ profiles/audio/avdtp.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-01-07
+diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+index f2b461330..da4114e0f 100644
+--- a/profiles/audio/avdtp.c
++++ b/profiles/audio/avdtp.c
+@@ -497,7 +497,9 @@ static gboolean avdtp_send(struct avdtp *session, uint8_t transaction,
+ 		single.signal_id = signal_id;
+ 
+ 		memcpy(session->buf, &single, sizeof(single));
+-		memcpy(session->buf + sizeof(single), data, len);
++
++		if (data)
++			memcpy(session->buf + sizeof(single), data, len);
+ 
+ 		return try_send(sock, session->buf, sizeof(single) + len);
+ 	}
+@@ -569,7 +571,7 @@ static void pending_req_free(void *data)
+ 
+ 	if (req->timeout)
+ 		timeout_remove(req->timeout);
+-	g_free(req->data);
++	free(req->data);
+ 	g_free(req);
+ }
+ 
+@@ -2687,7 +2689,7 @@ static int send_req(struct avdtp *session, gboolean priority,
+ 	return 0;
+ 
+ failed:
+-	g_free(req->data);
++	free(req->data);
+ 	g_free(req);
+ 	return err;
+ }
+@@ -2705,8 +2707,7 @@ static int send_request(struct avdtp *session, gboolean priority,
+ 
+ 	req = g_new0(struct pending_req, 1);
+ 	req->signal_id = signal_id;
+-	req->data = g_malloc(size);
+-	memcpy(req->data, buffer, size);
++	req->data = util_memdup(buffer, size);
+ 	req->data_size = size;
+ 	req->stream = stream;
+ 
+@@ -3323,7 +3324,9 @@ struct avdtp_service_capability *avdtp_service_cap_new(uint8_t category,
+ 	cap = g_malloc(sizeof(struct avdtp_service_capability) + length);
+ 	cap->category = category;
+ 	cap->length = length;
+-	memcpy(cap->data, data, length);
++
++	if (data)
++		memcpy(cap->data, data, length);
+ 
+ 	return cap;
+ }
+-- 
+2.33.1
 
-for you to fetch changes up to b9f9dbad0bd1c302d357fdd327c398f51f5fc2b1:
-
-  Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt() (2022-01-07 08:41:38 +0100)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add support for Foxconn QCA 0xe0d0
- - Fix HCI init sequence on MacBook Air 8,1 and 8,2
- - Fix Intel firmware loading on legacy ROM devices
-
-----------------------------------------------------------------
-Aaron Ma (1):
-      Bluetooth: btusb: Add support for Foxconn QCA 0xe0d0
-
-Aditya Garg (1):
-      Bluetooth: btbcm: disable read tx power for MacBook Air 8,1 and 8,2
-
-Dan Carpenter (2):
-      Bluetooth: L2CAP: uninitialized variables in l2cap_sock_setsockopt()
-      Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt()
-
-Jiasheng Jiang (1):
-      Bluetooth: hci_bcm: Check for error irq
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: hci_event: Rework hci_inquiry_result_with_rssi_evt
-
-Miaoqian Lin (1):
-      Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL check in qca_serdev_probe
-
-Sai Teja Aluvala (1):
-      Bluetooth: btqca: sequential validation
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: btintel: Fix broken LED quirk for legacy ROM devices
-
- drivers/bluetooth/btbcm.c   | 12 ++++++++++++
- drivers/bluetooth/btintel.c | 20 ++++++++++---------
- drivers/bluetooth/btintel.h |  2 +-
- drivers/bluetooth/btqca.c   | 47 +++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btqca.h   |  2 ++
- drivers/bluetooth/btusb.c   | 16 ++++++++++++---
- drivers/bluetooth/hci_bcm.c |  7 ++++++-
- drivers/bluetooth/hci_qca.c |  6 +++---
- include/net/bluetooth/hci.h |  6 +-----
- net/bluetooth/hci_event.c   | 19 +++++++++---------
- net/bluetooth/hci_sock.c    |  5 +++--
- net/bluetooth/l2cap_sock.c  | 14 ++++++++------
- 12 files changed, 116 insertions(+), 40 deletions(-)
