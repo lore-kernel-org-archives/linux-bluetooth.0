@@ -2,171 +2,193 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC4CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 22:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC229C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 22:34:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231143AbiAGWWU (ORCPT
+        id S231175AbiAGWeo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 17:22:20 -0500
-Received: from mga14.intel.com ([192.55.52.115]:1174 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230326AbiAGWWT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 17:22:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1641594139; x=1673130139;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=BT+jXPR5pGh571frl1kO5RtR8nCsvrNXEc9RaIOewXg=;
-  b=nbgVsaras7dyXq7/RSVwYAoT9M3D9tYj9c25IUdy5i0OKv0xYqb3jvwY
-   RwdwZ0oxjCTYcBfdbobm0xMPIuiwHq4f4nmtvqPh1/tUr1lhICeslgGZQ
-   rOaix+raZtKl5JryFH0SwkJ8Z2YsGZxqRwsKazBbiuFnokOr2NRxhwEUR
-   rkuXSsGk9pWfXeU6bsEKi3sUKA2g0puOGCFvfmJzAjOk7j/MrZP2yuCVf
-   /IbU6Zbxl9cVpsAOoCV8XrKM/qQrqarYOufAJsqn8kTjHok8Cl3XhEA3Z
-   tBaqLEHt1qrpW1IiXIjGUmgRQXtTQPmCzrc8BOtmwMxnkXBSPBGxiBHxu
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10220"; a="243150934"
-X-IronPort-AV: E=Sophos;i="5.88,271,1635231600"; 
-   d="scan'208";a="243150934"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jan 2022 14:22:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,271,1635231600"; 
-   d="scan'208";a="471445575"
-Received: from lkp-server01.sh.intel.com (HELO e357b3ef1427) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 07 Jan 2022 14:22:17 -0800
-Received: from kbuild by e357b3ef1427 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1n5xcm-000J5Y-VT; Fri, 07 Jan 2022 22:22:16 +0000
-Date:   Sat, 08 Jan 2022 06:21:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- b9f9dbad0bd1c302d357fdd327c398f51f5fc2b1
-Message-ID: <61d8bcee.s+yJbE8/qfNT9/mA%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 7 Jan 2022 17:34:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230492AbiAGWem (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 7 Jan 2022 17:34:42 -0500
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E80FC06173E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 14:34:42 -0800 (PST)
+Received: by mail-qk1-x735.google.com with SMTP id r139so7399500qke.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 14:34:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=H7bNmrEtxsmcwB/77MZdu1cG6v6NiCHbaVdFBv/GoAI=;
+        b=hBJKvDuNRDNm6AGfg1hsBiWFQ2qMiU26X1HZOGJrihmi5r7p6O39oGAIkbkYVDvhDz
+         kugItl5ZITOvM2HzVd94wwtHRsEsDVIx9sHBIX2uKC/niFLNRd220MBmoLEU5R894ONP
+         BUJEiiQq3KSGu/n+kkcnu4vVK7x3D2zPgi0a5XekAp9IaECn8VNsXXS/mHAjIwAAuGuo
+         jbuIQg6X64MSJ0Vdv2pOWjMVSm0jGmStg4ItlnXYXspSpYW7Wi3VRyVGT3W6TN58ce8q
+         rjK6QHZSJgWDt+vkzSoH0906K/w1WksIbaUE0ir6wYhswwPgHzXhTwVEycFvg7LY2Lg/
+         yAvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=H7bNmrEtxsmcwB/77MZdu1cG6v6NiCHbaVdFBv/GoAI=;
+        b=pi4brNv/xxhqWM9UPVKpFCp9BLfAw14waWKblwGmuSnSENtSiWHoBuWOKbaxXvZ0jB
+         9h4PiGYEWQnUkYmyY6F0yVF36npgy45Jpsy0D8GnH8uIO/THlQhpWtMHwwkEgzsu987B
+         QspXlnH66ZGXzI5rTiAUgKTeQzA5WwWQRq4XH0zRM0MZaHJ9b9fta9pGVYwtKqFfvI26
+         VFVf3SqnHzwn0zJytRlepjtIaRIaXs7BxACn5B939hDCwZcq+wpR2GfbFZs3V50JlNZj
+         gNji+1MROek10+/qFAJmkAVGyH7VX/bgilVuRZ8zbO/9HmNm6OFRCDWmMc2Mr4neVTIF
+         q8Mw==
+X-Gm-Message-State: AOAM532A47N+lUX64QuCPMipnUrIZCxMJrtm8ji84NpoUEApSMiSNCM7
+        GvtXfIRt9HIzgIBZxXGnmUDyRyrxnEs=
+X-Google-Smtp-Source: ABdhPJwaDiW/pu39B3Fd+45EsyDGBe4kTuU1rvWW4MWi98a0enoMQojZgKFtXH5BcFtDPxv43wbYcA==
+X-Received: by 2002:a05:620a:6:: with SMTP id j6mr42076704qki.294.1641594881371;
+        Fri, 07 Jan 2022 14:34:41 -0800 (PST)
+Received: from [172.17.0.2] ([20.110.87.229])
+        by smtp.gmail.com with ESMTPSA id q27sm3764077qki.100.2022.01.07.14.34.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jan 2022 14:34:41 -0800 (PST)
+Message-ID: <61d8c001.1c69fb81.24621.10e4@mx.google.com>
+Date:   Fri, 07 Jan 2022 14:34:41 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0448854304194972338=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] avdtp: Fix runtime errors passing NULL to memcpy
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220107213216.3754372-1-luiz.dentz@gmail.com>
+References: <20220107213216.3754372-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: b9f9dbad0bd1c302d357fdd327c398f51f5fc2b1  Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt()
+--===============0448854304194972338==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-elapsed time: 795m
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjAzNjc0CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMS42NSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjk5IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDQyLjI5IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNzQgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC4z
+OCBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMjU2LjEz
+IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDMuNjcgc2Vj
+b25kcwpNYWtlIENoZWNrIHcvVmFsZ3JpbmQgICAgICAgICBGQUlMICAgICAgMjYxLjYyIHNlY29u
+ZHMKTWFrZSBEaXN0Y2hlY2sgICAgICAgICAgICAgICAgRkFJTCAgICAgIDE1OC4yMyBzZWNvbmRz
+CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA4LjQ2IHNlY29uZHMKQnVp
+bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDEyMzAuMzcgc2Vjb25kcwpJbmNy
+ZW1lbnRhbCBCdWlsZCB3aXRoIHBhdGNoZXNQQVNTICAgICAgMC4wMCBzZWNvbmRzCgpEZXRhaWxz
+CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIE1ha2UgLSBGQUlM
+CkRlc2M6IEJ1aWxkIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQpPdXRwdXQ6CnRvb2xzL21nbXQtdGVz
+dGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTIzNjQ6
+NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1m
+dmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyMzY0IHwgaW50
+IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3Qt
+YXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6
+IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZh
+ci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBt
+YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2
+cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBu
+b3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXIt
+dHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFp
+bihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnByb2ZpbGVzL2F1ZGlv
+L2F2ZHRwLmM6IEluIGZ1bmN0aW9uIOKAmHNlbmRfcmVxdWVzdOKAmToKcHJvZmlsZXMvYXVkaW8v
+YXZkdHAuYzoyNzEwOjE0OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g
+4oCYdXRpbF9tZW1kdXDigJk7IGRpZCB5b3UgbWVhbiDigJh1dGlsX2hleGR1bXDigJk/IFstV2Vy
+cm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMjcxMCB8ICByZXEtPmRhdGEgPSB1
+dGlsX21lbWR1cChidWZmZXIsIHNpemUpOwogICAgICB8ICAgICAgICAgICAgICBefn5+fn5+fn5+
+fgogICAgICB8ICAgICAgICAgICAgICB1dGlsX2hleGR1bXAKcHJvZmlsZXMvYXVkaW8vYXZkdHAu
+YzoyNzEwOjEyOiBlcnJvcjogYXNzaWdubWVudCB0byDigJh2b2lkICrigJkgZnJvbSDigJhpbnTi
+gJkgbWFrZXMgcG9pbnRlciBmcm9tIGludGVnZXIgd2l0aG91dCBhIGNhc3QgWy1XZXJyb3I9aW50
+LWNvbnZlcnNpb25dCiAyNzEwIHwgIHJlcS0+ZGF0YSA9IHV0aWxfbWVtZHVwKGJ1ZmZlciwgc2l6
+ZSk7CiAgICAgIHwgICAgICAgICAgICBeCmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQg
+YXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6OTQ0NTogcHJvZmlsZXMvYXVkaW8vYmx1
+ZXRvb3RoZC1hdmR0cC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDMwMjogYWxsXSBF
+cnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sg
+LSBGQUlMCkRlc2M6IFJ1biAnbWFrZSBjaGVjaycKT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0
+cC5jOiBJbiBmdW5jdGlvbiDigJhzZW5kX3JlcXVlc3TigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRw
+LmM6MjcxMDoxNDogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHV0
+aWxfbWVtZHVw4oCZOyBkaWQgeW91IG1lYW4g4oCYdXRpbF9oZXhkdW1w4oCZPyBbLVdlcnJvcj1p
+bXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KIDI3MTAgfCAgcmVxLT5kYXRhID0gdXRpbF9t
+ZW1kdXAoYnVmZmVyLCBzaXplKTsKICAgICAgfCAgICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAg
+ICAgfCAgICAgICAgICAgICAgdXRpbF9oZXhkdW1wCnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6Mjcx
+MDoxMjogZXJyb3I6IGFzc2lnbm1lbnQgdG8g4oCYdm9pZCAq4oCZIGZyb20g4oCYaW504oCZIG1h
+a2VzIHBvaW50ZXIgZnJvbSBpbnRlZ2VyIHdpdGhvdXQgYSBjYXN0IFstV2Vycm9yPWludC1jb252
+ZXJzaW9uXQogMjcxMCB8ICByZXEtPmRhdGEgPSB1dGlsX21lbWR1cChidWZmZXIsIHNpemUpOwog
+ICAgICB8ICAgICAgICAgICAgXgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVy
+cm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjk0NDU6IHByb2ZpbGVzL2F1ZGlvL2JsdWV0b290
+aGQtYXZkdHAub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjExMzA2OiBjaGVja10gRXJy
+b3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlIENoZWNrIHcv
+VmFsZ3JpbmQgLSBGQUlMCkRlc2M6IFJ1biAnbWFrZSBjaGVjaycgd2l0aCBWYWxncmluZApPdXRw
+dXQ6CnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21n
+bXQtdGVzdGVyLmM6MTIzNjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBl
+eGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3
+aXRob3V0CjEyMzY0IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAg
+ICAgXn5+fgpwcm9maWxlcy9hdWRpby9hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhzZW5kX3JlcXVl
+c3TigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MjcxMDoxNDogZXJyb3I6IGltcGxpY2l0IGRl
+Y2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmHV0aWxfbWVtZHVw4oCZOyBkaWQgeW91IG1lYW4g4oCY
+dXRpbF9oZXhkdW1w4oCZPyBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0K
+IDI3MTAgfCAgcmVxLT5kYXRhID0gdXRpbF9tZW1kdXAoYnVmZmVyLCBzaXplKTsKICAgICAgfCAg
+ICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgdXRpbF9oZXhkdW1w
+CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MjcxMDoxMjogZXJyb3I6IGFzc2lnbm1lbnQgdG8g4oCY
+dm9pZCAq4oCZIGZyb20g4oCYaW504oCZIG1ha2VzIHBvaW50ZXIgZnJvbSBpbnRlZ2VyIHdpdGhv
+dXQgYSBjYXN0IFstV2Vycm9yPWludC1jb252ZXJzaW9uXQogMjcxMCB8ICByZXEtPmRhdGEgPSB1
+dGlsX21lbWR1cChidWZmZXIsIHNpemUpOwogICAgICB8ICAgICAgICAgICAgXgpjYzE6IGFsbCB3
+YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjk0
+NDU6IHByb2ZpbGVzL2F1ZGlvL2JsdWV0b290aGQtYXZkdHAub10gRXJyb3IgMQptYWtlOiAqKiog
+W01ha2VmaWxlOjQzMDI6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIwpUZXN0OiBNYWtlIERpc3RjaGVjayAtIEZBSUwKRGVzYzogUnVuIGRpc3RjaGVjayB0byBj
+aGVjayB0aGUgZGlzdHJpYnV0aW9uCk91dHB1dDoKLi4vLi4vcHJvZmlsZXMvYXVkaW8vYXZkdHAu
+YzogSW4gZnVuY3Rpb24g4oCYc2VuZF9yZXF1ZXN04oCZOgouLi8uLi9wcm9maWxlcy9hdWRpby9h
+dmR0cC5jOjI3MTA6MTQ6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9u
+IOKAmHV0aWxfbWVtZHVw4oCZOyBkaWQgeW91IG1lYW4g4oCYdXRpbF9oZXhkdW1w4oCZPyBbLVdp
+bXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KIDI3MTAgfCAgcmVxLT5kYXRhID0gdXRpbF9t
+ZW1kdXAoYnVmZmVyLCBzaXplKTsKICAgICAgfCAgICAgICAgICAgICAgXn5+fn5+fn5+fn4KICAg
+ICAgfCAgICAgICAgICAgICAgdXRpbF9oZXhkdW1wCi4uLy4uL3Byb2ZpbGVzL2F1ZGlvL2F2ZHRw
+LmM6MjcxMDoxMjogd2FybmluZzogYXNzaWdubWVudCB0byDigJh2b2lkICrigJkgZnJvbSDigJhp
+bnTigJkgbWFrZXMgcG9pbnRlciBmcm9tIGludGVnZXIgd2l0aG91dCBhIGNhc3QgWy1XaW50LWNv
+bnZlcnNpb25dCiAyNzEwIHwgIHJlcS0+ZGF0YSA9IHV0aWxfbWVtZHVwKGJ1ZmZlciwgc2l6ZSk7
+CiAgICAgIHwgICAgICAgICAgICBeCi91c3IvYmluL2xkOiBwcm9maWxlcy9hdWRpby9ibHVldG9v
+dGhkLWF2ZHRwLm86IGluIGZ1bmN0aW9uIGBzZW5kX3JlcXVlc3QnOgovZ2l0aHViL3dvcmtzcGFj
+ZS9zcmMvYmx1ZXotNS42Mi9fYnVpbGQvc3ViLy4uLy4uL3Byb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6
+MjcxMDogdW5kZWZpbmVkIHJlZmVyZW5jZSB0byBgdXRpbF9tZW1kdXAnCmNvbGxlY3QyOiBlcnJv
+cjogbGQgcmV0dXJuZWQgMSBleGl0IHN0YXR1cwptYWtlWzJdOiAqKiogW01ha2VmaWxlOjU4Nzc6
+IHNyYy9ibHVldG9vdGhkXSBFcnJvciAxCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NDMwMjogYWxs
+XSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEyMjc6IGRpc3RjaGVja10gRXJyb3IgMQoK
+CiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCB3L2V4dCBFTEwgLSBN
+YWtlIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVlWiBzb3VyY2Ugd2l0aCAnLS1lbmFibGUtZXh0ZXJu
+YWwtZWxsJyBjb25maWd1cmF0aW9uCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVu
+Y3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjM2NDo1OiBub3RlOiB2YXJp
+YWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmct
+YXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQgfCBpbnQgbWFpbihpbnQgYXJn
+YywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdmR0cC5jOiBJbiBm
+dW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3NjY6NTogbm90ZTogdmFyaWFi
+bGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFz
+c2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwgaW50IG1haW4oaW50IGFyZ2Ms
+IGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZyY3AuYzogSW4gZnVu
+Y3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5OjU6IG5vdGU6IHZhcmlhYmxl
+IHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3Np
+Z25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGludCBtYWluKGludCBhcmdjLCBj
+aGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KcHJvZmlsZXMvYXVkaW8vYXZkdHAuYzogSW4g
+ZnVuY3Rpb24g4oCYc2VuZF9yZXF1ZXN04oCZOgpwcm9maWxlcy9hdWRpby9hdmR0cC5jOjI3MTA6
+MTQ6IGVycm9yOiBpbXBsaWNpdCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJh1dGlsX21lbWR1
+cOKAmTsgZGlkIHlvdSBtZWFuIOKAmHV0aWxfaGV4ZHVtcOKAmT8gWy1XZXJyb3I9aW1wbGljaXQt
+ZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAyNzEwIHwgIHJlcS0+ZGF0YSA9IHV0aWxfbWVtZHVwKGJ1
+ZmZlciwgc2l6ZSk7CiAgICAgIHwgICAgICAgICAgICAgIF5+fn5+fn5+fn5+CiAgICAgIHwgICAg
+ICAgICAgICAgIHV0aWxfaGV4ZHVtcApwcm9maWxlcy9hdWRpby9hdmR0cC5jOjI3MTA6MTI6IGVy
+cm9yOiBhc3NpZ25tZW50IHRvIOKAmHZvaWQgKuKAmSBmcm9tIOKAmGludOKAmSBtYWtlcyBwb2lu
+dGVyIGZyb20gaW50ZWdlciB3aXRob3V0IGEgY2FzdCBbLVdlcnJvcj1pbnQtY29udmVyc2lvbl0K
+IDI3MTAgfCAgcmVxLT5kYXRhID0gdXRpbF9tZW1kdXAoYnVmZmVyLCBzaXplKTsKICAgICAgfCAg
+ICAgICAgICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFr
+ZVsxXTogKioqIFtNYWtlZmlsZTo5NDQ1OiBwcm9maWxlcy9hdWRpby9ibHVldG9vdGhkLWF2ZHRw
+Lm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MzAyOiBhbGxdIEVycm9yIDIKCgoKCi0t
+LQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
 
-configs tested: 99
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20220107
-m68k                            q40_defconfig
-powerpc                        warp_defconfig
-arm                       multi_v4t_defconfig
-sh                           se7619_defconfig
-m68k                       m5475evb_defconfig
-powerpc                 linkstation_defconfig
-arc                 nsimosci_hs_smp_defconfig
-arm                         assabet_defconfig
-arm                         cm_x300_defconfig
-h8300                            alldefconfig
-arm                          simpad_defconfig
-um                           x86_64_defconfig
-sh                        sh7785lcr_defconfig
-powerpc                  iss476-smp_defconfig
-h8300                            allyesconfig
-powerpc                    sam440ep_defconfig
-um                             i386_defconfig
-arm                  randconfig-c002-20220107
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-sparc                               defconfig
-sparc                            allyesconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a005-20220107
-x86_64               randconfig-a001-20220107
-x86_64               randconfig-a004-20220107
-x86_64               randconfig-a006-20220107
-x86_64               randconfig-a002-20220107
-x86_64               randconfig-a003-20220107
-i386                 randconfig-a003-20220107
-i386                 randconfig-a005-20220107
-i386                 randconfig-a004-20220107
-i386                 randconfig-a006-20220107
-i386                 randconfig-a002-20220107
-i386                 randconfig-a001-20220107
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-
-clang tested configs:
-powerpc                     skiroot_defconfig
-x86_64               randconfig-a012-20220107
-x86_64               randconfig-a015-20220107
-x86_64               randconfig-a014-20220107
-x86_64               randconfig-a013-20220107
-x86_64               randconfig-a011-20220107
-x86_64               randconfig-a016-20220107
-i386                 randconfig-a012-20220107
-i386                 randconfig-a016-20220107
-i386                 randconfig-a014-20220107
-i386                 randconfig-a015-20220107
-i386                 randconfig-a011-20220107
-i386                 randconfig-a013-20220107
-s390                 randconfig-r044-20220107
-hexagon              randconfig-r041-20220107
-hexagon              randconfig-r045-20220107
-riscv                randconfig-r042-20220107
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+--===============0448854304194972338==--
