@@ -2,54 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0DDAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 07:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF040C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 08:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233828AbiAGHmf convert rfc822-to-8bit (ORCPT
+        id S235760AbiAGIIl convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 02:42:35 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:36660 "EHLO
+        Fri, 7 Jan 2022 03:08:41 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:52346 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232885AbiAGHme (ORCPT
+        with ESMTP id S235551AbiAGIIk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 02:42:34 -0500
+        Fri, 7 Jan 2022 03:08:40 -0500
 Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8756BCECE8;
-        Fri,  7 Jan 2022 08:42:33 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id DEC8ACECE8;
+        Fri,  7 Jan 2022 09:08:36 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: hci_sock: fix endian bug in
- hci_sock_setsockopt()
+Subject: Re: [PATCH v5] Bluetooth: btqca: sequential validation
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220107071727.GD22086@kili>
-Date:   Fri, 7 Jan 2022 08:42:33 +0100
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+In-Reply-To: <1641536453-7628-1-git-send-email-quic_saluvala@quicinc.com>
+Date:   Fri, 7 Jan 2022 09:08:36 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        quic_hemantg@quicinc.com, linux-arm-msm@vger.kernel.org,
+        quic_bgodavar@quicinc.com, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org,
+        mcchou@chromium.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2F363C3C-4D1C-42B6-8877-D321864F473D@holtmann.org>
-References: <20220107071727.GD22086@kili>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
+Message-Id: <597B76E1-F88B-49C6-B849-5D9835AF3A06@holtmann.org>
+References: <1641536453-7628-1-git-send-email-quic_saluvala@quicinc.com>
+To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dan,
+Hi Sai,
 
-> This copies a u16 into the high bits of an int, which works on a big
-> endian system but not on a little endian system.
+> Added Sequential validation support
+> & patch command config
 > 
-> Fixes: 09572fca7223 ("Bluetooth: hci_sock: Add support for BT_{SND,RCV}BUF")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> 
+> v5:
+> * Addressed spacing in cmd
+> * Addressed position of int err declaration
+> * Removed redundant debug message
+> 
+> v4:
+> * addressed the change from u8 cmd to const u8 cmd
+> 
+> v3:
+> * removed rlen,rtype
+> * Replaced kfree with kfree_skb
+> 
+> v2:
+> * Added static declaration
+> * Addressed wrong indentation
+> * Removed EDL_PATCH_CONFIG_CMD_LEN
+> 
+> v1:
+> *Initial patch
 > ---
-> net/bluetooth/hci_sock.c | 5 +++--
-> 1 file changed, 3 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btqca.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btqca.h |  2 ++
+> 2 files changed, 48 insertions(+)
 
-patch has been applied to bluetooth-next tree.
+so I applied this patch to bluetooth-next tree after fixing up the commit message.
+
+However, this is the last patch from anyone of your team that I am taking. The disrespect of the patch submission guidelines or even basic attempt to submit a patch in the correct form or with comments addressed is astonishing. Please read up on patch submission guidelines or watch Greg KH's multiple talks on the topic. You are wasting my time and there is no reason that simple patches like this take 7-10 attempts to get it right.
+
+If you want to know what you did wrong this time around, then maybe try to “git am” your email to a clean bluetooth-next and look on how it looks like with “git show” afterwards before sending it to anybody.
 
 Regards
 
