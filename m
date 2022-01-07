@@ -2,245 +2,198 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 781F7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 09:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7E2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Jan 2022 17:53:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237163AbiAGJze (ORCPT
+        id S1348643AbiAGRxS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 04:55:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:46415 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236734AbiAGJzd (ORCPT
+        Fri, 7 Jan 2022 12:53:18 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:36560 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230122AbiAGRxR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 04:55:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1641549332;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vU/+uDnZT4UsYy+CubW6TDRh/j2zvfOBIhbG7CAs8Bc=;
-        b=G5tNpvk4yU/GJyKrTIJ4b0KIRzY+FrACpGrn/afUr43ffxXRd457ZccrcBOMaHczjfmBap
-        rnzu9Obz+TYuq0dRv2Qc/zgUuUUM55H8EYZu2us98K+VlESHghauafWBg3x+UXpDOTryOy
-        JCzRDuAYGV4jtn7uHm3SA7GxABqybWk=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-eDAQcJrpONaSyPSR-YV-6Q-1; Fri, 07 Jan 2022 04:55:31 -0500
-X-MC-Unique: eDAQcJrpONaSyPSR-YV-6Q-1
-Received: by mail-ed1-f72.google.com with SMTP id m8-20020a056402510800b003f9d22c4d48so4222367edd.21
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 01:55:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vU/+uDnZT4UsYy+CubW6TDRh/j2zvfOBIhbG7CAs8Bc=;
-        b=FtCZhV+I7liIo1Lua2ynu9WrP18gscctQa38fMhcHUGDv/GH3U6Y0V9l4jppobprvL
-         8Z7lV6J3YKCqBUGiQK/cVLShQrbbAD+AYPkBRDQLEICPX7hP5pT5fQblRgXLjzgIP4D6
-         UngZKd8tytlMNIvnvpF/rarH8v/8SNxRj/nrzzFy5kRopuHhf6sXmI/3KvF6Qek6GGHf
-         Q6lm2++lrP8feBXWlqQmIZjiz8/hEiHGD9CRE27CiJe8y+wLc0xfuQeMzuiIPCtq+La5
-         x1wJU3omiD3W8VnyYAkyzpe7o7d0uxanYZLsOxWBzShcqczUSrsoMuN8qjBVY6DVcnmu
-         lXIw==
-X-Gm-Message-State: AOAM532lkjw9JDCdkeArhPLqWFuqDUtr5prJK3Pb4VlMH4hKNfVkxHbC
-        N7cmuA3itVBctaOEIly+Mgyo86teOapv0s1KbJD0RIzt11NBul92HF7Wc56Sx/YQdByHb7ds0lI
-        XNHim8We0ur2bsKdcz5OTgEQpuMjM
-X-Received: by 2002:a17:907:16a8:: with SMTP id hc40mr47473812ejc.210.1641549330372;
-        Fri, 07 Jan 2022 01:55:30 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyHF9wCz78cGHX4ge90ZwZXWSxnboBDzrhueC6nzlzaqaV7drboEBAgy4xLeyAlpf3HJpDSng==
-X-Received: by 2002:a17:907:16a8:: with SMTP id hc40mr47473791ejc.210.1641549330082;
-        Fri, 07 Jan 2022 01:55:30 -0800 (PST)
-Received: from ?IPV6:2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1? (2001-1c00-0c1e-bf00-1db8-22d3-1bc9-8ca1.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1])
-        by smtp.gmail.com with ESMTPSA id ho9sm1248874ejc.86.2022.01.07.01.55.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jan 2022 01:55:29 -0800 (PST)
-Message-ID: <44981345-5889-e8bd-01f7-2b80114adfd8@redhat.com>
-Date:   Fri, 7 Jan 2022 10:55:28 +0100
+        Fri, 7 Jan 2022 12:53:17 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BEFDEB8269A
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 17:53:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C5E5C36AEB
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 17:53:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641577995;
+        bh=AvsjlA8FPlQRvSJaBS3pTRxxV3akc3cnDeHUYPgskvc=;
+        h=From:To:Subject:Date:From;
+        b=TYvutun7PXBwm5EXbK7asZtq11L7QBattWMegLrHZV3M8EAZVngroQkrSNojz9Dvb
+         b1JwQIRNNVbGX9NtKsJ4a35pGTnKQdx/gVWdOe2icGhpHpFEzpMXtoKZAoM+i79dFo
+         yN8kiInQGz34DaoGT5AoYdYuideSz0htDVHUDFPYT1E7jsSP+HORNw5MF86wH1Yeyp
+         ciYWkatxQGuhpm3TxGUFtMFN7vPp4PjSYBwmPNiSI/wgNfmoGmX3LoFiJMt/kjoAUJ
+         5tezfBHydk85Iy00acsAA7oD742m3++TfLCPmk/eMzjrQHzIs1AJuTzOxhUnXFXxCo
+         UzbWvviMj1FHg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 7C907C05FF0; Fri,  7 Jan 2022 17:53:15 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215462] New: bluetoothd segfaults in libdbus-1.so.3.19.13
+Date:   Fri, 07 Jan 2022 17:53:15 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-215462-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH] Bluetooth: btusb: Add a new quirk to skip
- HCI_FLT_CLEAR_ALL on fake CSR controllers
-Content-Language: en-US
-To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <6a3f5e8b-fbc1-bad8-aef0-3e2cf9be364e@gmail.com>
- <3BCA0ABD-6BFC-4487-A5DE-3AF043A6ADE0@holtmann.org>
- <2efeb63e-a3ee-82a7-69bc-84d39745a4f8@gmail.com>
-From:   Hans de Goede <hdegoede@redhat.com>
-In-Reply-To: <2efeb63e-a3ee-82a7-69bc-84d39745a4f8@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215462
 
-On 1/6/22 23:29, Ismael Ferreras Morezuelas wrote:
-> Hi again, Marcel.
-> 
->>> 		/* Clear the reset quirk since this is not an actual
->>> 		 * early Bluetooth 1.1 device from CSR.
->>> @@ -1942,16 +1943,16 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->>> 		/*
->>> 		 * Special workaround for these BT 4.0 chip clones, and potentially more:
->>> 		 *
->>> -		 * - 0x0134: a Barrot 8041a02                 (HCI rev: 0x1012 sub: 0x0810)
->>> +		 * - 0x0134: a Barrot 8041a02                 (HCI rev: 0x0810 sub: 0x1012)
->>
->> Don’t get this change.
->>
-> 
-> I swapped both numbers by mistake in my last commit when I moved it from
-> a conditional into a comment This is explained in the changeset as:
-> 
->  > Also, swapped the HCI subver and LMP subver numbers for the Barrot
->  > in the comment, which I copied wrong the last time around.
-> 
-> Thought I might as well fix it here, because it may never get corrected otherwise; it's misleading.
-> 
-> 
->>> 		 * - 0x7558: IC markings FR3191AHAL 749H15143 (HCI rev/sub-version: 0x0709)
->>> 		 *
->>> 		 * These controllers are really messed-up.
->>> 		 *
->>> 		 * 1. Their bulk RX endpoint will never report any data unless
->>> -		 * the device was suspended at least once (yes, really).
->>> +		 *    the device was suspended at least once (yes, really).
->>> 		 * 2. They will not wakeup when autosuspended and receiving data
->>> -		 * on their bulk RX endpoint from e.g. a keyboard or mouse
->>> -		 * (IOW remote-wakeup support is broken for the bulk endpoint).
->>> +		 *    on their bulk RX endpoint from e.g. a keyboard or mouse
->>> +		 *    (IOW remote-wakeup support is broken for the bulk endpoint).
->>
->> Fix the style issues separately.
-> 
-> Fair enough, I can obviate this part, no worries.
-> 
-> 
->>
->>> 		 *
->>> 		 * To fix 1. enable runtime-suspend, force-suspend the
->>> 		 * HCI and then wake-it up by disabling runtime-suspend.
->>> @@ -1971,7 +1972,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->>> 		if (ret >= 0)
->>> 			msleep(200);
->>> 		else
->>> -			bt_dev_err(hdev, "CSR: Failed to suspend the device for our Barrot 8041a02 receive-issue workaround");
->>> +			bt_dev_warn(hdev, "CSR: Couldn't suspend the device for our Barrot 8041a02 receive-issue workaround");
->>
->> Why change this?
->>
-> 
-> Because depending on the clone this print may end up showing all the time;
-> we *try* doing it, but some clones don't like it. I thought showing it
-> as a warning would make sense. Tweaking the text a bit again helps
-> when tracking down which version of the workaround the user is
-> running, we can narrow it by just grepping the log itself.
-> 
-> If it doesn't work it doesn't really affect anything, and we can't
-> whitelist something half the clones use to get unstuck and the other
-> half just ignore and stay peachy. We're trying an unified solution.
-> 
-> 
->>>
->>> 		pm_runtime_forbid(&data->udev->dev);
->>>
->>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index 63065bc01..4e5d5979d 100644
->>> --- a/include/net/bluetooth/hci.h
->>> +++ b/include/net/bluetooth/hci.h
->>> @@ -246,6 +246,12 @@ enum {
->>> 	 * HCI after resume.
->>> 	 */
->>> 	HCI_QUIRK_NO_SUSPEND_NOTIFIER,
->>> +
->>> +	/* When this quirk is set, HCI_OP_SET_EVENT_FLT requests with
->>> +	 * HCI_FLT_CLEAR_ALL are ignored. A subset of the CSR controller
->>> +	 * clones struggle with this and instantly lock up.
->>> +	 */
->>> +	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
->>> };
->>>
->>> /* HCI device flags */
->>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->>> index 8d33aa648..7af649afc 100644
->>> --- a/net/bluetooth/hci_core.c
->>> +++ b/net/bluetooth/hci_core.c
->>> @@ -150,6 +150,7 @@ static void bredr_setup(struct hci_request *req)
->>> {
->>> 	__le16 param;
->>> 	__u8 flt_type;
->>> +	struct hci_dev *hdev = req->hdev;
->>
->> This should always go first in a function.
->>
->>>
->>> 	/* Read Buffer Size (ACL mtu, max pkt, etc.) */
->>> 	hci_req_add(req, HCI_OP_READ_BUFFER_SIZE, 0, NULL);
->>> @@ -169,9 +170,13 @@ static void bredr_setup(struct hci_request *req)
->>> 	/* Read Current IAC LAP */
->>> 	hci_req_add(req, HCI_OP_READ_CURRENT_IAC_LAP, 0, NULL);
->>>
->>> -	/* Clear Event Filters */
->>> -	flt_type = HCI_FLT_CLEAR_ALL;
->>> -	hci_req_add(req, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
->>> +	/* Clear Event Filters; some fake CSR controllers lock up after setting
->>> +	 * this type of filter, so avoid sending the request altogether.
->>> +	 */
->>> +	if (!test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks)) {
->>> +		flt_type = HCI_FLT_CLEAR_ALL;
->>> +		hci_req_add(req, HCI_OP_SET_EVENT_FLT, 1, &flt_type);
->>> +	}
->>>
->>> 	/* Connection accept timeout ~20 secs */
->>> 	param = cpu_to_le16(0x7d00);
->>> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
->>> index 92611bfc0..cfcf64c0c 100644
->>> --- a/net/bluetooth/hci_request.c
->>> +++ b/net/bluetooth/hci_request.c
->>> @@ -980,11 +980,15 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
->>> static void hci_req_clear_event_filter(struct hci_request *req)
->>> {
->>> 	struct hci_cp_set_event_filter f;
->>> +	struct hci_dev *hdev = req->hdev;
->>> +
->>> +	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
->>> +		return;
->>>
->>> -	if (!hci_dev_test_flag(req->hdev, HCI_BREDR_ENABLED))
->>> +	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
->>> 		return;
->>>
->>> -	if (hci_dev_test_flag(req->hdev, HCI_EVENT_FILTER_CONFIGURED)) {
->>> +	if (hci_dev_test_flag(hdev, HCI_EVENT_FILTER_CONFIGURED)) {
->>> 		memset(&f, 0, sizeof(f));
->>> 		f.flt_type = HCI_FLT_CLEAR_ALL;
->>> 		hci_req_add(req, HCI_OP_SET_EVENT_FLT, 1, &f);
->>
->> This is not enough. If you do not have clear event filter, we need to disable suspend/resume support. These device can for obvious reason not sleep accordingly.
-> 
-> Would adding HCI_QUIRK_NO_SUSPEND_NOTIFIER be enough here? I'll take another look at the
-> codebase, any comments about the best/simplest way to tackle this would help me a lot.
-> 
-> As you can see I'm still getting my feet wet around the Bluetooth subsystem.
-> 
-> In theory adding another quirk condition in hci_req_set_event_filter() or anything that leads
-> to it (i.e. hci_suspend_dev() / BT_SUSPEND_CONFIGURE_WAKE) may also do the trick.
-> 
-> The least code I touch the better. Right now I'm thinking of mirroring my hci_req_clear_event_filter()
-> nop-out in hci_req_set_event_filter() *and* just setting the NO_SUSPEND_NOTIFIER quirk.
+            Bug ID: 215462
+           Summary: bluetoothd segfaults in libdbus-1.so.3.19.13
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.16-rc8
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+        Regression: No
 
-Note we already disable runtime suspend for these broken clones in
-the btusb code, I think that in itself might be enough, together with
-a comment in the header where the quirk is defined that devices using this
-must disable runtime suspend ?
+Using Debian sid/unstable with Linux 5.16-rc8 from the suite *experimental*,
+*bluez* 5.62-2 and *libdbus-1-3* 1.12.20-3, connecting to a Google Nest over
+Bluetooth, bluetoothd crashed with a segmentation fault:
 
-Regards,
+    [ 7793.540822] bluetoothd[7937]: segfault at 3 ip 00007f73196e3d28 sp
+00007fffbd269280 error 4 in libdbus-1.so.3.19.13[7f73196be000+2f000]
+    [ 7793.540835] Code: 08 4c 89 e9 44 89 e2 53 41 b9 6c 00 00 00 41 89 c0=
+ 48
+89 ee bf 01 00 00 00 e8 e4 f9 ff ff 5a 59 e9 9f fe ff ff 0f 1f 44 00 00 <0f=
+> b6
+16 44 89 e6 e8 fd be fd ff 85 c0 0f 84 87 fe ff ff b8 01 00
 
-Hans
+```
+(gdb) bt
+#0  _dbus_marshal_write_basic (str=3D0x55992b2dc560, insert_at=3D213,
+type=3Dtype@entry=3D121, value=3Dvalue@entry=3D0x3, byte_order=3D108,
+pos_after=3Dpos_after@entry=3D0x7fffbd2693e0) at
+../../../dbus/dbus-marshal-basic.c:814
+#1  0x00007f73196cef9b in _dbus_type_writer_write_basic_no_typecode (value=
+=3D0x3,
+type=3D121, writer=3D0x7fffbd2693c0) at ../../../dbus/dbus-marshal-recursiv=
+e.c:1605
+#2  _dbus_type_writer_write_basic_no_typecode (value=3D0x3, type=3D121,
+writer=3D0x7fffbd2693c0) at ../../../dbus/dbus-marshal-recursive.c:1600
+#3  _dbus_type_writer_write_basic (writer=3Dwriter@entry=3D0x7fffbd2693c0,
+type=3Dtype@entry=3D121, value=3Dvalue@entry=3D0x3) at
+../../../dbus/dbus-marshal-recursive.c:2327
+#4  0x00007f73196d36b8 in dbus_message_iter_append_basic
+(iter=3Diter@entry=3D0x7fffbd2693b0, type=3Dtype@entry=3D121, value=3D0x3) =
+at
+../../../dbus/dbus-message.c:2843
+#5  0x0000559929aba78e in get_codec (property=3D<optimized out>,
+iter=3D0x7fffbd2693b0, data=3D<optimized out>) at profiles/audio/a2dp.c:1970
+#6  0x0000559929b54f86 in append_property (iface=3Diface@entry=3D0x55992b2f=
+bdd0,
+p=3Dp@entry=3D0x559929bd6830 <sep_properties+48>, dict=3Ddict@entry=3D0x7ff=
+fbd269430)
+at gdbus/object.c:498
+#7  0x0000559929b55632 in append_properties (data=3Ddata@entry=3D0x55992b2f=
+bdd0,
+iter=3Diter@entry=3D0x7fffbd2694b0) at gdbus/object.c:527
+#8  0x0000559929b556bf in append_interface (data=3D0x55992b2fbdd0,
+user_data=3D0x7fffbd269590) at gdbus/object.c:542
+#9  0x00007f7319778938 in g_slist_foreach (list=3D<optimized out>,
+func=3Dfunc@entry=3D0x559929b55670 <append_interface>,
+user_data=3Duser_data@entry=3D0x7fffbd269590) at ../../../glib/gslist.c:885
+#10 0x0000559929b557c9 in emit_interfaces_added (data=3D0x55992b31f310) at
+gdbus/object.c:574
+#11 process_changes (user_data=3D0x55992b31f310) at gdbus/object.c:996
+#12 0x0000559929b56fb7 in g_dbus_flush (connection=3D0x55992b2d57d0) at
+gdbus/object.c:1494
+#13 g_dbus_send_message (message=3D0x55992b2fbe10, connection=3D0x55992b2d5=
+7d0) at
+gdbus/object.c:1518
+#14 g_dbus_send_message (connection=3D0x55992b2d57d0, message=3D0x55992b2fb=
+e10) at
+gdbus/object.c:1498
+#15 0x0000559929b39d87 in device_profile_connected (err=3D-5,
+profile=3D0x559929be0440 <a2dp_source_profile>, dev=3D0x55992b301360) at
+src/device.c:1802
+#16 service_state_changed (service=3D<optimized out>, old_state=3D<optimize=
+d out>,
+new_state=3D<optimized out>, user_data=3D<optimized out>) at src/device.c:7=
+002
+#17 0x0000559929b2d072 in change_state (service=3D0x55992b306bd0,
+state=3DBTD_SERVICE_STATE_DISCONNECTED, err=3D<optimized out>) at src/servi=
+ce.c:98
+#18 0x0000559929ab91ef in discovery_complete (session=3D<optimized out>,
+seps=3D<optimized out>, err=3D-5, user_data=3D0x55992b305b70) at
+profiles/audio/source.c:237
+#19 0x0000559929abdd87 in finalize_discover (s=3D0x55992b301250) at
+profiles/audio/a2dp.c:403
+#20 discover_cb (session=3D<optimized out>, seps=3D<optimized out>, err=3D<=
+optimized
+out>, user_data=3D0x55992b301250) at profiles/audio/a2dp.c:2842
+#21 0x0000559929ac0ba7 in finalize_discovery (session=3D0x55992b311700, err=
+=3D0) at
+profiles/audio/avdtp.c:1087
+#22 0x0000559929ac63e0 in avdtp_parse_resp (transaction=3D<optimized out>,
+size=3D16, buf=3D0x55992b311773, signal_id=3D<optimized out>, stream=3D0x0,
+session=3D0x55992b311700) at profiles/audio/avdtp.c:2957
+#23 session_cb (data=3D0x55992b311700, cond=3D<optimized out>, chan=3D<opti=
+mized
+out>) at profiles/audio/avdtp.c:2284
+#24 session_cb (chan=3D<optimized out>, cond=3D<optimized out>,
+data=3D0x55992b311700) at profiles/audio/avdtp.c:2208
+#25 0x00007f7319758be4 in g_main_dispatch (context=3D0x55992b2d05b0) at
+../../../glib/gmain.c:3381
+#26 g_main_context_dispatch (context=3D0x55992b2d05b0) at
+../../../glib/gmain.c:4099
+#27 0x00007f7319758f88 in g_main_context_iterate (context=3D0x55992b2d05b0,
+block=3Dblock@entry=3D1, dispatch=3Ddispatch@entry=3D1, self=3D<optimized o=
+ut>) at
+../../../glib/gmain.c:4175
+#28 0x00007f7319759273 in g_main_loop_run (loop=3D0x55992b2d1790) at
+../../../glib/gmain.c:4373
+#29 0x0000559929b6ccd5 in mainloop_run () at src/shared/mainloop-glib.c:66
+#30 0x0000559929b6d12c in mainloop_run_with_signal
+(func=3Dfunc@entry=3D0x559929afe2c0 <signal_callback>,
+user_data=3Duser_data@entry=3D0x0) at src/shared/mainloop-notify.c:188
+#31 0x0000559929ab142d in main (argc=3D<optimized out>, argv=3D<optimized o=
+ut>) at
+src/main.c:1210
+```
 
+It looks like it=E2=80=99s a problem in D-Bus, so I reported it to their is=
+sue tracker
+as *Segfault in `_dbus_marshal_write_basic`* [1].
+
+[1]: https://gitlab.freedesktop.org/dbus/dbus/-/issues/372
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
