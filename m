@@ -2,243 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9071C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jan 2022 01:35:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA5DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jan 2022 02:27:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232799AbiAHBfu (ORCPT
+        id S233336AbiAHC1R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 20:35:50 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:59440 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S230520AbiAHBfu (ORCPT
+        Fri, 7 Jan 2022 21:27:17 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:44808 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230187AbiAHC1R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 20:35:50 -0500
-X-UUID: a68be2b4b47b48959ab3f3e003f4ba29-20220108
-X-UUID: a68be2b4b47b48959ab3f3e003f4ba29-20220108
-Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 213261639; Sat, 08 Jan 2022 09:35:48 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by
- mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Sat, 8 Jan 2022 09:35:46 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 8 Jan 2022 09:35:46 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <Mark-YW.Chen@mediatek.com>,
-        <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
-        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
-        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
-        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
-        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
-        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
-        <Eric.Liang@mediatek.com>, <Stella.Chang@mediatek.com>,
-        <Tom.Chou@mediatek.com>, <steve.lee@mediatek.com>,
-        <jsiuda@google.com>, <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?q?Re=3A=20Bluetooth=3A=20mt7921s=3A=20Enable=20SCO=20over=20I2S?=
-Date:   Sat, 8 Jan 2022 09:35:44 +0800
-Message-ID: <1641605744-14346-1-git-send-email-sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <6DDA9D10-3001-4A57-B2F4-9712732868AC@holtmann.org--annotate>
-References: <6DDA9D10-3001-4A57-B2F4-9712732868AC@holtmann.org--annotate>
+        Fri, 7 Jan 2022 21:27:17 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3A440B8272D;
+        Sat,  8 Jan 2022 02:27:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6612C36AEB;
+        Sat,  8 Jan 2022 02:27:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641608835;
+        bh=TX3kCm6RVF/7MEzog9mzXfC2zzgkvFjbe2el+5vmbCU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=X3fM9io6M4QhzEtBKzHiKv1B1xv/TlAGOwneGNbM7yjEYF5ASNd17ERsI79KSuBjn
+         xXcyo7+BF431U1S7t4hQHKiZPycwi+xesilX4qxgpvTGwMO7nUcM88i0x4kGCKFdzO
+         H5wXQFbGOoord+ycVyU3r286MRqVnA2lHMDcudwgQn1kd0UplRMdHAuaGGkBgCR16h
+         VYbV1aq5ijpoWd9CF7DTOe0mX+R2NT8+1bup9RH59b3xvbpzO3Pf6pIhrYvHh7S81Z
+         x13kFNqdNVeHzaBRemME7SLF6uGBpFxLceMNi9j2LGtHewbxWL7aEU1VFOicfYYpJ2
+         mxVYHhUrHfo2g==
+Date:   Fri, 7 Jan 2022 18:27:12 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth 2022-01-07
+Message-ID: <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-MTK:  N
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+On Fri,  7 Jan 2022 13:09:42 -0800 Luiz Augusto von Dentz wrote:
+> The following changes since commit 710ad98c363a66a0cd8526465426c5c5f8377e=
+e0:
+>=20
+>   veth: Do not record rx queue hint in veth_xmit (2022-01-06 13:49:54 +00=
+00)
+>=20
+> are available in the Git repository at:
+>=20
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
+git tags/for-net-next-2022-01-07
+>=20
+> for you to fetch changes up to b9f9dbad0bd1c302d357fdd327c398f51f5fc2b1:
+>=20
+>   Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt() (2022-01-0=
+7 08:41:38 +0100)
+>=20
+> ----------------------------------------------------------------
+> bluetooth-next pull request for net-next:
+>=20
+>  - Add support for Foxconn QCA 0xe0d0
+>  - Fix HCI init sequence on MacBook Air 8,1 and 8,2
+>  - Fix Intel firmware loading on legacy ROM devices
 
-Hi, Marcel
+A few warnings here that may be worth addressing - in particular this
+one makes me feel that kbuild bot hasn't looked at the patches:
 
->
->Hi Sean,
->
->> The driver has to issue the specific command to enable Bluetooth SCO
->> over the I2S/PCM interface on mt7921s, that is supported since the
->> firmware with version 20211222191101 was added, and the patch would
->> not cause any harm even when the old firmware is applied.
->>
->> The SCO profile with the patch was tested by setting up a VOIP
->> application, connected to HFP device, checked telephony function can work normally.
->>
->> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
->> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
->> ---
->> v2: refine git message and fix typo
->> v3:
->>    1. free skb after calling  __hci_cmd_sync
->>    2. make bt_awake as const struct btmtk_sco
->> v4:
->>    1. update git message
->>    2. drop a few redundant error messages
->> ---
->> drivers/bluetooth/btmtk.h     | 20 +++++++++++
->> drivers/bluetooth/btmtksdio.c | 68 +++++++++++++++++++++++++++++++++++
->> 2 files changed, 88 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
->> index 2be1d2680ad8..fc57ef09d132 100644
->> --- a/drivers/bluetooth/btmtk.h
->> +++ b/drivers/bluetooth/btmtk.h
->> @@ -7,8 +7,12 @@
->>
->> #define HCI_WMT_MAX_EVENT_SIZE		64
->>
->> +#define BTMTK_WMT_REG_WRITE 0x1
->> #define BTMTK_WMT_REG_READ 0x2
->>
->> +#define MT7921_PINMUX_0 0x70005050
->> +#define MT7921_PINMUX_1 0x70005054
->> +
->> enum {
->>	BTMTK_WMT_PATCH_DWNLD = 0x1,
->>	BTMTK_WMT_TEST = 0x2,
->> @@ -76,6 +80,22 @@ struct btmtk_wakeon {
->>	__le16 wakeup_delay;
->> } __packed;
->>
->> +struct btmtk_sco {
->> +	u8 clock_config;
->> +	u8 transmit_format_config;
->> +	u8 channel_format_config;
->> +	u8 channel_select_config;
->> +} __packed;
->> +
->> +struct reg_write_cmd {
->> +	u8 type;
->> +	u8 rsv;
->> +	u8 num;
->> +	__le32 addr;
->> +	__le32 data;
->> +	__le32 mask;
->> +} __packed;
->> +
->> struct btmtk_hci_wmt_params {
->>	u8 op;
->>	u8 flag;
->> diff --git a/drivers/bluetooth/btmtksdio.c
->> b/drivers/bluetooth/btmtksdio.c index 89bd70651e9e..f6fb82b317de
->> 100644
->> --- a/drivers/bluetooth/btmtksdio.c
->> +++ b/drivers/bluetooth/btmtksdio.c
->> @@ -830,6 +830,66 @@ static int btsdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
->>	return err;
->> }
->>
->> +static int btsdio_mtk_reg_write(struct hci_dev *hdev, u32 reg, u32
->> +val, u32 mask) {
->> +	struct btmtk_hci_wmt_params wmt_params;
->> +	struct reg_write_cmd reg_write = {
->> +		.type = 1,
->> +		.num = 1,
->> +		.addr = cpu_to_le32(reg),
->> +		.data = cpu_to_le32(val),
->> +		.mask = cpu_to_le32(mask),
->> +	};
->
->Maybe a good idea to make this const as well.
->
+net/bluetooth/hci_sync.c:5143:5: warning: no previous prototype for =E2=80=
+=98hci_le_ext_create_conn_sync=E2=80=99 [-Wmissing-prototypes]
+ 5143 | int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_co=
+nn *conn,
+      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-will do it next verion
+Also this Fixes tag could be mended:
 
->> +	int err, status;
->> +
->> +	wmt_params.op = BTMTK_WMT_REGISTER;
->> +	wmt_params.flag = BTMTK_WMT_REG_WRITE;
->> +	wmt_params.dlen = sizeof(reg_write);
->> +	wmt_params.data = &reg_write;
->> +	wmt_params.status = &status;
->> +
->> +	err = mtk_hci_wmt_sync(hdev, &wmt_params);
->> +	if (err < 0)
->> +		bt_dev_err(hdev, "Failed to write reg(%d)", err);
->
->The please “..reg (%d)” as you have for the other error message.
->
+Commit: 6845667146a2 ("Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL check=
+ in qca_serdev_probe")
+	Fixes tag: Fixes: 77131dfe ("Bluetooth: hci_qca: Replace devm_gpiod_get() =
+with devm_gpiod_get_optional()")
+	Has these problem(s):
+		- SHA1 should be at least 12 digits long
+		  Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
+		  or later) just making sure it is not set (or set to "auto").
 
-will do it next version
 
->> +
->> +	return err;
->> +}
->> +
->> +static int btsdio_mtk_sco_setting(struct hci_dev *hdev) {
->> +	const struct btmtk_sco sco_setting = {
->> +		.clock_config = 0x49,
->> +		.channel_format_config = 0x80,
->> +	};
->> +	struct sk_buff *skb;
->> +	u32 val;
->> +	int err;
->> +
->> +	/* Enable SCO over I2S/PCM for MediaTek chipset */
->> +	skb =  __hci_cmd_sync(hdev, 0xfc72, sizeof(sco_setting),
->> +			      &sco_setting, HCI_CMD_TIMEOUT);
->> +	if (IS_ERR(skb))
->> +		return PTR_ERR(skb);
->> +
->> +	kfree_skb(skb);
->> +
->> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_0, &val);
->> +	if (err < 0)
->> +		return err;
->> +
->> +	val |= 0x11000000;
->> +	err = btsdio_mtk_reg_write(hdev, MT7921_PINMUX_0, val, ~0);
->> +	if (err < 0)
->> +		return err;
->> +
->> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_1, &val);
->> +	if (err < 0)
->> +		return err;
->> +
->> +	val |= 0x00000101;
->> +	return btsdio_mtk_reg_write(hdev, MT7921_PINMUX_1, val, ~0); }
->> +
->> static int btmtksdio_setup(struct hci_dev *hdev) {
->>	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev); @@ -862,6 +922,14
->> @@ static int btmtksdio_setup(struct hci_dev *hdev)
->>		err = mt79xx_setup(hdev, fwname);
->>		if (err < 0)
->>			return err;
->> +
->> +		/* Enable SCO over I2S/PCM */
->> +		err = btsdio_mtk_sco_setting(hdev);
->> +		if (err < 0) {
->> +			bt_dev_err(hdev, "Failed to enable SCO setting (%d)", err);
->> +			return err;
->> +		}
->> +
->
->Is this really a failure or could the chip continue to operate? It just means it falls back to SCO over HCI?
->
+Would you be able to fix the new warnings and resend the PR or are you
+confident that there isn't much serious breakage here and follow ups
+will be enough?
 
-In fact, the firmware with the btmtksdio driver does not support SCO over HCI.
-
-If we fail there, the chip will not be able to continue running the SCO profile,
-So I prefer we should be aware of this problem and return an error code immediately.
-
-By the way, the reason why we do not support SCO over HCI is btmtksdio and wifi
-sdio driver would compete for the same SDIO bus to send and receive data. This
-will cause a lot of latency for SCO data, so we use a dedicated bus to minimize
-the latency to ensure audio quality in the actual product.
-
->>		break;
->>	case 0x7663:
->>	case 0x7668:
->
->Regards
->
->Marcel
->
+FWIW to see the new warnings check out net-next, do a allmodconfig build
+with W=3D1 C=3D1, pull in your code, reset back to net-next (this will
+"touch" all the files that need rebuilding), do a single threaded build
+and save (2>file) the warnings, pull in your code, do another build
+(2>file2), diff the warnings from the build of just net-next and after
+pull.
