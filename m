@@ -2,102 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA5DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jan 2022 02:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A503C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Jan 2022 03:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233336AbiAHC1R (ORCPT
+        id S233435AbiAHD4h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Jan 2022 21:27:17 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:44808 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbiAHC1R (ORCPT
+        Fri, 7 Jan 2022 22:56:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230292AbiAHD4e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Jan 2022 21:27:17 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3A440B8272D;
-        Sat,  8 Jan 2022 02:27:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6612C36AEB;
-        Sat,  8 Jan 2022 02:27:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1641608835;
-        bh=TX3kCm6RVF/7MEzog9mzXfC2zzgkvFjbe2el+5vmbCU=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=X3fM9io6M4QhzEtBKzHiKv1B1xv/TlAGOwneGNbM7yjEYF5ASNd17ERsI79KSuBjn
-         xXcyo7+BF431U1S7t4hQHKiZPycwi+xesilX4qxgpvTGwMO7nUcM88i0x4kGCKFdzO
-         H5wXQFbGOoord+ycVyU3r286MRqVnA2lHMDcudwgQn1kd0UplRMdHAuaGGkBgCR16h
-         VYbV1aq5ijpoWd9CF7DTOe0mX+R2NT8+1bup9RH59b3xvbpzO3Pf6pIhrYvHh7S81Z
-         x13kFNqdNVeHzaBRemME7SLF6uGBpFxLceMNi9j2LGtHewbxWL7aEU1VFOicfYYpJ2
-         mxVYHhUrHfo2g==
-Date:   Fri, 7 Jan 2022 18:27:12 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth 2022-01-07
-Message-ID: <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20220107210942.3750887-1-luiz.dentz@gmail.com>
-References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+        Fri, 7 Jan 2022 22:56:34 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58F2C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Jan 2022 19:56:34 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id s1so7436358pga.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Jan 2022 19:56:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Evc8LcD4TtrYEx4kHuvGKjEcl3Q5NYJf75iDzkjNm9w=;
+        b=TpP8H8H8hYjr9fGjpYSUw1GgrFkH9y6Tw330ZgMNEIPE2f9PVa6kXRP/vzmMrrZBAt
+         SUJs/kCZu0vfL17gdU/8gUsO1Onzx2QV24qYdVQAShEblJozmV7hhOz+2dLBwWm8pnA2
+         MRbBhWee0c7qZUArIHdlfCULKIZY7sospHD97PWELleY5XqCWtr1sIH50V/jxCs0qGWu
+         zjj3GnGj1yQiF2PIgbtrl0tXECwCzc/meigFRThrY2E92O/QJsazcfF/6xh7sZmugG5c
+         EQCV6tt0ChRQQODach1o1tbSZuONNdohaoEcWz1mIgKalxeKkU53ITEtrDLTvtoEe7B0
+         axzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Evc8LcD4TtrYEx4kHuvGKjEcl3Q5NYJf75iDzkjNm9w=;
+        b=zIcK4hhTZqkbRH+P9+4UxgDQlmEUHW+RqQZZc+HwRdTXcgE8QAuIT+UCkb+DePOgbP
+         BP2ea12+X6G1FbNVH0ueD8AVTfM6kN6rBvqCzQQXWpEiW07/Q+pkLxoWpmd0ED9UTYk1
+         V+Xn66/Va/80BWLfw3QTaPNNtlp9p2BnajKBVZaTsOw6lwSyr3sCB2La0XxC29j2tqpa
+         1V7+zDhGCdSP4ba3RYHsw6sTjp+2P9o9Xmktc6JtrdtPhAMS2g+oI6BkypllLbCbIrL8
+         fdf8jCUndLOr8wVS1XfHb1gCM1z+dUIs/wZSWEC17RvOHk1h/tFYAHmX41o7H9PqAV5H
+         AA/A==
+X-Gm-Message-State: AOAM532rZr1NjzE4IiowyxYL8SyPunJexjNoOYhOB7oH1gRc6mIPi/ap
+        nxTxDegPDheBnctq8XHP5LW/S0EJ4c0=
+X-Google-Smtp-Source: ABdhPJxO+txsunm++oerAINLnoDtZ4GCYKk0BZXgY2Pvz+XaSRLHWBn41xdqA062D+N8AdkkWEHA6w==
+X-Received: by 2002:a62:b503:0:b0:4bc:1f47:3b26 with SMTP id y3-20020a62b503000000b004bc1f473b26mr47013079pfe.9.1641614194053;
+        Fri, 07 Jan 2022 19:56:34 -0800 (PST)
+Received: from localhost.localdomain ([2601:1c0:6a01:d830:f5b3:233e:73cd:8e1d])
+        by smtp.gmail.com with ESMTPSA id y4sm373995pjg.43.2022.01.07.19.56.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jan 2022 19:56:33 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH DNM] Bluetooth: Build: Test patch - Do Not Merge
+Date:   Fri,  7 Jan 2022 19:56:30 -0800
+Message-Id: <20220108035630.273898-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri,  7 Jan 2022 13:09:42 -0800 Luiz Augusto von Dentz wrote:
-> The following changes since commit 710ad98c363a66a0cd8526465426c5c5f8377e=
-e0:
->=20
->   veth: Do not record rx queue hint in veth_xmit (2022-01-06 13:49:54 +00=
-00)
->=20
-> are available in the Git repository at:
->=20
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git tags/for-net-next-2022-01-07
->=20
-> for you to fetch changes up to b9f9dbad0bd1c302d357fdd327c398f51f5fc2b1:
->=20
->   Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt() (2022-01-0=
-7 08:41:38 +0100)
->=20
-> ----------------------------------------------------------------
-> bluetooth-next pull request for net-next:
->=20
->  - Add support for Foxconn QCA 0xe0d0
->  - Fix HCI init sequence on MacBook Air 8,1 and 8,2
->  - Fix Intel firmware loading on legacy ROM devices
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-A few warnings here that may be worth addressing - in particular this
-one makes me feel that kbuild bot hasn't looked at the patches:
+Do Not Merge this path.
+This is a test patch to trigger the CI test.
 
-net/bluetooth/hci_sync.c:5143:5: warning: no previous prototype for =E2=80=
-=98hci_le_ext_create_conn_sync=E2=80=99 [-Wmissing-prototypes]
- 5143 | int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_co=
-nn *conn,
-      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ README | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Also this Fixes tag could be mended:
+diff --git a/README b/README
+index 669ac7c32292..514f2d6a9de9 100644
+--- a/README
++++ b/README
+@@ -1,3 +1,5 @@
++
++
+ Linux kernel
+ ============
+ 
+-- 
+2.25.1
 
-Commit: 6845667146a2 ("Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL check=
- in qca_serdev_probe")
-	Fixes tag: Fixes: 77131dfe ("Bluetooth: hci_qca: Replace devm_gpiod_get() =
-with devm_gpiod_get_optional()")
-	Has these problem(s):
-		- SHA1 should be at least 12 digits long
-		  Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-		  or later) just making sure it is not set (or set to "auto").
-
-
-Would you be able to fix the new warnings and resend the PR or are you
-confident that there isn't much serious breakage here and follow ups
-will be enough?
-
-FWIW to see the new warnings check out net-next, do a allmodconfig build
-with W=3D1 C=3D1, pull in your code, reset back to net-next (this will
-"touch" all the files that need rebuilding), do a single threaded build
-and save (2>file) the warnings, pull in your code, do another build
-(2>file2), diff the warnings from the build of just net-next and after
-pull.
