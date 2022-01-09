@@ -2,84 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97D8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 19:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E7BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 19:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236718AbiAITYh (ORCPT
+        id S234677AbiAITgr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jan 2022 14:24:37 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:49974 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S236725AbiAITYb (ORCPT
+        Sun, 9 Jan 2022 14:36:47 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:53543 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230165AbiAITgq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jan 2022 14:24:31 -0500
-X-UUID: 21bb4bc72a2b46caacca9030e5418a3c-20220110
-X-UUID: 21bb4bc72a2b46caacca9030e5418a3c-20220110
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 1198602015; Mon, 10 Jan 2022 03:24:29 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
- Mon, 10 Jan 2022 03:24:28 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 10 Jan 2022 03:24:27 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v5 5/5] Bluetooth: btmtksdio: clean up inconsistent error message in btmtksdio_mtk_reg_read
-Date:   Mon, 10 Jan 2022 03:24:01 +0800
-Message-ID: <7a5491bd4192cbd7423c8769641df9045a565ad4.1641755121.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
+        Sun, 9 Jan 2022 14:36:46 -0500
+Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 31AC5CED27;
+        Sun,  9 Jan 2022 20:36:44 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v5 1/5] Bluetooth: btmtksdio: rename btsdio_mtk_reg_read
+From:   Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
+Date:   Sun, 9 Jan 2022 20:36:43 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
+        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
+        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
+        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
+        km.lin@mediatek.com, robin.chiu@mediatek.com,
+        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
+        posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
+        Michael Sun <michaelfsun@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>, shawnku@google.com,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <39A8FEA2-D5AA-4D3D-9A14-E9EC187D300A@holtmann.org>
 References: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+To:     Sean Wang <sean.wang@mediatek.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi Sean,
 
-Have "..reg (%d)" to be consistent with the other similar error messages.
+> Using "btmtksdio" as the prefix instead of "btsdio"
+> 
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+> v5: new created to make the series better
+> ---
+> drivers/bluetooth/btmtksdio.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
-v5: new created to make the series better
----
- drivers/bluetooth/btmtksdio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+all 5 patches have been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index d82ba9d71fb8..25fb9c79b1f4 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -816,7 +816,7 @@ static int btmtksdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
- 
- 	err = mtk_hci_wmt_sync(hdev, &wmt_params);
- 	if (err < 0) {
--		bt_dev_err(hdev, "Failed to read reg(%d)", err);
-+		bt_dev_err(hdev, "Failed to read reg (%d)", err);
- 		return err;
- 	}
- 
--- 
-2.25.1
+Regards
+
+Marcel
 
