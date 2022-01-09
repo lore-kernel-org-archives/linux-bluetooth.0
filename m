@@ -2,94 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51C04C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 05:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4552FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 05:23:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbiAIFVt (ORCPT
+        id S229673AbiAIFXG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jan 2022 00:21:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46964 "EHLO
+        Sun, 9 Jan 2022 00:23:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiAIFVs (ORCPT
+        with ESMTP id S229447AbiAIFXF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jan 2022 00:21:48 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56BDEC06173F
-        for <linux-bluetooth@vger.kernel.org>; Sat,  8 Jan 2022 21:21:48 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id i8-20020a17090a138800b001b3936fb375so3014405pja.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 08 Jan 2022 21:21:48 -0800 (PST)
+        Sun, 9 Jan 2022 00:23:05 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B472C06173F;
+        Sat,  8 Jan 2022 21:23:05 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id i3so29146947ybh.11;
+        Sat, 08 Jan 2022 21:23:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3tFDJ9l2EzucFWxsNk41wS3QV1dITJi/rl4TOKkJVzc=;
-        b=hZA4ZZoWd36xHOIbgEoUW6g0pJnKrU9otlkx53pmLwd95IVQdg/H0V7jolUP7hOntk
-         d9YRy1YX2keALwaIyhiJhkdVOGNpdXBEGOQfxRkhnWSLJ9Bh5sRk6zap2c8ribu5xa75
-         ooxcYkUYoSJuqs+JhNKKzl8MJq0bvtcbI1Qb79t9SLSXRFw06gAt5xSKKF6RCJdDgL9S
-         5F6V/11ZYoZA2EFeThe0W4Oc4pyxHtVqPZJe9a/lnErbtvjoD/eGeDXWXTDH09jjWxT9
-         YwdQUfof0UNX2LWyqxsq/MWPUFD7Co+EHEVkh69bQ3TYabxgVeB8c6aDEaj5CBRkUKB6
-         T6Og==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Varh2KpZisFfNCnQZj7woasFSawJlKM5czdAIPJ3JMU=;
+        b=RG311M8bNP8LTvcyUZwF3n+dPVi5M/7hQYqwVtKTVHywMjI9sqS0O86DATBGEcEhyi
+         31dnf1BSYZPw/J3m7VAz00z8Px1TsMtbX4FUP7DsY6M0KNpYL2/bzU2jdzr1E1EPjR1h
+         wdIENIyxWSbExKosjxYj9kuIJ3iPZWTB9rlqJO/xcwJYvDjLu3zeNlHug/2HWi5FI8eH
+         4qCh0FCW7O/V8w/9cRq/ifJ7FuiGYeKbwFzGg5k4ax3ychMxMU1FF6ChfKhEPsjRIHA8
+         35Vioo1wqX87a43Ww/mceSqmODFfsNwGmaP/5Mq4kTA/RFT7VHQzliHpAMV3ou0YDfXr
+         Xu1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3tFDJ9l2EzucFWxsNk41wS3QV1dITJi/rl4TOKkJVzc=;
-        b=FO9eFbgghhezmfxVQFKe+SocGRRyJpbFKhDy4WN1ELyqZ8t57x3wNFgK50Ua3au9yH
-         4Iy1EMP/Cwo9erQaaNP7UfD42r8F1pGtGQtyHCAMTvGUMh8eLrqi9gWsFC8PEiSkH97c
-         VSWevXAGVUHZSz+xQPvHax2Hc3e/uLFsg329AfF4PjO/dVezqo3iyU8gjALL7Ka+PPIv
-         bK8KHw4FCzodRxGLTSC86D3ABN/DkizlaU5uB5k7eBwKg7bRn8Kf5I1LfDODqU5pUJ8o
-         dAJakxM84FnxlGEGYXPUNXVsmxWG3wbDa0XjAb4o27kuu2rtR2UkpFfkD5GC6hG5yMll
-         d6Gg==
-X-Gm-Message-State: AOAM5334Dv9TK/2WpulrUDaZK35AIA4R35mbbRo1/SE5kA3hP5fwR/RK
-        RVYfsrfwCW0B2JhChgcMw0kA79TcZDE=
-X-Google-Smtp-Source: ABdhPJxalctuywy2goVS+Clo8rF66XUizkXcQSNKyNbmczvIjUffHvWs/YTVDl9sgXj2Bjd0EqL00w==
-X-Received: by 2002:a17:902:d64f:b0:149:4d01:fb42 with SMTP id y15-20020a170902d64f00b001494d01fb42mr69847393plh.13.1641705706877;
-        Sat, 08 Jan 2022 21:21:46 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id nn16sm4299200pjb.54.2022.01.08.21.21.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Jan 2022 21:21:46 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sync: Fix compilation warning
-Date:   Sat,  8 Jan 2022 21:21:45 -0800
-Message-Id: <20220109052145.4081797-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Varh2KpZisFfNCnQZj7woasFSawJlKM5czdAIPJ3JMU=;
+        b=CGrOyDxFUJO1FSDa9xD1YqQi7BLpX5jmMT/H9mufYa3bA6DxB2n0eenLm0t7E5meG6
+         L2cfZgfjnmhJxlePXVLH2WjEsHxweTwPOTrBIoEMYg9UUnOfusRzuNQlsvyxaowk0BKR
+         9u352gv0iG+JDn30FHGx6T0CmamC7EUyZcYsGk8VUVcGi+XRKwegzI2xsq7K3M0pWCsH
+         WbT72y9KYjFvSxzC90EUxvp0uY2Ss1TkT10pE343IfCCvt+Z9fyRKbloQZEvvdjF3V2F
+         OscC3eIdRQCtYJUf4ocNMmgLo4ElldWjBfZHu/g7r+ZCa5xaxuY6nSqgjvYtgGULpIoW
+         SYkw==
+X-Gm-Message-State: AOAM530YA2QpdKyZP3aiy4pxvN9o73mj1BUq6pQvhBCHrmHhteYhGw8+
+        DM2WJiqbcBImVljQQlH80H2ZHjCuUeDyoskojiRRrLGU
+X-Google-Smtp-Source: ABdhPJwkl+ZGA9QLf8joJPqJxBdwtm/iajJcKnYRXgtXZ8Ga33b+IvHl61GAmEey5tCgt3S972P015IcjWeTJk4ZIws=
+X-Received: by 2002:a05:6902:1149:: with SMTP id p9mr62756822ybu.398.1641705783012;
+ Sat, 08 Jan 2022 21:23:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+ <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com> <6FFD2498-E81C-49DA-9B3E-4833241382EE@holtmann.org>
+In-Reply-To: <6FFD2498-E81C-49DA-9B3E-4833241382EE@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sat, 8 Jan 2022 21:22:51 -0800
+Message-ID: <CABBYNZLaOgPFRvv_h=pyXChnP=y205yrm_cnP=F3TVBrXv-qVQ@mail.gmail.com>
+Subject: Re: pull request: bluetooth 2022-01-07
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Jakub Kicinski <kuba@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-This fixes the following warning:
+On Sat, Jan 8, 2022 at 6:41 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Jakub,
+>
+> >> The following changes since commit 710ad98c363a66a0cd8526465426c5c5f83=
+77ee0:
+> >>
+> >>  veth: Do not record rx queue hint in veth_xmit (2022-01-06 13:49:54 +=
+0000)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-nex=
+t.git tags/for-net-next-2022-01-07
+> >>
+> >> for you to fetch changes up to b9f9dbad0bd1c302d357fdd327c398f51f5fc2b=
+1:
+> >>
+> >>  Bluetooth: hci_sock: fix endian bug in hci_sock_setsockopt() (2022-01=
+-07 08:41:38 +0100)
+> >>
+> >> ----------------------------------------------------------------
+> >> bluetooth-next pull request for net-next:
+> >>
+> >> - Add support for Foxconn QCA 0xe0d0
+> >> - Fix HCI init sequence on MacBook Air 8,1 and 8,2
+> >> - Fix Intel firmware loading on legacy ROM devices
+> >
+> > A few warnings here that may be worth addressing - in particular this
+> > one makes me feel that kbuild bot hasn't looked at the patches:
+> >
+> > net/bluetooth/hci_sync.c:5143:5: warning: no previous prototype for =E2=
+=80=98hci_le_ext_create_conn_sync=E2=80=99 [-Wmissing-prototypes]
+> > 5143 | int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci=
+_conn *conn,
+> >      |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+>
+> this we have to fix with a patch since none of the commits were touching =
+this. It really must have slipped through earlier.
 
-net/bluetooth/hci_sync.c:5143:5: warning: no previous prototype for
-‘hci_le_ext_create_conn_sync’ [-Wmissing-prototypes]
+Just sent a patch fixing the warning, once that is applied I will
+create a new tag and send the pull request.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> > Also this Fixes tag could be mended:
+> >
+> > Commit: 6845667146a2 ("Bluetooth: hci_qca: Fix NULL vs IS_ERR_OR_NULL c=
+heck in qca_serdev_probe")
+> >       Fixes tag: Fixes: 77131dfe ("Bluetooth: hci_qca: Replace devm_gpi=
+od_get() with devm_gpiod_get_optional()")
+> >       Has these problem(s):
+> >               - SHA1 should be at least 12 digits long
+> >                 Can be fixed by setting core.abbrev to 12 (or more) or =
+(for git v2.11
+> >                 or later) just making sure it is not set (or set to "au=
+to").
+>
+> I fixed that now and re-pushed the tree. Funny part is that I always chec=
+k that the Fixes SHA1 is actually valid, but I never thought about checking=
+ that it is at least 12 digits long. I totally missed that and keep it in m=
+ind going forward.
+>
+> Regards
+>
+> Marcel
+>
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 0feb68f12545..2fe8c60dc62b 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5140,8 +5140,8 @@ static void set_ext_conn_params(struct hci_conn *conn,
- 	p->max_ce_len = cpu_to_le16(0x0000);
- }
- 
--int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
--				u8 own_addr_type)
-+static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
-+				       struct hci_conn *conn, u8 own_addr_type)
- {
- 	struct hci_cp_le_ext_create_conn *cp;
- 	struct hci_cp_le_ext_conn_param *p;
--- 
-2.33.1
 
+--=20
+Luiz Augusto von Dentz
