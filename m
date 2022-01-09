@@ -2,65 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20E7BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 19:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DD8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 22:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234677AbiAITgr (ORCPT
+        id S237274AbiAIWK1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jan 2022 14:36:47 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:53543 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbiAITgq (ORCPT
+        Sun, 9 Jan 2022 17:10:27 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:57032 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237272AbiAIWK0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jan 2022 14:36:46 -0500
-Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 31AC5CED27;
-        Sun,  9 Jan 2022 20:36:44 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH v5 1/5] Bluetooth: btmtksdio: rename btsdio_mtk_reg_read
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
-Date:   Sun, 9 Jan 2022 20:36:43 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
-        Michael Sun <michaelfsun@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>, shawnku@google.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+        Sun, 9 Jan 2022 17:10:26 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7209F60EA8;
+        Sun,  9 Jan 2022 22:10:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B2CEC36AE3;
+        Sun,  9 Jan 2022 22:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641766225;
+        bh=IBra92ffqfZ+rHSrbea8fGiXiOScBbW8B0xwzylN6EQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=WTLTKAN77RUy/pF4Y28Lkdsh9l7UhbM3pS+ddIi+Hyr1oMfmr0+XeNKa+0ZiXL5ir
+         E1eKZFmu13+aOzDpwQHCMqCV+ypgO1BNjf7lXdXnxe44uEUDwDaNMP0kmcdNWOpikB
+         pNh7OQ0PKm0OEZv3vSSh2UXY+wM0H+HmLql1W0006JmKLOq2QJBuHxdWKlYtj7I8Sm
+         mQsHF1dIhsDuUdHRv7OzitQXSqZFvwJJQLKHIsti5g0cln6n5TAlnxnSjsLMjcQg5T
+         LkeGiuxElEXS8XYQjTtFd5HFMRtlhwuyxHo1nQqnT82Usy3N9sGxL6FlP8VXZpap0l
+         IrWjwuRJU4GPA==
+Date:   Sun, 9 Jan 2022 14:10:24 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "An, Tedd" <tedd.an@intel.com>, David Miller <davem@davemloft.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: pull request: bluetooth 2022-01-07
+Message-ID: <20220109141024.719698d2@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <CABBYNZJEZFwoQyAhXwpQsRB4c4jks4Yg9Sw9XLwPL7Pk3j_iMA@mail.gmail.com>
+References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+        <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <CABBYNZJEZFwoQyAhXwpQsRB4c4jks4Yg9Sw9XLwPL7Pk3j_iMA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <39A8FEA2-D5AA-4D3D-9A14-E9EC187D300A@holtmann.org>
-References: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
-
-> Using "btmtksdio" as the prefix instead of "btsdio"
+On Fri, 7 Jan 2022 23:50:40 -0800 Luiz Augusto von Dentz wrote:
+> > FWIW to see the new warnings check out net-next, do a allmodconfig build
+> > with W=1 C=1, pull in your code, reset back to net-next (this will
+> > "touch" all the files that need rebuilding), do a single threaded build
+> > and save (2>file) the warnings, pull in your code, do another build  
+> > (2>file2), diff the warnings from the build of just net-next and after  
+> > pull.  
 > 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> v5: new created to make the series better
-> ---
-> drivers/bluetooth/btmtksdio.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+> Hmm, we might as well do that in our CI then, but isn't that gonna
+> cause all sorts of warnings in different subsystem/drivers to appear?
+> I get that the diff should come clean if we do this 2 stage builds
+> like you suggested but I'm not sure that is the best approach for CI,
+> what do you think @An, Tedd? I'd guess we could keep our minimal
+> config to keep building times in check but add a 2 stage build per
+> patch so we can detect if they produce new warnings.
 
-all 5 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
-
+FWIW if you use patchwork you can try to massage our scripts to do the
+building: https://github.com/kuba-moo/nipa That said our setup is far
+from perfect as well.
