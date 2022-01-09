@@ -2,29 +2,29 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EFAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 19:24:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42123C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Jan 2022 19:24:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236704AbiAITYW (ORCPT
+        id S236710AbiAITY3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jan 2022 14:24:22 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:39994 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S236690AbiAITYV (ORCPT
+        Sun, 9 Jan 2022 14:24:29 -0500
+Received: from mailgw01.mediatek.com ([60.244.123.138]:49948 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S236690AbiAITY3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jan 2022 14:24:21 -0500
-X-UUID: 9e6b69e1e31047eea3f27758f28ee9b7-20220110
-X-UUID: 9e6b69e1e31047eea3f27758f28ee9b7-20220110
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        Sun, 9 Jan 2022 14:24:29 -0500
+X-UUID: d2008b55236e4520b03af54e8281353b-20220110
+X-UUID: d2008b55236e4520b03af54e8281353b-20220110
+Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 131549648; Mon, 10 Jan 2022 03:24:15 +0800
+        with ESMTP id 1064958171; Mon, 10 Jan 2022 03:24:27 +0800
 Received: from mtkcas10.mediatek.inc (172.21.101.39) by
  mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 10 Jan 2022 03:24:14 +0800
+ 15.0.1497.2; Mon, 10 Jan 2022 03:24:25 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 10 Jan 2022 03:24:13 +0800
+ Transport; Mon, 10 Jan 2022 03:24:25 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -41,11 +41,10 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Mark Chen <mark-yw.chen@mediatek.com>
-Subject: [PATCH v5 2/5] Bluetooth: mt7921s: Support wake on bluetooth
-Date:   Mon, 10 Jan 2022 03:23:58 +0800
-Message-ID: <b3363ceffd641a60636a4710f96a0bd14bb5150f.1641755121.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v5 4/5] Bluetooth: btmtksdio: move struct reg_read_cmd to common file
+Date:   Mon, 10 Jan 2022 03:24:00 +0800
+Message-ID: <295c786cf0bd42433aede61195ebd35c78fa4a09.1641755121.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
 References: <a22b710e69551c3503203f73ea898504cb634815.1641755121.git.objelf@gmail.com>
@@ -56,115 +55,54 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Mark Chen <mark-yw.chen@mediatek.com>
+From: Sean Wang <sean.wang@mediatek.com>
 
-Enable wake on bluetooth on mt7921s that can be supported since the
-firmware with version 20211129211059 was added, and the patch would
-not cause any harm even when the old firmware is applied.
+move struct reg_read_cmd to btmtk.h to allow other mtk drivers refer to.
 
-The patch was tested by setting up an HID or HOGP profile to connect a
-Bluetooth keyboard and mouse, then putting the system to suspend, then
-trying to wake up the system by moving the Bluetooth keyboard or mouse,
-and then checking if the system can wake up and be brought back to
-the normal state.
-
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
 ---
-v2: refine the git message
-v3:
-    1. fit to single line as possible
-    2. move the skb variable into local scope
-    3. free skb after calling __hci_cmd_sync
-    4. make bt_awake as const struct btmtk_wakeon
-v4: 1. drop __func__ in error messages
-    2. make hdev->wakeup assignment aligned to hdev->send
-v5: 1. add a ',' at the end of struct btmtk_wakeon bt_awake
-    2. move hdev->wakeup after hdev->send
-    3. make the error message for device_init_wakeup descriptive
+v2, v3, v4 and v5: no change
 ---
- drivers/bluetooth/btmtk.h     |  8 ++++++++
- drivers/bluetooth/btmtksdio.c | 33 ++++++++++++++++++++++++++++++++-
- 2 files changed, 40 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btmtk.h     | 7 +++++++
+ drivers/bluetooth/btmtksdio.c | 7 +------
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 6e7b0c7567c0..2be1d2680ad8 100644
+index fc57ef09d132..fb76d9765ce0 100644
 --- a/drivers/bluetooth/btmtk.h
 +++ b/drivers/bluetooth/btmtk.h
-@@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
- 	u8 time_compensation;
+@@ -87,6 +87,13 @@ struct btmtk_sco {
+ 	u8 channel_select_config;
  } __packed;
  
-+struct btmtk_wakeon {
-+	u8 mode;
-+	u8 gpo;
-+	u8 active_high;
-+	__le16 enable_delay;
-+	__le16 wakeup_delay;
++struct reg_read_cmd {
++	u8 type;
++	u8 rsv;
++	u8 num;
++	__le32 addr;
 +} __packed;
 +
- struct btmtk_hci_wmt_params {
- 	u8 op;
- 	u8 flag;
+ struct reg_write_cmd {
+ 	u8 type;
+ 	u8 rsv;
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 891e34b50e44..a8273874e29f 100644
+index a41b5f65e7a9..d82ba9d71fb8 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -958,6 +958,32 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
-+{
-+	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-+	bool may_wakeup = device_may_wakeup(bdev->dev);
-+	const struct btmtk_wakeon bt_awake = {
-+		.mode = 0x1,
-+		.gpo = 0,
-+		.active_high = 0x1,
-+		.enable_delay = cpu_to_le16(0xc80),
-+		.wakeup_delay = cpu_to_le16(0x20),
-+	};
-+
-+	if (may_wakeup && bdev->data->chipid == 0x7921) {
-+		struct sk_buff *skb;
-+
-+		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
-+				      &bt_awake, HCI_CMD_TIMEOUT);
-+		if (IS_ERR(skb))
-+			may_wakeup = false;
-+
-+		kfree_skb(skb);
-+	}
-+
-+	return may_wakeup;
-+}
-+
- static int btmtksdio_probe(struct sdio_func *func,
- 			   const struct sdio_device_id *id)
+@@ -800,12 +800,7 @@ static int mt79xx_setup(struct hci_dev *hdev, const char *fwname)
+ static int btmtksdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
  {
-@@ -997,6 +1023,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	hdev->setup    = btmtksdio_setup;
- 	hdev->shutdown = btmtksdio_shutdown;
- 	hdev->send     = btmtksdio_send_frame;
-+	hdev->wakeup   = btmtksdio_sdio_wakeup;
- 	hdev->set_bdaddr = btmtk_set_bdaddr;
- 
- 	SET_HCIDEV_DEV(hdev, &func->dev);
-@@ -1032,7 +1059,11 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	 */
- 	pm_runtime_put_noidle(bdev->dev);
- 
--	return 0;
-+	err = device_init_wakeup(bdev->dev, true);
-+	if (err)
-+		bt_dev_err(hdev, "failed to initialize device wakeup");
-+
-+	return err;
- }
- 
- static void btmtksdio_remove(struct sdio_func *func)
+ 	struct btmtk_hci_wmt_params wmt_params;
+-	struct reg_read_cmd {
+-		u8 type;
+-		u8 rsv;
+-		u8 num;
+-		__le32 addr;
+-	} __packed reg_read = {
++	struct reg_read_cmd reg_read = {
+ 		.type = 1,
+ 		.num = 1,
+ 	};
 -- 
 2.25.1
 
