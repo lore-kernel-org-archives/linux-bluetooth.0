@@ -2,96 +2,150 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDC9C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 08:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE20AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 10:55:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240780AbiAJIax (ORCPT
+        id S244298AbiAJKzH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jan 2022 03:30:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
+        Mon, 10 Jan 2022 05:55:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240779AbiAJIaK (ORCPT
+        with ESMTP id S244285AbiAJKzG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jan 2022 03:30:10 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5E9C061759
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 00:30:09 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id v7so10328854qtw.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 00:30:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=TakGUpz2ZaNLkv/bMS4wKYI1kGiJlFwoGHaCYZJx3AQ=;
-        b=Vz2jRG74UxuQGvKKzC7hSarUELs4QUctOYDeItgkx0NczDJPBbnY5qaxldhy0XfsxC
-         +5VTpHn1xpD2Em4UN25P4KaRfWe+FaGw6s47pKAYs9+UgHVk/m3BRycXHf3fRWNvc39r
-         ypRHBw2esZM7KFWnO7wtA89SGb8f0rhv7pGstWzNQLbQKG/VDRVV1eVWswZR1xSxtOju
-         6YsNA+slQxaHBvKOqlyrfwWQaZsSQnYW9skwr//WDDT5g7TbXVYteQTy7FR2YI6vYPBN
-         hdTbCVML+rGP9V4FwSD+nA1abgp+l7WjdSNoko6WyvBGdu2MOnaL2B8Q/D0tXezAzr1N
-         pWjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=TakGUpz2ZaNLkv/bMS4wKYI1kGiJlFwoGHaCYZJx3AQ=;
-        b=whZOTYAFrDFgjindeaPv02EoWiQQEVuf/SeOlYJmA7EFOE80RCHeo+G/fTX2FHGKau
-         IiiQ2TTGBkLapw9jFLRIxaPWzGd/T0HxgSgi16PFv6/JXY2YM7aTvt/7zWcvDNmsmhvu
-         P1lNWoprqkMNTKgea6x8Y4FJPnAIzF8XX5f3QyDQ4kTb8S3XiR8KJLKo/NqT3c4ma8Mr
-         5oyaP6qHMYdUVoU3qeUQYpSAAH+6b4yE1dc/0tnDG37AYXzyo7AnKvIel1964MvF8gGV
-         Y7hHiLswE5K46aJZKaGlarht0DoqMG9WEIrdee1W6DPUhm/nrnHcwrKpgs83ewhcMc5d
-         BqFw==
-X-Gm-Message-State: AOAM531Y40d2/U8knWwlgeshNhnsiNdmmUQZx5z50Lc72pjG6iay1lyD
-        RYHAAmsawX4L1qN6O0s1LgV1p1vKPJhMAELjN1MeNr4TuAE=
-X-Google-Smtp-Source: ABdhPJw2GoDDuMj5vyLMsy+1Qry7lcQTHNxvU7QbG8mt7y8jHQoSeIbWUxcyOrzsMBefzxjcgsbmsa3nOpm2bS6lEUY=
-X-Received: by 2002:a05:622a:452:: with SMTP id o18mr64074843qtx.549.1641803408590;
- Mon, 10 Jan 2022 00:30:08 -0800 (PST)
-MIME-Version: 1.0
-From:   =?UTF-8?Q?Sergio_Conde_G=C3=B3mez?= <skgsergio@gmail.com>
-Date:   Mon, 10 Jan 2022 09:29:59 +0100
-Message-ID: <CAGjK+HS2o8P4wPb869vaJoP6Fm-EMHmguhVKEyBX=nGoBchDKw@mail.gmail.com>
-Subject: Unable to connect to Bluetooth LE devices with long advertising times
+        Mon, 10 Jan 2022 05:55:06 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB86C06173F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 02:55:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6CA1CB815C5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 10:55:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 296D0C36AE5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 10:55:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641812103;
+        bh=32MMOCY5mOC8zxmil/9MKrwh7bxb1iyXuSHfUdoI1do=;
+        h=From:To:Subject:Date:From;
+        b=ic4KuuwAYeYgS/HNlTckcq1d4Ns9DLgyJykpAFpuBlauFY4ui/V7vFzWPfzfbxTm2
+         Tqoq0baodzkYst6BPcLdUr1Jz9IkS2acH0nDJOodhmvKw4JEG4R2dRHVxT/BfxHSg6
+         IV1aaYpjieuTuv2jyOojmyh8v9PLXVoKd1Dpor7NDajwjNrT9Mhj/tYbg2bRdtDouZ
+         +sCdtl4laU+K/hET+pkwlxDYwTMFAqnjCc15r2Kj9pMDuoNi8y8uGs+w+EF78Q/HJB
+         C2/lLL0h2/4GoRm2WFXUpWB3jAj8aDJT1sdUNJHoEcQLosaUuk7LHH2begOKPvnIMU
+         hgTloV3CQzl4Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 0DB4FC05FD7; Mon, 10 Jan 2022 10:55:03 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215474] New: Bluetooth fails randomly.
+Date:   Mon, 10 Jan 2022 10:55:02 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: barz621@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-215474-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215474
 
-I'm on kernel version 5.15.13 (shipped by Arch Linux) with bluez 5.63
-and I'm unable to connect to Bluetooth LE devices with 5s, 7,5s, 10s
-advertising times. As for hardware, I have a PCIe card with an Intel
-AC9260 (WiFi + BT combo)[1].
+            Bug ID: 215474
+           Summary: Bluetooth fails randomly.
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.15.13
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: barz621@gmail.com
+        Regression: No
 
-I've been doing some research together with an open-source firmware
-developer and some other users for one of the devices, and we found
-references of Linux's HCI_LE_AUTOCONN_TIMEOUT
-(include/net/bluetooth/hci.h) being too low[2].
+Hello. I have an intel i5-1135G7 based laptop and i have a problem with
+bluetooth. It disconnects at random once a day or so. The vendor is intel a=
+nd
+is connected via USB.
 
-Apparently, the Bluetooth Core Specification allows the advertising to
-be from 20ms to 10,485s in multiples of 0.625ms (Vol. 6, Part B,
-4.4.2.2.1, page 2749 of the Core Specification 5.3), and Linux's
-HCI_LE_AUTOCONN_TIMEOUT is set to 4s.
+*-usb:3
+                   description: Bluetooth wireless interface
+                   vendor: Intel Corp.
+                   physical id: a
+                   bus info: usb@3:a
+                   version: 0.00
+                   capabilities: bluetooth usb-2.01
+                   configuration: driver=3Dbtusb maxpower=3D100mA speed=3D1=
+2Mbit/s
 
-I've recompiled the kernel package on my machine raising it to 20s (no
-scientific reason for this number other than being
-HCI_LE_CONN_TIMEOUT) and I could connect to them (with the device with
-10s advertising time was not successful every time but at least I
-could connect). I retested changing the value again to 12s (to cover
-the 10,485s, plus some extra with no scientific reasons) and I got
-more or less the same results as with the 20s (but was quick testing
-this morning, not as in deep as with the 20s).
+When it fails the message i get is:
 
-The connection procedure was just running "bluetoothctl", "scan on",
-and when the device is first seen then "connect DEVICE_MAC".
+=CE=99=CE=B1=CE=BD 10 11:41:29 mainland kernel: usb 3-10: Failed to suspend=
+ device, error -110
+=CE=99=CE=B1=CE=BD 10 11:42:00 mainland bluetoothd[412]:
+src/adv_monitor.c:btd_adv_monitor_power_down() Unexpected NULL
+btd_adv_monitor_manager object upon power down
+=CE=99=CE=B1=CE=BD 10 11:42:02 mainland kernel: Bluetooth: hci0: command 0x=
+0c1a tx timeout
+=CE=99=CE=B1=CE=BD 10 11:42:04 mainland kernel: Bluetooth: hci0: command 0x=
+0406 tx timeout
+=CE=99=CE=B1=CE=BD 10 11:42:07 mainland kernel: Bluetooth: hci0: command 0x=
+0c03 tx timeout
+=CE=99=CE=B1=CE=BD 10 11:42:13 mainland rfkill[7516]: unblock set for id 0
+=CE=99=CE=B1=CE=BD 10 11:42:14 mainland kernel: usb 3-10: Failed to suspend=
+ device, error -110
+=CE=99=CE=B1=CE=BD 10 11:42:15 mainland kernel: Bluetooth: hci0: HCI reset =
+during shutdown
+failed
+=CE=99=CE=B1=CE=BD 10 11:42:22 mainland rfkill[7520]: unblock set for id 0
+=CE=99=CE=B1=CE=BD 10 11:42:28 mainland kernel: Bluetooth: hci0: Failed to =
+read MSFT supported
+features (-110)
+=CE=99=CE=B1=CE=BD 10 11:42:28 mainland kernel: usb 3-10: Failed to suspend=
+ device, error -110
+=CE=99=CE=B1=CE=BD 10 11:42:28 mainland bluetoothd[412]: Failed to set mode=
+: Failed (0x03)
+=CE=99=CE=B1=CE=BD 10 11:42:40 mainland kernel: usb 3-10: reset full-speed =
+USB device number 5
+using xhci_hcd
+=CE=99=CE=B1=CE=BD 10 11:42:55 mainland kernel: usb 3-10: device descriptor=
+ read/64, error
+-110
+=CE=99=CE=B1=CE=BD 10 11:43:11 mainland kernel: usb 3-10: device descriptor=
+ read/64, error
+-110
+=CE=99=CE=B1=CE=BD 10 11:43:11 mainland kernel: usb 3-10: reset full-speed =
+USB device number 5
+using xhci_hcd
 
-Now, I'm no expert in Bluetooth, BLE, or Linux Kernel, so I might be
-doing it wrong or misunderstanding something, but changing the value
-made it work. If this timeout is what is making us unable to connect
-to these devices, what's the reason for this low timeout outside the
-spec? Would be possible to fix it by not changing the devices to a
-shorter advertisement time (which impacts battery life)?
+Sometimes a reboot doesn't fix it and needs a shutdown and turn on again to
+work properly.
 
-Regards,
-Sergio Conde.
+Thanks in advance.
 
-[1]: https://www.intel.com/content/www/us/en/products/sku/99445/intel-wirelessac-9260/specifications.html
-[2]: Full discussion https://github.com/pvvx/ATC_MiThermometer/issues/172
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
