@@ -2,88 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E54EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 03:57:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8135FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 05:53:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233071AbiAJD5e (ORCPT
+        id S238853AbiAJFxK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Jan 2022 22:57:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58940 "EHLO
+        Mon, 10 Jan 2022 00:53:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232926AbiAJD5d (ORCPT
+        with ESMTP id S238848AbiAJFxH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Jan 2022 22:57:33 -0500
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 978D3C06173F;
-        Sun,  9 Jan 2022 19:57:33 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id e198so11919264ybf.7;
-        Sun, 09 Jan 2022 19:57:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gKx+R06dgFeuVR7iJXoCkBPxrF2Apl09qUxtv6PLYN0=;
-        b=JjDq71ibn5FynQdndgTl2I2VuEtzjI/3odcIwxX3kmKNI8EzqWvZQmlIx6vOqChYcu
-         22KtrGRjsozpl8SMvC9FEgbYMbhil5pBdVDac0DjNThmcaFdsgHFkexTJ1cNktw9LVdY
-         z4I1XhOFs7eCdpvqG1ouJD1Zo6vD0IDqCTWU1PFfgrA6n9g5w8A/XTNVmE7VeZTJPsAi
-         E7GbW+9ne5xQ4KW+8q9yhK5Fww+VyCW9Amjhw6lfsABQ/8/sjV793fJErtY048GHhZ2x
-         Of2aE0wcQk9rcLpa8X+k4ukofbxYiPl4bs8t5WRFuuGap6Y1Qrs+jbMR8uCGj5x0WhIY
-         zL5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gKx+R06dgFeuVR7iJXoCkBPxrF2Apl09qUxtv6PLYN0=;
-        b=Gqc15IPKehPxqixCrQ+nw/Kee8Msfyql8p+NS+3aPn0MzJpLmXbw0ALV8RJ/LuozSB
-         /wk3BrhlI71TYvU+Uml4eZKQpil9Ps1VP7eFJdM6mc7H7uOd2WMAOdN5yvU4mXj88yA1
-         gyt8mEgFLJnei6O0YscmosVgBzt5phzvPNnJyuep5ncmjNZMA0ZOQFa8K68SLZ+frkb6
-         rjuWqS1YISxb6YZ9pApDQnyrfU8SjLNIlqfZDLLZD3X9QnyJEAwGm6IcfP/7GDMX2Pi2
-         DAWd2BQ15V/OIYGADDtJ3DLNaeco4Tj08PG70uh+lwFlkfsR7ptLw6iL7JNHKZ1eqsEM
-         ijYw==
-X-Gm-Message-State: AOAM531PC/LG3IVg+6DU5iCUnkENJejBKCnHUeuTxYFRYe+axdswPOWU
-        3wBnvi6YKQVwK7vzNNhJHIFcqXTCIxFemRPqwNMV+smT
-X-Google-Smtp-Source: ABdhPJzTrETyuDmbXvR9z7gKCTEi3XRBUYW5RWIvBDdJ1o1QYQdlEAhxaqVSAAgeeilDeW2FdqR525K64kZ3HQA7h4U=
-X-Received: by 2002:a25:c41:: with SMTP id 62mr22130417ybm.284.1641787052533;
- Sun, 09 Jan 2022 19:57:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
- <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <6FFD2498-E81C-49DA-9B3E-4833241382EE@holtmann.org> <20220109141853.75c14667@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <CABBYNZJ3LRwt=CmnR4U1Kqk5Ggr8snN_2X_uTex+YUX9GJCkuw@mail.gmail.com> <20220109185654.69cbca57@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20220109185654.69cbca57@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 9 Jan 2022 19:57:20 -0800
-Message-ID: <CABBYNZKpYuW6+iZJomaykGLT6gF2NBjTxjw-27vBZRY89P3xgw@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2022-01-07
-To:     Jakub Kicinski <kuba@kernel.org>
+        Mon, 10 Jan 2022 00:53:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB76CC06173F;
+        Sun,  9 Jan 2022 21:53:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F14E560CA5;
+        Mon, 10 Jan 2022 05:53:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1785BC36AE9;
+        Mon, 10 Jan 2022 05:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1641793984;
+        bh=fXJXNXzrmlPOyKKygtvqZLNE6jha6xQbUhNH22X9/5Y=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=BPGsITuJuQn6mNm4GVHjXTu27Xkpx2j0+xHZgPDV8WO2npWWmJ5gJHNZ1Wan8aC0H
+         XDM8HC0sds9WiCSn+74Ay5Kj/MIqkr03bYrYRP0UCOe30hajRicjVGzGS5X39D0lTy
+         HJOz5tH8i5ILeBYhx+TQKH1e14DSY1NynEj7g6p+Rhh/sbMKxLKOrRIMUXedAEGcel
+         UIY0d3OMzHLlLCB9ua+KZTbjw17p5i4BNVx4qWf8rfNw/+XOX4waxBnQGi5/959sXR
+         ulLPcdCaT/yICVAo/KJEO7+rDYdXK1UiY4ScNp1W7FtCkSiUEF3/+1s6etx1QRnXlu
+         unZ2gjCLvKMeg==
+Date:   Sun, 9 Jan 2022 21:53:02 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
         "David S. Miller" <davem@davemloft.net>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: pull request: bluetooth 2022-01-07
+Message-ID: <20220109215302.2d8367c5@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+In-Reply-To: <CABBYNZKpYuW6+iZJomaykGLT6gF2NBjTxjw-27vBZRY89P3xgw@mail.gmail.com>
+References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
+        <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <6FFD2498-E81C-49DA-9B3E-4833241382EE@holtmann.org>
+        <20220109141853.75c14667@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+        <CABBYNZJ3LRwt=CmnR4U1Kqk5Ggr8snN_2X_uTex+YUX9GJCkuw@mail.gmail.com>
+        <20220109185654.69cbca57@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
+        <CABBYNZKpYuW6+iZJomaykGLT6gF2NBjTxjw-27vBZRY89P3xgw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
-
-On Sun, Jan 9, 2022 at 6:56 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sun, 9 Jan 2022 18:46:05 -0800 Luiz Augusto von Dentz wrote:
-> > > You're right. I think our patchwork build bot got confused about the
-> > > direction of the merge and displayed old warnings :S You know what..
-> > > let me just pull this as is and we can take the fixes in the next PR,
-> > > then. Apologies for the extra work!
+On Sun, 9 Jan 2022 19:57:20 -0800 Luiz Augusto von Dentz wrote:
+> On Sun, Jan 9, 2022 at 6:56 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> > > Im planning to send a new pull request later today, that should
+> > > address the warning and also takes cares of sort hash since that has
+> > > been fixup in place.  
 > >
-> > Im planning to send a new pull request later today, that should
-> > address the warning and also takes cares of sort hash since that has
-> > been fixup in place.
->
-> But I already pulled..
+> > But I already pulled..  
+> 
+> Nevermind then, shall I send the warning fix directly to net-next
+> then?
 
-Nevermind then, shall I send the warning fix directly to net-next
-then? Or you actually pulled the head of bluetooth-next not tag?
+Maybe send it in a week or so with other fixes which accumulate
+up to that point?
 
--- 
-Luiz Augusto von Dentz
+> Or you actually pulled the head of bluetooth-next not tag?
+
+I pulled the tag.
