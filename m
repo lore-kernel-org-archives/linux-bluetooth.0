@@ -2,97 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201DCC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 06:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDC9C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Jan 2022 08:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230038AbiAJGIH (ORCPT
+        id S240780AbiAJIax (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Jan 2022 01:08:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59266 "EHLO
+        Mon, 10 Jan 2022 03:30:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232910AbiAJGH5 (ORCPT
+        with ESMTP id S240779AbiAJIaK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Jan 2022 01:07:57 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B3CC061751;
-        Sun,  9 Jan 2022 22:07:56 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id d7so2245358ybo.5;
-        Sun, 09 Jan 2022 22:07:56 -0800 (PST)
+        Mon, 10 Jan 2022 03:30:10 -0500
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5E9C061759
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 00:30:09 -0800 (PST)
+Received: by mail-qt1-x836.google.com with SMTP id v7so10328854qtw.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Jan 2022 00:30:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ApmvpejRXpHVyHVDcTHhYixhKcbtDbVxNdD1J4DMsYQ=;
-        b=KSeRxba9oWjGobstF9EB9RqubnnCU0F26pEjljGZTrSgHQ5Mc3JFolgpDM2GcKxnsx
-         shjc/o1jIR6RBeH4XDWs2Ir1MMYSR9nHDgqzvm5JmzkQ7qj2Sk1mgeMHvN6xpn2MXGp2
-         RFIvZgWS++ctKQKPZUsM3nz1ujRPhbDEDInjNcM4CLLrHN0Nkx7kaeq5D0YlVr7EpFFL
-         4cNh2TWUBkImRoe2exorNhu42sr3WEQxhmxqZjKtfN9bZKDTlMqysjp92QBI/BDh0q7U
-         J8XyfkMzMPgVf8FWPJFAVWggynyLERTKl/jCEhSZWwtmPBinxrRkZVtLz6qYMn70S7cl
-         HIsw==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=TakGUpz2ZaNLkv/bMS4wKYI1kGiJlFwoGHaCYZJx3AQ=;
+        b=Vz2jRG74UxuQGvKKzC7hSarUELs4QUctOYDeItgkx0NczDJPBbnY5qaxldhy0XfsxC
+         +5VTpHn1xpD2Em4UN25P4KaRfWe+FaGw6s47pKAYs9+UgHVk/m3BRycXHf3fRWNvc39r
+         ypRHBw2esZM7KFWnO7wtA89SGb8f0rhv7pGstWzNQLbQKG/VDRVV1eVWswZR1xSxtOju
+         6YsNA+slQxaHBvKOqlyrfwWQaZsSQnYW9skwr//WDDT5g7TbXVYteQTy7FR2YI6vYPBN
+         hdTbCVML+rGP9V4FwSD+nA1abgp+l7WjdSNoko6WyvBGdu2MOnaL2B8Q/D0tXezAzr1N
+         pWjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ApmvpejRXpHVyHVDcTHhYixhKcbtDbVxNdD1J4DMsYQ=;
-        b=34S4ENWqsSveMqLW+DbjCV1Y0yEihNuzaDdeXCq5Mb80mNB+2RFby+RoEHam16nXMQ
-         C8thWJ7CEEHzhua8eCGBdSCMh1asmSil7IenYniuT0LI4E/xM8BPxduemzx0ZolHgde4
-         nriMY82gTRZ53dJ5Z4GheCRCvcX6qM+y+7N+6VL1hTGzrC6KURMfhERWv9nSO9ibPJe+
-         V5GVr7nMZUYQLcIhcOBrL0C9hElSj8H8/HOAtGzAhwNPDcN8NjtOsZdlSD0Gj6VBdBn/
-         hmRgxbstuhFU/RWVnA5DrOObPfF76Leg4Hx4ZpU4r4HXaTwv17FxfWpAjlTKu+/LIW+j
-         PAww==
-X-Gm-Message-State: AOAM533v+C0rivhvizqqRdriWoPhlR3xTxvNuqZLeQaHqlF6F/47xtvD
-        9eFMORhIctdY25mTHKVHl86p0XFBOgN6Hlhcgz4=
-X-Google-Smtp-Source: ABdhPJyoaK+YKsH9yrQIXs1v+CWIJAFxfh0cGLn/kVuIhoa1ZtVtY3TqlQiFh+eB+cxnoRo9DIm7vFp1dNWE003eQQg=
-X-Received: by 2002:a25:ae4d:: with SMTP id g13mr5483259ybe.293.1641794876063;
- Sun, 09 Jan 2022 22:07:56 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=TakGUpz2ZaNLkv/bMS4wKYI1kGiJlFwoGHaCYZJx3AQ=;
+        b=whZOTYAFrDFgjindeaPv02EoWiQQEVuf/SeOlYJmA7EFOE80RCHeo+G/fTX2FHGKau
+         IiiQ2TTGBkLapw9jFLRIxaPWzGd/T0HxgSgi16PFv6/JXY2YM7aTvt/7zWcvDNmsmhvu
+         P1lNWoprqkMNTKgea6x8Y4FJPnAIzF8XX5f3QyDQ4kTb8S3XiR8KJLKo/NqT3c4ma8Mr
+         5oyaP6qHMYdUVoU3qeUQYpSAAH+6b4yE1dc/0tnDG37AYXzyo7AnKvIel1964MvF8gGV
+         Y7hHiLswE5K46aJZKaGlarht0DoqMG9WEIrdee1W6DPUhm/nrnHcwrKpgs83ewhcMc5d
+         BqFw==
+X-Gm-Message-State: AOAM531Y40d2/U8knWwlgeshNhnsiNdmmUQZx5z50Lc72pjG6iay1lyD
+        RYHAAmsawX4L1qN6O0s1LgV1p1vKPJhMAELjN1MeNr4TuAE=
+X-Google-Smtp-Source: ABdhPJw2GoDDuMj5vyLMsy+1Qry7lcQTHNxvU7QbG8mt7y8jHQoSeIbWUxcyOrzsMBefzxjcgsbmsa3nOpm2bS6lEUY=
+X-Received: by 2002:a05:622a:452:: with SMTP id o18mr64074843qtx.549.1641803408590;
+ Mon, 10 Jan 2022 00:30:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20220107210942.3750887-1-luiz.dentz@gmail.com>
- <20220107182712.7549a8eb@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
- <6FFD2498-E81C-49DA-9B3E-4833241382EE@holtmann.org> <20220109141853.75c14667@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <CABBYNZJ3LRwt=CmnR4U1Kqk5Ggr8snN_2X_uTex+YUX9GJCkuw@mail.gmail.com>
- <20220109185654.69cbca57@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
- <CABBYNZKpYuW6+iZJomaykGLT6gF2NBjTxjw-27vBZRY89P3xgw@mail.gmail.com> <20220109215302.2d8367c5@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-In-Reply-To: <20220109215302.2d8367c5@kicinski-fedora-PC1C0HJN.hsd1.ca.comcast.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 9 Jan 2022 22:07:45 -0800
-Message-ID: <CABBYNZLyfoMep6d6oo=x7L+0sOrhyHvgtEh-b7WY9q__aUQ3Lg@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2022-01-07
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+From:   =?UTF-8?Q?Sergio_Conde_G=C3=B3mez?= <skgsergio@gmail.com>
+Date:   Mon, 10 Jan 2022 09:29:59 +0100
+Message-ID: <CAGjK+HS2o8P4wPb869vaJoP6Fm-EMHmguhVKEyBX=nGoBchDKw@mail.gmail.com>
+Subject: Unable to connect to Bluetooth LE devices with long advertising times
+To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+Hello,
 
-On Sun, Jan 9, 2022 at 9:53 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sun, 9 Jan 2022 19:57:20 -0800 Luiz Augusto von Dentz wrote:
-> > On Sun, Jan 9, 2022 at 6:56 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > > > Im planning to send a new pull request later today, that should
-> > > > address the warning and also takes cares of sort hash since that has
-> > > > been fixup in place.
-> > >
-> > > But I already pulled..
-> >
-> > Nevermind then, shall I send the warning fix directly to net-next
-> > then?
->
-> Maybe send it in a week or so with other fixes which accumulate
-> up to that point?
->
-> > Or you actually pulled the head of bluetooth-next not tag?
->
-> I pulled the tag.
+I'm on kernel version 5.15.13 (shipped by Arch Linux) with bluez 5.63
+and I'm unable to connect to Bluetooth LE devices with 5s, 7,5s, 10s
+advertising times. As for hardware, I have a PCIe card with an Intel
+AC9260 (WiFi + BT combo)[1].
 
-Fair enough, if you would like to merge the warning fix here is the commit:
+I've been doing some research together with an open-source firmware
+developer and some other users for one of the devices, and we found
+references of Linux's HCI_LE_AUTOCONN_TIMEOUT
+(include/net/bluetooth/hci.h) being too low[2].
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=219de95995fb6526b96687c5001f61fe41bed41e
+Apparently, the Bluetooth Core Specification allows the advertising to
+be from 20ms to 10,485s in multiples of 0.625ms (Vol. 6, Part B,
+4.4.2.2.1, page 2749 of the Core Specification 5.3), and Linux's
+HCI_LE_AUTOCONN_TIMEOUT is set to 4s.
 
--- 
-Luiz Augusto von Dentz
+I've recompiled the kernel package on my machine raising it to 20s (no
+scientific reason for this number other than being
+HCI_LE_CONN_TIMEOUT) and I could connect to them (with the device with
+10s advertising time was not successful every time but at least I
+could connect). I retested changing the value again to 12s (to cover
+the 10,485s, plus some extra with no scientific reasons) and I got
+more or less the same results as with the 20s (but was quick testing
+this morning, not as in deep as with the 20s).
+
+The connection procedure was just running "bluetoothctl", "scan on",
+and when the device is first seen then "connect DEVICE_MAC".
+
+Now, I'm no expert in Bluetooth, BLE, or Linux Kernel, so I might be
+doing it wrong or misunderstanding something, but changing the value
+made it work. If this timeout is what is making us unable to connect
+to these devices, what's the reason for this low timeout outside the
+spec? Would be possible to fix it by not changing the devices to a
+shorter advertisement time (which impacts battery life)?
+
+Regards,
+Sergio Conde.
+
+[1]: https://www.intel.com/content/www/us/en/products/sku/99445/intel-wirelessac-9260/specifications.html
+[2]: Full discussion https://github.com/pvvx/ATC_MiThermometer/issues/172
