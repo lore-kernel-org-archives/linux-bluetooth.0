@@ -2,101 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66479C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jan 2022 20:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC24C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jan 2022 22:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242072AbiAKUCu (ORCPT
+        id S1345291AbiAKWE1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jan 2022 15:02:50 -0500
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.24]:40133 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241741AbiAKUCt (ORCPT
+        Tue, 11 Jan 2022 17:04:27 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:45194 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245547AbiAKWE1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jan 2022 15:02:49 -0500
-X-Greylist: delayed 358 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Jan 2022 15:02:49 EST
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1641931007;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=Subject:From:To:Date:Message-ID:Cc:Date:From:Subject:Sender;
-    bh=Ap8JVWwAAH/ACE+XmiLMsYxQtdo8NhijAJBY7P+vCSw=;
-    b=B7+VOcAwfEbl2aI6AUj3LepKSc7FUx6h26MXKyigqZf0za7s6W40mplQp0Aei4TDS8
-    YjUBDMHsAq+XbAU0nO1vvrkFPW6cqbieEt0J0PHuAuH1UTKK+QoYB44IS6MfKrQgycKV
-    6StVq1nycAaoCYrBwwar0mBZ+OLqdCr5hNsX64YzZXq64oJrLYHvkJmkcRYsTXoNs2v6
-    QuZL4bX3kfNhFGorYLOTEfuGSvptHZEzyI7k1t1ze1i9MXAWxKxGxms7492/gODiD9AI
-    RcpXu49sidYulUcCGnKggJ65VSTI0bvuDNHSW1ZE3c9CYWJfqkIj74vnGQ7LsMjjXp3M
-    s9tQ==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusx3hdd0DIgVvBOfBkHJSg=="
-X-RZG-CLASS-ID: mo00
-Received: from [IPV6:2a00:6020:1cfa:f904::923]
-    by smtp.strato.de (RZmta 47.37.6 AUTH)
-    with ESMTPSA id Rb080by0BJulDsY
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate)
-    for <linux-bluetooth@vger.kernel.org>;
-    Tue, 11 Jan 2022 20:56:47 +0100 (CET)
-Message-ID: <0015e594-d888-f664-56c3-f4022286c736@hartkopp.net>
-Date:   Tue, 11 Jan 2022 20:56:40 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Content-Language: en-US
-To:     linux-bluetooth@vger.kernel.org
-From:   Oliver Hartkopp <socketcan@hartkopp.net>
-Subject: Latest Linux tree (merge window): BT mouse does not work
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Tue, 11 Jan 2022 17:04:27 -0500
+Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 26819CECD0;
+        Tue, 11 Jan 2022 23:04:25 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [BUG] Slow bluetooth speed on Apple MacBook Pro 16,1
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211228055353.1b4c09e9@localhost>
+Date:   Tue, 11 Jan 2022 23:04:24 +0100
+Cc:     Aditya Garg <gargaditya08@live.com>,
+        Johan Hedberg <johan.hedberg@intel.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "admin@kodeit.net" <admin@kodeit.net>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <512C8B97-C830-4561-BA66-9581F84D7BB3@holtmann.org>
+References: <3352A23E-EA42-4366-BBAA-459CEAE6F51B@live.com>
+ <20211228055353.1b4c09e9@localhost>
+To:     Orlando Chamberlain <redecorating@protonmail.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi all,
+Hi Orlando,
 
-after upgrading from Linus' tree 5.16.0-rc7-00108-g800829388818 to the 
-current merge window version 5.16.0-05432-g6f38be8f2ccd my BT mouse is 
-not working anymore.
+>> The file transfer speed on MacBook Pro 16,1 from an Android device to
+>> Mac is too slow even if I transfer a file of a few Kbs. In case of a
+>> transfer from Mac to my Android device, it simply fails.
+>> 
+>> Some logs that might be helpful :-
+>> 
+>> -- Logs begin at Fri 2021-11-26 21:34:04 IST, end at Tue 2021-12-28 08:38:16 IST. --
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: Core ver 2.22
+>> Dec 28 08:28:29 MacBook kernel: NET: Registered PF_BLUETOOTH protocol family
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI device and connection manager initialized
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI socket layer initialized
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: L2CAP socket layer initialized
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: SCO socket layer initialized
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART driver ver 2.3
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol H4 registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol BCSP registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol LL registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol ATH3K registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Three-wire (H5) registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Intel registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Broadcom registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol QCA registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol AG6XX registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Marvell registered
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: hci0: BCM: failed to write update baudrate (-16)
+>> Dec 28 08:28:29 MacBook kernel: Bluetooth: hci0: Failed to set baudrate
+> 
+> When it fails to set baud rate, btmon has the following:
+> 
+> < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6 
+>        Encoded baud rate: Not used (0x0000)
+>        Explicit baud rate: 3000000 Mbps
+>> HCI Event: Command Complete (0x0e) plen 4                        
+>      Broadcom Update UART Baud Rate (0x3f|0x0018) ncmd 1
+>        Status: Command Disallowed (0x0c)
+> 
+> Not sure if this means the command is unsupported by this chip, or if an "Encoded
+> baud rate" needs to be specified.
 
-I now get two new error messages:
+I think that I remember that the to be used baud rate is inside ACPI and that the Broadcom chip inside the MacBooks don’t support baud rate change and just start out at the appropriate rate in the first place. Then again, I don’t have a MacBook running Linux and thus can verify this.
 
-	hci0: unexpected event 0xff length: 5 > 0
+Actually I would start by dumping the ACPI tables and see if the resources for the UART are listed correctly.
 
-and
+Regards
 
-	hci0: unexpected event 0xff length: 7 > 0
-
-Any idea? Any new firmware required?
-
-Best regards,
-Oliver
-
-[    8.790201] Bluetooth: Core ver 2.22
-[    8.847435] Bluetooth: hci0: Bootloader revision 0.0 build 26 week 38 
-2015
-[    8.853022] Bluetooth: hci0: Device revision is 16
-[    8.853025] Bluetooth: hci0: Secure boot is enabled
-[    8.853026] Bluetooth: hci0: OTP lock is enabled
-[    8.853027] Bluetooth: hci0: API lock is enabled
-[    8.853028] Bluetooth: hci0: Debug lock is disabled
-[    8.853028] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-[    8.855879] Bluetooth: hci0: Found device firmware: intel/ibt-12-16.sfi
-
-[    9.422098] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    9.423532] Bluetooth: BNEP filters: protocol multicast
-[    9.423537] Bluetooth: BNEP socket layer initialized
-[    9.439281] iwlwifi 0000:01:00.0 wlp1s0: renamed from wlan0
-[   10.391796] Bluetooth: hci0: Waiting for firmware download to complete
-[   10.392752] Bluetooth: hci0: unexpected event 0xff length: 5 > 0
-[   10.392789] Bluetooth: hci0: Firmware loaded in 1492456 usecs
-[   10.392985] Bluetooth: hci0: Waiting for device to boot
-[   10.404942] Bluetooth: hci0: unexpected event 0xff length: 7 > 0
-[   10.404971] Bluetooth: hci0: Device booted in 11747 usecs
-[   10.405416] Bluetooth: hci0: Found Intel DDC parameters: 
-intel/ibt-12-16.ddc
-[   10.407835] Bluetooth: hci0: Applying Intel DDC parameters completed
-[   10.408848] Bluetooth: hci0: Firmware revision 0.1 build 50 week 12 2019
-[   10.468582] NET: Registered PF_ALG protocol family
-[   11.277319] Bluetooth: RFCOMM TTY layer initialized
-[   11.277343] Bluetooth: RFCOMM socket layer initialized
-[   11.277367] Bluetooth: RFCOMM ver 1.11
-
+Marcel
 
