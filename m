@@ -2,181 +2,180 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6891CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jan 2022 07:25:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 955DFC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jan 2022 12:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348512AbiAKHZh (ORCPT
+        id S239811AbiAKMSn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jan 2022 02:25:37 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:46708 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235242AbiAKHZg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jan 2022 02:25:36 -0500
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 20B3TJvL003322;
-        Tue, 11 Jan 2022 07:23:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : mime-version; s=corp-2021-07-09;
- bh=u/J5FbXR5MTPMNgB8a3M2foT2v3hFl7RGUFzigLoc+E=;
- b=bu8ln7AtAGgkAMnSM3CKwghe+lz7XF4HdlF9eUAjeg8UR+NfjEr2dEqUJNu/+33UDO3+
- N/1TdYZ6F+7iXIvoVwG30lAo2PP7CtW9E3Ndw4k+Tm2WpbgtNvCj14HmCjQi2x7eqMLx
- ox1D4n6o0cl9NkaQV63tPrSZd8OGmHoidWpEPxQpHUSoY3GMj2wP1i7gNnx26oQ9DyEx
- SWvi804l2Px6PUKzoisQvhD3/acFqN8Scu9vDmS1q2lTnYP4QV3vKobnb9vIrQhaRJ+C
- lqWdAzFlofLto//Ar5SqqaoxF1eofuwZ+lBdsS26U5yuJjwqO6SOCx5TDz79+mpFU9YU 3g== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3dgmk9aaxv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 07:23:33 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 20B7FwL4027999;
-        Tue, 11 Jan 2022 07:23:33 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2174.outbound.protection.outlook.com [104.47.59.174])
-        by aserp3020.oracle.com with ESMTP id 3df2e4dfqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jan 2022 07:23:33 +0000
+        Tue, 11 Jan 2022 07:18:43 -0500
+Received: from mail-ma1ind01olkn0151.outbound.protection.outlook.com ([104.47.100.151]:28628
+        "EHLO IND01-MA1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239606AbiAKMSm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 11 Jan 2022 07:18:42 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kJu9eBIbJ0b7nPqTj6E4XBDYIE/xjgmegU2u4rDwvgkiI7uHj5if5dncZ8ryS1b7bdiLGJkqWsc9xPy1pOy/reOx5Ln5k3kiCCHy1lsroSurDyNOJlcYfeFn2AAoMCBjmDaKC6kM5ab07iBPEOMCUmFd/3iIFaYxWrihqnxiujo53syUyosnNr0RwgKWde0N72OsWh2xTEmL/uhrxzJLMkr5W1dCGvods05jBwb626sD+HP00pAsPiqK7IbG7gWdseJyUAieveQo44lz+RIxdm3R1gM/kmVCzpE+CeEZMv8dasX2s/aCdBtOEawmBnkHO1m0bfTqh1x1/pbvor0Gbw==
+ b=oFDOvpfXCEBLMA2XfvmKrnWmsCYiRvSjOLFPgIl9s87n+ImNl5G1aHkJ5LqIz9uA2g736sTk9rOk1z+1aOcBx/k+/C7PfVh7tYgYNBWE6OGbeOfvpNnUandhquz+L0grADiUPFkhzqWFqyppoTdlGIvB40Yzq5GWJ88cRCt/pBE6F7sAYhg5WW/OpTljXs4L4t4H0Pm+0CUhuNTgxLEG9vCqm11jyOAQ19etK75PXcW+pMfghi9vt3g1LxP7Z/XvbqQoZZd+rog5gPCucyzPuXThphHHrZ+4DyopBTHoBknp+o+Qqag7sRzejLwFise0rK1qa0EhgKDf61WkyBUcdQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u/J5FbXR5MTPMNgB8a3M2foT2v3hFl7RGUFzigLoc+E=;
- b=NUPIZ3Nsntu1h8EvGxZ/g06l+dz+X0/+fW+lo7aTVjlfwLv/y2HK92oiyJF82SojUCk2a00jV7ERkwTCgPnwDJlVBpx0IyoAcA8Mc5zzJPlxQiUtI/2+RiMPPn9Y8OltYiN6+iHeSca4b9ETjm9e4PVX4nrxf8S0vW2PsCWd7lCKQMfdWPNmd2zGbL0z4ZSDbL+XM6oESfvp0Qkr7tFoqZyLWXgWXp/ckhXg23J8HBjLhqpZ29a4ifTcuwSm0podwfSlOHjnjJ2Tzlikc2xVHvAe8/tlDA0Ru0PfbsZKqETBIZCJZFxGMUf3ZLMdLlv2FWl1fD8t0phpricBXlWS8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ bh=smyUgqIJQdkevdZmclrxbuCEoL/d5U0S7hMFqk9EXvs=;
+ b=bKutwFPzwKft4SjU0hlfkRhvO/vvpDERBaY2bfbqXLQjRHy+3duqHLpmyT7zzwDjYC0WpNXggOoqdhLiWE8TKoRpDtvZwDAytqS/M9z6vs/fdePUQpjM6ewscUrjd9lvpm0NZF+Vf8Usm40NWRoevWfk+GMVi9mUQCWocfMsq87bzA49+Uc/gZIIJ72NxwbI1BP/OhIwb5yD/LE8F1fLzmf7NcKmfrP5mXNQ7tacHkELnxPpJPu+PDSBzv/tPN39pY5FLCfPgVmFnNV1LeRFgydblKcLBfUsFUUv6rzMREPKVTfi15EbASfZcoCJmiHv4R3ZuETKG0GG2Hy9ug+cFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u/J5FbXR5MTPMNgB8a3M2foT2v3hFl7RGUFzigLoc+E=;
- b=YrouBzJhZmDDGzoqNBfjLE+ucmNCiiSJMKI14kUX9roERp4dVTuFViQRS4e+sa/x37AqSV9ZK8uT11yDjjc2KGmTme9Q4OD45Jnyxhk9fn+vTkHT3vm1pWC2VG6lWdt5WD3WM8ZNWzGN/tLvBvtYQLwYYZRZi87llXbXmKttSyM=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by MWHPR1001MB2159.namprd10.prod.outlook.com
- (2603:10b6:301:2c::24) with Microsoft SMTP Server (version=TLS1_2,
+ bh=smyUgqIJQdkevdZmclrxbuCEoL/d5U0S7hMFqk9EXvs=;
+ b=HGOK9WYSZcP7BUFEzVjDYgS7FoHHZr7JbLHdVQLTx5ygjD3e1LVpPie+25X8Wo69OMvo/8w5MbqMaxAW+jTkycS2VMmbNsN8SsAVy77ptopCZssL1OReFhTZQ4UxSSrffrEAvn4VXFRU7P2bHa4CI7XeBdxxMw3aRT9VbVIBPnwyEYGFJ9lqSMZLsrRarnZFnsLOoY1xZvT3tU/TEB6vJMspD7GAtT6ND7iU/sZI3is4kiqrpCkYrq8Y1XWlE2eALBimUlIvyTbUk/xtUYAJatPJZ7/dh+/gNK/9jNaqe6Kro9+m26lJcvUoCUdZVQUjlbXWX9RvOaX1Si93lH3rkg==
+Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:1b::13)
+ by PNXPR01MB7305.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:a0::12) with
+ Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4867.11; Tue, 11 Jan
- 2022 07:23:31 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::b889:5c86:23c0:82b8]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::b889:5c86:23c0:82b8%4]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
- 07:23:30 +0000
-Date:   Tue, 11 Jan 2022 10:23:19 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
+ 2022 12:18:37 +0000
+Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+ ([fe80::7ca6:9165:19ec:4cd7]) by PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+ ([fe80::7ca6:9165:19ec:4cd7%8]) with mapi id 15.20.4867.012; Tue, 11 Jan 2022
+ 12:18:37 +0000
+From:   Aditya Garg <gargaditya08@live.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sync: unlock on error in
- hci_inquiry_result_with_rssi_evt()
-Message-ID: <20220111072319.GH11243@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-ClientProxiedBy: ZR0P278CA0075.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:22::8) To MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28)
+        Johan Hedberg <johan.hedberg@intel.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+CC:     Orlando Chamberlain <redecorating@protonmail.com>,
+        "admin@kodeit.net" <admin@kodeit.net>
+Subject: Re: [BUG] Slow bluetooth speed on Apple MacBook Pro 16,1
+Thread-Topic: [BUG] Slow bluetooth speed on Apple MacBook Pro 16,1
+Thread-Index: AQHX+5pglIbInP7e1kiyabPnZ43W7axd038A
+Date:   Tue, 11 Jan 2022 12:18:37 +0000
+Message-ID: <E0B80B1E-618E-42D2-9187-48FA5BF46BFA@live.com>
+References: <3352A23E-EA42-4366-BBAA-459CEAE6F51B@live.com>
+In-Reply-To: <3352A23E-EA42-4366-BBAA-459CEAE6F51B@live.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn:  [II4zycM89QlKq7fkFLbgtpoA2ML+SENBQUbniYWFqctmSPNFNjMDH773IUaikS+O]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a607bf29-b7ea-48bb-e6c7-08d9d4fc7f0a
+x-ms-traffictypediagnostic: PNXPR01MB7305:EE_
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: wog0mGRyKng/73sbXCKGQnAdQ4lyMyS5Q3gSqgmscsuWsby0OQl6wnsEZKLSWluMzUevlmBZW5GhoJe61wV0+kLMt9/4LSIiv8xlSRRWK+dkyvd6yxS7qxKFWyhcRIvq0vMaJblsDXwXa7gavqie98rsFk3zbuQ+7obeptC0lf8cbdEXxpeRrht4aDRWYL321KW9f3KIfCReHffm17ngQfwR6K23lF6PB/AVk6KyRUQHsUntwvQbj951ZvRb9SG4FYiLYVC1csTYkdJx9COadTDu62tTnPlue+uiZRbQzEEtAIyrA8LYT2j/TtvcEKgAwLoZomtd6XNb67/R02V65ns4OSpGO/WWtbu6gAc+n1labWan9HkLqiZCIycRqj6R/WUkz8FOi1Z5/ALR8kTcyV8B+J362R44MsxLlB/7WM2eSsTHKbnhdFxKPE6SU8e+guspFP38MbGGbVCcjVlJS7NuJctavEkobuF1KPzmEN1u0ei/YAZtUdf40iSLADFkzqc6a6b24OGdz1j5ZBAaUByRhZ0v18dbfac650aj6bC4r7ixVot9vH11Xi1KA6GnAN4IEIozSoQKP7aOgAFOuQ==
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9KHUFah59YOC5ldDchQfFG74yeZ83TpXQbkjVxBbG+1CwMHXdr0+u72UIpFA?=
+ =?us-ascii?Q?jDdCBWU753FNPtu6SLV1d+ZKJycXlZ2N5fyUJl/dXzFX9Pdhu5PU/WLXdiiQ?=
+ =?us-ascii?Q?pe3fGteaFJXtsgxQlZpAKvpOXtplvxFYpGVQmnBztEIxRKSxGiSgfseSnove?=
+ =?us-ascii?Q?aU7EMLE1MorGhNv9tgaI8Hxe+iPEJHqfDHoUDxTYpbhcB/EUcGWANmkH0RBe?=
+ =?us-ascii?Q?qwZ7LbSYdQcVXupT2RtKoXnbHAvSUVEV0ngbz7Dm+WjeXLhYB0XLW90jwb7H?=
+ =?us-ascii?Q?/xxHFZ8D/lhfFzJxAnlj+aKkMVmWrxI5opHZdy/Nnq838V6wRip2GjgXOVx2?=
+ =?us-ascii?Q?KZTYhMg+ko0qNQkZUfoz6v7a+K+7zh1I4EltZu0rMHeJ7+1aqCHcPxxWE4ng?=
+ =?us-ascii?Q?be+bzh0ESrx/9n2WxOkRreUpe2cjg9ROBr88KFvnZp9bOi6V3dspEiuuaw9Z?=
+ =?us-ascii?Q?nOfLeuHBHBlhCze1UhWp9CftHJN+2tch04NweqxKkH3miusi2nl97jB9QZuW?=
+ =?us-ascii?Q?+ZtMiaiOZAUMRqc47QMB6nS/A4dcdAwJjPBsZO1tJx8rq6EM4gIufPz4Pk67?=
+ =?us-ascii?Q?t/Yy52MkrjTVXQ+BV1ZjvVdubuufQia5/AVAcs3OutjUERy5ejbadHtUG7bb?=
+ =?us-ascii?Q?sojDIXYPt3R4f2Qr08ATwwwGncbOv4WciBbOvx/5/PdgUE/4G5MMOJL3qxYu?=
+ =?us-ascii?Q?XH4JiXf8vPIyHduH9X9EJj5dwu0UIEGPt1moGSNfb2jNrE/Ba81yuaUsNS40?=
+ =?us-ascii?Q?KEAy9ky6tGft57Ca2LoUIKY5qR7wItZGf79w/d9G0jxbBPaSYcvdg7iQVPZb?=
+ =?us-ascii?Q?G4oQSMEYRas5fZhRsi1R60rD1NGaWXolA90GB++Ky/yVsbTrTSqZEz8K0dZt?=
+ =?us-ascii?Q?85MWI8atibUd3ptltnotYs7FafiNHpuvxSIljdMbgHhJl6OJ71XEkZHkB6ia?=
+ =?us-ascii?Q?kyhcB974jRqiZEo355rNGIp5bCLIGqzj9XXE1fd0uRP4ridRfcnguFTOW9kT?=
+ =?us-ascii?Q?Gir+kAlkVUS/SxwFePbiMCu7Ow=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3CCD742684027349BAE71C2FDD79AC11@INDPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b5f1fc78-0f01-4471-7a42-08d9d4d34427
-X-MS-TrafficTypeDiagnostic: MWHPR1001MB2159:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR1001MB2159AFC1D8CAF4690257154F8E519@MWHPR1001MB2159.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1360;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YDXaYb3AC9HnDRLSAb3YhcAGpi8Ela83LwqCFH2HkNs824t66AnkWHdsQYeqK+iwIFp1qIXvH3D7X9gtfaIsggAyrleLrEAHb6SMvq8TSVozNP4XwzWTEsR4ZVT5lINtxWJX2vHIRrceleDJ7jvJzF3bx5tJHub3DaPRyddbcypdUqGRPyII4ANijPSLV22aRq+XDLPIYRd/KRhV3GK2I4L76PQ62Gn5Zd7fmvskdNVSr2WdAhBu2LRaZk6y6Yor2NIUmdQF5bolmSntwZo9wGuHXDnagvwMw/biw3OYi1z6Hn+mJ3djm9XNBpNZlML+ZAvSYEOVBGwbeJFZyXufL3vkJZTo/iUUTJzS118oDwLGCanbl7n158Hsn1oYnWZ2i6dP4nqQyeHcTfg/+KcCIq+WyLNuyiBm7PbWrYCE7cK6LVXuDXV9nFj4MThnTmlUPgGv0qe6juqs0m/ULMXhke2Wmr1uK2tMdUQi9bOdLMuG/8Xoya4/fDPSdHM5IkTPkekjJmOu/NuIluVoEM8QbHxXR7QNrPUH2i9iLE/vHhh5M0tdoOmKQ3VavLSgvMcOEqOi/zFJnHr4i8lwJ33NDyQId6JHbl1TQFBuh7pzvGP4vz/Od7YTc0YLvkfrMJ0dE2nmNPxWTm+hjekCwEdP9CpS+vIBzUnGLuJnGSlpNzVUvWd1IIZKiQyj/aZj24CblM5Fu8ElwZB3wnGQG5MGqw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(9686003)(316002)(110136005)(66556008)(6512007)(6486002)(5660300002)(6506007)(186003)(8936002)(38100700002)(38350700002)(4326008)(33716001)(8676002)(2906002)(44832011)(1076003)(83380400001)(52116002)(508600001)(86362001)(66946007)(66476007)(33656002)(6666004)(26005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DVJvKobRSLBKL3X+Yt3L4w+O4MgJqmn8Nv4RQdUdCWDs65tAYfzYDRh9okEw?=
- =?us-ascii?Q?7/P3pwEllwrcImVsty3lNzNU2ShoTxqYnm2FapGkPKoOLH9paP39Q5xebrim?=
- =?us-ascii?Q?+RZU2QRJ3cZoQlGG8kHBpgrcd7gkyZwU/MS019J/b/JiQr+j3+VtjqoUVAZG?=
- =?us-ascii?Q?d4YAhmlJ1+YonXdeb1R2icjEas2OZLx5JjLOP4FxjrpwE9HwseZe0IgTbR7q?=
- =?us-ascii?Q?wytOoHhpIDAjSC3V8egNxZ7srZcnyI0UgeJOJTZBanhTxlyfR4O0vKvbHnND?=
- =?us-ascii?Q?6q40SvUTF9fOXWvYqyMqYDjlygoBlFw8kHHiPpbLOuuAJUt76eNUAKZRZPxc?=
- =?us-ascii?Q?awWBPKEO3dRkOOM+nTiqhzCm5ZQPPfLA4PMEs0xlrzmvl1/2vqI8E8aYgkje?=
- =?us-ascii?Q?CCe5mbpUGRqCCTzGK+Cw8F62kEQeMYHwfsW2Ls2eC/E6JvFxwKOqs5QP7+sX?=
- =?us-ascii?Q?D49EfCU3II885OhW/7o2frvEaJ/6hIhmIOMvIf3xNwQ2heWTfhnH7GQSaVo7?=
- =?us-ascii?Q?ULa+RI9uU0WCGAFNevyp/w5J0cZ11r08aJWtebIh3+xLnDXm3jBHwcOLv+HT?=
- =?us-ascii?Q?b+rrC0KaNf87dsptJvXDsPe1z0ulTR0vFpGi4pqsU9+wMVpk4YmTkNO1wtxE?=
- =?us-ascii?Q?r5QZA1PHzdEAQZr7708SV7rkzFRaQvE7kHtvYT30tVC2wGpmpAD0UjjUj48g?=
- =?us-ascii?Q?zEpx3lNLaDXU0Qs6IV0D2VqhZxMXEm3wXDYqqpvrY9vsQ6VWBB0NkXmcs2+W?=
- =?us-ascii?Q?CxrJNPtW4KFH8cVgDLe1RWiemZ/k4lqBPcEs1qw5Fm7tgEH7X2wmRGtlR9jz?=
- =?us-ascii?Q?RIoCxWyXwviH2eSfI9erlluwZGuCpNeOdPl99Fwv7gDLNKi7e/q7gPdOAJxk?=
- =?us-ascii?Q?rLDwSB/ei1rj78daEzqfn/078YteHp4lkpY1u+CPOzKhi8dfLp+ENAx8AvAk?=
- =?us-ascii?Q?/4EAk3VeRFlJMnlQtSwk8sQuHUPUa2K9PEx7hklUnjqBCEsrXWTuCSPeXx+q?=
- =?us-ascii?Q?KvIBzz9KM7paREywv12ksMxzub7rZSvLDAJ6G515BulxTZoXHTZq5QptN+/Q?=
- =?us-ascii?Q?yB6Ow8SPZ+T1JeOzjZP6T+cPTjCAYYJQ+TSwomQCGP91ptJRvvZcemh9UKhK?=
- =?us-ascii?Q?bkP6lNPnaU1sBmVmjduc7Qb/3cKLzvg1SqcVii4qLw4MZsgxx/PBetI92hsv?=
- =?us-ascii?Q?lPFrWjDhvoZXFsdJMbM/lGFeR5lNJoZwbj16SsPewYOewJN8J5zW+D7ce+3g?=
- =?us-ascii?Q?Xr1WHACwh+k6744GJqOSbleZT1Xg3X/hK4/7WP14L4Zs5Rqto/QW9zkSaMd+?=
- =?us-ascii?Q?n9bbqfhWPl+tE1VUEh2G+0fMuiFegHD0JCDdf81sn+A4a2kDYa5PvGfGP4k/?=
- =?us-ascii?Q?YuOgUMNHexacljBk27ESf9LSIC5oxW4gIyCzj0awwm118Kf1eab54lEtf1DN?=
- =?us-ascii?Q?C0VRY82I79uk3LupdeDdUdgvFKZT6pc0cTsibyCt3n2dQhlFm7R6zIpfBs0c?=
- =?us-ascii?Q?MrmGVWlq4W6lmwxfUPA7sZlXBhXh/D6Q7bc0oPrsAYD/fANwVzEkScSjdR6L?=
- =?us-ascii?Q?y+Gm2v59GI30THSAtipVAdLesQi7B+wIz96H+cDTBnjqKAh2R6Ijm42NdyAP?=
- =?us-ascii?Q?5ooMy/eefCFdkjMFdzCPJDVp/nD+ODmEg07JoUkx+j+nvMvVSx4EE7dn7Aqs?=
- =?us-ascii?Q?ffNHW3Ft8VQy46+F3zGeVzIaFQ4=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5f1fc78-0f01-4471-7a42-08d9d4d34427
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-42ed3.templateTenant
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2022 07:23:29.8917
+X-MS-Exchange-CrossTenant-AuthSource: PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: a607bf29-b7ea-48bb-e6c7-08d9d4fc7f0a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jan 2022 12:18:37.7246
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LYvJgRQ5TroF26nKllvi3Ldym/RMJgw/7NrnHPuz5DhHt4eZ0XNvqQA7cSf2dvu6vogJhnP6HuunUc+XEnTHUbWyxx6VnGAxl2eNak/vAmo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1001MB2159
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10223 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 adultscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2201110039
-X-Proofpoint-GUID: eBVChr4cozJx_-JEDTT2nhosqhKLVNHx
-X-Proofpoint-ORIG-GUID: eBVChr4cozJx_-JEDTT2nhosqhKLVNHx
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PNXPR01MB7305
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add unlocks to two error paths in hci_inquiry_result_with_rssi_evt().
+Some additional errors are being seen in 5.16
 
-Fixes: fee645033e2c ("Bluetooth: hci_event: Use skb_pull_data when processing inquiry results")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
----
- net/bluetooth/hci_event.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+-- Logs begin at Fri 2021-11-26 21:34:04 IST, end at Tue 2022-01-11 17:44:4=
+0 IST. --
+Jan 11 17:42:26 MacBook kernel: Bluetooth: Core ver 2.22
+Jan 11 17:42:26 MacBook kernel: NET: Registered PF_BLUETOOTH protocol famil=
+y
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI device and connection manage=
+r initialized
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI socket layer initialized
+Jan 11 17:42:26 MacBook kernel: Bluetooth: L2CAP socket layer initialized
+Jan 11 17:42:26 MacBook kernel: Bluetooth: SCO socket layer initialized
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART driver ver 2.3
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol H4 registered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol BCSP registere=
+d
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol LL registered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol ATH3K register=
+ed
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol Three-wire (H5=
+) registered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol Intel register=
+ed
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol Broadcom regis=
+tered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol QCA registered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol AG6XX register=
+ed
+Jan 11 17:42:26 MacBook kernel: Bluetooth: HCI UART protocol Marvell regist=
+ered
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM: failed to write updat=
+e baudrate (-16)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to set baudrate
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM: chip id 150
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM: features 0x07
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM4364B3 Trinidad Olympic=
+ GEN (MFG)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM (001.016.075) build 00=
+99
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM: firmware Patch file n=
+ot found, tried:
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: BCM: 'brcm/BCM.hcd'
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:26 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:42:36 MacBook kernel: Bluetooth: BNEP (Ethernet Emulation) ver 1.=
+3
+Jan 11 17:42:36 MacBook kernel: Bluetooth: BNEP filters: protocol multicast
+Jan 11 17:42:36 MacBook kernel: Bluetooth: BNEP socket layer initialized
+Jan 11 17:43:20 MacBook kernel: Bluetooth: RFCOMM TTY layer initialized
+Jan 11 17:43:20 MacBook kernel: Bluetooth: RFCOMM socket layer initialized
+Jan 11 17:43:20 MacBook kernel: Bluetooth: RFCOMM ver 1.11
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
+Jan 11 17:43:45 MacBook kernel: Bluetooth: hci0: Failed to read codec capab=
+ilities (-56)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f1082b7c0218..e6c75cb1c7fe 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4536,7 +4536,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 			if (!info) {
- 				bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
- 					   HCI_EV_INQUIRY_RESULT_WITH_RSSI);
--				return;
-+				goto unlock;
- 			}
- 
- 			bacpy(&data.bdaddr, &info->bdaddr);
-@@ -4566,7 +4566,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 			if (!info) {
- 				bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
- 					   HCI_EV_INQUIRY_RESULT_WITH_RSSI);
--				return;
-+				goto unlock;
- 			}
- 
- 			bacpy(&data.bdaddr, &info->bdaddr);
-@@ -4588,7 +4588,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 		bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
- 			   HCI_EV_INQUIRY_RESULT_WITH_RSSI);
- 	}
--
-+unlock:
- 	hci_dev_unlock(hdev);
- }
- 
--- 
-2.20.1
+Also, we haven't got any reply from the maintainers yet. I hope that I shal=
+l get a reply this time
 
+Regards
+Aditya=
