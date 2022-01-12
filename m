@@ -2,122 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD163C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 15:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD02FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 16:58:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354610AbiALPfe (ORCPT
+        id S240180AbiALQ6d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jan 2022 10:35:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34732 "EHLO
+        Wed, 12 Jan 2022 11:58:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349515AbiALPfb (ORCPT
+        with ESMTP id S229532AbiALQ6c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jan 2022 10:35:31 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B04BC06173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 07:35:31 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id o3so5675196pjs.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 07:35:31 -0800 (PST)
+        Wed, 12 Jan 2022 11:58:32 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5089DC06173F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 08:58:32 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id p12so3565197qvj.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 08:58:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5Dk/y377iRORsKiJ49yJXoJTYjyMu47/+41vc8VQxzY=;
-        b=qtu7OvzPbjMNDhmtSerzkWoF6dHKnW+dVVEX3n00weDWnwJQsP4SniLgO+6xDOzDpw
-         fiFoONCTne4/G+jf2iL31mmfb4E8V0qGtu7HFinpoe6v7iuCS4BQ+eKma+oxVcgOw9XM
-         Nz2JMEywBLR8uT/P81l4z+7kJCX9eSpsTBevB1p0zujp3ls8Qu+FGWYY5o6bIYe1ie6m
-         3SrqTenWJxnsLJws1G/TvyyylyJ+PtHCenAzER0KEz5tOinGFF54sLE4zLRB0e7/j0cw
-         Mk5PvW6jD/clFPgqdIzwU4wPe90lzlXEt5Bgg65ilQiWRJXPnbQaPvS5BUUTRwsgS5Xf
-         L9fQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=r2kfsHAT0vQiexa9K0FKbKAvusuBXxvQbztUy9jltRs=;
+        b=CRW0ZpwmcmUqnX8x6xR467qDqLF2Mx+DdXGbZqJg6YS1kufs9x6VsTQ+J3aZpypXnb
+         s+WL3SpAC23VLzNuGc8aB+XqSo9V5QJcAR1BN8EsxOakQ41/yc1sUxN9Dh3O4DCzh7eM
+         X7t/qEKutZDn3I7aMPhX2w5kZe/8FjW6xfIpCIVl61hVqsHxvyoBrVMbdMqz17xl+n4T
+         wtXZB2OhMveeTFbPJt+Yh8dkldsyZ8nRmSS3CwH4vXx4n453BGob5QOd/8JcCyRsLLYe
+         x9ylA2tgaXFDzoJWGzntgAa1IdlB5LQxOD9DKj1IDQwm+bTPw0XbGCpJ2WJDhniCsXxE
+         Mcig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5Dk/y377iRORsKiJ49yJXoJTYjyMu47/+41vc8VQxzY=;
-        b=n9GHCdwva0SlLoHN82hpRoIbw9bGb0tdbBG5GRD/F23aUovr9L/Q9Mg3z3dqTugk0B
-         tNkcZ1wniLyV1RBpsmpSH+jCf/05kJ/bLdW+fAp6dgh0Q+EXO8Im35KwSXqy9dWbeioy
-         S3Q9Cmyv9dzwnCwtUYCbAH6cj+iS1kX7xyulu6D1GuLUjIc/Ez/97pzeEoVl2+bbeQIX
-         6EYM2so/0+d2p12bR0S5QPVPHi2qAiTvvBfGxWzNKGtALJruIvetLuZrlZJLrEq73VxN
-         7QpCigIHBp90d3mN856cmfQuNt+SPjjwVXmg1dG/rNElAxbTuPved/a5yE7UOctY/32Y
-         kURQ==
-X-Gm-Message-State: AOAM530l+/v0Zp59J1tjNBvd6dRQDTg1rDwgjrWo4Ej1XN/o+doI/xfd
-        GJ75e/VG9PerRnpz9sWzT6BgARq4i5w=
-X-Google-Smtp-Source: ABdhPJy1Up4S8XCW4tMzIa1dxX9af+JyLCLFYywQNWmBEe6H6cU8STaFOFS9gEBYNySzADqZHzrRMg==
-X-Received: by 2002:a17:903:11c5:b0:149:a8cf:37da with SMTP id q5-20020a17090311c500b00149a8cf37damr10055282plh.132.1642001730495;
-        Wed, 12 Jan 2022 07:35:30 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b12sm30017pfv.148.2022.01.12.07.35.29
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=r2kfsHAT0vQiexa9K0FKbKAvusuBXxvQbztUy9jltRs=;
+        b=RGYhd8JjijOWDIafH9jHSdKkydE4CFplG5LW21sGy95iERO5uqBoRCY0lsaT79sJEn
+         BXIXdmE+jZ7mEWjRMQDYCq7YRtGtzmCTzIMzL5fLI9MhneB4HuzNKpm473vy2whIR6Gj
+         58MubmxtjekPBAV7ZYyULWdn9KkBwAr5rZp+7xaTA/opyR9TKpEuVs3/ELxLF6NeiSL7
+         eyTvF4jrPcABGIUThsHA/Jxa5PFjkhB/NdgX4kid0cShAhGaNoqa0AdMm/EoyPbPhjTt
+         5qdoY+bbAc9iCmK9CgInpu/i0OeWMm9H13Lf8HcAjXp/8SGD7D1Rbur5MucJrRVadWDH
+         p2Ag==
+X-Gm-Message-State: AOAM5308H4o74tRrO2cOiHkljL2e+QSL10JN+kuR2E8wvLeu4rLnLtN8
+        rkOv87J2enDJxggjqIdpG7CbmO1RHe7Q6g==
+X-Google-Smtp-Source: ABdhPJwr9chijVmXm2Ez2C/ypqQgo5gz/NBePjKLi39LiSSofnkDd2/70U1QpFRYxsp/fGFcLY3slg==
+X-Received: by 2002:a05:6214:da1:: with SMTP id h1mr505384qvh.23.1642006711357;
+        Wed, 12 Jan 2022 08:58:31 -0800 (PST)
+Received: from [172.17.0.2] ([40.84.46.149])
+        by smtp.gmail.com with ESMTPSA id h17sm233225qtx.12.2022.01.12.08.58.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 07:35:30 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] media: Fix crash when endpoint replies with an error to SetConfiguration
-Date:   Wed, 12 Jan 2022 07:35:29 -0800
-Message-Id: <20220112153529.338208-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Wed, 12 Jan 2022 08:58:31 -0800 (PST)
+Message-ID: <61df08b7.1c69fb81.22f6c.1c7f@mx.google.com>
+Date:   Wed, 12 Jan 2022 08:58:31 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1611408720220042103=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] media: Fix crash when endpoint replies with an error to SetConfiguration
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220112153529.338208-1-luiz.dentz@gmail.com>
+References: <20220112153529.338208-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1611408720220042103==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If endpoint responds to SetConfiguration the transport is being
-destroyed without removing it from the list leading a crash.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/269
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=604907
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.44 seconds
+GitLint                       PASS      1.00 seconds
+Prep - Setup ELL              PASS      40.83 seconds
+Build - Prep                  PASS      0.70 seconds
+Build - Configure             PASS      8.44 seconds
+Build - Make                  PASS      1376.47 seconds
+Make Check                    PASS      11.17 seconds
+Make Check w/Valgrind         PASS      431.65 seconds
+Make Distcheck                PASS      225.72 seconds
+Build w/ext ELL - Configure   PASS      8.40 seconds
+Build w/ext ELL - Make        PASS      1364.92 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- profiles/audio/media.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index edefedc90..8162417ce 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -241,6 +241,16 @@ static struct media_adapter *find_adapter(struct btd_device *device)
- 	return NULL;
- }
- 
-+static void endpoint_remove_transport(struct media_endpoint *endpoint,
-+					struct media_transport *transport)
-+{
-+	if (!endpoint || !transport)
-+		return;
-+
-+	endpoint->transports = g_slist_remove(endpoint->transports, transport);
-+	media_transport_destroy(transport);
-+}
-+
- static void clear_configuration(struct media_endpoint *endpoint,
- 					struct media_transport *transport)
- {
-@@ -260,8 +270,7 @@ static void clear_configuration(struct media_endpoint *endpoint,
- 							DBUS_TYPE_INVALID);
- 	g_dbus_send_message(btd_get_dbus_connection(), msg);
- done:
--	endpoint->transports = g_slist_remove(endpoint->transports, transport);
--	media_transport_destroy(transport);
-+	endpoint_remove_transport(endpoint, transport);
- }
- 
- static void clear_endpoint(struct media_endpoint *endpoint)
-@@ -301,12 +310,8 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
- 
- 		if (dbus_message_is_method_call(request->msg,
- 					MEDIA_ENDPOINT_INTERFACE,
--					"SetConfiguration")) {
--			if (request->transport == NULL)
--				error("Expected to destroy transport");
--			else
--				media_transport_destroy(request->transport);
--		}
-+					"SetConfiguration"))
-+			endpoint_remove_transport(endpoint, request->transport);
- 
- 		dbus_error_free(&err);
- 		goto done;
--- 
-2.33.1
 
+--===============1611408720220042103==--
