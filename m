@@ -2,33 +2,29 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B735C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 07:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A154C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 07:40:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351286AbiALHkg (ORCPT
+        id S1351270AbiALHkj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jan 2022 02:40:36 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:33672 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1351299AbiALHjg (ORCPT
+        Wed, 12 Jan 2022 02:40:39 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:38308 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1351272AbiALHjd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jan 2022 02:39:36 -0500
-X-UUID: 2e40ab6a741e481b81514266684dba5b-20220112
-X-UUID: 2e40ab6a741e481b81514266684dba5b-20220112
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
+        Wed, 12 Jan 2022 02:39:33 -0500
+X-UUID: 4246199e049e4f0f80f9ecdb982e7845-20220112
+X-UUID: 4246199e049e4f0f80f9ecdb982e7845-20220112
+Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw02.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1835634332; Wed, 12 Jan 2022 15:39:33 +0800
-Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Wed, 12 Jan 2022 15:39:32 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb01.mediatek.inc
- (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 12 Jan
- 2022 15:39:26 +0800
+        with ESMTP id 1394784379; Wed, 12 Jan 2022 15:39:30 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by
+ mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 12 Jan 2022 15:39:28 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 12 Jan 2022 15:39:25 +0800
+ Transport; Wed, 12 Jan 2022 15:39:28 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -46,9 +42,9 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH 5/7] Bluetooth: btmtksdio: lower log level in btmtksdio_runtime_[resume|suspend]()
-Date:   Wed, 12 Jan 2022 15:39:15 +0800
-Message-ID: <c355cd94eee37a15a17a0ad51e82def6c922cd89.1641972745.git.objelf@gmail.com>
+Subject: [PATCH 7/7] Bluetooth: btmtksdio: mask out interrupt status
+Date:   Wed, 12 Jan 2022 15:39:17 +0800
+Message-ID: <a8fb77540e15a0c042fdfa338bee32e992aaafc9.1641972745.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <bddfacd096b6fe927d08e48ad6993c17c9954028.1641972745.git.objelf@gmail.com>
 References: <bddfacd096b6fe927d08e48ad6993c17c9954028.1641972745.git.objelf@gmail.com>
@@ -61,36 +57,41 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Lower its log level from INFO to DEBUG prior to we enable runtime pm for
-mt7921s with the smaller idle time as default.
+Currently, there is a loop in btmtksdio_txrx_work() which iteratively
+executes until the variable int_status is zero.
 
+But the variable int_status should be masked out with the actual interrupt
+sources (MTK_REG_CHISR bit 0-15) before we check the loop condition.
+Otherwise, RX_PKT_LEN (MTK_REG_CHISR bit 16-31) which is read-only and
+unclearable would cause the loop to get stuck on some chipsets like
+MT7663s.
+
+Fixes: 26270bc189ea ("Bluetooth: btmtksdio: move interrupt service to work")
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/bluetooth/btmtksdio.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btmtksdio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index b0aae4143037..3e8f19556e2c 100644
+index 491f029452ca..8be763ab3bf4 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -1253,7 +1253,7 @@ static int btmtksdio_runtime_suspend(struct device *dev)
+@@ -92,6 +92,7 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
+ #define TX_EMPTY		BIT(2)
+ #define TX_FIFO_OVERFLOW	BIT(8)
+ #define FW_MAILBOX_INT		BIT(15)
++#define INT_MASK		GENMASK(15, 0)
+ #define RX_PKT_LEN		GENMASK(31, 16)
  
- 	err = btmtksdio_fw_pmctrl(bdev);
+ #define MTK_REG_CSICR		0xc0
+@@ -565,6 +566,7 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 		 * FIFO.
+ 		 */
+ 		sdio_writel(bdev->func, int_status, MTK_REG_CHISR, NULL);
++		int_status &= INT_MASK;
  
--	bt_dev_info(bdev->hdev, "status (%d) return ownership to device", err);
-+	bt_dev_dbg(bdev->hdev, "status (%d) return ownership to device", err);
- 
- 	return err;
- }
-@@ -1273,7 +1273,7 @@ static int btmtksdio_runtime_resume(struct device *dev)
- 
- 	err = btmtksdio_drv_pmctrl(bdev);
- 
--	bt_dev_info(bdev->hdev, "status (%d) get ownership from device", err);
-+	bt_dev_dbg(bdev->hdev, "status (%d) get ownership from device", err);
- 
- 	return err;
- }
+ 		if ((int_status & FW_MAILBOX_INT) &&
+ 		    bdev->data->chipid == 0x7921) {
 -- 
 2.25.1
 
