@@ -2,125 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E477EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 20:56:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF3FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 22:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357822AbiALU4J (ORCPT
+        id S234586AbiALWsq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jan 2022 15:56:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53066 "EHLO
+        Wed, 12 Jan 2022 17:48:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344755AbiALU4I (ORCPT
+        with ESMTP id S234580AbiALWsp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jan 2022 15:56:08 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8083C06173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 12:56:07 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id c10so9210038ybb.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 12:56:07 -0800 (PST)
+        Wed, 12 Jan 2022 17:48:45 -0500
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E54BC061748
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 14:48:45 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id w9so5773076iol.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 14:48:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CBIz8X2d/IaQIMY6aTV2aX9NovDlTARalKFvbKoALkQ=;
-        b=pChNIINRWwqFjZPH5Gv4brz3yClrU05zm4AkdzlNwD9mvNP44zfKgt1CYcY4rwZHNI
-         5PWlPf4Srp7xeSUI3GMXWqhJwUfRkFIK63u8wTF1umzDzxCBNyZJhrs4rMVLsdGYVdTg
-         2B6s9dzWEuWVh5kInoTs4GbCSOkNO/VYSj+1zktPixonRbHQIU+L6yk3X6w9jjqg/UVZ
-         RQPJPLC7IlXgYIhE9zdOJoZ3jDCSraHb3UUADFRzWKL1xIk9OrWiiq5xppTMXm7qaNzz
-         aeRmJLEx7epKG0K+/sx1ZNA9n3Cq+yqA8lQv63hGE6qDZHmJC7n5DncHhuszCZ2JX713
-         4OTw==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=p/5eE7orLsIcNXsuvHQEKwUG1gSvQ6fLVrrHDFuDJRc=;
+        b=pUnh/uIuQb7hoUHUwbPDOISHNdMp5hmM4h63sXSLLVcCq5HW29BsZFmYdkyqC4gnxY
+         xZrF26s88VI+w717YdOCGiIZpnDHPAquMweP5EKu503gQHpD5KfZ5T8YZ3yNIFXe2TCf
+         BlB4aDKecCRXSKAMF7oDmlv4TkKJ+2a9B05ufvX8ppaBAd/sdceZpOYMbmryxysmTNQs
+         HGrCCW8q40f4WKFENMOYK0+O8oTy5Y3xFK+hABcpvnFnZndrXNFUxLhteV3c0ott74jz
+         KapTREUX0+ErZU0J87K9hgIiO/r4WmIhio/SsyEXwXd4ffpHG6STSVuIrGCQl3+XG7P/
+         xSQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CBIz8X2d/IaQIMY6aTV2aX9NovDlTARalKFvbKoALkQ=;
-        b=stqvvKm26eUJ54vGbC5Sh2llICGJOAZzCpOvK85GZbYnXHooEP3FCA39svAc6Gdoa1
-         9zxSeP7f5K5ENPPaGdWeav6mw5XyWSMvB5gPeg+OhQQ9Vr0/MJCzNwaenCWiUqGTkH7/
-         3ItAvDWi1XMJ4OK3Kn131ntt5LB8t3T17HgVMgTaOglCnanM/y8UEZB/oqD2XBQITtGC
-         KLymTF7lyfAzAtKt/J89bxchbGPgz6YOsgoVwSBkvRLU/xahMiQWLHbZK6DYxeEyP9sV
-         z+zaI080EaNHD7SjY5xwRn68A5yCE0p3MeOjOr2TqykkvWsjux7nmdoCM5RCVPYM3wDT
-         ekgQ==
-X-Gm-Message-State: AOAM533IMlwqfJudN9wjGcfigJSAAkS9sT/UPpAB7Sy5iaprk2wvUqNz
-        9imR/yESbFNmsS29+Fwvb79PkJaT5ch8HDtGt+8x0AaA
-X-Google-Smtp-Source: ABdhPJwzSVRnVsr+DpC435fn4tgUcQxynihaxuZ5JHaANbo7n4wZlNoTHMXOlfSLYr1kuGKoJ0403wFdTY35gHSZFx0=
-X-Received: by 2002:a25:3dc2:: with SMTP id k185mr1891734yba.733.1642020966996;
- Wed, 12 Jan 2022 12:56:06 -0800 (PST)
-MIME-Version: 1.0
-References: <0015e594-d888-f664-56c3-f4022286c736@hartkopp.net>
-In-Reply-To: <0015e594-d888-f664-56c3-f4022286c736@hartkopp.net>
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=p/5eE7orLsIcNXsuvHQEKwUG1gSvQ6fLVrrHDFuDJRc=;
+        b=pt3cc8nbdQ6xfz3B/buX2SeMV+LZcBmR9dcmWoFwQNIaqNXkDp9lwCLaIqz4swhRPk
+         yXpBS1cmErYJf1wMZRudXrK9k/5PakgKZWBxoNeOjl8oTJxjUOqNWvaOj0ex2KM4SteQ
+         x7IT6nMM76zb7YkFZZqxjB0XG0nmD/0KPeYAvILG3ymo+QJUyOD8tAGAZgMpRNDqBiW9
+         LX4VyXMgVnMXkH83fwEKX3Yr1w1KsxErY95S2dB0gF+VltsWqYi94BNNagwhXggS9hj5
+         fadyowX3VrncajjJGUsLW/iCS1Xl4651aTvTFLsqyOufxcG9psPgzcGi9O1FkHuBvwhO
+         3pfQ==
+X-Gm-Message-State: AOAM5316sZvOf6eEcApvuOkFJX1HDqxitZMnJQTrYw2+d69mijXBVKd3
+        /qrWnC8Uu1fsadYy956HpfUksH5oq2s=
+X-Google-Smtp-Source: ABdhPJzqeM9n66xkW9bVopwupHfyrkBTWau+UsYb4N4msog2w2CpNDqx/ZLO5EwZuTHEUbRjweUhBg==
+X-Received: by 2002:a05:6602:ca:: with SMTP id z10mr863949ioe.117.1642027724236;
+        Wed, 12 Jan 2022 14:48:44 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id o12sm777209ilu.86.2022.01.12.14.48.43
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Jan 2022 14:48:44 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 12 Jan 2022 12:55:56 -0800
-Message-ID: <CABBYNZLLDip=q4VGP5Mx8fNrdxd8oHfzDJY9+XYxe11nLCU+yw@mail.gmail.com>
-Subject: Re: Latest Linux tree (merge window): BT mouse does not work
-To:     Oliver Hartkopp <socketcan@hartkopp.net>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] hog: Add input queue while uhid device has not been created
+Date:   Wed, 12 Jan 2022 14:48:42 -0800
+Message-Id: <20220112224842.519814-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20220112224842.519814-1-luiz.dentz@gmail.com>
+References: <20220112224842.519814-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Oliver,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jan 12, 2022 at 12:07 PM Oliver Hartkopp <socketcan@hartkopp.net> wrote:
->
-> Hi all,
->
-> after upgrading from Linus' tree 5.16.0-rc7-00108-g800829388818 to the
-> current merge window version 5.16.0-05432-g6f38be8f2ccd my BT mouse is
-> not working anymore.
->
-> I now get two new error messages:
->
->         hci0: unexpected event 0xff length: 5 > 0
->
-> and
->
->         hci0: unexpected event 0xff length: 7 > 0
+Since report map is only read after all reports it is possible to start
+receiving notifications before uhid has been created, so this adds a
+queue to store the events while the report map is pending and once uhid
+has been created dequeue the events.
+---
+ profiles/input/hog-lib.c | 32 +++++++++++++++++++++++++++++---
+ 1 file changed, 29 insertions(+), 3 deletions(-)
 
-These are vendor events which I don't think were being handled anyway,
-so it is likely something else that is preventing it to work.
-
-> Any idea? Any new firmware required?
->
-> Best regards,
-> Oliver
->
-> [    8.790201] Bluetooth: Core ver 2.22
-> [    8.847435] Bluetooth: hci0: Bootloader revision 0.0 build 26 week 38
-> 2015
-> [    8.853022] Bluetooth: hci0: Device revision is 16
-> [    8.853025] Bluetooth: hci0: Secure boot is enabled
-> [    8.853026] Bluetooth: hci0: OTP lock is enabled
-> [    8.853027] Bluetooth: hci0: API lock is enabled
-> [    8.853028] Bluetooth: hci0: Debug lock is disabled
-> [    8.853028] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-> [    8.855879] Bluetooth: hci0: Found device firmware: intel/ibt-12-16.sfi
->
-> [    9.422098] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-> [    9.423532] Bluetooth: BNEP filters: protocol multicast
-> [    9.423537] Bluetooth: BNEP socket layer initialized
-> [    9.439281] iwlwifi 0000:01:00.0 wlp1s0: renamed from wlan0
-> [   10.391796] Bluetooth: hci0: Waiting for firmware download to complete
-> [   10.392752] Bluetooth: hci0: unexpected event 0xff length: 5 > 0
-> [   10.392789] Bluetooth: hci0: Firmware loaded in 1492456 usecs
-> [   10.392985] Bluetooth: hci0: Waiting for device to boot
-> [   10.404942] Bluetooth: hci0: unexpected event 0xff length: 7 > 0
-> [   10.404971] Bluetooth: hci0: Device booted in 11747 usecs
-> [   10.405416] Bluetooth: hci0: Found Intel DDC parameters:
-> intel/ibt-12-16.ddc
-> [   10.407835] Bluetooth: hci0: Applying Intel DDC parameters completed
-> [   10.408848] Bluetooth: hci0: Firmware revision 0.1 build 50 week 12 2019
-> [   10.468582] NET: Registered PF_ALG protocol family
-> [   11.277319] Bluetooth: RFCOMM TTY layer initialized
-> [   11.277343] Bluetooth: RFCOMM socket layer initialized
-> [   11.277367] Bluetooth: RFCOMM ver 1.11
-
-Can you attach the bluetoothd and btmon logs when you attempt to
-connect the mouse, at least for the logs above it does seem the
-firmware is being loaded properly.
-
->
-
-
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index beb19af70..0b375feb8 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -98,6 +98,7 @@ struct bt_hog {
+ 	struct queue		*gatt_op;
+ 	struct gatt_db		*gatt_db;
+ 	struct gatt_db_attribute	*report_map_attr;
++	struct queue		*input;
+ };
+ 
+ struct report_map {
+@@ -355,11 +356,18 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 		ev.u.input.size = len;
+ 	}
+ 
+-	err = bt_uhid_send(hog->uhid, &ev);
+-	if (err < 0) {
+-		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
++	/* If uhid had not been created yet queue up the input */
++	if (!hog->uhid_created) {
++		if (!hog->input)
++			hog->input = queue_new();
++
++		queue_push_tail(hog->input, util_memdup(&ev, sizeof(ev)));
+ 		return;
+ 	}
++
++	err = bt_uhid_send(hog->uhid, &ev);
++	if (err < 0)
++		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+ }
+ 
+ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+@@ -993,6 +1001,21 @@ static char *item2string(char *str, uint8_t *buf, uint8_t len)
+ 	return str;
+ }
+ 
++static bool input_dequeue(const void *data, const void *match_data)
++{
++	const struct uhid_event *ev = data;
++	const struct bt_hog *hog = match_data;
++	int err;
++
++	err = bt_uhid_send(hog->uhid, ev);
++	if (err < 0) {
++		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
++		return false;
++	}
++
++	return true;
++}
++
+ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 							ssize_t report_map_len)
+ {
+@@ -1072,6 +1095,8 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 	hog->uhid_created = true;
+ 
+ 	DBG("HoG created uHID device");
++
++	queue_remove_all(hog->input, input_dequeue, hog, free);
+ }
+ 
+ static void db_report_map_write_value_cb(struct gatt_db_attribute *attr,
+@@ -1284,6 +1309,7 @@ static void hog_free(void *data)
+ 
+ 	bt_hog_detach(hog);
+ 
++	queue_destroy(hog->input, free);
+ 	queue_destroy(hog->bas, (void *) bt_bas_unref);
+ 	g_slist_free_full(hog->instances, hog_free);
+ 
 -- 
-Luiz Augusto von Dentz
+2.33.1
+
