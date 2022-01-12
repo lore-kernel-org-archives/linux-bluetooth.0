@@ -2,101 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD02FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 16:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E477EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 20:56:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240180AbiALQ6d (ORCPT
+        id S1357822AbiALU4J (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Jan 2022 11:58:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53984 "EHLO
+        Wed, 12 Jan 2022 15:56:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229532AbiALQ6c (ORCPT
+        with ESMTP id S1344755AbiALU4I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Jan 2022 11:58:32 -0500
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5089DC06173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 08:58:32 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id p12so3565197qvj.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 08:58:32 -0800 (PST)
+        Wed, 12 Jan 2022 15:56:08 -0500
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8083C06173F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 12:56:07 -0800 (PST)
+Received: by mail-yb1-xb30.google.com with SMTP id c10so9210038ybb.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Jan 2022 12:56:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=r2kfsHAT0vQiexa9K0FKbKAvusuBXxvQbztUy9jltRs=;
-        b=CRW0ZpwmcmUqnX8x6xR467qDqLF2Mx+DdXGbZqJg6YS1kufs9x6VsTQ+J3aZpypXnb
-         s+WL3SpAC23VLzNuGc8aB+XqSo9V5QJcAR1BN8EsxOakQ41/yc1sUxN9Dh3O4DCzh7eM
-         X7t/qEKutZDn3I7aMPhX2w5kZe/8FjW6xfIpCIVl61hVqsHxvyoBrVMbdMqz17xl+n4T
-         wtXZB2OhMveeTFbPJt+Yh8dkldsyZ8nRmSS3CwH4vXx4n453BGob5QOd/8JcCyRsLLYe
-         x9ylA2tgaXFDzoJWGzntgAa1IdlB5LQxOD9DKj1IDQwm+bTPw0XbGCpJ2WJDhniCsXxE
-         Mcig==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CBIz8X2d/IaQIMY6aTV2aX9NovDlTARalKFvbKoALkQ=;
+        b=pChNIINRWwqFjZPH5Gv4brz3yClrU05zm4AkdzlNwD9mvNP44zfKgt1CYcY4rwZHNI
+         5PWlPf4Srp7xeSUI3GMXWqhJwUfRkFIK63u8wTF1umzDzxCBNyZJhrs4rMVLsdGYVdTg
+         2B6s9dzWEuWVh5kInoTs4GbCSOkNO/VYSj+1zktPixonRbHQIU+L6yk3X6w9jjqg/UVZ
+         RQPJPLC7IlXgYIhE9zdOJoZ3jDCSraHb3UUADFRzWKL1xIk9OrWiiq5xppTMXm7qaNzz
+         aeRmJLEx7epKG0K+/sx1ZNA9n3Cq+yqA8lQv63hGE6qDZHmJC7n5DncHhuszCZ2JX713
+         4OTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=r2kfsHAT0vQiexa9K0FKbKAvusuBXxvQbztUy9jltRs=;
-        b=RGYhd8JjijOWDIafH9jHSdKkydE4CFplG5LW21sGy95iERO5uqBoRCY0lsaT79sJEn
-         BXIXdmE+jZ7mEWjRMQDYCq7YRtGtzmCTzIMzL5fLI9MhneB4HuzNKpm473vy2whIR6Gj
-         58MubmxtjekPBAV7ZYyULWdn9KkBwAr5rZp+7xaTA/opyR9TKpEuVs3/ELxLF6NeiSL7
-         eyTvF4jrPcABGIUThsHA/Jxa5PFjkhB/NdgX4kid0cShAhGaNoqa0AdMm/EoyPbPhjTt
-         5qdoY+bbAc9iCmK9CgInpu/i0OeWMm9H13Lf8HcAjXp/8SGD7D1Rbur5MucJrRVadWDH
-         p2Ag==
-X-Gm-Message-State: AOAM5308H4o74tRrO2cOiHkljL2e+QSL10JN+kuR2E8wvLeu4rLnLtN8
-        rkOv87J2enDJxggjqIdpG7CbmO1RHe7Q6g==
-X-Google-Smtp-Source: ABdhPJwr9chijVmXm2Ez2C/ypqQgo5gz/NBePjKLi39LiSSofnkDd2/70U1QpFRYxsp/fGFcLY3slg==
-X-Received: by 2002:a05:6214:da1:: with SMTP id h1mr505384qvh.23.1642006711357;
-        Wed, 12 Jan 2022 08:58:31 -0800 (PST)
-Received: from [172.17.0.2] ([40.84.46.149])
-        by smtp.gmail.com with ESMTPSA id h17sm233225qtx.12.2022.01.12.08.58.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Jan 2022 08:58:31 -0800 (PST)
-Message-ID: <61df08b7.1c69fb81.22f6c.1c7f@mx.google.com>
-Date:   Wed, 12 Jan 2022 08:58:31 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1611408720220042103=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CBIz8X2d/IaQIMY6aTV2aX9NovDlTARalKFvbKoALkQ=;
+        b=stqvvKm26eUJ54vGbC5Sh2llICGJOAZzCpOvK85GZbYnXHooEP3FCA39svAc6Gdoa1
+         9zxSeP7f5K5ENPPaGdWeav6mw5XyWSMvB5gPeg+OhQQ9Vr0/MJCzNwaenCWiUqGTkH7/
+         3ItAvDWi1XMJ4OK3Kn131ntt5LB8t3T17HgVMgTaOglCnanM/y8UEZB/oqD2XBQITtGC
+         KLymTF7lyfAzAtKt/J89bxchbGPgz6YOsgoVwSBkvRLU/xahMiQWLHbZK6DYxeEyP9sV
+         z+zaI080EaNHD7SjY5xwRn68A5yCE0p3MeOjOr2TqykkvWsjux7nmdoCM5RCVPYM3wDT
+         ekgQ==
+X-Gm-Message-State: AOAM533IMlwqfJudN9wjGcfigJSAAkS9sT/UPpAB7Sy5iaprk2wvUqNz
+        9imR/yESbFNmsS29+Fwvb79PkJaT5ch8HDtGt+8x0AaA
+X-Google-Smtp-Source: ABdhPJwzSVRnVsr+DpC435fn4tgUcQxynihaxuZ5JHaANbo7n4wZlNoTHMXOlfSLYr1kuGKoJ0403wFdTY35gHSZFx0=
+X-Received: by 2002:a25:3dc2:: with SMTP id k185mr1891734yba.733.1642020966996;
+ Wed, 12 Jan 2022 12:56:06 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] media: Fix crash when endpoint replies with an error to SetConfiguration
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220112153529.338208-1-luiz.dentz@gmail.com>
-References: <20220112153529.338208-1-luiz.dentz@gmail.com>
+References: <0015e594-d888-f664-56c3-f4022286c736@hartkopp.net>
+In-Reply-To: <0015e594-d888-f664-56c3-f4022286c736@hartkopp.net>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 12 Jan 2022 12:55:56 -0800
+Message-ID: <CABBYNZLLDip=q4VGP5Mx8fNrdxd8oHfzDJY9+XYxe11nLCU+yw@mail.gmail.com>
+Subject: Re: Latest Linux tree (merge window): BT mouse does not work
+To:     Oliver Hartkopp <socketcan@hartkopp.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1611408720220042103==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Oliver,
 
-This is automated email and please do not reply to this email!
+On Wed, Jan 12, 2022 at 12:07 PM Oliver Hartkopp <socketcan@hartkopp.net> wrote:
+>
+> Hi all,
+>
+> after upgrading from Linus' tree 5.16.0-rc7-00108-g800829388818 to the
+> current merge window version 5.16.0-05432-g6f38be8f2ccd my BT mouse is
+> not working anymore.
+>
+> I now get two new error messages:
+>
+>         hci0: unexpected event 0xff length: 5 > 0
+>
+> and
+>
+>         hci0: unexpected event 0xff length: 7 > 0
 
-Dear submitter,
+These are vendor events which I don't think were being handled anyway,
+so it is likely something else that is preventing it to work.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=604907
+> Any idea? Any new firmware required?
+>
+> Best regards,
+> Oliver
+>
+> [    8.790201] Bluetooth: Core ver 2.22
+> [    8.847435] Bluetooth: hci0: Bootloader revision 0.0 build 26 week 38
+> 2015
+> [    8.853022] Bluetooth: hci0: Device revision is 16
+> [    8.853025] Bluetooth: hci0: Secure boot is enabled
+> [    8.853026] Bluetooth: hci0: OTP lock is enabled
+> [    8.853027] Bluetooth: hci0: API lock is enabled
+> [    8.853028] Bluetooth: hci0: Debug lock is disabled
+> [    8.853028] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
+> [    8.855879] Bluetooth: hci0: Found device firmware: intel/ibt-12-16.sfi
+>
+> [    9.422098] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+> [    9.423532] Bluetooth: BNEP filters: protocol multicast
+> [    9.423537] Bluetooth: BNEP socket layer initialized
+> [    9.439281] iwlwifi 0000:01:00.0 wlp1s0: renamed from wlan0
+> [   10.391796] Bluetooth: hci0: Waiting for firmware download to complete
+> [   10.392752] Bluetooth: hci0: unexpected event 0xff length: 5 > 0
+> [   10.392789] Bluetooth: hci0: Firmware loaded in 1492456 usecs
+> [   10.392985] Bluetooth: hci0: Waiting for device to boot
+> [   10.404942] Bluetooth: hci0: unexpected event 0xff length: 7 > 0
+> [   10.404971] Bluetooth: hci0: Device booted in 11747 usecs
+> [   10.405416] Bluetooth: hci0: Found Intel DDC parameters:
+> intel/ibt-12-16.ddc
+> [   10.407835] Bluetooth: hci0: Applying Intel DDC parameters completed
+> [   10.408848] Bluetooth: hci0: Firmware revision 0.1 build 50 week 12 2019
+> [   10.468582] NET: Registered PF_ALG protocol family
+> [   11.277319] Bluetooth: RFCOMM TTY layer initialized
+> [   11.277343] Bluetooth: RFCOMM socket layer initialized
+> [   11.277367] Bluetooth: RFCOMM ver 1.11
 
----Test result---
+Can you attach the bluetoothd and btmon logs when you attempt to
+connect the mouse, at least for the logs above it does seem the
+firmware is being loaded properly.
 
-Test Summary:
-CheckPatch                    PASS      1.44 seconds
-GitLint                       PASS      1.00 seconds
-Prep - Setup ELL              PASS      40.83 seconds
-Build - Prep                  PASS      0.70 seconds
-Build - Configure             PASS      8.44 seconds
-Build - Make                  PASS      1376.47 seconds
-Make Check                    PASS      11.17 seconds
-Make Check w/Valgrind         PASS      431.65 seconds
-Make Distcheck                PASS      225.72 seconds
-Build w/ext ELL - Configure   PASS      8.40 seconds
-Build w/ext ELL - Make        PASS      1364.92 seconds
-Incremental Build with patchesPASS      0.00 seconds
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1611408720220042103==--
+-- 
+Luiz Augusto von Dentz
