@@ -2,90 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC24C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Jan 2022 22:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5569EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Jan 2022 07:39:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345291AbiAKWE1 convert rfc822-to-8bit (ORCPT
+        id S1348472AbiALHjZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Jan 2022 17:04:27 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:45194 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245547AbiAKWE1 (ORCPT
+        Wed, 12 Jan 2022 02:39:25 -0500
+Received: from mailgw01.mediatek.com ([60.244.123.138]:33298 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1344426AbiALHjY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Jan 2022 17:04:27 -0500
-Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 26819CECD0;
-        Tue, 11 Jan 2022 23:04:25 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [BUG] Slow bluetooth speed on Apple MacBook Pro 16,1
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211228055353.1b4c09e9@localhost>
-Date:   Tue, 11 Jan 2022 23:04:24 +0100
-Cc:     Aditya Garg <gargaditya08@live.com>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "admin@kodeit.net" <admin@kodeit.net>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <512C8B97-C830-4561-BA66-9581F84D7BB3@holtmann.org>
-References: <3352A23E-EA42-4366-BBAA-459CEAE6F51B@live.com>
- <20211228055353.1b4c09e9@localhost>
-To:     Orlando Chamberlain <redecorating@protonmail.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Wed, 12 Jan 2022 02:39:24 -0500
+X-UUID: b93436c9d1cf4de88a6d9ae0a0618db1-20220112
+X-UUID: b93436c9d1cf4de88a6d9ae0a0618db1-20220112
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1273416240; Wed, 12 Jan 2022 15:39:22 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Wed, 12 Jan 2022 15:39:20 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 12 Jan
+ 2022 15:39:20 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 12 Jan 2022 15:39:19 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
+        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
+        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <jemele@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Mark Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH 1/7] Bluetooth: mt7921s: fix firmware coredump retrieve
+Date:   Wed, 12 Jan 2022 15:39:11 +0800
+Message-ID: <bddfacd096b6fe927d08e48ad6993c17c9954028.1641972745.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
+MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Orlando,
+From: Mark Chen <mark-yw.chen@mediatek.com>
 
->> The file transfer speed on MacBook Pro 16,1 from an Android device to
->> Mac is too slow even if I transfer a file of a few Kbs. In case of a
->> transfer from Mac to my Android device, it simply fails.
->> 
->> Some logs that might be helpful :-
->> 
->> -- Logs begin at Fri 2021-11-26 21:34:04 IST, end at Tue 2021-12-28 08:38:16 IST. --
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: Core ver 2.22
->> Dec 28 08:28:29 MacBook kernel: NET: Registered PF_BLUETOOTH protocol family
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI device and connection manager initialized
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI socket layer initialized
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: L2CAP socket layer initialized
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: SCO socket layer initialized
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART driver ver 2.3
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol H4 registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol BCSP registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol LL registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol ATH3K registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Three-wire (H5) registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Intel registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Broadcom registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol QCA registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol AG6XX registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: HCI UART protocol Marvell registered
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: hci0: BCM: failed to write update baudrate (-16)
->> Dec 28 08:28:29 MacBook kernel: Bluetooth: hci0: Failed to set baudrate
-> 
-> When it fails to set baud rate, btmon has the following:
-> 
-> < HCI Command: Broadcom Update UART Baud Rate (0x3f|0x0018) plen 6 
->        Encoded baud rate: Not used (0x0000)
->        Explicit baud rate: 3000000 Mbps
->> HCI Event: Command Complete (0x0e) plen 4                        
->      Broadcom Update UART Baud Rate (0x3f|0x0018) ncmd 1
->        Status: Command Disallowed (0x0c)
-> 
-> Not sure if this means the command is unsupported by this chip, or if an "Encoded
-> baud rate" needs to be specified.
+According to the MCU firmware behavior, as the driver is aware of the
+notification of the interrupt source FW_MAILBOX_INT that shows the MCU
+completed delivered a core dump piece to the host, the driver must
+acknowledge the MCU with the register PH2DSM0R bit PH2DSM0R_DRIVER_OWN
+to notify the MCU to handle the next core dump piece.
 
-I think that I remember that the to be used baud rate is inside ACPI and that the Broadcom chip inside the MacBooks don’t support baud rate change and just start out at the appropriate rate in the first place. Then again, I don’t have a MacBook running Linux and thus can verify this.
+Fixes: db57b625912a ("Bluetooth: btmtksdio: add support of processing firmware coredump and log")
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+---
+ drivers/bluetooth/btmtksdio.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Actually I would start by dumping the ACPI tables and see if the resources for the UART are listed correctly.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 25fb9c79b1f4..784e65c3fddd 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -87,8 +87,12 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
+ #define RX_DONE_INT		BIT(1)
+ #define TX_EMPTY		BIT(2)
+ #define TX_FIFO_OVERFLOW	BIT(8)
++#define FW_MAILBOX_INT		BIT(15)
+ #define RX_PKT_LEN		GENMASK(31, 16)
+ 
++#define MTK_REG_PH2DSM0R	0xc4
++#define PH2DSM0R_DRIVER_OWN	BIT(0)
++
+ #define MTK_REG_CTDR		0x18
+ 
+ #define MTK_REG_CRDR		0x1c
+@@ -481,6 +485,12 @@ static void btmtksdio_txrx_work(struct work_struct *work)
+ 		 */
+ 		sdio_writel(bdev->func, int_status, MTK_REG_CHISR, NULL);
+ 
++		if ((int_status & FW_MAILBOX_INT) &&
++		    bdev->data->chipid == 0x7921) {
++			sdio_writel(bdev->func, PH2DSM0R_DRIVER_OWN,
++				    MTK_REG_PH2DSM0R, 0);
++		}
++
+ 		if (int_status & FW_OWN_BACK_INT)
+ 			bt_dev_dbg(bdev->hdev, "Get fw own back");
+ 
+-- 
+2.25.1
 
