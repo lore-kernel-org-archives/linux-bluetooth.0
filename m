@@ -2,79 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 992A3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 16:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E75AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 20:46:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236813AbiAMQlY (ORCPT
+        id S234597AbiAMUqz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jan 2022 11:41:24 -0500
-Received: from giacobini.uberspace.de ([185.26.156.129]:34840 "EHLO
-        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232248AbiAMQlX (ORCPT
+        Thu, 13 Jan 2022 15:46:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230515AbiAMUqz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jan 2022 11:41:23 -0500
-Received: (qmail 25316 invoked by uid 990); 13 Jan 2022 16:41:22 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-From:   Soenke Huster <soenke.huster@eknoes.de>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Soenke Huster <soenke.huster@eknoes.de>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: fix null ptr deref on hci_sync_conn_complete_evt
-Date:   Thu, 13 Jan 2022 17:40:42 +0100
-Message-Id: <20220113164042.259990-1-soenke.huster@eknoes.de>
-X-Mailer: git-send-email 2.34.1
+        Thu, 13 Jan 2022 15:46:55 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182D5C061574;
+        Thu, 13 Jan 2022 12:46:55 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id 66so3575867ybf.4;
+        Thu, 13 Jan 2022 12:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tc4bxrdsSda67cQFkrLy1YQGDEwzONREQeowDYF99lg=;
+        b=MeYw7As0Uuxhnn4BTl5ziXrnvOGnueayzjx+JgreS+F52AGzWmnC/Nab14WQjBkA4s
+         aMZKV2jVn9yOGUmjS4yic+HKdijStb/tEwpE2rxLPqvCdhe703O2sF6cNeZYfI5y4v2S
+         xMDws6mlLB57/0uNJf0zyj+XSUCCRcmfiNGufny0SGcQkURzxqXyXu9uZsPiJ8iP1AZG
+         zPtZVJNzrNiYDXqhCbuwClj05HOoTrGolFLWIAXyyQIMcWvLXY/UhsXEux81meSAsyWC
+         105QtUdrC7eYMUSGF4fdQQ1ZjhFdnY7AoUTTAn5uzlVJUw21QaNP9qzekRZd/h8HcNjq
+         uW0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tc4bxrdsSda67cQFkrLy1YQGDEwzONREQeowDYF99lg=;
+        b=ZdkAu2DsI/9AS0IMF8Vl5IQ4rGvggOMfYrG8EMUCoh9DWTgZIn5OADrCoii7qvrw8Y
+         vEsnB9NSLTUXgh7rzSMFmY66f29wYpPMAQJfLKwVcmkF2lX+DVwzPZJ6nCBysLgreLr2
+         jgRjvcJJhs7viebfRF9E1UkSIzFsCqy6yQ3YzyTrVipR9cHMvOkSMfD7e4YIJLYpUGcr
+         w492wbXE4sMEuBIQNkH8SB0evJrUmQkaTq0MesbtEibeTYMoW222tyxMwGqPneIuBETT
+         eWk94HHkIdhGxkp315KUwfE0VvGAuu2SDf+wHKD63b9/+SRpsPzJNKKkUbgK7Tqt6v2+
+         5zjw==
+X-Gm-Message-State: AOAM530UFdCjkMX5qAbzI4tfgw2sih/iR0APWF6UojQFZ8kWYr6msE2J
+        RPI5JdF0HTUskQtW73gOU+eFIkF3Vf6kfqeSPPo=
+X-Google-Smtp-Source: ABdhPJz7n3P1HjlOjdK6te/OAZBRlVgx79lCGxCc8EuDaPN9aWmq87rw+LLwg/K6AGBBtGBiCFmRU4mZxAurLwfhP3k=
+X-Received: by 2002:a25:7287:: with SMTP id n129mr8260040ybc.351.1642106814153;
+ Thu, 13 Jan 2022 12:46:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: ++
-X-Rspamd-Report: BAYES_HAM(-0.045106) R_MISSING_CHARSET(0.5) MIME_GOOD(-0.1) MID_CONTAINS_FROM(1) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: 2.854893
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Thu, 13 Jan 2022 17:41:22 +0100
+References: <20220113164042.259990-1-soenke.huster@eknoes.de>
+In-Reply-To: <20220113164042.259990-1-soenke.huster@eknoes.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 13 Jan 2022 12:46:43 -0800
+Message-ID: <CABBYNZ+5XxOAEBKXZ1va-G6WNYAL_NQ0Fw3JLckB4zP7wgT3xA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: fix null ptr deref on hci_sync_conn_complete_evt
+To:     Soenke Huster <soenke.huster@eknoes.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This event is specified just for SCO and eSCO link types.
-On the reception of a HCI_Synchronous_Connection_Complete for a BDADDR
-of an existing LE connection, LE link type and a status that triggers the
-second case of the packet processing a NULL pointer dereference happens,
-as conn->link is NULL.
+Hi Soenke,
 
-Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
----
-v2: Fixed the obviously wrong boolean comparison
+On Thu, Jan 13, 2022 at 8:41 AM Soenke Huster <soenke.huster@eknoes.de> wrote:
+>
+> This event is specified just for SCO and eSCO link types.
+> On the reception of a HCI_Synchronous_Connection_Complete for a BDADDR
+> of an existing LE connection, LE link type and a status that triggers the
+> second case of the packet processing a NULL pointer dereference happens,
+> as conn->link is NULL.
+>
+> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+> ---
+> v2: Fixed the obviously wrong boolean comparison
+>
+> I found this null pointer dereference while fuzzing bluetooth-next.
+> On the described behaviour, a null ptr deref in line 4723 happens, as
+> conn->link is NULL. According to the Core spec, Link_Type must be SCO or eSCO,
+> all other values are reserved for future use. Checking that mitigates a null
+> pointer dereference.
+>
+>  net/bluetooth/hci_event.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 05997dff5666..d68f5640fb38 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4661,6 +4661,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+>         struct hci_ev_sync_conn_complete *ev = data;
+>         struct hci_conn *conn;
+>
+> +       if (!(ev->link_type == SCO_LINK || ev->link_type == ESCO_LINK)) {
+> +               bt_dev_err(hdev, "Ignoring connect complete event for invalid link type");
+> +               return;
+> +       }
 
-I found this null pointer dereference while fuzzing bluetooth-next.
-On the described behaviour, a null ptr deref in line 4723 happens, as
-conn->link is NULL. According to the Core spec, Link_Type must be SCO or eSCO,
-all other values are reserved for future use. Checking that mitigates a null
-pointer dereference.
+I rather have this as a switch statement:
 
- net/bluetooth/hci_event.c | 5 +++++
- 1 file changed, 5 insertions(+)
+switch (ev->link_type)
+case SCO_LINK:
+case ESCO_LINK:
+  break;
+default:
+  /* Add comment where the spec states this is invalid */
+  bt_dev_err(hdev, "Ignoring connect complete event for invalid link type");
+  return;
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 05997dff5666..d68f5640fb38 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4661,6 +4661,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	struct hci_ev_sync_conn_complete *ev = data;
- 	struct hci_conn *conn;
- 
-+	if (!(ev->link_type == SCO_LINK || ev->link_type == ESCO_LINK)) {
-+		bt_dev_err(hdev, "Ignoring connect complete event for invalid link type");
-+		return;
-+	}
-+
- 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
- 
- 	hci_dev_lock(hdev);
+>         bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+>
+>         hci_dev_lock(hdev);
+> --
+> 2.34.1
+>
+
+
 -- 
-2.34.1
-
+Luiz Augusto von Dentz
