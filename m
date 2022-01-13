@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F87C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 21:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B83C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 21:37:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235195AbiAMVha (ORCPT
+        id S235232AbiAMVhr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jan 2022 16:37:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48738 "EHLO
+        Thu, 13 Jan 2022 16:37:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232075AbiAMVh1 (ORCPT
+        with ESMTP id S235208AbiAMVhq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jan 2022 16:37:27 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB519C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 13:37:26 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id 66so3922635ybf.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 13:37:26 -0800 (PST)
+        Thu, 13 Jan 2022 16:37:46 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62570C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 13:37:46 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id g81so18839234ybg.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 13:37:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=y3B5u7z9sSBKkzmNePwagQHagBzD1ynztbveNLX4W34=;
-        b=GBP1Cc4/14lbOVjh3Cz/bszbNqlc234Bywi9ZLN2f9Wb2uB+SuIthlIzaM2Gb7Bdef
-         p/ZIdOjv3x3tiDD3XNnxVtgU3PHEqoZO/FwqKoIz+Dcu0aQvR+sBuClp8uO9O9Y9CJ6Z
-         2t23qG0KNQAumCVnDyz1iEIElNo7dqJoTbZGQmOsu86Ywnftfe9c7qkymj09dxf+SHyQ
-         OSrvysVarFYFltEWoLNyeDXZkyHY3ZHDYSX0JwemgZpQjsy6Zcad75HR923C+bpoFCYo
-         6T/dm00r4E/VZ+f+t4Vqh/MvG9SVz/K7yau80tQwUY8J7134hpa3GE/xVsK7Thm+1yG0
-         VdmA==
+        bh=+ZPNWrFZZ5UrpZSSEELfOFllKSxfvPN4z2wi6CuOD6w=;
+        b=DsakU/EPLM4xpLFoDP7wy2icIKb6ptl9R2VXY3tsepg/MhFOtmVa9UXJ0CzaKyX5Qm
+         aP1Ph/l7ullNmvSqvxF724V+uTA8TV7s3SCyhXuYvyKeU0uFtjoWtJKJctAvYiiGiTma
+         C48vH+audX8jjGwelXGMq7ciAzQF6PzMQZO2dFB022TSscJRokHTBu4MX7yeB3PjmFRg
+         UCVIOqHZJIe1twjn9PazFwKA1Sz/1tTKrjx7H6X7N8O/+CSDF9CEqL3u00P2uwlJRZ5W
+         MoVnsdti1PmESXIDRF+cT7/VpNZD5m370MvTQakPD20b9hiKiAWgkrrIuBe7+tFX6Kh5
+         CkNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to;
-        bh=y3B5u7z9sSBKkzmNePwagQHagBzD1ynztbveNLX4W34=;
-        b=t/u+Dd/EOtArTtY7xXHi6ScDjGg84RMkq4cGet56R/fGTA89Xxhx6cHWeYwaZMC4Sr
-         IBZtwt84MQI5PD34RyQs9xeIjTrXVFhIhoVVHDCIkFa/nlfAc/53fvP2xyIY7gBxkVUJ
-         zwBnPLID4pH3dHXN/DRn9EPHTLa0/oa+tM639YUyRDpKFVNCYNgcIeZZPrqtC5Cd5aYa
-         ANWxKImRoRsMBXS4CRXjgAAXksYAUGe+wpuczaufOg5/WUSTUd2slDLbyz4PD4YbPS2V
-         LM+44X1v6EDsrAGS2LuCSVmT0wZyxlrV0av/iRL54wPeUzX/p+CcrBSZqq7GfV40cesm
-         oP5g==
-X-Gm-Message-State: AOAM5338CoaLemk6QqISMpU0wO4AbO6UK5MUPzuI9Vwd6+szHdzhsGqX
-        YdSDlKUshXEvdZYFGZV+3A3hC52dlC+8A12rBsTbm8f+
-X-Google-Smtp-Source: ABdhPJxPQYO+8/W3OMr736BF2f3PtFFrm/KXdlZnRqOtqUSZKOIPahle19iK6VSOcv86Nb80M2GsSZowLjmQ6ijgfk4=
-X-Received: by 2002:a25:bd8d:: with SMTP id f13mr2716313ybh.573.1642109845949;
- Thu, 13 Jan 2022 13:37:25 -0800 (PST)
+        bh=+ZPNWrFZZ5UrpZSSEELfOFllKSxfvPN4z2wi6CuOD6w=;
+        b=6HVdWUr/hvrxdyiw2T9w5QL+Z/DrUNodzb0L389T/z2vNFSah37yVdolIdZ/TBtsIJ
+         xNF/xtOitA6xKjv90MocwAzOU+3VEmpUkBUF4YlatQJVhuAANFFDGWl1PQI/QHLnNf5F
+         1cvpJ0H6Znd+VZuSGj4o0ieXIVC5y6CdN+anK6rWfR64JtNHBeCI/7nchviqd5paNVkp
+         dq/n+757KX3eclsuE6Zxrs4EvRNn/7wUqbcytE8osEe2A4nyX+xrmISYnUmf1ryc+09T
+         KiCjRR1CvJ4+jf91iQV/USrUmJZQjFsgBMBckl4hhRrWvI5Pf06n/iKIX5sEAASS8kdh
+         Du+g==
+X-Gm-Message-State: AOAM53375P6ZcaGEaHv+Oa2o8i5HuUo0H6nltkiBgkCWNKbHTGSiJX8C
+        NwiA1beZySvuAwUxh24AH8M1CMzD9cCdrQbPNSszZo2a
+X-Google-Smtp-Source: ABdhPJxtsBdUCx6DLgTwYHMW5DseyccNQb8hedfaWxnXkbj7qPXom0JPcBL7ZljjYG31OApztCSAbxFMbBC1U0Iss+I=
+X-Received: by 2002:a25:c41:: with SMTP id 62mr8729680ybm.284.1642109865413;
+ Thu, 13 Jan 2022 13:37:45 -0800 (PST)
 MIME-Version: 1.0
-References: <20220112224842.519814-1-luiz.dentz@gmail.com> <61dfa05b.1c69fb81.f4256.34dd@mx.google.com>
-In-Reply-To: <61dfa05b.1c69fb81.f4256.34dd@mx.google.com>
+References: <20220112153529.338208-1-luiz.dentz@gmail.com> <61df08b7.1c69fb81.22f6c.1c7f@mx.google.com>
+In-Reply-To: <61df08b7.1c69fb81.22f6c.1c7f@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 13 Jan 2022 13:37:15 -0800
-Message-ID: <CABBYNZJz02QHR+E4uNPbCO9o8scJz_o6xtUHbF4VjLuwwL82GQ@mail.gmail.com>
-Subject: Re: [v2,1/2] hog: Fix read order of attributes
+Date:   Thu, 13 Jan 2022 13:37:34 -0800
+Message-ID: <CABBYNZKCJFud7mK88zFdKiZzN1gRUnQfJz=ScbVsrtDVoKuwEg@mail.gmail.com>
+Subject: Re: [BlueZ] media: Fix crash when endpoint replies with an error to SetConfiguration
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -59,7 +59,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Wed, Jan 12, 2022 at 7:45 PM <bluez.test.bot@gmail.com> wrote:
+On Wed, Jan 12, 2022 at 8:58 AM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -67,23 +67,23 @@ On Wed, Jan 12, 2022 at 7:45 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=605008
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=604907
 >
 > ---Test result---
 >
 > Test Summary:
-> CheckPatch                    PASS      1.65 seconds
-> GitLint                       PASS      0.74 seconds
-> Prep - Setup ELL              PASS      50.27 seconds
-> Build - Prep                  PASS      0.56 seconds
-> Build - Configure             PASS      10.06 seconds
-> Build - Make                  PASS      1882.33 seconds
-> Make Check                    PASS      13.16 seconds
-> Make Check w/Valgrind         PASS      563.83 seconds
-> Make Distcheck                PASS      292.14 seconds
-> Build w/ext ELL - Configure   PASS      10.16 seconds
-> Build w/ext ELL - Make        PASS      1806.94 seconds
-> Incremental Build with patchesPASS      3736.08 seconds
+> CheckPatch                    PASS      1.44 seconds
+> GitLint                       PASS      1.00 seconds
+> Prep - Setup ELL              PASS      40.83 seconds
+> Build - Prep                  PASS      0.70 seconds
+> Build - Configure             PASS      8.44 seconds
+> Build - Make                  PASS      1376.47 seconds
+> Make Check                    PASS      11.17 seconds
+> Make Check w/Valgrind         PASS      431.65 seconds
+> Make Distcheck                PASS      225.72 seconds
+> Build w/ext ELL - Configure   PASS      8.40 seconds
+> Build w/ext ELL - Make        PASS      1364.92 seconds
+> Incremental Build with patchesPASS      0.00 seconds
 >
 >
 >
