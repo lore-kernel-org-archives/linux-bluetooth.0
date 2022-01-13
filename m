@@ -2,179 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8664FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 22:07:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6159DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 22:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236721AbiAMWHU (ORCPT
+        id S237230AbiAMWSF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jan 2022 17:07:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55406 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232985AbiAMWHT (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jan 2022 17:07:19 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B81DC06161C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 14:07:19 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id n19-20020a7bc5d3000000b003466ef16375so6265550wmk.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 14:07:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3tOErErxThmjD0xxBLw7b3ck6IAyCGXM1dn0Rqm8J7Y=;
-        b=yx0rgwkdo3vd7lOgsPs9UiDKqHk6waAbRBsOmbZJS3yNS3sesXofyG5f+XNun78WFh
-         /P1ZHMoRashsJOl3O68YqHwA2HYCY23/m3ksGTBFkkcGaiV1HLcDTMS/rOqfZOY4lvpR
-         uXuxDKL0K3vVLcipeyGwM0B6QFhDj5B4HV/SRcvfQr1JsUuYjxeCXYQhwLc+URDqRY8F
-         K8xIDQylz+0VhLklaLmAmH8MgsWp8YqJFGwE7TrhBkHi7hROaa+OWUDqw8m6brDsJX4M
-         Q/7Liz2bUsWq9r7gSsNm00LUtGALuMAirHGzCn44C9A6emSMn1659nkhUta+NvPZpZVi
-         wNzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3tOErErxThmjD0xxBLw7b3ck6IAyCGXM1dn0Rqm8J7Y=;
-        b=hgJ2ai1JCF7l8cT8uMWCcL/diADOFmWJyy5aVAD2v9GyF0sqUYB9qKYzYYnbEDSOEu
-         mB+JqPP+9sjasFn/gw4oQVz8YTzjFotpoRWEQM7uy3FXN4L01eFJSC65mQRJrG0r1E4T
-         jggkfA2tmhIJo+Js+dRHo0UtTnJGJ0h9VK3DLoq97l54hqET6GXT9D2qPPcfxel6KD8f
-         xhd2gQZTXmkPYPWVC19HK8AXmOx9s+nhpDoDz4FmqjMOWjUL/hqS4TecQl/ZUjulSBCi
-         WRfuOe4YFV8GfNdhUlK0j7nj9wp/f+9m3diVT9CghnJrNYI9bTdCSRmAIVZHQziZanYY
-         vMng==
-X-Gm-Message-State: AOAM532Ihq8rX6kGI8Q6A5tjOmWv74fmuLxzUata2jPiPBhIpRJJ/llc
-        2S7m/2FKsay7Fc7Iyyp7oi999W+dee1V+SvxNV00Pg==
-X-Google-Smtp-Source: ABdhPJzZVWPUnsC++hqhfhHWCK1QSKdmUSdMmH/91YNlGcRneDSNc3ECfDvSUnknZPIFlzzT/OAJipmH23zkX2eSMeg=
-X-Received: by 2002:a7b:c142:: with SMTP id z2mr5464787wmi.167.1642111637971;
- Thu, 13 Jan 2022 14:07:17 -0800 (PST)
+        Thu, 13 Jan 2022 17:18:05 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:42653 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231331AbiAMWSF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 13 Jan 2022 17:18:05 -0500
+Received: from [192.168.0.2] (ip5f5aea9b.dynamic.kabel-deutschland.de [95.90.234.155])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 22B3661EA1925
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Jan 2022 23:18:03 +0100 (CET)
+Message-ID: <331ae35c-7d48-46fc-c4ae-1e60cb0f3378@molgen.mpg.de>
+Date:   Thu, 13 Jan 2022 23:18:02 +0100
 MIME-Version: 1.0
-References: <20220113150846.1570738-1-rad@semihalf.ocm> <CABBYNZJn1ej18ERtgnF_wvbvBEm0N=cBRHHtr8bu+nfAotjg2Q@mail.gmail.com>
-In-Reply-To: <CABBYNZJn1ej18ERtgnF_wvbvBEm0N=cBRHHtr8bu+nfAotjg2Q@mail.gmail.com>
-From:   =?UTF-8?Q?Rados=C5=82aw_Biernacki?= <rad@semihalf.com>
-Date:   Thu, 13 Jan 2022 23:07:02 +0100
-Message-ID: <CAOs-w0+W_BHTdZkOnu-EPme2dpoO_6bQi_2LRH7Xw0Ge=i9TOA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix skb allocation in mgmt_remote_name()
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        upstream@semihalf.com, Angela Czubak <acz@semihalf.com>,
-        Marek Maslanka <mm@semihalf.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+Subject: Pass through USB Bluetooth wireless interface to QEMU
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Dear Linux folks,
 
-czw., 13 sty 2022 o 17:17 Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> napisa=C5=82(a):
->
-> Hi Radoslaw,
->
-> On Thu, Jan 13, 2022 at 7:09 AM Radoslaw Biernacki <rad@semihalf.com> wro=
-te:
-> >
-> > From: Radoslaw Biernacki <rad@semihalf.com>
-> >
-> > This patch fixes skb allocation, as lack of space for ev might push skb
-> > tail beyond its end.
-> > Also introduce eir_precalc_len() that can be used instead of magic
-> > numbers for similar eir operations on skb.
-> >
-> > Fixes: cf1bce1de7eeb ("Bluetooth: mgmt: Make use of mgmt_send_event_skb=
- in MGMT_EV_DEVICE_FOUND")
-> > Signed-off-by: Angela Czubak <acz@semihalf.com>
-> > Signed-off-by: Marek Maslanka <mm@semihalf.com>
-> > Signed-off-by: Radoslaw Biernacki <rad@semihalf.com>
-> > ---
-> >  net/bluetooth/eir.h  |  5 +++++
-> >  net/bluetooth/mgmt.c | 12 ++++--------
-> >  2 files changed, 9 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
-> > index 05e2e917fc25..e5876751f07e 100644
-> > --- a/net/bluetooth/eir.h
-> > +++ b/net/bluetooth/eir.h
-> > @@ -15,6 +15,11 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 inst=
-ance, u8 *ptr);
-> >  u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
-> >  u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
-> >
-> > +static inline u16 eir_precalc_len(u8 data_len)
-> > +{
-> > +       return sizeof(u8) * 2 + data_len;
-> > +}
-> > +
-> >  static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type,
-> >                                   u8 *data, u8 data_len)
-> >  {
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index 37087cf7dc5a..d517fd847730 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -9680,13 +9680,11 @@ void mgmt_remote_name(struct hci_dev *hdev, bda=
-ddr_t *bdaddr, u8 link_type,
-> >  {
-> >         struct sk_buff *skb;
-> >         struct mgmt_ev_device_found *ev;
-> > -       u16 eir_len;
-> > -       u32 flags;
-> > +       u16 eir_len =3D 0;
-> > +       u32 flags =3D 0;
-> >
-> > -       if (name_len)
-> > -               skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND, 2 + =
-name_len);
-> > -       else
-> > -               skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND, 0);
-> > +       skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND,
-> > +                            sizeof(*ev) + (name ? eir_precalc_len(name=
-_len) : 0));
->
-> Looks like mgmt_device_connected also has a similar problem.
 
-Yes, I was planning to send a patch to this one though it will not be as sl=
-ick.
-It would be nice to have a helper which will call skb_put() and add
-eir data at once.
-Basically skb operation in pair to, what eir_append_data() does with
-help of eir_len but without awkwardness when passing return value to
-skb_put() (as it returns offset not size).
-I will send V2 with two patches. I hope they will align with your
-original goal of eliminating the necessity of intermediary buffers at
-some point in future.
+To debug the issue with file transfers to the Nokia N9 [1], I would like 
+to pass through the USB Bluetooth wireless to QEMU.
 
->
-> >         ev =3D skb_put(skb, sizeof(*ev));
-> >         bacpy(&ev->addr.bdaddr, bdaddr);
-> > @@ -9696,10 +9694,8 @@ void mgmt_remote_name(struct hci_dev *hdev, bdad=
-dr_t *bdaddr, u8 link_type,
-> >         if (name) {
-> >                 eir_len =3D eir_append_data(ev->eir, 0, EIR_NAME_COMPLE=
-TE, name,
-> >                                           name_len);
-> > -               flags =3D 0;
-> >                 skb_put(skb, eir_len);
-> >         } else {
-> > -               eir_len =3D 0;
-> >                 flags =3D MGMT_DEV_FOUND_NAME_REQUEST_FAILED;
-> >         }
->
-> These changes would leave flags and eir_len uninitialized.
+     $ lsusb
+     Bus 001 Device 004: ID 1bcf:28ae Sunplus Innovation Technology Inc. 
+Laptop Integrated Webcam HD
+     Bus 001 Device 003: ID 8087:0a2a Intel Corp. Bluetooth wireless 
+interface
+     Bus 001 Device 002: ID 8087:8001 Intel Corp. Integrated Hub
+     Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+     Bus 003 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+     Bus 002 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+     $ ls -ld /dev/bus/usb/001/003
+     crw-rw-rw- 1 root root 189, 2 13. Jan 23:05 /dev/bus/usb/001/003
 
-Both are initialized to 0 by this patch.
+Then following Leif’s article *QEMU USB host device pass-through* [1], I run
 
->
-> > --
-> > 2.34.1.703.g22d0c6ccf7-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+     $ qemu-system-x86_64 -version
+     QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-1)
+     Copyright (c) 2003-2021 Fabrice Bellard and the QEMU Project developers
+     $ sudo qemu-system-x86_64 -cpu host -m 2G -enable-kvm -usb -device 
+usb-host,vendorid=0x8087,productid=0x0a2a -hda /dev/shm/debian-64.img 
+-net nic -net user,hostfwd=tcp::22223-:22
+
+(`-device usb-host,hostbus=1,hostport=3` did *not* work for me.)
+
+In QEMU with *linux-image-5.15.0-2-amd64* 5.15.5-2 and *bluez* 5.62-2 
+the device is now detected, but bluetoothctl does not detect the 
+controller. (Starting QEMU as root does not make a difference.)
+
+     # lsusb
+     Bus 001 Device 002: ID 8087:0a2a Intel Corp. Bluetooth wireless 
+interface
+     Bus 001 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+     # lsusb -t
+     /:  Bus 01.Port 1: Dev 1, Class=root_hub, Driver=uhci_hcd/2p, 12M
+         |__ Port 1: Dev 2, If 0, Class=Wireless, Driver=btusb, 12M
+         |__ Port 1: Dev 2, If 1, Class=Wireless, Driver=btusb, 12M
+
+     # bluetoothctl
+     Agent registered
+     [bluetooth]# list
+     [bluetooth]#
+
+     # systemctl status bluetooth
+     ● bluetooth.service - Bluetooth service
+          Loaded: loaded (/lib/systemd/system/bluetooth.service; 
+enabled; vendor preset: enabled)
+          Active: active (running) since Thu 2022-01-13 23:05:25 CET; 
+6min ago
+            Docs: man:bluetoothd(8)
+        Main PID: 400 (bluetoothd)
+          Status: "Running"
+           Tasks: 1 (limit: 2326)
+          Memory: 4.4M
+             CPU: 24ms
+          CGroup: /system.slice/bluetooth.service
+                  └─400 /usr/libexec/bluetooth/bluetoothd
+
+     Jan 13 23:05:25 qemu systemd[1]: Starting Bluetooth service...
+     Jan 13 23:05:25 qemu bluetoothd[400]: Bluetooth daemon 5.62
+     Jan 13 23:05:25 qemu systemd[1]: Started Bluetooth service.
+     Jan 13 23:05:25 qemu bluetoothd[400]: Starting SDP server
+     Jan 13 23:05:25 qemu bluetoothd[400]: Bluetooth management 
+interface 1.21 initialized
+
+Linux in QEMU logs:
+
+
+     # dmesg | grep -e Bluetooth -e hci0
+     [    4.385414] Bluetooth: Core ver 2.22
+     [    4.385453] Bluetooth: HCI device and connection manager initialized
+     [    4.385741] Bluetooth: HCI socket layer initialized
+     [    4.385744] Bluetooth: L2CAP socket layer initialized
+     [    4.385751] Bluetooth: SCO socket layer initialized
+     [    4.593802] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+     [    4.593806] Bluetooth: BNEP filters: protocol multicast
+     [    4.593809] Bluetooth: BNEP socket layer initialized
+     [    6.544261] Bluetooth: hci0: Reading Intel version command 
+failed (-110)
+     [    6.544310] Bluetooth: hci0: command tx timeout
+
+The firmware is installed:
+
+     # ls /lib/firmware/intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+     /lib/firmware/intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+
+Do you have an idea, how to get it working?
+
+
+Kind regards,
+
+Paul
