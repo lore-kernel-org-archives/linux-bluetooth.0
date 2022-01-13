@@ -2,205 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 981B1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 11:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F500C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Jan 2022 13:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234135AbiAMLTr (ORCPT
+        id S235126AbiAMN1P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Jan 2022 06:19:47 -0500
-Received: from mga14.intel.com ([192.55.52.115]:58294 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230186AbiAMLTq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Jan 2022 06:19:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642072786; x=1673608786;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pRgmaFZdx1iF9wxe8qkBP1Iuotlet3LzEj6TNNGy/xM=;
-  b=CJ15zpgxtq4r4p2zqEMNgGAPU7p/YQ7jOW18XXeXGJKSGUXPm3rMXCG2
-   aE2qL0UKIUYFPCrm4LyGs61aviyyybwj34CHZCASpGNanzB1EME6n7RGn
-   CdZiFIwddKMm0JvuhmaAqY+GYm7LpUVpfW647QeM+dcv4zSxoKVbzeq44
-   1e/sidGOF3mmWBHZd5+2uW0UcT9XTQlxn2JW9vHxinM2xFbhtChGvl4Pe
-   JmMm9R4iBq50qIerFXSvSkI6tiissqdSWujwOntbhdQPRfGasapORVHLT
-   NhlsGjkpRcLNCK7wxiJH9fJD8i6g4UJ4WWdqDIj0o3KXI2tO8LH91KQ7x
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10225"; a="244192593"
-X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="244192593"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Jan 2022 03:19:43 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,284,1635231600"; 
-   d="scan'208";a="613921729"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 13 Jan 2022 03:19:41 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1n7y8r-00077l-6G; Thu, 13 Jan 2022 11:19:41 +0000
-Date:   Thu, 13 Jan 2022 19:18:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- c07ba878ca199a6089cdb323bf526adbeeb4201f
-Message-ID: <61e00aa1.MHik+XsdlA9IzU2l%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 13 Jan 2022 08:27:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49876 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229534AbiAMN1P (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 13 Jan 2022 08:27:15 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC88EC06173F;
+        Thu, 13 Jan 2022 05:27:14 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id x22so19361461lfd.10;
+        Thu, 13 Jan 2022 05:27:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=G72ZDsNgZpbxHJadsjYOpB+FuUHajnp+ihIWoz3Zf7k=;
+        b=fsF2iaPxk6cXPdIJJNtjHoUWgG22LpQspTstEjGJSoo/KxQwWNLpIFYiTsGi24gmFk
+         Wjx2JxC/zQZ1tit5p0pPr1dhn3otpuuqCavM0C/KVvgQAZNVTOZOyoJ2D7NcSz9ejXnk
+         UrbqB1XBObkBYX0kxwF1W8JdKN6HoHicXOPt6IHNuKEmHNo7v2hVO5UOLr4r7gsxCLvV
+         JlKgh3t9bZ4wnNLIsTGC3LIUNS0F40KH/O3etUT7azgI0hX/9aHf9KSIoRN7VGcy0+x8
+         jn9LJ5+04A2CelKckZGIHmwjiqhOgJC1Uilcu4Tvz9v3lgf45nUszw1HxbfdxmKJz9PG
+         AFYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=G72ZDsNgZpbxHJadsjYOpB+FuUHajnp+ihIWoz3Zf7k=;
+        b=Rss5aUUASV4XwQXo6kojNU5fUnwb6eq1YQz7Wt/HiyePsHl3mkhuJwg9NKcLpgLpTz
+         h3HvgsJo0Q5sTBH1exC2kKKyyNpD5T+uI23miWq4KKoJgZsrdolDQ6QuPNdKce+CPM4m
+         e3PHQxlWUZ11J8H3dZCRrj0sDyWOtrarzgSicVjqqJDyvrD0FOxNehpqFNJJgk8l9+Ee
+         wdl9ffUhgm1M4Krlxfc9IuwaCKvWi+YVLM4VhQdTJAYgvBhp3HrPGj/YHEX2NsazwWyO
+         EPm5CYDZRkAbpOG/lhx2c8qMDJyNEPDyX23JtWfK0zw1maC/5SzDN4RK4RbiacK+ex9H
+         5wag==
+X-Gm-Message-State: AOAM531ki9P3OmnGgOd03CfgwNHu+/LpjZV2u8dKs6gUBwCsDzMDE9LV
+        fxmRL7vDanjZoiM/4tgr5s8=
+X-Google-Smtp-Source: ABdhPJy62I8/4CY0JCMHFdEmot2tO5odHLO82mfhXJ5VDMK3ffOrqBI7GKkTXmTzSayP+nyE+lPHog==
+X-Received: by 2002:a05:651c:2059:: with SMTP id t25mr3001801ljo.427.1642080433041;
+        Thu, 13 Jan 2022 05:27:13 -0800 (PST)
+Received: from localhost.localdomain ([217.117.245.67])
+        by smtp.gmail.com with ESMTPSA id e4sm267609ljj.97.2022.01.13.05.27.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Jan 2022 05:27:12 -0800 (PST)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        lukas@wunner.de
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        Yiru Xu <xyru1999@gmail.com>
+Subject: [PATCH] Bluetooth: hci_serdev: call init_rwsem() before p->open()
+Date:   Thu, 13 Jan 2022 16:27:04 +0300
+Message-Id: <20220113132704.4354-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: c07ba878ca199a6089cdb323bf526adbeeb4201f  Bluetooth: hci_sync: unlock on error in hci_inquiry_result_with_rssi_evt()
+kvartet reported, that hci_uart_tx_wakeup() uses uninitialized rwsem.
+The problem was in wrong place for percpu_init_rwsem() call.
 
-elapsed time: 731m
+hci_uart_proto::open() may register a timer whose callback may call
+hci_uart_tx_wakeup(). There is a chance, that hci_uart_register_device()
+thread won't be fast enough to call percpu_init_rwsem().
 
-configs tested: 131
-configs skipped: 3
+Fix it my moving percpu_init_rwsem() call before p->open().
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 2 PID: 18524 Comm: syz-executor.5 Not tainted 5.16.0-rc6 #9
+...
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ assign_lock_key kernel/locking/lockdep.c:951 [inline]
+ register_lock_class+0x148d/0x1950 kernel/locking/lockdep.c:1263
+ __lock_acquire+0x106/0x57e0 kernel/locking/lockdep.c:4906
+ lock_acquire kernel/locking/lockdep.c:5637 [inline]
+ lock_acquire+0x1ab/0x520 kernel/locking/lockdep.c:5602
+ percpu_down_read_trylock include/linux/percpu-rwsem.h:92 [inline]
+ hci_uart_tx_wakeup+0x12e/0x490 drivers/bluetooth/hci_ldisc.c:124
+ h5_timed_event+0x32f/0x6a0 drivers/bluetooth/hci_h5.c:188
+ call_timer_fn+0x1a5/0x6b0 kernel/time/timer.c:1421
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                          randconfig-c001
-openrisc                  or1klitex_defconfig
-mips                           jazz_defconfig
-um                               alldefconfig
-ia64                            zx1_defconfig
-sh                          landisk_defconfig
-sh                   sh7724_generic_defconfig
-sh                               alldefconfig
-powerpc                      mgcoge_defconfig
-arm                            lart_defconfig
-sh                          sdk7780_defconfig
-sparc                       sparc32_defconfig
-m68k                       m5475evb_defconfig
-mips                             allyesconfig
-arm                            pleb_defconfig
-arm                           stm32_defconfig
-arm                        trizeps4_defconfig
-sh                           se7705_defconfig
-mips                         mpc30x_defconfig
-sh                     magicpanelr2_defconfig
-mips                  maltasmvp_eva_defconfig
-xtensa                  audio_kc705_defconfig
-mips                 decstation_r4k_defconfig
-nios2                            alldefconfig
-powerpc                      pasemi_defconfig
-m68k                            q40_defconfig
-arm                           tegra_defconfig
-arm                          badge4_defconfig
-ia64                             allmodconfig
-sh                         apsh4a3a_defconfig
-mips                           xway_defconfig
-powerpc                       ppc64_defconfig
-ia64                         bigsur_defconfig
-arm                          simpad_defconfig
-arm                         lpc18xx_defconfig
-m68k                        mvme16x_defconfig
-ia64                          tiger_defconfig
-m68k                       bvme6000_defconfig
-sh                             sh03_defconfig
-arm                        cerfcube_defconfig
-powerpc                 mpc837x_mds_defconfig
-xtensa                  nommu_kc705_defconfig
-powerpc                       maple_defconfig
-i386                             alldefconfig
-arm                           sunxi_defconfig
-sh                           se7721_defconfig
-sh                           se7780_defconfig
-powerpc                   motionpro_defconfig
-arm                           h3600_defconfig
-m68k                         amcore_defconfig
-powerpc                        warp_defconfig
-sh                          rsk7264_defconfig
-sh                          kfr2r09_defconfig
-um                             i386_defconfig
-h8300                               defconfig
-arm                  randconfig-c002-20220113
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-i386                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64                        randconfig-a002
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-riscv                randconfig-r042-20220113
-arc                  randconfig-r043-20220113
-s390                 randconfig-r044-20220113
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-
-clang tested configs:
-arm                  randconfig-c002-20220113
-x86_64                        randconfig-c007
-riscv                randconfig-c006-20220113
-powerpc              randconfig-c003-20220113
-i386                          randconfig-c001
-mips                 randconfig-c004-20220113
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-hexagon              randconfig-r045-20220113
-hexagon              randconfig-r041-20220113
-
+Fixes: d73e17281665 ("Bluetooth: hci_serdev: Init hci_uart proto_lock to avoid oops")
+Reported-by: Yiru Xu <xyru1999@gmail.com>
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ drivers/bluetooth/hci_serdev.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 9e03402ef1b3..e9a44ab3812d 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -305,6 +305,8 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 	if (err)
+ 		return err;
+ 
++	percpu_init_rwsem(&hu->proto_lock);
++
+ 	err = p->open(hu);
+ 	if (err)
+ 		goto err_open;
+@@ -327,7 +329,6 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 
+ 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
+ 	INIT_WORK(&hu->write_work, hci_uart_write_work);
+-	percpu_init_rwsem(&hu->proto_lock);
+ 
+ 	/* Only when vendor specific setup callback is provided, consider
+ 	 * the manufacturer information valid. This avoids filling in the
+-- 
+2.34.1
+
