@@ -2,140 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98D8BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jan 2022 20:12:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FCEC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Jan 2022 22:10:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244202AbiANUMu (ORCPT
+        id S230289AbiANWKB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jan 2022 15:12:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36024 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239687AbiANUMu (ORCPT
+        Fri, 14 Jan 2022 17:10:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43374 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229676AbiANWKB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jan 2022 15:12:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1642191169;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7iTzTn2n67utbixR5b6YXHlQ+XdyXgKqOT9cBufKBdM=;
-        b=N3W2HaqlnIcpnA8wvXXDuIJy5nZtLaefHh/bcQ+DjI+zmlcWawXTFPdElFTaoKsX3EwI3G
-        JUqoIdIqj3XPqn9kcrVfYIQMD95aDEKi/A82JvI3j3vKfAM+XSOyxlK/ek4ldoM3JoD1vP
-        cwhBD4DNMhOyEDu8LoF+9096dViVLtE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-466-WqMW-0tYOkCJQvw7kViKBg-1; Fri, 14 Jan 2022 15:12:48 -0500
-X-MC-Unique: WqMW-0tYOkCJQvw7kViKBg-1
-Received: by mail-ed1-f69.google.com with SMTP id i9-20020a05640242c900b003fe97faab62so9025389edc.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jan 2022 12:12:48 -0800 (PST)
+        Fri, 14 Jan 2022 17:10:01 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D37CC061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jan 2022 14:10:01 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id a1-20020a17090a688100b001b3fd52338eso14307507pjd.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jan 2022 14:10:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yqeC7/uqbCWSa4exECy/H1Jn/IUxGmmEMEe9B3hE86E=;
+        b=dNP+DfMqsf00nTGpKnPZECXol0LnF3Rp4VRiNRAM+Ry/4kF2Cbos0FHS4gBHIcaPx/
+         p8OngSeREPjPERuDnuRI5oeK8dL3qE/t1/7eO6vrrDSzGR7nOci23nldf1orYTPZ+t1o
+         cC2GpR985z5CJPDbw3stnHoZcOGmYr70e3jskKvEK2AWlickDYTR4wKH5/c9TJB6k9mK
+         zYkx7tXQ4qXR0F1YBcQP5/LrJ/mrrcAHMsXlR1bOqqx6nJ2/XiRO7XC+AFvdeQCIO1If
+         VwmXQ8Yaa/QDfOHPkkmkq5M7tnB6ZV9E7UMKfrguV4XOUNL/RiIxA3mvfIA5XcdLIsxS
+         +N1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=7iTzTn2n67utbixR5b6YXHlQ+XdyXgKqOT9cBufKBdM=;
-        b=HTSO2PCM9Z+IM4Vba94xx3Wqpak3kXbNpXGl3iPj9AZXE6nQNTJlYPJwZjFVTm0axz
-         l+xetiDjzrtgszsbtUDqoxGac5ExIRTmMX8/wJ1s5YoH4L4iSzg4dAiCpI4jwADiny3U
-         BKL2KCz6UMLx1UrpETNrhvbxoM+Jh2A86u40el5sEansrCKos608ZX8msWyGYN67lbGr
-         ENrFZFIkq1y4e8XKStoxmqBHmS1HA1fWjm9L0Nal9nlsQ0087iQES6E2guC4ryISNljN
-         oswNhN2M1jhLo2GhPhIOJiJDmAAfkanhGe0zPZZ/yQRQVJ2rrgGJOzG4EUH1c9bJBwC1
-         8g+A==
-X-Gm-Message-State: AOAM5309WIWVv8fROpiH1Ds3kfvj9oBYfdkmSFxBTFmBiAXbWTMxxAYP
-        rzSGMurhYrlPb2rVb39loSHMMi1XODmaSpfNxjF/6zdfA0oTMyAp69RxnVBcEo7p5OAzqlJ197V
-        AOoUFvBd0DFGxNXhUJAgaIk6WPTUJ
-X-Received: by 2002:a17:906:4998:: with SMTP id p24mr8386859eju.131.1642191167097;
-        Fri, 14 Jan 2022 12:12:47 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxlRk5849FD9Gb0CZqUKAe6WWwoBJIyORKH5tTXEVe14wdHDHsknTapvCgDiW0DJ1AVlgt6pg==
-X-Received: by 2002:a17:906:4998:: with SMTP id p24mr8386847eju.131.1642191166939;
-        Fri, 14 Jan 2022 12:12:46 -0800 (PST)
-Received: from redhat.com ([2.55.154.210])
-        by smtp.gmail.com with ESMTPSA id u12sm1884500eda.56.2022.01.14.12.12.44
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yqeC7/uqbCWSa4exECy/H1Jn/IUxGmmEMEe9B3hE86E=;
+        b=LrPrjN7IuUqSTA42deu2S+IYoGG+xMttkm1og5N5JMq735vfTCKosjx8YEJd7L4irS
+         DJ1QsjN1ELLzLcFEdzssy5U65etJuqcHky4LjU2ljiLLn5G8fS5PkPU3pEcxGKqDwwBm
+         /MB4yGr4Pov9ymogIFxWAy8suAawQY/UwnBKkYeHbBtMi9rTQD28pAev3n3Ao/Pc8x3j
+         wL8pgMoALS9D0K9R1B7P9nRt4fSiwN8JdrogCqEXcjNt+/cPGxhuA8VcrUjVu9ZPZauU
+         Tj+jgdMAbf91FHHpuu7qe5Wu0yfBX4nNxMup3yhaOmendS5ZOi7k5E4QQWk3ybiVbCdB
+         bZlg==
+X-Gm-Message-State: AOAM531rYFFFrw0C/WTy9LOiRt3Uygi/Ty/azsRcv31EfPnnlGv/hkuj
+        +0kDKah0DgyUoD4k5OvDewZbcvyT65M=
+X-Google-Smtp-Source: ABdhPJxx48yKxkp4HPbiIpt0rNFvd//eG1olplt4qdYsTwmwtpqwg3+nYwfZN92ms07MhDooKehC9A==
+X-Received: by 2002:a17:903:32c2:b0:14a:2099:eb38 with SMTP id i2-20020a17090332c200b0014a2099eb38mr11717206plr.58.1642198200276;
+        Fri, 14 Jan 2022 14:10:00 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id k19sm7220081pfu.178.2022.01.14.14.09.59
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 12:12:45 -0800 (PST)
-Date:   Fri, 14 Jan 2022 15:12:42 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH] Bluetooth: virtio_bt: fix device removal
-Message-ID: <20220114151142-mutt-send-email-mst@kernel.org>
-References: <20211125174200.133230-1-mst@redhat.com>
- <F52F65FE-6A07-486B-8E84-684ED85709E9@holtmann.org>
- <20211209162149-mutt-send-email-mst@kernel.org>
- <20211213054357-mutt-send-email-mst@kernel.org>
- <20211213185620-mutt-send-email-mst@kernel.org>
- <FF8BA713-6DD2-485B-9ADC-02006126BC60@holtmann.org>
+        Fri, 14 Jan 2022 14:09:59 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] monitor/avctp: Fix parsing of GetElementAttribute
+Date:   Fri, 14 Jan 2022 14:09:58 -0800
+Message-Id: <20220114220959.917157-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <FF8BA713-6DD2-485B-9ADC-02006126BC60@holtmann.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Dec 16, 2021 at 08:58:31PM +0100, Marcel Holtmann wrote:
-> Hi Michael,
-> 
-> >>>>> Device removal is clearly out of virtio spec: it attempts to remove
-> >>>>> unused buffers from a VQ before invoking device reset. To fix, make
-> >>>>> open/close NOPs and do all cleanup/setup in probe/remove.
-> >>>> 
-> >>>> so the virtbt_{open,close} as NOP is not really what a driver is suppose
-> >>>> to be doing. These are transport enable/disable callbacks from the BT
-> >>>> Core towards the driver. It maps to a device being enabled/disabled by
-> >>>> something like bluetoothd for example. So if disabled, I expect that no
-> >>>> resources/queues are in use.
-> >>>> 
-> >>>> Maybe I misunderstand the virtio spec in that regard, but I would like
-> >>>> to keep this fundamental concept of a Bluetooth driver. It does work
-> >>>> with all other transports like USB, SDIO, UART etc.
-> >>>> 
-> >>>>> The cost here is a single skb wasted on an unused bt device - which
-> >>>>> seems modest.
-> >>>> 
-> >>>> There should be no buffer used if the device is powered off. We also don’t
-> >>>> have any USB URBs in-flight if the transport is not active.
-> >>>> 
-> >>>>> NB: with this fix in place driver still suffers from a race condition if
-> >>>>> an interrupt triggers while device is being reset. Work on a fix for
-> >>>>> that issue is in progress.
-> >>>> 
-> >>>> In the virtbt_close() callback we should deactivate all interrupts.
-> >>>> 
-> >>>> Regards
-> >>>> 
-> >>>> Marcel
-> >>> 
-> >>> So Marcel, do I read it right that you are working on a fix
-> >>> and I can drop this patch for now?
-> >> 
-> >> ping
-> > 
-> > 
-> > If I don't hear otherwise I'll queue my version - it might not
-> > be ideal but it at least does not violate the spec.
-> > We can work on not allocating/freeing buffers later
-> > as appropriate.
-> 
-> I have a patch, but it is not fully tested yet.
-> 
-> Regards
-> 
-> Marcel
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-ping
+AVRCP byte order is always big endian:
 
-it's been a month ...
+Audio/Video Remote Control / Profile Specification - Page 20:
 
-I'm working on cleaning up module/device removal in virtio and bt
-is kind of sticking out.
+ 'Transfer Octet Order; Packets shall transfer multiple-octet fields in
+ standard network octet order (Big Endian), with more significant
+ (high-order) octets being transferred before less-significant (low-order)
+ octets.'
+---
+ monitor/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/monitor/avctp.c b/monitor/avctp.c
+index dc03195a8..fb2628282 100644
+--- a/monitor/avctp.c
++++ b/monitor/avctp.c
+@@ -1192,7 +1192,7 @@ static bool avrcp_get_element_attributes(struct avctp_frame *avctp_frame,
+ 	for (; num > 0; num--) {
+ 		uint32_t attr;
+ 
+-		if (!l2cap_frame_get_le32(frame, &attr))
++		if (!l2cap_frame_get_be32(frame, &attr))
+ 			return false;
+ 
+ 		print_field("%*cAttributeID: 0x%08x (%s)", (indent - 8),
 -- 
-MST
+2.33.1
 
