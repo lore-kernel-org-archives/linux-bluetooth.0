@@ -2,117 +2,209 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3942AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Jan 2022 01:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04A01C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Jan 2022 10:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231731AbiAOBDd (ORCPT
+        id S231586AbiAOKTx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Jan 2022 20:03:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53982 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiAOBDd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Jan 2022 20:03:33 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BE99C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jan 2022 17:03:33 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id n16-20020a17090a091000b001b46196d572so1740060pjn.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Jan 2022 17:03:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=i+1IbN4UyRH0UIy0LvgR8qcSwdT/SZf1HdxrW+k1aHA=;
-        b=YX6rxkFbFY3pBv2X2j4Y94gOqFZQgGmVYAoeyZPWwZv/nES4y/kqwEwJvfn36/TnOK
-         BGa+qc3eZ/Rw4Lub0DhYyWdJTZrpbzL+fKQ4UhoWoK+/97sBWOW2DzADEf5hajLOhD86
-         hjgVqtWR3TdTu8KaJfy+wiAML517FCkFbe5ntmuNxKr30MfEzEmpGUY/URqaRpXkNAX4
-         VaUWNPhwm45+7B2/LT62d39wI+cY1gwC8R3QyrolByDsBHVvjL8Nt4Trw6XrsK48Gdil
-         Jk2uRFJxggflgKdLe//BL0WCRWErYWwqtf0H2BjBRyTZJ98dl/iDFzCsXIaoG2CPLqlk
-         Z2TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=i+1IbN4UyRH0UIy0LvgR8qcSwdT/SZf1HdxrW+k1aHA=;
-        b=JW/4vsMeKZigY6bAk1XxY/SSyex6JFEKXID0WPSsdLC4HTrRtnue45FSryVUr2206m
-         iL3gRtxZ6YYeUANG8oIfd8y+QErdvWI/F6c1eEe8fxc6pHw8wKGAvVgnsq6CTGfFyLa1
-         z/viinuwYJnFrOvY25KDtRHLrjKE5G1kUp0t5KehKqmXGhop4KDccpdHbndWGP+19+aF
-         FuygMn5h+EaDBMnbcVitr/VIkXgkedgn1iSeFgnvTKomlbN9WIJHbptx1cw7vHgkEdgf
-         PpgTJJlsJVYfhfAf8WkD48otsd84sSWDDGGyxKi4ex0SWfPI8GTzOjX9QjK4HwIwNMe6
-         tcow==
-X-Gm-Message-State: AOAM531qAKkNZc3tEO6NIrwb03aXT0f3dwjF8/THolhkSqnimx5D6MRA
-        f27IsDAPDx4qsxl372/K/7mov+vbsGI=
-X-Google-Smtp-Source: ABdhPJwTMl5WHs5dtPxkZswVntomYHYGTek9Ll+NPuhMe8v5LRieK5HginjHXMrtQfCkJkh774AgiA==
-X-Received: by 2002:a17:902:c206:b0:14a:410e:2ac9 with SMTP id 6-20020a170902c20600b0014a410e2ac9mr12351783pll.42.1642208612348;
-        Fri, 14 Jan 2022 17:03:32 -0800 (PST)
-Received: from localhost.localdomain ([2601:1c0:6a01:d830:34a:96e0:8881:913d])
-        by smtp.gmail.com with ESMTPSA id om16sm2402679pjb.49.2022.01.14.17.03.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Jan 2022 17:03:31 -0800 (PST)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH] Bluetooth: Remove kernel-doc style comment block
-Date:   Fri, 14 Jan 2022 17:03:29 -0800
-Message-Id: <20220115010329.241808-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Sat, 15 Jan 2022 05:19:53 -0500
+Received: from mga01.intel.com ([192.55.52.88]:18788 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229530AbiAOKTw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 15 Jan 2022 05:19:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642241992; x=1673777992;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xYOhJDndCNQZi0urKoWTO7mbjGmB+v3eEDSoWzIzLvo=;
+  b=KCMNPxf0ZdmgLcvgR6s9TdF5iBOmDK4eDxP3gapZuSFsXdrUbBLUijUz
+   HmgXvbP9HF8m++d2gA/htWUX+DTCybriXzpvFj6sndG1Y4RVDwZS2HWfK
+   7DrJiYnFqRvTHOopcNKiChUgUkAGRHlp8gT3mUWiCulFbX5BZNW3Ga1Ec
+   ieyQp/2AmsnBkj8nrq+PxR2VliKEQ/wi8S13ZNu6CjneJdfrBgoOh4mQ9
+   9MMxgNwdqQQ0XggRinT3a5MUZ/vdxOokcz1cKDPi3xzUL+eXiPOV7DY7k
+   GDi6INXpZ/uq9PlPfTNFY+CbgU03jmZNjULCKcBZykChRYWo6q6vOfgtz
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10227"; a="268771109"
+X-IronPort-AV: E=Sophos;i="5.88,290,1635231600"; 
+   d="scan'208";a="268771109"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2022 02:19:52 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,290,1635231600"; 
+   d="scan'208";a="530648537"
+Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 15 Jan 2022 02:19:51 -0800
+Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1n8gA2-0009dx-GO; Sat, 15 Jan 2022 10:19:50 +0000
+Date:   Sat, 15 Jan 2022 18:19:01 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 3afee2118132e93e5f6fa636dfde86201a860ab3
+Message-ID: <61e29f95.5pr5MyyFY42b/Q27%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 3afee2118132e93e5f6fa636dfde86201a860ab3  Bluetooth: fix null ptr deref on hci_sync_conn_complete_evt
 
-This patch changes the kernel-doc style comment block to common comment
-block. These files don't support kernel-doc style so no need to use the
-kernel-doc style. Also, they cause the warning when W=1 option is used
-as below.
+elapsed time: 724m
 
-drivers/bluetooth/hci_ll.c:518: warning: Function parameter or member 'lldev' not described in 'download_firmware'
-drivers/bluetooth/btmrvl_debugfs.c:29: warning: cannot understand function prototype: 'struct btmrvl_debugfs_data '
-drivers/bluetooth/btmrvl_sdio.c:36: warning: expecting prototype for Marvell BT-over-SDIO driver(). Prototype was for VERSION() instead
+configs tested: 135
+configs skipped: 3
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                          randconfig-c001
+h8300                            allyesconfig
+arc                                 defconfig
+mips                           jazz_defconfig
+h8300                               defconfig
+powerpc                        cell_defconfig
+arm                           sama5_defconfig
+x86_64                           alldefconfig
+powerpc                 mpc85xx_cds_defconfig
+powerpc                      tqm8xx_defconfig
+powerpc                      arches_defconfig
+powerpc                     tqm8555_defconfig
+powerpc                      pcm030_defconfig
+sparc                               defconfig
+mips                           ip32_defconfig
+arm                           viper_defconfig
+xtensa                generic_kc705_defconfig
+xtensa                    xip_kc705_defconfig
+sh                   secureedge5410_defconfig
+ia64                                defconfig
+powerpc                 linkstation_defconfig
+ia64                         bigsur_defconfig
+ia64                            zx1_defconfig
+arm                      integrator_defconfig
+sh                          r7785rp_defconfig
+sh                            shmin_defconfig
+powerpc                     tqm8541_defconfig
+sh                          sdk7780_defconfig
+powerpc                     sequoia_defconfig
+mips                            ar7_defconfig
+arm                           h3600_defconfig
+sh                        sh7785lcr_defconfig
+arm                            zeus_defconfig
+arm                        spear6xx_defconfig
+sh                              ul2_defconfig
+ia64                             allmodconfig
+arm                      footbridge_defconfig
+sh                     magicpanelr2_defconfig
+arm                  randconfig-c002-20220113
+arm                  randconfig-c002-20220114
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+s390                             allmodconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+i386                                defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+mips                             allmodconfig
+mips                             allyesconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+i386                          randconfig-a003
+i386                          randconfig-a001
+i386                          randconfig-a005
+x86_64                        randconfig-a011
+x86_64                        randconfig-a013
+x86_64                        randconfig-a015
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+riscv                randconfig-r042-20220113
+arc                  randconfig-r043-20220113
+s390                 randconfig-r044-20220113
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+riscv                    nommu_k210_defconfig
+x86_64                    rhel-8.3-kselftests
+um                             i386_defconfig
+um                           x86_64_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                                  kexec
+
+clang tested configs:
+arm                  randconfig-c002-20220113
+x86_64                        randconfig-c007
+riscv                randconfig-c006-20220113
+powerpc              randconfig-c003-20220113
+i386                          randconfig-c001
+mips                 randconfig-c004-20220113
+mips                           ip27_defconfig
+mips                      pic32mzda_defconfig
+mips                          ath79_defconfig
+arm                     davinci_all_defconfig
+powerpc                     pseries_defconfig
+arm                       spear13xx_defconfig
+mips                         tb0219_defconfig
+powerpc                    socrates_defconfig
+powerpc                        icon_defconfig
+powerpc                   lite5200b_defconfig
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+i386                          randconfig-a013
+i386                          randconfig-a011
+i386                          randconfig-a015
+x86_64                        randconfig-a005
+x86_64                        randconfig-a003
+x86_64                        randconfig-a001
+hexagon              randconfig-r045-20220113
+hexagon              randconfig-r045-20220114
+riscv                randconfig-r042-20220114
+hexagon              randconfig-r041-20220114
+hexagon              randconfig-r041-20220113
+
 ---
- drivers/bluetooth/btmrvl_debugfs.c | 2 +-
- drivers/bluetooth/btmrvl_sdio.c    | 2 +-
- drivers/bluetooth/hci_ll.c         | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/btmrvl_debugfs.c b/drivers/bluetooth/btmrvl_debugfs.c
-index c4867576be00..db35b917aecf 100644
---- a/drivers/bluetooth/btmrvl_debugfs.c
-+++ b/drivers/bluetooth/btmrvl_debugfs.c
-@@ -1,4 +1,4 @@
--/**
-+/*
-  * Marvell Bluetooth driver: debugfs related functions
-  *
-  * Copyright (C) 2009, Marvell International Ltd.
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 68378b42ea7f..b8ef66f89fc1 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -1,4 +1,4 @@
--/**
-+/*
-  * Marvell BT-over-SDIO driver: SDIO interface related functions.
-  *
-  * Copyright (C) 2009, Marvell International Ltd.
-diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
-index eb1e736efeeb..4eb420a9ed04 100644
---- a/drivers/bluetooth/hci_ll.c
-+++ b/drivers/bluetooth/hci_ll.c
-@@ -509,7 +509,7 @@ static int send_command_from_firmware(struct ll_device *lldev,
- 	return 0;
- }
- 
--/**
-+/*
-  * download_firmware -
-  *	internal function which parses through the .bts firmware
-  *	script file intreprets SEND, DELAY actions only as of now
--- 
-2.25.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
