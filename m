@@ -2,99 +2,259 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85A42C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Jan 2022 13:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A818C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 16 Jan 2022 13:27:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbiAPNRG (ORCPT
+        id S235317AbiAPN1b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Jan 2022 08:17:06 -0500
-Received: from newmail.c0rporation.com ([82.165.56.171]:38368 "EHLO
-        newmail.c0rporation.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235214AbiAPNRF (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Jan 2022 08:17:05 -0500
-Received: from authenticated-user (newmail.c0rporation.com [82.165.56.171])
-        by newmail.c0rporation.com (Postfix) with ESMTPA id 1F7C540214;
-        Sun, 16 Jan 2022 13:17:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c0rporation.com;
-        s=dkim; t=1642339023;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U2xQ/kIvK3VmBHOR5a7f4hwbjy9cI2UKpi5DHWwpAdc=;
-        b=cRf/kSN5AFpS/MfD05qmGWEQZTtIm9yR6fE+sSEAB2t7TqJWdwem1IyBxJnMt2+A8waYfr
-        /Zsu3xcHUpyzuNtYcE2TTneP0CKd7otrbowgFqeVEa8XRNxVqf0vKTo0yCQ5siEEZQ14my
-        YnpU+Bn6RrXyZvDIhEhuLuJ3WdgJcrRNVA/zXLXbRmGaMFsCKn3Lin92OHBmjZ4GObx3u/
-        73eC2m/9J8n9A+DicqB3J5jdfx2Dx2+h8PAYnBQj1Go9kKo6Jns+ZEke4MDRQz/JoiKDQz
-        vwJMl4sgU8EguEds2cvpiegYgZz9SfKOiNirpikfJV4pR2D7FPJPe+vIWizkRg==
-Message-ID: <8563d31f-55a8-c100-8d13-26872ba62e24@c0rporation.com>
-Date:   Sun, 16 Jan 2022 13:17:02 +0000
+        Sun, 16 Jan 2022 08:27:31 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:50395 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232360AbiAPN1b (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 16 Jan 2022 08:27:31 -0500
+Received: from [192.168.0.4] (ip5f5aeaa0.dynamic.kabel-deutschland.de [95.90.234.160])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0B12661EA1BE4;
+        Sun, 16 Jan 2022 14:27:29 +0100 (CET)
+Message-ID: <d7206e12-1b99-c3be-84f4-df22af427ef5@molgen.mpg.de>
+Date:   Sun, 16 Jan 2022 14:27:28 +0100
 MIME-Version: 1.0
-Content-Language: en-GB
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     linux-bluetooth@vger.kernel.org
-References: <a96af59d-089f-1018-74fc-355e96fcf0c3@c0rporation.com>
- <d2b50954-5303-a547-3be8-35e6c3208a1d@molgen.mpg.de>
-From:   Jack Murray <kernel@c0rporation.com>
-Subject: Re: [PATCH] bluetooth: Add support for EP-B3536 USB Bluetooth adapter
-In-Reply-To: <d2b50954-5303-a547-3be8-35e6c3208a1d@molgen.mpg.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: Unable to transfer big files to Nokia N9
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, regressions@lists.linux.dev,
+        Takashi Iwai <tiwai@suse.com>
+References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+ <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
+ <cf71bdea-ec22-e4c9-016c-69e94a130607@molgen.mpg.de>
+ <a93c0fa7-7b84-6aea-265b-c913e0c84678@molgen.mpg.de>
+In-Reply-To: <a93c0fa7-7b84-6aea-265b-c913e0c84678@molgen.mpg.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spamd-Bar: ----
-Authentication-Results: newmail.c0rporation.com;
-        auth=pass smtp.auth=jack@c0rporation.com smtp.mailfrom=kernel@c0rporation.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It's actually EDUP (https://www.szedup.com/) that make it, not Teledyne 
-(unless there's some link between the companies that I couldn't see). 
-I'm happy to add EDUP to the commit message though if that's not going 
-to cause any confusion by the names not matching?
+#regzbot introduced: 81be03e026dc0c16dc1c64e088b2a53b73caa895
 
-On 16/01/2022 06:07, Paul Menzel wrote:
-> Dear Jack,
->
->
-> Am 15.01.22 um 22:30 schrieb Jack Murray:
->> From: Jack Murray <kernel@c0rporation.com>
+
+Dear Luiz,
+
+
+It turns out there was a regression in Linux 5.16-rc1.
+
+
+Am 20.12.21 um 22:31 schrieb Paul Menzel:
+
+> Am 01.12.21 um 23:07 schrieb Paul Menzel:
+> 
+>> Am 01.12.21 um 19:29 schrieb Luiz Augusto von Dentz:
 >>
->> This patch adds support for the EP-B3536 USB bluetooth 5.1 adapter based
->
-> Who manufactures that device? Is it Teledyne? 0x2550 is 9552 
-> (decimal), and according to [1] that is Teledyne. Maybe, add that to 
-> the commit message.
->
->> on the 8761B chipset. The existing driver and firmware work fine for 
->> this
->> device from what I can tell, so this patch just adds the 
->> vendor/product IDs
->> for it to the supported device list.
+>>> On Wed, Dec 1, 2021 at 9:39 AM Paul Menzel <pmenzel@molgen.mpg.de> 
+>>> wrote:
 >>
->> Signed-off-by: Jack Murray <kernel@c0rporation.com>
->> ---
->>   drivers/bluetooth/btusb.c | 2 ++
->>   1 file changed, 2 insertions(+)
+>>>> For the first time, I wanted to transfer a 2 MB PDF file from a Dell
+>>>> Latitude E7250 with Debian sid/unstable with Linux 5.16-rc1 to a Nokia
+>>>> N9 (MeeGo/Harmattan). Using the package *bluez-obexd* 5.61-1 and GNOME
+>>>> 41, the device was found, and paired fine. Then I selected to transfer
+>>>> the 2 MB file, and after starting for a second, it timed out after the
+>>>> progress bar moves forward ones and failed.
+>>>>
+>>>> The systemd journal contains:
+>>>>
+>>>>       obexd[21139]: Transfer(0x56243fe4f790) Error: Timed out waiting for response
+>>>>
+>>>> Testing with a a 5 byte test text file, worked fine. Also testing with a
+>>>> Galaly M32, both files were transferred without problems (though slowly
+>>>> with 32 KB/s.)
+>>>>
+>>>> Trying to connect to the device with bluetoothctl failed for me, and the
+>>>> journal contained, it failed.
+>>>>
+>>>>       $ bluetoothctl
+>>>>       Agent registered
+>>>>       [bluetooth]# connect 40:98:4E:5B:CE:XX
+>>>>       Attempting to connect to 40:98:4E:5B:CE:XX
+>>>>       Failed to connect: org.bluez.Error.Failed
+>>>>
+>>>>       bluetoothd[21104]: src/service.c:btd_service_connect() a2dp-source profile connect failed for 40:98:4E:5B:CE:B3: Protocol not available
+>>>>
+>>>> As the Nokia N9 was once pretty popular in the Linux community, I am
+>>>> pretty sure, it used to work fine in the past, and there is some
+>>>> regression. It’d be great, if you could give me some hints how to
+>>>> further debug the issue.
+>>>
+>>> We will need some logs, obexd and btmon, if possible.
 >>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 60d2fce59a71..207c8289c5c2 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -436,6 +436,8 @@ static const struct usb_device_id 
->> blacklist_table[] = {
->>          /* Additional Realtek 8761BU Bluetooth devices */
->>          { USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
->> BTUSB_WIDEBAND_SPEECH },
->> +       { USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
->> + BTUSB_WIDEBAND_SPEECH }, >
->>          /* Additional Realtek 8821AE Bluetooth devices */
->>          { USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
->
->
-> Kind regards,
->
-> Paul
->
->
-> [1]: https://www.usb.org/sites/default/files/vendor_ids082119_0.pdf
+>> I only managed to get the btmon trace [1]. I did `sudo modprobe -r 
+>> btusb` and `sudo btmon -w /dev/shm/trace.log`.
+>>
+>> Linux messages:
+>>
+>>      [29880.100381] calling  btusb_driver_init+0x0/0x1000 [btusb] @ 28716
+>>      [29880.239603] usbcore: registered new interface driver btusb
+>>      [29880.239608] initcall btusb_driver_init+0x0/0x1000 [btusb] returned 0 after 135952 usecs
+>>      [29880.240706] Bluetooth: hci0: unexpected event for opcode 0x0500
+>>      [29880.241598] Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
+>>      [29880.241605] Bluetooth: hci0: Intel device is already patched. patch num: 32
+>>
+>>  From the system journal:
+>>
+>>      Dez 01 22:52:19 ersatz obexd[21139]: Transfer(0x56243fe53dd0) Error: Timed out waiting for response
+> 
+> Were you able to see anything in the attached logs? If the obexd logs 
+> are missing, can you please tell how I should capture them?
+> 
+> I also tested with Ubuntu 20.04 (*linux-image-5.11.0-27-generic*) and 
+> 21.10 (*linux-image-5.13.0-19-generic*) live systems booted from a USB 
+> storage device, and transferring `/usr/bin/systemctl` 
+> (`/lib/systemd/systemd`) with size of 1.8 MB worked fine.
+> 
+> Could there be a regression in that area? Unfortunately, it’s not easy 
+> for me to do a bisection on the device at hand.
+> 
+> (Would it be possible to do with QEMU and USB controller and Bluetooth 
+> device passthrough? How can I transfer the file on the command line so I 
+> wouldn’t need to install a desktop environment?)
+
+Turns out, that is indeed possible [2], but turned out to be cumbersome, 
+as I hit the regression [3], which seems to have been fixed by commit 
+95655456e7ce (Bluetooth: btintel: Fix broken LED quirk for legacy ROM 
+devices) merged in the current Linux 5.17 cycle this week.
+
+As a work around, I applied a hunk from Takashi’s patch.
+
+-       { USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
++       { USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
++ 
+BTUSB_INTEL_BROKEN_INITIAL_NCMD },
+
+My problem with the Nokia N9 is still present in Linus’ master branch.
+
+Then I built a minimal Linux kernel for QEMU, and ran:
+
+     qemu-system-x86_64 -cpu host -m 2G -enable-kvm \
+       -usb -device usb-host,vendorid=0x8087,productid=0x0a2a \
+       -drive file=/dev/shm/debian-64.img,format=raw,if=virtio \
+       -net nic -net user,hostfwd=tcp::22223-:22 \
+       -kernel /dev/shm/bzImage -append "root=/dev/vda1 rw quiet"
+
+In the Debian sid/unstable VM, I used
+
+     ssh root@localhost -p 22223
+
+I once had to pair the VM with the Nokia N9 in bluetoothctl, and then 
+started `/usr/libexec/bluetooth/obexd`, and ran `obexctl`, and connected 
+first with `connect`, and then ran `send /lib/systemd/systemd` to 
+transfer the file. In the problematic cases it stopped/hung after the 
+first progress message.
+
+     # obexctl
+     [NEW] Client /org/bluez/obex
+     [obex]# connect 40:98:4E:5B:CE:XX
+     Attempting to connect to 40:98:4E:5B:CE:XX
+     [NEW] Session /org/bluez/obex/client/session0 [default]
+     [NEW] ObjectPush /org/bluez/obex/client/session0
+     Connection successful
+     [40:98:4E:5B:CE:XX]# send /lib/systemd/systemd
+     Attempting to send /lib/systemd/systemd to 
+/org/bluez/obex/client/session0
+     [NEW] Transfer /org/bluez/obex/client/session0/transfer0
+     Transfer /org/bluez/obex/client/session0/transfer0
+         Status: queued
+         Name: systemd
+         Size: 1841712
+         Filename: /lib/systemd/systemd
+         Session: /org/bluez/obex/client/session0
+     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: active
+     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 
+Transferred: 32737 (@32KB/s 00:55)
+     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: error
+     [DEL] Transfer /org/bluez/obex/client/session0/transfer0
+
+Some manual bisection of Linux releases, verified, that the regression 
+was introduced in Linux 5.16-rc1. (Lucky me, I started using Bluetooth 
+with the Nokia with Linux 5.16-rc1.) Then I verified it was introduced 
+by the Bluetooth pull request for Linux 5.16. Then I picked commit 
+81be03e026dc0c16dc1c64e088b2a53b73caa895 due to the commit message, and 
+bisected from there, and it turns out, that this commit is actually 
+introducing the regression.
+
+     $ git bisect good
+     81be03e026dc0c16dc1c64e088b2a53b73caa895 is the first bad commit
+     commit 81be03e026dc0c16dc1c64e088b2a53b73caa895
+     Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+     Date:   Fri Sep 3 15:27:32 2021 -0700
+
+         Bluetooth: RFCOMM: Replace use of memcpy_from_msg with 
+bt_skb_sendmmsg
+
+         This makes use of bt_skb_sendmmsg instead using memcpy_from_msg 
+which
+         is not considered safe to be used when lock_sock is held.
+
+         Also make rfcomm_dlc_send handle skb with fragments and queue 
+them all
+         atomically.
+
+         Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+         Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+
+      net/bluetooth/rfcomm/core.c | 50 
+++++++++++++++++++++++++++++++++++++++-------
+      net/bluetooth/rfcomm/sock.c | 46 
++++++++++--------------------------------
+      2 files changed, 53 insertions(+), 43 deletions(-)
+
+Unfortunately, the patch does not cleanly revert, so users have to wait 
+until an expert can take a look, and come up with a fix.
+
+
+Kind regards,
+
+Paul
+
+
+PS: For the records:
+
+     $ git bisect log
+     # bad: [81be03e026dc0c16dc1c64e088b2a53b73caa895] Bluetooth: 
+RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+     # good: [49d8a5606428ca0962d09050a5af81461ff90fbb] Bluetooth: fix 
+init and cleanup of sco_conn.timeout_work
+     git bisect start '81be03e026dc0' 'HEAD^'
+     # good: [904c139a2517191e48f9cb1bb2d611ae59434009] Bluetooth: Add 
+support for msbc coding format
+     git bisect good 904c139a2517191e48f9cb1bb2d611ae59434009
+     # good: [8bba13b1d08d42e2e8308924fa5c1551a7b2b011] Bluetooth: 
+btintel: Fix incorrect out of memory check
+     git bisect good 8bba13b1d08d42e2e8308924fa5c1551a7b2b011
+     # good: [38f64f650dc0e44c146ff88d15a7339efa325918] Bluetooth: Add 
+bt_skb_sendmsg helper
+     git bisect good 38f64f650dc0e44c146ff88d15a7339efa325918
+     # good: [0771cbb3b97d3c1d68eecd7f00055f599954c34e] Bluetooth: SCO: 
+Replace use of memcpy_from_msg with bt_skb_sendmsg
+     git bisect good 0771cbb3b97d3c1d68eecd7f00055f599954c34e
+     # first bad commit: [81be03e026dc0c16dc1c64e088b2a53b73caa895] 
+Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+
+
+Kind regards,
+
+Paul
+
+
+>> [1]: https://owww.molgen.mpg.de/~pmenzel/trace.log.7z
+[2]: 
+https://lore.kernel.org/linux-bluetooth/5891f0d5-8d51-9da5-7663-718f301490b1@molgen.mpg.de/T/#u
+[3]: 
+https://lore.kernel.org/linux-bluetooth/20211202162256.31837-1-tiwai@suse.de/
