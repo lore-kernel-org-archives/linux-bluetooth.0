@@ -2,44 +2,49 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27615C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C5F3C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:20:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244357AbiARCTv (ORCPT
+        id S244406AbiARCT5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jan 2022 21:19:51 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:34714 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244313AbiARCTs (ORCPT
+        Mon, 17 Jan 2022 21:19:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56350 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244359AbiARCTv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jan 2022 21:19:48 -0500
+        Mon, 17 Jan 2022 21:19:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79A3BC061574;
+        Mon, 17 Jan 2022 18:19:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 59059B811FF;
-        Tue, 18 Jan 2022 02:19:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ADC3C36AF3;
-        Tue, 18 Jan 2022 02:19:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 17B32612CD;
+        Tue, 18 Jan 2022 02:19:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B12C36AF2;
+        Tue, 18 Jan 2022 02:19:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642472385;
-        bh=iO+OXfsCFcozzPXNy918Y42k2yHxjBIdnLWnVD3PJLA=;
+        s=k20201202; t=1642472390;
+        bh=Ye+NvjmveOKmvl6+16nojtYqOUgYxCut3gVhU6p2Vlw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VV88apG+uAptvdWPY5yK4KKX3VTJ9PfARd9nK+vAWBePpBzIAHuVB6Q4wvozcDkHd
-         BHz+oy53392UPezt5VRm2J3gDjBF/A4+8vpeA8H3jmribOJ6ghSFUL96VIY2Ff3ckD
-         ekDPrWAmAnrFSQ75HhAKgleiTEv4ecGh1CjdwQUnos0353C+irtMjaWjvau3AxsN02
-         218T5kt7rI3vuc4WsPTkr3tryk6Kl/1NwHNUeSWx8C4+FhXyroBlfvrUQHObslpCYS
-         6mH+FWj4sJnqdm6MaMPTRC/NCc4LR15dQmsBs1mHQqvxuKJCO17E8LTxx/q6uOQ7tG
-         lqCqtiwZzWySQ==
+        b=fCWdC8Ioso/ZaNoG/2TmWYQA6X24XRzPllkIeIBdU8BPin5eJ6t4QF8mlJcT4a5jW
+         lDdtCS4a0PKQMyvtftI3X5crDx9rHJa7KmFSHaC6D5yFGLtnDyXJaad4KDBNk1v6SL
+         S3yg3euzWaOB4DfNUl76CAJz3mE+PYPm2NXepCGsbNFXGNLPK8ZSRXct9VMDm6HTss
+         ut+2gDKc0BzE6YqUV2B+jCNhilty5N0btOldUyLsHrXWUe/1JrbpWTY7El8hBnPIxC
+         c1xTRXdQ/B+6Pv81oXpEHxMFPudJcU2ntuav0dKxUZXOUhl0OtP1FnUyxAcNE+BWWU
+         a809ddlgW+G7w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 002/217] Bluetooth: Fix debugfs entry leak in hci_register_dev()
-Date:   Mon, 17 Jan 2022 21:16:05 -0500
-Message-Id: <20220118021940.1942199-2-sashal@kernel.org>
+Cc:     Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.16 005/217] Bluetooth: Fix removing adv when processing cmd complete
+Date:   Mon, 17 Jan 2022 21:16:08 -0500
+Message-Id: <20220118021940.1942199-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220118021940.1942199-1-sashal@kernel.org>
 References: <20220118021940.1942199-1-sashal@kernel.org>
@@ -51,38 +56,45 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Wei Yongjun <weiyongjun1@huawei.com>
+From: Archie Pusaka <apusaka@chromium.org>
 
-[ Upstream commit 5a4bb6a8e981d3d0d492aa38412ee80b21033177 ]
+[ Upstream commit 2128939fe2e771645dd88e1938c27fdf96bd1cd0 ]
 
-Fault injection test report debugfs entry leak as follows:
+If we remove one instance of adv using Set Extended Adv Enable, there
+is a possibility of issue occurs when processing the Command Complete
+event. Especially, the adv_info might not be found since we already
+remove it in hci_req_clear_adv_instance() -> hci_remove_adv_instance().
+If that's the case, we will mistakenly proceed to remove all adv
+instances instead of just one single instance.
 
-debugfs: Directory 'hci0' with parent 'bluetooth' already present!
+This patch fixes the issue by checking the content of the HCI command
+instead of checking whether the adv_info is found.
 
-When register_pm_notifier() failed in hci_register_dev(), the debugfs
-create by debugfs_create_dir() do not removed in the error handing path.
-
-Add the remove debugfs code to fix it.
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_core.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/bluetooth/hci_event.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8d33aa64846b1..98533def61a3b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3882,6 +3882,7 @@ int hci_register_dev(struct hci_dev *hdev)
- 	return id;
- 
- err_wqueue:
-+	debugfs_remove_recursive(hdev->debugfs);
- 	destroy_workqueue(hdev->workqueue);
- 	destroy_workqueue(hdev->req_workqueue);
- err:
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7d0db1ca12482..41795851949f1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1326,8 +1326,10 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
+ 					   &conn->le_conn_timeout,
+ 					   conn->conn_timeout);
+ 	} else {
+-		if (adv) {
+-			adv->enabled = false;
++		if (cp->num_of_sets) {
++			if (adv)
++				adv->enabled = false;
++
+ 			/* If just one instance was disabled check if there are
+ 			 * any other instance enabled before clearing HCI_LE_ADV
+ 			 */
 -- 
 2.34.1
 
