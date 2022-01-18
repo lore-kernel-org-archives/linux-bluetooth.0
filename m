@@ -2,49 +2,45 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6367BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD855C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350706AbiARC5s (ORCPT
+        id S1347957AbiARC5v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jan 2022 21:57:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34796 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345969AbiARCq6 (ORCPT
+        Mon, 17 Jan 2022 21:57:51 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:42956 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350160AbiARCvT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jan 2022 21:46:58 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8819CC06127D;
-        Mon, 17 Jan 2022 18:38:44 -0800 (PST)
+        Mon, 17 Jan 2022 21:51:19 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 69E596093C;
-        Tue, 18 Jan 2022 02:38:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13E35C36AEF;
-        Tue, 18 Jan 2022 02:38:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 43B1E612E8;
+        Tue, 18 Jan 2022 02:51:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A53A6C36AEB;
+        Tue, 18 Jan 2022 02:51:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642473523;
-        bh=gDmFszm+/TUhgaalM12dREB18MEqRLtv9uD+Yy9sdoY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n/DUMsdM66JPfi1PfoxsXBRz2DhVjJXgIgSS3cojT0QFOntQcuWNsnsCA4VA4WezZ
-         8nP3NG4U42GoCqVU7aQekF7vGYPTOjb3tjQsdVNrwZY8P4P8lD0MCO+TglbslPiiTG
-         isWf4187Fu1Bm1jlbXgjK8r4OUlUfI4N3ghTjii2hcyXOw14ZYSplUqU6o9MBolHr8
-         +RL4Hxx3Spf++XtWa9gqCjLTytbKYgt7ukA4GckiRsK5bG3PoRqkC9UrsMU6wpgOC/
-         F7ZSekuoiEyFtz+TMdXjrxR8Tl4wczxJxBPa/N15vzLAqAsDuwCaD3Kk4EdPhODV3q
-         yHxvhbm6D2Emg==
+        s=k20201202; t=1642474278;
+        bh=8HhqhLYUtzscszQjAX1dCUydahnbhPvnAe7pYo2zT+Y=;
+        h=From:To:Cc:Subject:Date:From;
+        b=tVKyNEnYdg5kKB2WyQxxJHE0smZvuRNvDJvMwLjGsKRdqTyJSkLFfGwXrfu5AVpqc
+         bUt8zuYAENjpuTKgrMqrrjOdT921TrjOj/9zLXuSf33f+nOB0HRoOQPW7WhG9iGAbw
+         8PbRF1AE3rtsxRWBsNxE26hwcyPA9MUvRKVWnW9qQlnq2S7cPrQA70yMRxrulLS5OA
+         nxShJU6eE72113DZrAe6U4BP9EK6sjclj0cnQoMfdOztYUtwXCokU/WRMmGyMZnY40
+         /tccl1T3d7Ljnug9EL4Hr6ByimanW4Ugi9ndBvYXK/wtr+P2ENcrGbPsel9h1ewxqY
+         vpC3uQdpoSgYQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 148/188] Bluetooth: vhci: Set HCI_QUIRK_VALID_LE_STATES
-Date:   Mon, 17 Jan 2022 21:31:12 -0500
-Message-Id: <20220118023152.1948105-148-sashal@kernel.org>
+        luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 01/33] Bluetooth: Fix debugfs entry leak in hci_register_dev()
+Date:   Mon, 17 Jan 2022 21:50:43 -0500
+Message-Id: <20220118025116.1954375-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220118023152.1948105-1-sashal@kernel.org>
-References: <20220118023152.1948105-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,33 +49,38 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Wei Yongjun <weiyongjun1@huawei.com>
 
-[ Upstream commit cfb4c313be670fd4bd09650216620fa4514cdb93 ]
+[ Upstream commit 5a4bb6a8e981d3d0d492aa38412ee80b21033177 ]
 
-This set HCI_QUIRK_VALID_LE_STATES quirk which is required for the likes
-of experimental LE simultaneous roles.
+Fault injection test report debugfs entry leak as follows:
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+debugfs: Directory 'hci0' with parent 'bluetooth' already present!
+
+When register_pm_notifier() failed in hci_register_dev(), the debugfs
+create by debugfs_create_dir() do not removed in the error handing path.
+
+Add the remove debugfs code to fix it.
+
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_vhci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/bluetooth/hci_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 8ab26dec5f6e8..8469f9876dd26 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -121,6 +121,8 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	if (opcode & 0x80)
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b43f31203a430..40e6e5feb1e06 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3148,6 +3148,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	return id;
  
-+	set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+
- 	if (hci_register_dev(hdev) < 0) {
- 		BT_ERR("Can't register HCI device");
- 		hci_free_dev(hdev);
+ err_wqueue:
++	debugfs_remove_recursive(hdev->debugfs);
+ 	destroy_workqueue(hdev->workqueue);
+ 	destroy_workqueue(hdev->req_workqueue);
+ err:
 -- 
 2.34.1
 
