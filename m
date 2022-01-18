@@ -2,37 +2,34 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42B44C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 03:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E19FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 03:48:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352853AbiARDee (ORCPT
+        id S1351235AbiARDsr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jan 2022 22:34:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359845AbiARDb7 (ORCPT
+        Mon, 17 Jan 2022 22:48:47 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:48952 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346905AbiARCkO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jan 2022 22:31:59 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E29CCC0219B3;
-        Mon, 17 Jan 2022 19:08:26 -0800 (PST)
+        Mon, 17 Jan 2022 21:40:14 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8A413601E3;
-        Tue, 18 Jan 2022 03:08:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C53DBC36AEB;
-        Tue, 18 Jan 2022 03:08:24 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2AC35B81249;
+        Tue, 18 Jan 2022 02:40:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E61B6C36AE3;
+        Tue, 18 Jan 2022 02:40:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642475306;
-        bh=i5PnfJ5ACF12zxhZM9oXbHuElB0dKR9hdwAK0CLrRJE=;
+        s=k20201202; t=1642473610;
+        bh=Am4JlF+3LE3QNxnbCrz5BtyOYey+mHZ/4iNz2HgS+MY=;
         h=From:To:Cc:Subject:Date:From;
-        b=epguTbfMd7zM9GfUIx0lkN2XEQApTuvwPQhNFaeNehuWpv5l+H4ea5DXGhIe3MrYO
-         bDqu3H2AtosYOqrCoknUnRaZGw/d7MZkFAERAflCcwRWFmgz3BXiJ5JlVGYTMIdT5P
-         +jrd4gC6UfN5gWVB6ft2u70ggJxl6iTAVwNWzqbNbu0IY/ltUWAHovVU7dRWwi4Lrc
-         Y1+sK6hPtzR3nq2fpNSLuwn5EGxKJanA1ryvSKcRLp+z311uPXrICMZYX3JAgb9q8z
-         diRDkYKAuFi9lRrUFbPPQuiQnKDSFixH2BL4Dlpr9LeeaI311MHbgol5cpIZRigVbA
-         1RteFe9RFySuQ==
+        b=OCaEpAVNKI7gdWm/RXd3AwrNXZeG+YICH5zPVU6R3gCfQJ6sP9FiwddJrcGfqoCeq
+         mQo28gN0FPwKyXeo092BZRlm+KdFtCnQJFrKcC991yburB+XTbAa1K+yb+7PLIYq+I
+         l4YbSVzINKNlveaq/71RHSvGOpgjaAJMBAgTIlMsay5cVwxoFI5BqEoPBXyCpsAbgk
+         /2IgZeptpMSkfOjxifpukWueEZ2p5gNxLNByGddSs3Oa8oblFHF92Tf3FyLKb8M5Vp
+         25gt4LvQdjYPpA0Np4aiJXo8w7Q2ULqnx/u5wgKxhv1BsJ5lHV3+/r8gYZY/of6z+f
+         BRSttpaZ1MZPA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
@@ -40,9 +37,9 @@ Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 01/29] Bluetooth: Fix debugfs entry leak in hci_register_dev()
-Date:   Mon, 17 Jan 2022 22:07:54 -0500
-Message-Id: <20220118030822.1955469-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 001/116] Bluetooth: Fix debugfs entry leak in hci_register_dev()
+Date:   Mon, 17 Jan 2022 21:38:12 -0500
+Message-Id: <20220118024007.1950576-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 X-stable: review
@@ -73,10 +70,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index eefaa10c74dbb..1cc78b88a0d9f 100644
+index 2ad66f64879f1..2e7998bad133b 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3459,6 +3459,7 @@ int hci_register_dev(struct hci_dev *hdev)
+@@ -3810,6 +3810,7 @@ int hci_register_dev(struct hci_dev *hdev)
  	return id;
  
  err_wqueue:
