@@ -2,52 +2,46 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC656C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1255EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Jan 2022 02:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346383AbiARChl (ORCPT
+        id S1350339AbiARC5l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Jan 2022 21:37:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245674AbiARCc4 (ORCPT
+        Mon, 17 Jan 2022 21:57:41 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:50482 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344839AbiARCnn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Jan 2022 21:32:56 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBAF0C06175D;
-        Mon, 17 Jan 2022 18:32:02 -0800 (PST)
+        Mon, 17 Jan 2022 21:43:43 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2664F611FD;
-        Tue, 18 Jan 2022 02:32:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54B3BC36AE3;
-        Tue, 18 Jan 2022 02:32:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0AE0DB8124B;
+        Tue, 18 Jan 2022 02:43:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08A25C36AE3;
+        Tue, 18 Jan 2022 02:43:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1642473121;
-        bh=y7DUbAYnbV+W1Whx7ceW4ohwB+O7PWFAmZ3Y6eWH30c=;
+        s=k20201202; t=1642473820;
+        bh=gDmFszm+/TUhgaalM12dREB18MEqRLtv9uD+Yy9sdoY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a87Za1gQm8V86lQeLTM/To8U7s4gblrwavBKUxafxC+qUwwwOJHYtV/hWuceC6YeF
-         CWjL9yupCc05JYxx951ZmMtE4Ff1G3ytEE5jGGdG2fCRy8Bss5Aa1youGj0YMfJgg/
-         49ioELjlXTbZNk9RgaNQH5kOZCk0jjcNwd/E7fvG4NfW1teM2GqxrS2nZmBSg8Aa2Q
-         TzuIvl6M9Is0glrCkiBJYxT037GS5Mm6N25kutnhCJfPrRtl74m5f7gM4/kK8BxbED
-         9MFqIbqewKuOb3DtqML8LW1cqPHqbOnjmIwwI3/dAoJnewDhXxzFTchJg8nEONeIjU
-         9ZeOQilKLUocQ==
+        b=NjIWQlq6uQ1P2UUASeoMZwiFNiKYLkfR63VHQY/HGh51DQGXETVJrkcGLZYpEzYCd
+         HrNNgEcyDdu2OYgzOH74Xzyk+ZF+Brgzi8nmfKKI1pMHeN0hEcJBekdsTPWwVAQ96T
+         4WCHrc9hOuIp5iVBguPoB4D7hHaVtxdbXcU3ZMf3slkGFMnDtPODygDyn2oSzQWom7
+         OYt0t1DRSp0JlIBao1M2va+Mouc8IhSVebrm6Y6YTjNyVcncIOqP9wBqEbqbs6uGYY
+         cNIeM8te1XdmgWlEuAWArvIOJ0t7NIqvJyMkTicdtxyswUvab5IjVl+e1TMLvTqKXg
+         VLGCZtkVAY6Jg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 004/188] Bluetooth: Fix removing adv when processing cmd complete
-Date:   Mon, 17 Jan 2022 21:28:48 -0500
-Message-Id: <20220118023152.1948105-4-sashal@kernel.org>
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 086/116] Bluetooth: vhci: Set HCI_QUIRK_VALID_LE_STATES
+Date:   Mon, 17 Jan 2022 21:39:37 -0500
+Message-Id: <20220118024007.1950576-86-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220118023152.1948105-1-sashal@kernel.org>
-References: <20220118023152.1948105-1-sashal@kernel.org>
+In-Reply-To: <20220118024007.1950576-1-sashal@kernel.org>
+References: <20220118024007.1950576-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -56,45 +50,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit 2128939fe2e771645dd88e1938c27fdf96bd1cd0 ]
+[ Upstream commit cfb4c313be670fd4bd09650216620fa4514cdb93 ]
 
-If we remove one instance of adv using Set Extended Adv Enable, there
-is a possibility of issue occurs when processing the Command Complete
-event. Especially, the adv_info might not be found since we already
-remove it in hci_req_clear_adv_instance() -> hci_remove_adv_instance().
-If that's the case, we will mistakenly proceed to remove all adv
-instances instead of just one single instance.
+This set HCI_QUIRK_VALID_LE_STATES quirk which is required for the likes
+of experimental LE simultaneous roles.
 
-This patch fixes the issue by checking the content of the HCI command
-instead of checking whether the adv_info is found.
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_event.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/bluetooth/hci_vhci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0bca035bf2dcc..75116cf1b173d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1325,8 +1325,10 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
- 					   &conn->le_conn_timeout,
- 					   conn->conn_timeout);
- 	} else {
--		if (adv) {
--			adv->enabled = false;
-+		if (cp->num_of_sets) {
-+			if (adv)
-+				adv->enabled = false;
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 8ab26dec5f6e8..8469f9876dd26 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -121,6 +121,8 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	if (opcode & 0x80)
+ 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+ 
++	set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
 +
- 			/* If just one instance was disabled check if there are
- 			 * any other instance enabled before clearing HCI_LE_ADV
- 			 */
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
+ 		hci_free_dev(hdev);
 -- 
 2.34.1
 
