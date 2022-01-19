@@ -2,102 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F17C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 20:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D22C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 20:32:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244018AbiASUZz (ORCPT
+        id S244786AbiASUc4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Jan 2022 15:25:55 -0500
-Received: from p-impout005aa.msg.pkvw.co.charter.net ([47.43.26.136]:48881
-        "EHLO p-impout005.msg.pkvw.co.charter.net" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S240188AbiASUZz (ORCPT
+        Wed, 19 Jan 2022 15:32:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22775 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231809AbiASUct (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Jan 2022 15:25:55 -0500
-X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 Jan 2022 15:25:55 EST
-Received: from localhost.localdomain ([24.31.246.181])
-        by cmsmtp with ESMTP
-        id AHPlndEzHM0uWAHPmnXTMO; Wed, 19 Jan 2022 20:18:44 +0000
-X-Authority-Analysis: v=2.4 cv=AY2iolbG c=1 sm=1 tr=0 ts=61e87224
- a=cAe/7qmlxnd6JlJqP68I9A==:117 a=cAe/7qmlxnd6JlJqP68I9A==:17 a=NEAV23lmAAAA:8
- a=yQdBAQUQAAAA:8 a=VwQbUJbxAAAA:8 a=JXEDzCox5okIAoVKa0MA:9
- a=SzazLyfi1tnkUD6oumHU:22 a=AjGcO6oz07-iQ99wixmX:22
-From:   Larry Finger <Larry.Finger@lwfinger.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        stable@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Add one more Bluetooth part for the Realtek RTL8852AE
-Date:   Wed, 19 Jan 2022 14:18:37 -0600
-Message-Id: <20220119201837.4135-1-Larry.Finger@lwfinger.net>
-X-Mailer: git-send-email 2.34.1
+        Wed, 19 Jan 2022 15:32:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1642624368;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yiP2qdUeRbGmyqt/ABT+kp8asUGAQz3zJ9nD3pBpt6o=;
+        b=djTAgoIY8x0lk6qJuJdHLo5IxI/b1mdNxYRuNWE0+j8rTj7V+FPmjsqiR+492xKldOEB5+
+        yNu40NAJ5EPUdwu3BDg2RupmaJKG/BlPsjQcBBVU9WcD/DPDfVJmd8oRfrfF92GzmIA2yH
+        q5gbJO6qV4QMTGUm9MmL+3i0+T6OFbk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-403-eIwcCew8P1y0zUWQJHq0-A-1; Wed, 19 Jan 2022 15:32:47 -0500
+X-MC-Unique: eIwcCew8P1y0zUWQJHq0-A-1
+Received: by mail-ed1-f70.google.com with SMTP id n16-20020aa7c690000000b00404cfbb888dso407630edq.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Jan 2022 12:32:47 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yiP2qdUeRbGmyqt/ABT+kp8asUGAQz3zJ9nD3pBpt6o=;
+        b=jR2rLR5yXex398MEuBseAwAEyjGqP2GqI43o8eGyEo7uO+ZB+oQvXX5bNkt3bzPqUa
+         HtgOEnnjlegaHQvXNB5SoKlNXAqhzP/VBbBKTjzwZeUqMMGj2ZBttOeyH4JNd0ihyyUv
+         Y7dDO/fjux1iw+Gkd69QrGwyuK2DV0MNHHmVXmKqmAvo8TAiEIUTTRLFo/cjFeQzmrCH
+         z4c8jPiqs9/ZUGiLrj4zc7Z2Nm/lSpFMzN9gvX3lvrVQmRZdsk9rL05vVmi4BCgNkxxy
+         yAFYRZCPu3Qytu3CoRcK4r52Cg04RbiCqjCJQrD6rymBUutI1DXnMVAI4an2Z/p7zdm+
+         1kUg==
+X-Gm-Message-State: AOAM532owUlOaH0A8FTMSp7YknlFyjvVgOUJMEseujDdLco5N0U1O8ZU
+        bmOVR81vJ/hX5oWA9UEqujiCESqq0GDQePJM3OEAG4YF3hXc1ETUvFcOTCZdrNUnQ4SUfrFU9QM
+        7idVWIRn59dpJTQjLOuP3zKfY2fOp
+X-Received: by 2002:a05:6402:26c8:: with SMTP id x8mr32273718edd.305.1642624365958;
+        Wed, 19 Jan 2022 12:32:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz1zt+Dnu9lz7NafeWrxe/jxKu3n6XeETQ4q2czohA0va6S3dGTObhNI2EbnY3qmkn9+sLc6A==
+X-Received: by 2002:a05:6402:26c8:: with SMTP id x8mr32273697edd.305.1642624365654;
+        Wed, 19 Jan 2022 12:32:45 -0800 (PST)
+Received: from ?IPV6:2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1? (2001-1c00-0c1e-bf00-1db8-22d3-1bc9-8ca1.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1])
+        by smtp.gmail.com with ESMTPSA id q23sm285829edw.53.2022.01.19.12.32.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 19 Jan 2022 12:32:45 -0800 (PST)
+Message-ID: <2fbdd560-79e3-82b2-11c3-bf043ec166e4@redhat.com>
+Date:   Wed, 19 Jan 2022 21:32:44 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfP2vpwKuN2gZq6KKycyaBtg3c00GoQBPa58vKQ2i+Ku9fc3aVGuqSJPISoDbaLxCyBkGUr0fL6qQ6VpDBPr6NBGErOY9wPAI/FkjNh9bY5cU5+dkxrDN
- SzBTDoOd1TiMQOzXrBUoveUvuh7KUSFoauoycBLuanWnjmiKjEZWGuYOPyWdWZmRl3e56L09TxZVRJvCZcyhUOWv5tDSbiyRCnT0Zn1pXC730H+4PhODxdsz
- SGBvyjRqNdYVrVkxuP2zPopZ60Oa8SEXtqbjTQmyLgUBeYdeszhlxN7ygikxWDWWOFVx2HKKnXXD0lsmcBxBkVw7PTr9ejlqa9LxSbSRbeoecv8ARMS9qGdH
- 878UtUKRrYDqoJotmSk4CmhZK+mrs5oiys6NLi/nzIqA1IGMo7f37qEtPjiUSUwOrVVG8QdZ
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] Bluetooth: hci_bcm: Add the Asus TF103C to the
+ bcm_broken_irq_dmi_table
+Content-Language: en-US
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <20211231115055.115988-1-hdegoede@redhat.com>
+ <FE6FDB9A-2188-45EE-9605-CF5A5B7E43A1@holtmann.org>
+ <dcf0b4bc-1b4c-eeca-42a1-6ac92a0e1275@redhat.com>
+ <723D20F2-2688-4112-9ED4-2F8C3B6BF4DF@holtmann.org>
+From:   Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <723D20F2-2688-4112-9ED4-2F8C3B6BF4DF@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This Realtek device has both wifi and BT components. The latter reports
-a USB ID of 0bda:2852, which is not in the table.
+Hi Marcel,
 
-BT device description in /sys/kernel/debug/usb/devices contains the following entries:
+On 1/19/22 20:39, Marcel Holtmann wrote:
+> Hi Hans,
+> 
+>>>> The DSDT for the Asus TF103C specifies a IOAPIC IRQ for the HCI -> host IRQ
+>>>> but this is not correct. Unlike the previous entries in the table, this
+>>>> time the correct GPIO to use instead is known; and the TF103C is battery
+>>>> powered making runtime-pm support more important.
+>>>>
+>>>> Extend the bcm_broken_irq_dmi_table mechanism to allow specifying the right
+>>>> GPIO instead of just always disabling runtime-pm and add an entry to it for
+>>>> the Asus TF103C.
+>>>>
+>>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>>>> ---
+>>>> drivers/bluetooth/hci_bcm.c | 44 ++++++++++++++++++++++++++++++-------
+>>>> 1 file changed, 36 insertions(+), 8 deletions(-)
+>>>>
+>>>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>>>> index ef54afa29357..c6ac4aa994af 100644
+>>>> --- a/drivers/bluetooth/hci_bcm.c
+>>>> +++ b/drivers/bluetooth/hci_bcm.c
+>>>> @@ -20,6 +20,7 @@
+>>>> #include <linux/regulator/consumer.h>
+>>>> #include <linux/clk.h>
+>>>> #include <linux/gpio/consumer.h>
+>>>> +#include <linux/gpio/machine.h>
+>>>> #include <linux/tty.h>
+>>>> #include <linux/interrupt.h>
+>>>> #include <linux/dmi.h>
+>>>> @@ -870,7 +871,23 @@ static int bcm_resume(struct device *dev)
+>>>> #endif
+>>>>
+>>>> /* Some firmware reports an IRQ which does not work (wrong pin in fw table?) */
+>>>> +static struct gpiod_lookup_table asus_tf103c_irq_gpios = {
+>>>> +	.dev_id = "serial0-0",
+>>>
+>>> do you need this one? I assume it could be easily enumerated as serial1-0 if you are unlucky.
+>>
+>> Yes there can be multiple global gpiod_lookup_table-s registered
+>> and the gpiolib code finds the one to use be matching this field
+>> to the dev_name() for the device passed to gpiod_get().
+>>
+>> I'm not worried about this getting enumerated with another dev_name(),
+>> this is a tablet with no ways to add extra serial-bus devices and
+>> there is only the 1 serial-bus device.
+> 
+> is there no other way to match this device?
 
-T: Bus=01 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#= 3 Spd=12 MxCh= 0
-D: Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs= 1
-P: Vendor=0bda ProdID=2852 Rev= 0.00
-S: Manufacturer=Realtek
-S: Product=Bluetooth Radio
-S: SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=1ms
-E: Ad=02(O) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-E: Ad=82(I) Atr=02(Bulk) MxPS= 64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
+I'm not sure what you mean ny "matching this device" ?  Since the ACPI
+tables on this tablet contain the wrong GPIO, we need a gpio-lookup
+table override and the gpio cores checks for a lookup table to use with
+a specific struct device * based on dev_name() and only based on that,
+there are no other matching options in the gpio-lookup mechanism.
 
-The missing USB_ID was reported by user trius65 at https://github.com/lwfinger/rtw89/issues/122
+Regards,
 
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
-Cc: stable@vger.kernel.org
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c30d131da784..cc690f04d2c3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -405,6 +405,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek 8852AE Bluetooth devices */
-+	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0xc852), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x385a), .driver_info = BTUSB_REALTEK |
--- 
-2.34.1
+Hans
 
