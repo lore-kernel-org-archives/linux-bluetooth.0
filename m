@@ -2,144 +2,72 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 723B8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 09:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C41BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 15:49:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353115AbiASJor (ORCPT
+        id S1355920AbiASPtv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Jan 2022 04:44:47 -0500
-Received: from mx.msync.work ([95.217.65.204]:52962 "EHLO mx.msync.work"
+        Wed, 19 Jan 2022 10:49:51 -0500
+Received: from mga09.intel.com ([134.134.136.24]:20020 "EHLO mga09.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348366AbiASJoq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Jan 2022 04:44:46 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2581F268DE1;
-        Wed, 19 Jan 2022 09:44:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lexina.in; s=dkim;
-        t=1642585484; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-         content-transfer-encoding:content-language:in-reply-to:references:
-         disposition-notification-to; bh=9/eVGmOIV/oivfsHMmjhRHKvLdXI2EOqqyAI5/Fn9o8=;
-        b=Ma6JDhP7gn5zvQiHkgLJUOJw3XqcXv8cjotmm0ATM8DOmkZPLcIkjv5Wc0RERim0ue3kri
-        mOI/wwf7TWkYWFD8y64V6g1McUhCvU1IPkgusm20Q30DqWviW0XIiiA8mHp4MAq0rFEObK
-        MHF17rXoJ0/SorZFzC/ObJJZHyUshRtD1rcAQfzHGxGj4+hen3WW1LYLCEWNDd9aTZLDnR
-        pa7s1IDjJHpa4X+QANH35pGxZHar/7WHdmbZ0bOBIRWxvdqVGW2bMxqXmF0f6Uk9o+r+ED
-        g8cpYkOmPAJlHtswMEBJ7HdnO/CJppQ9O8Rv0CeLkQ8TCYX1U5oQd4zruqaEGg==
-Subject: Re: [PATCH v3 1/2] Bluetooth: btrtl: Add support for RTL8822C hci_ver
- 0x08
-To:     Rudi Heitbaum <rudi@heitbaum.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211027091416.1577668-1-adeep@lexina.in>
- <20211027091416.1577668-2-adeep@lexina.in> <20220119090140.GA24@4f18b3450899>
-From:   Vyacheslav <adeep@lexina.in>
-Message-ID: <6c73a271-01a3-6616-35ae-6db3f86538a3@lexina.in>
-Date:   Wed, 19 Jan 2022 12:44:41 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        id S242648AbiASPtt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 Jan 2022 10:49:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1642607389; x=1674143389;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=P6j1sAIQNdblWh02gxi5FPlE5H+sTkhaZrXur8i4cJ8=;
+  b=Ft0eK3MVxl+jdilbayOfp+Eq9u2R6aPy46wNM4ePVfz/pWQ43D0oAbPs
+   CT8M/PF7WQ24mq9K3CqH1Lv64iVbfFWXdVD3YiHegHttxrATEdnh9pC8M
+   u//umi3enYjz3JIuc/+MnpYjFWfo9j9c/G0K9a5WSkbZkcI6cbzrJBBuG
+   8HeWH61wry07hk4B5NBPyvq61E7dEzY5e45nrkc6j46Xo1E7dTlO0a1T4
+   EAVaqV6OJdaPjVqK5ztpJv3ulItcc0bauGMH01OcPMJuffrN1gqgo3vCi
+   AigGPgaPiPxHSaiYUwR4E0ecmQpDHGz4QPwoCTnbWdyFJsWwjc3yXdZ4r
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10231"; a="244890820"
+X-IronPort-AV: E=Sophos;i="5.88,299,1635231600"; 
+   d="scan'208";a="244890820"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 07:49:47 -0800
+X-IronPort-AV: E=Sophos;i="5.88,299,1635231600"; 
+   d="scan'208";a="493067226"
+Received: from cihalawe-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.39.215])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2022 07:49:47 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, karl.westin@loytec.com,
+        inga.stotland@intel.com
+Subject: [PATCH BlueZ] mesh: Fix sequence number of message in friend queue
+Date:   Wed, 19 Jan 2022 07:49:31 -0800
+Message-Id: <20220119154931.182497-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20220119090140.GA24@4f18b3450899>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi!
-Thanks for reply
+As pointed out by https://github.com/bluez/bluez/issues/250, the last
+segment of a multi-segmented message added to Friend Queue was getting
+reset to the seqAuth value incorrectly. The correct sequence was set
+within the preceding for loop.
+---
+ mesh/net.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-19.01.2022 12:01, Rudi Heitbaum wrote:
- > On Wed, Oct 27, 2021 at 12:14:15PM +0300, Vyacheslav Bocharov wrote:
- >> Add detection of RTL8822CS controller with hci_ver = 0x08
- >>
- >> Signed-off-by: Vyacheslav Bocharov <adeep@lexina.in>
- >> ---
- >>   drivers/bluetooth/btrtl.c | 7 +++++++
- >>   1 file changed, 7 insertions(+)
- >>
- >> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
- >> index c2bdd1e6060e..38d547cc6fcd 100644
- >> --- a/drivers/bluetooth/btrtl.c
- >> +++ b/drivers/bluetooth/btrtl.c
- >> @@ -156,6 +156,13 @@ static const struct id_table ic_id_table[] = {
- >>   	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
- >>   	  .cfg_name = "rtl_bt/rtl8822cs_config" },
- >>
- >> +	/* 8822C with UART interface */
- >> +	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0x8, HCI_UART),
- >> +	  .config_needed = true,
- >> +	  .has_rom_version = true,
- >> +	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
- >> +	  .cfg_name = "rtl_bt/rtl8822cs_config" },
- >> +
- >>   	/* 8822C with USB interface */
- >>   	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_USB),
- >>   	  .config_needed = false,
- >
- > Hi Vyacheslav,
- >
- > Could I make a suggestion rebasing this patch against 5.16 and putting
- > the UART hci ver 0008 berore 000aI recently submitted a v4 patch with 
-the .has_msft_ext added based on bluetooth-next, but without the correct 
-order.
-https://patchwork.kernel.org/project/bluetooth/list/?series=606500
-Maybe the order of the lines is not so important?)
+diff --git a/mesh/net.c b/mesh/net.c
+index aa220f762..dd5398487 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -1325,7 +1325,6 @@ static bool friend_packet_queue(struct mesh_net *net,
+ 			hdr += (1 << SEGO_HDR_SHIFT);
+ 		}
+ 
+-		frnd_msg->u.s12[seg_max].seq = seq;
+ 		frnd_msg->cnt_in = seg_max;
+ 		frnd_msg->last_len = size % 12;
+ 		if (!frnd_msg->last_len)
+-- 
+2.31.1
 
- >
- > this has been tested on Tanix TX6.also tested on JetHome JetHub H1 
-and applied to Armbian patchset 
-(https://github.com/armbian/build/pull/3201).
-
-Also need to update the firmware in linux-firmware, the correct binaries 
-are in armbian-firmware.
-
- >
- > Before:
- >
- > [   11.512883] Bluetooth: hci0: RTL: examining hci_ver=08 
-hci_rev=000c lmp_ver=08 lmp_subver=8822
- > [   11.512940] Bluetooth: hci0: RTL: unknown IC info, lmp subver 
-8822, hci rev 000c, hci ver 0008
- > [   11.512957] Bluetooth: hci0: RTL: no config loaded
- >
- > After:
- >
- > [   12.642167] Bluetooth: hci0: RTL: examining hci_ver=08 
-hci_rev=000c lmp_ver=08 lmp_subver=8822
- > [   12.671911] Bluetooth: hci0: RTL: rom_version status=0 version=3
- > [   12.671961] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_fw.bin
- > [   12.706248] Bluetooth: hci0: RTL: loading rtl_bt/rtl8822cs_config.bin
- > [   12.730251] Bluetooth: hci0: RTL: cfg_sz 33, total sz 40737
- > [   13.318832] Bluetooth: hci0: RTL: fw version 0x05a91a4a
- >
- > Tested-by: Rudi Heitbaum <rudi@heitbaum.com>
- >
- > ---
- >   drivers/bluetooth/btrtl.c | 10 +++++++++-
- >   1 file changed, 9 insertions(+), 1 deletion(-)
- >
- > diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
- > --- a/drivers/bluetooth/btrtl.c	2022-01-09 22:55:34.000000000 +0000
- > +++ b/drivers/bluetooth/btrtl.c	2022-01-15 07:12:21.102080089 +0000
- > @@ -148,7 +148,15 @@
- >   	  .fw_name  = "rtl_bt/rtl8761bu_fw.bin",
- >   	  .cfg_name = "rtl_bt/rtl8761bu_config" },
- >
- > + 	/* 8822C (hci ver 0008) with UART interface */
- > +	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0x8, HCI_UART),
- > +	  .config_needed = true,
- > +	  .has_rom_version = true,
- > +	  .has_msft_ext = true,
- > +	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
- > +	  .cfg_name = "rtl_bt/rtl8822cs_config" },
- > +
- > -	/* 8822C with UART interface */
- > +	/* 8822C (hci ver 000a) with UART interface */
- >   	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0xa, HCI_UART),
- >   	  .config_needed = true,
- >   	  .has_rom_version = true,
- > --
- > 2.25.1
- >
---
-Vyacheslav
