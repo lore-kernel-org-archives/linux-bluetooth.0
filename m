@@ -2,88 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66CC8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 03:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B50C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Jan 2022 04:51:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344436AbiASDbD (ORCPT
+        id S1351550AbiASEvb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Jan 2022 22:31:03 -0500
-Received: from omta002.cacentral1.a.cloudfilter.net ([3.97.99.33]:33269 "EHLO
-        omta002.cacentral1.a.cloudfilter.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240019AbiASDbB (ORCPT
+        Tue, 18 Jan 2022 23:51:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54714 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351546AbiASEvb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Jan 2022 22:31:01 -0500
-X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Tue, 18 Jan 2022 22:31:01 EST
-Received: from shw-obgw-4001a.ext.cloudfilter.net ([10.228.9.142])
-        by cmsmtp with ESMTP
-        id 9vrontM9Qyr5HA1Zfnq68M; Wed, 19 Jan 2022 03:23:51 +0000
-Received: from cartman.1045.ca ([24.79.8.194])
-        by cmsmtp with ESMTPA
-        id A1ZcnCgSiUcbnA1ZdnZMNy; Wed, 19 Jan 2022 03:23:51 +0000
-Authentication-Results: ; auth=pass (LOGIN) smtp.auth=link_outgoing@shaw.ca
-X-Authority-Analysis: v=2.4 cv=OO00YAWB c=1 sm=1 tr=0 ts=61e78447
- a=R6DsPnAC7HDsLjZ8I5uN0A==:117 a=R6DsPnAC7HDsLjZ8I5uN0A==:17
- a=IkcTkHD0fZMA:10 a=DghFqjY3_ZEA:10 a=yNFEYGdLAAAA:8 a=UUniS0OLDGPSZ3FarLwA:9
- a=QEXdDO2ut3YA:10 a=Zh8OHTSCxmIxSlm4XFhg:22
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=1045.ca; s=mail;
-        t=1642562628; bh=8fMNLoTykZeAeRqm/pDKipcwMCLaPQPP+Jjrd3BZhUY=;
-        h=Date:To:From:Subject:From;
-        b=lPbsM+HRUqP/9xuAC5EI7zMLExThOTvqfEtlHK9oqlwLECth5f1vNr6Qzw2IyWvRw
-         i3/8NLXBv09AY+wt0hRDlaIHxXpR/8p69Mub7DC4xbwSxYATjZ9a9IC5LpWkXbuVaT
-         mpI85dmYMHLD1vOqqAqkgFudXv2ND7kX/n/+DbuDh3YYBr1PSK98r+ugsHirK5VoVX
-         UqGzIvxB2MvY8JB0fKaO+BbMOAUjGwo8hdgXbz8wtab88rSN7o2G/QAmbSAT0PLt+b
-         gOYolB05+uTtTE3FVE2SrEbkVo1MlhFZeK2i5sWwZ+tm7n8HE8grW5Vs/dE7rLCtvZ
-         +XHjFtYugUDmA==
-Received: from [192.168.1.155] (bruce486DX.1045.ca [192.168.1.155])
-        by cartman.1045.ca (Postfix) with ESMTPSA id 35925139AA8;
-        Tue, 18 Jan 2022 21:23:47 -0600 (CST)
-Message-ID: <c821e1bd-dcee-fa4b-93c3-29279756315d@1045.ca>
-Date:   Tue, 18 Jan 2022 21:23:43 -0600
+        Tue, 18 Jan 2022 23:51:31 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EBCC06161C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jan 2022 20:51:30 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id i8-20020a17090a138800b001b3936fb375so5096264pja.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Jan 2022 20:51:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VEgFmDgo3w6Jffnt8VKTDrZcIrWTG9ANzhjyGQZEAqQ=;
+        b=H0iK5vMBQEp8F3MgEJnyRBluasT22qWJaGzJOqdj9lS+6OA88aO4zmgItdxgko+tMS
+         xrhNksC0cX+4U2D0LhwTYhRdZM3thcwGvCdCvqOEY2j/PC0am5lsFcdimnTynOy1k2OJ
+         dqQM/R4C5ytxFxcAwDwbmBoB8F10SSIgrF9hgKNyeaUtyvEf7G222dvXc3lsI+L+8h3F
+         RAVTn282GO2HWyMoFwBC+I5iz+lm31m/X4IP1awEcCRovWaXDKfnuF1Fi3295ROMz0X6
+         yNFKsx/Xj6M7D3wUO5Q8weERjRlZZUiooMIfBcCpm3n7lZKH2xR5X2/xfbJWXQM6/uff
+         ILDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VEgFmDgo3w6Jffnt8VKTDrZcIrWTG9ANzhjyGQZEAqQ=;
+        b=PMBAguKkcvPPPfPMDSv+RwOXIHvgXAhaujzI+qqE9amq16KYA3a1MeJmlG/oZbhl+j
+         RQLS3v94+435RNtDhjXDmxLgxVSZyiBrIJV1zxciVHj8Zb7JGfuYPziLugAyGiQfZE7k
+         1Sg1EJItq+XNWhitFbz/At6/arMo2P/mbLcL5AyC3if4uGrWd4TyzNU8xX9kajzXsdNK
+         APZzaPy09rLZq9QyWAZRRDM0QYaU5dkSr0ezv2OEtcli9o6dfxKn4CtXc5Sir3jOI6jZ
+         2kcbdf3DzD1kb5aRUVS15pPZFi99IsfOrb/53db0ZF7KSdPzon9Mut0Dnu403Rq2uqIl
+         wg7A==
+X-Gm-Message-State: AOAM532TCGO8ENTgS0CI3wl9/LFuCMXDJi00ILOK2cOC1/nzAIVVSgK2
+        SWAQbmdxc1vmo0rPCYUJZ06hTT4KNgY=
+X-Google-Smtp-Source: ABdhPJzPvWk1OD6aSW3o/EmCn2P7ulHBP8iAdMhJzcKkOjqDmIoBKzlhYkEhMU26e/rNOkAvIBPy8Q==
+X-Received: by 2002:a17:903:4115:b0:14a:efa0:2779 with SMTP id r21-20020a170903411500b0014aefa02779mr2206604pld.12.1642567883449;
+        Tue, 18 Jan 2022 20:51:23 -0800 (PST)
+Received: from localhost.localdomain ([2601:1c0:6a01:d830:2227:6627:3120:5131])
+        by smtp.gmail.com with ESMTPSA id s21sm19427378pfg.75.2022.01.18.20.51.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Jan 2022 20:51:22 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH RFC] Bluetooth: btintel: Fix WBS setting for Intel legacy ROM products
+Date:   Tue, 18 Jan 2022 20:51:19 -0800
+Message-Id: <20220119045119.132191-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-From:   Bruce Link <bruce@1045.ca>
-Subject: [PATCH] Bluetooth: Add support for Realtek 8761BU Bluetooth receivers
- of ID 2550:8761
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CMAE-Envelope: MS4xfDFRrQ6WW1N/fGRv1RyCG0E9qIBoKuSrR2j1vZEc3j2cSHKMsvBo7EUmDCjJ4fw8zFW9vdHJolMCR+Ct2CXbEv/nwDBtPp17u7Zuyk5ASnO3TqqSvK87
- Ce/TXBNSOMKfIUNW4kuIKJcIwTjo6N00ekdQlClTumr+Sy6xBHXF8E5IEtqXEO0dAfGCYQvpl/A+KldbpIiInFwd/FKsrXTPKz8p02/EPohmfORb0M+WJDQr
- 9XQ9WXT3C8YCT/TTSpNUk2fRhFGovK0cYPcpQrkZ4yzAfj+TbHDEf6eVKtJoggG3727UNFWBsJQpKXOMk0I5u+0R4XJru7MF/GTkkKO1rbQ=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for Realtek 8761BU Bluetooth receivers of ID 2550:8761 by
-adding the appropriate ID to btusb.c to cause firmware to load.
-e.g.: EDUP EP-B2536, MPOW BH519A, MPOW BH456A
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-Signed-off-by: Bruce Link <bruce@1045.ca>
+Intel Legacy ROM Products don't support WBS except the SdP(8087:0aa7).
+But StP2(8087:0a2a) and SdP have the same version information, and
+btintel cannot distinguish between StP2 and SdP for WBS support.
+
+This patch sets the WBS support flag for SdP based on USB idProduct and
+uses it in btintel to configure the WBS.
+
+This flag is only applicable for Legacy ROM products.
+
+Fixes: 3df4dfbec0f29 ("Bluetooth: btintel: Move hci quirks to setup routine")
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
-N.B. I am able to successfully test this patch on my own system, but
-cannot meet the requirement of 4 other systems due to lack of
-availability. I hope this is acceptable given the small scope of the
-patch.
+ drivers/bluetooth/btintel.c | 10 +++++++---
+ drivers/bluetooth/btintel.h |  1 +
+ drivers/bluetooth/btusb.c   | 12 ++++++++++++
+ 3 files changed, 20 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 1a4f8b227eac..6730c9b2ae33 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2428,10 +2428,14 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 
+ 			/* Apply the device specific HCI quirks
+ 			 *
+-			 * WBS for SdP - SdP and Stp have a same hw_varaint but
+-			 * different fw_variant
++			 * WBS for SdP - The version information is the same for
++			 * both StP2 and SdP, so it cannot be used to
++			 * distinguish between StP2 and SdP. Instead, it uses
++			 * the flag set by the transport driver(btusb) for
++			 * the Legacy ROM SKU and sets the quirk for WBS.
+ 			 */
+-			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
++			if (btintel_test_flag(hdev,
++					      INTEL_ROM_LEGACY_WBS_SUPPORTED))
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
+ 
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index c9b24e9299e2..efdb3d738abf 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -152,6 +152,7 @@ enum {
+ 	INTEL_BROKEN_INITIAL_NCMD,
+ 	INTEL_BROKEN_SHUTDOWN_LED,
+ 	INTEL_ROM_LEGACY,
++	INTEL_ROM_LEGACY_WBS_SUPPORTED,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c30d131da784..16254681e162 100644
+index c30d131da784..286e2fa1ef44 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -482,6 +482,9 @@ static const struct usb_device_id blacklist_table[] = {
-         /* Additional Realtek 8761BU Bluetooth devices */
-         { USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
-BTUSB_WIDEBAND_SPEECH },
-+       { USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
-+ BTUSB_WIDEBAND_SPEECH },
+@@ -3742,6 +3742,18 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 		if (id->driver_info & BTUSB_INTEL_BROKEN_SHUTDOWN_LED)
+ 			btintel_set_flag(hdev, INTEL_BROKEN_SHUTDOWN_LED);
 +
-
-         /* Additional Realtek 8821AE Bluetooth devices */
-         { USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
-
++		/* Intel's Legacy ROM products don't support WBS except
++		 * the SdP(8087:0aa7). But the StP2(8087:0a2a) and SdP have the
++		 * same version information, and btintel can't distinguish
++		 * between StP2 and SdP for the WBS support.
++		 * It sets the flag here based on the USB PID to enable the WBS
++		 * support for legacy ROM products.
++		 * Note that this flag is only applicable to legacy ROM
++		 * products.
++		 */
++		if (id->idProduct == 0x0aa7)
++			btintel_set_flag(hdev, INTEL_ROM_LEGACY_WBS_SUPPORTED);
+ 	}
+ 
+ 	if (id->driver_info & BTUSB_MARVELL)
+-- 
+2.25.1
 
