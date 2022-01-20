@@ -2,87 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA66C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jan 2022 10:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A23B0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jan 2022 13:08:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359785AbiATKOB convert rfc822-to-8bit (ORCPT
+        id S1343687AbiATNIy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jan 2022 05:14:01 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:32943 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359784AbiATKOA (ORCPT
+        Thu, 20 Jan 2022 08:08:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245476AbiATNIh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jan 2022 05:14:00 -0500
-Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id AEDCFCECF1;
-        Thu, 20 Jan 2022 11:13:58 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: btintel: Fix WBS setting for Intel legacy ROM
- products
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220120075004.293700-1-hj.tedd.an@gmail.com>
-Date:   Thu, 20 Jan 2022 11:13:58 +0100
-Cc:     linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D75FCA2E-2843-4C14-BF0D-3AFDE0FA1C8E@holtmann.org>
-References: <20220120075004.293700-1-hj.tedd.an@gmail.com>
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Thu, 20 Jan 2022 08:08:37 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2194FC061574;
+        Thu, 20 Jan 2022 05:08:37 -0800 (PST)
+Received: from ip4d173d02.dynamic.kabel-deutschland.de ([77.23.61.2] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nAXB3-00032A-8D; Thu, 20 Jan 2022 14:08:33 +0100
+Message-ID: <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
+Date:   Thu, 20 Jan 2022 14:08:32 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
+ Move shutdown callback before flushing tx and rx queue"
+Content-Language: en-BS
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     "An, Tedd" <tedd.an@intel.com>,
+        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
+        "andypalmadi@gmail.com" <andypalmadi@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
+ <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
+ <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info>
+In-Reply-To: <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1642684117;dfe97bd5;
+X-HE-SMSGID: 1nAXB3-00032A-8D
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+On 10.12.21 10:16, Thorsten Leemhuis wrote:
+> Hi, this is your Linux kernel regression tracker speaking.
 
-> This patch adds the flag to identify the Intel legacy ROM products that
-> don't support WBS like WP and StP.
+/me again
+
+> On 10.12.21 02:10, An, Tedd wrote:
+>> On Fri, 2021-12-10 at 01:36 +0200, coldolt wrote:
+>>> After a restart, bluetooth doesn't work since commit 0ea53674d07f
+>>> "Bluetooth: Move shutdown callback before flushing tx and rx queue"
+>>>
+>>> bluetoothctl doesn't list any controllers and I get the following in
+>>> dmesg | grep -i bluetooth
+>>>
+>>> [    2.634812] Bluetooth: Core ver 2.22
+>>> [    2.634843] NET: Registered PF_BLUETOOTH protocol family
+>>> [    2.634845] Bluetooth: HCI device and connection manager initialized
+>>> [    2.634850] Bluetooth: HCI socket layer initialized
+>>> [    2.634853] Bluetooth: L2CAP socket layer initialized
+>>> [    2.634858] Bluetooth: SCO socket layer initialized
+>>> [    4.077788] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+>>> [    4.077794] Bluetooth: BNEP filters: protocol multicast
+>>> [    4.077799] Bluetooth: BNEP socket layer initialized
+>>> [    4.078219] random: bluetoothd: uninitialized urandom read (4 bytes read)
+>>> [    4.852835] Bluetooth: hci0: Reading Intel version command failed (-110)
+>>> [    4.852838] Bluetooth: hci0: command 0xfc05 tx timeout
+>>>
+>>> However, it works after a cold start or after putting the computer to sleep.
+>>>
+>>> Before 83f2dafe2a62 "Bluetooth: btintel: Refactoring setup routine for
+>>> legacy ROM sku", it always works after a restart, but from that commit
+>>> up until before 0ea53674d07f it either works or doesn't work after a
+>>> restart depending on if before restart it was working or not, meaning
+>>> it stays working or stays not working.
+>>>
+>>> Also on the first restart from before 83f2dafe2a62 into 0ea53674d07f
+>>> or later it works, but then restarting again into 0ea53674d07f or
+>>> later it no longer works. So it seems that 0ea53674d07f and later puts
+>>> the bluetooth in a nonworking state if you restart from it, but before
+>>> 83f2dafe2a62 it puts it back into a working state at startup, and in
+>>> between it doesn't do either, i.e. it stays the way it was.
+>>>
+>>> I have a Dell Latitude E5550 laptop with an Intel 7265 wifi/bluetooth
+>>> card REV=0x210 firmware version 29.4063824552.0 7265D-29. I'm on Arch
+>>> Linux, the problem is still there on 5.16-rc4.
+>>>
+>>> Here is a thread on the Arch Linux forums with several people with the
+>>> same problem, for some of them it got fixed with a kernel update or by
+>>> reloading modules, but not for everybody, including me
+>>> https://bbs.archlinux.org/viewtopic.php?id=271459
+>>>
+>>> #regzbot introduced 0ea53674d07f
 > 
-> Fixes: 3df4dfbec0f29 ("Bluetooth: btintel: Move hci quirks to setup routine")
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
-> drivers/bluetooth/btintel.c | 10 +++++++---
-> drivers/bluetooth/btintel.h |  1 +
-> drivers/bluetooth/btusb.c   |  6 ++++++
-> 3 files changed, 14 insertions(+), 3 deletions(-)
+> Many thx for directly getting regzbot involved! :-D
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 1a4f8b227eac..225ed0373e9d 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2428,10 +2428,14 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+>> This issue is under investigation to find the root cause and proper solution.
 > 
-> 			/* Apply the device specific HCI quirks
-> 			 *
-> -			 * WBS for SdP - SdP and Stp have a same hw_varaint but
-> -			 * different fw_variant
-> +			 * WBS for SdP - For the Legacy ROM products, only SdP
-> +			 * supports the WBS. But the version information is not
-> +			 * enough to use here because the StP2 and SdP have same
-> +			 * hw_variant and fw_variant. So, this flag is set by
-> +			 * the transport driver(btusb) based on the HW info
-> +			 * (idProduct)
-> 			 */
-> -			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
-> +			if (!btintel_test_flag(hdev, INTEL_NO_WBS_SUPPORT))
-> 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
-> 					&hdev->quirks);
+> Only internally? Or are there any other related public discussions that
+> are relevant to this and thus good to be aware of?
+
+What's the status here? It looks like there was no progress since 41
+days, which is awfully long even with the festive season in between.
+Could anyone provide a status update please?
+
+Ciao, Thorsten
+
+#regzbot poke
+
+P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
+on my table. I can only look briefly into most of them. Unfortunately
+therefore I sometimes will get things wrong or miss something important.
+I hope that's not the case here; if you think it is, don't hesitate to
+tell me about it in a public reply, that's in everyone's interest.
+
+BTW, I have no personal interest in this issue, which is tracked using
+regzbot, my Linux kernel regression tracking bot
+(https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
+this mail to get things rolling again and hence don't need to be CC on
+all further activities wrt to this regression.
+
+>> The downloaded firmware breaks the behavior though, we need to investigate
+>> further to see if it can be fixed in firmware or fix in the driver.
 > 
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index c9b24e9299e2..084a5e8dce39 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -152,6 +152,7 @@ enum {
-> 	INTEL_BROKEN_INITIAL_NCMD,
-> 	INTEL_BROKEN_SHUTDOWN_LED,
-> 	INTEL_ROM_LEGACY,
-> +	INTEL_NO_WBS_SUPPORT,
-
-please keep it as INTEL_ROM_LEGACY_NO_WBS or INTEL_ROM_LEGACY_NO_WBS_SUPPORT. It is better to make clear that this is only for our ROM products. Especially since above it is in the section for just the ROM products.
-
-Regards
-
-Marcel
-
+> The answer from my point is simple: it needs to be fixed in the kernel,
+> not just in the firmware, otherwise people that update the kernel
+> without updating the firmware at the same time will run into a
+> regression -- and that is not acceptable by kernel development standards.
+> 
+> Ciao, Thorsten
+> 
+> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
+> on my table. I can only look briefly into most of them. Unfortunately
+> therefore I sometimes will get things wrong or miss something important.
+> I hope that's not the case here; if you think it is, don't hesitate to
+> tell me about it in a public reply. That's in everyone's interest, as
+> what I wrote above might be misleading to everyone reading this; any
+> suggestion I gave they thus might sent someone reading this down the
+> wrong rabbit hole, which none of us wants.
+> 
+> BTW, I have no personal interest in this issue, which is tracked using
+> regzbot, my Linux kernel regression tracking bot
+> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
+> this mail to get things rolling again and hence don't need to be CC on
+> all further activities wrt to this regression.
