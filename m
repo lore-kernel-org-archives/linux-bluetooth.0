@@ -2,118 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7221C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jan 2022 17:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2787DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Jan 2022 19:44:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbiATR2M (ORCPT
+        id S1347014AbiATToX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jan 2022 12:28:12 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:56871 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244138AbiATR0V (ORCPT
+        Thu, 20 Jan 2022 14:44:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48384 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243633AbiATToV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jan 2022 12:26:21 -0500
-Received: by mail-il1-f197.google.com with SMTP id j6-20020a056e02218600b002b687be0048so4206428ila.23
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jan 2022 09:26:21 -0800 (PST)
+        Thu, 20 Jan 2022 14:44:21 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 920F7C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jan 2022 11:44:21 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id d5so4535986pjk.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jan 2022 11:44:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OThgPxXbOdMprFjyK/8qYqyu6iKQIOIkcWfmxarfAIE=;
+        b=QyoPH5lzW4IoesNX20Rz+wKQVxnHhqOAAcedrkiocTlcHR8j0nOsBKE0S2Yt1JRHcM
+         me5KoAZQVrItwoFcbHP1bKyjzdu3Z/V3RyBjA5tSR630dETMektnyBkWbTSqOd+Ho5cI
+         FLghrxaa2ddOoHg35s3JUYpCJOoN1aaHbCp4Kwx3uC5wzKf5rs20fXuQVZh/tqHO/2Ly
+         KjLsJP13NfCr5PCpkw6dBkU7+YRo4VzoYvxij4CwFo4kap3Vy60zUJSoP75DzkPLMB6w
+         KjebZSkeefnbZG+Sy8DpsJtQtuk8qJvrxHGgL4u/MIcbuOcHPEfhyN3w0IQQspiVIUph
+         OzIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=2uyROQkwAubxAhtrVkpi0xhwbRArP4G5FL5KEzxUI9M=;
-        b=v0S1KefkaIUVwMegVqK1oWhD/4Ys2rYJjeiwelTjRzCtB0disYHQYQm7wEqmXMY3kT
-         mXL27ccGHLWjqVS/TOr07FX/Xc+5iO6PZN3V9pll4XPsNYACv7RwhxYRQcCW8jcjZDdQ
-         BYh7Bj5jsI1sf/KCECFdO7DO13EzJaysFfSUsv0QjmP7aHc1/SjO73+FiwAPRluPLabw
-         LEz4ji8zV3olYlgA4OF2t9BjFghORz2DV707jUaN2JE/zVtS7/4pO+AG0CpfQwnNUlSY
-         dqLbRaUY6orkl7kwozDF8MWUvCRkLjSm2YtLXFwnNejPTJpi248J5z+hqvI496dZ1/Si
-         laCg==
-X-Gm-Message-State: AOAM530V7JKJzkVx4pXcmIP00mPIkzZ8ff26WcORXFnUlV/A1QHl0D+a
-        5Zf+beLqSTIcBGbthkOvgG2ucPbNuUn66wapGCvjYNBz7c5H
-X-Google-Smtp-Source: ABdhPJzn7lnstB1hmXA3lDtjeXtCpQEY7xs8KvPUbYnitaFERg04FffKPh05hSmrGJX9vU3ghvzbwqufncCskrbtcd8pME37RjTz
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OThgPxXbOdMprFjyK/8qYqyu6iKQIOIkcWfmxarfAIE=;
+        b=ad54KIp3W4RLwF64fbgmuctABkY2+Ad8GoqjTU8+PrAlUlENS4wqB39A5HIG86Kd3f
+         edao1W0woOsNRLOIzCfJJoyuiDpX1Rc4ocaeiZ0r0hsYCJ34nH2o2ZLL/SiN/FUJfG8g
+         xGXJAsj/PYnkWgG8znaqM4CjxVCt3YQ1QXQ+hG8Cpq+e1Yl09rqnhod2GSyUoBKqp4ri
+         ZeUEOjCqeyfyGQigfMga2NBYDepxDemvyfRjb5YmDVdebl232LwXmV6CujTRXoCWRJB4
+         hrrC6y8/CdIo5cn65xj+ymOY+OJTBIkbs5P/QXnQ4wSOmWJXHPnEQ5layNC6G26xca0i
+         Wg6w==
+X-Gm-Message-State: AOAM533EDZiwzVOqTvArP85cwbp66xkfTfS8C1BH5QX+M/BBRlvuFd27
+        xnE4GdnBy50OGSPpqId5p55QQZMXL/E=
+X-Google-Smtp-Source: ABdhPJxS2qr5kzfe1pmi/xePZKRQb3pwkzWiaaTxMniI/Pp8cV3oAi5W2w+OQy7ZJ7CDlzMdtrZd1A==
+X-Received: by 2002:a17:903:110d:b0:149:a908:16a2 with SMTP id n13-20020a170903110d00b00149a90816a2mr204243plh.77.1642707860849;
+        Thu, 20 Jan 2022 11:44:20 -0800 (PST)
+Received: from localhost.localdomain ([2601:1c0:6a01:d830:6e28:6472:c5bd:5307])
+        by smtp.gmail.com with ESMTPSA id y16sm4062279pfl.128.2022.01.20.11.44.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jan 2022 11:44:20 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH v2] Bluetooth: btintel: Fix WBS setting for Intel legacy ROM products
+Date:   Thu, 20 Jan 2022 11:44:18 -0800
+Message-Id: <20220120194418.349438-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Received: by 2002:a02:cc83:: with SMTP id s3mr15734606jap.153.1642699580697;
- Thu, 20 Jan 2022 09:26:20 -0800 (PST)
-Date:   Thu, 20 Jan 2022 09:26:20 -0800
-In-Reply-To: <0000000000000ca79b05d24e85fd@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fafeca05d606cc4a@google.com>
-Subject: Re: [syzbot] WARNING: ODEBUG bug in cancel_delayed_work (2)
-From:   syzbot <syzbot+4b140c35e652626b77ba@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-HEAD commit:    fa2e1ba3e9e3 Merge tag 'net-5.17-rc1' of git://git.kernel...
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=103cf9ffb00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fed7021824b74f81
-dashboard link: https://syzkaller.appspot.com/bug?extid=4b140c35e652626b77ba
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1615b23fb00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13718b50700000
+This patch adds the flag to identify the Intel legacy ROM products that
+don't support WBS like WP and StP.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4b140c35e652626b77ba@syzkaller.appspotmail.com
+Fixes: 3df4dfbec0f29 ("Bluetooth: btintel: Move hci quirks to setup routine")
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btintel.c | 11 ++++++++---
+ drivers/bluetooth/btintel.h |  1 +
+ drivers/bluetooth/btusb.c   |  6 ++++++
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 0 PID: 3603 at lib/debugobjects.c:505 debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Modules linked in:
-CPU: 0 PID: 3603 Comm: syz-executor756 Not tainted 5.16.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:505
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 80 f2 05 8a 4c 89 ee 48 c7 c7 80 e6 05 8a e8 24 a3 26 05 <0f> 0b 83 05 85 4f b3 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc90001d2f928 EFLAGS: 00010082
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: ffff888023568000 RSI: ffffffff815f9d98 RDI: fffff520003a5f17
-RBP: 0000000000000001 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815f3afe R11: 0000000000000000 R12: ffffffff89ae27e0
-R13: ffffffff8a05ed00 R14: ffffffff8166b6b0 R15: 1ffff920003a5f30
-FS:  0000555556897300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fe13002485e CR3: 0000000072763000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init lib/debugobjects.c:895 [inline]
- debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:866
- debug_timer_assert_init kernel/time/timer.c:739 [inline]
- debug_assert_init kernel/time/timer.c:784 [inline]
- del_timer+0x6d/0x110 kernel/time/timer.c:1204
- try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1285
- __cancel_work kernel/workqueue.c:3268 [inline]
- cancel_delayed_work+0x79/0x340 kernel/workqueue.c:3297
- l2cap_clear_timer include/net/bluetooth/l2cap.h:883 [inline]
- l2cap_chan_del+0x517/0xa80 net/bluetooth/l2cap_core.c:665
- l2cap_chan_close+0x1b9/0xaf0 net/bluetooth/l2cap_core.c:825
- l2cap_sock_shutdown+0x3d2/0x1070 net/bluetooth/l2cap_sock.c:1377
- l2cap_sock_release+0x72/0x200 net/bluetooth/l2cap_sock.c:1420
- __sock_release+0xcd/0x280 net/socket.c:650
- sock_close+0x18/0x20 net/socket.c:1318
- __fput+0x286/0x9f0 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- tracehook_notify_resume include/linux/tracehook.h:188 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:175 [inline]
- exit_to_user_mode_prepare+0x27e/0x290 kernel/entry/common.c:207
- __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
- syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:300
- do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f24557e606b
-Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-RSP: 002b:00007ffe2a68a750 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 00007f24557e606b
-RDX: ffffffffffffffb8 RSI: 0000000020000000 RDI: 0000000000000004
-RBP: 0000000000000003 R08: 0000000000000000 R09: 000000ff00000001
-R10: 000000ff00000001 R11: 0000000000000293 R12: 00005555568972b8
-R13: 0000000000000072 R14: 00007ffe2a68a7c0 R15: 0000000000000003
- </TASK>
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 1a4f8b227eac..8ddb476fabf6 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2428,10 +2428,15 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 
+ 			/* Apply the device specific HCI quirks
+ 			 *
+-			 * WBS for SdP - SdP and Stp have a same hw_varaint but
+-			 * different fw_variant
++			 * WBS for SdP - For the Legacy ROM products, only SdP
++			 * supports the WBS. But the version information is not
++			 * enough to use here because the StP2 and SdP have same
++			 * hw_variant and fw_variant. So, this flag is set by
++			 * the transport driver(btusb) based on the HW info
++			 * (idProduct)
+ 			 */
+-			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
++			if (!btintel_test_flag(hdev,
++					       INTEL_ROM_LEGACY_NO_WBS_SUPPORT))
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
+ 
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index c9b24e9299e2..e0060e58573c 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -152,6 +152,7 @@ enum {
+ 	INTEL_BROKEN_INITIAL_NCMD,
+ 	INTEL_BROKEN_SHUTDOWN_LED,
+ 	INTEL_ROM_LEGACY,
++	INTEL_ROM_LEGACY_NO_WBS_SUPPORT,
+ 
+ 	__INTEL_NUM_FLAGS,
+ };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c30d131da784..cbd0eaa05e17 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -62,6 +62,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_QCA_WCN6855	0x1000000
+ #define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	0x2000000
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
++#define BTUSB_INTEL_NO_WBS_SUPPORT	0x8000000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -385,9 +386,11 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x0033), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
++						     BTUSB_INTEL_NO_WBS_SUPPORT |
+ 						     BTUSB_INTEL_BROKEN_INITIAL_NCMD |
+ 						     BTUSB_INTEL_BROKEN_SHUTDOWN_LED },
+ 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
++						     BTUSB_INTEL_NO_WBS_SUPPORT |
+ 						     BTUSB_INTEL_BROKEN_SHUTDOWN_LED },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
+@@ -3737,6 +3740,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->send = btusb_send_frame_intel;
+ 		hdev->cmd_timeout = btusb_intel_cmd_timeout;
+ 
++		if (id->driver_info & BTUSB_INTEL_NO_WBS_SUPPORT)
++			btintel_set_flag(hdev, INTEL_ROM_LEGACY_NO_WBS_SUPPORT);
++
+ 		if (id->driver_info & BTUSB_INTEL_BROKEN_INITIAL_NCMD)
+ 			btintel_set_flag(hdev, INTEL_BROKEN_INITIAL_NCMD);
+ 
+-- 
+2.25.1
 
