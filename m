@@ -2,101 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2440C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 13:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9BE1C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 16:57:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380758AbiAUNaS (ORCPT
+        id S1381826AbiAUQ5W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 08:30:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58848 "EHLO
+        Fri, 21 Jan 2022 11:57:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380759AbiAUNaH (ORCPT
+        with ESMTP id S1380343AbiAUQ44 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 08:30:07 -0500
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12410C061401
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 05:30:07 -0800 (PST)
-Received: by mail-qt1-x834.google.com with SMTP id c3so8176029qtc.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 05:30:07 -0800 (PST)
+        Fri, 21 Jan 2022 11:56:56 -0500
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81043C061773;
+        Fri, 21 Jan 2022 08:55:48 -0800 (PST)
+Received: by mail-oi1-x22f.google.com with SMTP id bb37so14392661oib.1;
+        Fri, 21 Jan 2022 08:55:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=jcQ7zU3ePyEoWcbSVBRDKUIOR57mtAGb6gLjAuy1OWw=;
-        b=Da4RbKSp/mXHegq0bwB2BTtv67c/SfM6ARG6Y6t/2I0mMp4VKJShA4X+3uNGRA0xJR
-         LwuZZclth9wiX+v3dxUZqGNizNwmyJ+QpwIV/FC3kbyB9tDzwJ9fYk1AX5E0bYgyfq3b
-         6CAUN6wGZBFQWWmj7Sv0mlSB/s6kJAc3BUWRFzB3zv0qvETdEIPs6Phc8fK3l+cKA6wR
-         /7C6gGSbgj8aOKqM9xhjUBuoRsjir90trQNrDXCROX9WxzXVRbT9EH5H7Xa/H1fG0PAl
-         9hG8Ij+tF62ChC3NqisoAmhNw0iSkZ/QZsbWdrr9YzTLpRK6cqaMBRvxFsTTWjmT4F+z
-         6ylA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=/hFEnKfQJiIAaQ2mjd4rxrXqXcThyAji37idZyhsBAY=;
+        b=HEDrhGVj7yfZqvkjCw8k1/FNEXYzOGPmv9dNN2Hn6Ih3y+FbsyD2K4jPUpYbNauJT8
+         bhUbA4IVknUbh6oM8nQDN5aFYvnp1bOdR0zYfUmbmVsSTNpmSF+ydgzjS2IjIvPFwvOi
+         wm5++I3D8YKAJmsKDWrCqlQBb21YPA7Z0xNV/ft/YJNfpkRdkRTm3j2l3quXGaU2npIV
+         qgGxPa2AU2MyfCpmiy+eBEn6LQ+z89Kp3A8rlk7IcSJCOA3XTiiSHqGWRCR4V1McJOKW
+         1L+0wi/MNWYT1AuruOViuur8pCfx+lF/oFLKZH6fHOCNEZbY1AHof/Dlsq16lwsVaZUh
+         r9bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=jcQ7zU3ePyEoWcbSVBRDKUIOR57mtAGb6gLjAuy1OWw=;
-        b=GV1EDPt2NS4Pdlp6P+TDfeNP4A1EH0/YOxtF1Kp9g9+B+i/rbIYP3qvxH81hpCxUJ/
-         J/UbQmsUHimVx9nx0lcixl7ydeNl9ROheSG33J2UJmqySLonr5hF2robGqX9C7eaiMAr
-         erO6qPvp9ZHOf+fsjkn8ImLYaitLZ1tom9TjjYTYaGSXT+WJDEuxWk77XGTLhvj2IXi+
-         cw5uzMtnyMGT8L3TBSU/KNlH4WNwNWqH+bW8ccfc7UJtZhvh9vbJDLyxcBbrcBuJcQyg
-         VlspBie7wUO3g1Znflnuyob9F8UNsIj2ZN1LjdDGilnF36XQ9FCmPhZ5Rj16LKTQp9AC
-         JeuA==
-X-Gm-Message-State: AOAM532bJI5huL0sKRYnfl7cn5mt+q7f/hkpFsh3BlEWvQ8pv3DvKWnJ
-        Cktmv72vpH7tvmYeQ+UCyC8punqb8gw=
-X-Google-Smtp-Source: ABdhPJzhde8o1f1GMjWxMEz0gghpl5og+hg37L+kUbmU2WHXKWGhSyJhEjX62X9Z7eXiwdS8E9S36A==
-X-Received: by 2002:a05:622a:c3:: with SMTP id p3mr3118350qtw.21.1642771806035;
-        Fri, 21 Jan 2022 05:30:06 -0800 (PST)
-Received: from [172.17.0.2] ([20.69.255.211])
-        by smtp.gmail.com with ESMTPSA id k22sm2974498qkh.44.2022.01.21.05.30.05
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=/hFEnKfQJiIAaQ2mjd4rxrXqXcThyAji37idZyhsBAY=;
+        b=LD/ZRy5MlWFyv4U850/TZ/BlHnADzbQUmrAn5Vwa6GedMbqdfRPWrLcHSbpou/bVvb
+         7qKIek8LORHeBtbRIf4KtkvgHkG61FqfQ0teUWxabOASx5yh+3DytZNZ+vQmk/Mq8PXG
+         OUqoySn5+SgqyKWTCg7+5bAzQwPDFtDWE3zN7ZgQROiXSqgmVLcN4jC7vQhSq3pZOJ8g
+         7tL7ASlFT1/c8cv0EcJHUlHgkd/NMbvg5mS+sivLTrexBxu+kyxQ6U0LLzZPvO5HAbZc
+         qU7JNADXRpAhvkWtQnjQsxhLxX3Jv70ew06UQ/1B+LtNy3Jm07YF3OTXAowLfH526Ry+
+         pPlA==
+X-Gm-Message-State: AOAM532u1f+O5Y9zPiYTKfoPwN7PRhxDeXghqds6Maqrr9WaQRPVbgzt
+        BPmBNKNRugxp8B8E40n+S0E=
+X-Google-Smtp-Source: ABdhPJxuroa+LmFuxwX8sb8C/C6iB0kFXUlik7h0Gj12vxUub1iXO+HFMA6PEGE12EVI32ETMI7pNg==
+X-Received: by 2002:a05:6808:1147:: with SMTP id u7mr1261723oiu.117.1642784147933;
+        Fri, 21 Jan 2022 08:55:47 -0800 (PST)
+Received: from thinkpad.localdomain ([2804:14d:5cd1:5d03:cf72:4317:3105:f6e5])
+        by smtp.gmail.com with ESMTPSA id y8sm1089271oou.23.2022.01.21.08.55.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jan 2022 05:30:05 -0800 (PST)
-Message-ID: <61eab55d.1c69fb81.ea4f1.2de3@mx.google.com>
-Date:   Fri, 21 Jan 2022 05:30:05 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0589572665215455743=="
+        Fri, 21 Jan 2022 08:55:47 -0800 (PST)
+From:   Luiz Sampaio <sampaio.ime@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, Luiz Sampaio <sampaio.ime@gmail.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH 26/31] net: bluetooth: changing LED_* from enum led_brightness to actual value
+Date:   Fri, 21 Jan 2022 13:54:31 -0300
+Message-Id: <20220121165436.30956-27-sampaio.ime@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220121165436.30956-1-sampaio.ime@gmail.com>
+References: <20220121165436.30956-1-sampaio.ime@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, josephsih@chromium.org
-Subject: RE: [BlueZ,v1,1/2] adapter: support AOSP MGMT_EV_QUALITY_REPORT
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220121192352.BlueZ.v1.1.Ie4d1be8ced51f0aa92ee6d8eacf9666a121a1292@changeid>
-References: <20220121192352.BlueZ.v1.1.Ie4d1be8ced51f0aa92ee6d8eacf9666a121a1292@changeid>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0589572665215455743==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607234
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.93 seconds
-GitLint                       PASS      2.13 seconds
-Prep - Setup ELL              PASS      47.63 seconds
-Build - Prep                  PASS      0.70 seconds
-Build - Configure             PASS      9.44 seconds
-Build - Make                  PASS      1425.43 seconds
-Make Check                    PASS      12.99 seconds
-Make Check w/Valgrind         PASS      513.54 seconds
-Make Distcheck                PASS      239.71 seconds
-Build w/ext ELL - Configure   PASS      8.79 seconds
-Build w/ext ELL - Make        PASS      1279.33 seconds
-Incremental Build with patchesPASS      2864.90 seconds
-
-
-
+The enum led_brightness, which contains the declaration of LED_OFF,
+LED_ON, LED_HALF and LED_FULL is obsolete, as the led class now supports
+max_brightness.
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/leds.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/net/bluetooth/leds.c b/net/bluetooth/leds.c
+index f46847632ffa..7f7e3eed9407 100644
+--- a/net/bluetooth/leds.c
++++ b/net/bluetooth/leds.c
+@@ -22,7 +22,7 @@ void hci_leds_update_powered(struct hci_dev *hdev, bool enabled)
+ {
+ 	if (hdev->power_led)
+ 		led_trigger_event(hdev->power_led,
+-				  enabled ? LED_FULL : LED_OFF);
++				  enabled ? 255 : 0);
+ 
+ 	if (!enabled) {
+ 		struct hci_dev *d;
+@@ -37,7 +37,7 @@ void hci_leds_update_powered(struct hci_dev *hdev, bool enabled)
+ 		read_unlock(&hci_dev_list_lock);
+ 	}
+ 
+-	led_trigger_event(bt_power_led_trigger, enabled ? LED_FULL : LED_OFF);
++	led_trigger_event(bt_power_led_trigger, enabled ? 255 : 0);
+ }
+ 
+ static int power_activate(struct led_classdev *led_cdev)
+@@ -48,7 +48,7 @@ static int power_activate(struct led_classdev *led_cdev)
+ 	htrig = to_hci_basic_led_trigger(led_cdev->trigger);
+ 	powered = test_bit(HCI_UP, &htrig->hdev->flags);
+ 
+-	led_trigger_event(led_cdev->trigger, powered ? LED_FULL : LED_OFF);
++	led_trigger_event(led_cdev->trigger, powered ? 255 : 0);
+ 
+ 	return 0;
+ }
+-- 
+2.34.1
 
---===============0589572665215455743==--
