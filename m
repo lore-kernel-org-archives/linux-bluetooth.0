@@ -2,151 +2,247 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2352C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 18:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10531C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 18:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382141AbiAUSbl (ORCPT
+        id S1346158AbiAUShC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 13:31:41 -0500
-Received: from mga06.intel.com ([134.134.136.31]:45742 "EHLO mga06.intel.com"
+        Fri, 21 Jan 2022 13:37:02 -0500
+Received: from mga04.intel.com ([192.55.52.120]:29422 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1382048AbiAUSbQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 13:31:16 -0500
+        id S241096AbiAUShC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 21 Jan 2022 13:37:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642789876; x=1674325876;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zFD3urVjPXljiBgWCnV5ct4lnC2I/1e0hvWj60qyZYQ=;
-  b=Yy94EeYOagvi7rn/cWU15H1cWZS53YoBj3Ht/yCdbD1KsAK1Rpq+yUPC
-   bSUK2ZoLfJ+Ar+swKaF6GGYd+hOoWMkzIIDgY8cAJ7yX5Dyk99aRFOcSd
-   CafWNg5YD0QPJLjj+fTWOd2AvT1gKg6bQzpK39SwrxwypvzJbz2JQOPyo
-   9aJBQlpiHs5Ke2VKRRps5Y+/uZXw+i4JwqQLHg2I/1oQPQEfpkLt/1wn6
-   ps2VgTlyBMLZObZuC9XK6qo5iozuf4QTMbvXqB0aVysUxM0dQXHiFq+Jd
-   0yB6wZP8l4oKF+mFDJX5jh6pTUfskXPdJGWuztVTOc1Jr/+0Vz//fSR+G
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10234"; a="306437294"
+  t=1642790222; x=1674326222;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=0sIthaLnmWZHiwsMY0uooCeLogNWeDy6TiwG+3r3NBk=;
+  b=Gk6/NX1JH0hEAEZ6nlgjAYsC6mS2Yq+XU3zPEPEMznpfCqM4sPYLqdz7
+   olYj3eizaEKJn54rsd6iEgLGpprujiUf6QzJDD7vLNVts5chVQlTdg1XX
+   /w7Tnje/baGtjGYBq7yr3QYVmVrl0szUHIidm+0g2dW52SVr5qELu+Y1F
+   5GiFwF3lXSYozAA3uEmP7RdqqZztLvgSbgBT9S4WisvGLNd6ndlGibWTe
+   udfbpwg65QeuFaY7Hm8u3yYUEDnpyLUbazMMPrVtPygAPLoRh8u6Qaqye
+   l5p9dYT5AZfbE08XrW7o4E2U+8/aQ3jRFQp5CXSUdoVAfOeW1mlW1Sgxa
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10234"; a="244543951"
 X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="306437294"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2022 10:31:04 -0800
+   d="scan'208";a="244543951"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2022 10:37:02 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="476036054"
+   d="scan'208";a="561966364"
 Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 21 Jan 2022 10:31:00 -0800
+  by orsmga001.jf.intel.com with ESMTP; 21 Jan 2022 10:37:00 -0800
 Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1nAyge-000FZ0-1B; Fri, 21 Jan 2022 18:31:00 +0000
-Date:   Sat, 22 Jan 2022 02:30:02 +0800
+        id 1nAymS-000FZH-3c; Fri, 21 Jan 2022 18:37:00 +0000
+Date:   Sat, 22 Jan 2022 02:36:40 +0800
 From:   kernel test robot <lkp@intel.com>
-To:     Joseph Hwang <josephsih@chromium.org>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     kbuild-all@lists.01.org,
-        chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
-        Joseph Hwang <josephsih@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH v1 2/2] Bluetooth: btintel: surface Intel telemetry
- events through mgmt
-Message-ID: <202201220238.tZ1BfUpc-lkp@intel.com>
-References: <20220121192152.v1.2.I63681490281b2392aa1ac05dff91a126394ab649@changeid>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 8d7f167752c3e4c45a39e76ffa6f7209413d3fa6
+Message-ID: <61eafd38.Mm5hlScIt701WdH0%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220121192152.v1.2.I63681490281b2392aa1ac05dff91a126394ab649@changeid>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 8d7f167752c3e4c45a39e76ffa6f7209413d3fa6  Bluetooth: mgmt: Add MGMT Adv Monitor Device Found/Lost events
 
-Thank you for the patch! Perhaps something to improve:
+elapsed time: 725m
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on next-20220121]
-[cannot apply to net-next/master net/master bluetooth/master v5.16]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+configs tested: 171
+configs skipped: 3
 
-url:    https://github.com/0day-ci/linux/commits/Joseph-Hwang/Bluetooth-aosp-surface-AOSP-quality-report-through-mgmt/20220121-192436
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: ia64-randconfig-r035-20220121 (https://download.01.org/0day-ci/archive/20220122/202201220238.tZ1BfUpc-lkp@intel.com/config)
-compiler: ia64-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/9484eb7f87f7c8759b6fd7eec9d431c375b97432
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Joseph-Hwang/Bluetooth-aosp-surface-AOSP-quality-report-through-mgmt/20220121-192436
-        git checkout 9484eb7f87f7c8759b6fd7eec9d431c375b97432
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=ia64 SHELL=/bin/bash drivers/bluetooth/
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                          randconfig-c001
+mips                 randconfig-c004-20220120
+powerpc              randconfig-c003-20220120
+sh                          urquell_defconfig
+sh                               j2_defconfig
+arm                           stm32_defconfig
+sh                          landisk_defconfig
+arm                           corgi_defconfig
+powerpc                       eiger_defconfig
+xtensa                       common_defconfig
+ia64                      gensparse_defconfig
+ia64                             allyesconfig
+powerpc                      cm5200_defconfig
+sh                           se7619_defconfig
+sh                        sh7763rdp_defconfig
+arc                          axs103_defconfig
+m68k                       m5208evb_defconfig
+powerpc                     rainier_defconfig
+arm                           h5000_defconfig
+arm                         lpc18xx_defconfig
+arm                          exynos_defconfig
+mips                         tb0226_defconfig
+sh                  sh7785lcr_32bit_defconfig
+m68k                                defconfig
+nds32                            alldefconfig
+sh                           se7722_defconfig
+mips                       capcella_defconfig
+sh                        apsh4ad0a_defconfig
+arc                           tb10x_defconfig
+powerpc                  iss476-smp_defconfig
+arc                                 defconfig
+m68k                         apollo_defconfig
+x86_64                           alldefconfig
+arm                           tegra_defconfig
+um                             i386_defconfig
+arm                        realview_defconfig
+arm                        cerfcube_defconfig
+h8300                            alldefconfig
+sh                               alldefconfig
+mips                     decstation_defconfig
+h8300                    h8300h-sim_defconfig
+xtensa                generic_kc705_defconfig
+sh                          polaris_defconfig
+sh                            hp6xx_defconfig
+xtensa                    xip_kc705_defconfig
+arm                           viper_defconfig
+powerpc                 mpc834x_mds_defconfig
+arm                        multi_v7_defconfig
+h8300                            allyesconfig
+sh                          sdk7780_defconfig
+m68k                          sun3x_defconfig
+sparc                       sparc32_defconfig
+powerpc64                           defconfig
+arc                 nsimosci_hs_smp_defconfig
+mips                            ar7_defconfig
+powerpc                           allnoconfig
+powerpc                mpc7448_hpc2_defconfig
+sh                           se7724_defconfig
+arm                     eseries_pxa_defconfig
+powerpc                 mpc8540_ads_defconfig
+powerpc                         wii_defconfig
+powerpc                      ppc40x_defconfig
+s390                          debug_defconfig
+arm                       imx_v6_v7_defconfig
+arm                  randconfig-c002-20220120
+arm                  randconfig-c002-20220116
+arm                  randconfig-c002-20220117
+arm                  randconfig-c002-20220118
+arm                  randconfig-c002-20220119
+arm                  randconfig-c002-20220121
+ia64                             allmodconfig
+ia64                                defconfig
+m68k                             allmodconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+sh                               allmodconfig
+xtensa                           allyesconfig
+parisc                              defconfig
+s390                             allyesconfig
+s390                             allmodconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allmodconfig
+powerpc                          allyesconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+x86_64               randconfig-a016-20220117
+x86_64               randconfig-a012-20220117
+x86_64               randconfig-a013-20220117
+x86_64               randconfig-a011-20220117
+x86_64               randconfig-a014-20220117
+x86_64               randconfig-a015-20220117
+riscv                randconfig-r042-20220119
+s390                 randconfig-r044-20220119
+arc                  randconfig-r043-20220119
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                                  kexec
 
-All warnings (new ones prefixed by >>):
-
-   In file included from arch/ia64/include/asm/pgtable.h:153,
-                    from include/linux/pgtable.h:6,
-                    from arch/ia64/include/asm/uaccess.h:40,
-                    from include/linux/uaccess.h:11,
-                    from include/linux/sched/task.h:11,
-                    from include/linux/sched/signal.h:9,
-                    from include/linux/rcuwait.h:6,
-                    from include/linux/percpu-rwsem.h:7,
-                    from include/linux/fs.h:33,
-                    from include/linux/poll.h:10,
-                    from include/net/bluetooth/bluetooth.h:28,
-                    from drivers/bluetooth/btintel.c:14:
-   arch/ia64/include/asm/mmu_context.h: In function 'reload_context':
-   arch/ia64/include/asm/mmu_context.h:127:48: warning: variable 'old_rr4' set but not used [-Wunused-but-set-variable]
-     127 |         unsigned long rr0, rr1, rr2, rr3, rr4, old_rr4;
-         |                                                ^~~~~~~
-   In file included from drivers/bluetooth/btintel.c:14:
-   drivers/bluetooth/btintel.c: In function 'btintel_pull_quality_report_data':
->> drivers/bluetooth/btintel.c:2680:24: warning: format '%u' expects argument of type 'unsigned int', but argument 3 has type 'long unsigned int' [-Wformat=]
-    2680 |                 BT_ERR("Telemetry event length %d too short (at least %u)",
-         |                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    2681 |                        skb->len, sizeof(struct intel_tlv));
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~
-         |                                  |
-         |                                  long unsigned int
-   include/net/bluetooth/bluetooth.h:199:40: note: in definition of macro 'BT_ERR'
-     199 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                        ^~~
-   drivers/bluetooth/btintel.c:2680:72: note: format string is defined here
-    2680 |                 BT_ERR("Telemetry event length %d too short (at least %u)",
-         |                                                                       ~^
-         |                                                                        |
-         |                                                                        unsigned int
-         |                                                                       %lu
-
-
-vim +2680 drivers/bluetooth/btintel.c
-
-  2673	
-  2674	bool btintel_pull_quality_report_data(struct sk_buff *skb)
-  2675	{
-  2676		skb_pull(skb, sizeof(struct intel_prefix_evt_data));
-  2677	
-  2678		/* A telemetry event contains at least one intel_tlv subevent. */
-  2679		if (skb->len < sizeof(struct intel_tlv)) {
-> 2680			BT_ERR("Telemetry event length %d too short (at least %u)",
-  2681			       skb->len, sizeof(struct intel_tlv));
-  2682			return false;
-  2683		}
-  2684	
-  2685		return true;
-  2686	}
-  2687	EXPORT_SYMBOL_GPL(btintel_pull_quality_report_data);
-  2688	
+clang tested configs:
+x86_64                        randconfig-c007
+arm                  randconfig-c002-20220120
+riscv                randconfig-c006-20220120
+powerpc              randconfig-c003-20220120
+mips                 randconfig-c004-20220120
+i386                          randconfig-c001
+arm                  randconfig-c002-20220121
+riscv                randconfig-c006-20220121
+powerpc              randconfig-c003-20220121
+mips                 randconfig-c004-20220121
+powerpc                      walnut_defconfig
+powerpc                 mpc8313_rdb_defconfig
+powerpc                 mpc832x_rdb_defconfig
+mips                        bcm63xx_defconfig
+powerpc               mpc834x_itxgp_defconfig
+powerpc                     kmeter1_defconfig
+powerpc                       ebony_defconfig
+arm                        spear3xx_defconfig
+powerpc                 mpc8272_ads_defconfig
+x86_64               randconfig-a005-20220117
+x86_64               randconfig-a004-20220117
+x86_64               randconfig-a001-20220117
+x86_64               randconfig-a006-20220117
+x86_64               randconfig-a002-20220117
+x86_64               randconfig-a003-20220117
+x86_64                        randconfig-a005
+x86_64                        randconfig-a003
+x86_64                        randconfig-a001
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+i386                 randconfig-a005-20220117
+i386                 randconfig-a001-20220117
+i386                 randconfig-a006-20220117
+i386                 randconfig-a004-20220117
+i386                 randconfig-a002-20220117
+i386                 randconfig-a003-20220117
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+i386                          randconfig-a011
+i386                          randconfig-a013
+i386                          randconfig-a015
+riscv                randconfig-r042-20220120
+hexagon              randconfig-r045-20220120
+hexagon              randconfig-r041-20220120
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
