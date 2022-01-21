@@ -2,67 +2,51 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B3EAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 22:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3ECC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 22:53:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbiAUWwF convert rfc822-to-8bit (ORCPT
+        id S232879AbiAUWxH convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 17:52:05 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:44103 "EHLO
+        Fri, 21 Jan 2022 17:53:07 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:40068 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229926AbiAUWwE (ORCPT
+        with ESMTP id S229926AbiAUWxH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 17:52:04 -0500
+        Fri, 21 Jan 2022 17:53:07 -0500
 Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CE4F5CED1A;
-        Fri, 21 Jan 2022 23:52:02 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 92673CED1A;
+        Fri, 21 Jan 2022 23:53:05 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH 1/7] Bluetooth: mt7921s: fix firmware coredump retrieve
+Subject: Re: [PATCH] Bluetooth: hci_sync: unlock on error in
+ hci_inquiry_result_with_rssi_evt()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <bddfacd096b6fe927d08e48ad6993c17c9954028.1641972745.git.objelf@gmail.com>
-Date:   Fri, 21 Jan 2022 23:52:02 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
-        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20220111072319.GH11243@kili>
+Date:   Fri, 21 Jan 2022 23:53:05 +0100
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <A55FE370-4F70-4CA3-BB95-7220EB73D68F@holtmann.org>
-References: <bddfacd096b6fe927d08e48ad6993c17c9954028.1641972745.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
+Message-Id: <5202DA51-7BA4-41F1-BECA-858B894EC4F0@holtmann.org>
+References: <20220111072319.GH11243@kili>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+Hi Dan,
 
-> According to the MCU firmware behavior, as the driver is aware of the
-> notification of the interrupt source FW_MAILBOX_INT that shows the MCU
-> completed delivered a core dump piece to the host, the driver must
-> acknowledge the MCU with the register PH2DSM0R bit PH2DSM0R_DRIVER_OWN
-> to notify the MCU to handle the next core dump piece.
+> Add unlocks to two error paths in hci_inquiry_result_with_rssi_evt().
 > 
-> Fixes: db57b625912a ("Bluetooth: btmtksdio: add support of processing firmware coredump and log")
-> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+> Fixes: fee645033e2c ("Bluetooth: hci_event: Use skb_pull_data when processing inquiry results")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 > ---
-> drivers/bluetooth/btmtksdio.c | 10 ++++++++++
-> 1 file changed, 10 insertions(+)
+> net/bluetooth/hci_event.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 
-all 7 patches have been applied to bluetooth-next tree.
+patch doesn’t apply cleanly, please rebase against bluetooth-next tree.
 
 Regards
 
