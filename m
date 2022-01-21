@@ -2,101 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CDBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 23:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930D4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 23:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229819AbiAUXk1 (ORCPT
+        id S229842AbiAUXw1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 18:40:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbiAUXkZ (ORCPT
+        Fri, 21 Jan 2022 18:52:27 -0500
+Received: from giacobini.uberspace.de ([185.26.156.129]:39046 "EHLO
+        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229595AbiAUXw0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 18:40:25 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02473C06173B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 15:40:25 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id q63so5836842pja.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 15:40:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=QrmYYgskNVxe4+njed3Dyz6zUABTHTNn44jEf2IkdIo=;
-        b=UuxmgrZ+81lfUI+Bu7WERnU+lc3uDRXDHpWBasko49Hm5n7HQSoP50jw6H/5G24lGr
-         Lb3gAMxJ/MAMn86yIT/yOidhKP1Q1i39kFksdfnS+to1DgUDHC2MVEQ0WIH9MyHIE9Bb
-         HiH4M05rUiqGCe1wnCjo9Dr+xfrYOpOLlADtFa7MGm6cpZIt+V8hCX+QTFi1th9P/iWv
-         d7mkIq9KR4ONJqP/RXTwSh3nEay5wj7CVFKG7Y4WlCIhhbPb9sl7sDVDSsw4MLCDSxF4
-         OCG729Gaq7zB2lN1oYSdrZ0arKxcUNaZsmdZiG9AAM23OQiXjnLr8wetr8si275jPRBp
-         aDrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=QrmYYgskNVxe4+njed3Dyz6zUABTHTNn44jEf2IkdIo=;
-        b=lTLi/IvzaKRqaEUJlQTkwk1Za/AnHAXlihgZxoadwnQEA9Qr38oi3euqIpcfp20WNo
-         jZ2ixdHMLsXcVI/qJjGZzwWJbTgePPxaJyke1Xt2TEA3r+BoQjybFOBC4bs8RUX6GMbn
-         P/EfUcPUJ2mctIYtN3d92nfEmgEfi0mnc/Q9WSbSBPp2FkoyArRgNQjcI91VnFB88vYt
-         tPhQx+dCgeGP1aPF801tBhmmfltpIW17Y7IYftBStnMN4RZw7zXjvs7qbnD1RYVg7Kmw
-         1xRA5Oys1YHZjuifR699CSvh53be1YjY5aKeTeTJMl0KmQgK9XJ/w6KDWo+D/PNGoD8g
-         9Q1g==
-X-Gm-Message-State: AOAM5318DnVdduMmebvi9xQISm/hjj+XJpMDNm8gaZIhyNv8EJHGuEx+
-        vTiwvKYbkNXgMXO0QjIE7JAe4lfDPI0=
-X-Google-Smtp-Source: ABdhPJwgRZjUlwi/juFgY4nTBYu5JJ9mDS9lNWl1IlmHIXcrYnzVU+246jPCDeymz34zo8eJn6RZQw==
-X-Received: by 2002:a17:90a:5d83:: with SMTP id t3mr2889041pji.159.1642808424248;
-        Fri, 21 Jan 2022 15:40:24 -0800 (PST)
-Received: from [172.17.0.2] ([52.137.64.229])
-        by smtp.gmail.com with ESMTPSA id c5sm3025853pfc.12.2022.01.21.15.40.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jan 2022 15:40:23 -0800 (PST)
-Message-ID: <61eb4467.1c69fb81.d7452.7d3b@mx.google.com>
-Date:   Fri, 21 Jan 2022 15:40:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3861990136881130459=="
+        Fri, 21 Jan 2022 18:52:26 -0500
+Received: (qmail 2300 invoked by uid 990); 21 Jan 2022 23:52:24 -0000
+Authentication-Results: giacobini.uberspace.de;
+        auth=pass (plain)
+Message-ID: <5d83dba0-2283-ef9d-e8f7-82e6628d4263@eknoes.de>
+Date:   Sat, 22 Jan 2022 00:52:24 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/4] shared/gatt-db: Introduce gatt_db_service_add_ccc
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220121205454.1413365-1-luiz.dentz@gmail.com>
-References: <20220121205454.1413365-1-luiz.dentz@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20220121173622.192744-1-soenke.huster@eknoes.de>
+ <4f3d6dcf-c142-9a99-df97-6190c8f2abc9@eknoes.de>
+ <CABBYNZ+VQ3Gfw0n=PavFhnnOy2=+1OAeV5UT_S25Lz_4gWzWEQ@mail.gmail.com>
+ <995e58bb-6dfb-b3db-c8a5-b9e30dbb104d@eknoes.de>
+ <CABBYNZJx+UzHLRA8o=z-fkiHAmBJ6-WtY35eJtD6C6N6PhLbDQ@mail.gmail.com>
+From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
+Subject: Re: [RFC PATCH] Bluetooth: hci_event: Ignore multiple conn complete
+ events
+In-Reply-To: <CABBYNZJx+UzHLRA8o=z-fkiHAmBJ6-WtY35eJtD6C6N6PhLbDQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: -
+X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-3) SUSPICIOUS_RECIPS(1.5)
+X-Rspamd-Score: -1.6
+Received: from unknown (HELO unkown) (::1)
+        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Sat, 22 Jan 2022 00:52:24 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3861990136881130459==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On 22.01.22 00:32, Luiz Augusto von Dentz wrote:
+> Hi Sönke,
+> 
+> On Fri, Jan 21, 2022 at 3:18 PM Sönke Huster <soenke.huster@eknoes.de> wrote:
+>>
+>> Hi Luiz,
+>>
+>> On 21.01.22 22:31, Luiz Augusto von Dentz wrote:
+>>> Hi Sönke,
+>>>
+>>> On Fri, Jan 21, 2022 at 10:22 AM Sönke Huster <soenke.huster@eknoes.de> wrote:
+>>>>
+>>>> I just noticed that just checking for handle does not work, as obviously 0x0 could also be a handle value and therefore it can't be distinguished, whether it is not set yet or it is 0x0.
+>>>
+>>> Yep, we should probably check its state, check for state != BT_OPEN
+>>> since that is what hci_conn_add initialize the state.
+>>>
+>>
+>> I thought there are more valid connection states for the first HCI_CONNECTION_COMPLETE event, as it also occurs e.g. after an HCI_Create_Connection command, see Core 5.3 p.2170:
+>>> This event also indicates to the Host which issued the HCI_Create_Connection, HCI_Accept_-
+>>> Connection_Request, or HCI_Reject_Connection_Request command, and
+>>> then received an HCI_Command_Status event, if the issued command failed or
+>>> was successful.
+>>
+>> For example in hci_conn.c hci_acl_create_connection (which triggers a HCI_Create_Connection command as far as I understand), the state of the connection is changed to BT_CONNECT or BT_CONNECT2.
+>> But as I am quite new in the (Linux) Bluetooth world, I might have a wrong understanding of that.
+> 
+> Yep, we would probably need a switch to capture which states are valid
+> and which are not or we initialize the handle with something outside
+> of the valid range of handles (0x0000 to 0x0EFF) so we can initialize
+> it to e.g. 0xffff (using something like define HCI_CONN_HANDLE_UNSET)
+> so we can really tell when it has been set or not.
+> 
 
-Dear submitter,
+I think the state switch is just possible if there is no possibility
+to change a connection state back into one of the accepted states.
+Unless changing the state back into an accepted state includes a call
+to "hci_conn_del_sysfs", as the real issue when getting a duplicate
+HCI_Create_Connection event is that device_add in hci_conn_add_sysfs
+is called twice for the same connection.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607383
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.01 seconds
-GitLint                       PASS      1.36 seconds
-Prep - Setup ELL              PASS      38.22 seconds
-Build - Prep                  PASS      0.41 seconds
-Build - Configure             PASS      7.70 seconds
-Build - Make                  PASS      1301.25 seconds
-Make Check                    PASS      11.02 seconds
-Make Check w/Valgrind         PASS      399.26 seconds
-Make Distcheck                PASS      212.75 seconds
-Build w/ext ELL - Configure   PASS      7.61 seconds
-Build w/ext ELL - Make        PASS      1290.35 seconds
-Incremental Build with patchesPASS      5245.61 seconds
+There might be other issues as well in processing a duplicate event,
+but as far as I can see the bugs I trigger rely on multiple calls to
+device_add which lead in the long run to multiple user-after frees
+or null-pointer derefs. I tried to write that up in the bugzilla report
+here: https://bugzilla.kernel.org/show_bug.cgi?id=215497
 
 
+When using something like HCI_CONN_HANDLE_UNSET, we need to make sure
+that everywhere where we receive a handle from an event and use it to
+set conn->handle, it is a valid one. Otherwise a hacked / malicious
+controller would just send multiple events for the invalid handle.
 
----
-Regards,
-Linux Bluetooth
+What solution do you prefer? If you don't mind I'd like to try to
+create a patch.  
 
-
---===============3861990136881130459==--
+>>>> On 21.01.22 18:36, Soenke Huster wrote:
+>>>>> When a HCI_CONNECTION_COMPLETE event is received multiple times
+>>>>> for the same handle, the device is registered multiple times which leads
+>>>>> to memory corruptions. Therefore, consequent events for a single
+>>>>> connection are ignored.
+>>>>>
+>>>>> The conn->state can hold different values so conn->handle is
+>>>>> checked to detect whether a connection is already set up.
+>>>>>
+>>>>> Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=215497
+>>>>> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+>>>>> ---
+>>>>> This fixes the referenced bug and several use-after-free issues I discovered.
+>>>>> I tagged it as RFC, as I am not 100% sure if checking the existence of the
+>>>>> handle is the correct approach, but to the best of my knowledge it must be
+>>>>> set for the first time in this function for valid connections of this event,
+>>>>> therefore it should be fine.
+>>>>>
+>>>>> net/bluetooth/hci_event.c | 11 +++++++++++
+>>>>>  1 file changed, 11 insertions(+)
+>>>>>
+>>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>>>> index 681c623aa380..71ccb12c928d 100644
+>>>>> --- a/net/bluetooth/hci_event.c
+>>>>> +++ b/net/bluetooth/hci_event.c
+>>>>> @@ -3106,6 +3106,17 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+>>>>>               }
+>>>>>       }
+>>>>>
+>>>>> +     /* The HCI_Connection_Complete event is only sent once per connection.
+>>>>> +      * Processing it more than once per connection can corrupt kernel memory.
+>>>>> +      *
+>>>>> +      * As the connection handle is set here for the first time, it indicates
+>>>>> +      * whether the connection is already set up.
+>>>>> +      */
+>>>>> +     if (conn->handle) {
+>>>>> +             bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
+>>>>> +             goto unlock;
+>>>>> +     }
+>>>>> +
+>>>>>       if (!ev->status) {
+>>>>>               conn->handle = __le16_to_cpu(ev->handle);
+>>>>>
+>>>
+>>>
+>>>
+>>
+>> Best
+>> Sönke
+> 
+> 
+> 
