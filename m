@@ -2,86 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B397C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 17:37:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DFEC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 17:50:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380751AbiAURhG (ORCPT
+        id S242188AbiAURuQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 12:37:06 -0500
-Received: from giacobini.uberspace.de ([185.26.156.129]:43112 "EHLO
-        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244983AbiAURhD (ORCPT
+        Fri, 21 Jan 2022 12:50:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1382023AbiAURsp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 12:37:03 -0500
-Received: (qmail 14399 invoked by uid 990); 21 Jan 2022 17:37:00 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-From:   Soenke Huster <soenke.huster@eknoes.de>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Soenke Huster <soenke.huster@eknoes.de>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] Bluetooth: hci_event: Ignore multiple conn complete events
-Date:   Fri, 21 Jan 2022 18:36:22 +0100
-Message-Id: <20220121173622.192744-1-soenke.huster@eknoes.de>
-X-Mailer: git-send-email 2.34.1
+        Fri, 21 Jan 2022 12:48:45 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82F5C06175F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 09:48:42 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 09FDE61B00
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 17:48:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 752E5C340E1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 17:48:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642787321;
+        bh=tz59ud175vLCm5+eB56ix7HS3Aondy/fB7pL/qrNdJ0=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=MrmeXQXzTCiZg0XDN3jPsLnUVVmxLlfof6LpKJudyb2PLcv6sh3GKL10iukoDJyR1
+         qhSxEtQSsaQujEhBooW8KbjA22B4/sZpagS/0r67MaMFtzLpeKM/OKyruoVql1LgXt
+         wO3npeCVr0mixgYlGYQh9Y+SmUBdL+F5MdMfC8ILPedtp5MpZwH6Z30JUUoaxsJ5Xp
+         eupZPnU3g9vcNW5VUT9us2+jxDAQxcEMql9TrzXm/ky86oIqztUYntNKCssiHPLMPx
+         8YUzU9E1O9bDHMO8R/SQZMKCGYfLZttSyYil07VqSPpv6k8mJqPay3+UU4G1nHqv56
+         XY6tBxlQEIuYA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 576C3CC13A7; Fri, 21 Jan 2022 17:48:41 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215497] NULL pointer deref in klist_next triggered by Bluetooth
+ HCI_Disconnection_Complete event
+Date:   Fri, 21 Jan 2022 17:48:41 +0000
+X-Bugzilla-Reason: CC
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Networking
+X-Bugzilla-Component: Other
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: soenke.huster@eknoes.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: stephen@networkplumber.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215497-62941-os9yNT08RK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215497-62941@https.bugzilla.kernel.org/>
+References: <bug-215497-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: /
-X-Rspamd-Report: BAYES_HAM(-2.999998) R_MISSING_CHARSET(0.5) MIME_GOOD(-0.1) MID_CONTAINS_FROM(1) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: -0.099998
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Fri, 21 Jan 2022 18:37:00 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When a HCI_CONNECTION_COMPLETE event is received multiple times
-for the same handle, the device is registered multiple times which leads
-to memory corruptions. Therefore, consequent events for a single
-connection are ignored.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215497
 
-The conn->state can hold different values so conn->handle is
-checked to detect whether a connection is already set up.
+--- Comment #4 from S=C3=B6nke Huster (soenke.huster@eknoes.de) ---
+Submitted a patch to linux-bluetooth:
+https://lore.kernel.org/linux-bluetooth/20220121173622.192744-1-soenke.hust=
+er@eknoes.de/T/#u
 
-Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=215497
-Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
----
-This fixes the referenced bug and several use-after-free issues I discovered.
-I tagged it as RFC, as I am not 100% sure if checking the existence of the
-handle is the correct approach, but to the best of my knowledge it must be
-set for the first time in this function for valid connections of this event,
-therefore it should be fine.
+--=20
+You may reply to this email to add a comment.
 
-net/bluetooth/hci_event.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 681c623aa380..71ccb12c928d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3106,6 +3106,17 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 		}
- 	}
- 
-+	/* The HCI_Connection_Complete event is only sent once per connection.
-+	 * Processing it more than once per connection can corrupt kernel memory.
-+	 *
-+	 * As the connection handle is set here for the first time, it indicates
-+	 * whether the connection is already set up.
-+	 */
-+	if (conn->handle) {
-+		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
-+		goto unlock;
-+	}
-+
- 	if (!ev->status) {
- 		conn->handle = __le16_to_cpu(ev->handle);
- 
--- 
-2.34.1
-
+You are receiving this mail because:
+You are on the CC list for the bug.=
