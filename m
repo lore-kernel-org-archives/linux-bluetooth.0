@@ -2,137 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64587C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 21:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3904DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 22:13:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbiAUVbh (ORCPT
+        id S232566AbiAUWNe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 16:31:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55710 "EHLO
+        Fri, 21 Jan 2022 17:13:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbiAUVbh (ORCPT
+        with ESMTP id S229664AbiAUWNd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 16:31:37 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E88A3C06173B;
-        Fri, 21 Jan 2022 13:31:36 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id p5so31091332ybd.13;
-        Fri, 21 Jan 2022 13:31:36 -0800 (PST)
+        Fri, 21 Jan 2022 17:13:33 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0833CC06173B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 14:13:33 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id g14so31385588ybs.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 14:13:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=XBPXrK5d4Q3kr1rY61LzklnjBEDewcTywkOFDOQFUkc=;
-        b=emvhjIOrkbLkLK7QtoKAezEOQhTjn6XimYAssH9ANqpKpBVzZUO8qo+0n/4HO2bT1Z
-         UjSa8pHCocY/PZZ6+ZCtgarsqa0yFJz/eZPsZL/6u2lnfFPukQKGRJzBGFpmd7mTz3CE
-         qxcffHvPp3TSy2glIKET5KlOUENx/WHlbBKghYsVTWh+LF7YDkfiMzTz046rgztkBC04
-         fo1wkJiOu8TPhz0Z7nnb3UvV/eUEqCz5KbjFsJ0fMljNbko+ecdjeSyEL2qJ9aCV/Wwj
-         nvKmP1Sbu58tHUi5MlxcTI0fnjFeUexm1SH9g7bnkNp9f1aFkntCZisC5E7uZ1CHgwQP
-         Y1xA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=RzbzprbmERQ/ecYcSqkbG19eL3YdIDh05Yq0DWzJAaE=;
+        b=h4xrNMgywp3RxDrjmS1K9O665Om4jXqKToGPb3u1Ai2IwzkCIpjKm4E85R85IIRV/h
+         kepvQZ5cWQC7auWOmueHclWdoafWZbO6zyCgrVDgLW3dnmHI/HbYKN3JFWIZRbrlD5eM
+         L0hj5JL/zkj/Mp7uDGdetM2pbg4IyRk2ceqHFaP1MITbkCf2E3v6XS5RhlDFk8+VjlO/
+         MG7p5wk9Tw0uDo520ASbR4gnlHmLWgL2qdIdgoBmgLpxGzfblRjfnIe+jN+SVIyS63ed
+         N4WQGov2HVm/1Mti4DOd4zFGQEDgEjScxs0inOuXSTjBkjGMtj7z90E5akYroDPWuCmp
+         ppDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=XBPXrK5d4Q3kr1rY61LzklnjBEDewcTywkOFDOQFUkc=;
-        b=kgzwdXvOMVWcjHe8XaM2KqI0soKO4m5k1F1mAppXisAfH9U6jhxrNRjlHv59u8ED5O
-         fwKSOo3wQWEG0+zJGF8Uu2oY+URrFuHT5yZMRy7SBubLcFkFpu7mA9cRo/ja2EeBkyNJ
-         i9TrKcBuEqDDUwHZ/2n638Dln/r4L8M2Bnsct/HsaW3+U6eMvnbW+hu3gqp2NMCpbQYf
-         jYfTacFMKLSdP+YAtyibvj8OTYwLSV6wwGIbUdaWsiPaUbODHEyixsQKbwzw2aNRH1M5
-         GVySLfhqCkJ5sNCnH4s+wMkokfY8L/ZY31VD/iUZppRgfQqe0hMf9BenlJEBDXN5y6NA
-         ru+g==
-X-Gm-Message-State: AOAM532siZoDg/VZgyytL3cmCaFwWP625dLFWQ5KRqMYayQHfGGXU10E
-        6A6dFld98LOjlOkLQx8inCyQgrrSJ7LIk48seG8=
-X-Google-Smtp-Source: ABdhPJyosNI2jZMZmoRBd1lV9OFcMO4zy4soqrSDlvOGhQfzpGgMz6abZEWFOYbXpjZQUo/KfutPdvtrvu84Z2WAEww=
-X-Received: by 2002:a25:bd8d:: with SMTP id f13mr8920942ybh.573.1642800696041;
- Fri, 21 Jan 2022 13:31:36 -0800 (PST)
+         :message-id:subject:to;
+        bh=RzbzprbmERQ/ecYcSqkbG19eL3YdIDh05Yq0DWzJAaE=;
+        b=39FGY+/3z+nFaB7gOtYxP3s/e3E0SbudIH3s96grwlQJhQs5TbiXbGXz4HXr7ylMeh
+         Bag34X8p+6afmQlKeFQ91X5wUWxMSO3JaKBVgWxoRNcO1axUFxe1XSvsbUfCR/TSbr66
+         SujXXCO2NHjYy95g1Ne3ay6A4tFMsf8vSstxWNH2zn83XclPOl3dkfe6eYDBwe/2U0tR
+         eOIFdlDSQtJmh77eTrOu8CQUEJY8INsK/k7dXhwZwHkxb8fZZWTLzNN2Fb5F1xUOTCA2
+         TMeGVMWPqtb84ls2M4lU3Sra5imDyULjENrJZVRvV4h6vExc5SDTxWbMvib+BxeeepGk
+         jRFA==
+X-Gm-Message-State: AOAM531SZ30Mq/lCuaJgAJg0zWJmg4UcRpY89bcU3NLZxSOI3UwdsuY9
+        LOdQkJzQBD88Qj2nYyD9g5GJE3jDGIkZn87KQ10A13hqr20=
+X-Google-Smtp-Source: ABdhPJyXsw5Qhv5fXcttKjvv2nOUtv6K9Xvong9T3381NBGnx/oX6XM4Cl3RsWL84OZdeKGioH1xfZ2iMPg5B5E8P1g=
+X-Received: by 2002:a25:b683:: with SMTP id s3mr8974419ybj.293.1642803212120;
+ Fri, 21 Jan 2022 14:13:32 -0800 (PST)
 MIME-Version: 1.0
-References: <20220121173622.192744-1-soenke.huster@eknoes.de> <4f3d6dcf-c142-9a99-df97-6190c8f2abc9@eknoes.de>
-In-Reply-To: <4f3d6dcf-c142-9a99-df97-6190c8f2abc9@eknoes.de>
+References: <20220119002257.1428841-1-luiz.dentz@gmail.com> <61e773fc.1c69fb81.7f03d.d578@mx.google.com>
+In-Reply-To: <61e773fc.1c69fb81.7f03d.d578@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 21 Jan 2022 13:31:25 -0800
-Message-ID: <CABBYNZ+VQ3Gfw0n=PavFhnnOy2=+1OAeV5UT_S25Lz_4gWzWEQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] Bluetooth: hci_event: Ignore multiple conn complete events
-To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Date:   Fri, 21 Jan 2022 14:13:21 -0800
+Message-ID: <CABBYNZ+CqY3dJjc2PVTqcCjYEqpBT72rBa_UND_bzY=dkq0Erg@mail.gmail.com>
+Subject: Re: [BlueZ] hog-lib: Make use of UHID_CREATE2
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi S=C3=B6nke,
+Hi,
 
-On Fri, Jan 21, 2022 at 10:22 AM S=C3=B6nke Huster <soenke.huster@eknoes.de=
-> wrote:
+On Tue, Jan 18, 2022 at 6:14 PM <bluez.test.bot@gmail.com> wrote:
 >
-> I just noticed that just checking for handle does not work, as obviously =
-0x0 could also be a handle value and therefore it can't be distinguished, w=
-hether it is not set yet or it is 0x0.
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=606425
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.69 seconds
+> GitLint                       PASS      0.36 seconds
+> Prep - Setup ELL              PASS      42.37 seconds
+> Build - Prep                  PASS      0.42 seconds
+> Build - Configure             PASS      8.16 seconds
+> Build - Make                  PASS      1409.22 seconds
+> Make Check                    PASS      10.96 seconds
+> Make Check w/Valgrind         PASS      440.84 seconds
+> Make Distcheck                PASS      228.14 seconds
+> Build w/ext ELL - Configure   PASS      8.25 seconds
+> Build w/ext ELL - Make        PASS      1397.65 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-Yep, we should probably check its state, check for state !=3D BT_OPEN
-since that is what hci_conn_add initialize the state.
+Pushed.
 
-> On 21.01.22 18:36, Soenke Huster wrote:
-> > When a HCI_CONNECTION_COMPLETE event is received multiple times
-> > for the same handle, the device is registered multiple times which lead=
-s
-> > to memory corruptions. Therefore, consequent events for a single
-> > connection are ignored.
-> >
-> > The conn->state can hold different values so conn->handle is
-> > checked to detect whether a connection is already set up.
-> >
-> > Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=3D215497
-> > Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
-> > ---
-> > This fixes the referenced bug and several use-after-free issues I disco=
-vered.
-> > I tagged it as RFC, as I am not 100% sure if checking the existence of =
-the
-> > handle is the correct approach, but to the best of my knowledge it must=
- be
-> > set for the first time in this function for valid connections of this e=
-vent,
-> > therefore it should be fine.
-> >
-> > net/bluetooth/hci_event.c | 11 +++++++++++
-> >  1 file changed, 11 insertions(+)
-> >
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 681c623aa380..71ccb12c928d 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -3106,6 +3106,17 @@ static void hci_conn_complete_evt(struct hci_dev=
- *hdev, void *data,
-> >               }
-> >       }
-> >
-> > +     /* The HCI_Connection_Complete event is only sent once per connec=
-tion.
-> > +      * Processing it more than once per connection can corrupt kernel=
- memory.
-> > +      *
-> > +      * As the connection handle is set here for the first time, it in=
-dicates
-> > +      * whether the connection is already set up.
-> > +      */
-> > +     if (conn->handle) {
-> > +             bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for ex=
-isting connection");
-> > +             goto unlock;
-> > +     }
-> > +
-> >       if (!ev->status) {
-> >               conn->handle =3D __le16_to_cpu(ev->handle);
-> >
-
-
-
---=20
+-- 
 Luiz Augusto von Dentz
