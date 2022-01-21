@@ -2,248 +2,293 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10531C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 18:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0CAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 20:16:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346158AbiAUShC (ORCPT
+        id S232807AbiAUUQL convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 13:37:02 -0500
-Received: from mga04.intel.com ([192.55.52.120]:29422 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241096AbiAUShC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 13:37:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1642790222; x=1674326222;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=0sIthaLnmWZHiwsMY0uooCeLogNWeDy6TiwG+3r3NBk=;
-  b=Gk6/NX1JH0hEAEZ6nlgjAYsC6mS2Yq+XU3zPEPEMznpfCqM4sPYLqdz7
-   olYj3eizaEKJn54rsd6iEgLGpprujiUf6QzJDD7vLNVts5chVQlTdg1XX
-   /w7Tnje/baGtjGYBq7yr3QYVmVrl0szUHIidm+0g2dW52SVr5qELu+Y1F
-   5GiFwF3lXSYozAA3uEmP7RdqqZztLvgSbgBT9S4WisvGLNd6ndlGibWTe
-   udfbpwg65QeuFaY7Hm8u3yYUEDnpyLUbazMMPrVtPygAPLoRh8u6Qaqye
-   l5p9dYT5AZfbE08XrW7o4E2U+8/aQ3jRFQp5CXSUdoVAfOeW1mlW1Sgxa
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10234"; a="244543951"
-X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="244543951"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jan 2022 10:37:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,306,1635231600"; 
-   d="scan'208";a="561966364"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 21 Jan 2022 10:37:00 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nAymS-000FZH-3c; Fri, 21 Jan 2022 18:37:00 +0000
-Date:   Sat, 22 Jan 2022 02:36:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 8d7f167752c3e4c45a39e76ffa6f7209413d3fa6
-Message-ID: <61eafd38.Mm5hlScIt701WdH0%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Fri, 21 Jan 2022 15:16:11 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:45621 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229815AbiAUUQK (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 21 Jan 2022 15:16:10 -0500
+Received: from smtpclient.apple (p4fefca45.dip0.t-ipconnect.de [79.239.202.69])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BF3C6CED16;
+        Fri, 21 Jan 2022 21:16:06 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v1 1/2] Bluetooth: aosp: surface AOSP quality report
+ through mgmt
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220121192152.v1.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
+Date:   Fri, 21 Jan 2022 21:16:06 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <5728C674-E467-4955-AEDC-6FFB05A9D869@holtmann.org>
+References: <20220121192152.v1.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
+To:     Joseph Hwang <josephsih@chromium.org>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 8d7f167752c3e4c45a39e76ffa6f7209413d3fa6  Bluetooth: mgmt: Add MGMT Adv Monitor Device Found/Lost events
+Hi Joseph,
 
-elapsed time: 725m
+> When receiving a HCI vendor event, the kernel checks if it is an
+> AOSP bluetooth quality report. If yes, the event is sent to bluez
+> user space through the mgmt socket.
+> 
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> ---
+> 
+> include/net/bluetooth/hci_core.h |  2 ++
+> include/net/bluetooth/mgmt.h     |  7 ++++
+> net/bluetooth/aosp.c             | 61 ++++++++++++++++++++++++++++++++
+> net/bluetooth/aosp.h             | 12 +++++++
+> net/bluetooth/hci_event.c        | 33 ++++++++++++++++-
+> net/bluetooth/mgmt.c             | 22 ++++++++++++
+> 6 files changed, 136 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 21eadb113a31..727cb9c056b2 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1861,6 +1861,8 @@ int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
+> int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
+> void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
+> 				  bdaddr_t *bdaddr, u8 addr_type);
+> +int mgmt_quality_report(struct hci_dev *hdev, struct sk_buff *skb,
+> +			u8 quality_spec);
+> 
+> u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+> 		      u16 to_multiplier);
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index 99266f7aebdc..6a0fcb3aef8a 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -1120,3 +1120,10 @@ struct mgmt_ev_adv_monitor_device_lost {
+> 	__le16 monitor_handle;
+> 	struct mgmt_addr_info addr;
+> } __packed;
+> +
+> +#define MGMT_EV_QUALITY_REPORT			0x0031
+> +struct mgmt_ev_quality_report {
+> +	__u8 quality_spec;
+> +	__u8 data_len;
+> +	__u8 data[0];
+> +} __packed;
+> diff --git a/net/bluetooth/aosp.c b/net/bluetooth/aosp.c
+> index 432ae3aac9e3..9e3551627ad5 100644
+> --- a/net/bluetooth/aosp.c
+> +++ b/net/bluetooth/aosp.c
+> @@ -199,3 +199,64 @@ int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
+> 	else
+> 		return disable_quality_report(hdev);
+> }
+> +
+> +#define BLUETOOTH_QUALITY_REPORT_EV		0x58
+> +struct bqr_data {
+> +	__u8 quality_report_id;
+> +	__u8 packet_type;
+> +	__le16 conn_handle;
+> +	__u8 conn_role;
+> +	__s8 tx_power_level;
+> +	__s8 rssi;
+> +	__u8 snr;
+> +	__u8 unused_afh_channel_count;
+> +	__u8 afh_select_unideal_channel_count;
+> +	__le16 lsto;
+> +	__le32 conn_piconet_clock;
+> +	__le32 retransmission_count;
+> +	__le32 no_rx_count;
+> +	__le32 nak_count;
+> +	__le32 last_tx_ack_timestamp;
+> +	__le32 flow_off_count;
+> +	__le32 last_flow_on_timestamp;
+> +	__le32 buffer_overflow_bytes;
+> +	__le32 buffer_underflow_bytes;
+> +
+> +	/* Vendor Specific Parameter */
+> +	__u8 vsp[0];
+> +} __packed;
+> +
+> +struct aosp_hci_vs_data {
+> +	__u8 code;
+> +	__u8 data[0];
+> +} __packed;
 
-configs tested: 171
-configs skipped: 3
+unless you need these two for something, scrap them. You can define constants for the size check.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+> +
+> +bool aosp_is_quality_report_evt(struct sk_buff *skb)
+> +{
+> +	struct aosp_hci_vs_data *ev;
+> +
+> +	if (skb->len < sizeof(struct aosp_hci_vs_data))
+> +		return false;
+> +
+> +	ev = (struct aosp_hci_vs_data *)skb->data;
+> +
+> +	return ev->code == BLUETOOTH_QUALITY_REPORT_EV;
+> +}
+> +
+> +bool aosp_pull_quality_report_data(struct sk_buff *skb)
+> +{
+> +	size_t bqr_data_len = sizeof(struct bqr_data);
+> +
+> +	skb_pull(skb, sizeof(struct aosp_hci_vs_data));
+> +
+> +	/* skb->len is allowed to be larger than bqr_data_len to have
+> +	 * the Vendor Specific Parameter (vsp) field.
+> +	 */
+> +	if (skb->len < bqr_data_len) {
+> +		BT_ERR("AOSP evt data len %d too short (%u expected)",
+> +		       skb->len, bqr_data_len);
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                          randconfig-c001
-mips                 randconfig-c004-20220120
-powerpc              randconfig-c003-20220120
-sh                          urquell_defconfig
-sh                               j2_defconfig
-arm                           stm32_defconfig
-sh                          landisk_defconfig
-arm                           corgi_defconfig
-powerpc                       eiger_defconfig
-xtensa                       common_defconfig
-ia64                      gensparse_defconfig
-ia64                             allyesconfig
-powerpc                      cm5200_defconfig
-sh                           se7619_defconfig
-sh                        sh7763rdp_defconfig
-arc                          axs103_defconfig
-m68k                       m5208evb_defconfig
-powerpc                     rainier_defconfig
-arm                           h5000_defconfig
-arm                         lpc18xx_defconfig
-arm                          exynos_defconfig
-mips                         tb0226_defconfig
-sh                  sh7785lcr_32bit_defconfig
-m68k                                defconfig
-nds32                            alldefconfig
-sh                           se7722_defconfig
-mips                       capcella_defconfig
-sh                        apsh4ad0a_defconfig
-arc                           tb10x_defconfig
-powerpc                  iss476-smp_defconfig
-arc                                 defconfig
-m68k                         apollo_defconfig
-x86_64                           alldefconfig
-arm                           tegra_defconfig
-um                             i386_defconfig
-arm                        realview_defconfig
-arm                        cerfcube_defconfig
-h8300                            alldefconfig
-sh                               alldefconfig
-mips                     decstation_defconfig
-h8300                    h8300h-sim_defconfig
-xtensa                generic_kc705_defconfig
-sh                          polaris_defconfig
-sh                            hp6xx_defconfig
-xtensa                    xip_kc705_defconfig
-arm                           viper_defconfig
-powerpc                 mpc834x_mds_defconfig
-arm                        multi_v7_defconfig
-h8300                            allyesconfig
-sh                          sdk7780_defconfig
-m68k                          sun3x_defconfig
-sparc                       sparc32_defconfig
-powerpc64                           defconfig
-arc                 nsimosci_hs_smp_defconfig
-mips                            ar7_defconfig
-powerpc                           allnoconfig
-powerpc                mpc7448_hpc2_defconfig
-sh                           se7724_defconfig
-arm                     eseries_pxa_defconfig
-powerpc                 mpc8540_ads_defconfig
-powerpc                         wii_defconfig
-powerpc                      ppc40x_defconfig
-s390                          debug_defconfig
-arm                       imx_v6_v7_defconfig
-arm                  randconfig-c002-20220120
-arm                  randconfig-c002-20220116
-arm                  randconfig-c002-20220117
-arm                  randconfig-c002-20220118
-arm                  randconfig-c002-20220119
-arm                  randconfig-c002-20220121
-ia64                             allmodconfig
-ia64                                defconfig
-m68k                             allmodconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-sh                               allmodconfig
-xtensa                           allyesconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allmodconfig
-powerpc                          allyesconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64               randconfig-a016-20220117
-x86_64               randconfig-a012-20220117
-x86_64               randconfig-a013-20220117
-x86_64               randconfig-a011-20220117
-x86_64               randconfig-a014-20220117
-x86_64               randconfig-a015-20220117
-riscv                randconfig-r042-20220119
-s390                 randconfig-r044-20220119
-arc                  randconfig-r043-20220119
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
+This part I find a bit convoluted, just do a basic length check and then move on. The kernel has no interest in this data.
 
-clang tested configs:
-x86_64                        randconfig-c007
-arm                  randconfig-c002-20220120
-riscv                randconfig-c006-20220120
-powerpc              randconfig-c003-20220120
-mips                 randconfig-c004-20220120
-i386                          randconfig-c001
-arm                  randconfig-c002-20220121
-riscv                randconfig-c006-20220121
-powerpc              randconfig-c003-20220121
-mips                 randconfig-c004-20220121
-powerpc                      walnut_defconfig
-powerpc                 mpc8313_rdb_defconfig
-powerpc                 mpc832x_rdb_defconfig
-mips                        bcm63xx_defconfig
-powerpc               mpc834x_itxgp_defconfig
-powerpc                     kmeter1_defconfig
-powerpc                       ebony_defconfig
-arm                        spear3xx_defconfig
-powerpc                 mpc8272_ads_defconfig
-x86_64               randconfig-a005-20220117
-x86_64               randconfig-a004-20220117
-x86_64               randconfig-a001-20220117
-x86_64               randconfig-a006-20220117
-x86_64               randconfig-a002-20220117
-x86_64               randconfig-a003-20220117
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-i386                 randconfig-a005-20220117
-i386                 randconfig-a001-20220117
-i386                 randconfig-a006-20220117
-i386                 randconfig-a004-20220117
-i386                 randconfig-a002-20220117
-i386                 randconfig-a003-20220117
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a011
-i386                          randconfig-a013
-i386                          randconfig-a015
-riscv                randconfig-r042-20220120
-hexagon              randconfig-r045-20220120
-hexagon              randconfig-r041-20220120
+> diff --git a/net/bluetooth/aosp.h b/net/bluetooth/aosp.h
+> index 2fd8886d51b2..49894a995647 100644
+> --- a/net/bluetooth/aosp.h
+> +++ b/net/bluetooth/aosp.h
+> @@ -10,6 +10,8 @@ void aosp_do_close(struct hci_dev *hdev);
+> 
+> bool aosp_has_quality_report(struct hci_dev *hdev);
+> int aosp_set_quality_report(struct hci_dev *hdev, bool enable);
+> +bool aosp_is_quality_report_evt(struct sk_buff *skb);
+> +bool aosp_pull_quality_report_data(struct sk_buff *skb);
+> 
+> #else
+> 
+> @@ -26,4 +28,14 @@ static inline int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
+> 	return -EOPNOTSUPP;
+> }
+> 
+> +static inline bool aosp_is_quality_report_evt(struct sk_buff *skb)
+> +{
+> +	return false;
+> +}
+> +
+> +static inline bool aosp_pull_quality_report_data(struct sk_buff *skb)
+> +{
+> +	return false;
+> +}
+> +
+> #endif
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 681c623aa380..bccb659a9454 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -37,6 +37,7 @@
+> #include "smp.h"
+> #include "msft.h"
+> #include "eir.h"
+> +#include "aosp.h"
+> 
+> #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+> 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+> @@ -4225,6 +4226,36 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, void *data,
+> 	queue_work(hdev->workqueue, &hdev->tx_work);
+> }
+> 
+> +#define QUALITY_SPEC_NA			0x0
+> +#define QUALITY_SPEC_INTEL_TELEMETRY	0x1
+> +#define QUALITY_SPEC_AOSP_BQR		0x2
+> +
+> +static bool quality_report_evt(struct hci_dev *hdev,  void *data,
+> +			       struct sk_buff *skb)
+> +{
+> +	if (aosp_is_quality_report_evt(skb)) {
+> +		if (aosp_has_quality_report(hdev) &&
+> +		    aosp_pull_quality_report_data(skb))
+> +			mgmt_quality_report(hdev, skb, QUALITY_SPEC_AOSP_BQR);
+> +
+> +		return true;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static void hci_vendor_evt(struct hci_dev *hdev, void *data,
+> +			   struct sk_buff *skb)
+> +{
+> +	/* Every distinct vendor specification must have a well-defined
+> +	 * condition to determine if an event meets the specification.
+> +	 * The skb is consumed by a specification only if the event meets
+> +	 * the specification.
+> +	 */
+> +	if (!quality_report_evt(hdev, data, skb))
+> +		msft_vendor_evt(hdev, data, skb);
+> +}
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+No, not like this. This gets messy really quickly.
+
+We should allow for defining vendor event prefixes here. That AOSP decided to convolute the space 0x54 and above in unfortunate, but that is what we have to deal with.
+
+> +
+> static void hci_mode_change_evt(struct hci_dev *hdev, void *data,
+> 				struct sk_buff *skb)
+> {
+> @@ -6811,7 +6842,7 @@ static const struct hci_ev {
+> 	HCI_EV(HCI_EV_NUM_COMP_BLOCKS, hci_num_comp_blocks_evt,
+> 	       sizeof(struct hci_ev_num_comp_blocks)),
+> 	/* [0xff = HCI_EV_VENDOR] */
+> -	HCI_EV(HCI_EV_VENDOR, msft_vendor_evt, 0),
+> +	HCI_EV(HCI_EV_VENDOR, hci_vendor_evt, 0),
+> };
+> 
+> static void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 08d6494f1b34..78687ae885be 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4389,6 +4389,28 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+> 			       MGMT_STATUS_NOT_SUPPORTED);
+> }
+> 
+> +int mgmt_quality_report(struct hci_dev *hdev, struct sk_buff *skb,
+> +			u8 quality_spec)
+> +{
+> +	struct mgmt_ev_quality_report *ev;
+> +	size_t ev_len;
+> +	int err;
+> +
+> +	/* The ev comes with a variable-length data field. */
+> +	ev_len = sizeof(*ev) + skb->len;
+> +	ev = kmalloc(ev_len, GFP_KERNEL);
+> +	if (!ev)
+> +		return -ENOMEM;
+> +
+> +	ev->quality_spec = quality_spec;
+> +	ev->data_len = skb->len;
+> +	memcpy(ev->data, skb->data, skb->len);
+> +	err = mgmt_event(MGMT_EV_QUALITY_REPORT, hdev, ev, ev_len, NULL);
+> +	kfree(ev);
+> +
+> +	return err;
+> +}
+> +
+
+Don’t we have mgmt helper functions that allow us to add headers to a mgmt skb. I think there is really no point in allocating memory via kmalloc.
+
+Regards
+
+Marcel
+
