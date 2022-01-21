@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A9D3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 20:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C45DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 20:55:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230333AbiAUUy6 (ORCPT
+        id S231837AbiAUUzA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Jan 2022 15:54:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47422 "EHLO
+        Fri, 21 Jan 2022 15:55:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230426AbiAUUy6 (ORCPT
+        with ESMTP id S231322AbiAUUy7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Jan 2022 15:54:58 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4B2BC06173B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 12:54:57 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id c3so9710930pls.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 12:54:57 -0800 (PST)
+        Fri, 21 Jan 2022 15:54:59 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1EA3C06173D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 12:54:58 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id n16-20020a17090a091000b001b46196d572so10060601pjn.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 12:54:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=7+4JIuezm2ASlIUJy4Hq9LioKL5A046o9d+k5kWIPuc=;
-        b=FU4qvtfRSJ7zlGQvHJfS5YEcpkWg6KQHtZwnX7xMUDA2kfo9yPtaVUCHWt4LVMu245
-         j+pkZXm0xdfJDAGuxZDUSDX3eMqY7gOvJCMCgbxOcL4dkI3NE4RyEj4o6jLMWn3rp0A9
-         JHwa7AhlE7p1r/CHvIB3J37rg7aQylWXpQbGwxP00DwIr5PGQ64NSuTaoKL4zsTMpRKq
-         F9ID+KO2w+4GVgEv3/V9YUffcE4EozxWc9fXZo8s9bwIe3qUMau4RqqULozaRlBPtK0s
-         VABpjGNz1JoDnyaSn0fbCcGp5TkJBhAFuqCjNj2Hk5JgA+gWCC6mtND+ulsDxLsFykmJ
-         dFUw==
+        bh=T157zpPrAdmyj6XH3cNbxAkpr5gHylRa4bo497MB4js=;
+        b=UepqD61U4Bkan4OsbJGvZc6mGoSi77NvVSwPgfKJbK2KXIUvPwh1kc80n318b3acH+
+         aqIy1w/C1z0syuMBg9bzgy5b7D4afK9wkC+5PgHLlAhFuFbXlSIJQKEj/M++pf53hmSS
+         rbayCD1i790B3t+2D88Ut7DQCOoV/Z9wv4dljogRNxTG+9PBHFkoi/ittUQLFZQr/vyH
+         IuAWgLF+offo6Dq2fAavIJhBqtivDizFYqdFVfEwzfFw8NSGSyiaUnAm6AYil4EEmDCd
+         ffXDHfuCxwTQZjCxAPdXKgL07uxG1foiV7u/1Fx4pnHuA0huZsxvltgnRo9JBiSoG2qV
+         eMmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=7+4JIuezm2ASlIUJy4Hq9LioKL5A046o9d+k5kWIPuc=;
-        b=WF7lbEM2569CyNgOBvLnfBMH1LvIH4Kt8irfBAnSbTg+CaxyFVjCTUhlnqA377V9fP
-         SxvNQKb/MU80C8JmDgONu1hRbjOABAcZY7oQIV2WantMr+dJmt06Tc5ClD/2WwNB44Nb
-         Ul+8I5p/DjXjoq0kKitGouaubKjIAAThYSF4SmZhJK7KLYvGjVrfA8Ao4jI20EP+WrtN
-         ISggOErnTShJz5RofokwXe8crSgeWOm7S5OYlTF8dZCnxBP8eIGvlXGBqC2riPrVf1ni
-         yQPjXCRLscESr8Bgtcz18A7DokhPYZucJ9OQK/mGoYE9z1q5UlZMWieWApVBQbDOF1uw
-         XqSw==
-X-Gm-Message-State: AOAM533MS3ob5FpvY/RmkGlRfQcVsXQSyeCpmbQIYHgvdNDdcK5I0ake
-        //D2vgG11BmhC7ubU3c30IGnHe9SBa4W/A==
-X-Google-Smtp-Source: ABdhPJzJZ8lhr8PlmY2mO+w/6Vs/VGYzCoNjY9jhVIHnNpRYYqbbO2m2Fnbj27GZ8uJStMNhsovsQA==
-X-Received: by 2002:a17:902:7c09:b0:148:e02f:176b with SMTP id x9-20020a1709027c0900b00148e02f176bmr5273432pll.130.1642798496877;
-        Fri, 21 Jan 2022 12:54:56 -0800 (PST)
+        bh=T157zpPrAdmyj6XH3cNbxAkpr5gHylRa4bo497MB4js=;
+        b=s/HT5ZDCoi6pj9dZlzdJCqYekXoXqQRgQJ5hNaX49oQn6/MXa/+JwWSwTcWAgrRsui
+         mjlQFvS1qTsNHd172C8TKlwyGyiYyJxKlBgjua1eiCV2UXHWaTyM1CM2ljrySojFT49Y
+         ax0Aw7u/1h1qT9hdy7SfCjDvqPyUuaC8IEXED18CWpfQtcSB/E8xaPMID7tJmJT976vz
+         4braVxeqYJwavTI8UbBoizeLqjyIBT19HQr5BwIEEVy/Ag9a2tgeUun8Ehc5NzF53Z0D
+         Dwt1kq52O/j/pAxIpcyG8NgAmKbRVJYc0Nck4UxKiM3BchO9Uuj/KOCqaBiiBUFxbJqU
+         0lQw==
+X-Gm-Message-State: AOAM5318zxswtvuzLi6BK2u19mpTti8hfu47WDcJw9xVg9HwplbQEdJ+
+        ECcK5XeBcmrkDE6MthcbpVoCjzeHvLPi6Q==
+X-Google-Smtp-Source: ABdhPJzRuK+pJGWY34S2nh5uUEOFtVJbx4MSp7udzjlzzMyt6pb+2THe8hdSJTmzJF0293K567PfsQ==
+X-Received: by 2002:a17:902:ed85:b0:14a:2471:e11d with SMTP id e5-20020a170902ed8500b0014a2471e11dmr5135351plj.77.1642798498228;
+        Fri, 21 Jan 2022 12:54:58 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id j20sm7441279pfj.218.2022.01.21.12.54.56
+        by smtp.gmail.com with ESMTPSA id j20sm7441279pfj.218.2022.01.21.12.54.57
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jan 2022 12:54:56 -0800 (PST)
+        Fri, 21 Jan 2022 12:54:57 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] gatt: Make use of gatt_db_service_add_ccc
-Date:   Fri, 21 Jan 2022 12:54:52 -0800
-Message-Id: <20220121205454.1413365-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] gatt: Make use of gatt_db_attribute_notify
+Date:   Fri, 21 Jan 2022 12:54:54 -0800
+Message-Id: <20220121205454.1413365-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220121205454.1413365-1-luiz.dentz@gmail.com>
 References: <20220121205454.1413365-1-luiz.dentz@gmail.com>
@@ -66,115 +66,122 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses gatt_db_service_add_ccc and gatt_db_ccc_register so any ccc
-registered with the use of the former gets proper state tracking.
+This makes use of gatt_db_attribute_notify to send indications of
+Service Changed.
 ---
- src/gatt-database.c | 62 ++++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 34 deletions(-)
+ src/gatt-database.c | 73 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 59 insertions(+), 14 deletions(-)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index dbe9415a3..25641da8a 100644
+index dc75762f3..d3518ebfc 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -1018,13 +1018,6 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 		goto done;
- 	}
- 
--	ccc_cb = queue_find(database->ccc_callbacks, ccc_cb_match_handle,
--			UINT_TO_PTR(gatt_db_attribute_get_handle(attrib)));
--	if (!ccc_cb) {
--		ecode = BT_ATT_ERROR_UNLIKELY;
--		goto done;
--	}
--
- 	if (len == 1)
- 		val = *value;
- 	else
-@@ -1034,7 +1027,9 @@ static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
- 	if (val == ccc->value)
- 		goto done;
- 
--	if (ccc_cb->callback) {
-+	ccc_cb = queue_find(database->ccc_callbacks, ccc_cb_match_handle,
-+			UINT_TO_PTR(gatt_db_attribute_get_handle(attrib)));
-+	if (ccc_cb) {
- 		struct pending_op *op;
- 
- 		op = pending_ccc_new(att, attrib, val,
-@@ -1056,6 +1051,22 @@ done:
- 	gatt_db_attribute_write_result(attrib, id, ecode);
+@@ -378,6 +378,18 @@ static bool get_dst_info(struct bt_att *att, bdaddr_t *dst, uint8_t *dst_type)
+ 	return true;
  }
  
-+static void ccc_add_cb(struct btd_gatt_database *database,
-+			struct gatt_db_attribute *ccc,
-+			btd_gatt_database_ccc_write_t callback,
-+			void *user_data, btd_gatt_database_destroy_t destroy)
++static struct device_state *
++find_device_state_by_att(struct btd_gatt_database *database, struct bt_att *att)
 +{
-+	struct ccc_cb_data *ccc_cb;
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
 +
-+	ccc_cb = new0(struct ccc_cb_data, 1);
-+	ccc_cb->handle = gatt_db_attribute_get_handle(ccc);
-+	ccc_cb->callback = callback;
-+	ccc_cb->destroy = destroy;
-+	ccc_cb->user_data = user_data;
++	if (!get_dst_info(att, &bdaddr, &bdaddr_type))
++		return NULL;
 +
-+	queue_push_tail(database->ccc_callbacks, ccc_cb);
++	return find_device_state(database, &bdaddr, bdaddr_type);
 +}
 +
- static struct gatt_db_attribute *
- service_add_ccc(struct gatt_db_attribute *service,
- 				struct btd_gatt_database *database,
-@@ -1064,34 +1075,14 @@ service_add_ccc(struct gatt_db_attribute *service,
- 				btd_gatt_database_destroy_t destroy)
+ static struct device_state *get_device_state(struct btd_gatt_database *database,
+ 						struct bt_att *att)
  {
- 	struct gatt_db_attribute *ccc;
--	struct ccc_cb_data *ccc_cb;
--	bt_uuid_t uuid;
--
--	ccc_cb = new0(struct ccc_cb_data, 1);
--
--	/*
--	 * Provide a way for the permissions on a characteristic to dictate
--	 * the permissions on the CCC
--	 */
--	perm |= BT_ATT_PERM_READ | BT_ATT_PERM_WRITE;
--
--	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
--	ccc = gatt_db_service_add_descriptor(service, &uuid, perm,
--				gatt_ccc_read_cb, gatt_ccc_write_cb, database);
--	if (!ccc) {
--		error("Failed to create CCC entry in database");
--		free(ccc_cb);
--		return NULL;
--	}
--
--	gatt_db_attribute_set_fixed_length(ccc, 2);
- 
--	ccc_cb->handle = gatt_db_attribute_get_handle(ccc);
--	ccc_cb->callback = write_callback;
--	ccc_cb->destroy = destroy;
--	ccc_cb->user_data = user_data;
-+	ccc = gatt_db_service_add_ccc(service, perm);
-+	if (!ccc)
-+		return ccc;
- 
--	queue_push_tail(database->ccc_callbacks, ccc_cb);
-+	/* Only add ccc_cb if callback is set */
-+	if (write_callback)
-+		ccc_add_cb(database, ccc, write_callback, user_data, destroy);
- 
- 	return ccc;
+@@ -1299,16 +1311,6 @@ static void populate_devinfo_service(struct btd_gatt_database *database)
+ 	database_add_record(database, service);
  }
-@@ -1310,6 +1301,9 @@ static void populate_devinfo_service(struct btd_gatt_database *database)
  
- static void register_core_services(struct btd_gatt_database *database)
+-static void register_core_services(struct btd_gatt_database *database)
+-{
+-	gatt_db_ccc_register(database->db, gatt_ccc_read_cb, gatt_ccc_write_cb,
+-							NULL, database);
+-
+-	populate_gap_service(database);
+-	populate_gatt_service(database);
+-	populate_devinfo_service(database);
+-}
+-
+ static void conf_cb(void *user_data)
  {
-+	gatt_db_ccc_register(database->db, gatt_ccc_read_cb, gatt_ccc_write_cb,
-+								database);
+ 	GDBusProxy *proxy = user_data;
+@@ -1432,6 +1434,49 @@ remove:
+ 	}
+ }
+ 
++static void gatt_notify_cb(struct gatt_db_attribute *attrib,
++					struct gatt_db_attribute *ccc,
++					const uint8_t *value, size_t len,
++					struct bt_att *att, void *user_data)
++{
++	struct btd_gatt_database *database = user_data;
++	struct notify notify;
 +
- 	populate_gap_service(database);
- 	populate_gatt_service(database);
- 	populate_devinfo_service(database);
++	memset(&notify, 0, sizeof(notify));
++
++	notify.database = database;
++	notify.handle = gatt_db_attribute_get_handle(attrib);
++	notify.ccc_handle = gatt_db_attribute_get_handle(ccc);
++	notify.value = (void *) value;
++	notify.len = len;
++
++	if (attrib == database->svc_chngd)
++		notify.conf = service_changed_conf;
++
++	/* If a specific att is provided notify only to that device */
++	if (att) {
++		struct device_state *state;
++
++		state = find_device_state_by_att(database, att);
++		if (!state)
++			return;
++
++		send_notification_to_device(state, &notify);
++	} else
++		queue_foreach(database->device_states,
++				send_notification_to_device, &notify);
++}
++
++static void register_core_services(struct btd_gatt_database *database)
++{
++	gatt_db_ccc_register(database->db, gatt_ccc_read_cb, gatt_ccc_write_cb,
++						gatt_notify_cb, database);
++
++	populate_gap_service(database);
++	populate_gatt_service(database);
++	populate_devinfo_service(database);
++}
++
+ static void send_notification_to_devices(struct btd_gatt_database *database,
+ 					uint16_t handle, uint8_t *value,
+ 					uint16_t len, uint16_t ccc_handle,
+@@ -1478,8 +1523,8 @@ static void send_service_changed(struct btd_gatt_database *database,
+ 	put_le16(start, value);
+ 	put_le16(end, value + 2);
+ 
+-	send_notification_to_devices(database, handle, value, sizeof(value),
+-					ccc_handle, service_changed_conf, NULL);
++	gatt_db_attribute_notify(database->svc_chngd, database->svc_chngd_ccc,
++				 value, sizeof(value), NULL);
+ }
+ 
+ static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+@@ -3917,6 +3962,6 @@ void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database)
+ 	put_le16(0x0001, value);
+ 	put_le16(0xffff, value + 2);
+ 
+-	send_notification_to_devices(database, handle, value, sizeof(value),
+-					ccc_handle, service_changed_conf, NULL);
++	gatt_db_attribute_notify(database->svc_chngd, database->svc_chngd_ccc,
++				 value, sizeof(value), NULL);
+ }
 -- 
 2.34.1
 
