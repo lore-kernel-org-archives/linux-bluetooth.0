@@ -2,136 +2,302 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3D0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 01:57:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B708C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Jan 2022 11:22:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378294AbiAUB5A (ORCPT
+        id S1380129AbiAULWv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Jan 2022 20:57:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45772 "EHLO
+        Fri, 21 Jan 2022 06:22:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244566AbiAUB47 (ORCPT
+        with ESMTP id S1380056AbiAULWu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Jan 2022 20:56:59 -0500
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 337B4C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jan 2022 17:56:59 -0800 (PST)
-Received: by mail-qv1-xf2e.google.com with SMTP id a7so8883913qvl.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Jan 2022 17:56:59 -0800 (PST)
+        Fri, 21 Jan 2022 06:22:50 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B0E6C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 03:22:50 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id c5so7900161pgk.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Jan 2022 03:22:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=m0vALOdDq4h6S6L9GhNnaIgK+PbdK455Nu5juYyTeNk=;
-        b=Kv+N4Xyul7l5hKUk57rPad1UtdH503xVKzyiWP1F9KbUnwT3F3WWTl94yTsOw079Iw
-         U4yR0+KxOri1SBKs0kxFR2MkasxB2xZDQR1ttHWqok2/qJy9VWKHvPpPgvD5ychel3a6
-         eqlb8NvJ2yeFTfMyr/PVA6PwoRB9j1R3VTwAe6nXGApcXXvD8xPUXJDY+droL9lW+seC
-         1UhgG+P8JJ4xWa8lgc0RvQsWf6DDXrnnNGlCVWzcySqfor+3BioCMQB/RzoAbmdBS6Vg
-         uHJEswhrywdfwyNppIfZETASKboo8+iUNZvedK9haqzBqSJZin6JwW4JzdteXy4U8UkS
-         rlGA==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3q3X8YUXMmeX3ExmAyvXno86nrvAGMzIvDZTG48rU/Y=;
+        b=TcEOobGo7l3bMaindLBr+yt6TMkPedRSi8679oj9LjbMnJuol7C15438f6zTywCg/E
+         u8oAzVHdCyAy6uFOTF4WVBHBf8NCFrT3iQ2O3ml2BizWBFWJMLSECGQvmjpfqSfj/3Bz
+         AMFmweoUMA4fMz/ovmUdcQIxYud2AxmjFBtFg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=m0vALOdDq4h6S6L9GhNnaIgK+PbdK455Nu5juYyTeNk=;
-        b=N97ocbDaf6Bzti8VYD+WD14lKLQ+aGkDUEI0ENFigY7qqkLQaaOsxr81XlIZ0/p5Mw
-         drORfhF5EU7VRf/eD5WON256Npsa9q8Os8SArLYu6MOPtmgvFOY0DxQKEd+UUlVz5BqS
-         8Vt3nAG00z4Q9t39F1Hqgyxv1zZUdWDSrlFhX+TmojY/so+EV5u+egoJKIPbjgFjHyxv
-         WjjfiVsMrY39dT4laCA2yNm8HgvVLUv3aTlE+weIUOGpYvUtgxd/5piriZqG0GKFW/Z5
-         t7sZM6spoXtcCvqgtPWL/1u+oiQxjSYuVqMuwWPwTYSDxQXEKi6hCsFK30WIiHRqBxPr
-         kGCw==
-X-Gm-Message-State: AOAM531TMmqZxDopoOSCro4CTv7V/BZWrQEUpdUkFdHeR6V1mZHZC5JU
-        x6BqaEK2uz34RC5HWRZ1zlyNV2BZG94kkw==
-X-Google-Smtp-Source: ABdhPJyI9Htpp0aZwiHG4IGUu0n/8bU5mKZVe2BXpJE5fJxAisr/sPQ6i/O2X2cKE7O7egF9y+rDvA==
-X-Received: by 2002:ad4:5d6d:: with SMTP id fn13mr1795156qvb.25.1642730218101;
-        Thu, 20 Jan 2022 17:56:58 -0800 (PST)
-Received: from [172.17.0.2] ([20.62.96.168])
-        by smtp.gmail.com with ESMTPSA id s4sm2593490qko.113.2022.01.20.17.56.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jan 2022 17:56:57 -0800 (PST)
-Message-ID: <61ea12e9.1c69fb81.9022a.12a0@mx.google.com>
-Date:   Thu, 20 Jan 2022 17:56:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5167141727445920559=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3q3X8YUXMmeX3ExmAyvXno86nrvAGMzIvDZTG48rU/Y=;
+        b=nO7o/U5YGvWBv+giSx20/sGvKLJ2fKJBMdUGgzMZL9MZ03LMt9/kaqZ8xCg6JUA4Ij
+         +Hk9CWcZAwlkoBgt7WCnodzkBWZ1vugrayuSuFTdHtvxnL6p1i5TfwpFLvltOyZYgFx5
+         GaqRAzy3TR7/p5FzUVAC9k5AZ2SOD27PbRMKR6kOXD1lwpfUxIwJ30uR8CMaCjMBFcBy
+         JyORZPH+rRzlg2gstntSr8y4VRb55ZIaJ8EYYlx9G3kgXxRK/kMYrCA7t02o074eTMh+
+         uj0cqCJIrMjmbEIjSs1Ri6EYcrp5n1MZ15KWrfcob+8MLhgvj3B7JfqkdAgx+QEpaD5R
+         BKJw==
+X-Gm-Message-State: AOAM5317NwItatG8C9o0nB6rkU9HzrNd/nbqXOyCUTNh+yTgaLrq3eXX
+        mYVH/Y/zxYZ0RKE47m5KONGsgp9gwKYrFw==
+X-Google-Smtp-Source: ABdhPJx/NjDUfZCmSZ6vPyuzF8fWSkhjllUZhyS/GPI254soFBCLh9XCULkxf3gx7gxEonPKv5U6bw==
+X-Received: by 2002:a05:6a00:1a94:b0:4c3:a8f8:1e46 with SMTP id e20-20020a056a001a9400b004c3a8f81e46mr3604936pfv.2.1642764169136;
+        Fri, 21 Jan 2022 03:22:49 -0800 (PST)
+Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
+        by smtp.gmail.com with UTF8SMTPSA id b9sm6529218pfm.154.2022.01.21.03.22.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jan 2022 03:22:48 -0800 (PST)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v1 1/2] Bluetooth: aosp: surface AOSP quality report through mgmt
+Date:   Fri, 21 Jan 2022 19:22:32 +0800
+Message-Id: <20220121192152.v1.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
+X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, cgel.zte@gmail.com
-Subject: RE: bluetooth: mgmt: Replace zero-length array with flexible-array member
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220121013508.950175-1-deng.changcheng@zte.com.cn>
-References: <20220121013508.950175-1-deng.changcheng@zte.com.cn>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5167141727445920559==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+When receiving a HCI vendor event, the kernel checks if it is an
+AOSP bluetooth quality report. If yes, the event is sent to bluez
+user space through the mgmt socket.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607119
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.61 seconds
-GitLint                       FAIL      0.96 seconds
-SubjectPrefix                 FAIL      0.87 seconds
-BuildKernel                   PASS      30.32 seconds
-BuildKernel32                 PASS      26.97 seconds
-Incremental Build with patchesPASS      36.33 seconds
-TestRunner: Setup             PASS      472.13 seconds
-TestRunner: l2cap-tester      PASS      13.23 seconds
-TestRunner: bnep-tester       PASS      6.01 seconds
-TestRunner: mgmt-tester       PASS      103.93 seconds
-TestRunner: rfcomm-tester     PASS      7.33 seconds
-TestRunner: sco-tester        PASS      7.60 seconds
-TestRunner: smp-tester        PASS      7.47 seconds
-TestRunner: userchan-tester   PASS      6.25 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.61 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-bluetooth: mgmt: Replace zero-length array with flexible-array member\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#88: 
-https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays
-
-total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12719219.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL - 0.96 seconds
-Run gitlint with rule in .gitlint
-bluetooth: mgmt: Replace zero-length array with flexible-array member
-10: B1 Line exceeds max length (97>80): "https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays"
-
-
-##############################
-Test: SubjectPrefix - FAIL - 0.87 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+ include/net/bluetooth/hci_core.h |  2 ++
+ include/net/bluetooth/mgmt.h     |  7 ++++
+ net/bluetooth/aosp.c             | 61 ++++++++++++++++++++++++++++++++
+ net/bluetooth/aosp.h             | 12 +++++++
+ net/bluetooth/hci_event.c        | 33 ++++++++++++++++-
+ net/bluetooth/mgmt.c             | 22 ++++++++++++
+ 6 files changed, 136 insertions(+), 1 deletion(-)
 
---===============5167141727445920559==--
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 21eadb113a31..727cb9c056b2 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1861,6 +1861,8 @@ int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
+ int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
+ void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
+ 				  bdaddr_t *bdaddr, u8 addr_type);
++int mgmt_quality_report(struct hci_dev *hdev, struct sk_buff *skb,
++			u8 quality_spec);
+ 
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 99266f7aebdc..6a0fcb3aef8a 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -1120,3 +1120,10 @@ struct mgmt_ev_adv_monitor_device_lost {
+ 	__le16 monitor_handle;
+ 	struct mgmt_addr_info addr;
+ } __packed;
++
++#define MGMT_EV_QUALITY_REPORT			0x0031
++struct mgmt_ev_quality_report {
++	__u8 quality_spec;
++	__u8 data_len;
++	__u8 data[0];
++} __packed;
+diff --git a/net/bluetooth/aosp.c b/net/bluetooth/aosp.c
+index 432ae3aac9e3..9e3551627ad5 100644
+--- a/net/bluetooth/aosp.c
++++ b/net/bluetooth/aosp.c
+@@ -199,3 +199,64 @@ int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
+ 	else
+ 		return disable_quality_report(hdev);
+ }
++
++#define BLUETOOTH_QUALITY_REPORT_EV		0x58
++struct bqr_data {
++	__u8 quality_report_id;
++	__u8 packet_type;
++	__le16 conn_handle;
++	__u8 conn_role;
++	__s8 tx_power_level;
++	__s8 rssi;
++	__u8 snr;
++	__u8 unused_afh_channel_count;
++	__u8 afh_select_unideal_channel_count;
++	__le16 lsto;
++	__le32 conn_piconet_clock;
++	__le32 retransmission_count;
++	__le32 no_rx_count;
++	__le32 nak_count;
++	__le32 last_tx_ack_timestamp;
++	__le32 flow_off_count;
++	__le32 last_flow_on_timestamp;
++	__le32 buffer_overflow_bytes;
++	__le32 buffer_underflow_bytes;
++
++	/* Vendor Specific Parameter */
++	__u8 vsp[0];
++} __packed;
++
++struct aosp_hci_vs_data {
++	__u8 code;
++	__u8 data[0];
++} __packed;
++
++bool aosp_is_quality_report_evt(struct sk_buff *skb)
++{
++	struct aosp_hci_vs_data *ev;
++
++	if (skb->len < sizeof(struct aosp_hci_vs_data))
++		return false;
++
++	ev = (struct aosp_hci_vs_data *)skb->data;
++
++	return ev->code == BLUETOOTH_QUALITY_REPORT_EV;
++}
++
++bool aosp_pull_quality_report_data(struct sk_buff *skb)
++{
++	size_t bqr_data_len = sizeof(struct bqr_data);
++
++	skb_pull(skb, sizeof(struct aosp_hci_vs_data));
++
++	/* skb->len is allowed to be larger than bqr_data_len to have
++	 * the Vendor Specific Parameter (vsp) field.
++	 */
++	if (skb->len < bqr_data_len) {
++		BT_ERR("AOSP evt data len %d too short (%u expected)",
++		       skb->len, bqr_data_len);
++		return false;
++	}
++
++	return true;
++}
+diff --git a/net/bluetooth/aosp.h b/net/bluetooth/aosp.h
+index 2fd8886d51b2..49894a995647 100644
+--- a/net/bluetooth/aosp.h
++++ b/net/bluetooth/aosp.h
+@@ -10,6 +10,8 @@ void aosp_do_close(struct hci_dev *hdev);
+ 
+ bool aosp_has_quality_report(struct hci_dev *hdev);
+ int aosp_set_quality_report(struct hci_dev *hdev, bool enable);
++bool aosp_is_quality_report_evt(struct sk_buff *skb);
++bool aosp_pull_quality_report_data(struct sk_buff *skb);
+ 
+ #else
+ 
+@@ -26,4 +28,14 @@ static inline int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
+ 	return -EOPNOTSUPP;
+ }
+ 
++static inline bool aosp_is_quality_report_evt(struct sk_buff *skb)
++{
++	return false;
++}
++
++static inline bool aosp_pull_quality_report_data(struct sk_buff *skb)
++{
++	return false;
++}
++
+ #endif
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 681c623aa380..bccb659a9454 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -37,6 +37,7 @@
+ #include "smp.h"
+ #include "msft.h"
+ #include "eir.h"
++#include "aosp.h"
+ 
+ #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+ 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+@@ -4225,6 +4226,36 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, void *data,
+ 	queue_work(hdev->workqueue, &hdev->tx_work);
+ }
+ 
++#define QUALITY_SPEC_NA			0x0
++#define QUALITY_SPEC_INTEL_TELEMETRY	0x1
++#define QUALITY_SPEC_AOSP_BQR		0x2
++
++static bool quality_report_evt(struct hci_dev *hdev,  void *data,
++			       struct sk_buff *skb)
++{
++	if (aosp_is_quality_report_evt(skb)) {
++		if (aosp_has_quality_report(hdev) &&
++		    aosp_pull_quality_report_data(skb))
++			mgmt_quality_report(hdev, skb, QUALITY_SPEC_AOSP_BQR);
++
++		return true;
++	}
++
++	return false;
++}
++
++static void hci_vendor_evt(struct hci_dev *hdev, void *data,
++			   struct sk_buff *skb)
++{
++	/* Every distinct vendor specification must have a well-defined
++	 * condition to determine if an event meets the specification.
++	 * The skb is consumed by a specification only if the event meets
++	 * the specification.
++	 */
++	if (!quality_report_evt(hdev, data, skb))
++		msft_vendor_evt(hdev, data, skb);
++}
++
+ static void hci_mode_change_evt(struct hci_dev *hdev, void *data,
+ 				struct sk_buff *skb)
+ {
+@@ -6811,7 +6842,7 @@ static const struct hci_ev {
+ 	HCI_EV(HCI_EV_NUM_COMP_BLOCKS, hci_num_comp_blocks_evt,
+ 	       sizeof(struct hci_ev_num_comp_blocks)),
+ 	/* [0xff = HCI_EV_VENDOR] */
+-	HCI_EV(HCI_EV_VENDOR, msft_vendor_evt, 0),
++	HCI_EV(HCI_EV_VENDOR, hci_vendor_evt, 0),
+ };
+ 
+ static void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 08d6494f1b34..78687ae885be 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4389,6 +4389,28 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 			       MGMT_STATUS_NOT_SUPPORTED);
+ }
+ 
++int mgmt_quality_report(struct hci_dev *hdev, struct sk_buff *skb,
++			u8 quality_spec)
++{
++	struct mgmt_ev_quality_report *ev;
++	size_t ev_len;
++	int err;
++
++	/* The ev comes with a variable-length data field. */
++	ev_len = sizeof(*ev) + skb->len;
++	ev = kmalloc(ev_len, GFP_KERNEL);
++	if (!ev)
++		return -ENOMEM;
++
++	ev->quality_spec = quality_spec;
++	ev->data_len = skb->len;
++	memcpy(ev->data, skb->data, skb->len);
++	err = mgmt_event(MGMT_EV_QUALITY_REPORT, hdev, ev, ev_len, NULL);
++	kfree(ev);
++
++	return err;
++}
++
+ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			    u16 data_len)
+ {
+-- 
+2.35.0.rc0.227.g00780c9af4-goog
+
