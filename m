@@ -2,111 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E94ECC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 14:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6894C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 20:11:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233770AbiAWOxv (ORCPT
+        id S240050AbiAWULd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jan 2022 09:53:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57372 "EHLO
+        Sun, 23 Jan 2022 15:11:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233767AbiAWOxu (ORCPT
+        with ESMTP id S239970AbiAWULc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jan 2022 09:53:50 -0500
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4C0C06173B
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jan 2022 06:53:49 -0800 (PST)
-Received: by mail-qv1-xf2d.google.com with SMTP id a7so17367101qvl.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jan 2022 06:53:49 -0800 (PST)
+        Sun, 23 Jan 2022 15:11:32 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014EFC06173B;
+        Sun, 23 Jan 2022 12:11:31 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id j14so8175440lja.3;
+        Sun, 23 Jan 2022 12:11:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=hrv3awavkYT/6nv5AnQioqwba6ue1m1OzsBCwGOdpLE=;
-        b=H8Ilj400uquq3WDtYaugfyL6AE5ye+TCzFf0VzzM1MgKoRUVvOWLTci1kc78TM03F1
-         P3sw7pj0Qng9TspANBGilsDFH7ZhybQGQr0sAA68NKb8S9zTZhD5e6qapJRuhd53hGn9
-         xUZE+mlV56O2z5vYYDrqkgQl+DRypqDiOMkAtMyhmMUSjOej2XLezmaOfUPxZTcYl2br
-         C+jShSC+9w3zWQD4KKWRCr5F2xd+oDRGIGI8gRkQnqEQ01xU6uSiJlhhwbq4IGCZ+grQ
-         TFuTJC66plMpIe+eUnfXdLlTsL0wp9qbYMc9tQp2kyh4Y0Z8Uyd1s1m9G+I77emSExqs
-         hNOQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aAuSW76FCl1WuSKP7vtc/an1Ea7E8ZlL23+ctJBk8p4=;
+        b=f2eX4QXX0XC4GPUIKoGs+4XWYSAraFc2eY4WvbDyCJB5w66GuqIbNS9VFeYHUinww6
+         Gv0xXSFuxh7Y81UBmOSK6FR+r4G/BROZ5ZuRuCHOfznCS/Ga6jfvLfyksgYqPu6qpjdg
+         wLBWxrnAWzU7SRK0z/6cbXfKByKXBgMAvTHGKTRO1zNlX4rNJbIs2cu5cV38ySXi56hh
+         rYtdlSCWdEkCcoql0YzUMXK+XIdRqzRkB23fX0/dDNYXLyWsURwqXx8gtQxkjQXanObb
+         xRTcXkYVRSo4odAsoO9TPbJgeBLfGCswYiyUTRgjvKC4t/cUHyyQH0ogxb53nFBJQFOo
+         Gs6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=hrv3awavkYT/6nv5AnQioqwba6ue1m1OzsBCwGOdpLE=;
-        b=0udhXAasoaN5eaHCRgixxAGgpUJE12qXGJ386v9rMTpAFdDoOBY5tSSiTJCoQ5gg6E
-         Gi8GK7LfnhNy7Sc+SS6ApmGTw5zMeNGFHEyDq3fAT1IZ9v6fxAfmgTbc6FkmkBhwbyEZ
-         1y41L6y/YAikk4C9XJujOT90gvCH0N87efzxiA0PLCJ6bu+c2N5TcZPu+SyIFldf1yBm
-         VqwESfjaBARd/Bhi5pQLRWniu2PcqKA9oNUVtvkFnibwlzuJsTLP4vgZz+04JLsojDTO
-         6Aw950HtScGFhapWfT941QnZ55XHEkGKyhgnNsMCOdwIHCP7QrjSf3LTW060iSv7LRo5
-         yAWg==
-X-Gm-Message-State: AOAM531ftHZoXyWAPByOIE1IKb+k6lRupmEzBQwlXz2vA7HzaQGRejGl
-        edH6wGEtpSK2QS8s55QoF/KmOM9vkSoTXQ==
-X-Google-Smtp-Source: ABdhPJy1NPlfCWZ/cMIntky4rkwCtzGI6AWpVqKfsc2T2C9b/n0x4G5H3n8b76Dvdw+UfjBOqguoSw==
-X-Received: by 2002:a05:6214:21ef:: with SMTP id p15mr4678249qvj.92.1642949628726;
-        Sun, 23 Jan 2022 06:53:48 -0800 (PST)
-Received: from [172.17.0.2] ([40.79.36.188])
-        by smtp.gmail.com with ESMTPSA id bl17sm5860159qkb.16.2022.01.23.06.53.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Jan 2022 06:53:48 -0800 (PST)
-Message-ID: <61ed6bfc.1c69fb81.81a86.35c1@mx.google.com>
-Date:   Sun, 23 Jan 2022 06:53:48 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0740350910333134077=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aAuSW76FCl1WuSKP7vtc/an1Ea7E8ZlL23+ctJBk8p4=;
+        b=hdv53b1WmLtu9XM5w53Pa56nI6Tc9P3EeQCKnCyxk+WNPnTD2M3UGXTjlK7xjySPDv
+         FNXEIZOuFggA6NiB2J9FsKEGiCViNh3Df26ZlOFGO+luvedpBcyWKjEgzy17URvrKNQG
+         PUKBpLHkvk0ENlerXP3lSJT+K4u1Dy+7V/bCy9TFgGGR8yuFiOI5BAdU9TKxaZdLlbSz
+         vqTu5+H6JDnGD+8Zkcn++mPfh9DY9r2r9BplWuzGlzyGZVe3jnxRVX+uzpUplt4RbLFv
+         F7FENasCWbERYjAjeP/rPrj+CaDZTt8ATqGttFSAvz3DQn5CvIW/5hRAvJNk7910PfEp
+         NXNQ==
+X-Gm-Message-State: AOAM531asDlBEuIA8XoemoPX+1t1fuZYTm7NeaBubYDlKxJcpLrnxcDc
+        GluwuKRBdwbK9+v67mHP08wLgoFV0wYhKX7FZR8oi/NiNuw=
+X-Google-Smtp-Source: ABdhPJwrtieEckXwZbEL96znLSpfLom4rbY/6xPKYoIttPzuAlUPOJA0Y7Osr6LQRKqNx/8JWoeT60Umuw7akm7eOUM=
+X-Received: by 2002:a2e:91cd:: with SMTP id u13mr2969610ljg.427.1642968689771;
+ Sun, 23 Jan 2022 12:11:29 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, soenke.huster@eknoes.de
-Subject: RE: [RFC,v2] Bluetooth: hci_event: Ignore multiple conn complete events
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220123140624.30005-1-soenke.huster@eknoes.de>
-References: <20220123140624.30005-1-soenke.huster@eknoes.de>
+References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
+ <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
+ <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info> <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
+ <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
+In-Reply-To: <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
+From:   coldolt <andypalmadi@gmail.com>
+Date:   Sun, 23 Jan 2022 22:11:19 +0200
+Message-ID: <CAJvGw+CKz_tZXKkuzrPURLJsh1JBkO1ge7V_owa0htk9pEJsZw@mail.gmail.com>
+Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
+ Move shutdown callback before flushing tx and rx queue"
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     "An, Tedd" <tedd.an@intel.com>,
+        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0740350910333134077==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Sun, Jan 23, 2022 at 11:28 AM Thorsten Leemhuis
+<regressions@leemhuis.info> wrote:
+>
+> Top-posting for once, to make this easy accessible to everyone.
+>
+> Coldolt, could you please check if this regression is still in 5.17-rc1
+> or 5.16.2? I wonder if this patch fixed things:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-5.16.y&id=8e8cae520210139aab4b701a822bbefb13b8f007
+>
+> Ciao, Thorsten
 
-This is automated email and please do not reply to this email!
+Yes, that commit fixes it for me. This same issue seems to have come
+up many times in the past months, it is a duplicate of
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607576
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.90 seconds
-GitLint                       FAIL      0.97 seconds
-SubjectPrefix                 PASS      0.85 seconds
-BuildKernel                   PASS      30.23 seconds
-BuildKernel32                 PASS      27.08 seconds
-Incremental Build with patchesPASS      36.92 seconds
-TestRunner: Setup             PASS      479.12 seconds
-TestRunner: l2cap-tester      PASS      13.54 seconds
-TestRunner: bnep-tester       PASS      6.05 seconds
-TestRunner: mgmt-tester       PASS      104.38 seconds
-TestRunner: rfcomm-tester     PASS      7.51 seconds
-TestRunner: sco-tester        PASS      7.71 seconds
-TestRunner: smp-tester        PASS      7.54 seconds
-TestRunner: userchan-tester   PASS      6.37 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 0.97 seconds
-Run gitlint with rule in .gitlint
-[RFC,v2] Bluetooth: hci_event: Ignore multiple conn complete events
-16: B2 Line has trailing whitespace: "v2: "
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0740350910333134077==--
+#regzbot dup-of:
+https://lore.kernel.org/lkml/b0f6f66b-28aa-9d43-0aab-e6887ee0fda8@logobject.ch/
+#regzbot dup-of:
+https://lore.kernel.org/lkml/20211202162256.31837-1-tiwai@suse.de/
+#regzbot fixed-by: 95655456e7ce
