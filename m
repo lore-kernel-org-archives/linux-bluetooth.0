@@ -2,103 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 652CEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 07:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FA9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 09:28:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235753AbiAWHEh (ORCPT
+        id S232455AbiAWJ2a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jan 2022 02:04:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
+        Sun, 23 Jan 2022 04:28:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231671AbiAWHEh (ORCPT
+        with ESMTP id S229453AbiAWJ23 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jan 2022 02:04:37 -0500
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBD5CC06173B
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Jan 2022 23:04:36 -0800 (PST)
-Received: by mail-qt1-x835.google.com with SMTP id w6so15576756qtk.4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Jan 2022 23:04:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=v8SH5J2jm+/GF9WG2tawKaEAWL1OJQz10CpRSObX8qs=;
-        b=UaRrd+ZB31NHmGYTpbmFkQJ5zkKuIZ6CWKx8M7GqOqqi8uYWgNrcHLGpMB3IZNz26f
-         mhqy/4GTHTusRDumE2Xyl+d+CirSJ4aUh/5UxrAOvGgu9Ze7h4ym0RxvSJZpDO1MF96H
-         cjRODrSC2eEYEKuxXnfD91dVB8tLD8D5Wy/0TgpyChFj4SplMQPmwmQiS0u7ssfcOYU+
-         nvoyZj6n0IeOwR70Fct7qHOIeqMEx9X82BDszZIwl9uqD9T47N7ki8kOmC461IAfqVXn
-         epsXK/7ob81SY1XIxfbPF/qk8RxelfZPyfsp5qshdPmusAYib4gix523lQq2LprCXN5R
-         fl/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=v8SH5J2jm+/GF9WG2tawKaEAWL1OJQz10CpRSObX8qs=;
-        b=Gz9GKP720Jz0hn8VuwZAwQBy8Otsm6m0SCfAbf9s4lUxdNqyYXeB6BGA1v7TgW4k5u
-         hBb3UEK+6+B+pgmfSMLB/lQqINtogWahv0nHbMY8mkEg61ETvo4Wo3OwXAOXYhdv1A1f
-         drt0xXTa+QiKRpwOjSVH7IAMA9SI1ABlGd7J91uWgD/yvIehYkm3HGacJ3qWfVqdCu7v
-         GWVRIGHca0G6Wv4AUZe2pp82+kVYw4lYRWXwfJ9Ff+rDS/zJgsZFxqH1hp4AffCyHATF
-         CL7z9RLCXdd2EjbJMZQ7WHVZG/+5xnHR+js5VyQ/cw1kNyNXLfy7SiUgmCs19A6523Id
-         fa9w==
-X-Gm-Message-State: AOAM532sKOslJvxrhw3ML8Lnr7rghFTvnXzvFkOX4j6h4Yv7HMDjcPcA
-        Evq546gJ6+OBceEH60yqgJtVDBwyCYw=
-X-Google-Smtp-Source: ABdhPJyLRrr0e1cv1LdyvSACU+riSYrWU90XeUVvOhboUh68YZT8SMVeuAvfvmnSm54QebjRWMp3dw==
-X-Received: by 2002:a05:622a:10:: with SMTP id x16mr7982694qtw.502.1642921475755;
-        Sat, 22 Jan 2022 23:04:35 -0800 (PST)
-Received: from [172.17.0.2] ([20.62.69.108])
-        by smtp.gmail.com with ESMTPSA id m14sm5347010qtx.44.2022.01.22.23.04.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Jan 2022 23:04:35 -0800 (PST)
-Message-ID: <61ecfe03.1c69fb81.885b6.080c@mx.google.com>
-Date:   Sat, 22 Jan 2022 23:04:35 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8349547478229973936=="
+        Sun, 23 Jan 2022 04:28:29 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0060C06173B;
+        Sun, 23 Jan 2022 01:28:28 -0800 (PST)
+Received: from ip4d173d02.dynamic.kabel-deutschland.de ([77.23.61.2] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nBZAc-0002u8-K7; Sun, 23 Jan 2022 10:28:22 +0100
+Message-ID: <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
+Date:   Sun, 23 Jan 2022 10:28:21 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, soenke.huster@eknoes.de
-Subject: RE: [v2] Bluetooth: msft: fix null pointer deref on msft_monitor_device_evt
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220123055709.7925-1-soenke.huster@eknoes.de>
-References: <20220123055709.7925-1-soenke.huster@eknoes.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
+ Move shutdown callback before flushing tx and rx queue"
+Content-Language: en-BS
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+To:     "An, Tedd" <tedd.an@intel.com>,
+        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
+        "andypalmadi@gmail.com" <andypalmadi@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
+ <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
+ <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info>
+ <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
+In-Reply-To: <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1642930108;3c323245;
+X-HE-SMSGID: 1nBZAc-0002u8-K7
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8349547478229973936==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Top-posting for once, to make this easy accessible to everyone.
 
-This is automated email and please do not reply to this email!
+Coldolt, could you please check if this regression is still in 5.17-rc1
+or 5.16.2? I wonder if this patch fixed things:
 
-Dear submitter,
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-5.16.y&id=8e8cae520210139aab4b701a822bbefb13b8f007
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607542
+Ciao, Thorsten
 
----Test result---
+#regzbot poke
 
-Test Summary:
-CheckPatch                    PASS      1.55 seconds
-GitLint                       PASS      1.03 seconds
-SubjectPrefix                 PASS      0.85 seconds
-BuildKernel                   PASS      29.25 seconds
-BuildKernel32                 PASS      25.92 seconds
-Incremental Build with patchesPASS      35.97 seconds
-TestRunner: Setup             PASS      464.06 seconds
-TestRunner: l2cap-tester      PASS      13.32 seconds
-TestRunner: bnep-tester       PASS      6.07 seconds
-TestRunner: mgmt-tester       PASS      102.13 seconds
-TestRunner: rfcomm-tester     PASS      7.36 seconds
-TestRunner: sco-tester        PASS      7.57 seconds
-TestRunner: smp-tester        PASS      7.42 seconds
-TestRunner: userchan-tester   PASS      6.28 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8349547478229973936==--
+On 20.01.22 14:08, Thorsten Leemhuis wrote:
+> On 10.12.21 10:16, Thorsten Leemhuis wrote:
+>> Hi, this is your Linux kernel regression tracker speaking.
+> 
+> /me again
+> 
+>> On 10.12.21 02:10, An, Tedd wrote:
+>>> On Fri, 2021-12-10 at 01:36 +0200, coldolt wrote:
+>>>> After a restart, bluetooth doesn't work since commit 0ea53674d07f
+>>>> "Bluetooth: Move shutdown callback before flushing tx and rx queue"
+>>>>
+>>>> bluetoothctl doesn't list any controllers and I get the following in
+>>>> dmesg | grep -i bluetooth
+>>>>
+>>>> [    2.634812] Bluetooth: Core ver 2.22
+>>>> [    2.634843] NET: Registered PF_BLUETOOTH protocol family
+>>>> [    2.634845] Bluetooth: HCI device and connection manager initialized
+>>>> [    2.634850] Bluetooth: HCI socket layer initialized
+>>>> [    2.634853] Bluetooth: L2CAP socket layer initialized
+>>>> [    2.634858] Bluetooth: SCO socket layer initialized
+>>>> [    4.077788] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+>>>> [    4.077794] Bluetooth: BNEP filters: protocol multicast
+>>>> [    4.077799] Bluetooth: BNEP socket layer initialized
+>>>> [    4.078219] random: bluetoothd: uninitialized urandom read (4 bytes read)
+>>>> [    4.852835] Bluetooth: hci0: Reading Intel version command failed (-110)
+>>>> [    4.852838] Bluetooth: hci0: command 0xfc05 tx timeout
+>>>>
+>>>> However, it works after a cold start or after putting the computer to sleep.
+>>>>
+>>>> Before 83f2dafe2a62 "Bluetooth: btintel: Refactoring setup routine for
+>>>> legacy ROM sku", it always works after a restart, but from that commit
+>>>> up until before 0ea53674d07f it either works or doesn't work after a
+>>>> restart depending on if before restart it was working or not, meaning
+>>>> it stays working or stays not working.
+>>>>
+>>>> Also on the first restart from before 83f2dafe2a62 into 0ea53674d07f
+>>>> or later it works, but then restarting again into 0ea53674d07f or
+>>>> later it no longer works. So it seems that 0ea53674d07f and later puts
+>>>> the bluetooth in a nonworking state if you restart from it, but before
+>>>> 83f2dafe2a62 it puts it back into a working state at startup, and in
+>>>> between it doesn't do either, i.e. it stays the way it was.
+>>>>
+>>>> I have a Dell Latitude E5550 laptop with an Intel 7265 wifi/bluetooth
+>>>> card REV=0x210 firmware version 29.4063824552.0 7265D-29. I'm on Arch
+>>>> Linux, the problem is still there on 5.16-rc4.
+>>>>
+>>>> Here is a thread on the Arch Linux forums with several people with the
+>>>> same problem, for some of them it got fixed with a kernel update or by
+>>>> reloading modules, but not for everybody, including me
+>>>> https://bbs.archlinux.org/viewtopic.php?id=271459
+>>>>
+>>>> #regzbot introduced 0ea53674d07f
+>>
+>> Many thx for directly getting regzbot involved! :-D
+>>
+>>> This issue is under investigation to find the root cause and proper solution.
+>>
+>> Only internally? Or are there any other related public discussions that
+>> are relevant to this and thus good to be aware of?
+> 
+> What's the status here? It looks like there was no progress since 41
+> days, which is awfully long even with the festive season in between.
+> Could anyone provide a status update please?
+> 
+> Ciao, Thorsten
+> 
+> #regzbot poke
+> 
+> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
+> on my table. I can only look briefly into most of them. Unfortunately
+> therefore I sometimes will get things wrong or miss something important.
+> I hope that's not the case here; if you think it is, don't hesitate to
+> tell me about it in a public reply, that's in everyone's interest.
+> 
+> BTW, I have no personal interest in this issue, which is tracked using
+> regzbot, my Linux kernel regression tracking bot
+> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
+> this mail to get things rolling again and hence don't need to be CC on
+> all further activities wrt to this regression.
+> 
+>>> The downloaded firmware breaks the behavior though, we need to investigate
+>>> further to see if it can be fixed in firmware or fix in the driver.
+>>
+>> The answer from my point is simple: it needs to be fixed in the kernel,
+>> not just in the firmware, otherwise people that update the kernel
+>> without updating the firmware at the same time will run into a
+>> regression -- and that is not acceptable by kernel development standards.
+>>
+>> Ciao, Thorsten
+>>
+>> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
+>> on my table. I can only look briefly into most of them. Unfortunately
+>> therefore I sometimes will get things wrong or miss something important.
+>> I hope that's not the case here; if you think it is, don't hesitate to
+>> tell me about it in a public reply. That's in everyone's interest, as
+>> what I wrote above might be misleading to everyone reading this; any
+>> suggestion I gave they thus might sent someone reading this down the
+>> wrong rabbit hole, which none of us wants.
+>>
+>> BTW, I have no personal interest in this issue, which is tracked using
+>> regzbot, my Linux kernel regression tracking bot
+>> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
+>> this mail to get things rolling again and hence don't need to be CC on
+>> all further activities wrt to this regression.
