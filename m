@@ -2,164 +2,208 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49FA9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 09:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23597C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 14:07:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232455AbiAWJ2a (ORCPT
+        id S236660AbiAWOHw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jan 2022 04:28:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiAWJ23 (ORCPT
+        Sun, 23 Jan 2022 09:07:52 -0500
+Received: from giacobini.uberspace.de ([185.26.156.129]:60820 "EHLO
+        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236663AbiAWOHv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jan 2022 04:28:29 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0060C06173B;
-        Sun, 23 Jan 2022 01:28:28 -0800 (PST)
-Received: from ip4d173d02.dynamic.kabel-deutschland.de ([77.23.61.2] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nBZAc-0002u8-K7; Sun, 23 Jan 2022 10:28:22 +0100
-Message-ID: <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
-Date:   Sun, 23 Jan 2022 10:28:21 +0100
+        Sun, 23 Jan 2022 09:07:51 -0500
+Received: (qmail 32133 invoked by uid 990); 23 Jan 2022 14:07:49 -0000
+Authentication-Results: giacobini.uberspace.de;
+        auth=pass (plain)
+From:   Soenke Huster <soenke.huster@eknoes.de>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Soenke Huster <soenke.huster@eknoes.de>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [RFC PATCH v2] Bluetooth: hci_event: Ignore multiple conn complete events
+Date:   Sun, 23 Jan 2022 15:06:24 +0100
+Message-Id: <20220123140624.30005-1-soenke.huster@eknoes.de>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
- Move shutdown callback before flushing tx and rx queue"
-Content-Language: en-BS
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-To:     "An, Tedd" <tedd.an@intel.com>,
-        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
-        "andypalmadi@gmail.com" <andypalmadi@gmail.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
- <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
- <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info>
- <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
-In-Reply-To: <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1642930108;3c323245;
-X-HE-SMSGID: 1nBZAc-0002u8-K7
+X-Rspamd-Bar: /
+X-Rspamd-Report: BAYES_HAM(-3) R_MISSING_CHARSET(0.5) MIME_GOOD(-0.1) MID_CONTAINS_FROM(1) SUSPICIOUS_RECIPS(1.5)
+X-Rspamd-Score: -0.1
+Received: from unknown (HELO unkown) (::1)
+        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Sun, 23 Jan 2022 15:07:49 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Top-posting for once, to make this easy accessible to everyone.
+When one of the three connection complete events is received multiple
+times for the same handle, the device is registered multiple times which
+leads to memory corruptions. Therefore, consequent events for a single
+connection are ignored.
 
-Coldolt, could you please check if this regression is still in 5.17-rc1
-or 5.16.2? I wonder if this patch fixed things:
+The conn->state can hold different values, therefore HCI_CONN_HANDLE_UNSET
+is introduced to identify new connections. To make sure the events do not
+contain this or another invalid handle HCI_CONN_HANDLE_MAX and checks
+are introduced.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-5.16.y&id=8e8cae520210139aab4b701a822bbefb13b8f007
+Buglink: https://bugzilla.kernel.org/show_bug.cgi?id=215497
+Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+---
+v2: 
+- Introduce HCI_CONN_HANDLE_UNSET for new connections
+- Introduce HCI_CONN_HANDLE_MAX to check for valid handles
 
-Ciao, Thorsten
+While fuzzing I found several UAFs or null pointer dereferences
+due to multiple connection complete events. They occur due to
+multiple calls to device_register in one of the three connection
+complete events. See the bugreport for a more in-depth description.
 
-#regzbot poke
+ include/net/bluetooth/hci_core.h |  3 ++
+ net/bluetooth/hci_conn.c         |  1 +
+ net/bluetooth/hci_event.c        | 63 ++++++++++++++++++++++++--------
+ 3 files changed, 52 insertions(+), 15 deletions(-)
 
-On 20.01.22 14:08, Thorsten Leemhuis wrote:
-> On 10.12.21 10:16, Thorsten Leemhuis wrote:
->> Hi, this is your Linux kernel regression tracker speaking.
-> 
-> /me again
-> 
->> On 10.12.21 02:10, An, Tedd wrote:
->>> On Fri, 2021-12-10 at 01:36 +0200, coldolt wrote:
->>>> After a restart, bluetooth doesn't work since commit 0ea53674d07f
->>>> "Bluetooth: Move shutdown callback before flushing tx and rx queue"
->>>>
->>>> bluetoothctl doesn't list any controllers and I get the following in
->>>> dmesg | grep -i bluetooth
->>>>
->>>> [    2.634812] Bluetooth: Core ver 2.22
->>>> [    2.634843] NET: Registered PF_BLUETOOTH protocol family
->>>> [    2.634845] Bluetooth: HCI device and connection manager initialized
->>>> [    2.634850] Bluetooth: HCI socket layer initialized
->>>> [    2.634853] Bluetooth: L2CAP socket layer initialized
->>>> [    2.634858] Bluetooth: SCO socket layer initialized
->>>> [    4.077788] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
->>>> [    4.077794] Bluetooth: BNEP filters: protocol multicast
->>>> [    4.077799] Bluetooth: BNEP socket layer initialized
->>>> [    4.078219] random: bluetoothd: uninitialized urandom read (4 bytes read)
->>>> [    4.852835] Bluetooth: hci0: Reading Intel version command failed (-110)
->>>> [    4.852838] Bluetooth: hci0: command 0xfc05 tx timeout
->>>>
->>>> However, it works after a cold start or after putting the computer to sleep.
->>>>
->>>> Before 83f2dafe2a62 "Bluetooth: btintel: Refactoring setup routine for
->>>> legacy ROM sku", it always works after a restart, but from that commit
->>>> up until before 0ea53674d07f it either works or doesn't work after a
->>>> restart depending on if before restart it was working or not, meaning
->>>> it stays working or stays not working.
->>>>
->>>> Also on the first restart from before 83f2dafe2a62 into 0ea53674d07f
->>>> or later it works, but then restarting again into 0ea53674d07f or
->>>> later it no longer works. So it seems that 0ea53674d07f and later puts
->>>> the bluetooth in a nonworking state if you restart from it, but before
->>>> 83f2dafe2a62 it puts it back into a working state at startup, and in
->>>> between it doesn't do either, i.e. it stays the way it was.
->>>>
->>>> I have a Dell Latitude E5550 laptop with an Intel 7265 wifi/bluetooth
->>>> card REV=0x210 firmware version 29.4063824552.0 7265D-29. I'm on Arch
->>>> Linux, the problem is still there on 5.16-rc4.
->>>>
->>>> Here is a thread on the Arch Linux forums with several people with the
->>>> same problem, for some of them it got fixed with a kernel update or by
->>>> reloading modules, but not for everybody, including me
->>>> https://bbs.archlinux.org/viewtopic.php?id=271459
->>>>
->>>> #regzbot introduced 0ea53674d07f
->>
->> Many thx for directly getting regzbot involved! :-D
->>
->>> This issue is under investigation to find the root cause and proper solution.
->>
->> Only internally? Or are there any other related public discussions that
->> are relevant to this and thus good to be aware of?
-> 
-> What's the status here? It looks like there was no progress since 41
-> days, which is awfully long even with the festive season in between.
-> Could anyone provide a status update please?
-> 
-> Ciao, Thorsten
-> 
-> #regzbot poke
-> 
-> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-> on my table. I can only look briefly into most of them. Unfortunately
-> therefore I sometimes will get things wrong or miss something important.
-> I hope that's not the case here; if you think it is, don't hesitate to
-> tell me about it in a public reply, that's in everyone's interest.
-> 
-> BTW, I have no personal interest in this issue, which is tracked using
-> regzbot, my Linux kernel regression tracking bot
-> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-> this mail to get things rolling again and hence don't need to be CC on
-> all further activities wrt to this regression.
-> 
->>> The downloaded firmware breaks the behavior though, we need to investigate
->>> further to see if it can be fixed in firmware or fix in the driver.
->>
->> The answer from my point is simple: it needs to be fixed in the kernel,
->> not just in the firmware, otherwise people that update the kernel
->> without updating the firmware at the same time will run into a
->> regression -- and that is not acceptable by kernel development standards.
->>
->> Ciao, Thorsten
->>
->> P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
->> on my table. I can only look briefly into most of them. Unfortunately
->> therefore I sometimes will get things wrong or miss something important.
->> I hope that's not the case here; if you think it is, don't hesitate to
->> tell me about it in a public reply. That's in everyone's interest, as
->> what I wrote above might be misleading to everyone reading this; any
->> suggestion I gave they thus might sent someone reading this down the
->> wrong rabbit hole, which none of us wants.
->>
->> BTW, I have no personal interest in this issue, which is tracked using
->> regzbot, my Linux kernel regression tracking bot
->> (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
->> this mail to get things rolling again and hence don't need to be CC on
->> all further activities wrt to this regression.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 21eadb113a31..f5caff1ddb29 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -303,6 +303,9 @@ struct adv_monitor {
+ 
+ #define HCI_MAX_SHORT_NAME_LENGTH	10
+ 
++#define HCI_CONN_HANDLE_UNSET		0xffff
++#define HCI_CONN_HANDLE_MAX		0x0eff
++
+ /* Min encryption key size to match with SMP */
+ #define HCI_MIN_ENC_KEY_SIZE		7
+ 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 04ebe901e86f..d10651108033 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -689,6 +689,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 
+ 	bacpy(&conn->dst, dst);
+ 	bacpy(&conn->src, &hdev->bdaddr);
++	conn->handle = HCI_CONN_HANDLE_UNSET;
+ 	conn->hdev  = hdev;
+ 	conn->type  = type;
+ 	conn->role  = role;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 681c623aa380..664ccf1d8d93 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3068,6 +3068,11 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 	struct hci_ev_conn_complete *ev = data;
+ 	struct hci_conn *conn;
+ 
++	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
++		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for invalid handle");
++		return;
++	}
++
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 
+ 	hci_dev_lock(hdev);
+@@ -3106,6 +3111,17 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 		}
+ 	}
+ 
++	/* The HCI_Connection_Complete event is only sent once per connection.
++	 * Processing it more than once per connection can corrupt kernel memory.
++	 *
++	 * As the connection handle is set here for the first time, it indicates
++	 * whether the connection is already set up.
++	 */
++	if (conn->handle != HCI_CONN_HANDLE_UNSET) {
++		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
++		goto unlock;
++	}
++
+ 	if (!ev->status) {
+ 		conn->handle = __le16_to_cpu(ev->handle);
+ 
+@@ -4674,6 +4690,11 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 		return;
+ 	}
+ 
++	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
++		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete for invalid handle");
++		return;
++	}
++
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 
+ 	hci_dev_lock(hdev);
+@@ -4697,23 +4718,19 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 			goto unlock;
+ 	}
+ 
++	/* The HCI_Synchronous_Connection_Complete event is only sent once per connection.
++	 * Processing it more than once per connection can corrupt kernel memory.
++	 *
++	 * As the connection handle is set here for the first time, it indicates
++	 * whether the connection is already set up.
++	 */
++	if (conn->handle != HCI_CONN_HANDLE_UNSET) {
++		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete event for existing connection");
++		goto unlock;
++	}
++
+ 	switch (ev->status) {
+ 	case 0x00:
+-		/* The synchronous connection complete event should only be
+-		 * sent once per new connection. Receiving a successful
+-		 * complete event when the connection status is already
+-		 * BT_CONNECTED means that the device is misbehaving and sent
+-		 * multiple complete event packets for the same new connection.
+-		 *
+-		 * Registering the device more than once can corrupt kernel
+-		 * memory, hence upon detecting this invalid event, we report
+-		 * an error and ignore the packet.
+-		 */
+-		if (conn->state == BT_CONNECTED) {
+-			bt_dev_err(hdev, "Ignoring connect complete event for existing connection");
+-			goto unlock;
+-		}
+-
+ 		conn->handle = __le16_to_cpu(ev->handle);
+ 		conn->state  = BT_CONNECTED;
+ 		conn->type   = ev->link_type;
+@@ -5509,6 +5526,11 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 	struct smp_irk *irk;
+ 	u8 addr_type;
+ 
++	if (handle > HCI_CONN_HANDLE_MAX) {
++		bt_dev_err(hdev, "Ignoring HCI_LE_Connection_Complete for invalid handle");
++		return;
++	}
++
+ 	hci_dev_lock(hdev);
+ 
+ 	/* All controllers implicitly stop advertising in the event of a
+@@ -5550,6 +5572,17 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		cancel_delayed_work(&conn->le_conn_timeout);
+ 	}
+ 
++	/* The HCI_LE_Connection_Complete event is only sent once per connection.
++	 * Processing it more than once per connection can corrupt kernel memory.
++	 *
++	 * As the connection handle is set here for the first time, it indicates
++	 * whether the connection is already set up.
++	 */
++	if (conn->handle != HCI_CONN_HANDLE_UNSET) {
++		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for existing connection");
++		goto unlock;
++	}
++
+ 	le_conn_update_addr(conn, bdaddr, bdaddr_type, local_rpa);
+ 
+ 	/* Lookup the identity address from the stored connection
+-- 
+2.34.1
+
