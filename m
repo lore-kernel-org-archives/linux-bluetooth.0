@@ -2,89 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6894C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 23 Jan 2022 20:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E56C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Jan 2022 03:44:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240050AbiAWULd (ORCPT
+        id S241060AbiAXDo3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 Jan 2022 15:11:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45824 "EHLO
+        Sun, 23 Jan 2022 22:44:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239970AbiAWULc (ORCPT
+        with ESMTP id S241038AbiAXDo3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 Jan 2022 15:11:32 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 014EFC06173B;
-        Sun, 23 Jan 2022 12:11:31 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id j14so8175440lja.3;
-        Sun, 23 Jan 2022 12:11:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=aAuSW76FCl1WuSKP7vtc/an1Ea7E8ZlL23+ctJBk8p4=;
-        b=f2eX4QXX0XC4GPUIKoGs+4XWYSAraFc2eY4WvbDyCJB5w66GuqIbNS9VFeYHUinww6
-         Gv0xXSFuxh7Y81UBmOSK6FR+r4G/BROZ5ZuRuCHOfznCS/Ga6jfvLfyksgYqPu6qpjdg
-         wLBWxrnAWzU7SRK0z/6cbXfKByKXBgMAvTHGKTRO1zNlX4rNJbIs2cu5cV38ySXi56hh
-         rYtdlSCWdEkCcoql0YzUMXK+XIdRqzRkB23fX0/dDNYXLyWsURwqXx8gtQxkjQXanObb
-         xRTcXkYVRSo4odAsoO9TPbJgeBLfGCswYiyUTRgjvKC4t/cUHyyQH0ogxb53nFBJQFOo
-         Gs6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=aAuSW76FCl1WuSKP7vtc/an1Ea7E8ZlL23+ctJBk8p4=;
-        b=hdv53b1WmLtu9XM5w53Pa56nI6Tc9P3EeQCKnCyxk+WNPnTD2M3UGXTjlK7xjySPDv
-         FNXEIZOuFggA6NiB2J9FsKEGiCViNh3Df26ZlOFGO+luvedpBcyWKjEgzy17URvrKNQG
-         PUKBpLHkvk0ENlerXP3lSJT+K4u1Dy+7V/bCy9TFgGGR8yuFiOI5BAdU9TKxaZdLlbSz
-         vqTu5+H6JDnGD+8Zkcn++mPfh9DY9r2r9BplWuzGlzyGZVe3jnxRVX+uzpUplt4RbLFv
-         F7FENasCWbERYjAjeP/rPrj+CaDZTt8ATqGttFSAvz3DQn5CvIW/5hRAvJNk7910PfEp
-         NXNQ==
-X-Gm-Message-State: AOAM531asDlBEuIA8XoemoPX+1t1fuZYTm7NeaBubYDlKxJcpLrnxcDc
-        GluwuKRBdwbK9+v67mHP08wLgoFV0wYhKX7FZR8oi/NiNuw=
-X-Google-Smtp-Source: ABdhPJwrtieEckXwZbEL96znLSpfLom4rbY/6xPKYoIttPzuAlUPOJA0Y7Osr6LQRKqNx/8JWoeT60Umuw7akm7eOUM=
-X-Received: by 2002:a2e:91cd:: with SMTP id u13mr2969610ljg.427.1642968689771;
- Sun, 23 Jan 2022 12:11:29 -0800 (PST)
-MIME-Version: 1.0
-References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
- <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
- <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info> <38b569e4-2e9f-0155-4a5c-52876e8ca38a@leemhuis.info>
- <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
-In-Reply-To: <7672718f-b34e-225d-ff53-1199026728b7@leemhuis.info>
-From:   coldolt <andypalmadi@gmail.com>
-Date:   Sun, 23 Jan 2022 22:11:19 +0200
-Message-ID: <CAJvGw+CKz_tZXKkuzrPURLJsh1JBkO1ge7V_owa0htk9pEJsZw@mail.gmail.com>
-Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
- Move shutdown callback before flushing tx and rx queue"
-To:     Thorsten Leemhuis <regressions@leemhuis.info>
-Cc:     "An, Tedd" <tedd.an@intel.com>,
-        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+        Sun, 23 Jan 2022 22:44:29 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85D2C06173B
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 Jan 2022 19:44:28 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C2844B80E46
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 03:44:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 65F87C340F2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 03:44:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1642995865;
+        bh=oEVONP9Gp/deyO6sb9DreG8GW0460FgWTvFxTX0C4ic=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=PDtLMsKqmE44kA2BiiUemrLVTsZ0gbFE1KjE0l26haYWh9yOQKL71rsv7DOyal2wR
+         74EiEBDrJVTqhUZH3W9nmurs4xu/gHz8ix9vEujmffnjJIdx8ubejL9ln02MBqwW57
+         8L3enbiooQUPLBwFQi8s7kCAA5OfKfHrSxum9uxL7rP3qRjGbvsWs+cfp7D/+zIKt+
+         vwiOE1IbCrq7GKYxcJ+byx1UHNhEc60scod3Le2q0DAR7ve4kCjbj3wBdOz22YsaxO
+         pymJPX+K2XEGEFdbow3BOxloSs75Xh0gEkRo/qlk2cfC00ogZZ9hb+Ts+QrVxk2mD3
+         TAu+hCOASgnAw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 5626DCC13B2; Mon, 24 Jan 2022 03:44:25 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Mon, 24 Jan 2022 03:44:22 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: recovieira@hotmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-iT3s92Pi9d@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Jan 23, 2022 at 11:28 AM Thorsten Leemhuis
-<regressions@leemhuis.info> wrote:
->
-> Top-posting for once, to make this easy accessible to everyone.
->
-> Coldolt, could you please check if this regression is still in 5.17-rc1
-> or 5.16.2? I wonder if this patch fixed things:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=linux-5.16.y&id=8e8cae520210139aab4b701a822bbefb13b8f007
->
-> Ciao, Thorsten
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-Yes, that commit fixes it for me. This same issue seems to have come
-up many times in the past months, it is a duplicate of
+--- Comment #222 from Reginaldo Coimbra Vieira (recovieira@hotmail.com) ---
+The function "bredr_setup" was removed from the file
+"/net/bluetooth/hci_core.c". Good news seem to come from the kernel 5.17 on,
+really! Lots of things have been changed...
 
-#regzbot dup-of:
-https://lore.kernel.org/lkml/b0f6f66b-28aa-9d43-0aab-e6887ee0fda8@logobject.ch/
-#regzbot dup-of:
-https://lore.kernel.org/lkml/20211202162256.31837-1-tiwai@suse.de/
-#regzbot fixed-by: 95655456e7ce
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/diff/net=
+/bluetooth/hci_core.c?id=3Dv5.17-rc1&id2=3Dv5.16
+
+Thanks!
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
