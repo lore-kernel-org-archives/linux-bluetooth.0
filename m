@@ -2,101 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7501FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 06:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172AFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 06:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244970AbiAYGUk (ORCPT
+        id S1347258AbiAYGaT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jan 2022 01:20:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34844 "EHLO
+        Tue, 25 Jan 2022 01:30:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241466AbiAYGRY (ORCPT
+        with ESMTP id S1345732AbiAYG0n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jan 2022 01:17:24 -0500
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4A13C07852F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 20:40:09 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id e20so15584912qvu.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 20:40:09 -0800 (PST)
+        Tue, 25 Jan 2022 01:26:43 -0500
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15FDCC034610
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 20:49:14 -0800 (PST)
+Received: by mail-lf1-x12e.google.com with SMTP id u6so22667716lfm.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 20:49:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=vowgc1d6BoPw2rNsdZpW9qR+x0Lid+bAPrCQwRxbT4g=;
-        b=bCYMiYGZBSvM6FZStDQVP845ldqJXd6w/LwkWnPLWRDXTtXkHbqgv86FTiPhSyO8Dr
-         9cLCC6VwKSAeDOIicNJyUd0V8fuJnnMw3b2Y5dTssuKJ0n8Lo0FzGeqq3KPYf+vGr0IM
-         OMojK2fnFY/tfQ53bABpWFFJ+1cKR6NISbk/0sKb7b40xBCIBVIHkaooT0sP+Nyrukae
-         eETHLdAlhFk46ZHdXvhZVlI62QUykCZYHut/N2Xv0+eBdD9RcJIK5RiGVs10zsfTUSCh
-         uMM0k8l8kixILCKY/8UJwtzJqqOSrASq5CmaBPuVsjKLLyIAgzr6zEyBaGtWqZV3kpVa
-         l8tQ==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=t5Fu4TSCbARG2mLm13zGvdTuvUr0QZW1RLiG8C79TO4=;
+        b=ALObGffeoHvxkSiwET8Xu/lyNFq4JRJID+mFveG6Bc3LlZS7pd3L1dMGJe4ZNRLSpH
+         /pM8asQ76V2Iz+fdIUVR5NDb4SsLSmXBjCf+LHc54fNOBxXOzFIUFB/leJNVPFy6q2jC
+         LJq3AErof5GERCLLq3x6fM4W221i1NIwaZsvk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=vowgc1d6BoPw2rNsdZpW9qR+x0Lid+bAPrCQwRxbT4g=;
-        b=zKUW9xhrQTYiKqr9BwCh8B25slcTM64So28V9YLzj0OQgGqTh60dMtTK2tlxVV3j2Y
-         SSwNlgf4ZUqHBpBTxg+2cPVeUVYbnwPXdEI3PuHOQW5gDhCA2E3Z3Nwm2oNFvO34kz3f
-         aHiXA0efOqq9/KW7otlLA0UFIX38DiODomag9s0qa6yGdRSsIKNyQykTkj7l8ofb8ES3
-         K4q9Cc43YYAE7qu3VNDaU7YklKIGzB0WYQrVbB9A7qX/CO6XORwkdOh0TjQOIiImPmzu
-         OvylWtDZIHOL+6P/PwOzqPX9AbdmWFZ5/OimdTNK0pj/JECXpIQKitFJeeX5La5VXnD6
-         CwNA==
-X-Gm-Message-State: AOAM533sZrphBMyEuisw+9PbgvbA2z2D4e4E3hlXwiP0ULYoklif+erj
-        LIuBObBdzqwTsQ1n0gFdidByFowMFv29Lw==
-X-Google-Smtp-Source: ABdhPJzbqm+aFapJqQakKjrxwMFEE1RSBoab0ULleROWV2nvc+xJ2exBDJVrSKhOKiSCnc5kpdcvyA==
-X-Received: by 2002:a05:6214:5185:: with SMTP id kl5mr17929530qvb.31.1643085608559;
-        Mon, 24 Jan 2022 20:40:08 -0800 (PST)
-Received: from [172.17.0.2] ([23.102.113.196])
-        by smtp.gmail.com with ESMTPSA id ay6sm8619192qkb.127.2022.01.24.20.40.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Jan 2022 20:40:08 -0800 (PST)
-Message-ID: <61ef7f28.1c69fb81.a66b2.34d2@mx.google.com>
-Date:   Mon, 24 Jan 2022 20:40:08 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6443480041219724402=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=t5Fu4TSCbARG2mLm13zGvdTuvUr0QZW1RLiG8C79TO4=;
+        b=C/7y1jIZV4HJL24OXrskceuEsqD4xFqjNwViy5ELEn6uTfuNwm9vg9ieoF9zbTkvqe
+         4Q3VZawtVrj3PoAQeCA2MPnDQ28suE6ThLPcH5eqNt8xF31SpGSe8TsnYQh7Bu0H01fw
+         ido//J5zPESccFBfzNMQ03oVVjnG7+WfA+zt3ab2zr1YdtD8fw+SFkb+leljup3ebnxn
+         nRA2hGV0vIAe89nCjUzsw/5ZKrRGpDmhreykRieKOToU4r0lTVEHRLIyH5roMZBTJRFz
+         prNI+fAfo4wJU56C/mUpNDJV4uBQngoJea1hCYFjzS6W4p5Vhu1KY6BbYncOjnOVgXfs
+         Ew1g==
+X-Gm-Message-State: AOAM533pxN1UrX2RCVJsFKvkDpusnW4T8Au/EdeAnYKCnIg5W2crB74i
+        1gUtArZQYHK4IU1Mt1G3J9MacDd9z8uoFrZ8N8Y0Xw==
+X-Google-Smtp-Source: ABdhPJw+fQ0ckcKc3qv7ppFk2Xk6/Um2Yoc2Zv9iQG2zxzejOFnaWR7Al/D6yLftIA4t1oRd32TQpjupUhg8yfOZ3rY=
+X-Received: by 2002:a05:6512:1288:: with SMTP id u8mr524232lfs.443.1643086152391;
+ Mon, 24 Jan 2022 20:49:12 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC,1/2] shared/mgmt: Add request timeout handling
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220125010458.2326473-1-luiz.dentz@gmail.com>
-References: <20220125010458.2326473-1-luiz.dentz@gmail.com>
+References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
+ <164036941060.3935440.13095761506560620701.b4-ty@linaro.org> <CAD=FV=Vdjw-6GytO=Rpt==OYbnrNon3pYQnrZtUT4vX11S6ykw@mail.gmail.com>
+In-Reply-To: <CAD=FV=Vdjw-6GytO=Rpt==OYbnrNon3pYQnrZtUT4vX11S6ykw@mail.gmail.com>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Mon, 24 Jan 2022 20:49:01 -0800
+Message-ID: <CABmPvSGOLRKX20WO21P_qvtvDo812QGDr4nYOWE04pjoSGDGcw@mail.gmail.com>
+Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
+ IDP boards
+To:     Doug Anderson <dianders@chromium.org>
+Cc:     Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>, rjliao@codeaurora.org,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        saluvala@codeaurora.org, LKML <linux-kernel@vger.kernel.org>,
+        hbandi@codeaurora.org, BlueZ <linux-bluetooth@vger.kernel.org>,
+        hemantg@codeaurora.org, Matthias Kaehlcke <mka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6443480041219724402==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+Following up on this patch, this patch didn't seem to land anywhere,
+what is the plan to land this?
 
-Dear submitter,
+Thanks,
+Miao
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=608129
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.97 seconds
-GitLint                       PASS      2.03 seconds
-Prep - Setup ELL              PASS      42.90 seconds
-Build - Prep                  PASS      0.72 seconds
-Build - Configure             PASS      8.71 seconds
-Build - Make                  PASS      1414.03 seconds
-Make Check                    PASS      11.53 seconds
-Make Check w/Valgrind         PASS      446.01 seconds
-Make Distcheck                PASS      233.35 seconds
-Build w/ext ELL - Configure   PASS      8.72 seconds
-Build w/ext ELL - Make        PASS      1423.32 seconds
-Incremental Build with patchesPASS      2825.31 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6443480041219724402==--
+On Thu, Jan 13, 2022 at 3:59 PM Doug Anderson <dianders@chromium.org> wrote:
+>
+> Hi,
+>
+> On Fri, Dec 24, 2021 at 10:10 AM Bjorn Andersson
+> <bjorn.andersson@linaro.org> wrote:
+> >
+> > On Wed, 15 Dec 2021 22:36:03 +0530, Balakrishna Godavarthi wrote:
+> > > Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
+> > >
+> > >
+> >
+> > Applied, thanks!
+> >
+> > [1/1] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 IDP boards
+> >       commit: 3a89ff3087c03c2295250c07234efa75873c7b51
+>
+> Just to confirm, this later got dropped, right? I don't see it in the
+> Qualcomm git tree, so presumably it'll land once the merge window
+> closes.
+>
+> -Doug
