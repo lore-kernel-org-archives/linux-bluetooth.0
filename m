@@ -2,55 +2,70 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F570C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 16:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 505C6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 16:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345305AbiAYQDo (ORCPT
+        id S1583256AbiAYQQu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jan 2022 11:03:44 -0500
-Received: from nimbus1.mmprivatehosting.com ([54.208.90.49]:56982 "EHLO
-        nimbus1.mmprivatehosting.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352009AbiAYQCW (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jan 2022 11:02:22 -0500
-X-Greylist: delayed 356 seconds by postgrey-1.27 at vger.kernel.org; Tue, 25 Jan 2022 11:02:22 EST
-Received: from localhost (localhost [127.0.0.1])
-        by nimbus1.mmprivatehosting.com (Postfix) with ESMTP id B01F9609B6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 15:56:14 +0000 (UTC)
-X-Virus-Scanned: amavisd-new at mmprivatehosting.com
-Received: from dave.mielke.cc (cpe1c697a7445d3-cme0dbd1be3a7a.cpe.net.cable.rogers.com [174.116.66.202])
-        (Authenticated sender: relay@dave.mielke.cc)
-        by nimbus1.mmprivatehosting.com (Postfix) with ESMTPA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 15:56:14 +0000 (UTC)
-Received: from beta.private.mielke.cc (beta.private.mielke.cc [192.168.0.2])
-        by dave.mielke.cc (Postfix) with ESMTPS id E9EB048D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 10:56:13 -0500 (EST)
-Received: from beta.private.mielke.cc (localhost [127.0.0.1])
-        by beta.private.mielke.cc (8.17.1/8.15.2) with ESMTPS id 20PFuDQ8416881
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT)
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 10:56:13 -0500
-Received: (from dave@localhost)
-        by beta.private.mielke.cc (8.17.1/8.17.1/Submit) id 20PFuDR3416880
-        for linux-bluetooth@vger.kernel.org; Tue, 25 Jan 2022 10:56:13 -0500
-Date:   Tue, 25 Jan 2022 10:56:13 -0500
-From:   Dave Mielke <Dave@mielke.cc>
-To:     Linux Bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: bluetoothctl set-alias - how to select the device
-Message-ID: <YfAdnWn21MEHnwot@beta.private.mielke.cc>
+        Tue, 25 Jan 2022 11:16:50 -0500
+Received: from mx.msync.work ([95.217.65.204]:39594 "EHLO mx.msync.work"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242164AbiAYQOh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 25 Jan 2022 11:14:37 -0500
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3D558280BDF;
+        Tue, 25 Jan 2022 16:14:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lexina.in; s=dkim;
+        t=1643127255; h=from:subject:date:message-id:to:cc:mime-version:
+         content-transfer-encoding; bh=alWzfi1MKEuU9d1hu1mhFpKqqmhmtWV0WV3Nk7Rkdgs=;
+        b=cUNTOhSBJ6zN8EPd3IzMo1VAj0oreQA58uEDLw5qMzQqRpthZj/2XZ+jNUk220EDn545A9
+        pxvaD2ngszsYREuyPRqFa65pgneuvsX85ieGL8gyjy5PjWiOdI5aPpTVxN86LZdr0d416E
+        mXaCiqwxx+ZudoY5FMEPnt17ltqbXnqKlTKRu55zpiKxY3pdhH96tDUjEuPntwx2+Rap9t
+        lnd2lSL89aG44GZvHBPYDoFVnYwZrv/FLBcly+hNRRH4J0UhwDWVkuLExF4llmW4BwsEM+
+        JLPQWsOhO7n/VGyy+40eFVRR20W/aykJZ4/ICzjPKgXqGDUAKwzfxR7FN3CMZw==
+From:   Vyacheslav Bocharov <adeep@lexina.in>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Rudi Heitbaum <rudi@heitbaum.com>
+Subject: [PATCH v5 0/2] Bluetooth: hci_h5: btrtl: Add support for RTL8822CS hci_ver 0x08
+Date:   Tue, 25 Jan 2022 19:13:59 +0300
+Message-Id: <20220125161401.729179-1-adeep@lexina.in>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/2.1.3 (2021-09-10)
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi:
+Add a variation of RTL8822CS with hci_ver = 0x08. This is fully similar
+to RTL8822CS with hci_ver = 0x0a observed on the Tanix TX6 Android set-top
+box and JetHome JetHub H1.
 
-It isn't clear to me how bluetoothctl set-alias decides which device to rename. From a bit of a look at the code, it seemed like it might be the most recent connect, but that proved to be an incorrect conclusion. In the same way that select can be used to pick the active controller, is there a way to explicitly pick the active device?
+While testing the RTL8822CS SDIO WiFi/BT adapter, I found that in some
+cases the kernel could not initialize it. However, manually resetting the
+adapter via gpio allows it to start correctly.
+Apparently at system start the adapter is in an undefined state (including
+the unknown state of gpio after starting uboot). A forced reset helps to
+initialize the adapter in most cases. Experimentally it was found that
+100ms is enough to reset.
+So, add power reset via enable-gpios in h5_btrtl_open function.
+
+Changes from v4:
+- fix patch desription
+Changes from v3:
+- add has_msft_ext option
+Changes from v2:
+- align the patches for bluetooth-next
+Changes from v1:
+- remove Signed-off-by chbgdn <chbgdn@gmail.com> as not reachable
+
+Vyacheslav Bocharov (2):
+  Bluetooth: btrtl: Add support for RTL8822C hci_ver 0x08
+  Bluetooth: hci_h5: Add power reset via gpio in h5_btrtl_open
+
+ drivers/bluetooth/btrtl.c  | 8 ++++++++
+ drivers/bluetooth/hci_h5.c | 5 +++++
+ 2 files changed, 13 insertions(+)
 
 -- 
-I believe the Bible to be the very Word of God: http://Mielke.cc/bible/
-Dave Mielke            | 2213 Fox Crescent | WebHome: http://Mielke.cc/
-EMail: Dave@Mielke.cc  | Ottawa, Ontario   | Twitter: @Dave_Mielke
-Phone: +1 613 726 0014 | Canada  K2A 1H7   |
+2.30.2
+
