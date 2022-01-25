@@ -2,76 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90750C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 14:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7862C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 15:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1580507AbiAYOud (ORCPT
+        id S1351970AbiAYPJH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jan 2022 09:50:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41862 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1389233AbiAYOqq (ORCPT
+        Tue, 25 Jan 2022 10:09:07 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:59494 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1581348AbiAYPGc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jan 2022 09:46:46 -0500
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C405EC061755
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 06:46:42 -0800 (PST)
-Received: by mail-wm1-x32e.google.com with SMTP id n8so25492472wmk.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 06:46:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fireburn-co-uk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=jahFylLFQ4FlT07WI99OSrQG5jbtrsRBcgJaIkG4L6A=;
-        b=UDcH1PgtLKoIYH3SlII+wx0/4ofsh2TWpwqNN3rDGUJPyk+oh+Ofe+0qIWvuCtbZP9
-         Zgu4ogZ/grDV2ZBFLBQEkf3Cdw/+WoY/f+letjDjKKzHbvteFgVvNQOc8azY+NjzTZnq
-         q/gZUi14p4GVYPMIcRdT6pOGfuFEnhYuW8zq0Hs2mCQe1rx9o8NHzFlHuYDddGMSLdzY
-         SFhTjK+e+qkLJqs6FEWnWK/qjEgmJnbzvPIBRiky67qJ9TOlhcFhe+Bt1DHsNgYvXpuv
-         +lzO9TyuPP4zTG1NilhtdAlH5z42n8fN1N8MVQxkH+ImbOhMWk5qgnaAhgTRv5rtAmXD
-         fhWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jahFylLFQ4FlT07WI99OSrQG5jbtrsRBcgJaIkG4L6A=;
-        b=bKEfNIgFu0trSYiBF5poadLO/gAS2VpSa42s0o7rtk9SJMIPpgSrVK6jGePAGqq6hX
-         CWyomkwmhIFdwOlBBjOidVxWpD9358bX/U5c8BJXOHnswOFMgs5QoWVLIEH8wN5l3TPo
-         u5ThHXRC6aFhCo2PfrJM+fihwRuV14NiAncZ3reazC/Pk8mMvrH+7yJhd7Sh2CedPh/k
-         fypyfYjtQbo1aIFIldAuOkuzMrFdVYVLu0EwJ5ZwZt1PZ9sskHMDwI3mrFs4ms9MSprd
-         NtxsudTJIsB/i4M1zyz75IwYemSIQEfJPoUJH9jnN2GqeDl0HQ4HkjePBgKnIEBW7mKq
-         QOdA==
-X-Gm-Message-State: AOAM531zjyd6rPFmGv0kEdbQ9GX0t5MK8MLA4+9CdUMe+h3GzwuiIkuY
-        Ek3Wr6CwjuPdCZFVLsI3VxP8eA==
-X-Google-Smtp-Source: ABdhPJw4nvjztWbIig7Vl7dTcWWYzXRT6fmIpUqOb838PP6ua48xE1nLJHoHzDqJSYrIG8Pgx+jUOA==
-X-Received: by 2002:a7b:c04b:: with SMTP id u11mr3392710wmc.104.1643122001214;
-        Tue, 25 Jan 2022 06:46:41 -0800 (PST)
-Received: from axion.fireburn.co.uk.lan ([2a01:4b00:f40e:900::64c])
-        by smtp.gmail.com with ESMTPSA id w9sm579631wmc.36.2022.01.25.06.46.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jan 2022 06:46:40 -0800 (PST)
-From:   Mike Lothian <mike@fireburn.co.uk>
-To:     luiz.dentz@gmail.com
-Cc:     dan.carpenter@oracle.com, davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
-        netdev@vger.kernel.org
-Subject: Re: [PATCH 12/15] Bluetooth: hci_event: Use of a function table to handle HCI events
-Date:   Tue, 25 Jan 2022 14:46:39 +0000
-Message-Id: <20220125144639.2226-1-mike@fireburn.co.uk>
-X-Mailer: git-send-email 2.35.0
-In-Reply-To: <20211201000215.1134831-13-luiz.dentz@gmail.com>
-References: <20211201000215.1134831-13-luiz.dentz@gmail.com>
+        Tue, 25 Jan 2022 10:06:32 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF51461653
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 15:06:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 56B8FC340E8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 15:06:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643123186;
+        bh=5pQFrQLFWizahKo3ZSH24uEk1QI+VaXKWyXtpkjwulo=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=MVYsmvj3xT9ybqNSlNroQTHEQOgVMdSYl5VvGGgF/ZwTGF09qAdU8AmDAsbC3nPKf
+         +xAA4wByvbbomxn5LrUX7nbkbIA4I05KrirSoA0tI/ntdwvUVhTwpsfLJlWe7Kr11J
+         Hkg9mGNeJyzQX1o1iSnXHhqjb6tgXw8OGi2tSvDYApRzYoTNtdB6T/211yWjWZCq3y
+         0gtlo0o8Ik+BGganCoqDaJh+ijx7QcdA+QvX1JHPzXPmeFLoG1i9sGaM6FjP3v7cPu
+         o4caoA8aA1qXfCUiG2bo28FPtOYRm5TVfwMmpTXtcOKoLKlpgaFpnzxyU+p1EEm2+w
+         liWkpbOW7xG5Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3E43CCC13B1; Tue, 25 Jan 2022 15:06:26 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215528] Excessive logging from Intel Bluetooth "Bluetooth:
+ hci0: sending frame failed" "hci0: urb 00000000xxxxxxxx submission failed
+ (90)"
+Date:   Tue, 25 Jan 2022 15:06:26 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215528-62941-pC2UrlcudU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215528-62941@https.bugzilla.kernel.org/>
+References: <bug-215528-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215528
 
-This patch is causing a lot of spam in my dmesg at boot until it seems my wifi connects (or perhaps the bluetooth manager does something)
+--- Comment #8 from Artem S. Tashkinov (aros@gmx.com) ---
+Here's another batch of errors when my BT headphones connected before they =
+have
+been formally authorized:
 
-Bluetooth: hci0: unexpected event 0xff length: 5 > 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 48
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 48
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 48
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 0
+Bluetooth: hci0: SCO packet for unknown connection handle 257
+Bluetooth: hci0: SCO packet for unknown connection handle 257
+Bluetooth: hci0: SCO packet for unknown connection handle 257
 
-Thanks
+What a bloody mess.
 
-Mike
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
