@@ -2,108 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F61C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 06:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBBAC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 09:11:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377111AbiAYG6h (ORCPT
+        id S1456475AbiAYJL3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jan 2022 01:58:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33358 "EHLO
+        Tue, 25 Jan 2022 04:11:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S249548AbiAYEKU (ORCPT
+        with ESMTP id S1454039AbiAYI5Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Jan 2022 23:10:20 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72521C061769
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 18:40:02 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id c10so57535015ybb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Jan 2022 18:40:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SgFUPQ/8Layg0C/RxzILgA0Et58EfmsefukPB/DNHHw=;
-        b=LcvfH4kFqsfVDF3EOXpQy6sngQvMURHZ70JmHQEUIqn5XdtrGfvx/2lb93WDsP0o91
-         TspaAFilXKSw8ggl9PGu4EosvT4M4AMnwngjYkuIzp1LpEkDLui3Tfxow9K+5vbU1gnT
-         ou6+qYSlHOMzaxsFzTfBetSSKmQ+ovb7yScMcxQvMHHuehtlEfYXmYvItYVqL+yDshp2
-         Gn1dJThjIp8bEDO73xI3/thyHN4tjb0S5Y2Ii6sPtZ/cJRboqZcy9+3NOWFNeGeGjcIb
-         Etb6s8SGd7OCsmvNtxx7wmVXArZKwYJ9oqpj2iKMXvJ/Ghnh23XNoXpR47aXmB9NK1Ef
-         AhdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SgFUPQ/8Layg0C/RxzILgA0Et58EfmsefukPB/DNHHw=;
-        b=dqI1ovHFKOuFONnJTjxuxWy9MSCIJXOK0AuFj4vWJkgWt2Cqw5ZfAvHht/7npNtTrR
-         W8kUOlL9ZCar0Y44hjqo7v1GKsQvVAHRDOWw6wf9RyX8GnsTtM9Q6T8YKmFyX3+08FUo
-         q08xPlYlPZjTbVBny+dMgEkNzLX/46an9VahCr/e+dl7HpryczdyTl+87ywetfQonSnf
-         dv4YmAAAOvSfxSYO/oWVbbQtxWzL0mZc6tLJc4uBbSEyzrx4AihP6uvVQRbm2GnKTT8h
-         dD6ka8vVYCMjh2/jcWI/WAEISuBGQNvB1zN7oqJ8AybblvIoKQMQ8sWf7t+aZh03Boaq
-         xX1Q==
-X-Gm-Message-State: AOAM530CccsSzpdwqx7/XAuzajX/YmciEvqLkDSLnMIHCstxX6bJdBre
-        xb2PbRa1+iuctNDgxZ+wM7QxwYKDCa4JqNknXAKLXWkWNfE=
-X-Google-Smtp-Source: ABdhPJwCuRVhZ9NWSAwe+HBzU/iStpaEv7toucrflOOg8aYB1IfDjzhBZWvRuSa6cBZxFlRmt3bENOhnM4zcyGCiw5I=
-X-Received: by 2002:a25:bd8d:: with SMTP id f13mr27217442ybh.573.1643078400531;
- Mon, 24 Jan 2022 18:40:00 -0800 (PST)
-MIME-Version: 1.0
-References: <20220123140624.30005-1-soenke.huster@eknoes.de> <61ed6bfc.1c69fb81.81a86.35c1@mx.google.com>
-In-Reply-To: <61ed6bfc.1c69fb81.81a86.35c1@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 24 Jan 2022 18:39:35 -0800
-Message-ID: <CABBYNZKKpEhE9rEB85sZOAZjgkdiWNbggMAfd2e55tARjFhefw@mail.gmail.com>
-Subject: Re: [RFC,v2] Bluetooth: hci_event: Ignore multiple conn complete events
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
+        Tue, 25 Jan 2022 03:57:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4255C061401
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 00:08:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 95B15B815F3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 08:08:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4DC77C340E0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Jan 2022 08:08:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643098116;
+        bh=Gn9HwLUA1q+4WtDz8c+ybrmXoZKDMebGFefWOMWHqm4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=TuxW7TpHu8BwxwnhFWUys17osnXfrK1kCsq3dw5L+BGk1jadiGBlIKCu2xmMTbtEA
+         sIt+Jsaj4lYm60Mtv3tPnj1XhwA0tX2XuLDQubwlOOetjBcbvE9iL23EQk/kRjEzXX
+         Fb/zNkTThrZq0caZBDdgjTJknhnpvPDTsjuLDmqYdlAXiw+rmhzOvbBz/x+nCvnlnw
+         rt7hjc1xs94hFOx3n0MbqrI29MSUNJJK2z8o9+rHitB+W9iSIy2wYAuKya/2hazcPb
+         IpDP1z6D9RUNUOiH1hBAwbvEyjBGY33f11cuMQFyFtPMsfpkInkMtxuYRBqAPXHnkH
+         iIqSAMj9dKcVw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2FBCDCC13A6; Tue, 25 Jan 2022 08:08:36 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215497] NULL pointer deref in klist_next triggered by Bluetooth
+ HCI_Disconnection_Complete event
+Date:   Tue, 25 Jan 2022 08:08:36 +0000
+X-Bugzilla-Reason: CC
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Networking
+X-Bugzilla-Component: Other
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: soenke.huster@eknoes.de
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: stephen@networkplumber.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-215497-62941-7tmm5ZuIZT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215497-62941@https.bugzilla.kernel.org/>
+References: <bug-215497-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonke,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215497
 
-On Mon, Jan 24, 2022 at 1:13 AM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607576
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.90 seconds
-> GitLint                       FAIL      0.97 seconds
-> SubjectPrefix                 PASS      0.85 seconds
-> BuildKernel                   PASS      30.23 seconds
-> BuildKernel32                 PASS      27.08 seconds
-> Incremental Build with patchesPASS      36.92 seconds
-> TestRunner: Setup             PASS      479.12 seconds
-> TestRunner: l2cap-tester      PASS      13.54 seconds
-> TestRunner: bnep-tester       PASS      6.05 seconds
-> TestRunner: mgmt-tester       PASS      104.38 seconds
-> TestRunner: rfcomm-tester     PASS      7.51 seconds
-> TestRunner: sco-tester        PASS      7.71 seconds
-> TestRunner: smp-tester        PASS      7.54 seconds
-> TestRunner: userchan-tester   PASS      6.37 seconds
->
-> Details
-> ##############################
-> Test: GitLint - FAIL - 0.97 seconds
-> Run gitlint with rule in .gitlint
-> [RFC,v2] Bluetooth: hci_event: Ignore multiple conn complete events
-> 16: B2 Line has trailing whitespace: "v2: "
->
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+S=C3=B6nke Huster (soenke.huster@eknoes.de) changed:
 
-Applied, thanks.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |CODE_FIX
 
--- 
-Luiz Augusto von Dentz
+--- Comment #5 from S=C3=B6nke Huster (soenke.huster@eknoes.de) ---
+Fixed in d5ebaa7c5f6f688959e8d40840b2249ede63b8ed @ bluetooth-next
+(https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.g=
+it/commit/?id=3Dd5ebaa7c5f6f688959e8d40840b2249ede63b8ed)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are on the CC list for the bug.=
