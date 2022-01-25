@@ -2,53 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE51AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 21:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D575C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Jan 2022 21:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233248AbiAYVlI (ORCPT
+        id S233258AbiAYVmM convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Jan 2022 16:41:08 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:40336 "EHLO
+        Tue, 25 Jan 2022 16:42:12 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:41409 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233241AbiAYVlI (ORCPT
+        with ESMTP id S233215AbiAYVmL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Jan 2022 16:41:08 -0500
+        Tue, 25 Jan 2022 16:42:11 -0500
 Received: from smtpclient.apple (p5b3d24e1.dip0.t-ipconnect.de [91.61.36.225])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0562DCECF6;
-        Tue, 25 Jan 2022 22:41:07 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 15454CECF6;
+        Tue, 25 Jan 2022 22:42:10 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: hci_core: Rate limit the logging of invalid
- SCO handle
+Subject: Re: [PATCH v5 2/2] Bluetooth: hci_h5: Add power reset via gpio in
+ h5_btrtl_open
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220125191537.2426630-1-luiz.dentz@gmail.com>
-Date:   Tue, 25 Jan 2022 22:41:06 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <A071DB4D-49A8-4933-AFA8-BE8A7FED7C0B@holtmann.org>
-References: <20220125191537.2426630-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <20220125161401.729179-3-adeep@lexina.in>
+Date:   Tue, 25 Jan 2022 22:42:09 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Rudi Heitbaum <rudi@heitbaum.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <05BB86B6-9E4B-447F-91A3-34224703176C@holtmann.org>
+References: <20220125161401.729179-1-adeep@lexina.in>
+ <20220125161401.729179-3-adeep@lexina.in>
+To:     Vyacheslav Bocharov <adeep@lexina.in>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Vyachselav,
 
-> The invalid SCO handle error is normally caused by a race in the USB
-> transport where the data and event happen to be 2 different endpoints
-> so the event carrying the SCO handle is processed after its data.
+> Add power reset for bluetooth via enable-gpios in h5_btrtl_open function.
 > 
-> Note: This can probably be resolved with use of force_poll_sync
-> debugfs.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Signed-off-by: Vyacheslav Bocharov <adeep@lexina.in>
 > ---
-> net/bluetooth/hci_core.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> While testing the RTL8822CS SDIO WiFi/BT adapter, I found that in some
+> cases the kernel could not initialize it. However, manually resetting the
+> adapter via gpio allows it to start correctly.
+> Apparently at system start the adapter is in an undefined state (including
+> the unknown state of gpio after starting uboot). A forced reset helps to
+> initialize the adapter in most cases. Experimentally it was found that
+> 100ms is enough to reset.
 
-patch has been applied to bluetooth-next tree.
+if you put this here, then this information is lost. So move it to the commit message.
 
 Regards
 
