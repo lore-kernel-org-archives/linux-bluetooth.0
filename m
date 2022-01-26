@@ -2,94 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2238AC28CF5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 14:14:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D08BC28CF5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 17:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241995AbiAZOO1 (ORCPT
+        id S243723AbiAZRaR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jan 2022 09:14:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55338 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235430AbiAZOOZ (ORCPT
+        Wed, 26 Jan 2022 12:30:17 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:58417 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236899AbiAZRaQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jan 2022 09:14:25 -0500
-Received: from mx.msync.work (mx.msync.work [IPv6:2a01:4f9:2b:2dc2::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 969FAC061747;
-        Wed, 26 Jan 2022 06:14:25 -0800 (PST)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ADC0A284992;
-        Wed, 26 Jan 2022 14:14:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lexina.in; s=dkim;
-        t=1643206457; h=from:subject:date:message-id:to:mime-version:content-type:
-         content-transfer-encoding:content-language:in-reply-to:references:
-         disposition-notification-to; bh=zSeUci3vg054JmvwuBWDHBaCd3Dw4eWxI2aAH6Z4kfU=;
-        b=vdyVkyFNapCvR0GVXQljHd4CFBTht7wRCcVWs3zsrjVxlouOMTxRUentMVu6LpLouKBUcI
-        QMeOWMTsnQhwGsaRf4Ze+rjDshSLqIKaoN49nFKAE8uFXsH6cq0a9ZIRnHNUX2BGGGasaM
-        9scaHtDxAzxXRfujR1bq39JdWUaHkAkYGJYUf0KFCJs+2TK27hvfIrtBWtCou7Iof9lgmP
-        FOFWamXON55fxJzTUm6DNgiZHJcTuAtoSMDCYWjIhiJChdDmdLXq/F1cEdtOGQXzzPLOGs
-        pzHkK2dXPsueAzTwXH2G+QjCffl+KBOEYF/lPEd00rJdfamil/9Of6hfIk+lXQ==
-Subject: Re: [PATCH v7 0/2] Bluetooth: hci_h5: btrtl: Add support for
- RTL8822CS hci_ver 0x08
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-References: <20220126073905.3637841-1-adeep@lexina.in>
- <9CE136E5-3BEC-42CB-8A19-644E2B4D0D10@holtmann.org>
-From:   Vyacheslav <adeep@lexina.in>
-Message-ID: <dee7346e-cb1f-27b0-d460-86b86660bd2d@lexina.in>
-Date:   Wed, 26 Jan 2022 17:14:14 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Wed, 26 Jan 2022 12:30:16 -0500
+Received: from fedora.. (p4ff9fc34.dip0.t-ipconnect.de [79.249.252.52])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 67527CED0A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jan 2022 18:30:15 +0100 (CET)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increment management interface revision
+Date:   Wed, 26 Jan 2022 18:30:12 +0100
+Message-Id: <20220126173012.81238-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-In-Reply-To: <9CE136E5-3BEC-42CB-8A19-644E2B4D0D10@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Increment the mgmt revision due to recent changes.
 
-26.01.2022 16:40, Marcel Holtmann wrote:
-> Hi Vyacheslav,
-> 
->> Add a variation of RTL8822CS with hci_ver = 0x08. This is fully similar
->> to RTL8822CS with hci_ver = 0x0a observed on the Tanix TX6 Android set-top
->> box and JetHome JetHub H1.
->>
->> While testing the RTL8822CS SDIO WiFi/BT adapter, I found that in some
->> cases the kernel could not initialize it. However, manually resetting the
->> adapter via gpio allows it to start correctly.
->> Apparently at system start the adapter is in an undefined state (including
->> the unknown state of gpio after starting uboot). A forced reset helps to
->> initialize the adapter in most cases. Experimentally it was found that
->> 100ms is enough to reset.
->> So, add power reset via enable-gpios in h5_btrtl_open function.
->>
->> Changes from v6..v4:
->> - fix patch description
->> Changes from v3:
->> - add has_msft_ext option
->> Changes from v2:
->> - align the patches for bluetooth-next
->> Changes from v1:
->> - remove Signed-off-by chbgdn <chbgdn@gmail.com> as not reachable
->>
->> Vyacheslav Bocharov (2):
->>   Bluetooth: btrtl: Add support for RTL8822C hci_ver 0x08
->>   Bluetooth: hci_h5: Add power reset via gpio in h5_btrtl_open
->>
->> drivers/bluetooth/btrtl.c  | 8 ++++++++
->> drivers/bluetooth/hci_h5.c | 5 +++++
->> 2 files changed, 13 insertions(+)
-> 
-> both patches have been applied to bluetooth-next tree.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks!
-
-> 
-> Regards
-> 
-> Marcel
-> 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 08d6494f1b34..5dd684e0b259 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -42,7 +42,7 @@
+ #include "aosp.h"
+ 
+ #define MGMT_VERSION	1
+-#define MGMT_REVISION	21
++#define MGMT_REVISION	22
+ 
+ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_READ_INDEX_LIST,
+-- 
+2.34.1
 
