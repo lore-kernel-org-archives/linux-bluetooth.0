@@ -2,75 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B46C63684
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 07:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EDA8C28CF5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 09:01:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237956AbiAZHjT (ORCPT
+        id S238687AbiAZJBR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jan 2022 02:39:19 -0500
-Received: from mx.msync.work ([95.217.65.204]:52780 "EHLO mx.msync.work"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229676AbiAZHjS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jan 2022 02:39:18 -0500
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2EDF02832C1;
-        Wed, 26 Jan 2022 07:39:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lexina.in; s=dkim;
-        t=1643182757; h=from:subject:date:message-id:to:cc:mime-version:
-         content-transfer-encoding:in-reply-to:references;
-        bh=gNondfYloya5eVokEo9OWDbeyWm4oRwSK5gz16WAuwY=;
-        b=n9109b9nvfihvFC5I3TfE9rCQZWQIqe76Etm10sNl9Kaa6fbFfKJ7YA6rPEJDlt1KokCwX
-        VoYAAFcOEke4pIhdDC6cuhq06tMoExpx9UrJF6M1Py8SO6Xb1Bhzw02O7pMfLwJmCa0tMk
-        QfUN42uc0gk3HEBADYgqGLxk2T58DIA0eu6MctYQuhC0KQ/I+ksa4ycwowkKVb19/CBp1g
-        yPi8pcRQisSP9Mn/+EZ+cKyz74OvL01CGeafr0V42GavAlTQl2ZVmD/TsoNEj9wgsQqAZX
-        7xDqb8ZLgGQj21W/GcJp7Cj5K0BTu8pXZF57zUk8f0gN2H7CL2LVatLY5FfIoQ==
-From:   Vyacheslav Bocharov <adeep@lexina.in>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Rudi Heitbaum <rudi@heitbaum.com>
-Subject: [PATCH v7 2/2] Bluetooth: hci_h5: Add power reset via gpio in h5_btrtl_open
-Date:   Wed, 26 Jan 2022 10:39:05 +0300
-Message-Id: <20220126073905.3637841-3-adeep@lexina.in>
-In-Reply-To: <20220126073905.3637841-1-adeep@lexina.in>
-References: <20220126073905.3637841-1-adeep@lexina.in>
+        Wed, 26 Jan 2022 04:01:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37288 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231326AbiAZJBP (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 Jan 2022 04:01:15 -0500
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82F95C06161C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jan 2022 01:01:15 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id g11so22289632qvu.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Jan 2022 01:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=iko48Lj6ufCj7/am0xWXB5yUuRjxLoZ4P58zTLESiNs=;
+        b=Dh6CXpRVaDVP9NKtO75miKFz/zbeEhIAw3txNZDYN3SdNylfw0W36RalpDDQ/PLFjZ
+         O+3JTWnN8ByrWKAH3XCma8R7RqMLkADjfJlrJeA3NTiAPCwm2rryGOEe7PBqVrE+WOaM
+         ohFX8wh8HuWSF9NAvy+sHh1FlhLyBtkPSyfCgfx0KcBn4LI9PVsZTuScckmJ0DVLkfG+
+         jsRyrxqnxaQCKRj6BoWb6h7X4kxiqVdtmtCULcRYY6B2oTQrZEXGNSdGOESTy8imWZm3
+         QxIjrOul0qJ5PkLYi2eMEZNaCw31Es9wRqS5hWsjLIWBeC5tIltc/kpZK5B5kN5qByp9
+         Cing==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=iko48Lj6ufCj7/am0xWXB5yUuRjxLoZ4P58zTLESiNs=;
+        b=7Ztc0ruUWXHFcb8JXttoBcLDR2CZzBkRHLaHDopdxjuNSmk4UabYrpwes3P+3W50Lh
+         mM9ux3IwFSZKK9rv8rXxjQR7lpvBUxGdYxKN1+aHW8zU0cJ/5exgGwhUVxPPHNOmCzt1
+         gT36HhwTG4fLNkl8DF+To7uLWcjK1sNpqu5KCmEOGevkwNAAuP+Lu4oV4t0Ts5GJ2Fpe
+         LZAsn/NXzVkcjB6oPWvwSxO+Lgx3bpqjivtbuB9Zd7vKPFxzcvLypE3qEHcXlNpqyaVz
+         yzq2I9nspCHQC1+GeZ8Gos9Vd+Nimyw6EKV7JBd8FZUA4QuPFMH9yInK8L3TNHvPr9Mr
+         HCKQ==
+X-Gm-Message-State: AOAM5339UAAm1i86drLEm64OZydY/yDO22/2u3hVYMPKLG7nuJAt78ve
+        XolrgunOwvhnxRJmgORIdnmaZjoi/B0k7g==
+X-Google-Smtp-Source: ABdhPJwPDebQTMWq24zBPmEWY+Ds1sZgUK+wASVPMlWiNsdz0+TDONMGMZbcycdc0c341peot/9UcQ==
+X-Received: by 2002:ad4:5cc6:: with SMTP id iu6mr2512129qvb.2.1643187674510;
+        Wed, 26 Jan 2022 01:01:14 -0800 (PST)
+Received: from [172.17.0.2] ([20.110.199.225])
+        by smtp.gmail.com with ESMTPSA id x4sm1641924qkm.47.2022.01.26.01.01.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jan 2022 01:01:14 -0800 (PST)
+Message-ID: <61f10dda.1c69fb81.5dbba.94e1@mx.google.com>
+Date:   Wed, 26 Jan 2022 01:01:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1688413748838057953=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, adeep@lexina.in
+Subject: RE: Bluetooth: hci_h5: btrtl: Add support for RTL8822CS hci_ver 0x08
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220126073905.3637841-2-adeep@lexina.in>
+References: <20220126073905.3637841-2-adeep@lexina.in>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add power reset for bluetooth via enable-gpios in h5_btrtl_open function.
+--===============1688413748838057953==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-While testing the RTL8822CS SDIO WiFi/BT adapter, it was found that in
-some cases the kernel could not initialize BT firmware. However,
-manually resetting the adapter via gpio (off/on sequence) allows it to
-start correctly.
-Apparently, when the system starts, the adapter is in an undefined state
-(including unknown gpio state after starting uboot). A forced reset helps
-to initialize the adapter in most cases. It has been found experimentally
-that 100 ms is sufficient for a reset.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Vyacheslav Bocharov <adeep@lexina.in>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=608555
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.17 seconds
+GitLint                       PASS      1.85 seconds
+SubjectPrefix                 PASS      1.66 seconds
+BuildKernel                   PASS      30.22 seconds
+BuildKernel32                 PASS      26.49 seconds
+Incremental Build with patchesPASS      41.70 seconds
+TestRunner: Setup             PASS      464.47 seconds
+TestRunner: l2cap-tester      PASS      13.18 seconds
+TestRunner: bnep-tester       PASS      6.00 seconds
+TestRunner: mgmt-tester       PASS      102.76 seconds
+TestRunner: rfcomm-tester     PASS      7.29 seconds
+TestRunner: sco-tester        PASS      7.65 seconds
+TestRunner: smp-tester        PASS      7.42 seconds
+TestRunner: userchan-tester   PASS      6.24 seconds
+
+
+
 ---
- drivers/bluetooth/hci_h5.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 34286ffe0568..fdf504b0d265 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -966,6 +966,11 @@ static void h5_btrtl_open(struct h5 *h5)
- 		pm_runtime_enable(&h5->hu->serdev->dev);
- 	}
- 
-+	/* The controller needs reset to startup */
-+	gpiod_set_value_cansleep(h5->enable_gpio, 0);
-+	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
-+	msleep(100);
-+
- 	/* The controller needs up to 500ms to wakeup */
- 	gpiod_set_value_cansleep(h5->enable_gpio, 1);
- 	gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
--- 
-2.30.2
 
+--===============1688413748838057953==--
