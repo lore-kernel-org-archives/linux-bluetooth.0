@@ -2,77 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FC1C28CF5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 13:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AB20C28CF5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Jan 2022 13:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235236AbiAZNkl (ORCPT
+        id S235348AbiAZNps (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Jan 2022 08:40:41 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:60769 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231530AbiAZNkl (ORCPT
+        Wed, 26 Jan 2022 08:45:48 -0500
+Received: from relay2-d.mail.gandi.net ([217.70.183.194]:51489 "EHLO
+        relay2-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234226AbiAZNps (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Jan 2022 08:40:41 -0500
-Received: from smtpclient.apple (p4ff9fc34.dip0.t-ipconnect.de [79.249.252.52])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9D2BECED06;
-        Wed, 26 Jan 2022 14:40:39 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH v7 0/2] Bluetooth: hci_h5: btrtl: Add support for
- RTL8822CS hci_ver 0x08
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220126073905.3637841-1-adeep@lexina.in>
-Date:   Wed, 26 Jan 2022 14:40:38 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Rudi Heitbaum <rudi@heitbaum.com>
-Content-Transfer-Encoding: 7bit
-Message-Id: <9CE136E5-3BEC-42CB-8A19-644E2B4D0D10@holtmann.org>
-References: <20220126073905.3637841-1-adeep@lexina.in>
-To:     Vyacheslav Bocharov <adeep@lexina.in>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Wed, 26 Jan 2022 08:45:48 -0500
+Received: (Authenticated sender: hadess@hadess.net)
+        by mail.gandi.net (Postfix) with ESMTPSA id 3481240010;
+        Wed, 26 Jan 2022 13:45:45 +0000 (UTC)
+Message-ID: <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
+Subject: Re: [PATCH 1/4] build: Always define confdir and statedir
+From:   Bastien Nocera <hadess@hadess.net>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Wed, 26 Jan 2022 14:45:45 +0100
+In-Reply-To: <390473B8-2187-4C84-B319-9D4A8FB6ED0A@holtmann.org>
+References: <20220126113638.1706785-1-hadess@hadess.net>
+         <78f77f0268ce1b4818c0a0749d3371b825fa1c92.camel@hadess.net>
+         <390473B8-2187-4C84-B319-9D4A8FB6ED0A@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vyacheslav,
-
-> Add a variation of RTL8822CS with hci_ver = 0x08. This is fully similar
-> to RTL8822CS with hci_ver = 0x0a observed on the Tanix TX6 Android set-top
-> box and JetHome JetHub H1.
+On Wed, 2022-01-26 at 14:31 +0100, Marcel Holtmann wrote:
+> Hi Bastien,
 > 
-> While testing the RTL8822CS SDIO WiFi/BT adapter, I found that in some
-> cases the kernel could not initialize it. However, manually resetting the
-> adapter via gpio allows it to start correctly.
-> Apparently at system start the adapter is in an undefined state (including
-> the unknown state of gpio after starting uboot). A forced reset helps to
-> initialize the adapter in most cases. Experimentally it was found that
-> 100ms is enough to reset.
-> So, add power reset via enable-gpios in h5_btrtl_open function.
+> > Some patches from 2017 to use systemd lockdown. They've been used
+> > for 5
+> > years by Fedora and RHEL.
+> > 
+> > > As we will need those paths to lock down on them.
+> > > ---
+> > >  Makefile.am | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/Makefile.am b/Makefile.am
+> > > index e391d7ae8..2ba25e687 100644
+> > > --- a/Makefile.am
+> > > +++ b/Makefile.am
+> > > @@ -28,14 +28,14 @@ AM_CFLAGS = $(MISC_CFLAGS) $(WARNING_CFLAGS)
+> > > $(UDEV_CFLAGS) $(LIBEBOOK_CFLAGS) \
+> > >                                 $(LIBEDATASERVER_CFLAGS)
+> > > $(ell_cflags)
+> > >  AM_LDFLAGS = $(MISC_LDFLAGS)
+> > >  
+> > > +confdir = $(sysconfdir)/bluetooth
+> > > +statedir = $(localstatedir)/lib/bluetooth
+> > > +
+> > >  if DATAFILES
+> > >  dbusdir = $(DBUS_CONFDIR)/dbus-1/system.d
+> > >  dbus_DATA = src/bluetooth.conf
+> > >  
+> > > -confdir = $(sysconfdir)/bluetooth
+> > >  conf_DATA =
+> > > -
+> > > -statedir = $(localstatedir)/lib/bluetooth
+> > >  state_DATA =
+> > >  endif
+> > >  
 > 
-> Changes from v6..v4:
-> - fix patch description
-> Changes from v3:
-> - add has_msft_ext option
-> Changes from v2:
-> - align the patches for bluetooth-next
-> Changes from v1:
-> - remove Signed-off-by chbgdn <chbgdn@gmail.com> as not reachable
-> 
-> Vyacheslav Bocharov (2):
->  Bluetooth: btrtl: Add support for RTL8822C hci_ver 0x08
->  Bluetooth: hci_h5: Add power reset via gpio in h5_btrtl_open
-> 
-> drivers/bluetooth/btrtl.c  | 8 ++++++++
-> drivers/bluetooth/hci_h5.c | 5 +++++
-> 2 files changed, 13 insertions(+)
+> seems I missed that one. Can you please be more specific what this
+> change does.
 
-both patches have been applied to bluetooth-next tree.
+This change specifically? Check the next patches in the series, and
+you'll see pretty quickly.
 
-Regards
+For the rest of the patchset, check this man page for details on each
+of the directives:
+https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Security
 
-Marcel
+There's a fair amount of other directives we could use on top of those
+ones, but we can add them iteratively (and it makes bisecting easier,
+in case we forget about a particular use case).
 
+Cheers
