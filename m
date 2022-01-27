@@ -2,209 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 741E6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jan 2022 10:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97886C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jan 2022 19:59:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235212AbiA0KSN (ORCPT
+        id S1343519AbiA0T7T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jan 2022 05:18:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239030AbiA0KSJ (ORCPT
+        Thu, 27 Jan 2022 14:59:19 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:57690 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239957AbiA0T7T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jan 2022 05:18:09 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C5FDC06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 02:18:08 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id p37so2219459pfh.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 02:18:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FzKXCu84v+MEBRiOOvHJliiiXM+odd7Ou4VdHsoBS50=;
-        b=i890F8dpeDakBP+TSesc7zvw7eDIzB+Ahu3Bggz3XTamcTwnNJ6QHTJ1+28+9QJXSn
-         WaA/UINWRBJWl0zlofaoJng1ENEyfHsbXcVWuWjmtHKKXUKPrDiC3oo6QsOBlJDeGfzL
-         Njk/GKGd65QtZnJWbFeFdyAJxDlufiGEnvNQE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FzKXCu84v+MEBRiOOvHJliiiXM+odd7Ou4VdHsoBS50=;
-        b=mMlyCmsGp34TJAF+TTpdQ62hXDkGdowUYJ3DCmUtDxTsnIY7KrzaKj4yC9efru1w1M
-         0J7+/3LTgWw/qhW+G2JohoBYqYkN3IaoZDqFIrr93j2ut5IYl5ReZvAhYnfs433cNOMo
-         e8ulINYZtuRjg22t3Q3LjzEOijn4uotTze/wh3QwufYj+yTKJA5O1RfeK9sAW9tUeFVe
-         K0k4ZOxYnK0UnbkNB2k9iUWDEcw5pF4Q9FXk/erw1J74FxlnY1PgjzBMzSwSc+16JAwi
-         ZQS6ml7DPJM5JRXY3c/TL7Cp4xFeCWKoGj5zw5GUSDhYMePcrCKpKeP46E4gT1/jpPPf
-         d6FQ==
-X-Gm-Message-State: AOAM530idvcAiyAUvfvhJMTRznABGXEV/nbbfQw0MTkNEPG1qEMfZwQR
-        PByfNVmzipdAQCAoCpvaZm7zdyfWOwQvqA==
-X-Google-Smtp-Source: ABdhPJyjGTq81SFhiP75e7+lMYKha/nBvwGuNIXXii0gYvqWguKVrF/+6fdHh7S1C8mDUnXKqpYjBg==
-X-Received: by 2002:a63:9:: with SMTP id 9mr2252152pga.101.1643278687945;
-        Thu, 27 Jan 2022 02:18:07 -0800 (PST)
-Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id k13sm4967022pff.25.2022.01.27.02.18.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 27 Jan 2022 02:18:07 -0800 (PST)
-From:   Joseph Hwang <josephsih@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
-        Joseph Hwang <josephsih@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: btintel: surface Intel telemetry events through mgmt
-Date:   Thu, 27 Jan 2022 18:17:59 +0800
-Message-Id: <20220127181738.v2.2.I63681490281b2392aa1ac05dff91a126394ab649@changeid>
-X-Mailer: git-send-email 2.35.0.rc0.227.g00780c9af4-goog
-In-Reply-To: <20220127181738.v2.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
-References: <20220127181738.v2.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 27 Jan 2022 14:59:19 -0500
+Received: from smtpclient.apple (p4ff9fc34.dip0.t-ipconnect.de [79.249.252.52])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 14214CED25;
+        Thu, 27 Jan 2022 20:59:17 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix queuing commands when
+ HCI_UNREGISTER is set
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220127012100.3128690-1-luiz.dentz@gmail.com>
+Date:   Thu, 27 Jan 2022 20:59:15 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <71B08E35-D3D2-4F6D-9EE1-7EB73CC4F600@holtmann.org>
+References: <20220127012100.3128690-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When receiving a HCI vendor event, the kernel checks if it is an
-Intel telemetry event. If yes, the event is sent to bluez user
-space through the mgmt socket.
+Hi Luiz,
 
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
----
+> hci_cmd_sync_queue shall return an error if HCI_UNREGISTER flag has
+> been set as that means hci_unregister_dev has been called so it will
+> likely cause a uaf after the timeout as the hdev will be freed.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_sync.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-Changes in v2:
-- Drop the pull_quality_report_data function from hci_dev.
-  Do not bother hci_dev with it. Do not bleed the details
-  into the core.
+patch has been applied to bluetooth-next tree.
 
- drivers/bluetooth/btintel.c      | 27 ++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h      |  7 +++++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 12 ++++++++++++
- 4 files changed, 46 insertions(+), 1 deletion(-)
+Regards
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 1a4f8b227eac..9e1fdb68b669 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2401,8 +2401,9 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 	set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
- 
--	/* Set up the quality report callback for Intel devices */
-+	/* Set up the quality report callbacks for Intel devices */
- 	hdev->set_quality_report = btintel_set_quality_report;
-+	hdev->is_quality_report_evt = btintel_is_quality_report_evt;
- 
- 	/* For Legacy device, check the HW platform value and size */
- 	if (skb->len == sizeof(ver) && skb->data[1] == 0x37) {
-@@ -2645,6 +2646,30 @@ void btintel_secure_send_result(struct hci_dev *hdev,
- }
- EXPORT_SYMBOL_GPL(btintel_secure_send_result);
- 
-+#define INTEL_PREFIX		0x8087
-+#define TELEMETRY_CODE		0x03
-+
-+struct intel_prefix_evt_data {
-+	__le16 vendor_prefix;
-+	__u8 code;
-+	__u8 data[];   /* a number of struct intel_tlv subevents */
-+} __packed;
-+
-+bool btintel_is_quality_report_evt(struct sk_buff *skb)
-+{
-+	struct intel_prefix_evt_data *ev;
-+	u16 vendor_prefix;
-+
-+	if (skb->len < sizeof(struct intel_prefix_evt_data))
-+		return false;
-+
-+	ev = (struct intel_prefix_evt_data *)skb->data;
-+	vendor_prefix = __le16_to_cpu(ev->vendor_prefix);
-+
-+	return vendor_prefix == INTEL_PREFIX && ev->code == TELEMETRY_CODE;
-+}
-+EXPORT_SYMBOL_GPL(btintel_is_quality_report_evt);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index c9b24e9299e2..6dd4695b8b86 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -210,6 +210,7 @@ void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
- void btintel_secure_send_result(struct hci_dev *hdev,
- 				const void *ptr, unsigned int len);
- int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
-+bool btintel_is_quality_report_evt(struct sk_buff *skb);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -305,4 +306,10 @@ static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
- {
- 	return -ENODEV;
- }
-+
-+static inline bool btintel_is_quality_report_evt(struct sk_buff *skb)
-+{
-+	return false;
-+}
-+
- #endif
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b726fd595895..9d855ac1cb29 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -632,6 +632,7 @@ struct hci_dev {
- 	void (*cmd_timeout)(struct hci_dev *hdev);
- 	bool (*wakeup)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
-+	bool (*is_quality_report_evt)(struct sk_buff *skb);
- 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
- 	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
- 				     struct bt_codec *codec, __u8 *vnd_len,
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1b69d3efd415..892a48d2f6be 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4238,6 +4238,16 @@ static void aosp_quality_report_evt(struct hci_dev *hdev,  void *data,
- 				    QUALITY_SPEC_AOSP_BQR);
- }
- 
-+static void intel_vendor_evt(struct hci_dev *hdev,  void *data,
-+			     struct sk_buff *skb)
-+{
-+	/* Only interested in the telemetry event for now. */
-+	if (hdev->set_quality_report &&
-+	    hdev->is_quality_report_evt && hdev->is_quality_report_evt(skb))
-+		mgmt_quality_report(hdev, skb->data, skb->len,
-+				    QUALITY_SPEC_INTEL_TELEMETRY);
-+}
-+
- /* Define the fixed vendor event prefixes below.
-  * Note: AOSP HCI Requirements use 0x54 and up as sub-event codes without
-  *       actually defining a vendor prefix. Refer to
-@@ -4246,6 +4256,7 @@ static void aosp_quality_report_evt(struct hci_dev *hdev,  void *data,
-  *       space to avoid collision.
-  */
- static unsigned char AOSP_BQR_PREFIX[] = { 0x58 };
-+static unsigned char INTEL_PREFIX[] = { 0x87, 0x80 };
- 
- /* Some vendor prefixes are fixed values and lengths. */
- #define FIXED_EVT_PREFIX(_prefix, _vendor_func)				\
-@@ -4283,6 +4294,7 @@ struct vendor_event_prefix {
- 	__u8 (*get_prefix_len)(struct hci_dev *hdev);
- } evt_prefixes[] = {
- 	FIXED_EVT_PREFIX(AOSP_BQR_PREFIX, aosp_quality_report_evt),
-+	FIXED_EVT_PREFIX(INTEL_PREFIX, intel_vendor_evt),
- 	DYNAMIC_EVT_PREFIX(get_msft_evt_prefix, get_msft_evt_prefix_len,
- 			   msft_vendor_evt),
- 
--- 
-2.35.0.rc0.227.g00780c9af4-goog
+Marcel
 
