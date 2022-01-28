@@ -2,96 +2,307 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E608C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 02:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37162C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 02:07:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345164AbiA1CCb (ORCPT
+        id S1345224AbiA1CHi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jan 2022 21:02:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40778 "EHLO
+        Thu, 27 Jan 2022 21:07:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235461AbiA1CCb (ORCPT
+        with ESMTP id S1345178AbiA1CHi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jan 2022 21:02:31 -0500
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1916FC061714
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:02:31 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id k17so14202204ybk.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:02:31 -0800 (PST)
+        Thu, 27 Jan 2022 21:07:38 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11F0C061714
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:37 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id n17so6049282iod.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=4O1H+Zjq1efAjTJm35vZ3cTUrF526URxOfmum6VsXY8=;
-        b=J2GXHdmPy+kQcmGcgT8RjmGo5LpjLuvZIYbf2n+t4rj8VpxVxTW0tdmuNaAReGeCAs
-         JNh/KXpvYCOW//QQ/cr6S90awlHZHYaEsU2llO4rpgdOyzk5kc4JoLIXody0k75Z8ceR
-         Xc/gA97EnJc41vlid/G8Md7AYNllqYmGaTPwJHUyKYRGgA4WUDACM5aEBbZjl6FgWsay
-         /jyNrXjqd7A3suIi+hFzJe9RtJUjn9Bbtt5NdnGcNEyZj7E7T+xxru2Cei7UIlNUOZzn
-         xeFrW+uKWMK6m9X5tz00YLQpzhCaB3TmK9srRwG3FoFH106nvykW/61BB7tv6QR6JNL2
-         lUfg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hXZSR+xjTlB3Rf89jHBUZOSbxSBKhgoR5CbeOozYl8s=;
+        b=EhgieR9l1DH2aZJPL+KjOffI0/Czt0S+QESaz5U1qTYmgac6O3EGHSpBK/+iNbf6ZG
+         uv97k3xoTIGQmdafpKpqm6AhHRGFCg8Mq/UfSf0/aqjA88fbBXO0R3en1g2F6WXWe5a9
+         bxXGIvMgOglDigDvvmdWIVskdyDWTblQx1Gz1NxPIRQ4DAKzeqREBhTRVjrSg4d2Z364
+         TjewKs3ps1LWNMzOP9MOMYE/QeuChXFJOb4gyQVCVeCA92icSI1TobEj/nj+r1RkMgDs
+         aSc7htLv0nUsRc0ivFu6QxcJ0PehiwjUL7gYoSjyrdICg2Uh8VmJM/LWEpt5roLA++mt
+         b4Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=4O1H+Zjq1efAjTJm35vZ3cTUrF526URxOfmum6VsXY8=;
-        b=G42coO2szzWJOs1H+14tKzCFdCFRa1cD3p6Txsj1qnc/BY5yk/q/sM33IFaOfWSINV
-         gXk00Iq+PYLqt16XziLsMguFauUch6IecWMU58BlGyML2pViFrdog7iDQa53eJFjCEsu
-         akRaZ/WR7kp/mL1TpWIbk+B1qgDuQaoplN8Q7SBjJH9PIGl6YvnuN+TQ7ADBP+7rNeA5
-         goyRJWa4emM9jviOX4PtfqqfTyQryRvteNb1noAGW+8k40B6/su7+7Ol/RJmKCFo02/L
-         MBAAwfdgY7snuSeq27DQUXYFzMmlX4JcEmELQYYFtwxA8kD81aotuZkogOw/eG23hI2W
-         UZxw==
-X-Gm-Message-State: AOAM530yOmRqE43s/qsP4Gi/NIt9GP84J5EDRNMCPGANY2d36Z3+UFOS
-        h65p+NqLhPywE/fo4ASSeEkMLefQUMDLqiunafwv/mqRCRw=
-X-Google-Smtp-Source: ABdhPJwrQLKnr9NVAOMR+6w8kTAezQlB3KyTkn+Kq1O66QtEqPyocQMrCU9USxZ74Bja7D7fhsQQ9O+UR2nWRtdbrss=
-X-Received: by 2002:a25:50cf:: with SMTP id e198mr9673351ybb.398.1643335350116;
- Thu, 27 Jan 2022 18:02:30 -0800 (PST)
-MIME-Version: 1.0
-References: <20220121205454.1413365-1-luiz.dentz@gmail.com> <61eb4467.1c69fb81.d7452.7d3b@mx.google.com>
-In-Reply-To: <61eb4467.1c69fb81.d7452.7d3b@mx.google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hXZSR+xjTlB3Rf89jHBUZOSbxSBKhgoR5CbeOozYl8s=;
+        b=VYiDWEqHwUZgt/GhBTISXIesgufRJgaCQK2XmI/R94xlY9d8lDbCUDulHFcyom1Qqu
+         kXbE+cbO0d7k0qzBSJoVV+CnrVT/+GR69wf9jAsqDdq4ec1cyGTgGCvBZahf/1zdMfYd
+         m/PhQrULetFgYpReYv07OOHxs8Ax5Ldyx5nC3/tZYX22vutmFualX6VHHGObvkWQIYoz
+         /fZNtdztELckwd/LUmtyXk/FAxYpSauGEBq4i2trjua1BnO2yWqEanj2tX0RiPcb+72R
+         SNRkglpaeA+2dU8aWA7uJl6syct5YOCTsVKnVkr3DPd2OzCemMvmMXiNECq++OMbX+HN
+         TvXA==
+X-Gm-Message-State: AOAM5331uWVfYloftF46IzdwVXJ+vEIR4xlytSHDCsglkQIY6CzjcNvM
+        nF8XCwSmRXGJI2K0BmQIEBtstvcIxpxraw==
+X-Google-Smtp-Source: ABdhPJx5F9U2eiuCCKF+I3eus0UQmIpSVmQ+nf/XvJ740TCA2BSJnt70HmCBF0Vgq6Y/Mv9JT7sMgA==
+X-Received: by 2002:a05:6638:309:: with SMTP id w9mr3567736jap.241.1643335657005;
+        Thu, 27 Jan 2022 18:07:37 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p5sm12306763iof.50.2022.01.27.18.07.36
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jan 2022 18:07:36 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 27 Jan 2022 18:02:19 -0800
-Message-ID: <CABBYNZKkwqLQi+ybQf46Uvy9f2iGJXfzLkMwAGRvdUTjp5X_HA@mail.gmail.com>
-Subject: Re: [BlueZ,1/4] shared/gatt-db: Introduce gatt_db_service_add_ccc
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] shared/mgmt: Add request timeout handling
+Date:   Thu, 27 Jan 2022 18:07:34 -0800
+Message-Id: <20220128020735.3779202-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Jan 21, 2022 at 3:40 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607383
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      2.01 seconds
-> GitLint                       PASS      1.36 seconds
-> Prep - Setup ELL              PASS      38.22 seconds
-> Build - Prep                  PASS      0.41 seconds
-> Build - Configure             PASS      7.70 seconds
-> Build - Make                  PASS      1301.25 seconds
-> Make Check                    PASS      11.02 seconds
-> Make Check w/Valgrind         PASS      399.26 seconds
-> Make Distcheck                PASS      212.75 seconds
-> Build w/ext ELL - Configure   PASS      7.61 seconds
-> Build w/ext ELL - Make        PASS      1290.35 seconds
-> Incremental Build with patchesPASS      5245.61 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+This adds request timeout handling when using mgmt_send_timeout and
+mgmt_reply_timeout, the timeout is applied to the request only when it
+is actually transmitted and not while queued.
+---
+v2: Remove default timeout so the likes of mgmt_send/mgmt_reply use 0
+instead which disables the timeout handling.
 
-Pushed.
+ src/shared/mgmt.c | 85 ++++++++++++++++++++++++++++++++++++++++-------
+ src/shared/mgmt.h | 10 ++++++
+ 2 files changed, 83 insertions(+), 12 deletions(-)
 
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 41457b430..95229c248 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -25,6 +25,7 @@
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ #include "src/shared/mgmt.h"
++#include "src/shared/timeout.h"
+ 
+ struct mgmt {
+ 	int ref_count;
+@@ -49,6 +50,7 @@ struct mgmt {
+ };
+ 
+ struct mgmt_request {
++	struct mgmt *mgmt;
+ 	unsigned int id;
+ 	uint16_t opcode;
+ 	uint16_t index;
+@@ -57,6 +59,8 @@ struct mgmt_request {
+ 	mgmt_request_func_t callback;
+ 	mgmt_destroy_func_t destroy;
+ 	void *user_data;
++	int timeout;
++	unsigned int timeout_id;
+ };
+ 
+ struct mgmt_notify {
+@@ -81,6 +85,9 @@ static void destroy_request(void *data)
+ 	if (request->destroy)
+ 		request->destroy(request->user_data);
+ 
++	if (request->timeout_id)
++		timeout_remove(request->timeout_id);
++
+ 	free(request->buf);
+ 	free(request);
+ }
+@@ -150,6 +157,26 @@ static void write_watch_destroy(void *user_data)
+ 	mgmt->writer_active = false;
+ }
+ 
++static bool request_timeout(void *data)
++{
++	struct mgmt_request *request = data;
++
++	if (!request)
++		return false;
++
++	request->timeout_id = 0;
++
++	queue_remove_if(request->mgmt->pending_list, NULL, request);
++
++	if (request->callback)
++		request->callback(MGMT_STATUS_TIMEOUT, 0, NULL,
++						request->user_data);
++
++	destroy_request(request);
++
++	return false;
++}
++
+ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+ {
+ 	struct iovec iov;
+@@ -169,6 +196,12 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+ 		return false;
+ 	}
+ 
++	if (request->timeout)
++		request->timeout_id = timeout_add_seconds(request->timeout,
++							request_timeout,
++							request,
++							NULL);
++
+ 	util_debug(mgmt->debug_callback, mgmt->debug_data,
+ 				"[0x%04x] command 0x%04x",
+ 				request->index, request->opcode);
+@@ -566,7 +599,8 @@ bool mgmt_set_close_on_unref(struct mgmt *mgmt, bool do_close)
+ static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
+ 				uint16_t index, uint16_t length,
+ 				const void *param, mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 	struct mgmt_hdr *hdr;
+@@ -598,12 +632,18 @@ static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
+ 	hdr->index = htobs(index);
+ 	hdr->len = htobs(length);
+ 
++	/* Use a weak reference so requests don't prevent mgmt_unref to
++	 * cancel requests and free in case of the last reference is dropped by
++	 * the user.
++	 */
++	request->mgmt = mgmt;
+ 	request->opcode = opcode;
+ 	request->index = index;
+ 
+ 	request->callback = callback;
+ 	request->destroy = destroy;
+ 	request->user_data = user_data;
++	request->timeout = timeout;
+ 
+ 	return request;
+ }
+@@ -735,10 +775,11 @@ unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return ret;
+ }
+ 
+-unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+-				uint16_t length, const void *param,
+-				mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 
+@@ -746,7 +787,7 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy, timeout);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -766,6 +807,15 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return request->id;
+ }
+ 
++unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_send_timeout(mgmt, opcode, index, length, param, callback,
++					user_data, destroy, 0);
++}
++
+ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+@@ -777,7 +827,8 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy,
++					0);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -792,10 +843,11 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
+ 	return request->id;
+ }
+ 
+-unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+-				uint16_t length, const void *param,
+-				mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 
+@@ -803,7 +855,7 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy, timeout);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -823,6 +875,15 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return request->id;
+ }
+ 
++unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_reply_timeout(mgmt, opcode, index, length, param, callback,
++						user_data, destroy, 0);
++}
++
+ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id)
+ {
+ 	struct mgmt_request *request;
+diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+index 56add613d..b413cea78 100644
+--- a/src/shared/mgmt.h
++++ b/src/shared/mgmt.h
+@@ -55,6 +55,11 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+ 				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout);
+ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+@@ -63,6 +68,11 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+ 				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout);
+ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id);
+ bool mgmt_cancel_index(struct mgmt *mgmt, uint16_t index);
+ bool mgmt_cancel_all(struct mgmt *mgmt);
 -- 
-Luiz Augusto von Dentz
+2.34.1
+
