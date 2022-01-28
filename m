@@ -2,248 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C544C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 11:40:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72D85C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 13:18:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239715AbiA1LkT (ORCPT
+        id S1348719AbiA1NSX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jan 2022 06:40:19 -0500
-Received: from mga09.intel.com ([134.134.136.24]:61061 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238810AbiA1LkR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jan 2022 06:40:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643370017; x=1674906017;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=vJN+mwtIvvYMTA4rfefDNAMrCwYWLMNvCyDOEOdtXes=;
-  b=aTzUWltAUFjGKNt+slt/1XXeujinUQRYnUCgej1KAyqoLT50Rhpla76Y
-   ptoFw0bVvfPfnelpxtq786isn1wq6PomvKabj0GGN8cxrS++z6SQXhzPn
-   daGuLWV61nY2cTf8z0DgWpG2TEPJZmmZdlH5tyIUkWaATP5ln3M44qJVb
-   e87NWYYazXpuBn/tC51uLayAPuRSpCwF7AkUWqWqeBKqEr+0wRszpBAry
-   ZPJKDh8onV4TPEeIvi848a15N4quRuYlxfikhjMiOqmsFZQCJk2C5X8wZ
-   ENdwr27N0IrGqjHiFDyE81ox4IA/WQmT9MQ6y4vvHRbNo26tkd3IQ5mE0
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10240"; a="246878794"
-X-IronPort-AV: E=Sophos;i="5.88,323,1635231600"; 
-   d="scan'208";a="246878794"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2022 03:40:17 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,323,1635231600"; 
-   d="scan'208";a="625610874"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 28 Jan 2022 03:40:15 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nDPbz-000NnO-1X; Fri, 28 Jan 2022 11:40:15 +0000
-Date:   Fri, 28 Jan 2022 19:39:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 91cb4c19118a19470a9d7d6dbdf64763bbbadcde
-Message-ID: <61f3d5fc.7n9f9NuyJPTphdc1%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Fri, 28 Jan 2022 08:18:23 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:37513 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348681AbiA1NR7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 28 Jan 2022 08:17:59 -0500
+Received: from smtpclient.apple (p4ff9fc34.dip0.t-ipconnect.de [79.249.252.52])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 91CA7CED37;
+        Fri, 28 Jan 2022 14:17:56 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [BlueZ PATCH v2 1/4] doc: Add Bluetooth quality report event
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLLjHfGiM5W4S59B9bgLZaN3dgk-9WVBb_Fdm8F8jM9ZA@mail.gmail.com>
+Date:   Fri, 28 Jan 2022 14:17:55 +0100
+Cc:     Joseph Hwang <josephsih@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <737A07DA-6FEC-4BC1-8834-442C2A9E6291@holtmann.org>
+References: <20220127101609.3646316-1-josephsih@chromium.org>
+ <F67144BA-E7CF-43B7-997C-576536BA5968@holtmann.org>
+ <CABBYNZLLjHfGiM5W4S59B9bgLZaN3dgk-9WVBb_Fdm8F8jM9ZA@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 91cb4c19118a19470a9d7d6dbdf64763bbbadcde  Bluetooth: Increment management interface revision
+Hi Luiz,
 
-elapsed time: 726m
+>>> Add the Bluetooth quality report event in doc/mgmt-api.txt.
+>>> 
+>>> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+>>> ---
+>>> 
+>>> Changes in v2:
+>>> - This is a new patch for adding the event in doc/mgmt-api.txt
+>>> 
+>>> doc/mgmt-api.txt | 20 ++++++++++++++++++++
+>>> 1 file changed, 20 insertions(+)
+>>> 
+>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>>> index ebe56afa4..a0e71a732 100644
+>>> --- a/doc/mgmt-api.txt
+>>> +++ b/doc/mgmt-api.txt
+>>> @@ -4978,3 +4978,23 @@ Advertisement Monitor Device Lost Event
+>>>              2       LE Random
+>>> 
+>>>      This event will be sent to all management sockets.
+>>> +
+>>> +
+>>> +Bluetooth Quality Report Event
+>>> +==============================
+>>> +
+>>> +     Event code:             0x0031
+>>> +     Controller Index:       <controller_id>
+>>> +     Event Parameters:       Quality_Spec (1 Octet)
+>>> +                             Report_Len (2 Octets)
+>>> +                             Report (0-65535 Octets)
+>>> +
+>>> +     This event carries the Bluetooth quality report sent by the
+>>> +     controller.
+>>> +
+>>> +     Possible values for the Quality_Spec parameter:
+>>> +             0       Not Available
+>>> +             1       Intel Telemetry Event
+>>> +             2       AOSP Bluetooth Quality Report Event
+>> 
+>> can we swap this around please:
+>> 
+>>                0       AOSP Bluetooth Quality Report Event
+>>                1       Intel Telemetry Event
+>> 
+>> Regards
+>> 
+>> Marcel
+> 
+> I wonder if we shouldn't have these as bit fields though, so one can
+> select multiple reports if available.
 
-configs tested: 172
-configs skipped: 3
+the current code only allows for enabling one of these. If a driver specific one is specified, it takes precedence over the AOSP one, other AOSP is chosen (if supported).
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Reality is that all major vendors are settling on the AOSP extension since they already have that in their firmwares. So actually I don’t expect to see any other than AOSP or Intel.
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20220124
-powerpc              randconfig-c003-20220124
-arc                      axs103_smp_defconfig
-arm                       imx_v6_v7_defconfig
-m68k                       m5275evb_defconfig
-um                             i386_defconfig
-h8300                    h8300h-sim_defconfig
-arm                         s3c6400_defconfig
-riscv                            allyesconfig
-m68k                        mvme147_defconfig
-mips                 decstation_r4k_defconfig
-nios2                         10m50_defconfig
-xtensa                  audio_kc705_defconfig
-powerpc                      ppc40x_defconfig
-powerpc                 mpc837x_mds_defconfig
-powerpc                      mgcoge_defconfig
-mips                            ar7_defconfig
-arm                           tegra_defconfig
-arm                         axm55xx_defconfig
-arm                       aspeed_g5_defconfig
-arm                             rpc_defconfig
-mips                        vocore2_defconfig
-sh                   secureedge5410_defconfig
-sh                           sh2007_defconfig
-sh                           se7721_defconfig
-parisc                generic-64bit_defconfig
-sparc                       sparc64_defconfig
-mips                        bcm47xx_defconfig
-arm                           sunxi_defconfig
-arm                        multi_v7_defconfig
-s390                       zfcpdump_defconfig
-arm                            pleb_defconfig
-powerpc                  storcenter_defconfig
-arm                        keystone_defconfig
-sh                     sh7710voipgw_defconfig
-arm                            zeus_defconfig
-arm                        clps711x_defconfig
-arm                      footbridge_defconfig
-nios2                            allyesconfig
-arm                            xcep_defconfig
-sh                            shmin_defconfig
-ia64                      gensparse_defconfig
-arm                       omap2plus_defconfig
-arm                           h5000_defconfig
-powerpc                      ppc6xx_defconfig
-arc                              alldefconfig
-arc                        nsimosci_defconfig
-arm                             pxa_defconfig
-s390                          debug_defconfig
-arm                         assabet_defconfig
-h8300                     edosk2674_defconfig
-nios2                         3c120_defconfig
-xtensa                    xip_kc705_defconfig
-sh                         apsh4a3a_defconfig
-mips                           ci20_defconfig
-arm                  randconfig-c002-20220127
-arm                  randconfig-c002-20220124
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a002-20220124
-x86_64               randconfig-a003-20220124
-x86_64               randconfig-a001-20220124
-x86_64               randconfig-a004-20220124
-x86_64               randconfig-a005-20220124
-x86_64               randconfig-a006-20220124
-i386                 randconfig-a002-20220124
-i386                 randconfig-a005-20220124
-i386                 randconfig-a003-20220124
-i386                 randconfig-a004-20220124
-i386                 randconfig-a001-20220124
-i386                 randconfig-a006-20220124
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-riscv                randconfig-r042-20220127
-arc                  randconfig-r043-20220127
-arc                  randconfig-r043-20220124
-s390                 randconfig-r044-20220127
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
+Regards
 
-clang tested configs:
-arm                  randconfig-c002-20220124
-riscv                randconfig-c006-20220124
-i386                 randconfig-c001-20220124
-powerpc              randconfig-c003-20220124
-mips                 randconfig-c004-20220124
-x86_64               randconfig-c007-20220124
-powerpc                   bluestone_defconfig
-mips                           ip27_defconfig
-powerpc                      ppc44x_defconfig
-powerpc                 mpc8315_rdb_defconfig
-arm                    vt8500_v6_v7_defconfig
-powerpc                          g5_defconfig
-powerpc                      acadia_defconfig
-arm                        magician_defconfig
-mips                malta_qemu_32r6_defconfig
-powerpc                 mpc832x_mds_defconfig
-powerpc                      katmai_defconfig
-arm                                 defconfig
-arm                       cns3420vb_defconfig
-arm                     am200epdkit_defconfig
-arm                          ixp4xx_defconfig
-arm                         bcm2835_defconfig
-powerpc                       ebony_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64               randconfig-a011-20220124
-x86_64               randconfig-a013-20220124
-x86_64               randconfig-a015-20220124
-x86_64               randconfig-a016-20220124
-x86_64               randconfig-a014-20220124
-x86_64               randconfig-a012-20220124
-i386                 randconfig-a011-20220124
-i386                 randconfig-a016-20220124
-i386                 randconfig-a013-20220124
-i386                 randconfig-a014-20220124
-i386                 randconfig-a015-20220124
-i386                 randconfig-a012-20220124
-riscv                randconfig-r042-20220126
-riscv                randconfig-r042-20220124
-hexagon              randconfig-r045-20220124
-hexagon              randconfig-r045-20220126
-hexagon              randconfig-r041-20220124
-hexagon              randconfig-r041-20220126
-s390                 randconfig-r044-20220124
-hexagon              randconfig-r045-20220125
-hexagon              randconfig-r045-20220127
-hexagon              randconfig-r041-20220125
-hexagon              randconfig-r041-20220127
+Marcel
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
