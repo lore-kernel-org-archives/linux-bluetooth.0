@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E42C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 20:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E26D0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 21:05:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351468AbiA1U7m (ORCPT
+        id S240158AbiA1VF5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jan 2022 15:59:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48182 "EHLO
+        Fri, 28 Jan 2022 16:05:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351182AbiA1U7S (ORCPT
+        with ESMTP id S239231AbiA1VF5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jan 2022 15:59:18 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 254E2C061748;
-        Fri, 28 Jan 2022 12:59:18 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id s18so9273230ioa.12;
-        Fri, 28 Jan 2022 12:59:18 -0800 (PST)
+        Fri, 28 Jan 2022 16:05:57 -0500
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9E58C061714
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jan 2022 13:05:56 -0800 (PST)
+Received: by mail-il1-x12a.google.com with SMTP id i1so6521174ils.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Jan 2022 13:05:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=xiYhvzujcBaaFivtmfz1XJPI+uesSMM4OAxFSBu7qf0=;
-        b=CzMKM9msHbn+zCcZRGASucPl2B94QbYFkJHsdKPAu0VaqBGG6MXFYwygwv8nHY08sg
-         r2ao5LArwp60/FIlcey5RdKyistmQbZAbApy7iCq8TwlY2PRPczQAWpoM6ypvCnrmree
-         Lgo8/2RymR8GVwVdcJX7Y7H2f3ut1fYlsRaykL1F0ZDvhNl54MivO/UVMR4w3BoEwKOh
-         6eOpLBsZ/vBH+Gl5pH6f8hj35/CY1F7OQbWEYE4irvnC08JyuVcualqozWq66YxGfwuF
-         M1TUQlpAOZXVJid9b84Ai0g7t2E1F5KF+4DXRPUZTsrIM947iD8mPt6I0XrC6GkNajFD
-         AuuQ==
+        bh=tcDWAObkFT3s657nnffoFgd/L7SI1CBt8AVOsPsi/RU=;
+        b=iufLq1MHEj9QIaqDav5QfqcJOwkUTW7GZNkvs8u7d0eTMY1/Es4OrKoEO+g7OcmuCv
+         Yt2X7C2o+YVQE83Q/HrxB0zfi42jJpgCIiD5fZcGpxFPkqod6bxzcXraxFJlBU+FJo94
+         JHcEX7P0KfTjOMVju8+J78jPIjIfJ/+WU74hgfrOQa/h4GQQtOArb9tk6g6IbPdZKlw6
+         THNq53fUORvib3HlEErloupz/zQRxmxR8dC/nQcRv03V3CpsGxtXHugmvQzy2WbFSd2K
+         2vblIdlJK6vK9kJrQ+rf0cxSk4oA+HoNiCmGbGgU34fYXqLfuIw+GJnZFY2Njn1zrgLZ
+         johw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=xiYhvzujcBaaFivtmfz1XJPI+uesSMM4OAxFSBu7qf0=;
-        b=Q1wgbS5nE5SJcUrc/bBVlzfb8XivZ/UN53LJQzT4mlCYANevXkPW8qkARQJ7MNRpmE
-         hU+x63WuAToxOBEJSxJTNmy5NCmUqQ5KB05tkgprwERR5pHFdCUuSddRX5puh0xGoSF9
-         L2gi0THVZEULNfQgZWDGw/4YcI5qIWoQ7vQ53cRGzEdT6NYIQ6q3sJnekd/INy51QOBY
-         JvXBj6AnlfypHP77DSasTKqSzecEemT/7LL6EdlRqnkwvyaHJ4YkILIhHrj5FltdBUMZ
-         ztfFhFwq8uDEwASVlFYXRt2/VR+W8Q0hjBmbtfzYV9fPmf2EW5lebPs1r1GsHLwATFLR
-         xGow==
-X-Gm-Message-State: AOAM530x2j6k/I8psOnKdX7BqieeHEV0bL5w4Mc5ik1Jo45shwyZULWG
-        XfBZ045y/92p/4RsU8V6ZzJ4YMFSRL5/0w==
-X-Google-Smtp-Source: ABdhPJwpuKSbLTfML0GIASkagW2fo/rcR98ZBz/8tB0c4JaR++RD2PQ+6GLkYjnJWhuzggKWs23frg==
-X-Received: by 2002:a02:84ef:: with SMTP id f102mr5666240jai.25.1643403557340;
-        Fri, 28 Jan 2022 12:59:17 -0800 (PST)
+        bh=tcDWAObkFT3s657nnffoFgd/L7SI1CBt8AVOsPsi/RU=;
+        b=1Q3cCzzg6KfHO6afkbruh28c3e4zKnJG1r0f3xn/e/2G+UYSCQcTB7Q+fTLt23/8IE
+         BqlryiJdTSDtKHlukJtBF4XB30noxQHyOzcgRQ9bej7qYNDKtk5FioEOq1XkdRGrtJcN
+         GrmdnlfxYs5jxVvzYS5GjrJ2maNp/iPjRMHEiE9/Tg0VE7uA2rEZ66tN+6cGlpeMNH21
+         ItwQhU+/a6UJw7vNMd9000c72A3iio6l7VMLCORz++kVB09BaLiB29NGnki8mdr1GZPI
+         Dp9T+aPVWPX195Hqg0W0OE5oidYEzh09b62pQJnlZfb4bbTuV7Mfsos42nCb41Lr6juj
+         cf9A==
+X-Gm-Message-State: AOAM5326Mvk2s8mMs9T5fs3LWp7D5WmC6c86Y3VicxKaduA8IDqe02rr
+        eUZbSI3obhTJrlzHJccAZS8k6Zel/bdWWA==
+X-Google-Smtp-Source: ABdhPJycd+Vyr19XLW9x5h2Qb0FUP/Jh2VH1S6QXJedkUY0STxvcIBHRH/0zCfkjIbYJrnRj4Al+Rg==
+X-Received: by 2002:a92:7002:: with SMTP id l2mr7222147ilc.173.1643403955804;
+        Fri, 28 Jan 2022 13:05:55 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m1sm15198187ilu.87.2022.01.28.12.59.16
+        by smtp.gmail.com with ESMTPSA id m4sm66259ilj.57.2022.01.28.13.05.55
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jan 2022 12:59:16 -0800 (PST)
+        Fri, 28 Jan 2022 13:05:55 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2022-01-28
-Date:   Fri, 28 Jan 2022 12:59:15 -0800
-Message-Id: <20220128205915.3995760-1-luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/2] shared/mgmt: Add request timeout handling
+Date:   Fri, 28 Jan 2022 13:05:53 -0800
+Message-Id: <20220128210554.3997506-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,99 +62,248 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 8aaaf2f3af2ae212428f4db1af34214225f5cec3:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2022-01-09 17:00:17 -0800)
+This adds request timeout handling when using mgmt_send_timeout and
+mgmt_reply_timeout, the timeout is applied to the request only when it
+is actually transmitted and not while queued.
+---
+v2: Remove default timeout so the likes of mgmt_send/mgmt_reply use 0
+instead which disables the timeout handling.
+v3: Keep comments explaining why certain requests need a timeout.
 
-are available in the Git repository at:
+ src/shared/mgmt.c | 85 ++++++++++++++++++++++++++++++++++++++++-------
+ src/shared/mgmt.h | 10 ++++++
+ 2 files changed, 83 insertions(+), 12 deletions(-)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-01-28
+diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
+index 41457b430..95229c248 100644
+--- a/src/shared/mgmt.c
++++ b/src/shared/mgmt.c
+@@ -25,6 +25,7 @@
+ #include "src/shared/queue.h"
+ #include "src/shared/util.h"
+ #include "src/shared/mgmt.h"
++#include "src/shared/timeout.h"
+ 
+ struct mgmt {
+ 	int ref_count;
+@@ -49,6 +50,7 @@ struct mgmt {
+ };
+ 
+ struct mgmt_request {
++	struct mgmt *mgmt;
+ 	unsigned int id;
+ 	uint16_t opcode;
+ 	uint16_t index;
+@@ -57,6 +59,8 @@ struct mgmt_request {
+ 	mgmt_request_func_t callback;
+ 	mgmt_destroy_func_t destroy;
+ 	void *user_data;
++	int timeout;
++	unsigned int timeout_id;
+ };
+ 
+ struct mgmt_notify {
+@@ -81,6 +85,9 @@ static void destroy_request(void *data)
+ 	if (request->destroy)
+ 		request->destroy(request->user_data);
+ 
++	if (request->timeout_id)
++		timeout_remove(request->timeout_id);
++
+ 	free(request->buf);
+ 	free(request);
+ }
+@@ -150,6 +157,26 @@ static void write_watch_destroy(void *user_data)
+ 	mgmt->writer_active = false;
+ }
+ 
++static bool request_timeout(void *data)
++{
++	struct mgmt_request *request = data;
++
++	if (!request)
++		return false;
++
++	request->timeout_id = 0;
++
++	queue_remove_if(request->mgmt->pending_list, NULL, request);
++
++	if (request->callback)
++		request->callback(MGMT_STATUS_TIMEOUT, 0, NULL,
++						request->user_data);
++
++	destroy_request(request);
++
++	return false;
++}
++
+ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+ {
+ 	struct iovec iov;
+@@ -169,6 +196,12 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+ 		return false;
+ 	}
+ 
++	if (request->timeout)
++		request->timeout_id = timeout_add_seconds(request->timeout,
++							request_timeout,
++							request,
++							NULL);
++
+ 	util_debug(mgmt->debug_callback, mgmt->debug_data,
+ 				"[0x%04x] command 0x%04x",
+ 				request->index, request->opcode);
+@@ -566,7 +599,8 @@ bool mgmt_set_close_on_unref(struct mgmt *mgmt, bool do_close)
+ static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
+ 				uint16_t index, uint16_t length,
+ 				const void *param, mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 	struct mgmt_hdr *hdr;
+@@ -598,12 +632,18 @@ static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
+ 	hdr->index = htobs(index);
+ 	hdr->len = htobs(length);
+ 
++	/* Use a weak reference so requests don't prevent mgmt_unref to
++	 * cancel requests and free in case of the last reference is dropped by
++	 * the user.
++	 */
++	request->mgmt = mgmt;
+ 	request->opcode = opcode;
+ 	request->index = index;
+ 
+ 	request->callback = callback;
+ 	request->destroy = destroy;
+ 	request->user_data = user_data;
++	request->timeout = timeout;
+ 
+ 	return request;
+ }
+@@ -735,10 +775,11 @@ unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return ret;
+ }
+ 
+-unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+-				uint16_t length, const void *param,
+-				mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 
+@@ -746,7 +787,7 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy, timeout);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -766,6 +807,15 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return request->id;
+ }
+ 
++unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_send_timeout(mgmt, opcode, index, length, param, callback,
++					user_data, destroy, 0);
++}
++
+ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+@@ -777,7 +827,8 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy,
++					0);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -792,10 +843,11 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
+ 	return request->id;
+ }
+ 
+-unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+-				uint16_t length, const void *param,
+-				mgmt_request_func_t callback,
+-				void *user_data, mgmt_destroy_func_t destroy)
++unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout)
+ {
+ 	struct mgmt_request *request;
+ 
+@@ -803,7 +855,7 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 		return 0;
+ 
+ 	request = create_request(mgmt, opcode, index, length, param,
+-					callback, user_data, destroy);
++					callback, user_data, destroy, timeout);
+ 	if (!request)
+ 		return 0;
+ 
+@@ -823,6 +875,15 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 	return request->id;
+ }
+ 
++unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_reply_timeout(mgmt, opcode, index, length, param, callback,
++						user_data, destroy, 0);
++}
++
+ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id)
+ {
+ 	struct mgmt_request *request;
+diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+index 56add613d..b413cea78 100644
+--- a/src/shared/mgmt.h
++++ b/src/shared/mgmt.h
+@@ -55,6 +55,11 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+ 				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout);
+ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+@@ -63,6 +68,11 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
+ 				uint16_t length, const void *param,
+ 				mgmt_request_func_t callback,
+ 				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
++				uint16_t index, uint16_t length,
++				const void *param, mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy,
++				int timeout);
+ bool mgmt_cancel(struct mgmt *mgmt, unsigned int id);
+ bool mgmt_cancel_index(struct mgmt *mgmt, uint16_t index);
+ bool mgmt_cancel_all(struct mgmt *mgmt);
+-- 
+2.34.1
 
-for you to fetch changes up to 91cb4c19118a19470a9d7d6dbdf64763bbbadcde:
-
-  Bluetooth: Increment management interface revision (2022-01-27 12:35:13 -0800)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add support for RTL8822C hci_ver 0x08
- - Add support for RTL8852AE part 0bda:2852
- - Fix WBS setting for Intel legacy ROM products
- - Enable SCO over I2S ib mt7921s
- - Increment management interface revision
-
-----------------------------------------------------------------
-Dan Carpenter (1):
-      Bluetooth: hci_sync: unlock on error in hci_inquiry_result_with_rssi_evt()
-
-Ismael Ferreras Morezuelas (1):
-      Bluetooth: btusb: Whitespace fixes for btusb_setup_csr()
-
-Larry Finger (1):
-      Bluetooth: btusb: Add one more Bluetooth part for the Realtek RTL8852AE
-
-Luiz Augusto von Dentz (4):
-      Bluetooth: hci_sync: Fix compilation warning
-      Bluetooth: hci_core: Rate limit the logging of invalid SCO handle
-      Bluetooth: hci_event: Fix HCI_EV_VENDOR max_len
-      Bluetooth: hci_sync: Fix queuing commands when HCI_UNREGISTER is set
-
-Manish Mandlik (2):
-      Bluetooth: msft: Handle MSFT Monitor Device Event
-      Bluetooth: mgmt: Add MGMT Adv Monitor Device Found/Lost events
-
-Marcel Holtmann (1):
-      Bluetooth: Increment management interface revision
-
-Mark Chen (6):
-      Bluetooth: mt7921s: Support wake on bluetooth
-      Bluetooth: mt7921s: Enable SCO over I2S
-      Bluetooth: mt7921s: fix firmware coredump retrieve
-      Bluetooth: btmtksdio: refactor btmtksdio_runtime_[suspend|resume]()
-      Bluetooth: mt7921s: fix bus hang with wrong privilege
-      Bluetooth: mt7921s: fix btmtksdio_[drv|fw]_pmctrl()
-
-Pavel Skripkin (1):
-      Bluetooth: hci_serdev: call init_rwsem() before p->open()
-
-Sean Wang (6):
-      Bluetooth: btmtksdio: rename btsdio_mtk_reg_read
-      Bluetooth: btmtksdio: move struct reg_read_cmd to common file
-      Bluetooth: btmtksdio: clean up inconsistent error message in btmtksdio_mtk_reg_read
-      Bluetooth: btmtksdio: lower log level in btmtksdio_runtime_[resume|suspend]()
-      Bluetooth: btmtksdio: run sleep mode by default
-      Bluetooth: btmtksdio: mask out interrupt status
-
-Soenke Huster (3):
-      Bluetooth: fix null ptr deref on hci_sync_conn_complete_evt
-      Bluetooth: msft: fix null pointer deref on msft_monitor_device_evt
-      Bluetooth: hci_event: Ignore multiple conn complete events
-
-Tedd Ho-Jeong An (2):
-      Bluetooth: btintel: Fix WBS setting for Intel legacy ROM products
-      Bluetooth: Remove kernel-doc style comment block
-
-Vyacheslav Bocharov (2):
-      Bluetooth: btrtl: Add support for RTL8822C hci_ver 0x08
-      Bluetooth: hci_h5: Add power reset via gpio in h5_btrtl_open
-
- drivers/bluetooth/btintel.c        |  11 +-
- drivers/bluetooth/btintel.h        |   1 +
- drivers/bluetooth/btmrvl_debugfs.c |   2 +-
- drivers/bluetooth/btmrvl_sdio.c    |   2 +-
- drivers/bluetooth/btmtk.h          |  35 +++++
- drivers/bluetooth/btmtksdio.c      | 276 +++++++++++++++++++++++++++++--------
- drivers/bluetooth/btrtl.c          |   8 ++
- drivers/bluetooth/btusb.c          |  14 +-
- drivers/bluetooth/hci_h5.c         |   5 +
- drivers/bluetooth/hci_ll.c         |   2 +-
- drivers/bluetooth/hci_serdev.c     |   3 +-
- include/net/bluetooth/hci_core.h   |  17 +++
- include/net/bluetooth/mgmt.h       |  16 +++
- net/bluetooth/hci_conn.c           |   1 +
- net/bluetooth/hci_core.c           |   5 +-
- net/bluetooth/hci_event.c          |  89 +++++++++---
- net/bluetooth/hci_sync.c           |   7 +-
- net/bluetooth/mgmt.c               | 117 +++++++++++++++-
- net/bluetooth/msft.c               | 170 +++++++++++++++++++++--
- 19 files changed, 676 insertions(+), 105 deletions(-)
