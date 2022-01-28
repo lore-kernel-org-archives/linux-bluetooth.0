@@ -2,55 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA35C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Jan 2022 20:58:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6FAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 01:45:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234338AbiA0U6Z (ORCPT
+        id S1345161AbiA1Bpl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jan 2022 15:58:25 -0500
-Received: from mailbackend.panix.com ([166.84.1.89]:60867 "EHLO
-        mailbackend.panix.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiA0U6X (ORCPT
+        Thu, 27 Jan 2022 20:45:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37022 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234789AbiA1Bpj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Jan 2022 15:58:23 -0500
-Received: from [192.168.55.37] (ip68-111-137-238.sd.sd.cox.net [68.111.137.238])
-        by mailbackend.panix.com (Postfix) with ESMTPSA id 4JlCbx5S9BzLgq;
-        Thu, 27 Jan 2022 15:58:21 -0500 (EST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
-        t=1643317102; bh=Hvghr7JE4BHuqPhI3bxyFplZcVnjczKkxw/4tAV9RV0=;
-        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
-        b=n+rEiPhWKHJuAYUiIIHNCfYgt5DgPZjzkfMNeTfGZVKqtTxnZQDIMQm9X/mv5vnPT
-         zAFxP6qdPnHnSvCsnvKsG8I2/gr5PZiJG1gEAeSb4BpbXys2OReA4rz6NHuIqCOUku
-         Bxdtbz5pebyb8c5cHRt6YjJ8sbK8vXU2CFNKSq1c=
-Date:   Thu, 27 Jan 2022 12:58:20 -0800 (PST)
-From:   "Kenneth R. Crudup" <kenny@panix.com>
-Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-cc:     Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Kenneth R. Crudup" <kenny@panix.com>
-Subject: Re: Commit ad383c2c6 ("Bluetooth: hci_sync: Enable advertising when
- LL privacy is enabled") breaks my MS ArcTouch mouse
-In-Reply-To: <76f65c9-e031-3870-9dfb-49f8969534ae@panix.com>
-Message-ID: <6f3b9dbb-6ecf-cfea-2127-cb3360d78431@panix.com>
-References: <4124ccb8-11f-21e9-982e-7fb07f23225@panix.com> <CABBYNZLt3GmBTmAADa+FF2bdEfzMg_9Horxk2pT85BC+LFgrMQ@mail.gmail.com> <91c1e9ef-4786-b9f5-8bb8-b93c84c0874b@panix.com> <CABBYNZ+t+L=G-X0qt=Cnn7vUpLu2s1=purmAESnCaRvK7XtmdQ@mail.gmail.com>
- <76f65c9-e031-3870-9dfb-49f8969534ae@panix.com>
+        Thu, 27 Jan 2022 20:45:39 -0500
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F01C061714
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 17:45:39 -0800 (PST)
+Received: by mail-yb1-xb2a.google.com with SMTP id p5so13985829ybd.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 17:45:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+u8wqQf+JnCRbCKbY/yHaTc8fb1wco2u5ac9/L6SRVM=;
+        b=i2iPMRIjBl7u2M6J4yu3gxS6pPkYgGXPVA+p9HZJQRr3ejMWF9obkj7/EY43IClQjD
+         jAV55Wa/TR/wmFTo7XdqaKYTniScGrTcQVZgSYUvjrI/YUHmqAnn6qCqdulDJh/OWbXW
+         1BNQcVAHD0Kyy3cQHBJ6kMuK0A7TweiEPtjT+GUMCxaNRZzdxVuLwkIzqZKf0tjOYgsF
+         cfkx3eM+/TwNhfurK2IMvKdsxAr8XevhxB9PHKfF5mTcUZhl6JpyqbIniBn8LaGl/rhk
+         lX3dWBJbsdP7o6dp9AalPVfbOELm1Ehxx0iSSfpu/ZTHNcXC6EqdlouKVaqfAa+fKIld
+         kc9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+u8wqQf+JnCRbCKbY/yHaTc8fb1wco2u5ac9/L6SRVM=;
+        b=K7+agVDeG/GP7lRfGhU1tl90gs7l6GHA2JddIFsKI42eRmX+KKoN8OwRJVJXbOZMI4
+         fs8j3LKpCFq9wlSexKvqsCwDE5+GwrRxuArnf6iRf1UBRtYx5w6BtV5N7SNohS/Cgt41
+         43WEumPQxgT84uB33YjQ0ScxSFuJOdZKxXLHrizFhTTptjFbbOE8NgNKxpjFL5I47RUw
+         mT0Fx6qq8BqR3cPoSHxX0Yu1NLaGZjY3YJ7E4g22tz9O46bNmUw322WiTgHC6mXUJlp2
+         7whZzr72X6K/OQVYj/WhfRoDMhQj2zBSwMHRtOngVTlB6WywIP0z9OXBQ1724p53IQZw
+         8HHw==
+X-Gm-Message-State: AOAM532nr65TftUiveggRx37f3iyYj1pVPxWRtYEvDA22J1szFgH59XR
+        XWihGdYGvzO0yAx0HO5dRv4ggLI4Smz/QbVWYVw=
+X-Google-Smtp-Source: ABdhPJyKU5cy3AqDKmfkIc1Hb2Bu+bS1eLXV/skWbac2dp8eyvnsPIuuVMP2eYYHaYeyXXvQLiqCZx/AyT93VFuKc3Y=
+X-Received: by 2002:a25:f30a:: with SMTP id c10mr1907176ybs.733.1643334338379;
+ Thu, 27 Jan 2022 17:45:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20220127101609.3646316-1-josephsih@chromium.org> <F67144BA-E7CF-43B7-997C-576536BA5968@holtmann.org>
+In-Reply-To: <F67144BA-E7CF-43B7-997C-576536BA5968@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 27 Jan 2022 17:45:27 -0800
+Message-ID: <CABBYNZLLjHfGiM5W4S59B9bgLZaN3dgk-9WVBb_Fdm8F8jM9ZA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v2 1/4] doc: Add Bluetooth quality report event
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Joseph Hwang <josephsih@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Marcel, Joseph,
 
-Anything else I can do to help you diagnose this regression? One thing I do
-(vaguely) remember when building a custom kernel some time ago is that this
-device does some sort of "GATT encryption" (I'm sure I'm misremembering this,
-it's been a few years) and I couldn't connect to it either unless the
-appropriate config setup was used when building the kernel.
+On Thu, Jan 27, 2022 at 12:02 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Joseph,
+>
+> > Add the Bluetooth quality report event in doc/mgmt-api.txt.
+> >
+> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> > ---
+> >
+> > Changes in v2:
+> > - This is a new patch for adding the event in doc/mgmt-api.txt
+> >
+> > doc/mgmt-api.txt | 20 ++++++++++++++++++++
+> > 1 file changed, 20 insertions(+)
+> >
+> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> > index ebe56afa4..a0e71a732 100644
+> > --- a/doc/mgmt-api.txt
+> > +++ b/doc/mgmt-api.txt
+> > @@ -4978,3 +4978,23 @@ Advertisement Monitor Device Lost Event
+> >               2       LE Random
+> >
+> >       This event will be sent to all management sockets.
+> > +
+> > +
+> > +Bluetooth Quality Report Event
+> > +==============================
+> > +
+> > +     Event code:             0x0031
+> > +     Controller Index:       <controller_id>
+> > +     Event Parameters:       Quality_Spec (1 Octet)
+> > +                             Report_Len (2 Octets)
+> > +                             Report (0-65535 Octets)
+> > +
+> > +     This event carries the Bluetooth quality report sent by the
+> > +     controller.
+> > +
+> > +     Possible values for the Quality_Spec parameter:
+> > +             0       Not Available
+> > +             1       Intel Telemetry Event
+> > +             2       AOSP Bluetooth Quality Report Event
+>
+> can we swap this around please:
+>
+>                 0       AOSP Bluetooth Quality Report Event
+>                 1       Intel Telemetry Event
+>
+> Regards
+>
+> Marcel
 
-Thanks,
+I wonder if we shouldn't have these as bit fields though, so one can
+select multiple reports if available.
 
-	-Kenny
 
 -- 
-Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
+Luiz Augusto von Dentz
