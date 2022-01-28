@@ -2,85 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B039C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 22:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AF6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 22:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351283AbiA1WaS convert rfc822-to-8bit (ORCPT
+        id S1343752AbiA1WiY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Jan 2022 17:30:18 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:58120 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351647AbiA1WaR (ORCPT
+        Fri, 28 Jan 2022 17:38:24 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:51328 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232883AbiA1WiX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Jan 2022 17:30:17 -0500
-Received: from smtpclient.apple (p4ff9fc34.dip0.t-ipconnect.de [79.249.252.52])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0E659CED40;
-        Fri, 28 Jan 2022 23:30:15 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: pull request: bluetooth 2022-01-28
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220128134951.3452f557@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-Date:   Fri, 28 Jan 2022 23:30:14 +0100
+        Fri, 28 Jan 2022 17:38:23 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B1130B8271B;
+        Fri, 28 Jan 2022 22:38:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36FCFC340E7;
+        Fri, 28 Jan 2022 22:38:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643409501;
+        bh=VhDag0BlwSgL18JQLAGYtC7PmOJGwW0NRPadhluNNiA=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=aYeWH6I6REkKhtsWk95ArhyD2YJYro3oj6janFB8FcQxHcIEx1t59R0zG8W3GtiB4
+         jgDx4UI2KhxpbUZ2WybIOwUPb7WLG2OmatzEeOxSVOwq93MgjNPjjuZqaQ1YSAxyNp
+         NGZBXc9l8qWkU/1shoLx8FeHthYfK0Zl1gqye/rpIUQLZBxfgSmtqgQAUP9mujwLUY
+         HKMzcjT0uanxKCJZcUyWiwlqohHfSjE2bJathedUKwdrB/PHNDcZxIRDeIO2V/V9c+
+         721T7OQTUOQQAQy9yqVbHrZfdBxynsfTJAXbvo6iOGTskbLZ3HPH0690zko6yM9kcE
+         Cvlh1Zu3NGBOw==
+Date:   Fri, 28 Jan 2022 14:38:20 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         BlueZ <linux-bluetooth@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <11903531-644D-434D-95CB-6F679368475C@holtmann.org>
+Subject: Re: pull request: bluetooth 2022-01-28
+Message-ID: <20220128143820.21025a4e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <11903531-644D-434D-95CB-6F679368475C@holtmann.org>
 References: <20220128205915.3995760-1-luiz.dentz@gmail.com>
- <20220128134951.3452f557@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-To:     Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        <20220128134951.3452f557@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+        <11903531-644D-434D-95CB-6F679368475C@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+On Fri, 28 Jan 2022 23:30:14 +0100 Marcel Holtmann wrote:
+> > Thanks for fixing the warnings! :)
+> >=20
+> > I presume this is for the net-next given the name of your tree, but=20
+> > a lot of patches here have fixes tags. What's your methodology on
+> > separating fixes from new features?
+> >=20
+> > I think it may be worth adjusting the filter there and send more=20
+> > stuff earlier to Linus's tree. Especially fixes with the right mix=20
+> > of confidence and impact or pure device ID additions.
+> >=20
+> > To be clear - happy to pull this PR as is, I was meaning to ask about
+> > this for a while. =20
+>=20
+> we started to add Fixes: tag whenever you can identify a faulty commit or
+> can track down the original issue. This way we can later easily go back
+> and check. It have to note that a lot of vendor trees cherrypick patches
+> and this helps them picking the right ones.
 
->> The following changes since commit 8aaaf2f3af2ae212428f4db1af34214225f5cec3:
->> 
->>  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2022-01-09 17:00:17 -0800)
->> 
->> are available in the Git repository at:
->> 
->>  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-01-28
->> 
->> for you to fetch changes up to 91cb4c19118a19470a9d7d6dbdf64763bbbadcde:
->> 
->>  Bluetooth: Increment management interface revision (2022-01-27 12:35:13 -0800)
->> 
->> ----------------------------------------------------------------
->> bluetooth-next pull request for net-next:
->> 
->> - Add support for RTL8822C hci_ver 0x08
->> - Add support for RTL8852AE part 0bda:2852
->> - Fix WBS setting for Intel legacy ROM products
->> - Enable SCO over I2S ib mt7921s
->> - Increment management interface revision
-> 
-> Thanks for fixing the warnings! :)
-> 
-> I presume this is for the net-next given the name of your tree, but 
-> a lot of patches here have fixes tags. What's your methodology on
-> separating fixes from new features?
-> 
-> I think it may be worth adjusting the filter there and send more 
-> stuff earlier to Linus's tree. Especially fixes with the right mix 
-> of confidence and impact or pure device ID additions.
-> 
-> To be clear - happy to pull this PR as is, I was meaning to ask about
-> this for a while.
+Thumbs up for that!
 
-we started to add Fixes: tag whenever you can identify a faulty commit or
-can track down the original issue. This way we can later easily go back
-and check. It have to note that a lot of vendor trees cherrypick patches
-and this helps them picking the right ones.
+> I reviewed the list of patches again, and frankly none of them are super
+> critical to go to Linus right away.=20
 
-I reviewed the list of patches again, and frankly none of them are super
-critical to go to Linus right away. So if you don’t mind, please pull.
+My concern is that GregKH will start asking us why we hold onto trivial
+fixes like 5201d23cc8e5 until the merge window, I think this merge
+window has overflown his patch ID scheme ;) The risk of pushing fixes
+in early -rc's should be pretty low. But your call at the end of the
+day!
 
-Regards
+> So if you don=E2=80=99t mind, please pull.
 
-Marcel
-
+Sure thing, done! :)
