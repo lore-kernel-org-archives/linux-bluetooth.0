@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37162C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4F3C433F5
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Jan 2022 02:07:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345224AbiA1CHi (ORCPT
+        id S1345178AbiA1CHj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Jan 2022 21:07:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
+        Thu, 27 Jan 2022 21:07:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345178AbiA1CHi (ORCPT
+        with ESMTP id S1345225AbiA1CHi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 27 Jan 2022 21:07:38 -0500
-Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11F0C061714
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:37 -0800 (PST)
-Received: by mail-io1-xd36.google.com with SMTP id n17so6049282iod.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:37 -0800 (PST)
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F9D3C061714
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:38 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id u5so4155318ilq.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Jan 2022 18:07:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=hXZSR+xjTlB3Rf89jHBUZOSbxSBKhgoR5CbeOozYl8s=;
-        b=EhgieR9l1DH2aZJPL+KjOffI0/Czt0S+QESaz5U1qTYmgac6O3EGHSpBK/+iNbf6ZG
-         uv97k3xoTIGQmdafpKpqm6AhHRGFCg8Mq/UfSf0/aqjA88fbBXO0R3en1g2F6WXWe5a9
-         bxXGIvMgOglDigDvvmdWIVskdyDWTblQx1Gz1NxPIRQ4DAKzeqREBhTRVjrSg4d2Z364
-         TjewKs3ps1LWNMzOP9MOMYE/QeuChXFJOb4gyQVCVeCA92icSI1TobEj/nj+r1RkMgDs
-         aSc7htLv0nUsRc0ivFu6QxcJ0PehiwjUL7gYoSjyrdICg2Uh8VmJM/LWEpt5roLA++mt
-         b4Vg==
+        bh=MqC+nzQKyDPuomICd2Bnj+jHvHssw2y5p8nmQKToMWI=;
+        b=DN/y4elWN8VY1tVJ0moSdhl6mnK9V5B45CBi4Uw8eZ01t60oYAzizIIDz3ikq3FBLE
+         vSnvAIhvYurdwD6liQsUpWLzNHDd+IGAO+nHU8XR/UTv5o+ofSARpggArRoirnQzBQjY
+         Er5i3l3dNHK54i0Azo8uHznp2vcNIL7X+ZKWffywfi/DY9PmiF6j6g5Tkq151+mK3OyO
+         yOdkkhouhiBVW7599SzY3xbGUfcKJ7kbnIf1fHK2IypotNu40gXJ4Z4n7Iz6qRBWZAG0
+         9gJSfS5Ohhuf+0FwgtUAOK77l0VzpP96uIqY7qzjfDjq1DsUDhZnox1hWGa9nKBmphl5
+         gmHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hXZSR+xjTlB3Rf89jHBUZOSbxSBKhgoR5CbeOozYl8s=;
-        b=VYiDWEqHwUZgt/GhBTISXIesgufRJgaCQK2XmI/R94xlY9d8lDbCUDulHFcyom1Qqu
-         kXbE+cbO0d7k0qzBSJoVV+CnrVT/+GR69wf9jAsqDdq4ec1cyGTgGCvBZahf/1zdMfYd
-         m/PhQrULetFgYpReYv07OOHxs8Ax5Ldyx5nC3/tZYX22vutmFualX6VHHGObvkWQIYoz
-         /fZNtdztELckwd/LUmtyXk/FAxYpSauGEBq4i2trjua1BnO2yWqEanj2tX0RiPcb+72R
-         SNRkglpaeA+2dU8aWA7uJl6syct5YOCTsVKnVkr3DPd2OzCemMvmMXiNECq++OMbX+HN
-         TvXA==
-X-Gm-Message-State: AOAM5331uWVfYloftF46IzdwVXJ+vEIR4xlytSHDCsglkQIY6CzjcNvM
-        nF8XCwSmRXGJI2K0BmQIEBtstvcIxpxraw==
-X-Google-Smtp-Source: ABdhPJx5F9U2eiuCCKF+I3eus0UQmIpSVmQ+nf/XvJ740TCA2BSJnt70HmCBF0Vgq6Y/Mv9JT7sMgA==
-X-Received: by 2002:a05:6638:309:: with SMTP id w9mr3567736jap.241.1643335657005;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=MqC+nzQKyDPuomICd2Bnj+jHvHssw2y5p8nmQKToMWI=;
+        b=jOSfduzQlXOTHreplbQ3BrDFolW8OLB+tX+1EUIhDBrLqQuAJ0SLRjU5dsexxeKEoM
+         Hi6gCbrROy3APJtJO9L/X4ANMPnZGkdu9nkmPR6N013Zvi4XtokptvHeYKNijAxTJhq8
+         +DGB4jEuhMyGjWka8SSEl+EeiWyukdgYWn5E/8LzTZTJHtqT9/AXPmw/1hZohLinkqmV
+         xbaYZNMDv6QpNFUlRDaSDgJSsUHCMHxFgRmfuBdLZ6q+BO0nKuyo2xH+Rud/e/E/LVAu
+         xcX4xQjg31wAgLh06IyO8KJO71VwvYwM5OOg4UV7MZoDsMoa9Ol3JFdW7FhpOLStgXOF
+         yW1g==
+X-Gm-Message-State: AOAM532VPNKsrL/bWhSEUkrs5pD8N7RLm7ra3GvRAwSTaiujgFDtE90l
+        YECBZSpKI8BmxESXrskjSJl5VVADgdiveQ==
+X-Google-Smtp-Source: ABdhPJw+Sk26GBoq+6zqKv4Ap5o16gb60UYbY2DWAQBRdB9QuoN07jc/P5J3oNcuidjLn7sY8DwjOg==
+X-Received: by 2002:a05:6e02:12c7:: with SMTP id i7mr4756425ilm.138.1643335657755;
         Thu, 27 Jan 2022 18:07:37 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p5sm12306763iof.50.2022.01.27.18.07.36
+        by smtp.gmail.com with ESMTPSA id p5sm12306763iof.50.2022.01.27.18.07.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jan 2022 18:07:36 -0800 (PST)
+        Thu, 27 Jan 2022 18:07:37 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] shared/mgmt: Add request timeout handling
-Date:   Thu, 27 Jan 2022 18:07:34 -0800
-Message-Id: <20220128020735.3779202-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] adapter: Remove custom MGMT send/reply timeout
+Date:   Thu, 27 Jan 2022 18:07:35 -0800
+Message-Id: <20220128020735.3779202-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220128020735.3779202-1-luiz.dentz@gmail.com>
+References: <20220128020735.3779202-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,245 +66,286 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds request timeout handling when using mgmt_send_timeout and
-mgmt_reply_timeout, the timeout is applied to the request only when it
-is actually transmitted and not while queued.
+This removes the custom MGMT send/reply timeout since bt_mgmt itself
+can handle them itself and it actually start the timer only when the
+command is actually sent to the kernel rather then when it is queued.
+
+Fixes: https://github.com/bluez/bluez/issues/275
 ---
-v2: Remove default timeout so the likes of mgmt_send/mgmt_reply use 0
-instead which disables the timeout handling.
+ src/adapter.c | 162 ++++----------------------------------------------
+ 1 file changed, 10 insertions(+), 152 deletions(-)
 
- src/shared/mgmt.c | 85 ++++++++++++++++++++++++++++++++++++++++-------
- src/shared/mgmt.h | 10 ++++++
- 2 files changed, 83 insertions(+), 12 deletions(-)
-
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 41457b430..95229c248 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -25,6 +25,7 @@
- #include "src/shared/queue.h"
- #include "src/shared/util.h"
- #include "src/shared/mgmt.h"
-+#include "src/shared/timeout.h"
+diff --git a/src/adapter.c b/src/adapter.c
+index 9772e843a..72e98ba0a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -311,15 +311,6 @@ struct btd_adapter {
  
- struct mgmt {
- 	int ref_count;
-@@ -49,6 +50,7 @@ struct mgmt {
- };
+ 	struct oob_handler *oob_handler;
  
- struct mgmt_request {
-+	struct mgmt *mgmt;
- 	unsigned int id;
- 	uint16_t opcode;
- 	uint16_t index;
-@@ -57,6 +59,8 @@ struct mgmt_request {
- 	mgmt_request_func_t callback;
- 	mgmt_destroy_func_t destroy;
- 	void *user_data;
-+	int timeout;
-+	unsigned int timeout_id;
- };
+-	unsigned int load_ltks_id;
+-	unsigned int load_ltks_timeout;
+-
+-	unsigned int confirm_name_id;
+-	unsigned int confirm_name_timeout;
+-
+-	unsigned int pair_device_id;
+-	unsigned int pair_device_timeout;
+-
+ 	unsigned int db_id;		/* Service event handler for GATT db */
  
- struct mgmt_notify {
-@@ -81,6 +85,9 @@ static void destroy_request(void *data)
- 	if (request->destroy)
- 		request->destroy(request->user_data);
- 
-+	if (request->timeout_id)
-+		timeout_remove(request->timeout_id);
-+
- 	free(request->buf);
- 	free(request);
- }
-@@ -150,6 +157,26 @@ static void write_watch_destroy(void *user_data)
- 	mgmt->writer_active = false;
+ 	bool is_default;		/* true if adapter is default one */
+@@ -4134,21 +4125,6 @@ static void load_link_keys(struct btd_adapter *adapter, GSList *keys,
+ 							adapter->dev_id);
  }
  
-+static bool request_timeout(void *data)
-+{
-+	struct mgmt_request *request = data;
-+
-+	if (!request)
-+		return false;
-+
-+	request->timeout_id = 0;
-+
-+	queue_remove_if(request->mgmt->pending_list, NULL, request);
-+
-+	if (request->callback)
-+		request->callback(MGMT_STATUS_TIMEOUT, 0, NULL,
-+						request->user_data);
-+
-+	destroy_request(request);
-+
-+	return false;
-+}
-+
- static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+-static bool load_ltks_timeout(gpointer user_data)
+-{
+-	struct btd_adapter *adapter = user_data;
+-
+-	btd_error(adapter->dev_id, "Loading LTKs timed out for hci%u",
+-							adapter->dev_id);
+-
+-	adapter->load_ltks_timeout = 0;
+-
+-	mgmt_cancel(adapter->mgmt, adapter->load_ltks_id);
+-	adapter->load_ltks_id = 0;
+-
+-	return FALSE;
+-}
+-
+ static void load_ltks_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct iovec iov;
-@@ -169,6 +196,12 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
- 		return false;
+@@ -4160,11 +4136,6 @@ static void load_ltks_complete(uint8_t status, uint16_t length,
+ 				adapter->dev_id, mgmt_errstr(status), status);
  	}
  
-+	if (request->timeout)
-+		request->timeout_id = timeout_add_seconds(request->timeout,
-+							request_timeout,
-+							request,
-+							NULL);
-+
- 	util_debug(mgmt->debug_callback, mgmt->debug_data,
- 				"[0x%04x] command 0x%04x",
- 				request->index, request->opcode);
-@@ -566,7 +599,8 @@ bool mgmt_set_close_on_unref(struct mgmt *mgmt, bool do_close)
- static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
- 				uint16_t index, uint16_t length,
- 				const void *param, mgmt_request_func_t callback,
--				void *user_data, mgmt_destroy_func_t destroy)
-+				void *user_data, mgmt_destroy_func_t destroy,
-+				int timeout)
+-	adapter->load_ltks_id = 0;
+-
+-	timeout_remove(adapter->load_ltks_timeout);
+-	adapter->load_ltks_timeout = 0;
+-
+ 	DBG("LTKs loaded for hci%u", adapter->dev_id);
+ }
+ 
+@@ -4237,27 +4208,13 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ 		}
+ 	}
+ 
+-	adapter->load_ltks_id = mgmt_send(adapter->mgmt,
+-					MGMT_OP_LOAD_LONG_TERM_KEYS,
+-					adapter->dev_id, cp_size, cp,
+-					load_ltks_complete, adapter, NULL);
+-
+-	g_free(cp);
+-
+-	if (adapter->load_ltks_id == 0) {
++	if (!mgmt_send_timeout(adapter->mgmt, MGMT_OP_LOAD_LONG_TERM_KEYS,
++			adapter->dev_id, cp_size, cp, load_ltks_complete,
++			adapter, NULL, 2))
+ 		btd_error(adapter->dev_id, "Failed to load LTKs for hci%u",
+ 							adapter->dev_id);
+-		return;
+-	}
+ 
+-	/*
+-	 * This timeout handling is needed since the kernel is stupid
+-	 * and forgets to send a command complete response. However in
+-	 * case of failures it does send a command status.
+-	 */
+-	adapter->load_ltks_timeout = timeout_add_seconds(2,
+-						load_ltks_timeout, adapter,
+-						NULL);
++	g_free(cp);
+ }
+ 
+ static void load_irks_complete(uint8_t status, uint16_t length,
+@@ -5610,15 +5567,6 @@ static void adapter_free(gpointer user_data)
+ 		adapter->passive_scan_timeout = 0;
+ 	}
+ 
+-	if (adapter->load_ltks_timeout > 0)
+-		timeout_remove(adapter->load_ltks_timeout);
+-
+-	if (adapter->confirm_name_timeout > 0)
+-		timeout_remove(adapter->confirm_name_timeout);
+-
+-	if (adapter->pair_device_timeout > 0)
+-		timeout_remove(adapter->pair_device_timeout);
+-
+ 	if (adapter->auth_idle_id)
+ 		g_source_remove(adapter->auth_idle_id);
+ 
+@@ -6746,21 +6694,6 @@ const bdaddr_t *btd_adapter_get_address(struct btd_adapter *adapter)
+ 	return &adapter->bdaddr;
+ }
+ 
+-static bool confirm_name_timeout(gpointer user_data)
+-{
+-	struct btd_adapter *adapter = user_data;
+-
+-	btd_error(adapter->dev_id, "Confirm name timed out for hci%u",
+-							adapter->dev_id);
+-
+-	adapter->confirm_name_timeout = 0;
+-
+-	mgmt_cancel(adapter->mgmt, adapter->confirm_name_id);
+-	adapter->confirm_name_id = 0;
+-
+-	return FALSE;
+-}
+-
+ static void confirm_name_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct mgmt_request *request;
- 	struct mgmt_hdr *hdr;
-@@ -598,12 +632,18 @@ static struct mgmt_request *create_request(struct mgmt *mgmt, uint16_t opcode,
- 	hdr->index = htobs(index);
- 	hdr->len = htobs(length);
+@@ -6770,13 +6703,9 @@ static void confirm_name_complete(uint8_t status, uint16_t length,
+ 		btd_error(adapter->dev_id,
+ 				"Failed to confirm name for hci%u: %s (0x%02x)",
+ 				adapter->dev_id, mgmt_errstr(status), status);
++		return;
+ 	}
  
-+	/* Use a weak reference so requests don't prevent mgmt_unref to
-+	 * cancel requests and free in case of the last reference is dropped by
-+	 * the user.
-+	 */
-+	request->mgmt = mgmt;
- 	request->opcode = opcode;
- 	request->index = index;
- 
- 	request->callback = callback;
- 	request->destroy = destroy;
- 	request->user_data = user_data;
-+	request->timeout = timeout;
- 
- 	return request;
- }
-@@ -735,10 +775,11 @@ unsigned int mgmt_send_tlv(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 	return ret;
+-	adapter->confirm_name_id = 0;
+-
+-	timeout_remove(adapter->confirm_name_timeout);
+-	adapter->confirm_name_timeout = 0;
+-
+ 	DBG("Confirm name complete for hci%u", adapter->dev_id);
  }
  
--unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
--				uint16_t length, const void *param,
--				mgmt_request_func_t callback,
--				void *user_data, mgmt_destroy_func_t destroy)
-+unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
-+				uint16_t index, uint16_t length,
-+				const void *param, mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy,
-+				int timeout)
+@@ -6790,49 +6719,16 @@ static void confirm_name(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 	DBG("hci%d bdaddr %s name_known %u", adapter->dev_id, addr,
+ 								name_known);
+ 
+-	/*
+-	 * If the kernel does not answer the confirm name command with
+-	 * a command complete or command status in time, this might
+-	 * race against another device found event that also requires
+-	 * to confirm the name. If there is a pending command, just
+-	 * cancel it to be safe here.
+-	 */
+-	if (adapter->confirm_name_id > 0) {
+-		btd_warn(adapter->dev_id,
+-				"Found pending confirm name for hci%u",
+-							adapter->dev_id);
+-		mgmt_cancel(adapter->mgmt, adapter->confirm_name_id);
+-	}
+-
+-	if (adapter->confirm_name_timeout > 0) {
+-		timeout_remove(adapter->confirm_name_timeout);
+-		adapter->confirm_name_timeout = 0;
+-	}
+-
+ 	memset(&cp, 0, sizeof(cp));
+ 	bacpy(&cp.addr.bdaddr, bdaddr);
+ 	cp.addr.type = bdaddr_type;
+ 	cp.name_known = name_known;
+ 
+-	adapter->confirm_name_id = mgmt_reply(adapter->mgmt,
+-					MGMT_OP_CONFIRM_NAME,
+-					adapter->dev_id, sizeof(cp), &cp,
+-					confirm_name_complete, adapter, NULL);
+-
+-	if (adapter->confirm_name_id == 0) {
++	if (!mgmt_reply_timeout(adapter->mgmt, MGMT_OP_CONFIRM_NAME,
++				adapter->dev_id, sizeof(cp), &cp,
++				confirm_name_complete, adapter, NULL, 2))
+ 		btd_error(adapter->dev_id, "Failed to confirm name for hci%u",
+ 							adapter->dev_id);
+-		return;
+-	}
+-
+-	/*
+-	 * This timeout handling is needed since the kernel is stupid
+-	 * and forgets to send a command complete response. However in
+-	 * case of failures it does send a command status.
+-	 */
+-	adapter->confirm_name_timeout = timeout_add_seconds(2,
+-						confirm_name_timeout, adapter,
+-						NULL);
+ }
+ 
+ static void adapter_msd_notify(struct btd_adapter *adapter,
+@@ -8106,21 +8002,6 @@ static void free_pair_device_data(void *user_data)
+ 	g_free(data);
+ }
+ 
+-static bool pair_device_timeout(gpointer user_data)
+-{
+-	struct pair_device_data *data = user_data;
+-	struct btd_adapter *adapter = data->adapter;
+-
+-	btd_error(adapter->dev_id, "Pair device timed out for hci%u",
+-							adapter->dev_id);
+-
+-	adapter->pair_device_timeout = 0;
+-
+-	adapter_cancel_bonding(adapter, &data->bdaddr, data->addr_type);
+-
+-	return FALSE;
+-}
+-
+ static void pair_device_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
- 	struct mgmt_request *request;
+@@ -8130,13 +8011,6 @@ static void pair_device_complete(uint8_t status, uint16_t length,
  
-@@ -746,7 +787,7 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 		return 0;
+ 	DBG("%s (0x%02x)", mgmt_errstr(status), status);
  
- 	request = create_request(mgmt, opcode, index, length, param,
--					callback, user_data, destroy);
-+					callback, user_data, destroy, timeout);
- 	if (!request)
- 		return 0;
- 
-@@ -766,6 +807,15 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 	return request->id;
- }
- 
-+unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
-+				uint16_t length, const void *param,
-+				mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy)
-+{
-+	return mgmt_send_timeout(mgmt, opcode, index, length, param, callback,
-+					user_data, destroy, 0);
-+}
-+
- unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				uint16_t length, const void *param,
- 				mgmt_request_func_t callback,
-@@ -777,7 +827,8 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
- 		return 0;
- 
- 	request = create_request(mgmt, opcode, index, length, param,
--					callback, user_data, destroy);
-+					callback, user_data, destroy,
-+					0);
- 	if (!request)
- 		return 0;
- 
-@@ -792,10 +843,11 @@ unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index
- 	return request->id;
- }
- 
--unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
--				uint16_t length, const void *param,
--				mgmt_request_func_t callback,
--				void *user_data, mgmt_destroy_func_t destroy)
-+unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
-+				uint16_t index, uint16_t length,
-+				const void *param, mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy,
-+				int timeout)
+-	adapter->pair_device_id = 0;
+-
+-	if (adapter->pair_device_timeout > 0) {
+-		timeout_remove(adapter->pair_device_timeout);
+-		adapter->pair_device_timeout = 0;
+-	}
+-
+ 	/* Workaround for a kernel bug
+ 	 *
+ 	 * Broken kernels may reply to device pairing command with command
+@@ -8164,12 +8038,6 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+ int adapter_create_bonding(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 					uint8_t addr_type, uint8_t io_cap)
  {
- 	struct mgmt_request *request;
+-	if (adapter->pair_device_id > 0) {
+-		btd_error(adapter->dev_id,
+-			"Unable pair since another pairing is in progress");
+-		return -EBUSY;
+-	}
+-
+ 	suspend_discovery(adapter);
  
-@@ -803,7 +855,7 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 		return 0;
+ 	return adapter_bonding_attempt(adapter, bdaddr, addr_type, io_cap);
+@@ -8201,10 +8069,10 @@ int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 	bacpy(&data->bdaddr, bdaddr);
+ 	data->addr_type = addr_type;
  
- 	request = create_request(mgmt, opcode, index, length, param,
--					callback, user_data, destroy);
-+					callback, user_data, destroy, timeout);
- 	if (!request)
- 		return 0;
+-	id = mgmt_send(adapter->mgmt, MGMT_OP_PAIR_DEVICE,
++	id = mgmt_send_timeout(adapter->mgmt, MGMT_OP_PAIR_DEVICE,
+ 				adapter->dev_id, sizeof(cp), &cp,
+ 				pair_device_complete, data,
+-				free_pair_device_data);
++				free_pair_device_data, BONDING_TIMEOUT);
  
-@@ -823,6 +875,15 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 	return request->id;
+ 	if (id == 0) {
+ 		btd_error(adapter->dev_id, "Failed to pair %s for hci%u",
+@@ -8213,16 +8081,6 @@ int adapter_bonding_attempt(struct btd_adapter *adapter, const bdaddr_t *bdaddr,
+ 		return -EIO;
+ 	}
+ 
+-	adapter->pair_device_id = id;
+-
+-	/* Due to a bug in the kernel it is possible that a LE pairing
+-	 * request never times out. Therefore, add a timer to clean up
+-	 * if no response arrives
+-	 */
+-	adapter->pair_device_timeout = timeout_add_seconds(BONDING_TIMEOUT,
+-						pair_device_timeout, data,
+-						NULL);
+-
+ 	return 0;
  }
  
-+unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
-+				uint16_t length, const void *param,
-+				mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy)
-+{
-+	return mgmt_reply_timeout(mgmt, opcode, index, length, param, callback,
-+						user_data, destroy, 0);
-+}
-+
- bool mgmt_cancel(struct mgmt *mgmt, unsigned int id)
- {
- 	struct mgmt_request *request;
-diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
-index 56add613d..b413cea78 100644
---- a/src/shared/mgmt.h
-+++ b/src/shared/mgmt.h
-@@ -55,6 +55,11 @@ unsigned int mgmt_send(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				uint16_t length, const void *param,
- 				mgmt_request_func_t callback,
- 				void *user_data, mgmt_destroy_func_t destroy);
-+unsigned int mgmt_send_timeout(struct mgmt *mgmt, uint16_t opcode,
-+				uint16_t index, uint16_t length,
-+				const void *param, mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy,
-+				int timeout);
- unsigned int mgmt_send_nowait(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				uint16_t length, const void *param,
- 				mgmt_request_func_t callback,
-@@ -63,6 +68,11 @@ unsigned int mgmt_reply(struct mgmt *mgmt, uint16_t opcode, uint16_t index,
- 				uint16_t length, const void *param,
- 				mgmt_request_func_t callback,
- 				void *user_data, mgmt_destroy_func_t destroy);
-+unsigned int mgmt_reply_timeout(struct mgmt *mgmt, uint16_t opcode,
-+				uint16_t index, uint16_t length,
-+				const void *param, mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy,
-+				int timeout);
- bool mgmt_cancel(struct mgmt *mgmt, unsigned int id);
- bool mgmt_cancel_index(struct mgmt *mgmt, uint16_t index);
- bool mgmt_cancel_all(struct mgmt *mgmt);
 -- 
 2.34.1
 
