@@ -2,128 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A73F0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Jan 2022 15:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFF56C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jan 2022 14:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355376AbiA3PCz (ORCPT
+        id S1349217AbiAaO7g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Jan 2022 10:02:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34734 "EHLO
+        Mon, 31 Jan 2022 09:59:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355374AbiA3PCz (ORCPT
+        with ESMTP id S232149AbiAaO7d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Jan 2022 10:02:55 -0500
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B367C061714
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Jan 2022 07:02:54 -0800 (PST)
-Received: by mail-yb1-xb2e.google.com with SMTP id j2so19731002ybu.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Jan 2022 07:02:54 -0800 (PST)
+        Mon, 31 Jan 2022 09:59:33 -0500
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F397C061714
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 06:59:33 -0800 (PST)
+Received: by mail-lj1-x22b.google.com with SMTP id e17so19794368ljk.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 06:59:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kaishome.de; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=A9rXa8MOMOqUl59jZILcjrVHPpj0gaywXdH3Ebep4zI=;
-        b=fcpnd6x/yCzjJpJ4UJVM3bR8MB9UNlFJokooCvtABL/RkxtFAvFTxMcPq5wZMqdXJ/
-         tqL4U7B9L5FJ1uDLG3STX6aIPtaPz/76vniurYz/RolRiOUoVf9/eeHzROb3KbBXH/4j
-         Xk8upP54EUwR95zRtYjOrYCJAJBUU0uZxgolE=
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to:content-transfer-encoding;
+        bh=4oxw2yftup4zTZyREEGsuh0pigZ/icP5H9RySVtwFBQ=;
+        b=MdSN9xIu71W+qfVC9ewzYL0Ehd62NlL4wfjD50+UWbfcB7SFiXmySFUCP1WH5cG/Q/
+         WDmYVFxuyLAmCF2ksIzuDx38E/9JXUeNaQWZqaG+WHwAb0rVRGzHUvDqP8EonOYTyE+c
+         3dakU7AhBd3V4F+nXfh1eP15F1KkVXRY2rsiGt1Jx4rCd2Zq4jL8fFLDPRZ41+qBmRj4
+         wZDItaERYk9xxYafA7eLEtA0DJRIQj19zCh6EIruDpDffPmTLdkxNyUskgyBARd14a5Q
+         AYTPFvSgCB+6tmz5uF5A+KEFwvpGD7w/V+uH/GdQjxEaoqlfWPGyvIaQd3r77M/ZXBLL
+         4Z7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=A9rXa8MOMOqUl59jZILcjrVHPpj0gaywXdH3Ebep4zI=;
-        b=pN1cmkVoiuf0Yz5pQLo9mX6973KueKYlPB39p7dFeqCcVNXUSIBVAVw/8hhneUO1DB
-         5CxrtPBMNd5CIUvrPTic0Nb5X4BqadHsZZHFfuJBqvZCJBP+xuJbPTo7HMzMlTrHvJDm
-         yyryu8Hh5bjKc8r0qXUpWeJqt8b/4tVtTwLM9kPrtpSpkkvIH1uQmtA3Ts/IbiMF5HPf
-         ZpbNKfSTt/CvQP7q3015jIr4De4IRNcP7zFEHQsANNMEL7W7/V+XR8sAOECkGFsIhPph
-         ST9b7udAAls7dNYSZwvVGezFnm50UYJ0zP68tsu2ELYOv5tCtH8GV0lO88v2N0jw4wiD
-         spLQ==
-X-Gm-Message-State: AOAM5335PLH1ghIyQUsBAiy3tqds+AexHNZ41CDyN4rEe4oSBPQDrBfF
-        TBa/Wpb823xKTmv6N7H/9HYUR0gU+bsoQVArrxWL09r1LXUd5w==
-X-Google-Smtp-Source: ABdhPJy/WGDDxbPKC2HIp7fXUegT+1wuCSlr5P16Jw6nm8KsVFBFBDkL/3X1D0H4uFJHAHcFfhD2yd69XdAmPiwwxa8=
-X-Received: by 2002:a25:42c5:: with SMTP id p188mr24595258yba.154.1643554973588;
- Sun, 30 Jan 2022 07:02:53 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4oxw2yftup4zTZyREEGsuh0pigZ/icP5H9RySVtwFBQ=;
+        b=6uAw0Vl2t5jjrU4m6f69vMY9a1eg/BPbhwHD+j/1/r7CHskc5f/lDbOyMld2XrC53m
+         Ab6zzjh7FDbHB6KSpw/bKbYeRuHPWVuQ7VKkgmuJApGRavbgD9k91f6KsxOnwUnC1Qva
+         SfE8xsFiTntqDszUEETp9Gooh6re8tZ0gLuQPv4L0dsh0Zi+eKWggRcf3KsLvYvdCAFd
+         ZjB2Gg1mng3ai8oWkaK34/J4iYSAOM/wo9h2D/t2FSwIEN8bPtG3Po84xz+GyF639UJS
+         /8SYN3udWbA3SoFSinjYMAPYdMtBn7imiwUfV+mEgpjCxFA8PvW2YUIatL4JNPejHsoS
+         8JRg==
+X-Gm-Message-State: AOAM531TvTieNXmnCwBW6V4dyJqMD5mqDjWNLTr5G9J9M2qA4gp9Nvht
+        qIky4M7OfulKdvWJ5JW1biTUXzyJXUCityky
+X-Google-Smtp-Source: ABdhPJz7Bwr8mWNMds0MsdqjK3kbd2owfecuEXeolrd0kWbSL4s6SSTcy5KLHGPhqboHZJy0lmPGsw==
+X-Received: by 2002:a05:651c:1287:: with SMTP id 7mr13144673ljc.143.1643641171509;
+        Mon, 31 Jan 2022 06:59:31 -0800 (PST)
+Received: from [192.168.1.11] ([94.103.224.201])
+        by smtp.gmail.com with ESMTPSA id u12sm3146643lfl.188.2022.01.31.06.59.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 31 Jan 2022 06:59:31 -0800 (PST)
+Message-ID: <ec9ac627-e49b-f668-a434-c1a5173c04db@gmail.com>
+Date:   Mon, 31 Jan 2022 17:59:30 +0300
 MIME-Version: 1.0
-From:   Kai Krakow <kai@kaishome.de>
-Date:   Sun, 30 Jan 2022 16:02:43 +0100
-Message-ID: <CAC2ZOYu4zy0CPTW40qy3vJJDFuWEUvqqPJdMgtKL9=7Xh-YVEA@mail.gmail.com>
-Subject: kernel 5.15.17: Spamming dmesg with "Malicious advertising data"
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: kernel 5.15.17: Spamming dmesg with "Malicious advertising data"
+Content-Language: en-US
+To:     Kai Krakow <kai@kaishome.de>, linux-bluetooth@vger.kernel.org
+References: <CAC2ZOYu4zy0CPTW40qy3vJJDFuWEUvqqPJdMgtKL9=7Xh-YVEA@mail.gmail.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <CAC2ZOYu4zy0CPTW40qy3vJJDFuWEUvqqPJdMgtKL9=7Xh-YVEA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello!
+Hi Kai,
 
-Since kernel 5.15.17, dmesg is spammed with the following log,
-sometimes multiple times per second:
+On 1/30/22 18:02, Kai Krakow wrote:
+> Hello!
+> 
+> Since kernel 5.15.17, dmesg is spammed with the following log,
+> sometimes multiple times per second:
+> 
+>> Bluetooth: hci0: Malicious advertising data. Stopping processing
 
-> Bluetooth: hci0: Malicious advertising data. Stopping processing
+Thanks for the report.
 
-This was probably introduced by commit 2de0e6a71ceb056e17e4684dce8b7640367996f9.
-
-I'm not sure which device causes it, and it seems quite useless to
-repeat this message without any rate limiting, especially when no
-source of the incident is indicated.
-
-I'm suspecting that something is messed up here, and there's not
-really any malicious advertising going on. At least, there's a lot of
-LE advertising going on but that looks sane:
-
-```
-> HCI Event: LE Meta Event (0x3e) plen 40                                                                                                                                                                                                  #63 [hci0] 3.466120
-     LE Advertising Report (0x02)
-       Num reports: 1
-       Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-       Address type: Public (0x00)
-       Address: F8:04:2E:8A:20:C1 (SAMSUNG ELECTRO-MECHANICS(THAILAND))
-       Data length: 28
-       Company: Samsung Electronics Co. Ltd. (117)
-         Data: 42040180aef8042e8a20c1fa042e8a20c001000000000000
-       RSSI: -68 dBm (0xbc)
-> HCI Event: LE Meta Event (0x3e) plen 40                                                                                                                                                                                                  #64 [hci0] 3.469127
-     LE Advertising Report (0x02)
-       Num reports: 1
-       Event type: Connectable undirected - ADV_IND (0x00)
-       Address type: Public (0x00)
-       Address: 74:AC:B9:41:D2:23 (Ubiquiti Networks Inc.)
-       Data length: 28
-       128-bit Service UUIDs (partial): 1 entry
-         Vendor specific
-       Service Data (UUID 0x252a): 74acb941d21c
-       RSSI: -37 dBm (0xdb)
-> HCI Event: LE Meta Event (0x3e) plen 40                                                                                                                                                                                                  #65 [hci0] 3.540118
-     LE Advertising Report (0x02)
-       Num reports: 1
-       Event type: Scannable undirected - ADV_SCAN_IND (0x02)
-       Address type: Random (0x01)
-       Address: 53:F3:43:9B:9D:13 (Resolvable)
-       Data length: 28
-       16-bit Service UUIDs (complete): 1 entry
-         Google (0xfe9f)
-       Service Data (UUID 0xfe9f): 0000000000000000000000000000000000000000
-       RSSI: -70 dBm (0xba)
-> HCI Event: LE Meta Event (0x3e) plen 40                                                                                                                                                                                                  #66 [hci0] 3.596124
-     LE Advertising Report (0x02)
-       Num reports: 1
-       Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-       Address type: Public (0x00)
-       Address: 68:72:C3:A0:AA:75 (Samsung Electronics Co.,Ltd)
-       Data length: 28
-       Company: Samsung Electronics Co. Ltd. (117)
-         Data: 420401806e6872c3a0aa756a72c3a0aa7401000000000000
-       RSSI: -55 dBm (0xc9)
-```
-
-System info:
-
-> Linux jupiter 5.15.17-gentoo #1 SMP PREEMPT Sat Jan 29 07:32:24 CET 2022 x86_64 12th Gen Intel(R) Core(TM) i7-12700K GenuineIntel GNU/Linux
-> Bluetooth monitor ver 5.63
-> = Note: Linux version 5.15.17-gentoo (x86_64)                          0.256208
-> = Note: Bluetooth subsystem version 2.22                               0.256210
-> = New Index: 00:1A:7D:DA:71:15 (Primary,USB,hci0)               [hci0] 0.256211
-> = Open Index: 00:1A:7D:DA:71:15                                 [hci0] 0.256212
-> = Index Info: 00:1A:7D:DA:71:15 (Cambridge Silicon Radio)       [hci0] 0.256212
-> @ MGMT Open: bluetoothd (privileged) version 1.21             {0x0001} 0.256213
+It's caused by one of my patches. Can you, please, try [1] and see if it 
+works for you. It looks like we just need to backport that patch to fix 
+the problem in stable kernels.
 
 
-Regards,
-Kai
+I am sorry for these false-positive messages :(
+
+
+[1] 
+https://lore.kernel.org/linux-bluetooth/20211124201628.405647-1-brian.gix@intel.com/ 
+
+
+
+
+With regards,
+Pavel Skripkin
