@@ -2,123 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B5FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jan 2022 21:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BBEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jan 2022 21:28:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351155AbiAaVKI (ORCPT
+        id S1381041AbiAaV2H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Jan 2022 16:10:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44750 "EHLO
+        Mon, 31 Jan 2022 16:28:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379546AbiAaVJg (ORCPT
+        with ESMTP id S240178AbiAaV2G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Jan 2022 16:09:36 -0500
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18EEC06173D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:09:36 -0800 (PST)
-Received: by mail-ot1-x335.google.com with SMTP id g15-20020a9d6b0f000000b005a062b0dc12so14278919otp.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:09:36 -0800 (PST)
+        Mon, 31 Jan 2022 16:28:06 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E59C2C061714
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:28:05 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id c6so44712615ybk.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:28:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=R2J1Ic99L4kJYedsJXrEgCrliQJoVvf0Uyk+RpIbJhY=;
-        b=x3JUyezWAlIg+y5F+JzfMKEzkgG3ebuawRWuQqyDJKI8eF2tGaaqd8ju+tuF/rPdpZ
-         c9k0eO42P3gj3+kUhBqopEeXOHZGc8qKBL4iL7645Wx3W7bxVfwDA549n+r/y0sDHAsy
-         9xzNLpaRgDMEN81zZ3PgBpq1HeJssyD6sHp+54a8ubAtWcP6jcS5bz6hvO1kNDyXHgwi
-         C1k+7z8Qp3ZFYNIWL87uu7J5rnGcl5r8rb01gmr6Jj8MHZDNf+AMZqzGgSazo98GJClT
-         8lXZ7okU/H48WqrIYQS5br+Zdf/OeZKVHPJRweb31j+ZpVdyGw1N0LnweTAbsgXcTsHj
-         NL6Q==
+        d=kaishome.de; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=injGKBnT7tO8fADGfs4rEBmFAbO+OqDdJAgAndDkFN4=;
+        b=GRzs0rC5mSHsooh9FvY7eG2YuUwLoz8ckvayrEMd1CkIZ5n9Bf85YsQoBWrDRfYCtT
+         SlfHZ/2n5eZDBHms7AKp+heR8ketvKUE6XbzVBLBE0p7FCCGLsyHlP5ML31gDkPuYDN5
+         vCgciboBT5wyAHs1uWefTng6nx63fb3O45e3E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=R2J1Ic99L4kJYedsJXrEgCrliQJoVvf0Uyk+RpIbJhY=;
-        b=XMlhBOehh+BOaQDmElA9mY/73UbDqVqrP5Sh2F/N/JEpyxxUWUcOA1SmjkRzjetEGf
-         HIF+6PeR8kIBh9euOJNCxLerq9UEF+nA8wsoMAo2noL3nxWutTETXqq8lQbBnu/wGP1Z
-         F/JeNKKlJnFVvqcVa4nOx/LcuCUsiXx/Xmodo95QqYwSdhIrylrAStAxFre91SkwtFLM
-         Oh8XboX6bfOUjtcmeN8BaDPPxZS51EZdSsFCO9Jdt2vof8MA61B3ZQ4aKdkTWDPYKcI6
-         HxdAAbSSFwFsEwvyVxZgy+fQ4zfLMC1nxG87P3p0xPD5GWsT9uLLsj8ofDWGgD7SxX+r
-         ofwQ==
-X-Gm-Message-State: AOAM531JlSkNpUr5+SWPs2wCGHN9XLZe4oXLAZnNW4N0h+C+VhaaHJ+i
-        IFC1H7AGYd4hdWMevTGtx7zRQw==
-X-Google-Smtp-Source: ABdhPJyVFD8oHW/uorkeLcojJx2NTLLfghdS2U03XJEiCrDFgMRXuzVtD7N2LRvDzdV4fP/NIBAhBA==
-X-Received: by 2002:a9d:4d08:: with SMTP id n8mr12338398otf.16.1643663375866;
-        Mon, 31 Jan 2022 13:09:35 -0800 (PST)
-Received: from ripper ([2600:1700:a0:3dc8:205:1bff:fec0:b9b3])
-        by smtp.gmail.com with ESMTPSA id d7sm8815529otf.66.2022.01.31.13.09.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 31 Jan 2022 13:09:35 -0800 (PST)
-Date:   Mon, 31 Jan 2022 13:09:55 -0800
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Miao-chen Chou <mcchou@chromium.org>
-Cc:     Doug Anderson <dianders@chromium.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>, rjliao@codeaurora.org,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        saluvala@codeaurora.org, LKML <linux-kernel@vger.kernel.org>,
-        hbandi@codeaurora.org, BlueZ <linux-bluetooth@vger.kernel.org>,
-        hemantg@codeaurora.org, Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on
- SC7280 IDP boards
-Message-ID: <YfhQIyzBhvl6C0H+@ripper>
-References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
- <164036941060.3935440.13095761506560620701.b4-ty@linaro.org>
- <CAD=FV=Vdjw-6GytO=Rpt==OYbnrNon3pYQnrZtUT4vX11S6ykw@mail.gmail.com>
- <CABmPvSGOLRKX20WO21P_qvtvDo812QGDr4nYOWE04pjoSGDGcw@mail.gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=injGKBnT7tO8fADGfs4rEBmFAbO+OqDdJAgAndDkFN4=;
+        b=Ykz4VdK4mlDJePOILqWrGTF+9hsqef1MoYMf0LTnVqFbc07RGBrqOhE6ovKTtGrhDN
+         Psww4qHlAY6GkSN94ykJ7HwvtdHMY7EEHAfbsmlrDK30Lcxp6lEmV0ThrkZ6sMu48pRw
+         zFOLeqBAl7bF+eBFBKXd/u8KYhOmCqI3cs6bsgkSZQYO6tXhXAbc8uVU38iVOG5sxMTE
+         8H4Oy8lThkFTcU9EsVAK4KWwv9cE4n00Qy2LYZ2vLGmXvM3qXprTTxkHTOBVRRwI45Ru
+         bYWCdz3WLOy/TIh067XcfIBiU7KYNGmIjU0RBB6Qys/1thHsGDBq/MOgYQtGM1jFuCSk
+         kd3A==
+X-Gm-Message-State: AOAM531cFzsp+k5wic7p5XzZFJDUBNWu8SASHALyLuFJsNBruK7G9rVn
+        lCRwgIvditUJ/Qh8H11hyAttrnclwvDFH/2Bfvvd/1EHSO0=
+X-Google-Smtp-Source: ABdhPJxglNpt2A5cis0fLayN6xyXuTK7yClzkHs+DapD0wAD0nTkbahjHJUiY3KLNVYQIWdf7Y5quklHg2bCxskAGHs=
+X-Received: by 2002:a25:7454:: with SMTP id p81mr30254071ybc.725.1643664485171;
+ Mon, 31 Jan 2022 13:28:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABmPvSGOLRKX20WO21P_qvtvDo812QGDr4nYOWE04pjoSGDGcw@mail.gmail.com>
+References: <CAC2ZOYu4zy0CPTW40qy3vJJDFuWEUvqqPJdMgtKL9=7Xh-YVEA@mail.gmail.com>
+ <ec9ac627-e49b-f668-a434-c1a5173c04db@gmail.com>
+In-Reply-To: <ec9ac627-e49b-f668-a434-c1a5173c04db@gmail.com>
+From:   Kai Krakow <kai@kaishome.de>
+Date:   Mon, 31 Jan 2022 22:27:54 +0100
+Message-ID: <CAC2ZOYuXg4btk9PaE3whmP7JnntsixEvDuBNvv7GL1pvU1nepQ@mail.gmail.com>
+Subject: Re: kernel 5.15.17: Spamming dmesg with "Malicious advertising data"
+To:     Pavel Skripkin <paskripkin@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon 24 Jan 20:49 PST 2022, Miao-chen Chou wrote:
+Hey Pavel!
 
-> Hi,
-> 
-> Following up on this patch, this patch didn't seem to land anywhere,
-> what is the plan to land this?
-> 
+Am Mo., 31. Jan. 2022 um 15:59 Uhr schrieb Pavel Skripkin
+<paskripkin@gmail.com>:
+>
+> Hi Kai,
+>
+> On 1/30/22 18:02, Kai Krakow wrote:
+> > Hello!
+> >
+> > Since kernel 5.15.17, dmesg is spammed with the following log,
+> > sometimes multiple times per second:
+> >
+> >> Bluetooth: hci0: Malicious advertising data. Stopping processing
+>
+> Thanks for the report.
+>
+> It's caused by one of my patches. Can you, please, try [1] and see if it
+> works for you. It looks like we just need to backport that patch to fix
+> the problem in stable kernels.
 
-I picked it up after sending my 5.17 pull request, so it had to wait for
-the merge window to close. So it's part of the 5.18 branch and hence
-linux-next now. But please double check.
+I can confirm it's fixing the issue for 5.15.18, thanks. You can add
+my Tested-by.
 
 
-Note that the thank-you email included the commit hash before I rebased
-the 5.18 tree onto v5.17-rc1, so the correct hash seems to be:
+> I am sorry for these false-positive messages :(
 
-1ff6797c326b ("arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 IDP boards")
+NP
+
+
+> [1]
+> https://lore.kernel.org/linux-bluetooth/20211124201628.405647-1-brian.gix@intel.com/
 
 Regards,
-Bjorn
-
-> Thanks,
-> Miao
-> 
-> On Thu, Jan 13, 2022 at 3:59 PM Doug Anderson <dianders@chromium.org> wrote:
-> >
-> > Hi,
-> >
-> > On Fri, Dec 24, 2021 at 10:10 AM Bjorn Andersson
-> > <bjorn.andersson@linaro.org> wrote:
-> > >
-> > > On Wed, 15 Dec 2021 22:36:03 +0530, Balakrishna Godavarthi wrote:
-> > > > Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
-> > > >
-> > > >
-> > >
-> > > Applied, thanks!
-> > >
-> > > [1/1] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 IDP boards
-> > >       commit: 3a89ff3087c03c2295250c07234efa75873c7b51
-> >
-> > Just to confirm, this later got dropped, right? I don't see it in the
-> > Qualcomm git tree, so presumably it'll land once the merge window
-> > closes.
-> >
-> > -Doug
+Kai
