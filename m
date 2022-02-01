@@ -2,104 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A567C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 17:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD3AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 18:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241631AbiBARnJ (ORCPT
+        id S241795AbiBASPN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Feb 2022 12:43:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40617 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241614AbiBARnJ (ORCPT
+        Tue, 1 Feb 2022 13:15:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241850AbiBASNN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Feb 2022 12:43:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1643737388;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=3/onK8AnDtL53ai739ibWRR8ijRtGmfoRrTuaxLarqk=;
-        b=ex7hzx4IdASk55opdkuKEiKZLFRjsVKndlaYWHizS/beNfVy2fdVtLobK6pHOZvDjqYcrx
-        q7nfIYJDrRSqu2JrU9vi03AzgR8zdAUztSfc33IolaPiB4uafifJB6vpmNLDoiN31w8nt2
-        F2LJ+ZTF2c9GduL1gHJm428P1aah3g4=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-269-nbE7Q2x8Pb-HmicPntwa9Q-1; Tue, 01 Feb 2022 12:43:08 -0500
-X-MC-Unique: nbE7Q2x8Pb-HmicPntwa9Q-1
-Received: by mail-qk1-f200.google.com with SMTP id i26-20020a05620a075a00b0047ec29823c0so12704990qki.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 09:43:07 -0800 (PST)
+        Tue, 1 Feb 2022 13:13:13 -0500
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD1AC06175C
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 10:12:54 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id e16so15157598qtq.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 10:12:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=KviW0KHmpr8TZlndOcYAoc0tmEB2Ni+0NoMD9fuvDk4=;
+        b=l+g5GhpFYOMSxmNTzZQbYAUdV2U4zOUPZP2PeVuM06Z0pzw64DiXkxqG9YB902+yWw
+         QeRv2mcJFXWLl9qV2EQM52p8C3BFqElPGWF8ZicVVCzJm2gZPF8LMVFt5TH3EUaHua7a
+         PLHK7v9zDFGAFICE8yxMG0dZm7cnx5/NTDjxX16VjUWMIP9FHiToxMz+8F72plkFsi1C
+         goq1bi+kyb7kUR8nG0vGzNcEyvEn5VR5kwerxyQmqDplDOMD/7ieYgQ1pbcoD0pqFyWO
+         GPtDuFg0ja7vt0uxB8uSxcxirtAoU86QGO7/xAM8OwDHniBn+0TrQzPr/KdB/jT1J4af
+         WbJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3/onK8AnDtL53ai739ibWRR8ijRtGmfoRrTuaxLarqk=;
-        b=K9ZK0Ml0Z346GjY+lKCo6K6xlMxFliw0FQvKeX0nQUeFnKoQZTkFKdO9S41W/cwj74
-         qY1s63AJQE5nUAnrcX4Qvf7i+tEaACYWFbT1srAhekaNmRT2Jp3Rgf70TmRdz9qVmfO+
-         H9Hq5EPBI/pPhH+xQv/MYHnG2DU3vSrGETWkOsA3VS13+T0bWNaY8JuxS361xE2hlw/u
-         oITgJn5X6yl8C7rZqogIdbZyFJvuw/uFQX7VFKBTdCoWRz9JvRYO9b8c08Wfob7uAvhk
-         N+DhkH37HdmJ/vB7zxx71Sf9E1KpyTHfShHl4KGJBEzZxLg4RzpBEcjI9UWGT/d7f6jz
-         Lu4g==
-X-Gm-Message-State: AOAM5315zIGC8lfiYd3aaWePTF33RurEyInZGSCt0+G5szsPjZpaS4lG
-        V7BIvU1I1xoLNLItW1DCBlLcD21Se2Iff/RfQqYrju9TcxuNkE2Y3ZIwj5ntcGa8/tncqQG9TRW
-        FrwOf1YLF5xidL/X/misBp2gyLUN0
-X-Received: by 2002:a05:622a:44b:: with SMTP id o11mr10694447qtx.507.1643737387527;
-        Tue, 01 Feb 2022 09:43:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyADtOcufdtCgzPuWfrUXmKa/HFQ+qhMTdmjjxzdXxSj8ZJqSx+dyiOnLYrEWaALkPWKiqX+g==
-X-Received: by 2002:a05:622a:44b:: with SMTP id o11mr10694429qtx.507.1643737387313;
-        Tue, 01 Feb 2022 09:43:07 -0800 (PST)
-Received: from localhost.localdomain.com (024-205-208-113.res.spectrum.com. [24.205.208.113])
-        by smtp.gmail.com with ESMTPSA id d17sm11962845qkn.84.2022.02.01.09.43.05
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=KviW0KHmpr8TZlndOcYAoc0tmEB2Ni+0NoMD9fuvDk4=;
+        b=Oy2Yazuf3knB0R1MwFWDPvPXs2zl01Myc6qT0zTgAeSZBysCPRpwy7IhIfSSazG5Ir
+         L9kUuMu5Rbl/m0qKuF7LdehyhfQGbHeltwaub9j7m7l9uYVs7DQQdrif/JrTeB3KA33J
+         m0c98kpKJu3CcsfiEi2lam00oZolX0iPn8MB80Jcfl71Kvf58iVj0ZislzLz7sCSvCHC
+         V+jaC1seAtGbDfKcWEYUMIDIdn7zrqBhBGbx/oZOTuvG2DxBW2zRPAiny5Jazk75NVGP
+         OHnoLa8ERx0GLTO0be2FhkIFspx7lUPC976yzat0mjFloa2HxpkQHGN5WuKGV91PVSH6
+         kcxA==
+X-Gm-Message-State: AOAM5332UwezYEGErt/eVBb/poB+0ZGnl/rtm3Forut2OOG3qWf7LoT+
+        EV9CPUb1AbQHLUoHWAHwYDkTNMZnDzkezQ==
+X-Google-Smtp-Source: ABdhPJzov2BejG5noWjcPjImUuNw+Y7fH3NW+UdH8yt09YWBh5uF9kyaJrVo/NUfSRPyqRVLVt6+fg==
+X-Received: by 2002:ac8:5ac8:: with SMTP id d8mr14305590qtd.280.1643739173934;
+        Tue, 01 Feb 2022 10:12:53 -0800 (PST)
+Received: from [172.17.0.2] ([40.117.76.138])
+        by smtp.gmail.com with ESMTPSA id f20sm3757415qtf.39.2022.02.01.10.12.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 09:43:06 -0800 (PST)
-From:   trix@redhat.com
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, kuba@kernel.org, nathan@kernel.org,
-        ndesaulniers@google.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH] Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
-Date:   Tue,  1 Feb 2022 09:42:56 -0800
-Message-Id: <20220201174256.1690515-1-trix@redhat.com>
-X-Mailer: git-send-email 2.26.3
+        Tue, 01 Feb 2022 10:12:53 -0800 (PST)
+Message-ID: <61f97825.1c69fb81.739a8.15a8@mx.google.com>
+Date:   Tue, 01 Feb 2022 10:12:53 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============8352371845963031253=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, trix@redhat.com
+Subject: RE: Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220201174256.1690515-1-trix@redhat.com>
+References: <20220201174256.1690515-1-trix@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tom Rix <trix@redhat.com>
+--===============8352371845963031253==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-clang static analysis reports this problem
-hci_sync.c:4428:2: warning: Undefined or garbage value
-  returned to caller
-        return err;
-        ^~~~~~~~~~
+This is automated email and please do not reply to this email!
 
-If there are no connections this function is a noop but
-err is never set and a false error could be reported.
-Return 0 as other hci_* functions do.
+Dear submitter,
 
-Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
-Signed-off-by: Tom Rix <trix@redhat.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=610424
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.70 seconds
+GitLint                       PASS      1.03 seconds
+SubjectPrefix                 PASS      0.85 seconds
+BuildKernel                   PASS      37.44 seconds
+BuildKernel32                 PASS      32.39 seconds
+Incremental Build with patchesPASS      44.16 seconds
+TestRunner: Setup             PASS      604.98 seconds
+TestRunner: l2cap-tester      PASS      16.73 seconds
+TestRunner: bnep-tester       PASS      7.82 seconds
+TestRunner: mgmt-tester       PASS      129.30 seconds
+TestRunner: rfcomm-tester     PASS      9.40 seconds
+TestRunner: sco-tester        PASS      9.86 seconds
+TestRunner: smp-tester        PASS      9.72 seconds
+TestRunner: userchan-tester   PASS      8.10 seconds
+
+
+
 ---
- net/bluetooth/hci_sync.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 6e71aa6b6feae..9327737da6003 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4425,7 +4425,7 @@ static int hci_disconnect_all_sync(struct hci_dev *hdev, u8 reason)
- 			return err;
- 	}
- 
--	return err;
-+	return 0;
- }
- 
- /* This function perform power off HCI command sequence as follows:
--- 
-2.26.3
 
+--===============8352371845963031253==--
