@@ -2,58 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D775CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 20:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E89DCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 20:36:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234863AbiBAU0B (ORCPT
+        id S239550AbiBAUgz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Feb 2022 15:26:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52194 "EHLO
+        Tue, 1 Feb 2022 15:36:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbiBAU0A (ORCPT
+        with ESMTP id S229702AbiBAUgy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Feb 2022 15:26:00 -0500
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9351EC061714
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 12:26:00 -0800 (PST)
-Received: by mail-yb1-xb2a.google.com with SMTP id g14so54459305ybs.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 12:26:00 -0800 (PST)
+        Tue, 1 Feb 2022 15:36:54 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ACC2C061714;
+        Tue,  1 Feb 2022 12:36:54 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id m6so54537987ybc.9;
+        Tue, 01 Feb 2022 12:36:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=7ni7CaQfiByhpeDAPvCzGDS1O0zrjXfsGxopP/Ey7Bo=;
-        b=PQOzpt6lyNt2smfkCAwJTtDELyGAhchoPSCSUk/nwUBiJA44ORsXTMNGsSPJBJJwgz
-         a5VhxDqTb/UBdDd3D9tuDjuUQi9ZukcQ2NLev6GOxHSoH9FkTuO4PnMHMYty5rOLOKfH
-         JdIDIbEW/LhNH/IVUKplivIzf+Y7MCQaAyKCH8RuufBXon60a7CX0Y09fmgXVndNb9NF
-         otVioYk+Cei0TqFS7SrOmXibJGao0r431zLRM7FbvwllMPGfgbbqkmSQOSh8ko8L7X0q
-         +Hs1rOWByE5cwNFBd5WHVw0h6ZBXENLxYxHyg935nrpIX0TF/wPrO9wOZKS2+lrFWz5o
-         9LHw==
+        bh=rZxEgavNJow8Wx0FFzJL3BlfXa9k3Uaoz0LEpPT/Na8=;
+        b=W9m3HNwIynnZZuxdZJrhkpLAffoabuD+cuHhvdadf1SwtuL77onC69MyYQy796bar0
+         jU3Bv+9nxwMtNkVIr5bqLwFshq64m12LXIyrjgzeG3Zqa0QxnaUwHtOzYZkLmEpZNCzl
+         0or7HwUhawHHRvrYnUf2GQrqe95a/XHnh1sApPrUAUIhVlayB7YTGxKPhoTbDvoS7OAZ
+         M73YEVxYQ+KQlRZ2rUD5+vrSOfB4RUXDs9EMXi4poMoAPp3imExY+sNvD+jFlZLq62uq
+         HaFbcGZ16HbzopdgYglvZXj6w9KBmFH7Q26IyNkXQD18/47o4ms1p7tCFtxmcCuPv5VZ
+         z9GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=7ni7CaQfiByhpeDAPvCzGDS1O0zrjXfsGxopP/Ey7Bo=;
-        b=dhek8QQxVpncZIQCUWFbdg8rashwPdz/4xp+S0KpRXu5hBK7g7Q1wB25+rptA8xWNA
-         RKFKfKShr+OvtiphCueJWeaZXXwv2MPCLfTHmljdl9RJ3CXccwlKPI3Ux23OSORk7PCs
-         reX/BaAwA83Pbw2GR1PziG+cbxsTxSP5ohlSUfirahBEZy39gT7N+FV+Isj2QJth8/FN
-         f5Z+4kkSAryzh0u/rSut6bn0RUGAL7tIqAELnbSOQo+NwtlH3k6XNkb827TRN956v/Cu
-         HpaR3yhS/+178Y63abwda8ppd5lC4T3NNhqVw48qRgUy8yY2ZqFrOR6Mpak9jRV2sJ6V
-         X8OQ==
-X-Gm-Message-State: AOAM532q+TgS6ayVDJmODmCxNkS7ERDg6+fP9xt9T10AXOpAVXIZQV2G
-        yj1fIhkEo6651Sin4SFww6KQESqIa2/kRf3zp1iU6JRpfQQ=
-X-Google-Smtp-Source: ABdhPJy7Re0q1TayBWITuT3zEw3W1WGWqHCgeLIXt8nTtRw6RCpmKCl+pxxoVRLh2/lWxwJ8hr++elUL1cD1DmJmLs8=
-X-Received: by 2002:a25:2c8b:: with SMTP id s133mr37787333ybs.188.1643747159652;
- Tue, 01 Feb 2022 12:25:59 -0800 (PST)
+        bh=rZxEgavNJow8Wx0FFzJL3BlfXa9k3Uaoz0LEpPT/Na8=;
+        b=leT28kk34LRBLV0UyVvYw04CWKtOL2jnikPPE09DdJl36K/RHzZQO1dM4ZEBAnU2QZ
+         RyUJdYER7GAZE1RFv3Q4ztl1r+HKRdVm1Vyk57Yev23ZRWP6qSA0TQhgtKpX0eDWrf2I
+         eS+0Wpbw1a8Bh2a4Y/ju7Cg+FIWv8WW4mUnJrAXfgGwUvN6T/ZrE3DlvNy9nBXLRbTMC
+         FzwWrM9T18SaeMPnvknLKVen8cu4GMKsYARWU8qVYmga99GmZG6x2Rcl7o3B5GiuZf+P
+         BbG8Bm35/vxLNp42NdTN/F9Lqf4d9t3XApI2NKZtdxfdaHdA7R9hbLpXec2vVqn1waml
+         rM6g==
+X-Gm-Message-State: AOAM531lNqJBZJU2g6Hmdn8y9hxJIKMhrU9gdfTbdacRMCY5J7VSm9/o
+        N3VsY3ji0aHnptXyHn8MQg1YqX5RuIBqIcr/dq8=
+X-Google-Smtp-Source: ABdhPJwpJcz7TCycL5dQTokUujprw8bBkzQUm61YUsFx7YYCZYK3oX3Sr+XLfQO/W39IuT6ugFxe7azVa8JS0WET0LE=
+X-Received: by 2002:a05:6902:725:: with SMTP id l5mr38545588ybt.351.1643747813529;
+ Tue, 01 Feb 2022 12:36:53 -0800 (PST)
 MIME-Version: 1.0
-References: <20220121013508.950175-1-deng.changcheng@zte.com.cn> <61ea12e9.1c69fb81.9022a.12a0@mx.google.com>
-In-Reply-To: <61ea12e9.1c69fb81.9022a.12a0@mx.google.com>
+References: <20220118075033.925388-1-chi.minghao@zte.com.cn> <91565226-5134-45FC-A68F-0E98854227AC@holtmann.org>
+In-Reply-To: <91565226-5134-45FC-A68F-0E98854227AC@holtmann.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 1 Feb 2022 12:25:49 -0800
-Message-ID: <CABBYNZL7Ad_xYG4qabiBm264EaVsrzX8gB2wehBGLy71OHVG_w@mail.gmail.com>
-Subject: Re: bluetooth: mgmt: Replace zero-length array with flexible-array member
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     cgel.zte@gmail.com
+Date:   Tue, 1 Feb 2022 12:36:43 -0800
+Message-ID: <CABBYNZJh4yx+VAhU+KpeTid+4Reojp2OfDRQYjKXsoPmnKeZLg@mail.gmail.com>
+Subject: Re: [PATCH] net/bluetooth: remove unneeded err variable
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     cgel.zte@gmail.com, Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -61,74 +68,52 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Fri, Jan 21, 2022 at 4:29 PM <bluez.test.bot@gmail.com> wrote:
+On Wed, Jan 19, 2022 at 11:34 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
-> This is automated email and please do not reply to this email!
+> Hi Minghao,
 >
-> Dear submitter,
+> > Return value from mgmt_cmd_complete() directly instead
+> > of taking this in another redundant variable.
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=607119
+> the Bluetooth subsystem uses Bluetooth: as subject prefix.
 >
-> ---Test result---
+> > Reported-by: Zeal Robot <zealci@zte.com.cn>
+> > Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
+> > Signed-off-by: CGEL ZTE <cgel.zte@gmail.com>
+> > ---
+> > net/bluetooth/mgmt.c | 5 +----
+> > 1 file changed, 1 insertion(+), 4 deletions(-)
+> >
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index 37087cf7dc5a..d0804648da32 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -8601,7 +8601,6 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
+> >       struct mgmt_cp_get_adv_size_info *cp = data;
+> >       struct mgmt_rp_get_adv_size_info rp;
+> >       u32 flags, supported_flags;
+> > -     int err;
+> >
+> >       bt_dev_dbg(hdev, "sock %p", sk);
+> >
+> > @@ -8628,10 +8627,8 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
+> >       rp.max_adv_data_len = tlv_data_max_len(hdev, flags, true);
+> >       rp.max_scan_rsp_len = tlv_data_max_len(hdev, flags, false);
+> >
+> > -     err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_ADV_SIZE_INFO,
+> > +     return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_ADV_SIZE_INFO,
+> >                               MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
+> > -
+> > -     return err;
+> > }
 >
-> Test Summary:
-> CheckPatch                    FAIL      1.61 seconds
-> GitLint                       FAIL      0.96 seconds
-> SubjectPrefix                 FAIL      0.87 seconds
-> BuildKernel                   PASS      30.32 seconds
-> BuildKernel32                 PASS      26.97 seconds
-> Incremental Build with patchesPASS      36.33 seconds
-> TestRunner: Setup             PASS      472.13 seconds
-> TestRunner: l2cap-tester      PASS      13.23 seconds
-> TestRunner: bnep-tester       PASS      6.01 seconds
-> TestRunner: mgmt-tester       PASS      103.93 seconds
-> TestRunner: rfcomm-tester     PASS      7.33 seconds
-> TestRunner: sco-tester        PASS      7.60 seconds
-> TestRunner: smp-tester        PASS      7.47 seconds
-> TestRunner: userchan-tester   PASS      6.25 seconds
+> You also have a coding style error here in your indentation.
 >
-> Details
-> ##############################
-> Test: CheckPatch - FAIL - 1.61 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
-> bluetooth: mgmt: Replace zero-length array with flexible-array member\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-> #88:
-> https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays
+> Regards
 >
-> total: 0 errors, 1 warnings, 8 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12719219.patch has style problems, please review.
->
-> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: GitLint - FAIL - 0.96 seconds
-> Run gitlint with rule in .gitlint
-> bluetooth: mgmt: Replace zero-length array with flexible-array member
-> 10: B1 Line exceeds max length (97>80): "https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays"
->
->
-> ##############################
-> Test: SubjectPrefix - FAIL - 0.87 seconds
-> Check subject contains "Bluetooth" prefix
-> "Bluetooth: " is not specified in the subject
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+> Marcel
 
-Applied, thanks.
+Applied, after fixing the coding style and commit message, thanks.
 
 -- 
 Luiz Augusto von Dentz
