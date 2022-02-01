@@ -2,103 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA2EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 20:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB9FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 20:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239922AbiBAUMo (ORCPT
+        id S231887AbiBAUZK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Feb 2022 15:12:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49116 "EHLO
+        Tue, 1 Feb 2022 15:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239796AbiBAUMm (ORCPT
+        with ESMTP id S229793AbiBAUZI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Feb 2022 15:12:42 -0500
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1264C06173D
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 12:12:41 -0800 (PST)
-Received: by mail-wm1-x331.google.com with SMTP id k6-20020a05600c1c8600b003524656034cso2413449wms.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 12:12:41 -0800 (PST)
+        Tue, 1 Feb 2022 15:25:08 -0500
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB46C061714;
+        Tue,  1 Feb 2022 12:25:08 -0800 (PST)
+Received: by mail-yb1-xb2b.google.com with SMTP id c19so25738562ybf.2;
+        Tue, 01 Feb 2022 12:25:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=semihalf-com.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=pfoJSqUJqsGCmKEC9ZJtPKmunb6j3CTpdimjTdrcI9o=;
-        b=gN7la6WhB9fX25f5iMq/3MKNU4VegMYZ39NVSVxDhCib2Un+Bwdv/sgWFQ5KZTbYmy
-         Fmxwsft1nMA0qcdwtdcmJGb9Ott5WRCUl5koJ6DbfmbuXRSW769LYS4vu7UJMy1J+Ke3
-         dmFVBB4Vz9uYo3o+KYgF3YwHtXdHAVK0Dhwgebyng1UHIEf4NE4QW5TSwrDiCFfpGkCZ
-         hihBFzjNyfMPXIUsOfyKD47gmrngwdqW9w4SS9xbrUw8sYX7iISLbvwBhvtoewP3F0Kj
-         F+mNxgBXa8ZQGBRIvH1ybKiD73/1cdqhBnqqVWd/UM8J75OX93XtqNmeDEerPdMFYWEf
-         colw==
+         :cc;
+        bh=NQxBh7W6WQoopd/1GYZljiEFB/ShqPgFHLn5gnNvn8Y=;
+        b=eef4eipwpvsL3TFJxxFdmb4L8ZoICrM8iScWq6tOGrxMFYvddvijvxioe1BqimVZjF
+         zTxsmOqEWVCWAY9+ljLnftiZEr3qB6atVvG5B6HoLzXW9gcPBgXLSQxYllXa0qwvFBJ2
+         3Bgbwo3aF32NYbRzzZ7Twm7RLSpxWMSDOoFAVz01CTJbYtAb03oXc6CiMms5Sv/eX+4X
+         vO/IBz1JFEcwD+l02ewZnypRgup2+Va27nOIN8/FplZmyMtqy1nrLlz/p0nyRsphwJrK
+         29YI3Ovhcvrh6GkZKwLJLrKxMsb0WTfUzfk6shVmqBJfWny8lYNQkGC3sGqeXvNcRUv0
+         9abA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=pfoJSqUJqsGCmKEC9ZJtPKmunb6j3CTpdimjTdrcI9o=;
-        b=6AnQ+DCu4Pi+3k7/Wzxy4Tm1eaOEKfXd6B1qnMJewtdh8HSnXBjEwvLE9Vec/13DOY
-         CZCP0B+C50R0QReao4Fhi3EDyKVCwk4TtK3B4jrq8G8gNu7GYpu9Wi5CbExIgiJoH2sl
-         VMFBsInQqU/ThD6BUaluMCmpSiaxTAIzcWu9ziowhVJB+oxbd+/dlH5Q2Ku1mQ9mQMtV
-         Url3qg3jIxzweXe9NUfbIhpJjO3ATzJLnlS6bUuDADtGi3MPYh/PLpxDlN4+2TwihgRk
-         ohheQ189djB0161OFImx8TNVKmhNSaPw7H8smyfINjLb1Jq9Vt+QJUcuPbQ5eylXqHGm
-         ZIIw==
-X-Gm-Message-State: AOAM530mXgriK4qE1z40z/0Jhs3CJqLQZ2fzNgPr0FodTBLlI3LBioZL
-        oUiOJ2XS6KrebKYZRonCB5kKwQFwIyWhvW9OJAM0oWP2YDeK8A==
-X-Google-Smtp-Source: ABdhPJwsX1hsMHtqAEpTGOi5lnfcq0WkcArcwt29wPYYWJEgU9sEACiPWvPCksdPKfCIWLUkXL18m2Soth++TljycTU=
-X-Received: by 2002:a7b:c759:: with SMTP id w25mr3175443wmk.10.1643746360413;
- Tue, 01 Feb 2022 12:12:40 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=NQxBh7W6WQoopd/1GYZljiEFB/ShqPgFHLn5gnNvn8Y=;
+        b=F+SEbEloE90L80+VA3g0o5g2a1f4db0JABHAkBBzNJIsyyEqYQApOoo17hJ47RFvBR
+         DZ/zmnJYLTxDs6DQ5LzDMWly0MvRUaEOJwm2r0dUyV5EpBEcoav+zf3FMjMheVwMwaRL
+         mPva5QQ6Mk5s/GPJtgSxcovs8tSdW8XFZ+Z333IqU2NKeIgCow0Z3qSzLM9VNQyPTTke
+         jMbhlzw/0QhanZY9F6TVUXEi3aUub5m424hE7BcPvX6/vc9DoT+UJCvUJLIBNOPPLQXe
+         uzbulDG9KZnp2WQzYv9aUDaR8a4IsSkWHG1IYTRd6xC9homSqz2iOJIxrbw2aXWgdo8P
+         VDUQ==
+X-Gm-Message-State: AOAM5308wqNOZjk2sk9Ei0VG9biwLJdvp47ICzCOwFSleS1XiJsaLBrL
+        kZ2Hly6HzdGaNHSr9Xs94PIr1KTkD8S2cz9WVhg=
+X-Google-Smtp-Source: ABdhPJzc9Eqbhc8KooDpwUj/fmwXhyfk2NIiX2gE3LH5W4yJw1W0sv5950Z38giEOj+JUOPs3+zTNJgZcQX4aHD/gUo=
+X-Received: by 2002:a25:cccb:: with SMTP id l194mr37620366ybf.752.1643747107364;
+ Tue, 01 Feb 2022 12:25:07 -0800 (PST)
 MIME-Version: 1.0
-References: <20220201200353.1331443-1-rad@semihalf.ocm>
-In-Reply-To: <20220201200353.1331443-1-rad@semihalf.ocm>
-From:   =?UTF-8?Q?Rados=C5=82aw_Biernacki?= <rad@semihalf.com>
-Date:   Tue, 1 Feb 2022 21:12:32 +0100
-Message-ID: <CAOs-w0LmVOS-UMSmebeB9XzU_WVCortUrvJVA4Ek3jk18_7WVQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] Bluetooth: Fix skb handling in net/bluetooth/mgmt.c
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
+References: <20220201174256.1690515-1-trix@redhat.com>
+In-Reply-To: <20220201174256.1690515-1-trix@redhat.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 1 Feb 2022 12:24:56 -0800
+Message-ID: <CABBYNZJx0Yye2f7ZE7d0WeZ6QQTQGUDHhqeobWZHE3PZGmG72A@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
+To:     trix@redhat.com
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, nathan@kernel.org,
+        ndesaulniers@google.com,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        upstream@semihalf.com, Angela Czubak <acz@semihalf.com>,
-        Marek Maslanka <mm@semihalf.com>,
-        Radoslaw Biernacki <rad@semihalf.ocm>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        llvm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hey, please ignore this one as I made a typo in the domain name :|
+Hi Tom,
 
-wt., 1 lut 2022 o 21:03 Radoslaw Biernacki <rad@semihalf.com> napisa=C5=82(=
-a):
+On Tue, Feb 1, 2022 at 9:43 AM <trix@redhat.com> wrote:
 >
-> Here is second version of the fix for skb handling in net/bluetooth/mgmt.=
-c
-> First patch is fixing the skb allocation which theoretically might push s=
-kb
-> tail beyond its end.
-> Second patch simplifies operations on eir while using skb.
-> Patches adds two helper functions to eir.h to align to the goal of
-> eliminating the necessity of intermediary buffers, which can be achieved
-> with additional changes done in this spirit.
+> From: Tom Rix <trix@redhat.com>
 >
-> v1->v2:
->  - fix mgmt_device_connected()
->  - add eir_skb_put_data() - function for skb handing with eir
+> clang static analysis reports this problem
+> hci_sync.c:4428:2: warning: Undefined or garbage value
+>   returned to caller
+>         return err;
+>         ^~~~~~~~~~
 >
-> Radoslaw Biernacki (2):
->   Bluetooth: Fix skb allocation in mgmt_remote_name() &
->     mgmt_device_connected()
->   Bluetooth: Improve skb handling in mgmt_device_connected()
+> If there are no connections this function is a noop but
+> err is never set and a false error could be reported.
+> Return 0 as other hci_* functions do.
 >
->  net/bluetooth/eir.h  | 20 ++++++++++++++++++++
->  net/bluetooth/mgmt.c | 43 ++++++++++++++++---------------------------
->  2 files changed, 36 insertions(+), 27 deletions(-)
+> Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+> Signed-off-by: Tom Rix <trix@redhat.com>
+> ---
+>  net/bluetooth/hci_sync.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 6e71aa6b6feae..9327737da6003 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -4425,7 +4425,7 @@ static int hci_disconnect_all_sync(struct hci_dev *hdev, u8 reason)
+>                         return err;
+>         }
+>
+> -       return err;
+> +       return 0;
+>  }
+>
+>  /* This function perform power off HCI command sequence as follows:
 > --
-> 2.35.0.rc2.247.g8bbb082509-goog
->
+> 2.26.3
+
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
