@@ -2,53 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBA3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 09:32:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F472C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 12:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235994AbiBAJc6 (ORCPT
+        id S238144AbiBAMsd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Feb 2022 04:32:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235894AbiBAJcz (ORCPT
+        Tue, 1 Feb 2022 07:48:33 -0500
+Received: from maury.uberspace.de ([185.26.156.175]:60890 "EHLO
+        maury.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231538AbiBAMsc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Feb 2022 04:32:55 -0500
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CBEC061714
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 01:32:54 -0800 (PST)
-Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id ED4F21BF212;
-        Tue,  1 Feb 2022 09:32:52 +0000 (UTC)
-Message-ID: <de2e9b1426587214fcb1b28bb3bec265fd8f9044.camel@hadess.net>
-Subject: Re: [PATCH 1/4] build: Always define confdir and statedir
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Tue, 01 Feb 2022 10:32:52 +0100
-In-Reply-To: <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
-References: <20220126113638.1706785-1-hadess@hadess.net>
-         <78f77f0268ce1b4818c0a0749d3371b825fa1c92.camel@hadess.net>
-         <390473B8-2187-4C84-B319-9D4A8FB6ED0A@holtmann.org>
-         <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+        Tue, 1 Feb 2022 07:48:32 -0500
+Received: (qmail 12855 invoked by uid 990); 1 Feb 2022 12:41:50 -0000
+Authentication-Results: maury.uberspace.de;
+        auth=pass (plain)
+From:   Joern Koerner <joern.koerner@ijwo.de>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Joern Koerner <joern.koerner@ijwo.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add support for Edup BT5.1 Class1 Adapter (RTL8761B)
+Date:   Tue,  1 Feb 2022 13:41:34 +0100
+Message-Id: <20220201124134.806135-1-joern.koerner@ijwo.de>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: ++
+X-Rspamd-Report: R_MISSING_CHARSET(0.5) MIME_GOOD(-0.1) MID_CONTAINS_FROM(1) SUSPICIOUS_RECIPS(1.5)
+X-Rspamd-Score: 2.9
+Received: from unknown (HELO unkown) (::1)
+        by maury.uberspace.de (Haraka/2.8.28) with ESMTPSA; Tue, 01 Feb 2022 13:41:50 +0100
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 2022-01-26 at 14:45 +0100, Bastien Nocera wrote:
-> This change specifically? Check the next patches in the series, and
-> you'll see pretty quickly.
-> 
-> For the rest of the patchset, check this man page for details on each
-> of the directives:
-> https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Security
-> 
-> There's a fair amount of other directives we could use on top of
-> those
-> ones, but we can add them iteratively (and it makes bisecting easier,
-> in case we forget about a particular use case).
+$ cat /sys/kernel/debug/usb/devices. T:  Bus=02 Lev=02
+ Prnt=02 Port=00 Cnt=01 Dev#=  7 Spd=12   MxCh= 0 D:  Ver= 1.10 Cls=e0(wlcon)
+ Sub=01 Prot=01 MxPS=64 #Cfgs=  1 P:  Vendor=2550 ProdID=8761 Rev= 2.00 S: 
+ Manufacturer=Realtek S:  Product=Bluetooth Radio S: 
+ SerialNumber=00E04C239987 C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA I:* If#= 0
+ Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=81(I)
+ Atr=03(Int.) MxPS=  16 Ivl=1ms E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms E:
+  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms I:* If#= 1 Alt= 0 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=   0
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms I:  If#= 1 Alt= 1 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=   9
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms I:  If#= 1 Alt= 2 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=  17
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms I:  If#= 1 Alt= 3 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=  25
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms I:  If#= 1 Alt= 4 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=  33
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms I:  If#= 1 Alt= 5 #EPs= 2
+ Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb E:  Ad=03(O) Atr=01(Isoc) MxPS=  49
+ Ivl=1ms E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Did you have any more questions about this patchset?
+Signed-off-by: Joern Koerner <joern.koerner@ijwo.de>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ea72afb7abea..ba467663b79a 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -477,6 +477,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* Additional Realtek 8761B Bluetooth devices */
+ 	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 
+ 	/* Additional Realtek 8761BU Bluetooth devices */
+ 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+-- 
+2.35.1
+
