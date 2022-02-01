@@ -2,93 +2,53 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93BBEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Jan 2022 21:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CBA3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 09:32:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381041AbiAaV2H (ORCPT
+        id S235994AbiBAJc6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Jan 2022 16:28:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
+        Tue, 1 Feb 2022 04:32:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240178AbiAaV2G (ORCPT
+        with ESMTP id S235894AbiBAJcz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Jan 2022 16:28:06 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E59C2C061714
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:28:05 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id c6so44712615ybk.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Jan 2022 13:28:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kaishome.de; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=injGKBnT7tO8fADGfs4rEBmFAbO+OqDdJAgAndDkFN4=;
-        b=GRzs0rC5mSHsooh9FvY7eG2YuUwLoz8ckvayrEMd1CkIZ5n9Bf85YsQoBWrDRfYCtT
-         SlfHZ/2n5eZDBHms7AKp+heR8ketvKUE6XbzVBLBE0p7FCCGLsyHlP5ML31gDkPuYDN5
-         vCgciboBT5wyAHs1uWefTng6nx63fb3O45e3E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=injGKBnT7tO8fADGfs4rEBmFAbO+OqDdJAgAndDkFN4=;
-        b=Ykz4VdK4mlDJePOILqWrGTF+9hsqef1MoYMf0LTnVqFbc07RGBrqOhE6ovKTtGrhDN
-         Psww4qHlAY6GkSN94ykJ7HwvtdHMY7EEHAfbsmlrDK30Lcxp6lEmV0ThrkZ6sMu48pRw
-         zFOLeqBAl7bF+eBFBKXd/u8KYhOmCqI3cs6bsgkSZQYO6tXhXAbc8uVU38iVOG5sxMTE
-         8H4Oy8lThkFTcU9EsVAK4KWwv9cE4n00Qy2LYZ2vLGmXvM3qXprTTxkHTOBVRRwI45Ru
-         bYWCdz3WLOy/TIh067XcfIBiU7KYNGmIjU0RBB6Qys/1thHsGDBq/MOgYQtGM1jFuCSk
-         kd3A==
-X-Gm-Message-State: AOAM531cFzsp+k5wic7p5XzZFJDUBNWu8SASHALyLuFJsNBruK7G9rVn
-        lCRwgIvditUJ/Qh8H11hyAttrnclwvDFH/2Bfvvd/1EHSO0=
-X-Google-Smtp-Source: ABdhPJxglNpt2A5cis0fLayN6xyXuTK7yClzkHs+DapD0wAD0nTkbahjHJUiY3KLNVYQIWdf7Y5quklHg2bCxskAGHs=
-X-Received: by 2002:a25:7454:: with SMTP id p81mr30254071ybc.725.1643664485171;
- Mon, 31 Jan 2022 13:28:05 -0800 (PST)
-MIME-Version: 1.0
-References: <CAC2ZOYu4zy0CPTW40qy3vJJDFuWEUvqqPJdMgtKL9=7Xh-YVEA@mail.gmail.com>
- <ec9ac627-e49b-f668-a434-c1a5173c04db@gmail.com>
-In-Reply-To: <ec9ac627-e49b-f668-a434-c1a5173c04db@gmail.com>
-From:   Kai Krakow <kai@kaishome.de>
-Date:   Mon, 31 Jan 2022 22:27:54 +0100
-Message-ID: <CAC2ZOYuXg4btk9PaE3whmP7JnntsixEvDuBNvv7GL1pvU1nepQ@mail.gmail.com>
-Subject: Re: kernel 5.15.17: Spamming dmesg with "Malicious advertising data"
-To:     Pavel Skripkin <paskripkin@gmail.com>
+        Tue, 1 Feb 2022 04:32:55 -0500
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6CBEC061714
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 01:32:54 -0800 (PST)
+Received: (Authenticated sender: hadess@hadess.net)
+        by mail.gandi.net (Postfix) with ESMTPSA id ED4F21BF212;
+        Tue,  1 Feb 2022 09:32:52 +0000 (UTC)
+Message-ID: <de2e9b1426587214fcb1b28bb3bec265fd8f9044.camel@hadess.net>
+Subject: Re: [PATCH 1/4] build: Always define confdir and statedir
+From:   Bastien Nocera <hadess@hadess.net>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth@vger.kernel.org
+Date:   Tue, 01 Feb 2022 10:32:52 +0100
+In-Reply-To: <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
+References: <20220126113638.1706785-1-hadess@hadess.net>
+         <78f77f0268ce1b4818c0a0749d3371b825fa1c92.camel@hadess.net>
+         <390473B8-2187-4C84-B319-9D4A8FB6ED0A@holtmann.org>
+         <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.3 (3.42.3-1.fc35) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hey Pavel!
+On Wed, 2022-01-26 at 14:45 +0100, Bastien Nocera wrote:
+> This change specifically? Check the next patches in the series, and
+> you'll see pretty quickly.
+> 
+> For the rest of the patchset, check this man page for details on each
+> of the directives:
+> https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Security
+> 
+> There's a fair amount of other directives we could use on top of
+> those
+> ones, but we can add them iteratively (and it makes bisecting easier,
+> in case we forget about a particular use case).
 
-Am Mo., 31. Jan. 2022 um 15:59 Uhr schrieb Pavel Skripkin
-<paskripkin@gmail.com>:
->
-> Hi Kai,
->
-> On 1/30/22 18:02, Kai Krakow wrote:
-> > Hello!
-> >
-> > Since kernel 5.15.17, dmesg is spammed with the following log,
-> > sometimes multiple times per second:
-> >
-> >> Bluetooth: hci0: Malicious advertising data. Stopping processing
->
-> Thanks for the report.
->
-> It's caused by one of my patches. Can you, please, try [1] and see if it
-> works for you. It looks like we just need to backport that patch to fix
-> the problem in stable kernels.
-
-I can confirm it's fixing the issue for 5.15.18, thanks. You can add
-my Tested-by.
-
-
-> I am sorry for these false-positive messages :(
-
-NP
-
-
-> [1]
-> https://lore.kernel.org/linux-bluetooth/20211124201628.405647-1-brian.gix@intel.com/
-
-Regards,
-Kai
+Did you have any more questions about this patchset?
