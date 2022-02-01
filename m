@@ -2,103 +2,223 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD3AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 18:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F39C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Feb 2022 18:37:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241795AbiBASPN (ORCPT
+        id S241963AbiBAShB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Feb 2022 13:15:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
+        Tue, 1 Feb 2022 13:37:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241850AbiBASNN (ORCPT
+        with ESMTP id S241919AbiBAShA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Feb 2022 13:13:13 -0500
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD1AC06175C
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 10:12:54 -0800 (PST)
-Received: by mail-qt1-x835.google.com with SMTP id e16so15157598qtq.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 10:12:54 -0800 (PST)
+        Tue, 1 Feb 2022 13:37:00 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2765DC06173B
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Feb 2022 10:37:00 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id l25so33649790wrb.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Feb 2022 10:37:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=KviW0KHmpr8TZlndOcYAoc0tmEB2Ni+0NoMD9fuvDk4=;
-        b=l+g5GhpFYOMSxmNTzZQbYAUdV2U4zOUPZP2PeVuM06Z0pzw64DiXkxqG9YB902+yWw
-         QeRv2mcJFXWLl9qV2EQM52p8C3BFqElPGWF8ZicVVCzJm2gZPF8LMVFt5TH3EUaHua7a
-         PLHK7v9zDFGAFICE8yxMG0dZm7cnx5/NTDjxX16VjUWMIP9FHiToxMz+8F72plkFsi1C
-         goq1bi+kyb7kUR8nG0vGzNcEyvEn5VR5kwerxyQmqDplDOMD/7ieYgQ1pbcoD0pqFyWO
-         GPtDuFg0ja7vt0uxB8uSxcxirtAoU86QGO7/xAM8OwDHniBn+0TrQzPr/KdB/jT1J4af
-         WbJw==
+        d=semihalf-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=DI1x5+Wihj4SQ70P5LSVw+8H1DmmobNWAEhS7drOCTA=;
+        b=FODfQEB3+VrZ5tKcYc+CWcrD2hHYrFmADtl0dJMx5xXMl9RKo6eBF3lT/Sow792Z+Q
+         f8ZlSAACHtERHUoXHY1d2ecJjnB8wS/Q87qex3WylrZWuf1L4j5yHLHcNxaZVAyB4VVm
+         P6FiTB21uMDQPGS7O92SNJ6SXBTeFUVskTYpP0zcPV0blQxwnVptj7/dNOH+EaoFnNyr
+         79N8tEK+nSLcBIrjROxswMd5MknwJm5re8cehiZwo0Cio2Ty4Q3RhaQEMfGuLH5IXJQ/
+         riAlhibal7ZCvPd9Yc+vYrN969ElkfpTQPUZNpDBsSUk+pVx4QIFxvJsMjxH9C2pVKn5
+         FY9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=KviW0KHmpr8TZlndOcYAoc0tmEB2Ni+0NoMD9fuvDk4=;
-        b=Oy2Yazuf3knB0R1MwFWDPvPXs2zl01Myc6qT0zTgAeSZBysCPRpwy7IhIfSSazG5Ir
-         L9kUuMu5Rbl/m0qKuF7LdehyhfQGbHeltwaub9j7m7l9uYVs7DQQdrif/JrTeB3KA33J
-         m0c98kpKJu3CcsfiEi2lam00oZolX0iPn8MB80Jcfl71Kvf58iVj0ZislzLz7sCSvCHC
-         V+jaC1seAtGbDfKcWEYUMIDIdn7zrqBhBGbx/oZOTuvG2DxBW2zRPAiny5Jazk75NVGP
-         OHnoLa8ERx0GLTO0be2FhkIFspx7lUPC976yzat0mjFloa2HxpkQHGN5WuKGV91PVSH6
-         kcxA==
-X-Gm-Message-State: AOAM5332UwezYEGErt/eVBb/poB+0ZGnl/rtm3Forut2OOG3qWf7LoT+
-        EV9CPUb1AbQHLUoHWAHwYDkTNMZnDzkezQ==
-X-Google-Smtp-Source: ABdhPJzov2BejG5noWjcPjImUuNw+Y7fH3NW+UdH8yt09YWBh5uF9kyaJrVo/NUfSRPyqRVLVt6+fg==
-X-Received: by 2002:ac8:5ac8:: with SMTP id d8mr14305590qtd.280.1643739173934;
-        Tue, 01 Feb 2022 10:12:53 -0800 (PST)
-Received: from [172.17.0.2] ([40.117.76.138])
-        by smtp.gmail.com with ESMTPSA id f20sm3757415qtf.39.2022.02.01.10.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Feb 2022 10:12:53 -0800 (PST)
-Message-ID: <61f97825.1c69fb81.739a8.15a8@mx.google.com>
-Date:   Tue, 01 Feb 2022 10:12:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8352371845963031253=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=DI1x5+Wihj4SQ70P5LSVw+8H1DmmobNWAEhS7drOCTA=;
+        b=EQFsnrVfs6a+t7ODUseBav5qFchNkdE3S61951C2dYaD6bSBGGRXDkhXqmX3Ib4Hb2
+         Ldjl2h83jKUsBItQF1Noen/PJRb9NhH1yeShNWJRcmM+f/ONPZ9m0KtQPgL4p7XsRgKN
+         10MyGQKERLA/mUICxbEdTF46pgAeXlIMfp3R29JRQMTgoKNWyHtBFXQKZrmKyIdb5UcW
+         EUDJoYFxZVo0L4JEOuRlLR/en2c837d1wLb/uErHCNYPCgJXtFRj44GY1s6+cUzlsFIr
+         rWKbqkfIVd5H2Wxs3q8zZf7TfWNQk5XQez4vRqKz9OpoQZ1AwdH+NlgY/Lek9yvBefHL
+         pA/A==
+X-Gm-Message-State: AOAM530XXF5onASNLK2N9+LPEkBD6HrZIgey12ZZZ8gJJqnzX4fgvybR
+        8S081MavO4Od60YeiHavODZMd2Lj62cSjMj2XyJgZA==
+X-Google-Smtp-Source: ABdhPJykR69e7xynNf/2GwFt8xXKISZXw11Lu8sKsZOzgS4SZNut8V2WY0EwKSIQS5tWWaFjpg+UUAKzXkbQfOnBvCs=
+X-Received: by 2002:adf:f1c7:: with SMTP id z7mr13384515wro.198.1643740618703;
+ Tue, 01 Feb 2022 10:36:58 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, trix@redhat.com
-Subject: RE: Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220201174256.1690515-1-trix@redhat.com>
-References: <20220201174256.1690515-1-trix@redhat.com>
+References: <20220113150846.1570738-1-rad@semihalf.ocm> <CABBYNZJn1ej18ERtgnF_wvbvBEm0N=cBRHHtr8bu+nfAotjg2Q@mail.gmail.com>
+ <CAOs-w0+W_BHTdZkOnu-EPme2dpoO_6bQi_2LRH7Xw0Ge=i9TOA@mail.gmail.com>
+ <CABBYNZLinzOxJWgHwVbeEWe2zkz_y4BrXVYX4e0op580YO1OeA@mail.gmail.com> <CABBYNZL3ozczAK2mWXVd+x2NtZhaAbfnUFoA3ot1AQLNHSeL5w@mail.gmail.com>
+In-Reply-To: <CABBYNZL3ozczAK2mWXVd+x2NtZhaAbfnUFoA3ot1AQLNHSeL5w@mail.gmail.com>
+From:   =?UTF-8?Q?Rados=C5=82aw_Biernacki?= <rad@semihalf.com>
+Date:   Tue, 1 Feb 2022 19:36:50 +0100
+Message-ID: <CAOs-w0+T1Dcwsx-dy28v_6RxyQZidFoxOBts4++j8h5N5sY6mA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix skb allocation in mgmt_remote_name()
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        upstream@semihalf.com, Angela Czubak <acz@semihalf.com>,
+        Marek Maslanka <mm@semihalf.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8352371845963031253==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hey Luiz.
+Sorry for keeping you waiting. I will send it today.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=610424
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.70 seconds
-GitLint                       PASS      1.03 seconds
-SubjectPrefix                 PASS      0.85 seconds
-BuildKernel                   PASS      37.44 seconds
-BuildKernel32                 PASS      32.39 seconds
-Incremental Build with patchesPASS      44.16 seconds
-TestRunner: Setup             PASS      604.98 seconds
-TestRunner: l2cap-tester      PASS      16.73 seconds
-TestRunner: bnep-tester       PASS      7.82 seconds
-TestRunner: mgmt-tester       PASS      129.30 seconds
-TestRunner: rfcomm-tester     PASS      9.40 seconds
-TestRunner: sco-tester        PASS      9.86 seconds
-TestRunner: smp-tester        PASS      9.72 seconds
-TestRunner: userchan-tester   PASS      8.10 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8352371845963031253==--
+pon., 31 sty 2022 o 19:47 Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> napisa=C5=82(a):
+>
+> Hi Rados=C5=82aw,
+>
+> On Thu, Jan 13, 2022 at 2:23 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Rados=C5=82aw,
+> >
+> > On Thu, Jan 13, 2022 at 2:07 PM Rados=C5=82aw Biernacki <rad@semihalf.c=
+om> wrote:
+> > >
+> > > Hi Luiz,
+> > >
+> > > czw., 13 sty 2022 o 17:17 Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> napisa=C5=82(a):
+> > > >
+> > > > Hi Radoslaw,
+> > > >
+> > > > On Thu, Jan 13, 2022 at 7:09 AM Radoslaw Biernacki <rad@semihalf.co=
+m> wrote:
+> > > > >
+> > > > > From: Radoslaw Biernacki <rad@semihalf.com>
+> > > > >
+> > > > > This patch fixes skb allocation, as lack of space for ev might pu=
+sh skb
+> > > > > tail beyond its end.
+> > > > > Also introduce eir_precalc_len() that can be used instead of magi=
+c
+> > > > > numbers for similar eir operations on skb.
+> > > > >
+> > > > > Fixes: cf1bce1de7eeb ("Bluetooth: mgmt: Make use of mgmt_send_eve=
+nt_skb in MGMT_EV_DEVICE_FOUND")
+> > > > > Signed-off-by: Angela Czubak <acz@semihalf.com>
+> > > > > Signed-off-by: Marek Maslanka <mm@semihalf.com>
+> > > > > Signed-off-by: Radoslaw Biernacki <rad@semihalf.com>
+> > > > > ---
+> > > > >  net/bluetooth/eir.h  |  5 +++++
+> > > > >  net/bluetooth/mgmt.c | 12 ++++--------
+> > > > >  2 files changed, 9 insertions(+), 8 deletions(-)
+> > > > >
+> > > > > diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
+> > > > > index 05e2e917fc25..e5876751f07e 100644
+> > > > > --- a/net/bluetooth/eir.h
+> > > > > +++ b/net/bluetooth/eir.h
+> > > > > @@ -15,6 +15,11 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u=
+8 instance, u8 *ptr);
+> > > > >  u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_le=
+n);
+> > > > >  u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_le=
+n);
+> > > > >
+> > > > > +static inline u16 eir_precalc_len(u8 data_len)
+> > > > > +{
+> > > > > +       return sizeof(u8) * 2 + data_len;
+> > > > > +}
+> > > > > +
+> > > > >  static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type,
+> > > > >                                   u8 *data, u8 data_len)
+> > > > >  {
+> > > > > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > > > > index 37087cf7dc5a..d517fd847730 100644
+> > > > > --- a/net/bluetooth/mgmt.c
+> > > > > +++ b/net/bluetooth/mgmt.c
+> > > > > @@ -9680,13 +9680,11 @@ void mgmt_remote_name(struct hci_dev *hde=
+v, bdaddr_t *bdaddr, u8 link_type,
+> > > > >  {
+> > > > >         struct sk_buff *skb;
+> > > > >         struct mgmt_ev_device_found *ev;
+> > > > > -       u16 eir_len;
+> > > > > -       u32 flags;
+> > > > > +       u16 eir_len =3D 0;
+> > > > > +       u32 flags =3D 0;
+> > > > >
+> > > > > -       if (name_len)
+> > > > > -               skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND=
+, 2 + name_len);
+> > > > > -       else
+> > > > > -               skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND=
+, 0);
+> > > > > +       skb =3D mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND,
+> > > > > +                            sizeof(*ev) + (name ? eir_precalc_le=
+n(name_len) : 0));
+> > > >
+> > > > Looks like mgmt_device_connected also has a similar problem.
+> > >
+> > > Yes, I was planning to send a patch to this one though it will not be=
+ as slick.
+> > > It would be nice to have a helper which will call skb_put() and add
+> > > eir data at once.
+> > > Basically skb operation in pair to, what eir_append_data() does with
+> > > help of eir_len but without awkwardness when passing return value to
+> > > skb_put() (as it returns offset not size).
+> >
+> > Hmm, that might be a good idea indeed something like eir_append_skb,
+> > if only we could grow the skb with skb_put directly that would
+> > eliminate the problem with having to reserve enough space for the
+> > worse case.
+> >
+> > > I will send V2 with two patches. I hope they will align with your
+> > > original goal of eliminating the necessity of intermediary buffers at
+> > > some point in future.
+>
+> Are you still planning to send the v2?
+>
+> > > >
+> > > > >         ev =3D skb_put(skb, sizeof(*ev));
+> > > > >         bacpy(&ev->addr.bdaddr, bdaddr);
+> > > > > @@ -9696,10 +9694,8 @@ void mgmt_remote_name(struct hci_dev *hdev=
+, bdaddr_t *bdaddr, u8 link_type,
+> > > > >         if (name) {
+> > > > >                 eir_len =3D eir_append_data(ev->eir, 0, EIR_NAME_=
+COMPLETE, name,
+> > > > >                                           name_len);
+> > > > > -               flags =3D 0;
+> > > > >                 skb_put(skb, eir_len);
+> > > > >         } else {
+> > > > > -               eir_len =3D 0;
+> > > > >                 flags =3D MGMT_DEV_FOUND_NAME_REQUEST_FAILED;
+> > > > >         }
+> > > >
+> > > > These changes would leave flags and eir_len uninitialized.
+> > >
+> > > Both are initialized to 0 by this patch.
+> >
+> > Sorry, I must be blind that I didn't see you had changed that to be
+> > initialized in their declaration.
+> >
+> > > >
+> > > > > --
+> > > > > 2.34.1.703.g22d0c6ccf7-goog
+> > > > >
+> > > >
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
