@@ -2,118 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD84C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 22:48:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C66EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 23:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355879AbiBCWsb (ORCPT
+        id S1347868AbiBCXES (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Feb 2022 17:48:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33434 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355873AbiBCWsa (ORCPT
+        Thu, 3 Feb 2022 18:04:18 -0500
+Received: from relay08.th.seeweb.it ([5.144.164.169]:43593 "EHLO
+        relay08.th.seeweb.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233999AbiBCXER (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Feb 2022 17:48:30 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46703C06173D;
-        Thu,  3 Feb 2022 14:48:30 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id i62so5266838ioa.1;
-        Thu, 03 Feb 2022 14:48:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=NPWueLzrJFboH2nkL8a0Kt0j0fw6ZnAd3HPnO4FSgfI=;
-        b=nNf9+fu88OwLVGrq/dioOKFvP8s5k1wgcmIA0VUpL0g/hy3TXFhPHc3wyxof87N4DL
-         S9dL8n744p7DgMvaszLhpk9UVzZlvM5uJiSCAVoNXKxZRhHRCZ5usgYm+ADuK5wBJ7S+
-         ZoQ5hbKvmmwCIaIw1VDnkp23h88AIQsgGO3ay9gXodcD/FyRXW5eWSQ90mj7/VLn2pw3
-         +kJE5ubZEPHAr4k25BXA/C6+fQBvBdlewAVTX4AYxKrxeu25bhW/gpAK1IjjTJkq43AV
-         3qwzE/xtfapMQtuJxxyieb3Bv4dnGSY36SyNzXCnQqwQebVz2GG0UPbms3eFfpfeVZDe
-         Zj8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=NPWueLzrJFboH2nkL8a0Kt0j0fw6ZnAd3HPnO4FSgfI=;
-        b=T+7P1yUOKJOH3grwPntv8eRb+GSdk8oFsPAz915c083Ga8edww92z2mQBfAvFF6OXd
-         hBTvJl57/poULFw9gvJoolJN2TIDdBm8eMQsHbsBuFGHQyVAnCBAjGqxT0THfqKEYy+A
-         aoHki1mRVTq+yDSUTgFOJ0LcaEbpLsqJ6ncbY/OpiTNKb4uptyojaYKlw0UWqeSSx4Rb
-         I/xgd+0FmQCt70HaflyQNXE9YRJZiIGspuLyixMCm3oUoQvw8t1Ka32Xoq7H++1b51cV
-         DIusnwtzcaTprV2WRYDJdx5OMwd/DGXL+GiAPVjKxeX7DwqxcjaJPsDl+PxflteqI053
-         Dg0Q==
-X-Gm-Message-State: AOAM532IzcMknInscxo2gwISd9VL+/Ma8YSSHgzMiSjlii2QqW5Fmqep
-        3GUbeQjp0UFjs6Mv5M0rNu75p01dU6Y=
-X-Google-Smtp-Source: ABdhPJzLaSuHyHZqPOm0OepBhbWkNuI2kyqYoTEolXQTeVDEglvTAlTZmmCRq7UGOlLTNrZN6aVkfw==
-X-Received: by 2002:a02:6d5a:: with SMTP id e26mr77543jaf.262.1643928509716;
-        Thu, 03 Feb 2022 14:48:29 -0800 (PST)
-Received: from ?IPV6:2601:282:800:dc80:8870:ce19:2c7:3513? ([2601:282:800:dc80:8870:ce19:2c7:3513])
-        by smtp.googlemail.com with ESMTPSA id x14sm106528ilj.33.2022.02.03.14.48.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Feb 2022 14:48:29 -0800 (PST)
-Message-ID: <df19b376-49a3-1ef2-0664-a23a48e128dc@gmail.com>
-Date:   Thu, 3 Feb 2022 15:48:28 -0700
+        Thu, 3 Feb 2022 18:04:17 -0500
+Received: from SoMainline.org (94-209-165-62.cable.dynamic.v4.ziggo.nl [94.209.165.62])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by m-r2.th.seeweb.it (Postfix) with ESMTPSA id 915493F79B;
+        Fri,  4 Feb 2022 00:04:15 +0100 (CET)
+Date:   Fri, 4 Feb 2022 00:04:12 +0100
+From:   Marijn Suijten <marijn.suijten@somainline.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Claudio Takahasi <claudio.takahasi@gmail.com>,
+        igor.v.kovalenko@gmail.com
+Subject: Re: [BlueZ] advertising: Fix reporting advertising properties
+Message-ID: <20220203230412.dig2cu3vy2uzgsim@SoMainline.org>
+References: <20211215180527.886481-1-claudio.takahasi@gmail.com>
+ <61ba372b.1c69fb81.82f24.9d4f@mx.google.com>
+ <CABBYNZKBPuR-W1iko=rF=jLJw1pq05SKUDWr2+7LAvR0BJpwQA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.5.1
-Subject: Re: [PATCH net-next] net: don't include ndisc.h from ipv6.h
-Content-Language: en-US
-To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc:     netdev@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com,
-        andy@greyhouse.net, oliver@neukum.org, yoshfuji@linux-ipv6.org,
-        dsahern@kernel.org, alex.aring@gmail.com,
-        jukka.rissanen@linux.intel.com, stefan@datenfreihafen.org,
-        jk@codeconstruct.com.au, matt@codeconstruct.com.au,
-        linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-wpan@vger.kernel.org
-References: <20220203043457.2222388-1-kuba@kernel.org>
-From:   David Ahern <dsahern@gmail.com>
-In-Reply-To: <20220203043457.2222388-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZKBPuR-W1iko=rF=jLJw1pq05SKUDWr2+7LAvR0BJpwQA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2/2/22 9:34 PM, Jakub Kicinski wrote:
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index 082f30256f59..cda1f205f391 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -15,7 +15,6 @@
->  #include <linux/refcount.h>
->  #include <linux/jump_label_ratelimit.h>
->  #include <net/if_inet6.h>
-> -#include <net/ndisc.h>
->  #include <net/flow.h>
->  #include <net/flow_dissector.h>
->  #include <net/snmp.h>
-> diff --git a/include/net/ipv6_frag.h b/include/net/ipv6_frag.h
-> index 0a4779175a52..5052c66e22d2 100644
-> --- a/include/net/ipv6_frag.h
-> +++ b/include/net/ipv6_frag.h
-> @@ -1,6 +1,7 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  #ifndef _IPV6_FRAG_H
->  #define _IPV6_FRAG_H
-> +#include <linux/icmpv6.h>
->  #include <linux/kernel.h>
->  #include <net/addrconf.h>
->  #include <net/ipv6.h>
-> diff --git a/include/net/ndisc.h b/include/net/ndisc.h
-> index 53cb8de0e589..07d48bd6c0bd 100644
-> --- a/include/net/ndisc.h
-> +++ b/include/net/ndisc.h
-> @@ -71,7 +71,6 @@ do {								\
->  
->  struct ctl_table;
->  struct inet6_dev;
-> -struct net_device;
+Hi Claudio, Luiz,
 
-ndisc_parse_options references net_device. This part seems unrelated to
-the patch intent.
+On 2021-12-15 14:53:04, Luiz Augusto von Dentz wrote:
+> Hi Claudio,
+> 
+> On Wed, Dec 15, 2021 at 12:50 PM <bluez.test.bot@gmail.com> wrote:
+> >
+> > This is automated email and please do not reply to this email!
+> >
+> > Dear submitter,
+> >
+> > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=596151
+> >
+> > ---Test result---
+> >
+> > Test Summary:
+> > CheckPatch                    PASS      1.47 seconds
+> > GitLint                       PASS      0.99 seconds
+> > Prep - Setup ELL              PASS      49.04 seconds
+> > Build - Prep                  PASS      0.61 seconds
+> > Build - Configure             PASS      9.40 seconds
+> > Build - Make                  PASS      209.53 seconds
+> > Make Check                    PASS      9.37 seconds
+> > Make Distcheck                PASS      248.72 seconds
+> > Build w/ext ELL - Configure   PASS      9.46 seconds
+> > Build w/ext ELL - Make        PASS      198.40 seconds
+> > Incremental Build with patchesPASS      0.00 seconds
+> >
+> >
+> >
+> > ---
+> > Regards,
+> > Linux Bluetooth
+> 
+> Applied, thanks.
 
->  struct net_proto_family;
->  struct sk_buff;
->  struct prefix_info;
+This seems to at least partially back out of:
 
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=d36c45c55
 
+And as such, reintroduce the bug it fixed:
+
+https://bugzilla.redhat.com/show_bug.cgi?id=1534857
+https://bugs.archlinux.org/task/57464
+
+Me and two others in the pulseaudio IRC channel see this connection
+failure appear, and I've locally confirmed reverting this patch resolves
+the issue yet again.
+
+- Marijn
