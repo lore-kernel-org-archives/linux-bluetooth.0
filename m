@@ -2,101 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC1BC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 15:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF762C43217
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 15:14:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351701AbiBCPNb (ORCPT
+        id S1351739AbiBCPO6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Feb 2022 10:13:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39542 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351694AbiBCPN3 (ORCPT
+        Thu, 3 Feb 2022 10:14:58 -0500
+Received: from proxima.lasnet.de ([78.47.171.185]:53564 "EHLO
+        proxima.lasnet.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351698AbiBCPO4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Feb 2022 10:13:29 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63141C06173B
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Feb 2022 07:13:29 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id m7so2729117pjk.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Feb 2022 07:13:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=e8r/qPy4xiEC5v8Opo6Cug10Q5WgTRGOwx0c8CBSSII=;
-        b=EeFuNBtLOPJGnmyhw6gFlz4LmmLNk8ERzl/aO2qjggB+sqxAFlhtd5fB/ykIAOYlSe
-         28gnO/YqZDb+XWT5YcPMdl71t6brk16d3eR7sTnPrObgRDgcMjpmNZRpEemt3il8Y23j
-         +0OlrxR3nSeKdJOzRJeRwQCHxLhZUm4WPmhqyJcDhclioHR3hlijgFJxRiwIqHWd1p6J
-         XbPpesXRLgDv+z8YGtUNu506bWTsjIYErg920ceH/Zz/12VRRwN0bVit53Srs9lSZTet
-         LnlQgyFjKbER0CDivEFRdXpC1pe9cBM8GQBLwS+/L1x89Fksr/2Oh9MTYNYOKACw2aEA
-         DKVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=e8r/qPy4xiEC5v8Opo6Cug10Q5WgTRGOwx0c8CBSSII=;
-        b=jEgsLTjwA7+zXC5cOVWrpvTDqPdRo2Imjsjaei9JNVzdM4ryFSXR+Wszclg2hVzwqE
-         sc4hO1/4pSBLLSM4v62Vdpp6gXhzROLy1WJo2vUw9qwOnyr7L5W8320ITAuguGAtpxZ4
-         2w2XyhYmdEanxenYQSsRecYkzI4lHU1Rr+muI/msoLSLCjEewChmLtyur2royFuQpEpT
-         FUsACAr1OfpoChkgqkUMtYTjDONKVPSawvx+qhe2pWRLnyRY9kf0b64TMzoUMG0IJyMi
-         N7J7W0KBoY23jD5Mc90Y+Ki9C9f27Bn1/c1Rk9TAaKeD2B3K7Kh79W3uPJtPVoHsWK9W
-         udRQ==
-X-Gm-Message-State: AOAM532ZZl4+m7Xub48m9WChoutF6pkp6o4scqfpNWKlkYUTY++ncJpH
-        Gw0LNrQbgzpxUY3oaFtRO9AKWjFq7DfWlQ==
-X-Google-Smtp-Source: ABdhPJyYs4z+ZXWxQE5NxgOlUvlMm31ruz3MlKP9fl6vftaSfojmhysCZ0Dz0mtlwaR3Bt8MH5RxcA==
-X-Received: by 2002:a17:902:bf06:: with SMTP id bi6mr35964296plb.24.1643901208615;
-        Thu, 03 Feb 2022 07:13:28 -0800 (PST)
-Received: from [172.17.0.2] ([20.190.48.242])
-        by smtp.gmail.com with ESMTPSA id h18sm29925145pfh.51.2022.02.03.07.13.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Feb 2022 07:13:27 -0800 (PST)
-Message-ID: <61fbf117.1c69fb81.bc54f.d5b3@mx.google.com>
-Date:   Thu, 03 Feb 2022 07:13:27 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4216640843539718419=="
+        Thu, 3 Feb 2022 10:14:56 -0500
+Received: from [IPV6:2003:e9:d71f:7b00:83f0:ef29:ebc6:2fb7] (p200300e9d71f7b0083f0ef29ebc62fb7.dip0.t-ipconnect.de [IPv6:2003:e9:d71f:7b00:83f0:ef29:ebc6:2fb7])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 8C1E1C07BA;
+        Thu,  3 Feb 2022 16:14:51 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1643901291;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hnORKNBRjHpFsTO4HG8md0wUuEgPB5te4IcquTqbRF8=;
+        b=m+EZTLpsxJR5EkC1JiJuc3h5jEiw2V5tWNU3lR8f2+645w0581xZmli9qwHFBW+BtH9hst
+        F4F+B8iXNZIHZ1WPM88SPDB40DNFLIfogpkLMUYpWU+9MoDSWBvkYq24WME7jdjFjNM95w
+        gd6186kQa061jbaR6vtvRN0JxnT1ItpP/mi5fszi6xXo0asZ6Qd7Gmq/NNl+k5jWGtP6Jz
+        VOvkzpX81ytP4NSevp6qeFSZFG7ChxgEYWcaQd+YoWt5RIMxh2yh/LFMWhtncHCV2bGNvB
+        BCGjozch/k7BpW3MlhQ7Os0zySosKtDd6FD9Ra82iLjTQr4doTlzlRFy5X8juw==
+Message-ID: <e8dd1abc-6558-1269-3995-c8920a4e6000@datenfreihafen.org>
+Date:   Thu, 3 Feb 2022 16:14:50 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, michal.lowas-rzechonek@silvair.com
-Subject: RE: [BlueZ] mesh: Allow mesh-io to use dbus when initializing
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220203141234.710019-1-michal.lowas-rzechonek@silvair.com>
-References: <20220203141234.710019-1-michal.lowas-rzechonek@silvair.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH net-next] net: don't include ndisc.h from ipv6.h
+Content-Language: en-US
+To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc:     netdev@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com,
+        andy@greyhouse.net, oliver@neukum.org, yoshfuji@linux-ipv6.org,
+        dsahern@kernel.org, alex.aring@gmail.com,
+        jukka.rissanen@linux.intel.com, jk@codeconstruct.com.au,
+        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+References: <20220203043457.2222388-1-kuba@kernel.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <20220203043457.2222388-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4216640843539718419==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello.
 
-This is automated email and please do not reply to this email!
+On 03.02.22 05:34, Jakub Kicinski wrote:
+> Nothing in ipv6.h needs ndisc.h, drop it.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: j.vosburgh@gmail.com
+> CC: vfalico@gmail.com
+> CC: andy@greyhouse.net
+> CC: oliver@neukum.org
+> CC: yoshfuji@linux-ipv6.org
+> CC: dsahern@kernel.org
+> CC: alex.aring@gmail.com
+> CC: jukka.rissanen@linux.intel.com
+> CC: stefan@datenfreihafen.org
+> CC: jk@codeconstruct.com.au
+> CC: matt@codeconstruct.com.au
+> CC: linux-usb@vger.kernel.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: linux-wpan@vger.kernel.org
+> ---
+>   drivers/net/bonding/bond_alb.c | 1 +
+>   drivers/net/usb/cdc_mbim.c     | 1 +
+>   include/net/ipv6.h             | 1 -
+>   include/net/ipv6_frag.h        | 1 +
+>   include/net/ndisc.h            | 1 -
+>   net/6lowpan/core.c             | 1 +
+>   net/ieee802154/6lowpan/core.c  | 1 +
 
-Dear submitter,
+For ieee802154:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=611014
+Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.57 seconds
-GitLint                       PASS      0.37 seconds
-Prep - Setup ELL              PASS      41.12 seconds
-Build - Prep                  PASS      0.42 seconds
-Build - Configure             PASS      8.06 seconds
-Build - Make                  PASS      1205.09 seconds
-Make Check                    PASS      11.08 seconds
-Make Check w/Valgrind         PASS      405.96 seconds
-Make Distcheck                PASS      212.16 seconds
-Build w/ext ELL - Configure   PASS      7.76 seconds
-Build w/ext ELL - Make        PASS      1143.43 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4216640843539718419==--
+regards
+Stefan Schmidt
