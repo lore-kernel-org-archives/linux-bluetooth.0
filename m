@@ -2,219 +2,178 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C12EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 03:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1ADC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Feb 2022 04:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346775AbiBCD1l (ORCPT
+        id S1349290AbiBCEfH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Feb 2022 22:27:41 -0500
-Received: from mga12.intel.com ([192.55.52.136]:46737 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231626AbiBCD1l (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Feb 2022 22:27:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1643858861; x=1675394861;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=qy12Bf0gQ1OH2ECw2P9GQM/tEYmgu61+ixrhopyFWNM=;
-  b=DM+YwInpUNZHtnlp81pZYWvQkfqhcexhrlevGjU1wRFBA9eY5yH56v5G
-   UoND/CIVcoMaT0eiAidrd2tU1K+39afhAdID78S/Yipl3necVziaVwaYw
-   DraPg7vJRKXrr4QDVSpB5ZjnlJ//vHaB6kaa+6gwAaNPsMunUsdhB36s0
-   ECjgLJQUo1Uqqyjshp6orXLsBXOJ0ZXrotBnCW12oX+CGRJR7AdzkrxFY
-   yDt39IAOTi1+MbQi3bLmA2ndpzxg3ZUVJmKmQ1BUFNsfUebvqT6rYNIbl
-   vHsAiaK0hUu6+qELRT0ROLORG5fsC+/FywCG3jMvWXiIyHvZihPYmg8nA
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10246"; a="228036907"
-X-IronPort-AV: E=Sophos;i="5.88,338,1635231600"; 
-   d="scan'208";a="228036907"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2022 19:27:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,338,1635231600"; 
-   d="scan'208";a="583661698"
-Received: from lkp-server01.sh.intel.com (HELO 276f1b88eecb) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 02 Feb 2022 19:27:40 -0800
-Received: from kbuild by 276f1b88eecb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nFSmZ-000VVG-Mc; Thu, 03 Feb 2022 03:27:39 +0000
-Date:   Thu, 03 Feb 2022 11:27:10 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- a5dc88794406e8e900d4aedddf9818d5d59d3aac
-Message-ID: <61fb4b8e.lOYm+29445dRyWlm%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 2 Feb 2022 23:35:07 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:43546 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234031AbiBCEfG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Feb 2022 23:35:06 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 421096171A;
+        Thu,  3 Feb 2022 04:35:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF466C340EB;
+        Thu,  3 Feb 2022 04:35:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1643862905;
+        bh=J3CLrEhlOJTta1Pw3jPJy8ShYaMYmrnrd8RDIk5FRwo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=fvyM3BDZx7IvF54M0LuomhAxdaeJ4K/B9e22+q2MCMXmW/EGv6vVoJZPFbpl1JfBG
+         E4g962BMJoOUH2sxpE7C6o6MU1zsKg0ayvcsHr80CeCWNeQ0Cw4vWpk9o0DLaSv0xV
+         D0MEWabZYcspS+DlqPwH/pn4TrnrH+AESbJoP5gzFYmOrDD01oU1/HtLr8epCX+d6h
+         YNxK2pJ4Ut/W5ptFUBOm2u0KDrWpD9+ue5/2e28QZqXBHnxXqNfDvD4FJBGwFK+6OA
+         gDyf0+4HF19l81igmkOiQ8hLaTxuNuH91iSgVRI2qS2JxvcAo254QTtG7hwjh4I8HG
+         qcTTwHfkpUbrQ==
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     davem@davemloft.net
+Cc:     netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
+        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        stefan@datenfreihafen.org, jk@codeconstruct.com.au,
+        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+Subject: [PATCH net-next] net: don't include ndisc.h from ipv6.h
+Date:   Wed,  2 Feb 2022 20:34:57 -0800
+Message-Id: <20220203043457.2222388-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: a5dc88794406e8e900d4aedddf9818d5d59d3aac  Bluetooth: btusb: Add support for Intel Madison Peak (MsP2) device
+Nothing in ipv6.h needs ndisc.h, drop it.
 
-elapsed time: 725m
-
-configs tested: 145
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20220131
-powerpc              randconfig-c003-20220131
-i386                          randconfig-c001
-mips                  maltasmvp_eva_defconfig
-m68k                          sun3x_defconfig
-arm                          iop32x_defconfig
-arm                        clps711x_defconfig
-sh                           se7724_defconfig
-sh                         apsh4a3a_defconfig
-arm64                            alldefconfig
-mips                           ip32_defconfig
-arm                            zeus_defconfig
-powerpc                     asp8347_defconfig
-csky                             alldefconfig
-mips                        vocore2_defconfig
-sh                               alldefconfig
-parisc                generic-32bit_defconfig
-arc                           tb10x_defconfig
-powerpc                      ppc40x_defconfig
-powerpc                mpc7448_hpc2_defconfig
-arc                        nsimosci_defconfig
-openrisc                  or1klitex_defconfig
-arm                           viper_defconfig
-mips                       capcella_defconfig
-powerpc                       ppc64_defconfig
-arm                         vf610m4_defconfig
-mips                          rb532_defconfig
-mips                  decstation_64_defconfig
-powerpc                       holly_defconfig
-sh                  sh7785lcr_32bit_defconfig
-sh                        sh7785lcr_defconfig
-mips                           gcw0_defconfig
-powerpc                      ppc6xx_defconfig
-powerpc                     taishan_defconfig
-sh                     sh7710voipgw_defconfig
-arm                           corgi_defconfig
-sh                          r7785rp_defconfig
-ia64                          tiger_defconfig
-microblaze                      mmu_defconfig
-arm                  randconfig-c002-20220130
-arm                  randconfig-c002-20220131
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-s390                             allyesconfig
-i386                             allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-sparc                            allyesconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a004-20220131
-x86_64               randconfig-a003-20220131
-x86_64               randconfig-a001-20220131
-x86_64               randconfig-a006-20220131
-x86_64               randconfig-a005-20220131
-x86_64               randconfig-a002-20220131
-i386                 randconfig-a006-20220131
-i386                 randconfig-a005-20220131
-i386                 randconfig-a003-20220131
-i386                 randconfig-a002-20220131
-i386                 randconfig-a001-20220131
-i386                 randconfig-a004-20220131
-arc                  randconfig-r043-20220130
-arc                  randconfig-r043-20220131
-riscv                randconfig-r042-20220130
-s390                 randconfig-r044-20220130
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                             i386_defconfig
-um                           x86_64_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                                  kexec
-x86_64                          rhel-8.3-func
-
-clang tested configs:
-riscv                randconfig-c006-20220130
-x86_64                        randconfig-c007
-arm                  randconfig-c002-20220130
-powerpc              randconfig-c003-20220130
-mips                 randconfig-c004-20220130
-i386                          randconfig-c001
-riscv                randconfig-c006-20220201
-powerpc              randconfig-c003-20220201
-mips                 randconfig-c004-20220201
-arm                  randconfig-c002-20220201
-arm                         hackkit_defconfig
-arm                           spitz_defconfig
-powerpc                 mpc836x_rdk_defconfig
-arm                         shannon_defconfig
-powerpc                        icon_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64               randconfig-a013-20220131
-x86_64               randconfig-a015-20220131
-x86_64               randconfig-a014-20220131
-x86_64               randconfig-a016-20220131
-x86_64               randconfig-a011-20220131
-x86_64               randconfig-a012-20220131
-i386                 randconfig-a011-20220131
-i386                 randconfig-a013-20220131
-i386                 randconfig-a014-20220131
-i386                 randconfig-a012-20220131
-i386                 randconfig-a015-20220131
-i386                 randconfig-a016-20220131
-hexagon              randconfig-r045-20220130
-hexagon              randconfig-r045-20220131
-hexagon              randconfig-r041-20220130
-hexagon              randconfig-r041-20220131
-riscv                randconfig-r042-20220131
-s390                 randconfig-r044-20220131
-
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+CC: j.vosburgh@gmail.com
+CC: vfalico@gmail.com
+CC: andy@greyhouse.net
+CC: oliver@neukum.org
+CC: yoshfuji@linux-ipv6.org
+CC: dsahern@kernel.org
+CC: alex.aring@gmail.com
+CC: jukka.rissanen@linux.intel.com
+CC: stefan@datenfreihafen.org
+CC: jk@codeconstruct.com.au
+CC: matt@codeconstruct.com.au
+CC: linux-usb@vger.kernel.org
+CC: linux-bluetooth@vger.kernel.org
+CC: linux-wpan@vger.kernel.org
+---
+ drivers/net/bonding/bond_alb.c | 1 +
+ drivers/net/usb/cdc_mbim.c     | 1 +
+ include/net/ipv6.h             | 1 -
+ include/net/ipv6_frag.h        | 1 +
+ include/net/ndisc.h            | 1 -
+ net/6lowpan/core.c             | 1 +
+ net/ieee802154/6lowpan/core.c  | 1 +
+ net/mctp/device.c              | 1 +
+ 8 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_alb.c b/drivers/net/bonding/bond_alb.c
+index c98a4b0a8453..303c8d32d451 100644
+--- a/drivers/net/bonding/bond_alb.c
++++ b/drivers/net/bonding/bond_alb.c
+@@ -19,6 +19,7 @@
+ #include <linux/in.h>
+ #include <net/arp.h>
+ #include <net/ipv6.h>
++#include <net/ndisc.h>
+ #include <asm/byteorder.h>
+ #include <net/bonding.h>
+ #include <net/bond_alb.h>
+diff --git a/drivers/net/usb/cdc_mbim.c b/drivers/net/usb/cdc_mbim.c
+index 82bb5ed94c48..a7c1434fe2da 100644
+--- a/drivers/net/usb/cdc_mbim.c
++++ b/drivers/net/usb/cdc_mbim.c
+@@ -21,6 +21,7 @@
+ #include <net/ipv6.h>
+ #include <net/addrconf.h>
+ #include <net/ipv6_stubs.h>
++#include <net/ndisc.h>
+ 
+ /* alternative VLAN for IP session 0 if not untagged */
+ #define MBIM_IPS0_VID	4094
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 082f30256f59..cda1f205f391 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -15,7 +15,6 @@
+ #include <linux/refcount.h>
+ #include <linux/jump_label_ratelimit.h>
+ #include <net/if_inet6.h>
+-#include <net/ndisc.h>
+ #include <net/flow.h>
+ #include <net/flow_dissector.h>
+ #include <net/snmp.h>
+diff --git a/include/net/ipv6_frag.h b/include/net/ipv6_frag.h
+index 0a4779175a52..5052c66e22d2 100644
+--- a/include/net/ipv6_frag.h
++++ b/include/net/ipv6_frag.h
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ #ifndef _IPV6_FRAG_H
+ #define _IPV6_FRAG_H
++#include <linux/icmpv6.h>
+ #include <linux/kernel.h>
+ #include <net/addrconf.h>
+ #include <net/ipv6.h>
+diff --git a/include/net/ndisc.h b/include/net/ndisc.h
+index 53cb8de0e589..07d48bd6c0bd 100644
+--- a/include/net/ndisc.h
++++ b/include/net/ndisc.h
+@@ -71,7 +71,6 @@ do {								\
+ 
+ struct ctl_table;
+ struct inet6_dev;
+-struct net_device;
+ struct net_proto_family;
+ struct sk_buff;
+ struct prefix_info;
+diff --git a/net/6lowpan/core.c b/net/6lowpan/core.c
+index a068757eabaf..7b3341cef926 100644
+--- a/net/6lowpan/core.c
++++ b/net/6lowpan/core.c
+@@ -5,6 +5,7 @@
+  * (C) 2015 Pengutronix, Alexander Aring <aar@pengutronix.de>
+  */
+ 
++#include <linux/if_arp.h>
+ #include <linux/module.h>
+ 
+ #include <net/6lowpan.h>
+diff --git a/net/ieee802154/6lowpan/core.c b/net/ieee802154/6lowpan/core.c
+index 2cf62718a282..2c087b7f17c5 100644
+--- a/net/ieee802154/6lowpan/core.c
++++ b/net/ieee802154/6lowpan/core.c
+@@ -47,6 +47,7 @@
+ #include <linux/module.h>
+ #include <linux/netdevice.h>
+ #include <linux/ieee802154.h>
++#include <linux/if_arp.h>
+ 
+ #include <net/ipv6.h>
+ 
+diff --git a/net/mctp/device.c b/net/mctp/device.c
+index ef2755f82f87..02ddc0f1bd3e 100644
+--- a/net/mctp/device.c
++++ b/net/mctp/device.c
+@@ -6,6 +6,7 @@
+  * Copyright (c) 2021 Google
+  */
+ 
++#include <linux/if_arp.h>
+ #include <linux/if_link.h>
+ #include <linux/mctp.h>
+ #include <linux/netdevice.h>
+-- 
+2.34.1
+
