@@ -2,101 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2819C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Feb 2022 03:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8822C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Feb 2022 04:09:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356734AbiBDDIG (ORCPT
+        id S1356909AbiBDEJj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Feb 2022 22:08:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34366 "EHLO
+        Thu, 3 Feb 2022 23:09:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241328AbiBDDIE (ORCPT
+        with ESMTP id S1356905AbiBDEJi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Feb 2022 22:08:04 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47AEC061714
-        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Feb 2022 19:08:04 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id t17so4531482qto.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Feb 2022 19:08:04 -0800 (PST)
+        Thu, 3 Feb 2022 23:09:38 -0500
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2729EC061714;
+        Thu,  3 Feb 2022 20:09:38 -0800 (PST)
+Received: by mail-io1-xd2f.google.com with SMTP id s18so5876490ioa.12;
+        Thu, 03 Feb 2022 20:09:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=46Mw1qO5pXfPm053jQRSawXlYGP9gErfNx0Q7aNGP9M=;
-        b=Xi9sfVlhVF8bow7GjvO5H37Vpnq8WDlPoO1peDxyzOFTv9upV52Fl/oRrh2ReK+2WW
-         Gt6GZSJjxtJo7Rp2nmstQ78kkUdAVwJJzDg3p6sGiG+dXLn2kLrjq2mtuG6NteY8JQsV
-         TNp+ybciQ+Xn8yY8DXUYtQ7uwgqrFbimZKAqKNi+xaJk/991zbHiTdOR+XEk71JWm2PA
-         1/VdK7srG7gPKtb2E24Y1+cO2R5Q1wFebjVZGMblu9klJlCGKfdus5EJbOMKt/tZ0QJj
-         oiUuyrYBMY34qa8dAX1DVf14Swy8I9ulniB6OU47z3ehJouZQS5tkmnaFefpMOozyhMV
-         CiFw==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=9vd5xE0knFEuVKlXB3qXa46DN9ZLxiL/V6mLS4klh6s=;
+        b=OYiVJbaeVKGlU0Qy0/egzhuPTlLjAtl5WWUGYD78em7H+P02gbi4zCXjhW7uM6Np/L
+         LmdfZqNL9vzss4qH3u4psC1QZ3Qr+eRLuY8tr6FvDCLEHWt85900koNhoEMWa9Icubzg
+         +MNGevJHAHWNHtqH3hLVRjQVa9lF3q3U/w/WOPdR/TnN/hHJlnwQITfh+KohtE07pcAC
+         nbHl2DCnjPIR0LJjXKRKW4gMagwrg2dCnynMci2nO3T+tZVyt+MdhAGCNBdXAVX/JdGw
+         T4HDeQ6suivK+wODqxH7ewEOiX2BGAQXWiN2cLzp+hG4us0RUakr0usl3BzzI4tiTtzl
+         Rjkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=46Mw1qO5pXfPm053jQRSawXlYGP9gErfNx0Q7aNGP9M=;
-        b=nTn0ctEURwZkbx8dUB76xVa6OtHcAxE+gD/2Fs2fkU12/4bZ0ydGa5BJ4wGkIEBjiC
-         zVDCH70TksopJe96NyatdJCJ/+bBsoUDa1/oVk4uQLT/C/xtQ6aQRjxkUockmZcgIrYb
-         f2mzqjJw5qtDpWNEdQFBwAvAXBq8As65v+GMwH8ds5y+g1hqFs+GwZ1YkFpeNEVVwXX3
-         VRZfeqYkn9j+51o0dx3yI+hC22HZyiLQQ3qyOlqVKhWdzEFqajPMvwuvaYOeLuimo5zO
-         Pv4213LIdxGmBTBPvAYTo+lL7rqSVJwTxfhz3XdKE4S/YAapS51EnCibW3HP45WtRF4x
-         CeLA==
-X-Gm-Message-State: AOAM531rmLCVum4ICM2fNi9oOC2IKM+ivBl6oJjZ3clmdL09Y0TBV4+t
-        MSuNHOifIbXst26lh9CnGvV1D5STqGu17Q==
-X-Google-Smtp-Source: ABdhPJzJYWqK8FEWhfo4NOp4CcSUTy8GMbJkJbRfu8fLMdIeeekgcuc6dcEdCqFt/8tDPnAA+hx4FQ==
-X-Received: by 2002:a05:622a:1189:: with SMTP id m9mr754549qtk.589.1643944083741;
-        Thu, 03 Feb 2022 19:08:03 -0800 (PST)
-Received: from [172.17.0.2] ([20.124.180.70])
-        by smtp.gmail.com with ESMTPSA id c127sm398411qkf.36.2022.02.03.19.08.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 03 Feb 2022 19:08:03 -0800 (PST)
-Message-ID: <61fc9893.1c69fb81.d9930.239f@mx.google.com>
-Date:   Thu, 03 Feb 2022 19:08:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3165341554862536093=="
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9vd5xE0knFEuVKlXB3qXa46DN9ZLxiL/V6mLS4klh6s=;
+        b=viNzLbhTNXzITiihuhsSC2bUGj3buE6pEUQoSwNg9jeUQKKmXSnNAAcFV+XwcAML5L
+         V6nkbAMr1gadIBUgqrlfPtwkD9E7mh3lDdiSDImQHalUSD6TOPSHkyWZredNGjc7HUYZ
+         b4L93lwh1bWXTEEHuNAkuiKQ/a1IiVmtzYRU6e3xfqQQjVIOuczJF1wWuzxpg7INJbJq
+         q1hSH6vA1/g0Nw9z1yjklPtKeh4zTsavvXlm9LwFaaU0ULgAXRliuR9o22MHzemcdu/T
+         wyhPjb0YBQVoV4GYtiDv7yMx6z+cxiiEkNnsyvRPUZMxl0R+wtEaUI7FuHfIAQefPPe8
+         Vd3g==
+X-Gm-Message-State: AOAM531W0IALn87hR6FI6pmdmCdp9ggLCwjWryN2f4FqUo1NDS/aYw33
+        iAN8zaA5NPrehmYu1jPdCvzbmThs+4Q=
+X-Google-Smtp-Source: ABdhPJzXVQkmUfon04VNUqLrSdFDjnJvuv8muUVAdHLB8jLF9LNcZrLvjy0XC22k6CRcl9d16c2pUw==
+X-Received: by 2002:a05:6638:ccb:: with SMTP id e11mr549657jak.206.1643947777569;
+        Thu, 03 Feb 2022 20:09:37 -0800 (PST)
+Received: from ?IPV6:2601:282:800:dc80:8870:ce19:2c7:3513? ([2601:282:800:dc80:8870:ce19:2c7:3513])
+        by smtp.googlemail.com with ESMTPSA id g14sm451139ilr.12.2022.02.03.20.09.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Feb 2022 20:09:37 -0800 (PST)
+Message-ID: <35a6322b-cd8d-0fa3-69b2-76c984a48c00@gmail.com>
+Date:   Thu, 3 Feb 2022 21:09:35 -0700
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] gdbus: Emit InterfacesAdded of parents objects first
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220204013620.2465024-1-luiz.dentz@gmail.com>
-References: <20220204013620.2465024-1-luiz.dentz@gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.5.1
+Subject: Re: [PATCH net-next v2] net: don't include ndisc.h from ipv6.h
+Content-Language: en-US
+To:     Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc:     netdev@vger.kernel.org, Jeremy Kerr <jk@codeconstruct.com.au>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
+        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+References: <20220203231240.2297588-1-kuba@kernel.org>
+From:   David Ahern <dsahern@gmail.com>
+In-Reply-To: <20220203231240.2297588-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3165341554862536093==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2/3/22 4:12 PM, Jakub Kicinski wrote:
+> Nothing in ipv6.h needs ndisc.h, drop it.
+> 
+> Link: https://lore.kernel.org/r/20220203043457.2222388-1-kuba@kernel.org
+> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: j.vosburgh@gmail.com
+> CC: vfalico@gmail.com
+> CC: andy@greyhouse.net
+> CC: oliver@neukum.org
+> CC: yoshfuji@linux-ipv6.org
+> CC: dsahern@kernel.org
+> CC: alex.aring@gmail.com
+> CC: jukka.rissanen@linux.intel.com
+> CC: matt@codeconstruct.com.au
+> CC: linux-usb@vger.kernel.org
+> CC: linux-bluetooth@vger.kernel.org
+> CC: linux-wpan@vger.kernel.org
+> ---
+>  drivers/net/bonding/bond_alb.c | 1 +
+>  drivers/net/usb/cdc_mbim.c     | 1 +
+>  include/net/ipv6.h             | 1 -
+>  include/net/ipv6_frag.h        | 1 +
+>  net/6lowpan/core.c             | 1 +
+>  net/ieee802154/6lowpan/core.c  | 1 +
+>  net/mctp/device.c              | 1 +
+>  7 files changed, 6 insertions(+), 1 deletion(-)
+> 
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=611174
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.44 seconds
-GitLint                       PASS      1.06 seconds
-Prep - Setup ELL              PASS      53.53 seconds
-Build - Prep                  PASS      0.81 seconds
-Build - Configure             PASS      10.72 seconds
-Build - Make                  PASS      1499.10 seconds
-Make Check                    PASS      13.01 seconds
-Make Check w/Valgrind         PASS      539.50 seconds
-Make Distcheck                PASS      285.04 seconds
-Build w/ext ELL - Configure   PASS      10.78 seconds
-Build w/ext ELL - Make        PASS      1464.28 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
---===============3165341554862536093==--
