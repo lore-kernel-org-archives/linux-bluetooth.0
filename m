@@ -2,96 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4337C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Feb 2022 21:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1FA8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Feb 2022 21:40:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240836AbiBDVOE (ORCPT
+        id S242848AbiBDVkj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Feb 2022 16:14:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59390 "EHLO
+        Fri, 4 Feb 2022 16:40:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237272AbiBDVOE (ORCPT
+        with ESMTP id S233101AbiBDVkj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Feb 2022 16:14:04 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13039C061714
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Feb 2022 13:14:02 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id 124so21693957ybw.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Feb 2022 13:14:02 -0800 (PST)
+        Fri, 4 Feb 2022 16:40:39 -0500
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75A62C061714
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Feb 2022 13:40:38 -0800 (PST)
+Received: by mail-qk1-x72d.google.com with SMTP id o25so5848201qkj.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Feb 2022 13:40:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=HLI89Ki/2Yyhp/aVQAqgqIUGMvxWkXVvpSJVGRezcUA=;
-        b=LFPKxb8SV8eyPbxDy8TF65FqqbX9vrs+APYcY4Vk6WsFOD4+a/bWlMXpkR3kCoBimp
-         yF+R3gsC8JVGg17OMwheZwS4ZozjM/oZlfuuw5FvHgXMaz2YFlkVuOZZHZ3QRJpIGd28
-         Nv0ILGvd4qxwP8O3jQFeBjVLYDUWNP/ElDqhnhAcjk5uR/XL/tonm2pifL9vWeSPja+o
-         nQuhuPYHl5AKTrU3xYSRMmoxOztnPKDj8CtOmBC2A7orvx7BGRqGogw1UV7FYMAUmFhe
-         gMJiZG3buqk8529FAiUww2D2sx39EIPoSUxN3CV1VZTrBY3JwyzkmMDSimrWc9iMUQhw
-         Cdig==
+        h=message-id:date:mime-version:subject:reply-to:from:to:in-reply-to
+         :references;
+        bh=k23ajSHoKu7u8xnCwwBUOPNsoiEFIFJTGMTYXpZIZbU=;
+        b=WlU1RG39Tzj/3XDS/FaupH/JZpftlZZ8RkhAb6NK9ctRF2DFJUMR6F7gz2oPBuQUdQ
+         jy/dBQRAVbXvKwJFFzUQTRmctLPb9ZE008r20ZH9FvHIjtJx6sTBT/Wro10w02A/qyKP
+         4wvstU07eEtLUf0tLSanGEoepFn5LEOMwIvOZemjZVO0iJMOkA/6sZ0jFJlM1n1xZ5oI
+         wt7GvHI3sE2ku4RCDWT3nGw6oWRQCXrFcc2RyLN4t0Zwc9THv+pS9rKLzn0sQFRjtH+K
+         nyjJkVaOoLVGofsUBtyPGwuj5WAoq8FPhO+kuqAUsEx/qy5hEmL1d+sAupsprc4fQceU
+         k+bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=HLI89Ki/2Yyhp/aVQAqgqIUGMvxWkXVvpSJVGRezcUA=;
-        b=sC/Cl6o9nzbemiXbXkpddlRo3IpzlERTze8LE9SUO1MLN0vhGEhiUXoexMU42s1U5f
-         OzSOiTI4byc5T37r0AiQ1ovWLu6k77NsdQV6o075LjraqH+s+wuRo/HBzKOv/uahBF+C
-         EDex0SIQexm19lGJAHyDtoMZ/d7CHZZGF3HPEy798d8/oI/PtaG59bbwg6n89VfNl4JY
-         gBXpYpohOVfD/3eZu1hj2frABbAvTVMqYh/4J/AKH4woViPA55UjbNUYOE0JgHbfzFf4
-         9QBoXQF08AIQlO+dEJzKucg9g4ZZ4guruPeNx5RrW7P1+MKBdFalG7WM7b4ICktMjD1X
-         O+FA==
-X-Gm-Message-State: AOAM533Z1guXGWXO3LmMuos4DbexHtOWIRgDQYH7kY8K7QyO+EwMeq5p
-        xXsKNFeZdAjXPAk2FraT0viKn3kqEZVVYw2l+RPSc7YtpVQ=
-X-Google-Smtp-Source: ABdhPJxzSuyH5Kq0mmWNefy3gQ1z5tb1LqQydd4QPa37QHA2W7SPUeqRqD14hm8BUC7g9UPdib+BkZiU631F3OqggYs=
-X-Received: by 2002:a81:450d:: with SMTP id s13mr907005ywa.358.1644009240930;
- Fri, 04 Feb 2022 13:14:00 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:subject:reply-to
+         :from:to:in-reply-to:references;
+        bh=k23ajSHoKu7u8xnCwwBUOPNsoiEFIFJTGMTYXpZIZbU=;
+        b=FRt0PrDRltu6bFah8Y1xoITtW6fV3KdXkvmYC/QsmKhJJ3Kq2ox0oMKb/dU891vFJI
+         B2hoWEpTL0CI2q4EOtfBhu3vP1FyZrn8FXfJUOqxQEMJTpk3uFxoaIB4ItywELjkG4vD
+         00lST4D7T/CQ53ZRuz2DanTjm7shxEu6WvDG+1t0ukakOTHbkdUtg+BXUGV7zfBq/8v7
+         FetloshVmA4xyTQkIN9czwdH6qKRd63CvJopC0L542pBF0PKv4Ig7aI9O2dInfMI9b2B
+         L6ehvOFOq8hyHZLbGesAPCT4nWOX1K8KBTM1vaN/eYCKwTDO/Jk1dwVddG5yM6RAfnYx
+         YxjA==
+X-Gm-Message-State: AOAM530DGF9GWTvuJOw0wQKRVFJcYR1dT9d/lBnRYJBH6j179v8P4Phk
+        dR0bqSnOSGVSF/MYLRvln1qNcMOv/nY=
+X-Google-Smtp-Source: ABdhPJzaAZDVsRQfiYi6+tjbgTirGo1UZElz9hKgxx6ljwZcUT0Q68Muc3Q/p4FiERIljLpD5uBkpg==
+X-Received: by 2002:a05:620a:24c:: with SMTP id q12mr650837qkn.81.1644010837470;
+        Fri, 04 Feb 2022 13:40:37 -0800 (PST)
+Received: from [172.17.0.2] ([52.179.155.82])
+        by smtp.gmail.com with ESMTPSA id s4sm1694868qko.113.2022.02.04.13.40.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Feb 2022 13:40:37 -0800 (PST)
+Message-ID: <61fd9d55.1c69fb81.ca2fa.a14c@mx.google.com>
+Date:   Fri, 04 Feb 2022 13:40:37 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4628127548994293092=="
 MIME-Version: 1.0
-References: <20220204192619.2653955-1-luiz.dentz@gmail.com> <61fd9000.1c69fb81.b27d2.a5cf@mx.google.com>
-In-Reply-To: <61fd9000.1c69fb81.b27d2.a5cf@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 4 Feb 2022 13:13:49 -0800
-Message-ID: <CABBYNZK=eaPEQMTmrYtWR5LMhEv1itQBNQgvvobTTeOQxgVjmA@mail.gmail.com>
-Subject: Re: [v2] gdbus: Emit InterfacesAdded of parents objects first
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: RE: [RFC] Bluetooth: hci_core: Introduce hci_recv_event_data
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+In-Reply-To: <20220204211236.2690926-2-luiz.dentz@gmail.com>
+References: <20220204211236.2690926-2-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============4628127548994293092==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 4, 2022 at 12:43 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=611401
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.45 seconds
-> GitLint                       PASS      1.02 seconds
-> Prep - Setup ELL              PASS      43.52 seconds
-> Build - Prep                  PASS      0.74 seconds
-> Build - Configure             PASS      8.75 seconds
-> Build - Make                  PASS      1440.21 seconds
-> Make Check                    PASS      12.26 seconds
-> Make Check w/Valgrind         PASS      451.94 seconds
-> Make Distcheck                PASS      235.40 seconds
-> Build w/ext ELL - Configure   PASS      8.75 seconds
-> Build w/ext ELL - Make        PASS      1436.60 seconds
-> Incremental Build with patchesPASS      0.00 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+This is an automated email and please do not reply to this email.
 
-Pushed.
+Dear Submitter,
 
--- 
-Luiz Augusto von Dentz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+error: patch failed: net/bluetooth/hci_core.c:2740
+error: net/bluetooth/hci_core.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4628127548994293092==--
