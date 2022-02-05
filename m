@@ -2,83 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF5ECC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Feb 2022 00:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8E1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Feb 2022 03:50:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345660AbiBEACn (ORCPT
+        id S1379277AbiBEDuM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Feb 2022 19:02:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54456 "EHLO
+        Fri, 4 Feb 2022 22:50:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244086AbiBEACm (ORCPT
+        with ESMTP id S230127AbiBEDuM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Feb 2022 19:02:42 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593D8DF8C1BC
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Feb 2022 16:02:40 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id w20so12284502edc.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Feb 2022 16:02:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=X42Yl9QMyPV2NXhWHC7Poum8xe9aayY2SBprh9fIsh8=;
-        b=ocVWw+YP06Rde8ntV8a5MGEVZCKaTq76fEJvT0BPOTnlAttc+ozRwuuXHzSUkedroF
-         eeoo/TCu09TjtdvDto/65yFBq9raXZVTVlJrgXfdqsy6Oyb5nl+5PGhFPbN3VPohsmuo
-         pnciwuCVqSvi75XpZbhpJO7cjObyADhvIZC14=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=X42Yl9QMyPV2NXhWHC7Poum8xe9aayY2SBprh9fIsh8=;
-        b=THdR5OnTzmU5SHRR98pqMlCy8HxpUoo9aBqzJZ9ptCTTxxzJwIgLWbX+9Fs6bioEVn
-         kDE8AAJl+xSsR+PIGjqE62Bw6KI0Rz5CjGA/OldFUuWdeBH6967rfGJubQSkhBU/+U/H
-         X3+EQDya8lHHN4eRM63/1Rlfdxd5kjvXOEgFxlnzJDgfFGrDSRfLIY/TKiHa3oli0+w1
-         spi5MCHrRrbxtN2u9ycO3/qdB3KCoQcCNS8U2Zbj/UzmAJqNEfFEwNhhMuoejhL/rGVj
-         hXeRDCcQqWO764AGlsDUEX+C4Zz/LRslb9Ywh/loeIBcha1dzqd2P5+r/OvdRbPp4aFC
-         6irQ==
-X-Gm-Message-State: AOAM532uneQEdEMnI3gebIL5KDdYgB7DnQikUD2rGG9kLgDwPdYzvSEI
-        ujPkOlJGikk9VGOUtj+lHt7wt5A+fwB2qg==
-X-Google-Smtp-Source: ABdhPJyCE+DWIxoXEM0BOSJiUtsi2468cEckq+JwXsiRUQvldBJRe9PUKUw4yVexFRJHmdFE8UUvYg==
-X-Received: by 2002:a05:6402:254a:: with SMTP id l10mr1777537edb.230.1644019358636;
-        Fri, 04 Feb 2022 16:02:38 -0800 (PST)
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com. [209.85.128.50])
-        by smtp.gmail.com with ESMTPSA id fh23sm1103344ejc.176.2022.02.04.16.02.37
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Feb 2022 16:02:38 -0800 (PST)
-Received: by mail-wm1-f50.google.com with SMTP id l123-20020a1c2581000000b0037b9d960079so1681662wml.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Feb 2022 16:02:37 -0800 (PST)
-X-Received: by 2002:a1c:f702:: with SMTP id v2mr4179825wmh.155.1644019357479;
- Fri, 04 Feb 2022 16:02:37 -0800 (PST)
+        Fri, 4 Feb 2022 22:50:12 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6A9C061346;
+        Fri,  4 Feb 2022 19:50:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 011C5B839A4;
+        Sat,  5 Feb 2022 03:50:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A008BC340EF;
+        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644033008;
+        bh=mXGGPzkMphVN/vNDxO0Db/r+CxmdI8M2QTgO5oSLptc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=VtIlM+aj4dj+XxwnH5ONF2STs0o9OvMrnAlzxilwbHCCcykHMNviVK1zXjE94623D
+         btnYCKQeTY7dL5J/HTCkZVb4Dr6n93ALiBvI9ATq1o/kUgk2MyzOxWWfgyH0a8bUOu
+         RAyqQU+erdufyB0MTG7T+xbEtWioSrYM4YOqf3Md6LcomFYER38OBZWLC9NEzGcPvK
+         rZ2XnulrYOdsHcYcSr1IFRc4ntyUHnOY05Dxu0IzV2qZxeA9DYVHiL09C1wv/5ZLVE
+         kogoqrkKxNQvJDjtc5EUk/9Tf1kDr4wf1g6hzrMWLIjMkGqYqRgIgG6OX9o/ptxtSv
+         WUtL1bwsqzhIw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 802D3E5869F;
+        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Fri, 4 Feb 2022 16:02:26 -0800
-X-Gmail-Original-Message-ID: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
-Message-ID: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
-Subject: Question about Trusted property
-To:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: don't include ndisc.h from ipv6.h
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164403300852.24542.401822864711989941.git-patchwork-notify@kernel.org>
+Date:   Sat, 05 Feb 2022 03:50:08 +0000
+References: <20220203231240.2297588-1-kuba@kernel.org>
+In-Reply-To: <20220203231240.2297588-1-kuba@kernel.org>
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org,
+        jk@codeconstruct.com.au, stefan@datenfreihafen.org,
+        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
+        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
+        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz/BlueZ maintainers,
+Hello:
 
-What is the purpose of the Trusted property on org.bluez.Device1
-interface? Does it mean whether the device is bonded? My experiment
-with BlueZ shows that sometimes a device with "Trusted" property set
-is not bonded (does not have pairing key stored) and also vice versa,
-so I am assuming that the Trusted property means something else. What
-is an example use case of the Trusted property?
+This patch was applied to netdev/net-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Eventually, what I am trying to achieve is for BlueZ clients to find
-out whether a device is Bonded or not. Using the Paired property is
-not very accurate because it is set to true during connection although
-the device is not bonded (pairing key does not persist after
-disconnection). For this purpose, I am about to propose adding
-"Bonded" property to org.bluez.Device1. Some use cases include when
-there is a temporary pairing with a peer device we don't want UI to
-show that the device is in the Bonded device list. What do you think
-about exposing the Bonded state via D-Bus? I will do the
-implementation if this idea makes sense.
+On Thu,  3 Feb 2022 15:12:40 -0800 you wrote:
+> Nothing in ipv6.h needs ndisc.h, drop it.
+> 
+> Link: https://lore.kernel.org/r/20220203043457.2222388-1-kuba@kernel.org
+> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
+> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> 
+> [...]
 
-Thanks!
+Here is the summary with links:
+  - [net-next,v2] net: don't include ndisc.h from ipv6.h
+    https://git.kernel.org/netdev/net-next/c/c78b8b20e349
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
