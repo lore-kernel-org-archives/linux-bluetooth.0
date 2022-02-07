@@ -2,83 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B8E1C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Feb 2022 03:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02652C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Feb 2022 06:18:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379277AbiBEDuM (ORCPT
+        id S236729AbiBGGRs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Feb 2022 22:50:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
+        Mon, 7 Feb 2022 01:17:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230127AbiBEDuM (ORCPT
+        with ESMTP id S230505AbiBGE1Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Feb 2022 22:50:12 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E6A9C061346;
-        Fri,  4 Feb 2022 19:50:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 011C5B839A4;
-        Sat,  5 Feb 2022 03:50:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A008BC340EF;
-        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644033008;
-        bh=mXGGPzkMphVN/vNDxO0Db/r+CxmdI8M2QTgO5oSLptc=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=VtIlM+aj4dj+XxwnH5ONF2STs0o9OvMrnAlzxilwbHCCcykHMNviVK1zXjE94623D
-         btnYCKQeTY7dL5J/HTCkZVb4Dr6n93ALiBvI9ATq1o/kUgk2MyzOxWWfgyH0a8bUOu
-         RAyqQU+erdufyB0MTG7T+xbEtWioSrYM4YOqf3Md6LcomFYER38OBZWLC9NEzGcPvK
-         rZ2XnulrYOdsHcYcSr1IFRc4ntyUHnOY05Dxu0IzV2qZxeA9DYVHiL09C1wv/5ZLVE
-         kogoqrkKxNQvJDjtc5EUk/9Tf1kDr4wf1g6hzrMWLIjMkGqYqRgIgG6OX9o/ptxtSv
-         WUtL1bwsqzhIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 802D3E5869F;
-        Sat,  5 Feb 2022 03:50:08 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: don't include ndisc.h from ipv6.h
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164403300852.24542.401822864711989941.git-patchwork-notify@kernel.org>
-Date:   Sat, 05 Feb 2022 03:50:08 +0000
-References: <20220203231240.2297588-1-kuba@kernel.org>
-In-Reply-To: <20220203231240.2297588-1-kuba@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        jk@codeconstruct.com.au, stefan@datenfreihafen.org,
-        j.vosburgh@gmail.com, vfalico@gmail.com, andy@greyhouse.net,
-        oliver@neukum.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
-        matt@codeconstruct.com.au, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org
+        Sun, 6 Feb 2022 23:27:24 -0500
+X-Greylist: delayed 123 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sun, 06 Feb 2022 20:27:23 PST
+Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CF6BC043183;
+        Sun,  6 Feb 2022 20:27:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1644208043; x=1675744043;
+  h=from:to:cc:subject:date:message-id;
+  bh=pXQ7LkOBiXdg1mQC9sP2hejVjWSd8jyBBgp1P3TOblY=;
+  b=uzPgaGlKudtQ+4oC5hDoOswWVo+jEaGlY+17B00qFZFaER2bvpMPB/jg
+   9ByLR5A3MSPS1aYSZRzEHYRPwMhbXDp3XyCNCmFe/0Z5o7BFwf0y2Jb00
+   Gkc44MRV3nabnHImb7smRtIJja3NLiC3KRG2JVIju2N7/QYN3LwEQl7cX
+   0=;
+Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
+  by alexa-out.qualcomm.com with ESMTP; 06 Feb 2022 20:25:20 -0800
+X-QCInternal: smtphost
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 06 Feb 2022 20:25:18 -0800
+X-QCInternal: smtphost
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 07 Feb 2022 09:55:01 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 87A482152F; Mon,  7 Feb 2022 09:55:00 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
+        quic_rjliao@quicinc.com, quic_hbandi@quicinc.com,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v1] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 crd board
+Date:   Mon,  7 Feb 2022 09:54:38 +0530
+Message-Id: <1644207878-19839-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Add Bluetooth SoC WCN6750 node for SC7280 crd board
 
-This patch was applied to netdev/net-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
 
-On Thu,  3 Feb 2022 15:12:40 -0800 you wrote:
-> Nothing in ipv6.h needs ndisc.h, drop it.
-> 
-> Link: https://lore.kernel.org/r/20220203043457.2222388-1-kuba@kernel.org
-> Acked-by: Jeremy Kerr <jk@codeconstruct.com.au>
-> Acked-by: Stefan Schmidt <stefan@datenfreihafen.org>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+---
+ arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Here is the summary with links:
-  - [net-next,v2] net: don't include ndisc.h from ipv6.h
-    https://git.kernel.org/netdev/net-next/c/c78b8b20e349
-
-You are awesome, thank you!
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+index cd2755c..53ea3b4 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
++++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+@@ -23,6 +23,10 @@
+ 	};
+ };
+ 
++&bluetooth {
++	vddio-supply = <&vreg_l18b_1p8>;
++};
++
+ ap_tp_i2c: &i2c0 {
+ 	status = "okay";
+ 	clock-frequency = <400000>;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
