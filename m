@@ -2,133 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5AAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Feb 2022 15:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B224BC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Feb 2022 15:51:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236920AbiBGPtz convert rfc822-to-8bit (ORCPT
+        id S1377704AbiBGPt5 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Feb 2022 10:49:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60318 "EHLO
+        Mon, 7 Feb 2022 10:49:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236905AbiBGPsN (ORCPT
+        with ESMTP id S1386119AbiBGPqH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Feb 2022 10:48:13 -0500
+        Mon, 7 Feb 2022 10:46:07 -0500
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D8CBC0401CC;
-        Mon,  7 Feb 2022 07:48:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CA0C5C0401C1;
+        Mon,  7 Feb 2022 07:46:06 -0800 (PST)
 Received: from smtpclient.apple (p4ff9f3e5.dip0.t-ipconnect.de [79.249.243.229])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2285ECECF1;
-        Mon,  7 Feb 2022 16:48:10 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 396FDCECF1;
+        Mon,  7 Feb 2022 16:39:45 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH 2/2] Bluetooth: mediatek: fix the conflict between mtk and
- msft vendor event
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add a new quirk to skip
+ HCI_FLT_CLEAR_ALL on fake CSR controllers
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <2eed797ac2605bd068a025486fc0c09c2687e50c.1643435854.git.objelf@gmail.com>
-Date:   Mon, 7 Feb 2022 16:48:09 +0100
+In-Reply-To: <4957ed07-36b8-58a0-2307-d2e6e2940527@gmail.com>
+Date:   Mon, 7 Feb 2022 16:39:44 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
-        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1CE2BE2F-A47D-4EEF-809A-035775125D83@holtmann.org>
-References: <52ae30c33f2994efcdff180764801141d59e6e0c.1643435854.git.objelf@gmail.com>
- <2eed797ac2605bd068a025486fc0c09c2687e50c.1643435854.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
+Message-Id: <71CA3E33-9498-4970-BE1A-6308D4AEE054@holtmann.org>
+References: <4957ed07-36b8-58a0-2307-d2e6e2940527@gmail.com>
+To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+Hi Ismael,
 
-> There is a conflict between MediaTek wmt event and msft vendor extension
-> logic in the core layer since 145373cb1b1f ("Bluetooth: Add framework for
-> Microsoft vendor extension") was introduced because we changed the type of
-> mediatek wmt event to the type of msft vendor event in the driver.
+> Another subset of the more recent batch of Chinese clones aren't
+> specs-compliant and seem to lock up whenever they receive a
+> HCI_OP_SET_EVENT_FLT with flt_type set to zero/HCI_FLT_CLEAR_ALL,
+> which on Linux happens right at BR/EDR setup.
 > 
-> But the purpose we reported mediatek event to the core layer is for the
-> diagnostic purpose with that we are able to see the full packet trace via
-> monitoring socket with btmon. Thus, it is harmless we keep the original
-> type of mediatek vendor event here to avoid breaking the msft extension
-> function especially they can be supported by Mediatek chipset like MT7921
-> , MT7922 devices and future devices.
+> So, while all the previous efforts to wrangle the herd of fake CSRs
+> seem to be paying off (and these also get detected as such) we
+> still need to take care of this quirk; testers seem to agree
+> that these dongles tend to work well enough afterwards.
 > 
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> From some cursory USB packet capture on Windows it seems like
+> that driver doesn't appear to use this clear-all functionality at all.
+> 
+> This patch was tested on some really popular AliExpress-style
+> dongles, in my case marked as "V5.0". Chip markings: UG8413,
+> the backside of the PCB says "USB Dangel" (sic).
+> 
+> Here is the `hciconfig -a` output; for completeness:
+> 
+> hci0:	Type: Primary  Bus: USB
+> 	BD Address: 00:1A:7D:DA:7X:XX  ACL MTU: 679:8  SCO MTU: 48:16
+> 	UP RUNNING PSCAN ISCAN
+> 	Features: 0xbf 0x3e 0x4d 0xfa 0xdb 0x3d 0x7b 0xc7
+> 	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+> 	Link policy: RSWITCH SNIFF
+> 	Link mode: PERIPHERAL ACCEPT
+> 	Name: 'CSR8510 A10.'
+> 	Class: 0x7c0104
+> 	Service Classes: Rendering, Capturing, Object Transfer, Audio, Telephony
+> 	Device Class: Computer, Desktop workstation
+> 	HCI Version: 4.0 (0x6)  Revision: 0x3120
+> 	LMP Version: 4.0 (0x6)  Subversion: 0x22bb
+> 	Manufacturer: Cambridge Silicon Radio (10)
+> 
+> As well as the `lsusb -vv -d 0a12:0001`:
+> 
+> ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+> Device Descriptor:
+>  bLength                18
+>  bDescriptorType         1
+>  bcdUSB               2.00
+>  bDeviceClass          224 Wireless
+>  bDeviceSubClass         1 Radio Frequency
+>  bDeviceProtocol         1 Bluetooth
+>  bMaxPacketSize0        64
+>  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
+>  idProduct          0x0001 Bluetooth Dongle (HCI mode)
+>  bcdDevice           88.91
+>  iManufacturer           0
+>  iProduct                2 BT DONGLE10
+>  iSerial                 0
+>  bNumConfigurations      1
+> 
+> Also, changed the benign dmesg print that shows up whenever the
+> generic force-suspend fails from bt_dev_err to bt_dev_warn;
+> it's okay and done on a best-effort basis, not a problem
+> if that does not work.
+> 
+> Also, swapped the HCI subver and LMP subver numbers for the Barrot
+> in the comment, which I copied wrong the last time around.
+> 
+> Fixes: 81cac64ba258a ("Bluetooth: Deal with USB devices that are faking CSR vendor")
+> Fixes: cde1a8a992875 ("Bluetooth: btusb: Fix and detect most of the Chinese Bluetooth controllers")
+> Fixes: d74e0ae7e0303 ("Bluetooth: btusb: Fix detection of some fake CSR controllers with a bcdDevice val of 0x0134")
+> Fixes: 0671c0662383e ("Bluetooth: btusb: Add workaround for remote-wakeup issues with Barrot 8041a02 fake CSR controllers")
+> Fixes: f4292e2faf522 ("Bluetooth: btusb: Make the CSR clone chip force-suspend workaround more generic")
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=60824
+> https://gist.github.com/nevack/6b36b82d715dc025163d9e9124840a07
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Tested-by: Gonzalo Tornaría <tornaria@cmat.edu.uy>
+> Tested-by: Mateus Lemos <lemonsmateus@gmail.com>
+> Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 > ---
-> drivers/bluetooth/btmtk.h     | 1 +
-> drivers/bluetooth/btmtksdio.c | 9 +--------
-> drivers/bluetooth/btusb.c     | 5 -----
-> 3 files changed, 2 insertions(+), 13 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index 8960a5f89d48..013850fd2055 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -5,6 +5,7 @@
-> #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
-> #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
+> Changes for v2:
+>  * Added HCI_QUIRK_NO_SUSPEND_NOTIFIER to btusb_setup_csr().
+>    In theory we already disable runtime suspend in btusb, button
+>    better safe than sorry. Doesn't hurt to explicitly avoid the
+>    hci_suspend_dev() codepath, it also works as example.
+>  * Improved the quirk description in hci.h, as suggested by Hans
+>    de Goede. Explain the need to disable runtime suspend.
+>  * Also check for the quirk in hci_req_set_event_filter();
+>    mirror its hci_req_clear_event_filter() counterpart.
+>  * The struct hci_dev *hdev variables always go first.
+>  * Removed some misc formatting changes.
 > 
-> +#define HCI_EV_WMT 0xe4
-> #define HCI_WMT_MAX_EVENT_SIZE		64
+> The dongles still seem all peachy after the v2 changes. :)
 > 
-> #define BTMTK_WMT_REG_WRITE 0x1
-> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-> index 8e200e80d2f6..cbb09e1b823d 100644
-> --- a/drivers/bluetooth/btmtksdio.c
-> +++ b/drivers/bluetooth/btmtksdio.c
-> @@ -381,13 +381,6 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> 	struct hci_event_hdr *hdr = (void *)skb->data;
-> 	int err;
-> 
-> -	/* Fix up the vendor event id with 0xff for vendor specific instead
-> -	 * of 0xe4 so that event send via monitoring socket can be parsed
-> -	 * properly.
-> -	 */
-> -	if (hdr->evt == 0xe4)
-> -		hdr->evt = HCI_EV_VENDOR;
-> -
-> 	/* When someone waits for the WMT event, the skb is being cloned
-> 	 * and being processed the events from there then.
-> 	 */
-> @@ -403,7 +396,7 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
-> 	if (err < 0)
-> 		goto err_free_skb;
-> 
-> -	if (hdr->evt == HCI_EV_VENDOR) {
-> +	if (hdr->evt == HCI_EV_WMT) {
-> 		if (test_and_clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT,
-> 				       &bdev->tx_state)) {
-> 			/* Barrier to sync with other CPUs */
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index aefa0ee293f3..55ebab019d29 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2271,11 +2271,6 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
-> 		skb_put_data(skb, urb->transfer_buffer, urb->actual_length);
-> 
-> 		hdr = (void *)skb->data;
-> -		/* Fix up the vendor event id with 0xff for vendor specific
-> -		 * instead of 0xe4 so that event send via monitoring socket can
-> -		 * be parsed properly.
-> -		 */
-> -		hdr->evt = 0xff;
-> 
-> 		/* When someone waits for the WMT event, the skb is being cloned
-> 		 * and being processed the events from there then.
+> drivers/bluetooth/btusb.c   |  6 ++++--
+> include/net/bluetooth/hci.h | 10 ++++++++++
+> net/bluetooth/hci_core.c    | 11 ++++++++---
+> net/bluetooth/hci_request.c | 13 ++++++++++---
+> 4 files changed, 32 insertions(+), 8 deletions(-)
 
-please fix the reported issue by kernel test robot.
+the patch no longer applies cleanly against bluetooth-next tree. Please send an updated version.
 
 Regards
 
