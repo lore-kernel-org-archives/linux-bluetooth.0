@@ -2,104 +2,305 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2115C43217
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Feb 2022 12:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36166C4167B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Feb 2022 13:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348727AbiBGL64 (ORCPT
+        id S240321AbiBGNmC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Feb 2022 06:58:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50352 "EHLO
+        Mon, 7 Feb 2022 08:42:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356746AbiBGLN0 (ORCPT
+        with ESMTP id S1381343AbiBGN3x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Feb 2022 06:13:26 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5ADC043189;
-        Mon,  7 Feb 2022 03:13:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644232402; x=1675768402;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4xNbC5qCZstZuFmtgmc8pSYf6lHMJUKirKVnXS8RvWU=;
-  b=JwkmjvGoKervAdYbQ4rVD9ClJV/m6qxY+NoPiwdykovrybGfA+bR+72q
-   g6dz4yzXnUKaYrplkZRO10032XVz2jzaA4MvgsNvCryt96wzo+tcHGszq
-   RVZu3FaUvMGp8BrXBBeI8GVNl6ll5nFDLOM1VfckZGdqEmMMuhT0nF85y
-   +WYL9ciTrKMRYPAFlS3XkPBCGo0q44pxs2Mf3m70WjrSaojUMtKFzh6bm
-   dRKSDiaArWUdhlA9/0MG7zy5i7xVHDBD/7vaOn8BqhJCh3VKGqPXz4WUl
-   SRvQz/iNNX0XvyWaLq4UE59zXk154p8iLZeEsAgGtUhXHp1G6M/dfax8E
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10250"; a="273212853"
-X-IronPort-AV: E=Sophos;i="5.88,349,1635231600"; 
-   d="scan'208";a="273212853"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2022 03:13:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,349,1635231600"; 
-   d="scan'208";a="621513506"
-Received: from lkp-server01.sh.intel.com (HELO 9dd77a123018) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 07 Feb 2022 03:13:19 -0800
-Received: from kbuild by 9dd77a123018 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nH1xP-0000S0-9K; Mon, 07 Feb 2022 11:13:19 +0000
-Date:   Mon, 7 Feb 2022 19:12:33 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com
-Cc:     kbuild-all@lists.01.org, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, linux-arm-msm@vger.kernel.org,
-        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
-        quic_hbandi@quicinc.com
-Subject: Re: [PATCH v1] arm64: dts: qcom: sc7280: Add bluetooth node on
- SC7280 crd board
-Message-ID: <202202071900.HBQ0tQbr-lkp@intel.com>
-References: <1644207878-19839-1-git-send-email-quic_saluvala@quicinc.com>
+        Mon, 7 Feb 2022 08:29:53 -0500
+X-Greylist: delayed 601 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Feb 2022 05:29:51 PST
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15EC4C043181;
+        Mon,  7 Feb 2022 05:29:51 -0800 (PST)
+Received: from [192.168.0.7] (ip5f5aee58.dynamic.kabel-deutschland.de [95.90.238.88])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 70ABB61E64846;
+        Mon,  7 Feb 2022 14:14:21 +0100 (CET)
+Message-ID: <d41d8b41-c347-47e7-e52b-39d7211c8952@molgen.mpg.de>
+Date:   Mon, 7 Feb 2022 14:14:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1644207878-19839-1-git-send-email-quic_saluvala@quicinc.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: Unable to transfer big files to Nokia N9
+Content-Language: en-US
+To:     Thorsten Leemhuis <regressions@leemhuis.info>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, regressions@lists.linux.dev,
+        Takashi Iwai <tiwai@suse.com>
+References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+ <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
+ <cf71bdea-ec22-e4c9-016c-69e94a130607@molgen.mpg.de>
+ <a93c0fa7-7b84-6aea-265b-c913e0c84678@molgen.mpg.de>
+ <d7206e12-1b99-c3be-84f4-df22af427ef5@molgen.mpg.de>
+ <371027df-7f32-edab-208d-d4cdd2202ba6@leemhuis.info>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <371027df-7f32-edab-208d-d4cdd2202ba6@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sai,
+Dear Thorsten, dear Luiz,
 
-Thank you for the patch! Yet something to improve:
 
-[auto build test ERROR on robh/for-next]
-[also build test ERROR on v5.17-rc3]
-[cannot apply to next-20220207]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Am 28.01.22 um 11:36 schrieb Thorsten Leemhuis:
+> Hi, this is your Linux kernel regression tracker speaking.
 
-url:    https://github.com/0day-ci/linux/commits/Sai-Teja-Aluvala/arm64-dts-qcom-sc7280-Add-bluetooth-node-on-SC7280-crd-board/20220207-141304
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
-config: arm64-randconfig-s031-20220207 (https://download.01.org/0day-ci/archive/20220207/202202071900.HBQ0tQbr-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 11.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/36d7dc511b4181b7243171a2949e2f097d799d40
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Sai-Teja-Aluvala/arm64-dts-qcom-sc7280-Add-bluetooth-node-on-SC7280-crd-board/20220207-141304
-        git checkout 36d7dc511b4181b7243171a2949e2f097d799d40
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arm64 SHELL=/bin/bash
+Thorsten, thank you for following up on this.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+> On 16.01.22 14:27, Paul Menzel wrote:
+>> #regzbot introduced: 81be03e026dc0c16dc1c64e088b2a53b73caa895
+> 
+> thx for getting regzbot involved, much appreciated!
+> 
+>> Dear Luiz,
+>>
+>> It turns out there was a regression in Linux 5.16-rc1.
+> 
+> @bt-maintaners, what's the status here? Paul reported that over ten days
+> ago and there wasn't a single reply. Or did the discussion move
+> somewhere else?
+> 
+> @Paul: just wondering, did you give 5.17-rc1 a try? Might be worth a
+> shot, if only to confirm the issue is still present.
 
-All errors (new ones prefixed by >>):
+I just tried with 5.17-rc3, and the issue is still present.
 
->> Error: arch/arm64/boot/dts/qcom/sc7280-crd.dts:26.1-11 Label or path bluetooth not found
-   FATAL ERROR: Syntax error parsing input tree
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Kind regards,
+
+Paul
+
+
+>> Am 20.12.21 um 22:31 schrieb Paul Menzel:
+>>
+>>> Am 01.12.21 um 23:07 schrieb Paul Menzel:
+>>>
+>>>> Am 01.12.21 um 19:29 schrieb Luiz Augusto von Dentz:
+>>>>
+>>>>> On Wed, Dec 1, 2021 at 9:39 AM Paul Menzel <pmenzel@molgen.mpg.de>
+>>>>> wrote:
+>>>>
+>>>>>> For the first time, I wanted to transfer a 2 MB PDF file from a Dell
+>>>>>> Latitude E7250 with Debian sid/unstable with Linux 5.16-rc1 to a Nokia
+>>>>>> N9 (MeeGo/Harmattan). Using the package *bluez-obexd* 5.61-1 and GNOME
+>>>>>> 41, the device was found, and paired fine. Then I selected to transfer
+>>>>>> the 2 MB file, and after starting for a second, it timed out after the
+>>>>>> progress bar moves forward ones and failed.
+>>>>>>
+>>>>>> The systemd journal contains:
+>>>>>>
+>>>>>>        obexd[21139]: Transfer(0x56243fe4f790) Error: Timed out
+>>>>>> waiting for response
+>>>>>>
+>>>>>> Testing with a a 5 byte test text file, worked fine. Also testing
+>>>>>> with a
+>>>>>> Galaly M32, both files were transferred without problems (though
+>>>>>> slowly
+>>>>>> with 32 KB/s.)
+>>>>>>
+>>>>>> Trying to connect to the device with bluetoothctl failed for me,
+>>>>>> and the
+>>>>>> journal contained, it failed.
+>>>>>>
+>>>>>>        $ bluetoothctl
+>>>>>>        Agent registered
+>>>>>>        [bluetooth]# connect 40:98:4E:5B:CE:XX
+>>>>>>        Attempting to connect to 40:98:4E:5B:CE:XX
+>>>>>>        Failed to connect: org.bluez.Error.Failed
+>>>>>>
+>>>>>>        bluetoothd[21104]: src/service.c:btd_service_connect()
+>>>>>> a2dp-source profile connect failed for 40:98:4E:5B:CE:B3: Protocol
+>>>>>> not available
+>>>>>>
+>>>>>> As the Nokia N9 was once pretty popular in the Linux community, I am
+>>>>>> pretty sure, it used to work fine in the past, and there is some
+>>>>>> regression. It’d be great, if you could give me some hints how to
+>>>>>> further debug the issue.
+>>>>>
+>>>>> We will need some logs, obexd and btmon, if possible.
+>>>>
+>>>> I only managed to get the btmon trace [1]. I did `sudo modprobe -r
+>>>> btusb` and `sudo btmon -w /dev/shm/trace.log`.
+>>>>
+>>>> Linux messages:
+>>>>
+>>>>       [29880.100381] calling  btusb_driver_init+0x0/0x1000 [btusb] @
+>>>> 28716
+>>>>       [29880.239603] usbcore: registered new interface driver btusb
+>>>>       [29880.239608] initcall btusb_driver_init+0x0/0x1000 [btusb]
+>>>> returned 0 after 135952 usecs
+>>>>       [29880.240706] Bluetooth: hci0: unexpected event for opcode 0x0500
+>>>>       [29880.241598] Bluetooth: hci0: Legacy ROM 2.5 revision 1.0
+>>>> build 3 week 17 2014
+>>>>       [29880.241605] Bluetooth: hci0: Intel device is already patched.
+>>>> patch num: 32
+>>>>
+>>>>   From the system journal:
+>>>>
+>>>>       Dez 01 22:52:19 ersatz obexd[21139]: Transfer(0x56243fe53dd0)
+>>>> Error: Timed out waiting for response
+>>>
+>>> Were you able to see anything in the attached logs? If the obexd logs
+>>> are missing, can you please tell how I should capture them?
+>>>
+>>> I also tested with Ubuntu 20.04 (*linux-image-5.11.0-27-generic*) and
+>>> 21.10 (*linux-image-5.13.0-19-generic*) live systems booted from a USB
+>>> storage device, and transferring `/usr/bin/systemctl`
+>>> (`/lib/systemd/systemd`) with size of 1.8 MB worked fine.
+>>>
+>>> Could there be a regression in that area? Unfortunately, it’s not easy
+>>> for me to do a bisection on the device at hand.
+>>>
+>>> (Would it be possible to do with QEMU and USB controller and Bluetooth
+>>> device passthrough? How can I transfer the file on the command line so
+>>> I wouldn’t need to install a desktop environment?)
+>>
+>> Turns out, that is indeed possible [2], but turned out to be cumbersome,
+>> as I hit the regression [3], which seems to have been fixed by commit
+>> 95655456e7ce (Bluetooth: btintel: Fix broken LED quirk for legacy ROM
+>> devices) merged in the current Linux 5.17 cycle this week.
+>>
+>> As a work around, I applied a hunk from Takashi’s patch.
+>>
+>> -       { USB_DEVICE(0x8087, 0x0a2a), .driver_info =
+>> BTUSB_INTEL_COMBINED },
+>> +       { USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
+>> + BTUSB_INTEL_BROKEN_INITIAL_NCMD },
+>>
+>> My problem with the Nokia N9 is still present in Linus’ master branch.
+>>
+>> Then I built a minimal Linux kernel for QEMU, and ran:
+>>
+>>      qemu-system-x86_64 -cpu host -m 2G -enable-kvm \
+>>        -usb -device usb-host,vendorid=0x8087,productid=0x0a2a \
+>>        -drive file=/dev/shm/debian-64.img,format=raw,if=virtio \
+>>        -net nic -net user,hostfwd=tcp::22223-:22 \
+>>        -kernel /dev/shm/bzImage -append "root=/dev/vda1 rw quiet"
+>>
+>> In the Debian sid/unstable VM, I used
+>>
+>>      ssh root@localhost -p 22223
+>>
+>> I once had to pair the VM with the Nokia N9 in bluetoothctl, and then
+>> started `/usr/libexec/bluetooth/obexd`, and ran `obexctl`, and connected
+>> first with `connect`, and then ran `send /lib/systemd/systemd` to
+>> transfer the file. In the problematic cases it stopped/hung after the
+>> first progress message.
+>>
+>>      # obexctl
+>>      [NEW] Client /org/bluez/obex
+>>      [obex]# connect 40:98:4E:5B:CE:XX
+>>      Attempting to connect to 40:98:4E:5B:CE:XX
+>>      [NEW] Session /org/bluez/obex/client/session0 [default]
+>>      [NEW] ObjectPush /org/bluez/obex/client/session0
+>>      Connection successful
+>>      [40:98:4E:5B:CE:XX]# send /lib/systemd/systemd
+>>      Attempting to send /lib/systemd/systemd to
+>> /org/bluez/obex/client/session0
+>>      [NEW] Transfer /org/bluez/obex/client/session0/transfer0
+>>      Transfer /org/bluez/obex/client/session0/transfer0
+>>          Status: queued
+>>          Name: systemd
+>>          Size: 1841712
+>>          Filename: /lib/systemd/systemd
+>>          Session: /org/bluez/obex/client/session0
+>>      [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: active
+>>      [CHG] Transfer /org/bluez/obex/client/session0/transfer0
+>> Transferred: 32737 (@32KB/s 00:55)
+>>      [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: error
+>>      [DEL] Transfer /org/bluez/obex/client/session0/transfer0
+>>
+>> Some manual bisection of Linux releases, verified, that the regression
+>> was introduced in Linux 5.16-rc1. (Lucky me, I started using Bluetooth
+>> with the Nokia with Linux 5.16-rc1.) Then I verified it was introduced
+>> by the Bluetooth pull request for Linux 5.16. Then I picked commit
+>> 81be03e026dc0c16dc1c64e088b2a53b73caa895 due to the commit message, and
+>> bisected from there, and it turns out, that this commit is actually
+>> introducing the regression.
+>>
+>>      $ git bisect good
+>>      81be03e026dc0c16dc1c64e088b2a53b73caa895 is the first bad commit
+>>      commit 81be03e026dc0c16dc1c64e088b2a53b73caa895
+>>      Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>      Date:   Fri Sep 3 15:27:32 2021 -0700
+>>
+>>          Bluetooth: RFCOMM: Replace use of memcpy_from_msg with
+>> bt_skb_sendmmsg
+>>
+>>          This makes use of bt_skb_sendmmsg instead using memcpy_from_msg
+>> which
+>>          is not considered safe to be used when lock_sock is held.
+>>
+>>          Also make rfcomm_dlc_send handle skb with fragments and queue
+>> them all
+>>          atomically.
+>>
+>>          Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>          Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+>>
+>>       net/bluetooth/rfcomm/core.c | 50
+>> ++++++++++++++++++++++++++++++++++++++-------
+>>       net/bluetooth/rfcomm/sock.c | 46
+>> +++++++++--------------------------------
+>>       2 files changed, 53 insertions(+), 43 deletions(-)
+>>
+>> Unfortunately, the patch does not cleanly revert, so users have to wait
+>> until an expert can take a look, and come up with a fix.
+>>
+>>
+>> Kind regards,
+>>
+>> Paul
+>>
+>>
+>> PS: For the records:
+>>
+>>      $ git bisect log
+>>      # bad: [81be03e026dc0c16dc1c64e088b2a53b73caa895] Bluetooth: RFCOMM:
+>> Replace use of memcpy_from_msg with bt_skb_sendmmsg
+>>      # good: [49d8a5606428ca0962d09050a5af81461ff90fbb] Bluetooth: fix
+>> init and cleanup of sco_conn.timeout_work
+>>      git bisect start '81be03e026dc0' 'HEAD^'
+>>      # good: [904c139a2517191e48f9cb1bb2d611ae59434009] Bluetooth: Add
+>> support for msbc coding format
+>>      git bisect good 904c139a2517191e48f9cb1bb2d611ae59434009
+>>      # good: [8bba13b1d08d42e2e8308924fa5c1551a7b2b011] Bluetooth:
+>> btintel: Fix incorrect out of memory check
+>>      git bisect good 8bba13b1d08d42e2e8308924fa5c1551a7b2b011
+>>      # good: [38f64f650dc0e44c146ff88d15a7339efa325918] Bluetooth: Add
+>> bt_skb_sendmsg helper
+>>      git bisect good 38f64f650dc0e44c146ff88d15a7339efa325918
+>>      # good: [0771cbb3b97d3c1d68eecd7f00055f599954c34e] Bluetooth: SCO:
+>> Replace use of memcpy_from_msg with bt_skb_sendmsg
+>>      git bisect good 0771cbb3b97d3c1d68eecd7f00055f599954c34e
+>>      # first bad commit: [81be03e026dc0c16dc1c64e088b2a53b73caa895]
+>> Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+>>
+>>
+>> Kind regards,
+>>
+>> Paul
+>>
+>>
+>>>> [1]: https://owww.molgen.mpg.de/~pmenzel/trace.log.7z
+>> [2]:
+>> https://lore.kernel.org/linux-bluetooth/5891f0d5-8d51-9da5-7663-718f301490b1@molgen.mpg.de/T/#u
+>>
+>> [3]:
+>> https://lore.kernel.org/linux-bluetooth/20211202162256.31837-1-tiwai@suse.de/
+>>
+>>
+>>
