@@ -2,59 +2,39 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0181C43219
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 22:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E28CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 22:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387146AbiBHWVs (ORCPT
+        id S1387156AbiBHWVt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 17:21:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
+        Tue, 8 Feb 2022 17:21:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386663AbiBHVFp (ORCPT
+        with ESMTP id S1345032AbiBHWUw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 16:05:45 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D77FAC0612B8
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 13:05:43 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id m185so643177iof.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 13:05:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GJVZMi3Gsv5BJ0mNMhcI2PHhUdygyrhJZtXHgoad0bw=;
-        b=gUcr/O+Ky+nxn31adgrSFJw/U0UFYXoKhNuDDJKFDgPIKlrY4fz89zyVAbTREpunEf
-         XvgIWqNV/6XBvWEezPPbCKloHLY9JZgxNVXxYjRill95P6EgJI8nZqBnh60ee+cMSR4C
-         Vrr6fBjjGrMxD+NCynxRm3qR+N9rjqGVssv9rWeJCtMuk1SzxDzmFTX8yV+UjVtmUaCf
-         fgdYAwzpB4I0gJqZeaHU/SOTFRwBRhCVTM7hCBQJFARM55c8wJNmBhZVETO2iif80+/e
-         I60SOZ0aaBj4ASLMZCgptZ9XLS7a6DkBJdc2vfzUM7N5u2vMniMufeG2zY5FebvByOBF
-         BWyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GJVZMi3Gsv5BJ0mNMhcI2PHhUdygyrhJZtXHgoad0bw=;
-        b=Bhi9bRNm8EevVboub12jtv1SzoBTN7ZFNJlkUxGVqhc/o8Zzdu1+IYe9KkKweJnOrO
-         PYAK9aYzEmEWIC1rRvm9gWj8FR+ESG25KV4wyOHMFPINKMBNc5wzGx5AcvWXgqorK29n
-         Cy37oU/Lwj0zUT1i4FVrKSm6RjiInhyZ7eFdHacb2jw+D4Mb7NKjc9KTzgeJbproiSNC
-         yC7Be0k6IlfYB6MsjSDU3qWdmRQ2W5s2RtRnU3PdVSFArUeImIziTG5j0sz22aIG2TPY
-         pSARFMagYZbzp7pMbmm3di9EhKhFOYT1c/JFO1sXFST85ep53QNjoPb7w06YDDjwmzaz
-         f4iA==
-X-Gm-Message-State: AOAM5325P7qLTkn8cABkA0jAjTnA8afbDM9vvEMGvqqqgdQPhv2pVDtA
-        m9NBdZ0rNhgFQurc86by9dycXFcRJYZ9rQ==
-X-Google-Smtp-Source: ABdhPJzT2zgr7TzjvTaz6vMRlWRgzQvfptMbLDWNPJwxKYpzIewfCQXsZz3XHLpX36ntQ56aTnmX/w==
-X-Received: by 2002:a02:63ce:: with SMTP id j197mr2721651jac.134.1644354342956;
-        Tue, 08 Feb 2022 13:05:42 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q9sm8376405iop.30.2022.02.08.13.05.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 13:05:42 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] adv_monitor: Fix spamming errors
-Date:   Tue,  8 Feb 2022 13:05:41 -0800
-Message-Id: <20220208210541.3883437-1-luiz.dentz@gmail.com>
+        Tue, 8 Feb 2022 17:20:52 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F734C0612B8;
+        Tue,  8 Feb 2022 14:20:50 -0800 (PST)
+Received: from localhost.localdomain (ip5f5aebc2.dynamic.kabel-deutschland.de [95.90.235.194])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 16BEA61E64846;
+        Tue,  8 Feb 2022 23:20:47 +0100 (CET)
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] Revert "Bluetooth: Fix passing NULL to PTR_ERR"
+Date:   Tue,  8 Feb 2022 23:19:10 +0100
+Message-Id: <20220208221911.57058-1-pmenzel@molgen.mpg.de>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,66 +42,56 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This reverts commit 266191aa8d14b84958aaeb5e96ee4e97839e3d87, so that
+commit 81be03e026dc ("Bluetooth: RFCOMM: Replace use of memcpy_from_msg
+with bt_skb_sendmmsg"), introducing a regression, can be reverted.
 
-If advertising manager is not enabled don't log any error on
-btd_adapter_update_found_device, also change
-btd_adv_monitor_offload_supported to btd_adv_monitor_offload_enabled
-since that is checking if the features has been enabled rather than it
-is just supported.
-
-Fixes: https://github.com/bluez/bluez/issues/286
+Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
 ---
- src/adapter.c     | 2 +-
- src/adv_monitor.c | 6 ++----
- src/adv_monitor.h | 2 +-
- 3 files changed, 4 insertions(+), 6 deletions(-)
+ include/net/bluetooth/bluetooth.h | 2 +-
+ net/bluetooth/rfcomm/sock.c       | 2 +-
+ net/bluetooth/sco.c               | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e59b16328..b15b5021f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6899,7 +6899,7 @@ void btd_adapter_update_found_device(struct btd_adapter *adapter,
- 	bool duplicate = false;
- 	struct queue *matched_monitors = NULL;
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 4b3d0b16c185..318df161e6d3 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -505,7 +505,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+ 		struct sk_buff *tmp;
  
--	if (!btd_adv_monitor_offload_supported(adapter->adv_monitor_manager)) {
-+	if (!btd_adv_monitor_offload_enabled(adapter->adv_monitor_manager)) {
- 		if (bdaddr_type != BDADDR_BREDR)
- 			ad = bt_ad_new_with_data(data_len, data);
+ 		tmp = bt_skb_sendmsg(sk, msg, len, mtu, headroom, tailroom);
+-		if (IS_ERR(tmp)) {
++		if (IS_ERR_OR_NULL(tmp)) {
+ 			kfree_skb(skb);
+ 			return tmp;
+ 		}
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 4bf4ea6cbb5e..5938af3e9936 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -583,7 +583,7 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 602830e30..33f4d9619 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -1844,12 +1844,10 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
- 	manager_destroy(manager);
- }
+ 	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
+ 			      RFCOMM_SKB_TAIL_RESERVE);
+-	if (IS_ERR(skb))
++	if (IS_ERR_OR_NULL(skb))
+ 		return PTR_ERR(skb);
  
--bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *manager)
-+bool btd_adv_monitor_offload_enabled(struct btd_adv_monitor_manager *manager)
- {
--	if (!manager) {
--		error("Manager is NULL, get offload support failed");
-+	if (!manager)
- 		return false;
--	}
+ 	sent = rfcomm_dlc_send(d, skb);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 8eabf41b2993..7ebc9d294f0c 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -734,7 +734,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		return -EOPNOTSUPP;
  
- 	return !!(manager->enabled_features &
- 				MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS);
-diff --git a/src/adv_monitor.h b/src/adv_monitor.h
-index bed6572d0..c6bb8a68a 100644
---- a/src/adv_monitor.h
-+++ b/src/adv_monitor.h
-@@ -27,7 +27,7 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
- 						struct mgmt *mgmt);
- void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
+ 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
+-	if (IS_ERR(skb))
++	if (IS_ERR_OR_NULL(skb))
+ 		return PTR_ERR(skb);
  
--bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *manager);
-+bool btd_adv_monitor_offload_enabled(struct btd_adv_monitor_manager *manager);
- 
- struct queue *btd_adv_monitor_content_filter(
- 				struct btd_adv_monitor_manager *manager,
+ 	lock_sock(sk);
 -- 
 2.34.1
 
