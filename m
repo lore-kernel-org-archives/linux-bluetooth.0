@@ -2,103 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA19EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 19:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0181C43219
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 22:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385737AbiBHTCR (ORCPT
+        id S1387146AbiBHWVs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 14:02:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53760 "EHLO
+        Tue, 8 Feb 2022 17:21:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385672AbiBHTCQ (ORCPT
+        with ESMTP id S1386663AbiBHVFp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 14:02:16 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223CCC0613CB
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 11:02:16 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id 13so14509322qkd.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 11:02:16 -0800 (PST)
+        Tue, 8 Feb 2022 16:05:45 -0500
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D77FAC0612B8
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 13:05:43 -0800 (PST)
+Received: by mail-io1-xd30.google.com with SMTP id m185so643177iof.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 13:05:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=nR1YSstwKHWNA8Yu7n3G9IudJVMJIHZ6cuz139mU1C4=;
-        b=GxVkjMmGMscxG84k7l9rHQo86Lb+i3+Sqt+eO/WqPGNq60oAkaIINdr8a3qLlcQWl4
-         +apaSsZWkskuSrAzXNAD1eoAwUm3hZg4uzJDxruDKSVkHt1WV2aOQl42EIJXxOZaVJKD
-         ub6vCTDebiPn/gye467/MHBnmgyQjoSsocDtf1bQvRZXOtHbbUMZ+z57OVR9y4tvYucj
-         KbLnt1SQq0SEaYGkRzUj8lktbjrOOytQWtb1ERNwVYYlbD7fJadJ9GBU1ihpxWG36nbm
-         Sf5C9dHtB2AhmZTPf7ZLNzi2U7UkUQ0zND8RNTwBP3MnDx+/fLMBGfgsN5GC6WPdSSZ7
-         967g==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GJVZMi3Gsv5BJ0mNMhcI2PHhUdygyrhJZtXHgoad0bw=;
+        b=gUcr/O+Ky+nxn31adgrSFJw/U0UFYXoKhNuDDJKFDgPIKlrY4fz89zyVAbTREpunEf
+         XvgIWqNV/6XBvWEezPPbCKloHLY9JZgxNVXxYjRill95P6EgJI8nZqBnh60ee+cMSR4C
+         Vrr6fBjjGrMxD+NCynxRm3qR+N9rjqGVssv9rWeJCtMuk1SzxDzmFTX8yV+UjVtmUaCf
+         fgdYAwzpB4I0gJqZeaHU/SOTFRwBRhCVTM7hCBQJFARM55c8wJNmBhZVETO2iif80+/e
+         I60SOZ0aaBj4ASLMZCgptZ9XLS7a6DkBJdc2vfzUM7N5u2vMniMufeG2zY5FebvByOBF
+         BWyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=nR1YSstwKHWNA8Yu7n3G9IudJVMJIHZ6cuz139mU1C4=;
-        b=XQnr4w2W7wN3H9HAnZijdY+7ZXQsItlD9YNsTLj5/+3N0pnPUvza2HR+8vztdCIA51
-         vbYWYP2nDsr9yRdW3fY1o0wNhvSyHE+ecv+qycLdCnieEZJLOGJWaIu2GZSIvRRKJUJU
-         wYegwoFhDVVs5THV2KmMwaMvIa0dttX6hJKKqjDb5XcbLU/E6rRk8Vst80cx7eLRS2Cy
-         qFtZfc8Z5Rjodf7Abu0opyX37pJYnXojYBzwvwj3l0IpGFBJxJ1IvzfTkuDZAjw00DRw
-         itzvEVynCSMtTLvIDC+mnxNaM0QFbwQo9nAdyzaKDUORvsj+MZ+BxjljnxuzOuDqdxwL
-         eGeg==
-X-Gm-Message-State: AOAM531x4sFn7MLrImrN25L08Ba/xgtuBFE6Is+AM/BxSichjEOMEWaO
-        M3b/H9EBXhhxfj+V/YUm4qw5WFqLoUT5vw==
-X-Google-Smtp-Source: ABdhPJxaMKcrZF1pfbF4qNtm4jg2X0ssjE/zC9yRcpCtiVPdFnPC+AA2FM8Z7rn3U3c5Z7kOBVbV6g==
-X-Received: by 2002:a37:66d1:: with SMTP id a200mr3436406qkc.148.1644346934677;
-        Tue, 08 Feb 2022 11:02:14 -0800 (PST)
-Received: from [172.17.0.2] ([40.121.200.186])
-        by smtp.gmail.com with ESMTPSA id bk19sm7256168qkb.125.2022.02.08.11.02.14
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GJVZMi3Gsv5BJ0mNMhcI2PHhUdygyrhJZtXHgoad0bw=;
+        b=Bhi9bRNm8EevVboub12jtv1SzoBTN7ZFNJlkUxGVqhc/o8Zzdu1+IYe9KkKweJnOrO
+         PYAK9aYzEmEWIC1rRvm9gWj8FR+ESG25KV4wyOHMFPINKMBNc5wzGx5AcvWXgqorK29n
+         Cy37oU/Lwj0zUT1i4FVrKSm6RjiInhyZ7eFdHacb2jw+D4Mb7NKjc9KTzgeJbproiSNC
+         yC7Be0k6IlfYB6MsjSDU3qWdmRQ2W5s2RtRnU3PdVSFArUeImIziTG5j0sz22aIG2TPY
+         pSARFMagYZbzp7pMbmm3di9EhKhFOYT1c/JFO1sXFST85ep53QNjoPb7w06YDDjwmzaz
+         f4iA==
+X-Gm-Message-State: AOAM5325P7qLTkn8cABkA0jAjTnA8afbDM9vvEMGvqqqgdQPhv2pVDtA
+        m9NBdZ0rNhgFQurc86by9dycXFcRJYZ9rQ==
+X-Google-Smtp-Source: ABdhPJzT2zgr7TzjvTaz6vMRlWRgzQvfptMbLDWNPJwxKYpzIewfCQXsZz3XHLpX36ntQ56aTnmX/w==
+X-Received: by 2002:a02:63ce:: with SMTP id j197mr2721651jac.134.1644354342956;
+        Tue, 08 Feb 2022 13:05:42 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id q9sm8376405iop.30.2022.02.08.13.05.42
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Feb 2022 11:02:14 -0800 (PST)
-Message-ID: <6202be36.1c69fb81.9b50a.64a8@mx.google.com>
-Date:   Tue, 08 Feb 2022 11:02:14 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2675782313255933862=="
+        Tue, 08 Feb 2022 13:05:42 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] adv_monitor: Fix spamming errors
+Date:   Tue,  8 Feb 2022 13:05:41 -0800
+Message-Id: <20220208210541.3883437-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [v2,1/2] Bluetooth: mt7921s: support bluetooth reset mechanism
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <d328920a9abaaaedafc8c4922cdeb5935f6d64c3.1644342794.git.objelf@gmail.com>
-References: <d328920a9abaaaedafc8c4922cdeb5935f6d64c3.1644342794.git.objelf@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2675782313255933862==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+If advertising manager is not enabled don't log any error on
+btd_adapter_update_found_device, also change
+btd_adv_monitor_offload_supported to btd_adv_monitor_offload_enabled
+since that is checking if the features has been enabled rather than it
+is just supported.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=612283
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.66 seconds
-GitLint                       PASS      1.81 seconds
-SubjectPrefix                 PASS      1.66 seconds
-BuildKernel                   PASS      27.99 seconds
-BuildKernel32                 PASS      24.98 seconds
-Incremental Build with patchesPASS      41.37 seconds
-TestRunner: Setup             PASS      442.04 seconds
-TestRunner: l2cap-tester      PASS      13.30 seconds
-TestRunner: bnep-tester       PASS      5.71 seconds
-TestRunner: mgmt-tester       PASS      101.36 seconds
-TestRunner: rfcomm-tester     PASS      7.26 seconds
-TestRunner: sco-tester        PASS      7.53 seconds
-TestRunner: smp-tester        PASS      7.40 seconds
-TestRunner: userchan-tester   PASS      6.18 seconds
-
-
-
+Fixes: https://github.com/bluez/bluez/issues/286
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c     | 2 +-
+ src/adv_monitor.c | 6 ++----
+ src/adv_monitor.h | 2 +-
+ 3 files changed, 4 insertions(+), 6 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index e59b16328..b15b5021f 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -6899,7 +6899,7 @@ void btd_adapter_update_found_device(struct btd_adapter *adapter,
+ 	bool duplicate = false;
+ 	struct queue *matched_monitors = NULL;
+ 
+-	if (!btd_adv_monitor_offload_supported(adapter->adv_monitor_manager)) {
++	if (!btd_adv_monitor_offload_enabled(adapter->adv_monitor_manager)) {
+ 		if (bdaddr_type != BDADDR_BREDR)
+ 			ad = bt_ad_new_with_data(data_len, data);
+ 
+diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+index 602830e30..33f4d9619 100644
+--- a/src/adv_monitor.c
++++ b/src/adv_monitor.c
+@@ -1844,12 +1844,10 @@ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager)
+ 	manager_destroy(manager);
+ }
+ 
+-bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *manager)
++bool btd_adv_monitor_offload_enabled(struct btd_adv_monitor_manager *manager)
+ {
+-	if (!manager) {
+-		error("Manager is NULL, get offload support failed");
++	if (!manager)
+ 		return false;
+-	}
+ 
+ 	return !!(manager->enabled_features &
+ 				MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS);
+diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+index bed6572d0..c6bb8a68a 100644
+--- a/src/adv_monitor.h
++++ b/src/adv_monitor.h
+@@ -27,7 +27,7 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager_create(
+ 						struct mgmt *mgmt);
+ void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *manager);
+ 
+-bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *manager);
++bool btd_adv_monitor_offload_enabled(struct btd_adv_monitor_manager *manager);
+ 
+ struct queue *btd_adv_monitor_content_filter(
+ 				struct btd_adv_monitor_manager *manager,
+-- 
+2.34.1
 
---===============2675782313255933862==--
