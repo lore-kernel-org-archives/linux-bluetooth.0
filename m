@@ -2,214 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0535BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 22:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B22A1C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 22:21:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387230AbiBHWVx (ORCPT
+        id S1387294AbiBHWVy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 17:21:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
+        Tue, 8 Feb 2022 17:21:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387272AbiBHWU4 (ORCPT
+        with ESMTP id S1386208AbiBHTnt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 17:20:56 -0500
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEC3C0612B8;
-        Tue,  8 Feb 2022 14:20:55 -0800 (PST)
-Received: from localhost.localdomain (ip5f5aebc2.dynamic.kabel-deutschland.de [95.90.235.194])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4669B61E64846;
-        Tue,  8 Feb 2022 23:20:54 +0100 (CET)
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] Revert "Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg"
-Date:   Tue,  8 Feb 2022 23:19:11 +0100
-Message-Id: <20220208221911.57058-2-pmenzel@molgen.mpg.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220208221911.57058-1-pmenzel@molgen.mpg.de>
-References: <20220208221911.57058-1-pmenzel@molgen.mpg.de>
+        Tue, 8 Feb 2022 14:43:49 -0500
+X-Greylist: delayed 499 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Feb 2022 11:43:48 PST
+Received: from newmail.c0rporation.com (newmail.c0rporation.com [82.165.56.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3A9FC0612C0
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 11:43:48 -0800 (PST)
+Received: from authenticated-user (newmail.c0rporation.com [82.165.56.171])
+        by newmail.c0rporation.com (Postfix) with ESMTPA id CDF2446FF0;
+        Tue,  8 Feb 2022 19:35:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c0rporation.com;
+        s=dkim; t=1644348928;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hVY9IGO7ISDGEFbcKCbFa2YRuFMmQqPIokzLf8BkOv0=;
+        b=b/02mNvOERHeI9ANJWrkcWVlI+dNe1kvNN03lIFSDZCvF4rrI1avz/1tOok00ZsGoNGy3+
+        7mGj4nrspUf896gI6eqhnUBfkscBapOBWziNMbNJPpgtHJlBfgWBucbBf27ZigDkzNbnxM
+        0ds6snjfP/7Lw5wz4t80s12mi+q75SIzdnFZwGV912XN2boMvr/gyZncqo1YxlkhGvyM+R
+        BXqimczJaLy12Jh/Av+MvQ4b4Rd4aJEY9ZWUtu9zvqQ2IdSdfccxFacMibSvWGnmmcWIJw
+        pUNOZEZQPok2W1Gx043f3xlB5un5DgN6FEpeJ/o18Lob3e1alK+g4Ph4WJCbyg==
+Message-ID: <b9f59454-caac-3b48-62a7-ee094aca7571@c0rporation.com>
+Date:   Tue, 8 Feb 2022 19:35:27 +0000
 MIME-Version: 1.0
+Content-Language: en-GB
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+References: <a96af59d-089f-1018-74fc-355e96fcf0c3@c0rporation.com>
+ <850EDEB4-7C93-4F8E-AC41-701766BBE801@holtmann.org>
+From:   Jack Murray <kernel@c0rporation.com>
+Subject: Re: [PATCH] bluetooth: Add support for EP-B3536 USB Bluetooth adapter
+In-Reply-To: <850EDEB4-7C93-4F8E-AC41-701766BBE801@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Spamd-Bar: /
+Authentication-Results: newmail.c0rporation.com;
+        auth=pass smtp.auth=jack@c0rporation.com smtp.mailfrom=kernel@c0rporation.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This reverts commit 81be03e026dc0c16dc1c64e088b2a53b73caa895.
+Sorry I'd forgotten all about this as I actually ended up returning the 
+device since it didn't have sufficient range for what I wanted it for 
+anyway, so I can't include the /sys/kernel/debug/usb/devices output. 
+Here's an updated commit though if it's ok to merge without that.
 
-Since the commit, transferring files greater than some bytes to the
-Nokia N9 (MeeGo) or Jolla (Sailfish OS) is not possible anymore.
 
-    # obexctl
-    [NEW] Client /org/bluez/obex
-    [obex]# connect 40:98:4E:5B:CE:XX
-    Attempting to connect to 40:98:4E:5B:CE:XX
-    [NEW] Session /org/bluez/obex/client/session0 [default]
-    [NEW] ObjectPush /org/bluez/obex/client/session0
-    Connection successful
-    [40:98:4E:5B:CE:XX]# send /lib/systemd/systemd
-    Attempting to send /lib/systemd/systemd to /org/bluez/obex/client/session0
-    [NEW] Transfer /org/bluez/obex/client/session0/transfer0
-    Transfer /org/bluez/obex/client/session0/transfer0
-        Status: queued
-        Name: systemd
-        Size: 1841712
-        Filename: /lib/systemd/systemd
-        Session: /org/bluez/obex/client/session0
-    [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: active
-    [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Transferred: 32737 (@32KB/s 00:55)
-    [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: error
-    [DEL] Transfer /org/bluez/obex/client/session0/transfer0
+From: Jack Murray <kernel@c0rporation.com>
 
-Reverting it, fixes the regression.
+This patch adds support for the EDUP EP-B3536 USB bluetooth 5.1 adapter 
+based
+on the Realtek 8761B chipset. The existing driver and firmware work fine 
+for this
+device from what I can tell, so this patch just adds the vendor/product IDs
+for it to the supported device list.
 
-Link: https://lore.kernel.org/linux-bluetooth/aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de/T/#m1f9673e4ab0d55a7dccf87905337ab2e67d689f1
-Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+Signed-off-by: Jack Murray <kernel@c0rporation.com>
 ---
- net/bluetooth/rfcomm/core.c | 50 ++++++-------------------------------
- net/bluetooth/rfcomm/sock.c | 46 ++++++++++++++++++++++++++--------
- 2 files changed, 43 insertions(+), 53 deletions(-)
+   drivers/bluetooth/btusb.c | 2 ++
+   1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 7324764384b6..f2bacb464ccf 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -549,58 +549,22 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
- 	return dlc;
- }
- 
--static int rfcomm_dlc_send_frag(struct rfcomm_dlc *d, struct sk_buff *frag)
--{
--	int len = frag->len;
--
--	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
--
--	if (len > d->mtu)
--		return -EINVAL;
--
--	rfcomm_make_uih(frag, d->addr);
--	__skb_queue_tail(&d->tx_queue, frag);
--
--	return len;
--}
--
- int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
- {
--	unsigned long flags;
--	struct sk_buff *frag, *next;
--	int len;
-+	int len = skb->len;
- 
- 	if (d->state != BT_CONNECTED)
- 		return -ENOTCONN;
- 
--	frag = skb_shinfo(skb)->frag_list;
--	skb_shinfo(skb)->frag_list = NULL;
--
--	/* Queue all fragments atomically. */
--	spin_lock_irqsave(&d->tx_queue.lock, flags);
--
--	len = rfcomm_dlc_send_frag(d, skb);
--	if (len < 0 || !frag)
--		goto unlock;
--
--	for (; frag; frag = next) {
--		int ret;
--
--		next = frag->next;
--
--		ret = rfcomm_dlc_send_frag(d, frag);
--		if (ret < 0) {
--			kfree_skb(frag);
--			goto unlock;
--		}
-+	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
- 
--		len += ret;
--	}
-+	if (len > d->mtu)
-+		return -EINVAL;
- 
--unlock:
--	spin_unlock_irqrestore(&d->tx_queue.lock, flags);
-+	rfcomm_make_uih(skb, d->addr);
-+	skb_queue_tail(&d->tx_queue, skb);
- 
--	if (len > 0 && !test_bit(RFCOMM_TX_THROTTLED, &d->flags))
-+	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
- 		rfcomm_schedule();
- 	return len;
- }
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 5938af3e9936..2c95bb58f901 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -575,20 +575,46 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	sent = bt_sock_wait_ready(sk, msg->msg_flags);
-+	if (sent)
-+		goto done;
- 
--	release_sock(sk);
-+	while (len) {
-+		size_t size = min_t(size_t, len, d->mtu);
-+		int err;
- 
--	if (sent)
--		return sent;
-+		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
-+				msg->msg_flags & MSG_DONTWAIT, &err);
-+		if (!skb) {
-+			if (sent == 0)
-+				sent = err;
-+			break;
-+		}
-+		skb_reserve(skb, RFCOMM_SKB_HEAD_RESERVE);
-+
-+		err = memcpy_from_msg(skb_put(skb, size), msg, size);
-+		if (err) {
-+			kfree_skb(skb);
-+			if (sent == 0)
-+				sent = err;
-+			break;
-+		}
-+
-+		skb->priority = sk->sk_priority;
-+
-+		err = rfcomm_dlc_send(d, skb);
-+		if (err < 0) {
-+			kfree_skb(skb);
-+			if (sent == 0)
-+				sent = err;
-+			break;
-+		}
- 
--	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
--			      RFCOMM_SKB_TAIL_RESERVE);
--	if (IS_ERR_OR_NULL(skb))
--		return PTR_ERR(skb);
-+		sent += size;
-+		len  -= size;
-+	}
- 
--	sent = rfcomm_dlc_send(d, skb);
--	if (sent < 0)
--		kfree_skb(skb);
-+done:
-+	release_sock(sk);
- 
- 	return sent;
- }
--- 
-2.34.1
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 60d2fce59a71..207c8289c5c2 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -436,6 +436,8 @@ static const struct usb_device_id blacklist_table[] = {
+          /* Additional Realtek 8761BU Bluetooth devices */
+          { USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+BTUSB_WIDEBAND_SPEECH },
++       { USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
++ BTUSB_WIDEBAND_SPEECH }, >
+          /* Additional Realtek 8821AE Bluetooth devices */
+          { USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
 
+On 07/02/2022 15:40, Marcel Holtmann wrote:
+> Hi Jack,
+>
+>> This patch adds support for the EP-B3536 USB bluetooth 5.1 adapter based
+>> on the 8761B chipset. The existing driver and firmware work fine for this
+>> device from what I can tell, so this patch just adds the vendor/product IDs
+>> for it to the supported device list.
+>>
+>> Signed-off-by: Jack Murray <kernel@c0rporation.com>
+>> ---
+>>   drivers/bluetooth/btusb.c | 2 ++
+>>   1 file changed, 2 insertions(+)
+> please send an updated version addressing the comments and include /sys/kernel/debug/usb/devices.
+>
+> Regards
+>
+> Marcel
+>
