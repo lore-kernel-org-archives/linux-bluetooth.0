@@ -2,151 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F4BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 18:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA19EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 19:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384574AbiBHSSN (ORCPT
+        id S1385737AbiBHTCR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 13:18:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53222 "EHLO
+        Tue, 8 Feb 2022 14:02:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384542AbiBHSSM (ORCPT
+        with ESMTP id S1385672AbiBHTCQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 13:18:12 -0500
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BA4C061576;
-        Tue,  8 Feb 2022 10:18:07 -0800 (PST)
-X-UUID: eb66032c25c34bca98b765808ee69041-20220209
-X-UUID: eb66032c25c34bca98b765808ee69041-20220209
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 2074706789; Wed, 09 Feb 2022 02:18:02 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Wed, 9 Feb 2022 02:18:01 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 9 Feb 2022 02:18:01 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 2/2] Bluetooth: mediatek: fix the conflict between mtk and msft vendor event
-Date:   Wed, 9 Feb 2022 02:17:41 +0800
-Message-ID: <5f5f1e801432af9318bc604c54a6c15dcd8ab036.1644342794.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
+        Tue, 8 Feb 2022 14:02:16 -0500
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223CCC0613CB
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 11:02:16 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id 13so14509322qkd.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 11:02:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=nR1YSstwKHWNA8Yu7n3G9IudJVMJIHZ6cuz139mU1C4=;
+        b=GxVkjMmGMscxG84k7l9rHQo86Lb+i3+Sqt+eO/WqPGNq60oAkaIINdr8a3qLlcQWl4
+         +apaSsZWkskuSrAzXNAD1eoAwUm3hZg4uzJDxruDKSVkHt1WV2aOQl42EIJXxOZaVJKD
+         ub6vCTDebiPn/gye467/MHBnmgyQjoSsocDtf1bQvRZXOtHbbUMZ+z57OVR9y4tvYucj
+         KbLnt1SQq0SEaYGkRzUj8lktbjrOOytQWtb1ERNwVYYlbD7fJadJ9GBU1ihpxWG36nbm
+         Sf5C9dHtB2AhmZTPf7ZLNzi2U7UkUQ0zND8RNTwBP3MnDx+/fLMBGfgsN5GC6WPdSSZ7
+         967g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=nR1YSstwKHWNA8Yu7n3G9IudJVMJIHZ6cuz139mU1C4=;
+        b=XQnr4w2W7wN3H9HAnZijdY+7ZXQsItlD9YNsTLj5/+3N0pnPUvza2HR+8vztdCIA51
+         vbYWYP2nDsr9yRdW3fY1o0wNhvSyHE+ecv+qycLdCnieEZJLOGJWaIu2GZSIvRRKJUJU
+         wYegwoFhDVVs5THV2KmMwaMvIa0dttX6hJKKqjDb5XcbLU/E6rRk8Vst80cx7eLRS2Cy
+         qFtZfc8Z5Rjodf7Abu0opyX37pJYnXojYBzwvwj3l0IpGFBJxJ1IvzfTkuDZAjw00DRw
+         itzvEVynCSMtTLvIDC+mnxNaM0QFbwQo9nAdyzaKDUORvsj+MZ+BxjljnxuzOuDqdxwL
+         eGeg==
+X-Gm-Message-State: AOAM531x4sFn7MLrImrN25L08Ba/xgtuBFE6Is+AM/BxSichjEOMEWaO
+        M3b/H9EBXhhxfj+V/YUm4qw5WFqLoUT5vw==
+X-Google-Smtp-Source: ABdhPJxaMKcrZF1pfbF4qNtm4jg2X0ssjE/zC9yRcpCtiVPdFnPC+AA2FM8Z7rn3U3c5Z7kOBVbV6g==
+X-Received: by 2002:a37:66d1:: with SMTP id a200mr3436406qkc.148.1644346934677;
+        Tue, 08 Feb 2022 11:02:14 -0800 (PST)
+Received: from [172.17.0.2] ([40.121.200.186])
+        by smtp.gmail.com with ESMTPSA id bk19sm7256168qkb.125.2022.02.08.11.02.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Feb 2022 11:02:14 -0800 (PST)
+Message-ID: <6202be36.1c69fb81.9b50a.64a8@mx.google.com>
+Date:   Tue, 08 Feb 2022 11:02:14 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2675782313255933862=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
+Subject: RE: [v2,1/2] Bluetooth: mt7921s: support bluetooth reset mechanism
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <d328920a9abaaaedafc8c4922cdeb5935f6d64c3.1644342794.git.objelf@gmail.com>
 References: <d328920a9abaaaedafc8c4922cdeb5935f6d64c3.1644342794.git.objelf@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+--===============2675782313255933862==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-There is a conflict between MediaTek wmt event and msft vendor extension
-logic in the core layer since 145373cb1b1f ("Bluetooth: Add framework for
-Microsoft vendor extension") was introduced because we changed the type of
-mediatek wmt event to the type of msft vendor event in the driver.
+This is automated email and please do not reply to this email!
 
-But the purpose we reported mediatek event to the core layer is for the
-diagnostic purpose with that we are able to see the full packet trace via
-monitoring socket with btmon. Thus, it is harmless we keep the original
-type of mediatek vendor event here to avoid breaking the msft extension
-function especially they can be supported by Mediatek chipset like MT7921
-, MT7922 devices and future devices.
+Dear submitter,
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=612283
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.66 seconds
+GitLint                       PASS      1.81 seconds
+SubjectPrefix                 PASS      1.66 seconds
+BuildKernel                   PASS      27.99 seconds
+BuildKernel32                 PASS      24.98 seconds
+Incremental Build with patchesPASS      41.37 seconds
+TestRunner: Setup             PASS      442.04 seconds
+TestRunner: l2cap-tester      PASS      13.30 seconds
+TestRunner: bnep-tester       PASS      5.71 seconds
+TestRunner: mgmt-tester       PASS      101.36 seconds
+TestRunner: rfcomm-tester     PASS      7.26 seconds
+TestRunner: sco-tester        PASS      7.53 seconds
+TestRunner: smp-tester        PASS      7.40 seconds
+TestRunner: userchan-tester   PASS      6.18 seconds
+
+
+
 ---
-v2: fix the warning: variable 'hdr' set but not used
----
- drivers/bluetooth/btmtk.h     | 1 +
- drivers/bluetooth/btmtksdio.c | 9 +--------
- drivers/bluetooth/btusb.c     | 8 --------
- 3 files changed, 2 insertions(+), 16 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 8960a5f89d48..013850fd2055 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -5,6 +5,7 @@
- #define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
- #define FIRMWARE_MT7961		"mediatek/BT_RAM_CODE_MT7961_1_2_hdr.bin"
- 
-+#define HCI_EV_WMT 0xe4
- #define HCI_WMT_MAX_EVENT_SIZE		64
- 
- #define BTMTK_WMT_REG_WRITE 0x1
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 8e200e80d2f6..cbb09e1b823d 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -381,13 +381,6 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_event_hdr *hdr = (void *)skb->data;
- 	int err;
- 
--	/* Fix up the vendor event id with 0xff for vendor specific instead
--	 * of 0xe4 so that event send via monitoring socket can be parsed
--	 * properly.
--	 */
--	if (hdr->evt == 0xe4)
--		hdr->evt = HCI_EV_VENDOR;
--
- 	/* When someone waits for the WMT event, the skb is being cloned
- 	 * and being processed the events from there then.
- 	 */
-@@ -403,7 +396,7 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (err < 0)
- 		goto err_free_skb;
- 
--	if (hdr->evt == HCI_EV_VENDOR) {
-+	if (hdr->evt == HCI_EV_WMT) {
- 		if (test_and_clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT,
- 				       &bdev->tx_state)) {
- 			/* Barrier to sync with other CPUs */
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e03dfbd92fcc..9f10c5e256ec 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2251,7 +2251,6 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
- {
- 	struct hci_dev *hdev = urb->context;
- 	struct btusb_data *data = hci_get_drvdata(hdev);
--	struct hci_event_hdr *hdr;
- 	struct sk_buff *skb;
- 	int err;
- 
-@@ -2271,13 +2270,6 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
- 		hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
- 		skb_put_data(skb, urb->transfer_buffer, urb->actual_length);
- 
--		hdr = (void *)skb->data;
--		/* Fix up the vendor event id with 0xff for vendor specific
--		 * instead of 0xe4 so that event send via monitoring socket can
--		 * be parsed properly.
--		 */
--		hdr->evt = 0xff;
--
- 		/* When someone waits for the WMT event, the skb is being cloned
- 		 * and being processed the events from there then.
- 		 */
--- 
-2.25.1
 
+--===============2675782313255933862==--
