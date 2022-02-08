@@ -2,43 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47A9EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 06:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AABC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Feb 2022 06:49:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346913AbiBHGtt (ORCPT
+        id S1347804AbiBHGty (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 01:49:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44378 "EHLO
+        Tue, 8 Feb 2022 01:49:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239853AbiBHGts (ORCPT
+        with ESMTP id S1347792AbiBHGtx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 01:49:48 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151F2C0401EF
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Feb 2022 22:49:48 -0800 (PST)
-Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nHKJu-0004ue-HD; Tue, 08 Feb 2022 07:49:46 +0100
-Message-ID: <d565674e-b12c-2444-6efc-65c1e6e540d1@leemhuis.info>
-Date:   Tue, 8 Feb 2022 07:49:46 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [Bug 215576] New: HSP/HFP mSBC profile broken with QCA6174
-Content-Language: en-BS
-To:     bugzilla-daemon@kernel.org, linux-bluetooth@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <bug-215576-62941@https.bugzilla.kernel.org/>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
+        Tue, 8 Feb 2022 01:49:53 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17AD6C0401EF
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Feb 2022 22:49:53 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D16EDB817D3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 06:49:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 88080C340F2
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 06:49:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644302990;
+        bh=x8/gwAyS/ckucuPb1yFG3M2FH+1673+LOHSSiwkkTvU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=RZ7rn5VOtn56hnxDFb1BgtReorSaREQINDtHRyA2rzQx+C2KnlcDExZAvI6YFJJt0
+         OYIvTtBUSXFFwtej8ctgzdtIyl3X/KBf8FcDqV7eKDhRw1NOCAYjVKcOgRgGSgQ+zL
+         8HeV+bdz28kX8CZJHtd0HWj6OJ4cEnswJRHZOXMl836TVLGgJAuLeXuxNdI4U0oGbj
+         pfHHtNhZ7YV+OAJTuvXw7FcFIZi/XEnYtlpyHV6B5ZjPwNgHtSt82PNiXkhlyzIFQ4
+         SxLgIZp63f4FybhBXWpApqq9Uzey1PUK0lFkaGMuweuNa5HF7SBbLyKG0fZJ6nODfv
+         OcJBA79TLsuPQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 72932C05FE2; Tue,  8 Feb 2022 06:49:50 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215576] HSP/HFP mSBC profile broken with QCA6174
+Date:   Tue, 08 Feb 2022 06:49:50 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215576-62941-vwLe9opE7R@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215576-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1644302988;921d95a5;
-X-HE-SMSGID: 1nHKJu-0004ue-HD
+References: <bug-215576-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
+
+--- Comment #1 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
 [TLDR: I'm adding the regression report below to regzbot, the Linux
 kernel regression tracking bot; all text you find below is compiled from
 a few templates paragraphs you might have encountered already already
@@ -51,8 +82,8 @@ regressions, as explained here:
 https://www.kernel.org/doc/html/latest/admin-guide/reporting-issues.html
 
 On 07.02.22 19:00, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=215576
-> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
+>=20
 >             Bug ID: 215576
 >            Summary: HSP/HFP mSBC profile broken with QCA6174
 >            Product: Drivers
@@ -68,27 +99,31 @@ On 07.02.22 19:00, bugzilla-daemon@kernel.org wrote:
 >           Assignee: linux-bluetooth@vger.kernel.org
 >           Reporter: mike@mjones.io
 >         Regression: No
-> 
+>=20
 > Created attachment 300405
->   --> https://bugzilla.kernel.org/attachment.cgi?id=300405&action=edit
+>   --> https://bugzilla.kernel.org/attachment.cgi?id=3D300405&action=3Dedit
 > dmesg with 5.16.7
-> 
-> Between v5.15 and v5.16, mSBC via pipewire stopped working with the QCA6174
+>=20
+> Between v5.15 and v5.16, mSBC via pipewire stopped working with the QCA61=
+74
 > adapter.
-> 
-> Switching to the HSP/HFP profile with mSBC codec in pipewire produces a loud
+>=20
+> Switching to the HSP/HFP profile with mSBC codec in pipewire produces a l=
+oud
 > buzzing sound, and the microphone does not function. When using PulseAudio
-> instead of pipewire, the buzzing is absent but audio input/output also don't
+> instead of pipewire, the buzzing is absent but audio input/output also do=
+n't
 > work.
-> 
+>=20
 > Other users are reporting the same issue at [1].
-> 
-> I ran a git bisect between these two versions and the issue seems to have been
+>=20
+> I ran a git bisect between these two versions and the issue seems to have
+> been
 > caused by this commit:
-> 
+>=20
 > [b2af264ad3af437238c9500aa830ebcafb180e05] Bluetooth: Add support for
 > HCI_Enhanced_Setup_Synchronous_Connection command
-> 
+>=20
 > [1] https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2019
 
 To be sure this issue doesn't fall through the cracks unnoticed, I'm
@@ -97,7 +132,7 @@ adding it to regzbot, my Linux kernel regression tracking bot:
 #regzbot ^introduced b2af264ad3af437238c9500aa830ebcafb180e05
 #regzbot title bluetooth: HSP/HFP mSBC profile broken with QCA6174
 #regzbot ignore-activity
-#regzbot link https://bugzilla.kernel.org/show_bug.cgi?id=215576
+#regzbot link https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
 
 Reminder for developers: when fixing the issue, please add a 'Link:'
 tags pointing to the report (the mail quoted above) using
@@ -129,30 +164,8 @@ that's not the case here; if you think it is, don't hesitate to tell me
 in a public reply, it's in everyone's interest to set the public record
 straight.
 
--- 
-Additional information about regzbot:
+--=20
+You may reply to this email to add a comment.
 
-If you want to know more about regzbot, check out its web-interface, the
-getting start guide, and the references documentation:
-
-https://linux-regtracking.leemhuis.info/regzbot/
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
-
-The last two documents will explain how you can interact with regzbot
-yourself if your want to.
-
-Hint for reporters: when reporting a regression it's in your interest to
-CC the regression list and tell regzbot about the issue, as that ensures
-the regression makes it onto the radar of the Linux kernel's regression
-tracker -- that's in your interest, as it ensures your report won't fall
-through the cracks unnoticed.
-
-Hint for developers: you normally don't need to care about regzbot once
-it's involved. Fix the issue as you normally would, just remember to
-include 'Link:' tag in the patch descriptions pointing to all reports
-about the issue. This has been expected from developers even before
-regzbot showed up for reasons explained in
-'Documentation/process/submitting-patches.rst' and
-'Documentation/process/5.Posting.rst'.
-
+You are receiving this mail because:
+You are the assignee for the bug.=
