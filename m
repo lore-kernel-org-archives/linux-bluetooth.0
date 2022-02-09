@@ -2,97 +2,236 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EE4C43217
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 06:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0475C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 06:43:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232900AbiBIGbH (ORCPT
+        id S232692AbiBIGnc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Feb 2022 01:31:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36128 "EHLO
+        Wed, 9 Feb 2022 01:43:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233001AbiBIGau (ORCPT
+        with ESMTP id S232653AbiBIGnb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Feb 2022 01:30:50 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B48E05B1F3
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 22:30:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 59CDFB81F1F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 06:30:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D62CC340F1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 06:30:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644388245;
-        bh=WkgjiXhAY76l7hnxTuwVODvptO9Ja2eaP8RGn+xclkM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=TYvfoM+y+ZJDl1bbU94H+MR4esWdBuBG/6ZFVAnx3GUbqbiA95L2q3cn3yYapuQMt
-         GAVWbLsKnQ0NRdKu7XbR6Gcx7KNVPfSA4/92Hj7MR6FMUwJc0ZrY4C4qBYBMyo5Gcm
-         1nJiPiTkmuJTzpRDzZq1GnRFIob1JLfS9UFC3yITYWqOPhutRCnjAESUG0KFCEmVA2
-         S7xByr3g28quePGCILoo5Jq6QdMTYBJ4eMxyxI97boJSZN5gRkYMY0nS2T46BmmzYx
-         74X9Rp7KE/RdAaG7ejh8k49U1DJJ8BuV40Ux7n12Q4XYiww0ghSX1pdFPUInPQB/Za
-         tan1sViagAhwQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 1DAFEC05FCE; Wed,  9 Feb 2022 06:30:45 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Wed, 09 Feb 2022 06:30:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: gochkin@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209745-62941-KEJWWX3wYY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 9 Feb 2022 01:43:31 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A023CC0401C7
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 22:43:33 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id l123-20020a1c2581000000b0037b9d960079so2609285wml.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 22:43:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MLYjiOVPKhgNDOuYW/VTkzO6TMLwooskMLT94QS4iQA=;
+        b=E4VMwXJ0L2RIg+JWnsFqYky6/ZvCzNWTTPH8FQlSGYUDLrKQIUjsyfUvhSy+Rhooq0
+         XoqNwJnhYK4+ieT+hXHly/T2Qc+fLrWrwr2FSWgSFAQyO0tyzjZ8b9+Bnz3CL2Ew+aTO
+         4JgonE6Fap7X7t8X6kw0FI18JbopoQs2odSAF2eQ3s87MINR5htRIeya/dBvfqsrwWBi
+         R1bwQoSF4aCqXi/KM+feyF2Rv3q3pEtazUMLkIVmVwK2whzHwlHtnAmLVv5MbQupVkq6
+         12fx56d0L6Jx8fkoVTjK0q/tl5VPiZx4AzY0dsYZoQA7gEIdeBpoj15dLSC7hpYXxSwR
+         klxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MLYjiOVPKhgNDOuYW/VTkzO6TMLwooskMLT94QS4iQA=;
+        b=5YYKBSVXzjyobdO1wtvLTp39X0Qr17jNZ8WDJl8NXXRZwMN9LaW45kYckTkxewM1ii
+         s0/8ZwHfw7F0vF8JKSea8KIbpZ6Xp9/IrCVSaqUVq4x6g+qNbUJwPUjkkZ+i+00KxpSq
+         e4vp/x4P0GgLxtlkbpNPTN9aemuYknVHnnK0XrWtQ0rkn5M4YbjhQ2+Y7Mh4ZCgbMnxT
+         Fg8JadQebhhvSzsq8R/aRLcRNDc9D5FNwgkCSitNA/9W9nyo0uPSfURtcOaz7b7ZrtEJ
+         N7LFqy5mvwn5nYTs4nB9x+qVvqtBH9yupIY3C8WIFpndTPtB++33PFl9nSe5xQAQyi8O
+         ++Hg==
+X-Gm-Message-State: AOAM533wrHoOdiqxH4+Q6scoAQWGDSLgE5C7mQsvcplC1aFgocpG9bcF
+        pzeJSIwDec/+MTwXtZBCPGBFEJW8VhEjE9c4bMAigPFnj3X5iQ==
+X-Google-Smtp-Source: ABdhPJymT2JZGSN8Y7HYK5KFD4f2xSuuwK/QlfQctePRhEk6BA05HxF+VlKwcLl1SirPPkng/SApF9r56dE3Sg5yO5w=
+X-Received: by 2002:a05:600c:1c87:: with SMTP id k7mr1233953wms.60.1644388659305;
+ Tue, 08 Feb 2022 22:37:39 -0800 (PST)
 MIME-Version: 1.0
+References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
+ <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com> <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
+In-Reply-To: <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Wed, 9 Feb 2022 14:37:28 +0800
+Message-ID: <CAJQfnxG-=cJoYoTwSvUOjDtdk5tx=F4XXWzLOOAo3oGsvcQovw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
+ is called
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
+Hi Luiz,
 
-Yegor Yegorov (gochkin@gmail.com) changed:
+On Wed, 9 Feb 2022 at 10:39, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Tue, Sep 15, 2020 at 9:51 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Archie,
+> >
+> > On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
+> > >
+> > > From: Archie Pusaka <apusaka@chromium.org>
+> > >
+> > > RemoveDevice on adapter interface used to remove a device, even when
+> > > the device is connected. However, since the introduction of the new
+> > > 30 seconds timeout when setting a device as temporary, RemoveDevice
+> > > doesn't immediately remove a connected device, but only disconnects
+> > > it and waits for the timer to expire before effectively removes it.
+> > >
+> > > This patch removes the device as soon as it gets disconnected,
+> > > provided the disconnection is triggered by a call to RemoveDevice.
+> > > The regular timeout still applies for other cases.
+> > >
+> > > Tested manually by calling RemoveDevice on a connected device,
+> > > and with ChromeOS autotest setup.
+> > >
+> > > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+> > > ---
+> > >
+> > > Changes in v3:
+> > > * Rebasing again
+> > >
+> > > Changes in v2:
+> > > * Rebasing to HEAD
+> > >
+> > >  src/adapter.c |  2 --
+> > >  src/adapter.h |  2 ++
+> > >  src/device.c  | 11 +++++++++++
+> > >  3 files changed, 13 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/src/adapter.c b/src/adapter.c
+> > > index df628a7fd..4e27bd74b 100644
+> > > --- a/src/adapter.c
+> > > +++ b/src/adapter.c
+> > > @@ -80,8 +80,6 @@
+> > >  #include "adv_monitor.h"
+> > >  #include "eir.h"
+> > >
+> > > -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> > > -
+> > >  #define MODE_OFF               0x00
+> > >  #define MODE_CONNECTABLE       0x01
+> > >  #define MODE_DISCOVERABLE      0x02
+> > > diff --git a/src/adapter.h b/src/adapter.h
+> > > index c70a7b0da..2f1e4b737 100644
+> > > --- a/src/adapter.h
+> > > +++ b/src/adapter.h
+> > > @@ -29,6 +29,8 @@
+> > >  #include <lib/bluetooth.h>
+> > >  #include <lib/sdp.h>
+> > >
+> > > +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> > > +
+> > >  #define MAX_NAME_LENGTH                248
+> > >
+> > >  /* Invalid SSP passkey value used to indicate negative replies */
+> > > diff --git a/src/device.c b/src/device.c
+> > > index 8f73ce4d3..3e7784034 100644
+> > > --- a/src/device.c
+> > > +++ b/src/device.c
+> > > @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> > >  {
+> > >         struct bearer_state *state = get_state(device, bdaddr_type);
+> > >         DBusMessage *reply;
+> > > +       bool remove_device = false;
+> > >
+> > >         if (!state->connected)
+> > >                 return;
+> > > @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> > >         while (device->disconnects) {
+> > >                 DBusMessage *msg = device->disconnects->data;
+> > >
+> > > +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
+> > > +                                                               "RemoveDevice"))
+> > > +                       remove_device = true;
+> > > +
+> > >                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
+> > >                 device->disconnects = g_slist_remove(device->disconnects, msg);
+> > >                 dbus_message_unref(msg);
+> > > @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> > >
+> > >         g_dbus_emit_property_changed(dbus_conn, device->path,
+> > >                                                 DEVICE_INTERFACE, "Connected");
+> > > +
+> > > +       if (remove_device)
+> > > +               btd_adapter_remove_device(device->adapter, device);
+>
+> It looks like there are instances where device_remove_connection is
+> called that can lead to the following trace:
+>
+> ==4030336== Invalid read of size 8
+> ==4030336==    at 0x40B8A1: device_is_authenticating (device.c:6975)
+> ==4030336==    by 0x3ABA2F: adapter_remove_connection (adapter.c:7166)
+> ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
+> ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
+> ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
+> ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
+> ==4030336==    by 0x495312F: g_main_context_dispatch (in
+> /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x4952852: g_main_loop_run (in
+> /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x49C814: mainloop_run (mainloop-glib.c:66)
+> ==4030336==    by 0x49CD0B: mainloop_run_with_signal (mainloop-notify.c:188)
+> ==4030336==    by 0x29B18B: main (main.c:1239)
+> ==4030336==  Address 0x771bfe0 is 448 bytes inside a block of size 656 free'd
+> ==4030336==    at 0x48440E4: free (vg_replace_malloc.c:872)
+> ==4030336==    by 0x4954DAC: g_free (in /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x44D166: remove_interface (object.c:660)
+> ==4030336==    by 0x44DEDA: g_dbus_unregister_interface (object.c:1394)
+> ==4030336==    by 0x3ABA27: adapter_remove_connection (adapter.c:7164)
+> ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
+> ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
+> ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
+> ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
+> ==4030336==    by 0x495312F: g_main_context_dispatch (in
+> /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
+> ==4030336==    by 0x4952852: g_main_loop_run (in
+> /usr/lib64/libglib-2.0.so.0.7000.2)
+>
+> So it appeared to be unsafe to call btd_adapter_remove_device, btw
+> this happened when Ive attempted to pair 2 emulator instances
+> (btvirt).
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |gochkin@gmail.com
+Does this happen after calling Adapter1.RemoveDevice? I suppose if
+that's true then adapter_remove_connection shouldn't have been called
+since the device should have been removed at this point.
+Perhaps I misunderstood your message?
+>
+> > >  }
+> > >
+> > >  guint device_add_disconnect_watch(struct btd_device *device,
+> > > @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+> > >                 disconnect_all(device);
+> > >         }
+> > >
+> > > +       if (device->temporary_timer > 0)
+> > > +               g_source_remove(device->temporary_timer);
+> > > +
+> > >         if (device->store_id > 0) {
+> > >                 g_source_remove(device->store_id);
+> > >                 device->store_id = 0;
+> > > --
+> > > 2.28.0.618.gf4bc123cb7-goog
+> > >
+> >
+> > Applied, thanks.
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
---- Comment #19 from Yegor Yegorov (gochkin@gmail.com) ---
-It seems that I have a similar problem, but on the 5.17-RC kernel. I have
-Logitech MX Anywhere 3 mouse. It works properly on 5.16 kernel. I have noti=
-ced
-that on every repair to my computer the mouse changes its MAC address, but =
-it
-seems to be unrelated to this bug. On 5.17-RC kernel the mouse is working r=
-ight
-after pairing to the computer, but stops working on the first disconnect fr=
-om
-my computer (on computer sleep or reboot, on mouse standby or power down, a=
-nd
-on software disconnect from the mouse in bluetoothctl). The mouse start wor=
-king
-again only after removing the mouse from paired devices and repairing again.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Thanks,
+Archie
