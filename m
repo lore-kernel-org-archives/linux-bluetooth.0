@@ -2,236 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0475C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 06:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701C8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 08:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232692AbiBIGnc (ORCPT
+        id S230220AbiBIIve (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Feb 2022 01:43:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33948 "EHLO
+        Wed, 9 Feb 2022 03:51:34 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:37660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232653AbiBIGnb (ORCPT
+        with ESMTP id S230410AbiBIIvd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Feb 2022 01:43:31 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A023CC0401C7
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 22:43:33 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id l123-20020a1c2581000000b0037b9d960079so2609285wml.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 22:43:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MLYjiOVPKhgNDOuYW/VTkzO6TMLwooskMLT94QS4iQA=;
-        b=E4VMwXJ0L2RIg+JWnsFqYky6/ZvCzNWTTPH8FQlSGYUDLrKQIUjsyfUvhSy+Rhooq0
-         XoqNwJnhYK4+ieT+hXHly/T2Qc+fLrWrwr2FSWgSFAQyO0tyzjZ8b9+Bnz3CL2Ew+aTO
-         4JgonE6Fap7X7t8X6kw0FI18JbopoQs2odSAF2eQ3s87MINR5htRIeya/dBvfqsrwWBi
-         R1bwQoSF4aCqXi/KM+feyF2Rv3q3pEtazUMLkIVmVwK2whzHwlHtnAmLVv5MbQupVkq6
-         12fx56d0L6Jx8fkoVTjK0q/tl5VPiZx4AzY0dsYZoQA7gEIdeBpoj15dLSC7hpYXxSwR
-         klxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MLYjiOVPKhgNDOuYW/VTkzO6TMLwooskMLT94QS4iQA=;
-        b=5YYKBSVXzjyobdO1wtvLTp39X0Qr17jNZ8WDJl8NXXRZwMN9LaW45kYckTkxewM1ii
-         s0/8ZwHfw7F0vF8JKSea8KIbpZ6Xp9/IrCVSaqUVq4x6g+qNbUJwPUjkkZ+i+00KxpSq
-         e4vp/x4P0GgLxtlkbpNPTN9aemuYknVHnnK0XrWtQ0rkn5M4YbjhQ2+Y7Mh4ZCgbMnxT
-         Fg8JadQebhhvSzsq8R/aRLcRNDc9D5FNwgkCSitNA/9W9nyo0uPSfURtcOaz7b7ZrtEJ
-         N7LFqy5mvwn5nYTs4nB9x+qVvqtBH9yupIY3C8WIFpndTPtB++33PFl9nSe5xQAQyi8O
-         ++Hg==
-X-Gm-Message-State: AOAM533wrHoOdiqxH4+Q6scoAQWGDSLgE5C7mQsvcplC1aFgocpG9bcF
-        pzeJSIwDec/+MTwXtZBCPGBFEJW8VhEjE9c4bMAigPFnj3X5iQ==
-X-Google-Smtp-Source: ABdhPJymT2JZGSN8Y7HYK5KFD4f2xSuuwK/QlfQctePRhEk6BA05HxF+VlKwcLl1SirPPkng/SApF9r56dE3Sg5yO5w=
-X-Received: by 2002:a05:600c:1c87:: with SMTP id k7mr1233953wms.60.1644388659305;
- Tue, 08 Feb 2022 22:37:39 -0800 (PST)
-MIME-Version: 1.0
-References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
- <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com> <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
-In-Reply-To: <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Wed, 9 Feb 2022 14:37:28 +0800
-Message-ID: <CAJQfnxG-=cJoYoTwSvUOjDtdk5tx=F4XXWzLOOAo3oGsvcQovw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
- is called
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
+        Wed, 9 Feb 2022 03:51:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A42E019D01
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 00:51:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DBD4961956
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 08:48:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4580EC340F8
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 08:48:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644396528;
+        bh=l/QHMM4RnWbZMN5ovcuJK4yMCCPDKczrdXYgcw5QyFI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=DGtRQEouO0jlQuNwzRVEODYmiyTj7NmwAv0q5V4NwgUe18iKU6sJ3HDkvVDhFLEd+
+         JG6Iaf4fa8tF2kp8vAjqs1dkILW4tRD4psgFHrRvRGzDE+g2DgipqunK8YG7W5rZst
+         T/duLxlHIsmNKXwrgvg3FqoNzRszBCHPiI1FTckMBGG8qBpyShmOc0e++KAxFoqdeb
+         UhsA/gjhGr+hlQ/LUd2thNuYxTRp+9BugTbDt5jEwFSxKbSSBZP2PbrDCuQbLzWp3K
+         TpEiyg3LYyxiwR974ogJl/uFyNZ50iUcyq6s82tTHT9m1+9ETxC/c1VuUizcwEgIJ7
+         5ajbuMSIpgA7Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3583EC05FD2; Wed,  9 Feb 2022 08:48:48 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Wed, 09 Feb 2022 08:48:47 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kvaster@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215167-62941-BlKrIzA7RT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-On Wed, 9 Feb 2022 at 10:39, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Tue, Sep 15, 2020 at 9:51 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
-> > >
-> > > From: Archie Pusaka <apusaka@chromium.org>
-> > >
-> > > RemoveDevice on adapter interface used to remove a device, even when
-> > > the device is connected. However, since the introduction of the new
-> > > 30 seconds timeout when setting a device as temporary, RemoveDevice
-> > > doesn't immediately remove a connected device, but only disconnects
-> > > it and waits for the timer to expire before effectively removes it.
-> > >
-> > > This patch removes the device as soon as it gets disconnected,
-> > > provided the disconnection is triggered by a call to RemoveDevice.
-> > > The regular timeout still applies for other cases.
-> > >
-> > > Tested manually by calling RemoveDevice on a connected device,
-> > > and with ChromeOS autotest setup.
-> > >
-> > > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-> > > ---
-> > >
-> > > Changes in v3:
-> > > * Rebasing again
-> > >
-> > > Changes in v2:
-> > > * Rebasing to HEAD
-> > >
-> > >  src/adapter.c |  2 --
-> > >  src/adapter.h |  2 ++
-> > >  src/device.c  | 11 +++++++++++
-> > >  3 files changed, 13 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/src/adapter.c b/src/adapter.c
-> > > index df628a7fd..4e27bd74b 100644
-> > > --- a/src/adapter.c
-> > > +++ b/src/adapter.c
-> > > @@ -80,8 +80,6 @@
-> > >  #include "adv_monitor.h"
-> > >  #include "eir.h"
-> > >
-> > > -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > -
-> > >  #define MODE_OFF               0x00
-> > >  #define MODE_CONNECTABLE       0x01
-> > >  #define MODE_DISCOVERABLE      0x02
-> > > diff --git a/src/adapter.h b/src/adapter.h
-> > > index c70a7b0da..2f1e4b737 100644
-> > > --- a/src/adapter.h
-> > > +++ b/src/adapter.h
-> > > @@ -29,6 +29,8 @@
-> > >  #include <lib/bluetooth.h>
-> > >  #include <lib/sdp.h>
-> > >
-> > > +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > +
-> > >  #define MAX_NAME_LENGTH                248
-> > >
-> > >  /* Invalid SSP passkey value used to indicate negative replies */
-> > > diff --git a/src/device.c b/src/device.c
-> > > index 8f73ce4d3..3e7784034 100644
-> > > --- a/src/device.c
-> > > +++ b/src/device.c
-> > > @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > >  {
-> > >         struct bearer_state *state = get_state(device, bdaddr_type);
-> > >         DBusMessage *reply;
-> > > +       bool remove_device = false;
-> > >
-> > >         if (!state->connected)
-> > >                 return;
-> > > @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > >         while (device->disconnects) {
-> > >                 DBusMessage *msg = device->disconnects->data;
-> > >
-> > > +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-> > > +                                                               "RemoveDevice"))
-> > > +                       remove_device = true;
-> > > +
-> > >                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
-> > >                 device->disconnects = g_slist_remove(device->disconnects, msg);
-> > >                 dbus_message_unref(msg);
-> > > @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > >
-> > >         g_dbus_emit_property_changed(dbus_conn, device->path,
-> > >                                                 DEVICE_INTERFACE, "Connected");
-> > > +
-> > > +       if (remove_device)
-> > > +               btd_adapter_remove_device(device->adapter, device);
->
-> It looks like there are instances where device_remove_connection is
-> called that can lead to the following trace:
->
-> ==4030336== Invalid read of size 8
-> ==4030336==    at 0x40B8A1: device_is_authenticating (device.c:6975)
-> ==4030336==    by 0x3ABA2F: adapter_remove_connection (adapter.c:7166)
-> ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x4952852: g_main_loop_run (in
-> /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x49C814: mainloop_run (mainloop-glib.c:66)
-> ==4030336==    by 0x49CD0B: mainloop_run_with_signal (mainloop-notify.c:188)
-> ==4030336==    by 0x29B18B: main (main.c:1239)
-> ==4030336==  Address 0x771bfe0 is 448 bytes inside a block of size 656 free'd
-> ==4030336==    at 0x48440E4: free (vg_replace_malloc.c:872)
-> ==4030336==    by 0x4954DAC: g_free (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x44D166: remove_interface (object.c:660)
-> ==4030336==    by 0x44DEDA: g_dbus_unregister_interface (object.c:1394)
-> ==4030336==    by 0x3ABA27: adapter_remove_connection (adapter.c:7164)
-> ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> ==4030336==    by 0x4952852: g_main_loop_run (in
-> /usr/lib64/libglib-2.0.so.0.7000.2)
->
-> So it appeared to be unsafe to call btd_adapter_remove_device, btw
-> this happened when Ive attempted to pair 2 emulator instances
-> (btvirt).
+Viktor Kuzmin (kvaster@gmail.com) changed:
 
-Does this happen after calling Adapter1.RemoveDevice? I suppose if
-that's true then adapter_remove_connection shouldn't have been called
-since the device should have been removed at this point.
-Perhaps I misunderstood your message?
->
-> > >  }
-> > >
-> > >  guint device_add_disconnect_watch(struct btd_device *device,
-> > > @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
-> > >                 disconnect_all(device);
-> > >         }
-> > >
-> > > +       if (device->temporary_timer > 0)
-> > > +               g_source_remove(device->temporary_timer);
-> > > +
-> > >         if (device->store_id > 0) {
-> > >                 g_source_remove(device->store_id);
-> > >                 device->store_id = 0;
-> > > --
-> > > 2.28.0.618.gf4bc123cb7-goog
-> > >
-> >
-> > Applied, thanks.
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
->
-> --
-> Luiz Augusto von Dentz
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kvaster@gmail.com
 
-Thanks,
-Archie
+--- Comment #26 from Viktor Kuzmin (kvaster@gmail.com) ---
+My hardware: Dell XPS 7590
+
+Device ID 8087:0029 Intel Corp. AX200 Bluetooth
+
+With linux kernel 5.16.7. By default sometimes bluetooth works and sometimes
+after reboot or after suspend/resume I have:
+
+Bluetooth: hci0: command 0xfc05 tx timeout
+
+File: drivers/bluetooth/btusb.c
+Function: btusb_qca_cmd_timeout
+
+If I disable 'reset_gpio' or change 'msleep(200)' to 'msleep(500)' then
+bluetooth is working and I have:
+
+[   10.195266] Bluetooth: Core ver 2.22
+[   10.197208] Bluetooth: HCI device and connection manager initialized
+[   10.197211] Bluetooth: HCI socket layer initialized
+[   10.197213] Bluetooth: L2CAP socket layer initialized
+[   10.197216] Bluetooth: SCO socket layer initialized
+[   10.309387] Bluetooth: hci0: Found device firmware: intel/ibt-20-1-3.sfi
+[   10.309454] Bluetooth: hci0: Boot Address: 0x24800
+[   10.309457] Bluetooth: hci0: Firmware Version: 125-46.21
+[   10.309459] Bluetooth: hci0: Firmware already loaded
+[   10.364049] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   10.364053] Bluetooth: BNEP filters: protocol multicast
+[   10.364057] Bluetooth: BNEP socket layer initialized
+[   10.370006] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.371010] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.372073] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.373040] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.374004] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.375026] Bluetooth: hci0: Failed to read codec capabilities (-56)
+[   10.376009] Bluetooth: hci0: Failed to read codec capabilities (-56)
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
