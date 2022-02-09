@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EDBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 09:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FC6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 09:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234487AbiBIJZ7 (ORCPT
+        id S233744AbiBIJ0I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Feb 2022 04:25:59 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:47330 "EHLO
+        Wed, 9 Feb 2022 04:26:08 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:47982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbiBIJZ4 (ORCPT
+        with ESMTP id S229544AbiBIJ0H (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Feb 2022 04:25:56 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B567FE03E21E
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 01:25:52 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso4624389pjg.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Feb 2022 01:25:52 -0800 (PST)
+        Wed, 9 Feb 2022 04:26:07 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF36AE058254
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 01:26:01 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id y17so1691019plg.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Feb 2022 01:26:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=lZ7VTq83RLOJ0uaKrHIzjaJZ39aUOWoyZ3tyZJGSuJU=;
-        b=Q8F6O7dEG2GmVqhWUePA72aKjaibZFeijXFsC1Bf32F/sm6KdfoPdt7Z2JUIP4ayKJ
-         +YYJFFdxBkzEQ8B/i1pQxNhh4nkLY2jlK++Gh5fNElZlt/NDGCGSMCm7yL9K46AP0472
-         YrxskiyxBWJoq5e+fZv5+VQ5AUPymvivuiAOk=
+        bh=vZUO0cqlNRIJarZJPiafFiE07Tp9QCPY4gWT3QTXXvQ=;
+        b=MuP0BGrWdMzNenvaMZIVRsd7fdvLFy+WKwRFeYpCEQR3pedG07OBNa03n3XKM2UoX4
+         /jmjbqvWlxIvP74qXsU0ZH9VmYRzmExVHKvn2F5a4fFw3r3H9c6ctIzzBTpsH6a/zMLZ
+         xqlaSN0U/3UiW1bGy9Ewy+dxl5zNXE47dFwx4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lZ7VTq83RLOJ0uaKrHIzjaJZ39aUOWoyZ3tyZJGSuJU=;
-        b=U2umLXDVgStvvTek2recXR8+u4mxP464OGHVsZs99ciV5ap4HkTesxb2/WNLKWNZmQ
-         PCubGy3JCfx5nWG3jDh8V8rH0hrQ6ch3lGbQb0M/PIgx7aaK3iCDvr3ziwkzyFrrO5tn
-         /CLQPA9zEwkXx/6Qrp91+R3dcIoaS4lG+6dkRNi01mNmi60Z7o5nFORq1iCcdiGTV17E
-         JqnKYltGEhSvsLgotTFjxASB8MHSTivlCKqbDNzrxo/Yb784rdkjVXMtoccLp/+sPWgG
-         qIXVMHwk4EHCVlqbRLX1TCVYkjhtqyhmGr0YTeyVzxe/Vem0OQamrE5dcTa6JuLZU8R3
-         H55w==
-X-Gm-Message-State: AOAM532x3SrmozcimEI4hyPKfQjQQM9UeYlSPwsX9WQmIs9GwVikmUo7
-        GDARAay2llk0qkrxw92bTcTnDoxlZUFNiw==
-X-Google-Smtp-Source: ABdhPJzcwi4WfVrKuzHeNTX5DiKKi/0SBFV1n0bFRbOxFKOQ3J5zV0PfPvhAy/lv3MkU5+mNto7PXw==
-X-Received: by 2002:a17:902:ec82:: with SMTP id x2mr1301453plg.139.1644398678214;
-        Wed, 09 Feb 2022 01:24:38 -0800 (PST)
+        bh=vZUO0cqlNRIJarZJPiafFiE07Tp9QCPY4gWT3QTXXvQ=;
+        b=NHoUBcs5qwwDchZHdo6VMUzuXCmECm2c7CG/dfiWxo5LDYErPi1LHTul9n9oJcdE9H
+         LgXKSCMg4i8U6d8IfNXUb6FrG3oCT+GvU1wcW4EuNhwnUuDm4Vt/+sGEHC9KDFGXpdgM
+         cbhDLJuR8upnBhXiK0TLVJ+0Ut0vL2q7059hJDAqNUBTaAXXEblDIX0lOp4VjwlVgKDv
+         C5RbBIASjc5BqnYKYXaXyl+4uz74pfrUDZD6icTrQ3obIdrQhjToxJTE1i3e3ibXgzhz
+         XudEjf6XKchDUmdlPu5qyLEv4tymUoXcc6yFZYIFG899V2nF2IO+2OkagheFlTCSYTf4
+         e6NA==
+X-Gm-Message-State: AOAM532nBUVWyOZtHjPhiZfkxL7BVhNUlFd2VHp62o0d6QVSYpUprvdZ
+        4HHcwNKXZAsg3X5/YtWtigy9SH64r9QUjw==
+X-Google-Smtp-Source: ABdhPJymZi6xfZg5ANX0bNcNcrr+a/ey0sWRCVKDH1VMNkZR4JMgczTsZKwu2trJ6cSsM0JMD92K4g==
+X-Received: by 2002:a17:903:2d2:: with SMTP id s18mr1519335plk.56.1644398680996;
+        Wed, 09 Feb 2022 01:24:40 -0800 (PST)
 Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id nu7sm6076006pjb.30.2022.02.09.01.24.36
+        by smtp.gmail.com with UTF8SMTPSA id g12sm18050158pfm.119.2022.02.09.01.24.39
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 09 Feb 2022 01:24:37 -0800 (PST)
+        Wed, 09 Feb 2022 01:24:40 -0800 (PST)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
         Joseph Hwang <josephsih@chromium.org>
-Subject: [BlueZ PATCH v3 7/9] adapter: enable quality report via MGMT_OP_SET_QUALITY_REPORT
-Date:   Wed,  9 Feb 2022 17:24:12 +0800
-Message-Id: <20220209092414.751642-5-josephsih@chromium.org>
+Subject: [BlueZ PATCH v3 8/9] tools/btmgmt: fix quality report command
+Date:   Wed,  9 Feb 2022 17:24:13 +0800
+Message-Id: <20220209092414.751642-6-josephsih@chromium.org>
 X-Mailer: git-send-email 2.35.0.263.gb82422642f-goog
 In-Reply-To: <20220209092414.751642-1-josephsih@chromium.org>
 References: <20220209092414.751642-1-josephsih@chromium.org>
@@ -63,84 +63,73 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The quality report feature is now enabled through
-MGMT_OP_SET_QUALITY_REPORT instead of through the experimental
-features.
+The set quality report feature becomes a mgmt command and
+is not included in the experimental features any more.
 
 Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
 
 Changes in v3:
-- This is a new patch that enables the quality report feature via
-  MGMT_OP_SET_QUALITY_REPORT.
+- This is a new patch that fixes the quality on/off command in
+  btmgmt.
 
- src/adapter.c | 32 +++++---------------------------
- 1 file changed, 5 insertions(+), 27 deletions(-)
+ tools/btmgmt.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 9816235ec..9cb684345 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -122,13 +122,6 @@ static const struct mgmt_exp_uuid le_simult_central_peripheral_uuid = {
- 	.str = "671b10b5-42c0-4696-9227-eb28d1b049d6"
- };
- 
--/* 330859bc-7506-492d-9370-9a6f0614037f */
--static const struct mgmt_exp_uuid quality_report_uuid = {
--	.val = { 0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
--		0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33 },
--	.str = "330859bc-7506-492d-9370-9a6f0614037f"
--};
--
- /* 15c0a148-c273-11ea-b3de-0242ac130004 */
- static const struct mgmt_exp_uuid rpa_resolution_uuid = {
- 	.val = { 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
-@@ -9754,25 +9747,6 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
- 				(void *)le_simult_central_peripheral_uuid.val);
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 42ef9acef..4f215b4af 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1842,7 +1842,7 @@ static void cmd_exp_privacy(int argc, char **argv)
+ 	}
  }
  
--static bool is_exp_feature_uuid_the_same(const void *data,
--							const void *match_data)
--{
--	return memcmp(data, match_data,
--			sizeof(((struct mgmt_exp_uuid *)NULL)->val)) == 0;
--}
--
--bool is_quality_report_supported(struct btd_adapter *adapter)
--{
--	return queue_find(adapter->exps, is_exp_feature_uuid_the_same,
--				(void *)quality_report_uuid.val) != NULL;
--}
--
--static void quality_report_func(struct btd_adapter *adapter, uint8_t action)
--{
--	if (action)
--		queue_push_tail(adapter->exps, (void *)quality_report_uuid.val);
--}
--
- static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
- 					const void *param, void *user_data)
+-static void exp_quality_rsp(uint8_t status, uint16_t len, const void *param,
++static void quality_rsp(uint8_t status, uint16_t len, const void *param,
+ 							void *user_data)
  {
-@@ -9848,7 +9822,6 @@ static const struct exp_feat {
- 	EXP_FEAT(&debug_uuid, exp_debug_func),
- 	EXP_FEAT(&le_simult_central_peripheral_uuid,
- 		 le_simult_central_peripheral_func),
--	EXP_FEAT(&quality_report_uuid, quality_report_func),
- 	EXP_FEAT(&rpa_resolution_uuid, rpa_resolution_func),
- 	EXP_FEAT(&codec_offload_uuid, codec_offload_func),
- };
-@@ -9922,6 +9895,11 @@ static void read_exp_features(struct btd_adapter *adapter)
- 	btd_error(adapter->dev_id, "Failed to read exp features info");
- }
+ 	if (status != 0)
+@@ -1856,12 +1856,7 @@ static void exp_quality_rsp(uint8_t status, uint16_t len, const void *param,
  
-+bool is_quality_report_supported(struct btd_adapter *adapter)
-+{
-+	return !!(adapter->supported_settings & MGMT_SETTING_QUALITY_REPORT);
-+}
-+
- static void quality_report_debug(const char *str, void *user_data)
+ static void cmd_exp_quality(int argc, char **argv)
  {
- 	const char *prefix = user_data;
+-	/* 330859bc-7506-492d-9370-9a6f0614037f */
+-	static const uint8_t uuid[16] = {
+-				0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
+-				0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
+-	};
+-	struct mgmt_cp_set_exp_feature cp;
++	struct mgmt_cp_set_quality_report cp;
+ 	uint8_t val;
+ 
+ 	if (mgmt_index == MGMT_INDEX_NONE) {
+@@ -1878,11 +1873,10 @@ static void cmd_exp_quality(int argc, char **argv)
+ 	}
+ 
+ 	memset(&cp, 0, sizeof(cp));
+-	memcpy(cp.uuid, uuid, 16);
+ 	cp.action = val;
+ 
+-	if (mgmt_send(mgmt, MGMT_OP_SET_EXP_FEATURE, mgmt_index,
+-			sizeof(cp), &cp, exp_quality_rsp, NULL, NULL) == 0) {
++	if (mgmt_send(mgmt, MGMT_OP_SET_QUALITY_REPORT, mgmt_index,
++			sizeof(cp), &cp, quality_rsp, NULL, NULL) == 0) {
+ 		error("Unable to send quality report feature cmd");
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+@@ -5636,10 +5630,10 @@ static const struct bt_shell_menu main_menu = {
+ 		cmd_exp_debug,		"Set debug feature"		},
+ 	{ "exp-privacy",	"<on/off>",
+ 		cmd_exp_privacy,	"Set LL privacy feature"	},
+-	{ "exp-quality",	"<on/off>", cmd_exp_quality,
+-		"Set bluetooth quality report feature"			},
+ 	{ "exp-offload",		"<on/off>",
+ 		cmd_exp_offload_codecs,	"Toggle codec support"		},
++	{ "quality",		"<on/off>",
++		cmd_exp_quality, "Set bluetooth quality report feature"	},
+ 	{ "read-sysconfig",	NULL,
+ 		cmd_read_sysconfig,	"Read System Configuration"	},
+ 	{ "set-sysconfig",	"<-v|-h> [options...]",
 -- 
 2.35.0.263.gb82422642f-goog
 
