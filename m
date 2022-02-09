@@ -2,80 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39706C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 17:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC1BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 21:02:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237531AbiBIR1O (ORCPT
+        id S232725AbiBIVCl convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Feb 2022 12:27:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55184 "EHLO
+        Wed, 9 Feb 2022 16:02:41 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231446AbiBIR1N (ORCPT
+        with ESMTP id S232723AbiBIVCe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Feb 2022 12:27:13 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23245C0613C9
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 09:27:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9F2B1B80ECB
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 17:27:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 505F9C340E7
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 17:27:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644427633;
-        bh=2OxqKWEUHEpLjtL5iU+nnjmZJwjTwnTUo2EOzKKqZmM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ux10eRkRrojqPDZAKLqNtMEcdivV8T/hcNBnLrGDUV19zX44vS1lSI3sPokxQXssJ
-         dawvkgERJfkWXvuxjTQnQU1HmF6enzFTA2Vofzm2KnkkKFrBP2mcZkP+zrZa2Lvy60
-         B53GwgLi/D/BBKcZ6wpvGCyq+jXo78ya+9Xcqu1iFCp5gREt6c1f0XblkJTIEz7xff
-         DJ8tA//sFRI9/rCBFkdEpd4zj+77+9V6PSuKS0lIQauwP2IuCMVkdcPFlzuF0sqhrg
-         akYPJeor9vZY9OJvzm+wEhg8y23Qw/KioT7C16nzwud8WJWaJtTEcKiJcYvPz+pi+U
-         ziZoAedzX1VoQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2C64BC05FCE; Wed,  9 Feb 2022 17:27:13 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215576] HSP/HFP mSBC profile broken with QCA6174
-Date:   Wed, 09 Feb 2022 17:27:13 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: mike@mjones.io
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cf_regression
-Message-ID: <bug-215576-62941-3kAo84GF6R@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215576-62941@https.bugzilla.kernel.org/>
-References: <bug-215576-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Wed, 9 Feb 2022 16:02:34 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 77997C08C5F5
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 13:02:34 -0800 (PST)
+Received: from smtpclient.apple (p4fefcd07.dip0.t-ipconnect.de [79.239.205.7])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 605A9CED2D;
+        Wed,  9 Feb 2022 22:02:33 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+Subject: Re: [BlueZ PATCH v3 2/9] lib: Add structures and constants for
+ quality report event
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220209092414.751642-2-josephsih@chromium.org>
+Date:   Wed, 9 Feb 2022 22:02:32 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org,
+        josephsih@google.com
+Content-Transfer-Encoding: 8BIT
+Message-Id: <91511B47-1A3B-41FD-9C02-D47666B4C091@holtmann.org>
+References: <20220209092414.751642-1-josephsih@chromium.org>
+ <20220209092414.751642-2-josephsih@chromium.org>
+To:     Joseph Hwang <josephsih@chromium.org>
+X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
+Hi Joseph,
 
-Mike Jones (mike@mjones.io) changed:
+> Add the new struct and constants to lib/mgmt.h.
+> 
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> ---
+> 
+> Changes in v3:
+> - Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
+> 
+> Changes in v2:
+> - This is a new patch for adding the new struct and constants.
+> 
+> lib/mgmt.h | 10 ++++++++++
+> 1 file changed, 10 insertions(+)
+> 
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index 922a24367..db9a24cd6 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -1032,6 +1032,15 @@ struct mgmt_ev_adv_monitor_device_lost {
+> 	struct mgmt_addr_info addr;
+> } __packed;
+> 
+> +#define MGMT_EV_QUALITY_REPORT			0x0031
+> +#define QUALITY_SPEC_AOSP_BQR			0x0
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-         Regression|No                          |Yes
+Just AOSP.
 
---=20
-You may reply to this email to add a comment.
+> +#define QUALITY_SPEC_INTEL_TELEMETRY		0x1
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Just INTEL.
+
+> +struct mgmt_ev_quality_report {
+> +	uint8_t quality_spec;
+> +	uint32_t data_len;
+> +	uint8_t data[];
+> +} __packed;
+> +
+> static const char *mgmt_op[] = {
+> 	"<0x0000>",
+> 	"Read Version",
+> @@ -1172,6 +1181,7 @@ static const char *mgmt_ev[] = {
+> 	"Controller Resume",
+> 	"Advertisement Monitor Device Found",		/* 0x002f */
+> 	"Advertisement Monitor Device Lost",
+> +	"Bluetooth Quality Report",			/* 0x0031 */
+> };
+> 
+> static const char *mgmt_status[] = {
+
+as with the mgmt-api.txt changes, just “Quality Report” and combine command and event changes.
+
+Regards
+
+Marcel
+
