@@ -2,248 +2,223 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D0EC43217
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 02:40:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B934C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Feb 2022 02:42:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242046AbiBICk0 (ORCPT
+        id S237659AbiBICmQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Feb 2022 21:40:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
+        Tue, 8 Feb 2022 21:42:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241862AbiBIBHI (ORCPT
+        with ESMTP id S1343955AbiBICk3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Feb 2022 20:07:08 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A037C06157B;
-        Tue,  8 Feb 2022 17:07:07 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id c6so1652710ybk.3;
-        Tue, 08 Feb 2022 17:07:07 -0800 (PST)
+        Tue, 8 Feb 2022 21:40:29 -0500
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1525C03FEFC
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Feb 2022 18:39:51 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id v186so2125924ybg.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Feb 2022 18:39:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gWLpVKRgj6qNlwd6T0x0f3bWJlz86m3X+7fitr5avvo=;
-        b=XQ5aPXyPPfTSGU97cIuuPkKprxaQDHXXpynMhRQNnPgBpmO1VP8qa5kw894N47Dy44
-         nZdGu6B2qEyq+wVnQGglFxldwcRVd2f2bGcdoA3OJpQH9qIMZPuZZO8ONRcyvoYwUf66
-         jhZcNpLH7VPHrEmrQvLGLrbV4dnkWQHJtaTnzIlqbqWbA/Cze3rs2GtmMv+AwuLZsxMZ
-         Gsn2adro83f7UCEbqwIEzbg6pg1ea4FpHoSDwdISH24kRkrtnX4qo4bYzPPwlHtpocUF
-         m24JYYUjpqnhjBtQm0J3EzeVL5fhibf0EG6IH/51z5AVo7d/1pq76yaQU+TVMHSNHC5t
-         lE5Q==
+        bh=GNvuYJS+BDktQ76i8HMvIJpRaBzyH1n1z59+AckQW2A=;
+        b=Ku60g/mHRsBJN3BEmZ49ZDOokdTHT0GxvBqKr7oEpDBvE+huIdYB2jNh3RXW1t6bZe
+         VjREe32p6J5xJTUIyYE6FyKn+sv3D+lRJUkaQSbglakujYhHW0SFs1diGUzTUXl14Qy4
+         PnUPKeo1dihsNFaXUMl2hveaxxeFMVRpEYF+kKHnSZ4CcspHn9DyAWFmj+8zMyCfeaaA
+         byUOmWHTQPEtnz5DA8sE8HDlndSVVi1TujQ1NDLOc4Mhmj3HWoD7B5/bVU5QgSJAFXFs
+         SU0wdoNx+dFK4hZ9FCjI7HYCtHcEH62XhOvQ9lMR0puqH99Z04Ke65cQ+njwUqr1+3qM
+         PXYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gWLpVKRgj6qNlwd6T0x0f3bWJlz86m3X+7fitr5avvo=;
-        b=cdIpBhW1HRcZI1fuzowGCTZO7gB35EovVPCinQljZ6+y0o/eTjlMxmN2pB2getZj6P
-         X8mRXmgZ3+SWaCz3K55CZ3+U2XwQOw5wEpX0M9Cr+tPRtcVRA7GJh/CSp8iMRS92y+qI
-         HSa0hVB0KRkLlclQKxCaujFKiJJe1deyNpcGtJ8nQe0UGJ3lOPGekYoVWfdAF/Q+fmrI
-         9ptdNYzV0/+XvEadac4wC5OltPRGW0rbKW3zCkS6aWH4EON+J6CbYeMHe28sEAMusExN
-         uq6WHr417U3pCNVdNGWi//TeZzUREWl164U9T7gumnnta6YTYPY6XdMLeLTDA5zEV2qS
-         m4Mg==
-X-Gm-Message-State: AOAM533chkE/iFxAvnvvpjm1yC9DxrhQ7ukGPiIR2yHQ7s6ykz+tr3w8
-        4B8vaXfmO8dzUVO6SF3jVzkOaEfe74LP5GNwV7w=
-X-Google-Smtp-Source: ABdhPJzlQO7sorUpjUtav9AXsUukam3TPueefNCr8aWMRldfUKZZsyZ6hujYAVIXOSJOmcjlqOuIysdRK2Eg5Rf4S5w=
-X-Received: by 2002:a0d:c542:: with SMTP id h63mr7621202ywd.376.1644368826567;
- Tue, 08 Feb 2022 17:07:06 -0800 (PST)
+        bh=GNvuYJS+BDktQ76i8HMvIJpRaBzyH1n1z59+AckQW2A=;
+        b=zogtVycYUyetgf1tPtI0EMGVPehB1yXQOAk8o0pEFbhDrM84g1hpi6a4qy/UJQS81H
+         FrSogk5X711WBWJtK56N8JxJpnJZPIjoEdX/vqfDr2r+JEj+uWsa+RTYspb/9FUNNgQ1
+         dJtss4baT1JtHIGGBUTkYuc9/uLn4XLHYa4n9H2Zzm8KYPZzhZtv7ckXo4uH7f9057eO
+         EySsZMp2esADh8IpCZzitey2qFAJf7/kHmTNSZOduHBCklyK3hLDyzGSr4G+JFSzx/Xe
+         jWzoFtGCBhywARzUZvIXa5dkadi+JpaHzexG7ZLwMDOQatIehbWvb5pc68k4SpHcCDcX
+         6K4Q==
+X-Gm-Message-State: AOAM5328RaFSpvOMP9D8n7syDwxYlOzhrBsxA2ZlqJSRw6ABqTXXxk0p
+        aOSHlNDtRhUjZ5Mg+IroeuQ2IgBAi5oI0r/ztKM=
+X-Google-Smtp-Source: ABdhPJwRRTJ2JMuU2JsP9GOOEG87lk6bpmCuEWZ8NEE/o5CLTlYO/n0RwjnVk14lSJeVdi0LmUj3a7/MToXJTAkcsQU=
+X-Received: by 2002:a81:c40c:: with SMTP id j12mr165041ywi.37.1644374390762;
+ Tue, 08 Feb 2022 18:39:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20220208221911.57058-1-pmenzel@molgen.mpg.de> <20220208221911.57058-2-pmenzel@molgen.mpg.de>
-In-Reply-To: <20220208221911.57058-2-pmenzel@molgen.mpg.de>
+References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
+ <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com>
+In-Reply-To: <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Feb 2022 17:06:55 -0800
-Message-ID: <CABBYNZ+33DB=r6w-aLw=+7S6Ryo0zM54A7gx0XpfsFx65Pxh4Q@mail.gmail.com>
-Subject: Re: [PATCH 2/2] Revert "Bluetooth: RFCOMM: Replace use of
- memcpy_from_msg with bt_skb_sendmmsg"
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Date:   Tue, 8 Feb 2022 18:39:39 -0800
+Message-ID: <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
+ is called
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+Hi Archie,
 
-On Tue, Feb 8, 2022 at 2:20 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+On Tue, Sep 15, 2020 at 9:51 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> This reverts commit 81be03e026dc0c16dc1c64e088b2a53b73caa895.
+> Hi Archie,
 >
-> Since the commit, transferring files greater than some bytes to the
-> Nokia N9 (MeeGo) or Jolla (Sailfish OS) is not possible anymore.
->
->     # obexctl
->     [NEW] Client /org/bluez/obex
->     [obex]# connect 40:98:4E:5B:CE:XX
->     Attempting to connect to 40:98:4E:5B:CE:XX
->     [NEW] Session /org/bluez/obex/client/session0 [default]
->     [NEW] ObjectPush /org/bluez/obex/client/session0
->     Connection successful
->     [40:98:4E:5B:CE:XX]# send /lib/systemd/systemd
->     Attempting to send /lib/systemd/systemd to /org/bluez/obex/client/session0
->     [NEW] Transfer /org/bluez/obex/client/session0/transfer0
->     Transfer /org/bluez/obex/client/session0/transfer0
->         Status: queued
->         Name: systemd
->         Size: 1841712
->         Filename: /lib/systemd/systemd
->         Session: /org/bluez/obex/client/session0
->     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: active
->     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Transferred: 32737 (@32KB/s 00:55)
->     [CHG] Transfer /org/bluez/obex/client/session0/transfer0 Status: error
->     [DEL] Transfer /org/bluez/obex/client/session0/transfer0
+> On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > RemoveDevice on adapter interface used to remove a device, even when
+> > the device is connected. However, since the introduction of the new
+> > 30 seconds timeout when setting a device as temporary, RemoveDevice
+> > doesn't immediately remove a connected device, but only disconnects
+> > it and waits for the timer to expire before effectively removes it.
+> >
+> > This patch removes the device as soon as it gets disconnected,
+> > provided the disconnection is triggered by a call to RemoveDevice.
+> > The regular timeout still applies for other cases.
+> >
+> > Tested manually by calling RemoveDevice on a connected device,
+> > and with ChromeOS autotest setup.
+> >
+> > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+> > ---
+> >
+> > Changes in v3:
+> > * Rebasing again
+> >
+> > Changes in v2:
+> > * Rebasing to HEAD
+> >
+> >  src/adapter.c |  2 --
+> >  src/adapter.h |  2 ++
+> >  src/device.c  | 11 +++++++++++
+> >  3 files changed, 13 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index df628a7fd..4e27bd74b 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -80,8 +80,6 @@
+> >  #include "adv_monitor.h"
+> >  #include "eir.h"
+> >
+> > -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> > -
+> >  #define MODE_OFF               0x00
+> >  #define MODE_CONNECTABLE       0x01
+> >  #define MODE_DISCOVERABLE      0x02
+> > diff --git a/src/adapter.h b/src/adapter.h
+> > index c70a7b0da..2f1e4b737 100644
+> > --- a/src/adapter.h
+> > +++ b/src/adapter.h
+> > @@ -29,6 +29,8 @@
+> >  #include <lib/bluetooth.h>
+> >  #include <lib/sdp.h>
+> >
+> > +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
+> > +
+> >  #define MAX_NAME_LENGTH                248
+> >
+> >  /* Invalid SSP passkey value used to indicate negative replies */
+> > diff --git a/src/device.c b/src/device.c
+> > index 8f73ce4d3..3e7784034 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> >  {
+> >         struct bearer_state *state = get_state(device, bdaddr_type);
+> >         DBusMessage *reply;
+> > +       bool remove_device = false;
+> >
+> >         if (!state->connected)
+> >                 return;
+> > @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> >         while (device->disconnects) {
+> >                 DBusMessage *msg = device->disconnects->data;
+> >
+> > +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
+> > +                                                               "RemoveDevice"))
+> > +                       remove_device = true;
+> > +
+> >                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
+> >                 device->disconnects = g_slist_remove(device->disconnects, msg);
+> >                 dbus_message_unref(msg);
+> > @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+> >
+> >         g_dbus_emit_property_changed(dbus_conn, device->path,
+> >                                                 DEVICE_INTERFACE, "Connected");
+> > +
+> > +       if (remove_device)
+> > +               btd_adapter_remove_device(device->adapter, device);
 
-Would you please create a github issue
-(https://github.com/bluez/bluez/issues/) and attach the btmon trace so
-we can check what is the error, you might as well attach the obexd
-logs.
+It looks like there are instances where device_remove_connection is
+called that can lead to the following trace:
 
-> Reverting it, fixes the regression.
+==4030336== Invalid read of size 8
+==4030336==    at 0x40B8A1: device_is_authenticating (device.c:6975)
+==4030336==    by 0x3ABA2F: adapter_remove_connection (adapter.c:7166)
+==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
+==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
+==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
+==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
+==4030336==    by 0x495312F: g_main_context_dispatch (in
+/usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x4952852: g_main_loop_run (in
+/usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x49C814: mainloop_run (mainloop-glib.c:66)
+==4030336==    by 0x49CD0B: mainloop_run_with_signal (mainloop-notify.c:188)
+==4030336==    by 0x29B18B: main (main.c:1239)
+==4030336==  Address 0x771bfe0 is 448 bytes inside a block of size 656 free'd
+==4030336==    at 0x48440E4: free (vg_replace_malloc.c:872)
+==4030336==    by 0x4954DAC: g_free (in /usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x44D166: remove_interface (object.c:660)
+==4030336==    by 0x44DEDA: g_dbus_unregister_interface (object.c:1394)
+==4030336==    by 0x3ABA27: adapter_remove_connection (adapter.c:7164)
+==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
+==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
+==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
+==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
+==4030336==    by 0x495312F: g_main_context_dispatch (in
+/usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
+==4030336==    by 0x4952852: g_main_loop_run (in
+/usr/lib64/libglib-2.0.so.0.7000.2)
+
+So it appeared to be unsafe to call btd_adapter_remove_device, btw
+this happened when Ive attempted to pair 2 emulator instances
+(btvirt).
+
+> >  }
+> >
+> >  guint device_add_disconnect_watch(struct btd_device *device,
+> > @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
+> >                 disconnect_all(device);
+> >         }
+> >
+> > +       if (device->temporary_timer > 0)
+> > +               g_source_remove(device->temporary_timer);
+> > +
+> >         if (device->store_id > 0) {
+> >                 g_source_remove(device->store_id);
+> >                 device->store_id = 0;
+> > --
+> > 2.28.0.618.gf4bc123cb7-goog
+> >
 >
-> Link: https://lore.kernel.org/linux-bluetooth/aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de/T/#m1f9673e4ab0d55a7dccf87905337ab2e67d689f1
-> Signed-off-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> ---
->  net/bluetooth/rfcomm/core.c | 50 ++++++-------------------------------
->  net/bluetooth/rfcomm/sock.c | 46 ++++++++++++++++++++++++++--------
->  2 files changed, 43 insertions(+), 53 deletions(-)
+> Applied, thanks.
 >
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 7324764384b6..f2bacb464ccf 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -549,58 +549,22 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
->         return dlc;
->  }
->
-> -static int rfcomm_dlc_send_frag(struct rfcomm_dlc *d, struct sk_buff *frag)
-> -{
-> -       int len = frag->len;
-> -
-> -       BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
-> -
-> -       if (len > d->mtu)
-> -               return -EINVAL;
-> -
-> -       rfcomm_make_uih(frag, d->addr);
-> -       __skb_queue_tail(&d->tx_queue, frag);
-> -
-> -       return len;
-> -}
-> -
->  int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
->  {
-> -       unsigned long flags;
-> -       struct sk_buff *frag, *next;
-> -       int len;
-> +       int len = skb->len;
->
->         if (d->state != BT_CONNECTED)
->                 return -ENOTCONN;
->
-> -       frag = skb_shinfo(skb)->frag_list;
-> -       skb_shinfo(skb)->frag_list = NULL;
-> -
-> -       /* Queue all fragments atomically. */
-> -       spin_lock_irqsave(&d->tx_queue.lock, flags);
-> -
-> -       len = rfcomm_dlc_send_frag(d, skb);
-> -       if (len < 0 || !frag)
-> -               goto unlock;
-> -
-> -       for (; frag; frag = next) {
-> -               int ret;
-> -
-> -               next = frag->next;
-> -
-> -               ret = rfcomm_dlc_send_frag(d, frag);
-> -               if (ret < 0) {
-> -                       kfree_skb(frag);
-> -                       goto unlock;
-> -               }
-> +       BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
->
-> -               len += ret;
-> -       }
-> +       if (len > d->mtu)
-> +               return -EINVAL;
->
-> -unlock:
-> -       spin_unlock_irqrestore(&d->tx_queue.lock, flags);
-> +       rfcomm_make_uih(skb, d->addr);
-> +       skb_queue_tail(&d->tx_queue, skb);
->
-> -       if (len > 0 && !test_bit(RFCOMM_TX_THROTTLED, &d->flags))
-> +       if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
->                 rfcomm_schedule();
->         return len;
->  }
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 5938af3e9936..2c95bb58f901 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -575,20 +575,46 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
->         lock_sock(sk);
->
->         sent = bt_sock_wait_ready(sk, msg->msg_flags);
-> +       if (sent)
-> +               goto done;
->
-> -       release_sock(sk);
-> +       while (len) {
-> +               size_t size = min_t(size_t, len, d->mtu);
-> +               int err;
->
-> -       if (sent)
-> -               return sent;
-> +               skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
-> +                               msg->msg_flags & MSG_DONTWAIT, &err);
-> +               if (!skb) {
-> +                       if (sent == 0)
-> +                               sent = err;
-> +                       break;
-> +               }
-> +               skb_reserve(skb, RFCOMM_SKB_HEAD_RESERVE);
-> +
-> +               err = memcpy_from_msg(skb_put(skb, size), msg, size);
-> +               if (err) {
-> +                       kfree_skb(skb);
-> +                       if (sent == 0)
-> +                               sent = err;
-> +                       break;
-> +               }
-> +
-> +               skb->priority = sk->sk_priority;
-> +
-> +               err = rfcomm_dlc_send(d, skb);
-> +               if (err < 0) {
-> +                       kfree_skb(skb);
-> +                       if (sent == 0)
-> +                               sent = err;
-> +                       break;
-> +               }
->
-> -       skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
-> -                             RFCOMM_SKB_TAIL_RESERVE);
-> -       if (IS_ERR_OR_NULL(skb))
-> -               return PTR_ERR(skb);
-> +               sent += size;
-> +               len  -= size;
-> +       }
->
-> -       sent = rfcomm_dlc_send(d, skb);
-> -       if (sent < 0)
-> -               kfree_skb(skb);
-> +done:
-> +       release_sock(sk);
->
->         return sent;
->  }
 > --
-> 2.34.1
->
+> Luiz Augusto von Dentz
+
 
 
 -- 
