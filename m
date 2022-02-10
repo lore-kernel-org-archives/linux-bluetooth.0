@@ -2,250 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E270C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 21:31:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E830C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 22:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344608AbiBJVbY (ORCPT
+        id S1344865AbiBJWOy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Feb 2022 16:31:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46882 "EHLO
+        Thu, 10 Feb 2022 17:14:54 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230287AbiBJVbY (ORCPT
+        with ESMTP id S234724AbiBJWOx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Feb 2022 16:31:24 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ECFEAF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 13:31:24 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id bt13so19418886ybb.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 13:31:24 -0800 (PST)
+        Thu, 10 Feb 2022 17:14:53 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC811145
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 14:14:53 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id t36so1947982pfg.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 14:14:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jgvfzHw5pk0UZo+/joiYYfVx+57Q+bFCpja6Fn6+xPE=;
-        b=RPJMn9ZaSVCNR7TSHsd9L52LVM9CS1yntBIL5XQLxHOtGJNJtoka8ohjl7m1fda5Iz
-         GN5OmpBAaR/bIwa9Otg10RBk1Z6eQ3RubzFm3UQnQfsdinILAxdjg/gPqQxhuw/xzowg
-         w7y+XW2+TuGYROFzvqHuUiLMHxN532YejLcumu9HSNVk7BrfbtzjaaedEwWhHATA084G
-         uilQyTy1axKa+8SFL7+N1CK6P+i/GbbAaD8qiKxOlDJaB7XVHBH4ZVY7SGiT38TrHr02
-         304Lknjrxd7H3U5p2jwIrOLThbo1QValcwheJEOUNB1Yu6evnEbFS1dqIDBYUisr74Tx
-         knPw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KvgV6liMx30J7bWbl7GImuY5vwckT7tkG/hOPlL74GY=;
+        b=X9RUd0z735mcpq9v4uHPwj13RVT4pNg7yxuYQVwT5khdS6M7EPAZthfxyieQWS7iQb
+         R3r3k+CRW6brXCl42dVhyZBQ+RKeTtoiGHS4WX+w+wpnndUgZw8nwzURm2sXxuXZEBmf
+         Abbj4GYPHeOaqyGYdvWgxqXGqMC+FUMk2WVEo9GVjfrJv4063EVGBv9oVh3JR2B6crjJ
+         sa1YykE92cDFHpiuZO3DX1rL5IZiLMtgYtJ2ZXupRQJXQH53ua1gIkD2FYRxd60ub9FF
+         z13Tl1dOpBWgQZ85iFYvb+3BTkV1fMUIXxBRrUZpsAM/4jUZylr52pD+5MwTJl2rVyXf
+         USLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jgvfzHw5pk0UZo+/joiYYfVx+57Q+bFCpja6Fn6+xPE=;
-        b=MIpbTYyjEakaNLKDuY4eAQIiv2hvimj+r8skgRNase6KPC+LilOr8XbQGxe9gdP0sc
-         l7Pd273RzoIplMQbwJzkDnfGG0UpX9A1iVRwX7oR0UsezRgiz58S3ghWLVhwF60Edj2w
-         WL75Cv9VKg58MVJ/JZHerF00uZfzbrenG44NBYTNoiGuEzuw/xFvicOSbR6BHp9ppf60
-         LQt/OmTTwwQXO2kl6CuDe4FjDdjTR4YzfkxroYpqM4petA/1fpgfvBTKtm3QQqD1W/la
-         WJYJL9Zo5omCW7CFDth2vb4nlauxe4yvzyJyuXSgg4nIXtq4h3++zH0veR82FwcAueB3
-         4V1w==
-X-Gm-Message-State: AOAM533DETgpTkAutH6RywfnLRw8WEEramqxFWIa1+d1oR5Z5F6Nb1Bj
-        KjrE6Ihzm6KhI4K5Kb4YDvxZ1fDP5Yn9ZaAUiGo=
-X-Google-Smtp-Source: ABdhPJyOIeC+Lgj7igWwUhuS2bLi81BfXJyydQD+q/BOKpGj8/MmGRHTKYlAisDngL543X7saCpp+9gw6n13Q0QCQVY=
-X-Received: by 2002:a25:2682:: with SMTP id m124mr2308987ybm.188.1644528683115;
- Thu, 10 Feb 2022 13:31:23 -0800 (PST)
-MIME-Version: 1.0
-References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
- <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com>
- <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com> <CAJQfnxG-=cJoYoTwSvUOjDtdk5tx=F4XXWzLOOAo3oGsvcQovw@mail.gmail.com>
-In-Reply-To: <CAJQfnxG-=cJoYoTwSvUOjDtdk5tx=F4XXWzLOOAo3oGsvcQovw@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KvgV6liMx30J7bWbl7GImuY5vwckT7tkG/hOPlL74GY=;
+        b=NzFJuTffKAwSeSQysbVtrvDd0n15utszb0svkDpUDbhSsFZJu5j50Yyreog5XVLqsU
+         uAa5u7q50MCtE9a5bGpJp+ouYADTsNeFPz1I2FVQviFJtQB0N8BhuJNz9yPqA04G0FKj
+         Wpz1KF/j5dsA4ZGDmZrPhqHfCYDhOftOhysTN1fHwwvisDR98Yyx8ZA3ZDsIEISXCFo2
+         vQVjvrRQD38lGppiwVRYYarIHkZ9eECMtzj71k8isOE1PLV9NrtMnITpNJeeTk94K8Zf
+         o+ThgsUP/s5S4oMI3zn7HpD2tV1hzUCPXXYMDj7tK4esOC/R0u0oytTwHReL4S8dHg84
+         XNbQ==
+X-Gm-Message-State: AOAM532lwAA0p+uIH3W5K6Le9/TewheKXOS1YBX+M++UbIu7O140hDlA
+        jQ6nabqSUEMTwF+DfQYPmJPxs4/ggLGE7g==
+X-Google-Smtp-Source: ABdhPJxAXFp/tlhLzmZ6duDPdB2A55HpjQ99vJicRP5nbogeNXiMimF9F+mbd2lSfKcWLozQD9JdkQ==
+X-Received: by 2002:a63:8bc7:: with SMTP id j190mr2307604pge.473.1644531293066;
+        Thu, 10 Feb 2022 14:14:53 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d8sm17922212pfj.179.2022.02.10.14.14.52
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Feb 2022 14:14:52 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 10 Feb 2022 13:31:12 -0800
-Message-ID: <CABBYNZL4uv1eC4t+=zh9PouSdEU0sAo=3OX3B8B5MTYrcq7oHA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
- is called
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] device: Fix crash when removing device
+Date:   Thu, 10 Feb 2022 14:14:51 -0800
+Message-Id: <20220210221451.418234-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Feb 8, 2022 at 10:37 PM Archie Pusaka <apusaka@google.com> wrote:
->
-> Hi Luiz,
->
-> On Wed, 9 Feb 2022 at 10:39, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Tue, Sep 15, 2020 at 9:51 AM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > > On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
-> > > >
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > RemoveDevice on adapter interface used to remove a device, even when
-> > > > the device is connected. However, since the introduction of the new
-> > > > 30 seconds timeout when setting a device as temporary, RemoveDevice
-> > > > doesn't immediately remove a connected device, but only disconnects
-> > > > it and waits for the timer to expire before effectively removes it.
-> > > >
-> > > > This patch removes the device as soon as it gets disconnected,
-> > > > provided the disconnection is triggered by a call to RemoveDevice.
-> > > > The regular timeout still applies for other cases.
-> > > >
-> > > > Tested manually by calling RemoveDevice on a connected device,
-> > > > and with ChromeOS autotest setup.
-> > > >
-> > > > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-> > > > ---
-> > > >
-> > > > Changes in v3:
-> > > > * Rebasing again
-> > > >
-> > > > Changes in v2:
-> > > > * Rebasing to HEAD
-> > > >
-> > > >  src/adapter.c |  2 --
-> > > >  src/adapter.h |  2 ++
-> > > >  src/device.c  | 11 +++++++++++
-> > > >  3 files changed, 13 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/src/adapter.c b/src/adapter.c
-> > > > index df628a7fd..4e27bd74b 100644
-> > > > --- a/src/adapter.c
-> > > > +++ b/src/adapter.c
-> > > > @@ -80,8 +80,6 @@
-> > > >  #include "adv_monitor.h"
-> > > >  #include "eir.h"
-> > > >
-> > > > -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > > -
-> > > >  #define MODE_OFF               0x00
-> > > >  #define MODE_CONNECTABLE       0x01
-> > > >  #define MODE_DISCOVERABLE      0x02
-> > > > diff --git a/src/adapter.h b/src/adapter.h
-> > > > index c70a7b0da..2f1e4b737 100644
-> > > > --- a/src/adapter.h
-> > > > +++ b/src/adapter.h
-> > > > @@ -29,6 +29,8 @@
-> > > >  #include <lib/bluetooth.h>
-> > > >  #include <lib/sdp.h>
-> > > >
-> > > > +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > > +
-> > > >  #define MAX_NAME_LENGTH                248
-> > > >
-> > > >  /* Invalid SSP passkey value used to indicate negative replies */
-> > > > diff --git a/src/device.c b/src/device.c
-> > > > index 8f73ce4d3..3e7784034 100644
-> > > > --- a/src/device.c
-> > > > +++ b/src/device.c
-> > > > @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > >  {
-> > > >         struct bearer_state *state = get_state(device, bdaddr_type);
-> > > >         DBusMessage *reply;
-> > > > +       bool remove_device = false;
-> > > >
-> > > >         if (!state->connected)
-> > > >                 return;
-> > > > @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > >         while (device->disconnects) {
-> > > >                 DBusMessage *msg = device->disconnects->data;
-> > > >
-> > > > +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-> > > > +                                                               "RemoveDevice"))
-> > > > +                       remove_device = true;
-> > > > +
-> > > >                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
-> > > >                 device->disconnects = g_slist_remove(device->disconnects, msg);
-> > > >                 dbus_message_unref(msg);
-> > > > @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > >
-> > > >         g_dbus_emit_property_changed(dbus_conn, device->path,
-> > > >                                                 DEVICE_INTERFACE, "Connected");
-> > > > +
-> > > > +       if (remove_device)
-> > > > +               btd_adapter_remove_device(device->adapter, device);
-> >
-> > It looks like there are instances where device_remove_connection is
-> > called that can lead to the following trace:
-> >
-> > ==4030336== Invalid read of size 8
-> > ==4030336==    at 0x40B8A1: device_is_authenticating (device.c:6975)
-> > ==4030336==    by 0x3ABA2F: adapter_remove_connection (adapter.c:7166)
-> > ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> > ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> > ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> > ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> > ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x4952852: g_main_loop_run (in
-> > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x49C814: mainloop_run (mainloop-glib.c:66)
-> > ==4030336==    by 0x49CD0B: mainloop_run_with_signal (mainloop-notify.c:188)
-> > ==4030336==    by 0x29B18B: main (main.c:1239)
-> > ==4030336==  Address 0x771bfe0 is 448 bytes inside a block of size 656 free'd
-> > ==4030336==    at 0x48440E4: free (vg_replace_malloc.c:872)
-> > ==4030336==    by 0x4954DAC: g_free (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x44D166: remove_interface (object.c:660)
-> > ==4030336==    by 0x44DEDA: g_dbus_unregister_interface (object.c:1394)
-> > ==4030336==    by 0x3ABA27: adapter_remove_connection (adapter.c:7164)
-> > ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> > ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> > ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> > ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> > ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > ==4030336==    by 0x4952852: g_main_loop_run (in
-> > /usr/lib64/libglib-2.0.so.0.7000.2)
-> >
-> > So it appeared to be unsafe to call btd_adapter_remove_device, btw
-> > this happened when Ive attempted to pair 2 emulator instances
-> > (btvirt).
->
-> Does this happen after calling Adapter1.RemoveDevice? I suppose if
-> that's true then adapter_remove_connection shouldn't have been called
-> since the device should have been removed at this point.
-> Perhaps I misunderstood your message?
+Calling btd_adapter_remove_device from device_remove_connection can
+cause a crash, so instead of removing it immediatelly this set a the
+temporary timeout to 0.
 
-Looks like there are more people with the same problem:
+Fixes: https://github.com/bluez/bluez/issues/290
+---
+ src/device.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://github.com/bluez/bluez/issues/290
-
-> > > >  }
-> > > >
-> > > >  guint device_add_disconnect_watch(struct btd_device *device,
-> > > > @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
-> > > >                 disconnect_all(device);
-> > > >         }
-> > > >
-> > > > +       if (device->temporary_timer > 0)
-> > > > +               g_source_remove(device->temporary_timer);
-> > > > +
-> > > >         if (device->store_id > 0) {
-> > > >                 g_source_remove(device->store_id);
-> > > >                 device->store_id = 0;
-> > > > --
-> > > > 2.28.0.618.gf4bc123cb7-goog
-> > > >
-> > >
-> > > Applied, thanks.
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Thanks,
-> Archie
-
-
-
+diff --git a/src/device.c b/src/device.c
+index 6d29eb896..b5a47d302 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3285,7 +3285,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+ 						DEVICE_INTERFACE, "Connected");
+ 
+ 	if (remove_device)
+-		btd_adapter_remove_device(device->adapter, device);
++		set_temporary_timer(device, 0);
+ }
+ 
+ guint device_add_disconnect_watch(struct btd_device *device,
 -- 
-Luiz Augusto von Dentz
+2.34.1
+
