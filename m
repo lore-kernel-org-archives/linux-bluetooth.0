@@ -2,124 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBAFC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 05:35:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E16C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 06:09:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233826AbiBJFfC (ORCPT
+        id S235083AbiBJGJT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Feb 2022 00:35:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34002 "EHLO
+        Thu, 10 Feb 2022 01:09:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232744AbiBJFfA (ORCPT
+        with ESMTP id S235071AbiBJGJS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Feb 2022 00:35:00 -0500
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6798810C0
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 21:35:01 -0800 (PST)
-Received: by mail-qt1-x832.google.com with SMTP id r14so4092854qtt.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Feb 2022 21:35:01 -0800 (PST)
+        Thu, 10 Feb 2022 01:09:18 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED961E6
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Feb 2022 22:09:19 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id w20so939377plq.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Feb 2022 22:09:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=kHkFto8yKFG5UHWq/r2s14vIOfvBou+m0ilKJUTpxQw=;
-        b=VMN0+HREkLTDuUBdQSIHYb4+pmXKu9/26Zw/NmtcSy0pl6j5pSd9VHi/tbvs6dHz8J
-         ZNDzy8fdJTjygdFCel+K9Y/BhnYqjqtyjQ+K+W7Jk5ObkU2KfyLhSS60SV9Bhemd+x4n
-         pDn0JQvqTsoQFQVWwEgwGxJKd/yhtQ87mOjtEh2BVn+doOacijNAtUPAjnc0S+hMfUIg
-         0Xp0AzIngIAoXaE8Jz0rdq9xb9rQl1DlfbnQ96XAbWW39mKWNeTpSTC5FVTzjPTCOUvq
-         NP+RiXsLA4z0RyiZz4ZlkTys46Oor4ufxGr2xJkzKbFlmBr532yJnIOiKtHT0UTZJk4C
-         RJ4w==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5HYK5DYizP6Nv1Iv9FoR5LRDFbWxhVScfHYFFmYT4Ag=;
+        b=iFHxnGNdK5X8MW9MGDfGSy+8+TXUxsW2xfGi42fTtWFJ03qMitQ6tvaxsRCWRG4y5u
+         7IedgnbEGAqeyaiPGoyC+mx1yn0HgR3sob1aZzrpIoCyc1MAa9K4aS+HLHEw7mFEX9SF
+         r4RjMh974A4qvF1/DQB7C/z472pX10zX/2IyX8qrZEFPMc241u9H+fBV7tMSSgxtTwLC
+         YX5IzxJj2Y0GcJqRjVWAz7Y9xFOarfFT4lFH1vDO8aaqyReVy98y+vJpTtSpgl3joYKs
+         hqFhF7xhN/7aegXuXeXivphIwduZbDrXtXh/FwONVl+/Bq9NjD04R7uLN/H0mLBA/J0V
+         zg/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=kHkFto8yKFG5UHWq/r2s14vIOfvBou+m0ilKJUTpxQw=;
-        b=Bxp2hq4WJbkKCuewMM+g6/oKsUX+17EMyNuJzCQSGS6iIRaT0EU8OpJVm2NOt1r8p4
-         /3u/e/JCK7/F3DZz++mjedLUxwy029VEaxNcMZaLTvCmMpyz9UUII1qMNf43vms86pkk
-         FdLVCNldqCosIWSNQi/cIczuI9AlmVUJmMg3GQXRszMEjGURmQ3MYbwmp2jywFqRpVo5
-         HtkQrIaKeYscfyDiOgTrZQrJ/9XB/DOppDQdBDT10a0GWc0yMpw3M3ncaS6k6kNj9kOS
-         Pppj2GdbLZQ4LBBSbVH11UBpmG8tkOcCjityTqY2mSYEEpHwaSgiQCTct+usaKDLEpKf
-         rm/Q==
-X-Gm-Message-State: AOAM532ExgHCqkuDlZ1Zw9akCMsB/XfoTv+D0SKvkJp0nP8h0NjLR1qH
-        Jgljtl4CM3KDfIpBGowvvrLIQrfvzU1GYg==
-X-Google-Smtp-Source: ABdhPJyUQ4eBYuaObfKE1OUdB2BZQ3722ZoXBGk9YaQzj5WR2zGwDFWiya6EBs6aOmnKtLY0UkJRnQ==
-X-Received: by 2002:ac8:7d16:: with SMTP id g22mr3799313qtb.180.1644471300384;
-        Wed, 09 Feb 2022 21:35:00 -0800 (PST)
-Received: from [172.17.0.2] ([52.188.166.91])
-        by smtp.gmail.com with ESMTPSA id 13sm10404424qtz.87.2022.02.09.21.34.59
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5HYK5DYizP6Nv1Iv9FoR5LRDFbWxhVScfHYFFmYT4Ag=;
+        b=ptBXsBbNqmKONmLwqvNjQq44DSLi7n9LnY09niBX5FLqeKPO57O3XOI3NlCfGPL6K6
+         5X+7En8bd7OQachIRlPOjVNUBhEbVv/UzF9Wo1kUBWpZH0b4FK2CL9r43NA5MqEuzpph
+         Gg7J2jMJjVCdIj3mqhvMZnGGcvTsy4l8zX0MmLLY6GFXuveglR8c7SARdsBO+Vusv/9k
+         KMGFCqGQFP4eJHfSMoOfBE5JAR9adSYR6YeDledqB54tUudr7aIFY9YQD/mbIsYy/CJH
+         0azSfMtyXDubt6mLKnrFpwowqDNBh8rdBUpUtG8gSZW16t2WFkTq9A0B/BMU6xnLioNZ
+         oJQA==
+X-Gm-Message-State: AOAM5315LF5e47S8iz1Kto06idzNQXmG78ZUWmxZyc6toJKq7OJeC5Mp
+        sGNYI7fcWNa5aJAfoad5XzXmJ/8G6bI=
+X-Google-Smtp-Source: ABdhPJykUBRKiHY2voImefLjrt5fpn9Ukqc6tKvNgsHvkR/ttq6z7CAvotZpYBmYCRUIkLkm+TarCg==
+X-Received: by 2002:a17:902:b190:: with SMTP id s16mr6005088plr.119.1644473358788;
+        Wed, 09 Feb 2022 22:09:18 -0800 (PST)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830::169b])
+        by smtp.gmail.com with ESMTPSA id j185sm20383919pfd.85.2022.02.09.22.09.17
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Feb 2022 21:34:59 -0800 (PST)
-Message-ID: <6204a403.1c69fb81.eb5b9.84b7@mx.google.com>
-Date:   Wed, 09 Feb 2022 21:34:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2422825529030431629=="
+        Wed, 09 Feb 2022 22:09:18 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] monitor/sdp: Fixes out-of-bounds array access
+Date:   Wed,  9 Feb 2022 22:09:17 -0800
+Message-Id: <20220210060917.50156-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/4] bthost: Fix not handling ACL fragmentation
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220209235553.150294-1-luiz.dentz@gmail.com>
-References: <20220209235553.150294-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2422825529030431629==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is automated email and please do not reply to this email!
+This patch fixes the out-of-bounds array access caught by the ASAN.
 
-Dear submitter,
+monitor/sdp.c:497:19: runtime error: index 8 out of bounds for type 'cont_data [8]'
+=================================================================
+==4180==ERROR: AddressSanitizer: global-buffer-overflow on address 0x7fe2d271a542 at pc 0x7fe2d174a57d bp 0x7ffc6dcac1d0 sp 0x7ffc6dcab978
+WRITE of size 9 at 0x7fe2d271a542 thread T0
+    #0 0x7fe2d174a57c  (/lib/x86_64-linux-gnu/libasan.so.5+0x9b57c)
+    #1 0x7fe2d23bae85 in search_attr_rsp monitor/sdp.c:692
+    #2 0x7fe2d23be3f1 in sdp_packet monitor/sdp.c:771
+    #3 0x7fe2d23b004c in l2cap_frame monitor/l2cap.c:3247
+    #4 0x7fe2d23b3d9c in l2cap_packet monitor/l2cap.c:3312
+    #5 0x7fe2d237d5c3 in packet_hci_acldata monitor/packet.c:11638
+    #6 0x7fe2d2381876 in packet_monitor monitor/packet.c:3967
+    #7 0x7fe2d230b285 in data_callback monitor/control.c:973
+    #8 0x7fe2d2447029 in mainloop_run src/shared/mainloop.c:106
+    #9 0x7fe2d2449306 in mainloop_run_with_signal src/shared/mainloop-notify.c:188
+    #10 0x7fe2d230324a in main monitor/main.c:290
+    #11 0x7fe2d0b440b2 in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x270b2)
+    #12 0x7fe2d2303b7d in _start (/home/han1/work/dev/bluez/monitor/btmon+0x1dbb7d)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=612835
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      6.03 seconds
-GitLint                       PASS      3.97 seconds
-Prep - Setup ELL              PASS      52.60 seconds
-Build - Prep                  PASS      0.90 seconds
-Build - Configure             PASS      10.70 seconds
-Build - Make                  PASS      1847.93 seconds
-Make Check                    PASS      13.01 seconds
-Make Check w/Valgrind         PASS      549.65 seconds
-Make Distcheck                PASS      294.08 seconds
-Build w/ext ELL - Configure   PASS      10.33 seconds
-Build w/ext ELL - Make        PASS      1833.60 seconds
-Incremental Build with patchesPASS      7382.33 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,1/4] bthost: Fix not handling ACL fragmentation
-WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
-#257: FILE: emulator/bthost.c:2560:
-+		/* fall through */
-
-/github/workspace/src/12741130.patch total: 0 errors, 1 warnings, 192 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12741130.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+0x7fe2d271a542 is located 30 bytes to the left of global variable 'tid_list' defined in 'monitor/sdp.c:43:24' (0x7fe2d271a560) of size 384
+0x7fe2d271a542 is located 2 bytes to the right of global variable 'cont_list' defined in 'monitor/sdp.c:424:25' (0x7fe2d271a400) of size 320
+SUMMARY: AddressSanitizer: global-buffer-overflow (/lib/x86_64-linux-gnu/libasan.so.5+0x9b57c)
+...
+==4180==ABORTING
 ---
-Regards,
-Linux Bluetooth
+ monitor/sdp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/monitor/sdp.c b/monitor/sdp.c
+index 10bc0a121..daf9a9da8 100644
+--- a/monitor/sdp.c
++++ b/monitor/sdp.c
+@@ -494,7 +494,7 @@ static void handle_continuation(struct tid_data *tid, bool nested,
+ 		cont_list[n].data = NULL;
+ 		cont_list[n].size = 0;
+ 	} else
+-		memcpy(cont_list[i].cont, data + bytes, data[bytes] + 1);
++		memcpy(cont_list[n].cont, data + bytes, data[bytes] + 1);
+ }
+ 
+ static uint16_t common_rsp(const struct l2cap_frame *frame,
+-- 
+2.25.1
 
---===============2422825529030431629==--
