@@ -2,150 +2,232 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DCDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 22:55:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1CAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 23:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345337AbiBJWzz (ORCPT
+        id S1345608AbiBJXSR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Feb 2022 17:55:55 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43926 "EHLO
+        Thu, 10 Feb 2022 18:18:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344698AbiBJWzy (ORCPT
+        with ESMTP id S1345151AbiBJXSO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Feb 2022 17:55:54 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D791E55B0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 14:55:54 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id a39so12095065pfx.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 14:55:54 -0800 (PST)
+        Thu, 10 Feb 2022 18:18:14 -0500
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91729266C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 15:18:14 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id j24so6564432qkk.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 15:18:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8wu6J3CUz+yK8eT0oBk/3837IZPQ0PXsIDjvqTM+eBY=;
-        b=dpouK2sO88U07lEbLCgQaMrrdZFdaLcsqCLCQol+S4iSa01sHkGEUbK4TFQX8+hdr/
-         jMwgdcNxF5nFNm11dghPzLQ0qeXb36nQ5nZHoGOXKy6ak46J2XPm69NxWGddCQIOlT8+
-         VucfMcnsHAWvXqOLQ68lRUgkHI6fF1EWK7NxhCQslh5lX0j5KTxfl2cMRdT2gq9sR5oj
-         0+x2/76rvT8sXuq0lFwpMaDvK/cHccp7AQxWmzNDuGHFUDVmTDsq+ncn6SzNKzG6pv4g
-         QAmtCpLoLnP9Ho7gO5d4OwkVuIIfIUDsYX7St1TXloUxQMG0bUo3v9/rVlMxgImQr1xM
-         H+bQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=XwQIM4fxhGgwLg7OTjfa7gyMmWrqhAMISBaZqcH9Z0s=;
+        b=ewip7k/pIU+BXwnI14wtzPSqxKO+wUghsiKdGLM6aeZyJBRGbuf31QZivrTsj8HjOp
+         OiNwQ3dT268F++T9bMxW+fcMYa4ek3PtPegKmGVb6r8p6g/HzoHA8tfih2T259rRtzBe
+         AWlOcKT3W5mA7qLNrrlyell1Qpzp3bJNDPC66WPKaTHdB5Z9ux+/5JB6jSQxz+/5/udr
+         ycwAvVupl7zRuvT831hCUZ0eMLTZWAvQrWKWMjwSdMH69jic0WmGPP4iUy7+cTPDQYz3
+         QMXXIinmHVqJ9qrEAg5IjwEDehNyCD5PHGJNy6dVC5nXBDzstpW5jTL3t5Wr/Qwf9qai
+         PIxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=8wu6J3CUz+yK8eT0oBk/3837IZPQ0PXsIDjvqTM+eBY=;
-        b=1od3/5S1E8UYaPHnTbHKe7Bsep5W4X/qFJ/qPMxmekydwE8t68u17BuiFSbXL3n4r9
-         ioyAkEoRvy7znjoEwn94FwzRE/FRYf2srx0kqLz6+eJ1/8qdKNvyIO7h8GgkXjfu4HLT
-         nYP/M2RDDmnLh3k4yylzBP7D0ZLTmcXqCntLjN2tx/GrFmqiqn7Bpr3yOBxBi0uuoIQ/
-         Yj5L7oY41b6TmtIlAcGXrMaPhwjHMCN/cSxxkqGPioPPCUcre15IaEbOvrgLhb2xmULA
-         BzEPvr47aW9t4zUUPyXu7gcRZlEKJran5x49dZAJsSWfnzkhHh13XpQl95vzqRFaZ87U
-         NWMA==
-X-Gm-Message-State: AOAM5315ZUzjevqL2eCiWQNlbdMwhn3enql0FFt1N0md06ovazFPfviy
-        alZQXU+CKWixom3YBx2zXFxJ/W1uoxRTTA==
-X-Google-Smtp-Source: ABdhPJx1ga1YbMZeNUK6NuGzSf74sMLr6cXwqmf5yE/yl6wYjpCKMOTZ47YcXGJMqTjVE2ucCBRznw==
-X-Received: by 2002:a05:6a00:10c1:: with SMTP id d1mr9814598pfu.79.1644533754099;
-        Thu, 10 Feb 2022 14:55:54 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g12sm23421869pfm.119.2022.02.10.14.55.53
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=XwQIM4fxhGgwLg7OTjfa7gyMmWrqhAMISBaZqcH9Z0s=;
+        b=c2XE0lrKlN8xMUFe0SGGFxmhsLePawoZwEqRbkET8tJ1p5wVQycTOkmrSTtfDnb4bm
+         UkKT+eWjc9bwVZO+VipaBO39l5n2qbkpBTfYooNVvlj6bM+5ViLeHNokzKSC4T73v41I
+         /f4O3X6yCsZh1sEDBQ1TykodjHPUgAp00/EOAeQcNePLDtdr4c8M6vXpdLlrLQfe/01x
+         Mxb8DEDT+QFBSSiz3g7GhJ/pDejllqhF/HyyFjbILR5+d8VBfbm91pIyFXHLB4uFex3z
+         5ZO1Txvv20pWZXpEHYqjhEhKHns+zwUF3E2iD16kq+GsMjOaI9kIoSe1WxDfvi8ENaJb
+         54IA==
+X-Gm-Message-State: AOAM531ijSVCUSRyUNC+wFqWrAvy3wXA6lkKSIeGiivRpo24e/Fxs7P1
+        sVEZ7nV1JcjCL+c9g6L9BIo+/OwtcRhxew==
+X-Google-Smtp-Source: ABdhPJzy0hcg0hh7xr5emNImfv/ZXr4ala6f9MAKWZmxf57VM+Zif9MdzGkXLmtWD4oNOWl9R57NwA==
+X-Received: by 2002:a37:bf83:: with SMTP id p125mr5107700qkf.382.1644535093485;
+        Thu, 10 Feb 2022 15:18:13 -0800 (PST)
+Received: from [172.17.0.2] ([13.90.62.24])
+        by smtp.gmail.com with ESMTPSA id j19sm8205586qkp.120.2022.02.10.15.18.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 14:55:53 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2] device: Fix crash when removing device
-Date:   Thu, 10 Feb 2022 14:55:52 -0800
-Message-Id: <20220210225552.573320-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 10 Feb 2022 15:18:13 -0800 (PST)
+Message-ID: <62059d35.1c69fb81.7ce93.e2e5@mx.google.com>
+Date:   Thu, 10 Feb 2022 15:18:13 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7471358690387025958=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] device: Fix crash when removing device
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220210221451.418234-1-luiz.dentz@gmail.com>
+References: <20220210221451.418234-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7471358690387025958==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Calling btd_adapter_remove_device from device_remove_connection can
-cause a crash, so instead of removing it immediatelly this set a the
-temporary timeout to 0.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjEzMjQyCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgMS40MiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAxLjA0IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDQ5Ljg0IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNzYgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgMTAu
+MDMgc2Vjb25kcwpCdWlsZCAtIE1ha2UgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTM4OS41
+NSBzZWNvbmRzCk1ha2UgQ2hlY2sgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxLjIxIHNl
+Y29uZHMKTWFrZSBDaGVjayB3L1ZhbGdyaW5kICAgICAgICAgRkFJTCAgICAgIDM0NS44MSBzZWNv
+bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIEZBSUwgICAgICAxODEuNTkgc2Vjb25k
+cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgMTAuMjUgc2Vjb25kcwpC
+dWlsZCB3L2V4dCBFTEwgLSBNYWtlICAgICAgICBGQUlMICAgICAgMTM2OC4wMyBzZWNvbmRzCklu
+Y3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlc1BBU1MgICAgICAwLjAwIHNlY29uZHMKCkRldGFp
+bHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBGQUlM
+CkRlc2M6IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdCB3aXRoIHJ1bGUgaW4gLmNoZWNrcGF0Y2gu
+Y29uZgpPdXRwdXQ6CltCbHVlWl0gZGV2aWNlOiBGaXggY3Jhc2ggd2hlbiByZW1vdmluZyBkZXZp
+Y2UKV0FSTklORzpUWVBPX1NQRUxMSU5HOiAnaW1tZWRpYXRlbGx5JyBtYXkgYmUgbWlzc3BlbGxl
+ZCAtIHBlcmhhcHMgJ2ltbWVkaWF0ZWx5Jz8KIzgxOiAKY2F1c2UgYSBjcmFzaCwgc28gaW5zdGVh
+ZCBvZiByZW1vdmluZyBpdCBpbW1lZGlhdGVsbHkgdGhpcyBzZXQgYSB0aGUKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eXl5eXl5eXl4KCi9naXRodWIvd29ya3Nw
+YWNlL3NyYy8xMjc0MjQ2MC5wYXRjaCB0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDggbGlu
+ZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNr
+cGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5
+cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRodWIvd29ya3Nw
+YWNlL3NyYy8xMjc0MjQ2MC5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcu
+CgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFD
+Uk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVS
+X1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpO
+T1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVw
+b3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5U
+QUlORVJTLgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIE1h
+a2UgLSBGQUlMCkRlc2M6IEJ1aWxkIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQpPdXRwdXQ6CnRvb2xz
+L21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVy
+LmM6MTIzNjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3
+aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEy
+MzY0IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1
+bml0L3Rlc3QtYXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRw
+LmM6NzY2OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0
+aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2
+NiB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5p
+dC90ZXN0LWF2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5j
+Ojk4OTo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg
+4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkg
+fCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnNyYy9k
+ZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3JlbW92ZV9jb25uZWN0aW9u4oCZOgpzcmMv
+ZGV2aWNlLmM6MzI4ODozOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g
+4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmTsgZGlkIHlvdSBtZWFuIOKAmGNsZWFyX3RlbXBvcmFy
+eV90aW1lcuKAmT8gWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAzMjg4
+IHwgICBzZXRfdGVtcG9yYXJ5X3RpbWVyKGRldmljZSwgMCk7CiAgICAgIHwgICBefn5+fn5+fn5+
+fn5+fn5+fn5+CiAgICAgIHwgICBjbGVhcl90ZW1wb3JhcnlfdGltZXIKc3JjL2RldmljZS5jOiBB
+dCB0b3AgbGV2ZWw6CnNyYy9kZXZpY2UuYzo0NjA0OjEzOiBlcnJvcjogY29uZmxpY3RpbmcgdHlw
+ZXMgZm9yIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkgWy1XZXJyb3JdCiA0NjA0IHwgc3RhdGlj
+IHZvaWQgc2V0X3RlbXBvcmFyeV90aW1lcihzdHJ1Y3QgYnRkX2RldmljZSAqZGV2LCB1bnNpZ25l
+ZCBpbnQgdGltZW91dCkKICAgICAgfCAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+CnNy
+Yy9kZXZpY2UuYzo0NjA0OjEzOiBlcnJvcjogc3RhdGljIGRlY2xhcmF0aW9uIG9mIOKAmHNldF90
+ZW1wb3JhcnlfdGltZXLigJkgZm9sbG93cyBub24tc3RhdGljIGRlY2xhcmF0aW9uCnNyYy9kZXZp
+Y2UuYzozMjg4OjM6IG5vdGU6IHByZXZpb3VzIGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIOKAmHNl
+dF90ZW1wb3JhcnlfdGltZXLigJkgd2FzIGhlcmUKIDMyODggfCAgIHNldF90ZW1wb3JhcnlfdGlt
+ZXIoZGV2aWNlLCAwKTsKICAgICAgfCAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2Fy
+bmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMDI0
+Mzogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0
+MzA4OiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
+TWFrZSBDaGVjayAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJwpPdXRwdXQ6CnNyYy9kZXZp
+Y2UuYzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3JlbW92ZV9jb25uZWN0aW9u4oCZOgpzcmMvZGV2
+aWNlLmM6MzI4ODozOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCY
+c2V0X3RlbXBvcmFyeV90aW1lcuKAmTsgZGlkIHlvdSBtZWFuIOKAmGNsZWFyX3RlbXBvcmFyeV90
+aW1lcuKAmT8gWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAzMjg4IHwg
+ICBzZXRfdGVtcG9yYXJ5X3RpbWVyKGRldmljZSwgMCk7CiAgICAgIHwgICBefn5+fn5+fn5+fn5+
+fn5+fn5+CiAgICAgIHwgICBjbGVhcl90ZW1wb3JhcnlfdGltZXIKc3JjL2RldmljZS5jOiBBdCB0
+b3AgbGV2ZWw6CnNyYy9kZXZpY2UuYzo0NjA0OjEzOiBlcnJvcjogY29uZmxpY3RpbmcgdHlwZXMg
+Zm9yIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkgWy1XZXJyb3JdCiA0NjA0IHwgc3RhdGljIHZv
+aWQgc2V0X3RlbXBvcmFyeV90aW1lcihzdHJ1Y3QgYnRkX2RldmljZSAqZGV2LCB1bnNpZ25lZCBp
+bnQgdGltZW91dCkKICAgICAgfCAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9k
+ZXZpY2UuYzo0NjA0OjEzOiBlcnJvcjogc3RhdGljIGRlY2xhcmF0aW9uIG9mIOKAmHNldF90ZW1w
+b3JhcnlfdGltZXLigJkgZm9sbG93cyBub24tc3RhdGljIGRlY2xhcmF0aW9uCnNyYy9kZXZpY2Uu
+YzozMjg4OjM6IG5vdGU6IHByZXZpb3VzIGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIOKAmHNldF90
+ZW1wb3JhcnlfdGltZXLigJkgd2FzIGhlcmUKIDMyODggfCAgIHNldF90ZW1wb3JhcnlfdGltZXIo
+ZGV2aWNlLCAwKTsKICAgICAgfCAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2Fybmlu
+Z3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMDI0Mzog
+c3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMTI3
+ODogY2hlY2tdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
+TWFrZSBDaGVjayB3L1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gJ21ha2UgY2hlY2snIHdpdGgg
+VmFsZ3JpbmQKT3V0cHV0Ogp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu
+4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyMzY0OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5n
+IHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KA
+mSwgcmV0cnlpbmcgd2l0aG91dAoxMjM2NCB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2
+W10pCiAgICAgIHwgICAgIF5+fn4Kc3JjL2RldmljZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2Vf
+cmVtb3ZlX2Nvbm5lY3Rpb27igJk6CnNyYy9kZXZpY2UuYzozMjg4OjM6IGVycm9yOiBpbXBsaWNp
+dCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJhzZXRfdGVtcG9yYXJ5X3RpbWVy4oCZOyBkaWQg
+eW91IG1lYW4g4oCYY2xlYXJfdGVtcG9yYXJ5X3RpbWVy4oCZPyBbLVdlcnJvcj1pbXBsaWNpdC1m
+dW5jdGlvbi1kZWNsYXJhdGlvbl0KIDMyODggfCAgIHNldF90ZW1wb3JhcnlfdGltZXIoZGV2aWNl
+LCAwKTsKICAgICAgfCAgIF5+fn5+fn5+fn5+fn5+fn5+fn4KICAgICAgfCAgIGNsZWFyX3RlbXBv
+cmFyeV90aW1lcgpzcmMvZGV2aWNlLmM6IEF0IHRvcCBsZXZlbDoKc3JjL2RldmljZS5jOjQ2MDQ6
+MTM6IGVycm9yOiBjb25mbGljdGluZyB0eXBlcyBmb3Ig4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKA
+mSBbLVdlcnJvcl0KIDQ2MDQgfCBzdGF0aWMgdm9pZCBzZXRfdGVtcG9yYXJ5X3RpbWVyKHN0cnVj
+dCBidGRfZGV2aWNlICpkZXYsIHVuc2lnbmVkIGludCB0aW1lb3V0KQogICAgICB8ICAgICAgICAg
+ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn4Kc3JjL2RldmljZS5jOjQ2MDQ6MTM6IGVycm9yOiBzdGF0
+aWMgZGVjbGFyYXRpb24gb2Yg4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmSBmb2xsb3dzIG5vbi1z
+dGF0aWMgZGVjbGFyYXRpb24Kc3JjL2RldmljZS5jOjMyODg6Mzogbm90ZTogcHJldmlvdXMgaW1w
+bGljaXQgZGVjbGFyYXRpb24gb2Yg4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmSB3YXMgaGVyZQog
+MzI4OCB8ICAgc2V0X3RlbXBvcmFyeV90aW1lcihkZXZpY2UsIDApOwogICAgICB8ICAgXn5+fn5+
+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwpt
+YWtlWzFdOiAqKiogW01ha2VmaWxlOjEwMjQzOiBzcmMvYmx1ZXRvb3RoZC1kZXZpY2Uub10gRXJy
+b3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQzMDg6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlIERpc3RjaGVjayAtIEZBSUwKRGVzYzogUnVu
+IGRpc3RjaGVjayB0byBjaGVjayB0aGUgZGlzdHJpYnV0aW9uCk91dHB1dDoKLi4vLi4vc3JjL2Rl
+dmljZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2VfcmVtb3ZlX2Nvbm5lY3Rpb27igJk6Ci4uLy4u
+L3NyYy9kZXZpY2UuYzozMjg4OjM6IHdhcm5pbmc6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1
+bmN0aW9uIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJk7IGRpZCB5b3UgbWVhbiDigJhjbGVhcl90
+ZW1wb3JhcnlfdGltZXLigJk/IFstV2ltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogMzI4
+OCB8ICAgc2V0X3RlbXBvcmFyeV90aW1lcihkZXZpY2UsIDApOwogICAgICB8ICAgXn5+fn5+fn5+
+fn5+fn5+fn5+fgogICAgICB8ICAgY2xlYXJfdGVtcG9yYXJ5X3RpbWVyCi4uLy4uL3NyYy9kZXZp
+Y2UuYzogQXQgdG9wIGxldmVsOgouLi8uLi9zcmMvZGV2aWNlLmM6NDYwNDoxMzogd2FybmluZzog
+Y29uZmxpY3RpbmcgdHlwZXMgZm9yIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkKIDQ2MDQgfCBz
+dGF0aWMgdm9pZCBzZXRfdGVtcG9yYXJ5X3RpbWVyKHN0cnVjdCBidGRfZGV2aWNlICpkZXYsIHVu
+c2lnbmVkIGludCB0aW1lb3V0KQogICAgICB8ICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+
+fn4KLi4vLi4vc3JjL2RldmljZS5jOjQ2MDQ6MTM6IGVycm9yOiBzdGF0aWMgZGVjbGFyYXRpb24g
+b2Yg4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmSBmb2xsb3dzIG5vbi1zdGF0aWMgZGVjbGFyYXRp
+b24KLi4vLi4vc3JjL2RldmljZS5jOjMyODg6Mzogbm90ZTogcHJldmlvdXMgaW1wbGljaXQgZGVj
+bGFyYXRpb24gb2Yg4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmSB3YXMgaGVyZQogMzI4OCB8ICAg
+c2V0X3RlbXBvcmFyeV90aW1lcihkZXZpY2UsIDApOwogICAgICB8ICAgXn5+fn5+fn5+fn5+fn5+
+fn5+fgptYWtlWzJdOiAqKiogW01ha2VmaWxlOjEwMjQzOiBzcmMvYmx1ZXRvb3RoZC1kZXZpY2Uu
+b10gRXJyb3IgMQptYWtlWzFdOiAqKiogW01ha2VmaWxlOjQzMDg6IGFsbF0gRXJyb3IgMgptYWtl
+OiAqKiogW01ha2VmaWxlOjExMTk5OiBkaXN0Y2hlY2tdIEVycm9yIDEKCgojIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgdy9leHQgRUxMIC0gTWFrZSAtIEZBSUwKRGVz
+YzogQnVpbGQgQmx1ZVogc291cmNlIHdpdGggJy0tZW5hYmxlLWV4dGVybmFsLWVsbCcgY29uZmln
+dXJhdGlvbgpPdXRwdXQ6CnRvb2xzL21nbXQtdGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7i
+gJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTIzNjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcg
+c2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZ
+LCByZXRyeWluZyB3aXRob3V0CjEyMzY0IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3Zb
+XSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFp
+buKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNp
+emUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwg
+cmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10p
+CiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7i
+gJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXpl
+IGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJl
+dHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQog
+ICAgICB8ICAgICBefn5+CnNyYy9kZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3JlbW92
+ZV9jb25uZWN0aW9u4oCZOgpzcmMvZGV2aWNlLmM6MzI4ODozOiBlcnJvcjogaW1wbGljaXQgZGVj
+bGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYc2V0X3RlbXBvcmFyeV90aW1lcuKAmTsgZGlkIHlvdSBt
+ZWFuIOKAmGNsZWFyX3RlbXBvcmFyeV90aW1lcuKAmT8gWy1XZXJyb3I9aW1wbGljaXQtZnVuY3Rp
+b24tZGVjbGFyYXRpb25dCiAzMjg4IHwgICBzZXRfdGVtcG9yYXJ5X3RpbWVyKGRldmljZSwgMCk7
+CiAgICAgIHwgICBefn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgIHwgICBjbGVhcl90ZW1wb3Jhcnlf
+dGltZXIKc3JjL2RldmljZS5jOiBBdCB0b3AgbGV2ZWw6CnNyYy9kZXZpY2UuYzo0NjA0OjEzOiBl
+cnJvcjogY29uZmxpY3RpbmcgdHlwZXMgZm9yIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkgWy1X
+ZXJyb3JdCiA0NjA0IHwgc3RhdGljIHZvaWQgc2V0X3RlbXBvcmFyeV90aW1lcihzdHJ1Y3QgYnRk
+X2RldmljZSAqZGV2LCB1bnNpZ25lZCBpbnQgdGltZW91dCkKICAgICAgfCAgICAgICAgICAgICBe
+fn5+fn5+fn5+fn5+fn5+fn5+CnNyYy9kZXZpY2UuYzo0NjA0OjEzOiBlcnJvcjogc3RhdGljIGRl
+Y2xhcmF0aW9uIG9mIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkgZm9sbG93cyBub24tc3RhdGlj
+IGRlY2xhcmF0aW9uCnNyYy9kZXZpY2UuYzozMjg4OjM6IG5vdGU6IHByZXZpb3VzIGltcGxpY2l0
+IGRlY2xhcmF0aW9uIG9mIOKAmHNldF90ZW1wb3JhcnlfdGltZXLigJkgd2FzIGhlcmUKIDMyODgg
+fCAgIHNldF90ZW1wb3JhcnlfdGltZXIoZGV2aWNlLCAwKTsKICAgICAgfCAgIF5+fn5+fn5+fn5+
+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsx
+XTogKioqIFtNYWtlZmlsZToxMDI0Mzogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEK
+bWFrZTogKioqIFtNYWtlZmlsZTo0MzA4OiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdhcmRzLApM
+aW51eCBCbHVldG9vdGgKCg==
 
-Fixes: https://github.com/bluez/bluez/issues/290
----
-v2: Fix compilation
-
- src/device.c | 46 +++++++++++++++++++++++-----------------------
- 1 file changed, 23 insertions(+), 23 deletions(-)
-
-diff --git a/src/device.c b/src/device.c
-index 6d29eb896..81b8ebd1e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3200,6 +3200,28 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
- 								"Connected");
- }
- 
-+static bool device_disappeared(gpointer user_data)
-+{
-+	struct btd_device *dev = user_data;
-+
-+	dev->temporary_timer = 0;
-+
-+	btd_adapter_remove_device(dev->adapter, dev);
-+
-+	return FALSE;
-+}
-+
-+static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
-+{
-+	clear_temporary_timer(dev);
-+
-+	if (!timeout)
-+		return;
-+
-+	dev->temporary_timer = timeout_add_seconds(timeout, device_disappeared,
-+								dev, NULL);
-+}
-+
- void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
- {
- 	struct bearer_state *state = get_state(device, bdaddr_type);
-@@ -3285,7 +3307,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
- 						DEVICE_INTERFACE, "Connected");
- 
- 	if (remove_device)
--		btd_adapter_remove_device(device->adapter, device);
-+		set_temporary_timer(device, 0);
- }
- 
- guint device_add_disconnect_watch(struct btd_device *device,
-@@ -4590,28 +4612,6 @@ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type)
- 	store_device_info(device);
- }
- 
--static bool device_disappeared(gpointer user_data)
--{
--	struct btd_device *dev = user_data;
--
--	dev->temporary_timer = 0;
--
--	btd_adapter_remove_device(dev->adapter, dev);
--
--	return FALSE;
--}
--
--static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
--{
--	clear_temporary_timer(dev);
--
--	if (!timeout)
--		return;
--
--	dev->temporary_timer = timeout_add_seconds(timeout, device_disappeared,
--								dev, NULL);
--}
--
- void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type)
- {
- 	if (bdaddr_type == BDADDR_BREDR)
--- 
-2.34.1
-
+--===============7471358690387025958==--
