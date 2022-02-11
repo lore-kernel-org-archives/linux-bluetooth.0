@@ -2,120 +2,203 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5DC7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 22:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF7AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 23:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354041AbiBKWVD (ORCPT
+        id S1353156AbiBKX7e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Feb 2022 17:21:03 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54598 "EHLO
+        Fri, 11 Feb 2022 18:59:34 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240543AbiBKWVC (ORCPT
+        with ESMTP id S242360AbiBKX7d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Feb 2022 17:21:02 -0500
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1EED48
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 14:20:59 -0800 (PST)
-Received: by mail-yb1-xb2d.google.com with SMTP id v186so29091719ybg.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 14:20:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=MLPx3NlNTXvpdN1sQ19Hn8v2AJ2oB1TBGetHcj8opKg=;
-        b=M5KiBvdJ/bTcAG9turhNIwznG8u569JP1n10+1Bb5LRy3ygF+jTmN1lBGWHwe4Rsim
-         UsODpBF5i1L2R7fW02LzwEJytexqHDGzVGJzCSHEjEstkrvtgVq6WCVLY2kPQRPYNNbc
-         lz2Sa/CoUwDHXhZwNqSed7hkc0sTvn84zbBlnO4b/oq6jzt0+h0PQGP4fdyEb66ArV6E
-         3jbv69SmKxl348zd5EDD07SiUU7ICvmkcMB3OcGEJVcUBY4AZdNX7sMkRwYn6/G8tpOc
-         KED3ljXtizFL3v5iOemrHenGgyCmi/MrHz+c3irkUgjQOayO4Y+zql2uoQZO7CuA5lAi
-         gdAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=MLPx3NlNTXvpdN1sQ19Hn8v2AJ2oB1TBGetHcj8opKg=;
-        b=uO+FR6hr1Ex7JKwPafJRb7+WZixHkQTLDYRu5pZDtO3O8Mx6IOpbuvaGWvFFnbZBDc
-         D0RPlYbDut8AfBOuyPKuJvqvPbK2kz88QO9d2G/30oeyhmqUf3nQR1Mh0pqqMq4n8wS8
-         fLVW0u/Z1e+m7cx+L7KLX6+LrVN6c+S1AgCqO/wtVuhidqDFfTeYsANHU2sXhaKTSmGP
-         ddgl7hAhVPaMYIdgGcqw0EyrK2yGLhoPWXzewDvZ/MgF0NSA2mW5psffMZPxkLh3R8Wm
-         IwTxKXJ3H9lF1SB8heACi0M1nN1Dzlq644HKY+NuLYndRKz1UacAUf4GvMOn9mdi3dgM
-         J0iA==
-X-Gm-Message-State: AOAM531FwBmFYHZbwHiQIoGTRTLQwkNQlanZrgPNFaI/By7KrACKsWig
-        R1cr+47bzJaZ1y+x8W2DtBH4shUlCZwgv4XfnB7b7lS3fLs=
-X-Google-Smtp-Source: ABdhPJw/mI02wK1HfIRMLwVMg/YUoghmV2Ywix57cFxoH/kloRJ0wswpengiznkWhv9SnlOqUEYeiGddSlFcHq3tDAc=
-X-Received: by 2002:a25:b310:: with SMTP id l16mr3500283ybj.752.1644618058268;
- Fri, 11 Feb 2022 14:20:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20220210225552.573320-1-luiz.dentz@gmail.com> <6205ac70.1c69fb81.e6be8.b6a2@mx.google.com>
-In-Reply-To: <6205ac70.1c69fb81.e6be8.b6a2@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 11 Feb 2022 14:20:47 -0800
-Message-ID: <CABBYNZJ-BVYyGrWpfnMOUh1YkmR4TgvxCFS0G9MPRMioSmJenA@mail.gmail.com>
-Subject: Re: [BlueZ,v2] device: Fix crash when removing device
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        Fri, 11 Feb 2022 18:59:33 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CAFAD62
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 15:59:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0840761B80
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 23:59:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6ACB1C340EB
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 23:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644623970;
+        bh=e1GZGnotD9Shdi8G88r9G1yRbJRkxN/UYQGmeRQuWkY=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=n6AHixMb5e+VmCsEMNwVDu8EDZkbGDRpGDOM6CK+5Mnjx00ZqVNNKEWj4DeToMuBs
+         q3wuNPoqjTD6CGjUnzRK27GGcX7lZd+CuJLTtXFoNCXphX/8Z19+F36LHwA8kK/SYG
+         h2EgP8wOb1hZuNfPAfyKRrRA5A7XnQ01M71n7fs86kW8mYHYO6SPzm73pmOFFLFuIB
+         se5NkjW5zG0Wo9AUNOiEbv2KaTEspg+Ozw1cesm5R34kFUm9QhIashk6UQ7roLVAey
+         GmFAv9arxUZVIIyKOCseWaI47p3hDBze1zZcJ0FQV4I3n3284CLqNI2XVt8JLcSxpX
+         jwmPLPPlVaAkg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3A9AEC05FD0; Fri, 11 Feb 2022 23:59:30 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215594] Unable to transfer big files to Nokia N9 and Jolla
+ phone
+Date:   Fri, 11 Feb 2022 23:59:29 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215594-62941-r6JrBNhI4f@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215594-62941@https.bugzilla.kernel.org/>
+References: <bug-215594-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215594
 
-On Thu, Feb 10, 2022 at 4:23 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=613256
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      1.46 seconds
-> GitLint                       PASS      1.00 seconds
-> Prep - Setup ELL              PASS      41.27 seconds
-> Build - Prep                  PASS      0.75 seconds
-> Build - Configure             PASS      8.25 seconds
-> Build - Make                  PASS      1386.15 seconds
-> Make Check                    PASS      11.95 seconds
-> Make Check w/Valgrind         PASS      440.83 seconds
-> Make Distcheck                PASS      230.47 seconds
-> Build w/ext ELL - Configure   PASS      8.17 seconds
-> Build w/ext ELL - Make        PASS      1374.80 seconds
-> Incremental Build with patchesPASS      0.00 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> [BlueZ,v2] device: Fix crash when removing device
-> WARNING:TYPO_SPELLING: 'immediatelly' may be misspelled - perhaps 'immediately'?
-> #81:
-> cause a crash, so instead of removing it immediatelly this set a the
->                                          ^^^^^^^^^^^^
->
-> /github/workspace/src/12742555.patch total: 0 errors, 1 warnings, 64 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12742555.patch has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-Pushed.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
--- 
-Luiz Augusto von Dentz
+--- Comment #1 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+> ACL Data RX: Handle 256 flags 0x02 dlen 15=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+>                                                                      #102
+> [hci0] 40.702432
+      Channel: 65 len 11 [PSM 3 mode Basic (0x00)] {chan 0}
+      RFCOMM: Unnumbered Info with Header Check (UIH) (0xef)
+         Address: 0x49 cr 0 dlci 0x12
+         Control: 0xef poll/final 0
+         Length: 7
+         FCS: 0x14
+        a0 00 07 10 00 7f ff 14                          ........=20=20=20=
+=20=20=20=20=20
+=3D obexctl: [^A^BNEW^A^B] Session /org/bluez/obex/client/session0 [default=
+]=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+40.703445
+=3D obexctl: [^A^BNEW^A^B] ObjectPush /org/bluez/obex/client/session0=20=20=
+=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+40.703761
+=3D obexctl: Connection successful=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+ 40.703803
+=3D obexctl: send /lib/systemd/systemd=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+ 46.405464
+=3D obexctl: Attempting to send /lib/systemd/systemd to
+/org/bluez/obex/client/session0=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+                           46.405516
+=3D obexctl: [^A^BNEW^A^B] Transfer /org/bluez/obex/client/session0/transfe=
+r0=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+46.407098
+=3D obexctl: Transfer /org/bluez/obex/client/session0/transfer0=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+ 46.407161
+=3D obexctl:      Status: queued=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+     46.40>
+=3D obexctl:      Name: systemd=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+     46.40>
+=3D obexctl:      Size: 1845808=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+     46.40>
+=3D obexctl:      Filename: /lib/systemd/systemd=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+     46.40>
+=3D obexctl:      Session: /org/bluez/obex/client/session0=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+     46.40>
+=3D obexctl: [^A^BCHG^A^B] Transfer /org/bluez/obex/client/session0/transfe=
+r0
+Status: active=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+47.629711
+=3D obexctl: [^A^BCHG^A^B] Transfer /org/bluez/obex/client/session0/transfe=
+r0
+Transferred: 32737 (@32KB/s 00:55)=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20
+47.630411
+=3D obexctl: [^A^BCHG^A^B] Transfer /org/bluez/obex/client/session0/transfe=
+r0
+Status: error=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+106.630035
+=3D obexctl: [^A^BDEL^A^B] Transfer /org/bluez/obex/client/session0/transfe=
+r0=20
+
+So the transfer apparently didn't even start, with what system are you tray=
+ing
+to communicate to?
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
