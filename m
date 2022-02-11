@@ -2,146 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1115DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Feb 2022 23:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6484C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 00:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244876AbiBJX5F (ORCPT
+        id S1345989AbiBKACQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Feb 2022 18:57:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56396 "EHLO
+        Thu, 10 Feb 2022 19:02:16 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243325AbiBJX5E (ORCPT
+        with ESMTP id S239080AbiBKACP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Feb 2022 18:57:04 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA025F7D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 15:57:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644537424; x=1676073424;
-  h=message-id:subject:from:to:date:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=D0KlA15nFsknitjKhZPyWgU2/kQ1B6vwluQDe5GKLIc=;
-  b=oG1PJKZABUumY8lVxHW5v4wzfj9ruhVVtCrIdMSoU37ptUNDnoV2/YZl
-   HBHSfO+sc7FJKSM4tQzqD+ro8d6a48+BgOAWGoqapytuJ5xAnBfuQ0md2
-   Mqw3F+yYOTEtek5zD7vv7clbDGVWVEqKCYeJYxwP9umoHMLWzeEWsBMDT
-   sFRXIGjkW8KiKkTWRDeV+tkFtBOkYtu+lcrvvVB3KiveTKD/v9u3FhJzI
-   bbGuYl2Q5WneYnAxazqaKzL+d+bWbmDbDBJsKWO93/YMG+lYOMEU+f4Bm
-   Ulk667mAYt6dOdhKSyaRAZ7RNnQ4L2w46aqIA8+4NCCWFexXjTraAiZA1
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10254"; a="249371302"
-X-IronPort-AV: E=Sophos;i="5.88,359,1635231600"; 
-   d="scan'208";a="249371302"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 15:57:04 -0800
-X-IronPort-AV: E=Sophos;i="5.88,359,1635231600"; 
-   d="scan'208";a="486024523"
-Received: from dtamondo-mobl.amr.corp.intel.com (HELO [10.212.170.152]) ([10.212.170.152])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2022 15:57:04 -0800
-Message-ID: <121567b781f15898ae71109c96f3c8b7fa740e9c.camel@linux.intel.com>
-Subject: Re: [BlueZ PATCH v2] device: Fix crash when removing device
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Thu, 10 Feb 2022 15:56:57 -0800
-In-Reply-To: <20220210225552.573320-1-luiz.dentz@gmail.com>
-References: <20220210225552.573320-1-luiz.dentz@gmail.com>
-Organization: Intel Corporation
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Thu, 10 Feb 2022 19:02:15 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9BC4B43
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 16:02:15 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id cf2so13680131edb.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 16:02:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3fCgT38Arn4wQQoi+ovyGr4e/8ACygaFfOcJVPGk/8U=;
+        b=X1kqHrKw7icmlX1Mahkh5QLIq4eK2VmAD8BGlp8hIHuBP0Ysb/rbRk7sk80wOMlcy5
+         f2q2BqE50X8zzxUgAqScG8LawmQwk7n84WeIrQBWBiVe1poHQ/U8e5XV3EJphpHp2AKV
+         xuHQCpSciLiGCK8tD6HqsRUM9mPUX+ZhbEIok=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3fCgT38Arn4wQQoi+ovyGr4e/8ACygaFfOcJVPGk/8U=;
+        b=RYaTJgPKqXt3zp1E5oUVuutEKX/gsxLF3wZl6msqdw3tBzTxDb+xQZ169mi36rHY8M
+         X6nAx8GKvTVM2Ut1rJPXdMv4F/ARLAlToFIe1e6sJXfumKhgLlod6wBo3MqJ/VDNzaU7
+         MIXZGpCglJA+p2XtnOUizBd9onjAwLEJEoe6+KEnHqrkolxUCQqsCcbBFtkpPLpq5wWp
+         7rg9bBvnT4LAaYuhH12mzk2yQzzA8sD7ExwOjd85Xqj16tjzrDg8rKwuW54RnC2xj6XI
+         CU9rSqk1anJFBFCow3HVOhrWiI7Go66+CPVLzC840/sr6lUPVoN8dXv1kVfouYJDve9D
+         ZnvQ==
+X-Gm-Message-State: AOAM531qPaysAqMFiXBJmI2ngslSH6+wmLHjGrEQ2aBZCuopEBseArWQ
+        WfpKi+TZDZ0w7lCiWk2veQ+YLBtSq4/OX0xW
+X-Google-Smtp-Source: ABdhPJwtlHj4S/9IpIrAdWqlVHSgs+u5CgRVOAz7Vp5WYvNr+QbhIO4U8Bv8cB+g8n5f1a2cRjeVzw==
+X-Received: by 2002:aa7:c04d:: with SMTP id k13mr10781113edo.301.1644537733673;
+        Thu, 10 Feb 2022 16:02:13 -0800 (PST)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com. [209.85.221.44])
+        by smtp.gmail.com with ESMTPSA id h8sm10286273edk.14.2022.02.10.16.02.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Feb 2022 16:02:13 -0800 (PST)
+Received: by mail-wr1-f44.google.com with SMTP id v12so12402528wrv.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 16:02:13 -0800 (PST)
+X-Received: by 2002:a05:6000:1e15:: with SMTP id bj21mr8110680wrb.222.1644537732577;
+ Thu, 10 Feb 2022 16:02:12 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
+ <CAO271m=vQsGwRvpe2tUUMuqB7r2z2cAut27U1LY6bQ_sHAk3NA@mail.gmail.com> <CABBYNZKs-JH_g2iUxStL5bRu-1z1TVzrS5pk2RyXUK8hiWYb7Q@mail.gmail.com>
+In-Reply-To: <CABBYNZKs-JH_g2iUxStL5bRu-1z1TVzrS5pk2RyXUK8hiWYb7Q@mail.gmail.com>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Thu, 10 Feb 2022 16:02:01 -0800
+X-Gmail-Original-Message-ID: <CAO271mnbrRxtEvMhc7GMaWY=BEKUzzv_CbN1j5WKf4NruKfJng@mail.gmail.com>
+Message-ID: <CAO271mnbrRxtEvMhc7GMaWY=BEKUzzv_CbN1j5WKf4NruKfJng@mail.gmail.com>
+Subject: Re: Question about Trusted property
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2022-02-10 at 14:55 -0800, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Calling btd_adapter_remove_device from device_remove_connection can
-> cause a crash, so instead of removing it immediatelly this set a the
-> temporary timeout to 0.
-> 
-> Fixes: https://github.com/bluez/bluez/issues/290
+Hi Luiz,
 
-Tested-by: Tedd Ho-Jeong AN <tedd.an@intel.com>
+Thanks for the clarification. So my guess was right that it does not
+have to do with bondedness. In that case, do you think it makes sense
+to add a "Bonded" flag property to org.bluez.Device1? There are some
+use case flows that pair with a peer device but do not actually bond,
+and just with Paired property the UI can't know whether to show this
+device as "Bonded" or not.
 
-> ---
-> v2: Fix compilation
-> 
->  src/device.c | 46 +++++++++++++++++++++++-----------------------
->  1 file changed, 23 insertions(+), 23 deletions(-)
-> 
-> diff --git a/src/device.c b/src/device.c
-> index 6d29eb896..81b8ebd1e 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3200,6 +3200,28 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
->                                                                 "Connected");
->  }
->  
-> +static bool device_disappeared(gpointer user_data)
-> +{
-> +       struct btd_device *dev = user_data;
-> +
-> +       dev->temporary_timer = 0;
-> +
-> +       btd_adapter_remove_device(dev->adapter, dev);
-> +
-> +       return FALSE;
-> +}
-> +
-> +static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
-> +{
-> +       clear_temporary_timer(dev);
-> +
-> +       if (!timeout)
-> +               return;
-> +
-> +       dev->temporary_timer = timeout_add_seconds(timeout, device_disappeared,
-> +                                                               dev, NULL);
-> +}
-> +
->  void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
->  {
->         struct bearer_state *state = get_state(device, bdaddr_type);
-> @@ -3285,7 +3307,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
->                                                 DEVICE_INTERFACE, "Connected");
->  
->         if (remove_device)
-> -               btd_adapter_remove_device(device->adapter, device);
-> +               set_temporary_timer(device, 0);
->  }
->  
->  guint device_add_disconnect_watch(struct btd_device *device,
-> @@ -4590,28 +4612,6 @@ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type)
->         store_device_info(device);
->  }
->  
-> -static bool device_disappeared(gpointer user_data)
-> -{
-> -       struct btd_device *dev = user_data;
-> -
-> -       dev->temporary_timer = 0;
-> -
-> -       btd_adapter_remove_device(dev->adapter, dev);
-> -
-> -       return FALSE;
-> -}
-> -
-> -static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
-> -{
-> -       clear_temporary_timer(dev);
-> -
-> -       if (!timeout)
-> -               return;
-> -
-> -       dev->temporary_timer = timeout_add_seconds(timeout, device_disappeared,
-> -                                                               dev, NULL);
-> -}
-> -
->  void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type)
->  {
->         if (bdaddr_type == BDADDR_BREDR)
-
-
+On Thu, Feb 10, 2022 at 1:30 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Sonny,
+>
+> On Thu, Feb 10, 2022 at 11:23 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> >
+> > Dear maintainers,
+> >
+> > Friendly ping on this question. Does adding "Bonded" property to
+> > org.bluez.Device1 make sense?
+> >
+> > On Fri, Feb 4, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > >
+> > > Hi Luiz/BlueZ maintainers,
+> > >
+> > > What is the purpose of the Trusted property on org.bluez.Device1
+> > > interface? Does it mean whether the device is bonded? My experiment
+> > > with BlueZ shows that sometimes a device with "Trusted" property set
+> > > is not bonded (does not have pairing key stored) and also vice versa,
+> > > so I am assuming that the Trusted property means something else. What
+> > > is an example use case of the Trusted property?
+> > >
+> > > Eventually, what I am trying to achieve is for BlueZ clients to find
+> > > out whether a device is Bonded or not. Using the Paired property is
+> > > not very accurate because it is set to true during connection although
+> > > the device is not bonded (pairing key does not persist after
+> > > disconnection). For this purpose, I am about to propose adding
+> > > "Bonded" property to org.bluez.Device1. Some use cases include when
+> > > there is a temporary pairing with a peer device we don't want UI to
+> > > show that the device is in the Bonded device list. What do you think
+> > > about exposing the Bonded state via D-Bus? I will do the
+> > > implementation if this idea makes sense.
+> > >
+> > > Thanks!
+>
+> Trusted primary use is to bypass agent authorization, so when set the
+> agent will not have to authorize profile connections, and yes you can
+> set a device to be Trusted even without having it paired since the
+> bonding procedure refers to authentication rather than authorization
+> which is what Trusted controls.
+>
+>
+> --
+> Luiz Augusto von Dentz
