@@ -2,103 +2,160 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08AFAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 10:02:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B17CBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 11:23:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348744AbiBKKCY (ORCPT
+        id S242364AbiBKLXj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Feb 2022 05:02:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41278 "EHLO
+        Fri, 11 Feb 2022 06:23:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348731AbiBKKCX (ORCPT
+        with ESMTP id S229584AbiBKLXi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Feb 2022 05:02:23 -0500
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1E6E9C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 02:02:22 -0800 (PST)
-Received: by mail-qk1-x733.google.com with SMTP id m25so7856070qka.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 02:02:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Yrmy/MI76Vfq8d2KNWB85GP7hiV9xgz7C7cCUBNgNkw=;
-        b=ldaiH8J1Gkfr0LtiClBdYrLeV6nx8fdI3VhmLpELzdzhyTp1plHWh4NsEuU10U/h8t
-         rIfkBhceGymHSOLvgXb7hDzADVAgVSSM3h1B3nsnGQ1z1qIqmoxGD9SqKpuyxMtLI1nf
-         VwoFkFc4JRiRwylzCfV6erp6VDyS4qoZmu37GDJp1ps20F7NCw+86l/bQjblTCj+1ttW
-         PQYGLQfoIKEkOmYYcB09CGU88gGkmO/qenn6yMtdlTd9Z6und1jg6jLyxEj3MC2pF3pc
-         bMPl+P/X1gD0Y0BDfh4zjPpcm4/gNSJMXi3JqZT1gdff5q/s+1vdHf6G46Cx3EYYB3zX
-         yJKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Yrmy/MI76Vfq8d2KNWB85GP7hiV9xgz7C7cCUBNgNkw=;
-        b=o7XZRa98rnzWAJFeX2BCzs47dcbCWUKOH7Q5Nk5l8pMOR+5RPVSqKMG8UHw+wLaJXn
-         wA8CsQI/kdFkbYlEH2Zl2flZFWDCiloDnJMEOPh5wItzczFUpgJEgokvnp2YLoEAyBKC
-         LDBGZwmjzBsPYnOKpcDGezElcppkg3bWspYkHAz2xS8rFm3rBkPl/75df2MkZUIJ5Qp+
-         eBE8qucuu5sryRLS9/QUaN91t8A4ePAmmantgcBV3B6daDt1jtjgTf6icpuN8BlIuCUp
-         4A3Fl0mpopSfDXfkdM4KbbzzpjSoeAYAoxhga45rBNLzGeLwQNzv3HJE+PKZaX1Y0efC
-         ZSKw==
-X-Gm-Message-State: AOAM531AqXTaaRUi5YEXl2qv6Lt8WtQ97yTldYZ8SNHagHIrxYfL5j+a
-        nrwLOnCNR5HMmxr2V5eE4BQVBMeiTLQgWA==
-X-Google-Smtp-Source: ABdhPJySJRQUanGSS68fvy/sYy31tOUZ1SLGso3MaaMUFb8dig/nAri8W1Y6vxoGQxSw9aoRGVcWjg==
-X-Received: by 2002:a05:620a:40cc:: with SMTP id g12mr311460qko.308.1644573741647;
-        Fri, 11 Feb 2022 02:02:21 -0800 (PST)
-Received: from [172.17.0.2] ([52.251.121.46])
-        by smtp.gmail.com with ESMTPSA id f22sm12840313qtb.1.2022.02.11.02.02.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Feb 2022 02:02:21 -0800 (PST)
-Message-ID: <6206342d.1c69fb81.ff867.73e7@mx.google.com>
-Date:   Fri, 11 Feb 2022 02:02:21 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3742043561408239344=="
+        Fri, 11 Feb 2022 06:23:38 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71AFEE75
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 03:23:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E551EB82960
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 11:23:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 49CC5C340E9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 11:23:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644578612;
+        bh=Tc8Jan29jsBm4tV05JUUF0becU95Mau9cuCZYGsPZQ0=;
+        h=From:To:Subject:Date:From;
+        b=OjEib6quNeW2Df1RYMCkrf214NGVx7tw2BLikU4XYLNWTCGRjl4oJxGH4L77AXJiv
+         Z8q8hHkLlzcka2i04F66rmtPQS765r29gzVV5horLtUSoLbv1DtyPsmc1s6dzWwXFE
+         /QSBjS2enlNm112eL9RK6ZHx9fZkLeddYqGkFnrSLuItQRi+V7L/TfNVN4tRzHYOvz
+         wu8mjdsoN0Jb0IEBrbT98TtGcVwinGTy6o3o2pTjwOk2uOy68cPNFL4KbvAdSn1tzD
+         PCf+kGD3Tz4uGep+g3RovUpqTUAaAkiAjO6D4I8cHW+nnrjK/HDHRVODxjrBhEVYPK
+         YC5DEoR+GngYg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2D0B9C05FD0; Fri, 11 Feb 2022 11:23:32 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215589] New: Random bluetooth dropout after sleep.
+Date:   Fri, 11 Feb 2022 11:23:31 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rodomar705@protonmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-215589-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pepe2k@gmail.com
-Subject: RE: Bluetooth: btusb: add support for LG LGSBWAC02 (MT7663BUN)
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220211093103.18124-1-pepe2k@gmail.com>
-References: <20220211093103.18124-1-pepe2k@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3742043561408239344==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215589
 
-This is automated email and please do not reply to this email!
+            Bug ID: 215589
+           Summary: Random bluetooth dropout after sleep.
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.16.8-zen1-1-zen
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: rodomar705@protonmail.com
+        Regression: No
 
-Dear submitter,
+Created attachment 300430
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300430&action=3Dedit
+ATA SCSI trace failing randomly
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=613415
+After the previous issue of AX210 bluetooth issues after warm reboots I got
+another problem; after the system sleep and get woken up from it, the bluet=
+ooth
+adapter stop completely to respond to the host, other times it will connect=
+ to
+my bluetooth mouse for a few seconds and then the bluetooth subsystem locks=
+ up
+randomly. Sometimes when it works and then stop working I see this message =
+in
+the dmesg log:
 
----Test result---
+[ 9248.324043] hid-generic 0005:0A5C:4503.0009: input,hidraw1: BLUETOOTH HID
+v1.29 Mouse [TeckNet BM308] on xx:xx:xx:xx:xx:xx
+[ 9259.970320] pcieport 0000:00:08.1: PME: Spurious native interrupt!
+[ 9276.881203] pcieport 0000:00:08.1: PME: Spurious native interrupt!
+[ 9277.137263] usb 3-4: reset full-speed USB device number 2 using xhci_hcd
+...
+[ 9997.610527] Bluetooth: hci0: command 0x0405 tx timeout
+[10041.455285] Bluetooth: hci0: command 0x0408 tx timeout
+[10082.421187] Bluetooth: hci0: command 0x0408 tx timeout
+[10127.484049] Bluetooth: hci0: command 0x0408 tx timeout
+...
+[10143.614676] Bluetooth: hci0: command 0x0c1a tx timeout
+[10143.614686] Bluetooth: hci0: Timed out waiting for suspend events
+[10143.614693] Bluetooth: hci0: No way to reset. Ignoring and continuing
+[10143.614697] Bluetooth: hci0: Suspend timeout bit: 4
+[10143.614700] Bluetooth: hci0: Suspend timeout bit: 6
+[10143.614703] Bluetooth: hci0: Suspend timeout bit: 9
+[10143.614730] Bluetooth: hci0: Suspend notifier action (3) failed: -110
 
-Test Summary:
-CheckPatch                    PASS      1.73 seconds
-GitLint                       PASS      1.00 seconds
-SubjectPrefix                 PASS      0.90 seconds
-BuildKernel                   PASS      37.50 seconds
-BuildKernel32                 PASS      32.75 seconds
-Incremental Build with patchesPASS      44.43 seconds
-TestRunner: Setup             PASS      573.51 seconds
-TestRunner: l2cap-tester      PASS      15.69 seconds
-TestRunner: bnep-tester       PASS      7.19 seconds
-TestRunner: mgmt-tester       PASS      120.64 seconds
-TestRunner: rfcomm-tester     PASS      9.15 seconds
-TestRunner: sco-tester        PASS      9.19 seconds
-TestRunner: smp-tester        PASS      9.07 seconds
-TestRunner: userchan-tester   PASS      7.64 seconds
+To fix this problem I usually put the laptop to sleep and wake it up again
+Today however I was greeted with this error multiple times:
 
+see ata_scsi_trace.txt
 
+This laptop doesn't have a SATA port, but I guess the error comes from the
+probing of the chipset non connected port? Why it crashes though?
 
----
-Regards,
-Linux Bluetooth
+Then this error is printed:
 
+[10151.146976] ata2: failed stop FIS RX (-16)
+[10151.148212] ata1: failed stop FIS RX (-16)
 
---===============3742043561408239344==--
+And then multiple new errors coming from a function called list (but it see=
+ms
+that the caller is the bluetooth subsystem):
+
+see list_stack_trace.txt
+
+Then the bluetooth subsystem 4 times:
+
+see bluetooth_stack_trace.txt
+
+Finally after a sleep wake cycle again this was printed again:
+
+see double_stack_trace.txt.
+
+In this last case, however, the bluetooth works perfectly fine, after 3 cyc=
+les.
+
+I don't really get what's happening here, frankly.
+
+If you need more information on this, just ask.
+
+Marco.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
