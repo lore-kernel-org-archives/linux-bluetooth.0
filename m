@@ -2,94 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AEEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 08:03:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DD7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 08:29:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347914AbiBKIDt (ORCPT
+        id S1348041AbiBKI3p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Feb 2022 03:03:49 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60770 "EHLO
+        Fri, 11 Feb 2022 03:29:45 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346181AbiBKIDs (ORCPT
+        with ESMTP id S230344AbiBKI3o (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Feb 2022 03:03:48 -0500
-Received: from so254-9.mailgun.net (so254-9.mailgun.net [198.61.254.9])
-        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTPS id 9C057BBF
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 00:03:47 -0800 (PST)
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1644566627; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=nF9XH8XJCDk7v0HhA0wn4IzrdqbTbiufUXlzSglbXeM=; b=B86jKr+3zWYwi6KxGrubeutf52VZANO8j8ytYuf60dEqYT7TvQHQBqoaZxWSlRF5q5QWT5i3
- 9izRSyM0p1l6gimpLt5VMXkT2lq5U7yuMfv2oiEhyUBdxeAuXp9PyEVlDdT14wVdLFUvLmWm
- d2XxP/jgLXZSL6f+iMVYezAtkGo=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 6206186219d16b66a93a7073 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 11 Feb 2022 08:03:46
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id A4E6DC43619; Fri, 11 Feb 2022 08:03:46 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        Fri, 11 Feb 2022 03:29:44 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37385CF;
+        Fri, 11 Feb 2022 00:29:43 -0800 (PST)
+Received: from [192.168.0.2] (ip5f5aebe1.dynamic.kabel-deutschland.de [95.90.235.225])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 661BAC4338F;
-        Fri, 11 Feb 2022 08:03:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 661BAC4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
-        hemantg@codeaurora.org, rjliao@codeaurora.org,
-        zijuhu@codeaurora.org, tjiang@codeaurora.org,
-        Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v2] Bluetooth: btusb: Improve stability for QCA devices
-Date:   Fri, 11 Feb 2022 16:03:40 +0800
-Message-Id: <1644566620-16748-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id A9EC261EA1926;
+        Fri, 11 Feb 2022 09:29:41 +0100 (CET)
+Message-ID: <1c1e4143-0750-3dc5-eb63-2e8f52699e7c@molgen.mpg.de>
+Date:   Fri, 11 Feb 2022 09:29:41 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: Unable to transfer big files to Nokia N9
+Content-Language: en-US
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, regressions@lists.linux.dev,
+        Takashi Iwai <tiwai@suse.com>
+References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+ <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
+ <cf71bdea-ec22-e4c9-016c-69e94a130607@molgen.mpg.de>
+ <a93c0fa7-7b84-6aea-265b-c913e0c84678@molgen.mpg.de>
+ <d7206e12-1b99-c3be-84f4-df22af427ef5@molgen.mpg.de>
+ <371027df-7f32-edab-208d-d4cdd2202ba6@leemhuis.info>
+ <d41d8b41-c347-47e7-e52b-39d7211c8952@molgen.mpg.de>
+ <aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de>
+ <9cb4b1ae-760f-f8ec-b3fe-a5d0be0dba25@leemhuis.info>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <9cb4b1ae-760f-f8ec-b3fe-a5d0be0dba25@leemhuis.info>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+Dear Thorsten,
 
-Controller will reset after NVM is downloaded for QCA
-device, so wait a moment for reset Done then go ahead
-to improve stability.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
----
- drivers/bluetooth/btusb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Am 10.02.22 um 11:36 schrieb Thorsten Leemhuis:
+> Hi, this is your Linux kernel regression tracker speaking. Top-posting
+> for once, to make this easy accessible to everyone.
+> 
+> Hey bluetooth-maintainers, what's the status here? I already asked for a
+> status update more that a week ago and didn't get a reply. Paul also
+> confirmed recently the issue is still present and no reply either. IOW:
+> this is talking way to long for a issue that was bisected?
+> 
+> Could you please comment on this? What can be done to get this rolling?
+> Or do I have to ask upstream maintainers to revert the culprit?
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e03dfbd92fcc..20e36f53d2e7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2994,6 +2994,7 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_PATCH_UPDATED	0x80
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
-+#define QCA_BT_RESET_WAIT_MS    100
- 
- #define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
- #define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-@@ -3320,6 +3321,10 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
- 		if (err < 0)
- 			return err;
-+		/* Controller will reset after NVM is downloaded, so wait a moment
-+		 * for reset Done, it will improve stability.
-+		 */
-+		msleep(QCA_BT_RESET_WAIT_MS);
- 	}
- 
- 	return 0;
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+I sent two reverts [1], and probably forgot to add a tag to reference 
+this discussion.
 
+Luiz asked me two provide more logs. Hopefully, I am going to come 
+around to that today, but maybe it’s better to revert so that Linux 5.16 
+can also be fixed.
+
+
+Kind regards,
+
+Paul
+
+
+[1]: 
+https://lore.kernel.org/linux-bluetooth/20220208221911.57058-1-pmenzel@molgen.mpg.de/T/
