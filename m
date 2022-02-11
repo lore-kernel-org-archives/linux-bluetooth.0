@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8564CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 00:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F48C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 00:18:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346275AbiBKASo (ORCPT
+        id S1346279AbiBKASo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 10 Feb 2022 19:18:44 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51842 "EHLO
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242748AbiBKASm (ORCPT
+        with ESMTP id S1346262AbiBKASn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Feb 2022 19:18:42 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 198A9105
+        Thu, 10 Feb 2022 19:18:43 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF4F558E
         for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 16:18:43 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id w20so3273636plq.12
+Received: by mail-pf1-x432.google.com with SMTP id a39so12389763pfx.7
         for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 16:18:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=4c4lSDhQw9gBes/CzLEVSAVialIXB+yXKGpThtYQ4/Q=;
-        b=od3icoPD5v7g/2X9SiztzSzj9wBjCKDL0Idt8v5c4N8gZRX3NoZKZ53+h8RtYLhr1m
-         wKAq0e3Qm7b+BvEP3Dveb14mkF+02/GilKeYsz56403ginkJfi3nP2ULVA6yKytMJOfZ
-         x5KjTM5EDKlMVLEXJC7bcO3umPcv2DjwinyMSDHNU55Fx5qehENWTn2vKq9ZaXjUJTQl
-         nb/IuYAlvRb+lBL83XnB9YxCEGDROC8bvc9qx+VmXLmTx/TLKkdpolaWPb8g1p240Rjs
-         zJIlSjJYl1M6L8gaEjrwXSCAnCvEuPTt6R6/BEzLr+ZDBYt/1OJoo4omyz2IqQPGPdXX
-         Z/CQ==
+        bh=WAQz1cmq7S+46Q19Se7FctEmdzmieMxLeZeEwTRluAA=;
+        b=IC715ZI6pcKIrJ4owDhJ6/ljhNa5/bqFaREcQ7whNeEiNyOO738XLdk2DgLvJxqbWd
+         if3SgJXt06Mj9ish7nuEyNZmca2SPWjoaUG3rsRCTmuXh0233oLHIiavCH1ghAhqGIk4
+         dXPLtuMAiEm52+f1YQ3yodb8aflE6vqzVHCLVRdsOURKRf0+fQvhBQbQyWEfhwjACozC
+         nvld+zwwA2TMC7kroSIwNM1MZF9Zq4HlA4ZPCIFiaH/cmdJaL2vrxmtdEXjME7+FdHlr
+         cUZUxfiOKGLtelCMw6J4gF1LwQr0fYaITUpzDf1ec4epv8qfLuo/1wbAjN9oxAHPVfPk
+         RWfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4c4lSDhQw9gBes/CzLEVSAVialIXB+yXKGpThtYQ4/Q=;
-        b=UX+Tcom3JJFCJiiFHO2u55i+U1QUfSlOeTy2/jC5AHmd7B9seZi9lk9NRCWQoIk4jB
-         yOSwyWMJXVj3KV6XASVDra1PR7ooXU7mVxWy0k+zkg3A9wwbr6hwZIw5GpQRdSZWEBmo
-         jKaihbKSU688We8zp+Z5CzaFdDKq6zdZtMtmyNEyDuPH0oOcLvAO6NWBk++iU9pgSI+B
-         aMfIob9cs601IECqBsNgIOSI4nURwAbMev8/jIbW8wxJcWBhzVRam0b2PUsFbMgI2cSQ
-         xTpIJNrZ4BF6YMbuKIkgvpvaOX4il2GRjiLI+7aHcNFK5qe7sKme1fjcbM7vs+npmrP3
-         gp6Q==
-X-Gm-Message-State: AOAM530kuEw7KWuGtqYdEBbXD0jDxUIJgWK+ePLDytE2m0vlh8iMvgNL
-        uCvhO0/JfmFfbVEB64oMPeMqOgUwUiY=
-X-Google-Smtp-Source: ABdhPJwld8UvH0+rhl6LKNEUr2xPJmFw7V/kuZKpUx12iV3sGIFSDLMufdvYuJrrv8NovGABEXXdmQ==
-X-Received: by 2002:a17:902:a509:: with SMTP id s9mr10100775plq.134.1644538722348;
-        Thu, 10 Feb 2022 16:18:42 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=WAQz1cmq7S+46Q19Se7FctEmdzmieMxLeZeEwTRluAA=;
+        b=bvaFXYYHOt5m3yC+0H3ngHIFNYwbJXiNMFjToJS8+V8fXEj5hlux5+EgwWCT0VMWIK
+         H2Lq7jJEy1pWqG220dSHzLAyCr8o6in3PkHBb1ZnobcdGwikaI0nnHf3sxJ5UkFCVLuq
+         jHN4+CnGM441TeB5/b6xOTAE+WbpDmoFF1GzuyKhHk4qru9DpJwLMBLLyfk96qfS9EVx
+         /RB2cfJPvEvtFRrFo0604jH0iCHCmxwr52+s27nHSxWh+6aRZINljqac52nmVevTg/GF
+         Mwd8N6rPVHHs/0cepSJjIWRI7wATQIXtmI7cBBhPNb7VISgNUSga0Mo44WzDiMp+b+tf
+         B8Tg==
+X-Gm-Message-State: AOAM530EZATX2PRe7ooPIbGotZJyvtqWozD/AOni0oUwITlPJ0g9dO0f
+        i7zBW+uJqnStaAKzmg3DHqbZv5M6sWM=
+X-Google-Smtp-Source: ABdhPJx29AMC5afK+kz/NYHvGSFmbHti/IwW042rh5WYF4ChGusIyzMZOl/C/OKlr16bvLc6A8K1LA==
+X-Received: by 2002:a05:6a00:1891:: with SMTP id x17mr10003233pfh.73.1644538723126;
+        Thu, 10 Feb 2022 16:18:43 -0800 (PST)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830::169b])
-        by smtp.gmail.com with ESMTPSA id n37sm8328321pgl.48.2022.02.10.16.18.41
+        by smtp.gmail.com with ESMTPSA id n37sm8328321pgl.48.2022.02.10.16.18.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Feb 2022 16:18:41 -0800 (PST)
+        Thu, 10 Feb 2022 16:18:42 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH 1/4] adapter: Fix the reusing gerror without re-initialization
-Date:   Thu, 10 Feb 2022 16:18:37 -0800
-Message-Id: <20220211001840.22566-1-hj.tedd.an@gmail.com>
+Subject: [BlueZ PATCH 2/4] device: Fix the reusing gerror without re-initialization
+Date:   Thu, 10 Feb 2022 16:18:38 -0800
+Message-Id: <20220211001840.22566-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220211001840.22566-1-hj.tedd.an@gmail.com>
+References: <20220211001840.22566-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -72,35 +74,34 @@ This patch relaces the g_error_free() to g_clear_error() which frees the
 variable and set it to NULL if the variable is used in the function
 again.
 
-Fixes: 2287c517ca1bd ("adapter: Fix unchecked return value")
-Fixes: https://github.com/bluez/bluez/issues/276
+Fixes: 6a154cd08000b ("device: Fix unchecked return value")
 ---
- src/adapter.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ src/device.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 3ee98431d..eef50f67a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4676,7 +4676,7 @@ static void load_devices(struct btd_adapter *adapter)
- 		if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 			error("Unable to load key file from %s: (%s)", filename,
+diff --git a/src/device.c b/src/device.c
+index 6d29eb896..6a7bdd207 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -543,7 +543,7 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
+ 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+ 		error("Unable to load key file from %s: (%s)", filename,
+ 								gerr->message);
+-		g_error_free(gerr);
++		g_clear_error(&gerr);
+ 	}
+ 
+ 	data_old = g_key_file_to_data(key_file, &length_old, NULL);
+@@ -556,7 +556,7 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
+ 		if (!g_file_set_contents(filename, data, length, &gerr)) {
+ 			error("Unable set contents for %s: (%s)", filename,
  								gerr->message);
 -			g_error_free(gerr);
 +			g_clear_error(&gerr);
  		}
- 
- 		key_info = get_key_info(key_file, entry->d_name);
-@@ -5662,7 +5662,7 @@ static void convert_names_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
  	}
- 	g_key_file_set_string(key_file, "General", "Name", value);
- 
-@@ -5895,7 +5895,7 @@ static void convert_entry(char *key, char *value, void *user_data)
+ 	g_free(data);
+@@ -592,7 +592,7 @@ static void device_store_cached_name_resolve(struct btd_device *dev)
  	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
  		error("Unable to load key file from %s: (%s)", filename,
  								gerr->message);
@@ -108,8 +109,8 @@ index 3ee98431d..eef50f67a 100644
 +		g_clear_error(&gerr);
  	}
  
- 	set_device_type(key_file, type);
-@@ -6001,7 +6001,7 @@ static void store_sdp_record(char *local, char *peer, int handle, char *value)
+ 	failed_time = (uint64_t) dev->name_resolve_failed_time;
+@@ -2666,7 +2666,7 @@ static void store_gatt_db(struct btd_device *device)
  	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
  		error("Unable to load key file from %s: (%s)", filename,
  								gerr->message);
@@ -117,8 +118,17 @@ index 3ee98431d..eef50f67a 100644
 +		g_clear_error(&gerr);
  	}
  
- 	sprintf(handle_str, "0x%8.8X", handle);
-@@ -6085,7 +6085,7 @@ static void convert_sdp_entry(char *key, char *value, void *user_data)
+ 	/* Remove current attributes since it might have changed */
+@@ -3635,7 +3635,7 @@ static void load_att_info(struct btd_device *device, const char *local,
+ 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+ 		error("Unable to load key file from %s: (%s)", filename,
+ 								gerr->message);
+-		g_error_free(gerr);
++		g_clear_error(&gerr);
+ 	}
+ 	groups = g_key_file_get_groups(key_file, NULL);
+ 
+@@ -6163,7 +6163,7 @@ void device_store_svc_chng_ccc(struct btd_device *device, uint8_t bdaddr_type,
  	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
  		error("Unable to load key file from %s: (%s)", filename,
  								gerr->message);
@@ -126,115 +136,7 @@ index 3ee98431d..eef50f67a 100644
 +		g_clear_error(&gerr);
  	}
  
- 	store_attribute_uuid(key_file, start, end, prim_uuid, uuid);
-@@ -6145,7 +6145,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	for (service = services; *service; service++) {
-@@ -6170,7 +6170,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
- 	if (!g_file_set_contents(filename, data, length, &gerr)) {
- 		error("Unable set contents for %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	if (device_type < 0)
-@@ -6185,7 +6185,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 	set_device_type(key_file, device_type);
- 
-@@ -6241,7 +6241,7 @@ static void convert_ccc_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	sprintf(group, "%hu", handle);
-@@ -6297,7 +6297,7 @@ static void convert_gatt_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	sprintf(group, "%hu", handle);
-@@ -6352,7 +6352,7 @@ static void convert_proximity_entry(char *key, char *value, void *user_data)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	g_key_file_set_string(key_file, alert, "Level", value);
-@@ -6556,7 +6556,7 @@ static void load_config(struct btd_adapter *adapter)
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	/* Get alias */
-@@ -8313,7 +8313,7 @@ static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	for (i = 0; i < 16; i++)
-@@ -8479,7 +8479,7 @@ static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	for (i = 0; i < 16; i++)
-@@ -8657,7 +8657,7 @@ static void store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	g_key_file_set_integer(key_file, "ConnectionParameters",
-@@ -9316,7 +9316,7 @@ static void remove_keys(struct btd_adapter *adapter,
- 	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", filename,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 
- 	if (type == BDADDR_BREDR) {
-@@ -9418,7 +9418,7 @@ static bool get_static_addr(struct btd_adapter *adapter)
- 								&gerr)) {
- 		error("Unable to load key file from %s: (%s)",
- 					STORAGEDIR "/addresses", gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
- 	}
- 	addrs = g_key_file_get_string_list(file, "Static", mfg, &len, NULL);
- 	if (addrs) {
+ 	/* for bonded devices this is done on every connection so limit writes
 -- 
 2.25.1
 
