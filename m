@@ -2,85 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13939C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 09:00:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6073C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 09:04:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244544AbiBKJAB (ORCPT
+        id S1348230AbiBKJEY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Feb 2022 04:00:01 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48012 "EHLO
+        Fri, 11 Feb 2022 04:04:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234134AbiBKJAA (ORCPT
+        with ESMTP id S1348187AbiBKJEX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Feb 2022 04:00:00 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E62218;
-        Fri, 11 Feb 2022 00:59:59 -0800 (PST)
-Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nIRmX-00009c-Ch; Fri, 11 Feb 2022 09:59:57 +0100
-Message-ID: <def03073-3fab-3b34-6ffc-702bb1b3758f@leemhuis.info>
-Date:   Fri, 11 Feb 2022 09:59:56 +0100
+        Fri, 11 Feb 2022 04:04:23 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B001F57
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 01:04:23 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id k25so8465321qtp.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 01:04:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=pkeQitvZCye11vT/YLbWqaEyjBdrTVoRnbUVXMIcwxI=;
+        b=X7m2cCkdSnPDHWiuqtr/VQBL18QF/9zIoS5AB7UMaaGWGRe/m9l4aXfhfk/YKnz6Fw
+         bJvSq9UozyDlY0OTNrrIQpBdA8qB13Gs31DvsLlplQHSlo58zMn+n7VfwnKkRZqnhnaM
+         yaMK9EE8da5jyCjwtoDJjOk6iCaDIMpIE8DHH3IiCO5IbOGkqrHck20145ZhUKTuOp+0
+         pLxMqeix8DUVWnYiPfb4tEDflsvMe+tXrl/0FS+1NhGP7PzcpSRc5eUwyyFgMjG4oylM
+         730GnIPZpOVQlTbZiEHrzJyMmFhE8knMWqx9ROIsJJ3Y80vvM1xFqqRCjRt7PPvM1nIE
+         XzSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=pkeQitvZCye11vT/YLbWqaEyjBdrTVoRnbUVXMIcwxI=;
+        b=L+DC7zElA7cqUJIZSHxNQskIwaAVK8ygUAplzyQ7nMJPX/uYOC/gkLB3L7YveE5z8U
+         ETE1fWMc13dskFmhx/wqlck4HXWzI7nA11amNXnQ7/rZRj5l3EePbf09wgsBGIOUZxFZ
+         htZQyexe36Ihg1UBcrSJ1x0AKCeYcGzysZwsEAO9xA5raZV2AZRI7aAlMMTq2QU80YzE
+         f8X1iyhqppTPsOfgwya02u1sR0VlDEtM5OzfK644lG5m88SCHZZyiJMwYxJKDZP71e33
+         3GJsBv7CiojG7oVT+2rRBLuM0qtjSd0bxNvJF/+JMIBfUgSDxgTzHscHbVDZZsgG55EN
+         A2+A==
+X-Gm-Message-State: AOAM533lGjKk5igPBjcotbfsZ1j35kZ0MskjKHRVTndQAAEhYPyCUrMs
+        zUguO8u6j74Wa5loRtKkdwQc8nsHbRM=
+X-Google-Smtp-Source: ABdhPJw59/tcYBpr4eGADfGCJu1du3SyFZ5HGRzFXGIzmTftLMw9vphcolwvslqvyBPwoNPh4rz1oQ==
+X-Received: by 2002:a05:622a:15cc:: with SMTP id d12mr397054qty.261.1644570262403;
+        Fri, 11 Feb 2022 01:04:22 -0800 (PST)
+Received: from [172.17.0.2] ([104.209.216.66])
+        by smtp.gmail.com with ESMTPSA id m8sm3523058qtx.2.2022.02.11.01.04.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Feb 2022 01:04:22 -0800 (PST)
+Message-ID: <62062696.1c69fb81.c010e.5fe1@mx.google.com>
+Date:   Fri, 11 Feb 2022 01:04:22 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0260316998621527316=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: Unable to transfer big files to Nokia N9
-Content-Language: en-BS
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>, regressions@lists.linux.dev,
-        Takashi Iwai <tiwai@suse.com>
-References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
- <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
- <cf71bdea-ec22-e4c9-016c-69e94a130607@molgen.mpg.de>
- <a93c0fa7-7b84-6aea-265b-c913e0c84678@molgen.mpg.de>
- <d7206e12-1b99-c3be-84f4-df22af427ef5@molgen.mpg.de>
- <371027df-7f32-edab-208d-d4cdd2202ba6@leemhuis.info>
- <d41d8b41-c347-47e7-e52b-39d7211c8952@molgen.mpg.de>
- <aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de>
- <9cb4b1ae-760f-f8ec-b3fe-a5d0be0dba25@leemhuis.info>
- <1c1e4143-0750-3dc5-eb63-2e8f52699e7c@molgen.mpg.de>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <1c1e4143-0750-3dc5-eb63-2e8f52699e7c@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1644569999;2afef0c4;
-X-HE-SMSGID: 1nIRmX-00009c-Ch
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, zijuhu@codeaurora.org
+Subject: RE: [v1] Bluetooth: btusb: Improve stability for QCA devices
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1644566196-15424-1-git-send-email-zijuhu@codeaurora.org>
+References: <1644566196-15424-1-git-send-email-zijuhu@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 11.02.22 09:29, Paul Menzel wrote:
-> Am 10.02.22 um 11:36 schrieb Thorsten Leemhuis:
->> Hi, this is your Linux kernel regression tracker speaking. Top-posting
->> for once, to make this easy accessible to everyone.
->>
->> Hey bluetooth-maintainers, what's the status here? I already asked for a
->> status update more that a week ago and didn't get a reply. Paul also
->> confirmed recently the issue is still present and no reply either. IOW:
->> this is talking way to long for a issue that was bisected?
->>
->> Could you please comment on this? What can be done to get this rolling?
->> Or do I have to ask upstream maintainers to revert the culprit?
-> 
-> I sent two reverts [1], and probably forgot to add a tag to reference
-> this discussion.
-> 
-> Luiz asked me two provide more logs. Hopefully, I am going to come
-> around to that today, but maybe it’s better to revert so that Linux 5.16
-> can also be fixed.
+--===============0260316998621527316==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Ahh, thx, great to see this finally got things running.
+This is automated email and please do not reply to this email!
 
-This will let regzbot know about it:
+Dear submitter,
 
-#regzbot monitor:
-https://lore.kernel.org/linux-bluetooth/20220208221911.57058-1-pmenzel@molgen.mpg.de/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=613386
 
-With a proper "Link:" tag this would have happened automatically, but no
-worries, a lot of people forget to set it. :-D
+---Test result---
 
-Ciao, Thorsten
+Test Summary:
+CheckPatch                    PASS      1.57 seconds
+GitLint                       PASS      1.01 seconds
+SubjectPrefix                 PASS      0.88 seconds
+BuildKernel                   PASS      30.36 seconds
+BuildKernel32                 PASS      26.71 seconds
+Incremental Build with patchesPASS      36.33 seconds
+TestRunner: Setup             PASS      470.65 seconds
+TestRunner: l2cap-tester      PASS      13.51 seconds
+TestRunner: bnep-tester       PASS      6.11 seconds
+TestRunner: mgmt-tester       PASS      104.12 seconds
+TestRunner: rfcomm-tester     PASS      7.75 seconds
+TestRunner: sco-tester        PASS      7.73 seconds
+TestRunner: smp-tester        PASS      7.61 seconds
+TestRunner: userchan-tester   PASS      6.49 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0260316998621527316==--
