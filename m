@@ -2,264 +2,241 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25578C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 05:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E790C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Feb 2022 07:38:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233884AbiBKFMe (ORCPT
+        id S1347725AbiBKHiB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Feb 2022 00:12:34 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49772 "EHLO
+        Fri, 11 Feb 2022 02:38:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231843AbiBKFMb (ORCPT
+        with ESMTP id S1347721AbiBKHh6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Feb 2022 00:12:31 -0500
-Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3A0E2651
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 21:12:30 -0800 (PST)
-Received: by mail-wr1-x42c.google.com with SMTP id d27so13229696wrc.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 21:12:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jdIK2FXUTw0zgAqPGwlh0Unbbi9HK+v/BFspsvbakwc=;
-        b=ZkIBYeWz1USza2E5JM/ovn6/iOTP/07JD1GaZJYvaFHmbJ5DZDpLeUxl2WXx9drpFj
-         baCr0znBL/rBomaP11QZUOFCo3yLGRQJYuKmxyFTcuNXjoTT5Q5w6GUz2JTkk64fTH8A
-         pB4CgSMjC1d1IIsxpO/jwU2JLjNxpLnbvhfUC/MpT/VdS+lTef8jNnPia5S+kGDTL06r
-         hJGAv7tBPW2IwaRG4vOE/elFYxBauvsAthomF0PVTBCdKz/kEZHbU73JkjnmA+Wp+fVo
-         stBT88nJZ8GEU5ITFM3LQeyFvawssJtGwnMEBmR8AGGf/CwFqj5ARXVgktXVAdrCHD6w
-         tGww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jdIK2FXUTw0zgAqPGwlh0Unbbi9HK+v/BFspsvbakwc=;
-        b=DPoZYFbi3KR1pcv5skJQZvaEDckFZvgCPPOqGKPyUNuqrS8sb/ksNfy33LcQ7rNAK4
-         1AcecNXBJFl3NdIEP/X4tv1AXeDZs+8Zf1t1zPjebbXMeBtRwrdn6dU7LBPKMobItxld
-         2xzyOe4lf1P10QYc+ef3TFyGBPuWO933zLeblK7ckUJAXsYkUeZ6IzTitwVxhECjM+Z8
-         1KmUVrwbKLIolkVlv63JgY83iV0W6gszDkLe0PiBW5soDaq9lFvrMAAnKBF53LpdjBGz
-         9LDbRlJ9uRYnMIhou5e1bCIowGC3qeIW8E/8d5tRNv4aDJZq/csYP3K6IB/8Y8UHwKZO
-         y8jw==
-X-Gm-Message-State: AOAM533/66MwcA0trKHLNMDd/j9ofTvvoHQB7OEqJLWAtCmYwgXFLez/
-        3H0uoZ9rf3+vK6BbBMZD204tLfWauId57BWAZFAhl3fJsOFTxg==
-X-Google-Smtp-Source: ABdhPJz47kfjXF+rM3tKiOMojqZZbR93c1Dd917TLigAfCJ23hLAvDcGwsZSskcwTs2z//C8vBZJi4VpHcvM0qkso8w=
-X-Received: by 2002:a5d:610f:: with SMTP id v15mr8498653wrt.602.1644556349103;
- Thu, 10 Feb 2022 21:12:29 -0800 (PST)
+        Fri, 11 Feb 2022 02:37:58 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 419CE9B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Feb 2022 23:37:41 -0800 (PST)
+Received: from [192.168.0.2] (ip5f5aebe1.dynamic.kabel-deutschland.de [95.90.235.225])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6423E61EA1926;
+        Fri, 11 Feb 2022 08:37:38 +0100 (CET)
+Message-ID: <fdaaf4ca-934f-c0ff-63f8-2feda6a106ef@molgen.mpg.de>
+Date:   Fri, 11 Feb 2022 08:37:38 +0100
 MIME-Version: 1.0
-References: <20200915110347.Bluez.v3.1.If16fd16b4a629ec4d4093a974256225a95b58044@changeid>
- <CABBYNZKQhnQDaTQ_e-FA6hCEW5ZChaOdOQ-qCx3gpQXSPBD29g@mail.gmail.com>
- <CABBYNZJLdqu7WhdqGoH7HQry1enU=PkQXNBVonfiHwDbFpoVxw@mail.gmail.com>
- <CAJQfnxG-=cJoYoTwSvUOjDtdk5tx=F4XXWzLOOAo3oGsvcQovw@mail.gmail.com> <CABBYNZL4uv1eC4t+=zh9PouSdEU0sAo=3OX3B8B5MTYrcq7oHA@mail.gmail.com>
-In-Reply-To: <CABBYNZL4uv1eC4t+=zh9PouSdEU0sAo=3OX3B8B5MTYrcq7oHA@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 11 Feb 2022 13:12:17 +0800
-Message-ID: <CAJQfnxHHoD8sNi+B2S6NSKkk98=-0AubwTtCpBG41ZmWGLMZgA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3] device: don't wait for timeout if RemoveDevice
- is called
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Daniel Winkler <danielwinkler@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: [BlueZ PATCH 1/4] adapter: Fix the reusing gerror without
+ re-initialization
+Content-Language: en-US
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+References: <20220211001840.22566-1-hj.tedd.an@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20220211001840.22566-1-hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Dear Tedd,
 
-On Fri, 11 Feb 2022 at 05:31, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Tue, Feb 8, 2022 at 10:37 PM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On Wed, 9 Feb 2022 at 10:39, Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Archie,
-> > >
-> > > On Tue, Sep 15, 2020 at 9:51 AM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Archie,
-> > > >
-> > > > On Mon, Sep 14, 2020 at 8:04 PM Archie Pusaka <apusaka@google.com> wrote:
-> > > > >
-> > > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > > >
-> > > > > RemoveDevice on adapter interface used to remove a device, even when
-> > > > > the device is connected. However, since the introduction of the new
-> > > > > 30 seconds timeout when setting a device as temporary, RemoveDevice
-> > > > > doesn't immediately remove a connected device, but only disconnects
-> > > > > it and waits for the timer to expire before effectively removes it.
-> > > > >
-> > > > > This patch removes the device as soon as it gets disconnected,
-> > > > > provided the disconnection is triggered by a call to RemoveDevice.
-> > > > > The regular timeout still applies for other cases.
-> > > > >
-> > > > > Tested manually by calling RemoveDevice on a connected device,
-> > > > > and with ChromeOS autotest setup.
-> > > > >
-> > > > > Reviewed-by: Daniel Winkler <danielwinkler@google.com>
-> > > > > ---
-> > > > >
-> > > > > Changes in v3:
-> > > > > * Rebasing again
-> > > > >
-> > > > > Changes in v2:
-> > > > > * Rebasing to HEAD
-> > > > >
-> > > > >  src/adapter.c |  2 --
-> > > > >  src/adapter.h |  2 ++
-> > > > >  src/device.c  | 11 +++++++++++
-> > > > >  3 files changed, 13 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/src/adapter.c b/src/adapter.c
-> > > > > index df628a7fd..4e27bd74b 100644
-> > > > > --- a/src/adapter.c
-> > > > > +++ b/src/adapter.c
-> > > > > @@ -80,8 +80,6 @@
-> > > > >  #include "adv_monitor.h"
-> > > > >  #include "eir.h"
-> > > > >
-> > > > > -#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > > > -
-> > > > >  #define MODE_OFF               0x00
-> > > > >  #define MODE_CONNECTABLE       0x01
-> > > > >  #define MODE_DISCOVERABLE      0x02
-> > > > > diff --git a/src/adapter.h b/src/adapter.h
-> > > > > index c70a7b0da..2f1e4b737 100644
-> > > > > --- a/src/adapter.h
-> > > > > +++ b/src/adapter.h
-> > > > > @@ -29,6 +29,8 @@
-> > > > >  #include <lib/bluetooth.h>
-> > > > >  #include <lib/sdp.h>
-> > > > >
-> > > > > +#define ADAPTER_INTERFACE      "org.bluez.Adapter1"
-> > > > > +
-> > > > >  #define MAX_NAME_LENGTH                248
-> > > > >
-> > > > >  /* Invalid SSP passkey value used to indicate negative replies */
-> > > > > diff --git a/src/device.c b/src/device.c
-> > > > > index 8f73ce4d3..3e7784034 100644
-> > > > > --- a/src/device.c
-> > > > > +++ b/src/device.c
-> > > > > @@ -3007,6 +3007,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > > >  {
-> > > > >         struct bearer_state *state = get_state(device, bdaddr_type);
-> > > > >         DBusMessage *reply;
-> > > > > +       bool remove_device = false;
-> > > > >
-> > > > >         if (!state->connected)
-> > > > >                 return;
-> > > > > @@ -3036,6 +3037,10 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > > >         while (device->disconnects) {
-> > > > >                 DBusMessage *msg = device->disconnects->data;
-> > > > >
-> > > > > +               if (dbus_message_is_method_call(msg, ADAPTER_INTERFACE,
-> > > > > +                                                               "RemoveDevice"))
-> > > > > +                       remove_device = true;
-> > > > > +
-> > > > >                 g_dbus_send_reply(dbus_conn, msg, DBUS_TYPE_INVALID);
-> > > > >                 device->disconnects = g_slist_remove(device->disconnects, msg);
-> > > > >                 dbus_message_unref(msg);
-> > > > > @@ -3061,6 +3066,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-> > > > >
-> > > > >         g_dbus_emit_property_changed(dbus_conn, device->path,
-> > > > >                                                 DEVICE_INTERFACE, "Connected");
-> > > > > +
-> > > > > +       if (remove_device)
-> > > > > +               btd_adapter_remove_device(device->adapter, device);
-> > >
-> > > It looks like there are instances where device_remove_connection is
-> > > called that can lead to the following trace:
-> > >
-> > > ==4030336== Invalid read of size 8
-> > > ==4030336==    at 0x40B8A1: device_is_authenticating (device.c:6975)
-> > > ==4030336==    by 0x3ABA2F: adapter_remove_connection (adapter.c:7166)
-> > > ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> > > ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> > > ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> > > ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> > > ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> > > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x4952852: g_main_loop_run (in
-> > > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x49C814: mainloop_run (mainloop-glib.c:66)
-> > > ==4030336==    by 0x49CD0B: mainloop_run_with_signal (mainloop-notify.c:188)
-> > > ==4030336==    by 0x29B18B: main (main.c:1239)
-> > > ==4030336==  Address 0x771bfe0 is 448 bytes inside a block of size 656 free'd
-> > > ==4030336==    at 0x48440E4: free (vg_replace_malloc.c:872)
-> > > ==4030336==    by 0x4954DAC: g_free (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x44D166: remove_interface (object.c:660)
-> > > ==4030336==    by 0x44DEDA: g_dbus_unregister_interface (object.c:1394)
-> > > ==4030336==    by 0x3ABA27: adapter_remove_connection (adapter.c:7164)
-> > > ==4030336==    by 0x3C2A60: dev_disconnected (adapter.c:8123)
-> > > ==4030336==    by 0x45C6B4: request_complete (mgmt.c:298)
-> > > ==4030336==    by 0x45FF74: can_read_data (mgmt.c:390)
-> > > ==4030336==    by 0x49B28F: watch_callback (io-glib.c:157)
-> > > ==4030336==    by 0x495312F: g_main_context_dispatch (in
-> > > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x49A8207: ??? (in /usr/lib64/libglib-2.0.so.0.7000.2)
-> > > ==4030336==    by 0x4952852: g_main_loop_run (in
-> > > /usr/lib64/libglib-2.0.so.0.7000.2)
-> > >
-> > > So it appeared to be unsafe to call btd_adapter_remove_device, btw
-> > > this happened when Ive attempted to pair 2 emulator instances
-> > > (btvirt).
-> >
-> > Does this happen after calling Adapter1.RemoveDevice? I suppose if
-> > that's true then adapter_remove_connection shouldn't have been called
-> > since the device should have been removed at this point.
-> > Perhaps I misunderstood your message?
->
-> Looks like there are more people with the same problem:
->
-> https://github.com/bluez/bluez/issues/290
 
-Thanks for letting me know.
-I see that you have submitted a fix and Tedd has verified it.
-Strangely enough I cannot seem to repro it, nor do I understand how
-that even happened.
->
-> > > > >  }
-> > > > >
-> > > > >  guint device_add_disconnect_watch(struct btd_device *device,
-> > > > > @@ -4482,6 +4490,9 @@ void device_remove(struct btd_device *device, gboolean remove_stored)
-> > > > >                 disconnect_all(device);
-> > > > >         }
-> > > > >
-> > > > > +       if (device->temporary_timer > 0)
-> > > > > +               g_source_remove(device->temporary_timer);
-> > > > > +
-> > > > >         if (device->store_id > 0) {
-> > > > >                 g_source_remove(device->store_id);
-> > > > >                 device->store_id = 0;
-> > > > > --
-> > > > > 2.28.0.618.gf4bc123cb7-goog
-> > > > >
-> > > >
-> > > > Applied, thanks.
-> > > >
-> > > > --
-> > > > Luiz Augusto von Dentz
-> > >
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
-> >
-> > Thanks,
-> > Archie
->
->
->
-> --
-> Luiz Augusto von Dentz
+Am 11.02.22 um 01:18 schrieb Tedd Ho-Jeong An:
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-Regards,
-Archie
+I had a hard time to understand, what the git commit message summary 
+meant. Maybe:
+
+> adapter: Use g_clear_error() to set gerr to NULL to fix segfault
+
+
+> When the GError variable is freeed with g_error_free(), it is not set to
+> NULL and reusing the same variable again can cause the seg_fault because
+> it is still pointing the old memory address which is freed.
+
+Could you please include an example stack-/backtrace?
+
+> This patch relaces the g_error_free() to g_clear_error() which frees the
+> variable and set it to NULL if the variable is used in the function
+
+set*s*
+
+> again.
+> 
+> Fixes: 2287c517ca1bd ("adapter: Fix unchecked return value")
+> Fixes: https://github.com/bluez/bluez/issues/276
+
+To make the tags unambiguous, at least in the Linux kernel world, 
+*Resolves* or *Closes* are used to refer to issues.
+
+
+Kind regards,
+
+Paul
+
+
+> ---
+>   src/adapter.c | 34 +++++++++++++++++-----------------
+>   1 file changed, 17 insertions(+), 17 deletions(-)
+> 
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 3ee98431d..eef50f67a 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -4676,7 +4676,7 @@ static void load_devices(struct btd_adapter *adapter)
+>   		if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   			error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -			g_error_free(gerr);
+> +			g_clear_error(&gerr);
+>   		}
+>   
+>   		key_info = get_key_info(key_file, entry->d_name);
+> @@ -5662,7 +5662,7 @@ static void convert_names_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   	g_key_file_set_string(key_file, "General", "Name", value);
+>   
+> @@ -5895,7 +5895,7 @@ static void convert_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	set_device_type(key_file, type);
+> @@ -6001,7 +6001,7 @@ static void store_sdp_record(char *local, char *peer, int handle, char *value)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	sprintf(handle_str, "0x%8.8X", handle);
+> @@ -6085,7 +6085,7 @@ static void convert_sdp_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	store_attribute_uuid(key_file, start, end, prim_uuid, uuid);
+> @@ -6145,7 +6145,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	for (service = services; *service; service++) {
+> @@ -6170,7 +6170,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
+>   	if (!g_file_set_contents(filename, data, length, &gerr)) {
+>   		error("Unable set contents for %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	if (device_type < 0)
+> @@ -6185,7 +6185,7 @@ static void convert_primaries_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   	set_device_type(key_file, device_type);
+>   
+> @@ -6241,7 +6241,7 @@ static void convert_ccc_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	sprintf(group, "%hu", handle);
+> @@ -6297,7 +6297,7 @@ static void convert_gatt_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	sprintf(group, "%hu", handle);
+> @@ -6352,7 +6352,7 @@ static void convert_proximity_entry(char *key, char *value, void *user_data)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	g_key_file_set_string(key_file, alert, "Level", value);
+> @@ -6556,7 +6556,7 @@ static void load_config(struct btd_adapter *adapter)
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	/* Get alias */
+> @@ -8313,7 +8313,7 @@ static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	for (i = 0; i < 16; i++)
+> @@ -8479,7 +8479,7 @@ static void store_csrk(struct btd_adapter *adapter, const bdaddr_t *peer,
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	for (i = 0; i < 16; i++)
+> @@ -8657,7 +8657,7 @@ static void store_conn_param(struct btd_adapter *adapter, const bdaddr_t *peer,
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	g_key_file_set_integer(key_file, "ConnectionParameters",
+> @@ -9316,7 +9316,7 @@ static void remove_keys(struct btd_adapter *adapter,
+>   	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
+>   		error("Unable to load key file from %s: (%s)", filename,
+>   								gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   
+>   	if (type == BDADDR_BREDR) {
+> @@ -9418,7 +9418,7 @@ static bool get_static_addr(struct btd_adapter *adapter)
+>   								&gerr)) {
+>   		error("Unable to load key file from %s: (%s)",
+>   					STORAGEDIR "/addresses", gerr->message);
+> -		g_error_free(gerr);
+> +		g_clear_error(&gerr);
+>   	}
+>   	addrs = g_key_file_get_string_list(file, "Static", mfg, &len, NULL);
+>   	if (addrs) {
