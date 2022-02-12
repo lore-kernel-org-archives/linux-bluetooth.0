@@ -2,101 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36019C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Feb 2022 10:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFFDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Feb 2022 15:22:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233481AbiBLKfq (ORCPT
+        id S232543AbiBLPWk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Feb 2022 05:35:46 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:39934 "EHLO
+        Sat, 12 Feb 2022 10:22:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231653AbiBLKfp (ORCPT
+        with ESMTP id S229531AbiBLPWk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Feb 2022 05:35:45 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0388226130
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 02:35:43 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id r64-20020a17090a43c600b001b8854e682eso11139996pjg.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 02:35:42 -0800 (PST)
+        Sat, 12 Feb 2022 10:22:40 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A46C2214
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 07:22:36 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id o24so17240816wro.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 07:22:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=x3HVJdyEp7jTYKFCpgtyr4fzoKpf0UO1KC2qeI+rfIg=;
-        b=buufTkO7e+uQFAYzBJRoIu8MF0RFMir/nHkS6UuBSxN2AaWaSNyMfXqEikvs/AyTL1
-         TJKf/E+HD5KCufjW7pcWpcJHT1Ow/zCAEmAXAndPlIQBiJ+WCxNckY9ca3YRi6zRuisa
-         n8HOLGm+SwFHhPtOJGn9Oim3V/X5RWluv80SZT/9Bp/bia6KXHx000lsaZFhtc3uDr+/
-         /ifoEXSlccemsOLDWLMrfpK//PAZWyttoRGP1/VfXmiKHJbsmB9E9Fl+RJnZfUpMvJqJ
-         ckZIyNXZpgG3EwnE4gMBUrTHQA30gtpVOaFI9O6SjSswrbz043Q4jSl5jggSVf/vNtsk
-         cNbg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mW8dqxBm+IG4Y6Q1qXfaqxW4iPb0EgpCasprPGiMdug=;
+        b=Y/BW0A03jgEgF7HKNsRlvOg58xuCvCRSdIOmHlAtZ8E+voaQmUal7bYSRkU5t+E5Yu
+         Njej+IZqHeoLzNkwOgGDOV+pjbS53cjn90K/19v6n96xZKFrWnaqYRw5IqnN7hqfeRB8
+         5IruOss//Qy/y5Y+WQhL81qX/lX+UtCp38tt293690MDLLOfTJeVU9zzb3i0mrymTf+0
+         ea1vUR6c+Zv4zf1a+f7Y5yO0sxp1nAzttbwqejtltsDY3VAoAwXZU0Oy/9x4k+fHmbiu
+         oPcKvqHz/0kk8YFzlXOrLqT/IZfhUpxB/KYh5K689rIvaeEYzdpKeu4lZuJl/TCN4vUI
+         07/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=x3HVJdyEp7jTYKFCpgtyr4fzoKpf0UO1KC2qeI+rfIg=;
-        b=Jww2xASQNNrlt9UQlS6lrw5hKTj34BLLy1SxlNIkg8QElc1JkHpAqJESwdCcLltH9K
-         ET4OAsU3YVexNCNT7iLuQLMcAfiwutCe5Ibb8YbnUWYRLojj6gmK37XajptnhdHsamPQ
-         o+grXVvdorSi5dkiRHwzJh/aaV/KckkyI7rGZ8lmeQVgAH5voIFpfXC8EH+5+xDNsuhC
-         j35iB1vUiN0eNdt8nm/iMS/twjWxOwXDQiir30JMQpAmjvKzzpJkARhLSoRkzaZUQSnv
-         h1fCXiScXFh3RasXCQb2HBHgqPcJVf3y/8hAbGWTywDY95f/F9QOiEbTvDpuMSlr184Y
-         K+0A==
-X-Gm-Message-State: AOAM530gNxYC1yGFGCkaw9XSUMwTfDXykSiXukOzl/Mm5CsfFODMl9Te
-        bqatyr52V98Acwgeg9oZtWP5CdpF4p4=
-X-Google-Smtp-Source: ABdhPJz2aXjfF7V3+eI0WDbwKVXODxjRhIsDTMYq1aeFfO6/UZyt/FzLuGVVjltd0/2HgHzsBqS1rA==
-X-Received: by 2002:a17:903:11c3:: with SMTP id q3mr5385465plh.97.1644662142118;
-        Sat, 12 Feb 2022 02:35:42 -0800 (PST)
-Received: from [172.17.0.2] ([20.115.138.98])
-        by smtp.gmail.com with ESMTPSA id q32sm22513451pgm.26.2022.02.12.02.35.41
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mW8dqxBm+IG4Y6Q1qXfaqxW4iPb0EgpCasprPGiMdug=;
+        b=GtNGECFVPtCHBPsmq+7sDwTvIppzi4VeW4/pLrLRRQAlW5k2++q9CPY4SsTxD4SdJG
+         yecgezDz7g7M3Q0v+ZBPpUYruB9oflDgNVfvunNEkqOL9C/c87SQbd6vECEfRbjpTRz/
+         DQotbEPA+ahgh/Iw1XcfSpR0YLb1M9KJM+1thhGFTjnhojAm+q5jhBZt2lWU7FeNu49T
+         xfjdyfqBZcSMrp9AhSg3pvPceA17EC2HS238Zi7fUC/04Rfrxx9wtnQsvGh67UujPI01
+         aoSX5s9t0f0HN6f1wKNyc4VYC4CRtKNqbQBPx2Wdg3fuhe/7yz30B96ozdzf7kmdQ1z1
+         y3KQ==
+X-Gm-Message-State: AOAM530ezfn7iqs0a7ziMoYdZV7LjHpgsP/xXTEEZu6nTMTmQ0YxolMp
+        XGRIjxa6WJm4sKLuMaaxAmSi8HD9gTE=
+X-Google-Smtp-Source: ABdhPJxhyFpZNZrmVFUOAYFIqfnB8PJrS4nCIxRjhWFAn7g6uHbGq1CJJILHUQSaEwznf97Yw8AtQg==
+X-Received: by 2002:a05:6000:1090:: with SMTP id y16mr5088479wrw.563.1644679355164;
+        Sat, 12 Feb 2022 07:22:35 -0800 (PST)
+Received: from coreI5.home (2a01cb0c055ede00ea40f2fffe0a4e3d.ipv6.abo.wanadoo.fr. [2a01:cb0c:55e:de00:ea40:f2ff:fe0a:4e3d])
+        by smtp.gmail.com with ESMTPSA id l7sm4600309wrs.46.2022.02.12.07.22.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Feb 2022 02:35:41 -0800 (PST)
-Message-ID: <62078d7d.1c69fb81.14533.86db@mx.google.com>
-Date:   Sat, 12 Feb 2022 02:35:41 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============8858007672696300822=="
+        Sat, 12 Feb 2022 07:22:34 -0800 (PST)
+From:   Fabrice Delliaux <netbox253@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Fabrice Delliaux <netbox253@gmail.com>
+Subject: [PATCH] error: Fix typo.
+Date:   Sat, 12 Feb 2022 16:21:20 +0100
+Message-Id: <20220212152121.11032-1-netbox253@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, daniel.trnka@gmail.com
-Subject: RE: [BlueZ] adapter: battery provider for non-LE controllers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220212084541.221196-1-daniel.trnka@gmail.com>
-References: <20220212084541.221196-1-daniel.trnka@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8858007672696300822==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=613710
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.58 seconds
-GitLint                       PASS      0.41 seconds
-Prep - Setup ELL              PASS      48.76 seconds
-Build - Prep                  PASS      0.59 seconds
-Build - Configure             PASS      9.52 seconds
-Build - Make                  PASS      1713.11 seconds
-Make Check                    PASS      11.99 seconds
-Make Check w/Valgrind         PASS      520.57 seconds
-Make Distcheck                PASS      267.76 seconds
-Build w/ext ELL - Configure   PASS      9.52 seconds
-Build w/ext ELL - Make        PASS      1682.08 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
 ---
-Regards,
-Linux Bluetooth
+ src/error.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/src/error.h b/src/error.h
+index dded9f93d..cc7790a23 100644
+--- a/src/error.h
++++ b/src/error.h
+@@ -27,7 +27,7 @@
+ 						"argument"
+ #define ERR_BREDR_CONN_ADAPTER_NOT_POWERED	"br-connection-adapter-not-"\
+ 						"powered"
+-#define ERR_BREDR_CONN_NOT_SUPPORTED		"br-connection-not-suuported"
++#define ERR_BREDR_CONN_NOT_SUPPORTED		"br-connection-not-supported"
+ #define ERR_BREDR_CONN_BAD_SOCKET		"br-connection-bad-socket"
+ #define ERR_BREDR_CONN_MEMORY_ALLOC		"br-connection-memory-"\
+ 						"allocation"
+-- 
+2.34.1
 
---===============8858007672696300822==--
