@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE97BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Feb 2022 06:56:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237A5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Feb 2022 06:57:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232230AbiBLG4K (ORCPT
+        id S232284AbiBLG5m (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Feb 2022 01:56:10 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57384 "EHLO
+        Sat, 12 Feb 2022 01:57:42 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbiBLG4J (ORCPT
+        with ESMTP id S229720AbiBLG5l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Feb 2022 01:56:09 -0500
+        Sat, 12 Feb 2022 01:57:41 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39A1627173
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 22:56:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EECBF27173
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Feb 2022 22:57:37 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 321DDB816F9
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 06:56:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D27EEC340F0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 06:56:01 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A2583B82121
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 06:57:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 70D9CC340EF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Feb 2022 06:57:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644648961;
-        bh=owz3uw7iSFmmdaoyCbi4bI3RZIB//3VjxDc3NFkWh1k=;
+        s=k20201202; t=1644649055;
+        bh=rKW9OsimYV25nyRs7o1OGQuvjhvoCWqmWQsF5QzLBQA=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=kFVcq4jx5LnMw7uUATW93oCG3uaeJC6mnZ1+Ub9yNSsFproAODfBksd5OQummCE6J
-         e9bJiLEi+LyBhZqiBnkkipJHza+HA5HdmtDvqSzEq33V/SQnB7wS3bfwMtRoDhSJnD
-         08kRtsBO8FbV+Z40z83qJgewkaUIKY0MqIhLLTYTu7VJCrDZCBX/Vi9MEDHUuhnN7+
-         wJAKNdmEIuJYYaNCVSCtHDqv4z0T/hhMT8W0k2w9ZPTqZJJoiyOFfyWYpOtV0xI5Nz
-         LOpv/jaZSlN2mMLcnAXLPt0I/lLPhYTU+X8nB5QHFJcz9Wi6K6BZqWfEdyeo7x0bZw
-         rLqyEk/JXo6XA==
+        b=CAqaNtfwzDPw8W2fjUlXdzDIzZ6pp8uPZLkeUaFSlkU2MLhj9vHF/6iX9mLw4zUkj
+         7bhpBUsR2WhuNuSlyyy7BydlD8XFANThZW2Fjl5Te5SLjjT7A7FhzNG5/Ke/W2KEU8
+         mmid3HE36mJPC0gIaooCeCC3z9DrRHGfs7U1KUSadO8YN+9oMzNEgGde92Ty5OYrVX
+         G5Br3EWIqK7AzWTtfJFh/juxmdGsdX0nUF2UTUr3rq1L1Ak5AV83Jf4x4o5JodH3qH
+         wivVj4W/YukOdZscoFcuHh0oJ+Os8NW328l+PKUWpdAichCYZS1mJ1T7LnNdRbKdAm
+         M4y7tnOOU7V6w==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B8F9EC05FD2; Sat, 12 Feb 2022 06:56:01 +0000 (UTC)
+        id 6077BC05FF5; Sat, 12 Feb 2022 06:57:35 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 215594] Unable to transfer big files to Nokia N9 and Jolla
  phone
-Date:   Sat, 12 Feb 2022 06:56:01 +0000
+Date:   Sat, 12 Feb 2022 06:57:35 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -54,8 +54,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215594-62941-58xP7W4wj9@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc attachments.created
+Message-ID: <bug-215594-62941-gi2nL5MJnD@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215594-62941@https.bugzilla.kernel.org/>
 References: <bug-215594-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,19 +69,23 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D215594
 
---- Comment #3 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-Just to also document it here, commit 81be03e026dc (Bluetooth: RFCOMM: Repl=
-ace
-use of memcpy_from_msg with bt_skb_sendmmsg) introduced that regression, and
-reverting this fixes the issue.
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-[1]:
-https://lore.kernel.org/linux-bluetooth/def03073-3fab-3b34-6ffc-702bb1b3758=
-f@leemhuis.info/T/#m04445e920610d42a9510d0f6d97afa5376e4a3ca
-[2]:
-https://lore.kernel.org/linux-bluetooth/20220208221911.57058-1-pmenzel@molg=
-en.mpg.de/
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
+
+--- Comment #4 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Created attachment 300441
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300441&action=3Dedit
+Output of `btmon --write /dev/shm/btmon-trace-small-file.log`
+
+btmon log, when sending a small file (3 bytes):
+
+    $ more test.txt
+    bt
 
 --=20
 You may reply to this email to add a comment.
