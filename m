@@ -2,129 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52106C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 09:09:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141AAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 09:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242626AbiBNJJL (ORCPT
+        id S235950AbiBNJN7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Feb 2022 04:09:11 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58018 "EHLO
+        Mon, 14 Feb 2022 04:13:59 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiBNJJL (ORCPT
+        with ESMTP id S231175AbiBNJN6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Feb 2022 04:09:11 -0500
-Received: from so254-9.mailgun.net (so254-9.mailgun.net [198.61.254.9])
-        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTPS id 1566E59A72
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 01:09:03 -0800 (PST)
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1644829744; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=0IElTyYDBIfvi2zer1ahdbOZj2DmTRQFW8xbpLmh/s8=;
- b=p3iTfhY7Lz+8WOKwRNYabAC1feAty1MmEF2jJi/9MHDZnaVJuZzTJwLg5W1KzzPlzefh21Uj
- RSnnOdDH9TAhHj9kJVUXM/0nsbsmuzrK1vueo3f1SmFFL17mm54jo4pKePt5KwWMMigR+3CA
- hfe9BgBRplyFMV0EjkSJ+L05A+o=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
- 620a1c2e3047cf1c0a528732 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 14 Feb 2022 09:09:02
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 713F0C4360C; Mon, 14 Feb 2022 09:09:01 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id A4C18C4338F;
-        Mon, 14 Feb 2022 09:09:00 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 14 Feb 2022 17:09:00 +0800
-From:   zijuhu@codeaurora.org
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
-        hemantg@codeaurora.org, rjliao@codeaurora.org,
-        tjiang@codeaurora.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Improve stability for QCA devices
-In-Reply-To: <59F65F10-0988-4E50-8956-69C601F05434@holtmann.org>
-References: <1644566620-16748-1-git-send-email-zijuhu@codeaurora.org>
- <59F65F10-0988-4E50-8956-69C601F05434@holtmann.org>
-Message-ID: <d7fa066f93e5869d955da46c43f6b142@codeaurora.org>
-X-Sender: zijuhu@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        Mon, 14 Feb 2022 04:13:58 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B86860068
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 01:13:51 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id m10-20020a25800a000000b0061daa5b7151so32551504ybk.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 01:13:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=qOJUau3R9DNwghj7AGgRGxzrrSvkfkutzqGQ8LXl1n4=;
+        b=WiqoSzc/MoHiP8/Y2wi9GAOycBK62nhA2OMYTU9WGBK1hT3n9E0VLIStOJKRL3jUFq
+         k3JCmQH83bsW1xK3ocehxZd8vEZgkorBAgc19FRMvT0Mbo7zvs3bITzF3wEXLCKdytOa
+         HOM0IyGzVu9ONxgGFuAUZ/EIbzjep+rUkc9h7oh5h+Vsg62jI+nwVypS9O4EtjFDh/C9
+         S5SmLvvwi6ybjIj0SxEGLribnBtD/m32Jh8eiOSoWLQnH7/q6xBzu+Ggba3S0rLqW+cX
+         gHRyKQt3s8N3PvV+8o5qlG2Gw9jZcExB+UjL/ZWbfv1SOA0LT9l/judDs4i/f0KOiIbe
+         paww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=qOJUau3R9DNwghj7AGgRGxzrrSvkfkutzqGQ8LXl1n4=;
+        b=itABWM5DzYzn4xTFSHjuEQackWWnCTamPA8/eAwsqVEeFN8sK46UJyzOgAxLAqdlAL
+         lK+wRxtDy8I6Ns8fC6Roeq7B4n4iw2sixagm9nM27K1oXvwsCDke46eus/NkSkfHRdlM
+         hOPE8nNTA6lv0/JXJxLxeeemZuX0n5hCIldEc/FafCrV3mlu7GQnpwX0khwmhtqKAKqA
+         8pzU0UjtDIW7Qewov7DK7v38GOuyMu+r1bzIsnRhYj6DkarqX2yZcN49Qe3fPWYfFEmp
+         fzSZEITg3diUbDjXy8zvaWSSEMi7k6z4tDPIXstqcHq9klEI3PbskPWqfzYa8LmoWgrt
+         Uaeg==
+X-Gm-Message-State: AOAM532j6Zy9uT31cZDdONj0SpQg07MXh7NZ0U5aiNwhifJaRjMAUFjs
+        5PRWHpjXB5HqiPkTf9Ms+toL8ZmQgq5N+QjYeRlZ25xzf9+wL2DCgDsBGHvDC45eukwvtnNvpcP
+        wOBlLvV1Rf8pDYH4fSm1GDtZXJTZAdw1LwYuUn+gDh9hWZ8KntWW5fdTudlXmHkCFZ4SIPyHBPr
+        l4pZNLoIOmBxI=
+X-Google-Smtp-Source: ABdhPJxFt9pV0EmvxqByMpEOPrS5id8EWfl4U3c2tkhTg7KCvi5Uleeg7SBLBLqS70Htzpd6oZZyzKfFsenfMHtxHA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:b204:5f3:5b41:e9f])
+ (user=howardchung job=sendgmr) by 2002:a25:d512:: with SMTP id
+ r18mr11563551ybe.87.1644830030294; Mon, 14 Feb 2022 01:13:50 -0800 (PST)
+Date:   Mon, 14 Feb 2022 17:13:43 +0800
+Message-Id: <20220214171329.Bluez.v1.1.I8c72b5af2506378bba6da369228ae50483231e35@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+Subject: [Bluez PATCH v1] lib: fix hci_strtolm crash
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2022-02-12 00:22, Marcel Holtmann wrote:
-> Hi Zijun,
-> 
->> Controller will reset after NVM is downloaded for QCA
->> device, so wait a moment for reset Done then go ahead
->> to improve stability.
->> 
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->> drivers/bluetooth/btusb.c | 5 +++++
->> 1 file changed, 5 insertions(+)
->> 
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index e03dfbd92fcc..20e36f53d2e7 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -2994,6 +2994,7 @@ static int btusb_set_bdaddr_wcn6855(struct 
->> hci_dev *hdev,
->> #define QCA_PATCH_UPDATED	0x80
->> #define QCA_DFU_TIMEOUT		3000
->> #define QCA_FLAG_MULTI_NVM      0x80
->> +#define QCA_BT_RESET_WAIT_MS    100
->> 
->> #define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
->> #define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
->> @@ -3320,6 +3321,10 @@ static int btusb_setup_qca(struct hci_dev 
->> *hdev)
->> 		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
->> 		if (err < 0)
->> 			return err;
->> +		/* Controller will reset after NVM is downloaded, so wait a moment
->> +		 * for reset Done, it will improve stability.
->> +		 */
->> +		msleep(QCA_BT_RESET_WAIT_MS);
-> 
-> how hard is to just grab the data sheet and figure out the appropriate
-> time to wait? I will be all documented and then reference the
-> documentation.
-> 
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-let me explain more for this patch:
-a BT enable failure issue is reported for WCN6855 2.1 chip, the root
-cause located is that HCI command is sent before controller reset is 
-Done.
-100ms delay is suggested by firmware team and it is a appropriate 
-interval
-based on verification. so these info is not available from data sheet 
-currently.
+|str| can be NULL in the case of reading lm value. Calling strcasestr
+could lead to a crash.
 
-> I really dislike this "add a sleep here and sleep there". It might
-> just work for now. The next hardware generation comes around or if
-> placed on a different board just behaves a little bit different. And
-> at some point we are at 10 seconds sleep and you start complaining why
-> the controller initialization takes so long. Stop guessing and
-> reference the data sheet.
-> 
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+---
+Verified by running "hciconfig hci0 lm" on hatch
 
-you are right.
-i will only restrict that delay to WCN6855 2.1 chip this issue is 
-reported for.
+ lib/hci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Regards
-> 
-> Marcel
+diff --git a/lib/hci.c b/lib/hci.c
+index 5141f20ac..5228c2ad2 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -323,7 +323,7 @@ int hci_strtolm(char *str, unsigned int *val)
+ 	int ret = hci_str2bit(link_mode_map, str, val);
+ 
+ 	/* Deprecated name. Kept for compatibility. */
+-	if (strcasestr(str, "MASTER")) {
++	if (!!str && strcasestr(str, "MASTER")) {
+ 		ret = 1;
+ 		*val |= HCI_LM_MASTER;
+ 	}
+-- 
+2.35.1.265.g69c8d7142f-goog
+
