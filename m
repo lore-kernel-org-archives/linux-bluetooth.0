@@ -2,326 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A29C3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 18:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D8FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 19:04:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357511AbiBNSjZ (ORCPT
+        id S230130AbiBNTEj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Feb 2022 13:39:25 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43258 "EHLO
+        Mon, 14 Feb 2022 14:04:39 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:50740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232272AbiBNSjZ (ORCPT
+        with ESMTP id S229702AbiBNTEN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Feb 2022 13:39:25 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6E7065418
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 10:39:13 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id bt13so49000219ybb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 10:39:13 -0800 (PST)
+        Mon, 14 Feb 2022 14:04:13 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1171C8C49D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 11:03:54 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id w2so9825748edc.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 11:03:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=A3IDWsr7pQasCgLof1uuYvu23ASiDLQs21jzN8ILbD8=;
-        b=nd0v8trHoBHqpoOJgAJL7om1Belj33I7+KN11bH2m0JXmYWMio2voWkBHZHYLHkgkk
-         0+hIp+/PKJi/kG9cykv74z6NDtH2/3NpSqkSSdoNYnj4QJVrQ3f1RAiWAeKRdusqgRiE
-         4jLQkpU17qsNjatjUQ74WgjfF22umcnAI1NGVQ2TfkBSkZXWMkuBTJncz88CE5v5+GC1
-         yK0iXzmQfskj5XPIG+f9NxwH1/wF9HiumcRI4xFU2JfSQDqVC9zSVuEwL0pFJjw0edGk
-         CyNHz16/hS5RBiVKF/sE8/ltY7cWGrwK5TzJRTqSGrNTfqPwdTWq82MJuu+OI9TLXgm0
-         FBhQ==
+        bh=xdr3WFp3E9OzgNCWLotNQ7VjdvztBcysFRD6qohkMU4=;
+        b=IAj/f401Pamj54tFk8U9adtcleW7eXX912sjBfKSWPtoZKqN7gFSxwHebO0+kVIu5K
+         +uE6bJcXGJv6avd3tDOTJgfx6bZ4vVOh9sAiTle1ScL1lAy7/XBbE2E0rqrLgnHEk1sp
+         Rr5dep5YOvLSEO2ogfKAEs+jgEXAITnpjt6u8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=A3IDWsr7pQasCgLof1uuYvu23ASiDLQs21jzN8ILbD8=;
-        b=WMO+QHp+gFL4ZWFaxv+rRsZz/rlCNM1usQN3FKABmSyT7rHEs6uYEiz9EQtyxQmNXc
-         nhOqW3LIaGVkFNFvVNz914kOZeoK6TUjjV1zGG5UYSUfz7UPX1bWD5jNf+py1C2syNUg
-         d7nxzezRn64giUSI8tj3deN2gHm3O0iRhy39uD7bAp9vJ77dwvfAc4C3yBGbhPydF4lv
-         zUXD6ze3zyFFnNFC5CdKvhCUYMB82x1XpOfoQA5wfuxZwnX6STw0al3iRF4vBleSFsHD
-         ojv5gqWW7eXD0Q6RH8iUsHISG3jSflyD5o2CnC9ZSMCVtP7fT40YER4ZcZmo+dMEO8/k
-         RRxA==
-X-Gm-Message-State: AOAM531V2I3wB8Vek208hhPDmZ39kZgyIlPu3YqAknw7J+zrVA+q9ciQ
-        qJisweuZf3k6EqIaYzFUGfggVVpw9wKAU+2wBHOIsXDtqzY=
-X-Google-Smtp-Source: ABdhPJzz5qdZDioHZfv9/Rti2q1QohH7G94HzN6d8vE4vCZBJ5mBkwgxmdb6wARLtPcNu4SaZIhRzDzRRLlbZh7gMbQ=
-X-Received: by 2002:a81:4005:: with SMTP id l5mr6021ywn.317.1644863952894;
- Mon, 14 Feb 2022 10:39:12 -0800 (PST)
+        bh=xdr3WFp3E9OzgNCWLotNQ7VjdvztBcysFRD6qohkMU4=;
+        b=y0rGXWXTa2CVu1/M3ULWcffDapcDsZxd7Xztkjcf4faY0njCzMNDoWYiiy6YXFjoh4
+         BR8Kagl1RfMTEPFH19vR7jFV1Lbl0mR1rm7u+iSvLkNXP7mpSdIwt64X1WLcpGjMf9zy
+         D1+rVYdQJ3Fh14WWVl5vPhacNTZGtDZ9wBDAt1+T4VxKwr3h9hQGSJtk1N1pgBX/1gvC
+         qoqgxWkxUZVoIifB+iyppq+0Jp9wDjRIF4e6M8kZzNm2BEsPDNvoijAMJrw6/OT0z6Be
+         aoFkOiCGQthdJxdQ00wxNEe9Nj5euOqrMzylHcd6+hNwalSGXzwKp8H4kTfT6S18A72P
+         MvLA==
+X-Gm-Message-State: AOAM530+sH+rWstnQ3nAUG9UqN5bag3dRJ0NilSf3mTC0ips07GQ5z0Y
+        dGkV1e+rShh7SysA9rU+YUNONwBm3JyfZg==
+X-Google-Smtp-Source: ABdhPJxpJAbRZ+vEhToULpc3sojhPapJkkJWpKEvM4Ilv2jUPMi0n8J0OC+iDDOzcglEsSUgpflhGA==
+X-Received: by 2002:a05:6402:22b7:: with SMTP id cx23mr185373edb.91.1644865144206;
+        Mon, 14 Feb 2022 10:59:04 -0800 (PST)
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com. [209.85.221.49])
+        by smtp.gmail.com with ESMTPSA id c5sm16005229edk.43.2022.02.14.10.59.03
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Feb 2022 10:59:03 -0800 (PST)
+Received: by mail-wr1-f49.google.com with SMTP id d27so24645539wrb.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 10:59:03 -0800 (PST)
+X-Received: by 2002:a05:6000:1683:: with SMTP id y3mr357342wrd.222.1644865143200;
+ Mon, 14 Feb 2022 10:59:03 -0800 (PST)
 MIME-Version: 1.0
-References: <20220214153105.2862331-1-fontaine.fabrice@gmail.com>
-In-Reply-To: <20220214153105.2862331-1-fontaine.fabrice@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Feb 2022 10:39:02 -0800
-Message-ID: <CABBYNZ+_JiB=RZmcWuFtPL4p39gB1T3v85LbdWyVodcoYQLFRA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2] fix build with glibc < 2.25
-To:     Fabrice Fontaine <fontaine.fabrice@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20220212084541.221196-1-daniel.trnka@gmail.com>
+In-Reply-To: <20220212084541.221196-1-daniel.trnka@gmail.com>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Mon, 14 Feb 2022 10:58:52 -0800
+X-Gmail-Original-Message-ID: <CAO271mn+kd08LkTsByqqGt6EuvJpEdNpRHZsK2eVZg0so_KmQA@mail.gmail.com>
+Message-ID: <CAO271mn+kd08LkTsByqqGt6EuvJpEdNpRHZsK2eVZg0so_KmQA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] adapter: battery provider for non-LE controllers
+To:     Daniel Trnka <daniel.trnka@gmail.com>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Fabrice,
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 
-On Mon, Feb 14, 2022 at 8:09 AM Fabrice Fontaine
-<fontaine.fabrice@gmail.com> wrote:
+On Sat, Feb 12, 2022 at 12:48 AM Daniel Trnka <daniel.trnka@gmail.com> wrote:
 >
-> getrandom and sys/random.h are only available since glibc 2.25:
-> https://www.gnu.org/software/gnulib/manual/html_node/sys_002frandom_002eh.html
-> resulting in the following build failures since version 5.63 and
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/log/?qt=grep&q=getrandom:
->
-> plugins/autopair.c:20:24: fatal error: sys/random.h: No such file or directory
->  #include <sys/random.h>
->                         ^
->
-> To fix this build failure, add a getrandom fallback borrowed from
-> pipewire and licensed under MIT:
-> https://gitlab.freedesktop.org/pipewire/pipewire/-/blob/master/src/pipewire/utils.c
->
-> Fixes:
->  - http://autobuild.buildroot.org/results/6b8870d12e0804d6154230a7322c49416c1dc0e2
->
-> Signed-off-by: Fabrice Fontaine <fontaine.fabrice@gmail.com>
+> Enable battery provider dbus interface BatteryProviderManager1 for
+> non-LE controllers, so external clients like pipewire can provide
+> battery information for bluetooth headsets on non-LE controllers.
 > ---
-> Changes v1 -> v2 (after review of Marcel Holtmann):
->  - Add a getrandom fallback in src/missing.h instead of adding ifdef
+>  src/adapter.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 >
->  Makefile.am            |  1 +
->  configure.ac           |  4 +++-
->  emulator/le.c          |  3 +++
->  emulator/phy.c         |  3 +++
->  peripheral/main.c      |  3 +++
->  plugins/autopair.c     |  3 +++
->  profiles/health/hdp.c  |  3 +++
->  profiles/health/mcap.c |  3 +++
->  src/missing.h          | 30 ++++++++++++++++++++++++++++++
->  tools/btgatt-server.c  |  3 +++
->  10 files changed, 55 insertions(+), 1 deletion(-)
->  create mode 100644 src/missing.h
+> diff --git a/src/adapter.c b/src/adapter.c
+> index eef50f67a..2071cf8db 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -8976,6 +8976,11 @@ static int adapter_register(struct btd_adapter *adapter)
+>                 agent_unref(agent);
+>         }
 >
-> diff --git a/Makefile.am b/Makefile.am
-> index 82125c482..d6c18fe0d 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -299,6 +299,7 @@ pkglibexec_PROGRAMS += src/bluetoothd
->  src_bluetoothd_SOURCES = $(builtin_sources) \
->                         $(attrib_sources) $(btio_sources) \
->                         src/bluetooth.ver \
-> +                       src/missing.h \
->                         src/main.c src/log.h src/log.c \
->                         src/backtrace.h src/backtrace.c \
->                         src/rfkill.c src/btd.h src/sdpd.h \
-> diff --git a/configure.ac b/configure.ac
-> index 07d068a4d..441bd5f29 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -54,6 +54,8 @@ AC_ARG_ENABLE(threads, AS_HELP_STRING([--enable-threads],
->
->  AC_CHECK_FUNCS(explicit_bzero)
->
-> +AC_CHECK_FUNCS(getrandom)
+> +       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
+> +               adapter->battery_provider_manager =
+> +                       btd_battery_provider_manager_create(adapter);
+> +       }
 > +
->  AC_CHECK_FUNCS(rawmemchr)
+>         /* Don't start GATT database and advertising managers on
+>          * non-LE controllers.
+>          */
+> @@ -9010,11 +9015,6 @@ static int adapter_register(struct btd_adapter *adapter)
+>                 }
+>         }
 >
->  AC_CHECK_FUNC(signalfd, dummy=yes,
-> @@ -68,7 +70,7 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
->  AC_CHECK_LIB(dl, dlopen, dummy=yes,
->                         AC_MSG_ERROR(dynamic linking loader is required))
->
-> -AC_CHECK_HEADERS(linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h)
-> +AC_CHECK_HEADERS(linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h sys/random.h)
->
->  PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
->                                 AC_MSG_ERROR(GLib >= 2.28 is required))
-> diff --git a/emulator/le.c b/emulator/le.c
-> index f8f313f2c..b3916d49b 100644
-> --- a/emulator/le.c
-> +++ b/emulator/le.c
-> @@ -20,12 +20,15 @@
->  #include <sys/socket.h>
->  #include <sys/un.h>
->  #include <sys/uio.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->  #include <time.h>
->
->  #include "lib/bluetooth.h"
->  #include "lib/hci.h"
->
-> +#include "src/missing.h"
->  #include "src/shared/util.h"
->  #include "src/shared/crypto.h"
->  #include "src/shared/ecc.h"
-> diff --git a/emulator/phy.c b/emulator/phy.c
-> index 44cace438..9cb6460d7 100644
-> --- a/emulator/phy.c
-> +++ b/emulator/phy.c
-> @@ -19,11 +19,14 @@
->  #include <stdlib.h>
->  #include <string.h>
->  #include <sys/socket.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->  #include <netinet/in.h>
->  #include <netinet/ip.h>
->  #include <time.h>
->
-> +#include "src/missing.h"
->  #include "src/shared/util.h"
->  #include "src/shared/mainloop.h"
->
-> diff --git a/peripheral/main.c b/peripheral/main.c
-> index 91adb45fc..e854bd14c 100644
-> --- a/peripheral/main.c
-> +++ b/peripheral/main.c
-> @@ -25,12 +25,15 @@
->  #include <sys/stat.h>
->  #include <sys/types.h>
->  #include <sys/mount.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->
->  #ifndef WAIT_ANY
->  #define WAIT_ANY (-1)
->  #endif
->
-> +#include "src/missing.h"
->  #include "src/shared/mainloop.h"
->  #include "peripheral/efivars.h"
->  #include "peripheral/attach.h"
-> diff --git a/plugins/autopair.c b/plugins/autopair.c
-> index a75ecebe4..6ce97672b 100644
-> --- a/plugins/autopair.c
-> +++ b/plugins/autopair.c
-> @@ -17,13 +17,16 @@
->  #include <fcntl.h>
->  #include <unistd.h>
->  #include <errno.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->
->  #include <glib.h>
->
->  #include "lib/bluetooth.h"
->  #include "lib/sdp.h"
->
-> +#include "src/missing.h"
->  #include "src/plugin.h"
->  #include "src/adapter.h"
->  #include "src/device.h"
-> diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-> index 9d9d1e824..1e6e16fd2 100644
-> --- a/profiles/health/hdp.c
-> +++ b/profiles/health/hdp.c
-> @@ -16,7 +16,9 @@
->  #include <stdint.h>
->  #include <stdbool.h>
->  #include <unistd.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->
->  #include <glib.h>
->
-> @@ -26,6 +28,7 @@
->
->  #include "gdbus/gdbus.h"
->
-> +#include "src/missing.h"
->  #include "src/dbus-common.h"
->  #include "src/log.h"
->  #include "src/error.h"
-> diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
-> index aad0a08a3..6b779c513 100644
-> --- a/profiles/health/mcap.c
-> +++ b/profiles/health/mcap.c
-> @@ -19,13 +19,16 @@
->  #include <errno.h>
->  #include <unistd.h>
->  #include <time.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->
->  #include <glib.h>
->
->  #include "lib/bluetooth.h"
->  #include "bluetooth/l2cap.h"
->  #include "btio/btio.h"
-> +#include "src/missing.h"
->  #include "src/log.h"
->  #include "src/shared/timeout.h"
->
-> diff --git a/src/missing.h b/src/missing.h
-> new file mode 100644
-> index 000000000..df8bd980a
-> --- /dev/null
-> +++ b/src/missing.h
-> @@ -0,0 +1,30 @@
-> +// SPDX-License-Identifier: MIT
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2018 Wim Taymans
-> + *
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#ifndef HAVE_GETRANDOM
-> +ssize_t getrandom(void *buf, size_t buflen, unsigned int flags)
-> +{
-> +       ssize_t bytes;
-> +       int fd;
-> +
-> +       fd = open("/dev/urandom", O_CLOEXEC);
-> +       if (fd < 0)
-> +               return -1;
-> +
-> +       bytes = read(fd, buf, buflen);
-> +       close(fd);
-> +
-> +       return bytes;
-> +}
-> +#endif
-
-How about having this under src/shared/util.h, name it util_getrandom
-and don't bother with glibc otherwise this really gets messy
-maintaining it over time
-
-> diff --git a/tools/btgatt-server.c b/tools/btgatt-server.c
-> index 15d49a464..30314f4ac 100644
-> --- a/tools/btgatt-server.c
-> +++ b/tools/btgatt-server.c
-> @@ -20,7 +20,9 @@
->  #include <getopt.h>
->  #include <unistd.h>
->  #include <errno.h>
-> +#ifdef HAVE_SYS_RANDOM_H
->  #include <sys/random.h>
-> +#endif
->
->  #include "lib/bluetooth.h"
->  #include "lib/hci.h"
-> @@ -28,6 +30,7 @@
->  #include "lib/l2cap.h"
->  #include "lib/uuid.h"
->
-> +#include "src/missing.h"
->  #include "src/shared/mainloop.h"
->  #include "src/shared/util.h"
->  #include "src/shared/att.h"
+> -       if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
+> -               adapter->battery_provider_manager =
+> -                       btd_battery_provider_manager_create(adapter);
+> -       }
+> -
+>         db = btd_gatt_database_get_db(adapter->database);
+>         adapter->db_id = gatt_db_register(db, services_modified,
+>                                                         services_modified,
 > --
-> 2.34.1
+> 2.35.1
 >
-
-
--- 
-Luiz Augusto von Dentz
