@@ -2,96 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DA8C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 11:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A9BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Feb 2022 11:58:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350445AbiBNLPO (ORCPT
+        id S233881AbiBNL6S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Feb 2022 06:15:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45268 "EHLO
+        Mon, 14 Feb 2022 06:58:18 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350087AbiBNLPG (ORCPT
+        with ESMTP id S233127AbiBNL6Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Feb 2022 06:15:06 -0500
-Received: from so254-9.mailgun.net (so254-9.mailgun.net [198.61.254.9])
-        by lindbergh.monkeyblade.net (Postfix) with UTF8SMTPS id 85563ADFF8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 02:43:54 -0800 (PST)
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1644835435; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=rcn9ALIlWKMM2fTTA+HHH8I55YhsQbojYCrOJlAIZU4=; b=J+7iEfwFJGrg00+hUMASg8e8mxBt0mve0sCzaDONZGIwqiRp58jux1m4Akp9zETtB0lpRcX/
- fL8DvzKOLTR6AcMIpK88O4/TYCRfb30tlj/0BlWOhS57BFmwOWwdBaJQvCmMArLLQQfEi2w3
- aQFgFnhgV2vbaw36OJm7HR8z8S4=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-west-2.postgun.com with SMTP id
- 620a326519d16b66a926d089 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 14 Feb 2022 10:43:49
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id A12CAC43165; Mon, 14 Feb 2022 10:43:48 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id A47C4C43164;
-        Mon, 14 Feb 2022 10:43:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org A47C4C43164
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
-        hemantg@codeaurora.org, rjliao@codeaurora.org,
-        zijuhu@codeaurora.org, tjiang@codeaurora.org,
-        Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v4] Bluetooth: btusb: Improve stability for QCA devices
-Date:   Mon, 14 Feb 2022 18:43:39 +0800
-Message-Id: <1644835419-23943-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Mon, 14 Feb 2022 06:58:16 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91E89CD8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 03:58:09 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id k25so15157572qtp.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 03:58:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=jtzY3XwGAzdRhmPTUy3snMKgxJCR7uLp8lGGoL7TYqc=;
+        b=OndF2VOZjaCFoTDtcxRPLt7eATfzfP1Gyisxc+wgTS1Cv0AHOOtkeFUnYisLWGRTyC
+         VL8zuqMrJXFFrSAU9DatlYb0O4zawl2ZYDApdR9OE3LMEYI9N1xDvkIHwCWwZEFVMhW5
+         YKmBJvoWmPl7OgCN3+Z7+KU0fa0xEDvK/3qMS2iVk9slKo0MAiWPZLwB/jxV5hdTj7R7
+         ZnTfJ+NoI25n6tZA3x0HJQ15uyodh0BQzk4Ev1c0pAWiAMFQtjyaiusLRiE2k4Hl368f
+         27VxdKs9w068ggY1BQN8IfVVXEOmJsjdB6wWQqb9yaTWo8eNOFdJEfKu7/V6FXvJyTF+
+         bUdw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=jtzY3XwGAzdRhmPTUy3snMKgxJCR7uLp8lGGoL7TYqc=;
+        b=vimSe7Gae4lLcTNa4nDqpm66f2tDn/sGziMuDhfclr836mcNIp7k4j7a76aF7cP9m+
+         r5AfYq+F6JIHxtg9mRWgUPClJRUfatZP0jOCreJBJfq8u9ka+I+/GuVj/V9x5Yv4RWa8
+         8+PRkyDG8i+1EgQ+PFsRTkwMNVhjHxM6EbhT8yrZNGTJ3t7ps4MicZxNEM5qQF8mIBpe
+         z9N3WVCNZpjOClEYQY9biNUBzrGEavMiDZ0rBUGuEjdT6as2g6JdpE1FZRntoGOi14Ji
+         trVHcATPuo+DC/s+eJhLUlV0+tJX1QJr1+oQA1OaBauaw5i2XEiXyWfZ33bfmn7KGZ0U
+         gNNw==
+X-Gm-Message-State: AOAM532KeJFfiGxeFcFjmXaozkCZQ3bxx+kG1Gt6IjasBwiFJ3CCtJ+q
+        Ea/WsLz4pCyiipJMyGs02RzPttV6OakeNg==
+X-Google-Smtp-Source: ABdhPJy5a84vRUsiOgK6TcL7qIcD1vr3aDfI9JstJSdUC0NvH6Na/ZcTneLQ7/5gYhzhFfapQ8NFIA==
+X-Received: by 2002:ac8:578a:: with SMTP id v10mr9045949qta.148.1644839888542;
+        Mon, 14 Feb 2022 03:58:08 -0800 (PST)
+Received: from [172.17.0.2] ([52.168.109.72])
+        by smtp.gmail.com with ESMTPSA id q139sm4262448qke.104.2022.02.14.03.58.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Feb 2022 03:58:08 -0800 (PST)
+Message-ID: <620a43d0.1c69fb81.219fb.4359@mx.google.com>
+Date:   Mon, 14 Feb 2022 03:58:08 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1477603129951387475=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, zijuhu@codeaurora.org
+Subject: RE: [v3] Bluetooth: btusb: Improve stability for QCA devices
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1644834935-23189-1-git-send-email-zijuhu@codeaurora.org>
+References: <1644834935-23189-1-git-send-email-zijuhu@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+--===============1477603129951387475==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-WCN6855 2.1 will reset to apply firmware downloaded, so wait
-a moment for reset done then go ahead to improve stability.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614062
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.59 seconds
+GitLint                       PASS      0.95 seconds
+SubjectPrefix                 PASS      0.88 seconds
+BuildKernel                   PASS      29.75 seconds
+BuildKernel32                 PASS      26.48 seconds
+Incremental Build with patchesPASS      35.93 seconds
+TestRunner: Setup             PASS      473.13 seconds
+TestRunner: l2cap-tester      PASS      13.72 seconds
+TestRunner: bnep-tester       PASS      6.25 seconds
+TestRunner: mgmt-tester       PASS      105.25 seconds
+TestRunner: rfcomm-tester     PASS      7.81 seconds
+TestRunner: sco-tester        PASS      7.84 seconds
+TestRunner: smp-tester        PASS      7.71 seconds
+TestRunner: userchan-tester   PASS      6.41 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ef5d52f0e123..9e0d59d4382a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2999,6 +2999,7 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_PATCH_UPDATED	0x80
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
-+#define QCA_BT_RESET_WAIT_MS    100
- 
- #define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
- #define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-@@ -3325,6 +3326,13 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 		err = btusb_setup_qca_load_nvm(hdev, &ver, info);
- 		if (err < 0)
- 			return err;
-+
-+		/* WCN6855 2.1 will reset to apply firmware downloaded here, so
-+		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
-+		 * cause potential enable failure.
-+		 */
-+		if (info->rom_version == 0x00130201)
-+			msleep(QCA_BT_RESET_WAIT_MS);
- 	}
- 
- 	return 0;
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
+--===============1477603129951387475==--
