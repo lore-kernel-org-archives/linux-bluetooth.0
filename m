@@ -2,94 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BE7C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 19:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3F8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 19:49:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243610AbiBOTY7 (ORCPT
+        id S237060AbiBOTtU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 14:24:59 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:58104 "EHLO
+        Tue, 15 Feb 2022 14:49:20 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230290AbiBOTY6 (ORCPT
+        with ESMTP id S232657AbiBOTtS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 14:24:58 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79308566E;
-        Tue, 15 Feb 2022 11:24:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 513F3617CB;
-        Tue, 15 Feb 2022 19:24:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8127AC340EB;
-        Tue, 15 Feb 2022 19:24:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644953086;
-        bh=kUCZYr9eynBGfoyFNpGztKhdR0TjeWfPR20goAdEojo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pgheRwOAKjRlXMfJul10RwEjs5CBKHR/i0QEhyIM79774uc0ovg3u5myvyhB8s/qu
-         xkZdoun6Ve/NuXn1+qZDB9F/trYlid+yq9euKiwm3PP7bJ4zoGvDfPTjgfeWCzsH6f
-         Z5GtGABFqXnkSAxbAOokUuetZQuukvg8GogLN1PAUilOeXNWgORbaiYjI/aeCr++5W
-         YWvZj7f6KVH+xfahOEVmZaopl52rdr1jj6eaQg39ut/UgM8cVQWsEKIq8K1eRZzAAa
-         TaPAe7uN1AmbZCmz+9XMV8T/S9ihvGxGOcJfBqdWD8uwk44Sq4S7ITZBKug7wSeC6N
-         S7tHpNRHJfaSA==
-Date:   Tue, 15 Feb 2022 13:32:21 -0600
-From:   "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To:     Leon Romanovsky <leon@kernel.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-xtensa@linux-xtensa.org,
-        linux-crypto@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
-        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
-        linux-staging@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-ext4@vger.kernel.org, linux-acpi@vger.kernel.org,
-        devel@acpica.org, linux-arch@vger.kernel.org, linux-mm@kvack.org,
-        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
-        linux-rdma@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
- flexible-array members
-Message-ID: <20220215193221.GA884407@embeddedor>
-References: <20220215174743.GA878920@embeddedor>
- <202202151016.C0471D6E@keescook>
- <20220215192110.GA883653@embeddedor>
- <Ygv8wY75hNqS7zO6@unreal>
+        Tue, 15 Feb 2022 14:49:18 -0500
+Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F846660C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 11:49:08 -0800 (PST)
+Received: by mail-lj1-x229.google.com with SMTP id n24so50794ljj.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 11:49:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:from
+         :subject:content-transfer-encoding;
+        bh=nbgayFeF929gkOcuBbiM0neyYmkLWR/NdGibiXj0Gfw=;
+        b=YowUgmkC7u43Ub6w/3/5g67znicb148dmlv2F97pt8OyjG0MiYi6mvZoqj+lvsNAJq
+         SW0UrVco6SfqzOztTEAo7melbzVaRIY4OFUhpSAuTsPIEItBj2P4e9CbgEbntL0QjdN5
+         FQ/HQR63pGtpuuL/IyplGjVefmtcZL/tTgv/ywk6Q3OxZYMprtgheXBARyppEep/n0IM
+         GhFwS/79ibyYp+tpwWLK87jJQdWsXFciDXepArQaywqWpDlEzl3viMTkGPtgvy68CT7R
+         bz+4vPvPJtnFCSHQiIQ9+Q14FO5HiMdQZzC9zqXwQScJ+aFFK/Ne19Tfvn3dq0JkK9aS
+         v++A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:from:subject:content-transfer-encoding;
+        bh=nbgayFeF929gkOcuBbiM0neyYmkLWR/NdGibiXj0Gfw=;
+        b=3thOUneBOHReDLS41SAWmnKAXaPqhmXlO6XmarwVkA0exCcKOcwzU3S6K9YLizxMFV
+         cBGm6yllWMMB2KVDn9AztIxIpnqgZLCtezmvl1hW3FEwjn3vG9u4TWbxOpNfNf9t5BCX
+         Mg5aNeRRrEgM4zi/jBQWw33Vg67B/fhPmh/LoFSU10kzOcj0Ty5U3IjFvNv8mFJAgrCi
+         OV8UfqShIm6KLLFy27jgQ+VDwUc6FGuv+y5cqGEOq6+ruYy2b+gAFEdalGhccZ9IP9Yo
+         0aa9nEtke5boxEtHOXp7wrZk6w3i4s6ielnUdicyVdmOZZg/irzcbsPQquX5gC6bPSxZ
+         fxAA==
+X-Gm-Message-State: AOAM533+HrLF9O5X5CzEXGV7qu5MaKVHOOq1glvfKJlxpefnj+FxvPwo
+        3zKy0ZZSGrar9xPr7+KV/Y+Eh7sN/Jk=
+X-Google-Smtp-Source: ABdhPJycYwZXhb16GATfR3L/FQSOYeGNR6nuf54PITyEQFHjF3mrai3mtVSN28DmzF6erf+FfFiU5g==
+X-Received: by 2002:a2e:bf21:: with SMTP id c33mr446985ljr.414.1644954546482;
+        Tue, 15 Feb 2022 11:49:06 -0800 (PST)
+Received: from ?IPV6:2a02:2168:8737:3600:93f5:693c:adf6:4fb? ([2a02:2168:8737:3600:93f5:693c:adf6:4fb])
+        by smtp.gmail.com with ESMTPSA id 18sm1496486lfz.286.2022.02.15.11.49.05
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Feb 2022 11:49:05 -0800 (PST)
+Message-ID: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
+Date:   Tue, 15 Feb 2022 22:49:04 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ygv8wY75hNqS7zO6@unreal>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org
+From:   Andrey Butirsky <butirsky@gmail.com>
+Subject: Lenovo Legion M600 wireless bluetooth mouse connected and paired yet
+ not working
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 09:19:29PM +0200, Leon Romanovsky wrote:
-> On Tue, Feb 15, 2022 at 01:21:10PM -0600, Gustavo A. R. Silva wrote:
-> > On Tue, Feb 15, 2022 at 10:17:40AM -0800, Kees Cook wrote:
-> > > On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
-> > > 
-> > > These all look trivially correct to me. Only two didn't have the end of
-> > > the struct visible in the patch, and checking those showed them to be
-> > > trailing members as well, so:
-> > > 
-> > > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > 
-> > I'll add this to my -next tree.
-> 
-> I would like to ask you to send mlx5 patch separately to netdev. We are working
-> to delete that file completely and prefer to avoid from unnecessary merge conflicts.
+Detailed report is here, basically can't get any event from the mouse:
+https://superuser.com/questions/1697648/lenovo-legion-m600-wireless-bluetooth-mouse-connected-and-paired-yet-not-working
 
-Oh OK. Sure thing; I will do so.
+Have the same mouse and ready to provide any assistant to solve this. 
+Any clue?
 
-Thanks
---
-Gustavo
+(If this is a tough problem I would probably have to return the mouse to 
+store, it's not cheap..)
+
