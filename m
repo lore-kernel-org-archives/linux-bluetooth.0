@@ -2,135 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E77FBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 17:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E29C35274
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 18:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242715AbiBORxV (ORCPT
+        id S242991AbiBOSSB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 12:53:21 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33968 "EHLO
+        Tue, 15 Feb 2022 13:18:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235112AbiBORxS (ORCPT
+        with ESMTP id S242970AbiBOSR4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 12:53:18 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDFA3FDFBF;
-        Tue, 15 Feb 2022 09:53:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644947586; x=1676483586;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=fjS+jLcimlpk3IgAjjxRkS7J2bLZR7vNKhdUAkDnH0s=;
-  b=edbVc8amMd0XPgXkRK8/61mMkGK9aavolWBCev63EO+m9Ds9sFFXv65o
-   oYF3FFHAn3t1StRdZ/jT258RCC64cFTJI4h83HkcWyQXWiB6r5tPapRB0
-   jT4Ojh4xBFHBL5mXxJsw6ZAibRDHB5mDtIx7ISpRCle1X064UguMWAsha
-   6q0fZ8tcWfl2PEWLFdOSm4Z5/hZMA/7Dufgz23b6QqrZ0Y3uhm0sgswUu
-   bejq82d/yDspDR53UDjbBzySNPrjaTRbxguXzJrDpZAYh54uwh5xe8pX9
-   9I4pOlrRJn95wsB8Fqlqj4rmu9E8O1q7inlQIxXDSmwMMxF4+nbPT5gz3
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10259"; a="230374786"
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="230374786"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Feb 2022 09:53:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,371,1635231600"; 
-   d="scan'208";a="502570210"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 15 Feb 2022 09:53:01 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nK20b-0009uF-90; Tue, 15 Feb 2022 17:53:01 +0000
-Date:   Wed, 16 Feb 2022 01:52:29 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Joseph Hwang <josephsih@chromium.org>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     kbuild-all@lists.01.org,
-        chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
-        Joseph Hwang <josephsih@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v4 1/3] Bluetooth: aosp: surface AOSP quality report
- through mgmt
-Message-ID: <202202160117.jjnGwidL-lkp@intel.com>
-References: <20220215213519.v4.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
+        Tue, 15 Feb 2022 13:17:56 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91463119F3F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 10:17:42 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id v5-20020a17090a4ec500b001b8b702df57so3872702pjl.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 10:17:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=rU/cr+2YS83r8ZzfG0ihHyfke5lY7dzNO33vRqwTRo0=;
+        b=BbY3zUMbpsKVLuD6QiFaFpnxej58wpxQPVVGisDcf+K+2coTsFmZNXGoWqBeKoLb1x
+         3ZptFg7el6LpqeSuHR1QjwuSCHfpkEX/T+XcjAHpaQzkvx2kHT7d0+kYGoaayuMfQhPV
+         CAs5kcpK7DDzn/NDlTFukbq1xe316LjUYcWLM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=rU/cr+2YS83r8ZzfG0ihHyfke5lY7dzNO33vRqwTRo0=;
+        b=XcTmcy9WcRvr4XOPXjb+ZfFR+WFXbuEqTy1ucEsVECoAYa/eC3m49rxVoovTOsPLzB
+         fk6bDFZGKGf9jyKrwQt4IvXu0peMzAXAwDgF09HK2vSSnKSNHq5pndWupwdZ5mQc/bhg
+         pnJJK0oLPMKrrdXpi2nCf1vrhujxzcSfBSdUtEHV6I15/WbKcrRLHcPPS2yRerGB62Cw
+         Cv0mFv1swnIuGXlvdE495NDX+uIs/xC4vWH8qZKth3D4GD0qAJxYHVc60dOyMF5Cg8kw
+         5Sbtn6dlwsbI0yOhbNguT4XqXvxfwcT9M0PYlRJUG3tNrMjIJSXCQnl04qoMKbB5R5DJ
+         f36A==
+X-Gm-Message-State: AOAM532pSgD878uF7CCR9K9wtbTflFBrqpXTSXxxllF1XpgRObPUuYRK
+        h3KBm0qzFtzYE/5PT/9bzg+sfQ==
+X-Google-Smtp-Source: ABdhPJwjJJkj0fC2gO+FdGjnaisWCk9FKkCf0qazg7PUuY4rrjoW+egyeLOWB+yCEr/MI5qa+9+dbA==
+X-Received: by 2002:a17:902:eb8f:: with SMTP id q15mr235036plg.67.1644949062021;
+        Tue, 15 Feb 2022 10:17:42 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id a186sm3157627pgc.70.2022.02.15.10.17.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Feb 2022 10:17:41 -0800 (PST)
+Date:   Tue, 15 Feb 2022 10:17:40 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     GR-QLogic-Storage-Upstream@marvell.com,
+        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, sparclinux@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-xtensa@linux-xtensa.org,
+        linux-crypto@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        coresight@lists.linaro.org, linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
+        linux-staging@lists.linux.dev,
+        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-ext4@vger.kernel.org, linux-acpi@vger.kernel.org,
+        devel@acpica.org, linux-arch@vger.kernel.org, linux-mm@kvack.org,
+        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
+        linux-rdma@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        alsa-devel@alsa-project.org, devicetree@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
+ flexible-array members
+Message-ID: <202202151016.C0471D6E@keescook>
+References: <20220215174743.GA878920@embeddedor>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220215213519.v4.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220215174743.GA878920@embeddedor>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
+> There is a regular need in the kernel to provide a way to declare
+> having a dynamically sized set of trailing elements in a structure.
+> Kernel code should always use “flexible array members”[1] for these
+> cases. The older style of one-element or zero-length arrays should
+> no longer be used[2].
+> 
+> This code was transformed with the help of Coccinelle:
+> (next-20220214$ spatch --jobs $(getconf _NPROCESSORS_ONLN) --sp-file script.cocci --include-headers --dir . > output.patch)
+> 
+> @@
+> identifier S, member, array;
+> type T1, T2;
+> @@
+> 
+> struct S {
+>   ...
+>   T1 member;
+>   T2 array[
+> - 0
+>   ];
+> };
 
-Thank you for the patch! Perhaps something to improve:
+These all look trivially correct to me. Only two didn't have the end of
+the struct visible in the patch, and checking those showed them to be
+trailing members as well, so:
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on net-next/master next-20220215]
-[cannot apply to net/master v5.17-rc4]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Reviewed-by: Kees Cook <keescook@chromium.org>
 
-url:    https://github.com/0day-ci/linux/commits/Joseph-Hwang/Bluetooth-aosp-surface-AOSP-quality-report-through-mgmt/20220215-213800
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: h8300-randconfig-s032-20220214 (https://download.01.org/0day-ci/archive/20220216/202202160117.jjnGwidL-lkp@intel.com/config)
-compiler: h8300-linux-gcc (GCC) 11.2.0
-reproduce:
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/8c2212761e41006d67f3fad819b5bde57bc17773
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Joseph-Hwang/Bluetooth-aosp-surface-AOSP-quality-report-through-mgmt/20220215-213800
-        git checkout 8c2212761e41006d67f3fad819b5bde57bc17773
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=h8300 SHELL=/bin/bash net/bluetooth/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-   net/bluetooth/hci_event.c:338:15: sparse: sparse: restricted __le16 degrades to integer
->> net/bluetooth/hci_event.c:4288:3: sparse: sparse: symbol 'evt_prefixes' was not declared. Should it be static?
-   net/bluetooth/hci_event.c: note: in included file (through include/net/bluetooth/hci_core.h):
-   include/net/bluetooth/hci.h:2473:47: sparse: sparse: array of flexible structures
-   include/net/bluetooth/hci.h:2559:43: sparse: sparse: array of flexible structures
-
-vim +/evt_prefixes +4288 net/bluetooth/hci_event.c
-
-  4275	
-  4276	/* Every distinct vendor specification must have a well-defined vendor
-  4277	 * event prefix to determine if a vendor event meets the specification.
-  4278	 * If an event prefix is fixed, it should be delcared with FIXED_EVT_PREFIX.
-  4279	 * Otherwise, DYNAMIC_EVT_PREFIX should be used for variable prefixes.
-  4280	 */
-  4281	struct vendor_event_prefix {
-  4282		__u8 *prefix;
-  4283		__u8 prefix_len;
-  4284		void (*vendor_func)(struct hci_dev *hdev, void *data,
-  4285				    struct sk_buff *skb);
-  4286		__u8 *(*get_prefix)(struct hci_dev *hdev);
-  4287		__u8 (*get_prefix_len)(struct hci_dev *hdev);
-> 4288	} evt_prefixes[] = {
-  4289		FIXED_EVT_PREFIX(AOSP_BQR_PREFIX, aosp_quality_report_evt),
-  4290		DYNAMIC_EVT_PREFIX(get_msft_evt_prefix, get_msft_evt_prefix_len,
-  4291				   msft_vendor_evt),
-  4292	
-  4293		/* end with a null entry */
-  4294		{},
-  4295	};
-  4296	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+-- 
+Kees Cook
