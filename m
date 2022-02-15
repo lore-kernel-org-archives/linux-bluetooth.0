@@ -2,83 +2,169 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A12D5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 11:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2628FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 12:38:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237350AbiBOLdW (ORCPT
+        id S237694AbiBOMiT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 06:33:22 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:56582 "EHLO
+        Tue, 15 Feb 2022 07:38:19 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:46072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237320AbiBOLdD (ORCPT
+        with ESMTP id S229824AbiBOMiR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 06:33:03 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537921EC79
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 03:32:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 52498CE1E35
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 11:32:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B2C66C340F4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 11:32:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1644924746;
-        bh=xcCQmPLYrrHNm0ygYZNP9ncHfmVlH+bQ7P61wkj+0iM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ZeWI6bM/u8g1cO1s/krFk49qlBwTTCWJY8XgKiS1cenQAPSYCwUnmn4MHfRBLoDRl
-         DLMzBWXmj6nGyMGFpKFuBjBrCFEVWvRcTf7TSN4sm4F7YjDvg2kdhQxWlliej2U1lc
-         tP2TBNH2WR++LLxtt6Y/vfI3/BA71/EJc/qSUoRG+IHruGCR85XqhNCQqffjY4sHYn
-         kp+iQYXMCb9uW3bmLzR6T3dKRjCQMzW9x5MPxdA1B0QHEf4xMh6LTgw4MkdLqsRn1T
-         EvFp2AEfIoUam0886Psozkh5UEHQeNq4BapF1L+pQhchTMO0v99T7gmP4RSn/3zFq9
-         dOmFwauvV02XA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id A0E68C05FCE; Tue, 15 Feb 2022 11:32:26 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215528] Excessive logging from Intel Bluetooth "Bluetooth:
- hci0: sending frame failed" "hci0: urb 00000000xxxxxxxx submission failed
- (90)"
-Date:   Tue, 15 Feb 2022 11:32:26 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215528-62941-kHqQ6roPs0@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215528-62941@https.bugzilla.kernel.org/>
-References: <bug-215528-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 15 Feb 2022 07:38:17 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F7E69CF8;
+        Tue, 15 Feb 2022 04:38:07 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id l125so22431923ybl.4;
+        Tue, 15 Feb 2022 04:38:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=R9vhyJh6Jc7bd+DxxGEFFu5LM3pzvH0HiXPe/xtg9ak=;
+        b=j7aOCyl69mieXDVfXhDqtYhyCXIEcbhSttf4Qv8UGwG3QaMnaE5Pv4fRrhD3gOiJSR
+         U6XNbfgEzWVqeZAi8HzM7WViDjr68tjGJqbYGT8V8YIfVopSI8JjTaLhAfSZ6PIvEUM0
+         k07U4CZNEAThrzGJow8AQ+b1L5Pn7W+oqmuQmXrglTX0ovIciXtmSlBbeCO8b/Oq91P+
+         OgZsTkCpV1nSJLf3RlrZlOTRc1/AjZ+G5tHN84fktjd5WxRkdvXI8Y253Ez8KGyKcohh
+         zyynOyyfESOYI/AaOl1xZBhNSwANoK+JgEbENXAc0LHnQVUjUTuufBGo9wIN+X/9v7ai
+         g4vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=R9vhyJh6Jc7bd+DxxGEFFu5LM3pzvH0HiXPe/xtg9ak=;
+        b=fnXXl6pcw7xxmEXTjBc1J7qA868TiZtQzcUT4GCzjLHC1UEoX0x+MJSjULgjV8n80s
+         Pnj5kqdwiAe3JzmXFyHaP7QGdAHOIdv6frlcRNGBrRAhTJR9pIU8bqIoCkNQzHBahqWt
+         p/QwevD1x4iQf1qSmks3U4u5Wzcvvi3Aa3HuX5GD4Idk87N5QOc0UqoR3d1zJgawtk7B
+         nNCBB+1GBdevDAY0zRaV5iJ0PFDccqyxINaGjhD+zSywhYWccH8e9c5F+xg1x2zob3k4
+         frKQJLthV1z0XVcJum/e9TzAZNRTRPtZA1cPp0fTvRojUqImBKdnGo/1P46C1Wce6lDY
+         aj/Q==
+X-Gm-Message-State: AOAM5305ehF6I1BjN7nu8PvK/v/aTMWyICQ+ZmorUhRifblG5VxbljV4
+        72LmJoBGaP20bNwqGByH+SGjhMeYDstdATklmg==
+X-Google-Smtp-Source: ABdhPJyaCOLCaS0Gw4oOy7lrmZuktaQxSNwc8VkOnhPjWU6IHYX7dmQ1uZ3ZcqLis7y9A7RBfwbc3Qa2PtelQZATmDM=
+X-Received: by 2002:a25:610f:: with SMTP id v15mr1768318ybb.236.1644928686895;
+ Tue, 15 Feb 2022 04:38:06 -0800 (PST)
 MIME-Version: 1.0
+From:   Jinmeng Zhou <jjjinmeng.zhou@gmail.com>
+Date:   Tue, 15 Feb 2022 20:37:56 +0800
+Message-ID: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
+Subject: 4 missing check bugs
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        shenwenbosmile@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215528
+Dear maintainers,
 
---- Comment #10 from Artem S. Tashkinov (aros@gmx.com) ---
-Can you please rate limit these messages for Christ's sake?
+Hi, our tool finds several missing check bugs on
+Linux kernel v4.18.5 using static analysis.
+We are looking forward to having more experts' eyes on this. Thank you!
 
-Specially "SCO packet for unknown connection handle X" - I'm not even sure =
-they
-should be logged in the first place unless debugging is enabled.
+Before calling sk_alloc() with SOCK_RAW type,
+there should be a permission check, ns_capable(ns,CAP_NET_RAW).
+For example,
 
---=20
-You may reply to this email to add a comment.
+static int xsk_create(struct net *net, struct socket *sock, int protocol,
+      int kern)
+{
+struct xdp_sock *xs;
+struct sock *sk;
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+if (!ns_capable(net->user_ns, CAP_NET_RAW))
+return -EPERM;
+if (sock->type != SOCK_RAW)
+return -ESOCKTNOSUPPORT;
+...
+sk = sk_alloc(net, PF_XDP, GFP_KERNEL, &xsk_proto, kern);
+if (!sk)
+return -ENOBUFS;
+...
+}
+
+
+
+We find 4 missing check bugs.
+The functions that miss permission checks in v4.18.5:
+
+net/bluetooth/hidp/sock.c
+static int hidp_sock_create(struct net *net, struct socket *sock, int protocol,
+    int kern)
+{
+struct sock *sk;
+
+BT_DBG("sock %p", sock);
+
+if (sock->type != SOCK_RAW)
+return -ESOCKTNOSUPPORT;
+
+sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &hidp_proto, kern);
+if (!sk)
+return -ENOMEM;
+...
+}
+
+
+net/bluetooth/cmtp/sock.c
+static int cmtp_sock_create(struct net *net, struct socket *sock, int protocol,
+    int kern)
+{
+struct sock *sk;
+
+BT_DBG("sock %p", sock);
+
+if (sock->type != SOCK_RAW)
+return -ESOCKTNOSUPPORT;
+
+sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &cmtp_proto, kern);
+if (!sk)
+return -ENOMEM;
+...
+}
+
+
+net/bluetooth/hci_sock.c
+static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
+   int kern)
+{
+struct sock *sk;
+
+BT_DBG("sock %p", sock);
+
+if (sock->type != SOCK_RAW)
+return -ESOCKTNOSUPPORT;
+
+sock->ops = &hci_sock_ops;
+
+sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &hci_sk_proto, kern);
+if (!sk)
+return -ENOMEM;
+...
+}
+
+
+/net/bluetooth/bnep/sock.c
+static int bnep_sock_create(struct net *net, struct socket *sock, int protocol,
+    int kern)
+{
+struct sock *sk;
+
+BT_DBG("sock %p", sock);
+
+if (sock->type != SOCK_RAW)
+return -ESOCKTNOSUPPORT;
+
+sk = sk_alloc(net, PF_BLUETOOTH, GFP_ATOMIC, &bnep_proto, kern);
+if (!sk)
+return -ENOMEM;
+...
+}
+
+
+Thanks again!
+
+
+Best regards,
+Jinmeng Zhou
