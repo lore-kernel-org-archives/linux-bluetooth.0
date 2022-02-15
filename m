@@ -2,90 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFBBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 21:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFAA8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 21:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238756AbiBOVvY (ORCPT
+        id S234664AbiBOVwE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 16:51:24 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47830 "EHLO
+        Tue, 15 Feb 2022 16:52:04 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234664AbiBOVvX (ORCPT
+        with ESMTP id S241205AbiBOVwD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 16:51:23 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31BC2D5F72;
-        Tue, 15 Feb 2022 13:51:13 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id m7so502396pjk.0;
-        Tue, 15 Feb 2022 13:51:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=mexl3os4BQqYiQV1Two8gyEZOIW76cOBbYjh80oXZRc=;
-        b=XuFSQmRrVV5aRBEPyP3BEPRjdy/3JQIe2BH9WIOfwaBRne8yld3renrqxEmMJh+ElN
-         vH1LuvUiyeSSIUfg2W//ST8J55qFhQIpj8nfzUVCjxjudsKcWDIE57FIepm0C+nSuupX
-         Sk7ADm8lFFtdQr54NfN2GZWNhRP4JD9eWnu2B81UbaykpWelj6gFC00T9Nby2fjW1x6P
-         yfdP8nvNXP1HstDUZ4vuQ6agbv38e2JApSEs6Ke/UwX0aKKn9lAUSCXUlX1sta3KSz4Q
-         /yj05EqV+MOM5OCXL51GHne6DBtDWb6/LdIj8NQ9rm7FLV/HixV+41W3yHIgSICVXDsU
-         lXcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=mexl3os4BQqYiQV1Two8gyEZOIW76cOBbYjh80oXZRc=;
-        b=g9cU6rgy6MIUOu6UwbVjgUu4JQdjUJF4zDJDkVQKcgwRikvlhr/VXY02tcnX+RQwMQ
-         DQD1Mc9YQR2MTtXtT2+gjvxCG8F46ZsFM+qauUwtZY5F++6HdhUuyqw3f6tfHCuEXg5V
-         wQE6e2XYO4ElWl46B/PokDV5mqiIbtZOamAccDJbib47HnE6b+O0lNwxbsY0GHG57Z+Y
-         lZw340kEji4pb2uuuuSFsPWYCM8tnNNPdI0P9OQkeKQiF570VLJEJIrujXT10W1hivcp
-         FEMW+/L+BLjL6USSGffG15K6Ua9VajLJB1nHIRawzvzwbrg6Xl63t4O6kUTDACldnGZs
-         OzLg==
-X-Gm-Message-State: AOAM530LGeLh6Wh6WrggSmQvaRyRuRMnkqm3fIJ1NqdEMEM6DPnp5s2P
-        LxkaSuvZcTvYSpKJOkcaja4=
-X-Google-Smtp-Source: ABdhPJxQ/5GF4sBQCPRsKWvD0cB3cbEOz0QRM4q8OD13AysF+sxQaMhIkcxg5Bn3ML5+05shYbB8gQ==
-X-Received: by 2002:a17:90b:3e85:: with SMTP id rj5mr946051pjb.65.1644961872676;
-        Tue, 15 Feb 2022 13:51:12 -0800 (PST)
-Received: from [192.168.86.21] (c-73-241-150-58.hsd1.ca.comcast.net. [73.241.150.58])
-        by smtp.gmail.com with ESMTPSA id e4sm2230484pgr.35.2022.02.15.13.51.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 13:51:12 -0800 (PST)
-Message-ID: <8cb46dd1-c2eb-869a-0af8-443d84a83b85@gmail.com>
-Date:   Tue, 15 Feb 2022 13:51:10 -0800
+        Tue, 15 Feb 2022 16:52:03 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5A29EB31B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 13:51:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23B94B81D11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 21:51:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C7B95C340F0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 21:51:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1644961909;
+        bh=cYGZM/8mbz/GiXqVesHx41OouvKj30gvRgmlEtRluuU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=ti3pglyyEDJMANA2D0OG3rgm52WrF4aeIavElq11zYAu/ADSEH9yv2xoeKDf5vX3Z
+         8tpH2HsY85fsdTeSiln3q+BFxGIsbwX3bMYxsikozU2neWraE7YiiEEyfLHQBzyVRI
+         TissBJH7BwtFpuzAfQY5wFUFwyltTOOEor4D+aq+RBk4JRAvX1u0BJCw2IPlTKVWHV
+         ZFmL/torb+0hm83Dyte2eLwqDKBmgjTWJ+5QW/S2QQ1DSE72Badwsm+/PYrNoQm6Kq
+         Yyw3Ko94IFf3gNfvcaWA1sUwQYDhY4JmV6t07RUsW+P1kwlVv8UPplOp7AbVXLapQb
+         3AyM9QF7yd2yw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id A878EC05FCE; Tue, 15 Feb 2022 21:51:49 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215528] Excessive logging from Intel Bluetooth "Bluetooth:
+ hci0: sending frame failed" "hci0: urb 00000000xxxxxxxx submission failed
+ (90)"
+Date:   Tue, 15 Feb 2022 21:51:49 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215528-62941-AHVw3S8dAg@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215528-62941@https.bugzilla.kernel.org/>
+References: <bug-215528-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: 4 missing check bugs
-Content-Language: en-US
-To:     Jinmeng Zhou <jjjinmeng.zhou@gmail.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, davem@davemloft.net,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        shenwenbosmile@gmail.com
-References: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
-From:   Eric Dumazet <eric.dumazet@gmail.com>
-In-Reply-To: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215528
 
-On 2/15/22 04:37, Jinmeng Zhou wrote:
-> Dear maintainers,
->
-> Hi, our tool finds several missing check bugs on
-> Linux kernel v4.18.5 using static analysis.
-> We are looking forward to having more experts' eyes on this. Thank you!
->
-> Before calling sk_alloc() with SOCK_RAW type,
-> there should be a permission check, ns_capable(ns,CAP_NET_RAW).
-> For example,
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-v4.18 is not a stable kernel.
+--- Comment #11 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t/commit/?id=3D2d4b37b67cacbbad6fdb8621333f5ce48ae0e5fd
 
-No one is supposed to use v4.18.5, and expect others to fix bugs in it.
+--=20
+You may reply to this email to add a comment.
 
-
+You are receiving this mail because:
+You are the assignee for the bug.=
