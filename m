@@ -2,96 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D10C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 21:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFBBC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 21:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243624AbiBOVpO (ORCPT
+        id S238756AbiBOVvY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 16:45:14 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44810 "EHLO
+        Tue, 15 Feb 2022 16:51:24 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232789AbiBOVpO (ORCPT
+        with ESMTP id S234664AbiBOVvX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 16:45:14 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6AB9B3E4C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 13:45:03 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id y129so154156ybe.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 13:45:03 -0800 (PST)
+        Tue, 15 Feb 2022 16:51:23 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31BC2D5F72;
+        Tue, 15 Feb 2022 13:51:13 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id m7so502396pjk.0;
+        Tue, 15 Feb 2022 13:51:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=czs/J9RaI+qJ+N+soY6GSVtJL6AV1C9DbecgxRXsAj8=;
-        b=NcN2Sc3QvByraC3CB5Hx/IuOwg2yNZmOtPh745yq5D9oiVnkDZNTs6kf3kta3uQHl9
-         zbjkYOJTaUJ886dUUXyE+XMNnI8BFcuNUdhWwI9dMvA3XgFebGxYPDKxwUSAHxEvAy6h
-         OsDrpkS1yC0BoNMN1ShnoT8/xn4ony+B5MC0IK6nVYSSgxpVZSaUyFBW0G0ePRSWmry3
-         FzSa3AlwH5/9U9XMJMUbifxnePfxrYqfV0nycdW1/l+2dkzR0w3AACxZR1c2GlM6GZxw
-         Xr8Xik26N6/6cmhoISDJbR7b38OBuTgBCKn954wUFa6b+HasoMGBP0sJHTIb7w5g9Fm6
-         LRXQ==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=mexl3os4BQqYiQV1Two8gyEZOIW76cOBbYjh80oXZRc=;
+        b=XuFSQmRrVV5aRBEPyP3BEPRjdy/3JQIe2BH9WIOfwaBRne8yld3renrqxEmMJh+ElN
+         vH1LuvUiyeSSIUfg2W//ST8J55qFhQIpj8nfzUVCjxjudsKcWDIE57FIepm0C+nSuupX
+         Sk7ADm8lFFtdQr54NfN2GZWNhRP4JD9eWnu2B81UbaykpWelj6gFC00T9Nby2fjW1x6P
+         yfdP8nvNXP1HstDUZ4vuQ6agbv38e2JApSEs6Ke/UwX0aKKn9lAUSCXUlX1sta3KSz4Q
+         /yj05EqV+MOM5OCXL51GHne6DBtDWb6/LdIj8NQ9rm7FLV/HixV+41W3yHIgSICVXDsU
+         lXcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=czs/J9RaI+qJ+N+soY6GSVtJL6AV1C9DbecgxRXsAj8=;
-        b=QlT0pGRJPklGnwKsMv0ULFS58qf5H60gdeAUWUp34ZSSb716lXyLiYk1+8vH/vvw3h
-         3Daaa1aCWgJpZcIQViF7pg6E74YUpKhFTzKsYU8cH1Y2TPx0ZsVlRL0FmfmGomx2wM+G
-         JVmXFXdanclRzZSXQnkjf72nCiQ/O/GVr8V1PHoe3Ba+ODZagInoWrjYfdUneDsahUBC
-         JPdC+16QpnprtNELk3yZF12DPRqh4zOmrHy3aG8B5pg99vh7Tew2sKi4aHW9L86LLJIh
-         YX/ZCj0fX0VZ0Sp6PHlq2LepWMXRRZlMdOJdc317/kiIgGl3XCAejlN2QBhKjfvoCBbZ
-         pY8A==
-X-Gm-Message-State: AOAM530AOeIoonrXZa+ovBKqpKwgHVZw2iLLOkTjo7Vzq6bH8EhlyUyS
-        8NNGbv5FYoxVbP4LCYlyJNCyQKwI0nwokUzJjYe4+6BaKEg=
-X-Google-Smtp-Source: ABdhPJzdExG2tE7ACUAoezvdiPOWK6mFYvUoe0tkyORxDUxLSUjY7fCbWDbe0AcoS9mdDJrjW/+LuxHZsRT/VBqv9Ao=
-X-Received: by 2002:a25:508b:: with SMTP id e133mr865864ybb.293.1644961502779;
- Tue, 15 Feb 2022 13:45:02 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=mexl3os4BQqYiQV1Two8gyEZOIW76cOBbYjh80oXZRc=;
+        b=g9cU6rgy6MIUOu6UwbVjgUu4JQdjUJF4zDJDkVQKcgwRikvlhr/VXY02tcnX+RQwMQ
+         DQD1Mc9YQR2MTtXtT2+gjvxCG8F46ZsFM+qauUwtZY5F++6HdhUuyqw3f6tfHCuEXg5V
+         wQE6e2XYO4ElWl46B/PokDV5mqiIbtZOamAccDJbib47HnE6b+O0lNwxbsY0GHG57Z+Y
+         lZw340kEji4pb2uuuuSFsPWYCM8tnNNPdI0P9OQkeKQiF570VLJEJIrujXT10W1hivcp
+         FEMW+/L+BLjL6USSGffG15K6Ua9VajLJB1nHIRawzvzwbrg6Xl63t4O6kUTDACldnGZs
+         OzLg==
+X-Gm-Message-State: AOAM530LGeLh6Wh6WrggSmQvaRyRuRMnkqm3fIJ1NqdEMEM6DPnp5s2P
+        LxkaSuvZcTvYSpKJOkcaja4=
+X-Google-Smtp-Source: ABdhPJxQ/5GF4sBQCPRsKWvD0cB3cbEOz0QRM4q8OD13AysF+sxQaMhIkcxg5Bn3ML5+05shYbB8gQ==
+X-Received: by 2002:a17:90b:3e85:: with SMTP id rj5mr946051pjb.65.1644961872676;
+        Tue, 15 Feb 2022 13:51:12 -0800 (PST)
+Received: from [192.168.86.21] (c-73-241-150-58.hsd1.ca.comcast.net. [73.241.150.58])
+        by smtp.gmail.com with ESMTPSA id e4sm2230484pgr.35.2022.02.15.13.51.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Feb 2022 13:51:12 -0800 (PST)
+Message-ID: <8cb46dd1-c2eb-869a-0af8-443d84a83b85@gmail.com>
+Date:   Tue, 15 Feb 2022 13:51:10 -0800
 MIME-Version: 1.0
-References: <20220215015136.1948793-1-luiz.dentz@gmail.com> <620b1b7c.1c69fb81.6c718.cf49@mx.google.com>
-In-Reply-To: <620b1b7c.1c69fb81.6c718.cf49@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 15 Feb 2022 13:44:52 -0800
-Message-ID: <CABBYNZ+H6eop0MbewQtii+hogXBY4i7_27AxvXbYB7R9=5NWcg@mail.gmail.com>
-Subject: Re: [BlueZ] rfcomm-tester: Increase amount of data from 8k to 32k
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: 4 missing check bugs
+Content-Language: en-US
+To:     Jinmeng Zhou <jjjinmeng.zhou@gmail.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, davem@davemloft.net,
+        Jakub Kicinski <kuba@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        shenwenbosmile@gmail.com
+References: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
+From:   Eric Dumazet <eric.dumazet@gmail.com>
+In-Reply-To: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
 
-On Mon, Feb 14, 2022 at 7:18 PM <bluez.test.bot@gmail.com> wrote:
+On 2/15/22 04:37, Jinmeng Zhou wrote:
+> Dear maintainers,
 >
-> This is automated email and please do not reply to this email!
+> Hi, our tool finds several missing check bugs on
+> Linux kernel v4.18.5 using static analysis.
+> We are looking forward to having more experts' eyes on this. Thank you!
 >
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614322
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.46 seconds
-> GitLint                       PASS      0.98 seconds
-> Prep - Setup ELL              PASS      41.39 seconds
-> Build - Prep                  PASS      0.69 seconds
-> Build - Configure             PASS      8.35 seconds
-> Build - Make                  PASS      1247.51 seconds
-> Make Check                    PASS      11.71 seconds
-> Make Check w/Valgrind         PASS      434.73 seconds
-> Make Distcheck                PASS      223.30 seconds
-> Build w/ext ELL - Configure   PASS      8.39 seconds
-> Build w/ext ELL - Make        PASS      1234.66 seconds
-> Incremental Build with patchesPASS      0.00 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+> Before calling sk_alloc() with SOCK_RAW type,
+> there should be a permission check, ns_capable(ns,CAP_NET_RAW).
+> For example,
 
-Pushed.
--- 
-Luiz Augusto von Dentz
+
+v4.18 is not a stable kernel.
+
+No one is supposed to use v4.18.5, and expect others to fix bugs in it.
+
+
