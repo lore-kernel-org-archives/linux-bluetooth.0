@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F09C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 13:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1982CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 13:36:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235296AbiBONgy (ORCPT
+        id S238311AbiBONg5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 08:36:54 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33926 "EHLO
+        Tue, 15 Feb 2022 08:36:57 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231797AbiBONgy (ORCPT
+        with ESMTP id S238283AbiBONg4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 08:36:54 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E91A65179
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 05:36:44 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id z16so13022678pfh.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 05:36:44 -0800 (PST)
+        Tue, 15 Feb 2022 08:36:56 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F896E8F6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 05:36:47 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id i21so33437676pfd.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 05:36:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=b+/YuDBUcvSQNoEcHVaCYlQpUanQiQyBVuqYOJZ6w10=;
-        b=NwNJ9xMM9ITUiux8d2if4on42CmEBLcX7oqL7YfHU3q52YQx8m0xR1ef2V1FfZLO3S
-         TzG+bXXiqEE+xjilFbzf9qeFwZ4M9XvecMax8cxlDU+W8BQ2Mft+oTGteyiqrY1jZJhC
-         R5YQzirdXg6M1rOMFiCrTS8WfEqNxR65oiOS0=
+        bh=21rCQRiXB46+PABuCyw+4bZoZw/a3puD6LYmvybmjdQ=;
+        b=JR2odJ94fdopH+gQjWdTdqd8pIITZBp7KH6amMqBbyjMT6TkzjT+qBkrmnTDCIGfcU
+         N8LjgQa+EyESx3Au80N87/AwtzKEVANE4cFyMphSXnJ3s6xgbydTTStQ1qqdC0ljPWcm
+         7UpFwnS+PKv8eZChJofY9ULXiuXVIR6BKIxnA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=b+/YuDBUcvSQNoEcHVaCYlQpUanQiQyBVuqYOJZ6w10=;
-        b=hxUysbzVFgMdBtZ/MhsvBz0PW6BEwyPa8E8Oqh4KmJf0VmYFvkJfhNHtFVW5mo5GZ8
-         pghS7sYE49fqTP6U3rY73QuLQBAVagU2lXJAw/Ch4LxDjuAqV7QbIyYiu/FpkkptJSxK
-         T9PfM87EsF/Al6YepYz9DQ/z/QblM9/+VzBzfXOKmJjFbLfDbGUhj7bJhrJrnPGQH42C
-         Y0mqvPAyVuPTWk5tlIHhk7o9hWxDN6zV9OBxsvasIbyLVob3nxZR/NRVHK2wZdCm9YZZ
-         LfWfd8EUVSrfHp5qsDA59louDablQCl7SiYITg4LlBY3EsoFctcBnD5V3sGaFGNfnlgj
-         s7xA==
-X-Gm-Message-State: AOAM5312gh79KEcvdjutLIFpQLYuPGSwafHOKVv521ydfnEjDZEXzUYx
-        pt/nBXkbjxMrzKM3QJqeclpvm6vIkbwO1g==
-X-Google-Smtp-Source: ABdhPJyRnAZ3LaTpo76pqRHugCJmvk0OyYhq3l5e1ACrx0zgmpP99Xt7zY94rc5a9EaySPwu0WfgAg==
-X-Received: by 2002:a05:6a00:228e:: with SMTP id f14mr4476374pfe.33.1644932203660;
-        Tue, 15 Feb 2022 05:36:43 -0800 (PST)
+        bh=21rCQRiXB46+PABuCyw+4bZoZw/a3puD6LYmvybmjdQ=;
+        b=rGsMZE1d+/2NOyFY3tisojJ5yv9L5hv/NtUEWJHOgj+x7EdL9dBNZ+dw55Bfrz+x5a
+         7qajHZ2RhC7umed2nfFSw9c9pyxp22g9oA/9yIXJw2pXFEuaemi5QrGIVgWkxhMEglwa
+         mk5gZd2MJowkqfBMqxue8Ta6DxbUpIEJPsVUSgTLjzN1UlgisHHnxtrORbGeEr3LatfA
+         QZYGVtO965Up3G0q5QSe/cKEYx+klnPCmWOPf1wwKOk20LTJ0fMrhpj078GdO1CG2Y4u
+         8+PO5K4wmRVl6IiXTjA0ygxEp9jDsryWF40Eu/mzIV+GxwYcw/dKMyqHHuFJXQTwhsrw
+         FleQ==
+X-Gm-Message-State: AOAM5312NUvrwI0RERLQNel9W45ylytk609kNC1u4G6U8fcyzSk6DAHw
+        ElVyzXpE30X041EpuiuWofOe+J5OjHKRsw==
+X-Google-Smtp-Source: ABdhPJzhoY5F+IwOupsE8AUgZ+b+6bfU9Ce7qf5wX9lxeQBI1Cg5AzHgksMssnKJIWXQoT7jqEbPPQ==
+X-Received: by 2002:a63:b58:: with SMTP id a24mr3556904pgl.537.1644932206468;
+        Tue, 15 Feb 2022 05:36:46 -0800 (PST)
 Received: from localhost (208.158.221.35.bc.googleusercontent.com. [35.221.158.208])
-        by smtp.gmail.com with UTF8SMTPSA id bg9sm5932351pjb.46.2022.02.15.05.36.42
+        by smtp.gmail.com with UTF8SMTPSA id x6sm8940389pfo.152.2022.02.15.05.36.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Feb 2022 05:36:43 -0800 (PST)
+        Tue, 15 Feb 2022 05:36:46 -0800 (PST)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
         Joseph Hwang <josephsih@chromium.org>
-Subject: [BlueZ PATCH v4 2/8] lib: Add structures and constants for quality report command and event
-Date:   Tue, 15 Feb 2022 21:36:30 +0800
-Message-Id: <20220215133636.2827039-2-josephsih@chromium.org>
+Subject: [BlueZ PATCH v4 3/8] adapter: enable quality report via MGMT_OP_SET_QUALITY_REPORT
+Date:   Tue, 15 Feb 2022 21:36:31 +0800
+Message-Id: <20220215133636.2827039-3-josephsih@chromium.org>
 X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
 In-Reply-To: <20220215133636.2827039-1-josephsih@chromium.org>
 References: <20220215133636.2827039-1-josephsih@chromium.org>
@@ -63,76 +63,75 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add the new MGMT struct and constants to lib/mgmt.h.
+The quality report feature is now enabled through
+MGMT_OP_SET_QUALITY_REPORT instead of through the experimental
+features.
 
 Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
 
 Changes in v4:
-- Combine both MGMT command and event changes in a single patch.
-- Fix namings of QUALITY_SPEC_AOSP and QUALITY_SPEC_INTEL.
-- Use "Quality Report" without the prefix "Bluetooth".
+- Move forward this patch in the patch series so that this
+  command patch is prior to the quality report event patches.
 
 Changes in v3:
-- Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
+- This is a new patch that enables the quality report feature via
+  MGMT_OP_SET_QUALITY_REPORT.
 
-Changes in v2:
-- This is a new patch for adding the new struct and constants.
+ src/adapter.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
- lib/mgmt.h | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
-
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 922a24367..c7a2a7868 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -96,6 +96,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
- #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
- #define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
-+#define MGMT_SETTING_QUALITY_REPORT	0x00040000
- 
- #define MGMT_OP_READ_INFO		0x0004
- struct mgmt_rp_read_info {
-@@ -757,6 +758,14 @@ struct mgmt_cp_add_adv_patterns_monitor_rssi {
- 	struct mgmt_adv_pattern patterns[0];
- } __packed;
- 
-+#define MGMT_OP_SET_QUALITY_REPORT		0x0057
-+struct mgmt_cp_set_quality_report {
-+	uint8_t action;
-+} __packed;
-+struct mgmt_rp_set_quality_report {
-+	uint32_t current_settings;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	uint16_t opcode;
-@@ -1032,6 +1041,15 @@ struct mgmt_ev_adv_monitor_device_lost {
- 	struct mgmt_addr_info addr;
- } __packed;
- 
-+#define MGMT_EV_QUALITY_REPORT			0x0031
-+#define QUALITY_SPEC_AOSP			0x0
-+#define QUALITY_SPEC_INTEL			0x1
-+struct mgmt_ev_quality_report {
-+	uint8_t quality_spec;
-+	uint32_t data_len;
-+	uint8_t data[];
-+} __packed;
-+
- static const char *mgmt_op[] = {
- 	"<0x0000>",
- 	"Read Version",
-@@ -1172,6 +1190,7 @@ static const char *mgmt_ev[] = {
- 	"Controller Resume",
- 	"Advertisement Monitor Device Found",		/* 0x002f */
- 	"Advertisement Monitor Device Lost",
-+	"Quality Report",				/* 0x0031 */
+diff --git a/src/adapter.c b/src/adapter.c
+index eef50f67a..d988865f6 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -120,13 +120,6 @@ static const struct mgmt_exp_uuid le_simult_central_peripheral_uuid = {
+ 	.str = "671b10b5-42c0-4696-9227-eb28d1b049d6"
  };
  
- static const char *mgmt_status[] = {
+-/* 330859bc-7506-492d-9370-9a6f0614037f */
+-static const struct mgmt_exp_uuid quality_report_uuid = {
+-	.val = { 0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
+-		0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33 },
+-	.str = "330859bc-7506-492d-9370-9a6f0614037f"
+-};
+-
+ /* 15c0a148-c273-11ea-b3de-0242ac130004 */
+ static const struct mgmt_exp_uuid rpa_resolution_uuid = {
+ 	.val = { 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
+@@ -9600,12 +9593,6 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
+ 				(void *)le_simult_central_peripheral_uuid.val);
+ }
+ 
+-static void quality_report_func(struct btd_adapter *adapter, uint8_t action)
+-{
+-	if (action)
+-		queue_push_tail(adapter->exps, (void *)quality_report_uuid.val);
+-}
+-
+ static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+@@ -9681,7 +9668,6 @@ static const struct exp_feat {
+ 	EXP_FEAT(&debug_uuid, exp_debug_func),
+ 	EXP_FEAT(&le_simult_central_peripheral_uuid,
+ 		 le_simult_central_peripheral_func),
+-	EXP_FEAT(&quality_report_uuid, quality_report_func),
+ 	EXP_FEAT(&rpa_resolution_uuid, rpa_resolution_func),
+ 	EXP_FEAT(&codec_offload_uuid, codec_offload_func),
+ };
+@@ -9755,6 +9741,11 @@ static void read_exp_features(struct btd_adapter *adapter)
+ 	btd_error(adapter->dev_id, "Failed to read exp features info");
+ }
+ 
++bool is_quality_report_supported(struct btd_adapter *adapter)
++{
++	return !!(adapter->supported_settings & MGMT_SETTING_QUALITY_REPORT);
++}
++
+ static void read_info_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
 -- 
 2.35.1.265.g69c8d7142f-goog
 
