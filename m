@@ -2,214 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8931CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 07:23:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E5EAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Feb 2022 10:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233498AbiBOHXu (ORCPT
+        id S236300AbiBOKHf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 02:23:50 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:44292 "EHLO
+        Tue, 15 Feb 2022 05:07:35 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229585AbiBOHXt (ORCPT
+        with ESMTP id S235480AbiBOKHe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 02:23:49 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B467F1EBD
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Feb 2022 23:23:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1644909820; x=1676445820;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Zisy3xlJK8C9vl/2KIv4x2ygWlJy9gQOdg1JLFakEEk=;
-  b=EyX/WO6jxjmulzzodymPDW+fW+PmSkKyvKH33UqTK6dSrNwkgDoPWYlm
-   YXjktaXBqrAdyUfZ5I2eYamlBE2pCZE9yyRMTNystQ7RTBgB84QKdURyL
-   kGnUGc1V6ROT8uSchCJkkAL2B4L2VMnPL4x8BDvIiR3TpeFMaiNAj61qD
-   U9En48y5WBDTZfhjo6xwi9vWUTuDDZoEcyGxREgWZ0IU9l6enAKrPEm0e
-   hsUbNIohpdII7pnmQJ2eXQDj59ZKHcAhk9qd/b1WWC41BB2LtOfIDPmBH
-   /+zgGBejen3Lv/J0E81hRx4Qknhxe9hdiU32ngLZoMnoIv+g1UPyX5tAc
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10258"; a="237679268"
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="237679268"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2022 23:23:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,370,1635231600"; 
-   d="scan'208";a="680880538"
-Received: from lkp-server01.sh.intel.com (HELO d95dc2dabeb1) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Feb 2022 23:23:38 -0800
-Received: from kbuild by d95dc2dabeb1 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nJsBV-0009Mp-T1; Tue, 15 Feb 2022 07:23:37 +0000
-Date:   Tue, 15 Feb 2022 15:23:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 952b6d5f18594418963b70467a8cd115cfa37a5d
-Message-ID: <620b54f0.KUs1UGFtvB91eik+%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Tue, 15 Feb 2022 05:07:34 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44D727E5B5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 02:07:23 -0800 (PST)
+Received: from [192.168.0.2] (ip5f5aee0e.dynamic.kabel-deutschland.de [95.90.238.14])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id C918461EA1928;
+        Tue, 15 Feb 2022 11:07:21 +0100 (CET)
+Message-ID: <232b507b-65bd-3857-78f9-4df888620823@molgen.mpg.de>
+Date:   Tue, 15 Feb 2022 11:07:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH] Bluetooth: Fix bt_skb_sendmmsg not allocating partial
+ chunks
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20220215015938.1950978-1-luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20220215015938.1950978-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 952b6d5f18594418963b70467a8cd115cfa37a5d  Bluetooth: 6lowpan: No need to clear memory twice
+Dear Luiz,
 
-elapsed time: 737m
 
-configs tested: 135
-configs skipped: 3
+Am 15.02.22 um 02:59 schrieb Luiz Augusto von Dentz:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> Since bt_skb_sendmmsg can be used with the likes of SOCK_STREAM it
+> shall return the partial chunks it could allocate instead of freeing
+> everything as otherwise it can cause problems like bellow.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Thank you for fixing the bug I found.
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20220214
-mips                 randconfig-c004-20220214
-nios2                            alldefconfig
-sh                          r7780mp_defconfig
-sh                            titan_defconfig
-ia64                         bigsur_defconfig
-powerpc                   motionpro_defconfig
-powerpc                     asp8347_defconfig
-arm                          lpd270_defconfig
-xtensa                         virt_defconfig
-arc                     haps_hs_smp_defconfig
-xtensa                              defconfig
-arm                        oxnas_v6_defconfig
-sh                     magicpanelr2_defconfig
-mips                          rb532_defconfig
-parisc                              defconfig
-sh                           se7751_defconfig
-powerpc                       maple_defconfig
-parisc                           alldefconfig
-microblaze                          defconfig
-sparc                               defconfig
-arm64                            alldefconfig
-arm                        mvebu_v7_defconfig
-m68k                          hp300_defconfig
-arm                     eseries_pxa_defconfig
-arm                            pleb_defconfig
-sh                           se7721_defconfig
-powerpc                           allnoconfig
-arm                         lpc18xx_defconfig
-powerpc                      bamboo_defconfig
-arc                        nsimosci_defconfig
-arm                  randconfig-c002-20220214
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-x86_64               randconfig-a013-20220214
-x86_64               randconfig-a014-20220214
-x86_64               randconfig-a012-20220214
-x86_64               randconfig-a015-20220214
-x86_64               randconfig-a011-20220214
-x86_64               randconfig-a016-20220214
-i386                 randconfig-a013-20220214
-i386                 randconfig-a016-20220214
-i386                 randconfig-a012-20220214
-i386                 randconfig-a015-20220214
-i386                 randconfig-a011-20220214
-i386                 randconfig-a014-20220214
-riscv                randconfig-r042-20220214
-arc                  randconfig-r043-20220214
-s390                 randconfig-r044-20220214
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
+Tested-by: Paul Menzel <pmenzel@molgen.mpg.de> (Nokia N9 (MeeGo/Harmattan)
 
-clang tested configs:
-riscv                randconfig-c006-20220214
-i386                 randconfig-c001-20220214
-powerpc              randconfig-c003-20220214
-arm                  randconfig-c002-20220214
-mips                 randconfig-c004-20220214
-arm                         lpc32xx_defconfig
-powerpc                 mpc8315_rdb_defconfig
-mips                        workpad_defconfig
-arm                         s3c2410_defconfig
-powerpc                     ppa8548_defconfig
-mips                          ath25_defconfig
-powerpc                     mpc5200_defconfig
-arm                  colibri_pxa300_defconfig
-arm                         bcm2835_defconfig
-mips                     cu1830-neo_defconfig
-arm                       spear13xx_defconfig
-arm                       aspeed_g4_defconfig
-arm                          pcm027_defconfig
-mips                         tb0287_defconfig
-arm                          moxart_defconfig
-powerpc                    gamecube_defconfig
-mips                     loongson2k_defconfig
-arm                       netwinder_defconfig
-arm                       versatile_defconfig
-powerpc                      ppc44x_defconfig
-x86_64               randconfig-a002-20220214
-x86_64               randconfig-a006-20220214
-x86_64               randconfig-a005-20220214
-x86_64               randconfig-a004-20220214
-x86_64               randconfig-a003-20220214
-x86_64               randconfig-a001-20220214
-i386                 randconfig-a004-20220214
-i386                 randconfig-a005-20220214
-i386                 randconfig-a006-20220214
-i386                 randconfig-a003-20220214
-i386                 randconfig-a001-20220214
-i386                 randconfig-a002-20220214
-hexagon              randconfig-r045-20220214
-hexagon              randconfig-r041-20220214
+> Link: https://lore.kernel.org/linux-bluetooth/aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de/T/#m1f9673e4ab0d55a7dccf87905337ab2e67d689f1
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+The Linux kernel regression status, when expanding the bug entry: asks 
+to add:
+
+Fixes: 81be03e026dc ("Bluetooth: RFCOMM: Replace use of memcpy_from_msg 
+with bt_skb_sendmmsg")
+Reported-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Link: 
+https://lore.kernel.org/r/d7206e12-1b99-c3be-84f4-df22af427ef5@molgen.mpg.de
+
+> Fixes: 81be03e026dc ("Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Maybe also add:
+
+BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=215594
+
+> ---
+>   include/net/bluetooth/bluetooth.h | 3 +--
+>   1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 4b3d0b16c185..a647e5fabdbd 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -506,8 +506,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+>   
+>   		tmp = bt_skb_sendmsg(sk, msg, len, mtu, headroom, tailroom);
+>   		if (IS_ERR(tmp)) {
+> -			kfree_skb(skb);
+> -			return tmp;
+> +			return skb;
+>   		}
+>   
+>   		len -= tmp->len;
+
+
+Kind regards,
+
+Paul
+
+
+[1]: https://linux-regtracking.leemhuis.info/regzbot/mainline/
