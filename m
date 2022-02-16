@@ -2,137 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20946C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 10:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7224C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 12:05:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230235AbiBPKoa (ORCPT
+        id S232849AbiBPMFm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Feb 2022 05:44:30 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41020 "EHLO
+        Wed, 16 Feb 2022 07:05:42 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiBPKoa (ORCPT
+        with ESMTP id S229908AbiBPMFl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Feb 2022 05:44:30 -0500
-Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 755191A839
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 02:44:16 -0800 (PST)
-Received: by ajax-webmail-mail-app2 (Coremail) ; Wed, 16 Feb 2022 18:44:11
- +0800 (GMT+08:00)
-X-Originating-IP: [222.205.6.121]
-Date:   Wed, 16 Feb 2022 18:44:11 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   "Lin Ma" <linma@zju.edu.cn>
-To:     "Marcel Holtmann" <marcel@holtmann.org>
-Cc:     "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: Re: [PATCH v1] Bluetooth: fix data races in smp_unregister(),
- smp_del_chan()
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2022 www.mailtech.cn zju.edu.cn
-In-Reply-To: <7C579AAE-EB97-4C87-9E5E-C39ACF6FF37B@holtmann.org>
-References: <20220216043714.22011-1-linma@zju.edu.cn>
- <7C579AAE-EB97-4C87-9E5E-C39ACF6FF37B@holtmann.org>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        Wed, 16 Feb 2022 07:05:41 -0500
+X-Greylist: delayed 464 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 16 Feb 2022 04:05:29 PST
+Received: from mail.heine.tech (mail.heine.tech [IPv6:2a01:4f8:1c0c:5073::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020491DE59A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 04:05:28 -0800 (PST)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPA id A08061814B9;
+        Wed, 16 Feb 2022 12:57:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=heine.tech; s=dkim;
+        t=1645012658; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+         content-transfer-encoding:in-reply-to;
+        bh=zEKbwPRsNTvuQSntWGvSbKBYf7Fm80VdBm6Y9QiEzDI=;
+        b=OFefllUxD2wSQcmDl/4ZqK789yEMRbf82f9mmjcn6LpN/Uzbuq0UF0Dsmxv+LHf9xCE9/q
+        y4xQxX4iALNZ5tGPdxK7R7IYJcMRBHe42VAdtKIT128jK5CgY2TrPaRMsqdenz4iBVXTyd
+        k7hO4cYsT+m08sMHsdTI+tw+eKgRaiw=
+From:   "Michael Nosthoff" <bluez@heine.tech>
+In-Reply-To: <20220215225015.3568246-1-fontaine.fabrice@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Date:   Wed, 16 Feb 2022 12:57:38 +0100
+Cc:     linux-bluetooth@vger.kernel.org,
+        "Michael Nosthoff" <bluez@heine.tech>,
+        "Michael Nosthoff" <buildroot@heine.tech>
+To:     "Fabrice Fontaine" <fontaine.fabrice@gmail.com>
 MIME-Version: 1.0
-Message-ID: <4a17d618.afef3.17f0221ea50.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: en_US
-X-CM-TRANSID: by_KCgAnL8N81Qxica7tAQ--.18479W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQTElNG3FSmxgA1sO
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+Message-ID: <50-620ce680-7-4d762500@265872973>
+Subject: =?utf-8?q?Re=3A?= [PATCH BlueZ] =?utf-8?q?tools/mesh-cfgtest=3A?= include 
+ limits.h
+User-Agent: SOGoMail 5.5.0
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: None
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsLAoKVGhhbmtzIGZvciB0aGUgdGltZWx5IHJlcGx5LgoKUmVnYXJkcwoKTGluCgoK
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2VzLS0tLS0KPiBGcm9tOiAiTWFyY2VsIEhvbHRtYW5uIiA8
-bWFyY2VsQGhvbHRtYW5uLm9yZz4KPiBTZW50IFRpbWU6IDIwMjItMDItMTYgMTg6MjM6NTIgKFdl
-ZG5lc2RheSkKPiBUbzogIkxpbiBNYSIgPGxpbm1hQHpqdS5lZHUuY24+Cj4gQ2M6ICJKb2hhbiBI
-ZWRiZXJnIiA8am9oYW4uaGVkYmVyZ0BnbWFpbC5jb20+LCAiTHVpeiBBdWd1c3RvIHZvbiBEZW50
-eiIgPGx1aXouZGVudHpAZ21haWwuY29tPiwgIkRhdmlkIFMuIE1pbGxlciIgPGRhdmVtQGRhdmVt
-bG9mdC5uZXQ+LCBsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCB2MV0gQmx1ZXRvb3RoOiBmaXggZGF0YSByYWNlcyBpbiBzbXBfdW5yZWdpc3Rlcigp
-LCBzbXBfZGVsX2NoYW4oKQo+IAo+IEhpIExpbiwKPiAKPiA+IFByZXZpb3VzIGNvbW1pdCBlMDQ0
-ODA5MjBkMWUgKCJCbHVldG9vdGg6IGRlZmVyIGNsZWFudXAgb2YgcmVzb3VyY2VzCj4gPiBpbiBo
-Y2lfdW5yZWdpc3Rlcl9kZXYoKSIpIGRlZmVycyBhbGwgZGVzdHJ1Y3RpdmUgYWN0aW9ucyB0bwo+
-ID4gaGNpX3JlbGVhc2VfZGV2KCkgdG8gcHJldmVudCBjb2N1cnJlbnQgcHJvYmxlbXMgbGlrZSBO
-UEQsIFVBRi4KPiA+IAo+ID4gSG93ZXZlciwgdGhlcmUgYXJlIHN0aWxsIHNvbWUgZXhjZXB0aW9u
-cyB0aGF0IGFyZSBpZ25vcmVkLgo+ID4gCj4gPiBUaGUgc21wX3VucmVnaXN0ZXIoKSBpbiBoY2lf
-ZGV2X2Nsb3NlX3N5bmMoKSAocHJldmlvdXNseSBpbgo+ID4gaGNpX2Rldl9kb19jbG9zZSkgd2ls
-bCByZWxlYXNlIHJlc291cmNlcyBsaWtlIHRoZSBzZW5zaXRpdmUgY2hhbm5lbAo+ID4gYW5kIHRo
-ZSBzbXBfZGV2IG9iamVjdHMuIENvbnNpZGVyIHRoZSBzaXR1YXRpb25zIHRoZSBkZXZpY2UgaXMg
-ZGV0YWNoaW5nCj4gPiBvciBwb3dlciBkb3duIHdoaWxlIHRoZSBrZXJuZWwgaXMgc3RpbGwgb3Bl
-cmF0aW5nIG9uIGl0LCB0aGUgZm9sbG93aW5nCj4gPiBkYXRhIHJhY2UgY291bGQgdGFrZSBwbGFj
-ZS4KPiA+IAo+ID4gdGhyZWFkLUEgIGhjaV9kZXZfY2xvc2Vfc3luYyAgfCB0aHJlYWQtQiAgcmVh
-ZF9sb2NhbF9vb2JfZXh0X2RhdGEKPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgfAo+
-ID4gaGNpX2Rldl91bmxvY2soKSAgICAgICAgICAgICAgfAo+ID4gLi4uICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgfCBoY2lfZGV2X2xvY2soKQo+ID4gaWYgKGhkZXYtPnNtcF9kYXRhKSAgICAg
-ICAgICAgfAo+ID4gIGNoYW4gPSBoZGV2LT5zbXBfZGF0YSAgICAgICB8Cj4gPiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIHwgY2hhbiA9IGhkZXYtPnNtcF9kYXRhICgzKQo+ID4gICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICB8Cj4gPiAgaGRldi0+c21wX2RhdGEgPSBOVUxMICgxKSAg
-IHwgaWYgKCFjaGFuIHx8ICFjaGFuLT5kYXRhKSAoNCkKPiA+ICAuLi4gICAgICAgICAgICAgICAg
-ICAgICAgICAgfAo+ID4gIHNtcCA9IGNoYW4tPmRhdGEgICAgICAgICAgICB8IHNtcCA9IGNoYW4t
-PmRhdGEKPiA+ICBpZiAoc21wKSAgICAgICAgICAgICAgICAgICAgfAo+ID4gICAgY2hhbi0+ZGF0
-YSA9IE5VTEwgKDIpICAgICB8Cj4gPiAgICAuLi4gICAgICAgICAgICAgICAgICAgICAgIHwKPiA+
-ICAgIGtmcmVlX3NlbnNpdGl2ZShzbXApICAgICAgfAo+ID4gICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICB8IC8vIGRlcmVmZXJlbmNlIHNtcCB0cmlnZ2VyIFVGQQo+ID4gCj4gPiBUaGF0IGlz
-LCB0aGUgb2JqZWN0cyBoZGV2LT5zbXBfZGF0YSBhbmQgY2hhbi0+ZGF0YSBib3RoIHN1ZmZlciBm
-cm9tIHRoZQo+ID4gZGF0YSByYWNlcy4gSW4gYSBwcmVlbXB0LWVuYWJsZSBrZXJuZWwsIHRoZSBh
-Ym92ZSBzY2hlZHVsZSAod2hlbiAoMykgaXMKPiA+IGJlZm9yZSAoMSkgYW5kICg0KSBpcyBiZWZv
-cmUgKDIpKSBsZWFkcyB0byBVQUYgYnVncy4gSXQgY2FuIGJlCj4gPiByZXByb2R1Y2VkIGluIHRo
-ZSBsYXRlc3Qga2VybmVsIGFuZCBiZWxvdyBpcyBwYXJ0IG9mIHRoZSByZXBvcnQ6Cj4gPiAKPiA+
-IFsgICA0OS4wOTcxNDZdID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT0KPiA+IFsgICA0OS4wOTc2MTFdIEJVRzogS0FTQU46IHVz
-ZS1hZnRlci1mcmVlIGluIHNtcF9nZW5lcmF0ZV9vb2IrMHgyZGQvMHg1NzAKPiA+IFsgICA0OS4w
-OTc2MTFdIFJlYWQgb2Ygc2l6ZSA4IGF0IGFkZHIgZmZmZjg4ODAwNjUyODM2MCBieSB0YXNrIGdl
-bmVyYXRlX29vYi8xNTUKPiA+IFsgICA0OS4wOTc2MTFdCj4gPiBbICAgNDkuMDk3NjExXSBDYWxs
-IFRyYWNlOgo+ID4gWyAgIDQ5LjA5NzYxMV0gIDxUQVNLPgo+ID4gWyAgIDQ5LjA5NzYxMV0gIGR1
-bXBfc3RhY2tfbHZsKzB4MzQvMHg0NAo+ID4gWyAgIDQ5LjA5NzYxMV0gIHByaW50X2FkZHJlc3Nf
-ZGVzY3JpcHRpb24uY29uc3Rwcm9wLjArMHgxZi8weDE1MAo+ID4gWyAgIDQ5LjA5NzYxMV0gID8g
-c21wX2dlbmVyYXRlX29vYisweDJkZC8weDU3MAo+ID4gWyAgIDQ5LjA5NzYxMV0gID8gc21wX2dl
-bmVyYXRlX29vYisweDJkZC8weDU3MAo+ID4gWyAgIDQ5LjA5NzYxMV0gIGthc2FuX3JlcG9ydC5j
-b2xkKzB4N2YvMHgxMWIKPiA+IFsgICA0OS4wOTc2MTFdICA/IHNtcF9nZW5lcmF0ZV9vb2IrMHgy
-ZGQvMHg1NzAKPiA+IFsgICA0OS4wOTc2MTFdICBzbXBfZ2VuZXJhdGVfb29iKzB4MmRkLzB4NTcw
-Cj4gPiBbICAgNDkuMDk3NjExXSAgcmVhZF9sb2NhbF9vb2JfZXh0X2RhdGErMHg2ODkvMHhjMzAK
-PiA+IFsgICA0OS4wOTc2MTFdICA/IGhjaV9ldmVudF9wYWNrZXQrMHhjODAvMHhjODAKPiA+IFsg
-ICA0OS4wOTc2MTFdICA/IHN5c3ZlY19hcGljX3RpbWVyX2ludGVycnVwdCsweDliLzB4YzAKPiA+
-IFsgICA0OS4wOTc2MTFdICA/IGFzbV9zeXN2ZWNfYXBpY190aW1lcl9pbnRlcnJ1cHQrMHgxMi8w
-eDIwCj4gPiBbICAgNDkuMDk3NjExXSAgPyBtZ210X2luaXRfaGRldisweDFjLzB4MjQwCj4gPiBb
-ICAgNDkuMDk3NjExXSAgPyBtZ210X2luaXRfaGRldisweDI4LzB4MjQwCj4gPiBbICAgNDkuMDk3
-NjExXSAgaGNpX3NvY2tfc2VuZG1zZysweDE4ODAvMHgxZTcwCj4gPiBbICAgNDkuMDk3NjExXSAg
-PyBjcmVhdGVfbW9uaXRvcl9ldmVudCsweDg5MC8weDg5MAo+ID4gWyAgIDQ5LjA5NzYxMV0gID8g
-Y3JlYXRlX21vbml0b3JfZXZlbnQrMHg4OTAvMHg4OTAKPiA+IFsgICA0OS4wOTc2MTFdICBzb2Nr
-X3NlbmRtc2crMHhkZi8weDExMAo+ID4gWyAgIDQ5LjA5NzYxMV0gIF9fc3lzX3NlbmR0bysweDE5
-ZS8weDI3MAo+ID4gWyAgIDQ5LjA5NzYxMV0gID8gX19pYTMyX3N5c19nZXRwZWVybmFtZSsweGEw
-LzB4YTAKPiA+IFsgICA0OS4wOTc2MTFdICA/IGtlcm5lbF9mcHVfYmVnaW5fbWFzaysweDFjMC8w
-eDFjMAo+ID4gWyAgIDQ5LjA5NzYxMV0gIF9feDY0X3N5c19zZW5kdG8rMHhkOC8weDFiMAo+ID4g
-WyAgIDQ5LjA5NzYxMV0gID8gc3lzY2FsbF9leGl0X3RvX3VzZXJfbW9kZSsweDFkLzB4NDAKPiA+
-IFsgICA0OS4wOTc2MTFdICBkb19zeXNjYWxsXzY0KzB4M2IvMHg5MAo+ID4gWyAgIDQ5LjA5NzYx
-MV0gIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDQ0LzB4YWUKPiA+IFsgICA0OS4w
-OTc2MTFdIFJJUDogMDAzMzoweDdmNWE1OWY1MWY2NAo+ID4gLi4uCj4gPiBbICAgNDkuMDk3NjEx
-XSBSQVg6IGZmZmZmZmZmZmZmZmZmZGEgUkJYOiAwMDAwMDAwMDAwMDAwMDAwIFJDWDogMDAwMDdm
-NWE1OWY1MWY2NAo+ID4gWyAgIDQ5LjA5NzYxMV0gUkRYOiAwMDAwMDAwMDAwMDAwMDA3IFJTSTog
-MDAwMDdmNWE1OWQ2YWM3MCBSREk6IDAwMDAwMDAwMDAwMDAwMDYKPiA+IFsgICA0OS4wOTc2MTFd
-IFJCUDogMDAwMDAwMDAwMDAwMDAwMCBSMDg6IDAwMDAwMDAwMDAwMDAwMDAgUjA5OiAwMDAwMDAw
-MDAwMDAwMDAwCj4gPiBbICAgNDkuMDk3NjExXSBSMTA6IDAwMDAwMDAwMDAwMDAwNDAgUjExOiAw
-MDAwMDAwMDAwMDAwMjQ2IFIxMjogMDAwMDdmZmVjMjY5MTZlZQo+ID4gWyAgIDQ5LjA5NzYxMV0g
-UjEzOiAwMDAwN2ZmZWMyNjkxNmVmIFIxNDogMDAwMDdmNWE1OWQ2YWZjMCBSMTU6IDAwMDA3ZjVh
-NTlkNmI3MDAKPiA+IAo+ID4gVG8gc29sdmUgdGhlc2UgZGF0YSByYWNlcywgdGhpcyBwYXRjaCBw
-bGFjZXMgdGhlIHNtcF91bnJlZ2lzdGVyKCkKPiA+IGZ1bmN0aW9uIGluIHRoZSBwcm90ZWN0ZWQg
-YXJlYSBieSB0aGUgaGNpX2Rldl9sb2NrKCkuIFRoYXQgaXMsIHRoZQo+ID4gc21wX3VucmVnaXN0
-ZXIoKSBmdW5jdGlvbiBjYW4gbm90IGJlIGNvbmN1cnJlbnRseSBleGVjdXRlZCB3aGVuCj4gPiBv
-cGVyYXRpbmcgZnVuY3Rpb25zIChtb3N0IG9mIHRoZW0gYXJlIG1nbXQgb3BlcmF0aW9ucyBpbiBt
-Z210LmMpIGhvbGQKPiA+IHRoZSBkZXZpY2UgbG9jay4KPiA+IAo+ID4gVGhpcyBwYXRjaCBpcyB0
-ZXN0ZWQgd2l0aCBrZXJuZWwgTE9DSyBERUJVR0dJTkcgZW5hYmxlZC4gVGhlIHByaWNlIGZyb20K
-PiA+IHRoZSBleHRlbmRlZCBob2xkaW5nIHRpbWUgb2YgdGhlIGRldmljZSBsb2NrIGlzIHN1cHBv
-c2VkIHRvIGJlIGxvdyBhcyB0aGUKPiA+IHNtcF91bnJlZ2lzdGVyKCkgZnVuY3Rpb24gaXMgZmFp
-cmx5IHNob3J0IGFuZCBlZmZpY2llbnQuCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IExpbiBNYSA8
-bGlubWFAemp1LmVkdS5jbj4KPiA+IC0tLQo+ID4gbmV0L2JsdWV0b290aC9oY2lfc3luYy5jIHwg
-NCArKy0tCj4gPiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25zKCspLCAyIGRlbGV0aW9ucygt
-KQo+IAo+IHBhdGNoIGhhcyBiZWVuIGFwcGxpZWQgdG8gYmx1ZXRvb3RoLW5leHQgdHJlZS4KPiAK
-PiBSZWdhcmRzCj4gCj4gTWFyY2VsCg==
+Hi Fabrice,
+
+On Tuesday, February 15, 2022 23:50 CET, Fabrice Fontaine <fontaine.fab=
+rice@gmail.com> wrote:
+
+> ---
+> I'm sending back this patch as for an unknown reason, the patch sent =
+by
+> Michael in July 2021 is set as superseded in patchwork:
+> https://patchwork.kernel.org/project/bluetooth/patch/20210722204923.2=
+9735-1-bluez@heine.tech
+> 
+I had sent a v2 with an improved description. The buildbot didn't like =
+the Commit Msg because of the too long
+urls to the buildroot autobuilders. Maybe that's why it was marked as "=
+archived" on patchwork?
+
+https://patchwork.kernel.org/project/bluetooth/patch/20210723081039.303=
+96-1-bluez@heine.tech/
+
+Regards,
+Michael
+
