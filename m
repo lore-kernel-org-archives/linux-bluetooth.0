@@ -2,100 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D804C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 08:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E21C0C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 09:43:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231543AbiBPIPw (ORCPT
+        id S232391AbiBPJoE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Feb 2022 03:15:52 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:58972 "EHLO
+        Wed, 16 Feb 2022 04:44:04 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:33496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231528AbiBPIPk (ORCPT
+        with ESMTP id S232396AbiBPJoD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Feb 2022 03:15:40 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F59254A6A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 00:15:27 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id 195so1495272pgc.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 00:15:27 -0800 (PST)
+        Wed, 16 Feb 2022 04:44:03 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F3B29926F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 01:43:46 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id o3so1509863qtm.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 01:43:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=W+2TrrUJvMSS9r6nDjg8VXFSYq69Wj2ThIHgUyzlIIo=;
-        b=YBLxiKIPo2TAHc8rAx95Jlj7n1WAai/8MsIuAvnD4OF+55PhUl8CFLK6VcmoE3qSeE
-         qU7Ahjk69cesCDj4j6Wgmx6TSutbKRqcOQ2dNCWd/0L2thupEq2hI1Kp/ETd0rjdxnnU
-         T94U655ljaShB+3LydMvKqO64lcIJYWvXq5Pc=
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=8wjWUF6yExlyFHsvGimj9nTfGy8vbqcTdR05/PDJF4I=;
+        b=APH+EgPoWk3fMvMqPHG/9LaZcGYlq+sxFNd+vy2Z8Wwv2O2pt8k68oHf6OFQSl+g28
+         uMvi6j9gElebMyYiyMHLDiwKoJLBoGYXkOfxn8dokltYQ7PBESdPcF1TWgbt/nfd3LzQ
+         r/a9twIo82EdR3iZoIyANsA1MKkoN+72TJks+IH7sFSyzfS1UeZE84y5zif5J61HtMth
+         zxvNWIarS+kNA0FS6uUcgLSExsM2NHQFJqXbP0fcdI3vUsq8V+63wU02HCYSNRYZKEHj
+         bQC4XYekLYQtF3DIe2ZtHkxrWoU7U7kgQRUSiWi29U1JaBPh7oWwShLT4NNyb56cR0Zi
+         +aYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=W+2TrrUJvMSS9r6nDjg8VXFSYq69Wj2ThIHgUyzlIIo=;
-        b=jHQQkAWZmnI2vE8DPsQiF6ChLGf5XYmfgqiPdV9hEl4B8fTzRJoWglzyBvbQNI3qhI
-         qrweIhrIEmdQCXPISjB/HZNw/I+sasOqV87fyfvJNejFSI1Oa8phZL8UCa8vrS2JYk//
-         CYZWRvkKBEw4UFDNpX4DxA21rkNFMHasBuVU1c9lDkrvkFNq1Fax5HuR7mMvV4m0l0O1
-         CHkoi9MsniwG9xdgdttfQa/7WEwRW4U3stb6Rkolh5tGeSKGPRkVRMQFG1W+dIku0uOR
-         gVPlGQ98eJ5+hfKMx/AOHoKQ7EesGRSaKbXfGphuarGNKMv1X+wlLzC+0lNXnWiwCeOD
-         mviQ==
-X-Gm-Message-State: AOAM530h3krsm304MTcWaOMw2+fghkukg6nhfAjyWDA2PRVwlhr4SW9b
-        6WhdsG8nSmjvfuAE7zpoISxcThrtJQYc8w==
-X-Google-Smtp-Source: ABdhPJzkScTdOeWcVLIp9sCLIJlWP4WekbWWGA+pfGW8kQpmMQ6jjfLiZrI9pswyvD9prTts6ZbU4g==
-X-Received: by 2002:a62:2902:0:b0:4ca:75a3:aa1c with SMTP id p2-20020a622902000000b004ca75a3aa1cmr1507401pfp.65.1644999326664;
-        Wed, 16 Feb 2022 00:15:26 -0800 (PST)
-Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id h5sm8268043pfc.118.2022.02.16.00.15.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Feb 2022 00:15:26 -0800 (PST)
-From:   Joseph Hwang <josephsih@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
-        Joseph Hwang <josephsih@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Shuo-Peng Liao <deanliao@chromium.org>
-Subject: [BlueZ PATCH v1] monitor: fix division by zero about conn->tx_pkt_med
-Date:   Wed, 16 Feb 2022 16:15:18 +0800
-Message-Id: <20220216081518.2956782-1-josephsih@chromium.org>
-X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=8wjWUF6yExlyFHsvGimj9nTfGy8vbqcTdR05/PDJF4I=;
+        b=UDCy2UqrQwf8DLub5hSQYW+jMTPtumcBiE8ryXKKzPofpni1u+Ste0QKO0HULxH1HV
+         ZzvGYcyoellBzbs3IqvI6w9AQ+FLHrhcgUds3wlBdUVLwvgM2Jkvn7nniP60aFXMQWWy
+         B2KZScqP9DZaTU0cYVsdZXjXhStn86gLbdlqHRyRcI9YmG0ArMJ2SSK0GfBFrlWOWe6l
+         aScrWDdSbDskxbVR+Z756TPCliqJwMzDSuf26726zXzrXWW2s41u1LzwGwHnevVbWCDJ
+         ffHeHWRHv65WkeI04ZtP+FTXD/J19tlGgVFdA4LTl9w2JctvreHAl9Y0JHP591kQP4um
+         zx6g==
+X-Gm-Message-State: AOAM531U0TH8qD0xN1moglTqB999PW6QB+ndvgFgqHQ2JwPKYHR4YNkX
+        XkPBBfjwTM4DrahrN6uLeSpzGZU4uhQdPg==
+X-Google-Smtp-Source: ABdhPJzxmNIakH5R0jcAnbqBgcxjCDX/92HOV/RUMof0lxyPyLgx/yY1ON3e+6pXVZ+5GBhsBRjpeg==
+X-Received: by 2002:ac8:7d48:0:b0:2d6:102:e38c with SMTP id h8-20020ac87d48000000b002d60102e38cmr1348915qtb.251.1645004625384;
+        Wed, 16 Feb 2022 01:43:45 -0800 (PST)
+Received: from [172.17.0.2] ([137.135.109.179])
+        by smtp.gmail.com with ESMTPSA id r13sm13000982qkp.129.2022.02.16.01.43.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Feb 2022 01:43:44 -0800 (PST)
+Message-ID: <620cc750.1c69fb81.b21a0.80d9@mx.google.com>
+Date:   Wed, 16 Feb 2022 01:43:44 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1888096578589858059=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, josephsih@chromium.org
+Subject: RE: [BlueZ,v1] monitor: fix division by zero about conn->tx_pkt_med
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220216081518.2956782-1-josephsih@chromium.org>
+References: <20220216081518.2956782-1-josephsih@chromium.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In a connection without outgoing traffic, conn->tx_num will remain 0.
-In this case, conn->tx_pkt_med should be simply 0 without calculating
-"conn->tx_bytes / conn->tx_num".
+--===============1888096578589858059==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This was likely to happen, for example, when "btmon -w btsnoop.log"
-was launched in the middle of a LE mouse connection, and a number of
-incoming ACL Data RX were received as the mouse movements.  When
-running "btmon -a btsnoop.log", it would encounter this error.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Yun-Hao Chung <howardchung@chromium.org>
-Reviewed-by: Shuo-Peng Liao <deanliao@chromium.org>
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614851
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.49 seconds
+GitLint                       PASS      1.01 seconds
+Prep - Setup ELL              PASS      51.66 seconds
+Build - Prep                  PASS      0.93 seconds
+Build - Configure             PASS      10.55 seconds
+Build - Make                  PASS      1818.86 seconds
+Make Check                    PASS      12.41 seconds
+Make Check w/Valgrind         PASS      534.70 seconds
+Make Distcheck                PASS      283.60 seconds
+Build w/ext ELL - Configure   PASS      10.79 seconds
+Build w/ext ELL - Make        PASS      1795.15 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- monitor/analyze.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 0c74e8f2e..ac23e13bb 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -161,7 +161,8 @@ static void conn_destroy(void *data)
- 		break;
- 	}
- 
--	conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
-+	if (conn->tx_num > 0)
-+		conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
- 
- 	printf("  Found %s connection with handle %u\n", str, conn->handle);
- 	/* TODO: Store address type */
--- 
-2.35.1.265.g69c8d7142f-goog
-
+--===============1888096578589858059==--
