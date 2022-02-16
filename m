@@ -2,142 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC27C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 22:18:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66988C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 22:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236853AbiBPWSj (ORCPT
+        id S237036AbiBPWgR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Feb 2022 17:18:39 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53606 "EHLO
+        Wed, 16 Feb 2022 17:36:17 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:50086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbiBPWSi (ORCPT
+        with ESMTP id S234060AbiBPWgR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Feb 2022 17:18:38 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC0C20193F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 14:18:25 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id h5so1523668ioj.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 14:18:25 -0800 (PST)
+        Wed, 16 Feb 2022 17:36:17 -0500
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDB7B250384
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 14:36:02 -0800 (PST)
+Received: by mail-lj1-x234.google.com with SMTP id bx31so5626496ljb.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 14:36:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=gy8Q7hwl+Y0piUzmJiK8zHQPZ0ofgoAuSIy6CuzRRHM=;
-        b=ERBDA4U2BmbNnIYU23K7qKgE5dhF75zwzJDx7Baps4E90zWU1j2nB4NUstQE0ZQkCs
-         4HfwpH4iMM7MpCEIIZuYW5P7VpKNWlJ5EYhdBhipoFfxU/z14e+7rz4xUNBXxwiNN8Qv
-         bQwAh9PVly1Q1h1Ts1QVqjZ2BfBdu9KBjk0X37FXcwrUkw7oc0n9kE7Ydm3B2JG8Gkct
-         v3NoUsiDg9JNkWtveBQ+SNyaD/nRVwCt30j71zmf2tmSrFLM3AYHO+ZlbIfYWcX1e5Re
-         fJY23yNPLffQRcJDnCcqd2q6/BHO9cFqBEIDvu+zIS6QH8Ke6lJLG6nxGA1iowescTVm
-         mBOw==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=L2XOBELbHv+EuWLZVpKFvNB150NWh8Nm4wce+iA2D/4=;
+        b=Rjp8IhwO5ZaT7lgQ/6tVX0LXid13jfWhOXk5fXmb7emnhS6nbD0ozDla3ZEP/2xfhR
+         6Fk7pl5YAN2R3bm8V/ojdIlHu+UeF/+0zzUvqOgQk47PH+avNGHSvhxj1rZDvhyNxK83
+         Z0wxCdOme5KI0GY0EDPgyqadtMUVokI8UmY5InvwKJ6/bWEeR6XJy7AEwJcWkm1IDanS
+         F3mLXZX3RQEG9qT9EthwCCqx9LYdN2HOlaf3hkqH0vEu7AooFWA34DlqRF9iXMOfwsyt
+         gesnASCpZarKLeln21LGRhFpAjDJ/jeR1kmBGtX7swDA13r2JTWKscUel1VyIo+BXxip
+         tmoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=gy8Q7hwl+Y0piUzmJiK8zHQPZ0ofgoAuSIy6CuzRRHM=;
-        b=WKFRrtCRChfXfqGrd73091/8neSKfQLic2PJHoeQ44W9gOaPzAjJm9AFxXAHMYYTLq
-         moH1+Ik8ica+DwtBq57QAl78Qj9+SdJ2hFHKfMxS5pySXyLsPx+E24NstKOTatuYp+l4
-         3VWInyp9woN3heLSVrkkP1nzT3ToRdJZVVVy4Sw4GM8ym3JjuwwdS36lrAjAcP9jMqQC
-         Mtw6DHG0hkw69/t0Hf7kL/cT32fLm5x+L8cHwL/+jNjyAMTK0pFejn6hKOgHYcSR9TF6
-         Z3T9zCcsyNyHuweDAdeAu5PvSPDbYzMoYTfMjE9I4zueVl/zfMhIjlITImfrYxT7l01b
-         Spvg==
-X-Gm-Message-State: AOAM532X79XjfOPH/eq1a4bdIJRcdIY9liOPzqbnm9g+EvEBowvPq8qL
-        Rvsvm+A+HHzz+YwTlWBvx/7P5rmvQTKEnA==
-X-Google-Smtp-Source: ABdhPJw3/YDtZo8Zl+M/ZUZAIjT8Ma2P6KT/6IiSh9pXtuanizJtKQNnAhRnIewsvO3pTqn4Fn8TcQ==
-X-Received: by 2002:a05:6638:b1a:b0:311:4aa1:6c36 with SMTP id a26-20020a0566380b1a00b003114aa16c36mr3213383jab.281.1645049904249;
-        Wed, 16 Feb 2022 14:18:24 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id j15sm608216ile.6.2022.02.16.14.18.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Feb 2022 14:18:24 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sync: Fix not using conn_timeout
-Date:   Wed, 16 Feb 2022 14:18:22 -0800
-Message-Id: <20220216221822.2694867-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        bh=L2XOBELbHv+EuWLZVpKFvNB150NWh8Nm4wce+iA2D/4=;
+        b=uNMmhPjQMpyoQJFw1BV707N2+5aRF+GzuSjqUJHbVCRaNfs/bexDjPk4/IYjpH9qZ0
+         l3KWkSbbCrfWoSE1xNh9w9E5Uo9/Y752rsT+RjQ7sYAnbMbH36t3VPUVBktX3c6JuICc
+         E/+/QW0wJfHg798Kbyy8ohJJURCNtcG2IBHPEMZAHa1rr5l34UDCcJkL0saOGcOLJVux
+         7hl4ng/UistIdFM2rBM6wNWACC0WHjVF4XiTetymdCmjMoDpN9JZfFbRYob7303Ss2fD
+         cwfy+RxSKxrjmfYzM0m62TQFwF5eMt44TBMn5N+VNprh68jBfgPbCt6PhqmFUSD6qn76
+         yXLA==
+X-Gm-Message-State: AOAM530MXEbpRJOHiC7PP9Rluec0D44N9YeG6HE/4+it2F0NG2m+ynk7
+        mcNyLSAX08WONWQ55e5mQ8epH7uINQM=
+X-Google-Smtp-Source: ABdhPJwBXnIZiGt+vwO42JufuZOtmFkPxX6qqW5ancAgy0c/JW//XlRSW1bGfzRFjUWPCQ5kEFlPgg==
+X-Received: by 2002:a2e:aaa3:0:b0:244:e280:3b0d with SMTP id bj35-20020a2eaaa3000000b00244e2803b0dmr137743ljb.63.1645050960966;
+        Wed, 16 Feb 2022 14:36:00 -0800 (PST)
+Received: from ?IPV6:2a02:2168:8737:3600:64fc:d235:9024:8319? ([2a02:2168:8737:3600:64fc:d235:9024:8319])
+        by smtp.gmail.com with ESMTPSA id i16sm900874ljb.117.2022.02.16.14.36.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Feb 2022 14:36:00 -0800 (PST)
+Message-ID: <b7a2b073-fd69-36a4-6ce0-cb1b942ccde6@gmail.com>
+Date:   Thu, 17 Feb 2022 01:35:59 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:97.0) Gecko/20100101
+ Thunderbird/97.0
+Subject: Re: Lenovo Legion M600 wireless bluetooth mouse connected and paired
+ yet not working
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
+ <CABBYNZLA6bRCxd=Tse_XbUT8ReBo4QjvstSassfQAcTX+Fk9_g@mail.gmail.com>
+ <b50b9b75-96ea-0d93-3687-3a79cdec5419@gmail.com>
+ <CABBYNZKAUMOZ8vhk2ATPOaVHbcqCTg-DMD2vypkx_CTOjeVg2g@mail.gmail.com>
+ <6bec2be7-a411-c5bf-6e5d-b3efee33b834@gmail.com>
+ <CABBYNZLAZGoB1JKW63SNJuFB-4raDvHjjEk4w8y0K1MLwe4b7A@mail.gmail.com>
+From:   Andrey Butirsky <butirsky@gmail.com>
+In-Reply-To: <CABBYNZLAZGoB1JKW63SNJuFB-4raDvHjjEk4w8y0K1MLwe4b7A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 17.02.2022 00:08, Luiz Augusto von Dentz wrote:
+>> It's BlueZ Version: 5.60-0ubuntu2.2, Ubuntu 21.10
+> I try upgrading or better yet use the head since we have some fixes like:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/profiles/input/hog-lib.c?id=0516d2527ea83c8fa209d52c564ce99408a00fbe
 
-When using hci_le_create_conn_sync it shall wait for the conn_timeout
-since the connection complete may take longer than just 2 seconds.
-
-Also fix the masking of HCI_EV_LE_ENHANCED_CONN_COMPLETE and
-HCI_EV_LE_CONN_COMPLETE so they are never both set so we can predict
-which one the controller will use in case of HCI_OP_LE_CREATE_CONN.
-
-Fixes: 6cd29ec6ae5e3 ("Bluetooth: hci_sync: Wait for proper events when connecting LE")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_sync.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9dbf007e3dc7..002f9c5b5371 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3265,11 +3265,17 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT)
- 		events[0] |= 0x40;	/* LE Data Length Change */
- 
--	/* If the controller supports LL Privacy feature, enable
--	 * the corresponding event.
-+	/* If the controller supports LL Privacy feature or LE Extended
-+	 * Create Connection, enable the corresponding event.
- 	 */
--	if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
-+	if (ll_privacy_capable(hdev) || hdev->commands[37] & 0x80) {
- 		events[1] |= 0x02;	/* LE Enhanced Connection Complete */
-+	} else if (hdev->commands[26] & 0x10) {
-+		/* If the controller supports the LE Create Connection
-+		 * command, enable the corresponding event.
-+		 */
-+		events[0] |= 0x01;	/* LE Connection Complete */
-+	}
- 
- 	/* If the controller supports Extended Scanner Filter
- 	 * Policies, enable the corresponding event.
-@@ -3289,12 +3295,6 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (hdev->commands[26] & 0x08)
- 		events[0] |= 0x02;	/* LE Advertising Report */
- 
--	/* If the controller supports the LE Create Connection
--	 * command, enable the corresponding event.
--	 */
--	if (hdev->commands[26] & 0x10)
--		events[0] |= 0x01;	/* LE Connection Complete */
--
- 	/* If the controller supports the LE Connection Update
- 	 * command, enable the corresponding event.
- 	 */
-@@ -5188,7 +5188,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
- 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_EXT_CREATE_CONN,
- 					plen, data,
- 					HCI_EV_LE_ENHANCED_CONN_COMPLETE,
--					HCI_CMD_TIMEOUT, NULL);
-+					conn->conn_timeout, NULL);
- }
- 
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -5274,8 +5274,11 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	cp.max_ce_len = cpu_to_le16(0x0000);
- 
- 	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CONN,
--				       sizeof(cp), &cp, HCI_EV_LE_CONN_COMPLETE,
--				       HCI_CMD_TIMEOUT, NULL);
-+				       sizeof(cp), &cp,
-+				       ll_privacy_capable(hdev) ?
-+				       HCI_EV_LE_ENHANCED_CONN_COMPLETE :
-+				       HCI_EV_LE_CONN_COMPLETE,
-+				       conn->conn_timeout, NULL);
- 
- done:
- 	/* Re-enable advertising after the connection attempt is finished. */
--- 
-2.35.1
+Tried BlueZ 5.63 on my Fedora installation, no luck. Will try to build 
+head if no better idea..
 
