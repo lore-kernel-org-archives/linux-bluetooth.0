@@ -2,138 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D23F6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 01:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CD9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 02:48:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245738AbiBPB50 (ORCPT
+        id S1343648AbiBPCsM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 20:57:26 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34750 "EHLO
+        Tue, 15 Feb 2022 21:48:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235112AbiBPB5V (ORCPT
+        with ESMTP id S237229AbiBPCsK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 20:57:21 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8AA7F6D6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 17:57:06 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id l125so1647828ybl.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 17:57:06 -0800 (PST)
+        Tue, 15 Feb 2022 21:48:10 -0500
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 858C019C33
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 18:47:59 -0800 (PST)
+Received: by mail-qt1-x836.google.com with SMTP id ca12so862392qtb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 18:47:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZT4wF/MHqavWEsO40mxjqMITqCdp59SbwsnEV7hRF7g=;
-        b=PerSpL7e4qINu5kCY49pWoLsJeCrR96nNucAiC9ZHmVcOoYg9JGlfDu46mLuFePTnh
-         36sTiAa4sZZWv3Ev7OTYXNFf8Kr+wx5+e+BmV3lSNTPyKTYeNau2KiZbpakxqYibb+cW
-         SaivgQLIwxIiDXxlQ775Rjg7W5sijsF5qQLKAC4hOXc9TaDZONzC4OpGZEmG/5pyOZqf
-         B5mryRyhCoU/S+aBVq9FIYoB27u37RH3fUfscvuoiylO53kUv9hJ1Zx9rPB5ys95VSLJ
-         x2viZ35LtseDIu1epgwhfbWcXLyZTrUXY8KEuK9Z1wpcPHbrd3oSVe4fKyfEtE4mWMEM
-         E7Rg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=OmDiAuo0Sg6JwR+Y+Ph5WJF8B14X5J6eyBQVJbHNDpE=;
+        b=U63Voo4Cf4g/I480cikoMKOWT+yIsvcBT4e7LfEoV78jF1DTf4qnJihCyTKfn9UPuo
+         eGq9OFYH0q8FXld84QjLSidQ+D+AMIJJap+C827LEkmgITNYG8NZTNs1iCPiaYyr7fGZ
+         D5/UqfjDeZgAbyM/VkyfXzeNtkqznRZV4Q3XmGNM0YVWTKyaVyIMS3YdjGd89PMKJINQ
+         t162KWsQ2O+8q6eZKXDbW7udNLqbQjOrXGtnXzEHR4RsrCICNt7kh9kubVH8KTVeQpof
+         eM1kMtPMIdGmghev3Qo4i836prFQ01oxyGGs6jXeF6JlDbANXKgcVh0XqH3ofyXwWFHT
+         6Psg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZT4wF/MHqavWEsO40mxjqMITqCdp59SbwsnEV7hRF7g=;
-        b=Uq0AaTAcVf1PlypmrByh+Kr18VK4mdDzyR6RFaesamZdsNpmmaaYSB/CNX2nwaCNOc
-         q9R2T/XRhLAIjlvjc3YEVPYCzh2Cl1YGw8MBBNhOLiNUIU5JKsg2DNnv8I2VEIr7bkzR
-         ljuyx+moLJnsVO5VIIxiM2lmR74o51WMG3gLhSuy0J1Od6gvUNvDtZQ5e3AgrxyCVYw8
-         XuXFuWaglsi7ZLUnAr9xkCmA389731S+z8SWR0GBM92SSpTWQxbIGozfNXxLeOCAoPhd
-         ivuS+y1eWvS3s7aZP+k3fTiG528qGjAZtbxszVEHD/2NgTL/kzgzEyRIJ+LEwOkmj8IF
-         i67w==
-X-Gm-Message-State: AOAM531ymP7bJTDwaCMON8F9ezBn+EN+45Bl/8yr6HlfvSg1OUEurhI/
-        I4qnpMEHlOUcuRnsSHpESImSpk2NQ1OUF97TnSo=
-X-Google-Smtp-Source: ABdhPJxENvgHgTR46PepwnRA1Df6r+EHe704LD1//d3bKHM11rXf4Muilyxq34HMbcOKDq8ioxenOJ4bjIMSD/kN+zs=
-X-Received: by 2002:a81:ed06:0:b0:2d1:5f32:7e94 with SMTP id
- k6-20020a81ed06000000b002d15f327e94mr508170ywm.317.1644976625420; Tue, 15 Feb
- 2022 17:57:05 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=OmDiAuo0Sg6JwR+Y+Ph5WJF8B14X5J6eyBQVJbHNDpE=;
+        b=XngDorUwDkKxQe/nz3sjep4IVcUxjNrBMshy2KfJQ3G+8V+6XoJ7be1cXKAx/WF8jM
+         9PgWWibyoMsOkGGN55choanEFw9fykiyF8pVvmpU8ZjM7PLMlsc1UsUUhj9crIkAHXvj
+         b0V2S8XY+Bn5XxZ89siboAXZJeRORqHZpwNxXebZVoRPSFv6TddTZnj2ZBQmwIonLIfC
+         J4SAmAI9FapR5RI4N+MHix5EJU0lLNBwppCtRyybtE5tTKI4SfyJEjvtFgOw3u+ulisZ
+         VxlAxEP7EUWEeTl2O60z6YkQ8wHwXh3YUssAAEjiwbttAnFmaG56PkT6PyvoKqY2Eg8a
+         fBcA==
+X-Gm-Message-State: AOAM530yWYp3+77u5TB2Djzdchx3vvN7sGNSAyVYOWQStDiuszL4qGod
+        avzgsHAv/vhpgnfJouBckvP871tFM5/fvw==
+X-Google-Smtp-Source: ABdhPJxIspQwegoMvPziHMPyowrV8KhAiiJd7JFQchNPqn9eMwHA3GRsEWtael6ddOj0SN+G00h+kg==
+X-Received: by 2002:a05:622a:1828:b0:2cf:51e6:b5d4 with SMTP id t40-20020a05622a182800b002cf51e6b5d4mr704803qtc.148.1644979678562;
+        Tue, 15 Feb 2022 18:47:58 -0800 (PST)
+Received: from [172.17.0.2] ([13.82.220.109])
+        by smtp.gmail.com with ESMTPSA id q139sm6850714qke.104.2022.02.15.18.47.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Feb 2022 18:47:57 -0800 (PST)
+Message-ID: <620c65dd.1c69fb81.219fb.4da0@mx.google.com>
+Date:   Tue, 15 Feb 2022 18:47:57 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5757022944950741700=="
 MIME-Version: 1.0
-References: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
- <CAO271m=vQsGwRvpe2tUUMuqB7r2z2cAut27U1LY6bQ_sHAk3NA@mail.gmail.com>
- <CABBYNZKs-JH_g2iUxStL5bRu-1z1TVzrS5pk2RyXUK8hiWYb7Q@mail.gmail.com>
- <CAO271mnbrRxtEvMhc7GMaWY=BEKUzzv_CbN1j5WKf4NruKfJng@mail.gmail.com> <CAO271mkRwR9nMe79d78wJSiyybHjiZdGtGApAWBJjWqPYT3KYA@mail.gmail.com>
-In-Reply-To: <CAO271mkRwR9nMe79d78wJSiyybHjiZdGtGApAWBJjWqPYT3KYA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 15 Feb 2022 17:56:54 -0800
-Message-ID: <CABBYNZ+yPyH0u0jQbva33pY6Cx0U7t-rkn4OkJBjbbC-Lvztjg@mail.gmail.com>
-Subject: Re: Question about Trusted property
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,DO,NOT,MERGER] Test Patches
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220215233902.3090-1-hj.tedd.an@gmail.com>
+References: <20220215233902.3090-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+--===============5757022944950741700==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 15, 2022 at 8:50 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
->
-> Hi Luiz,
->
-> Friendly ping here. Could you respond to my RFC about adding "Bonded"
-> property? I am about to write the patch but I would like to hear
-> whether this makes sense from your perspective. Thanks.
+This is automated email and please do not reply to this email!
 
-Yes please go ahead and introduce it, also remember to add support to
-the likes of bluetoothctl as well.
+Dear submitter,
 
-> On Thu, Feb 10, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> >
-> > Hi Luiz,
-> >
-> > Thanks for the clarification. So my guess was right that it does not
-> > have to do with bondedness. In that case, do you think it makes sense
-> > to add a "Bonded" flag property to org.bluez.Device1? There are some
-> > use case flows that pair with a peer device but do not actually bond,
-> > and just with Paired property the UI can't know whether to show this
-> > device as "Bonded" or not.
-> >
-> > On Thu, Feb 10, 2022 at 1:30 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Sonny,
-> > >
-> > > On Thu, Feb 10, 2022 at 11:23 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > >
-> > > > Dear maintainers,
-> > > >
-> > > > Friendly ping on this question. Does adding "Bonded" property to
-> > > > org.bluez.Device1 make sense?
-> > > >
-> > > > On Fri, Feb 4, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
-> > > > >
-> > > > > Hi Luiz/BlueZ maintainers,
-> > > > >
-> > > > > What is the purpose of the Trusted property on org.bluez.Device1
-> > > > > interface? Does it mean whether the device is bonded? My experiment
-> > > > > with BlueZ shows that sometimes a device with "Trusted" property set
-> > > > > is not bonded (does not have pairing key stored) and also vice versa,
-> > > > > so I am assuming that the Trusted property means something else. What
-> > > > > is an example use case of the Trusted property?
-> > > > >
-> > > > > Eventually, what I am trying to achieve is for BlueZ clients to find
-> > > > > out whether a device is Bonded or not. Using the Paired property is
-> > > > > not very accurate because it is set to true during connection although
-> > > > > the device is not bonded (pairing key does not persist after
-> > > > > disconnection). For this purpose, I am about to propose adding
-> > > > > "Bonded" property to org.bluez.Device1. Some use cases include when
-> > > > > there is a temporary pairing with a peer device we don't want UI to
-> > > > > show that the device is in the Bonded device list. What do you think
-> > > > > about exposing the Bonded state via D-Bus? I will do the
-> > > > > implementation if this idea makes sense.
-> > > > >
-> > > > > Thanks!
-> > >
-> > > Trusted primary use is to bypass agent authorization, so when set the
-> > > agent will not have to authorize profile connections, and yes you can
-> > > set a device to be Trusted even without having it paired since the
-> > > bonding procedure refers to authentication rather than authorization
-> > > which is what Trusted controls.
-> > >
-> > >
-> > > --
-> > > Luiz Augusto von Dentz
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614726
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.41 seconds
+GitLint                       PASS      1.04 seconds
+Prep - Setup ELL              PASS      54.15 seconds
+Build - Prep                  PASS      0.95 seconds
+Build - Configure             PASS      10.99 seconds
+Build - Make                  PASS      1876.89 seconds
+Make Check                    PASS      12.92 seconds
+Make Check w/Valgrind         PASS      553.35 seconds
+Make Distcheck                PASS      289.38 seconds
+Build w/ext ELL - Configure   PASS      10.65 seconds
+Build w/ext ELL - Make        PASS      1829.24 seconds
+Incremental Build with patchesPASS      0.00 seconds
 
 
 
--- 
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5757022944950741700==--
