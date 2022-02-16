@@ -2,111 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D017AC43219
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 19:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050EBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 19:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237994AbiBPTGM (ORCPT
+        id S238045AbiBPTNB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Feb 2022 14:06:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:52602 "EHLO
+        Wed, 16 Feb 2022 14:13:01 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:48998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235595AbiBPTGL (ORCPT
+        with ESMTP id S238040AbiBPTNA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Feb 2022 14:06:11 -0500
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3523C27019F;
-        Wed, 16 Feb 2022 11:05:59 -0800 (PST)
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-2d641c31776so9255867b3.12;
-        Wed, 16 Feb 2022 11:05:59 -0800 (PST)
+        Wed, 16 Feb 2022 14:13:00 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08024E8685
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 11:12:47 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id b13so5710634edn.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 11:12:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=28gnj+XMtLZLxONL4SFPBLkXj4fxaMqzeVTUkVSlqac=;
+        b=eEmphGODii3w1fd44zy9IvonLOUquFrOlfn3JcgEympM3Bi6n8Xsu+Hfp3M4wzOPwc
+         Q8CZgRF0mnH7YAO5yUQNKPk5PH6qjulTF0sMt0IWsPS+ttTa8liVxPFij8elmTZkXX/K
+         eoNkoXH5YBCFQHCU99KBB8alC1g8CWlQdLEVo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yLrFIsE9bo3p9BnVIL7Uc7sprqnSKm0YOW7fBIQdERM=;
-        b=RuPu7SzNkaJd1WR9+wnB7RuMLb2/6JyYiKaOmBtWGY+4dQhlRrtGvZ6OCmGpbsWMoE
-         P6HWXArbpHHQ7o31q4rHYkzBeYrTVeQSPrCkdBec5F3RuJYRVM//BwT9telG3bmZAcoB
-         FxtlU7vncA/7M5kWQwcqyBdpk27zG/p5D5rGZq0nsDf1j034j4N9NruAlDbyjIIBOzmu
-         KbHBVnw1SI5P4hqVE2AIEQGFaF2ieMYBNUQvgI02g+e1RAX1uy1xzU6XISp25w56c5dM
-         rQeGODqdry9lEgQwF/Hg6FiJO1SoO7gDJ8o3BoJD78lW8gTuVok5Fl/klWvtUyspycM7
-         AmqA==
-X-Gm-Message-State: AOAM532jcwakILeJ+RRfPI4QyknirUMpZKArmVbmtERBQUf3YEr8M+pB
-        AOGbopeO05mizhBNkS7JDbWQ5dPD2ZUb11wOmK0=
-X-Google-Smtp-Source: ABdhPJyFOmiGOmRDkw8czUhuWEAUWZI3b6hfKAcdDSxdtm3oSTgs7z2noREt7vOvPl7JarLhxJEUxltkCz2WrL99cSU=
-X-Received: by 2002:a0d:c244:0:b0:2d1:1fbb:180d with SMTP id
- e65-20020a0dc244000000b002d11fbb180dmr3902361ywd.196.1645038358332; Wed, 16
- Feb 2022 11:05:58 -0800 (PST)
+        bh=28gnj+XMtLZLxONL4SFPBLkXj4fxaMqzeVTUkVSlqac=;
+        b=LDrTehTyUnpaGPOxbSF/nKjNDQ2ZV5KeBf4UAUpmLtoa5tghLYHMLKwm3T1m5tM40m
+         3j9EYV7NAbqc+VIR++ixpzxjNUD+8dRS0JumOmYlWevHe85q+HGOd89+lhVJF5XGqeeE
+         PRAkPU7hGNtZLRCuXls+I9exLvnCZUJxkxEiUV9owYcdyl+RqPRPzi1pB4BVJZAWDuYx
+         gJvQvjj8Qp+CImPAckO0ZsMC8aSRCGCYCqYOoIn+2jx0F2q5wQyqqvSgYrmAi/BCjBZ7
+         zZ87voNFNovBhjXtaobP4RgoysOT05s4bmbxS2Vpo3MlUxnKqPUQXu/ile1X0yNhk1CV
+         M1pw==
+X-Gm-Message-State: AOAM531qlb+J73tAWpuMmvwEQGOfTlhLqUBpctpf3OgG0cHJXGhbBtkG
+        PF30YtE1gXQRU+naXgkS0rjH7tS4WwQrtw==
+X-Google-Smtp-Source: ABdhPJwMhAdEEuO+38XNMIsQfdRad25KH0nqbmnnAIOYP/IAEgbIAkzIJamadBwPQPtVeJ0cXm1Wxg==
+X-Received: by 2002:a05:6402:2065:b0:407:eb07:740 with SMTP id bd5-20020a056402206500b00407eb070740mr4504328edb.406.1645038765371;
+        Wed, 16 Feb 2022 11:12:45 -0800 (PST)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com. [209.85.221.41])
+        by smtp.gmail.com with ESMTPSA id p18sm238311ejm.63.2022.02.16.11.12.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Feb 2022 11:12:45 -0800 (PST)
+Received: by mail-wr1-f41.google.com with SMTP id v12so5114723wrv.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 11:12:44 -0800 (PST)
+X-Received: by 2002:adf:dfc4:0:b0:1e4:ed7c:34ca with SMTP id
+ q4-20020adfdfc4000000b001e4ed7c34camr3408536wrn.22.1645038764318; Wed, 16 Feb
+ 2022 11:12:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20220215174743.GA878920@embeddedor> <202202151016.C0471D6E@keescook>
- <20220215192110.GA883653@embeddedor> <Ygv8wY75hNqS7zO6@unreal> <20220215193221.GA884407@embeddedor>
-In-Reply-To: <20220215193221.GA884407@embeddedor>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Wed, 16 Feb 2022 20:05:47 +0100
-Message-ID: <CAJZ5v0jpAnQk+Hub6ue6t712RW+W0YBjb_gAcZZbUeuYMGv7mg@mail.gmail.com>
-Subject: Re: [PATCH][next] treewide: Replace zero-length arrays with
- flexible-array members
-To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc:     Leon Romanovsky <leon@kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        linux-alpha@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-ia64@vger.kernel.org, linux-s390@vger.kernel.org,
-        Linux-sh list <linux-sh@vger.kernel.org>,
-        sparclinux@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-xtensa@linux-xtensa.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        nouveau <nouveau@lists.freedesktop.org>,
-        coresight@lists.linaro.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        bcm-kernel-feedback-list <bcm-kernel-feedback-list@broadcom.com>,
-        netdev <netdev@vger.kernel.org>,
-        Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-        "open list:TARGET SUBSYSTEM" <linux-scsi@vger.kernel.org>,
-        target-devel@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
-        linux-staging@lists.linux.dev,
-        linux-rpi-kernel@lists.infradead.org, sparmaintainer@unisys.com,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        Ext4 Developers List <linux-ext4@vger.kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        "open list:ACPI COMPONENT ARCHITECTURE (ACPICA)" <devel@acpica.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        Linux Memory Management List <linux-mm@kvack.org>,
-        greybus-dev@lists.linaro.org, linux-i3c@lists.infradead.org,
-        linux-rdma@vger.kernel.org,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
-        <alsa-devel@alsa-project.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>, linux-perf-users@vger.kernel.org,
-        linux-hardening@vger.kernel.org
+References: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
+ <CAO271m=vQsGwRvpe2tUUMuqB7r2z2cAut27U1LY6bQ_sHAk3NA@mail.gmail.com>
+ <CABBYNZKs-JH_g2iUxStL5bRu-1z1TVzrS5pk2RyXUK8hiWYb7Q@mail.gmail.com>
+ <CAO271mnbrRxtEvMhc7GMaWY=BEKUzzv_CbN1j5WKf4NruKfJng@mail.gmail.com>
+ <CAO271mkRwR9nMe79d78wJSiyybHjiZdGtGApAWBJjWqPYT3KYA@mail.gmail.com> <CABBYNZ+yPyH0u0jQbva33pY6Cx0U7t-rkn4OkJBjbbC-Lvztjg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+yPyH0u0jQbva33pY6Cx0U7t-rkn4OkJBjbbC-Lvztjg@mail.gmail.com>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Wed, 16 Feb 2022 11:12:33 -0800
+X-Gmail-Original-Message-ID: <CAO271mmNb_DF-kg+jwj0-hqFomzYegkHN1mg6okk5VG-wfJw0Q@mail.gmail.com>
+Message-ID: <CAO271mmNb_DF-kg+jwj0-hqFomzYegkHN1mg6okk5VG-wfJw0Q@mail.gmail.com>
+Subject: Re: Question about Trusted property
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Feb 15, 2022 at 8:24 PM Gustavo A. R. Silva
-<gustavoars@kernel.org> wrote:
+Thanks for the confirmation, Luiz. We will send patches related to this RFC.
+
+On Tue, Feb 15, 2022 at 5:57 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> On Tue, Feb 15, 2022 at 09:19:29PM +0200, Leon Romanovsky wrote:
-> > On Tue, Feb 15, 2022 at 01:21:10PM -0600, Gustavo A. R. Silva wrote:
-> > > On Tue, Feb 15, 2022 at 10:17:40AM -0800, Kees Cook wrote:
-> > > > On Tue, Feb 15, 2022 at 11:47:43AM -0600, Gustavo A. R. Silva wrote:
-> > > >
-> > > > These all look trivially correct to me. Only two didn't have the end of
-> > > > the struct visible in the patch, and checking those showed them to be
-> > > > trailing members as well, so:
-> > > >
-> > > > Reviewed-by: Kees Cook <keescook@chromium.org>
-> > >
-> > > I'll add this to my -next tree.
+> Hi Sonny,
+>
+> On Tue, Feb 15, 2022 at 8:50 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
 > >
-> > I would like to ask you to send mlx5 patch separately to netdev. We are working
-> > to delete that file completely and prefer to avoid from unnecessary merge conflicts.
+> > Hi Luiz,
+> >
+> > Friendly ping here. Could you respond to my RFC about adding "Bonded"
+> > property? I am about to write the patch but I would like to hear
+> > whether this makes sense from your perspective. Thanks.
 >
-> Oh OK. Sure thing; I will do so.
-
-Can you also send the ACPI patch separately, please?
-
-We would like to route it through the upstream ACPICA code base.
+> Yes please go ahead and introduce it, also remember to add support to
+> the likes of bluetoothctl as well.
+>
+> > On Thu, Feb 10, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > >
+> > > Hi Luiz,
+> > >
+> > > Thanks for the clarification. So my guess was right that it does not
+> > > have to do with bondedness. In that case, do you think it makes sense
+> > > to add a "Bonded" flag property to org.bluez.Device1? There are some
+> > > use case flows that pair with a peer device but do not actually bond,
+> > > and just with Paired property the UI can't know whether to show this
+> > > device as "Bonded" or not.
+> > >
+> > > On Thu, Feb 10, 2022 at 1:30 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi Sonny,
+> > > >
+> > > > On Thu, Feb 10, 2022 at 11:23 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > > > >
+> > > > > Dear maintainers,
+> > > > >
+> > > > > Friendly ping on this question. Does adding "Bonded" property to
+> > > > > org.bluez.Device1 make sense?
+> > > > >
+> > > > > On Fri, Feb 4, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > > > > >
+> > > > > > Hi Luiz/BlueZ maintainers,
+> > > > > >
+> > > > > > What is the purpose of the Trusted property on org.bluez.Device1
+> > > > > > interface? Does it mean whether the device is bonded? My experiment
+> > > > > > with BlueZ shows that sometimes a device with "Trusted" property set
+> > > > > > is not bonded (does not have pairing key stored) and also vice versa,
+> > > > > > so I am assuming that the Trusted property means something else. What
+> > > > > > is an example use case of the Trusted property?
+> > > > > >
+> > > > > > Eventually, what I am trying to achieve is for BlueZ clients to find
+> > > > > > out whether a device is Bonded or not. Using the Paired property is
+> > > > > > not very accurate because it is set to true during connection although
+> > > > > > the device is not bonded (pairing key does not persist after
+> > > > > > disconnection). For this purpose, I am about to propose adding
+> > > > > > "Bonded" property to org.bluez.Device1. Some use cases include when
+> > > > > > there is a temporary pairing with a peer device we don't want UI to
+> > > > > > show that the device is in the Bonded device list. What do you think
+> > > > > > about exposing the Bonded state via D-Bus? I will do the
+> > > > > > implementation if this idea makes sense.
+> > > > > >
+> > > > > > Thanks!
+> > > >
+> > > > Trusted primary use is to bypass agent authorization, so when set the
+> > > > agent will not have to authorize profile connections, and yes you can
+> > > > set a device to be Trusted even without having it paired since the
+> > > > bonding procedure refers to authentication rather than authorization
+> > > > which is what Trusted controls.
+> > > >
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
