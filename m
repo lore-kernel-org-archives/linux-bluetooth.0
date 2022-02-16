@@ -2,101 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23CD9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 02:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E556EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 03:03:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343648AbiBPCsM (ORCPT
+        id S1343987AbiBPDED (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 21:48:12 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37284 "EHLO
+        Tue, 15 Feb 2022 22:04:03 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237229AbiBPCsK (ORCPT
+        with ESMTP id S241477AbiBPDED (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 21:48:10 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 858C019C33
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 18:47:59 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id ca12so862392qtb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 18:47:59 -0800 (PST)
+        Tue, 15 Feb 2022 22:04:03 -0500
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E54670CCF;
+        Tue, 15 Feb 2022 19:03:52 -0800 (PST)
+Received: by mail-yb1-xb30.google.com with SMTP id c6so2009530ybk.3;
+        Tue, 15 Feb 2022 19:03:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=OmDiAuo0Sg6JwR+Y+Ph5WJF8B14X5J6eyBQVJbHNDpE=;
-        b=U63Voo4Cf4g/I480cikoMKOWT+yIsvcBT4e7LfEoV78jF1DTf4qnJihCyTKfn9UPuo
-         eGq9OFYH0q8FXld84QjLSidQ+D+AMIJJap+C827LEkmgITNYG8NZTNs1iCPiaYyr7fGZ
-         D5/UqfjDeZgAbyM/VkyfXzeNtkqznRZV4Q3XmGNM0YVWTKyaVyIMS3YdjGd89PMKJINQ
-         t162KWsQ2O+8q6eZKXDbW7udNLqbQjOrXGtnXzEHR4RsrCICNt7kh9kubVH8KTVeQpof
-         eM1kMtPMIdGmghev3Qo4i836prFQ01oxyGGs6jXeF6JlDbANXKgcVh0XqH3ofyXwWFHT
-         6Psg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=2vb56BJHgozBm1V/crpd69p2Ram5QN1qqxOhVnbB5aE=;
+        b=L8fKxPV1oOF4s0A+Lc0Q/53uPiwWiNUcZIT6zWE/jKzVxjtGJyFoqjp1Gbn0qkLK9d
+         TQy6ECAl5Aq6U/MIGXdCWsEQxlJ28tMoFezkjoDBVY4uLNYFZmBmuyV8LHczc+bnab/2
+         GoZFfoIwyiz4rrVzNVOOBd3hKEQmtVLHzEmZeSQ8QA5Fi40lIqNbJpwPXIt5CSCxY+hE
+         oZSuWUde0EzbQO05OhohQb8E2LMeGotfqaEEwcVEP9KUMpeKJ6YplTUFLahrhR6IShQq
+         pBIMAvWfHXDAGfDFz8mjID2u1KahdIMlD6mjJHoTMP2hpFbpmzRw0gRAPh3mcVTFG2C2
+         uOzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=OmDiAuo0Sg6JwR+Y+Ph5WJF8B14X5J6eyBQVJbHNDpE=;
-        b=XngDorUwDkKxQe/nz3sjep4IVcUxjNrBMshy2KfJQ3G+8V+6XoJ7be1cXKAx/WF8jM
-         9PgWWibyoMsOkGGN55choanEFw9fykiyF8pVvmpU8ZjM7PLMlsc1UsUUhj9crIkAHXvj
-         b0V2S8XY+Bn5XxZ89siboAXZJeRORqHZpwNxXebZVoRPSFv6TddTZnj2ZBQmwIonLIfC
-         J4SAmAI9FapR5RI4N+MHix5EJU0lLNBwppCtRyybtE5tTKI4SfyJEjvtFgOw3u+ulisZ
-         VxlAxEP7EUWEeTl2O60z6YkQ8wHwXh3YUssAAEjiwbttAnFmaG56PkT6PyvoKqY2Eg8a
-         fBcA==
-X-Gm-Message-State: AOAM530yWYp3+77u5TB2Djzdchx3vvN7sGNSAyVYOWQStDiuszL4qGod
-        avzgsHAv/vhpgnfJouBckvP871tFM5/fvw==
-X-Google-Smtp-Source: ABdhPJxIspQwegoMvPziHMPyowrV8KhAiiJd7JFQchNPqn9eMwHA3GRsEWtael6ddOj0SN+G00h+kg==
-X-Received: by 2002:a05:622a:1828:b0:2cf:51e6:b5d4 with SMTP id t40-20020a05622a182800b002cf51e6b5d4mr704803qtc.148.1644979678562;
-        Tue, 15 Feb 2022 18:47:58 -0800 (PST)
-Received: from [172.17.0.2] ([13.82.220.109])
-        by smtp.gmail.com with ESMTPSA id q139sm6850714qke.104.2022.02.15.18.47.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 18:47:57 -0800 (PST)
-Message-ID: <620c65dd.1c69fb81.219fb.4da0@mx.google.com>
-Date:   Tue, 15 Feb 2022 18:47:57 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5757022944950741700=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2vb56BJHgozBm1V/crpd69p2Ram5QN1qqxOhVnbB5aE=;
+        b=CcXOmIio4zE8gMojhqVM/3k0Vfct1BpqmzcxSpVLJdW5eVol0YIjNIpdT0FuPFkexH
+         FORBmpaGvYxwYYqOdzv/JrFHS3a3Q6b7ADxfJiFLaA8YCKtolpt9/e8Yi4+hdCtopR9U
+         ephgNRyDhdqKPnTuuq2313cM8CvCCn/jy7b4z0TDqHB/g9lMzxSvGEAyLVdiyu5934ns
+         6RutZ6pujw6ui1KQ8SFsJtT27f5G91XjkijvsC+6ayI9pOzhxk6QFf0SthkqslbS10Fe
+         /7XTIDYPrRGcNMccs0vlwf0/k4fY6Rhl4n6EYYDaCAQXikletC9rHLYH+Vh3uYVmFerc
+         BO3A==
+X-Gm-Message-State: AOAM5321EpbW4SeGzhS0NWlB98b7xgtmGrJsRJTSrnFgCuCTegwPbKjw
+        WGWj5ahs5VGZETsPuETRYKcFjHYir5YIanM7Cg==
+X-Google-Smtp-Source: ABdhPJxHuQ0Hs7qZOfe5yD4ngIRcR0IQu99iX6oKivlY2oKeH94oYrcc33wQ4nRq5FfUzqMWwO7vHCFlVhAWeiBaviQ=
+X-Received: by 2002:a25:414c:0:b0:61a:9576:61f0 with SMTP id
+ o73-20020a25414c000000b0061a957661f0mr518651yba.644.1644980631469; Tue, 15
+ Feb 2022 19:03:51 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ,DO,NOT,MERGER] Test Patches
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220215233902.3090-1-hj.tedd.an@gmail.com>
-References: <20220215233902.3090-1-hj.tedd.an@gmail.com>
+References: <CAA-qYXiUFi5atN8tGRdORbiGqWnbdquuAeKuwdpWSVFVO2FveA@mail.gmail.com>
+ <8cb46dd1-c2eb-869a-0af8-443d84a83b85@gmail.com>
+In-Reply-To: <8cb46dd1-c2eb-869a-0af8-443d84a83b85@gmail.com>
+From:   Jinmeng Zhou <jjjinmeng.zhou@gmail.com>
+Date:   Wed, 16 Feb 2022 11:03:40 +0800
+Message-ID: <CAA-qYXh27znv90bm4VosJzYM-jT-iLmPrrkMHoP53mT-72tBVw@mail.gmail.com>
+Subject: Re: 4 missing check bugs
+To:     Eric Dumazet <eric.dumazet@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        shenwenbosmile@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5757022944950741700==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Dear maintainers,
 
-This is automated email and please do not reply to this email!
+I double-check the newest version v5.17 and the stable version 5.16.9.
+The code of the 4 functions remains the same.
+Are they missing check bugs?
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614726
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.41 seconds
-GitLint                       PASS      1.04 seconds
-Prep - Setup ELL              PASS      54.15 seconds
-Build - Prep                  PASS      0.95 seconds
-Build - Configure             PASS      10.99 seconds
-Build - Make                  PASS      1876.89 seconds
-Make Check                    PASS      12.92 seconds
-Make Check w/Valgrind         PASS      553.35 seconds
-Make Distcheck                PASS      289.38 seconds
-Build w/ext ELL - Configure   PASS      10.65 seconds
-Build w/ext ELL - Make        PASS      1829.24 seconds
-Incremental Build with patchesPASS      0.00 seconds
+Thanks!
 
 
+Best regards,
+Jinmeng Zhou
 
----
-Regards,
-Linux Bluetooth
-
-
---===============5757022944950741700==--
+On Wed, Feb 16, 2022 at 5:51 AM Eric Dumazet <eric.dumazet@gmail.com> wrote:
+>
+>
+> On 2/15/22 04:37, Jinmeng Zhou wrote:
+> > Dear maintainers,
+> >
+> > Hi, our tool finds several missing check bugs on
+> > Linux kernel v4.18.5 using static analysis.
+> > We are looking forward to having more experts' eyes on this. Thank you!
+> >
+> > Before calling sk_alloc() with SOCK_RAW type,
+> > there should be a permission check, ns_capable(ns,CAP_NET_RAW).
+> > For example,
+>
+>
+> v4.18 is not a stable kernel.
+>
+> No one is supposed to use v4.18.5, and expect others to fix bugs in it.
+>
+>
