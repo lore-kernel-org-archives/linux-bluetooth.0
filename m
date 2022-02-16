@@ -2,132 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AD70C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 00:22:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D23F6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 01:57:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240744AbiBPAWm (ORCPT
+        id S245738AbiBPB50 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 19:22:42 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37468 "EHLO
+        Tue, 15 Feb 2022 20:57:26 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:34750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232793AbiBPAWm (ORCPT
+        with ESMTP id S235112AbiBPB5V (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 19:22:42 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DEF8193F4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 16:22:30 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id b5so534428qtq.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 16:22:30 -0800 (PST)
+        Tue, 15 Feb 2022 20:57:21 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8AA7F6D6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 17:57:06 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id l125so1647828ybl.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 17:57:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=YPTzvOFi//MusTFllVrV1iztVdLZPy9dc1Q3fbrT7aA=;
-        b=BZvAJ3BAkIW+foeUa+79Cnb5/oVY1LdHqukVO52iGSeOauxIB3BOi8TvmNNTeUQxA9
-         h6XElYKOIWo9sH6P/AygyL8nFKoAe1RCTHQRm0mQD8hQfuHffMFn6qSjuAl7UmjuqNam
-         NCdcO1lY/lc2bKqbQ+gaSKt7wKSMUlIGKmpZ0ADLpee3vlkzILvggBtV3FraqF+iQuuF
-         +JZ5lXLveM203WbFRDioKDuMOmxeC4uY+jF6IKr4cU4jZ/CG/0nYTZYnYFaZUwQ6U1jO
-         5e6cDUHYNGiIx5LoUd6aXPC42nquawowFafyiHjTxLWb/xDujXf3ZJNv6xuRWph5Er1G
-         Cafg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZT4wF/MHqavWEsO40mxjqMITqCdp59SbwsnEV7hRF7g=;
+        b=PerSpL7e4qINu5kCY49pWoLsJeCrR96nNucAiC9ZHmVcOoYg9JGlfDu46mLuFePTnh
+         36sTiAa4sZZWv3Ev7OTYXNFf8Kr+wx5+e+BmV3lSNTPyKTYeNau2KiZbpakxqYibb+cW
+         SaivgQLIwxIiDXxlQ775Rjg7W5sijsF5qQLKAC4hOXc9TaDZONzC4OpGZEmG/5pyOZqf
+         B5mryRyhCoU/S+aBVq9FIYoB27u37RH3fUfscvuoiylO53kUv9hJ1Zx9rPB5ys95VSLJ
+         x2viZ35LtseDIu1epgwhfbWcXLyZTrUXY8KEuK9Z1wpcPHbrd3oSVe4fKyfEtE4mWMEM
+         E7Rg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=YPTzvOFi//MusTFllVrV1iztVdLZPy9dc1Q3fbrT7aA=;
-        b=uxQUXzKbO8iPXcKl29FQfBz40eN+lBdsoYgoOAeAbtNwHA5Zil2RBqx9fwfuuBxgtn
-         jbnNtMaRRMUQzcEIrbidbV3MIO4zfjQzDGGczudynEyBsHVUTwQh2qZm3sVuofgp4YgA
-         TyCDnA3Bo1q6MsmIgQfD7d9T5XLaBHG1+6XNIrCobAfpYB+Lg4SBRftKPxXNae3+3rF7
-         Y8ntzk9a6gBNODcae5QzZYNk5BwV8jfJoUMIUOj3pt0cnnSBukludLqsw2DgBiXMxftA
-         d6DeEkzTo9V8qL0gv94gEI60UYePF1bMgLZ4kAtIiQvABOd9eVocnc9U/O6oh6gYD3qR
-         S23w==
-X-Gm-Message-State: AOAM530X5LH2BbYpPwzVPZjzscbCfkZI3Zn07V7hQSYbzwZ+viAwOInF
-        RVbk/p6mPMXhLeEcNhhM3rckCmAVxZil5w==
-X-Google-Smtp-Source: ABdhPJzk73Vj91i0T8du7shbOZbxfJDTHGF2AfLD3uwWwM4nDFvNACz5basKVr8ZKt45UkTDxmNKOw==
-X-Received: by 2002:a05:622a:1441:b0:2d4:4afc:8409 with SMTP id v1-20020a05622a144100b002d44afc8409mr404885qtx.460.1644970949028;
-        Tue, 15 Feb 2022 16:22:29 -0800 (PST)
-Received: from [172.17.0.2] ([20.57.49.185])
-        by smtp.gmail.com with ESMTPSA id t11sm12928472qkp.82.2022.02.15.16.22.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 16:22:28 -0800 (PST)
-Message-ID: <620c43c4.1c69fb81.40644.a4cd@mx.google.com>
-Date:   Tue, 15 Feb 2022 16:22:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1696857431791484384=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZT4wF/MHqavWEsO40mxjqMITqCdp59SbwsnEV7hRF7g=;
+        b=Uq0AaTAcVf1PlypmrByh+Kr18VK4mdDzyR6RFaesamZdsNpmmaaYSB/CNX2nwaCNOc
+         q9R2T/XRhLAIjlvjc3YEVPYCzh2Cl1YGw8MBBNhOLiNUIU5JKsg2DNnv8I2VEIr7bkzR
+         ljuyx+moLJnsVO5VIIxiM2lmR74o51WMG3gLhSuy0J1Od6gvUNvDtZQ5e3AgrxyCVYw8
+         XuXFuWaglsi7ZLUnAr9xkCmA389731S+z8SWR0GBM92SSpTWQxbIGozfNXxLeOCAoPhd
+         ivuS+y1eWvS3s7aZP+k3fTiG528qGjAZtbxszVEHD/2NgTL/kzgzEyRIJ+LEwOkmj8IF
+         i67w==
+X-Gm-Message-State: AOAM531ymP7bJTDwaCMON8F9ezBn+EN+45Bl/8yr6HlfvSg1OUEurhI/
+        I4qnpMEHlOUcuRnsSHpESImSpk2NQ1OUF97TnSo=
+X-Google-Smtp-Source: ABdhPJxENvgHgTR46PepwnRA1Df6r+EHe704LD1//d3bKHM11rXf4Muilyxq34HMbcOKDq8ioxenOJ4bjIMSD/kN+zs=
+X-Received: by 2002:a81:ed06:0:b0:2d1:5f32:7e94 with SMTP id
+ k6-20020a81ed06000000b002d15f327e94mr508170ywm.317.1644976625420; Tue, 15 Feb
+ 2022 17:57:05 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, fontaine.fabrice@gmail.com
-Subject: RE: [BlueZ] tools/mesh-cfgtest: include limits.h
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220215225015.3568246-1-fontaine.fabrice@gmail.com>
-References: <20220215225015.3568246-1-fontaine.fabrice@gmail.com>
+References: <CAO271mmuMDoqNdXUUuPpyz3VyuLWrZUr1K=Jry+H9mGEtz-Z4Q@mail.gmail.com>
+ <CAO271m=vQsGwRvpe2tUUMuqB7r2z2cAut27U1LY6bQ_sHAk3NA@mail.gmail.com>
+ <CABBYNZKs-JH_g2iUxStL5bRu-1z1TVzrS5pk2RyXUK8hiWYb7Q@mail.gmail.com>
+ <CAO271mnbrRxtEvMhc7GMaWY=BEKUzzv_CbN1j5WKf4NruKfJng@mail.gmail.com> <CAO271mkRwR9nMe79d78wJSiyybHjiZdGtGApAWBJjWqPYT3KYA@mail.gmail.com>
+In-Reply-To: <CAO271mkRwR9nMe79d78wJSiyybHjiZdGtGApAWBJjWqPYT3KYA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 15 Feb 2022 17:56:54 -0800
+Message-ID: <CABBYNZ+yPyH0u0jQbva33pY6Cx0U7t-rkn4OkJBjbbC-Lvztjg@mail.gmail.com>
+Subject: Re: Question about Trusted property
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1696857431791484384==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sonny,
 
-This is automated email and please do not reply to this email!
+On Tue, Feb 15, 2022 at 8:50 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+>
+> Hi Luiz,
+>
+> Friendly ping here. Could you respond to my RFC about adding "Bonded"
+> property? I am about to write the patch but I would like to hear
+> whether this makes sense from your perspective. Thanks.
 
-Dear submitter,
+Yes please go ahead and introduce it, also remember to add support to
+the likes of bluetoothctl as well.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614720
+> On Thu, Feb 10, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> >
+> > Hi Luiz,
+> >
+> > Thanks for the clarification. So my guess was right that it does not
+> > have to do with bondedness. In that case, do you think it makes sense
+> > to add a "Bonded" flag property to org.bluez.Device1? There are some
+> > use case flows that pair with a peer device but do not actually bond,
+> > and just with Paired property the UI can't know whether to show this
+> > device as "Bonded" or not.
+> >
+> > On Thu, Feb 10, 2022 at 1:30 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Sonny,
+> > >
+> > > On Thu, Feb 10, 2022 at 11:23 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > > >
+> > > > Dear maintainers,
+> > > >
+> > > > Friendly ping on this question. Does adding "Bonded" property to
+> > > > org.bluez.Device1 make sense?
+> > > >
+> > > > On Fri, Feb 4, 2022 at 4:02 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > > > >
+> > > > > Hi Luiz/BlueZ maintainers,
+> > > > >
+> > > > > What is the purpose of the Trusted property on org.bluez.Device1
+> > > > > interface? Does it mean whether the device is bonded? My experiment
+> > > > > with BlueZ shows that sometimes a device with "Trusted" property set
+> > > > > is not bonded (does not have pairing key stored) and also vice versa,
+> > > > > so I am assuming that the Trusted property means something else. What
+> > > > > is an example use case of the Trusted property?
+> > > > >
+> > > > > Eventually, what I am trying to achieve is for BlueZ clients to find
+> > > > > out whether a device is Bonded or not. Using the Paired property is
+> > > > > not very accurate because it is set to true during connection although
+> > > > > the device is not bonded (pairing key does not persist after
+> > > > > disconnection). For this purpose, I am about to propose adding
+> > > > > "Bonded" property to org.bluez.Device1. Some use cases include when
+> > > > > there is a temporary pairing with a peer device we don't want UI to
+> > > > > show that the device is in the Bonded device list. What do you think
+> > > > > about exposing the Bonded state via D-Bus? I will do the
+> > > > > implementation if this idea makes sense.
+> > > > >
+> > > > > Thanks!
+> > >
+> > > Trusted primary use is to bypass agent authorization, so when set the
+> > > agent will not have to authorize profile connections, and yes you can
+> > > set a device to be Trusted even without having it paired since the
+> > > bonding procedure refers to authentication rather than authorization
+> > > which is what Trusted controls.
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.40 seconds
-GitLint                       FAIL      0.99 seconds
-Prep - Setup ELL              PASS      41.86 seconds
-Build - Prep                  PASS      0.77 seconds
-Build - Configure             PASS      8.46 seconds
-Build - Make                  PASS      1361.27 seconds
-Make Check                    PASS      11.94 seconds
-Make Check w/Valgrind         PASS      437.89 seconds
-Make Distcheck                PASS      225.60 seconds
-Build w/ext ELL - Configure   PASS      8.57 seconds
-Build w/ext ELL - Make        PASS      1344.82 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] tools/mesh-cfgtest: include limits.h
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#87: 
-http://autobuild.buildroot.net/results/20cc47f54de0b0d4bdf108c3715c590ae8ab476f/
-
-/github/workspace/src/12747687.patch total: 0 errors, 1 warnings, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12747687.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[BlueZ] tools/mesh-cfgtest: include limits.h
-17: B1 Line exceeds max length (92>80): "https://patchwork.kernel.org/project/bluetooth/patch/20210722204923.29735-1-bluez@heine.tech"
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1696857431791484384==--
+-- 
+Luiz Augusto von Dentz
