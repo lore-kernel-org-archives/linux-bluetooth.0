@@ -2,125 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13926C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 04:00:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F251C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 04:37:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238820AbiBPEAQ (ORCPT
+        id S1344476AbiBPEhj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Feb 2022 23:00:16 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33694 "EHLO
+        Tue, 15 Feb 2022 23:37:39 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231233AbiBPEAP (ORCPT
+        with ESMTP id S1344431AbiBPEhf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Feb 2022 23:00:15 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77AC1FFF86
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 20:00:04 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id q20so960858qtw.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 20:00:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=HURjIxx3EGK8jFh1TmzxvIP38bMVABVdxegseQH4EjU=;
-        b=WsNrSCJ1PI3iSdf9ZdRy6n8thS2UXAefusAvgPWc7o07u6mypmIFTOBylG9QmdA9P4
-         Jp4BXWdvRvKXe/H9ZtjCy5s0cQ9IpD3XoB9tHCgddMoefVSTqYPLubt7+Z0IHERm4krF
-         J+eoBm3RaBrCX0asWcf+j+MtwehM3HPDJZbRPDLYKCedtVtsXGbRwK3+GFAPWcIeDo/V
-         eu24YSaNjHrfaPBl621hrbs1XnqNMviUlOlV/ncTxHXUSmuBbVj+Mr1MG/J14YkaJzfP
-         cnKj0XHQk6psZslRbuNywX88qvIYWIx40EMQXFOsgxN161ODxRiiDAS8QLNdghk21vL3
-         1oEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=HURjIxx3EGK8jFh1TmzxvIP38bMVABVdxegseQH4EjU=;
-        b=zVsCSzQOpwxmXoNKvk66wlfRH+Ai5iqysK7mRTWepBF4KRYZLKOj8eWft7xUocKHzl
-         pIUicTOWjnTG5W9g+BHByPDfPEGs2Wu8Kd5Szm3EZPGNe58vHQZVbrBpssAYUVq5+x03
-         NXxgSkPEQ8wfcoD+ZS0Gt0KMeytctalrFeo/yXkP3yFEAYiCEns3kN2AfRwoHgV4cHGk
-         QeEXj9IFxbZfKgEDCizFSnU9C20ltPoYslGdp3/8tb9/H2KnTv8EHD1XoUmzZx0uYATV
-         GiJwedCDHJazwXSRLrVbbVWeVKy3VlC02Jr/xajomRBcSG/yukeMNsLD7xlu+dCBOEiP
-         P6Tw==
-X-Gm-Message-State: AOAM532HO7Qk94y/6A+ihS5TFjxxJCs5waWb79vm6G7sb9NPVeFslwBd
-        YX2cfv7EqNc9cGJgwJuUQ1QvCqWMhO36Bw==
-X-Google-Smtp-Source: ABdhPJzaaWLIMRNDmcMp3As9oL4+xWqHI7T90RxkXQJNy6FEXkGP7OvzFMWhvl6+IpEnVI1G2XZUAQ==
-X-Received: by 2002:ac8:7f51:0:b0:2ca:8f7a:5586 with SMTP id g17-20020ac87f51000000b002ca8f7a5586mr807037qtk.462.1644984003428;
-        Tue, 15 Feb 2022 20:00:03 -0800 (PST)
-Received: from [172.17.0.2] ([20.121.218.143])
-        by smtp.gmail.com with ESMTPSA id d22sm18821095qkn.112.2022.02.15.20.00.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 20:00:03 -0800 (PST)
-Message-ID: <620c76c3.1c69fb81.fa102.5e3a@mx.google.com>
-Date:   Tue, 15 Feb 2022 20:00:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0449285112646477339=="
+        Tue, 15 Feb 2022 23:37:35 -0500
+Received: from zju.edu.cn (mail.zju.edu.cn [61.164.42.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9780AF4063
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 20:37:22 -0800 (PST)
+Received: from localhost.localdomain (unknown [222.205.15.208])
+        by mail-app2 (Coremail) with SMTP id by_KCgCXnop+fwxibTzsAQ--.39156S4;
+        Wed, 16 Feb 2022 12:37:19 +0800 (CST)
+From:   Lin Ma <linma@zju.edu.cn>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, linux-bluetooth@vger.kernel.org
+Cc:     Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v1] Bluetooth: fix data races in smp_unregister(), smp_del_chan()
+Date:   Wed, 16 Feb 2022 12:37:14 +0800
+Message-Id: <20220216043714.22011-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, linma@zju.edu.cn
-Subject: RE: [v0] bluetooth: fix data races in smp_unregister(), smp_del_chan()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220216033619.10821-1-linma@zju.edu.cn>
-References: <20220216033619.10821-1-linma@zju.edu.cn>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: by_KCgCXnop+fwxibTzsAQ--.39156S4
+X-Coremail-Antispam: 1UD129KBjvJXoWxGw4fGF17KFWUCw4fCr17Jrb_yoWrZFykpF
+        Z0kFyxCr4kXrWUXw47A3WxAFykWFZrZ3W8GFW8Jw1UGw45Kr1UJrWIyryjq3W7CrWUAa4j
+        v3Wqyrs2qryDAw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUka1xkIjI8I6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AE
+        w4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2
+        IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVW8Jr0_Cr1UM28EF7xvwVC2
+        z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s0DM2AIxVAIcxkEcV
+        Aq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j
+        6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
+        vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48JMxAIw28IcVCjz48v
+        1sIEY20_GFWkJr1UJwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r
+        18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij64vI
+        r41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr
+        1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvE
+        x4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUdHUDUUUUU=
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0449285112646477339==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Previous commit e04480920d1e ("Bluetooth: defer cleanup of resources
+in hci_unregister_dev()") defers all destructive actions to
+hci_release_dev() to prevent cocurrent problems like NPD, UAF.
 
-This is automated email and please do not reply to this email!
+However, there are still some exceptions that are ignored.
 
-Dear submitter,
+The smp_unregister() in hci_dev_close_sync() (previously in
+hci_dev_do_close) will release resources like the sensitive channel
+and the smp_dev objects. Consider the situations the device is detaching
+or power down while the kernel is still operating on it, the following
+data race could take place.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614788
+thread-A  hci_dev_close_sync  | thread-B  read_local_oob_ext_data
+                              |
+hci_dev_unlock()              |
+...                           | hci_dev_lock()
+if (hdev->smp_data)           |
+  chan = hdev->smp_data       |
+                              | chan = hdev->smp_data (3)
+                              |
+  hdev->smp_data = NULL (1)   | if (!chan || !chan->data) (4)
+  ...                         |
+  smp = chan->data            | smp = chan->data
+  if (smp)                    |
+    chan->data = NULL (2)     |
+    ...                       |
+    kfree_sensitive(smp)      |
+                              | // dereference smp trigger UFA
 
----Test result---
+That is, the objects hdev->smp_data and chan->data both suffer from the
+data races. In a preempt-enable kernel, the above schedule (when (3) is
+before (1) and (4) is before (2)) leads to UAF bugs. It can be
+reproduced in the latest kernel and below is part of the report:
 
-Test Summary:
-CheckPatch                    PASS      1.61 seconds
-GitLint                       FAIL      1.06 seconds
-SubjectPrefix                 FAIL      0.86 seconds
-BuildKernel                   PASS      30.92 seconds
-BuildKernel32                 PASS      27.23 seconds
-Incremental Build with patchesPASS      37.01 seconds
-TestRunner: Setup             PASS      475.85 seconds
-TestRunner: l2cap-tester      PASS      13.55 seconds
-TestRunner: bnep-tester       PASS      6.14 seconds
-TestRunner: mgmt-tester       PASS      105.79 seconds
-TestRunner: rfcomm-tester     FAIL      7.67 seconds
-TestRunner: sco-tester        PASS      7.74 seconds
-TestRunner: smp-tester        PASS      7.70 seconds
-TestRunner: userchan-tester   PASS      6.51 seconds
+[   49.097146] ================================================================
+[   49.097611] BUG: KASAN: use-after-free in smp_generate_oob+0x2dd/0x570
+[   49.097611] Read of size 8 at addr ffff888006528360 by task generate_oob/155
+[   49.097611]
+[   49.097611] Call Trace:
+[   49.097611]  <TASK>
+[   49.097611]  dump_stack_lvl+0x34/0x44
+[   49.097611]  print_address_description.constprop.0+0x1f/0x150
+[   49.097611]  ? smp_generate_oob+0x2dd/0x570
+[   49.097611]  ? smp_generate_oob+0x2dd/0x570
+[   49.097611]  kasan_report.cold+0x7f/0x11b
+[   49.097611]  ? smp_generate_oob+0x2dd/0x570
+[   49.097611]  smp_generate_oob+0x2dd/0x570
+[   49.097611]  read_local_oob_ext_data+0x689/0xc30
+[   49.097611]  ? hci_event_packet+0xc80/0xc80
+[   49.097611]  ? sysvec_apic_timer_interrupt+0x9b/0xc0
+[   49.097611]  ? asm_sysvec_apic_timer_interrupt+0x12/0x20
+[   49.097611]  ? mgmt_init_hdev+0x1c/0x240
+[   49.097611]  ? mgmt_init_hdev+0x28/0x240
+[   49.097611]  hci_sock_sendmsg+0x1880/0x1e70
+[   49.097611]  ? create_monitor_event+0x890/0x890
+[   49.097611]  ? create_monitor_event+0x890/0x890
+[   49.097611]  sock_sendmsg+0xdf/0x110
+[   49.097611]  __sys_sendto+0x19e/0x270
+[   49.097611]  ? __ia32_sys_getpeername+0xa0/0xa0
+[   49.097611]  ? kernel_fpu_begin_mask+0x1c0/0x1c0
+[   49.097611]  __x64_sys_sendto+0xd8/0x1b0
+[   49.097611]  ? syscall_exit_to_user_mode+0x1d/0x40
+[   49.097611]  do_syscall_64+0x3b/0x90
+[   49.097611]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   49.097611] RIP: 0033:0x7f5a59f51f64
+...
+[   49.097611] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f5a59f51f64
+[   49.097611] RDX: 0000000000000007 RSI: 00007f5a59d6ac70 RDI: 0000000000000006
+[   49.097611] RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+[   49.097611] R10: 0000000000000040 R11: 0000000000000246 R12: 00007ffec26916ee
+[   49.097611] R13: 00007ffec26916ef R14: 00007f5a59d6afc0 R15: 00007f5a59d6b700
 
-Details
-##############################
-Test: GitLint - FAIL - 1.06 seconds
-Run gitlint with rule in .gitlint
-[v0] bluetooth: fix data races in smp_unregister(), smp_del_chan()
-37: B1 Line exceeds max length (81>80): "[   49.097146] =================================================================="
-69: B1 Line exceeds max length (85>80): "[   49.097611] RSP: 002b:00007f5a59d6abc0 EFLAGS: 00000246 ORIG_RAX: 000000000000002c"
+To solve these data races, this patch places the smp_unregister()
+function in the protected area by the hci_dev_lock(). That is, the
+smp_unregister() function can not be concurrently executed when
+operating functions (most of them are mgmt operations in mgmt.c) hold
+the device lock.
 
+This patch is tested with kernel LOCK DEBUGGING enabled. The price from
+the extended holding time of the device lock is supposed to be low as the
+smp_unregister() function is fairly short and efficient.
 
-##############################
-Test: SubjectPrefix - FAIL - 0.86 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-##############################
-Test: TestRunner: rfcomm-tester - FAIL - 7.67 seconds
-Run test-runner with rfcomm-tester
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Basic RFCOMM Socket Client - Write 32k Success       Failed       0.154 seconds
-
-
-
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_sync.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 0feb68f12545..e34fc15b7d2c 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4106,9 +4106,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 	hci_inquiry_cache_flush(hdev);
+ 	hci_pend_le_actions_clear(hdev);
+ 	hci_conn_hash_flush(hdev);
+-	hci_dev_unlock(hdev);
+-
++	/* Prevent data races on hdev->smp_data or hdev->smp_bredr_data */
+ 	smp_unregister(hdev);
++	hci_dev_unlock(hdev);
+ 
+ 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
+ 
+-- 
+2.33.1
 
---===============0449285112646477339==--
