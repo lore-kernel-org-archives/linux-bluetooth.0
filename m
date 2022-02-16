@@ -2,112 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB80C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 05:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D804C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Feb 2022 08:15:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241596AbiBPFOC (ORCPT
+        id S231543AbiBPIPw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Feb 2022 00:14:02 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:59574 "EHLO
+        Wed, 16 Feb 2022 03:15:52 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:58972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234289AbiBPFOC (ORCPT
+        with ESMTP id S231528AbiBPIPk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Feb 2022 00:14:02 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B62C27B2D
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 21:13:51 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id a11-20020a17090a740b00b001b8b506c42fso5474045pjg.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Feb 2022 21:13:51 -0800 (PST)
+        Wed, 16 Feb 2022 03:15:40 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96F59254A6A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 00:15:27 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id 195so1495272pgc.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Feb 2022 00:15:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=RYupViMi8L0yVClW1vJ4gVeavnx155e8HDArg95QPJ8=;
-        b=jgNeIDq3Yi9/iCB5C6xfth2iGnbLKw831DGLvmPrMsEd8NZo8+BQ/exYpkreHNNp6e
-         fBQ0XgyNyc17pEMWNvsdAtqnkJHZxMK02wqOWhpjPLR/jhC+zzuOveDcrh2cETqZbsQG
-         fteS/SfBXxhSiDhME9/SdMUxJc5LuIgVk2JUq2P1MMmm0xcXOae3ZG+qXuHAds2i3F1R
-         ZDAdJu2iKC+CjLeP1Vp7JVimjEatjW3WQt9pU1/yJPVnz5YfDlDQ6MFuyBU64Ix8FgH0
-         jFVi4e10wXuydasdMFMgbmMu53YJaCv4f3VVgdqi8nIRnH9HWP29iHOTLHKTU8s9oZEY
-         2I6g==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=W+2TrrUJvMSS9r6nDjg8VXFSYq69Wj2ThIHgUyzlIIo=;
+        b=YBLxiKIPo2TAHc8rAx95Jlj7n1WAai/8MsIuAvnD4OF+55PhUl8CFLK6VcmoE3qSeE
+         qU7Ahjk69cesCDj4j6Wgmx6TSutbKRqcOQ2dNCWd/0L2thupEq2hI1Kp/ETd0rjdxnnU
+         T94U655ljaShB+3LydMvKqO64lcIJYWvXq5Pc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=RYupViMi8L0yVClW1vJ4gVeavnx155e8HDArg95QPJ8=;
-        b=4sZV6BTsZQC0quvN24KK+wcky24SAeRHTDYWmJHFcfmw42GxZ2UHuxhaoGhJZos5gv
-         +kj+RJO12uK709OBqs+/92LnENeFUIzxN827UJAP8xigG/iR2zzPM+Vu4CvMGAlby962
-         IS/lQBH7GXl62e7xmjcOaBuEBKo5ppw2Jw/qbO1FCu721u20SnDsgi2UzHv+S5ten4Jd
-         x72W5itSkkLrOg33RnX4P3dmUax93ElKw8mZkvoWCc6KV2GAiSrKt+ycGhigwuE99NvY
-         aq6OxmtDoJUfwwMsNnhwi49sFwhe2vQmrAnTnpa2THOyHlnNDwB7alJXUo7byHL1Mbkp
-         J5NA==
-X-Gm-Message-State: AOAM53275dl1R9VpQBPsaFAfKXPOhUk9ysIwEU5oHy6chsoQWwlXy0vf
-        8r1CAq522UxUi8yGi+GXYXkH0B3G//s=
-X-Google-Smtp-Source: ABdhPJwOE4ChdZxl2ap0TOZzqdGtVUgAuHJk99HCDigRQQyxccW4a9dyMcdOD3uEITHiFOI8GQsDbg==
-X-Received: by 2002:a17:902:d886:b0:14d:5b6f:5bbe with SMTP id b6-20020a170902d88600b0014d5b6f5bbemr905328plz.127.1644988430416;
-        Tue, 15 Feb 2022 21:13:50 -0800 (PST)
-Received: from [172.17.0.2] ([52.183.100.121])
-        by smtp.gmail.com with ESMTPSA id d16sm35112984pfj.1.2022.02.15.21.13.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Feb 2022 21:13:50 -0800 (PST)
-Message-ID: <620c880e.1c69fb81.65c34.6c39@mx.google.com>
-Date:   Tue, 15 Feb 2022 21:13:50 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6033543071441233027=="
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=W+2TrrUJvMSS9r6nDjg8VXFSYq69Wj2ThIHgUyzlIIo=;
+        b=jHQQkAWZmnI2vE8DPsQiF6ChLGf5XYmfgqiPdV9hEl4B8fTzRJoWglzyBvbQNI3qhI
+         qrweIhrIEmdQCXPISjB/HZNw/I+sasOqV87fyfvJNejFSI1Oa8phZL8UCa8vrS2JYk//
+         CYZWRvkKBEw4UFDNpX4DxA21rkNFMHasBuVU1c9lDkrvkFNq1Fax5HuR7mMvV4m0l0O1
+         CHkoi9MsniwG9xdgdttfQa/7WEwRW4U3stb6Rkolh5tGeSKGPRkVRMQFG1W+dIku0uOR
+         gVPlGQ98eJ5+hfKMx/AOHoKQ7EesGRSaKbXfGphuarGNKMv1X+wlLzC+0lNXnWiwCeOD
+         mviQ==
+X-Gm-Message-State: AOAM530h3krsm304MTcWaOMw2+fghkukg6nhfAjyWDA2PRVwlhr4SW9b
+        6WhdsG8nSmjvfuAE7zpoISxcThrtJQYc8w==
+X-Google-Smtp-Source: ABdhPJzkScTdOeWcVLIp9sCLIJlWP4WekbWWGA+pfGW8kQpmMQ6jjfLiZrI9pswyvD9prTts6ZbU4g==
+X-Received: by 2002:a62:2902:0:b0:4ca:75a3:aa1c with SMTP id p2-20020a622902000000b004ca75a3aa1cmr1507401pfp.65.1644999326664;
+        Wed, 16 Feb 2022 00:15:26 -0800 (PST)
+Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
+        by smtp.gmail.com with UTF8SMTPSA id h5sm8268043pfc.118.2022.02.16.00.15.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 16 Feb 2022 00:15:26 -0800 (PST)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Shuo-Peng Liao <deanliao@chromium.org>
+Subject: [BlueZ PATCH v1] monitor: fix division by zero about conn->tx_pkt_med
+Date:   Wed, 16 Feb 2022 16:15:18 +0800
+Message-Id: <20220216081518.2956782-1-josephsih@chromium.org>
+X-Mailer: git-send-email 2.35.1.265.g69c8d7142f-goog
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, linma@zju.edu.cn
-Subject: RE: [v1] Bluetooth: fix data races in smp_unregister(), smp_del_chan()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220216043714.22011-1-linma@zju.edu.cn>
-References: <20220216043714.22011-1-linma@zju.edu.cn>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6033543071441233027==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In a connection without outgoing traffic, conn->tx_num will remain 0.
+In this case, conn->tx_pkt_med should be simply 0 without calculating
+"conn->tx_bytes / conn->tx_num".
 
-This is automated email and please do not reply to this email!
+This was likely to happen, for example, when "btmon -w btsnoop.log"
+was launched in the middle of a LE mouse connection, and a number of
+incoming ACL Data RX were received as the mouse movements.  When
+running "btmon -a btsnoop.log", it would encounter this error.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=614795
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.77 seconds
-GitLint                       PASS      0.42 seconds
-SubjectPrefix                 PASS      0.24 seconds
-BuildKernel                   PASS      36.72 seconds
-BuildKernel32                 PASS      31.95 seconds
-Incremental Build with patchesPASS      43.85 seconds
-TestRunner: Setup             PASS      576.01 seconds
-TestRunner: l2cap-tester      PASS      15.71 seconds
-TestRunner: bnep-tester       PASS      7.06 seconds
-TestRunner: mgmt-tester       PASS      122.73 seconds
-TestRunner: rfcomm-tester     FAIL      8.94 seconds
-TestRunner: sco-tester        PASS      9.15 seconds
-TestRunner: smp-tester        PASS      9.07 seconds
-TestRunner: userchan-tester   PASS      7.41 seconds
-
-Details
-##############################
-Test: TestRunner: rfcomm-tester - FAIL - 8.94 seconds
-Run test-runner with rfcomm-tester
-Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
-
-Failed Test Cases
-Basic RFCOMM Socket Client - Write 32k Success       Failed       0.192 seconds
-
-
-
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Yun-Hao Chung <howardchung@chromium.org>
+Reviewed-by: Shuo-Peng Liao <deanliao@chromium.org>
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+ monitor/analyze.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
---===============6033543071441233027==--
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 0c74e8f2e..ac23e13bb 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -161,7 +161,8 @@ static void conn_destroy(void *data)
+ 		break;
+ 	}
+ 
+-	conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
++	if (conn->tx_num > 0)
++		conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
+ 
+ 	printf("  Found %s connection with handle %u\n", str, conn->handle);
+ 	/* TODO: Store address type */
+-- 
+2.35.1.265.g69c8d7142f-goog
+
