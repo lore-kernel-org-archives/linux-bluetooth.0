@@ -2,101 +2,169 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09F99C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 11:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABD2BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 12:13:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239719AbiBQLZU (ORCPT
+        id S240310AbiBQMNx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 06:25:20 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35156 "EHLO
+        Thu, 17 Feb 2022 07:13:53 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239714AbiBQLZT (ORCPT
+        with ESMTP id S240253AbiBQMNw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 06:25:19 -0500
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBE71285B5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 03:25:04 -0800 (PST)
-Received: by mail-qv1-xf33.google.com with SMTP id a19so7555466qvm.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 03:25:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=1YxyHBpK86vwn21nZ+fk41SlHyv83GHveDi1OfwvzaE=;
-        b=aWEiM76wmuY0xCd83yJE4ly0LZJ693pr2EXGYu6lbCMc1vSGl8AJh6kD36bMo8iDut
-         TYi790a1GILYDxfKXBI82pwikneEPtPnTwVvZjPkdi1t8pMPOmfTwAAKZFIv/dKHX2zo
-         mHK836SsgW6ZG2Diz4u6haLBISrQimvbxEgeXZdT/LhJfA6DNESNe/jFY/LOMl1nhw2q
-         IlxyMF3kc59vRqVZN4yj4POY/57qp5Q9uD6aaaC2M190I61BV3GNE04T2WSSRoKNgN5/
-         /2GPHZBbF5rQuX6AYuaO544CqHFoAYklJ8LOHInRqbG8/8RwE1FrRe9QXU2Pu/djBAVz
-         86kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=1YxyHBpK86vwn21nZ+fk41SlHyv83GHveDi1OfwvzaE=;
-        b=Y36icaXIHBGn9a+AmqTWGCnXmmLNhtiT6R/cQscpWeLdGcPleikB6qs2klsMmUCGu9
-         qCgmC69naKVXU+Rvsi+Ph4NbzVdHzdpCQyla0ZLVPVagU9XGAIzJSWxRtWUHJ4FcYanq
-         xOLs6CPVZ86eUMxZOLqTIIM+EqrOZHXKJ4epRVx6AlHxCnhPxCNZW5L6gl6ZEiC1jQPh
-         31r/OabAE51avlizM04JtjO0TMhyqgyQuMISHJBhDEoLmsu5WIDpA+p3W/6XYaS2nOz+
-         VziLkDrUaoBz8MDllQ7zqsyu2o0YwAUslMQqArRnGteveAeqf4/UgrmK74dt0zUfL3xg
-         pX2A==
-X-Gm-Message-State: AOAM5335W47ftpN6+QKSZNZL/DIMguV5CLKAIIP4Xrnp9RFg1JlJlc0w
-        eHN7h9lHVnWQz+c7q7JeDRFAw3jrcOA=
-X-Google-Smtp-Source: ABdhPJzVbrqlDnwWN9vI1YiEk63AALcgXjetVAktuJLFmDIPwTLoA96SaZdTTPapO+kfLx4o1Ofv9Q==
-X-Received: by 2002:a0c:ef0f:0:b0:430:1cc5:1e48 with SMTP id t15-20020a0cef0f000000b004301cc51e48mr1625401qvr.29.1645097103372;
-        Thu, 17 Feb 2022 03:25:03 -0800 (PST)
-Received: from [172.17.0.2] ([20.186.104.68])
-        by smtp.gmail.com with ESMTPSA id h4sm3654705qkf.66.2022.02.17.03.25.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 03:25:02 -0800 (PST)
-Message-ID: <620e308e.1c69fb81.c75a9.73ec@mx.google.com>
-Date:   Thu, 17 Feb 2022 03:25:02 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2949382723288457851=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bluez@heine.tech
-Subject: RE: [BlueZ] Makefile.tools: remove duplicate link entry
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220217095647.2693176-1-bluez@heine.tech>
-References: <20220217095647.2693176-1-bluez@heine.tech>
+        Thu, 17 Feb 2022 07:13:52 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9C4F9B18B3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 04:13:35 -0800 (PST)
+Received: from smtpclient.apple (p4fefcd07.dip0.t-ipconnect.de [79.239.205.7])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7C6A7CECDD;
+        Thu, 17 Feb 2022 13:13:34 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+Subject: Re: [BlueZ PATCH v4 1/8] doc: Introduce the quality report command
+ and event
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220215133636.2827039-1-josephsih@chromium.org>
+Date:   Thu, 17 Feb 2022 13:13:33 +0100
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        pali@kernel.org, josephsih@google.com,
+        chromeos-bluetooth-upstreaming@chromium.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <666C5B97-A51C-48B9-AC91-0655C0D158B5@holtmann.org>
+References: <20220215133636.2827039-1-josephsih@chromium.org>
+To:     Joseph Hwang <josephsih@chromium.org>
+X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2949382723288457851==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Joseph,
 
-This is automated email and please do not reply to this email!
+> Add the MGMT quality report command and event in doc/mgmt-api.txt.
+> 
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> ---
+> 
+> Changes in v4:
+> - Use "Quality Report Event" without the prefix "Bluetooth" word.
+> - Combine both MGMT quality report command and event changes in a
+>  single patch.
+> 
+> Changes in v3:
+> - Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
+> - Add 5 new patches (5/9 - 9/9) to enable the quality report
+>  feature via MGMT_OP_SET_QUALITY_REPORT instead of through the
+>  experimental features.
+> 
+> Changes in v2:
+> - This is a new patch for adding the event in doc/mgmt-api.txt
+> 
+> doc/mgmt-api.txt | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 61 insertions(+)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index ebe56afa4..a494f5d7e 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -332,6 +332,7 @@ Read Controller Information Command
+> 		15	Static Address
+> 		16	PHY Configuration
+> 		17	Wideband Speech
+> +		18	Quality Report
+> 
+> 	This command generates a Command Complete event on success or
+> 	a Command Status event on failure.
+> @@ -2924,6 +2925,7 @@ Read Extended Controller Information Command
+> 		15	Static Address
+> 		16	PHY Configuration
+> 		17	Wideband Speech
+> +		18	Quality Report
+> 
+> 	The EIR_Data field contains information about class of device,
+> 	local name and other values. Not all of them might be present. For
+> @@ -3858,6 +3860,46 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
+> 				Invalid Parameters
+> 
+> 
+> +Set Quality Report Command
+> +==========================
+> +
+> +	Command Code:		0x0057
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Action (1 Octet)
 
-Dear submitter,
+I remember mentioning that we should use Quality_Report instead of Action.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=615314
+> +	Return Parameters:	Current_Settings (4 Octets)
+> +
+> +	This command is used to enable and disable the controller's quality
+> +	report feature. The allowed values for the Action command parameter
+> +	are 0x00 and 0x01. All other values will return Invalid Parameters.
+> +
+> +	The value 0x00 disables the Quality Report, and the value 0x01
+> +	enables the Quality Report feature.
+> +
+> +	This command is only available for the controllers that support
+> +	either AOSP Bluetooth quality report or Intel telemetry event.
 
----Test result---
+The details below are interesting, but don’t have to be in this document. It is supported if the Supported_Settings indicate support for it.
 
-Test Summary:
-CheckPatch                    PASS      1.44 seconds
-GitLint                       PASS      0.98 seconds
-Prep - Setup ELL              PASS      44.01 seconds
-Build - Prep                  PASS      0.75 seconds
-Build - Configure             PASS      8.77 seconds
-Build - Make                  PASS      1318.86 seconds
-Make Check                    PASS      11.85 seconds
-Make Check w/Valgrind         PASS      453.09 seconds
-Make Distcheck                PASS      249.38 seconds
-Build w/ext ELL - Configure   PASS      8.83 seconds
-Build w/ext ELL - Make        PASS      1288.74 seconds
-Incremental Build with patchesPASS      0.00 seconds
+> +	For a controller supporting the AOSP specification, it should call
+> +	hci_set_aosp_capable() in its driver. The controller should also
+> +	return version_supported v0.98 or higher in its Vendor-specific
+> +	capabilities responding to the LE_Get_Vendor_Capabilities_Command.
+> +	On the other hand, for a controller supporting Intel specification,
+> +	it should set up the set_quality_report callback properly. The driver
+> +	is responsible of setting up the quality report capability as
+> +	described above; otherwise, a Not Supported status will be returned.
+> +
+> +	This command requires to use a valid controller index. Otherwise,
+> +	an Invalid Index status will be returned.
+> +
+> +	The command is sent to the controller to enable/disable the quality
+> +	report feature, and generates a Command Complete event on success.
+> +	If the controller failed to execute the action, a Failed status will
+> +	be returned.
 
+Can this be used when powered off, is it remembered over power off/on cycles etc.
 
+> +
+> +	Possible errors:	Failed
+> +				Invalid Index
+> +				Invalid Parameters
+> +				Not Supported
+> +
+> +
+> Command Complete Event
+> ======================
+> 
+> @@ -4978,3 +5020,22 @@ Advertisement Monitor Device Lost Event
+> 		2	LE Random
+> 
+> 	This event will be sent to all management sockets.
+> +
+> +
+> +Quality Report Event
+> +====================
+> +
+> +	Event code:		0x0031
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Quality_Spec (1 Octet)
+> +				Report_Len (2 Octets)
+> +				Report (0-65535 Octets)
+> +
+> +	This event carries the Bluetooth quality report sent by the
+> +	controller.
+> +
+> +	Possible values for the Quality_Spec parameter:
+> +		0	AOSP Bluetooth Quality Report Event
+> +		1	Intel Telemetry Event
+> +
+> +	This event will be sent to all management sockets.
 
----
-Regards,
-Linux Bluetooth
+Regards
 
+Marcel
 
---===============2949382723288457851==--
