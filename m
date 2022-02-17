@@ -2,344 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 766D7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 13:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06675C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 13:07:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240649AbiBQNEz convert rfc822-to-8bit (ORCPT
+        id S240651AbiBQNHM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 08:04:55 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:37528 "EHLO
+        Thu, 17 Feb 2022 08:07:12 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240652AbiBQNEt (ORCPT
+        with ESMTP id S240647AbiBQNHL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 08:04:49 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B94282AB508;
-        Thu, 17 Feb 2022 05:04:34 -0800 (PST)
-Received: from smtpclient.apple (p4fefcd07.dip0.t-ipconnect.de [79.239.205.7])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D49D6CECDE;
-        Thu, 17 Feb 2022 14:04:33 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH v4 3/3] Bluetooth: mgmt: add set_quality_report for
- MGMT_OP_SET_QUALITY_REPORT
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220215133546.2826837-1-josephsih@chromium.org>
-Date:   Thu, 17 Feb 2022 14:04:33 +0100
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org,
-        josephsih@google.com, "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <DBB44155-EE79-4B1F-A947-FD6411FAC26D@holtmann.org>
-References: <20220215213519.v4.1.I2015b42d2d0a502334c9c3a2983438b89716d4f0@changeid>
- <20220215133546.2826837-1-josephsih@chromium.org>
-To:     Joseph Hwang <josephsih@chromium.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Thu, 17 Feb 2022 08:07:11 -0500
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58D6EA763
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 05:06:55 -0800 (PST)
+Received: by mail-lj1-x230.google.com with SMTP id o9so8227188ljq.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 05:06:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:subject:in-reply-to:content-transfer-encoding;
+        bh=f6C7qvpZAiYH/yPQDDigtwhT5/d+I3uypZCFdwWapdo=;
+        b=GFL1Tgo5fFRDneZY7z0RErw4mFDYR12hsxTxfMBh1morhKqsaioSIsg9BROYY9AnX+
+         Dg9qZX90INqtMYwyG5a0VusVbnI//HvKYmUNittf6K5E1bo/NiSZf1lPTYALDU5iXG7U
+         uvCl2PtIlm+/eWjPkS40YMONNQNvqGBQ7K1thZ1eQgI2DZWAbZdYuEJG2sFiqN20ppW/
+         uXVRnzd7MkgmEdBsfLZaWaIxyJdnMuJvE0RnV+pjFthTKdjb6zE7huYs7l4WI/xu8wtb
+         pqS6fqsCdf+/gU48zsrqYDQp6Sn4u/Yd1GgsXEQnH1sq5ofUoWvQMeaMSRJ56uAJW3Wy
+         czMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=f6C7qvpZAiYH/yPQDDigtwhT5/d+I3uypZCFdwWapdo=;
+        b=pdoqZWTfZGXe0lMI3GWHow58uTQR7vUjMkeh3FFxz/5FvVyx21up2l81MckSfa8Vxc
+         PrmKRLEBC3p7SO6jgkxisoKdSiNT6LDbM5Jz3EX7JvTo0Z62aiLydhR1CuGqXNOkwoy6
+         v7LSelWBySmHmCRUoVNx5oMDq6D1pOWp4yTkO3khqqEreGcbp4u5Mq9egc/1dYLcrdOL
+         ZbT/ehj/RvvCilpBReayX/3AoL9Mk4h5jlNX3GtYYPs5zX9sTht3rGSo7E/mmXfCsQb1
+         5wKlmIsQt4pP8RnsNZrLHoNN2RZNFzFVnUp2y/kCPohzukO4uQpZd10vFt+nZf1Gg5QQ
+         rolw==
+X-Gm-Message-State: AOAM533gFoKUgav5uqv8IV7D6t69fi2uYYlDu94mrW14zFKKPaMGAz5p
+        B6z5UfIBz3KMpX+GsRZhWkZsnbI6u0U=
+X-Google-Smtp-Source: ABdhPJy0cjKYVIYauJexjxYQoAZjCn1M4el4hQe+f5nORbNzMKf3xQKbAklQD7ngQw9zTY086sb68g==
+X-Received: by 2002:a2e:9949:0:b0:23c:4c33:54b with SMTP id r9-20020a2e9949000000b0023c4c33054bmr2083560ljj.253.1645103214154;
+        Thu, 17 Feb 2022 05:06:54 -0800 (PST)
+Received: from ?IPV6:2a02:2168:8737:3600:cd2a:e1fa:1ed7:c576? ([2a02:2168:8737:3600:cd2a:e1fa:1ed7:c576])
+        by smtp.gmail.com with ESMTPSA id u20sm1280792lfo.294.2022.02.17.05.06.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Feb 2022 05:06:53 -0800 (PST)
+Message-ID: <58080949-4139-3dda-cb2a-d89f20713ffb@gmail.com>
+Date:   Thu, 17 Feb 2022 16:06:52 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
+ <CABBYNZLA6bRCxd=Tse_XbUT8ReBo4QjvstSassfQAcTX+Fk9_g@mail.gmail.com>
+ <b50b9b75-96ea-0d93-3687-3a79cdec5419@gmail.com>
+ <CABBYNZKAUMOZ8vhk2ATPOaVHbcqCTg-DMD2vypkx_CTOjeVg2g@mail.gmail.com>
+ <6bec2be7-a411-c5bf-6e5d-b3efee33b834@gmail.com>
+ <CABBYNZLAZGoB1JKW63SNJuFB-4raDvHjjEk4w8y0K1MLwe4b7A@mail.gmail.com>
+ <b7a2b073-fd69-36a4-6ce0-cb1b942ccde6@gmail.com>
+ <CABBYNZKjUYAqctfpap2f36TcBuJFk0wX5P8jkUjpw1qqupeb0A@mail.gmail.com>
+From:   Andrey Butirsky <butirsky@gmail.com>
+Subject: Re: Lenovo Legion M600 wireless bluetooth mouse connected and paired
+ yet not working
+In-Reply-To: <CABBYNZKjUYAqctfpap2f36TcBuJFk0wX5P8jkUjpw1qqupeb0A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+On 17.02.2022 02:10, Luiz Augusto von Dentz wrote:
+> Hi Andrey,
+>
+> On Wed, Feb 16, 2022 at 2:36 PM Andrey Butirsky <butirsky@gmail.com> wrote:
+>> Tried BlueZ 5.63 on my Fedora installation, no luck. Will try to build
+>> head if no better idea..
+> If that doesn't work I'm afraid you will need a dedicated kernel
+> driver in order to deal with its HID reports since BlueZ just forwards
+> the reports to the kernel.
 
-> This patch adds a new set_quality_report mgmt handler to set
-> the quality report feature. The feature is removed from the
-> experimental features at the same time.
-> 
-> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> ---
-> 
-> Changes in v4:
-> - return current settings for set_quality_report.
-> 
-> Changes in v3:
-> - This is a new patch to enable the quality report feature.
->  The reading and setting of the quality report feature are
->  removed from the experimental features.
-> 
-> include/net/bluetooth/mgmt.h |   7 ++
-> net/bluetooth/mgmt.c         | 168 +++++++++++++++--------------------
-> 2 files changed, 81 insertions(+), 94 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 83b602636262..74d253ff617a 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -109,6 +109,7 @@ struct mgmt_rp_read_index_list {
-> #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
-> #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
-> #define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
-> +#define MGMT_SETTING_QUALITY_REPORT	0x00040000
-> 
-> #define MGMT_OP_READ_INFO		0x0004
-> #define MGMT_READ_INFO_SIZE		0
-> @@ -838,6 +839,12 @@ struct mgmt_cp_add_adv_patterns_monitor_rssi {
-> } __packed;
-> #define MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE	8
-> 
-> +#define MGMT_OP_SET_QUALITY_REPORT		0x0057
-> +struct mgmt_cp_set_quality_report {
-> +	__u8	action;
-> +} __packed;
-> +#define MGMT_SET_QUALITY_REPORT_SIZE		1
-> +
-> #define MGMT_EV_CMD_COMPLETE		0x0001
-> struct mgmt_ev_cmd_complete {
-> 	__le16	opcode;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 5e48576041fb..ccd77b94905b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -857,6 +857,10 @@ static u32 get_supported_settings(struct hci_dev *hdev)
-> 
-> 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
-> 
-> +	if (hdev && (aosp_has_quality_report(hdev) ||
-> +		     hdev->set_quality_report))
-> +		settings |= MGMT_SETTING_QUALITY_REPORT;
-> +
+Could you clarify do you mean usual BlueZ dedicated driver just built 
+from bluetooth-next for my kernel or some non-existent driver one yet 
+had to write?
 
-the hdev check here is useless. The hdev structure is always valid.
-
-> 	return settings;
-> }
-> 
-> @@ -928,6 +932,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
-> 	if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
-> 		settings |= MGMT_SETTING_WIDEBAND_SPEECH;
-> 
-> +	if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
-> +		settings |= MGMT_SETTING_QUALITY_REPORT;
-> +
-> 	return settings;
-> }
-> 
-> @@ -3871,12 +3878,6 @@ static const u8 debug_uuid[16] = {
-> };
-> #endif
-> 
-> -/* 330859bc-7506-492d-9370-9a6f0614037f */
-> -static const u8 quality_report_uuid[16] = {
-> -	0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
-> -	0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
-> -};
-> -
-> /* a6695ace-ee7f-4fb9-881a-5fac66c629af */
-> static const u8 offload_codecs_uuid[16] = {
-> 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f, 0x1a, 0x88,
-> @@ -3898,7 +3899,7 @@ static const u8 rpa_resolution_uuid[16] = {
-> static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
-> 				  void *data, u16 data_len)
-> {
-> -	char buf[102];   /* Enough space for 5 features: 2 + 20 * 5 */
-> +	char buf[82];   /* Enough space for 4 features: 2 + 20 * 4 */
-> 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
-> 	u16 idx = 0;
-> 	u32 flags;
-> @@ -3939,18 +3940,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
-> 		idx++;
-> 	}
-> 
-> -	if (hdev && (aosp_has_quality_report(hdev) ||
-> -		     hdev->set_quality_report)) {
-> -		if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
-> -			flags = BIT(0);
-> -		else
-> -			flags = 0;
-> -
-> -		memcpy(rp->features[idx].uuid, quality_report_uuid, 16);
-> -		rp->features[idx].flags = cpu_to_le32(flags);
-> -		idx++;
-> -	}
-> -
-
-(I see, you copied it from here. Yes, here you need to check for hdev!)
-
-> 	if (hdev && hdev->get_data_path_id) {
-> 		if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
-> 			flags = BIT(0);
-> @@ -4163,80 +4152,6 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
-> 	return err;
-> }
-> 
-> -static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
-> -				   struct mgmt_cp_set_exp_feature *cp,
-> -				   u16 data_len)
-> -{
-> -	struct mgmt_rp_set_exp_feature rp;
-> -	bool val, changed;
-> -	int err;
-> -
-> -	/* Command requires to use a valid controller index */
-> -	if (!hdev)
-> -		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-> -				       MGMT_OP_SET_EXP_FEATURE,
-> -				       MGMT_STATUS_INVALID_INDEX);
-> -
-> -	/* Parameters are limited to a single octet */
-> -	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-> -		return mgmt_cmd_status(sk, hdev->id,
-> -				       MGMT_OP_SET_EXP_FEATURE,
-> -				       MGMT_STATUS_INVALID_PARAMS);
-> -
-> -	/* Only boolean on/off is supported */
-> -	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-> -		return mgmt_cmd_status(sk, hdev->id,
-> -				       MGMT_OP_SET_EXP_FEATURE,
-> -				       MGMT_STATUS_INVALID_PARAMS);
-> -
-> -	hci_req_sync_lock(hdev);
-> -
-> -	val = !!cp->param[0];
-> -	changed = (val != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
-> -
-> -	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
-> -		err = mgmt_cmd_status(sk, hdev->id,
-> -				      MGMT_OP_SET_EXP_FEATURE,
-> -				      MGMT_STATUS_NOT_SUPPORTED);
-> -		goto unlock_quality_report;
-> -	}
-> -
-> -	if (changed) {
-> -		if (hdev->set_quality_report)
-> -			err = hdev->set_quality_report(hdev, val);
-> -		else
-> -			err = aosp_set_quality_report(hdev, val);
-> -
-> -		if (err) {
-> -			err = mgmt_cmd_status(sk, hdev->id,
-> -					      MGMT_OP_SET_EXP_FEATURE,
-> -					      MGMT_STATUS_FAILED);
-> -			goto unlock_quality_report;
-> -		}
-> -
-> -		if (val)
-> -			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
-> -		else
-> -			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
-> -	}
-> -
-> -	bt_dev_dbg(hdev, "quality report enable %d changed %d", val, changed);
-> -
-> -	memcpy(rp.uuid, quality_report_uuid, 16);
-> -	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
-> -	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
-> -
-> -	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_EXP_FEATURE, 0,
-> -				&rp, sizeof(rp));
-> -
-> -	if (changed)
-> -		exp_feature_changed(hdev, quality_report_uuid, val, sk);
-> -
-> -unlock_quality_report:
-> -	hci_req_sync_unlock(hdev);
-> -	return err;
-> -}
-> -
-> static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
-> 				  struct mgmt_cp_set_exp_feature *cp,
-> 				  u16 data_len)
-> @@ -4363,7 +4278,6 @@ static const struct mgmt_exp_feature {
-> 	EXP_FEAT(debug_uuid, set_debug_func),
-> #endif
-> 	EXP_FEAT(rpa_resolution_uuid, set_rpa_resolution_func),
-> -	EXP_FEAT(quality_report_uuid, set_quality_report_func),
-> 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
-> 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
-> 
-> @@ -8653,6 +8567,71 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
-> 				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
-> }
-> 
-> +static int set_quality_report(struct sock *sk, struct hci_dev *hdev,
-> +			      void *data, u16 data_len)
-> +{
-> +	struct mgmt_cp_set_quality_report *cp = data;
-> +	bool enable, changed;
-> +	int err;
-> +
-> +	/* Command requires to use a valid controller index */
-> +	if (!hdev)
-> +		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-> +				       MGMT_OP_SET_QUALITY_REPORT,
-> +				       MGMT_STATUS_INVALID_INDEX);
-> +
-> +	/* Only 0 (off) and 1 (on) is supported */
-> +	if (cp->action != 0x00 && cp->action != 0x01)
-> +		return mgmt_cmd_status(sk, hdev->id,
-> +				       MGMT_OP_SET_QUALITY_REPORT,
-> +				       MGMT_STATUS_INVALID_PARAMS);
-> +
-> +	hci_req_sync_lock(hdev);
-> +
-> +	enable = !!cp->action;
-> +	changed = (enable != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
-> +
-> +	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
-> +		err = mgmt_cmd_status(sk, hdev->id,
-> +				      MGMT_OP_SET_QUALITY_REPORT,
-> +				      MGMT_STATUS_NOT_SUPPORTED);
-> +		goto unlock_quality_report;
-> +	}
-> +
-> +	if (changed) {
-> +		if (hdev->set_quality_report)
-> +			err = hdev->set_quality_report(hdev, enable);
-> +		else
-> +			err = aosp_set_quality_report(hdev, enable);
-> +
-> +		if (err) {
-> +			err = mgmt_cmd_status(sk, hdev->id,
-> +					      MGMT_OP_SET_QUALITY_REPORT,
-> +					      MGMT_STATUS_FAILED);
-> +			goto unlock_quality_report;
-> +		}
-> +
-> +		if (enable)
-> +			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
-> +		else
-> +			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
-> +	}
-> +
-> +	bt_dev_dbg(hdev, "quality report enable %d changed %d",
-> +		   enable, changed);
-> +
-> +	err = send_settings_rsp(sk, MGMT_OP_SET_QUALITY_REPORT, hdev);
-> +	if (err < 0)
-> +		goto unlock_quality_report;
-> +
-> +	if (changed)
-> +		err = new_settings(hdev, sk);
-> +
-> +unlock_quality_report:
-> +	hci_req_sync_unlock(hdev);
-> +	return err;
-> +}
-> +
-> static const struct hci_mgmt_handler mgmt_handlers[] = {
-> 	{ NULL }, /* 0x0000 (no command) */
-> 	{ read_version,            MGMT_READ_VERSION_SIZE,
-> @@ -8779,6 +8758,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
-> 	{ add_adv_patterns_monitor_rssi,
-> 				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
-> 						HCI_MGMT_VAR_LEN },
-> +	{ set_quality_report,      MGMT_SET_QUALITY_REPORT_SIZE },
-> };
-> 
-> void mgmt_index_added(struct hci_dev *hdev)
-
-So this patch I actually get merged first.
-
-However we still need to figure out if this setting is suppose to survive power off/on cycles. Right now as far as I can tell it is added to hci_dev_clear_volatile_flags and thus needs to be set again after power on.
-
-Is this the expected behavior? I don’t think we want that. Since normally all other settings are restored after power on. And it is explicitly mentioned in doc/mgmt-api.txt as well.
-
-Regards
-
-Marcel
+In the latter case, do you have some sample drivers maybe one could easy 
+to adopt?
 
 
