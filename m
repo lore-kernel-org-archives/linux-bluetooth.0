@@ -2,85 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F44EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 16:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D383C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 17:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243268AbiBQQgc (ORCPT
+        id S242731AbiBQRgk convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 11:36:32 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:40102 "EHLO
+        Thu, 17 Feb 2022 12:36:40 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:53794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233858AbiBQQgc (ORCPT
+        with ESMTP id S242741AbiBQRgh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 11:36:32 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3300B2B2FCB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 08:36:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645115775; x=1676651775;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MzY2Dpa7WXd8Y/qN3oUL9Os7oqX8hGXNVcYnW55LxR8=;
-  b=ULgieVSftULPF/lG5n6fYUyMfkaHetotsDmWoW7IpJrlOMYgvOqKEmMZ
-   u79fKDi6+xh+iWvTVAXSdRGsN/j6/FaSLd5jBn4ylYQ914hcn9hpm3yfB
-   Tbot81hjqCFVo3/Zk8a3zXZW3Ifqa5yJrWeZM3IHWSMAQLquQxPM7CCBr
-   LBd999CJVvRPZJNTRWFYFjcFGAqshCXbRpxWtPQ3GsRfDU3X0kAc4YYYB
-   IxXhmxi5KKbjoE3DM0ez/qTxsfPSAj4x3Vii27KqFC7usVn2HnfUCeMh9
-   wuHxdOEAOz3Hd3W/P+kluP9pN/H2TISz8pwnRoiMbNV+1XHus0pfLfiFw
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="248508985"
-X-IronPort-AV: E=Sophos;i="5.88,376,1635231600"; 
-   d="scan'208";a="248508985"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 08:36:14 -0800
-X-IronPort-AV: E=Sophos;i="5.88,376,1635231600"; 
-   d="scan'208";a="637220129"
-Received: from angelara-mobl.amr.corp.intel.com (HELO [10.212.243.134]) ([10.212.243.134])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 08:36:14 -0800
-Message-ID: <aad96edd229fbb2b2b8d19727696e24add6783cb.camel@linux.intel.com>
-Subject: Re: [BlueZ PATCH] shared: Fix the incorrect type with bit shift
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
-Date:   Thu, 17 Feb 2022 08:36:13 -0800
-In-Reply-To: <9ADB9AF8-0F3F-4B49-BA89-1026920C591A@holtmann.org>
-References: <20220217063145.50497-1-hj.tedd.an@gmail.com>
-         <9ADB9AF8-0F3F-4B49-BA89-1026920C591A@holtmann.org>
-Organization: Intel Corporation
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 17 Feb 2022 12:36:37 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9ABC72B3AC1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 09:36:22 -0800 (PST)
+Received: from smtpclient.apple (p4fefcd07.dip0.t-ipconnect.de [79.239.205.7])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 911D6CECE3;
+        Thu, 17 Feb 2022 18:36:21 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix not using conn_timeout
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZKY7utNOKjMXT_YYbFNXMAjjOY3QmshYVE4aCp5g_DwjQ@mail.gmail.com>
+Date:   Thu, 17 Feb 2022 18:36:21 +0100
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FB05C2BC-3219-4013-AE25-F65D4A11FFAB@holtmann.org>
+References: <20220216221822.2694867-1-luiz.dentz@gmail.com>
+ <85EF808B-F51B-4F3B-B484-5952D8DC108B@holtmann.org>
+ <CABBYNZKY7utNOKjMXT_YYbFNXMAjjOY3QmshYVE4aCp5g_DwjQ@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Luiz,
 
-On Thu, 2022-02-17 at 10:55 +0100, Marcel Holtmann wrote:
-> Hi Tedd,
+>>> When using hci_le_create_conn_sync it shall wait for the conn_timeout
+>>> since the connection complete may take longer than just 2 seconds.
+>>> 
+>>> Also fix the masking of HCI_EV_LE_ENHANCED_CONN_COMPLETE and
+>>> HCI_EV_LE_CONN_COMPLETE so they are never both set so we can predict
+>>> which one the controller will use in case of HCI_OP_LE_CREATE_CONN.
+>>> 
+>>> Fixes: 6cd29ec6ae5e3 ("Bluetooth: hci_sync: Wait for proper events when connecting LE")
+>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> ---
+>>> net/bluetooth/hci_sync.c | 27 +++++++++++++++------------
+>>> 1 file changed, 15 insertions(+), 12 deletions(-)
+>>> 
+>>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>>> index 9dbf007e3dc7..002f9c5b5371 100644
+>>> --- a/net/bluetooth/hci_sync.c
+>>> +++ b/net/bluetooth/hci_sync.c
+>>> @@ -3265,11 +3265,17 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+>>>      if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT)
+>>>              events[0] |= 0x40;      /* LE Data Length Change */
+>>> 
+>>> -     /* If the controller supports LL Privacy feature, enable
+>>> -      * the corresponding event.
+>>> +     /* If the controller supports LL Privacy feature or LE Extended
+>>> +      * Create Connection, enable the corresponding event.
+>>>       */
+>>> -     if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
+>>> +     if (ll_privacy_capable(hdev) || hdev->commands[37] & 0x80) {
+>>>              events[1] |= 0x02;      /* LE Enhanced Connection Complete */
+>>> +     } else if (hdev->commands[26] & 0x10) {
+>>> +             /* If the controller supports the LE Create Connection
+>>> +              * command, enable the corresponding event.
+>>> +              */
+>>> +             events[0] |= 0x01;      /* LE Connection Complete */
+>>> +     }
+>>> 
+>>>      /* If the controller supports Extended Scanner Filter
+>>>       * Policies, enable the corresponding event.
+>>> @@ -3289,12 +3295,6 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+>>>      if (hdev->commands[26] & 0x08)
+>>>              events[0] |= 0x02;      /* LE Advertising Report */
+>>> 
+>>> -     /* If the controller supports the LE Create Connection
+>>> -      * command, enable the corresponding event.
+>>> -      */
+>>> -     if (hdev->commands[26] & 0x10)
+>>> -             events[0] |= 0x01;      /* LE Connection Complete */
+>>> -
+>> 
+>> I do not understand why you are trying to intermix this with LL Privacy. If the controller supports the LE Extended Create Connection, then we should enable that event. No matter if we have LL Privacy supported or enabled.
+>> 
+>> If we have other code that intermixes this, then it needs to be untangled.
+>> 
+>> What we should be doing is to only support LL Privacy if we also have support for LE Extended Create Connection command, but the assumption the other way around makes no sense.
 > 
-> > This patch fixes the following runtime error:
-> > 
-> > $ sudo ./monitor/btmon -w test.btsnoop
-> >  Bluetooth monitor ver 5.63
-> >  src/shared/btsnoop.c:339:18: runtime error: left shift of 65535 by 16 places cannot be represented in type 'int'
-> 
-> what compiler version is this? Or what warnings did you enable? Since this is weird, so while yes 0xffff can not be shifted, but we are also not shifting into an uint16_t. The fix is fine, I am just
-> curious. There will be other places with the same problem.
+> The spec does allow the use of LE Create Connection and Enhanced
+> Connection Complete since it does support own_address_type to be
+> 0x02/0x03 which means LL Privacy, I believe LE Extented Create
+> Connection was introduced much later than LL Privacy so we may find
+> controllers supporting LL Privacy with LE Create Connection but
+> without support for LE Extended Create Connection.
 
-I am using gcc 9.3.0 came with Ubuntu 20.04.
-This is enabled by the "-fsanitize=undefined" option.
+my memory is getting old and even while I actively worked on 4.2 and 5.x specs, I keep forgetting details.
 
-Recent change enabled LSAN, ASAN, and UBSAN by default.
+So here is the thing from the latest specs for the LE Enhanced Connection Complete event:
 
+C24: Mandatory if the Controller supports Connection State and either LE Feature (LL Privacy) or LE Feature (Extended Advertising) is supported, otherwise optional if the Controller supports Connection State, otherwise excluded.
 
-> 
-> Regards
-> 
-> Marcel
-> 
+That means that when either of these features are listed as supported, we unmask the event. Keep the LE Connection Complete also unmasked since the spec is clear that if both are unmasked the “enhanced” version shall be used.
 
+Maybe introduce an use_enhanced_conn_complete() macro.
+
+Regards
+
+Marcel
 
