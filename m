@@ -2,62 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6283C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 23:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC280C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 23:47:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbiBQXpR (ORCPT
+        id S229628AbiBQXrc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 18:45:17 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:40648 "EHLO
+        Thu, 17 Feb 2022 18:47:32 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:55994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbiBQXpQ (ORCPT
+        with ESMTP id S229597AbiBQXrb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 18:45:16 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60515367002
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:44:03 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id m7so7115190pjk.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:44:03 -0800 (PST)
+        Thu, 17 Feb 2022 18:47:31 -0500
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B29A378F76
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:47:06 -0800 (PST)
+Received: by mail-pj1-f50.google.com with SMTP id qe15so7061661pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:47:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=IbGAC1h6wZ2Rtb7hj4bLmC7vwrTbHvpT1XKOfFl5ukY=;
-        b=NT4FT0fwWdl0X3xCe39jhBdaVQqfEDgC3M9V8G+EgP1QRemWXA6X920CDLnviXHqCm
-         DxpBvL0xydWQPq9LpTsTEbcau0AO2CAEWltyVCt7aE+xOJYp+aTcL+cXv/KjfKmqvrk/
-         uM+SzbZZBUpfJMdPg97k47kgb23DMyHW7oMgzjRk/HAShGBkuBCke3ikjdYXIsDHWCW7
-         /4k8k6BruxK6Ls4DCtIQOFgvWdnAa2Uk9vV0WelCicN+RgfXv3THRDusdYynyw5ddbqL
-         ahloVcONsOkY3TTDhiKdseE/cFIKRnX36nswN54fdU47ikUZwcyUlhFgFsYpDHuODdEJ
-         6rRA==
+        bh=SF3Rz9iAegGfFyo/QFSu8zphh0k7BTH08lz7l9LmvHs=;
+        b=QFnucT4jVLpbz8QSa7F3vDOzGYsgA+TxYW/4VRwi4xSxIO8dcJATUMVYpNKTmNebuc
+         z4Omv5ANDtEQ4EE+oYjxTcaxJr8zBdTjWqWTdV2IzyMzZCfCfATNgxZ6Ofd8UjZ8XBCT
+         Ag1e3UeGZt7ykc8Zkii7CLZlehDXVjKrO/LBSljq3yqTNRCiOSBnHbSBKxpObm34Qfv9
+         6TBP0PbWhTai9I6SCIcg/bRieS0kHJXiRO7aOpsqGx1U6U2VSnU4ON8hFqoelITqqqYh
+         hz3D19y/vsxjRpmTAxIRjlJ6E+vGPB5NaootausgYK9soJ6IxBKfxuAzxaxyZstvQico
+         s9+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=IbGAC1h6wZ2Rtb7hj4bLmC7vwrTbHvpT1XKOfFl5ukY=;
-        b=lOD9S6DeW0I6stk/98P2KCj5MQd+dGMVUz8URLo1a/E1OM/RE2dymaTCeHBOsOidlt
-         A79p4oZT5EKFONd9O2wFqjZ0/RGFNu0H8tqG1IR0RMe2wz1E6W61dlgXL28fqbFncYgm
-         6i711hoqYQXC9YmS6SmdaMEndjt11bJ3EiP2w9zvkv73TF28MzQ2x3cJ/uhUcdnjZaMQ
-         AIyENJaistqQ4RAMBqSol+8GFd6KhpYCrVBD5RzxrWfBWx8aXzCEQSwLGNjesKv4PiPT
-         QeYwGA4bmgScVa/kZt5ygJkm6N54bzxkw0yFYY8h/aV0JNkNlOnv6lQZf2EY57Rwumc5
-         499w==
-X-Gm-Message-State: AOAM530w9VYdlhqIO1HWPHvq0aL9ddIGAtOTKRDvi9DrXmKMFIB+eTBs
-        mrwqzTs3AnCo4IVkLFwikJZekG7Qg6lBRA==
-X-Google-Smtp-Source: ABdhPJwElr+MlMtYoJhNQniM1MZCQlRXKMts6cDn4yr8bv6kWafSJvQ2YnQp93O5PnB7HOoVyofIVQ==
-X-Received: by 2002:a17:90a:6e47:b0:1b9:1154:6635 with SMTP id s7-20020a17090a6e4700b001b911546635mr9742306pjm.118.1645141143834;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SF3Rz9iAegGfFyo/QFSu8zphh0k7BTH08lz7l9LmvHs=;
+        b=x8F3KBO4lA3xjW1gIhX+C8pQc2NY+Pl1B0FAzFwz7F7enhP3+QD+MaflXssigx2Wyo
+         o5pswNqPmU/yJJhKybJai/KOI9+ow4Pwoc/KAbSVqMmgdo/W/zyEHizIm6kgLVQKxnse
+         GRr/1/b/mYkWR72ojVmDwcOI4f50rxKiK+4q5R8bO+TSPZKV7PV0lUggFddJ2j919/7z
+         VkB3MSJeQkcX92NonaCanW1O0saegbRodx/PgzDc/TRAFNFlwEhP7blIc6uLrCFfJpX/
+         75AJ2fYBRwF+wkfCo+Z7jxkRnWwe136boF3YASYSZujBIeCxXz/80lU1FOMNDVPBmkgb
+         QAiQ==
+X-Gm-Message-State: AOAM5318cCuEYC0jxVgsu+TiMNSUTFsyW6ynvf83Ps0lt8Ef07U9fS7I
+        TGM05115iKpU/SFgROJUXgJacWVwRYMCCw==
+X-Google-Smtp-Source: ABdhPJw5nOJA2N37OdDgTTIk7YyFOI5aTILnQ/DdOehOR/sZsaWZuUB8EkFR0ECQnWcKE0BcvB+ZeA==
+X-Received: by 2002:a17:902:da88:b0:14a:26ae:4e86 with SMTP id j8-20020a170902da8800b0014a26ae4e86mr5164971plx.59.1645141143093;
         Thu, 17 Feb 2022 15:39:03 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id lb18sm2840780pjb.42.2022.02.17.15.39.03
+        by smtp.gmail.com with ESMTPSA id lb18sm2840780pjb.42.2022.02.17.15.39.02
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 15:39:03 -0800 (PST)
+        Thu, 17 Feb 2022 15:39:02 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] adapter: Fix allowing multiple adapters with the same address
-Date:   Thu, 17 Feb 2022 15:39:02 -0800
-Message-Id: <20220217233902.3093404-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] main.conf: Introduce MaxControllers
+Date:   Thu, 17 Feb 2022 15:39:01 -0800
+Message-Id: <20220217233902.3093404-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220217233902.3093404-1-luiz.dentz@gmail.com>
-References: <20220217233902.3093404-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -66,34 +64,87 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The bdaddr of an adapter is used for its unique storage path so having
-multiple adapters with the same address would likely cause problems
-with its storage as they would be shared.
+This introduces MaxControllers which can be used to limit the number of
+adapters exposed in the system.
 ---
- src/adapter.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ src/adapter.c | 7 +++++++
+ src/btd.h     | 1 +
+ src/main.c    | 9 +++++++++
+ src/main.conf | 4 ++++
+ 4 files changed, 21 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 1551011a8..97ce26f8e 100644
+index 2071cf8db..1551011a8 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -9807,6 +9807,16 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 			goto failed;
- 		}
- 	} else {
-+		struct btd_adapter *tmp;
+@@ -10078,6 +10078,13 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 		return;
+ 	}
+ 
++	/* Check if at maximum adapters allowed in the system then ignore the
++	 * adapter.
++	 */
++	if (btd_opts.max_adapters &&
++			btd_opts.max_adapters == g_slist_length(adapters))
++		return;
 +
-+		tmp = adapter_find(&rp->bdaddr);
-+		if (tmp) {
-+			btd_error(adapter->dev_id,
-+				"Bluetooth address for index %u match index %u",
-+				adapter->dev_id, tmp->dev_id);
-+			goto failed;
-+		}
+ 	reset_adv_monitors(index);
+ 
+ 	adapter = btd_adapter_new(index);
+diff --git a/src/btd.h b/src/btd.h
+index a805a40d7..d13646889 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -121,6 +121,7 @@ struct btd_opts {
+ 	uint16_t	did_version;
+ 
+ 	bt_mode_t	mode;
++	uint16_t	max_adapters;
+ 	bt_gatt_cache_t gatt_cache;
+ 	uint16_t	gatt_mtu;
+ 	uint8_t		gatt_channels;
+diff --git a/src/main.c b/src/main.c
+index 8cc2dfca6..bf9d398e4 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -77,6 +77,7 @@ static const char *supported_options[] = {
+ 	"NameResolving",
+ 	"DebugKeys",
+ 	"ControllerMode",
++	"MaxControllers"
+ 	"MultiProfile",
+ 	"FastConnectable",
+ 	"Privacy",
+@@ -779,6 +780,14 @@ static void parse_config(GKeyFile *config)
+ 		g_free(str);
+ 	}
+ 
++	val = g_key_file_get_integer(config, "General", "MaxControllers", &err);
++	if (err) {
++		g_clear_error(&err);
++	} else {
++		DBG("MaxControllers=%d", val);
++		btd_opts.max_adapters = val;
++	}
 +
- 		bacpy(&adapter->bdaddr, &rp->bdaddr);
- 		if (!(adapter->supported_settings & MGMT_SETTING_LE))
- 			adapter->bdaddr_type = BDADDR_BREDR;
+ 	str = g_key_file_get_string(config, "General", "MultiProfile", &err);
+ 	if (err) {
+ 		g_clear_error(&err);
+diff --git a/src/main.conf b/src/main.conf
+index 49b9e6755..401796235 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -51,6 +51,10 @@
+ # Possible values: "dual", "bredr", "le"
+ #ControllerMode = dual
+ 
++# Maximum number of controllers allowed to be exposed to the system.
++# Default=0 (unlimited)
++#MaxControllers=0
++
+ # Enables Multi Profile Specification support. This allows to specify if
+ # system supports only Multiple Profiles Single Device (MPSD) configuration
+ # or both Multiple Profiles Single Device (MPSD) and Multiple Profiles Multiple
 -- 
 2.35.1
 
