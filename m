@@ -2,152 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0401AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 21:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 202B6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 22:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244898AbiBQVZJ (ORCPT
+        id S1343750AbiBQWC3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 16:25:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60332 "EHLO
+        Thu, 17 Feb 2022 17:02:29 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242293AbiBQVZI (ORCPT
+        with ESMTP id S237360AbiBQWC2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 16:25:08 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D17BE80234
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 13:24:53 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id q132so6082228pgq.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 13:24:53 -0800 (PST)
+        Thu, 17 Feb 2022 17:02:28 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851191A38B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 14:02:12 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id v10so11054758qvk.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 14:02:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=66M16CBRPYrlao7BmByLPHnxUcjLypCxTCLl2w8IVS4=;
-        b=eTj8gy9SABYXFyLxQMvQukiaI4vKeyPJNbak3c5dJqhTl7AkOe2flM1jD1GjqiFfxB
-         Vmv1/R4NKQDFb2FFn9o3pqaYe2zhaXWcoOUffihFSbcgOMShbe/368ppm65aaHVUaFck
-         spjy5HuojZoeOfd01JonYLtJtNU/J1gUMjovZlmloeu7NUDd8hHVoxXE3n4LtxIEvuit
-         WYuiBqoLL7qhARGmgVz+HmqnOGEJvUXGdnOOHj5aehvmomhBJpPxYrk4sDLqhojIxArI
-         1JW3Bn7+oTtzuWI15qnE3vnHty3orbhKglvbdKc9T+H0Wga+8Eoi0xfuMIDwQvVy3SGK
-         JLZg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Q0o8d65UeUQDyuBFDAmIw/bFzxA6vnsVwqyNByJhWpI=;
+        b=OrtONLMXYgG2KVJhS5DTruOUh9gG+uJxZoJ5RUEAG2AqGvIO3zRe2gn6EQoV346c1r
+         8A0Y1AMTiLkkcwAHRIO7QJWcoTkJmwawC+4ulEERUavbFGXASsx9Vw7+VS8LPFiL7/P6
+         e/xWg1ZeB3Xy5OoKaRACd+8SxDyS+azr1DS7FW33v/HNzfoxPcqIcBDP1rHu7fxL/7UF
+         mPQLI0nHdzAiZumecqb0w1fqhfZAq1i+351jf/1cXbIwZS6jKtdY6hxBMse7GYnDeWPI
+         GYVh1GM7rR12d98g69GVlyQiTlxzpVYL/IM1XQTpezwow5d7Tj9tEbHCDWcpBUjXLbhh
+         Nahw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=66M16CBRPYrlao7BmByLPHnxUcjLypCxTCLl2w8IVS4=;
-        b=q1qKv1uXtYC2AZPYI06IHGoUYofHB30iS3/2Mm9dP/KTmL8YkGYSXgJhkk15qeFian
-         45Xw8DLL1uzaKZOCiXbyK5pBWinAN6CulgtN6mWfHHROFhVoGVyDnxglXx3yRxx+58oz
-         Lco74Fa+gqMkwvGS/xohr9xpsiIkqh7xdq37JYZQ4NPkXdIVuB213TW8p7fwVHbpgfnp
-         QzfWW8qzlUYj+WdpietVYryBpkC4FHBm3FIPRGFGz3jSwPfprnLMZE3X6c2AY9uLXqZ3
-         +6dtGyzPb7XIRKQ97LeL7ICJ2KRjxPJpsSvS8ovU1FAOhTSMRNUoESKDMA18MZYFzppg
-         x/Og==
-X-Gm-Message-State: AOAM532E3TWRL1PfXDaAl9HD85DexydEEPSLffd8WRIVLfLUxV0yWiiC
-        pw9nnO6f05A5hH+lseKAuWv7poAdBEVwQA==
-X-Google-Smtp-Source: ABdhPJyfFqR/x2BqbSkb6gBO3sXN/KfgTwzXXm9PR63MNRS8YILzRUUmv6b0Pvn1YfBhKsImVo8X4g==
-X-Received: by 2002:a63:a545:0:b0:34c:9ba5:6125 with SMTP id r5-20020a63a545000000b0034c9ba56125mr3833184pgu.392.1645133092961;
-        Thu, 17 Feb 2022 13:24:52 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z25sm7290562pgu.39.2022.02.17.13.24.52
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Q0o8d65UeUQDyuBFDAmIw/bFzxA6vnsVwqyNByJhWpI=;
+        b=PXml9LblA6dun1grvCEocf5MwBno5dxDGVCjgKPH8oVPEvduOG5XmIGX4DWsckjg4q
+         upz+o7VPFZjXr+dm2y8gbi97vGy50qw9lX/i0gFCx32q7KFr+qx3To4x4/e/19W9s727
+         pPPbDIXUwjLz078pIhAnx1s/lDr5OwgCxewhvUD7waxeBh6i9LTQ91XTf2OQOxyLMHbh
+         FnYMHOHm/dbbQi1lWZ33cUUpnRjWlL7fUDCDV6xFrBLIO5WKaWKQB4xi/usY9jZdX2zj
+         Xa8uEQ2ADP8/3XthbEpJ+77WRRwORfCgF7MQX34GxplOXIgOoIEMm2gKo92/VjeacWWv
+         k9ZA==
+X-Gm-Message-State: AOAM532edIeRVMSb2CKFAN26sstnRJYDMSKHaqlsMjDfFAEmh4D4e+J2
+        24CE3+rU//+bHkgqdwudxf4MTJzjb3E=
+X-Google-Smtp-Source: ABdhPJxKrF8Xq+zAadUs7keC1sznsdhBy3FEWtVJnJnvFe8vEDa2OYQ1r2ZjB+Bn4J6n92PpQ8AodA==
+X-Received: by 2002:a0c:d807:0:b0:42c:1ff7:7242 with SMTP id h7-20020a0cd807000000b0042c1ff77242mr3801448qvj.119.1645135331317;
+        Thu, 17 Feb 2022 14:02:11 -0800 (PST)
+Received: from [172.17.0.2] ([137.116.72.163])
+        by smtp.gmail.com with ESMTPSA id y20sm23408350qta.9.2022.02.17.14.02.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 13:24:52 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix not using conn_timeout
-Date:   Thu, 17 Feb 2022 13:24:52 -0800
-Message-Id: <20220217212452.3067244-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 17 Feb 2022 14:02:11 -0800 (PST)
+Message-ID: <620ec5e3.1c69fb81.384e.447c@mx.google.com>
+Date:   Thu, 17 Feb 2022 14:02:11 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0143539777866650791=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_sync: Fix not using conn_timeout
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220217212452.3067244-1-luiz.dentz@gmail.com>
+References: <20220217212452.3067244-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============0143539777866650791==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When using hci_le_create_conn_sync it shall wait for the conn_timeout
-since the connection complete may take longer than just 2 seconds.
+This is automated email and please do not reply to this email!
 
-Also fix the masking of HCI_EV_LE_ENHANCED_CONN_COMPLETE and
-HCI_EV_LE_CONN_COMPLETE so they are never both set so we can predict
-which one the controller will use in case of HCI_OP_LE_CREATE_CONN.
+Dear submitter,
 
-Fixes: 6cd29ec6ae5e3 ("Bluetooth: hci_sync: Wait for proper events when connecting LE")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=615563
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.89 seconds
+GitLint                       PASS      0.95 seconds
+SubjectPrefix                 PASS      0.90 seconds
+BuildKernel                   PASS      36.80 seconds
+BuildKernel32                 PASS      33.44 seconds
+Incremental Build with patchesPASS      47.52 seconds
+TestRunner: Setup             PASS      592.64 seconds
+TestRunner: l2cap-tester      PASS      18.89 seconds
+TestRunner: bnep-tester       PASS      7.44 seconds
+TestRunner: mgmt-tester       PASS      126.90 seconds
+TestRunner: rfcomm-tester     PASS      10.09 seconds
+TestRunner: sco-tester        PASS      9.70 seconds
+TestRunner: smp-tester        PASS      9.34 seconds
+TestRunner: userchan-tester   PASS      7.85 seconds
+
+
+
 ---
-v2: Add use_enhanced_conn_complete and include comments regarding when the use
-of HCI_EV_LE_ENHANCED_CONN_COMPLETE.
+Regards,
+Linux Bluetooth
 
- include/net/bluetooth/hci_core.h |  8 ++++++++
- net/bluetooth/hci_sync.c         | 21 +++++++++++++++------
- 2 files changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c454913794bf..a5ee8a00d52a 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1505,6 +1505,14 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- /* Extended advertising support */
- #define ext_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_EXT_ADV))
- 
-+/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 1789:
-+ *
-+ * C24: Mandatory if the LE Controller supports Connection State and either
-+ * LE Feature (LL Privacy) or LE Feature (Extended Advertising) is supported
-+ */
-+#define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
-+					 ext_adv_capable(dev))
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 9dbf007e3dc7..b66a2271c433 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3265,10 +3265,10 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (hdev->le_features[0] & HCI_LE_DATA_LEN_EXT)
- 		events[0] |= 0x40;	/* LE Data Length Change */
- 
--	/* If the controller supports LL Privacy feature, enable
--	 * the corresponding event.
-+	/* If the controller supports LL Privacy feature or LE Extended Adv,
-+	 * enable the corresponding event.
- 	 */
--	if (hdev->le_features[0] & HCI_LE_LL_PRIVACY)
-+	if (use_enhanced_conn_complete(hdev))
- 		events[1] |= 0x02;	/* LE Enhanced Connection Complete */
- 
- 	/* If the controller supports Extended Scanner Filter
-@@ -5188,7 +5188,7 @@ static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
- 	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_EXT_CREATE_CONN,
- 					plen, data,
- 					HCI_EV_LE_ENHANCED_CONN_COMPLETE,
--					HCI_CMD_TIMEOUT, NULL);
-+					conn->conn_timeout, NULL);
- }
- 
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -5273,9 +5273,18 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	cp.min_ce_len = cpu_to_le16(0x0000);
- 	cp.max_ce_len = cpu_to_le16(0x0000);
- 
-+	/* BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2261:
-+	 *
-+	 * If this event is unmasked and the HCI_LE_Connection_Complete event
-+	 * is unmasked, only the HCI_LE_Enhanced_Connection_Complete event is
-+	 * sent when a new connection has been created.
-+	 */
- 	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CONN,
--				       sizeof(cp), &cp, HCI_EV_LE_CONN_COMPLETE,
--				       HCI_CMD_TIMEOUT, NULL);
-+				       sizeof(cp), &cp,
-+				       use_enhanced_conn_complete(hdev) ?
-+				       HCI_EV_LE_ENHANCED_CONN_COMPLETE :
-+				       HCI_EV_LE_CONN_COMPLETE,
-+				       conn->conn_timeout, NULL);
- 
- done:
- 	/* Re-enable advertising after the connection attempt is finished. */
--- 
-2.35.1
-
+--===============0143539777866650791==--
