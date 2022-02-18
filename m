@@ -2,109 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB78BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 03:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 826C3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 06:28:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229484AbiBRDtn (ORCPT
+        id S230055AbiBRG3F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 22:49:43 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49362 "EHLO
+        Fri, 18 Feb 2022 01:29:05 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:33962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbiBRDtn (ORCPT
+        with ESMTP id S229694AbiBRG3E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 22:49:43 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA24760CE
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:49:27 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id v73so4707602ybe.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:49:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yKpWIr0TcA77XBBCX3gs+GMKHM6n8k9HS5ec9QazhkQ=;
-        b=mgc6k/yKJ2jkPFJ+gHPqa1kQyFVAe8Z3lU5OwgnPpS/JSPRXQg2cIAdTPRhI5zMi9/
-         6EVQ35Agac8HU9SCrH6fSE9YlqsC4YszwLaDaU+mZesYzem3vFFcnf86D82+PNjTOwDv
-         hHMogfQ0189NJAjcDBFtXWRB/9Mk3CDRfTnXylcDhqDczo5wilbxPWDfW7Kxx41IwbRK
-         YlJ9fuahjWbq95+gaOOCnDdoni74Z2NbVKS/vYhyf+INWWGuAbrTuLrmqn8i6lirSvRU
-         Ex0ViVtpuVcUY9hDpfJfGRr2Sy0I7qLClkhdIQM1OR1VWsAX3M1Z447ldQW+IpRXiz+e
-         fNhw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yKpWIr0TcA77XBBCX3gs+GMKHM6n8k9HS5ec9QazhkQ=;
-        b=vgMI/bVcyfo4QN5r9DUXt+3YO4ke2S3e1YM+fYZlKRCJD5OqSGRN9Ka4f9U3ki5JzI
-         unCYW3IJxDypNTV9z6ZF0lDrTknqK+td1nypw5dJtV6fj13bjIce7ROE7dYsJ9sodui7
-         nPnTfn6PvR9Kp3CaDg0tQZpN7lcwL6zrkQAa9Lp+wR0L006SkGN1trnG+P8Fzy2DJtp/
-         Whpcl47740H5ewbI7U6d3mXviguWXUJB6YTlhgnnmS3YMOhAct1AH4bpg7IjYABusEpq
-         yAh8uSzRpdju8nxTgbxTZXAWgxgJ9WZht5h87Yf3yjaX96+l1//MR2S9kzZ+FL9VNcjX
-         PYAQ==
-X-Gm-Message-State: AOAM533CHncofBQB/D5bNSEv5XbVoOQXBWXz5G/O5CmyTVPg7c25wubF
-        CzPulHeYHVXnuKIDTyqSZ96mp8LOi7kCfLr4WWoKi7ImUAAtzjup
-X-Google-Smtp-Source: ABdhPJxpdw5CCv/loHvG7s1pzxNcodNXBpHnXhebUNIOryrEMQvDBjJDpMmfo1A9d6+DmZAhblqOGqH+s+Bk8259Bzo=
-X-Received: by 2002:a05:6902:91e:b0:621:b123:de46 with SMTP id
- bu30-20020a056902091e00b00621b123de46mr5674977ybb.76.1645156166864; Thu, 17
- Feb 2022 19:49:26 -0800 (PST)
+        Fri, 18 Feb 2022 01:29:04 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E88B1B7186
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 22:28:46 -0800 (PST)
+Received: from [192.168.0.2] (ip5f5aebcf.dynamic.kabel-deutschland.de [95.90.235.207])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id D1E5E61E6478B;
+        Fri, 18 Feb 2022 07:28:43 +0100 (CET)
+Message-ID: <d2c865b1-bfbd-4667-2398-967b612f6c8d@molgen.mpg.de>
+Date:   Fri, 18 Feb 2022 07:28:43 +0100
 MIME-Version: 1.0
-References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
- <CAJCQCtTdiPNkV1_b478_LkG11TMOPEdDGHTjf5LfZJpwWrK+bg@mail.gmail.com>
- <CAJCQCtTNk25u6sm_Xqt8qzf7mM5kmOrnXyD6pT1GKJ5z5-Kqbw@mail.gmail.com>
- <CAJCQCtRYKbTQ16eUq2qODZ=dE=HB6pZpLNswdqMbiWw+DBE9KQ@mail.gmail.com>
- <CABBYNZKfy-ntFhbx0TStNwFiwxCF4sPVaHS4wDbef0shb=pawg@mail.gmail.com>
- <CAJCQCtRiTQ1BTEHugxhS-zmXFG4qi4WLxsRyZsG9-_Q0isM+7Q@mail.gmail.com>
- <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com> <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
-In-Reply-To: <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
-From:   Chris Murphy <lists@colorremedies.com>
-Date:   Thu, 17 Feb 2022 20:49:11 -0700
-Message-ID: <CAJCQCtTpHQe2co3fLNs5csKQchmwH=3YwQOvFnuc2nhjRseVnw@mail.gmail.com>
-Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
- connect to bluetooth devices
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: [PATCH BlueZ] main.conf: Fix parsing of mode options
+Content-Language: en-US
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Chris Murphy <lists@colorremedies.com>,
-        Bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20220218021605.3126182-1-luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20220218021605.3126182-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Feb 17, 2022 at 5:15 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Chris,
->
-> On Thu, Feb 17, 2022 at 3:36 PM Chris Murphy <lists@colorremedies.com> wrote:
-> >
-> > OK I started over, and for now keeping the reporting constrained to
-> > the hardware I personally have on hand.
-> >
-> > Hardware:
-> > Lenovo Thinkpad X1 Carbon Gen 7
-> > Bus 001 Device 004: ID 8087:0aaa Intel Corp. Bluetooth 9460/9560
-> > Jefferson Peak (JfP)
-> > Sony 1000XM3 headset
-> > bluez-5.63-3.fc36.x86_64
-> >
-> > kernel 5.17.0-rc4
-> > * remove the paired headset with bluetoothctl
-> > * reset the headset so it's not longer paired either
-> > * put the headset in pairing mode
-> > * GNOME Settings Bluetooth panel sees -> LE_WH-1000XM3, Not Setup
-> > * click on Not Setup and nothing happens
->
-> Well from the logs it doesn't seem the GNOME Setting is trying to do
-> anything, have you tried bluetoothctl> connect <address>
-
-`bluetoothctl scan on`  does see the device
-$ bluetoothctl pair 38:18:4C:24:2D:1D
-Device 38:18:4C:24:2D:1D not available
-$ bluetoothctl connect 38:18:4C:24:2D:1D
-Device 38:18:4C:24:2D:1D not available
-
-$ journalctl -b -o short-monotonic --no-hostname | grep -i blue
-https://drive.google.com/file/d/1x9EDvDx6XUowyRy2056n6uW-4PLx5KRb/view?usp=sharing
+Dear Luiz,
 
 
+Am 18.02.22 um 03:16 schrieb Luiz Augusto von Dentz:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This replace the of g_key_file_get_integer which is limited to only
 
---
-Chris Murphy
+Do you mean “This replaces the use of”? Maybe just:
+
+Replace g_key_file_get_integer, limited to only decimal values, with …
+
+> decimal values to g_key_file_get_string and then use strtol to convert
+> the string value to integer.
+
+Maybe give an example config file line with a hex assignment:
+
+     X=0x…
+> Fixes: https://github.com/bluez/bluez/issues/293
+> ---
+>   src/main.c | 15 ++++++++++++---
+>   1 file changed, 12 insertions(+), 3 deletions(-)
+> 
+> diff --git a/src/main.c b/src/main.c
+> index bf9d398e4..a448320c1 100644
+> --- a/src/main.c
+> +++ b/src/main.c
+> @@ -354,13 +354,22 @@ static void parse_mode_config(GKeyFile *config, const char *group,
+>   
+>   	for (i = 0; i < params_len; ++i) {
+>   		GError *err = NULL;
+> -		int val = g_key_file_get_integer(config, group,
+> -						params[i].val_name, &err);
+> +		char *str;
+> +
+> +		str = g_key_file_get_string(config, group, params[i].val_name,
+> +									&err);
+>   		if (err) {
+>   			DBG("%s", err->message);
+>   			g_clear_error(&err);
+>   		} else {
+> -			info("%s=%d", params[i].val_name, val);
+> +			char *endptr = NULL;
+> +			int val;
+> +
+> +			val = strtol(str, &endptr, 0);
+> +			if (!endptr || *endptr != '\0')
+> +				continue;
+> +
+> +			info("%s=%s(%d)", params[i].val_name, str, val);
+>   
+>   			val = MAX(val, params[i].min);
+>   			val = MIN(val, params[i].max);
+
+
+Kind regards,
+
+Paul
