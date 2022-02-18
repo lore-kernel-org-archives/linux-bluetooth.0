@@ -2,94 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E4DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 11:55:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F02C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 14:16:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234719AbiBRLzS (ORCPT
+        id S235930AbiBROQQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Feb 2022 06:55:18 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:41740 "EHLO
+        Fri, 18 Feb 2022 09:16:16 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:45724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234690AbiBRLzR (ORCPT
+        with ESMTP id S232114AbiBROQQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Feb 2022 06:55:17 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23509253BD7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 03:55:01 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id bn33so3925501ljb.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 03:55:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:subject:in-reply-to:content-transfer-encoding;
-        bh=LpTSlOI5yVEKnbppnJaKaIMeR05a7qhhYy/oeJHL2FQ=;
-        b=BK94jbNHfsjH/XHtcQPW/2qpNWomTnUcAIRy3out6Dm99dC5IDcVoEQowbosnkJurh
-         Ix8StOCyFqwaKraQfhM0N2W7mc7bKplN9vwPDJJStEoe019SYJpBK7aVC2rK1TbeP4jH
-         /oSXRbwQyNL+YvrTv3WdjAlauESCKBqwov82eqC4npEc+udoikvoHAluPsh3sEbhhVqD
-         KINnoIlVdvhwXkw4Rdzi5nXFXITNQ3fNKpr+ItwtpqZG2GqVRKXGhdB8fyqIzVQf856Q
-         Mzddazsvsfuz0waFtsAcMHHTBfkmuE4xNMU9tBUOC6W7Kecmbe9qOKrd2M+VtkDyx7Ei
-         nM/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=LpTSlOI5yVEKnbppnJaKaIMeR05a7qhhYy/oeJHL2FQ=;
-        b=oKtJhXlts1UYOveJGsDzxD97ihNQCLxgPcsLdeHvZ1Pu8Yv4KinIjy5ve3wZo7CLAS
-         p/4wmaZkEIGubSP4hgXJCMq26PpUSs8md3b73cCai5td2SK7xmdRUQ488LxDOQflRzAk
-         gDP4oeehRirPmJfRBkI/M6iE3ZUzjAbhdCfkb+Ny9T+Q2oBx9nLAZhSsBwCuv1aleuPs
-         rktxxp7NQjqxrLPNqsBPqujvkcknBVIV/gCc/OgZLuigCYcFjKewOryrCumtdEXAghUK
-         vAP7WvXacp7te7BZN79dj5GBdXeRZA+ykFURhYjsEC58Z1+JYQtSWGOr0KeTpgYC/Wqx
-         lFtg==
-X-Gm-Message-State: AOAM531ryJZAbClJtSMCYGldfqKTjgqDcLfzDS7QNVLfQvnbp3+6Mu5P
-        RWwGwEA9NKndcpTWioM/XSD2Iy4gxTY=
-X-Google-Smtp-Source: ABdhPJxgXte6Rv5Qxs3q4rwNkjRU4GkxGVh+SNkoA+ybU/TCeVWMqSEdwDil7yRbCmiL1PGjtIF/tg==
-X-Received: by 2002:a05:651c:a09:b0:239:8f43:ad53 with SMTP id k9-20020a05651c0a0900b002398f43ad53mr5568944ljq.458.1645185299355;
-        Fri, 18 Feb 2022 03:54:59 -0800 (PST)
-Received: from ?IPV6:2a02:2168:8737:3600:cd2a:e1fa:1ed7:c576? ([2a02:2168:8737:3600:cd2a:e1fa:1ed7:c576])
-        by smtp.gmail.com with ESMTPSA id bt24sm232105lfb.246.2022.02.18.03.54.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Feb 2022 03:54:58 -0800 (PST)
-Message-ID: <72b3b0ee-cca0-3804-ce78-1345c4590963@gmail.com>
-Date:   Fri, 18 Feb 2022 14:54:58 +0300
+        Fri, 18 Feb 2022 09:16:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6074229C119
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 06:15:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 07FA7B8265C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 14:15:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7BECC340F1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 14:15:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645193756;
+        bh=VmNg4OHfpfngl/R3+DYCrZU2oO5sgu3L2nbd8dfiPEM=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=KsAkqhdFV8ujCTaBL1XkvsMHbEo/lLmK4aySBIivCMoaZt8sqbso1YBqYNReNN3iX
+         XjaSzxwjli0QeTkj2Rfqf4IDVvNCpVsJFgZ1LKTNb/e/8a9VHN0d9FZ3trr0sOec2g
+         7fCQRaiGNt6JHyjlY/3CSRACQmiiaakjFTCD8pgnrGAgBvUZLo5Cy1+10A+w5CafNQ
+         ieOhvN4aMtna5cMkpoJspMKFNbAOY4A+d7yDm7Knt+JeGVRZDjrDbvH3SnA1QIeEK8
+         SnpHTeWAQYxM9B+O0zs9LuxBmYFwgaHjwr6vGSUvcHsDukfINwCoPZtl10JeFdf9Lu
+         1lgItjfnEFGqw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 8F6C1CC13AF; Fri, 18 Feb 2022 14:15:56 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215576] HSP/HFP mSBC profile broken with QCA6174
+Date:   Fri, 18 Feb 2022 14:15:56 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215576-62941-mgAUSJWfs5@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215576-62941@https.bugzilla.kernel.org/>
+References: <bug-215576-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
- <CABBYNZLA6bRCxd=Tse_XbUT8ReBo4QjvstSassfQAcTX+Fk9_g@mail.gmail.com>
- <b50b9b75-96ea-0d93-3687-3a79cdec5419@gmail.com>
- <CABBYNZKAUMOZ8vhk2ATPOaVHbcqCTg-DMD2vypkx_CTOjeVg2g@mail.gmail.com>
- <6bec2be7-a411-c5bf-6e5d-b3efee33b834@gmail.com>
- <CABBYNZLAZGoB1JKW63SNJuFB-4raDvHjjEk4w8y0K1MLwe4b7A@mail.gmail.com>
- <b7a2b073-fd69-36a4-6ce0-cb1b942ccde6@gmail.com>
- <CABBYNZKjUYAqctfpap2f36TcBuJFk0wX5P8jkUjpw1qqupeb0A@mail.gmail.com>
-From:   Andrey Butirsky <butirsky@gmail.com>
-Subject: Re: Lenovo Legion M600 wireless bluetooth mouse connected and paired
- yet not working
-In-Reply-To: <CABBYNZKjUYAqctfpap2f36TcBuJFk0wX5P8jkUjpw1qqupeb0A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 17.02.2022 02:10, Luiz Augusto von Dentz wrote:
-> Hi Andrey,
->
-> On Wed, Feb 16, 2022 at 2:36 PM Andrey Butirsky <butirsky@gmail.com> wrote:
->> Tried BlueZ 5.63 on my Fedora installation, no luck. Will try to build
->> head if no better idea..
-> If that doesn't work I'm afraid you will need a dedicated kernel
-> driver in order to deal with its HID reports since BlueZ just forwards
-> the reports to the kernel.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
 
-Important addition: the mouse does work on Android 8.10.
+The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
+huis.info) changed:
 
-Does it mean Android has that special HID driver that missed on Linux? 
-8.10 came out long before the mouse even existed..
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |marcel@holtmann.org,
+                   |                            |regressions@leemhuis.info
 
-Do you have explanation?
+--- Comment #3 from The Linux kernel's regression tracker (Thorsten Leemhui=
+s) (regressions@leemhuis.info) ---
+hey bluetooth maintainers, what the status here? This regression was report=
+ed
+more than ten days ago, it was bisected, and a second person roughly confir=
+ms
+it, nevertheless there wasn't a single reply yet. Is somebody looking into
+this?
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
