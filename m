@@ -2,101 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD2DEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 03:27:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB78BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 03:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231944AbiBRD1a (ORCPT
+        id S229484AbiBRDtn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 22:27:30 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:42218 "EHLO
+        Thu, 17 Feb 2022 22:49:43 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:49362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231939AbiBRD13 (ORCPT
+        with ESMTP id S229471AbiBRDtn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 22:27:29 -0500
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378B72E08D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:27:14 -0800 (PST)
-Received: by mail-qk1-x729.google.com with SMTP id n185so6755820qke.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:27:14 -0800 (PST)
+        Thu, 17 Feb 2022 22:49:43 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA24760CE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:49:27 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id v73so4707602ybe.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:49:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=S4LMLwn4In1DLjaVZ0nTYlkc7sWlKXcP/yjWEiCLlvI=;
-        b=VdiXmytj+VjhlLSE9audXUDSD4YjBglI6uNj+Rs+Rlb/L74zP/w2gZWUreWdrAOxsj
-         IUeO/QHG456UHG6VGHR4dq/uS8Oi77yDKvSJmSLspFk1a7GYYkyOmkBdrGlsVwXeimh0
-         O72TY5koK7GfPTYz00N4kyP+/vX7HmnN/jEqVXzb0168BpyS+nfrnrtLJ8RhQ7EXTWNO
-         FXgwakBJz6S1tUVtAiALrlqCRqP/E1utMQeIVMw5ResFHoT+eeMVpT1rRtsu4LIsIurZ
-         y4Oc6M/iZTwrVwXmwX1rX1YQoUufHSAI9W36Kei9xMwX52dwFH/xd8Cn5rsG4/LUr8lo
-         ai5w==
+        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yKpWIr0TcA77XBBCX3gs+GMKHM6n8k9HS5ec9QazhkQ=;
+        b=mgc6k/yKJ2jkPFJ+gHPqa1kQyFVAe8Z3lU5OwgnPpS/JSPRXQg2cIAdTPRhI5zMi9/
+         6EVQ35Agac8HU9SCrH6fSE9YlqsC4YszwLaDaU+mZesYzem3vFFcnf86D82+PNjTOwDv
+         hHMogfQ0189NJAjcDBFtXWRB/9Mk3CDRfTnXylcDhqDczo5wilbxPWDfW7Kxx41IwbRK
+         YlJ9fuahjWbq95+gaOOCnDdoni74Z2NbVKS/vYhyf+INWWGuAbrTuLrmqn8i6lirSvRU
+         Ex0ViVtpuVcUY9hDpfJfGRr2Sy0I7qLClkhdIQM1OR1VWsAX3M1Z447ldQW+IpRXiz+e
+         fNhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=S4LMLwn4In1DLjaVZ0nTYlkc7sWlKXcP/yjWEiCLlvI=;
-        b=oZ4J/9FSuH6U9ZdOLLNfOtA8HO8u1XvPIEkL//VYnYjh9lye/ry6JUehu3zTluQh4W
-         gI0XuT2UaeMTAssy5dbul1A0wjYzDgWcIyaJPIoeP21D/vU2cCQfQE2ZFsSkOnzbPmL0
-         /UN178gk7jNpw7V08yhIBEcxn78r8NxXsho6lj4tqDoF61URxhZxcQE6IPtTLvqKey7y
-         CCWeKilV7mf5OIVQXJNZ0YaBGpO7Rckn6u7RGbbd/ZsU37c9sZgAul6ZnTRM7Rcat9wv
-         KSy+5s/YN2yyU2m9OCM3/IwJzhX35Z0EYo2rzyCYzN6V5R+opPmErKdEgxMbOjXi8CkZ
-         dMDA==
-X-Gm-Message-State: AOAM5327dNJ2xKg7V+ltEJ/1zcNV0wZMuY3yMd2urhOqLObzWuI1ehV8
-        clEwNmZxf1P4nkSVAgMFksN/qYC29is=
-X-Google-Smtp-Source: ABdhPJzY82y37ns8m/rhjyc3H5mo6vfNu1tgVj6Gu0BM36fU46G07bj0++cjsGBuJekRnAVkOe6Tpg==
-X-Received: by 2002:a05:620a:1506:b0:47c:fd66:7053 with SMTP id i6-20020a05620a150600b0047cfd667053mr3554848qkk.322.1645154833207;
-        Thu, 17 Feb 2022 19:27:13 -0800 (PST)
-Received: from [172.17.0.2] ([20.186.108.193])
-        by smtp.gmail.com with ESMTPSA id y5sm21169847qkp.37.2022.02.17.19.27.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 19:27:12 -0800 (PST)
-Message-ID: <620f1210.1c69fb81.e1488.8904@mx.google.com>
-Date:   Thu, 17 Feb 2022 19:27:12 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3331223056590492256=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yKpWIr0TcA77XBBCX3gs+GMKHM6n8k9HS5ec9QazhkQ=;
+        b=vgMI/bVcyfo4QN5r9DUXt+3YO4ke2S3e1YM+fYZlKRCJD5OqSGRN9Ka4f9U3ki5JzI
+         unCYW3IJxDypNTV9z6ZF0lDrTknqK+td1nypw5dJtV6fj13bjIce7ROE7dYsJ9sodui7
+         nPnTfn6PvR9Kp3CaDg0tQZpN7lcwL6zrkQAa9Lp+wR0L006SkGN1trnG+P8Fzy2DJtp/
+         Whpcl47740H5ewbI7U6d3mXviguWXUJB6YTlhgnnmS3YMOhAct1AH4bpg7IjYABusEpq
+         yAh8uSzRpdju8nxTgbxTZXAWgxgJ9WZht5h87Yf3yjaX96+l1//MR2S9kzZ+FL9VNcjX
+         PYAQ==
+X-Gm-Message-State: AOAM533CHncofBQB/D5bNSEv5XbVoOQXBWXz5G/O5CmyTVPg7c25wubF
+        CzPulHeYHVXnuKIDTyqSZ96mp8LOi7kCfLr4WWoKi7ImUAAtzjup
+X-Google-Smtp-Source: ABdhPJxpdw5CCv/loHvG7s1pzxNcodNXBpHnXhebUNIOryrEMQvDBjJDpMmfo1A9d6+DmZAhblqOGqH+s+Bk8259Bzo=
+X-Received: by 2002:a05:6902:91e:b0:621:b123:de46 with SMTP id
+ bu30-20020a056902091e00b00621b123de46mr5674977ybb.76.1645156166864; Thu, 17
+ Feb 2022 19:49:26 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] main.conf: Fix parsing of mode options
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220218021605.3126182-1-luiz.dentz@gmail.com>
-References: <20220218021605.3126182-1-luiz.dentz@gmail.com>
+References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
+ <CAJCQCtTdiPNkV1_b478_LkG11TMOPEdDGHTjf5LfZJpwWrK+bg@mail.gmail.com>
+ <CAJCQCtTNk25u6sm_Xqt8qzf7mM5kmOrnXyD6pT1GKJ5z5-Kqbw@mail.gmail.com>
+ <CAJCQCtRYKbTQ16eUq2qODZ=dE=HB6pZpLNswdqMbiWw+DBE9KQ@mail.gmail.com>
+ <CABBYNZKfy-ntFhbx0TStNwFiwxCF4sPVaHS4wDbef0shb=pawg@mail.gmail.com>
+ <CAJCQCtRiTQ1BTEHugxhS-zmXFG4qi4WLxsRyZsG9-_Q0isM+7Q@mail.gmail.com>
+ <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com> <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
+In-Reply-To: <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
+From:   Chris Murphy <lists@colorremedies.com>
+Date:   Thu, 17 Feb 2022 20:49:11 -0700
+Message-ID: <CAJCQCtTpHQe2co3fLNs5csKQchmwH=3YwQOvFnuc2nhjRseVnw@mail.gmail.com>
+Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
+ connect to bluetooth devices
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Chris Murphy <lists@colorremedies.com>,
+        Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3331223056590492256==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Feb 17, 2022 at 5:15 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Chris,
+>
+> On Thu, Feb 17, 2022 at 3:36 PM Chris Murphy <lists@colorremedies.com> wrote:
+> >
+> > OK I started over, and for now keeping the reporting constrained to
+> > the hardware I personally have on hand.
+> >
+> > Hardware:
+> > Lenovo Thinkpad X1 Carbon Gen 7
+> > Bus 001 Device 004: ID 8087:0aaa Intel Corp. Bluetooth 9460/9560
+> > Jefferson Peak (JfP)
+> > Sony 1000XM3 headset
+> > bluez-5.63-3.fc36.x86_64
+> >
+> > kernel 5.17.0-rc4
+> > * remove the paired headset with bluetoothctl
+> > * reset the headset so it's not longer paired either
+> > * put the headset in pairing mode
+> > * GNOME Settings Bluetooth panel sees -> LE_WH-1000XM3, Not Setup
+> > * click on Not Setup and nothing happens
+>
+> Well from the logs it doesn't seem the GNOME Setting is trying to do
+> anything, have you tried bluetoothctl> connect <address>
 
-This is automated email and please do not reply to this email!
+`bluetoothctl scan on`  does see the device
+$ bluetoothctl pair 38:18:4C:24:2D:1D
+Device 38:18:4C:24:2D:1D not available
+$ bluetoothctl connect 38:18:4C:24:2D:1D
+Device 38:18:4C:24:2D:1D not available
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=615612
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.55 seconds
-GitLint                       PASS      0.99 seconds
-Prep - Setup ELL              PASS      52.63 seconds
-Build - Prep                  PASS      0.81 seconds
-Build - Configure             PASS      10.55 seconds
-Build - Make                  PASS      1511.36 seconds
-Make Check                    PASS      12.99 seconds
-Make Check w/Valgrind         PASS      545.06 seconds
-Make Distcheck                PASS      281.59 seconds
-Build w/ext ELL - Configure   PASS      10.64 seconds
-Build w/ext ELL - Make        PASS      1467.66 seconds
-Incremental Build with patchesPASS      0.00 seconds
+$ journalctl -b -o short-monotonic --no-hostname | grep -i blue
+https://drive.google.com/file/d/1x9EDvDx6XUowyRy2056n6uW-4PLx5KRb/view?usp=sharing
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============3331223056590492256==--
+--
+Chris Murphy
