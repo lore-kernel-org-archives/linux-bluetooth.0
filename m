@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7761CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 23:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C441C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 23:40:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237402AbiBRXTJ (ORCPT
+        id S240180AbiBRXlC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Feb 2022 18:19:09 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:43802 "EHLO
+        Fri, 18 Feb 2022 18:41:02 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:51272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232249AbiBRXTI (ORCPT
+        with ESMTP id S240178AbiBRXlB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Feb 2022 18:19:08 -0500
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6975914A6CC
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 15:18:48 -0800 (PST)
-Received: by mail-io1-xd32.google.com with SMTP id f14so1656137ioz.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 15:18:48 -0800 (PST)
+        Fri, 18 Feb 2022 18:41:01 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97C027B489
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 15:40:43 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id gf13-20020a17090ac7cd00b001bbfb9d760eso37128pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 15:40:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=hF4WxHzhzMcbT/AQS/gMCJbxshddKkAHU609UNHMFio=;
-        b=c5defT5JvMghXSg0g4V5D6K2PYEOPlMc9nwuJfFMGoVUKeFF6S+1gOkBkQ/sM3m7Ub
-         EFsFf6mOeF6q8opuQHyJXNFGl5IU/AMiLZE0+F45G6Nj+D8p4aGCuP8MHfY/4suTqC1a
-         JuDwIMqqr1rvsfWQrwk+hIJe7FCCLQ3/I852GH7yksJZ4QDUuSolPMABnCEvGSc9EDik
-         r8Ouu+LnePokx2ZTaIEcroWZqzenwxgDa/jDFaFFEJii5WfJ1pDj9u5lJWsdZ9H/Bsae
-         QDIk1C6pk7YuuJCvYtM0GiU8WzUbPU9FWLLR70UZ0Xj0pjemeaccmtro/v7at8eWemdK
-         DBKg==
+        b=Ak4B76HO8cH6/b+ff4bcWV+nSCoce05+LKFRoGN8kububxWlzxTymH8i1tYZUrD0Z4
+         fKyqzizvDh1EAMj2MHmkyejeEDx+Rid4rRWZpq7QDNjIu6rlmkEY1Gs0EArdl/gG3mb3
+         aJN2nNbpnzBYURV9Y25P88swxqsX58xHerHUG2M56YbwE0HhJODggO2iTf/nZw+oFsyu
+         t2wZJOyqhnv/Hf3aUbFS1t9lSMlDKDg5ZLmm5A74eVRTjhBu4weba2ReGG4YjkaAXwBK
+         TeZo6o26hyLJY8qQczG7apNcsE1Y03U7IL4gK0l/IpbPmdLgPjSYq73gCI/wy5lt+2aS
+         34Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=hF4WxHzhzMcbT/AQS/gMCJbxshddKkAHU609UNHMFio=;
-        b=RRzrYvom5OJFp6wa5vRf49i8A6opG8CNfefrzHVWg9GAv9VHFJKCMsbK91B1kWxyHz
-         Ro5HxCqb6CNQltiQiQIv+2ePosRAUIgtB8HehtmQmJETImqgVaMZv/RZ5tepjFnpnK2I
-         XO9KffXF7qF9/Zm2Y3NmophFX7OTPn+grfte+s4ns0ADjjXDwWSo0wquOAqVCE/VhIWg
-         +z/gPEyqTqLOeFckauh2nHzhzIufQ5wgkt3RlfJ/4hCipkLxIu2ilJeEupxrodGnRws0
-         AbBUwAxChpkQuDBpIFNtAuzJnVxFnVB6A7FGt7cNv4zbpJM7yhU3BSOrep2Y5OjZNSuZ
-         9kcw==
-X-Gm-Message-State: AOAM533rXL1KUnRwTObs4tb4KQPb0szrT5Gnd+BBkQ5lXlTo6cEuPb6r
-        IKTyhe/rk+kmmoKQ3v8zhcYBqTzLFlg=
-X-Google-Smtp-Source: ABdhPJyOJIu9nhsREVUXBbA5Jn/M6LwUr+vKt4IIIFGOc/ktNwdiXKTqjMllAjUKDHVbxU9xBSvrig==
-X-Received: by 2002:a05:6602:2d53:b0:63d:7080:92b6 with SMTP id d19-20020a0566022d5300b0063d708092b6mr7216714iow.107.1645226327494;
-        Fri, 18 Feb 2022 15:18:47 -0800 (PST)
+        b=pqkR4+4uuuxUMKi66vTkAY5gA5v9AEoqmUrKniNsrvccaWRNzw1oKwa1meaPwF/Qjl
+         AldVj5jHeIx1rqoxx+L+G5CLa9WX5hd9g6pKKYihTV7+35y/acofIA2KFByGTx13koyt
+         7zXtUVpa7BkwJASqNBV1b3FqIzTlArIffsZ8t122I34GN5JNCsUtfyDLGQEvyY2eR4vP
+         ancAtnMHiGYKwgAMPVtu+XrCCn6W3rSoIn5uI7hCr7ksDRxck36pASYVBETOjSMT7uUY
+         9rdp9FCRDEtBrRZ339k9z4K9E4H0mXyuBxvpQqVOcm/Vdkb14m/zGrgWuDs6qpcSU78k
+         sRKQ==
+X-Gm-Message-State: AOAM5326gENfsGCRivP7pUA6DyiUmbHjg0PDE7sM8MB5jezyTkPaRYDW
+        PxSS3KwGkryI59WibLk1sym51cY1wx4=
+X-Google-Smtp-Source: ABdhPJyic6zt7B+W6X2072Hw7PybwLLP9YrG04jFnR72wrTmILrbh522kaFFniC5HWvl0txB6CPEnw==
+X-Received: by 2002:a17:902:ba96:b0:14c:8407:8e4b with SMTP id k22-20020a170902ba9600b0014c84078e4bmr9269631pls.135.1645227642571;
+        Fri, 18 Feb 2022 15:40:42 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id d9sm4225443ilc.30.2022.02.18.15.18.46
+        by smtp.gmail.com with ESMTPSA id k18sm4170114pfi.10.2022.02.18.15.40.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 15:18:47 -0800 (PST)
+        Fri, 18 Feb 2022 15:40:42 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH BlueZ v2] player: Fix Track being emitted with empty metadata
-Date:   Fri, 18 Feb 2022 15:18:46 -0800
-Message-Id: <20220218231846.3455223-1-luiz.dentz@gmail.com>
+Date:   Fri, 18 Feb 2022 15:40:41 -0800
+Message-Id: <20220218234041.3460546-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
