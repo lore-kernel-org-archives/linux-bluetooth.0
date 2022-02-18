@@ -2,192 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A6AFC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 01:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B6BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 02:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231284AbiBRBo2 (ORCPT
+        id S231468AbiBRCQX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 20:44:28 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:51374 "EHLO
+        Thu, 17 Feb 2022 21:16:23 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231255AbiBRBo0 (ORCPT
+        with ESMTP id S231465AbiBRCQW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 20:44:26 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93976673D7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 17:44:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645148650; x=1676684650;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=mNbl7N/LJRH3QjNedp48S1cq4hqDH657ZXTM76UdR3U=;
-  b=nK12FNzSpQEgksFP0tB1u2zsZ0vR0XYMithsm4wcaXO1LDfHdL1nEW6o
-   t5p3+5L8hlt82zcOa9iIulD0opZ6fU2GiKkn4mbm6pbzYW7KFjVA6STQe
-   NrUT7KU7DYRk+iD9bD394akC1s9yOIR9/ScaLwtf4lKAyD+KAaahKTUfY
-   xdsugiNypw0yrMsIB5pqW+uGRHTcr9t4duvUwRRFUnXN8NFp6K5p2u9nU
-   8KpGsmUbc4YxtOfni2HEOSSHZqpn1OsV4dm0LXzDZApVLkTKXlGd9+EZf
-   RNH7jhnuhIOvzDo/GW8RWOEONYatmPYU2Fl+eK0DBAmqZF4s3IB6r77S0
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10261"; a="337470971"
-X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="337470971"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Feb 2022 17:44:10 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,377,1635231600"; 
-   d="scan'208";a="572099619"
-Received: from lkp-server01.sh.intel.com (HELO 6f05bf9e3301) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 17 Feb 2022 17:44:08 -0800
-Received: from kbuild by 6f05bf9e3301 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nKsJc-0000ns-0K; Fri, 18 Feb 2022 01:44:08 +0000
-Date:   Fri, 18 Feb 2022 09:43:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- e8e41e2b99cc4355fdf057fefcaf3db4b1ad6bc6
-Message-ID: <620ef9ad.g11/AcOmGfheGP6g%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 17 Feb 2022 21:16:22 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42232042AC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 18:16:06 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id v13-20020a17090ac90d00b001b87bc106bdso11061087pjt.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 18:16:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z/h1YRsh6fLXRWLJjTrAi9809tNygUW1zBfzJzr6M7Q=;
+        b=PTgX7EV6EIKbcHQBLG0VjMqAmqnvO+AqHCOsXckB5H/5zsOzvegXKD5G7HIJU7uwBJ
+         ZnxrDecXDC145pa20bqTlGA57b5D9UGvD98wtAlG+Gdu19vrPhJQP//LdEDGsmpD80E8
+         FwM+LRn2//sBHiR6QQspCB8xeKSi6lwuZmdi7lgKkPU1qlaUOpK70EjKyfLoD9kz/7Vr
+         EhzZafQ+OMou4o15S0CesBiDQO5OQg6Km/UpdWd2s4X0yo/K4cGuwSNb3BhSPdYDlLtq
+         yTjTxPtbDaNVkQqef4gFOIYz+JdY7+TkkhPpXNgjNuwBADnrPEr0xFuNzbDs1Gb7dIbu
+         VmLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Z/h1YRsh6fLXRWLJjTrAi9809tNygUW1zBfzJzr6M7Q=;
+        b=OcDusyygYpZ7QC0jHY4vDgaaM4DPYptZ/6K9K5gFCIPyxluhzLblARWnbGYg+o4Sxh
+         N1/nYv5Hsthyx8JIc10l/m9afkBPVoo8/KEwa3U/LoUK6g5i+3EODe0z/IGfB3m5EYmR
+         5v+1luwsyrcYZ/7azroq48DIOhyN6J6R1QcVcN3HT7Zd7i2Sf1D5VCACQ3hgxZbrBPaO
+         LNLdfINZXpSobH2ZQTeGOY13dxhM7gsn5z+SQEzJ0342FFRfpA/zzhmI/3PmGsaHBXRU
+         KeCOoJH/+OYWkbB1IdBXhy+epHsjy4rCP5gc0bwt5R7yC6bZSzTJmxkWn41v/eQb6jUk
+         mgvA==
+X-Gm-Message-State: AOAM532jXh9DzUrxrd8VULXiEYIP+F6yCo1LEpsNVjt/LxI+pu9Kbm8G
+        RpNRfhrW16NBAaDg4XxFSg5NXGuTr/wl3A==
+X-Google-Smtp-Source: ABdhPJx66nAII650OjXg28UtYyR6xNYRylGdMtt6sAvUH3FZzQoN0OJeFBYtR2ZAY4zEWp3V3V3vyw==
+X-Received: by 2002:a17:902:9045:b0:14f:14e7:f3aa with SMTP id w5-20020a170902904500b0014f14e7f3aamr5280514plz.69.1645150566101;
+        Thu, 17 Feb 2022 18:16:06 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h14sm959640pfh.95.2022.02.17.18.16.05
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 17 Feb 2022 18:16:05 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] main.conf: Fix parsing of mode options
+Date:   Thu, 17 Feb 2022 18:16:05 -0800
+Message-Id: <20220218021605.3126182-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: e8e41e2b99cc4355fdf057fefcaf3db4b1ad6bc6  Bluetooth: mediatek: fix the conflict between mtk and msft vendor event
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-elapsed time: 728m
+This replace the of g_key_file_get_integer which is limited to only
+decimal values to g_key_file_get_string and then use strtol to convert
+the string value to integer.
 
-configs tested: 114
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                          randconfig-c001
-powerpc                       maple_defconfig
-arc                                 defconfig
-sh                         microdev_defconfig
-mips                  decstation_64_defconfig
-riscv                            allyesconfig
-xtensa                  nommu_kc705_defconfig
-xtensa                    xip_kc705_defconfig
-m68k                       m5475evb_defconfig
-arm                        spear6xx_defconfig
-arm                            lart_defconfig
-sh                            titan_defconfig
-h8300                            alldefconfig
-nios2                         3c120_defconfig
-m68k                         apollo_defconfig
-sh                           se7343_defconfig
-sh                     sh7710voipgw_defconfig
-powerpc                      pasemi_defconfig
-arc                    vdk_hs38_smp_defconfig
-x86_64                           alldefconfig
-mips                           ip32_defconfig
-mips                            gpr_defconfig
-arc                         haps_hs_defconfig
-xtensa                           alldefconfig
-arm                           h5000_defconfig
-ia64                         bigsur_defconfig
-powerpc                      tqm8xx_defconfig
-um                             i386_defconfig
-m68k                         amcore_defconfig
-arm                          pxa3xx_defconfig
-ia64                          tiger_defconfig
-m68k                           sun3_defconfig
-powerpc                        cell_defconfig
-powerpc                      makalu_defconfig
-arm                  randconfig-c002-20220217
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-i386                          randconfig-a003
-i386                          randconfig-a001
-i386                          randconfig-a005
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-
-clang tested configs:
-riscv                randconfig-c006-20220217
-x86_64                        randconfig-c007
-powerpc              randconfig-c003-20220217
-arm                  randconfig-c002-20220217
-i386                          randconfig-c001
-mips                 randconfig-c004-20220217
-arm                     davinci_all_defconfig
-arm                      tct_hammer_defconfig
-arm                     am200epdkit_defconfig
-powerpc                     tqm5200_defconfig
-arm                        magician_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a011
-i386                          randconfig-a013
-i386                          randconfig-a015
-hexagon              randconfig-r045-20220217
-hexagon              randconfig-r041-20220217
-riscv                randconfig-r042-20220217
-
+Fixes: https://github.com/bluez/bluez/issues/293
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ src/main.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/src/main.c b/src/main.c
+index bf9d398e4..a448320c1 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -354,13 +354,22 @@ static void parse_mode_config(GKeyFile *config, const char *group,
+ 
+ 	for (i = 0; i < params_len; ++i) {
+ 		GError *err = NULL;
+-		int val = g_key_file_get_integer(config, group,
+-						params[i].val_name, &err);
++		char *str;
++
++		str = g_key_file_get_string(config, group, params[i].val_name,
++									&err);
+ 		if (err) {
+ 			DBG("%s", err->message);
+ 			g_clear_error(&err);
+ 		} else {
+-			info("%s=%d", params[i].val_name, val);
++			char *endptr = NULL;
++			int val;
++
++			val = strtol(str, &endptr, 0);
++			if (!endptr || *endptr != '\0')
++				continue;
++
++			info("%s=%s(%d)", params[i].val_name, str, val);
+ 
+ 			val = MAX(val, params[i].min);
+ 			val = MIN(val, params[i].max);
+-- 
+2.35.1
+
