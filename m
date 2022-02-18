@@ -2,149 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC280C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Feb 2022 23:47:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E492AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 00:16:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229628AbiBQXrc (ORCPT
+        id S229933AbiBRAQO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 18:47:32 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:55994 "EHLO
+        Thu, 17 Feb 2022 19:16:14 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:43326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbiBQXrb (ORCPT
+        with ESMTP id S229893AbiBRAQN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 18:47:31 -0500
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B29A378F76
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:47:06 -0800 (PST)
-Received: by mail-pj1-f50.google.com with SMTP id qe15so7061661pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 15:47:06 -0800 (PST)
+        Thu, 17 Feb 2022 19:16:13 -0500
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10DB3381B6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 16:15:56 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2d66f95f1d1so49889617b3.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 16:15:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SF3Rz9iAegGfFyo/QFSu8zphh0k7BTH08lz7l9LmvHs=;
-        b=QFnucT4jVLpbz8QSa7F3vDOzGYsgA+TxYW/4VRwi4xSxIO8dcJATUMVYpNKTmNebuc
-         z4Omv5ANDtEQ4EE+oYjxTcaxJr8zBdTjWqWTdV2IzyMzZCfCfATNgxZ6Ofd8UjZ8XBCT
-         Ag1e3UeGZt7ykc8Zkii7CLZlehDXVjKrO/LBSljq3yqTNRCiOSBnHbSBKxpObm34Qfv9
-         6TBP0PbWhTai9I6SCIcg/bRieS0kHJXiRO7aOpsqGx1U6U2VSnU4ON8hFqoelITqqqYh
-         hz3D19y/vsxjRpmTAxIRjlJ6E+vGPB5NaootausgYK9soJ6IxBKfxuAzxaxyZstvQico
-         s9+w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AFCLr9hmq6/j4HWE6M1b+ecTVGjzCMlG/ePLwm+vbJA=;
+        b=QcMCFMV7bXcVgsRVkG01bM4LbE08gyzj5QfVC6b9YheVznqCBwxWgt7hIW2+sPqx2t
+         x4fhA+FitADOp23vpv1wZwAFw0hVk8sOoPk0YNEFv2JuEvE8edo0DMudf3Sp6PU75goL
+         BTN6IK844QmPEGEPAzYm7PP/nfWwRkw60CW/Wh2YdtGgLembJ9+gk+/zYKCRDzaU7epK
+         WIA53dJ4GwiT5AF3DX3gL0TwVTSLDVNQjIciJXyMfDRAce3/IEIn7jPZ0TdKD/Dsz0gO
+         beFUuPjVhf/HOceNSoO8oTsApsyHV+jLsH6d04StlBcE8aY0aGZhjrSX0WNA62zlC4wI
+         ZFlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SF3Rz9iAegGfFyo/QFSu8zphh0k7BTH08lz7l9LmvHs=;
-        b=x8F3KBO4lA3xjW1gIhX+C8pQc2NY+Pl1B0FAzFwz7F7enhP3+QD+MaflXssigx2Wyo
-         o5pswNqPmU/yJJhKybJai/KOI9+ow4Pwoc/KAbSVqMmgdo/W/zyEHizIm6kgLVQKxnse
-         GRr/1/b/mYkWR72ojVmDwcOI4f50rxKiK+4q5R8bO+TSPZKV7PV0lUggFddJ2j919/7z
-         VkB3MSJeQkcX92NonaCanW1O0saegbRodx/PgzDc/TRAFNFlwEhP7blIc6uLrCFfJpX/
-         75AJ2fYBRwF+wkfCo+Z7jxkRnWwe136boF3YASYSZujBIeCxXz/80lU1FOMNDVPBmkgb
-         QAiQ==
-X-Gm-Message-State: AOAM5318cCuEYC0jxVgsu+TiMNSUTFsyW6ynvf83Ps0lt8Ef07U9fS7I
-        TGM05115iKpU/SFgROJUXgJacWVwRYMCCw==
-X-Google-Smtp-Source: ABdhPJw5nOJA2N37OdDgTTIk7YyFOI5aTILnQ/DdOehOR/sZsaWZuUB8EkFR0ECQnWcKE0BcvB+ZeA==
-X-Received: by 2002:a17:902:da88:b0:14a:26ae:4e86 with SMTP id j8-20020a170902da8800b0014a26ae4e86mr5164971plx.59.1645141143093;
-        Thu, 17 Feb 2022 15:39:03 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id lb18sm2840780pjb.42.2022.02.17.15.39.02
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 15:39:02 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] main.conf: Introduce MaxControllers
-Date:   Thu, 17 Feb 2022 15:39:01 -0800
-Message-Id: <20220217233902.3093404-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AFCLr9hmq6/j4HWE6M1b+ecTVGjzCMlG/ePLwm+vbJA=;
+        b=yIMVRYJSGw24pZ4x2r7mypt0OHn9KhhHRT+eKFPOdN6ho/31gujwkgHK4pUWml9uRc
+         kNFGlROExoEnucy9dGIu0Jw1+70I0jzdTh6jGhFIIXt9O7MyN0Ffmed3Sr5qCjZFrJBA
+         ZRwMYwYDimNfmTDOTl5pqoM/uhtW3hrtjK3x9niwqktTdJcKiDt3/Ey2sau1J4m29BfF
+         qJBIbfkV5nQ6irBN81r6fk+qyB37UZ2TtHrcGKltPkveLpYCXsU6+4DO+nHV05VdxXQW
+         izTjcUN4kT37Yis6H+yMcnArz1u7t1WHZ2t3Vz1gc4VwjzbjB2ULRCwlkkhesFnVkajd
+         271w==
+X-Gm-Message-State: AOAM532oSBEdKCZR0v477ddsaosOzrdje4o2drKJfBvFGSPUGpFSLCOx
+        RfM0PPJXbqRuAtHi+d5qrzQOvir2m7Hq7h6R4a713q8b
+X-Google-Smtp-Source: ABdhPJwOuG0nIZksmoXA1ZvMMawAbtDyqdOj/WHiSYVROrqUYNTGDQDdWFHp4oEAXJDt1bIWBlwT0ABpn5K/AIp3djA=
+X-Received: by 2002:a0d:c781:0:b0:2d2:d059:19c1 with SMTP id
+ j123-20020a0dc781000000b002d2d05919c1mr5338256ywd.376.1645143355168; Thu, 17
+ Feb 2022 16:15:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
+ <CAJCQCtTdiPNkV1_b478_LkG11TMOPEdDGHTjf5LfZJpwWrK+bg@mail.gmail.com>
+ <CAJCQCtTNk25u6sm_Xqt8qzf7mM5kmOrnXyD6pT1GKJ5z5-Kqbw@mail.gmail.com>
+ <CAJCQCtRYKbTQ16eUq2qODZ=dE=HB6pZpLNswdqMbiWw+DBE9KQ@mail.gmail.com>
+ <CABBYNZKfy-ntFhbx0TStNwFiwxCF4sPVaHS4wDbef0shb=pawg@mail.gmail.com>
+ <CAJCQCtRiTQ1BTEHugxhS-zmXFG4qi4WLxsRyZsG9-_Q0isM+7Q@mail.gmail.com> <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com>
+In-Reply-To: <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 17 Feb 2022 16:15:44 -0800
+Message-ID: <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
+Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
+ connect to bluetooth devices
+To:     Chris Murphy <lists@colorremedies.com>
+Cc:     Bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Chris,
 
-This introduces MaxControllers which can be used to limit the number of
-adapters exposed in the system.
----
- src/adapter.c | 7 +++++++
- src/btd.h     | 1 +
- src/main.c    | 9 +++++++++
- src/main.conf | 4 ++++
- 4 files changed, 21 insertions(+)
+On Thu, Feb 17, 2022 at 3:36 PM Chris Murphy <lists@colorremedies.com> wrote:
+>
+> OK I started over, and for now keeping the reporting constrained to
+> the hardware I personally have on hand.
+>
+> Hardware:
+> Lenovo Thinkpad X1 Carbon Gen 7
+> Bus 001 Device 004: ID 8087:0aaa Intel Corp. Bluetooth 9460/9560
+> Jefferson Peak (JfP)
+> Sony 1000XM3 headset
+> bluez-5.63-3.fc36.x86_64
+>
+> kernel 5.17.0-rc4
+> * remove the paired headset with bluetoothctl
+> * reset the headset so it's not longer paired either
+> * put the headset in pairing mode
+> * GNOME Settings Bluetooth panel sees -> LE_WH-1000XM3, Not Setup
+> * click on Not Setup and nothing happens
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2071cf8db..1551011a8 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -10078,6 +10078,13 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
- 		return;
- 	}
- 
-+	/* Check if at maximum adapters allowed in the system then ignore the
-+	 * adapter.
-+	 */
-+	if (btd_opts.max_adapters &&
-+			btd_opts.max_adapters == g_slist_length(adapters))
-+		return;
-+
- 	reset_adv_monitors(index);
- 
- 	adapter = btd_adapter_new(index);
-diff --git a/src/btd.h b/src/btd.h
-index a805a40d7..d13646889 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -121,6 +121,7 @@ struct btd_opts {
- 	uint16_t	did_version;
- 
- 	bt_mode_t	mode;
-+	uint16_t	max_adapters;
- 	bt_gatt_cache_t gatt_cache;
- 	uint16_t	gatt_mtu;
- 	uint8_t		gatt_channels;
-diff --git a/src/main.c b/src/main.c
-index 8cc2dfca6..bf9d398e4 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -77,6 +77,7 @@ static const char *supported_options[] = {
- 	"NameResolving",
- 	"DebugKeys",
- 	"ControllerMode",
-+	"MaxControllers"
- 	"MultiProfile",
- 	"FastConnectable",
- 	"Privacy",
-@@ -779,6 +780,14 @@ static void parse_config(GKeyFile *config)
- 		g_free(str);
- 	}
- 
-+	val = g_key_file_get_integer(config, "General", "MaxControllers", &err);
-+	if (err) {
-+		g_clear_error(&err);
-+	} else {
-+		DBG("MaxControllers=%d", val);
-+		btd_opts.max_adapters = val;
-+	}
-+
- 	str = g_key_file_get_string(config, "General", "MultiProfile", &err);
- 	if (err) {
- 		g_clear_error(&err);
-diff --git a/src/main.conf b/src/main.conf
-index 49b9e6755..401796235 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -51,6 +51,10 @@
- # Possible values: "dual", "bredr", "le"
- #ControllerMode = dual
- 
-+# Maximum number of controllers allowed to be exposed to the system.
-+# Default=0 (unlimited)
-+#MaxControllers=0
-+
- # Enables Multi Profile Specification support. This allows to specify if
- # system supports only Multiple Profiles Single Device (MPSD) configuration
- # or both Multiple Profiles Single Device (MPSD) and Multiple Profiles Multiple
+Well from the logs it doesn't seem the GNOME Setting is trying to do
+anything, have you tried bluetoothctl> connect <address>
+
+> The above activity is recorded with 'btmon -w btmon-w-headsetpair.txt'
+> and i get both termin output and a binary file
+>
+> terminal output
+> https://drive.google.com/file/d/1fFbyRm32Lf0yzrHhE1vEE0ztnSeoe7VB/view?usp=sharing
+>
+> binary output
+> https://drive.google.com/file/d/1BmnO-utOooMWgcEHTuoz13Ndd5hGuqe_/view?usp=sharing
+>
+> kernel 5.16.9
+> * bluetooth panel says it's connected to LE_WH-1000XM3, as if the
+> previous pairing attempt above worked
+> * bluetooth panel name for the device flips between LE_WH-1000XM3 and WH-1000XM3
+> * headset is still in pairing mode from when i was trying to pair with
+> 5.17.0 (flashing blue lights), it eventually powers off so as far as
+> it's concern pairing didn't succeed
+> * again remove the headset with bluetoothctl
+> * put the headset back into pairing mode, click on LE_WH-1000XM3 in
+> the list, "Not Setup" flips to "Connected" in the GNOME bluetooth
+> panel, and the headset reports pairing is successful
+> this is what bluetoothd is reporting during the name flipping
+> https://drive.google.com/file/d/1qjAlkODkjJzR33WpHD2Sxze8zq4t1UhS/view?usp=sharing
+>
+> Definitely seems kernel related.
+>
+>
+> --
+> Chris Murphy
+
+
+
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
