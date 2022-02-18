@@ -2,107 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B6BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 02:16:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED33CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 18 Feb 2022 03:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231468AbiBRCQX (ORCPT
+        id S231922AbiBRDVP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Feb 2022 21:16:23 -0500
-Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:34410 "EHLO
+        Thu, 17 Feb 2022 22:21:15 -0500
+Received: from gmail-smtp-in.l.google.com ([23.128.96.19]:52428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231465AbiBRCQW (ORCPT
+        with ESMTP id S231909AbiBRDVO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Feb 2022 21:16:22 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E42232042AC
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 18:16:06 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id v13-20020a17090ac90d00b001b87bc106bdso11061087pjt.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 18:16:06 -0800 (PST)
+        Thu, 17 Feb 2022 22:21:14 -0500
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522DB136
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:20:58 -0800 (PST)
+Received: by mail-qv1-xf2e.google.com with SMTP id v10so12292971qvk.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Feb 2022 19:20:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/h1YRsh6fLXRWLJjTrAi9809tNygUW1zBfzJzr6M7Q=;
-        b=PTgX7EV6EIKbcHQBLG0VjMqAmqnvO+AqHCOsXckB5H/5zsOzvegXKD5G7HIJU7uwBJ
-         ZnxrDecXDC145pa20bqTlGA57b5D9UGvD98wtAlG+Gdu19vrPhJQP//LdEDGsmpD80E8
-         FwM+LRn2//sBHiR6QQspCB8xeKSi6lwuZmdi7lgKkPU1qlaUOpK70EjKyfLoD9kz/7Vr
-         EhzZafQ+OMou4o15S0CesBiDQO5OQg6Km/UpdWd2s4X0yo/K4cGuwSNb3BhSPdYDlLtq
-         yTjTxPtbDaNVkQqef4gFOIYz+JdY7+TkkhPpXNgjNuwBADnrPEr0xFuNzbDs1Gb7dIbu
-         VmLg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=+swSFcqxh48rIz1iafz3JnZlVrEZ7NeFM3JLWgVdn74=;
+        b=pRbyfea64jOVBJdPq/NV8IhlFa658Mu+/SLFItV1J5/F0OJFFUoezN/NsGqlP//c/Y
+         5ejCpHhUvj4BGLg4YJcZrYHQ1CzxxLZ+s4soJb/pRpqphbV69Nl89S0sdo1EyD8iYS6P
+         UjVQMYEM90Mwmwc6G0KUaSqnijkftTiQ60R0wD6WZbtSa9yWaKOqcXkLD8zBghV8gxCR
+         dhT7/DZzwwUWUz9CgsIpyyFkMdWp/OMyBmo6zss+UqAV8oNHDfNDaSw40By5WeMONyVT
+         pHwgHrXI8jYgBO4hGx4as6a4kNLiznky0s/LxUMYBofFv1o4K595Laa0h+1jUJB0eJqP
+         xCYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Z/h1YRsh6fLXRWLJjTrAi9809tNygUW1zBfzJzr6M7Q=;
-        b=OcDusyygYpZ7QC0jHY4vDgaaM4DPYptZ/6K9K5gFCIPyxluhzLblARWnbGYg+o4Sxh
-         N1/nYv5Hsthyx8JIc10l/m9afkBPVoo8/KEwa3U/LoUK6g5i+3EODe0z/IGfB3m5EYmR
-         5v+1luwsyrcYZ/7azroq48DIOhyN6J6R1QcVcN3HT7Zd7i2Sf1D5VCACQ3hgxZbrBPaO
-         LNLdfINZXpSobH2ZQTeGOY13dxhM7gsn5z+SQEzJ0342FFRfpA/zzhmI/3PmGsaHBXRU
-         KeCOoJH/+OYWkbB1IdBXhy+epHsjy4rCP5gc0bwt5R7yC6bZSzTJmxkWn41v/eQb6jUk
-         mgvA==
-X-Gm-Message-State: AOAM532jXh9DzUrxrd8VULXiEYIP+F6yCo1LEpsNVjt/LxI+pu9Kbm8G
-        RpNRfhrW16NBAaDg4XxFSg5NXGuTr/wl3A==
-X-Google-Smtp-Source: ABdhPJx66nAII650OjXg28UtYyR6xNYRylGdMtt6sAvUH3FZzQoN0OJeFBYtR2ZAY4zEWp3V3V3vyw==
-X-Received: by 2002:a17:902:9045:b0:14f:14e7:f3aa with SMTP id w5-20020a170902904500b0014f14e7f3aamr5280514plz.69.1645150566101;
-        Thu, 17 Feb 2022 18:16:06 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h14sm959640pfh.95.2022.02.17.18.16.05
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=+swSFcqxh48rIz1iafz3JnZlVrEZ7NeFM3JLWgVdn74=;
+        b=NCApOb2jL6Zfa3eOYfVtsjxDLXDegjpzPnTytpdhIiXkk7F5XSYSOdKZ1uwi0NVegz
+         TTW/zfkvLSseG4LjG6/myiNneA62CcE99ut47SliRfYfibI0Y12i3s3KWpSb845YnwO4
+         2i5bDfv2JxvXaDjyUiKSsQiPF7+kgMqGHxf/JeaSAIhTKibb8duvmaco6oxqzpMvCkzA
+         Mi9o7LCFElsxS0l6WWuglmXQ2J4xgTCy6cQ7ivvb/fePvBFykmprpdX3nhc9ANE/D6rg
+         MGVlHKS/Yz0zZnweVfTThX4pcznD9gK2nVY5QwmoMvAsMlrFDVANU637bhxsD5kTPtGp
+         YdUg==
+X-Gm-Message-State: AOAM5307f0HNua0jIzFal2e0ea3tNYUX9BxQUAHnznk2Pqeo19myimQ/
+        sbzWQ7fX+jIYhRM1DGBDVTvCUCObddmUKg==
+X-Google-Smtp-Source: ABdhPJzzze3DGWTKXf/74JvCe5Zv1k1qYWWLH6/WZFC/OLz5Q92NCP6XWU8yjQ7F0l60lgEeNbPSzQ==
+X-Received: by 2002:a05:6214:2461:b0:42c:3e46:7ddb with SMTP id im1-20020a056214246100b0042c3e467ddbmr4395462qvb.10.1645154457325;
+        Thu, 17 Feb 2022 19:20:57 -0800 (PST)
+Received: from [172.17.0.2] ([20.36.162.245])
+        by smtp.gmail.com with ESMTPSA id bq33sm22075051qkb.64.2022.02.17.19.20.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Feb 2022 18:16:05 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] main.conf: Fix parsing of mode options
-Date:   Thu, 17 Feb 2022 18:16:05 -0800
-Message-Id: <20220218021605.3126182-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 17 Feb 2022 19:20:56 -0800 (PST)
+Message-ID: <620f1098.1c69fb81.a39bb.dd75@mx.google.com>
+Date:   Thu, 17 Feb 2022 19:20:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6277770181532622623=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] main.conf: Introduce MaxControllers
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220217233902.3093404-1-luiz.dentz@gmail.com>
+References: <20220217233902.3093404-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6277770181532622623==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This replace the of g_key_file_get_integer which is limited to only
-decimal values to g_key_file_get_string and then use strtol to convert
-the string value to integer.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/293
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=615589
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.20 seconds
+GitLint                       PASS      2.11 seconds
+Prep - Setup ELL              PASS      51.36 seconds
+Build - Prep                  PASS      0.78 seconds
+Build - Configure             PASS      10.27 seconds
+Build - Make                  PASS      1447.42 seconds
+Make Check                    PASS      12.29 seconds
+Make Check w/Valgrind         PASS      524.58 seconds
+Make Distcheck                PASS      273.84 seconds
+Build w/ext ELL - Configure   PASS      10.39 seconds
+Build w/ext ELL - Make        PASS      1438.64 seconds
+Incremental Build with patchesPASS      2933.71 seconds
+
+
+
 ---
- src/main.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/main.c b/src/main.c
-index bf9d398e4..a448320c1 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -354,13 +354,22 @@ static void parse_mode_config(GKeyFile *config, const char *group,
- 
- 	for (i = 0; i < params_len; ++i) {
- 		GError *err = NULL;
--		int val = g_key_file_get_integer(config, group,
--						params[i].val_name, &err);
-+		char *str;
-+
-+		str = g_key_file_get_string(config, group, params[i].val_name,
-+									&err);
- 		if (err) {
- 			DBG("%s", err->message);
- 			g_clear_error(&err);
- 		} else {
--			info("%s=%d", params[i].val_name, val);
-+			char *endptr = NULL;
-+			int val;
-+
-+			val = strtol(str, &endptr, 0);
-+			if (!endptr || *endptr != '\0')
-+				continue;
-+
-+			info("%s=%s(%d)", params[i].val_name, str, val);
- 
- 			val = MAX(val, params[i].min);
- 			val = MIN(val, params[i].max);
--- 
-2.35.1
 
+--===============6277770181532622623==--
