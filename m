@@ -2,101 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB56C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Feb 2022 02:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C368C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Feb 2022 09:18:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238880AbiBSCgF (ORCPT
+        id S235598AbiBSJSx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 18 Feb 2022 21:36:05 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:35700 "EHLO
+        Sat, 19 Feb 2022 04:18:53 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:60324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232054AbiBSCgE (ORCPT
+        with ESMTP id S241764AbiBSJSs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 18 Feb 2022 21:36:04 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADED01732E8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 18:35:46 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id qe15so10095543pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 18 Feb 2022 18:35:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=pgWpgB6xhMvFcr7Y/z0QJzPTF/iK2v3RRXAlUqB1HAE=;
-        b=czVi+31Dk/wBblnyBxLxJmKwp9CEi3fDxR+athTgVVrFzN+hQ1PfUVO65AQWJ+u1Mu
-         gZDtSYVvplV8YejwDNynedduepawC4CfiJ4DDLtbe0jTIGqMq38G5CNaRPV8HU77AzVO
-         VGOZzp6Mvcy4AcSQfLS1ybEvBTsgkLS5d2bEuOQwi+ZUvqvl9GeICwRffYd7NGB1NxJF
-         snnDXpsFo2ezrm1BSETYzkFtiJ5gr6iPvq2fr4UlCSbN5c6x7GtlypGCPm/70NyiUZP9
-         98h5QZuyuurUNNUNSxEonLzCz4aIr7ZmkLYVmZyEc/oB282A6BZufeg5GB2ATvhMfWFV
-         ddAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=pgWpgB6xhMvFcr7Y/z0QJzPTF/iK2v3RRXAlUqB1HAE=;
-        b=1xVFVwCkWoQuHGky3HhTS3dclQWRnMZleqA/lkM/vcbp2xY8FKNBPU9e2ILbDdTLrc
-         3KIgEZJC4WPCkbX0hetmXJU/TZHV1BZ4g2QnwbZgVWB2QVA3/rUjp0p6P5bw7W+KN/aA
-         izO6LxsERHr7ra7cAn8tKZKKRjfg1xFDuQsG0TCLnVl0R6L/eHULN+S8REGxrKVhdIQ/
-         OBHc6/nvWaxfW8MWk09ptyC6BNcNamJVyQK/QmWGm4cGBZLKfDD6kSJj7nVLnS31eO2a
-         g6pz6FmoDNJDWUgmcMUe/NvdhFLhuumkPfutrxONaOKsQQ+xidoXxcjwke+4DFwLJ130
-         m4Pg==
-X-Gm-Message-State: AOAM532ax+0Z8ZfAWoLSmpuUhvyZnPzSbSYFeSg7BcpZpQWJc0MtLWaX
-        i7RhPyL+SIuLX2JWOL8uYHyNcI2EWYI=
-X-Google-Smtp-Source: ABdhPJywbDpfrTlQuadW/hZPpFPLCTwAgytoTiwHBzIes/PdSKaY/A/VE0bogMN1yfm9fXI0+w2lHw==
-X-Received: by 2002:a17:903:40cd:b0:14e:dd7f:f3d5 with SMTP id t13-20020a17090340cd00b0014edd7ff3d5mr10056413pld.88.1645238145827;
-        Fri, 18 Feb 2022 18:35:45 -0800 (PST)
-Received: from [172.17.0.2] ([20.114.45.163])
-        by smtp.gmail.com with ESMTPSA id c15sm3045238pfv.6.2022.02.18.18.35.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 18 Feb 2022 18:35:45 -0800 (PST)
-Message-ID: <62105781.1c69fb81.f63bb.7f22@mx.google.com>
-Date:   Fri, 18 Feb 2022 18:35:45 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4004629082252637146=="
+        Sat, 19 Feb 2022 04:18:48 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EC349698
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Feb 2022 01:18:28 -0800 (PST)
+Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nLLsn-0005R7-1n; Sat, 19 Feb 2022 10:18:25 +0100
+Message-ID: <c418c95d-339c-5b8a-5349-26078424abe4@leemhuis.info>
+Date:   Sat, 19 Feb 2022 10:18:24 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2] player: Fix Track being emitted with empty metadata
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220218234041.3460546-1-luiz.dentz@gmail.com>
-References: <20220218234041.3460546-1-luiz.dentz@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-BW
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>
+References: <20220215015938.1950978-1-luiz.dentz@gmail.com>
+ <E428782F-C1D1-43FB-8CB3-009BD97A2D14@holtmann.org>
+From:   Thorsten Leemhuis <linux@leemhuis.info>
+Subject: Re: [PATCH] Bluetooth: Fix bt_skb_sendmmsg not allocating partial
+ chunks
+In-Reply-To: <E428782F-C1D1-43FB-8CB3-009BD97A2D14@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1645262308;cbce8504;
+X-HE-SMSGID: 1nLLsn-0005R7-1n
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4004629082252637146==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+[CCing Johan, Jakub and Dave]
 
-Dear submitter,
+Hi Bluetooth maintainers!
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=615912
+On 16.02.22 11:26, Marcel Holtmann wrote:
+>
+>> Since bt_skb_sendmmsg can be used with the likes of SOCK_STREAM it
+>> shall return the partial chunks it could allocate instead of freeing
+>> everything as otherwise it can cause problems like bellow.
+>>
+>> Link: https://lore.kernel.org/linux-bluetooth/aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de/T/#m1f9673e4ab0d55a7dccf87905337ab2e67d689f1
+>> Fixes: 81be03e026dc ("Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg")
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> ---
+>> include/net/bluetooth/bluetooth.h | 3 +--
+>> 1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> patch has been applied to bluetooth-next tree.
 
----Test result---
+Luiz, Marcel, thx for fixing this 5.16 regression and picking the patch
+up for merging. But I have to wonder: why was this simple fix put into a
+tree that apparently is meant to only get merged to mainline during the
+the next merge window? That will mean this regression will bother people
+(maybe Paul is not the only one that is affected by this) for weeks to
+come and even make it into 5.17, before it gets fixed for 5.18-rc1.
+Despite the lack of a "Cc: <stable@vger.kernel.org>" tag it likely will
+get backporting to 5.17.y and 5.16.y afterwards, but the latter soon
+after will be EOLed anyway.
 
-Test Summary:
-CheckPatch                    PASS      0.54 seconds
-GitLint                       PASS      0.39 seconds
-Prep - Setup ELL              PASS      41.47 seconds
-Build - Prep                  PASS      0.51 seconds
-Build - Configure             PASS      8.02 seconds
-Build - Make                  PASS      1696.97 seconds
-Make Check                    PASS      12.56 seconds
-Make Check w/Valgrind         PASS      539.33 seconds
-Make Distcheck                PASS      285.54 seconds
-Build w/ext ELL - Configure   PASS      10.33 seconds
-Build w/ext ELL - Make        PASS      1768.07 seconds
-Incremental Build with patchesPASS      0.00 seconds
+Correct me if I'm wrong, but that afaik is not how the Linux development
+process is meant to handle such regressions. This approach also
+contributes to the huge stable and longterm releases after the end of
+each merge window, which some people see as a problem.
 
+I bring this up because there were other regression fixes in the last
+few weeks that took such a slow path towards mainline. I also checked
+MAINTAINERS and noticed you even have a tree that could feed fixes like
+this to Linus via the regular net tree, but apparently you haven't used
+it in quite a while:
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
+I rechecked and noticed not a single bluetooth fix was merged between
+v5.16-rc1..v5.16. I doubt Jakub or Dave are the reason, as they merge
+fixes from downstream trees every week and send them to Linus shortly
+after that.
 
+So why are things like that? Or is there something wrong with my look on
+things?
 
----
-Regards,
-Linux Bluetooth
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
 
-
---===============4004629082252637146==--
+P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+reports on my table. I can only look briefly into most of them and lack
+knowledge about most of the areas they concern. I thus unfortunately
+will sometimes get things wrong or miss something important. I hope
+that's not the case here; if you think it is, don't hesitate to tell me
+in a public reply, it's in everyone's interest to set the public record
+straight.
