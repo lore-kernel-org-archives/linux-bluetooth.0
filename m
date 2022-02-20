@@ -2,60 +2,63 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 218BAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 19 Feb 2022 23:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96204C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 20 Feb 2022 00:06:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231410AbiBSXTH (ORCPT
+        id S231410AbiBTAG5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 19 Feb 2022 18:19:07 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:54738 "EHLO
+        Sat, 19 Feb 2022 19:06:57 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:32802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229897AbiBSXTG (ORCPT
+        with ESMTP id S229807AbiBTAG4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 19 Feb 2022 18:19:06 -0500
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B39D42A17
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Feb 2022 15:18:45 -0800 (PST)
-Received: by mail-lf1-x136.google.com with SMTP id u20so11933271lff.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Feb 2022 15:18:45 -0800 (PST)
+        Sat, 19 Feb 2022 19:06:56 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF442205F2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Feb 2022 16:06:35 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id d23so11948266lfv.13
+        for <linux-bluetooth@vger.kernel.org>; Sat, 19 Feb 2022 16:06:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:subject:in-reply-to:content-transfer-encoding;
-        bh=sYlfUvmASJJE7FL9eryicNemduu1ELetHdlq51J+iJw=;
-        b=c8z65IeoakXJDU0SI70tF82/noCHWnq7Dc364CxnZckG4eDWLt5E23S7QzS06vXd86
-         MMgEsNlaQ/VJW6nW/JBynjvE7b8ZSeyOuwSUKvRbfhqStNI3mGnqBZ+Qlc/mz0LvAQP3
-         0uJ0T4vQMnwNfmGJma9tfu9oAgBUg208dZnfmV64lejJTvt07nENcLYeJv860mLzADp6
-         oRSubzCY47TYS6PtneB8/LX8hUAlF8G2yb6cOrhiycqH/qVUiATb9/OeN6KbCBopxzSj
-         mF4uaTUP16Q78SzkhnmcKfvdL9YTbT0NoOgFmppmmm0qJJn0wR8yRt4FHmqzoee+Ryzw
-         nYjg==
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=0hbcmpUf78JELApq/uZGUHxOdgu+a7cYpjSUP5vKiJA=;
+        b=pQtKg11hQ8cIFLYfVOrMbyr+xXHbrvEmFrlW31OccoLQ1bFYcijOgXIdKQrEA0TrFC
+         iJFDr6TaCCXd7k+5cde2lkWs6T3edzcMslnoT3IGsF2X7BDnD/RbVaIDpVajClB5JgJg
+         3tBjTRRXsJG4MCZ+4N/+fBaY7u98QxPhHgS7bma2Qmq2X/aFaFBZ/VzyKF22Hz0ntfOA
+         J+iMaFW6RMuZ8dwMLcVX3up9opmJHwr5s3dczGyyFWKiKN3qQ56vD8IVfW1eaeQV8XEq
+         ixoAZip0mAAmxxT5AAH9i1/g6sb6z/hhXhNn3is096QBem/Oep3EshQYD1RNeY8SRhdC
+         ZWDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
          :content-transfer-encoding;
-        bh=sYlfUvmASJJE7FL9eryicNemduu1ELetHdlq51J+iJw=;
-        b=lGoo1HCWVfOs/mRNfgUvCksrsYLWyGWS61Kk00uOSBHnkxoMDtb9DOLS5+fJ9xCj7g
-         wicnjo5vcQwmUm2IC3ZmSeMpZB39jbDDdMnobvQqAF7rPfMmaCqmuyJYb4F60eYsfunq
-         eike4HYQtbgoICERpnbBFoNBu+jTIjOOjadnKI4BurkcYZ1hn+qOwrSNrhyC3ItAZ4V8
-         mChsQSDmklMoDzu36bNxnaQTF38A4XXjt0Yj67eaaszG5qm1Kt7Wih9a2CNNXt+z7nip
-         fFdBqtPFR/UlQUFDeS4uashuv5LVmyoP9RB5siDRub0Glp84qrlRTn6buKGGdqhkWsJN
-         pt6A==
-X-Gm-Message-State: AOAM533one5zpD69bv4bqJtmQEiZBi6jgA4uDFLOgstA7Nj4ftWG/IiO
-        NtyjotTHW/EAf1oNH/60+2I=
-X-Google-Smtp-Source: ABdhPJxIwexDOzZblKOB8PT9m432DtMVJXVt1z8ILBZgT4zhiRKcOHSlVnUGIM8/0oSwOXnhHskZQw==
-X-Received: by 2002:a05:6512:3884:b0:443:c530:78bc with SMTP id n4-20020a056512388400b00443c53078bcmr4425755lft.411.1645312723521;
-        Sat, 19 Feb 2022 15:18:43 -0800 (PST)
-Received: from ?IPV6:2a02:2168:8737:3600:57b8:cdf6:2169:b497? ([2a02:2168:8737:3600:57b8:cdf6:2169:b497])
-        by smtp.gmail.com with ESMTPSA id g19sm815446ljm.7.2022.02.19.15.18.42
+        bh=0hbcmpUf78JELApq/uZGUHxOdgu+a7cYpjSUP5vKiJA=;
+        b=axOPU1vupEKthAFSjnuzHpkGC/MI3DC1KgMo1HDjfM112O+K8sWPV2VGM6a6qyvykE
+         nyn/KD1X8MwWfYTOtaNUl3NBmeTIP5KG69TM42jTkqN51objD7ENhm2K7CAvCROEJ+KK
+         7dxZL1OaRdI3ZxwVHfJBCdfe/zAVt8x+1BHQ8SgYXEirw63XVLWk1b3VzUAF0hsnmUa3
+         GmJfMj1VmOv8gI0IBOChIuUL7Ys/smH5XixEJkhbH3IEtyMQ9Cr8pi7HZlHJDcEZKzd3
+         AcfiJQdgiey07ZwWfsSdCFmSGIsQMZt49XL2vsnufOxj/iHGjz7Hb12BHLtHRZ/bvJom
+         7thA==
+X-Gm-Message-State: AOAM533rG4pPbeO0M+86erocGGhzHrBmWikxkx0xDetIzdtlZ4nI9Z80
+        8JRBm6DU+nkZ9Z8WJuMck7tcsWOebvE=
+X-Google-Smtp-Source: ABdhPJywKVJoqvKIqMP3qTgm1Nrj7MBnx1e4Zvgs83PSQzSl/3cedejS0Zi2Z72y2IZTqMUmU79NGw==
+X-Received: by 2002:ac2:5e2f:0:b0:443:671b:cead with SMTP id o15-20020ac25e2f000000b00443671bceadmr9461226lfg.306.1645315594007;
+        Sat, 19 Feb 2022 16:06:34 -0800 (PST)
+Received: from ?IPV6:2a02:2168:8737:3600:b359:909a:13f:7c62? ([2a02:2168:8737:3600:b359:909a:13f:7c62])
+        by smtp.gmail.com with ESMTPSA id j21sm690414lfr.139.2022.02.19.16.06.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 19 Feb 2022 15:18:42 -0800 (PST)
-Message-ID: <6de28c0c-82d5-648d-efb5-a483ede899e1@gmail.com>
-Date:   Sun, 20 Feb 2022 02:18:41 +0300
+        Sat, 19 Feb 2022 16:06:33 -0800 (PST)
+Message-ID: <e2581b04-5c45-7a86-6bfc-bcab85900a62@gmail.com>
+Date:   Sun, 20 Feb 2022 03:06:32 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.5.0
+Subject: Re: Lenovo Legion M600 wireless bluetooth mouse connected and paired
+ yet not working
 Content-Language: en-US
+From:   Andrey Butirsky <butirsky@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 References: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
@@ -70,35 +73,23 @@ References: <f610b069-07ab-1004-e8f1-b84533593c92@gmail.com>
  <CABBYNZJL4YCpXHL8ihSFh04fEGAqcB7K8a9aR22E6TwB2Wj0Tg@mail.gmail.com>
  <12462d5d-b140-6b08-2e72-d8fd77105086@gmail.com>
  <CABBYNZJg0qHO4gvLh8O44um68CzRMM4PE3OymRhGfiQ1kDZO1w@mail.gmail.com>
-From:   Andrey Butirsky <butirsky@gmail.com>
-Subject: Re: Lenovo Legion M600 wireless bluetooth mouse connected and paired
- yet not working
-In-Reply-To: <CABBYNZJg0qHO4gvLh8O44um68CzRMM4PE3OymRhGfiQ1kDZO1w@mail.gmail.com>
+ <6de28c0c-82d5-648d-efb5-a483ede899e1@gmail.com>
+In-Reply-To: <6de28c0c-82d5-648d-efb5-a483ede899e1@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
 
-On 19.02.2022 00:38, Luiz Augusto von Dentz wrote:
-> Hi Andrey,
-> Did you manage to test with latest git? Note that windows does seem to
-> handle composite HoG device:
->
-> https://github.com/bluez/bluez/issues/258
+On 20.02.2022 02:18, Andrey Butirsky wrote:
+>> Btw, it could be due to:
+>>
+>> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=aa699cb762a02ec7409940ddcfe65b788de8270d 
+>>
+>>
+>> There were some systems (afaik 32bits) with a problem with the header
+>> copy we had.
+> Can I check it somehow?
 
-I built bluetooth kernel modules from bluetooth-next, tag v5.13. Not 
-sure if it made any sense or my distro kernel already included them..
-
-Anyway, there was no any difference in mouse behavior.
-
-
-> Btw, it could be due to:
->
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=aa699cb762a02ec7409940ddcfe65b788de8270d
->
-> There were some systems (afaik 32bits) with a problem with the header
-> copy we had.
-Can I check it somehow?
+Oh, I built BlueZ from master so shouldn't be the case.
