@@ -2,195 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19644C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Feb 2022 22:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A07D8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Feb 2022 22:38:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235667AbiBUWeX (ORCPT
+        id S235723AbiBUWic (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Feb 2022 17:34:23 -0500
-Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:36334 "EHLO
+        Mon, 21 Feb 2022 17:38:32 -0500
+Received: from mxb-00190b01.gslb.pphosted.com ([23.128.96.19]:47642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235668AbiBUWeW (ORCPT
+        with ESMTP id S235703AbiBUWib (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Feb 2022 17:34:22 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51161E093
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Feb 2022 14:33:56 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id i19so10287581wmq.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Feb 2022 14:33:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=kby3PNa2Owh2Gu1TRCvl+evsgj7HxbpNl9YbTkLaljw=;
-        b=ppr41cJmihFf5hW1e9+ots1hq5N2GDNepZo/K/Fc4PdU6XN2ld0Cu2axJmSf3kh8Y8
-         Z4Acv9eaxV6cfSl61W1eNig+6hc/O7d+i6TxK89iEPmUaaaGFksFnwk5/c9W13zrOD5N
-         zKO8/QRXXDQ2cJh4/RF1pT4RJo+GyDOQwYXHtZq07NhlXbCvmPxgdb7jcKV+F9FbDUUJ
-         SBqvTsEjAxMUVstc4bBLgzfI8caN60FqsHqMdKX6XKMk7/AapBXhvpFC61CpTvAGZcBb
-         VpSsnhL+PvPyjYsSSnLrbZqM1eptxZUyEzPX18m+ODU6JjprD0k2AXiUgOV4nqmoHxz7
-         gFWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kby3PNa2Owh2Gu1TRCvl+evsgj7HxbpNl9YbTkLaljw=;
-        b=IKV8BCK37Tia+dOou8dy3q8deAfNkXVcHmiw4GWOmfCfhQ1x9EY8M9SHIi5PVZB3eI
-         DHz4rsbtzj94DYgaEF1qyemuGcjzJkHNivTuppI7wFexbwNop5VQVwFN/JjFx3t8Upr4
-         c8e6PyVWYsr6w1WWBD+BkwO8S+Bdyo4JLoMz381gd7/NDbpHYEKT+jKUC72WBs8f3q8P
-         GShY/cCNkrcCy4eRouWbA/GOINUjQNO5q3Lz4WK3fF020kQno9DWvYrolvBBBeI4E538
-         Qhd56jfBKRtLUaHRxfS9HOxFeVxUILiUos+bFibqktLBGwEfQpvfxYCH7VBrsdHfbgTf
-         pO6A==
-X-Gm-Message-State: AOAM531B/eAGEvgEdKNlTGShpD8efBUcDFkEwidcxwX1d5x0MWtR97xz
-        t5p00Qm5/8LTpLwWqVzcVj4=
-X-Google-Smtp-Source: ABdhPJwmVpNApOJZ2es28Zs/zom4ArUnT2iLIjO/JMVaOJ6F5L9m0HMjXfKavdZT3zz/Clw3GwEHJg==
-X-Received: by 2002:a05:600c:4c27:b0:37b:fa17:899a with SMTP id d39-20020a05600c4c2700b0037bfa17899amr882310wmp.126.1645482834707;
-        Mon, 21 Feb 2022 14:33:54 -0800 (PST)
-Received: from [192.168.1.10] (4e691f2a.skybroadband.com. [78.105.31.42])
-        by smtp.googlemail.com with ESMTPSA id f14sm707004wmq.3.2022.02.21.14.33.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 21 Feb 2022 14:33:54 -0800 (PST)
-Message-ID: <b1a4a920-dbba-58be-72b4-2c95b9b79283@googlemail.com>
-Date:   Mon, 21 Feb 2022 22:33:49 +0000
+        Mon, 21 Feb 2022 17:38:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D8FC8E71
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Feb 2022 14:38:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1645483087;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=yNyqavxJK7ZHgL6rDzOdeF37q+fW4SE+roeR8B04wWM=;
+        b=CdX3eogj6KDAB297R8RjHvvm4I9JS+sS6DEWrwn7cmbk8plfkmW3Co4mlkbu0k12BedbaB
+        SBBUw0ED1ljleKJIaXDpKXpSa3vjoHSs4ZfI+7u/iAb/aTZSW4+6/TRimx0x40ewJ4kUAS
+        0wUiqdYPqT3iNlsTdIgqWgorydQSYlE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-537-vCutpY0QOMuN_yAa3ikUkg-1; Mon, 21 Feb 2022 17:38:03 -0500
+X-MC-Unique: vCutpY0QOMuN_yAa3ikUkg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FA0F2F47;
+        Mon, 21 Feb 2022 22:38:02 +0000 (UTC)
+Received: from starship (unknown [10.40.195.190])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 002C2519B3;
+        Mon, 21 Feb 2022 22:38:00 +0000 (UTC)
+Message-ID: <f648f2e11bb3c2974c32e605a85ac3a9fac944f1.camel@redhat.com>
+Subject: Since commit e8907f76544ffe225ab95d70f7313267b1d0c76d bluetooth
+ scanning stopped working on my system
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org
+Date:   Tue, 22 Feb 2022 00:37:59 +0200
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
- connect to bluetooth devices
-Content-Language: en-GB
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Chris Murphy <lists@colorremedies.com>,
-        Bluetooth <linux-bluetooth@vger.kernel.org>
-References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
- <CAJCQCtTdiPNkV1_b478_LkG11TMOPEdDGHTjf5LfZJpwWrK+bg@mail.gmail.com>
- <CAJCQCtTNk25u6sm_Xqt8qzf7mM5kmOrnXyD6pT1GKJ5z5-Kqbw@mail.gmail.com>
- <CAJCQCtRYKbTQ16eUq2qODZ=dE=HB6pZpLNswdqMbiWw+DBE9KQ@mail.gmail.com>
- <CABBYNZKfy-ntFhbx0TStNwFiwxCF4sPVaHS4wDbef0shb=pawg@mail.gmail.com>
- <CAJCQCtRiTQ1BTEHugxhS-zmXFG4qi4WLxsRyZsG9-_Q0isM+7Q@mail.gmail.com>
- <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com>
- <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
- <CAJCQCtTpHQe2co3fLNs5csKQchmwH=3YwQOvFnuc2nhjRseVnw@mail.gmail.com>
- <9ad505e1-7b59-7ebf-378b-23a6c0e25802@googlemail.com>
- <CABBYNZ+9tUKgLyUWM5vkMW8vHxYsXv6DEaDWdHt8xTTs6puGQA@mail.gmail.com>
- <aaeb4131-d177-d41e-617b-b0060cd83c92@googlemail.com>
- <CABBYNZLB+8UzhzttMrKbHW_+-A1EsY9iT5Y55VuOOEPuD4kAHQ@mail.gmail.com>
-From:   Chris Clayton <chris2553@googlemail.com>
-In-Reply-To: <CABBYNZLB+8UzhzttMrKbHW_+-A1EsY9iT5Y55VuOOEPuD4kAHQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Luiz.
+Today I updated to a new kernel and I am bisecting few regressions:
 
-On 21/02/2022 21:27, Luiz Augusto von Dentz wrote:
-> Hi Chris,
-> 
-> On Mon, Feb 21, 2022 at 12:23 PM Chris Clayton <chris2553@googlemail.com> wrote:
->>
->> Hi Luiz,
->>
->> On 21/02/2022 17:11, Luiz Augusto von Dentz wrote:
->>> Hi Chris,
->>>
->>> On Mon, Feb 21, 2022 at 5:22 AM Chris Clayton <chris2553@googlemail.com> wrote:
->>>>
->>>> Sorry folks, clicked Send instead of Save Draft in my earlier message.
->>>>
->>>> Anyway...
->>>>
->>>> On 18/02/2022 03:49, Chris Murphy wrote:
->>>>> On Thu, Feb 17, 2022 at 5:15 PM Luiz Augusto von Dentz
->>>>> <luiz.dentz@gmail.com> wrote:
->>>>>>
->>>>>> Hi Chris,
->>>>>>
->>>>>> On Thu, Feb 17, 2022 at 3:36 PM Chris Murphy <lists@colorremedies.com> wrote:
->>>>>>>
->>>>>>> OK I started over, and for now keeping the reporting constrained to
->>>>>>> the hardware I personally have on hand.
->>>>>>>
->>>>>>> Hardware:
->>>>>>> Lenovo Thinkpad X1 Carbon Gen 7
->>>>>>> Bus 001 Device 004: ID 8087:0aaa Intel Corp. Bluetooth 9460/9560
->>>>>>> Jefferson Peak (JfP)
->>>>>>> Sony 1000XM3 headset
->>>>>>> bluez-5.63-3.fc36.x86_64
->>>>>>>
->>>>>>> kernel 5.17.0-rc4
->>>>>>> * remove the paired headset with bluetoothctl
->>>>>>> * reset the headset so it's not longer paired either
->>>>>>> * put the headset in pairing mode
->>>>>>> * GNOME Settings Bluetooth panel sees -> LE_WH-1000XM3, Not Setup
->>>>>>> * click on Not Setup and nothing happens
->>>>>>
->>>>>> Well from the logs it doesn't seem the GNOME Setting is trying to do
->>>>>> anything, have you tried bluetoothctl> connect <address>
->>>>>
->>>>> `bluetoothctl scan on`  does see the device
->>>>> $ bluetoothctl pair 38:18:4C:24:2D:1D
->>>>> Device 38:18:4C:24:2D:1D not available
->>>>> $ bluetoothctl connect 38:18:4C:24:2D:1D
->>>>> Device 38:18:4C:24:2D:1D not available
->>>>>
->>>>> $ journalctl -b -o short-monotonic --no-hostname | grep -i blue
->>>>> https://drive.google.com/file/d/1x9EDvDx6XUowyRy2056n6uW-4PLx5KRb/view?usp=sharing
->>>>>
->>>>>
->>>>
->>>> I too am experiencing the problem that already-paired devices fail to connect to my laptop when running a 5.17 kernel.
->>>>
->>>> Extract from dmesg shows:
->>>> [    3.825684] Bluetooth: hci0: Waiting for firmware download to complete
->>>> [    3.825910] Bluetooth: hci0: Firmware loaded in 1551910 usecs
->>>> [    3.825910] Bluetooth: hci0: unexpected event 0xff length: 5 > 0
->>>> [    3.825936] Bluetooth: hci0: Waiting for device to boot
->>>> [    3.839948] Bluetooth: hci0: unexpected event 0xff length: 7 > 0
->>>> [    3.839973] Bluetooth: hci0: Device booted in 13715 usecs
->>>> [    3.840205] Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-19-0-4.ddc
->>>> [    3.843002] Bluetooth: hci0: Applying Intel DDC parameters completed
->>>> [    3.843926] Bluetooth: hci0: Firmware revision 0.4 build 125 week 46 2021
->>>>
->>>> Extract from lshw shows:
->>>>                    description: Bluetooth wireless interface
->>>>                    product: AX201 Bluetooth
->>>>                    vendor: Intel Corp.
->>>>                    physical id: e
->>>>                    bus info: usb@1:e
->>>>                    version: 0.02
->>>>                    capabilities: bluetooth usb-2.01
->>>>                    configuration: driver=btusb maxpower=100mA speed=12Mbit/s
->>>>
->>>> I don't know whether this will help, but I've found that the problem only occurs when boot from cold (i.e power on the
->>>> laptop. If I then do a warm reboot, my bluetooh devices connect successfully. The significant difference may be that on
->>>> a cold start, the firmware needs to loaded whereas on a warm reboot I see:
->>>>
->>>> [    2.000989] Bluetooth: hci0: Firmware already loaded
->>>>
->>>> Hope this helps. I am happy to test any fixes or provide additional diagnostics, but I'm not subscribed so please cc me.
->>>
->>> What exactly doesn't work? Can't you power up the controller, etc?
->>
->> I have two bluetooth audio devices. One is a set of headphones and the other is a speaker. Both are paired with my
->> laptop and, normally, both automatically connect to the laptop when I power them on. I've had the speaker for three
->> years or more is has worked fine with all kernels that I have used up to and including the latest stable series -
->> 5.16.10. The headphones were acquired a year or so ago and to date have worked with all kernels I have had installed
->> since then. Consequently, this problem is a 5,17 regression.
->>
->> After a cold (power-on) boot with a 5.17 kernel, they do no connect automatically when switched on. Furthermore, if I
->> use the blueman application to attempt to connect, that attempt fails. The only way that I have found to connect
->> successfully is to do a reboot, after which the devices can connect automatically when I switch them on.
->>
->> I'm sorry, I have no idea what you mean by "Can't you power up the controller, etc?"
-> 
-> Use btmon to capture the trace when you attempt to connect, it also
-> would be a good idea to use bluetoothctl when attempting to connect.
+I noticed that if I open GNOME's bluetooth setting, it hangs for like minute or so,
+and then shows only the paired devices and no scan results.
 
-It's getting late now, so I'll do a btmon trace tomorrow. From it's name, I assume bluetoothctl is part of the systemd
-suite. I don't have systemd on the laptop but use sysvinit to start userspace including, of course, bluetoothd.
+I bisected this to this commit.
 
-Chris
+For reference I am running fairly old fedora 32 on this machine, and thus I have
+bluez 5.55 and stock GNOME from fedora 32.
+
+I can provide any more info on anything if required and/or test patches.
+
+I wasn't able tor revert this commit as it is part of a bigger rewrite of scanning
+which makes sense.
+
+I tried merging bluetooth-next master as of today,
+into my kernel but no noticeable improvement.
 
 
-> 
+Best regards,
+	Maxim Levitsky
+
