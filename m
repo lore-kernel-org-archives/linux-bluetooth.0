@@ -2,100 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 019D7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Feb 2022 21:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D36C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Feb 2022 21:39:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235751AbiBVVW4 (ORCPT
+        id S235766AbiBVVj1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Feb 2022 16:22:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58272 "EHLO
+        Tue, 22 Feb 2022 16:39:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235735AbiBVVWz (ORCPT
+        with ESMTP id S235800AbiBVVj0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Feb 2022 16:22:55 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FC7C3C18
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 13:22:29 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id em10-20020a17090b014a00b001bc3071f921so184681pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 13:22:29 -0800 (PST)
+        Tue, 22 Feb 2022 16:39:26 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89D021390EE
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 13:39:00 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id w2so1204739pfu.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 13:39:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+0bc0XxrWajH0dWWRkv3mvkpGCcm6Or0SxsPZo2tQ2w=;
-        b=QaDRlmw+BQuc07Za5JPcQI7vHbzd5hHYAzmFIiQPwyk4pgxC3ByXocT7fgRJVnLwjV
-         rYsnJHvJdrfAOtifUPWm5SeopSP2ACqC1yBn9lY1MwNjkUVAqjEIzWTQZ3Gx3lEuijDR
-         fPVYqOoUBo0qpLEetAqbJY70RkWBLJXlrm8CX7meRSjGHdnN32BCf34mXHYULeDGXZVX
-         XgeytdSc9iONDgoU7BTLdsaZPl5zdXao7xIJyoe/BeziojTvo6vH4UR5VWHItlxsflcZ
-         0UU1M2hIOQc1J3XeHwMK4fHOyNVw4X2212p2I8zfc5H9fXbsB93VoGyH8B8vQ3cMi4Ee
-         bXKg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=YatsP8z2A3P1aRyKVUP/LvVpk3M+F8Yq7WpI5/J0Tf4=;
+        b=ITyRDwORY1jncHIwXJ97aZJ8xNuWMKM2aNpE8qFDs/ev1pmZIduFgKd/UxIuWKECfb
+         6EuzdKhikrocktFgqwicM8VbJOlm4tUJl12vFbCuE7pL1PKHhVneqRpcWnIfMsxWd2WG
+         4oRFpJySKeBQuAtWzOEDIqAS93S7IbTM1nqqTO4h39/MrwoPoUrgPy7H1hRyQ02A2MA5
+         RIOI3ULVjQbzggpIET3puwIj5ZN8psdLMaQe7eWhY5OpD5Ul/Vkz0PngfKcQ5Dq+bhua
+         1qzMaOCgf9li16gfl0g0tAwvXYEbVq1AGtlZWa3wPb8CY38h1O8zTPsuezs2AuCRtFn3
+         MGFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+0bc0XxrWajH0dWWRkv3mvkpGCcm6Or0SxsPZo2tQ2w=;
-        b=BWYDCwP+SK/hLFBOKKM0oyVXDIkD9pB+zwGPdnJxJw4pP0LLNhuFp6GM8CpFwUi1eF
-         Relmqd8mZlvGRUFGS5SxBqsGBTBO3OhbmoWmazeFyoYTVH5CEm3xAvrirvIcvOBfUvcV
-         3+N5ignK55hkcg8uAsC2zYjMCS+9iqvJ9TvrKkzCC/hBW8eirdLdAYlfvjQ9z4QBL6nE
-         LN55gu2+dPSKg4bzvbZjGG1ujLn9x+IVkoJSWnTAsWZ1JVBkNK1R0wzJHTIRfmGmtM/F
-         rADwOshJyk0Er1p62WuzmE8QYSis/kR9r3wBaq5HXOmzK2xfQ10IFH6ICdEeShTr3JO1
-         v/tg==
-X-Gm-Message-State: AOAM531o7vniztKdXoP540uExCMuNdMDp6tomUB5vKL1OzsCjcZ/LLjP
-        ODQHcKqVfpeu0idTma1ytYoljW3zLf0=
-X-Google-Smtp-Source: ABdhPJzRkYd/Fu9G3MuVwfQZnU2bjkDYK/yd2984i3yCvzAGmB9FFfF4ma30vdfEg089RCLiXrpgJw==
-X-Received: by 2002:a17:902:d708:b0:14d:cf6a:a9a3 with SMTP id w8-20020a170902d70800b0014dcf6aa9a3mr25236069ply.118.1645564948362;
-        Tue, 22 Feb 2022 13:22:28 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id v20-20020a17090a899400b001bc44cd08fesm493398pjn.20.2022.02.22.13.22.27
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=YatsP8z2A3P1aRyKVUP/LvVpk3M+F8Yq7WpI5/J0Tf4=;
+        b=td13CXriv4INCRXQnbYueOMxqy6VFYzAvocTBn1Au0XOM5jr0z/6kGlG28ZAZfjI3J
+         XsPm8jPhtHSDTTvbH+fBaco/58+ImxU8798PrH/B09nNCGqspDHnXfk981IASwjA0qd1
+         u9VcErbVvT87wtHwGvs3KzDT7VkiN6+DeYMy6QzSSUcUNRZRs4tQhN/4AYpt/5Iso+A0
+         MC0FgTV9yx4Hgefv6LAroTfP0+Y5hPE3EwF+aOya/VUoQIW98QwsiAUZPqo8zj9DQQrj
+         0UttGyJtB3MzCo/lgwcJIaOy6GdxIVGIx930/AUGYgIKH0Gr9OD+g+Q6o8OREYDyCbrx
+         6CAw==
+X-Gm-Message-State: AOAM533LLFkMRdbld/mEm5HfVZkFO7aUlQx2wZzrLGRMicaZIuLZIavN
+        ACIyI0vKPsIDLF8eXQCRs0KrN+ODtXs=
+X-Google-Smtp-Source: ABdhPJyRAlk2PcEmTxf3NCe9pZQuq4hFUwHLwGrJ8e8DulTjpwTG44UZlpqaj1adf6i30e+YqIYjlQ==
+X-Received: by 2002:a63:d0d:0:b0:34e:34b:fc17 with SMTP id c13-20020a630d0d000000b0034e034bfc17mr20827247pgl.501.1645565939796;
+        Tue, 22 Feb 2022 13:38:59 -0800 (PST)
+Received: from [172.17.0.2] ([20.190.57.254])
+        by smtp.gmail.com with ESMTPSA id v1sm501483pje.18.2022.02.22.13.38.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Feb 2022 13:22:28 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: SCO: Fix codec when using HCI_Enhanced_Setup_Synchronous_Connection
-Date:   Tue, 22 Feb 2022 13:22:27 -0800
-Message-Id: <20220222212227.24515-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 22 Feb 2022 13:38:59 -0800 (PST)
+Message-ID: <621557f3.1c69fb81.41410.1fff@mx.google.com>
+Date:   Tue, 22 Feb 2022 13:38:59 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4281762703018124244=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v4,BlueZ] player: Fix Track being emitted with empty metadata
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220222193855.301757-1-luiz.dentz@gmail.com>
+References: <20220222193855.301757-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4281762703018124244==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes sure BT_CODEC_MSBC is used by default if socket user attempt
-to use BT_VOICE_TRANSPARENT.
+This is automated email and please do not reply to this email!
 
-Fixes: b2af264ad3af ("Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=616863
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.70 seconds
+GitLint                       PASS      0.38 seconds
+Prep - Setup ELL              PASS      50.46 seconds
+Build - Prep                  PASS      0.61 seconds
+Build - Configure             PASS      9.83 seconds
+Build - Make                  PASS      1752.78 seconds
+Make Check                    PASS      12.36 seconds
+Make Check w/Valgrind         PASS      533.80 seconds
+Make Distcheck                PASS      276.34 seconds
+Build w/ext ELL - Configure   PASS      10.04 seconds
+Build w/ext ELL - Make        PASS      1725.46 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- net/bluetooth/sco.c | 12 +++---------
- 1 file changed, 3 insertions(+), 9 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8eabf41b2993..b35c772efc7e 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -879,15 +879,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 		}
- 
- 		sco_pi(sk)->setting = voice.setting;
--		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
--				     BDADDR_BREDR);
--		if (!hdev) {
--			err = -EBADFD;
--			break;
--		}
--		if (enhanced_sco_capable(hdev) &&
--		    voice.setting == BT_VOICE_TRANSPARENT)
--			sco_pi(sk)->codec.id = BT_CODEC_TRANSPARENT;
-+		if (voice.setting == BT_VOICE_TRANSPARENT)
-+			sco_pi(sk)->codec.id = BT_CODEC_MSBC;
-+
- 		hci_dev_put(hdev);
- 		break;
- 
--- 
-2.35.1
 
+--===============4281762703018124244==--
