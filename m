@@ -2,93 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7F4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Feb 2022 21:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C690AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Feb 2022 22:12:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238272AbiBWV5W (ORCPT
+        id S243344AbiBWWNT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Feb 2022 16:57:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56540 "EHLO
+        Wed, 23 Feb 2022 17:13:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232124AbiBWV5V (ORCPT
+        with ESMTP id S231708AbiBWWNS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Feb 2022 16:57:21 -0500
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E66D35248
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 13:56:50 -0800 (PST)
+        Wed, 23 Feb 2022 17:13:18 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E06F4F471
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 14:12:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1645653408;
-        bh=R3MOz0kaKVeZFt4XH5glaupgy3FerYbqwcYKy1DYtVQ=;
-        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
-        b=BbaP7euMfCpCkqfM084/0cksIn5BIRBxZBxrQ0mrTBs2wmMvIh/eSiyLPGNE1cWtO
-         TaQEHw/DCBlDXVX7o9cGm7l3/BtAZMMnpC2U90Gif/Fiauzf6XSyUhsvDLc9GrSlxb
-         DgBG4sefyqJvBIs0jPjxElvoP1/sSFrBQfin6WLs=
+        s=badeba3b8450; t=1645654367;
+        bh=Pu7JU/CQUzDb9woGaLZEQIOi3GF8xDhxUbqB3fyhwiI=;
+        h=X-UI-Sender-Class:Date:Subject:To:References:From:In-Reply-To;
+        b=WMDjiUgTjcSC8laZum3IWCoMMVku2OutKMFMDz1lxktuMcgydF1Vbc883FHWP5a8T
+         riQyxtPXcc8QLD25R6v//YELDj9RFuei5CsO8CY6/GoniEyv1gzgDI7voBEXOG+JSJ
+         E3KTGjCG579go42h0G8AcCPXMdN6R7WXZAsSWOTU=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from madeye.fritz.box ([37.4.228.18]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MhU9j-1nrOdP1wyh-00eaEQ; Wed, 23
- Feb 2022 22:56:48 +0100
-From:   Nicolas Fella <nicolas.fella@gmx.de>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Nicolas Fella <nicolas.fella@gmx.de>
-Subject: [PATCH BlueZ] neard: Fix reading State message
-Date:   Wed, 23 Feb 2022 22:56:17 +0100
-Message-Id: <20220223215618.335489-1-nicolas.fella@gmx.de>
-X-Mailer: git-send-email 2.35.1
+Received: from [192.168.178.56] ([37.4.228.18]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MeCtZ-1nugjQ0iO7-00bNgN; Wed, 23
+ Feb 2022 23:12:47 +0100
+Message-ID: <c692d560-af17-7a6e-c53e-36aa0c9501dc@gmx.de>
+Date:   Wed, 23 Feb 2022 23:12:46 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH BlueZ] Use audio-card-bluetooth icon
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <20211223175005.52976-1-nicolas.fella@gmx.de>
+ <CABBYNZL4ftQ7PCMPywddoZvPcu_D9xkx21o=Bo=g9DtZ=vJStg@mail.gmail.com>
+From:   Nicolas Fella <nicolas.fella@gmx.de>
+In-Reply-To: <CABBYNZL4ftQ7PCMPywddoZvPcu_D9xkx21o=Bo=g9DtZ=vJStg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:bRH4cr4jf1kZDZhPTbQdlwM9feQNaT8yzezkQZZFcqC9CrOkXIE
- bbqGeHHD3xkwj3H6FhOPawA2ipMdsxHd5j+4w+B90sA9GNEke1JE4YxmM2DpHd4MScNyfzS
- IxI3P0Dt8H6Q+FDwzFIChzvr4g55koe89rRkBIb0hadvL9f/jX6KdGziP6dK6GH+mPVMQt1
- rM3PJ3Pj2xgO5E76ShgQg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:C37dJlydnw0=:H6zsOEVYIwlvKP6Itl5JhG
- 3xKlNZ9FvpWPSCxD5wW7Ixa50FIktCxFGy6W4Gtfc4RX7XeizuBdhLb9upLn66IkZHEpJGucq
- kQ+4Tin4/GRHpmSj82rkeBDj2MYsbfS46q9Ao4MFYkmwO3wKF9NIWf34FI/bkK3YRmv4cCow1
- uaOELPerjEvfgg0LV4c3H4cE7fbS6NdBgAEBSpw3kEJc3kK+mfw16fqfaQrcP3/7GL5eOcz/b
- LGc3yNxTAO5GZbB2WCvCK3cwZ8P1iAjIHEICsLFTlSEVh6/0JEK0puYYDBUEpTEz0qyJQH7Lr
- vfqmGMiaf2DDajYH3Bwj4ZKYve/aI9QM08zW5u3mkxrFB2fr6O3pv6o2Bqh/5N+xjCwS4VxW5
- mso5Xu1NCcWHRI1UgQHwnwl/KFRaqvtWLl6Tug56Ntp2wOXNjaTXvwgV21uW/iWYvsO1v/8ru
- DxFdmG7v7hhbMMFTFD6vQe3j55JcELC3yHQwIJomS8SkHygsaBY4y6uAW7gSRBHiTpD9+5PKr
- vIETCaC9JQPy6CpC1B9B5UWxtE/jLpm1yLDuUdgoZOTOvbxiVjK5mspUB7BUG+SYlRHaaESo0
- W3sbMuAcrNlG/OsaClni3+EcI+tYM/8LvAuNRuifzbVFJ2Dzo8V9f4ZrTHN6L3lvJoFwyfISx
- MDBIoWfVtY6FV5k23Yda61HgN7w/wUEWwQ1oE3KOfFMKn205jU/PMczqaJY5UB8Y4Bz3JZoYA
- uobk2BKt2p+vSDPAtQFfi/A3zIzMegDl6VgAl2xob8CP7kwzsLpQZKwuKHC2oQYQklG3pIv18
- vLWjhSlvT0ncqtblZkULl+5geFZ8ta4PeHYalEFDqpooAlY3r3WTssXLVSwK3Ado0h8FzbECF
- 8euFYM7RYTUHc1aQfzYQMuwfx6HKF8N2bN3oAqe7mfMJQoTA65OgXE/r79kZ2UPdbc7M+mva7
- GWY46V8FrIpvDEmADTbYlg/kqfNZVkc9Sc+bzhzsOtRiKnytYc8jBXu/Eef7cQmB6qRMFFrmd
- ly3efwV0Fqtz9hYowgQxobIC+rmZOg79cjB2ZpeT/0McL5gCfX6i4LMPElKSd1UDbIZj6aQC9
- hJra2U9ErlUuUA=
+X-Provags-ID: V03:K1:vKSV4Cn9jVp+JskwkxB4dLlxVkiaPQcss4apec3Dlsr8BylT/t+
+ xmwWcVKa3ipXOm+GoOqSFdM+QBZSZoxMCXwmd0UmvM0XuUIgPkRMGBo08Si4q/IsfAsvAbE
+ GVV0vT5vwS4s3mpVjQHSeZ8Rw2K+2oWXKBIhDvzofU+hIflKLEjkYViY78qYsEh8d9ujEaj
+ gOQw7knkDpupQX3NiXyWg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:M3AIa7C1JZs=:1H0Rf9KCeFMMPv/c19kajC
+ pChnm+xzBB1ed5+ZoyVEz+DlDk0XvcaFCjNHbXfmjSPe+HKrdz82tCitDIiqLL9p6kndz2i5B
+ 91wm5KxXLiww3TRGO7uUF6CecmqQH2uivJ9X+W1f+iotGAKnYWKAfs34U/vSPSBc1BBsXqxKc
+ kRK+mMZg5lCT5k+iSR6ODikZBfysHueilz+8jsGDw+5/AD1AkqZx98kdFH76H765oO/UZALUy
+ OOgR7gf0KQ/mvDRHW75c5S+TqMn4KSJAHaSi4Bgn2OHNLaY++ctMPhwoZMduQPPdpKGM5Z40E
+ WwwIT/K58K9IO/aVS5LBQmd8wY1F+VmiSns8U/C0S48rlk/YimGcLItssCJi1rSUtNYwCWUmI
+ IxaMKhoC6P6ifj9CmzSTaiEOUReD1WBxRnqcze8E8dwdMMvNIoOtc3fliXOjwugUEpYWaVgIA
+ mxMGz9MLOliuUAFUalhz8C1Trhhe2iVvY1j/+3b924pnQ1Gmyp7ZK5HLm9YWqkuAJdoTv+4D1
+ dM8YrrPzw0RFxIyPSTR2yWGhCL3SB4mYxF4/iLY4UykqWpz52ArWKNQfNMK5vG7osmXrNOT/m
+ dFdQbMvJjraxLqze15gA5tOKtOrASFhk7Cko25Uy9FpcH7U7tB7CNXPGPvQebE6+6UxFw6eMV
+ Y0rwO3lc2kJuOvl+atDPlKu5q0nZns1uH2Z7yR62z+5EoJI2Sd7sqbEkETBYBRQ0sEAUMN9TR
+ Rsse5XPauUZiKjiX3F+DF/nSFAAtySDI6l+fHHImAf5EWvQYTwayhw6rVYWz50BRLNNA3797C
+ +lmYtiW4XAq9Q3Hy2q+Yhiq0okQuj+vb1A+AhkmuwbvrBmzyyRxdQFvTrOUxW0aOTpbTkJP26
+ nbtQOjS57brAiRPKcetUARIzWTP5n8koYwSGu04cnTg5AH65GkjppQzHdsMMi6ZSEhvx/Zs4T
+ ygOYD0v05S/13W0eGWnvsp5nvbYZB6gULha/VGCJOn7PYYfsYa44EeOEYt5dS09zZdZ7ibOmn
+ OFyOIuL0elAjkSrpzBc3GdnNvUUFvPGBiWJn/v9/RJGILVHxmFKNE3JFR2eNZAe8EsqRFzWqh
+ gPEmw7npOi+d9g=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-dbus_message_iter_recurse only makese sense for container types, this is a=
- string.
+Hi
 
-Fixes: https://github.com/bluez/bluez/issues/300
-=2D--
- plugins/neard.c | 2 --
- 1 file changed, 2 deletions(-)
+On 1/5/22 20:07, Luiz Augusto von Dentz wrote:
+> Hi Nicolas,
+>
+> On Fri, Dec 24, 2021 at 5:06 PM Nicolas Fella <nicolas.fella@gmx.de> wro=
+te:
+>> PulseAudio uses this icon for this kind of device
+>>
+>> Let's be consistent
+>>
+>> Users will gracefully fall back to audio-card if audio-card-bluetooth
+>> is not found
+>> ---
+>>   src/dbus-common.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/src/dbus-common.c b/src/dbus-common.c
+>> index 5e2c83d52..3611cb013 100644
+>> --- a/src/dbus-common.c
+>> +++ b/src/dbus-common.c
+>> @@ -80,7 +80,7 @@ const char *class_to_icon(uint32_t class)
+>>                  case 0x0d: /* Camcorder */
+>>                          return "camera-video";
+>>                  default:
+>> -                       return "audio-card";    /* Other audio device *=
+/
+>> +                       return "audio-card-bluetooth";  /* Other audio =
+device */
+>>                  }
+>>                  break;
+>>          case 0x05:
+>> --
+>> 2.34.1
+> It doesn't seem to be part of
+> https://specifications.freedesktop.org/icon-naming-spec/latest/ar01s04.h=
+tml,
+> does the icon themes really have such icon?
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index a75527148..99762482c 100644
-=2D-- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -575,14 +575,12 @@ static int process_message(DBusMessage *msg, struct =
-oob_params *remote)
- 			if (process_nokia_com_bt(data, size, remote))
- 				goto error;
- 		} else if (strcasecmp(key, "State") =3D=3D 0) {
--			DBusMessageIter array;
- 			const char *state;
+I can't name any theme that does. There is a request to add it to Breeze
+in https://bugs.kde.org/show_bug.cgi?id=3D447431.
 
- 			if (dbus_message_iter_get_arg_type(&value) !=3D
- 					DBUS_TYPE_STRING)
- 				goto error;
+If a theme doesn't have audio-card-bluetooth a compliant implementation
+will fall back to audio-card, so using it won't hurt.
 
--			dbus_message_iter_recurse(&value, &array);
- 			dbus_message_iter_get_basic(&value, &state);
+We have a bit of a chicken-and-egg situation here. Without bluez using
+the icon there is less incentive to add it to icon themes.
 
- 			remote->power_state =3D process_state(state);
-=2D-
-2.35.1
+Cheers
+
+Nicolas
+
 
