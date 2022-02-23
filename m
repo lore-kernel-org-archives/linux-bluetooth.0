@@ -2,128 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0626C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Feb 2022 23:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D5BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Feb 2022 01:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236330AbiBVX4m (ORCPT
+        id S235111AbiBWBvR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Feb 2022 18:56:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49704 "EHLO
+        Tue, 22 Feb 2022 20:51:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236304AbiBVX4k (ORCPT
+        with ESMTP id S233342AbiBWBvQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Feb 2022 18:56:40 -0500
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63D8DDFD3;
-        Tue, 22 Feb 2022 15:56:10 -0800 (PST)
-X-UUID: ab958ac8a96444a9aaaacbb930c942c5-20220223
-X-UUID: ab958ac8a96444a9aaaacbb930c942c5-20220223
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 693625170; Wed, 23 Feb 2022 07:56:03 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Wed, 23 Feb 2022 07:56:01 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 23 Feb 2022 07:56:01 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Yake Yang <yake.yang@mediatek.com>
-Subject: [PATCH 1/2] Bluetooth: btusb: Add a new PID/VID 13d3/3567 for MT7921
-Date:   Wed, 23 Feb 2022 07:55:59 +0800
-Message-ID: <dba1c05e4bfdf53e631ff134eaa9449e2ad5deef.1645573830.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
+        Tue, 22 Feb 2022 20:51:16 -0500
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18BF654181
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 17:50:50 -0800 (PST)
+Received: by mail-yb1-xb2a.google.com with SMTP id p19so44944580ybc.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Feb 2022 17:50:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=vAFnf59NUMGbnfylN1Si4hCPWuQpFgXI4MnZW1deHnA=;
+        b=m5nHAVdFDXBRxATpYLo+dBpa5Pb/AnTC+IQ8WMfeAv9feUnHk4MEKzTvvfrDjQSiF8
+         3E6c3JtirZN6+FVP/XdTEJHEQFD5G3tpnwNq9jnPtat5rmi7dp7Dyd16mZtmX7bqmBnG
+         hKbVE/Qbekj6Z+/5WFdf4Z/DA33NiEhs471YJzYgLDiiC7EUbWIxrIjgCXAPBRptzUXq
+         go7ilooGYHnfcYLxWJuuJTuL0uznJlb0vBotHHEeo0SDzzrF2OyWE/0H1qrKGJsw5+aT
+         QBvvWCUrR5tUmwiSl6NQk9EJoSomIh7FokWN05zRmrF5r1Ei/qTpHOH5qAsgk9OUNxti
+         Q/tA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=vAFnf59NUMGbnfylN1Si4hCPWuQpFgXI4MnZW1deHnA=;
+        b=pzTP/z9N+30rjgPNSKJTWJp5KwpZEanSHF70yyIoJq2MeIY0hxlHwVyv5G6VWprg17
+         nHCQ3ZrIW2NXZsDhb1iVYtQs10lGtkwiAv7AXJcE9nttAqg7PmEnbT3oOl+Ov8kaK8R1
+         yU0zBhiYcX2bXWG4hd9lNW73a3P439hK8B6+/kSfg6swQHSitCXY19OSGbkh26yPPiD4
+         YgCfBuRB2eypc48FERywo86naKazG7tFe68p/SCt1Re2ZXgZMXqcCRpLMcwwenjA97w6
+         6dfi0sqzrJQvVmayZakWlTEmPl9EaIWGp63Hb5ZJB/mab8R/YPRqr/g4qpn/qKnd3PKq
+         Y6kQ==
+X-Gm-Message-State: AOAM5302ALvtl5Z7n1404lI3zb1EMN8HxNqRZhgJqIlb0oBEB7UVZ0Rk
+        ZnDt+gFg6rUjJXXBIzl8A/1QiAYl+yl/vTIBeoFhbJti
+X-Google-Smtp-Source: ABdhPJyd5rznwlEoyfGjWLYne4+xVVKZUNAweSKkTOh7sv4Rb9b75GNF5BLOijZUlxFNx5OJgOGZToirSB7IOxDcIxQ=
+X-Received: by 2002:a25:55:0:b0:61a:4d80:55ce with SMTP id 82-20020a250055000000b0061a4d8055cemr25728599yba.41.1645581049060;
+ Tue, 22 Feb 2022 17:50:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+References: <20220222193855.301757-1-luiz.dentz@gmail.com> <621557f3.1c69fb81.41410.1fff@mx.google.com>
+In-Reply-To: <621557f3.1c69fb81.41410.1fff@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 22 Feb 2022 17:50:37 -0800
+Message-ID: <CABBYNZ+SKrmPusXfOkhVL1d+1pVGdxfZfE4OtVoz4Js1-pycnQ@mail.gmail.com>
+Subject: Re: [v4,BlueZ] player: Fix Track being emitted with empty metadata
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yake Yang <yake.yang@mediatek.com>
+Hi,
 
-Add VID 13D3 & PID 3567 for MediaTek MT7921 USB Bluetooth chip.
+On Tue, Feb 22, 2022 at 1:39 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=616863
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.70 seconds
+> GitLint                       PASS      0.38 seconds
+> Prep - Setup ELL              PASS      50.46 seconds
+> Build - Prep                  PASS      0.61 seconds
+> Build - Configure             PASS      9.83 seconds
+> Build - Make                  PASS      1752.78 seconds
+> Make Check                    PASS      12.36 seconds
+> Make Check w/Valgrind         PASS      533.80 seconds
+> Make Distcheck                PASS      276.34 seconds
+> Build w/ext ELL - Configure   PASS      10.04 seconds
+> Build w/ext ELL - Make        PASS      1725.46 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
+>
 
-The information in /sys/kernel/debug/usb/devices about the Bluetooth
-device is listed as the below.
+Pushed.
 
-T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=13d3 ProdID=3567 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Yake Yang <yake.yang@mediatek.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 558151f2f150..9f8c3d41d504 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -455,6 +455,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x13d3, 0x3564), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x13d3, 0x3567), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
 -- 
-2.25.1
-
+Luiz Augusto von Dentz
