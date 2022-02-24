@@ -2,34 +2,35 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1861C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 13:39:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D87DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 13:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235170AbiBXNk1 convert rfc822-to-8bit (ORCPT
+        id S235268AbiBXNnO convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Feb 2022 08:40:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34870 "EHLO
+        Thu, 24 Feb 2022 08:43:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233714AbiBXNk0 (ORCPT
+        with ESMTP id S233007AbiBXNnN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Feb 2022 08:40:26 -0500
+        Thu, 24 Feb 2022 08:43:13 -0500
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 60EFD25F36C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 05:39:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E527D154732
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 05:42:43 -0800 (PST)
 Received: from smtpclient.apple (p4fefc101.dip0.t-ipconnect.de [79.239.193.1])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 157C2CED12;
-        Thu, 24 Feb 2022 14:39:55 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 19AB7CED12;
+        Thu, 24 Feb 2022 14:42:43 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
+Subject: Re: [RFC] Bluetooth: SCO: Fix codec when using
+ HCI_Enhanced_Setup_Synchronous_Connection
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220224080219.38653-1-luiz.dentz@gmail.com>
-Date:   Thu, 24 Feb 2022 14:39:54 +0100
+In-Reply-To: <20220222212227.24515-1-luiz.dentz@gmail.com>
+Date:   Thu, 24 Feb 2022 14:42:42 +0100
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2D0784C9-C413-43EC-91F5-35C47AA31BBC@holtmann.org>
-References: <20220224080219.38653-1-luiz.dentz@gmail.com>
+Message-Id: <064E5D28-C0AB-4ADA-883B-E9AB90067E4A@holtmann.org>
+References: <20220222212227.24515-1-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
@@ -38,65 +39,39 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-> hci_update_accept_list_sync is returning the filter based on the error
-> but that gets overwritten by hci_le_set_addr_resolution_enable_sync
-> return instead of using the actual result of the likes of
-> hci_le_add_accept_list_sync which was intended.
+> This makes sure BT_CODEC_MSBC is used by default if socket user attempt
+> to use BT_VOICE_TRANSPARENT.
 > 
-> Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
+> Fixes: b2af264ad3af ("Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command")
 > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/bluetooth/hci_sync.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+> net/bluetooth/sco.c | 12 +++---------
+> 1 file changed, 3 insertions(+), 9 deletions(-)
 > 
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index b66a2271c433..ca51d6138540 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1844,7 +1844,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
-> 	struct bdaddr_list *b, *t;
-> 	u8 num_entries = 0;
-> 	bool pend_conn, pend_report;
-> -	int err;
-> +	int err, ret;
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 8eabf41b2993..b35c772efc7e 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -879,15 +879,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+> 		}
 > 
-> 	/* Pause advertising if resolving list can be used as controllers are
-> 	 * cannot accept resolving list modifications while advertising.
-> @@ -1930,6 +1930,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
-> 		err = -EINVAL;
-> 
-> done:
-> +	ret = err ? 0x00 : 0x01;
+> 		sco_pi(sk)->setting = voice.setting;
+> -		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
+> -				     BDADDR_BREDR);
+> -		if (!hdev) {
+> -			err = -EBADFD;
+> -			break;
+> -		}
+> -		if (enhanced_sco_capable(hdev) &&
+> -		    voice.setting == BT_VOICE_TRANSPARENT)
+> -			sco_pi(sk)->codec.id = BT_CODEC_TRANSPARENT;
+> +		if (voice.setting == BT_VOICE_TRANSPARENT)
+> +			sco_pi(sk)->codec.id = BT_CODEC_MSBC;
 > +
-> 	/* Enable address resolution when LL Privacy is enabled. */
-> 	err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
-> 	if (err)
-> @@ -1940,7 +1942,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
-> 		hci_resume_advertising_sync(hdev);
-> 
-> 	/* Select filter policy to use accept list */
-> -	return err ? 0x00 : 0x01;
-> +	return ret;
-> }
+> 		hci_dev_put(hdev);
+> 		break;
 
-hmmmmm. I dislike the usage of err and ret together. That makes for some hard to read code (and the return value is u8 and not int).
-
-Maybe doing
-
-	u8 filter_policy = 0x00;
-
-	...
-
-And then
-
-done:
-	/* select filter policy to use accept list */
-	filter_policy = 0x01;
-
-	...
-
-	return filter_policy;
-}
+why are you removing the rest and especially the eSCO check?
 
 Regards
 
