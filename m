@@ -2,98 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F20C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 15:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE0EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 16:08:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233589AbiBXPoH (ORCPT
+        id S229854AbiBXQIf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Feb 2022 10:44:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48208 "EHLO
+        Thu, 24 Feb 2022 11:08:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbiBXPoG (ORCPT
+        with ESMTP id S229667AbiBXQI2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:44:06 -0500
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E51E1A39F8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:43:31 -0800 (PST)
-Received: from [192.168.0.2] (ip5f5aee05.dynamic.kabel-deutschland.de [95.90.238.5])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id D108A61EA193B;
-        Thu, 24 Feb 2022 16:43:29 +0100 (CET)
-Message-ID: <fc74637a-f3c8-7870-82ec-90bf55b60462@molgen.mpg.de>
-Date:   Thu, 24 Feb 2022 16:43:29 +0100
+        Thu, 24 Feb 2022 11:08:28 -0500
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66DF317B8A3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 08:07:46 -0800 (PST)
+Received: by mail-qv1-xf32.google.com with SMTP id g23so4352940qvb.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 08:07:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=00fDgM6vk/fxecRlJ47+xgsuO7mgzuEJ9//gvfi7Jk8=;
+        b=m1l6GByRRCcfnPbbL0qSsBaeNS9uzRp4aJzfvQ1Co8uA2lbM4IeUG0nKCO28Fjhjji
+         t2zQSnAKqt1KVjYqQAMQZ7ZWmfGJ9Hqjce/fF3asBlVPEuehCaqxCvxJKHZAJ4tJXHuk
+         VWq2NyQ4evLX0UiKuhjzOVFxwB2tU7RA2DK09RudLQZmVRRvOpyJDym+7kYEdyz62vq8
+         ZZgWyhFgbc9NCl5LxUmTcwsalM7RbyQ/eo8Evk/cLHLy9ZTsj8lQ7ht3LTqg3pBs+Mhv
+         1/hzMD1y/IwFqU612YR0hLZ3wu53ygrKoukj7kuomJ9jPphgYsB91iXYtVNQWoYLOA7b
+         EPAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=00fDgM6vk/fxecRlJ47+xgsuO7mgzuEJ9//gvfi7Jk8=;
+        b=5/0u7Q6KQc9/tm4/r58yNoZt+NpzfCJ7K/bmgwAv6c9TcWfH9d/YJPB8ncDbRgGEzV
+         HETXXOw2PGmMgvxryKR1/Op2s/9uBmOxiSWQxV7irFw2AxiZhsOM5E1zWmdfAUBqMf9G
+         cn5mLWlchGR3fVGKEZ0kgfHLNUIpS/YsmJfaOal/TCRo46CHu9SXeeraxYlON18wUgHE
+         bpyVXL5P7hDJ+trmQtdlqLZ6yzSovAlUWfaPbZGYpGi1mZrZ+OZwMsDpouZdrhPzajDI
+         avRqVMAxhXuwS9xizqMU3MS0CTUfgbwG3XjlW+Ig41NSuWecYRLAJbYlQHK2qxmDm0Fd
+         Rnxw==
+X-Gm-Message-State: AOAM531wXifZq+X3dnvoRQogfwSjLPqUe84d1t038vnmr0FtqJUI6hBF
+        dkI1niAn5/6O/F4Dq3eWNY8p0vkHHOJnLw==
+X-Google-Smtp-Source: ABdhPJy5bYmDe/xWA9z4i+ToAuAOkvgY1cWhZUbtfC/TEGKAfXR7t+aNwydZzuMGk+F0j4L4bq4v8Q==
+X-Received: by 2002:a05:622a:18a6:b0:2dd:2c5b:ca00 with SMTP id v38-20020a05622a18a600b002dd2c5bca00mr2870107qtc.549.1645718661199;
+        Thu, 24 Feb 2022 08:04:21 -0800 (PST)
+Received: from [172.17.0.2] ([20.185.24.225])
+        by smtp.gmail.com with ESMTPSA id h18sm1042284qtk.90.2022.02.24.08.04.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 08:04:21 -0800 (PST)
+Message-ID: <6217ac85.1c69fb81.69871.6183@mx.google.com>
+Date:   Thu, 24 Feb 2022 08:04:21 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5071219737125073967=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: Since commit e8907f76544ffe225ab95d70f7313267b1d0c76d bluetooth
- scanning stopped working on my system
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth@vger.kernel.org
-References: <f648f2e11bb3c2974c32e605a85ac3a9fac944f1.camel@redhat.com>
- <CABBYNZKWpPvJvKefgjw5YXCk9BL7900X+XnobLS6gw+50wKNfA@mail.gmail.com>
- <31367223b2e310521493b257244c188f3c22a619.camel@redhat.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <31367223b2e310521493b257244c188f3c22a619.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220224151147.119619-1-luiz.dentz@gmail.com>
+References: <20220224151147.119619-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Maxim,
+--===============5071219737125073967==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=617616
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.63 seconds
+GitLint                       PASS      0.98 seconds
+SubjectPrefix                 PASS      0.89 seconds
+BuildKernel                   PASS      33.05 seconds
+BuildKernel32                 PASS      29.40 seconds
+Incremental Build with patchesPASS      39.56 seconds
+TestRunner: Setup             PASS      514.51 seconds
+TestRunner: l2cap-tester      PASS      14.40 seconds
+TestRunner: bnep-tester       PASS      6.53 seconds
+TestRunner: mgmt-tester       PASS      116.47 seconds
+TestRunner: rfcomm-tester     PASS      9.05 seconds
+TestRunner: sco-tester        PASS      8.87 seconds
+TestRunner: smp-tester        PASS      8.63 seconds
+TestRunner: userchan-tester   PASS      7.40 seconds
 
 
-Am 24.02.22 um 14:01 schrieb Maxim Levitsky:
-> On Tue, 2022-02-22 at 10:35 -0800, Luiz Augusto von Dentz wrote:
 
->> On Mon, Feb 21, 2022 at 7:14 PM Maxim Levitsky wrote:
->>> Today I updated to a new kernel and I am bisecting few 
->>> regressions:
-
-[…]
-
-> I do notice that even on 5.16 kernel, I am not able to use the HSF
-> or whatever low quality bi-directional bluetooh protocol is called
-> for my headset. Used to work, I don't know what broke it, likely not 
-> related to this.
-> 
-> I also updated bluez to 5.6 by installing fedora 33 package, and 
-> initially it seems to work, but after reboot, the issue shows up 
-> again. Looks like sometimes the scan does work. So far I wasn't able 
-> to make it work even once since then. Reloading btusb doesn't help. 
-> Can't install newer package due to deps on glib sadly. I might be 
-> able to compile it from source, but that will take some time to 
-> figure out how the components of the bluez stack are connected 
-> together.
-> 
-> For the reference I have 'Intel Corp. AX200 Bluetooth' and I have
-> the same device on my AMD laptop and both have USB ID 8087:0029 My
-> AMD laptop has Fedora 34 though.
-
-Sorry, I lost track, if it’s still about one regression, you 
-successfully bisected or not.
-
-Anyway, passing through the USB Bluetooth device to QEMU helped me [1], 
-and might help you to overcome the dependency problems. (My steps 
-actually worked, but turned out the Linux kernel commit I tested with 
-had another regression not making the Bluetooth controller initialize.)
-
-Marcel also replied, he is using btproxy to debug issues, but I did not 
-try it, as it wasn’t clear to me how to get it working easily, and he 
-also wrote something about non-public patches.
+---
+Regards,
+Linux Bluetooth
 
 
-Kind regards,
-
-Paul
-
-
-[1]: 
-https://lore.kernel.org/linux-bluetooth/5891f0d5-8d51-9da5-7663-718f301490b1@molgen.mpg.de/T/#u
+--===============5071219737125073967==--
