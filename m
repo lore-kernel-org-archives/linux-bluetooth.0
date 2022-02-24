@@ -2,121 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB133C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 14:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BED74C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 15:11:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235363AbiBXOJw (ORCPT
+        id S235719AbiBXPMV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Feb 2022 09:09:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33762 "EHLO
+        Thu, 24 Feb 2022 10:12:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235344AbiBXOJr (ORCPT
+        with ESMTP id S231327AbiBXPMU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Feb 2022 09:09:47 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFE28294FC2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 06:09:15 -0800 (PST)
-Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1nNEnw-0003dI-Iq; Thu, 24 Feb 2022 15:09:12 +0100
-Message-ID: <db329421-ff6c-50c9-69f6-ae8e1b9e9063@leemhuis.info>
-Date:   Thu, 24 Feb 2022 15:09:11 +0100
+        Thu, 24 Feb 2022 10:12:20 -0500
+Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19DFCD307
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:11:49 -0800 (PST)
+Received: by mail-io1-xd2d.google.com with SMTP id c23so3050732ioi.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:11:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XLJXXCWwb6OPq4nqGiaPk5LWn3Ael/oCt7XIoqDJrj8=;
+        b=j7Y5BRBl5b3nD6AkJFq6QnJ0NPyNcBh+zkqvuRboKFtGZovSz207Apg9I6uAUoTrIT
+         aFb0+4WzsdR/A/GJCFix3qSqaS3zVPXjXKqRHhc94Ed6q2D2WmySPyRjGaQnANFTfAsY
+         H43wJXTzdklytjeLJ4Xm8GR7OXFo1kIdC6E7valVdlYluW9wGvPicrocl6Vp/yPXkpkR
+         SPTjyft2qiI6tDc5D8RylRp7ezmdq2B+94swk5zK4+DFI1ierKlt0BwjY3YsTLEaBgHk
+         s60OgO0S5S02SGgge+luyxOsh8jCB1wzzKJw97gT6CXQ6V2eqaRJrG4EEHfRCJJiPpZp
+         d8Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XLJXXCWwb6OPq4nqGiaPk5LWn3Ael/oCt7XIoqDJrj8=;
+        b=KJdO/FgAHFEC/5bbfSANalBFQ9R4zUK7FokOkGDeDAe3Uf554ikWro4UR/XnxPs5dY
+         D0t4RHLZYu6L4cMm6AqGCgKUgWo1faIOJ7vSCmJm0cVcqdEhmGj6Ok0apfCDkscDMD4p
+         97jWR+Am6+7tMza3F4U7ClbYnlC9iJCtirEIIiYrWVB0NsfnUQy7dDQr+wYG9yowlehg
+         x58B6dYSGz/KwX4ON1CEhj5hBX4b6k+E+8lIsv8pk2OIFIJOwQyjadb2mcvnTxno602i
+         pi8anl9Rq8EBp7I9Z81dM1zi9hwG0o6bV3dBm9x7VwnDzqmDyLirFaWA1/N2vwkRY/4d
+         0u4A==
+X-Gm-Message-State: AOAM532hLgdRnIcKxLXaBQpTM6kd1g/MBiKgH0EbdEckmf8uwx9myqCH
+        ToxKZpFVsrRpJTMkf4uu7NTmVzVc+FU=
+X-Google-Smtp-Source: ABdhPJz7areVOYGIH01fKrS1Y2gHxR8vYw0bfvoJaO5OrOeS0lMUq3zKdGsjN4LRxvf6X/gmqMOq3A==
+X-Received: by 2002:a5d:8903:0:b0:635:9b1:5424 with SMTP id b3-20020a5d8903000000b0063509b15424mr2382119ion.92.1645715508590;
+        Thu, 24 Feb 2022 07:11:48 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id r2sm1769103ioj.27.2022.02.24.07.11.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 07:11:48 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
+Date:   Thu, 24 Feb 2022 07:11:47 -0800
+Message-Id: <20220224151147.119619-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Content-Language: en-BW
-From:   Thorsten Leemhuis <linux@leemhuis.info>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <20220215015938.1950978-1-luiz.dentz@gmail.com>
- <E428782F-C1D1-43FB-8CB3-009BD97A2D14@holtmann.org>
- <c418c95d-339c-5b8a-5349-26078424abe4@leemhuis.info>
-Subject: Re: [PATCH] Bluetooth: Fix bt_skb_sendmmsg not allocating partial
- chunks
-In-Reply-To: <c418c95d-339c-5b8a-5349-26078424abe4@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1645711755;1947dcc0;
-X-HE-SMSGID: 1nNEnw-0003dI-Iq
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker again. Top-posting for
-once, to make this easily accessible for everyone.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I sent below inquiry on Saturday and didn't get a reply; and I didn't
-notice any other activity to get this regression fix mainlined soon.
+hci_update_accept_list_sync is returning the filter based on the error
+but that gets overwritten by hci_le_set_addr_resolution_enable_sync
+return instead of using the actual result of the likes of
+hci_le_add_accept_list_sync which was intended.
 
-Bluetooth maintainers, what's up here? I'd like to avoid getting Linus
-involved, but I guess I'm out of options if this mail doesn't get things
-rolling -- or alternatively an answer why this fix might better wait for
-the next merge window to get merged.
+Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Use u8 filter_policy instead of int ret as variable to store the result.
 
-Ciao, Thorsten
+ net/bluetooth/hci_sync.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-On 19.02.22 10:18, Thorsten Leemhuis wrote:
-> 
-> [CCing Johan, Jakub and Dave]
-> 
-> Hi Bluetooth maintainers!
-> 
-> On 16.02.22 11:26, Marcel Holtmann wrote:
->>
->>> Since bt_skb_sendmmsg can be used with the likes of SOCK_STREAM it
->>> shall return the partial chunks it could allocate instead of freeing
->>> everything as otherwise it can cause problems like bellow.
->>>
->>> Link: https://lore.kernel.org/linux-bluetooth/aa3ee7ac-6c52-3861-1798-3cc1a37f6ebf@molgen.mpg.de/T/#m1f9673e4ab0d55a7dccf87905337ab2e67d689f1
->>> Fixes: 81be03e026dc ("Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg")
->>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>> ---
->>> include/net/bluetooth/bluetooth.h | 3 +--
->>> 1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> patch has been applied to bluetooth-next tree.
-> 
-> Luiz, Marcel, thx for fixing this 5.16 regression and picking the patch
-> up for merging. But I have to wonder: why was this simple fix put into a
-> tree that apparently is meant to only get merged to mainline during the
-> the next merge window? That will mean this regression will bother people
-> (maybe Paul is not the only one that is affected by this) for weeks to
-> come and even make it into 5.17, before it gets fixed for 5.18-rc1.
-> Despite the lack of a "Cc: <stable@vger.kernel.org>" tag it likely will
-> get backporting to 5.17.y and 5.16.y afterwards, but the latter soon
-> after will be EOLed anyway.
-> 
-> Correct me if I'm wrong, but that afaik is not how the Linux development
-> process is meant to handle such regressions. This approach also
-> contributes to the huge stable and longterm releases after the end of
-> each merge window, which some people see as a problem.
-> 
-> I bring this up because there were other regression fixes in the last
-> few weeks that took such a slow path towards mainline. I also checked
-> MAINTAINERS and noticed you even have a tree that could feed fixes like
-> this to Linus via the regular net tree, but apparently you haven't used
-> it in quite a while:
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
-> I rechecked and noticed not a single bluetooth fix was merged between
-> v5.16-rc1..v5.16. I doubt Jakub or Dave are the reason, as they merge
-> fixes from downstream trees every week and send them to Linus shortly
-> after that.
-> 
-> So why are things like that? Or is there something wrong with my look on
-> things?
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> 
-> P.S.: As the Linux kernel's regression tracker I'm getting a lot of
-> reports on my table. I can only look briefly into most of them and lack
-> knowledge about most of the areas they concern. I thus unfortunately
-> will sometimes get things wrong or miss something important. I hope
-> that's not the case here; if you think it is, don't hesitate to tell me
-> in a public reply, it's in everyone's interest to set the public record
-> straight.
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index b66a2271c433..d146d4efae43 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1845,6 +1845,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 	u8 num_entries = 0;
+ 	bool pend_conn, pend_report;
+ 	int err;
++	u8 filter_policy;
+ 
+ 	/* Pause advertising if resolving list can be used as controllers are
+ 	 * cannot accept resolving list modifications while advertising.
+@@ -1930,6 +1931,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 		err = -EINVAL;
+ 
+ done:
++	filter_policy = err ? 0x00 : 0x01;
++
+ 	/* Enable address resolution when LL Privacy is enabled. */
+ 	err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
+ 	if (err)
+@@ -1940,7 +1943,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
+ 		hci_resume_advertising_sync(hdev);
+ 
+ 	/* Select filter policy to use accept list */
+-	return err ? 0x00 : 0x01;
++	return filter_policy;
+ }
+ 
+ /* Returns true if an le connection is in the scanning state */
+-- 
+2.35.1
+
