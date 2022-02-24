@@ -2,111 +2,182 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BED74C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 15:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDF4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 15:17:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235719AbiBXPMV (ORCPT
+        id S235912AbiBXPR2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Feb 2022 10:12:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
+        Thu, 24 Feb 2022 10:17:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231327AbiBXPMU (ORCPT
+        with ESMTP id S233983AbiBXPR0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Feb 2022 10:12:20 -0500
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19DFCD307
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:11:49 -0800 (PST)
-Received: by mail-io1-xd2d.google.com with SMTP id c23so3050732ioi.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:11:49 -0800 (PST)
+        Thu, 24 Feb 2022 10:17:26 -0500
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B07845AC1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:16:55 -0800 (PST)
+Received: by mail-il1-x12d.google.com with SMTP id d3so1935040ilr.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Feb 2022 07:16:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XLJXXCWwb6OPq4nqGiaPk5LWn3Ael/oCt7XIoqDJrj8=;
-        b=j7Y5BRBl5b3nD6AkJFq6QnJ0NPyNcBh+zkqvuRboKFtGZovSz207Apg9I6uAUoTrIT
-         aFb0+4WzsdR/A/GJCFix3qSqaS3zVPXjXKqRHhc94Ed6q2D2WmySPyRjGaQnANFTfAsY
-         H43wJXTzdklytjeLJ4Xm8GR7OXFo1kIdC6E7valVdlYluW9wGvPicrocl6Vp/yPXkpkR
-         SPTjyft2qiI6tDc5D8RylRp7ezmdq2B+94swk5zK4+DFI1ierKlt0BwjY3YsTLEaBgHk
-         s60OgO0S5S02SGgge+luyxOsh8jCB1wzzKJw97gT6CXQ6V2eqaRJrG4EEHfRCJJiPpZp
-         d8Hw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VUZ6Pub5f0T9fxmfVosX16sXl17Z0g2lbUvkIpOliqw=;
+        b=EqaUmwz1/C4vlckRx5cf+joOkAe6Ta8p54V+oehnpSkIMWDZ9nAWmSmKujot5aDU6c
+         CU1RPA4jppfPvRC3MIH/mi0YKKwlrIYpOvsFdlYI3sOwtZWfeR/4WW+i0lEATRZ5Ga5l
+         z4ZqSta51QsMm20sTGvLPArnqzSYZ48432DyQmEmEPjRLuu5GF6JdLFx2OsHjN/IbDoE
+         iiaWzPtBEA2x16dAL3bDyXlJYZmcoQduAgcuFQIOUfQrPhP2PcJQio7GFLRlTNX7QB1t
+         og5dzcRE9FUKCFKTo2sGmutcBJUF52uZclX2DKLHUxK7tXX4mSluDz8tTdMuGh8gVgmP
+         VAfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=XLJXXCWwb6OPq4nqGiaPk5LWn3Ael/oCt7XIoqDJrj8=;
-        b=KJdO/FgAHFEC/5bbfSANalBFQ9R4zUK7FokOkGDeDAe3Uf554ikWro4UR/XnxPs5dY
-         D0t4RHLZYu6L4cMm6AqGCgKUgWo1faIOJ7vSCmJm0cVcqdEhmGj6Ok0apfCDkscDMD4p
-         97jWR+Am6+7tMza3F4U7ClbYnlC9iJCtirEIIiYrWVB0NsfnUQy7dDQr+wYG9yowlehg
-         x58B6dYSGz/KwX4ON1CEhj5hBX4b6k+E+8lIsv8pk2OIFIJOwQyjadb2mcvnTxno602i
-         pi8anl9Rq8EBp7I9Z81dM1zi9hwG0o6bV3dBm9x7VwnDzqmDyLirFaWA1/N2vwkRY/4d
-         0u4A==
-X-Gm-Message-State: AOAM532hLgdRnIcKxLXaBQpTM6kd1g/MBiKgH0EbdEckmf8uwx9myqCH
-        ToxKZpFVsrRpJTMkf4uu7NTmVzVc+FU=
-X-Google-Smtp-Source: ABdhPJz7areVOYGIH01fKrS1Y2gHxR8vYw0bfvoJaO5OrOeS0lMUq3zKdGsjN4LRxvf6X/gmqMOq3A==
-X-Received: by 2002:a5d:8903:0:b0:635:9b1:5424 with SMTP id b3-20020a5d8903000000b0063509b15424mr2382119ion.92.1645715508590;
-        Thu, 24 Feb 2022 07:11:48 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id r2sm1769103ioj.27.2022.02.24.07.11.48
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Feb 2022 07:11:48 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
-Date:   Thu, 24 Feb 2022 07:11:47 -0800
-Message-Id: <20220224151147.119619-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VUZ6Pub5f0T9fxmfVosX16sXl17Z0g2lbUvkIpOliqw=;
+        b=Q/hKlY00VtX5WsOyF8A5kDqOYRq2bZ7p6/8ZbpMxGW9DHcY64UlxFU99XVejkLaIVC
+         3hL0sikq4WZmD7EU0KnlVFgifLa0iWXI05UtEA2bQf4kdhLyky+r1vNQW4QVe61w5iGq
+         glTiX74m1XnEOqRqPOc5vNmamWvqAybjoiUBLjP19biL8I01swgM0Sq77GY8vw7l9lcH
+         dw56RDRqH28uOHKu6E/5IrsrkY5je18qB9onrouiJjlzjqosUIUgeSop4ftNDeOYZfKj
+         xczLwEKuDtYKEFXcnF1UvX7V39bcLb7j4nPC1UDstGA5WoQni1+hRnUOYZzag+dBwA55
+         JEXQ==
+X-Gm-Message-State: AOAM530NeCdyxYPn5imvCGGmVe5mELLhR7Teraai0UCSkgtsEd7m3/Nr
+        3urYk4oNsAjh6WfApqs30qfMfC35OuSlr705xro=
+X-Google-Smtp-Source: ABdhPJweM8K37WMx269tP7Mlg4RYl4PBL+vV3U1T1iOBFoknlQoa2qByrcCp9Eohs4ZYVUdzwvPQyxg9EBXLB240oXI=
+X-Received: by 2002:a92:c243:0:b0:2c1:c5f5:bf5f with SMTP id
+ k3-20020a92c243000000b002c1c5f5bf5fmr2684989ilo.243.1645715814833; Thu, 24
+ Feb 2022 07:16:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
+ <CAJCQCtRiTQ1BTEHugxhS-zmXFG4qi4WLxsRyZsG9-_Q0isM+7Q@mail.gmail.com>
+ <CAJCQCtS35JeABLDBaNpfgxjq+ZJ9rZgwtRnSYLNm8tMwtdYGMw@mail.gmail.com>
+ <CABBYNZKTSe83iP4tm36we4cpAbeGUbEw9frZD1wCM9yo1zry5w@mail.gmail.com>
+ <CAJCQCtTpHQe2co3fLNs5csKQchmwH=3YwQOvFnuc2nhjRseVnw@mail.gmail.com>
+ <9ad505e1-7b59-7ebf-378b-23a6c0e25802@googlemail.com> <CABBYNZ+9tUKgLyUWM5vkMW8vHxYsXv6DEaDWdHt8xTTs6puGQA@mail.gmail.com>
+ <aaeb4131-d177-d41e-617b-b0060cd83c92@googlemail.com> <CABBYNZLB+8UzhzttMrKbHW_+-A1EsY9iT5Y55VuOOEPuD4kAHQ@mail.gmail.com>
+ <b1a4a920-dbba-58be-72b4-2c95b9b79283@googlemail.com> <82216882-463a-8976-e6bc-4a8919107a31@googlemail.com>
+ <CABBYNZ+mO1gQgfwhemY9cqbi8vNLm_60A9c1vPYT2tH4rhgFww@mail.gmail.com>
+ <a35b4b75-bb64-89c8-bacd-d58ed8576272@googlemail.com> <2ce6175c-74ec-8469-80a5-374bd1429542@googlemail.com>
+ <CABBYNZJNTOT-mEQe2cfZiEX6A2pR7+sacBqtBRPRZY69YmgtvA@mail.gmail.com> <17f2bf7e-1d6b-e090-8926-21a408f2b496@googlemail.com>
+In-Reply-To: <17f2bf7e-1d6b-e090-8926-21a408f2b496@googlemail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 24 Feb 2022 07:16:43 -0800
+Message-ID: <CABBYNZ+cL4f8xvTJFQGLgqPueE=-UsOtvcPQez0BEsJ5xGppfQ@mail.gmail.com>
+Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
+ connect to bluetooth devices
+To:     Chris Clayton <chris2553@googlemail.com>
+Cc:     Chris Murphy <lists@colorremedies.com>,
+        Bluetooth <linux-bluetooth@vger.kernel.org>,
+        regressions@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Chris,
 
-hci_update_accept_list_sync is returning the filter based on the error
-but that gets overwritten by hci_le_set_addr_resolution_enable_sync
-return instead of using the actual result of the likes of
-hci_le_add_accept_list_sync which was intended.
+On Thu, Feb 24, 2022 at 2:08 AM Chris Clayton <chris2553@googlemail.com> wrote:
+>
+> Hi Luiz,
+>
+> On 24/02/2022 08:16, Luiz Augusto von Dentz wrote:
+> > Hi Chris,
+> >
+> > On Wed, Feb 23, 2022 at 9:59 PM Chris Clayton <chris2553@googlemail.com> wrote:
+> >>
+> >>
+> >>
+> >> On 23/02/2022 22:42, Chris Clayton wrote:
+> >>> Hi.
+> >>>
+> >>> <snip>
+> >>>
+> >>>>
+> >>>> We are starting to suspect this is not a new issue, it just become
+> >>>> easier to reproduce with newer kernels since the mgmt commands are now
+> >>>> handled by a different work/thread which probably takes longer to
+> >>>> respond hitting problems such as:
+> >>>>
+> >>>> https://github.com/bluez/bluez/issues/275#issuecomment-1020608282
+> >>>>
+> >>>> This has been fixed by:
+> >>>>
+> >>>> https://github.com/bluez/bluez/commit/faad125c5505b941f06c54525616e192a6369208
+> >>>> https://github.com/bluez/bluez/commit/5f378404bff6bbfea3f20e36535c494efa5066a5
+> >>>>
+> >>>
+> >>> I cloned bluez, but that FTBFS, so I applied the two patches by hand.
+> >>>
+> >>> After the first boot, my bluetooth devices connected fine. But after a poweroff and boot, they didn't. Nor did they on
+> >>> the third and fourth boots, so the patches don't seem to be the answer. (They couldn't really be anyway because changes
+> >>> to the kernel have broken user-space which I understand is a big no no unless there is a really compelling reason.)
+> >>>
+> >>> I've gathered some diagnostics today and they are attached. They consist of 6 files containing the output from btmon and
+> >>> dmesg and the log file for the system daemons, which, of course, includes bluetoothd. There are 2 sets of these files -
+> >>> one from a boot that resulted in a system where my devices would not connect and another from a boot where they could
+> >>
+> >> s/would not connect and another/would connect and another/
+> >>
+> >>> not connect. You'll note that the btmon log is empty for a failed connection.
+> >>>
+> >>> I also tried a bisection with v5.16 as good and v5.17-rc1 as bad. Unfortunately, I found several steps resulted in a
+> >>> kernel where bluetooth seemed to be substantially borked - to the extent that blueman was non-functional and clicking on
+> >>> the tray icon did not start up the blueman-manager application.
+> >
+> > Running with 5.17.0-0.rc5.102.fc37.x86_64 there doesn't seem to be any
+> > problems, well apart from LE device with Privacy/RPA:
+> >
+> > https://gist.github.com/Vudentz/5792f4989198c7f2994af2e31eb973af
+> >
+> > Ive tried suspend/resume a couple of times just to see if there is
+> > something odd going own, anyway I'm running with the latest userspace
+> > so perhaps I really need some old userspace to reproduce this. There
+>
+> I don't have an old userspace. I built my system from source about four years ago using the methods from Linux From
+> Scratch and Beyond Linux From Scratch. I have been updating the packages since then as and when they are released. In a
+> way, you could equate my system to one of the rolling releases. It is very up-to-date but at the same time very stable.
+>
+> This morning I updated to the latest releases of the 5.15 and 5.16 stable series. I've also built and installed the
+> latest in the 5.4 and 5.10 stable series. (All four had new releases yesterday.) Bluetooth works as expected on all 4 of
+> those kernels. It has also worked on every kernel released by Linus and every stables series kernel in the last four
+> years. I usually start trying out a development kernel when rc3, 4 or 5 is released, depending on time available. If I
+> find any problems I report them and provide any diagnostics required and test patches.
+>
+> Bluetooth is unreliable on my system when I boot 5.17-rc kernels. There is little doubt in my mind that something that
+> has changed in 5.17 is at the root of this. Whether it is actually a bug in userspace doesn't change the fact that there
+> is a regression because of one or more changes in the kernel. As I said yesterday, my understanding is that such
+> regressions are frowned upon.
+>
+> I'll try another bisection today, but limit its range to changes made in the net/bluetooth directory.
 
-Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
-v2: Use u8 filter_policy instead of int ret as variable to store the result.
+Please record the HCI with btmon, it must be producing something since
+it records even the mgmt commands.
 
- net/bluetooth/hci_sync.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> In the meantime I've copied this email to regressions@lists.linux.dev, so they can track this.
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index b66a2271c433..d146d4efae43 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -1845,6 +1845,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	u8 num_entries = 0;
- 	bool pend_conn, pend_report;
- 	int err;
-+	u8 filter_policy;
- 
- 	/* Pause advertising if resolving list can be used as controllers are
- 	 * cannot accept resolving list modifications while advertising.
-@@ -1930,6 +1931,8 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 		err = -EINVAL;
- 
- done:
-+	filter_policy = err ? 0x00 : 0x01;
-+
- 	/* Enable address resolution when LL Privacy is enabled. */
- 	err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
- 	if (err)
-@@ -1940,7 +1943,7 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 		hci_resume_advertising_sync(hdev);
- 
- 	/* Select filter policy to use accept list */
--	return err ? 0x00 : 0x01;
-+	return filter_policy;
- }
- 
- /* Returns true if an le connection is in the scanning state */
+Hmm, is that really necessary? 5.17 has not been release tagged yet
+and you are already considering it a regression?
+
+> Chris
+>
+> > might be something with name resolving though, it appears gnome don't
+> > show devices if they don't have a proper name (that is not their
+> > address) so perhaps that gives the impression there is nothing going
+> > on when in fact that all normal, well apart from the fact that names
+> > takes way too long to be resolved.
+> >
+> >>> I also booted into a 5.16.10 kernel and connecting bluetooth devices worked flawlessly. (This was with the unpatched
+> >>> bluez daemon)
+> >>>
+> >>> Chris
+> >>>> So the timer doesn't start until the request is sent. but obvoiusly
+> >>>> older versions of userspace don't have that fix so they end up
+> >>>> cancelling the loading of LTKs, this would explain why reloading the
+> >>>> daemon would make it work again.
+> >
+> >
+> >
+
+
+
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
