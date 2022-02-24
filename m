@@ -2,49 +2,49 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DF11C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 00:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7BCAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 00:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231158AbiBXAbL (ORCPT
+        id S230462AbiBXAbN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Feb 2022 19:31:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
+        Wed, 23 Feb 2022 19:31:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230424AbiBXAbJ (ORCPT
+        with ESMTP id S229834AbiBXAbK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Feb 2022 19:31:09 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 811226E34D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 16:30:40 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v4so529866pjh.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 16:30:40 -0800 (PST)
+        Wed, 23 Feb 2022 19:31:10 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B94A6D976
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 16:30:41 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id c9so315372pll.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 16:30:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=bes3roHlNFOFnWbovj/EDVIKI3u6AKmdoM06/CCIA4Q=;
-        b=HRm0jEfXxqZoJqUld4+rhfSpqyjAfAsuWqS6qBTFnfAQdBg3rETOdjz+fkTkZn3tm8
-         CYuL1BMGjWnMyEI5qLlRwX4zQaAmlw3OHqSu5gtJnCLNRenwPLVAe8ESTblSUQ7gQrER
-         8nnPfpVEm4IyDpIk6pQxC72DNonqLtBNiUpxKdTC8I41HQaEn9HwwLEfUWLkVfCD7SFX
-         k3/i5unMPa9IfFCF9NuPoRiOncTiBCypS0b3Li75jSC+S6lN9tHtmaoWGRY4IUsI7izR
-         fcEEvzRIB++dSdAtW4s7/4ILjGIZdDwr+OZs87+4bslUEb7Wt+xGHC7+Cjb2zBfn6ItA
-         r+nw==
+        bh=bN72KDA/URR+CXci2mzM3peVK0aNrF9ntA5ysSCg1Jg=;
+        b=Hwxy+h1WWPv68+GPj0AtbKcUXuQnflS7s6LgL6+tsHspp9oHVSqhE9iMlypigCeQ6K
+         GhiUB5ZOy0GKKNG/DGNZkUSj2bXO2aSTOi1i5uD4QzBLgQ8jiEqV/78VB5TAs3gf20Lu
+         4vT6+eVjbZnDAx22qRStGu7H1KkWjCW+ene5OcstU9RcKVncVgwwgikwNj3mbev6oFrc
+         WtWmG3PDkfxRf33k77xINGLSeg+JRv/2n+rQ7B7fPyNDmXbd5JUBQccGrgm2T/f79xen
+         x6RJKOLEhVJl6ZSmka9EhBmm+VA8Jf9oVQiHWVkMMpztqq/Xh8Ir2Zok61QgcMi7mc8X
+         /Liw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bes3roHlNFOFnWbovj/EDVIKI3u6AKmdoM06/CCIA4Q=;
-        b=Jsh5AYawdwHrAjLil+Ai1TKrkNIckBTA8uqUjfQyAC1qWth5XZWIvtgESOKpo/0Vq+
-         IdlF7/dwgogTfmp2fSXc6ay5Bjoyy3+vLjUJqYGmdtekIcxBUPcfT0WSpu00xM5fvijB
-         ksa+KWAKh8dSfzkUVrXiOZ/ikCrPGzW0Gt/uCpZ7BlZAFaINg77oCBXUwY5pXbV5idT6
-         f2aWmsLMBatXp4N8cn9ZunbjLjvBpa3KQjox9f8FEqkDDxVqBvKjPuoZilGb/hFsIyYy
-         yJALzOzJjTUi8eXN3AXUIVf3At1wELBojbTFZ3tPdJx9DMwnzH1VMoU4pL1vV8XYGXtm
-         0ypA==
-X-Gm-Message-State: AOAM531rWPLewKc3Zhjr+09va13WXULeT/qM66+YeUDNlx5xcGh+hLqC
-        nPw4p2DeFjsblzUftG1XrgwkZT71nWs=
-X-Google-Smtp-Source: ABdhPJwi2ukGrHR2fKhO0/24BzkmHJhiMZ5AMBF6PHwmChu/x8GAaUvQSb5njynKJZ+eh/pgFUjlFg==
-X-Received: by 2002:a17:903:4084:b0:14f:cf98:5515 with SMTP id z4-20020a170903408400b0014fcf985515mr50487plc.124.1645662639621;
-        Wed, 23 Feb 2022 16:30:39 -0800 (PST)
+        bh=bN72KDA/URR+CXci2mzM3peVK0aNrF9ntA5ysSCg1Jg=;
+        b=tMMtTPNhkSTgR6wADWiXeJbpxYc/RcPtQqcqPmvk84cdCxfZXcj7nHgcVsEPxudf5M
+         0MK3F7DMUq0tSR/BUqNU5X2ZNz7H9p5QxJDPw0cSNVLYOarXwhpCnxZCOidppo001a5O
+         02C8hqPYaf2dl3ooNL38Tv4xpI8tofPCwbmQ1rb4ROEy9gl5VZUvQg4mxkLL4J3+lSNO
+         QF0cebA0PyYOOdn9fiFK1oq5Y3RCK0NjmEOiHcus4wbQJsRk4aHELjqG555fgLLBt5sW
+         NC76Gjx9axkC1vjZBkpLLSgH7F8Aklfn32D9hwkamKARZalr64gnNtUpg08pU7dG4kCd
+         3q3A==
+X-Gm-Message-State: AOAM532i2EuM3Mtk0ElOCmyOw9UgMgQQ/hdpmUNhKZHupgbt3R9nfXm4
+        i+mOw73CgvTp+U0WUqEjywSCtZHepNM=
+X-Google-Smtp-Source: ABdhPJykEpmkbq/AzIlYijgxwg6pKxIxIilYogiMkBcymdIRkR3smmXfNntSA/in2BCrgytGgDqjKA==
+X-Received: by 2002:a17:90a:ca8d:b0:1bc:649c:6dd1 with SMTP id y13-20020a17090aca8d00b001bc649c6dd1mr121268pjt.165.1645662640253;
+        Wed, 23 Feb 2022 16:30:40 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
         by smtp.gmail.com with ESMTPSA id t19sm574570pjs.54.2022.02.23.16.30.39
         for <linux-bluetooth@vger.kernel.org>
@@ -52,9 +52,9 @@ Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71
         Wed, 23 Feb 2022 16:30:39 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 10/11] bthost: Add support for Periodic Advertising
-Date:   Wed, 23 Feb 2022 16:30:28 -0800
-Message-Id: <20220224003029.706163-11-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 11/11] bthost: Add support for Create BIG
+Date:   Wed, 23 Feb 2022 16:30:29 -0800
+Message-Id: <20220224003029.706163-12-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220224003029.706163-1-luiz.dentz@gmail.com>
 References: <20220224003029.706163-1-luiz.dentz@gmail.com>
@@ -66,52 +66,45 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bthost_set_pa_params and bthost_set_pa_enable.
+This adds bthost_create_big
 ---
- emulator/bthost.c | 19 +++++++++++++++++++
- emulator/bthost.h |  2 ++
- 2 files changed, 21 insertions(+)
+ emulator/bthost.c | 13 +++++++++++++
+ emulator/bthost.h |  1 +
+ 2 files changed, 14 insertions(+)
 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index d751e7dd4..fef542236 100644
+index fef542236..43434387c 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -2801,6 +2801,25 @@ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable)
- 	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, cp, 6);
+@@ -2820,6 +2820,19 @@ void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_PA_ENABLE, &cp, sizeof(cp));
  }
  
-+void bthost_set_pa_params(struct bthost *bthost)
++void bthost_create_big(struct bthost *bthost, uint8_t num_bis)
 +{
-+	struct bt_hci_cmd_le_set_pa_params cp;
++	struct bt_hci_cmd_le_create_big cp;
 +
 +	memset(&cp, 0, sizeof(cp));
 +	cp.handle = 0x01;
-+	send_command(bthost, BT_HCI_CMD_LE_SET_PA_PARAMS, &cp, sizeof(cp));
-+}
-+
-+void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable)
-+{
-+	struct bt_hci_cmd_le_set_pa_enable cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.enable = enable;
-+	cp.handle = 0x01;
-+	send_command(bthost, BT_HCI_CMD_LE_SET_PA_ENABLE, &cp, sizeof(cp));
++	cp.adv_handle = 0x01;
++	cp.num_bis = num_bis;
++	cp.bis.sdu = 40;
++	cp.bis.phy = 0x01;
++	send_command(bthost, BT_HCI_CMD_LE_CREATE_BIG, &cp, sizeof(cp));
 +}
 +
  bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr)
  {
  	const struct queue_entry *entry;
 diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 868af5469..55a7adf26 100644
+index 55a7adf26..18e7b98e3 100644
 --- a/emulator/bthost.h
 +++ b/emulator/bthost.h
-@@ -84,6 +84,8 @@ void bthost_set_ext_adv_data(struct bthost *bthost, const uint8_t *data,
- 								uint8_t len);
- void bthost_set_ext_adv_params(struct bthost *bthost);
+@@ -86,6 +86,7 @@ void bthost_set_ext_adv_params(struct bthost *bthost);
  void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable);
-+void bthost_set_pa_params(struct bthost *bthost);
-+void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable);
+ void bthost_set_pa_params(struct bthost *bthost);
+ void bthost_set_pa_enable(struct bthost *bthost, uint8_t enable);
++void bthost_create_big(struct bthost *bthost, uint8_t num_bis);
  bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
  
  void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
