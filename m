@@ -2,48 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51DE9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 02:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C679BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Feb 2022 02:06:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229940AbiBXCHG (ORCPT
+        id S229952AbiBXCHI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Feb 2022 21:07:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53738 "EHLO
+        Wed, 23 Feb 2022 21:07:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbiBXCHF (ORCPT
+        with ESMTP id S229941AbiBXCHH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Feb 2022 21:07:05 -0500
+        Wed, 23 Feb 2022 21:07:07 -0500
 Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AD6641D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 18:06:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E1DB853
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Feb 2022 18:06:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1645668395; x=1677204395;
+  t=1645668397; x=1677204397;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Cvd+xLakMB/8GSTNTyEuvAKnMwdMeGT9MJgKOHxAYGg=;
-  b=IRKppubHz6mawX+4bLwv0SAxpbLWri+0EAROLi+6fVeLdjPFOqirldgf
-   p/wCt0ZXODb7uInbWDKleL9Jl9VnDENB3oyhYQiPkT7/Vjw/UUZ/J1YcE
-   Zh4wR/sfEoBsju8FfJ0CNY5aTTE8c0bm/DY7Dm8IonCtkTjavRL9DAZXy
-   jIzuJy5zgRCd8Sw7RXkrnMwQ4Wv0LL1AWd5WZQJ24F1S5QUUKRrUXXnuI
-   xCZKS2hnPNcQfE/MTNAR8+ZCj6ce+GZdea8/gBaldPUADeBoljqwqeZ19
-   B9bPIAgjqe5XKb/nIH4LH+BOzjoea8dySKhNUBJ7ouHBc0mwMyHeHDS4a
+  bh=81ea5c0d54wLGPgGbtraKs9AyWMBNQkSxgLGbaTQ3bQ=;
+  b=OL4hSSq9wDzpyX9v5xNwW2XeVsp0iRIh+Mnx+WWWES+MZt0O6s9n/Qdg
+   znpWlSSNqE5hEFHaYHgZtWsLRSwZqZ7hKovjfeEw9kDP+9Q+XgNNXMqVV
+   +Db2r7Jr6TVo6XXQBM+cusrgH/s47NoujM8efwrf1tagSNGXtJOnHj7gW
+   PaCuuI1fSIuz6et3RfdCUdmXGyXhSj7n0oGKy9LUmaw2tpByQz9jQA7Vg
+   XEtZxw+xwRftnjILX+J49oWPiXx324alB+NRIMJfMpr4Sg+JqlMUZPwi4
+   R0n6A5GXDRYM1mk2d7i/ytGhTmKT/md7x49Hw4Z9Qjv2Up6DePdmP70Ya
    A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="239524996"
+X-IronPort-AV: E=McAfee;i="6200,9189,10267"; a="239525000"
 X-IronPort-AV: E=Sophos;i="5.88,392,1635231600"; 
-   d="scan'208";a="239524996"
+   d="scan'208";a="239525000"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
   by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 18:06:33 -0800
 X-IronPort-AV: E=Sophos;i="5.88,392,1635231600"; 
-   d="scan'208";a="607268562"
+   d="scan'208";a="607268568"
 Received: from tjsmith-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.34.213])
   by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Feb 2022 18:06:33 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH 1/7] mgmt: Add support for Mesh in the kernel
-Date:   Wed, 23 Feb 2022 18:06:18 -0800
-Message-Id: <20220224020624.159247-2-brian.gix@intel.com>
+Subject: [PATCH 3/7] mesh: Add common MGMT command accessors
+Date:   Wed, 23 Feb 2022 18:06:20 -0800
+Message-Id: <20220224020624.159247-4-brian.gix@intel.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220224020624.159247-1-brian.gix@intel.com>
 References: <20220224020624.159247-1-brian.gix@intel.com>
@@ -53,210 +53,278 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-These commands and events allow User space apps to test for Mesh
-support, and request incoming mesh packets be delivered and request
-outbound mesh packets to be sent. This is the basis for sharing
-one controller between the legacy bluetoothd daemon and the mesh
-bluetooth-meshd daemon.
----
- doc/mgmt-api.txt | 180 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 180 insertions(+)
+While mesh-io-mgmt is the main consumer of MGMT services, we also use
+MGMT to identify controllers and their capabilities, when determining
+the appropriate Mesh IO carrier. This centralizes all MGMT access to
+a single socket, shared accross all consumers.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ebe56afa4..41c196250 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3858,6 +3858,132 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
- 				Invalid Parameters
+Also fixes the Controller added/removed handling so that a controller
+disappearing or reappearing gets handled rationally.
+---
+ mesh/mesh-mgmt.c | 149 ++++++++++++++++++++++++++++++++++++-----------
+ mesh/mesh-mgmt.h |  12 +++-
+ 2 files changed, 125 insertions(+), 36 deletions(-)
+
+diff --git a/mesh/mesh-mgmt.c b/mesh/mesh-mgmt.c
+index 754093dbc..e878a4f11 100644
+--- a/mesh/mesh-mgmt.c
++++ b/mesh/mesh-mgmt.c
+@@ -12,35 +12,63 @@
+ #include <config.h>
+ #endif
  
++#include <ell/ell.h>
++
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ #include "src/shared/mgmt.h"
  
-+Set Mesh Receiver Command
-+=========================
-+
-+	Command Code:		0x0057
-+	Controller Index:	<controller id>
-+	Command Parameters:	Enable (1 Octets)
-+				Window (2 Octets)
-+				Period (2 Octets)
-+				Num AD Types (1 Octets)
-+				AD Types { }
-+
-+	This command Enables or Disables Mesh Receiving. When enabled passive
-+	scanning remains enabled for this controller.
-+
-+	The Window/Period values are used to set the Scan Parameters when no
-+	other scanning is being done.
-+
-+	Num AD Types and AD Types parameter, filter Advertising and Scan
-+	responses by AD type. Reponses that do not contain at least one of the
-+	requested AD types will be ignored. Otherwise they will be delivered
-+	with the Mesh Device Found event.
-+
-+	Possible errors:	Failed
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Read Mesh Features Command
-+==========================
-+
-+	Command Code:		0x0058
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Index (2 Octets)
-+				Max Handles (1 Octets)
-+				Used Handles (1 Octets)
-+				Handle { }
-+
-+	This command is used to both verify that Outbound Mesh packet
-+	support is enabled, and to indicate the number of packets that
-+	can and are simultaneously queued.
-+
-+	Index identifies the HCI Controller that this information is valid for.
-+
-+	Max Handles indicates the maximum number of packets that may be queued.
-+
-+	Used Handles indicates the number of packets awaiting transmission.
-+
-+	Handle is an array of the currently outstanding packets.
-+
-+	Possible errors:	Failed
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Transmit Mesh Packet Command
-+============================
-+
-+	Command Code:		0x0059
-+	Controller Index:	<controller id>
-+	Command Parameters:	Addr (6 octets)
-+				Addr Type (1 Octets)
-+				Instant (8 Octets)
-+				Delay (2 Octets)
-+				Count (1 Octets)
-+				Data (variable)
-+
-+	Return Parameters:	Handle (1 Octets)
-+
-+	This command sends a Mesh Packet as a NONCONN LE Advertisement.
-+
-+	The Addr + Addr Type parameters specifify the address to use in the
-+	outbound advertising packet. If BD_ADDR_ANY and LE_RANDOM is set, the
-+	kernel will create a single use non-resolvable address.
-+
-+	The Instant parameter is used in combination with the Delay
-+	parameter, to finely time the sending of the Advertising packet. It
-+	should be set to the Instant value tag of a received incoming
-+	Mesh Device Found Event. It is only useful in POLL-RESPONSE situations
-+	where a response must be sent within a negotiated time window. The value
-+	of the Instant parameter should not be interpreted by the host, and
-+	only has meaning to the controller.
-+
-+	The Delay parameter, if 0x0000, will cause the packet to be sent
-+	at the earliest opportunity. If non-Zero, and the controller supports
-+	delayed delivery, the Instant and Delay parameters will be used
-+	to delay the outbound packet. While the Instant is not defined, the
-+	Delay is specified in milliseconds.
-+
-+	The Count parameter must be sent to a non-Zero value indicating the
-+	number of times this packet will be sent before transmission completes.
-+	If the Delay parameter is non-Zero, then Count must be 1 only.
-+
-+	The Data parameter is an octet array of the AD Type and Mesh Packet.
-+
-+	This command will return immediately, and if it succeeds, will generate
-+	a Mesh Packet Transmission Complete event when after the packet has been
-+	sent.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Cancel Transmit Mesh Packet Command
-+===================================
-+
-+	Command Code:		0x005A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Handle (1 Octets)
-+
-+	This command may be used to cancel an outbound transmission request.
-+
-+	The Handle parameter is the returned handle from a successful Transmit
-+	Mesh Packet request. If Zero is specified as the handle, all outstanding
-+	send requests are canceled.
-+
-+	For each mesh packet canceled, the Mesh Packet Transmission Complete
-+	event will be generated, regardless of whether the packet was sent
-+	successfully.
-+
-+	Possible errors:	Failed
-+				Invalid Parameters
-+
-+
- Command Complete Event
- ======================
+-#include "ell/queue.h"
+-#include "ell/log.h"
+-#include "ell/util.h"
+-
+ #include "mesh/mesh-mgmt.h"
  
-@@ -4978,3 +5104,57 @@ Advertisement Monitor Device Lost Event
- 		2	LE Random
+-struct read_info_reg {
+-	mesh_mgmt_read_info_func_t cb;
+-	void *user_data;
+-};
+-
+-struct read_info_req {
+-	int index;
+-	struct mesh_io *io;
++struct mesh_controler {
++	int	index;
++	bool	mesh_support;
++	bool	powered;
+ };
  
- 	This event will be sent to all management sockets.
++static mesh_mgmt_read_info_func_t ctl_info;
+ static struct mgmt *mgmt_mesh;
+-static struct l_queue *read_info_regs;
++static struct l_queue *ctl_list;
++static void *list_user_data;
++static bool mesh_detected;
 +
++static bool by_index(const void *a, const void *b)
++{
++	const struct mesh_controler *ctl = a;
++	int index = L_PTR_TO_UINT(b);
+ 
+-static void process_read_info_req(void *data, void *user_data)
++	return ctl->index == index;
++}
 +
-+Mesh Device Found Event
-+=======================
++static void index_removed(uint16_t index, uint16_t length, const void *param,
++							void *user_data);
++static void features_cb(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
+ {
+-	struct read_info_reg *reg = data;
+ 	int index = L_PTR_TO_UINT(user_data);
++	struct mesh_controler *ctl;
 +
-+	Event code:		0x0031
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				RSSI (1 Octet)
-+				Flags (4 Octets)
-+				Instant (8 Octets)
-+				AD_Data_Length (2 Octets)
-+				AD_Data (0-65535 Octets)
+ 
+-	reg->cb(index, reg->user_data);
++	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
++	if (!ctl)
++		return;
 +
-+	This event indicates that the controller has received an Advertisement
-+	or Scan Result containing an AD Type matching the Mesh scan set.
++	l_debug("Status: %d, Length: %d", status, length);
++	if (status != MGMT_STATUS_NOT_SUPPORTED &&
++					status != MGMT_STATUS_UNKNOWN_COMMAND) {
++		ctl->mesh_support = true;
++		if (!mesh_detected) {
++			mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
++					MGMT_INDEX_NONE, index_removed,
++					NULL, NULL);
++		}
++		mesh_detected = true;
++	} else
++		l_debug("Kernel mesh not supported for hci%u", index);
 +
-+	The address of the sending device is returned, and must be a valid LE
-+	Address_Type.
++	if (ctl_info)
++		ctl_info(index, true, ctl->powered, ctl->mesh_support,
++							list_user_data);
+ }
+ 
+ static void read_info_cb(uint8_t status, uint16_t length,
+@@ -49,12 +77,25 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 	int index = L_PTR_TO_UINT(user_data);
+ 	const struct mgmt_rp_read_info *rp = param;
+ 	uint32_t current_settings, supported_settings;
++	struct mesh_controler *ctl;
+ 
+ 	l_debug("hci %u status 0x%02x", index, status);
+ 
++	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
++	if (!ctl)
++		return;
 +
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
+ 	if (status != MGMT_STATUS_SUCCESS) {
++		ctl = l_queue_remove_if(ctl_list, by_index,
++						L_UINT_TO_PTR(index));
+ 		l_error("Failed to read info for hci index %u: %s (0x%02x)",
+ 				index, mgmt_errstr(status), status);
 +
-+	The RSSI field is a signed octet, and is the RSSI reported by the
-+	receiving controller.
++		l_warn("Hci dev %d removal detected", index);
++		if (ctl && ctl_info)
++			ctl_info(index, false, false, false, list_user_data);
 +
-+	The Instant field is 64 bit value that represents the instant in time
-+	the packet was received. It's value is not intended to be interpretted
-+	by the host, and is only useful if the host wants to make a timed
-+	response to the received packet. (i.e. a Poll/Response)
++		l_free(ctl);
+ 		return;
+ 	}
+ 
+@@ -69,23 +110,34 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 	l_debug("settings: supp %8.8x curr %8.8x",
+ 					supported_settings, current_settings);
+ 
+-	if (current_settings & MGMT_SETTING_POWERED) {
+-		l_info("Controller hci %u is in use", index);
+-		return;
+-	}
+-
+ 	if (!(supported_settings & MGMT_SETTING_LE)) {
+ 		l_info("Controller hci %u does not support LE", index);
++		l_queue_remove(ctl_list, ctl);
++		l_free(ctl);
+ 		return;
+ 	}
+ 
+-	l_queue_foreach(read_info_regs, process_read_info_req,
+-							L_UINT_TO_PTR(index));
++	if (current_settings & MGMT_SETTING_POWERED)
++		ctl->powered = true;
 +
-+	AD_Length and AD_Data contains the Info structure of Advertising and
-+	Scan rsults. To receive this event, AD filters must be requested with
-+	the Set Mesh Receiver command command, specifying which AD Types to
-+	return. All AD structures will be received in this event if any of the
-+	filtered AD Types are present.
++	mesh_mgmt_send(MGMT_OP_MESH_READ_FEATURES, index, 0, NULL,
++				features_cb, L_UINT_TO_PTR(index), NULL);
+ }
+ 
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
++	struct mesh_controler *ctl = l_queue_find(ctl_list, by_index,
++							L_UINT_TO_PTR(index));
 +
-+	This event will be sent to all management sockets.
++	if (!ctl) {
++		ctl = l_new(struct mesh_controler, 1);
++		ctl->index = index;
++		l_queue_push_head(ctl_list, ctl);
++	} else {
++		ctl->mesh_support = ctl->powered = false;
++	}
 +
+ 	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
+ 				read_info_cb, L_UINT_TO_PTR(index), NULL);
+ }
+@@ -93,7 +145,9 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ static void index_removed(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+-	l_warn("Hci dev %4.4x removed", index);
++	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
++				read_info_cb, L_UINT_TO_PTR(index), NULL);
 +
-+Mesh Packet Transmit Complete Event
-+===================================
+ }
+ 
+ static void read_index_list_cb(uint8_t status, uint16_t length,
+@@ -133,8 +187,8 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
+ 
+ static bool mesh_mgmt_init(void)
+ {
+-	if (!read_info_regs)
+-		read_info_regs = l_queue_new();
++	if (!ctl_list)
++		ctl_list = l_queue_new();
+ 
+ 	if (!mgmt_mesh) {
+ 		mgmt_mesh = mgmt_new_default();
+@@ -146,8 +200,6 @@ static bool mesh_mgmt_init(void)
+ 
+ 		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_ADDED,
+ 				MGMT_INDEX_NONE, index_added, NULL, NULL);
+-		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
+-				MGMT_INDEX_NONE, index_removed, NULL, NULL);
+ 	}
+ 
+ 	return true;
+@@ -155,16 +207,11 @@ static bool mesh_mgmt_init(void)
+ 
+ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
+ {
+-	struct read_info_reg *reg;
+-
+ 	if (!mesh_mgmt_init())
+ 		return false;
+ 
+-	reg = l_new(struct read_info_reg, 1);
+-	reg->cb = cb;
+-	reg->user_data = user_data;
+-
+-	l_queue_push_tail(read_info_regs, reg);
++	ctl_info = cb;
++	list_user_data = user_data;
+ 
+ 	/* Use MGMT to find a candidate controller */
+ 	l_debug("send read index_list");
+@@ -175,3 +222,35 @@ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
+ 
+ 	return true;
+ }
 +
-+	Event code:		0x0032
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Handle (1 Octets)
++void mesh_mgmt_destroy()
++{
++	mgmt_unref(mgmt_mesh);
++	mgmt_mesh = NULL;
++	ctl_info = NULL;
++	list_user_data = NULL;
++	l_queue_destroy(ctl_list, l_free);
++	ctl_list = NULL;
++}
 +
-+	This event indicates that a requested outbound Mesh packet has
-+	completed and no longer occupies a transmit slot.
++unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_send_timeout(mgmt_mesh, opcode, index, length, param,
++					callback, user_data, destroy, 0);
++}
 +
-+	This event will be sent to all management sockets.
++unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
++				mgmt_notify_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_register(mgmt_mesh, event, index, callback,
++						user_data, destroy);
++}
++
++bool mesh_mgmt_unregister(unsigned int id)
++{
++	return mgmt_unregister(mgmt_mesh, id);
++}
+diff --git a/mesh/mesh-mgmt.h b/mesh/mesh-mgmt.h
+index 90ac14e73..a3cd72faf 100644
+--- a/mesh/mesh-mgmt.h
++++ b/mesh/mesh-mgmt.h
+@@ -9,6 +9,16 @@
+  */
+ #include <stdbool.h>
+ 
+-typedef void (*mesh_mgmt_read_info_func_t)(int index, void *user_data);
++typedef void (*mesh_mgmt_read_info_func_t)(int index, bool added, bool powered,
++						bool mesh, void *user_data);
+ 
+ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data);
++unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
++				mgmt_notify_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy);
++bool mesh_mgmt_unregister(unsigned int id);
++void mesh_mgmt_destroy(void);
 -- 
 2.35.1
 
