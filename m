@@ -2,79 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4C4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 02:30:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447E2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 05:35:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236747AbiBYCap (ORCPT
+        id S237561AbiBYFfl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Feb 2022 21:30:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38498 "EHLO
+        Fri, 25 Feb 2022 00:35:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231263AbiBYCao (ORCPT
+        with ESMTP id S236037AbiBYFfk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Feb 2022 21:30:44 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87AC320B15F;
-        Thu, 24 Feb 2022 18:30:13 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3A521B82A96;
-        Fri, 25 Feb 2022 02:30:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CF11AC340F4;
-        Fri, 25 Feb 2022 02:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1645756210;
-        bh=tCgwYpUmEoWAO6jH1XEO78hSgFEOcyy/j9gcQGDjwjY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=I8hth6jNdjYlCr5yzFUCmo6tcoRx37sLrsc7Mesnj9R+s0s6zjV/XmUy4QqlM7ePM
-         3DzWSvQKCYnE8YBdVTtUlqa8cq4XMFBDeufuMoMticjMI0q3TspUTWMeCu/dxdKCt0
-         t6tsx4djxoGXofbecy1sJamdXFkmX07eClsHk5erHAHKEbCyIqOFN/vADy6NU6+jxK
-         ncX2rutY8dxUwU3jipYWCLkmACMVN7twlG7RGahBkzhvaD7p0ozRdPvtsPYRO5EdBG
-         mSKgUhUxb5s6K68H3ck2Lfdmrf+TVR4dZFYVmMjlPUKpJW2TM03pY+ioiBJHijxzjH
-         e6hlZyjLCLaew==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B3DC4E6D3DE;
-        Fri, 25 Feb 2022 02:30:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2021-06-14
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <164575621073.25534.8884614257765630962.git-patchwork-notify@kernel.org>
-Date:   Fri, 25 Feb 2022 02:30:10 +0000
-References: <20220224210838.197787-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220224210838.197787-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+        Fri, 25 Feb 2022 00:35:40 -0500
+Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6F11B4027;
+        Thu, 24 Feb 2022 21:35:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1645767309; x=1677303309;
+  h=from:to:cc:subject:date:message-id;
+  bh=K/ZmoVmGsoJHp14aeR2Uuw0XLgHND2lgxjfjAK/d/VY=;
+  b=hLV8EZbAUxAjuNt255hv/p71wW77Nm0/AZG6PtO0vH4OnJn151VsusmZ
+   iuQKebAHo4hMEPPKozQKeKBDdD4Q6Kgq5xrOonnro4ZVV3YktPPrZch3e
+   QwigbEWkLdHlL4umqcpMhvCex2KNPz+khpbrBwsMEf+H3YjrvT3yuuv2H
+   k=;
+Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
+  by alexa-out.qualcomm.com with ESMTP; 24 Feb 2022 21:35:09 -0800
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 24 Feb 2022 21:35:07 -0800
+X-QCInternal: smtphost
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 25 Feb 2022 11:04:49 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id E06BA21673; Fri, 25 Feb 2022 11:04:47 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     gross@kernel.org, robh+dt@kernel.org, bjorn.andersson@linaro.org,
+        krzysztof.kozlowski@canonical.com, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-bluetooth@vger.kernel.org,
+        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
+        quic_rjliao@quicinc.com, mcchou@chromium.org,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v3] arm64: dts: qcom: sc7280: Add IO regulator handler in SC7280 CRD based platforms
+Date:   Fri, 25 Feb 2022 11:04:45 +0530
+Message-Id: <1645767286-13890-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Add IO regulator handler in SC7280 CRD based platforms.
+As IO regulator varies in different SC7280 platforms
+updating this handler in individual platform bluetooth node.
 
-This pull request was applied to netdev/net.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+---
+V3: Updated commit text to reflect the change
+v2: updated reviewer comments.
+v1: intial patch 
+---
+ arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-On Thu, 24 Feb 2022 13:08:38 -0800 you wrote:
-> The following changes since commit 42404d8f1c01861b22ccfa1d70f950242720ae57:
-> 
->   net: mv643xx_eth: process retval from of_get_mac_address (2022-02-24 10:05:08 -0800)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-02-24
-> 
-> [...]
-
-Here is the summary with links:
-  - pull request: bluetooth 2021-06-14
-    https://git.kernel.org/netdev/net/c/8a7271000b91
-
-You are awesome, thank you!
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+index e2efbdd..6cbbddc 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
++++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+@@ -35,6 +35,10 @@
+ 	};
+ };
+ 
++&bluetooth {
++	vddio-supply = <&vreg_l18b_1p8>;
++};
++
+ ap_tp_i2c: &i2c0 {
+ 	status = "okay";
+ 	clock-frequency = <400000>;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
