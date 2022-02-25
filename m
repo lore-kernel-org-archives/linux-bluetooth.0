@@ -2,143 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC73C43217
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 21:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39721C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 22:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234098AbiBYVzm (ORCPT
+        id S235814AbiBYWVy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Feb 2022 16:55:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33418 "EHLO
+        Fri, 25 Feb 2022 17:21:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230052AbiBYVzl (ORCPT
+        with ESMTP id S229927AbiBYWVx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Feb 2022 16:55:41 -0500
-Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1607218CD8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 13:55:07 -0800 (PST)
-Received: by mail-ot1-x331.google.com with SMTP id j3-20020a9d7683000000b005aeed94f4e9so4577857otl.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 13:55:07 -0800 (PST)
+        Fri, 25 Feb 2022 17:21:53 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279E61A6FBE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:21:21 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id z2so5927890plg.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:21:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=m/vqkWoLM2koeZAVeet1hIz9u/sHUyuW7PwgatN//uU=;
-        b=gVA38gVk5Bz6qX9+3TKvQmTJbn8Non5K/l9Quge1etshRDJ5NyKr5KNQ8U+1h8IfzH
-         te0ujsc4GV441ZVDNugdbECMhzVpS8mx3jIU9tT5Z0aYywFV0DWfAWzku/w59vX9vsWI
-         YjoyBr2QqUPaYD50kNXo8xDwCG/IBTvYlvcPoYgZEmwleVuPFUiZv+snbsZKIa92KTMh
-         eNMSlbjVwC+VRBj1w+mMmt3btdgNlXsGdQG3Rq3daIsOqbOFif3eS2JLlZ0n8foRDwki
-         pdNAIjCVCf6NVrPnucizvMJt+/z9HybfdN3hlZxA4Vw/VGVdTxiOFRrd0mV3AZCWrRWi
-         garw==
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TEN/dCUpS+UrJze4tcYBCH3t9ePSjmcjsOenxAlYHV8=;
+        b=Lr1tchV38447lptCdCXaBn8UKvdZZCEf0kPwvk2Q3FsjE6JYfGTUar62npSHd4Z6vu
+         X96cRIOYld0hinVxiCkghYZ68jgV1RfDMHAo99i/c2mN+NlhL7h9eQyWX5UBp1W48R6U
+         L3YA4BMkEXCcaCnyy8MWPXj/E41DDSNhE+WHtcvweAeDMCHUgURawQzwjZ4xYZLYOc8u
+         lexjvq4JJybEosmlK4Y6WCKD63UG/GnqBKzwsWA0H8LAZA7C+zXGl37lJGdWOT7bT5uj
+         8Zzz2Al5kztKAqYjbDjQrEGZP9HZi5YT2w7UnLe0tHBSCKZP2UFPxObxmWYIIhGLsgcq
+         aNsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m/vqkWoLM2koeZAVeet1hIz9u/sHUyuW7PwgatN//uU=;
-        b=I2QDPTtN1tFFKxpCuB4eGkEzi+mc36AMHlEQP218ZQGfmRC7kEzk8QySpb6p8YivvP
-         VOfVMu4sRh97lv21ukCZ70cITxSWBmLldB8Hme0JuG8Z1Sut3vcrSGkyj0lZxmgGY3OK
-         DTTdnLhWYB+P2HX2LTCCV+W0Xq0Q71E7AHid4xkFSoIZ58EM9F1/Ft2YxQeQ9kuGcihw
-         JC6ofcjpFz7x2N1T1l84x7R65ZYNyoEkr2mJ/jpynw5NpQsmGlp+MTl/xnu251TEmn6Y
-         VQP1c8wARS5KgiVH3Crdk6nZ4PfvdcSaSPaMsIkp5PX1YEkg3jxLBbyzwSqALaDRs6Ao
-         3quA==
-X-Gm-Message-State: AOAM530dviRRk5ukITPvgvrBQCGJND6NAoXriD0u5jlpxEffz1g9eNxL
-        fPdvN7kVs3zlhpw1kynYxINneg==
-X-Google-Smtp-Source: ABdhPJyWXfpVOjBQzPDsuZlQkeTho7DcqtU5U87DNz4IiNmLbE7u74pfulpklA/AtpE9EXIZhDTquw==
-X-Received: by 2002:a9d:176:0:b0:5ae:ed94:f1c0 with SMTP id 109-20020a9d0176000000b005aeed94f1c0mr3838228otu.74.1645826107045;
-        Fri, 25 Feb 2022 13:55:07 -0800 (PST)
-Received: from ripper ([2600:1700:a0:3dc8:205:1bff:fec0:b9b3])
-        by smtp.gmail.com with ESMTPSA id cz42-20020a05687064aa00b000d6c97027b7sm1705425oab.30.2022.02.25.13.55.05
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TEN/dCUpS+UrJze4tcYBCH3t9ePSjmcjsOenxAlYHV8=;
+        b=wMLUj1Zi1ewJk6EEZi1En6y5H/5QMp/7iR7rUN4afCNRiHxU6r76OAHmLKz8cJzZmk
+         mcMlLa7Jwfg/ZwSYqMHwkRAKqA7Or8pFIMHXbzjSuLR+bf2N8MSQoxkk/qYnhsjFjEoC
+         3ktbB8m4ZiKuqiWfz8g3Q6HjpEfNstC1InYkYjyy2i/75vScqVf82DiSXKK9UnTsXoti
+         dr2raRA0EpaTvbPVjlJM1eWN0/5msjNpAuq6DQgrOpOQMoxHAMw9hSCEOSvUy8GwXRxP
+         u8PkysnEO/TkyzycOJod9z7klCkjLx1jjLF4F0EG5m7Io3Adp0t7rTezgR2BOsmxx/H5
+         2r+w==
+X-Gm-Message-State: AOAM533OCbHuCcPfy2Ubw6h/KesIyUotNndrgLZN9aQD7hzyrR01ODe+
+        B6mo31JyBWyUub2TYQzZ59doX646yfw=
+X-Google-Smtp-Source: ABdhPJxuGD2r8MizboUZibzhKoQd48yKp4omj7zM9TSdBnWrmB5fpNpK5f0jwO+7xHVYnYfDp7l6Ew==
+X-Received: by 2002:a17:902:a98b:b0:14f:ae28:c660 with SMTP id bh11-20020a170902a98b00b0014fae28c660mr9620107plb.94.1645827680347;
+        Fri, 25 Feb 2022 14:21:20 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id ep5-20020a17090ae64500b001bc56af507dsm10187736pjb.47.2022.02.25.14.21.19
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 13:55:06 -0800 (PST)
-Date:   Fri, 25 Feb 2022 13:57:03 -0800
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Luca Weiss <luca@z3ntu.xyz>
-Cc:     linux-arm-msm@vger.kernel.org,
-        ~postmarketos/upstreaming@lists.sr.ht, phone-devel@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: [PATCH 0/5] Wifi & Bluetooth on LG G Watch R
-Message-ID: <YhlQr17fGi+Q7KT8@ripper>
-References: <20220216212433.1373903-1-luca@z3ntu.xyz>
- <YhcGSmd5M3W+fI6c@builder.lan>
- <4379033.LvFx2qVVIh@g550jk>
+        Fri, 25 Feb 2022 14:21:19 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] hog-lib: Fix not waiting for UHID_START
+Date:   Fri, 25 Feb 2022 14:21:19 -0800
+Message-Id: <20220225222119.567035-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4379033.LvFx2qVVIh@g550jk>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri 25 Feb 12:19 PST 2022, Luca Weiss wrote:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> Hi Bjorn
-> 
-> On Donnerstag, 24. Februar 2022 05:15:06 CET Bjorn Andersson wrote:
-> > On Wed 16 Feb 15:24 CST 2022, Luca Weiss wrote:
-> > > This series adds the BCM43430A0 chip providing Bluetooth & Wifi on the
-> > > LG G Watch R.
-> > 
-> > I picked the dts changes, but would prefer that the other two changes
-> > goes through the BT tree. I see that you haven't copied Marcel on the
-> > dt-binding change though, so please resubmit those two patches together.
-> 
-> Thank you, will resubmit the first two!
-> 
-> Just to be clear, as far as I understand each patch gets sent based on its own 
-> get_maintainer.pl, and the cover letter gets sent to the superset of all 
-> individual patch recipients?
+With use of UHID_CREATE2 the code needs to wait for UHID_START in order
+to know if the reports are numbered or not.
 
-It's rather annoying to be maintainer and only get 1-2 patches out of a
-larger series and having to browse lore.kernel.org to find the rest. So
-based on that I tend to make sure that everyone is Cc'ed on all patches
-in my series.
+Fixes: https://github.com/bluez/bluez/issues/298
+---
+ profiles/input/hog-lib.c | 40 +++++++++++++++++++++-------------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
 
-And then there's the general advice that if there isn't a strong
-dependency between the patches, it might be better to just submit them
-separately in the first place. Simply to make it easier for each
-maintainer to merge your patches.
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 5af99fcda..e3f3f8f91 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -81,6 +81,7 @@ struct bt_hog {
+ 	struct bt_uhid		*uhid;
+ 	int			uhid_fd;
+ 	bool			uhid_created;
++	bool			uhid_start;
+ 	uint64_t		uhid_flags;
+ 	uint16_t		bcdhid;
+ 	uint8_t			bcountrycode;
+@@ -358,8 +359,8 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 		ev.u.input.size = len;
+ 	}
+ 
+-	/* If uhid had not been created yet queue up the input */
+-	if (!hog->uhid_created) {
++	/* If uhid had not sent UHID_START yet queue up the input */
++	if (!hog->uhid_start) {
+ 		if (!hog->input)
+ 			hog->input = queue_new();
+ 
+@@ -809,16 +810,34 @@ static void set_numbered(void *data, void *user_data)
+ 	}
+ }
+ 
++static bool input_dequeue(const void *data, const void *match_data)
++{
++	const struct uhid_event *ev = data;
++	const struct bt_hog *hog = match_data;
++	int err;
++
++	err = bt_uhid_send(hog->uhid, ev);
++	if (err < 0) {
++		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
++		return false;
++	}
++
++	return true;
++}
++
+ static void start_flags(struct uhid_event *ev, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+ 
++	hog->uhid_start = true;
+ 	hog->uhid_flags = ev->u.start.dev_flags;
+ 
+ 	DBG("uHID device flags: 0x%16" PRIx64, hog->uhid_flags);
+ 
+ 	if (hog->uhid_flags)
+ 		g_slist_foreach(hog->reports, set_numbered, hog);
++
++	queue_remove_all(hog->input, input_dequeue, hog, free);
+ }
+ 
+ static void set_report_cb(guint8 status, const guint8 *pdu,
+@@ -992,21 +1011,6 @@ fail:
+ 	report_reply(hog, err, 0, false, 0, NULL);
+ }
+ 
+-static bool input_dequeue(const void *data, const void *match_data)
+-{
+-	const struct uhid_event *ev = data;
+-	const struct bt_hog *hog = match_data;
+-	int err;
+-
+-	err = bt_uhid_send(hog->uhid, ev);
+-	if (err < 0) {
+-		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+-		return false;
+-	}
+-
+-	return true;
+-}
+-
+ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 							size_t report_map_len)
+ {
+@@ -1070,8 +1074,6 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+ 	hog->uhid_created = true;
+ 
+ 	DBG("HoG created uHID device");
+-
+-	queue_remove_all(hog->input, input_dequeue, hog, free);
+ }
+ 
+ static void db_report_map_write_value_cb(struct gatt_db_attribute *attr,
+-- 
+2.35.1
 
-> I'm using this script that's largely based on something I found online a while 
-> ago
-> https://github.com/z3ntu/dotfiles/blob/master/scripts/usr/local/bin/cocci_cc
-> 
-> Also just checked and Marcel isn't listed as maintainer of the relevant dt 
-> bindings in MAINTAINERS, maybe they should get added there?
-> 
-
-In general I think the DT bindings goes through the relevant subsystem
-maintainer, so I would suggest that you post a patch. If for some reason
-Marcel shouldn't merge BT related DT patches, then the discussion that
-follows will make that clear and you could make sure that MAINTAINERS
-reflects the outcome.
-
-Regards,
-Bjorn
-
-> (also CCed Marcel on this email)
-> 
-> Regards
-> Luca
-> 
-> > 
-> > Thanks,
-> > Bjorn
-> > 
-> > > Luca Weiss (5):
-> > >   dt-bindings: bluetooth: broadcom: add BCM43430A0
-> > >   Bluetooth: hci_bcm: add BCM43430A0
-> > >   ARM: dts: qcom: msm8226: Add pinctrl for sdhci nodes
-> > >   ARM: dts: qcom: apq8026-lg-lenok: Add Wifi
-> > >   ARM: dts: qcom: apq8026-lg-lenok: Add Bluetooth
-> > >  
-> > >  .../bindings/net/broadcom-bluetooth.yaml      |  1 +
-> > >  arch/arm/boot/dts/qcom-apq8026-lg-lenok.dts   | 98 ++++++++++++++++---
-> > >  arch/arm/boot/dts/qcom-msm8226.dtsi           | 57 +++++++++++
-> > >  drivers/bluetooth/hci_bcm.c                   |  1 +
-> > >  4 files changed, 144 insertions(+), 13 deletions(-)
-> 
-> 
-> 
-> 
