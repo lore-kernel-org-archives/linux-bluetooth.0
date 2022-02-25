@@ -2,84 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447E2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 05:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56F3AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 07:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237561AbiBYFfl (ORCPT
+        id S238218AbiBYHmg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Feb 2022 00:35:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41462 "EHLO
+        Fri, 25 Feb 2022 02:42:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236037AbiBYFfk (ORCPT
+        with ESMTP id S236678AbiBYHme (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Feb 2022 00:35:40 -0500
-Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D6F11B4027;
-        Thu, 24 Feb 2022 21:35:09 -0800 (PST)
+        Fri, 25 Feb 2022 02:42:34 -0500
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184FA1AA491;
+        Thu, 24 Feb 2022 23:42:02 -0800 (PST)
+Received: by mail-qt1-x82c.google.com with SMTP id bt3so1740016qtb.0;
+        Thu, 24 Feb 2022 23:42:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1645767309; x=1677303309;
-  h=from:to:cc:subject:date:message-id;
-  bh=K/ZmoVmGsoJHp14aeR2Uuw0XLgHND2lgxjfjAK/d/VY=;
-  b=hLV8EZbAUxAjuNt255hv/p71wW77Nm0/AZG6PtO0vH4OnJn151VsusmZ
-   iuQKebAHo4hMEPPKozQKeKBDdD4Q6Kgq5xrOonnro4ZVV3YktPPrZch3e
-   QwigbEWkLdHlL4umqcpMhvCex2KNPz+khpbrBwsMEf+H3YjrvT3yuuv2H
-   k=;
-Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
-  by alexa-out.qualcomm.com with ESMTP; 24 Feb 2022 21:35:09 -0800
-X-QCInternal: smtphost
-Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
-  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 24 Feb 2022 21:35:07 -0800
-X-QCInternal: smtphost
-Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 25 Feb 2022 11:04:49 +0530
-Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
-        id E06BA21673; Fri, 25 Feb 2022 11:04:47 +0530 (IST)
-From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
-To:     gross@kernel.org, robh+dt@kernel.org, bjorn.andersson@linaro.org,
-        krzysztof.kozlowski@canonical.com, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, quic_bgodavar@quicinc.com,
-        quic_rjliao@quicinc.com, mcchou@chromium.org,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: [PATCH v3] arm64: dts: qcom: sc7280: Add IO regulator handler in SC7280 CRD based platforms
-Date:   Fri, 25 Feb 2022 11:04:45 +0530
-Message-Id: <1645767286-13890-1-git-send-email-quic_saluvala@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WB2UJiGQQxiDi2Mxv6dyEHAg8UeTsSc7+1pqPfX8yFE=;
+        b=VUCwRvbs2awdPoNnKnLqLr7KCxDcgpZ8/Ilak4tfVc1xLDoAyywZNz676eigbUVtgf
+         Iyl+CbynMVnbMFw7VXjVxGK+LvUC9bCyr8oFEncwxpRaYOKSSM+pI2/ol0gQeKcc3eRJ
+         9KOg/G3svYXaZPwkUNnqNlquPMrtolkCHgnHZxMg2jc6ureY639A3rI6pugLFw78xe/x
+         Ok+h2TdNyCvXFtbGQnEKxOyN7QYqcEnmXe5N/+wjgrW9ceOLbS/HhH0Xw+jcn0CfyixY
+         oyJzvbA2a2F0uwe1UZfrHZp751sDw3G4JkdLe5TtH5bkVjIJC4k3BOb41CewV7IXn6tv
+         2fRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WB2UJiGQQxiDi2Mxv6dyEHAg8UeTsSc7+1pqPfX8yFE=;
+        b=mjhj2nNrP3GkyYe8ltYZUS3saDzeYbEwysZ6O+U9z/j86QdXflDzaFMgDT7ye6ihmp
+         8pPIcwxIZdfVWWCbqdPnbiYLQq5Tt8fNU/naSjT7oN5cuwQ65EKuhyijX5/NPeTW9f0P
+         inpQLxn+cfTTbFVc6yh5KY0+jSuceN8lI2PcpabRAxx6f28l1OgH/D2Vi4y2CTET2LCM
+         NCHHDcmd4Q6riAcmbzjSbWDU9zeRGleGdUmJ2DsFfRoamj+VDPvfuygp4JeC6ulOVFlT
+         zORnb3lxDlz8b70ZB+79yOz8ZQU9KPUmqh3uLBRGpfg+dGxg+mj9UGq6a0eHVEFoOSQM
+         miKg==
+X-Gm-Message-State: AOAM530PsPVX/NqF+hrr24PweufhzHeuaS7frQlhDjjLGFdYLagu2KiU
+        pAHGSQ/lM9M6piHIlxISvlE=
+X-Google-Smtp-Source: ABdhPJxjqnhaU9ZhDG0v+hpfHVSdL81T+h8tnNNbR5dn9I8Val+zYcI4zqcJTbHvP9qn8SFDfI7T9Q==
+X-Received: by 2002:ac8:58c7:0:b0:2dd:1a1:191d with SMTP id u7-20020ac858c7000000b002dd01a1191dmr5758070qta.334.1645774921290;
+        Thu, 24 Feb 2022 23:42:01 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id bq42-20020a05620a46aa00b006494fb49246sm864853qkb.86.2022.02.24.23.41.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Feb 2022 23:42:00 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: chi.minghao@zte.com.cn
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] net/bluetooth: use memset avoid memory leaks
+Date:   Fri, 25 Feb 2022 07:41:52 +0000
+Message-Id: <20220225074152.2039466-1-chi.minghao@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add IO regulator handler in SC7280 CRD based platforms.
-As IO regulator varies in different SC7280 platforms
-updating this handler in individual platform bluetooth node.
+From: Minghao Chi (CGEL ZTE) <chi.minghao@zte.com.cn>
 
-Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
----
-V3: Updated commit text to reflect the change
-v2: updated reviewer comments.
-v1: intial patch 
----
- arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
- 1 file changed, 4 insertions(+)
+Use memset to initialize structs to prevent memory leaks
+in l2cap_ecred_connect
 
-diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-index e2efbdd..6cbbddc 100644
---- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-+++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-@@ -35,6 +35,10 @@
- 	};
- };
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Minghao Chi (CGEL ZTE) <chi.minghao@zte.com.cn>
+---
+ net/bluetooth/l2cap_core.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e817ff0607a0..8df99c07f272 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1436,6 +1436,7 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
  
-+&bluetooth {
-+	vddio-supply = <&vreg_l18b_1p8>;
-+};
-+
- ap_tp_i2c: &i2c0 {
- 	status = "okay";
- 	clock-frequency = <400000>;
+ 	l2cap_ecred_init(chan, 0);
+ 
++	memset(&data, 0, sizeof(data));
+ 	data.pdu.req.psm     = chan->psm;
+ 	data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
+ 	data.pdu.req.mps     = cpu_to_le16(chan->mps);
 -- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+2.25.1
 
