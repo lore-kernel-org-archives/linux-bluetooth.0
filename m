@@ -2,165 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39721C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 22:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F0C4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Feb 2022 22:27:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235814AbiBYWVy (ORCPT
+        id S238268AbiBYW2K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Feb 2022 17:21:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46172 "EHLO
+        Fri, 25 Feb 2022 17:28:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229927AbiBYWVx (ORCPT
+        with ESMTP id S235814AbiBYW2I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Feb 2022 17:21:53 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 279E61A6FBE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:21:21 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id z2so5927890plg.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:21:21 -0800 (PST)
+        Fri, 25 Feb 2022 17:28:08 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF5256433
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:27:34 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id y189so8612115ybe.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Feb 2022 14:27:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TEN/dCUpS+UrJze4tcYBCH3t9ePSjmcjsOenxAlYHV8=;
-        b=Lr1tchV38447lptCdCXaBn8UKvdZZCEf0kPwvk2Q3FsjE6JYfGTUar62npSHd4Z6vu
-         X96cRIOYld0hinVxiCkghYZ68jgV1RfDMHAo99i/c2mN+NlhL7h9eQyWX5UBp1W48R6U
-         L3YA4BMkEXCcaCnyy8MWPXj/E41DDSNhE+WHtcvweAeDMCHUgURawQzwjZ4xYZLYOc8u
-         lexjvq4JJybEosmlK4Y6WCKD63UG/GnqBKzwsWA0H8LAZA7C+zXGl37lJGdWOT7bT5uj
-         8Zzz2Al5kztKAqYjbDjQrEGZP9HZi5YT2w7UnLe0tHBSCKZP2UFPxObxmWYIIhGLsgcq
-         aNsw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qjsMp7xX3ynS5KcguIDmZLn/ntTYnkqaOeDF7REL5dA=;
+        b=A2sFE6EmXvWJO2GAR4r6b0cc1TJATlcwe/jkDTL6KKfD7kWCXjBA0OJp+7VatR1IfQ
+         0gSzTMb++NOLKEzUj5IEIxYnc1al6d6BEQUdbdDTngZ9ekcYmpKtswG6JqFo9og9EUWi
+         BX63Nc6MrWESYakzPKKN3WhpBB9mm8yxRw2e7dSEp2b/+sjpTxCVI9wFxaui1cypYqv4
+         EZFkYiyD3B0NFyeUnESI6CrR1dStT23+uH6EtLK/tbSVxEVWKPl9u7LgQpleNWiDNg6N
+         VVe3tGyj4VvuAmV1ClyD4zF9xdpEql9eIgSVj3rMN1nLFORxpGsUF4J6aewYnr06CI/N
+         2YyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=TEN/dCUpS+UrJze4tcYBCH3t9ePSjmcjsOenxAlYHV8=;
-        b=wMLUj1Zi1ewJk6EEZi1En6y5H/5QMp/7iR7rUN4afCNRiHxU6r76OAHmLKz8cJzZmk
-         mcMlLa7Jwfg/ZwSYqMHwkRAKqA7Or8pFIMHXbzjSuLR+bf2N8MSQoxkk/qYnhsjFjEoC
-         3ktbB8m4ZiKuqiWfz8g3Q6HjpEfNstC1InYkYjyy2i/75vScqVf82DiSXKK9UnTsXoti
-         dr2raRA0EpaTvbPVjlJM1eWN0/5msjNpAuq6DQgrOpOQMoxHAMw9hSCEOSvUy8GwXRxP
-         u8PkysnEO/TkyzycOJod9z7klCkjLx1jjLF4F0EG5m7Io3Adp0t7rTezgR2BOsmxx/H5
-         2r+w==
-X-Gm-Message-State: AOAM533OCbHuCcPfy2Ubw6h/KesIyUotNndrgLZN9aQD7hzyrR01ODe+
-        B6mo31JyBWyUub2TYQzZ59doX646yfw=
-X-Google-Smtp-Source: ABdhPJxuGD2r8MizboUZibzhKoQd48yKp4omj7zM9TSdBnWrmB5fpNpK5f0jwO+7xHVYnYfDp7l6Ew==
-X-Received: by 2002:a17:902:a98b:b0:14f:ae28:c660 with SMTP id bh11-20020a170902a98b00b0014fae28c660mr9620107plb.94.1645827680347;
-        Fri, 25 Feb 2022 14:21:20 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id ep5-20020a17090ae64500b001bc56af507dsm10187736pjb.47.2022.02.25.14.21.19
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Feb 2022 14:21:19 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] hog-lib: Fix not waiting for UHID_START
-Date:   Fri, 25 Feb 2022 14:21:19 -0800
-Message-Id: <20220225222119.567035-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qjsMp7xX3ynS5KcguIDmZLn/ntTYnkqaOeDF7REL5dA=;
+        b=o7U6/K9bDvwcdnIh5u3k4vcC7noOz6EORfGzXyMfajtqRXzE3UTGw5TLvr7p+hQIbF
+         UhVf2Q+18wR8nji0FMaOOPiRJm2ijmG00pNeUSHGiIJxlYnM5ZUG/97QNAqPOPQLg0IN
+         ofzYMDrRWwo/IkVsPLF7s6PpEZkKdTESra245QyWxO31jE2asDW6kxyZnT89miUFVHPc
+         QoMDciC2khy/uUKOkQoHXdvMeIWswqBzbSdm91WKRrV9M5XzAQ7+v/3PzKNrTMV8eKqt
+         XbMM0U2LtWg/Owuc8vUShFGzvaS6OLS2G1/yvXirOzAy6OMkGPdntGQVEIfxHv6V0QX4
+         IqSA==
+X-Gm-Message-State: AOAM533W6uRTgxCmKGoEXKYXPaC0v7C4nGaC4lIfJqDtWaxvhuZhEKiP
+        RVsgbxwUCemito6NLpWiWygpOY28Uv5lOnMeVG4=
+X-Google-Smtp-Source: ABdhPJw4JB+s2Tipaofshsa4kLwDQ1Cj9YvrlXOFM2BQdrPATgVljrRMvwNDQcztknfzmZ2ASuQ36UzuGZTUldma9z8=
+X-Received: by 2002:a25:a467:0:b0:61e:1b4a:7700 with SMTP id
+ f94-20020a25a467000000b0061e1b4a7700mr9398736ybi.390.1645828053174; Fri, 25
+ Feb 2022 14:27:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <f648f2e11bb3c2974c32e605a85ac3a9fac944f1.camel@redhat.com>
+ <CABBYNZKWpPvJvKefgjw5YXCk9BL7900X+XnobLS6gw+50wKNfA@mail.gmail.com>
+ <31367223b2e310521493b257244c188f3c22a619.camel@redhat.com>
+ <fc74637a-f3c8-7870-82ec-90bf55b60462@molgen.mpg.de> <0838aa454b7b127fab1b2a945180304088251b13.camel@redhat.com>
+In-Reply-To: <0838aa454b7b127fab1b2a945180304088251b13.camel@redhat.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 25 Feb 2022 14:27:22 -0800
+Message-ID: <CABBYNZKMj6yhqsvkx=tcj=tz_9_78r87NBqk6TC1cyO6g4Pesw@mail.gmail.com>
+Subject: Re: Since commit e8907f76544ffe225ab95d70f7313267b1d0c76d bluetooth
+ scanning stopped working on my system
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paul Menzel <pmenzel@molgen.mpg.de>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Maxim,
 
-With use of UHID_CREATE2 the code needs to wait for UHID_START in order
-to know if the reports are numbered or not.
+On Thu, Feb 24, 2022 at 8:29 AM Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>
+> On Thu, 2022-02-24 at 16:43 +0100, Paul Menzel wrote:
+> > Dear Maxim,
+> >
+> >
+> > Am 24.02.22 um 14:01 schrieb Maxim Levitsky:
+> > > On Tue, 2022-02-22 at 10:35 -0800, Luiz Augusto von Dentz wrote:
+> > > > On Mon, Feb 21, 2022 at 7:14 PM Maxim Levitsky wrote:
+> > > > > Today I updated to a new kernel and I am bisecting few
+> > > > > regressions:
+> >
+> > [=E2=80=A6]
+> >
+> > > I do notice that even on 5.16 kernel, I am not able to use the HSF
+> > > or whatever low quality bi-directional bluetooh protocol is called
+> > > for my headset. Used to work, I don't know what broke it, likely not
+> > > related to this.
+> > >
+> > > I also updated bluez to 5.6 by installing fedora 33 package, and
+> > > initially it seems to work, but after reboot, the issue shows up
+> > > again. Looks like sometimes the scan does work. So far I wasn't able
+> > > to make it work even once since then. Reloading btusb doesn't help.
+> > > Can't install newer package due to deps on glib sadly. I might be
+> > > able to compile it from source, but that will take some time to
+> > > figure out how the components of the bluez stack are connected
+> > > together.
+> > >
+> > > For the reference I have 'Intel Corp. AX200 Bluetooth' and I have
+> > > the same device on my AMD laptop and both have USB ID 8087:0029 My
+> > > AMD laptop has Fedora 34 though.
+> >
+> > Sorry, I lost track, if it=E2=80=99s still about one regression, you
+> > successfully bisected or not.
+> yes, I sucessfully bisected the regression. 1 commit before mentioned com=
+mit
+> the bluetooth works for me, and not after it, with same .config and every=
+thing else.
+>
+>
+> >
+> > Anyway, passing through the USB Bluetooth device to QEMU helped me [1],
+> > and might help you to overcome the dependency problems. (My steps
+> > actually worked, but turned out the Linux kernel commit I tested with
+> > had another regression not making the Bluetooth controller initialize.)
+> First thing I tried, but alas it worked for me in fedora 34 VM I tried to=
+ test with
+> (with the same 5.17-rc5 kernel, albeet with different .config, more tailo=
+red for a VM).
 
-Fixes: https://github.com/bluez/bluez/issues/298
----
- profiles/input/hog-lib.c | 40 +++++++++++++++++++++-------------------
- 1 file changed, 21 insertions(+), 19 deletions(-)
+Give it a try with:
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index 5af99fcda..e3f3f8f91 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -81,6 +81,7 @@ struct bt_hog {
- 	struct bt_uhid		*uhid;
- 	int			uhid_fd;
- 	bool			uhid_created;
-+	bool			uhid_start;
- 	uint64_t		uhid_flags;
- 	uint16_t		bcdhid;
- 	uint8_t			bcountrycode;
-@@ -358,8 +359,8 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- 		ev.u.input.size = len;
- 	}
- 
--	/* If uhid had not been created yet queue up the input */
--	if (!hog->uhid_created) {
-+	/* If uhid had not sent UHID_START yet queue up the input */
-+	if (!hog->uhid_start) {
- 		if (!hog->input)
- 			hog->input = queue_new();
- 
-@@ -809,16 +810,34 @@ static void set_numbered(void *data, void *user_data)
- 	}
- }
- 
-+static bool input_dequeue(const void *data, const void *match_data)
-+{
-+	const struct uhid_event *ev = data;
-+	const struct bt_hog *hog = match_data;
-+	int err;
-+
-+	err = bt_uhid_send(hog->uhid, ev);
-+	if (err < 0) {
-+		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void start_flags(struct uhid_event *ev, void *user_data)
- {
- 	struct bt_hog *hog = user_data;
- 
-+	hog->uhid_start = true;
- 	hog->uhid_flags = ev->u.start.dev_flags;
- 
- 	DBG("uHID device flags: 0x%16" PRIx64, hog->uhid_flags);
- 
- 	if (hog->uhid_flags)
- 		g_slist_foreach(hog->reports, set_numbered, hog);
-+
-+	queue_remove_all(hog->input, input_dequeue, hog, free);
- }
- 
- static void set_report_cb(guint8 status, const guint8 *pdu,
-@@ -992,21 +1011,6 @@ fail:
- 	report_reply(hog, err, 0, false, 0, NULL);
- }
- 
--static bool input_dequeue(const void *data, const void *match_data)
--{
--	const struct uhid_event *ev = data;
--	const struct bt_hog *hog = match_data;
--	int err;
--
--	err = bt_uhid_send(hog->uhid, ev);
--	if (err < 0) {
--		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
--		return false;
--	}
--
--	return true;
--}
--
- static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
- 							size_t report_map_len)
- {
-@@ -1070,8 +1074,6 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
- 	hog->uhid_created = true;
- 
- 	DBG("HoG created uHID device");
--
--	queue_remove_all(hog->input, input_dequeue, hog, free);
- }
- 
- static void db_report_map_write_value_cb(struct gatt_db_attribute *attr,
--- 
-2.35.1
+https://patchwork.kernel.org/project/bluetooth/patch/20220224232950.56204-1=
+-brian.gix@intel.com/
 
+Btw, are there any other users of the MGMT socket? Or it is just bluetoothd=
+?
+
+> Best regards,
+>         Maxim Levitsky
+>
+> >
+> > Marcel also replied, he is using btproxy to debug issues, but I did not
+> > try it, as it wasn=E2=80=99t clear to me how to get it working easily, =
+and he
+> > also wrote something about non-public patches.
+> >
+> >
+> > Kind regards,
+> >
+> > Paul
+> >
+> >
+> > [1]:
+> > https://lore.kernel.org/linux-bluetooth/5891f0d5-8d51-9da5-7663-718f301=
+490b1@molgen.mpg.de/T/#u
+> >
+>
+>
+
+
+--=20
+Luiz Augusto von Dentz
