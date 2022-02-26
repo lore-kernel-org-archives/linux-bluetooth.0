@@ -2,103 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDDAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Feb 2022 16:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F37DCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Feb 2022 16:21:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232281AbiBZQEi (ORCPT
+        id S232320AbiBZQVq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Feb 2022 11:04:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35992 "EHLO
+        Sat, 26 Feb 2022 11:21:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231523AbiBZQEg (ORCPT
+        with ESMTP id S232281AbiBZQVp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Feb 2022 11:04:36 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCEE8B91DA
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Feb 2022 08:04:01 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id c9so7292997pll.0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Feb 2022 08:04:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=TVwSC6h5s3cXSOcRC0Vxua/JTzVdi+I6yHLZX7k2RBU=;
-        b=gZ6DkWVXPtn/gxhcWmtQ6LHAeMOorxzEEqyGYkYnMtG+TDqu1PEpM8Lee/71w54vPx
-         bbZ1Eqy1zT//6gyubD10Wtngew+99LmxhfRRrk8q7rt5zjSgtxmcKqQaiXj80/55FrRE
-         fgHR0ehiXQf2qbVsnixMOwHM3xiXYGKzWba2qa6SJrKiLBgwO4Mqw11y5uSWMc0FC0X5
-         d3kiRwsv5cKjittch9WpYUiKrodisRcwXZItiEspwfqrwLxd9JVevQT/xocHIEeP0kOX
-         zoiGXZJjMr5Zor5utxn8Qi3nKs/qMw/PryX5oXjeC0OkJi4XiJVC16u0xxWudTF5/vK7
-         CZSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=TVwSC6h5s3cXSOcRC0Vxua/JTzVdi+I6yHLZX7k2RBU=;
-        b=ib7X7okPCTq9/IJtAaUiUBeTdOCZEzoMr1GCzemJ6RmcQZ1O87XvTJY6DdsZniIVll
-         gt+eSCO0ZTSNErXCizotkPDAE+spOavdPw/vtY+utZ4HcUZnwAYQf5P8c6NKiZ8yHb4E
-         vwzZL4DhMFOL+lIU7IRkRQn0zZHiszv1iu1oFjQbZyae1U+qC1b4FRVUKeGbuE0WSDPy
-         XQmu0V5OvZZjuXDWaDBv1eEbUB4vnS6/7vfh0vBnjfd/RVvga5nRQbxfeAXO6feCXu1d
-         Kr1G4dj+ekd+0bls3hFT66pfuWv7yCkN0eclRv7ZUUQY67BAr5odExBwMsLzbkWMLQ0a
-         guHQ==
-X-Gm-Message-State: AOAM533d/BTKhcON5XxackodiT1r5y5us3fH3RH5mPQG7H1XazKce9Xi
-        XXmTbR6Hf05C2BcINq5Cf4+YiD+z9GU=
-X-Google-Smtp-Source: ABdhPJzhq29MWjz4aeKQdEY7ZVBiRAgoU6oKzP2rIo/85JKLdEWYrfvPRwON8rGrHGBKA6PF3vXDpw==
-X-Received: by 2002:a17:902:694c:b0:14f:bb61:e7bf with SMTP id k12-20020a170902694c00b0014fbb61e7bfmr12107726plt.159.1645891441135;
-        Sat, 26 Feb 2022 08:04:01 -0800 (PST)
-Received: from [172.17.0.2] ([52.156.135.168])
-        by smtp.gmail.com with ESMTPSA id o3-20020a056a0015c300b004e17afd9af9sm7782605pfu.92.2022.02.26.08.04.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Feb 2022 08:04:00 -0800 (PST)
-Message-ID: <621a4f70.1c69fb81.d3b37.2fd3@mx.google.com>
-Date:   Sat, 26 Feb 2022 08:04:00 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1891115587734098992=="
+        Sat, 26 Feb 2022 11:21:45 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D231E7A6A
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Feb 2022 08:21:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 272F9B80834
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Feb 2022 16:21:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AA8CFC340F3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Feb 2022 16:21:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1645892468;
+        bh=PbSWRwkAXmqFYIf/SaEVpbezo3AV6KVa9et8WVx01ag=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Y++Jx9z43vawoEF0rRkGd5biWr/M/uGrFqUSIwmCFu53iJs4xWz1yNgm8txKKDlmg
+         2MRRpHQqnIYQsVvmiackR8e71+f9vIyBFrbvS/EFC6OvCNPVPzpjIlYEzF5Tx/ELs8
+         pKtI6miMQlnglwnFS3a9TZq7xtX5P4f/VsUgzWD8XaaehiTmqLaWbkmaNzhWJ6CD98
+         1qO/U8T4U/bCHeY1dC6jKkWhReIUL4NuLzlmW5ujF76w2EGhHxarjKNinHLNHNjOeO
+         BBl5GVKAHlu5NfVoYx3SBIFjdISwTwbCcMIBtuXNTFoexAdY8Z6hxToMN6mHrMvl0/
+         5u1hzQRPQOIQw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 932C4C05FD2; Sat, 26 Feb 2022 16:21:08 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215576] HSP/HFP mSBC profile broken with QCA6174
+Date:   Sat, 26 Feb 2022 16:21:08 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mike@mjones.io
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215576-62941-17zsB6vVHG@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215576-62941@https.bugzilla.kernel.org/>
+References: <bug-215576-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, helmut@subdivi.de
-Subject: RE: Bluetooth: btusb: Add another Realtek 8761BU
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <YhpF0JdpCmRXZtrG@alf.mars>
-References: <YhpF0JdpCmRXZtrG@alf.mars>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1891115587734098992==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
 
-This is automated email and please do not reply to this email!
+--- Comment #7 from Mike Jones (mike@mjones.io) ---
+Thanks for looking into this, Luiz, and thanks wavexx for your experiments!=
+ I
+can confirm the same results on my system: the first patch (codec.id =3D
+BT_CODEC_MSBC) doesn't work, but wavexx's workaround to disable enhanced SCO
+results in fully-functional mSBC.
 
-Dear submitter,
+I've managed to find a laptop with an Intel AX200, and here mSBC works fine=
+ on
+an unpatched v5.16.11 kernel. So this issue doesn't seem to affect all
+adapters.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=618306
+--=20
+You may reply to this email to add a comment.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.80 seconds
-GitLint                       PASS      0.41 seconds
-SubjectPrefix                 PASS      0.22 seconds
-BuildKernel                   PASS      38.76 seconds
-BuildKernel32                 PASS      33.68 seconds
-Incremental Build with patchesPASS      45.28 seconds
-TestRunner: Setup             PASS      590.81 seconds
-TestRunner: l2cap-tester      PASS      15.51 seconds
-TestRunner: bnep-tester       PASS      6.98 seconds
-TestRunner: mgmt-tester       PASS      126.10 seconds
-TestRunner: rfcomm-tester     PASS      9.33 seconds
-TestRunner: sco-tester        PASS      9.27 seconds
-TestRunner: smp-tester        PASS      9.03 seconds
-TestRunner: userchan-tester   PASS      7.51 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1891115587734098992==--
+You are receiving this mail because:
+You are the assignee for the bug.=
