@@ -2,66 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 201D7C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Feb 2022 18:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B54E1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Feb 2022 18:45:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238476AbiB1SkW (ORCPT
+        id S234826AbiB1Spr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Feb 2022 13:40:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59212 "EHLO
+        Mon, 28 Feb 2022 13:45:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240670AbiB1SkO (ORCPT
+        with ESMTP id S240873AbiB1SpS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Feb 2022 13:40:14 -0500
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8502B18B4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 10:31:33 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id qx21so26594956ejb.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 10:31:33 -0800 (PST)
+        Mon, 28 Feb 2022 13:45:18 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22F75473A7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 10:44:22 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id p19so22418009ybc.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 10:44:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qDcn13bPQCr8cHPRRpNhcxUoS2UoplOHFj2nUV/6fkM=;
-        b=SXucrCHuNJwoev+QNfisOQUAyyevzH/uoW/ETF/+OP9ksgUvWW6UBKqknhBNegk59t
-         B8zZISvS3a0mhaCp6PWWjBP/OqPF/KJCzb53Jasu/2gwwpAMrbSt1mw4auIMP5ZTZUdU
-         jeuSPRACK9d5LCyhHkRkaW/xsbFeVDtPPLQVA=
+        bh=nMDxHOhE1DGtLVy6lIjIv+fobHY3F15WDVFcK9E2w30=;
+        b=UUcm6fQYf/FdycHdWXLnZPaEjoxZ2sN7sS64ILv4+bqiQ6cwFEpi5LuOiKiVN15EFI
+         DtwjBlbuVVr60Huvm5QRwJPOOjXqH0eZNZnzSYsZ4+gFW66vjz/mGbTVG/S/EIajfm3m
+         /froyLBfPyxXLYHW02gxTd0//aJNAASUCFVwU1RYqkXGxptd5ddyRGnVPQj7HxxnSsZg
+         M8I03atU8ZXM+MdCxN3W2CxQ8Sho1woTHHtqrFXBm/2CUpLSEoVnQPeD6tYmFzRy4QvR
+         1ngw7Tu/v1lSw69nuSlaYwNjCOA9cj1WSTlJ5Yfqy8pMVe+rVs6IMDm/acYtaDLH6QhT
+         gMLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qDcn13bPQCr8cHPRRpNhcxUoS2UoplOHFj2nUV/6fkM=;
-        b=1xMutrBalXd+Vx0u1k4Nx7Hgh1Ke9Y8F/mZXZ3hqPRYo+mnfXHhV7brMloYdxyrMYa
-         hb9W1M22cTcNm33EetUzpSG4ymMLDT+YV2I9n9hNR8AOT2SiU56uyIBFkz0zh62fnkBM
-         bNgabvvW8vyDZGIXkF94N+lMrXrH4+LVhifQqWqHnZuvdy9I6NsYbaCMoJvraNjaRsMi
-         V+bBa18kDL3iqbBcfNgRBXsDZep8loj654NmP5RfLhd70qZE+cULQ3VAd1cwj+LhZIqu
-         3NNeO/JHKTFr588ubuvbGvZHOwLkZzQ8gUpEcVAelm5Yi3Fe3yhWA9lKf2rUuPEKQB7u
-         Sj9Q==
-X-Gm-Message-State: AOAM532ryyKGopbTnaohWql5LImX71z7IVL0f7qNPDA1y3vrmew0ypS4
-        I1S0j5ZqjbZZPCjVNWjUuz9FI80WTsGXbg==
-X-Google-Smtp-Source: ABdhPJzQdZNj9+da+zohqcc13uqfIKmgRP67mZajoXmSKFhKb5PyIunJu23p7rqpqwTP2eARRthUWA==
-X-Received: by 2002:a17:906:2c12:b0:6ce:88f7:474a with SMTP id e18-20020a1709062c1200b006ce88f7474amr15594242ejh.166.1646073092000;
-        Mon, 28 Feb 2022 10:31:32 -0800 (PST)
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com. [209.85.218.50])
-        by smtp.gmail.com with ESMTPSA id u22-20020a17090657d600b006ce3bc743b3sm4523053ejr.60.2022.02.28.10.31.31
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Feb 2022 10:31:31 -0800 (PST)
-Received: by mail-ej1-f50.google.com with SMTP id p15so26642531ejc.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 10:31:31 -0800 (PST)
-X-Received: by 2002:a17:906:2b97:b0:6cd:6d67:ab5d with SMTP id
- m23-20020a1709062b9700b006cd6d67ab5dmr16346152ejg.723.1646073090863; Mon, 28
- Feb 2022 10:31:30 -0800 (PST)
+        bh=nMDxHOhE1DGtLVy6lIjIv+fobHY3F15WDVFcK9E2w30=;
+        b=gTrzfBgobPtN7kz9bw3f4QVqg88sVAo6tHBQKgj9Y4lhJHKZ57HtGBkNkpbzMswLDV
+         45RiK4GCniBmu0WUwzVmJ+VcZAOnWvEFeqTqh2jX4NuW3WIYtyhlPaclwAG/X634Ola1
+         8nbed+Xxb1O6p/y89cCcVlkvuMTbS7DfhhS/4fiR147HREUTWhA27CikRdrQ8H8Q2L+E
+         NDbXpy89y8B69R63QgPxcQA4pS7asVvrcUj2O6YtqpPUE0OwVnNqyV6JS0pm+wRSaV/b
+         wOZOx+tISArUNz8OfL+nOLkh4pbWwyFAqKWsF+OUlMMXGg2op0AcGCai1OFh3y2UOXzP
+         hiyw==
+X-Gm-Message-State: AOAM5321yoKri7wuiiUfTK3h4nubTeaieZsCIt0krHyY/iT5tMwo5e7j
+        3NsI46FXNVQuboo65JJfjXk8YesZAtVInd5DcEDOatqej4w=
+X-Google-Smtp-Source: ABdhPJwYkTUFAWuNfxG2eeYzC1bmqtaLuLPi9zbLWruAaoHho/C6gDaIRWqvnxSFaqodI6g+Jpp58OFp4kfhilzDxLI=
+X-Received: by 2002:a25:d803:0:b0:614:b201:a798 with SMTP id
+ p3-20020a25d803000000b00614b201a798mr20242523ybg.612.1646073861308; Mon, 28
+ Feb 2022 10:44:21 -0800 (PST)
 MIME-Version: 1.0
 References: <f46af838-8b28-79e6-5298-4458b44664ca@mindspring.com>
 In-Reply-To: <f46af838-8b28-79e6-5298-4458b44664ca@mindspring.com>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Mon, 28 Feb 2022 10:31:19 -0800
-X-Gmail-Original-Message-ID: <CAO271m=RNShfq+zRQjX=yK8NkUDwknr0mekJsCg_Rny3s0gUgA@mail.gmail.com>
-Message-ID: <CAO271m=RNShfq+zRQjX=yK8NkUDwknr0mekJsCg_Rny3s0gUgA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 28 Feb 2022 10:44:10 -0800
+Message-ID: <CABBYNZLthsOUzh0ce9co1r9x02FRFPoBkTrpehUtUtMiwiyzGw@mail.gmail.com>
 Subject: Re: Battery1 vs. GATT reporting
 To:     Ed Beroset <beroset@mindspring.com>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -69,37 +62,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Ed,
 
-Your understanding is correct about the purpose of that flag. So I can
-confirm that (1) is true. For (2), I can confirm otherwise, since I am
-able to get both battery values from GATT API and Battery1 API. Here
-is my output:
-
-```
-// pair and connect to an LE device with battery service first (e.g an LE Mouse)
-// [bluetoothctl]# gatt.list-attributes
-// [bluetoothctl]# gatt.select-attribute
-/org/bluez/hci0/dev_C6_XX/service000e/char000f
-
-// via GATT API
-[BluetoothMouse3600:/service000e/char000f]# gatt.read
-Attempting to read /org/bluez/hci0/dev_C6_XX/service000e/char000f
-[CHG] Attribute /org/bluez/hci0/dev_C6_XX/service000e/char000f Value:
-  4d                                               M
-  4d                                               M
-
-// via Battery API
-[BluetoothMouse3600:/service000e/char000f]# info
-Device C6:XX (random)
-        Name: BluetoothMouse3600
-        Alias: BluetoothMouse3600
-        ...
-        Battery Percentage: 0x4e (78)
-[BluetoothMouse3600:/service000e/char000f]#
-```
-
-Could you try the same with bluetoothctl and share the output?
-
-On Mon, Feb 28, 2022 at 6:20 AM Ed Beroset <beroset@mindspring.com> wrote:
+On Mon, Feb 28, 2022 at 9:45 AM Ed Beroset <beroset@mindspring.com> wrote:
 >
 > In
 > https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=713f6f09 a
@@ -118,6 +81,15 @@ On Mon, Feb 28, 2022 at 6:20 AM Ed Beroset <beroset@mindspring.com> wrote:
 > So can someone verify that:
 > 1. the interface is intended to be shared via GATT and Battery1
 > 2. that it does not work that way today
->
-> Ed
->
+
+Did you check if that was not fixed already? It seems to work alright
+with git latest using bluetoothctl:
+
+[NEW] Primary Service (Handle 0x0000)
+/org/bluez/hci0/dev_XX_XX_XX_XX_XX_XX/service0020
+0000180f-0000-1000-8000-00805f9b34fb
+Battery Service
+
+
+-- 
+Luiz Augusto von Dentz
