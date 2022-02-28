@@ -2,74 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97587C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Feb 2022 17:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F46C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Feb 2022 08:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbiB0RhC convert rfc822-to-8bit (ORCPT
+        id S233382AbiB1Iye (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 27 Feb 2022 12:37:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38078 "EHLO
+        Mon, 28 Feb 2022 03:54:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbiB0RhA (ORCPT
+        with ESMTP id S229634AbiB1Iyd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 27 Feb 2022 12:37:00 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7038D22508
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Feb 2022 09:36:20 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1EC2BCEC82;
-        Sun, 27 Feb 2022 18:36:19 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [RFC] Bluetooth: don't use ESCO setup for BT_VOICE
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220227163430.24694-1-pav@iki.fi>
-Date:   Sun, 27 Feb 2022 18:36:18 +0100
-Cc:     linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kiran K <kiran.k@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <77583189-3095-4206-B262-D0D1C655A7B0@holtmann.org>
-References: <20220222212227.24515-1-luiz.dentz@gmail.com>
- <20220227163430.24694-1-pav@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Mon, 28 Feb 2022 03:54:33 -0500
+Received: from smtpproxy21.qq.com (smtpbg701.qq.com [203.205.195.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDDAF1BE97
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Feb 2022 00:53:54 -0800 (PST)
+X-QQ-mid: bizesmtp65t1646038403tua3280w
+Received: from localhost.localdomain (unknown [58.240.82.166])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Mon, 28 Feb 2022 16:53:17 +0800 (CST)
+X-QQ-SSF: 01400000002000C0F000C00A0000000
+X-QQ-FEAT: SD+t2IR+F7O+YhhETfxAYyN2jG/VLDjQ8rddYiB6TdZ9/1JUCMC2Y+I+yAWG3
+        Ehx7ULKn/eqJypYXTr2Z8BaJZpmnZuADiefGszrQzSxTuURZd2QQfqwfeoYNplapcj21T7/
+        NC19q5RGFmDcGzaz+CTnQtuB8TBdZ2n+htJ+4lWfJ9xBjVmLvphnUQGNgAFwUjGt52iCQ9P
+        LyrLeHIiYWCSZfeTXWOXUQiD40lZJM2lIlMkCBJqb1QtwP8H9XpaCK46NY6Ca/CAbFSnS87
+        uSyMrb5GQyjCgAWkuiRpYINyNPNZXfXwFPrTa6V0v5Dx/ILuySJ2PMb4zGUen/VQCjeYYmM
+        DYLv03a7zCb22x9AJSyr4bL06ppgHR6yoSAAtc5N/wtR6RQvbD1d5PIAoOI1w==
+X-QQ-GoodBg: 2
+From:   Meng Tang <tangmeng@uniontech.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Meng Tang <tangmeng@uniontech.com>
+Subject: [PATCH] Bluetooth: btrtl: Fix incorrect bin loading by MODULE_FIRMWARE
+Date:   Mon, 28 Feb 2022 16:53:16 +0800
+Message-Id: <20220228085316.26856-1-tangmeng@uniontech.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign2
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+In brctl, there are some problems which are as follows:
+1. The bin name of MODULE_FIRMWARE is incorrect or the bin does not
+exist.
+2. The bin used in ic_id_table have not added MODULE_FIRMWARE
+declarations.
+3. Sorting confusion.
 
-> According to user reports, how HCI_Enhanced_Setup_Synchronous_Connection
-> is currently used to establish MSBC connections results to broken audio
-> on some adapters (QCA6174, mt7921e).
-> 
-> Revert to previous behavior of using HCI_Setup_Synchronous_Connection,
-> unless the user has explicitly set BT_CODEC sockopt. Since bt_codec
-> contents come from Core specification, use a separate flag for the
-> setting.
-> 
-> Fixes: b2af264ad3af ("Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command")
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=215576
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
-> 
-> Notes:
->    Maybe we want to use the ESCO connect setup only when userspace has
->    requested the codec offload support.  I don't have any of the broken
->    hardware myself, so this is not tested on them.
-> 
->    Alternatively, there should be some driver quirk to indicate the
->    enhanced sco connection setup is not broken.
+Thus, modify incorrect bin names and delete some non-existing bin
+names, add MODULE_FIRMWARE for bins that used in ic_id_table and
+sort by MODULE_FIRMWARE(ctl_bt/*.bin).
 
-yes, these needs to be marked as my hardware is broken.
+Signed-off-by: Meng Tang <tangmeng@uniontech.com>
+---
+ drivers/bluetooth/btrtl.c | 37 +++++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 18 deletions(-)
 
-From a specification point of view, the Enhanced Setup Sync Conn is a super set of the Setup Sync Conn (which is a super set of Add SCO). If implementers screwed that up, we clear spell that out.
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index c2030f7e25b4..e34b0a29f230 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -88,14 +88,14 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = true,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723bs_config" },
++	  .cfg_name = "rtl_bt/rtl8723bs_config-OBDA8723" },
+ 
+ 	/* 8723B */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723b_config" },
++	  .cfg_name = NULL },
+ 
+ 	/* 8723D */
+ 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
+@@ -104,19 +104,12 @@ static const struct id_table ic_id_table[] = {
+ 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
+ 	  .cfg_name = "rtl_bt/rtl8723d_config" },
+ 
+-	/* 8723DS */
+-	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
+-	  .config_needed = true,
+-	  .has_rom_version = true,
+-	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8723ds_config" },
+-
+ 	/* 8821A */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8821a_config" },
++	  .cfg_name = NULL },
+ 
+ 	/* 8821C */
+ 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB),
+@@ -131,7 +124,7 @@ static const struct id_table ic_id_table[] = {
+ 	  .config_needed = false,
+ 	  .has_rom_version = true,
+ 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
+-	  .cfg_name = "rtl_bt/rtl8761a_config" },
++	  .cfg_name = NULL },
+ 
+ 	/* 8761B */
+ 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
+@@ -922,15 +915,23 @@ MODULE_LICENSE("GPL");
+ MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723bs_config-OBDA8723.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723d_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8723d_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761bu_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821c_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8821c_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
+-MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cs_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cs_fw.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cu_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8822cu_fw.bin");
+ MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
++MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
+-- 
+2.20.1
 
-Maybe we messed up the usage of the Enhanced Setup Sync Conn and that should be of course checked. I hope the hardware manufactures can chime in here. Or provide firmware updates.
 
-Regards
-
-Marcel
 
