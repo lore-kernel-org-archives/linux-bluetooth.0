@@ -2,430 +2,228 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62220C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Mar 2022 19:39:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CEAC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Mar 2022 19:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235860AbiCATkX (ORCPT
+        id S237139AbiCATle (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Mar 2022 14:40:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38406 "EHLO
+        Tue, 1 Mar 2022 14:41:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232698AbiCATkX (ORCPT
+        with ESMTP id S235982AbiCATld (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Mar 2022 14:40:23 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38F9F65494
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Mar 2022 11:39:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646163581; x=1677699581;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=CCYRy3VV1KBpJQkNopd4dZW+DCBH0ITm6Y5KWWBQdXQ=;
-  b=ACIwYq/mbF+0ksuaA9oOHNoMEnQHbfdm3TAuA74VjXbldBwl12OS7hxy
-   o3Yd4W7ysMJV933/PaZqaoHTgJnSlCTBxnM8JhU25PNqEtEFCN+8wOwnV
-   U92G/0o//aYMyxLQzMWvYuTjYs0DNFKI+KifVvpoOF9bRADddfWbncJaK
-   cn2O0JMqYbdes5E3JukHQ8CBvVfw03VPJKJVZUk5/dd4VAf9NqErhInMT
-   pRZ335gfwFl4hGdYSM5/uBi16fLqPa0WdwtAYDNlc7m9+c46Fcn4eJg9y
-   416LAuwJobBWFolg68M1mcbJStRklyCSU3CGhIS0UgU/9HS7slk2xucRY
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="236730534"
-X-IronPort-AV: E=Sophos;i="5.90,146,1643702400"; 
-   d="scan'208";a="236730534"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 11:39:40 -0800
-X-IronPort-AV: E=Sophos;i="5.90,146,1643702400"; 
-   d="scan'208";a="535031802"
-Received: from rlucey-mobl.ger.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.91.119])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 11:39:40 -0800
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.von.dentz@intel.com, marcel@holtmann.org, brian.gix@intel.com,
-        tedd.an@intel.com
-Subject: [PATCH v4] Bluetooth: Scrub MGMT cmd pending queue for consistency
-Date:   Tue,  1 Mar 2022 11:39:30 -0800
-Message-Id: <20220301193930.752813-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 1 Mar 2022 14:41:33 -0500
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE80C65495
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Mar 2022 11:40:51 -0800 (PST)
+Received: by mail-wr1-x435.google.com with SMTP id bk29so4854506wrb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Mar 2022 11:40:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=EYiqfeejVjLKTthZUfPChuvieL0v0hl9DhBJkmL65Uw=;
+        b=nxyZV3daXtwFFrtzTBLR4yPbMqZxzm8Kj+0y41g9U1spgqjM26jSew1yWmOS8iochV
+         PUaNYT0W4WkK+a6uspTF6jedoVI0i2J+k8lUKuYr9q1zwqw7nQESQOPWQv7rHd5XH1mY
+         U3QDQ/pvncnIC1cBdtzjpQYNEUBUxc8vzF+VkvBaRNvKzuBEsveTKeTCuBO1/wCVyKRg
+         6mlX95Pbo6f9oKB1cf+Y0cnbEwaRi7MRcWjQLtFhmxYTFA4Pk5WOB+npTbxIjhCWfdYm
+         0u7yeMrONfhwH65iEJoIk7eEN0KHChlk6Z++JvscjMkV8eBDcM9o+rx0/gnjgYaU5jwy
+         qLvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=EYiqfeejVjLKTthZUfPChuvieL0v0hl9DhBJkmL65Uw=;
+        b=g2xtuCBbzxtTgPSQZ+YbMmL3BnC4oUlyg6gZIz0AFa2Wji1QfkVODl6ZEIPsJOSW+/
+         lq2Plsy6GjklHX5uLXBydrbT7q6N6QenRhYrqUML+gQDFsv4kBxp+O8pNC8wa24q7ZeX
+         ZNFL87HKXT4cY+LBqTWQlbRdJGq5ltTL3n8LxnIY6yYF4hzIuxzTA88XIaFYxLHkdj2s
+         PGYJmuA6zfMWa0Z6E0eIl+4i0C+MOvo7em4OV7GSIArQBpSqqtPxnB3pqFR28k0iPxkc
+         vsiM71QpMS9IqQEaFEueP/RUe3LIikUvAo1M9qPoRRyltZsUU5YtJ7YF4cjZiw7w0O04
+         bGxg==
+X-Gm-Message-State: AOAM531x0t2NemBWQzTwukOqqBFR9u3Y+waeZ6VvNO5sLiptAFuOsd+e
+        GbGD7RwRT6QXzzst5vk2Blo=
+X-Google-Smtp-Source: ABdhPJw/v6bBKvJH8MJgF1A/I+trNzWh8e3U3PNLhUqbYpsJnqvKePbRy6svEswyV0jvQGtzkQivUQ==
+X-Received: by 2002:a05:6000:186d:b0:1e8:49fc:69ce with SMTP id d13-20020a056000186d00b001e849fc69cemr20535638wri.80.1646163650424;
+        Tue, 01 Mar 2022 11:40:50 -0800 (PST)
+Received: from [192.168.1.10] (4e691f2a.skybroadband.com. [78.105.31.42])
+        by smtp.googlemail.com with ESMTPSA id i186-20020a1c3bc3000000b00382b25f6c9fsm737841wma.42.2022.03.01.11.40.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 11:40:49 -0800 (PST)
+Message-ID: <032917a9-0c14-16d3-2751-945b9cd766a3@googlemail.com>
+Date:   Tue, 1 Mar 2022 19:40:48 +0000
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: bug kernel 5.17, qualcom and intel adapters, unable to reliably
+ connect to bluetooth devices
+Content-Language: en-GB
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Chris Murphy <lists@colorremedies.com>,
+        Bluetooth <linux-bluetooth@vger.kernel.org>,
+        regressions@lists.linux.dev
+References: <CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com>
+ <b1a4a920-dbba-58be-72b4-2c95b9b79283@googlemail.com>
+ <82216882-463a-8976-e6bc-4a8919107a31@googlemail.com>
+ <CABBYNZ+mO1gQgfwhemY9cqbi8vNLm_60A9c1vPYT2tH4rhgFww@mail.gmail.com>
+ <a35b4b75-bb64-89c8-bacd-d58ed8576272@googlemail.com>
+ <2ce6175c-74ec-8469-80a5-374bd1429542@googlemail.com>
+ <CABBYNZJNTOT-mEQe2cfZiEX6A2pR7+sacBqtBRPRZY69YmgtvA@mail.gmail.com>
+ <17f2bf7e-1d6b-e090-8926-21a408f2b496@googlemail.com>
+ <CABBYNZ+cL4f8xvTJFQGLgqPueE=-UsOtvcPQez0BEsJ5xGppfQ@mail.gmail.com>
+ <16cac2c8-c1ca-c8d7-e3d9-5f00be511614@googlemail.com>
+ <CABBYNZJQOSZ1fecTRQOX+w8crdiLdr0_tVstgbnyEVq3NaxscQ@mail.gmail.com>
+ <6b17bdb5-dddb-e7c7-86f6-2240c6523a81@googlemail.com>
+ <CABBYNZ+2Dg+AdnJqpR=wS0juektNapwHcPHBWdZyvSGFT1dVLQ@mail.gmail.com>
+ <cdfed116-a5ea-0313-ba87-da429a0ac089@googlemail.com>
+ <CABBYNZLnMwod+pgomEfvu83AJ=jM+uqwK9-Eqj6fA9_wXg6HBA@mail.gmail.com>
+ <CABBYNZJvQaD4z_pL2YJnu3Ma8MLmxkUqAHMswd8s9XsE5FNMMw@mail.gmail.com>
+From:   Chris Clayton <chris2553@googlemail.com>
+In-Reply-To: <CABBYNZJvQaD4z_pL2YJnu3Ma8MLmxkUqAHMswd8s9XsE5FNMMw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-A number of places in the MGMT handlers we examine the command queue for
-other commands (in progress but not yet complete) that will interact
-with the process being performed. However, not all commands go into the
-queue if one of:
+Hi
 
-1. There is no negative side effect of consecutive or redundent commands
-2. The command is entirely perform "inline".
+On 01/03/2022 18:57, Luiz Augusto von Dentz wrote:
+> Hi Chris,
+> 
+> On Tue, Mar 1, 2022 at 10:34 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Chris,
+>>
+>> On Tue, Mar 1, 2022 at 1:26 AM Chris Clayton <chris2553@googlemail.com> wrote:
+>>>
+>>> Hi Luiz,
+>>>
+>>> I guess you are hoping for PEBKAC :-)
+>>>
+>>> On 28/02/2022 21:20, Luiz Augusto von Dentz wrote:
+>>>> Hi Chris,
+>>>>
+>>>> On Mon, Feb 28, 2022 at 1:02 PM Chris Clayton <chris2553@googlemail.com> wrote:
+>>>>>
+>>>>> Hi Luiz,
+>>>>>
+>>>>> On 28/02/2022 19:34, Luiz Augusto von Dentz wrote:
+>>>>>> Hi Chris,
+>>>>>>
+>>>>>> On Sat, Feb 26, 2022 at 12:04 AM Chris Clayton <chris2553@googlemail.com> wrote:
+>>>>>>>
+>>>>>>> Hi,
+>>>>>>>
+>>>>>>> On 24/02/2022 15:16, Luiz Augusto von Dentz wrote:
+>>>>>>>>> I'll try another bisection today, but limit its range to changes made in the net/bluetooth directory.
+>>>>>>>
+>>>>>>> That  bisection has proved very difficult because the bluetooth "service" in kernels at some steps of the bisection were
+>>>>>>> completely borked to the extent that blueman's device-manager application wouldn't start and emitted the messages:
+>>>>>>>
+>>>>>>> blueman-manager 12.00.37 ERROR    Manager:137 on_dbus_name_appeared: Default adapter not found, trying first available.
+>>>>>>> blueman-manager 12.00.37 ERROR    Manager:141 on_dbus_name_appeared: No adapter(s) found, exiting
+>>>>>>>
+>>>>>>> Obviously, I don't know whether the problem I am trying to pinpoint is hiding behind this more fundamental problem with
+>>>>>>> the bluetooth "service", so being unable to say whether that kernel was good or bad, I had to skip. There seems to be a
+>>>>>>> batch of commits that mean that, whilst the kernel builds okay, hunting down a bluetooth-related problem is not
+>>>>>>> possible. Eventually and I cursed and gave up. Whatever was causing this breakage has obviously been fixed.
+>>>>>>>
+>>>>>>>> Please record the HCI with btmon, it must be producing something since
+>>>>>>>> it records even the mgmt commands.
+>>>>>>>>
+>>>>>>>
+>>>>>>> Refreshed by a good night's sleep, I started another bisection (between 5.16 and 5.17-rc1) yesterday morning but this
+>>>>>>> time did not limit it to net/bluetooth.  That was going okay until I ran into what I assume is the same batch of borked
+>>>>>>> kernels. I've been more persistent this time but have just had a run of 16 steps in which the bluetooth support in the
+>>>>>>> kernel is broken so badly that testing bluetooth is not possible. I will push on today, but I've suspended that activity
+>>>>>>> to get the hci trace that Luiz has asked for.
+>>>>>>>
+>>>>>>> Using information from the bisect, I built a kernel that had tested as bad (but not borked). The commit is
+>>>>>>> f2b551fad8d8f2ac5e1f810ad595298381e0b0c5. As I've mentioned before, the problem with devices not connecting is
+>>>>>>> intermittent - for a given kernel, sometimes a connection works and other times it doesn't. On the first boot of this
+>>>>>>> kernel, my bluetooth devices could connect, Attached are 4 files related to this - the output from btmon, and the
+>>>>>>> related portions of daemon.log, kern.log and sys.log from /var/log/. Each of the these files is suffixed with ".good".
+>>>>>>>
+>>>>>>> I then powered down the laptop and booted into the same kernel. This time the bluetooth devices could not connect. Four
+>>>>>>> more files are attached for this boot and are suffixed with ".bad". I said in an earlier email that when connection
+>>>>>>> fails, there is no output from btmon, so that log is empty. That's still the case, but I guess that fact itself is a
+>>>>>>> clue to what the problem might be. What I can add, however, is that if, in that same bad kernel, I unload and then
+>>>>>>> reload the btusb module, connections start to work. Maybe that too is a clue. The same unload/load process revives
+>>>>>>> bluetooth on a kernel built after a pull of Linus' latest and greatest this morning.
+>>>>>>>
+>>>>>>> Since I now have a workround, I'm going stop the current bisection that I was doing.  I've done another couple of steps
+>>>>>>> this morning and both produced kernels on which I could not test bluetooth and had to tell git bisect to skip. If
+>>>>>>> however, I can provide any other diagnostics, please let me know.
+>>>>>>>
+>>>>>>> Chris
+>>>>>>
+>>>>>> Can you try with the following patch:
+>>>>>>
+>>>>>> https://patchwork.kernel.org/project/bluetooth/patch/20220228173918.524733-1-brian.gix@intel.com/
+>>>>>>
+>>>>>>
+>>>>> Sorry, that patch has made no difference. After the first boot my headphones connected okay, but after a power-down and
+>>>>> reboot they would not connect without an unload and reload of the btusb module.
+>>>>
+>>>> Can you tell us exactly what steps you are using? Are you applying on
+>>>> top of what, rc6?
+>>>>
+>>>
+>>> Until I got your patch yesterday, I was using a clone of
+>>> git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git which I update frequently and have been doing so for as
+>>> long as I can remember. Just in case there was a hidden flaw in that tree, I took a new clone yesterday, (so yes, the
+>>> patch was tested on top of rc6) copied over the .config file and applied the patch. Then I built and installed the
+>>> kernel, updated grub, powered off the laptop and booted into the new kernel. Once the laptop had booted and logged in to
+>>> my LXQt desktop, I powered on my headphones and a connection was establisehed almost straight away. I powered the
+>>> headphones off and the disconnection worked fine.
+>>>
+>>> Knowing that the problem crops up intermittently, I then rebooted the laptop. When the boot was complete, I then powered
+>>> on my bluetooth headphones an waited for them to connect to the laptop. After about 20 seconds, a connection had not
+>>> been established. I powered off the headphones, used modprobe to unload and then reload the btusb module. When I powered
+>>> on the headphones, a connectiin was established within 2 or 3 seconds.
+> 
+> Ive attempted 5 restart with 5.17.0-0.rc6.109.fc37.x86_64, my headset
+> was able to reconnect every single time without any problem. The only
 
-This change examines each "pending command" check, and if it is not
-needed, deletes the check. Of the remaining pending command checks, we
-make sure that the command is in the pending queue by using the
-mgmt_pending_add/mgmt_pending_remove pair rather than the
-mgmt_pending_new/mgmt_pending_free pair.
+For your five tests, did it connect on the first boot? As I've said, sometimes it fails to connect on the first boot,
+but if it succeeds, it has always failed after a power-off and restart. Looking back at the notes I took during the
+bisect, I've didn't have a single bisection step where I had to boot more more than twice to ascertain that it was a bad
+kernel. As I said, I didn't mark a kernel as good until I'd had five successful boots.
+> normally, once from gdm and then another time when gnome is loading,
+> but I assume it is normal nowadays since it appears when switching
+> session pipewire unregisters its audio endpoints.
+> 
 
-Signed-off-by: Brian Gix <brian.gix@intel.com>
----
- net/bluetooth/mgmt.c      | 99 +++++++++++++++++++++++++--------------
- net/bluetooth/mgmt_util.c | 15 ++++++
- net/bluetooth/mgmt_util.h |  2 +
- 3 files changed, 80 insertions(+), 36 deletions(-)
+I don't use pipewire. Prior to 5.17, bluetooth has worked more or less trouble free for at least 4 years. I've read
+about pipewire in Linux Magazine but don't see what it would bring to my party except complication.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4b15b95e61e6..e5c89aa5e125 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -931,6 +931,11 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	return settings;
- }
- 
-+static bool pending_find_cmd(struct mgmt_pending_cmd *cmd, struct hci_dev *hdev)
-+{
-+	return mgmt_pending_find_cmd(HCI_CHANNEL_CONTROL, cmd, hdev);
-+}
-+
- static struct mgmt_pending_cmd *pending_find(u16 opcode, struct hci_dev *hdev)
- {
- 	return mgmt_pending_find(HCI_CHANNEL_CONTROL, opcode, hdev);
-@@ -1220,7 +1225,13 @@ static int new_settings(struct hci_dev *hdev, struct sock *skip)
- static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct mgmt_pending_cmd *cmd = data;
--	struct mgmt_mode *cp = cmd->param;
-+	struct mgmt_mode *cp;
-+
-+	/* Make sure cmd still outstanding. */
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_POWERED)
-+		return;
-+
-+	cp = cmd->param;
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-@@ -1244,7 +1255,7 @@ static void mgmt_set_powered_complete(struct hci_dev *hdev, void *data, int err)
- 				mgmt_status(err));
- 	}
- 
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- }
- 
- static int set_powered_sync(struct hci_dev *hdev, void *data)
-@@ -1283,7 +1294,7 @@ static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_new(sk, MGMT_OP_SET_POWERED, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, MGMT_OP_SET_POWERED, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -1292,6 +1303,9 @@ static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
- 	err = hci_cmd_sync_queue(hdev, set_powered_sync, cmd,
- 				 mgmt_set_powered_complete);
- 
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
- failed:
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -1385,6 +1399,9 @@ static void mgmt_set_discoverable_complete(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_DISCOVERABLE)
-+		return;
-+
- 	hci_dev_lock(hdev);
- 
- 	if (err) {
-@@ -1404,7 +1421,7 @@ static void mgmt_set_discoverable_complete(struct hci_dev *hdev, void *data,
- 	new_settings(hdev, cmd->sk);
- 
- done:
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -1513,7 +1530,7 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_new(sk, MGMT_OP_SET_DISCOVERABLE, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DISCOVERABLE, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -1540,6 +1557,9 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
- 	err = hci_cmd_sync_queue(hdev, set_discoverable_sync, cmd,
- 				 mgmt_set_discoverable_complete);
- 
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
- failed:
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -1552,6 +1572,9 @@ static void mgmt_set_connectable_complete(struct hci_dev *hdev, void *data,
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_CONNECTABLE)
-+		return;
-+
- 	hci_dev_lock(hdev);
- 
- 	if (err) {
-@@ -1564,7 +1587,9 @@ static void mgmt_set_connectable_complete(struct hci_dev *hdev, void *data,
- 	new_settings(hdev, cmd->sk);
- 
- done:
--	mgmt_pending_free(cmd);
-+	if (cmd)
-+		mgmt_pending_remove(cmd);
-+
- 	hci_dev_unlock(hdev);
- }
- 
-@@ -1636,7 +1661,7 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_new(sk, MGMT_OP_SET_CONNECTABLE, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, MGMT_OP_SET_CONNECTABLE, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -1656,6 +1681,9 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 	err = hci_cmd_sync_queue(hdev, set_connectable_sync, cmd,
- 				 mgmt_set_connectable_complete);
- 
-+	if (err < 0)
-+		mgmt_pending_remove(cmd);
-+
- failed:
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -1776,6 +1804,9 @@ static void set_ssp_complete(struct hci_dev *hdev, void *data, int err)
- 	u8 enable = cp->val;
- 	bool changed;
- 
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_SSP)
-+		return;
-+
- 	if (err) {
- 		u8 mgmt_err = mgmt_status(err);
- 
-@@ -3325,6 +3356,9 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
- 
- 	bt_dev_dbg(hdev, "err %d", err);
- 
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_LOCAL_NAME)
-+		return;
-+
- 	if (status) {
- 		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME,
- 				status);
-@@ -3497,6 +3531,9 @@ static void set_default_phy_complete(struct hci_dev *hdev, void *data, int err)
- 	struct sk_buff *skb = cmd->skb;
- 	u8 status = mgmt_status(err);
- 
-+	if (!pending_find_cmd(cmd, hdev) || cmd->opcode != MGMT_OP_SET_PHY_CONFIGURATION)
-+		return;
-+
- 	if (!status) {
- 		if (!skb)
- 			status = MGMT_STATUS_FAILED;
-@@ -3763,13 +3800,6 @@ static int set_wideband_speech(struct sock *sk, struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	if (pending_find(MGMT_OP_SET_WIDEBAND_SPEECH, hdev)) {
--		err = mgmt_cmd_status(sk, hdev->id,
--				      MGMT_OP_SET_WIDEBAND_SPEECH,
--				      MGMT_STATUS_BUSY);
--		goto unlock;
--	}
--
- 	if (hdev_is_powered(hdev) &&
- 	    !!cp->val != hci_dev_test_flag(hdev,
- 					   HCI_WIDEBAND_SPEECH_ENABLED)) {
-@@ -5040,12 +5070,6 @@ static int read_local_oob_data(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	if (pending_find(MGMT_OP_READ_LOCAL_OOB_DATA, hdev)) {
--		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_READ_LOCAL_OOB_DATA,
--				      MGMT_STATUS_BUSY);
--		goto unlock;
--	}
--
- 	cmd = mgmt_pending_new(sk, MGMT_OP_READ_LOCAL_OOB_DATA, hdev, NULL, 0);
- 	if (!cmd)
- 		err = -ENOMEM;
-@@ -5265,11 +5289,14 @@ static void start_discovery_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct mgmt_pending_cmd *cmd = data;
- 
-+	if (!pending_find_cmd(cmd, hdev))
-+		return;
-+
- 	bt_dev_dbg(hdev, "err %d", err);
- 
- 	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(err),
- 			  cmd->param, 1);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED:
- 				DISCOVERY_FINDING);
-@@ -5331,7 +5358,7 @@ static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
- 	else
- 		hdev->discovery.limited = false;
- 
--	cmd = mgmt_pending_new(sk, op, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, op, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto failed;
-@@ -5340,7 +5367,7 @@ static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
- 	err = hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
- 				 start_discovery_complete);
- 	if (err < 0) {
--		mgmt_pending_free(cmd);
-+		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
- 
-@@ -5434,7 +5461,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
- 	}
- 
--	cmd = mgmt_pending_new(sk, MGMT_OP_START_SERVICE_DISCOVERY,
-+	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
- 			       hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
-@@ -5467,7 +5494,7 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
- 	err = hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
- 				 start_discovery_complete);
- 	if (err < 0) {
--		mgmt_pending_free(cmd);
-+		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
- 
-@@ -5499,11 +5526,14 @@ static void stop_discovery_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct mgmt_pending_cmd *cmd = data;
- 
-+	if (!pending_find_cmd(cmd, hdev))
-+		return;
-+
- 	bt_dev_dbg(hdev, "err %d", err);
- 
- 	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(err),
- 			  cmd->param, 1);
--	mgmt_pending_free(cmd);
-+	mgmt_pending_remove(cmd);
- 
- 	if (!err)
- 		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-@@ -5539,7 +5569,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
--	cmd = mgmt_pending_new(sk, MGMT_OP_STOP_DISCOVERY, hdev, data, len);
-+	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, hdev, data, len);
- 	if (!cmd) {
- 		err = -ENOMEM;
- 		goto unlock;
-@@ -5548,7 +5578,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 	err = hci_cmd_sync_queue(hdev, stop_discovery_sync, cmd,
- 				 stop_discovery_complete);
- 	if (err < 0) {
--		mgmt_pending_free(cmd);
-+		mgmt_pending_remove(cmd);
- 		goto unlock;
- 	}
- 
-@@ -7478,6 +7508,9 @@ static void read_local_oob_ext_data_complete(struct hci_dev *hdev, void *data,
- 	u8 status = mgmt_status(err);
- 	u16 eir_len;
- 
-+	if (!pending_find_cmd(cmd, hdev))
-+		return;
-+
- 	if (!status) {
- 		if (!skb)
- 			status = MGMT_STATUS_FAILED;
-@@ -7973,11 +8006,7 @@ static bool requested_adv_flags_are_valid(struct hci_dev *hdev, u32 adv_flags)
- 
- static bool adv_busy(struct hci_dev *hdev)
- {
--	return (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
--		pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
--		pending_find(MGMT_OP_SET_LE, hdev) ||
--		pending_find(MGMT_OP_ADD_EXT_ADV_PARAMS, hdev) ||
--		pending_find(MGMT_OP_ADD_EXT_ADV_DATA, hdev));
-+	return pending_find(MGMT_OP_SET_LE, hdev);
- }
- 
- static void add_adv_complete(struct hci_dev *hdev, struct sock *sk, u8 instance,
-@@ -8567,9 +8596,7 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	if (pending_find(MGMT_OP_ADD_ADVERTISING, hdev) ||
--	    pending_find(MGMT_OP_REMOVE_ADVERTISING, hdev) ||
--	    pending_find(MGMT_OP_SET_LE, hdev)) {
-+	if (pending_find(MGMT_OP_SET_LE, hdev)) {
- 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADVERTISING,
- 				      MGMT_STATUS_BUSY);
- 		goto unlock;
-diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
-index edee60bbc7b4..c29c34b9aba9 100644
---- a/net/bluetooth/mgmt_util.c
-+++ b/net/bluetooth/mgmt_util.c
-@@ -228,6 +228,21 @@ struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
- 	return NULL;
- }
- 
-+bool mgmt_pending_find_cmd(unsigned short channel,
-+			struct mgmt_pending_cmd *this_cmd, struct hci_dev *hdev)
-+{
-+	struct mgmt_pending_cmd *cmd;
-+
-+	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
-+		if (hci_sock_get_channel(cmd->sk) != channel)
-+			continue;
-+		if (cmd == this_cmd)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- struct mgmt_pending_cmd *mgmt_pending_find_data(unsigned short channel,
- 						u16 opcode,
- 						struct hci_dev *hdev,
-diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
-index 98e40395a383..f61e5b612fc4 100644
---- a/net/bluetooth/mgmt_util.h
-+++ b/net/bluetooth/mgmt_util.h
-@@ -44,6 +44,8 @@ int mgmt_cmd_complete(struct sock *sk, u16 index, u16 cmd, u8 status,
- 
- struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
- 					   struct hci_dev *hdev);
-+bool mgmt_pending_find_cmd(unsigned short channel, struct mgmt_pending_cmd *cmd,
-+					   struct hci_dev *hdev);
- struct mgmt_pending_cmd *mgmt_pending_find_data(unsigned short channel,
- 						u16 opcode,
- 						struct hci_dev *hdev,
--- 
-2.35.1
+ends on how bluetoothd is being
+> started or something.
+> 
 
+Did you see the warnings that read "Bluetooth: hci0: unexpected event 0xff length: 5 > 0"? That seems to indicate that
+something is sending events that are unexpected. What effect will that have?  As I said, according to lshw, my system's
+bluetooth hardware is Intel AX201. Is that what you are testing on?
+
+>>> I've booted this laptop countless times over the last few days. Doing the bisect, I didn't mark a commit as good until I
+>>> had done five boots and been able to connect my headphones on each boot. What I can say from that work is that two
+>>> consecutive boots into a working kernel are very rare. I can't remeber an occasion when it took more than two boots to
+>>> establish that a kernel was bad.
+>>
+>> Do commands such as bluetoothctl power on or scan on works? Try
+>> running bluetoothd -dn from a shell (disable bluetooth.service), also
+>> are there any settings changed in main.conf?
+>>
+
+Sorry, I forgot to answer this question earlier. I haven't changed main.conf. Besides, my bluetooth devices connect
+successfully every time with 5.16.11 and 5.15.25 kernels. As I've said before, that strongly suggests that there is a
+code regression in 5.17.
+
+>>
+>> --
+>> Luiz Augusto von Dentz
+> 
+> 
+> 
