@@ -2,99 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32587C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 13:44:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53313C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 14:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242328AbiCBNpk (ORCPT
+        id S242779AbiCBOKw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 08:45:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50838 "EHLO
+        Wed, 2 Mar 2022 09:10:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236210AbiCBNpj (ORCPT
+        with ESMTP id S242769AbiCBOKu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 08:45:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B41BB5C642
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 05:44:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646228695;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=hvepoNzs1VRMmuURt4Qb/fWyBsChePGthX1yB7b/DFk=;
-        b=DVW+c6RYTNYS5mqd7PQxWYrijSF6XlACBc7fCVXqczsAYDJIItkV1AhAvzJbJaKPYNd8ih
-        gEc9GbFu/6bQ1YveGtg0P9FXkFDfEcZIStoNJNd5tUELjNs84KWrUgrsXk2seI7Bq7ZCTv
-        NOKBLDzmztUYvIjD5t5VLVkk/CEmUZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-628-SIrw-65SPjmE23NapeAs8g-1; Wed, 02 Mar 2022 08:44:50 -0500
-X-MC-Unique: SIrw-65SPjmE23NapeAs8g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C4C3801DDB;
-        Wed,  2 Mar 2022 13:44:49 +0000 (UTC)
-Received: from shalem.redhat.com (unknown [10.39.195.180])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 330F47B616;
-        Wed,  2 Mar 2022 13:44:43 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: [PATCH] Bluetooth: hci_core: Fix unbalanced unlock in set_device_flags()
-Date:   Wed,  2 Mar 2022 14:44:39 +0100
-Message-Id: <20220302134439.515377-1-hdegoede@redhat.com>
+        Wed, 2 Mar 2022 09:10:50 -0500
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80B89C2481
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 06:09:51 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id f4so1178694qvd.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 06:09:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=zrUawacDijnh4O5vC6iZGfb6nFIfCw8xS6BZUXH3lyg=;
+        b=TIf2Gbxtpz37yk66NfJi6yuKHr6BBzFPYtOxepSa0eDFhoSw1EwE8+Dud1d3OBFlHG
+         gj/Kg/xvC75o4lu6adT8v4nHUf9hqlGboU6z26cPC6figB26zjRrzMbiud2mwOGQPWnH
+         QO0utzsBM2wrTN3OYdsrN8fpjvW7KU2532ru0ibPk+MKdMT9INin57bzAQcxVQiWnLQA
+         pWD+SA18rieKZKY2HKRDv/4cnsMpTR3r1DQKyyIBgbvwl70UpwLFfFZ/63kW4Iu91t1P
+         qOFF1sbjfzbIABxaR0GeZ7rjAmnu1MV35DvucCTJKBf2dsn8iSroYOBOp491MMm4hawQ
+         61CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=zrUawacDijnh4O5vC6iZGfb6nFIfCw8xS6BZUXH3lyg=;
+        b=iDs47uXZqlZQB1V5k/km9JQYYurJiK8AX8rwnkq/np3RBllnqxoNZTtITjfAQUn6ER
+         Wn674taoTMjcqHbAnmSyJ/3cM3PP906D0PT3eqBPrt7UURxcjWLAs9vdT8fygnfDX/aW
+         IsBrq/7y4hqDV7QqWPrnAJ2USr1lPULXYVVpkXzaVPie4xDoUyJTqfNdUyQEmDQXPyvy
+         MsWni5XgKpxMWxjs5cFXILVBUIdI85VccKRY0Uzk3Snmt+WL8OrJzG0bCGHE09iWGu5H
+         PuxgqJV32qi53JEshcSA9+00XGeFAa9ThghrfCcTw5h9NnOFdcqyQ/skd0/Jm6gCYOD8
+         aucw==
+X-Gm-Message-State: AOAM531wsCw8CoEYhdNb1Xh1V4him9sH25z0OpHkL9owDumAT+iADzrD
+        C2+U6tk198KJa3cWjN+iK6bd1+sJKvo=
+X-Google-Smtp-Source: ABdhPJwjt8Tkv8kb9rge556vZAY3mlL+j+DcPBT5kIB4t95DgbwfNmlxmfwyVMwkATZ7hy78Ve1i8w==
+X-Received: by 2002:a05:6214:27e4:b0:42e:a257:b77c with SMTP id jt4-20020a05621427e400b0042ea257b77cmr21042103qvb.62.1646230190289;
+        Wed, 02 Mar 2022 06:09:50 -0800 (PST)
+Received: from [172.17.0.2] ([13.82.126.25])
+        by smtp.gmail.com with ESMTPSA id s19-20020ac85cd3000000b002de4e165ae0sm11290349qta.75.2022.03.02.06.09.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 06:09:50 -0800 (PST)
+Message-ID: <621f7aae.1c69fb81.1e0a4.91fc@mx.google.com>
+Date:   Wed, 02 Mar 2022 06:09:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4429384641586876618=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
+Subject: RE: Bluetooth: hci_core: Fix unbalanced unlock in set_device_flags()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220302134439.515377-1-hdegoede@redhat.com>
+References: <20220302134439.515377-1-hdegoede@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There is only one "goto done;" in set_device_flags() and this happens
-*before* hci_dev_lock() is called, move the done label to after the
-hci_dev_unlock() to fix the following unlock balance:
+--===============4429384641586876618==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[   31.493567] =====================================
-[   31.493571] WARNING: bad unlock balance detected!
-[   31.493576] 5.17.0-rc2+ #13 Tainted: G         C  E
-[   31.493581] -------------------------------------
-[   31.493584] bluetoothd/685 is trying to release lock (&hdev->lock) at:
-[   31.493594] [<ffffffffc07603f5>] set_device_flags+0x65/0x1f0 [bluetooth]
-[   31.493684] but there are no more locks to release!
+This is automated email and please do not reply to this email!
 
-Note this bug has been around for a couple of years, but before
-commit fe92ee6425a2 ("Bluetooth: hci_core: Rework hci_conn_params flags")
-supported_flags was hardcoded to "((1U << HCI_CONN_FLAG_MAX) - 1)" so
-the check for unsupported flags which does the "goto done;" never
-triggered.
+Dear submitter,
 
-Fixes: fe92ee6425a2 ("Bluetooth: hci_core: Rework hci_conn_params flags")
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619579
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.68 seconds
+GitLint                       PASS      0.97 seconds
+SubjectPrefix                 PASS      0.85 seconds
+BuildKernel                   PASS      36.20 seconds
+BuildKernel32                 PASS      31.72 seconds
+Incremental Build with patchesPASS      43.70 seconds
+TestRunner: Setup             PASS      564.00 seconds
+TestRunner: l2cap-tester      PASS      15.37 seconds
+TestRunner: bnep-tester       PASS      7.22 seconds
+TestRunner: mgmt-tester       PASS      117.53 seconds
+TestRunner: rfcomm-tester     FAIL      9.09 seconds
+TestRunner: sco-tester        PASS      8.99 seconds
+TestRunner: smp-tester        PASS      8.92 seconds
+TestRunner: userchan-tester   PASS      7.47 seconds
+
+Details
+##############################
+Test: TestRunner: rfcomm-tester - FAIL - 9.09 seconds
+Run test-runner with rfcomm-tester
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Basic RFCOMM Socket Client - Write 32k Success       Failed       0.188 seconds
+
+
+
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 37087cf7dc5a..f05b9b73e84b 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4513,9 +4513,9 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		}
- 	}
- 
--done:
- 	hci_dev_unlock(hdev);
- 
-+done:
- 	if (status == MGMT_STATUS_SUCCESS)
- 		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
- 				     supported_flags, current_flags);
--- 
-2.35.1
 
+--===============4429384641586876618==--
