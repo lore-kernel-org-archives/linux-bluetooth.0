@@ -2,208 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8093BC43217
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 04:57:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ADAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 06:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234367AbiCBE60 (ORCPT
+        id S236068AbiCBGoh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Mar 2022 23:58:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37228 "EHLO
+        Wed, 2 Mar 2022 01:44:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233841AbiCBE60 (ORCPT
+        with ESMTP id S231331AbiCBGog (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Mar 2022 23:58:26 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27B532D1E2
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Mar 2022 20:57:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646197063; x=1677733063;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=oac9i9snsjvwGQZNlC8TzcDuHRw2LoLRRM0/J7AoWSU=;
-  b=cqvGJqGJFv+Y1LbDzCylAsEIkcZLo65TuVpWffGY/dv8fxSv87qH6vp4
-   Dd3bs3O4Zg9gHZwWefjIZIiSLoeJtBA1y17xcW2l1uZm5kXpQ9Y7ZJ8mI
-   CPnDNau2OK973t4LMZrK9WC+tuJqKT7rDtg01b3zcLDZaf7uzuhwRr93e
-   gpdPKX/nPp1iMC9ksx1hyOgQPzKDQ5PlAbCOxfNX5JIFKiTK9Q4Cmn4L/
-   RcLAEsPpdEDSIE74tXWb/O/GAtGgeOB67211HgziIGgnJdD0RWTZwonB6
-   ijLMEsoq2v+hP9t97DwvM2E1NibZi9trredniErY2NFK16EZljOAoni7E
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10273"; a="253506135"
-X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
-   d="scan'208";a="253506135"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Mar 2022 20:57:42 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,148,1643702400"; 
-   d="scan'208";a="709365668"
-Received: from lkp-server02.sh.intel.com (HELO e9605edfa585) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 01 Mar 2022 20:57:41 -0800
-Received: from kbuild by e9605edfa585 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nPH3U-00014t-LU; Wed, 02 Mar 2022 04:57:40 +0000
-Date:   Wed, 02 Mar 2022 12:57:05 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 8c9fa1be6896314a67fdf87ee160551a892d6d51
-Message-ID: <621ef921.pQ1Ud6bIc3ngX6xp%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 2 Mar 2022 01:44:36 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A8A60DA8
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Mar 2022 22:43:54 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id a5so1037809pfv.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Mar 2022 22:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QZ9QuUbnnno5e4ENBA2QznXjOtydSkfYpGbBShy0RE8=;
+        b=pMF/TrCa/4PxjbnGy7SGmUdmUx6DmahYDGZp7lWS5JPkiR/1WmErq8MJrvso5UQvPd
+         TnJPJg4U/ph4eKUS8gyqVp/K5+QWcBFJw1eU4DibLs9iUjRff0gs5vm7BjN5Nxc+E70e
+         Y+ekEUVUqAAF+Fz0NWCiRtrJpFI+ZJtOLyuw3idCIjh8tUF66WHVWIhBamQT5Sfd/Ocm
+         VZWRrZXrflfrYm9M42JnNITPerAaWWzeGwFKXppcaw05ae44aWOPzlwM/HAcTY8qAk41
+         E4zmfIxQMY43/CoNSxtwY6dGbSmsxO89TdhZv/ROFpAOtZLSVo81WfR3LmWO0+Ad8HaD
+         zVmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QZ9QuUbnnno5e4ENBA2QznXjOtydSkfYpGbBShy0RE8=;
+        b=fdRjNpgYAvoemrWtpTRMpTv8e1yH1QEXcODwYPAEfgVbnC8+zrxo826heTW1su0Xyx
+         NbUSVYX+3zFXkT2eHCK78VhGrCgSEaX4Cv3gwnPExM8r13s/c3ygyB3PWxz4BXCXh4rF
+         3fOCE6lmAOdKVgl86JTt4xmTNme62m/yUB3YexnE6Z81GXFzBzIoEbEUlJ1h/pg6mY9w
+         5/JdWtwHiw0A0/V/XwLW4K6kfTg+y1TP+eu2+p+vMoSQ6na5cMOsyIUGVxmmfrRdbnvP
+         3KScuQMLs8wIIrBeFzc7xgI4DiLBB34hYESHjG3F9LP4q9YgFuw4alIL6ddAvlrYHc2S
+         j+Rw==
+X-Gm-Message-State: AOAM533bSfs6CR/UEz4rBgvtSEKsNteWGBISt1WxcvcDfkvWle7zrE5D
+        6LAUtuH2c2M/zrePYkHc3GEClnOu7Ic=
+X-Google-Smtp-Source: ABdhPJz8OSnc/EOzxa51Bmu/mQclN+5y9XmCGWOFITl0XI3k4HmXQrXyexZ7FUjHS7cZwKJsHYv3aQ==
+X-Received: by 2002:a63:515:0:b0:379:460f:7bda with SMTP id 21-20020a630515000000b00379460f7bdamr2201239pgf.534.1646203433402;
+        Tue, 01 Mar 2022 22:43:53 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id m12-20020a17090a2c0c00b001bc4cf0107esm3962205pjd.53.2022.03.01.22.43.52
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Mar 2022 22:43:53 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work
+Date:   Tue,  1 Mar 2022 22:43:51 -0800
+Message-Id: <20220302064351.225212-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 8c9fa1be6896314a67fdf87ee160551a892d6d51  Bluetooth: mediatek: fix the conflict between mtk and msft vendor event
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-elapsed time: 720m
+The could be multiple hci_cmd_sync_work_entry enqueued when
+hci_cmd_sync_work is executed so this makes sure they are all
+dequeued properly.
 
-configs tested: 128
-configs skipped: 3
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                          randconfig-c001
-powerpc                         ps3_defconfig
-arm                       multi_v4t_defconfig
-arc                                 defconfig
-openrisc                  or1klitex_defconfig
-ia64                            zx1_defconfig
-arm                     eseries_pxa_defconfig
-powerpc                      mgcoge_defconfig
-arc                    vdk_hs38_smp_defconfig
-mips                        vocore2_defconfig
-powerpc                      tqm8xx_defconfig
-arm                         nhk8815_defconfig
-powerpc                mpc7448_hpc2_defconfig
-xtensa                              defconfig
-arm                        oxnas_v6_defconfig
-sh                          polaris_defconfig
-sh                          urquell_defconfig
-arm                          gemini_defconfig
-sh                        sh7757lcr_defconfig
-mips                            ar7_defconfig
-powerpc                      arches_defconfig
-powerpc                        warp_defconfig
-mips                           ip32_defconfig
-sh                            hp6xx_defconfig
-arm                            zeus_defconfig
-arm                         assabet_defconfig
-sh                           se7343_defconfig
-mips                  decstation_64_defconfig
-sh                            migor_defconfig
-m68k                        stmark2_defconfig
-arm                       imx_v6_v7_defconfig
-arc                           tb10x_defconfig
-microblaze                          defconfig
-m68k                          multi_defconfig
-arm                         axm55xx_defconfig
-sh                         ecovec24_defconfig
-sh                           se7780_defconfig
-arm                  randconfig-c002-20220301
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-arc                  randconfig-r043-20220301
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                         rhel-8.3-kunit
-x86_64                                  kexec
-
-clang tested configs:
-x86_64                        randconfig-c007
-powerpc              randconfig-c003-20220301
-riscv                randconfig-c006-20220301
-i386                          randconfig-c001
-arm                  randconfig-c002-20220301
-mips                 randconfig-c004-20220301
-powerpc                     mpc5200_defconfig
-arm                                 defconfig
-powerpc                  mpc866_ads_defconfig
-arm                          imote2_defconfig
-mips                     cu1830-neo_defconfig
-mips                      pic32mzda_defconfig
-mips                           rs90_defconfig
-powerpc                      walnut_defconfig
-riscv                    nommu_virt_defconfig
-arm                         bcm2835_defconfig
-arm                         palmz72_defconfig
-arm                         orion5x_defconfig
-arm                        spear3xx_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a011
-i386                          randconfig-a013
-i386                          randconfig-a015
-hexagon              randconfig-r045-20220301
-hexagon              randconfig-r041-20220301
-riscv                randconfig-r042-20220301
-s390                 randconfig-r044-20220301
-
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ net/bluetooth/hci_sync.c | 65 ++++++++++++++++++++++++----------------
+ 1 file changed, 39 insertions(+), 26 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index d146d4efae43..724d34bdd62a 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -273,43 +273,56 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync_status);
+ 
+-static void hci_cmd_sync_work(struct work_struct *work)
++
++static void hci_cmd_sync_work_entry_run(struct hci_dev *hdev,
++					struct hci_cmd_sync_work_entry *entry)
+ {
+-	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
+-	struct hci_cmd_sync_work_entry *entry;
+ 	hci_cmd_sync_work_func_t func;
+ 	hci_cmd_sync_work_destroy_t destroy;
+ 	void *data;
++	int err;
+ 
+-	bt_dev_dbg(hdev, "");
++	bt_dev_dbg(hdev, "entry %p", entry);
+ 
+-	mutex_lock(&hdev->cmd_sync_work_lock);
+-	entry = list_first_entry(&hdev->cmd_sync_work_list,
+-				 struct hci_cmd_sync_work_entry, list);
+-	if (entry) {
+-		list_del(&entry->list);
+-		func = entry->func;
+-		data = entry->data;
+-		destroy = entry->destroy;
+-		kfree(entry);
+-	} else {
+-		func = NULL;
+-		data = NULL;
+-		destroy = NULL;
+-	}
+-	mutex_unlock(&hdev->cmd_sync_work_lock);
++	func = entry->func;
++	data = entry->data;
++	destroy = entry->destroy;
++	kfree(entry);
+ 
+-	if (func) {
+-		int err;
++	if (!func)
++		return;
++
++	hci_req_sync_lock(hdev);
++
++	err = func(hdev, data);
+ 
+-		hci_req_sync_lock(hdev);
++	if (destroy)
++		destroy(hdev, data, err);
+ 
+-		err = func(hdev, data);
++	hci_req_sync_unlock(hdev);
++}
+ 
+-		if (destroy)
+-			destroy(hdev, data, err);
++static void hci_cmd_sync_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
++	struct hci_cmd_sync_work_entry *entry;
++
++	bt_dev_dbg(hdev, "");
++
++	while (1) {
++		mutex_lock(&hdev->cmd_sync_work_lock);
++		entry = list_first_entry_or_null(&hdev->cmd_sync_work_list,
++						 struct hci_cmd_sync_work_entry,
++						 list);
++		if (!entry) {
++			mutex_unlock(&hdev->cmd_sync_work_lock);
++			break;
++		}
++
++		list_del(&entry->list);
++		mutex_unlock(&hdev->cmd_sync_work_lock);
+ 
+-		hci_req_sync_unlock(hdev);
++		hci_cmd_sync_work_entry_run(hdev, entry);
+ 	}
+ }
+ 
+-- 
+2.35.1
+
