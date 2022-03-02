@@ -2,103 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FE85C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 21:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D64C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 22:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245375AbiCBVh0 (ORCPT
+        id S243657AbiCBWRm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 16:37:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45432 "EHLO
+        Wed, 2 Mar 2022 17:17:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245358AbiCBVhW (ORCPT
+        with ESMTP id S230045AbiCBWRl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 16:37:22 -0500
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D9C5640A;
-        Wed,  2 Mar 2022 13:36:37 -0800 (PST)
-Received: by mail-yb1-xb29.google.com with SMTP id g1so6186206ybe.4;
-        Wed, 02 Mar 2022 13:36:37 -0800 (PST)
+        Wed, 2 Mar 2022 17:17:41 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4C9D204F
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 14:16:57 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id g7-20020a17090a708700b001bb78857ccdso6045180pjk.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 14:16:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=F9su24UUCpFbzNjnzich2MRj6bAe/1UrU40e7yTrYl4=;
-        b=kJYAGOURvvI51nvUQxCcdujpjcu86BIy/7PcVFcAJWYVOU+VYmjLG9uxZrne+ZHDgf
-         wtt7Kypti4GRddq2ZjajoyBnDi7tp09Cga9N7UzWlurwi96LioKSp8NONWFv5sT++x/h
-         h1WBPZHYIaPO5XacD02pjmsgSaHO6XXw9lqnlBJZ8+nPI42KCQpKwvtxWQvQz8fKku5f
-         gFc9tMlKx0mCEsRRlTZWPyER9U3zCGb/3DXO5eD8tMlpAluM0TeeXOqPHirtTqo8eSm0
-         0QWH5oMH1IqlROCrEpPnw21RjBWG22y6EHp2rBGdiYKJDjOePeQLu1Vhc3lIvK4Imm4x
-         p5Uw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=TaU9ENhNj0yhSiVX+DvnkwGgr4nlaHMox1SjVtDD0/M=;
+        b=jeE+nEGBQl228MU2oAqHe9iPaL7pg3hBQt8IVOyrLi9WNZ6EHvf+HIGuh+lP/Qthek
+         HEphYUcnDoLDU0GposP/4kgq8qbrjs26JQWoNI1yJxibXRwx0VSWrWotOyR+A0YSx5DR
+         DTGYcrZB1UMHMabfUegpsvAFOAfw49sBolqZ22u6AuZQpuR7ZCBc9vSkhFbvvgRlbpn+
+         UPue6rRir3FbBcHU9jDQBGfmTJ/sYhdQ3ofwM/9MAvulu7Ntrx8N0u4CjFjlSeoPyLrc
+         67PQfo11h8dooMSOptpGqHbtDaIiWUZgL6T7ZE9iczSyGbnI/VkWHMuZDCfF9wiQcP4v
+         7+qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=F9su24UUCpFbzNjnzich2MRj6bAe/1UrU40e7yTrYl4=;
-        b=JWqXaFIgqrxP2j8EZHSwzPbAJyq5fDaTMNGghNein14AYt2H7EitiPgHHW+S3ZIs6x
-         S3ht+ln75f74A7hetB+PqsVo+5QIBP82plYIAY/Be8Hbbw990+45Gj8vqSGHPeteybZh
-         bUnmtWyjDgs0SWXPalE1DPfMnxmyKEuSdq7IzWJlHxrehBCnJGoK5Ez87tL6zq5fJT1X
-         PR7yuwcaD9OuX/zo8Z8iB8lZzddZHvBaEVQCRPqavcc45SFLNPY24vUFektGNuLc9zne
-         ALXl1qr/CIS6gHM8oHxSCOVh0UeBIAOX4yKcXq5/zVu/S2TzlUK/aW9EViDTyTRE3tJs
-         Ec+w==
-X-Gm-Message-State: AOAM5320W4XrRAGku9lyLkyp7z8Zr1teXjx+NM6uZmWzinFFWdJHhgT9
-        dvFMlvnFTU1uNFKzS5JNQ1BLDr5+KxKnXRu03tY=
-X-Google-Smtp-Source: ABdhPJw7BiPedTto2QQEQGe/650vKh+a92S6h573kPbrCj+bZkGHT0XJF4cXuWxFhf6Ef1veMooEo6KVj72th/wvP+w=
-X-Received: by 2002:a25:8546:0:b0:61e:1d34:ec71 with SMTP id
- f6-20020a258546000000b0061e1d34ec71mr29825208ybn.259.1646256996745; Wed, 02
- Mar 2022 13:36:36 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=TaU9ENhNj0yhSiVX+DvnkwGgr4nlaHMox1SjVtDD0/M=;
+        b=69KcSPNYvy0eInEWL5Q0sEmHaxXAQzAcx1wEm0vCOMwfZIBmh/PgpBGKAJC5T0fNJy
+         vN5FwOPoF/KjIbLqlkFq4wDa/qRlhKWYS+sMuGztIUvK2Q3lQouDW2EMTM49X3NH+GO+
+         YtmsjakvBzNJJFq2CeQe6D55moxnpSYtzXH5q/cyE+U2O0cR6GwluhQ9fkXCi9eEEMTf
+         tp2mlmc3qdNttyOzUWDTaSFNaiOO90CZMqwxzvMIcywv/I45pv/dawZ9JwBLGtSN3mXz
+         A7v6w9vrtFlFUCRb4GjPr8EfCiXuTdK7jH0Fiw4+gIe2KJnf0xWJp0bynw3DAfFWvfvL
+         MMCg==
+X-Gm-Message-State: AOAM532p3iNAmWKP0PA/XyF4gEMBhL4RzUJHz+XYIvwYdh8oy6o2P5/f
+        lU2FTzlJAm4qlZIb1cAMvjTbIVQAhbE=
+X-Google-Smtp-Source: ABdhPJwTA+cpjuX9TTg8KMFZ0Zjig4UVYCTCCxzebQBpMysP8fpdlbkQJspxT/PdrWziKm5WUew4GA==
+X-Received: by 2002:a17:90a:1188:b0:1bd:36d0:d7b2 with SMTP id e8-20020a17090a118800b001bd36d0d7b2mr1912677pja.223.1646259416633;
+        Wed, 02 Mar 2022 14:16:56 -0800 (PST)
+Received: from [172.17.0.2] ([13.83.218.124])
+        by smtp.gmail.com with ESMTPSA id k130-20020a633d88000000b00378c359ea29sm138737pga.12.2022.03.02.14.16.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 14:16:56 -0800 (PST)
+Message-ID: <621fecd8.1c69fb81.23697.09cc@mx.google.com>
+Date:   Wed, 02 Mar 2022 14:16:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1495011494278007846=="
 MIME-Version: 1.0
-References: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 2 Mar 2022 13:36:25 -0800
-Message-ID: <CABBYNZKpZ+tA0YuBFzwug-W3Bcx9GuL4hcrPSfSQt0VnbZi58A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Don't assign twice the same value
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2] Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220302210245.392267-1-luiz.dentz@gmail.com>
+References: <20220302210245.392267-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Christophe,
+--===============1495011494278007846==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 2, 2022 at 12:18 PM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
->
-> data.pid is set twice with the same value. Remove one of these redundant
-> calls.
->
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
->  net/bluetooth/l2cap_core.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index e817ff0607a0..0d460cb7f965 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -1443,7 +1443,6 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
->         data.pdu.scid[0]     = cpu_to_le16(chan->scid);
->
->         chan->ident = l2cap_get_ident(conn);
-> -       data.pid = chan->ops->get_peer_pid(chan);
+This is automated email and please do not reply to this email!
 
-Perhaps we should do if (!data->pid) then since afaik one can do
-connect without bind.
+Dear submitter,
 
->         data.count = 1;
->         data.chan = chan;
-> --
-> 2.32.0
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619699
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.87 seconds
+GitLint                       FAIL      0.46 seconds
+SubjectPrefix                 PASS      0.32 seconds
+BuildKernel                   PASS      34.50 seconds
+BuildKernel32                 PASS      30.26 seconds
+Incremental Build with patchesPASS      42.30 seconds
+TestRunner: Setup             PASS      545.20 seconds
+TestRunner: l2cap-tester      PASS      14.76 seconds
+TestRunner: bnep-tester       PASS      6.57 seconds
+TestRunner: mgmt-tester       PASS      113.78 seconds
+TestRunner: rfcomm-tester     FAIL      8.42 seconds
+TestRunner: sco-tester        PASS      8.55 seconds
+TestRunner: smp-tester        PASS      8.35 seconds
+TestRunner: userchan-tester   PASS      6.92 seconds
+
+Details
+##############################
+Test: GitLint - FAIL - 0.46 seconds
+Run gitlint with rule in .gitlint
+[v2] Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work
+10: B1 Line exceeds max length (103>80): "Link: https://lore.kernel.org/all/CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com/T/"
 
 
--- 
-Luiz Augusto von Dentz
+##############################
+Test: TestRunner: rfcomm-tester - FAIL - 8.42 seconds
+Run test-runner with rfcomm-tester
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Basic RFCOMM Socket Client - Write 32k Success       Failed       0.178 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1495011494278007846==--
