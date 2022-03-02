@@ -2,86 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F792C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 00:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6594CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 00:44:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238781AbiCBAoP (ORCPT
+        id S238791AbiCBApC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Mar 2022 19:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54372 "EHLO
+        Tue, 1 Mar 2022 19:45:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbiCBAoO (ORCPT
+        with ESMTP id S238787AbiCBApC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Mar 2022 19:44:14 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF0E75E776;
-        Tue,  1 Mar 2022 16:43:32 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id y11so405307pfa.6;
-        Tue, 01 Mar 2022 16:43:32 -0800 (PST)
+        Tue, 1 Mar 2022 19:45:02 -0500
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4595B5E776
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Mar 2022 16:44:20 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id 11so266854qtt.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Mar 2022 16:44:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fp/ZzC2cCQ2Io+M+604eQm7eXnqtJaZUFyzMY2YG4e4=;
-        b=MfFzGIps6M/RpO6zEdt6Gh5s1OyHw8P6HX6DsV3Ua9TMoQF+2a6ZDXJeuhDVvFxY1H
-         TkjpTdvzJMdM5x7mNJqkXJZ7jRdHMCHk2lGvCl3Fyiao09PTeZkLtaGTKBEXdUUPmJe8
-         6s2JZy3Er2b8tfOoftN7Tf3rEPYw1CBVk90ccdGvazcHQF25FbdXZ6T1Wfxw6A7iZ7RR
-         /lpz9AJNu6llTUwBjrcq+OIjJfOAc5BJD/D12tKZJ9hmQaPloELTFlPQcbZqYHiLldE3
-         6AXI3kz6xSgTpesmBz03ML7k8aRonqPnS0zTtNhYLt9C27gTIc9P/oV/QmntahSyeroF
-         FrCQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=PrX/VrRQrt9kxfexIos3FT+CR5p4DXW3HCcahCZxMCI=;
+        b=hIWDAZzSyDX8o6UFV6iN9LL4yD16qLIs97UKs7cJ4iPGrBjLwlnOm9pHfaPkYN+E22
+         d8hhXlIfz5tJyPgMVIyYT8UtVTWBkmBqcQjOVZsh3iPM5wOcpQI4aSxLDsmed68qVVIt
+         i3mNpY2rePMuPlB2c1cb5KQtlDlPlkPD9uosv8miw3SjP1tpObyTih90ubczUcwSfUzK
+         5vyDI6SRTavbl1dB9/iRE/HEKdDrPh9gOca5o47HVoURRlXWhybYbLGlotBQMbgXmcZr
+         L1mTtSV8EMCbP74RNa7tnvJW14mU4h9xcUG8H0xONHs9ap/x3oSB5ujQAw2OyrNqVVfv
+         p6/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fp/ZzC2cCQ2Io+M+604eQm7eXnqtJaZUFyzMY2YG4e4=;
-        b=tYm3NvSBSKVAjTPVM11tDs/FKrjctuy7+g6gE9b4lJIKBgrODB/QtYn3DvDu813M1p
-         mdMgVnAaPbYOQGBnXIrzanrZAG+oMH5xhRSJCbtBjATGCPnRmA49KCnk9RXTrXVuedQ3
-         883yEjkwzmVofH3UBXlOhAS1+cqmpPbeuZ+aOxU1L67aNFN91wU7UJVhtRSg5GYyWddM
-         MBzxYJsBrfPAGs/7Qd6kcdwCAg2jN+0lwE/OqKXGWBfwxqNZmx03m8t0+ULnL9zeiKMA
-         i+VCpeEFMSFfSMa+Yo5LtB5Tmnae9AW5NR41Hp/piTXKx4FKbBh8YS4TliEMx3Q5Gcto
-         3jfw==
-X-Gm-Message-State: AOAM53138qfDM3jUIyQK949OYABp0mCkrX9yCzVqq1Ucy9C2KXnavLkc
-        xXjrzXDh8OjERmDxgvqJgCdcCvkV8Eg=
-X-Google-Smtp-Source: ABdhPJxEg290Uy1RuipYnwv0zJsQxgPpaDyhoftDKqyws7uGD5nLvyxlPaD10XUTCITGaP8iB1FXiQ==
-X-Received: by 2002:a63:e54d:0:b0:375:5987:af5d with SMTP id z13-20020a63e54d000000b003755987af5dmr24160022pgj.14.1646181812227;
-        Tue, 01 Mar 2022 16:43:32 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 6-20020a630006000000b0036d11540db8sm14046833pga.76.2022.03.01.16.43.31
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=PrX/VrRQrt9kxfexIos3FT+CR5p4DXW3HCcahCZxMCI=;
+        b=d/WXAI4LcVtT3xv64yc7Zhx3qWuYJZxZFYhx+AMGfeWPzZk8HBKhoqQfzRicqvj10g
+         XLOM00WsV8ckqmMRy/8L8ftaOy3NwPuZEpP9FwLHM94iiJkqR3r0EIoslVCtEV5jkdAk
+         8+Usrr815yzPDy1M67Iet/nZ48WL3FyeYgM57rwv71ExLom1cqCLQLOL2EDOyHAan5Ug
+         sRHAVANjjt3kzj3gQCDmoYf/2yEFaTuKw8VU1MZcq5e7cntm1uimZIMTbZKx9znNv7GN
+         GQUzx8qp3vJw/a4ivSChTD2UJO/pyR0tUpmzg3Rc4NLSCGfF7wn7yFvkzs/uqmjiD/SI
+         zHLQ==
+X-Gm-Message-State: AOAM532W0TL/IE/ukEerWlbhbvTMNXnb/129F3an6V1pt6Wk8ZVxjq8U
+        pRPwqgAKNOK7fmAWi59OuUoXdykkNzlT4w==
+X-Google-Smtp-Source: ABdhPJxRwRK93ZsWxSQiD2ytZ51rzgN9cSGyIzV3//SmfvCg3VfPqH1sS+Abs1jUQByYeYx+BRRDFw==
+X-Received: by 2002:ac8:5809:0:b0:2de:a097:98ca with SMTP id g9-20020ac85809000000b002dea09798camr21367435qtg.252.1646181859162;
+        Tue, 01 Mar 2022 16:44:19 -0800 (PST)
+Received: from [172.17.0.2] ([20.122.121.54])
+        by smtp.gmail.com with ESMTPSA id d77-20020ae9ef50000000b00649555ce936sm7864644qkg.83.2022.03.01.16.44.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 16:43:31 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2022-03-01
-Date:   Tue,  1 Mar 2022 16:43:30 -0800
-Message-Id: <20220302004330.125536-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 01 Mar 2022 16:44:19 -0800 (PST)
+Message-ID: <621ebde3.1c69fb81.4f0e1.a85e@mx.google.com>
+Date:   Tue, 01 Mar 2022 16:44:19 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0720909529738729393=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] shared/shell: Introduce bt_shell_exec
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220301233045.109794-1-luiz.dentz@gmail.com>
+References: <20220301233045.109794-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit caef14b7530c065fb85d54492768fa48fdb5093e:
+--===============0720909529738729393==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  net: ipa: fix a build dependency (2022-02-28 11:44:27 +0000)
+This is automated email and please do not reply to this email!
 
-are available in the Git repository at:
+Dear submitter,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-03-01
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619349
 
-for you to fetch changes up to 275f3f64870245b06188f24bdf917e55a813d294:
+---Test result---
 
-  Bluetooth: Fix not checking MGMT cmd pending queue (2022-03-01 16:10:58 -0800)
+Test Summary:
+CheckPatch                    PASS      1.51 seconds
+GitLint                       PASS      1.07 seconds
+Prep - Setup ELL              PASS      51.80 seconds
+Build - Prep                  PASS      0.83 seconds
+Build - Configure             PASS      10.43 seconds
+Build - Make                  PASS      1500.30 seconds
+Make Check                    PASS      12.38 seconds
+Make Check w/Valgrind         PASS      533.05 seconds
+Make Distcheck                PASS      278.20 seconds
+Build w/ext ELL - Configure   PASS      10.45 seconds
+Build w/ext ELL - Make        PASS      1473.77 seconds
+Incremental Build with patchesPASS      0.00 seconds
 
-----------------------------------------------------------------
-bluetooth pull request for net:
 
- - Fix regression with scanning not working in some systems.
 
-----------------------------------------------------------------
-Brian Gix (1):
-      Bluetooth: Fix not checking MGMT cmd pending queue
+---
+Regards,
+Linux Bluetooth
 
- net/bluetooth/mgmt.c | 99 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 63 insertions(+), 36 deletions(-)
+
+--===============0720909529738729393==--
