@@ -2,96 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 813DFC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 19:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28599C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 19:18:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244988AbiCBTRZ convert rfc822-to-8bit (ORCPT
+        id S233901AbiCBTT0 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 14:17:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43038 "EHLO
+        Wed, 2 Mar 2022 14:19:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243467AbiCBTRZ (ORCPT
+        with ESMTP id S242314AbiCBTTY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 14:17:25 -0500
+        Wed, 2 Mar 2022 14:19:24 -0500
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56BD851317;
-        Wed,  2 Mar 2022 11:16:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E12873334A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 11:18:37 -0800 (PST)
 Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 39BE6CED10;
-        Wed,  2 Mar 2022 20:16:40 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 16974CED12;
+        Wed,  2 Mar 2022 20:18:37 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH] bluetooth: hci_event: don't print an error on vendor
- events
+Subject: Re: [PATCH] Bluetooth: hci_sync: Fix not processing all entries on
+ cmd_sync_work
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220302182352.441352-1-caleb.connolly@linaro.org>
-Date:   Wed, 2 Mar 2022 20:16:39 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org
+In-Reply-To: <20220302191100.364431-1-luiz.dentz@gmail.com>
+Date:   Wed, 2 Mar 2022 20:18:36 +0100
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <0C35F358-3E66-457E-9080-DAE4EB10BF16@holtmann.org>
-References: <20220302182352.441352-1-caleb.connolly@linaro.org>
-To:     Caleb Connolly <caleb.connolly@linaro.org>
+Message-Id: <B566F0C8-38BE-40D7-89BD-DAD6F2C96A56@holtmann.org>
+References: <20220302191100.364431-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Caleb,
+Hi Luiz,
 
-> Since commit 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events"),
-> some devices see errors being printed for vendor events, e.g.
+> hci_cmd_sync_queue can be called multiple times, each adding a
+> hci_cmd_sync_work_entry, before hci_cmd_sync_work is run so this makes
+> sure they are all dequeued properly otherwise it creates a backlog of
+> entries that are never run.
 > 
-> [   75.806141] Bluetooth: hci0: setting up wcn399x
-> [   75.948311] Bluetooth: hci0: unexpected event 0xff length: 14 > 0
-> [   75.955552] Bluetooth: hci0: QCA Product ID   :0x0000000a
-> [   75.961369] Bluetooth: hci0: QCA SOC Version  :0x40010214
-> [   75.967417] Bluetooth: hci0: QCA ROM Version  :0x00000201
-> [   75.973363] Bluetooth: hci0: QCA Patch Version:0x00000001
-> [   76.000289] Bluetooth: hci0: QCA controller version 0x02140201
-> [   76.006727] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> [   76.986850] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.013574] Bluetooth: hci0: QCA Downloading qca/oneplus6/crnv21.bin
-> [   77.024302] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.032681] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.040674] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.049251] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.057997] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.066320] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.075065] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.083073] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.091250] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.099417] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.110166] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.118672] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.127449] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.137190] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.146192] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.154242] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.163183] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.171202] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.179364] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.187259] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.198451] Bluetooth: hci0: QCA setup on UART is completed
-> 
-> Use the quick-return path in hci_event_func() to avoid printing this
-> message for vendor events, this reverts to the previous behaviour which
-> didn't print an error for vendor events.
-> 
-> Fixes: 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events")
-> Signed-off-by: Caleb Connolly <caleb.connolly@linaro.org>
+> Link: https://lore.kernel.org/all/CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com/T/
+> Fixes: 6a98e3836fa20 ("Bluetooth: Add helper for serialized HCI command execution")
+> Tested-by: Chris Clayton <chris2553@googlemail.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/bluetooth/hci_event.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/hci_sync.c | 64 ++++++++++++++++++++++++----------------
+> 1 file changed, 38 insertions(+), 26 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index d146d4efae43..121df2dcf2f1 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -273,43 +273,55 @@ int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
+> }
+> EXPORT_SYMBOL(__hci_cmd_sync_status);
+> 
+> -static void hci_cmd_sync_work(struct work_struct *work)
+> +static void hci_cmd_sync_work_entry_run(struct hci_dev *hdev,
+> +					struct hci_cmd_sync_work_entry *entry)
+> {
+> -	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
+> -	struct hci_cmd_sync_work_entry *entry;
+> 	hci_cmd_sync_work_func_t func;
+> 	hci_cmd_sync_work_destroy_t destroy;
+> 	void *data;
+> +	int err;
+> 
+> -	bt_dev_dbg(hdev, "");
+> +	bt_dev_dbg(hdev, "entry %p", entry);
+> 
+> -	mutex_lock(&hdev->cmd_sync_work_lock);
+> -	entry = list_first_entry(&hdev->cmd_sync_work_list,
+> -				 struct hci_cmd_sync_work_entry, list);
+> -	if (entry) {
+> -		list_del(&entry->list);
+> -		func = entry->func;
+> -		data = entry->data;
+> -		destroy = entry->destroy;
+> -		kfree(entry);
+> -	} else {
+> -		func = NULL;
+> -		data = NULL;
+> -		destroy = NULL;
+> -	}
+> -	mutex_unlock(&hdev->cmd_sync_work_lock);
+> +	func = entry->func;
+> +	data = entry->data;
+> +	destroy = entry->destroy;
+> +	kfree(entry);
+> 
+> -	if (func) {
+> -		int err;
+> +	if (!func)
+> +		return;
+> 
+> -		hci_req_sync_lock(hdev);
+> +	hci_req_sync_lock(hdev);
+> +
+> +	err = func(hdev, data);
+> 
+> -		err = func(hdev, data);
+> +	if (destroy)
+> +		destroy(hdev, data, err);
+> 
+> -		if (destroy)
+> -			destroy(hdev, data, err);
+> +	hci_req_sync_unlock(hdev);
+> +}
+> +
+> +static void hci_cmd_sync_work(struct work_struct *work)
+> +{
+> +	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
+> +	struct hci_cmd_sync_work_entry *entry;
+> +
+> +	bt_dev_dbg(hdev, "");
+> +
+> +	/* Dequeue all entries and run them */
+> +	while (1) {
+> +		mutex_lock(&hdev->cmd_sync_work_lock);
+> +		entry = list_first_entry_or_null(&hdev->cmd_sync_work_list,
+> +						 struct hci_cmd_sync_work_entry,
+> +						 list);
+> +		if (entry)
+> +			list_del(&entry->list);
+> +		mutex_unlock(&hdev->cmd_sync_work_lock);
+> +
+> +		if (!entry)
+> +			break;
+> 
+> -		hci_req_sync_unlock(hdev);
+> +		hci_cmd_sync_work_entry_run(hdev, entry);
+> 	}
+> }
+> 
 
-patch has been applied to bluetooth-stable tree.
+I was dead serious with my example on how to do this. Scrap the hci_cmd_sync_work_entry_run and do this all in one while loop.
 
 Regards
 
