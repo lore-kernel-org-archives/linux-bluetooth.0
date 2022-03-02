@@ -2,140 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EB0C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 21:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F780C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 21:14:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239550AbiCBVDd (ORCPT
+        id S245300AbiCBVOp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 16:03:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50612 "EHLO
+        Wed, 2 Mar 2022 16:14:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232218AbiCBVDb (ORCPT
+        with ESMTP id S245356AbiCBVNV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 16:03:31 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7038113F9F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 13:02:47 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id i1so2662634plr.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 13:02:47 -0800 (PST)
+        Wed, 2 Mar 2022 16:13:21 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 830C9DD94B
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 13:11:51 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id s11so2968634pfu.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 13:11:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vbkzLyak8N+Zd+GzODzJQy+LcSQ7ysxJC2ZVRmTWNic=;
-        b=BY4XgjY36hIXOvGctbfyOw6znS85x8w+dyrXdlW8NsEi3HKiJvKI5PJpx3cJeq0qV8
-         CkJ9A1wozqnl5PdzCD01O4vatEtQmymDZFte4iBKBjgPC7pm+Zut/dgpzMU3RdnTQ2uO
-         vxixX5AGgsBcgjIEFLDNSGe7VhmabP5pR4E/cse3MR4VenL73DUdKGyFYAbeTXPCqYnp
-         PN6KRRpnbt4srIigld5cDM6unEr63HniArqikwCusOaJvUTbDtp5icmsljJ+gPoF1+w5
-         dB2OA91Qw5gXN3PPVuHuq8opKnCqHwaDgotqgdE0tjyh1egUrsJa2HZUTYrc6P8rVWaJ
-         n3oA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=50Nephl6fy1USBwU2EAcPAe5o7oNF9XmCVhDKcdgHU0=;
+        b=k/Qt51uzJu4Gip8Ko+DPexOfWfq5bXJRzTWN60gXZW5CIgFMjzCBAs0vSLrk7hs1EO
+         fvE4gRVm7ercvQLg0wxaeEtyZwXN8eoOiq950lJvJmMZ0VD8+zshBgd6n7zuO5+VHff0
+         sGmHrrqI3SqXovpOfwO3whrfC72gWFen8+s39eESdI5ajg3r4K8H1UDJS0UPlVZrN57W
+         tTtjjVUWbw9TDrNDqWm9kTO1vh4atkRhOgQu4QfIzd04EQt6YDHjTrZ5iWit6zkKQAkj
+         yPuXfaAjLVwZf+i7vpBvqObpfluls+h/1dmiWzPu0uMTJTLvDASILntTZ6qDAoJcrKHX
+         81xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=vbkzLyak8N+Zd+GzODzJQy+LcSQ7ysxJC2ZVRmTWNic=;
-        b=pXfHvBOKI9ECXef4GNKo9+b0FCSpJ1voOwkP6esGHzl50pcElXvtattlx1Y835U8BN
-         ukUTA1JkvtcmD2Dp5htdKMZQolr/jNUKtraucLmxuY/66VMt+6ZbXmuZ56vHcYjBjf0J
-         kSMVoPWfjnuhESapMt+GR5fhFieGNB9M6oMo+4JMEleM9tLUSLz5zVfSBgLKUAnnqZab
-         07hXVRUV7kN8EehpZE/TjwiIsK987o/uODeTKocw2Eq6VpJDo6qaUtGhU8hjyG+ufcbA
-         XJOhwFuMs2kMUBWZ5edDsKg7jPi8m2nAbIAb74yTAJWGRUHCGSclLUIFjqbYS1ClAV/a
-         mcAg==
-X-Gm-Message-State: AOAM533MjYFb9fN2RvxATokDNsaasSk4KZgUQgm0Z2ndfDZxe2NF929p
-        KTCj5daoHv7FaZm6LnnvNqfJRY2bbjs=
-X-Google-Smtp-Source: ABdhPJwzP6xx9q/vjQc3+n+wzGtAm78ilU2WScgPUXGP9qID8m0LfHxW+NZ6OXnyartlzFad+hDbUA==
-X-Received: by 2002:a17:902:e5c3:b0:14f:a4ff:34b8 with SMTP id u3-20020a170902e5c300b0014fa4ff34b8mr32010237plf.24.1646254966613;
-        Wed, 02 Mar 2022 13:02:46 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id hk2-20020a17090b224200b001bf0a7d9da3sm195821pjb.9.2022.03.02.13.02.46
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=50Nephl6fy1USBwU2EAcPAe5o7oNF9XmCVhDKcdgHU0=;
+        b=Cr+RWrCYZmi5gfB2L6c8aFUJn/v4ppDVWbJirkctjLpXLGmCGclAAfbTHZObVVOZEc
+         WhHz5jih2pJ2VrBOR8/De70rce4tfeIgBYedO3XbtaRQmqMB6U09VPLS3MzzSollJPgB
+         vW1ZdQkstZ3qpyjqIWv2HQP3klk1khbh5dtCOQcZhDJ2LoZczyoasqUswu5OJlHgGF2F
+         8rhqzH1Sx96/NukWsU4Wv02b3CuYfxRfiKdUMTlgs9iLA4zUr9Pfe8ux3t701yywuBRV
+         Boa0EzCC+zzefepRIeyX2rXmZSnlYcArbtIPQsGVgwhBvYWXilfbCmh6s5mzF9hNnGpu
+         /YRA==
+X-Gm-Message-State: AOAM5325/aXasMaaElekN6ml5vudvG6C42FNadRUOp6MGlpnUNSmsBKs
+        KBCfGrMnAps6uaywf/sMLpHvpMkzlB4=
+X-Google-Smtp-Source: ABdhPJxltXAtmGBNVNhtXf4IFftegx4umlqaRI/PMwunk9xIp2LQQ/EJb3iGb20JJzOl0hBf+W1q1A==
+X-Received: by 2002:a65:5842:0:b0:374:58b8:2563 with SMTP id s2-20020a655842000000b0037458b82563mr27523461pgr.52.1646255510709;
+        Wed, 02 Mar 2022 13:11:50 -0800 (PST)
+Received: from [172.17.0.2] ([20.112.13.67])
+        by smtp.gmail.com with ESMTPSA id q92-20020a17090a1b6500b001bc169e26aasm5375532pjq.2.2022.03.02.13.11.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 13:02:46 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work
-Date:   Wed,  2 Mar 2022 13:02:45 -0800
-Message-Id: <20220302210245.392267-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Wed, 02 Mar 2022 13:11:50 -0800 (PST)
+Message-ID: <621fdd96.1c69fb81.7b41f.fa6a@mx.google.com>
+Date:   Wed, 02 Mar 2022 13:11:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3659729772137072795=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, christophe.jaillet@wanadoo.fr
+Subject: RE: Bluetooth: Don't assign twice the same value
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
+References: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3659729772137072795==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-hci_cmd_sync_queue can be called multiple times, each adding a
-hci_cmd_sync_work_entry, before hci_cmd_sync_work is run so this makes
-sure they are all dequeued properly otherwise it creates a backlog of
-entries that are never run.
+This is automated email and please do not reply to this email!
 
-Link: https://lore.kernel.org/all/CAJCQCtSeUtHCgsHXLGrSTWKmyjaQDbDNpP4rb0i+RE+L2FTXSA@mail.gmail.com/T/
-Fixes: 6a98e3836fa20 ("Bluetooth: Add helper for serialized HCI command execution")
-Tested-by: Chris Clayton <chris2553@googlemail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619692
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.72 seconds
+GitLint                       PASS      0.42 seconds
+SubjectPrefix                 PASS      0.26 seconds
+BuildKernel                   PASS      38.87 seconds
+BuildKernel32                 PASS      34.65 seconds
+Incremental Build with patchesPASS      47.41 seconds
+TestRunner: Setup             PASS      618.78 seconds
+TestRunner: l2cap-tester      PASS      16.73 seconds
+TestRunner: bnep-tester       PASS      7.50 seconds
+TestRunner: mgmt-tester       PASS      128.99 seconds
+TestRunner: rfcomm-tester     FAIL      9.62 seconds
+TestRunner: sco-tester        PASS      9.64 seconds
+TestRunner: smp-tester        PASS      9.54 seconds
+TestRunner: userchan-tester   PASS      7.80 seconds
+
+Details
+##############################
+Test: TestRunner: rfcomm-tester - FAIL - 9.62 seconds
+Run test-runner with rfcomm-tester
+Total: 10, Passed: 9 (90.0%), Failed: 1, Not Run: 0
+
+Failed Test Cases
+Basic RFCOMM Socket Client - Write 32k Success       Failed       0.224 seconds
+
+
+
 ---
- net/bluetooth/hci_sync.c | 39 +++++++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 18 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index d146d4efae43..06c6e954dcbd 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -283,33 +283,36 @@ static void hci_cmd_sync_work(struct work_struct *work)
- 
- 	bt_dev_dbg(hdev, "");
- 
--	mutex_lock(&hdev->cmd_sync_work_lock);
--	entry = list_first_entry(&hdev->cmd_sync_work_list,
--				 struct hci_cmd_sync_work_entry, list);
--	if (entry) {
--		list_del(&entry->list);
-+	/* Dequeue all entries and run them */
-+	while (1) {
-+		mutex_lock(&hdev->cmd_sync_work_lock);
-+		entry = list_first_entry_or_null(&hdev->cmd_sync_work_list,
-+						 struct hci_cmd_sync_work_entry,
-+						 list);
-+		if (entry)
-+			list_del(&entry->list);
-+		mutex_unlock(&hdev->cmd_sync_work_lock);
-+
-+		if (!entry)
-+			break;
-+
- 		func = entry->func;
- 		data = entry->data;
- 		destroy = entry->destroy;
- 		kfree(entry);
--	} else {
--		func = NULL;
--		data = NULL;
--		destroy = NULL;
--	}
--	mutex_unlock(&hdev->cmd_sync_work_lock);
- 
--	if (func) {
--		int err;
-+		if (func) {
-+			int err;
- 
--		hci_req_sync_lock(hdev);
-+			hci_req_sync_lock(hdev);
- 
--		err = func(hdev, data);
-+			err = func(hdev, data);
- 
--		if (destroy)
--			destroy(hdev, data, err);
-+			if (destroy)
-+				destroy(hdev, data, err);
- 
--		hci_req_sync_unlock(hdev);
-+			hci_req_sync_unlock(hdev);
-+		}
- 	}
- }
- 
--- 
-2.35.1
 
+--===============3659729772137072795==--
