@@ -2,97 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B61C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 23:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42768C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Mar 2022 00:07:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiCBX70 (ORCPT
+        id S230039AbiCCAIW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 18:59:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44816 "EHLO
+        Wed, 2 Mar 2022 19:08:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229891AbiCBX7Y (ORCPT
+        with ESMTP id S230055AbiCCAIW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 18:59:24 -0500
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98C4AB8B5D
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 15:58:39 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id u61so6738872ybi.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 15:58:39 -0800 (PST)
+        Wed, 2 Mar 2022 19:08:22 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB586FA32
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 16:07:37 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id u16so3312593pfg.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Mar 2022 16:07:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Z9g6+j3hWaSSl/8rQsC5jQNaPqHt3DHAq6OTGFpeHz0=;
-        b=RdzwKuD2/UlMOo1olO3BtAiJ0haWE4dkC2U5uqMsKAN2XSgg+h3Oe6MCV6qIOiy4dl
-         Rx7RJdaDjRraOPaQowsjlRiX8+Gwz4jLA8oATbv7JXR3s9Sox1CAmIfjSOVxdZrwsfjW
-         03cuXdmu7EC/qnnFdm2JonklhwU7ma+d52LxCeSUsopGi5ffWhwWY2eYPTIt+IfVFutQ
-         2vwAJ8XOwZ0SVCWzhtRGSpcRa05WQQlYVfTX4Wt8USPKDMeVH6jjh76ALROCeloL8Ss3
-         IeeFAU4JH7JoCeJ+jqNymP1JB1u4taPmZL03OqKoIx2MWXLFkNHrOdPPvuCk3K0gvyLv
-         BScQ==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KVA4k4dXNYbQ6zZb1JQo4288As5qtJVLtt6xD6t1o7E=;
+        b=L/HcEuVPlJwv6Yb5s4gmSZF2U7n0bBgyOFoMQTwWxDsKLiX23P5UesXQlaabhhJOEM
+         gSyPPsLb4cl4eZJAZbCyTwd7d7Lsi6rSdW3qMKd2XtmDcffPh46lHMq8u6xYpRURYdSC
+         17xuZ8asqMCQBkhU3XKQsyWNvY26GOyYJcb8MFOqms/KFfYJYc2OH4y+3luEm6IxzmQw
+         ngx8M8yJz1R2IrqvkwrdB6bQ5W1W1v0wNtADEyx2sPlsFQVBPX4hs0OOgKJ1HvPkseTd
+         gdYhwUDeKyVo/98++GoyP93m29oBo0aZ52MczGmHfJvB6TXNhdcs9rKU5dmfXf6mf6tC
+         0JGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Z9g6+j3hWaSSl/8rQsC5jQNaPqHt3DHAq6OTGFpeHz0=;
-        b=dKpPAq3yyLnEOpBLrQQApydCa8O8pvxX+wHIJscOTVVq9AiaYXc2uhkEmt2/7+eyir
-         A9zODlUj3XoJOktkNu9xT3kha+OIjlQ/0QF/bndryz70gDnt1fuRR4uo1NuMXGEpNL8d
-         IDgtvmu2PALZYNKMuyRPp8GnQm7MtNohKHu5iri3L57bWjYG0CYuhLGACqMzxZEwYK7D
-         qxoG9L536wX9uh7qtkRfbeqgykXoHGVml4VFwN0qUduN7iv23rf/HoHABHWiIH4SfPxQ
-         AGV6YXmBj9NMBIs+7DlAAKT9zcW95F5cBev4tAgM8c1aYwEJdcWJLC5F3mpRIKySFGOb
-         9PLg==
-X-Gm-Message-State: AOAM531oQqZi9Zy42jqRIjiGlJ7FBEoeJL67XieQbZPGgkNe8pLuPnIH
-        hXDAWUOUie8zClt12oO55hR0Jcz3LP8YJ/tRuiIaDs+k
-X-Google-Smtp-Source: ABdhPJwI5YSWLbvFALbth5cMzs3bK9Tn6BfCjj/QzpwCS1GMCxjMGgDtDocR6IQUNPUsjQBBfr90+cBh6drbZiuFxJA=
-X-Received: by 2002:a25:8546:0:b0:61e:1d34:ec71 with SMTP id
- f6-20020a258546000000b0061e1d34ec71mr30199640ybn.259.1646263335730; Wed, 02
- Mar 2022 15:22:15 -0800 (PST)
-MIME-Version: 1.0
-References: <20220301233045.109794-1-luiz.dentz@gmail.com> <621ebde3.1c69fb81.4f0e1.a85e@mx.google.com>
-In-Reply-To: <621ebde3.1c69fb81.4f0e1.a85e@mx.google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KVA4k4dXNYbQ6zZb1JQo4288As5qtJVLtt6xD6t1o7E=;
+        b=tknKpb/uKd3pXJASjIbkKDV68E9EIYXBVZH57Z3S4vUzwHaqB1qdpWPZ0Dq7PlYf0k
+         jEkW2Th0DFFyRVCDqVoM3/le7zlYv0MYdRwSwc7dMe8C77zxAcFE6Bu0OFzYBMiBfZf1
+         /pAmlxxiINYML7BNiwq1vkkoF4HhxjdTCKT0b5n5hBBJHti4Cu5l51YlkdiX/J8j41vk
+         ZR/Q7Xb9U4EIhzXpalzgbuBlkeRze8FJnKpEbp0PmoekOdnE2s+LuginfYf9jI1Gwucc
+         574qaTectQGyLaiWoDeHuUOLC7J5hxLhHd7QBqBvl0qfBSLClYlPcroI9+JiKqfh2gvl
+         4Zig==
+X-Gm-Message-State: AOAM530zmzK50h1L6ra3NHekAguZ2Hidgr1mWrjIODtr9xS32osAwJv+
+        IeGnHeteaFnceL9NVUbPeCY9H3szGU8=
+X-Google-Smtp-Source: ABdhPJwji09vYfCzcc+BBpJkuJyXKUMsfYP3xamefM6nMludlvXyem83cyve7E/islV3vAK1ZNfY/w==
+X-Received: by 2002:a92:c5c1:0:b0:2c2:8aeb:6570 with SMTP id s1-20020a92c5c1000000b002c28aeb6570mr28653482ilt.162.1646262540470;
+        Wed, 02 Mar 2022 15:09:00 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d15-20020a056e02214f00b002bc80da7cc6sm270745ilv.72.2022.03.02.15.08.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 15:08:59 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 2 Mar 2022 15:22:04 -0800
-Message-ID: <CABBYNZKkgrTruTapU1V4wHd3fAx2Udh8xvT+7wttR4T8n4V64A@mail.gmail.com>
-Subject: Re: [BlueZ] shared/shell: Introduce bt_shell_exec
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix not checking for valid hdev on bt_dev_{info,warn,err,dbg}
+Date:   Wed,  2 Mar 2022 15:08:58 -0800
+Message-Id: <20220302230858.444141-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Mar 1, 2022 at 4:44 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619349
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.51 seconds
-> GitLint                       PASS      1.07 seconds
-> Prep - Setup ELL              PASS      51.80 seconds
-> Build - Prep                  PASS      0.83 seconds
-> Build - Configure             PASS      10.43 seconds
-> Build - Make                  PASS      1500.30 seconds
-> Make Check                    PASS      12.38 seconds
-> Make Check w/Valgrind         PASS      533.05 seconds
-> Make Distcheck                PASS      278.20 seconds
-> Build w/ext ELL - Configure   PASS      10.45 seconds
-> Build w/ext ELL - Make        PASS      1473.77 seconds
-> Incremental Build with patchesPASS      0.00 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+This fixes attemting to print hdev->name directly which causes them to
+print an error:
 
-Pushed
+kernel: read_version:367: (efault): sock 000000006a3008f2
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/bluetooth.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index a647e5fabdbd..d82736e58d45 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -204,19 +204,21 @@ void bt_err_ratelimited(const char *fmt, ...);
+ #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
+ #endif
+ 
++#define bt_dev_name(hdev) (hdev ? (hdev)->name : NULL)
++
+ #define bt_dev_info(hdev, fmt, ...)				\
+-	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_warn(hdev, fmt, ...)				\
+-	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_WARN("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_err(hdev, fmt, ...)				\
+-	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_dbg(hdev, fmt, ...)				\
+-	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ 
+ #define bt_dev_warn_ratelimited(hdev, fmt, ...)			\
+-	bt_warn_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	bt_warn_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_err_ratelimited(hdev, fmt, ...)			\
+-	bt_err_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	bt_err_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ 
+ /* Connection and socket states */
+ enum {
 -- 
-Luiz Augusto von Dentz
+2.35.1
+
