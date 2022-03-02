@@ -2,99 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B37C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 19:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B32C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Mar 2022 19:43:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbiCBTVk convert rfc822-to-8bit (ORCPT
+        id S241978AbiCBTnt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Mar 2022 14:21:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57394 "EHLO
+        Wed, 2 Mar 2022 14:43:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbiCBTVk (ORCPT
+        with ESMTP id S242002AbiCBTni (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Mar 2022 14:21:40 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 508F76D970;
-        Wed,  2 Mar 2022 11:20:56 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7696CCED12;
-        Wed,  2 Mar 2022 20:20:55 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH v2] bluetooth: hci_event: don't print an error on vendor
- events
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220302183515.448334-1-caleb.connolly@linaro.org>
-Date:   Wed, 2 Mar 2022 20:20:55 +0100
+        Wed, 2 Mar 2022 14:43:38 -0500
+X-Greylist: delayed 400 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Mar 2022 11:42:54 PST
+Received: from post.munsonfam.org (post.munsonfam.org [172.104.17.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BAC549900;
+        Wed,  2 Mar 2022 11:42:53 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at munsonfam.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+        s=20211029; t=1646249771;
+        bh=VYngCzG9clONeml2uhaUgxir5/zqo7l4bZiFQxv/mJw=;
+        h=Date:From:To:Cc:Subject:From;
+        b=d7weWaD9aYfYX+hpYssOLvnts5zSF9XLIPLIBHbbTGiu8hcIiq6J6vfcrXROyvwFZ
+         GdaOrQNawSpbQtLXrJQLs0VtY0kqVCxnV3b0qwRaLIWETSQhV51szftz1pay1kAQ0R
+         mzqZfoc3KC1N5EEHEM3Zr6ps2aanAgCXEm1+Rno617k5hKtx0gsr+scvsjMCPtok0k
+         Thn75O8gztSiKpcmh4A6B8bOVlFYOKMrTtrPoPVeFPM1XwXDK83YJnkUdksvhPJ5vv
+         IOkJ/gkf4HteAKUlhtVwPPoIHkVBSC0TdThLvgdE9ixapRK028KXUYyPngg/od8kBW
+         k0RaNBiaIScUQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+ s=20211029; t=1646249771;
+ bh=VYngCzG9clONeml2uhaUgxir5/zqo7l4bZiFQxv/mJw=;
+ h=Date:From:To:Cc:Subject:From;
+ b=d7weWaD9aYfYX+hpYssOLvnts5zSF9XLIPLIBHbbTGiu8hcIiq6J6vfcrXROyvwFZ
+ GdaOrQNawSpbQtLXrJQLs0VtY0kqVCxnV3b0qwRaLIWETSQhV51szftz1pay1kAQ0R
+ mzqZfoc3KC1N5EEHEM3Zr6ps2aanAgCXEm1+Rno617k5hKtx0gsr+scvsjMCPtok0k
+ Thn75O8gztSiKpcmh4A6B8bOVlFYOKMrTtrPoPVeFPM1XwXDK83YJnkUdksvhPJ5vv
+ IOkJ/gkf4HteAKUlhtVwPPoIHkVBSC0TdThLvgdE9ixapRK028KXUYyPngg/od8kBW
+ k0RaNBiaIScUQ==
+Received: by lappy-486.munsonfam.org (Postfix, from userid 1000)
+ id 7E7639E0237; Wed,  2 Mar 2022 14:36:09 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+ s=20211029; t=1646249771;
+ bh=VYngCzG9clONeml2uhaUgxir5/zqo7l4bZiFQxv/mJw=;
+ h=Date:From:To:Cc:Subject:From;
+ b=d7weWaD9aYfYX+hpYssOLvnts5zSF9XLIPLIBHbbTGiu8hcIiq6J6vfcrXROyvwFZ
+ GdaOrQNawSpbQtLXrJQLs0VtY0kqVCxnV3b0qwRaLIWETSQhV51szftz1pay1kAQ0R
+ mzqZfoc3KC1N5EEHEM3Zr6ps2aanAgCXEm1+Rno617k5hKtx0gsr+scvsjMCPtok0k
+ Thn75O8gztSiKpcmh4A6B8bOVlFYOKMrTtrPoPVeFPM1XwXDK83YJnkUdksvhPJ5vv
+ IOkJ/gkf4HteAKUlhtVwPPoIHkVBSC0TdThLvgdE9ixapRK028KXUYyPngg/od8kBW
+ k0RaNBiaIScUQ==
+Date:   Wed, 2 Mar 2022 14:36:09 -0500
+From:   Eric B Munson <eric@munsonfam.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <21F7790B-8849-4131-AF09-4E622B1A9E9D@holtmann.org>
-References: <20220302183515.448334-1-caleb.connolly@linaro.org>
-To:     Caleb Connolly <caleb.connolly@linaro.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Problem: Bluetooth stops connecting to paired devices after commit
+ 6a98e3836fa207
+Message-ID: <Yh/HKSW05IfXCGbR@munsonfam.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature"; boundary="yoqJaS6jdXW3GHEp"
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Caleb,
 
-> Since commit 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events"),
-> some devices see warnings being printed for vendor events, e.g.
-> 
-> [   75.806141] Bluetooth: hci0: setting up wcn399x
-> [   75.948311] Bluetooth: hci0: unexpected event 0xff length: 14 > 0
-> [   75.955552] Bluetooth: hci0: QCA Product ID   :0x0000000a
-> [   75.961369] Bluetooth: hci0: QCA SOC Version  :0x40010214
-> [   75.967417] Bluetooth: hci0: QCA ROM Version  :0x00000201
-> [   75.973363] Bluetooth: hci0: QCA Patch Version:0x00000001
-> [   76.000289] Bluetooth: hci0: QCA controller version 0x02140201
-> [   76.006727] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
-> [   76.986850] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.013574] Bluetooth: hci0: QCA Downloading qca/oneplus6/crnv21.bin
-> [   77.024302] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.032681] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.040674] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.049251] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.057997] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.066320] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.075065] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.083073] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.091250] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.099417] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.110166] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.118672] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.127449] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.137190] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.146192] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.154242] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.163183] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.171202] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.179364] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.187259] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
-> [   77.198451] Bluetooth: hci0: QCA setup on UART is completed
-> 
-> Avoid printing the event length warning for vendor events, this reverts
-> to the previous behaviour where such warnings weren't printed.
-> 
-> Fixes: 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events")
-> Signed-off-by: Caleb Connolly <caleb.connolly@linaro.org>
-> ---
-> Changes since v1:
-> * Don't return early! Vendor events still get parsed despite the
->   warning. I should have looked a little more closely at that...
-> ---
-> net/bluetooth/hci_event.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+--yoqJaS6jdXW3GHEp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-patch has been applied to bluetooth-stable tree.
+Hi,
 
-Regards
+When testing the latest upstream this morning, my bluetooth mouse
+stopped working. Further inspection showed that my laptop is failing to
+connect, but I didn't see anything relevant in dmesg, the driver seemed
+to load firmware and intialize fine.
 
-Marcel
+A bisect turned up commit 6a98e3836fa207 as the first bad one, but
+unfortunately there was another problem discovered during the bisect
+where my bluetooth radio failed to come up at all.
 
+I am using a 5 year old Lenovo X1 carbon which is using the Intel
+Wireless 8265 / 8275 card and the btintel driver.
+
+I can easily reproduce, and would be happy to test patches or help
+diagnose if I can. Is this a known issue?
+
+Regards,
+Eric
+
+--yoqJaS6jdXW3GHEp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEZ71cx3bfGX4kMtFBqEb2cZzVukkFAmIfxxUACgkQqEb2cZzV
+uknIPA/7BUlzuhCHYlHrnxQ+K2//zZaX5M6MkKNGiD3qWu1/l7IoNb0MyscPbWj3
+wJHqYtvWAbBUEm3gxjOtnS0pCK8emoap/SCYagFUzl7llwCxxZ2nvRqc+m5Revq0
+iKxFa8Yh2TNN21rC8CLyb7NCvZO8XAObxptu23CCLHjbTT41bxvwVuyzg9HeOsVT
+XTOII31i0pEVDoVkg7ToOIRtg73b7bWi14WYBlRcoORy5olWdmkc0OOfMYa6kd5f
+OzbwOIyIv4PsSD4U9vkxU0vp2lTd6qP1zKi6hbya33MqWRFlLarbmBQYo9Ti8pnR
+PmeyvUkylTjxbxQ6hC5gYQd1+5oDupWpyAg03ApRbbsUqZtfOPTYEheTZv0DLMW/
+lf7teBR8zP/C5UHrk5rafu0DBOSSBE5DOZwm8NL/9GkMOcGxpKsGFXy4uUKsPC1/
+dlUazoXreo4g9zm4yO9FdtX4Eu2C2pdLlvdoYs2tIj1p6N5nYUbWOycgRz5ykNYV
+WYoZCa82P0vLPxybdPcGrygSMU+xZo0DuXjApm8f+XZ3xaajl9cANU08qQlFqRu8
+gdpdR3HogsvDzqTr10Fs9wjES1DL0kJzPnDnqJmB4DbBIAqbYapcI0G+WWGdhZT5
+DaioWdQBqLp5jmLYwoC4mi8F0O7F5lhhKQzASbO0b34TTW40nbs=
+=g4kZ
+-----END PGP SIGNATURE-----
+
+--yoqJaS6jdXW3GHEp--
