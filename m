@@ -2,98 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED16C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Mar 2022 05:48:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42EABC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Mar 2022 12:23:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229738AbiCCFtb (ORCPT
+        id S232465AbiCCMYT convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Mar 2022 00:49:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50742 "EHLO
+        Thu, 3 Mar 2022 07:24:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiCCFt3 (ORCPT
+        with ESMTP id S229790AbiCCMYR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Mar 2022 00:49:29 -0500
-Received: from smtp.smtpout.orange.fr (smtp08.smtpout.orange.fr [80.12.242.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846AA119F0A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Mar 2022 21:48:41 -0800 (PST)
-Received: from [192.168.1.18] ([90.126.236.122])
-        by smtp.orange.fr with ESMTPA
-        id PeKLnokkrxHdTPeKLneDHk; Thu, 03 Mar 2022 06:48:39 +0100
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
-X-ME-Date: Thu, 03 Mar 2022 06:48:39 +0100
-X-ME-IP: 90.126.236.122
-Message-ID: <3bf9dbf1-74fc-5cc9-b6fc-c3267be0a4ac@wanadoo.fr>
-Date:   Thu, 3 Mar 2022 06:48:37 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH] Bluetooth: Don't assign twice the same value
-Content-Language: en-US
+        Thu, 3 Mar 2022 07:24:17 -0500
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E9081BD2EE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Mar 2022 04:23:27 -0800 (PST)
+Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
+        by mail.holtmann.org (Postfix) with ESMTPSA id D50E5CED23;
+        Thu,  3 Mar 2022 13:23:26 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+Subject: Re: [RFC] Bluetooth: HCI: Add HCI_QUIRK_ENHANCED_SETUP_SYNC_CONN
+ quirk
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220302225049.432025-1-luiz.dentz@gmail.com>
+Date:   Thu, 3 Mar 2022 13:23:26 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <2CF7A301-D806-4E9A-A441-BE661FF3AD5B@holtmann.org>
+References: <20220302225049.432025-1-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
- <CABBYNZKpZ+tA0YuBFzwug-W3Bcx9GuL4hcrPSfSQt0VnbZi58A@mail.gmail.com>
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-In-Reply-To: <CABBYNZKpZ+tA0YuBFzwug-W3Bcx9GuL4hcrPSfSQt0VnbZi58A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Le 02/03/2022 à 22:36, Luiz Augusto von Dentz a écrit :
-> Hi Christophe,
+Hi Luiz,
+
+> This adds HCI_QUIRK_ENHANCED_SETUP_SYNC_CONN quirk which can be used to
+> mark HCI_Enhanced_Setup_Synchronous_Connection as supported by
+> controller since using just the support command bits are not enough
+> since some controller report it as supported but the command don't work
+> properly with some configurations (e.g. BT_VOICE_TRANSPARENT/mSBC).
 > 
-> On Wed, Mar 2, 2022 at 12:18 PM Christophe JAILLET
-> <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org> wrote:
->>
->> data.pid is set twice with the same value. Remove one of these redundant
->> calls.
->>
->> Signed-off-by: Christophe JAILLET <christophe.jaillet-39ZsbGIQGT5GWvitb5QawA@public.gmane.org>
->> ---
->>   net/bluetooth/l2cap_core.c | 1 -
->>   1 file changed, 1 deletion(-)
->>
->> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
->> index e817ff0607a0..0d460cb7f965 100644
->> --- a/net/bluetooth/l2cap_core.c
->> +++ b/net/bluetooth/l2cap_core.c
->> @@ -1443,7 +1443,6 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
->>          data.pdu.scid[0]     = cpu_to_le16(chan->scid);
->>
->>          chan->ident = l2cap_get_ident(conn);
->> -       data.pid = chan->ops->get_peer_pid(chan);
+> Fixes: b2af264ad3af ("Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command")
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=215576
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> drivers/bluetooth/btusb.c        | 58 +++++++++++++++++---------------
+> include/net/bluetooth/hci.h      |  9 +++++
+> include/net/bluetooth/hci_core.h |  8 +++--
+> 3 files changed, 46 insertions(+), 29 deletions(-)
 > 
-> Perhaps we should do if (!data->pid) then since afaik one can do
-> connect without bind.
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 558151f2f150..c862d0f963b5 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -36,33 +36,34 @@ static bool reset = true;
+> 
+> static struct usb_driver btusb_driver;
+> 
+> -#define BTUSB_IGNORE		0x01
+> -#define BTUSB_DIGIANSWER	0x02
+> -#define BTUSB_CSR		0x04
+> -#define BTUSB_SNIFFER		0x08
+> -#define BTUSB_BCM92035		0x10
+> -#define BTUSB_BROKEN_ISOC	0x20
+> -#define BTUSB_WRONG_SCO_MTU	0x40
+> -#define BTUSB_ATH3012		0x80
+> -#define BTUSB_INTEL_COMBINED	0x100
+> -#define BTUSB_INTEL_BOOT	0x200
+> -#define BTUSB_BCM_PATCHRAM	0x400
+> -#define BTUSB_MARVELL		0x800
+> -#define BTUSB_SWAVE		0x1000
+> -#define BTUSB_AMP		0x4000
+> -#define BTUSB_QCA_ROME		0x8000
+> -#define BTUSB_BCM_APPLE		0x10000
+> -#define BTUSB_REALTEK		0x20000
+> -#define BTUSB_BCM2045		0x40000
+> -#define BTUSB_IFNUM_2		0x80000
+> -#define BTUSB_CW6622		0x100000
+> -#define BTUSB_MEDIATEK		0x200000
+> -#define BTUSB_WIDEBAND_SPEECH	0x400000
+> -#define BTUSB_VALID_LE_STATES   0x800000
+> -#define BTUSB_QCA_WCN6855	0x1000000
+> -#define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	0x2000000
+> -#define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
+> -#define BTUSB_INTEL_NO_WBS_SUPPORT	0x8000000
+> +#define BTUSB_IGNORE			BIT(0)
+> +#define BTUSB_DIGIANSWER		BIT(1)
+> +#define BTUSB_CSR			BIT(2)
+> +#define BTUSB_SNIFFER			BIT(3)
+> +#define BTUSB_BCM92035			BIT(4)
+> +#define BTUSB_BROKEN_ISOC		BIT(5)
+> +#define BTUSB_WRONG_SCO_MTU		BIT(6)
+> +#define BTUSB_ATH3012			BIT(7)
+> +#define BTUSB_INTEL_COMBINED		BIT(8)
+> +#define BTUSB_INTEL_BOOT		BIT(9)
+> +#define BTUSB_BCM_PATCHRAM		BIT(10)
+> +#define BTUSB_MARVELL			BIT(11)
+> +#define BTUSB_SWAVE			BIT(12)
+> +#define BTUSB_AMP			BIT(13)
+> +#define BTUSB_QCA_ROME			BIT(14)
+> +#define BTUSB_BCM_APPLE			BIT(15)
+> +#define BTUSB_REALTEK			BIT(16)
+> +#define BTUSB_BCM2045			BIT(17)
+> +#define BTUSB_IFNUM_2			BIT(18)
+> +#define BTUSB_CW6622			BIT(19)
+> +#define BTUSB_MEDIATEK			BIT(20)
+> +#define BTUSB_WIDEBAND_SPEECH		BIT(21)
+> +#define BTUSB_VALID_LE_STATES		BIT(22)
+> +#define BTUSB_QCA_WCN6855		BIT(23)
+> +#define BTUSB_INTEL_BROKEN_SHUTDOWN_LED	BIT(24)
+> +#define BTUSB_INTEL_BROKEN_INITIAL_NCMD BIT(25)
+> +#define BTUSB_INTEL_NO_WBS_SUPPORT	BIT(26)
+> +#define BTUSB_ENHANCED_SETUP_SYNC_CONN  BIT(27)
 
-Not sure to follow you.
-'data' is local to this function. data->pid is undefined at this point.
-
-
-If your comment is about the end of the function that should be 
-conditional, I don't know the bluetooth stack at all and can't have any 
-opinion about it.
-
-If it is relevant, s.o. else will need to provide a patch for it.
-
-CJ
+not in the same patch.
 
 > 
->>          data.count = 1;
->>          data.chan = chan;
->> --
->> 2.32.0
->>
+> static const struct usb_device_id btusb_table[] = {
+> 	/* Generic Bluetooth USB device */
+> @@ -3848,6 +3849,9 @@ static int btusb_probe(struct usb_interface *intf,
+> 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
+> 	}
 > 
-> 
+> +	if (id->driver_info & BTUSB_ENHANCED_SETUP_SYNC_CONN)
+> +		set_bit(HCI_QUIRK_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
+> +
+> 	if (id->driver_info & BTUSB_CSR) {
+> 		struct usb_device *udev = data->udev;
+> 		u16 bcdDevice = le16_to_cpu(udev->descriptor.bcdDevice);
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 35c073d44ec5..7fe10ad044c1 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -255,6 +255,15 @@ enum {
+> 	 * during the hdev->setup vendor callback.
+> 	 */
+> 	HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+> +
+> +	/*
+> +	 * When this quirk is set, enables the use of
+> +	 * HCI_OP_ENHANCED_SETUP_SYNC_CONN command to setup SCO connections.
+> +	 *
+> +	 * This quirk can be set before hci_register_dev is called or
+> +	 * during the hdev->setup vendor callback.
+> +	 */
+> +	HCI_QUIRK_ENHANCED_SETUP_SYNC_CONN,
+> };
+
+And NO. We are not penalizing well behaving hardware. We mark broken hardware as broken.
+
+In addition, we really need to print out after ->setup() has run what quirks a given hardware sets and be verbose in dmesg about this mess. Companies really need to learn to get the stuff right or provide firmware updates to fix it.
+
+If this command is broken, then also WBS support should also be disabled. We need to make them feel this pain and give incentives to get this broken hardware fixed.
+
+Also I am only going to apply such a patch when I see the driver change to it as well.
+
+Regards
+
+Marcel
 
