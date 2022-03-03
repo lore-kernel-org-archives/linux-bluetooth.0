@@ -2,113 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 596CFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Mar 2022 12:37:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2289C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Mar 2022 21:07:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233356AbiCCMi3 convert rfc822-to-8bit (ORCPT
+        id S234717AbiCCVId (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Mar 2022 07:38:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49262 "EHLO
+        Thu, 3 Mar 2022 16:08:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231641AbiCCMi2 (ORCPT
+        with ESMTP id S232741AbiCCVIc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Mar 2022 07:38:28 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D71542559E;
-        Thu,  3 Mar 2022 04:37:39 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A504ECED23;
-        Thu,  3 Mar 2022 13:37:38 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH v2] bluetooth: hci_event: don't print an error on vendor
- events
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZJPN6o-v2OpAXND0+UfwB3AQL2=r6CDQ0S8PktWZqijMw@mail.gmail.com>
-Date:   Thu, 3 Mar 2022 13:37:38 +0100
-Cc:     Caleb Connolly <caleb.connolly@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <E6952D0A-FFF7-409E-8779-F82FC4DE9252@holtmann.org>
-References: <20220302183515.448334-1-caleb.connolly@linaro.org>
- <21F7790B-8849-4131-AF09-4E622B1A9E9D@holtmann.org>
- <CABBYNZJPN6o-v2OpAXND0+UfwB3AQL2=r6CDQ0S8PktWZqijMw@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Thu, 3 Mar 2022 16:08:32 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F1D4A3CD;
+        Thu,  3 Mar 2022 13:07:45 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id q11so5867411pln.11;
+        Thu, 03 Mar 2022 13:07:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lcGRiz6rr/TDwlVwBBClv8R+9QvaexT6KVuBbBlpjEA=;
+        b=CAG5vCfyC5+8LNntm92xwzyDYPQlhh+BDt8EgB1cRrVEpr6sV+JU5AgFw4HACaOgfX
+         y5YzcYXLjRh/D5Shetpp5bkY5QYhOW1w7mUt1pbmbVbDbkgN9wKqUmN4iSb6PVPvD3zG
+         GRx1fnkRMdpzef1FPqpUl8kozn7IeIXJTCxAigHzLENBOXfpz62srnXHIX/zveD8d5Op
+         CxpFl5fDdKeogQz+U629+2CkrttPShKJw/W1uthuVBUlosCY3H/Y8MLe9Qi3fTjT0LkH
+         Qqbk00h9Km8m706w54vy7cQEzisfxQT070Y6/v8F+8KcDGdp0iKUbP1Zs/bkO8jj8/LB
+         nv7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lcGRiz6rr/TDwlVwBBClv8R+9QvaexT6KVuBbBlpjEA=;
+        b=oReSRYaJLVrY+6CdKALMFrEmNZuVQ+gqKFSbtc8vzHBaJsEVbQh87PNE/YUEK67kli
+         igC50OZnL6HoyIAdlX+QaBTekcVN+tohyzPe17u7khtIGaiLYUd6dFNsjVu7vr3BCtuZ
+         IACYV3MtH8SounReSopis6UwKu8FHRPTuQXg/Lsq9SaSzA1MvRLThXlyi7Uh9EXZndWX
+         400sXUGWbqojfEixT1Z5DyV4vOdK02rsmkigF5KKRSHe/CtVrtzawBcGdBswPPr3VyUF
+         fec0foPesuV2odqXHowixEKygUsbA4Im5A2ztvWzyObc2FmUanTYWEruNJq2xdwUmjKz
+         sp3g==
+X-Gm-Message-State: AOAM532mDeEufdhWu60XZr5qQhDEY8dNGrQEXXt6w8CN086aeGuYjtre
+        AYjQbFgn6p79cCRSj+oLYY9VuzvEeuY=
+X-Google-Smtp-Source: ABdhPJygVn2JDXKjQVwukHWAT2xZQWWQQ4hudGJk1EHeG8w0NACdaADjAqr8bqZKqXPA0dwW0znI8Q==
+X-Received: by 2002:a17:902:8548:b0:14e:e968:9703 with SMTP id d8-20020a170902854800b0014ee9689703mr37247062plo.148.1646341664853;
+        Thu, 03 Mar 2022 13:07:44 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id q15-20020a63504f000000b0037425262293sm2686580pgl.43.2022.03.03.13.07.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 13:07:44 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-03-03
+Date:   Thu,  3 Mar 2022 13:07:43 -0800
+Message-Id: <20220303210743.314679-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+The following changes since commit f8e9bd34cedd89b93b1167aa32ab8ecd6c2ccf4a:
 
->>> Since commit 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events"),
->>> some devices see warnings being printed for vendor events, e.g.
->>> 
->>> [   75.806141] Bluetooth: hci0: setting up wcn399x
->>> [   75.948311] Bluetooth: hci0: unexpected event 0xff length: 14 > 0
->>> [   75.955552] Bluetooth: hci0: QCA Product ID   :0x0000000a
->>> [   75.961369] Bluetooth: hci0: QCA SOC Version  :0x40010214
->>> [   75.967417] Bluetooth: hci0: QCA ROM Version  :0x00000201
->>> [   75.973363] Bluetooth: hci0: QCA Patch Version:0x00000001
->>> [   76.000289] Bluetooth: hci0: QCA controller version 0x02140201
->>> [   76.006727] Bluetooth: hci0: QCA Downloading qca/crbtfw21.tlv
->>> [   76.986850] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.013574] Bluetooth: hci0: QCA Downloading qca/oneplus6/crnv21.bin
->>> [   77.024302] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.032681] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.040674] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.049251] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.057997] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.066320] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.075065] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.083073] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.091250] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.099417] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.110166] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.118672] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.127449] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.137190] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.146192] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.154242] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.163183] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.171202] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.179364] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.187259] Bluetooth: hci0: unexpected event 0xff length: 3 > 0
->>> [   77.198451] Bluetooth: hci0: QCA setup on UART is completed
->>> 
->>> Avoid printing the event length warning for vendor events, this reverts
->>> to the previous behaviour where such warnings weren't printed.
->>> 
->>> Fixes: 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events")
->>> Signed-off-by: Caleb Connolly <caleb.connolly@linaro.org>
->>> ---
->>> Changes since v1:
->>> * Don't return early! Vendor events still get parsed despite the
->>>  warning. I should have looked a little more closely at that...
->>> ---
->>> net/bluetooth/hci_event.c | 2 +-
->>> 1 file changed, 1 insertion(+), 1 deletion(-)
->> 
->> patch has been applied to bluetooth-stable tree.
->> 
-> I believe a proper fix has already been pushed to bluetooth-next:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=314d8cd2787418c5ac6b02035c344644f47b292b
-> 
-> HCI_EV_VENDOR shall be assumed to be variable length and that also
-> uses bt_dev_warn_ratelimited to avoid spamming the logs in case it
-> still fails.
+  Merge branch 'smc-fix' (2022-03-03 10:34:18 +0000)
 
-ok, I reverted the patch and lets this go via net-next tree then. Stable can pick this up if it really becomes a larger problem.
+are available in the Git repository at:
 
-Regards
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-03-03
 
-Marcel
+for you to fetch changes up to 008ee9eb8a11bcabf12c91771dd4f470b082bd44:
 
+  Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work (2022-03-03 13:30:03 +0100)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix regression with processing of MGMT commands
+ - Fix unbalanced unlock in Set Device Flags
+
+----------------------------------------------------------------
+Hans de Goede (1):
+      Bluetooth: hci_core: Fix unbalanced unlock in set_device_flags()
+
+Luiz Augusto von Dentz (1):
+      Bluetooth: hci_sync: Fix not processing all entries on cmd_sync_work
+
+ net/bluetooth/hci_sync.c | 49 +++++++++++++++++++++++-------------------------
+ net/bluetooth/mgmt.c     |  2 +-
+ 2 files changed, 24 insertions(+), 27 deletions(-)
