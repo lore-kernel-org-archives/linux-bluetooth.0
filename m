@@ -2,147 +2,153 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86226C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Mar 2022 17:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC729C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Mar 2022 20:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236448AbiCDRZR convert rfc822-to-8bit (ORCPT
+        id S229550AbiCDUSr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Mar 2022 12:25:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51464 "EHLO
+        Fri, 4 Mar 2022 15:18:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234034AbiCDRZQ (ORCPT
+        with ESMTP id S230256AbiCDURm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Mar 2022 12:25:16 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9BB5715A21F;
-        Fri,  4 Mar 2022 09:24:27 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D5A44CECCF;
-        Fri,  4 Mar 2022 18:24:26 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH] Bluetooth: btrtl: Fix incorrect bin loading by
- MODULE_FIRMWARE
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220228085316.26856-1-tangmeng@uniontech.com>
-Date:   Fri, 4 Mar 2022 18:24:26 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0CF67627-7F23-43B8-A815-B6158D6F9B8F@holtmann.org>
-References: <20220228085316.26856-1-tangmeng@uniontech.com>
-To:     Meng Tang <tangmeng@uniontech.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Fri, 4 Mar 2022 15:17:42 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B6CC8F82;
+        Fri,  4 Mar 2022 12:14:17 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id 195so10849540iou.0;
+        Fri, 04 Mar 2022 12:14:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=p3HzqQP1KC7y7MVdIYLOONNXlQIe0kZIuhD7eE/pgTM=;
+        b=kgGd9pMRtCj6/JHxEDcKGFQ0tuYTYldJVrrfutWg3nVXkn51yxiqgRN/xHbH45h09p
+         JeiBXGCcuRm4H9ZlkmxsfvxnNEgEgyn9zsl8uZ6egstmLdWFObrfSx6bLQbGQolYAuOy
+         msOCk5IrS+XGgk6AN677Tfwd1ur+bBAx6VJey195AbZLp3DHgEV57m0jx2Yu5TvBkn+H
+         Xe8iDI9ssOomS4pGxaE+64oVh9GUzgwLPUjiQ7r7GPGhn4EyV9wY2wT4MrWWvy274i4Y
+         GI7WqRb7sD9JQCRWgQdIsuP+rlH5IQnSYmoPFLBmz+tH+X8eVkKfppVecxsS2iQEfKaK
+         Lhig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=p3HzqQP1KC7y7MVdIYLOONNXlQIe0kZIuhD7eE/pgTM=;
+        b=AzG54a2uTJKC0hRGAuq5vqUaABu6fpjkkomj5K/XTTVfECnIhACgS0tTwhmDHv3JqB
+         a7SBSu++JOvbkF+rqE3Kw+B0zXYInrrrXGmVjkT186srQ8CFwiuC+4WfWBwUZcqAEhwR
+         rR6bxMnYtSgTn3Ef5r749EwgUDl8vjOqTDVYKu106QelqAOPvEuvN6oKWVV1UubIAENT
+         vvzlQ2qTu4kAAzhqPDuNmwhTri8LGwbANZQXqjz0urU1P4d666+1AUmgRa1oGJeQDjAN
+         0JzGPVBqDuzGrADsFBGsdmOH7dVYG277+qSt+/LMjXQJGhXilSu6r281PrXrqPZcIPwL
+         L/iw==
+X-Gm-Message-State: AOAM533oylzCNa3VZDw6kDJ+/7FEaLuCdJxR3zr0a3y69InlqzJK0eWS
+        xmSGiEChBADswO8SvJjpgEviHka6WjI=
+X-Google-Smtp-Source: ABdhPJxAPBJQuPy9+BtOUh7FGRm150+QGtm6IiLk//Fi//I4qmvJWVobehU4IrWjgFBahNYtxLTBbw==
+X-Received: by 2002:a02:c6b4:0:b0:315:3d31:b6e5 with SMTP id o20-20020a02c6b4000000b003153d31b6e5mr131354jan.44.1646422760750;
+        Fri, 04 Mar 2022 11:39:20 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id g4-20020a92cda4000000b002c24724f23csm6334863ild.13.2022.03.04.11.39.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 11:39:20 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2022-03-04
+Date:   Fri,  4 Mar 2022 11:39:19 -0800
+Message-Id: <20220304193919.649815-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Meng,
+The following changes since commit 1039135aedfc5021b4827eb87276d7b4272024ac:
 
-> In brctl, there are some problems which are as follows:
-> 1. The bin name of MODULE_FIRMWARE is incorrect or the bin does not
-> exist.
-> 2. The bin used in ic_id_table have not added MODULE_FIRMWARE
-> declarations.
-> 3. Sorting confusion.
-> 
-> Thus, modify incorrect bin names and delete some non-existing bin
-> names, add MODULE_FIRMWARE for bins that used in ic_id_table and
-> sort by MODULE_FIRMWARE(ctl_bt/*.bin).
-> 
-> Signed-off-by: Meng Tang <tangmeng@uniontech.com>
-> ---
-> drivers/bluetooth/btrtl.c | 37 +++++++++++++++++++------------------
-> 1 file changed, 19 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index c2030f7e25b4..e34b0a29f230 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -88,14 +88,14 @@ static const struct id_table ic_id_table[] = {
-> 	  .config_needed = true,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8723bs_config" },
-> +	  .cfg_name = "rtl_bt/rtl8723bs_config-OBDA8723" },
-> 
-> 	/* 8723B */
-> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8723b_config" },
-> +	  .cfg_name = NULL },
-> 
-> 	/* 8723D */
-> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
-> @@ -104,19 +104,12 @@ static const struct id_table ic_id_table[] = {
-> 	  .fw_name  = "rtl_bt/rtl8723d_fw.bin",
-> 	  .cfg_name = "rtl_bt/rtl8723d_config" },
-> 
-> -	/* 8723DS */
-> -	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_UART),
-> -	  .config_needed = true,
-> -	  .has_rom_version = true,
-> -	  .fw_name  = "rtl_bt/rtl8723ds_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8723ds_config" },
-> -
-> 	/* 8821A */
-> 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xa, 0x6, HCI_USB),
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8821a_config" },
-> +	  .cfg_name = NULL },
-> 
-> 	/* 8821C */
-> 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB),
-> @@ -131,7 +124,7 @@ static const struct id_table ic_id_table[] = {
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8761a_config" },
-> +	  .cfg_name = NULL },
-> 
-> 	/* 8761B */
-> 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
-> @@ -922,15 +915,23 @@ MODULE_LICENSE("GPL");
-> MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723bs_config-OBDA8723.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723d_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723d_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8761b_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8761b_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8761bu_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8761bu_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8821c_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8821c_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8822cs_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8822cs_fw.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8822cu_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8822cu_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
+  net: ethernet: sun: Remove redundant code (2022-03-04 13:07:54 +0000)
 
-simply put no. I have no idea what you are doing. The commit message description is indecipherable to me. This looks like 4 independent things mashed together.
+are available in the Git repository at:
 
-Regards
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-03-04
 
-Marcel
+for you to fetch changes up to 6dfbe29f45fb0bde29213dbd754a79e8bfc6ecef:
 
+  Bluetooth: btusb: Add another Realtek 8761BU (2022-03-04 16:58:13 +0100)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add new PID/VID (0x13d3/0x3567) for MT7921
+ - Add new PID/VID (0x2550/0x8761) for Realtek 8761BU
+ - Add support for LG LGSBWAC02 (MT7663BUN)
+ - Add support for BCM43430A0 and BCM43430A1
+ - Add support for Intel Madison Peak (MsP2)
+
+----------------------------------------------------------------
+Changcheng Deng (1):
+      Bluetooth: mgmt: Replace zero-length array with flexible-array member
+
+Chih-Ying Chiang (1):
+      Bluetooth: mt7921s: support bluetooth reset mechanism
+
+Christophe JAILLET (1):
+      Bluetooth: 6lowpan: No need to clear memory twice
+
+Colin Ian King (1):
+      Bluetooth: make array bt_uuid_any static const
+
+Helmut Grohne (1):
+      Bluetooth: btusb: Add another Realtek 8761BU
+
+Kiran K (1):
+      Bluetooth: btusb: Add support for Intel Madison Peak (MsP2) device
+
+Luca Weiss (1):
+      Bluetooth: hci_bcm: add BCM43430A0 & BCM43430A1
+
+Luiz Augusto von Dentz (2):
+      Bluetooth: Fix not checking for valid hdev on bt_dev_{info,warn,err,dbg}
+      Bluetooth: btusb: Make use of of BIT macro to declare flags
+
+Minghao Chi (1):
+      Bluetooth: mgmt: Remove unneeded variable
+
+Minghao Chi (CGEL ZTE) (1):
+      Bluetooth: use memset avoid memory leaks
+
+Niels Dossche (2):
+      Bluetooth: hci_event: Add missing locking on hdev in hci_le_ext_adv_term_evt
+      Bluetooth: move adv_instance_cnt read within the device lock
+
+Piotr Dymacz (1):
+      Bluetooth: btusb: add support for LG LGSBWAC02 (MT7663BUN)
+
+Radoslaw Biernacki (2):
+      Bluetooth: Fix skb allocation in mgmt_remote_name() & mgmt_device_connected()
+      Bluetooth: Improve skb handling in mgmt_device_connected()
+
+Sean Wang (1):
+      Bluetooth: mediatek: fix the conflict between mtk and msft vendor event
+
+Tom Rix (1):
+      Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
+
+Yake Yang (2):
+      Bluetooth: btusb: Add a new PID/VID 13d3/3567 for MT7921
+      Bluetooth: btmtksdio: Fix kernel oops when sdio suspend.
+
+Zijun Hu (1):
+      Bluetooth: btusb: Improve stability for QCA devices
+
+ drivers/bluetooth/btmtk.h         |   7 +++
+ drivers/bluetooth/btmtksdio.c     | 126 ++++++++++++++++++++++++++++++++++----
+ drivers/bluetooth/btusb.c         |  81 +++++++++++++-----------
+ drivers/bluetooth/hci_bcm.c       |   2 +
+ include/net/bluetooth/bluetooth.h |  14 +++--
+ include/net/bluetooth/mgmt.h      |   2 +-
+ net/bluetooth/6lowpan.c           |   1 -
+ net/bluetooth/eir.h               |  20 ++++++
+ net/bluetooth/hci_event.c         |  19 +++---
+ net/bluetooth/hci_sync.c          |   2 +-
+ net/bluetooth/l2cap_core.c        |   1 +
+ net/bluetooth/mgmt.c              |  58 ++++++++----------
+ 12 files changed, 237 insertions(+), 96 deletions(-)
