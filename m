@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D692AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Mar 2022 01:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC5FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Mar 2022 01:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230371AbiCEBXX (ORCPT
+        id S230372AbiCEBXY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Mar 2022 20:23:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57932 "EHLO
+        Fri, 4 Mar 2022 20:23:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230334AbiCEBXV (ORCPT
+        with ESMTP id S230367AbiCEBXW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Mar 2022 20:23:21 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C903462F4
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 17:22:31 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id 27so8848422pgk.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Mar 2022 17:22:31 -0800 (PST)
+        Fri, 4 Mar 2022 20:23:22 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80076656A
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 17:22:32 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id bd1so9192382plb.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Mar 2022 17:22:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ZnQLZQ+47xiR7bPIhf/j9mqGbUUqU3OVpPtAhF5eO5k=;
-        b=BtZ30PcBFePFUulbjF3lzrSXynYrwJzfGnWTAIuR3MFWiX8SeVmV7GTnRxzflEGktk
-         8699xJJ+yYtxYG6LLJ+T1bKZrkKGEBvVKbaoYPDeo6Ikmgi+2QepepZ5GOm/D9Rkqqoo
-         f9r8NY2FJYLnlWJHV3pcYzQMUh4PJz7YOh5bt4L95txH/dUuAiuzcQ56BVH0qy5P9lFd
-         oOhbTD58tU/Pq6YTnJNM1e4TdSzlJ7Rxn61LcDLr8LQZC+0bxxPZ9P+/Vsmi4UdzIF2b
-         5LJk95Q9ilG5fA4W4oJh0rXfTP+wL4j1LYDuJwXyGuUOo3+ZjTh2vUTbVkEWEFTG8cJK
-         oBHQ==
+        bh=5+rBSTF3sbYgAZ1sTD//Ehy88r9kNGpqp/Y56gyqolU=;
+        b=AIX0a+jvpvzzGM7soW3THUzWjg7hWBan8r30HiAEvkRtU6GUt/WykLFjFiSgthQqcO
+         M59QxvsCFxVmgeJSnuFDylFVZ2tGBQJqj8YJNoIUPKRkdg6Fbq8Log0qvoyIQwOw9Zoy
+         QNHJfQGYgvOKS2ygtwcgGgs1f8In1w1r+jUfZvJV4ZZO1Hm8Jf9HDOIWS99upZNymiEg
+         qEQBG+GGhhVlXWNcKOi1uVR4zLPzudQVmazVKroPWlG719rHwQWd8Zec+Brq7F3aaUrp
+         /beQrQbaAj6AokZAKQ5yaqaMaLdij/S2rWPdy9Pk5dVLkrxvY0IAq2Fj8b+FDYhlIayF
+         ak1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZnQLZQ+47xiR7bPIhf/j9mqGbUUqU3OVpPtAhF5eO5k=;
-        b=uQ09GbCZlotl17tgUpz/M6mGhGlyVBi797FJld5ehZiUbgA7QRFm6Q7BYKllDw0WRZ
-         IHK1P9BonYZKned9zgjkLQmqie0eg4ghqoqJr1k0IBG0oR+MMpgewj8ejjLUYWpWDwpD
-         FxACbK/Oj7GM0dSy5HS1mlHwUtjS6vdG+leReMwT3HGquGkAwFiR6wIL/gctzIsOBxKc
-         dqH2ymtQH53BIpBVBwyllpKzqi5QPhpOZ9M7XL4gFfGdmxo5Y0C3rkrnHl7Wcy4kGAnL
-         JUif/XvLMDXN++QBIC0JFh9dG0yAynGhujfvRx8ecVq3ALIuTkLVTD3bk2+0cnrvxjaP
-         UO6A==
-X-Gm-Message-State: AOAM5301vh4xaccSzRg2JgoaEhOLUIzPqg92tWIJEXrLdueAVcUBKdHW
-        bq16QyjZgQA2I4aKtzKI4zwhGovrAxY=
-X-Google-Smtp-Source: ABdhPJyvfUkXoco1KeuBZNE7b0tlsS4Shf5ZNG+eciHpXYaU+rKYEYz1vplbcpW3ZdmSmsf3kOgBeQ==
-X-Received: by 2002:a05:6a00:84b:b0:4f2:a695:e356 with SMTP id q11-20020a056a00084b00b004f2a695e356mr1444481pfk.0.1646443351065;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5+rBSTF3sbYgAZ1sTD//Ehy88r9kNGpqp/Y56gyqolU=;
+        b=efp+Act6b2E7/ta/6rmcISDS9Wyidsujq50wASLwTJck3g4cVSPChwlFkcMqzItgIo
+         BqIbFteplXRa6oYx0Zxk8uNK2IYGyqG4hqiW+4GW5RReK9l8EF398c+4zMsWaGbH6PA3
+         gyJc7fhhhEPef7zsfeqJJVWPGU73qNyaZGDBroMa5/6JrF5OvBwi0Qeg7Yykqkj2e4g/
+         SQasU+doLF3himgtqMu1naf2rmhO1HrSZCUTeNoBKSVbbcixR3b4yaNMQHf/r/rOKzcX
+         0hUaXRo1xvJAvWFil7HtEpySBG0D6572vBn95VqvJsUitbNIRqOd6dQQtCcuBY7ssfHu
+         IBbg==
+X-Gm-Message-State: AOAM532PPVFa5sFVSJmGlrpA/SxrucT6pLV8xesEn6Mv+1aXsuwdmuqb
+        zjnTcLrQiu1Dhol2TKIs8a3vwqKmYeM=
+X-Google-Smtp-Source: ABdhPJx8ti6cWcjtgAu2smAsHE/B624/kMwXAD/hkRH2G0RiHHVhqb3RZzdp4jBeo32sBCBFedhn3Q==
+X-Received: by 2002:a17:902:cec8:b0:151:cac8:f0a2 with SMTP id d8-20020a170902cec800b00151cac8f0a2mr1189321plg.12.1646443351815;
         Fri, 04 Mar 2022 17:22:31 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m16-20020a638c10000000b0037c4cf366c0sm5363932pgd.61.2022.03.04.17.22.30
+        by smtp.gmail.com with ESMTPSA id m16-20020a638c10000000b0037c4cf366c0sm5363932pgd.61.2022.03.04.17.22.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 17:22:30 -0800 (PST)
+        Fri, 04 Mar 2022 17:22:31 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 00/12] emulator: Initial Broacast Receiver
-Date:   Fri,  4 Mar 2022 17:22:17 -0800
-Message-Id: <20220305012229.853784-1-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v2 01/12] monitor: Fix Create BIG PDU
+Date:   Fri,  4 Mar 2022 17:22:18 -0800
+Message-Id: <20220305012229.853784-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220305012229.853784-1-luiz.dentz@gmail.com>
+References: <20220305012229.853784-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,40 +66,72 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This implements the necessary commands to be able to emulate a Broadcast
-Receiver:
+The PDU of Create BIG is actually fixed size as the num_bis is
+related to the number of indexes to be connected and not the BIS
+parameters.
+---
+ emulator/btdev.c | 2 +-
+ monitor/bt.h     | 2 +-
+ monitor/packet.c | 9 ++-------
+ 3 files changed, 4 insertions(+), 9 deletions(-)
 
-BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC
-BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL
-BT_HCI_CMD_LE_PERIODIC_ADV_TERM_SYNC
-BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED
-BT_HCI_CMD_LE_BIG_CREATE_SYNC
-BT_HCI_CMD_LE_BIG_TERM_SYNC
-
-v2: Adds support for BT_H4_ISO_PKT to bthost.
-
-Luiz Augusto von Dentz (12):
-  monitor: Fix Create BIG PDU
-  btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC
-  btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL
-  btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_TERM_SYNC
-  btdev: Send BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED when scan is initiated
-  btdev: Send BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED if remote start pa
-  monitor: Rename Periodic Advertising terms to PA/pa
-  btdev: Implements BT_HCI_CMD_LE_BIG_CREATE_SYNC
-  btdev: Implements BT_HCI_CMD_LE_BIG_TERM_SYNC
-  bthost: Add support for BT_H4_ISO_PKT
-  bthost: Add support for Periodic Advertising
-  bthost: Add support for Create BIG
-
- emulator/btdev.c  | 455 +++++++++++++++++++++++++++++++++++++++-------
- emulator/bthost.c | 392 ++++++++++++++++++++++++++++++++++-----
- emulator/bthost.h |  14 ++
- emulator/hciemu.c |   1 +
- monitor/bt.h      |  93 +++++-----
- monitor/packet.c  | 113 ++++++------
- 6 files changed, 862 insertions(+), 206 deletions(-)
-
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 378674010..9189e8082 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -5692,10 +5692,10 @@ static int cmd_create_big_complete(struct btdev *dev, const void *data,
+ 							uint8_t len)
+ {
+ 	const struct bt_hci_cmd_le_create_big *cmd = data;
++	const struct bt_hci_bis *bis = &cmd->bis;
+ 	int i;
+ 
+ 	for (i = 0; i < cmd->num_bis; i++) {
+-		const struct bt_hci_bis *bis = &cmd->bis[i];
+ 		struct btdev_conn *conn;
+ 		struct {
+ 			struct bt_hci_evt_le_big_complete evt;
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 66ed3ef5a..51b1833dc 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -2758,7 +2758,7 @@ struct bt_hci_cmd_le_create_big {
+ 	uint8_t  handle;
+ 	uint8_t  adv_handle;
+ 	uint8_t  num_bis;
+-	struct bt_hci_bis bis[0];
++	struct bt_hci_bis bis;
+ } __attribute__ ((packed));
+ 
+ #define BT_HCI_CMD_LE_CREATE_BIG_TEST		0x2069
+diff --git a/monitor/packet.c b/monitor/packet.c
+index ec779a9d5..a17c632a7 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -8200,10 +8200,8 @@ static void le_reject_cis_req_cmd(const void *data, uint8_t size)
+ 	print_reason(cmd->reason);
+ }
+ 
+-static void print_bis(const void *data, int i)
++static void print_bis(const struct bt_hci_bis *bis)
+ {
+-	const struct bt_hci_bis *bis = data;
+-
+ 	print_usec_interval("SDU Interval", bis->sdu_interval);
+ 	print_field("Maximum SDU size: %u", le16_to_cpu(bis->sdu));
+ 	print_field("Maximum Latency: %u ms (0x%4.4x)",
+@@ -8223,10 +8221,7 @@ static void le_create_big_cmd(const void *data, uint8_t size)
+ 	print_field("Handle: 0x%2.2x", cmd->handle);
+ 	print_field("Advertising Handle: 0x%2.2x", cmd->adv_handle);
+ 	print_field("Number of BIS: %u", cmd->num_bis);
+-
+-	size -= sizeof(*cmd);
+-
+-	print_list(cmd->bis, size, cmd->num_bis, sizeof(*cmd->bis), print_bis);
++	print_bis(&cmd->bis);
+ }
+ 
+ static void print_bis_test(const void *data, int i)
 -- 
 2.35.1
 
