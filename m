@@ -2,153 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC729C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Mar 2022 20:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10962C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Mar 2022 00:21:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbiCDUSr (ORCPT
+        id S230031AbiCEAWB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Mar 2022 15:18:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60108 "EHLO
+        Fri, 4 Mar 2022 19:22:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230256AbiCDURm (ORCPT
+        with ESMTP id S229449AbiCEAWA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Mar 2022 15:17:42 -0500
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B6CC8F82;
-        Fri,  4 Mar 2022 12:14:17 -0800 (PST)
-Received: by mail-io1-xd29.google.com with SMTP id 195so10849540iou.0;
-        Fri, 04 Mar 2022 12:14:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=p3HzqQP1KC7y7MVdIYLOONNXlQIe0kZIuhD7eE/pgTM=;
-        b=kgGd9pMRtCj6/JHxEDcKGFQ0tuYTYldJVrrfutWg3nVXkn51yxiqgRN/xHbH45h09p
-         JeiBXGCcuRm4H9ZlkmxsfvxnNEgEgyn9zsl8uZ6egstmLdWFObrfSx6bLQbGQolYAuOy
-         msOCk5IrS+XGgk6AN677Tfwd1ur+bBAx6VJey195AbZLp3DHgEV57m0jx2Yu5TvBkn+H
-         Xe8iDI9ssOomS4pGxaE+64oVh9GUzgwLPUjiQ7r7GPGhn4EyV9wY2wT4MrWWvy274i4Y
-         GI7WqRb7sD9JQCRWgQdIsuP+rlH5IQnSYmoPFLBmz+tH+X8eVkKfppVecxsS2iQEfKaK
-         Lhig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=p3HzqQP1KC7y7MVdIYLOONNXlQIe0kZIuhD7eE/pgTM=;
-        b=AzG54a2uTJKC0hRGAuq5vqUaABu6fpjkkomj5K/XTTVfECnIhACgS0tTwhmDHv3JqB
-         a7SBSu++JOvbkF+rqE3Kw+B0zXYInrrrXGmVjkT186srQ8CFwiuC+4WfWBwUZcqAEhwR
-         rR6bxMnYtSgTn3Ef5r749EwgUDl8vjOqTDVYKu106QelqAOPvEuvN6oKWVV1UubIAENT
-         vvzlQ2qTu4kAAzhqPDuNmwhTri8LGwbANZQXqjz0urU1P4d666+1AUmgRa1oGJeQDjAN
-         0JzGPVBqDuzGrADsFBGsdmOH7dVYG277+qSt+/LMjXQJGhXilSu6r281PrXrqPZcIPwL
-         L/iw==
-X-Gm-Message-State: AOAM533oylzCNa3VZDw6kDJ+/7FEaLuCdJxR3zr0a3y69InlqzJK0eWS
-        xmSGiEChBADswO8SvJjpgEviHka6WjI=
-X-Google-Smtp-Source: ABdhPJxAPBJQuPy9+BtOUh7FGRm150+QGtm6IiLk//Fi//I4qmvJWVobehU4IrWjgFBahNYtxLTBbw==
-X-Received: by 2002:a02:c6b4:0:b0:315:3d31:b6e5 with SMTP id o20-20020a02c6b4000000b003153d31b6e5mr131354jan.44.1646422760750;
-        Fri, 04 Mar 2022 11:39:20 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g4-20020a92cda4000000b002c24724f23csm6334863ild.13.2022.03.04.11.39.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 11:39:20 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2022-03-04
-Date:   Fri,  4 Mar 2022 11:39:19 -0800
-Message-Id: <20220304193919.649815-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Fri, 4 Mar 2022 19:22:00 -0500
+X-Greylist: delayed 907 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 04 Mar 2022 16:21:11 PST
+Received: from l2mail1.panix.com (l2mail1.panix.com [166.84.1.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D05F259F5A
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 16:21:11 -0800 (PST)
+Received: from mailbackend.panix.com (mailbackend.panix.com [166.84.1.89])
+        by l2mail1.panix.com (Postfix) with ESMTPS id 4K9Q3x5HGczDS3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 19:06:05 -0500 (EST)
+Received: from xps-7390 (ip98-164-213-246.oc.oc.cox.net [98.164.213.246])
+        by mailbackend.panix.com (Postfix) with ESMTPSA id 4K9Q3t4mvPz2t2f;
+        Fri,  4 Mar 2022 19:06:02 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=panix.com; s=panix;
+        t=1646438763; bh=casus4L3TbPO2zm3BnR5igubAf9LxZR+oexTj4DCcrM=;
+        h=Date:From:Reply-To:To:cc:Subject:In-Reply-To:References;
+        b=vkZLEOQKrBtu5oe4ZGzZAn3HG7sHolnEU0ds+AsXQ4I6KkhL4SxVPmDwdlJW6jTco
+         8pG1Uu9/FNdapKjNkOSYLXUQRmxwSCd7PRuLKXSFzzNxD1Jenl3aVsD8enz7Kt7R/0
+         nmt5boFy0qpMx/xZoPc9XZ0yTrwdKiV1Qc4ESHt4=
+Date:   Fri, 4 Mar 2022 16:03:52 -0800 (PST)
+From:   "Kenneth R. Crudup" <kenny@panix.com>
+Reply-To: "Kenneth R. Crudup" <kenny@panix.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+cc:     Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Kenneth R. Crudup" <kenny@panix.com>, regressions@lists.linux.dev,
+        marcel@holtmann.org
+Subject: Re: Commit ad383c2c6 ("Bluetooth: hci_sync: Enable advertising when
+ LL privacy is enabled") breaks my MS ArcTouch mouse
+In-Reply-To: <3bc9bbab-b3cd-4c52-cc33-5d723d973deb@panix.com>
+Message-ID: <28e1099-76a-3b8d-b6d2-84dbde9ab853@panix.com>
+References: <4124ccb8-11f-21e9-982e-7fb07f23225@panix.com> <CABBYNZLt3GmBTmAADa+FF2bdEfzMg_9Horxk2pT85BC+LFgrMQ@mail.gmail.com> <91c1e9ef-4786-b9f5-8bb8-b93c84c0874b@panix.com> <CABBYNZ+t+L=G-X0qt=Cnn7vUpLu2s1=purmAESnCaRvK7XtmdQ@mail.gmail.com>
+ <76f65c9-e031-3870-9dfb-49f8969534ae@panix.com> <6f3b9dbb-6ecf-cfea-2127-cb3360d78431@panix.com> <3bc9bbab-b3cd-4c52-cc33-5d723d973deb@panix.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 1039135aedfc5021b4827eb87276d7b4272024ac:
 
-  net: ethernet: sun: Remove redundant code (2022-03-04 13:07:54 +0000)
+On Sat, 29 Jan 2022, Kenneth R. Crudup wrote:
 
-are available in the Git repository at:
+> So, it turns out that my lack of discoverability is also tied into this last
+> series of BT commits
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-03-04
+So, after "for-net-next-2021-11-16" was pushed into Linus' master, my Laptop's
+Bluetooth has been horribly broken; I can't add new devices (says "can't put
+your adaptor into Discoverable mode"), and my MS ArcTouch mouse (and who knows
+what else) doesn't work anymore. I also get stalls/crashes from the BT system
+when trying to shutdown or reboot.
 
-for you to fetch changes up to 6dfbe29f45fb0bde29213dbd754a79e8bfc6ecef:
+This is a *serious* regression- I had to revert the entirety of that merge.
+I keep checking the BT changes that have made it to Linus' master of late (and
+even monitoring the Bluetooth git), after nearly 6 weeks, BT is still broken-
+certainly I can't be the only person seeing these issues. I did see where
+someone had a regression about not being able to do scans, and that was fixed,
+but trying that commit (since merged to master) doesn't fix anything for me.
 
-  Bluetooth: btusb: Add another Realtek 8761BU (2022-03-04 16:58:13 +0100)
+My BT adaptor is an Intel AX201 on USB:
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
+----
+[Fri Mar  4 15:40:52 2022] Bluetooth: hci0: Found device firmware: intel/ibt-19-32-4.sfi
+[Fri Mar  4 15:40:52 2022] Bluetooth: hci0: Boot Address: 0x24800
+[Fri Mar  4 15:40:52 2022] Bluetooth: hci0: Firmware Version: 126-5.22
+----
 
- - Add new PID/VID (0x13d3/0x3567) for MT7921
- - Add new PID/VID (0x2550/0x8761) for Realtek 8761BU
- - Add support for LG LGSBWAC02 (MT7663BUN)
- - Add support for BCM43430A0 and BCM43430A1
- - Add support for Intel Madison Peak (MsP2)
+----
+Bus 003 Device 003: ID 8087:0026 Intel Corp.
+Device Descriptor:
+  bLength                18
+  bDescriptorType         1
+  bcdUSB               2.01
+  bDeviceClass          224 Wireless
+  bDeviceSubClass         1 Radio Frequency
+  bDeviceProtocol         1 Bluetooth
+  bMaxPacketSize0        64
+  idVendor           0x8087 Intel Corp.
+  idProduct          0x0026
+----
 
-----------------------------------------------------------------
-Changcheng Deng (1):
-      Bluetooth: mgmt: Replace zero-length array with flexible-array member
+What can I do to help you fix this?
 
-Chih-Ying Chiang (1):
-      Bluetooth: mt7921s: support bluetooth reset mechanism
+	-Kenny
 
-Christophe JAILLET (1):
-      Bluetooth: 6lowpan: No need to clear memory twice
-
-Colin Ian King (1):
-      Bluetooth: make array bt_uuid_any static const
-
-Helmut Grohne (1):
-      Bluetooth: btusb: Add another Realtek 8761BU
-
-Kiran K (1):
-      Bluetooth: btusb: Add support for Intel Madison Peak (MsP2) device
-
-Luca Weiss (1):
-      Bluetooth: hci_bcm: add BCM43430A0 & BCM43430A1
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: Fix not checking for valid hdev on bt_dev_{info,warn,err,dbg}
-      Bluetooth: btusb: Make use of of BIT macro to declare flags
-
-Minghao Chi (1):
-      Bluetooth: mgmt: Remove unneeded variable
-
-Minghao Chi (CGEL ZTE) (1):
-      Bluetooth: use memset avoid memory leaks
-
-Niels Dossche (2):
-      Bluetooth: hci_event: Add missing locking on hdev in hci_le_ext_adv_term_evt
-      Bluetooth: move adv_instance_cnt read within the device lock
-
-Piotr Dymacz (1):
-      Bluetooth: btusb: add support for LG LGSBWAC02 (MT7663BUN)
-
-Radoslaw Biernacki (2):
-      Bluetooth: Fix skb allocation in mgmt_remote_name() & mgmt_device_connected()
-      Bluetooth: Improve skb handling in mgmt_device_connected()
-
-Sean Wang (1):
-      Bluetooth: mediatek: fix the conflict between mtk and msft vendor event
-
-Tom Rix (1):
-      Bluetooth: hci_sync: fix undefined return of hci_disconnect_all_sync()
-
-Yake Yang (2):
-      Bluetooth: btusb: Add a new PID/VID 13d3/3567 for MT7921
-      Bluetooth: btmtksdio: Fix kernel oops when sdio suspend.
-
-Zijun Hu (1):
-      Bluetooth: btusb: Improve stability for QCA devices
-
- drivers/bluetooth/btmtk.h         |   7 +++
- drivers/bluetooth/btmtksdio.c     | 126 ++++++++++++++++++++++++++++++++++----
- drivers/bluetooth/btusb.c         |  81 +++++++++++++-----------
- drivers/bluetooth/hci_bcm.c       |   2 +
- include/net/bluetooth/bluetooth.h |  14 +++--
- include/net/bluetooth/mgmt.h      |   2 +-
- net/bluetooth/6lowpan.c           |   1 -
- net/bluetooth/eir.h               |  20 ++++++
- net/bluetooth/hci_event.c         |  19 +++---
- net/bluetooth/hci_sync.c          |   2 +-
- net/bluetooth/l2cap_core.c        |   1 +
- net/bluetooth/mgmt.c              |  58 ++++++++----------
- 12 files changed, 237 insertions(+), 96 deletions(-)
+-- 
+Kenneth R. Crudup / Sr. SW Engineer, Scott County Consulting, Orange County CA
