@@ -2,228 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25645C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Mar 2022 07:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40B4DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Mar 2022 07:58:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230441AbiCEH6J (ORCPT
+        id S231244AbiCEH6t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 5 Mar 2022 02:58:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45234 "EHLO
+        Sat, 5 Mar 2022 02:58:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbiCEH6I (ORCPT
+        with ESMTP id S229994AbiCEH6t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 5 Mar 2022 02:58:08 -0500
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4045551E7E
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 23:57:19 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-2dbd8777564so114857367b3.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Mar 2022 23:57:19 -0800 (PST)
+        Sat, 5 Mar 2022 02:58:49 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91197522CB
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Mar 2022 23:57:59 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id c4so9351288qtx.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Mar 2022 23:57:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NzuGPUTt1YZZ7Rgh/PBEF8DFTwV/oCvrQMa/tuOTpB8=;
-        b=YtObIq+TC/TsTopWXkuKijiIGab7kUy221elWbRWuFIeCI0odtApHVz6ktrAyw1Nvm
-         l++CUn1lRaV/mJ1uwLpm2s71x3XE2CqjYLx9zkbg4q/yu1C20vbmxI0wHm+7AUD3Vq+l
-         l6cJbkK3dDYOrt9fVxRVU9VwwqFUOVizXnQmJUAY6SQFK6GRL84HmS2FRzy+oRqhdZdu
-         J7yIz+RvFLXjQeIY4IIFYqhe/HkYu6UieL2ukpWcgwQj4+Q7Qn4RIl92msnds1xKP66s
-         eIEeHRxyqHD7HEISxAESl26aeaJV3G9+VEsYdQ/G+GxFVhVSTCSf0lR3HPnS1E1tMmLe
-         Ycuw==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=aKQNz2VtncJV5BUmlWhQ0aWN51SBjejd2LIvV1stw8U=;
+        b=BbTuKUNGloj2u8GMba1isDA4ttuG0Ev1IuV27avGyrmAvSieJhA/dyGX5V+lZSNLZS
+         MIbJ+ZnWdkf+5Sd/BN/UqUSM2aOQpppnAy5VBxJMyBDeW3BI4IT+/tcaQn6Ha0z49mrW
+         s2NyH0YpnKDlkyO/g3zoVpFAupU7WOudPIitgpO2dB99cNmdmVVLRd/t+TcTCG0VpboN
+         poDl8ioQvlENyLk5EEjZt6BPjWt7rYQfVrC4iyDYLwxPFscYJBJ/Uw40v92UMnhTfXAm
+         5WyiEze4tqXUa0vQ0I0651UycdRU4o6r08jM2XXfakS92/ZKoh+p0vrOsI9CCvd+5DD5
+         JGvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NzuGPUTt1YZZ7Rgh/PBEF8DFTwV/oCvrQMa/tuOTpB8=;
-        b=MQTpCvNfzIZbJyn2EAxQO9RXocKOe+6VDhgCfUKQu9zS06STEfN9hTfKQjNTZb3hYD
-         VpoqepHGtsnrvdKPQg+srXTsvvn9hIcliWQWwXMDA9dY1qj46Wq4A5VkqlgpP3FgKbNG
-         wSba9OCyMlfOmayjAhC9QxCPi4qDGcOUimfr+GdUWiqPhCg+cEat1lmlpoi1yHdb2usZ
-         PK0KX+wAnNiHOLrmaaVt7JmalnX4Z+CIwiPHDPn2B6YvJtAsYnh9+Q5OAxljA6mhIa8L
-         dV4ixP/TBNx8O9tfAdswiOxXGdOKAkGvvFGo2HF8L8NH5PZ0f7nS19tKkhHzDDDwDdu2
-         BIuA==
-X-Gm-Message-State: AOAM531JJNqhXd4qn3o2dyn5hy7WFmvk70FVk1azLg2Ar0vuq3CBIhBd
-        2bXreXASqnIfo706xuNyhVvRveJbD1+zlqABHYtZVrG80eWJTg==
-X-Google-Smtp-Source: ABdhPJxXYOilOyxjxpfUV9XY2XLoR71W5PPmnZql1qhG43L4/572bnLZ1ZPO5ZK+qBgO9nQRWqwUQOnT9mn0FUg/mwM=
-X-Received: by 2002:a81:53c2:0:b0:2dc:3600:7db3 with SMTP id
- h185-20020a8153c2000000b002dc36007db3mr1766366ywb.23.1646467038031; Fri, 04
- Mar 2022 23:57:18 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=aKQNz2VtncJV5BUmlWhQ0aWN51SBjejd2LIvV1stw8U=;
+        b=UPoOduh4E2oJsqzqYBL4IoV+/adMe2UTKbvNPFUfm0vgp5YtLhCifiaWOGR2ljLZkJ
+         VqEDf3FnEs17uWHgJ8YFxLHM3aZbP5ZGbQAyQrgB2fIoqLr70qjnjDoFgNJe5Jq9hI4g
+         SYCD+8cPS5fBzTDBbbkHOWLdeAIyzwXEoSJcie1uPo/YAL0swxivVWzPHtg8xy3JkKue
+         QwqAdmivH+mK6VFFpoTgQfEZGUE2LIuc3IKYhjWZpa5p4FPwjf0F9aPCMJhnBIDINeRa
+         PGY3JzxNmgzM84ksgRoQk1zay17kr5cH4mIlkhf4rShDFs+EKCi50Y6ktfd8dtiwb0Pj
+         aSyA==
+X-Gm-Message-State: AOAM531G23CuEFAeenDQ2uyYNfEslbvwHAqUOGax03YTBOdzRHdXx1aS
+        5NlQqpVkVGbLCS8W8Db1De04ZvhgGTw=
+X-Google-Smtp-Source: ABdhPJxPKpCpk01kDBer2r1mjCf3hsToUHx0Q/8/POsKkdtjF+pFEd3ookfi90MnUOg26bucFSln3Q==
+X-Received: by 2002:a05:622a:148d:b0:2da:5cc0:7647 with SMTP id t13-20020a05622a148d00b002da5cc07647mr2032215qtx.337.1646467078521;
+        Fri, 04 Mar 2022 23:57:58 -0800 (PST)
+Received: from [172.17.0.2] ([52.184.167.65])
+        by smtp.gmail.com with ESMTPSA id s19-20020ac85cd3000000b002de4e165ae0sm4722349qta.75.2022.03.04.23.57.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 23:57:58 -0800 (PST)
+Message-ID: <62231806.1c69fb81.590de.acdc@mx.google.com>
+Date:   Fri, 04 Mar 2022 23:57:58 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1267288052385319118=="
 MIME-Version: 1.0
-References: <20220215133636.2827039-1-josephsih@chromium.org> <666C5B97-A51C-48B9-AC91-0655C0D158B5@holtmann.org>
-In-Reply-To: <666C5B97-A51C-48B9-AC91-0655C0D158B5@holtmann.org>
-From:   Joseph Hwang <josephsih@google.com>
-Date:   Sat, 5 Mar 2022 15:57:07 +0800
-Message-ID: <CAHFy41_KiZygzfj91+8tJQWqESWKCXuatQFuKovh+DnMcPyY8Q@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v4 1/8] doc: Introduce the quality report command
- and event
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, swyterzone@gmail.com
+Subject: RE: [v3] Bluetooth: btusb: Add quirk to skip HCI_FLT_CLEAR_ALL on fake CSR controllers
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <3b6c7c18-dc48-b924-bd09-3638a5c741a4@gmail.com>
+References: <3b6c7c18-dc48-b924-bd09-3638a5c741a4@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel, thank you for reviewing the patches! Please read my replies
-in the lines below. Thanks!
+--===============1267288052385319118==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 17, 2022 at 8:13 PM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Joseph,
->
-> > Add the MGMT quality report command and event in doc/mgmt-api.txt.
-> >
-> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> > ---
-> >
-> > Changes in v4:
-> > - Use "Quality Report Event" without the prefix "Bluetooth" word.
-> > - Combine both MGMT quality report command and event changes in a
-> >  single patch.
-> >
-> > Changes in v3:
-> > - Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
-> > - Add 5 new patches (5/9 - 9/9) to enable the quality report
-> >  feature via MGMT_OP_SET_QUALITY_REPORT instead of through the
-> >  experimental features.
-> >
-> > Changes in v2:
-> > - This is a new patch for adding the event in doc/mgmt-api.txt
-> >
-> > doc/mgmt-api.txt | 61 ++++++++++++++++++++++++++++++++++++++++++++++++
-> > 1 file changed, 61 insertions(+)
-> >
-> > diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> > index ebe56afa4..a494f5d7e 100644
-> > --- a/doc/mgmt-api.txt
-> > +++ b/doc/mgmt-api.txt
-> > @@ -332,6 +332,7 @@ Read Controller Information Command
-> >               15      Static Address
-> >               16      PHY Configuration
-> >               17      Wideband Speech
-> > +             18      Quality Report
-> >
-> >       This command generates a Command Complete event on success or
-> >       a Command Status event on failure.
-> > @@ -2924,6 +2925,7 @@ Read Extended Controller Information Command
-> >               15      Static Address
-> >               16      PHY Configuration
-> >               17      Wideband Speech
-> > +             18      Quality Report
-> >
-> >       The EIR_Data field contains information about class of device,
-> >       local name and other values. Not all of them might be present. Fo=
-r
-> > @@ -3858,6 +3860,46 @@ Add Advertisement Patterns Monitor With RSSI Thr=
-eshold Command
-> >                               Invalid Parameters
-> >
-> >
-> > +Set Quality Report Command
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > +
-> > +     Command Code:           0x0057
-> > +     Controller Index:       <controller id>
-> > +     Command Parameters:     Action (1 Octet)
->
-> I remember mentioning that we should use Quality_Report instead of Action=
-.
->
-> > +     Return Parameters:      Current_Settings (4 Octets)
-> > +
-> > +     This command is used to enable and disable the controller's quali=
-ty
-> > +     report feature. The allowed values for the Action command paramet=
-er
-> > +     are 0x00 and 0x01. All other values will return Invalid Parameter=
-s.
-> > +
-> > +     The value 0x00 disables the Quality Report, and the value 0x01
-> > +     enables the Quality Report feature.
-> > +
-> > +     This command is only available for the controllers that support
-> > +     either AOSP Bluetooth quality report or Intel telemetry event.
->
-> The details below are interesting, but don=E2=80=99t have to be in this d=
-ocument. It is supported if the Supported_Settings indicate support for it.
->
-> > +     For a controller supporting the AOSP specification, it should cal=
-l
-> > +     hci_set_aosp_capable() in its driver. The controller should also
-> > +     return version_supported v0.98 or higher in its Vendor-specific
-> > +     capabilities responding to the LE_Get_Vendor_Capabilities_Command=
-.
-> > +     On the other hand, for a controller supporting Intel specificatio=
-n,
-> > +     it should set up the set_quality_report callback properly. The dr=
-iver
-> > +     is responsible of setting up the quality report capability as
-> > +     described above; otherwise, a Not Supported status will be return=
-ed.
-> > +
-> > +     This command requires to use a valid controller index. Otherwise,
-> > +     an Invalid Index status will be returned.
-> > +
-> > +     The command is sent to the controller to enable/disable the quali=
-ty
-> > +     report feature, and generates a Command Complete event on success=
-.
-> > +     If the controller failed to execute the action, a Failed status w=
-ill
-> > +     be returned.
->
-> Can this be used when powered off, is it remembered over power off/on cyc=
-les etc.
+This is automated email and please do not reply to this email!
 
-It is not remembered by the Intel controller over power cycles. I will
-test the other AOSP vendors, and plan to address this issue in
-separate patches in which I will describe the behavior explicitly.
-Thanks.
+Dear submitter,
 
->
-> > +
-> > +     Possible errors:        Failed
-> > +                             Invalid Index
-> > +                             Invalid Parameters
-> > +                             Not Supported
-> > +
-> > +
-> > Command Complete Event
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > @@ -4978,3 +5020,22 @@ Advertisement Monitor Device Lost Event
-> >               2       LE Random
-> >
-> >       This event will be sent to all management sockets.
-> > +
-> > +
-> > +Quality Report Event
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +     Event code:             0x0031
-> > +     Controller Index:       <controller_id>
-> > +     Event Parameters:       Quality_Spec (1 Octet)
-> > +                             Report_Len (2 Octets)
-> > +                             Report (0-65535 Octets)
-> > +
-> > +     This event carries the Bluetooth quality report sent by the
-> > +     controller.
-> > +
-> > +     Possible values for the Quality_Spec parameter:
-> > +             0       AOSP Bluetooth Quality Report Event
-> > +             1       Intel Telemetry Event
-> > +
-> > +     This event will be sent to all management sockets.
->
-> Regards
->
-> Marcel
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=620584
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.12 seconds
+GitLint                       FAIL      1.06 seconds
+SubjectPrefix                 PASS      0.95 seconds
+BuildKernel                   PASS      31.67 seconds
+BuildKernel32                 PASS      28.77 seconds
+Incremental Build with patchesPASS      38.30 seconds
+TestRunner: Setup             PASS      491.73 seconds
+TestRunner: l2cap-tester      PASS      15.72 seconds
+TestRunner: bnep-tester       PASS      6.20 seconds
+TestRunner: mgmt-tester       PASS      102.91 seconds
+TestRunner: rfcomm-tester     PASS      7.99 seconds
+TestRunner: sco-tester        PASS      7.79 seconds
+TestRunner: smp-tester        PASS      7.73 seconds
+TestRunner: userchan-tester   PASS      6.47 seconds
+
+Details
+##############################
+Test: GitLint - FAIL - 1.06 seconds
+Run gitlint with rule in .gitlint
+[v3] Bluetooth: btusb: Add quirk to skip HCI_FLT_CLEAR_ALL on fake CSR controllers
+1: T1 Title exceeds max length (82>80): "[v3] Bluetooth: btusb: Add quirk to skip HCI_FLT_CLEAR_ALL on fake CSR controllers"
+24: B3 Line contains hard tab characters (\t): "hci0:	Type: Primary  Bus: USB"
+25: B3 Line contains hard tab characters (\t): "	BD Address: 00:1A:7D:DA:7X:XX  ACL MTU: 679:8  SCO MTU: 48:16"
+26: B3 Line contains hard tab characters (\t): "	UP RUNNING PSCAN ISCAN"
+27: B3 Line contains hard tab characters (\t): "	Features: 0xbf 0x3e 0x4d 0xfa 0xdb 0x3d 0x7b 0xc7"
+28: B3 Line contains hard tab characters (\t): "	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3"
+29: B3 Line contains hard tab characters (\t): "	Link policy: RSWITCH SNIFF"
+30: B3 Line contains hard tab characters (\t): "	Link mode: PERIPHERAL ACCEPT"
+31: B3 Line contains hard tab characters (\t): "	Name: 'CSR8510 A10.'"
+32: B3 Line contains hard tab characters (\t): "	Class: 0x7c0104"
+33: B3 Line contains hard tab characters (\t): "	Service Classes: Rendering, Capturing, Object Transfer, Audio, Telephony"
+34: B3 Line contains hard tab characters (\t): "	Device Class: Computer, Desktop workstation"
+35: B3 Line contains hard tab characters (\t): "	HCI Version: 4.0 (0x6)  Revision: 0x3120"
+36: B3 Line contains hard tab characters (\t): "	LMP Version: 4.0 (0x6)  Subversion: 0x22bb"
+37: B3 Line contains hard tab characters (\t): "	Manufacturer: Cambridge Silicon Radio (10)"
 
 
---=20
 
-Joseph Shyh-In Hwang
-Email: josephsih@google.com
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1267288052385319118==--
