@@ -2,78 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85677C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Mar 2022 08:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E33C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Mar 2022 21:58:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232879AbiCFIuZ (ORCPT
+        id S234309AbiCFV66 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Mar 2022 03:50:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53014 "EHLO
+        Sun, 6 Mar 2022 16:58:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbiCFIuZ (ORCPT
+        with ESMTP id S234302AbiCFV65 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Mar 2022 03:50:25 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 32DA458E4A
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Mar 2022 00:49:33 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2910.dip0.t-ipconnect.de [91.61.41.16])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3C986CECF9;
-        Sun,  6 Mar 2022 09:49:32 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [BlueZ PATCH v4 1/8] doc: Introduce the quality report command
- and event
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHFy41_D3bBzU6Efd3q8Fuh2Ftmq5CrJ6zOj4hCH=x_9M5O89Q@mail.gmail.com>
-Date:   Sun, 6 Mar 2022 09:49:31 +0100
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Sun, 6 Mar 2022 16:58:57 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6BC1C11B;
+        Sun,  6 Mar 2022 13:58:03 -0800 (PST)
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1646603881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OLij3hLq/ByEiIvsKO2mUqNMbWd2cFRiFv/iL/CpBCk=;
+        b=tUne71KCZTwV5KHN/PA2BeuDU0Ui2RmzmR06wo5VCgSnXvcNJ6gUdlowRejfyJNqosczI0
+        XyIRewLv9JIHiQHH8tPt2M+F4beDGD/0Yt9G+nD/DvgMbBI64JFULurNIZzsA0PINVVvbJ
+        1QmKMsvsr8OT4Dt1Kql7HOdKoTP+eJN1PnsOPhvPeyuU0o0fqW5DVr/vBOLYy2td0FE4iD
+        mI6Bh7LRqEVP0JG44lJL9GazmWDjSATwFYGnODpUEoEwH3i8Qxyw9zG+Pj3ogW8w9lOUAq
+        htbT4393p5kH+q1pUt6hS94uyx81KNWM5UWwCA2zec7l3KTSzI3/u1bWwA9cSw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1646603881;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OLij3hLq/ByEiIvsKO2mUqNMbWd2cFRiFv/iL/CpBCk=;
+        b=rkxcvxvK79CfwpOoWAKzxP921+aI4UP2669w0fns34DkINPs693vfhMMINY9U6iEsbZWfw
+        PeHf6FpY2DQ8tJBQ==
+To:     netdev@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Antonio Quartulli <a@unstable.cc>,
+        b.a.t.m.a.n@lists.open-mesh.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Divya Koppera <Divya.Koppera@microchip.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Jon Maloy <jmaloy@redhat.com>, linux-bluetooth@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-staging@lists.linux.dev,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <44687930-3737-46E5-991C-F6C1910C48F7@holtmann.org>
-References: <20220215133636.2827039-1-josephsih@chromium.org>
- <666C5B97-A51C-48B9-AC91-0655C0D158B5@holtmann.org>
- <CAHFy41_KiZygzfj91+8tJQWqESWKCXuatQFuKovh+DnMcPyY8Q@mail.gmail.com>
- <8AD1FDEA-CB22-4DEE-9ACE-CAAD3459DEF0@holtmann.org>
- <CAHFy41_D3bBzU6Efd3q8Fuh2Ftmq5CrJ6zOj4hCH=x_9M5O89Q@mail.gmail.com>
-To:     Joseph Hwang <josephsih@google.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Marcel Holtmann <marcel@holtmann.org>,
+        Marek Lindner <mareklindner@neomailbox.ch>,
+        Remi Denis-Courmont <courmisch@gmail.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Simon Wunderlich <sw@simonwunderlich.de>,
+        Sven Eckelmann <sven@narfation.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        tipc-discussion@lists.sourceforge.net,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Ying Xue <ying.xue@windriver.com>
+Subject: [PATCH net-next 00/10] net: Convert user to netif_rx(), part 3.
+Date:   Sun,  6 Mar 2022 22:57:43 +0100
+Message-Id: <20220306215753.3156276-1-bigeasy@linutronix.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+This is the third and last batch of converting netif_rx_ni() caller to
+netif_rx(). The change making this possible is net-next and
+netif_rx_ni() is a wrapper around netif_rx(). This is a clean up in
+order to remove netif_rx_ni().
 
->  What I plan to do about adapter power cycle for quality report:
-> 
->  Step 1: At power off, do not clear the flag of HCI_QUALITY_REPORT in
-> hci_dev_clear_volatile_flags(). Will use HCI_QUALITY_REPORT to track
-> if the quality report is enabled before power off. Will also disable
-> the quality report explicitly in hci_sync.c:hci_dev_open_sync() just
-> before aosp_do_close()  so that different vendor chips will have
-> quality off at power off.
-> 
->  Step 2: In hci_sync.c:hci_dev_open_sync(), re-enable quality report
-> explicitly just after aosp_do_open() if HCI_QUALITY_REPORT is true so
-> that all vendor chips have quality back on at power on.
-> 
->  If the quality report is not enabled before power cycle,
-> HCI_QUALITY_REPORT will always stay false. Nothing mentioned above
-> will be executed in this case.
-> 
->  One thing is worth noting here. The HCI_QUALITY_REPORT represents
-> the host setting instead of the controller state. During power off,
-> the HCI_QUALITY_REPORT host setting remains true while the controller
-> state about quality report is turned off. This behavior is similar to
-> "wide-band-speech" whose setting remains true during power off.
-> 
->  Does this sound good to you? If yes, I will append a new patch to
-> the next Series-version. Thanks!
+The micrel phy driver is patched twice within this series: the first is
+is to replace netif_rx_ni() and second to move netif_rx() outside of the
+IRQ-off section. It is probably simpler to keep it within this series.
 
-yes, that sounds good. Please provide the mgmt addition as first patches.
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>
+Cc: Antonio Quartulli <a@unstable.cc>
+Cc: b.a.t.m.a.n@lists.open-mesh.org
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Divya Koppera <Divya.Koppera@microchip.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Jon Maloy <jmaloy@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Cc: linux-staging@lists.linux.dev
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Marek Lindner <mareklindner@neomailbox.ch>
+Cc: Remi Denis-Courmont <courmisch@gmail.com>
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: Sven Eckelmann <sven@narfation.org>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: tipc-discussion@lists.sourceforge.net
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: Ying Xue <ying.xue@windriver.com>
 
-Regards
+Sebastian
 
-Marcel
 
