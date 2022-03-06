@@ -2,109 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F23C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Mar 2022 21:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D134C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Mar 2022 23:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234328AbiCFV7G (ORCPT
+        id S232424AbiCFXBG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Mar 2022 16:59:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50592 "EHLO
+        Sun, 6 Mar 2022 18:01:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234307AbiCFV67 (ORCPT
+        with ESMTP id S231717AbiCFXBG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Mar 2022 16:58:59 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2705B1C10B;
-        Sun,  6 Mar 2022 13:58:06 -0800 (PST)
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1646603882;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GUAFLtBHk3izDc+rmSdg92znyPU6liBmxT8d8PGetHs=;
-        b=rYdczkJh2CASqGnjEpRaDZxqFGsinymVnuAfLziYMDLf1xW4Zm0Ze0XYuBvMOTJGirMVo9
-        e7mzhJLE2z6LUURwziGfYPGncgQPGzNz3uuFDl463FPDHWP2x1dzrbxN5oHBOJU81wEcyX
-        h0wpHP9/eSk8Op5SCVCtqqItDhDfKGnMs3BRlciDR7tks+ctZ/p8TyvpJC/1XBO+8wEtyq
-        pZ7C3nNy8Zeb1QoIScQ30VXKXJHmDA7uMjEw1hy7x8k8cnDCuzNq1SsludiDqHy+ab/qYQ
-        bANBxPEdmI7xH/Qfb7HcDpV2Y3eBe83Hx5oWf1A726pdNzQSyjjR5I74OkN33Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1646603882;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=GUAFLtBHk3izDc+rmSdg92znyPU6liBmxT8d8PGetHs=;
-        b=UtGxE3dwa4y8CFV8SsT+yVUee/GX7lk1veoy0vYYDN0/uSEjawm8HDCwrpNHcBKlLFnnDj
-        igae4+EeuvLrgpDA==
-To:     netdev@vger.kernel.org
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH net-next 06/10] bluetooth: Use netif_rx().
-Date:   Sun,  6 Mar 2022 22:57:49 +0100
-Message-Id: <20220306215753.3156276-7-bigeasy@linutronix.de>
-In-Reply-To: <20220306215753.3156276-1-bigeasy@linutronix.de>
-References: <20220306215753.3156276-1-bigeasy@linutronix.de>
+        Sun, 6 Mar 2022 18:01:06 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55475D67B
+        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Mar 2022 15:00:12 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id c16-20020a17090aa61000b001befad2bfaaso12078235pjq.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Mar 2022 15:00:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=4pJ/pcxwIYmi16cgb/ptO1VKPQ+U4fJWbnJ+Q+Z57hk=;
+        b=pq6ehFKM1nZMSwcgvFc9RXfKMQnf3rpUPYlgvyjOvAgvZ3bxbqXV2qxuPFKoU/SfnK
+         SjwiUi/9j6bLvVEcSPoAfoV5P7RzkPQP32gF+2UnajIkMZ9JqOXlG2hKcYRtcv/NQ3LW
+         +NMWLY7fJKm3JOrEluj5AMkKhQkR2kTLFkqqp9iXgvuWPj5brGoABfTkqLKa0d1RnQ0x
+         454D13yH926JxKBl2QHaRGfp70Gck8vdxk5Ak1dsJ5iA2IgN9c1DSFQNdHQO7Qv38tLO
+         qz3htAvxSt7eRrce2dc7adgZD2DlipM9dDGelqqokzCG/yOe7bGa9rgXhfSwv3RSIN1Y
+         H7xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=4pJ/pcxwIYmi16cgb/ptO1VKPQ+U4fJWbnJ+Q+Z57hk=;
+        b=i95zJx6xf3JhiWAbxIgelyXbCUzZzPsCD0cyyMTxU8QdljJYmHfb9NyMLwPkAuXGyM
+         KFIJLqZnzuCF5PQG9lao+FDYfaaYhwqr9m/DDz50FedM+qilf8YIBXTosNSYSApOW88H
+         pTS0HYoBlsadgJFaAEAwV5tTn1G6TuHGKp0ELJCv3oa6sdA1TL+nz2OagIN2Z0IRZgEQ
+         nmGLERG2ZlnufTsPPqvyPGy+7vwK1xWDsyAASDjap95vChvrXI3joDZatttoxIvUxp/d
+         y/nYJCzLsMby7N1qmOuFgRxtyEnU4SUTfMMv69XAxLCW+Xm3HR3U0r3P4gXx+8pfOrmk
+         hUng==
+X-Gm-Message-State: AOAM5303yxM2tnL2ssjMiqBilkX9dqXVMUOoMzzFGCCGDNWC0SQIhLgm
+        sAoq6+AZobjIJUrklhAtjSJvtBvs6ls=
+X-Google-Smtp-Source: ABdhPJxTKaQcRjP2+3i9UKzr14nMIzB/WHw4tR68eEds+9U/LDcO0IUm5jLUbr+k1Yvdmo5SLv3/yA==
+X-Received: by 2002:a17:902:bb02:b0:151:56a8:f80b with SMTP id im2-20020a170902bb0200b0015156a8f80bmr9529358plb.30.1646607611899;
+        Sun, 06 Mar 2022 15:00:11 -0800 (PST)
+Received: from [172.17.0.2] ([13.93.208.94])
+        by smtp.gmail.com with ESMTPSA id u11-20020a056a00124b00b004e11307f8cdsm12593706pfi.86.2022.03.06.15.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 06 Mar 2022 15:00:11 -0800 (PST)
+Message-ID: <62253cfb.1c69fb81.ad015.0f49@mx.google.com>
+Date:   Sun, 06 Mar 2022 15:00:11 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6879426771342160425=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, bigeasy@linutronix.de
+Subject: RE: net: Convert user to netif_rx(), part 3.
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220306215753.3156276-7-bigeasy@linutronix.de>
+References: <20220306215753.3156276-7-bigeasy@linutronix.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Since commit
-   baebdf48c3600 ("net: dev: Makes sure netif_rx() can be invoked in any co=
-ntext.")
+--===============6879426771342160425==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-the function netif_rx() can be used in preemptible/thread context as
-well as in interrupt context.
+This is automated email and please do not reply to this email!
 
-Use netif_rx().
+Dear submitter,
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=620752
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.03 seconds
+GitLint                       FAIL      0.45 seconds
+SubjectPrefix                 FAIL      0.32 seconds
+BuildKernel                   PASS      33.53 seconds
+BuildKernel32                 PASS      29.85 seconds
+Incremental Build with patchesPASS      39.86 seconds
+TestRunner: Setup             PASS      525.29 seconds
+TestRunner: l2cap-tester      PASS      16.50 seconds
+TestRunner: bnep-tester       PASS      6.45 seconds
+TestRunner: mgmt-tester       PASS      107.98 seconds
+TestRunner: rfcomm-tester     PASS      8.33 seconds
+TestRunner: sco-tester        PASS      8.05 seconds
+TestRunner: smp-tester        PASS      8.16 seconds
+TestRunner: userchan-tester   PASS      6.73 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.03 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+[net-next,06/10] bluetooth: Use netif_rx().\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#68: 
+   baebdf48c3600 ("net: dev: Makes sure netif_rx() can be invoked in any context.")
+
+total: 0 errors, 1 warnings, 0 checks, 16 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12770937.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL - 0.45 seconds
+Run gitlint with rule in .gitlint
+[net-next,06/10] bluetooth: Use netif_rx().
+1: T3 Title has trailing punctuation (.): "[net-next,06/10] bluetooth: Use netif_rx()."
+4: B1 Line exceeds max length (83>80): "   baebdf48c3600 ("net: dev: Makes sure netif_rx() can be invoked in any context.")"
+
+
+##############################
+Test: SubjectPrefix - FAIL - 0.32 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- net/bluetooth/6lowpan.c   | 2 +-
- net/bluetooth/bnep/core.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 8e8c075411530..215af9b3b5895 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -240,7 +240,7 @@ static int give_skb_to_upper(struct sk_buff *skb, struc=
-t net_device *dev)
- 	if (!skb_cp)
- 		return NET_RX_DROP;
-=20
--	return netif_rx_ni(skb_cp);
-+	return netif_rx(skb_cp);
- }
-=20
- static int iphc_decompress(struct sk_buff *skb, struct net_device *netdev,
-diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
-index 40baa6b7321ae..5a6a49885ab66 100644
---- a/net/bluetooth/bnep/core.c
-+++ b/net/bluetooth/bnep/core.c
-@@ -400,7 +400,7 @@ static int bnep_rx_frame(struct bnep_session *s, struct=
- sk_buff *skb)
- 	dev->stats.rx_packets++;
- 	nskb->ip_summed =3D CHECKSUM_NONE;
- 	nskb->protocol  =3D eth_type_trans(nskb, dev);
--	netif_rx_ni(nskb);
-+	netif_rx(nskb);
- 	return 0;
-=20
- badframe:
---=20
-2.35.1
 
+--===============6879426771342160425==--
