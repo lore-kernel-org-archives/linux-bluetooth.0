@@ -2,88 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0097AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 18:57:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81AC8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 20:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244887AbiCGS6K (ORCPT
+        id S240284AbiCGUGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Mar 2022 13:58:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46630 "EHLO
+        Mon, 7 Mar 2022 15:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244902AbiCGS6I (ORCPT
+        with ESMTP id S232081AbiCGUGJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Mar 2022 13:58:08 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EB293196
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Mar 2022 10:57:13 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id u61so32910836ybi.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Mar 2022 10:57:13 -0800 (PST)
+        Mon, 7 Mar 2022 15:06:09 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 918F8710FF;
+        Mon,  7 Mar 2022 12:05:14 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id x5so21504905edd.11;
+        Mon, 07 Mar 2022 12:05:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=S4gJ5WSgOm6UPb/Jf/ZU25tmWFHW5ov82wrvElSdaTo=;
-        b=KThcTFXsJ+AU0ZRn03LuNejg6+aoPqcsoaoF4yq8m42UT8tWF/sA3JCs1m1/cIW8eB
-         yHa+PMUvYAADsVOavcandn6ddDRnIPq34rGWzJPMsszKzfAjURd+zLWQmMr+ee7Yk6ta
-         H+VZkYDownNLc48SuDrnnY+U0eJ5Znrk1wuPQ=
+        bh=2JSic4G9BWhZ4l2LjW4YQThwu0UhN9BignLM2I7ktfA=;
+        b=Jp9lSDPX2x562WF7grbcrhO1bZPRVf302ccbWSRD3okEJpn7s+KYL4FEGj1tnfJDuP
+         g+7aTjENeGusOUCxDXdn2yVpqyFBz4jJoKM4PpTSgQfkIWA/hwFJKaulBbdDbIovCAtP
+         4zH4W7PDpPggblQGsIsOOtWxI56wa/yKUhVIqs5AETkQJ40LQj7BOi66+gBsX+Y5SbPx
+         1MW8q3r358nhXqdBf8jtUBkhvt1gU10WGn3/+BShHM1KkIjaDZXSOjjwS8c97KnflEdr
+         LIeRi428it/REP6tBuhO5maGw/Fat/VALnuz2pC3AETeLd+Rh+KQjQZscDlLOwjWOKP/
+         dgYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=S4gJ5WSgOm6UPb/Jf/ZU25tmWFHW5ov82wrvElSdaTo=;
-        b=Cp3C4ZnLtQOUxmeRd9FLQEK3S+a3rOQ5t9maEkWtG+YVPhp1WURQXg9EVA2vPLhVM9
-         EAHgF6MD4IoA3QmSIKI4Wq38xLW3yMZ7iLITDX2wGBI3jxNo+HvOWn1hlQmwEsHT4JpS
-         ugy75X/zzDT7p6rRz7y4p2u8TFL27RLsAVNh9z6l+G0pwA1ba8doDlxWk3HgbaXR6FBT
-         /4QCs2okLiyq6Q0LP7pIu8gSQRe71fCvCjAGMRR7HwgAMgr90aO1PPbs9M7EK8Y9gMYT
-         Zam6LFol2/OCAzMHs01FBqlrE1xFQ/SiJtNYAYq2WTjLYROMWOx3pcXgv5jBAoK3eOqG
-         sf+Q==
-X-Gm-Message-State: AOAM530pyu7FVRtItb19gs5tFNYbnMD+X9LrYc1c5HS06glBNrF9r9vJ
-        IgFsqV087ahOrbh9H6MecuGGQMXmlW3bBzIAQOzUWGZNuQxuig==
-X-Google-Smtp-Source: ABdhPJzNufD+y8EXjtPbsaqNxTgIvNBzykinmYwXJKHzIPeFRBmIHW30ZbI4L0xWfsS9N9Q5G2JQJQh3cQ0rOBtSjEc=
-X-Received: by 2002:a25:7804:0:b0:628:ec4c:989b with SMTP id
- t4-20020a257804000000b00628ec4c989bmr8794539ybc.428.1646679433000; Mon, 07
- Mar 2022 10:57:13 -0800 (PST)
+        bh=2JSic4G9BWhZ4l2LjW4YQThwu0UhN9BignLM2I7ktfA=;
+        b=bMjzOL9UQR8QQZxf1M1L/6SInDkv1ZWQ/jANrdkdKKhR7ffEpoatceb73Vqq071Hks
+         omazlprSxEdxE2bFHv9EMGkUfikimFpJ4WYehlikDlw6hFxNnCtmHqCZe1mrCAEjpk8O
+         cRVJO4vXIy8h831Uxm2xOJgCFhSZWU972/wWJQH8D19cQr4ZQLTcjDw7Ie6UgZU9c4lj
+         WROPXDMHlWzroMB+XvpEIFu1g9sAq52oJO8SZWR38VpFMwYZhbfKEm8lYnLhJHzRXGXz
+         m2KDX0QnlQYIMurhNRHkzaKhgiXQSl0OTTPefkuNPFKRwDVu5168/mdcYfc7quc1/PiO
+         jwhg==
+X-Gm-Message-State: AOAM532TqlkX+d08Hy0YIEsJeaK+/clu8ALEQPW1CilfxsvB3dJgnsCz
+        cezPra7jJOhPIy3gXnt1q7I=
+X-Google-Smtp-Source: ABdhPJw3BCkAVGibC3jnXLkH3b0Ln3luJGH0BZX6ZmrZXeBosz2SwHxyiFwpLqk8u8dkiFpKpyztaA==
+X-Received: by 2002:a50:934b:0:b0:410:befb:cfd0 with SMTP id n11-20020a50934b000000b00410befbcfd0mr12751376eda.27.1646683512640;
+        Mon, 07 Mar 2022 12:05:12 -0800 (PST)
+Received: from osgiliath.lan (201.ip-51-68-45.eu. [51.68.45.201])
+        by smtp.googlemail.com with ESMTPSA id m13-20020a170906234d00b006cf86bb0652sm5055354eja.121.2022.03.07.12.05.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 12:05:12 -0800 (PST)
+From:   Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        hdegoede@redhat.com, pmenzel@molgen.mpg.de, swyterzone@gmail.com
+Subject: [PATCH v4 1/2] Bluetooth: hci_sync: Add a new quirk to skip HCI_FLT_CLEAR_ALL
+Date:   Mon,  7 Mar 2022 21:04:44 +0100
+Message-Id: <20220307200445.5554-1-swyterzone@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-From:   Katherine Lai <laikatherine@chromium.org>
-Date:   Mon, 7 Mar 2022 10:57:02 -0800
-Message-ID: <CAPBVwTQrcYYauoCXBWdOsPa_vmN=cajYzVFcep_GLC-2OwOwYQ@mail.gmail.com>
-Subject: [RFC] Bluetooth: Adding support for /etc/bluetooth/main.conf.d
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Background
+Some controllers have problems with being sent a command to clear
+all filtering. While the HCI code does not unconditionally
+send a clear-all anymore at BR/EDR setup (after the state machine
+refactor), there might be more ways of hitting these codepaths
+in the future as the kernel develops.
 
-It was found that a change to the default settings for
-MinConnectionInterval and MaxConnectionInterval in main.conf broke
-some of ChromeOS=E2=80=99s keyboard HID tests for only certain Bluetooth
-controllers. These keyboards aren=E2=80=99t able to connect to the device.
-Since those connection parameters improve the connection interval for
-most other chipsets, we want to leave the default values but have a
-way to have an optional override to address problematic models.
+Cc: stable@vger.kernel.org
+Cc: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+---
+ include/net/bluetooth/hci.h | 10 ++++++++++
+ net/bluetooth/hci_sync.c    | 16 ++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 35c073d44ec5..5cb095b09a94 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -255,6 +255,16 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
++
++	/* When this quirk is set, HCI_OP_SET_EVENT_FLT requests with
++	 * HCI_FLT_CLEAR_ALL are ignored and event filtering is
++	 * completely avoided. A subset of the CSR controller
++	 * clones struggle with this and instantly lock up.
++	 *
++	 * Note that devices using this must (separately) disable
++	 * runtime suspend, because event filtering takes place there.
++	 */
++	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+ };
+ 
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index e31d1150dc71..c3bdaf2de511 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2812,6 +2812,9 @@ static int hci_set_event_filter_sync(struct hci_dev *hdev, u8 flt_type,
+ 	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
+ 		return 0;
+ 
++	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
++		return 0;
++
+ 	memset(&cp, 0, sizeof(cp));
+ 	cp.flt_type = flt_type;
+ 
+@@ -2832,6 +2835,13 @@ static int hci_clear_event_filter_sync(struct hci_dev *hdev)
+ 	if (!hci_dev_test_flag(hdev, HCI_EVENT_FILTER_CONFIGURED))
+ 		return 0;
+ 
++	/* In theory the state machine should not reach here unless
++	 * a hci_set_event_filter_sync() call succeeds, but we do
++	 * the check both for parity and as a future reminder.
++	 */
++	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
++		return 0;
++
+ 	return hci_set_event_filter_sync(hdev, HCI_FLT_CLEAR_ALL, 0x00,
+ 					 BDADDR_ANY, 0x00);
+ }
+@@ -4831,6 +4841,12 @@ static int hci_update_event_filter_sync(struct hci_dev *hdev)
+ 	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
+ 		return 0;
+ 
++	/* Some fake CSR controllers lock up after setting this type of
++	 * filter, so avoid sending the request altogether.
++	 */
++	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
++		return 0;
++
+ 	/* Always clear event filter when starting */
+ 	hci_clear_event_filter_sync(hdev);
+ 
+-- 
+2.35.1
 
-Proposed Solution
-
-Adding support to bluetoothd for an additional config directory
-/etc/bluetooth/main.conf.d containing multiple files which will
-override common params. Override order will be lexically sorted
-filename order. This pattern is already used by Linux distros, for
-example there is /etc/sudoers.d which files will override common
-params in /etc/sudoers.
-
-Users can add override config files to /etc/bluetooth/main.conf.d
-rather than directly editing /etc/bluetooth/main.conf. This is more
-friendly to package managers since BlueZ package updates won't cause
-conflict to /etc/bluetooth/main.conf.
-
-In bluez=E2=80=99s main.c, merge the params for each *.conf file from
-/etc/bluetooth/main.conf.d with the existing /etc/bluetooth/main.conf
-in lexical filename order
-
-/etc/bluetooth/main.conf.d will be configurable at build time, e.g.
-with ./configure --main-conf-dir
