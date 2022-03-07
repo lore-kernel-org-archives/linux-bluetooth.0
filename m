@@ -2,137 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D134C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  6 Mar 2022 23:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96847C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 06:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232424AbiCFXBG (ORCPT
+        id S235473AbiCGGHH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Mar 2022 18:01:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43030 "EHLO
+        Mon, 7 Mar 2022 01:07:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231717AbiCFXBG (ORCPT
+        with ESMTP id S235477AbiCGGHG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Mar 2022 18:01:06 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E55475D67B
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Mar 2022 15:00:12 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id c16-20020a17090aa61000b001befad2bfaaso12078235pjq.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Mar 2022 15:00:12 -0800 (PST)
+        Mon, 7 Mar 2022 01:07:06 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD675F4C1
+        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Mar 2022 22:06:11 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2dbfe49a4aaso124871117b3.5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Mar 2022 22:06:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=4pJ/pcxwIYmi16cgb/ptO1VKPQ+U4fJWbnJ+Q+Z57hk=;
-        b=pq6ehFKM1nZMSwcgvFc9RXfKMQnf3rpUPYlgvyjOvAgvZ3bxbqXV2qxuPFKoU/SfnK
-         SjwiUi/9j6bLvVEcSPoAfoV5P7RzkPQP32gF+2UnajIkMZ9JqOXlG2hKcYRtcv/NQ3LW
-         +NMWLY7fJKm3JOrEluj5AMkKhQkR2kTLFkqqp9iXgvuWPj5brGoABfTkqLKa0d1RnQ0x
-         454D13yH926JxKBl2QHaRGfp70Gck8vdxk5Ak1dsJ5iA2IgN9c1DSFQNdHQO7Qv38tLO
-         qz3htAvxSt7eRrce2dc7adgZD2DlipM9dDGelqqokzCG/yOe7bGa9rgXhfSwv3RSIN1Y
-         H7xg==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=mZ2+/749yEomNHYS2IrCoidt/fbzFL4sKPvli6dKG0U=;
+        b=OJHabYKdEAksvM95eEef4t0d88Vy2yNZ/PrbEqKySKhCXbkYmohSSzGkw02Z06NGTc
+         fObq3dOb7KRxyQiEDwWn3NzeCVJs+fZq/NNMsHbixjg+h5QuhK0IhMHCLp80+uMGZ/2C
+         1ISqvbaV14eOyczTwnqIdENVWEZu3tA/zI9+6vIcnqoumh3LSrPg3JP9Z/ZHkBionfxI
+         wPqhYaKTwf+4YuKpbSw91hBsxhzdmtQCjE7yy8epvak6sW+dvinaQhioQgPVFKUv9hKR
+         Gteyw2RS/Q3mu/Wy1M7kSePv8c5/iI+3bkKaZGqzQKHUDE87vu1lFiZ+x7pUzg8Uc6BV
+         K3+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=4pJ/pcxwIYmi16cgb/ptO1VKPQ+U4fJWbnJ+Q+Z57hk=;
-        b=i95zJx6xf3JhiWAbxIgelyXbCUzZzPsCD0cyyMTxU8QdljJYmHfb9NyMLwPkAuXGyM
-         KFIJLqZnzuCF5PQG9lao+FDYfaaYhwqr9m/DDz50FedM+qilf8YIBXTosNSYSApOW88H
-         pTS0HYoBlsadgJFaAEAwV5tTn1G6TuHGKp0ELJCv3oa6sdA1TL+nz2OagIN2Z0IRZgEQ
-         nmGLERG2ZlnufTsPPqvyPGy+7vwK1xWDsyAASDjap95vChvrXI3joDZatttoxIvUxp/d
-         y/nYJCzLsMby7N1qmOuFgRxtyEnU4SUTfMMv69XAxLCW+Xm3HR3U0r3P4gXx+8pfOrmk
-         hUng==
-X-Gm-Message-State: AOAM5303yxM2tnL2ssjMiqBilkX9dqXVMUOoMzzFGCCGDNWC0SQIhLgm
-        sAoq6+AZobjIJUrklhAtjSJvtBvs6ls=
-X-Google-Smtp-Source: ABdhPJxTKaQcRjP2+3i9UKzr14nMIzB/WHw4tR68eEds+9U/LDcO0IUm5jLUbr+k1Yvdmo5SLv3/yA==
-X-Received: by 2002:a17:902:bb02:b0:151:56a8:f80b with SMTP id im2-20020a170902bb0200b0015156a8f80bmr9529358plb.30.1646607611899;
-        Sun, 06 Mar 2022 15:00:11 -0800 (PST)
-Received: from [172.17.0.2] ([13.93.208.94])
-        by smtp.gmail.com with ESMTPSA id u11-20020a056a00124b00b004e11307f8cdsm12593706pfi.86.2022.03.06.15.00.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Mar 2022 15:00:11 -0800 (PST)
-Message-ID: <62253cfb.1c69fb81.ad015.0f49@mx.google.com>
-Date:   Sun, 06 Mar 2022 15:00:11 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6879426771342160425=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bigeasy@linutronix.de
-Subject: RE: net: Convert user to netif_rx(), part 3.
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220306215753.3156276-7-bigeasy@linutronix.de>
-References: <20220306215753.3156276-7-bigeasy@linutronix.de>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=mZ2+/749yEomNHYS2IrCoidt/fbzFL4sKPvli6dKG0U=;
+        b=2BwrTDchiActPrNTqNmmmCY8woEN/vjtRLx5bvqowjqC0b+8e1c2DuTRz3j0fBMLOd
+         CUnQW28/YzjxWfQSk6DxfrgO8ZW4N9W0LTQIHH9EJ8SucQf6shufezAqyZqkOR2jZrad
+         ZuhDh+r1fT9tQ2V0BTHKhP65Hz8JYYC/ace/qrRcpxJbBl3YR3BhuPigmH1KXfSU+KRJ
+         xhszvBbEVBwf1TclAbF/eDLzC0FU5JtVWFU0HrFS9PmV5xmCFm0A07XyZ6fVSyy3di/q
+         bePxajQyOebsCRJ2ffGm40meOgVbeEhzhSmM2LLW3cEKWAz0qY7ksrfbFPL1iXB35iky
+         7aag==
+X-Gm-Message-State: AOAM533lt1FTDvaxrBJ0MSGHm21EePsH4zaIA2Difh8jHFM4pi1stM/d
+        hXmMVjqk/yV8zmH/515F89/+MbIeyDzzj/Dovx1p5W9ygfGVqc3Yq/npxouiwXe5YJHX9tWwxM3
+        iQ8+WM9YbjyHl2biUsSqf1owojj42z0QWfmO21eGXSXufuFxyASbWBG8wGCMpF2w3yuvWLhQS+m
+        K+uxfB0WtIEfI=
+X-Google-Smtp-Source: ABdhPJw8DoUX33I8301iwT9NkVq9qN/T9XgoStb8b03XJfH2IvJSUm8lPcJjGGwQtObmLF1jQSrj83grzGe6R/ISEA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:50e2:ac45:9667:bfb9])
+ (user=howardchung job=sendgmr) by 2002:a25:a541:0:b0:628:75d5:1982 with SMTP
+ id h59-20020a25a541000000b0062875d51982mr7018126ybi.520.1646633170549; Sun,
+ 06 Mar 2022 22:06:10 -0800 (PST)
+Date:   Mon,  7 Mar 2022 14:05:59 +0800
+Message-Id: <20220307140437.Bluez.v1.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
+Subject: [Bluez PATCH v1] audio: fix crash in a2dp_discover
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6879426771342160425==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-This is automated email and please do not reply to this email!
+Sample stack trace:
+0x0000567c394e4c6b (bluetoothd - a2dp.c: 270) setup_cb_free
+0x0000567c394e4a94 (bluetoothd - a2dp.c: 2884) a2dp_discover
+0x0000567c394e3c03 (bluetoothd - sink.c: 275) sink_setup_stream
+0x0000567c394e3d4f (bluetoothd - sink.c: 299) sink_connect
+0x0000567c39535183 (bluetoothd - service.c: 294) btd_service_connect
+0x0000567c39539f68 (bluetoothd - device.c: 2006) connect_next
+0x0000567c3954086d (bluetoothd - device.c: 2060) service_state_changed
+0x0000567c39534efb (bluetoothd - service.c: 111) change_state
+0x0000567c3953559c (bluetoothd - service.c: 0)
+btd_service_connecting_complete
+0x0000567c39534a5c (bluetoothd - profile.c: 1641) record_cb
+0x0000567c395197cd (bluetoothd - sdp-client.c: 298) connect_watch
+0x00007b14bc8034f6 (libglib-2.0.so.0 - gmain.c: 3337)
+g_main_context_dispatch
+0x00007b14bc803801 (libglib-2.0.so.0 - gmain.c: 4131)
+g_main_context_iterate
+0x00007b14bc803a7d (libglib-2.0.so.0 - gmain.c: 4329) g_main_loop_run
+0x0000567c39566af1 (bluetoothd - mainloop-glib.c: 79) mainloop_run
+0x0000567c39566ddb (bluetoothd - mainloop-notify.c: 201)
+mainloop_run_with_signal
+0x0000567c3954bf4c (bluetoothd - main.c: 1222) main
+0x00007b14bc579797 (libc.so.6 - libc-start.c: 332) __libc_start_main
+0x0000567c394df449 (bluetoothd) _start
+0x00007ffd70145737
 
-Dear submitter,
+This could be triggered from a2dp_discover -> avdtp_discover ->
+send_request -> send_req -> l2cap_connect (return error) ->
+avdtp_set_state (to disconnect state)-> channel_remove -> channel_free
+-> finalize_setup_errno (discover cb is freed) -> error handling all
+the way back to a2dp_discover -> a2dp_discover (discover cb is freed
+again, crashed!).
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=620752
+The fix is to add setup_ref/setup_unref around a2dp_discover to ensure
+setup alive, and check if setup->chan to see if channel_free has been
+called or not.
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.03 seconds
-GitLint                       FAIL      0.45 seconds
-SubjectPrefix                 FAIL      0.32 seconds
-BuildKernel                   PASS      33.53 seconds
-BuildKernel32                 PASS      29.85 seconds
-Incremental Build with patchesPASS      39.86 seconds
-TestRunner: Setup             PASS      525.29 seconds
-TestRunner: l2cap-tester      PASS      16.50 seconds
-TestRunner: bnep-tester       PASS      6.45 seconds
-TestRunner: mgmt-tester       PASS      107.98 seconds
-TestRunner: rfcomm-tester     PASS      8.33 seconds
-TestRunner: sco-tester        PASS      8.05 seconds
-TestRunner: smp-tester        PASS      8.16 seconds
-TestRunner: userchan-tester   PASS      6.73 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.03 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[net-next,06/10] bluetooth: Use netif_rx().\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#68: 
-   baebdf48c3600 ("net: dev: Makes sure netif_rx() can be invoked in any context.")
-
-total: 0 errors, 1 warnings, 0 checks, 16 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12770937.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL - 0.45 seconds
-Run gitlint with rule in .gitlint
-[net-next,06/10] bluetooth: Use netif_rx().
-1: T3 Title has trailing punctuation (.): "[net-next,06/10] bluetooth: Use netif_rx()."
-4: B1 Line exceeds max length (83>80): "   baebdf48c3600 ("net: dev: Makes sure netif_rx() can be invoked in any context.")"
-
-
-##############################
-Test: SubjectPrefix - FAIL - 0.32 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 ---
-Regards,
-Linux Bluetooth
+Hi maintainers,
 
+The fix is tested by forcing session->io to NULL in send_req in the code
+and verifing the crash doesn't happen.
 
---===============6879426771342160425==--
+ profiles/audio/a2dp.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 9fbcd35f7..39e1e9624 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2878,14 +2878,22 @@ unsigned int a2dp_discover(struct avdtp *session, a2dp_discover_cb_t cb,
+ 	if (!setup)
+ 		return 0;
+ 
++	setup_ref(setup);
+ 	cb_data = setup_cb_new(setup);
+ 	cb_data->discover_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+-	if (avdtp_discover(session, discover_cb, setup) == 0)
++	if (avdtp_discover(session, discover_cb, setup) == 0) {
++		setup_unref(setup);
+ 		return cb_data->id;
++	}
+ 
+-	setup_cb_free(cb_data);
++	/* Check if the channel is still there before freeing setup_cb, since it
++	 * could be freed by channel_free().
++	 */
++	if (setup->chan)
++		setup_cb_free(cb_data);
++	setup_unref(setup);
+ 	return 0;
+ }
+ 
+-- 
+2.35.1.616.g0bdcbb4464-goog
+
