@@ -2,101 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F5C3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 07:34:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F9C9C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 12:00:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235819AbiCGHfp (ORCPT
+        id S239622AbiCGMBY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Mar 2022 02:35:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56828 "EHLO
+        Mon, 7 Mar 2022 07:01:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235816AbiCGHfo (ORCPT
+        with ESMTP id S234615AbiCGMBT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Mar 2022 02:35:44 -0500
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D5435F4F7
-        for <linux-bluetooth@vger.kernel.org>; Sun,  6 Mar 2022 23:34:50 -0800 (PST)
-Received: by mail-qt1-x82d.google.com with SMTP id b23so12540171qtt.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Mar 2022 23:34:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=zYbUn1AFs0nPIyX5DrIskC86eSlGkD1xn2YAyBGq5p0=;
-        b=eKEKJkIFbNwU8eryOcVHK2EjySm0ZC9sxUZdDjDwy/wEEwF/N28yH9APL9mtdXnDUm
-         pA3I4lwLjOAwH0IzUcXMs1nwL06mvWGrmIQw+1ElOpBp0lJbWpQ+Qqax2FyQ/P59UmPZ
-         HdJBAKyOLVC3iE92Urm5bblmCcN1SFNgnNjNaZmmoRzUqRc2No0x6p+zYcZspE5xjxrz
-         jnXcEDO7iKqE+a/j5knuK0NOf/01/Y9xebNNb9KTs4NV2SZOXcpA523kZ/Y9oa3s74Ai
-         5zxpwoRnLaJNmi6/VDZBdIsPjELVDqxMjafZEFjQGzmhm616VJd76zh+d3wFY8fXjaq4
-         jzWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=zYbUn1AFs0nPIyX5DrIskC86eSlGkD1xn2YAyBGq5p0=;
-        b=PGAFMyshCLkBkVtRDcy6xW1QtM+3k50AeyBIQOEa57CeGRIQwPM7OOdj8jwUPXJK7m
-         cfwVZMyS2QIXUzyaj/0Krss7V6AsIP4Cq6z1Jdjy4/k2Vzi5YRgCQF65BZcWlEWaWwm2
-         nN3DYzUG3CfX7k97kc/0+J4zJsdkAE3H6pYzeDKv58bQulPZ2XLpYs65ZGCatb5532OZ
-         YhR3Y3gni1prpsHmXEgy7E2h+kXQJU0ChyOuPHFPSQqEZSBUvlvb1nDSWZlIu9E5cEDm
-         5bDXlToTJzmUUbU5Rj75CSZBbICCg8OlEER1jx5PjKaKoL/M8666VZVlkOoaNb/5K8Js
-         IzXw==
-X-Gm-Message-State: AOAM533IDa7UO2PKzB6K7Ug35j0RZ7OHreWX64tFZziHiB2/P8DmRddQ
-        XCJjF0wd+ntTFGanM3Qc5H0hL9cXattp8w==
-X-Google-Smtp-Source: ABdhPJzEEk4dapXpZDUykQZZvYtRM7V8Kifw1iC8gs56X0IfZsDK/OSSVUUu1UPhgK9HkgacobMSlg==
-X-Received: by 2002:ac8:5648:0:b0:2ce:dd03:59fa with SMTP id 8-20020ac85648000000b002cedd0359famr8444909qtt.288.1646638489098;
-        Sun, 06 Mar 2022 23:34:49 -0800 (PST)
-Received: from [172.17.0.2] ([13.77.102.221])
-        by smtp.gmail.com with ESMTPSA id f83-20020a379c56000000b0067b2dd2c860sm1028242qke.54.2022.03.06.23.34.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 06 Mar 2022 23:34:48 -0800 (PST)
-Message-ID: <6225b598.1c69fb81.5217a.45b3@mx.google.com>
-Date:   Sun, 06 Mar 2022 23:34:48 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1462585769586226816=="
+        Mon, 7 Mar 2022 07:01:19 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75FB278912;
+        Mon,  7 Mar 2022 04:00:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DA70160ED9;
+        Mon,  7 Mar 2022 12:00:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 41496C340F8;
+        Mon,  7 Mar 2022 12:00:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646654413;
+        bh=uoA/yLVU/b+oLbGKfCPcOcNL/NpocL53c2UhSxUM5X0=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=n7lbew84IjCUDVuL0t2kMi5mLKdOSr79LSw2Ss5xBTXI24X0W5PZovs4iVr67fqKe
+         ENER3ae6dBsUhCt7gr3Fgm3Sj2/h08Y0B0qCjREhpVjNkqrI0M3YnQ6DZqhZKM5EMM
+         5klvwvQs/fZhtCAiQk07dTA5HlyC8yOMBLjkCK8uswJ8KnItHOTK9AcUfuGfb4Rn4B
+         QhKGYDHHpkBPec7j92J9gB3YLzrFTfZkwCuIANFdcqZbMNKhJ+6ZfIQsaBUpIkUSgo
+         8QAVqy+QVrmIr7FIHZq+qIZlZ4He+HnxW4UmMdNVhY9QQpSlBa9WyWM6KkWLjC8pkH
+         5Yok8HKf71u1w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1993BEAC081;
+        Mon,  7 Mar 2022 12:00:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v1] audio: fix crash in a2dp_discover
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220307140437.Bluez.v1.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
-References: <20220307140437.Bluez.v1.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/10] net: Convert user to netif_rx(), part 3.
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <164665441309.23552.3596500663864763691.git-patchwork-notify@kernel.org>
+Date:   Mon, 07 Mar 2022 12:00:13 +0000
+References: <20220306215753.3156276-1-bigeasy@linutronix.de>
+In-Reply-To: <20220306215753.3156276-1-bigeasy@linutronix.de>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+        tglx@linutronix.de, agordeev@linux.ibm.com, wintera@linux.ibm.com,
+        andrew@lunn.ch, a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org,
+        borntraeger@linux.ibm.com, Divya.Koppera@microchip.com,
+        gregkh@linuxfoundation.org, hca@linux.ibm.com,
+        hkallweit1@gmail.com, johan.hedberg@gmail.com, jmaloy@redhat.com,
+        linux-bluetooth@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-staging@lists.linux.dev, luiz.dentz@gmail.com,
+        marcel@holtmann.org, mareklindner@neomailbox.ch,
+        courmisch@gmail.com, linux@armlinux.org.uk, sw@simonwunderlich.de,
+        sven@narfation.org, svens@linux.ibm.com,
+        tipc-discussion@lists.sourceforge.net, gor@linux.ibm.com,
+        wenjia@linux.ibm.com, ying.xue@windriver.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1462585769586226816==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This series was applied to netdev/net-next.git (master)
+by David S. Miller <davem@davemloft.net>:
 
-Dear submitter,
+On Sun,  6 Mar 2022 22:57:43 +0100 you wrote:
+> This is the third and last batch of converting netif_rx_ni() caller to
+> netif_rx(). The change making this possible is net-next and
+> netif_rx_ni() is a wrapper around netif_rx(). This is a clean up in
+> order to remove netif_rx_ni().
+> 
+> The micrel phy driver is patched twice within this series: the first is
+> is to replace netif_rx_ni() and second to move netif_rx() outside of the
+> IRQ-off section. It is probably simpler to keep it within this series.
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=620823
+Here is the summary with links:
+  - [net-next,01/10] s390: net: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/a70d20704ad5
+  - [net-next,02/10] staging: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/4bcc4249b4cf
+  - [net-next,03/10] tun: vxlan: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/3d391f6518fd
+  - [net-next,04/10] tipc: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/a0f0db8292e6
+  - [net-next,05/10] batman-adv: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/94da81e2fc42
+  - [net-next,06/10] bluetooth: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/d33d0dc9275d
+  - [net-next,07/10] phonet: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/63d57cd67454
+  - [net-next,08/10] net: phy: micrel: Use netif_rx().
+    https://git.kernel.org/netdev/net-next/c/e1f9e434617f
+  - [net-next,09/10] net: Remove netif_rx_any_context() and netif_rx_ni().
+    https://git.kernel.org/netdev/net-next/c/2655926aea9b
+  - [net-next,10/10] net: phy: micrel: Move netif_rx() outside of IRQ-off section.
+    https://git.kernel.org/netdev/net-next/c/67dbd6c0a2c4
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.54 seconds
-GitLint                       PASS      1.09 seconds
-Prep - Setup ELL              PASS      52.28 seconds
-Build - Prep                  PASS      0.91 seconds
-Build - Configure             PASS      10.71 seconds
-Build - Make                  PASS      1460.20 seconds
-Make Check                    PASS      13.01 seconds
-Make Check w/Valgrind         PASS      538.68 seconds
-Make Distcheck                PASS      282.48 seconds
-Build w/ext ELL - Configure   PASS      10.73 seconds
-Build w/ext ELL - Make        PASS      1428.08 seconds
-Incremental Build with patchesPASS      0.00 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1462585769586226816==--
