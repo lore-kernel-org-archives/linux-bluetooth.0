@@ -2,100 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0721CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 16:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 299D8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 19:19:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348345AbiCHQcY (ORCPT
+        id S1349436AbiCHTUG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Mar 2022 11:32:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        Tue, 8 Mar 2022 14:20:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbiCHQcX (ORCPT
+        with ESMTP id S241169AbiCHTUF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:32:23 -0500
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764A8506F8
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 08:31:26 -0800 (PST)
-Received: by mail-io1-f72.google.com with SMTP id f7-20020a056602088700b00645ebbe277cso2711841ioz.22
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 08:31:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=V1zLNO1KAqXnOsAbreZ3eBprRbDmLPsP43VZUANZ1eE=;
-        b=IQX5BIGDliNZsVXPE7uESKJ7b375g52qHUxIDsmzIyIwJ+SZbnKBT9+qGWkqbRfB7P
-         gBUtO+PzhoouoxIXZryrt/+4XRxrDez+572wyNKUU0FkOUM6QO1bZJE9FAVpPtHZFkdP
-         XiPzPyqfVyDxKBx2KF3Fjen7S/44NpNYfvXvUsBbbMWEE3sZ2triDU44SpKxVQ8cVxGc
-         V8+e+cCOm25kY+abchKyzuTrYas4SjY++obPMc1IuO2wSHfDm+6Kco3gV42YfRI8RLPp
-         b0kfEd9mxe0JUhOapVyLunhX6qIL0XCy+eA9/6X5aVAj1g8Pf6wzmLl+Ra1yfSmeihb0
-         bYnQ==
-X-Gm-Message-State: AOAM530rHFPnTqSaZz7ltfuNLxtoD3ZoIQ1SAB+uhmkjTNWMXYunE7HC
-        mK25esnmJ4sqjNNS/oe9IIxyONSYAIgT7BZMG8yPV87TQPXL
-X-Google-Smtp-Source: ABdhPJz2wlhCoBGloN79xjSbYtO9yttKkeIGLgG5eHIjjuJ6B4OJHpcgxXKi5Qtx3q3ZgYzJZZI+3dM1OCybcO34ErYNuEZmv0oD
+        Tue, 8 Mar 2022 14:20:05 -0500
+Received: from post.munsonfam.org (post.munsonfam.org [172.104.17.240])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D46CF4BBA6;
+        Tue,  8 Mar 2022 11:19:07 -0800 (PST)
+X-Virus-Scanned: Debian amavisd-new at munsonfam.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+        s=20211029; t=1646767146;
+        bh=WUDUq32+avV6AuvvB00/SiKeDAyjsl+E+09hOXUIlG8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nPlof2j+MkJzBhl0+6G8Np+VGzF2OkilZCdyG5jnY0vZ7fdBnrDOkjoEsKsOgjsu7
+         JAVIDuc4OlFwcdaLBEYLqLWK+Ldu0ACLQhelvm5QUZFjbl1bddKmW18GU+ULZ4JsL6
+         BdtD/I5WOe2UIobPWDf0lUl2C6BXj0X6M5us/yvHhladfaTsP2m4E7SfH1MY4cjitg
+         JFiqFGpIkyny8qlrk8HViQFufwaUfpfkMjnEoeG/fS8b2XzU4jwHMg+0bdIg/SuPYh
+         TipU7iL45fGIXO8f0yuoTHefu3p2Nu4NvhGwpa/zaqZk+e+jlY5wQU/DK6Pn+AOAAz
+         PiGv9nCKzp/gA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+ s=20211029; t=1646767146;
+ bh=WUDUq32+avV6AuvvB00/SiKeDAyjsl+E+09hOXUIlG8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=nPlof2j+MkJzBhl0+6G8Np+VGzF2OkilZCdyG5jnY0vZ7fdBnrDOkjoEsKsOgjsu7
+ JAVIDuc4OlFwcdaLBEYLqLWK+Ldu0ACLQhelvm5QUZFjbl1bddKmW18GU+ULZ4JsL6
+ BdtD/I5WOe2UIobPWDf0lUl2C6BXj0X6M5us/yvHhladfaTsP2m4E7SfH1MY4cjitg
+ JFiqFGpIkyny8qlrk8HViQFufwaUfpfkMjnEoeG/fS8b2XzU4jwHMg+0bdIg/SuPYh
+ TipU7iL45fGIXO8f0yuoTHefu3p2Nu4NvhGwpa/zaqZk+e+jlY5wQU/DK6Pn+AOAAz
+ PiGv9nCKzp/gA==
+Received: by lappy-486.munsonfam.org (Postfix, from userid 1000)
+ id 64F009E010E; Tue,  8 Mar 2022 14:19:03 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=munsonfam.org;
+ s=20211029; t=1646767145;
+ bh=WUDUq32+avV6AuvvB00/SiKeDAyjsl+E+09hOXUIlG8=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZwjMrn6NAsHhSfg1/pTnEuCPuMWoBs7PQuU+vyf/u5jeSqEQa4ZZrUMaeoHr+NLVs
+ auu6qlkuMUqdzTnWeYJXiNxIAGIc/4nRpJGTsXKfO/MP+aJl+PO6Rh+KM/ZfVPkcxe
+ +njgSqYg+41OxdvqWKeaMyntLvzjEfp7XqXDde9piosKg3vkR6+cOZPYOa5kdv5DOU
+ wMnoB2u7NFgU2kSYRHp+U9UjtYYd+aoWnaol/rvp33W3IWaPC6+pO7/8/b6VemY0Z4
+ TXkn4NKescgF1Ri6bH5UGST40krqjpVIALxN/MsJ/4VyBsQvMOnyJ7NhTkaziaFam8
+ ItYA3HL2nZ94w==
+Date:   Tue, 8 Mar 2022 14:19:03 -0500
+From:   Eric B Munson <eric@munsonfam.org>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Problem: Bluetooth stops connecting to paired devices after
+ commit 6a98e3836fa207
+Message-ID: <YiesJ4sLv010CpsA@munsonfam.org>
+References: <Yh/HKSW05IfXCGbR@munsonfam.org>
 MIME-Version: 1.0
-X-Received: by 2002:a5d:944a:0:b0:645:dc2c:46c6 with SMTP id
- x10-20020a5d944a000000b00645dc2c46c6mr5968524ior.190.1646757085832; Tue, 08
- Mar 2022 08:31:25 -0800 (PST)
-Date:   Tue, 08 Mar 2022 08:31:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000021ebaf05d9b78339@google.com>
-Subject: [syzbot] INFO: trying to register non-static key in sco_sock_timeout
-From:   syzbot <syzbot+c893cac8686270f25523@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature"; boundary="+OQ+VktpKdL07tFC"
+Content-Disposition: inline
+In-Reply-To: <Yh/HKSW05IfXCGbR@munsonfam.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
 
-syzbot found the following issue on:
+--+OQ+VktpKdL07tFC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-HEAD commit:    91265a6da44d Add linux-next specific files for 20220303
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1621ba59700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=617f79440a35673a
-dashboard link: https://syzkaller.appspot.com/bug?extid=c893cac8686270f25523
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+On Wed, 02 Mar 2022, Eric B Munson wrote:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> Hi,
+>=20
+> When testing the latest upstream this morning, my bluetooth mouse
+> stopped working. Further inspection showed that my laptop is failing to
+> connect, but I didn't see anything relevant in dmesg, the driver seemed
+> to load firmware and intialize fine.
+>=20
+> A bisect turned up commit 6a98e3836fa207 as the first bad one, but
+> unfortunately there was another problem discovered during the bisect
+> where my bluetooth radio failed to come up at all.
+>=20
+> I am using a 5 year old Lenovo X1 carbon which is using the Intel
+> Wireless 8265 / 8275 card and the btintel driver.
+>=20
+> I can easily reproduce, and would be happy to test patches or help
+> diagnose if I can. Is this a known issue?
+>=20
+> Regards,
+> Eric
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c893cac8686270f25523@syzkaller.appspotmail.com
+This problem remains with the latest 5.17-rc7 kernel. Is there anything
+I can offer to help pinpoint what the cause is?
 
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 PID: 21810 Comm: kworker/0:3 Not tainted 5.17.0-rc6-next-20220303-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events sco_sock_timeout
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- assign_lock_key kernel/locking/lockdep.c:980 [inline]
- register_lock_class+0xf04/0x11b0 kernel/locking/lockdep.c:1293
- __lock_acquire+0x10a/0x56c0 kernel/locking/lockdep.c:4939
- lock_acquire kernel/locking/lockdep.c:5672 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5637
- lock_sock_nested+0x36/0xf0 net/core/sock.c:3312
- lock_sock include/net/sock.h:1682 [inline]
- sco_sock_timeout+0xd2/0x290 net/bluetooth/sco.c:97
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
+Regards,
+Eric
 
+--+OQ+VktpKdL07tFC
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-----BEGIN PGP SIGNATURE-----
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+iQIzBAABCgAdFiEEZ71cx3bfGX4kMtFBqEb2cZzVukkFAmInrB4ACgkQqEb2cZzV
+ukkveQ//YkLwFAz9um8O0Zth3ajoyVf5iD34ftR9Tyx1IS7c6QHijhRCYhvDpsHm
+h9B1aVk0e7vN9GRCZuZx06MgVrv0Iv8iCVX/vbfJrHuKM+nv4uu92b3Vzbwq7u6D
+fxOFrtrbbyPBTzSSCb2YkNnvfX8NbkK9CoaP2quYflsOtxUGunJ3gtEcmuVC+f03
+qPeRFIor/TOldxacj1Y8hewDo1wr4Wzk+EAio7FVlnk4QJ7vZ5pM3HJ1DpKCtIX+
+rj5uWt/yyNVU89Af+woHECJIfRrgTrTGFpqcc2PIJBGSn1k4oOOfKD2JO8E0sfxp
+C+D40fIlQ3Y/cVH+TcvyD0Si4CJ9IwhuFk22D/izoIGdkZgHW9Hjx4Gc6VFOaBIb
+KYTnog/KDJGZNe3zfOqB4DXOw4ADWLE7QuL0E75oICj0Nb6oQJUsv3EKVKwzZfuG
+Qi+yIdgrPf+xtTt4+IiWbq52sgFO6CCqMjoHS94LhdspYqcUrVkVJTCwtrzQ0S0v
+RkIISpbauVezANNu7BXPq5xz3rSLVeUXEcDzIGbYeR1s9/Nt3LEfFnkwSdAlXz95
++P/kGSes/ZfZOZcKMGwFgfJVonuR8RjKeTzHkTFQJGSlgntcusR18TxlbaZF7P7+
+KyiM5Q0CLSQSqfzpIbZAPxjTgoUBIdeqQTZ7EutvVMHFi2fCkIA=
+=eAcx
+-----END PGP SIGNATURE-----
+
+--+OQ+VktpKdL07tFC--
