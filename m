@@ -2,107 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52748C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 14:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104C4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 16:03:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346069AbiCHO6m (ORCPT
+        id S243062AbiCHQE3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Mar 2022 09:58:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52646 "EHLO
+        Tue, 8 Mar 2022 11:04:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239658AbiCHO6j (ORCPT
+        with ESMTP id S245280AbiCHQE2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Mar 2022 09:58:39 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26F611A17;
-        Tue,  8 Mar 2022 06:57:41 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id A91AE1F37E;
-        Tue,  8 Mar 2022 14:57:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646751460; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Emo8w3yGcQp3k2y24B4+Lq5nwc9G/zycXNA7HGHzKmY=;
-        b=n13z2+9UHxWrJwGXuc7QNLvD85WBs+isP527OJ2TxfyzskGNQJFKDyfreCcWu26SdIWECv
-        RLr/+Aia+m3rUHVJeUWKhlUrcpm/RAOEgCSxtE8SPixEXW2tQYdLsZxm411HVFBvTIGXQ1
-        +48BgMSp04VPt7Wo5jAtVxvW7+v3/DI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646751460;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Emo8w3yGcQp3k2y24B4+Lq5nwc9G/zycXNA7HGHzKmY=;
-        b=YzoCAaL8HjQPWimS0WyLZO9L3B+ShKsblcZyfZjE5VG754cVrLujYZNFsmwZnhMEolCOw8
-        3vSKpwj/Cfxw/6Ag==
-Received: from alsa1.nue.suse.com (alsa1.suse.de [10.160.4.42])
-        by relay2.suse.de (Postfix) with ESMTP id 92DA6A3B83;
-        Tue,  8 Mar 2022 14:57:40 +0000 (UTC)
-From:   Takashi Iwai <tiwai@suse.de>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Add missing Chicony device for Realtek RTL8723BE
-Date:   Tue,  8 Mar 2022 15:57:31 +0100
-Message-Id: <20220308145731.23166-1-tiwai@suse.de>
-X-Mailer: git-send-email 2.31.1
+        Tue, 8 Mar 2022 11:04:28 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926754F46C
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 08:03:30 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id a1so16470031qta.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 08:03:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=3gsRRfcty1n5hv8YwMqOrCHerUb+tMyO1FJwojfPeNM=;
+        b=lhLWWpLrvwB9GPtcWfJPViU4DpOlPPjlDYSBWQJMbYbu/fqaoybMo6x35+FrFFmk+t
+         QbetV40O7rCElGuJ3zD7E7fL/qYdI7so3VW7aublGU54ddnFkeJ0NZ/jSafhc7uRTqku
+         DG4KR9394xd1H/E59SN3dHh9rcKTKbzsrR2DTmWwrjX347M6+FTO2i2EbUu4JsZ3wAYx
+         MjT/K8eOA4ELK2d8S0MYszQJ2cjN1UrtH6P7FU6ELs5ZNKbjXXSSMbN02kXiP1Fwk/8E
+         DJ2Jfj9AmKuPU28+BDSvkMHDZK3cSq4Yd9aoqve2VAPPTCGmTnfi3jnef+dMKtug4zwk
+         kyqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=3gsRRfcty1n5hv8YwMqOrCHerUb+tMyO1FJwojfPeNM=;
+        b=6tdWnammhHNB7qJ8TVLckH8ZblcCXZp5JxUW+Pubh+zvSMjrwtoK4dQ5ofHTJPAIRp
+         2TrGc1r+O7Mm+WoB0InqmbGs3OQunO+9K4Znor4+tL6ra9JOLUxyp6BNTI+3UAZM0UNS
+         LeYCnS41FkLInUb5uPn6r2k4osp6aZTmh9GsjgNfNDWx11ynVcr/SLVzXoW4Dmj7tpwP
+         0QAy5MxNyLxihgWO9TYhlVkyxxxPmHGoDmiHFoxKbcC70AJrBgcoqucK1uVLWkCxPvSq
+         +WQKH1daPhV8DQmMGnwAfuaUU2rYcIfcRzmJP7eNX7pTPf2iq5c0U8YISHcKPixkmxKS
+         k1KQ==
+X-Gm-Message-State: AOAM531MwiUYNJXvHVMDZLmQUQhwGgKhM6AQJBFUuKscDsQhqb/FlKVo
+        X6iNp1GAtHOAeyzf80szKKr79CQ3agc=
+X-Google-Smtp-Source: ABdhPJwOgiYSQ1NBsOO0q3PEtUk/4xeHFb+n3rc7qHcgsux9U2GJoxaBXM/j7wo9pSqUATHGJz3cDA==
+X-Received: by 2002:a05:622a:60d:b0:2df:f4f2:c85e with SMTP id z13-20020a05622a060d00b002dff4f2c85emr13883813qta.250.1646755409404;
+        Tue, 08 Mar 2022 08:03:29 -0800 (PST)
+Received: from [172.17.0.2] ([52.177.3.156])
+        by smtp.gmail.com with ESMTPSA id g5-20020ac87f45000000b002e125ef0ba3sm197723qtk.82.2022.03.08.08.03.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Mar 2022 08:03:29 -0800 (PST)
+Message-ID: <62277e51.1c69fb81.9ac77.1f85@mx.google.com>
+Date:   Tue, 08 Mar 2022 08:03:29 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7281096726661577437=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, tiwai@suse.de
+Subject: RE: Bluetooth: btusb: Add missing Chicony device for Realtek RTL8723BE
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220308145731.23166-1-tiwai@suse.de>
+References: <20220308145731.23166-1-tiwai@suse.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Chicony Electronics BT device with 04f2:b49f seems to be a missing
-entry for Realtek RTL8723BE.
+--===============7281096726661577437==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-T:  Bus=02 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  4 Spd=12   MxCh= 0
-D:  Ver= 2.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04f2 ProdID=b49f Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+This is automated email and please do not reply to this email!
 
-BugLink: https://bugzilla.opensuse.org/show_bug.cgi?id=1196779
-Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=621551
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.59 seconds
+GitLint                       PASS      0.96 seconds
+SubjectPrefix                 PASS      0.84 seconds
+BuildKernel                   PASS      29.65 seconds
+BuildKernel32                 PASS      26.22 seconds
+Incremental Build with patchesPASS      36.07 seconds
+TestRunner: Setup             PASS      459.59 seconds
+TestRunner: l2cap-tester      PASS      15.03 seconds
+TestRunner: bnep-tester       PASS      5.66 seconds
+TestRunner: mgmt-tester       PASS      100.04 seconds
+TestRunner: rfcomm-tester     PASS      7.94 seconds
+TestRunner: sco-tester        PASS      7.12 seconds
+TestRunner: smp-tester        PASS      7.75 seconds
+TestRunner: userchan-tester   PASS      5.91 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index c30d131da784..ceb60ca81c76 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -463,6 +463,7 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Additional Realtek 8723BE Bluetooth devices */
- 	{ USB_DEVICE(0x0489, 0xe085), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x0489, 0xe08b), .driver_info = BTUSB_REALTEK },
-+	{ USB_DEVICE(0x04f2, 0xb49f), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3410), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3416), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x13d3, 0x3459), .driver_info = BTUSB_REALTEK },
--- 
-2.34.1
 
+--===============7281096726661577437==--
