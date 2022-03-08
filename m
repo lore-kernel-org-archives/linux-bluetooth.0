@@ -2,161 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A142C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Mar 2022 21:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90106C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 00:54:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245311AbiCGVZn (ORCPT
+        id S1344128AbiCHAzF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Mar 2022 16:25:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38722 "EHLO
+        Mon, 7 Mar 2022 19:55:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233761AbiCGVZm (ORCPT
+        with ESMTP id S237712AbiCHAzE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Mar 2022 16:25:42 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B82C60DB1
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Mar 2022 13:24:47 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id w16so33678131ybi.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Mar 2022 13:24:47 -0800 (PST)
+        Mon, 7 Mar 2022 19:55:04 -0500
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E95811CE
+        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Mar 2022 16:54:07 -0800 (PST)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-2d07ae0b1c0so184837637b3.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Mar 2022 16:54:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KmB8fp7Em83941w0yGbKCxsAUDlc6685RYn/O4lBIl4=;
-        b=jSyCvV57zmxczNPC40QHfPWINMD/nuYifLzVrc/vjUwKS3pbGvfVGeI0vetgvmL35P
-         8Pgcg5wiYMubvlmJ8ccpmErRj2oj0W0TeEgwTx+O6gEKH7SGOoPddTq0eynI+jxxHFcr
-         4e0qZQEul4HNmY/9n4yFM1WuVCZOWvnoq9wk8RDRYlFhEnKV+mDeniYOpyhqCXFJkwAA
-         0TGlBELaqQHr/mUBCgowcqwz438GStd0CvgwtGbje5P/7uzW3/lppWxaO/siNSGFPzFj
-         LDUcI1hk+rmLouIWWcnLCHHbxWsNDkxbcVNbjYTFFsXvK9Pb5S/pN1dejvhjh1TNhAca
-         TwgA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=7Ho/P7lZ6w2v/bbh5/0X/Bq1CWvN5lwiHcU/mrgn5Lk=;
+        b=TEXgjMLDbBVIA3na1n+eMiclvjt9MdtbZqT2+KizR4LFSDrOd4eJF50k6FXEUVDi5v
+         pEcwHhrkQMIyQFz2uIcfWZm2Scb5fp8EO47SVqdn62FqcM+W3v614fz2eNztPYE4jZ0+
+         BkXh+ApJAz79x4hbYhKZ4y7VgmiTJd8ic/xsq4F7lxtz4El05qMHLTEPkON83bWqRNga
+         /BiAXI1zqLNAwkh3k+TCV85d4bMPkx/yVVCPd1J2CRHkN4EkobbAAKHjF8+48zp3LCkP
+         wx85vYHvg3Ey6RAIusdJwIo3UBtz13apOAWWX4Au/1yYGU6kkSztaig1IKgnofsgq2ZR
+         TO9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KmB8fp7Em83941w0yGbKCxsAUDlc6685RYn/O4lBIl4=;
-        b=zuxIVhDeawVFlzjKd/eUjM7Ejpzv1d7yI45AJzMyC0NoEf2PiHA4oqs2fUwIzMpbfe
-         LRIWux85Ujaj0Syi9HwlL6EKV6o8xOvKyd8g5NO1Hlqn2psL7rt7Ynb8eGykL9TMGB6P
-         21FPpztGhLCsuf98ry+SJl26AfL/O+HV9yqdYmAexu5f19bFcAMZKH1ZNnvk2dTgxC31
-         Ps443sLp8TnUjSZFEp/4r6M1gxfs/BKgDkOwJTpByD0Cc33/beE8hqp5Gn4TT9+Vhxjl
-         ncbBkoFUOMQIgA304KGth1CAanHru7xiFKBWc6EW2qB0QnnfVQQdcQUh0qdsdh2k2jsw
-         /90w==
-X-Gm-Message-State: AOAM533ZkfTC3wdegSCeWYUEQ9yRo9J6Wx85OTgL//IwUTbaWYCGk2hz
-        CjXx1zRS3m/xtjA+dIOrBAyeEiCjsZQNw4GuUw8=
-X-Google-Smtp-Source: ABdhPJxng1DWnpyk5PDAqQelp5on+A4FpUWnAuULTfVmY1eFPsyi/VShygvxJSKxlDKHu6oL0pUjXeOTzxmSisRW8ls=
-X-Received: by 2002:a25:d083:0:b0:629:254e:bd42 with SMTP id
- h125-20020a25d083000000b00629254ebd42mr7861648ybg.459.1646688286434; Mon, 07
- Mar 2022 13:24:46 -0800 (PST)
+         :message-id:subject:to;
+        bh=7Ho/P7lZ6w2v/bbh5/0X/Bq1CWvN5lwiHcU/mrgn5Lk=;
+        b=DCTeqn13QeEJcXd7UVtJz/puOcHVHZyBjJEffLZlZiHnJufGldsHOjyOrj8O64vYh7
+         F/PSx1h38VRI14QbcVAlMCoSIBF77Rtaftr/vNAICv9K0IOgq12YroLlhiK6LqQpxCbM
+         658d7BIm/2cD8RETMTsGscOPjSorpDbX5FAj95GNQutDlaALfVyRaR2Q2P96XpTnLbyC
+         c1n1XavUNF7Ttd0OubFQOf2ujOFdJ0atF/5ETgyS0wO1oXROd62gM83Os03wofScxAnt
+         bGmnEdKJGX/ZahNg8dYEVhBFfiMy1t59z26uIxcgZ9q7kWHpzWC8M+nvrTKGrahzI0qt
+         dmSg==
+X-Gm-Message-State: AOAM5338XaihpX+NVq6htETCD7V8gr5Qh00Yu7rWcxozWUWat/Pmo1of
+        0PaM4tKlvdh8nCWYR7FwGHGfUCQqFibjOCozi47XnzHr
+X-Google-Smtp-Source: ABdhPJwxmcjFuZZczV4FJwZQUMMmixhExf9HXqKC0kmGJsCvQlt7AmgAOGSkaQcHLpbJHiH+ToGNDosiprQFJLKqm9E=
+X-Received: by 2002:a81:9115:0:b0:2dc:2daf:4b8b with SMTP id
+ i21-20020a819115000000b002dc2daf4b8bmr11172152ywg.376.1646700846928; Mon, 07
+ Mar 2022 16:54:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20220307140437.Bluez.v1.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
-In-Reply-To: <20220307140437.Bluez.v1.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
+References: <20220303003136.4882-1-luiz.dentz@gmail.com> <6220333d.1c69fb81.59e13.3197@mx.google.com>
+In-Reply-To: <6220333d.1c69fb81.59e13.3197@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 7 Mar 2022 13:24:35 -0800
-Message-ID: <CABBYNZJnUtn4LwcFc+Nccpx4PRuBzgpu1-3-D2if_P6NaLZmkQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] audio: fix crash in a2dp_discover
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Mon, 7 Mar 2022 16:53:56 -0800
+Message-ID: <CABBYNZL=R4AGKhz48hgpttBZmhVAUFtg6ONxBJA0A3dS92JHtQ@mail.gmail.com>
+Subject: Re: [BlueZ] client: Add support for scan <le/bredr>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi,
 
-On Sun, Mar 6, 2022 at 10:06 PM Howard Chung <howardchung@google.com> wrote:
+On Wed, Mar 2, 2022 at 7:17 PM <bluez.test.bot@gmail.com> wrote:
 >
-> From: Yun-Hao Chung <howardchung@chromium.org>
+> This is automated email and please do not reply to this email!
 >
-> Sample stack trace:
-> 0x0000567c394e4c6b (bluetoothd - a2dp.c: 270) setup_cb_free
-> 0x0000567c394e4a94 (bluetoothd - a2dp.c: 2884) a2dp_discover
-> 0x0000567c394e3c03 (bluetoothd - sink.c: 275) sink_setup_stream
-> 0x0000567c394e3d4f (bluetoothd - sink.c: 299) sink_connect
-> 0x0000567c39535183 (bluetoothd - service.c: 294) btd_service_connect
-> 0x0000567c39539f68 (bluetoothd - device.c: 2006) connect_next
-> 0x0000567c3954086d (bluetoothd - device.c: 2060) service_state_changed
-> 0x0000567c39534efb (bluetoothd - service.c: 111) change_state
-> 0x0000567c3953559c (bluetoothd - service.c: 0)
-> btd_service_connecting_complete
-> 0x0000567c39534a5c (bluetoothd - profile.c: 1641) record_cb
-> 0x0000567c395197cd (bluetoothd - sdp-client.c: 298) connect_watch
-> 0x00007b14bc8034f6 (libglib-2.0.so.0 - gmain.c: 3337)
-> g_main_context_dispatch
-> 0x00007b14bc803801 (libglib-2.0.so.0 - gmain.c: 4131)
-> g_main_context_iterate
-> 0x00007b14bc803a7d (libglib-2.0.so.0 - gmain.c: 4329) g_main_loop_run
-> 0x0000567c39566af1 (bluetoothd - mainloop-glib.c: 79) mainloop_run
-> 0x0000567c39566ddb (bluetoothd - mainloop-notify.c: 201)
-> mainloop_run_with_signal
-> 0x0000567c3954bf4c (bluetoothd - main.c: 1222) main
-> 0x00007b14bc579797 (libc.so.6 - libc-start.c: 332) __libc_start_main
-> 0x0000567c394df449 (bluetoothd) _start
-> 0x00007ffd70145737
+> Dear submitter,
 >
-> This could be triggered from a2dp_discover -> avdtp_discover ->
-> send_request -> send_req -> l2cap_connect (return error) ->
-> avdtp_set_state (to disconnect state)-> channel_remove -> channel_free
-> -> finalize_setup_errno (discover cb is freed) -> error handling all
-> the way back to a2dp_discover -> a2dp_discover (discover cb is freed
-> again, crashed!).
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=619734
 >
-> The fix is to add setup_ref/setup_unref around a2dp_discover to ensure
-> setup alive, and check if setup->chan to see if channel_free has been
-> called or not.
+> ---Test result---
 >
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> Test Summary:
+> CheckPatch                    FAIL      1.60 seconds
+> GitLint                       PASS      1.09 seconds
+> Prep - Setup ELL              PASS      50.66 seconds
+> Build - Prep                  PASS      0.92 seconds
+> Build - Configure             PASS      10.27 seconds
+> Build - Make                  PASS      1761.16 seconds
+> Make Check                    PASS      13.30 seconds
+> Make Check w/Valgrind         PASS      532.70 seconds
+> Make Distcheck                PASS      280.62 seconds
+> Build w/ext ELL - Configure   PASS      10.33 seconds
+> Build w/ext ELL - Make        PASS      1735.38 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> [BlueZ] client: Add support for scan <le/bredr>
+> WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+> #102: FILE: client/main.c:1419:
+> +static const char *scan_arguments[] = {
+>
+> /github/workspace/src/12766921.patch total: 0 errors, 1 warnings, 61 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12766921.patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+>
+>
 > ---
-> Hi maintainers,
->
-> The fix is tested by forcing session->io to NULL in send_req in the code
-> and verifing the crash doesn't happen.
->
->  profiles/audio/a2dp.c | 12 ++++++++++--
->  1 file changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 9fbcd35f7..39e1e9624 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -2878,14 +2878,22 @@ unsigned int a2dp_discover(struct avdtp *session, a2dp_discover_cb_t cb,
->         if (!setup)
->                 return 0;
->
-> +       setup_ref(setup);
->         cb_data = setup_cb_new(setup);
->         cb_data->discover_cb = cb;
->         cb_data->user_data = user_data;
->
-> -       if (avdtp_discover(session, discover_cb, setup) == 0)
-> +       if (avdtp_discover(session, discover_cb, setup) == 0) {
-> +               setup_unref(setup);
->                 return cb_data->id;
-> +       }
->
-> -       setup_cb_free(cb_data);
-> +       /* Check if the channel is still there before freeing setup_cb, since it
-> +        * could be freed by channel_free().
-> +        */
-> +       if (setup->chan)
-> +               setup_cb_free(cb_data);
-> +       setup_unref(setup);
->         return 0;
-
-This sounds a little too complicated and I'm afraid we may run into
-other problems if we start taking extra references, so how about we
-don't attach the cb_data to begin with:
-
-https://gist.github.com/Vudentz/7f1a3eeea7decdb17b67d288b1dff77e
-
->  }
->
-> --
-> 2.35.1.616.g0bdcbb4464-goog
+> Regards,
+> Linux Bluetooth
 >
 
-
+Pushed.
 -- 
 Luiz Augusto von Dentz
