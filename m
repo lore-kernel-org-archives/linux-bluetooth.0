@@ -2,171 +2,202 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC77C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 07:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E88DEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 09:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237159AbiCHHyJ (ORCPT
+        id S1345391AbiCHJou (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Mar 2022 02:54:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39468 "EHLO
+        Tue, 8 Mar 2022 04:44:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231175AbiCHHyI (ORCPT
+        with ESMTP id S237159AbiCHJou (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Mar 2022 02:54:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A21003CFD7
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Mar 2022 23:53:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646725990;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J8hHnYsGpvC5TU7EphxVfoEfIwjP9uGo0yZ9ClotWYE=;
-        b=Fr29qJLubbAaTSXJ/9oc70fzPsfiu9//bkwo0XQbMu0+crGrlWGkFUW4y3+lz/GF3Aag3T
-        aoWtDNlRsUyc8dZaJP7sn3c1SnnsCenuEzGyPi7XBsRYh/LwVlPdAh0mjjmVIX1MQE9Iw+
-        c6MxZ3ZJi6qoApdXGjw4bASxdQUy9XM=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-1-ekt90sXaNbSv_vcXlMaAPw-1; Tue, 08 Mar 2022 02:53:09 -0500
-X-MC-Unique: ekt90sXaNbSv_vcXlMaAPw-1
-Received: by mail-ed1-f72.google.com with SMTP id h17-20020a05640250d100b004133863d836so10129344edb.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Mar 2022 23:53:09 -0800 (PST)
+        Tue, 8 Mar 2022 04:44:50 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7B827FE7
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 01:43:54 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2d61f6c1877so155677027b3.15
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 01:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=swLthqUUPb6xo/EMJu8ReUPFOgroqtqP+uFPnA7Nza0=;
+        b=c7B5wkDC0c7tKrV2zDDYS3qgKRD24R1s/zZcG/kUge6S38lDxwblH2p5s+GexlpzGX
+         7t6fV6KRi2pW29Rjw/kCVkj3FN/G1iPTCecxK8RioIQ5pt4y+ZsTKX3B4l0PfYLS6/ux
+         UQPuwkvNkHdITx0dmKIJQhY7dYxrJ/QtDHMWVWPTefSOJUKCFHbwxANIgK74y54nvusk
+         pUvP6gqwewbMR+gBRsEW+Oj9B/lWnIgsaN/3kFJ7ZXakqrW+vcXeshnLhQdHDnSOu7Rt
+         Lxmfr7XOYcX/5lqvzRm/OPp2ntvsKiu79n7wN7vth9+j3jwN4ESgirugTgkxlND60iTx
+         mMPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=J8hHnYsGpvC5TU7EphxVfoEfIwjP9uGo0yZ9ClotWYE=;
-        b=aJ41euRiLvewngSQyh5r28OcFMhtIJv4e/qieVGV09XQnmOdf3ZmFMKLbaqDGGicLf
-         GsImymcVpc0MO1gx33D3n4MdbgYcgxN4ZvPyDJpIGeYZhOu91gemLB1vbN+52S3qKRKU
-         /aj5j2wkQuQfiaTIrnO9D5NlfUnRzA9/oLeXli3NH2q61gKjV3GDX7/ntbzzpgFSvJtk
-         Adz0gLySTCtpgxsraRO0W1U3pqRlyOQ0PC6dqdNT+BQKkG91ulcs3fcOmI03Fq15aCTG
-         B198gIMc7ofHginZpVBOiHRU8FgTHFtSrYcUSiGvX3QP8xA037LMQAoxc4hLP3wvMvhn
-         lh9Q==
-X-Gm-Message-State: AOAM5321soq0Gt8x3ouc8Wgq4GhuTOXvG9lKulDcdOMRe5IM+wyujyIu
-        6i3z8DXNOY0erp6+lSBf+vJwJb+gowwjkAfGYxKqHbO9GRSom2Tcza35zhepZZUqZyEjV9PjTBr
-        TkRWMODenX9BvwVkwcS1VdbkHS0nl
-X-Received: by 2002:a17:907:1ca4:b0:6da:86a4:1ec7 with SMTP id nb36-20020a1709071ca400b006da86a41ec7mr11880754ejc.556.1646725988197;
-        Mon, 07 Mar 2022 23:53:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwY5icmhkUl1KViWJFlGUe2BLp5rHGY7H6vVoZqspPDkWJ9Umbdb2nJVmq0BKwPkK7hLambhw==
-X-Received: by 2002:a17:907:1ca4:b0:6da:86a4:1ec7 with SMTP id nb36-20020a1709071ca400b006da86a41ec7mr11880742ejc.556.1646725988033;
-        Mon, 07 Mar 2022 23:53:08 -0800 (PST)
-Received: from ?IPV6:2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1? (2001-1c00-0c1e-bf00-1db8-22d3-1bc9-8ca1.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1db8:22d3:1bc9:8ca1])
-        by smtp.gmail.com with ESMTPSA id z11-20020a50e68b000000b00412ec8b2180sm7291072edm.90.2022.03.07.23.53.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Mar 2022 23:53:07 -0800 (PST)
-Message-ID: <72d66def-e23e-0029-6d52-3fbf3cf22849@redhat.com>
-Date:   Tue, 8 Mar 2022 08:53:04 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v4 1/2] Bluetooth: hci_sync: Add a new quirk to skip
- HCI_FLT_CLEAR_ALL
-Content-Language: en-US
-To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>,
-        marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pmenzel@molgen.mpg.de
-References: <20220307200445.5554-1-swyterzone@gmail.com>
-From:   Hans de Goede <hdegoede@redhat.com>
-In-Reply-To: <20220307200445.5554-1-swyterzone@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=swLthqUUPb6xo/EMJu8ReUPFOgroqtqP+uFPnA7Nza0=;
+        b=IrqbOiJ9pTgGVBNxx5xeO2JCBsbZxd1++/rNmM6nyQSlrg8PgzD1hcBqzTThjV79JT
+         dRVVIsr+XUD89nZv9WF8qzcr96eWnSQnGkZ8CV6RPGvHfb69jck1s9hXwr1azaMbR7Ru
+         rpuCiVlCtFnwD/PgKQF4ZsMDYoYKPVYLeRgqbtZNWxeBTnE3iAg4qLys57z3AJFsp1Xp
+         iQXw6KvtoF9Bqi58joa/jSKQTkDJl9niZJNKibOGGcof3dQKHXDjzqVKEjqzvTg4GgAh
+         X+0Lk2U2gyS14c4w+OlXxEKCaamTVNiZA9+oYEoAQXDePQuBwp0Ba6+gW0IQjZcRE2HR
+         hq8A==
+X-Gm-Message-State: AOAM5302L/FLKQktx66WhGD4LPbLKEakk89vLkyNcU5hjjWd9H6yc1Sl
+        eyi5r2rEAb2wWHhKP7EMJdHeFZJjIllsrOAYKj9Q0tqL70j2ExGTQn11cxjAsNdnbjxqXmUzvh/
+        5LyOmFbJ7Z7c/OrzuNTpIho1Z9qurLPgbh974PRlmDjxBAYPzzKQgSVGulQhcbZ5jiAQEXlz8R9
+        XXYUd5gd6K9oc=
+X-Google-Smtp-Source: ABdhPJwNWeoN5pAttjqFhzmQP07z/KU6fMg4vyXK8AsF6Q0Xy9oL85ZZ0fNeHoWgIE2S5LltMYgG+aFqPBCKja85Dw==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:57d8:a2f4:6afe:d442])
+ (user=howardchung job=sendgmr) by 2002:a81:2555:0:b0:2d0:dc91:5a1c with SMTP
+ id l82-20020a812555000000b002d0dc915a1cmr12129022ywl.200.1646732633407; Tue,
+ 08 Mar 2022 01:43:53 -0800 (PST)
+Date:   Tue,  8 Mar 2022 17:43:48 +0800
+Message-Id: <20220308174253.Bluez.v2.1.Ieb7448d3d951876e1f412452fcfd27cdc7bd015b@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.35.1.616.g0bdcbb4464-goog
+Subject: [Bluez PATCH v2] audio: fix crash in a2dp_discover
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-On 3/7/22 21:04, Ismael Ferreras Morezuelas wrote:
-> Some controllers have problems with being sent a command to clear
-> all filtering. While the HCI code does not unconditionally
-> send a clear-all anymore at BR/EDR setup (after the state machine
-> refactor), there might be more ways of hitting these codepaths
-> in the future as the kernel develops.
-> 
-> Cc: stable@vger.kernel.org
-> Cc: Hans de Goede <hdegoede@redhat.com>
-> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+Sample stack trace:
+0x0000567c394e4c6b (bluetoothd - a2dp.c: 270) setup_cb_free
+0x0000567c394e4a94 (bluetoothd - a2dp.c: 2884) a2dp_discover
+0x0000567c394e3c03 (bluetoothd - sink.c: 275) sink_setup_stream
+0x0000567c394e3d4f (bluetoothd - sink.c: 299) sink_connect
+0x0000567c39535183 (bluetoothd - service.c: 294) btd_service_connect
+0x0000567c39539f68 (bluetoothd - device.c: 2006) connect_next
+0x0000567c3954086d (bluetoothd - device.c: 2060) service_state_changed
+0x0000567c39534efb (bluetoothd - service.c: 111) change_state
+0x0000567c3953559c (bluetoothd - service.c: 0)
+btd_service_connecting_complete
+0x0000567c39534a5c (bluetoothd - profile.c: 1641) record_cb
+0x0000567c395197cd (bluetoothd - sdp-client.c: 298) connect_watch
+0x00007b14bc8034f6 (libglib-2.0.so.0 - gmain.c: 3337)
+g_main_context_dispatch
+0x00007b14bc803801 (libglib-2.0.so.0 - gmain.c: 4131)
+g_main_context_iterate
+0x00007b14bc803a7d (libglib-2.0.so.0 - gmain.c: 4329) g_main_loop_run
+0x0000567c39566af1 (bluetoothd - mainloop-glib.c: 79) mainloop_run
+0x0000567c39566ddb (bluetoothd - mainloop-notify.c: 201)
+mainloop_run_with_signal
+0x0000567c3954bf4c (bluetoothd - main.c: 1222) main
+0x00007b14bc579797 (libc.so.6 - libc-start.c: 332) __libc_start_main
+0x0000567c394df449 (bluetoothd) _start
+0x00007ffd70145737
 
-Thanks, the series looks good to me:
+This could be triggered from a2dp_discover -> avdtp_discover ->
+send_request -> send_req -> l2cap_connect (return error) ->
+avdtp_set_state (to disconnect state)-> channel_remove -> channel_free
+-> finalize_setup_errno (discover cb is freed) -> error handling all
+the way back to a2dp_discover -> a2dp_discover (discover cb is freed
+again, crashed!).
 
-Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+The fix is to attach cb with setup after avdtp_discover success.
 
-for both patches.
+Suggested-by: luiz.dentz@gmail.com
 
-Regards,
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+---
+Hi maintainers,
 
-Hans
+The fix is tested by forcing session->io to NULL in send_req in the code
+and verifing the crash doesn't happen.
 
-> ---
->  include/net/bluetooth/hci.h | 10 ++++++++++
->  net/bluetooth/hci_sync.c    | 16 ++++++++++++++++
->  2 files changed, 26 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 35c073d44ec5..5cb095b09a94 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -255,6 +255,16 @@ enum {
->  	 * during the hdev->setup vendor callback.
->  	 */
->  	HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
-> +
-> +	/* When this quirk is set, HCI_OP_SET_EVENT_FLT requests with
-> +	 * HCI_FLT_CLEAR_ALL are ignored and event filtering is
-> +	 * completely avoided. A subset of the CSR controller
-> +	 * clones struggle with this and instantly lock up.
-> +	 *
-> +	 * Note that devices using this must (separately) disable
-> +	 * runtime suspend, because event filtering takes place there.
-> +	 */
-> +	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
->  };
->  
->  /* HCI device flags */
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index e31d1150dc71..c3bdaf2de511 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2812,6 +2812,9 @@ static int hci_set_event_filter_sync(struct hci_dev *hdev, u8 flt_type,
->  	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
->  		return 0;
->  
-> +	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
-> +		return 0;
-> +
->  	memset(&cp, 0, sizeof(cp));
->  	cp.flt_type = flt_type;
->  
-> @@ -2832,6 +2835,13 @@ static int hci_clear_event_filter_sync(struct hci_dev *hdev)
->  	if (!hci_dev_test_flag(hdev, HCI_EVENT_FILTER_CONFIGURED))
->  		return 0;
->  
-> +	/* In theory the state machine should not reach here unless
-> +	 * a hci_set_event_filter_sync() call succeeds, but we do
-> +	 * the check both for parity and as a future reminder.
-> +	 */
-> +	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
-> +		return 0;
-> +
->  	return hci_set_event_filter_sync(hdev, HCI_FLT_CLEAR_ALL, 0x00,
->  					 BDADDR_ANY, 0x00);
->  }
-> @@ -4831,6 +4841,12 @@ static int hci_update_event_filter_sync(struct hci_dev *hdev)
->  	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
->  		return 0;
->  
-> +	/* Some fake CSR controllers lock up after setting this type of
-> +	 * filter, so avoid sending the request altogether.
-> +	 */
-> +	if (test_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks))
-> +		return 0;
-> +
->  	/* Always clear event filter when starting */
->  	hci_clear_event_filter_sync(hdev);
->  
+Changes in v2:
+- adopted luiz's solution
+
+ profiles/audio/a2dp.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 9fbcd35f7..f761dbe54 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -244,6 +244,15 @@ static struct a2dp_setup_cb *setup_cb_new(struct a2dp_setup *setup)
+ 	cb->setup = setup;
+ 	cb->id = ++cb_id;
+ 
++	return cb;
++}
++
++static struct a2dp_setup_cb *setup_cb_add(struct a2dp_setup *setup)
++{
++	struct a2dp_setup_cb *cb;
++
++	cb = setup_cb_new(setup);
++
+ 	setup->cb = g_slist_append(setup->cb, cb);
+ 	return cb;
+ }
+@@ -1840,7 +1849,7 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
+ 	if (!setup)
+ 		return -ENOMEM;
+ 
+-	cb_data = setup_cb_new(setup);
++	cb_data = setup_cb_add(setup);
+ 	cb_data->config_cb = reconfig_cb;
+ 	cb_data->user_data = user_data;
+ 
+@@ -2878,12 +2887,17 @@ unsigned int a2dp_discover(struct avdtp *session, a2dp_discover_cb_t cb,
+ 	if (!setup)
+ 		return 0;
+ 
++	/* Don't add cb since avdtp_discover can end up disconnecting the
++	 * session causing the cb to be freed.
++	 */
+ 	cb_data = setup_cb_new(setup);
+ 	cb_data->discover_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+-	if (avdtp_discover(session, discover_cb, setup) == 0)
++	if (avdtp_discover(session, discover_cb, setup) == 0) {
++		setup->cb = g_slist_append(setup->cb, cb_data);
+ 		return cb_data->id;
++	}
+ 
+ 	setup_cb_free(cb_data);
+ 	return 0;
+@@ -2911,7 +2925,7 @@ unsigned int a2dp_select_capabilities(struct avdtp *session,
+ 	if (!setup)
+ 		return 0;
+ 
+-	cb_data = setup_cb_new(setup);
++	cb_data = setup_cb_add(setup);
+ 	cb_data->select_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+@@ -2984,7 +2998,7 @@ unsigned int a2dp_config(struct avdtp *session, struct a2dp_sep *sep,
+ 	if (!setup)
+ 		return 0;
+ 
+-	cb_data = setup_cb_new(setup);
++	cb_data = setup_cb_add(setup);
+ 	cb_data->config_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+@@ -3075,7 +3089,7 @@ unsigned int a2dp_resume(struct avdtp *session, struct a2dp_sep *sep,
+ 	if (!setup)
+ 		return 0;
+ 
+-	cb_data = setup_cb_new(setup);
++	cb_data = setup_cb_add(setup);
+ 	cb_data->resume_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+@@ -3133,7 +3147,7 @@ unsigned int a2dp_suspend(struct avdtp *session, struct a2dp_sep *sep,
+ 	if (!setup)
+ 		return 0;
+ 
+-	cb_data = setup_cb_new(setup);
++	cb_data = setup_cb_add(setup);
+ 	cb_data->suspend_cb = cb;
+ 	cb_data->user_data = user_data;
+ 
+-- 
+2.35.1.616.g0bdcbb4464-goog
 
