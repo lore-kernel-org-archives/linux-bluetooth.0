@@ -2,103 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 104C4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 16:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0721CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 16:31:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243062AbiCHQE3 (ORCPT
+        id S1348345AbiCHQcY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Mar 2022 11:04:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
+        Tue, 8 Mar 2022 11:32:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245280AbiCHQE2 (ORCPT
+        with ESMTP id S233477AbiCHQcX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Mar 2022 11:04:28 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926754F46C
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 08:03:30 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id a1so16470031qta.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 08:03:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=3gsRRfcty1n5hv8YwMqOrCHerUb+tMyO1FJwojfPeNM=;
-        b=lhLWWpLrvwB9GPtcWfJPViU4DpOlPPjlDYSBWQJMbYbu/fqaoybMo6x35+FrFFmk+t
-         QbetV40O7rCElGuJ3zD7E7fL/qYdI7so3VW7aublGU54ddnFkeJ0NZ/jSafhc7uRTqku
-         DG4KR9394xd1H/E59SN3dHh9rcKTKbzsrR2DTmWwrjX347M6+FTO2i2EbUu4JsZ3wAYx
-         MjT/K8eOA4ELK2d8S0MYszQJ2cjN1UrtH6P7FU6ELs5ZNKbjXXSSMbN02kXiP1Fwk/8E
-         DJ2Jfj9AmKuPU28+BDSvkMHDZK3cSq4Yd9aoqve2VAPPTCGmTnfi3jnef+dMKtug4zwk
-         kyqg==
+        Tue, 8 Mar 2022 11:32:23 -0500
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764A8506F8
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 08:31:26 -0800 (PST)
+Received: by mail-io1-f72.google.com with SMTP id f7-20020a056602088700b00645ebbe277cso2711841ioz.22
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 08:31:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=3gsRRfcty1n5hv8YwMqOrCHerUb+tMyO1FJwojfPeNM=;
-        b=6tdWnammhHNB7qJ8TVLckH8ZblcCXZp5JxUW+Pubh+zvSMjrwtoK4dQ5ofHTJPAIRp
-         2TrGc1r+O7Mm+WoB0InqmbGs3OQunO+9K4Znor4+tL6ra9JOLUxyp6BNTI+3UAZM0UNS
-         LeYCnS41FkLInUb5uPn6r2k4osp6aZTmh9GsjgNfNDWx11ynVcr/SLVzXoW4Dmj7tpwP
-         0QAy5MxNyLxihgWO9TYhlVkyxxxPmHGoDmiHFoxKbcC70AJrBgcoqucK1uVLWkCxPvSq
-         +WQKH1daPhV8DQmMGnwAfuaUU2rYcIfcRzmJP7eNX7pTPf2iq5c0U8YISHcKPixkmxKS
-         k1KQ==
-X-Gm-Message-State: AOAM531MwiUYNJXvHVMDZLmQUQhwGgKhM6AQJBFUuKscDsQhqb/FlKVo
-        X6iNp1GAtHOAeyzf80szKKr79CQ3agc=
-X-Google-Smtp-Source: ABdhPJwOgiYSQ1NBsOO0q3PEtUk/4xeHFb+n3rc7qHcgsux9U2GJoxaBXM/j7wo9pSqUATHGJz3cDA==
-X-Received: by 2002:a05:622a:60d:b0:2df:f4f2:c85e with SMTP id z13-20020a05622a060d00b002dff4f2c85emr13883813qta.250.1646755409404;
-        Tue, 08 Mar 2022 08:03:29 -0800 (PST)
-Received: from [172.17.0.2] ([52.177.3.156])
-        by smtp.gmail.com with ESMTPSA id g5-20020ac87f45000000b002e125ef0ba3sm197723qtk.82.2022.03.08.08.03.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 08:03:29 -0800 (PST)
-Message-ID: <62277e51.1c69fb81.9ac77.1f85@mx.google.com>
-Date:   Tue, 08 Mar 2022 08:03:29 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7281096726661577437=="
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=V1zLNO1KAqXnOsAbreZ3eBprRbDmLPsP43VZUANZ1eE=;
+        b=IQX5BIGDliNZsVXPE7uESKJ7b375g52qHUxIDsmzIyIwJ+SZbnKBT9+qGWkqbRfB7P
+         gBUtO+PzhoouoxIXZryrt/+4XRxrDez+572wyNKUU0FkOUM6QO1bZJE9FAVpPtHZFkdP
+         XiPzPyqfVyDxKBx2KF3Fjen7S/44NpNYfvXvUsBbbMWEE3sZ2triDU44SpKxVQ8cVxGc
+         V8+e+cCOm25kY+abchKyzuTrYas4SjY++obPMc1IuO2wSHfDm+6Kco3gV42YfRI8RLPp
+         b0kfEd9mxe0JUhOapVyLunhX6qIL0XCy+eA9/6X5aVAj1g8Pf6wzmLl+Ra1yfSmeihb0
+         bYnQ==
+X-Gm-Message-State: AOAM530rHFPnTqSaZz7ltfuNLxtoD3ZoIQ1SAB+uhmkjTNWMXYunE7HC
+        mK25esnmJ4sqjNNS/oe9IIxyONSYAIgT7BZMG8yPV87TQPXL
+X-Google-Smtp-Source: ABdhPJz2wlhCoBGloN79xjSbYtO9yttKkeIGLgG5eHIjjuJ6B4OJHpcgxXKi5Qtx3q3ZgYzJZZI+3dM1OCybcO34ErYNuEZmv0oD
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tiwai@suse.de
-Subject: RE: Bluetooth: btusb: Add missing Chicony device for Realtek RTL8723BE
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220308145731.23166-1-tiwai@suse.de>
-References: <20220308145731.23166-1-tiwai@suse.de>
+X-Received: by 2002:a5d:944a:0:b0:645:dc2c:46c6 with SMTP id
+ x10-20020a5d944a000000b00645dc2c46c6mr5968524ior.190.1646757085832; Tue, 08
+ Mar 2022 08:31:25 -0800 (PST)
+Date:   Tue, 08 Mar 2022 08:31:25 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000021ebaf05d9b78339@google.com>
+Subject: [syzbot] INFO: trying to register non-static key in sco_sock_timeout
+From:   syzbot <syzbot+c893cac8686270f25523@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7281096726661577437==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    91265a6da44d Add linux-next specific files for 20220303
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1621ba59700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=617f79440a35673a
+dashboard link: https://syzkaller.appspot.com/bug?extid=c893cac8686270f25523
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=621551
+Unfortunately, I don't have any reproducer for this issue yet.
 
----Test result---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c893cac8686270f25523@syzkaller.appspotmail.com
 
-Test Summary:
-CheckPatch                    PASS      1.59 seconds
-GitLint                       PASS      0.96 seconds
-SubjectPrefix                 PASS      0.84 seconds
-BuildKernel                   PASS      29.65 seconds
-BuildKernel32                 PASS      26.22 seconds
-Incremental Build with patchesPASS      36.07 seconds
-TestRunner: Setup             PASS      459.59 seconds
-TestRunner: l2cap-tester      PASS      15.03 seconds
-TestRunner: bnep-tester       PASS      5.66 seconds
-TestRunner: mgmt-tester       PASS      100.04 seconds
-TestRunner: rfcomm-tester     PASS      7.94 seconds
-TestRunner: sco-tester        PASS      7.12 seconds
-TestRunner: smp-tester        PASS      7.75 seconds
-TestRunner: userchan-tester   PASS      5.91 seconds
-
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 0 PID: 21810 Comm: kworker/0:3 Not tainted 5.17.0-rc6-next-20220303-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events sco_sock_timeout
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ assign_lock_key kernel/locking/lockdep.c:980 [inline]
+ register_lock_class+0xf04/0x11b0 kernel/locking/lockdep.c:1293
+ __lock_acquire+0x10a/0x56c0 kernel/locking/lockdep.c:4939
+ lock_acquire kernel/locking/lockdep.c:5672 [inline]
+ lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5637
+ lock_sock_nested+0x36/0xf0 net/core/sock.c:3312
+ lock_sock include/net/sock.h:1682 [inline]
+ sco_sock_timeout+0xd2/0x290 net/bluetooth/sco.c:97
+ process_one_work+0x996/0x1610 kernel/workqueue.c:2289
+ worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+ kthread+0x2e9/0x3a0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
---===============7281096726661577437==--
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
