@@ -2,107 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3038C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 19:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09491C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Mar 2022 22:51:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240933AbiCHT0l (ORCPT
+        id S1350829AbiCHWwI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Mar 2022 14:26:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59494 "EHLO
+        Tue, 8 Mar 2022 17:52:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239799AbiCHT0k (ORCPT
+        with ESMTP id S235509AbiCHWwH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Mar 2022 14:26:40 -0500
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DB94E394
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 11:25:43 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-2dc348dab52so179742427b3.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 11:25:43 -0800 (PST)
+        Tue, 8 Mar 2022 17:52:07 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C454EF4A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Mar 2022 14:51:09 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id x5so598030edd.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 14:51:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=o3V7hO3HL/njE7IuGzEu6Aq+m9HUzhClcq7NIL/105k=;
-        b=Oo+3SnOwIYQ6sio4aaGr5SRZopmyX5vxU6kAacONnv3qTiME/zHscBGrKlgv8KOSng
-         QDF4yHQMIgySlwj95c12P6Eckp2FUTlxcHfFE4Rbebmh88upVR+upORWt6ANNW0bik0J
-         yfq7ttUPrQpnIWYf0IzcbCZAVIFv5U7F/+RttX8lQyFvHbSOGnj0p8W+faa7NZJPUPeF
-         a9eZs+yvuIkvzFDqvfcZFn0iS08LcrpVpQyAmBRlt4Lexclwerge0K5GS0biPz56ALkW
-         zdIMzD+J8t5mFK6ABpACEISJqVfzaCd+MwpkQ/rdJKjAKDBGsCg6OhopafzCKCQSvDFs
-         OAdw==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=GNyxxtXcnyfmNNBli9SgJPfg/+KszGAsz9fS3NorGIg=;
+        b=PnxAQB5mg7PZ8UGtkbZ1UIXLxmuEZkxURrHl7X35BCyIjZbw/9FMzwIGmuxidUWqBV
+         1XhVUkSVmREfytJ4rUEGANtRJViTBNnNCeZSwLNtV9CzVyCnQidRghFDVelxbbB6j1d7
+         XkcjEhAf7/6UiGCiOPy1mluFiAEfv1T3D9qG4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=o3V7hO3HL/njE7IuGzEu6Aq+m9HUzhClcq7NIL/105k=;
-        b=MS8yYroMmew2hTiEJUkzRov/9NFjzxmfjGky0TfAjskrhjRHfSZaaPIYI6vi/AIWo8
-         k/Tc0acmxQNpGENcG0wHZdbJEvdTG+LhjYI3+2v8du3MZcmdHVgpB63MDrfma0DALjXE
-         cibQ/bmLJwRm0QVAV8GHKSXBs5x88I+P13GfAVY60z6z5lRYFHLUfblFop1hmYAOkGBv
-         xqr/4fj4VcUNqBFpoZxVXvm/uVEAspTXa0f2lSCTfJmAlX/7pT77qvgU5gNGmevH+Jng
-         1naJPPST5IEFF72UBBHdyUEy0BTGYMbeuGQ0uISvJTBUJDYCxgxTdk9aso870cCWPG1h
-         zKUw==
-X-Gm-Message-State: AOAM533U1ICjAzjxQ5qA0TMvVkEi4WgP+PKKdrWYNmumXMFshhO7mYEo
-        MztrZ921ni5HQsATQVEO8V/Q/x0bkoGQaf7zILMZzyhM
-X-Google-Smtp-Source: ABdhPJwOX3AdtgiJuWXHj6Thw7sC5YVw3deghzsTfci4+QE7Geav+x/G64P9hreyhAWwkD34RHc9TGqbaAj2iUdjr4k=
-X-Received: by 2002:a81:9115:0:b0:2dc:2daf:4b8b with SMTP id
- i21-20020a819115000000b002dc2daf4b8bmr14668757ywg.376.1646767542687; Tue, 08
- Mar 2022 11:25:42 -0800 (PST)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=GNyxxtXcnyfmNNBli9SgJPfg/+KszGAsz9fS3NorGIg=;
+        b=OxwBZg2hzPUcAg4tDNDpFkNnfGhYLCcGMTiNpdG9jxWGSXP+dWaEHF3+asC1E2umad
+         z19fIN3VGXgnRRrT1wxAyp0QZrfzLE2go7S7QAd37NRYMk2NHIkn8syiTFptzNpefYpA
+         0+YYOlCuSqsScV47yXgZgcsae6KIMNU8LT87fRJ7EnT5KSgRuPkrp2AdPJBPT8v4s9d3
+         wkB+dXIYcvh4G3A37Dvl0MrNcyfQn9/iGZ8hBSB2NBGBudiWQJEEBz0ZyW+wMmKc3qd7
+         Ju2pukMrr8HgQh5hRBI70LoLeOaLZ6L6yUTIZaiB9ujNCbpT/zrUfl2ECe8/EKdI8VTC
+         H8JQ==
+X-Gm-Message-State: AOAM533kTiOV5Hg/7S5enugkQFU43DMjvz+fn/RA9YFHR9IRsMFFy8dX
+        RbLNRlk7D93Kjwp+YN+izNKBGtxwER58YA==
+X-Google-Smtp-Source: ABdhPJzXVfKtrKFcX/hjO2FpxQwn4Dp1GWALBKXm+X81UcKYic+4Z5i90reN8sK0I+AGPONhcivF3A==
+X-Received: by 2002:a05:6402:51cb:b0:409:e99f:bc1c with SMTP id r11-20020a05640251cb00b00409e99fbc1cmr18641834edd.68.1646779868343;
+        Tue, 08 Mar 2022 14:51:08 -0800 (PST)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com. [209.85.218.47])
+        by smtp.gmail.com with ESMTPSA id n4-20020a056402060400b00415a1f9a4dasm54352edv.91.2022.03.08.14.51.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 14:51:07 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id yy13so1140848ejb.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Mar 2022 14:51:07 -0800 (PST)
+X-Received: by 2002:a17:906:2b97:b0:6cd:6d67:ab5d with SMTP id
+ m23-20020a1709062b9700b006cd6d67ab5dmr15541284ejg.723.1646779866998; Tue, 08
+ Mar 2022 14:51:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20220305012229.853784-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220305012229.853784-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Mar 2022 11:25:31 -0800
-Message-ID: <CABBYNZL8GAG9kzMAEvSHGVDZC_LwKo02=bvmf36_YL9FJmpvAQ@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v2 00/12] emulator: Initial Broacast Receiver
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <CAPBVwTQrcYYauoCXBWdOsPa_vmN=cajYzVFcep_GLC-2OwOwYQ@mail.gmail.com>
+ <6f8f47ceebfbcfd7fa8b04a4df807ae822e2960c.camel@hadess.net>
+In-Reply-To: <6f8f47ceebfbcfd7fa8b04a4df807ae822e2960c.camel@hadess.net>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Tue, 8 Mar 2022 14:50:55 -0800
+X-Gmail-Original-Message-ID: <CAO271m=hf0uB1t50t6tTXqDQREVxzX2S=R2rVCGK60xwVKgSYQ@mail.gmail.com>
+Message-ID: <CAO271m=hf0uB1t50t6tTXqDQREVxzX2S=R2rVCGK60xwVKgSYQ@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth: Adding support for /etc/bluetooth/main.conf.d
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     Katherine Lai <laikatherine@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Bastien,
 
-On Fri, Mar 4, 2022 at 5:22 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This implements the necessary commands to be able to emulate a Broadcast
-> Receiver:
->
-> BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC
-> BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL
-> BT_HCI_CMD_LE_PERIODIC_ADV_TERM_SYNC
-> BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED
-> BT_HCI_CMD_LE_BIG_CREATE_SYNC
-> BT_HCI_CMD_LE_BIG_TERM_SYNC
->
-> v2: Adds support for BT_H4_ISO_PKT to bthost.
->
-> Luiz Augusto von Dentz (12):
->   monitor: Fix Create BIG PDU
->   btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC
->   btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_CREATE_SYNC_CANCEL
->   btdev: Implement BT_HCI_CMD_LE_PERIODIC_ADV_TERM_SYNC
->   btdev: Send BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED when scan is initiated
->   btdev: Send BT_HCI_EVT_LE_PER_SYNC_ESTABLISHED if remote start pa
->   monitor: Rename Periodic Advertising terms to PA/pa
->   btdev: Implements BT_HCI_CMD_LE_BIG_CREATE_SYNC
->   btdev: Implements BT_HCI_CMD_LE_BIG_TERM_SYNC
->   bthost: Add support for BT_H4_ISO_PKT
->   bthost: Add support for Periodic Advertising
->   bthost: Add support for Create BIG
->
->  emulator/btdev.c  | 455 +++++++++++++++++++++++++++++++++++++++-------
->  emulator/bthost.c | 392 ++++++++++++++++++++++++++++++++++-----
->  emulator/bthost.h |  14 ++
->  emulator/hciemu.c |   1 +
->  monitor/bt.h      |  93 +++++-----
->  monitor/packet.c  | 113 ++++++------
->  6 files changed, 862 insertions(+), 206 deletions(-)
->
-> --
-> 2.35.1
->
 
-Pushed.
--- 
-Luiz Augusto von Dentz
+On Tue, Mar 8, 2022 at 2:14 AM Bastien Nocera <hadess@hadess.net> wrote:
+>
+> Hey Katherine,
+>
+> On Mon, 2022-03-07 at 10:57 -0800, Katherine Lai wrote:
+> > Background
+> >
+> > It was found that a change to the default settings for
+> > MinConnectionInterval and MaxConnectionInterval in main.conf broke
+> > some of ChromeOS=E2=80=99s keyboard HID tests for only certain Bluetoot=
+h
+> > controllers. These keyboards aren=E2=80=99t able to connect to the devi=
+ce.
+> > Since those connection parameters improve the connection interval for
+> > most other chipsets, we want to leave the default values but have a
+> > way to have an optional override to address problematic models.
+> >
+> >
+> > Proposed Solution
+> >
+> > Adding support to bluetoothd for an additional config directory
+> > /etc/bluetooth/main.conf.d containing multiple files which will
+> > override common params. Override order will be lexically sorted
+> > filename order. This pattern is already used by Linux distros, for
+> > example there is /etc/sudoers.d which files will override common
+> > params in /etc/sudoers.
+> >
+> > Users can add override config files to /etc/bluetooth/main.conf.d
+> > rather than directly editing /etc/bluetooth/main.conf. This is more
+> > friendly to package managers since BlueZ package updates won't cause
+> > conflict to /etc/bluetooth/main.conf.
+> >
+> > In bluez=E2=80=99s main.c, merge the params for each *.conf file from
+> > /etc/bluetooth/main.conf.d with the existing /etc/bluetooth/main.conf
+> > in lexical filename order
+> >
+> > /etc/bluetooth/main.conf.d will be configurable at build time, e.g.
+> > with ./configure --main-conf-dir
+>
+> This isn't quite how the pattern is usually used. With the existing
+> patterns, the OS-supplied stock configuration would be in
+> /usr/lib/bluetooth/main.conf.d (maybe with the default .conf in the
+> same directory as that subdir), with /etc/bluetooth/main.conf.d only
+> used for the user/admin override the default configuration.
+We did a bit of research and found that /etc/X and /etc/X.d is more
+common, e.g. the one described in
+https://www.redhat.com/sysadmin/etc-configuration-directories.
+If some distribution wants to organize the conf files to
+/usr/lib/bluetooth (for stock by package managers) and
+/etc/bluetooth/main.conf.d (for admin/users), I guess this is where
+having a configurable path is useful.
+What do you think?
+>
+> I don't think that making it optional, or have the path changeable is
+> needed, but the rest seems good.
+>
+> Cheers
