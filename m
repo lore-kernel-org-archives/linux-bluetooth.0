@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 442F4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Mar 2022 16:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1DCC43217
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Mar 2022 16:25:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235406AbiCIQZy (ORCPT
+        id S235467AbiCIQZ4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Mar 2022 11:25:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36022 "EHLO
+        Wed, 9 Mar 2022 11:25:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238099AbiCIQVR (ORCPT
+        with ESMTP id S238386AbiCIQV7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Mar 2022 11:21:17 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97DB7151D2B;
-        Wed,  9 Mar 2022 08:18:31 -0800 (PST)
+        Wed, 9 Mar 2022 11:21:59 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CF563A5;
+        Wed,  9 Mar 2022 08:21:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2CC606195C;
-        Wed,  9 Mar 2022 16:18:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D6C3C340F3;
-        Wed,  9 Mar 2022 16:18:27 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 23FBEB82212;
+        Wed,  9 Mar 2022 16:20:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57812C340F4;
+        Wed,  9 Mar 2022 16:20:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646842710;
-        bh=94Eezw0rkaghiNp0XtbPiQ+zQlAXCbVMeFdXKfkMh5s=;
+        s=k20201202; t=1646842857;
+        bh=6tcnReq4dlKG8UQNN1H5WqTssEeBvARoDbZQTqK+57o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C6LT1CmR0bVDarGjCQscOX3e9yz6PuHfBl0WPjllTU0mSB5YnaJQpxJ27DYNufMey
-         4qlVhYoACC+m2VwYpAH/CFub3XmaweOMRZbUbi7WU/8qVTm3Cm4bBVn4t8fw/rgHTQ
-         3tRJzMhYg/CQ7lFfvFhKSrJSOFmE9QTlhsFGu6Rvgv75vwJQIvJ33ikS8UB95l1L4u
-         nOpCoXub6l2IbswKHG8MS86auduDp1Zg8f/Rj7bp3cmgmj+bzBv5HGXkGRMKrwb4bj
-         /yDRjRFovIgscpAyKrsOVMpzj12UbYPSipJ4ijaG0PfEfV+gHbqHsRbzR1omWrNQ8j
-         oX3ETFYEOqZ5w==
+        b=rEEqkjnifxkc10cIn9soREV2HXkOFNuEMazySeey9nk22iRcBy17il2LUIKYRMG9q
+         SW31YDIPrCW1z+5eTXmWjkv9dlj2sDpwxv1s/3oij0xJSd61wNp5P7ZSt+vbIr/2vY
+         2fJc0YfzKYyL7mChUUocDCrupZtCx/Qhx0Gt+29K2k89/5y1KuzdlSlCKM1R6li9uU
+         eSLhQUtGFwWNhgfbKs9HksUoZxV8Utxcxn55TweHSSFw1f0VX1xYjWlZ/rpX5GFOv7
+         7Q9mYuIhY/qQC/FI+7fY75swB2APSqX8+HPGrjfq6CVsV/KJ2GxTmyepQYbQ1bKy/O
+         dMUtviK5h3DNg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
@@ -40,12 +40,12 @@ Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 14/27] Bluetooth: hci_core: Fix leaking sent_cmd skb
-Date:   Wed,  9 Mar 2022 11:16:51 -0500
-Message-Id: <20220309161711.135679-14-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 13/24] Bluetooth: hci_core: Fix leaking sent_cmd skb
+Date:   Wed,  9 Mar 2022 11:19:32 -0500
+Message-Id: <20220309161946.136122-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220309161711.135679-1-sashal@kernel.org>
-References: <20220309161711.135679-1-sashal@kernel.org>
+In-Reply-To: <20220309161946.136122-1-sashal@kernel.org>
+References: <20220309161946.136122-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 1 insertion(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 6c00ce302f09..1c8fb27b155a 100644
+index 53f1b08017aa..c67390367cc2 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3969,6 +3969,7 @@ void hci_release_dev(struct hci_dev *hdev)
+@@ -4083,6 +4083,7 @@ void hci_release_dev(struct hci_dev *hdev)
  	hci_dev_unlock(hdev);
  
  	ida_simple_remove(&hci_index_ida, hdev->id);
