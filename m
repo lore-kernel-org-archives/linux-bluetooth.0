@@ -2,93 +2,208 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 099EFC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 10 Mar 2022 20:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E99C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 00:19:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244493AbiCJUF1 convert rfc822-to-8bit (ORCPT
+        id S243485AbiCKAUy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Mar 2022 15:05:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50422 "EHLO
+        Thu, 10 Mar 2022 19:20:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244427AbiCJUF0 (ORCPT
+        with ESMTP id S244627AbiCKAUx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Mar 2022 15:05:26 -0500
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 16422180219
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 12:04:21 -0800 (PST)
-Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0E58ACECE2;
-        Thu, 10 Mar 2022 21:04:21 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [RFC] Bluetooth: Adding support for /etc/bluetooth/main.conf.d
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAO271mmX+jMbcuskH23FnWBZc2Or05wLuAc9n6B1Or4g145OTA@mail.gmail.com>
-Date:   Thu, 10 Mar 2022 21:04:20 +0100
-Cc:     Katherine Lai <laikatherine@chromium.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <14A05E77-95D3-4313-B9F6-BC654CD96E01@holtmann.org>
-References: <CAPBVwTQrcYYauoCXBWdOsPa_vmN=cajYzVFcep_GLC-2OwOwYQ@mail.gmail.com>
- <3DAED89D-72AC-4D38-A092-D2A52AEEE5BB@holtmann.org>
- <CAO271mmX+jMbcuskH23FnWBZc2Or05wLuAc9n6B1Or4g145OTA@mail.gmail.com>
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        Thu, 10 Mar 2022 19:20:53 -0500
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129E319DEB7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 16:19:51 -0800 (PST)
+Received: by mail-lj1-x22f.google.com with SMTP id l12so9997021ljh.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 16:19:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4N04DytqF3AnJ8zYie/C8QgJqUWJ24FtotOohZp3nIw=;
+        b=V3wQO3LqJVxk691OVNtpXmCvjHZkS6S1YSaHrNcYUvJZxoLMSYgh2CfhiVsdX4Y4D5
+         8zFVYH66/MItEsnhh9VUPoM1NnbmUao9a5nF/izI6QQCBp8cb8JFVufvEE8nFi9taq62
+         ZsecFvdQD+cQO4GYke5TjyhCmv3hAZf25U5xja3uv+HuHKji2D0Jtmxmi5ErEZxbyJXj
+         h8Z1WtLSbbGXMsrTLBXUsIKE0JtpHVqpTPskaMpCXhBSu8J5HSwY/uImz5Z91198xhvM
+         EwhlkNo8U1g6QAjniVbhr1LfEYEqtMLLBqLD0idLTOVjTvDJ1zylrW5y9FnBV6GDgj7k
+         qw5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4N04DytqF3AnJ8zYie/C8QgJqUWJ24FtotOohZp3nIw=;
+        b=q3bXM0KYT045RBXE3stJt9J/ozT7jI1RPxLDVFyWLcdoPWeq5sGt8ahiIPmoSFioRa
+         P7R9ol1Vq7x5gyYtlwwLCthQvTMoLLBmOSjJfn9N+Mgj1Xp9Rv54fXhQyuxfUSLzDucV
+         7ezIR8y/B6cvdeQb/RyrjFwqEvz2QhyA7lkY6Jdxpt0xSPEOzaDm31EpWOXPkNwizNGf
+         pKbDxqG1BexuyKzzgwrkVKMbMmyQd9mOhT77YNPUSb+UIyuZn3bcATWuKULZPfPOoTOG
+         mVgcU30C7c1l+AXiW2sb+6VKyIH74RNgIh3FtsiRMFeGTXMj7Uup8qBn4elmynw2AhPx
+         bduw==
+X-Gm-Message-State: AOAM530XfKI4bwk4GEGP1f/aHnznbc2ZOm6DnawMgfQvWk2IgGpuTCoH
+        OYgTAUhYQdKE8LMyaToVrrBafA==
+X-Google-Smtp-Source: ABdhPJxLEJ5e0pS7eU5hFSz30yqNvsSesv2kNr5/nAbCOdwAeXZUdZMcH2oAnZA0MyBzMU736H9uRw==
+X-Received: by 2002:a2e:5459:0:b0:246:42f0:9d78 with SMTP id y25-20020a2e5459000000b0024642f09d78mr4646440ljd.192.1646957989281;
+        Thu, 10 Mar 2022 16:19:49 -0800 (PST)
+Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
+        by smtp.gmail.com with ESMTPSA id f14-20020a056512092e00b004423570c03asm1255081lft.287.2022.03.10.16.19.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Mar 2022 16:19:48 -0800 (PST)
+From:   Linus Walleij <linus.walleij@linaro.org>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        phone-devel@vger.kernel.org,
+        Markuss Broks <markuss.broks@gmail.com>,
+        Stephan Gerhold <stephan@gerhold.net>
+Subject: [PATCH] Bluetooth: btbcm: Support per-board firmware variants
+Date:   Fri, 11 Mar 2022 01:17:46 +0100
+Message-Id: <20220311001746.480163-1-linus.walleij@linaro.org>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+There are provedly different firmware variants for the different
+phones using some of these chips. These were extracted from a few
+Samsung phones:
 
->>> It was found that a change to the default settings for
->>> MinConnectionInterval and MaxConnectionInterval in main.conf broke
->>> some of ChromeOS’s keyboard HID tests for only certain Bluetooth
->>> controllers. These keyboards aren’t able to connect to the device.
->>> Since those connection parameters improve the connection interval for
->>> most other chipsets, we want to leave the default values but have a
->>> way to have an optional override to address problematic models.
->>> 
->>> 
->>> Proposed Solution
->>> 
->>> Adding support to bluetoothd for an additional config directory
->>> /etc/bluetooth/main.conf.d containing multiple files which will
->>> override common params. Override order will be lexically sorted
->>> filename order. This pattern is already used by Linux distros, for
->>> example there is /etc/sudoers.d which files will override common
->>> params in /etc/sudoers.
->>> 
->>> Users can add override config files to /etc/bluetooth/main.conf.d
->>> rather than directly editing /etc/bluetooth/main.conf. This is more
->>> friendly to package managers since BlueZ package updates won't cause
->>> conflict to /etc/bluetooth/main.conf.
->>> 
->>> In bluez’s main.c, merge the params for each *.conf file from
->>> /etc/bluetooth/main.conf.d with the existing /etc/bluetooth/main.conf
->>> in lexical filename order
->>> 
->>> /etc/bluetooth/main.conf.d will be configurable at build time, e.g.
->>> with ./configure --main-conf-dir
->> 
->> actually I rather not do this. Let met try to explain this. In modern distribution layout, the /etc directory is purely for the admin of the system. They can do localized changes. Defaults are meant to be in /usr/lib/ actually. And override is also meant that an /etc file can fully replace an /usr/lib file.
->> 
->> We already structured that /etc/bluetooth/main.conf is optional and that package managers / distros should only install it if they really know what they are doing. If an upgrade of a package overwrites /etc/bluetooth/main.conf then it is doing something wrong (mind you we don’t install it by default).
->> 
->> That said, some time ago I discussed with Alain, that fundamentally you first need an option to identify your controller, what firmware etc. and then can decide what to load. That thread ended and got no further discussion. Based on that identification we wanted to allow tweaking certain set of parameters to add known good parameters / workaround to broken hardware.
->> 
->> If you say, that you already know all of this anyway upfront and your filesystem is specific for a given platform, then use tmpfs for /etc/bluetooth/main.conf or alternatively, we actually introduce support for CONFIGURATION_DIRECTORY. We already have this in iwd and it would make sense to just support it.
->> 
->> The CONFIGURATION_DIRECTORY directory comes from systemd (https://www.freedesktop.org/software/systemd/man/systemd.exec.html), but since it is just an environment variable for the bluetoothd process, you can do with any shell by just setting it.
-> 
-> If I interpret this correctly, the reason against this proposal isn't
-> really about the location of the conf (/usr vs /etc), but rather that
-> BlueZ intends to use the main.conf already as an override (so there is
-> no need for another override), is that right?
+37446 BCM4334B0.samsung,codina-tmo.hcd
+37366 BCM4334B0.samsung,golden.hcd
+37403 BCM4334B0.samsung,kyle.hcd
+37366 BCM4334B0.samsung,skomer.hcd
 
-that is one of them. The other is that these days overrides are done differently as mentioned above.
+This patch supports the above naming schedule with inserting
+[.board_name] between the firmware name and ".hcd". This scheme
+is the same as used by the companion BRCM wireless chips
+as can be seen in
+drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
+or just by looking at the firmwares in linux-firmware/brcm.
 
-Regards
+Currently we only support board variants using the device
+tree compatible string as board type, but other schemes are
+possible.
 
-Marcel
+This makes it possible to successfully load a few unique
+firmware variants for some Samsung phones.
+
+Cc: phone-devel@vger.kernel.org
+Cc: Markuss Broks <markuss.broks@gmail.com>
+Cc: Stephan Gerhold <stephan@gerhold.net>
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/bluetooth/btbcm.c | 55 ++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 54 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index d9ceca7a7935..9d1a8d80a8cd 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -9,6 +9,7 @@
+ #include <linux/module.h>
+ #include <linux/firmware.h>
+ #include <linux/dmi.h>
++#include <linux/of.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -29,7 +30,7 @@
+ #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
+ 
+ #define BCM_FW_NAME_LEN			64
+-#define BCM_FW_NAME_COUNT_MAX		2
++#define BCM_FW_NAME_COUNT_MAX		4
+ /* For kmalloc-ing the fw-name array instead of putting it on the stack */
+ typedef char bcm_fw_name[BCM_FW_NAME_LEN];
+ 
+@@ -476,6 +477,45 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
+ 	{ }
+ };
+ 
++/*
++ * This currently only looks up the device tree board appendix,
++ * but can be expanded to other mechanisms.
++ */
++#ifdef CONFIG_OF
++static const char *btbcm_get_board_name(struct device *dev)
++{
++	struct device_node *root;
++	char *board_type;
++	const char *tmp;
++	int len;
++	int i;
++
++	root = of_find_node_by_path("/");
++	if (!root)
++		return NULL;
++
++	if (of_property_read_string_index(root, "compatible", 0, &tmp))
++		return NULL;
++
++	/* get rid of any '/' in the compatible string */
++	len = strlen(tmp) + 1;
++	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
++	strscpy(board_type, tmp, len);
++	for (i = 0; i < board_type[i]; i++) {
++		if (board_type[i] == '/')
++			board_type[i] = '-';
++	}
++	of_node_put(root);
++
++	return board_type;
++}
++#else
++static const char *btbcm_get_board_name(struct device *dev)
++{
++	return NULL;
++}
++#endif
++
+ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
+ {
+ 	u16 subver, rev, pid, vid;
+@@ -483,12 +523,15 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
+ 	struct hci_rp_read_local_version *ver;
+ 	const struct bcm_subver_table *bcm_subver_table;
+ 	const char *hw_name = NULL;
++	const char *board_name = NULL;
+ 	char postfix[16] = "";
+ 	int fw_name_count = 0;
+ 	bcm_fw_name *fw_name;
+ 	const struct firmware *fw;
+ 	int i, err;
+ 
++	board_name = btbcm_get_board_name(&hdev->dev);
++
+ 	/* Reset */
+ 	err = btbcm_reset(hdev);
+ 	if (err)
+@@ -549,11 +592,21 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
+ 		return -ENOMEM;
+ 
+ 	if (hw_name) {
++		if (board_name) {
++			snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
++				 "brcm/%s%s.%s.hcd", hw_name, postfix, board_name);
++			fw_name_count++;
++		}
+ 		snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
+ 			 "brcm/%s%s.hcd", hw_name, postfix);
+ 		fw_name_count++;
+ 	}
+ 
++	if (board_name) {
++		snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
++			 "brcm/BCM%s.%s.hcd", postfix, board_name);
++		fw_name_count++;
++	}
+ 	snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
+ 		 "brcm/BCM%s.hcd", postfix);
+ 	fw_name_count++;
+-- 
+2.35.1
 
