@@ -2,103 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C11C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 04:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B8CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 13:40:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244001AbiCKEHb (ORCPT
+        id S240735AbiCKNlO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Mar 2022 23:07:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34590 "EHLO
+        Fri, 11 Mar 2022 08:41:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231511AbiCKEH3 (ORCPT
+        with ESMTP id S231279AbiCKNlN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Mar 2022 23:07:29 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82AA13EBA
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 20:06:27 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id k125so757027qkf.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 20:06:27 -0800 (PST)
+        Fri, 11 Mar 2022 08:41:13 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FC5412A75F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 05:40:10 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id o26so7485837pgb.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 05:40:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=GGHOCdeB69Q5l07XZHz8L+wEusc2cHCpWGfafHIxN+s=;
-        b=RGM4TowjFAI/5GRJW3qJ4NAhoK9LhbE56gp0I57tHBkPn8OMjYA0H0XRv+/2D/X7la
-         WAcgjDCFNbyfNXb+jEp1eH6xkws5jSXEzE5QYwGPEe3fXV3BxOV/sQN8GCjx8WMtbSlY
-         l2qcb8K6FBmOFryxrvqe6ssBMYUR0y4jWwFs5MCUzljWp6oKuCccFwk4QK/75naYuwNd
-         7+D+8aMyKOzpY3a8IQ6jFd6u1mNOFWV0RHhAy1pFKEODnzeY/LrYmLvPAJF56blw3Grw
-         KCwCN9CKAVHDyh5RFPuAkwCnD3DZAESIJHxo1YdLr4D7I6YwpclRwdgIdz+1SSpG6AiM
-         jgPQ==
+        d=matician-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zJPnVIMSU+IrQ9w0O2hqLwzd9dxtAvfXm0oaAs1Cu+o=;
+        b=KyHQnFWzijooxhm4+qEClaFTQnEh1kFr5/0X6dBynGp50rRU03p/aEaHySlTcLLpML
+         N0HWi23HXrJPFZNrUjwzzK3VnbpzBrSp9Shhvljosnj3JI/kxNP6wU6pjcuTuZ7dcVjx
+         liJOt/SOw8J6okyDGeurWLW49JV+Eb2j4ZbojSFQP/CyO2g7enBbQoAhFtasV6sUBBIr
+         LX/DHfsT2qlfLFhfQ79u1hsJZIAmNU6Xj1uWDTt/GN+/gw5kiLcNvGYc/DwKztEP2O3J
+         JIV4lrsGnRq2UVntgxzw18B/RVWt9dBeEFW4jeHsj2glVNDlA2kW29O/FgG5Nvpy5jtj
+         adxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=GGHOCdeB69Q5l07XZHz8L+wEusc2cHCpWGfafHIxN+s=;
-        b=XUX48aZUBamaAlxOkIqmCUwwPZa6DOd8GpPtzpaarh+kAytFCnB6yiNHzvAT0UlYxr
-         YNGIiioX3UFKNf0cJ4r6YTY1y3tI//UTevU6jb1zX0egDU4SubTzxAfmGGaVDk72kFqz
-         dW9DThwCdH1R9EdcgQBzPISjURpxcOCQvnd/idJLFfdRqeVZQ7c7zFnyz+lvfoL5WE+g
-         ksew91oGOXjAbS/k6/kGSJV0t86LbtN5EvHuSKzzbqHEb2EB37RDTuMFQJXkyVBQqcHd
-         ZCbKsuVQFnJ95oT3cFhSUcJHtfAvmgMoPkOsjFzC4DMQUx6qdvZjPmpNi6b5hyNfNfpf
-         lZKA==
-X-Gm-Message-State: AOAM533KG6iZTj+yeTwD+k5R9IIvqrFsl7Vm3w7qdx1f9vGTfWDLOt+e
-        dc4L+UPNKapCht0+14IIKOq2j/GR/SIDiA==
-X-Google-Smtp-Source: ABdhPJxDjQzLzaJyr7fNoeYZn0H9lSB6Pk8fS5Qr7wyUWJJxM6b+yDXF0JLNXJ6Ss6o+pqPVi6ut+g==
-X-Received: by 2002:a37:9a83:0:b0:67b:31be:2ac2 with SMTP id c125-20020a379a83000000b0067b31be2ac2mr5477196qke.416.1646971586710;
-        Thu, 10 Mar 2022 20:06:26 -0800 (PST)
-Received: from [172.17.0.2] ([20.231.124.63])
-        by smtp.gmail.com with ESMTPSA id 13-20020ac84e8d000000b002e068382bf8sm4775431qtp.63.2022.03.10.20.06.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 20:06:26 -0800 (PST)
-Message-ID: <622acac2.1c69fb81.be8c3.c94b@mx.google.com>
-Date:   Thu, 10 Mar 2022 20:06:26 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4976147610890282436=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zJPnVIMSU+IrQ9w0O2hqLwzd9dxtAvfXm0oaAs1Cu+o=;
+        b=yomQusQ70h4tVZrN+dduG6cJv4+JYvDNluLyzsy2tAaeG4lhuDs+/N7mJu27mbBmaa
+         ZUo1aLXCO0y09E+HDHlyMHaa+wcUNRbDyp2moTqh9UoGYZSHZrf2XNWSFAtMSwn76q2C
+         fg2KDnXpeCw4rT+CbF4HirMI7/FNKV2tGhvZ+GZ5RUNUZrpdMKwh88vrSB8eP+q9GCTl
+         Xckvxeen+2V2ZyGlWImiAkOpw4dLCvyYrgYa+pc7c2jAAXeCimpgXtSIgEXBVxKtAchd
+         MCHu6ogSHUpWHRB3bwA+vQt6SsLC1dx9Cy8+Ion1D1inRQXwHNoA42MITVd5fOnwOXFf
+         agRA==
+X-Gm-Message-State: AOAM53268ItZ+AW/LS6wrKwkNvlvxzljAewNCxC9l1iPIBMphnOEdPh7
+        PZ0zWuEUpqdfCJja+5zXpRwAVzogUOO9eJkuyGtsgg==
+X-Google-Smtp-Source: ABdhPJx4GJU+1g8Uc2yFPdnKGb6haWmbhQxzW0xSrGlkccKHqf6BpPTBeJ3wRN6VG158WX8XHwf24SeVKo+jdecgXDs=
+X-Received: by 2002:a63:5c0f:0:b0:374:4a37:48f9 with SMTP id
+ q15-20020a635c0f000000b003744a3748f9mr8659467pgb.470.1647006010014; Fri, 11
+ Mar 2022 05:40:10 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tangmeng@uniontech.com
-Subject: RE: [v2] Bluetooth: btrtl: btmrvl: Fix firmware filename for rtl chipset
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220311032720.28499-1-tangmeng@uniontech.com>
-References: <20220311032720.28499-1-tangmeng@uniontech.com>
+References: <20220224100641.2449550-1-gavin@matician.com> <71D25C8F-67D1-4EC0-9160-5F61C832F0AF@holtmann.org>
+ <CACB127+s8mj2-Hkt4yZXRZ_cQ9CbAK0r3y709-8Cb3awpVJm9Q@mail.gmail.com>
+In-Reply-To: <CACB127+s8mj2-Hkt4yZXRZ_cQ9CbAK0r3y709-8Cb3awpVJm9Q@mail.gmail.com>
+From:   Gavin Li <gavin@matician.com>
+Date:   Fri, 11 Mar 2022 05:39:58 -0800
+Message-ID: <CACB127+XwPBWOL_VL7Xq+FvD5zFhn0ZUDURvVvV6OdN0oYpvUQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: fix incorrect nonblock bitmask in bt_sock_wait_ready()
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4976147610890282436==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Marcel,
 
-This is automated email and please do not reply to this email!
+Please let me know what you think with regards to the comments above.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=622477
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.72 seconds
-GitLint                       PASS      1.05 seconds
-SubjectPrefix                 PASS      0.88 seconds
-BuildKernel                   PASS      41.97 seconds
-BuildKernel32                 PASS      37.66 seconds
-Incremental Build with patchesPASS      50.31 seconds
-TestRunner: Setup             PASS      635.50 seconds
-TestRunner: l2cap-tester      PASS      18.84 seconds
-TestRunner: bnep-tester       PASS      7.80 seconds
-TestRunner: mgmt-tester       PASS      125.51 seconds
-TestRunner: rfcomm-tester     PASS      10.03 seconds
-TestRunner: sco-tester        PASS      9.74 seconds
-TestRunner: smp-tester        PASS      9.75 seconds
-TestRunner: userchan-tester   PASS      8.34 seconds
+Best,
+Gavin
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4976147610890282436==--
+On Thu, Feb 24, 2022 at 12:56 PM Gavin Li <gavin@matician.com> wrote:
+>
+> Hi Marcel,
+>
+> Thanks for reviewing this quickly.
+>
+> > > diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+> > > index ee319779781e6..69374321130e4 100644
+> > > --- a/net/bluetooth/af_bluetooth.c
+> > > +++ b/net/bluetooth/af_bluetooth.c
+> > > @@ -568,7 +568,7 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
+> > > EXPORT_SYMBOL(bt_sock_wait_state);
+> > >
+> > > /* This function expects the sk lock to be held when called */
+> > > -int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
+> > > +int bt_sock_wait_ready(struct sock *sk, unsigned int flags)
+> >
+> > can we then also do s/flags/msg_flags/ then.
+> I prefer keeping it as flags because all other net code also uses
+> flags, msg_flags only appears
+> in msg->msg_flags.
+>
+> > > @@ -576,7 +576,7 @@ int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
+> > >
+> > >       BT_DBG("sk %p", sk);
+> > >
+> > > -     timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
+> > > +     timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
+> >
+> > Since sock_sndtimeo() is taking a bool. This might be better !!(flags & MSG_DONTWAIT).
+> It appears to be well-known in the net code that sock_sndtimeo takes a
+> bool, since no other
+> uses of it do the "!!" conversion.
+>
+> Let me know what you think. I can make the changes if needed but I was
+> just trying my best
+> to match the currently existing convention.
+>
+> Best,
+> Gavin
