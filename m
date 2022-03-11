@@ -2,123 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E428CC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 03:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9471BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 04:02:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346038AbiCKD3Q (ORCPT
+        id S242746AbiCKEDR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Mar 2022 22:29:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41444 "EHLO
+        Thu, 10 Mar 2022 23:03:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346023AbiCKD3P (ORCPT
+        with ESMTP id S236057AbiCKEDQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Mar 2022 22:29:15 -0500
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C238EACA0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 19:28:11 -0800 (PST)
-X-QQ-mid: bizesmtp85t1646969247tscer40p
-Received: from localhost.localdomain ( [58.240.82.166])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Fri, 11 Mar 2022 11:27:21 +0800 (CST)
-X-QQ-SSF: 01400000002000C0H000000A0000000
-X-QQ-FEAT: Mzskoac49Oix45HU7RpkQ25a/rIjfqz/xgRkOTk+Y7CcKbw/h3EHuchHvEdlb
-        YN24DiTvtEVge8S7aK4kQwchQyKrDxvx1VNqEfkQIrt+wImigdULiJ3EOryxyvIF/NG+0ha
-        UBt61aD3nL4PF/5sMItOvZyBTcYl55U4a279CoBfx6U0u34TdQ7Q7UdhGHhpubR5z/1Ce6t
-        z6ct/d3hBKwL2uXlnUEdySVHF3UkUjDga1LCdAyRhFY24h5Pyq1MDtaJGqJgqqmBiFUia8g
-        +/qXnndJXL4VdQt3YME58G787MOhCea1Cc/WURqTIsl5HwymukdxtgwORTtm3LrdXw5ZkpC
-        BZkeRwiRdqrLVjuYe9GF25I3cda06tv8QDO5Ths5aXavKIcB+TB3ROgaYxCOA==
-X-QQ-GoodBg: 1
-From:   Meng Tang <tangmeng@uniontech.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Meng Tang <tangmeng@uniontech.com>
-Subject: [PATCH v2] Bluetooth: btrtl: btmrvl: Fix firmware filename for rtl chipset
-Date:   Fri, 11 Mar 2022 11:27:20 +0800
-Message-Id: <20220311032720.28499-1-tangmeng@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Thu, 10 Mar 2022 23:03:16 -0500
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA7EAA7746
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 20:02:14 -0800 (PST)
+Received: by mail-qt1-x835.google.com with SMTP id u18so130009qtx.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 20:02:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=1FRmwLHdnWaO0eS++A3sxCi+0h9B6Cw9cB6VAD4NZ1c=;
+        b=lqxbmYpNuVAK3vvHw/JUoVz/MvTETX4byEb8CJ2NobxsjpaDCmfKDM7EaCii4JCOZS
+         0sIbtvPdrBQn+sANzHp99qutmApHT1xM9ShhY/GYk8wgkO1/E4Ma1Ama5sj/O6AH32tx
+         qYxMeyPkFJEH14m4a8AVawy7rOQ2ALurAuJt81jajfkZSem1/6gOl/PUWgnTpOS0NIPj
+         O8wuttkoaKmPrIFv4C4Gz0rNnowWMM5enL+LgYevLJCFBkCwYy8Gjz0NY9xPHVocFr0R
+         v6nKFr3el8P9ltoqh6zoTIBC6/xbQFaEXat0udLi5dfbx2PS8l6nG9N0My2cfzFg5yVE
+         iQpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=1FRmwLHdnWaO0eS++A3sxCi+0h9B6Cw9cB6VAD4NZ1c=;
+        b=shhkbK/81Y24EVjJlhkZ1vQHydZPUYwvguXiRT7ngtv5ti/ratI2u38BdFg3/bKipK
+         8hH6HuSsBZLkGq5Dx32bl39o5CByQmVKqLwYfS1iVUkHRybJs/Vj3X7EWmIpq/xC1zCj
+         LdSg8M7ei5Gbxy11Q370FJI7rcBpvPzymZ+VYMJwdo3sbumHPF6VDNsJVXDTLE2QsFQJ
+         D/zmUBQiSRXCwpEgoAmFmxnxQv2UY4o/vo75yHnDUJOY/7FEvfTxKJyIFg4MJZFtoc+L
+         bFWddfC/EvysowBFwVouZfUO7/lAbsIc1xNrAKRB7zQKKCLK8YBMCch2TQPPyxkBj9IY
+         Vrbw==
+X-Gm-Message-State: AOAM5328/awnn4J+3vwfrbHI0wa5wvCxBV7kWxqO1LDDQOV0UU7K+lhW
+        d6AGwhYKebmYONPtU5yVYVvj168OEhmLLg==
+X-Google-Smtp-Source: ABdhPJz/avixqeN4jZrPNAu0KgK3LomMA8FXKQAxg6mF8b3m66KqXQJDHMZagxILSqZhTmNMS0o22A==
+X-Received: by 2002:ac8:598a:0:b0:2e0:5c40:8272 with SMTP id e10-20020ac8598a000000b002e05c408272mr6690529qte.609.1646971333927;
+        Thu, 10 Mar 2022 20:02:13 -0800 (PST)
+Received: from [172.17.0.2] ([20.230.19.217])
+        by smtp.gmail.com with ESMTPSA id b20-20020a376714000000b0067b21e5d18asm3262249qkc.105.2022.03.10.20.02.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Mar 2022 20:02:13 -0800 (PST)
+Message-ID: <622ac9c5.1c69fb81.ec440.3aa7@mx.google.com>
+Date:   Thu, 10 Mar 2022 20:02:13 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7840632490909304518=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign5
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, tangmeng@uniontech.com
+Subject: RE: Bluetooth: btrtl: btmrvl: Fix firmware filename for rtl chipset
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220311032620.28362-1-tangmeng@uniontech.com>
+References: <20220311032620.28362-1-tangmeng@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Firmware for rtl chipset is as part of the linux-firmware repository
-in dir linux-firmware/rtl_bt. Today, the rtl8761a_config,
-rtl8821a_config, rtl8723b_config and rtl8723bs_config files are used
-in btrtl, but it doesn't actually exist, which causes errors like:
+--===============7840632490909304518==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-bluetooth: Direct firmware load for rtl_bt/rtl8821a_config.bin
-           failed with error -2
+This is automated email and please do not reply to this email!
 
-According to the files in the rtl_bt directory in the Linux firmware,
-fixes the driver to load correct firmware file for rtl.
+Dear submitter,
 
-Signed-off-by: Meng Tang <tangmeng@uniontech.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=622476
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.65 seconds
+GitLint                       PASS      1.02 seconds
+SubjectPrefix                 PASS      0.85 seconds
+BuildKernel                   PASS      30.72 seconds
+BuildKernel32                 PASS      27.17 seconds
+Incremental Build with patchesPASS      36.75 seconds
+TestRunner: Setup             PASS      472.62 seconds
+TestRunner: l2cap-tester      PASS      15.49 seconds
+TestRunner: bnep-tester       PASS      6.11 seconds
+TestRunner: mgmt-tester       PASS      98.84 seconds
+TestRunner: rfcomm-tester     PASS      7.81 seconds
+TestRunner: sco-tester        PASS      7.49 seconds
+TestRunner: smp-tester        PASS      7.23 seconds
+TestRunner: userchan-tester   PASS      5.82 seconds
+
+
+
 ---
- drivers/bluetooth/btrtl.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index c2030f7e25b4..e3cfe0dff07d 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -88,14 +88,14 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = true,
- 	  .has_rom_version = true,
- 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
--	  .cfg_name = "rtl_bt/rtl8723bs_config" },
-+	  .cfg_name = "rtl_bt/rtl8723bs_config-OBDA8723" },
- 
- 	/* 8723B */
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
--	  .cfg_name = "rtl_bt/rtl8723b_config" },
-+	  .cfg_name = NULL },
- 
- 	/* 8723D */
- 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
-@@ -116,7 +116,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
--	  .cfg_name = "rtl_bt/rtl8821a_config" },
-+	  .cfg_name = NULL },
- 
- 	/* 8821C */
- 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB),
-@@ -131,7 +131,7 @@ static const struct id_table ic_id_table[] = {
- 	  .config_needed = false,
- 	  .has_rom_version = true,
- 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
--	  .cfg_name = "rtl_bt/rtl8761a_config" },
-+	  .cfg_name = NULL },
- 
- 	/* 8761B */
- 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
-@@ -921,15 +921,12 @@ MODULE_VERSION(VERSION);
- MODULE_LICENSE("GPL");
- MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8723bs_config-OBDA8723.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
--MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============7840632490909304518==--
