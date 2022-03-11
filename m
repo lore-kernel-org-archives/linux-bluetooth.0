@@ -2,208 +2,190 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E99C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 00:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A590AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Mar 2022 01:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243485AbiCKAUy (ORCPT
+        id S1345224AbiCKBFQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Mar 2022 19:20:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39142 "EHLO
+        Thu, 10 Mar 2022 20:05:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244627AbiCKAUx (ORCPT
+        with ESMTP id S237426AbiCKBFM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Mar 2022 19:20:53 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 129E319DEB7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 16:19:51 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id l12so9997021ljh.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 16:19:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4N04DytqF3AnJ8zYie/C8QgJqUWJ24FtotOohZp3nIw=;
-        b=V3wQO3LqJVxk691OVNtpXmCvjHZkS6S1YSaHrNcYUvJZxoLMSYgh2CfhiVsdX4Y4D5
-         8zFVYH66/MItEsnhh9VUPoM1NnbmUao9a5nF/izI6QQCBp8cb8JFVufvEE8nFi9taq62
-         ZsecFvdQD+cQO4GYke5TjyhCmv3hAZf25U5xja3uv+HuHKji2D0Jtmxmi5ErEZxbyJXj
-         h8Z1WtLSbbGXMsrTLBXUsIKE0JtpHVqpTPskaMpCXhBSu8J5HSwY/uImz5Z91198xhvM
-         EwhlkNo8U1g6QAjniVbhr1LfEYEqtMLLBqLD0idLTOVjTvDJ1zylrW5y9FnBV6GDgj7k
-         qw5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4N04DytqF3AnJ8zYie/C8QgJqUWJ24FtotOohZp3nIw=;
-        b=q3bXM0KYT045RBXE3stJt9J/ozT7jI1RPxLDVFyWLcdoPWeq5sGt8ahiIPmoSFioRa
-         P7R9ol1Vq7x5gyYtlwwLCthQvTMoLLBmOSjJfn9N+Mgj1Xp9Rv54fXhQyuxfUSLzDucV
-         7ezIR8y/B6cvdeQb/RyrjFwqEvz2QhyA7lkY6Jdxpt0xSPEOzaDm31EpWOXPkNwizNGf
-         pKbDxqG1BexuyKzzgwrkVKMbMmyQd9mOhT77YNPUSb+UIyuZn3bcATWuKULZPfPOoTOG
-         mVgcU30C7c1l+AXiW2sb+6VKyIH74RNgIh3FtsiRMFeGTXMj7Uup8qBn4elmynw2AhPx
-         bduw==
-X-Gm-Message-State: AOAM530XfKI4bwk4GEGP1f/aHnznbc2ZOm6DnawMgfQvWk2IgGpuTCoH
-        OYgTAUhYQdKE8LMyaToVrrBafA==
-X-Google-Smtp-Source: ABdhPJxLEJ5e0pS7eU5hFSz30yqNvsSesv2kNr5/nAbCOdwAeXZUdZMcH2oAnZA0MyBzMU736H9uRw==
-X-Received: by 2002:a2e:5459:0:b0:246:42f0:9d78 with SMTP id y25-20020a2e5459000000b0024642f09d78mr4646440ljd.192.1646957989281;
-        Thu, 10 Mar 2022 16:19:49 -0800 (PST)
-Received: from localhost.localdomain (c-fdcc225c.014-348-6c756e10.bbcust.telenor.se. [92.34.204.253])
-        by smtp.gmail.com with ESMTPSA id f14-20020a056512092e00b004423570c03asm1255081lft.287.2022.03.10.16.19.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 16:19:48 -0800 (PST)
-From:   Linus Walleij <linus.walleij@linaro.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Linus Walleij <linus.walleij@linaro.org>,
-        phone-devel@vger.kernel.org,
-        Markuss Broks <markuss.broks@gmail.com>,
-        Stephan Gerhold <stephan@gerhold.net>
-Subject: [PATCH] Bluetooth: btbcm: Support per-board firmware variants
-Date:   Fri, 11 Mar 2022 01:17:46 +0100
-Message-Id: <20220311001746.480163-1-linus.walleij@linaro.org>
-X-Mailer: git-send-email 2.35.1
+        Thu, 10 Mar 2022 20:05:12 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF32C7D72
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Mar 2022 17:04:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646960650; x=1678496650;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=MZsfe0WgwaNSrI+f5fWxgUqa/TRG5TqERkdMdTAvYM4=;
+  b=a+ogPL2q0TG5WZqeW7gYaPd+cx7YyuYCvayMRDrEpkuRe9TJ600nJUD7
+   tDcnGZ5hCjEjvVGUl2r+gnSaDwzE4NquMv6Nc3d3NW1Qim0OIYaPRx4OR
+   RNBnlV4EijOTNxAetiQ5cPc25ebYLBC4BGFMSLJOMbWZywyPaXZzEmw2w
+   wT1HKm+Yh8UalvUg0zdPVb0pjNTcgo4Yr3bNgmB7qzh/F/XFUwfwZIBnM
+   3jjyPnvhgEawuvWnrF41dms4hjfdp2JJt3inXt4LW2adq30Fjh25oWS2Y
+   kA0qJDXOisVnEl4UnVLmze5RZAjRUMt3yb3eKi+X2APfojYF4/WO0RtMC
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10282"; a="341887158"
+X-IronPort-AV: E=Sophos;i="5.90,172,1643702400"; 
+   d="scan'208";a="341887158"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2022 17:02:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,172,1643702400"; 
+   d="scan'208";a="548277954"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by fmsmga007.fm.intel.com with ESMTP; 10 Mar 2022 17:02:10 -0800
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nSTfW-0005bF-4k; Fri, 11 Mar 2022 01:02:10 +0000
+Date:   Fri, 11 Mar 2022 09:01:41 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 4afc6c7435575398b4a3d045ccc8a8b1eab02fe9
+Message-ID: <622a9f75.MREjiHEKyL+vYdaC%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There are provedly different firmware variants for the different
-phones using some of these chips. These were extracted from a few
-Samsung phones:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 4afc6c7435575398b4a3d045ccc8a8b1eab02fe9  Bluetooth: btusb: Use quirk to skip HCI_FLT_CLEAR_ALL on fake CSR controllers
 
-37446 BCM4334B0.samsung,codina-tmo.hcd
-37366 BCM4334B0.samsung,golden.hcd
-37403 BCM4334B0.samsung,kyle.hcd
-37366 BCM4334B0.samsung,skomer.hcd
+elapsed time: 721m
 
-This patch supports the above naming schedule with inserting
-[.board_name] between the firmware name and ".hcd". This scheme
-is the same as used by the companion BRCM wireless chips
-as can be seen in
-drivers/net/wireless/broadcom/brcm80211/brcmfmac/firmware.c
-or just by looking at the firmwares in linux-firmware/brcm.
+configs tested: 113
+configs skipped: 3
 
-Currently we only support board variants using the device
-tree compatible string as board type, but other schemes are
-possible.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-This makes it possible to successfully load a few unique
-firmware variants for some Samsung phones.
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                          randconfig-c001
+powerpc                 mpc8540_ads_defconfig
+arm                            pleb_defconfig
+microblaze                          defconfig
+arm                           stm32_defconfig
+powerpc                        cell_defconfig
+sh                           se7750_defconfig
+sh                         ap325rxa_defconfig
+powerpc                mpc7448_hpc2_defconfig
+powerpc                 canyonlands_defconfig
+arc                        nsim_700_defconfig
+sh                        edosk7705_defconfig
+openrisc                    or1ksim_defconfig
+arc                        vdk_hs38_defconfig
+sh                  sh7785lcr_32bit_defconfig
+arm64                            alldefconfig
+arm                         s3c6400_defconfig
+ia64                                defconfig
+arm                        keystone_defconfig
+sh                            shmin_defconfig
+h8300                    h8300h-sim_defconfig
+powerpc                     tqm8548_defconfig
+arm                  randconfig-c002-20220310
+ia64                             allmodconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nds32                             allnoconfig
+nios2                               defconfig
+arc                              allyesconfig
+csky                                defconfig
+alpha                               defconfig
+nds32                               defconfig
+nios2                            allyesconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+s390                             allmodconfig
+parisc64                            defconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+i386                          randconfig-a003
+i386                          randconfig-a001
+i386                          randconfig-a005
+x86_64                        randconfig-a013
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
+i386                          randconfig-a014
+i386                          randconfig-a012
+i386                          randconfig-a016
+arc                  randconfig-r043-20220310
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                           allyesconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                         rhel-8.3-kunit
+x86_64                                  kexec
 
-Cc: phone-devel@vger.kernel.org
-Cc: Markuss Broks <markuss.broks@gmail.com>
-Cc: Stephan Gerhold <stephan@gerhold.net>
-Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+clang tested configs:
+powerpc                 mpc836x_rdk_defconfig
+powerpc                  mpc866_ads_defconfig
+arm                       cns3420vb_defconfig
+riscv                          rv32_defconfig
+powerpc                     ppa8548_defconfig
+arm                         orion5x_defconfig
+powerpc                     ksi8560_defconfig
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+x86_64                        randconfig-a005
+i386                          randconfig-a002
+i386                          randconfig-a004
+i386                          randconfig-a006
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+i386                          randconfig-a011
+i386                          randconfig-a013
+i386                          randconfig-a015
+hexagon              randconfig-r041-20220310
+hexagon              randconfig-r045-20220310
+s390                 randconfig-r044-20220310
+riscv                randconfig-r042-20220310
+
 ---
- drivers/bluetooth/btbcm.c | 55 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index d9ceca7a7935..9d1a8d80a8cd 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -9,6 +9,7 @@
- #include <linux/module.h>
- #include <linux/firmware.h>
- #include <linux/dmi.h>
-+#include <linux/of.h>
- #include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -29,7 +30,7 @@
- #define BDADDR_BCM43341B (&(bdaddr_t) {{0xac, 0x1f, 0x00, 0x1b, 0x34, 0x43}})
- 
- #define BCM_FW_NAME_LEN			64
--#define BCM_FW_NAME_COUNT_MAX		2
-+#define BCM_FW_NAME_COUNT_MAX		4
- /* For kmalloc-ing the fw-name array instead of putting it on the stack */
- typedef char bcm_fw_name[BCM_FW_NAME_LEN];
- 
-@@ -476,6 +477,45 @@ static const struct bcm_subver_table bcm_usb_subver_table[] = {
- 	{ }
- };
- 
-+/*
-+ * This currently only looks up the device tree board appendix,
-+ * but can be expanded to other mechanisms.
-+ */
-+#ifdef CONFIG_OF
-+static const char *btbcm_get_board_name(struct device *dev)
-+{
-+	struct device_node *root;
-+	char *board_type;
-+	const char *tmp;
-+	int len;
-+	int i;
-+
-+	root = of_find_node_by_path("/");
-+	if (!root)
-+		return NULL;
-+
-+	if (of_property_read_string_index(root, "compatible", 0, &tmp))
-+		return NULL;
-+
-+	/* get rid of any '/' in the compatible string */
-+	len = strlen(tmp) + 1;
-+	board_type = devm_kzalloc(dev, len, GFP_KERNEL);
-+	strscpy(board_type, tmp, len);
-+	for (i = 0; i < board_type[i]; i++) {
-+		if (board_type[i] == '/')
-+			board_type[i] = '-';
-+	}
-+	of_node_put(root);
-+
-+	return board_type;
-+}
-+#else
-+static const char *btbcm_get_board_name(struct device *dev)
-+{
-+	return NULL;
-+}
-+#endif
-+
- int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
- {
- 	u16 subver, rev, pid, vid;
-@@ -483,12 +523,15 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
- 	struct hci_rp_read_local_version *ver;
- 	const struct bcm_subver_table *bcm_subver_table;
- 	const char *hw_name = NULL;
-+	const char *board_name = NULL;
- 	char postfix[16] = "";
- 	int fw_name_count = 0;
- 	bcm_fw_name *fw_name;
- 	const struct firmware *fw;
- 	int i, err;
- 
-+	board_name = btbcm_get_board_name(&hdev->dev);
-+
- 	/* Reset */
- 	err = btbcm_reset(hdev);
- 	if (err)
-@@ -549,11 +592,21 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
- 		return -ENOMEM;
- 
- 	if (hw_name) {
-+		if (board_name) {
-+			snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
-+				 "brcm/%s%s.%s.hcd", hw_name, postfix, board_name);
-+			fw_name_count++;
-+		}
- 		snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
- 			 "brcm/%s%s.hcd", hw_name, postfix);
- 		fw_name_count++;
- 	}
- 
-+	if (board_name) {
-+		snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
-+			 "brcm/BCM%s.%s.hcd", postfix, board_name);
-+		fw_name_count++;
-+	}
- 	snprintf(fw_name[fw_name_count], BCM_FW_NAME_LEN,
- 		 "brcm/BCM%s.hcd", postfix);
- 	fw_name_count++;
--- 
-2.35.1
-
+0-DAY CI Kernel Test Service
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
