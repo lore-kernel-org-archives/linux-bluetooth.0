@@ -2,101 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C411C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Mar 2022 01:24:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CABC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Mar 2022 01:56:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229464AbiCLBZe (ORCPT
+        id S229966AbiCLB5a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Mar 2022 20:25:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55860 "EHLO
+        Fri, 11 Mar 2022 20:57:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiCLBZe (ORCPT
+        with ESMTP id S229447AbiCLB5a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Mar 2022 20:25:34 -0500
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3722180221
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 17:24:29 -0800 (PST)
-Received: by mail-qk1-x736.google.com with SMTP id b67so8434336qkc.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 17:24:29 -0800 (PST)
+        Fri, 11 Mar 2022 20:57:30 -0500
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5BFA2738CC
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 17:56:24 -0800 (PST)
+Received: by mail-qk1-x731.google.com with SMTP id g8so4912048qke.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Mar 2022 17:56:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=8FTTpKjAK1toKhKmoJcYsSrrkz5xHnrYtMHw3+T6OEY=;
-        b=Wy68CmBauL11LgNUtuo8HfIEqBMhZG6kMfJqXKcSWxwsko7Sl4R7s9vw512Ar8QIuL
-         ggbw0zduJPzu70lcr/HLuJ+8O93VO3t26aNvwOW9qLWyfP1D1cU+j6/bcnVI45M6J2Zo
-         dUvTydhcEQ+58fiZleEfqVntDV9wJXW4g5B/PSPXMGqZrxDv171u+1Gnzj2xtbniTy5d
-         McNmXXKBVORPBZbVAoNCrY+T7yvSQZmodS/IQ8VRBlzqbfF0+8CuMG6kOF8Zb3ISlxKL
-         jeQ9eAGNNtTfSXoUJjggxF9Lwrb+wGCjKZ8Me+3IH9HDEX6ze1nBZxLm/2caQFX9a/dV
-         BAhQ==
+        d=fireburn-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xfi+bTCXfqpw9uvIqrCKiFAYx08ePpQMftNlWEai8GI=;
+        b=mmi7xLeMizQ9pqcmQrTJGMiaIqx7payr8WRD5COB9uOq5Rl6SSEc+fMBAAj+/z6ZiT
+         brWs4DqIBz2pRGQcGP9nCuZoT43l00LGmAo7BUFILFNG9x+MdbB+DqxmBc+k6qfzHGok
+         Taiw2rXQtxxYg1HxnAGxJiWzVLCwYlVUUeYTz5i/kBZwcPeGgdI2HaIYOMnnUZc0un9x
+         phfCJkdOrOv5d+a6n463OvPH8/N9vxKziFEHXxveumuQYk6HGMEgUSRThTQ5HSwlR8qX
+         FqcAUSHKpUvy82CBVYdczzAA6xryKl9ao/SkoqKdBAoWNNZhBitp31Smo7kytZYGI8Rv
+         5ePg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=8FTTpKjAK1toKhKmoJcYsSrrkz5xHnrYtMHw3+T6OEY=;
-        b=W3vMaQukBqwNGkFVYa9WtvWdqBhhs8blslilzuHINt88lss/D0uLG4qvbGtuP8WbYH
-         TeNiIejQc3uEnvmtjTo/eU4/5g26WAa8oBsWNtlQKsb4qXg61lWYaTv6mcMiDw+DPiqf
-         ahgUZMC3d8EGFjf6HeEvwsQSr1DV63GTvU0C8xG+2XvBdIuRlsWOaVeNs2w0sVMiFhHB
-         FrjIyX/monJZWf9eQqmoTdkAg48dq0KYVABDKMixDd2hHNYkgak+tUH4gCVo8j2eGrtA
-         coTy1IC2VsrA5Y+r51mKDbAj8TXUyelsKlxXmb1LdbwI/9td5drO9OjyC5B19JoYK8bM
-         MBaQ==
-X-Gm-Message-State: AOAM533EO3fCIzvgj1dR8GbmGzxwbiXbI/0QH4GLZGOZ5DbXv/pR5SHM
-        Vdq8doSLxQxVdqWImxQ7ii6wDWSAgEd32A==
-X-Google-Smtp-Source: ABdhPJyEP3u2HZmbmnCCpCTrgImcBPmm0PA+SoDjoxR6vUQwNqLzsPA5YIswk9dugs7z+V+yuppPhw==
-X-Received: by 2002:a05:620a:1210:b0:67b:3fc4:b7a7 with SMTP id u16-20020a05620a121000b0067b3fc4b7a7mr8297903qkj.114.1647048268698;
-        Fri, 11 Mar 2022 17:24:28 -0800 (PST)
-Received: from [172.17.0.2] ([20.231.123.102])
-        by smtp.gmail.com with ESMTPSA id j1-20020a05620a288100b0067b1be3201bsm4571809qkp.112.2022.03.11.17.24.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Mar 2022 17:24:28 -0800 (PST)
-Message-ID: <622bf64c.1c69fb81.9fb3a.bce8@mx.google.com>
-Date:   Fri, 11 Mar 2022 17:24:28 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5201937166198049099=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xfi+bTCXfqpw9uvIqrCKiFAYx08ePpQMftNlWEai8GI=;
+        b=GOFO+RUAyUOUHGO00rbRCD/TKw9+ZrT7sfKrICLFujwQcFG/8K810PULiCjFxj8c1D
+         7qRAHJUBVB0srq3F4H+dtdOVOS0ltJ7sPweOkcwMw9pdM8FBILoRbAzVgd6ujTiqwG3a
+         nQ520LfSFJMmmGI7jSPNqo6QifxEGDU74e65zsFnhnocxlRO+ge5mNDvZgkIyEmI7KmH
+         zYzdUGIxPEiogSM86VVTlFLVfSzon6vswk8u3JeJ+JIZrvhkQ+rAwc0FTGl63Keicofc
+         A62qzlaIWeutvRocuZ7z0CSQgDC3z4M2biNxShE5xffjp5BoLWZjQmI2SZ7/uliGWjDn
+         9v1g==
+X-Gm-Message-State: AOAM532IUDsvSkpTrGxHbCmun/0tvPgl+1rQYxqpilLsRAYXNDJNTvPF
+        HD4uQRviMuoIUYMPckLFNTLpwmpbVIpx3JfF2rYA/2NeK3E/lw==
+X-Google-Smtp-Source: ABdhPJyDiBjfvy+DNPABDeJ8lQGZ/K1AJn+0jatIIIY6cpB4OWf7W40ok8GNidb/Vcxwmg2+MC6g3kJjZH+3FAe27Gg=
+X-Received: by 2002:a05:620a:16c5:b0:67d:47db:8b50 with SMTP id
+ a5-20020a05620a16c500b0067d47db8b50mr8486422qkn.77.1647050183941; Fri, 11 Mar
+ 2022 17:56:23 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] bthost: Fix not setting all parameters when using Create BIG cmd
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220311211730.3285028-1-luiz.dentz@gmail.com>
-References: <20220311211730.3285028-1-luiz.dentz@gmail.com>
+References: <20211201000215.1134831-13-luiz.dentz@gmail.com> <20220125144639.2226-1-mike@fireburn.co.uk>
+In-Reply-To: <20220125144639.2226-1-mike@fireburn.co.uk>
+From:   Mike Lothian <mike@fireburn.co.uk>
+Date:   Sat, 12 Mar 2022 01:56:13 +0000
+Message-ID: <CAHbf0-FEVZZYg7U__YXqPmS=XETb2pObB-8CX+vh8=-HivppJA@mail.gmail.com>
+Subject: Re: [PATCH 12/15] Bluetooth: hci_event: Use of a function table to
+ handle HCI events
+To:     luiz.dentz@gmail.com
+Cc:     dan.carpenter@oracle.com, davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5201937166198049099==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 25 Jan 2022 at 14:46, Mike Lothian <mike@fireburn.co.uk> wrote:
+>
+> Hi
+>
+> This patch is causing a lot of spam in my dmesg at boot until it seems my wifi connects (or perhaps the bluetooth manager does something)
+>
+> Bluetooth: hci0: unexpected event 0xff length: 5 > 0
+>
+> Thanks
+>
+> Mike
 
-This is automated email and please do not reply to this email!
+Hi
 
-Dear submitter,
+Has there been any movement on this issue?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=622790
+I'm currently running with this patch locally to make the dmesg spam go away
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.05 seconds
-GitLint                       PASS      2.12 seconds
-Prep - Setup ELL              PASS      55.50 seconds
-Build - Prep                  PASS      0.88 seconds
-Build - Configure             PASS      11.01 seconds
-Build - Make                  PASS      1549.91 seconds
-Make Check                    PASS      12.81 seconds
-Make Check w/Valgrind         PASS      566.40 seconds
-Make Distcheck                PASS      295.67 seconds
-Build w/ext ELL - Configure   PASS      11.28 seconds
-Build w/ext ELL - Make        PASS      1520.49 seconds
-Incremental Build with patchesPASS      3122.33 seconds
-
-
+From f786c85baac0ee93730998fa52cbd588c9f39286 Mon Sep 17 00:00:00 2001
+From: Mike Lothian <mike@fireburn.co.uk>
+Date: Tue, 25 Jan 2022 14:52:00 +0000
+Subject: [PATCH] Remove excessive bluetooth warning
 
 ---
-Regards,
-Linux Bluetooth
+net/bluetooth/hci_event.c | 8 --------
+1 file changed, 8 deletions(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fc30f4c03d29..aa57fccd2e47 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6818,14 +6818,6 @@ static void hci_event_func(struct hci_dev
+*hdev, u8 event, struct sk_buff *skb,
+               return;
+       }
 
---===============5201937166198049099==--
+-       /* Just warn if the length is over max_len size it still be
+-        * possible to partially parse the event so leave to callback to
+-        * decide if that is acceptable.
+-        */
+-       if (skb->len > ev->max_len)
+-               bt_dev_warn(hdev, "unexpected event 0x%2.2x length: %u > %u",
+-                           event, skb->len, ev->max_len);
+-
+       data = hci_ev_skb_pull(hdev, skb, event, ev->min_len);
+       if (!data)
+               return;
+--
+2.35.0
