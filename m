@@ -2,89 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B5F7C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 20:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD606C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 21:50:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242151AbiCNUK6 (ORCPT
+        id S245396AbiCNVv3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 16:10:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52718 "EHLO
+        Mon, 14 Mar 2022 17:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234634AbiCNUK5 (ORCPT
+        with ESMTP id S236193AbiCNVv2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 16:10:57 -0400
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43A1913D05
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 13:09:47 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-2e5757b57caso22111087b3.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 13:09:47 -0700 (PDT)
+        Mon, 14 Mar 2022 17:51:28 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58030344CE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 14:50:18 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id s42so16352340pfg.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 14:50:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fqQiqOZ7RfIulelz5E8LT0ePHyMzupzCrkiHv77NoHo=;
-        b=LlOUUxAMsO8Vtg/2IzK3ioAaVvp+k4BfLFsXyxYxclX8xPxXJkyeRwUYA8hztAyH9B
-         hrv+l6g3BdJxU5FPjiIkTyUMKQ6VkKKXgOjmIkNyKz5rwXILgr4PaHPYKG7xv4lmwvUn
-         iSORa4gHoAcyYGAqMninRiMpTRBvTdXD8gzLrjebyNGdgqyTl3TYo2cLwDtgUuZy5Xth
-         UvFzTGbh3hrUtTsbbcW/zby61tbzD5l0iHR1p1dbEJwUgncEU5jr4xa4g7pYQCOo5HOf
-         7/MyQ+Ka5t03cFjAA0KHoRv/ol4daeULmDo/A4Sr1l54pN07leyM0YFMyIbvqzvAi+IB
-         bFJg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qOAzIAGITBNGyHFTZ7Cmq/ShOyrjrDEaYD2HgQ928xA=;
+        b=DLYCCBHwiNA5sjj3uvWwFKxvEiTB0jetmihNzm67O409zkWwRO48S4VDNj183TGhBz
+         HMCnDIGgruSeuktVZg7obi6p4q+veP7iHNkLshZijvIrZcnbOaBr0ILMmRtDh0TCJ5Ip
+         qhnwNgEExppuPFN/fZU4qL07RoCAByPUoDCDMnXvvJz8Yc2kxniFSRWvnzaw0AxGpbpX
+         Lzsxx2umpULGzoQkYQ8WE4bC6fxFQXHPNJjmu2kOCAPdMy+xMqRpzW5xxDrb0cmxSdyN
+         D6bEZKISbhZMoislZ0Aook0cQ1/u7sHI+wBqOC16t2jh/RZ/fC41Ei7l9hgJcvgKi/eY
+         v/DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fqQiqOZ7RfIulelz5E8LT0ePHyMzupzCrkiHv77NoHo=;
-        b=JmfG338mM0HzN7TdoM5f5YpXem7g0nR19MqU8OQsTFZax/Rpix1P1UyefvPrtdu6Ty
-         F5PfG0cGUgFQeOi3eMMqLfKv/7iCsEU5uT1Ob+mnxmd+P3LacLfyPOvu1C1KVzjCzQsn
-         u5qUqvLHohZ9X+IYNdGt+l/0UVi16L2bexi4FCMc3XDxf2v53Edl4LiNvwJDwXYYV4JP
-         cy8vODuUc6dL143CRaYhTeoPvZ1eIi23s3ztbAO3FrpmmHzksfYkvp+lln2514aAA97o
-         GhHwxpGPV9MzffEhZiCq4KwTQMKxbT63xm8Yv1KybRFrQRT1F32S7hN3o10yNZrmlbcC
-         JXqw==
-X-Gm-Message-State: AOAM530N6uBoBvSmKZoZTgk+bQoDDI2vhch2uKlHbmSGkkK86gUIarJs
-        HcC2Y8MMU7YOdhr1OJwgB6No3A+Xk5nzsNsqG/m5ZMvx
-X-Google-Smtp-Source: ABdhPJxOeYkRDKhgb4yHNzGewGk6i4uuDCW5C1rKyd0pxQrL3wQIT1wKl2Khhqb6zX9oc08J67NqFhO/c+TFr1XK2ZQ=
-X-Received: by 2002:a81:f0c:0:b0:2d6:83ab:7605 with SMTP id
- 12-20020a810f0c000000b002d683ab7605mr20598547ywp.150.1647288586417; Mon, 14
- Mar 2022 13:09:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220125185305.2419774-1-luiz.dentz@gmail.com>
- <20220314135044.2040-1-mike@fireburn.co.uk> <CABBYNZJfVnjuo9JPtapiHrfoXUoDYRQ0eMmh3n6-hx--jb=hSQ@mail.gmail.com>
- <CAHbf0-GUYcuj_rFdXAZ-VS-gY_mmbx2-05UdQ3W1VRxbFDkgwQ@mail.gmail.com>
-In-Reply-To: <CAHbf0-GUYcuj_rFdXAZ-VS-gY_mmbx2-05UdQ3W1VRxbFDkgwQ@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qOAzIAGITBNGyHFTZ7Cmq/ShOyrjrDEaYD2HgQ928xA=;
+        b=VB8EIOYcQj2ycwR6289fnGNdQbbEhUlmBvswbt1Hc4v8447baaUI41CrDp5udJVTWI
+         kXTEB85Ej/fqmWGQpVmn980+mH/PJuy2vuG/Kv2VQ2oO78UDNoTxs9g/Qax6FDY+7QJ7
+         0uQnv7uxUzp806qMH+ZxjOBJb9cVDQ4FLmVtghNkBLoz6gUyDZUZragTjT2U9UIF2Mcy
+         yNXuQk+OkePYhHEAvEn8WiM9RpN9JGoFjJOjGazhsR3h18Es3w7KaUZNkNSKoF3M1Zhl
+         Y5PWud8MjuF5bPhcdLYMLXeLkb4v+NRsRgO1X9Fjo83mpUSIopuP4ZgVwVj9D68knohM
+         c/GQ==
+X-Gm-Message-State: AOAM532NtSLdRF3zRy2nA1ly7cTBL+nukdeWiYYrWQ6Ji31ylMzbfhNr
+        0d5yMSn45GdWlhdaMv0lk2AmZdlAS4M=
+X-Google-Smtp-Source: ABdhPJy9EXlOReQq8IvYirkcC2sl+tXUHRegwgZC30HikrABwSOoEAA68wGRBpTdDR+mmZRWn7PHgQ==
+X-Received: by 2002:a63:9c4:0:b0:380:f8fd:561d with SMTP id 187-20020a6309c4000000b00380f8fd561dmr18248153pgj.60.1647294617305;
+        Mon, 14 Mar 2022 14:50:17 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s15-20020a63af4f000000b0037c8875108dsm18029032pgo.45.2022.03.14.14.50.16
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 14:50:17 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Mar 2022 13:09:35 -0700
-Message-ID: <CABBYNZKAFgQJWyPuNiQ0+ejwKPgQ02CCTS9QEkVzdmJNt2Wesw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_event: Fix HCI_EV_VENDOR max_len
-To:     Mike Lothian <mike@fireburn.co.uk>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] gatt: Print error if gatt_db_attribut_notify fails
+Date:   Mon, 14 Mar 2022 14:50:09 -0700
+Message-Id: <20220314215010.23822-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Mar 14, 2022 at 11:31 AM Mike Lothian <mike@fireburn.co.uk> wrote:
->
-> On Mon, 14 Mar 2022 at 17:30, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> >
-> > We fixed this a while back:
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/net/bluetooth/hci_event.c?id=314d8cd2787418c5ac6b02035c344644f47b292b
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Yes, and it looks like that commit is queued for kernel 5.18. I was
-> hoping you could get it added into 5.17 where I'm seeing spurious
-> messages during boot, before it's released
->
+This prints an error if gatt_db_attribut_notify fails.
+---
+ src/gatt-database.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Can we perhaps merge it to bluetooth.git so we send a pr to be included in 5.17?
-
-
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 485af04ea..d6c94058c 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -1523,8 +1523,9 @@ static void send_service_changed(struct btd_gatt_database *database,
+ 	put_le16(start, value);
+ 	put_le16(end, value + 2);
+ 
+-	gatt_db_attribute_notify(database->svc_chngd, value, sizeof(value),
+-				NULL);
++	if (!gatt_db_attribute_notify(database->svc_chngd, value, sizeof(value),
++								NULL))
++		error("Failed to notify Service Changed");
+ }
+ 
+ static void gatt_db_service_added(struct gatt_db_attribute *attrib,
+@@ -3967,6 +3968,7 @@ void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database)
+ 	put_le16(0x0001, value);
+ 	put_le16(0xffff, value + 2);
+ 
+-	gatt_db_attribute_notify(database->svc_chngd, value, sizeof(value),
+-				NULL);
++	if (!gatt_db_attribute_notify(database->svc_chngd, value, sizeof(value),
++								NULL))
++		error("Failed to notify Service Changed");
+ }
 -- 
-Luiz Augusto von Dentz
+2.35.1
+
