@@ -2,71 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37C57C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:32:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 442FFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:34:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242266AbiCNPdp convert rfc822-to-8bit (ORCPT
+        id S242556AbiCNPfn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 11:33:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41976 "EHLO
+        Mon, 14 Mar 2022 11:35:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233435AbiCNPdp (ORCPT
+        with ESMTP id S242549AbiCNPfd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:33:45 -0400
+        Mon, 14 Mar 2022 11:35:33 -0400
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 448931BE9B;
-        Mon, 14 Mar 2022 08:32:34 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B605C2182D;
+        Mon, 14 Mar 2022 08:34:23 -0700 (PDT)
 Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 65347CECC5;
-        Mon, 14 Mar 2022 16:32:33 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id ACCA2CECC5;
+        Mon, 14 Mar 2022 16:34:22 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH] Bluetooth: hci_event: Remove excessive bluetooth warning
+Subject: Re: [PATCH] Bluetooth: hci_uart: add missing NULL check in h5_enqueue
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220312164550.1810665-1-mike@fireburn.co.uk>
-Date:   Mon, 14 Mar 2022 16:32:32 +0100
+In-Reply-To: <20220313174936.1299-1-paskripkin@gmail.com>
+Date:   Mon, 14 Mar 2022 16:34:22 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Hilda Wu <hildawu@realtek.com>,
+        Archie Pusaka <apusaka@chromium.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        syzbot+b9bd12fbed3485a3e51f@syzkaller.appspotmail.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <61E2F921-2006-4E9A-AAFF-47371CBC5FCD@holtmann.org>
-References: <20220312164550.1810665-1-mike@fireburn.co.uk>
-To:     Mike Lothian <mike@fireburn.co.uk>
+Message-Id: <E53EB6BA-06CE-48B4-96A5-745D0F2D3646@holtmann.org>
+References: <20220313174936.1299-1-paskripkin@gmail.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>
 X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mike,
+Hi Pavel,
 
-> Fixes: 3e54c5890c87a ("Bluetooth: hci_event: Use of a function table to handle HCI events")
-> Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
+> Syzbot hit general protection fault in __pm_runtime_resume(). The problem
+> was in missing NULL check.
+> 
+> hu->serdev can be NULL and we should not blindly pass &serdev->dev
+> somewhere, since it will cause GPF.
+> 
+> Reported-by: syzbot+b9bd12fbed3485a3e51f@syzkaller.appspotmail.com
+> Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
 > ---
-> net/bluetooth/hci_event.c | 8 --------
-> 1 file changed, 8 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index fc30f4c03d29..aa57fccd2e47 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6818,14 +6818,6 @@ static void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
-> 		return;
-> 	}
-> 
-> -	/* Just warn if the length is over max_len size it still be
-> -	 * possible to partially parse the event so leave to callback to
-> -	 * decide if that is acceptable.
-> -	 */
-> -	if (skb->len > ev->max_len)
-> -		bt_dev_warn(hdev, "unexpected event 0x%2.2x length: %u > %u",
-> -			    event, skb->len, ev->max_len);
-> -
+> drivers/bluetooth/hci_h5.c | 8 +++++---
+> 1 file changed, 5 insertions(+), 3 deletions(-)
 
-which event type is this? You need to have a commit message giving details. I am also pretty sure that this is broken hardware and we can go for ratelimited version, but the warning is justified if the hardware is stupid. If our table is wrong, we fix the table, but not just silence an unpleasant warning.
+patch has been applied to bluetooth-next tree.
+
+However if someone would finally step up and write a standalone serdev only driver for 3-Wire UART support, this would not be a problem in the first place. We are just applying on bandaid after another.
 
 Regards
 
