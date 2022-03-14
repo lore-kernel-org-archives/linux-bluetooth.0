@@ -2,106 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29397C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 568F4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:37:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242584AbiCNPgs (ORCPT
+        id S233908AbiCNPiV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 11:36:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
+        Mon, 14 Mar 2022 11:38:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235158AbiCNPgr (ORCPT
+        with ESMTP id S231261AbiCNPiU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:36:47 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62D4D41FAF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:35:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6C0D5612B7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 15:35:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D5F60C340E9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 15:35:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647272135;
-        bh=EoVCnsDgtlK8zHlEDImgEv3ALzSMIVcTQWlypO+D4Q4=;
-        h=From:To:Subject:Date:From;
-        b=MvIdKzHtQSboaKn9lLq/VOL/lGDnX9djZnpuXMcjXD6VYFW3FFK2eehlSBjhFKBt6
-         cXXbI9MDXPlC+Cgdz8I3pS7Bx+hjqeXvLSCqvUTNGmM9fpco2yzbtD1nr/TncVNxw9
-         5aI/DvgRyDXmvrBNLDOKzPKViHseXYXaOMzShTESS890KbjRdqg+HFF0UY6XmMzsV8
-         d2ZowJOGNYBygNCGgAXJtLIUO0CmTcsKNvh3cjkyN2C2UzzoUQCXBrfUWhUw7Vzo2j
-         w44wQXwwX59PkdzdNRLtl4c/+/jk+2KRrrxvQ6HR6v+ceWL5ubbcRxK4sazeELGb/5
-         niasDFLAjukNA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id BD4E4C05F98; Mon, 14 Mar 2022 15:35:35 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215681] New: Malicious advertising data showed in dmesg
-Date:   Mon, 14 Mar 2022 15:35:35 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: gnulux@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-215681-62941@https.bugzilla.kernel.org/>
+        Mon, 14 Mar 2022 11:38:20 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8610143ADA
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:37:10 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id h196so13039900qke.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:37:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fireburn-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=0elgh052PSKRgUoeTnvN0bWDvw6A8anfaBt8OXlPQ1Y=;
+        b=IyDJx9FYLxq0/OFsl6PjULq1hPM856m5NjEgas6tyzwW95iNX23GcmcSfTJao1Fs/h
+         tEtyXRs5sajz8UhQzmJCrvnbMP7lrCkmfqVXyx57DLKwk4PFK0RvlBIsiR/94g0I7C5A
+         YrnmAurs8ZyiwcDO763iE4Nv7FSddrIfqLH+28Ije3Ai5heLz+OwouI0bqjK4GIIGWai
+         MTsTx3GdhUHVPdnjITT9f0PKJUHfKt2sEuZ5Aur/ejjH+qKT/4cd6c/WW8NOPmmTLXgw
+         izFMebbzzUX0tj8pI8aAt+aXqwLiX40VKiFbdvc6SUYsmPf/GGGio/meEWEfa6Q5ya6T
+         7vIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=0elgh052PSKRgUoeTnvN0bWDvw6A8anfaBt8OXlPQ1Y=;
+        b=J3mr0a15+fHst14FdKmWCKCeCURLWV/KsnSDxMxVHCxE72rXF2H9bt/+sfYrsuzT4c
+         xY7R4TnE7QoETTBdrFOkBhGljWc9i4yd+gC33kvChnzzn0LcjnCX/R8y7WfGgsDTHT+x
+         asTj+EX0XH7NbQK9oHhKMJWE14oOQR2GbfDpgkHN9HkFMr8G2ipNCZ8F3P7LHrvvMana
+         EyrhNQagKpnxQgt0LB78yPfOTMJv78/9HrE6lJbVpeMpgdlC9krYaAO+lxiz9B8qSFvA
+         Khw/Q6+G9dENkmBF98uOu6qPu1sbK4t3EQOg489j1HNb7/sEki5sMXbWGrY60N+hck+I
+         6uxw==
+X-Gm-Message-State: AOAM533AhHs39i9URA9Aoa/bYM4ZKa+75h/bCJPm80t07jBrkVcHL1BI
+        cN77YB1Vitcc6+3UjBWOsLX7KcJGeIAQmP7xN3dFIg==
+X-Google-Smtp-Source: ABdhPJyTloUkN91Q7ZAlujMEv/38sKubt4ooFXq30iFcN33LD+RPW78EKqagwBPZqPZIqDQ7wmDhXrXxN16GxBT1U60=
+X-Received: by 2002:a05:620a:1902:b0:5f1:8f5d:b0f2 with SMTP id
+ bj2-20020a05620a190200b005f18f5db0f2mr15068195qkb.60.1647272229548; Mon, 14
+ Mar 2022 08:37:09 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220312164550.1810665-1-mike@fireburn.co.uk> <61E2F921-2006-4E9A-AAFF-47371CBC5FCD@holtmann.org>
+In-Reply-To: <61E2F921-2006-4E9A-AAFF-47371CBC5FCD@holtmann.org>
+From:   Mike Lothian <mike@fireburn.co.uk>
+Date:   Mon, 14 Mar 2022 15:36:57 +0000
+Message-ID: <CAHbf0-GWcz85r4GEzmySFJ1n4iqeDTAm5H_Njs0FEpBs1hkJHw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Remove excessive bluetooth warning
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215681
+On Mon, 14 Mar 2022 at 15:32, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Mike,
+>
+> > Fixes: 3e54c5890c87a ("Bluetooth: hci_event: Use of a function table to=
+ handle HCI events")
+> > Signed-off-by: Mike Lothian <mike@fireburn.co.uk>
+> > ---
+> > net/bluetooth/hci_event.c | 8 --------
+> > 1 file changed, 8 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index fc30f4c03d29..aa57fccd2e47 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -6818,14 +6818,6 @@ static void hci_event_func(struct hci_dev *hdev,=
+ u8 event, struct sk_buff *skb,
+> >               return;
+> >       }
+> >
+> > -     /* Just warn if the length is over max_len size it still be
+> > -      * possible to partially parse the event so leave to callback to
+> > -      * decide if that is acceptable.
+> > -      */
+> > -     if (skb->len > ev->max_len)
+> > -             bt_dev_warn(hdev, "unexpected event 0x%2.2x length: %u > =
+%u",
+> > -                         event, skb->len, ev->max_len);
+> > -
+>
+> which event type is this? You need to have a commit message giving detail=
+s. I am also pretty sure that this is broken hardware and we can go for rat=
+elimited version, but the warning is justified if the hardware is stupid. I=
+f our table is wrong, we fix the table, but not just silence an unpleasant =
+warning.
+>
+> Regards
+>
+> Marcel
+>
 
-            Bug ID: 215681
-           Summary: Malicious advertising data showed in dmesg
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.10.95
-          Hardware: ARM
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: gnulux@gmail.com
-        Regression: No
+Hi Marcel
 
-Hi,=20
+I noticed it had already been fixed in "Bluetooth: hci_event: Fix
+HCI_EV_VENDOR max_len"
 
-I have recently moved from Raspbian 9 to 10 which means kernel 4.19 to kern=
-em
-5.10 .=20
-I use an application that advertises permanently and scans ble devices.=20
-Since the upgrade i noticed plenty of messages in  dmesg output like this :=
-=20
+I've replied to that patch asking if it can be added to stable, would
+be nice to get this into 5.17.0 before next week
 
-[Mon Mar 14 15:16:44 2022] Bluetooth: hci0: Malicious advertising data.
-Stopping processing
+Cheers
 
-This kind of messages were not displayed with 4.19 kernel
-
-Any suggestions, how I can disable this flooding message?
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Mike
