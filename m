@@ -2,175 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A30C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 21:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2BEC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 22:01:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245401AbiCNVva (ORCPT
+        id S245456AbiCNWCY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 17:51:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53202 "EHLO
+        Mon, 14 Mar 2022 18:02:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236193AbiCNVv3 (ORCPT
+        with ESMTP id S245425AbiCNWCW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 17:51:29 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE5A344CF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 14:50:19 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id z16so16331305pfh.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 14:50:19 -0700 (PDT)
+        Mon, 14 Mar 2022 18:02:22 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442C63C48F;
+        Mon, 14 Mar 2022 15:01:11 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id o5so4745858ybe.2;
+        Mon, 14 Mar 2022 15:01:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=njAUkH5dFFKuqO+juI/HLGmCs3nd2qaoyWds8EGJd78=;
-        b=YE6lKpEeqWWr7bxVddJNsxSeXHOsfubyQgK5FMK2g021xkXIq7LtC5F/WcOQgXufx5
-         mLyh8hhgNV8LUmwEgFeJBL+q+zv2OIItg1FLqHy66MI7LGJowUDsvK45gnESLLVTmCqu
-         Bu2TlFZKYyRdWQFI7CBAw+R+2vpSYG1HqWpGYOU/kJEx67i6jH2RrMJRiryi+kxhayDY
-         gZN8RJ72YgE4GaOfk+Qd7IHmwo4Wv3Of4RBsLmMnyCexXopJNG5OJ2f3wkJhYFUWdk3j
-         0INGwWDo1uGqkDNPEbIMU/KEwq7H8UxNFDrp/o/MS7wyIEpirTiYeiNPv6+y2xkHOF0S
-         XNVw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=FDQp0elUbEb3l2ztp8B9W0hhZAwxOZgBnkRa+RhHUnU=;
+        b=WvHe4lvu9eMeiGDQrTW+QFd0atSq6h7tPADdOTemrhvtyF8fR44hONCUmP0BXcMICq
+         JD3TdX9CequRTw9vJXkuES8i5Gko+9m6uEF/P0SfS+6vGijN1MQDhGVutZ81RLJAQS2S
+         uTSibi6jnSh+A8VH9wDeT9A4EtrE+iqiTaHdH9mEXKFPyMQ7B8N6QQLS4hz8Egcl9AO+
+         U46H8gbP8konmPKMj6reDwTQbs50B8ykWJEDaT/WLGDYDVzZhJRxl9mZp+zDSapC/lZZ
+         cJhnrPLQEUA0wJhh3vfgUOYJaP3mJ3T/KUZmlR+tni99BAty+93dOAESeaaejKEbG6KE
+         UU3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=njAUkH5dFFKuqO+juI/HLGmCs3nd2qaoyWds8EGJd78=;
-        b=ya31GS/qiqUkYQw5I4QPNCpnX1yc8HBWfR3HZyMIPtlxQfIXuPFMuQkczvd2FVL6kR
-         ffhc1GIKiyCwihZHvddOrXdK/9EaDZdSUfZZYU7rcWno2H0iyApA12m/LXsOf+ypG+FG
-         wLqS7EKqdGHZHEA/ZjMOdCOILhswLVr27mmaj9HtM06h79a/WTVaJiyzkKZaDbKXuYXZ
-         v1BsQpfSTsW7E2HZk7/NkvouKEzDCHiJrZ20b/MjvgZUkZKBVVxWpuB+erkyRfwy6UkN
-         +zYysavFrnkzz9vFE/WvEFQAg3tkv4tN3MXiXhn6UL03CWL4jfxQFhNrVpOzik+Mxf5+
-         f+dg==
-X-Gm-Message-State: AOAM530CTE4E1XxIr170FuiDFIYng4HLjJqhSb3mrWKsKvoC5R9rXbqv
-        VntVv9nvYYK9jz20KkenE16WXz4eq6A=
-X-Google-Smtp-Source: ABdhPJwnxh+wn5h6pi3UtQc9xuPn+VaEkwEDjFUcy9/H6hnHms8tu5Pzr4LyCtElRjOxgbR9rw4jhA==
-X-Received: by 2002:a63:2358:0:b0:380:e306:f0bd with SMTP id u24-20020a632358000000b00380e306f0bdmr19906066pgm.594.1647294618357;
-        Mon, 14 Mar 2022 14:50:18 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id s15-20020a63af4f000000b0037c8875108dsm18029032pgo.45.2022.03.14.14.50.17
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 14:50:17 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] gatt-db: Fix gatt_db_attribute_notify
-Date:   Mon, 14 Mar 2022 14:50:10 -0700
-Message-Id: <20220314215010.23822-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220314215010.23822-1-luiz.dentz@gmail.com>
-References: <20220314215010.23822-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=FDQp0elUbEb3l2ztp8B9W0hhZAwxOZgBnkRa+RhHUnU=;
+        b=HicE5R3XrpaO6TncjgeGxicCpgGIxZtAvj1Iwg9ePt0fzbCpTckId38OTwevc256rA
+         pE5KU/ujewY4Nf4smBwOrUpVCE8RYiZOo1HovOXu9j1NRQDOFnsunD/j69v/oxRLU7Ii
+         clNCQGao454S7Sh/CpAhYov7HWtJzted8zk0mzMmJ6viZlsmzdnZu5+hlitXyzQdddLk
+         jduDMrJhh2UkgadNZYOhnA2xerzmiZSajPGU2dw30NC6fAc6C2+sVNEF6+UxwiOlMGdb
+         uyWiRCfF/OYGysWW4LhJ1JLNBBS+x0T8ycy4NtfoUUNdmSkuNwZkSwDS2uyFoV1qvo8i
+         STQQ==
+X-Gm-Message-State: AOAM533BrIHoFH/U2HCH9dtqR8Hm2CXfclg0TFIQx3tZXjAfpoLbzCsi
+        gGAji7LqJNo+znrqX26e8mXuZ0vuQN0Z2ULYvhOITELI
+X-Google-Smtp-Source: ABdhPJyje4eQsiO8dt4q7jDAtFimCxHJPbizI7qD7bwtkI9WgWPNi408Kg2S6oHIMFc3vrtLGm9QkspOr98knrLIUO0=
+X-Received: by 2002:a25:a467:0:b0:61e:1b4a:7700 with SMTP id
+ f94-20020a25a467000000b0061e1b4a7700mr19985076ybi.390.1647295270388; Mon, 14
+ Mar 2022 15:01:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <e2c2fe36c226529c99595370003d3cb1b7133c47.1646252285.git.christophe.jaillet@wanadoo.fr>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 14 Mar 2022 15:00:59 -0700
+Message-ID: <CABBYNZ+uNjszAf9jYL4iu+HxjrktnQL2FeQfdDRnFfNNnmw07g@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Don't assign twice the same value
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Christophe,
 
-gatt_db_attribute_notify was only accepting passing the Characteristic
-Declaration instead of accepting its value as well,
-gatt_db_service_foreach_desc also have similar limitation so both have
-been updated to allow working with both value and declaration.
----
- src/shared/gatt-db.c | 63 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 51 insertions(+), 12 deletions(-)
+On Wed, Mar 2, 2022 at 12:18 PM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> data.pid is set twice with the same value. Remove one of these redundant
+> calls.
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+>  net/bluetooth/l2cap_core.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index e817ff0607a0..0d460cb7f965 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -1443,7 +1443,6 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
+>         data.pdu.scid[0]     = cpu_to_le16(chan->scid);
+>
+>         chan->ident = l2cap_get_ident(conn);
+> -       data.pid = chan->ops->get_peer_pid(chan);
+>
+>         data.count = 1;
+>         data.chan = chan;
+> --
+> 2.32.0
+>
+Applied, thanks.
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 53d3e1243..be07cdbe4 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -1528,32 +1528,71 @@ void gatt_db_service_foreach_char(struct gatt_db_attribute *attrib,
- 	gatt_db_service_foreach(attrib, &characteristic_uuid, func, user_data);
- }
- 
-+static int gatt_db_attribute_get_index(struct gatt_db_attribute *attrib)
-+{
-+	struct gatt_db_service *service;
-+	int index;
-+
-+	if (!attrib)
-+		return -1;
-+
-+	service = attrib->service;
-+	index = attrib->handle - service->attributes[0]->handle;
-+
-+	if (index > (service->num_handles - 1))
-+		return -1;
-+
-+	return index;
-+}
-+
-+static struct gatt_db_attribute *
-+gatt_db_attribute_get_value(struct gatt_db_attribute *attrib)
-+{
-+	struct gatt_db_service *service;
-+	int index;
-+
-+	if (!attrib)
-+		return NULL;
-+
-+	index = gatt_db_attribute_get_index(attrib);
-+	if (index < 0)
-+		return NULL;
-+
-+	service = attrib->service;
-+
-+	if (!bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
-+		index++;
-+	else if (bt_uuid_cmp(&characteristic_uuid,
-+				&service->attributes[index - 1]->uuid))
-+		return NULL;
-+
-+	return service->attributes[index];
-+}
-+
- void gatt_db_service_foreach_desc(struct gatt_db_attribute *attrib,
- 						gatt_db_attribute_cb_t func,
- 						void *user_data)
- {
- 	struct gatt_db_service *service;
- 	struct gatt_db_attribute *attr;
-+	int index;
- 	uint16_t i;
- 
- 	if (!attrib || !func)
- 		return;
- 
--	/* Return if this attribute is not a characteristic declaration */
--	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
-+	attrib = gatt_db_attribute_get_value(attrib);
-+	if (!attrib)
-+		return;
-+
-+	index = gatt_db_attribute_get_index(attrib);
-+	if (index < 0)
- 		return;
- 
- 	service = attrib->service;
- 
- 	/* Start from the attribute following the value handle */
--	for (i = 0; i < service->num_handles; i++) {
--		if (service->attributes[i] == attrib) {
--			i += 2;
--			break;
--		}
--	}
--
--	for (; i < service->num_handles; i++) {
-+	for (i = index + 1; i < service->num_handles; i++) {
- 		attr = service->attributes[i];
- 		if (!attr)
- 			continue;
-@@ -2163,8 +2202,8 @@ bool gatt_db_attribute_notify(struct gatt_db_attribute *attrib,
- 	if (!attrib || !attrib->notify_func)
- 		return false;
- 
--	/* Return if this attribute is not a characteristic declaration */
--	if (bt_uuid_cmp(&characteristic_uuid, &attrib->uuid))
-+	attrib = gatt_db_attribute_get_value(attrib);
-+	if (!attrib)
- 		return false;
- 
- 	ccc = gatt_db_attribute_get_ccc(attrib);
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
