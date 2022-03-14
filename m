@@ -2,110 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D55A7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 23:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F4FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 23:40:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241278AbiCNXD0 (ORCPT
+        id S234064AbiCNXlY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 19:03:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52868 "EHLO
+        Mon, 14 Mar 2022 19:41:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238795AbiCNXDY (ORCPT
+        with ESMTP id S230486AbiCNXlX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 19:03:24 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61586340F3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 16:02:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647298934; x=1678834934;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=nmb0PTFiFQ7no7UFdrIRoEcjtdkrXl8xYXmyB55GnGw=;
-  b=CYfd1QcajJUfbUqbd7sRqikBGPF+l1KXqMBXYmjV3cyKkk2bNBMQIyTI
-   dbrXvHoo8d82aHQH2k229up9fBYXUM6KCMSaOJkvbvTUQ6toWB5HYvyE0
-   n/m/cttTanHSUTAP+9talgLKZ7YfdKALsx8rGynrYtQPp+qradkjzex7E
-   1f49/yRQeMjbgobc4oc8dS6B0JQSrw//2FQDEKhA36rgjWIWLkGaW1AXa
-   SU9W04umrC7YqCBEofmLot2zwWIF3zr8Q2MEvc6GZv+2hrhCA5E4i2yzZ
-   hEvv16yb9F8pNAQfhKNE9LMfoz0XBKI+fDoJ9ljU6KEUs6B0vS4jmwrgk
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10286"; a="256115580"
-X-IronPort-AV: E=Sophos;i="5.90,181,1643702400"; 
-   d="scan'208";a="256115580"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2022 16:02:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,181,1643702400"; 
-   d="scan'208";a="497802662"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 14 Mar 2022 16:02:13 -0700
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nTthc-000AJd-Ao; Mon, 14 Mar 2022 23:02:12 +0000
-Date:   Tue, 15 Mar 2022 07:01:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc:     kbuild-all@lists.01.org, linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master 111/128]
- drivers/net/ethernet/mscc/ocelot.c:2920:14: error: 'IEEE_8021QAZ_MAX_TCS'
- undeclared
-Message-ID: <202203150608.Rb0JPSVD-lkp@intel.com>
+        Mon, 14 Mar 2022 19:41:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3BCD3D48D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 16:40:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7035861497
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 23:40:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1361C340F4;
+        Mon, 14 Mar 2022 23:40:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647301210;
+        bh=kk4XUI+iHuJQi2xpmNg2veT8DsevFcNETB8LAIub/Rg=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=VQJRPw+Vys+L63HAfRAG/B1tM55I9wUVzPd4YOpnYVLA/6Xb7AUWc7ufiEPqn+nVO
+         hfgqANg+RpMuJhJCKtk3Yb++CpkYVSoA/YiA4S5F2M/5UAXBn7zbccG4kAijOdGVWL
+         G+80Fw3BldPc9ECB6jV9iIhL5eXk7TrjriMya1US8bnatkXqR/Ioz4CLqlfpre0kQr
+         Ow7BSVP4Zs7BxrFvthvNJ3jPPF5+58pcIfLaltt70oN21Zh0+5XJ/8RMkqmAP2q4Rq
+         USHKvUy7xKLYdWQzKosfw33SzzbtANbv/XKo6B+2vWQ02/lgHrFbjK0a4gQwUazv3U
+         S3kxRBaF2+GXQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B7D7DE6D44B;
+        Mon, 14 Mar 2022 23:40:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] gatt: Print error if gatt_db_attribut_notify fails
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164730121074.18839.12006572635522029824.git-patchwork-notify@kernel.org>
+Date:   Mon, 14 Mar 2022 23:40:10 +0000
+References: <20220314215010.23822-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220314215010.23822-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-head:   f564af34bb7d58f4e0776b64168f565f17ee8597
-commit: 978777d0fb06663523281aa50a5040c3aa31fbe7 [111/128] net: dsa: felix: configure default-prio and dscp priorities
-config: i386-randconfig-a001-20220314 (https://download.01.org/0day-ci/archive/20220315/202203150608.Rb0JPSVD-lkp@intel.com/config)
-compiler: gcc-9 (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
-reproduce (this is a W=1 build):
-        # https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=978777d0fb06663523281aa50a5040c3aa31fbe7
-        git remote add bluetooth-next https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
-        git fetch --no-tags bluetooth-next master
-        git checkout 978777d0fb06663523281aa50a5040c3aa31fbe7
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+Hello:
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-All errors (new ones prefixed by >>):
+On Mon, 14 Mar 2022 14:50:09 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This prints an error if gatt_db_attribut_notify fails.
+> ---
+>  src/gatt-database.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-   drivers/net/ethernet/mscc/ocelot.c: In function 'ocelot_port_set_default_prio':
->> drivers/net/ethernet/mscc/ocelot.c:2920:14: error: 'IEEE_8021QAZ_MAX_TCS' undeclared (first use in this function)
-    2920 |  if (prio >= IEEE_8021QAZ_MAX_TCS)
-         |              ^~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/mscc/ocelot.c:2920:14: note: each undeclared identifier is reported only once for each function it appears in
-   drivers/net/ethernet/mscc/ocelot.c: In function 'ocelot_port_add_dscp_prio':
-   drivers/net/ethernet/mscc/ocelot.c:2962:14: error: 'IEEE_8021QAZ_MAX_TCS' undeclared (first use in this function)
-    2962 |  if (prio >= IEEE_8021QAZ_MAX_TCS)
-         |              ^~~~~~~~~~~~~~~~~~~~
+Here is the summary with links:
+  - [BlueZ,1/2] gatt: Print error if gatt_db_attribut_notify fails
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=8fb8f9e73ff8
+  - [BlueZ,2/2] gatt-db: Fix gatt_db_attribute_notify
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=411d63ec33a2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-vim +/IEEE_8021QAZ_MAX_TCS +2920 drivers/net/ethernet/mscc/ocelot.c
-
-  2917	
-  2918	int ocelot_port_set_default_prio(struct ocelot *ocelot, int port, u8 prio)
-  2919	{
-> 2920		if (prio >= IEEE_8021QAZ_MAX_TCS)
-  2921			return -ERANGE;
-  2922	
-  2923		ocelot_rmw_gix(ocelot,
-  2924			       ANA_PORT_QOS_CFG_QOS_DEFAULT_VAL(prio),
-  2925			       ANA_PORT_QOS_CFG_QOS_DEFAULT_VAL_M,
-  2926			       ANA_PORT_QOS_CFG,
-  2927			       port);
-  2928	
-  2929		return 0;
-  2930	}
-  2931	EXPORT_SYMBOL_GPL(ocelot_port_set_default_prio);
-  2932	
-
----
-0-DAY CI Kernel Test Service
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
