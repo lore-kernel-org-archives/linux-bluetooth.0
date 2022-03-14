@@ -2,126 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A30B4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79347C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:24:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239999AbiCNPWj convert rfc822-to-8bit (ORCPT
+        id S237891AbiCNPZY convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 11:22:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49496 "EHLO
+        Mon, 14 Mar 2022 11:25:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239722AbiCNPWg (ORCPT
+        with ESMTP id S236583AbiCNPZX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:22:36 -0400
+        Mon, 14 Mar 2022 11:25:23 -0400
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 22FE8140F1;
-        Mon, 14 Mar 2022 08:21:25 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B05F6354
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:24:13 -0700 (PDT)
 Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3F406CECC5;
-        Mon, 14 Mar 2022 16:21:24 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 373DBCECC5;
+        Mon, 14 Mar 2022 16:24:13 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [PATCH] Bluetooth: btrtl: btmrvl: Fix firmware filename for rtl
- chipset
+Subject: Re: [PATCH] Bluetooth: fix incorrect nonblock bitmask in
+ bt_sock_wait_ready()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220311032620.28362-1-tangmeng@uniontech.com>
-Date:   Mon, 14 Mar 2022 16:21:23 +0100
+In-Reply-To: <CACB127+s8mj2-Hkt4yZXRZ_cQ9CbAK0r3y709-8Cb3awpVJm9Q@mail.gmail.com>
+Date:   Mon, 14 Mar 2022 16:24:12 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
+        linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <6FCDA0C9-59CD-44F1-B31A-27DDB7FB8D25@holtmann.org>
-References: <20220311032620.28362-1-tangmeng@uniontech.com>
-To:     Meng Tang <tangmeng@uniontech.com>
+Message-Id: <CA26CE39-DBDE-4DC6-80C1-F091968DC4D3@holtmann.org>
+References: <20220224100641.2449550-1-gavin@matician.com>
+ <71D25C8F-67D1-4EC0-9160-5F61C832F0AF@holtmann.org>
+ <CACB127+s8mj2-Hkt4yZXRZ_cQ9CbAK0r3y709-8Cb3awpVJm9Q@mail.gmail.com>
+To:     Gavin Li <gavin@matician.com>
 X-Mailer: Apple Mail (2.3693.60.0.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Meng,
+Hi Gavin,
 
-> Firmware for rtl chipset is as part of the linux-firmware repository
-> in dir linux-firmware/rtl_bt. Today, the rtl8761a_config,
-> rtl8821a_config, rtl8723b_config and rtl8723bs_config files are used
-> in btrtl, but it doesn't actually exist, which causes errors like:
-> 
-> bluetooth: Direct firmware load for rtl_bt/rtl8821a_config.bin
->           failed with error -2
-> 
-> According to the files in the rtl_bt directory in the Linux firmware,
-> fixes the driver to load correct firmware file for rtl.
-> 
-> Signed-off-by: Meng Tang <tangmeng@uniontech.com>
-> ---
-> drivers/bluetooth/btrtl.c | 13 +++++--------
-> 1 file changed, 5 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index c2030f7e25b4..e3cfe0dff07d 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -88,14 +88,14 @@ static const struct id_table ic_id_table[] = {
-> 	  .config_needed = true,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8723bs_config" },
-> +	  .cfg_name = "rtl_bt/rtl8723bs_config-OBDA8723" },
+>>> diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+>>> index ee319779781e6..69374321130e4 100644
+>>> --- a/net/bluetooth/af_bluetooth.c
+>>> +++ b/net/bluetooth/af_bluetooth.c
+>>> @@ -568,7 +568,7 @@ int bt_sock_wait_state(struct sock *sk, int state, unsigned long timeo)
+>>> EXPORT_SYMBOL(bt_sock_wait_state);
+>>> 
+>>> /* This function expects the sk lock to be held when called */
+>>> -int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
+>>> +int bt_sock_wait_ready(struct sock *sk, unsigned int flags)
+>> 
+>> can we then also do s/flags/msg_flags/ then.
+> I prefer keeping it as flags because all other net code also uses
+> flags, msg_flags only appears
+> in msg->msg_flags.
 
-this change is not explained.
+while that might be true, I find it a lot clearer if the variable is msg_flags.
 
+>>> @@ -576,7 +576,7 @@ int bt_sock_wait_ready(struct sock *sk, unsigned long flags)
+>>> 
+>>>      BT_DBG("sk %p", sk);
+>>> 
+>>> -     timeo = sock_sndtimeo(sk, flags & O_NONBLOCK);
+>>> +     timeo = sock_sndtimeo(sk, flags & MSG_DONTWAIT);
+>> 
+>> Since sock_sndtimeo() is taking a bool. This might be better !!(flags & MSG_DONTWAIT).
+> It appears to be well-known in the net code that sock_sndtimeo takes a
+> bool, since no other
+> uses of it do the "!!" conversion.
 > 
-> 	/* 8723B */
-> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xb, 0x6, HCI_USB),
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8723b_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8723b_config" },
-> +	  .cfg_name = NULL },
+> Let me know what you think. I can make the changes if needed but I was
+> just trying my best
+> to match the currently existing convention.
 
-.config_needed is set to false. Then we better use a request_firmware version where the existence of the file is optional.
-
-And even if we wanted to remove it (which would make the .config_needed obsolute), we are not doing a NULL assignment, we just remove the line.
-
-> 
-> 	/* 8723D */
-> 	{ IC_INFO(RTL_ROM_LMP_8723B, 0xd, 0x8, HCI_USB),
-> @@ -116,7 +116,7 @@ static const struct id_table ic_id_table[] = {
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8821a_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8821a_config" },
-> +	  .cfg_name = NULL },
-> 
-> 	/* 8821C */
-> 	{ IC_INFO(RTL_ROM_LMP_8821A, 0xc, 0x8, HCI_USB),
-> @@ -131,7 +131,7 @@ static const struct id_table ic_id_table[] = {
-> 	  .config_needed = false,
-> 	  .has_rom_version = true,
-> 	  .fw_name  = "rtl_bt/rtl8761a_fw.bin",
-> -	  .cfg_name = "rtl_bt/rtl8761a_config" },
-> +	  .cfg_name = NULL },
-> 
-> 	/* 8761B */
-> 	{ IC_INFO(RTL_ROM_LMP_8761A, 0xb, 0xa, HCI_UART),
-> @@ -921,15 +921,12 @@ MODULE_VERSION(VERSION);
-> MODULE_LICENSE("GPL");
-> MODULE_FIRMWARE("rtl_bt/rtl8723a_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723b_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8723b_config.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723bs_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
-> +MODULE_FIRMWARE("rtl_bt/rtl8723bs_config-OBDA8723.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723ds_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8723ds_config.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8761a_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8761a_config.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8821a_fw.bin");
-> -MODULE_FIRMWARE("rtl_bt/rtl8821a_config.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8822b_fw.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8822b_config.bin");
-> MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
+And other code in the kernel makes sure to clearly turn something into a bool. You get 0x00 and 0x40.
 
 Regards
 
