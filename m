@@ -2,87 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E895CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 17:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CAE3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 18:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233553AbiCNRbo (ORCPT
+        id S236981AbiCNScY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 13:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33120 "EHLO
+        Mon, 14 Mar 2022 14:32:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiCNRbn (ORCPT
+        with ESMTP id S234274AbiCNScX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 13:31:43 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0DDABF77
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 10:30:33 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id u61so32179196ybi.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 10:30:33 -0700 (PDT)
+        Mon, 14 Mar 2022 14:32:23 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A5B73DDC6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 11:31:13 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id jx8so12742404qvb.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 11:31:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=fireburn-co-uk.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=raQa8Nmjc/PTxEEFNJJMTi3ZiAgiKKbCJubIMbYM3wo=;
-        b=SDmd7Kxbeg2w9b9LUrUiJvT/z5RLs7fbXbpdak3nOZ+skC5pUjZ9bVvl9khBD1BD7d
-         l+Lv4sQObp1Zpv6tFyhZlJNGvkKreyiF2r24l4AncFcoSY9/2XHDoE+1TSzVgYPRusjO
-         kJL5M5wK19lPExQGB3wKf48n9ZqN9DFNUyl6OPscB3N9NuovaUxksZPC8zJf69Tjmqze
-         15/80svrD8qd+v/FT8AfR3kfBIcvhHQ3Jv4gTR0H2lmzT6m4qirz7YkBxpwofLqFZxvf
-         hVdehSJa1GP8wzXtPa6uROXh8uDgZyNJPFJhLhhf0OUfekNPZMP1Kcq3ldzjjc6kL6eJ
-         YreQ==
+        bh=dW8o8MxEwRTcrsXdOuxwmkRI+eKo3H9OXkKdjk5Dnho=;
+        b=vzH4iz1WcVXs7wIx4F9lJ22WspyqKGporQGqQKMWE2DI+iPCvCEzML9hatNadgzfNM
+         eneUNBDk7FXPLyCzWZ9uSF81OtzkfNJM3PvdtigLm7j9VOlRYbnXOb6zHI/A4RXcAa96
+         c4O3q7GZd68a2/OWfCKpJ7e1hNAV8rgi4HWTfGS2KWDRuzgrLt5cjSCvDYoaoVzPCyv0
+         uceiV5Q7mQLdALpUtXP8fUN3yCtStbXZpMnEATBPVF4RYe34OvDLWNXGY+HaR4xE95aA
+         cUDxPLLlMYu075O1SAp1GudcW57fixutUeLjtsa+OxeDOgwd0PwrVIEIy/RnKEs+sUSL
+         nkHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=raQa8Nmjc/PTxEEFNJJMTi3ZiAgiKKbCJubIMbYM3wo=;
-        b=eFp03y204itfNvddlUWgL1MAaUetBVjwUSZsw+e6wYyuqL6H84qS0whMfNUFIuC+Os
-         rNYSeMTh6ATiLKWPt+S2Tcdlrr2DSGqmX706SUfyp6qO6ugjQb6GpjcWvdjReHurlZNp
-         BFw1yUXU22U49yK+Jw3ouz2Fx97NPDb9JcKC8uiYkcBDVxlMYNU5khoYXl3gqsWF9q/H
-         rrJjapG4otXKqxLK/5P+EYdkhYOiZUdZgy7Ra6fTpjJ4/+bZQf6jCywtvcRBAf8IMWkh
-         5w6CnWlu2ndYzo5qjYRt+NVRlOpMHlectTtR9PKBS+oVdBa88nUUSFrSz+k7BD5w91oh
-         JAOQ==
-X-Gm-Message-State: AOAM532ykrZnh3mWpEt8A2dza0pSTWDD9vIQuLg6UXeUABOe6sDa/uDp
-        CpKJAws7k/AsHAYP3Z+l1nkHLq9QK1lJeIVqhTO8IEu/vXI=
-X-Google-Smtp-Source: ABdhPJxc9rCXd8pqA23X7yPpesboSnK7S/Ja5Yt7VDZ8SevSB/uSTrG5AifritZRsPLSpJ03PP2dy37gLcgGZKeCNFE=
-X-Received: by 2002:a25:8546:0:b0:61e:1d34:ec71 with SMTP id
- f6-20020a258546000000b0061e1d34ec71mr17939185ybn.259.1647279032831; Mon, 14
- Mar 2022 10:30:32 -0700 (PDT)
+        bh=dW8o8MxEwRTcrsXdOuxwmkRI+eKo3H9OXkKdjk5Dnho=;
+        b=MeiN6QwFyiDGg26uApXwYu9tvOodPaoxMu8OGBKf1J2lJOJpFk4hj0RwD2Qdfb+hNa
+         qtF0aLXl1KZFst2Nt+9IuZ9tQwFzZHwVy2GkntA207+9lKS/02VjkszKMfYdhNH2GuKj
+         6g+zDoN0+fIOfZD66p0iILNKnHKPDeRA0jV5piusMCb+YyueamwtyS77SWe25Vo9N/1J
+         y5/VVzfT6RNPUmDmr9uLf3yFkLLqqxOyM+3Apw5lGvXrvjfAHTsdfB2uZmDT1hcOkzBQ
+         kz3ZrTIRKzOjh4BWTsPtPngfPxIZ1gYBs4bP1BWdgSZVADsh+JsTrDqaLzdLefY6XPk/
+         6zsg==
+X-Gm-Message-State: AOAM532qrGQnPyFTlYZMS6zowekXhETy2ej29E+pGMA6UjAu3SJU8gpT
+        1Zm2CuphhkinXMmXrklBXioV8zpQFlBv7fJik8trAGu5FTxsVQ==
+X-Google-Smtp-Source: ABdhPJwegnbo1NP3PunJ4hcD0+XYOy6bOqZQSjw8iuxI6cO/GGnic1P4MZ9nhCSfzuodYYyhQ9/COYovHrYXu+rp5nU=
+X-Received: by 2002:ad4:5c4d:0:b0:43e:a8e3:228a with SMTP id
+ a13-20020ad45c4d000000b0043ea8e3228amr10058814qva.3.1647282672487; Mon, 14
+ Mar 2022 11:31:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220125185305.2419774-1-luiz.dentz@gmail.com> <20220314135044.2040-1-mike@fireburn.co.uk>
-In-Reply-To: <20220314135044.2040-1-mike@fireburn.co.uk>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Mar 2022 10:30:22 -0700
-Message-ID: <CABBYNZJfVnjuo9JPtapiHrfoXUoDYRQ0eMmh3n6-hx--jb=hSQ@mail.gmail.com>
+References: <20220125185305.2419774-1-luiz.dentz@gmail.com>
+ <20220314135044.2040-1-mike@fireburn.co.uk> <CABBYNZJfVnjuo9JPtapiHrfoXUoDYRQ0eMmh3n6-hx--jb=hSQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJfVnjuo9JPtapiHrfoXUoDYRQ0eMmh3n6-hx--jb=hSQ@mail.gmail.com>
+From:   Mike Lothian <mike@fireburn.co.uk>
+Date:   Mon, 14 Mar 2022 18:31:01 +0000
+Message-ID: <CAHbf0-GUYcuj_rFdXAZ-VS-gY_mmbx2-05UdQ3W1VRxbFDkgwQ@mail.gmail.com>
 Subject: Re: [PATCH] Bluetooth: hci_event: Fix HCI_EV_VENDOR max_len
-To:     Mike Lothian <mike@fireburn.co.uk>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mike,
+On Mon, 14 Mar 2022 at 17:30, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+>
+> We fixed this a while back:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/net/bluetooth/hci_event.c?id=314d8cd2787418c5ac6b02035c344644f47b292b
+>
+> --
+> Luiz Augusto von Dentz
 
-On Mon, Mar 14, 2022 at 6:50 AM Mike Lothian <mike@fireburn.co.uk> wrote:
->
-> Hi
->
-> I've only just noticed this patch solves my issue
->
-> https://lore.kernel.org/netdev/20220125144639.2226-1-mike@fireburn.co.uk/
->
-> Can it be added to stable too?
->
-> My patch can then be ignored:
->
-> https://patchwork.kernel.org/project/bluetooth/patch/20220312164550.1810665-1-mike@fireburn.co.uk/
->
-> Thanks
->
-> Mike
+Yes, and it looks like that commit is queued for kernel 5.18. I was
+hoping you could get it added into 5.17 where I'm seeing spurious
+messages during boot, before it's released
 
-We fixed this a while back:
+Thanks
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/net/bluetooth/hci_event.c?id=314d8cd2787418c5ac6b02035c344644f47b292b
-
--- 
-Luiz Augusto von Dentz
+Mike
