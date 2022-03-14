@@ -2,147 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D08C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DD93C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Mar 2022 15:30:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240118AbiCNP0X convert rfc822-to-8bit (ORCPT
+        id S241420AbiCNPbX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Mar 2022 11:26:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59640 "EHLO
+        Mon, 14 Mar 2022 11:31:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238922AbiCNP0W (ORCPT
+        with ESMTP id S233435AbiCNPbX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:26:22 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8C94217067
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:25:10 -0700 (PDT)
-Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D5AACCECC5;
-        Mon, 14 Mar 2022 16:25:09 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
+        Mon, 14 Mar 2022 11:31:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E65C1AF19
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 08:30:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 01FCA61243
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Mar 2022 15:30:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 59295C340EC;
+        Mon, 14 Mar 2022 15:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647271810;
+        bh=Y4M/wjx6qhvgG+4LqxzOFmAjUQ8KSsGP40KibZp7W4M=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=LOZ8Zz7i1Tw+wUrU3T90Zn3x0QUeNS0J89OH3/OqhA4j3fdZutubodbbJ18Gk56BV
+         iBfLYvlsuigzudaX40/cOabqw5xzzYzLeJGZy3ZbGUStxnPXrpkiYCqI1Og9djoQSe
+         qcoNzNGCBwBVqsEvB+RUn0yM31FZYac15mjXpSOHWtKNY2l+gP3tzAr7wegSY8706T
+         R4EQ4MkewUDVU9P3zZP3fuh6QLdXEWPpHl81rz3LxvOya81G0o9CkEFCio4oau3Ys6
+         DorYBivm41jMwWgtlyKevOd7sykduZhNNVpZqLbPHrpC2DZizoeY695BO/G4D6Xz3J
+         Ur5BZEz3+wViA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 38E17E6D3DE;
+        Mon, 14 Mar 2022 15:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Subject: Re: [PATCH] Bluetooth: Fix use after free in hci_send_acl
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220311211933.3285806-1-luiz.dentz@gmail.com>
-Date:   Mon, 14 Mar 2022 16:25:09 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4307603B-96C6-45FA-8CCF-B6626989E944@holtmann.org>
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164727181022.21893.9899108200506354783.git-patchwork-notify@kernel.org>
+Date:   Mon, 14 Mar 2022 15:30:10 +0000
 References: <20220311211933.3285806-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220311211933.3285806-1-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello:
 
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
+
+On Fri, 11 Mar 2022 13:19:33 -0800 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
 > This fixes the following trace caused by receiving
 > HCI_EV_DISCONN_PHY_LINK_COMPLETE which does call hci_conn_del without
 > first checking if conn->type is in fact AMP_LINK and in case it is
 > do properly cleanup upper layers with hci_disconn_cfm:
 > 
-> ==================================================================
->    BUG: KASAN: use-after-free in hci_send_acl+0xaba/0xc50
->    Read of size 8 at addr ffff88800e404818 by task bluetoothd/142
-> 
->    CPU: 0 PID: 142 Comm: bluetoothd Not tainted
->    5.17.0-rc5-00006-gda4022eeac1a #7
->    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
->    rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
->    Call Trace:
->     <TASK>
->     dump_stack_lvl+0x45/0x59
->     print_address_description.constprop.0+0x1f/0x150
->     kasan_report.cold+0x7f/0x11b
->     hci_send_acl+0xaba/0xc50
->     l2cap_do_send+0x23f/0x3d0
->     l2cap_chan_send+0xc06/0x2cc0
->     l2cap_sock_sendmsg+0x201/0x2b0
->     sock_sendmsg+0xdc/0x110
->     sock_write_iter+0x20f/0x370
->     do_iter_readv_writev+0x343/0x690
->     do_iter_write+0x132/0x640
->     vfs_writev+0x198/0x570
->     do_writev+0x202/0x280
->     do_syscall_64+0x38/0x90
->     entry_SYSCALL_64_after_hwframe+0x44/0xae
->    RSP: 002b:00007ffce8a099b8 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
->    Code: 0f 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3
->    0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 14 00 00 00 0f 05
->    <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 89 54 24 1c 48 89 74 24 10
->    RDX: 0000000000000001 RSI: 00007ffce8a099e0 RDI: 0000000000000015
->    RAX: ffffffffffffffda RBX: 00007ffce8a099e0 RCX: 00007f788fc3cf77
->    R10: 00007ffce8af7080 R11: 0000000000000246 R12: 000055e4ccf75580
->    RBP: 0000000000000015 R08: 0000000000000002 R09: 0000000000000001
->    </TASK>
->    R13: 000055e4ccf754a0 R14: 000055e4ccf75cd0 R15: 000055e4ccf4a6b0
-> 
->    Allocated by task 45:
->        kasan_save_stack+0x1e/0x40
->        __kasan_kmalloc+0x81/0xa0
->        hci_chan_create+0x9a/0x2f0
->        l2cap_conn_add.part.0+0x1a/0xdc0
->        l2cap_connect_cfm+0x236/0x1000
->        le_conn_complete_evt+0x15a7/0x1db0
->        hci_le_conn_complete_evt+0x226/0x2c0
->        hci_le_meta_evt+0x247/0x450
->        hci_event_packet+0x61b/0xe90
->        hci_rx_work+0x4d5/0xc50
->        process_one_work+0x8fb/0x15a0
->        worker_thread+0x576/0x1240
->        kthread+0x29d/0x340
->        ret_from_fork+0x1f/0x30
-> 
->    Freed by task 45:
->        kasan_save_stack+0x1e/0x40
->        kasan_set_track+0x21/0x30
->        kasan_set_free_info+0x20/0x30
->        __kasan_slab_free+0xfb/0x130
->        kfree+0xac/0x350
->        hci_conn_cleanup+0x101/0x6a0
->        hci_conn_del+0x27e/0x6c0
->        hci_disconn_phylink_complete_evt+0xe0/0x120
->        hci_event_packet+0x812/0xe90
->        hci_rx_work+0x4d5/0xc50
->        process_one_work+0x8fb/0x15a0
->        worker_thread+0x576/0x1240
->        kthread+0x29d/0x340
->        ret_from_fork+0x1f/0x30
-> 
->    The buggy address belongs to the object at ffff88800c0f0500
->    The buggy address is located 24 bytes inside of
->    which belongs to the cache kmalloc-128 of size 128
->    The buggy address belongs to the page:
->    128-byte region [ffff88800c0f0500, ffff88800c0f0580)
->    flags: 0x100000000000200(slab|node=0|zone=1)
->    page:00000000fe45cd86 refcount:1 mapcount:0
->    mapping:0000000000000000 index:0x0 pfn:0xc0f0
->    raw: 0000000000000000 0000000080100010 00000001ffffffff
->    0000000000000000
->    raw: 0100000000000200 ffffea00003a2c80 dead000000000004
->    ffff8880078418c0
->    page dumped because: kasan: bad access detected
->    ffff88800c0f0400: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
->    Memory state around the buggy address:
->> ffff88800c0f0500: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->    ffff88800c0f0480: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->    ffff88800c0f0580: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->                                ^
->    ==================================================================
->    ffff88800c0f0600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> 
-> Reported-by: Sönke Huster <soenke.huster@eknoes.de>
-> Tested-by: Sönke Huster <soenke.huster@eknoes.de>
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> [...]
 
-patch has been applied to bluetooth-next tree.
+Here is the summary with links:
+  - Bluetooth: Fix use after free in hci_send_acl
+    https://git.kernel.org/bluetooth/bluetooth-next/c/db0309dd3768
 
-Regards
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Marcel
 
