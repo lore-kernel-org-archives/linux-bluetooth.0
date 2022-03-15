@@ -2,126 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42370C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Mar 2022 18:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F393FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Mar 2022 18:50:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350937AbiCOSKF (ORCPT
+        id S244930AbiCOSv0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Mar 2022 14:10:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57026 "EHLO
+        Tue, 15 Mar 2022 14:51:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346008AbiCOSKE (ORCPT
+        with ESMTP id S231664AbiCOSvZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Mar 2022 14:10:04 -0400
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD9CB59A4D;
-        Tue, 15 Mar 2022 11:08:51 -0700 (PDT)
-X-UUID: 372c819213d64504b3eac5393916279e-20220316
-X-UUID: 372c819213d64504b3eac5393916279e-20220316
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1023954275; Wed, 16 Mar 2022 02:08:47 +0800
-Received: from mtkexhb02.mediatek.inc (172.21.101.103) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Wed, 16 Mar 2022 02:08:45 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb02.mediatek.inc
- (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 16 Mar
- 2022 02:08:45 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 16 Mar 2022 02:08:45 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <abhishekpandit@google.com>,
-        <michaelfsun@google.com>, <mcchou@chromium.org>,
-        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 1/5] Bluetooth: btmtksdio: Fix kernel oops in btmtksdio_interrupt
-Date:   Wed, 16 Mar 2022 02:08:44 +0800
-Message-ID: <1647367724-5486-1-git-send-email-sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <7b4627d5017be2c26ded9daf7fd297bed6614852.1647366404.git.objelf@gmail.com--annotate>
-References: <7b4627d5017be2c26ded9daf7fd297bed6614852.1647366404.git.objelf@gmail.com--annotate>
+        Tue, 15 Mar 2022 14:51:25 -0400
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC1556C3B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Mar 2022 11:50:12 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id w4so5288edc.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Mar 2022 11:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Euhy+u3ZvFRmOyJITc3F/l6IY1RO55ftFt7yfjZpi7Y=;
+        b=CeOURO41HT7gHWQ7A9UL0rcVtX6vK+nYh39avpy8ns7jU/k4BjiBSut0ZEMRAb7cOX
+         SAOfUFwFjpmvqmcuKgxU/EqWIKdam/7bVZMorkHMk3dJxXqeW7AyOayKwJzSIana98wT
+         A3oJWDRgYc9ikBuWp7QyNASt4AhhR724/D+IuRqOxIdgmDVVFIeWj92MjGB9ywDY/rTM
+         bMRUwy+8Jlqj0yTzoIQho8qKaN3zxb/Q8EhEx2H58EHBwojyXyKi6O4DO3iPk483e2o1
+         LPu55R7sprLc/WE7fkjF0B/bzB6VyI0groqb4r1WILO6U0L688PjCMe+WBbirdRyzysI
+         h5MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Euhy+u3ZvFRmOyJITc3F/l6IY1RO55ftFt7yfjZpi7Y=;
+        b=ZGrYsJW8KGqfIFD0JJ1GiLb63kAb0kQOIVtddJ9ERkX4vohq+LQECck/cnrPknB3ak
+         kw/HheiExo9ij+5ngkA5j1D5WtmMNllva0KebozbJiSaxg35++4b/qsvCVEO8FXwxycI
+         MCoVvqxceflwxMlKnhbvkSJVR6pvGlBZEdC9HJ76j2fYXAA/pbMNxTt7YV6km0qhc+2O
+         Owx4ljTihmTdNoWAFq47aKoJiv5Txw/0plaVx6+YemMqNYx1nbmT4OTvZLuCa336pASG
+         vxjJCDN0wK8R6SqUMfS+yzTcNS1tpbV5+WBX1jUzwwIlIG7wi8A8Qbu5xIkJBcJWyJcL
+         WaUw==
+X-Gm-Message-State: AOAM5309HBV24OJNsZ0q5V6tJwwkBqaYWSGWwXscyop53HfvXO+bSsnK
+        MyO8RbMSHrhzyk9Qw8Ip8wkhS7LfoSKPevKPaPgOYFyVHfo=
+X-Google-Smtp-Source: ABdhPJzjPYw5UrBX0KMfhUkkoXL71hQm8MqQVveyS4KcFXk3yko1C7PUvBIrDics5q16bAdi16IrShmchmWF2J9DJxg=
+X-Received: by 2002:a50:bac5:0:b0:416:4651:7782 with SMTP id
+ x63-20020a50bac5000000b0041646517782mr26018190ede.219.1647370210871; Tue, 15
+ Mar 2022 11:50:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+References: <20220315095129.15254-1-tangmeng@uniontech.com>
+In-Reply-To: <20220315095129.15254-1-tangmeng@uniontech.com>
+From:   Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Date:   Tue, 15 Mar 2022 19:49:59 +0100
+Message-ID: <CAFBinCBQzs6zY1p8E3gn9jhm8EhiH5YpZpzyBc0C5c6ziOpgFA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] Bluetooth: btrtl: btmrvl: Fix firmware filename
+ for rtl8723bs chipset
+To:     Meng Tang <tangmeng@uniontech.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hello,
 
-Hi Marcel,
+On Tue, Mar 15, 2022 at 10:51 AM Meng Tang <tangmeng@uniontech.com> wrote:
+>
+> Firmware for rtl8723bs chipset is as part of the linux-firmware
+> repository in filename rtl8723bs_config-OBDA8723.bin.
+>
+> This patch fixes mwifiex driver to load correct firmware file for
+> rtl8723bs.
+This raises some serious questions for me:
+- the subject states that this patch is for the btmrvl driver
+- mwifiex is for Marvell based chips which to my knowledge are not
+related to any Realtek chips, so mwifiex should never try to load
+Realtek firmware files
 
-Please ignore the series because I put a wrong version as the prefix
+[...]
+> @@ -88,7 +88,7 @@ static const struct id_table ic_id_table[] = {
+>           .config_needed = true,
+>           .has_rom_version = true,
+>           .fw_name  = "rtl_bt/rtl8723bs_fw.bin",
+> -         .cfg_name = "rtl_bt/rtl8723bs_config" },
+> +         .cfg_name = "rtl_bt/rtl8723bs_config-OBDA8723" },
+This change is incorrect, see btrtl_initialize():
+  if (btrtl_dev->ic_info->cfg_name) {
+    if (postfix) {
+       snprintf(cfg_name, sizeof(cfg_name), "%s-%s.bin",
+btrtl_dev->ic_info->cfg_name, postfix);
+     } else {
+       snprintf(cfg_name, sizeof(cfg_name), "%s.bin",
+btrtl_dev->ic_info->cfg_name);
 
-I will send the series later.
+This suffix (postfix) can be either OBDA8723, OBDA0623 or just be
+absent - see hci_h5.c (h5_acpi_match, h5_serdev_probe() which sets
+h5->id and h5_btrtl_setup() which uses h5->id).
 
-        Sean
+[...]
+> -MODULE_FIRMWARE("rtl_bt/rtl8723bs_config.bin");
+> +MODULE_FIRMWARE("rtl_bt/rtl8723bs_config-OBDA8723.bin");
+According to the driver code "rtl_bt/rtl8723bs_config.bin" is a valid
+value so I think it should not be removed.
+Adding "rtl_bt/rtl8723bs_config-OBDA8723.bin" is fine for me - if
+that's done then "rtl_bt/rtl8723bs_config-OBDA0623.bin" should be
+added as well.
 
->
->From: Yake Yang <yake.yang@mediatek.com>
->
->Fix the following kernel oops in btmtksdio_interrrupt
->
->[   14.339134]  btmtksdio_interrupt+0x28/0x54
->[   14.339139]  process_sdio_pending_irqs+0x68/0x1a0
->[   14.339144]  sdio_irq_work+0x40/0x70
->[   14.339154]  process_one_work+0x184/0x39c
->[   14.339160]  worker_thread+0x228/0x3e8
->[   14.339168]  kthread+0x148/0x3ac
->[   14.339176]  ret_from_fork+0x10/0x30
->
->That happened because hdev->power_on is already called before sdio_set_drvdata which btmtksdio_interrupt handler relies on is not properly set up.
->
->The details are shown as the below: hci_register_dev would run queue_work(hdev->req_workqueue, &hdev->power_on) as WQ_HIGHPRI workqueue_struct to complete the power-on sequeunce and thus hci_power_on may run before sdio_set_drvdata is done in btmtksdio_probe.
->
->The hci_dev_do_open in hci_power_on would initialize the device and enable the interrupt and thus it is possible that btmtksdio_interrupt is being called right before sdio_set_drvdata is filled out.
->
->When btmtksdio_interrupt is being called and sdio_set_drvdata is not filled , the kernel oops is going to happen because btmtksdio_interrupt access an uninitialized pointer.
->
->Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
->Reviewed-by: Mark Chen <markyawenchen@gmail.com>
->Co-developed-by: Sean Wang <sean.wang@mediatek.com>
->Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->Signed-off-by: Yake Yang <yake.yang@mediatek.com>
->---
-> drivers/bluetooth/btmtksdio.c | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c index df3f9d090529..9644069cecbb 100644
->--- a/drivers/bluetooth/btmtksdio.c
->+++ b/drivers/bluetooth/btmtksdio.c
->@@ -1281,6 +1281,8 @@ static int btmtksdio_probe(struct sdio_func *func,
->	hdev->manufacturer = 70;
->	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
->
->+	sdio_set_drvdata(func, bdev);
->+
->	err = hci_register_dev(hdev);
->	if (err < 0) {
->		dev_err(&func->dev, "Can't register HCI device\n"); @@ -1288,8 +1290,6 @@ static int btmtksdio_probe(struct sdio_func *func,
->		return err;
->	}
->
->-	sdio_set_drvdata(func, bdev);
->-
->	/* pm_runtime_enable would be done after the firmware is being
->	 * downloaded because the core layer probably already enables
->	 * runtime PM for this func such as the case host->caps &
->--
->2.25.1
->
->
+
+Best regards,
+Martin
