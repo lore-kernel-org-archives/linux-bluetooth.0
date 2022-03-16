@@ -2,116 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D500C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 14:42:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C68DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 15:07:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238129AbiCPOnW convert rfc822-to-8bit (ORCPT
+        id S1351502AbiCPPJC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Mar 2022 10:43:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49034 "EHLO
+        Wed, 16 Mar 2022 11:09:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbiCPOnV (ORCPT
+        with ESMTP id S1356949AbiCPPIx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Mar 2022 10:43:21 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D61D15F257;
-        Wed, 16 Mar 2022 07:42:05 -0700 (PDT)
-Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BDC18CECF7;
-        Wed, 16 Mar 2022 15:42:04 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH 2/2] Bluetooth: Send AdvMonitor Dev Found for all matched
- devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220312020707.2.Ie20f132ad5cb6bcd435d6c6e0fca8a9d858e83d4@changeid>
-Date:   Wed, 16 Mar 2022 15:42:04 +0100
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B4529896-AA8A-40F5-BC3D-A887E2C690E1@holtmann.org>
-References: <20220312020707.1.I2b7f789329979102339d7e0717522ba417b63109@changeid>
- <20220312020707.2.Ie20f132ad5cb6bcd435d6c6e0fca8a9d858e83d4@changeid>
-To:     Manish Mandlik <mmandlik@google.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        Wed, 16 Mar 2022 11:08:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754433C70A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 08:07:38 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EF395615E6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 15:07:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5ACEDC36AEF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 15:07:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647443257;
+        bh=KJORzPmDRP5LVMEpt0bJx8ZpHFiKzSBYQ9hsUTWm4S4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=HFwdqxz0m8Gea9qskgYxD1BSrcJM+T4Xfh+fiwhve9jQB54WimRQyU5SwyLj60zmF
+         u7J6TqLrVXlUKm2HBuIqh6E5QQ1kR5tZnSiPL7de1dlNxZF+CrN3zBZ4No+PSBXATi
+         ZgbpmMfmUECTVHP/9OpODxCf0/NxpjkbIJWMkxRh386qVRxb09yDYCTF7gVdOeYfTt
+         I/LWJY2zvKGLrVEqA2f+jMXPguBfez1jKqGEY+mj6mCM8AR07+BFpgb8+HJWYusZ6T
+         a2l2VwuvhTTB8zVYEBrPXsoO7FlXb5s5+oDThPTjuibcV38DnvFSqbTUVGBl5OfxO3
+         +kyJbO988VQxw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 4B617C05FD5; Wed, 16 Mar 2022 15:07:37 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Wed, 16 Mar 2022 15:07:36 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pieroavola@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215167-62941-kXwOHkfhCl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-> When an Advertisement Monitor is configured with SamplingPeriod 0xFF,
-> the controller reports only one adv report along with the MSFT Monitor
-> Device event.
-> 
-> When an advertiser matches multiple monitors, some controllers send one
-> adv report for each matched monitor; whereas, some controllers send just
-> one adv report for all matched monitors.
-> 
-> In such a case, report Adv Monitor Device Found event for each matched
-> monitor.
-> 
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
-> 
-> net/bluetooth/mgmt.c | 70 +++++++++++++++++++++++---------------------
-> 1 file changed, 37 insertions(+), 33 deletions(-)
+--- Comment #31 from Piero Avola (pieroavola@gmail.com) ---
+(In reply to Piero Avola from comment #30)
+> However modprobe -r btusb && modprobe btusb seems to make bluetooth worki=
+ng
+> again.
 
-patch has been applied to bluetooth-next tree.
+I have to take this back. After rebooting I repeatedly see the errors when
+trying this:
+> Bluetooth: hci0: Reading Intel version command failed (-110)
+> Bluetooth: hci0: command tx timeout
 
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index d59c70e9166f..e4da2318a2f6 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -9628,17 +9628,44 @@ void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
-> 		   NULL);
-> }
-> 
-> +static void mgmt_send_adv_monitor_device_found(struct hci_dev *hdev,
-> +					       struct sk_buff *skb,
-> +					       struct sock *skip_sk,
-> +					       u16 handle)
-> +{
-> +	struct sk_buff *advmon_skb;
-> +	size_t advmon_skb_len;
-> +	__le16 *monitor_handle;
-> +
-> +	if (!skb)
-> +		return;
-> +
-> +	advmon_skb_len = (sizeof(struct mgmt_ev_adv_monitor_device_found) -
-> +			  sizeof(struct mgmt_ev_device_found)) + skb->len;
-> +	advmon_skb = mgmt_alloc_skb(hdev, MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-> +				    advmon_skb_len);
-> +	if (!advmon_skb)
-> +		return;
-> +
-> +	/* ADV_MONITOR_DEVICE_FOUND is similar to DEVICE_FOUND event except
-> +	 * that it also has 'monitor_handle'. Make a copy of DEVICE_FOUND and
-> +	 * store monitor_handle of the matched monitor.
-> +	 */
-> +	monitor_handle = skb_put(advmon_skb, sizeof(*monitor_handle));
-> +	*monitor_handle = cpu_to_le16(handle);
-> +	skb_put_data(advmon_skb, skb->data, skb->len);
-> +
-> +	mgmt_event_skb(advmon_skb, skip_sk);
-> +}
-> +
+--=20
+You may reply to this email to add a comment.
 
-However, this is rather hackish code. It will blow up in our faces at some point and we will spent weeks to find the bug.
-
-I realized that you already got this pattern merged by Luiz and that is why I merged your patch. I would have not accepted this in the first place. Maybe you need to spent some development cycles and check how all DEVICE_FOUND events can be properly generalized.
-
-Regards
-
-Marcel
-
+You are receiving this mail because:
+You are the assignee for the bug.=
