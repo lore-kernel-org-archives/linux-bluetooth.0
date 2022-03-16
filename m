@@ -2,93 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9479C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 16:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA4AAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 23:15:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354638AbiCPQ4l (ORCPT
+        id S237284AbiCPXQv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Mar 2022 12:56:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56560 "EHLO
+        Wed, 16 Mar 2022 19:16:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235591AbiCPQ4j (ORCPT
+        with ESMTP id S236786AbiCPXQu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Mar 2022 12:56:39 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A4D4DF4D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 09:55:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6900EB81A73
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 16:55:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16B1AC340E9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Mar 2022 16:55:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647449723;
-        bh=KSinGKmVch2EcpJlxPBSsRyAw6mK+SARMnWblKms0cM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=cAJEXpR3syd9uQl1tQVtsRuuoCO2d6oOgG281c+g8hV9DhXuWI1Ki3kZ/7MSrdSMJ
-         8S3D7o6tFW/SgLiU636k5Y5CW25LdgYrdr7rBcE1t7oARfJ6Om83UiyTjATHaMzoyq
-         AGqNUfXV0qNqMfO7Dc1sF0D2djWv052FBMO5dmqN9uqaP6XB9juutEmPzbTBzHrJEp
-         ea2VkqXBwBC+CSP2VGqJtQ2wNg0dYPKvUOesIOw99+hSw+ujuJ79CTaYZ5j3Tsju8s
-         5lXm+cDmqRzXdaFGmPhfzzlTLZ/i6/uYhx7oY+qzYsyrU0+v1WAFaLvUeA5mKhBwdD
-         /LcJyWnYxeDZw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id EBC9FC05F98; Wed, 16 Mar 2022 16:55:22 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215681] Malicious advertising data showed in dmesg
-Date:   Wed, 16 Mar 2022 16:55:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: gnulux@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215681-62941-auOFyYIZ3R@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215681-62941@https.bugzilla.kernel.org/>
-References: <bug-215681-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 16 Mar 2022 19:16:50 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A59425D8;
+        Wed, 16 Mar 2022 16:15:31 -0700 (PDT)
+X-UUID: b529025c30664f37bbf8a1b431cb428a-20220317
+X-UUID: b529025c30664f37bbf8a1b431cb428a-20220317
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 188726484; Thu, 17 Mar 2022 07:15:26 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Thu, 17 Mar 2022 07:15:25 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 17 Mar
+ 2022 07:15:25 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 17 Mar 2022 07:15:25 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Eric.Liang@mediatek.com>, <Stella.Chang@mediatek.com>,
+        <Tom.Chou@mediatek.com>, <steve.lee@mediatek.com>,
+        <jsiuda@google.com>, <frankgor@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        "Yake Yang" <yake.yang@mediatek.com>
+Subject: [PATCH v5 1/5] Bluetooth: btmtksdio: Fix kernel oops in btmtksdio_interrupt
+Date:   Thu, 17 Mar 2022 07:15:19 +0800
+Message-ID: <d4be9c9c1ce2757bad4df19885d605e97a1ceec8.1647472087.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215681
+From: Yake Yang <yake.yang@mediatek.com>
 
---- Comment #2 from Olivier JUDITH (gnulux@gmail.com) ---
+Fix the following kernel oops in btmtksdio_interrrupt
 
+[   14.339134]  btmtksdio_interrupt+0x28/0x54
+[   14.339139]  process_sdio_pending_irqs+0x68/0x1a0
+[   14.339144]  sdio_irq_work+0x40/0x70
+[   14.339154]  process_one_work+0x184/0x39c
+[   14.339160]  worker_thread+0x228/0x3e8
+[   14.339168]  kthread+0x148/0x3ac
+[   14.339176]  ret_from_fork+0x10/0x30
 
-Hi,=20
+That happened because hdev->power_on is already called before
+sdio_set_drvdata which btmtksdio_interrupt handler relies on is not
+properly set up.
 
-Yes i compiled before and i can do it again.=20
-In the meanwhile i tried 5.15 and i've no Malicious messages displayed.
+The details are shown as the below: hci_register_dev would run
+queue_work(hdev->req_workqueue, &hdev->power_on) as WQ_HIGHPRI
+workqueue_struct to complete the power-on sequeunce and thus hci_power_on
+may run before sdio_set_drvdata is done in btmtksdio_probe.
 
-i'll we apply you suggestion
+The hci_dev_do_open in hci_power_on would initialize the device and enable
+the interrupt and thus it is possible that btmtksdio_interrupt is being
+called right before sdio_set_drvdata is filled out.
 
-The issue come from hci_le_adv_report_evt in hci_event.h. i noticed that th=
-is
-function is a bit different in 5.15.=20
+When btmtksdio_interrupt is being called and sdio_set_drvdata is not filled
+, the kernel oops is going to happen because btmtksdio_interrupt access an
+uninitialized pointer.
 
-i also understood that the change was to evict flow of messages but the real
-cause seems to be a packet size is exceeded. Does this mean that my adverti=
-sing
-is not correct ?
+Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
+Reviewed-by: Mark Chen <markyawenchen@gmail.com>
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Yake Yang <yake.yang@mediatek.com>
+---
+v4->v5: no change
+---
+ drivers/bluetooth/btmtksdio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index df3f9d090529..9644069cecbb 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -1281,6 +1281,8 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	hdev->manufacturer = 70;
+ 	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+ 
++	sdio_set_drvdata(func, bdev);
++
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0) {
+ 		dev_err(&func->dev, "Can't register HCI device\n");
+@@ -1288,8 +1290,6 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 		return err;
+ 	}
+ 
+-	sdio_set_drvdata(func, bdev);
+-
+ 	/* pm_runtime_enable would be done after the firmware is being
+ 	 * downloaded because the core layer probably already enables
+ 	 * runtime PM for this func such as the case host->caps &
+-- 
+2.25.1
 
-You are receiving this mail because:
-You are the assignee for the bug.=
