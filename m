@@ -2,35 +2,33 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C598C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 23:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E902C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Mar 2022 23:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237938AbiCPXQw (ORCPT
+        id S238785AbiCPXQz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Mar 2022 19:16:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
+        Wed, 16 Mar 2022 19:16:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237487AbiCPXQv (ORCPT
+        with ESMTP id S238062AbiCPXQy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Mar 2022 19:16:51 -0400
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61CC225EE;
-        Wed, 16 Mar 2022 16:15:32 -0700 (PDT)
-X-UUID: 61cb56c7f339402ebe29570440c97f2e-20220317
-X-UUID: 61cb56c7f339402ebe29570440c97f2e-20220317
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw01.mediatek.com
+        Wed, 16 Mar 2022 19:16:54 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24DD825EE;
+        Wed, 16 Mar 2022 16:15:37 -0700 (PDT)
+X-UUID: dff16f317e4545c683dccf4bdfded4e6-20220317
+X-UUID: dff16f317e4545c683dccf4bdfded4e6-20220317
+Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw02.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1643740617; Thu, 17 Mar 2022 07:15:28 +0800
-Received: from mtkexhb02.mediatek.inc (172.21.101.103) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Thu, 17 Mar 2022 07:15:27 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb02.mediatek.inc
- (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 17 Mar
- 2022 07:15:26 +0800
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 748204362; Thu, 17 Mar 2022 07:15:31 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Thu, 17 Mar 2022 07:15:30 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 17 Mar 2022 07:15:26 +0800
+ Transport; Thu, 17 Mar 2022 07:15:30 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
@@ -48,9 +46,9 @@ CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
         <linux-mediatek@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         "Yake Yang" <yake.yang@mediatek.com>
-Subject: [PATCH v5 2/5] Bluetooth: mt7921s: Set HCI_QUIRK_VALID_LE_STATES
-Date:   Thu, 17 Mar 2022 07:15:20 +0800
-Message-ID: <5c88405b5e37cc16e99ed6221128491ff8364fc6.1647472087.git.objelf@gmail.com>
+Subject: [PATCH v5 5/5] Bluetooth: mt7921s: Add WBS support
+Date:   Thu, 17 Mar 2022 07:15:23 +0800
+Message-ID: <7d595b67ff646deaf92ca47716d7a0a9c5a2a4c1.1647472087.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <d4be9c9c1ce2757bad4df19885d605e97a1ceec8.1647472087.git.objelf@gmail.com>
 References: <d4be9c9c1ce2757bad4df19885d605e97a1ceec8.1647472087.git.objelf@gmail.com>
@@ -63,8 +61,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yake Yang <yake.yang@mediatek.com>
 
-The patch set HCI_QUIRK_VALID_LE_STATES to be consistent with the btusb for
-MT7921 and is required for the likes of experimental LE simultaneous roles.
+It is time to add wide band speech (WBS) support.
 
 Reviewed-by: Mark Chen <markyawenchen@gmail.com>
 Co-developed-by: Sean Wang <sean.wang@mediatek.com>
@@ -77,19 +74,19 @@ v4->v5: no change
  1 file changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 9644069cecbb..034e55278c56 100644
+index c28eb9fc6176..f3dc5881fff7 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -1070,6 +1070,9 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 			}
+@@ -1123,6 +1123,9 @@ static int btmtksdio_setup(struct hci_dev *hdev)
+ 			return err;
  		}
  
-+		/* Valid LE States quirk for MediaTek 7921 */
-+		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		/* Enable WBS with mSBC codec */
++		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
 +
- 		break;
- 	case 0x7663:
- 	case 0x7668:
+ 		/* Enable GPIO reset mechanism */
+ 		if (bdev->reset) {
+ 			err = btmtksdio_reset_setting(hdev);
 -- 
 2.25.1
 
