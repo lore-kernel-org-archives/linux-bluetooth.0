@@ -2,118 +2,134 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F026C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 04:31:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D48C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 07:38:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344410AbiCUEdQ (ORCPT
+        id S244180AbiCUHjs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Mar 2022 00:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
+        Mon, 21 Mar 2022 03:39:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344426AbiCUEdL (ORCPT
+        with ESMTP id S231861AbiCUHjr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Mar 2022 00:33:11 -0400
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E32F31DEB
-        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Mar 2022 21:31:36 -0700 (PDT)
-Received: from [192.168.0.3] (ip5f5aef4e.dynamic.kabel-deutschland.de [95.90.239.78])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 87CB261E6478B;
-        Mon, 21 Mar 2022 05:31:33 +0100 (CET)
-Message-ID: <c33b9cf1-7805-b318-c246-fba441d20ffc@molgen.mpg.de>
-Date:   Mon, 21 Mar 2022 05:31:33 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [BlueZ PATCH 5/9] monitor: Display AdvMonitor DeviceFound/Lost
- events
-Content-Language: en-US
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     marcel@holtmann.org, luiz.dentz@gmail.com,
+        Mon, 21 Mar 2022 03:39:47 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45628DAD;
+        Mon, 21 Mar 2022 00:38:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1647848303; x=1679384303;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cpzD0G7WlQb79BAELGk4nC4vtuBs/ikyOE9n2dBg9kk=;
+  b=lROo1YEysYVD3MraDwexTTJ0ra5QLQpbXT9LhrHuwaDHuhfWJl/Kxvd1
+   fbEesNzBt6zS304KKBAW/Wp/5b9Sn7MA+w8QrLxU5/bu9zD/o3A/Pc22u
+   LZVdlvmIAI0/mCRG0cw0tfenhUCMYl3UYIeQN4NUt/jYyuHd5GGzQmeKZ
+   4fn41c3cqP5KyUGFYyv8w+MWFZhbn/+esY07Qk5z5k/6oW1PvIurSzrjJ
+   n5YKZBkXHDKctMd9uWdK2cY535MCcezh/uvrooI1NpRbJ15XB8WmB4EW8
+   4UpIPtx0SkxtUyTIRSzun0Vp34UDLnNWmk5os35WVuqyt922ZLjYKfAEM
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10292"; a="320694522"
+X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
+   d="scan'208";a="320694522"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 00:38:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
+   d="scan'208";a="648466434"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 21 Mar 2022 00:38:20 -0700
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nWCcN-000Hbn-NW; Mon, 21 Mar 2022 07:38:19 +0000
+Date:   Mon, 21 Mar 2022 15:38:09 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     kbuild-all@lists.01.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         linux-bluetooth@vger.kernel.org,
-        Miao-chen Chou <mcchou@chromium.org>
-References: <20220320183445.BlueZ.1.I21d5ed25e9a0a2427bddbd6d4ec04d80d735fc53@changeid>
- <20220320183445.BlueZ.5.I53ad1b66c8f8a65e5950354cd20417d812ad9c72@changeid>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20220320183445.BlueZ.5.I53ad1b66c8f8a65e5950354cd20417d812ad9c72@changeid>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
+        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] Bluetooth: btusb: Add Intel devcoredump support
+Message-ID: <202203211500.z1bvoo6A-lkp@intel.com>
+References: <20220320183225.2.I61857ea92be43418b8ce16839f79a4704cc89fa6@changeid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220320183225.2.I61857ea92be43418b8ce16839f79a4704cc89fa6@changeid>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Manish,
+Hi Manish,
+
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master v5.17 next-20220318]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220321-093553
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+config: parisc-randconfig-r023-20220320 (https://download.01.org/0day-ci/archive/20220321/202203211500.z1bvoo6A-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/677f482cb7027ab030842015cfd6c188568df39f
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220321-093553
+        git checkout 677f482cb7027ab030842015cfd6c188568df39f
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=parisc SHELL=/bin/bash drivers/bluetooth/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   drivers/bluetooth/btintel.c: In function 'btintel_register_devcoredump_support':
+>> drivers/bluetooth/btintel.c:1447:9: warning: 'strncpy' specified bound 16 equals destination size [-Wstringop-truncation]
+    1447 |         strncpy(driver_name, driver, DRIVER_NAME_LEN);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Thank you for the patch.
+vim +/strncpy +1447 drivers/bluetooth/btintel.c
 
-Am 21.03.22 um 02:36 schrieb Manish Mandlik:
-> Display information about MGMT_EV_ADV_MONITOR_DEVICE_FOUND and
-> MGMT_EV_ADV_MONITOR_DEVICE_LOST events in the btmon output.
+  1429	
+  1430	int btintel_register_devcoredump_support(struct hci_dev *hdev,
+  1431						 const char *driver)
+  1432	{
+  1433		struct intel_debug_features features;
+  1434		int err;
+  1435	
+  1436		err = btintel_read_debug_features(hdev, &features);
+  1437		if (err) {
+  1438			bt_dev_info(hdev, "Error reading debug features");
+  1439			return err;
+  1440		}
+  1441	
+  1442		if (!(features.page1[0] & 0x3f)) {
+  1443			bt_dev_info(hdev, "Telemetry exception format not supported");
+  1444			return -EOPNOTSUPP;
+  1445		}
+  1446	
+> 1447		strncpy(driver_name, driver, DRIVER_NAME_LEN);
+  1448		hci_devcoredump_register(hdev, btintel_dmp_hdr, NULL);
+  1449	
+  1450		return err;
+  1451	}
+  1452	EXPORT_SYMBOL_GPL(btintel_register_devcoredump_support);
+  1453	
 
-If you should reroll this patch, could you please add example messages 
-to the commit message?
-
-
-Kind regards,
-
-Paul
-
-
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
-> 
->   monitor/packet.c | 29 +++++++++++++++++++++++++++++
->   1 file changed, 29 insertions(+)
-> 
-> diff --git a/monitor/packet.c b/monitor/packet.c
-> index b7431b57d..6f615f7ba 100644
-> --- a/monitor/packet.c
-> +++ b/monitor/packet.c
-> @@ -14103,6 +14103,31 @@ static void mgmt_device_found_evt(const void *data, uint16_t size)
->   	print_eir(data + 14, size - 14, false);
->   }
->   
-> +static void mgmt_adv_monitor_device_found_evt(const void *data, uint16_t size)
-> +{
-> +	uint16_t handle = get_le16(data);
-> +	uint8_t address_type = get_u8(data + 8);
-> +	int8_t rssi = get_s8(data + 9);
-> +	uint32_t flags = get_le32(data + 10);
-> +	uint16_t data_len = get_le16(data + 14);
-> +
-> +	print_field("Handle: %u", handle);
-> +	mgmt_print_address(data + 2, address_type);
-> +	print_rssi(rssi);
-> +	mgmt_print_device_flags(flags);
-> +	print_field("Data length: %u", data_len);
-> +	print_eir(data + 16, size - 16, false);
-> +}
-> +
-> +static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
-> +{
-> +	uint16_t handle = get_le16(data);
-> +	uint8_t address_type = get_u8(data + 8);
-> +
-> +	print_field("Handle: %u", handle);
-> +	mgmt_print_address(data + 2, address_type);
-> +}
-> +
->   static void mgmt_discovering_evt(const void *data, uint16_t size)
->   {
->   	uint8_t type = get_u8(data);
-> @@ -14414,6 +14439,10 @@ static const struct mgmt_data mgmt_event_table[] = {
->   			mgmt_controller_suspend_evt, 1, true },
->   	{ 0x002e, "Controller Resumed",
->   			mgmt_controller_resume_evt, 8, true },
-> +	{ 0x002f, "Adv Monitor Device Found",
-> +			mgmt_adv_monitor_device_found_evt, 16, false },
-> +	{ 0x0030, "Adv Monitor Device Lost",
-> +			mgmt_adv_monitor_device_lost_evt, 9, true },
->   	{ }
->   };
->   
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
