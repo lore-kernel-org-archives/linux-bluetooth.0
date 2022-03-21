@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39A84C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E8CC433FE
 	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 20:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232282AbiCUU5B (ORCPT
+        id S233055AbiCUU5D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Mar 2022 16:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41918 "EHLO
+        Mon, 21 Mar 2022 16:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231426AbiCUU5A (ORCPT
+        with ESMTP id S229880AbiCUU5B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Mar 2022 16:57:00 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A190196D72
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 13:55:34 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id e22so18136651ioe.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 13:55:34 -0700 (PDT)
+        Mon, 21 Mar 2022 16:57:01 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AB7E197522
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 13:55:35 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id z7so18215756iom.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 13:55:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=GFc9sXDCUSGMKzcmjKZL85zsIJOnPsCDkSf/Z7ucJ1E=;
-        b=gTRRSStniyQcgVXwW2SrDKgzIFlo1sWPm0onKHVqobgC5rzMpoO81t7K/pmrzoUJSW
-         W4jh1fZysxFN6PZO94k5RVKHIsR/T9MId+JomHjA/Ot/17G9hFDbtF4kKIHXtGITO8YP
-         s5MsFMdlPiZRg4oP+JmKnH/9uCPD2b30/YGBeBqS3qNIyfnpJbcggyOk5Hjlbkf51SS4
-         p85RHTINQ/0fxctsniNXnRmI044KdV0xpx4MoGnqGDsbRRtHFe057IBCkavfsT0XHF8E
-         MGgINcnlTOCEhKIEoVGfxQFqM37/5FOEBJ+XKuj6hs4yxnLBzOZkSyugAEm/qgA18rXY
-         7cYA==
+        bh=A5mU7ZW/EoX09OtoTGJHt6b6/ozCCsZy6iGJ/CCN76Y=;
+        b=kluyaFcgm/qU5YUbCiySwx60XK+QQTEDGo0EuwNSinsgKFRw7kTE+BY1qVqfC+fgZG
+         A23yC1T8Q/yyCirPyllJM34r6QP9tMwm/BKnACrr+mW+n3SxiiSfRhXDdZ2uO+1MD5rq
+         NTxgpMOmhmLkbGCqUW8piTKzESdstaRO4M7Ae/NZtpHLbQyt1SjrKS2HDq8T1+8KqfkI
+         e/60xx+2ALmMk16z12GJGFWDKjSORsI6qPAO0XRf4WYcObA9Ohoxr62GDV0gHMzPtrur
+         QnELBMnjNdmzzFcRf2PxqelTwpm78fbIEKrQEPITWBHZBHKRnD4NvWnMh1/9U2fN0z+O
+         eB4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=GFc9sXDCUSGMKzcmjKZL85zsIJOnPsCDkSf/Z7ucJ1E=;
-        b=DoSaYt0lSmsEX8UWE8aaW6E4yb9CGV+mmzzmtyaeGYD+HPKrYGGH04q6/aDCbiq7JR
-         FwlefP6tqjE2e8CZaarT8fIvytetekGNgTiXVzIC9yQYS3iCCyUW0kvpGjB2MfhdqMgk
-         siOtRHWQMLIcXJAdPynYPMtZtePYUOozqYOvgRm/UUQteAo5cKoJFSuHLnvCLgEsunkO
-         htIu+Redsz82xQjV2QbRQIIyR2W7EOlt7DvM+nSdJMSDSLrSV3b2z/WIErYz+S0gkJyA
-         zM0PyCTiodxLQ88ERTdu2TQRQQiSeasLx+HIrOaIGeBUlMqeEzohWiTwOoUuDB5U896K
-         zFMw==
-X-Gm-Message-State: AOAM530p27iYLDQqJbFZ2VYhHGG3tQgklu+PMPSCFTvAGfWOgESj01qU
-        tQg0j3tEmFPfOYsHc9JqSaGN+3DcMvw=
-X-Google-Smtp-Source: ABdhPJx59G0c0L0X33kLrT6KmAoQSHog1rdX6BfoVIls2o8REEnTNmUfHhH1iVNOkoqLGDTYJ+pKDg==
-X-Received: by 2002:a05:6602:14cb:b0:646:4868:5fd with SMTP id b11-20020a05660214cb00b00646486805fdmr10665834iow.31.1647896133517;
-        Mon, 21 Mar 2022 13:55:33 -0700 (PDT)
+        bh=A5mU7ZW/EoX09OtoTGJHt6b6/ozCCsZy6iGJ/CCN76Y=;
+        b=v4P0dWq6fdzKB18Go9eKHN+Tfjcm6Cui7hZXJH2mkFXNby9ag62j56oIqLDpFKdhYA
+         eZjQblIjFBjcTWuUS84ijXBeVbXcRidkiIYRewzfWBIEs64Cz54XfFRIWMtuefkIvlEy
+         VEXeNvPXNstiQwB7tubXzvt7skHfrOI/FU/eo0fOKb+98QgBoby5kejGnPhqvWXz3z/6
+         C82fb3JsO6nhLzPN+PElxp67ra25mx6Ys1Eca6XxVajritWpsLW2ec7XFEdttvKcw2F9
+         fQx/uOcuyBc32imwNpiT2m+O9lVN0fZTjxlEjz5Q8XZIGXa7cwQw2pIMreo/StljQFq+
+         cQ0Q==
+X-Gm-Message-State: AOAM532ee+RhxqUa6hov5PRGdIeVLs+ZMdBbLnnZ+NFPfTyAu9C3AUee
+        Xpr+1UqBWvFdr8B+ufJwFhJTO/SvhSM=
+X-Google-Smtp-Source: ABdhPJz2lqFLAeklW5sx87SpKy6K9X93Oh8qabnp2FfCGB6q33gBr+CYvfLC7bkUdicIifD8N1HRWA==
+X-Received: by 2002:a5d:9651:0:b0:641:6371:fb77 with SMTP id d17-20020a5d9651000000b006416371fb77mr10796985ios.99.1647896134436;
+        Mon, 21 Mar 2022 13:55:34 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
         by smtp.gmail.com with ESMTPSA id q4-20020a056e0215c400b002c5fdff3087sm10962223ilu.29.2022.03.21.13.55.33
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Mar 2022 13:55:33 -0700 (PDT)
+        Mon, 21 Mar 2022 13:55:34 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/5] gatt-server: Add DBG macro
-Date:   Mon, 21 Mar 2022 13:55:28 -0700
-Message-Id: <20220321205529.2469387-4-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/5] att: Rename att_debug and att_verbose to DBG and VERBOSE
+Date:   Mon, 21 Mar 2022 13:55:29 -0700
+Message-Id: <20220321205529.2469387-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220321205529.2469387-1-luiz.dentz@gmail.com>
 References: <20220321205529.2469387-1-luiz.dentz@gmail.com>
@@ -66,178 +66,174 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds gatt_log wrapper for util_debug and DBG so file and function
-names are printed with the logs.
+att_debug and att_verbose are macros which are more common to be
+used as uppercase, this also change them to use DBG like other parts of
+the code.
 ---
- src/shared/gatt-server.c | 64 ++++++++++++++++++++--------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ src/shared/att.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 776e5ce2b..2adb4afbf 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -41,6 +41,9 @@
- 
- #define NFY_MULT_TIMEOUT 10
- 
-+#define DBG(_server, _format, arg...) \
-+	gatt_log(_server, "%s:%s() " _format, __FILE__, __func__, ## arg)
-+
- struct async_read_op {
- 	struct bt_att_chan *chan;
- 	struct bt_gatt_server *server;
-@@ -233,6 +236,18 @@ static bool encode_read_by_grp_type_rsp(struct gatt_db *db, struct queue *q,
- 	return true;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index 7344b0c46..f7bef08bc 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -307,11 +307,11 @@ static void att_log(struct bt_att *att, uint8_t level, const char *format,
+ 	va_end(va);
  }
  
-+static void gatt_log(struct bt_gatt_server *server, const char *format, ...)
-+{
-+	va_list ap;
-+
-+	if (!server || !format || !server->debug_callback)
-+		return;
-+
-+	va_start(ap, format);
-+	util_debug_va(server->debug_callback, server->debug_data, format, ap);
-+	va_end(ap);
-+}
-+
- static void read_by_grp_type_cb(struct bt_att_chan *chan, uint8_t opcode,
- 					const void *pdu, uint16_t length,
- 					void *user_data)
-@@ -259,9 +274,7 @@ static void read_by_grp_type_cb(struct bt_att_chan *chan, uint8_t opcode,
- 	end = get_le16(pdu + 2);
- 	get_uuid_le(pdu + 4, length - 4, &type);
+-#define att_debug(_att, _format, _arg...) \
++#define DBG(_att, _format, _arg...) \
+ 	att_log(_att, BT_ATT_DEBUG, "%s:%s() " _format, __FILE__, __func__,\
+ 		## _arg)
  
--	util_debug(server->debug_callback, server->debug_data,
--				"Read By Grp Type - start: 0x%04x end: 0x%04x",
--				start, end);
-+	DBG(server, "Read By Grp Type - start: 0x%04x end: 0x%04x", start, end);
+-#define att_verbose(_att, _format, _arg...) \
++#define VERBOSE(_att, _format, _arg...) \
+ 	att_log(_att, BT_ATT_DEBUG_VERBOSE, "%s:%s() " _format, __FILE__, \
+ 		__func__, ## _arg)
  
- 	if (!start || !end) {
- 		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-@@ -483,9 +496,7 @@ static void read_by_type_cb(struct bt_att_chan *chan, uint8_t opcode,
- 	end = get_le16(pdu + 2);
- 	get_uuid_le(pdu + 4, length - 4, &type);
+@@ -359,7 +359,7 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
+ 				sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
+ 		return true;
  
--	util_debug(server->debug_callback, server->debug_data,
--				"Read By Type - start: 0x%04x end: 0x%04x",
--				start, end);
-+	DBG(server, "Read By Type - start: 0x%04x end: 0x%04x", start, end);
+-	att_debug(att, "ATT unable to generate signature");
++	DBG(att, "ATT unable to generate signature");
  
- 	if (!start || !end) {
- 		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-@@ -605,9 +616,7 @@ static void find_info_cb(struct bt_att_chan *chan, uint8_t opcode,
- 	start = get_le16(pdu);
- 	end = get_le16(pdu + 2);
+ fail:
+ 	free(op->pdu);
+@@ -488,7 +488,7 @@ static bool timeout_cb(void *user_data)
+ 	if (!op)
+ 		return false;
  
--	util_debug(server->debug_callback, server->debug_data,
--					"Find Info - start: 0x%04x end: 0x%04x",
--					start, end);
-+	DBG(server, "Find Info - start: 0x%04x end: 0x%04x", start, end);
+-	att_debug(att, "(chan %p) Operation timed out: 0x%02x", chan,
++	DBG(att, "(chan %p) Operation timed out: 0x%02x", chan,
+ 						op->opcode);
  
- 	if (!start || !end) {
- 		ecode = BT_ATT_ERROR_INVALID_HANDLE;
-@@ -708,9 +717,10 @@ static void find_by_type_val_cb(struct bt_att_chan *chan, uint8_t opcode,
- 	end = get_le16(pdu + 2);
- 	uuid16 = get_le16(pdu + 4);
+ 	if (att->timeout_callback)
+@@ -524,11 +524,11 @@ static ssize_t bt_att_chan_write(struct bt_att_chan *chan, uint8_t opcode,
+ 	iov.iov_base = (void *) pdu;
+ 	iov.iov_len = len;
  
--	util_debug(server->debug_callback, server->debug_data,
--			"Find By Type Value - start: 0x%04x end: 0x%04x uuid: 0x%04x",
--			start, end, uuid16);
-+	DBG(server,
-+	    "Find By Type Value - start: 0x%04x end: 0x%04x uuid: 0x%04x",
-+	    start, end, uuid16);
-+
- 	ehandle = start;
- 	if (start > end) {
- 		data.ecode = BT_ATT_ERROR_INVALID_HANDLE;
-@@ -756,8 +766,7 @@ static void write_complete_cb(struct gatt_db_attribute *attr, int err,
+-	att_verbose(att, "(chan %p) ATT op 0x%02x", chan, opcode);
++	VERBOSE(att, "(chan %p) ATT op 0x%02x", chan, opcode);
+ 
+ 	ret = io_send(chan->io, &iov, 1);
+ 	if (ret < 0) {
+-		att_debug(att, "(chan %p) write failed: %s", chan,
++		DBG(att, "(chan %p) write failed: %s", chan,
+ 						strerror(-ret));
+ 		return ret;
+ 	}
+@@ -661,12 +661,12 @@ static bool disconnect_cb(struct io *io, void *user_data)
+ 	len = sizeof(err);
+ 
+ 	if (getsockopt(chan->fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
+-		att_debug(att, "(chan %p) Failed to obtain disconnect "
++		DBG(att, "(chan %p) Failed to obtain disconnect "
+ 				"error: %s", chan, strerror(errno));
+ 		err = 0;
+ 	}
+ 
+-	att_debug(att, "Channel %p disconnected: %s", chan, strerror(err));
++	DBG(att, "Channel %p disconnected: %s", chan, strerror(err));
+ 
+ 	/* Dettach channel */
+ 	queue_remove(att->chans, chan);
+@@ -795,7 +795,7 @@ static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
+ 		op->timeout_id = 0;
+ 	}
+ 
+-	att_debug(att, "(chan %p) Retrying operation %p", chan, op);
++	DBG(att, "(chan %p) Retrying operation %p", chan, op);
+ 
+ 	chan->pending_req = NULL;
+ 
+@@ -818,7 +818,7 @@ static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
+ 	 * the bearer.
+ 	 */
+ 	if (!op) {
+-		att_debug(att, "(chan %p) Received unexpected ATT response",
++		DBG(att, "(chan %p) Received unexpected ATT response",
+ 								chan);
+ 		io_shutdown(chan->io);
  		return;
- 	}
+@@ -850,7 +850,7 @@ static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
+ 	goto done;
  
--	util_debug(server->debug_callback, server->debug_data,
--						"Write Complete: err %d", err);
-+	DBG(server, "Write Complete: err %d", err);
+ fail:
+-	att_debug(att, "(chan %p) Failed to handle response PDU; opcode: "
++	DBG(att, "(chan %p) Failed to handle response PDU; opcode: "
+ 			"0x%02x", chan, opcode);
  
- 	handle = gatt_db_attribute_get_handle(attr);
+ 	rsp_opcode = BT_ATT_OP_ERROR_RSP;
+@@ -875,7 +875,7 @@ static void handle_conf(struct bt_att_chan *chan, uint8_t *pdu, ssize_t pdu_len)
+ 	 * invalid.
+ 	 */
+ 	if (!op || pdu_len) {
+-		att_debug(att, "(chan %p) Received unexpected/invalid ATT "
++		DBG(att, "(chan %p) Received unexpected/invalid ATT "
+ 				"confirmation", chan);
+ 		io_shutdown(chan->io);
+ 		return;
+@@ -949,7 +949,7 @@ static bool handle_signed(struct bt_att *att, uint8_t *pdu, ssize_t pdu_len)
+ 	return true;
  
-@@ -818,10 +827,8 @@ static void write_cb(struct bt_att_chan *chan, uint8_t opcode, const void *pdu,
- 		goto error;
- 	}
+ fail:
+-	att_debug(att, "ATT failed to verify signature: 0x%02x", opcode);
++	DBG(att, "ATT failed to verify signature: 0x%02x", opcode);
  
--	util_debug(server->debug_callback, server->debug_data,
--				"Write %s - handle: 0x%04x",
--				(opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd",
--				handle);
-+	DBG(server, "Write %s - handle: 0x%04x",
-+		(opcode == BT_ATT_OP_WRITE_REQ) ? "Req" : "Cmd", handle);
- 
- 	ecode = check_length(length, 0);
- 	if (ecode)
-@@ -885,8 +892,7 @@ static void read_complete_cb(struct gatt_db_attribute *attr, int err,
- 	uint16_t mtu;
- 	uint16_t handle;
- 
--	util_debug(server->debug_callback, server->debug_data,
--				"Read Complete: err %d", err);
-+	DBG(server, "Read Complete: err %d", err);
- 
- 	mtu = bt_att_get_mtu(server->att);
- 	handle = gatt_db_attribute_get_handle(attr);
-@@ -922,10 +928,8 @@ static void handle_read_req(struct bt_att_chan *chan,
- 		goto error;
- 	}
- 
--	util_debug(server->debug_callback, server->debug_data,
--			"Read %sReq - handle: 0x%04x",
--			opcode == BT_ATT_OP_READ_BLOB_REQ ? "Blob " : "",
--			handle);
-+	DBG(server, "Read %sReq - handle: 0x%04x",
-+		opcode == BT_ATT_OP_READ_BLOB_REQ ? "Blob " : "", handle);
- 
- 	ecode = check_permissions(server, attr, BT_ATT_PERM_READ_MASK);
- 	if (ecode)
-@@ -1125,8 +1129,7 @@ static void read_multiple_cb(struct bt_att_chan *chan, uint8_t opcode,
- 
- 	handle = data->handles[0];
- 
--	util_debug(server->debug_callback, server->debug_data,
--			"%s Req - %zu handles, 1st: 0x%04x",
-+	DBG(server, "%s Req - %zu handles, 1st: 0x%04x",
- 			data->opcode == BT_ATT_OP_READ_MULT_REQ ?
- 			"Read Multiple" : "Read Multiple Variable Length",
- 			data->num_handles, handle);
-@@ -1312,8 +1315,7 @@ static void prep_write_cb(struct bt_att_chan *chan, uint8_t opcode,
- 		goto error;
- 	}
- 
--	util_debug(server->debug_callback, server->debug_data,
--				"Prep Write Req - handle: 0x%04x", handle);
-+	DBG(server, "Prep Write Req - handle: 0x%04x", handle);
- 
- 	ecode = check_length(length, offset);
- 	if (ecode)
-@@ -1433,8 +1435,7 @@ static void exec_write_cb(struct bt_att_chan *chan, uint8_t opcode,
- 
- 	flags = ((uint8_t *) pdu)[0];
- 
--	util_debug(server->debug_callback, server->debug_data,
--				"Exec Write Req - flags: 0x%02x", flags);
-+	DBG(server, "Exec Write Req - flags: 0x%02x", flags);
- 
- 	if (flags == 0x00)
- 		write = false;
-@@ -1505,8 +1506,7 @@ static void exchange_mtu_cb(struct bt_att_chan *chan, uint8_t opcode,
- 	server->mtu = final_mtu;
- 	bt_att_set_mtu(server->att, final_mtu);
- 
--	util_debug(server->debug_callback, server->debug_data,
--			"MTU exchange complete, with MTU: %u", final_mtu);
-+	DBG(server, "MTU exchange complete, with MTU: %u", final_mtu);
+ 	return false;
  }
+@@ -1032,7 +1032,7 @@ static bool can_read_data(struct io *io, void *user_data)
+ 	if (bytes_read < 0)
+ 		return false;
  
- static bool gatt_server_register_att_handlers(struct bt_gatt_server *server)
+-	att_verbose(att, "(chan %p) ATT received: %zd", chan, bytes_read);
++	VERBOSE(att, "(chan %p) ATT received: %zd", chan, bytes_read);
+ 
+ 	att_hexdump(att, '>', chan->buf, bytes_read);
+ 
+@@ -1047,12 +1047,12 @@ static bool can_read_data(struct io *io, void *user_data)
+ 	/* Act on the received PDU based on the opcode type */
+ 	switch (get_op_type(opcode)) {
+ 	case ATT_OP_TYPE_RSP:
+-		att_verbose(att, "(chan %p) ATT response received: 0x%02x",
++		VERBOSE(att, "(chan %p) ATT response received: 0x%02x",
+ 				chan, opcode);
+ 		handle_rsp(chan, opcode, pdu + 1, bytes_read - 1);
+ 		break;
+ 	case ATT_OP_TYPE_CONF:
+-		att_verbose(att, "(chan %p) ATT confirmation received: 0x%02x",
++		VERBOSE(att, "(chan %p) ATT confirmation received: 0x%02x",
+ 				chan, opcode);
+ 		handle_conf(chan, pdu + 1, bytes_read - 1);
+ 		break;
+@@ -1063,7 +1063,7 @@ static bool can_read_data(struct io *io, void *user_data)
+ 		 * promptly notify the upper layer via disconnect handlers.
+ 		 */
+ 		if (chan->in_req) {
+-			att_debug(att, "(chan %p) Received request while "
++			DBG(att, "(chan %p) Received request while "
+ 					"another is pending: 0x%02x",
+ 					chan, opcode);
+ 			io_shutdown(chan->io);
+@@ -1083,7 +1083,7 @@ static bool can_read_data(struct io *io, void *user_data)
+ 		/* For all other opcodes notify the upper layer of the PDU and
+ 		 * let them act on it.
+ 		 */
+-		att_debug(att, "(chan %p) ATT PDU received: 0x%02x", chan,
++		DBG(att, "(chan %p) ATT PDU received: 0x%02x", chan,
+ 							opcode);
+ 		handle_notify(chan, pdu, bytes_read);
+ 		break;
+@@ -1237,7 +1237,7 @@ static void bt_att_attach_chan(struct bt_att *att, struct bt_att_chan *chan)
+ 
+ 	io_set_close_on_destroy(chan->io, att->close_on_unref);
+ 
+-	att_debug(att, "Channel %p attached", chan);
++	DBG(att, "Channel %p attached", chan);
+ 
+ 	wakeup_chan_writer(chan, NULL);
+ }
 -- 
 2.35.1
 
