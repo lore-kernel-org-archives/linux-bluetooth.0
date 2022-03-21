@@ -2,134 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D48C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 07:38:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48839C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 12:55:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244180AbiCUHjs (ORCPT
+        id S1347554AbiCUM4r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Mar 2022 03:39:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53736 "EHLO
+        Mon, 21 Mar 2022 08:56:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231861AbiCUHjr (ORCPT
+        with ESMTP id S1343693AbiCUM4q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Mar 2022 03:39:47 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45628DAD;
-        Mon, 21 Mar 2022 00:38:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647848303; x=1679384303;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cpzD0G7WlQb79BAELGk4nC4vtuBs/ikyOE9n2dBg9kk=;
-  b=lROo1YEysYVD3MraDwexTTJ0ra5QLQpbXT9LhrHuwaDHuhfWJl/Kxvd1
-   fbEesNzBt6zS304KKBAW/Wp/5b9Sn7MA+w8QrLxU5/bu9zD/o3A/Pc22u
-   LZVdlvmIAI0/mCRG0cw0tfenhUCMYl3UYIeQN4NUt/jYyuHd5GGzQmeKZ
-   4fn41c3cqP5KyUGFYyv8w+MWFZhbn/+esY07Qk5z5k/6oW1PvIurSzrjJ
-   n5YKZBkXHDKctMd9uWdK2cY535MCcezh/uvrooI1NpRbJ15XB8WmB4EW8
-   4UpIPtx0SkxtUyTIRSzun0Vp34UDLnNWmk5os35WVuqyt922ZLjYKfAEM
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10292"; a="320694522"
-X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
-   d="scan'208";a="320694522"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 00:38:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,198,1643702400"; 
-   d="scan'208";a="648466434"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 21 Mar 2022 00:38:20 -0700
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nWCcN-000Hbn-NW; Mon, 21 Mar 2022 07:38:19 +0000
-Date:   Mon, 21 Mar 2022 15:38:09 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
-        luiz.dentz@gmail.com
-Cc:     kbuild-all@lists.01.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Manish Mandlik <mmandlik@google.com>,
-        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Add Intel devcoredump support
-Message-ID: <202203211500.z1bvoo6A-lkp@intel.com>
-References: <20220320183225.2.I61857ea92be43418b8ce16839f79a4704cc89fa6@changeid>
+        Mon, 21 Mar 2022 08:56:46 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E67394ECE7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 05:55:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8DFFDB815DB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 12:55:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 37ACCC340E8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 12:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647867317;
+        bh=IJ98coHESuTd4va8gcEA/zAGXwn+ymd1hJvAwmfPkVM=;
+        h=From:To:Subject:Date:From;
+        b=UtILfUFF+COxk5aHPTNnBXGDJm+v4iFVtACXD59INrN6gr+AXcuiMrKxOuXfPIo/3
+         6ZNaHQOw5b6vy0tXwyBFZW3oOZjZErVh1F7fSWCVAA/0ALODriIOixYiBhjymqNL9S
+         TaNaePV1L9eT/bXUTzXMpvM5YwdIvcQPyyFhktauLmODTOYLNBxpKcSK0+VO+IbJXc
+         YQ9aTjTlMBASbOy6qgkRhX4xjre77TyN/VA13JkhuCn7mOPKVD+5xCHZedZZr/qT8t
+         jtlh5Ql6ZndK3XRp4osXSIE7A24v6AvYfFxGvbU+zlbJbt+FAIFWtiuCvn+KdUIPKQ
+         3N0rvrU6bF/og==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 1A990C05F98; Mon, 21 Mar 2022 12:55:17 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215713] New: New (useless?) warning messages from BlueTooth in
+ kernel 5.17
+Date:   Mon, 21 Mar 2022 12:55:16 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: low
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-215713-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220320183225.2.I61857ea92be43418b8ce16839f79a4704cc89fa6@changeid>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215713
 
-Thank you for the patch! Perhaps something to improve:
+            Bug ID: 215713
+           Summary: New (useless?) warning messages from BlueTooth in
+                    kernel 5.17
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.17
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: low
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: aros@gmx.com
+        Regression: No
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master v5.17 next-20220318]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+I've just upgraded from 5.15.30 to 5.17 and now upon pairing my BT headphon=
+es I
+see brand new warning messages I've never seen before:
 
-url:    https://github.com/0day-ci/linux/commits/Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220321-093553
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-config: parisc-randconfig-r023-20220320 (https://download.01.org/0day-ci/archive/20220321/202203211500.z1bvoo6A-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/677f482cb7027ab030842015cfd6c188568df39f
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220321-093553
-        git checkout 677f482cb7027ab030842015cfd6c188568df39f
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=parisc SHELL=/bin/bash drivers/bluetooth/
+Bluetooth: hci0: unexpected event 0xff length: 25 > 0
+Bluetooth: hci0: unexpected event 0xff length: 4 > 0
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+I wonder if it's a kernel bug or it's a valid message.=20
 
-All warnings (new ones prefixed by >>):
+The BT headphones work without any issues though.
 
-   drivers/bluetooth/btintel.c: In function 'btintel_register_devcoredump_support':
->> drivers/bluetooth/btintel.c:1447:9: warning: 'strncpy' specified bound 16 equals destination size [-Wstringop-truncation]
-    1447 |         strncpy(driver_name, driver, DRIVER_NAME_LEN);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The device is 8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter.
 
+# lsmod | grep bt
+btusb                  40960  0
+btbcm                  20480  1 btusb
+btintel                32768  1 btusb
+bluetooth             471040  52 btintel,btbcm,bnep,btusb,rfcomm
 
-vim +/strncpy +1447 drivers/bluetooth/btintel.c
+# dmesg -t | egrep -i "bt|blue"=20
+Bluetooth: Core ver 2.22
+NET: Registered PF_BLUETOOTH protocol family
+Bluetooth: HCI device and connection manager initialized
+Bluetooth: HCI socket layer initialized
+Bluetooth: L2CAP socket layer initialized
+Bluetooth: SCO socket layer initialized
+usbcore: registered new interface driver btusb
+Bluetooth: hci0: Found device firmware: intel/ibt-18-16-1.sfi
+Bluetooth: hci0: Boot Address: 0x40800
+Bluetooth: hci0: Firmware Version: 86-46.21
+Bluetooth: hci0: Firmware already loaded
+Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+Bluetooth: BNEP socket layer initialized
+Bluetooth: RFCOMM TTY layer initialized
+Bluetooth: RFCOMM socket layer initialized
+Bluetooth: RFCOMM ver 1.11
+Bluetooth: hci0: unexpected event 0xff length: 25 > 0
+Bluetooth: hci0: unexpected event 0xff length: 4 > 0
 
-  1429	
-  1430	int btintel_register_devcoredump_support(struct hci_dev *hdev,
-  1431						 const char *driver)
-  1432	{
-  1433		struct intel_debug_features features;
-  1434		int err;
-  1435	
-  1436		err = btintel_read_debug_features(hdev, &features);
-  1437		if (err) {
-  1438			bt_dev_info(hdev, "Error reading debug features");
-  1439			return err;
-  1440		}
-  1441	
-  1442		if (!(features.page1[0] & 0x3f)) {
-  1443			bt_dev_info(hdev, "Telemetry exception format not supported");
-  1444			return -EOPNOTSUPP;
-  1445		}
-  1446	
-> 1447		strncpy(driver_name, driver, DRIVER_NAME_LEN);
-  1448		hci_devcoredump_register(hdev, btintel_dmp_hdr, NULL);
-  1449	
-  1450		return err;
-  1451	}
-  1452	EXPORT_SYMBOL_GPL(btintel_register_devcoredump_support);
-  1453	
+--=20
+You may reply to this email to add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+You are receiving this mail because:
+You are the assignee for the bug.=
