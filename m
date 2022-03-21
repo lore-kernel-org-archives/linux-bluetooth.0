@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFFEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 01:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 679D6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Mar 2022 01:37:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344020AbiCUBin (ORCPT
+        id S1344011AbiCUBis (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 20 Mar 2022 21:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
+        Sun, 20 Mar 2022 21:38:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343988AbiCUBik (ORCPT
+        with ESMTP id S1344022AbiCUBin (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 20 Mar 2022 21:38:40 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97E0DD97D
-        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Mar 2022 18:37:15 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2dc1ce31261so114074767b3.6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Mar 2022 18:37:15 -0700 (PDT)
+        Sun, 20 Mar 2022 21:38:43 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97ECADD97A
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Mar 2022 18:37:18 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id z15-20020a25bb0f000000b00613388c7d99so11069572ybg.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 20 Mar 2022 18:37:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=eCqYJR6Vta2NjxcLrsGvMmxUCWwhAPgPhCQWWuHd4Y4=;
-        b=kz0Uc6pZ7z4oLTmSdIDcAxIKp1pbbb8D5r/MwgpHRds1vvkua53D+Tapa9acxdG7eo
-         tY1J4TK9mgLoMW7YdmNAARBLQ+cmmUnwsfQGR5Orzljogr+cqAW8NdfgldrJ+t4d/54d
-         B7U+Yrf01aUwh720VEnGdyxfzHlA5L+RUlOewVehAcyum7v1FIXvbh5rsAFKnDfZJRpu
-         88Kx7yAQoYkWssLF6STLKYjxHG8kf9xlHyvGXPsph0fbcg9VxSYznuAFr/80p+Ca+r//
-         cEkLeRE6TXo4JlGsJI73qX65krYTK5X/DUCqP9tnO0Tkai3zCaft9BEwqlQM18SBm2SC
-         sXyw==
+        bh=YXq71nLjntbIYjgifO6/WWT8gp5pZBjfe99X73obMew=;
+        b=VAA1ZDAvMSYm2jMxo+arQfNPGcQMlrSCd/DN6HGS5AtgWAo5tr+et0iw7iLf5LOGEp
+         9lyj1o1oyDDihvMaeNtyuHxv1ZL5nYXgxP2B4bNbFUzlxKEhk+TE8Ff4snVbg28zk2aj
+         IbjJ3taYFoDHwTKc4ZD9PjGKOPBuE6f0vjGFZPMFXx4BsbVaBFta1V6MkWmd0mpk+iJu
+         tmSU+AZ5DBMI3Z96NuFs/XV6EdrMf4Wk4DPAmIpwiXCPDqa28260Ho3cAHMarNEuj79s
+         GWuIYXJzqUiIbZ2O/kaKUwwgWb2OmNAVayVf8775QQna83eW023yTqIt980p/7TaxsrY
+         DGyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=eCqYJR6Vta2NjxcLrsGvMmxUCWwhAPgPhCQWWuHd4Y4=;
-        b=MfedlTa5e2AX8Ybop2WxvcCP0qPmLLBviSf9h4wEn9gEqlGxoGQrhN33tdbHSXN+B9
-         vLJnVKJwnhJqU9NChBjYyqM7S+PXy4853NF9GVfm09bOfhcTRd6dOlHYcIa93Pc0hBVJ
-         Qs8XNcC2guHC+7DjPrw0pq4iZgxrsEmu598Hfvi4PUgw5o/2pG47h7rn9kqP5b6vyyaY
-         6nyMw9ZuDc0CmyBGyluskkfAa0Zp3ZaAulCZ5JtZQr6SWnKYn1iUe68li0D4pEXmBYuZ
-         7IzNKwTE1eEH28pRKJKc0uheoCBDFQAGYXrpzJ91d+CwsVVVmeXdbZDtdLFRVlLMs2x5
-         FPrg==
-X-Gm-Message-State: AOAM530BpGjhvrsBwX97ZPhdz1ki5h7UpwgvCw5Qy1wKsOZvSN35T4s8
-        1u6Q8SL9V7XURfNWSvaeuKN3xBlAFFinqQ==
-X-Google-Smtp-Source: ABdhPJwlVva+cXpU8GCm3W74m4FHHVElpESBgCFqe5Al87O5c4+HbNbu7wvt5hP1rN6okuaKF5NjxdBvR4BmRw==
+        bh=YXq71nLjntbIYjgifO6/WWT8gp5pZBjfe99X73obMew=;
+        b=WXQvafaXoJjG+2JJpHURR+T1cAAl8D+0slvA+NkmkDtWE10Zd9Ly3Qsdezj1AVTAEP
+         vU/Ic3LNWGoWQynzrwco5pn+aEgWSKa4+mC5H0D0x8VRp2q2Tx52yZi39CKhpA901AE3
+         RNguh4ONn+GnrNm5md8U8fVch147ZcpK1ZK0DqD1YVMlTximX12zE2IwvQjPGDoUCpPX
+         Vn2mGRV6ysrkE1YZ5EqBPR1kxiQjG5Q67kZcgGzt7ws4UQcrJ8IVK+ZxuM5oPebZSXT+
+         8/dScM5f9bKqlKFGGTmIktLy2ZoA1vExLwrFXsdMAV9HuzahEsd4Wm3zA445kFSXbeZj
+         gUkQ==
+X-Gm-Message-State: AOAM532Nlc1rTFi2HVOtIkZtCThp3Z9LWUBKxRhwlJ30t0wSa5/EfbHS
+        ncRFNafbKFDavZcLQIAPltuR38fLtGO9JA==
+X-Google-Smtp-Source: ABdhPJwKYKmJ+O3Mbb2iOijDa4A8txzq0voseRw2rnD+dh7nO1Uzrp4Objnjjv1A05NdeeLU7UnXZrZDJ6L3PQ==
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:e0cb:81c1:7b8f:ab9f])
- (user=mmandlik job=sendgmr) by 2002:a25:d684:0:b0:633:68be:a431 with SMTP id
- n126-20020a25d684000000b0063368bea431mr19728582ybg.555.1647826635086; Sun, 20
- Mar 2022 18:37:15 -0700 (PDT)
-Date:   Sun, 20 Mar 2022 18:36:58 -0700
+ (user=mmandlik job=sendgmr) by 2002:a81:493:0:b0:2e5:a1de:9f1a with SMTP id
+ 141-20020a810493000000b002e5a1de9f1amr22477282ywe.88.1647826637817; Sun, 20
+ Mar 2022 18:37:17 -0700 (PDT)
+Date:   Sun, 20 Mar 2022 18:36:59 -0700
 In-Reply-To: <20220320183445.BlueZ.1.I21d5ed25e9a0a2427bddbd6d4ec04d80d735fc53@changeid>
-Message-Id: <20220320183445.BlueZ.4.I81b6c0f613e08fe2cabd5c6b16ed68c2116e359d@changeid>
+Message-Id: <20220320183445.BlueZ.5.I53ad1b66c8f8a65e5950354cd20417d812ad9c72@changeid>
 Mime-Version: 1.0
 References: <20220320183445.BlueZ.1.I21d5ed25e9a0a2427bddbd6d4ec04d80d735fc53@changeid>
 X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [BlueZ PATCH 4/9] adv_monitor: Do not remove the device while monitoring
+Subject: [BlueZ PATCH 5/9] monitor: Display AdvMonitor DeviceFound/Lost events
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -65,98 +65,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Bluetoothd clears temporary devices if they are not seen for 30 seconds.
-When controller offloading is enabled and SamplingPeriod is set to 0xFF,
-the controller sends only one advertisement report per device during the
-monitoring period. In such a case, don't remove the temporary devices if
-they are being monitored.
+Display information about MGMT_EV_ADV_MONITOR_DEVICE_FOUND and
+MGMT_EV_ADV_MONITOR_DEVICE_LOST events in the btmon output.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
- src/adv_monitor.c |  4 ++++
- src/device.c      | 22 +++++++++++++++++++++-
- src/device.h      |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
+ monitor/packet.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 35d9bc9c8..77b8ea10d 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -1663,6 +1663,8 @@ static void adv_monitor_device_found_callback(uint16_t index, uint16_t length,
- 			return;
- 		}
- 
-+		btd_device_set_monitored(info.device, true);
-+
- 		/* Check for matched monitor in all apps */
- 		info.monitor_handle = handle;
- 		queue_foreach(manager->apps, notify_device_found_per_app,
-@@ -1745,6 +1747,8 @@ static void adv_monitor_device_lost_callback(uint16_t index, uint16_t length,
- 	/* Check for matched monitor in all apps */
- 	info.monitor_handle = handle;
- 	queue_foreach(manager->apps, notify_device_lost_per_app, &info);
-+
-+	btd_device_set_monitored(info.device, false);
+diff --git a/monitor/packet.c b/monitor/packet.c
+index b7431b57d..6f615f7ba 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -14103,6 +14103,31 @@ static void mgmt_device_found_evt(const void *data, uint16_t size)
+ 	print_eir(data + 14, size - 14, false);
  }
  
- /* Allocates a manager object */
-diff --git a/src/device.c b/src/device.c
-index 3992f9a0c..00d0cc2fb 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -218,6 +218,7 @@ struct btd_device {
- 	GSList		*services;		/* List of btd_service */
- 	GSList		*pending;		/* Pending services */
- 	GSList		*watches;		/* List of disconnect_data */
-+	bool		monitored;		/* Tracked by Adv Monitor */
- 	bool		temporary;
- 	bool		connectable;
- 	unsigned int	disconn_timer;
-@@ -3206,11 +3207,30 @@ static bool device_disappeared(gpointer user_data)
- 
- 	dev->temporary_timer = 0;
- 
--	btd_adapter_remove_device(dev->adapter, dev);
-+	/* Do not remove the device if it is being tracked by an Advertisement
-+	 * Monitor. It will be removed when the Advertisement Monitor stops
-+	 * tracking that device.
-+	 */
-+	if (!dev->monitored)
-+		btd_adapter_remove_device(dev->adapter, dev);
- 
- 	return FALSE;
- }
- 
-+void btd_device_set_monitored(struct btd_device *device, bool monitored)
++static void mgmt_adv_monitor_device_found_evt(const void *data, uint16_t size)
 +{
-+	if (!device)
-+		return;
++	uint16_t handle = get_le16(data);
++	uint8_t address_type = get_u8(data + 8);
++	int8_t rssi = get_s8(data + 9);
++	uint32_t flags = get_le32(data + 10);
++	uint16_t data_len = get_le16(data + 14);
 +
-+	device->monitored = monitored;
-+
-+	/* If the device is not being monitored and the temporary_timer has
-+	 * already expired, it indicates that the device can be removed.
-+	 */
-+	if (!monitored && device->temporary && !device->temporary_timer)
-+		device_disappeared(device);
++	print_field("Handle: %u", handle);
++	mgmt_print_address(data + 2, address_type);
++	print_rssi(rssi);
++	mgmt_print_device_flags(flags);
++	print_field("Data length: %u", data_len);
++	print_eir(data + 16, size - 16, false);
 +}
 +
- static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
++static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
++{
++	uint16_t handle = get_le16(data);
++	uint8_t address_type = get_u8(data + 8);
++
++	print_field("Handle: %u", handle);
++	mgmt_print_address(data + 2, address_type);
++}
++
+ static void mgmt_discovering_evt(const void *data, uint16_t size)
  {
- 	clear_temporary_timer(dev);
-diff --git a/src/device.h b/src/device.h
-index 071576d6b..0a4103747 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -87,6 +87,7 @@ bool device_is_connectable(struct btd_device *device);
- bool device_is_paired(struct btd_device *device, uint8_t bdaddr_type);
- bool device_is_bonded(struct btd_device *device, uint8_t bdaddr_type);
- gboolean device_is_trusted(struct btd_device *device);
-+void btd_device_set_monitored(struct btd_device *device, bool monitored);
- void device_set_paired(struct btd_device *dev, uint8_t bdaddr_type);
- void device_set_unpaired(struct btd_device *dev, uint8_t bdaddr_type);
- void btd_device_set_temporary(struct btd_device *device, bool temporary);
+ 	uint8_t type = get_u8(data);
+@@ -14414,6 +14439,10 @@ static const struct mgmt_data mgmt_event_table[] = {
+ 			mgmt_controller_suspend_evt, 1, true },
+ 	{ 0x002e, "Controller Resumed",
+ 			mgmt_controller_resume_evt, 8, true },
++	{ 0x002f, "Adv Monitor Device Found",
++			mgmt_adv_monitor_device_found_evt, 16, false },
++	{ 0x0030, "Adv Monitor Device Lost",
++			mgmt_adv_monitor_device_lost_evt, 9, true },
+ 	{ }
+ };
+ 
 -- 
 2.35.1.894.gb6a874cedc-goog
 
