@@ -2,68 +2,57 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4795C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Mar 2022 06:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 336A0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Mar 2022 07:56:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236842AbiCVGGV (ORCPT
+        id S229707AbiCVH5d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Mar 2022 02:06:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53826 "EHLO
+        Tue, 22 Mar 2022 03:57:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiCVGGU (ORCPT
+        with ESMTP id S229472AbiCVH5c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Mar 2022 02:06:20 -0400
-Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F93AD4C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 23:04:52 -0700 (PDT)
-Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-2db2add4516so179531957b3.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Mar 2022 23:04:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yviPRoNCsxnnkW3G+JqFsi5JehNjFkYYjatmXaXYQm4=;
-        b=BneRAjS6qMqGNPzt+IONjDb2LHUMmeC+2i3PL+czkdq6FJh6Ic6ablrCq8Vf1h568/
-         ouoazn+JGYRRvDcQgKIJn2Q1TGGlmawwrl5vash9Q/+wTpfvR+vQu9a4Kx5OxzHEW7q6
-         k+RlflnKeyL8KM9JmuftbnEFw1+zIBSsqYnlNIaU/TF1yA1bX20fVOKgWZKr3fc4ghYP
-         otf712kEPfx0fmTuW4NSR6DBGxB23lMpWawXK3UuLidrefvbqZ7ONkmwHNN6l5zUrsDs
-         4MAxZFwbESG6Yv5Wob5bbjmZuaUrmehGkJcfXihJ+T2JJodrzESzrDb1gqK7eDWEVrDf
-         9Huw==
+        Tue, 22 Mar 2022 03:57:32 -0400
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011CB5A08E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 00:56:02 -0700 (PDT)
+Received: by mail-lj1-f173.google.com with SMTP id bn33so22872157ljb.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 00:56:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yviPRoNCsxnnkW3G+JqFsi5JehNjFkYYjatmXaXYQm4=;
-        b=Zhcmq8JHk4SUVEMJFElyuuge3Hb8dDuaYyHPaIxO+t8+jdLk1PaarLrVp+ogKHXZ8D
-         4sSPhuZLQaOq4jvF33eqctKBWWenLkznWLmBsNcBzZsJih1tsgBJpV7A1HDvVnys/Jm7
-         KbzlkrA58XJyecL2k77ak200ogKoT/6PM12AE8H4I+S32Y5YSJms25+LVQ97ggY4a0EO
-         VU6HDTbCCuGAB7Nblmyi9T6hEHJRI0GQ2aEHsbN2J7RQYKTOsGHx94UAwzc6NC35noo7
-         /wTxfiBWSOGJuzbgrAJWtbgTh0DJj49Yw6HPQ/ZH+QpjYJqGU1Old8lIQlp+IfX8hS6S
-         bi+Q==
-X-Gm-Message-State: AOAM530VfG0xWGtLy8B4DWNyPdDZlO2YdDnfddD2XwZkTawmjRZKeH3q
-        m2OK/SfXpH3zJiijQ3vQtEa49n4TvQrOM3AY7rbXR6Nz
-X-Google-Smtp-Source: ABdhPJwaqooaHeYI3Ei2AJLL7qEWb7xIoJCjmCSqCokF1EOlEfFaGvUEn7ASQWCSlD+xo+ZTUL4ftAVF4owL9IoiVwM=
-X-Received: by 2002:a81:9ace:0:b0:2e6:5069:5f9e with SMTP id
- r197-20020a819ace000000b002e650695f9emr5526810ywg.317.1647929091421; Mon, 21
- Mar 2022 23:04:51 -0700 (PDT)
+        bh=C1We4UvL4QPwmGDLrWjVNOB5JOzUc+sQhEdjrrL1tto=;
+        b=UduC406sTPHRqfV+CfJWRn3/a+wVqk5rlx4kAQa2Ecy8XAeQ/2DqUvMv3sMbv63TFL
+         Yf+CItIJXSurRpFqB3zrarqe4/E09frMVkcn7h2dWxeYUlKZGBEBiABEpth0J7FQvIv9
+         HQooIUEY9HXBy3amRjeTxU8H/LrTrCYiyuCrlywFIFP6w9OMKzahY3+xXzRLwqCbFi9O
+         8pPAtMoaLObKF19Iy4E7kT57WjqK4jDOZFNgSjo/L2QNy48HTX24H2fHkKmtrWruql74
+         qDAL8/EoC8MBMixaUp6C7FKTIfRhTpHcI06U51irjG22soaptSlaIYPIDWfZEZwHZ1Ng
+         N+Jw==
+X-Gm-Message-State: AOAM5314Bh8aCz7APEavGUtvjtUHoxDGRFf2/NL/KncbXiDPfrtO/v+G
+        /5Q/dwo0tkHD2VfYe0iLbzjPfjZ/uWc83Zd0iwx6J6wO8uk=
+X-Google-Smtp-Source: ABdhPJySuShuNwf50FFycHEaDcFuRR7qMFgNJsfMH4fWjflBBkWoiIJ8t48dPrb1p2NXQEzVj9mXHgcIDnjZcEdnrH0=
+X-Received: by 2002:a2e:8496:0:b0:249:7dbc:d81b with SMTP id
+ b22-20020a2e8496000000b002497dbcd81bmr9221240ljh.332.1647935760248; Tue, 22
+ Mar 2022 00:56:00 -0700 (PDT)
 MIME-Version: 1.0
 References: <CANFkB1ydGuwKRjusy3U0HCQo8E88XbZTh_UdPZ8wujt7P5KKnQ@mail.gmail.com>
  <CABBYNZLjV3PQ7Hm3PJZcTcs64aLzWLBNfooSYuZmSywv0RJG0g@mail.gmail.com>
 In-Reply-To: <CABBYNZLjV3PQ7Hm3PJZcTcs64aLzWLBNfooSYuZmSywv0RJG0g@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 21 Mar 2022 23:04:40 -0700
-Message-ID: <CABBYNZKu9fEUs9XEbOcq8fMRML4qKxsq3HpSed69LGZ6WSUDRQ@mail.gmail.com>
+From:   Adam Pigg <adam@piggz.co.uk>
+Date:   Tue, 22 Mar 2022 07:55:48 +0000
+Message-ID: <CANFkB1yr3N_Twac=ocxBRst79-gmdu8=6VTD6oPgdGT0rb_HaQ@mail.gmail.com>
 Subject: Re: GATT issue, possible bluez bug?
-To:     Adam Pigg <adam@piggz.co.uk>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Adam,
+Hi Luiz
 
-On Mon, Mar 21, 2022 at 5:43 PM Luiz Augusto von Dentz
+On Tue, 22 Mar 2022 at 00:44, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
 > Hi Adam,
@@ -129,9 +118,13 @@ On Mon, Mar 21, 2022 at 5:43 PM Luiz Augusto von Dentz
 >
 > What version are you using? I would first try with the latest to see
 > if that something already fixed.
+>
+>
+Im using 5.63 already, which is the latest tag (on opensuse tumbleweed)
 
-Btw, please use bluetoothctl instead of gatttool, gatttool may
-actually conflict with the bluetoothd.
+I'll also try bluetoothctl and attach logs using that, though I
+suspect it will behave the same as the python library and my own
+library.
 
--- 
-Luiz Augusto von Dentz
+> --
+> Luiz Augusto von Dentz
