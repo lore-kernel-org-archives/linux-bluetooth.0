@@ -2,120 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12D4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 19:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36A3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 20:13:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344457AbiCWUAG (ORCPT
+        id S1344549AbiCWUPR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 16:00:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58080 "EHLO
+        Wed, 23 Mar 2022 16:15:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232629AbiCWUAG (ORCPT
+        with ESMTP id S244619AbiCWUPO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 16:00:06 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 169EC27B00
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:58:36 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id u103so4680140ybi.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:58:36 -0700 (PDT)
+        Wed, 23 Mar 2022 16:15:14 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55F36450
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 13:13:44 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id o13so2049317pgc.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 13:13:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HUuHIEv0o+LFeMtSUaKrqm1eMAqC9FZGgtOg0F+ne9o=;
-        b=QvsfGU4NHzKlWE/sejfWuPbPaGNjG16Ws5gZvECOUOSlnOV4aQ2waia0zz+KWiS6Fn
-         LtFMQIlJULky38/4um3VjkWmYN/mTe9QXQhotWjEocsFQaXUBRI0Q+5T/RtEYmGTdtSo
-         r8OdKVQsEgk/G9vJFZ1URScMpCRMLbRk396IpIXnE94V2Kbeo6U9c5frEsWaGPA+QtmZ
-         6omckn15tD2WLbEXdBdt8YUXftyoHU4SSFLpdVNPO0WHxvKzSVAMj+KOxxG4qFUx6CO/
-         tiFOVOjZdBmyFgHTvduH1k8MgWaYDo06AXZZndCJ2btaR1qx5/wIz2k4SbaqJwsO56Gh
-         G6xw==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=IP07YkQg0rPEBTHMn8DcG1oqgtBsAiOLeh56Bth5JYA=;
+        b=cyESw/5IbCg0TBBMMJSmU4eDHeLpsGugfyrLP1x3XdAJPY2f5ewzEhzytb9Z3W3/n4
+         y9Dy1vLKc5Yl5wOAYqwVHJGc3B2CapvM1BSMrqsGC+BF4ZEj+KWTA2Zu9YwWMCIFB9/L
+         6/lGQCIwlIGHa8qXCPhXGLdxK2jjxnIpvz2vGwmJFldlOqBIjDuaSc5oEPzr4TxS5LSL
+         TFuAl5zUBtx3YSZTszeHMDbWSHNd3MnCC7+y10epYSLhxfsrc9y75p76NTDfm85jDzlF
+         lDq0PY9SwbXwhf66BgU1nxXKwqCXNlVdZWCPXzfDCG0i34mrUBA8i6vsVEg2qpx3htWV
+         kqYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HUuHIEv0o+LFeMtSUaKrqm1eMAqC9FZGgtOg0F+ne9o=;
-        b=drhe+xkSKZHIIMLNh0/+gAlsWcle+ArapLX6uQwxLtAio/KzZ9sLctRk0UUc4Xb4Da
-         6W47ZxSWOdnMjonOU+NhuhSOvvmpK7/fb2+LO6OLR+kdqRN9QzNpftMdTQjg1Bbcl9uu
-         +YV4W107PhsfJRIMfdQLSxOlPoixjD0QWeH458G99m7/3ftJ0SA0JrcoiqW5e2wP/M97
-         3Nc29DBF02bvGXUiPwNVar81P6wozZO2szj4yoYMgxxQKwW8vfvsb8yyLbKCByYzareX
-         mDVJiXIDHkPepKUwXswZPLuDoiJV1hRYpadKHQcX27/zbrxJHirJyvj2s7tc6FY/rrN9
-         YH6g==
-X-Gm-Message-State: AOAM533ZufCI7riNPLzkwjqOwl4ETjQ/m+W2bvPD+APs7kCrTrxa9KLC
-        g3nVk3lhhcV8+cPGudkkAavJe/k+h8GYrTIGftFTUT1Igfw=
-X-Google-Smtp-Source: ABdhPJzzY0JTWd1TdSOJi//Cgz8b5IQXcr1GQAlQTZrYsHtHYB4urW9SdvJhT7Z+AdpPdW43acWQTVjZtED7nhGydyY=
-X-Received: by 2002:a25:9742:0:b0:61d:9526:ebc3 with SMTP id
- h2-20020a259742000000b0061d9526ebc3mr1619721ybo.578.1648065515290; Wed, 23
- Mar 2022 12:58:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220323000654.3157833-1-luiz.dentz@gmail.com>
- <20220323000654.3157833-4-luiz.dentz@gmail.com> <DE87AE95-85DD-4732-8D49-F6E212F836B6@holtmann.org>
-In-Reply-To: <DE87AE95-85DD-4732-8D49-F6E212F836B6@holtmann.org>
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=IP07YkQg0rPEBTHMn8DcG1oqgtBsAiOLeh56Bth5JYA=;
+        b=ee25C6WRkurEYSQWTu9agZZTxuduyCVrMw7lGkXP36o9pc8T22Ddr/ZgIcl9cykjvy
+         b0m5r9SZqPSMQJt2p3MX5z59LP1d0aSWYuPlSXOamp8RoKqEi3NIBGN+sWfGhtRV14AG
+         v2KTrmHlqQnD7tVu8mzDQ/NdkkS1XN8ZD5XQka4e36Q/uFlJ0kjq5w96Oz2H6yNxN6lq
+         QJhSj7Nvuk0yt+2iF7pmJYQ9qb3ueFAkoIBVuCaAjwRsYl23Cz8tkLvOYPwTti6Oi/9W
+         LYpac82/zwLQzR9kL5ionN2mC7JRpyhpzzNgZhzAe0g4QDlPSyddEnrxk584xoNumL3D
+         s7Aw==
+X-Gm-Message-State: AOAM532CSEyundVldFvIax2vj3dzTm0X9DO9i+380lNIEw92P3s8cF3s
+        cSzGBlc0J2Lb7ifMG9LcmxG3fl7WntE=
+X-Google-Smtp-Source: ABdhPJxvHBVcLm6lYi86H3rgKrbeOYI6SiHYHEAw/u0F5ExKo7lfxMpIwuuKqU8Jg4JsZ/L2Gfk/Hw==
+X-Received: by 2002:a63:4041:0:b0:37f:8077:e0de with SMTP id n62-20020a634041000000b0037f8077e0demr1228436pga.138.1648066423866;
+        Wed, 23 Mar 2022 13:13:43 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id m4-20020a17090a7f8400b001bef3fc3938sm478361pjl.49.2022.03.23.13.13.43
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Mar 2022 13:13:43 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 23 Mar 2022 12:58:24 -0700
-Message-ID: <CABBYNZK+Sh_r5SW7ot=QR2gweKf6MtGDsKjGdRGWOmKEP-ny5g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 4/9] adapter: Don't use DBG in mgmt_debug
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 1/9] log: Introduce DBG_IS_ENABLED
+Date:   Wed, 23 Mar 2022 13:13:33 -0700
+Message-Id: <20220323201341.3596128-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220323201341.3596128-1-luiz.dentz@gmail.com>
+References: <20220323201341.3596128-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Mar 23, 2022 at 3:37 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Luiz,
->
-> > mgmt_debug callback is used to print debug strings from mgmt instances
-> > which includes the file and function names so using DBG would add yet
-> > another set of file and function prefixes which makes the logs
-> > confusing.
-> > ---
-> > src/adapter.c | 8 +++-----
-> > 1 file changed, 3 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 97ce26f8e..6680c5410 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -10327,9 +10327,8 @@ static void read_version_complete(uint8_t status, uint16_t length,
-> >
-> > static void mgmt_debug(const char *str, void *user_data)
-> > {
-> > -     const char *prefix = user_data;
-> > -
-> > -     info("%s%s", prefix, str);
-> > +     if (DBG_IS_ENABLED())
-> > +             btd_debug(0xffff, "%s", str);
-> > }
-> >
-> > int adapter_init(void)
-> > @@ -10342,8 +10341,7 @@ int adapter_init(void)
-> >               return -EIO;
-> >       }
-> >
-> > -     if (getenv("MGMT_DEBUG"))
-> > -             mgmt_set_debug(mgmt_primary, mgmt_debug, "mgmt: ", NULL);
-> > +     mgmt_set_debug(mgmt_primary, mgmt_debug, NULL, NULL);
->
-> oh no. This is crazy. Please re-think this and what computational overhead you are introducing.
+This introduces DBG_IS_ENABLE macro which can be used to check if
+BTD_DEBUG_FLAG_PRINT has been enabled for the current file.
+---
+ src/log.c | 12 ++++++++++++
+ src/log.h | 11 +++++++++++
+ 2 files changed, 23 insertions(+)
 
-I considered moving DBG_IS_ENABLED() in place of getenv("MGMT_DEBUG")
-so that would be use just once per adapter, the problem is that
-wouldn't work with:
-
-case SIGUSR2:
-__btd_toggle_debug();
-
-Or perhaps I just need yet another match that adds the file and
-function name so we can strip them out of DBG_IDX.
-
-> Regards
->
-> Marcel
->
-
-
+diff --git a/src/log.c b/src/log.c
+index 0155a6bba..1157859ef 100644
+--- a/src/log.c
++++ b/src/log.c
+@@ -179,6 +179,18 @@ void __btd_log_init(const char *debug, int detach)
+ 	info("Bluetooth daemon %s", VERSION);
+ }
+ 
++bool __btd_log_is_enabled(const char *file)
++{
++	struct btd_debug_desc *desc;
++
++	for (desc = __start___debug; desc < __stop___debug; desc++) {
++		if (desc->file && g_pattern_match_simple(file, desc->file))
++			return desc->flags & BTD_DEBUG_FLAG_PRINT;
++	}
++
++	return false;
++}
++
+ void __btd_log_cleanup(void)
+ {
+ 	closelog();
+diff --git a/src/log.h b/src/log.h
+index 74941beb2..e35238870 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <stdint.h>
++#include <stdbool.h>
+ 
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
+ 
+@@ -27,6 +28,7 @@ void btd_debug(uint16_t index, const char *format, ...)
+ void __btd_log_init(const char *debug, int detach);
+ void __btd_log_cleanup(void);
+ void __btd_toggle_debug(void);
++bool __btd_log_is_enabled(const char *file);
+ 
+ struct btd_debug_desc {
+ 	const char *file;
+@@ -38,6 +40,15 @@ struct btd_debug_desc {
+ void __btd_enable_debug(struct btd_debug_desc *start,
+ 					struct btd_debug_desc *stop);
+ 
++/* DBG_IS_ENABLED:
++ *
++ * Simple macro that can be used to check if debug has been enabled for the
++ * __FILE__.
++ * Note: This does a lookup thus why it was not used by the likes of
++ * DBG/DBG_IDX which loads it directly from section("__debug").
++ */
++#define DBG_IS_ENABLED() __btd_log_is_enabled(__FILE__)
++
+ /**
+  * DBG:
+  * @fmt: format string
 -- 
-Luiz Augusto von Dentz
+2.35.1
+
