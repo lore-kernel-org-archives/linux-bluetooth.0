@@ -2,130 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9B2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 22:31:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFB2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 22:40:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345237AbiCWWcm (ORCPT
+        id S242252AbiCWWlg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 18:32:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52148 "EHLO
+        Wed, 23 Mar 2022 18:41:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345196AbiCWWck (ORCPT
+        with ESMTP id S234878AbiCWWlf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:32:40 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C37458F99B
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:31:10 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id q5so2942972plg.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:31:10 -0700 (PDT)
+        Wed, 23 Mar 2022 18:41:35 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A3035857
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id w8so2948030pll.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=LAb7qk/awMZFg9RDyU6A4uZdHQmb0R8ih+iZPmdwcnk=;
-        b=XHzF9NPynq2efSM8ZB6VAlDdCsQRvnbsTtfnESpUPxpdmYdJxpU5wfwzrAQXXeL/aa
-         ME9f09MFaRhnpWYW/LVfLzTRQu7LQm9YcfNaxbNtVeDJqJNKF15CtZj36jSu6fULTShF
-         hWR92ctGCdNCr77n6p79XKZTN+ywyt3FFaVd1ok3GAt4FqK62TYSEqU4sz8xO56bnZlS
-         qvA9AWd7pVbDMb9zy77eA2E9ne4o7bd2fiPlC/SoUJSmISOEzmq5dKgJ33HzYRsaUbeG
-         IzCZ7OgW1k9oTO6XzEP/iyS04glpacVUQeMy59DTWGHOfiTUtoKwe1kn1CeQF505mY1b
-         D6nA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
+        b=Bg2e9pcc0QTwSwwA18iSxYR/hz7RMgXz8Wr7HsMOrksSBDlnHDCblZpf1aCgMm+Ntt
+         noCT1r0HwxxWFFTxY0amri0FqADO5KqyvVBTUlU5Z2UCa2Jloyq7Gv2UVMVRiPInJ78G
+         Z19LTXQHRTLsb2L6ZyMuJ/H4eNk+oAiCpbuzk8NANEr3NNYjxj76nzltk1W6vxJp76C4
+         e2ZH31fzMiqKkfu1eayLrpcOBjb840JS5KwNy4m/W2jKfICL6cGOWmxfl3LyzCR7kLDe
+         n3/1IHIr7zznbDpiXqQ40uJqECb7lbDydNZ2GRlfl4XiqeHYcZv7LO6VA+f4TlYTkpd5
+         mBsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=LAb7qk/awMZFg9RDyU6A4uZdHQmb0R8ih+iZPmdwcnk=;
-        b=cZT9TqwBGrMDquegCJNhXULmDjU6rIwVrWckAX7mesohkyCHAnbmgiM9JVbhCOKFTw
-         uS3m1/icNHhjDuKfW9Gm3U8dUXmzNIE7+0uwMh3QyATwabLvmKmXEyk1oyiLY17aTMCx
-         YHisbCKzMYerUUQb7Kh0CjYfTlTylXm6dHabIF6/4FMJIzezrxCcc6L2fVGDIU5Gg5jY
-         FLGf9dk/27q3NvsEQCSy1fEXDo1zH/Uwd2K1ylFz40OHRNTTDzeFjuP0lvib+JoRrqnx
-         Rh3x5fBLCJ2nD3V5MYgPUr85dQFAt5NQXQp6mR8S6NQ6HUqdKllb0YYAhaxjCDoH9Z8O
-         FcBg==
-X-Gm-Message-State: AOAM5313/a8PLnLImE9aLTDiykiJDixQZ+4+/EvSSm8yq5vJ3+rweIMm
-        mEFuOI7lIBP9Sz5dTQrYO4G6WTrPxcY=
-X-Google-Smtp-Source: ABdhPJw/Yq7R0gNUTce7drB/udq31lNYcpfbKj0W4yk/W1jG3oaMz5CKkxP2Kv6uy3VhX3cyEBn3kg==
-X-Received: by 2002:a17:902:b7c1:b0:153:e971:663e with SMTP id v1-20020a170902b7c100b00153e971663emr2446808plz.78.1648074669996;
-        Wed, 23 Mar 2022 15:31:09 -0700 (PDT)
-Received: from [172.17.0.2] ([40.83.245.66])
-        by smtp.gmail.com with ESMTPSA id 21-20020a630115000000b00382a0895661sm694190pgb.11.2022.03.23.15.31.09
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
+        b=EanfgfFVo2zuR1pma5AucF0qsETU+B/EUqgzjNhHawf1cZtG5QgUf0MgYScDo4vaQr
+         xvbUK0gyJI0vQfqz9sTrhy9M91j3LBeYQCaFQrqZwn+DqcJD5pag+hLhm7lqUiL8HakM
+         sktxuGWyEkerwHINx8LUNryF9Xc8P5ObeMAHFtdOJFJc1J4oCSrPKCFkTpH7IFVgHIIi
+         J6FjdrE/OwETTcI8bYx5ZXQ9hefmSuqqLBrM4e466beCIKrd7dvoyWnz2u/eaIqnzE21
+         0P5z2VbwRVrp4UxTYCHPjme2wXyiYQpa3H+HDHbFLLvqg5c06ukKYPHLy+1pRa+Z90V+
+         gaBQ==
+X-Gm-Message-State: AOAM531StaltMoExft+GAiqTDTALFNo2VsP7bw6+zmfGUbMxP3QaBwKJ
+        MbnpUWCW6W/zkABfNY3UZBc4FG0n0vs=
+X-Google-Smtp-Source: ABdhPJy85Ms0W2CncS3abkGKykMexF7Q+sAOLsAGl4Mihgtmk+S3u/d+lsjkGzqqTv/yYlbmXAGTMg==
+X-Received: by 2002:a17:902:ce09:b0:151:96e2:d4b5 with SMTP id k9-20020a170902ce0900b0015196e2d4b5mr2335916plg.3.1648075204768;
+        Wed, 23 Mar 2022 15:40:04 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id z14-20020aa7888e000000b004f79f59827asm825109pfe.139.2022.03.23.15.40.04
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 15:31:09 -0700 (PDT)
-Message-ID: <623b9fad.1c69fb81.4240f.2b15@mx.google.com>
-Date:   Wed, 23 Mar 2022 15:31:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7567596425581082324=="
+        Wed, 23 Mar 2022 15:40:04 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ] adapter: Introduce BTD_ADAPTER_DBG
+Date:   Wed, 23 Mar 2022 15:39:54 -0700
+Message-Id: <20220323224003.3736525-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC,BlueZ] adapter: Introduce BTD_ADAPTER_DBG
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220323205227.3605495-1-luiz.dentz@gmail.com>
-References: <20220323205227.3605495-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7567596425581082324==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=625859
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.69 seconds
-GitLint                       PASS      0.46 seconds
-Prep - Setup ELL              PASS      49.83 seconds
-Build - Prep                  PASS      0.62 seconds
-Build - Configure             PASS      9.65 seconds
-Build - Make                  PASS      1651.60 seconds
-Make Check                    PASS      13.21 seconds
-Make Check w/Valgrind         PASS      525.62 seconds
-Make Distcheck                PASS      270.47 seconds
-Build w/ext ELL - Configure   PASS      9.85 seconds
-Build w/ext ELL - Make        PASS      1716.04 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[RFC,BlueZ] adapter: Introduce BTD_ADAPTER_DBG
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#99: FILE: src/adapter.h:28:
-+							__func__ , ## arg)
- 							         ^
-
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#114: FILE: src/device.h:16:
-+							__func__ , ## arg)
- 							         ^
-
-/github/workspace/src/12790144.patch total: 2 errors, 0 warnings, 20 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12790144.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+This introduces BTD_ADAPTER_DBG which includes the controller index
+when using DBG_IDX, in addition to it also add similar macro for
+devices in the form of BTD_DEVICE_DBG which resolves the adapter and
+before calling BTD_ADAPTER_DBG.
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.h | 4 ++++
+ src/device.h  | 4 ++++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/src/adapter.h b/src/adapter.h
+index 35deb1d11..515be3210 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -23,6 +23,10 @@
+ /* Invalid SSP passkey value used to indicate negative replies */
+ #define INVALID_PASSKEY		0xffffffff
+ 
++#define BTD_ADAPTER_DBG(adapter, fmt, arg...) \
++	DBG_IDX(btd_adapter_get_index(adapter), "%s:%s() " fmt, __FILE__, \
++							__func__ , ## arg)
++
+ struct btd_adapter;
+ struct btd_device;
+ struct queue;
+diff --git a/src/device.h b/src/device.h
+index 071576d6b..4d40d1d22 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -11,6 +11,10 @@
+ 
+ #define DEVICE_INTERFACE	"org.bluez.Device1"
+ 
++#define BTD_DEVICE_DBG(device, fmt, arg...) \
++	BTD_ADAPTER_DBG(device_get_adapter(device), "%s:%s() " fmt, __FILE__, \
++							__func__ , ## arg)
++
+ struct btd_device;
+ 
+ struct btd_device *device_create(struct btd_adapter *adapter,
+-- 
+2.35.1
 
---===============7567596425581082324==--
