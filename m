@@ -2,96 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5298BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 05:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7367C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 06:02:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239061AbiCWFXo (ORCPT
+        id S241836AbiCWGEU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 01:23:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
+        Wed, 23 Mar 2022 02:04:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232493AbiCWFXn (ORCPT
+        with ESMTP id S232574AbiCWGES (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 01:23:43 -0400
-Received: from smtpproxy21.qq.com (smtpbg701.qq.com [203.205.195.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC3170CD3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 22:22:08 -0700 (PDT)
-X-QQ-mid: bizesmtp87t1648012918tdaneddp
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Wed, 23 Mar 2022 13:21:51 +0800 (CST)
-X-QQ-SSF: 01400000002000C0D000000A0000000
-X-QQ-FEAT: 0VgNaGdhy9gR1o7aVolNIq/TTv1x7QJEQOriKZS1Dl7ddUu+5v7eLLjFun6wU
-        bQnC3QQgy/ermfdJYqseFr3oNmfUPOIy5IRp6whWmdByH4K642VHT56tSIfm5JeeieA2bB2
-        twlXKcILXA/S3cQjMQHKDTTIyvZ2yyqOx8gv5NnlUpZ6Nbqg7hBQo4oxaPIKG4yD+TpNrev
-        FsaBlHHYKDm/ZnQz5ZWWiljIAJ1P4m98NNekpzUDDE5hzINSkJEDdHrzqfxZwYAFwSQbfD+
-        DYuUxeFXBmVCFKE3KwLQKaYg1gc0YPxBQ8/4DBQbDanNR9WmHBG+wcRtc1SzFbrGMgwSG7Z
-        zGqVHmbNlWkMY4Z9fZm7IQvomlH6w==
-X-QQ-GoodBg: 1
-From:   xinpeng wang <wangxinpeng@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     xinpeng wang <wangxinpeng@uniontech.com>
-Subject: [PATCH] obexd: Fix can't receive small files sent by windows
-Date:   Wed, 23 Mar 2022 13:21:49 +0800
-Message-Id: <20220323052149.28674-1-wangxinpeng@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Wed, 23 Mar 2022 02:04:18 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 103776D18A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 23:02:50 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id f3so503023qvz.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 23:02:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=IIUGxbzu76oLZycGcHSM1dxrvM2L04zq1shm3Q+5Ylo=;
+        b=TaI7g2qfJ3uJmdp9q5pojuryUJzrSUG8ac4JbjB+Q2V9blgfA9V4JMXysSX9qmO5NN
+         ZxWzjK1vhfNuFslsPdWnPxlK425P/a070UP9ubLfWpVTnHNIu4hJdrrNwGsX1lZSYYzb
+         olH0R+Y08riRBveAHIzmbC3NVe55tAfDZpNVZ5nNnMc/fxPO8YR2pj9/+KqqMzPVXTh2
+         Hj9E8hGG+qKOGs7lRYTWVS2tXzvr3jZaqqeogsf3jOY4tpkkvJ2dJQByxlEl+Cqt9FB9
+         HpFsFyqX92UOwLMCxA/cX/BAgUDp77IeKAULhCwmTaoEgWbnHz303J51Ry4TZvP9Qs4K
+         S+jg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=IIUGxbzu76oLZycGcHSM1dxrvM2L04zq1shm3Q+5Ylo=;
+        b=QE/0xsxY/hDv2w4nX0gnKppFTVhu3ibCCD3Ct30rVrHGjRED/G9EEePePkN/kkG5qS
+         CnkwZOmBUE0YCKhMkmaoss0pz04Tk7bNxYdvZylwnDn+mCvpCYbDTUdFtQDH+XCcL5xu
+         kC1HiJ5G4ggkWjBuz+CsxSgFWiq8oXPNCvVnFz6J7S4R+8KKr1IfZm9L2857UGZI24LM
+         gUCbDGqRSDq7ISEnAtzuo+z7Ss7Nmr/gZx9S/2rmEyMLkolusjYNBHuG7e5M/cfpc0hd
+         RQ3+CmxHcPlT3QSJz4/nohbj+SYdhFoxdSXjZL9n+Yxa66TJQtdgF/Q0uvY2HfWn+GFY
+         +CKA==
+X-Gm-Message-State: AOAM533jkJFgD01xhpeNb1gc2QdivwkTuND0d4gj7uTRwQ93u6uFDz2T
+        4al3TSwUZtyYBlzmu1smXXtsCyNPcJtgZQ==
+X-Google-Smtp-Source: ABdhPJz3oYnfT+hOg0bFFtc/xQaUGat+jZM9c0VyTRCV42qEWV1CBmeTAznfOsjcj55/Iyif47WWmQ==
+X-Received: by 2002:a05:6214:5281:b0:441:ac1:dd21 with SMTP id kj1-20020a056214528100b004410ac1dd21mr14875132qvb.2.1648015368365;
+        Tue, 22 Mar 2022 23:02:48 -0700 (PDT)
+Received: from [172.17.0.2] ([23.102.123.174])
+        by smtp.gmail.com with ESMTPSA id p13-20020a05622a048d00b002e1ce0c627csm16349501qtx.58.2022.03.22.23.02.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 23:02:48 -0700 (PDT)
+Message-ID: <623ab808.1c69fb81.a2a1a.7e03@mx.google.com>
+Date:   Tue, 22 Mar 2022 23:02:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2819753785265437717=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign9
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/9] log: Introduce DBG_IS_ENABLED
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220323000654.3157833-1-luiz.dentz@gmail.com>
+References: <20220323000654.3157833-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Windows devices use streaming mode to send files. If a small file is
-sent,the first time processing data will be completed successfully,
-and the transfer_complete function will be called before the end to
-clear os->path.At this time, the dbus signal is still pending, and
-the dbus method call requesting the file path has not been processed;
-in this way, the upper-level program will not be able to obtain the
-file path, resulting in failure to receive the file.
-Therefore, the signal of Filename is generated, and it is forced to
-be sent when status=active.
+--===============2819753785265437717==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: xinpeng wang <wangxinpeng@uniontech.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=625602
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      13.01 seconds
+GitLint                       PASS      8.92 seconds
+Prep - Setup ELL              PASS      43.75 seconds
+Build - Prep                  PASS      0.71 seconds
+Build - Configure             PASS      8.81 seconds
+Build - Make                  PASS      1290.37 seconds
+Make Check                    PASS      11.94 seconds
+Make Check w/Valgrind         PASS      439.98 seconds
+Make Distcheck                PASS      232.10 seconds
+Build w/ext ELL - Configure   PASS      8.79 seconds
+Build w/ext ELL - Make        PASS      1255.66 seconds
+Incremental Build with patchesPASS      11577.93 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,v2,3/9] mgmt: Introduce mgmt_set_verbose
+WARNING:REPEATED_WORD: Possible repeated word: 'the'
+#83: 
+the the likes hexdump of packets, by default it is disabled since in
+
+/github/workspace/src/12789344.patch total: 0 errors, 1 warnings, 61 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12789344.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- obexd/src/manager.c | 6 +++++-
- obexd/src/obex.c    | 1 +
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/obexd/src/manager.c b/obexd/src/manager.c
-index 01741fe62..2c180dc44 100644
---- a/obexd/src/manager.c
-+++ b/obexd/src/manager.c
-@@ -533,8 +533,12 @@ void manager_emit_transfer_property(struct obex_transfer *transfer,
- void manager_emit_transfer_started(struct obex_transfer *transfer)
- {
- 	transfer->status = TRANSFER_STATUS_ACTIVE;
-+	if (!transfer->path)
-+		return;
- 
--	manager_emit_transfer_property(transfer, "Status");
-+	g_dbus_emit_property_changed_full(connection, transfer->path,
-+					TRANSFER_INTERFACE, "Status",
-+					G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
- }
- 
- static void emit_transfer_completed(struct obex_transfer *transfer,
-diff --git a/obexd/src/obex.c b/obexd/src/obex.c
-index 3a68fd66c..c0d9e160a 100644
---- a/obexd/src/obex.c
-+++ b/obexd/src/obex.c
-@@ -720,6 +720,7 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
- 		manager_emit_transfer_property(os->service_data, "Size");
- 
- 	os->path = g_strdup(filename);
-+	manager_emit_transfer_property(os->service_data, "Filename");
- 
- 	return 0;
- }
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============2819753785265437717==--
