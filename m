@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DFB2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 22:40:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3756C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 22:40:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242252AbiCWWlg (ORCPT
+        id S1345288AbiCWWlh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 18:41:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42030 "EHLO
+        Wed, 23 Mar 2022 18:41:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234878AbiCWWlf (ORCPT
+        with ESMTP id S234878AbiCWWlg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:41:35 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A3035857
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id w8so2948030pll.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
+        Wed, 23 Mar 2022 18:41:36 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24A3D3631A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:06 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id o6-20020a17090a9f8600b001c6562049d9so3286595pjp.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
-        b=Bg2e9pcc0QTwSwwA18iSxYR/hz7RMgXz8Wr7HsMOrksSBDlnHDCblZpf1aCgMm+Ntt
-         noCT1r0HwxxWFFTxY0amri0FqADO5KqyvVBTUlU5Z2UCa2Jloyq7Gv2UVMVRiPInJ78G
-         Z19LTXQHRTLsb2L6ZyMuJ/H4eNk+oAiCpbuzk8NANEr3NNYjxj76nzltk1W6vxJp76C4
-         e2ZH31fzMiqKkfu1eayLrpcOBjb840JS5KwNy4m/W2jKfICL6cGOWmxfl3LyzCR7kLDe
-         n3/1IHIr7zznbDpiXqQ40uJqECb7lbDydNZ2GRlfl4XiqeHYcZv7LO6VA+f4TlYTkpd5
-         mBsg==
+        bh=FHmrDzWf34S+VIdONSZXDksFW5be3bZdPT1V47AMKuk=;
+        b=U0+ijJyuiwN/VsQM0kUvQ1kUQa4l+CrFTIKKdQezUq/d/snnt7xsZnPrl4UnKu5oCH
+         uBJ3Xj2oO24jMbIHceYxtFUNeuhW0pkkKP31bkdw/qt+9wjUyZ6YL55+SsnV+ti0xy3X
+         wFaTWssaYUjCLHQP83/f7DgetQCqc/QkG6gqZuOYhQLemfay3g5gog0hrEgO/p/kvILE
+         gWoDzm+lsPlJ/sNNDETWp67pK0NqkUcMtI9Kx+SDC6WHI0PBkk4JI910nhDSoT0p0Psm
+         gh3tBBCKA1cK4Sj4GZibV/uLLtEOEdUc0xc7XPIphUP611uFQrelbFd1bwRrrOx6jDZm
+         q2sg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
-        b=EanfgfFVo2zuR1pma5AucF0qsETU+B/EUqgzjNhHawf1cZtG5QgUf0MgYScDo4vaQr
-         xvbUK0gyJI0vQfqz9sTrhy9M91j3LBeYQCaFQrqZwn+DqcJD5pag+hLhm7lqUiL8HakM
-         sktxuGWyEkerwHINx8LUNryF9Xc8P5ObeMAHFtdOJFJc1J4oCSrPKCFkTpH7IFVgHIIi
-         J6FjdrE/OwETTcI8bYx5ZXQ9hefmSuqqLBrM4e466beCIKrd7dvoyWnz2u/eaIqnzE21
-         0P5z2VbwRVrp4UxTYCHPjme2wXyiYQpa3H+HDHbFLLvqg5c06ukKYPHLy+1pRa+Z90V+
-         gaBQ==
-X-Gm-Message-State: AOAM531StaltMoExft+GAiqTDTALFNo2VsP7bw6+zmfGUbMxP3QaBwKJ
-        MbnpUWCW6W/zkABfNY3UZBc4FG0n0vs=
-X-Google-Smtp-Source: ABdhPJy85Ms0W2CncS3abkGKykMexF7Q+sAOLsAGl4Mihgtmk+S3u/d+lsjkGzqqTv/yYlbmXAGTMg==
-X-Received: by 2002:a17:902:ce09:b0:151:96e2:d4b5 with SMTP id k9-20020a170902ce0900b0015196e2d4b5mr2335916plg.3.1648075204768;
-        Wed, 23 Mar 2022 15:40:04 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FHmrDzWf34S+VIdONSZXDksFW5be3bZdPT1V47AMKuk=;
+        b=ohG1DAV61RmY9JOIMI+UdkbSx4cAfhmAUmyL3LmbF6K65vY6cSk53rIQICCuJrnOJ4
+         JD5jAxn5KrAyO0aD7u7/11x65gC6BfHJBES4Lbxy/E3iO4sWRnHp5xvfiWCPfL6GGjFn
+         4pxaB05gtCmliKyE19Xc1YpYE5/UvrAfKpIVQ7z+uA6ky6fXRjJI7AKq9kpZM4Zo2xcI
+         xC/14mha6Tv/zIvjQ2PWg7IjpOdCnNhMmvdCE/t90dIA34gKJflvDtn2W2V+YIorXTnf
+         G19LOyaaGt/V5QPD5M6YWOHmMNG1OwHU40TAplJ/WnXVV7lLwoT5dy0G9q3AqD1GzVzh
+         0ohA==
+X-Gm-Message-State: AOAM5333AgP8flu+kxTEYKGhfyDf/xxgKz0o4b+fgidJeLTzeZbu0NqM
+        obJYLrm80f+GZwV34lqXp2E35anoKLg=
+X-Google-Smtp-Source: ABdhPJz392a64SXhInlh6t/l3RPZXBbr2o2kRDxgcA98Ub6Xiw/tmSmEs065Ay7QMEFBM7VXEA62EA==
+X-Received: by 2002:a17:90b:33d2:b0:1c6:f3c1:49c3 with SMTP id lk18-20020a17090b33d200b001c6f3c149c3mr2309990pjb.82.1648075205426;
+        Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
         by smtp.gmail.com with ESMTPSA id z14-20020aa7888e000000b004f79f59827asm825109pfe.139.2022.03.23.15.40.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 15:40:04 -0700 (PDT)
+        Wed, 23 Mar 2022 15:40:05 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] adapter: Introduce BTD_ADAPTER_DBG
-Date:   Wed, 23 Mar 2022 15:39:54 -0700
-Message-Id: <20220323224003.3736525-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v4 1/9] log: Don't log __FILE__ and __func__ with DBG_IDX
+Date:   Wed, 23 Mar 2022 15:39:55 -0700
+Message-Id: <20220323224003.3736525-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220323224003.3736525-1-luiz.dentz@gmail.com>
+References: <20220323224003.3736525-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,45 +66,38 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces BTD_ADAPTER_DBG which includes the controller index
-when using DBG_IDX, in addition to it also add similar macro for
-devices in the form of BTD_DEVICE_DBG which resolves the adapter and
-before calling BTD_ADAPTER_DBG.
+This removes __FILE__ and __func__ from DBG_IDX since users of it may
+already contain such information embedded in the format.
 ---
- src/adapter.h | 4 ++++
- src/device.h  | 4 ++++
- 2 files changed, 8 insertions(+)
+ src/log.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/src/adapter.h b/src/adapter.h
-index 35deb1d11..515be3210 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -23,6 +23,10 @@
- /* Invalid SSP passkey value used to indicate negative replies */
- #define INVALID_PASSKEY		0xffffffff
+diff --git a/src/log.h b/src/log.h
+index 74941beb2..1ed742a0d 100644
+--- a/src/log.h
++++ b/src/log.h
+@@ -9,6 +9,7 @@
+  */
  
-+#define BTD_ADAPTER_DBG(adapter, fmt, arg...) \
-+	DBG_IDX(btd_adapter_get_index(adapter), "%s:%s() " fmt, __FILE__, \
-+							__func__ , ## arg)
-+
- struct btd_adapter;
- struct btd_device;
- struct queue;
-diff --git a/src/device.h b/src/device.h
-index 071576d6b..4d40d1d22 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -11,6 +11,10 @@
+ #include <stdint.h>
++#include <stdbool.h>
  
- #define DEVICE_INTERFACE	"org.bluez.Device1"
+ void info(const char *format, ...) __attribute__((format(printf, 1, 2)));
  
-+#define BTD_DEVICE_DBG(device, fmt, arg...) \
-+	BTD_ADAPTER_DBG(device_get_adapter(device), "%s:%s() " fmt, __FILE__, \
-+							__func__ , ## arg)
-+
- struct btd_device;
+@@ -52,10 +53,11 @@ void __btd_enable_debug(struct btd_debug_desc *start,
+ 		.file = __FILE__, .flags = BTD_DEBUG_FLAG_DEFAULT, \
+ 	}; \
+ 	if (__btd_debug_desc.flags & BTD_DEBUG_FLAG_PRINT) \
+-		btd_debug(idx, "%s:%s() " fmt, __FILE__, __func__ , ## arg); \
++		btd_debug(idx, fmt, ## arg); \
+ } while (0)
  
- struct btd_device *device_create(struct btd_adapter *adapter,
+-#define DBG(fmt, arg...) DBG_IDX(0xffff, fmt, ## arg)
++#define DBG(fmt, arg...) \
++	DBG_IDX(0xffff, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+ #define error(fmt, arg...) \
+ 	btd_error(0xffff, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+ #define warn(fmt, arg...) \
 -- 
 2.35.1
 
