@@ -2,238 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F26DBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 22:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D73C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 23:39:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345298AbiCWWlr (ORCPT
+        id S1346131AbiCWXlF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 18:41:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42620 "EHLO
+        Wed, 23 Mar 2022 19:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345305AbiCWWln (ORCPT
+        with ESMTP id S1346126AbiCWXlA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 18:41:43 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86AA4381A4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:11 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id mm17-20020a17090b359100b001c6da62a559so7761734pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 15:40:11 -0700 (PDT)
+        Wed, 23 Mar 2022 19:41:00 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9194DC6C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 16:39:29 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id f3so2495459qvz.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 16:39:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=A5mU7ZW/EoX09OtoTGJHt6b6/ozCCsZy6iGJ/CCN76Y=;
-        b=ZdfyZGcnWsgdnPJEMGBRArNbpVzBpvqK5UFP+MKhhJvK0OV+0yWVl39/f/Z1SFe3Id
-         j9Ijjjh/iRTsgDNZtihSXkPq63AKLBShejG0483n3b6AbGCmcIFg7G13hN+3k/nWUSoO
-         xjqFVdcFPhGskgo5uDpz6ziTrpODPnO0DkuHAUOLFYF3p8j3+Wbr1hhH3pBKD8KZoBip
-         FR6H1n9GDZzLfewgrWkYj1jLCeI2ry6T08F2hJQzAKXD2NoPJT26Qg12a7rg6u7L/Oyd
-         m1izBOYn4QaVxqjPcp14ZxIqKDQIPWhfu/cNAFbChmIE5t59YrkS/QMGPXwmQExEOGde
-         39wQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=OmiBqg44RztiO5NAHPl9oI+858cBfTNZJkUL+kRNXWI=;
+        b=keG06egt1a9qRjKuig0aYFNmosmj60Oht4+7jjrrFbFeWVQ1lJ4EC1UirBSSv3mhkG
+         dU/j74tSvZc0W8J1sWkrzOv58HLlcLa7JCh27wkcM+4+z6RLBRNAbrUETBSs5+Dd6bLW
+         hxSCB3kl8rfLf74QAW0ufTXtSbBEqVCw1rzMCXCiFi5ifwuTNEt1vwXK1/7jW8SwnlC/
+         qr4BcuU2TlhkKLkykoXNWKhn4YlRFGiJUp3f1wEBGT1ScuafKE0tU5PQdaQjwsAvMz/o
+         w4oqe5N26X3jkMJR2ouuJ2yOedz5NG/xaVpDzwudZPbCSdZOPt4QdvFgKa/Q2X6EZ4AA
+         TIfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=A5mU7ZW/EoX09OtoTGJHt6b6/ozCCsZy6iGJ/CCN76Y=;
-        b=kfuRy2DkxYx4+4Fv4Q0Jid1T8jKojMeWeeRw55KfIbHv0g9syqpMdARGaIa5tnVI03
-         z+QgLDiu6bjblhMd/wubY5TN56ONM+m9eVP4GtO0rApRMwBHTnEIiTJrUfulXo23UE7u
-         h/drSEgsk4Omvs5kZIGz+YakJTMkic5PQi+bs9eGuVZ7e08THe82daC4xhmMECIJUPcH
-         GmbdVBlaec/uULXwb8eehW8R8PFFEbumL064K8tMGm1DIx+UXxFH2XkH7PMi6l33WnG9
-         OPBku3rSuOOqM59KI8zoV+IFAFODoha7Gp5CdVPXQ30YpxSPQmF2hZZG+PhwWi9l56d2
-         2c2w==
-X-Gm-Message-State: AOAM533Y5yoeC2yKVnX+y1R41ANNMwECjBvVh5bGOgE6hcLq0bur/vHk
-        Tthkf/hYM2eW4QDr4J51ekrEYybSTXI=
-X-Google-Smtp-Source: ABdhPJwMqYJ/M4IZQF5rMAm0ASFrH0uSHJ5ohYvwORQKJGfQuoRtb/xStXt+nn5ZYCJzKNN3gbADaw==
-X-Received: by 2002:a17:902:ce8b:b0:154:42e2:924e with SMTP id f11-20020a170902ce8b00b0015442e2924emr2329795plg.138.1648075210704;
-        Wed, 23 Mar 2022 15:40:10 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z14-20020aa7888e000000b004f79f59827asm825109pfe.139.2022.03.23.15.40.10
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=OmiBqg44RztiO5NAHPl9oI+858cBfTNZJkUL+kRNXWI=;
+        b=dcUQM2jWCR3vG90uPAnYHhG0zaZHG40hmTey0NBVBnMzy7w4oXX0UtQuHVskYkZJW8
+         3vIoyDIG/KN9CiLfemc75Xw99xpJmSxE7SJPCEnOHloxyySFsUZYIbLx1Fgpj9qw5TwH
+         mpQi7aNpZ3KV+2lGtwmoksgkW6cg88PUlKVB/3NrctzVB0VK6QyuHwKpgeEpDWNNFiHY
+         rC6oMazzbn2fv4RN0/zIO+5nTGY5mJxSoK3PtJz3mHY5SBWGxhCkJxtIZ7zgNaw15PHB
+         BjYGF02vtlTzzOXmzvz1Ca5Vc6qlbW/RCU0KVn1iuQSmQH8ozbmTqvO2JXh+max6TvTB
+         UNow==
+X-Gm-Message-State: AOAM5334DFEbuQxWXqs0eSdNL/s9Owxu/ANzjJ2OstPNsaFB2fvozCd3
+        9pYvcI2Oir7dLuPKEvKtk5PgKS9p6sf20g==
+X-Google-Smtp-Source: ABdhPJw/s3A/WttIZ7mCwlp9SvsUCr9bSvXALDLdEKXGyjaitUHHsNLKbSM0h87cK7zhM0hTVsnj2A==
+X-Received: by 2002:a05:6214:242a:b0:441:1e13:5dcd with SMTP id gy10-20020a056214242a00b004411e135dcdmr2037049qvb.121.1648078768523;
+        Wed, 23 Mar 2022 16:39:28 -0700 (PDT)
+Received: from [172.17.0.2] ([40.114.12.104])
+        by smtp.gmail.com with ESMTPSA id m4-20020ac85b04000000b002e1dcaed228sm1047476qtw.7.2022.03.23.16.39.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 15:40:10 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4 8/9] att: Rename att_debug and att_verbose to DBG and VERBOSE
-Date:   Wed, 23 Mar 2022 15:40:02 -0700
-Message-Id: <20220323224003.3736525-9-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220323224003.3736525-1-luiz.dentz@gmail.com>
-References: <20220323224003.3736525-1-luiz.dentz@gmail.com>
+        Wed, 23 Mar 2022 16:39:28 -0700 (PDT)
+Message-ID: <623bafb0.1c69fb81.caf17.82f9@mx.google.com>
+Date:   Wed, 23 Mar 2022 16:39:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7318597250300641773=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4,1/9] log: Don't log __FILE__ and __func__ with DBG_IDX
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220323224003.3736525-2-luiz.dentz@gmail.com>
+References: <20220323224003.3736525-2-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7318597250300641773==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-att_debug and att_verbose are macros which are more common to be
-used as uppercase, this also change them to use DBG like other parts of
-the code.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=625873
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.36 seconds
+GitLint                       PASS      0.96 seconds
+Prep - Setup ELL              PASS      42.81 seconds
+Build - Prep                  PASS      0.72 seconds
+Build - Configure             PASS      8.56 seconds
+Build - Make                  PASS      1291.43 seconds
+Make Check                    PASS      11.92 seconds
+Make Check w/Valgrind         PASS      440.83 seconds
+Make Distcheck                PASS      226.74 seconds
+Build w/ext ELL - Configure   PASS      8.66 seconds
+Build w/ext ELL - Make        PASS      1251.70 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- src/shared/att.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 7344b0c46..f7bef08bc 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -307,11 +307,11 @@ static void att_log(struct bt_att *att, uint8_t level, const char *format,
- 	va_end(va);
- }
- 
--#define att_debug(_att, _format, _arg...) \
-+#define DBG(_att, _format, _arg...) \
- 	att_log(_att, BT_ATT_DEBUG, "%s:%s() " _format, __FILE__, __func__,\
- 		## _arg)
- 
--#define att_verbose(_att, _format, _arg...) \
-+#define VERBOSE(_att, _format, _arg...) \
- 	att_log(_att, BT_ATT_DEBUG_VERBOSE, "%s:%s() " _format, __FILE__, \
- 		__func__, ## _arg)
- 
-@@ -359,7 +359,7 @@ static bool encode_pdu(struct bt_att *att, struct att_send_op *op,
- 				sign_cnt, &((uint8_t *) op->pdu)[1 + length])))
- 		return true;
- 
--	att_debug(att, "ATT unable to generate signature");
-+	DBG(att, "ATT unable to generate signature");
- 
- fail:
- 	free(op->pdu);
-@@ -488,7 +488,7 @@ static bool timeout_cb(void *user_data)
- 	if (!op)
- 		return false;
- 
--	att_debug(att, "(chan %p) Operation timed out: 0x%02x", chan,
-+	DBG(att, "(chan %p) Operation timed out: 0x%02x", chan,
- 						op->opcode);
- 
- 	if (att->timeout_callback)
-@@ -524,11 +524,11 @@ static ssize_t bt_att_chan_write(struct bt_att_chan *chan, uint8_t opcode,
- 	iov.iov_base = (void *) pdu;
- 	iov.iov_len = len;
- 
--	att_verbose(att, "(chan %p) ATT op 0x%02x", chan, opcode);
-+	VERBOSE(att, "(chan %p) ATT op 0x%02x", chan, opcode);
- 
- 	ret = io_send(chan->io, &iov, 1);
- 	if (ret < 0) {
--		att_debug(att, "(chan %p) write failed: %s", chan,
-+		DBG(att, "(chan %p) write failed: %s", chan,
- 						strerror(-ret));
- 		return ret;
- 	}
-@@ -661,12 +661,12 @@ static bool disconnect_cb(struct io *io, void *user_data)
- 	len = sizeof(err);
- 
- 	if (getsockopt(chan->fd, SOL_SOCKET, SO_ERROR, &err, &len) < 0) {
--		att_debug(att, "(chan %p) Failed to obtain disconnect "
-+		DBG(att, "(chan %p) Failed to obtain disconnect "
- 				"error: %s", chan, strerror(errno));
- 		err = 0;
- 	}
- 
--	att_debug(att, "Channel %p disconnected: %s", chan, strerror(err));
-+	DBG(att, "Channel %p disconnected: %s", chan, strerror(err));
- 
- 	/* Dettach channel */
- 	queue_remove(att->chans, chan);
-@@ -795,7 +795,7 @@ static bool handle_error_rsp(struct bt_att_chan *chan, uint8_t *pdu,
- 		op->timeout_id = 0;
- 	}
- 
--	att_debug(att, "(chan %p) Retrying operation %p", chan, op);
-+	DBG(att, "(chan %p) Retrying operation %p", chan, op);
- 
- 	chan->pending_req = NULL;
- 
-@@ -818,7 +818,7 @@ static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
- 	 * the bearer.
- 	 */
- 	if (!op) {
--		att_debug(att, "(chan %p) Received unexpected ATT response",
-+		DBG(att, "(chan %p) Received unexpected ATT response",
- 								chan);
- 		io_shutdown(chan->io);
- 		return;
-@@ -850,7 +850,7 @@ static void handle_rsp(struct bt_att_chan *chan, uint8_t opcode, uint8_t *pdu,
- 	goto done;
- 
- fail:
--	att_debug(att, "(chan %p) Failed to handle response PDU; opcode: "
-+	DBG(att, "(chan %p) Failed to handle response PDU; opcode: "
- 			"0x%02x", chan, opcode);
- 
- 	rsp_opcode = BT_ATT_OP_ERROR_RSP;
-@@ -875,7 +875,7 @@ static void handle_conf(struct bt_att_chan *chan, uint8_t *pdu, ssize_t pdu_len)
- 	 * invalid.
- 	 */
- 	if (!op || pdu_len) {
--		att_debug(att, "(chan %p) Received unexpected/invalid ATT "
-+		DBG(att, "(chan %p) Received unexpected/invalid ATT "
- 				"confirmation", chan);
- 		io_shutdown(chan->io);
- 		return;
-@@ -949,7 +949,7 @@ static bool handle_signed(struct bt_att *att, uint8_t *pdu, ssize_t pdu_len)
- 	return true;
- 
- fail:
--	att_debug(att, "ATT failed to verify signature: 0x%02x", opcode);
-+	DBG(att, "ATT failed to verify signature: 0x%02x", opcode);
- 
- 	return false;
- }
-@@ -1032,7 +1032,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 	if (bytes_read < 0)
- 		return false;
- 
--	att_verbose(att, "(chan %p) ATT received: %zd", chan, bytes_read);
-+	VERBOSE(att, "(chan %p) ATT received: %zd", chan, bytes_read);
- 
- 	att_hexdump(att, '>', chan->buf, bytes_read);
- 
-@@ -1047,12 +1047,12 @@ static bool can_read_data(struct io *io, void *user_data)
- 	/* Act on the received PDU based on the opcode type */
- 	switch (get_op_type(opcode)) {
- 	case ATT_OP_TYPE_RSP:
--		att_verbose(att, "(chan %p) ATT response received: 0x%02x",
-+		VERBOSE(att, "(chan %p) ATT response received: 0x%02x",
- 				chan, opcode);
- 		handle_rsp(chan, opcode, pdu + 1, bytes_read - 1);
- 		break;
- 	case ATT_OP_TYPE_CONF:
--		att_verbose(att, "(chan %p) ATT confirmation received: 0x%02x",
-+		VERBOSE(att, "(chan %p) ATT confirmation received: 0x%02x",
- 				chan, opcode);
- 		handle_conf(chan, pdu + 1, bytes_read - 1);
- 		break;
-@@ -1063,7 +1063,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		 * promptly notify the upper layer via disconnect handlers.
- 		 */
- 		if (chan->in_req) {
--			att_debug(att, "(chan %p) Received request while "
-+			DBG(att, "(chan %p) Received request while "
- 					"another is pending: 0x%02x",
- 					chan, opcode);
- 			io_shutdown(chan->io);
-@@ -1083,7 +1083,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		/* For all other opcodes notify the upper layer of the PDU and
- 		 * let them act on it.
- 		 */
--		att_debug(att, "(chan %p) ATT PDU received: 0x%02x", chan,
-+		DBG(att, "(chan %p) ATT PDU received: 0x%02x", chan,
- 							opcode);
- 		handle_notify(chan, pdu, bytes_read);
- 		break;
-@@ -1237,7 +1237,7 @@ static void bt_att_attach_chan(struct bt_att *att, struct bt_att_chan *chan)
- 
- 	io_set_close_on_destroy(chan->io, att->close_on_unref);
- 
--	att_debug(att, "Channel %p attached", chan);
-+	DBG(att, "Channel %p attached", chan);
- 
- 	wakeup_chan_writer(chan, NULL);
- }
--- 
-2.35.1
 
+--===============7318597250300641773==--
