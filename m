@@ -2,50 +2,39 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0363C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 19:53:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB4EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 19:57:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240392AbiCWTyo (ORCPT
+        id S1344462AbiCWT7A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 15:54:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43390 "EHLO
+        Wed, 23 Mar 2022 15:59:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234227AbiCWTym (ORCPT
+        with ESMTP id S232629AbiCWT67 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 15:54:42 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5166B9D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:53:11 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id v35so4657707ybi.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:53:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9GTupP3RjonrdqaJjYBtz9pLrsE5wG85AfMMObR7dn0=;
-        b=KE0SQv7WrEdMxaOKTtNHm4LseCVbYTtuGZh5RuAHt9QpWu2Hx2pyzYYrk/xivldVbq
-         1GCwmiSYAlXz6NnlY3E19Swt1n/GUGyXwNbVbsGRI6PXGXzckGDNi928EvthwRjIx6st
-         lKONga9KMWV5GGPvX/YUKf2Nbc/nKe51hD3sA4ELsdbczakI2kUEf6i0jLmgsY3QY0IH
-         XVr1MW4JDGiSKXeElta3971vhfas0EYcIsoR5Vhg+Vvv0LQ7/Vn+X3oTDbxdPjXQ1buM
-         Sv89st9ZP+8BPdR1A/YS/c4peDSpAhaKdg2ORng3uB0Xu1MT0J0XUo+5Jr+nmGjGRnae
-         /Rew==
+        Wed, 23 Mar 2022 15:58:59 -0400
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBE608BF76
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:57:27 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id h7so4530734lfl.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:57:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9GTupP3RjonrdqaJjYBtz9pLrsE5wG85AfMMObR7dn0=;
-        b=kx/B6nCLSyFfx/XjxKtVLxdsJoTbmbCKA+ZuKhet41pqW8e7PTE8MKYtGJN3V+2aWZ
-         DyeSFg6fyP7gNogn1vF2yjdcTPR6mwJsuotT1ji731uju85TGQQDPB8aW7oSn7quzYmm
-         jmaCjgnBq5jkvQ3BjUw6ERK79eBBIkR8BCgmQ/s0/0G08snknOWGR86Lnb7IKf9Vrl7v
-         pko5LcdS64RtJ3/zCt8qZyUjrECxIt8l/lVJkpR2S7mbDMxj5iJ72TGUMPEp/fxgzRD4
-         aeL9Wbo24S67eiGqKOjYcDa7KPEZGObcJ/dHVINylmZlEoBwaLvn7K1+AgjVF1OxOx/g
-         aokA==
-X-Gm-Message-State: AOAM531D7CdTGb13XO1MP5azxsRjy6E+wdehq39tI9ZfZX3A96OaS8wt
-        5A6/f9yyESKcTGN58/SuFjt9ZSBphg7MdHIwhmQ=
-X-Google-Smtp-Source: ABdhPJxagtC1wteoD3xARP2BoPJHiXxmC/lG0wJrJo/xFvuycPJIVR13q67dUzXvVoaNYotWj7x9VvSm1BryzVsi7bg=
-X-Received: by 2002:a05:6902:1009:b0:634:674f:ef16 with SMTP id
- w9-20020a056902100900b00634674fef16mr1732540ybt.459.1648065190722; Wed, 23
- Mar 2022 12:53:10 -0700 (PDT)
+        bh=eelW8p0BtUMUKdTA99eRRWpfX/RcRpTCICobWExV4mQ=;
+        b=ZU6Ok4mWSGI4NVf9X6IvlYSLjLzwqjgc48vTkwxtkLXHPhm0ofqsB3K45CEceDL6R/
+         nox3XIbzuNFLHpmB4vr1wMvl1z1gJqPKSjYKlGVoCZLpi82FG7M8LCEejsaDReV/T1w8
+         FM8P6zCEidsGluy+w5R6g4BlKYZZNOFKPHswNqD55xvGhrgAB41adBP3Frl17EaHdz6J
+         /dyR4A+1pZZ7ZjXG9Srw7jN69KwOBdTl/rwNKp73ZmreRNyovXGUhd/jbnbJ5TwgxpPl
+         bL9bTIyhsrvWFWS4TiohLtknXQ2mWBrpbX0XYH76ccCNoDkNmpguGmHohdR2z74VTzFk
+         HZ1A==
+X-Gm-Message-State: AOAM5303ZVA5BgZDv0/x0AP8TLSWFl+6r1Tmp4Pbmcg6gJk3FWacychh
+        B+qSV5fVIw21oQgcWEcAWCSMXIS4i1ZRsEzVqig4KSwCDhXphg==
+X-Google-Smtp-Source: ABdhPJwXTwlafX2kcbnoJt1MJvEFrRUxWbRxMBF7AU8wBbJJ3YWskVlxTTt8vBtx2zwPnNln9+2eydwCx/ziBLqRhRc=
+X-Received: by 2002:a05:6512:690:b0:44a:30d6:fb1c with SMTP id
+ t16-20020a056512069000b0044a30d6fb1cmr1167816lfe.430.1648065445834; Wed, 23
+ Mar 2022 12:57:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <CANFkB1ydGuwKRjusy3U0HCQo8E88XbZTh_UdPZ8wujt7P5KKnQ@mail.gmail.com>
  <CABBYNZLjV3PQ7Hm3PJZcTcs64aLzWLBNfooSYuZmSywv0RJG0g@mail.gmail.com>
@@ -59,20 +48,22 @@ References: <CANFkB1ydGuwKRjusy3U0HCQo8E88XbZTh_UdPZ8wujt7P5KKnQ@mail.gmail.com>
  <CANFkB1zMOYTD8ZsDHczHqce9ipgyu9-fEeXEZqTzuf=T4UufLQ@mail.gmail.com>
  <CANFkB1yOadrpibp4ZNE8e0E+-Wy4z_FV3LC=B7HZzUjGAh3DVA@mail.gmail.com> <CABBYNZK_CdiXaZzw++x8fzarP_WhCehLia17EpruVTduKZ=Png@mail.gmail.com>
 In-Reply-To: <CABBYNZK_CdiXaZzw++x8fzarP_WhCehLia17EpruVTduKZ=Png@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 23 Mar 2022 12:52:59 -0700
-Message-ID: <CABBYNZK7WWVQ3kof+fYZV4VkJrxQe9wkf9RDsHojPEcS7FLFsQ@mail.gmail.com>
+From:   Adam Pigg <adam@piggz.co.uk>
+Date:   Wed, 23 Mar 2022 19:57:13 +0000
+Message-ID: <CANFkB1y-bgt4NgMdrJ30OUR9z-KRuAdRydpz8wRoUmj7-dj0zw@mail.gmail.com>
 Subject: Re: GATT issue, possible bluez bug?
-To:     Adam Pigg <adam@piggz.co.uk>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Adam,
+Hi Luiz
 
-On Wed, Mar 23, 2022 at 12:45 PM Luiz Augusto von Dentz
+Thanks for having the patience with me on this....
+
+On Wed, 23 Mar 2022 at 19:46, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 >
 > Hi Adam,
@@ -320,12 +311,58 @@ On Wed, Mar 23, 2022 at 12:45 PM Luiz Augusto von Dentz
 > following the spec in many respects as even their MTU changes from
 > request to response and it does multiple rounds of Exchange MTU and
 > stop responding while doing it.
+>
 
-Btw, I checked the android logs and it doesn't even do any Exchange
-MTU on its own, so it just responds with 247 so I think this is
-related to the peripheral inconsistency with its own MTU (247 != 252)
-so it attempts to do another round of Exchange MTU while ATT request
-is in place which perhaps cause it to stop responding.
+I can certainly look into how to contact Huami/Amazfit ... I wouldnt
+count on a response though!
 
--- 
-Luiz Augusto von Dentz
+I see you looked at the android log already.
+
+Do you have an idea for a patch I could try out?  Im deep in this now
+anyway, and over-wrote my system bluez :D
+
+Its strange how they have messed up this generation of device as all
+the older ones work fine, and I imagine they must just build on the
+old code base.
+
+> >
+> >
+> > > Thanks
+> > >
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > > >
+> > > > > > >
+> > > > > > > > < HCI Command: Disconnect (0x01|0x0006) plen 3
+> > > > > > > >
+> > > > > > > >                            #48 [hci0] 58.673128
+> > > > > > > >         Handle: 3585
+> > > > > > > >         Reason: Remote User Terminated Connection (0x13)
+> > > > > > > >
+> > > > > > > > > Thanks
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > > --
+> > > > > > > > > > > Luiz Augusto von Dentz
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > --
+> > > > > > > > Luiz Augusto von Dentz
+> > > > > >
+> > > > > >
+> > > > > >
+> > > > > > --
+> > > > > > Luiz Augusto von Dentz
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
