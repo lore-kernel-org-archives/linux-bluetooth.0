@@ -2,59 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0430AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 20:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9DBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 21:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240790AbiCWUyD (ORCPT
+        id S231894AbiCWVIM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 16:54:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54694 "EHLO
+        Wed, 23 Mar 2022 17:08:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344812AbiCWUx7 (ORCPT
+        with ESMTP id S229748AbiCWVIM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 16:53:59 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 053338B6DD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 13:52:29 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id g3so2721322plo.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 13:52:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
-        b=hk0g0ytehl7tarlOOTOJjAbTxp02X7fWO6OMZSz7vroIURW4Bkop5zhybyqxy7yOKq
-         Uqql+w7pf+8fogZjcnwevpqO2sIjooSPW8avY8isnNJ3yS9W87a6139m8mCoNrM4JZmQ
-         0Dyuptm7HMOOUBJw10y5eQSh+SYy26Uam5J16LwlsdXjkgNWDycxm+mKdU7p3NZJf50U
-         VqxWwg9mfAxahSQXwQmLMNDObxXCvtWl5RQOYpsw0gB/PBz3mqf8GbNyWGygsQt8TMKT
-         /TWGMzDybc/JnL8sfwc2naoXRF0/9I6W9RfLbUuT+IoWqrUQf5kg53A8YKadtG6vjwBd
-         CUqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=fQwh4amWpFaUYFE3yRHpnASrf87h4cacFDES28Pe7yU=;
-        b=tGrg2TrBj2Sdp1AEPfky4mI2gtND3SyIAxJ3Gzv+xECIWoBFjulcwK6UvQBv9WtvdH
-         LGx0Ncajs0/YY/LtwdQnDO9bIZZC+o/vm6057NwVDVy2wrMcsexjvOq5PFGpncO3oS/9
-         Qg/IjuI8a0uJzUb9c6XnIjV4hKXEZOq5tUtfe0RSMkR4RAUAsPOtSu2fQ/GR3un6/gk8
-         ZboSXFATC2vVySIzLaQleZ/319kDOD6B2M3pNqefq0J99aER1xtOG1ABE56hu3M1DNhk
-         E58g9pBXeN/oSh9Pl2ZS0jHgBe5L2+2YL1hM15C8aDQIJEKHf3mKB2GvtT+W7VC9godj
-         l7Dw==
-X-Gm-Message-State: AOAM531zS57OUgNgf/LdnXQVMGwmv+o85hOHFPDTBhIMDsmLpLohIWq8
-        0qwiJhhElM48aEKlq87yzXl0eCP/rps=
-X-Google-Smtp-Source: ABdhPJyRKOGWGYcDc/RVqXuDPL6sy2iCeKUP+vuXCNIWu+0x4J5BhCCTAUT2R7uq/RfsHb1baORb0Q==
-X-Received: by 2002:a17:902:6ac7:b0:150:24d6:b2ee with SMTP id i7-20020a1709026ac700b0015024d6b2eemr1961139plt.168.1648068748263;
-        Wed, 23 Mar 2022 13:52:28 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id j4-20020a056a00174400b004fabbccb1a5sm743873pfc.94.2022.03.23.13.52.27
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 23 Mar 2022 13:52:28 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Wed, 23 Mar 2022 17:08:12 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 943FF716ED
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 14:06:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648069601; x=1679605601;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4tX2VHvCiEXMor7xN+p2Vue9XuYmp1IO2BWlpO7tBH8=;
+  b=PazrWbbiZ4f6SgFPQPbeO+ukFInwhLbll8z0v3Q7sDkOXzSscERPhW2I
+   nFrDLnvOuRpj6vctVJ4zNuteXGFMWkPIVTFRnYXVZnqamh50PiYrwrXCi
+   aASn2sInxk/2SRptuCIjyIpB9pBNaE6aHvSDj59Irj0trdgWCWWGVWIkR
+   KjV4tQFqqPpUiQwbm1xnL4LUi7ES9ed0yU9DvndrdWpE+KfyTSgcxnd6M
+   hWGDhUg1r4n6u2leFD2iPZBqK+4ueBFBvw/TAWKXNrETIlx6r1dHR5F4t
+   53N4Cg7BbTuxftqW3cF23KIH/BfSsZLM86hKuzRfU4T8mlkJYTla5nm3r
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10295"; a="238167068"
+X-IronPort-AV: E=Sophos;i="5.90,205,1643702400"; 
+   d="scan'208";a="238167068"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2022 14:06:41 -0700
+X-IronPort-AV: E=Sophos;i="5.90,205,1643702400"; 
+   d="scan'208";a="601450895"
+Received: from nishthas-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.134.104])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2022 14:06:41 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] adapter: Introduce BTD_ADAPTER_DBG
-Date:   Wed, 23 Mar 2022 13:52:27 -0700
-Message-Id: <20220323205227.3605495-1-luiz.dentz@gmail.com>
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] mesh: Fix address overrun error in rx filter
+Date:   Wed, 23 Mar 2022 14:06:29 -0700
+Message-Id: <20220323210629.17274-1-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,47 +51,146 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This fixes the following error for invalid read access when registering
+filter for incoming messages:
 
-This introduces BTD_ADAPTER_DBG which includes the controller index
-when using DBG_IDX, in addition to it also add similar macro for
-devices in the form of BTD_DEVICE_DBG which resolves the adapter and
-before calling BTD_ADAPTER_DBG.
+140632==ERROR: AddressSanitizer: stack-buffer-overflow on address...
+ #0 0x7f60c185741d in MemcmpInterceptorCommon(...
+    #1 0x7f60c1857af8 in __interceptor_memcmp (/lib64/libasan.so...
+    #2 0x55a10101536e in find_by_filter mesh/mesh-io-unit.c:494
+    #3 0x55a1010d8c46 in l_queue_remove_if ell/queue.c:517
+    #4 0x55a101014ebd in recv_register mesh/mesh-io-unit.c:506
+    #5 0x55a10102946f in mesh_net_attach mesh/net.c:2885
+    #6 0x55a101086f64 in send_reply mesh/dbus.c:153
+    #7 0x55a101124c3d in handle_method_return ell/dbus.c:216
+    #8 0x55a10112c8ef in message_read_handler ell/dbus.c:276
+    #9 0x55a1010dae20 in io_callback ell/io.c:120
+    #10 0x55a1010dff7e in l_main_iterate ell/main.c:478
+    #11 0x55a1010e06e3 in l_main_run ell/main.c:525
+    #12 0x55a1010e06e3 in l_main_run ell/main.c:507
+    #13 0x55a1010e0bfc in l_main_run_with_signal ell/main.c:647
+    #14 0x55a10100316e in main mesh/main.c:292
+    #15 0x7f60c0c6855f in __libc_start_call_main (/lib64/libc.so.6+...
+    #16 0x7f60c0c6860b in __libc_start_main_alias_1 (/lib64/libc.so.6+...
+    #17 0x55a101003ce4 in _start (/home/istotlan/bluez/mesh/bluetooth-m...
 ---
- src/adapter.h | 4 ++++
- src/device.h  | 4 ++++
- 2 files changed, 8 insertions(+)
+ mesh/mesh-io-generic.c | 25 ++++++++++++++++---------
+ mesh/mesh-io-unit.c    | 18 +++++++++++-------
+ 2 files changed, 27 insertions(+), 16 deletions(-)
 
-diff --git a/src/adapter.h b/src/adapter.h
-index 35deb1d11..515be3210 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -23,6 +23,10 @@
- /* Invalid SSP passkey value used to indicate negative replies */
- #define INVALID_PASSKEY		0xffffffff
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+index 6c0b8f0fd..364e363a6 100644
+--- a/mesh/mesh-io-generic.c
++++ b/mesh/mesh-io-generic.c
+@@ -810,10 +810,13 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
  
-+#define BTD_ADAPTER_DBG(adapter, fmt, arg...) \
-+	DBG_IDX(btd_adapter_get_index(adapter), "%s:%s() " fmt, __FILE__, \
-+							__func__ , ## arg)
+ static bool find_by_filter(const void *a, const void *b)
+ {
+-	const struct pvt_rx_reg *rx_reg = a;
+-	const uint8_t *filter = b;
++	const struct pvt_rx_reg *rx_reg_old = a;
++	const struct pvt_rx_reg *rx_reg = b;
 +
- struct btd_adapter;
- struct btd_device;
- struct queue;
-diff --git a/src/device.h b/src/device.h
-index 071576d6b..4d40d1d22 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -11,6 +11,10 @@
++	if (rx_reg_old->len != rx_reg->len)
++		return false;
  
- #define DEVICE_INTERFACE	"org.bluez.Device1"
+-	return !memcmp(rx_reg->filter, filter, rx_reg->len);
++	return !memcmp(rx_reg_old->filter, rx_reg->filter, rx_reg->len);
+ }
  
-+#define BTD_DEVICE_DBG(device, fmt, arg...) \
-+	BTD_ADAPTER_DBG(device_get_adapter(device), "%s:%s() " fmt, __FILE__, \
-+							__func__ , ## arg)
+ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+@@ -821,16 +824,13 @@ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+ {
+ 	struct bt_hci_cmd_le_set_scan_enable cmd;
+ 	struct mesh_io_private *pvt = io->pvt;
+-	struct pvt_rx_reg *rx_reg;
++	struct pvt_rx_reg *rx_reg, *rx_reg_old;
+ 	bool already_scanning;
+ 	bool active = false;
+ 
+ 	if (!cb || !filter || !len)
+ 		return false;
+ 
+-	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
+-
+-	l_free(rx_reg);
+ 	rx_reg = l_malloc(sizeof(*rx_reg) + len);
+ 
+ 	memcpy(rx_reg->filter, filter, len);
+@@ -838,6 +838,10 @@ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+ 	rx_reg->cb = cb;
+ 	rx_reg->user_data = user_data;
+ 
++	rx_reg_old = l_queue_remove_if(pvt->rx_regs, find_by_filter, rx_reg);
 +
- struct btd_device;
++	l_free(rx_reg_old);
++
+ 	already_scanning = !l_queue_isempty(pvt->rx_regs);
  
- struct btd_device *device_create(struct btd_adapter *adapter,
+ 	l_queue_push_head(pvt->rx_regs, rx_reg);
+@@ -863,10 +867,13 @@ static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
+ {
+ 	struct bt_hci_cmd_le_set_scan_enable cmd = {0, 0};
+ 	struct mesh_io_private *pvt = io->pvt;
+-	struct pvt_rx_reg *rx_reg;
++	struct pvt_rx_reg *rx_reg, rx_reg_tmp;
+ 	bool active = false;
+ 
+-	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
++	memcpy(&rx_reg_tmp.filter, filter, len);
++	rx_reg_tmp.len = len;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, &rx_reg_tmp);
+ 
+ 	if (rx_reg)
+ 		l_free(rx_reg);
+diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
+index f4b615ac8..bf3f808e4 100644
+--- a/mesh/mesh-io-unit.c
++++ b/mesh/mesh-io-unit.c
+@@ -488,24 +488,24 @@ static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
+ 
+ static bool find_by_filter(const void *a, const void *b)
+ {
+-	const struct pvt_rx_reg *rx_reg = a;
+-	const uint8_t *filter = b;
++	const struct pvt_rx_reg *rx_reg_old = a;
++	const struct pvt_rx_reg *rx_reg = b;
+ 
+-	return !memcmp(rx_reg->filter, filter, rx_reg->len);
++	if (rx_reg_old->len != rx_reg->len)
++		return false;
++
++	return !memcmp(rx_reg_old->filter, rx_reg->filter, rx_reg->len);
+ }
+ 
+ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+ 			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
+ {
+ 	struct mesh_io_private *pvt = io->pvt;
+-	struct pvt_rx_reg *rx_reg;
++	struct pvt_rx_reg *rx_reg, *rx_reg_old;
+ 
+ 	if (!cb || !filter || !len)
+ 		return false;
+ 
+-	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
+-
+-	l_free(rx_reg);
+ 	rx_reg = l_malloc(sizeof(*rx_reg) + len);
+ 
+ 	memcpy(rx_reg->filter, filter, len);
+@@ -513,6 +513,10 @@ static bool recv_register(struct mesh_io *io, const uint8_t *filter,
+ 	rx_reg->cb = cb;
+ 	rx_reg->user_data = user_data;
+ 
++	rx_reg_old = l_queue_remove_if(pvt->rx_regs, find_by_filter, rx_reg);
++
++	l_free(rx_reg_old);
++
+ 	l_queue_push_head(pvt->rx_regs, rx_reg);
+ 
+ 	return true;
 -- 
 2.35.1
 
