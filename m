@@ -2,67 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17580C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 10:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17269C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 10:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243594AbiCWKnb convert rfc822-to-8bit (ORCPT
+        id S235247AbiCWKvm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 06:43:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46420 "EHLO
+        Wed, 23 Mar 2022 06:51:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240536AbiCWKna (ORCPT
+        with ESMTP id S233371AbiCWKvm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 06:43:30 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44DE96D1B4;
-        Wed, 23 Mar 2022 03:42:00 -0700 (PDT)
-Received: from smtpclient.apple (p5b3d2183.dip0.t-ipconnect.de [91.61.33.131])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9BA26CED32;
-        Wed, 23 Mar 2022 11:41:53 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+        Wed, 23 Mar 2022 06:51:42 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEAFA75C3C;
+        Wed, 23 Mar 2022 03:50:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5373C61180;
+        Wed, 23 Mar 2022 10:50:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AB96FC340E9;
+        Wed, 23 Mar 2022 10:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648032611;
+        bh=kjeZ9alUc2aWCvK8F3N4ELOWHGXAyCN/wyWHw77ecyM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=m+R/v48GTVq6Nw0Y2NiGubmq/CXboOdaZKUJrWodtdkNCuBT+/GorN9ibMklBvltu
+         7Ezlzpktyx54ZJTf04yYbhGSJsJEp0GHcQ1Ipoc/cPAquzAgYzAFNhkuGYtp0wMRmQ
+         d/6IkwdClmOh8meJc2Alq13p0cgLEg+NTYjsFXFIE8M688F+itd8VcQ0g8yB9+IuaU
+         EjmgNw1NRWVWlYKM8AaCf89jQlGTpgcOHquCjWAqPNP+JQHU/Eq8gTN5EfPAjJiKgb
+         fj3cX79WIMmL+h1MdHfwYynzL4++93tTxT/YeZPVoAb05pDlkuqXB9aTBlAwQ6OY95
+         QlWXbVptvxJSw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 85DF4EAC096;
+        Wed, 23 Mar 2022 10:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Subject: Re: [PATCH] Bluetooth: mt7921s: Fix the incorrect pointer check
-From:   Marcel Holtmann <marcel@holtmann.org>
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164803261154.27387.6013475934933962209.git-patchwork-notify@kernel.org>
+Date:   Wed, 23 Mar 2022 10:50:11 +0000
+References: <5d56b2a23e6e793c64ed98890329ce1beb010ce0.1647991506.git.objelf@gmail.com>
 In-Reply-To: <5d56b2a23e6e793c64ed98890329ce1beb010ce0.1647991506.git.objelf@gmail.com>
-Date:   Wed, 23 Mar 2022 11:41:53 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
+To:     Sean Wang <sean.wang@mediatek.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
         Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
         Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
         frankgor@google.com, abhishekpandit@google.com,
         michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
         linux-bluetooth@vger.kernel.org,
         linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Yake Yang <yake.yang@mediatek.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6F03EA00-35D0-4E43-A8BD-8A3618C87695@holtmann.org>
-References: <5d56b2a23e6e793c64ed98890329ce1beb010ce0.1647991506.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        yake.yang@mediatek.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+Hello:
 
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
+
+On Wed, 23 Mar 2022 07:30:40 +0800 you wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
 > Fix the incorrect pointer check on ven_data.
 > 
 > Fixes: f41b91fa1783 ("Bluetooth: mt7921s: Add .btmtk_get_codec_config_data")
 > Co-developed-by: Yake Yang <yake.yang@mediatek.com>
 > Signed-off-by: Yake Yang <yake.yang@mediatek.com>
 > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> drivers/bluetooth/btmtksdio.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> [...]
 
-patch has been applied to bluetooth-next tree.
+Here is the summary with links:
+  - Bluetooth: mt7921s: Fix the incorrect pointer check
+    https://git.kernel.org/bluetooth/bluetooth-next/c/864cc8a234cd
 
-Regards
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Marcel
 
