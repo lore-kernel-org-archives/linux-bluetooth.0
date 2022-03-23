@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 064F8C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2107C433EF
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 00:06:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240858AbiCWAI0 (ORCPT
+        id S240860AbiCWAI0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 22 Mar 2022 20:08:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240849AbiCWAIZ (ORCPT
+        with ESMTP id S240853AbiCWAIZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 22 Mar 2022 20:08:25 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1791A5DE7F
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83B625E143
         for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 17:06:57 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id c2so13748720pga.10
+Received: by mail-pl1-x631.google.com with SMTP id c23so93753plo.0
         for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 17:06:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=lMeVwZRc+kCFv6ywPENuuniweobbSTLYVjAmAjxzwIE=;
-        b=C8mcyl3j3WaP25KR/Vc8jrR+A7k5VEF6+DF3AuzoxWRU/87dfMC2hbZsENmTL3Of7A
-         oB2Ur7tOp1wOclI8gnQNLXvjVHj5GUZ/lCxBZJpojvXEiN3x5zkBgnkUP3ZCOxaLCRl5
-         z3nDXWTF0z6FtftFCwgsEIxmHvVoLkG9JMzxEebrGwA15fhbhB7ZTWthOyiP4NI5CA+L
-         EAUKhqtAbquQSHgKOr6ZNlxw/YjKzQBhZ8AGWm31SHhmnrcB/ayPDLzty+d1pDeGjJiW
-         jjsUnfoW0Ky4GCExp/zlSzt5T4Kkgar3MEWFt4yUeIYkduTdSBtGaLXPRw5tcGqxI8HD
-         d5EQ==
+        bh=oA2b2MSFZ5xMIcZQftlPk/BJnbKEpfSvA/B3B3AZtBo=;
+        b=S+ACimeHKf47x+75YpDn69/Ldbv0OJymFBKcQqFOdIPso+b8VZ+YN01psvbsnJizhM
+         zhiW/8rm0kbwUwZPoP0zFEyW2O5uTxTEzBe3YCtq75NXY3GkruZ5yj9NUxnujG8I9+b2
+         6Yj1JpX6Y3pOetnrDBkjVgdyFGoNgRs6eCSagp63hUpDHvgS4YI1CUpqnLG/4kQ7yuxx
+         TcHjnRKxFrY5n5S4te62FXawSP7BjNTZWJFh2l/x0G7V+T65ZF322E/GFYvKxHoZtJyE
+         xDT1GJQfwwn/OeqMTsz2/vu5v19/t4QiR6JcychiVFLAmqkpb3g46jJqCyRBPNeaIpwG
+         Haeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lMeVwZRc+kCFv6ywPENuuniweobbSTLYVjAmAjxzwIE=;
-        b=J5evYvWBl1DG4mp3/E4EBENKVnHcWqYiW6PFwvIsczXz7UL11u4bsPpcKMjzFdjFLt
-         LWwuo47Byyp2Q4aHyXXfRlW1yFac4yD8yJKsUGnck1HwBr8woZh7/nlfWG7t3w5mnGyj
-         ksTTGgJK74Z/VzCLE6olmejGzM7ZmddBLJhYppPXbJ76pPe+Bfcm8Tulw3a2auDTo33A
-         e9tAyGI33Sc94NSLLA65n5vJk3JNf5Hbp8mliHM1OJldhlfjEg+gpCNze85NoRBsZ4i0
-         wQ5UxJYmKuXELNXjtgLKNfShrNhUXfOc0Jteo6ap7nRz2pRf9KpiM8G0R0IXY++S87uB
-         +dxA==
-X-Gm-Message-State: AOAM530+ecXFkSLYh3Zgj0tC5MS46yhjiTowa+DihsPIYTsfzWtzgXlm
-        XheH0IoxFtJjy5Ji3iw4Z/1m1tZhCSo=
-X-Google-Smtp-Source: ABdhPJyIevS5o+52IYgKdOZVr3H527FjsPm4eD22VY7YMusdMF5A8C+7/1H3MYEOA/TfyqYdoQ+jfg==
-X-Received: by 2002:a63:f966:0:b0:380:5d50:ba72 with SMTP id q38-20020a63f966000000b003805d50ba72mr8954848pgk.403.1647994016237;
+        bh=oA2b2MSFZ5xMIcZQftlPk/BJnbKEpfSvA/B3B3AZtBo=;
+        b=N6cR/yMAMy9np6wyVMW5TZ0DhttKRiHoIGn/wd5U3lXReGcNBs+uwu4NZ7LkQXboiM
+         FMzvDRM968ZAQaBVsQNTyoemolUdxpuWadj8xKqMUPs4hLr5i104ZjwoP3Jx5Ppg/3PN
+         f2pxdgHLOBcp5bUpxpgSZtTcBk5EbzlRc4elJSDTtuAKTKJdpOeGLM5JA49iMN3qIRI1
+         Z9pWGjeJrLzX1POp0XQWsvbdHBlTAw0QB2sSREn8mowDCbACKu/cTxNfex544TSbeRyJ
+         w+Y4sLXcThs+LpUCxs3/WFWkSf204jDGE2VNUlzmWHp/XxoWF5F/SOGaHLOCzAUU6UYZ
+         UpXw==
+X-Gm-Message-State: AOAM531ID2ShBZc3psYIX3ku6BZPn3woY5ZJbI7vY9aq2Q9tIfQZYSic
+        rNAoz4/6JjwjZp4l+XKHclY6Bvi1bBk=
+X-Google-Smtp-Source: ABdhPJx3gzXoOPQfoQY5i9y0jNOekjrbGNXTGeqz178v+rkSw5WDfX3xSbC9tiRD4Ztrhc1LRzsSGg==
+X-Received: by 2002:a17:903:1209:b0:14e:e31c:b8c4 with SMTP id l9-20020a170903120900b0014ee31cb8c4mr20951542plh.153.1647994016832;
         Tue, 22 Mar 2022 17:06:56 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id bx22-20020a056a00429600b004fa936a64b0sm10098423pfb.196.2022.03.22.17.06.55
+        by smtp.gmail.com with ESMTPSA id bx22-20020a056a00429600b004fa936a64b0sm10098423pfb.196.2022.03.22.17.06.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 17:06:55 -0700 (PDT)
+        Tue, 22 Mar 2022 17:06:56 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 2/9] mgmt: Add DBG macro
-Date:   Tue, 22 Mar 2022 17:06:47 -0700
-Message-Id: <20220323000654.3157833-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 3/9] mgmt: Introduce mgmt_set_verbose
+Date:   Tue, 22 Mar 2022 17:06:48 -0700
+Message-Id: <20220323000654.3157833-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220323000654.3157833-1-luiz.dentz@gmail.com>
 References: <20220323000654.3157833-1-luiz.dentz@gmail.com>
@@ -66,106 +66,90 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds mgmt_log wrapper for util_debug and DBG so file and function
-names are printed with the logs.
+This introduces mgmt_set_verbose which can be used to enable printing
+the the likes hexdump of packets, by default it is disabled since in
+most cases the hexdump is not very useful and there are better tools
+to collect the hexdumo like btmon.
 ---
- src/shared/mgmt.c | 36 ++++++++++++++++++++++--------------
- 1 file changed, 22 insertions(+), 14 deletions(-)
+ src/shared/mgmt.c | 24 ++++++++++++++++++++----
+ src/shared/mgmt.h |  1 +
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
 diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 95229c248..c7e6a6c1d 100644
+index c7e6a6c1d..cf518cc2b 100644
 --- a/src/shared/mgmt.c
 +++ b/src/shared/mgmt.c
-@@ -27,6 +27,9 @@
- #include "src/shared/mgmt.h"
- #include "src/shared/timeout.h"
+@@ -50,6 +50,7 @@ struct mgmt {
+ 	mgmt_debug_func_t debug_callback;
+ 	mgmt_destroy_func_t debug_destroy;
+ 	void *debug_data;
++	bool verbose;
+ };
  
-+#define DBG(_mgmt, _format, arg...) \
-+	mgmt_log(_mgmt, "%s:%s() " _format, __FILE__, __func__, ## arg)
-+
- struct mgmt {
- 	int ref_count;
- 	int fd;
-@@ -177,6 +180,18 @@ static bool request_timeout(void *data)
- 	return false;
+ struct mgmt_request {
+@@ -192,6 +193,15 @@ static void mgmt_log(struct mgmt *mgmt, const char *format, ...)
+ 	va_end(ap);
  }
  
-+static void mgmt_log(struct mgmt *mgmt, const char *format, ...)
++static void mgmt_hexdump(struct mgmt *mgmt, char dir, const void *data,
++							size_t len)
 +{
-+	va_list ap;
-+
-+	if (!mgmt || !format || !mgmt->debug_callback)
++	if (!mgmt->verbose)
 +		return;
 +
-+	va_start(ap, format);
-+	util_debug_va(mgmt->debug_callback, mgmt->debug_data, format, ap);
-+	va_end(ap);
++	util_hexdump(dir, data, len, mgmt->debug_callback, mgmt->debug_data);
 +}
 +
  static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
  {
  	struct iovec iov;
-@@ -187,8 +202,8 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
+@@ -219,8 +229,7 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
  
- 	ret = io_send(mgmt->io, &iov, 1);
- 	if (ret < 0) {
--		util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"write failed: %s", strerror(-ret));
-+		DBG(mgmt, "write failed: %s", strerror(-ret));
+ 	DBG(mgmt, "[0x%04x] command 0x%04x", request->index, request->opcode);
+ 
+-	util_hexdump('<', request->buf, ret, mgmt->debug_callback,
+-							mgmt->debug_data);
++	mgmt_hexdump(mgmt, '<', request->buf, ret);
+ 
+ 	queue_push_tail(mgmt->pending_list, request);
+ 
+@@ -373,8 +382,7 @@ static bool can_read_data(struct io *io, void *user_data)
+ 	if (bytes_read < 0)
+ 		return false;
+ 
+-	util_hexdump('>', mgmt->buf, bytes_read,
+-				mgmt->debug_callback, mgmt->debug_data);
++	mgmt_hexdump(mgmt, '>', mgmt->buf, bytes_read);
+ 
+ 	if (bytes_read < MGMT_HDR_SIZE)
+ 		return true;
+@@ -594,6 +602,14 @@ bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
+ 	return true;
+ }
+ 
++void mgmt_set_verbose(struct mgmt *mgmt, bool value)
++{
++	if (!mgmt)
++		return;
 +
- 		if (request->callback)
- 			request->callback(MGMT_STATUS_FAILED, 0, NULL,
- 							request->user_data);
-@@ -202,9 +217,7 @@ static bool send_request(struct mgmt *mgmt, struct mgmt_request *request)
- 							request,
- 							NULL);
++	mgmt->verbose = value;
++}
++
+ bool mgmt_set_close_on_unref(struct mgmt *mgmt, bool do_close)
+ {
+ 	if (!mgmt)
+diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
+index b413cea78..0f3e54c16 100644
+--- a/src/shared/mgmt.h
++++ b/src/shared/mgmt.h
+@@ -28,6 +28,7 @@ typedef void (*mgmt_debug_func_t)(const char *str, void *user_data);
  
--	util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"[0x%04x] command 0x%04x",
--				request->index, request->opcode);
-+	DBG(mgmt, "[0x%04x] command 0x%04x", request->index, request->opcode);
+ bool mgmt_set_debug(struct mgmt *mgmt, mgmt_debug_func_t callback,
+ 				void *user_data, mgmt_destroy_func_t destroy);
++void mgmt_set_verbose(struct mgmt *mgmt, bool value);
  
- 	util_hexdump('<', request->buf, ret, mgmt->debug_callback,
- 							mgmt->debug_data);
-@@ -283,9 +296,7 @@ static void request_complete(struct mgmt *mgmt, uint8_t status,
- 	request = queue_remove_if(mgmt->pending_list,
- 					match_request_opcode_index, &match);
- 	if (!request) {
--		util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"Unable to find request for opcode 0x%04x",
--				opcode);
-+		DBG(mgmt, "Unable to find request for opcode 0x%04x", opcode);
+ bool mgmt_set_close_on_unref(struct mgmt *mgmt, bool do_close);
  
- 		/* Attempt to remove with no opcode */
- 		request = queue_remove_if(mgmt->pending_list,
-@@ -383,8 +394,7 @@ static bool can_read_data(struct io *io, void *user_data)
- 		cc = mgmt->buf + MGMT_HDR_SIZE;
- 		opcode = btohs(cc->opcode);
- 
--		util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"[0x%04x] command 0x%04x complete: 0x%02x",
-+		DBG(mgmt, "[0x%04x] command 0x%04x complete: 0x%02x",
- 						index, opcode, cc->status);
- 
- 		request_complete(mgmt, cc->status, opcode, index, length - 3,
-@@ -394,15 +404,13 @@ static bool can_read_data(struct io *io, void *user_data)
- 		cs = mgmt->buf + MGMT_HDR_SIZE;
- 		opcode = btohs(cs->opcode);
- 
--		util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"[0x%04x] command 0x%02x status: 0x%02x",
-+		DBG(mgmt, "[0x%04x] command 0x%02x status: 0x%02x",
- 						index, opcode, cs->status);
- 
- 		request_complete(mgmt, cs->status, opcode, index, 0, NULL);
- 		break;
- 	default:
--		util_debug(mgmt->debug_callback, mgmt->debug_data,
--				"[0x%04x] event 0x%04x", index, event);
-+		DBG(mgmt, "[0x%04x] event 0x%04x", index, event);
- 
- 		process_notify(mgmt, event, index, length,
- 						mgmt->buf + MGMT_HDR_SIZE);
 -- 
 2.35.1
 
