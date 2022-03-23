@@ -2,144 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD992C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 02:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C98C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 03:36:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241403AbiCWC6R (ORCPT
+        id S232187AbiCWDiF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Mar 2022 22:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39766 "EHLO
+        Tue, 22 Mar 2022 23:38:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231958AbiCWC6Q (ORCPT
+        with ESMTP id S241578AbiCWDh7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Mar 2022 22:58:16 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A1C970864
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 19:56:48 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id a11so188173qtb.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 19:56:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Nf1o1RCM+sqj4LVBOHn6/s7AS3F4rOIfTFO4NTzY1BA=;
-        b=IEaj4RcO79eV439z4HmC1vHBOasDo605pDm/ZQ57IHq5MQ7/BESZl1VL8h4ORjF0uW
-         sL+WW0Qm600+81h562zua+WWjmuQP/iBbG9x5TR94tJkCfPe9aMjUE8zQncS3ayomwaR
-         9tphkSssF/1THZyMrDoNUkz+gdfb2JHez5+cLHOaqVlU3bbLxV3ozI45G2hjlYhdZplk
-         CF1IYlroNxyPYCcGguDIxP5SbyfGsRXrISi7FgujqOVwjDiNul82O2t1yEvLCur0gEru
-         Z/f031wB/noTZGdx6M9ut/nl94yus9O4H06EGFyEu5ENBvpcvXMtorbVf1KTgcV8HWus
-         jzHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Nf1o1RCM+sqj4LVBOHn6/s7AS3F4rOIfTFO4NTzY1BA=;
-        b=M4KP/eH/OvYrGC4xl7PbZjyeIO/KZjqmLi6E5KUNuZcpUMQrk/OxFpLn+Fbux1xC5G
-         62+Ake92KMByEkkgU328Qlq2Wdb/HuEuwpdIfs8/qvV6HT6aKD1KYO5QGwOzOsyz5pPQ
-         c/LHl55QX6zp1kUBaypEjdsZ4K3JMZy4azkkkXBQI0jEQxmrDB3x27GYkUWv01mK1sHy
-         SxcpGLoNw5bbNqhsPDuzL+3ICv7BEf7Eh0InLxTjVfIM+5VHxV4A8zJ/c4qdV2pIAtJ3
-         4CdwWbyldfHPtqhKquFCdY0IYTkfG5jE3N3gJNjOcG1n9aXQHW3u2MwFPGtFA04+5UsT
-         uMyg==
-X-Gm-Message-State: AOAM532wRz0avoR7YT6ZBm8h7woXf7cVstaXZNgz6nv4Kf/qfwALUDal
-        gigiARKUwWWcWqclbX3Fo2ZXWXdpw1DCpQ==
-X-Google-Smtp-Source: ABdhPJzjoyHdXsncDVtmi8Fnv3VgbS9OEVru9oRIr6LFYlD+YZMXmZCDdX5Bw3htEN02taXR36SUrw==
-X-Received: by 2002:ac8:5789:0:b0:2e1:c40e:9be3 with SMTP id v9-20020ac85789000000b002e1c40e9be3mr22334279qta.308.1648004207254;
-        Tue, 22 Mar 2022 19:56:47 -0700 (PDT)
-Received: from [172.17.0.2] ([52.179.120.165])
-        by smtp.gmail.com with ESMTPSA id a16-20020a05622a02d000b002e20e4bf4aesm8248700qtx.23.2022.03.22.19.56.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 19:56:47 -0700 (PDT)
-Message-ID: <623a8c6f.1c69fb81.641d1.95d2@mx.google.com>
-Date:   Tue, 22 Mar 2022 19:56:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0879652602860224747=="
+        Tue, 22 Mar 2022 23:37:59 -0400
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AB570CD1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 22 Mar 2022 20:36:25 -0700 (PDT)
+X-QQ-mid: bizesmtp63t1648006579tb7ls3za
+Received: from localhost.localdomain ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Wed, 23 Mar 2022 11:36:14 +0800 (CST)
+X-QQ-SSF: 01400000000000C0D000B00A0000000
+X-QQ-FEAT: jfdGVjI73+QTWEhMp8TSi/75ht75hgsMCPpObJyTMLuOSwgd3u1PfXpJ+1bDA
+        D87S92Qvh8aW1gQYy4dYfn8UlFGES5s87i+zEtjxdN8Wk4/+YE5HGrQWp0eiH/b6rQdfbjm
+        FZ3rgJ1wKUtEoOh6SM7z1n8W8NxnIlrFVqNrAywSxJzzuOby+lwX2gLEsQ968aO2UAY/ljJ
+        qmJEoLeFQ6KwuGb3JciD1Gahft56v9OES34+EvZO6Lmhu7RVHrQqvk3dUtuxeQhNr9FzQGO
+        oxRDO6JjNeevp8yGCNbf9FTn7BrPSbdvfHOSRNCDg56a6YBkRq3ItTjygA/JlQHEdSQHt/e
+        8i40WMeunr8w7/kOEQ=
+X-QQ-GoodBg: 2
+From:   xinpeng wang <wangxinpeng@uniontech.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     xinpeng wang <wangxinpeng@uniontech.com>
+Subject: [PATCH] obexd: Fix cann't receive small files sent by windows
+Date:   Wed, 23 Mar 2022 11:36:12 +0800
+Message-Id: <20220323033612.12132-1-wangxinpeng@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] gatt-server: Limit the Server MTU based on the Client MTU
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220322234956.3153209-1-luiz.dentz@gmail.com>
-References: <20220322234956.3153209-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign4
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0879652602860224747==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Windows devices use streaming mode to send files. If a small file is
+sent,the first time processing data will be completed successfully,
+and the transfer_complete function will be called before the end to
+clear os->path.At this time, the dbus signal is still pending, and
+the dbus method call requesting the file path has not been processed;
+in this way, the upper-level program will not be able to obtain the
+file path, resulting in failure to receive the file.
+Therefore, the signal of Filename is generated, and it is forced to
+be sent when status=active.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=625601
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.48 seconds
-GitLint                       FAIL      0.99 seconds
-Prep - Setup ELL              PASS      50.55 seconds
-Build - Prep                  PASS      0.74 seconds
-Build - Configure             PASS      10.12 seconds
-Build - Make                  PASS      1461.63 seconds
-Make Check                    FAIL      12.98 seconds
-Make Check w/Valgrind         FAIL      511.72 seconds
-Make Distcheck                FAIL      246.21 seconds
-Build w/ext ELL - Configure   PASS      10.14 seconds
-Build w/ext ELL - Make        PASS      1435.79 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[BlueZ] gatt-server: Limit the Server MTU based on the Client MTU
-10: B1 Line exceeds max length (117>80): "Link: https://lore.kernel.org/linux-bluetooth/CABBYNZL-fjTd8JdmRRM5Y26d41KwDxvvuaED+j2+yPT-RBpMtw@mail.gmail.com/T/#t"
-
-
-##############################
-Test: Make Check - FAIL
-Desc: Run 'make check'
-Output:
-./test-driver: line 107: 30021 Aborted                 (core dumped) "$@" > $log_file 2>&1
-make[3]: *** [Makefile:10773: test-suite.log] Error 1
-make[2]: *** [Makefile:10881: check-TESTS] Error 2
-make[1]: *** [Makefile:11275: check-am] Error 2
-make: *** [Makefile:11277: check] Error 2
-
-
-##############################
-Test: Make Check w/Valgrind - FAIL
-Desc: Run 'make check' with Valgrind
-Output:
-./test-driver: line 107: 47441 Aborted                 (core dumped) "$@" > $log_file 2>&1
-make[3]: *** [Makefile:10773: test-suite.log] Error 1
-make[2]: *** [Makefile:10881: check-TESTS] Error 2
-make[1]: *** [Makefile:11275: check-am] Error 2
-make: *** [Makefile:11277: check] Error 2
-
-
-##############################
-Test: Make Distcheck - FAIL
-Desc: Run distcheck to check the distribution
-Output:
-../../test-driver: line 107: 67803 Aborted                 (core dumped) "$@" > $log_file 2>&1
-make[4]: *** [Makefile:10773: test-suite.log] Error 1
-make[3]: *** [Makefile:10881: check-TESTS] Error 2
-make[2]: *** [Makefile:11275: check-am] Error 2
-make[1]: *** [Makefile:11277: check] Error 2
-make: *** [Makefile:11198: distcheck] Error 1
-
-
-
-
+Signed-off-by: xinpeng wang <wangxinpeng@uniontech.com>
 ---
-Regards,
-Linux Bluetooth
+ obexd/src/manager.c | 5 ++++-
+ obexd/src/obex.c    | 1 +
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/obexd/src/manager.c b/obexd/src/manager.c
+index 01741fe62..ba9ad43e6 100644
+--- a/obexd/src/manager.c
++++ b/obexd/src/manager.c
+@@ -533,8 +533,11 @@ void manager_emit_transfer_property(struct obex_transfer *transfer,
+ void manager_emit_transfer_started(struct obex_transfer *transfer)
+ {
+ 	transfer->status = TRANSFER_STATUS_ACTIVE;
++	if (!transfer->path)
++		return;
+ 
+-	manager_emit_transfer_property(transfer, "Status");
++	g_dbus_emit_property_changed_full(connection, transfer->path,
++					TRANSFER_INTERFACE, "Status",G_DBUS_PROPERTY_CHANGED_FLAG_FLUSH);
+ }
+ 
+ static void emit_transfer_completed(struct obex_transfer *transfer,
+diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+index 3a68fd66c..c0d9e160a 100644
+--- a/obexd/src/obex.c
++++ b/obexd/src/obex.c
+@@ -720,6 +720,7 @@ int obex_put_stream_start(struct obex_session *os, const char *filename)
+ 		manager_emit_transfer_property(os->service_data, "Size");
+ 
+ 	os->path = g_strdup(filename);
++	manager_emit_transfer_property(os->service_data, "Filename");
+ 
+ 	return 0;
+ }
+-- 
+2.20.1
 
 
---===============0879652602860224747==--
+
