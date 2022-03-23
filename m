@@ -2,81 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37513C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 10:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 205A9C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Mar 2022 12:24:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235367AbiCWKvp (ORCPT
+        id S236086AbiCWMZl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Mar 2022 06:51:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39210 "EHLO
+        Wed, 23 Mar 2022 08:25:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235336AbiCWKvn (ORCPT
+        with ESMTP id S231716AbiCWMZk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Mar 2022 06:51:43 -0400
+        Wed, 23 Mar 2022 08:25:40 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964AE75C3C;
-        Wed, 23 Mar 2022 03:50:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 402EF78911
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 05:24:07 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1B2BEB81E70;
-        Wed, 23 Mar 2022 10:50:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AF5BDC340F2;
-        Wed, 23 Mar 2022 10:50:11 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C7497B81E70
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:24:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 76522C340F2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Mar 2022 12:24:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648032611;
-        bh=0nZK4AfBZIKQRvSrQXHV2JkZ04BBuYgWS/yp4rPQSGE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=t0mn2e8kRqoW7iDenpOwqcqN4qagYeQe4WMUtS6V+eOYPZHbOmCuOa4cyVfoQfzCS
-         G2hGSSUsGxqeIzRE2JE9z1OWgOVL5ln0qdmF3zJsBjeBd8sBU+1GHQW6IGEW0RZCi4
-         CabmeBsZsQ9D6KLx8BkXs4EDX275841bGvRLxBSgIrGejSeIDGbPk915myQ5nJ4K7K
-         t8ZcLbfKxA1S/+JYUkvM7av++0h8Zjc5Nf1pTEm0NS08b/9y4JRphgTOhnSIEtU4Dc
-         lr6Yqn+37t0/EQ44Py5x7oCujWU4G6QtZxMICfHIJFeegueNbTAvaL1V4QTiMUkCKB
-         RtNbeZ2W8sQyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9257AE6D402;
-        Wed, 23 Mar 2022 10:50:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1648038244;
+        bh=4ThyYAI9TqBe15w8goIBWklyq0LdP/ON8dphKRXsR64=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=bIr1xRfwM4Q1Z8P9Avz+IDecxFxREJr/z9+qoHv6pSmQJOWidf5R54I3y8IKt4PUn
+         3eOSZQIaP5L4Sc8NgKz1ZMmIDXDYoqK0ydgj4DnXBeQV7uZk0FFVsqX/3C3XY3zo34
+         wsvDL9bYgez7aCPCVBz5geS4Jdv7KyV8fIdsTT/8ZJIMyao1eXPr2JYax9EpyX68IY
+         RmKqCXBWIbWhO7jwUykmd+BFWOKXp7Aj4fiKuaHcsK/oWHWFczNFcgNTk62UeGi+fv
+         7Ur+4DsWy1bUegkfsBfRVPi8nj5wDglQHnuqGyzv2Pq28FI5oA8c+uDlSySYj+2/0C
+         mosMmoGbqOXTA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 53877C05FD4; Wed, 23 Mar 2022 12:24:04 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215713] New (useless?) warning messages from BlueTooth in
+ kernel 5.17
+Date:   Wed, 23 Mar 2022 12:24:04 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: low
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-215713-62941-f2OQYAIuvU@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215713-62941@https.bugzilla.kernel.org/>
+References: <bug-215713-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: mt7921s: fix a NULL check
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <164803261159.27387.13243818190116041496.git-patchwork-notify@kernel.org>
-Date:   Wed, 23 Mar 2022 10:50:11 +0000
-References: <20220323074830.GA4639@kili>
-In-Reply-To: <20220323074830.GA4639@kili>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     marcel@holtmann.org, yake.yang@mediatek.com,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        matthias.bgg@gmail.com, sean.wang@mediatek.com,
-        markyawenchen@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, kernel-janitors@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215713
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-On Wed, 23 Mar 2022 10:48:30 +0300 you wrote:
-> There is a typo in the NULL check so it's never true.  It should be
-> checking "*ven_data" instead of "ven_data".
-> 
-> Fixes: 3cabc5ca2c9d ("Bluetooth: mt7921s: Add .btmtk_get_codec_config_data")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->  drivers/bluetooth/btmtksdio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEW                         |RESOLVED
+         Resolution|---                         |CODE_FIX
 
-Here is the summary with links:
-  - Bluetooth: mt7921s: fix a NULL check
-    https://git.kernel.org/bluetooth/bluetooth-next/c/864cc8a234cd
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
