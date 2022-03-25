@@ -2,144 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25449C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 03:31:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 379B6C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 04:06:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353673AbiCYDcf (ORCPT
+        id S234782AbiCYEHg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Mar 2022 23:32:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
+        Fri, 25 Mar 2022 00:07:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234035AbiCYDcd (ORCPT
+        with ESMTP id S232001AbiCYEHf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Mar 2022 23:32:33 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7519F3B3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 20:31:00 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id x2so6788995plm.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 20:31:00 -0700 (PDT)
+        Fri, 25 Mar 2022 00:07:35 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7942C6245
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 21:06:01 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id v2so5616976qtc.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 21:06:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GGiTeRG4IQk7h6C89ytVphusb4+2ymibartIH2Voor0=;
-        b=jSy5FHrMi1uSu+9XPjkA6dqRLZHrwSVVPGi/LShhirbbhIg051NvEtAfXFZQohs/64
-         XIjdKJvuE5u2BblRvrXXkEA1gfUwsaYQvUresbFcxHuNWXxMLwDOT8Ssi7PwdukIYdB4
-         28jFf7mVxW74xbdy+ZKfKxYR6FgRn35qxHdOY=
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=3zJfTC0zvKlwdhTA326I8oXsVHGM8xN6wVF5xA1hKag=;
+        b=X2n41KGRxa32+h9KHsug+H41FVFAwvBfBzQVuwHdQ7aK3jgAAmCvjlffhQBzaaQNti
+         5B+DzBcs92YtVDAoF6Fd8bMlnz3VrirpnIWKINtkuml2UuRVeVsPaNrJv7jrBvlGGIrH
+         Nvpu9ej5pdqp9cs5Hgt6E5L3oGPTEZ/wWPRIzye0hlaQY/nt5qIfFEmyDh/JW27dkELg
+         0v3VR4no8h7WKdpjHHe+TXgmPCSdFb0Mfy8N1dYUJeyAs+SfvyGEECJlqAAa4QDa2L6a
+         YZWhS0ulwCVeDQrqW0n5ePmkRYV8z1i4T0ZNMfKaJOemiGT6kE43M/kCaZqq+FIKBiQ9
+         BwMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GGiTeRG4IQk7h6C89ytVphusb4+2ymibartIH2Voor0=;
-        b=FXPjvAKzXVfZQgZ5C+6nVBavZkqQxOEoZUlJ4zAopv9b7Uh7RT33arlrOXUnBk0qhS
-         u3NXKt8wJhSx57B8HODGAv6A4aZ4I//zMfGKNF76BKpcqEW2Y6au4MjETaKdG65hTsXN
-         BIJQ6svrbflKlyPq7NJeK3EqiJY/1v2pAVEQJHiRdvoOYwltd7fHolj4rEsKnUOjAKa1
-         jBauArhAU6pJSwuHDnoh38rA00AlpsCO+J/EjK6ub42olCjHocDwRrhhxHzDEqHorTnH
-         f1uqBmwyf+anDsOQWIe4qtjiDaPIeGhl4PPkcwIjrl1LFoT4XpVOZ7c0qPyRvPVnWqR8
-         aWrw==
-X-Gm-Message-State: AOAM533kjzWIi0tg9jV4kumT6e3xfZK4ix2G09IW+ZeUkADkzOJUECM5
-        NZsj66WvLC1nueB/YckixB1BKA==
-X-Google-Smtp-Source: ABdhPJyQm2KDpZRppICe4Wr5sAd4fXOScBA5SeJDI8r3lTjC/qlbZm17yG255aUtuU6tDztFm5IfAw==
-X-Received: by 2002:a17:90b:1809:b0:1c7:28fb:bdd0 with SMTP id lw9-20020a17090b180900b001c728fbbdd0mr10228571pjb.231.1648179060040;
-        Thu, 24 Mar 2022 20:31:00 -0700 (PDT)
-Received: from localhost (0.223.81.34.bc.googleusercontent.com. [34.81.223.0])
-        by smtp.gmail.com with UTF8SMTPSA id 21-20020a630115000000b00382a0895661sm3773921pgb.11.2022.03.24.20.30.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Mar 2022 20:30:59 -0700 (PDT)
-From:   Ying Hsu <yinghsu@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Ying Hsu <yinghsu@chromium.org>,
-        Joseph Hwang <josephsih@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
-Date:   Fri, 25 Mar 2022 03:30:51 +0000
-Message-Id: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
-X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=3zJfTC0zvKlwdhTA326I8oXsVHGM8xN6wVF5xA1hKag=;
+        b=tmyT/1sm8Ndc4oYRGx8bT17E8XJpBx+79/w/ESEDEWUlG/QLG7fWysLYT0fU9Jc3xP
+         Enpqsh/degb8sKwvUjjwhsbIrE9Z2U7FdhFlU2B26JNFHQsQr8uCazgHZQI/7AgigHW/
+         plpQXbEJ/afn1H1RGf3jOHy3c6yfuwYzE8BnEyuJlrQtRHyrW0T1lRSdE6Bw42UKQ9DT
+         R0Pdx5uimprS9y9TFeCJm0QkzuQbP31fCFDIKWBfH7hO8F0K3GEBRKeGr1SyZO6oHbLH
+         YfdpFD6VcMjqXv4i9ShK5qAEB7qCChFjrOAIlA4lpCfWsxSSMvrxfgAZxsyFPfGsVOYK
+         AdrQ==
+X-Gm-Message-State: AOAM532pCGqP1FCw0U9dwCeTXGX0x3OB61qXAIdCW9zS7RCoVjdFxd31
+        2dNn/MwvkOeBuqtT5GeNvCCgKM45Nz+Efg==
+X-Google-Smtp-Source: ABdhPJySRvwAEOI/uxspVpNNd2qPkoofFVJ0Qgd5FX15CkeH60sLG65+tfGt9TiCpkdNqvuHnK9vqA==
+X-Received: by 2002:ac8:5dc8:0:b0:2e2:3514:3f2f with SMTP id e8-20020ac85dc8000000b002e235143f2fmr7524640qtx.407.1648181160693;
+        Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.232.203.141])
+        by smtp.gmail.com with ESMTPSA id z19-20020a05622a029300b002e1a763dac1sm4021954qtw.9.2022.03.24.21.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
+Message-ID: <623d3fa8.1c69fb81.b19c7.8cd4@mx.google.com>
+Date:   Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8902765170834206684=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
+Subject: RE: Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
+References: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Connecting the same socket twice consecutively in sco_sock_connect()
-could lead to a race condition where two sco_conn objects are created
-but only one is associated with the socket. If the socket is closed
-before the SCO connection is established, the timer associated with the
-dangling sco_conn object won't be canceled. As the sock object is being
-freed, the use-after-free problem happens when the timer callback
-function sco_sock_timeout() accesses the socket. Here's the call trace:
+--===============8902765170834206684==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-dump_stack+0x107/0x163
-? refcount_inc+0x1c/
-print_address_description.constprop.0+0x1c/0x47e
-? refcount_inc+0x1c/0x7b
-kasan_report+0x13a/0x173
-? refcount_inc+0x1c/0x7b
-check_memory_region+0x132/0x139
-refcount_inc+0x1c/0x7b
-sco_sock_timeout+0xb2/0x1ba
-process_one_work+0x739/0xbd1
-? cancel_delayed_work+0x13f/0x13f
-? __raw_spin_lock_init+0xf0/0xf0
-? to_kthread+0x59/0x85
-worker_thread+0x593/0x70e
-kthread+0x346/0x35a
-? drain_workqueue+0x31a/0x31a
-? kthread_bind+0x4b/0x4b
-ret_from_fork+0x1f/0x30
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Ying Hsu <yinghsu@chromium.org>
-Reviewed-by: Joseph Hwang <josephsih@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=626220
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.64 seconds
+GitLint                       PASS      1.01 seconds
+SubjectPrefix                 PASS      0.82 seconds
+BuildKernel                   PASS      34.79 seconds
+BuildKernel32                 PASS      31.51 seconds
+Incremental Build with patchesPASS      41.66 seconds
+TestRunner: Setup             PASS      529.53 seconds
+TestRunner: l2cap-tester      PASS      16.42 seconds
+TestRunner: bnep-tester       PASS      6.76 seconds
+TestRunner: mgmt-tester       PASS      108.12 seconds
+TestRunner: rfcomm-tester     PASS      8.97 seconds
+TestRunner: sco-tester        PASS      8.37 seconds
+TestRunner: smp-tester        PASS      8.39 seconds
+TestRunner: userchan-tester   PASS      6.94 seconds
+
+
+
 ---
-Tested this commit using a C reproducer on qemu-x86_64 for 8 hours.
+Regards,
+Linux Bluetooth
 
- net/bluetooth/sco.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8eabf41b2993..380c63194736 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -574,19 +574,24 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
- 	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
- 
--	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
--		return -EBADFD;
-+	lock_sock(sk);
-+	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
-+		err = -EBADFD;
-+		goto done;
-+	}
- 
--	if (sk->sk_type != SOCK_SEQPACKET)
--		return -EINVAL;
-+	if (sk->sk_type != SOCK_SEQPACKET) {
-+		err = -EINVAL;
-+		goto done;
-+	}
- 
- 	hdev = hci_get_route(&sa->sco_bdaddr, &sco_pi(sk)->src, BDADDR_BREDR);
--	if (!hdev)
--		return -EHOSTUNREACH;
-+	if (!hdev) {
-+		err = -EHOSTUNREACH;
-+		goto done;
-+	}
- 	hci_dev_lock(hdev);
- 
--	lock_sock(sk);
--
- 	/* Set destination address and psm */
- 	bacpy(&sco_pi(sk)->dst, &sa->sco_bdaddr);
- 
--- 
-2.35.1.1021.g381101b075-goog
-
+--===============8902765170834206684==--
