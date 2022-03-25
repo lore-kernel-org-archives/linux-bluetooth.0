@@ -2,162 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2DEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 19:24:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A4EFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 19:27:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiCYTZ5 (ORCPT
+        id S229810AbiCYT3A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Mar 2022 15:25:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56938 "EHLO
+        Fri, 25 Mar 2022 15:29:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiCYTZ4 (ORCPT
+        with ESMTP id S229943AbiCYT2e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Mar 2022 15:25:56 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 012071D3069;
-        Fri, 25 Mar 2022 11:57:45 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id d134so4759423ybc.13;
-        Fri, 25 Mar 2022 11:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=pMUdB3zlB3HAdVOnuQq2xqrqNwClgzIqakPQ1O+ryLU=;
-        b=opPwPmQ9CLhSVpFfpRo/PnBU7bPVVHAPFJ1+x8z+qQd0hmCRkVKbvsaSiLtGvH7hri
-         KWFRk2+QKbwa5BOQlXx+GWWjBEs1LVcfK5smQaCJNcIGlwdaJYAJbEQc4O8YDF2FK8dp
-         FkmMTQxcnTuAXTULYRJT9c4v5g6IwTAoAsUpRgZCPr0gevfsCeeumVtaYvdcvYILjzc9
-         ndggUmwBaFt70j4xy/UwL3Q+87A2iGWXSQYBhYfxxDuiIjjQNmcOWvR5iMOEM5RiIttx
-         62+yd1ghBGIlWjr2ABqMozfiBbKKF4+Ro7YbzVDTcuC3Ty9FOj7vlzjp+BxfckRZTD+3
-         m7rA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=pMUdB3zlB3HAdVOnuQq2xqrqNwClgzIqakPQ1O+ryLU=;
-        b=VsA1ytTjw03d8z+WiVrjboVkBunHQ9QhSQp8Zvxfjjfg60llg1Ftfy9XDO8X631M15
-         u7Dpvtzu/bybMv5NybIldkdSnqtedH59xaHWiQr+p2WGnFSEGrQMYBNCpHIIU9B1gT7B
-         4bA6VmP2hdIi+ulwABf0p0ek6q+ZvrR4Ur7JG9Ro5sG6c4JA7DecPJUnalKW3+iiiCGn
-         UNoTtZrAgGPu6tLIG1pvkf6UrDEuCa2vaw/g/AArfd+w4F9M7fx1TPctmv9HUE1aFpPH
-         Zu3BtWo+oMqqmFAYf71bMX1jG/5LvyNswT2xAH+nUszTZQKuDjb1Azg97b858tlxn1AV
-         gj6g==
-X-Gm-Message-State: AOAM533DvDixNK+cVIXEXOD8C5lTKDiU2ienZyGJJsH5+TjFf4q7gWxa
-        FqQKwtfd7WBUw/aLt4Fvw+kBHN1r3fchW7f69KIs/RMV
-X-Google-Smtp-Source: ABdhPJz9mZFBCIieZ8fOD5eJ9gyxfBvi/T2xMJdphBpSLz3OJ7s5HzF8ZMV1+EakSTtbiCrhnz4gCLq2e2SfDREHghk=
-X-Received: by 2002:a05:6902:1009:b0:634:674f:ef16 with SMTP id
- w9-20020a056902100900b00634674fef16mr12320198ybt.459.1648234215466; Fri, 25
- Mar 2022 11:50:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
-In-Reply-To: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 25 Mar 2022 11:50:04 -0700
-Message-ID: <CABBYNZKF1Ye6D130XgaFmqN6JAssf78-FaQh_AEkwigy8qaVjw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
-To:     Ying Hsu <yinghsu@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Joseph Hwang <josephsih@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        Fri, 25 Mar 2022 15:28:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D9C2BE2D8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Mar 2022 12:02:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7357BB829A4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Mar 2022 18:24:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E115C340EE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Mar 2022 18:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648232686;
+        bh=9flt5WhvWQWUEOlEVa5+LNjvkixG3g/5q1WGyU7TncQ=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=L5h4RipeDwu3ud+9QbneR18BHnBIOP4+WI0GkENoPzgLZLpkqCFmOMKcnXCvRbM/w
+         4BX9992mX1SsDxus0jNmRumrwKNsEySrBx2/50nn4Ljg/fO8z41x6wYUlZgAyaeSPi
+         wuCJ/0SJ5Nns/0dBY9lWqWpmc+JFh0AHy81s+c/AdkcVUA947Hw2EtffX+em5Bv+/6
+         VTYssMD+3osfAy76jZfOhOFTGVwfiFircs8SFuctAw2FvoSxEEXDix/X8iOQqiwDAW
+         BA28Kj6/cyxqeghpnJuS8kPec2kPga0PFv7og28unuHXXtI2xchr5YGVt7O+B30Ew7
+         tJSth1z/tubKA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 1609DCAC6E2; Fri, 25 Mar 2022 18:24:46 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215528] Excessive logging from Intel Bluetooth "Bluetooth:
+ hci0: sending frame failed" "hci0: urb 00000000xxxxxxxx submission failed
+ (90)"
+Date:   Fri, 25 Mar 2022 18:24:45 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215528-62941-zMpaJevDDl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215528-62941@https.bugzilla.kernel.org/>
+References: <bug-215528-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ying,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215528
 
-On Thu, Mar 24, 2022 at 8:31 PM Ying Hsu <yinghsu@chromium.org> wrote:
->
-> Connecting the same socket twice consecutively in sco_sock_connect()
-> could lead to a race condition where two sco_conn objects are created
-> but only one is associated with the socket. If the socket is closed
-> before the SCO connection is established, the timer associated with the
-> dangling sco_conn object won't be canceled. As the sock object is being
-> freed, the use-after-free problem happens when the timer callback
-> function sco_sock_timeout() accesses the socket. Here's the call trace:
->
-> dump_stack+0x107/0x163
-> ? refcount_inc+0x1c/
-> print_address_description.constprop.0+0x1c/0x47e
-> ? refcount_inc+0x1c/0x7b
-> kasan_report+0x13a/0x173
-> ? refcount_inc+0x1c/0x7b
-> check_memory_region+0x132/0x139
-> refcount_inc+0x1c/0x7b
-> sco_sock_timeout+0xb2/0x1ba
-> process_one_work+0x739/0xbd1
-> ? cancel_delayed_work+0x13f/0x13f
-> ? __raw_spin_lock_init+0xf0/0xf0
-> ? to_kthread+0x59/0x85
-> worker_thread+0x593/0x70e
-> kthread+0x346/0x35a
-> ? drain_workqueue+0x31a/0x31a
-> ? kthread_bind+0x4b/0x4b
-> ret_from_fork+0x1f/0x30
->
-> Signed-off-by: Ying Hsu <yinghsu@chromium.org>
-> Reviewed-by: Joseph Hwang <josephsih@chromium.org>
-> ---
-> Tested this commit using a C reproducer on qemu-x86_64 for 8 hours.
+--- Comment #14 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+(In reply to Artem S. Tashkinov from comment #12)
+> Thank you.
+>=20
+> I hope to see it in 5.15.
 
-We should probably add a link or something to the reproducer then, was
-it syzbot? It does have some instructions on how to link its issues.
+afaik the changes that caused this issue were introduced in 5.17 so 5.15
+shouldn't be affected.
 
->  net/bluetooth/sco.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index 8eabf41b2993..380c63194736 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -574,19 +574,24 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
->             addr->sa_family != AF_BLUETOOTH)
->                 return -EINVAL;
->
-> -       if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
-> -               return -EBADFD;
-> +       lock_sock(sk);
-> +       if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND) {
-> +               err = -EBADFD;
-> +               goto done;
-> +       }
->
-> -       if (sk->sk_type != SOCK_SEQPACKET)
-> -               return -EINVAL;
-> +       if (sk->sk_type != SOCK_SEQPACKET) {
-> +               err = -EINVAL;
-> +               goto done;
-> +       }
->
->         hdev = hci_get_route(&sa->sco_bdaddr, &sco_pi(sk)->src, BDADDR_BREDR);
-> -       if (!hdev)
-> -               return -EHOSTUNREACH;
-> +       if (!hdev) {
-> +               err = -EHOSTUNREACH;
-> +               goto done;
-> +       }
->         hci_dev_lock(hdev);
->
-> -       lock_sock(sk);
-> -
+--=20
+You may reply to this email to add a comment.
 
-Also are we sure we are not introducing a locking hierarchy problem
-here? Previously we had hci_dev_lock then sock_lock now it is the
-opposite, or perhaps we never want to have them at the same time?
-
->         /* Set destination address and psm */
->         bacpy(&sco_pi(sk)->dst, &sa->sco_bdaddr);
->
-> --
-> 2.35.1.1021.g381101b075-goog
->
-
-
--- 
-Luiz Augusto von Dentz
+You are receiving this mail because:
+You are the assignee for the bug.=
