@@ -2,103 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 379B6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 04:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D59DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Mar 2022 05:58:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234782AbiCYEHg (ORCPT
+        id S1355405AbiCYF7o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 25 Mar 2022 00:07:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60982 "EHLO
+        Fri, 25 Mar 2022 01:59:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232001AbiCYEHf (ORCPT
+        with ESMTP id S244003AbiCYF7o (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 25 Mar 2022 00:07:35 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7942C6245
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 21:06:01 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id v2so5616976qtc.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 21:06:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=3zJfTC0zvKlwdhTA326I8oXsVHGM8xN6wVF5xA1hKag=;
-        b=X2n41KGRxa32+h9KHsug+H41FVFAwvBfBzQVuwHdQ7aK3jgAAmCvjlffhQBzaaQNti
-         5B+DzBcs92YtVDAoF6Fd8bMlnz3VrirpnIWKINtkuml2UuRVeVsPaNrJv7jrBvlGGIrH
-         Nvpu9ej5pdqp9cs5Hgt6E5L3oGPTEZ/wWPRIzye0hlaQY/nt5qIfFEmyDh/JW27dkELg
-         0v3VR4no8h7WKdpjHHe+TXgmPCSdFb0Mfy8N1dYUJeyAs+SfvyGEECJlqAAa4QDa2L6a
-         YZWhS0ulwCVeDQrqW0n5ePmkRYV8z1i4T0ZNMfKaJOemiGT6kE43M/kCaZqq+FIKBiQ9
-         BwMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=3zJfTC0zvKlwdhTA326I8oXsVHGM8xN6wVF5xA1hKag=;
-        b=tmyT/1sm8Ndc4oYRGx8bT17E8XJpBx+79/w/ESEDEWUlG/QLG7fWysLYT0fU9Jc3xP
-         Enpqsh/degb8sKwvUjjwhsbIrE9Z2U7FdhFlU2B26JNFHQsQr8uCazgHZQI/7AgigHW/
-         plpQXbEJ/afn1H1RGf3jOHy3c6yfuwYzE8BnEyuJlrQtRHyrW0T1lRSdE6Bw42UKQ9DT
-         R0Pdx5uimprS9y9TFeCJm0QkzuQbP31fCFDIKWBfH7hO8F0K3GEBRKeGr1SyZO6oHbLH
-         YfdpFD6VcMjqXv4i9ShK5qAEB7qCChFjrOAIlA4lpCfWsxSSMvrxfgAZxsyFPfGsVOYK
-         AdrQ==
-X-Gm-Message-State: AOAM532pCGqP1FCw0U9dwCeTXGX0x3OB61qXAIdCW9zS7RCoVjdFxd31
-        2dNn/MwvkOeBuqtT5GeNvCCgKM45Nz+Efg==
-X-Google-Smtp-Source: ABdhPJySRvwAEOI/uxspVpNNd2qPkoofFVJ0Qgd5FX15CkeH60sLG65+tfGt9TiCpkdNqvuHnK9vqA==
-X-Received: by 2002:ac8:5dc8:0:b0:2e2:3514:3f2f with SMTP id e8-20020ac85dc8000000b002e235143f2fmr7524640qtx.407.1648181160693;
-        Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
-Received: from [172.17.0.2] ([20.232.203.141])
-        by smtp.gmail.com with ESMTPSA id z19-20020a05622a029300b002e1a763dac1sm4021954qtw.9.2022.03.24.21.06.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
-Message-ID: <623d3fa8.1c69fb81.b19c7.8cd4@mx.google.com>
-Date:   Thu, 24 Mar 2022 21:06:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8902765170834206684=="
+        Fri, 25 Mar 2022 01:59:44 -0400
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA8F95FC8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Mar 2022 22:58:08 -0700 (PDT)
+Received: from [192.168.0.3] (ip5f5aef76.dynamic.kabel-deutschland.de [95.90.239.118])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id B45A961E64846;
+        Fri, 25 Mar 2022 06:58:05 +0100 (CET)
+Message-ID: <9dcd9cae-ee36-c812-f725-c81a035e4456@molgen.mpg.de>
+Date:   Fri, 25 Mar 2022 06:58:05 +0100
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
-Subject: RE: Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
-References: <20220325033028.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] obexd: Fix can't receive small files sent by windows
+Content-Language: en-US
+To:     Xinpeng Wang <wangxinpeng@uniontech.com>
+Cc:     linux-bluetooth@vger.kernel.org
+References: <20220323052149.28674-1-wangxinpeng@uniontech.com>
+ <8ff37c48-4e71-1c40-53bb-5bb99d7a1a88@molgen.mpg.de>
+ <2022032321151404413716@uniontech.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <2022032321151404413716@uniontech.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8902765170834206684==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=626220
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.64 seconds
-GitLint                       PASS      1.01 seconds
-SubjectPrefix                 PASS      0.82 seconds
-BuildKernel                   PASS      34.79 seconds
-BuildKernel32                 PASS      31.51 seconds
-Incremental Build with patchesPASS      41.66 seconds
-TestRunner: Setup             PASS      529.53 seconds
-TestRunner: l2cap-tester      PASS      16.42 seconds
-TestRunner: bnep-tester       PASS      6.76 seconds
-TestRunner: mgmt-tester       PASS      108.12 seconds
-TestRunner: rfcomm-tester     PASS      8.97 seconds
-TestRunner: sco-tester        PASS      8.37 seconds
-TestRunner: smp-tester        PASS      8.39 seconds
-TestRunner: userchan-tester   PASS      6.94 seconds
+Dear Xinpeng,
 
 
+Am 23.03.22 um 14:15 schrieb wangxinpeng@uniontech.com:
 
----
-Regards,
-Linux Bluetooth
+> Thank you very much for your guidance.
+
+Thank you for the patch, and your response. Sorry for the late reply.
+
+> Modifications to the patch, I will pay attention to replace it with `--reroll-count`
+> in the future, thanks a lot.
+
+Awesome.
+
+> A Windows device refers to a computer with the Windows 10 system installed.
+> 
+> Ways to reproduce the problem:
+> 1.Use the laptop with the windows 10 system installed to send small files to the computer
+> with the ubuntu system through bluetooth
+> (I found that sometimes sending fails during testing,then i installed a blueman on ubuntu,
+> use blueman to connect to the windows computer first);
+> 2.the small file's size is less than 10k.
+> After sending ok, it will be found that the file is in the ~/.cache/obexd/ directory, but not transferred to
+> the ~/Download directory. For large files, it is in the ~/Download directory after sending.
+> 
+> Validation bug fix:
+> This problem needs to be done by bluez and the upper management program (like blueman);
+> the full effect cannot be seen until the upper management program is modified.
+> Now use dbus-monitor --session path=/org/bluez/obex/server/session1/transfer0
+> (this command is the first time the file is received at startup, and the number will be incremented each time after that)
+>   to see whether obexd generates the correct signal(include Filename).
+
+Thank you for the detailed response. I do currently not have a Microsoft 
+Windows system to test this, but sounds good.
+
+Personally, I would like to hive this information in the commit message, 
+but I d not know the policy of the project. If you are up to it, you 
+could amend the commit message, and reroll it.
+
+Thank you for your work.
 
 
---===============8902765170834206684==--
+Kind regards,
+
+Paul
