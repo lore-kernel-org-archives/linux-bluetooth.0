@@ -2,50 +2,50 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3C6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 06:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B75D9C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 07:09:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231617AbiCZGoI (ORCPT
+        id S231738AbiCZHLL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Mar 2022 02:44:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49446 "EHLO
+        Sat, 26 Mar 2022 03:11:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbiCZGoG (ORCPT
+        with ESMTP id S229882AbiCZHLK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Mar 2022 02:44:06 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8DEA17F3F5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Mar 2022 23:42:29 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id w21so8147036pgm.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 25 Mar 2022 23:42:29 -0700 (PDT)
+        Sat, 26 Mar 2022 03:11:10 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D2C026D121
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 00:09:35 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id c11so8166006pgu.11
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 00:09:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=DzmW1EwXib0HEBL5ioOFxuUKPvj/IW7QJoaVVg8+xH0=;
-        b=k94K+4orcgP8kDrhyw/hF4hSopr8E4xGvyHDrqmV3/AETXXKBicOS4bD6VEdw0a1rk
-         fhuEs9Biymqy6AHdhF5pzSmXa5ciGqejQRnrQLgx+SNgTm/KSr+Q2OPuHqp9haPiNsxN
-         wWrIRxjQUk6PDVquYpGEneQwQulpcj2oVxdyE=
+        bh=aY7Qm3duZzz4/ANMI52LqTxkdMO5YlOW9+CWZKbNUDQ=;
+        b=I05Mab032aTpoTeimJ2ZOfF1xo8R9P0uXq5lBgIRm+2ywDCJ7TRBiojiTa2Sl4OyrW
+         ENUppUa56EY/52pmYjwVkvLFtLbIrXRiqjns6jQiDFovrx+lkvG4JwIweL0YU8mdQjko
+         42818OZdanjVU+H50AQcXJKz2sx+o0LKLoabM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=DzmW1EwXib0HEBL5ioOFxuUKPvj/IW7QJoaVVg8+xH0=;
-        b=Ke8y/pao22iBckmpQgR+UUjLCxHBdXhJ2FCDNzqxWtvfBLF5wKw1Up4I3cX3usrVvy
-         7O9+Q1CpVgITBLXAJD42POJ1VoUOnNRefHlF5FQNRj5LoUkXJzj/NqpDEgxenKV4ixah
-         64qbWtF7XQcObN3zK/x94nsXdXCL/UrfxBmwKoVo+OmFCjgylwgNTG6mABU62oyGycBJ
-         D8LM5yP4ofm3yhEHHhjG4VJG/561paIXNIQpjqY7pvPmMSMw1mQetSst4ttMtEnr0hlX
-         KmMuv+FbdxhtziY5ekifUxy2gNjpBMWzzNOOJGbOZHB8ruh6B0rMHJxVYQSeGrKSx7nQ
-         Vzqg==
-X-Gm-Message-State: AOAM533TrbXQrEvo1NsyZ0kJqp04r6KV4oYff4bNrgMObFcF6z7kQwr/
-        71UQ/W+kN5JIlS7AYH6gGv4DsA==
-X-Google-Smtp-Source: ABdhPJwXINhn4isrhWwq6UFZEvwUcMk+1i2H2+Yb705ZRLHFhy/5zUzg6kvPyFIyPtyDuoEF4KjUNQ==
-X-Received: by 2002:a05:6a00:98e:b0:4fb:1162:b2a5 with SMTP id u14-20020a056a00098e00b004fb1162b2a5mr6604055pfg.12.1648276949326;
-        Fri, 25 Mar 2022 23:42:29 -0700 (PDT)
+        bh=aY7Qm3duZzz4/ANMI52LqTxkdMO5YlOW9+CWZKbNUDQ=;
+        b=iITdoDvUmOx8AQT5oBW+J4472DZEwWAdD7WVWL9e7o/mEsKpAAGp5H992QzVZ2jml7
+         Qej6A1ce6b4KrHUorkjlEX3O668Y9egFCFFC1BaxK26w7r40Sp/KAZRGfK7DehQh95hy
+         RYQqf7yEhNzB4+UZLJ2BYUUfnB8nByrduEGvIqxWZeOaH2otu2rOlbXjB3N7fOxRyLnD
+         tEvf3tu8hRNay67K7Z8H0V6wULlPQXQQqJNhLP8SCiAzkA8tnN2cstX4pgFcZhe5/994
+         IK/NVA1DSiXmfIoIC/lm2dxC7NgZWbgCZVH/F/3dBEBX4zmoSDQgUxQPbT2c8ZLyu0BF
+         hTvQ==
+X-Gm-Message-State: AOAM531UvCvB0xJrgE1e7PeONoFxxvmTunio1Dq822emwpA3zgHPvP2A
+        KVmZvHQBpblPRbFoeQF4ivp0Nw==
+X-Google-Smtp-Source: ABdhPJxLT1yAk+YxicpfYCc3ehIfT2Bhk4TwGg5YlmuZKXxtcXZhn3FYsvFWkuU6byOwpgW5/SuX6g==
+X-Received: by 2002:a05:6a00:815:b0:4fb:e46:511c with SMTP id m21-20020a056a00081500b004fb0e46511cmr7185978pfk.54.1648278574592;
+        Sat, 26 Mar 2022 00:09:34 -0700 (PDT)
 Received: from localhost (0.223.81.34.bc.googleusercontent.com. [34.81.223.0])
-        by smtp.gmail.com with UTF8SMTPSA id d80-20020a621d53000000b004fae1119955sm8960061pfd.213.2022.03.25.23.42.26
+        by smtp.gmail.com with UTF8SMTPSA id j6-20020a17090a588600b001c699d77503sm7565679pji.2.2022.03.26.00.09.31
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Mar 2022 23:42:29 -0700 (PDT)
+        Sat, 26 Mar 2022 00:09:33 -0700 (PDT)
 From:   Ying Hsu <yinghsu@chromium.org>
 To:     marcel@holtmann.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -60,9 +60,9 @@ Cc:     chromeos-bluetooth-upstreaming@chromium.org,
         Paolo Abeni <pabeni@redhat.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH] Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
-Date:   Sat, 26 Mar 2022 06:35:17 +0000
-Message-Id: <20220326063415.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
+Subject: [PATCH v2] Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
+Date:   Sat, 26 Mar 2022 07:09:28 +0000
+Message-Id: <20220326070853.v2.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
 X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -104,6 +104,9 @@ Signed-off-by: Ying Hsu <yinghsu@chromium.org>
 Reviewed-by: Joseph Hwang <josephsih@chromium.org>
 ---
 Tested this commit using a C reproducer on qemu-x86_64 for 8 hours.
+
+Changes in v2:
+- Adding Link, Reported-by, and Fixes tags in comment.
 
  net/bluetooth/sco.c | 21 +++++++++++++--------
  1 file changed, 13 insertions(+), 8 deletions(-)
