@@ -2,103 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD423C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 07:11:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92694C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 07:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231503AbiCZHM7 (ORCPT
+        id S231836AbiCZHbq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Mar 2022 03:12:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33548 "EHLO
+        Sat, 26 Mar 2022 03:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbiCZHM6 (ORCPT
+        with ESMTP id S231389AbiCZHbp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Mar 2022 03:12:58 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36241F611
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 00:11:22 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id a5so7925106qvx.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 00:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=rnXTElMxBif/HfIMD5Aec7uqqt/QG+aZwtxUHNzWu4c=;
-        b=NCWBalIdGJfat2/Vtnw+jSnLlcbC4GBpNnP+pTv6+bdQ3Qg54clUo3g0VPajN6MSqp
-         52CY7uydTYSgb6PJ7zq2ouQ6v2LNRZzwBmwU6MC88f8pk1koTQxZLxF4BH2sLf9FphVj
-         nfb9iDr0QGLYB+OEhIo8eogdjU2/8L7t2/aO/oqowzgWt7G6Lj/1lc7axC3L+VWz8vCV
-         Dhpt9N7GyvBd2y6zKaPtVhp0KAyVScC0aJap6yDPAfZ1U3MSWP+mHlQ9fabyKoytOZqZ
-         vxbZofpfGbamsmBtgUaTldkvZbKp7GT3KXgESNm+1I+nrmubY6yQGzTneww3SvhaEvNi
-         yLBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=rnXTElMxBif/HfIMD5Aec7uqqt/QG+aZwtxUHNzWu4c=;
-        b=MAGer8frAoa9ktTT84fr/qtV6d1zbVKdnopHKKt2o+nvJdTABDh5AjdldmuQVT2Syk
-         I3eHiksQ/mWilXb43jSDIqIk7xsDFtgfWmDY4+gxf4SW0rqkphRDYVwxq+yMOrjGuqRy
-         ppsjb1w5B/OesCuA56wPM7+FmNJ2+Fc0k1bssHr2VgGsIFcrwkpDWZwEKkfmPJ7VWUD/
-         4o0LTEnDvdEC+8gSVT5gHxMU6/EdR99j1RaWsaFLUDT5aQEFHdJlBtkh93MNK7P7fmf8
-         pDLHteoBTfHOFItyOUOunpzZmqs+btbdaWUmtzFKMAHLi+Xpi4ufYwVQ2PWKPWRkj4Au
-         gpyA==
-X-Gm-Message-State: AOAM532hSNowZRctpkxOvfmx6eqqIjEB7830hElMFHxR98gFw/MsiGfM
-        GFFAKJbX6Y98hQ0lUY60IygbIZCiqiru2Q==
-X-Google-Smtp-Source: ABdhPJwDT6F4eKEV2cQoMv6DHPLUUVOE0ObgAPrIiXVF1aockubJrfIujbXByytnUVFqA9ErFG1WRQ==
-X-Received: by 2002:ad4:5c6c:0:b0:441:65:4b9d with SMTP id i12-20020ad45c6c000000b0044100654b9dmr12450296qvh.11.1648278681774;
-        Sat, 26 Mar 2022 00:11:21 -0700 (PDT)
-Received: from [172.17.0.2] ([20.231.39.157])
-        by smtp.gmail.com with ESMTPSA id r64-20020a37a843000000b0067b0cf40b18sm4709156qke.69.2022.03.26.00.11.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 26 Mar 2022 00:11:21 -0700 (PDT)
-Message-ID: <623ebc99.1c69fb81.ea0ab.9c35@mx.google.com>
-Date:   Sat, 26 Mar 2022 00:11:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2482292701540438169=="
+        Sat, 26 Mar 2022 03:31:45 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D596554B6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 00:30:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1648279809; x=1679815809;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OV9YWzfST4f2QUwBxvkzNpuNm2sMQrseHUCCEETmQ08=;
+  b=JXd8a8FbK50bNRgluGif9lML+Sy7cpDmA+FhYVo9/rP+LIFUOE7z/Spf
+   H+zx/s03RuWwONjPgAqQVnOo3bXfbhmN2Psxg3IDPEvQ+J2QuIMqYPCXu
+   hfaQcfp6HprEK2q9IjG0CyT+JY9iUPO37SPEIaJxzGcdNIvmeGavaBfok
+   01FGXLX8STlSBrQ6rVuX7UEv/QFMbkO1swkJ+LLXU8yJH0CouGzOriwZL
+   S7EDj3StpkPagDdQxfdvfVA/BxpgXLOfjnuyhgyjFx+3rGB4IaGJ/sJe5
+   toAnsArVON1SEu96C31z+7EZ7mIjCcaj5n2mcpn/Jk9S+UE7eYXBjhx1Z
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10297"; a="238701923"
+X-IronPort-AV: E=Sophos;i="5.90,211,1643702400"; 
+   d="scan'208";a="238701923"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2022 00:30:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,211,1643702400"; 
+   d="scan'208";a="520446047"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 26 Mar 2022 00:30:07 -0700
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nY0sA-000N8d-Vh; Sat, 26 Mar 2022 07:30:06 +0000
+Date:   Sat, 26 Mar 2022 15:30:00 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     kbuild-all@lists.01.org
+Subject: Re: [PATCH 2/2] Bluetooth: Print broken quirks
+Message-ID: <202203261536.VslNAaC7-lkp@intel.com>
+References: <20220325211314.425364-2-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
-Subject: RE: Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220326063415.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
-References: <20220326063415.1.I67f8ad854ac2f48701902bfb34d6e2070011b779@changeid>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220325211314.425364-2-luiz.dentz@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2482292701540438169==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+I love your patch! Perhaps something to improve:
 
-Dear submitter,
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on next-20220325]
+[cannot apply to bluetooth/master v5.17]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=626494
+url:    https://github.com/0day-ci/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-HCI-Add-HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN-quirk/20220326-051551
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+config: x86_64-randconfig-s021 (https://download.01.org/0day-ci/archive/20220326/202203261536.VslNAaC7-lkp@intel.com/config)
+compiler: gcc-9 (Ubuntu 9.4.0-1ubuntu1~20.04.1) 9.4.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/0day-ci/linux/commit/5ca7f4a3fcd3584b663e15b4c3d8230918b8971d
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-HCI-Add-HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN-quirk/20220326-051551
+        git checkout 5ca7f4a3fcd3584b663e15b4c3d8230918b8971d
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.77 seconds
-GitLint                       PASS      1.06 seconds
-SubjectPrefix                 PASS      0.86 seconds
-BuildKernel                   PASS      43.89 seconds
-BuildKernel32                 PASS      39.92 seconds
-Incremental Build with patchesPASS      52.73 seconds
-TestRunner: Setup             PASS      686.83 seconds
-TestRunner: l2cap-tester      PASS      20.11 seconds
-TestRunner: bnep-tester       PASS      8.56 seconds
-TestRunner: mgmt-tester       PASS      135.33 seconds
-TestRunner: rfcomm-tester     PASS      11.01 seconds
-TestRunner: sco-tester        PASS      10.73 seconds
-TestRunner: smp-tester        PASS      10.60 seconds
-TestRunner: userchan-tester   PASS      8.91 seconds
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
 
+sparse warnings: (new ones prefixed by >>)
+>> net/bluetooth/hci_sync.c:3837:3: sparse: sparse: symbol 'hci_broken_table' was not declared. Should it be static?
 
----
-Regards,
-Linux Bluetooth
+vim +/hci_broken_table +3837 net/bluetooth/hci_sync.c
 
+  3833	
+  3834	struct hci_broken {
+  3835		unsigned long quirk;
+  3836		const char *desc;
+> 3837	} hci_broken_table[] = {
+  3838		HCI_BROKEN(HCI_QUIRK_BROKEN_LOCAL_COMMANDS,
+  3839			   "HCI Read Local Supported Commands not supported"),
+  3840		HCI_BROKEN(HCI_QUIRK_BROKEN_STORED_LINK_KEY,
+  3841			   "HCI Delete Stored Link Key command is advertised, "
+  3842			   "but not supported."),
+  3843		HCI_BROKEN(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
+  3844			   "HCI Read Default Erroneous Data Reporting command is "
+  3845			   "advertised, but not supported."),
+  3846		HCI_BROKEN(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+  3847			   "HCI Read Transmit Power Level command is advertised, "
+  3848			   "but not supported."),
+  3849		HCI_BROKEN(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+  3850			   "HCI Set Event Filter command not supported."),
+  3851		HCI_BROKEN(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+  3852			   "HCI Enhanced Setup Synchronous Connection command is "
+  3853			   "advertised, but not supported.")
+  3854	};
+  3855	
 
---===============2482292701540438169==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
