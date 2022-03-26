@@ -2,86 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E46CBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 13:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0CAFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Mar 2022 17:12:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233093AbiCZN5R (ORCPT
+        id S234411AbiCZRNn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Mar 2022 09:57:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49546 "EHLO
+        Sat, 26 Mar 2022 13:13:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232543AbiCZN5Q (ORCPT
+        with ESMTP id S234837AbiCZRNf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Mar 2022 09:57:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2037C26E6
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 06:55:40 -0700 (PDT)
+        Sat, 26 Mar 2022 13:13:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCFC3C4B6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 10:10:33 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CF6D5B8093C
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 13:55:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E2BEC340F3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 13:55:37 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 054EE60F9F
+        for <linux-bluetooth@vger.kernel.org>; Sat, 26 Mar 2022 17:10:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67095C340F3;
+        Sat, 26 Mar 2022 17:10:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648302937;
-        bh=T6wexI+Uk3HiWnoMzFzW5vFnLg4IqtL4QXu2WdAw5u0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=LLuEw2q33eDb8F+7YkEiCM7zh1V/fXT1xTtlTvRwrzsy6hyIT9epf1HFdO8BcXWvS
-         21gyYIAkMGj1S9sEO3GBq9NcaroOCvGXiiwZrWCyc4dKWrfk9jswMyeWFYjBODMpSH
-         WVQs09n6DoRJocqNzodaSmXfMx9ri/5g9FxHu6GGH2u13Oe8HeWlbnD011BUmG+v/r
-         wC8d8RrP1Rr7fZPVS4YVY9ZYxhnnmZ88lFFDEi4TSgCBBswqKQcmcD08WVHdg4w7lV
-         5a0htvE16/zKX+2mT726msha8etrq/QGCrYFWa5GodzzSQRvBYTBd3cCIUjv9DHCHO
-         2l4lnwXxdP04g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 8C985C05FD4; Sat, 26 Mar 2022 13:55:37 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215746] rfcomm: WARNING: possible circular locking dependency
- detected: rfcomm_sk_state_change <-> rfcomm_run
-Date:   Sat, 26 Mar 2022 13:55:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: travneff@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc attachments.created
-Message-ID: <bug-215746-62941-RprW0JILFX@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215746-62941@https.bugzilla.kernel.org/>
-References: <bug-215746-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        s=k20201202; t=1648314610;
+        bh=CQXu/B348T82En33bCUAp1U92pHQaMHzt5sc8Omed3I=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ZzTZ5VhNfiDHMlt+ZFOCCqLmdzDRxt8YIlfRqQIymppHDPH7P4whTh9kWIQPj+TdB
+         7om1GWTl6U6za+tVZGa2tJ2x72AbYAk1lk1JsmoxA00nYcVWVF40gch1KvLyvWZnrq
+         OnxujYbp+w8+egCKtIMUUgnrWOS+y2LUsahSSirCryHuhPpWxhvH+//1O57wTmI/0h
+         64GGQKta9LBZkKD2IEUzEwMUfpbXfIO7UX9BlUUMotMPkBk7rc6xziCVS/vyjZmmXG
+         X+6dmDlaS2kSOPqN1zMbyA0OjYGhfgHhnQWG/Fj5ktL/wtpblMO+Yfb470NG0xej+G
+         4zu8AP7Bey2CQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43551F03843;
+        Sat, 26 Mar 2022 17:10:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v2] mesh: Fix address overrun error in rx filter
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164831461027.13360.7891839260901344422.git-patchwork-notify@kernel.org>
+Date:   Sat, 26 Mar 2022 17:10:10 +0000
+References: <20220325234625.24642-1-inga.stotland@intel.com>
+In-Reply-To: <20220325234625.24642-1-inga.stotland@intel.com>
+To:     Inga Stotland <inga.stotland@intel.com>
+Cc:     brian.gix@intel.com, linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215746
+Hello:
 
-Andrew (travneff@gmail.com) changed:
+This patch was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@intel.com>:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |travneff@gmail.com
+On Fri, 25 Mar 2022 16:46:25 -0700 you wrote:
+> This fixes the following error for invalid read access when registering
+> filter for incoming messages:
+> 
+> 140632==ERROR: AddressSanitizer: stack-buffer-overflow on address...
+>  #0 0x7f60c185741d in MemcmpInterceptorCommon(...
+>     #1 0x7f60c1857af8 in __interceptor_memcmp (/lib64/libasan.so...
+>     #2 0x55a10101536e in find_by_filter mesh/mesh-io-unit.c:494
+>     #3 0x55a1010d8c46 in l_queue_remove_if ell/queue.c:517
+>     #4 0x55a101014ebd in recv_register mesh/mesh-io-unit.c:506
+>     #5 0x55a10102946f in mesh_net_attach mesh/net.c:2885
+>     #6 0x55a101086f64 in send_reply mesh/dbus.c:153
+>     #7 0x55a101124c3d in handle_method_return ell/dbus.c:216
+>     #8 0x55a10112c8ef in message_read_handler ell/dbus.c:276
+>     #9 0x55a1010dae20 in io_callback ell/io.c:120
+>     #10 0x55a1010dff7e in l_main_iterate ell/main.c:478
+>     #11 0x55a1010e06e3 in l_main_run ell/main.c:525
+>     #12 0x55a1010e06e3 in l_main_run ell/main.c:507
+>     #13 0x55a1010e0bfc in l_main_run_with_signal ell/main.c:647
+>     #14 0x55a10100316e in main mesh/main.c:292
+>     #15 0x7f60c0c6855f in __libc_start_call_main (/lib64/libc.so.6+...
+>     #16 0x7f60c0c6860b in __libc_start_main_alias_1 (/lib64/libc.so.6+...
+>     #17 0x55a101003ce4 in _start (/home/istotlan/bluez/mesh/bluetooth-m...
+> 
+> [...]
 
---- Comment #1 from Andrew (travneff@gmail.com) ---
-Created attachment 300618
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300618&action=3Dedit
-full dmesg log with the warning
+Here is the summary with links:
+  - [BlueZ,v2] mesh: Fix address overrun error in rx filter
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=2a2b027176d5
 
---=20
-You may reply to this email to add a comment.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
