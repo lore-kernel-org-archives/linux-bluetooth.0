@@ -2,79 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40D4EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Mar 2022 18:00:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846D0C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Mar 2022 18:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244889AbiC1SB4 (ORCPT
+        id S245145AbiC1SSw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Mar 2022 14:01:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        Mon, 28 Mar 2022 14:18:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244886AbiC1SBx (ORCPT
+        with ESMTP id S245140AbiC1SSj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Mar 2022 14:01:53 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F70540A30
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Mar 2022 11:00:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 08C3661180
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Mar 2022 18:00:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 537F3C340F3;
-        Mon, 28 Mar 2022 18:00:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648490411;
-        bh=WdRAIqooItxYOmBSjxJcVMZAXtyZzmqeviel8d0aIHQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=rYIZNFnRONJ17rULRIub9Bd1ioXpYzuXXEzkhkHKnvoci1+gfLJQ/v83D/32Q1358
-         f8OejPqTIFeU+RUmnf/WF4COW6c0N2ROaw1ZNFV1oG3oo/3/3NHSUVyHqW/sNKEOKQ
-         2VPXHb4REzKC8bNjf+hXNSa6T3ZNcfrMdxWWJGuKb1uUZRMsXtoc8Uc/0Lj4rFeqn4
-         SADNUJcxvXOCt96SAQONqfDlWVMeaVjLSyuP3mNeaK8LpqD4ayD3llIwZIL59ud+03
-         SNejIjozYxPyfIgfrLp8MdKXgPgux6i/a4vM0SljNNq7mcVGdOe4oTpu3vxSR04iqm
-         as3titK/HEwLg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 31278E7BB0B;
-        Mon, 28 Mar 2022 18:00:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 28 Mar 2022 14:18:39 -0400
+Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D898F62BDB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Mar 2022 11:16:54 -0700 (PDT)
+Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-2e592e700acso158623827b3.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Mar 2022 11:16:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=/fi6mZYDfm0VV6vDZo77jPGFXmDYCwJMMhGPMBdpvWA=;
+        b=d3+vr1pSN2rcrvjRel5ATsgXSvQIfoXheYc3q7Dd9FlHk6FZzGZUJFNBFcuswVp79a
+         4P3a9tJlNzLztUu2riVxfXONBlFENHJKN67Z0tmpKdtatJbLCPA11PT/AZAue+fxmKOM
+         zTimIdCQkibNJZ2M79P28oDtbh873SZvVmMc7g0Ug/Mu4eiRENqM0NcI2hk3qcIqUarQ
+         w9dX0lIlZm6IKVp4rRPUSenN1wZuMW0FbrtWWfK2JUjP7/xCqMFErA/PnPoeVvuvqHtk
+         iePrJHrBZCLAQ5ULr5gwWuUsXnXnoD+GjztZGKLJKMgnzmVyzl0LqY2Dcpp11q14MKw+
+         mUkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=/fi6mZYDfm0VV6vDZo77jPGFXmDYCwJMMhGPMBdpvWA=;
+        b=mtIvX/Weh9rGpBX4aInFJso0nODcxgk9w2anVjP/qpKvCVIb39NPUO641zU5P3IIkW
+         jNcowK0ILRSsXSxLcFEpkBVIaTvPwkyxuKgvNL7aHk4chLnpZ/LGn2Ny4Wvhl7pAh7+H
+         URPSmfuagID1VG4L3q+UXOQMWf7Y/f936jW1j34wOanHfBDhw3QiV0iZcSFExtUOsHOI
+         KrbPIJjVLld7sF90knodC2feOhSnAFo6+uSKkjAhocMenymxfZnA+gT0PdbHOmjNFl5Z
+         vrWEfioyv93SHivpumvVTj6cgDbqIJZDu4HmeDMgyh5WQudRNUE5MjVpk+r2A5DRPMHr
+         ec3g==
+X-Gm-Message-State: AOAM531UxAwbGnj9xQB85pU/Zgln78+o+NJNpBXl/FGYDJBCnVpHiWuy
+        R+DXGJPj5FsTtQv+4BlhSVJ7hEmadMk0RtMq/tWtPi4Qwkg=
+X-Google-Smtp-Source: ABdhPJwJ25BTMHJdO2b4HDlZSk9D1iahttPGARPmGBkB5uWqCzSOs0IxpvpfmtWMDXpYFofT3Giwq4QUkcCWFLDiTb4=
+X-Received: by 2002:a81:f0c:0:b0:2d6:83ab:7605 with SMTP id
+ 12-20020a810f0c000000b002d683ab7605mr26916926ywp.150.1648491413611; Mon, 28
+ Mar 2022 11:16:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/2] adapter: Fix adding SDP records when operating on
- LE only mode
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <164849041119.15036.9636485473839872004.git-patchwork-notify@kernel.org>
-Date:   Mon, 28 Mar 2022 18:00:11 +0000
-References: <20220324213658.59479-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220324213658.59479-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+References: <20220325092706.17135-1-frederic.danis@collabora.com> <CABBYNZJJAN7GeNRm8_UyyE4pBDKn+YWLiqHBxecKcKUJhzDbTQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJJAN7GeNRm8_UyyE4pBDKn+YWLiqHBxecKcKUJhzDbTQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 28 Mar 2022 11:16:43 -0700
+Message-ID: <CABBYNZ+7nup69rsTsaAhZAFxS3Mc_bMLBZr3vVjbW4D5sG8o7w@mail.gmail.com>
+Subject: Re: [PATCH] a2dp: Fix crash when SEP codec has not been initialized
+To:     =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Fr=C3=A9d=C3=A9ric,
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Fri, Mar 25, 2022 at 1:06 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Fr=C3=A9d=C3=A9ric,
+>
+> On Fri, Mar 25, 2022 at 12:53 PM Fr=C3=A9d=C3=A9ric Danis
+> <frederic.danis@collabora.com> wrote:
+> >
+> > If SEP has not been properly discovered avdtp_get_codec may return NULL
+> > thus causing crashes such as when running AVRCP/TG/VLH/BI-01-C after
+> > AVRCP/TG/RCR/BV-04-C
+> > ---
+> >  profiles/audio/a2dp.c | 17 ++++++++++++++---
+> >  1 file changed, 14 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > index f761dbe54..7da008071 100644
+> > --- a/profiles/audio/a2dp.c
+> > +++ b/profiles/audio/a2dp.c
+> > @@ -1995,7 +1995,12 @@ static gboolean get_codec(const GDBusPropertyTab=
+le *property,
+> >  {
+> >         struct a2dp_remote_sep *sep =3D data;
+> >         struct avdtp_service_capability *cap =3D avdtp_get_codec(sep->s=
+ep);
+> > -       struct avdtp_media_codec_capability *codec =3D (void *) cap->da=
+ta;
+> > +       struct avdtp_media_codec_capability *codec;
+> > +
+> > +       if (!cap)
+> > +               return FALSE;
+> > +
+> > +       codec =3D (void *) cap->data;
+> >
+> >         dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
+> >                                                 &codec->media_codec_typ=
+e);
+> > @@ -2008,10 +2013,16 @@ static gboolean get_capabilities(const GDBusPro=
+pertyTable *property,
+> >  {
+> >         struct a2dp_remote_sep *sep =3D data;
+> >         struct avdtp_service_capability *service =3D avdtp_get_codec(se=
+p->sep);
+> > -       struct avdtp_media_codec_capability *codec =3D (void *) service=
+->data;
+> > -       uint8_t *caps =3D codec->data;
+> > +       struct avdtp_media_codec_capability *codec;
+> > +       uint8_t *caps;
+> >         DBusMessageIter array;
+> >
+> > +       if (!service)
+> > +               return FALSE;
+> > +
+> > +       codec =3D (void *) service->data;
+> > +       caps =3D codec->data;
+> > +
+> >         dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> >                                         DBUS_TYPE_BYTE_AS_STRING, &arra=
+y);
+> >
+> > --
+> > 2.25.1
+>
+> We should either have a .exist callback or not have the endpoint
+> registered if its codec is not available, I'm leaning toward the
+> latter given that it is useless to have the endpoint if it cannot be
+> used without the codec information.
 
-On Thu, 24 Mar 2022 14:36:57 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If mode is set to BT_MODE_LE SDP protocol won't be operational so it is
-> useless to attempt to add records.
-> ---
->  src/adapter.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+In case you missed my response on slack, here is the suggestion change:
 
-Here is the summary with links:
-  - [BlueZ,1/2] adapter: Fix adding SDP records when operating on LE only mode
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=4fefa24097e4
-  - [BlueZ,2/2] a2dp: Don't initialize a2dp_sep->destroy until properly registered
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=18fc3abad28c
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index c3ac432a7..28654924b 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2074,6 +2074,11 @@ static struct a2dp_remote_sep
+*register_remote_sep(void *data, void *user_data)
+        if (sep)
+                return sep;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
++       if (avdtp_get_codec(rsep)) {
++               error("Unable to get remote sep codec");
++               return NULL;
++       }
++
+        sep =3D new0(struct a2dp_remote_sep, 1);
+        sep->chan =3D chan;
+        sep->sep =3D rsep;
 
 
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+--=20
+Luiz Augusto von Dentz
