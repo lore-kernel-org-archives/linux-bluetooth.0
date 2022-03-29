@@ -2,102 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA31C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 08:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92406C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 11:34:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233724AbiC2IDi (ORCPT
+        id S234076AbiC2Lfr convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Mar 2022 04:03:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49796 "EHLO
+        Tue, 29 Mar 2022 07:35:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231421AbiC2IDh (ORCPT
+        with ESMTP id S231625AbiC2Lfq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Mar 2022 04:03:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72471E3DE
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 01:01:55 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 68182B80CCD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 08:01:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DEB8FC340F2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 08:01:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648540912;
-        bh=/9ozGYZ6mGnpWJP2vacgPYZzGmZHVQuO6KJl+Sj3VWo=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=q/eByb6aYMb26Qd8bjN9jF2bCBgAC2aiPrW4dILzYk9NE8bHnvFeVnA6EOuE1IkwJ
-         FnfysKB2+Ng/IYf5d1ICijJSETLh8/2pOETO1jd/n2j0Y3gz+KAL5yyTTZ7K4JT4Qn
-         L3fcDhE9A71j81bbecbvUwRCzA+87h/dOORlLYdozTMGGN7hopaBmNb4h7R8opmCYP
-         PuQlXBeV0h78pcm7vdUKkxzonYPMdQNzV9uNPoqyWxAyxDA6CoeM5D+sZeVRpH0G7w
-         sbLk6F7WRMlmt/8i0ufR/6lg7mterx6z8YEkXKEy+pJvDx8a0MNkxn4Ektindfb37+
-         J7yeElOmj/oHA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C9200C05FD0; Tue, 29 Mar 2022 08:01:52 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215725] Basilisk X Hyperspeed Bluetooth LE mouse fail to
- connect under 5.17 with Opcode 0x2043 failure
-Date:   Tue, 29 Mar 2022 08:01:52 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215725-62941-MtkKAbJFu1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215725-62941@https.bugzilla.kernel.org/>
-References: <bug-215725-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Tue, 29 Mar 2022 07:35:46 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AD54F27CC1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 04:34:00 -0700 (PDT)
+Received: from smtpclient.apple (p4ff9fa3c.dip0.t-ipconnect.de [79.249.250.60])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 811D8CECC8;
+        Tue, 29 Mar 2022 13:33:59 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+Subject: Re: [PATCH 2/2] Bluetooth: Print broken quirks
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220325211314.425364-2-luiz.dentz@gmail.com>
+Date:   Tue, 29 Mar 2022 13:33:58 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BA52316B-CC2F-4030-8764-DC8979075ACB@holtmann.org>
+References: <20220325211314.425364-1-luiz.dentz@gmail.com>
+ <20220325211314.425364-2-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215725
+Hi Luiz,
 
---- Comment #1 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-Hi, this is your Linux kernel regression tracker.
+> This prints warnings for controllers setting broken quirks to increase
+> their visibility and warn about broken controllers firmware that
+> probably needs updates to behave properly.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_sync.c | 44 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 44 insertions(+)
+> 
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 8f4c5698913d..089500136096 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3825,6 +3825,48 @@ static int hci_init_sync(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +#define HCI_BROKEN(_quirk, _desc) \
+> +{ \
+> +	.quirk = _quirk, \
+> +	.desc = _desc, \
+> +}
+> +
+> +struct hci_broken {
+> +	unsigned long quirk;
+> +	const char *desc;
+> +} hci_broken_table[] = {
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_LOCAL_COMMANDS,
+> +		   "HCI Read Local Supported Commands not supported"),
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_STORED_LINK_KEY,
+> +		   "HCI Delete Stored Link Key command is advertised, "
+> +		   "but not supported."),
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
+> +		   "HCI Read Default Erroneous Data Reporting command is "
+> +		   "advertised, but not supported."),
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+> +		   "HCI Read Transmit Power Level command is advertised, "
+> +		   "but not supported."),
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+> +		   "HCI Set Event Filter command not supported."),
+> +	HCI_BROKEN(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+> +		   "HCI Enhanced Setup Synchronous Connection command is "
+> +		   "advertised, but not supported.")
+> +};
 
-On 22.03.22 14:38, bugzilla-daemon@kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=3D215725
->=20
->             Bug ID: 215725
->            Summary: Basilisk X Hyperspeed Bluetooth LE mouse fail to
->                     connect under 5.17 with Opcode 0x2043 failure
+static const hci_quirk_broken
 
-Hey bluetooth maintainers, what's up here? That's a report about a
-regression that was submitted more than a week ago. Has anything
-happened to get it fixed? Reminder: this ideally should be fixed in
-5.17.y before 5.16.y becomes EOL, which I guess will happen in round
-about two or three weeks from now.
+And then HCI_QUIRK_BROKEN(LOCAL_COMMANDS, “text”),
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+> +
+> +static void hci_dev_print_broken(struct hci_dev *hdev)
+> +{
+> +	int i;
+> +
+> +	bt_dev_dbg(hdev, "");
+> +
+> +	for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
+> +		struct hci_broken *broken = &hci_broken_table[i];
+> +
+> +		if (test_bit(broken->quirk, &hdev->quirks))
+> +			bt_dev_warn(hdev, "%s", broken->desc);
+> +	}
+> +}
+> +
+> int hci_dev_open_sync(struct hci_dev *hdev)
+> {
+> 	int ret = 0;
+> @@ -4031,6 +4073,8 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+> 	}
+> 
+> done:
+> +	hci_dev_print_broken(hdev);
+> +
 
-P.S.: As the Linux kernel's regression tracker I'm getting a lot of
-reports on my table. I can only look briefly into most of them and lack
-knowledge about most of the areas they concern. I thus unfortunately
-will sometimes get things wrong or miss something important. I hope
-that's not the case here; if you think it is, don't hesitate to tell me
-in a public reply, it's in everyone's interest to set the public record
-straight.
+This is wrong. It gets printed all the time and no matter if success or failure. This needs to go after hdev->setup.
 
---=20
-You may reply to this email to add a comment.
+Regards
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Marcel
+
