@@ -2,121 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DF6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 13:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FFFCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 14:44:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237055AbiC2NZE (ORCPT
+        id S233193AbiC2OqS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Mar 2022 09:25:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
+        Tue, 29 Mar 2022 10:46:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235104AbiC2NZD (ORCPT
+        with ESMTP id S238050AbiC2OqL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Mar 2022 09:25:03 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F663DFB8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 06:23:19 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: fdanis)
-        with ESMTPSA id 516F41F427D0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1648560198;
-        bh=v7R3zZSI0Pd0F/jDiCT4YUswtf2hj0dUEOs1wAc8nOM=;
-        h=From:To:Subject:Date:From;
-        b=exZ4OAHUdL15eUfrKVBjMTHfhKM13UbWYrRluYWYcqF7j/4Kl3yz+WnaHCNc02lC6
-         BEiE3wU6heLifcuHJvtRIwkjefpvtaVNRbP1Y7vqzGcU1Lh18ZtFz/BrZ/4VFGbtW8
-         mxW4iUJqezyDYEHpyrRQtd5nkY5yxvhfG3szPSQVXGLmx1ocn14sNy7/ImoMaGIyGK
-         X7gdF5akUeF9vQZmEOb9jkXzXynDIpRms+iV7PaBRzKPCTOuT0pxj6PH430dLrukBd
-         vGEjH6h8ryVjtJh/PV6l0kerUoHXUvsG/FayLlDFslknm6WYfe+ko4g6yY8Vb+kVkq
-         zW3fIVoy83MeQ==
-From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
-        <frederic.danis@collabora.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] a2dp: Fix crash when SEP codec has not been initialized
-Date:   Tue, 29 Mar 2022 15:23:11 +0200
-Message-Id: <20220329132311.163117-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 29 Mar 2022 10:46:11 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B280047057
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 07:44:28 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id j21so15440656qta.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 07:44:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=QJqDEk/4DKuDESszL6JBWXEtl/jAiDAn/vU1RwLwEWg=;
+        b=UFbK/ocFJTF3i1CGTEUNRX5RluV686b7zqPwr7BI6+72O4jP5uUdsUrohViAOhlWt0
+         qPTvojnFrYnD0o2eMzBc4Qhb2UHeM/AMWyyKPOzPFSBF6DqLzJBXP+m5gQfos3NSXLr9
+         scUEA1pbVHbWr9mH49KWULSy43JHCQ1+M+80wb+oiX/fDN+CiPxXLLFQ+q/GOfbBOFEA
+         y9MrNFmIziJ99yp+qjk7WzXvy38WokZ2biRpr86XDDwnSiArDVfW+Qay3iQ8EflIBOTQ
+         q60SJkOyfk+/JAJynr0e/QQs2GoFFLxMeSl35zFS8ElrJp7Z88jFEnHwXsomTzATJwZB
+         4Z1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=QJqDEk/4DKuDESszL6JBWXEtl/jAiDAn/vU1RwLwEWg=;
+        b=I09fD2anwUSu56SApk3hKZC7fNHTe6u133/mzmd7ffgGqRFvb8resVvVF4nWq1fj4y
+         EtuOYKAENvmLIBK3lP0/FJ3KguGC12B5CwSneUayj1A2WoeszYN3S2BzFrRkkpvhAA4o
+         MPoQFaa3qAqODs35Nsqx4gre3zG27JQBckhBSqeqCl+dfUZQhNw1f8HDF9PBzSisyWeI
+         uFn8lSDYubR4c13Qx36l/kfY+zrp93IatugMmqWD0GopV9yU0xmroG6OOVh7O4nw9LvF
+         Sq8XndT/dEcmd/XVe8z3zxZ/+lB54WWVvdj4ndKAqd0fvf5Uo4+KtbzTPqBXSHQI+OUN
+         X/bw==
+X-Gm-Message-State: AOAM533xkF0SiKhqJRcwEe+IYx7Qoaj7rQntlhbsXF3JKUWV4fzoFP2a
+        bPkcPXYOLEhR+4uwZQDPwC/amJ+rQpYAig==
+X-Google-Smtp-Source: ABdhPJwLkPMUHRrtu3f/Wd+rnTiLRw0mNV37x0jT8suCI4LrGTHgS+ZPFk31i1HoB7PGQLWBX//eBw==
+X-Received: by 2002:a05:622a:138a:b0:2e1:ea16:4fd9 with SMTP id o10-20020a05622a138a00b002e1ea164fd9mr28284200qtk.527.1648565067575;
+        Tue, 29 Mar 2022 07:44:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.232.143.228])
+        by smtp.gmail.com with ESMTPSA id u62-20020a379241000000b0067ed2b0994dsm9591531qkd.54.2022.03.29.07.44.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Mar 2022 07:44:27 -0700 (PDT)
+Message-ID: <62431b4b.1c69fb81.45d6.05e8@mx.google.com>
+Date:   Tue, 29 Mar 2022 07:44:27 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1847461333273617822=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
+Subject: RE: [v3] a2dp: Fix crash when SEP codec has not been initialized
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220329132311.163117-1-frederic.danis@collabora.com>
+References: <20220329132311.163117-1-frederic.danis@collabora.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If SEP has not been properly discovered avdtp_get_codec may return NULL
-thus causing crashes such as when running AVRCP/TG/VLH/BI-01-C after
-AVRCP/TG/RCR/BV-04-C.
+--===============1847461333273617822==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The endpoint should not be registered if its codec is not available.
+This is automated email and please do not reply to this email!
 
-Remove A2DP channel seps queue empty check in store_remote_seps() as it
-prevent to remove invalidated checkpoint if this is the only one saved.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=627219
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.52 seconds
+GitLint                       PASS      1.00 seconds
+Prep - Setup ELL              PASS      52.78 seconds
+Build - Prep                  PASS      0.76 seconds
+Build - Configure             PASS      10.69 seconds
+Build - Make                  PASS      1501.55 seconds
+Make Check                    PASS      13.29 seconds
+Make Check w/Valgrind         PASS      540.54 seconds
+Make Distcheck                PASS      283.94 seconds
+Build w/ext ELL - Configure   PASS      10.71 seconds
+Build w/ext ELL - Make        PASS      1468.92 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
-v3: add a fix for the invalidated sep removale in cache
-v2: don't register enpoint if its codec is unavailable
+Regards,
+Linux Bluetooth
 
- profiles/audio/a2dp.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index c3ac432a7..7ad34bab9 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -829,9 +829,6 @@ static void store_remote_seps(struct a2dp_channel *chan)
- 	char *data;
- 	gsize length = 0;
- 
--	if (queue_isempty(chan->seps))
--		return;
--
- 	ba2str(device_get_address(device), dst_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-@@ -1993,7 +1990,12 @@ static gboolean get_codec(const GDBusPropertyTable *property,
- {
- 	struct a2dp_remote_sep *sep = data;
- 	struct avdtp_service_capability *cap = avdtp_get_codec(sep->sep);
--	struct avdtp_media_codec_capability *codec = (void *) cap->data;
-+	struct avdtp_media_codec_capability *codec;
-+
-+	if (!cap)
-+		return FALSE;
-+
-+	codec = (void *) cap->data;
- 
- 	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE,
- 						&codec->media_codec_type);
-@@ -2006,10 +2008,16 @@ static gboolean get_capabilities(const GDBusPropertyTable *property,
- {
- 	struct a2dp_remote_sep *sep = data;
- 	struct avdtp_service_capability *service = avdtp_get_codec(sep->sep);
--	struct avdtp_media_codec_capability *codec = (void *) service->data;
--	uint8_t *caps = codec->data;
-+	struct avdtp_media_codec_capability *codec;
-+	uint8_t *caps;
- 	DBusMessageIter array;
- 
-+	if (!service)
-+		return FALSE;
-+
-+	codec = (void *) service->data;
-+	caps = codec->data;
-+
- 	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
- 					DBUS_TYPE_BYTE_AS_STRING, &array);
- 
-@@ -2074,6 +2082,11 @@ static struct a2dp_remote_sep *register_remote_sep(void *data, void *user_data)
- 	if (sep)
- 		return sep;
- 
-+	if (!avdtp_get_codec(rsep)) {
-+		error("Unable to get remote sep codec");
-+		return NULL;
-+	}
-+
- 	sep = new0(struct a2dp_remote_sep, 1);
- 	sep->chan = chan;
- 	sep->sep = rsep;
--- 
-2.25.1
-
+--===============1847461333273617822==--
