@@ -2,134 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90557C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 21:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4F7C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 22:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234456AbiC2Vee (ORCPT
+        id S238353AbiC2WyF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Mar 2022 17:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54100 "EHLO
+        Tue, 29 Mar 2022 18:54:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234467AbiC2Ved (ORCPT
+        with ESMTP id S238290AbiC2WyE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Mar 2022 17:34:33 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6464B239320
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 14:32:49 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id bx5so18754784pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 14:32:49 -0700 (PDT)
+        Tue, 29 Mar 2022 18:54:04 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D1DA0BF3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id mj15-20020a17090b368f00b001c637aa358eso344118pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=56fbgVdh1J5rDKNt0tG5KJcZBRHreXxak00Yp74aW1I=;
-        b=ilSQ+/cHwPPlNj/TePc5MDo2j/KnT225LrnwfjrNBqYAGqJ6Z3bmCatFDmFzSVHWpw
-         /e/HElBEGwvKsiECTdsI2d7jlxEtsUqhEsNO+rsxdKynKJz1orTom6FlRn0nYkFXLOKj
-         kM4oa8pGvpywps50t16GHe+lvF6/ua+OagiFvInsphng1QmgwIbYyqryb+xn5qzVXgqa
-         MUKAQn3DTQtmHQBVDRUGjN7zXITqnVqRHKnW/KZmN9VSgkf/Cpd8FI70tmdNhdp10LW0
-         Y7uc6Kr9wSauwF+n5P/k1eD3gZrFav4W2Kn/AsMoT96pST7kRwFeepaTsCbzOpGzkd07
-         aCLQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=X51Q2oaGEZk+9G3DnwGGNsAmpD66sfxgajtL2F+euJE=;
+        b=LWEjKQpan69iRWl9OdiaSi0yObxRT/r8Nvvv1D2o+8yTzQ8uijYd1vXbbFCvRGdopB
+         3SYsof5GQ11R+BA/ymO9tTXqhJGesVplPMWXZAEyRq9kdAIhKaR1OAjVDih5yJaKcggU
+         GWuf/BN+S/a1NpaR0ehv7eTZFvMrn5+SJ9PbIjHNx7/bWkMT4z/xZJpZQuPmw5xQtDMn
+         zmHS4usl55JUwXjBjaG8QGBtgLOQlp7JniGNnwdOIRcxkGWw2qCBX7mnPAmgWwhNCXAl
+         skRP+KvPjtyyulk7+vhtYko1tDP9hwTCtMMLUU4OorfmBfg2XjHDXypNqqTpLD0+5Fkp
+         9zQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=56fbgVdh1J5rDKNt0tG5KJcZBRHreXxak00Yp74aW1I=;
-        b=zP8he6+BhanDW1sGr8ty+qTJnUZ8TFyODrojVDYYSi456fOBVrxJ2l7rLpE14kfJjN
-         wzBpk0rWfB8ZtKe0NCyUROfGMrV3eORRJ4AI2zmNlLJHmxk+wDd7pRPrkUlCccs2233C
-         Hsph9ekuAAX1Qnfhh/2iXeRbU4QmkNhqmhIhQiJGy5jSe9yF823xtEbBHBcc2afZDzUP
-         EIodWm30/WrX0Yynwp58CIjfMFfIXZAnr9ZsGm9Bb6mPWCg7vCi0FFAcbfuIAYOS1Sw3
-         6UuHkMUo1dSN2Ha15gbZP3mOBb6HhfEZUdlgeZ4eazyuDTwivUy9GZWIuwrKnFSF5/Qi
-         fsXw==
-X-Gm-Message-State: AOAM532FFrFwHIKbiqXvSv/p7RFNz56ewzisvDt0WS0f0XEV2nDcM8Bg
-        LwVLYaqd2bgQZfpFcm/YLzAF0Y2Ixio=
-X-Google-Smtp-Source: ABdhPJwANd4TMVFggMhc0v6IEziRWKfZmDAlgos66bIIVLlx0doWtkD8HAApi+oYE1BZ/Ft2VcF1XQ==
-X-Received: by 2002:a17:90a:7d10:b0:1c9:7939:c70 with SMTP id g16-20020a17090a7d1000b001c979390c70mr1146012pjl.203.1648589568311;
-        Tue, 29 Mar 2022 14:32:48 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id w63-20020a638242000000b0038631169c02sm15657012pgd.57.2022.03.29.14.32.47
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=X51Q2oaGEZk+9G3DnwGGNsAmpD66sfxgajtL2F+euJE=;
+        b=b8iVu0WGQSMbuq62B5r6ajP/MsCCrWJEMTlAUPqFnGLibwVum95Spi37uexjNgWXTU
+         2THyK2HZ/xWSj8yuMlLSVIUV3386fnEEH/R/DKZ8GC6d55KT70BCjDkk+FW4xBP5YdkV
+         FmKxSGHOYQv2qGmV17ahlajN6qvrdDq3oDcJLc5BpumL2Ku+ctCU7Py7aDzpGO3IzRYN
+         K17h5y2Ir3kWP6t3r01dl4Kthpk5UHDh0+xEkSJJY4PdsZYrdnafQuZ9cfXXDmBZhgS2
+         ymPH3ZlYAVbC1bCsQa5xXsfPEiSlZWxTDBeimlC82HdNS09Tf2UA7D04EvBzweQ5URUC
+         qWvA==
+X-Gm-Message-State: AOAM532TQasYj727J2svsQLHlm6ugivcZaL1ZYzV9ioTcM3ay7xOrSFR
+        VjqY2+CVefXZaPNcUQQpPWvPM8+h0Qo=
+X-Google-Smtp-Source: ABdhPJwoRRSWbAzFeXx24QHL2A3MEu1Io2PHCm8VOSPBHYVqTnGqvzyh6fJZ4YZMknVNJ+TG+0adjA==
+X-Received: by 2002:a17:902:d2d1:b0:154:45d2:a05d with SMTP id n17-20020a170902d2d100b0015445d2a05dmr32250365plc.74.1648594340064;
+        Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
+Received: from [172.17.0.2] ([104.42.218.121])
+        by smtp.gmail.com with ESMTPSA id l6-20020a17090a660600b001c985b0cb53sm3898181pjj.26.2022.03.29.15.52.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 14:32:47 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v4] a2dp: Fix crash when SEP codec has not been initialized
-Date:   Tue, 29 Mar 2022 14:32:47 -0700
-Message-Id: <20220329213247.2334757-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Tue, 29 Mar 2022 15:52:19 -0700 (PDT)
+Message-ID: <62438da3.1c69fb81.ae42c.a929@mx.google.com>
+Date:   Tue, 29 Mar 2022 15:52:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3110144288218967587=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v4] a2dp: Fix crash when SEP codec has not been initialized
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220329213247.2334757-1-luiz.dentz@gmail.com>
+References: <20220329213247.2334757-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3110144288218967587==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If SEP has not been properly discovered avdtp_get_codec may return NULL
-thus causing crashes such as when running AVRCP/TG/VLH/BI-01-C after
-AVRCP/TG/RCR/BV-04-C
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=627319
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.44 seconds
+Prep - Setup ELL              PASS      45.94 seconds
+Build - Prep                  PASS      0.61 seconds
+Build - Configure             PASS      8.87 seconds
+Build - Make                  PASS      1623.11 seconds
+Make Check                    PASS      12.49 seconds
+Make Check w/Valgrind         PASS      499.49 seconds
+Make Distcheck                PASS      256.95 seconds
+Build w/ext ELL - Configure   PASS      9.23 seconds
+Build w/ext ELL - Make        PASS      1636.91 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
-v4: remove queue_isempty check from store_remote_seps since that prevents
-cleaning up if no seps could be registered.
+Regards,
+Linux Bluetooth
 
- profiles/audio/a2dp.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index c3ac432a7..5c20e5807 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -829,9 +829,6 @@ static void store_remote_seps(struct a2dp_channel *chan)
- 	char *data;
- 	gsize length = 0;
- 
--	if (queue_isempty(chan->seps))
--		return;
--
- 	ba2str(device_get_address(device), dst_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-@@ -2074,6 +2071,11 @@ static struct a2dp_remote_sep *register_remote_sep(void *data, void *user_data)
- 	if (sep)
- 		return sep;
- 
-+	if (avdtp_get_codec(rsep)) {
-+		error("Unable to get remote sep codec");
-+		return NULL;
-+	}
-+
- 	sep = new0(struct a2dp_remote_sep, 1);
- 	sep->chan = chan;
- 	sep->sep = rsep;
-@@ -2148,6 +2150,7 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
- 	struct avdtp_remote_sep *rsep;
- 	uint8_t lseid, rseid;
- 	char *value;
-+	bool update = false;
- 
- 	if (!seids)
- 		return;
-@@ -2206,10 +2209,19 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
- 		}
- 
- 		sep = register_remote_sep(rsep, chan);
--		if (sep)
--			sep->from_cache = true;
-+		if (!sep) {
-+			avdtp_unregister_remote_sep(chan->session, rsep);
-+			update = true;
-+			continue;
-+		}
-+
-+		sep->from_cache = true;
- 	}
- 
-+	/* Update cache */
-+	if (update)
-+		store_remote_seps(chan);
-+
- 	value = g_key_file_get_string(key_file, "Endpoints", "LastUsed", NULL);
- 	if (!value)
- 		return;
--- 
-2.35.1
-
+--===============3110144288218967587==--
