@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8486DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 16:12:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2E8EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 16:17:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242440AbiC3QNo (ORCPT
+        id S1348691AbiC3QSz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Mar 2022 12:13:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54574 "EHLO
+        Wed, 30 Mar 2022 12:18:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245065AbiC3QNm (ORCPT
+        with ESMTP id S230055AbiC3QSy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Mar 2022 12:13:42 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524F73BFBD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 09:11:57 -0700 (PDT)
+        Wed, 30 Mar 2022 12:18:54 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECDBBE22
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 09:17:09 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DD21461775
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:11:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 47F1AC3410F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:11:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C906CB81D6E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:17:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 90A05C340F2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:17:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648656716;
-        bh=SMwyuxsG2M3TgqzWbs2LRpDQ1Lc+QdlFs2WeMICSSe4=;
+        s=k20201202; t=1648657026;
+        bh=HpgMc3I4DlH1IzgC3w6CneuKgzJPvi9sRwSWFIWNHk8=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=oo5JZ63fMSdP2k0biH5FMtAVQm5tZ4SvPeoJpvjTftfxaXZhHkgt3ed30PMnUXOC6
-         PU+wUquNyfEftWpP8WKaBYk33Pqa0WdtQdejIChihltvk6K7CaL58MQ/xVPoOCj5LH
-         it8wLLpyPjszTz5N+m2uk6NaxOsA8G9HGvsx8orocxMUH7r1r4DZ6pQBmbEW+wDEwJ
-         +nedPC9IMyFs1IB42VCz8/BtduMuW4C+YwlfxM+Rff4uMAi83Gfy5omD2C5/rRN19C
-         1lnSyZu/PFdq+EEi9E9XN1ddga8iAZHaSghdKGOFyboeho1N+CIPW6fZ9mm3t20QiT
-         13zFSqJJvi7sg==
+        b=AGgfxU5Wq8vMz8kQcNH9UCbOQNg6xA7MzyLIN2i4Y3KijBKrYeqA0fmBv/NCMa+Je
+         HkJbhL0cWs6syEKp6xnYHe2Ros/BZCHAjlEL8dCx2PucNsyJghVLOdQZgqgSeWqaIF
+         KjJY5q08nhfxOIXBkU8DIeOa+W3ihXqnp3Fk852lUZJIx3LDfoCfYWQsoEegZj/H2H
+         GfQIdXCkctABgY26PrrY9mtl4LmD1k2NUrI76knzGdE6o7UBuJhS/ynsv2Q2kalvVd
+         O5gBP3YejJyvuaFZL1FC74Yz+SKy30B6/85nR8EvPqMSbjD8J8mccAIRr1/GkseNV5
+         Fpq/D0zSBdbDQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 280F3C05FCE; Wed, 30 Mar 2022 16:11:56 +0000 (UTC)
+        id 8011EC05FD4; Wed, 30 Mar 2022 16:17:06 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 215776] Unable to reconnect Bluetooth keyboard after
  disconnection
-Date:   Wed, 30 Mar 2022 16:11:56 +0000
+Date:   Wed, 30 Mar 2022 16:17:06 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,14 +48,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: zacmarco@gmail.com
-X-Bugzilla-Status: NEEDINFO
-X-Bugzilla-Resolution: 
+X-Bugzilla-Who: aros@gmx.com
+X-Bugzilla-Status: CLOSED
+X-Bugzilla-Resolution: DOCUMENTED
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215776-62941-gkONsGEaWk@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_status resolution
+Message-ID: <bug-215776-62941-7AXFElgDgW@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215776-62941@https.bugzilla.kernel.org/>
 References: <bug-215776-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,31 +69,30 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D215776
 
---- Comment #2 from Marco Zaccheria (zacmarco@gmail.com) ---
-Hi Artem,
+Artem S. Tashkinov (aros@gmx.com) changed:
 
-thanks for the quick reply, the problem I have is that 5.17.1 seems to tric=
-ky
-to get precompiled for my distro (Ubuntu 20.04 LTS), because of unmet
-dependencies (libssl3).
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+             Status|NEEDINFO                    |CLOSED
+         Resolution|---                         |DOCUMENTED
 
-Being a work PC, I would avoid going through the process of manually compil=
-ing
-the kernel or external packages, or doing a full system upgrade unless stri=
-ctly
-necessary (for example, if I'm sure this would resolve my keyboard issue).
+--- Comment #3 from Artem S. Tashkinov (aros@gmx.com) ---
+> Could you please advice?
 
-Said that, is there anyone in he BT support team that could try such a
-configuration? To be honest, it seems to be a very common issue out there as
-there are plenty of forums covering (with no final answer) the same topic, =
-so
-it doesn't seem strictly related to my current keyboard.
+Since you're using the Ubuntu Linux kernel, you'll be better served by Ubun=
+tu
+developers.
 
-Could you please advice?
+https://wiki.ubuntu.com/Kernel/Bugs
+https://bugs.launchpad.net/ubuntu/+source/linux/+bugs
 
-Thank you
+This bugzilla is for the vanilla kernel which you can trivially compile from
+sources if needed.
 
-   Marco
+Kernel developers are very unlikely to help you because they primarily work
+with the mainline kernel. It's not humanly possible to keep track of billio=
+ns
+of kernels by various Linux distros.
 
 --=20
 You may reply to this email to add a comment.
