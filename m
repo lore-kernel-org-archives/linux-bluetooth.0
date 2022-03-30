@@ -2,346 +2,208 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22078C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 16:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656D5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 18:00:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349017AbiC3QvO (ORCPT
+        id S1349594AbiC3SCN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Mar 2022 12:51:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57742 "EHLO
+        Wed, 30 Mar 2022 14:02:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349026AbiC3QvM (ORCPT
+        with ESMTP id S245029AbiC3SCK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Mar 2022 12:51:12 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91892921CC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 09:49:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4818E61851
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AB6EFC36AEA
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648658964;
-        bh=pn4PWZt2rkF/zQCcLeBh4XbzlNqcvZei1XFzaVOBub4=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qIWL+6t/w/3pLDShilLcQd78m/T4WDG4hAcEM8RRwTA4JY410XaL9kBBWzzpe9KRL
-         x4L/RDDeHJ8AjEF7Ql7p+CesBRz252Vs+rhwFXbw1UTEyCkPYWw0BBQ19g0IYVaRTx
-         rSzO+BnCgV8DvEQqqCtSpS8P2Ia5q6vsj4ZJnIipw1r0fQpexUC3L84lU/m4CyvcOZ
-         0SdcX3nG/Acnu+ValyPare+Xkpr4hacFY+o+rGgx4CGfs3qLQohpRqqb22lE5kE7UU
-         7/6P/dC2nXsUss4LUaiUk+perQwMLGZk3w/ts0SEZr2P4GHoc9VZhlR6jjQ2a+Bt9W
-         qJvpCjq5ZgKjQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 9A171C05FCE; Wed, 30 Mar 2022 16:49:24 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 30 Mar 2022 16:49:20 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yrds96@protonmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-s9tYxy4dDa@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
+        Wed, 30 Mar 2022 14:02:10 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F2F5597
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 11:00:25 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id e81so9032368ybf.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 11:00:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=eeMZmw/kqadzdyJs5nlh7eHQdmfPhh8haxuMTK6KHSU=;
+        b=VrkFiLX+YLqWOBkWoDB8TCWdc/YNwBjSHrLL6FNC6hfaLS2LnORZUOvWG+fUoSyeJ2
+         iwqyOd0hRtuP68kSyo7AMVIYh7m4SGruPGBqifd49YgjPwMYZgHIypF8Kb8hpvFjrZtY
+         92KCTu0FjaZ6FaHFe1gihyffJSz53RA/b6ttbZDTf3BAp8ykEVRc1V6/M3SMNAZzSvDx
+         YVNvj7IUxCS0eR1UPAL7dh/X8gRvxoFGnCCkxkecwmePlGqeiE8uabLlYxyDC4OCCiD8
+         VzDini5gPQWIT24yCmZISqNnFFreRxkAeOJhg6LDAey0U9QO5y38AOjI1w7IGzB8CoqI
+         MuMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=eeMZmw/kqadzdyJs5nlh7eHQdmfPhh8haxuMTK6KHSU=;
+        b=Hsl17PtMtnSJEYG/2O7IGIsj6anEsHaSa3Y0Iomuo9xIKZQMSd7Y6655PEY+H1LdNn
+         BDXej27waaBq5Qgn/5DRuSbTl8W390tHz3dbk5BTRedCYMAWKqjtfXEUMKxrFCJ/YAya
+         zEsnmu03LK4+Cf/OBkFTsHkXq/xpujSvwkKfwKFxIh/obxXdemnm6lVEV0JZbnH+jfUa
+         4KFw9NHmxCeNXteSgavL3m7GuvmtC/maIo68h64XgUewwa3iXMGF080Ux/rUcksV/GmI
+         pbVBS+hbZbUMWAp/0u1O8PIMSKVgi9lZ3sIra+GdeQ8cSJqjAHa4dCea2B7QW7jnA2hs
+         fWPg==
+X-Gm-Message-State: AOAM533vQZlGqubgEVoWnlP++XFfI7w+3J3TlxMslVCnsuV3NWx5icMW
+        /7b4wCt39ywV9WbSiFRD6gHbMEjq8yTxQLAUS14=
+X-Google-Smtp-Source: ABdhPJxmcqenpANha42/ct3r+dM/v1iFYLA0tPl3zOcHnudZSB86Y9uCMStcDW0HMQyZ02xAZUFYiAQjbd8OkAhc8Mo=
+X-Received: by 2002:a25:9742:0:b0:61d:9526:ebc3 with SMTP id
+ h2-20020a259742000000b0061d9526ebc3mr824713ybo.578.1648663224446; Wed, 30 Mar
+ 2022 11:00:24 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220329201646.2296314-1-luiz.dentz@gmail.com>
+ <20220329201646.2296314-2-luiz.dentz@gmail.com> <e8c5b25a-6e4a-d958-c3c0-aa9dad797c8c@molgen.mpg.de>
+In-Reply-To: <e8c5b25a-6e4a-d958-c3c0-aa9dad797c8c@molgen.mpg.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 30 Mar 2022 11:00:13 -0700
+Message-ID: <CABBYNZKmb6Y1TSaVOoAaSuMpOK4GA9AMtBgpaZSGEXdzgDJAUQ@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] Bluetooth: Print broken quirks
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Hi Paul,
 
---- Comment #230 from Yuri Santos (yrds96@protonmail.com) ---
-just reporting my dongle it's working on 5.17-1 kernel's version, never wor=
-ked
-before.
+On Tue, Mar 29, 2022 at 11:13 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Luiz,
+>
+>
+> Thank you for your patch.
+>
+> Maybe as commit message summary:
+>
+> Warn about broken quirks
+>
+> Am 29.03.22 um 22:16 schrieb Luiz Augusto von Dentz:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This prints warnings for controllers setting broken quirks to increase
+> > their visibility and warn about broken controllers firmware that
+> > probably needs updates to behave properly.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> >   net/bluetooth/hci_sync.c | 66 +++++++++++++++++++++++++++++++++++++--=
+-
+> >   1 file changed, 62 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index 8f4c5698913d..8994ff1f94e6 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -3825,6 +3825,67 @@ static int hci_init_sync(struct hci_dev *hdev)
+> >       return 0;
+> >   }
+> >
+> > +#define HCI_QUIRK_BROKEN(_quirk, _desc) \
+> > +{ \
+> > +     .quirk =3D _quirk, \
+> > +     .desc =3D _desc, \
+> > +}
+> > +
+> > +static const struct hci_quirk_broken {
+> > +     unsigned long quirk;
+> > +     const char *desc;
+> > +} hci_broken_table[] =3D {
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_LOCAL_COMMANDS,
+> > +                      "HCI Read Local Supported Commands not supported=
+"),
+>
+> The user wouldn=E2=80=99t know, that this is a device firmware problem. C=
+ould
+> something be added to the warning, like:
+>
+> Therefore, device firmware VERSION violates the spec. Please contact the
+> manufacturer.
+
+We do print out the firmware filename when loading it so I'm not
+convinced printing it again would make any difference for the user.
+
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_STORED_LINK_KEY,
+> > +                      "HCI Delete Stored Link Key command is advertise=
+d, "
+> > +                      "but not supported."),
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
+> > +                      "HCI Read Default Erroneous Data Reporting comma=
+nd is "
+> > +                      "advertised, but not supported."),
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+> > +                      "HCI Read Transmit Power Level command is advert=
+ised, "
+> > +                      "but not supported."),
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+> > +                      "HCI Set Event Filter command not supported."),
+> > +     HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+> > +                      "HCI Enhanced Setup Synchronous Connection comma=
+nd is "
+> > +                      "advertised, but not supported.")
+> > +};
+> > +
+> > +static void hci_dev_print_broken_quirks(struct hci_dev *hdev)
+> > +{
+> > +     int i;
+>
+> I=E2=80=99d use `unsigned int`, but no idea, what the subsystem does rega=
+rding
+> counting variables.
+
+I suppose size_t would be better given that sizeof is used.
+
+>
+> Kind regards,
+>
+> Paul
+>
+>
+> > +
+> > +     bt_dev_dbg(hdev, "");
+> > +
+> > +     for (i =3D 0; i < ARRAY_SIZE(hci_broken_table); i++) {
+> > +             const struct hci_quirk_broken *broken =3D &hci_broken_tab=
+le[i];
+> > +
+> > +             if (test_bit(broken->quirk, &hdev->quirks))
+> > +                     bt_dev_warn(hdev, "%s", broken->desc);
+> > +     }
+> > +}
+> > +
+> > +static int hci_dev_setup_sync(struct hci_dev *hdev)
+> > +{
+> > +     bt_dev_dbg(hdev, "");
+> > +
+> > +     hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> > +
+> > +     if (hdev->setup) {
+> > +             int ret;
+> > +
+> > +             ret =3D hdev->setup(hdev);
+> > +             if (ret)
+> > +                     return ret;
+> > +
+> > +             hci_dev_print_broken_quirks(hdev);
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >   int hci_dev_open_sync(struct hci_dev *hdev)
+> >   {
+> >       int ret =3D 0;
+> > @@ -3887,10 +3948,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+> >           test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> >               bool invalid_bdaddr;
+> >
+> > -             hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> > -
+> > -             if (hdev->setup)
+> > -                     ret =3D hdev->setup(hdev);
+> > +             ret =3D hci_dev_setup_sync(hdev);
+> >
+> >               /* The transport driver can set the quirk to mark the
+> >                * BD_ADDR invalid before creating the HCI device or in
 
 
-these lines are reported on dmesg but device now function normally:
-
-[ 3281.331944] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds and force-suspending once...
-[ 3281.331952] Bluetooth: hci0: CSR: Couldn't suspend the device for our Ba=
-rrot
-8041a02 receive-issue workaround
-
-output of lsusb:
-
-yuri@archlinux ~> sudo lsusb -d 0a12:0001 -v=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-                                          130
-
-Bus 008 Device 007: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Don=
-gle
-(HCI mode)
-Device Descriptor:
-  bLength                18
-  bDescriptorType         1
-  bcdUSB               2.00
-  bDeviceClass          224 Wireless
-  bDeviceSubClass         1 Radio Frequency
-  bDeviceProtocol         1 Bluetooth
-  bMaxPacketSize0        64
-  idVendor           0x0a12 Cambridge Silicon Radio, Ltd
-  idProduct          0x0001 Bluetooth Dongle (HCI mode)
-  bcdDevice           88.91
-  iManufacturer           0
-  iProduct                2 BT DONGLE10
-  iSerial                 0
-  bNumConfigurations      1
-  Configuration Descriptor:
-    bLength                 9
-    bDescriptorType         2
-    wTotalLength       0x00b1
-    bNumInterfaces          2
-    bConfigurationValue     1
-    iConfiguration          0
-    bmAttributes         0x80
-      (Bus Powered)
-    MaxPower              100mA
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        0
-      bAlternateSetting       0
-      bNumEndpoints           3
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x81  EP 1 IN
-        bmAttributes            3
-          Transfer Type            Interrupt
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0010  1x 16 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x02  EP 2 OUT
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x82  EP 2 IN
-        bmAttributes            2
-          Transfer Type            Bulk
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0040  1x 64 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       0
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0000  1x 0 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       1
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0009  1x 9 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       2
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0011  1x 17 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       3
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0019  1x 25 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       4
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0021  1x 33 bytes
-        bInterval               1
-    Interface Descriptor:
-      bLength                 9
-      bDescriptorType         4
-      bInterfaceNumber        1
-      bAlternateSetting       5
-      bNumEndpoints           2
-      bInterfaceClass       224 Wireless
-      bInterfaceSubClass      1 Radio Frequency
-      bInterfaceProtocol      1 Bluetooth
-      iInterface              0
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x03  EP 3 OUT
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0031  1x 49 bytes
-        bInterval               1
-      Endpoint Descriptor:
-        bLength                 7
-        bDescriptorType         5
-        bEndpointAddress     0x83  EP 3 IN
-        bmAttributes            1
-          Transfer Type            Isochronous
-          Synch Type               None
-          Usage Type               Data
-        wMaxPacketSize     0x0031  1x 49 bytes
-        bInterval               1
-Device Status:     0x0000
-  (Bus Powered)
 
 --=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Luiz Augusto von Dentz
