@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA62CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 16:49:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22078C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 16:49:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244663AbiC3Qu4 (ORCPT
+        id S1349017AbiC3QvO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Mar 2022 12:50:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57092 "EHLO
+        Wed, 30 Mar 2022 12:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240379AbiC3Quz (ORCPT
+        with ESMTP id S1349026AbiC3QvM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Mar 2022 12:50:55 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE64828CABE
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 09:49:08 -0700 (PDT)
+        Wed, 30 Mar 2022 12:51:12 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91892921CC
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 09:49:25 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 76E64B81D89
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 22BBEC36AE9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:06 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4818E61851
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AB6EFC36AEA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 16:49:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648658946;
-        bh=YPbpXBoaJ72y/LY51M9tfYbVZu5DYIGBWkJ57ffikVo=;
+        s=k20201202; t=1648658964;
+        bh=pn4PWZt2rkF/zQCcLeBh4XbzlNqcvZei1XFzaVOBub4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=G/NQ0JrpH/Rur5GSPzCGXFh0mKkPJAzDrUqGiNIcZhUkGCnNwie/KLQ6Si1asZNLL
-         1jgeCL/Du40aF3oXkx62dDT+Z1VI5CYvpOf7O06KpXtytIlMDoDwvbF0sbQmLNE+Q3
-         gZitIgaR61xwtzsrf8g2gUKR6w9oeYDw3uruR+cMCyrAha8EY7agGehW898SF6NCEC
-         ms3QP9PNy1FgCIzVy+8u6dVCmDdSbjuOk9KJY1imEfaoDW+CXL9R6tp3pmDbs/Lypx
-         WYlWSz1kqnNBiuxzfIpr4G/qC5b6xvK5xuT7C4j4SaDMetr1iyj6J/TKNxe+YDCQ8U
-         ipzdJliwvZQlg==
+        b=qIWL+6t/w/3pLDShilLcQd78m/T4WDG4hAcEM8RRwTA4JY410XaL9kBBWzzpe9KRL
+         x4L/RDDeHJ8AjEF7Ql7p+CesBRz252Vs+rhwFXbw1UTEyCkPYWw0BBQ19g0IYVaRTx
+         rSzO+BnCgV8DvEQqqCtSpS8P2Ia5q6vsj4ZJnIipw1r0fQpexUC3L84lU/m4CyvcOZ
+         0SdcX3nG/Acnu+ValyPare+Xkpr4hacFY+o+rGgx4CGfs3qLQohpRqqb22lE5kE7UU
+         7/6P/dC2nXsUss4LUaiUk+perQwMLGZk3w/ts0SEZr2P4GHoc9VZhlR6jjQ2a+Bt9W
+         qJvpCjq5ZgKjQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 11A2DC05FCE; Wed, 30 Mar 2022 16:49:06 +0000 (UTC)
+        id 9A171C05FCE; Wed, 30 Mar 2022 16:49:24 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Wed, 30 Mar 2022 16:49:02 +0000
+Date:   Wed, 30 Mar 2022 16:49:20 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,7 +55,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-puFVxfNzoK@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-s9tYxy4dDa@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,7 +69,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #229 from Yuri Santos (yrds96@protonmail.com) ---
+--- Comment #230 from Yuri Santos (yrds96@protonmail.com) ---
 just reporting my dongle it's working on 5.17-1 kernel's version, never wor=
 ked
 before.
