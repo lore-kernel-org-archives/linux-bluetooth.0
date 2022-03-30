@@ -2,101 +2,216 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A4F7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Mar 2022 22:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4AEBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 01:34:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238353AbiC2WyF (ORCPT
+        id S241662AbiC3BgG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Mar 2022 18:54:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
+        Tue, 29 Mar 2022 21:36:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238290AbiC2WyE (ORCPT
+        with ESMTP id S231966AbiC3BgF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Mar 2022 18:54:04 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D1DA0BF3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id mj15-20020a17090b368f00b001c637aa358eso344118pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=X51Q2oaGEZk+9G3DnwGGNsAmpD66sfxgajtL2F+euJE=;
-        b=LWEjKQpan69iRWl9OdiaSi0yObxRT/r8Nvvv1D2o+8yTzQ8uijYd1vXbbFCvRGdopB
-         3SYsof5GQ11R+BA/ymO9tTXqhJGesVplPMWXZAEyRq9kdAIhKaR1OAjVDih5yJaKcggU
-         GWuf/BN+S/a1NpaR0ehv7eTZFvMrn5+SJ9PbIjHNx7/bWkMT4z/xZJpZQuPmw5xQtDMn
-         zmHS4usl55JUwXjBjaG8QGBtgLOQlp7JniGNnwdOIRcxkGWw2qCBX7mnPAmgWwhNCXAl
-         skRP+KvPjtyyulk7+vhtYko1tDP9hwTCtMMLUU4OorfmBfg2XjHDXypNqqTpLD0+5Fkp
-         9zQQ==
+        Tue, 29 Mar 2022 21:36:05 -0400
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FF51274C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 18:34:20 -0700 (PDT)
+Received: by mail-il1-f199.google.com with SMTP id 5-20020a92c645000000b002c99d83806dso5048810ill.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Mar 2022 18:34:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=X51Q2oaGEZk+9G3DnwGGNsAmpD66sfxgajtL2F+euJE=;
-        b=b8iVu0WGQSMbuq62B5r6ajP/MsCCrWJEMTlAUPqFnGLibwVum95Spi37uexjNgWXTU
-         2THyK2HZ/xWSj8yuMlLSVIUV3386fnEEH/R/DKZ8GC6d55KT70BCjDkk+FW4xBP5YdkV
-         FmKxSGHOYQv2qGmV17ahlajN6qvrdDq3oDcJLc5BpumL2Ku+ctCU7Py7aDzpGO3IzRYN
-         K17h5y2Ir3kWP6t3r01dl4Kthpk5UHDh0+xEkSJJY4PdsZYrdnafQuZ9cfXXDmBZhgS2
-         ymPH3ZlYAVbC1bCsQa5xXsfPEiSlZWxTDBeimlC82HdNS09Tf2UA7D04EvBzweQ5URUC
-         qWvA==
-X-Gm-Message-State: AOAM532TQasYj727J2svsQLHlm6ugivcZaL1ZYzV9ioTcM3ay7xOrSFR
-        VjqY2+CVefXZaPNcUQQpPWvPM8+h0Qo=
-X-Google-Smtp-Source: ABdhPJwoRRSWbAzFeXx24QHL2A3MEu1Io2PHCm8VOSPBHYVqTnGqvzyh6fJZ4YZMknVNJ+TG+0adjA==
-X-Received: by 2002:a17:902:d2d1:b0:154:45d2:a05d with SMTP id n17-20020a170902d2d100b0015445d2a05dmr32250365plc.74.1648594340064;
-        Tue, 29 Mar 2022 15:52:20 -0700 (PDT)
-Received: from [172.17.0.2] ([104.42.218.121])
-        by smtp.gmail.com with ESMTPSA id l6-20020a17090a660600b001c985b0cb53sm3898181pjj.26.2022.03.29.15.52.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 15:52:19 -0700 (PDT)
-Message-ID: <62438da3.1c69fb81.ae42c.a929@mx.google.com>
-Date:   Tue, 29 Mar 2022 15:52:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3110144288218967587=="
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=va05jRzK/SCLEj6HDQO0eCPe+nDWCLO9CrJExBDzQb0=;
+        b=zuLFIIF67f3LNJidnFzy5q3b56+5nPWs9GmhBvsSyX4cwQLT8KJd2qkl3NWbiJ8iOn
+         AHAmf+thf7UuTrV51YNZ7dv5Vs9W5HBz4S/Z7ZvsygPoteBACH8fRRnnjvZuP+7eWC+B
+         Qdp2q5rP1buK6eo5RM3ZrX5BzAJaJwRRkwqglYu02rjdgHXd8S/AN00vttXfwPClcYIr
+         lNwhCW64XD/dRYQXWMtbIv+0KCNBEgH6UQxJ2C2LDtKqf2KP82VisA6xwQ/ng/K7mZJx
+         LIGTKFUmRtJ2HxFaQooOsCyqYrZLSdEbBGBkXZNOM9ralMn5QaGd9WGcv/dFiukaAgD4
+         MvYA==
+X-Gm-Message-State: AOAM532CI0cA/XiyWldapMAkXabETJOxUaipWXANQsV9Hlz7j3f2p1Ia
+        UGKyyx1TWPTTCrAOf4PvTGZZWAsTvZgN7zoGlWirtd+Sh50P
+X-Google-Smtp-Source: ABdhPJzMr6DFezAeRCrWnahgP1KDp6dWXgmNqoRh6AXQC9e6x7IAiapUulJirSQxwwtLsKkdv1fOgXMJAzRY4f8db94Izi0+RL/9
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v4] a2dp: Fix crash when SEP codec has not been initialized
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220329213247.2334757-1-luiz.dentz@gmail.com>
-References: <20220329213247.2334757-1-luiz.dentz@gmail.com>
+X-Received: by 2002:a05:6e02:1d81:b0:2c9:bf9e:91ee with SMTP id
+ h1-20020a056e021d8100b002c9bf9e91eemr5270707ila.128.1648604059959; Tue, 29
+ Mar 2022 18:34:19 -0700 (PDT)
+Date:   Tue, 29 Mar 2022 18:34:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005e857005db658b71@google.com>
+Subject: [syzbot] INFO: task hung in rfcomm_process_sessions (2)
+From:   syzbot <syzbot+d761775dff24be3ad4be@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3110144288218967587==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    cffb2b72d3ed Merge tag 'kgdb-5.18-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11ae58bb700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=69c8957f4ac2dea6
+dashboard link: https://syzkaller.appspot.com/bug?extid=d761775dff24be3ad4be
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103e2107700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149c7ec7700000
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=627319
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d761775dff24be3ad4be@syzkaller.appspotmail.com
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.66 seconds
-GitLint                       PASS      0.44 seconds
-Prep - Setup ELL              PASS      45.94 seconds
-Build - Prep                  PASS      0.61 seconds
-Build - Configure             PASS      8.87 seconds
-Build - Make                  PASS      1623.11 seconds
-Make Check                    PASS      12.49 seconds
-Make Check w/Valgrind         PASS      499.49 seconds
-Make Distcheck                PASS      256.95 seconds
-Build w/ext ELL - Configure   PASS      9.23 seconds
-Build w/ext ELL - Make        PASS      1636.91 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
+INFO: task krfcommd:2706 blocked for more than 143 seconds.
+      Tainted: G        W         5.17.0-syzkaller-12817-gcffb2b72d3ed #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:krfcommd        state:D stack:28984 pid: 2706 ppid:     2 flags:0x00004000
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5073 [inline]
+ __schedule+0x937/0x1090 kernel/sched/core.c:6382
+ schedule+0xeb/0x1b0 kernel/sched/core.c:6454
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6513
+ __mutex_lock_common+0xd1f/0x2590 kernel/locking/mutex.c:673
+ __mutex_lock kernel/locking/mutex.c:733 [inline]
+ mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:785
+ rfcomm_process_sessions+0x21/0x3f0 net/bluetooth/rfcomm/core.c:2015
+ rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2122
+ kthread+0x2a3/0x2d0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30
+ </TASK>
+INFO: task syz-executor296:3618 blocked for more than 143 seconds.
+      Tainted: G        W         5.17.0-syzkaller-12817-gcffb2b72d3ed #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor296 state:D stack:26552 pid: 3618 ppid:  3612 flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5073 [inline]
+ __schedule+0x937/0x1090 kernel/sched/core.c:6382
+ schedule+0xeb/0x1b0 kernel/sched/core.c:6454
+ __lock_sock+0x1cf/0x330 net/core/sock.c:2770
+ lock_sock_nested+0x9f/0x100 net/core/sock.c:3317
+ lock_sock include/net/sock.h:1682 [inline]
+ rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
+ __rfcomm_dlc_close+0x2cc/0x480 net/bluetooth/rfcomm/core.c:489
+ rfcomm_dlc_close+0x10d/0x1c0 net/bluetooth/rfcomm/core.c:520
+ __rfcomm_sock_close+0x101/0x220 net/bluetooth/rfcomm/sock.c:220
+ rfcomm_sock_shutdown+0xa5/0x220 net/bluetooth/rfcomm/sock.c:905
+ rfcomm_sock_release+0x55/0x120 net/bluetooth/rfcomm/sock.c:925
+ __sock_release net/socket.c:650 [inline]
+ sock_close+0xd8/0x260 net/socket.c:1318
+ __fput+0x3f6/0x860 fs/file_table.c:317
+ task_work_run+0x146/0x1c0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0x5e3/0x20f0 kernel/exit.c:794
+ do_group_exit+0x2af/0x2b0 kernel/exit.c:924
+ get_signal+0x23e8/0x23f0 kernel/signal.c:2903
+ arch_do_signal_or_restart+0xa1/0x740 arch/x86/kernel/signal.c:868
+ handle_signal_work kernel/entry/common.c:149 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:187 [inline]
+ exit_to_user_mode_prepare+0x165/0x200 kernel/entry/common.c:222
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:304 [inline]
+ syscall_exit_to_user_mode+0x2e/0x70 kernel/entry/common.c:315
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f4e731503f9
+RSP: 002b:00007fff14a0e988 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: fffffffffffffffc RBX: 0000555556a333b8 RCX: 00007f4e731503f9
+RDX: 0000000000000080 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
+R13: 0000000000000072 R14: 00007fff14a0ea10 R15: 0000000000000000
+ </TASK>
+INFO: lockdep is turned off.
+NMI backtrace for cpu 1
+CPU: 1 PID: 28 Comm: khungtaskd Tainted: G        W         5.17.0-syzkaller-12817-gcffb2b72d3ed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1dc/0x2d8 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x45f/0x490 lib/nmi_backtrace.c:111
+ nmi_trigger_cpumask_backtrace+0x16a/0x280 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:212 [inline]
+ watchdog+0xc82/0xcd0 kernel/hung_task.c:369
+ kthread+0x2a3/0x2d0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30
+ </TASK>
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 8 Comm: kworker/u4:0 Tainted: G        W         5.17.0-syzkaller-12817-gcffb2b72d3ed #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:bcmp+0x1/0x170 lib/string.c:801
+Code: 7e fd eb c5 44 89 f9 80 e1 07 38 c1 7c ce 4c 89 ff e8 33 7c 7e fd eb c4 31 ed 89 e8 5b 41 5c 41 5d 41 5e 41 5f 5d c3 66 90 55 <41> 57 41 56 41 55 41 54 53 49 89 d6 49 89 f7 48 89 fb 49 bd 00 00
+RSP: 0018:ffffc900000d7930 EFLAGS: 00000297
+RAX: 1ffffffff15103dd RBX: ffffffff81d6d87e RCX: dffffc0000000000
+RDX: 0000000000000005 RSI: ffffffff8f7f6000 RDI: ffffffff81d6d87e
+RBP: ffffc900000d7a80 R08: ffffffff81d6d87e R09: ffffffff845cf58d
+R10: 0000000000000003 R11: ffff88813fe6d700 R12: ffffffff8a881e6a
+R13: ffffffff8f7f6000 R14: ffffffff8f7f6000 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000055e1e7f11600 CR3: 000000000ca8e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __jump_label_patch+0x24d/0x410 arch/x86/kernel/jump_label.c:65
+ arch_jump_label_transform_queue+0x49/0xd0 arch/x86/kernel/jump_label.c:137
+ __jump_label_update+0x15d/0x350 kernel/jump_label.c:451
+ static_key_disable_cpuslocked+0xcc/0x1b0 kernel/jump_label.c:207
+ static_key_disable+0x16/0x20 kernel/jump_label.c:215
+ toggle_allocation_gate+0x3c8/0x460 mm/kfence/core.c:793
+ process_one_work+0x83c/0x11a0 kernel/workqueue.c:2289
+ worker_thread+0xa6c/0x1290 kernel/workqueue.c:2436
+ kthread+0x2a3/0x2d0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	7e fd                	jle    0xffffffff
+   2:	eb c5                	jmp    0xffffffc9
+   4:	44 89 f9             	mov    %r15d,%ecx
+   7:	80 e1 07             	and    $0x7,%cl
+   a:	38 c1                	cmp    %al,%cl
+   c:	7c ce                	jl     0xffffffdc
+   e:	4c 89 ff             	mov    %r15,%rdi
+  11:	e8 33 7c 7e fd       	callq  0xfd7e7c49
+  16:	eb c4                	jmp    0xffffffdc
+  18:	31 ed                	xor    %ebp,%ebp
+  1a:	89 e8                	mov    %ebp,%eax
+  1c:	5b                   	pop    %rbx
+  1d:	41 5c                	pop    %r12
+  1f:	41 5d                	pop    %r13
+  21:	41 5e                	pop    %r14
+  23:	41 5f                	pop    %r15
+  25:	5d                   	pop    %rbp
+  26:	c3                   	retq
+  27:	66 90                	xchg   %ax,%ax
+  29:	55                   	push   %rbp
+* 2a:	41 57                	push   %r15 <-- trapping instruction
+  2c:	41 56                	push   %r14
+  2e:	41 55                	push   %r13
+  30:	41 54                	push   %r12
+  32:	53                   	push   %rbx
+  33:	49 89 d6             	mov    %rdx,%r14
+  36:	49 89 f7             	mov    %rsi,%r15
+  39:	48 89 fb             	mov    %rdi,%rbx
+  3c:	49                   	rex.WB
+  3d:	bd                   	.byte 0xbd
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
---===============3110144288218967587==--
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
