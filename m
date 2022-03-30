@@ -2,101 +2,170 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19DC8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 11:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFEAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 30 Mar 2022 11:55:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343543AbiC3LL3 (ORCPT
+        id S1344528AbiC3L5Q convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 30 Mar 2022 07:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58164 "EHLO
+        Wed, 30 Mar 2022 07:57:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343540AbiC3LL2 (ORCPT
+        with ESMTP id S1345839AbiC3LzE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 30 Mar 2022 07:11:28 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 262A63ED33
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 04:09:42 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id d65so12806028qke.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 04:09:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ALK4cjDUO2arKmU+90tIQYZU0JwIPGzeMWgeB9D0m5U=;
-        b=qM4Qj7+A4B9l4zz1zBCbj9QyW24P/XF9uUftnZDjvVF/7wJeHIXBoYM0GCcSicvAuB
-         zG3df+6MI0QBQAHZwOgpueog5NP+DD+dsE4FihmRRD0W6QlQsau45pFTcbWyjFoDE7iY
-         qK+S14omkgqbhp+m/HPMj9InMa+RxoxJmVNtQeMrOfoLmSIzN7JYj5w1XtMexM6U9xjF
-         h6n8/KWoKjEj47AtcmPOEtn5TdOg8WKAHtDU38sV8YPtrtXTMl38TrQtAE0zj9UGJD2O
-         U8N2hgGYY+kwVzypTBuo1YA+hD4PzllU7mb4xWh1Z3Hn8wp1yEGIlUqWzFMhAYWw4n2x
-         zSOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ALK4cjDUO2arKmU+90tIQYZU0JwIPGzeMWgeB9D0m5U=;
-        b=j2ZQksTF5p7p4I1rXc1xPdA//qDP2eAbXswPzOxuzsnqNxcVz8nnW4a4FpFJGYjit6
-         TWiR+Po6ca+Fo3OYiIh/BSgyQ2kDtuq37sY6GJmHv3UWp/+QH0VPYz0M+rsJ+n4iEcXW
-         4GiCcwRwhQeruwhpWc5CHBSUyQr9dlE8SRc5g9nTpFikm71naTsgSgZaSmWuW4e5asji
-         zQASlVvb5BzoAo+nYcjBqde7DDlPjCTI5nq8zGiB6F8TsfAWiZQA2to+xoJr0UCZlBF1
-         gzHa3bfGMaKGJf7q5zudX9zfDL5u742T0IAR0tl++ATljOqJrqslLZRAeMVICnTTc5l7
-         IqLw==
-X-Gm-Message-State: AOAM531qk7E+wVP3aF7Jztv22X3KqEPVfoXMyShuBEa84SuohPQqj3VA
-        bJDo72YyZaBh58OzHGQdtYjEfPC/Jt8=
-X-Google-Smtp-Source: ABdhPJwO7OBsXawPM3XyxL8DhDuudq8tPS8H9SLO41Z2uPjrjdx/yoaOa4aZkv7rj8YLHhQVenBfFg==
-X-Received: by 2002:a05:620a:152d:b0:67d:7370:f428 with SMTP id n13-20020a05620a152d00b0067d7370f428mr22842136qkk.15.1648638581347;
-        Wed, 30 Mar 2022 04:09:41 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.47.175])
-        by smtp.gmail.com with ESMTPSA id l13-20020a37a20d000000b0067d17b656acsm10765165qke.78.2022.03.30.04.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 04:09:40 -0700 (PDT)
-Message-ID: <62443a74.1c69fb81.b7f31.8a91@mx.google.com>
-Date:   Wed, 30 Mar 2022 04:09:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1784529225989209516=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [BlueZ] tools: Fix g_dbus_setup_private connection check in mpris-proxy
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220330094740.45637-1-frederic.danis@collabora.com>
-References: <20220330094740.45637-1-frederic.danis@collabora.com>
+        Wed, 30 Mar 2022 07:55:04 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 56B8E263678
+        for <linux-bluetooth@vger.kernel.org>; Wed, 30 Mar 2022 04:51:47 -0700 (PDT)
+Received: from smtpclient.apple (p4ff9fa3c.dip0.t-ipconnect.de [79.249.250.60])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7FDA2CECCC;
+        Wed, 30 Mar 2022 13:51:41 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+Subject: Re: [PATCH v2 2/3] Bluetooth: Print broken quirks
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220329201646.2296314-2-luiz.dentz@gmail.com>
+Date:   Wed, 30 Mar 2022 13:51:40 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <5F248916-7BF7-4FA1-AA37-4596B6BD4F35@holtmann.org>
+References: <20220329201646.2296314-1-luiz.dentz@gmail.com>
+ <20220329201646.2296314-2-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1784529225989209516==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+> This prints warnings for controllers setting broken quirks to increase
+> their visibility and warn about broken controllers firmware that
+> probably needs updates to behave properly.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_sync.c | 66 +++++++++++++++++++++++++++++++++++++---
+> 1 file changed, 62 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 8f4c5698913d..8994ff1f94e6 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3825,6 +3825,67 @@ static int hci_init_sync(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +#define HCI_QUIRK_BROKEN(_quirk, _desc) \
+> +{ \
+> +	.quirk = _quirk, \
+> +	.desc = _desc, \
+> +}
+> +
 
-Dear submitter,
+#define HCI_QUIRK_BROKEN(_quirk, _desc) { .quirk = _quirk, .desc = _desc }
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=627447
+Doesn’t this fit into a single line?
 
----Test result---
+> +static const struct hci_quirk_broken {
+> +	unsigned long quirk;
+> +	const char *desc;
 
-Test Summary:
-CheckPatch                    PASS      1.57 seconds
-GitLint                       PASS      1.10 seconds
-Prep - Setup ELL              PASS      51.59 seconds
-Build - Prep                  PASS      0.93 seconds
-Build - Configure             PASS      10.28 seconds
-Build - Make                  PASS      1821.30 seconds
-Make Check                    PASS      12.59 seconds
-Make Check w/Valgrind         PASS      528.58 seconds
-Make Distcheck                PASS      276.12 seconds
-Build w/ext ELL - Configure   PASS      10.18 seconds
-Build w/ext ELL - Make        PASS      1781.88 seconds
-Incremental Build with patchesPASS      0.00 seconds
+I am not sure if we better use an anonymous table here.
 
+static const struct {
+	..
+} hci_broken_table[] = {
+	..
+};
 
+> +} hci_broken_table[] = {
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_LOCAL_COMMANDS,
+> +			 "HCI Read Local Supported Commands not supported"),
 
----
-Regards,
-Linux Bluetooth
+I am after this:
+
+	HCI_QUIRK_BROKEN(LOCAL_COMMANDS, “HCI Read Local Supported ..”),
 
 
---===============1784529225989209516==--
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_STORED_LINK_KEY,
+> +			 "HCI Delete Stored Link Key command is advertised, "
+> +			 "but not supported."),
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
+> +			 "HCI Read Default Erroneous Data Reporting command is "
+> +			 "advertised, but not supported."),
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+> +			 "HCI Read Transmit Power Level command is advertised, "
+> +			 "but not supported."),
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+> +			 "HCI Set Event Filter command not supported."),
+> +	HCI_QUIRK_BROKEN(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+> +			 "HCI Enhanced Setup Synchronous Connection command is "
+> +			 "advertised, but not supported.")
+> +};
+> +
+> +static void hci_dev_print_broken_quirks(struct hci_dev *hdev)
+> +{
+> +	int i;
+> +
+> +	bt_dev_dbg(hdev, "");
+> +
+> +	for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
+> +		const struct hci_quirk_broken *broken = &hci_broken_table[i];
+> +
+> +		if (test_bit(broken->quirk, &hdev->quirks))
+> +			bt_dev_warn(hdev, "%s", broken->desc);
+> +	}
+
+	for (i = 0; .. ) }
+		if (!test_bit(hci_broken_table[i], &hdev->quirks))
+			continue;
+
+		bt_dev_warn(hdev, “%s”, hci_broken_table[i].desc);
+	}
+> +}
+> +
+> +static int hci_dev_setup_sync(struct hci_dev *hdev)
+> +{
+> +	bt_dev_dbg(hdev, "");
+> +
+> +	hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> +
+> +	if (hdev->setup) {
+> +		int ret;
+> +
+> +		ret = hdev->setup(hdev);
+> +		if (ret)
+> +			return ret;
+> +
+> +		hci_dev_print_broken_quirks(hdev);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> int hci_dev_open_sync(struct hci_dev *hdev)
+> {
+> 	int ret = 0;
+> @@ -3887,10 +3948,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+> 	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> 		bool invalid_bdaddr;
+> 
+> -		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> -
+> -		if (hdev->setup)
+> -			ret = hdev->setup(hdev);
+> +		ret = hci_dev_setup_sync(hdev);
+
+Please don’t create spaghetti code. Just add the print of the quirks here.
+
+In addition you also need to print the quirks even if no hdev->setup is defined. Quirks can also be set on probe() without the need of a vendor specific setup function.
+
+> 
+> 		/* The transport driver can set the quirk to mark the
+> 		 * BD_ADDR invalid before creating the HCI device or in
+
+Regards
+
+Marcel
+
