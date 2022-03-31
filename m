@@ -2,272 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EF17C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Mar 2022 18:27:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A03CDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 31 Mar 2022 18:27:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233966AbiCaS24 (ORCPT
+        id S234311AbiCaS25 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 31 Mar 2022 14:28:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59144 "EHLO
+        Thu, 31 Mar 2022 14:28:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233699AbiCaS2z (ORCPT
+        with ESMTP id S233699AbiCaS24 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 31 Mar 2022 14:28:55 -0400
+        Thu, 31 Mar 2022 14:28:56 -0400
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB14F13E07
-        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Mar 2022 11:27:06 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD62013E3D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 31 Mar 2022 11:27:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1648751226; x=1680287226;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VdqKsx58uR6DjArRWMNDbPKqtJeDnbJMl1R85/eRJN4=;
-  b=eBCtC7xtxWANP0Qmu/hZIOCSXC+rnFZUathH21xl1rfkleOlQp8ne/L4
-   Ux/fpPVLAT3+wnx0l/qr3JyVx9ol2RVofTIvORTLjbb/m8DIPKDvMbLDo
-   92CaKo9zCAEjtJ4oAnbuZ5NOWVdZqRRJD85o9Oaw8uRo7VBnGkRZaZ9IN
-   dRNo5tsLbU580AxVPGKXRl0NLpYQR1fI7Rw0d+mqXukaIV6apqHQt2pw4
-   gLyJSjhOsVBzDsBzwL+o0bsl/qkNrwiKFLrc5RJ9a9ahmMNjOtRLKOajw
-   BkgNFtNH8Uzm3SDAKyu1df3SQPjoQ1FPe5+ASCjongZbXl/VaFdo2gAJR
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="239843228"
+  t=1648751228; x=1680287228;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LcfR5UXD/v4QWZxPx+c2UlqvgDRa+5hDv+XNCt9r9Xw=;
+  b=XsVDO6gpqrYmA4tax6eR0WGXAbq4SeOC7pSBRD9t8FIkQf3uSQPMNu0n
+   52ctPLLtixw7JE43tqaIBhoLbUuUYCk3MRG1nNCsY0Ptzc5/DdyXh6s4y
+   rWqMZvrtVDskoZThQST18IUBxI8KUaG67SXelC81NRWFPu3WHaiZR2qaU
+   ybwwLfaom6ifqgcDyoU87BiMuPNz3w8W7yYVVRW9qelfcC9msP2SMgZ1J
+   PqdvCv7kvCGNN+ZI6F9nwAHkl7KyzVn3beYjR2E7sdwr2KISfCdsLSHwk
+   1FEK1oMu3NaPOgTPyxQLy4C/S1CqXxHsD8SudsNvoqX4wZf8Gsxia/TZw
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10302"; a="239843230"
 X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
-   d="scan'208";a="239843228"
+   d="scan'208";a="239843230"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 11:27:04 -0700
 X-IronPort-AV: E=Sophos;i="5.90,225,1643702400"; 
-   d="scan'208";a="520744388"
+   d="scan'208";a="520744393"
 Received: from vpareek-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.135.212])
   by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 11:27:03 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH BlueZ 1/2] docs: Add support for Mesh Scanning and Sending
-Date:   Thu, 31 Mar 2022 11:26:52 -0700
-Message-Id: <20220331182653.465828-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ 2/2] mgmt-tester: Adds turning on Mesh Experimental feature
+Date:   Thu, 31 Mar 2022 11:26:53 -0700
+Message-Id: <20220331182653.465828-2-brian.gix@intel.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220331182653.465828-1-brian.gix@intel.com>
+References: <20220331182653.465828-1-brian.gix@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adds four new MGMT Commands:
-	- MESH_RECEIVER - Enable Mesh Receiver with Passive scanning
-	  with a list of AD Types (Mesh and/or Extended Mesh).
-
-	- MESH_FEATURES - Requests information on how many simultaneous
-	  outbound  mesh packets can be pending at one time.
-
-	- MESH_TX_PACKET - Send a requested Mesh Packet, perhaps with a
-	  specific fine-timed delay.
-
-	- MESH_TX_CANCEL - Cancel a prior Mesh TX request that has not
-	  yet completed.
-
-Adds two new MGMT Events:
-	- MESH_DEVICE_FOUND - Returned when Mesh is enabled, and one of
-	  the requested AD Types is detected in an incoming
-	  Advertisement.
-
-	- MESH_TX_COMPLETE - Reports that a prior requested transmission
-	  has completed and no longer consumes one of the available
-	  outbound slots.
+Turns on experimental Mesh feature, and expects it in report when
+querying which experimental features are supported and have been
+enabled.
 ---
- doc/mgmt-api.txt | 170 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
+ tools/mgmt-tester.c | 41 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ebe56afa4..2da89e2f3 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -332,6 +332,7 @@ Read Controller Information Command
- 		15	Static Address
- 		16	PHY Configuration
- 		17	Wideband Speech
-+		18	Mesh Mode
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index e5319d123..475a4d43e 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -221,6 +221,32 @@ static void read_info_callback(uint8_t status, uint16_t length,
+ 	bthost_notify_ready(bthost, tester_pre_setup_complete);
+ }
  
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -3858,6 +3859,128 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
- 				Invalid Parameters
++static const uint8_t set_exp_feat_param_mesh[] = {
++	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f, 0x05, 0xbf, /* UUID - Mesh */
++	0x8d, 0x4d, 0x03, 0x7a, 0xd7, 0x63, 0xe4, 0x2c,
++	0x01,						/* Action - enable */
++};
++
++static void mesh_exp_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_print("Mesh feature could not be enabled");
++		return;
++	}
++
++	tester_print("Mesh feature is enabled");
++}
++
++static void mesh_exp_feature(struct test_data *data, uint16_t index)
++{
++	tester_print("Enabling Mesh feature");
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, index,
++		  sizeof(set_exp_feat_param_mesh), set_exp_feat_param_mesh,
++		  mesh_exp_callback, NULL, NULL);
++}
++
+ static void index_added_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -233,6 +259,10 @@ static void index_added_callback(uint16_t index, uint16_t length,
  
+ 	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
+ 					read_info_callback, NULL, NULL);
++
++	tester_warn("Enable management Mesh interface");
++	mesh_exp_feature(data, data->mgmt_index);
++
+ }
  
-+Set Mesh Receiver Command
-+=========================
-+
-+	Command Code:		0x0057
-+	Controller Index:	<controller id>
-+	Command Parameters:	Enable (1 Octets)
-+				Window (2 Octets)
-+				Period (2 Octets)
-+				Num AD Types (1 Octets)
-+				AD Types (variable)
-+
-+	This command Enables or Disables Mesh Receiving. When enabled passive
-+	scanning remains enabled for this controller.
-+
-+	The Window/Period values are used to set the Scan Parameters when no
-+	other scanning is being done.
-+
-+	Num AD Types and AD Types parameter, filter Advertising and Scan
-+	responses by AD type. Reponses that do not contain at least one of the
-+	requested AD types will be ignored. Otherwise they will be delivered
-+	with the Mesh Device Found event.
-+
-+	Possible errors:	Failed
-+				No Resources
-+				Invalid Parameters
-+
-+Read Mesh Features Command
-+==========================
-+
-+	Command Code:		0x0058
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Index (2 Octets)
-+				Max Handles (1 Octets)
-+				Used Handles (1 Octets)
-+				Handle (variable)
-+
-+	This command is used to both verify that Outbound Mesh packet
-+	support is enabled, and to indicate the number of packets that
-+	can and are simultaneously queued.
-+
-+	Index identifies the HCI Controller that this information is valid for.
-+
-+	Max Handles indicates the maximum number of packets that may be queued.
-+
-+	Used Handles indicates the number of packets awaiting transmission.
-+
-+	Handle is an array of the currently outstanding packets.
-+
-+	Possible errors:	Failed
-+				No Resources
-+				Invalid Parameters
-+
-+Transmit Mesh Packet Command
-+============================
-+
-+	Command Code:		0x0059
-+	Controller Index:	<controller id>
-+	Command Parameters:	Addr (6 octets)
-+				Addr Type (1 Octets)
-+				Instant (8 Octets)
-+				Delay (2 Octets)
-+				Count (1 Octets)
-+				Data (variable)
-+	Return Parameters:	Handle
-+
-+	This command sends a Mesh Packet as a NONCONN LE Advertisement.
-+
-+	The Addr + Addr Type parameters specifify the address to use in the
-+	outbound advertising packet. If BD_ADDR_ANY and LE_RANDOM is set, the
-+	kernel will create a single use non-resolvable address.
-+
-+	The Instant parameter is used in combination with the Delay
-+	parameter, to finely time the sending of the Advertising packet. It
-+	should be set to the Instant value tag of a received incoming
-+	Mesh Device Found Event. It is only useful in POLL-RESPONSE situations
-+	where a response must be sent within a negotiated time window. The value
-+	of the Instant parameter should not be interpreted by the host, and
-+	only has meaning to the controller.
-+
-+	The Delay parameter, if 0x0000, will cause the packet to be sent
-+	at the earliest opportunity. If non-Zero, and the controller supports
-+	delayed delivery, the Instant and Delay parameters will be used
-+	to delay the outbound packet. While the Instant is not defined, the
-+	Delay is specified in milliseconds.
-+
-+	The Count parameter must be sent to a non-Zero value indicating the
-+	number of times this packet will be sent before transmission completes.
-+	If the Delay parameter is non-Zero, then Count must be 1 only.
-+
-+	The Data parameter is an octet array of the AD Type and Mesh Packet.
-+
-+	This command will return immediately, and if it succeeds, will generate
-+	a Mesh Packet Transmission Complete event when after the packet has been
-+	sent.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+Cancel Transmit Mesh Packet Command
-+===================================
-+
-+	Command Code:		0x005A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Handle (1 octets)
-+
-+	This command may be used to cancel an outbound transmission request.
-+
-+	The Handle parameter is the returned handle from a successful Transmit
-+	Mesh Packet request. If Zero is specified as the handle, all outstanding
-+	send requests are canceled.
-+
-+	For each mesh packet canceled, the Mesh Packet Transmission Complete
-+	event will be generated, regardless of whether the packet was sent
-+	successfully.
-+
-+	Possible errors:	Failed
-+				Invalid Parameters
-+
-+
- Command Complete Event
- ======================
+ static void index_removed_callback(uint16_t index, uint16_t length,
+@@ -387,6 +417,7 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
  
-@@ -4978,3 +5101,50 @@ Advertisement Monitor Device Lost Event
- 		2	LE Random
+ 	if (test && test->setup_le_states)
+ 		hciemu_set_central_le_states(data->hciemu, test->le_states);
++
+ }
  
- 	This event will be sent to all management sockets.
-+
-+
-+Mesh Device Found Event
-+=======================
-+
-+	Event code:		0x0031
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				RSSI (1 Octet)
-+				Flags (4 Octets)
-+				Instant (4 Octets)
-+				AD_Data_Length (2 Octets)
-+				AD_Data (0-65535 Octets)
-+
-+	This event indicates that the controller has received an Advertisement
-+	or Scan Result containing an AD Type matching the Mesh scan set.
-+
-+	The address of the sending device is returned, and must be a valid LE
-+	Address_Type.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The RSSI field is a signed octet, and is the RSSI reported by the
-+	receiving controller.
-+
-+	The Instant field is 32 bit value that represents the instant in time
-+	the packet was received. It's value is not intended to be interpretted
-+	by the host, and is only useful if the host wants to make a timed
-+	response to the received packet. (i.e. a Poll/Response)
-+
-+	This event will be sent to all management sockets.
-+
-+Mesh Packet Transmit Complete Event
-+===================================
-+
-+	Event code:		0x0032
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Handle (2 Octets)
-+
-+	This event indicates that a requested outbound Mesh packet has
-+	completed and no longer occupies a transmit slot.
-+
-+	This event will be sent to all management sockets.
+ static void test_pre_setup(const void *test_data)
+@@ -7324,7 +7355,7 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 			expect_param = test->expect_func(&expect_len);
+ 
+ 		if (length != expect_len) {
+-			tester_warn("Invalid cmd response parameter size");
++			tester_warn("Invalid cmd response parameter size %d %d", length, expect_len);
+ 			tester_test_failed();
+ 			return;
+ 		}
+@@ -9798,7 +9829,7 @@ static const struct generic_data set_dev_flags_fail_3 = {
+ };
+ 
+ static const uint8_t read_exp_feat_param_success[] = {
+-	0x03, 0x00,				/* Feature Count */
++	0x04, 0x00,				/* Feature Count */
+ 	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,	/* UUID - Simultaneous */
+ 	0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,	/* Central Peripheral */
+ 	0xb5, 0x10, 0x1b, 0x67,
+@@ -9810,7 +9841,11 @@ static const uint8_t read_exp_feat_param_success[] = {
+ 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f,	/* UUID - Codec Offload */
+ 	0x1a, 0x88, 0xb9, 0x4f, 0x7f, 0xee,
+ 	0xce, 0x5a, 0x69, 0xa6,
+-	0x00, 0x00, 0x00, 0x00			/* Flags */
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f,	/* UUID - Mesh support */
++	0x05, 0xbf, 0x8d, 0x4d, 0x03, 0x7a,
++	0xd7, 0x63, 0xe4, 0x2c,
++	0x01, 0x00, 0x00, 0x00,			/* Flags */
+ };
+ 
+ static const struct generic_data read_exp_feat_success = {
 -- 
 2.35.1
 
