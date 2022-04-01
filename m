@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59287C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 23:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ACE6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 23:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353430AbiDAXk0 (ORCPT
+        id S1353427AbiDAXk2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 19:40:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42732 "EHLO
+        Fri, 1 Apr 2022 19:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353437AbiDAXkW (ORCPT
+        with ESMTP id S1353438AbiDAXkW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 1 Apr 2022 19:40:22 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A3FDE37
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 16:38:31 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id z10so3087656iln.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Apr 2022 16:38:31 -0700 (PDT)
+Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97185FF9
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 16:38:30 -0700 (PDT)
+Received: by mail-il1-x12d.google.com with SMTP id j15so3002796ila.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Apr 2022 16:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=XeImaVfzLHou7+z6R/xeYIY1VSit5WMBxFwnBNaCYSc=;
-        b=R3wyaIkjEWpeiMOQ/HhvfISFnjB0nO44o3ug6/sK2xcTifK/1L/YZ8P1uRbfAbnB1O
-         HC83F+jCjpBWgV75sTlvs08ONGVFSxP4smvGAzrSkIeTxvLfwjYWo8Am1wwlkn5TwoM0
-         HLkvwtWt9COJW75ZqJ8dJBZaI+5K0ESKIj6qGA5eBvoYUphEY5M0r0tedVOnG64ljhSR
-         srb9UnMHIoSON2Z2EWPqG99txFrtuIWzCYGkFNnpH5r4GzBNwBNTANjIiINaLwrCULk/
-         TGYLI/fk/q6XAcfJBE9zRA9I78uUIOhB9BszZ/sPpmGNbr1TYuqk4ZXRIpBA7qOFL4XR
-         79FA==
+        bh=tRi9mkD2hB3smWylSIZlbf8NOW3OIQwRaYtRTDbSDKo=;
+        b=JX6OijcR8WIImGFVrJ4ROAoFpl0K80Bhx+Ilvd6AHfcC2GH9CDE59pp/5gSTif7ocd
+         RgruJ4CJelx9p5SrebBiW+u86LPBsFOW5dnyJTELeXVu40FpEoF8PCxMVKkgefVOZPLB
+         5j9+maTEQKcX3uK31Lla1EYbshio1RRI5uoUnMBFVy52lTSDeTX0fyKmYZWBZ4twU3hq
+         UcSf6/xeG/nTtII0UcXkaBS9nuRJk2T3scdmnthGriU1rJKF/N9vny/H4fjS/zmy3/yA
+         iuI4edMJaLYeyw14CLhh4rZNkOCItxgHgc/4M1J9zSUq2TpTvjBvMVRYqqQd33yUdrtu
+         zyOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XeImaVfzLHou7+z6R/xeYIY1VSit5WMBxFwnBNaCYSc=;
-        b=tuU6ggGcDVHKMWTMwUdMc95bshpMiyHBUoOuDeBuqBdyxJcojQvmslSGqyY+oFWR4S
-         UxF/qodDNBSX/JNPhR3JyYzfl5A6/Tr+d2GTQepvathOHsXRVdHLAh9yMoH3VIPY+UxL
-         N84UkLKE7k8Wlji6uJlplQ06b72ei4PbQz9/YpRsvfgXq/8uD9aDnTSPJ5P9q6yf72VD
-         dk6UnvTnWEQZeWY9Wn5TYBMJGkFTHM/7P3y/oreCSeo91ZWBw2S8FW+D7hrn4joP2ZnT
-         PRIFzwaryhYiJYyujF9Gr6dvw+qqXNmgqEmf45DhSB5c76kwLVW8tjvfY2MYMTR141Ot
-         eVfw==
-X-Gm-Message-State: AOAM530nbPCWCSa8FMgBwvQiJ3Dp87EIKQxH8+g/Hnbbs9zGdiqcAEN1
-        HhoMDWGBR5w406o3M0UHIrL+kS0FtLg=
-X-Google-Smtp-Source: ABdhPJzhednDgspih/DM5aZnuash9hbjd9wPmzTD6/EaIJ9TQyCFvmvn0Wv2Ru2NCyaa6PkNjFGXNw==
-X-Received: by 2002:a05:6e02:216f:b0:2ca:203b:75d with SMTP id s15-20020a056e02216f00b002ca203b075dmr365224ilv.174.1648856310720;
-        Fri, 01 Apr 2022 16:38:30 -0700 (PDT)
+        bh=tRi9mkD2hB3smWylSIZlbf8NOW3OIQwRaYtRTDbSDKo=;
+        b=3eP1BjAmcoqBqFYrsAXZsy2QOYiLZ5vOZMrI0a0d4S/47q/Kjd0HSJZbVWbyMP+53M
+         ks3hGdV5jyv9FvYgNz//kiTlrRzOKBMU+9zIjxyTPoRHacDA1OZSd/ctDdKfOoct4laE
+         vAqhL31dM6XeRgi3fzOFB9i32LvJvdXFIguQKep8lg6T34Rpk5yg3fvQ/DLf4xE6qwT8
+         +3m2cV5qMsP+q3HWRG7x+jU6N++2o6z/A7bbNMW5byO8hhcnxQPLOEGWSFQ6ph/b8aq/
+         MSCE3S5xlJJxP6OAqnjjs3JsjtOiBRkz6HHRKCneeTMzmQ7X7tNtGVBsfXdKkHOvlo9K
+         JiXg==
+X-Gm-Message-State: AOAM5333bdCe/Oc5SF8VD7od8++VPciUO3Ke+0Bkft5UTQOQQEO8P3u7
+        OXIJZvg5TJ4oXGnotaX/ZHH9h9tJxp4=
+X-Google-Smtp-Source: ABdhPJwvWvVpMosNtpDd0BAJNqg1aTe/WegJcfCVC75ddGPvpMKa5o7Jw/NR7UOscrFTYoExoCR7Bg==
+X-Received: by 2002:a05:6e02:178a:b0:2ca:123a:c6eb with SMTP id y10-20020a056e02178a00b002ca123ac6ebmr952473ilu.187.1648856309872;
+        Fri, 01 Apr 2022 16:38:29 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b19-20020a5d8553000000b00649f02b1b0csm2217062ios.39.2022.04.01.16.38.30
+        by smtp.gmail.com with ESMTPSA id b19-20020a5d8553000000b00649f02b1b0csm2217062ios.39.2022.04.01.16.38.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 16:38:30 -0700 (PDT)
+        Fri, 01 Apr 2022 16:38:29 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 4/4] Bluetooth: hci_sync: Split hci_dev_open_sync
-Date:   Fri,  1 Apr 2022 16:38:26 -0700
-Message-Id: <20220401233826.122544-4-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/4] Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
+Date:   Fri,  1 Apr 2022 16:38:25 -0700
+Message-Id: <20220401233826.122544-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220401233826.122544-1-luiz.dentz@gmail.com>
 References: <20220401233826.122544-1-luiz.dentz@gmail.com>
@@ -66,276 +66,31 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This splits hci_dev_open_sync so each stage is handle by its own
-function so it is easier to identify each stage.
+This sets HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA controllers
+since SCO appear to not work when using HCI_OP_ENHANCED_SETUP_SYNC_CONN.
 
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=215576
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 225 ++++++++++++++++++++++-----------------
- 1 file changed, 126 insertions(+), 99 deletions(-)
+ drivers/bluetooth/btusb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 5610ec1242d6..2d3b9adbd215 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3849,90 +3849,40 @@ static const struct {
- 			 "advertised, but not supported.")
- };
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 50df417207af..06a854a2507e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3335,6 +3335,11 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 			msleep(QCA_BT_RESET_WAIT_MS);
+ 	}
  
--int hci_dev_open_sync(struct hci_dev *hdev)
-+/* This function handles hdev setup stage:
-+ *
-+ * Calls hdev->setup
-+ * Setup address if HCI_QUIRK_USE_BDADDR_PROPERTY is set.
-+ */
-+static int hci_dev_setup_sync(struct hci_dev *hdev)
- {
- 	int ret = 0;
--
--	bt_dev_dbg(hdev, "");
--
--	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
--		ret = -ENODEV;
--		goto done;
--	}
-+	bool invalid_bdaddr;
-+	size_t i;
- 
- 	if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
--	    !hci_dev_test_flag(hdev, HCI_CONFIG)) {
--		/* Check for rfkill but allow the HCI setup stage to
--		 * proceed (which in itself doesn't cause any RF activity).
--		 */
--		if (hci_dev_test_flag(hdev, HCI_RFKILLED)) {
--			ret = -ERFKILL;
--			goto done;
--		}
--
--		/* Check for valid public address or a configured static
--		 * random address, but let the HCI setup proceed to
--		 * be able to determine if there is a public address
--		 * or not.
--		 *
--		 * In case of user channel usage, it is not important
--		 * if a public address or static random address is
--		 * available.
--		 *
--		 * This check is only valid for BR/EDR controllers
--		 * since AMP controllers do not have an address.
--		 */
--		if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--		    hdev->dev_type == HCI_PRIMARY &&
--		    !bacmp(&hdev->bdaddr, BDADDR_ANY) &&
--		    !bacmp(&hdev->static_addr, BDADDR_ANY)) {
--			ret = -EADDRNOTAVAIL;
--			goto done;
--		}
--	}
--
--	if (test_bit(HCI_UP, &hdev->flags)) {
--		ret = -EALREADY;
--		goto done;
--	}
--
--	if (hdev->open(hdev)) {
--		ret = -EIO;
--		goto done;
--	}
--
--	set_bit(HCI_RUNNING, &hdev->flags);
--	hci_sock_dev_event(hdev, HCI_DEV_OPEN);
--
--	atomic_set(&hdev->cmd_cnt, 1);
--	set_bit(HCI_INIT, &hdev->flags);
--
--	if (hci_dev_test_flag(hdev, HCI_SETUP) ||
--	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
--		bool invalid_bdaddr;
--		size_t i;
-+	    !test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks))
-+		return 0;
- 
--		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
-+	bt_dev_dbg(hdev, "");
- 
--		if (hdev->setup)
--			ret = hdev->setup(hdev);
-+	hci_sock_dev_event(hdev, HCI_DEV_SETUP);
- 
--		for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
--			if (test_bit(hci_broken_table[i].quirk, &hdev->quirks))
--				bt_dev_warn(hdev, "%s",
--					    hci_broken_table[i].desc);
--		}
-+	if (hdev->setup)
-+		ret = hdev->setup(hdev);
- 
--		/* The transport driver can set the quirk to mark the
--		 * BD_ADDR invalid before creating the HCI device or in
--		 * its setup callback.
--		 */
--		invalid_bdaddr = test_bit(HCI_QUIRK_INVALID_BDADDR,
--					  &hdev->quirks);
-+	for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
-+		if (test_bit(hci_broken_table[i].quirk, &hdev->quirks))
-+			bt_dev_warn(hdev, "%s", hci_broken_table[i].desc);
-+	}
- 
--		if (ret)
--			goto setup_failed;
-+	/* The transport driver can set the quirk to mark the
-+	 * BD_ADDR invalid before creating the HCI device or in
-+	 * its setup callback.
++	/* Mark HCI_OP_ENHANCED_SETUP_SYNC_CONN as broken as it doesn't seem to
++	 * work with the likes of HSP/HFP mSBC.
 +	 */
-+	invalid_bdaddr = test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++	set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
++
+ 	return 0;
+ }
  
-+	if (!ret) {
- 		if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
- 			if (!bacmp(&hdev->public_addr, BDADDR_ANY))
- 				hci_dev_get_bd_addr_from_property(hdev);
-@@ -3951,33 +3901,51 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 					invalid_bdaddr = false;
- 			}
- 		}
-+	}
- 
--setup_failed:
--		/* The transport driver can set these quirks before
--		 * creating the HCI device or in its setup callback.
--		 *
--		 * For the invalid BD_ADDR quirk it is possible that
--		 * it becomes a valid address if the bootloader does
--		 * provide it (see above).
--		 *
--		 * In case any of them is set, the controller has to
--		 * start up as unconfigured.
--		 */
--		if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
--		    invalid_bdaddr)
--			hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
-+	/* The transport driver can set these quirks before
-+	 * creating the HCI device or in its setup callback.
-+	 *
-+	 * For the invalid BD_ADDR quirk it is possible that
-+	 * it becomes a valid address if the bootloader does
-+	 * provide it (see above).
-+	 *
-+	 * In case any of them is set, the controller has to
-+	 * start up as unconfigured.
-+	 */
-+	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
-+	    invalid_bdaddr)
-+		hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
- 
--		/* For an unconfigured controller it is required to
--		 * read at least the version information provided by
--		 * the Read Local Version Information command.
--		 *
--		 * If the set_bdaddr driver callback is provided, then
--		 * also the original Bluetooth public device address
--		 * will be read using the Read BD Address command.
--		 */
--		if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
--			ret = hci_unconf_init_sync(hdev);
--	}
-+	/* For an unconfigured controller it is required to
-+	 * read at least the version information provided by
-+	 * the Read Local Version Information command.
-+	 *
-+	 * If the set_bdaddr driver callback is provided, then
-+	 * also the original Bluetooth public device address
-+	 * will be read using the Read BD Address command.
-+	 */
-+	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
-+		return hci_unconf_init_sync(hdev);
-+
-+	return ret;
-+}
-+
-+/* This function handles hdev init stage:
-+ *
-+ * Calls hci_dev_setup_sync to perform setup stage
-+ * Calls hci_init_sync to perform HCI command init sequence
-+ */
-+static int hci_dev_init_sync(struct hci_dev *hdev)
-+{
-+	int ret;
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	atomic_set(&hdev->cmd_cnt, 1);
-+	set_bit(HCI_INIT, &hdev->flags);
-+
-+	ret = hci_dev_setup_sync(hdev);
- 
- 	if (hci_dev_test_flag(hdev, HCI_CONFIG)) {
- 		/* If public address change is configured, ensure that
-@@ -4017,6 +3985,65 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 
- 	clear_bit(HCI_INIT, &hdev->flags);
- 
-+	return ret;
-+}
-+
-+int hci_dev_open_sync(struct hci_dev *hdev)
-+{
-+	int ret;
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-+		ret = -ENODEV;
-+		goto done;
-+	}
-+
-+	if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
-+	    !hci_dev_test_flag(hdev, HCI_CONFIG)) {
-+		/* Check for rfkill but allow the HCI setup stage to
-+		 * proceed (which in itself doesn't cause any RF activity).
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_RFKILLED)) {
-+			ret = -ERFKILL;
-+			goto done;
-+		}
-+
-+		/* Check for valid public address or a configured static
-+		 * random address, but let the HCI setup proceed to
-+		 * be able to determine if there is a public address
-+		 * or not.
-+		 *
-+		 * In case of user channel usage, it is not important
-+		 * if a public address or static random address is
-+		 * available.
-+		 *
-+		 * This check is only valid for BR/EDR controllers
-+		 * since AMP controllers do not have an address.
-+		 */
-+		if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+		    hdev->dev_type == HCI_PRIMARY &&
-+		    !bacmp(&hdev->bdaddr, BDADDR_ANY) &&
-+		    !bacmp(&hdev->static_addr, BDADDR_ANY)) {
-+			ret = -EADDRNOTAVAIL;
-+			goto done;
-+		}
-+	}
-+
-+	if (test_bit(HCI_UP, &hdev->flags)) {
-+		ret = -EALREADY;
-+		goto done;
-+	}
-+
-+	if (hdev->open(hdev)) {
-+		ret = -EIO;
-+		goto done;
-+	}
-+
-+	set_bit(HCI_RUNNING, &hdev->flags);
-+	hci_sock_dev_event(hdev, HCI_DEV_OPEN);
-+
-+	ret = hci_dev_init_sync(hdev);
- 	if (!ret) {
- 		hci_dev_hold(hdev);
- 		hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
 -- 
 2.35.1
 
