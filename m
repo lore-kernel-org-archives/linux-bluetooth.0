@@ -2,31 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C03C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CFB3C433EF
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 12:16:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345807AbiDAMSq (ORCPT
+        id S1345805AbiDAMSp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 08:18:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33926 "EHLO
+        Fri, 1 Apr 2022 08:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231462AbiDAMSn (ORCPT
+        with ESMTP id S1344205AbiDAMSn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 1 Apr 2022 08:18:43 -0400
-Received: from mxout04.lancloud.ru (mxout04.lancloud.ru [45.84.86.114])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 146C527796E
+Received: from mxout02.lancloud.ru (mxout02.lancloud.ru [45.84.86.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEF7F27796F
         for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 05:16:53 -0700 (PDT)
 Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 7D18520D30AC
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout02.lancloud.ru C8D512307CD8
 Received: from LanCloud
 Received: from LanCloud
 Received: from LanCloud
 From:   Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
 To:     <linux-bluetooth@vger.kernel.org>
 CC:     Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
-Subject: [PATCH BlueZ 4/6] tools: Limit width of fields in sscanf
-Date:   Fri, 1 Apr 2022 15:16:45 +0300
-Message-ID: <20220401121647.3985682-5-i.kamaletdinov@omp.ru>
+Subject: [PATCH BlueZ 5/6] device: Limit width of fields in sscanf
+Date:   Fri, 1 Apr 2022 15:16:46 +0300
+Message-ID: <20220401121647.3985682-6-i.kamaletdinov@omp.ru>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220401121647.3985682-1-i.kamaletdinov@omp.ru>
 References: <20220401121647.3985682-1-i.kamaletdinov@omp.ru>
@@ -40,42 +40,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In tools/btmgmt.c and tools/hex2hcd.c few sscanf does not limit width
-of fields. This could lead to static overflow and stack corruption.
+In src/device.c few sscanf does not limit width of uuid field. This
+could lead to static overflow and stack corruption.
 
 Found by Linux Verification Center (linuxtesting.org) with the SVACE
 static analysis tool.
 ---
- tools/btmgmt.c  | 2 +-
- tools/hex2hcd.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ src/device.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 42ef9acef..8f63f12ba 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -5164,7 +5164,7 @@ static bool str2pattern(struct mgmt_adv_pattern *pattern, const char *str)
- 	char pattern_str[62] = { 0 };
- 	char tmp;
+diff --git a/src/device.c b/src/device.c
+index 381faf91c..8dc12d026 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3790,8 +3790,8 @@ static int load_desc(char *handle, char *value,
+ 		return -EIO;
  
--	if (sscanf(str, "%2hhx%n:%2hhx%n:%s", &pattern->ad_type, &type_len,
-+	if (sscanf(str, "%2hhx%n:%2hhx%n:%61s", &pattern->ad_type, &type_len,
- 			&pattern->offset, &offset_end_pos, pattern_str) != 3)
- 		return false;
+ 	/* Check if there is any value stored, otherwise it is just the UUID */
+-	if (sscanf(value, "%04hx:%s", &val, uuid_str) != 2) {
+-		if (sscanf(value, "%s", uuid_str) != 1)
++	if (sscanf(value, "%04hx:%36s", &val, uuid_str) != 2) {
++		if (sscanf(value, "%36s", uuid_str) != 1)
+ 			return -EIO;
+ 		val = 0;
+ 	}
+@@ -3840,9 +3840,9 @@ static int load_chrc(char *handle, char *value,
+ 		return -EIO;
  
-diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
-index 674d62744..e6dca5a81 100644
---- a/tools/hex2hcd.c
-+++ b/tools/hex2hcd.c
-@@ -248,7 +248,7 @@ static void ver_parse_file(const char *pathname)
+ 	/* Check if there is any value stored */
+-	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%s",
++	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%36s",
+ 			&value_handle, &properties, val_str, uuid_str) != 4) {
+-		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%s",
++		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%36s",
+ 				&value_handle, &properties, uuid_str) != 3)
+ 			return -EIO;
+ 		val_len = 0;
+@@ -3884,8 +3884,8 @@ static int load_incl(struct gatt_db *db, char *handle, char *value,
+ 	if (sscanf(handle, "%04hx", &start) != 1)
+ 		return -EIO;
  
- 	memset(ver, 0, sizeof(*ver));
+-	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%s", &start, &end,
+-								uuid_str) != 3)
++	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%36s", &start,
++							&end, uuid_str) != 3)
+ 		return -EIO;
  
--	if (sscanf(pathname, "%[A-Z0-9]_%3c.%3c.%3c.%4c.%4c.hex",
-+	if (sscanf(pathname, "%19[A-Z0-9]_%3c.%3c.%3c.%4c.%4c.hex",
- 					ver->name, ver->major, ver->minor,
- 					ver->build, dummy1, dummy2) != 6) {
- 		printf("\t/* failed to parse %s */\n", pathname);
+ 	/* Log debug message. */
+@@ -3918,7 +3918,7 @@ static int load_service(struct gatt_db *db, char *handle, char *value)
+ 	if (sscanf(handle, "%04hx", &start) != 1)
+ 		return -EIO;
+ 
+-	if (sscanf(value, "%[^:]:%04hx:%s", type, &end, uuid_str) != 3)
++	if (sscanf(value, "%[^:]:%04hx:%36s", type, &end, uuid_str) != 3)
+ 		return -EIO;
+ 
+ 	if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR))
 -- 
 2.35.1
 
