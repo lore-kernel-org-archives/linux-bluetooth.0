@@ -2,52 +2,51 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C67E3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 15:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF578C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 15:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351091AbiDAPGv (ORCPT
+        id S235557AbiDAPGz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 11:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55160 "EHLO
+        Fri, 1 Apr 2022 11:06:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350082AbiDAOrI (ORCPT
+        with ESMTP id S1348399AbiDAO4A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:47:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5002A044A;
-        Fri,  1 Apr 2022 07:37:04 -0700 (PDT)
+        Fri, 1 Apr 2022 10:56:00 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D874AC337D;
+        Fri,  1 Apr 2022 07:44:01 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 514B060BAC;
-        Fri,  1 Apr 2022 14:36:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A0BC2BBE4;
-        Fri,  1 Apr 2022 14:36:35 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C4581B8240E;
+        Fri,  1 Apr 2022 14:44:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 338C7C3410F;
+        Fri,  1 Apr 2022 14:43:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648823796;
-        bh=xozeWcdYljMbVk8JHkfaL42nAioAU9CGV6Boy5rn2yA=;
+        s=k20201202; t=1648824239;
+        bh=H9GmwK+B63pcrmYuNjENxKmlouwAu7ZViJydwDwFh7g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C13BdZElevWcF+Q7/mzZB5NNNk9b4iOQepfNHb4Ds2EUbelmAwpWADLhwdXYD/tep
-         HzNhQpBkz5UnLjw0f+sRGa45F4zWdX7CXla2UaSlY974TahlzNkBcQ7eCRObvgezAA
-         HUW8G3Oh0pq4Q6w0W9Yrc5UuiJsWpFIFOLepAA2TTBg8wkQhl38BzIg0YY0rSejd7K
-         FZ6z+kkKuye3P0ziwYnrdTXV3YzkUvtF9pnxQaIgMDfPp/imSHiFQWLIbonXlC1Ow4
-         p0qzHXFXApYvd8HjHG8UlCu0J6rPXJYjeVGd0b1CCW1iLieqlF+fQyG5JsmYS5iIyd
-         oZF8AzWsq+LxQ==
+        b=fkMR5sRuJzYJF8Ybo0bg1p7pd9nd5FEGnEBMYvkZSaXR+foOdZplA049OLB3H4zr4
+         ss4jT05rClIm7YPRh7m/IFXRWoySkAhxSX9aO6iYESJ2gBzvNoEQdNoMTbjhRAsHgc
+         D/vkK5x+RXYQBYGdpuvT0EBxnBFbdDS556QQI/yOBAhFdiQHHbvwVBTXgpUW3ofOvr
+         /Lw5fKuwSipNmnIfBaJ1G11ulJkdSZC/zoznjdnEADJKdFqLxRzJ/xxNG0qBxDrsgx
+         k5hEeKGLHyZuIUHq2qH0P79JRwFNDt5/qzoPE9d6EF/BMBfkvr2Xa7c40+qx/DhyL6
+         bd91z1/vUElHQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "Minghao Chi (CGEL ZTE)" <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>,
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
         pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 082/109] Bluetooth: use memset avoid memory leaks
-Date:   Fri,  1 Apr 2022 10:32:29 -0400
-Message-Id: <20220401143256.1950537-82-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 46/65] Bluetooth: Fix not checking for valid hdev on bt_dev_{info,warn,err,dbg}
+Date:   Fri,  1 Apr 2022 10:41:47 -0400
+Message-Id: <20220401144206.1953700-46-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220401143256.1950537-1-sashal@kernel.org>
-References: <20220401143256.1950537-1-sashal@kernel.org>
+In-Reply-To: <20220401144206.1953700-1-sashal@kernel.org>
+References: <20220401144206.1953700-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -56,33 +55,54 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: "Minghao Chi (CGEL ZTE)" <chi.minghao@zte.com.cn>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit d3715b2333e9a21692ba16ef8645eda584a9515d ]
+[ Upstream commit 9b392e0e0b6d026da5a62bb79a08f32e27af858e ]
 
-Use memset to initialize structs to prevent memory leaks
-in l2cap_ecred_connect
+This fixes attemting to print hdev->name directly which causes them to
+print an error:
 
-Reported-by: Zeal Robot <zealci@zte.com.cn>
-Signed-off-by: Minghao Chi (CGEL ZTE) <chi.minghao@zte.com.cn>
+kernel: read_version:367: (efault): sock 000000006a3008f2
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/net/bluetooth/bluetooth.h | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4f8f37599962..e06baffc0dc6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1436,6 +1436,7 @@ static void l2cap_ecred_connect(struct l2cap_chan *chan)
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 9125effbf448..3fecc4a411a1 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -180,19 +180,21 @@ void bt_err_ratelimited(const char *fmt, ...);
+ #define BT_DBG(fmt, ...)	pr_debug(fmt "\n", ##__VA_ARGS__)
+ #endif
  
- 	l2cap_ecred_init(chan, 0);
++#define bt_dev_name(hdev) ((hdev) ? (hdev)->name : "null")
++
+ #define bt_dev_info(hdev, fmt, ...)				\
+-	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_INFO("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_warn(hdev, fmt, ...)				\
+-	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_WARN("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_err(hdev, fmt, ...)				\
+-	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_ERR("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_dbg(hdev, fmt, ...)				\
+-	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	BT_DBG("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
  
-+	memset(&data, 0, sizeof(data));
- 	data.pdu.req.psm     = chan->psm;
- 	data.pdu.req.mtu     = cpu_to_le16(chan->imtu);
- 	data.pdu.req.mps     = cpu_to_le16(chan->mps);
+ #define bt_dev_warn_ratelimited(hdev, fmt, ...)			\
+-	bt_warn_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	bt_warn_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ #define bt_dev_err_ratelimited(hdev, fmt, ...)			\
+-	bt_err_ratelimited("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
++	bt_err_ratelimited("%s: " fmt, bt_dev_name(hdev), ##__VA_ARGS__)
+ 
+ /* Connection and socket states */
+ enum {
 -- 
 2.34.1
 
