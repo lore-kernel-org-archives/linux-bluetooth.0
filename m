@@ -2,101 +2,277 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF19C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 16:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9502AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 17:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243740AbiDAQaL (ORCPT
+        id S1349827AbiDARXK convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 12:30:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49190 "EHLO
+        Fri, 1 Apr 2022 13:23:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348478AbiDAQ16 (ORCPT
+        with ESMTP id S1349774AbiDARXF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 12:27:58 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB64192A8
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 09:00:06 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id t19so2525403qtc.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Apr 2022 09:00:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=AKXcF4teVwlDU5LgheGWUQHjwPclxbfbFlscmhjQvKo=;
-        b=g3y11gE1LlpQsue7MDpndBttOXR+ybi1vxZX2LdQx4bvyopxd0nwmdrr+nU8YuUyJQ
-         bluB+XRovMGmHGj9XylnHCEqA6+hFb11Q5MeQeae/NczhokRn05WcNly3lKcwre6vxTp
-         ablozqMtFtXP+EVh2claAwW2fIU2LwQ9kYjYFQAJ+1S2b9vrKQNVqUI8yXeg2FAXHaJ7
-         NaaGErJNYxPQIM/+mQpQAlCpmIHCVigX+je+274nxi6nd+Ns80DfPwgLmnGSX/PVRBQu
-         nd8SiuQtiKobciSnDq3Eu5XvyFb/0SxCgdIFmM7HYk2CNgwXOd7gZcuqOaZ0C+EvTxzX
-         v9eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=AKXcF4teVwlDU5LgheGWUQHjwPclxbfbFlscmhjQvKo=;
-        b=VXtNFmMcheMm8WUn0fpsAFnHxELBPSMUA0xIcz1RqzMV1M1TkWSX8+ihE140ELUo0C
-         OFVr/2mMJ5S1BCd9TZSHDYfHP7PM8nHRw0ErlSmBJyPcbD2DQmqZxoA6xRd6VAIhycur
-         ld4flu/ZQ6kSiz0oargGl1sFP0fU68cJU+ZJLkxPXEvyCkuhTeLZpRFJSaovOC+ZZlRc
-         9jY1QH7IcqDQFD4Avo36whdOOauGcIWzdGNX1YxrW2Sb6mQLurXsTCLCLnXaSif0XxoK
-         muD+7OTJciwURJwnXDxz3SEBjNVZknrCB18LhB1FPWrpIWMpAwXw65O8oTzHSMvvfQtP
-         nL/g==
-X-Gm-Message-State: AOAM530VrnHO71pUM2A8rSwPwTftoIVZnySoomNIWDcuK40VUHFEnBao
-        ww9QANk5dFKLrySUpB0mlIGy2T30q0H7HA==
-X-Google-Smtp-Source: ABdhPJxgza1VTSpX1NXA1/qe5GdNk4WnbuIGa1QocVCnlMSipcI5BS2ryhOdNQJK7YK8lJ+M7nMyfQ==
-X-Received: by 2002:a05:622a:1c1:b0:2e1:b35c:2aa9 with SMTP id t1-20020a05622a01c100b002e1b35c2aa9mr9038147qtw.313.1648828804305;
-        Fri, 01 Apr 2022 09:00:04 -0700 (PDT)
-Received: from [172.17.0.2] ([20.186.11.107])
-        by smtp.gmail.com with ESMTPSA id b17-20020a05622a021100b002e1f86db385sm1962321qtx.68.2022.04.01.09.00.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 09:00:03 -0700 (PDT)
-Message-ID: <62472183.1c69fb81.bfc3c.b910@mx.google.com>
-Date:   Fri, 01 Apr 2022 09:00:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8746605423345953343=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, i.kamaletdinov@omp.ru
-Subject: RE: Fix bugs found by SVACE static analisys tool
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220401121647.3985682-2-i.kamaletdinov@omp.ru>
-References: <20220401121647.3985682-2-i.kamaletdinov@omp.ru>
+        Fri, 1 Apr 2022 13:23:05 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A45AEC6802
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 10:21:13 -0700 (PDT)
+Received: from smtpclient.apple (p4ff9fa3c.dip0.t-ipconnect.de [79.249.250.60])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C013BCED02;
+        Fri,  1 Apr 2022 19:21:11 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+Subject: Re: [PATCH BlueZ 1/2] docs: Add support for Mesh Scanning and Sending
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220331182653.465828-1-brian.gix@intel.com>
+Date:   Fri, 1 Apr 2022 19:21:11 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <248EF762-97D2-4484-A333-B19BFDC912A0@holtmann.org>
+References: <20220331182653.465828-1-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8746605423345953343==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Brian,
 
-This is automated email and please do not reply to this email!
+> Adds four new MGMT Commands:
+> 	- MESH_RECEIVER - Enable Mesh Receiver with Passive scanning
+> 	  with a list of AD Types (Mesh and/or Extended Mesh).
+> 
+> 	- MESH_FEATURES - Requests information on how many simultaneous
+> 	  outbound  mesh packets can be pending at one time.
+> 
+> 	- MESH_TX_PACKET - Send a requested Mesh Packet, perhaps with a
+> 	  specific fine-timed delay.
+> 
+> 	- MESH_TX_CANCEL - Cancel a prior Mesh TX request that has not
+> 	  yet completed.
+> 
+> Adds two new MGMT Events:
+> 	- MESH_DEVICE_FOUND - Returned when Mesh is enabled, and one of
+> 	  the requested AD Types is detected in an incoming
+> 	  Advertisement.
+> 
+> 	- MESH_TX_COMPLETE - Reports that a prior requested transmission
+> 	  has completed and no longer consumes one of the available
+> 	  outbound slots.
+> ---
+> doc/mgmt-api.txt | 170 +++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 170 insertions(+)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index ebe56afa4..2da89e2f3 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -332,6 +332,7 @@ Read Controller Information Command
+> 		15	Static Address
+> 		16	PHY Configuration
+> 		17	Wideband Speech
 
-Dear submitter,
+we need to leave 18 to Quality Reporting.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=628188
+> +		18	Mesh Mode
+> 
+> 	This command generates a Command Complete event on success or
+> 	a Command Status event on failure.
+> @@ -3858,6 +3859,128 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
+> 				Invalid Parameters
+> 
 
----Test result---
+Lets leave 0x0057 to Set Quality Report command.
 
-Test Summary:
-CheckPatch                    PASS      8.20 seconds
-GitLint                       PASS      5.62 seconds
-Prep - Setup ELL              PASS      39.64 seconds
-Build - Prep                  PASS      0.69 seconds
-Build - Configure             PASS      7.87 seconds
-Build - Make                  PASS      1330.57 seconds
-Make Check                    PASS      11.64 seconds
-Make Check w/Valgrind         PASS      404.30 seconds
-Make Distcheck                PASS      209.94 seconds
-Build w/ext ELL - Configure   PASS      7.88 seconds
-Build w/ext ELL - Make        PASS      1278.53 seconds
-Incremental Build with patchesPASS      8064.66 seconds
+> 
+> +Set Mesh Receiver Command
+> +=========================
+> +
+> +	Command Code:		0x0057
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Enable (1 Octets)
+> +				Window (2 Octets)
+> +				Period (2 Octets)
+> +				Num AD Types (1 Octets)
+> +				AD Types (variable)
+> +
+> +	This command Enables or Disables Mesh Receiving. When enabled passive
+> +	scanning remains enabled for this controller.
+> +
+> +	The Window/Period values are used to set the Scan Parameters when no
+> +	other scanning is being done.
+> +
+> +	Num AD Types and AD Types parameter, filter Advertising and Scan
+> +	responses by AD type. Reponses that do not contain at least one of the
+> +	requested AD types will be ignored. Otherwise they will be delivered
+> +	with the Mesh Device Found event.
+> +
+> +	Possible errors:	Failed
+> +				No Resources
+> +				Invalid Parameters
+> +
+> +Read Mesh Features Command
+> +==========================
+> +
+> +	Command Code:		0x0058
+> +	Controller Index:	<controller id>
+> +	Command Parameters:
+> +	Return Parameters:	Index (2 Octets)
+> +				Max Handles (1 Octets)
+> +				Used Handles (1 Octets)
+> +				Handle (variable)
+> +
+> +	This command is used to both verify that Outbound Mesh packet
+> +	support is enabled, and to indicate the number of packets that
+> +	can and are simultaneously queued.
+> +
+> +	Index identifies the HCI Controller that this information is valid for.
 
+Scrap the Index. It is already present the basic mgmt frame structure.
 
+> +
+> +	Max Handles indicates the maximum number of packets that may be queued.
+> +
+> +	Used Handles indicates the number of packets awaiting transmission.
+> +
+> +	Handle is an array of the currently outstanding packets.
+> +
+> +	Possible errors:	Failed
+> +				No Resources
+> +				Invalid Parameters
 
----
-Regards,
-Linux Bluetooth
+I rather have 0x0058 Read Mesh Features, 0x0059 Set Mesh Receiver, 0x005a Transmit Mesh Packet and 0x005b Cancel Transmit Mesh Packet.
 
+> +
+> +Transmit Mesh Packet Command
+> +============================
+> +
+> +	Command Code:		0x0059
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Addr (6 octets)
+> +				Addr Type (1 Octets)
+> +				Instant (8 Octets)
+> +				Delay (2 Octets)
+> +				Count (1 Octets)
+> +				Data (variable)
+> +	Return Parameters:	Handle
+> +
+> +	This command sends a Mesh Packet as a NONCONN LE Advertisement.
+> +
+> +	The Addr + Addr Type parameters specifify the address to use in the
+> +	outbound advertising packet. If BD_ADDR_ANY and LE_RANDOM is set, the
+> +	kernel will create a single use non-resolvable address.
+> +
+> +	The Instant parameter is used in combination with the Delay
+> +	parameter, to finely time the sending of the Advertising packet. It
+> +	should be set to the Instant value tag of a received incoming
+> +	Mesh Device Found Event. It is only useful in POLL-RESPONSE situations
+> +	where a response must be sent within a negotiated time window. The value
+> +	of the Instant parameter should not be interpreted by the host, and
+> +	only has meaning to the controller.
+> +
+> +	The Delay parameter, if 0x0000, will cause the packet to be sent
+> +	at the earliest opportunity. If non-Zero, and the controller supports
+> +	delayed delivery, the Instant and Delay parameters will be used
+> +	to delay the outbound packet. While the Instant is not defined, the
+> +	Delay is specified in milliseconds.
+> +
+> +	The Count parameter must be sent to a non-Zero value indicating the
+> +	number of times this packet will be sent before transmission completes.
+> +	If the Delay parameter is non-Zero, then Count must be 1 only.
+> +
+> +	The Data parameter is an octet array of the AD Type and Mesh Packet.
+> +
+> +	This command will return immediately, and if it succeeds, will generate
+> +	a Mesh Packet Transmission Complete event when after the packet has been
+> +	sent.
+> +
+> +	Possible errors:	Failed
+> +				Busy
+> +				No Resources
+> +				Invalid Parameters
+> +
+> +Cancel Transmit Mesh Packet Command
+> +===================================
+> +
+> +	Command Code:		0x005A
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Handle (1 octets)
+> +
+> +	This command may be used to cancel an outbound transmission request.
+> +
+> +	The Handle parameter is the returned handle from a successful Transmit
+> +	Mesh Packet request. If Zero is specified as the handle, all outstanding
+> +	send requests are canceled.
+> +
+> +	For each mesh packet canceled, the Mesh Packet Transmission Complete
+> +	event will be generated, regardless of whether the packet was sent
+> +	successfully.
+> +
+> +	Possible errors:	Failed
+> +				Invalid Parameters
+> +
+> +
+> Command Complete Event
+> ======================
+> 
+> @@ -4978,3 +5101,50 @@ Advertisement Monitor Device Lost Event
+> 		2	LE Random
+> 
+> 	This event will be sent to all management sockets.
+> +
+> +
+> +Mesh Device Found Event
+> +=======================
+> +
+> +	Event code:		0x0031
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				RSSI (1 Octet)
+> +				Flags (4 Octets)
+> +				Instant (4 Octets)
+> +				AD_Data_Length (2 Octets)
+> +				AD_Data (0-65535 Octets)
+> +
+> +	This event indicates that the controller has received an Advertisement
+> +	or Scan Result containing an AD Type matching the Mesh scan set.
+> +
+> +	The address of the sending device is returned, and must be a valid LE
+> +	Address_Type.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved (not in use)
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	The RSSI field is a signed octet, and is the RSSI reported by the
+> +	receiving controller.
+> +
+> +	The Instant field is 32 bit value that represents the instant in time
+> +	the packet was received. It's value is not intended to be interpretted
+> +	by the host, and is only useful if the host wants to make a timed
+> +	response to the received packet. (i.e. a Poll/Response)
+> +
+> +	This event will be sent to all management sockets.
 
---===============8746605423345953343==--
+Describe the Flags field please.
+
+> +
+> +Mesh Packet Transmit Complete Event
+> +===================================
+> +
+> +	Event code:		0x0032
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Handle (2 Octets)
+> +
+> +	This event indicates that a requested outbound Mesh packet has
+> +	completed and no longer occupies a transmit slot.
+> +
+> +	This event will be sent to all management sockets.
+
+Regards
+
+Marcel
+
