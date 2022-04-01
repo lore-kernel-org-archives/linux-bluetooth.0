@@ -2,31 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06B5C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA096C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343645AbiDAK35 (ORCPT
+        id S1343599AbiDAK37 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 06:29:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38828 "EHLO
+        Fri, 1 Apr 2022 06:29:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343542AbiDAK34 (ORCPT
+        with ESMTP id S1343546AbiDAK34 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 1 Apr 2022 06:29:56 -0400
 Received: from mxout04.lancloud.ru (mxout04.lancloud.ru [45.84.86.114])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B9C26E57B
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0E8526E57F
         for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 03:28:05 -0700 (PDT)
 Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 1779520CAB74
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 4801F20C837F
 Received: from LanCloud
 Received: from LanCloud
 Received: from LanCloud
 From:   Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
 To:     <linux-bluetooth@vger.kernel.org>
 CC:     Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
-Subject: [PATCH BlueZ 1/7] monitor: Fix out-of-bound read in print_le_states
-Date:   Fri, 1 Apr 2022 13:27:51 +0300
-Message-ID: <20220401102757.3960551-2-i.kamaletdinov@omp.ru>
+Subject: [PATCH BlueZ 6/7] device: Limit width of fields in sscanf
+Date:   Fri, 1 Apr 2022 13:27:56 +0300
+Message-ID: <20220401102757.3960551-7-i.kamaletdinov@omp.ru>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220401102757.3960551-1-i.kamaletdinov@omp.ru>
 References: <20220401102757.3960551-1-i.kamaletdinov@omp.ru>
@@ -40,42 +40,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Accessing le_states_desc_table array with value 15 can cause
-out-of-bound read because current size of array is 14.
-
-Currently this cannot lead to any problems becase we do no have such
-state in le_states_comb_table but this could be changed in future and
-raise described problem.
+In src/device.c few sscanf does not limit width of uuid field. This
+could lead to static overflow and stack corruption.
 
 Found by Linux Verification Center (linuxtesting.org) with the SVACE
 static analysis tool.
 ---
- monitor/packet.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ src/device.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index b7431b57d..15d629e2d 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2816,7 +2816,8 @@ static const struct {
- static void print_le_states(const uint8_t *states_array)
- {
- 	uint64_t mask, states = 0;
--	int i, n;
-+	int i = 0;
-+	size_t n = 0;
+diff --git a/src/device.c b/src/device.c
+index 381faf91c..8dc12d026 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3790,8 +3790,8 @@ static int load_desc(char *handle, char *value,
+ 		return -EIO;
  
- 	for (i = 0; i < 8; i++)
- 		states |= ((uint64_t) states_array[i]) << (i * 8);
-@@ -2833,7 +2834,7 @@ static void print_le_states(const uint8_t *states_array)
- 		if (!(states & val))
- 			continue;
+ 	/* Check if there is any value stored, otherwise it is just the UUID */
+-	if (sscanf(value, "%04hx:%s", &val, uuid_str) != 2) {
+-		if (sscanf(value, "%s", uuid_str) != 1)
++	if (sscanf(value, "%04hx:%36s", &val, uuid_str) != 2) {
++		if (sscanf(value, "%36s", uuid_str) != 1)
+ 			return -EIO;
+ 		val = 0;
+ 	}
+@@ -3840,9 +3840,9 @@ static int load_chrc(char *handle, char *value,
+ 		return -EIO;
  
--		for (n = 0; n < 16; n++) {
-+		for (n = 0; n < ARRAY_SIZE(le_states_desc_table); n++) {
- 			if (le_states_comb_table[i].states & (1 << n))
- 				str[num++] = le_states_desc_table[n].str;
- 		}
+ 	/* Check if there is any value stored */
+-	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%s",
++	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%36s",
+ 			&value_handle, &properties, val_str, uuid_str) != 4) {
+-		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%s",
++		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%36s",
+ 				&value_handle, &properties, uuid_str) != 3)
+ 			return -EIO;
+ 		val_len = 0;
+@@ -3884,8 +3884,8 @@ static int load_incl(struct gatt_db *db, char *handle, char *value,
+ 	if (sscanf(handle, "%04hx", &start) != 1)
+ 		return -EIO;
+ 
+-	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%s", &start, &end,
+-								uuid_str) != 3)
++	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%36s", &start,
++							&end, uuid_str) != 3)
+ 		return -EIO;
+ 
+ 	/* Log debug message. */
+@@ -3918,7 +3918,7 @@ static int load_service(struct gatt_db *db, char *handle, char *value)
+ 	if (sscanf(handle, "%04hx", &start) != 1)
+ 		return -EIO;
+ 
+-	if (sscanf(value, "%[^:]:%04hx:%s", type, &end, uuid_str) != 3)
++	if (sscanf(value, "%[^:]:%04hx:%36s", type, &end, uuid_str) != 3)
+ 		return -EIO;
+ 
+ 	if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR))
 -- 
 2.35.1
 
