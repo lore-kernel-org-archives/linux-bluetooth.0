@@ -2,201 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D052C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 08:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F06B5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243948AbiDAIrh (ORCPT
+        id S1343645AbiDAK35 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 04:47:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46082 "EHLO
+        Fri, 1 Apr 2022 06:29:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230512AbiDAIrg (ORCPT
+        with ESMTP id S1343542AbiDAK34 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 04:47:36 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 131103C72A
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 01:45:46 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id a5so1543765qvx.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Apr 2022 01:45:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=iUuATVdUsYCS1AGZkFAL9u67UqMeCjLZ+3GIO+A7TlU=;
-        b=dF3lIa6AMJv/2w7PwednSaJXYhAbs07SppJ+F94QyWeu6hhcf0hfN7cEQnfH2reg3S
-         r7mE1zPai07K/RluzCqK4d9Yb8oKaLO/ZoJoH/DbIq1XIYsYpcCUFdeT2pPmxGSj9TOV
-         9eMdGzz+2yfVbQ3f/uxeGAa8+CjlprI+hwNYWbxcN+qG8ijXJejiUAbiy1WBlKyuPETS
-         K16ZiKt1VBx/CCZ5MdfX9VSPyaAEvYWujre+k5Q8MlwaI6ED+SCQzX0RG8joGWU6jDE+
-         qDFjjaAJ+ML3LYjD5k8zcSsC9zh4YekEQeFH8KAfyDhIlXHTLnik/HfdAegguDgzG1qO
-         nJ+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=iUuATVdUsYCS1AGZkFAL9u67UqMeCjLZ+3GIO+A7TlU=;
-        b=5F+SKrbyxLcjB9BAzBOrX1bXesMM6RRXFXEhRtvMcX30Gt/ozVlj/IQVIlCNAo+u4W
-         GUhrSsn0j+h/JLRi563Vnt1hjMznrB3MI3VQpfgm9LS0saJ9ElXFbPKqTRtue7qgj21A
-         ITBvx3E6rEX75v4bsp/TcHTCGZbQeemAEq/8rXvL4upizMNxo/+ZyFHg+rRiiID4bN6R
-         c3/9KrWKcvdC8i5wDDCodRk8kGh3+ntJfnGuDinx8O7xx80e5Dv4IpZokr4QQjj05pQ6
-         dfBs5G4U0snVEdf7A0lWQmI1hy4fXX2bbyG77fxJTjjH/76sVm4IpzsizY1MWC/T/9hj
-         15aA==
-X-Gm-Message-State: AOAM530r3UHsOQGbp2iPlp2fXJI09quAufLwKwm4/GWWqEZc0ArzVBtK
-        MRiLXxSpOUBHiIEXgKIJMrVTgSt8szlslw==
-X-Google-Smtp-Source: ABdhPJx1PsXabuco1JNB7oOkVkijFUay0Pu121lKWG41GWE4HRpQTdQZYpkuGL6WRE+mNbiukUCsLw==
-X-Received: by 2002:a05:6214:c85:b0:441:2bb9:92fa with SMTP id r5-20020a0562140c8500b004412bb992famr7096418qvr.21.1648802744719;
-        Fri, 01 Apr 2022 01:45:44 -0700 (PDT)
-Received: from [172.17.0.2] ([40.70.81.155])
-        by smtp.gmail.com with ESMTPSA id y12-20020a05622a164c00b002e1e277885esm1345114qtj.8.2022.04.01.01.45.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Apr 2022 01:45:44 -0700 (PDT)
-Message-ID: <6246bbb8.1c69fb81.7d321.7b15@mx.google.com>
-Date:   Fri, 01 Apr 2022 01:45:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7087515089663237929=="
+        Fri, 1 Apr 2022 06:29:56 -0400
+Received: from mxout04.lancloud.ru (mxout04.lancloud.ru [45.84.86.114])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B9C26E57B
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 03:28:05 -0700 (PDT)
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 1779520CAB74
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+From:   Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
+Subject: [PATCH BlueZ 1/7] monitor: Fix out-of-bound read in print_le_states
+Date:   Fri, 1 Apr 2022 13:27:51 +0300
+Message-ID: <20220401102757.3960551-2-i.kamaletdinov@omp.ru>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220401102757.3960551-1-i.kamaletdinov@omp.ru>
+References: <20220401102757.3960551-1-i.kamaletdinov@omp.ru>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, i.kamaletdinov@omp.ru
-Subject: RE: Fix bugs found by SVACE static analisys tool
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220401074640.3956695-2-i.kamaletdinov@omp.ru>
-References: <20220401074640.3956695-2-i.kamaletdinov@omp.ru>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
+ LFEX1910.lancloud.ru (fd00:f066::80)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7087515089663237929==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Accessing le_states_desc_table array with value 15 can cause
+out-of-bound read because current size of array is 14.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjI4MTA5CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgOS45OCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICA2Ljk2IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDQyLjMzIHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuNjggc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC40
-NSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAzNi40NiBz
-ZWNvbmRzCk1ha2UgQ2hlY2sgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMC40OCBzZWNv
-bmRzCk1ha2UgQ2hlY2sgdy9WYWxncmluZCAgICAgICAgIEZBSUwgICAgICAzNS42NCBzZWNvbmRz
-Ck1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMjMuMTYgc2Vjb25kcwpC
-dWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgOC41NyBzZWNvbmRzCkJ1aWxk
-IHcvZXh0IEVMTCAtIE1ha2UgICAgICAgIEZBSUwgICAgICAzNi45MyBzZWNvbmRzCkluY3JlbWVu
-dGFsIEJ1aWxkIHdpdGggcGF0Y2hlc0ZBSUwgICAgICA0Ni4wOCBzZWNvbmRzCgpEZXRhaWxzCiMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja1BhdGNoIC0gRkFJTApEZXNj
-OiBSdW4gY2hlY2twYXRjaC5wbCBzY3JpcHQgd2l0aCBydWxlIGluIC5jaGVja3BhdGNoLmNvbmYK
-T3V0cHV0OgpbQmx1ZVosMy83XSB0b29sczogRml4IHNpZ25lZCBpbnRlcmdlciBvdmVyZmxvdyBp
-biBidHNub29wLmMKV0FSTklORzpUWVBPX1NQRUxMSU5HOiAnaW50ZXJnZXInIG1heSBiZSBtaXNz
-cGVsbGVkIC0gcGVyaGFwcyAnaW50ZWdlcic/CiMzNTogClN1YmplY3Q6IFtQQVRDSCBCbHVlWiAz
-LzddIHRvb2xzOiBGaXggc2lnbmVkIGludGVyZ2VyIG92ZXJmbG93IGluIGJ0c25vb3AuYwogICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBeXl5eXl5eXgoKL2dpdGh1
-Yi93b3Jrc3BhY2Uvc3JjLzEyNzk3OTc0LnBhdGNoIHRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5n
-cywgOCBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0
-cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0
-byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBsYWNlLgoKL2dpdGh1
-Yi93b3Jrc3BhY2Uvc3JjLzEyNzk3OTc0LnBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09N
-UExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09G
-RiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9UQUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19L
-U1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBs
-ZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCgpbQmx1ZVosNC83XSB0b29sczogUHJldmVudCBpbmZpbml0eSBsb29w
-cyBpbiBibHVlbW9vbi5jCldBUk5JTkc6VFlQT19TUEVMTElORzogJ3N0YW5kYXJ0JyBtYXkgYmUg
-bWlzc3BlbGxlZCAtIHBlcmhhcHMgJ3N0YW5kYXJkJz8KIzUwOiAKQWNjb3JkaW5nIHRvIEM5OSBz
-dGFuZGFydCBTSVpFX01BWCBjb3VsZCBiZSBhcyBzbWFsbCBhcyA2NTUzNS4KICAgICAgICAgICAg
-ICAgICBeXl5eXl5eXgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjLzEyNzk3OTc1LnBhdGNoIHRvdGFs
-OiAwIGVycm9ycywgMSB3YXJuaW5ncywgMjUgbGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUg
-b2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAg
-bWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3Ig
-LS1maXgtaW5wbGFjZS4KCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjc5Nzk3NS5wYXRjaCBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlw
-ZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9D
-SEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQ
-TElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBh
-cmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKW0JsdWVaLDYvN10gZGV2aWNl
-OiBMaW1pdCB3aWR0aCBvZiBmaWVsZHMgaW4gc3NjYW5mCldBUk5JTkc6TE9OR19MSU5FOiBsaW5l
-IGxlbmd0aCBvZiA4MiBleGNlZWRzIDgwIGNvbHVtbnMKIzkwOiBGSUxFOiBzcmMvZGV2aWNlLmM6
-Mzg4NzoKKwlpZiAoc3NjYW5mKHZhbHVlLCBHQVRUX0lOQ0xVREVfVVVJRF9TVFIgIjolMDRoeDol
-MDRoeDolMzZzIiwgJnN0YXJ0LCAmZW5kLAoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjLzEyNzk3OTc4
-LnBhdGNoIHRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMzcgbGluZXMgY2hlY2tlZAoKTk9U
-RTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0Y2ggbWF5IGJlIGFi
-bGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGljYWwgc3R5bGUgdXNp
-bmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjc5Nzk3
-OC5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVk
-IG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNU
-IEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJ
-Q0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2Yg
-dGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0g
-dG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKW0JsdWVa
-LDcvN10gZ2F0dDogRml4IGRvdWJsZSBmcmVlIGFuZCBmcmVlZCBtZW1vcnkgZGVyZWZlcmVuY2UK
-V0FSTklORzpUWVBPX1NQRUxMSU5HOiAnb2NjdXJlJyBtYXkgYmUgbWlzc3BlbGxlZCAtIHBlcmhh
-cHMgJ29jY3VycmVkJz8KIzUwOiAKbm90aWZpY2F0aW9uIGl0IGlzIHBvc3NpYmxlIHRvIHRvIG9j
-Y3VyZSBkb3VibGUgZnJlZSBhbmQgZGVyZWZlcmVuY2Ugb2YKICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgIF5eXl5eXgoKV0FSTklORzpSRVBFQVRFRF9XT1JEOiBQb3NzaWJsZSByZXBl
-YXRlZCB3b3JkOiAndG8nCiM1MDogCm5vdGlmaWNhdGlvbiBpdCBpcyBwb3NzaWJsZSB0byB0byBv
-Y2N1cmUgZG91YmxlIGZyZWUgYW5kIGRlcmVmZXJlbmNlIG9mCgovZ2l0aHViL3dvcmtzcGFjZS9z
-cmMvMTI3OTc5NjgucGF0Y2ggdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMCBsaW5lcyBj
-aGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRj
-aCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNh
-bCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uv
-c3JjLzEyNzk3OTY4LnBhdGNoIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5P
-VEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09NTUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBD
-T05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMgTUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFD
-S0VEIFNQRFhfTElDRU5TRV9UQUcgU1BMSVRfU1RSSU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6
-IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQK
-ICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
-UlMuCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAt
-IEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVaIHNvdXJjZSB0cmVlCk91dHB1dDoKbW9uaXRvci9w
-YWNrZXQuYzogSW4gZnVuY3Rpb24g4oCYcHJpbnRfbGVfc3RhdGVz4oCZOgptb25pdG9yL3BhY2tl
-dC5jOjI4MzY6MTc6IGVycm9yOiBjb21wYXJpc29uIG9mIGludGVnZXIgZXhwcmVzc2lvbnMgb2Yg
-ZGlmZmVyZW50IHNpZ25lZG5lc3M6IOKAmGludOKAmSBhbmQg4oCYbG9uZyB1bnNpZ25lZCBpbnTi
-gJkgWy1XZXJyb3I9c2lnbi1jb21wYXJlXQogMjgzNiB8ICAgZm9yIChuID0gMDsgbiA8IEFSUkFZ
-X1NJWkUobGVfc3RhdGVzX2Rlc2NfdGFibGUpOyBuKyspIHsKICAgICAgfCAgICAgICAgICAgICAg
-ICAgXgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAq
-KiogW01ha2VmaWxlOjcyNzc6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZTogKioqIFtN
-YWtlZmlsZTo0MzEwOiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMKVGVzdDogTWFrZSBDaGVjayAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJwpPdXRwdXQ6
-Cm1vbml0b3IvcGFja2V0LmM6IEluIGZ1bmN0aW9uIOKAmHByaW50X2xlX3N0YXRlc+KAmToKbW9u
-aXRvci9wYWNrZXQuYzoyODM2OjE3OiBlcnJvcjogY29tcGFyaXNvbiBvZiBpbnRlZ2VyIGV4cHJl
-c3Npb25zIG9mIGRpZmZlcmVudCBzaWduZWRuZXNzOiDigJhpbnTigJkgYW5kIOKAmGxvbmcgdW5z
-aWduZWQgaW504oCZIFstV2Vycm9yPXNpZ24tY29tcGFyZV0KIDI4MzYgfCAgIGZvciAobiA9IDA7
-IG4gPCBBUlJBWV9TSVpFKGxlX3N0YXRlc19kZXNjX3RhYmxlKTsgbisrKSB7CiAgICAgIHwgICAg
-ICAgICAgICAgICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
-bWFrZVsxXTogKioqIFtNYWtlZmlsZTo3Mjc3OiBtb25pdG9yL3BhY2tldC5vXSBFcnJvciAxCm1h
-a2U6ICoqKiBbTWFrZWZpbGU6MTEyODM6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgdy9WYWxncmluZCAtIEZBSUwKRGVzYzog
-UnVuICdtYWtlIGNoZWNrJyB3aXRoIFZhbGdyaW5kCk91dHB1dDoKbW9uaXRvci9wYWNrZXQuYzog
-SW4gZnVuY3Rpb24g4oCYcHJpbnRfbGVfc3RhdGVz4oCZOgptb25pdG9yL3BhY2tldC5jOjI4MzY6
-MTc6IGVycm9yOiBjb21wYXJpc29uIG9mIGludGVnZXIgZXhwcmVzc2lvbnMgb2YgZGlmZmVyZW50
-IHNpZ25lZG5lc3M6IOKAmGludOKAmSBhbmQg4oCYbG9uZyB1bnNpZ25lZCBpbnTigJkgWy1XZXJy
-b3I9c2lnbi1jb21wYXJlXQogMjgzNiB8ICAgZm9yIChuID0gMDsgbiA8IEFSUkFZX1NJWkUobGVf
-c3RhdGVzX2Rlc2NfdGFibGUpOyBuKyspIHsKICAgICAgfCAgICAgICAgICAgICAgICAgXgpjYzE6
-IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2Vm
-aWxlOjcyNzc6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0
-MzEwOiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
-QnVpbGQgdy9leHQgRUxMIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZVogc291cmNlIHdp
-dGggJy0tZW5hYmxlLWV4dGVybmFsLWVsbCcgY29uZmlndXJhdGlvbgpPdXRwdXQ6Cm1vbml0b3Iv
-cGFja2V0LmM6IEluIGZ1bmN0aW9uIOKAmHByaW50X2xlX3N0YXRlc+KAmToKbW9uaXRvci9wYWNr
-ZXQuYzoyODM2OjE3OiBlcnJvcjogY29tcGFyaXNvbiBvZiBpbnRlZ2VyIGV4cHJlc3Npb25zIG9m
-IGRpZmZlcmVudCBzaWduZWRuZXNzOiDigJhpbnTigJkgYW5kIOKAmGxvbmcgdW5zaWduZWQgaW50
-4oCZIFstV2Vycm9yPXNpZ24tY29tcGFyZV0KIDI4MzYgfCAgIGZvciAobiA9IDA7IG4gPCBBUlJB
-WV9TSVpFKGxlX3N0YXRlc19kZXNjX3RhYmxlKTsgbisrKSB7CiAgICAgIHwgICAgICAgICAgICAg
-ICAgIF4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZTo3Mjc3OiBtb25pdG9yL3BhY2tldC5vXSBFcnJvciAxCm1ha2U6ICoqKiBb
-TWFrZWZpbGU6NDMxMDogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjClRlc3Q6IEluY3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlcyAtIEZBSUwKRGVzYzogSW5j
-cmVtZW50YWwgYnVpbGQgcGVyIHBhdGNoIGluIHRoZSBzZXJpZXMKT3V0cHV0Ogptb25pdG9yL3Bh
-Y2tldC5jOiBJbiBmdW5jdGlvbiDigJhwcmludF9sZV9zdGF0ZXPigJk6Cm1vbml0b3IvcGFja2V0
-LmM6MjgzNjoxNzogZXJyb3I6IGNvbXBhcmlzb24gb2YgaW50ZWdlciBleHByZXNzaW9ucyBvZiBk
-aWZmZXJlbnQgc2lnbmVkbmVzczog4oCYaW504oCZIGFuZCDigJhsb25nIHVuc2lnbmVkIGludOKA
-mSBbLVdlcnJvcj1zaWduLWNvbXBhcmVdCiAyODM2IHwgICBmb3IgKG4gPSAwOyBuIDwgQVJSQVlf
-U0laRShsZV9zdGF0ZXNfZGVzY190YWJsZSk7IG4rKykgewogICAgICB8ICAgICAgICAgICAgICAg
-ICBeCmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoq
-KiBbTWFrZWZpbGU6NzI3NzogbW9uaXRvci9wYWNrZXQub10gRXJyb3IgMQptYWtlOiAqKiogW01h
-a2VmaWxlOjQzMTA6IGFsbF0gRXJyb3IgMgoKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290
-aAoK
+Currently this cannot lead to any problems becase we do no have such
+state in le_states_comb_table but this could be changed in future and
+raise described problem.
 
---===============7087515089663237929==--
+Found by Linux Verification Center (linuxtesting.org) with the SVACE
+static analysis tool.
+---
+ monitor/packet.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/monitor/packet.c b/monitor/packet.c
+index b7431b57d..15d629e2d 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -2816,7 +2816,8 @@ static const struct {
+ static void print_le_states(const uint8_t *states_array)
+ {
+ 	uint64_t mask, states = 0;
+-	int i, n;
++	int i = 0;
++	size_t n = 0;
+ 
+ 	for (i = 0; i < 8; i++)
+ 		states |= ((uint64_t) states_array[i]) << (i * 8);
+@@ -2833,7 +2834,7 @@ static void print_le_states(const uint8_t *states_array)
+ 		if (!(states & val))
+ 			continue;
+ 
+-		for (n = 0; n < 16; n++) {
++		for (n = 0; n < ARRAY_SIZE(le_states_desc_table); n++) {
+ 			if (le_states_comb_table[i].states & (1 << n))
+ 				str[num++] = le_states_desc_table[n].str;
+ 		}
+-- 
+2.35.1
+
