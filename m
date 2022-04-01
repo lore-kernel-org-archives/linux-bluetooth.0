@@ -2,31 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B945BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 11:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7943C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 11:14:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345375AbiDALQL (ORCPT
+        id S1345366AbiDALQM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 07:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52602 "EHLO
+        Fri, 1 Apr 2022 07:16:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345366AbiDALQK (ORCPT
+        with ESMTP id S1345371AbiDALQL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 07:16:10 -0400
-Received: from mxout04.lancloud.ru (mxout04.lancloud.ru [45.84.86.114])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6F9012E14B
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 04:14:16 -0700 (PDT)
+        Fri, 1 Apr 2022 07:16:11 -0400
+Received: from mxout01.lancloud.ru (mxout01.lancloud.ru [45.84.86.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7633132E8D
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 04:14:17 -0700 (PDT)
 Received: from LanCloud
-DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 6BB1A20CBB8A
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout01.lancloud.ru DBD6520D4AD3
 Received: from LanCloud
 Received: from LanCloud
 Received: from LanCloud
 From:   Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
 To:     <linux-bluetooth@vger.kernel.org>
 CC:     Ildar Kamaletdinov <i.kamaletdinov@omp.ru>
-Subject: [PATCH BlueZ 5/7] tools: Limit width of fields in sscanf
-Date:   Fri, 1 Apr 2022 14:14:06 +0300
-Message-ID: <20220401111408.3961844-6-i.kamaletdinov@omp.ru>
+Subject: [PATCH BlueZ 7/7] gatt: Fix double free and freed memory dereference
+Date:   Fri, 1 Apr 2022 14:14:08 +0300
+Message-ID: <20220401111408.3961844-8-i.kamaletdinov@omp.ru>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220401111408.3961844-1-i.kamaletdinov@omp.ru>
 References: <20220401111408.3961844-1-i.kamaletdinov@omp.ru>
@@ -40,42 +40,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In tools/btmgmt.c and tools/hex2hcd.c few sscanf does not limit width
-of fields. This could lead to static overflow and stack corruption.
+If device is no longer exists or not paired when notifications send it
+is possible to get double free and dereference of already freed memory.
+
+To avoid this we need to recheck the state of device after sending
+notification.
 
 Found by Linux Verification Center (linuxtesting.org) with the SVACE
 static analysis tool.
 ---
- tools/btmgmt.c  | 2 +-
- tools/hex2hcd.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ src/gatt-database.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 42ef9acef..8f63f12ba 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -5164,7 +5164,7 @@ static bool str2pattern(struct mgmt_adv_pattern *pattern, const char *str)
- 	char pattern_str[62] = { 0 };
- 	char tmp;
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index d6c94058c..d32f616a9 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -3877,6 +3877,10 @@ void btd_gatt_database_server_connected(struct btd_gatt_database *database,
  
--	if (sscanf(str, "%2hhx%n:%2hhx%n:%s", &pattern->ad_type, &type_len,
-+	if (sscanf(str, "%2hhx%n:%2hhx%n:%61s", &pattern->ad_type, &type_len,
- 			&pattern->offset, &offset_end_pos, pattern_str) != 3)
- 		return false;
+ 	send_notification_to_device(state, state->pending);
  
-diff --git a/tools/hex2hcd.c b/tools/hex2hcd.c
-index 674d62744..e6dca5a81 100644
---- a/tools/hex2hcd.c
-+++ b/tools/hex2hcd.c
-@@ -248,7 +248,7 @@ static void ver_parse_file(const char *pathname)
- 
- 	memset(ver, 0, sizeof(*ver));
- 
--	if (sscanf(pathname, "%[A-Z0-9]_%3c.%3c.%3c.%4c.%4c.hex",
-+	if (sscanf(pathname, "%19[A-Z0-9]_%3c.%3c.%3c.%4c.%4c.hex",
- 					ver->name, ver->major, ver->minor,
- 					ver->build, dummy1, dummy2) != 6) {
- 		printf("\t/* failed to parse %s */\n", pathname);
++	state = find_device_state(database, &bdaddr, bdaddr_type);
++	if (!state || !state->pending)
++		return;
++
+ 	free(state->pending->value);
+ 	free(state->pending);
+ 	state->pending = NULL;
 -- 
 2.35.1
 
