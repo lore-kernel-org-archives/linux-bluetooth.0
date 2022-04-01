@@ -2,124 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D51D2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 17:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 450E1C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 17:30:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350018AbiDARb2 convert rfc822-to-8bit (ORCPT
+        id S1345574AbiDARcF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 13:31:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49588 "EHLO
+        Fri, 1 Apr 2022 13:32:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243872AbiDARbZ (ORCPT
+        with ESMTP id S243872AbiDARcE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 13:31:25 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 35EA61AAA4E
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 10:29:31 -0700 (PDT)
-Received: from smtpclient.apple (p4ff9fa3c.dip0.t-ipconnect.de [79.249.250.60])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A33B6CED02;
-        Fri,  1 Apr 2022 19:29:30 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH v3 2/3] Bluetooth: Print broken quirks
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220330182552.2613523-2-luiz.dentz@gmail.com>
-Date:   Fri, 1 Apr 2022 19:29:30 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6AFB6D57-1342-445D-A9CC-C761DB356E16@holtmann.org>
-References: <20220330182552.2613523-1-luiz.dentz@gmail.com>
- <20220330182552.2613523-2-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        Fri, 1 Apr 2022 13:32:04 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AF9E1A9488
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 10:30:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C4563B82592
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Apr 2022 17:30:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E6E0C340EC;
+        Fri,  1 Apr 2022 17:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648834212;
+        bh=8ExYeFAIpiUlehHEsPjzfGmsJoxl3gqgsbk9Pz9Zz0E=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=FCaWbxWSVne1L0snwjbFukWUmLxzjqs93GuuJOXKpWdZ0eEcx7OeV48fGsr4AB/Dz
+         VAtMryX4/RCSTDW9GkEOx0/IzlfA6dMJUpudadFOOEvMvNhiKFtHJR0lQCdAQcKNcq
+         WbonSxleHFAG7SUTmiAyN7J1DEBobvmuvE3iGf0oOMVQP+/vLoBIwIS76UJx4tw4n2
+         TwnmJ/QWfcKE7Gdis/DPdE2J/abAwi4+5tNt7Cq3hT9sDIfvOhZ+Ch5Bu1h7GkiHrX
+         COSCGIxjLNR9tBcygE1SeCrmgVPWWZSKsrDjxyXhLf5AqyJ3UZydJYSyf8uIRvapzM
+         1jo32ewevJ6qA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E8B0E6BBCA;
+        Fri,  1 Apr 2022 17:30:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/3] Add Mesh functionality to net/bluetooth
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164883421225.6587.11737123964714497714.git-patchwork-notify@kernel.org>
+Date:   Fri, 01 Apr 2022 17:30:12 +0000
+References: <20220331180749.456913-1-brian.gix@intel.com>
+In-Reply-To: <20220331180749.456913-1-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hello:
 
-> This prints warnings for controllers setting broken quirks to increase
-> their visibility and warn about broken controllers firmware that
-> probably needs updates to behave properly.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/hci_sync.c | 53 +++++++++++++++++++++++++++++++++++++---
-> 1 file changed, 49 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 8f4c5698913d..e97880d7bdb2 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3825,6 +3825,54 @@ static int hci_init_sync(struct hci_dev *hdev)
-> 	return 0;
-> }
-> 
-> +#define HCI_QUIRK_BROKEN(_quirk, _desc) { HCI_QUIRK_BROKEN_##_quirk, _desc }
-> +
-> +static const struct {
-> +	unsigned long quirk;
-> +	const char *desc;
-> +} hci_broken_table[] = {
-> +	HCI_QUIRK_BROKEN(LOCAL_COMMANDS,
-> +			 "HCI Read Local Supported Commands not supported"),
-> +	HCI_QUIRK_BROKEN(STORED_LINK_KEY,
-> +			 "HCI Delete Stored Link Key command is advertised, "
-> +			 "but not supported."),
-> +	HCI_QUIRK_BROKEN(ERR_DATA_REPORTING,
-> +			 "HCI Read Default Erroneous Data Reporting command is "
-> +			 "advertised, but not supported."),
-> +	HCI_QUIRK_BROKEN(READ_TRANSMIT_POWER,
-> +			 "HCI Read Transmit Power Level command is advertised, "
-> +			 "but not supported."),
-> +	HCI_QUIRK_BROKEN(FILTER_CLEAR_ALL,
-> +			 "HCI Set Event Filter command not supported."),
-> +	HCI_QUIRK_BROKEN(ENHANCED_SETUP_SYNC_CONN,
-> +			 "HCI Enhanced Setup Synchronous Connection command is "
-> +			 "advertised, but not supported.")
-> +};
-> +
-> +static int hci_dev_setup_sync(struct hci_dev *hdev)
-> +{
-> +	size_t i;
-> +
-> +	bt_dev_dbg(hdev, "");
-> +
-> +	hci_sock_dev_event(hdev, HCI_DEV_SETUP);
-> +
-> +	if (hdev->setup) {
-> +		int ret;
-> +
-> +		ret = hdev->setup(hdev);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
-> +		if (test_bit(hci_broken_table[i].quirk, &hdev->quirks))
-> +			bt_dev_warn(hdev, "%s", hci_broken_table[i].desc);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> int hci_dev_open_sync(struct hci_dev *hdev)
-> {
-> 	int ret = 0;
-> @@ -3887,10 +3935,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
-> 	    test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
-> 		bool invalid_bdaddr;
-> 
-> -		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
-> -
-> -		if (hdev->setup)
-> -			ret = hdev->setup(hdev);
-> +		ret = hci_dev_setup_sync(hdev);
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
 
-just put the code here instead of creating another helper function.
+On Thu, 31 Mar 2022 11:07:46 -0700 you wrote:
+> Housekeeping and implementation.
+> 
+> Brian Gix (3):
+>   Bluetooth: Keep MGMT pending queue ordered FIFO
+>   Bluetooth: Implement support for Mesh
+>   Bluetooth: Add experimental wrapper for MGMT based mesh
+> 
+> [...]
 
-Regards
+Here is the summary with links:
+  - [1/3] Bluetooth: Keep MGMT pending queue ordered FIFO
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2598fe7291d8
+  - [2/3] Bluetooth: Implement support for Mesh
+    (no matching commit)
+  - [3/3] Bluetooth: Add experimental wrapper for MGMT based mesh
+    (no matching commit)
 
-Marcel
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
