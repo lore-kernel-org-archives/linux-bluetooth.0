@@ -2,53 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE35C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 14:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3311DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Apr 2022 14:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346842AbiDAO1d (ORCPT
+        id S1346877AbiDAO1o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Apr 2022 10:27:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33878 "EHLO
+        Fri, 1 Apr 2022 10:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346832AbiDAO1c (ORCPT
+        with ESMTP id S1346863AbiDAO1k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Apr 2022 10:27:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59AD5147510;
-        Fri,  1 Apr 2022 07:25:43 -0700 (PDT)
+        Fri, 1 Apr 2022 10:27:40 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3B719E396;
+        Fri,  1 Apr 2022 07:25:49 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id EB4BA61BCE;
-        Fri,  1 Apr 2022 14:25:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEEA2C340F2;
-        Fri,  1 Apr 2022 14:25:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F334CB82466;
+        Fri,  1 Apr 2022 14:25:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25E13C34112;
+        Fri,  1 Apr 2022 14:25:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648823142;
-        bh=gouVROA5DvaNV23cEyJOTX1H2nEAK67vhW8Pg5mWjpY=;
+        s=k20201202; t=1648823146;
+        bh=su2KRCwuNBQc7cumBH0i19tL0bZ1Vk8IOtg5gBsMwE8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hkVL15N5LSb8Y9Lxv1RJcj+yEGV+0+uGC1cLJkSZnyNcFIcFcwJkJBzlvRUEX8cQ3
-         NFW25q29R0xv5Bplff3qo0SF8xbh66gMVEqC9Erla0+vteC2eW2XYzjKFWenk3tBjX
-         959f5GKrey9FBeU+nhhZ7ChugnVH65BL5lQXU6nCakpb+NZE3nRlfubImZOAvOR356
-         XJ1pC+clMeNuw06MV41ykUHvxzINCHFGOgC9TgpjGAFCQ4f4xrHRANdmiPJbPS93Lr
-         HwW9QrdzuNAODaCUzIjasCJ00ORWWkxoziSwZeMtPHTFfCyrR2jWYYSobURQd/88pG
-         v2yNAvIkrT4bg==
+        b=B8u2gZZ20ooYEha3m6tIE8lvxp9Xa0PQaJMiweJJqAWQuHO/EnZXFRaQvrJQ+yXvS
+         iJ1rdIqWqGc+4Onxd8JTnvfUS7Z/ookj44cCV92PBnjxjWBMMRA3G0+jy4rqlZsCrF
+         5mHX+nKkwYAWNJcDOo8Vdvi4xC38Mc6zYchB1dXnQLltya4fZatYrIYeW9+Ru3Wr0G
+         fEsgGfOSkZPMKJiGkZAe9RERjyTYSg+qqf13f9f5X0lJphUO+k4ZjCleqLPC7lERKE
+         aXVv5/A93c6Bm0A+K8wS+Bw6UrjpEMZjEs2obs5wBJXNjJivJAhMn/QCY3ylvFda68
+         OaDRk9/kYvjmQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 002/149] Bluetooth: hci_sync: Fix compilation warning
-Date:   Fri,  1 Apr 2022 10:23:09 -0400
-Message-Id: <20220401142536.1948161-2-sashal@kernel.org>
+Cc:     Soenke Huster <soenke.huster@eknoes.de>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.17 004/149] Bluetooth: fix null ptr deref on hci_sync_conn_complete_evt
+Date:   Fri,  1 Apr 2022 10:23:11 -0400
+Message-Id: <20220401142536.1948161-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220401142536.1948161-1-sashal@kernel.org>
 References: <20220401142536.1948161-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -56,37 +55,47 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Soenke Huster <soenke.huster@eknoes.de>
 
-[ Upstream commit 89a0b8b98f49ae34886e67624208c2898e1e4d7f ]
+[ Upstream commit 3afee2118132e93e5f6fa636dfde86201a860ab3 ]
 
-This fixes the following warning:
+This event is just specified for SCO and eSCO link types.
+On the reception of a HCI_Synchronous_Connection_Complete for a BDADDR
+of an existing LE connection, LE link type and a status that triggers the
+second case of the packet processing a NULL pointer dereference happens,
+as conn->link is NULL.
 
-net/bluetooth/hci_sync.c:5143:5: warning: no previous prototype for
-‘hci_le_ext_create_conn_sync’ [-Wmissing-prototypes]
-
+Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_sync.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index ab9aa700b6b3..4426cc2aaf4a 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5140,8 +5140,8 @@ static void set_ext_conn_params(struct hci_conn *conn,
- 	p->max_ce_len = cpu_to_le16(0x0000);
- }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fc30f4c03d29..e47cde778b1c 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4661,6 +4661,19 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+ 	struct hci_ev_sync_conn_complete *ev = data;
+ 	struct hci_conn *conn;
  
--int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
--				u8 own_addr_type)
-+static int hci_le_ext_create_conn_sync(struct hci_dev *hdev,
-+				       struct hci_conn *conn, u8 own_addr_type)
- {
- 	struct hci_cp_le_ext_create_conn *cp;
- 	struct hci_cp_le_ext_conn_param *p;
++	switch (ev->link_type) {
++	case SCO_LINK:
++	case ESCO_LINK:
++		break;
++	default:
++		/* As per Core 5.3 Vol 4 Part E 7.7.35 (p.2219), Link_Type
++		 * for HCI_Synchronous_Connection_Complete is limited to
++		 * either SCO or eSCO
++		 */
++		bt_dev_err(hdev, "Ignoring connect complete event for invalid link type");
++		return;
++	}
++
+ 	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
+ 
+ 	hci_dev_lock(hdev);
 -- 
 2.34.1
 
