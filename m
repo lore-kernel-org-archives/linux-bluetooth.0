@@ -2,129 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFE3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Apr 2022 00:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBB1C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Apr 2022 02:40:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356108AbiDDAgl (ORCPT
+        id S1376923AbiDDCmH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Apr 2022 20:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54576 "EHLO
+        Sun, 3 Apr 2022 22:42:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354020AbiDDAgk (ORCPT
+        with ESMTP id S1356313AbiDDCmG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Apr 2022 20:36:40 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17597193C6
-        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Apr 2022 17:34:45 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id k23so13267966ejd.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Apr 2022 17:34:45 -0700 (PDT)
+        Sun, 3 Apr 2022 22:42:06 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BA824092
+        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Apr 2022 19:40:10 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id t2so6666715qtw.9
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Apr 2022 19:40:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sMDg7eh35+cgK9V+wCbU7Bj5WyzMtSWA+Ve2bb7rcGo=;
-        b=ijR/OXY90Hpv2aVO/T1AWe/deI7xFC7UOxsplMaZ7Te/c42R4rxBfTwOiMGknwyEtI
-         9eEFrpyM9fcUVoE0ANAMCVNPMDtnBSUMYkBknPG68r+kWqVsALONkRmHuKsoWQ1/LNHD
-         z8f7Xi2AKr+Z003FKTfR2PLj7oM6X7mXO/REMSyWsfyF9RGekAOE4juqFAiF9sEhF2nZ
-         hfUlTIZF/iZUSqW77yVE+FH1j74jMYHTPbmuLekO0KQRoxjT7v6nLe3OUSG5mYmR1gAo
-         HvqwbDA0Egv6ia+/keJ8445angP6GswuVT98nVReFPT1HWhmaoZ1lPhno8VZduLjXNU5
-         c06A==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=TGRo0g/Rnqyo2kjT2dTHVz57BlIjFuDhvQ7vHgyGP6g=;
+        b=VqBp4NYZFDf660fM1ZBE2dIlju5qDgLcu/2KKpahgrvMPobGj3Hue+ARom2tvTCXu8
+         kMsY0RlslNDRW3B6WV0pwOObU4UWgALF+TR33rd5dzqmNmAH47Zdl6y94AfhlliS7MpQ
+         3j9EATb5HyVFjbuJr1zBwxAnTsA29ZTR7UzdY//8cDM4E1GRTupFrshsvwDASpr8ZzTF
+         9Ung2nKmVbyJgFTRE9QvQ6CtxMrDGh8LS5b4V9rVArfz7hTJnBsFf57Woh8EotKrKfTG
+         5fU+tkiSDEbYnsCnyEZXDOru71dfhg9GDFyKPcJhUfvRsEG2kjuv7YImgiLBnqR5l2T7
+         fcKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sMDg7eh35+cgK9V+wCbU7Bj5WyzMtSWA+Ve2bb7rcGo=;
-        b=WjU2rm7f81LNOvTf5Yv4UY5156Yv770HZZLq8BQGgosaA9Ef29yoLr5oLr77AH6KU2
-         EK07TOp+Eb7PNUR2THmitAhQ/MePpLUiv2WtFtg0NxZqwdB9ndVncP9D9TELskgLz534
-         fgij5T887rm1bcGmMcMHIS/PQTuvMXmchDTOBVAPNMiEHvy8syQGTxarxpI98uCYLIXS
-         BTcFAFeyDDZqpCYH/hAlA7jZScowOpZRD08yk5jLni9SMGWAwO/jVDPJh8knTFEeBPgT
-         Q7Llg4pZ+y2W1iba1f70c7YLKUonl4yUgfuCscVH0hyk/6MsDAynQE/bsjkt5HQdHC1b
-         QmOQ==
-X-Gm-Message-State: AOAM5306UNcJoXRcORWaOEa1li/oSCU7nsyqCZkzj83+jOFeKGq1PT2d
-        SsPm5Ik4J2GN/4le3Mc7n8u2PBg428c=
-X-Google-Smtp-Source: ABdhPJyu/OYtdowJivA+ebZxUW9WfM5hA3AyANakQhZP26Y31P9ageoeNzgQg+7++xUldc8ig6QRjw==
-X-Received: by 2002:a17:906:7f02:b0:6cf:86d8:c31c with SMTP id d2-20020a1709067f0200b006cf86d8c31cmr9121960ejr.518.1649032483581;
-        Sun, 03 Apr 2022 17:34:43 -0700 (PDT)
-Received: from nlaptop.localdomain (ptr-dtfv0poj8u7zblqwbt6.18120a2.ip6.access.telenet.be. [2a02:1811:cc83:eef0:f2b6:6987:9238:41ca])
-        by smtp.gmail.com with ESMTPSA id qb10-20020a1709077e8a00b006dfedd50ce3sm3724531ejc.143.2022.04.03.17.34.42
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=TGRo0g/Rnqyo2kjT2dTHVz57BlIjFuDhvQ7vHgyGP6g=;
+        b=bpBQ/GrnPpy4fc9HuUN35xX2KeYVoNgpVId3FD8He8g8JTQRYzupeAbBQkmZ3tarU1
+         UbRPNJtc7NWXD+EQBLwKRycvZYzbXgz/pR/lNwxLA5BNNR1ub5KJ6hkbeTtYgenak3CB
+         ys5xJF5QPPv4W6mboevvaXqyTJjcfEA4SejMsD8Ac17njLhwWsAeukYieWVI+WvLGAwD
+         vcUJlfcHDq+tgb35zAZNl0UPSJPFJuIYLxWJrjvZmzIMFrmnrlrPN5iLQFr1GnA+BaKN
+         3U2Hnr+nfuRfNKzBXOwcm1zUSDvemSiDoa5u2pbyXqE+HQLyfHBfAznGxwZIXSDIV6AT
+         bjkg==
+X-Gm-Message-State: AOAM530MCD8bmI5e932rJWyhjUPO3nDCAT44BwyNV1eD4pqvBd60JdyY
+        EKF+O6ik1xnekX0XoWe7l3UmN/g493Q=
+X-Google-Smtp-Source: ABdhPJw+45DRkpq3sx5EsVY+iLyatuzPqmWQqUCZ21zoPHpmxDoy/GhLS29LwUHX4a/PfmlS2TlOOQ==
+X-Received: by 2002:a05:622a:1906:b0:2e0:77a7:16c4 with SMTP id w6-20020a05622a190600b002e077a716c4mr16065846qtc.119.1649040009688;
+        Sun, 03 Apr 2022 19:40:09 -0700 (PDT)
+Received: from [172.17.0.2] ([20.122.93.141])
+        by smtp.gmail.com with ESMTPSA id v5-20020a05622a144500b002e1c7d027b1sm7513044qtx.66.2022.04.03.19.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Apr 2022 17:34:43 -0700 (PDT)
-From:   Niels Dossche <dossche.niels@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Niels Dossche <dossche.niels@gmail.com>
-Subject: [PATCH] Bluetooth: use hdev lock for accept_list and reject_list in conn req
-Date:   Mon,  4 Apr 2022 02:34:04 +0200
-Message-Id: <20220404003403.35690-1-dossche.niels@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Sun, 03 Apr 2022 19:40:09 -0700 (PDT)
+Message-ID: <624a5a89.1c69fb81.a00b3.1b2a@mx.google.com>
+Date:   Sun, 03 Apr 2022 19:40:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4479506395778650708=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, dossche.niels@gmail.com
+Subject: RE: Bluetooth: use hdev lock for accept_list and reject_list in conn req
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220404003403.35690-1-dossche.niels@gmail.com>
+References: <20220404003403.35690-1-dossche.niels@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-All accesses (both read and modifications) to
-hdev->{accept,reject}_list are protected by hdev lock,
-except the ones in hci_conn_request_evt. This can cause a race condition
-in the form of a list corruption.
-The solution is to protect these lists in hci_conn_request_evt as well.
+--===============4479506395778650708==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I was unable to find the exact commit that introduced the issue for the
-reject list, I was only able to find it for the accept list.
+This is automated email and please do not reply to this email!
 
-Note:
-I am currently working on a static analyser to detect missing locks
-using type-based static analysis as my master's thesis
-in order to obtain my master's degree.
-If you would like to have more details, please let me know.
-This was a reported case. I manually verified the report by looking
-at the code, so that I do not send wrong information or patches.
-After concluding that this seems to be a true positive, I created
-this patch. I have both compile-tested this patch and runtime-tested
-this patch on x86_64. The effect on a running system could be a
-potential race condition in exceptional cases.
-This issue was found on Linux v5.17.1.
+Dear submitter,
 
-Fixes: a55bd29d5227 ("Bluetooth: Add white list lookup for incoming connection requests")
-Signed-off-by: Niels Dossche <dossche.niels@gmail.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=628619
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.54 seconds
+GitLint                       PASS      1.01 seconds
+SubjectPrefix                 PASS      0.89 seconds
+BuildKernel                   PASS      30.05 seconds
+BuildKernel32                 PASS      27.33 seconds
+Incremental Build with patchesPASS      38.38 seconds
+TestRunner: Setup             PASS      458.46 seconds
+TestRunner: l2cap-tester      PASS      15.27 seconds
+TestRunner: bnep-tester       PASS      6.04 seconds
+TestRunner: mgmt-tester       PASS      99.50 seconds
+TestRunner: rfcomm-tester     PASS      7.31 seconds
+TestRunner: sco-tester        PASS      7.24 seconds
+TestRunner: smp-tester        PASS      6.75 seconds
+TestRunner: userchan-tester   PASS      5.87 seconds
+
+
+
 ---
- net/bluetooth/hci_event.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index abaabfae19cc..b9038f24f46f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3222,8 +3222,11 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 		return;
- 	}
- 
-+	hci_dev_lock(hdev);
-+
- 	if (hci_bdaddr_list_lookup(&hdev->reject_list, &ev->bdaddr,
- 				   BDADDR_BREDR)) {
-+		hci_dev_unlock(hdev);
- 		hci_reject_conn(hdev, &ev->bdaddr);
- 		return;
- 	}
-@@ -3236,14 +3239,13 @@ static void hci_conn_request_evt(struct hci_dev *hdev, void *data,
- 	    !hci_dev_test_flag(hdev, HCI_CONNECTABLE) &&
- 	    !hci_bdaddr_list_lookup_with_flags(&hdev->accept_list, &ev->bdaddr,
- 					       BDADDR_BREDR)) {
-+		hci_dev_unlock(hdev);
- 		hci_reject_conn(hdev, &ev->bdaddr);
- 		return;
- 	}
- 
- 	/* Connection accepted */
- 
--	hci_dev_lock(hdev);
--
- 	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
- 	if (ie)
- 		memcpy(ie->data.dev_class, ev->dev_class, 3);
--- 
-2.35.1
 
+--===============4479506395778650708==--
