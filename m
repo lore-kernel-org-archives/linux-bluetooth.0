@@ -2,87 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CA1C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E99E5C433EF
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 00:44:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386254AbiDFAlw (ORCPT
+        id S1390547AbiDFAmK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Apr 2022 20:41:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59542 "EHLO
+        Tue, 5 Apr 2022 20:42:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1443899AbiDEPk0 (ORCPT
+        with ESMTP id S1457466AbiDEQDQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Apr 2022 11:40:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CBD214DFC5;
-        Tue,  5 Apr 2022 07:02:06 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B2E30B81BA9;
-        Tue,  5 Apr 2022 14:02:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BBD4C385A0;
-        Tue,  5 Apr 2022 14:02:02 +0000 (UTC)
-Date:   Tue, 5 Apr 2022 10:02:00 -0400
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Ben Young Tae Kim <ytkim@qca.qualcomm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Dumazet <eric.dumazet@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: hci_qca: Use del_timer_sync() before freeing
-Message-ID: <20220405100200.64f56e50@gandalf.local.home>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        Tue, 5 Apr 2022 12:03:16 -0400
+X-Greylist: delayed 436 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 05 Apr 2022 08:50:35 PDT
+Received: from mail.pelzflorian.de (pelzflorian.de [5.45.111.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFDE84F9CD
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Apr 2022 08:50:35 -0700 (PDT)
+Received: from pelzflorian.localdomain (unknown [5.45.111.108])
+        by mail.pelzflorian.de (Postfix) with ESMTPSA id EBD8C3606A0
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Apr 2022 17:43:17 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=pelzflorian.de;
+        s=mail; t=1649173398;
+        bh=ymOcM2/1rhgKmG/D7aCJ/zReR4MoKWojyWqHC+IMUkM=;
+        h=Date:From:To:Subject;
+        b=QrW/0hln9x07EyL50Un/vFtuPxiRM4Z9ijvn2/0OJkSkhST0XP2055isnP4S2PYgR
+         SDuAyQ424oZDl0L1ZC7azVlTBOFwFlIKssD0UlRFYNW1MkYIdG2eh6cDB+XWQL7e5Y
+         D+y8IxfysnYrQjWMNfCT4z8oh/BghRg5E0hNjy3Q=
+Date:   Tue, 5 Apr 2022 17:43:05 +0200
+From:   Florian Pelz <pelzflorian@pelzflorian.de>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] main: Remove unused main.conf option NameResolving
+Message-ID: <20220405154226.nejyr5twrhsqrzim@pelzflorian.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Steven Rostedt <rostedt@goodmis.org>
-
-While looking at a crash report on a timer list being corrupted, which
-usually happens when a timer is freed while still active. This is
-commonly triggered by code calling del_timer() instead of
-del_timer_sync() just before freeing.
-
-One possible culprit is the hci_qca driver, which does exactly that.
-
-Eric mentioned that wake_retrans_timer could be rearmed via the work
-queue, so also move the destruction of the work queue before
-del_timer_sync().
-
-Cc: Eric Dumazet <eric.dumazet@gmail.com>
-Cc: stable@vger.kernel.org
-Fixes: 0ff252c1976da ("Bluetooth: hciuart: Add support QCA chipset for UART")
-Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+Commit 826023de56896e83f35ae69a73d6a120a2f5b11e removed the last use
+of name_resolv.
 ---
-Changes since v1: https://lkml.kernel.org/r/20220404182236.1caa174e@rorschach.local.home
- - Moved destroy_workqueue() before del_timer_sync() calls (Eric Dumazet).
+ src/btd.h     | 1 -
+ src/main.c    | 8 --------
+ src/main.conf | 4 ----
+ 3 files changed, 13 deletions(-)
 
- drivers/bluetooth/hci_qca.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f6e91fb432a3..eab34e24d944 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -696,9 +696,9 @@ static int qca_close(struct hci_uart *hu)
- 	skb_queue_purge(&qca->tx_wait_q);
- 	skb_queue_purge(&qca->txq);
- 	skb_queue_purge(&qca->rx_memdump_q);
--	del_timer(&qca->tx_idle_timer);
--	del_timer(&qca->wake_retrans_timer);
- 	destroy_workqueue(qca->workqueue);
-+	del_timer_sync(&qca->tx_idle_timer);
-+	del_timer_sync(&qca->wake_retrans_timer);
- 	qca->hu = NULL;
+diff --git a/src/btd.h b/src/btd.h
+index d13646889..c11076cce 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -109,7 +109,6 @@ struct btd_opts {
+ 	struct btd_defaults defaults;
  
- 	kfree_skb(qca->rx_skb);
+ 	gboolean	reverse_discovery;
+-	gboolean	name_resolv;
+ 	gboolean	debug_keys;
+ 	gboolean	fast_conn;
+ 	gboolean	refresh_discovery;
+diff --git a/src/main.c b/src/main.c
+index a448320c1..52fa4829b 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -766,13 +766,6 @@ static void parse_config(GKeyFile *config)
+ 	} else
+ 		btd_opts.reverse_discovery = boolean;
+ 
+-	boolean = g_key_file_get_boolean(config, "General",
+-						"NameResolving", &err);
+-	if (err)
+-		g_clear_error(&err);
+-	else
+-		btd_opts.name_resolv = boolean;
+-
+ 	boolean = g_key_file_get_boolean(config, "General",
+ 						"DebugKeys", &err);
+ 	if (err)
+@@ -954,7 +947,6 @@ static void init_defaults(void)
+ 	btd_opts.discovto = DEFAULT_DISCOVERABLE_TIMEOUT;
+ 	btd_opts.tmpto = DEFAULT_TEMPORARY_TIMEOUT;
+ 	btd_opts.reverse_discovery = TRUE;
+-	btd_opts.name_resolv = TRUE;
+ 	btd_opts.debug_keys = FALSE;
+ 	btd_opts.refresh_discovery = TRUE;
+ 	btd_opts.name_request_retry_delay = DEFAULT_NAME_REQUEST_RETRY_DELAY;
+diff --git a/src/main.conf b/src/main.conf
+index 401796235..337dc77e5 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -37,10 +37,6 @@
+ # Defaults to 'true'.
+ #ReverseServiceDiscovery = true
+ 
+-# Enable name resolving after inquiry. Set it to 'false' if you don't need
+-# remote devices name and want shorter discovery cycle. Defaults to 'true'.
+-#NameResolving = true
+-
+ # Enable runtime persistency of debug link keys. Default is false which
+ # makes debug link keys valid only for the duration of the connection
+ # that they were created for.
+
+base-commit: 234d60423c3b8186a27b31028d4c0acb847eedb1
 -- 
-2.35.1
+2.34.0
 
