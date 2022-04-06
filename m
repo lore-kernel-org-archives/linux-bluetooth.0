@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCE7C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 14:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FEC8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 17:12:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234551AbiDFOTb (ORCPT
+        id S238363AbiDFROy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Apr 2022 10:19:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38812 "EHLO
+        Wed, 6 Apr 2022 13:14:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235527AbiDFOSw (ORCPT
+        with ESMTP id S238459AbiDFROZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Apr 2022 10:18:52 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8442B525C
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Apr 2022 19:33:16 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id f3so1258013qvz.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Apr 2022 19:33:16 -0700 (PDT)
+        Wed, 6 Apr 2022 13:14:25 -0400
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BA354DA28C
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 07:37:19 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id b18so4466421qtk.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Apr 2022 07:37:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=6TqcBjLq5PiMEQTnSLsbDDJaUEWpVZWercMg3D2aO3A=;
-        b=PkM3dSZ6YelxvIzeF3t0gqVBZbUFXiTwTNTyT3JoxamhdPjLY07zYaprPuYWIPvkqt
-         2iFwjlYGO5iYudtWmmx/7AzxydYo/D+fspy8ZCQXRtPl1bacrT55TSX8wymqRppuIs3p
-         CD7XvO77gmMIYe6Ib3G2JxNmAMvcFksOdaj69eVltvxY4aikt8FBozG8XXGSljrYSUaG
-         BzHirrQL9z6rXB6i3H+l7C1AeX/YlnsT6DfZiV7hQl9MBElZetU6kIKdn2eCbtlSkP8y
-         efPt55w/XZX7atPzOvOFh2PMHLoQnLrcY6Awq/Uk1ScAPz1t6aidHYRvNE9txtZWuYZ0
-         oZxQ==
+        bh=5inza/b5MvnMOVc/Y1e8COEfJexTZu0TaWXzA7PU0ls=;
+        b=M/Wkf57H036+mLKEmW7ixv9VKYuwmFmBns+92SbzN/Xn0WagoFo5Ih0SexicIQhrqY
+         g3HKFDNA+7bLOF696NXAe694zKfP2F9LhqyWUK3wDbtRwEp26ZJJ5nq98za6H+AgQehC
+         liZsfZQ4zRCfnyGi7d6x7e2FpdlIMvdZLOVcbHoUgW+SRY+icM6/BF6lE3RDY6QKhRXK
+         /5odc9sEbuhVHCOGZZTXImdCT+dZaeOhQmwfJ6Fi37SS126emYhtQl7tRDZ1ZK7nHY2s
+         SkK6aESyMnnobem+5Nq4HvkQWG+G3cIfhLWgC0w0i8f+gd9CmOCCRnnjmG62laYkkFPX
+         jfOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=6TqcBjLq5PiMEQTnSLsbDDJaUEWpVZWercMg3D2aO3A=;
-        b=VDOSvin8PkEj+69/+z4esi20XDdtT+gvqXvkpVKBg/oi1QOfpxRyt6ocGZ0u6u97aE
-         c7uKl5Nkrma6JrIAqybtuliKW+tg9PGuFk39bPgyv2bnhzCjIMG8KkrqNORdZzljCKo3
-         DfOHUyE32sem38JVoXfjyfEMEGMXJ+1Z7euA7j1nAFcALFzCz5v2RIukI+GNnJEO+p+l
-         njWheJKziO9aIB0lfXlcJhRkRg5SMRPRE3xoAn3b0ITfMIPqzMNKvqhnLmdns7uN9yZT
-         k5oD6R+Jo7nIlCHZc1gPTD6vA4awglQRW9Sgkv+s7p+dSZzkD0UCJxfRM8fgXHzIfPLd
-         GH/Q==
-X-Gm-Message-State: AOAM533shQY5LNIoGMTuaYllt9sNd6VOMcpfW4tidUZwbxZh54Y+rBQP
-        /SGoueDj+dWCXVhaoLMtfhDYN4SZFmYEWQ==
-X-Google-Smtp-Source: ABdhPJxT23QjUO3rKSVc9LcW6pjxf5hBbhkgNr4hH3pDRGEljHgfssfT0JwMn1XJJEoaneAUS9jpEw==
-X-Received: by 2002:a05:6214:f03:b0:441:27ee:ba71 with SMTP id gw3-20020a0562140f0300b0044127eeba71mr5590326qvb.88.1649212395966;
-        Tue, 05 Apr 2022 19:33:15 -0700 (PDT)
-Received: from [172.17.0.2] ([20.230.106.254])
-        by smtp.gmail.com with ESMTPSA id s5-20020a37a905000000b0067d35f2fdb1sm8892893qke.37.2022.04.05.19.33.15
+        bh=5inza/b5MvnMOVc/Y1e8COEfJexTZu0TaWXzA7PU0ls=;
+        b=okxKs+2iLz9XQua6UdlHMniwBDjVTiG8NviWt7vk3+ynoUMLcWQBdZg8DL+g0wcLSb
+         4yAc0XTcfyX+xF+PpDmk+Yib4fC8fUncVMXTTN5jLI8bg2e2nMO0QvtTAcV4Mk5KgscU
+         2U32Dv50lhy1jTe7imdvrDbJaHCrpdr4FW6pergx+BcJC0gJi3HPzGnmQZpS1+iDmsQR
+         eF/CZz1JRE9OBXFOWTKwMSp/PWuBopyoLMiWR5BP2xy6Uxb5OcIMB6j13oTLZP3dVGAY
+         RttvjRggee1oYi5hQF1/xiG8meR5a2r9b5d45MnObjMapLOX/kcC+GsTJm3gdOQAR9Oc
+         zCyw==
+X-Gm-Message-State: AOAM530nIoj7j4ee19sYMO4xrIZRN7bY2czvw0rDLlQ5O9qxgJouUdi8
+        HQR7pbIVFXfFNu6pOzgJ5ivtd125Wo7rFg==
+X-Google-Smtp-Source: ABdhPJyXhRnTUwgBmO/MlGhnsrFmb7YOFkgihxBhKAqQ9Y2LtgVuyinkJe99aLZsWRAabyHGtRf+EA==
+X-Received: by 2002:a05:620a:22f9:b0:67d:1561:f4f4 with SMTP id p25-20020a05620a22f900b0067d1561f4f4mr6093468qki.217.1649255838213;
+        Wed, 06 Apr 2022 07:37:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.124.105.73])
+        by smtp.gmail.com with ESMTPSA id z6-20020ae9c106000000b0067d3b9ef387sm9828973qki.28.2022.04.06.07.37.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 19:33:15 -0700 (PDT)
-Message-ID: <624cfbeb.1c69fb81.f46e4.bf65@mx.google.com>
-Date:   Tue, 05 Apr 2022 19:33:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8846296058100996342=="
+        Wed, 06 Apr 2022 07:37:17 -0700 (PDT)
+Message-ID: <624da59d.1c69fb81.2e0bd.0aa2@mx.google.com>
+Date:   Wed, 06 Apr 2022 07:37:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7845134259466205465=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dossche.niels@gmail.com
-Subject: RE: [v2] Bluetooth: use hdev lock for accept_list and reject_list in conn req
+To:     linux-bluetooth@vger.kernel.org, pelzflorian@pelzflorian.de
+Subject: RE: [v2] main: Remove unused main.conf option NameResolving
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220405173751.7269-1-dossche.niels@gmail.com>
-References: <20220405173751.7269-1-dossche.niels@gmail.com>
+In-Reply-To: <20220406084357.iai4k6jvg6gnnbyi@pelzflorian.localdomain>
+References: <20220406084357.iai4k6jvg6gnnbyi@pelzflorian.localdomain>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8846296058100996342==
+--===============7845134259466205465==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -74,25 +74,46 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=629298
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=629501
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      1.57 seconds
-GitLint                       PASS      0.99 seconds
-SubjectPrefix                 PASS      0.85 seconds
-BuildKernel                   PASS      30.97 seconds
-BuildKernel32                 PASS      27.76 seconds
-Incremental Build with patchesPASS      38.25 seconds
-TestRunner: Setup             PASS      466.52 seconds
-TestRunner: l2cap-tester      PASS      15.59 seconds
-TestRunner: bnep-tester       PASS      6.09 seconds
-TestRunner: mgmt-tester       PASS      103.36 seconds
-TestRunner: rfcomm-tester     PASS      7.67 seconds
-TestRunner: sco-tester        PASS      7.56 seconds
-TestRunner: smp-tester        PASS      7.52 seconds
-TestRunner: userchan-tester   PASS      6.33 seconds
+CheckPatch                    FAIL      1.50 seconds
+GitLint                       PASS      1.01 seconds
+Prep - Setup ELL              PASS      47.85 seconds
+Build - Prep                  PASS      0.74 seconds
+Build - Configure             PASS      9.70 seconds
+Build - Make                  PASS      1374.25 seconds
+Make Check                    PASS      11.87 seconds
+Make Check w/Valgrind         PASS      462.56 seconds
+Make Distcheck                PASS      243.13 seconds
+Build w/ext ELL - Configure   PASS      8.86 seconds
+Build w/ext ELL - Make        PASS      1328.73 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[v2] main: Remove unused main.conf option NameResolving
+WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '826023de5689', maybe rebased or not pulled?
+#49: 
+Commit 826023de5689 ("core: Create devices dynamically during
+
+/github/workspace/src/12803348.patch total: 0 errors, 1 warnings, 37 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12803348.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
 
 
 
@@ -101,4 +122,4 @@ Regards,
 Linux Bluetooth
 
 
---===============8846296058100996342==--
+--===============7845134259466205465==--
