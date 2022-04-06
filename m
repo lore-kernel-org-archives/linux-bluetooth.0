@@ -2,77 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEFFDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 23:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68BE8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 23:35:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237748AbiDFXcQ (ORCPT
+        id S237802AbiDFXhu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Apr 2022 19:32:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60188 "EHLO
+        Wed, 6 Apr 2022 19:37:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbiDFXcO (ORCPT
+        with ESMTP id S237792AbiDFXht (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Apr 2022 19:32:14 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D89D6F8EF7
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 16:30:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 3EC05CE2495
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 23:30:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 795BFC385A7;
-        Wed,  6 Apr 2022 23:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649287813;
-        bh=G0gBTMAeNWDGDpwVj5mV0Qz8luEwZJf3HSIfDSzOcRo=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=iL0WQwNzuM/7Jj9QnV4qcGViDeek9XnnIKXU0hCwt2G4i9ItFmMW6ebUjcKo2i8Tn
-         65dPKvynVyiszHuyG13uzETlKwV1HGdUtIJjFj+VM2jBV4e5IBRSp38U33cvfi99xr
-         wD3vJw06RkBFHnqA8SA2CD4YbHQhGTit2rkrU9CZs7237OM6E2ocx37Cpcsy6s9CnZ
-         WELFOH3531FNAuEB4rmfVXrjRXWxelBLrU3zM2KBJ0L2JtOF1i799GOGdt+0/PA+SQ
-         wDUiqiU6kqDp1m+KskaPcbuEwtSLe09pkd8WmjnKN2OE99+QudNzt6jehZJJuiLDWN
-         7J0pqKgNEkSgg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5B6D6E8DBDA;
-        Wed,  6 Apr 2022 23:30:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RFC BlueZ] gap: Don't attempt to read the appearance if already set
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <164928781337.14953.12626381396586592126.git-patchwork-notify@kernel.org>
-Date:   Wed, 06 Apr 2022 23:30:13 +0000
-References: <20220404201750.1082470-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220404201750.1082470-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Wed, 6 Apr 2022 19:37:49 -0400
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90B4D1E533D
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 16:35:51 -0700 (PDT)
+Received: from github.com (hubbernetes-node-6c82970.va3-iad.github.net [10.48.200.77])
+        by smtp.github.com (Postfix) with ESMTPA id D035FE057F
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 16:35:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1649288150;
+        bh=ymg8VVfVl7+uqvGNg8Pmbua23xd76a7nZGgKKrC5jkw=;
+        h=Date:From:To:Subject:From;
+        b=opNDVEyRvwBsf0EhVtl9+tO9W0hUxoc0FEqWhjuJxfgoP1MO9ujKGG8qe1Jxa5Mbw
+         KLBHmzhws+iEwMt1bAnEgy5R/CsPBlwu68v/sQ/yldAmeepycq0wGmYGztADLRQYSe
+         qMV0/FH62BAKkRkD+h/DuM6xYRxbb0JxvweBqH/s=
+Date:   Wed, 06 Apr 2022 16:35:50 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/3627ed-d1871f@github.com>
+Subject: [bluez/bluez] bbeabc: gap: Don't attempt to read the appearance if
+ alrea...
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: bbeabca44a3da3e1efd8e57b0366bbb45aadbb5b
+      https://github.com/bluez/bluez/commit/bbeabca44a3da3e1efd8e57b0366bbb45aadbb5b
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-04 (Mon, 04 Apr 2022)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/gap/gas.c
 
-On Mon,  4 Apr 2022 13:17:50 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Devices are unlikely to change appearance over time which is the reason
-> why we cache then on the storage so this skips reading it on every
-> reconnection.
-> ---
->  profiles/gap/gas.c | 5 +++++
->  1 file changed, 5 insertions(+)
+  Log Message:
+  -----------
+  gap: Don't attempt to read the appearance if already set
 
-Here is the summary with links:
-  - [RFC,BlueZ] gap: Don't attempt to read the appearance if already set
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bbeabca44a3d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Devices are unlikely to change appearance over time which is the reason
+why we cache then on the storage so this skips reading it on every
+reconnection.
 
 
+  Commit: 0533085d22ba0bc314378524f1cccdea901da434
+      https://github.com/bluez/bluez/commit/0533085d22ba0bc314378524f1cccdea901da434
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-06 (Wed, 06 Apr 2022)
+
+  Changed paths:
+    M monitor/bt.h
+    M monitor/packet.c
+
+  Log Message:
+  -----------
+  monitor: Add support for LE BIG Info Adverting Report
+
+This adds support for LE BIG Info Advertising Report.
+
+
+  Commit: 10948891336d8ca43055c465e3d00f428a035c4c
+      https://github.com/bluez/bluez/commit/10948891336d8ca43055c465e3d00f428a035c4c
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-06 (Wed, 06 Apr 2022)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  btdev: Add support for sending LE BIG Info Adv Reports
+
+This adds support for sending LE BIG Info Adv Reports if LE Create BIG
+has been called.
+
+
+  Commit: d1871fc935228f034741e1f5064a0f3e2234ffcd
+      https://github.com/bluez/bluez/commit/d1871fc935228f034741e1f5064a0f3e2234ffcd
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-06 (Wed, 06 Apr 2022)
+
+  Changed paths:
+    M emulator/btdev.c
+
+  Log Message:
+  -----------
+  btdev: Fix BIG Create Sync
+
+This fixes status return to BIG Create Sync command.
+
+
+Compare: https://github.com/bluez/bluez/compare/3627eddea130...d1871fc93522
