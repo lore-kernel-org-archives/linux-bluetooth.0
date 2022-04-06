@@ -2,124 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5103AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 09:29:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B903C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Apr 2022 11:53:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234604AbiDFJbx (ORCPT
+        id S231220AbiDFLze (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Apr 2022 05:31:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52728 "EHLO
+        Wed, 6 Apr 2022 07:55:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1582682AbiDFJWH (ORCPT
+        with ESMTP id S231158AbiDFLzL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Apr 2022 05:22:07 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 748D322C1D5
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Apr 2022 19:54:40 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id o15so2321320qtv.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Apr 2022 19:54:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=d0F0q0VxA4CuqxxoDRxv00y/WTDUFtz6OJ2J1cqjYSs=;
-        b=o+j4tK5K2Vx93Y+ntUUA0+34nIdZzTZ/epmwQ7oqnKNYayqRUlH/QRZoSD7qeJ5f/4
-         IHCi1X7nEYfsEES443SfR+hrBsUYA0ue3mEQdIGFQm1VoOzaMgL/HLOgAwJbbTZ0QX2h
-         AC/Obf5yEEj7nkLAQnb9jlQMyvo9/PRrpcuvtbiXR6nvJ8I15baY6W/0FQv8jPTF3ZEy
-         Jo9NXfSj20TFWxK4rOmZJbRyumlLwn23IBSn7kuSCNq4/D/WWDoklLQEra3BL7t9vQF0
-         PQJg0hIUCOjOdHSl62VLanWUpKqh/cN/Flx75XlxHOJi9GIBf6uCjNeHdnudeozVNFzs
-         ZIHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=d0F0q0VxA4CuqxxoDRxv00y/WTDUFtz6OJ2J1cqjYSs=;
-        b=Ukt1iK41+f4D74B9fja29WX41m0QLoPoB7slVPs/eRUw+Xtt3M3ZGxAk4XzSDjRSBL
-         +VB9D9OmMUniGoyRAGi/SVHOrMHTIISJPv9N0d/Fd27CINlpFNg/9/GuvuMHYlozJ15J
-         5HZsyXJwa91h+qH2w1K4jlhsbYdiPuu09Rrb5tX5pKywRSvd9tmy+sjf59Ce7gvErw4w
-         bM8yTiGEoJKv/VURdUhxf/6fUvgHl9pRpQonfurMN5V1c+FuaTen1AqK0xqUd8xA08fN
-         opzMvc8VYXgLwnuPNNpFYqOCo5Q4Ni+6Tn5ySIcP6GWVeR+Zbf/wUfDcz2ByN46+Bk/M
-         QsQw==
-X-Gm-Message-State: AOAM533r4Q4o63AdWlcfn4smDxU7EDQhYbpn/OqoBuO/dmEz3ITq+7+D
-        Aq+YtMaRtf84mfuC9zN6CLjOd1juZo/Cyg==
-X-Google-Smtp-Source: ABdhPJz8GtL/F1jQOFNLFgJs3PmSt+nLag/p/M6q7Ypvz262cpsh9kv50pXYU5e1p4wkJqHTAWZGcw==
-X-Received: by 2002:a05:620a:414b:b0:67e:2b2c:324c with SMTP id k11-20020a05620a414b00b0067e2b2c324cmr4416707qko.205.1649213676101;
-        Tue, 05 Apr 2022 19:54:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.230.63.189])
-        by smtp.gmail.com with ESMTPSA id p10-20020a05620a132a00b0067f926e36b2sm8813050qkj.91.2022.04.05.19.54.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 19:54:35 -0700 (PDT)
-Message-ID: <624d00eb.1c69fb81.e0504.b7b2@mx.google.com>
-Date:   Tue, 05 Apr 2022 19:54:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4090320862309617696=="
+        Wed, 6 Apr 2022 07:55:11 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03011519D77
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 00:19:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B3A24B81FF0
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 07:18:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5EFFEC385A8
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 07:18:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649229537;
+        bh=zfFMsRC27dBcLVtkj15IB4rgrnZjraFQkHJjNtpHqvs=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=HEY+qemst3Oz6N8gvTa54aAWA6FkSWFP28g+1zIXyesRr3XI5EEJzffCwmsroXLQu
+         jUp3TZ4zYPZv0SQqLzU6TGfGChi0NurLH51SoJ+I1eCPniTchIVPMiJqV88wdrVEKc
+         WQXedNiTA5tCuNoQ88Uoglv1PU4imK0O8Mahzlei+bT7ycw6lUP/uRNDjlkBIKGbVC
+         T4IB5ByvWNVUR3jb2feuus4tjhW2l7m24w1qJJYaNtkgrO5jixyL8Rln1XUB6mRU7X
+         MQRPG28pRNSSiWr7SXHiqHV1OpT70tV3LEkKw8fpQHnwuh3yRGvZ7IvdYtn8JUBFvR
+         1PEr3wGG7/FLA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 36DEAC05FE2; Wed,  6 Apr 2022 07:18:57 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Wed, 06 Apr 2022 07:18:54 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: brice@waegenei.re
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215167-62941-gFzCY8jshA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pelzflorian@pelzflorian.de
-Subject: RE: main: Remove unused main.conf option NameResolving
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220405154226.nejyr5twrhsqrzim@pelzflorian.localdomain>
-References: <20220405154226.nejyr5twrhsqrzim@pelzflorian.localdomain>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4090320862309617696==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=629300
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.54 seconds
-GitLint                       PASS      0.98 seconds
-Prep - Setup ELL              PASS      43.41 seconds
-Build - Prep                  PASS      0.73 seconds
-Build - Configure             PASS      8.74 seconds
-Build - Make                  PASS      1421.17 seconds
-Make Check                    PASS      11.57 seconds
-Make Check w/Valgrind         PASS      449.08 seconds
-Make Distcheck                PASS      235.85 seconds
-Build w/ext ELL - Configure   PASS      8.83 seconds
-Build w/ext ELL - Make        PASS      1419.89 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-main: Remove unused main.conf option NameResolving
-WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '826023de56896e83f35ae69a73d6a120a2f5b11e', maybe rebased or not pulled?
-#51: 
-Commit 826023de56896e83f35ae69a73d6a120a2f5b11e removed the last use
-
-/github/workspace/src/12802245.patch total: 0 errors, 1 warnings, 37 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12802245.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+--- Comment #32 from Brice Waegeneire (brice@waegenei.re) ---
+I have the same problem with Linux 5.17 and an Intel AX210:
 
 
+# dmesg | tail -n5
+> [132429.090891] Bluetooth: hci0: command 0xfc05 tx timeout
+> [136438.549331] usbcore: deregistering interface driver btusb
+> [136442.981006] usbcore: registered new interface driver btusb
+> [136444.998477] Bluetooth: hci0: command 0xfc05 tx timeout
+> [136444.998480] Bluetooth: hci0: Reading Intel version command failed (-1=
+10)
 
 
----
-Regards,
-Linux Bluetooth
+$ uname -a
+> Linux safou 5.17.1 #1 SMP PREEMPT 1 x86_64 GNU/Linux
 
 
---===============4090320862309617696==--
+$ lsusb | grep -i bluetooth
+> Bus 001 Device 008: ID 8087:0032 Intel Corp. AX210 Bluetooth
+
+
+If you need more information I'm at your disposal.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
