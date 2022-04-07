@@ -2,124 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D2EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Apr 2022 00:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 002F2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Apr 2022 04:42:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbiDGAhm (ORCPT
+        id S240722AbiDGEoK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Apr 2022 20:37:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35254 "EHLO
+        Thu, 7 Apr 2022 00:44:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232508AbiDGAhd (ORCPT
+        with ESMTP id S232893AbiDGEoI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Apr 2022 20:37:33 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DDFB60CF1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Apr 2022 17:35:35 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id c4so6996816qtx.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Apr 2022 17:35:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=TbZRvjy9CFqAGP1/lvkp4QGk7PKyLeRUjBVZS3UgHJs=;
-        b=eoEeume5uwJ2FTSfDi9fd3mofEiD1YjXw20szs46GbYhRYRAJAXekrwFWypfBocSOx
-         Xo/ZNWSxZd6Qf4VYYRH9Llr3+6o+J0jm7/WHRSHtjOfXLp1VNZHa9e5txFn4xcptk2t3
-         mhrww+i/thvmY6OmLX5lz/JcVguGd6ggsBoAcwZHsmLNFTeNYgNBY62SVpOLKE5mXmy6
-         OLGxigt28nTwVEeQq9vLBsKWmfX0cZ/gdmOHPu0VFprJTtCJ7QMNw8TKPDCyVem4ey/w
-         7x9WefPwfCesPE9ARVZ3EENZzWWTNUp5przBQ1ObI46iYCh2YhcINglg2hfA6aTW75hk
-         yd7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=TbZRvjy9CFqAGP1/lvkp4QGk7PKyLeRUjBVZS3UgHJs=;
-        b=UC92HIRBiEGgH0ofk1u31MR4Mc4fhpX3pnOHruii3xAQa03eBTkKDKj/20VUpvUXOf
-         FsCfEtxkIzIm+GX1ssrNlCO3qtmBWVxN72r17/QZI37mX3Ypl8qmDyYd6XJhFloSoqRa
-         HUMd8QQRP+5gxN66Hw8mTdbnFR4xH9J+Nv6UXtQjZw1X4l+PGxlIq13Q+TcxlNgqkhCU
-         Xj1RWdikUKmbqwJJr89WhbeqH9CkqJjAnPSVheempUHbPHYToXEKsE8IDwLjpekzFaow
-         JEWsJ69hUw66sBd86EUrXX1BMyqSDAoFgM/BXwnEEL9rcJNyoq4nwssPGYLWOZ8S3Ye1
-         kr4g==
-X-Gm-Message-State: AOAM530G7zgZDO213/nGeOF7VVJWxlm40V+y8EmKAGfjAoPFbYMgWnn4
-        XrCedxn+VDKw/igjgh35SpiJdGKona8j6w==
-X-Google-Smtp-Source: ABdhPJwGsREtZJMoA3jHI51R6DhDmbAq8F/YhIJq80DL1FiYM1LJQvExjHpdpX6yUZ51qgC177QaYw==
-X-Received: by 2002:ac8:4d96:0:b0:2eb:d035:7f00 with SMTP id a22-20020ac84d96000000b002ebd0357f00mr332860qtw.597.1649291734155;
-        Wed, 06 Apr 2022 17:35:34 -0700 (PDT)
-Received: from [172.17.0.2] ([40.65.228.53])
-        by smtp.gmail.com with ESMTPSA id t7-20020a05622a180700b002e0ccf0aa49sm15060093qtc.62.2022.04.06.17.34.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Apr 2022 17:35:13 -0700 (PDT)
-Message-ID: <624e31c1.1c69fb81.cbd7f.c832@mx.google.com>
-Date:   Wed, 06 Apr 2022 17:35:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4001751413933387052=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/3] monitor: Add support for LE BIG Info Adverting Report
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220406213355.1918220-1-luiz.dentz@gmail.com>
-References: <20220406213355.1918220-1-luiz.dentz@gmail.com>
+        Thu, 7 Apr 2022 00:44:08 -0400
+X-Greylist: delayed 908 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 06 Apr 2022 21:42:09 PDT
+Received: from mail-m975.mail.163.com (mail-m975.mail.163.com [123.126.97.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 101AE65E0;
+        Wed,  6 Apr 2022 21:42:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id; bh=M+DOsIMoR6Lx2TPgr7
+        0J/v+vaBEJ+wDqvgo9cHgmApQ=; b=PVw5TznebNmyM0YY97rMsBrkSdWGiw3nRL
+        r2IIynXIhE2Cb5Y5RH1cHkDdTzBjLcB2vv1vV1DLKDBWcLm1vq7txcaFwQM6+MqS
+        sUbwmLF+VoeyTTze1RHfF3nfvLHbfU2k4LRJLsItwoSxC+2mbUa4V3sryottKVIq
+        GX94/WzXs=
+Received: from localhost.localdomain (unknown [202.112.113.212])
+        by smtp5 (Coremail) with SMTP id HdxpCgCXGrH7Z05i+MtdAA--.7405S4;
+        Thu, 07 Apr 2022 12:26:52 +0800 (CST)
+From:   Yuanjun Gong <ruc_gongyuanjun@163.com>
+To:     Yuanjun Gong <ruc_gongyuanjun@163.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Bluetooth: hci_uart: check for missing tty operations
+Date:   Thu,  7 Apr 2022 12:26:23 +0800
+Message-Id: <20220407042623.28438-1-ruc_gongyuanjun@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: HdxpCgCXGrH7Z05i+MtdAA--.7405S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7CF4fAr17KrWrXFy8JFW8WFg_yoW8WFW7pF
+        WfGF15CF1UJr47Wr17Aay5WFyrJ3Z3WrWIk39Fvas8urW5trW8Zw1ay345t39rZrW5Jr4I
+        v3WDta47GF1UJrUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRnvtAUUUUU=
+X-Originating-IP: [202.112.113.212]
+X-CM-SenderInfo: 5uxfsw5rqj53pdqm30i6rwjhhfrp/1tbiJw3b5V5vBN3fPgABsc
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4001751413933387052==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Gong Yuanjun <ruc_gongyuanjun@163.com>
 
-This is automated email and please do not reply to this email!
+Add a check to the missing tty operations in hci_ag6xx,
+hci_h4, hci_ll following the implementations in hci_ath.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=629731
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      4.33 seconds
-GitLint                       PASS      2.89 seconds
-Prep - Setup ELL              PASS      42.45 seconds
-Build - Prep                  PASS      0.68 seconds
-Build - Configure             PASS      8.47 seconds
-Build - Make                  PASS      1384.46 seconds
-Make Check                    PASS      11.53 seconds
-Make Check w/Valgrind         PASS      440.77 seconds
-Make Distcheck                PASS      228.57 seconds
-Build w/ext ELL - Configure   PASS      8.77 seconds
-Build w/ext ELL - Make        PASS      1367.66 seconds
-Incremental Build with patchesPASS      4171.28 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,1/3] monitor: Add support for LE BIG Info Adverting Report
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#110: FILE: monitor/bt.h:3671:
-+} __attribute__ ((packed));
-
-/github/workspace/src/12804115.patch total: 0 errors, 1 warnings, 58 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12804115.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Gong Yuanjun <ruc_gongyuanjun@163.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_ag6xx.c | 3 +++
+ drivers/bluetooth/hci_h4.c    | 3 +++
+ drivers/bluetooth/hci_ll.c    | 3 +++
+ 3 files changed, 9 insertions(+)
 
+diff --git a/drivers/bluetooth/hci_ag6xx.c b/drivers/bluetooth/hci_ag6xx.c
+index 2d40302409ff..a5f141d43066 100644
+--- a/drivers/bluetooth/hci_ag6xx.c
++++ b/drivers/bluetooth/hci_ag6xx.c
+@@ -36,6 +36,9 @@ static int ag6xx_open(struct hci_uart *hu)
+ 
+ 	BT_DBG("hu %p", hu);
+ 
++        if (!hci_uart_has_flow_control(hu))
++            return -EOPNOTSUPP;
++
+ 	ag6xx = kzalloc(sizeof(*ag6xx), GFP_KERNEL);
+ 	if (!ag6xx)
+ 		return -ENOMEM;
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 1d0cdf023243..0ceabe340351 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -44,6 +44,9 @@ static int h4_open(struct hci_uart *hu)
+ 
+ 	BT_DBG("hu %p", hu);
+ 
++        if (!hci_uart_has_flow_control(hu))
++            return -EOPNOTSUPP;
++
+ 	h4 = kzalloc(sizeof(*h4), GFP_KERNEL);
+ 	if (!h4)
+ 		return -ENOMEM;
+diff --git a/drivers/bluetooth/hci_ll.c b/drivers/bluetooth/hci_ll.c
+index 4eb420a9ed04..22166df1467f 100644
+--- a/drivers/bluetooth/hci_ll.c
++++ b/drivers/bluetooth/hci_ll.c
+@@ -114,6 +114,9 @@ static int ll_open(struct hci_uart *hu)
+ 
+ 	BT_DBG("hu %p", hu);
+ 
++        if (!hci_uart_has_flow_control(hu))
++            return -EOPNOTSUPP;
++
+ 	ll = kzalloc(sizeof(*ll), GFP_KERNEL);
+ 	if (!ll)
+ 		return -ENOMEM;
+-- 
+2.17.1
 
---===============4001751413933387052==--
