@@ -2,214 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B1B6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Apr 2022 22:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72723C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Apr 2022 23:59:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiDGWLP (ORCPT
+        id S232673AbiDHABy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Apr 2022 18:11:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47986 "EHLO
+        Thu, 7 Apr 2022 20:01:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232039AbiDGWKt (ORCPT
+        with ESMTP id S232626AbiDHABx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Apr 2022 18:10:49 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08B65D1A0
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Apr 2022 15:08:26 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id o15-20020a056e02092f00b002ca7b493a07so1852111ilt.21
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Apr 2022 15:08:26 -0700 (PDT)
+        Thu, 7 Apr 2022 20:01:53 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA70619853C
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Apr 2022 16:59:51 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id m16so6472378plx.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Apr 2022 16:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aUcOW+b/B0sVL/nrOuOnCZl8YB85FuSY2th6iPJ2wGo=;
+        b=CuKGtU1MeOjeUrKUd9/erYqfDFC8eyDWORurJ7yyd4oZugMT6PZItYtqswE5VptHBn
+         XLkgwzxJPraC/DmnZMpOirUzwQDlQLi9jwojSZBCyE1sHit4wFrRpWSY8ZDe3/cjfMOM
+         rcOuH7m/4cBJmo7itMZRtaJ60BcYWge+DrLJcidxu42Sf4bOLkuE6Z5w4N11zaz6GA2g
+         UiO1hejfMW5sFvjEwoC2DsewcEDbesIfrn+qao3CFMG8pJiCM+C9FTBqBRdXPmG6Zf0H
+         fbT9IDqr8PmkH5H2DMQQ7YxIGetCYdVtpzuDqI+qMhzrHopBwJVVyXNRO00jGQM1nA0t
+         gHDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=FcnDF7Pwv/fxekIgcMUqQ2gFtdJTzyL5GThXsIFoAJY=;
-        b=x77eGxLnJxkq9xpKicp/KcL2sYEUu6tm9q+it6gGP9IJClgFdIkcQfMb2kioidEmbY
-         nk7G5vkb3LE4gF3lMtFVuv1SGjqw5O+qszZyAfW1HxLU2qStDae2CKsE8nvpYpWVSImH
-         p3qXgTi6rD7aglekhBhX9q/+eriK/AWZLzCR9Wg/7jBuMjWBfjpU+B1TyyiIWvesYcK6
-         h7vfdNPUKpT+jWqEVZ+VEKe5aLwlqF1BTW0zXUSJ5NnVDN7eOVNCSlCQnH1t2hTFbGDy
-         MbkE22+r4sgHc3wRPPTqH3kW+nW7mRg0fEl4p63TCXhvj3F0trdZyX10CF9wTyUJlg/v
-         DGhQ==
-X-Gm-Message-State: AOAM530PHHtkLx2sv43xnG2bDyDJbXMRzuh6/8zHWFv5rM/heHGbPXD6
-        /aUhn5rfCL4GP299eZg4Th0OUY5yg6yVqPfmIwfJ5WffDfbq
-X-Google-Smtp-Source: ABdhPJwAO4bCNZbC4W05yLKUBMWrrXBkaSfvdAGp0T4arlEyORp2fDsYByKQD5NC/O/3quotb4zGZh8FVtf1smxEPxQg+W66ftO8
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aUcOW+b/B0sVL/nrOuOnCZl8YB85FuSY2th6iPJ2wGo=;
+        b=iZ1qLNLwtyUHlxERB5cvVnwXm28xTgKShbTIfBqVFbClN/MSu511CaOdddTm4fPvJp
+         p3EESqxvaTXkiUjxtqfDQBFmi6W4Mu8PWJUTJBcIxIx96yJpfaYe05op746YvwmQxjuT
+         vF+EMB+puB5YYoITtf4Gro2myU9GzXN8IhJld6GiXEbrnQ51VnUKFCEDvMBoOJesUGR2
+         RuDD55t+zAAvUtPdBCOrV0Od6nfErquVUGJ9zHw72Wrwu3J/WoeRhg6qiVwKWbLtkOxz
+         GUB/Ygk9pj0jawx8gO8EbzHb8+bg5x3k0BJnHifN7u5zBbF/ausFectTa0aZgoFVs0pN
+         kwYg==
+X-Gm-Message-State: AOAM532WwC1i1b26UZCODVboxv+wbG0nwK6LSsz/t16k1YdXAUMrVHD2
+        S7bmpBVtoY9dTKplaqTFLE2Jx3oDWBE=
+X-Google-Smtp-Source: ABdhPJz8dG0Hjwlc40tgEmXpcS9sp9YNeQTlu2UjURsSxuayX07r852bLQtrzQ4AE80QMrjd+ZpGcA==
+X-Received: by 2002:a17:902:e84d:b0:156:bf35:6449 with SMTP id t13-20020a170902e84d00b00156bf356449mr16517980plg.26.1649375991064;
+        Thu, 07 Apr 2022 16:59:51 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id bg13-20020a17090b0d8d00b001caa8f51098sm9770532pjb.9.2022.04.07.16.59.50
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Apr 2022 16:59:50 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] shell: Fix not being able to auto complete submenus
+Date:   Thu,  7 Apr 2022 16:59:48 -0700
+Message-Id: <20220407235949.2428708-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1809:b0:2ca:869a:6518 with SMTP id
- a9-20020a056e02180900b002ca869a6518mr267183ilv.178.1649369306112; Thu, 07 Apr
- 2022 15:08:26 -0700 (PDT)
-Date:   Thu, 07 Apr 2022 15:08:26 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000098289005dc17b71b@google.com>
-Subject: [syzbot] possible deadlock in sco_conn_del
-From:   syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-syzbot found the following issue on:
-
-HEAD commit:    696206280c5e Add linux-next specific files for 20220404
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=12c57ff5700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5eb81244dbc8d9b7
-dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.18.0-rc1-next-20220404-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor.4/21629 is trying to acquire lock:
-ffff88801acb3130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1682 [inline]
-ffff88801acb3130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
-
-but task is already holding lock:
-ffffffff8d76e388 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1576 [inline]
-ffffffff8d76e388 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xda/0x260 net/bluetooth/hci_conn.c:1458
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (hci_cb_list_lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:600 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:733
-       hci_connect_cfm include/net/bluetooth/hci_core.h:1561 [inline]
-       hci_remote_features_evt+0x62b/0xa20 net/bluetooth/hci_event.c:3736
-       hci_event_func net/bluetooth/hci_event.c:6890 [inline]
-       hci_event_packet+0x7c1/0xf60 net/bluetooth/hci_event.c:6939
-       hci_rx_work+0x522/0xd60 net/bluetooth/hci_core.c:3819
-       process_one_work+0x996/0x1610 kernel/workqueue.c:2289
-       worker_thread+0x665/0x1080 kernel/workqueue.c:2436
-       kthread+0x2e9/0x3a0 kernel/kthread.c:376
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
-
--> #1 (&hdev->lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:600 [inline]
-       __mutex_lock+0x12f/0x12f0 kernel/locking/mutex.c:733
-       sco_sock_connect+0x1eb/0xa80 net/bluetooth/sco.c:593
-       __sys_connect_file+0x14f/0x190 net/socket.c:1900
-       __sys_connect+0x161/0x190 net/socket.c:1917
-       __do_sys_connect net/socket.c:1927 [inline]
-       __se_sys_connect net/socket.c:1924 [inline]
-       __x64_sys_connect+0x6f/0xb0 net/socket.c:1924
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0x80 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3096 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3219 [inline]
-       validate_chain kernel/locking/lockdep.c:3834 [inline]
-       __lock_acquire+0x2abe/0x5660 kernel/locking/lockdep.c:5060
-       lock_acquire kernel/locking/lockdep.c:5672 [inline]
-       lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5637
-       lock_sock_nested+0x36/0xf0 net/core/sock.c:3312
-       lock_sock include/net/sock.h:1682 [inline]
-       sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
-       sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1379
-       hci_disconn_cfm include/net/bluetooth/hci_core.h:1579 [inline]
-       hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1458
-       hci_dev_close_sync+0x567/0x1140 net/bluetooth/hci_sync.c:4121
-       hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
-       hci_unregister_dev+0x1d0/0x550 net/bluetooth/hci_core.c:2687
-       vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
-       __fput+0x277/0x9d0 fs/file_table.c:317
-       task_work_run+0xdd/0x1a0 kernel/task_work.c:164
-       exit_task_work include/linux/task_work.h:37 [inline]
-       do_exit+0xaff/0x2a00 kernel/exit.c:795
-       do_group_exit+0xd2/0x2f0 kernel/exit.c:925
-       __do_sys_exit_group kernel/exit.c:936 [inline]
-       __se_sys_exit_group kernel/exit.c:934 [inline]
-       __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:934
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0x80 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-other info that might help us debug this:
-
-Chain exists of:
-  sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> &hdev->lock --> hci_cb_list_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(hci_cb_list_lock);
-                               lock(&hdev->lock);
-                               lock(hci_cb_list_lock);
-  lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
-
- *** DEADLOCK ***
-
-3 locks held by syz-executor.4/21629:
- #0: ffff88801e84d048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
- #1: ffff88801e84c078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x26d/0x1140 net/bluetooth/hci_sync.c:4108
- #2: ffffffff8d76e388 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1576 [inline]
- #2: ffffffff8d76e388 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xda/0x260 net/bluetooth/hci_conn.c:1458
-
-stack backtrace:
-CPU: 1 PID: 21629 Comm: syz-executor.4 Not tainted 5.18.0-rc1-next-20220404-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2176
- check_prev_add kernel/locking/lockdep.c:3096 [inline]
- check_prevs_add kernel/locking/lockdep.c:3219 [inline]
- validate_chain kernel/locking/lockdep.c:3834 [inline]
- __lock_acquire+0x2abe/0x5660 kernel/locking/lockdep.c:5060
- lock_acquire kernel/locking/lockdep.c:5672 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5637
- lock_sock_nested+0x36/0xf0 net/core/sock.c:3312
- lock_sock include/net/sock.h:1682 [inline]
- sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
- sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1379
- hci_disconn_cfm include/net/bluetooth/hci_core.h:1579 [inline]
- hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1458
- hci_dev_close_sync+0x567/0x1140 net/bluetooth/hci_sync.c:4121
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_unregister_dev+0x1d0/0x550 net/bluetooth/hci_core.c:2687
- vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
- __fput+0x277/0x9d0 fs/file_table.c:317
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- exit_task_work include/linux/task_work.h:37 [inline]
- do_exit+0xaff/0x2a00 kernel/exit.c:795
- do_group_exit+0xd2/0x2f0 kernel/exit.c:925
- __do_sys_exit_group kernel/exit.c:936 [inline]
- __se_sys_exit_group kernel/exit.c:934 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:934
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0x80 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f677aa89049
-Code: Unable to access opcode bytes at RIP 0x7f677aa8901f.
-RSP: 002b:00007ffc2aa139c8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000064 RCX: 00007f677aa89049
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 00007f677aae225c R08: 000000000000000c R09: 00005555561573b8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000016
-R13: 00007ffc2aa14ca0 R14: 00005555561573b8 R15: 00007ffc2aa15da0
- </TASK>
-
-
+submenus should be part of the list of possible auto completes just as
+other commands.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ src/shared/shell.c | 35 ++++++++++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 7 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 7ba264b99..72232f7c0 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -139,14 +139,22 @@ static void cmd_help(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+-static const struct bt_shell_menu *find_menu(const char *name, size_t len)
++static const struct bt_shell_menu *find_menu(const char *name, size_t len,
++							int *index)
+ {
+ 	const struct queue_entry *entry;
++	int i;
+ 
+-	for (entry = queue_get_entries(data.submenus); entry;
+-						entry = entry->next) {
++	for (i = 0, entry = queue_get_entries(data.submenus); entry;
++						entry = entry->next, i++) {
+ 		struct bt_shell_menu *menu = entry->data;
+ 
++		if (index) {
++			if (i < *index)
++				continue;
++			(*index)++;
++		}
++
+ 		if (!strncmp(menu->name, name, len))
+ 			return menu;
+ 	}
+@@ -188,7 +196,7 @@ static void cmd_menu(int argc, char *argv[])
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ 
+-	menu = find_menu(argv[1], strlen(argv[1]));
++	menu = find_menu(argv[1], strlen(argv[1]), NULL);
+ 	if (!menu) {
+ 		bt_shell_printf("Unable find menu with name: %s\n", argv[1]);
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+@@ -485,7 +493,7 @@ static int submenu_exec(int argc, char *argv[])
+ 	len = name - argv[0];
+ 	name[0] = '\0';
+ 
+-	submenu = find_menu(argv[0], strlen(argv[0]));
++	submenu = find_menu(argv[0], strlen(argv[0]), NULL);
+ 	if (!submenu)
+ 		return -ENOENT;
+ 
+@@ -735,7 +743,7 @@ static char *find_cmd(const char *text,
+ static char *cmd_generator(const char *text, int state)
+ {
+ 	static int index;
+-	static bool default_menu_enabled, submenu_enabled;
++	static bool default_menu_enabled, menu_enabled, submenu_enabled;
+ 	static const struct bt_shell_menu *menu;
+ 	char *cmd;
+ 
+@@ -754,9 +762,22 @@ static char *cmd_generator(const char *text, int state)
+ 			index = 0;
+ 			menu = data.menu;
+ 			default_menu_enabled = false;
++
++			if (data.main == data.menu)
++				menu_enabled = true;
+ 		}
+ 	}
+ 
++	if (menu_enabled) {
++		menu = find_menu(text, strlen(text), &index);
++		if (menu)
++			return strdup(menu->name);
++
++		index = 0;
++		menu = data.menu;
++		menu_enabled = false;
++	}
++
+ 	if (!submenu_enabled) {
+ 		cmd = find_cmd(text, menu->entries, &index);
+ 		if (cmd || menu != data.main)
+@@ -766,7 +787,7 @@ static char *cmd_generator(const char *text, int state)
+ 		if (!cmd)
+ 			return NULL;
+ 
+-		menu = find_menu(text, cmd - text);
++		menu = find_menu(text, cmd - text, NULL);
+ 		if (!menu)
+ 			return NULL;
+ 
+-- 
+2.35.1
+
