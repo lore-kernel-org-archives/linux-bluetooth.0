@@ -2,101 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3367C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Apr 2022 03:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1CCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Apr 2022 05:51:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231274AbiDHDfp (ORCPT
+        id S234558AbiDHFxw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Apr 2022 23:35:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41320 "EHLO
+        Fri, 8 Apr 2022 01:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230133AbiDHDfo (ORCPT
+        with ESMTP id S232124AbiDHFxv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Apr 2022 23:35:44 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD012BEF
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Apr 2022 20:33:42 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id 10so9670419qtz.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Apr 2022 20:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=UaoGGc1xiVhsX7eqAmOBudNuAEp0feCkXF+OpFwZ5mM=;
-        b=XWCCpYeGwoX2ajq2AFnaoM4kc3i+iV2n5T24QVXvezb7MzhLYBGXzmc2NX+EakwI2J
-         hB0W1KH9tetra3s3p3Nvp9jQC+S3WqKMhBY8KdFwiMQTbczk2Dnd6qYn/GJb4U6oPltO
-         ygQuJgKwwcdVcBs8dzVAGTYOQluz6d2yWiAIO8+4TP0eujk8X6pwdmSk9Ra6KLlA3cGe
-         9YgPv+BRKGyTQYs45dvIXSFl1jiPyl4sXTKn3fzzrtCQZz+kEpObbZNCB/GSlq7WsKQj
-         tdAMado4sCP/tohDvZe6swjc+2vl5JG3MXMrTVt/x/iFHrU6o1469G9ATdydYihq3E4Y
-         sXJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=UaoGGc1xiVhsX7eqAmOBudNuAEp0feCkXF+OpFwZ5mM=;
-        b=AdDR9IR35ekZQrQyANP11+mhPHwuTuKfZrKepeehEmBywaQsetVSgGaCfI8JZR1OjK
-         xH68czL5G92+SvYGxpV0XnPYxzGSQ4Ub+aNg3Gu8t9Z9rQbPe5ynsdF84J61OAK2WJ44
-         hCRRdtgx6BupaIUUMBkvc5svyskfcYnLBXg5K2pmwYXWKvwIXrsTiNtQA3BsbvBvnGiQ
-         +tXtJGCldudKP2F/b2fPG1WsRq8qLA0IAOgBdZUbR7d8LtF1JI41zLeoSGVYFyKsoQPd
-         yKk9PLVM6bVDE9DDr3KI+BVVO6HUenKSERCElz2L+tOJddmM/B1ueMyVEYgDOITgaQkB
-         iHLQ==
-X-Gm-Message-State: AOAM5321/8DW6TPGMkYLcUwpTSnXQUuOJpHfkelxDVSDWyAlBFjQ+npg
-        Vlk0xadggOzP5yFB85AXArLgfoQAHIDIig==
-X-Google-Smtp-Source: ABdhPJx2fuZk2bsKtUJHzfLe56S4bnIRS6akUBY3Z8BQGKbpLFtlK7ehQI5OmK/lvuT45l80BOdf9g==
-X-Received: by 2002:ac8:4f12:0:b0:2eb:de47:e30 with SMTP id b18-20020ac84f12000000b002ebde470e30mr2264205qte.193.1649388820997;
-        Thu, 07 Apr 2022 20:33:40 -0700 (PDT)
-Received: from [172.17.0.2] ([20.114.150.3])
-        by smtp.gmail.com with ESMTPSA id o27-20020a05620a111b00b0067d5f359007sm12122695qkk.23.2022.04.07.20.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Apr 2022 20:33:40 -0700 (PDT)
-Message-ID: <624fad14.1c69fb81.2b333.d162@mx.google.com>
-Date:   Thu, 07 Apr 2022 20:33:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2176159336167441354=="
+        Fri, 8 Apr 2022 01:53:51 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D3522EBEA
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Apr 2022 22:51:49 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 30E33B829C8
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Apr 2022 05:51:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DAF51C385A3
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Apr 2022 05:51:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649397106;
+        bh=ozBxjZJjo8rCHrwaP0PkWCK7ELCEAMez8nXn0vVaAeU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=LRDe8eMYxYNq30ujRCeZTaBHttaTto+gF3pz+W6xAxDqIamklwm4F8O5c3Z0rtIX4
+         m6ZsqWVZfdy02USMTZZ3puGsbVptY+XYYuD2lGgzyDHRSyWaV+W1pKNNaL1dbYkBmB
+         P5EIugC7RQUy5XzOq6e1DiEdsISvmCMwoWXNWj9hnvg/rJ4Q6WnyzMF/5ZYlIWUAd2
+         GbmKqJkbSgZfk/Z/yQBupX33htzV+aueq9brjx+b0T0oucL+vr13XzGYvZ+WX/3huC
+         BrOw+jzBPng1MeaaMgjkY0PtnSVUR4kp2FqRrGrbjbWtOEXz8ybl35yTmwQ1t/qYh6
+         rYy9M5lZAObjg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id C2BC8C05FD5; Fri,  8 Apr 2022 05:51:46 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215776] Unable to reconnect Bluetooth keyboard after
+ disconnection
+Date:   Fri, 08 Apr 2022 05:51:46 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: newjuerlee@gmail.com
+X-Bugzilla-Status: CLOSED
+X-Bugzilla-Resolution: DOCUMENTED
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215776-62941-AjaAlDADHi@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215776-62941@https.bugzilla.kernel.org/>
+References: <bug-215776-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] shell: Fix not being able to auto complete submenus
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220407235949.2428708-1-luiz.dentz@gmail.com>
-References: <20220407235949.2428708-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2176159336167441354==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215776
 
-This is automated email and please do not reply to this email!
+--- Comment #4 from newjuerlee@gmail.com ---
+help
 
-Dear submitter,
+<bugzilla-daemon@kernel.org> =E4=BA=8E2022=E5=B9=B43=E6=9C=8831=E6=97=A5=E5=
+=91=A8=E5=9B=9B 10:51=E5=86=99=E9=81=93=EF=BC=9A
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=630223
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D215776
+>
+> --- Comment #2 from Marco Zaccheria (zacmarco@gmail.com) ---
+> Hi Artem,
+>
+> thanks for the quick reply, the problem I have is that 5.17.1 seems to
+> tricky
+> to get precompiled for my distro (Ubuntu 20.04 LTS), because of unmet
+> dependencies (libssl3).
+>
+> Being a work PC, I would avoid going through the process of manually
+> compiling
+> the kernel or external packages, or doing a full system upgrade unless
+> strictly
+> necessary (for example, if I'm sure this would resolve my keyboard issue).
+>
+> Said that, is there anyone in he BT support team that could try such a
+> configuration? To be honest, it seems to be a very common issue out there
+> as
+> there are plenty of forums covering (with no final answer) the same topic,
+> so
+> it doesn't seem strictly related to my current keyboard.
+>
+> Could you please advice?
+>
+> Thank you
+>
+>    Marco
+>
+> --
+> You may reply to this email to add a comment.
+>
+> You are receiving this mail because:
+> You are the assignee for the bug.
 
----Test result---
+--=20
+You may reply to this email to add a comment.
 
-Test Summary:
-CheckPatch                    PASS      2.86 seconds
-GitLint                       PASS      1.92 seconds
-Prep - Setup ELL              PASS      42.50 seconds
-Build - Prep                  PASS      0.67 seconds
-Build - Configure             PASS      8.50 seconds
-Build - Make                  PASS      1238.33 seconds
-Make Check                    PASS      11.68 seconds
-Make Check w/Valgrind         PASS      437.83 seconds
-Make Distcheck                PASS      225.68 seconds
-Build w/ext ELL - Configure   PASS      8.59 seconds
-Build w/ext ELL - Make        PASS      1239.81 seconds
-Incremental Build with patchesPASS      2536.87 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2176159336167441354==--
+You are receiving this mail because:
+You are the assignee for the bug.=
