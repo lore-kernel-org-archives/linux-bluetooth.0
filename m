@@ -2,67 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C07CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Apr 2022 07:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78526C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 10 Apr 2022 09:05:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231809AbiDJHcn (ORCPT
+        id S236043AbiDJJIE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 10 Apr 2022 03:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
+        Sun, 10 Apr 2022 05:08:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234203AbiDJHc3 (ORCPT
+        with ESMTP id S229921AbiDJJID (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 10 Apr 2022 03:32:29 -0400
-Received: from mta-out-06.alice.it (mta-out-06.alice.it [217.169.118.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B3090344D5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Apr 2022 00:30:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alice.it; s=20211207; t=1649575819; 
-        bh=aYnN2M2/J7LiDks3GtVfK/dknBgrlIPDu1xhTIZ5SQ0=;
-        h=Message-ID:Content-Type:MIME-Version:Content-Transfer-Encoding:Content-Description:Subject:To:From:Date:Reply-To;
-        b=z6KJJ8crSWOTMRUOLjtgEMLQP0Yv2/qg9whfgnUuTnzwjUDRz+XdlWVL2uDbzzvJtUmNjIjW1lUzRyAzW9pxuL4VAp8aSpX9Qqr2KoG8AFU4FrK6JLSm8F6mQFd92OmKSHkWvUtDaTjv0xks4sFXNxkJ5CkCOgeU2cOpTCl9IU9afYycV15H1UfjwXERzASKQyVW4St+teuI/HaIwwz3p4GPo9vsUlm2l/MRwDDxUJdpBZ1zygb57ae8B6KfT5xq2AXVrIlp3k/ThEh14Ez3ktKvLOFcVfXEjJ/4mNI5yG0TeRqMGpb/ZDgQKZwPh4QOt2A/GjXM19fkTZsmWXIlHw==
-X-RazorGate-Vade: gggruggvucftvghtrhhoucdtuddrgedvvddrudekfedguddulecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfvgffngfevqffokffvtefnkfetpdfqfgfvnecuuegrihhlohhuthemuceftddunecunecujfgurheptggggffuvffhffhrsehtqhdttddttddunecuhfhrohhmpedfofgrthhthhgrihhsucfoihgthhgrvghlfdeofhhilhhiphhpohdrfeefleekkedvudeghedusegrlhhitggvrdhitheqnecuggftrfgrthhtvghrnhepleeikeegveeliefghfegfeeuleektdejtdetkeevhfeileeigedtjeegkefhudegnecukfhppeelhedrudejgedrieegrddugedvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehhvghlohepfghsvghrqdfrvedrfedrhhhomhgvpdhinhgvthepleehrddujeegrdeigedrudegvddpmhgrihhlfhhrohhmpehfihhlihhpphhordeffeelkeekvddugeehudesrghlihgtvgdrihhtpdhnsggprhgtphhtthhopedupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohhthhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-RazorGate-Vade-Verdict: clean 0
-X-RazorGate-Vade-Classification: clean
-Received: from User-PC.3.home (95.174.64.142) by mta-out-06.alice.it (5.8.807.04) (authenticated as filippo.3398821451@alice.it)
-        id 624F4060006F384F for linux-bluetooth@vger.kernel.org; Sun, 10 Apr 2022 09:30:15 +0200
-Message-ID: <624F4060006F384F@mta-out-06.alice.it> (added by
-            postmaster@alice.it)
-Content-Type: text/plain; charset="iso-8859-1"
+        Sun, 10 Apr 2022 05:08:03 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D21292
+        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Apr 2022 02:05:53 -0700 (PDT)
+Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1ndTW2-0005gq-4M; Sun, 10 Apr 2022 11:05:50 +0200
+Message-ID: <7afb6b94-cbd8-fecd-9c68-4200d87cda59@leemhuis.info>
+Date:   Sun, 10 Apr 2022 11:05:46 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Description: Mail message body
-Subject: Compliment
-To:     linux-bluetooth@vger.kernel.org
-From:   "Matthais Michael" <filippo.3398821451@alice.it>
-Date:   Sun, 10 Apr 2022 08:30:11 +0100
-Reply-To: matthais.michael@cheapnet.it
-Sensitivity: Personal
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v4 1/4] Bluetooth: HCI: Add
+ HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk
+Content-Language: en-US
+To:     patchwork-bot+bluetooth@kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Jakub Kicinski <kuba@kernel.org>
+References: <20220401233826.122544-1-luiz.dentz@gmail.com>
+ <164917981297.18365.2641777452049475210.git-patchwork-notify@kernel.org>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <164917981297.18365.2641777452049475210.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1649581553;da8f8199;
+X-HE-SMSGID: 1ndTW2-0005gq-4M
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-My n a m e is Matthais Michael, the Director of Financial Security and Trus=
-t F u n d Builders, our company was contracted to release your Covid-19 Com=
-pensation p a y m e n t to you on behalf of the UNITED NATION (UN). Your pa=
-yment R e l e a s e Code is: CNG/3480/04/00. The Total amount payable to yo=
-u is US$7.5 Million.
+Hi, this is your Linux kernel regression tracker.
 
-You are to reconfirm the following information to enable us determine that =
-we are dealing with the right b e n e f i c i a r y, also the receipt of yo=
-ur information  will facilitate the processing of your payment:
+On 05.04.22 19:30, patchwork-bot+bluetooth@kernel.org wrote:
+> 
+> This series was applied to bluetooth/bluetooth-next.git (master)
+> by Marcel Holtmann <marcel@holtmann.org>:
+> 
+> On Fri,  1 Apr 2022 16:38:23 -0700 you wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-1 F u l l Name:
-2 Residential address:
-3 A g e:
-4 Occupation:
-5 D i r e c t telephone n u m b e r s:
+BTW: Thx for taking care of this, Luiz!
 
-After verification of your Information, you will be contacted with detailed=
- i n f o r m a t i o n of procedures for the immediate release of your paym=
-ent to y o u without any hitch whatsoever.
+>> This adds HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk which can be
+>> used to mark HCI_Enhanced_Setup_Synchronous_Connection as broken even
+>> if its support command bit are set since some controller report it as
+>> supported but the command don't work properly with some configurations
+>> (e.g. BT_VOICE_TRANSPARENT/mSBC).
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>   - [v4,1/4] Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/c625b467f47c
+>   - [v4,2/4] Bluetooth: Print broken quirks
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/fa5cd0fd5bdf
+>   - [v4,3/4] Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
+>     https://git.kernel.org/bluetooth/bluetooth-next/c/38a1944deda4
+>   - [v4,4/4] Bluetooth: hci_sync: Split hci_dev_open_sync
+>     (no matching commit)
+> 
+> You are awesome, thank you!
 
-Send the requested information so we can proceed accordingly.
+Hey, this patchset is fixing a regression from 5.16 (see patch 3/4), but
+apparently is only scheduled to go upstream in the next cycle, as it was
+applied to bluetooth-next.git. The patches also seem to miss tags to get
+them backported to stable. Is that intentional? At least patches 1, 2,
+and 3 don't look that complex, why can't they get in this cycle and get
+backported to stable soon to finally provide a solution for users that
+are plagued by this for weeks already?
 
-Regards
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
 
-Mr. Matthais Michael
+P.S.: As the Linux kernel's regression tracker I'm getting a lot of
+reports on my table. I can only look briefly into most of them and lack
+knowledge about most of the areas they concern. I thus unfortunately
+will sometimes get things wrong or miss something important. I hope
+that's not the case here; if you think it is, don't hesitate to tell me
+in a public reply, it's in everyone's interest to set the public record
+straight.
