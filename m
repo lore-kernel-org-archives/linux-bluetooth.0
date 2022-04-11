@@ -2,122 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB498C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 19:16:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9685EC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 21:04:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349530AbiDKTSk (ORCPT
+        id S239690AbiDKVHA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Apr 2022 15:18:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36730 "EHLO
+        Mon, 11 Apr 2022 17:07:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235610AbiDKTSi (ORCPT
+        with ESMTP id S1346486AbiDKVG7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Apr 2022 15:18:38 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A79236B7D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 12:16:23 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id t12so2343234pll.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 12:16:23 -0700 (PDT)
+        Mon, 11 Apr 2022 17:06:59 -0400
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF6B2AC49
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:04:44 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 88-20020a9d0ee1000000b005d0ae4e126fso12135152otj.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:04:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=aqPebkqfmJxhumkpjK5kd2ZdUuBokr3wa5daJVIbJ0A=;
-        b=XAyCdzLHvlpPmxZw2mD+Bm9pxxVGIJ/qU7Dwgovs2SB/3A18StZUGU9ekQQDLFpe5Y
-         V3oJ6X7JhTk8t/CB5L8IafS8LmdIHdtn3ct98ecGMFMh4uTekYf/1oFtwNUYofIHBhmj
-         xRBLIsIrDIudahjEUt1eqPGFFF9BKQl6ItoFO4cFUM9gv5ioMXKUmpSj3IZnM9nL8UII
-         rxToMkyiDsUS2fDI0gD39+EakEjoc8M7G84t05Wjh7TFWyJTPNIBa6DfhGNNqkKVl+10
-         5aK7h8dG6uGOPQNrYQrt9HZ/Cj7DzP5wK26mDFASAN6jeYabKcg+iE5lGS/vzjkdqdEn
-         W/Jw==
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=77PX79Y9IPAg5eHYXNxxfMPoxrPEosfgIY3QM8YJll8=;
+        b=HIkQz44wBum19qdatUG526f4XiRWheHtHVxCYhxfaqqiEtuH7WwWxZFamXzz+JtPju
+         0VL/DG2XsnoF8crLKPRzng22wuqnKv1jFHYcE0nfRina9YGLEziQigyZ9zgcapaUqWmL
+         tpcRMrF0WOTRhrxTDoN7wh/oDuu9PlXbRIDKDglMpud+OyWhQYPFRQbZiAz0HAD0RjPS
+         2ga8Qtn/MnguZjyUfG+OLq80Wb8tvC3z/qZ9dCNnjcnlRDXGPonmfx+aAA8zn/OmrzQi
+         KU0KwgwzX5DLw4bMxg1VAwSacniZGQH7EhWC6sJ89kog6hR2frMO5TByrUcHVWs28Dd9
+         ys2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=aqPebkqfmJxhumkpjK5kd2ZdUuBokr3wa5daJVIbJ0A=;
-        b=hq2hGU/tKg5bggLsw2zJ/tzTLO3zguQQWIQsFBZ7y18wSGlelz0Dcup1MlOSzprc6n
-         6F9ZoUdg+GEluONQHKAeGOtJEhbkbZoe2zgY2Ixvi0V1C+jS5N0rLi3iJR7KRj6KQPBn
-         TkcTkIlbRlesdj5emSf2b2Ln/trkD/Mq71Mdbw3S0Sa69SuWla2jcJLjBmAqSpk95rH2
-         M1ELQ0W8zG5zPIUSAXN9crweO4KGZ49oCs5m+hlTi5rxThoNG9TTqgsnux9sjarIDih5
-         WuuMleWhfRbpclA0k+msFVhR98pb3AHOENsEq+zjP5z21j0vF8SozQZUPlgbFYA44uzc
-         ZOqA==
-X-Gm-Message-State: AOAM532XcuVO5czmNYrcDjBe3wJpxjzuW9TBCRBDbY2OggyAZcUy0bM6
-        4jWGRBdZojtM0oMaOx7ioolbX/Pxdf/AWw==
-X-Google-Smtp-Source: ABdhPJwAuC0TwViWK/0BX2oRWvSHJlTFjqNNurviS9XsvvqhfB4BEKqJLoTKOa9nswjcb2m+u9j5Mw==
-X-Received: by 2002:a17:902:cec4:b0:158:5584:7c46 with SMTP id d4-20020a170902cec400b0015855847c46mr8398879plg.80.1649704582763;
-        Mon, 11 Apr 2022 12:16:22 -0700 (PDT)
-Received: from [172.17.0.2] ([13.91.224.68])
-        by smtp.gmail.com with ESMTPSA id g15-20020a056a0023cf00b004e17e11cb17sm37964593pfc.111.2022.04.11.12.16.22
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=77PX79Y9IPAg5eHYXNxxfMPoxrPEosfgIY3QM8YJll8=;
+        b=W1haZz92p8W9+Mbo/nWf761eyJs0DvTgkhUmGEMDvogv+4l6/iTH0nW/afiZL4uqU1
+         DnRZ5Erag9e6MrihOgJIMmcK0j7S6lD3xxPYXvmmJG1flFhlIfHBr/6RxwwoMoJa74ge
+         Hqs/fCLSWtEqXRg/5CSclffDkggKS49OsEKKmQdBvd5S/pmGV//AH5h2i/4KzzUHv/0Y
+         V7K+nWRwHlIPLWMcs8aTsd0oXv9OAZSsqVndaORK1N0t5jWJh7laPvwLgfkAq6nUd4M3
+         sTwYPoK1CEZwsywUZqxCaDjoT0X6PO43c7GXvAMELyqK0BMioebXe31J30/c5l89gxO2
+         /ZFg==
+X-Gm-Message-State: AOAM531/X4f5lelBML6h2Gw3ha2TvEwCrE3nyauW5HZ+DbBPhkql0YLQ
+        BPXa+3xd45m8hv5iYSHjlkI56A==
+X-Google-Smtp-Source: ABdhPJzbt+6r3bUkdCzVZS8rMIyYxfN0BphKqVhmcZuHTHMoVlPWzuKcs4sx10u/Py/5hjORnkewrA==
+X-Received: by 2002:a05:6830:d8:b0:5b2:553d:2cf8 with SMTP id x24-20020a05683000d800b005b2553d2cf8mr12021675oto.156.1649711083390;
+        Mon, 11 Apr 2022 14:04:43 -0700 (PDT)
+Received: from builder.lan ([2600:1700:a0:3dc8:3697:f6ff:fe85:aac9])
+        by smtp.gmail.com with ESMTPSA id i28-20020a9d4a9c000000b005ce06a77de2sm13366637otf.48.2022.04.11.14.04.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 12:16:22 -0700 (PDT)
-Message-ID: <62547e86.1c69fb81.fac87.1e51@mx.google.com>
-Date:   Mon, 11 Apr 2022 12:16:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1295946229488578287=="
+        Mon, 11 Apr 2022 14:04:42 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 16:04:40 -0500
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Cc:     agross@kernel.org, robh+dt@kernel.org,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, mka@chromium.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
+        mcchou@chromium.org
+Subject: Re: [RESEND v3] arm64: dts: qcom: sc7280: Add IO regulator handler
+ in SC7280 CRD platforms
+Message-ID: <YlSX6AvqoZafn2Kn@builder.lan>
+References: <1647937864-25661-1-git-send-email-quic_saluvala@quicinc.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ismael@iodev.co.uk
-Subject: RE: Bluetooth: btusb: Add 0x0bda:0x8771 Realtek 8761BUV (UGREEN CM390)
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220411174747.13704-1-ismael@iodev.co.uk>
-References: <20220411174747.13704-1-ismael@iodev.co.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1647937864-25661-1-git-send-email-quic_saluvala@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1295946229488578287==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue 22 Mar 03:31 CDT 2022, Sai Teja Aluvala wrote:
 
-This is automated email and please do not reply to this email!
+> Add IO regulator handler in SC7280 CRD based platforms.
+> As IO regulator varies in different SC7280 platforms
+> updating this handler in individual platform bluetooth node.
+> 
 
-Dear submitter,
+To me a significant part of this change is "bluetooth", yet it's not
+mentioned until the very end of the commit message.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=631181
+Please update your $subject to be more to the point and to include
+"bluetooth", and please don't repeat $subject as the first line in your
+commit message.
 
----Test result---
+Thanks,
+Bjorn
 
-Test Summary:
-CheckPatch                    FAIL      0.86 seconds
-GitLint                       PASS      0.45 seconds
-SubjectPrefix                 PASS      0.31 seconds
-BuildKernel                   PASS      38.29 seconds
-BuildKernel32                 PASS      34.51 seconds
-Incremental Build with patchesPASS      49.79 seconds
-TestRunner: Setup             PASS      589.49 seconds
-TestRunner: l2cap-tester      PASS      18.06 seconds
-TestRunner: bnep-tester       PASS      7.24 seconds
-TestRunner: mgmt-tester       PASS      126.14 seconds
-TestRunner: rfcomm-tester     PASS      9.79 seconds
-TestRunner: sco-tester        PASS      9.48 seconds
-TestRunner: smp-tester        PASS      9.40 seconds
-TestRunner: userchan-tester   PASS      7.72 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 0.86 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-Bluetooth: btusb: Add 0x0bda:0x8771 Realtek 8761BUV (UGREEN CM390)\WARNING:COMMIT_MESSAGE: Missing commit description - Add an appropriate one
-
-total: 0 errors, 1 warnings, 10 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12809480.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1295946229488578287==--
+> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> ---
+> v3: Updated commit text to reflect the change
+> v2: updated reviewer comments.
+> v1: intial patch
+> ---
+> ---
+>  arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> index cd2755c..53ea3b4 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> +++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> @@ -23,6 +23,10 @@
+>  	};
+>  };
+>  
+> +&bluetooth {
+> +	vddio-supply = <&vreg_l18b_1p8>;
+> +};
+> +
+>  ap_tp_i2c: &i2c0 {
+>  	status = "okay";
+>  	clock-frequency = <400000>;
+> -- 
+> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+> 
