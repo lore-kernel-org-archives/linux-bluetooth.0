@@ -2,399 +2,197 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E5D3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 18:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AD5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 18:51:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349234AbiDKSrv (ORCPT
+        id S1349266AbiDKSxj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Apr 2022 14:47:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56168 "EHLO
+        Mon, 11 Apr 2022 14:53:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345246AbiDKSru (ORCPT
+        with ESMTP id S1349260AbiDKSxg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Apr 2022 14:47:50 -0400
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528402CC9F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 11:45:34 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-2eafabbc80aso175899157b3.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 11:45:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1p3bN3ZG1sFv0w36j9uW2MNlGWIeVcizrsv1xoxYlhg=;
-        b=Qm2yxZkUVPJ4/fSD3xtlhg1aUKW3eMSsx5IdVv3zGFCmuCfupU9im0VoijyvDNiATk
-         V8q0LI1wb2eUjia5LNqF6VR1fXsCp4I3PUWlLj1SxzyGvWeKKI6ELdw/FkmdPw0cB1iB
-         QaMB3FahGxKRI2/AQTcl2sTUpc4KIAWlh5lhljkhYSMqWVIDE4cQtO6hMc6FFMCd2+2r
-         vEn5pEOpme1kMRJdp36/Dagi72XFOnbxc6wrHy4ISwZgJCkK3YJw5Rr67wUVbQhHcNJG
-         xFPpvZXGl5cksUT6ciFOkAzTZW94zgjeVSNfMQOx95d6VV9T/vGPcCEWeWwhg5M+qvMD
-         VnYg==
+        Mon, 11 Apr 2022 14:53:36 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0553E0C7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 11:51:20 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id d1-20020a6bcd01000000b0064d23a49b27so6706197iog.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 11:51:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1p3bN3ZG1sFv0w36j9uW2MNlGWIeVcizrsv1xoxYlhg=;
-        b=CUPTYdGdu+JU+4oziSQHWP9S4dJl+++F3n0OoF4pcW0Y8LDHGg+AigwyvbnEhD0R99
-         SBD5e/tbgm4hQc0zyfjLJKSq6e2BfvOozI7ki4hr8UAMO6DSXOeAY902M9Rg/+9LUH9c
-         iFafC/W//meHQ1Avw16qBbrloVGigcrD47TGcK5beS1fjmemWdzEqSK6qVVuUii5hU+/
-         ZfopoFuy5ZfoCcHk6i4FuKXdzqG36mJ+ESuVS/FPTf1LMst83i6USIpiDDpSlFivt4wQ
-         CIbxRX5eYj0rTXNaNZ9bTcvQ/w90eVVelFpkYAadx5i9VAFhIq3u1uWwROlwYiQYnhj0
-         wf/w==
-X-Gm-Message-State: AOAM533xKD/ryVYgS6UF9xEEypP+yznBX85d5nBAta3r69rjhrJ/rpTU
-        dxgaLoWzSX6pZfbAscVlOZztXLkaNe2KCwsnkfErSpT7
-X-Google-Smtp-Source: ABdhPJzOj/7LbfUVF97G8jjq77FUeN8rWY7e3aC04DtbQbYtBj4Kc1DMTbj4Mt0ntfb17QGB5DExpQLOZN2JlY4i3ws=
-X-Received: by 2002:a81:4987:0:b0:2ec:4986:eeb4 with SMTP id
- w129-20020a814987000000b002ec4986eeb4mr2580395ywa.150.1649702733431; Mon, 11
- Apr 2022 11:45:33 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=krJm4vr1bgmJgUgNDyh6UBF5mJpXVx2anHtQTms+VBM=;
+        b=kudQjW31hBjIrBvQJzoc5REzW34f0/Mo0zRIn5traGuqH5wQDDI/4wcPogvflgs7ab
+         8isTg9KJ/GGO2T7jae1mxjDaFC4QcOBpGrD1K8k/+LbAGv23b4Og2tWuhFReLjo+b/4B
+         JATKLA5HJjGm9DgASW9nbzRYUNF9zM2GlzyjkTagOE7Tosq8GBR+lGuipOFwNGVtTuCD
+         oURrI58fFsowy/FKv4OrxaLzF+4YKG+QzMT/XMzAuITYdYJKdoP4oJO/sETcU3A6+hN7
+         6nqfgM5AfVrHo0lU08Gfrj15qPDfsPiDur0elP95PG9VRw7iAoASBGv7PrG75stPyYb3
+         r/SA==
+X-Gm-Message-State: AOAM533Z+PKQx6juAKTHYFZSvFhmMFiiZnwjPFr7VNpcqwofe5E895R6
+        QmaaDHpc+DR0WZbLi2yeJuNxmNG1xKZ7aGQ4ZtS+MeEO0qib
+X-Google-Smtp-Source: ABdhPJw8NTvadcUpf18oM9LygklWpQS332IuVoJT6oX/kODIOc5pa5yL4UZsOqtqf4cT8wNtgpVfEaQYoMRtnv1bNUiHlxeaicDz
 MIME-Version: 1.0
-References: <20220408080633.20463-1-kiran.k@intel.com>
-In-Reply-To: <20220408080633.20463-1-kiran.k@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 11 Apr 2022 11:45:22 -0700
-Message-ID: <CABBYNZJSE32xQF5buFUCN-QcmMyPPuHpnPMp_vvHRkRUTM65ng@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: btintel: Add support to configure TX power
-To:     Kiran K <kiran.k@intel.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Seema S <seema.sreemantha@intel.com>
+X-Received: by 2002:a05:6e02:1a81:b0:2c9:e6ac:49c with SMTP id
+ k1-20020a056e021a8100b002c9e6ac049cmr13877913ilv.281.1649703080065; Mon, 11
+ Apr 2022 11:51:20 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 11:51:20 -0700
+In-Reply-To: <00000000000098289005dc17b71b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000127d8305dc656e84@google.com>
+Subject: Re: [syzbot] possible deadlock in sco_conn_del
+From:   syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+syzbot has found a reproducer for the following issue on:
 
-On Fri, Apr 8, 2022 at 1:02 AM Kiran K <kiran.k@intel.com> wrote:
->
-> BRDS - Bluetooth Regulatory Domain Specific absorption rate
-> -----------------------------------------------------------
->
-> Bluetooth has regulatory limitations which prohibit or allow usage
-> of certain bands or channels as well as limiting Tx power. The Tx power
-> values can be configured in ACPI table. This patch reads ACPI entry of
-> Bluetooth SAR and configures the controller accordingly.
+HEAD commit:    d12d7e1cfe38 Add linux-next specific files for 20220411
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=162e29a8f00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=58fcaf7d8df169a6
+dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a2ff0f700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149fd2df700000
 
-It should be great to have a trace example of the commands in use, so
-if we can have btmon decoding these to show what is being sent that
-way we can also debug if something goes wrong.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com
 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Signed-off-by: Seema S <seema.sreemantha@intel.com>
-> ---
->  drivers/bluetooth/btintel.c | 229 ++++++++++++++++++++++++++++++++++++
->  drivers/bluetooth/btintel.h |  18 +++
->  2 files changed, 247 insertions(+)
->
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 818681c89db8..d3dc703eba78 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -9,6 +9,7 @@
->  #include <linux/module.h>
->  #include <linux/firmware.h>
->  #include <linux/regmap.h>
-> +#include <linux/acpi.h>
->  #include <asm/unaligned.h>
->
->  #include <net/bluetooth/bluetooth.h>
-> @@ -32,6 +33,9 @@ struct cmd_write_boot_params {
->         u8  fw_build_yy;
->  } __packed;
->
-> +#define BTINTEL_SAR_NAME       "BRDS"
-> +#define BTINTEL_SAR_PREFIX     "\\_SB_.PC00.XHCI.RHUB"
-> +
->  int btintel_check_bdaddr(struct hci_dev *hdev)
->  {
->         struct hci_rp_read_bd_addr *bda;
-> @@ -2250,6 +2254,228 @@ static int btintel_configure_offload(struct hci_dev *hdev)
->         return err;
->  }
->
-> +static acpi_status btintel_sar_callback(acpi_handle handle, u32 lvl, void *data,
-> +                                       void **ret)
-> +{
-> +       acpi_status status;
-> +       int len;
-> +       struct btintel_sar *sar;
-> +       union acpi_object *p, *elements;
-> +       struct acpi_buffer string = {ACPI_ALLOCATE_BUFFER, NULL};
-> +       struct acpi_buffer buffer = {ACPI_ALLOCATE_BUFFER, NULL};
-> +
-> +       status = acpi_get_name(handle, ACPI_FULL_PATHNAME, &string);
-> +       if (ACPI_FAILURE(status)) {
-> +               BT_DBG("ACPI Failure: %s", acpi_format_exception(status));
-> +               return status;
-> +       }
-> +
-> +       if (strncmp(BTINTEL_SAR_PREFIX, string.pointer,
-> +                   strlen(BTINTEL_SAR_PREFIX))) {
-> +               kfree(string.pointer);
-> +               return AE_OK;
-> +       }
-> +
-> +       len = strlen(string.pointer);
-> +       if (strncmp((char *)string.pointer + len - 4, BTINTEL_SAR_NAME, 4)) {
-> +               kfree(string.pointer);
-> +               return AE_OK;
-> +       }
-> +       kfree(string.pointer);
-> +
-> +       status = acpi_evaluate_object(handle, NULL, NULL, &buffer);
-> +       if (ACPI_FAILURE(status)) {
-> +               BT_DBG("ACPI Failure: %s", acpi_format_exception(status));
-> +               return status;
-> +       }
-> +
-> +       p = buffer.pointer;
-> +       sar = data;
-> +
-> +       if (p->type != ACPI_TYPE_PACKAGE || p->package.count != 2) {
-> +               kfree(buffer.pointer);
-> +               BT_DBG("Invalid object type or package count");
-> +               return AE_ERROR;
-> +       }
-> +
-> +       elements = p->package.elements;
-> +
-> +       /* SAR table is located at element[1] */
-> +       p = &elements[1];
-> +
-> +       if (p->type != ACPI_TYPE_PACKAGE || p->package.count != 8) {
-> +               kfree(buffer.pointer);
-> +               return AE_ERROR;
-> +       }
-> +
-> +       sar->domain = (u8)p->package.elements[0].integer.value;
-> +       sar->type = (u8)p->package.elements[1].integer.value;
-> +       sar->br = (u32)p->package.elements[2].integer.value;
-> +       sar->edr2 = (u32)p->package.elements[3].integer.value;
-> +       sar->edr3 = (u32)p->package.elements[4].integer.value;
-> +       sar->le = (u32)p->package.elements[5].integer.value;
-> +       sar->le_2mhz = (u32)p->package.elements[6].integer.value;
-> +       sar->le_lr  = (u32)p->package.elements[7].integer.value;
-> +       kfree(buffer.pointer);
-> +       return AE_CTRL_TERMINATE;
-> +}
-> +
-> +static void btintel_send_sar_ddc(struct hci_dev *hdev, void *data, u8 len)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       skb = __hci_cmd_sync(hdev, 0xfc8b, len, data, HCI_CMD_TIMEOUT);
-> +       if (IS_ERR(skb)) {
-> +               bt_dev_warn(hdev, "Failed to send Intel Write SAR DDC (%ld)", PTR_ERR(skb));
-> +               return;
-> +       }
-> +       kfree_skb(skb);
-> +}
-> +
-> +static int btintel_set_legacy_sar(struct hci_dev *hdev, struct btintel_sar *sar)
-> +{
-> +       struct btintel_cp_ddc_write     *cmd;
-> +       u8      buffer[64];
-> +
-> +       if (!sar)
-> +               return -EINVAL;
+======================================================
+WARNING: possible circular locking dependency detected
+5.18.0-rc1-next-20220411-syzkaller #0 Not tainted
+------------------------------------------------------
+syz-executor104/3623 is trying to acquire lock:
+ffff88807bd9b130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1682 [inline]
+ffff88807bd9b130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
 
-Add a memset to 0 as this may trigger uninitialized errors in the
-likes of static analyzers.
+but task is already holding lock:
+ffffffff8d777e08 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1580 [inline]
+ffffffff8d777e08 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xda/0x260 net/bluetooth/hci_conn.c:1458
 
-> +       cmd = (void *)buffer;
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x0131);
-> +       cmd->data[0] = sar->br >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-
-We should probably handle the errors when sending these commands and
-don't continue, also perhaps it would be better to have each command
-in its own function with a proper name indicating what it is doing.
-
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x0132);
-> +       cmd->data[0] = sar->br >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       cmd->len = 5;
-> +       cmd->id = cpu_to_le16(0x0137);
-> +       cmd->data[0] = sar->br >> 3;
-> +       cmd->data[1] = sar->edr2 >> 3;
-> +       cmd->data[2] = sar->edr3 >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 6);
-> +
-> +       cmd->len = 5;
-> +       cmd->id = cpu_to_le16(0x0138);
-> +       cmd->data[0] = sar->br >> 3;
-> +       cmd->data[1] = sar->edr2 >> 3;
-> +       cmd->data[2] = sar->edr3 >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 6);
-> +
-> +       cmd->len = 5;
-> +       cmd->id = cpu_to_le16(0x013b);
-> +       cmd->data[0] = sar->br >> 3;
-> +       cmd->data[1] = sar->edr2 >> 3;
-> +       cmd->data[2] = sar->edr3 >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 6);
-> +
-> +       cmd->len = 5;
-> +       cmd->id = cpu_to_le16(0x013c);
-> +       cmd->data[0] = sar->br >> 3;
-> +       cmd->data[1] = sar->edr2 >> 3;
-> +       cmd->data[2] = sar->edr3 >> 3;
-> +       btintel_send_sar_ddc(hdev, cmd, 6);
-> +
-> +       return 0;
-> +}
-> +
-> +static int btintel_set_mutual_sar(struct hci_dev *hdev, struct btintel_sar *sar)
-> +{
-> +       u8 buffer[64];
-> +       struct btintel_cp_ddc_write *cmd;
-> +       u8 enable[1] = {1};
-> +       struct sk_buff *skb;
-> +
-> +       if (!sar)
-> +               return -EINVAL;
-> +
-> +       cmd = (void *)buffer;
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x019e);
-> +       if (!(sar->le_2mhz & BIT(7)))
-> +               cmd->data[0] = 0x01;
-> +       else
-> +               cmd->data[0] = 0x00;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-
-Ditto as above.
-
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x019f);
-> +       cmd->data[0] = sar->le_lr;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x01a0);
-> +       cmd->data[0] = sar->br;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x01a1);
-> +       cmd->data[0] = sar->edr2;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x01a2);
-> +       cmd->data[0] = sar->edr3;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       cmd->len = 3;
-> +       cmd->id = cpu_to_le16(0x01a3);
-> +       cmd->data[0] = sar->le;
-> +       btintel_send_sar_ddc(hdev, cmd, 4);
-> +
-> +       skb = __hci_cmd_sync(hdev, 0xfe25, 1, enable, HCI_CMD_TIMEOUT);
-> +       if (IS_ERR(skb)) {
-> +               bt_dev_warn(hdev, "Failed to send Intel SAR Enable (%ld)", PTR_ERR(skb));
-> +               return PTR_ERR(skb);
-> +       }
-> +       kfree_skb(skb);
-> +
-> +       return 0;
-> +}
-> +
-> +static int btintel_set_specific_absorption_rate(struct hci_dev *hdev,
-> +                                               struct intel_version_tlv *ver)
-> +{
-> +       acpi_status status;
-> +       struct btintel_sar sar;
-> +
-> +       switch (ver->cnvr_top & 0xfff) {
-> +       case 0x810: /* MsP */
-> +               break;
-> +       default:
-> +               return 0;
-> +       }
-> +
-> +       memset(&sar, 0, sizeof(sar));
-> +
-> +       status = acpi_walk_namespace(ACPI_TYPE_METHOD, ACPI_ROOT_OBJECT,
-> +                                    ACPI_UINT32_MAX, NULL,
-> +                                    btintel_sar_callback, &sar, NULL);
-> +
-> +       if (ACPI_FAILURE(status))
-> +               return -1;
-> +
-> +       if (sar.domain != 0x12)
-> +               return -1;
-> +
-> +       /* No need to configure controller if Bluetooth SAR is disabled in BIOS
-> +        */
-> +       if (!sar.type)
-> +               return 0;
-> +
-> +       if (sar.type == 1) {
-> +               bt_dev_info(hdev, "Applying both legacy and mutual Bluetooth SAR");
-> +               btintel_set_legacy_sar(hdev, &sar);
-> +               btintel_set_mutual_sar(hdev, &sar);
-> +       }
-> +       return 0;
-> +}
-> +
->  static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
->                                         struct intel_version_tlv *ver)
->  {
-> @@ -2294,6 +2520,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
->         /* Read supported use cases and set callbacks to fetch datapath id */
->         btintel_configure_offload(hdev);
->
-> +       /* Set Specific Absorption Rate */
-> +       btintel_set_specific_absorption_rate(hdev, ver);
-> +
->         hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
->
->         /* Read the Intel version information after loading the FW  */
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index e0060e58573c..7aa58fb7b02a 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -137,6 +137,24 @@ struct intel_offload_use_cases {
->         __u8    preset[8];
->  } __packed;
->
-> +/* structure to store the data read from ACPI table */
-> +struct btintel_sar {
-> +       u8      domain;
-> +       u8      type;
-> +       u32     br;
-> +       u32     edr2;
-> +       u32     edr3;
-> +       u32     le;
-> +       u32     le_2mhz;
-> +       u32     le_lr;
-> +};
-
-The above should also be using __packed, also for data packets the
-multibyte field shall tell what is the expected endianness so given
-the id below is using __le16 I assume the fields above shall be
-__le32.
-
-> +struct btintel_cp_ddc_write {
-> +       u8      len;
-> +       __le16  id;
-> +       u8      data[0];
-> +} __packed;
-> +
->  #define INTEL_HW_PLATFORM(cnvx_bt)     ((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
->  #define INTEL_HW_VARIANT(cnvx_bt)      ((u8)(((cnvx_bt) & 0x003f0000) >> 16))
->  #define INTEL_CNVX_TOP_TYPE(cnvx_top)  ((cnvx_top) & 0x00000fff)
-> --
-> 2.17.1
->
+which lock already depends on the new lock.
 
 
--- 
-Luiz Augusto von Dentz
+the existing dependency chain (in reverse order) is:
+
+-> #2 (hci_cb_list_lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+       hci_connect_cfm include/net/bluetooth/hci_core.h:1565 [inline]
+       hci_remote_features_evt+0x62b/0xa20 net/bluetooth/hci_event.c:3736
+       hci_event_func net/bluetooth/hci_event.c:6890 [inline]
+       hci_event_packet+0x7c1/0xf60 net/bluetooth/hci_event.c:6939
+       hci_rx_work+0x522/0xd60 net/bluetooth/hci_core.c:3819
+       process_one_work+0x996/0x1610 kernel/workqueue.c:2289
+       worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+       kthread+0x2e9/0x3a0 kernel/kthread.c:376
+       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
+
+-> #1 (&hdev->lock){+.+.}-{3:3}:
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+       sco_sock_connect+0x1eb/0xa80 net/bluetooth/sco.c:593
+       __sys_connect_file+0x14f/0x190 net/socket.c:1900
+       __sys_connect+0x161/0x190 net/socket.c:1917
+       __do_sys_connect net/socket.c:1927 [inline]
+       __se_sys_connect net/socket.c:1924 [inline]
+       __x64_sys_connect+0x6f/0xb0 net/socket.c:1924
+       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3095 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3214 [inline]
+       validate_chain kernel/locking/lockdep.c:3829 [inline]
+       __lock_acquire+0x2abe/0x5660 kernel/locking/lockdep.c:5053
+       lock_acquire kernel/locking/lockdep.c:5665 [inline]
+       lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5630
+       lock_sock_nested+0x36/0xf0 net/core/sock.c:3314
+       lock_sock include/net/sock.h:1682 [inline]
+       sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
+       sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1379
+       hci_disconn_cfm include/net/bluetooth/hci_core.h:1583 [inline]
+       hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1458
+       hci_dev_close_sync+0x567/0x1140 net/bluetooth/hci_sync.c:4152
+       hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
+       hci_rfkill_set_block+0x19c/0x1d0 net/bluetooth/hci_core.c:935
+       rfkill_set_block+0x1f9/0x540 net/rfkill/core.c:345
+       rfkill_fop_write+0x2c3/0x570 net/rfkill/core.c:1286
+       vfs_write+0x269/0xac0 fs/read_write.c:589
+       ksys_write+0x1e8/0x250 fs/read_write.c:644
+       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> &hdev->lock --> hci_cb_list_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(hci_cb_list_lock);
+                               lock(&hdev->lock);
+                               lock(hci_cb_list_lock);
+  lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
+
+ *** DEADLOCK ***
+
+4 locks held by syz-executor104/3623:
+ #0: ffffffff8d9583a8 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_write+0x15c/0x570 net/rfkill/core.c:1278
+ #1: ffff888022e89048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
+ #2: ffff888022e88078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x26d/0x1140 net/bluetooth/hci_sync.c:4139
+ #3: ffffffff8d777e08 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1580 [inline]
+ #3: ffffffff8d777e08 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0xda/0x260 net/bluetooth/hci_conn.c:1458
+
+stack backtrace:
+CPU: 0 PID: 3623 Comm: syz-executor104 Not tainted 5.18.0-rc1-next-20220411-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3095 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3214 [inline]
+ validate_chain kernel/locking/lockdep.c:3829 [inline]
+ __lock_acquire+0x2abe/0x5660 kernel/locking/lockdep.c:5053
+ lock_acquire kernel/locking/lockdep.c:5665 [inline]
+ lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5630
+ lock_sock_nested+0x36/0xf0 net/core/sock.c:3314
+ lock_sock include/net/sock.h:1682 [inline]
+ sco_conn_del+0x131/0x2c0 net/bluetooth/sco.c:197
+ sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1379
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1583 [inline]
+ hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1458
+ hci_dev_close_sync+0x567/0x1140 net/bluetooth/hci_sync.c:4152
+ hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
+ hci_rfkill_set_block+0x19c/0x1d0 net/bluetooth/hci_core.c:935
+ rfkill_set_block+0x1f9/0x540 net/rfkill/core.c:345
+ rfkill_fop_write+0x2c3/0x570 net/rfkill/core.c:1286
+ vfs_write+0x269/0xac0 fs/read_write.c:589
+ ksys_write+0x1e8/0x250 fs/read_write.c:644
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f841a998629
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 d1 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f841a1472f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f841aa214c0 RCX: 00007f841a998629
+RDX: 0000000000000008 RSI: 0000000020000080 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007fff20c0bcce
+R13: 00007fff20c0bccf R14: 00007f841aa214c8 R15: 0000000000022000
+ </TASK>
+
