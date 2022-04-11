@@ -2,128 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE7E5C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 09:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51315C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 10:11:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344325AbiDKJWy (ORCPT
+        id S1345148AbiDKKNX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Apr 2022 05:22:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46384 "EHLO
+        Mon, 11 Apr 2022 06:13:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344367AbiDKJWa (ORCPT
+        with ESMTP id S1345245AbiDKKM6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Apr 2022 05:22:30 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC49832EF9;
-        Mon, 11 Apr 2022 02:20:16 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 23B9K7Sx8027537, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 23B9K7Sx8027537
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Mon, 11 Apr 2022 17:20:07 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 11 Apr 2022 17:20:07 +0800
-Received: from localhost.localdomain (172.21.132.198) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Mon, 11 Apr 2022 17:20:06 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
-        <karenhsu@realtek.com>, <kidman@realtek.com>,
-        <max.chou@realtek.com>, <hsinyu_chang@realtek.com>
-Subject: [PATCH] Bluetooth: btrtl: Add support for RTL8852C
-Date:   Mon, 11 Apr 2022 17:19:57 +0800
-Message-ID: <20220411091957.838-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 11 Apr 2022 06:12:58 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3F83A711
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 03:10:44 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id a11so15732861qtb.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 03:10:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Ugl/cvIpYLjRSgPUnwnAhxpqRLKhyWnrRORllHmqwGw=;
+        b=T4PQ5Kb5qeYNy9jxmKQHyvSFG/eYyAr2qlkXxZCOTVehfg6VRbhL2EaYDpJ1yAr6BP
+         /2a6GukioVwl5/WSgQOOhD5+2Ka8qrwGwgdnC6L6BEnldx4hugX8Y0x+FecYCRivMFzg
+         UFXXPmiUc/1BXA5RBx8L5h1YcigYtg1y2JNThB052DDiyoWjnM1k69Dsy6E9XSHBEp4C
+         E7j9PiUF4nL7irPZXvSEjvEngNDfeBcqQbKUTo3p7dxPs/ZW84D8BZkk4QBkpuFChPdb
+         zfsRMsMHif/XNtIUAO7cPPTr61jlr0+wXiYIINmrrNn0lhnLY35U75M6ou4mx1EKIHj/
+         a7JQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Ugl/cvIpYLjRSgPUnwnAhxpqRLKhyWnrRORllHmqwGw=;
+        b=HuHOBcMgjOl1fSUCcel1hHsuxp7HmV+ah25jHgWxTp0SYoB13hm7XXsTk4vIwCeHMr
+         HiGLLkERFX9fZJlGsnmrmoj+JtIBHNsFU32gvKpznSYXnFnmUWomwhDuZprlixz8Ns+5
+         VvQeMwPs/JBqbSBb9ID7WPgZzVSp7zKMb2Gr3KJAxtvL+nWWzZLQpAmZtNg5uIZVpUMr
+         OQVwcGOtLn7V7HoC7sWuKyxeU3Wn4HoEeP3XvQ8KaxHSbVEut6KJdOPcmDERJ4gUoH6w
+         g0i+DqD2cItT1cGWQwzrBLOgwsqXV46mrFGz6CHjq8/hiDw7DV/7xYcIPvseZPJTd2tv
+         Oscg==
+X-Gm-Message-State: AOAM532Fjkninc13oMlwZE5ySR09KOIAOp0lPJ0NxR0WQyJAbkZTtO9/
+        cl2GLckTUEXeX0GUBojGtIUs6WL+J5uyrg==
+X-Google-Smtp-Source: ABdhPJxA9SHljfwcP4HM7VJzJbPOqJYSSeSOFOBPQ1gldoEWWzmMk/DkhJDH6oxZHqL78vkCBJkdVw==
+X-Received: by 2002:ac8:124a:0:b0:2ed:fcf:e7db with SMTP id g10-20020ac8124a000000b002ed0fcfe7dbmr7752251qtj.140.1649671843113;
+        Mon, 11 Apr 2022 03:10:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.127.98.13])
+        by smtp.gmail.com with ESMTPSA id t125-20020a372d83000000b0069c1df12422sm1866027qkh.84.2022.04.11.03.10.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Apr 2022 03:10:42 -0700 (PDT)
+Message-ID: <6253fea2.1c69fb81.a41c5.65e0@mx.google.com>
+Date:   Mon, 11 Apr 2022 03:10:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6702866410200602701=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.198]
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
-X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/11/2022 08:58:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzQvMTEgpFekyCAwNzoyNjowMA==?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, max.chou@realtek.com
+Subject: RE: Bluetooth: btrtl: Add support for RTL8852C
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220411091957.838-1-max.chou@realtek.com>
+References: <20220411091957.838-1-max.chou@realtek.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+--===============6702866410200602701==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add the support for RTL8852C BT controller on USB interface.
-The necessary firmware file will be submitted to linux-firmware.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Max Chou <max.chou@realtek.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=630976
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.75 seconds
+GitLint                       PASS      0.99 seconds
+SubjectPrefix                 PASS      0.82 seconds
+BuildKernel                   PASS      41.54 seconds
+BuildKernel32                 PASS      36.68 seconds
+Incremental Build with patchesPASS      49.60 seconds
+TestRunner: Setup             PASS      603.24 seconds
+TestRunner: l2cap-tester      PASS      19.03 seconds
+TestRunner: bnep-tester       PASS      7.62 seconds
+TestRunner: mgmt-tester       PASS      125.70 seconds
+TestRunner: rfcomm-tester     PASS      9.83 seconds
+TestRunner: sco-tester        PASS      9.83 seconds
+TestRunner: smp-tester        PASS      9.68 seconds
+TestRunner: userchan-tester   PASS      7.88 seconds
+
+
+
 ---
- drivers/bluetooth/btrtl.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 481d488bca0f..47c28fd8f006 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -50,6 +50,7 @@ enum btrtl_chip_id {
- 	CHIP_ID_8761B,
- 	CHIP_ID_8852A = 18,
- 	CHIP_ID_8852B = 20,
-+	CHIP_ID_8852C = 25,
- };
- 
- struct id_table {
-@@ -196,6 +197,14 @@ static const struct id_table ic_id_table[] = {
- 	  .has_msft_ext = true,
- 	  .fw_name  = "rtl_bt/rtl8852bu_fw.bin",
- 	  .cfg_name = "rtl_bt/rtl8852bu_config" },
-+
-+	/* 8852C */
-+	{ IC_INFO(RTL_ROM_LMP_8852A, 0xc, 0xc, HCI_USB),
-+	  .config_needed = false,
-+	  .has_rom_version = true,
-+	  .has_msft_ext = true,
-+	  .fw_name  = "rtl_bt/rtl8852cu_fw.bin",
-+	  .cfg_name = "rtl_bt/rtl8852cu_config" },
- 	};
- 
- static const struct id_table *btrtl_match_ic(u16 lmp_subver, u16 hci_rev,
-@@ -305,6 +314,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 		{ RTL_ROM_LMP_8761A, 14 },	/* 8761B */
- 		{ RTL_ROM_LMP_8852A, 18 },	/* 8852A */
- 		{ RTL_ROM_LMP_8852A, 20 },	/* 8852B */
-+		{ RTL_ROM_LMP_8852A, 25 },	/* 8852C */
- 	};
- 
- 	min_size = sizeof(struct rtl_epatch_header) + sizeof(extension_sig) + 3;
-@@ -768,6 +778,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
- 	case CHIP_ID_8822C:
- 	case CHIP_ID_8852A:
- 	case CHIP_ID_8852B:
-+	case CHIP_ID_8852C:
- 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
- 		hci_set_aosp_capable(hdev);
-@@ -947,3 +958,5 @@ MODULE_FIRMWARE("rtl_bt/rtl8852au_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852au_config.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bu_fw.bin");
- MODULE_FIRMWARE("rtl_bt/rtl8852bu_config.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8852cu_fw.bin");
-+MODULE_FIRMWARE("rtl_bt/rtl8852cu_config.bin");
--- 
-2.17.1
 
+--===============6702866410200602701==--
