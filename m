@@ -2,117 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9685EC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 21:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 625E7C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Apr 2022 21:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239690AbiDKVHA (ORCPT
+        id S1350239AbiDKVu0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Apr 2022 17:07:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54144 "EHLO
+        Mon, 11 Apr 2022 17:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346486AbiDKVG7 (ORCPT
+        with ESMTP id S1350205AbiDKVuZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Apr 2022 17:06:59 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CF6B2AC49
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:04:44 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id 88-20020a9d0ee1000000b005d0ae4e126fso12135152otj.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:04:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=77PX79Y9IPAg5eHYXNxxfMPoxrPEosfgIY3QM8YJll8=;
-        b=HIkQz44wBum19qdatUG526f4XiRWheHtHVxCYhxfaqqiEtuH7WwWxZFamXzz+JtPju
-         0VL/DG2XsnoF8crLKPRzng22wuqnKv1jFHYcE0nfRina9YGLEziQigyZ9zgcapaUqWmL
-         tpcRMrF0WOTRhrxTDoN7wh/oDuu9PlXbRIDKDglMpud+OyWhQYPFRQbZiAz0HAD0RjPS
-         2ga8Qtn/MnguZjyUfG+OLq80Wb8tvC3z/qZ9dCNnjcnlRDXGPonmfx+aAA8zn/OmrzQi
-         KU0KwgwzX5DLw4bMxg1VAwSacniZGQH7EhWC6sJ89kog6hR2frMO5TByrUcHVWs28Dd9
-         ys2w==
+        Mon, 11 Apr 2022 17:50:25 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36AB91A80D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:48:10 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id v14-20020a056e020f8e00b002caa6a5d918so4074881ilo.15
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 14:48:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=77PX79Y9IPAg5eHYXNxxfMPoxrPEosfgIY3QM8YJll8=;
-        b=W1haZz92p8W9+Mbo/nWf761eyJs0DvTgkhUmGEMDvogv+4l6/iTH0nW/afiZL4uqU1
-         DnRZ5Erag9e6MrihOgJIMmcK0j7S6lD3xxPYXvmmJG1flFhlIfHBr/6RxwwoMoJa74ge
-         Hqs/fCLSWtEqXRg/5CSclffDkggKS49OsEKKmQdBvd5S/pmGV//AH5h2i/4KzzUHv/0Y
-         V7K+nWRwHlIPLWMcs8aTsd0oXv9OAZSsqVndaORK1N0t5jWJh7laPvwLgfkAq6nUd4M3
-         sTwYPoK1CEZwsywUZqxCaDjoT0X6PO43c7GXvAMELyqK0BMioebXe31J30/c5l89gxO2
-         /ZFg==
-X-Gm-Message-State: AOAM531/X4f5lelBML6h2Gw3ha2TvEwCrE3nyauW5HZ+DbBPhkql0YLQ
-        BPXa+3xd45m8hv5iYSHjlkI56A==
-X-Google-Smtp-Source: ABdhPJzbt+6r3bUkdCzVZS8rMIyYxfN0BphKqVhmcZuHTHMoVlPWzuKcs4sx10u/Py/5hjORnkewrA==
-X-Received: by 2002:a05:6830:d8:b0:5b2:553d:2cf8 with SMTP id x24-20020a05683000d800b005b2553d2cf8mr12021675oto.156.1649711083390;
-        Mon, 11 Apr 2022 14:04:43 -0700 (PDT)
-Received: from builder.lan ([2600:1700:a0:3dc8:3697:f6ff:fe85:aac9])
-        by smtp.gmail.com with ESMTPSA id i28-20020a9d4a9c000000b005ce06a77de2sm13366637otf.48.2022.04.11.14.04.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 14:04:42 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 16:04:40 -0500
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Cc:     agross@kernel.org, robh+dt@kernel.org,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, mka@chromium.org,
-        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
-        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
-        mcchou@chromium.org
-Subject: Re: [RESEND v3] arm64: dts: qcom: sc7280: Add IO regulator handler
- in SC7280 CRD platforms
-Message-ID: <YlSX6AvqoZafn2Kn@builder.lan>
-References: <1647937864-25661-1-git-send-email-quic_saluvala@quicinc.com>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Nrfu+QqSF6/ab+WasZFQXdtEXQrUlu6Oj2jlqNXgE2Y=;
+        b=A9sw+1ueuNmLkiSexaEp38bHLG+6Imv67ncb5pUweayL8TEC3lgPXBp28vY05XITgQ
+         5XmI7qV2uT3T9mPZwD/xY04oJ31YNuXD7Pq10WYCdi/2NJJjx9ceYOmb2psH5/70kMoT
+         TMwznWxpy0BQpbTxyMb2TxjXFSlSAC+Q4Ngsbvxl6SSo4aas+mzxp5Sd9PAUCFosTiYN
+         DG0lj9yAAaK34JLPcePqi0UpiE02tuK8507Oem8B9JaC9RJi6cB89FpL/1loG96Im8YL
+         fqrF4547WsfZ1rxOh++7rj3QlerFyxxpNmHWigjbJGDPgNzU1PY25W5oaSCqGkgIlJ+h
+         0l/w==
+X-Gm-Message-State: AOAM530B9pCTcYZyL6vAKvqWKWs4W1m22yLVxBrKs2J/Vn9FNBFYYQJK
+        kGrdeXxzh9EMP9JnyCjNZRkCuNF58a1YcZRaAPWxMS1qG/ZO
+X-Google-Smtp-Source: ABdhPJwJO9uxDUuoSJ6AW+FyvTZ0JArsOxFYZApz2erqpsQNVtXt62RJ98yJQG2Mai75WQ1cVZbXr1dav+A3EkX+HtssNTxCCL1X
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1647937864-25661-1-git-send-email-quic_saluvala@quicinc.com>
+X-Received: by 2002:a05:6e02:1e0e:b0:2c6:18c3:9691 with SMTP id
+ g14-20020a056e021e0e00b002c618c39691mr14673558ila.287.1649713689588; Mon, 11
+ Apr 2022 14:48:09 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 14:48:09 -0700
+In-Reply-To: <00000000000098289005dc17b71b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000072fb2705dc67e6c0@google.com>
+Subject: Re: [syzbot] possible deadlock in sco_conn_del
+From:   syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com,
+        josephsih@chromium.org, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
+        yinghsu@chromium.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue 22 Mar 03:31 CDT 2022, Sai Teja Aluvala wrote:
+syzbot has bisected this issue to:
 
-> Add IO regulator handler in SC7280 CRD based platforms.
-> As IO regulator varies in different SC7280 platforms
-> updating this handler in individual platform bluetooth node.
-> 
+commit 92b8aa6d18f7a9ae36a0f71d31742aeef201207a
+Author: Ying Hsu <yinghsu@chromium.org>
+Date:   Sat Mar 26 07:09:28 2022 +0000
 
-To me a significant part of this change is "bluetooth", yet it's not
-mentioned until the very end of the commit message.
+    Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
 
-Please update your $subject to be more to the point and to include
-"bluetooth", and please don't repeat $subject as the first line in your
-commit message.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10fada04f00000
+start commit:   d12d7e1cfe38 Add linux-next specific files for 20220411
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12fada04f00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14fada04f00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=58fcaf7d8df169a6
+dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a2ff0f700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=149fd2df700000
 
-Thanks,
-Bjorn
+Reported-by: syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com
+Fixes: 92b8aa6d18f7 ("Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout")
 
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> ---
-> v3: Updated commit text to reflect the change
-> v2: updated reviewer comments.
-> v1: intial patch
-> ---
-> ---
->  arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> index cd2755c..53ea3b4 100644
-> --- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> +++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> @@ -23,6 +23,10 @@
->  	};
->  };
->  
-> +&bluetooth {
-> +	vddio-supply = <&vreg_l18b_1p8>;
-> +};
-> +
->  ap_tp_i2c: &i2c0 {
->  	status = "okay";
->  	clock-frequency = <400000>;
-> -- 
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
-> 
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
