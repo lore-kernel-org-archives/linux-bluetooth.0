@@ -2,90 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3655BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 05:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBD5FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 12:44:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347955AbiDLFax (ORCPT
+        id S1353785AbiDLMqM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Apr 2022 01:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38088 "EHLO
+        Tue, 12 Apr 2022 08:46:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240383AbiDLFaw (ORCPT
+        with ESMTP id S1353904AbiDLMpx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Apr 2022 01:30:52 -0400
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA5834677
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 22:28:34 -0700 (PDT)
-Received: from [192.168.0.2] (ip5f5aef95.dynamic.kabel-deutschland.de [95.90.239.149])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id B4F5761EA1929;
-        Tue, 12 Apr 2022 07:28:31 +0200 (CEST)
-Message-ID: <b31674e7-f05b-2acc-109c-23e0597307ea@molgen.mpg.de>
-Date:   Tue, 12 Apr 2022 07:28:31 +0200
+        Tue, 12 Apr 2022 08:45:53 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 524997C150;
+        Tue, 12 Apr 2022 05:10:12 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id bg10so36925093ejb.4;
+        Tue, 12 Apr 2022 05:10:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rq9lR94HUSwFCQZMw7bg3ocQXJ+m1X8SURhYPub1cJc=;
+        b=HdmVvFiWFm5FuLOzxIGZw8PYTX2AkLfWmgtmdMqk3e41zt0SS/amriqzLdBoEhiBVY
+         flJD/cwGV/iOGXd/P8hJQvKbnvXGBXwckMPofJsy+Cfxdvz7h5R5R2JYzxmnHI49oQVz
+         iKxLvvtWOWkKNk6nSvWZUXfLtF+Rnw2x8LnJlzVqP/KB8imACgWjQykUgTVrBNGszmJS
+         P6w4IoTt65gvQnUAZMh5bUrTQitCHY7inTg+D5aLGVxd8wC/YcIv7rD+kDE0dx5tRIp8
+         89MvNTFX2vEC8YPLPQHiS9WGDTSCBixkSFs7KBzlYRx/Gtyh9BT8Ke6M1+gN5dwn1b36
+         PJ5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=rq9lR94HUSwFCQZMw7bg3ocQXJ+m1X8SURhYPub1cJc=;
+        b=TiJnck0N3h2KfV+tvmLPuPE7FHlkxJnJTzsLuqcdo3g1CgxAJvpKRc8QvE4ApA17yD
+         bxTRYwvJcog7fD3a3aRvkSIYIrz0FpTG/bERQBLvxjaCU/Sqnqzkn6QbYhAvQqmf6XIW
+         FyoluGhJYHwnZ1NBsqR9n6YzVubJ5NuEm1IYte8VuZ4jW8lwn3xUgQpwXaMKq2uSgH9g
+         nAQNpkFEI5lUFufPJ6fD9Te4axcVbeQfLugwz0tWi45Ler4tmZY6wjHFMaPgbzgBNj+x
+         3N7DW2fGKoOyKx1rWVeu9gPntqwqloFJLUVAoqA48sgT7Y6CxH4vmz7thoXU0GcrIsGy
+         0wUg==
+X-Gm-Message-State: AOAM5304HIFMx4ZmDlFavpx4OB7jRNB1uLIZTGL1EgEJUiF2+j0Hdc2M
+        bOMfwr0JuWzlNsiYQ/x0DFXdAro/t7iL2g==
+X-Google-Smtp-Source: ABdhPJwTAZSruMAB8r/F0xAtfgsPaDIaToqXknRPt2MxMzHNFsXtX+F967xZn+NIgBI/JAMB6MCaug==
+X-Received: by 2002:a17:907:6e17:b0:6da:83a3:c27a with SMTP id sd23-20020a1709076e1700b006da83a3c27amr33351767ejc.415.1649765409959;
+        Tue, 12 Apr 2022 05:10:09 -0700 (PDT)
+Received: from localhost.localdomain ([213.174.17.16])
+        by smtp.gmail.com with ESMTPSA id z16-20020a17090665d000b006e8789e8cedsm3709174ejn.204.2022.04.12.05.10.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 05:10:09 -0700 (PDT)
+From:   Vasyl Vavrychuk <vvavrychuk@gmail.com>
+X-Google-Original-From: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+To:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+Subject: [RFC PATCH] Bluetooth: core: Allow bind HCI socket user channel when HCI is UP.
+Date:   Tue, 12 Apr 2022 15:09:45 +0300
+Message-Id: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH BlueZ] btdev: Fix not cleanup ssp_status and
- ssp_auto_complete
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20220411235804.3776702-1-luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20220411235804.3776702-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Luiz,
+This is needed for user-space to ensure that HCI init scheduled from
+hci_register_dev is completed.
 
+Function hci_register_dev queues power_on workqueue which will run
+hci_power_on > hci_dev_do_open. Function hci_dev_do_open sets HCI_INIT
+for some time.
 
-Thank you for your patch.
+It is not allowed to bind to HCI socket user channel when HCI_INIT is
+set. As result, bind might fail when user-space program is run early
+enough during boot.
 
-Am 12.04.22 um 01:58 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes not clenup ssp_status and ssp_auto_complete flags on
+Now, user-space program can first issue HCIDEVUP ioctl to ensure HCI
+init scheduled at hci_register_dev was completed.
 
-cle*a*nup
+Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+---
+ net/bluetooth/hci_sock.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-> auth_complete.
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 33b3c0ffc339..c98de809f856 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1194,9 +1194,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 
+ 		if (test_bit(HCI_INIT, &hdev->flags) ||
+ 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
+-		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
+-		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
+-		     test_bit(HCI_UP, &hdev->flags))) {
++		    hci_dev_test_flag(hdev, HCI_CONFIG)) {
+ 			err = -EBUSY;
+ 			hci_dev_put(hdev);
+ 			goto done;
+-- 
+2.30.2
 
-I’d just write:
-
-Clean up ssp_status and ssp_auto_complete flags on auth_complete
-
-(Same for the commit message summary.)
-
-> ---
->   emulator/btdev.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index f70fa9136..ccfaed36b 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -1366,6 +1366,11 @@ static void auth_complete(struct btdev_conn *conn, uint8_t status)
->   	ev.status = status;
->   
->   	send_event(conn->dev, BT_HCI_EVT_AUTH_COMPLETE, &ev, sizeof(ev));
-> +
-> +	conn->dev->ssp_status = 0;
-> +	conn->dev->ssp_auth_complete = false;
-> +	conn->link->dev->ssp_status = 0;
-> +	conn->link->dev->ssp_auth_complete = false;
->   }
->   
->   static int cmd_link_key_reply_complete(struct btdev *dev, const void *data,
-
-Acked-by: Paul Menzel <pmenzel@molgen.mpg.de>
-
-
-Kind regards,
-
-Paul
