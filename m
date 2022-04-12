@@ -2,67 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C080FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 02:07:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53352C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 02:52:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243147AbiDLCJ2 (ORCPT
+        id S242416AbiDLCzN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Apr 2022 22:09:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60180 "EHLO
+        Mon, 11 Apr 2022 22:55:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242695AbiDLCJY (ORCPT
+        with ESMTP id S231991AbiDLCzM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Apr 2022 22:09:24 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1F333A00
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 19:07:08 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id g16-20020a05660203d000b005f7b3b0642eso10700812iov.16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 19:07:08 -0700 (PDT)
+        Mon, 11 Apr 2022 22:55:12 -0400
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9168224941
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 19:52:55 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id ke15so15155833qvb.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Apr 2022 19:52:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=LSOG5c8bme/05aqH4tFyobL2k4TvIhReIVToxhBf7QI=;
+        b=RMkB+lqFzLYpb9jmfq4KtS0+Sa7GopX5mv44PLgzH/NSCC+dhcs7vBkKzhH5DLkfhq
+         OIZUAsrLw2tjXvblLV8x75CVN8bCS9uojOSBvV0ZXhMNUQAJTWF+eTVzfPrYHp0IksLP
+         +vBAxsxsaGgemHiw2eoA2qEZ8TsaceTBfMtWbsLE/NKgW1pK5YQvwoi7sdBkf28vHPvS
+         xIT5yUV3QX04rDFSf0pZGhyMQeM67mhrr7TKPd0nnvkd3xW2K8eBVlXnRG0smsNapzSN
+         yeRWzArqRfOwKJsezPwoRFCZ5VDLFi+qQpXTukbmznwQPTmR6BeUQSWSE4Cz+seROeK7
+         k2gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=rgLhKgyYYXped5y5Egl1XGVJSyw4pIOBxrcsqBBOMPM=;
-        b=SWdo930CivI29nXK8Qx7wetFcNeSoFZEXaOqVRSAWCaIW2W7CC+sDQN/tqWz1tFTM3
-         yaY4AgdBYvhxHHSnRvBwbmqh3WkysQceG1vSJgNLHZqGtKdvY6bzhgEswavmqmkczeeH
-         fpgmD4N0OXpwGOHQXj+fOK79cV1IVchbNUBB4xzmL60uRp4DfwgqtzYU9xD0NbGYCCdg
-         rTxgRmjBfhA+y4Heyt9gLL1MsWJMYoS/Ms0OxKgjcNLNY7QyOM5q8m1l9adShIR1FBz9
-         L3t1DrQp2f2l0j9qCAhBQ+Fh1Zal7gRg5WF3KBC9UK0+YNOb+hb7hd+/JaA458K6HjTH
-         Zo2w==
-X-Gm-Message-State: AOAM530dROejhHKacvVrG4YBMhsgRXb2LqHn//v260g1PYffQ3614KPS
-        JwwxcDbThjjZl1LBsyXo2h9FHqqS47GLg6zWl8lXMPDfoM32
-X-Google-Smtp-Source: ABdhPJxIQgnlTG6611QNF85mk+GE0GJsYrhE1dmIPSFt+vn4RQPBc5gWboiYalgK2FPu7DY4f5GKByS9KaJbMktyCjEYOz5HhU6T
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=LSOG5c8bme/05aqH4tFyobL2k4TvIhReIVToxhBf7QI=;
+        b=kbkWdhKs/HLjT0WdqQWq3rlK+pFGpIKufFjQW+/vjN1g/PkdFLrnnMb/nj9YT7RzdR
+         uCQxKxYIp5YrOEp8B9Yn9I4NddA8B3VoZHbslcTUTPfRYZ5x+imwjhuLz7xdzVg3FVgU
+         0sSVGyNGQ+i5GzOHTDAhFwSF/hrG27o5W1VqqaiASeC3OD7NVKxjau9Al32i7Mpfj+2E
+         EaE9GjIccKVFoTmdvnV9W9t/gS3piXHb91iHAji+oYWGAE9w/mI0d3o5Jt2vXef/DBB1
+         DQpTkC4lQfE0IbNNOt+cVE7h9WIymelf7OB+0DO9RNSRygUqj/3XA4qby0FDBocelwuJ
+         D/Zw==
+X-Gm-Message-State: AOAM531Tpt3t5bfpwV8bmgMzU+XzLEleAMOkkg+m+4Ng+eomJsL0gAf6
+        rbFgQ8+FGc48oi1OYyhLBNAbmp/CI/5G1g==
+X-Google-Smtp-Source: ABdhPJy2sKX3odJ0bQQtF1PQqYMnwag8PbxSzCStRHSpEPpvl46QJPc8s/gHZ0bWTBw8CPZ7SgLlqQ==
+X-Received: by 2002:a0c:fd91:0:b0:444:46e9:9556 with SMTP id p17-20020a0cfd91000000b0044446e99556mr1963650qvr.75.1649731974491;
+        Mon, 11 Apr 2022 19:52:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.122.82.10])
+        by smtp.gmail.com with ESMTPSA id 193-20020a3703ca000000b0069bf950dd20sm5813900qkd.43.2022.04.11.19.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Apr 2022 19:52:54 -0700 (PDT)
+Message-ID: <6254e986.1c69fb81.d973.81c4@mx.google.com>
+Date:   Mon, 11 Apr 2022 19:52:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7085990622319275461=="
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ba9:b0:2ca:8e77:82e1 with SMTP id
- n9-20020a056e021ba900b002ca8e7782e1mr7327019ili.311.1649729227774; Mon, 11
- Apr 2022 19:07:07 -0700 (PDT)
-Date:   Mon, 11 Apr 2022 19:07:07 -0700
-In-Reply-To: <20220412015446.6243-1-hdanton@sina.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000098e01a05dc6b8433@google.com>
-Subject: Re: [syzbot] possible deadlock in sco_conn_del
-From:   syzbot <syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com>
-To:     hdanton@sina.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] client/player: Add endpoint menu
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220411235804.3776702-2-luiz.dentz@gmail.com>
+References: <20220411235804.3776702-2-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============7085990622319275461==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+This is automated email and please do not reply to this email!
 
-Reported-and-tested-by: syzbot+b825d87fe2d043e3e652@syzkaller.appspotmail.com
+Dear submitter,
 
-Tested on:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=631261
 
-commit:         d12d7e1c Add linux-next specific files for 20220411
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/
-kernel config:  https://syzkaller.appspot.com/x/.config?x=58fcaf7d8df169a6
-dashboard link: https://syzkaller.appspot.com/bug?extid=b825d87fe2d043e3e652
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13879aa8f00000
+---Test result---
 
-Note: testing is done by a robot and is best-effort only.
+Test Summary:
+CheckPatch                    FAIL      2.59 seconds
+GitLint                       PASS      1.04 seconds
+Prep - Setup ELL              PASS      43.20 seconds
+Build - Prep                  PASS      0.72 seconds
+Build - Configure             PASS      8.65 seconds
+Build - Make                  PASS      1291.87 seconds
+Make Check                    PASS      11.53 seconds
+Make Check w/Valgrind         PASS      448.81 seconds
+Make Distcheck                PASS      231.60 seconds
+Build w/ext ELL - Configure   PASS      8.76 seconds
+Build w/ext ELL - Make        PASS      1265.50 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,1/2] client/player: Add endpoint menu
+ERROR:INITIALISED_STATIC: do not initialise statics to NULL
+#150: FILE: client/player.c:70:
++static GList *medias = NULL;
+
+ERROR:INITIALISED_STATIC: do not initialise statics to NULL
+#154: FILE: client/player.c:74:
++static GList *endpoints = NULL;
+
+ERROR:INITIALISED_STATIC: do not initialise statics to NULL
+#155: FILE: client/player.c:75:
++static GList *local_endpoints = NULL;
+
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#256: FILE: client/player.c:1046:
++		GDBusProxy *proxy = l->data;
++		print_endpoint(proxy, NULL);
+
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#367: FILE: client/player.c:1157:
++						{ "properties", "a{sv}" } ),
+
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#370: FILE: client/player.c:1160:
++					GDBUS_ARGS({ "transport", "o" } ),
+
+ERROR:INITIALISED_STATIC: do not initialise statics to 0
+#610: FILE: client/player.c:1400:
++	static int index = 0;
+
+/github/workspace/src/12809906.patch total: 6 errors, 1 warnings, 1098 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12809906.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7085990622319275461==--
