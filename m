@@ -2,89 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5085FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 19:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8830C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Apr 2022 20:29:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231502AbiDLT4i (ORCPT
+        id S229569AbiDLUaw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Apr 2022 15:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
+        Tue, 12 Apr 2022 16:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232895AbiDLTzX (ORCPT
+        with ESMTP id S229739AbiDLUaV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Apr 2022 15:55:23 -0400
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4B6769CFA
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Apr 2022 12:48:31 -0700 (PDT)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-2ebf3746f87so118528237b3.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Apr 2022 12:48:31 -0700 (PDT)
+        Tue, 12 Apr 2022 16:30:21 -0400
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0603CE6C45
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Apr 2022 13:27:58 -0700 (PDT)
+Received: by mail-il1-f182.google.com with SMTP id y16so14343682ilc.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Apr 2022 13:27:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bRks0/ntxXNc5+ERqFgIMVaFbMGHLMxyKZMpvhFga6k=;
-        b=ZeVhGXiqKe9EsuQS6VS/1VVhcFz/IVLGlKC0/LDvQroOBj8KoxPsVuNJ5iLcUFEzlD
-         4o3HRXVRv4lVpWB3id4Rik0AYpZXtuk/7TCEvwO4DsvFw96qp0mcT3gwbIffr+4Wc54y
-         7DTuG0gpjhS0/tP/yXsqR9yiEbJccmcbAohhS6kWqeeayhtzT5b4X0lovFd04HuUEWXa
-         +OEdgQ09hLwVS3ZtVh7S2CMzDIoAMDepyIGnQbZ18p+lcPpZt4Jbo7cvmQvvGg/v4D2f
-         HYXOMIJLsFNbxKFhlKKrSQ1FYOtBs5x51x8MaddKjwekHwJtxBu7hdS19m6LB9sCsxAI
-         wl1g==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mtWgSbdruveJrUu4BEEfTpIcZsOOG4f5Z6iyZGNvjTs=;
+        b=k8IghNDL9y2NiS75EzSrdDO7SZhF7jWIvOu9suR8Lgq6xuLFw039/ONgyFZiIZAQ2n
+         YO1PSblgTQjmtP9zls9CGMw1OtLRYP1OXsBqb+r6UGCoebQcsJtmPmYXMLqxKiEb+MV1
+         /Zal36mKfVkEzEzLNezz6+dGAaHdZhFIT7kfaSB6GxEg2tvYKgSA1FDGrgolQ6IyVtE/
+         ePLfWFMMyR1/ZeXFcRigPidSmQd87Pbw46NKrA16SPz7V0orgUK08O/X3YxtlyzeePun
+         uzoHdzYdzJNto8chKVFpZ5GgjWEnGOoYD3eW803GUZyPQ7XeWTNRjOcDBAHsoPp3efnK
+         iWBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bRks0/ntxXNc5+ERqFgIMVaFbMGHLMxyKZMpvhFga6k=;
-        b=kreVOICp1h11pVkuyXLKbYbY8fotXeKWghOP42fwmEcqn8BAlrk3O9uPIDwLDr89L4
-         9RCogUAOygm4i8Cfb8zaRU4G53GziS0QPqWcDu5p9bi3GCd7MF7UndspZYnuYGDehPhb
-         Ovsm/CkCQmofmIChBz4jFc2ROxgCg8E8WfTtNbwxM2YcZYP4xNCTBYWcEMawbRKgnijB
-         Fn3L86DYrLIEC7TaRiC39Zpt8Ne97NaKPIbbtq3u/p7e0cI/3xmg5Yv3aJuinFn4U43l
-         GVDTE8F+kGn9sZnUu9UopBcUxwIQ+MxdUeaoI+GOFI2QLb5RO75TBvGSFrUH4HFua0bE
-         MHlQ==
-X-Gm-Message-State: AOAM53005rh42jwuBi5LxWJu+pNyoppG/CYeFbhcnJBiBZoThpuL5mAN
-        QN+j1WW7LVjxGKwL/8092WLrxLHtnHCFavlHlG95853vGRQ=
-X-Google-Smtp-Source: ABdhPJxn1ZPZ+EUNxrS4tVkfyxXgXiNxHzLSlzYdEBE4HUGdgRoqx69TjWdqpn9ylxGvjS6CAaAvw/w+jrI73IlTT6E=
-X-Received: by 2002:a0d:cc83:0:b0:2ec:1f2d:b527 with SMTP id
- o125-20020a0dcc83000000b002ec1f2db527mr10674474ywd.376.1649792910734; Tue, 12
- Apr 2022 12:48:30 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220126113638.1706785-1-hadess@hadess.net> <78f77f0268ce1b4818c0a0749d3371b825fa1c92.camel@hadess.net>
- <390473B8-2187-4C84-B319-9D4A8FB6ED0A@holtmann.org> <61d3fea272805d6bfb1a6cf5883404ea7e294e7c.camel@hadess.net>
- <de2e9b1426587214fcb1b28bb3bec265fd8f9044.camel@hadess.net>
-In-Reply-To: <de2e9b1426587214fcb1b28bb3bec265fd8f9044.camel@hadess.net>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mtWgSbdruveJrUu4BEEfTpIcZsOOG4f5Z6iyZGNvjTs=;
+        b=fE1rR91HfPWU3EbCyNe/WkJ0z6xBboDFAMh5ORdWiw+yW2pHePeLEAMF9o80IxSS/F
+         pgZMgp24FTD+ar27mI/ELf5egFoPFeFVDtnZdi+ivQoZf67lZnu6ju1EhUiyHf8pY84f
+         q/kI8njfVUZiqR8ZXhxlHQUSMJlcFRTy7I3kIY0MdopfOe4y2xyvL8ka0S2VYNw8hAJY
+         ZMUPqnXEOVUNvlu7lgkGdqQjKLToOYAxWnigQ+AFMgnYSHmIbw84lOs5ApELTKHjc5G7
+         Jnm9IFU1gTDehG3408LbsGqPqqT+kUGWTJLViLl/8DKandZB1GGrOOnPhE6WJ0gFf4VI
+         2Kjw==
+X-Gm-Message-State: AOAM530aV/JWxZWD5Rlgn/NW1YtlNPeJqPW4Gy/EC4TAnNLeND4owAVh
+        /GXCXBaDDYNO2uwkWIQgqjYLDhl6i6s=
+X-Google-Smtp-Source: ABdhPJzLzTfx5wDnCiXFlI+Bdsx4alD0u+dw0VhAEYz4o3tziEnwZ1IjQq85YlF7XttaCDFzsU9mLg==
+X-Received: by 2002:a05:6e02:1a23:b0:2ca:bf14:62e with SMTP id g3-20020a056e021a2300b002cabf14062emr4092422ile.137.1649794790857;
+        Tue, 12 Apr 2022 13:19:50 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s12-20020a92cbcc000000b002bd04428740sm20690328ilq.80.2022.04.12.13.19.50
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Apr 2022 13:19:50 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 12 Apr 2022 12:48:20 -0700
-Message-ID: <CABBYNZLDNAzxeLhbNSkT=sW8YFkLQxMZcingqw+GiWvqzuJBog@mail.gmail.com>
-Subject: Re: [PATCH 1/4] build: Always define confdir and statedir
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC BlueZ] build: Make use of StateDirectory and ConfigurationDirectory
+Date:   Tue, 12 Apr 2022 13:19:49 -0700
+Message-Id: <20220412201949.4011833-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Feb 2, 2022 at 5:55 AM Bastien Nocera <hadess@hadess.net> wrote:
->
-> On Wed, 2022-01-26 at 14:45 +0100, Bastien Nocera wrote:
-> > This change specifically? Check the next patches in the series, and
-> > you'll see pretty quickly.
-> >
-> > For the rest of the patchset, check this man page for details on each
-> > of the directives:
-> > https://www.freedesktop.org/software/systemd/man/systemd.exec.html#Security
-> >
-> > There's a fair amount of other directives we could use on top of
-> > those
-> > ones, but we can add them iteratively (and it makes bisecting easier,
-> > in case we forget about a particular use case).
->
-> Did you have any more questions about this patchset?
+This makes use of StateDirectory[1] and ConfigurationDirectory[1] to
+inform systemd what those paths are used for instead of using
+ReadWritePaths and ReadOnlyPaths which can lead to issues.
 
-Looks like we have some problems with these changes:
+Fixes: https://github.com/bluez/bluez/issues/329
 
-https://github.com/bluez/bluez/issues/329
+[1] https://www.freedesktop.org/software/systemd/man/systemd.exec.html
+---
+ src/bluetooth.service.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+index f18801866..912c4ac53 100644
+--- a/src/bluetooth.service.in
++++ b/src/bluetooth.service.in
+@@ -19,8 +19,8 @@ ProtectSystem=full
+ PrivateTmp=true
+ ProtectKernelTunables=true
+ ProtectControlGroups=true
+-ReadWritePaths=@statedir@
+-ReadOnlyPaths=@confdir@
++StateDirectory=@statedir@
++ConfigurationDirectory=@confdir@
+ 
+ # Execute Mappings
+ MemoryDenyWriteExecute=true
 -- 
-Luiz Augusto von Dentz
+2.35.1
+
