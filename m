@@ -2,86 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F40DDC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Apr 2022 02:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B26C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Apr 2022 21:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239600AbiDNCOw (ORCPT
+        id S236666AbiDNVzM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Apr 2022 22:14:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58034 "EHLO
+        Thu, 14 Apr 2022 17:55:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbiDNCOu (ORCPT
+        with ESMTP id S232417AbiDNVzL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Apr 2022 22:14:50 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C54515B5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Apr 2022 19:12:28 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9D84DB827DB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 02:12:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A887C385A6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 02:12:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649902345;
-        bh=jo7dvZQJAclIU9n2dMBaMHWPleErI+m+wNbYXI29lCw=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=gpBUFIllMJnkM+vVJ43tGcDLZ1Yk8Ki6aYCDP8w6kGZIrCCYCHRali5p9jf1XJ4+M
-         g7mdaFICkns1lL3jsz0U/3Fb3DpVE3NRtr/W3NfCgTqS5CgLobe3jAXLHyXvl+BCJg
-         XD1KquDalnIk4UUz0R4P2t5OFsn3pF6Bi4mqJ6/kYwwXAtGCvWcCWUlGV/CP8KdIe0
-         eEUrnBDn2yFV8CRSBnk1QeuWjIPsiC01GuQZwTBt0EEgkmrZSKg1hQizH1LdvuDOx+
-         x44ZIP3BLuyjlTYgpL4srHtitsYXL/KXUr0oHxBom/Wbhv5WLA2B1iiCeQRfgpAqxw
-         yMXn/EohQOxPA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id DB9A1C05FCE; Thu, 14 Apr 2022 02:12:24 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Thu, 14 Apr 2022 17:55:11 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608E566CAB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 14:52:44 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id md4so6266826pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 14:52:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FLEXJqoNfhDcSo/m+DEeVXkRQ2EhSwqq6M+G0z4IneI=;
+        b=p2A/9a40VntJBaV1frk5lU2xqfTT5Xm48tW/SSkMwJDxRa1ZHlhKuyXHH7ZUDdHyf2
+         Xky3xiE8N3kPkUrix/KXoPP/RSyQ/omskrs2Y8lsXIvZDx1NNW4zi9hozeQWAlkpCxnr
+         rn2/x5iqBWFEMytP+4Gc+o7OuqQkYaECJIMBJyjzawGIMdYTFT7pdrKQ5+ucON3UH4Le
+         nJZQRLNqzX8oUN7Phy4d2N8fxiQhc2B3kVvv/SZ9lF6Q/zmzhCWZzTkTaIMK5l2kv8VF
+         Uy2brXiNB8v3iSVSbmQTrepnL0Bgyb2Ron4yWm67+dcMMZbrCXO16wDM6H1Dig8E0vR4
+         m/Jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=FLEXJqoNfhDcSo/m+DEeVXkRQ2EhSwqq6M+G0z4IneI=;
+        b=ztBnS96qMEFmIZvviU8sZOX2oWR6VazwT/TbGTYpP4EgmnQoal6SIHag6MPp1/t2Ee
+         8E2Qo4sDxiGawQ/Jxc6bKRtWkqhuTzLny90oO3Dqog1FfdAWLSeOZXzXD6wFteGU44J4
+         N4a4h8YsbaITD80vmBdTKVODx6Lc0s6k/LrsY6RL481Jm+4ZGpzhDW6aM1H+ntY8bkY6
+         EookofYiIcYPoYikGkWcMwasqnksECY/u1NZ10W19fBMaHClTEaon4pRKdjyxGvCWEB1
+         PGf2qR0/sfYxgkqCL6kOrii5yngjgpCUrQpSnZP9gTfDoNgOCEa3awJd3ftB/1mU3lOL
+         1fjw==
+X-Gm-Message-State: AOAM533U+72xClFcRL3d/Uu6ujfDByR5HsDtQu/ipUidYnmmtP9ikeCC
+        OfufFY5RrpjeDa0RcA+q1NDi9gtG2a8=
+X-Google-Smtp-Source: ABdhPJx6iHBveccU8KcSpWIwn9ciJmN+g7rAuqmB1myntdQHDDhdw4fGppUxkLt8GuR2w1A3F+2h6A==
+X-Received: by 2002:a17:90b:4b0e:b0:1c6:f499:1cc9 with SMTP id lx14-20020a17090b4b0e00b001c6f4991cc9mr635209pjb.133.1649973163357;
+        Thu, 14 Apr 2022 14:52:43 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id bm27-20020a656e9b000000b0039e5d327f78sm2787903pgb.44.2022.04.14.14.52.42
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 14:52:43 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 214863] Intel AX200 "Bluetooth: hci0: failed to restart LE
- scan: status 31"
-Date:   Thu, 14 Apr 2022 02:12:24 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kai.heng.feng@canonical.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: WILL_NOT_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-214863-62941-rJ9m2SjJDW@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-214863-62941@https.bugzilla.kernel.org/>
-References: <bug-214863-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ] build: Fix bluetooth.service
+Date:   Thu, 14 Apr 2022 14:52:42 -0700
+Message-Id: <20220414215242.554396-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214863
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Kai-Heng Feng (kai.heng.feng@canonical.com) changed:
+This fixes bluetooth.service failing to start if statedir has not been
+created yet:
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |WILL_NOT_FIX
+bluetooth.service: Failed to set up mount namespacing:
+/run/systemd/unit-root/var/lib/bluetooth: No such file or directory
 
---- Comment #3 from Kai-Heng Feng (kai.heng.feng@canonical.com) ---
-With latest kernel/firmware, the error still shows but Bluetooth seems to
-continue to work.
+It also removes ReadOnlyPaths since ProtectSystem=full already mounts
+the entire filesystem as read-only.
 
---=20
-You may reply to this email to add a comment.
+Fixes: https://github.com/bluez/bluez/issues/329
+---
+ src/bluetooth.service.in | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
+index f18801866..12adad34f 100644
+--- a/src/bluetooth.service.in
++++ b/src/bluetooth.service.in
+@@ -19,8 +19,7 @@ ProtectSystem=full
+ PrivateTmp=true
+ ProtectKernelTunables=true
+ ProtectControlGroups=true
+-ReadWritePaths=@statedir@
+-ReadOnlyPaths=@confdir@
++ReadWritePaths=-@statedir@
+ 
+ # Execute Mappings
+ MemoryDenyWriteExecute=true
+-- 
+2.35.1
+
