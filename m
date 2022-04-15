@@ -2,96 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3B26C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Apr 2022 21:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB777C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Apr 2022 00:10:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236666AbiDNVzM (ORCPT
+        id S235851AbiDOANK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Apr 2022 17:55:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55710 "EHLO
+        Thu, 14 Apr 2022 20:13:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232417AbiDNVzL (ORCPT
+        with ESMTP id S1347947AbiDOAMm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Apr 2022 17:55:11 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 608E566CAB
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 14:52:44 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id md4so6266826pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 14:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLEXJqoNfhDcSo/m+DEeVXkRQ2EhSwqq6M+G0z4IneI=;
-        b=p2A/9a40VntJBaV1frk5lU2xqfTT5Xm48tW/SSkMwJDxRa1ZHlhKuyXHH7ZUDdHyf2
-         Xky3xiE8N3kPkUrix/KXoPP/RSyQ/omskrs2Y8lsXIvZDx1NNW4zi9hozeQWAlkpCxnr
-         rn2/x5iqBWFEMytP+4Gc+o7OuqQkYaECJIMBJyjzawGIMdYTFT7pdrKQ5+ucON3UH4Le
-         nJZQRLNqzX8oUN7Phy4d2N8fxiQhc2B3kVvv/SZ9lF6Q/zmzhCWZzTkTaIMK5l2kv8VF
-         Uy2brXiNB8v3iSVSbmQTrepnL0Bgyb2Ron4yWm67+dcMMZbrCXO16wDM6H1Dig8E0vR4
-         m/Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=FLEXJqoNfhDcSo/m+DEeVXkRQ2EhSwqq6M+G0z4IneI=;
-        b=ztBnS96qMEFmIZvviU8sZOX2oWR6VazwT/TbGTYpP4EgmnQoal6SIHag6MPp1/t2Ee
-         8E2Qo4sDxiGawQ/Jxc6bKRtWkqhuTzLny90oO3Dqog1FfdAWLSeOZXzXD6wFteGU44J4
-         N4a4h8YsbaITD80vmBdTKVODx6Lc0s6k/LrsY6RL481Jm+4ZGpzhDW6aM1H+ntY8bkY6
-         EookofYiIcYPoYikGkWcMwasqnksECY/u1NZ10W19fBMaHClTEaon4pRKdjyxGvCWEB1
-         PGf2qR0/sfYxgkqCL6kOrii5yngjgpCUrQpSnZP9gTfDoNgOCEa3awJd3ftB/1mU3lOL
-         1fjw==
-X-Gm-Message-State: AOAM533U+72xClFcRL3d/Uu6ujfDByR5HsDtQu/ipUidYnmmtP9ikeCC
-        OfufFY5RrpjeDa0RcA+q1NDi9gtG2a8=
-X-Google-Smtp-Source: ABdhPJx6iHBveccU8KcSpWIwn9ciJmN+g7rAuqmB1myntdQHDDhdw4fGppUxkLt8GuR2w1A3F+2h6A==
-X-Received: by 2002:a17:90b:4b0e:b0:1c6:f499:1cc9 with SMTP id lx14-20020a17090b4b0e00b001c6f4991cc9mr635209pjb.133.1649973163357;
-        Thu, 14 Apr 2022 14:52:43 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id bm27-20020a656e9b000000b0039e5d327f78sm2787903pgb.44.2022.04.14.14.52.42
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 14:52:43 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Fix bluetooth.service
-Date:   Thu, 14 Apr 2022 14:52:42 -0700
-Message-Id: <20220414215242.554396-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 14 Apr 2022 20:12:42 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1A32275E3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 17:10:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 115B7B82BE8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 00:10:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B1B6FC385A7;
+        Fri, 15 Apr 2022 00:10:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649981411;
+        bh=QnDtRmZBhYIo1asZ8Es5O7uApIslui3Wj5NmYCn6DY8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=g2d3r/7kHbeve5sK3NzQJvDMKFzTRdvAvWRZ3aZjAFl3MXmE68y9mMe2IvVlG2No4
+         XWiJI04mECWiQruZfCCZR8dfn2B5QIDP877IM9ytyi/XJO0X+nmbBMH02iv67xhujK
+         XSS4PLzdhigDfPPvVFqKqYuM/KxqVk8/pN+ldEWewWU6TcH+wuTqo1VPjqm+fQnU9z
+         yk/S8Qnftk+4jP7eOw2Eor9w1ecR46SrpD42ZacFhoReRRRm1SXYNexGvgAbnLD60N
+         PN8fCwMITcscJH5XfJwF1OcQJdPqtkhVAoz56NTT2FLd1UDq6k7XVnLODpXKZfe7Se
+         Mz2xVYj/Hd9XQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 92FFCEAC081;
+        Fri, 15 Apr 2022 00:10:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] btdev: Fix not cleanup ssp_status and ssp_auto_complete
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <164998141159.26689.17018142389614578549.git-patchwork-notify@kernel.org>
+Date:   Fri, 15 Apr 2022 00:10:11 +0000
+References: <20220411235804.3776702-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220411235804.3776702-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-This fixes bluetooth.service failing to start if statedir has not been
-created yet:
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-bluetooth.service: Failed to set up mount namespacing:
-/run/systemd/unit-root/var/lib/bluetooth: No such file or directory
+On Mon, 11 Apr 2022 16:58:02 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This fixes not clenup ssp_status and ssp_auto_complete flags on
+> auth_complete.
+> ---
+>  emulator/btdev.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-It also removes ReadOnlyPaths since ProtectSystem=full already mounts
-the entire filesystem as read-only.
+Here is the summary with links:
+  - [BlueZ] btdev: Fix not cleanup ssp_status and ssp_auto_complete
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1967b5311525
+  - [BlueZ,2/2] client/player: Add transport menu
+    (no matching commit)
 
-Fixes: https://github.com/bluez/bluez/issues/329
----
- src/bluetooth.service.in | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/src/bluetooth.service.in b/src/bluetooth.service.in
-index f18801866..12adad34f 100644
---- a/src/bluetooth.service.in
-+++ b/src/bluetooth.service.in
-@@ -19,8 +19,7 @@ ProtectSystem=full
- PrivateTmp=true
- ProtectKernelTunables=true
- ProtectControlGroups=true
--ReadWritePaths=@statedir@
--ReadOnlyPaths=@confdir@
-+ReadWritePaths=-@statedir@
- 
- # Execute Mappings
- MemoryDenyWriteExecute=true
+You are awesome, thank you!
 -- 
-2.35.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
