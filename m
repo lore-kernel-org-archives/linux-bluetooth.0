@@ -2,109 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17802C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Apr 2022 05:16:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B878CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Apr 2022 06:03:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233203AbiDOFTU (ORCPT
+        id S238417AbiDOGFq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Apr 2022 01:19:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43382 "EHLO
+        Fri, 15 Apr 2022 02:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231304AbiDOFTU (ORCPT
+        with ESMTP id S235377AbiDOGFo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Apr 2022 01:19:20 -0400
-Received: from smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32DCEF13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 22:16:53 -0700 (PDT)
-Received: from github.com (hubbernetes-node-3f5a5f8.ash1-iad.github.net [10.56.128.15])
-        by smtp.github.com (Postfix) with ESMTPA id 40EC884075F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 22:16:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1649999812;
-        bh=llGRKnbLKMDlrzRmLXVlvJqWUuCXuTDvDUXThzhs9k0=;
-        h=Date:From:To:Subject:From;
-        b=rrIrOfn5h5O8PCSGJsiZDixfivMK7MfO9xn17ZpLPNteGjJ4gaLY2pKpWvx1ENYZy
-         knosZqkoC/gEBcC4RhVI3K0tQuz6FO6v2fviHiz0EWk1hrgp+8F5tJF+T9Cm7FVbbk
-         8bktEZEuMK/7HM33iJjVMpJHPIhnGilnraBn83BM=
-Date:   Thu, 14 Apr 2022 22:16:52 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7903bb-036024@github.com>
-Subject: [bluez/bluez] 1967b5: btdev: Fix not cleanup ssp_status and
- ssp_auto_com...
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Fri, 15 Apr 2022 02:05:44 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61F32A8ED3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 23:03:16 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id e10so6085497qka.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Apr 2022 23:03:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ImSbcf6qenKpb4pp3gYHEjrVCY4pBE9q2+GOmyq0kjc=;
+        b=P0vWufb0sC3n89OXD6rfWYqIzb21YWr8Y7xFu1NWodE9ww/JXlVjFy3nQWp9cbCDfa
+         /DQ+bkiwSVi9GMPvlrVKktMoTYYgtHL7NxflgobItHvLEvFMELy/ZtT5hCJuHm+x4jKS
+         UJDAtdAPdaUgw7+v6pgjUSka8zuigGVEmT1dA+mA+0hXD08/4+p6UtAXmiGXDiOKG7NZ
+         zo15VVlqIDCPi2sYaN1owTumhtjdMTFi+M+frZ6hifGPIChXv10bYqNLSKbCeu1xJ1/Q
+         D0KTf7aOzm3WmxWQ6zYUOvydLUr+YVr3JICsTwPZIxkux9+krhrZ7HIhHGgcpu1G6RIp
+         f9Yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ImSbcf6qenKpb4pp3gYHEjrVCY4pBE9q2+GOmyq0kjc=;
+        b=0O1tIn8VpfgjQWVBk2X9SpzEtSuRW+BJzHYKk3FmpX1r/XBsfd18Qkm1C2Yn26KcUa
+         +orWZJeiWt5fPrp8leqbrvoeN9fC/QpL2dl1rnoN2N49cFRZnnnpZJ5SS/4inYQAYTFh
+         h0YsRGopfJzKzcqGDXGIk8J9apa+Qkose2vjCv48AqXzp9zw9oTMLiGO0ee+JSPQhE2J
+         gwmWWKlPje+RyW6qXl6kqKQpjx6E443ol6pXa7KBsDmb1k1a5GqOxHli73z5JDqQXKNk
+         wvKKVUn+2aNNL5qAyDDrnKBHqWBJpU5oxiVt5JqDMqCAs1xvVu18d92Mo05N/0EwMlcr
+         xEMw==
+X-Gm-Message-State: AOAM530FCS6Spv2wmpLzS2Ly/dyz1/QtPkgwurDdN/7tER2E3l7ayOBl
+        JjLzmuCsOZMrcKWkix2EXHQ+DDrc1mwY3w==
+X-Google-Smtp-Source: ABdhPJyCxeli+cWSk2jljeMM0MBfF9Lrfq3YDoaEl4RiHAZB14NRkFdMrO0jgJLdsMGFJj7PysVKjw==
+X-Received: by 2002:a05:620a:2946:b0:699:c582:f319 with SMTP id n6-20020a05620a294600b00699c582f319mr4544856qkp.118.1650002595345;
+        Thu, 14 Apr 2022 23:03:15 -0700 (PDT)
+Received: from [172.17.0.2] ([20.96.32.148])
+        by smtp.gmail.com with ESMTPSA id u5-20020a05622a198500b002f1f02b7465sm35219qtc.17.2022.04.14.23.03.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Apr 2022 23:03:15 -0700 (PDT)
+Message-ID: <62590aa3.1c69fb81.b5e2e.01f8@mx.google.com>
+Date:   Thu, 14 Apr 2022 23:03:15 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0674114316412027762=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, ismael@iodev.co.uk
+Subject: RE: Bluetooth: btusb: Add 0x0bda:0x8771 Realtek 8761BUV devices
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220413125415.20293-1-ismael@iodev.co.uk>
+References: <20220413125415.20293-1-ismael@iodev.co.uk>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 1967b5311525846d94fca3a2a73f9efc743b0572
-      https://github.com/bluez/bluez/commit/1967b5311525846d94fca3a2a73f9efc743b0572
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-04-13 (Wed, 13 Apr 2022)
+--===============0674114316412027762==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-  Changed paths:
-    M emulator/btdev.c
+This is automated email and please do not reply to this email!
 
-  Log Message:
-  -----------
-  btdev: Fix not cleanup ssp_status and ssp_auto_complete
+Dear submitter,
 
-This resets ssp_status and ssp_auto_complete flags on auth_complete.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=631879
 
+---Test result---
 
-  Commit: dc1b309901e5a1af4fdb5dc36c4af87ea9f7fae3
-      https://github.com/bluez/bluez/commit/dc1b309901e5a1af4fdb5dc36c4af87ea9f7fae3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-04-14 (Thu, 14 Apr 2022)
-
-  Changed paths:
-    M emulator/btdev.c
-    M emulator/bthost.c
-    M emulator/bthost.h
-
-  Log Message:
-  -----------
-  bthost: Add support for Create CIS
-
-This introduces bthost_set_cig_params and bthost_create_cis.
+Test Summary:
+CheckPatch                    PASS      1.56 seconds
+GitLint                       PASS      1.01 seconds
+SubjectPrefix                 PASS      0.83 seconds
+BuildKernel                   PASS      32.14 seconds
+BuildKernel32                 PASS      28.58 seconds
+Incremental Build with patchesPASS      40.22 seconds
+TestRunner: Setup             PASS      473.15 seconds
+TestRunner: l2cap-tester      PASS      16.01 seconds
+TestRunner: bnep-tester       PASS      6.47 seconds
+TestRunner: mgmt-tester       PASS      107.67 seconds
+TestRunner: rfcomm-tester     PASS      8.18 seconds
+TestRunner: sco-tester        PASS      7.99 seconds
+TestRunner: smp-tester        PASS      7.93 seconds
+TestRunner: userchan-tester   PASS      6.60 seconds
 
 
-  Commit: f9f2b28d457a63aba3de85d930513b1a1990732c
-      https://github.com/bluez/bluez/commit/f9f2b28d457a63aba3de85d930513b1a1990732c
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-04-14 (Thu, 14 Apr 2022)
 
-  Changed paths:
-    M emulator/bthost.c
-
-  Log Message:
-  -----------
-  bthost: Fix not setting all parameters when using Create BIG cmd
-
-Create BIG shall set proper values for interval, latency, rtn and phy.
+---
+Regards,
+Linux Bluetooth
 
 
-  Commit: 03602479bd7bb3c32c718431b45441d03e6f9ce4
-      https://github.com/bluez/bluez/commit/03602479bd7bb3c32c718431b45441d03e6f9ce4
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-04-14 (Thu, 14 Apr 2022)
-
-  Changed paths:
-    M emulator/btdev.c
-
-  Log Message:
-  -----------
-  btdev: Fix CIS Established
-
-CIS Established was using the ISO latency instead of SDU interval for
-transport latency.
-
-
-Compare: https://github.com/bluez/bluez/compare/7903bbe1005b...03602479bd7b
+--===============0674114316412027762==--
