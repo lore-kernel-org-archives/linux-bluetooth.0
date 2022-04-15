@@ -2,101 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0596C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Apr 2022 18:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A37C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Apr 2022 21:24:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345120AbiDOSD6 (ORCPT
+        id S1355041AbiDOV0c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Apr 2022 14:03:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
+        Fri, 15 Apr 2022 17:26:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345070AbiDOSD5 (ORCPT
+        with ESMTP id S1354653AbiDOV0V (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Apr 2022 14:03:57 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 581099682A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 11:01:28 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id d198so3946009qkc.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 11:01:28 -0700 (PDT)
+        Fri, 15 Apr 2022 17:26:21 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C14C7E0AFD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 14:22:54 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id be5so7949401plb.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 14:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=xVC61ZVi69hwKcEX4AWBQMQhD2iLyLHZzkZr0J4M7Rc=;
-        b=kelJGp7VLMEDHH8h5gpIQtpXi993CCKLVFJ7JnFxN4UpyknSYjQqf1dLAY38kxJRPK
-         8rPovf2WrNsEICNkw81uDwNnIEN0GPvdURRIFAPNGe+u62+t0X0dXfAlxSzur2fhkaZ8
-         vRH6NVPn0E/4k1XubS0RdFUbDHVFShtYlcZB45IELufRWFQLqThwddgR5d0B7gH+1UCl
-         bnkYrhuYNC4WE9i8JvqoKYln/c+8LI24KIWulHnydAOUS7MHkluBPevRVNsynG8kJnqN
-         GrM4VMp17ZUYa8bYBdCmpvyNGOODn10bNIwx9PTxvUAEoxzNiLZS/94sucwbRIqR9yCC
-         inig==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=Vo9Mm/8ugT+ZMa+jmm5grG/1Sj2jaI41Nsvz/X5hhlE=;
+        b=FiMPlQJP6V47mu6AKGpseQOfPKnEIkhNu8aogv9Bgfshj7FRGM1AeCSycpIq+PGLki
+         pg8GA2eqtGbUYClmyTfX6csjSwiflpp/SJB94M+Oad5vpzGEkFasJqALS9gsq6gNe2hO
+         aLwyGaUAKS1aPTDkyiE9y86WR0sVkdT9rRU9/iEwA7DTxteGdlGESaxTlq65k0aEpQVS
+         Q7ZJDSVeHpGcyG0tKHEQAIG8UvEXEnnf0BDC+vaqzL3mmLjiduUyJh66Tok1c3i84wi/
+         het4vVyZxus0XOrG90tpSNFEt+OdamvA1IGbzc4ryMwHFqLmADlePk7l0krT0jYN2A8X
+         8NCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=xVC61ZVi69hwKcEX4AWBQMQhD2iLyLHZzkZr0J4M7Rc=;
-        b=YRzN6e4Qv13yOMOdFNXQSseY9KbRvPXz1Ix7vZzGkpn70VbtX8yZmEqaDU70SZqp2A
-         niETt23+kWOSINeY/9ClbjoIBte4JjhnN4Ad7QhVdWFV6vIfuhJXHtFbiRt/0GtcB1BR
-         o1jXZExod3krmlbo8C42+IkVEEZKmUJaEId2/DoIYgJnY/lQAslgI3HEMxwZDG9ZoH8H
-         C+qO85aMzUcbB5elUJ7QRECbMvQT50hHdUwAK9UvSHNy4TjrAd3KtgjkXl6aUo4XWzPV
-         Ucg8MHApnZOrGjhaXd3RcNp/BM7taTwrcrlKkow6dETDGzWx5+7gciRYc/9EJ+n688zy
-         Ht5w==
-X-Gm-Message-State: AOAM5331w8rs4aoCoD6iNh6jByQbU8gcTIVPhoa5d360DgBeqeQTrprj
-        bCO+gWe4DRC3pYINAS6p+03Be3rhA17ebQ==
-X-Google-Smtp-Source: ABdhPJxmQHnFyZedgpfPdtlsQRqJnshbrnkKFTXH2MbhRhnk3GLzy85Fh3devhGid43sT31wO9wMHQ==
-X-Received: by 2002:a05:620a:2415:b0:69c:5c75:21d7 with SMTP id d21-20020a05620a241500b0069c5c7521d7mr107681qkn.412.1650045687307;
-        Fri, 15 Apr 2022 11:01:27 -0700 (PDT)
-Received: from [172.17.0.2] ([52.177.112.216])
-        by smtp.gmail.com with ESMTPSA id bi29-20020a05620a319d00b0069c3f6adc18sm2787016qkb.22.2022.04.15.11.01.26
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Vo9Mm/8ugT+ZMa+jmm5grG/1Sj2jaI41Nsvz/X5hhlE=;
+        b=bgitaZEiOFEVuCoIVIaqo4DBq/twOMkV7NVJ0zdq2q4CXWAR0HBIZrvx5TIE5ndZtY
+         mQJtvi+MJGc17PsqRbmu+x/6wFSi4d39p16pZKuLi04/RznRArIpggNvjvBAc07egPwY
+         CIkAS6Q3ubszgV3E5U6/8yg+wjkgnqZWK6yG4Dqp+N65o4fzSRiVFPMC/FHsPU902u0+
+         7thSBUXFD2ik/7/kFJzosRKYjX8NJosX5rQA/hT5RAi3TXBdA5j43nC091t5lqTf/7eo
+         LD7SuyHKDYC1eGAaiFLg9DhGSgHH8l6gX0E7gGF8eKSsUOnhbDeEOPWEwTCy8VlQ/58M
+         s2OQ==
+X-Gm-Message-State: AOAM5317MHVwBgOq1/Ws6y7uAHKvk7l7fCcx1sm+O+4/Hf160W/BolhP
+        leH0DCXQFKLUKOnqe1YJ89R+NEtgu4A=
+X-Google-Smtp-Source: ABdhPJyN+RbxQFWB5bUyqkIlq8NdTwb/Ltx0DUTr3WpQpcBbE0CKIx8bEVmnvwhKgP4I0+LTgpD4pg==
+X-Received: by 2002:a17:902:9001:b0:156:a567:2683 with SMTP id a1-20020a170902900100b00156a5672683mr698467plp.164.1650057773760;
+        Fri, 15 Apr 2022 14:22:53 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id f4-20020aa79d84000000b00505f920ffb8sm3740494pfq.179.2022.04.15.14.22.53
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Apr 2022 11:01:26 -0700 (PDT)
-Message-ID: <6259b2f6.1c69fb81.c4836.fc6b@mx.google.com>
-Date:   Fri, 15 Apr 2022 11:01:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2888698630516238688=="
+        Fri, 15 Apr 2022 14:22:53 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/3] main: Add support for CONFIGURATION_DIRECTORY environment variable
+Date:   Fri, 15 Apr 2022 14:22:50 -0700
+Message-Id: <20220415212251.1065432-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220415212251.1065432-1-luiz.dentz@gmail.com>
+References: <20220415212251.1065432-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, isak.westin@hotmail.com
-Subject: RE: mesh: Use correct net_id for received CTL messages
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <VI1PR09MB4239579EE5A795C707FBE075E3EE9@VI1PR09MB4239.eurprd09.prod.outlook.com>
-References: <VI1PR09MB4239579EE5A795C707FBE075E3EE9@VI1PR09MB4239.eurprd09.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2888698630516238688==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+When running as a systemd service the CONFIGURATION_DIRECTORY
+environment variable maybe set:
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=632621
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.39 seconds
-GitLint                       PASS      1.02 seconds
-Prep - Setup ELL              PASS      42.96 seconds
-Build - Prep                  PASS      0.73 seconds
-Build - Configure             PASS      8.59 seconds
-Build - Make                  PASS      1376.65 seconds
-Make Check                    PASS      11.85 seconds
-Make Check w/Valgrind         PASS      442.86 seconds
-Make Distcheck                PASS      229.18 seconds
-Build w/ext ELL - Configure   PASS      8.63 seconds
-Build w/ext ELL - Make        PASS      1371.84 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
+https://www.freedesktop.org/software/systemd/man/systemd.exec.html
 ---
-Regards,
-Linux Bluetooth
+ src/main.c | 40 ++++++++++++++++++++++++++++++----------
+ 1 file changed, 30 insertions(+), 10 deletions(-)
 
+diff --git a/src/main.c b/src/main.c
+index a448320c1..890d159d7 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -64,7 +64,7 @@
+ 
+ struct btd_opts btd_opts;
+ static GKeyFile *main_conf;
+-static char *main_conf_file_path;
++static char main_conf_file_path[PATH_MAX];
+ 
+ static const char *supported_options[] = {
+ 	"Name",
+@@ -175,18 +175,43 @@ GKeyFile *btd_get_main_conf(void)
+ 	return main_conf;
+ }
+ 
+-static GKeyFile *load_config(const char *file)
++static GKeyFile *load_config(const char *name)
+ {
+ 	GError *err = NULL;
+ 	GKeyFile *keyfile;
++	int len;
++
++	if (!name)
++		return NULL;
++
++	if (name[0] == '/')
++		snprintf(main_conf_file_path, PATH_MAX, "%s", name);
++	else {
++		const char *configdir = getenv("CONFIGURATION_DIRECTORY");
++
++		/* Check if running as service */
++		if (configdir) {
++			/* Check if there multiple paths given */
++			len = strstr(configdir, ":") - configdir;
++			if (len < 0)
++				len = strlen(configdir);
++		} else {
++			configdir = CONFIGDIR;
++			len = strlen(configdir);
++		}
++
++		snprintf(main_conf_file_path, PATH_MAX, "%*s/%s", len,
++						 configdir, name);
++	}
+ 
+ 	keyfile = g_key_file_new();
+ 
+ 	g_key_file_set_list_separator(keyfile, ',');
+ 
+-	if (!g_key_file_load_from_file(keyfile, file, 0, &err)) {
++	if (!g_key_file_load_from_file(keyfile, main_conf_file_path, 0, &err)) {
+ 		if (!g_error_matches(err, G_FILE_ERROR, G_FILE_ERROR_NOENT))
+-			error("Parsing %s failed: %s", file, err->message);
++			error("Parsing %s failed: %s", main_conf_file_path,
++				err->message);
+ 		g_error_free(err);
+ 		g_key_file_free(keyfile);
+ 		return NULL;
+@@ -1194,12 +1219,7 @@ int main(int argc, char *argv[])
+ 
+ 	mainloop_sd_notify("STATUS=Starting up");
+ 
+-	if (option_configfile)
+-		main_conf_file_path = option_configfile;
+-	else
+-		main_conf_file_path = CONFIGDIR "/main.conf";
+-
+-	main_conf = load_config(main_conf_file_path);
++	main_conf = load_config(option_configfile ? : "main.conf");
+ 
+ 	parse_config(main_conf);
+ 
+-- 
+2.35.1
 
---===============2888698630516238688==--
