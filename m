@@ -2,191 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD639C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Apr 2022 02:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDAC1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Apr 2022 02:55:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230184AbiDPC4U (ORCPT
+        id S229505AbiDPC61 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Apr 2022 22:56:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49480 "EHLO
+        Fri, 15 Apr 2022 22:58:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbiDPC4Q (ORCPT
+        with ESMTP id S229481AbiDPC60 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Apr 2022 22:56:16 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819ED2AC4E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 19:53:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650077626; x=1681613626;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=7mH1/lYM5xG++xZo9zSk1pUboUFPTaLNxmnRG9TTiZk=;
-  b=ONg2uNSaUiK/wnUpzK5QNtqnhsTN8ZYinWhCGtSowgnylSth3uuDMMoi
-   +g2nzbU9KlpKJ9QFaD/J57h0YJDHDbi08mLssuebn+eGy8PoRVeqQY4fd
-   pXaDgp67/S1eLXdLZzvfVOwmzMunG8Rle+cgoFFux/HVv8vPqMJ6fQvEb
-   S9bOMj5/5j9celu1sr1d6fqgbbPO5uEBtu0JWytDAWxLENdmVb0jP3dHP
-   TqY+wVk1+gy7W0aUsCOfb1M6lqLB4YBhaZ8giK8tyvynXepk+J14O3t0J
-   LpenpdNp5O3mtcufq8/8OspD41O/S+zDG5Rb+LtZhPYBcImpBGRWHrssv
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10318"; a="250559903"
-X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
-   d="scan'208";a="250559903"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2022 19:53:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,264,1643702400"; 
-   d="scan'208";a="528152290"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 15 Apr 2022 19:53:44 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nfYZE-0002gz-2i;
-        Sat, 16 Apr 2022 02:53:44 +0000
-Date:   Sat, 16 Apr 2022 10:52:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 495e70abe13bcfbc6b3beea2b29d30334c9548ac
-Message-ID: <625a2f89.vD9z1e9DULvcN9EZ%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 15 Apr 2022 22:58:26 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5DDEE4DF
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 19:55:56 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id cp8so3934051qtb.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 19:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=4KUeOinPLGbMmLaCiDx3bTkLE7vZwNy3pnc7pu3+hwQ=;
+        b=b1zCuLmni/ArjhW4we+EajdWUBuM+5z2HJ/hb5MUoqpNqhqz8ck7BQzKiqE3wKawpA
+         XAMtd+taSHnu8E2WyscFaYjpX10v0YyahbpUI+M3iYwhuFztu8aDbhgApC+/s0JJnQzj
+         Qr6wItxy6H6lurgX2XdNoFhfZzD2pbmYo5PZibuCgFcs8/JQuZNRZqqQDe8iXs9nu7Zl
+         fhzPYo+M+SB7jhGCVFrORSd3lMC4gKtL0iswt9ivLb9EjJlaehhSczn19hM2+58LAPuK
+         Ryue9i5SfQHI2WGkCxnBTXwKZrqWmx3jCtp/shDpDhArePLJXyu+jIIPEmazuBSJCa+q
+         4MYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=4KUeOinPLGbMmLaCiDx3bTkLE7vZwNy3pnc7pu3+hwQ=;
+        b=VHX6qBPLg5pZ2nT4lieCIDHlUEGFEU5r1dH0DcGsLzTrMBELp6534Ch5juk9x3Uwqy
+         +12KrtKtWh2uf1EYcvMNsWISlr//6HWoN5YW4i2bY8nBNiRGxzkmlO2kgxR4jZ34FABy
+         RwpsRlpJ8IEZ5zAN+hORAiTpeyko4mDPxnjNwKKJXyi55Ze5iVXHql4W5tdoCBj3Dtf6
+         7HfgpvwNPi+L/bW8KKo+v7ewzfCYpMjzteotDUfkYRmfK8jK33efxkC6+WOz5CARdO4o
+         ktv3YpBHYchbTX/mz3PnDAnxezJKIXqfAa7xhCpEKhv0Wh2lbd40u4tQkgPb9XR3oJTf
+         E2qQ==
+X-Gm-Message-State: AOAM533zpDbC0ODpdzq6gieyQZcP9Z7cu6mMAGkU7C+ExStiMPglWxTs
+        H5kbZU0asHS9UeAxuGtfMuDjUxaXcJ1dxg==
+X-Google-Smtp-Source: ABdhPJwM/8fOqMLY/Nf0xUfW5trAR8wRfxwW/lK6EUShcjQyt4uISaQr+UxbcXpfxM6B05XKg1GVvQ==
+X-Received: by 2002:ac8:7c51:0:b0:2f1:f3d5:4157 with SMTP id o17-20020ac87c51000000b002f1f3d54157mr798389qtv.562.1650077754513;
+        Fri, 15 Apr 2022 19:55:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.62.106])
+        by smtp.gmail.com with ESMTPSA id az9-20020a05620a170900b00680aeaac936sm3258273qkb.136.2022.04.15.19.55.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Apr 2022 19:55:54 -0700 (PDT)
+Message-ID: <625a303a.1c69fb81.3d61a.2dd4@mx.google.com>
+Date:   Fri, 15 Apr 2022 19:55:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4619898274124572234=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] test-runner: Add dedicated option to start D-Bus
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220416001853.1240822-1-luiz.dentz@gmail.com>
+References: <20220416001853.1240822-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 495e70abe13bcfbc6b3beea2b29d30334c9548ac  Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
+--===============4619898274124572234==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-elapsed time: 722m
+This is automated email and please do not reply to this email!
 
-configs tested: 112
-configs skipped: 4
+Dear submitter,
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=632702
 
-gcc tested configs:
-arm64                               defconfig
-arm64                            allyesconfig
-arm                              allmodconfig
-arm                                 defconfig
-arm                              allyesconfig
-i386                          randconfig-c001
-powerpc              randconfig-c003-20220415
-s390                          debug_defconfig
-powerpc                     taishan_defconfig
-arc                           tb10x_defconfig
-m68k                           sun3_defconfig
-powerpc                       eiger_defconfig
-arm                       multi_v4t_defconfig
-powerpc                     mpc83xx_defconfig
-sh                        sh7757lcr_defconfig
-mips                      maltasmvp_defconfig
-sh                          r7780mp_defconfig
-sh                        edosk7760_defconfig
-arm                       aspeed_g5_defconfig
-openrisc                            defconfig
-powerpc64                        alldefconfig
-arm                     eseries_pxa_defconfig
-sh                   sh7724_generic_defconfig
-powerpc                 mpc85xx_cds_defconfig
-i386                             alldefconfig
-powerpc                      ppc6xx_defconfig
-powerpc                   motionpro_defconfig
-powerpc                      cm5200_defconfig
-arm                            mps2_defconfig
-um                                  defconfig
-arc                     haps_hs_smp_defconfig
-x86_64                              defconfig
-powerpc                     tqm8555_defconfig
-x86_64                        randconfig-c001
-arm                  randconfig-c002-20220414
-ia64                             allmodconfig
-ia64                             allyesconfig
-ia64                                defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-nios2                               defconfig
-arc                              allyesconfig
-csky                                defconfig
-nios2                            allyesconfig
-alpha                               defconfig
-alpha                            allyesconfig
-h8300                            allyesconfig
-xtensa                           allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-s390                                defconfig
-s390                             allmodconfig
-parisc                              defconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                             allyesconfig
-sparc                            allyesconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-i386                                defconfig
-i386                             allyesconfig
-sparc                               defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a011
-x86_64                        randconfig-a013
-x86_64                        randconfig-a015
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-arc                  randconfig-r043-20220415
-s390                 randconfig-r044-20220415
-riscv                randconfig-r042-20220415
-riscv                               defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-x86_64                           allyesconfig
-x86_64                         rhel-8.3-kunit
-x86_64                               rhel-8.3
+---Test result---
 
-clang tested configs:
-x86_64                        randconfig-c007
-powerpc              randconfig-c003-20220414
-arm                  randconfig-c002-20220414
-i386                          randconfig-c001
-arm                       aspeed_g4_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-hexagon              randconfig-r041-20220415
-hexagon              randconfig-r045-20220415
-riscv                randconfig-r042-20220414
-hexagon              randconfig-r041-20220414
-hexagon              randconfig-r045-20220414
+Test Summary:
+CheckPatch                    FAIL      1.43 seconds
+GitLint                       PASS      1.05 seconds
+Prep - Setup ELL              PASS      53.24 seconds
+Build - Prep                  PASS      0.76 seconds
+Build - Configure             PASS      10.54 seconds
+Build - Make                  PASS      1475.39 seconds
+Make Check                    PASS      12.56 seconds
+Make Check w/Valgrind         PASS      542.53 seconds
+Make Distcheck                PASS      286.35 seconds
+Build w/ext ELL - Configure   PASS      10.83 seconds
+Build w/ext ELL - Make        PASS      1446.60 seconds
+Incremental Build with patchesPASS      0.00 seconds
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ] test-runner: Add dedicated option to start D-Bus
+ERROR:INITIALISED_STATIC: do not initialise statics to false
+#95: FILE: tools/test-runner.c:50:
++static bool start_daemon = false;
+
+WARNING:MISSING_SPACE: break quoted strings at a space character
+#108: FILE: tools/test-runner.c:253:
+ 				"bluetooth.enable_ecred=1"
++				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
+
+/github/workspace/src/12815530.patch total: 1 errors, 1 warnings, 91 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12815530.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4619898274124572234==--
