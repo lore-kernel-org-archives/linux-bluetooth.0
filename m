@@ -2,177 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E44C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Apr 2022 00:18:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E14C6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Apr 2022 02:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229547AbiDPAV1 (ORCPT
+        id S229939AbiDPCda (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Apr 2022 20:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46134 "EHLO
+        Fri, 15 Apr 2022 22:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiDPAV0 (ORCPT
+        with ESMTP id S229934AbiDPCd3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Apr 2022 20:21:26 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B20FD398E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 17:18:55 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id g12-20020a17090a640c00b001cb59d7a57cso8404885pjj.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 17:18:55 -0700 (PDT)
+        Fri, 15 Apr 2022 22:33:29 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B366482D27
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 19:30:57 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id j9so316911qkg.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Apr 2022 19:30:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sz4IHHoDtXFM8pbU3ctHD/oh3X3RJRHz3VjvrVzkxpw=;
-        b=jDmwCDZKDhDxOF5gBIatQl47m64O25qn1QHET0w2uEQUR0ysVh+guXZVN1U3u6HFWc
-         TXo+yedc5CRpQsVWT9E4pagF5xqcQnIw6f3u4u84T1G+kjvlXa1igmGSrEvcVGnCnZWr
-         fjPA0SuQpTnLdvLnEnO5CC2VHkyP7nA87m6LM84qd26KR6UH2uOG2qeOKV6Gf//38c7y
-         mA6EYlREPNpgi5oJegCQOi54DYxWQGTERygYCUMxXr1E1g9epgTZAupjUcdOcQhdTthv
-         AwgkYSnQD/GuqflW0OanYbOgZ1LXW27XQmwTSODOsGnrXmwGZODWLZjSwzH0l/CKod7s
-         xanQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=tENT+LZh7xQZ6irD/Xb9lV7v5euxZSsNW2+cOFjnM/E=;
+        b=igJbF7Sit8AMfm7sTQZH8OM1l25/w9bMuRwQ6da6Lv7Y26357mgQOjrFQaT4pUTO5b
+         zftqRJRNev8Qit2AU8hy2eXExgrRMhv3A6+ZJjl0tqHmx2jA5TDNT5jTRH15+SwF1wK3
+         8oykt4nvOXQBX5O6kjrmpmMS1oQGTUi3LCeCJqTMyMJV9o+4IBqjZ4W05Wd9pUcqnfn9
+         UTe5uSqQfF87euMxc1Un4ojYSStpzgGlHgA6/Ugh60nuZ7D8y1ZouZySsqOxLqI+x4ls
+         MeJ+O0PslNRqJSxfak0N5cVk/fKTalP7uTcHKc6UWj08Lo1advf3/65o2pYJaFm5zatz
+         lF4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sz4IHHoDtXFM8pbU3ctHD/oh3X3RJRHz3VjvrVzkxpw=;
-        b=gZBE87xIoMwnLzEwFF7oraJKEFqKGXfVZMTjlrpnSIA5xGyJDnP6bB2/jq4tpjSEuq
-         hrx7W823Ayt6HHcmbZDTiDn6WJ6dCqY/grLXV0QZOuQ14fYGh0gJ3rXLUISy9ckZNjGL
-         Cy30AFgc25n97nP5kqM7kCnLiRIYHTNpnbHPrkQ1pbQ0RqB6nO+LQzI3HcofdXXj2W1t
-         vHzMac58hpirZbIHWt4er17JsmU6OGhw+DXNQaVqOcFxBocCBvKmeSR1IwFoSNueVken
-         1zl8wDFgtWN7BXt6pBPbGghlEiESahwu3IAWRcWS8rieMG2wHVQhd2CvYwDh6DzwoHvv
-         6Dtw==
-X-Gm-Message-State: AOAM533mRCpdNmqt2KxCanQBhwHwqA4Uw94Oon5bl3AVsr2LcgWU4X8f
-        7Qrzk02jwEP17TaiQvsvpjcyP0nGEaY=
-X-Google-Smtp-Source: ABdhPJyECIib/KebKeBr2Bvu3KRzb6U8dbAFpt2cCDAQ7/0aSGnWE4N+Tk2hvaThQhe2Wgqd+tarcA==
-X-Received: by 2002:a17:90b:1b44:b0:1cd:49b8:42b8 with SMTP id nv4-20020a17090b1b4400b001cd49b842b8mr1439827pjb.102.1650068334356;
-        Fri, 15 Apr 2022 17:18:54 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z16-20020a056a00241000b004f3a647ae89sm3851970pfh.174.2022.04.15.17.18.53
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=tENT+LZh7xQZ6irD/Xb9lV7v5euxZSsNW2+cOFjnM/E=;
+        b=71ZNqSLm/E8WFLkPU7+9TV4oaJYnDv/5Tay91DGHFHhXpVoi+0U3wdabMI/AGvSlJN
+         pf1M5BNhZ6MjZufMrtS3q00SBL9D8lO8jRT1UMNhdFlhTmEOQOTHrxGanzXkasxTLIHP
+         ay/TcOf5q0lRKz3QF/B1c7Avyhcu5gIsCTTiB8fyxg4IFvTenY5nMkRNPYOyi35damIs
+         arU3GCIYZG4UwBeppMP8nn+FqhouSld/j/vHtmadmHsan6Rh4ycjXOAViWLZRLNiIXJc
+         QJucyRvYe3OH5669fkrQ5kFkj8A4N3ZZj8/nQq+yVwJDccbdNJVQ6/Kcqp+p6Wj8QHud
+         +voQ==
+X-Gm-Message-State: AOAM531/9R2Nrhwsip+Llan+BHfhR5rocpWrKpeBGsV993qFruBjr+zZ
+        EgUbJ7LWvYCtrE8Ea3XbmdMWw+xj/QCG7Q==
+X-Google-Smtp-Source: ABdhPJyu2TsIJCe/MRCret6wN8sPTI/unwXQQ5ATzdtGp9jJtJd2ZkTBr1y/uwog7C5eaweF/hHDQw==
+X-Received: by 2002:ae9:ef55:0:b0:69e:7116:8644 with SMTP id d82-20020ae9ef55000000b0069e71168644mr366354qkg.293.1650071455370;
+        Fri, 15 Apr 2022 18:10:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.94.67.103])
+        by smtp.gmail.com with ESMTPSA id r7-20020ac85c87000000b002e234014a1fsm3825318qta.81.2022.04.15.18.10.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Apr 2022 17:18:53 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] test-runner: Add dedicated option to start D-Bus
-Date:   Fri, 15 Apr 2022 17:18:53 -0700
-Message-Id: <20220416001853.1240822-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Fri, 15 Apr 2022 18:10:55 -0700 (PDT)
+Message-ID: <625a179f.1c69fb81.7f351.677e@mx.google.com>
+Date:   Fri, 15 Apr 2022 18:10:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0102991410510379845=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,BlueZ,1/3] storage: Add support for STATE_DIRECTORY environment variable
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220415223049.1155838-1-luiz.dentz@gmail.com>
+References: <20220415223049.1155838-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============0102991410510379845==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds a dedicated option to start D-Bus alone which can be useful
-when testing the bluetoothd with the likes of valgrind.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=632684
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      4.66 seconds
+GitLint                       FAIL      2.95 seconds
+Prep - Setup ELL              PASS      42.20 seconds
+Build - Prep                  PASS      0.77 seconds
+Build - Configure             PASS      8.36 seconds
+Build - Make                  PASS      1579.29 seconds
+Make Check                    PASS      11.92 seconds
+Make Check w/Valgrind         PASS      433.54 seconds
+Make Distcheck                PASS      233.76 seconds
+Build w/ext ELL - Configure   PASS      8.62 seconds
+Build w/ext ELL - Make        PASS      1575.38 seconds
+Incremental Build with patchesPASS      4837.45 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[v2,BlueZ,1/3] storage: Add support for STATE_DIRECTORY environment variable
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __printf(3, 4) over __attribute__((format(printf, 3, 4)))
+#888: FILE: src/textfile.h:12:
++					__attribute__((format(printf, 3, 4)));
+
+/github/workspace/src/12815484.patch total: 0 errors, 1 warnings, 715 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12815484.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+[v2,BlueZ,2/3] main: Add support for CONFIGURATION_DIRECTORY environment variable
+WARNING:EMBEDDED_FUNCTION_NAME: Prefer using '"%s...", __func__' to using 'main', this function's name, in a string
+#161: FILE: src/main.c:1222:
++	main_conf = load_config(option_configfile ? : "main.conf");
+
+/github/workspace/src/12815482.patch total: 0 errors, 1 warnings, 67 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12815482.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[v2,BlueZ,2/3] main: Add support for CONFIGURATION_DIRECTORY environment variable
+1: T1 Title exceeds max length (81>80): "[v2,BlueZ,2/3] main: Add support for CONFIGURATION_DIRECTORY environment variable"
+
+
+
+
 ---
- tools/test-runner.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index fd7b3b1b7..1f1a8c36f 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -47,6 +47,7 @@ static int test_argc;
- 
- static bool run_auto = false;
- static bool start_dbus = false;
-+static bool start_daemon = false;
- static bool start_emulator = false;
- static bool start_monitor = false;
- static int num_devs = 0;
-@@ -249,11 +250,12 @@ static void start_qemu(void)
- 				"rootflags=trans=virtio,version=9p2000.L "
- 				"acpi=off pci=noacpi noapic quiet ro init=%s "
- 				"bluetooth.enable_ecred=1"
--				"TESTHOME=%s TESTDBUS=%u TESTMONITOR=%u "
--				"TESTEMULATOR=%u TESTDEVS=%d TESTAUTO=%u "
--				"TESTARGS=\'%s\'",
--				initcmd, cwd, start_dbus, start_monitor,
--				start_emulator, num_devs, run_auto, testargs);
-+				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
-+				"TESTMONITOR=%u TESTEMULATOR=%u TESTDEVS=%d "
-+				"TESTAUTO=%u TESTARGS=\'%s\'",
-+				initcmd, cwd, start_dbus, start_daemon,
-+				start_monitor, start_emulator, num_devs,
-+				run_auto, testargs);
- 
- 	argv = alloca(sizeof(qemu_argv) +
- 				(sizeof(char *) * (4 + (num_devs * 4))));
-@@ -683,11 +685,13 @@ static void run_command(char *cmdname, char *home)
- 	if (start_dbus) {
- 		create_dbus_system_conf();
- 		dbus_pid = start_dbus_daemon();
--		daemon_pid = start_bluetooth_daemon(home);
--	} else {
-+	} else
- 		dbus_pid = -1;
-+
-+	if (start_daemon)
-+		daemon_pid = start_bluetooth_daemon(home);
-+	else
- 		daemon_pid = -1;
--	}
- 
- 	if (start_monitor)
- 		monitor_pid = start_btmon(home);
-@@ -874,6 +878,12 @@ static void run_tests(void)
- 		start_dbus = true;
- 	}
- 
-+	ptr = strstr(cmdline, "TESTDAEMON=1");
-+	if (ptr) {
-+		printf("bluetoothd requested\n");
-+		start_daemon = true;
-+	}
-+
- 	ptr = strstr(cmdline, "TESTMONITOR=1");
- 	if (ptr) {
- 		printf("Monitor requested\n");
-@@ -904,7 +914,8 @@ static void usage(void)
- 	printf("\ttest-runner [options] [--] <command> [args]\n");
- 	printf("Options:\n"
- 		"\t-a, --auto             Find tests and run them\n"
--		"\t-d, --dbus             Start D-Bus daemon\n"
-+		"\t-b, --dbus             Start D-Bus daemon\n"
-+		"\t-d, --daemon           Start bluetoothd\n"
- 		"\t-m, --monitor          Start btmon\n"
- 		"\t-l, --emulator         Start btvirt\n"
- 		"\t-u, --unix [path]      Provide serial device\n"
-@@ -916,8 +927,9 @@ static void usage(void)
- static const struct option main_options[] = {
- 	{ "all",     no_argument,       NULL, 'a' },
- 	{ "auto",    no_argument,       NULL, 'a' },
-+	{ "dbus",    no_argument,       NULL, 'b' },
- 	{ "unix",    no_argument,       NULL, 'u' },
--	{ "dbus",    no_argument,       NULL, 'd' },
-+	{ "daemon",  no_argument,       NULL, 'd' },
- 	{ "emulator", no_argument,      NULL, 'l' },
- 	{ "monitor", no_argument,       NULL, 'm' },
- 	{ "qemu",    required_argument, NULL, 'q' },
-@@ -941,7 +953,7 @@ int main(int argc, char *argv[])
- 	for (;;) {
- 		int opt;
- 
--		opt = getopt_long(argc, argv, "audlmq:k:vh", main_options,
-+		opt = getopt_long(argc, argv, "aubdlmq:k:vh", main_options,
- 								NULL);
- 		if (opt < 0)
- 			break;
-@@ -953,8 +965,12 @@ int main(int argc, char *argv[])
- 		case 'u':
- 			num_devs = 1;
- 			break;
-+		case 'b':
-+			start_dbus = true;
-+			break;
- 		case 'd':
- 			start_dbus = true;
-+			start_daemon = true;
- 			break;
- 		case 'l':
- 			start_emulator = true;
--- 
-2.35.1
 
+--===============0102991410510379845==--
