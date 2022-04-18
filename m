@@ -2,142 +2,174 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3775BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Apr 2022 04:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53AEAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Apr 2022 05:58:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236484AbiDREaS (ORCPT
+        id S236693AbiDRGBa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Apr 2022 00:30:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42588 "EHLO
+        Mon, 18 Apr 2022 02:01:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233504AbiDREaP (ORCPT
+        with ESMTP id S230316AbiDRGB2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Apr 2022 00:30:15 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F00315FD2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Apr 2022 21:27:38 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id z5-20020a170902ccc500b0015716eaec65so6997678ple.14
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Apr 2022 21:27:38 -0700 (PDT)
+        Mon, 18 Apr 2022 02:01:28 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07B1517A88
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Apr 2022 22:58:50 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id n11so10377964qvl.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Apr 2022 22:58:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=+/eC90OaFPtCaXAVUOvO7KkKJSMFfPnaKQl89qkOnoY=;
-        b=JpgwfDr9QKb74zaKNLlZ5FX7qM9UP3OyCKpZcfjbb3VC5TbuQs20xuegayANnytjTU
-         T7R2IM88bX6gF+PAcYgmhREqbNQ1DhFST2q7RsOoX0Gx2N2OHAIVcacam8rcxQUoDz3p
-         D9iG+azHvB6LaRjGIBhQA6ywqqugb6RmgM/0b7Y/XUJN5cTay8uQPiQjOAKAMnVsKyGz
-         9sFnvJ4FCsleZugm36HgD0NwCFfO5YNn/Yt/ES5SkC1ll0dEq+GgjWy5eSRqXiFoM3I0
-         2FuVpx3Eyxsujg5E7N2Zx5yRdt5iKFZruN3r8l1RtLlgFErPdbmERR54XJfdyZZO5VaN
-         G6Hw==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=X0X+KDTlJk6Zqh1ig7esHrfKd/JM4yspKZpR8hXTmiU=;
+        b=dUwu42Eru5YZxt4nBX/TiqBer4uXFzNXwVzJEi2Y1b6ZeuT+VmSSm7wrbJsfBEFD3o
+         gg4dmniO3ah/1PJnrlKFe1TfimfTgmdb6B3QzN92vihfn35oWgOa8/qH7SoOB64Rf1ty
+         UhpluqSddHitG/oNrLsBYcfJLy0vZEIcuqSBWF1hGAjeeBmd4C8ZC7w1S1RTJWpcMtDK
+         Yb75zbeKIU4UouaTxNM3bZ14dyO7Jib9ybkMMb2gnwtSQ3uoYI+9vkpr584H1f78wSGc
+         KxpHBke76A9osR1RYCtQFuvOeB3/mTwFs6yGfjidOy5A+chtZucPf9zjFKPs7MGgCfj5
+         8kFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=+/eC90OaFPtCaXAVUOvO7KkKJSMFfPnaKQl89qkOnoY=;
-        b=bPCct7NVXAKoh20MGNXxZDzLaXjERupMr5RYmH888CCraOxgjuL/+gqdDr6jGY5l4R
-         e9CnAT5IYv7DzPQgXbclfpXWWyG7CmLPw1OLocgy/IPiXiBAUCwn8WlS0xGI7cx2Fszt
-         8ND66qfnI8JGRdhGlDdg/LJAggKBpO8gvvRDR3i2Cl1269SF0jUsel1Cu0IdirRFUoIu
-         3ksiRgKqMjbj74F7CjoyW/8uUj6QwDOn+CNzd1OdP2MaOERd7pIxQQOtzMN6sJGd38AK
-         mpF5ml+GGCPjcB51hSV/56VuZs7NyBKYw8fD/UTkkEu0YSl71t6Ga46av3WkdsjLnJH4
-         o2kw==
-X-Gm-Message-State: AOAM531AuqOMMNadye7kPgvcgHVa1zTXGHIBu4ls67M3PkrTiLo5UTne
-        uME5007DzZ6oU8TqHTdnRMWPXwhbNZwUIirVNYJX5xfy2isBdHC9AiixQ55kKdJlrqFi8uPBL5A
-        P+yNM/rRqhFpBhks+SwSE0cjP9Q6ZakWacQT7lsy/ivIrfYSx1m5BhS632crZfPbwXqs+muJstp
-        W9
-X-Google-Smtp-Source: ABdhPJyqXxjkslAkH7VvijgNdyr++bSq0nNT1V68dKbOL3CSWY9Duw2oohhd3ioEtYGM9Yz2P9msAoth5ncE
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
- (user=jiangzp job=sendgmr) by 2002:a17:90b:1e10:b0:1ce:8478:ea09 with SMTP id
- pg16-20020a17090b1e1000b001ce8478ea09mr16642389pjb.134.1650256057494; Sun, 17
- Apr 2022 21:27:37 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 04:26:34 +0000
-In-Reply-To: <20220418042635.2567170-1-jiangzp@google.com>
-Message-Id: <20220418042629.Bluez.v1.2.I29a0e38364a8d5854342019b607fa049c74248a3@changeid>
-Mime-Version: 1.0
-References: <20220418042635.2567170-1-jiangzp@google.com>
-X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
-Subject: [Bluez PATCH v1 2/2] client: Add bonded-devices and show Bonded flag
- in info
-From:   Zhengping Jiang <jiangzp@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=X0X+KDTlJk6Zqh1ig7esHrfKd/JM4yspKZpR8hXTmiU=;
+        b=sahze0LqevZK5+zd3gzDXwG5nI66pChFCPKJLof/oWnrjqmrPUaWoGsSDZHHoA8wXn
+         od0nEX5GTe8ySkLh+1QEqxgcI9fP04cHSbHCGddlg8zy6oVBW2C2v3s0EAqMK35N2WP3
+         vZStFKzKZl2MVQD0eqmOwUot4BD+xprmXYjcmiFXbbw+GSpNMu260dffnklI9ZMlvh/c
+         RGsfKxq8qML8jqcp1/gB+BO2d+ySI6v23ha0weWZprIQufOpRhiFfChYyN+gHgPGfmFY
+         lRSNqphABiUijRTpSyAjHEx6W/OBWrK+XfyL2ATW3yQJnw6QM1jbhljlmCBnVB7QguKL
+         BiGA==
+X-Gm-Message-State: AOAM533RYavmfls0w6VweALRdb3hKGqyyU3trh7FrXPBPcTx8sjHnFUs
+        T1gNkW53YHEYiiWwWred1HZ9RaZRuJtZMg==
+X-Google-Smtp-Source: ABdhPJyMzi60Hp38Q25+3WedGVaHAH/I0OdarDcAMIW8VaKLblqK2NcKuUnRdyih38GxfTp/3iuQDw==
+X-Received: by 2002:a05:6214:c6d:b0:446:32a6:b783 with SMTP id t13-20020a0562140c6d00b0044632a6b783mr6759013qvj.125.1650261528942;
+        Sun, 17 Apr 2022 22:58:48 -0700 (PDT)
+Received: from [172.17.0.2] ([20.232.176.55])
+        by smtp.gmail.com with ESMTPSA id x24-20020ac87318000000b002f1fc5fcaedsm1731901qto.68.2022.04.17.22.58.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Apr 2022 22:58:48 -0700 (PDT)
+Message-ID: <625cfe18.1c69fb81.aa5f.8351@mx.google.com>
+Date:   Sun, 17 Apr 2022 22:58:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5187497464811840583=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: Adding bonded flag to D-Bus property
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220418042629.Bluez.v1.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
+References: <20220418042629.Bluez.v1.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add "bonded-devices" to the menu and show the "Bonded" property for
-command "info".
+--===============5187497464811840583==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-Reviewed-by: Yun-Hao Chung <howardchung@chromium.org>
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjMyOTE2CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMy4xNSBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAyLjEyIHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDUwLjkzIHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNzggc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgMTAu
+NDMgc2Vjb25kcwpCdWlsZCAtIE1ha2UgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTM5NC4x
+MSBzZWNvbmRzCk1ha2UgQ2hlY2sgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA1LjgyIHNl
+Y29uZHMKTWFrZSBDaGVjayB3L1ZhbGdyaW5kICAgICAgICAgRkFJTCAgICAgIDM1MC41MyBzZWNv
+bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyNzEuMjkgc2Vjb25k
+cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgMTAuMzIgc2Vjb25kcwpC
+dWlsZCB3L2V4dCBFTEwgLSBNYWtlICAgICAgICBGQUlMICAgICAgMTM2Ny40MCBzZWNvbmRzCklu
+Y3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlc0ZBSUwgICAgICAxNDIwLjczIHNlY29uZHMKCkRl
+dGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAt
+IEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVaIHNvdXJjZSB0cmVlCk91dHB1dDoKdG9vbHMvbWdt
+dC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzox
+MjM2NDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg
+4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQg
+fCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQv
+dGVzdC1hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3
+NjY6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
+mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwg
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
+c3QtYXZyY3AuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5
+OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
+ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4Kc3JjL2Rldmlj
+ZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2Vfc2V0X2JvbmRlZOKAmToKc3JjL2RldmljZS5jOjYx
+Mzc6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUg
+Wy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3RhdGVtZW50XQogNjEzNyB8ICBzdHJ1Y3QgYmVh
+cmVyX3N0YXRlICpzdGF0ZSA9IGdldF9zdGF0ZShkZXZpY2UsIGJkYWRkcl90eXBlKTsKICAgICAg
+fCAgXn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2Vb
+MV06ICoqKiBbTWFrZWZpbGU6MTAyNDg6IHNyYy9ibHVldG9vdGhkLWRldmljZS5vXSBFcnJvciAx
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDMxMDogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biAnbWFrZSBj
+aGVjaycKT3V0cHV0OgpzcmMvZGV2aWNlLmM6IEluIGZ1bmN0aW9uIOKAmGRldmljZV9zZXRfYm9u
+ZGVk4oCZOgpzcmMvZGV2aWNlLmM6NjEzNzoyOiBlcnJvcjogSVNPIEM5MCBmb3JiaWRzIG1peGVk
+IGRlY2xhcmF0aW9ucyBhbmQgY29kZSBbLVdlcnJvcj1kZWNsYXJhdGlvbi1hZnRlci1zdGF0ZW1l
+bnRdCiA2MTM3IHwgIHN0cnVjdCBiZWFyZXJfc3RhdGUgKnN0YXRlID0gZ2V0X3N0YXRlKGRldmlj
+ZSwgYmRhZGRyX3R5cGUpOwogICAgICB8ICBefn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcg
+dHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZToxMDI0ODogc3JjL2JsdWV0
+b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZToxMTI4MzogY2hlY2td
+IEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZSBDaGVj
+ayB3L1ZhbGdyaW5kIC0gRkFJTApEZXNjOiBSdW4gJ21ha2UgY2hlY2snIHdpdGggVmFsZ3JpbmQK
+T3V0cHV0Ogp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29s
+cy9tZ210LXRlc3Rlci5jOjEyMzY0OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGlt
+aXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlp
+bmcgd2l0aG91dAoxMjM2NCB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAg
+IHwgICAgIF5+fn4Kc3JjL2RldmljZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2Vfc2V0X2JvbmRl
+ZOKAmToKc3JjL2RldmljZS5jOjYxMzc6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBtaXhlZCBk
+ZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3RhdGVtZW50
+XQogNjEzNyB8ICBzdHJ1Y3QgYmVhcmVyX3N0YXRlICpzdGF0ZSA9IGdldF9zdGF0ZShkZXZpY2Us
+IGJkYWRkcl90eXBlKTsKICAgICAgfCAgXn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTAyNDg6IHNyYy9ibHVldG9v
+dGhkLWRldmljZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDMxMDogYWxsXSBFcnJv
+ciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIHcvZXh0IEVM
+TCAtIE1ha2UgLSBGQUlMCkRlc2M6IEJ1aWxkIEJsdWVaIHNvdXJjZSB3aXRoICctLWVuYWJsZS1l
+eHRlcm5hbC1lbGwnIGNvbmZpZ3VyYXRpb24KT3V0cHV0Ogp0b29scy9tZ210LXRlc3Rlci5jOiBJ
+biBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyMzY0OjU6IG5vdGU6
+IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFj
+a2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjM2NCB8IGludCBtYWluKGlu
+dCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6
+IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2
+YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tp
+bmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQg
+YXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJ
+biBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFy
+aWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5n
+LWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFy
+Z2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgpzcmMvZGV2aWNlLmM6IEluIGZ1bmN0
+aW9uIOKAmGRldmljZV9zZXRfYm9uZGVk4oCZOgpzcmMvZGV2aWNlLmM6NjEzNzoyOiBlcnJvcjog
+SVNPIEM5MCBmb3JiaWRzIG1peGVkIGRlY2xhcmF0aW9ucyBhbmQgY29kZSBbLVdlcnJvcj1kZWNs
+YXJhdGlvbi1hZnRlci1zdGF0ZW1lbnRdCiA2MTM3IHwgIHN0cnVjdCBiZWFyZXJfc3RhdGUgKnN0
+YXRlID0gZ2V0X3N0YXRlKGRldmljZSwgYmRhZGRyX3R5cGUpOwogICAgICB8ICBefn5+fn4KY2Mx
+OiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTogKioqIFtNYWtl
+ZmlsZToxMDI0ODogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFrZTogKioqIFtN
+YWtlZmlsZTo0MzEwOiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMKVGVzdDogSW5jcmVtZW50YWwgQnVpbGQgd2l0aCBwYXRjaGVzIC0gRkFJTApEZXNjOiBJbmNy
+ZW1lbnRhbCBidWlsZCBwZXIgcGF0Y2ggaW4gdGhlIHNlcmllcwpPdXRwdXQ6CnRvb2xzL21nbXQt
+dGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTIz
+NjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
+mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyMzY0IHwg
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
+c3QtYXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2
+OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
+ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0
+LWF2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1
+OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2
+YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQg
+bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnNyYy9kZXZpY2Uu
+YzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3NldF9ib25kZWTigJk6CnNyYy9kZXZpY2UuYzo2MTM3
+OjI6IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVjbGFyYXRpb25zIGFuZCBjb2RlIFst
+V2Vycm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0KIDYxMzcgfCAgc3RydWN0IGJlYXJl
+cl9zdGF0ZSAqc3RhdGUgPSBnZXRfc3RhdGUoZGV2aWNlLCBiZGFkZHJfdHlwZSk7CiAgICAgIHwg
+IF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFd
+OiAqKiogW01ha2VmaWxlOjEwMjQ4OiBzcmMvYmx1ZXRvb3RoZC1kZXZpY2Uub10gRXJyb3IgMQpt
+YWtlOiAqKiogW01ha2VmaWxlOjQzMTA6IGFsbF0gRXJyb3IgMgoKCgoKLS0tClJlZ2FyZHMsCkxp
+bnV4IEJsdWV0b290aAoK
 
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
----
-
-Changes in v1:
-- Show the status of the "Bonded" flag in bluetoothctl
-- Add option to show list of bonded devices
-
- client/main.c | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/client/main.c b/client/main.c
-index 589268c3a68c..45c89a1de37b 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -1090,6 +1090,32 @@ static void cmd_paired_devices(int argc, char *argv[])
- 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
- }
- 
-+static void cmd_bonded_devices(int argc, char *argv[])
-+{
-+	GList *ll;
-+
-+	if (check_default_ctrl() == FALSE)
-+		return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+
-+	for (ll = g_list_first(default_ctrl->devices);
-+			ll; ll = g_list_next(ll)) {
-+		GDBusProxy *proxy = ll->data;
-+		DBusMessageIter iter;
-+		dbus_bool_t bonded;
-+
-+		if (g_dbus_proxy_get_property(proxy, "Bonded", &iter) == FALSE)
-+			continue;
-+
-+		dbus_message_iter_get_basic(&iter, &bonded);
-+		if (!bonded)
-+			continue;
-+
-+		print_device(proxy, NULL);
-+	}
-+
-+	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-+}
-+
- static void generic_callback(const DBusError *error, void *user_data)
- {
- 	char *str = user_data;
-@@ -1781,6 +1807,7 @@ static void cmd_info(int argc, char *argv[])
- 	print_property(proxy, "Appearance");
- 	print_property(proxy, "Icon");
- 	print_property(proxy, "Paired");
-+	print_property(proxy, "Bonded");
- 	print_property(proxy, "Trusted");
- 	print_property(proxy, "Blocked");
- 	print_property(proxy, "Connected");
-@@ -3116,6 +3143,8 @@ static const struct bt_shell_menu main_menu = {
- 	{ "devices",      NULL,       cmd_devices, "List available devices" },
- 	{ "paired-devices", NULL,     cmd_paired_devices,
- 					"List paired devices"},
-+	{ "bonded-devices", NULL,     cmd_bonded_devices,
-+					"List bonded devices"},
- 	{ "system-alias", "<name>",   cmd_system_alias,
- 					"Set controller alias" },
- 	{ "reset-alias",  NULL,       cmd_reset_alias,
--- 
-2.36.0.rc0.470.gd361397f0d-goog
-
+--===============5187497464811840583==--
