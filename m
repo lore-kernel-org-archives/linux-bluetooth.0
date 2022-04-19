@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC0A8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Apr 2022 15:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9289AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Apr 2022 15:07:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245557AbiDSPEg (ORCPT
+        id S245336AbiDSPKL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Apr 2022 11:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56788 "EHLO
+        Tue, 19 Apr 2022 11:10:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347499AbiDSPEf (ORCPT
+        with ESMTP id S236347AbiDSPKK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Apr 2022 11:04:35 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D5FC2DD73
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 08:01:52 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id t11so33481337eju.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 08:01:52 -0700 (PDT)
+        Tue, 19 Apr 2022 11:10:10 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789D43A5FB
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 08:07:26 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id t11so33518788eju.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 08:07:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kynetics-com.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=3upJnd1aFZWxs7CUK2+oITgLbb7BGw/zMQnr9toHaSs=;
-        b=zBGFOmpZB+cWlaU8mtqlsamhFT3VfmItJ0tOCiErvbVASvBzoC8a3T6htC8WUEkPeO
-         dbCODvhVjVFQ7ktEowIgO9FYvQAf/L0a86Cpxv3ueS6/RO12vJqTMQmi4a9OVjl0KoQ7
-         uowdsYY8oXel7L4WCs/AOFBeWbG1xZlqd1KQrZT//VevvtL2mcEsJJ5QdtF6njSCV4rs
-         qkSI9D3P3CFggWhSSrSFBDqiitit4HDMtEHnJDrWsrf9A3BCzNBmJnAgio2r7Y4xzeqg
-         Unin/jkt9Aerd1ZE0GPftWYtmBplqOTWsGBqML/nVao+cpW3ghe2h+AduY5LeLNls8dI
-         LiKw==
+        b=0M7CquJBhu5fjpa4MROl+9MnpsIVBzSo4IW7KLgebmcShhLxP+hqHW6h7EVqgUtJgA
+         FYPdlfO3L4LSs+EAyfk2o2V9B6tdVi2+73MOlgYJ+ZKRPr0/Hda+e9zvcT83d8/oGRNN
+         bJrH15T6uBuxwAhQ3THVesldTN2j5qBeqYi9dEUgo1QYFKaeEZOd+ORITSwm/r+pYrCk
+         tsrTZ3IpTOXqtaWlexR2vOd4oeh7qixaRVyanTDRvFiz6cIbeagzm6zMwlK0hscuO9O+
+         6a3Cbfg95BFkRiumWWvpEGtOB0U+EiNc71L5J5Y3YrSZkfe8Nj8xq/Qdf+4LcI6NrA6m
+         dTCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=3upJnd1aFZWxs7CUK2+oITgLbb7BGw/zMQnr9toHaSs=;
-        b=gWThs+KX6779nGvmHlWXI3ZdiFq6AZVrAk2cUMQlcNsuCsNK7jxauG2h4noF2zzpBi
-         loy9P8csxvbeeNfGKDRKgb4qCYT9h2cAeapniyz6l+ZU0JW3WvShAwYOUgWyd059wltF
-         Prkayl0Isx+tfH4PcrjQqL09Tzbk70+duhLc5oUPMfgpPD9uDMYCn0v0qTwHNG9S+qOh
-         LxAzRaGhaE8PIlky/N25FcBDO/LLVejRfHf8dBwcxIaSsSgSIB/DAzLjpFtsIwUSsciM
-         JgkL9czSYTjKIjViJmPuLSxH8GubzMHjesCH+aAc+2VUsOUmjGVBIkd77TNKkeAbnYDM
-         MZRA==
-X-Gm-Message-State: AOAM533w1nzSAytJGT0HuA+6c1rrCX4NDbpruDia0cRKqpEma7uWxjwx
-        6X//aRRHEZjbET0pRG4JFaDW6L3uIesKlA==
-X-Google-Smtp-Source: ABdhPJzLF9/E0KpOkRp7iyT7mQhXW820j1tI3Hs+jNBlGaz25zHsWp0Eonq+LBz/KswAwZMqI7dqiQ==
-X-Received: by 2002:a17:906:6dc4:b0:6e8:465d:65c3 with SMTP id j4-20020a1709066dc400b006e8465d65c3mr13656666ejt.179.1650380510618;
-        Tue, 19 Apr 2022 08:01:50 -0700 (PDT)
+        b=rc9qIMppror774pPvgkaFRTombNLaTco6TILWgL2xv6DygNE2/1NkG8nf/uuDSWcFi
+         mxTsCcxzR5XQvlonSzeTdAChqbxb2hjCOj0/aTLixYGhPPILH70b3+2Ft2/tMkfSaAP9
+         2WziqC1AFE9qEdF1jyODPVxJWgUUV3H9ahsry4Mb26GA+Mh4ksTzeMpa8/eLRhzvz0mZ
+         fUQY6rURxQlS+hSNzf8EnMYkzelvviVpjTA3BUhPK0n8CDCBPBxHo7nwByjiRgbrWz9v
+         4y4LZ7b+Qej89g3cQwCoyfGvf0823xktf3AkuatLdYu02qlLFh7MXkk0OgbtFd9bmbvY
+         Hg3A==
+X-Gm-Message-State: AOAM5306bZgwY7QbeotA35G7oShnrZzRH7KSAeixmzKpMTMJ/FLZEUmo
+        1TRk6+TUEAhJpj/69oR0TVOL7BMaQMDw8w==
+X-Google-Smtp-Source: ABdhPJw8DNpA7SmhRE7PS57BYAM3jOKH9htevRS1dTPBEv43men3WRkM3kQX+TUYAQPDgNsh0H4nUw==
+X-Received: by 2002:a17:907:728c:b0:6e8:a052:4f03 with SMTP id dt12-20020a170907728c00b006e8a0524f03mr13724227ejc.344.1650380844764;
+        Tue, 19 Apr 2022 08:07:24 -0700 (PDT)
 Received: from localhost.lan (217-133-17-98.static.clienti.tiscali.it. [217.133.17.98])
-        by smtp.gmail.com with ESMTPSA id cr10-20020a056402222a00b0041d918fdf99sm8649389edb.85.2022.04.19.08.01.49
+        by smtp.gmail.com with ESMTPSA id s1-20020a056402036100b004240a3fc6b4sm74200edw.82.2022.04.19.08.07.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Apr 2022 08:01:50 -0700 (PDT)
+        Tue, 19 Apr 2022 08:07:24 -0700 (PDT)
 From:   Diego Rondini <diego.rondini@kynetics.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Diego Rondini <diego.rondini@kynetics.com>
 Subject: [PATCH BlueZ] test: changes for Python3
-Date:   Tue, 19 Apr 2022 17:03:56 +0200
-Message-Id: <20220419150356.694346-1-diego.rondini@kynetics.com>
+Date:   Tue, 19 Apr 2022 17:09:49 +0200
+Message-Id: <20220419150949.694702-1-diego.rondini@kynetics.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
