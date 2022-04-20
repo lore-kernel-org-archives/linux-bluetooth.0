@@ -2,107 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 710B0C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 05:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63DB7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 06:18:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359386AbiDTF1v (ORCPT
+        id S1359502AbiDTGVG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Apr 2022 01:27:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59208 "EHLO
+        Wed, 20 Apr 2022 02:21:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359407AbiDTF1V (ORCPT
+        with ESMTP id S230473AbiDTGVF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Apr 2022 01:27:21 -0400
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3FB37010
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 22:24:31 -0700 (PDT)
-X-QQ-mid: bizesmtp87t1650432254t6wicki9
-Received: from localhost.localdomain ( [58.240.82.166])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Wed, 20 Apr 2022 13:24:04 +0800 (CST)
-X-QQ-SSF: 01400000002000E0L000B00A0000000
-X-QQ-FEAT: F3yR32iATbhjwPuCH9v2WdRlSuRJVe6iE1qD9WghV/yeISm4wWE2BFYIcpuKV
-        gTSeyx43xhQmqVpxsBNHmOs2VuJ6SwK93RhgxsTOAOlkajZZVjYUCm56FZ7DJ65LMvYuOVY
-        cIGnB0Rl6VTYDtVwrkwdiBxXZrFreviM2XuP7b8p7Az2gWCEhnT6x6yBDOYBDPcOr39Acj4
-        BN5TReLO4X+DaY7EiC1/jo4q0+KmWXVV158A16tgcJbJM2cwzTn82OqJcWj8cGad9U4Yb+H
-        kTg7rxAS7Kvs4otMt+5PSiUHLOAOyctxuFJ7mkU7TBddtfvU0c47AdSisaEKVB5hy476XHE
-        RtBjHMjfkV1juCiCNGV88gHs+qT/ME4xYCCuhho
-X-QQ-GoodBg: 2
-From:   Meng Tang <tangmeng@uniontech.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Meng Tang <tangmeng@uniontech.com>
-Subject: [PATCH] Bluetooth: btusb: Add one Bluetooth part for the Realtek RTL8852BE
-Date:   Wed, 20 Apr 2022 13:24:02 +0800
-Message-Id: <20220420052402.19049-1-tangmeng@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Wed, 20 Apr 2022 02:21:05 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C7B396BC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 23:18:20 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id l127so1031777pfl.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Apr 2022 23:18:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=DonBWLiI6LuOnRRMQMF+LJ/sy6B51o7hSDZZDrBPtq0=;
+        b=DAkxFBcCdfXWxjEQG2RcY7NaSLoHy9w4R0l0b4FzL7OJVbhXACh+XQeSwtNVLGwgqf
+         bd1x4k0HX0dA9A5QdMLhxm+9VAf40+F+vKeGShtuwDm9Uha9s74hBAKBk4gr9Kxpr1De
+         ySFNpLrOlP6wrvLMnaSB74Sj+nOlCzERXL3lNjbJRYpFHHaR5Y8miDRs1gVBvTXxreZt
+         znfTMX/hCbV++F2qIn6+ctJpccRuLwdpgHElxWMGKI838h4I9ZtdSldz2r7yiNOkZcje
+         21n9VZJciUW4+FNEVkgQDaQ+OwI+NQhjrf9RLV2fOtohQ8qsuXa9Xaw+5aOFmabOEwlo
+         yuqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=DonBWLiI6LuOnRRMQMF+LJ/sy6B51o7hSDZZDrBPtq0=;
+        b=PXb9cMXLtgHAS+wPhJuCaB3HtwtYSpAwL4UBGmf7OFi1cuWUZZvVoXFJhGFrwS1GRj
+         havnqmALhoKCoOsKJnLiv91atmbzaDHDN93JzW4gwiabNGtYySYfj61LqNDLT7A9/Fa2
+         mekUxX3c6Ak7CGUXNpoUeTVkRXM4zr3yUdiFD4t37v4JgrIDd5MqHbK6MfsGZncJ0xZc
+         ZdcXHLEF2VgGZx6yBA47P5fcVabtm1+xSllQE4Wj523pN8CyjWaZlYMT0b+Yiida7PGv
+         eD1MAAId+Y7Nxg2N0jk2hzJax67KMVxRIk3Vz10AW1RK/M4H3FQSeQo5b2QLf7mM3lcc
+         qm9Q==
+X-Gm-Message-State: AOAM531m4LirYUq468krkfhqkPdvHVktvHBCtEDp41BNfAdTCLh4ZWB7
+        KmDGYXhr/KeM54vvX28DCSCvKTKT9Ag=
+X-Google-Smtp-Source: ABdhPJzb1sh4Ggg/pdcvFfF/R77XH0oOQ9uoy0SP9PtRaUYIPSkR0o6Cg5zRwCcrX8C1p7VeowpLBA==
+X-Received: by 2002:a05:6a00:b4d:b0:509:1ed1:570e with SMTP id p13-20020a056a000b4d00b005091ed1570emr21752337pfo.19.1650435499732;
+        Tue, 19 Apr 2022 23:18:19 -0700 (PDT)
+Received: from [172.17.0.2] ([13.93.143.40])
+        by smtp.gmail.com with ESMTPSA id e10-20020a17090a630a00b001c685cfd9d1sm17725823pjj.20.2022.04.19.23.18.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Apr 2022 23:18:19 -0700 (PDT)
+Message-ID: <625fa5ab.1c69fb81.cc197.adac@mx.google.com>
+Date:   Tue, 19 Apr 2022 23:18:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4893248645408534237=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign8
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, tangmeng@uniontech.com
+Subject: RE: Bluetooth: btusb: Add one Bluetooth part for the Realtek RTL8852BE
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220420052402.19049-1-tangmeng@uniontech.com>
+References: <20220420052402.19049-1-tangmeng@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This Realtek device has both wifi and BT components. The latter
-reports a USB ID of 0bda:b85b, which is not in the table.
+--===============4893248645408534237==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-BT device description in /sys/kernel/debug/usb/devices contains the
-following entries:
+This is automated email and please do not reply to this email!
 
-T:  Bus=07 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0bda ProdID=b85b Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Dear submitter,
 
-Signed-off-by: Meng Tang <tangmeng@uniontech.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=633626
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.87 seconds
+GitLint                       PASS      0.44 seconds
+SubjectPrefix                 PASS      0.31 seconds
+BuildKernel                   PASS      38.50 seconds
+BuildKernel32                 PASS      34.90 seconds
+Incremental Build with patchesPASS      48.09 seconds
+TestRunner: Setup             PASS      573.67 seconds
+TestRunner: l2cap-tester      PASS      19.10 seconds
+TestRunner: bnep-tester       PASS      6.96 seconds
+TestRunner: mgmt-tester       PASS      121.05 seconds
+TestRunner: rfcomm-tester     PASS      10.85 seconds
+TestRunner: sco-tester        PASS      10.50 seconds
+TestRunner: smp-tester        PASS      10.58 seconds
+TestRunner: userchan-tester   PASS      7.38 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 06a854a2507e..671a8691722e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -422,6 +422,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x4006), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
-+	/* Realtek 8852BE Bluetooth devices */
-+	{ USB_DEVICE(0x0bda, 0xb85b), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
-+
- 	/* Realtek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
- 	  .driver_info = BTUSB_REALTEK },
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============4893248645408534237==--
