@@ -2,64 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 513ABC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 08:55:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F1DBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 12:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376941AbiDTI6L convert rfc822-to-8bit (ORCPT
+        id S1353657AbiDTMtC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Apr 2022 04:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53390 "EHLO
+        Wed, 20 Apr 2022 08:49:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377045AbiDTI5q (ORCPT
+        with ESMTP id S1348748AbiDTMtC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Apr 2022 04:57:46 -0400
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::223])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D8145FC1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 01:55:00 -0700 (PDT)
-Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id 480AD60008;
-        Wed, 20 Apr 2022 08:54:58 +0000 (UTC)
-Message-ID: <8f12681aea9335dd83d104b9930a1e276905f05e.camel@hadess.net>
-Subject: Re: [PATCH v2 BlueZ 3/3] build: Make use of StateDirectory and
- ConfigurationDirectory
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Wed, 20 Apr 2022 10:54:57 +0200
-In-Reply-To: <CABBYNZJmGGSZbWZ1=aYkAt6yFo=uP_760mHt_-nq8TeYEbRiBg@mail.gmail.com>
-References: <20220415223049.1155838-1-luiz.dentz@gmail.com>
-         <20220415223049.1155838-3-luiz.dentz@gmail.com>
-         <7222b71167dd3ec90d7b4ad1b12b6179cc95f94d.camel@hadess.net>
-         <CABBYNZJmGGSZbWZ1=aYkAt6yFo=uP_760mHt_-nq8TeYEbRiBg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.44.0 (3.44.0-1.fc36) 
-MIME-Version: 1.0
+        Wed, 20 Apr 2022 08:49:02 -0400
+Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9383C485;
+        Wed, 20 Apr 2022 05:46:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1650458776; x=1681994776;
+  h=from:to:cc:subject:date:message-id;
+  bh=wpZPNcTrbg6UuvRsRNQ06iL7QRinWmpeDhD7MtVprBQ=;
+  b=WuED9DTVS5DuhpAVB9Pw1Cq7gCMinbQZhkRduEAjRYj64MCOPdDSJjh5
+   9Bplpp3f6Cb74QpClsZSTgDaCL+nwfOmzQkvQDgw6fVihh5jbMemd16kP
+   jPEFYmrzjqT4TiFRq299yxaUmykzXYawhdnlY7ASBL2P3bprUlNZNk1JU
+   0=;
+Received: from ironmsg07-lv.qualcomm.com ([10.47.202.151])
+  by alexa-out.qualcomm.com with ESMTP; 20 Apr 2022 05:46:16 -0700
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg07-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 20 Apr 2022 05:46:14 -0700
+X-QCInternal: smtphost
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 20 Apr 2022 18:15:52 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 51BCB21656; Wed, 20 Apr 2022 18:15:51 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        bjorn.andersson@linaro.org, agross@kernel.org, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Cc:     mka@chromium.org, quic_hemantg@quicinc.com,
+        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
+        quic_hbandi@quicinc.com, abhishekpandit@chromium.org,
+        mcchou@chromium.org, Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v4] Bluetooth: arm64: dts: qcom: sc7280: Add IO regulator handler in SC7280 CRD platforms
+Date:   Wed, 20 Apr 2022 18:15:40 +0530
+Message-Id: <1650458740-16957-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 2022-04-19 at 11:40 -0700, Luiz Augusto von Dentz wrote:
-> Hi Bastien,
-> 
-> On Tue, Apr 19, 2022 at 3:33 AM Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > 
-> > On Fri, 2022-04-15 at 15:30 -0700, Luiz Augusto von Dentz wrote:
-> > > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > > 
-> > > This makes use of StateDirectory[1] and ConfigurationDirectory[1]
-> > > to
-> > > inform systemd what those paths are used for instead of using
-> > > ReadWritePaths and ReadOnlyPaths which can lead to issues.
-> > > 
-> > > Fixes: https://github.com/bluez/bluez/issues/329
-> > 
-> > FYI, my reviews on those patches are at:
-> > https://github.com/bluez/bluez/issues/329#issuecomment-1102459104
-> > 
-> > Cheers
-> 
-> Ive sent a couple of patches addressing them, please have a look.
+As IO regulator varies in different SC7280 platforms
+updating this handler in individual platform bluetooth node.
 
-Patches look good, thanks!
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+---
+v4: updated commit text
+v3: Updated commit text to reflect the change
+v2: updated reviewer comments.
+v1: intial patch
+---
+---
+ arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+index e2efbdd..6cbbddc 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
++++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+@@ -35,6 +35,10 @@
+ 	};
+ };
+ 
++&bluetooth {
++	vddio-supply = <&vreg_l18b_1p8>;
++};
++
+ ap_tp_i2c: &i2c0 {
+ 	status = "okay";
+ 	clock-frequency = <400000>;
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+
