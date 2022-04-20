@@ -2,104 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57F14C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 20:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 273E4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 21:23:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382024AbiDTURl (ORCPT
+        id S1382500AbiDTV0n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Apr 2022 16:17:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58506 "EHLO
+        Wed, 20 Apr 2022 17:26:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351311AbiDTUR0 (ORCPT
+        with ESMTP id S1382498AbiDTV0m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Apr 2022 16:17:26 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B725E46668
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 13:14:39 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id c23so2856283plo.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 13:14:39 -0700 (PDT)
+        Wed, 20 Apr 2022 17:26:42 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0542648881
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 14:23:56 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id bb21so1970124qtb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 14:23:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=unP3oOLZzZNN5SF2bW2yygikeJ7QdH3xEez4jSep3nY=;
-        b=U+Ns67IwzErw5jW3hMtAQe/Pll5rrS+e+D1zNxzJKumHBddukx6nOwdNMxeq2YZjxg
-         GLQyYWLzz/SiCACBsmSK5ltDaKFiSoo7Zd+l+cTJZxhquNfr1CKyOw7H0hAoGehADBi5
-         dx9WMm3N7WirAowsLw4/r3ttAHF2B0DTZnlehIWJB2eZLGpK/Ky0AZivhuDrh4X2jvR1
-         caPjkXT5sOpdHdfuabv2zRMgLlq2X/eH7MB/S8vkEeZxSPJw8YHSAxgjlwFGhUAm8KDT
-         VODSicgstzKlHfEnE5EmZIuw1De/drox85EyWaXaE/NfcPLsBUfoMK0ND5k21bHTZGA4
-         PWdA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=IATZNkDeVFn/PRIjkPI0TNKSh2DzVB6WH7EpKbf+cXI=;
+        b=Cv3kLMjy8l0/ldOihAZw7934Ubi3RvzOzMgibUhH5tgt+LpbIk3eaJXz46UhajwLdk
+         L7130Mx1qwQeMGLiQ027sA40/76Do1FOZivKJ283RRKdCBv4jFUhoAgVKeuw/4QuJdQl
+         sarllpvAAQL6YMYjkKq1Achq7wDnMNJ2tEq/lLC4dmM03R0wqUogU2aQM0yCAYLQPwvF
+         ekwFNAONZw/XBhwdM/qAQN4g1cAxCdBxwJY+iAAShUnN2CK4FtcWV0Zs9D18ybE2elHs
+         Oj3TRcVii607Pjxbz4HZZpKn4gbZo1W/ia0llBRgUClRjht0AjjyJ6Z5I7M5JvVLqWgY
+         ttbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=unP3oOLZzZNN5SF2bW2yygikeJ7QdH3xEez4jSep3nY=;
-        b=Zt8sdDdIanIHKI049PeiMK4s4LZIqNzZJ2TcH+ReIDbQolJ08Evw+Ipi2ApT/hAfll
-         p8ma5xe4tZqpFw0Qny6f8sBbsTSVqAczR1iIxW5v6Xxf4QwH5Byo9HA0/GctSWGOe2zc
-         P1cvdb5TyhTTy+FWvMPrB71GizYCdugn9UTLziSRsux47O4kw5R74hSR6ll159b5kAMd
-         x/FNYol7mWzYhOM/eo4OCz2rfN3Lfsx1SfBVXpZfsW7vEl/cKZFjFtOYS5PYhKXBb7WF
-         PNVRt9kBk6rm2KN9Zg5mtMoUy33AWLH5O71h+jVO4IVHVOTozSY2xfii56+aOXQ227zR
-         zvAA==
-X-Gm-Message-State: AOAM531pQ8uXVP3NI2V6//AATKglotSon5TNWPRzfLDby2c1Us1pDJH4
-        9zRQe596Z3ffTO4Fw4e6M4G/795Zdsw=
-X-Google-Smtp-Source: ABdhPJwCAYCCTQmaa47yzM2OCFatigFi9usFNj0pMrQxlNM+Jl4niilUXXIXYjhoiYOi6OKVXV7EGg==
-X-Received: by 2002:a17:90b:1c86:b0:1bf:2a7e:5c75 with SMTP id oo6-20020a17090b1c8600b001bf2a7e5c75mr6385949pjb.145.1650485678743;
-        Wed, 20 Apr 2022 13:14:38 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b3-20020a17090a800300b001cd4989feb7sm35855pjn.3.2022.04.20.13.14.37
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=IATZNkDeVFn/PRIjkPI0TNKSh2DzVB6WH7EpKbf+cXI=;
+        b=wIuh9mXdN3iPusVB5fu6aFC41AaJg+H/8WOUbtKoWcPSnQcdpJ1czu1n1HCzxTUise
+         RUEGg5b/JDk/XzjdDQ6+7mnlylLHIqY8akafUU5EQFJWgYz5ps39oXYS5jBwX1SOLJJB
+         LtX72cp/NxOEoCJnxKEqL2DCGGZbQOwBwBBtgv7JwdA2dZxB/GqSnPzj3pQ5sKs1dtLk
+         eXwBMyHfkuiD7juvsdwT/Z06CkYzzPyVc6yYOjsB13N+7xporaMZpi7Z9B1yLemflznb
+         Sd0loZO2Ywxu4Oq9rZDeMbROwaSCzuQxf76l5jVDJjiGhs+ABLwBncqEd3LpcKbVzY4O
+         W03A==
+X-Gm-Message-State: AOAM531PINOQMiZgs1XBbOAXmcGnHC+5LwL5IkIGhPGj9uw6BNAFCbYh
+        2JftM7YVlP7RmooPHjenvN9dmoavYnLtOA==
+X-Google-Smtp-Source: ABdhPJwsTmO4dPeMAM8UyL2cVXbWDYWALlBfgPLl7kM90mcuv8aC16BIoiMwxyz63WNpzBuw7R2Tsw==
+X-Received: by 2002:ac8:7c46:0:b0:2e1:d6c2:2b15 with SMTP id o6-20020ac87c46000000b002e1d6c22b15mr15235795qtv.405.1650489834955;
+        Wed, 20 Apr 2022 14:23:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.115.123.31])
+        by smtp.gmail.com with ESMTPSA id t12-20020a05622a01cc00b002f204a559a4sm2386480qtw.53.2022.04.20.14.23.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Apr 2022 13:14:38 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] hog-lib: Check if Report ID is set before prepending it
-Date:   Wed, 20 Apr 2022 13:14:37 -0700
-Message-Id: <20220420201437.2855806-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Wed, 20 Apr 2022 14:23:54 -0700 (PDT)
+Message-ID: <626079ea.1c69fb81.c8e68.2613@mx.google.com>
+Date:   Wed, 20 Apr 2022 14:23:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3487161249284201561=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] hog-lib: Check if Report ID is set before prepending it
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220420201437.2855806-1-luiz.dentz@gmail.com>
+References: <20220420201437.2855806-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3487161249284201561==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Before prepending the Report ID check if it is non-zero:
+This is automated email and please do not reply to this email!
 
-BLUETOOTH SPECIFICATION Page 16 of 26
-HID Service Specification
+Dear submitter,
 
-Report ID shall be nonzero in a Report Reference characteristic
-descriptor where there is more than one instance of the Report
-characteristic for any given Report Type.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=633916
 
-Fixes: https://github.com/bluez/bluez/issues/334
-Fixes: https://github.com/bluez/bluez/issues/320
-Fixes: https://www.spinics.net/lists/linux-bluetooth/msg97262.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.43 seconds
+GitLint                       PASS      0.99 seconds
+Prep - Setup ELL              PASS      42.85 seconds
+Build - Prep                  PASS      0.76 seconds
+Build - Configure             PASS      8.67 seconds
+Build - Make                  PASS      1271.22 seconds
+Make Check                    PASS      11.98 seconds
+Make Check w/Valgrind         PASS      444.82 seconds
+Make Distcheck                PASS      231.22 seconds
+Build w/ext ELL - Configure   PASS      8.82 seconds
+Build w/ext ELL - Make        PASS      1263.07 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- profiles/input/hog-lib.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index b611f6b4a..e69ea1ba4 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -348,7 +348,14 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- 	ev.type = UHID_INPUT;
- 	buf = ev.u.input.data;
- 
--	if (report->numbered) {
-+	/* BLUETOOTH SPECIFICATION Page 16 of 26
-+	 * HID Service Specification
-+	 *
-+	 * Report ID shall be nonzero in a Report Reference characteristic
-+	 * descriptor where there is more than one instance of the Report
-+	 * characteristic for any given Report Type.
-+	 */
-+	if (report->numbered && report->id) {
- 		buf[0] = report->id;
- 		len = MIN(len, sizeof(ev.u.input.data) - 1);
- 		memcpy(buf + 1, pdu, len);
--- 
-2.35.1
 
+--===============3487161249284201561==--
