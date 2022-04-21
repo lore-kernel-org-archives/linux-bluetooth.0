@@ -2,132 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63998C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 15:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE53FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 20:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382983AbiDUQAm convert rfc822-to-8bit (ORCPT
+        id S1390612AbiDUUKI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Apr 2022 12:00:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
+        Thu, 21 Apr 2022 16:10:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390408AbiDUQAl (ORCPT
+        with ESMTP id S230301AbiDUUKH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Apr 2022 12:00:41 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D9C0473A2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 08:57:49 -0700 (PDT)
-Received: from smtpclient.apple (p4fefc32f.dip0.t-ipconnect.de [79.239.195.47])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 99AA6CED13;
-        Thu, 21 Apr 2022 17:57:48 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH] Bluetooth: hci_event: Fix checking for invalid handle on
- error status
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220420221433.2933868-1-luiz.dentz@gmail.com>
-Date:   Thu, 21 Apr 2022 17:57:48 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <654FF692-95EB-459A-9144-62EA911C7BBB@holtmann.org>
-References: <20220420221433.2933868-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        Thu, 21 Apr 2022 16:10:07 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D324C78E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 13:07:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4806CB82911
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 20:07:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E8883C385A1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 20:07:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650571633;
+        bh=RuUkErZC1dksMjguLynfXovNzesQRa9DH2FFdwsHf1M=;
+        h=From:To:Subject:Date:From;
+        b=dJ9U19aCO5uPlAAHmQ9eo+UAMob+svNrBPnLZnjOIqrrEhiRsiEBcfW2Mr+tua+55
+         8TrVJDyAou/CZQkWZnt/y342l4akCywep3JkXnbM1PPsOe9fB59dhpLx7w6S1KhWqF
+         csA2yGRyHb49ofih3tutvOtvyFwy7ojq4L/C4Qi/Gu8eC11NuxMXHHxxp2eH7mg5si
+         Z3MUxzIJfbK3cSWW3cwQTK2nVMKudF8YANWDiqJIYtIqvhAGkL95n99AEcvm66EneE
+         LuZTMV48kX1qqKKkgr5YP881WSJIVRh/70KNHye2Ya/Z+LywloJ3gcW0P8McV+vbdz
+         fs2nNV45z8fSA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id CBF5DC05FD0; Thu, 21 Apr 2022 20:07:13 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215872] New: ath11k: QCA6390 firmware crashes after some time
+Date:   Thu, 21 Apr 2022 20:07:13 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mail@kai-mast.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-215872-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215872
 
-> Commit d5ebaa7c5f6f6 introduces checks for handle range
-> (e.g HCI_CONN_HANDLE_MAX) but controllers don't seem to respect the
-> valid range int case of error status:
-> 
->> HCI Event: Connect Complete (0x03) plen 11
->        Status: Page Timeout (0x04)
->        Handle: 65535
->        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
-> 	Sound Products Inc)
->        Link type: ACL (0x01)
->        Encryption: Disabled (0x00)
-> [1644965.827560] Bluetooth: hci0: Ignoring HCI_Connection_Complete for
-> invalid handle
+            Bug ID: 215872
+           Summary: ath11k: QCA6390 firmware crashes after some time
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.17.3-arch1-1
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: mail@kai-mast.de
+        Regression: No
 
-so the problem is that with BR/EDR the lookup is by BD_ADDR. I think the check for valid handle is wrong at the beginning of connect complete handler.
+Created attachment 300786
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300786&action=3Dedit
+dmesg | grep Bluetooth
 
-The problem is really the fact the we trying a big hammer at the beginning. The hci_conn_add in case of auto-connect should validate status and handle. We are not even validating the status right now assuming we always get a status == 0 on auto-connect.
+I'm on arch Linux. For a while now (multiple kernel versions since 5.15 at
+least) my qca firwmare seems to crash. Weirdly bluetooth stops working and =
+WiFi
+still works fine.
+There is nothing in particular that seems to trigger this. I just have to w=
+ait
+for a while. Sometimes a few minutes after boot sometimes a few hours.=20
 
-The second handle validation should only occur if we have !status in the bottom half of that function.
+Rebooting without a power connection or booting into Windows usually resolv=
+es
+this issue.
 
+I'm on a 2020 Dell XPS 9500. Fimrware is up to date at 1.13.
 
-> Because of it is impossible to cleanup the connections properly since
-> the stack would attempt to cancel the connection which is no longer in
-> progress causing the following trace:
-> 
-> < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
->        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
-> 	Sound Products Inc)
-> = bluetoothd: src/profile.c:record_cb() Unable to get Hands-Free Voice
-> 	gateway SDP record: Connection timed out
->> HCI Event: Command Complete (0x0e) plen 10
->      Create Connection Cancel (0x01|0x0008) ncmd 1
->        Status: Unknown Connection Identifier (0x02)
->        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
-> 	Sound Products Inc)
-> < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
->        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
-> 	Sound Products Inc)
+Output of uname -a: Linux kai-xps 5.17.3-arch1-1 #1 SMP PREEMPT Thu, 14 Apr
+2022 01:18:36 +0000 x86_64 GNU/Linux
 
-Can we get details about which controller uses 0xffff instead of 0 for the handle?
+--=20
+You may reply to this email to add a comment.
 
-> 
-> Fixes: d5ebaa7c5f6f6 ("Bluetooth: hci_event: Ignore multiple conn complete events")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index abaabfae19cc..1cc5a712459e 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3068,7 +3068,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
-> 	struct hci_ev_conn_complete *ev = data;
-> 	struct hci_conn *conn;
-> 
-> -	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-> +	if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-> 		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for invalid handle");
-> 		return;
-> 	}
-
-See comments above.
-
-> @@ -4690,7 +4690,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
-> 		return;
-> 	}
-> 
-> -	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-> +	if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-> 		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete for invalid handle");
-> 		return;
-> 	}
-
-This is also in the wrong position. Fundamentally we need to check the validity of the handle before we assign it and not just globally.
-
-> @@ -5527,7 +5527,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
-> 	struct smp_irk *irk;
-> 	u8 addr_type;
-> 
-> -	if (handle > HCI_CONN_HANDLE_MAX) {
-> +	if (!status && handle > HCI_CONN_HANDLE_MAX) {
-> 		bt_dev_err(hdev, "Ignoring HCI_LE_Connection_Complete for invalid handle");
-> 		return;
-> 	}
-
-Same here. The global check is pointless. Check before using it.
-
-Regards
-
-Marcel
-
+You are receiving this mail because:
+You are the assignee for the bug.=
