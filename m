@@ -2,80 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B511C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 12:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63998C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 15:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384766AbiDUMcD (ORCPT
+        id S1382983AbiDUQAm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Apr 2022 08:32:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38372 "EHLO
+        Thu, 21 Apr 2022 12:00:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384697AbiDUMcB (ORCPT
+        with ESMTP id S1390408AbiDUQAl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Apr 2022 08:32:01 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BA1C3136F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 05:29:11 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id h28-20020a056e021d9c00b002cc403e851aso2536740ila.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 05:29:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=2LH/TUAXgyjFg87lmutVH/Zh/Ig4GTObkpnNk61xg+4=;
-        b=i8C6mZi7qsJXX4Ygku4RBpqaW4o5Am9iUITgEfwu3WOy1Ies/tS1fwwp7J39zDql/E
-         YTm3+TNXIUP7Uyse+KG5SpWR2OgLLEt0zNh3DnfwZupMufoJHP173/EbZOfJCz09V4+K
-         hMa/FZEU0Pjkl9ufvnW0OqpLnkmTHnLWAzHON2GnYhjNudS+Emaw89FxcJ6tz4lwwevp
-         h+rHoJpyOi54W9ciIs4h520kNLRZEOU8EgPaoUFD3Sas9aovtE+oHxp39CZCBOtggiAR
-         sax1FoSvRWxdm0VKt67smD3RZjFuFlsFOuU+03fuJqqZO1l+EB+zxz3oQMyz88ZNn3RZ
-         COGg==
-X-Gm-Message-State: AOAM533jbCplBCsw89Z6V08RpKKJ9W0LvIqSccpCM9g5DHS3A5+s+phH
-        89+l6uA4d5/YPSYVIeC9Zhy+jbYj7mVwGCC2sRcxDyKLPEDV
-X-Google-Smtp-Source: ABdhPJw9cDZEQPn7qRg5XxIXfP++kvVm4Mw1mTgznR6D5YpBs5CrAp8bCEiEqG9rWSv0a5q9ra/l7nk55Ugc5U+QM+RiN92OCC+2
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1cab:b0:2ca:b397:a2e0 with SMTP id
- x11-20020a056e021cab00b002cab397a2e0mr10720692ill.104.1650544150570; Thu, 21
- Apr 2022 05:29:10 -0700 (PDT)
-Date:   Thu, 21 Apr 2022 05:29:10 -0700
-In-Reply-To: <000000000000f8b5ef05dd25b963@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c7ede805dd2941b2@google.com>
-Subject: Re: [syzbot] UBSAN: shift-out-of-bounds in ntfs_fill_super
-From:   syzbot <syzbot+1631f09646bc214d2e76@syzkaller.appspotmail.com>
-To:     almaz.alexandrovich@paragon-software.com, chao@kernel.org,
-        davem@davemloft.net, jaegeuk@kernel.org, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        luiz.dentz@gmail.com, marcel@holtmann.org, nathan@kernel.org,
-        ndesaulniers@google.com, netdev@vger.kernel.org,
-        ntfs3@lists.linux.dev, syzkaller-bugs@googlegroups.com,
-        trix@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 21 Apr 2022 12:00:41 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7D9C0473A2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 08:57:49 -0700 (PDT)
+Received: from smtpclient.apple (p4fefc32f.dip0.t-ipconnect.de [79.239.195.47])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 99AA6CED13;
+        Thu, 21 Apr 2022 17:57:48 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+Subject: Re: [PATCH] Bluetooth: hci_event: Fix checking for invalid handle on
+ error status
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220420221433.2933868-1-luiz.dentz@gmail.com>
+Date:   Thu, 21 Apr 2022 17:57:48 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <654FF692-95EB-459A-9144-62EA911C7BBB@holtmann.org>
+References: <20220420221433.2933868-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hi Luiz,
 
-commit adf9ea89c719c1d23794e363f631e376b3ff8cbc
-Author: Chao Yu <chao@kernel.org>
-Date:   Thu Aug 26 02:03:15 2021 +0000
+> Commit d5ebaa7c5f6f6 introduces checks for handle range
+> (e.g HCI_CONN_HANDLE_MAX) but controllers don't seem to respect the
+> valid range int case of error status:
+> 
+>> HCI Event: Connect Complete (0x03) plen 11
+>        Status: Page Timeout (0x04)
+>        Handle: 65535
+>        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> 	Sound Products Inc)
+>        Link type: ACL (0x01)
+>        Encryption: Disabled (0x00)
+> [1644965.827560] Bluetooth: hci0: Ignoring HCI_Connection_Complete for
+> invalid handle
 
-    f2fs: fix unexpected ENOENT comes from f2fs_map_blocks()
+so the problem is that with BR/EDR the lookup is by BD_ADDR. I think the check for valid handle is wrong at the beginning of connect complete handler.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=101dd0fcf00000
-start commit:   b253435746d9 Merge tag 'xtensa-20220416' of https://github..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=121dd0fcf00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=141dd0fcf00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ff9f8140cbb3af7
-dashboard link: https://syzkaller.appspot.com/bug?extid=1631f09646bc214d2e76
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12e13cfcf00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=135e3008f00000
+The problem is really the fact the we trying a big hammer at the beginning. The hci_conn_add in case of auto-connect should validate status and handle. We are not even validating the status right now assuming we always get a status == 0 on auto-connect.
 
-Reported-by: syzbot+1631f09646bc214d2e76@syzkaller.appspotmail.com
-Fixes: adf9ea89c719 ("f2fs: fix unexpected ENOENT comes from f2fs_map_blocks()")
+The second handle validation should only occur if we have !status in the bottom half of that function.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+> Because of it is impossible to cleanup the connections properly since
+> the stack would attempt to cancel the connection which is no longer in
+> progress causing the following trace:
+> 
+> < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+>        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> 	Sound Products Inc)
+> = bluetoothd: src/profile.c:record_cb() Unable to get Hands-Free Voice
+> 	gateway SDP record: Connection timed out
+>> HCI Event: Command Complete (0x0e) plen 10
+>      Create Connection Cancel (0x01|0x0008) ncmd 1
+>        Status: Unknown Connection Identifier (0x02)
+>        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> 	Sound Products Inc)
+> < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+>        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> 	Sound Products Inc)
+
+Can we get details about which controller uses 0xffff instead of 0 for the handle?
+
+> 
+> Fixes: d5ebaa7c5f6f6 ("Bluetooth: hci_event: Ignore multiple conn complete events")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> net/bluetooth/hci_event.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index abaabfae19cc..1cc5a712459e 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3068,7 +3068,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+> 	struct hci_ev_conn_complete *ev = data;
+> 	struct hci_conn *conn;
+> 
+> -	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> +	if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> 		bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for invalid handle");
+> 		return;
+> 	}
+
+See comments above.
+
+> @@ -4690,7 +4690,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+> 		return;
+> 	}
+> 
+> -	if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> +	if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> 		bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete for invalid handle");
+> 		return;
+> 	}
+
+This is also in the wrong position. Fundamentally we need to check the validity of the handle before we assign it and not just globally.
+
+> @@ -5527,7 +5527,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+> 	struct smp_irk *irk;
+> 	u8 addr_type;
+> 
+> -	if (handle > HCI_CONN_HANDLE_MAX) {
+> +	if (!status && handle > HCI_CONN_HANDLE_MAX) {
+> 		bt_dev_err(hdev, "Ignoring HCI_LE_Connection_Complete for invalid handle");
+> 		return;
+> 	}
+
+Same here. The global check is pointless. Check before using it.
+
+Regards
+
+Marcel
+
