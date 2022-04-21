@@ -2,55 +2,55 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 221D2C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 06:45:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 377CAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 06:45:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376315AbiDUGsP (ORCPT
+        id S1385076AbiDUGsU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Apr 2022 02:48:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45754 "EHLO
+        Thu, 21 Apr 2022 02:48:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385402AbiDUGrs (ORCPT
+        with ESMTP id S1385175AbiDUGrV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Apr 2022 02:47:48 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8AF8110F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 23:44:53 -0700 (PDT)
+        Thu, 21 Apr 2022 02:47:21 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C7121572B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 23:43:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650523493; x=1682059493;
+  t=1650523436; x=1682059436;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=NaDAyaqFVN3Q0DIBHztqleUCRttZ7Oxt3AQT71CDTCI=;
-  b=H5gBtgO4eFMY6bZZ/qRXFvnqU9f4rTL4qOoxVbROulROhm+S71VoAhv7
-   7MIaZ0cW2a+xXqJy1Zaj4tIdQFjZU7RN2c3Hp0WD1JcZ6Itd2YHkmTFVN
-   aZCLizDDehfZPi+Dotaybbcm9IHvanKyYED7ealX8NHLI5K/8TH71hr/K
-   OndKEDqmSJokuQ56pVsdT7aWjz2HNTVoX0UCCb5QLjvU0cI/aPFSTXtDN
-   C9L9Qt5PLnI5ogGmSjJJVWmUF9yKoH34ik3o74uOWCxcsROzMwfdefZvH
-   9Wy1whAEWMBYNeEnsphYPEfT3ypmq+C7uDzchNcJOJW5o9iJcZxk2clOG
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="244190279"
+  bh=DchvKaYk5dETHBFZioj5ajFrvMfQV6ftcgPkimAEC8o=;
+  b=WXjz7vN1DAfAuYRZNaiZSUXcJ2U+8Q5rWfAdmLjBqnH/QiEJH4Lcp5Bh
+   Jg7XwEAUspdFfvTnTOTzq3IbGlt6ZYOQbx8RM5SAxTTdH6DuxqiCRiO92
+   58pxJdFJ6ICeW6naFDHUJHDdoP/us3e1G0LKE2qgNB6o6n6U/7cff3i3m
+   MuGVOLCJc5L3z7LgzDLCk1D/B7oE74wuIx2Nsq+EexTXIuw+Jf1dEq0be
+   9NMelym0PCriZi1+fqWzq+J7O9O7PgKx1wsUt8CQjGT6FEdFLVIDf+mwm
+   255mfnMJGMytL62vqvPiIuA1610zpN0ILMiI6yVd2ImSrEj0ke7yijp3j
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10323"; a="350704800"
 X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="244190279"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2022 23:44:53 -0700
+   d="scan'208";a="350704800"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Apr 2022 23:43:52 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.90,278,1643702400"; 
-   d="scan'208";a="510918950"
+   d="scan'208";a="555609055"
 Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 20 Apr 2022 23:44:52 -0700
+  by orsmga007.jf.intel.com with ESMTP; 20 Apr 2022 23:43:51 -0700
 Received: from kbuild by 3abc53900bec with local (Exim 4.95)
         (envelope-from <lkp@intel.com>)
-        id 1nhQYd-00081b-B3;
-        Thu, 21 Apr 2022 06:44:51 +0000
-Date:   Thu, 21 Apr 2022 14:43:51 +0800
+        id 1nhQXe-00080g-Vb;
+        Thu, 21 Apr 2022 06:43:50 +0000
+Date:   Thu, 21 Apr 2022 14:43:50 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org
+Cc:     kbuild-all@lists.01.org
 Subject: Re: [PATCH] Bluetooth: hci_event: Fix checking for invalid handle on
  error status
-Message-ID: <202204210838.G9CZnn9u-lkp@intel.com>
+Message-ID: <202204210853.eFHdXHTU-lkp@intel.com>
 References: <20220420221433.2933868-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -73,36 +73,38 @@ https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-hci_event-Fix-checking-for-invalid-handle-on-error-status/20220421-061600
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: riscv-randconfig-r042-20220420 (https://download.01.org/0day-ci/archive/20220421/202204210838.G9CZnn9u-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project bac6cd5bf85669e3376610cfc4c4f9ca015e7b9b)
+config: arc-randconfig-r043-20220420 (https://download.01.org/0day-ci/archive/20220421/202204210853.eFHdXHTU-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 11.2.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # install riscv cross compiling tool for clang build
-        # apt-get install binutils-riscv64-linux-gnu
         # https://github.com/intel-lab-lkp/linux/commit/91a252b91692543d5f9536ebdf10f20a413a858f
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-hci_event-Fix-checking-for-invalid-handle-on-error-status/20220421-061600
         git checkout 91a252b91692543d5f9536ebdf10f20a413a858f
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash net/bluetooth/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross W=1 O=build_dir ARCH=arc SHELL=/bin/bash net/bluetooth/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
->> net/bluetooth/hci_event.c:3071:7: error: use of undeclared identifier 'status'
-           if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-                ^
-   net/bluetooth/hci_event.c:4693:7: error: use of undeclared identifier 'status'
-           if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
-                ^
-   2 errors generated.
+   net/bluetooth/hci_event.c: In function 'hci_conn_complete_evt':
+>> net/bluetooth/hci_event.c:3071:14: error: 'status' undeclared (first use in this function); did you mean 'kstatfs'?
+    3071 |         if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+         |              ^~~~~~
+         |              kstatfs
+   net/bluetooth/hci_event.c:3071:14: note: each undeclared identifier is reported only once for each function it appears in
+   net/bluetooth/hci_event.c: In function 'hci_sync_conn_complete_evt':
+   net/bluetooth/hci_event.c:4693:14: error: 'status' undeclared (first use in this function); did you mean 'kstatfs'?
+    4693 |         if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+         |              ^~~~~~
+         |              kstatfs
 
 
-vim +/status +3071 net/bluetooth/hci_event.c
+vim +3071 net/bluetooth/hci_event.c
 
   3064	
   3065	static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
