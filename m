@@ -2,88 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23957C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Apr 2022 23:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4921AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 03:03:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356568AbiDTXtA (ORCPT
+        id S1377620AbiDUDGY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Apr 2022 19:49:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53326 "EHLO
+        Wed, 20 Apr 2022 23:06:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230418AbiDTXs7 (ORCPT
+        with ESMTP id S229505AbiDUDGW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Apr 2022 19:48:59 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF91B3B2AC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 16:46:11 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id n134so3592732iod.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 16:46:11 -0700 (PDT)
+        Wed, 20 Apr 2022 23:06:22 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99D22E0FC
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 20:03:33 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id q75so2707875qke.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Apr 2022 20:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=gHWZSaJeb0kclIH+CxG9bdtPS5ELkz0JHxRRl/XiVHA=;
-        b=ai6KXWtdtJh0XzbbEImgFQgbhoYJIYuH1m3BRsrr+BPZHivO+Z5WfAE2iCRJJeorgM
-         +0s0pCO9aedaKjRilDEHg6b91AluDOkaStuM0MtLhX0HaKUzSTPBMjkMZXLQCBc4Br2r
-         Iz1EHAHGUuVZrjj479i1MXYVcL0M/YebefSHjcco5MtV+wCnN6bfzSx2hQP2lCoq1h0I
-         DqosVgjYm7BCCGO+61v2U6A1527Z0QyyWa5Pr2DXtcng5B6aTScvTlTZphtG5eD8sa9Z
-         dYJzt0a25yvcUjrbdvx6Qzr9mWZbTCf5TefBXwiwfDWO+x5M6JxXkISKug37p9scKdwS
-         XLPw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=2fAHZVBoD10b9sEc3szIu57dsBBsG0rPRmwIyFWnamY=;
+        b=SZoDJvmGHQUqbsKEO3TJOHPS4Ui0sWBR7KBh39Vxx+00W8qdk19Ml3mo4J6i2JsBLM
+         hdH0LdRg6n+W9TVTfsXWzad7xOnAP9ikQpzUxZ1/AElsn2SKn1iz46o6mEBlSmjtyEno
+         FGhj8FjUMMQAZS0NtLWjluq2Fybi8bqUubetko2RAkjNxnXgzMs0fuYeI7wiPw8jPNXz
+         WgiaTscIT9gZxw7cLW7Q37Yye/GJQ9UzZqqlqKgiGK5aomKmFNqXXREklu7P1HSSukyx
+         c9dQkZZ79as94S6jwOwiqyFzbr+5C5PFznchJ2zpMdIwrztORrnyzBxydWLdZ2fciUw1
+         q6gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=gHWZSaJeb0kclIH+CxG9bdtPS5ELkz0JHxRRl/XiVHA=;
-        b=qfskhy6Ujz20li9tUPsZfxpH5pHrAcWaEi95aCnODfebI/d6Bswt3iWH/hwX1+6Ot2
-         jYrXEeVWXYofPiTFvGOyk2hbMyCbwd3tsSfW9Mtoz/mBaAiaH6XdUlm81n6+M5kveZTB
-         JvHSQoHthfK1GvdOApwD3YFyY3JdMrVcXCsAB+kqRmhnoGoiw+yihuWMFHjGvFLqkayC
-         Z+vB3IlcA+yWsA367ef8lzhagiod5XiYms870hqckd969h8nACoKGCdDxHwKrk7eYC3D
-         A2OiG+twvrHKIKqPF03u226+rgabbW1cneDRjCPUm7NM5HZgjeE6dmilE8YLYaZyyPV1
-         neGw==
-X-Gm-Message-State: AOAM532muHn0xUj5ARWFrqT1QsLGElACQ04FDuomdsDmXv9ASjRYfBYl
-        Md2pCO5oaOkUprTioHAXZ6NgU7FcGzc=
-X-Google-Smtp-Source: ABdhPJxIFr6CuphPSg7RMaG05cwkPX+KbTaSjdpUcg74Sh1hYGGEVRhF7D/FXGkl2wRSyrnv3orIXA==
-X-Received: by 2002:a05:6638:3283:b0:32a:75a3:3925 with SMTP id f3-20020a056638328300b0032a75a33925mr4987866jav.248.1650498371051;
-        Wed, 20 Apr 2022 16:46:11 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b19-20020a5d8553000000b00649f02b1b0csm12291013ios.39.2022.04.20.16.46.10
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=2fAHZVBoD10b9sEc3szIu57dsBBsG0rPRmwIyFWnamY=;
+        b=X4PMtxCva9IaucUUNYA6NrEHKorgIYmQ82ZVjld0GrBRFmZspAKc5d9dKkUns9Fs/M
+         0/iDmE9g/ScgAxT1HgD24Xe4GVbILCuCEZQcLEMa8Xwvq+psleVw3ZGZmyVv6AyEloav
+         clla4xlF1aJYhhhKzNuah3qZHpVVxyaDM4No96fAVsBrq8eCdCjwFVF74kra4/bAqwel
+         96rrkp8yihpH1ylaRXqJy2malA0HfMPuR8uELHvKmJHK5Ywy5WVyK0FaGudlI2VpMc+g
+         v8JlDXXgmddnvJj6SQkA+nxWWcd92sIXs7HBAUtuxIQHgsTH2Uy5qCVG6rh79DgbCMx0
+         LnWw==
+X-Gm-Message-State: AOAM531wYBSiqceYn50des6OEiFfFfMO8TShLTbm9FFtAFZbrZg46AE8
+        oiAyK8EegfDlWzGDg0tmaIPTpxOZ7be63Q==
+X-Google-Smtp-Source: ABdhPJy3e0SiwXeXr5M3Ryq9j680Mtne2pNoaVahQi8zse5ev8V31QQbB25dnCrm7pGdMxFkPh0A7A==
+X-Received: by 2002:a37:5505:0:b0:60d:9998:6dfd with SMTP id j5-20020a375505000000b0060d99986dfdmr15166108qkb.607.1650510212583;
+        Wed, 20 Apr 2022 20:03:32 -0700 (PDT)
+Received: from [172.17.0.2] ([20.242.17.211])
+        by smtp.gmail.com with ESMTPSA id r7-20020ac85c87000000b002f2048a946bsm2896948qta.26.2022.04.20.20.03.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Apr 2022 16:46:10 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] btmon: Fix decoding of Enhanced Credit Connection Request
-Date:   Wed, 20 Apr 2022 16:46:09 -0700
-Message-Id: <20220420234609.2968138-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Wed, 20 Apr 2022 20:03:32 -0700 (PDT)
+Message-ID: <6260c984.1c69fb81.b8863.547e@mx.google.com>
+Date:   Wed, 20 Apr 2022 20:03:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4910103825161628114=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] btmon: Fix decoding of Enhanced Credit Connection Request
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220420234609.2968138-1-luiz.dentz@gmail.com>
+References: <20220420234609.2968138-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4910103825161628114==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This fixes the decoding of Enhanced Credit Connection Request which was
-not accounting the fields correctly causing 2 extra Source CID to be
-printed.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=633945
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.44 seconds
+GitLint                       PASS      0.98 seconds
+Prep - Setup ELL              PASS      42.20 seconds
+Build - Prep                  PASS      0.71 seconds
+Build - Configure             PASS      8.42 seconds
+Build - Make                  PASS      1245.43 seconds
+Make Check                    PASS      12.15 seconds
+Make Check w/Valgrind         PASS      437.69 seconds
+Make Distcheck                PASS      225.55 seconds
+Build w/ext ELL - Configure   PASS      8.50 seconds
+Build w/ext ELL - Make        PASS      1234.97 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- monitor/l2cap.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 4e449854a..01825ce0a 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1331,7 +1331,7 @@ static void sig_ecred_conn_req(const struct l2cap_frame *frame)
- 	const struct bt_l2cap_pdu_ecred_conn_req *pdu = frame->data;
- 	uint16_t scid;
- 
--	l2cap_frame_pull((void *)frame, frame, sizeof(pdu));
-+	l2cap_frame_pull((void *)frame, frame, sizeof(*pdu));
- 
- 	print_psm(pdu->psm);
- 	print_field("MTU: %u", le16_to_cpu(pdu->mtu));
--- 
-2.35.1
 
+--===============4910103825161628114==--
