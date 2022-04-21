@@ -2,238 +2,358 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D51F6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 21:46:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F8A7C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 21:51:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352026AbiDUVtF (ORCPT
+        id S1442234AbiDUVym (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Apr 2022 17:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40700 "EHLO
+        Thu, 21 Apr 2022 17:54:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1442184AbiDUVtD (ORCPT
+        with ESMTP id S1387986AbiDUVyl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Apr 2022 17:49:03 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99C9D49C8A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 14:46:12 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id bo5so6182586pfb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 14:46:12 -0700 (PDT)
+        Thu, 21 Apr 2022 17:54:41 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 614EC4E382
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 14:51:50 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id v12-20020a9d7d0c000000b006054b51c3d4so4173119otn.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 14:51:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=d4ge2fjTGNbco9PNIIuhtJCHmMwyWdxUxshl86o03s8=;
-        b=dF9PiRwfcXHXwlr8qT+AgoGIUc7GR6HAa6vDT+T6/8rDjYNRUOet/Hp6RkRqJTA5qJ
-         88v1zUIa3D6NNIANpDM4ZSSO/YM8YSUftFIOjzwYfWlOHjI8TBA+KagAizTwzHHpd1Cl
-         M+FqFwH0/djgikEIS63gfHkX+42/+vixddHwm1VRB43anb9nb9B5gDob+/rw8qFCzxJE
-         sd6O5U5MWj4vYgHqXrFrC1WWuu7NkfcnUi+ehUbTNbU2vQPs6LnvztDqcBuTz8MwyJKa
-         No5+TWiPPvu3Nr2idPpGffsQMSvt/wJp57q+DRP2cd+Ln7bNu92pJ20ReVnJvZeGYDNR
-         Teww==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NYTHPceTX5qHeo6cl26z2+CQI9915fzGclNjwBHEaMM=;
+        b=dJfKDFd0xGGrWJ7IqyfhfBenkpfAMSKFNUEEHWQD1XTg807WDEeopqPcNRuTRtber4
+         DE0vRMipvFI5VDsTm5L5LMevMrdm8orLQFMrNt9KcU+Bl8T3+Wa4ZMOfZmXJNzbj2LEy
+         WAb8RYknJ4e3XvBdF6hzSWAuAsPDXHphTzvM7zlyPfF1et2DnN4h3p2+2okXGzawGr5s
+         WN+i5xjCy7ve4buAE0905znIi6zDzbkxV4yS0/OSLQG2H3sRNGGnZyiQhvZWmB9odwaH
+         NzhHZ1J83NQIIhL7+mGXv2+61h16pHw0mBaBCq7g3/HrM7Szuu1EHOwsRDX8icUzn0H6
+         L+cA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=d4ge2fjTGNbco9PNIIuhtJCHmMwyWdxUxshl86o03s8=;
-        b=IHtrstuCL187DON2tCugnNpVExaKV2zjpts1jcoF4xTAMWlCqsbirz/SdVuGeNoZy6
-         7ND+2OK4ce9o2PZLntzqkTJ7YtvkVS/8OlOIDuDn+YjHGmsz9tisN5vSjs8EDY5oEMZc
-         e310zIkdj0nMwjETZ9Ug5j0N7Xs5dPOQcAdHMdd3vj6/Mzw/R6arIZttMavIdnnTx6cR
-         ymKFFxyaGPzuAbDnFkR6g+A77i/YjHwLtSQXWJPgqJQ6BFQU/vvWg4ctxMLkX25zE+3d
-         2XFan9OvEiK0InuvWLDDxeXtMWBEewtMv3pFq1F1JviKA8tlueH9arFk+S4dN+89Vvb9
-         zdAw==
-X-Gm-Message-State: AOAM532nMQfr7h+Fa5X7V65GiveZGPwvHaji0mhZo6FkXZ4gOzt7RBlQ
-        f/uO6MwhcL7p70ycqWA7ZaaKfZEtHXs=
-X-Google-Smtp-Source: ABdhPJyanxbcSNalkEwnzZnVguIJivCVYyEvnobDE/XYxntvBT0JWayF5dFLYHf6t0hMzXRnBC5EUw==
-X-Received: by 2002:a62:d402:0:b0:50a:b621:2e with SMTP id a2-20020a62d402000000b0050ab621002emr1494845pfh.49.1650577571742;
-        Thu, 21 Apr 2022 14:46:11 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id mp9-20020a17090b190900b001cd4989feb6sm3812484pjb.2.2022.04.21.14.46.10
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Apr 2022 14:46:11 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/3] Bluetooth: hci_sync: Cleanup hci_conn if it cannot be aborted
-Date:   Thu, 21 Apr 2022 14:46:07 -0700
-Message-Id: <20220421214607.3326277-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220421214607.3326277-1-luiz.dentz@gmail.com>
-References: <20220421214607.3326277-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NYTHPceTX5qHeo6cl26z2+CQI9915fzGclNjwBHEaMM=;
+        b=5LSRkIfTT4bmJ90k1r0IurDMHpJeed8BalcA6xsZvD66lCuLelRXN7F9MqZ5N4lOuw
+         pIAsf5pVEAm3UZ8j7Wq5LHQbH6fPnsP+IPqf2oiE1iwrC3uCUkR17aFIGPe//0hGp9lF
+         5yHcGxo4fkvHLR2l6bgezPChhzuUnkSDn1yF89A9oQ+RPxGcgnvU6ws7+rtR2HXdvEyI
+         IWTOUGLhCNtQqF0SzKItdxHN/zVvEdaa1qiYqJODjCH7wAGBkhugXuO//QydvWEwBGTb
+         XqiyuWZr0gXgimMqBuFG1V4a+gddg8tvX85WKiBkrDwGjwr8V/eeG6Wh2y9UvOo1eb2m
+         de/w==
+X-Gm-Message-State: AOAM531ReRUEZcBErp9o7VQvIjIX8F0HwKD3NO3xM4SuXx6n3xBE3U6K
+        AzknGGOgZWZd/Mz2EViArP2f0WoEEq0mNl0rn8OUo8CA
+X-Google-Smtp-Source: ABdhPJzvWZfAF6RXiRyhgfYQDhixOQxoa5Dhzwc1B03eDq4UN2/xYi7yfOrY5ksGdiC6gFSIPIZ0XqYvCqx9zJhsiF0=
+X-Received: by 2002:a9d:5a19:0:b0:5cd:9ca0:898b with SMTP id
+ v25-20020a9d5a19000000b005cd9ca0898bmr701182oth.318.1650577909268; Thu, 21
+ Apr 2022 14:51:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220405215207.1415731-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220405215207.1415731-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 21 Apr 2022 14:51:37 -0700
+Message-ID: <CABBYNZKAjfPY_g+OirbPFaxCRf4VDjxyxjG+gFEPFxRJ7P==Cw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_sync: Split hci_dev_open_sync
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-This attempts to cleanup the hci_conn if it cannot be aborted as
-otherwise it would likely result in having the controller and host
-stack out of sync with respect to connection handle.
+On Tue, Apr 5, 2022 at 2:52 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This splits hci_dev_open_sync so each stage is handle by its own
+> function so it is easier to identify each stage.
+>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/hci_sync.c | 255 ++++++++++++++++++++++-----------------
+>  1 file changed, 141 insertions(+), 114 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 5610ec1242d6..2d3b9adbd215 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3849,9 +3849,148 @@ static const struct {
+>                          "advertised, but not supported.")
+>  };
+>
+> -int hci_dev_open_sync(struct hci_dev *hdev)
+> +/* This function handles hdev setup stage:
+> + *
+> + * Calls hdev->setup
+> + * Setup address if HCI_QUIRK_USE_BDADDR_PROPERTY is set.
+> + */
+> +static int hci_dev_setup_sync(struct hci_dev *hdev)
+>  {
+>         int ret = 0;
+> +       bool invalid_bdaddr;
+> +       size_t i;
+> +
+> +       if (!hci_dev_test_flag(hdev, HCI_SETUP) &&
+> +           !test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks))
+> +               return 0;
+> +
+> +       bt_dev_dbg(hdev, "");
+> +
+> +       hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> +
+> +       if (hdev->setup)
+> +               ret = hdev->setup(hdev);
+> +
+> +       for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
+> +               if (test_bit(hci_broken_table[i].quirk, &hdev->quirks))
+> +                       bt_dev_warn(hdev, "%s", hci_broken_table[i].desc);
+> +       }
+> +
+> +       /* The transport driver can set the quirk to mark the
+> +        * BD_ADDR invalid before creating the HCI device or in
+> +        * its setup callback.
+> +        */
+> +       invalid_bdaddr = test_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +
+> +       if (!ret) {
+> +               if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
+> +                       if (!bacmp(&hdev->public_addr, BDADDR_ANY))
+> +                               hci_dev_get_bd_addr_from_property(hdev);
+> +
+> +                       if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> +                           hdev->set_bdaddr) {
+> +                               ret = hdev->set_bdaddr(hdev,
+> +                                                      &hdev->public_addr);
+> +
+> +                               /* If setting of the BD_ADDR from the device
+> +                                * property succeeds, then treat the address
+> +                                * as valid even if the invalid BD_ADDR
+> +                                * quirk indicates otherwise.
+> +                                */
+> +                               if (!ret)
+> +                                       invalid_bdaddr = false;
+> +                       }
+> +               }
+> +       }
+> +
+> +       /* The transport driver can set these quirks before
+> +        * creating the HCI device or in its setup callback.
+> +        *
+> +        * For the invalid BD_ADDR quirk it is possible that
+> +        * it becomes a valid address if the bootloader does
+> +        * provide it (see above).
+> +        *
+> +        * In case any of them is set, the controller has to
+> +        * start up as unconfigured.
+> +        */
+> +       if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+> +           invalid_bdaddr)
+> +               hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
+> +
+> +       /* For an unconfigured controller it is required to
+> +        * read at least the version information provided by
+> +        * the Read Local Version Information command.
+> +        *
+> +        * If the set_bdaddr driver callback is provided, then
+> +        * also the original Bluetooth public device address
+> +        * will be read using the Read BD Address command.
+> +        */
+> +       if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
+> +               return hci_unconf_init_sync(hdev);
+> +
+> +       return ret;
+> +}
+> +
+> +/* This function handles hdev init stage:
+> + *
+> + * Calls hci_dev_setup_sync to perform setup stage
+> + * Calls hci_init_sync to perform HCI command init sequence
+> + */
+> +static int hci_dev_init_sync(struct hci_dev *hdev)
+> +{
+> +       int ret;
+> +
+> +       bt_dev_dbg(hdev, "");
+> +
+> +       atomic_set(&hdev->cmd_cnt, 1);
+> +       set_bit(HCI_INIT, &hdev->flags);
+> +
+> +       ret = hci_dev_setup_sync(hdev);
+> +
+> +       if (hci_dev_test_flag(hdev, HCI_CONFIG)) {
+> +               /* If public address change is configured, ensure that
+> +                * the address gets programmed. If the driver does not
+> +                * support changing the public address, fail the power
+> +                * on procedure.
+> +                */
+> +               if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> +                   hdev->set_bdaddr)
+> +                       ret = hdev->set_bdaddr(hdev, &hdev->public_addr);
+> +               else
+> +                       ret = -EADDRNOTAVAIL;
+> +       }
+> +
+> +       if (!ret) {
+> +               if (!hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+> +                   !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> +                       ret = hci_init_sync(hdev);
+> +                       if (!ret && hdev->post_init)
+> +                               ret = hdev->post_init(hdev);
+> +               }
+> +       }
+> +
+> +       /* If the HCI Reset command is clearing all diagnostic settings,
+> +        * then they need to be reprogrammed after the init procedure
+> +        * completed.
+> +        */
+> +       if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
+> +           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> +           hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+> +               ret = hdev->set_diag(hdev, true);
+> +
+> +       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> +               msft_do_open(hdev);
+> +               aosp_do_open(hdev);
+> +       }
+> +
+> +       clear_bit(HCI_INIT, &hdev->flags);
+> +
+> +       return ret;
+> +}
+> +
+> +int hci_dev_open_sync(struct hci_dev *hdev)
+> +{
+> +       int ret;
+>
+>         bt_dev_dbg(hdev, "");
+>
+> @@ -3904,119 +4043,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+>         set_bit(HCI_RUNNING, &hdev->flags);
+>         hci_sock_dev_event(hdev, HCI_DEV_OPEN);
+>
+> -       atomic_set(&hdev->cmd_cnt, 1);
+> -       set_bit(HCI_INIT, &hdev->flags);
+> -
+> -       if (hci_dev_test_flag(hdev, HCI_SETUP) ||
+> -           test_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks)) {
+> -               bool invalid_bdaddr;
+> -               size_t i;
+> -
+> -               hci_sock_dev_event(hdev, HCI_DEV_SETUP);
+> -
+> -               if (hdev->setup)
+> -                       ret = hdev->setup(hdev);
+> -
+> -               for (i = 0; i < ARRAY_SIZE(hci_broken_table); i++) {
+> -                       if (test_bit(hci_broken_table[i].quirk, &hdev->quirks))
+> -                               bt_dev_warn(hdev, "%s",
+> -                                           hci_broken_table[i].desc);
+> -               }
+> -
+> -               /* The transport driver can set the quirk to mark the
+> -                * BD_ADDR invalid before creating the HCI device or in
+> -                * its setup callback.
+> -                */
+> -               invalid_bdaddr = test_bit(HCI_QUIRK_INVALID_BDADDR,
+> -                                         &hdev->quirks);
+> -
+> -               if (ret)
+> -                       goto setup_failed;
+> -
+> -               if (test_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks)) {
+> -                       if (!bacmp(&hdev->public_addr, BDADDR_ANY))
+> -                               hci_dev_get_bd_addr_from_property(hdev);
+> -
+> -                       if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> -                           hdev->set_bdaddr) {
+> -                               ret = hdev->set_bdaddr(hdev,
+> -                                                      &hdev->public_addr);
+> -
+> -                               /* If setting of the BD_ADDR from the device
+> -                                * property succeeds, then treat the address
+> -                                * as valid even if the invalid BD_ADDR
+> -                                * quirk indicates otherwise.
+> -                                */
+> -                               if (!ret)
+> -                                       invalid_bdaddr = false;
+> -                       }
+> -               }
+> -
+> -setup_failed:
+> -               /* The transport driver can set these quirks before
+> -                * creating the HCI device or in its setup callback.
+> -                *
+> -                * For the invalid BD_ADDR quirk it is possible that
+> -                * it becomes a valid address if the bootloader does
+> -                * provide it (see above).
+> -                *
+> -                * In case any of them is set, the controller has to
+> -                * start up as unconfigured.
+> -                */
+> -               if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
+> -                   invalid_bdaddr)
+> -                       hci_dev_set_flag(hdev, HCI_UNCONFIGURED);
+> -
+> -               /* For an unconfigured controller it is required to
+> -                * read at least the version information provided by
+> -                * the Read Local Version Information command.
+> -                *
+> -                * If the set_bdaddr driver callback is provided, then
+> -                * also the original Bluetooth public device address
+> -                * will be read using the Read BD Address command.
+> -                */
+> -               if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
+> -                       ret = hci_unconf_init_sync(hdev);
+> -       }
+> -
+> -       if (hci_dev_test_flag(hdev, HCI_CONFIG)) {
+> -               /* If public address change is configured, ensure that
+> -                * the address gets programmed. If the driver does not
+> -                * support changing the public address, fail the power
+> -                * on procedure.
+> -                */
+> -               if (bacmp(&hdev->public_addr, BDADDR_ANY) &&
+> -                   hdev->set_bdaddr)
+> -                       ret = hdev->set_bdaddr(hdev, &hdev->public_addr);
+> -               else
+> -                       ret = -EADDRNOTAVAIL;
+> -       }
+> -
+> -       if (!ret) {
+> -               if (!hci_dev_test_flag(hdev, HCI_UNCONFIGURED) &&
+> -                   !hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> -                       ret = hci_init_sync(hdev);
+> -                       if (!ret && hdev->post_init)
+> -                               ret = hdev->post_init(hdev);
+> -               }
+> -       }
+> -
+> -       /* If the HCI Reset command is clearing all diagnostic settings,
+> -        * then they need to be reprogrammed after the init procedure
+> -        * completed.
+> -        */
+> -       if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
+> -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> -           hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+> -               ret = hdev->set_diag(hdev, true);
+> -
+> -       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> -               msft_do_open(hdev);
+> -               aosp_do_open(hdev);
+> -       }
+> -
+> -       clear_bit(HCI_INIT, &hdev->flags);
+> -
+> +       ret = hci_dev_init_sync(hdev);
+>         if (!ret) {
+>                 hci_dev_hold(hdev);
+>                 hci_dev_set_flag(hdev, HCI_RPA_EXPIRED);
+> --
+> 2.35.1
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_conn.c         | 32 ++++++++++++++++++++++++--------
- net/bluetooth/hci_event.c        | 13 ++++---------
- net/bluetooth/hci_sync.c         | 11 ++++++++++-
- 4 files changed, 39 insertions(+), 19 deletions(-)
+Any feedback on these changes?
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 59815df1272a..64d3a63759a8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1156,7 +1156,7 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
- 
- void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
- 
--void hci_le_conn_failed(struct hci_conn *conn, u8 status);
-+void hci_conn_failed(struct hci_conn *conn, u8 status);
- 
- /*
-  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index cd51bf2a709b..882a7df13005 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -670,7 +670,7 @@ static void le_conn_timeout(struct work_struct *work)
- 		/* Disable LE Advertising */
- 		le_disable_advertising(hdev);
- 		hci_dev_lock(hdev);
--		hci_le_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
-+		hci_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
- 		hci_dev_unlock(hdev);
- 		return;
- 	}
-@@ -873,7 +873,7 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, uint8_t src_type)
- EXPORT_SYMBOL(hci_get_route);
- 
- /* This function requires the caller holds hdev->lock */
--void hci_le_conn_failed(struct hci_conn *conn, u8 status)
-+static void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_conn_params *params;
-@@ -886,8 +886,6 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 		params->conn = NULL;
- 	}
- 
--	conn->state = BT_CLOSED;
--
- 	/* If the status indicates successful cancellation of
- 	 * the attempt (i.e. Unknown Connection Id) there's no point of
- 	 * notifying failure since we'll go back to keep trying to
-@@ -899,10 +897,6 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 		mgmt_connect_failed(hdev, &conn->dst, conn->type,
- 				    conn->dst_type, status);
- 
--	hci_connect_cfm(conn, status);
--
--	hci_conn_del(conn);
--
- 	/* Since we may have temporarily stopped the background scanning in
- 	 * favor of connection establishment, we should restart it.
- 	 */
-@@ -914,6 +908,28 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 	hci_enable_advertising(hdev);
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+void hci_conn_failed(struct hci_conn *conn, u8 status)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-+
-+	switch (conn->type) {
-+	case LE_LINK:
-+		hci_le_conn_failed(conn, status);
-+		break;
-+	case ACL_LINK:
-+		mgmt_connect_failed(hdev, &conn->dst, conn->type,
-+				    conn->dst_type, status);
-+		break;
-+	}
-+
-+	conn->state = BT_CLOSED;
-+	hci_connect_cfm(conn, status);
-+	hci_conn_del(conn);
-+}
-+
- static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct hci_conn *conn = data;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3002df41f16b..ad460f1da4ed 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2834,7 +2834,7 @@ static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
- 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
- 
- 	/* All connection failure handling is taken care of by the
--	 * hci_le_conn_failed function which is triggered by the HCI
-+	 * hci_conn_failed function which is triggered by the HCI
- 	 * request completion callbacks used for connecting.
- 	 */
- 	if (status)
-@@ -2859,7 +2859,7 @@ static void hci_cs_le_ext_create_conn(struct hci_dev *hdev, u8 status)
- 	bt_dev_dbg(hdev, "status 0x%2.2x", status);
- 
- 	/* All connection failure handling is taken care of by the
--	 * hci_le_conn_failed function which is triggered by the HCI
-+	 * hci_conn_failed function which is triggered by the HCI
- 	 * request completion callbacks used for connecting.
- 	 */
- 	if (status)
-@@ -3178,12 +3178,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- done:
- 	if (ev->status) {
--		conn->state = BT_CLOSED;
--		if (conn->type == ACL_LINK)
--			mgmt_connect_failed(hdev, &conn->dst, conn->type,
--					    conn->dst_type, ev->status);
--		hci_connect_cfm(conn, ev->status);
--		hci_conn_del(conn);
-+		hci_conn_failed(conn, ev->status);
- 	} else if (ev->link_type == SCO_LINK) {
- 		switch (conn->setting & SCO_AIRMODE_MASK) {
- 		case SCO_AIRMODE_CVSD:
-@@ -5621,7 +5616,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	}
- 
- 	if (status) {
--		hci_le_conn_failed(conn, status);
-+		hci_conn_failed(conn, status);
- 		goto unlock;
- 	}
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 2d3b9adbd215..fa95eb2dcffa 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4466,12 +4466,21 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
- static int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 			       u8 reason)
- {
-+	int err;
-+
- 	switch (conn->state) {
- 	case BT_CONNECTED:
- 	case BT_CONFIG:
- 		return hci_disconnect_sync(hdev, conn, reason);
- 	case BT_CONNECT:
--		return hci_connect_cancel_sync(hdev, conn);
-+		err = hci_connect_cancel_sync(hdev, conn);
-+		/* Cleanup hci_conn object if it cannot be cancelled as it
-+		 * likelly means the controller and host stack are out of sync.
-+		 */
-+		if (err)
-+			hci_conn_failed(conn, err);
-+
-+		return err;
- 	case BT_CONNECT2:
- 		return hci_reject_conn_sync(hdev, conn, reason);
- 	default:
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
