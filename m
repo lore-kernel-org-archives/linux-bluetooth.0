@@ -2,141 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B88CEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 20:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34BA1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Apr 2022 20:52:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1392554AbiDUUuO (ORCPT
+        id S1392575AbiDUUzp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Apr 2022 16:50:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58750 "EHLO
+        Thu, 21 Apr 2022 16:55:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1392545AbiDUUuM (ORCPT
+        with ESMTP id S1392576AbiDUUzn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Apr 2022 16:50:12 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9889A4E382
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 13:47:19 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id r12so6613086iod.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 13:47:19 -0700 (PDT)
+        Thu, 21 Apr 2022 16:55:43 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE6544EA0A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 13:52:52 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id w194so6872108oiw.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Apr 2022 13:52:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=ZMg6v7mRQoQurDiSBRN8Mq5vNLxJn9BdvEQJmSGDd4I=;
-        b=qaIPbW9Cu7RDdbPr+kWUPybWMx3eUHRkb1b7zq6XrZNeZpwmZhDTQbt43zSKmv+e/J
-         NUVMlORXI5CoKnw32S75PX8Db6/YmVsE2EaZdQUCS6Ap77/DRWBOnFwuZ3GNn5d1N6iW
-         ckHgAVasug2GJsiiMbO0+5DYMpIcGDnpQJnNkaxYbb/Dqb0xmIbvB88ANOMrap0ON42Z
-         gOW+Q05Yk5VXHkoQESe/hCNWY/laCYtSnkMUpWm68LQ/ftWZXV/r1LPtanroQT3tjV+f
-         zIAf7gf72LgK/pkibrvBzF5L1fW6lTDE+JdvoVZADc7H9TaqGTj3uPQVAiB6AzRTy+Hj
-         S7xQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=E1pw43PPby1af/FatofrAqvya9F5/rju3G/L3DZ5IRI=;
+        b=h9S5NBFq20hk5/mmFbZAEea8rLFsBbZyKNzFdAZzXDw6HAOf8j979B13PQfEhCQJGu
+         ATXJ6RPtVTm0a5ZlEkE1+37cC7AE4DkcLeEkoyqJhWhrSTiYI8bE0iC5pXpWA8okLZtY
+         ArXf1Kyh9tbW7r0Nl+sIXf/Bvzg5ILnzQosHSTZBL6ttmbWcAmRf02J0V153uKbhLlaV
+         /YUoX5KGqd0sYOewziulm9Lkfv8gmjpdKPB8WcWQPnZlwzR1yn3cUb9FqzvgMxl4NW/U
+         SqCgQlD4dWeexaTTjNIr7YGvXFHQ4I/SJfxpF2A0B7qkM1EA6XopVTYf2wjgxK+kvx3c
+         L4DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ZMg6v7mRQoQurDiSBRN8Mq5vNLxJn9BdvEQJmSGDd4I=;
-        b=5cGMwLvUam6H7OeqVjLad0T0r1OFfhyvqGpwpG/cXowUi8LW/UlREpPZKc3EXaNZQg
-         CrYsK2vQOngNb6bd8X1NjFaV6wVNRz5NlBuQd65pcGmK151fDTHAVCea//UBsBXdHPD8
-         KaNW87GMKTxLHnhCD+WeRQcqsL9F96YBpn25kb4tWaMwoDyB5v/0PvD8v63OvX7TU7wy
-         JaK3Yh4fcbaU3K6BhbQAcFr1rr8AdO00UsmkdZO96nmN4AYxSzy//nqjA1QaJ6mCMdPK
-         6ZJrYJU/G32puS7RUU/nlc8f6Jb/1yJYrOz4o0JSdigzc5p9yix1WN3spCT1NmUgYzJB
-         4OXA==
-X-Gm-Message-State: AOAM533io+asd0bh4LZzB9SNdYcyAxDrsgmPvElCT0Ay4FLZRwf9DSz4
-        BsX/JRS0gw60eYQSo9TkWDQaJaqd3hw=
-X-Google-Smtp-Source: ABdhPJyn8MFSFsg+JoqreFyLJwCmnF5WYOO4ge9ICTq4MVAByMjIdAeI6nkyTzlSKWX7OsMwMxr6oA==
-X-Received: by 2002:a02:b0c3:0:b0:327:b824:b8ac with SMTP id w3-20020a02b0c3000000b00327b824b8acmr730998jah.120.1650574038678;
-        Thu, 21 Apr 2022 13:47:18 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id s21-20020a6bd315000000b006573987c4fcsm80281iob.3.2022.04.21.13.47.17
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Apr 2022 13:47:17 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_event: Fix creating hci_conn object on error status
-Date:   Thu, 21 Apr 2022 13:47:15 -0700
-Message-Id: <20220421204715.3268714-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220421204715.3268714-1-luiz.dentz@gmail.com>
-References: <20220421204715.3268714-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=E1pw43PPby1af/FatofrAqvya9F5/rju3G/L3DZ5IRI=;
+        b=TxYMToUVIxuZTKa+lCCLwEE1td6DCDHcQosVXulKYJEeuELtxkRtRR2qP3yulzfKhq
+         +xjkqiRRdOdG5n1rXeEVnCYh8YhlHMzr+QBmkc3gdqmyXA1ZCDjEKIejhXY2VB7p1p2Y
+         52QnraA3TEeXbHPQSU3VVQQvhJ4dLLy0p6/TslarLdwg8SG+RIeHkGLI1RdcVEo8xy3U
+         5BtxT5KS57QMR4RAmzE/+JKuIbhTVIbn/vSMrEX3lQPCp3ZWuSsllJm1If89bb/gUXZj
+         7SlV4vMeU2jaES5GnhO03gSpOvpSUDE/iS9OGwHQ5jTrfocGAIJXqKpbVo8drDCVNSKV
+         8I0g==
+X-Gm-Message-State: AOAM530SmKBeEsj5Y95o6LGcTwCHps0t0sWGAmD2qaIdQS7oUWhD88cl
+        jIkCX6gjVUTWcQCoyMjWh4J1WFxtRxRACxRAl2tysSAl
+X-Google-Smtp-Source: ABdhPJyKy8woHAd6enKAQBbju+oKaKH8npB84PXCPOu+XaeblOhIRk7gT2ZGDm7AX7BmglAlirDlq2ZXZEdkSFRjEMY=
+X-Received: by 2002:a05:6808:15a7:b0:322:be0d:556a with SMTP id
+ t39-20020a05680815a700b00322be0d556amr739390oiw.85.1650574372239; Thu, 21 Apr
+ 2022 13:52:52 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220420221433.2933868-1-luiz.dentz@gmail.com> <654FF692-95EB-459A-9144-62EA911C7BBB@holtmann.org>
+In-Reply-To: <654FF692-95EB-459A-9144-62EA911C7BBB@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 21 Apr 2022 13:52:40 -0700
+Message-ID: <CABBYNZKZB3Xv0z+KdV2nBmV0YXK_e0anSD0oxpNKJ68C1tWQYg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_event: Fix checking for invalid handle on
+ error status
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-It is useless to create a hci_conn object if on error status as the
-result would be it being freed in the process and anyway it is likely a
-result of controller and host stack being out of sync for some reason.
+On Thu, Apr 21, 2022 at 8:57 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Luiz,
+>
+> > Commit d5ebaa7c5f6f6 introduces checks for handle range
+> > (e.g HCI_CONN_HANDLE_MAX) but controllers don't seem to respect the
+> > valid range int case of error status:
+> >
+> >> HCI Event: Connect Complete (0x03) plen 11
+> >        Status: Page Timeout (0x04)
+> >        Handle: 65535
+> >        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> >       Sound Products Inc)
+> >        Link type: ACL (0x01)
+> >        Encryption: Disabled (0x00)
+> > [1644965.827560] Bluetooth: hci0: Ignoring HCI_Connection_Complete for
+> > invalid handle
+>
+> so the problem is that with BR/EDR the lookup is by BD_ADDR. I think the check for valid handle is wrong at the beginning of connect complete handler.
+>
+> The problem is really the fact the we trying a big hammer at the beginning. The hci_conn_add in case of auto-connect should validate status and handle. We are not even validating the status right now assuming we always get a status == 0 on auto-connect.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_event.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+Ive sent a separate patch addressing the use of hci_conn_add on error
+status, in some places we did it properly but others didn't so it
+would result in hci_conn object being created just to be freed later
+at the same function.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a658aa4c7306..3002df41f16b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3074,6 +3074,12 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 
- 	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type, &ev->bdaddr);
- 	if (!conn) {
-+		/* In case of error status and there is no connection pending
-+		 * just unlock as there is nothing to cleanup.
-+		 */
-+		if (ev->status)
-+			goto unlock;
-+
- 		/* Connection may not exist if auto-connected. Check the bredr
- 		 * allowlist to see if this device is allowed to auto connect.
- 		 * If link is an ACL type, create a connection class
-@@ -3120,8 +3126,8 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	if (!ev->status) {
- 		conn->handle = __le16_to_cpu(ev->handle);
- 		if (conn->handle > HCI_CONN_HANDLE_MAX) {
--			bt_dev_err(hdev, "Invalid handle: 0x%4.4x",
--				   conn->handle);
-+			bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
-+				   conn->handle, HCI_CONN_HANDLE_MAX);
- 			ev->status = HCI_ERROR_INVALID_PARAMETERS;
- 			goto done;
- 		}
-@@ -4729,8 +4735,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
- 	case 0x00:
- 		conn->handle = __le16_to_cpu(ev->handle);
- 		if (conn->handle > HCI_CONN_HANDLE_MAX) {
--			bt_dev_err(hdev, "Invalid handle: 0x%4.4x",
--				   conn->handle);
-+			bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x",
-+				   conn->handle, HCI_CONN_HANDLE_MAX);
- 			ev->status = HCI_ERROR_INVALID_PARAMETERS;
- 			conn->state = BT_CLOSED;
- 			break;
-@@ -5540,6 +5546,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 
- 	conn = hci_lookup_le_connect(hdev);
- 	if (!conn) {
-+		/* In case of error status and there is no connection pending
-+		 * just unlock as there is nothing to cleanup.
-+		 */
-+		if (status)
-+			goto unlock;
-+
- 		conn = hci_conn_add(hdev, LE_LINK, bdaddr, role);
- 		if (!conn) {
- 			bt_dev_err(hdev, "no memory for new connection");
-@@ -5603,7 +5615,8 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	conn->dst_type = ev_bdaddr_type(hdev, conn->dst_type, NULL);
- 
- 	if (handle > HCI_CONN_HANDLE_MAX) {
--		bt_dev_err(hdev, "Invalid handle: 0x%4.4x", conn->handle);
-+		bt_dev_err(hdev, "Invalid handle: 0x%4.4x > 0x%4.4x", handle,
-+			   HCI_CONN_HANDLE_MAX);
- 		status = HCI_ERROR_INVALID_PARAMETERS;
- 	}
- 
+> The second handle validation should only occur if we have !status in the bottom half of that function.
+
+Send a v2 checking the handle just before assigning it to hci_conn object.
+
+>
+> > Because of it is impossible to cleanup the connections properly since
+> > the stack would attempt to cancel the connection which is no longer in
+> > progress causing the following trace:
+> >
+> > < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+> >        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> >       Sound Products Inc)
+> > = bluetoothd: src/profile.c:record_cb() Unable to get Hands-Free Voice
+> >       gateway SDP record: Connection timed out
+> >> HCI Event: Command Complete (0x0e) plen 10
+> >      Create Connection Cancel (0x01|0x0008) ncmd 1
+> >        Status: Unknown Connection Identifier (0x02)
+> >        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> >       Sound Products Inc)
+> > < HCI Command: Create Connection Cancel (0x01|0x0008) plen 6
+> >        Address: 94:DB:56:XX:XX:XX (Sony Home Entertainment&
+> >       Sound Products Inc)
+>
+> Can we get details about which controller uses 0xffff instead of 0 for the handle?
+>
+> >
+> > Fixes: d5ebaa7c5f6f6 ("Bluetooth: hci_event: Ignore multiple conn complete events")
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > net/bluetooth/hci_event.c | 6 +++---
+> > 1 file changed, 3 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index abaabfae19cc..1cc5a712459e 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -3068,7 +3068,7 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, void *data,
+> >       struct hci_ev_conn_complete *ev = data;
+> >       struct hci_conn *conn;
+> >
+> > -     if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> > +     if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> >               bt_dev_err(hdev, "Ignoring HCI_Connection_Complete for invalid handle");
+> >               return;
+> >       }
+>
+> See comments above.
+>
+> > @@ -4690,7 +4690,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev, void *data,
+> >               return;
+> >       }
+> >
+> > -     if (__le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> > +     if (!status && __le16_to_cpu(ev->handle) > HCI_CONN_HANDLE_MAX) {
+> >               bt_dev_err(hdev, "Ignoring HCI_Sync_Conn_Complete for invalid handle");
+> >               return;
+> >       }
+>
+> This is also in the wrong position. Fundamentally we need to check the validity of the handle before we assign it and not just globally.
+>
+> > @@ -5527,7 +5527,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+> >       struct smp_irk *irk;
+> >       u8 addr_type;
+> >
+> > -     if (handle > HCI_CONN_HANDLE_MAX) {
+> > +     if (!status && handle > HCI_CONN_HANDLE_MAX) {
+> >               bt_dev_err(hdev, "Ignoring HCI_LE_Connection_Complete for invalid handle");
+> >               return;
+> >       }
+>
+> Same here. The global check is pointless. Check before using it.
+>
+> Regards
+>
+> Marcel
+>
+
+
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
