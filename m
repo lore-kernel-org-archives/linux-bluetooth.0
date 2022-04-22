@@ -2,124 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A2BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB76C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:28:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445908AbiDVJ0s convert rfc822-to-8bit (ORCPT
+        id S1446015AbiDVJbs convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 05:26:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
+        Fri, 22 Apr 2022 05:31:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377251AbiDVJ0q (ORCPT
+        with ESMTP id S230167AbiDVJbr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:26:46 -0400
+        Fri, 22 Apr 2022 05:31:47 -0400
+X-Greylist: delayed 518 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 22 Apr 2022 02:28:54 PDT
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A7B4F27CE0;
-        Fri, 22 Apr 2022 02:23:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7292A506D3;
+        Fri, 22 Apr 2022 02:28:54 -0700 (PDT)
 Received: from smtpclient.apple (p4fefc32f.dip0.t-ipconnect.de [79.239.195.47])
-        by mail.holtmann.org (Postfix) with ESMTPSA id C11D8CECD2;
-        Fri, 22 Apr 2022 11:16:04 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 25550CECD5;
+        Fri, 22 Apr 2022 11:20:15 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH v2] Bluetooth: btusb: add support for Qualcomm WCN785x
+Subject: Re: [RFC PATCH] Bluetooth: core: Allow bind HCI socket user channel
+ when HCI is UP.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1650017516-28912-1-git-send-email-quic_zijuhu@quicinc.com>
-Date:   Fri, 22 Apr 2022 11:16:04 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
+Date:   Fri, 22 Apr 2022 11:20:14 +0200
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <7EF2E4E4-2DC5-450C-8840-314B9D210521@holtmann.org>
-References: <1650017516-28912-1-git-send-email-quic_zijuhu@quicinc.com>
-To:     Zijun Hu <quic_zijuhu@quicinc.com>
+Message-Id: <9EA1D51C-D316-49CF-A7F8-765C58C18880@holtmann.org>
+References: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
+To:     Vasyl Vavrychuk <vvavrychuk@gmail.com>
 X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Vasyl,
 
-> Qualcomm WCN785x has PID/VID 0cf3/e700 as shown by
-> /sys/kernel/debug/usb/devices:
+> This is needed for user-space to ensure that HCI init scheduled from
+> hci_register_dev is completed.
 > 
-> T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  8 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e700 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+> Function hci_register_dev queues power_on workqueue which will run
+> hci_power_on > hci_dev_do_open. Function hci_dev_do_open sets HCI_INIT
+> for some time.
 > 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> It is not allowed to bind to HCI socket user channel when HCI_INIT is
+> set. As result, bind might fail when user-space program is run early
+> enough during boot.
+> 
+> Now, user-space program can first issue HCIDEVUP ioctl to ensure HCI
+> init scheduled at hci_register_dev was completed.
+> 
+> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
 > ---
-> drivers/bluetooth/btusb.c | 10 ++++++++--
-> 1 file changed, 8 insertions(+), 2 deletions(-)
+> net/bluetooth/hci_sock.c | 4 +---
+> 1 file changed, 1 insertion(+), 3 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 06a854a2507e..67a6a84a6f61 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -317,6 +317,11 @@ static const struct usb_device_id blacklist_table[] = {
-> 						     BTUSB_WIDEBAND_SPEECH |
-> 						     BTUSB_VALID_LE_STATES },
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index 33b3c0ffc339..c98de809f856 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -1194,9 +1194,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
 > 
-> +	/* QCA WCN785x chipset */
-> +	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
-> +						     BTUSB_WIDEBAND_SPEECH |
-> +						     BTUSB_VALID_LE_STATES },
-> +
-> 	/* Broadcom BCM2035 */
-> 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
-> 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
-> @@ -3037,6 +3042,7 @@ static const struct qca_device_info qca_devices_table[] = {
-> 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-> 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> 	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-> +	{ 0x00190200, 40, 4, 16 }, /* WCN785x 2.0 */
-> };
-> 
-> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> @@ -3327,11 +3333,11 @@ static int btusb_setup_qca(struct hci_dev *hdev)
-> 		if (err < 0)
-> 			return err;
-> 
-> -		/* WCN6855 2.1 will reset to apply firmware downloaded here, so
-> +		/* WCN6855 2.1 and later will reset to apply firmware downloaded here, so
-> 		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
-> 		 * cause potential enable failure.
-> 		 */
-> -		if (info->rom_version == 0x00130201)
-> +		if ((info->rom_version == 0x00130201) || (info->rom_version == 0x00190200))
-> 			msleep(QCA_BT_RESET_WAIT_MS);
+> 		if (test_bit(HCI_INIT, &hdev->flags) ||
+> 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
+> -		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
+> -		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
+> -		     test_bit(HCI_UP, &hdev->flags))) {
+> +		    hci_dev_test_flag(hdev, HCI_CONFIG)) {
+> 			err = -EBUSY;
+> 			hci_dev_put(hdev);
+> 			goto done;
 
-I think it is better to start using a switch statement here.
+I am not following the reasoning here. It is true that the device has to run init before you can do something with it. From mgmt interface your device will only be announced when it is really ready.
 
 Regards
 
