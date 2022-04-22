@@ -2,81 +2,175 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72DD4C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:30:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3E4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:47:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446123AbiDVJdO (ORCPT
+        id S1350687AbiDVJug (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 05:33:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49204 "EHLO
+        Fri, 22 Apr 2022 05:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1446098AbiDVJdF (ORCPT
+        with ESMTP id S232515AbiDVJug (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:33:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880DD4EF6E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 02:30:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 212B361D94
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 09:30:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E2E9C385B6;
-        Fri, 22 Apr 2022 09:30:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650619812;
-        bh=oHj9UzeX5TTh/jY7tBFy4tmuwcotJtPCjmQ1aT5XzoE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=gv1gckuuZs8QIb96kQLhST4Mw/MVoNudcL5zfhgz8fic7diA+fp4op2T0eiIvsblt
-         4rys4RtPTsFuD6lO7MXwHK2MKpdiTL6kYfLdFXJdsy7raL2iL0stimJ/eSJt73p9GL
-         NUXsz0MeWjYbNkOt0N76eWhvt/wGGp5XyDq7ZdUKW6w7lMbm5xWweWv92QiYXuH8Fo
-         H8m24A2XRLvBlYD5LFBWxPKeSQY5jrmG0qHXfcnPMl8XLGPkTGF2i0W24VWnPpiH42
-         aknt3lP4BfYxZJrkBB1Fg4CSM4ryyFE11p7bagG/ZnfONDqJLHtxuBUt+8et2Dvs/L
-         tbODs9L7Ih8Xg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5C157E8DD85;
-        Fri, 22 Apr 2022 09:30:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 22 Apr 2022 05:50:36 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A29FE01B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 02:47:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650620863; x=1682156863;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=JxKVX47NFu3Ms6T5wFHB8Xtu19+gsocYqP5GwK3ITNc=;
+  b=VOPpfPOg6e9RFpIKxosen05Qjpveufvkl5Vg3m94ceXl46hxBbj+SchF
+   B4OZ/KPBAa+gIS2QqwJ+uj6YqM3zBEdPRo228Svcu8XIEKekTCR2cpkK2
+   CyQB5jBzz2H+79/a1U/XP1XZPasFOiivyN5Ewt4KEyx/PYgsanFWPkhni
+   Y5glK0EuKgftx5lr9NTasU31T7goFOP6SUx2A8LiHaWD38LjDOp9b2VJj
+   jufpsifaLKznyVR32k8pGCT8KqyMdxNqqqofcBrz65+1HOANf+pOI/8Tw
+   gLzR6/9bwdXg998q/AGMRgnQEXFBql+PM5EBOwQygX/fvhsYKV4eCsynu
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="327548117"
+X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
+   d="scan'208";a="327548117"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 02:47:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
+   d="scan'208";a="530764314"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by orsmga006.jf.intel.com with ESMTP; 22 Apr 2022 02:47:41 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nhpt7-0009za-5N;
+        Fri, 22 Apr 2022 09:47:41 +0000
+Date:   Fri, 22 Apr 2022 17:47:16 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 40fc9176241fdd0f310103b3036088a7e09df1e7
+Message-ID: <626279a4.A5qgI2RXR6qREUR5%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: use hdev lock in activate_scan for
- hci_is_adv_monitoring
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165061981237.24106.5638198039269621064.git-patchwork-notify@kernel.org>
-Date:   Fri, 22 Apr 2022 09:30:12 +0000
-References: <20220407180651.14871-1-dossche.niels@gmail.com>
-In-Reply-To: <20220407180651.14871-1-dossche.niels@gmail.com>
-To:     Niels Dossche <dossche.niels@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        howardchung@chromium.org
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 40fc9176241fdd0f310103b3036088a7e09df1e7  Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+elapsed time: 1077m
 
-On Thu,  7 Apr 2022 20:06:52 +0200 you wrote:
-> hci_is_adv_monitoring's function documentation states that it must be
-> called under the hdev lock. Paths that leads to an unlocked call are:
-> discov_update => start_discovery => interleaved_discov => active_scan
-> and: discov_update => start_discovery => active_scan
-> 
-> The solution is to take the lock in active_scan during the duration of
-> the call to hci_is_adv_monitoring.
-> 
-> [...]
+configs tested: 96
+configs skipped: 3
 
-Here is the summary with links:
-  - Bluetooth: use hdev lock in activate_scan for hci_is_adv_monitoring
-    https://git.kernel.org/bluetooth/bluetooth-next/c/e05c3c0e1b45
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-You are awesome, thank you!
+gcc tested configs:
+arm64                               defconfig
+arm64                            allyesconfig
+arm                              allmodconfig
+arm                                 defconfig
+arm                              allyesconfig
+i386                          randconfig-c001
+powerpc                     asp8347_defconfig
+sh                           se7712_defconfig
+arc                                 defconfig
+sh                        edosk7760_defconfig
+arm                             rpc_defconfig
+powerpc                 linkstation_defconfig
+arm                          pxa3xx_defconfig
+powerpc                     tqm8555_defconfig
+arm                          pxa910_defconfig
+mips                        bcm47xx_defconfig
+sh                          polaris_defconfig
+arm                        spear6xx_defconfig
+mips                            ar7_defconfig
+powerpc                     pq2fads_defconfig
+x86_64                        randconfig-c001
+arm                  randconfig-c002-20220421
+ia64                             allmodconfig
+ia64                             allyesconfig
+ia64                                defconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+nios2                               defconfig
+arc                              allyesconfig
+csky                                defconfig
+nios2                            allyesconfig
+alpha                               defconfig
+alpha                            allyesconfig
+h8300                            allyesconfig
+xtensa                           allyesconfig
+sh                               allmodconfig
+s390                                defconfig
+s390                             allmodconfig
+parisc                              defconfig
+parisc64                            defconfig
+parisc                           allyesconfig
+s390                             allyesconfig
+sparc                               defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+i386                                defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                           allnoconfig
+powerpc                          allmodconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+arc                  randconfig-r043-20220421
+s390                 randconfig-r044-20220421
+riscv                randconfig-r042-20220421
+riscv                               defconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+riscv                             allnoconfig
+riscv                            allmodconfig
+riscv                            allyesconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                          rhel-8.3-func
+x86_64                                  kexec
+x86_64                              defconfig
+x86_64                           allyesconfig
+x86_64                         rhel-8.3-kunit
+x86_64                               rhel-8.3
+
+clang tested configs:
+riscv                randconfig-c006-20220421
+mips                 randconfig-c004-20220421
+x86_64                        randconfig-c007
+i386                          randconfig-c001
+arm                  randconfig-c002-20220421
+powerpc              randconfig-c003-20220421
+arm                        mvebu_v5_defconfig
+powerpc                 mpc8315_rdb_defconfig
+powerpc                      ppc64e_defconfig
+powerpc                        fsp2_defconfig
+powerpc                     tqm8560_defconfig
+hexagon                          alldefconfig
+arm                     davinci_all_defconfig
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
