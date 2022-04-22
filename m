@@ -2,103 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F83C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 17:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D321EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 21:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbiDVR0o (ORCPT
+        id S230007AbiDVVix (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 13:26:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41342 "EHLO
+        Fri, 22 Apr 2022 17:38:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiDVR0n (ORCPT
+        with ESMTP id S230138AbiDVViu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 13:26:43 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A16A2CEE36
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 10:23:43 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id q1so11084445plx.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 10:23:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=wb2QP3BO46rrJ9oZ0liecSIUWxQThgljBZkIb7Pq8+E=;
-        b=bEFk8cSz1q45kTeyfVTByZJjq4ZgtMjgzWa77YMG6xMHdsv15tUQ+yChLtlzKO7shj
-         INvAII3D464EwdBBMrfRjqjTeuohyb05REuCShNN3ud3nCjUUGwM4se0yoYz6AwUgi1Y
-         Xjerh2aHfz4irDH7d/cLvxrb8H6U9/eaMn0N2nAUobCWty4R3yAWeeN1dd8l42CgY5/b
-         Ck+mJ/9sw7Lod7tOZp/+yqr9LIgRLjsOdKBDustgt6ZHQwjA1AsUHYrhKgKobUnxPlHQ
-         2WhaMuVf8E2PmY7z17BdS/KY6+AAe2yg9967QwvJIt+mR6Mw9rzKW+NlIw2Cfev2IEov
-         ud2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=wb2QP3BO46rrJ9oZ0liecSIUWxQThgljBZkIb7Pq8+E=;
-        b=kf5r5zEazDIkpa9ILVniQuGIWEA8yuCPraqtISZiIHJDXkD355xt3okvAn/frYBWub
-         HNOKVJcfWjpBcTibQF0ZoQHYg1aRFmpDWeSPtdbemmnYVQSkrqajSR0zWa09Z5phHfq6
-         gW/CWbJvItbeAzYGbb7tqEgUlOuhtL6saMLuAZGCGEkXsvPz19BC3F562LtqI3PsOHRP
-         XAcrHeEwLOB6RqIzLrXuOuQMcoCclNAFk9P3Sj5adZ9adYoNhIOoxzSra1YP8SxHp0bl
-         PhDuKP2plvxwawxgABEgVIOMQRk0DUhzyy12KuWX/eFlcTm51xBPd9pT3BBiePWsRhwJ
-         8d6Q==
-X-Gm-Message-State: AOAM531js1LH4Q9XzokdUUCX2BpiDZE12YHjp2ubRDoSalzBXqbRhM3Q
-        6bhBE2CHo9xTQP4EP6mNQ1wvwMKvRNQ=
-X-Google-Smtp-Source: ABdhPJz9dkwG8F9dBYnXqGFY2CNsqHfmgnsOhPdZLgBzfreoUU7Oj73hwzu1FX+Wt+tIccwg+IlPzw==
-X-Received: by 2002:a17:903:2043:b0:15b:f6ff:79ed with SMTP id q3-20020a170903204300b0015bf6ff79edmr4237666pla.15.1650648135327;
-        Fri, 22 Apr 2022 10:22:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.157.12.14])
-        by smtp.gmail.com with ESMTPSA id p6-20020a17090a2c4600b001cb78f1e301sm6933353pjm.1.2022.04.22.10.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Apr 2022 10:22:15 -0700 (PDT)
-Message-ID: <6262e447.1c69fb81.e0d8e.199c@mx.google.com>
-Date:   Fri, 22 Apr 2022 10:22:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2261596456140259502=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, icenowy@outlook.com
-Subject: RE: btrtl: try to use OF machine compatible as config postfix
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <BYAPR20MB24723A54E913F0218DF87F83BCF79@BYAPR20MB2472.namprd20.prod.outlook.com>
-References: <BYAPR20MB24723A54E913F0218DF87F83BCF79@BYAPR20MB2472.namprd20.prod.outlook.com>
+        Fri, 22 Apr 2022 17:38:50 -0400
+Received: from o6.sgmail.github.com (o6.sgmail.github.com [192.254.113.101])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 446FA412281
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 13:44:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        h=from:subject:mime-version:content-type:content-transfer-encoding:to;
+        s=smtpapi; bh=wH0qAcM2An/FZuJUYRuI3OFSXtmBkqKprM3jBFfw5Lw=;
+        b=F/q+FOAiEr7iTWwVzDjPgiA2Jv650xx/b0kAp0KJCctmNFkSPNBiFeyvqWw+Hhssk/7F
+        zz1phKUoMc8i47h6CuhS69Ul0FNgVlGU5HLdIahtg1Je3kCn0UZkANs/Kkw5LvcdRiZ9mm
+        oeMmDc4OdO5MH51+dX/2XJRkPJDwXEjjY=
+Received: by filterdrecv-644fcdb6d6-kjv48 with SMTP id filterdrecv-644fcdb6d6-kjv48-1-62630AEC-FE
+        2022-04-22 20:07:08.783284237 +0000 UTC m=+1376095.252406715
+Received: from smtp.github.com (unknown)
+        by geopod-ismtpd-2-3 (SG)
+        with ESMTP id k6KJw6rjRCmQ2S097humfQ
+        for <linux-bluetooth@vger.kernel.org>;
+        Fri, 22 Apr 2022 20:07:08.691 +0000 (UTC)
+Received: from github.com (hubbernetes-node-655f4a4.ash1-iad.github.net [10.56.14.49])
+        by smtp.github.com (Postfix) with ESMTPA id 49E9F840E93
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 13:06:28 -0700 (PDT)
+Date:   Fri, 22 Apr 2022 20:07:08 +0000 (UTC)
+From:   Luiz Augusto von Dentz <noreply@github.com>
+Message-ID: <bluez/bluez/push/refs/heads/master/a1939b-3e2ad5@github.com>
+Subject: [bluez/bluez] c53562: hog-lib: Check if Report ID is set before
+ prependi...
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
+X-SG-EID: =?us-ascii?Q?NCuo=2Faci8=2Fvc654FLG8ZqCi=2Ftd5PhuN55Q9iF5tvb2ErGMYgqEnmC5+VcxN1HW?=
+ =?us-ascii?Q?HZEMO+yd+6Y5QOUrvrilW=2F0hzAy+0q23lKrfbYi?=
+ =?us-ascii?Q?bGIdh7J02Fv7HM4JTIyfg6aU2HQ=2F7Osa2zUxfxZ?=
+ =?us-ascii?Q?PXq3kUE9jKk115WqLDi7ZD+JKwMl=2FavI4EDmoqL?=
+ =?us-ascii?Q?H9aM13uK8pTIa6LHlvdFmv14WGAyJ73AZrR6gbA?=
+ =?us-ascii?Q?oUX5AgR=2F+Vv86FxyxSqugZio2Nd9iHryJDqEBI5?=
+ =?us-ascii?Q?XO+Lv1NPx35PwWmjpn9Xg=3D=3D?=
+To:     linux-bluetooth@vger.kernel.org
+X-Entity-ID: /f+S0XqulHHajbNb6hGdxg==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2261596456140259502==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c535623a713c340031daf56d0798829644a92532
+      https://github.com/bluez/bluez/commit/c535623a713c340031daf56d0798829644a92532
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-22 (Fri, 22 Apr 2022)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M profiles/input/hog-lib.c
 
-Dear submitter,
+  Log Message:
+  -----------
+  hog-lib: Check if Report ID is set before prepending it
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=634720
+Before prepending the Report ID check if it is non-zero:
 
----Test result---
+BLUETOOTH SPECIFICATION Page 16 of 26
+HID Service Specification
 
-Test Summary:
-CheckPatch                    PASS      2.36 seconds
-GitLint                       PASS      1.29 seconds
-SubjectPrefix                 PASS      0.93 seconds
-BuildKernel                   PASS      31.82 seconds
-BuildKernel32                 PASS      28.41 seconds
-Incremental Build with patchesPASS      50.57 seconds
-TestRunner: Setup             PASS      487.24 seconds
-TestRunner: l2cap-tester      PASS      17.97 seconds
-TestRunner: bnep-tester       PASS      6.12 seconds
-TestRunner: mgmt-tester       PASS      106.62 seconds
-TestRunner: rfcomm-tester     PASS      9.91 seconds
-TestRunner: sco-tester        PASS      9.59 seconds
-TestRunner: smp-tester        PASS      9.65 seconds
-TestRunner: userchan-tester   PASS      6.46 seconds
+Report ID shall be nonzero in a Report Reference characteristic
+descriptor where there is more than one instance of the Report
+characteristic for any given Report Type.
+
+Fixes: https://www.spinics.net/lists/linux-bluetooth/msg97262.html
 
 
+  Commit: 3e2ad5009c0fb2c8a7b3a04438ad1e449c764dcc
+      https://github.com/bluez/bluez/commit/3e2ad5009c0fb2c8a7b3a04438ad1e449c764dcc
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-04-22 (Fri, 22 Apr 2022)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M monitor/l2cap.c
+
+  Log Message:
+  -----------
+  btmon: Fix decoding of Enhanced Credit Connection Request
+
+This fixes the decoding of Enhanced Credit Connection Request which was
+not accounting the fields correctly causing 2 extra Source CID to be
+printed.
 
 
---===============2261596456140259502==--
+Compare: https://github.com/bluez/bluez/compare/a1939bd51e0f...3e2ad5009c0f
