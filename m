@@ -2,175 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3E4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E38A4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 16:02:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350687AbiDVJug (ORCPT
+        id S1349023AbiDVQFm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 05:50:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34184 "EHLO
+        Fri, 22 Apr 2022 12:05:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232515AbiDVJug (ORCPT
+        with ESMTP id S229956AbiDVQFj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:50:36 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A29FE01B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 02:47:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650620863; x=1682156863;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JxKVX47NFu3Ms6T5wFHB8Xtu19+gsocYqP5GwK3ITNc=;
-  b=VOPpfPOg6e9RFpIKxosen05Qjpveufvkl5Vg3m94ceXl46hxBbj+SchF
-   B4OZ/KPBAa+gIS2QqwJ+uj6YqM3zBEdPRo228Svcu8XIEKekTCR2cpkK2
-   CyQB5jBzz2H+79/a1U/XP1XZPasFOiivyN5Ewt4KEyx/PYgsanFWPkhni
-   Y5glK0EuKgftx5lr9NTasU31T7goFOP6SUx2A8LiHaWD38LjDOp9b2VJj
-   jufpsifaLKznyVR32k8pGCT8KqyMdxNqqqofcBrz65+1HOANf+pOI/8Tw
-   gLzR6/9bwdXg998q/AGMRgnQEXFBql+PM5EBOwQygX/fvhsYKV4eCsynu
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="327548117"
-X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
-   d="scan'208";a="327548117"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 02:47:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,281,1643702400"; 
-   d="scan'208";a="530764314"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga006.jf.intel.com with ESMTP; 22 Apr 2022 02:47:41 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nhpt7-0009za-5N;
-        Fri, 22 Apr 2022 09:47:41 +0000
-Date:   Fri, 22 Apr 2022 17:47:16 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 40fc9176241fdd0f310103b3036088a7e09df1e7
-Message-ID: <626279a4.A5qgI2RXR6qREUR5%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 22 Apr 2022 12:05:39 -0400
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12olkn2087.outbound.protection.outlook.com [40.92.21.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71275DE76;
+        Fri, 22 Apr 2022 09:02:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c0+Yp8Ny9YVpxVnasjO3MgUG/f/ZJMhmQPNYp9o9YLbbK46qQ3wna6xhoH+A3QHbLSuxEIkcyfpTUeVkIaC3W9iwaEZbQ4D15M4yRTMn/9NgDJf4+E7fwA5rma4LH0yPkunXbxoos1dq3WzrV3tWEDYuR+NAuaUa0w3aGigYjSzYOk+0+FBS3BiGbnupIbKB9eaIRx0mcA3kLGksA5LR+K+91djy/ygOl24gdO2h2L6ytQ8eZMrc962YVTW0GOkG4QJgdq3QNt+y0msP2Pl/NZNOJBgcClXBSkbi9RvhvkYDJaM4QYjBuS3aMWkjwtjaLj8kxl6A3xCev56HzeFA6A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+lHADMAL0NkfusQGDXcw7p3Nxi7opqnAU8qpxK++s+M=;
+ b=JrxvymA52Q/y/y9juqDLKgzqYRVdn/KRCDoTqaXr/toIvrRFu3iLQf5GsdwOqlfdFlSDzjAMkVymo8YDsxTYbgZaU3EnhV1kzLZcjr+Nc27PwWrH7R7jM8NuSaRgiFt4/+RccBjRbKhQE9qpo31e86WTUpuXHjO6d9eLpFY28BIzf307nWpGx21k8seNN3ab+YZu0YWOf2y0gf8U+CwpaglKEsuEqLRognlPF/pnthgsSGrUAfnmrxyP5k4QVzPU/uRzOOtqa97G2VkeWxPoM9OzJ7SNWvGmsRsDfVM7pwBflZsi0hz6OJ10jsWpdtr1nRj7a82bxFdhZdWUrZ6+8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+lHADMAL0NkfusQGDXcw7p3Nxi7opqnAU8qpxK++s+M=;
+ b=j+NdJsEk4JcPP+Ftc+mlSx1gyQ4Jmv6PCvqiN1nKNpkk+GhfwJinGRHRlAarI7X853UPfSyXYBQBWZ/kOARGDw7LdNjezbZa3Ph9H6R7O5WagjMLcD16gOwhEIA8q6HTV1zlc7bZFuZ1tHiMrdCGXAN6wW9o3lOax4YedqEMQGRZfpjsFnJMSGCD2rNWOdVaJFZlKBbGN/TN0Ls5/N0+AkNTaYmw4AODDOkzteW7WEaTFWbKkiUiDMb1fcNi9i5kuQeLG+Zmhu8k8PbBSxLi1gx4iVHoihor8TAlFUd9VqPNO6vHmeQmSgSmA3O5AeafXxel8XC5E0/J9+Efwhf5TA==
+Received: from BYAPR20MB2472.namprd20.prod.outlook.com (2603:10b6:a03:155::16)
+ by CY4PR2001MB1685.namprd20.prod.outlook.com (2603:10b6:910:68::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Fri, 22 Apr
+ 2022 16:02:44 +0000
+Received: from BYAPR20MB2472.namprd20.prod.outlook.com
+ ([fe80::3480:160a:eb92:d6e3]) by BYAPR20MB2472.namprd20.prod.outlook.com
+ ([fe80::3480:160a:eb92:d6e3%6]) with mapi id 15.20.5186.015; Fri, 22 Apr 2022
+ 16:02:44 +0000
+From:   icenowy@outlook.com
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sunxi@lists.linux.dev, Icenowy Zheng <icenowy@aosc.io>
+Subject: [PATCH 0/3] btrtl: try to use OF machine compatible as config postfix
+Date:   Sat, 23 Apr 2022 00:02:28 +0800
+Message-ID: <BYAPR20MB2472590CD7F6385C0E002763BCF79@BYAPR20MB2472.namprd20.prod.outlook.com>
+X-Mailer: git-send-email 2.35.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [S9Mp5eyF3vDnUHmlK9ml8yArgbO9NKlj]
+X-ClientProxiedBy: HK2PR04CA0070.apcprd04.prod.outlook.com
+ (2603:1096:202:15::14) To BYAPR20MB2472.namprd20.prod.outlook.com
+ (2603:10b6:a03:155::16)
+X-Microsoft-Original-Message-ID: <20220422160231.1072810-1-icenowy@outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: b947124e-01ef-45ba-3a7d-08da2479890f
+X-MS-TrafficTypeDiagnostic: CY4PR2001MB1685:EE_
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: D+pswPgHCa2AdIhOON7T4/mpAuMbJmtmIvsbh70hurqiCmTKXyvxiHz07VhWSoM6ctIiYY+2JCQczsnryxe3YeqCaLrlHRL06iySXJjsf+JaMsL98QP/sHUF31bkO8dH4ZAwFTz0uw64GcuNMsJ8a+idgiCYomPvgZ9Tv5Jqo/j3mi6tVQ0DByIOxXdS9q6rg7yRUxLAFzaVMn1/YIvWf3n0OMj6GjmWxu553G//Xrf5KSjuCll9zu9MA1w5vj/lE4yntDG+x4AxdKEksrleDW/M66uLhbahD/5yzB7rxgzmLGxOPRf7bnq15TdzA1NXJB+CoFdpU1hXrKgtJUdSElv9Q7DCs6iw0Fe0/wXGRcc0VMPB4ebjc8Hk4WCmR87DI37c8kAPFX+MpXxodyhWHDfzA6Fw2KiDihTbVfpC7iWz9oZyYGkbxHY9jPNwgxHL6xkhvd87ZR6ZocmGkLZ2Ji1ybPXeSiaeswHXq8CPvIoeYaWrMuKu4Pu+X2dG+P4m8jJpuaPKWTs6QfM9y3jwmNzf+Q60pSkG5+zJQ2c+egSyaphwMFHK1MG5WmmNMzOlb8gGj1LbG1VfOf3LdsCDHw==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?FrsArwEygSz8sIYG2HCz4QOEbqvB/Hq9xYG09z6nuUNWMSD31E095oZDTgKt?=
+ =?us-ascii?Q?WaKmBRKbn5EcHbsoV/emZHoj+44/tgQ0Q7HjYkENGP/8t0/Zo30DTVw/PtDq?=
+ =?us-ascii?Q?kzYNyq/QcRt209SsK4ebnXo027D3tMQKupub6mzgn4eea7ONKgLzw0q4yLay?=
+ =?us-ascii?Q?6rZuXqHTcG1WdeEfTwjNf/ndn05vZz74v5LEduLqEScKDNgP9cbtKKlUyTNT?=
+ =?us-ascii?Q?DzhSQ/B/Akv7w7Ny5h+sMFTlEz1e5iubUYE9oJGL7qCg04bBC1sdcC0+hS5U?=
+ =?us-ascii?Q?2Sy+DVGSBaBOHYXg48Q0ODrTvQnlni5XZp02JMC8BYEctWIASOQf1H1tmVrb?=
+ =?us-ascii?Q?eB6ugKxJjZ+/UnxYvbLcM+wwSGziCGSJMc4iRIbMFzNSH2h6cHZ8TpPqNitf?=
+ =?us-ascii?Q?Kgj5AhDz0IvqPmGD1gFI4v9MlGxKcDPXNd8CyTDmFE+kw5wXqAhTeabNaSfa?=
+ =?us-ascii?Q?8Vcgiptr4XSmdcf7AfUcL5qyHnAz0yP2uyFbuj5EKqVwrrpY0L8hmMaoij2h?=
+ =?us-ascii?Q?ycgyUjnDpgUiN8C6zOptAXeZMNFmSY2u9faKHxyyBVtJntg5BP2mT2yRWzu1?=
+ =?us-ascii?Q?9Up5SmrlPk3hFdhBDbRHKf6AQJemxiLuzkseAQn3LSijXwaYQr7NBsLXHC08?=
+ =?us-ascii?Q?djXLYnU9mbCPL1iK8Orrj7/dOST+/uk5o1Lb2PqzJAYLU5pLh+lNAO6zK6jk?=
+ =?us-ascii?Q?WhjdhYqesPUzHP1nboxfRgvuLwXk8YSeGwocPKS+O1dQrvYurT9awTvjyKPl?=
+ =?us-ascii?Q?HKJc/Dz7bFvLaRIHCT/HwU8bRqLyqTLUxT25hy92D4cAYmaiExBPcQdASCtE?=
+ =?us-ascii?Q?C23JRfOLtNSEo12B+o19o5Oq4fIEdt3IU+/+twPKnKkvX3TzoD7wu0fdINIo?=
+ =?us-ascii?Q?5mGe4HTLG3d9IdUFa+pFzLPkNTDEXG5ZiuX1uCAVRMB6qd9uaXOBrTwxRVFt?=
+ =?us-ascii?Q?/h2YoyIdLlXyvKtZ4hX6GQZDgRTb7/2WTClujl7obgtnraCm267wlcdnjJdL?=
+ =?us-ascii?Q?YZSDf1u07w+N2cEWBYuA0KTsTLAbtx5fv7i7S1J38291Zm1iqvVD6er6LIqW?=
+ =?us-ascii?Q?aStqeV7SMdm8iEE4je524qqUlPioOo/RjAmTK7rFm7ODIVSshL9qHONqDHL9?=
+ =?us-ascii?Q?w6j/7/2D0eZE1tBmNdAYOLgtxtXZ4l79mWe4aoROtb7XMLcBtGicUkwWuzQY?=
+ =?us-ascii?Q?FNEY0qDD9okAOatbe+O6Ty9wOnVqohJkVjpdAyS0bw4vurcgtO4PaaqnSoR6?=
+ =?us-ascii?Q?YCL/YUkFG5n2JDdib7ZW67EkmhIhRyI/gVZ+m7V1ymCuBsMGdgncmQeRtMxr?=
+ =?us-ascii?Q?t/DiOF4SPcDCZjom+4e1/cwnq/7KXNGaQFxerEhDoTLl+B70Mj9PyJBQkVH0?=
+ =?us-ascii?Q?OjWx3WgBPUTRq6LM4+eEFDtyGYViepQktzWFKgzdbg8yown3UZ9JQnHAZO+X?=
+ =?us-ascii?Q?Jbaf7s1hvJ4=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b947124e-01ef-45ba-3a7d-08da2479890f
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR20MB2472.namprd20.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Apr 2022 16:02:44.2184
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR2001MB1685
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 40fc9176241fdd0f310103b3036088a7e09df1e7  Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
+From: Icenowy Zheng <icenowy@aosc.io>
 
-elapsed time: 1077m
+Currently for OF machines there's no way to specify a machine-specific
+btrtl config file.
 
-configs tested: 96
-configs skipped: 3
+Try to use OF machine compatible string as config postfix, in a similar
+manner with brcmfmac driver (which needs machine-specific config files
+too).
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Icenowy Zheng (3):
+  Bluetooth: btrtl: try config w/o postfix if postfixed one failed to
+    load
+  Bluetooth: btrtl: use board DT compatible string as config postfix
+  Bluetooth: btrtl: allow longer config file name
 
-gcc tested configs:
-arm64                               defconfig
-arm64                            allyesconfig
-arm                              allmodconfig
-arm                                 defconfig
-arm                              allyesconfig
-i386                          randconfig-c001
-powerpc                     asp8347_defconfig
-sh                           se7712_defconfig
-arc                                 defconfig
-sh                        edosk7760_defconfig
-arm                             rpc_defconfig
-powerpc                 linkstation_defconfig
-arm                          pxa3xx_defconfig
-powerpc                     tqm8555_defconfig
-arm                          pxa910_defconfig
-mips                        bcm47xx_defconfig
-sh                          polaris_defconfig
-arm                        spear6xx_defconfig
-mips                            ar7_defconfig
-powerpc                     pq2fads_defconfig
-x86_64                        randconfig-c001
-arm                  randconfig-c002-20220421
-ia64                             allmodconfig
-ia64                             allyesconfig
-ia64                                defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-nios2                               defconfig
-arc                              allyesconfig
-csky                                defconfig
-nios2                            allyesconfig
-alpha                               defconfig
-alpha                            allyesconfig
-h8300                            allyesconfig
-xtensa                           allyesconfig
-sh                               allmodconfig
-s390                                defconfig
-s390                             allmodconfig
-parisc                              defconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                             allyesconfig
-sparc                               defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-arc                  randconfig-r043-20220421
-s390                 randconfig-r044-20220421
-riscv                randconfig-r042-20220421
-riscv                               defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-x86_64                              defconfig
-x86_64                           allyesconfig
-x86_64                         rhel-8.3-kunit
-x86_64                               rhel-8.3
-
-clang tested configs:
-riscv                randconfig-c006-20220421
-mips                 randconfig-c004-20220421
-x86_64                        randconfig-c007
-i386                          randconfig-c001
-arm                  randconfig-c002-20220421
-powerpc              randconfig-c003-20220421
-arm                        mvebu_v5_defconfig
-powerpc                 mpc8315_rdb_defconfig
-powerpc                      ppc64e_defconfig
-powerpc                        fsp2_defconfig
-powerpc                     tqm8560_defconfig
-hexagon                          alldefconfig
-arm                     davinci_all_defconfig
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
+ drivers/bluetooth/btrtl.c  |  8 +++++++-
+ drivers/bluetooth/hci_h5.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 34 insertions(+), 1 deletion(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.35.1
+
