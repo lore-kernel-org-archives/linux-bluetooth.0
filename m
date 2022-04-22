@@ -2,90 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB76C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2991DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Apr 2022 09:30:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1446015AbiDVJbs convert rfc822-to-8bit (ORCPT
+        id S1446039AbiDVJdL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 05:31:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48400 "EHLO
+        Fri, 22 Apr 2022 05:33:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230167AbiDVJbr (ORCPT
+        with ESMTP id S1446108AbiDVJdI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 05:31:47 -0400
-X-Greylist: delayed 518 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 22 Apr 2022 02:28:54 PDT
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7292A506D3;
-        Fri, 22 Apr 2022 02:28:54 -0700 (PDT)
-Received: from smtpclient.apple (p4fefc32f.dip0.t-ipconnect.de [79.239.195.47])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 25550CECD5;
-        Fri, 22 Apr 2022 11:20:15 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [RFC PATCH] Bluetooth: core: Allow bind HCI socket user channel
- when HCI is UP.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
-Date:   Fri, 22 Apr 2022 11:20:14 +0200
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <9EA1D51C-D316-49CF-A7F8-765C58C18880@holtmann.org>
-References: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
-To:     Vasyl Vavrychuk <vvavrychuk@gmail.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        Fri, 22 Apr 2022 05:33:08 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B48E4EF6D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 02:30:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id BD898B82B7F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 09:30:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6B3F9C385B5;
+        Fri, 22 Apr 2022 09:30:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650619812;
+        bh=uZair5wIdcfRAcFneI5mJ2YtmYXtWA580mHptbZYx9Y=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=sbWaq/+hZxdZOT+Dy9hib8i8WHK0yV9E26AUROF462jxLtUSBS5/+bdQtaFRrCO4e
+         IxTTUWTn4B5tXcqdgQM2qhkcgVORN8O0X62tJN8AQOQBH8at2yiNPC3GRDTUNK41Q4
+         GEgQ9Hs6RoK7gaq9z+dyRSzulqbjz2Fmife2QiJ0qZNRRFK4Q53orO96slA73ZGzYc
+         WDqbU1XV9w3WZbKEN3O//adSUSPGnil76oPZaAD3o4EhksysTBPwh414cHNmop+Ksi
+         n608uyqbhaH+HeI2PbgjSpBbTwgdIvCsdZr7opFD7vE2X06CyWkedNflC3RSlgtB3z
+         bkQ+PwMfOCNhg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 53761F0383D;
+        Fri, 22 Apr 2022 09:30:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: use hdev lock for accept_list and reject_list
+ in conn req
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165061981233.24106.17851581389197850076.git-patchwork-notify@kernel.org>
+Date:   Fri, 22 Apr 2022 09:30:12 +0000
+References: <20220405173751.7269-1-dossche.niels@gmail.com>
+In-Reply-To: <20220405173751.7269-1-dossche.niels@gmail.com>
+To:     Niels Dossche <dossche.niels@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vasyl,
+Hello:
 
-> This is needed for user-space to ensure that HCI init scheduled from
-> hci_register_dev is completed.
-> 
-> Function hci_register_dev queues power_on workqueue which will run
-> hci_power_on > hci_dev_do_open. Function hci_dev_do_open sets HCI_INIT
-> for some time.
-> 
-> It is not allowed to bind to HCI socket user channel when HCI_INIT is
-> set. As result, bind might fail when user-space program is run early
-> enough during boot.
-> 
-> Now, user-space program can first issue HCIDEVUP ioctl to ensure HCI
-> init scheduled at hci_register_dev was completed.
-> 
-> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
-> ---
-> net/bluetooth/hci_sock.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 33b3c0ffc339..c98de809f856 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -1194,9 +1194,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
-> 
-> 		if (test_bit(HCI_INIT, &hdev->flags) ||
-> 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
-> -		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
-> -		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
-> -		     test_bit(HCI_UP, &hdev->flags))) {
-> +		    hci_dev_test_flag(hdev, HCI_CONFIG)) {
-> 			err = -EBUSY;
-> 			hci_dev_put(hdev);
-> 			goto done;
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
 
-I am not following the reasoning here. It is true that the device has to run init before you can do something with it. From mgmt interface your device will only be announced when it is really ready.
+On Tue,  5 Apr 2022 19:37:52 +0200 you wrote:
+> All accesses (both reads and modifications) to
+> hdev->{accept,reject}_list are protected by hdev lock,
+> except the ones in hci_conn_request_evt. This can cause a race
+> condition in the form of a list corruption.
+> The solution is to protect these lists in hci_conn_request_evt as well.
+> 
+> I was unable to find the exact commit that introduced the issue for the
+> reject list, I was only able to find it for the accept list.
+> 
+> [...]
 
-Regards
+Here is the summary with links:
+  - [v2] Bluetooth: use hdev lock for accept_list and reject_list in conn req
+    https://git.kernel.org/bluetooth/bluetooth-next/c/1072b8391c7c
 
-Marcel
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
