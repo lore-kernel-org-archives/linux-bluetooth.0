@@ -2,183 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D423DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Apr 2022 01:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFEAC43217
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Apr 2022 15:35:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231464AbiDWBMa (ORCPT
+        id S234968AbiDWPi0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Apr 2022 21:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45460 "EHLO
+        Sat, 23 Apr 2022 11:38:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229941AbiDWBM3 (ORCPT
+        with ESMTP id S230228AbiDWPiZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Apr 2022 21:12:29 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762D722FD8A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Apr 2022 18:09:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1650676174; x=1682212174;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=b63LUjZDWZxGvorFuW+MlfmsOgL4Q6D1upEtktZ6Z9U=;
-  b=FYPthS6Np3UzPBW5Nf9U+Pw2Y6kgjDXfwjOzxKt+ewnpKBWivnenentP
-   aIAt5ERnZYwFCQVl3dkHEOv0iR9sxzKdCud8VDJw54pScgQvhjbEfqtVP
-   d8T/ig8e9KKySsjY6EaZFpn1eyLxIZ+ywZSRIllS4wIeMLtBqyD2AMdSY
-   vKgism0YTvDRXvs/Fle9VKBVzme9V9GpZNEUuR+KZ/CvXh5T3kGrVvPve
-   mXdF5Rztgfa1NoEq7RdftCHgZqgDEMQYdwVECw46H/NnxO3h1ZGJB2Uer
-   u2Vc9K0VCw5rK5/k/RwdL8eL6mt/45MXIbWR+2QvBnQiYp9HlOMhdx8ZR
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="262423433"
-X-IronPort-AV: E=Sophos;i="5.90,283,1643702400"; 
-   d="scan'208";a="262423433"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2022 18:09:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,283,1643702400"; 
-   d="scan'208";a="511807527"
-Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
-  by orsmga003.jf.intel.com with ESMTP; 22 Apr 2022 18:09:32 -0700
-Received: from kbuild by 3abc53900bec with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ni4HE-000Ako-3u;
-        Sat, 23 Apr 2022 01:09:32 +0000
-Date:   Sat, 23 Apr 2022 09:08:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1072b8391c7c1e04722b8b9324aa8e2938a9ee7b
-Message-ID: <62635198.GpRzKmFYfeilBdR3%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 23 Apr 2022 11:38:25 -0400
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 034E610FE
+        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Apr 2022 08:35:27 -0700 (PDT)
+Received: by mail-oi1-x22d.google.com with SMTP id v65so7598744oig.10
+        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Apr 2022 08:35:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yZmrXMgw1MBRyJ3VvvD/S/NJK9gJ19shfJZhz6rDBD8=;
+        b=mGSQvuV4hkqafUS7ZKoo2FiRZjhxNffY3wsAOyi1ma31ijRXbJn7+RGsvTN6SXsFGX
+         wKkFcFDQHKqocEa661h2Jjyd41tSBDAQR9fFp0fTa7nU065FkmcLu6e1fcP1s9rhoqZj
+         d32vvCyFvTHHFxt4RpSRFdovtI6OsL6Lebx9Hg7Stu0I7Sby4ZxAiSgi4Kx8RgifAM/+
+         /oO28YDzcfR8AgzXwbBxfaJBjz1qK42jCwypNOXerWO+v6k4fnV1v/dGEt2y2M7DudbP
+         qTatpmrm4WRPsciOM8dowgfI1mcbKTcUeOto2H6tIeHIqPuZWFa3Rr/GfSni5GmgOtHH
+         7Eaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yZmrXMgw1MBRyJ3VvvD/S/NJK9gJ19shfJZhz6rDBD8=;
+        b=faSUt/foGuKDjGrENKsZ/B6WeKLcL9c16l4wPfPBWoxLXwDk9340CBjN65Md4rKmUf
+         38hhZt0cNiIWXkRPLVt4xZj0aAeGI+/zMPjIcMnzeUBlUQMruP0Wq37nNEMNliSRlyfN
+         ZBUhP8XKkI9IC2XjZe8tYZRpDAaUy+u62VcRvbtTRLDWcFdtoeAYjgNcuvzAOq0wcM8k
+         Hd1ujjVIZdMP9idITrvhLFlxju0CI5YFMsImu4mHXQqpXHFVJuGBo1SA83WiivKsqaun
+         wHSL7N9p9o97xLLPo7uTinxf1feoC/9MXtvFCJO2sQhlHZ9EhGDFS3wl/UkPjzA4Vt39
+         RArQ==
+X-Gm-Message-State: AOAM533aVvejVmMSsP7eZjdwN6KDunnSKYzzlDr6aGuM9A5jcZJuDDtD
+        BybIFnh7s2Z2FhIzmeU9OJSqBQ==
+X-Google-Smtp-Source: ABdhPJwEkJcEyjTPFjAvW1fVnvHs6ADGz6qPasmzNXMt4XfJZ82bYxcgsxvOViNCsBPsSyFJ5kSPgQ==
+X-Received: by 2002:a05:6808:144a:b0:325:642:f58f with SMTP id x10-20020a056808144a00b003250642f58fmr1307346oiv.221.1650728126028;
+        Sat, 23 Apr 2022 08:35:26 -0700 (PDT)
+Received: from builder.lan ([2600:1700:a0:3dc8:3697:f6ff:fe85:aac9])
+        by smtp.gmail.com with ESMTPSA id j9-20020a056808056900b0032252797ea4sm1948720oig.6.2022.04.23.08.35.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Apr 2022 08:35:25 -0700 (PDT)
+Date:   Sat, 23 Apr 2022 10:35:23 -0500
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, agross@kernel.org,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        mka@chromium.org, quic_hemantg@quicinc.com,
+        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
+        quic_hbandi@quicinc.com, abhishekpandit@chromium.org,
+        mcchou@chromium.org
+Subject: Re: [PATCH v4] Bluetooth: arm64: dts: qcom: sc7280: Add IO regulator
+ handler in SC7280 CRD platforms
+Message-ID: <YmQcu2GVES4FuwFU@builder.lan>
+References: <1650458740-16957-1-git-send-email-quic_saluvala@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <1650458740-16957-1-git-send-email-quic_saluvala@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1072b8391c7c1e04722b8b9324aa8e2938a9ee7b  Bluetooth: use hdev lock for accept_list and reject_list in conn req
+On Wed 20 Apr 07:45 CDT 2022, Sai Teja Aluvala wrote:
 
-elapsed time: 862m
+Look here:
 
-configs tested: 104
-configs skipped: 3
+$ git log --oneline -- sc7280-crd.dts
+737f9ea6cee7 arm64: dts: qcom: sc7280: Rename crd to crd-r3
+073a39a2a63a arm64: dts: qcom: sc7280: Add pmg1110 regulators for sc7280-crd
+3ebf11fa4a35 arm64: dts: qcom: sc7280-crd: Add Touchscreen and touchpad support
+248da168fbae arm64: dts: qcom: sc7280: Define EC and H1 nodes for IDP/CRD
+427b249504ea arm64: dts: qcom: sc7280-crd: Add device tree files for CRD
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+You have 2 commits specifically touching this file and you have 3
+touching the platform. Your change touches only the single board, so it
+should match the two.
 
-gcc tested configs:
-arm64                               defconfig
-arm64                            allyesconfig
-arm                              allmodconfig
-arm                                 defconfig
-arm                              allyesconfig
-i386                          randconfig-c001
-ia64                         bigsur_defconfig
-sh                        apsh4ad0a_defconfig
-arm                           sama5_defconfig
-sh                           se7722_defconfig
-arm                            xcep_defconfig
-sh                           se7619_defconfig
-m68k                       m5475evb_defconfig
-powerpc                   currituck_defconfig
-powerpc                 canyonlands_defconfig
-powerpc                       holly_defconfig
-arm                        trizeps4_defconfig
-sh                           se7751_defconfig
-arc                          axs103_defconfig
-x86_64                        randconfig-c001
-arm                  randconfig-c002-20220422
-ia64                             allmodconfig
-ia64                             allyesconfig
-ia64                                defconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-nios2                               defconfig
-arc                              allyesconfig
-csky                                defconfig
-nios2                            allyesconfig
-alpha                               defconfig
-alpha                            allyesconfig
-h8300                            allyesconfig
-xtensa                           allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-s390                                defconfig
-s390                             allmodconfig
-parisc                              defconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                             allyesconfig
-sparc                               defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a011
-x86_64                        randconfig-a013
-x86_64                        randconfig-a015
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-riscv                               defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-x86_64                              defconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                         rhel-8.3-kunit
-x86_64                               rhel-8.3
+As said before, your subject is too noisy, you can express this change
+with less words. Something like "...: Override Bluetooth vddio" completely
+covers the "what" of this patch, in 54 characters.
 
-clang tested configs:
-riscv                randconfig-c006-20220422
-mips                 randconfig-c004-20220422
-x86_64                        randconfig-c007
-i386                          randconfig-c001
-arm                  randconfig-c002-20220422
-powerpc              randconfig-c003-20220422
-powerpc                      acadia_defconfig
-mips                           ip27_defconfig
-powerpc                 mpc832x_rdb_defconfig
-powerpc                      ppc64e_defconfig
-powerpc                  mpc885_ads_defconfig
-arm                         socfpga_defconfig
-mips                      malta_kvm_defconfig
-powerpc                    socrates_defconfig
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-hexagon              randconfig-r041-20220422
-s390                 randconfig-r044-20220422
-riscv                randconfig-r042-20220422
-hexagon              randconfig-r045-20220422
+> As IO regulator varies in different SC7280 platforms
+> updating this handler in individual platform bluetooth node.
+> 
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+"Bluetooth vddio in the CRD differs from that in the IDP, override it."
+
+Makes it clear what area is touched, what value is overriden and why
+it's overriden.
+
+Regards,
+Bjorn
+
+> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> ---
+> v4: updated commit text
+> v3: Updated commit text to reflect the change
+> v2: updated reviewer comments.
+> v1: intial patch
+> ---
+> ---
+>  arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> index e2efbdd..6cbbddc 100644
+> --- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> +++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
+> @@ -35,6 +35,10 @@
+>  	};
+>  };
+>  
+> +&bluetooth {
+> +	vddio-supply = <&vreg_l18b_1p8>;
+> +};
+> +
+>  ap_tp_i2c: &i2c0 {
+>  	status = "okay";
+>  	clock-frequency = <400000>;
+> -- 
+> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+> 
