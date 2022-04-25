@@ -2,135 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB35DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 15:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5711BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 16:12:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242661AbiDYPEn (ORCPT
+        id S243255AbiDYQPp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Apr 2022 11:04:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55302 "EHLO
+        Mon, 25 Apr 2022 12:15:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242577AbiDYPEl (ORCPT
+        with ESMTP id S243261AbiDYQPj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Apr 2022 11:04:41 -0400
-Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E995F6C;
-        Mon, 25 Apr 2022 08:01:37 -0700 (PDT)
+        Mon, 25 Apr 2022 12:15:39 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1030811C998
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Apr 2022 09:12:34 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id hu11so12117930qvb.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Apr 2022 09:12:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1650898897; x=1682434897;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=FBrhtTN2aS8dT3F1AKor4CP1gqyYhfOxCA3kTdmrgqA=;
-  b=UjY4g4CE5ScekPwphlgge125EFaJ7B7fnUTrZy9th44WzVhyzZV5dy8E
-   L19pXWfLpYWT3JhLivpHyuS8MdbSWFTHHCFo0ni71JzH/wq6UVCwzzPcL
-   wwdj7LP2kbsVvpePbY2WR2lYlWrafq6s8lStokJ30G4XkevXbFJY/ObNX
-   Y=;
-Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 25 Apr 2022 08:01:37 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 08:01:37 -0700
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Mon, 25 Apr 2022 08:01:34 -0700
-From:   Zijun Hu <quic_zijuhu@quicinc.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v3] Bluetooth: btusb: add support for Qualcomm WCN785x
-Date:   Mon, 25 Apr 2022 23:01:29 +0800
-Message-ID: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=dxyqqTI2+OVOhetC48XiGclQIDnoko/tDpJBQSWmo7M=;
+        b=EIwiaCVPJpsqZ2aaKrdke+8SYCGlFnoG73p3UPB5ewFd+xYo5gRydwZd5W9GYfbMtW
+         TDSd62ww+KRHjVJSmPTJbP7oyiGxs4nY+hnAPYimh75aeGXnwnCjySdWwQVLUiPy6ZJf
+         q6OwD0aLER+taO+jSKjF0hkp8EWFcQsfZ+jokVIa6s+GxWbljdZWtiAEfDxvE6siNdk6
+         tos+MVe/u2EbfPN715aJ847036lxky4b+X3LnZLCjXstyg+bUoAYzuj1Q7Axqol/r+g5
+         nYxcBMu2+Bn9XqJj2lutAhGHuvwM8w5jIgyc51x7rJZbguAuHGsZbVzVeGyaQSxSA5zt
+         Oz5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=dxyqqTI2+OVOhetC48XiGclQIDnoko/tDpJBQSWmo7M=;
+        b=wqAcQql3U85qR66p5tsNLdC0yXjzogsl/6piLc3EpTbuNBjyXfp0Y5z0owcLUNfpN6
+         BQ0lB01XWBbgQ5CK2rnC+gfplwKCSXW7n5kFCWBBLErvdi5sC1HBW1H6+0QSz35cC2ep
+         JsILk3btWXU+NgLeqyBffTzDo8A6ktz0BJU8C18hmszrv31/TjWvSknSEPA2Johd3M8I
+         4bUOxwVt1xoOrcGsErmFcfXNkhVqwUNPf0/YVfr9tECJZgSqCP9M04N6i6+yqS1klmA5
+         wAEaD+LzyAkrU1oawueK7KVaAoA2RCp7soaHKXYgC3qbxKMrh+7bPN3ulf7SF424Xczn
+         jlUQ==
+X-Gm-Message-State: AOAM532lTFxWCvjlbsNb9BNyE4WnkDiK0+O0KVe5XeKsgcRhQOLdMh9B
+        fT2qGhjmCnBc2afNgJevz/WGbxvtTY3+dQ==
+X-Google-Smtp-Source: ABdhPJx6vur1pv0XlltjNSLeopEBKnVRuy8uY5kDlxM6HOL41iKAADDKwKADowU54Y0UbDdoq2dnnw==
+X-Received: by 2002:a05:6214:226a:b0:456:3724:ddab with SMTP id gs10-20020a056214226a00b004563724ddabmr4262262qvb.126.1650903152329;
+        Mon, 25 Apr 2022 09:12:32 -0700 (PDT)
+Received: from [172.17.0.2] ([52.252.110.85])
+        by smtp.gmail.com with ESMTPSA id o4-20020ae9f504000000b0069e75e7387fsm5043091qkg.43.2022.04.25.09.12.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Apr 2022 09:12:32 -0700 (PDT)
+Message-ID: <6266c870.1c69fb81.ac2f.b56e@mx.google.com>
+Date:   Mon, 25 Apr 2022 09:12:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6347312606717167527=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v3] Bluetooth: btusb: add support for Qualcomm WCN785x
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Qualcomm WCN785x has PID/VID 0cf3/e700 as shown by
-/sys/kernel/debug/usb/devices:
+--===============6347312606717167527==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  8 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cf3 ProdID=e700 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=635371
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.76 seconds
+GitLint                       PASS      1.07 seconds
+SubjectPrefix                 PASS      0.87 seconds
+BuildKernel                   PASS      36.74 seconds
+BuildKernel32                 PASS      32.95 seconds
+Incremental Build with patchesPASS      44.00 seconds
+TestRunner: Setup             PASS      553.75 seconds
+TestRunner: l2cap-tester      PASS      19.28 seconds
+TestRunner: bnep-tester       PASS      6.95 seconds
+TestRunner: mgmt-tester       PASS      113.56 seconds
+TestRunner: rfcomm-tester     PASS      10.91 seconds
+TestRunner: sco-tester        PASS      10.52 seconds
+TestRunner: smp-tester        PASS      10.56 seconds
+TestRunner: userchan-tester   PASS      7.28 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 06a854a2507e..e6e28d3d1683 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -317,6 +317,11 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
- 
-+	/* QCA WCN785x chipset */
-+	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
- 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
-@@ -3037,6 +3042,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
- 	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-+	{ 0x00190200, 40, 4, 16 }, /* WCN785x 2.0 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3327,11 +3333,11 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 		if (err < 0)
- 			return err;
- 
--		/* WCN6855 2.1 will reset to apply firmware downloaded here, so
-+		/* WCN6855 2.1 and later will reset to apply firmware downloaded here, so
- 		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
- 		 * cause potential enable failure.
- 		 */
--		if (info->rom_version == 0x00130201)
-+		if (info->rom_version >= 0x00130201)
- 			msleep(QCA_BT_RESET_WAIT_MS);
- 	}
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
+--===============6347312606717167527==--
