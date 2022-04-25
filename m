@@ -2,127 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B73C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 03:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9741EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 03:57:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240513AbiDYDEM (ORCPT
+        id S240612AbiDYEAr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 24 Apr 2022 23:04:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51806 "EHLO
+        Mon, 25 Apr 2022 00:00:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbiDYDEK (ORCPT
+        with ESMTP id S229996AbiDYEAl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 24 Apr 2022 23:04:10 -0400
-Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7B61B7BD;
-        Sun, 24 Apr 2022 20:01:06 -0700 (PDT)
-Received: from relay.mailchannels.net (localhost [127.0.0.1])
-        by relay.mailchannels.net (Postfix) with ESMTP id 6E6E2C13B4;
-        Mon, 25 Apr 2022 03:01:05 +0000 (UTC)
-Received: from pdx1-sub0-mail-a217.dreamhost.com (unknown [127.0.0.6])
-        (Authenticated sender: dreamhost)
-        by relay.mailchannels.net (Postfix) with ESMTPA id 98D18C15B2;
-        Mon, 25 Apr 2022 03:01:04 +0000 (UTC)
-ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1650855664; a=rsa-sha256;
-        cv=none;
-        b=H9YMoe/idniQ4oRp9Q6cTnJUHzUf0nEAmLqRz2/zJNVBcVjQc9fxBRsxt3XyEVjIpUykph
-        Xj2yFner+wwkb+0WOAOeg7gk9L5h4VA6J5boQEulI8eu0TA7iX8KGJKVqLnzsorqNq+rug
-        rCRG9ZbQ5eG/n2DNmBnPPUXkHY/oHAhg5LawAAUg2lYfbGNgjhQ4XvDg4pUyRR4OPzYYIn
-        Crb+SuSn7dT/pvYYF9dSiaOvLcnpv3n6ZG0lQyqVolnXSKQcm+3wVbUJ1sAc0rAcmyLgA9
-        Dr75+tGuzymOuOnyU2wnUHdjNWVoqB8TEYI4akknfAMTQO2ussSSNF1OriAoAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
- d=mailchannels.net;
-        s=arc-2022; t=1650855664;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:dkim-signature;
-        bh=FnZ8llSJWkl2FqoEfQdnZQWLmuu+j68/tH7/8sZn3UY=;
-        b=TGbEm/JiTeLA8E2OINRL3m+y2CBEOvCQON2tx/bLEzyDbnXed+rFINuJto6L/S1IQ6Z68w
-        ke8TbjiObgPLkx6mLshRa4O4JSlzhREvJePtRtd8A42Ii04TjDc10tMB7+T2L0KT95Xx02
-        OXALCw0CWNkSgZ3szMyf3EzXzUP2nC/qogAgsqqusDbZiG/tYqejf+YM47chcfF247N+ug
-        d1UBtB8hWGRAulLVROZkkp8VT7QOZBAZ7xgaFQu9+PH2H7fM/vPPDbNodTb0l/65x1ObMa
-        PNvrsbbxTk1zkwz67BmxCyNwF6Oeb07cP932woFb1vhDjlbKWSzLa/Hwx2oDkA==
-ARC-Authentication-Results: i=1;
-        rspamd-6dfbdcb948-4k72z;
-        auth=pass smtp.auth=dreamhost smtp.mailfrom=ian@linux.cowan.aero
-X-MC-Relay: Neutral
-X-MailChannels-SenderId: dreamhost|x-authsender|ian@linux.cowan.aero
-X-MailChannels-Auth-Id: dreamhost
-X-Bottle-Arch: 39d2fbac15c5e251_1650855665044_2609463641
-X-MC-Loop-Signature: 1650855665043:2074948883
-X-MC-Ingress-Time: 1650855665043
-Received: from pdx1-sub0-mail-a217.dreamhost.com (pop.dreamhost.com
- [64.90.62.162])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
-        by 100.116.106.102 (trex/6.7.1);
-        Mon, 25 Apr 2022 03:01:05 +0000
-Received: from localhost.localdomain (unknown [69.12.38.97])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: ian@linux.cowan.aero)
-        by pdx1-sub0-mail-a217.dreamhost.com (Postfix) with ESMTPSA id 4KmqXH3M74z2n;
-        Sun, 24 Apr 2022 20:01:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.cowan.aero;
-        s=dreamhost; t=1650855664;
-        bh=FnZ8llSJWkl2FqoEfQdnZQWLmuu+j68/tH7/8sZn3UY=;
-        h=From:To:Cc:Subject:Date:Content-Transfer-Encoding;
-        b=siVSzLaEaaqZT/RAhNBylm4r5vV8JuOFCeG1sURL8AdbRiCzRrK+19KSq7aL2ienI
-         3a+BxU0wc2KXC6txjBN5UmMk4ot26YrxYU4EL6oytvRs1fWsMvrB171iaHD9q+aPcA
-         +Q/IdORkxLg8eufTGAuLMx/fc875DeZ+NJswTiZtbgAG+jba5bvXl6CVZgsor1QOzt
-         SPQHNV+e6q0i2gCyQi7FTnDZ5icniPzYtPMo7c15BVZMAgPTp6NhnFiocbiMPe+Sp6
-         5y63n74rjw1vH7P3Ii8W71f6xBaRXJyF17Uzi7OVKLuQHoS7FROATvetQUueOeKyAz
-         SLU7UvPGcJlVg==
-From:   Ian Cowan <ian@linux.cowan.aero>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ian Cowan <ian@linux.cowan.aero>
-Subject: [PATCH] drivers: net: bluetooth: centralize function exit and print error
-Date:   Sun, 24 Apr 2022 23:00:53 -0400
-Message-Id: <20220425030053.517168-1-ian@linux.cowan.aero>
-X-Mailer: git-send-email 2.35.1
+        Mon, 25 Apr 2022 00:00:41 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC48335AAC
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Apr 2022 20:57:36 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id ay11so9564600qtb.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Apr 2022 20:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=q8EHtyqbOZZ1mLehoEkfXE2ylwvKIneqK4tXb+Acae0=;
+        b=NSHhW9c8dM7oHsfm8HzHKy54oqgJjLFZEZ9rJP1tvmy91GamD8pCYo9GSO5LHv+2dN
+         gb5pnHviTinRIp9SdMSdf4oDoiCU+/pMSu7B0Ni84eZTcSphdGEKYk/HpkKzmBlQOK1y
+         OMawLHiA8HsqaQteNffvm4yQb7jWxnjzHRM9WjDq7SCCo429xFXDjAIepoX7iT2VkTqg
+         BDFj/HNMi3pitJvN//Da0B0+85Cj7MdSJn2Ivv0h22Chnl6SHjOUHUISRQqvf0bBfGjz
+         kaoobK9UgwIVntafyCrirI/kSGP53K7MkBLHB82eb1YRR0qmkTPAGCho4uhQazFwhIu8
+         l54Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=q8EHtyqbOZZ1mLehoEkfXE2ylwvKIneqK4tXb+Acae0=;
+        b=K1EQNsB6mAa66SLMBSqqxy97h0BqtCGDjlq2PbqdtUgr8mPbsneDDcoOG6oYps8G8I
+         dHMvQAg7un5r6RzcA1iSPm3sBe73LnReEwFwT1+4mpUmUWh2b2kPCjE29f6tX1X2C8hA
+         OkoxO0EnEfbjuM02QlTv2cAWRVKr0dO78eQ61+JXcNQhwGlNW/216fh00o1S3d4hFVAH
+         mi9MURhdWTKZmsX4ieDRGJDvVEcJosjKqzmSnkmkFXkYZl0KvbO28IaSqjY9qzIZ2P9j
+         +ec+LC5EfztRKJ8yv3MEoyQQ+f2Iq/+pqLAsR2GPdEnl5Tfw+uHKsdJB87am4l8OUxaT
+         DsMw==
+X-Gm-Message-State: AOAM532YJ++ybFquwAaCWnYtgA7VcYCjj6eChRdmW1yakrWT7SpDeDdQ
+        EaWNv3JRl4TScFhU0/XGRLEh4lONGyOQEA==
+X-Google-Smtp-Source: ABdhPJxnxhsmO/5IGupJbHhi/ves2+01BN0JHHoZSxSOr+LjizG61JZV/dbucleVj6u3Ljob7d0TJA==
+X-Received: by 2002:ac8:5b95:0:b0:2f3:6d44:9611 with SMTP id a21-20020ac85b95000000b002f36d449611mr399151qta.163.1650859055738;
+        Sun, 24 Apr 2022 20:57:35 -0700 (PDT)
+Received: from [172.17.0.2] ([20.230.40.246])
+        by smtp.gmail.com with ESMTPSA id b17-20020ac87fd1000000b002f34449232bsm5962056qtk.9.2022.04.24.20.57.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Apr 2022 20:57:35 -0700 (PDT)
+Message-ID: <62661c2f.1c69fb81.9d03a.ffd3@mx.google.com>
+Date:   Sun, 24 Apr 2022 20:57:35 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8326595720246713578=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, ian@linux.cowan.aero
+Subject: RE: drivers: net: bluetooth: centralize function exit and print error
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220425030053.517168-1-ian@linux.cowan.aero>
+References: <20220425030053.517168-1-ian@linux.cowan.aero>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Centralize the return for this one function, and this will add the error
-being printed if it occurs earlier in the function. The same thing will
-be returned with the logic, so the only thing that will differ is an
-extra debugging output for an error.
+--===============8326595720246713578==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Ian Cowan <ian@linux.cowan.aero>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=635140
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.66 seconds
+GitLint                       PASS      0.95 seconds
+SubjectPrefix                 FAIL      0.83 seconds
+BuildKernel                   PASS      31.73 seconds
+BuildKernel32                 PASS      29.18 seconds
+Incremental Build with patchesPASS      38.44 seconds
+TestRunner: Setup             PASS      474.46 seconds
+TestRunner: l2cap-tester      PASS      17.79 seconds
+TestRunner: bnep-tester       PASS      6.41 seconds
+TestRunner: mgmt-tester       PASS      104.80 seconds
+TestRunner: rfcomm-tester     PASS      9.90 seconds
+TestRunner: sco-tester        PASS      9.63 seconds
+TestRunner: smp-tester        PASS      9.66 seconds
+TestRunner: userchan-tester   PASS      6.67 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.83 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- net/bluetooth/6lowpan.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 215af9b3b589..15928e9ce088 100644
---- a/net/bluetooth/6lowpan.c
-+++ b/net/bluetooth/6lowpan.c
-@@ -516,7 +516,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	err = setup_header(skb, netdev, &addr, &addr_type);
- 	if (err < 0) {
- 		kfree_skb(skb);
--		return NET_XMIT_DROP;
-+		goto output_error_ret;
- 	}
- 
- 	if (err) {
-@@ -537,6 +537,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 
- 	dev_kfree_skb(skb);
- 
-+output_error_ret:
- 	if (err)
- 		BT_DBG("ERROR: xmit failed (%d)", err);
- 
--- 
-2.35.1
 
+--===============8326595720246713578==--
