@@ -2,82 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD036C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 14:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB35DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 15:01:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbiDYOdi (ORCPT
+        id S242661AbiDYPEn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Apr 2022 10:33:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46758 "EHLO
+        Mon, 25 Apr 2022 11:04:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234166AbiDYOde (ORCPT
+        with ESMTP id S242577AbiDYPEl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Apr 2022 10:33:34 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0567534BB8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Apr 2022 07:30:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B7145B8184F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Apr 2022 14:30:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 51A9EC385A7;
-        Mon, 25 Apr 2022 14:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650897027;
-        bh=FzoW20lQaV0AspO9OsC2h2eStvDhqbdsckW6Trr/UQI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=c7Sv2Kb1YZggoPySYzCDBIyMDGHXrVaBwx3JGkUEysLV+YzRYWvMUcDhFwMhQD7U5
-         7R0Rq6EKRcEi/VHvxJxRcQc9AZ7ArLAFi8jnZLppFm3olv11ig05wI2Tfq/4u67dbG
-         f1G22JIw9gWO9tAkW/RspH/jrkLMaG2gocw182B0UxeefYjRoRhuT7iXBxR6QYpKsx
-         H2Lb0xljFA2Qo74NHnXe5Pis9p3N0FT4fjfG+rUk+jcoxpex9jimNn8TcrowxWWOtT
-         ahTir+iPdcPzBNu+9DOGp6nfnnOMRxw8WI5zIVpi9Y4OFI5Zlsya+fYlCUDU8TYsJ6
-         oD+7+XqTmIpLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29491E8DD67;
-        Mon, 25 Apr 2022 14:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 25 Apr 2022 11:04:41 -0400
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E995F6C;
+        Mon, 25 Apr 2022 08:01:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1650898897; x=1682434897;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=FBrhtTN2aS8dT3F1AKor4CP1gqyYhfOxCA3kTdmrgqA=;
+  b=UjY4g4CE5ScekPwphlgge125EFaJ7B7fnUTrZy9th44WzVhyzZV5dy8E
+   L19pXWfLpYWT3JhLivpHyuS8MdbSWFTHHCFo0ni71JzH/wq6UVCwzzPcL
+   wwdj7LP2kbsVvpePbY2WR2lYlWrafq6s8lStokJ30G4XkevXbFJY/ObNX
+   Y=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+  by alexa-out-sd-02.qualcomm.com with ESMTP; 25 Apr 2022 08:01:37 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Apr 2022 08:01:37 -0700
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Mon, 25 Apr 2022 08:01:34 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v3] Bluetooth: btusb: add support for Qualcomm WCN785x
+Date:   Mon, 25 Apr 2022 23:01:29 +0800
+Message-ID: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: protect le accept and resolv lists with hdev->lock
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165089702716.25646.7761597175138105526.git-patchwork-notify@kernel.org>
-Date:   Mon, 25 Apr 2022 14:30:27 +0000
-References: <20220422223116.70026-1-dossche.niels@gmail.com>
-In-Reply-To: <20220422223116.70026-1-dossche.niels@gmail.com>
-To:     Niels Dossche <dossche.niels@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        ankit.p.navik@intel.com
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Qualcomm WCN785x has PID/VID 0cf3/e700 as shown by
+/sys/kernel/debug/usb/devices:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  8 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e700 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
 
-On Sat, 23 Apr 2022 00:31:17 +0200 you wrote:
-> Concurrent operations from events on le_{accept,resolv}_list are
-> currently unprotected by hdev->lock.
-> Most existing code do already protect the lists with that lock.
-> This can be observed in hci_debugfs and hci_sync.
-> Add the protection for these events too.
-> 
-> Fixes: b950aa88638c ("Bluetooth: Add definitions and track LE resolve list modification")
-> Fixes: 0f36b589e4ee ("Bluetooth: Track LE white list modification via HCI commands")
-> Signed-off-by: Niels Dossche <dossche.niels@gmail.com>
-> 
-> [...]
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Here is the summary with links:
-  - Bluetooth: protect le accept and resolv lists with hdev->lock
-    https://git.kernel.org/bluetooth/bluetooth-next/c/df50527dbc32
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 06a854a2507e..e6e28d3d1683 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -317,6 +317,11 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+ 
++	/* QCA WCN785x chipset */
++	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+ 	{ USB_DEVICE(0x0a5c, 0x200a), .driver_info = BTUSB_WRONG_SCO_MTU },
+@@ -3037,6 +3042,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+ 	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
++	{ 0x00190200, 40, 4, 16 }, /* WCN785x 2.0 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3327,11 +3333,11 @@ static int btusb_setup_qca(struct hci_dev *hdev)
+ 		if (err < 0)
+ 			return err;
+ 
+-		/* WCN6855 2.1 will reset to apply firmware downloaded here, so
++		/* WCN6855 2.1 and later will reset to apply firmware downloaded here, so
+ 		 * wait ~100ms for reset Done then go ahead, otherwise, it maybe
+ 		 * cause potential enable failure.
+ 		 */
+-		if (info->rom_version == 0x00130201)
++		if (info->rom_version >= 0x00130201)
+ 			msleep(QCA_BT_RESET_WAIT_MS);
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
