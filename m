@@ -2,133 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFEAC43217
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Apr 2022 15:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B73C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Apr 2022 03:01:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234968AbiDWPi0 (ORCPT
+        id S240513AbiDYDEM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 23 Apr 2022 11:38:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36892 "EHLO
+        Sun, 24 Apr 2022 23:04:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230228AbiDWPiZ (ORCPT
+        with ESMTP id S229577AbiDYDEK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 23 Apr 2022 11:38:25 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 034E610FE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Apr 2022 08:35:27 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id v65so7598744oig.10
-        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Apr 2022 08:35:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=yZmrXMgw1MBRyJ3VvvD/S/NJK9gJ19shfJZhz6rDBD8=;
-        b=mGSQvuV4hkqafUS7ZKoo2FiRZjhxNffY3wsAOyi1ma31ijRXbJn7+RGsvTN6SXsFGX
-         wKkFcFDQHKqocEa661h2Jjyd41tSBDAQR9fFp0fTa7nU065FkmcLu6e1fcP1s9rhoqZj
-         d32vvCyFvTHHFxt4RpSRFdovtI6OsL6Lebx9Hg7Stu0I7Sby4ZxAiSgi4Kx8RgifAM/+
-         /oO28YDzcfR8AgzXwbBxfaJBjz1qK42jCwypNOXerWO+v6k4fnV1v/dGEt2y2M7DudbP
-         qTatpmrm4WRPsciOM8dowgfI1mcbKTcUeOto2H6tIeHIqPuZWFa3Rr/GfSni5GmgOtHH
-         7Eaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=yZmrXMgw1MBRyJ3VvvD/S/NJK9gJ19shfJZhz6rDBD8=;
-        b=faSUt/foGuKDjGrENKsZ/B6WeKLcL9c16l4wPfPBWoxLXwDk9340CBjN65Md4rKmUf
-         38hhZt0cNiIWXkRPLVt4xZj0aAeGI+/zMPjIcMnzeUBlUQMruP0Wq37nNEMNliSRlyfN
-         ZBUhP8XKkI9IC2XjZe8tYZRpDAaUy+u62VcRvbtTRLDWcFdtoeAYjgNcuvzAOq0wcM8k
-         Hd1ujjVIZdMP9idITrvhLFlxju0CI5YFMsImu4mHXQqpXHFVJuGBo1SA83WiivKsqaun
-         wHSL7N9p9o97xLLPo7uTinxf1feoC/9MXtvFCJO2sQhlHZ9EhGDFS3wl/UkPjzA4Vt39
-         RArQ==
-X-Gm-Message-State: AOAM533aVvejVmMSsP7eZjdwN6KDunnSKYzzlDr6aGuM9A5jcZJuDDtD
-        BybIFnh7s2Z2FhIzmeU9OJSqBQ==
-X-Google-Smtp-Source: ABdhPJwEkJcEyjTPFjAvW1fVnvHs6ADGz6qPasmzNXMt4XfJZ82bYxcgsxvOViNCsBPsSyFJ5kSPgQ==
-X-Received: by 2002:a05:6808:144a:b0:325:642:f58f with SMTP id x10-20020a056808144a00b003250642f58fmr1307346oiv.221.1650728126028;
-        Sat, 23 Apr 2022 08:35:26 -0700 (PDT)
-Received: from builder.lan ([2600:1700:a0:3dc8:3697:f6ff:fe85:aac9])
-        by smtp.gmail.com with ESMTPSA id j9-20020a056808056900b0032252797ea4sm1948720oig.6.2022.04.23.08.35.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Apr 2022 08:35:25 -0700 (PDT)
-Date:   Sat, 23 Apr 2022 10:35:23 -0500
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, agross@kernel.org,
-        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        mka@chromium.org, quic_hemantg@quicinc.com,
-        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
-        quic_hbandi@quicinc.com, abhishekpandit@chromium.org,
-        mcchou@chromium.org
-Subject: Re: [PATCH v4] Bluetooth: arm64: dts: qcom: sc7280: Add IO regulator
- handler in SC7280 CRD platforms
-Message-ID: <YmQcu2GVES4FuwFU@builder.lan>
-References: <1650458740-16957-1-git-send-email-quic_saluvala@quicinc.com>
+        Sun, 24 Apr 2022 23:04:10 -0400
+Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F7B61B7BD;
+        Sun, 24 Apr 2022 20:01:06 -0700 (PDT)
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+        by relay.mailchannels.net (Postfix) with ESMTP id 6E6E2C13B4;
+        Mon, 25 Apr 2022 03:01:05 +0000 (UTC)
+Received: from pdx1-sub0-mail-a217.dreamhost.com (unknown [127.0.0.6])
+        (Authenticated sender: dreamhost)
+        by relay.mailchannels.net (Postfix) with ESMTPA id 98D18C15B2;
+        Mon, 25 Apr 2022 03:01:04 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1650855664; a=rsa-sha256;
+        cv=none;
+        b=H9YMoe/idniQ4oRp9Q6cTnJUHzUf0nEAmLqRz2/zJNVBcVjQc9fxBRsxt3XyEVjIpUykph
+        Xj2yFner+wwkb+0WOAOeg7gk9L5h4VA6J5boQEulI8eu0TA7iX8KGJKVqLnzsorqNq+rug
+        rCRG9ZbQ5eG/n2DNmBnPPUXkHY/oHAhg5LawAAUg2lYfbGNgjhQ4XvDg4pUyRR4OPzYYIn
+        Crb+SuSn7dT/pvYYF9dSiaOvLcnpv3n6ZG0lQyqVolnXSKQcm+3wVbUJ1sAc0rAcmyLgA9
+        Dr75+tGuzymOuOnyU2wnUHdjNWVoqB8TEYI4akknfAMTQO2ussSSNF1OriAoAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+        s=arc-2022; t=1650855664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:dkim-signature;
+        bh=FnZ8llSJWkl2FqoEfQdnZQWLmuu+j68/tH7/8sZn3UY=;
+        b=TGbEm/JiTeLA8E2OINRL3m+y2CBEOvCQON2tx/bLEzyDbnXed+rFINuJto6L/S1IQ6Z68w
+        ke8TbjiObgPLkx6mLshRa4O4JSlzhREvJePtRtd8A42Ii04TjDc10tMB7+T2L0KT95Xx02
+        OXALCw0CWNkSgZ3szMyf3EzXzUP2nC/qogAgsqqusDbZiG/tYqejf+YM47chcfF247N+ug
+        d1UBtB8hWGRAulLVROZkkp8VT7QOZBAZ7xgaFQu9+PH2H7fM/vPPDbNodTb0l/65x1ObMa
+        PNvrsbbxTk1zkwz67BmxCyNwF6Oeb07cP932woFb1vhDjlbKWSzLa/Hwx2oDkA==
+ARC-Authentication-Results: i=1;
+        rspamd-6dfbdcb948-4k72z;
+        auth=pass smtp.auth=dreamhost smtp.mailfrom=ian@linux.cowan.aero
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|ian@linux.cowan.aero
+X-MailChannels-Auth-Id: dreamhost
+X-Bottle-Arch: 39d2fbac15c5e251_1650855665044_2609463641
+X-MC-Loop-Signature: 1650855665043:2074948883
+X-MC-Ingress-Time: 1650855665043
+Received: from pdx1-sub0-mail-a217.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+        by 100.116.106.102 (trex/6.7.1);
+        Mon, 25 Apr 2022 03:01:05 +0000
+Received: from localhost.localdomain (unknown [69.12.38.97])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: ian@linux.cowan.aero)
+        by pdx1-sub0-mail-a217.dreamhost.com (Postfix) with ESMTPSA id 4KmqXH3M74z2n;
+        Sun, 24 Apr 2022 20:01:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.cowan.aero;
+        s=dreamhost; t=1650855664;
+        bh=FnZ8llSJWkl2FqoEfQdnZQWLmuu+j68/tH7/8sZn3UY=;
+        h=From:To:Cc:Subject:Date:Content-Transfer-Encoding;
+        b=siVSzLaEaaqZT/RAhNBylm4r5vV8JuOFCeG1sURL8AdbRiCzRrK+19KSq7aL2ienI
+         3a+BxU0wc2KXC6txjBN5UmMk4ot26YrxYU4EL6oytvRs1fWsMvrB171iaHD9q+aPcA
+         +Q/IdORkxLg8eufTGAuLMx/fc875DeZ+NJswTiZtbgAG+jba5bvXl6CVZgsor1QOzt
+         SPQHNV+e6q0i2gCyQi7FTnDZ5icniPzYtPMo7c15BVZMAgPTp6NhnFiocbiMPe+Sp6
+         5y63n74rjw1vH7P3Ii8W71f6xBaRXJyF17Uzi7OVKLuQHoS7FROATvetQUueOeKyAz
+         SLU7UvPGcJlVg==
+From:   Ian Cowan <ian@linux.cowan.aero>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ian Cowan <ian@linux.cowan.aero>
+Subject: [PATCH] drivers: net: bluetooth: centralize function exit and print error
+Date:   Sun, 24 Apr 2022 23:00:53 -0400
+Message-Id: <20220425030053.517168-1-ian@linux.cowan.aero>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1650458740-16957-1-git-send-email-quic_saluvala@quicinc.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed 20 Apr 07:45 CDT 2022, Sai Teja Aluvala wrote:
+Centralize the return for this one function, and this will add the error
+being printed if it occurs earlier in the function. The same thing will
+be returned with the logic, so the only thing that will differ is an
+extra debugging output for an error.
 
-Look here:
+Signed-off-by: Ian Cowan <ian@linux.cowan.aero>
+---
+ net/bluetooth/6lowpan.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-$ git log --oneline -- sc7280-crd.dts
-737f9ea6cee7 arm64: dts: qcom: sc7280: Rename crd to crd-r3
-073a39a2a63a arm64: dts: qcom: sc7280: Add pmg1110 regulators for sc7280-crd
-3ebf11fa4a35 arm64: dts: qcom: sc7280-crd: Add Touchscreen and touchpad support
-248da168fbae arm64: dts: qcom: sc7280: Define EC and H1 nodes for IDP/CRD
-427b249504ea arm64: dts: qcom: sc7280-crd: Add device tree files for CRD
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 215af9b3b589..15928e9ce088 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -516,7 +516,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	err = setup_header(skb, netdev, &addr, &addr_type);
+ 	if (err < 0) {
+ 		kfree_skb(skb);
+-		return NET_XMIT_DROP;
++		goto output_error_ret;
+ 	}
+ 
+ 	if (err) {
+@@ -537,6 +537,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 
+ 	dev_kfree_skb(skb);
+ 
++output_error_ret:
+ 	if (err)
+ 		BT_DBG("ERROR: xmit failed (%d)", err);
+ 
+-- 
+2.35.1
 
-You have 2 commits specifically touching this file and you have 3
-touching the platform. Your change touches only the single board, so it
-should match the two.
-
-As said before, your subject is too noisy, you can express this change
-with less words. Something like "...: Override Bluetooth vddio" completely
-covers the "what" of this patch, in 54 characters.
-
-> As IO regulator varies in different SC7280 platforms
-> updating this handler in individual platform bluetooth node.
-> 
-
-"Bluetooth vddio in the CRD differs from that in the IDP, override it."
-
-Makes it clear what area is touched, what value is overriden and why
-it's overriden.
-
-Regards,
-Bjorn
-
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> ---
-> v4: updated commit text
-> v3: Updated commit text to reflect the change
-> v2: updated reviewer comments.
-> v1: intial patch
-> ---
-> ---
->  arch/arm64/boot/dts/qcom/sc7280-crd.dts | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/sc7280-crd.dts b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> index e2efbdd..6cbbddc 100644
-> --- a/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> +++ b/arch/arm64/boot/dts/qcom/sc7280-crd.dts
-> @@ -35,6 +35,10 @@
->  	};
->  };
->  
-> +&bluetooth {
-> +	vddio-supply = <&vreg_l18b_1p8>;
-> +};
-> +
->  ap_tp_i2c: &i2c0 {
->  	status = "okay";
->  	clock-frequency = <400000>;
-> -- 
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
-> 
