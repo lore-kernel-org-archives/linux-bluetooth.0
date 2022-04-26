@@ -2,81 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D55C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 18:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6C08C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 19:39:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353743AbiDZSXb (ORCPT
+        id S1354000AbiDZTmv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Apr 2022 14:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42848 "EHLO
+        Tue, 26 Apr 2022 15:42:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245551AbiDZSXY (ORCPT
+        with ESMTP id S1345512AbiDZTmu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Apr 2022 14:23:24 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D49627C;
-        Tue, 26 Apr 2022 11:20:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5F907B821FD;
-        Tue, 26 Apr 2022 18:20:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 16D20C385AA;
-        Tue, 26 Apr 2022 18:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650997212;
-        bh=IChXkZaJvZkNcfmr+3DC8BXoJsGWNChHpzqf694eNpI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=nxyY8gH7KtrErcm+JZ147vq0vNiDVKN8B8r7PPix9wXJGvaDkG7bmCC9ce3dS4wJ6
-         7lFcDJNl5GFzEnoKnhB1ZHQsajw4NWoAhU6J0Rcpk8YbgCWQ64n6j7Iw7d7RpB7/Kn
-         wp4Bck1kOLu0c1IcLVE0mwn92TymSvW11KluA7nJqLriBd08JR4KctUwKAbNp9Sfnq
-         AnEXY6m5wmMVxoTYR+zMhHOF21S1Zpq1ZFMq5e+mcJL2lwW00edgCEc8UE6v0JXbzK
-         n9GFG48N8nmrs+eFXW/wPmXrQnoWfz1sVrnc5Dx7Ay3PHlxXnBbPpsxdaPQFHqO611
-         kvU5tTmzBN/dw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7108F0383D;
-        Tue, 26 Apr 2022 18:20:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 26 Apr 2022 15:42:50 -0400
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530D61102A3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Apr 2022 12:39:41 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id bz24so13556087qtb.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Apr 2022 12:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=jpXvVB1Sw3L3mJ9RCaMGeO+SHPqraLUQMT+a+bRvNg0=;
+        b=gc2W47C7KqdDcM53eyQsHrHq+t8bCS/iWmIpURofxmbHoeMh/a8nn5JXWpsIqjLq9Q
+         lsE6lN3//mXDMx7vyjK31d5TZHoZf1vfGne3RsvncvPik42yx7VjzhC/l0QqIE8aRjQw
+         Lt51o+WUNwh7+lAl4qAD3sVxdqoMRYDQVaAQRd8eg65ujuKX7OKsDnn25QnrjX3ssq10
+         U+ypnVoWS3niCZg4EX/1GSqq+MVTam9TofVGIr/HjXtJhpVSoGbVYm+lohK7ZO/ji5BD
+         tn62ft+JVsziMRFUKfHan2lim3mKhsO+mwBTEyFhsjIeL0yQtuM76MmlYbxCO3uI/AOA
+         uDVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=jpXvVB1Sw3L3mJ9RCaMGeO+SHPqraLUQMT+a+bRvNg0=;
+        b=6bgpwJhd38bchLnT5pp0OFaDWozaLEIFrwbAWxjLur+7KJjSxTc82wRDhGjPtL9myH
+         g6UPAufKKPv9yDA8+pL3lEv+Q5MSFvhLLoLiYgUu6Ja3RZByHI+LxkZ53lWdMt8rrb/g
+         NvZg5nSqyY93NKfVVMoeYFi6vd8gyuyeIEZyYFLAh4DJr37SmopsvJxNUSOxZN0WdOaB
+         eBuaeC7Xr1Bh5RXANNGNZ79OLny/k8jT3FDwvs2Lwx0DqTCZS0LnALFd2Syai7sUHfBd
+         7oSyvnncTNSox7WFLPaEWMg41GmlwEOttcatu3PbWCBb5h5Pq+yHdTG0aRYKTEJRky5g
+         edsw==
+X-Gm-Message-State: AOAM532/7LEmojtBzyLV8UKzX0mP52/2EQCmdBYLYwVcVWIhf52jpius
+        TNwvBq4TbPsPQimfezhqqDtzUjimtxM=
+X-Google-Smtp-Source: ABdhPJzG2lvfIrg/oYtEmBxB1W9edKOnE7RFhecQvC1MvWiVftLbdFGkfEu5fuXxa0o6ZiyOqscQhQ==
+X-Received: by 2002:ac8:5e54:0:b0:2f1:f60d:2b3c with SMTP id i20-20020ac85e54000000b002f1f60d2b3cmr16534308qtx.667.1651001980024;
+        Tue, 26 Apr 2022 12:39:40 -0700 (PDT)
+Received: from [172.17.0.2] ([40.112.49.152])
+        by smtp.gmail.com with ESMTPSA id l13-20020a05622a050d00b002f205ba53efsm8576058qtx.25.2022.04.26.12.39.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Apr 2022 12:39:39 -0700 (PDT)
+Message-ID: <62684a7b.1c69fb81.8dccf.209f@mx.google.com>
+Date:   Tue, 26 Apr 2022 12:39:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2438250801493236288=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: core: Fix missing power_on work cancel on HCI
- close
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165099721194.28515.11075486461525033162.git-patchwork-notify@kernel.org>
-Date:   Tue, 26 Apr 2022 18:20:11 +0000
-References: <20220426081823.21557-1-vasyl.vavrychuk@opensynergy.com>
-In-Reply-To: <20220426081823.21557-1-vasyl.vavrychuk@opensynergy.com>
-To:     Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
-Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        kuba@kernel.org, pabeni@redhat.com
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v2,BlueZ] client/player: Add transport.receive command
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220426180401.794718-1-luiz.dentz@gmail.com>
+References: <20220426180401.794718-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============2438250801493236288==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+This is automated email and please do not reply to this email!
 
-On Tue, 26 Apr 2022 11:18:23 +0300 you wrote:
-> Move power_on work cancel to hci_dev_close_sync to ensure that power_on
-> work is canceled after HCI interface down, power off, rfkill, etc.
-> 
-> For example, if
-> 
->     hciconfig hci0 down
-> 
-> [...]
+Dear submitter,
 
-Here is the summary with links:
-  - Bluetooth: core: Fix missing power_on work cancel on HCI close
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2d866d8ec36f
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=635861
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.50 seconds
+GitLint                       FAIL      1.01 seconds
+Prep - Setup ELL              PASS      42.35 seconds
+Build - Prep                  PASS      0.70 seconds
+Build - Configure             PASS      8.43 seconds
+Build - Make                  PASS      1357.65 seconds
+Make Check                    PASS      11.97 seconds
+Make Check w/Valgrind         PASS      441.40 seconds
+Make Distcheck                PASS      226.99 seconds
+Build w/ext ELL - Configure   PASS      8.58 seconds
+Build w/ext ELL - Make        PASS      1358.19 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[v2,BlueZ] client/player: Add transport.receive command
+9: B3 Line contains hard tab characters (\t): "	 receive [filename]"
 
 
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2438250801493236288==--
