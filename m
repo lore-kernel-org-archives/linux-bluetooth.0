@@ -2,53 +2,55 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E57EC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 18:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D55C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 18:20:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353716AbiDZSX2 (ORCPT
+        id S1353743AbiDZSXb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Apr 2022 14:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42740 "EHLO
+        Tue, 26 Apr 2022 14:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350350AbiDZSXX (ORCPT
+        with ESMTP id S245551AbiDZSXY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Apr 2022 14:23:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79F9ABC8C;
-        Tue, 26 Apr 2022 11:20:13 -0700 (PDT)
+        Tue, 26 Apr 2022 14:23:24 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D49627C;
+        Tue, 26 Apr 2022 11:20:14 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9F4AB6187F;
-        Tue, 26 Apr 2022 18:20:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 09B6DC385A0;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5F907B821FD;
+        Tue, 26 Apr 2022 18:20:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 16D20C385AA;
         Tue, 26 Apr 2022 18:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1650997212;
-        bh=pUAAbRv5wP4gWM5AuRMqHaGND3XB7Ugb5gqYlrWTp/I=;
+        bh=IChXkZaJvZkNcfmr+3DC8BXoJsGWNChHpzqf694eNpI=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=BqU+6eblqStF3Yz7DhWeuRwbOuljqcOq9vC8dFfhpJm8ypOFiS9nbJdv/yxDIu1mz
-         LYazen/u/v2XeX6GTxUfklH+uJ6nQIIl7gqC0EIotVTXFw+L88J1W2lmnQ9kejIJi0
-         q7ZQ401HJZH939rkNmTqxLB46zyqNsgiPFKn546mF1Idl5P4ji4C6rE85UgEXDwraI
-         e8RJs9oBdexeRiBypUAAfgEhMS+BMzWkmBThzdzzXLV1zhVVI3z4x2ZZNm0NpdojP3
-         y9utFypzh/Ikwy5wrpvKUvE/AbhWCUuc2wUKLuYEXFKjwm3sQSGYffFd4dmvFL0Dj7
-         xEFlO4negZr2A==
+        b=nxyY8gH7KtrErcm+JZ147vq0vNiDVKN8B8r7PPix9wXJGvaDkG7bmCC9ce3dS4wJ6
+         7lFcDJNl5GFzEnoKnhB1ZHQsajw4NWoAhU6J0Rcpk8YbgCWQ64n6j7Iw7d7RpB7/Kn
+         wp4Bck1kOLu0c1IcLVE0mwn92TymSvW11KluA7nJqLriBd08JR4KctUwKAbNp9Sfnq
+         AnEXY6m5wmMVxoTYR+zMhHOF21S1Zpq1ZFMq5e+mcJL2lwW00edgCEc8UE6v0JXbzK
+         n9GFG48N8nmrs+eFXW/wPmXrQnoWfz1sVrnc5Dx7Ay3PHlxXnBbPpsxdaPQFHqO611
+         kvU5tTmzBN/dw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD0B2F67CA0;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7108F0383D;
         Tue, 26 Apr 2022 18:20:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: btusb: add support for Qualcomm WCN785x
+Subject: Re: [PATCH] Bluetooth: core: Fix missing power_on work cancel on HCI
+ close
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165099721190.28515.14695801626807676486.git-patchwork-notify@kernel.org>
+Message-Id: <165099721194.28515.11075486461525033162.git-patchwork-notify@kernel.org>
 Date:   Tue, 26 Apr 2022 18:20:11 +0000
-References: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1650898889-12470-1-git-send-email-quic_zijuhu@quicinc.com>
-To:     quic_zijuhu <quic_zijuhu@quicinc.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org
+References: <20220426081823.21557-1-vasyl.vavrychuk@opensynergy.com>
+In-Reply-To: <20220426081823.21557-1-vasyl.vavrychuk@opensynergy.com>
+To:     Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        kuba@kernel.org, pabeni@redhat.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -58,48 +60,19 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Marcel Holtmann <marcel@holtmann.org>:
 
-On Mon, 25 Apr 2022 23:01:29 +0800 you wrote:
-> Qualcomm WCN785x has PID/VID 0cf3/e700 as shown by
-> /sys/kernel/debug/usb/devices:
+On Tue, 26 Apr 2022 11:18:23 +0300 you wrote:
+> Move power_on work cancel to hci_dev_close_sync to ensure that power_on
+> work is canceled after HCI interface down, power off, rfkill, etc.
 > 
-> T:  Bus=02 Lev=02 Prnt=02 Port=01 Cnt=02 Dev#=  8 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0cf3 ProdID=e700 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+> For example, if
+> 
+>     hciconfig hci0 down
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: btusb: add support for Qualcomm WCN785x
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d42038f8db90
+  - Bluetooth: core: Fix missing power_on work cancel on HCI close
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2d866d8ec36f
 
 You are awesome, thank you!
 -- 
