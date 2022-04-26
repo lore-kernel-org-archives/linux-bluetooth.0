@@ -2,399 +2,214 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1207AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 09:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4EE2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Apr 2022 10:01:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348244AbiDZKAR (ORCPT
+        id S1344014AbiDZKEe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Apr 2022 06:00:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34944 "EHLO
+        Tue, 26 Apr 2022 06:04:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348318AbiDZKAM (ORCPT
+        with ESMTP id S1348453AbiDZKDu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Apr 2022 06:00:12 -0400
-Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9CA14550F;
-        Tue, 26 Apr 2022 02:18:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1650964728; x=1682500728;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=oWeM/fVTUrTIq0QBF8aM/jCYR3/+l0d/e9f8ZsVQNnc=;
-  b=xCAUK86dDTh3PLlh/UzSlW6PGsM5gZRQU2mFhAvohoBqwFUh429Eu6cE
-   6BACQQX+AE6IrBwBDNUW3ZC6MlkBctkMD0hjuR4SXh3OUIF/VfITpjajt
-   ksZ73mJgCSwrXHiEhvs2K7+NdaNv7zk6ZyXwJpi72/8Ur77urWAYt5u2P
-   E=;
-Received: from unknown (HELO ironmsg02-sd.qualcomm.com) ([10.53.140.142])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 26 Apr 2022 02:18:48 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg02-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 02:18:47 -0700
-Received: from [10.253.37.230] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Tue, 26 Apr
- 2022 02:18:45 -0700
-Message-ID: <23ab1e90-fc3c-117c-01e2-bc73288b7d47@quicinc.com>
-Date:   Tue, 26 Apr 2022 17:18:43 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v1] Bluetooth: btusb: Set
- HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA
-Content-Language: en-US
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Tue, 26 Apr 2022 06:03:50 -0400
+Received: from repost01.tmes.trendmicro.eu (repost01.tmes.trendmicro.eu [18.185.115.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D36CD62119;
+        Tue, 26 Apr 2022 02:24:16 -0700 (PDT)
+Received: from 104.47.5.52_.trendmicro.com (unknown [172.21.206.109])
+        by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 3CE0B1000125B;
+        Tue, 26 Apr 2022 09:24:15 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1650965052.588000
+X-TM-MAIL-UUID: 6fdb132b-385e-400e-891e-685b5ea67b4e
+Received: from EUR02-HE1-obe.outbound.protection.outlook.com (unknown [104.47.5.52])
+        by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id 8FBA510002184;
+        Tue, 26 Apr 2022 09:24:12 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n99BRZiHBm0Ne7FF9BH1F2LrYPmFghhMhcWCBhnpbx53z48rBCwUqSUKEv9j9YGiDh7y7cQbYq+fz52EPYbIz/CSS+9d2RaV0DNGHevvRkDNFUxb47/y7nlKKhSYC04FQ7yLIAoRQkeseIvk1PjlBNJsVm5IgH0AlizyO4ZPsxNpexp8L7jNhAgbnJ88+bRBbJ8GETtZi6zTlypJXQBLZXOiLf84Wnle2bYSZpfsrzu394VV3hqo/BuRYlojFfXYqpKwukg0Kg+uasSdgXeZX6VU74IZefnTmScZd+NbBKbs7xZ6KfKT1pvRzzgpey+rZ0pjtdm0TmfG8cTjTlGVcw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Th71CWUWUPueaJF14ZEex3R314WrrLtrwMDZZBnubuU=;
+ b=hxCShC8KihVMiAsKo4MVqW6NW9vBciQ7mHMHWJQl/CQUxj4Dubwqto405rKpw/tIyNU+uCh34r4DAZu8X6++3xG9L+/MQKW76A7/kmTW4ur2lECuVqbc9I3jt1rrzbDxgPM6Pd9skhKo2lTcyARRT/Gu7FKwI4MKPGYjh+qdTtP6/Y6G6cFCNVW4mVx0QU2Nq94sN85bvWVLiAgaMIZzeTjolwbD4RyH79gGjqbyjRK8G4kUKaTB/jGro6iX3OW08Bt5X9AeSjZ/FSE9hH494b55aJvtTmrXxQXt6VmoLkAwOpkgI4ptwqXn2csp4bMywqIojt+wJ8v+oRFpoePOUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=opensynergy.com; dmarc=pass action=none
+ header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=opensynergy.com;
+Message-ID: <ea0c7c48-a93b-e0fe-0a1d-e4c88c235f37@opensynergy.com>
+Date:   Tue, 26 Apr 2022 12:24:08 +0300
+Subject: Re: [RFC PATCH] Bluetooth: core: Allow bind HCI socket user channel
+ when HCI is UP.
+Content-Language: uk
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Vasyl Vavrychuk <vvavrychuk@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>
-References: <1650012368-13505-1-git-send-email-quic_zijuhu@quicinc.com>
- <1D02DBF7-9368-43D5-9062-96CC73E22B57@holtmann.org>
-From:   quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <1D02DBF7-9368-43D5-9062-96CC73E22B57@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+References: <20220412120945.28862-1-vasyl.vavrychuk@opensynergy.com>
+ <9EA1D51C-D316-49CF-A7F8-765C58C18880@holtmann.org>
+From:   Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+In-Reply-To: <9EA1D51C-D316-49CF-A7F8-765C58C18880@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+X-ClientProxiedBy: AM8P189CA0027.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:218::32) To PAXPR04MB9106.eurprd04.prod.outlook.com
+ (2603:10a6:102:227::8)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d76ee49a-66ff-4f1b-2edd-08da2766854a
+X-MS-TrafficTypeDiagnostic: DB7PR04MB4059:EE_
+X-Microsoft-Antispam-PRVS: <DB7PR04MB40599DFBCDA6F2B676886C7CECFB9@DB7PR04MB4059.eurprd04.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: AKpcARHN/3PJ7bUi4d44vctkioTSQtAh5Xb/lSuAnTpTkLQkTsjQ6JwnoaSTtyEoKHbJm7QpHww6lAsU48LrZT2ZUwr59BH2lyiEKpEooD36PA2TZuw2XNxWwX2suTu4s/wbPtaxGmWIfesJk1i+wjw0OXXTzDQPNyPKCwtakPjsB0TPK5bquNGPvz07Fkt0XmmAx8QB6pc9DgGgJCeykZjevsxgWneC3coHO6v6huJUoeXDPGgTJpOE6/FArqUPRi0FIogFgqn6HoNL3ev366tpdVAsyZIv2cu1jkxPKrvcexM0mINEazYOnOiO/3QPPo+wsDftexpEkX/0dosUgL/fWMIH1R4UHGlxrSb/T1lY7DxuDMLU/vm4ygtnrqFcv4XH55aK1sF2ey++RGweDqW4TkKGODPpp4yrTxNxUqsz5im0749f1Ackj0gY6d36s0DvSq7Rd9PnCZKv6cDTqcAP176JfUogV4fWpDZHUT36B/k4yEvrCKAeLouY9opH6BjXef8eJf0FaUcZA00W0Lhcwl5EMCmY38NuoIs713CcxqKZOdzvcfFlbOOb1lpwNzmilfnQyWJRu4YMVFBvyGPBlKM6OBS25XRGMQBPzV8+dn81gv45LiZ/4l61K6Rp2SfV0Vr58EK6SMmS6XOcT9N7p+Y6WRMWK/nfE86aXo/C95OpHdhViKO8lBJ0gc7cOdXDwprohJNNhxAWGydhUHquwnS54DYuW5623zvN5zk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9106.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(39840400004)(376002)(136003)(396003)(346002)(66476007)(8676002)(66556008)(86362001)(42186006)(83380400001)(7416002)(31696002)(44832011)(54906003)(66946007)(38100700002)(2906002)(2616005)(186003)(316002)(110136005)(8936002)(4326008)(31686004)(36756003)(508600001)(966005)(26005)(53546011)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eWdibFdOWTdmTlh1K3UxblR0Y0krREZCTkdNSFV2dFpyUVdoM3hoV0tSU3Js?=
+ =?utf-8?B?K05TbTgva2U3S2dRcnNZL05kc0xmVi9kckJBZWozSFowcUdhWU5ydERTb282?=
+ =?utf-8?B?a3RGVEhrc2ZoMlNlTml5T25aZzhXS3NHM0w2SnVHcE5EQlprbmhlMS83WWVB?=
+ =?utf-8?B?ZWFCdTgwNGZ1WmRNNWNURmdmcFd6ejY3UVZpTE5Kb0V3cCtOanJiMkM2dkpR?=
+ =?utf-8?B?QmR5NWJiVWk1czUwOTJzeWFkcWJmM2gzZlJVTktVbDFHVHJ1aWROYXptd2ds?=
+ =?utf-8?B?SUVubXdvVHNidTVnSnFvT0RMU2JEWHo4R1BnRzQzWTVucE85MDNTL202TGk1?=
+ =?utf-8?B?Q3diS0R0Y1AzSGlMa3dlbzhYSjE3TkxJM2NsRGxCNmxDVkJzUkNrWlh0NmJP?=
+ =?utf-8?B?dkVFUkw5UG5HeVZZVW13ZE9CcHpRYnRzNEVZMG1oQXBZYjhUUmQvL3RmTC9C?=
+ =?utf-8?B?SnRiR29kZ0xYUmE4ZTR6ZmFXQUVMUkZjYWpFcXlpQmF0aHZRS1cyUHg0cGYz?=
+ =?utf-8?B?cG8yVStBVkJPYi9JenVwMHovTWhWRHp3blV5eVhJeHJCaFJGWWE5ZWxZS3k5?=
+ =?utf-8?B?Y3ZVYWdaNmVLSzhQVUJZMno1RFlrZ3FZWDQxdmk3bWczQngra2xOazZYLzFm?=
+ =?utf-8?B?WlY5a1hPNjMySDRscGZGUlNYK3l1b2lrOUxiOTVKaEF1WnFDTVZvQlhXTE9D?=
+ =?utf-8?B?cTMrei9hWUo5Q2N6bC84ekMwSGkrMHJ4YW9jYmNHNUs1R3B4V1dReVRGWm41?=
+ =?utf-8?B?WEkrTzJkbFYvcGFiajhvME9yblFma1dGbHF4VSt1Nzg5NzFUQWZXVmU3cFNz?=
+ =?utf-8?B?L1l1dnUreWF0UlZnVUJmOFhJSUlobldxbVlSN0tjMjVUMHZPTHhRckFDZVZt?=
+ =?utf-8?B?N0xFMFM2aFBDaFdGcmRaSVM3NjNwdGhSZEJ4V2xlS29Ub2xrY0p1NW1CUm0y?=
+ =?utf-8?B?cEhBekNTNENmZ014cFdONG0wQnZVZWFHWWNoUVlPNHZXYmwwTmpLZW9CWlhP?=
+ =?utf-8?B?WGRYMVVnMWZES0RGTWhOYjd1ZE0zTmUxaS9yWEM0Tm5lM3hzTEJsVVl1STRs?=
+ =?utf-8?B?OThQR3YwdHJ0QVB6d1RLczh4U3B4SGxNdVVLdTQ0UW40Wllac3VXWExUVitv?=
+ =?utf-8?B?aTdwYmxzWkU1MDM1bTVqNjhva0ZnU0s1d01MUWNvcXhxQzJBN2ZyNWtqcnV3?=
+ =?utf-8?B?ejNjdVVOR3dtMEpCN2UvUTc2VzkvaVJibi9nbGRxbVZkV1BCY0pld0prQlVx?=
+ =?utf-8?B?bldSWndZbjNQeitmTjNLYUJ3WHJiYzRpNVduYjltbm1nSXV4bVpSbFk3SFlO?=
+ =?utf-8?B?SW9TemUrU0d0K2NNVkRKdHU3ZGx5QVZvR3JtVlVIY1d0b2o0d2JBSXpzRFVJ?=
+ =?utf-8?B?Q2JwempHemJBaDFwclllQmdub0QwSHNIbTNmWVFhVklVNmZTWkR0T0hGSXpt?=
+ =?utf-8?B?MWVCSU1wT3N2N1MvTTg4YUY0YitRbDJZOEwrTHpiNGNYcE4vN0pRZ3pJS3NU?=
+ =?utf-8?B?bHB1NUJYazJZVHlhbzhIM0twZkRXWXVkZmZubDhFYjZyTGdQd25LSE1PNmsz?=
+ =?utf-8?B?QnlWcllFY0ZFVWpqN3g1OHhOdUR4emk1cWNZdmhYNnl3T2tSNzdsZDlMS1lK?=
+ =?utf-8?B?RlZlbkJJS2hYQ2JweCszenFRbW84Y3AvTDRieklFVUNPNXBDbTR1VzZNMEk2?=
+ =?utf-8?B?QTFVL0tRbFR2bGZ0ZFlycS9kcjQ2QWhUZ1ZPZlR3WVpmKzM1RUpXZGhNM3J1?=
+ =?utf-8?B?T0syU3FGVHdkMjVsY2xoelBFZE1VaHJQU2VnYk1lZVc0N1ZoMTlqNnhFeGl1?=
+ =?utf-8?B?c2NONW1KQmVGMUV3SnJpMjBIQkF3aWhqUG5LYWVOZzhISkN5clBYYTNMNW1j?=
+ =?utf-8?B?Wk9ETzR5MjlYR2NzTXpIT05Yc1BYaTBpSGRTeXRLajh0R2dHLzIzbWRxTHdS?=
+ =?utf-8?B?Sjk1ZlIybysvdGxKVGthZElIRkFhczdBRnNHa0FuRFVQYmR1M3FQUzk5RzJO?=
+ =?utf-8?B?S2Z1ZVRRaVhtdEdqZ2VrdEs4ZlhTRlRDYTZQaG52SHd1K3M4WlBWdFN6T3A2?=
+ =?utf-8?B?K3BuL3BDZDJ5T2U4WThIWS9ldjliUTdxWnlxSUNadFRHOTF4MlNNbVp1QkRa?=
+ =?utf-8?B?c2V5KzhtUDZPT1dqMzJSM0FIcTltS2JtditXQWgrNTIrdzkvS05kNENuY0x4?=
+ =?utf-8?B?eENQd2dlTWdHZ0Z4akRqRVcrdUpnT29jbm1wT1VhUHA5YjlEQUlvTGN1WlA1?=
+ =?utf-8?B?c2VBQkZ2M3BRMjBLU3pxekY1cktFcVZ6TmFtNzhuVk80b1dFa20yQ3RoV0JT?=
+ =?utf-8?B?dUNRYkdCdW5acHlBbXQwT1k0Smh3K3RUOVlTU21NRVhWbzVyWGlHZz09?=
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d76ee49a-66ff-4f1b-2edd-08da2766854a
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9106.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Apr 2022 09:24:10.4599
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lH8qmIoKXoEz+4vZXwG41xojhD1+FOAqflUD6upxbcus6iMdVe8eN0MG2O1pubv4wqJ0X3dnOXQlQZ9R+ZYf6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB4059
+X-TM-AS-ERS: 104.47.5.52-0.0.0.0
+X-TMASE-Version: StarCloud-1.3-8.8.1001-26856.006
+X-TMASE-Result: 10--19.108200-4.000000
+X-TMASE-MatchedRID: vbSD0OnL8/IMek0ClnpVp/HkpkyUphL9O8fk7n+zHAzXFJ7W3lIp49o0
+        qNbNhZKlVcLzvvAcZUct/x9i2Zd5RgzkIbwJgE/FEzEoOqAAVLNNLPQl0QAltP4DDXoaCqk7ilJ
+        mlF8p4QfplHhcW5EzjMvY6bQdecIl4FG4Cyz4VuYReM8i8p3vgEyQ5fRSh265TPm/MsQarwPU5x
+        sKpwPfyQpCfWsX3u4oF6dov8Gg2zrxlOJuQNHlfRFbgtHjUWLywqZ0OS45Py5i2IuOMF2AXLnGE
+        on+x/FhqCtC/8fgyE3r23emh+znp49+HWzUuQkw93bduyx/IZw0YL9SJPufX+QuInKvLeQ3MuTw
+        baqEJZN8WT1PvdHHDFl5gHXJcVkKeghDV/oDeqp+yskgwrfsC30tCKdnhB58vqq8s2MNhPCy5/t
+        FZu9S3Ku6xVHLhqfx33fj+sMArfMaMUyeC0staJwDp1OIv3zjQ/yXhuru+WsNTS/FFYL+sdvPwi
+        a2JVHPJpUV89uZZ78+FfDc5UEa8Q==
+X-TMASE-XGENCLOUD: 0d05273e-c75c-4aaf-8da1-b725fce82a95-0-0-200-0
+X-TM-Deliver-Signature: 7C6EE04E4EF2FE8DC664CD3501162682
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
+        s=TM-DKIM-20210503141657; t=1650965055;
+        bh=SwOBDTwwNhfKbjVqKss7bfRJmrW2G3ePdxmtV9hFJcg=; l=2427;
+        h=Date:To:From;
+        b=B4vyy3NTDBMiHAgmu0PMIaO993dXM9TITrzEVbfWNm+M5etRk0CL8aD4FuNVakn1d
+         XUAgp9UQ2xiSYR4cebI9BXJLF7osh2MH+9o5apXFHlJwv4X2sMqCLXtHX6W7F8sfn6
+         eBBb/p28hx/lo9RDf+qlJgfrFIG5eKOpYmE/pg6/BWK2S1oNseWSwaFaEszSh9xJ2X
+         jsFx7MfoA2ISRouD5OiZwS4MFaiRJPSy1B2wrHj030dMrMROqnmULQK4pNkhRg4PBU
+         93rmbXl1KAj2jT/rjPYTG0IPVTuvRKQMOjoJqKo9qg1/5FkObbbdLG1rlFVqpgu37X
+         u/qOOd9Ntky3Q==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 4/22/2022 5:17 PM, Marcel Holtmann wrote:
-> Hi Zijun,
+Hi, Marcel,
+
+On 4/22/2022 12:20 PM, Marcel Holtmann wrote:
+> Hi Vasyl,
 > 
->> Set HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA controllers since
->> they answer HCI_OP_READ_DEF_ERR_DATA_REPORTING with error code
->> "UNKNOWN HCI COMMAND" as shown below:
+>> This is needed for user-space to ensure that HCI init scheduled from
+>> hci_register_dev is completed.
 >>
->> [  580.517552] Bluetooth: hci0: unexpected cc 0x0c5a length: 1 < 2
->> [  580.517660] Bluetooth: hci0: Opcode 0x c5a failed: -38
+>> Function hci_register_dev queues power_on workqueue which will run
+>> hci_power_on > hci_dev_do_open. Function hci_dev_do_open sets HCI_INIT
+>> for some time.
 >>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> It is not allowed to bind to HCI socket user channel when HCI_INIT is
+>> set. As result, bind might fail when user-space program is run early
+>> enough during boot.
+>>
+>> Now, user-space program can first issue HCIDEVUP ioctl to ensure HCI
+>> init scheduled at hci_register_dev was completed.
+>>
+>> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
 >> ---
->> drivers/bluetooth/btusb.c | 2 ++
->> 1 file changed, 2 insertions(+)
+>> net/bluetooth/hci_sock.c | 4 +---
+>> 1 file changed, 1 insertion(+), 3 deletions(-)
 >>
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 06a854a2507e..a33f8705f147 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -3340,6 +3340,8 @@ static int btusb_setup_qca(struct hci_dev *hdev)
->> 	 */
->> 	set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
+>> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+>> index 33b3c0ffc339..c98de809f856 100644
+>> --- a/net/bluetooth/hci_sock.c
+>> +++ b/net/bluetooth/hci_sock.c
+>> @@ -1194,9 +1194,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
 >>
->> +	set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
->> +
->> 	return 0;
->> }
+>> 		if (test_bit(HCI_INIT, &hdev->flags) ||
+>> 		    hci_dev_test_flag(hdev, HCI_SETUP) ||
+>> -		    hci_dev_test_flag(hdev, HCI_CONFIG) ||
+>> -		    (!hci_dev_test_flag(hdev, HCI_AUTO_OFF) &&
+>> -		     test_bit(HCI_UP, &hdev->flags))) {
+>> +		    hci_dev_test_flag(hdev, HCI_CONFIG)) {
+>> 			err = -EBUSY;
+>> 			hci_dev_put(hdev);
+>> 			goto done;
 > 
-> please include the supported commands output from btmon that indicates that this hardware declares support for this command.
-> 
-hcitool -i hci0 cmd 0x04 0x02
-< HCI Command: ogf 0x04, ocf 0x0002, plen 0
-> HCI Event: 0x0e plen 68
-  01 02 10 00 FF FF FB 03 CE FF EF FF FF FF FF 1F F2 0F E8 FE
-  3F F7 8F FF 1C 00 04 00 61 FF FF FF 7F BE 20 F5 FF F0 FF FF
-  FF FF FF FF FF EF FF FF FF FF 03 00 00 00 00 00 00 00 00 00
-  00 00 00 00 00 00 00 00
+> I am not following the reasoning here. It is true that the device has to run init before you can do something with it. From mgmt interface your device will only be announced when it is really ready.
 
-btmon output:
-< HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0                                                                                 5.414488
-> HCI Event: Command Complete (0x0e) plen 68                                                                                                      5.419751
-      Read Local Supported Commands (0x04|0x0002) ncmd 1
-        Status: Success (0x00)
-        Commands: 288 entries
-          Inquiry (Octet 0 - Bit 0)
-          Inquiry Cancel (Octet 0 - Bit 1)
-          Periodic Inquiry Mode (Octet 0 - Bit 2)
-          Exit Periodic Inquiry Mode (Octet 0 - Bit 3)
-          Create Connection (Octet 0 - Bit 4)
-          Disconnect (Octet 0 - Bit 5)
-          Add SCO Connection (Octet 0 - Bit 6)
-          Create Connection Cancel (Octet 0 - Bit 7)
-          Accept Connection Request (Octet 1 - Bit 0)
-          Reject Connection Request (Octet 1 - Bit 1)
-          Link Key Request Reply (Octet 1 - Bit 2)
-          Link Key Request Negative Reply (Octet 1 - Bit 3)
-          PIN Code Request Reply (Octet 1 - Bit 4)
-          PIN Code Request Negative Reply (Octet 1 - Bit 5)
-          Change Connection Packet Type (Octet 1 - Bit 6)
-          Authentication Requested (Octet 1 - Bit 7)
-          Set Connection Encryption (Octet 2 - Bit 0)
-          Change Connection Link Key (Octet 2 - Bit 1)
-          Remote Name Request (Octet 2 - Bit 3)
-          Remote Name Request Cancel (Octet 2 - Bit 4)
-          Read Remote Supported Features (Octet 2 - Bit 5)
-          Read Remote Extended Features (Octet 2 - Bit 6)
-          Read Remote Version Information (Octet 2 - Bit 7)
-          Read Clock Offset (Octet 3 - Bit 0)
-          Read LMP Handle (Octet 3 - Bit 1)
-          Hold Mode (Octet 4 - Bit 1)
-          Sniff Mode (Octet 4 - Bit 2)
-          Exit Sniff Mode (Octet 4 - Bit 3)
-          QoS Setup (Octet 4 - Bit 6)
-          Role Discovery (Octet 4 - Bit 7)
-          Switch Role (Octet 5 - Bit 0)
-          Read Link Policy Settings (Octet 5 - Bit 1)
-          Write Link Policy Settings (Octet 5 - Bit 2)
-          Read Default Link Policy Settings (Octet 5 - Bit 3)
-          Write Default Link Policy Settings (Octet 5 - Bit 4)
-          Flow Specification (Octet 5 - Bit 5)
-          Set Event Mask (Octet 5 - Bit 6)
-          Reset (Octet 5 - Bit 7)
-          Set Event Filter (Octet 6 - Bit 0)
-          Flush (Octet 6 - Bit 1)
-          Read PIN Type (Octet 6 - Bit 2)
-          Write PIN Type (Octet 6 - Bit 3)
-          Read Stored Link Key (Octet 6 - Bit 5)
-          Write Stored Link Key (Octet 6 - Bit 6)
-          Delete Stored Link Key (Octet 6 - Bit 7)
-          Write Local Name (Octet 7 - Bit 0)
-          Read Local Name (Octet 7 - Bit 1)
-          Read Connection Accept Timeout (Octet 7 - Bit 2)
-          Write Connection Accept Timeout (Octet 7 - Bit 3)
-          Read Page Timeout (Octet 7 - Bit 4)
-          Write Page Timeout (Octet 7 - Bit 5)
-          Read Scan Enable (Octet 7 - Bit 6)
-          Write Scan Enable (Octet 7 - Bit 7)
-          Read Page Scan Activity (Octet 8 - Bit 0)
-          Write Page Scan Activity (Octet 8 - Bit 1)
-          Read Inquiry Scan Activity (Octet 8 - Bit 2)
-          Write Inquiry Scan Activity (Octet 8 - Bit 3)
-          Read Authentication Enable (Octet 8 - Bit 4)
-          Write Authentication Enable (Octet 8 - Bit 5)
-          Read Encryption Mode (Octet 8 - Bit 6)
-          Write Encryption Mode (Octet 8 - Bit 7)
-          Read Class of Device (Octet 9 - Bit 0)
-          Write Class of Device (Octet 9 - Bit 1)
-          Read Voice Setting (Octet 9 - Bit 2)
-          Write Voice Setting (Octet 9 - Bit 3)
-          Read Automatic Flush Timeout (Octet 9 - Bit 4)
-          Write Automatic Flush Timeout (Octet 9 - Bit 5)
-          Read Num Broadcast Retransmissions (Octet 9 - Bit 6)
-          Write Num Broadcast Retransmissions (Octet 9 - Bit 7)
-          Read Hold Mode Activity (Octet 10 - Bit 0)
-          Write Hold Mode Activity (Octet 10 - Bit 1)
-          Read Transmit Power Level (Octet 10 - Bit 2)
-          Read Sync Flow Control Enable (Octet 10 - Bit 3)
-          Write Sync Flow Control Enable (Octet 10 - Bit 4)
-          Set Controller To Host Flow Control (Octet 10 - Bit 5)
-          Host Buffer Size (Octet 10 - Bit 6)
-          Host Number of Completed Packets (Octet 10 - Bit 7)
-          Read Link Supervision Timeout (Octet 11 - Bit 0)
-          Write Link Supervision Timeout (Octet 11 - Bit 1)
-          Read Number of Supported IAC (Octet 11 - Bit 2)
-          Read Current IAC LAP (Octet 11 - Bit 3)
-          Write Current IAC LAP (Octet 11 - Bit 4)
-          Set AFH Host Channel Classification (Octet 12 - Bit 1)
-          Read Inquiry Scan Type (Octet 12 - Bit 4)
-          Write Inquiry Scan Type (Octet 12 - Bit 5)
-          Read Inquiry Mode (Octet 12 - Bit 6)
-          Write Inquiry Mode (Octet 12 - Bit 7)
-          Read Page Scan Type (Octet 13 - Bit 0)
-          Write Page Scan Type (Octet 13 - Bit 1)
-          Read AFH Channel Assessment Mode (Octet 13 - Bit 2)
-          Write AFH Channel Assessment Mode (Octet 13 - Bit 3)
-          Read Local Version Information (Octet 14 - Bit 3)
-          Read Local Supported Features (Octet 14 - Bit 5)
-          Read Local Extended Features (Octet 14 - Bit 6)
-          Read Buffer Size (Octet 14 - Bit 7)
-          Read BD ADDR (Octet 15 - Bit 1)
-          Read Failed Contact Counter (Octet 15 - Bit 2)
-          Reset Failed Contact Counter (Octet 15 - Bit 3)
-          Read Link Quality (Octet 15 - Bit 4)
-          Read RSSI (Octet 15 - Bit 5)
-          Read AFH Channel Map (Octet 15 - Bit 6)
-          Read Clock (Octet 15 - Bit 7)
-          Read Loopback Mode (Octet 16 - Bit 0)
-          Write Loopback Mode (Octet 16 - Bit 1)
-          Enable Device Under Test Mode (Octet 16 - Bit 2)
-          Setup Synchronous Connection (Octet 16 - Bit 3)
-          Accept Synchronous Connection Request (Octet 16 - Bit 4)
-          Reject Synchronous Connection Request (Octet 16 - Bit 5)
-          Read Extended Inquiry Response (Octet 17 - Bit 0)
-          Write Extended Inquiry Response (Octet 17 - Bit 1)
-          Refresh Encryption Key (Octet 17 - Bit 2)
-          Sniff Subrating (Octet 17 - Bit 4)
-          Read Simple Pairing Mode (Octet 17 - Bit 5)
-          Write Simple Pairing Mode (Octet 17 - Bit 6)
-          Read Local OOB Data (Octet 17 - Bit 7)
-          Read Inquiry Response TX Power Level (Octet 18 - Bit 0)
-          Write Inquiry Transmit Power Level (Octet 18 - Bit 1)
-          Read Default Erroneous Data Reporting (Octet 18 - Bit 2)
-          Write Default Erroneous Data Reporting (Octet 18 - Bit 3)
-          IO Capability Request Reply (Octet 18 - Bit 7)
-          User Confirmation Request Reply (Octet 19 - Bit 0)
-          User Confirmation Request Neg Reply (Octet 19 - Bit 1)
-          User Passkey Request Reply (Octet 19 - Bit 2)
-          User Passkey Request Negative Reply (Octet 19 - Bit 3)
-          Remote OOB Data Request Reply (Octet 19 - Bit 4)
-          Write Simple Pairing Debug Mode (Octet 19 - Bit 5)
-          Enhanced Flush (Octet 19 - Bit 6)
-          Remote OOB Data Request Neg Reply (Octet 19 - Bit 7)
-          Send Keypress Notification (Octet 20 - Bit 2)
-          IO Capability Request Negative Reply (Octet 20 - Bit 3)
-          Read Encryption Key Size (Octet 20 - Bit 4)
-          Set Event Mask Page 2 (Octet 22 - Bit 2)
-          Read Enhanced Transmit Power Level (Octet 24 - Bit 0)
-          Read LE Host Supported (Octet 24 - Bit 5)
-          Write LE Host Supported (Octet 24 - Bit 6)
-          LE Set Event Mask (Octet 25 - Bit 0)
-          LE Read Buffer Size (Octet 25 - Bit 1)
-          LE Read Local Supported Features (Octet 25 - Bit 2)
-          Octet 25 - Bit 3
-          LE Set Random Address (Octet 25 - Bit 4)
-          LE Set Advertising Parameters (Octet 25 - Bit 5)
-          LE Read Advertising Channel TX Power (Octet 25 - Bit 6)
-          LE Set Advertising Data (Octet 25 - Bit 7)
-          LE Set Scan Response Data (Octet 26 - Bit 0)
-          LE Set Advertise Enable (Octet 26 - Bit 1)
-          LE Set Scan Parameters (Octet 26 - Bit 2)
-          LE Set Scan Enable (Octet 26 - Bit 3)
-          LE Create Connection (Octet 26 - Bit 4)
-          LE Create Connection Cancel (Octet 26 - Bit 5)
-          LE Read White List Size (Octet 26 - Bit 6)
-          LE Clear White List (Octet 26 - Bit 7)
-          LE Add Device To White List (Octet 27 - Bit 0)
-          LE Remove Device From White List (Octet 27 - Bit 1)
-          LE Connection Update (Octet 27 - Bit 2)
-          LE Set Host Channel Classification (Octet 27 - Bit 3)
-          LE Read Channel Map (Octet 27 - Bit 4)
-          LE Read Remote Used Features (Octet 27 - Bit 5)
-          LE Encrypt (Octet 27 - Bit 6)
-          LE Rand (Octet 27 - Bit 7)
-          LE Start Encryption (Octet 28 - Bit 0)
-          LE Long Term Key Request Reply (Octet 28 - Bit 1)
-          LE Long Term Key Request Neg Reply (Octet 28 - Bit 2)
-          LE Read Supported States (Octet 28 - Bit 3)
-          LE Receiver Test (Octet 28 - Bit 4)
-          LE Transmitter Test (Octet 28 - Bit 5)
-          LE Test End (Octet 28 - Bit 6)
-          Octet 29 - Bit 1
-          Octet 29 - Bit 2
-          Enhanced Setup Synchronous Connection (Octet 29 - Bit 3)
-          Enhanced Accept Synchronous Connection Request (Octet 29 - Bit 4)
-          Read Local Supported Codecs (Octet 29 - Bit 5)
-          Set External Frame Configuration (Octet 29 - Bit 7)
-          Set Triggered Clock Capture (Octet 30 - Bit 5)
-          Set Connectionless Slave Broadcast (Octet 31 - Bit 0)
-          Start Synchronization Train (Octet 31 - Bit 2)
-          Set Reserved LT_ADDR (Octet 31 - Bit 4)
-          Delete Reserved LT_ADDR (Octet 31 - Bit 5)
-          Set Connectionless Slave Broadcast Data (Octet 31 - Bit 6)
-          Read Synchronization Train Parameters (Octet 31 - Bit 7)
-          Write Synchronization Train Parameters (Octet 32 - Bit 0)
-          Remote OOB Extended Data Request Reply (Octet 32 - Bit 1)
-          Read Secure Connections Host Support (Octet 32 - Bit 2)
-          Write Secure Connections Host Support (Octet 32 - Bit 3)
-          Read Authenticated Payload Timeout (Octet 32 - Bit 4)
-          Write Authenticated Payload Timeout (Octet 32 - Bit 5)
-          Read Local OOB Extended Data (Octet 32 - Bit 6)
-          Write Secure Connections Test Mode (Octet 32 - Bit 7)
-          LE Remote Connection Parameter Request Reply (Octet 33 - Bit 4)
-          LE Remote Connection Parameter Request Negative Reply (Octet 33 - Bit 5)
-          LE Set Data Length (Octet 33 - Bit 6)
-          LE Read Suggested Default Data Length (Octet 33 - Bit 7)
-          LE Write Suggested Default Data Length (Octet 34 - Bit 0)
-          LE Read Local P-256 Public Key (Octet 34 - Bit 1)
-          LE Generate DHKey (Octet 34 - Bit 2)
-          LE Add Device To Resolving List (Octet 34 - Bit 3)
-          LE Remove Device From Resolving List (Octet 34 - Bit 4)
-          LE Clear Resolving List (Octet 34 - Bit 5)
-          LE Read Resolving List Size (Octet 34 - Bit 6)
-          LE Read Peer Resolvable Address (Octet 34 - Bit 7)
-          LE Read Local Resolvable Address (Octet 35 - Bit 0)
-          LE Set Address Resolution Enable (Octet 35 - Bit 1)
-          LE Set Resolvable Private Address Timeout (Octet 35 - Bit 2)
-          LE Read Maximum Data Length (Octet 35 - Bit 3)
-          Octet 35 - Bit 4
-          Octet 35 - Bit 5
-          Octet 35 - Bit 6
-          Octet 35 - Bit 7
-          Octet 36 - Bit 0
-          Octet 36 - Bit 1
-          Octet 36 - Bit 2
-          Octet 36 - Bit 3
-          Octet 36 - Bit 4
-          Octet 36 - Bit 5
-          Octet 36 - Bit 6
-          Octet 36 - Bit 7
-          Octet 37 - Bit 0
-          Octet 37 - Bit 1
-          Octet 37 - Bit 2
-          Octet 37 - Bit 3
-          Octet 37 - Bit 4
-          Octet 37 - Bit 5
-          Octet 37 - Bit 6
-          Octet 37 - Bit 7
-          Octet 38 - Bit 0
-          Octet 38 - Bit 1
-          Octet 38 - Bit 2
-          Octet 38 - Bit 3
-          Octet 38 - Bit 4
-          Octet 38 - Bit 5
-          Octet 38 - Bit 6
-          Octet 38 - Bit 7
-          Octet 39 - Bit 0
-          Octet 39 - Bit 1
-          Octet 39 - Bit 2
-          Octet 39 - Bit 3
-          Octet 39 - Bit 4
-          Octet 39 - Bit 5
-          Octet 39 - Bit 6
-          Octet 39 - Bit 7
-          Octet 40 - Bit 0
-          Octet 40 - Bit 1
-          Octet 40 - Bit 2
-          Octet 40 - Bit 3
-          Octet 40 - Bit 4
-          Octet 40 - Bit 5
-          Octet 40 - Bit 6
-          Octet 40 - Bit 7
-          Octet 41 - Bit 0
-          Octet 41 - Bit 1
-          Octet 41 - Bit 2
-          Octet 41 - Bit 3
-          Octet 41 - Bit 5
-          Octet 41 - Bit 6
-          Octet 41 - Bit 7
-          Octet 42 - Bit 0
-          Octet 42 - Bit 1
-          Octet 42 - Bit 2
-          Octet 42 - Bit 3
-          Octet 42 - Bit 4
-          Octet 42 - Bit 5
-          Octet 42 - Bit 6
-          Octet 42 - Bit 7
-          Octet 43 - Bit 0
-          Octet 43 - Bit 1
-          Octet 43 - Bit 2
-          Octet 43 - Bit 3
-          Octet 43 - Bit 4
-          Octet 43 - Bit 5
-          Octet 43 - Bit 6
-          Octet 43 - Bit 7
-          Octet 44 - Bit 0
-          Octet 44 - Bit 1
-          Octet 44 - Bit 2
-          Octet 44 - Bit 3
-          Octet 44 - Bit 4
-          Octet 44 - Bit 5
-          Octet 44 - Bit 6
-          Octet 44 - Bit 7
-          Octet 45 - Bit 0
-          Octet 45 - Bit 1
-          Octet 45 - Bit 2
-          Octet 45 - Bit 3
-          Octet 45 - Bit 4
-          Octet 45 - Bit 5
-          Octet 45 - Bit 6
-          Octet 45 - Bit 7
-          Octet 46 - Bit 0
-          Octet 46 - Bit 1
-> Regards
-> 
-> Marcel
-> 
+Sorry, I am not familiar with mgmt interface. I obtain device using 
+HCIGETDEVLIST.
 
+BTW. I have pushed related patch [1]. Comparing to this patch, [1] is 
+less intrusive since it does not effect user-space semantics.
+
+Patch [1] allows to ensure that device is not in HCI_INIT state by running
+
+     hciconfig hci0 down
+
+This will either wait for HCI_INIT complete and then powers HCI down, or 
+cancels pending power_on.
+
+If we apply [1], we can still consider an optimization to allow binding 
+during HCI_INIT since this optimization will allow me to ommit extra
+
+     hciconfig hci0 down
+
+[1]: 
+https://lore.kernel.org/linux-bluetooth/20220426081823.21557-1-vasyl.vavrychuk@opensynergy.com/T/#u
+
+Kind regards,
+Vasyl
