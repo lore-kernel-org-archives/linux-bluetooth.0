@@ -2,122 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C74DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Apr 2022 20:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBEEAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Apr 2022 21:07:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236730AbiD0UvR (ORCPT
+        id S231545AbiD0VKq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Apr 2022 16:51:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46936 "EHLO
+        Wed, 27 Apr 2022 17:10:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236881AbiD0UvL (ORCPT
+        with ESMTP id S237467AbiD0VKA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Apr 2022 16:51:11 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4C2DDFE0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 13:47:57 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id g28so5528320ybj.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 13:47:57 -0700 (PDT)
+        Wed, 27 Apr 2022 17:10:00 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F378F18C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 14:06:00 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id b17so1930041qvf.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 14:06:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wjBGniCkrPPn2XJZCJS3viIi0a1wQPIJsNzJkxVm3f8=;
-        b=YXmUuFGWRsnYvsuY8WxZpw1NN/uZTGV6gHRqPICsiQRgxqgwXOkO/+BP3u7R4nLgDR
-         J8RDj5ofdIF/V7CiQyuSIh+I2b9gslArzgmXoctHFZ2Pb5ps54nc1OGV9QJYvdnjEmnk
-         Jw5sUbmAmOp2wuhVs9orQottDeetDhjjGBsT9ePMvqZbpacVgXVeoEFSJwGNOaAnNHmk
-         /GDAcTiTIawFjZ2Nuf5OSztqR1DCor1lA++7hJnYa3lx31QP+T6V0ewLkbYbqtLy8lDS
-         XYUEJ/r6FA1QXwi/uBFdEBuWntwcKM4SsOMVR8N5FUzviZ5vjiZ7F+nt2Cq5CBkTtIKG
-         hUZg==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=D/FBiUTa5BW0feiphcuVsnkjXQEOOp44IIxOW8Oe5EU=;
+        b=PVPZOMVV1WyNUWTN176JKIWOKBX52DZzMuD97ZDakiIhLNtZOFxzCqPa23j7ZtXdhu
+         eEQlJGpRLQ4guQeamzGS0Q85VsOo37ew1i4k31Rg61cxEY5q+5KTkCFJlgCRTM6oF8eK
+         rjy1cAMfenv1WhGvTIM7GhODh/K9GXcwEFxeal9zMqED4UFDdj/dPLXXWDvAlPGSCLfm
+         E6KdZZsXWRUEVkP5zquDethVQTm1iBxKCx8Dr49M/WWfK7Rk04R0J93uFqtfvVfZ7l2B
+         g3AZoESkP5hJcFwZEQvRYlRP2+HPe3c/VnelCZNMdYQrKbu6+FvFVfNGwFB73drwq3kz
+         jggw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wjBGniCkrPPn2XJZCJS3viIi0a1wQPIJsNzJkxVm3f8=;
-        b=jFnhGGDXBK/Zhgr5QmNuQWGXVDRVe7YtVom2YpfTzc+b1VmIHNfMTC0DFb1w6BNWuJ
-         tDE/PMiYyGS1ueLLIc3jChIpFPSw/JI9Vrt4E8I3o4eSQ6VW1gmmfs2P1RfLVJKsVczT
-         msH8+F/Kxh+3XL9qSMFjcn9IiFBjJTj0Uy8e2x/d6K89WYNxaLSX7PFYB2M36/WIBXC4
-         WjuqWtw6qQEB9Z6G009M3Mv62Ik5yj8wkqmuZ+p6Dntqbk59FlU2AXZbXcbHcwLFH7Bl
-         tbi1xoxRSFQsMEP5jVtohKP3ISheEjoDUovCvt7yuSbixa1laoITGA19NQXq1TmFcYcu
-         nDUA==
-X-Gm-Message-State: AOAM531Dv9A7GfhqNYDR9aSbRhgZHg2dawRDl56voIbmhqbOIGZ0Ue5M
-        uqM3N69TloAdqHMmxKpgUXcmN1Zbzygr/zP5Cii40Q==
-X-Google-Smtp-Source: ABdhPJwN8etrWMh6Os0GxHfjXTwaVKnhY711RgcSmkqMqHskXsAPhaJWu2gLTWYYQDHYI8eCDcXjQUlF8pDMBdyhq4w=
-X-Received: by 2002:a25:ea48:0:b0:644:e2e5:309 with SMTP id
- o8-20020a25ea48000000b00644e2e50309mr27820653ybe.407.1651092476629; Wed, 27
- Apr 2022 13:47:56 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=D/FBiUTa5BW0feiphcuVsnkjXQEOOp44IIxOW8Oe5EU=;
+        b=HTmpnukPe8NBFe9l9wT/9O700Q3QylhG8WGAi8b4iX2wXshMMH3pKXabRq2zV5tq12
+         7Yi3S5Lq3oCSWpWHRd04S0EwVZNq9choX6UB/prXRj43b3nC5wvGf+5K9Gqjw0/k/RB6
+         1FR1EjOZ0U0VSftI4I6s5h+KSsd8tA2YZZVzBEQYqO/oQPUBBslv+5Mtn/LdfhkQBRgk
+         1e0jtK1md5jtNIi6/t84xMarX0UBvqeLJEXWLlw9jJUJc7JzqSH9cxxbKnnVZeYvaZv3
+         sQ/a5uWJQrbBU2fpDKc85tVa8HyiVL3dLLKSweaveTt1EIQTjfa/cywVu+nZwYUWZpA7
+         8kag==
+X-Gm-Message-State: AOAM530WEuwIQTuv1aPKvMJ4Z4l+8AQUPdFDDK+8uhLH6uwshS3o+o8V
+        L/PLSs/WZJVCfdhRHQDhBq9qWoB4/SMgqg==
+X-Google-Smtp-Source: ABdhPJzI1zrvI4G8r2tBaHj8lY21pR33K5t+1XZtWevOV5m+NYLcgU7hBz3EV7g1Lc0WwUpkV5/DeA==
+X-Received: by 2002:a05:6214:c26:b0:446:63cb:35eb with SMTP id a6-20020a0562140c2600b0044663cb35ebmr21335057qvd.63.1651093559637;
+        Wed, 27 Apr 2022 14:05:59 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.43.74])
+        by smtp.gmail.com with ESMTPSA id s4-20020ae9de04000000b0069c3a577b0asm8523016qkf.51.2022.04.27.14.05.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 14:05:59 -0700 (PDT)
+Message-ID: <6269b037.1c69fb81.fee4.0f76@mx.google.com>
+Date:   Wed, 27 Apr 2022 14:05:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1742108024668501957=="
 MIME-Version: 1.0
-References: <202204270907.nUUrw3dS-lkp@intel.com> <20220427200259.2564-1-lnx.erin@gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, lnx.erin@gmail.com
+Subject: RE: [net-next,v3] net: SO_RCVMARK socket option for SO_MARK with recvmsg()
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Wed, 27 Apr 2022 13:47:45 -0700
-Message-ID: <CANn89iLDK=_MBo20S09Pq2PtKKPfWMM2R9FcDUWVjX-dk6cYDA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK
- with recvmsg()
-To:     Erin MacNeil <lnx.erin@gmail.com>
-Cc:     Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Marc Kleine-Budde <mkl@pengutronix.de>,
-        Robin van der Gracht <robin@protonic.nl>,
-        Oleksij Rempel <linux@rempel-privat.de>, kernel@pengutronix.de,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        David Ahern <dsahern@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Matt Johnston <matt@codeconstruct.com.au>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Lorenz Bauer <lmb@cloudflare.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        Martynas Pumputis <m@lambda.lt>,
-        Akhmat Karakotov <hmukos@yandex-team.ru>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Florian Westphal <fw@strlen.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Palethorpe <rpalethorpe@suse.com>,
-        Willem de Bruijn <willemb@google.com>,
-        Hangbin Liu <liuhangbin@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Richard Sanger <rsanger@wand.net.nz>,
-        Yajun Deng <yajun.deng@linux.dev>,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        linux-alpha@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        sparclinux@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20220427200259.2564-1-lnx.erin@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Apr 27, 2022 at 1:03 PM Erin MacNeil <lnx.erin@gmail.com> wrote:
->
-> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
-> should be included in the ancillary data returned by recvmsg().
->
-> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
->
-> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
->
+--===============1742108024668501957==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+This is automated email and please do not reply to this email!
 
-Thanks.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=636346
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      5.22 seconds
+GitLint                       PASS      1.07 seconds
+SubjectPrefix                 FAIL      0.90 seconds
+BuildKernel                   PASS      31.48 seconds
+BuildKernel32                 PASS      27.89 seconds
+Incremental Build with patchesPASS      38.28 seconds
+TestRunner: Setup             PASS      470.72 seconds
+TestRunner: l2cap-tester      PASS      17.48 seconds
+TestRunner: bnep-tester       PASS      6.24 seconds
+TestRunner: mgmt-tester       PASS      101.20 seconds
+TestRunner: rfcomm-tester     PASS      9.74 seconds
+TestRunner: sco-tester        PASS      9.47 seconds
+TestRunner: smp-tester        PASS      9.56 seconds
+TestRunner: userchan-tester   PASS      6.38 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.90 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1742108024668501957==--
