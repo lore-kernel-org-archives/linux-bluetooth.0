@@ -2,92 +2,140 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58981C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Apr 2022 02:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA02EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Apr 2022 02:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357123AbiD0CUI (ORCPT
+        id S1354611AbiD0CVN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Apr 2022 22:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        Tue, 26 Apr 2022 22:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354611AbiD0CUH (ORCPT
+        with ESMTP id S243969AbiD0CVN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Apr 2022 22:20:07 -0400
-Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EBB48E41;
-        Tue, 26 Apr 2022 19:16:57 -0700 (PDT)
+        Tue, 26 Apr 2022 22:21:13 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AB960068
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Apr 2022 19:18:02 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id x9so254305qts.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Apr 2022 19:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1651025817; x=1682561817;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=0LtVdpu7TJxwRWqQgenACGRyVEfd/HIaPAbCNLD3QxI=;
-  b=aQtsfs6M+e9NpTxON4pdayxAhT3cVFuu2CUI/4z6N6rDWUtKxVQqILV1
-   o3u4wkLOOC5jekJymDujwPiRCDUkN16CMGU6J+Hgz8X/zrrwiafHd9XVk
-   7udk1FuiZWDLQtuIt8vnYWsku/+VmShJ2jq/Ei9ZQAEgo4+gFppwe4Pfl
-   c=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 26 Apr 2022 19:16:57 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg01-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Apr 2022 19:16:57 -0700
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Tue, 26 Apr 2022 19:16:55 -0700
-From:   Zijun Hu <quic_zijuhu@quicinc.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v2] Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA
-Date:   Wed, 27 Apr 2022 10:16:51 +0800
-Message-ID: <1651025811-10680-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=JKCVKbLgqVFgldfIMeP/+aObC9RsFH5OD8It93d2uh4=;
+        b=lqFQCRsRrkQTs3ykVA5qcyJwu83Ii5vuN9P3El0pIGXhcR5GdK1sBN5iVWC/PohYSo
+         HeM5S1INIhlvQzt6/JB6CQzD/2aVVeS8Yt/Cejke1z1nP8EUOPZwXzczXfJva2CPI/ev
+         a+Md9dsGZLMaBu3PNZt3DXuMT6SzHjapKhINDj7cvhJ1lrhXZwW1VsFZcJG7YJTiXU3k
+         Fb8123ToXaK21553E0519Md+mHxcbkzTtL9Vmf+/OQvZp2XWtlwVCOgirkKPln1X8PZz
+         O/DAV9C+jSGbi+B6glrbBYZzj2HPfCUcxDdFuCnz9Kxw+5hbtcRiQ2eJdDLnRD7kAbLR
+         JmGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=JKCVKbLgqVFgldfIMeP/+aObC9RsFH5OD8It93d2uh4=;
+        b=QKVgBPFT31qTayDun0ExGczQjf0AUfc2IISV7YvhR+pq/nhOGVigQFxiZX85QxjRRM
+         UUG9uxUAWXvrS07Cgdn7ytOx4h/gbrXKAKQljvqFieDdDpQRl09vwPPE9PHE2IAD4v0W
+         MMZfAHXJkY7bZMQGVDCPEvM4earex/8IuZVM9tUTcvQVToenXEOq7v33skkNqF1NQnos
+         BCf3MsUMXoU6koIZ76iSLwtw8nz42poHbKWNnWoDi4kHW/x6pyDTdCvNotBP2R1SPyt5
+         N2H3tXmjXjBTzj7Q1ePlgWiV9GInLUYKFyHM8cn/GTu1Aa8Mup5lqC5NblPNjYNE7ysJ
+         5q9w==
+X-Gm-Message-State: AOAM533GZ4EoWtGd7cumc2AgAVkNgGZkqhZ97oTrIiViDz8m2EpkDWDU
+        dPQ6tYjnh8EGcG5UeXqdS/7GbKYK278GNQ==
+X-Google-Smtp-Source: ABdhPJwekzauW/bqU73y7mtJYUrNI/vj6cP6CoyLNqa9unrEYFHRb8zMUTj1Thk2Yz5I+ejdUmvYEw==
+X-Received: by 2002:a05:622a:1394:b0:2f3:4383:bf0 with SMTP id o20-20020a05622a139400b002f343830bf0mr17702758qtk.80.1651025880986;
+        Tue, 26 Apr 2022 19:18:00 -0700 (PDT)
+Received: from [172.17.0.2] ([40.112.53.243])
+        by smtp.gmail.com with ESMTPSA id s19-20020a05622a179300b002e1ceeb21d0sm9126906qtk.97.2022.04.26.19.18.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Apr 2022 19:18:00 -0700 (PDT)
+Message-ID: <6268a7d8.1c69fb81.288c.4fa8@mx.google.com>
+Date:   Tue, 26 Apr 2022 19:18:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4170559158846685989=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/4] btmon: Add proper decoding to Service Data UUID
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220426230347.857783-1-luiz.dentz@gmail.com>
+References: <20220426230347.857783-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Set HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA controllers since
-they answer HCI_OP_READ_DEF_ERR_DATA_REPORTING with error code
-"UNKNOWN HCI COMMAND" as shown below:
+--===============4170559158846685989==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-[  580.517552] Bluetooth: hci0: unexpected cc 0x0c5a length: 1 < 2
-[  580.517660] Bluetooth: hci0: Opcode 0x c5a failed: -38
+This is automated email and please do not reply to this email!
 
-hcitool -i hci0 cmd 0x03 0x5a
-< HCI Command: ogf 0x03, ocf 0x005a, plen 0
-> HCI Event: 0x0e plen 4
-  01 5A 0C 01
+Dear submitter,
 
-btmon log:
-< HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0
-> HCI Event: Command Complete (0x0e) plen 4
-      Read Default Erroneous Data Reporting (0x03|0x005a) ncmd 1
-        Status: Unknown HCI Command (0x01)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=635945
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      6.08 seconds
+GitLint                       PASS      4.09 seconds
+Prep - Setup ELL              PASS      49.83 seconds
+Build - Prep                  PASS      0.77 seconds
+Build - Configure             PASS      10.00 seconds
+Build - Make                  PASS      1440.82 seconds
+Make Check                    PASS      12.56 seconds
+Make Check w/Valgrind         PASS      517.26 seconds
+Make Distcheck                PASS      269.46 seconds
+Build w/ext ELL - Configure   PASS      10.86 seconds
+Build w/ext ELL - Make        PASS      1541.46 seconds
+Incremental Build with patchesPASS      6355.82 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,3/4] btmon: Add support for decoding Basic Audio Annoucements
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#123: FILE: monitor/bt.h:3524:
++} __attribute__ ((packed));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#128: FILE: monitor/bt.h:3529:
++} __attribute__ ((packed));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#133: FILE: monitor/bt.h:3534:
++} __attribute__ ((packed));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#139: FILE: monitor/bt.h:3540:
++} __attribute__ ((packed));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#145: FILE: monitor/bt.h:3546:
++} __attribute__ ((packed));
+
+/github/workspace/src/12828051.patch total: 0 errors, 5 warnings, 152 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12828051.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e6e28d3d1683..428843dbcf32 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3346,6 +3346,8 @@ static int btusb_setup_qca(struct hci_dev *hdev)
- 	 */
- 	set_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &hdev->quirks);
- 
-+	set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
-+
- 	return 0;
- }
- 
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
+--===============4170559158846685989==--
