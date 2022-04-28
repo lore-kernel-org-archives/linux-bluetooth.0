@@ -2,145 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A63C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 06:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5A8C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 08:50:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237486AbiD1Ghe (ORCPT
+        id S1344787AbiD1Ixj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Apr 2022 02:37:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40010 "EHLO
+        Thu, 28 Apr 2022 04:53:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241333AbiD1Ghb (ORCPT
+        with ESMTP id S1344430AbiD1Ixb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Apr 2022 02:37:31 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B26C27521A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 23:34:18 -0700 (PDT)
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=bjornoya.blackshift.org)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <mkl@pengutronix.de>)
-        id 1njxhg-0001Q8-Hr; Thu, 28 Apr 2022 08:32:40 +0200
-Received: from pengutronix.de (2a03-f580-87bc-d400-6c64-eec7-9c08-9d9e.ip6.dokom21.de [IPv6:2a03:f580:87bc:d400:6c64:eec7:9c08:9d9e])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        (Authenticated sender: mkl-all@blackshift.org)
-        by smtp.blackshift.org (Postfix) with ESMTPSA id D7C416F531;
-        Thu, 28 Apr 2022 06:32:11 +0000 (UTC)
-Date:   Thu, 28 Apr 2022 08:32:11 +0200
-From:   Marc Kleine-Budde <mkl@pengutronix.de>
-To:     Erin MacNeil <lnx.erin@gmail.com>
-Cc:     Richard Henderson <rth@twiddle.net>,
-        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-        Matt Turner <mattst88@gmail.com>,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        Helge Deller <deller@gmx.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Oliver Hartkopp <socketcan@hartkopp.net>,
-        Robin van der Gracht <robin@protonic.nl>,
-        Oleksij Rempel <linux@rempel-privat.de>, kernel@pengutronix.de,
-        Alexander Aring <alex.aring@gmail.com>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        David Ahern <dsahern@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Matt Johnston <matt@codeconstruct.com.au>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Lorenz Bauer <lmb@cloudflare.com>,
-        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-        Martynas Pumputis <m@lambda.lt>,
-        Akhmat Karakotov <hmukos@yandex-team.ru>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
-        Florian Westphal <fw@strlen.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Palethorpe <rpalethorpe@suse.com>,
-        Willem de Bruijn <willemb@google.com>,
-        Hangbin Liu <liuhangbin@gmail.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Richard Sanger <rsanger@wand.net.nz>,
-        Yajun Deng <yajun.deng@linux.dev>,
-        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
-        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
-        sparclinux@vger.kernel.org, netdev@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-can@vger.kernel.org, linux-wpan@vger.kernel.org,
-        linux-sctp@vger.kernel.org
-Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK
- with recvmsg()
-Message-ID: <20220428063211.4ndwg7xzudl7l7h7@pengutronix.de>
-References: <202204270907.nUUrw3dS-lkp@intel.com>
- <20220427200259.2564-1-lnx.erin@gmail.com>
+        Thu, 28 Apr 2022 04:53:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C9F5F56;
+        Thu, 28 Apr 2022 01:50:12 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77AFF61FCF;
+        Thu, 28 Apr 2022 08:50:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A95FDC385BE;
+        Thu, 28 Apr 2022 08:50:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651135811;
+        bh=yJ3N75uEIR/gCanU0NC90G8JPSmkSdYcQ1tUtvj74pI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=DosSt2aNGB31lzMl08cJqXA8i+ur8IzPNOgDUFd1Xp5SWgZ6DByuGf6KpKi6mVvuT
+         YgYFg4nxy8bJ9O0E0dki+GeOjEokDwGk9zctBCrGFPnEKFTvnAcbFEpB3bCbCf0Y9s
+         wmhlUZqojoWPlOUHOASQbSPk8HbxkleiSiNmQlRg/RCCX8tgwqU8w6bHIa4yYyEkad
+         Gitv6AQ9T1F6JRzho/1K122ES5NUuWqjBJeLo3awM8x+osIFz5EkI8Bj4BXeRS7RvX
+         GvdGEkt02tx0AjeF1HYZ1TSJTemD8P3nbehbRNTSk6/ImDhhw9e0I0eJqqah6DF5h8
+         Crud0KK1yZLig==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9308EE8DD67;
+        Thu, 28 Apr 2022 08:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="twk6owb5igwqlcml"
-Content-Disposition: inline
-In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth 2022-04-27
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <165113581159.13774.5811953848563780188.git-patchwork-notify@kernel.org>
+Date:   Thu, 28 Apr 2022 08:50:11 +0000
+References: <20220427234031.1257281-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220427234031.1257281-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello:
 
---twk6owb5igwqlcml
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This pull request was applied to netdev/net.git (master)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 27.04.2022 16:02:37, Erin MacNeil wrote:
-> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
-> should be included in the ancillary data returned by recvmsg().
->=20
-> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
->=20
-> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
-> ---
->  net/can/bcm.c                           |  2 +-
->  net/can/j1939/socket.c                  |  2 +-
->  net/can/raw.c                           |  2 +-
+On Wed, 27 Apr 2022 16:40:31 -0700 you wrote:
+> The following changes since commit acb16b395c3f3d7502443e0c799c2b42df645642:
+> 
+>   virtio_net: fix wrong buf address calculation when using xdp (2022-04-26 13:24:44 +0200)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-04-27
+> 
+> [...]
 
-For the net/can changes:
+Here is the summary with links:
+  - pull request: bluetooth 2022-04-27
+    https://git.kernel.org/netdev/net/c/febb2d2fa561
 
-Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-regards,
-Marc
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde           |
-Embedded Linux                   | https://www.pengutronix.de  |
-Vertretung West/Dortmund         | Phone: +49-231-2826-924     |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-5555 |
-
---twk6owb5igwqlcml
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEBsvAIBsPu6mG7thcrX5LkNig010FAmJqNOgACgkQrX5LkNig
-010oWwf/YQtdMP9EhexK+DgW94m7NnyknIp9mL/PgS712H8tMgbdcesQGNCYJvag
-mWhVZeGq5XI/oC3he0VDrAvI+i0WVRjj4ljyd3hVnL5o6Y0+0V2kV8Te5+/qHKqp
-HG3KiLAkGO2LNKpoUXMVORu/+V4Mwl/oiggQbQ+tzAjZ4BIZ7fCHQVv39LSUDXAY
-NrrZ8oF+gi5QTRhvbvQXUlskp2Idym5ND+QevTxOX5Uo3zUV5H7ERo0iwpIZwRJw
-8/t1/a+pX6V8hgtHEgi8kmJOlw9AAWjiUFZY9ngresTMZL7pjyuz1cHTOaGt4Sve
-Y5A7ifvkLmiO+EpPJ8FsaWn53qpmgQ==
-=kyeH
------END PGP SIGNATURE-----
-
---twk6owb5igwqlcml--
