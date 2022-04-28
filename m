@@ -2,164 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50858C43217
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 03:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABCA2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 03:47:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241929AbiD1DJW (ORCPT
+        id S242569AbiD1Du4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Apr 2022 23:09:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33172 "EHLO
+        Wed, 27 Apr 2022 23:50:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241897AbiD1DJT (ORCPT
+        with ESMTP id S242548AbiD1Duy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Apr 2022 23:09:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3058B2DD65
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 20:06:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651115165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9TjwB1FTuGbK/nxnFw4g+yurxGpo+tp+h6ik2UYFFps=;
-        b=hbscj8hqOkh2g4fT5zMjJM7UQq2staRZ+Rk10RzWtnshzu7V3IW+NAPWl0pRM+yg1+0Zx9
-        N0EB1isfkIp7yLrXBeIIUM3rsagaFi6aDbpwLuT8sfK9YRfcwQMTNe61aBjYVdFa3kApOE
-        7d53X4rDP4xvzVQaa2jxYafTfRehDgA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-627-GFvNEVLuMxaifYtn8deXBg-1; Wed, 27 Apr 2022 23:05:59 -0400
-X-MC-Unique: GFvNEVLuMxaifYtn8deXBg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6AB8529AA2EE;
-        Thu, 28 Apr 2022 03:05:59 +0000 (UTC)
-Received: from fs-i40c-03.fs.lab.eng.bos.redhat.com (fs-i40c-03.fs.lab.eng.bos.redhat.com [10.16.224.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 427582166B4D;
-        Thu, 28 Apr 2022 03:05:59 +0000 (UTC)
-From:   Alexander Aring <aahringo@redhat.com>
-To:     jukka.rissanen@linux.intel.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        stefan@datenfreihafen.org, torvalds@linuxfoundation.org
-Subject: [PATCH bluetooth-next 3/3] net: 6lowpan: constify lowpan_nhc structures
-Date:   Wed, 27 Apr 2022 23:05:34 -0400
-Message-Id: <20220428030534.3220410-4-aahringo@redhat.com>
-In-Reply-To: <20220428030534.3220410-1-aahringo@redhat.com>
-References: <20220428030534.3220410-1-aahringo@redhat.com>
+        Wed, 27 Apr 2022 23:50:54 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDC4869732
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 20:47:40 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id r9so3146573pjo.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Apr 2022 20:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=/B+bsHLKGCz+4XMd8nFKf9v6zOOCZ8yPsJEoWZsGbps=;
+        b=X8dPUP0RACUheA1sLfZEMu1eEzxjbce2liI1xrdQQUk3Sohzj10AEaWwOQt1UmvhFv
+         akPKF47braShUHMN0yUyEmwl6ZyT3EnA7zJ7NrFJsy7NKI50p9G33ky5F+tmQd3430Sk
+         sme5Y4pMMqNabbUE57fRkpJm30ql4Pw0PiF33e4kIZ6H+dER4oh9S5itjEMUKUmccDYG
+         ImaOoH/rPJX5yxNiWfsZmkGyDaXWf/eiS8g4crjexGXypI9GXxuMXvftDdDTvq+qtQFi
+         5CAOxOn4AI12GcBC+ftYqx16lmk3BoGVbj0aTQXItO2AkpV6GnSqBqjSl12rQ9JR0vh4
+         zBSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=/B+bsHLKGCz+4XMd8nFKf9v6zOOCZ8yPsJEoWZsGbps=;
+        b=w3xODfUK5caLOi8G0wXatANUMnVkIdoHI78ZihFvCqCMC+Zz3DkJ5ssxIiC2C4gq+N
+         Ltu1Aug2IvduGj3KgwTDoVYKUq3XYKl98mAHUiFrYC5hjKCpUqMiyQjxKZrwf1k/gPAo
+         XZtQOX+RjH03CUMn01FHQ1u5wgMjt9w8KjVOIF3kkuGUXZzr5AwepGX9/oiFnt/qnXTZ
+         cEqjaKqvL8ssMRcexeEbEMAnNPXEc2tdeevx3htaowc5BrQ0jZF4TT3BI/u3fVWBmJmF
+         T/JZHxkPEm9J93x6C8qUWuEKNRBgrRBmAOMojaB7mhwfOJNSHSaMEKXdxXvzw45PZMlS
+         /TBQ==
+X-Gm-Message-State: AOAM533xVK8pwlsfc3EZEQPTA3h/6G6l+dlM4tpLAz5sAZ5pjJRn2p64
+        VAhfhHIJF2gcSflSK6ZtsYmJaGF1New=
+X-Google-Smtp-Source: ABdhPJwJN0gQUV/R3PU6dCAMbsJoiqSOaQxBUYTwdj8davsppykBu8wSoxfS+eCYWUHV3b5wl/9DcA==
+X-Received: by 2002:a17:90b:3b87:b0:1da:4c83:8394 with SMTP id pc7-20020a17090b3b8700b001da4c838394mr5184411pjb.230.1651117660188;
+        Wed, 27 Apr 2022 20:47:40 -0700 (PDT)
+Received: from [172.17.0.2] ([52.190.253.210])
+        by smtp.gmail.com with ESMTPSA id h2-20020a17090ac38200b001cd4989feecsm8604382pjt.56.2022.04.27.20.47.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 20:47:39 -0700 (PDT)
+Message-ID: <626a0e5b.1c69fb81.7b667.4f88@mx.google.com>
+Date:   Wed, 27 Apr 2022 20:47:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2144786426561306814=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, aahringo@redhat.com
+Subject: RE: net: 6lowpan: simplify lookup by nhc id
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220428030534.3220410-2-aahringo@redhat.com>
+References: <20220428030534.3220410-2-aahringo@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch constify the lowpan_nhc declarations. Since we drop the rb
-node datastructure there is no need for runtime manipulation of this
-structure.
+--===============2144786426561306814==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Alexander Aring <aahringo@redhat.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=636426
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      5.77 seconds
+GitLint                       PASS      1.40 seconds
+SubjectPrefix                 FAIL      0.92 seconds
+BuildKernel                   PASS      41.46 seconds
+BuildKernel32                 PASS      37.48 seconds
+Incremental Build with patchesPASS      63.86 seconds
+TestRunner: Setup             PASS      646.14 seconds
+TestRunner: l2cap-tester      PASS      20.96 seconds
+TestRunner: bnep-tester       PASS      7.82 seconds
+TestRunner: mgmt-tester       PASS      130.76 seconds
+TestRunner: rfcomm-tester     PASS      12.14 seconds
+TestRunner: sco-tester        PASS      11.49 seconds
+TestRunner: smp-tester        PASS      11.45 seconds
+TestRunner: userchan-tester   PASS      7.68 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.92 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- net/6lowpan/nhc.c | 16 ++++++++--------
- net/6lowpan/nhc.h |  6 +++---
- 2 files changed, 11 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-index 019f121b2449..7b374595328d 100644
---- a/net/6lowpan/nhc.c
-+++ b/net/6lowpan/nhc.c
-@@ -12,12 +12,12 @@
- 
- #include "nhc.h"
- 
--static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
-+static const struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
- static DEFINE_SPINLOCK(lowpan_nhc_lock);
- 
--static struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
-+static const struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
- {
--	struct lowpan_nhc *nhc;
-+	const struct lowpan_nhc *nhc;
- 	int i;
- 	u8 id;
- 
-@@ -41,7 +41,7 @@ static struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
- int lowpan_nhc_check_compression(struct sk_buff *skb,
- 				 const struct ipv6hdr *hdr, u8 **hc_ptr)
- {
--	struct lowpan_nhc *nhc;
-+	const struct lowpan_nhc *nhc;
- 	int ret = 0;
- 
- 	spin_lock_bh(&lowpan_nhc_lock);
-@@ -59,7 +59,7 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
- 			      u8 **hc_ptr)
- {
- 	int ret;
--	struct lowpan_nhc *nhc;
-+	const struct lowpan_nhc *nhc;
- 
- 	spin_lock_bh(&lowpan_nhc_lock);
- 
-@@ -102,7 +102,7 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
- 				const struct net_device *dev,
- 				struct ipv6hdr *hdr)
- {
--	struct lowpan_nhc *nhc;
-+	const struct lowpan_nhc *nhc;
- 	int ret;
- 
- 	spin_lock_bh(&lowpan_nhc_lock);
-@@ -138,7 +138,7 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
- 	return 0;
- }
- 
--int lowpan_nhc_add(struct lowpan_nhc *nhc)
-+int lowpan_nhc_add(const struct lowpan_nhc *nhc)
- {
- 	int ret = 0;
- 
-@@ -156,7 +156,7 @@ int lowpan_nhc_add(struct lowpan_nhc *nhc)
- }
- EXPORT_SYMBOL(lowpan_nhc_add);
- 
--void lowpan_nhc_del(struct lowpan_nhc *nhc)
-+void lowpan_nhc_del(const struct lowpan_nhc *nhc)
- {
- 	spin_lock_bh(&lowpan_nhc_lock);
- 
-diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
-index 9df602a632bd..ab7b4977c32b 100644
---- a/net/6lowpan/nhc.h
-+++ b/net/6lowpan/nhc.h
-@@ -24,7 +24,7 @@
- #define LOWPAN_NHC(__nhc, _name, _nexthdr,	\
- 		   _hdrlen, _id, _idmask,	\
- 		   _uncompress, _compress)	\
--static struct lowpan_nhc __nhc = {		\
-+static const struct lowpan_nhc __nhc = {	\
- 	.name		= _name,		\
- 	.nexthdr	= _nexthdr,		\
- 	.nexthdrlen	= _hdrlen,		\
-@@ -116,14 +116,14 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
-  *
-  * @nhc: nhc which should be add.
-  */
--int lowpan_nhc_add(struct lowpan_nhc *nhc);
-+int lowpan_nhc_add(const struct lowpan_nhc *nhc);
- 
- /**
-  * lowpan_nhc_del - delete a next header compression from framework
-  *
-  * @nhc: nhc which should be delete.
-  */
--void lowpan_nhc_del(struct lowpan_nhc *nhc);
-+void lowpan_nhc_del(const struct lowpan_nhc *nhc);
- 
- /**
-  * lowpan_nhc_init - adding all default nhcs
--- 
-2.31.1
 
+--===============2144786426561306814==--
