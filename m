@@ -2,93 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D5E0C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Apr 2022 23:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F380FC4167E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 01:27:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231230AbiD0Xnv (ORCPT
+        id S240536AbiD1Bat (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Apr 2022 19:43:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44228 "EHLO
+        Wed, 27 Apr 2022 21:30:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230409AbiD0Xnt (ORCPT
+        with ESMTP id S240368AbiD1Bap (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Apr 2022 19:43:49 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3293D6161F;
-        Wed, 27 Apr 2022 16:40:35 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id iq10so2795219pjb.0;
-        Wed, 27 Apr 2022 16:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pA7N5oM5U7ZFZAud2ceA5aBZ7HfbRjldpjtLGGTMl9M=;
-        b=KRstV8sVbdRXrJDYbQQAbE4hSSSSqIetxqnPUoR5VcRKvTYr3nLanKjjGTCdcDyxad
-         pc/T3XpJk7zDtiwva7YMoSiuyOdXPTR7J5n/U6cthpJe64hcT+A4V1ZB5aJy9HMtarGV
-         MUJN1B1Q2G/VT5KwpE7RnN2XlD6TAFTHZX2/tAbQ+XZZlVFSFxJ+dGM0VsQXEhF9/ReW
-         uf9tFtOhT8Eh7WalJ4IktHDfneOVPv/zvCkhCodoZkJq6vCUScMW7o5KxJax3XpdlZa2
-         ziZUCO4OxZWi0YP2jHODU9zfV9Bge3K1dQg0+CMlgsKT89aujLsY1c7cqx//aNPOcWTV
-         BNWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pA7N5oM5U7ZFZAud2ceA5aBZ7HfbRjldpjtLGGTMl9M=;
-        b=qINAb+wgAtOclzKnjQHKlAseQWKgnMMn5K4XuGcDdeQkmjyE2Bgg5rAq6OCZtuLRuV
-         XH3eLhrPF0A3X4kU1AWsibtbOj8ECdHAcfXIuVcq9peTwts+g5u5MhGQhvwqZYyTK8Fq
-         WQJBd66lrYGJx8hudb2L2mVeEGuuOnoXXzdI/JO/OOeo6+1qeJjdYOu7YPurdJzZGbNL
-         40qmzyHLjhwOVJMhnwALnZqC/RcUUw9bl+efFH8iC2g65JXbhWTayCknL9Jlk5BybGbH
-         AmDoLEP0zIRp/SK/zoerQBEfxgP+M7netM8W4PMhbmhm+RN86tHO9IrLCihY4o2I6L2/
-         Tong==
-X-Gm-Message-State: AOAM531Dng34HwcxM8OTyaCWM+i+QTbgTvXAMpJTBRazeeytPJvGqLer
-        zgLZb2UorUAb2unP7KYciWr9lT0cb7M=
-X-Google-Smtp-Source: ABdhPJxAR6SmLlCJV+Nx/EguglOhP0iM1PmcnG+nibMxg5KDRBbAFTlK2brnGzY8RNgwg8MDNMYDGA==
-X-Received: by 2002:a17:902:e791:b0:151:dbbd:aeae with SMTP id cp17-20020a170902e79100b00151dbbdaeaemr30702018plb.171.1651102832890;
-        Wed, 27 Apr 2022 16:40:32 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g11-20020a63110b000000b003c14af50614sm406747pgl.44.2022.04.27.16.40.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Apr 2022 16:40:32 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2022-04-27
-Date:   Wed, 27 Apr 2022 16:40:31 -0700
-Message-Id: <20220427234031.1257281-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Wed, 27 Apr 2022 21:30:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E1872471;
+        Wed, 27 Apr 2022 18:27:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5614961F4C;
+        Thu, 28 Apr 2022 01:27:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50B7AC385A7;
+        Thu, 28 Apr 2022 01:27:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651109251;
+        bh=5dLrCbyI9dL25gLCPU2lKXEykc++03SFd32wMmRhRMY=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=koKAxCKdTDd8Xos0qjF/PfaziMK1H7iXllHu4DOFfT+tReZ2slA19GSEMY1NlrAXx
+         VCl18ElprtpHwUe4m65SdEsv1lGqWR3skTPCIuYj/AcvueZmK3CfpzJW38Oe9aW1zU
+         niSCpJJrh/1kho5qWUQ0hxDz49tTwAxQmRAVgyHOutEFpbyFTQT+0/n0f2LPwPcn1R
+         +Dx77zrHy1TrRK6QnZ774j01Ivr9AWwFEgJu1KMLXjMZHmBX7IyZ29UEvIk2CTFpUy
+         L/bxWFE2CanErRZcRufMiQgOIsSO8CHUEukTRo4tKbwzfo1NiCLAjsYKkuz+oVQVEq
+         ZQkANYmzOu1Zg==
+Message-ID: <bde14dfc-d1ea-ca1f-5074-01e13eef3cab@kernel.org>
+Date:   Wed, 27 Apr 2022 19:27:26 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.0
+Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK
+ with recvmsg()
+Content-Language: en-US
+To:     Erin MacNeil <lnx.erin@gmail.com>
+Cc:     Richard Henderson <rth@twiddle.net>,
+        Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+        Matt Turner <mattst88@gmail.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        Helge Deller <deller@gmx.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Oliver Hartkopp <socketcan@hartkopp.net>,
+        Marc Kleine-Budde <mkl@pengutronix.de>,
+        Robin van der Gracht <robin@protonic.nl>,
+        Oleksij Rempel <linux@rempel-privat.de>, kernel@pengutronix.de,
+        Alexander Aring <alex.aring@gmail.com>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jeremy Kerr <jk@codeconstruct.com.au>,
+        Matt Johnston <matt@codeconstruct.com.au>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Lorenz Bauer <lmb@cloudflare.com>,
+        Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+        Martynas Pumputis <m@lambda.lt>,
+        Akhmat Karakotov <hmukos@yandex-team.ru>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Wei Wang <weiwan@google.com>, Yangbo Lu <yangbo.lu@nxp.com>,
+        Florian Westphal <fw@strlen.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Richard Palethorpe <rpalethorpe@suse.com>,
+        Willem de Bruijn <willemb@google.com>,
+        Hangbin Liu <liuhangbin@gmail.com>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Richard Sanger <rsanger@wand.net.nz>,
+        Yajun Deng <yajun.deng@linux.dev>,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        linux-alpha@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+        sparclinux@vger.kernel.org, netdev@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-can@vger.kernel.org, linux-wpan@vger.kernel.org,
+        linux-sctp@vger.kernel.org
+References: <202204270907.nUUrw3dS-lkp@intel.com>
+ <20220427200259.2564-1-lnx.erin@gmail.com>
+From:   David Ahern <dsahern@kernel.org>
+In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit acb16b395c3f3d7502443e0c799c2b42df645642:
+On 4/27/22 2:02 PM, Erin MacNeil wrote:
+> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
+> should be included in the ancillary data returned by recvmsg().
+> 
+> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
+> 
+> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
+> ---
 
-  virtio_net: fix wrong buf address calculation when using xdp (2022-04-26 13:24:44 +0200)
 
-are available in the Git repository at:
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-04-27
-
-for you to fetch changes up to 9b3628d79b46f06157affc56fdb218fdd4988321:
-
-  Bluetooth: hci_sync: Cleanup hci_conn if it cannot be aborted (2022-04-26 20:10:51 +0200)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix regression causing some HCI events to be discarded when they
-   shouldn't.
-
-----------------------------------------------------------------
-Luiz Augusto von Dentz (3):
-      Bluetooth: hci_event: Fix checking for invalid handle on error status
-      Bluetooth: hci_event: Fix creating hci_conn object on error status
-      Bluetooth: hci_sync: Cleanup hci_conn if it cannot be aborted
-
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_conn.c         | 32 ++++++++++++----
- net/bluetooth/hci_event.c        | 80 +++++++++++++++++++++++-----------------
- net/bluetooth/hci_sync.c         | 11 +++++-
- 5 files changed, 83 insertions(+), 43 deletions(-)
