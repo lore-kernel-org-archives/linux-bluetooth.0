@@ -2,202 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D43C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 20:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF83BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 21:20:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351625AbiD1UIk (ORCPT
+        id S1352218AbiD1VXv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Apr 2022 16:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47274 "EHLO
+        Thu, 28 Apr 2022 17:23:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351417AbiD1UIi (ORCPT
+        with ESMTP id S237099AbiD1VXu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Apr 2022 16:08:38 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB3385668
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 13:05:22 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id x52so3584623pfu.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 13:05:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6vHBJnV74qLIehJVP2T7SQpP4c6G+vpqMpaTLlNt99s=;
-        b=mA/4BCIKjaOmXcZoibkLNwrgPlLXRkvcBMoeQAo5kJOGWwdajc+CTRZjogC7jkR3kw
-         kdhjNHOjpBtJ3kh0JCPqQzxioKltfIGdVr+6ZKwAaB5HFx/fBw01eXbepdIWMrDWIIjW
-         zJFVdpLYO+CiWM32ePO5J4AxexjqaPHhUmi4Jz/z05uG23Zhzj4aV6X2CFfWw5v2FmaF
-         PLCFKDkxxeAXe2aOj/raEAhARc+HKRuLAy18A9nGoVpGrENpt9zSCa4i0tP02XHN1qgk
-         v6nleUqP9LI8QfT2dbCJepvEqDtI4ro+lj6m9AMcdHcqbYo6D73+x4AmTN1kp3Lpg57+
-         4ZeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=6vHBJnV74qLIehJVP2T7SQpP4c6G+vpqMpaTLlNt99s=;
-        b=gRyU71AAj0a8QgOKJmcEouzPys0RUp0AIPTbEKB4B2P1pxB8gS/ajtRZusCusFyvYE
-         G4GcM7yOOOITS73x7fBrIoIujQCyIOb8hjq+QHTf0dKYBPr3RSjsizmF0iyijVtcCs0e
-         9g1ubwlX9OIhm6hZnZNR+kPpiqDB3EPSVk2gvofT/alO6s6VjTXpH7TQPpZ2HtSGX32b
-         FZ0jtnM9yhQ6TAhDI/Slrk2ZrUNAdcKSmLjrDw80turzn2ivAYI2RQp/UilayhKCpv+x
-         hbWtVprJFLtdiBkfFHEDVuu7DBHjJtAank5gOM1E9CIXrHlg7I+NLGF8wVTZKibXHZ1J
-         nidw==
-X-Gm-Message-State: AOAM531CCVKgH4sD5pVj5BGvFljRcchrCYDQYUeXU04ZxfzIpoB0nLFs
-        mmOOtlrc6nMlQom93ezLRLKOQ6/ZbqQ=
-X-Google-Smtp-Source: ABdhPJz8gY13aewRpxHNKPJqKqZ1zJjoFByLVeZikU9ysYpFmzBTE5WhkN+0s90MLZha1IyLKLngog==
-X-Received: by 2002:a05:6a00:b87:b0:50a:5ff2:bb2d with SMTP id g7-20020a056a000b8700b0050a5ff2bb2dmr36392313pfj.68.1651176321855;
-        Thu, 28 Apr 2022 13:05:21 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id fv12-20020a17090b0e8c00b001cd4989fed0sm11765110pjb.28.2022.04.28.13.05.20
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Apr 2022 13:05:21 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] transport: Fix not being able to initialize volume properly
-Date:   Thu, 28 Apr 2022 13:05:20 -0700
-Message-Id: <20220428200520.1429133-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Thu, 28 Apr 2022 17:23:50 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B8E237D0;
+        Thu, 28 Apr 2022 14:20:34 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4CBF461F3B;
+        Thu, 28 Apr 2022 21:20:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 971E1C385A9;
+        Thu, 28 Apr 2022 21:20:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651180833;
+        bh=Ef4FdoAUs1E4p1l6Hja12/6MqX5sUBzOSTh36QSsHUs=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=PvJf5VNsAiwEEl+vN+Ona8Ega6nbsskrRFIaGDmCt8u+3ie0c0acYxbnknCNsR0Bh
+         Z7SdcUl7fYrLFDC1HynZByWdQAVzKBCX2HJBIBrBEYou8uV9xWvwCGFZAIW57FIO0o
+         GRDRcQ2z1wQobFUYriYvXpzgusR5OSLGWS/ngtW6uHGTbQafuosH2/cmP4byzVeG0Y
+         BCGIiZE9QqdfyNsvOn3112nZIS6iiMV4LEhZkmeraZXkJpZiBL8QMkrn43CBEZRNxy
+         Sd7YKkLYgoORVYhpcRiI6byqtMfmpchN5ERubjggc+usqJhFCGC5qST6GIHW2biIvF
+         ck552V83iEtNA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 706E1F03870;
+        Thu, 28 Apr 2022 21:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3] net: SO_RCVMARK socket option for SO_MARK with
+ recvmsg()
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <165118083345.15958.2167314191776902298.git-patchwork-notify@kernel.org>
+Date:   Thu, 28 Apr 2022 21:20:33 +0000
+References: <20220427200259.2564-1-lnx.erin@gmail.com>
+In-Reply-To: <20220427200259.2564-1-lnx.erin@gmail.com>
+To:     Erin MacNeil <lnx.erin@gmail.com>
+Cc:     rth@twiddle.net, ink@jurassic.park.msu.ru, mattst88@gmail.com,
+        tsbogend@alpha.franken.de, James.Bottomley@HansenPartnership.com,
+        deller@gmx.de, davem@davemloft.net, kuba@kernel.org,
+        pabeni@redhat.com, arnd@arndb.de, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        socketcan@hartkopp.net, mkl@pengutronix.de, robin@protonic.nl,
+        linux@rempel-privat.de, kernel@pengutronix.de,
+        alex.aring@gmail.com, stefan@datenfreihafen.org,
+        yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+        jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+        vyasevich@gmail.com, nhorman@tuxdriver.com,
+        marcelo.leitner@gmail.com, edumazet@google.com, lmb@cloudflare.com,
+        ptikhomirov@virtuozzo.com, m@lambda.lt, hmukos@yandex-team.ru,
+        sfr@canb.auug.org.au, weiwan@google.com, yangbo.lu@nxp.com,
+        fw@strlen.de, tglx@linutronix.de, rpalethorpe@suse.com,
+        willemb@google.com, liuhangbin@gmail.com, pablo@netfilter.org,
+        rsanger@wand.net.nz, yajun.deng@linux.dev,
+        jiapeng.chong@linux.alibaba.com, linux-alpha@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+        netdev@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-wpan@vger.kernel.org, linux-sctp@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-In case AVRCP is connected first and
-media_transport_update_device_volume is called without any media_player
-being available the volume setting would be lost and Transport.Volume
-won't be available, so this introduces btd_device_{set,get}_volume
-helpers which is used to store the volume temporarely so
-media_player_get_device_volume is able to restore it when the transport
-is created.
+This patch was applied to netdev/net-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Fixes: https://github.com/bluez/bluez/issues/335
----
- profiles/audio/media.c     |  8 +++++---
- profiles/audio/transport.c | 12 ++++++++++--
- src/device.c               | 13 +++++++++++++
- src/device.h               |  3 +++
- 4 files changed, 31 insertions(+), 5 deletions(-)
+On Wed, 27 Apr 2022 16:02:37 -0400 you wrote:
+> Adding a new socket option, SO_RCVMARK, to indicate that SO_MARK
+> should be included in the ancillary data returned by recvmsg().
+> 
+> Renamed the sock_recv_ts_and_drops() function to sock_recv_cmsgs().
+> 
+> Signed-off-by: Erin MacNeil <lnx.erin@gmail.com>
+> 
+> [...]
 
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index 8162417ce..c5d8ab14e 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -456,11 +456,11 @@ int8_t media_player_get_device_volume(struct btd_device *device)
- 
- 	target_player = avrcp_get_target_player_by_device(device);
- 	if (!target_player)
--		return -1;
-+		goto done;
- 
- 	adapter = find_adapter(device);
- 	if (!adapter)
--		return -1;
-+		goto done;
- 
- 	for (l = adapter->players; l; l = l->next) {
- 		struct media_player *mp = l->data;
-@@ -469,7 +469,9 @@ int8_t media_player_get_device_volume(struct btd_device *device)
- 			return mp->volume;
- 	}
- 
--	return -1;
-+done:
-+	/* If media_player doesn't exists use device_volume */
-+	return btd_device_get_volume(device);
- }
- 
- static gboolean set_configuration(struct media_endpoint *endpoint,
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index d158fc97a..5848e4019 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -949,6 +949,7 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
- 	if (dev == NULL)
- 		return -1;
- 
-+	/* Attempt to locate the transport to get its volume */
- 	for (l = transports; l; l = l->next) {
- 		struct media_transport *transport = l->data;
- 		if (transport->device != dev)
-@@ -959,7 +960,8 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
- 			return media_transport_get_volume(transport);
- 	}
- 
--	return 0;
-+	/* If transport volume doesn't exists use device_volume */
-+	return btd_device_get_volume(dev);
- }
- 
- void media_transport_update_device_volume(struct btd_device *dev,
-@@ -970,13 +972,19 @@ void media_transport_update_device_volume(struct btd_device *dev,
- 	if (dev == NULL || volume < 0)
- 		return;
- 
-+	/* Attempt to locate the transport to set its volume */
- 	for (l = transports; l; l = l->next) {
- 		struct media_transport *transport = l->data;
- 		if (transport->device != dev)
- 			continue;
- 
- 		/* Volume is A2DP only */
--		if (media_endpoint_get_sep(transport->endpoint))
-+		if (media_endpoint_get_sep(transport->endpoint)) {
- 			media_transport_update_volume(transport, volume);
-+			return;
-+		}
- 	}
-+
-+	/* If transport volume doesn't exists add to device_volume */
-+	btd_device_set_volume(dev, volume);
- }
-diff --git a/src/device.c b/src/device.c
-index 38f4993f2..112bcc1f9 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -274,6 +274,8 @@ struct btd_device {
- 	guint		store_id;
- 
- 	time_t		name_resolve_failed_time;
-+
-+	int8_t		volume;
- };
- 
- static const uint16_t uuid_list[] = {
-@@ -4334,6 +4336,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
- 		return NULL;
- 
- 	device->tx_power = 127;
-+	device->volume = -1;
- 
- 	device->db = gatt_db_new();
- 	if (!device->db) {
-@@ -7303,3 +7306,13 @@ void btd_device_cleanup(void)
- {
- 	btd_service_remove_state_cb(service_state_cb_id);
- }
-+
-+void btd_device_set_volume(struct btd_device *device, int8_t volume)
-+{
-+	device->volume = volume;
-+}
-+
-+int8_t btd_device_get_volume(struct btd_device *device)
-+{
-+	return device->volume;
-+}
-diff --git a/src/device.h b/src/device.h
-index 071576d6b..9cdc0e68d 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -180,3 +180,6 @@ bool btd_device_all_services_allowed(struct btd_device *dev);
- void btd_device_update_allowed_services(struct btd_device *dev);
- void btd_device_init(void);
- void btd_device_cleanup(void);
-+
-+void btd_device_set_volume(struct btd_device *dev, int8_t volume);
-+int8_t btd_device_get_volume(struct btd_device *dev);
+Here is the summary with links:
+  - [net-next,v3] net: SO_RCVMARK socket option for SO_MARK with recvmsg()
+    https://git.kernel.org/netdev/net-next/c/6fd1d51cfa25
+
+You are awesome, thank you!
 -- 
-2.35.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
