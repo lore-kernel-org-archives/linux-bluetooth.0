@@ -2,79 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5A8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 08:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C04C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 11:32:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344787AbiD1Ixj (ORCPT
+        id S234872AbiD1LfW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Apr 2022 04:53:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59892 "EHLO
+        Thu, 28 Apr 2022 07:35:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344430AbiD1Ixb (ORCPT
+        with ESMTP id S244994AbiD1LfW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Apr 2022 04:53:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1C9F5F56;
-        Thu, 28 Apr 2022 01:50:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 77AFF61FCF;
-        Thu, 28 Apr 2022 08:50:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A95FDC385BE;
-        Thu, 28 Apr 2022 08:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651135811;
-        bh=yJ3N75uEIR/gCanU0NC90G8JPSmkSdYcQ1tUtvj74pI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=DosSt2aNGB31lzMl08cJqXA8i+ur8IzPNOgDUFd1Xp5SWgZ6DByuGf6KpKi6mVvuT
-         YgYFg4nxy8bJ9O0E0dki+GeOjEokDwGk9zctBCrGFPnEKFTvnAcbFEpB3bCbCf0Y9s
-         wmhlUZqojoWPlOUHOASQbSPk8HbxkleiSiNmQlRg/RCCX8tgwqU8w6bHIa4yYyEkad
-         Gitv6AQ9T1F6JRzho/1K122ES5NUuWqjBJeLo3awM8x+osIFz5EkI8Bj4BXeRS7RvX
-         GvdGEkt02tx0AjeF1HYZ1TSJTemD8P3nbehbRNTSk6/ImDhhw9e0I0eJqqah6DF5h8
-         Crud0KK1yZLig==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9308EE8DD67;
-        Thu, 28 Apr 2022 08:50:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Thu, 28 Apr 2022 07:35:22 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B961FCFE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 04:32:07 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id d19-20020a0566022d5300b0065499cd4a73so4252518iow.14
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 04:32:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=OLJAFGzDsMJJ4vQznge540lOuDzmbTYygXPQSl9cRbQ=;
+        b=o/anArnv79XOhpwiC4Ljt7jMa4VAfxaNZDGAr/KW44xtWrCHKlDp1F9RrgH2so9+9W
+         ODlSn7W9GzDwpUZjkx9k4rLzf7lL9lYyvqEo83hsQxcyKewIIdok/VerrHxEnZN29/0r
+         ad2tWA3SVAQP0RsTu49Ja0Fz1uvQnIPUx1Tb0+7mQdaMsb+SEJ1k8gftQ3qf4ra/YX9g
+         Goco0pdCmulsyMqjUaY/b6sVcY3pZLxCRLwyyiJBIWm1MAa/NRYxXbKvT6512Ty9sEQw
+         DOz7GKPvT6zFnc/xicI+eWs59TRTGe2Y1hKJIUq3V3EsbLidQxEOg12qCAD7xfJ2xD1H
+         UCoQ==
+X-Gm-Message-State: AOAM531CvcIkaXDJmLr2JS8jeLsBo4uh4PfgK5F3ipLAhMnyP//cGXCd
+        FOM9T4lH9BkytMlTOFA7ZZr2n+DOrl6sTsGjHro1xK9ghTRQ
+X-Google-Smtp-Source: ABdhPJxAB0syNAAGUZ1g96hnh6vV4104IOqaj5OdTdHHn6UlNjjQtYhmf+CWQ5O28oTueITCCnG3U8t1lGf+LO7u83qZ5Ixvnhkl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2022-04-27
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <165113581159.13774.5811953848563780188.git-patchwork-notify@kernel.org>
-Date:   Thu, 28 Apr 2022 08:50:11 +0000
-References: <20220427234031.1257281-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220427234031.1257281-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:20eb:b0:2cd:83e9:b910 with SMTP id
+ q11-20020a056e0220eb00b002cd83e9b910mr10188255ilv.185.1651145526916; Thu, 28
+ Apr 2022 04:32:06 -0700 (PDT)
+Date:   Thu, 28 Apr 2022 04:32:06 -0700
+In-Reply-To: <000000000000af7f9905da904400@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009abe0e05ddb546f6@google.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in dst_destroy
+From:   syzbot <syzbot+736f4a4f98b21dba48f0@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        luiz.von.dentz@intel.com, marcel@holtmann.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com, weiwan@google.com,
+        yajun.deng@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+syzbot has bisected this issue to:
 
-This pull request was applied to netdev/net.git (master)
-by Paolo Abeni <pabeni@redhat.com>:
+commit d16e6d19ccc6d3aa6b96d6a8fdb9e04fb9dffdbd
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Oct 6 01:09:33 2021 +0000
 
-On Wed, 27 Apr 2022 16:40:31 -0700 you wrote:
-> The following changes since commit acb16b395c3f3d7502443e0c799c2b42df645642:
-> 
->   virtio_net: fix wrong buf address calculation when using xdp (2022-04-26 13:24:44 +0200)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-04-27
-> 
-> [...]
+    Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
 
-Here is the summary with links:
-  - pull request: bluetooth 2022-04-27
-    https://git.kernel.org/netdev/net/c/febb2d2fa561
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14d40c1f700000
+start commit:   03fa8fc93e44 Merge branch 'remove-virt_to_bus-drivers'
+git tree:       net-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=16d40c1f700000
+console output: https://syzkaller.appspot.com/x/log.txt?x=12d40c1f700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6e95eee1a1aa4fb4
+dashboard link: https://syzkaller.appspot.com/bug?extid=736f4a4f98b21dba48f0
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1239a4e4f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a4b3b8f00000
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Reported-by: syzbot+736f4a4f98b21dba48f0@syzkaller.appspotmail.com
+Fixes: d16e6d19ccc6 ("Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev")
 
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
