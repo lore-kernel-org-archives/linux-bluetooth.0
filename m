@@ -2,78 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85C04C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 11:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B3C9C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Apr 2022 13:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234872AbiD1LfW (ORCPT
+        id S1346764AbiD1NI2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Apr 2022 07:35:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57988 "EHLO
+        Thu, 28 Apr 2022 09:08:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244994AbiD1LfW (ORCPT
+        with ESMTP id S1346409AbiD1NIZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Apr 2022 07:35:22 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B961FCFE
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 04:32:07 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id d19-20020a0566022d5300b0065499cd4a73so4252518iow.14
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 04:32:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=OLJAFGzDsMJJ4vQznge540lOuDzmbTYygXPQSl9cRbQ=;
-        b=o/anArnv79XOhpwiC4Ljt7jMa4VAfxaNZDGAr/KW44xtWrCHKlDp1F9RrgH2so9+9W
-         ODlSn7W9GzDwpUZjkx9k4rLzf7lL9lYyvqEo83hsQxcyKewIIdok/VerrHxEnZN29/0r
-         ad2tWA3SVAQP0RsTu49Ja0Fz1uvQnIPUx1Tb0+7mQdaMsb+SEJ1k8gftQ3qf4ra/YX9g
-         Goco0pdCmulsyMqjUaY/b6sVcY3pZLxCRLwyyiJBIWm1MAa/NRYxXbKvT6512Ty9sEQw
-         DOz7GKPvT6zFnc/xicI+eWs59TRTGe2Y1hKJIUq3V3EsbLidQxEOg12qCAD7xfJ2xD1H
-         UCoQ==
-X-Gm-Message-State: AOAM531CvcIkaXDJmLr2JS8jeLsBo4uh4PfgK5F3ipLAhMnyP//cGXCd
-        FOM9T4lH9BkytMlTOFA7ZZr2n+DOrl6sTsGjHro1xK9ghTRQ
-X-Google-Smtp-Source: ABdhPJxAB0syNAAGUZ1g96hnh6vV4104IOqaj5OdTdHHn6UlNjjQtYhmf+CWQ5O28oTueITCCnG3U8t1lGf+LO7u83qZ5Ixvnhkl
+        Thu, 28 Apr 2022 09:08:25 -0400
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B4978565F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Apr 2022 06:05:10 -0700 (PDT)
+X-QQ-mid: bizesmtp67t1651151084t0ubflmf
+Received: from localhost.localdomain ( [58.240.82.166])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Thu, 28 Apr 2022 21:04:38 +0800 (CST)
+X-QQ-SSF: 01400000002000E0M000000A0000000
+X-QQ-FEAT: ZHWZeLXy+8e6BJiTYangnhOr5IcHo9PDpnvWd/LzUXHVBYP5Ns70+NJtTUtxx
+        L01MpdLZwTtCieUxlV8UIGqzjZfGRszS7pO8xh6GIBpyVBzL7HR/q1gSfEyLMHiTUWPYb6e
+        LzytBKJhBvGYQDlAvnb1PJcM5l9U8f7C0jrWpYitUp8ANcew4BSSrFywwKiT8/7SKMXi1aM
+        NvRixxfd88NJhhjN7sGdtrFCaq0BBxCC0b2dfsA71mGdGzxE3SGnt77lmuNQNcengdztGt8
+        pl0GwkrVhYcJv2ejnebUG5rudHVO0oD6yKydmspMLdzTUNVpJDPPuL71y0ye/og60cAbfKf
+        RFIcLQgPtwtvRxgh9eAC9xLtEg8iLQE6STJYzpRxlRiyRIs8+0=
+X-QQ-GoodBg: 1
+From:   Meng Tang <tangmeng@uniontech.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Meng Tang <tangmeng@uniontech.com>
+Subject: [PATCH] Bluetooth: Add bluetooth error information for error codes
+Date:   Thu, 28 Apr 2022 21:04:35 +0800
+Message-Id: <20220428130435.896-1-tangmeng@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:20eb:b0:2cd:83e9:b910 with SMTP id
- q11-20020a056e0220eb00b002cd83e9b910mr10188255ilv.185.1651145526916; Thu, 28
- Apr 2022 04:32:06 -0700 (PDT)
-Date:   Thu, 28 Apr 2022 04:32:06 -0700
-In-Reply-To: <000000000000af7f9905da904400@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009abe0e05ddb546f6@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in dst_destroy
-From:   syzbot <syzbot+736f4a4f98b21dba48f0@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        luiz.von.dentz@intel.com, marcel@holtmann.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com, weiwan@google.com,
-        yajun.deng@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign10
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
+Bluetooth error codes to Unix errno mapping is not completed. For
+example, the following Bluetooth error codes are directly classified
+as ENOSYS.
 
-commit d16e6d19ccc6d3aa6b96d6a8fdb9e04fb9dffdbd
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Wed Oct 6 01:09:33 2021 +0000
+  /* Possible error codes */
+  #define HCI_SCO_INTERVAL_REJECTED     0x1C
+  #define HCI_SCO_AIR_MODE_REJECTED     0x1D
+  #define HCI_UNSPECIFIED_ERROR         0x1F
+  #define HCI_ROLE_CHANGE_NOT_ALLOWED   0x21
+  #define HCI_LMP_RESPONSE_TIMEOUT      0x22
+  #define HCI_UNIT_KEY_USED             0x26
+  #define HCI_INSTANT_PASSED            0x28
 
-    Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
+As a result, when these error codes occur in Bluetooth, ENOSYS is
+always returned, and users cannot know the specific error codes of
+Bluetooth, thus affecting the positioning of Bluetooth problems.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14d40c1f700000
-start commit:   03fa8fc93e44 Merge branch 'remove-virt_to_bus-drivers'
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16d40c1f700000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12d40c1f700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6e95eee1a1aa4fb4
-dashboard link: https://syzkaller.appspot.com/bug?extid=736f4a4f98b21dba48f0
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1239a4e4f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13a4b3b8f00000
+This will make it difficult to locate and analyze Bluetooth issues.
+Therefore, I added information for bluetooth error codes that are
+not currently mapped to help users get bluetooth error codes.
 
-Reported-by: syzbot+736f4a4f98b21dba48f0@syzkaller.appspotmail.com
-Fixes: d16e6d19ccc6 ("Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev")
+Signed-off-by: Meng Tang <tangmeng@uniontech.com>
+---
+ net/bluetooth/lib.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index 5326f41a58b7..eaf952de0ef9 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -122,6 +122,14 @@ int bt_to_errno(__u16 code)
+ 	case 0x1b:
+ 		return ECONNREFUSED;
+ 
++	case 0x1c:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), SCO Interval Rejected", code);
++		return ENOSYS;
++
++	case 0x1d:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), SCO Air Mode Rejected", code);
++		return ENOSYS;
++
+ 	case 0x19:
+ 	case 0x1e:
+ 	case 0x23:
+@@ -129,7 +137,28 @@ int bt_to_errno(__u16 code)
+ 	case 0x25:
+ 		return EPROTO;
+ 
++	case 0x1f:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), Unspecified Error", code);
++		return ENOSYS;
++
++	case 0x21:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), Role Change Not Allowed", code);
++		return ENOSYS;
++
++	case 0x22:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), LMP Response Timeout", code);
++		return ENOSYS;
++
++	case 0x26:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), Unit Key Used", code);
++		return ENOSYS;
++
++	case 0x28:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), Instant Passed", code);
++		return ENOSYS;
++
+ 	default:
++		printk(KERN_ERR "Bluetooth: errno(0x%02x), Error code unknown", code);
+ 		return ENOSYS;
+ 	}
+ }
+-- 
+2.20.1
+
+
+
