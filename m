@@ -2,69 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 150F8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 14:49:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0505C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 14:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377917AbiD2Ow0 convert rfc822-to-8bit (ORCPT
+        id S239445AbiD2OyF convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Apr 2022 10:52:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52868 "EHLO
+        Fri, 29 Apr 2022 10:54:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377919AbiD2OwZ (ORCPT
+        with ESMTP id S1377999AbiD2Oxw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:52:25 -0400
+        Fri, 29 Apr 2022 10:53:52 -0400
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2B115939BB
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Apr 2022 07:49:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6241911A39;
+        Fri, 29 Apr 2022 07:50:25 -0700 (PDT)
 Received: from smtpclient.apple (p5b3d2ea3.dip0.t-ipconnect.de [91.61.46.163])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E034FCED21;
-        Fri, 29 Apr 2022 16:49:03 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3B3CCCED21;
+        Fri, 29 Apr 2022 16:50:24 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH] btusb: CSR chip hangs when unbound
+Subject: Re: [PATCH v1 1/3] dt-bindings: net: bluetooth: Add wlan-gpio entry
+ for wcn6750
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220429114113.356263-1-jtornosm@redhat.com>
-Date:   Fri, 29 Apr 2022 16:49:03 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+In-Reply-To: <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
+Date:   Fri, 29 Apr 2022 16:50:23 +0200
+Cc:     agross@kernel.org, robh+dt@kernel.org, bjorn.andersson@linaro.org,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        quic_saluvala@quicinc.com, quic_rjliao@quicinc.com,
+        mcchou@chromium.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <B8BA4391-6F9D-4D3A-AF30-C2A3FC399D1D@holtmann.org>
-References: <20220429114113.356263-1-jtornosm@redhat.com>
-To:     Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Message-Id: <DDBF36DE-18F1-40ED-90B8-CE2E31841D4A@holtmann.org>
+References: <1651228073-1999-1-git-send-email-quic_bgodavar@quicinc.com>
+ <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
+To:     Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
 X-Mailer: Apple Mail (2.3696.80.82.1.1)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jose,
+Hi Balakrishna,
 
-> Bluetooth Dongles with CSR chip (i.e. USB Bluetooth V4.0 Dongle by Trust)
-> hang when they are unbound from 'unbind' sysfs entry and can not be bound
-> again.
+> This patch adds a wlan-gpio entry and its reference usage for
+> BT SoC wcn6750.
 > 
-> The reason is CSR chip hangs when usb configuration command with index 0 
-> (used to unconfigure) is sent during disconnection.
-> 
-> To avoid this unwanted result, it is necessary not to send this command 
-> for CSR chip when usb device is unbound. Besides, "skip_unconfigure"  sysfs 
-> entry has been created for testing purposes with these or other devices.
-> 
-> Athough device is not unconfigured, it is better to avoid device hanging to
-> be able to operate. Even bluetooth can be previously turned off.
-> On the other hand, this is not important if usb device is going to be bound 
-> again (normal behavior), i.e. with usbip.
-> 
-> Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
 > ---
-> drivers/bluetooth/btusb.c  |  6 ++++++
-> drivers/usb/core/generic.c |  2 +-
-> drivers/usb/core/sysfs.c   | 36 ++++++++++++++++++++++++++++++++++++
-> include/linux/usb.h        |  2 ++
-> 4 files changed, 45 insertions(+), 1 deletion(-)
+> Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml | 6 ++++++
+> 1 file changed, 6 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> index f93c6e7..624f957 100644
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> @@ -24,6 +24,10 @@ properties:
+>       - qcom,qca6390-bt
+>       - qcom,wcn6750-bt
+> 
+> +  wlan-gpios:
+> +    maxItems: 1
+> +    description: gpio specifier used to wlan chip
+> +
+>   enable-gpios:
+>     maxItems: 1
+>     description: gpio specifier used to enable chip
+> @@ -123,6 +127,7 @@ allOf:
+>               - qcom,wcn6750-bt
+>     then:
+>       required:
+> +        - wlan-gpios
 
-send this to the USB guys first and get their ACK.
+why is this in the Bluetooth section? Why should Bluetooth care about any WiFi GPIO?
 
 Regards
 
