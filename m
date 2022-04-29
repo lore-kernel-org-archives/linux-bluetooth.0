@@ -2,86 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9EDDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 14:54:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2526C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 23:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377990AbiD2O5s convert rfc822-to-8bit (ORCPT
+        id S1381678AbiD2XDz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Apr 2022 10:57:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42466 "EHLO
+        Fri, 29 Apr 2022 19:03:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377984AbiD2O5r (ORCPT
+        with ESMTP id S1381676AbiD2XDs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Apr 2022 10:57:47 -0400
-X-Greylist: delayed 242 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 29 Apr 2022 07:54:27 PDT
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CAB0DBE9C1;
-        Fri, 29 Apr 2022 07:54:27 -0700 (PDT)
-Received: from smtpclient.apple (p5b3d2ea3.dip0.t-ipconnect.de [91.61.46.163])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B4274CED22;
-        Fri, 29 Apr 2022 16:54:26 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: WAR to handle WCN6750 HW issue
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
-Date:   Fri, 29 Apr 2022 16:54:25 +0200
-Cc:     Andy Gross <agross@kernel.org>, robh+dt@kernel.org,
-        bjorn.andersson@linaro.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        Fri, 29 Apr 2022 19:03:48 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E372F58E72;
+        Fri, 29 Apr 2022 16:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651273229; x=1682809229;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=858DoRS31fHhMLUp7/Yb4Lvh4eKNkn9um6ioVF9KkCw=;
+  b=ZnsBIT9NjlnZ5VndYXzEKIzkhKIbVFhFZ10UpEevvUPjzNpxION8x7ov
+   CniOhIQtss21uzI3Q/ew0HgFn2XPYey+xX+khkrwNJtgFykPjOHbxMG65
+   LM54TW4rFnjTYLiQLMLPclgEBPAUNH3tyhk02vDZEbgghGq/TrihPQlWO
+   4USM4CqCeszci3OERXXvSORacH4CFTf+sXGSchmMM6LpKV35YJ/N+lPgx
+   zDac/2Sozm1jTqwrkN53GLIJXbw2I3jKY+xosxmHP4K0rqF6QFNOFN/WM
+   Z57orgIH9Knrp/etr5OlAhjS8UYvZOTFCHZ5zVGG1Fg+lITmfHvGtpk95
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10332"; a="329741978"
+X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
+   d="scan'208";a="329741978"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2022 16:00:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,186,1647327600"; 
+   d="scan'208";a="566347931"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by fmsmga007.fm.intel.com with ESMTP; 29 Apr 2022 16:00:24 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nkZb6-0006f4-2h;
+        Fri, 29 Apr 2022 23:00:24 +0000
+Date:   Sat, 30 Apr 2022 06:59:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+        agross@kernel.org, robh+dt@kernel.org, bjorn.andersson@linaro.org,
+        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+Cc:     kbuild-all@lists.01.org, mka@chromium.org,
         linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
         quic_saluvala@quicinc.com, quic_rjliao@quicinc.com,
-        mcchou@chromium.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0D3D8346-0F64-4CAF-8BED-940F189A3E97@holtmann.org>
-References: <1651228073-1999-1-git-send-email-quic_bgodavar@quicinc.com>
- <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
-To:     Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        mcchou@chromium.org,
+        Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+Subject: [PATCH] Bluetooth: hci_qca: fix excluded_middle.cocci warnings
+Message-ID: <Ymxt6qICRLDgUjAA@4bf0d7f47e85>
+References: <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
+X-Patchwork-Hint: ignore
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+From: kernel test robot <lkp@intel.com>
 
-> The patch is workaround for hardware issue on WCN6750.
-> On WCN6750 sometimes observed AON power source takes 100ms
-> time to fully discharge voltage during OFF. As WCN6750 is
-> combo chip for WLAN and BT. If any of the tech area ON is
-> triggered during discharge phase, it fails to turn ON.
-> To overcome this hardware issue, During BT ON, driver check
-> for WLAN_EN pin status. If it high, it will pull BT_EN to high
-> immediately else it will wait for 100ms assuming WLAN was just
-> powered OFF and then BT_EN will be pulled to high.
-> 
-> Fixes: d8f97da1b92d2 ("Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6750")
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-> ---
-> drivers/bluetooth/hci_qca.c | 30 ++++++++++++++++++++++++------
-> 1 file changed, 24 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index eab34e2..c3862d1 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -219,6 +219,7 @@ struct qca_serdev {
-> 	struct hci_uart	 serdev_hu;
-> 	struct gpio_desc *bt_en;
-> 	struct gpio_desc *sw_ctrl;
-> +	struct gpio_desc *wlan_en;
-> 	struct clk	 *susclk;
-> 	enum qca_btsoc_type btsoc_type;
-> 	struct qca_power *bt_power;
+drivers/bluetooth/hci_qca.c:1633:42-44: WARNING !A || A && B is equivalent to !A || B
 
-I am really against these intermixing of Bluetooth and WiFi details. There is work ongoing to do some sequence power procedure. Maybe that is something you should look into. This is a mess.
 
-And again, we are still hacking around hci_qca.c instead of writing a clean serdev only driver for this hardware. I have the feeling that nobody listens to review comments these days. It is just hacking patches together to get hardware enabled somehow and then disappear.
+ Condition !A || A && B is equivalent to !A || B.
 
-Regards
+Generated by: scripts/coccinelle/misc/excluded_middle.cocci
 
-Marcel
+CC: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: kernel test robot <lkp@intel.com>
+---
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Balakrishna-Godavarthi/WAR-to-handle-WCN6750-hardware-issue/20220429-193129
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/robh/linux.git for-next
+:::::: branch date: 11 hours ago
+:::::: commit date: 11 hours ago
+
+ drivers/bluetooth/hci_qca.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1630,7 +1630,7 @@ static int qca_regulator_init(struct hci
+ 		msleep(50);
+ 	}
+ 
+-	if (!qcadev->wlan_en || (qcadev->wlan_en && gpiod_get_value_cansleep(qcadev->wlan_en)))
++	if (!qcadev->wlan_en || gpiod_get_value_cansleep(qcadev->wlan_en))
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 1);
+ 
+ 	if (qcadev->wlan_en && !gpiod_get_value_cansleep(qcadev->wlan_en)) {
