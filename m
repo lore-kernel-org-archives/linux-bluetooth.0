@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E526C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 12:00:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B4FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Apr 2022 12:02:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358818AbiD2MDi (ORCPT
+        id S1356313AbiD2MGE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Apr 2022 08:03:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38252 "EHLO
+        Fri, 29 Apr 2022 08:06:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235150AbiD2MDh (ORCPT
+        with ESMTP id S237453AbiD2MGD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Apr 2022 08:03:37 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5384634F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Apr 2022 05:00:15 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id fu47so5480075qtb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Apr 2022 05:00:15 -0700 (PDT)
+        Fri, 29 Apr 2022 08:06:03 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A4C256C37
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Apr 2022 05:02:45 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id y3so5481857qtn.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Apr 2022 05:02:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=bD3gxFzdmAvEXuCoCFNGMzmXW/zHd99k8bbRUdtaoM0=;
-        b=WskkV4GvQiupgl+FnT4peNVxY1IWFBmslX4p+DIMU7OmNA+Azmo2NbZkiS4NGcEGbx
-         4Dg25F6gZkbJba+hlX/R9O0soe3qqkhUiYODu2we8GDfxz5UfIha3v59354x1ic28Wv5
-         7ioolPd9BQduyrvK/vi2Vb3oWiXQRIsYjCMhF6LN8uM9vEX29mh9w8QBRWccC+7XgQbK
-         Bn88u7Do8NKGcOTC0P8lo6D0psuaa+pD9PBeL02Y4BBNmSt15SclGLeCmrP1VvlkjW1t
-         St8Awg8ttfqYKYOCVaALm1F0aR1j9aIqCQOy54u54GZNpfBi4WuIYm7Y5PF8LAXwipaS
-         eqqQ==
+        bh=SstPgasRIgU1OkRSVX5+voo9qBznetTY7Fv/nZunjMk=;
+        b=X4iwAnLtJwAq781OPHsVQhGis6e33fJp8XMXAd8Pnc9RBonnWRTY02oFnoTFtOlYcX
+         Dj8K4mjADiBeD+FMeNfWKiEug4cPHVfB+tJIxgwg0cCszLWNRme0wbYnrJWyvwOwhQf8
+         zPkde0Ev27SVEYFO3sxNgP8kQnYekHaWuEDkhkaJmBv/sRZCXzk0DE3lQM3xVOK20juD
+         Rm6XqNAj2gQqLOh8hwDUgRwy9Waa0Q8gn3es9Ms6exYbdx9srIb9cV7nh4lwjl80RoZm
+         kENnBS9qU7pSO63FbNkYF9/wbYzQkJnQ0a3k4Y8vgPQte3ob8yM5NGJ43LdcPqeemBtN
+         fM9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=bD3gxFzdmAvEXuCoCFNGMzmXW/zHd99k8bbRUdtaoM0=;
-        b=H9VYg0dq2EPMoU0jMhv9nc5cipuigrxfzvjBYiiegTukoOhfz+qxPJSng8HKZMZoqE
-         grnPaEG17ecXOvqv/IrTBrbgh8koNA++kUIw7UxpP5PjQCx3/59t/CRjQUyA2Jjrgiln
-         /Ak/9jRYsqx8f6wP9z9w4DMCH5M2CAf7luZlyjGh4MMReFJa1WJ5XXYhhnVck92Ez6HM
-         NTYeCVk1jM1oA7mSzu+nyanMbWvk88OZdQNO1ocBm3FCzAhd+F/4PlGDoDk7WraVoIpT
-         uTfH6gUUHVOHPGeOJnYCYiJjzA9onro6R77xeM+CSiTMdYWI5lpsFwDbvzhf27mpP5o/
-         ufdw==
-X-Gm-Message-State: AOAM533LyReFerYBTFYPqPJ+aPDlckR7/SUEw8TKqvLJRFSgX84Re0un
-        bljkfxd+fbWxKqYeh9R1GT3AC7TveTGYWg==
-X-Google-Smtp-Source: ABdhPJxHY3FzR4+aFvQkQgUDmXG2x/MaauABGWZGvBn4+ZeRBztlOGwUuTHtoHptIiKqJ/rTqADxTA==
-X-Received: by 2002:a05:622a:613:b0:2f3:64b5:82d with SMTP id z19-20020a05622a061300b002f364b5082dmr19283247qta.176.1651233614638;
-        Fri, 29 Apr 2022 05:00:14 -0700 (PDT)
-Received: from [172.17.0.2] ([52.152.170.76])
-        by smtp.gmail.com with ESMTPSA id l5-20020a05622a174500b002f369c846f0sm1652708qtk.74.2022.04.29.05.00.14
+        bh=SstPgasRIgU1OkRSVX5+voo9qBznetTY7Fv/nZunjMk=;
+        b=7XeYGxcgCzIIz1/kUDtaulqiaWyBZiBjO8SNyzHpDLz506YuUnRMLpM2QrLMF2Ax/a
+         Cj+Ff+MC0uSipGCAgKZZSlQ58G2ZalwLRjpZB+nzx8S66n2JiKzS/2Ey7++faflo7d8V
+         +yBdBYaNm1iGCiWqDvndLcVAffoeysFwJhkK2tAWG/mKlQC+Sgngqc/KFbXU5AasFCb9
+         kizJ4uGzv8qEczSIRxpTKEb/2ntxTuaUNvnll8QBynwRyl6ZA+HE0xXvE+7spkZugW3B
+         QqLG7+t6/ap/49ekmn2MaaSDfNwOeIzsxxIyDJvRIUqLwrER1heQeP3R49nB1NNtwnTD
+         L7mw==
+X-Gm-Message-State: AOAM532mIhS2Bj71QadEDOZXhEi5b7aUI75B3ai3KJ4apCY+ydAfro76
+        b17YrSawvfO22pQhjjFACexYUvOmMXTlzg==
+X-Google-Smtp-Source: ABdhPJzL68YVJYBaD1TgJRiE+pIygsGBS8dORDhkmwgRqjy1N50Lo8B7W8PB1kmTt1UliMKZgPmpnA==
+X-Received: by 2002:a05:622a:16:b0:2f3:99ba:9842 with SMTP id x22-20020a05622a001600b002f399ba9842mr387211qtw.411.1651233764163;
+        Fri, 29 Apr 2022 05:02:44 -0700 (PDT)
+Received: from [172.17.0.2] ([20.242.72.29])
+        by smtp.gmail.com with ESMTPSA id h186-20020a376cc3000000b00699c789a757sm1345190qkc.132.2022.04.29.05.02.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 05:00:14 -0700 (PDT)
-Message-ID: <626bd34e.1c69fb81.4e13d.9a46@mx.google.com>
-Date:   Fri, 29 Apr 2022 05:00:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0638094853053801494=="
+        Fri, 29 Apr 2022 05:02:43 -0700 (PDT)
+Message-ID: <626bd3e3.1c69fb81.85bcc.7e64@mx.google.com>
+Date:   Fri, 29 Apr 2022 05:02:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6438334304583584559=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_bgodavar@quicinc.com
-Subject: RE: WAR to handle WCN6750 hardware issue
+To:     linux-bluetooth@vger.kernel.org, jtornosm@redhat.com
+Subject: RE: btusb: CSR chip hangs when unbound
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
-References: <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
+In-Reply-To: <20220429114113.356263-1-jtornosm@redhat.com>
+References: <20220429114113.356263-1-jtornosm@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0638094853053801494==
+--===============6438334304583584559==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -74,31 +74,110 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=636918
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=636921
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      4.79 seconds
-GitLint                       PASS      3.01 seconds
-SubjectPrefix                 FAIL      1.73 seconds
-BuildKernel                   PASS      31.70 seconds
-BuildKernel32                 PASS      28.95 seconds
-Incremental Build with patchesPASS      49.95 seconds
-TestRunner: Setup             PASS      484.37 seconds
-TestRunner: l2cap-tester      PASS      17.17 seconds
-TestRunner: bnep-tester       PASS      6.09 seconds
-TestRunner: mgmt-tester       PASS      102.27 seconds
-TestRunner: rfcomm-tester     PASS      9.76 seconds
-TestRunner: sco-tester        PASS      9.61 seconds
-TestRunner: smp-tester        PASS      9.27 seconds
-TestRunner: userchan-tester   PASS      6.42 seconds
+CheckPatch                    FAIL      2.40 seconds
+GitLint                       FAIL      0.98 seconds
+SubjectPrefix                 FAIL      0.83 seconds
+BuildKernel                   PASS      40.73 seconds
+BuildKernel32                 PASS      36.23 seconds
+Incremental Build with patchesPASS      48.50 seconds
+TestRunner: Setup             PASS      588.54 seconds
+TestRunner: l2cap-tester      PASS      19.99 seconds
+TestRunner: bnep-tester       PASS      7.46 seconds
+TestRunner: mgmt-tester       PASS      116.45 seconds
+TestRunner: rfcomm-tester     PASS      11.38 seconds
+TestRunner: sco-tester        PASS      11.05 seconds
+TestRunner: smp-tester        PASS      11.04 seconds
+TestRunner: userchan-tester   PASS      7.56 seconds
 
 Details
 ##############################
-Test: SubjectPrefix - FAIL - 1.73 seconds
+Test: CheckPatch - FAIL - 2.40 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+btusb: CSR chip hangs when unbound\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#72: 
+for CSR chip when usb device is unbound. Besides, "skip_unconfigure"  sysfs 
+
+ERROR:OPEN_BRACE: that open brace { should be on the previous line
+#94: FILE: drivers/bluetooth/btusb.c:4837:
+ 		if (le16_to_cpu(udev->descriptor.idVendor)  == 0x0a12 &&
+ 		    le16_to_cpu(udev->descriptor.idProduct) == 0x0001)
++		{
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#99: FILE: drivers/bluetooth/btusb.c:4842:
++                         * index 0 (unconfigure) is sent, avoid this at least$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#100: FILE: drivers/bluetooth/btusb.c:4843:
++                         * if it is unbound */$
+
+WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
+#100: FILE: drivers/bluetooth/btusb.c:4843:
++                         * if it is unbound */
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#128: FILE: drivers/usb/core/sysfs.c:1193:
++                                      struct device_attribute *attr, char *buf)$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#128: FILE: drivers/usb/core/sysfs.c:1193:
++                                      struct device_attribute *attr, char *buf)$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#143: FILE: drivers/usb/core/sysfs.c:1208:
++                                      struct device_attribute *attr,$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#143: FILE: drivers/usb/core/sysfs.c:1208:
++                                      struct device_attribute *attr,$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#144: FILE: drivers/usb/core/sysfs.c:1209:
++                                      const char *buf, size_t count)$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#144: FILE: drivers/usb/core/sysfs.c:1209:
++                                      const char *buf, size_t count)$
+
+WARNING:SSCANF_TO_KSTRTO: Prefer kstrto<type> to single variable sscanf
+#150: FILE: drivers/usb/core/sysfs.c:1215:
++	if (sscanf(buf, "%d", &val) != 1 || val < 0 || val > 1)
++		return -EINVAL;
+
+total: 6 errors, 6 warnings, 83 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+NOTE: Whitespace errors detected.
+      You may wish to use scripts/cleanpatch or scripts/cleanfile
+
+/github/workspace/src/12831884.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL - 0.98 seconds
+Run gitlint with rule in .gitlint
+btusb: CSR chip hangs when unbound
+7: B2 Line has trailing whitespace: "The reason is CSR chip hangs when usb configuration command with index 0 "
+10: B2 Line has trailing whitespace: "To avoid this unwanted result, it is necessary not to send this command "
+11: B2 Line has trailing whitespace: "for CSR chip when usb device is unbound. Besides, "skip_unconfigure"  sysfs "
+16: B2 Line has trailing whitespace: "On the other hand, this is not important if usb device is going to be bound "
+
+
+##############################
+Test: SubjectPrefix - FAIL - 0.83 seconds
 Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
 "Bluetooth: " is not specified in the subject
 
 
@@ -108,4 +187,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0638094853053801494==--
+--===============6438334304583584559==--
