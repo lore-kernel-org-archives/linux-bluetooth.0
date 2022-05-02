@@ -2,172 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FE0BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 19:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9AEBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 21:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1387176AbiEBTuw (ORCPT
+        id S232133AbiEBVJ1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 May 2022 15:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33460 "EHLO
+        Mon, 2 May 2022 17:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238542AbiEBTuv (ORCPT
+        with ESMTP id S232110AbiEBVJ0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 May 2022 15:50:51 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF12665CE
-        for <linux-bluetooth@vger.kernel.org>; Mon,  2 May 2022 12:47:21 -0700 (PDT)
-Received: from [IPV6:2003:e9:d724:5eaf:7962:46e1:bce5:9013] (p200300e9d7245eaf796246e1bce59013.dip0.t-ipconnect.de [IPv6:2003:e9:d724:5eaf:7962:46e1:bce5:9013])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (No client certificate requested)
-        (Authenticated sender: stefan@datenfreihafen.org)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 7A01AC0F56;
-        Mon,  2 May 2022 21:37:19 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
-        s=2021; t=1651520239;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8hGpWv1RDWq7kf4AFO9qh9ojGqRMzUceRRnpQPDO0dE=;
-        b=Rks4ubu/diMPgrqGQP2T2Z0cz6Aom8UvuBG+kMA5IRi/wtwvEy4CnxzAFx7lcEn+58iLMn
-        vtb/xNxbyaZ8iCDykaBuZdR+Ra14/ELhWwC+ZKDnkChhb5KMIeIhyxDjNbDgWKJHKiQ36a
-        KEspgCNYdRfM3eXajCvu6KA3QQ2WaiZx0kC/HLXjW3Cpd/ia7B5uRu2xii6+Sj97tO1vOk
-        vnf72X7gN8lQlu7l6J0GSnChrDD9GIYWzg/1xnRvxuCSIw9NPh3o3z7qRAuuf2MvTtK+V8
-        FR0ijG6pt8tB1s9+XzKY/zXk0LspprXTa1Hl69GnGbzz/LVZ784RQA4rZDhCQQ==
-Message-ID: <6009d104-7f73-0acb-0e34-f4a90534e226@datenfreihafen.org>
-Date:   Mon, 2 May 2022 21:37:19 +0200
+        Mon, 2 May 2022 17:09:26 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B2FBC36
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 May 2022 14:05:56 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id x18so2252464plg.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 May 2022 14:05:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=mZFJU8oGnSo9NfWXq+X3qpT08JftfIhhfeGmT7oGTVo=;
+        b=kZjypGl+uT0xL9z2ytFoHLzKR+H4j2rSPPBmprQ2eDPLjjloEaOkcwQZPV3a8auGkJ
+         Jrt11QApqMQv5afw0zp3VckO8lA6iLXNdVeV9yNn5OG8beFBHYh8MimUHUT4W/D2sOXV
+         XSCGVTMBSEPaoEpJUG1LB9Hg4ju8EaZWEoYVL1BBcDg5ow3CPOXTP19q3lud1pMSleo+
+         2vGV8NFIYwpQY2QW/3ZBcg0wcc+NvjLXLZ0IY8idJGUtRFFXSSQLzbYtEoJSsDS08YKh
+         Hsju5/PzWBS85P54q66I/ZyhsB2qxst6yHlWHF+Rl6NUeCLf5glRHC62f0OTbLVhPjQ+
+         oXcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=mZFJU8oGnSo9NfWXq+X3qpT08JftfIhhfeGmT7oGTVo=;
+        b=kbppU4K7BisxK5x84ptDrmbUc7oaLuTHOLQqVqyNLqQqAroN9ZnbtFjGzRRfRglOGy
+         UWkK0lozMOnPKapiXWwnePa0fOOazDNw2ykwaW/gvtdxH4dyP85TldZjJ+Xzu3DNNoP2
+         XMIhgZnKMtmzIgfP1AhG0CAWjluNTVnPjibe1yIWC1cukW665032U/tYgh14nbnWn7Z3
+         UNc8fOqnYlub21HNerbfyfeN8oA+0xHubdFEr9VsSHjEU+VTq+Q3tC9xszak5usQFujL
+         b/eO2ldnzP+ta3wLk8XahgU/SU48oUP5SIYNc0LaGDc1gu/PlL3Y/bMT/j3KrDSGSVLS
+         gt+w==
+X-Gm-Message-State: AOAM5336VdZRd6kMGYQOGvEkLee+/SXWyh46daywCoo6ic8g5K/nSMOj
+        iVFEbGmYYVADeWjAk3aDm3t70IBndLQ=
+X-Google-Smtp-Source: ABdhPJyFmgCcryvrgu9+uMuE1g/rtWpRLAMwSKdpC0N8sF8hGM9kZR/jV1FvWjhf70vj2jaw6pKj2w==
+X-Received: by 2002:a17:902:ef47:b0:156:646b:58e7 with SMTP id e7-20020a170902ef4700b00156646b58e7mr13238584plx.57.1651525555934;
+        Mon, 02 May 2022 14:05:55 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id g2-20020a170902e38200b0015e8d4eb2d8sm846255ple.290.2022.05.02.14.05.55
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 May 2022 14:05:55 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] monitor: Decode LTV fields of Basic Audio Announcements
+Date:   Mon,  2 May 2022 14:05:53 -0700
+Message-Id: <20220502210553.2271064-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220502210553.2271064-1-luiz.dentz@gmail.com>
+References: <20220502210553.2271064-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH bluetooth-next 3/3] net: 6lowpan: constify lowpan_nhc
- structures
-Content-Language: en-US
-To:     Alexander Aring <aahringo@redhat.com>,
-        jukka.rissanen@linux.intel.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        torvalds@linuxfoundation.org
-References: <20220428030534.3220410-1-aahringo@redhat.com>
- <20220428030534.3220410-4-aahringo@redhat.com>
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-In-Reply-To: <20220428030534.3220410-4-aahringo@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Hello.
+This decodes the LTV fields of Basic Audio Announcements:
 
-On 28.04.22 05:05, Alexander Aring wrote:
-> This patch constify the lowpan_nhc declarations. Since we drop the rb
-> node datastructure there is no need for runtime manipulation of this
-> structure.
-> 
-> Signed-off-by: Alexander Aring <aahringo@redhat.com>
-> ---
->   net/6lowpan/nhc.c | 16 ++++++++--------
->   net/6lowpan/nhc.h |  6 +++---
->   2 files changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/6lowpan/nhc.c b/net/6lowpan/nhc.c
-> index 019f121b2449..7b374595328d 100644
-> --- a/net/6lowpan/nhc.c
-> +++ b/net/6lowpan/nhc.c
-> @@ -12,12 +12,12 @@
->   
->   #include "nhc.h"
->   
-> -static struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
-> +static const struct lowpan_nhc *lowpan_nexthdr_nhcs[NEXTHDR_MAX + 1];
->   static DEFINE_SPINLOCK(lowpan_nhc_lock);
->   
-> -static struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
-> +static const struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
->   {
-> -	struct lowpan_nhc *nhc;
-> +	const struct lowpan_nhc *nhc;
->   	int i;
->   	u8 id;
->   
-> @@ -41,7 +41,7 @@ static struct lowpan_nhc *lowpan_nhc_by_nhcid(struct sk_buff *skb)
->   int lowpan_nhc_check_compression(struct sk_buff *skb,
->   				 const struct ipv6hdr *hdr, u8 **hc_ptr)
->   {
-> -	struct lowpan_nhc *nhc;
-> +	const struct lowpan_nhc *nhc;
->   	int ret = 0;
->   
->   	spin_lock_bh(&lowpan_nhc_lock);
-> @@ -59,7 +59,7 @@ int lowpan_nhc_do_compression(struct sk_buff *skb, const struct ipv6hdr *hdr,
->   			      u8 **hc_ptr)
->   {
->   	int ret;
-> -	struct lowpan_nhc *nhc;
-> +	const struct lowpan_nhc *nhc;
->   
->   	spin_lock_bh(&lowpan_nhc_lock);
->   
-> @@ -102,7 +102,7 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
->   				const struct net_device *dev,
->   				struct ipv6hdr *hdr)
->   {
-> -	struct lowpan_nhc *nhc;
-> +	const struct lowpan_nhc *nhc;
->   	int ret;
->   
->   	spin_lock_bh(&lowpan_nhc_lock);
-> @@ -138,7 +138,7 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
->   	return 0;
->   }
->   
-> -int lowpan_nhc_add(struct lowpan_nhc *nhc)
-> +int lowpan_nhc_add(const struct lowpan_nhc *nhc)
->   {
->   	int ret = 0;
->   
-> @@ -156,7 +156,7 @@ int lowpan_nhc_add(struct lowpan_nhc *nhc)
->   }
->   EXPORT_SYMBOL(lowpan_nhc_add);
->   
-> -void lowpan_nhc_del(struct lowpan_nhc *nhc)
-> +void lowpan_nhc_del(const struct lowpan_nhc *nhc)
->   {
->   	spin_lock_bh(&lowpan_nhc_lock);
->   
-> diff --git a/net/6lowpan/nhc.h b/net/6lowpan/nhc.h
-> index 9df602a632bd..ab7b4977c32b 100644
-> --- a/net/6lowpan/nhc.h
-> +++ b/net/6lowpan/nhc.h
-> @@ -24,7 +24,7 @@
->   #define LOWPAN_NHC(__nhc, _name, _nexthdr,	\
->   		   _hdrlen, _id, _idmask,	\
->   		   _uncompress, _compress)	\
-> -static struct lowpan_nhc __nhc = {		\
-> +static const struct lowpan_nhc __nhc = {	\
->   	.name		= _name,		\
->   	.nexthdr	= _nexthdr,		\
->   	.nexthdrlen	= _hdrlen,		\
-> @@ -116,14 +116,14 @@ int lowpan_nhc_do_uncompression(struct sk_buff *skb,
->    *
->    * @nhc: nhc which should be add.
->    */
-> -int lowpan_nhc_add(struct lowpan_nhc *nhc);
-> +int lowpan_nhc_add(const struct lowpan_nhc *nhc);
->   
->   /**
->    * lowpan_nhc_del - delete a next header compression from framework
->    *
->    * @nhc: nhc which should be delete.
->    */
-> -void lowpan_nhc_del(struct lowpan_nhc *nhc);
-> +void lowpan_nhc_del(const struct lowpan_nhc *nhc);
->   
->   /**
->    * lowpan_nhc_init - adding all default nhcs
+< HCI Command: LE Set Periodic Advertising Data (0x08|0x003f) plen 41
+        Handle: 0
+        Operation: Complete ext advertising data (0x03)
+        Data length: 0x26
+        Service Data: Basic Audio Announcement (0x1851)
+          Presetation Delay: 40000
+          Number of Subgroups: 1
+            Subgroup #0:
+            Number of BIS(s): 1
+            Codec: LC3 (0x06)
+            Codec Specific Configuration #0: len 0x02 type 0x01
+            Codec Specific Configuration: 03
+            Codec Specific Configuration #1: len 0x02 type 0x02
+            Codec Specific Configuration: 01
+            Codec Specific Configuration #2: len 0x05 type 0x03
+            Codec Specific Configuration: 01000000
+            Codec Specific Configuration #3: len 0x03 type 0x04
+            Codec Specific Configuration: 2800
+            Metadata #0: len 0x03 type 0x02
+            Metadata: 0200
+              BIS #0:
+              Index: 1
+              Codec Specific Configuration:
+---
+ monitor/packet.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-Reviewed-by: Stefan Schmidt <stefan@datenfreihafen.org>
+diff --git a/monitor/packet.c b/monitor/packet.c
+index d409e4e63..99ed9c281 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3318,6 +3318,44 @@ static void *iov_pull(struct iovec *iov, size_t len)
+ 	return data;
+ }
+ 
++static void print_ltv(const char *label, const uint8_t *data, uint8_t len)
++{
++	struct iovec iov;
++	int i;
++
++	iov.iov_base = (void *) data;
++	iov.iov_len = len;
++
++	for (i = 0; iov.iov_len; i++) {
++		uint8_t l, t, *v;
++
++		l = get_u8(iov_pull(&iov, sizeof(l)));
++		if (!l) {
++			print_field("%s #%d: len 0x%02x", label, i, l);
++			break;
++		}
++
++		v = iov_pull(&iov, sizeof(*v));
++		if (!v)
++			break;
++
++		t = get_u8(v);
++
++		print_field("%s #%d: len 0x%02x type 0x%02x", label, i, l, t);
++
++		l -= 1;
++
++		v = iov_pull(&iov, l);
++		if (!v)
++			break;
++
++		print_hex_field(label , v, l);
++	}
++
++	if (iov.iov_len)
++		print_hex_field(label , iov.iov_base, iov.iov_len);
++}
++
+ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
+ {
+ 	struct iovec iov;
+@@ -3368,7 +3406,7 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
+ 		if (!iov_pull(&iov, codec_cfg->len))
+ 			goto done;
+ 
+-		print_hex_field("    Codec Specific Configuration",
++		print_ltv("    Codec Specific Configuration",
+ 					codec_cfg->data, codec_cfg->len);
+ 
+ 		metadata = iov_pull(&iov, sizeof(*metadata));
+@@ -3378,7 +3416,7 @@ static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
+ 		if (!iov_pull(&iov, metadata->len))
+ 			goto done;
+ 
+-		print_hex_field("    Metadata", metadata->data, metadata->len);
++		print_ltv("    Metadata", metadata->data, metadata->len);
+ 
+ 		/* Level 3 - BIS(s)*/
+ 		for (j = 0; j < subgroup->num_bis; j++) {
+-- 
+2.35.1
 
-regards
-Stefan Schmidt
