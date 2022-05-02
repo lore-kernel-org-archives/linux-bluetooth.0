@@ -2,79 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B54BAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 10:24:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA562C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 11:07:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353681AbiEBK2S (ORCPT
+        id S231352AbiEBLLI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 May 2022 06:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47938 "EHLO
+        Mon, 2 May 2022 07:11:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238667AbiEBK2Q (ORCPT
+        with ESMTP id S1384672AbiEBLK7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 May 2022 06:28:16 -0400
-Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CB5334;
-        Mon,  2 May 2022 03:24:48 -0700 (PDT)
+        Mon, 2 May 2022 07:10:59 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0703D1EC53
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 May 2022 04:07:28 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id 126so10111536qkm.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 May 2022 04:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1651487088; x=1683023088;
-  h=from:to:cc:subject:date:message-id;
-  bh=aIQiPVQV8Y+lL7j3g3uZDmsRTkL6UUd0G/jOVDvWS0Y=;
-  b=KkHm87N6r/L7viu6B1Esk8UdSi03rb/xnGG+Vq+KXbTKX6jzl2mWPMNd
-   KTQq8qKUBXUP3zWToKQ5qE091ZBpDC1EUm8Q+ZI8oJAMza0VKImwC1ZfC
-   szJWKhnk6/54ye2SA1mr42Bj1gSA7UZuwnb5oA63+1A8OShQnc449x2eC
-   8=;
-Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
-  by alexa-out.qualcomm.com with ESMTP; 02 May 2022 03:24:48 -0700
-X-QCInternal: smtphost
-Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
-  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 02 May 2022 03:24:46 -0700
-X-QCInternal: smtphost
-Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 02 May 2022 15:54:30 +0530
-Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
-        id 0334420ECC; Mon,  2 May 2022 15:54:30 +0530 (IST)
-From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
-        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
-        quic_hbandi@quicinc.com, abhishekpandit@chromium.org,
-        mcchou@chromium.org, Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: [PATCH v1] Bluetooth: hci_qca: Return wakeup for qca_wakeup
-Date:   Mon,  2 May 2022 15:54:08 +0530
-Message-Id: <1651487048-30298-1-git-send-email-quic_saluvala@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=CWQDniP/f7Ql7RrcXP1P1hi8YGgZSLwWc8r5PyE/O2c=;
+        b=TCoSm+w+9zj0iNMdiZFXt3d5LsG0nkuis6iAMczo2qsPZwRcP6h+HkX1ImSeQwrVYA
+         Fd5YIMMMHivB714jxDcIkFYZAZzuh7bSqE1O49dSvOHnwlJtUY2oTb4xEVP4keKysjWZ
+         uWPfz3rimNGnGUkR4PX55KYSaV2iZCSYiBpc0jyxpu3D83ajhUxawb1cP0t6JIN5bxIH
+         5swoACtB8vcinqEkhE370Mzt2+Su0AEqY7l+NG/rCqFGJSp/ocIGMjDOAYRCIj77aXNe
+         hqlOg4FSXoVNv3wd5zrgZJsa3DzPukOI5OS0MfeOos1nnsPYAWtNo1ndhLyiPVrKgyrO
+         xj+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=CWQDniP/f7Ql7RrcXP1P1hi8YGgZSLwWc8r5PyE/O2c=;
+        b=Bozz5XXJjcngNT+yFSOnc+KCjlhYpnlEN/qnl59Q9y28HMj4nTH1I4iPMzKxCzO7Eg
+         STuxjGu+A1lC22c3tv/rz5nXq6lOxEx7FItIooTKwvdElT9sPW/uaSPFYAntyBFO7cmE
+         cn3lEJjB4hp1ymtn0WVf3zypufNbILXv74XhfHjM0bhHzZqbfVkVvEMHe6deDurDqil1
+         kI5RwAkeQRhlmtcFHgTY+luUCPXNdTRswoohu3nZm7jZze+UCN5bNUBb0VQhlFqqA+47
+         hVojRMkQjW2N9z2jqsJfhjQY2MEtV79vJbcTZNyawlHCG1Lrnfv0wQvkrXBODtHhPg7y
+         xP9g==
+X-Gm-Message-State: AOAM533fFS9c6TByv0fWalXHhs8u8ie3Q8E++HnhysdHfEHo/OZYeTSu
+        qhbcHN8ZQa/9LGlTsQNMcWxQLoXxVKWMrg==
+X-Google-Smtp-Source: ABdhPJw8Jk5pogusa5LCjX43jDTOmXkOLTVaT7i6+ptpdh9my0LLAjwGgCL2/DxPlWOkIewLDgxwYw==
+X-Received: by 2002:a37:68d4:0:b0:60d:f4eb:fc12 with SMTP id d203-20020a3768d4000000b0060df4ebfc12mr7848276qkc.413.1651489646910;
+        Mon, 02 May 2022 04:07:26 -0700 (PDT)
+Received: from [172.17.0.2] ([20.127.17.195])
+        by smtp.gmail.com with ESMTPSA id a7-20020a05620a124700b0069fc13ce211sm4020527qkl.66.2022.05.02.04.07.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 May 2022 04:07:26 -0700 (PDT)
+Message-ID: <626fbb6e.1c69fb81.bb318.168c@mx.google.com>
+Date:   Mon, 02 May 2022 04:07:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1040842405078567746=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_saluvala@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_qca: Return wakeup for qca_wakeup
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1651487048-30298-1-git-send-email-quic_saluvala@quicinc.com>
+References: <1651487048-30298-1-git-send-email-quic_saluvala@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the return value of qca_wakeup(), since
-.wakeup work inversely with original .prevent_wake.
+--===============1040842405078567746==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 4539ca67fe8ed (Bluetooth: Rename driver .prevent_wake to .wakeup)
-Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=637536
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.69 seconds
+GitLint                       PASS      1.05 seconds
+SubjectPrefix                 PASS      0.86 seconds
+BuildKernel                   PASS      35.22 seconds
+BuildKernel32                 PASS      30.54 seconds
+Incremental Build with patchesPASS      42.68 seconds
+TestRunner: Setup             PASS      517.97 seconds
+TestRunner: l2cap-tester      PASS      17.84 seconds
+TestRunner: bnep-tester       PASS      6.46 seconds
+TestRunner: mgmt-tester       PASS      104.54 seconds
+TestRunner: rfcomm-tester     PASS      10.14 seconds
+TestRunner: sco-tester        PASS      9.74 seconds
+TestRunner: smp-tester        PASS      10.04 seconds
+TestRunner: userchan-tester   PASS      6.65 seconds
+
+
 
 ---
-v1:initial Patch
----
- drivers/bluetooth/hci_qca.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index eab34e2..8df1101 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1588,7 +1588,7 @@ static bool qca_wakeup(struct hci_dev *hdev)
- 	wakeup = device_may_wakeup(hu->serdev->ctrl->dev.parent);
- 	bt_dev_dbg(hu->hdev, "wakeup status : %d", wakeup);
- 
--	return !wakeup;
-+	return wakeup;
- }
- 
- static int qca_regulator_init(struct hci_uart *hu)
--- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
+--===============1040842405078567746==--
