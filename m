@@ -2,88 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60B8DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 09:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B54BAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 May 2022 10:24:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380211AbiEBJTS (ORCPT
+        id S1353681AbiEBK2S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 May 2022 05:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37612 "EHLO
+        Mon, 2 May 2022 06:28:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1384160AbiEBJS5 (ORCPT
+        with ESMTP id S238667AbiEBK2Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 May 2022 05:18:57 -0400
-X-Greylist: delayed 575 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 02 May 2022 02:15:28 PDT
-Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C5D72BB3C;
-        Mon,  2 May 2022 02:15:28 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 80A1141139;
-        Mon,  2 May 2022 11:05:45 +0200 (CEST)
-Date:   Mon, 2 May 2022 11:05:42 +0200
-From:   Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
-To:     linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-        Intel Linux Wireless <linuxwifi@intel.com>
-Cc:     Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: Crash / Null pointer dereference in l2cap_chan_send()
-Message-ID: <Ym+exknyLoxOZqFe@sellars>
-References: <20201110062039.GC2423@otheros>
- <20201110205950.GF2423@otheros>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20201110205950.GF2423@otheros>
-X-Last-TLS-Session-Version: TLSv1.3
+        Mon, 2 May 2022 06:28:16 -0400
+Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CB5334;
+        Mon,  2 May 2022 03:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1651487088; x=1683023088;
+  h=from:to:cc:subject:date:message-id;
+  bh=aIQiPVQV8Y+lL7j3g3uZDmsRTkL6UUd0G/jOVDvWS0Y=;
+  b=KkHm87N6r/L7viu6B1Esk8UdSi03rb/xnGG+Vq+KXbTKX6jzl2mWPMNd
+   KTQq8qKUBXUP3zWToKQ5qE091ZBpDC1EUm8Q+ZI8oJAMza0VKImwC1ZfC
+   szJWKhnk6/54ye2SA1mr42Bj1gSA7UZuwnb5oA63+1A8OShQnc449x2eC
+   8=;
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 02 May 2022 03:24:48 -0700
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 02 May 2022 03:24:46 -0700
+X-QCInternal: smtphost
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 02 May 2022 15:54:30 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 0334420ECC; Mon,  2 May 2022 15:54:30 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        quic_bgodavar@quicinc.com, quic_rjliao@quicinc.com,
+        quic_hbandi@quicinc.com, abhishekpandit@chromium.org,
+        mcchou@chromium.org, Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH v1] Bluetooth: hci_qca: Return wakeup for qca_wakeup
+Date:   Mon,  2 May 2022 15:54:08 +0530
+Message-Id: <1651487048-30298-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 10, 2020 at 09:59:50PM +0100, Linus Lüssing wrote:
-> On Tue, Nov 10, 2020 at 07:20:39AM +0100, Linus Lüssing wrote:
-> > [...]
-> >
-> > The issue was introduced with the following commit:
-> > 
-> >     f4bfdc5e571e ("iwlwifi: mvm: stop supporting swcrypto and bt_coex_active module parameters")
-> >     * first affected tag: v5.8-rc1
-> > 
-> 
-> PS: As this commit mentioned bt_coex_active, I retried with a
-> vanilla 5.9.6 kernel while leaving bt_coex_active at its
-> default value. That is leaving it enabled while all previous tests
-> I did had it disabled.
-> 
-> However I still get the Bluetooth A2DP freeze and subsequent
-> kernel panics.
-> [...]
+This fixes the return value of qca_wakeup(), since
+.wakeup work inversely with original .prevent_wake.
 
-I did a few more tests and found out that it was the old iwlwifi
-firmware causing the kernel panics for me when Bluetooth co-existence
-is enabled.
+Fixes: 4539ca67fe8ed (Bluetooth: Rename driver .prevent_wake to .wakeup)
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
 
-With firmware-iwlwifi_20170823-1_all.deb on Debian I can reproduce
-the issue, with firmware-iwlwifi_20180518-1~bpo9+1_all.deb or
-firmware-iwlwifi_20210818-1_all.deb I can't.
+---
+v1:initial Patch
+---
+ drivers/bluetooth/hci_qca.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Also, I can still reproduce the kernel panic with firmware-iwlwifi at
-version 20170823-1 and with a recent Linux kernel on Debian Sid
-(linux-image-5.17.0-1-amd64, 5.17.3-1). So nothing which has fixed
-it in the upstream kernel since v5.8-rc1.
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index eab34e2..8df1101 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1588,7 +1588,7 @@ static bool qca_wakeup(struct hci_dev *hdev)
+ 	wakeup = device_may_wakeup(hu->serdev->ctrl->dev.parent);
+ 	bt_dev_dbg(hu->hdev, "wakeup status : %d", wakeup);
+ 
+-	return !wakeup;
++	return wakeup;
+ }
+ 
+ static int qca_regulator_init(struct hci_uart *hu)
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
-
-I'm a bit surprised that a non-free firmware can create kernel
-panics in "random" code paths. But maybe that's expected as
-whatever is running the iwlwifi firmware has access to more memory
-areas than I would like it to have? Let me know if I should dig
-deeper, if there is something that should/could be fixed in the
-upstream, opensource iwlwifi driver to prevent such kernel panics.
-
-Regards, Linus
-
-
-PS: firmware-iwlwifi_20170823-1_all.deb seems unavailable on Debian
-at the moment, even the archives. But I found a copy in the Kali
-Linux archives:
-http://old.kali.org/kali/pool/non-free/f/firmware-nonfree/firmware-iwlwifi_20170823-1_all.deb
