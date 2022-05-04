@@ -2,116 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1A8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 20:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE2BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 21:09:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378044AbiEDUe4 (ORCPT
+        id S1378503AbiEDVNd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 16:34:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41012 "EHLO
+        Wed, 4 May 2022 17:13:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378037AbiEDUez (ORCPT
+        with ESMTP id S235258AbiEDVNc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 16:34:55 -0400
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CCBE4F9EB;
-        Wed,  4 May 2022 13:31:18 -0700 (PDT)
-Received: by mail-ot1-f45.google.com with SMTP id l9-20020a056830268900b006054381dd35so1655766otu.4;
-        Wed, 04 May 2022 13:31:18 -0700 (PDT)
+        Wed, 4 May 2022 17:13:32 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2EB04F9CE
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 14:09:55 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id i188-20020a636dc5000000b003c143f97bc2so1250057pgc.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 14:09:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=oItEKj1b8hRoSj+evTl/1i3LqgkEyIfpmXzFkcTI5XE=;
+        b=lsoJakvRGlMU+NfxFavfHmfBE+mQbla+vv3HQcrlyAzi1ohUeDazGcv+1k/TNTUX68
+         IJHvNVYfLdorORjM60z0yf1WfSCDGC8iu3YtFTc3Dym4d6KUEE5fbzV78hqKUh8tObkI
+         hSHwzAznXbRiV0TzMiVwxhxhV6DYzJPw4VeTWsxnYlTncsecKiUs0R4rPYgszSqnmPFf
+         p0OKvG6608HtUXMcTWgF5KyDBR+yhVSYfLN9Exhc54Suxpu5LC1JFgnxaJajzkKH2MXY
+         EseydC+2Cl9M8KrBsbQLWSJXe94QaqZjhOurdUz8F3GwIOenuCWomZXPhWXdMvTBoTE7
+         82TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eqhMwN4tyN2ECyEbdMTwnZxfCbkUyNiMmIExOF8iPPE=;
-        b=BqsRaXpLPDBV+f7jLdimuAKNgW57BuKTjJw+8KR8iAqMiAXCNy+f1/bOBbQDv93UZc
-         mnP3SxFaxavAmuP0Jg2sxXxOQiaBBD/fzAUHFw8vi9stowEXoT7jTI3jM7n1tshvQJtl
-         +2oTaBITgMAxYQm74x/p51XX5R64tR7Kg6II7RwvKE/52C1t4wDoWjirrKgJG9NrhCGg
-         T+dcf3Ow0ZxQ6Un/9h3j32okmu0eQWYARSVzu36W2zoollCEMqR3Laz8yug4uOnK8Gxa
-         5wsgnUZxUt1Tj4/0JR/076ISJtNtJzjNMdk/i/tulUHg/PlS/jm4BWkJ1pb3uk1M5eRZ
-         9LnA==
-X-Gm-Message-State: AOAM531+XLWdxY/8EeBdYLYuYLTbm4vcKnr22tNiBfM6laZ+RkaKnEpq
-        3pjwl8IysDzWV3cVwZR4xQ==
-X-Google-Smtp-Source: ABdhPJwQywTu4F9RwachS/Z+ymS39mbMLYXQjo/u7vJvvBOE89ll6PcoXARhA7T/H6EuKifCvUSMUQ==
-X-Received: by 2002:a05:6830:14d4:b0:606:cc5:32cd with SMTP id t20-20020a05683014d400b006060cc532cdmr7035362otq.359.1651696277498;
-        Wed, 04 May 2022 13:31:17 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id u36-20020a05687004e400b000e932746d33sm8441359oam.28.2022.05.04.13.31.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 13:31:16 -0700 (PDT)
-Received: (nullmailer pid 2175284 invoked by uid 1000);
-        Wed, 04 May 2022 20:31:15 -0000
-Date:   Wed, 4 May 2022 15:31:15 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-Cc:     agross@kernel.org, bjorn.andersson@linaro.org,
-        linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, mka@chromium.org,
-        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
-        quic_saluvala@quicinc.com, quic_rjliao@quicinc.com,
-        mcchou@chromium.org
-Subject: Re: [PATCH v1 1/3] dt-bindings: net: bluetooth: Add wlan-gpio entry
- for wcn6750
-Message-ID: <YnLik/JKsHs6yfwc@robh.at.kernel.org>
-References: <1651228073-1999-1-git-send-email-quic_bgodavar@quicinc.com>
- <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1651228073-1999-2-git-send-email-quic_bgodavar@quicinc.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=oItEKj1b8hRoSj+evTl/1i3LqgkEyIfpmXzFkcTI5XE=;
+        b=DXw2hCfQqRfBoqtjonRY5Dfdmx48y7KE453p+M5n7n14LdTQeGHynjekpLuK4owv8M
+         HEcmLdMdb7swQe6D1eWS8mr3ffSI1NIIw3+oISVuZzESpNT2d+VqW9LRN4ap4N3U8Tku
+         V5a79xJdZX/hQ7MSIQOpDMDuajsnRarJCudjGj6szn0BRNVyD0TcViy+qJkEjzNF5Jp8
+         128TIqNQ2uYKlesLbOL2Xr30UscxKI+JpmI6kEkSqHQwazAEZHSmwAt8Fjhh47A5OEAU
+         ARcp28GwhSkUjYuiTMYsMSrvjnvpU9TD3BCor5gU/0mIPA6y3cTPEe/qbzb5wRaRJjx6
+         cQLA==
+X-Gm-Message-State: AOAM531apAyHtXMs1xc67QEorz6LVx47lGu5qKlaHO+1ZxJhQ3eUT+gg
+        W85Kw+rovlTyz1wpEiK5y20bdrS7Utu/5OXMelP5XzkxcWYyRif3zHNlMRdm+oqk5zsrGftwnh0
+        zgPMgAfXSoICbk86GNQCkRZq1woQ1r0eKnKReN3Vt7wnOfTulMbsiZOLeYzG6cW8RLg85tRnhtj
+        sO
+X-Google-Smtp-Source: ABdhPJx1JVm05U0/gWJ8kkBMVi/oyAWbQ5BPXflczzjZX9Tz+9cgQ6W5omYiCMJgYcJRs3Zc/5s57InkY2W+
+X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
+ (user=jiangzp job=sendgmr) by 2002:a17:902:c94d:b0:15e:ba3e:c4d3 with SMTP id
+ i13-20020a170902c94d00b0015eba3ec4d3mr8852281pla.121.1651698595247; Wed, 04
+ May 2022 14:09:55 -0700 (PDT)
+Date:   Wed,  4 May 2022 14:09:45 -0700
+Message-Id: <20220504210948.2968827-1-jiangzp@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
+Subject: [Bluez PATCH v3 0/3] Adding bonded flag to D-Bus property
+From:   Zhengping Jiang <jiangzp@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Zhengping Jiang <jiangzp@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Apr 29, 2022 at 03:57:51PM +0530, Balakrishna Godavarthi wrote:
-> This patch adds a wlan-gpio entry and its reference usage for
+Currently BlueZ client can't know easily whether a device is bonded or
+not. This is causing issues for a number of applications. For example,
+in the Nearby Share case, the peer device is paired, but not bonded.
+This series will add the "Bonded" property in org.bluez.Device1 D-Bus
+interface. Changes are also made in bluetoothctl to show the status of
+the bonded flag as well as a list of bonded devices.
 
-wlan-gpios
+Changes in v3:
+- Move documentation update to a separate patch
+- Add description to bonded and paired
+- Add an optional argument to the devices command to filter device list
+- Remove paired-devices command
 
-> BT SoC wcn6750.
-> 
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-> ---
->  Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> index f93c6e7..624f957 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> @@ -24,6 +24,10 @@ properties:
->        - qcom,qca6390-bt
->        - qcom,wcn6750-bt
->  
-> +  wlan-gpios:
-> +    maxItems: 1
-> +    description: gpio specifier used to wlan chip
+Changes in v2:
+- Move one variable declaration to the top following C90 standard
 
-How does one 'wlan' a chip?
+Changes in v1:
+- Add "Bonded" to D-Bus interface
+- Send property changed signal if the bonded flag is changed
+- Show the status of the "Bonded" flag in bluetoothctl
+- Add option to show list of bonded devices
 
-> +
->    enable-gpios:
->      maxItems: 1
->      description: gpio specifier used to enable chip
-> @@ -123,6 +127,7 @@ allOf:
->                - qcom,wcn6750-bt
->      then:
->        required:
-> +        - wlan-gpios
->          - enable-gpios
->          - swctrl-gpios
->          - vddio-supply
-> @@ -166,6 +171,7 @@ examples:
->              compatible = "qcom,wcn6750-bt";
->              pinctrl-names = "default";
->              pinctrl-0 = <&bt_en_default>;
-> +            wlan-gpios = <&tlmm 84 GPIO_ACTIVE_HIGH>;
->              enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
->              swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
->              vddio-supply = <&vreg_l19b_1p8>;
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
-> 
-> 
+Zhengping Jiang (3):
+  device: Add "Bonded" flag to dbus property
+  doc: add "Bonded" flag to dbus property
+  client: Add filter to devices and show Bonded in info
+
+ client/main.c      | 72 ++++++++++++++++++++++++++++++----------------
+ doc/device-api.txt | 12 +++++++-
+ src/device.c       | 38 ++++++++++++++++++++----
+ 3 files changed, 91 insertions(+), 31 deletions(-)
+
+-- 
+2.36.0.464.gb9c8b46e94-goog
+
