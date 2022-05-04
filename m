@@ -2,93 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811D8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CFCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377524AbiEDWT3 (ORCPT
+        id S1378486AbiEDWX0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 18:19:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40246 "EHLO
+        Wed, 4 May 2022 18:23:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355845AbiEDWT3 (ORCPT
+        with ESMTP id S1343978AbiEDWXY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 18:19:29 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89FF9BE1C
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:15:51 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id j2so4819161ybu.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 15:15:51 -0700 (PDT)
+        Wed, 4 May 2022 18:23:24 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F9F52E79
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:19:47 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id e24so2471922pjt.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 15:19:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qLBklQTU++z1XSeA0IFDBp8dJkPyeYhGjMSHqs5VeMA=;
-        b=NWe0TZcqMFAwCb8eYzInkQywqxx45yJ/Dp3UIamLDQ3fdPCvawza91uR6m3BTXZB1c
-         tOFje3SBN3ZUSbpczZvytggrRDBBNbpv2xxtvzN3Yf8JFj4juv+Ixd0d4sCLqPQ9pO0M
-         SkPfGB9EZ3QwwM8oegYN4MjMndK4rqiMyKtjTrkIyjlxw2cNBCk65l/GhzOjUjAI1YB/
-         iA765SA3zq2F/ud9RrhWKMjOyEKO3KnEU1HU2UVlR5w75a/XuK9ZtPxe/kNs3B0zlRk8
-         F9Dz7yO/Krb1igXE6UMDINeUjlXTVXHft6B128HL30WE9LHSQgnc4nqoZMqLTr8jgy1m
-         E61Q==
+        bh=gYihGH9qceF6yjSjGs6QrGlD7pC4Ldd85EHVOBBXQHM=;
+        b=ih3B/9H117zVuBjepeRDj8BbdOiU2tlMi8DSupUJRuRnpJmjLxxu6K7bDiHzm8ciD8
+         E2au+erVxRxFv0XKuWn02BRf7r8I6GOdOuioUuQ9u+rsLtDy41bvtGwgn9RClSvIsszF
+         mkMuBNWdM0AHjOlEochj5FkcjpMA4qul33qqnyMhV5skorAM6oHUXm3P+UzCUImB1wkT
+         ObN+2N6UAR6UDjr3eAmoU1uYRaP93sBOMx01YdTlhZbJha3UE3EEiq9afvZdMSH0IJHJ
+         bbdqiRODj+dWcscwAWgWtyN9kaBkQAmGGusINQvI0g17GECHC0gwnkp+EXMWy/faB74w
+         YMSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qLBklQTU++z1XSeA0IFDBp8dJkPyeYhGjMSHqs5VeMA=;
-        b=trx4pqV9vjdoRlu/8lhGn/3dhj4bQO0iijEGKAjQO5wvDqCAT+TzuVYD68XnGAqHWQ
-         FpuIDO3QBDn7ldZcK7Xa0ydRG/cmZqcRADch4N7W6y5TMpjp5OWO0CiiY/XN4ydVZVl2
-         yi7CjIcwCUYs17i4VU076629NNI3IGmhR3tT5GV5g7MsbQRLL7zBEvp0tgpnehIOgTPW
-         QM5PNDmFVu8eq32IihiQ2IDRkIJ3jPdhggMWQaQ5rcz6jy5Y6oWYkbH8fGUVrK3b0VYG
-         uM+KCfu/dExXG/l9mOtD9IsU41tjKFnYC91scpZj13HifIQgXKHaJZTUxF4dz1vMH7dy
-         1gJw==
-X-Gm-Message-State: AOAM5312FihrdXpp7NnjfnGJJI2SPk4QJU//YBToaWiyyeS4COZEEWWn
-        xpdlrJx03mIhLaJ6zVY4dEkPfS1I1TL6Ju2GvjWglQ==
-X-Google-Smtp-Source: ABdhPJyjwpvxnoeMjH4hOqPTmTuEjrbSWm6SYSfBU1hA8Xqb22rp4DU76PZhUpFUOSMMV4MibDXJTCgu5WQIa3Kjr3I=
-X-Received: by 2002:a25:aa94:0:b0:648:62f2:ef4e with SMTP id
- t20-20020a25aa94000000b0064862f2ef4emr18637229ybi.626.1651702550800; Wed, 04
- May 2022 15:15:50 -0700 (PDT)
+        bh=gYihGH9qceF6yjSjGs6QrGlD7pC4Ldd85EHVOBBXQHM=;
+        b=U2eifP6+sWPvgdJoWEKwXsozzSp/ZvmT6jgQT1cQTcd22ylCho0HfI5SMcQCItgB2O
+         mLQaiS4M8bcSHSHAD9VxRGL3//6Hx52kzo4eKcE8V3ersxTxE3oxkEdTYeNhxIO8xe9I
+         uFrIjED1tU64EF/FCppv0aD5CymLSxZRrBpPMNdUmkQaxkb9oDxtM4tqmUriDw7VO6D0
+         3KPceiTWjDSNiDkUF/vFXqzFncGDiD6Z7Vcsre7dhM/ZTrGy//Dp5mCA9oC8mj0u3WTg
+         KCFDupHCkhlJkO2p4AbtBVKy1SsDrjMR0kuE0gZ3eBfGMxvNQoo5Ujw0nO6EeUfNA+CO
+         yyHQ==
+X-Gm-Message-State: AOAM532G9rEuBag4KMUNxo26Hc93VK1S+qusCStMZMLGzc3mdamk1yxA
+        hPZbk7dlmwXxv/6xNAbsNOOtlZRgSdvovXAiB0Y=
+X-Google-Smtp-Source: ABdhPJyOOJQ57zr72Ru1vxH2Lq3Em5HNrbaA9b1zu5fyB0hMV7pY+YiSoIzP68skJjgjD9TPehDuu28cL2kuKdPQStk=
+X-Received: by 2002:a17:90a:528f:b0:1dc:9a7c:4a3 with SMTP id
+ w15-20020a17090a528f00b001dc9a7c04a3mr2034370pjh.112.1651702786497; Wed, 04
+ May 2022 15:19:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1651647576.git.hakan.jansson@infineon.com> <64b59ca66cc22e6433a044e7bba2b3e97c810dc2.1651647576.git.hakan.jansson@infineon.com>
-In-Reply-To: <64b59ca66cc22e6433a044e7bba2b3e97c810dc2.1651647576.git.hakan.jansson@infineon.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 5 May 2022 00:15:39 +0200
-Message-ID: <CACRpkdY3xPcyNcJfdGbSP5rdcUV6hr87yJNDVDGZdRCfN+MqLA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add property
- for autobaud mode
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+References: <20220504210948.2968827-1-jiangzp@google.com> <20220504140940.Bluez.v3.2.I52f3efc7576fd0048437f1419dd2e1e687f7ac65@changeid>
+ <6792e558daf326716ac0ac87867367cd91da3b45.camel@hadess.net>
+In-Reply-To: <6792e558daf326716ac0ac87867367cd91da3b45.camel@hadess.net>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 4 May 2022 15:19:34 -0700
+Message-ID: <CABBYNZ+4-PPP9veRbDmA4MWiHr7+QNQaHKL1v-q_erRimnpaEw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 2/3] doc: add "Bonded" flag to dbus property
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     Zhengping Jiang <jiangzp@google.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        Yun-Hao Chung <howardchung@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, May 4, 2022 at 11:04 AM Hakan Jansson
-<hakan.jansson@infineon.com> wrote:
+Hi Bastien,
 
-> +  brcm,uses-autobaud-mode:
-> +    type: boolean
-> +    description: >
-> +      The controller should be started in autobaud mode by asserting
-> +      BT_UART_CTS_N (i.e. host RTS) during startup. Only HCI commands supported
-> +      in autobaud mode should be used until patch FW has been loaded.
+On Wed, May 4, 2022 at 2:37 PM Bastien Nocera <hadess@hadess.net> wrote:
+>
+> On Wed, 2022-05-04 at 14:09 -0700, Zhengping Jiang wrote:
+> > Bonded flag is used to indicate the link key or ltk of the remote
+> > device has been stored.
+> >
+> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> > Reviewed-by: Yun-Hao Chung <howardchung@chromium.org>
+> >
+> > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+> > ---
+> >
+> > Changes in v3:
+> > - Move documentation update to a separate patch
+> > - Add description to bonded and paired
+> >
+> >  doc/device-api.txt | 12 +++++++++++-
+> >  1 file changed, 11 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/doc/device-api.txt b/doc/device-api.txt
+> > index 1e8590b27d58..c7e217c07526 100644
+> > --- a/doc/device-api.txt
+> > +++ b/doc/device-api.txt
+> > @@ -246,7 +246,17 @@ Properties string Address [readonly]
+> >
+> >                 boolean Paired [readonly]
+> >
+> > -                       Indicates if the remote device is paired.
+> > +                       Indicates if the remote device is paired. Pairing is
+> > +                       the process where devices exchange the information to
+> > +                       establish an encrypted connection.
+> > +
+> > +               boolean Bonded [readonly]
+> > +
+> > +                       Indicates if the remote device is bonded. Bonded means
+> > +                       the link key or the ltk from the pairing process has
+> > +                       been stored.
+>
+> "long-term key (LTK)"
+>
+> Is Paired effectively the same as Bonded for Classic devices? If so,
+> would be great to mention.
 
-Things like gnss uses the current-speed attribute to set a serial link speed,
-maybe also Bluetooth?
+There are some rare occasion where the link-keys cannot be
+persisted/stored (e.g. debug keys), but in the other hand Bonded would
+always means Paired, perhaps this is useful if you want to persist
+some device information at upper layers otherwise I can't think of any
+other use of Bonded over Paired.
 
-Would it make sense to use
+> > +                       A PropertiesChanged signal indicate changes to this
+> > +                       status.
+> >
+> >                 boolean Connected [readonly]
+> >
+>
 
-current-speed-auto;
 
-As a flag for these things in general?
-
-Yours,
-Linus Walleij
+-- 
+Luiz Augusto von Dentz
