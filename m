@@ -2,70 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED92C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 07:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E22C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 09:04:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345678AbiEDHuX (ORCPT
+        id S1346703AbiEDJIM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 03:50:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48254 "EHLO
+        Wed, 4 May 2022 05:08:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241137AbiEDHuW (ORCPT
+        with ESMTP id S232414AbiEDJIK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 03:50:22 -0400
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 457D213F03;
-        Wed,  4 May 2022 00:46:47 -0700 (PDT)
-Date:   Wed, 04 May 2022 07:46:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail2; t=1651650403;
-        bh=wG5xTqvpw4JV4k/SUtdwKNTQQEVmavrVULpNR9uaiBk=;
-        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:Feedback-ID:From:To:
-         Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID;
-        b=WISP9Hg+gh3KnWymTIYwnIVfApL9KiosYQXwCfVYgftiQzm95iwU9N1rgLMwCPGA1
-         2Zop5Z3xSn8kX0hPj8Na/v0lTCiTb3ZmOJb2Ic2s2E0ZTGAr7DJaqySjgJv+ncChRu
-         gSZZeDvzNdfyRAZ00jfwt5fi38DC32Xc1s26p2V5Cq+1xNP6HJrfAwYp4MidsbHUSf
-         +XyIELe5hYm7bgfYtB1p1JWmNStBxNFG9DZk8Eu5lmVs9PGspxGQcE/QUsqZS1+J5E
-         jOIV8Rj3v6FH/TApJZVuqUXHICHt9usC/71dCnF18t9aWSMoDrSyWffWId+ZKu2S2w
-         0icX2SkOH1xGw==
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
-From:   Juerg Haefliger <juergh@protonmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Juerg Haefliger <juergh@protonmail.com>
-Reply-To: Juerg Haefliger <juergh@protonmail.com>
-Subject: [PATCH RESEND] Bluetooth: ath3k: Add MODULE_FIRMWARE for patch and config files
-Message-ID: <20220504074606.15505-1-juergh@protonmail.com>
-Feedback-ID: 10260306:user:proton
+        Wed, 4 May 2022 05:08:10 -0400
+Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5BFA1705B;
+        Wed,  4 May 2022 02:04:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1651655075; x=1683191075;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pmRtOTWex9hNEf+BFE9wMMYebJAIk/+hxIQsxl8B6Ls=;
+  b=Yi2opl/gZSSMawr92FqfCTsvQoRfoMP/I95xaAkgDxcc4XRutJoazvfM
+   wb65/3Jekecy9KsyTvj45MMc03wDF0eK2axCv5Q1dFh9K9JBe+l9nAw11
+   zsFX21J8ajXXXpLraKxBUA/AFXK8qlT7FvpEOyl/03vYVZWVs8dlVDqAb
+   s=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10336"; a="119183638"
+X-IronPort-AV: E=Sophos;i="5.91,197,1647298800"; 
+   d="scan'208";a="119183638"
+Received: from unknown (HELO mucxv002.muc.infineon.com) ([172.23.11.17])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2022 11:04:33 +0200
+Received: from MUCSE814.infineon.com (MUCSE814.infineon.com [172.23.29.40])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv002.muc.infineon.com (Postfix) with ESMTPS;
+        Wed,  4 May 2022 11:04:33 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE814.infineon.com
+ (172.23.29.40) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 4 May 2022
+ 11:04:32 +0200
+Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
+ MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Wed, 4 May 2022 11:04:32 +0200
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+CC:     Hakan Jansson <hakan.jansson@infineon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH 0/2] Bluetooth: hci_bcm: Autobaud mode support
+Date:   Wed, 4 May 2022 11:03:38 +0200
+Message-ID: <cover.1651647576.git.hakan.jansson@infineon.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE815.infineon.com (172.23.29.41) To
+ MUCSE807.infineon.com (172.23.29.33)
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The ath3k driver loads patch and configuration files so add MODULE_FIRMWARE
-macros to povide that information via modinfo.
+Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
+Autobaud mode can also be required on some boards where the controller device
+is using a non-standard baud rate when first powered on.
 
-Signed-off-by: Juerg Haefliger <juergh@protonmail.com>
----
-RESEND:
-  Resend from protonmail email account to please the test bot.
----
- drivers/bluetooth/ath3k.c | 2 ++
- 1 file changed, 2 insertions(+)
+Only a limited subset of HCI commands are supported in autobaud mode.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index 88262d3a9392..56e9a64177ae 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -538,3 +538,5 @@ MODULE_DESCRIPTION("Atheros AR30xx firmware driver");
- MODULE_VERSION(VERSION);
- MODULE_LICENSE("GPL");
- MODULE_FIRMWARE(ATH3K_FIRMWARE);
-+MODULE_FIRMWARE("ar3k/AthrBT_0x*.dfu");
-+MODULE_FIRMWARE("ar3k/ramps_0x*_*.dfu");
---
-2.32.0
+These patches add a DT property, "brcm,uses-autobaud-mode", to control autobaud
+mode selection.
 
+Hakan Jansson (2):
+  dt-bindings: net: broadcom-bluetooth: Add property for autobaud mode
+  Bluetooth: hci_bcm: Add support for FW loading in autobaud mode
+
+ .../bindings/net/broadcom-bluetooth.yaml      |  7 +++++
+ drivers/bluetooth/btbcm.c                     | 31 ++++++++++++++-----
+ drivers/bluetooth/btbcm.h                     |  8 ++---
+ drivers/bluetooth/hci_bcm.c                   | 15 +++++++--
+ 4 files changed, 46 insertions(+), 15 deletions(-)
+
+
+base-commit: 48b57999e38745b707abe233019786cc097df3c9
+-- 
+2.25.1
 
