@@ -2,174 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1314EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBAEC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237498AbiEDWnp (ORCPT
+        id S241549AbiEDWyc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 18:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56748 "EHLO
+        Wed, 4 May 2022 18:54:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbiEDWno (ORCPT
+        with ESMTP id S1379386AbiEDWyC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 18:43:44 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52C349F21
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:40:06 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id n8so1586588qke.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 15:40:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ZriHbX8PuWo6UPOsUCoXXucrZBAsE/bXX3GE6MiE3AA=;
-        b=d9CGOGFN7gcZ/rx/QPpJ76w5Sy8cOLVZWOXym744uL43AdXyLQCTDe6j6IJD9CjgyP
-         uiLzEK3crQhFLU1vF/ihyS+aFTlNhBD7IbmOQu5Sn2sfV/a7b5zRkR8PTTdmbLas++7f
-         LaOtGYCRcr1MMu3KmeK/7ce1/5zkjPLyY9FJ9hEeW0Zf3kavuAMIe1XXillAph6zkfSO
-         Eh1RTNjKOxX1RkDuwyBhkpmWpNtVOFCzXSp3+SCiaWqJu7pt48noKyJc8zLnKa09UNA2
-         FXJ2Sj6XjHKO4brJhlwVEvc2t+rTO9JNaZbSgyn+giGNYMrZ+7NRvEbk7AlTjuPcKM3a
-         ecjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ZriHbX8PuWo6UPOsUCoXXucrZBAsE/bXX3GE6MiE3AA=;
-        b=5VK1zxJbHqbraBarVNiCOre5F4ymo8Ef55Rr9ABcOcZTktSbxBH4BDnfDkXKlG0Bu4
-         MBFKnr1e+pNgDNNDpiSvLiq4++GhKeTdCfopCIL0Zc8tDBLBcdb2a9DGJs8lh3fcV5q8
-         twn2iCnZthY5ZFG+vj4QQN2UDOccbhRn1ATa7YcJ6WytkPtUK1vXlngdqCnjLDucgBBz
-         ceNvq00ly7EZeHbnQjMmmTx3L9kVLi2i5cKhpRa/Vk2EMwxten9NjZI9PdNBJBGur42w
-         yFCeM92TTxmhqE29lGanDP6fCjaN3CObpmUEY8UHtxu3KXlD+BLeNAoH55ojVWp3azgt
-         pYgA==
-X-Gm-Message-State: AOAM5310mZZSgYApyAPnX8RxL9pcgbsRFWNR62PP2gpshATdnc2MpJtU
-        YM0je36co1TZ5T/VrW10GiZN2kj/9nHrIA==
-X-Google-Smtp-Source: ABdhPJzGZ0rDia9gsP4sdnMH9/ewI6NXaOlqJfz/AmIHFtIwweLLi1hRGi5lsBBCMa963Z4A8MGmjA==
-X-Received: by 2002:a05:620a:28ce:b0:6a0:201f:36cb with SMTP id l14-20020a05620a28ce00b006a0201f36cbmr2950149qkp.703.1651704005801;
-        Wed, 04 May 2022 15:40:05 -0700 (PDT)
-Received: from [172.17.0.2] ([52.170.150.93])
-        by smtp.gmail.com with ESMTPSA id p17-20020ac87411000000b002f39b99f6c5sm8247306qtq.95.2022.05.04.15.40.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 15:40:05 -0700 (PDT)
-Message-ID: <627300c5.1c69fb81.e089a.a88d@mx.google.com>
-Date:   Wed, 04 May 2022 15:40:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0002786972003569612=="
+        Wed, 4 May 2022 18:54:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9C4E30
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:50:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8C8E2B82A27
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 22:50:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 598F7C385A8;
+        Wed,  4 May 2022 22:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651704612;
+        bh=6MfYxoij1jlC3oaWUF39Sv3nyC+Hp7uFErNewWK9mhQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=pev69p5oLJin8+q8rWu3cSBYEWON5u0CfydpTkbGreFcsI6BGmOwpO/y1hPVqPCGa
+         R6S0oJxtLGfb6KlybN6uZK7qgqVGQ5HMdVsNWbJqlclZ3M8dZg0PVtbtPm8HkdBsDT
+         2DFI6S+I5h089riyC0fhZe8/hsbsfNYayv7u8tzMwZ3texRM19jWd7sXyg3EpSGA4j
+         NgEqXHgtw3tyhf9UflUlGE/7p5/FxMIRe9i9dUY3HNN+x4cpFRNnLgSf17sDt6xGFd
+         QYpzMlTqW/VZSmAtoj8PeHIRcTtnaenBAP2hbWn1iU5KjLk8KSicmf201a/QqHGzd+
+         +Z0C9JL+X2D0w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3BCDAF03848;
+        Wed,  4 May 2022 22:50:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
-Subject: RE: Adding bonded flag to D-Bus property
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220504140940.Bluez.v3.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
-References: <20220504140940.Bluez.v3.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [Bluez PATCH v3 0/3] Adding bonded flag to D-Bus property
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165170461223.30622.14714373718612988760.git-patchwork-notify@kernel.org>
+Date:   Wed, 04 May 2022 22:50:12 +0000
+References: <20220504210948.2968827-1-jiangzp@google.com>
+In-Reply-To: <20220504210948.2968827-1-jiangzp@google.com>
+To:     Zhengping Jiang <jiangzp@google.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+        chromeos-bluetooth-upstreaming@chromium.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0002786972003569612==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hello:
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjM4NDU1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgNC4zNyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAyLjg1IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDQzLjY5IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuNjkgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC43
-OSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMjgyLjk0
-IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDUuMTQgc2Vj
-b25kcwpNYWtlIENoZWNrIHcvVmFsZ3JpbmQgICAgICAgICBGQUlMICAgICAgMzA4LjM5IHNlY29u
-ZHMKTWFrZSBEaXN0Y2hlY2sgICAgICAgICAgICAgICAgUEFTUyAgICAgIDIzNS43OSBzZWNvbmRz
-CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA4Ljk2IHNlY29uZHMKQnVp
-bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDEyNTMuMjYgc2Vjb25kcwpJbmNy
-ZW1lbnRhbCBCdWlsZCB3aXRoIHBhdGNoZXNGQUlMICAgICAgMTI3OS40OSBzZWNvbmRzCgpEZXRh
-aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIE1ha2UgLSBG
-QUlMCkRlc2M6IEJ1aWxkIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQpPdXRwdXQ6CnRvb2xzL21nbXQt
-dGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTIz
-NjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
-mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyMzY0IHwg
-aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
-c3QtYXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2
-OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
-ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGlu
-dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0
-LWF2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1
-OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2
-YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQg
-bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnNyYy9kZXZpY2Uu
-YzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3NldF9ib25kZWTigJk6CnNyYy9kZXZpY2UuYzo2MTQx
-OjI6IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVjbGFyYXRpb25zIGFuZCBjb2RlIFst
-V2Vycm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0KIDYxNDEgfCAgc3RydWN0IGJlYXJl
-cl9zdGF0ZSAqc3RhdGUgPSBnZXRfc3RhdGUoZGV2aWNlLCBiZGFkZHJfdHlwZSk7CiAgICAgIHwg
-IF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFd
-OiAqKiogW01ha2VmaWxlOjEwMjQ4OiBzcmMvYmx1ZXRvb3RoZC1kZXZpY2Uub10gRXJyb3IgMQpt
-YWtlOiAqKiogW01ha2VmaWxlOjQzMTA6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlIENoZWNrIC0gRkFJTApEZXNjOiBSdW4gJ21ha2UgY2hl
-Y2snCk91dHB1dDoKc3JjL2RldmljZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2Vfc2V0X2JvbmRl
-ZOKAmToKc3JjL2RldmljZS5jOjYxNDE6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBtaXhlZCBk
-ZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3RhdGVtZW50
-XQogNjE0MSB8ICBzdHJ1Y3QgYmVhcmVyX3N0YXRlICpzdGF0ZSA9IGdldF9zdGF0ZShkZXZpY2Us
-IGJkYWRkcl90eXBlKTsKICAgICAgfCAgXn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
-ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTAyNDg6IHNyYy9ibHVldG9v
-dGhkLWRldmljZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEyODM6IGNoZWNrXSBF
-cnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sg
-dy9WYWxncmluZCAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJyB3aXRoIFZhbGdyaW5kCk91
-dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMv
-bWdtdC10ZXN0ZXIuYzoxMjM2NDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0
-IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5n
-IHdpdGhvdXQKMTIzNjQgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8
-ICAgICBefn5+CnNyYy9kZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3NldF9ib25kZWTi
-gJk6CnNyYy9kZXZpY2UuYzo2MTQxOjI6IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVj
-bGFyYXRpb25zIGFuZCBjb2RlIFstV2Vycm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0K
-IDYxNDEgfCAgc3RydWN0IGJlYXJlcl9zdGF0ZSAqc3RhdGUgPSBnZXRfc3RhdGUoZGV2aWNlLCBi
-ZGFkZHJfdHlwZSk7CiAgICAgIHwgIF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVh
-dGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEwMjQ4OiBzcmMvYmx1ZXRvb3Ro
-ZC1kZXZpY2Uub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQzMTA6IGFsbF0gRXJyb3Ig
-MgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCB3L2V4dCBFTEwg
-LSBNYWtlIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVlWiBzb3VyY2Ugd2l0aCAnLS1lbmFibGUtZXh0
-ZXJuYWwtZWxsJyBjb25maWd1cmF0aW9uCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4g
-ZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjM2NDo1OiBub3RlOiB2
-YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tp
-bmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQgfCBpbnQgbWFpbihpbnQg
-YXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdmR0cC5jOiBJ
-biBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3NjY6NTogbm90ZTogdmFy
-aWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5n
-LWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwgaW50IG1haW4oaW50IGFy
-Z2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZyY3AuYzogSW4g
-ZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5OjU6IG5vdGU6IHZhcmlh
-YmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1h
-c3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGludCBtYWluKGludCBhcmdj
-LCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4Kc3JjL2RldmljZS5jOiBJbiBmdW5jdGlv
-biDigJhkZXZpY2Vfc2V0X2JvbmRlZOKAmToKc3JjL2RldmljZS5jOjYxNDE6MjogZXJyb3I6IElT
-TyBDOTAgZm9yYmlkcyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFy
-YXRpb24tYWZ0ZXItc3RhdGVtZW50XQogNjE0MSB8ICBzdHJ1Y3QgYmVhcmVyX3N0YXRlICpzdGF0
-ZSA9IGdldF9zdGF0ZShkZXZpY2UsIGJkYWRkcl90eXBlKTsKICAgICAgfCAgXn5+fn5+CmNjMTog
-YWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZp
-bGU6MTAyNDg6IHNyYy9ibHVldG9vdGhkLWRldmljZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFr
-ZWZpbGU6NDMxMDogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IEluY3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlcyAtIEZBSUwKRGVzYzogSW5jcmVt
-ZW50YWwgYnVpbGQgcGVyIHBhdGNoIGluIHRoZSBzZXJpZXMKT3V0cHV0Ogp0b29scy9tZ210LXRl
-c3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyMzY0
-OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
-ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjM2NCB8IGlu
-dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0
-LWF2ZHRwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1
-OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2
-YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQg
-bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1h
-dnJjcC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTog
-bm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFy
-LXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1h
-aW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgpzcmMvZGV2aWNlLmM6
-IEluIGZ1bmN0aW9uIOKAmGRldmljZV9zZXRfYm9uZGVk4oCZOgpzcmMvZGV2aWNlLmM6NjE0MToy
-OiBlcnJvcjogSVNPIEM5MCBmb3JiaWRzIG1peGVkIGRlY2xhcmF0aW9ucyBhbmQgY29kZSBbLVdl
-cnJvcj1kZWNsYXJhdGlvbi1hZnRlci1zdGF0ZW1lbnRdCiA2MTQxIHwgIHN0cnVjdCBiZWFyZXJf
-c3RhdGUgKnN0YXRlID0gZ2V0X3N0YXRlKGRldmljZSwgYmRhZGRyX3R5cGUpOwogICAgICB8ICBe
-fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
-KioqIFtNYWtlZmlsZToxMDI0ODogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFr
-ZTogKioqIFtNYWtlZmlsZTo0MzEwOiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdhcmRzLApMaW51
-eCBCbHVldG9vdGgKCg==
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
---===============0002786972003569612==--
+On Wed,  4 May 2022 14:09:45 -0700 you wrote:
+> Currently BlueZ client can't know easily whether a device is bonded or
+> not. This is causing issues for a number of applications. For example,
+> in the Nearby Share case, the peer device is paired, but not bonded.
+> This series will add the "Bonded" property in org.bluez.Device1 D-Bus
+> interface. Changes are also made in bluetoothctl to show the status of
+> the bonded flag as well as a list of bonded devices.
+> 
+> [...]
+
+Here is the summary with links:
+  - [Bluez,v3,1/3] device: Add "Bonded" flag to dbus property
+    (no matching commit)
+  - [Bluez,v3,2/3] doc: add "Bonded" flag to dbus property
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5c05df7c7607
+  - [Bluez,v3,3/3] client: Add filter to devices and show Bonded in info
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bda2a9e6f902
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
