@@ -2,82 +2,233 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBAEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE605C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 23:17:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241549AbiEDWyc (ORCPT
+        id S1381631AbiEDXU3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 18:54:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42432 "EHLO
+        Wed, 4 May 2022 19:20:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379386AbiEDWyC (ORCPT
+        with ESMTP id S1385765AbiEDXQt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 18:54:02 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9C4E30
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:50:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 8C8E2B82A27
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 22:50:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 598F7C385A8;
-        Wed,  4 May 2022 22:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651704612;
-        bh=6MfYxoij1jlC3oaWUF39Sv3nyC+Hp7uFErNewWK9mhQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=pev69p5oLJin8+q8rWu3cSBYEWON5u0CfydpTkbGreFcsI6BGmOwpO/y1hPVqPCGa
-         R6S0oJxtLGfb6KlybN6uZK7qgqVGQ5HMdVsNWbJqlclZ3M8dZg0PVtbtPm8HkdBsDT
-         2DFI6S+I5h089riyC0fhZe8/hsbsfNYayv7u8tzMwZ3texRM19jWd7sXyg3EpSGA4j
-         NgEqXHgtw3tyhf9UflUlGE/7p5/FxMIRe9i9dUY3HNN+x4cpFRNnLgSf17sDt6xGFd
-         QYpzMlTqW/VZSmAtoj8PeHIRcTtnaenBAP2hbWn1iU5KjLk8KSicmf201a/QqHGzd+
-         +Z0C9JL+X2D0w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3BCDAF03848;
-        Wed,  4 May 2022 22:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 4 May 2022 19:16:49 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C8D4517C4
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 16:12:20 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id q20so1685985wmq.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 16:12:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=qfWwXZWPvxEE3w1uLnkzPlrx6nJaZSmQ1gbsC3kCZlI=;
+        b=fMehx6+pldeupaypGl5lGMLh8Blc5Pb964suvnwujkOTfmhEds0USznV5iIpAmDMiQ
+         3bX5ovLiBcm+P+Qjkm7S30sNoAIneyphU/3HUmg8FgNya3x4Ys+vGWu+B9CwMsbZwixV
+         5hhw5d61RXfF0ZuA9a19yWLWnmsownsAlvxGOq/bh+zf+KCchfsYUSjN3DbkCogRNiil
+         4sZMBBy0wN3DJWJ3HV3y9RTPrsOy6eZO4wbIVzlw9cfeY3DYzhWrMs9JJuoIK2/rWVPl
+         SzHF6XACCrgzPRUtq8fL5afcNflV6Vriy9o5VdAvBNuxRLNvKxX70jkd0hURqNp4X2R8
+         1xwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=qfWwXZWPvxEE3w1uLnkzPlrx6nJaZSmQ1gbsC3kCZlI=;
+        b=UfiaIWSndsbxzfA9ZzXVIKhsN11ocWiHOBz43kby2wM9xsO/tspIXet2x0kGBRSAdP
+         UcDZ8InvH606SuR8DdZ4WZYh9M2SE7SL8MedtqUPmaBlKPTc8I0yCBWcfoIWbseET/27
+         ZOCRS6MGpHkH30dDxN8d0w/jFKKFx8E+eL9J08kxjdIMm7zXIkbPc2D5CG4/NmSIcMGZ
+         NuB4brh/tBP2cSjkXDju3zTDQE88sARs13LqCgq9IAmI0dPWvEDlgWbqK4X5nsWwTds7
+         pOB355D95hfN46LGPLg7I9tFf4b+IskYBw+kda5zliQ6pBcz5WEIE2LreXQ1It2UXACm
+         dbhA==
+X-Gm-Message-State: AOAM5337bDf0wo29krl/TUUAk1objdVe7ZnSfFksTcaSe+/1Xiw5z84x
+        OFNOe1p123YC97+YkIzjV0yjQ07vut3XVxykvWgzwChb/nIz
+X-Google-Smtp-Source: ABdhPJzn8kCki7g2xrksVPCE2X0dMoSQ5GNrlnQWJqU+8a/RnZE5ShgkUyQvDBvdRa4kG7oifCsX28YouBnWU5DkxR0=
+X-Received: by 2002:a05:600c:4fc9:b0:394:4317:1aa4 with SMTP id
+ o9-20020a05600c4fc900b0039443171aa4mr1477643wmq.179.1651705059031; Wed, 04
+ May 2022 15:57:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Bluez PATCH v3 0/3] Adding bonded flag to D-Bus property
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165170461223.30622.14714373718612988760.git-patchwork-notify@kernel.org>
-Date:   Wed, 04 May 2022 22:50:12 +0000
-References: <20220504210948.2968827-1-jiangzp@google.com>
-In-Reply-To: <20220504210948.2968827-1-jiangzp@google.com>
-To:     Zhengping Jiang <jiangzp@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        chromeos-bluetooth-upstreaming@chromium.org
+References: <20220504014440.3697851-1-keescook@chromium.org> <20220504014440.3697851-29-keescook@chromium.org>
+In-Reply-To: <20220504014440.3697851-29-keescook@chromium.org>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Wed, 4 May 2022 18:57:28 -0400
+Message-ID: <CAHC9VhT5Y=ENiSyb=S-NVbGX63sLOv4nVuR_GS-yww6tiz0wYA@mail.gmail.com>
+Subject: Re: [PATCH 28/32] selinux: Use mem_to_flex_dup() with xfrm and sidtab
+To:     Kees Cook <keescook@chromium.org>
+Cc:     "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Xiu Jianfeng <xiujianfeng@huawei.com>,
+        =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
+        netdev@vger.kernel.org, selinux@vger.kernel.org,
+        Alexei Starovoitov <ast@kernel.org>,
+        alsa-devel@alsa-project.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Gabbasov <andrew_gabbasov@mentor.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Arend van Spriel <aspriel@gmail.com>,
+        Baowen Zheng <baowen.zheng@corigine.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Bradley Grove <linuxdrivers@attotech.com>,
+        brcm80211-dev-list.pdl@broadcom.com,
+        Christian Brauner <brauner@kernel.org>,
+        Christian Lamparter <chunkeey@googlemail.com>,
+        Chris Zankel <chris@zankel.net>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Daniel Axtens <dja@axtens.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Gow <davidgow@google.com>,
+        David Howells <dhowells@redhat.com>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        devicetree@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Francis Laniel <laniel_francis@privacyrequired.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gregory Greenman <gregory.greenman@intel.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Hante Meuleman <hante.meuleman@broadcom.com>,
+        Hulk Robot <hulkci@huawei.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        John Keeping <john@metanate.com>,
+        Juergen Gross <jgross@suse.com>, Kalle Valo <kvalo@kernel.org>,
+        Keith Packard <keithp@keithp.com>, keyrings@vger.kernel.org,
+        kunit-dev@googlegroups.com,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Lee Jones <lee.jones@linaro.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-xtensa@linux-xtensa.org, llvm@lists.linux.dev,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Louis Peens <louis.peens@corigine.com>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Mark Brown <broonie@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rich Felker <dalias@aerifal.cx>,
+        Rob Herring <robh+dt@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        SHA-cyfmac-dev-list@infineon.com,
+        Simon Horman <simon.horman@corigine.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Takashi Iwai <tiwai@suse.com>, Tom Rix <trix@redhat.com>,
+        Udipto Goswami <quic_ugoswami@quicinc.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        wcn36xx@lists.infradead.org, Wei Liu <wei.liu@kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Yang Yingliang <yangyingliang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+On Tue, May 3, 2022 at 9:57 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> As part of the work to perform bounds checking on all memcpy() uses,
+> replace the open-coded a deserialization of bytes out of memory into a
+> trailing flexible array by using a flex_array.h helper to perform the
+> allocation, bounds checking, and copying:
+>
+>     struct xfrm_sec_ctx
+>     struct sidtab_str_cache
+>
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Paul Moore <paul@paul-moore.com>
+> Cc: Stephen Smalley <stephen.smalley.work@gmail.com>
+> Cc: Eric Paris <eparis@parisplace.org>
+> Cc: Nick Desaulniers <ndesaulniers@google.com>
+> Cc: Xiu Jianfeng <xiujianfeng@huawei.com>
+> Cc: "Christian G=C3=B6ttsche" <cgzones@googlemail.com>
+> Cc: netdev@vger.kernel.org
+> Cc: selinux@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  include/uapi/linux/xfrm.h    | 4 ++--
+>  security/selinux/ss/sidtab.c | 9 +++------
+>  security/selinux/xfrm.c      | 7 ++-----
+>  3 files changed, 7 insertions(+), 13 deletions(-)
+>
+> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> index 65e13a099b1a..4a6fa2beff6a 100644
+> --- a/include/uapi/linux/xfrm.h
+> +++ b/include/uapi/linux/xfrm.h
+> @@ -31,9 +31,9 @@ struct xfrm_id {
+>  struct xfrm_sec_ctx {
+>         __u8    ctx_doi;
+>         __u8    ctx_alg;
+> -       __u16   ctx_len;
+> +       __DECLARE_FLEX_ARRAY_ELEMENTS_COUNT(__u16, ctx_len);
+>         __u32   ctx_sid;
+> -       char    ctx_str[0];
+> +       __DECLARE_FLEX_ARRAY_ELEMENTS(char, ctx_str);
+>  };
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+While I like the idea of this in principle, I'd like to hear about the
+testing you've done on these patches.  A previous flex array
+conversion in the audit uapi headers ended up causing a problem with
+GCC12 and SWIG; while it was a SWIG problem and not a kernel header
+problem that was thin consolation for those with broken builds.
 
-On Wed,  4 May 2022 14:09:45 -0700 you wrote:
-> Currently BlueZ client can't know easily whether a device is bonded or
-> not. This is causing issues for a number of applications. For example,
-> in the Nearby Share case, the peer device is paired, but not bonded.
-> This series will add the "Bonded" property in org.bluez.Device1 D-Bus
-> interface. Changes are also made in bluetoothctl to show the status of
-> the bonded flag as well as a list of bonded devices.
-> 
-> [...]
+> diff --git a/security/selinux/ss/sidtab.c b/security/selinux/ss/sidtab.c
+> index a54b8652bfb5..a9d434e8cff7 100644
+> --- a/security/selinux/ss/sidtab.c
+> +++ b/security/selinux/ss/sidtab.c
+> @@ -23,8 +23,8 @@ struct sidtab_str_cache {
+>         struct rcu_head rcu_member;
+>         struct list_head lru_member;
+>         struct sidtab_entry *parent;
+> -       u32 len;
+> -       char str[];
+> +       DECLARE_FLEX_ARRAY_ELEMENTS_COUNT(u32, len);
+> +       DECLARE_FLEX_ARRAY_ELEMENTS(char, str);
+>  };
+>
+>  #define index_to_sid(index) ((index) + SECINITSID_NUM + 1)
 
-Here is the summary with links:
-  - [Bluez,v3,1/3] device: Add "Bonded" flag to dbus property
-    (no matching commit)
-  - [Bluez,v3,2/3] doc: add "Bonded" flag to dbus property
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5c05df7c7607
-  - [Bluez,v3,3/3] client: Add filter to devices and show Bonded in info
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=bda2a9e6f902
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+--=20
+paul-moore.com
