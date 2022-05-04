@@ -2,128 +2,174 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CFCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:19:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1314EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 22:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378486AbiEDWX0 (ORCPT
+        id S237498AbiEDWnp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 18:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42220 "EHLO
+        Wed, 4 May 2022 18:43:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343978AbiEDWXY (ORCPT
+        with ESMTP id S229881AbiEDWno (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 18:23:24 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F9F52E79
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:19:47 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id e24so2471922pjt.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 15:19:47 -0700 (PDT)
+        Wed, 4 May 2022 18:43:44 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D52C349F21
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 15:40:06 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id n8so1586588qke.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 15:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gYihGH9qceF6yjSjGs6QrGlD7pC4Ldd85EHVOBBXQHM=;
-        b=ih3B/9H117zVuBjepeRDj8BbdOiU2tlMi8DSupUJRuRnpJmjLxxu6K7bDiHzm8ciD8
-         E2au+erVxRxFv0XKuWn02BRf7r8I6GOdOuioUuQ9u+rsLtDy41bvtGwgn9RClSvIsszF
-         mkMuBNWdM0AHjOlEochj5FkcjpMA4qul33qqnyMhV5skorAM6oHUXm3P+UzCUImB1wkT
-         ObN+2N6UAR6UDjr3eAmoU1uYRaP93sBOMx01YdTlhZbJha3UE3EEiq9afvZdMSH0IJHJ
-         bbdqiRODj+dWcscwAWgWtyN9kaBkQAmGGusINQvI0g17GECHC0gwnkp+EXMWy/faB74w
-         YMSw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ZriHbX8PuWo6UPOsUCoXXucrZBAsE/bXX3GE6MiE3AA=;
+        b=d9CGOGFN7gcZ/rx/QPpJ76w5Sy8cOLVZWOXym744uL43AdXyLQCTDe6j6IJD9CjgyP
+         uiLzEK3crQhFLU1vF/ihyS+aFTlNhBD7IbmOQu5Sn2sfV/a7b5zRkR8PTTdmbLas++7f
+         LaOtGYCRcr1MMu3KmeK/7ce1/5zkjPLyY9FJ9hEeW0Zf3kavuAMIe1XXillAph6zkfSO
+         Eh1RTNjKOxX1RkDuwyBhkpmWpNtVOFCzXSp3+SCiaWqJu7pt48noKyJc8zLnKa09UNA2
+         FXJ2Sj6XjHKO4brJhlwVEvc2t+rTO9JNaZbSgyn+giGNYMrZ+7NRvEbk7AlTjuPcKM3a
+         ecjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gYihGH9qceF6yjSjGs6QrGlD7pC4Ldd85EHVOBBXQHM=;
-        b=U2eifP6+sWPvgdJoWEKwXsozzSp/ZvmT6jgQT1cQTcd22ylCho0HfI5SMcQCItgB2O
-         mLQaiS4M8bcSHSHAD9VxRGL3//6Hx52kzo4eKcE8V3ersxTxE3oxkEdTYeNhxIO8xe9I
-         uFrIjED1tU64EF/FCppv0aD5CymLSxZRrBpPMNdUmkQaxkb9oDxtM4tqmUriDw7VO6D0
-         3KPceiTWjDSNiDkUF/vFXqzFncGDiD6Z7Vcsre7dhM/ZTrGy//Dp5mCA9oC8mj0u3WTg
-         KCFDupHCkhlJkO2p4AbtBVKy1SsDrjMR0kuE0gZ3eBfGMxvNQoo5Ujw0nO6EeUfNA+CO
-         yyHQ==
-X-Gm-Message-State: AOAM532G9rEuBag4KMUNxo26Hc93VK1S+qusCStMZMLGzc3mdamk1yxA
-        hPZbk7dlmwXxv/6xNAbsNOOtlZRgSdvovXAiB0Y=
-X-Google-Smtp-Source: ABdhPJyOOJQ57zr72Ru1vxH2Lq3Em5HNrbaA9b1zu5fyB0hMV7pY+YiSoIzP68skJjgjD9TPehDuu28cL2kuKdPQStk=
-X-Received: by 2002:a17:90a:528f:b0:1dc:9a7c:4a3 with SMTP id
- w15-20020a17090a528f00b001dc9a7c04a3mr2034370pjh.112.1651702786497; Wed, 04
- May 2022 15:19:46 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ZriHbX8PuWo6UPOsUCoXXucrZBAsE/bXX3GE6MiE3AA=;
+        b=5VK1zxJbHqbraBarVNiCOre5F4ymo8Ef55Rr9ABcOcZTktSbxBH4BDnfDkXKlG0Bu4
+         MBFKnr1e+pNgDNNDpiSvLiq4++GhKeTdCfopCIL0Zc8tDBLBcdb2a9DGJs8lh3fcV5q8
+         twn2iCnZthY5ZFG+vj4QQN2UDOccbhRn1ATa7YcJ6WytkPtUK1vXlngdqCnjLDucgBBz
+         ceNvq00ly7EZeHbnQjMmmTx3L9kVLi2i5cKhpRa/Vk2EMwxten9NjZI9PdNBJBGur42w
+         yFCeM92TTxmhqE29lGanDP6fCjaN3CObpmUEY8UHtxu3KXlD+BLeNAoH55ojVWp3azgt
+         pYgA==
+X-Gm-Message-State: AOAM5310mZZSgYApyAPnX8RxL9pcgbsRFWNR62PP2gpshATdnc2MpJtU
+        YM0je36co1TZ5T/VrW10GiZN2kj/9nHrIA==
+X-Google-Smtp-Source: ABdhPJzGZ0rDia9gsP4sdnMH9/ewI6NXaOlqJfz/AmIHFtIwweLLi1hRGi5lsBBCMa963Z4A8MGmjA==
+X-Received: by 2002:a05:620a:28ce:b0:6a0:201f:36cb with SMTP id l14-20020a05620a28ce00b006a0201f36cbmr2950149qkp.703.1651704005801;
+        Wed, 04 May 2022 15:40:05 -0700 (PDT)
+Received: from [172.17.0.2] ([52.170.150.93])
+        by smtp.gmail.com with ESMTPSA id p17-20020ac87411000000b002f39b99f6c5sm8247306qtq.95.2022.05.04.15.40.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 May 2022 15:40:05 -0700 (PDT)
+Message-ID: <627300c5.1c69fb81.e089a.a88d@mx.google.com>
+Date:   Wed, 04 May 2022 15:40:05 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0002786972003569612=="
 MIME-Version: 1.0
-References: <20220504210948.2968827-1-jiangzp@google.com> <20220504140940.Bluez.v3.2.I52f3efc7576fd0048437f1419dd2e1e687f7ac65@changeid>
- <6792e558daf326716ac0ac87867367cd91da3b45.camel@hadess.net>
-In-Reply-To: <6792e558daf326716ac0ac87867367cd91da3b45.camel@hadess.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 4 May 2022 15:19:34 -0700
-Message-ID: <CABBYNZ+4-PPP9veRbDmA4MWiHr7+QNQaHKL1v-q_erRimnpaEw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 2/3] doc: add "Bonded" flag to dbus property
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     Zhengping Jiang <jiangzp@google.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: Adding bonded flag to D-Bus property
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220504140940.Bluez.v3.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
+References: <20220504140940.Bluez.v3.1.I6ab300fa4999c9310f4cb6fc09b1290edb6b2c2b@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+--===============0002786972003569612==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-On Wed, May 4, 2022 at 2:37 PM Bastien Nocera <hadess@hadess.net> wrote:
->
-> On Wed, 2022-05-04 at 14:09 -0700, Zhengping Jiang wrote:
-> > Bonded flag is used to indicate the link key or ltk of the remote
-> > device has been stored.
-> >
-> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-> > Reviewed-by: Yun-Hao Chung <howardchung@chromium.org>
-> >
-> > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-> > ---
-> >
-> > Changes in v3:
-> > - Move documentation update to a separate patch
-> > - Add description to bonded and paired
-> >
-> >  doc/device-api.txt | 12 +++++++++++-
-> >  1 file changed, 11 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/doc/device-api.txt b/doc/device-api.txt
-> > index 1e8590b27d58..c7e217c07526 100644
-> > --- a/doc/device-api.txt
-> > +++ b/doc/device-api.txt
-> > @@ -246,7 +246,17 @@ Properties string Address [readonly]
-> >
-> >                 boolean Paired [readonly]
-> >
-> > -                       Indicates if the remote device is paired.
-> > +                       Indicates if the remote device is paired. Pairing is
-> > +                       the process where devices exchange the information to
-> > +                       establish an encrypted connection.
-> > +
-> > +               boolean Bonded [readonly]
-> > +
-> > +                       Indicates if the remote device is bonded. Bonded means
-> > +                       the link key or the ltk from the pairing process has
-> > +                       been stored.
->
-> "long-term key (LTK)"
->
-> Is Paired effectively the same as Bonded for Classic devices? If so,
-> would be great to mention.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjM4NDU1CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgNC4zNyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAyLjg1IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDQzLjY5IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNjkgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC43
+OSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMjgyLjk0
+IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDUuMTQgc2Vj
+b25kcwpNYWtlIENoZWNrIHcvVmFsZ3JpbmQgICAgICAgICBGQUlMICAgICAgMzA4LjM5IHNlY29u
+ZHMKTWFrZSBEaXN0Y2hlY2sgICAgICAgICAgICAgICAgUEFTUyAgICAgIDIzNS43OSBzZWNvbmRz
+CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA4Ljk2IHNlY29uZHMKQnVp
+bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDEyNTMuMjYgc2Vjb25kcwpJbmNy
+ZW1lbnRhbCBCdWlsZCB3aXRoIHBhdGNoZXNGQUlMICAgICAgMTI3OS40OSBzZWNvbmRzCgpEZXRh
+aWxzCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIE1ha2UgLSBG
+QUlMCkRlc2M6IEJ1aWxkIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQpPdXRwdXQ6CnRvb2xzL21nbXQt
+dGVzdGVyLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnRvb2xzL21nbXQtdGVzdGVyLmM6MTIz
+NjQ6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
+mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CjEyMzY0IHwg
+aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
+c3QtYXZkdHAuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2
+OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
+ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0
+LWF2cmNwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1
+OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2
+YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQg
+bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnNyYy9kZXZpY2Uu
+YzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3NldF9ib25kZWTigJk6CnNyYy9kZXZpY2UuYzo2MTQx
+OjI6IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVjbGFyYXRpb25zIGFuZCBjb2RlIFst
+V2Vycm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0KIDYxNDEgfCAgc3RydWN0IGJlYXJl
+cl9zdGF0ZSAqc3RhdGUgPSBnZXRfc3RhdGUoZGV2aWNlLCBiZGFkZHJfdHlwZSk7CiAgICAgIHwg
+IF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFd
+OiAqKiogW01ha2VmaWxlOjEwMjQ4OiBzcmMvYmx1ZXRvb3RoZC1kZXZpY2Uub10gRXJyb3IgMQpt
+YWtlOiAqKiogW01ha2VmaWxlOjQzMTA6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlIENoZWNrIC0gRkFJTApEZXNjOiBSdW4gJ21ha2UgY2hl
+Y2snCk91dHB1dDoKc3JjL2RldmljZS5jOiBJbiBmdW5jdGlvbiDigJhkZXZpY2Vfc2V0X2JvbmRl
+ZOKAmToKc3JjL2RldmljZS5jOjYxNDE6MjogZXJyb3I6IElTTyBDOTAgZm9yYmlkcyBtaXhlZCBk
+ZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFyYXRpb24tYWZ0ZXItc3RhdGVtZW50
+XQogNjE0MSB8ICBzdHJ1Y3QgYmVhcmVyX3N0YXRlICpzdGF0ZSA9IGdldF9zdGF0ZShkZXZpY2Us
+IGJkYWRkcl90eXBlKTsKICAgICAgfCAgXn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRy
+ZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6MTAyNDg6IHNyYy9ibHVldG9v
+dGhkLWRldmljZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEyODM6IGNoZWNrXSBF
+cnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sg
+dy9WYWxncmluZCAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJyB3aXRoIFZhbGdyaW5kCk91
+dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMv
+bWdtdC10ZXN0ZXIuYzoxMjM2NDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0
+IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5n
+IHdpdGhvdXQKMTIzNjQgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8
+ICAgICBefn5+CnNyYy9kZXZpY2UuYzogSW4gZnVuY3Rpb24g4oCYZGV2aWNlX3NldF9ib25kZWTi
+gJk6CnNyYy9kZXZpY2UuYzo2MTQxOjI6IGVycm9yOiBJU08gQzkwIGZvcmJpZHMgbWl4ZWQgZGVj
+bGFyYXRpb25zIGFuZCBjb2RlIFstV2Vycm9yPWRlY2xhcmF0aW9uLWFmdGVyLXN0YXRlbWVudF0K
+IDYxNDEgfCAgc3RydWN0IGJlYXJlcl9zdGF0ZSAqc3RhdGUgPSBnZXRfc3RhdGUoZGV2aWNlLCBi
+ZGFkZHJfdHlwZSk7CiAgICAgIHwgIF5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVh
+dGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjEwMjQ4OiBzcmMvYmx1ZXRvb3Ro
+ZC1kZXZpY2Uub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQzMTA6IGFsbF0gRXJyb3Ig
+MgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCB3L2V4dCBFTEwg
+LSBNYWtlIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVlWiBzb3VyY2Ugd2l0aCAnLS1lbmFibGUtZXh0
+ZXJuYWwtZWxsJyBjb25maWd1cmF0aW9uCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4g
+ZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjM2NDo1OiBub3RlOiB2
+YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tp
+bmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQgfCBpbnQgbWFpbihpbnQg
+YXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdmR0cC5jOiBJ
+biBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3NjY6NTogbm90ZTogdmFy
+aWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5n
+LWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwgaW50IG1haW4oaW50IGFy
+Z2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3QtYXZyY3AuYzogSW4g
+ZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5OjU6IG5vdGU6IHZhcmlh
+YmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1h
+c3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGludCBtYWluKGludCBhcmdj
+LCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4Kc3JjL2RldmljZS5jOiBJbiBmdW5jdGlv
+biDigJhkZXZpY2Vfc2V0X2JvbmRlZOKAmToKc3JjL2RldmljZS5jOjYxNDE6MjogZXJyb3I6IElT
+TyBDOTAgZm9yYmlkcyBtaXhlZCBkZWNsYXJhdGlvbnMgYW5kIGNvZGUgWy1XZXJyb3I9ZGVjbGFy
+YXRpb24tYWZ0ZXItc3RhdGVtZW50XQogNjE0MSB8ICBzdHJ1Y3QgYmVhcmVyX3N0YXRlICpzdGF0
+ZSA9IGdldF9zdGF0ZShkZXZpY2UsIGJkYWRkcl90eXBlKTsKICAgICAgfCAgXn5+fn5+CmNjMTog
+YWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZp
+bGU6MTAyNDg6IHNyYy9ibHVldG9vdGhkLWRldmljZS5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFr
+ZWZpbGU6NDMxMDogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+ClRlc3Q6IEluY3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlcyAtIEZBSUwKRGVzYzogSW5jcmVt
+ZW50YWwgYnVpbGQgcGVyIHBhdGNoIGluIHRoZSBzZXJpZXMKT3V0cHV0Ogp0b29scy9tZ210LXRl
+c3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyMzY0
+OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
+ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAoxMjM2NCB8IGlu
+dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0
+LWF2ZHRwLmM6IEluIGZ1bmN0aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1
+OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2
+YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQg
+bWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1h
+dnJjcC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTog
+bm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFy
+LXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1h
+aW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgpzcmMvZGV2aWNlLmM6
+IEluIGZ1bmN0aW9uIOKAmGRldmljZV9zZXRfYm9uZGVk4oCZOgpzcmMvZGV2aWNlLmM6NjE0MToy
+OiBlcnJvcjogSVNPIEM5MCBmb3JiaWRzIG1peGVkIGRlY2xhcmF0aW9ucyBhbmQgY29kZSBbLVdl
+cnJvcj1kZWNsYXJhdGlvbi1hZnRlci1zdGF0ZW1lbnRdCiA2MTQxIHwgIHN0cnVjdCBiZWFyZXJf
+c3RhdGUgKnN0YXRlID0gZ2V0X3N0YXRlKGRldmljZSwgYmRhZGRyX3R5cGUpOwogICAgICB8ICBe
+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMKbWFrZVsxXTog
+KioqIFtNYWtlZmlsZToxMDI0ODogc3JjL2JsdWV0b290aGQtZGV2aWNlLm9dIEVycm9yIDEKbWFr
+ZTogKioqIFtNYWtlZmlsZTo0MzEwOiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdhcmRzLApMaW51
+eCBCbHVldG9vdGgKCg==
 
-There are some rare occasion where the link-keys cannot be
-persisted/stored (e.g. debug keys), but in the other hand Bonded would
-always means Paired, perhaps this is useful if you want to persist
-some device information at upper layers otherwise I can't think of any
-other use of Bonded over Paired.
-
-> > +                       A PropertiesChanged signal indicate changes to this
-> > +                       status.
-> >
-> >                 boolean Connected [readonly]
-> >
->
-
-
--- 
-Luiz Augusto von Dentz
+--===============0002786972003569612==--
