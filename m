@@ -2,423 +2,881 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7151AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 May 2022 16:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B5DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 May 2022 00:04:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239985AbiECRCw (ORCPT
+        id S244369AbiEDAHu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 May 2022 13:02:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51552 "EHLO
+        Tue, 3 May 2022 20:07:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239974AbiECRCv (ORCPT
+        with ESMTP id S229509AbiEDAHt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 May 2022 13:02:51 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFE893A733
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 May 2022 09:59:17 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id g16-20020a05660226d000b00638d8e1828bso13110297ioo.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 May 2022 09:59:17 -0700 (PDT)
+        Tue, 3 May 2022 20:07:49 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094BF31208;
+        Tue,  3 May 2022 17:04:15 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id cq17-20020a17090af99100b001dc0386cd8fso3320934pjb.5;
+        Tue, 03 May 2022 17:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=HQ7hbjZ34wQtNjzpqwTFJIS0GQFyPzVS5q1fam5fKAA=;
+        b=Jy4/HpDcCxoPbJC8yAQuN/IsuXSTLXoPkPqNFEvOrrQ2nBwjYTj2QFzCiRXxXBQSHd
+         qgzoy1dyL3hIfXsFuG7VimogFUro3dmhmN6JMKUjowq+gyuW+96z9ckpkM/MQLFEv46Q
+         fQApVbRa84Kpyy71wQMMznmWCjrMgk+isKZWQm0f1xhffdyP6vEwVB7JSWCBmddcvUgr
+         L/OAUTguUiuh8TfstdE774jeDDKbl0zWAkv7h3xpZpcWqfNfkO4+4plssMFp4b/DifP8
+         ym2CITp/4rxw/7j/6kdpHYuCczkmvnTUS0dA3em4Jzyvm3qYsNqdmCFM6LZaX158O9fP
+         qnZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=LXfEj28WD4fslUoQufiPOJivjECGYbUeceAVFgp5+pc=;
-        b=GHRz+7j4j877N5CKuFCLYKNl6IfS0uTzBBe3I/j98iwNpNsIJt53ZffT5n9ioFQPRx
-         PeNd+Gp4pmmuEgHfwLn+omHqxGM9F3EbEaFO9xhQQGpj0WthQ39x2OwOqMuGuIqWlg9F
-         xUOKyIc/OHBVHRDsI8LBt/NVcXoGNKlHmrFWJ9SaRjajkrmzgxCNF5yf5ScfpMnFdbZn
-         AE0jl9+R+A3ked6Q4huZ1jgZoOEVNShsrPcwg5i/5137OojZCT0uTgmiHDJehKwjUw7v
-         YCOqCv63WrHqCRpgAgX3ehR8pif7AaOLaUDb1tjKD/0u2wmX33zL7NhaMGbsfz2a6V9q
-         FvGg==
-X-Gm-Message-State: AOAM530V9apwrOHFFr70EOVQ1Cy77Nw3jW6Q95loDsQOe/XLFMMaMzzo
-        6ve04EHloTndZfcZeSw5FjxqQQNXEIJlUFwEskas7WnmvmpJ
-X-Google-Smtp-Source: ABdhPJy3l3Ou4SbsIXyKYyj9ELjDzyDzzdm1KD017rSi9scqHCueCDmqtjC7NnNx9x7Ff7Zx4XOppALOLs5q58fMw+9lAKQrtr7K
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HQ7hbjZ34wQtNjzpqwTFJIS0GQFyPzVS5q1fam5fKAA=;
+        b=Ay6UWRigcyCBAtRCGtNmSa5lqy6LvNFyDJRdEr02nGS5koB7m/NQESbkjobxZ+Z9Yw
+         QmPn2nTRDyTXT2UjiOVR/bhEv0SZW/GYKct1wzUWMI/AvETtn7QuTaPXRVS0IVcHb51y
+         OHEkCQkQT8LQa1bn0fouA4DTKGUhDHOCzTXZO1JRDeibT1odu+r6l0MvzGsdHYPx+iX5
+         kvKN9jajbdz4S5MqmxAyKtRpVwsWaeEriuAfBF3dFcAzzY+8qQRStKx65v1IvX3XKAKY
+         Wp6kMgjeed7oI5ZotRkfCZQ2IPFEOkEq0/R5PY5HnoYqeLRkZZHh52yRQAHcAL/0OQDD
+         Lw7w==
+X-Gm-Message-State: AOAM532pq1rg5HbLMQNe1yenrY73kMpo8ktFn5P9uSrSYD68uaQSyOOQ
+        yCXkUZgFfDAc1hzSxYCmfyYS0S6tJk1/FzBjAvk=
+X-Google-Smtp-Source: ABdhPJyN/1hPXkrCk34xWcW1v0knhCAxW5je/Ixy/Tgi9WdNmiIn2oa7TqLBB27gJCYpkL+83CRf1/S4nVWNq+tk+OE=
+X-Received: by 2002:a17:90a:8a92:b0:1d7:3cca:69d8 with SMTP id
+ x18-20020a17090a8a9200b001d73cca69d8mr7378484pjn.61.1651622654252; Tue, 03
+ May 2022 17:04:14 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1482:b0:32b:8a7c:bdca with SMTP id
- j2-20020a056638148200b0032b8a7cbdcamr799026jak.148.1651597156652; Tue, 03 May
- 2022 09:59:16 -0700 (PDT)
-Date:   Tue, 03 May 2022 09:59:16 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d59b7105de1e6d3a@google.com>
-Subject: [syzbot] INFO: task hung in hci_dev_close_sync
-From:   syzbot <syzbot+c56f6371c48cad0420f9@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
+References: <20220320183225.1.Iaf638bb9f885f5880ab1b4e7ae2f73dd53a54661@changeid>
+ <CABBYNZJSu9QgO-zbBQTecbvzWNNtYrmHdSCjvEVURVKxPiojAw@mail.gmail.com> <CAGPPCLDu5_ES5CcsUU3qHLWHkzAV=FUU8rns8Twh6C5FVSeEUQ@mail.gmail.com>
+In-Reply-To: <CAGPPCLDu5_ES5CcsUU3qHLWHkzAV=FUU8rns8Twh6C5FVSeEUQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 3 May 2022 17:04:02 -0700
+Message-ID: <CABBYNZ+jGjSHvpQg8uXyC2siCu8Zk-oqKnhiO1MG5d-3cUsyag@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: Add support for devcoredump
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Manish,
 
-syzbot found the following issue on:
+On Tue, May 3, 2022 at 4:00 PM Manish Mandlik <mmandlik@google.com> wrote:
+>
+> Hi Luiz,
+>
+> On Mon, Mar 21, 2022 at 9:46 AM Luiz Augusto von Dentz <luiz.dentz@gmail.=
+com> wrote:
+>>
+>> Hi Manish,
+>>
+>> On Sun, Mar 20, 2022 at 6:34 PM Manish Mandlik <mmandlik@google.com> wro=
+te:
+>> >
+>> > From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>> >
+>> > Add devcoredump APIs to hci core so that drivers only have to provide
+>> > the dump skbs instead of managing the synchronization and timeouts.
+>> >
+>> > The devcoredump APIs should be used in the following manner:
+>> >  - hci_devcoredump_init is called to allocate the dump.
+>> >  - hci_devcoredump_append is called to append any skbs with dump data
+>> >    OR hci_devcoredump_append_pattern is called to insert a pattern.
+>> >  - hci_devcoredump_complete is called when all dump packets have been
+>> >    sent OR hci_devcoredump_abort is called to indicate an error and
+>> >    cancel an ongoing dump collection.
+>> >
+>> > The high level APIs just prepare some skbs with the appropriate data a=
+nd
+>> > queue it for the dump to process. Packets part of the crashdump can be
+>> > intercepted in the driver in interrupt context and forwarded directly =
+to
+>> > the devcoredump APIs.
+>>
+>> If this sort of information comes from telemetry support it can be
+>> intercepted by other means as well e.g. btmon, in fact I think that
+>> would have been better since we already dump the backtrace of
+>> bluetoothd crashes into the monitor as well. Anyway the kernel
+>> devcoredump support seems to just be dumping the data into sysfs so we
+>> could be fetching that information from there as well but I'm not
+>> really sure what we would be gaining with that since we are just
+>> adding yet another kernel dependency for something that userspace
+>> could already be doing by itself.
+>
+> Currently every vendor has their own way of collecting firmware dumps. Th=
+e main intention of adding devcoredump support for bluetooth is to provide =
+a unified way to collect firmware crashdumps across all vendors/controllers=
+. This will generate a dump file in the sysfs and vendors can use it for fu=
+rther debugging. There is no plan to include any information from these dum=
+ps into the btmon logs.
+>
+>>
+>> > Internally, there are 5 states for the dump: idle, active, complete,
+>> > abort and timeout. A devcoredump will only be in active state after it
+>> > has been initialized. Once active, it accepts data to be appended,
+>> > patterns to be inserted (i.e. memset) and a completion event or an abo=
+rt
+>> > event to generate a devcoredump. The timeout is initialized at the sam=
+e
+>> > time the dump is initialized (defaulting to 10s) and will be cleared
+>> > either when the timeout occurs or the dump is complete or aborted.
+>>
+>> Is there some userspace component parsing these dumps? Or we will need
+>> to add some support for the likes of btmon to collect the logs from
+>> sysfs?
+>
+> Yes, user space component is required to parse these dumps. But these too=
+ls will be vendor specific and could be proprietary. However, ChromeOS woul=
+d be using these dumps to identify bluetooth firmware crashes. I'll share m=
+ore information on ChromeOS use case offline.
 
-HEAD commit:    9f9b9a2972eb Add linux-next specific files for 20220502
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1304f300f00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=db7d696bedca61f5
-dashboard link: https://syzkaller.appspot.com/bug?extid=c56f6371c48cad0420f9
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Fair enough, but we do need some way to exercise this code by the CI,
+so at very least we need emulator support otherwise it needs to be
+behind an experimental UUID until proper tests are introduced.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+>>
+>>
+>> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>> > Signed-off-by: Manish Mandlik <mmandlik@google.com>
+>> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>> > ---
+>> >
+>> >  include/net/bluetooth/hci_core.h |  51 ++++
+>> >  net/bluetooth/hci_core.c         | 496 ++++++++++++++++++++++++++++++=
++
+>> >  net/bluetooth/hci_sync.c         |   2 +
+>> >  3 files changed, 549 insertions(+)
+>> >
+>> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/=
+hci_core.h
+>> > index d5377740e99c..818ba3a43e8c 100644
+>> > --- a/include/net/bluetooth/hci_core.h
+>> > +++ b/include/net/bluetooth/hci_core.h
+>> > @@ -118,6 +118,43 @@ enum suspended_state {
+>> >         BT_SUSPEND_CONFIGURE_WAKE,
+>> >  };
+>> >
+>> > +#define DEVCOREDUMP_TIMEOUT    msecs_to_jiffies(100000)        /* 100=
+ sec */
+>> > +
+>> > +typedef int  (*dmp_hdr_t)(struct hci_dev *hdev, char *buf, size_t siz=
+e);
+>> > +typedef void (*notify_change_t)(struct hci_dev *hdev, int state);
+>> > +
+>> > +/* struct hci_devcoredump - Devcoredump state
+>> > + *
+>> > + * @supported: Indicates if FW dump collection is supported by driver
+>> > + * @state: Current state of dump collection
+>> > + * @alloc_size: Total size of the dump
+>> > + * @head: Start of the dump
+>> > + * @tail: Pointer to current end of dump
+>> > + * @end: head + alloc_size for easy comparisons
+>> > + *
+>> > + * @dmp_hdr: Create a dump header to identify controller/fw/driver in=
+fo
+>> > + * @notify_change: Notify driver when devcoredump state has changed
+>> > + */
+>> > +struct hci_devcoredump {
+>> > +       bool            supported;
+>> > +
+>> > +       enum devcoredump_state {
+>> > +               HCI_DEVCOREDUMP_IDLE,
+>> > +               HCI_DEVCOREDUMP_ACTIVE,
+>> > +               HCI_DEVCOREDUMP_DONE,
+>> > +               HCI_DEVCOREDUMP_ABORT,
+>> > +               HCI_DEVCOREDUMP_TIMEOUT
+>> > +       } state;
+>> > +
+>> > +       u32             alloc_size;
+>> > +       char            *head;
+>> > +       char            *tail;
+>> > +       char            *end;
+>> > +
+>> > +       dmp_hdr_t       dmp_hdr;
+>> > +       notify_change_t notify_change;
+>> > +};
+>> > +
+>> >  struct hci_conn_hash {
+>> >         struct list_head list;
+>> >         unsigned int     acl_num;
+>> > @@ -568,6 +605,11 @@ struct hci_dev {
+>> >         const char              *fw_info;
+>> >         struct dentry           *debugfs;
+>> >
+>> > +       struct hci_devcoredump  dump;
+>> > +       struct sk_buff_head     dump_q;
+>> > +       struct work_struct      dump_rx;
+>> > +       struct delayed_work     dump_timeout;
+>> > +
+>> >         struct device           dev;
+>> >
+>> >         struct rfkill           *rfkill;
+>> > @@ -1308,6 +1350,15 @@ static inline void hci_set_aosp_capable(struct =
+hci_dev *hdev)
+>> >  #endif
+>> >  }
+>> >
+>> > +int hci_devcoredump_register(struct hci_dev *hdev, dmp_hdr_t dmp_hdr,
+>> > +                            notify_change_t notify_change);
+>> > +int hci_devcoredump_init(struct hci_dev *hdev, u32 dmp_size);
+>> > +int hci_devcoredump_append(struct hci_dev *hdev, struct sk_buff *skb)=
+;
+>> > +int hci_devcoredump_append_pattern(struct hci_dev *hdev, u8 pattern, =
+u32 len);
+>> > +int hci_devcoredump_complete(struct hci_dev *hdev);
+>> > +int hci_devcoredump_abort(struct hci_dev *hdev);
+>> > +void hci_devcoredump_reset(struct hci_dev *hdev);
+>> > +
+>> >  int hci_dev_open(__u16 dev);
+>> >  int hci_dev_close(__u16 dev);
+>> >  int hci_dev_do_close(struct hci_dev *hdev);
+>> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+>> > index b4782a6c1025..76dbb6b28870 100644
+>> > --- a/net/bluetooth/hci_core.c
+>> > +++ b/net/bluetooth/hci_core.c
+>> > @@ -28,6 +28,7 @@
+>> >  #include <linux/export.h>
+>> >  #include <linux/rfkill.h>
+>> >  #include <linux/debugfs.h>
+>> > +#include <linux/devcoredump.h>
+>> >  #include <linux/crypto.h>
+>> >  #include <linux/property.h>
+>> >  #include <linux/suspend.h>
+>> > @@ -2404,6 +2405,498 @@ static int hci_suspend_notifier(struct notifie=
+r_block *nb, unsigned long action,
+>> >         return NOTIFY_DONE;
+>> >  }
+>> >
+>> > +enum hci_devcoredump_pkt_type {
+>> > +       HCI_DEVCOREDUMP_PKT_INIT,
+>> > +       HCI_DEVCOREDUMP_PKT_SKB,
+>> > +       HCI_DEVCOREDUMP_PKT_PATTERN,
+>> > +       HCI_DEVCOREDUMP_PKT_COMPLETE,
+>> > +       HCI_DEVCOREDUMP_PKT_ABORT,
+>> > +};
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c56f6371c48cad0420f9@syzkaller.appspotmail.com
+I'd move the documentation of the states here, also perhaps we should
+have the handling of devcoredump in its own file e.g. coredump.c,
+since hci_core.c is quite big already adding things that are not part
+of HCI/core specification makes it even bigger.
 
-INFO: task kworker/u5:1:3691 blocked for more than 143 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:1    state:D stack:27464 pid: 3691 ppid:     2 flags:0x00004000
-Workqueue: hci4 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3098
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3185
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4092
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-INFO: task kworker/u5:2:3694 blocked for more than 143 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:2    state:D stack:27688 pid: 3694 ppid:     2 flags:0x00004000
-Workqueue: hci1 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3098
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3185
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4092
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-INFO: task kworker/u5:3:3696 blocked for more than 143 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:3    state:D stack:27192 pid: 3696 ppid:     2 flags:0x00004000
-Workqueue: hci2 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3098
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3185
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4092
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-INFO: task kworker/u5:5:5430 blocked for more than 144 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:5    state:D stack:27536 pid: 5430 ppid:     2 flags:0x00004000
-Workqueue: hci0 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3098
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3185
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4092
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-INFO: task syz-executor.5:5786 blocked for more than 144 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.5  state:D stack:28408 pid: 5786 ppid:     1 flags:0x00000000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x44e/0x1440 kernel/workqueue.c:2884
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1131
- sock_ioctl+0x2f1/0x640 net/socket.c:1248
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f13b1488ea7
-RSP: 002b:00007ffeca7dc868 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ffeca7dcf28 RCX: 00007f13b1488ea7
-RDX: 0000000000000000 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 00007f13b0bff700 R09: 00007f13b0bff700
-R10: 00007f13b0bff9d0 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007ffeca7dc9c0 R14: 00007f13b159c9b8 R15: 000000000000000c
- </TASK>
-INFO: task syz-executor.3:5903 blocked for more than 144 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.3  state:D stack:28408 pid: 5903 ppid:     1 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x44e/0x1440 kernel/workqueue.c:2884
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1131
- sock_ioctl+0x2f1/0x640 net/socket.c:1248
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7ffbbf688ea7
-RSP: 002b:00007fffc1092908 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fffc1092fc8 RCX: 00007ffbbf688ea7
-RDX: 0000000000000001 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 00007ffbbedff700 R09: 00007ffbbedff700
-R10: 00007ffbbedff9d0 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007fffc1092a60 R14: 00007ffbbf79c9b8 R15: 000000000000000c
- </TASK>
-INFO: task syz-executor.2:6048 blocked for more than 144 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.2  state:D stack:28408 pid: 6048 ppid:     1 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x44e/0x1440 kernel/workqueue.c:2884
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1131
- sock_ioctl+0x2f1/0x640 net/socket.c:1248
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7ff9c0e88ea7
-RSP: 002b:00007ffed3e82ed8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ffed3e83598 RCX: 00007ff9c0e88ea7
-RDX: 0000000000000004 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 00007ff9c05ff700 R09: 00007ff9c05ff700
-R10: 00007ff9c05ff9d0 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007ffed3e83030 R14: 00007ff9c0f9c9b8 R15: 000000000000000c
- </TASK>
-INFO: task syz-executor.0:6305 blocked for more than 145 seconds.
-      Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:28408 pid: 6305 ppid:     1 flags:0x00000000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5106 [inline]
- __schedule+0xa9a/0x4cc0 kernel/sched/core.c:6421
- schedule+0xd2/0x1f0 kernel/sched/core.c:6493
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1883
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x44e/0x1440 kernel/workqueue.c:2884
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1131
- sock_ioctl+0x2f1/0x640 net/socket.c:1248
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fe7a4488ea7
-RSP: 002b:00007ffcc64117a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007ffcc6411e68 RCX: 00007fe7a4488ea7
-RDX: 0000000000000002 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 00007fe7a3bff700 R09: 00007fe7a3bff700
-R10: 00007fe7a3bff9d0 R11: 0000000000000246 R12: 0000000000000003
-R13: 00007ffcc6411900 R14: 00007fe7a459c9b8 R15: 000000000000000c
- </TASK>
+>> > +struct hci_devcoredump_skb_cb {
+>> > +       u16 pkt_type;
+>> > +};
+>> > +
+>> > +struct hci_devcoredump_skb_pattern {
+>> > +       u8 pattern;
+>> > +       u32 len;
+>> > +} __packed;
+>> > +
+>> > +#define hci_dmp_cb(skb)        ((struct hci_devcoredump_skb_cb *)((sk=
+b)->cb))
+>> > +
+>> > +#define MAX_DEVCOREDUMP_HDR_SIZE       512     /* bytes */
+>> > +
+>> > +static int hci_devcoredump_update_hdr_state(char *buf, size_t size, i=
+nt state)
+>> > +{
+>> > +       if (!buf)
+>> > +               return 0;
+>> > +
+>> > +       return snprintf(buf, size, "Bluetooth devcoredump\nState: %d\n=
+", state);
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static int hci_devcoredump_update_state(struct hci_dev *hdev, int sta=
+te)
+>> > +{
+>> > +       hdev->dump.state =3D state;
+>> > +
+>> > +       return hci_devcoredump_update_hdr_state(hdev->dump.head,
+>> > +                                               hdev->dump.alloc_size,=
+ state);
+>> > +}
+>> > +
+>> > +static int hci_devcoredump_mkheader(struct hci_dev *hdev, char *buf,
+>> > +                                   size_t buf_size)
+>> > +{
+>> > +       char *ptr =3D buf;
+>> > +       size_t rem =3D buf_size;
+>> > +       size_t read =3D 0;
+>> > +
+>> > +       read =3D hci_devcoredump_update_hdr_state(ptr, rem, HCI_DEVCOR=
+EDUMP_IDLE);
+>> > +       read +=3D 1; /* update_hdr_state adds \0 at the end upon state=
+ rewrite */
+>> > +       rem -=3D read;
+>> > +       ptr +=3D read;
+>> > +
+>> > +       if (hdev->dump.dmp_hdr) {
+>> > +               /* dmp_hdr() should return number of bytes written */
+>> > +               read =3D hdev->dump.dmp_hdr(hdev, ptr, rem);
+>> > +               rem -=3D read;
+>> > +               ptr +=3D read;
+>> > +       }
+>> > +
+>> > +       read =3D snprintf(ptr, rem, "--- Start dump ---\n");
+>> > +       rem -=3D read;
+>> > +       ptr +=3D read;
+>> > +
+>> > +       return buf_size - rem;
+>> > +}
+>> > +
+>> > +/* Do not call with hci_dev_lock since this calls driver code. */
+>> > +static void hci_devcoredump_notify(struct hci_dev *hdev, int state)
+>> > +{
+>> > +       if (hdev->dump.notify_change)
+>> > +               hdev->dump.notify_change(hdev, state);
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +void hci_devcoredump_reset(struct hci_dev *hdev)
+>> > +{
+>> > +       hdev->dump.head =3D NULL;
+>> > +       hdev->dump.tail =3D NULL;
+>> > +       hdev->dump.alloc_size =3D 0;
+>> > +
+>> > +       hci_devcoredump_update_state(hdev, HCI_DEVCOREDUMP_IDLE);
+>> > +
+>> > +       cancel_delayed_work(&hdev->dump_timeout);
+>> > +       skb_queue_purge(&hdev->dump_q);
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static void hci_devcoredump_free(struct hci_dev *hdev)
+>> > +{
+>> > +       if (hdev->dump.head)
+>> > +               vfree(hdev->dump.head);
+>> > +
+>> > +       hci_devcoredump_reset(hdev);
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static int hci_devcoredump_alloc(struct hci_dev *hdev, u32 size)
+>> > +{
+>> > +       hdev->dump.head =3D vmalloc(size);
+>> > +       if (!hdev->dump.head)
+>> > +               return -ENOMEM;
+>> > +
+>> > +       hdev->dump.alloc_size =3D size;
+>> > +       hdev->dump.tail =3D hdev->dump.head;
+>> > +       hdev->dump.end =3D hdev->dump.head + size;
+>> > +
+>> > +       hci_devcoredump_update_state(hdev, HCI_DEVCOREDUMP_IDLE);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static bool hci_devcoredump_copy(struct hci_dev *hdev, char *buf, u32=
+ size)
+>> > +{
+>> > +       if (hdev->dump.tail + size > hdev->dump.end)
+>> > +               return false;
+>> > +
+>> > +       memcpy(hdev->dump.tail, buf, size);
+>> > +       hdev->dump.tail +=3D size;
+>> > +
+>> > +       return true;
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static bool hci_devcoredump_memset(struct hci_dev *hdev, u8 pattern, =
+u32 len)
+>> > +{
+>> > +       if (hdev->dump.tail + len > hdev->dump.end)
+>> > +               return false;
+>> > +
+>> > +       memset(hdev->dump.tail, pattern, len);
+>> > +       hdev->dump.tail +=3D len;
+>> > +
+>> > +       return true;
+>> > +}
+>> > +
+>> > +/* Call with hci_dev_lock only. */
+>> > +static int hci_devcoredump_prepare(struct hci_dev *hdev, u32 dump_siz=
+e)
+>> > +{
+>> > +       char *dump_hdr;
+>> > +       int dump_hdr_size;
+>> > +       u32 size;
+>> > +       int err =3D 0;
+>> > +
+>> > +       dump_hdr =3D vmalloc(MAX_DEVCOREDUMP_HDR_SIZE);
+>> > +       if (!dump_hdr) {
+>> > +               err =3D -ENOMEM;
+>> > +               goto hdr_free;
+>> > +       }
+>> > +
+>> > +       dump_hdr_size =3D hci_devcoredump_mkheader(hdev, dump_hdr,
+>> > +                                                MAX_DEVCOREDUMP_HDR_S=
+IZE);
+>> > +       size =3D dump_hdr_size + dump_size;
+>> > +
+>> > +       if (hci_devcoredump_alloc(hdev, size)) {
+>> > +               err =3D -ENOMEM;
+>> > +               goto hdr_free;
+>> > +       }
+>> > +
+>> > +       /* Insert the device header */
+>> > +       if (!hci_devcoredump_copy(hdev, dump_hdr, dump_hdr_size)) {
+>> > +               bt_dev_err(hdev, "Failed to insert header");
+>> > +               hci_devcoredump_free(hdev);
+>> > +
+>> > +               err =3D -ENOMEM;
+>> > +               goto hdr_free;
+>> > +       }
+>> > +
+>> > +hdr_free:
+>> > +       if (dump_hdr)
+>> > +               vfree(dump_hdr);
+>> > +
+>> > +       return err;
+>> > +}
+>> > +
+>> > +/* Bluetooth devcoredump state machine.
+>> > + *
+>> > + * Devcoredump states:
+>> > + *
+>> > + *      HCI_DEVCOREDUMP_IDLE: The default state.
+>> > + *
+>> > + *      HCI_DEVCOREDUMP_ACTIVE: A devcoredump will be in this state o=
+nce it has
+>> > + *              been initialized using hci_devcoredump_init(). Once a=
+ctive, the
+>> > + *              driver can append data using hci_devcoredump_append()=
+ or insert
+>> > + *              a pattern using hci_devcoredump_append_pattern().
+>> > + *
+>> > + *      HCI_DEVCOREDUMP_DONE: Once the dump collection is complete, t=
+he drive
+>> > + *              can signal the completion using hci_devcoredump_compl=
+ete(). A
+>> > + *              devcoredump is generated indicating the completion ev=
+ent and
+>> > + *              then the state machine is reset to the default state.
+>> > + *
+>> > + *      HCI_DEVCOREDUMP_ABORT: The driver can cancel ongoing dump col=
+lection in
+>> > + *              case of any error using hci_devcoredump_abort(). A de=
+vcoredump
+>> > + *              is still generated with the available data indicating=
+ the abort
+>> > + *              event and then the state machine is reset to the defa=
+ult state.
+>> > + *
+>> > + *      HCI_DEVCOREDUMP_TIMEOUT: A timeout timer for HCI_DEVCOREDUMP_=
+TIMEOUT sec
+>> > + *              is started during devcoredump initialization. Once th=
+e timeout
+>> > + *              occurs, the driver is notified, a devcoredump is gene=
+rated with
+>> > + *              the available data indicating the timeout event and t=
+hen the
+>> > + *              state machine is reset to the default state.
+>> > + *
+>> > + * The driver must register using hci_devcoredump_register() before u=
+sing the
+>> > + * hci devcoredump APIs.
+>> > + */
+>> > +static void hci_devcoredump_rx(struct work_struct *work)
+>> > +{
+>> > +       struct hci_dev *hdev =3D container_of(work, struct hci_dev, du=
+mp_rx);
+>> > +       struct sk_buff *skb;
+>> > +       struct hci_devcoredump_skb_pattern *pattern;
+>> > +       u32 dump_size;
+>> > +       int start_state;
+>> > +
+>> > +#define DBG_UNEXPECTED_STATE() \
+>> > +               bt_dev_dbg(hdev, \
+>> > +                          "Unexpected packet (%d) for state (%d). ", =
+\
+>> > +                          hci_dmp_cb(skb)->pkt_type, hdev->dump.state=
+)
+>> > +
+>> > +       while ((skb =3D skb_dequeue(&hdev->dump_q))) {
+>> > +               hci_dev_lock(hdev);
+>> > +               start_state =3D hdev->dump.state;
+>> > +
+>> > +               switch (hci_dmp_cb(skb)->pkt_type) {
+>> > +               case HCI_DEVCOREDUMP_PKT_INIT:
+>> > +                       if (hdev->dump.state !=3D HCI_DEVCOREDUMP_IDLE=
+) {
+>> > +                               DBG_UNEXPECTED_STATE();
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       if (skb->len !=3D sizeof(dump_size)) {
+>> > +                               bt_dev_dbg(hdev, "Invalid dump init pk=
+t");
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       dump_size =3D *((u32 *)skb->data);
+>> > +                       if (!dump_size) {
+>> > +                               bt_dev_err(hdev, "Zero size dump init =
+pkt");
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       if (hci_devcoredump_prepare(hdev, dump_size)) =
+{
+>> > +                               bt_dev_err(hdev, "Failed to prepare fo=
+r dump");
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       hci_devcoredump_update_state(hdev,
+>> > +                                                    HCI_DEVCOREDUMP_A=
+CTIVE);
+>> > +                       queue_delayed_work(hdev->workqueue, &hdev->dum=
+p_timeout,
+>> > +                                          DEVCOREDUMP_TIMEOUT);
+>> > +                       break;
+>> > +
+>> > +               case HCI_DEVCOREDUMP_PKT_SKB:
+>> > +                       if (hdev->dump.state !=3D HCI_DEVCOREDUMP_ACTI=
+VE) {
+>> > +                               DBG_UNEXPECTED_STATE();
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       if (!hci_devcoredump_copy(hdev, skb->data, skb=
+->len))
+>> > +                               bt_dev_dbg(hdev, "Failed to insert skb=
+");
+>> > +                       break;
+>> > +
+>> > +               case HCI_DEVCOREDUMP_PKT_PATTERN:
+>> > +                       if (hdev->dump.state !=3D HCI_DEVCOREDUMP_ACTI=
+VE) {
+>> > +                               DBG_UNEXPECTED_STATE();
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       if (skb->len !=3D sizeof(*pattern)) {
+>> > +                               bt_dev_dbg(hdev, "Invalid pattern skb"=
+);
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       pattern =3D (void *)skb->data;
+>> > +
+>> > +                       if (!hci_devcoredump_memset(hdev, pattern->pat=
+tern,
+>> > +                                                   pattern->len))
+>> > +                               bt_dev_dbg(hdev, "Failed to set patter=
+n");
+>> > +                       break;
+>> > +
+>> > +               case HCI_DEVCOREDUMP_PKT_COMPLETE:
+>> > +                       if (hdev->dump.state !=3D HCI_DEVCOREDUMP_ACTI=
+VE) {
+>> > +                               DBG_UNEXPECTED_STATE();
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       hci_devcoredump_update_state(hdev,
+>> > +                                                    HCI_DEVCOREDUMP_D=
+ONE);
+>> > +                       dump_size =3D hdev->dump.tail - hdev->dump.hea=
+d;
+>> > +
+>> > +                       bt_dev_info(hdev,
+>> > +                                   "Devcoredump complete with size %u=
+ "
+>> > +                                   "(expect %u)",
+>> > +                                   dump_size, hdev->dump.alloc_size);
+>> > +
+>> > +                       dev_coredumpv(&hdev->dev, hdev->dump.head, dum=
+p_size,
+>> > +                                     GFP_KERNEL);
+>> > +                       break;
+>> > +
+>> > +               case HCI_DEVCOREDUMP_PKT_ABORT:
+>> > +                       if (hdev->dump.state !=3D HCI_DEVCOREDUMP_ACTI=
+VE) {
+>> > +                               DBG_UNEXPECTED_STATE();
+>> > +                               goto loop_continue;
+>> > +                       }
+>> > +
+>> > +                       hci_devcoredump_update_state(hdev,
+>> > +                                                    HCI_DEVCOREDUMP_A=
+BORT);
+>> > +                       dump_size =3D hdev->dump.tail - hdev->dump.hea=
+d;
+>> > +
+>> > +                       bt_dev_info(hdev,
+>> > +                                   "Devcoredump aborted with size %u =
+"
+>> > +                                   "(expect %u)",
+>> > +                                   dump_size, hdev->dump.alloc_size);
+>> > +
+>> > +                       /* Emit a devcoredump with the available data =
+*/
+>> > +                       dev_coredumpv(&hdev->dev, hdev->dump.head, dum=
+p_size,
+>> > +                                     GFP_KERNEL);
+>> > +                       break;
+>> > +
+>> > +               default:
+>> > +                       bt_dev_dbg(hdev,
+>> > +                                  "Unknown packet (%d) for state (%d)=
+. ",
+>> > +                                  hci_dmp_cb(skb)->pkt_type, hdev->du=
+mp.state);
+>> > +                       break;
+>> > +               }
+>> > +
+>> > +loop_continue:
+>> > +               kfree_skb(skb);
+>> > +               hci_dev_unlock(hdev);
+>> > +
+>> > +               if (start_state !=3D hdev->dump.state)
+>> > +                       hci_devcoredump_notify(hdev, hdev->dump.state)=
+;
+>> > +
+>> > +               hci_dev_lock(hdev);
+>> > +               if (hdev->dump.state =3D=3D HCI_DEVCOREDUMP_DONE ||
+>> > +                   hdev->dump.state =3D=3D HCI_DEVCOREDUMP_ABORT)
+>> > +                       hci_devcoredump_reset(hdev);
+>> > +               hci_dev_unlock(hdev);
+>> > +       }
+>> > +}
+>> > +
+>> > +static void hci_devcoredump_timeout(struct work_struct *work)
+>> > +{
+>> > +       struct hci_dev *hdev =3D container_of(work, struct hci_dev,
+>> > +                                           dump_timeout.work);
+>> > +       u32 dump_size;
+>> > +
+>> > +       hci_devcoredump_notify(hdev, HCI_DEVCOREDUMP_TIMEOUT);
+>> > +
+>> > +       hci_dev_lock(hdev);
+>> > +
+>> > +       cancel_work_sync(&hdev->dump_rx);
+>> > +
+>> > +       hci_devcoredump_update_state(hdev, HCI_DEVCOREDUMP_TIMEOUT);
+>> > +       dump_size =3D hdev->dump.tail - hdev->dump.head;
+>> > +       bt_dev_info(hdev, "Devcoredump timeout with size %u (expect %u=
+)",
+>> > +                   dump_size, hdev->dump.alloc_size);
+>> > +
+>> > +       /* Emit a devcoredump with the available data */
+>> > +       dev_coredumpv(&hdev->dev, hdev->dump.head, dump_size, GFP_KERN=
+EL);
+>> > +
+>> > +       hci_devcoredump_reset(hdev);
+>> > +
+>> > +       hci_dev_unlock(hdev);
+>> > +}
+>> > +
+>> > +int hci_devcoredump_register(struct hci_dev *hdev, dmp_hdr_t dmp_hdr,
+>> > +                            notify_change_t notify_change)
+>> > +{
+>> > +       /* driver must implement dmp_hdr() function for bluetooth devc=
+oredump */
+>> > +       if (!dmp_hdr)
+>> > +               return -EINVAL;
+>> > +
+>> > +       hci_dev_lock(hdev);
+>> > +       hdev->dump.dmp_hdr =3D dmp_hdr;
+>> > +       hdev->dump.notify_change =3D notify_change;
+>> > +       hdev->dump.supported =3D true;
+>> > +       hci_dev_unlock(hdev);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_register);
+>> > +
+>> > +int hci_devcoredump_init(struct hci_dev *hdev, u32 dmp_size)
+>> > +{
+>> > +       struct sk_buff *skb =3D NULL;
+>> > +
+>> > +       if (!hdev->dump.supported)
+>> > +               return -EOPNOTSUPP;
+>> > +
+>> > +       skb =3D alloc_skb(sizeof(dmp_size), GFP_ATOMIC);
+>> > +       if (!skb) {
+>> > +               bt_dev_err(hdev, "Failed to allocate devcoredump init"=
+);
+>> > +               return -ENOMEM;
+>> > +       }
+>> > +
+>> > +       hci_dmp_cb(skb)->pkt_type =3D HCI_DEVCOREDUMP_PKT_INIT;
+>> > +       skb_put_data(skb, &dmp_size, sizeof(dmp_size));
+>> > +
+>> > +       skb_queue_tail(&hdev->dump_q, skb);
+>> > +       queue_work(hdev->workqueue, &hdev->dump_rx);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_init);
+>> > +
+>> > +int hci_devcoredump_append(struct hci_dev *hdev, struct sk_buff *skb)
+>> > +{
+>> > +       if (!skb)
+>> > +               return -ENOMEM;
+>> > +
+>> > +       if (!hdev->dump.supported) {
+>> > +               kfree_skb(skb);
+>> > +               return -EOPNOTSUPP;
+>> > +       }
+>> > +
+>> > +       hci_dmp_cb(skb)->pkt_type =3D HCI_DEVCOREDUMP_PKT_SKB;
+>> > +
+>> > +       skb_queue_tail(&hdev->dump_q, skb);
+>> > +       queue_work(hdev->workqueue, &hdev->dump_rx);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_append);
+>> > +
+>> > +int hci_devcoredump_append_pattern(struct hci_dev *hdev, u8 pattern, =
+u32 len)
+>> > +{
+>> > +       struct hci_devcoredump_skb_pattern p;
+>> > +       struct sk_buff *skb =3D NULL;
+>> > +
+>> > +       if (!hdev->dump.supported)
+>> > +               return -EOPNOTSUPP;
+>> > +
+>> > +       skb =3D alloc_skb(sizeof(p), GFP_ATOMIC);
+>> > +       if (!skb) {
+>> > +               bt_dev_err(hdev, "Failed to allocate devcoredump patte=
+rn");
+>> > +               return -ENOMEM;
+>> > +       }
+>> > +
+>> > +       p.pattern =3D pattern;
+>> > +       p.len =3D len;
+>> > +
+>> > +       hci_dmp_cb(skb)->pkt_type =3D HCI_DEVCOREDUMP_PKT_PATTERN;
+>> > +       skb_put_data(skb, &p, sizeof(p));
+>> > +
+>> > +       skb_queue_tail(&hdev->dump_q, skb);
+>> > +       queue_work(hdev->workqueue, &hdev->dump_rx);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_append_pattern);
+>> > +
+>> > +int hci_devcoredump_complete(struct hci_dev *hdev)
+>> > +{
+>> > +       struct sk_buff *skb =3D NULL;
+>> > +
+>> > +       if (!hdev->dump.supported)
+>> > +               return -EOPNOTSUPP;
+>> > +
+>> > +       skb =3D alloc_skb(0, GFP_ATOMIC);
+>> > +       if (!skb) {
+>> > +               bt_dev_err(hdev, "Failed to allocate devcoredump compl=
+ete");
+>> > +               return -ENOMEM;
+>> > +       }
+>> > +
+>> > +       hci_dmp_cb(skb)->pkt_type =3D HCI_DEVCOREDUMP_PKT_COMPLETE;
+>> > +
+>> > +       skb_queue_tail(&hdev->dump_q, skb);
+>> > +       queue_work(hdev->workqueue, &hdev->dump_rx);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_complete);
+>> > +
+>> > +int hci_devcoredump_abort(struct hci_dev *hdev)
+>> > +{
+>> > +       struct sk_buff *skb =3D NULL;
+>> > +
+>> > +       if (!hdev->dump.supported)
+>> > +               return -EOPNOTSUPP;
+>> > +
+>> > +       skb =3D alloc_skb(0, GFP_ATOMIC);
+>> > +       if (!skb) {
+>> > +               bt_dev_err(hdev, "Failed to allocate devcoredump abort=
+");
+>> > +               return -ENOMEM;
+>> > +       }
+>> > +
+>> > +       hci_dmp_cb(skb)->pkt_type =3D HCI_DEVCOREDUMP_PKT_ABORT;
+>> > +
+>> > +       skb_queue_tail(&hdev->dump_q, skb);
+>> > +       queue_work(hdev->workqueue, &hdev->dump_rx);
+>> > +
+>> > +       return 0;
+>> > +}
+>> > +EXPORT_SYMBOL(hci_devcoredump_abort);
+>> > +
+>> >  /* Alloc HCI device */
+>> >  struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+>> >  {
+>> > @@ -2511,14 +3004,17 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_=
+priv)
+>> >         INIT_WORK(&hdev->tx_work, hci_tx_work);
+>> >         INIT_WORK(&hdev->power_on, hci_power_on);
+>> >         INIT_WORK(&hdev->error_reset, hci_error_reset);
+>> > +       INIT_WORK(&hdev->dump_rx, hci_devcoredump_rx);
+>> >
+>> >         hci_cmd_sync_init(hdev);
+>> >
+>> >         INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+>> > +       INIT_DELAYED_WORK(&hdev->dump_timeout, hci_devcoredump_timeout=
+);
+>> >
+>> >         skb_queue_head_init(&hdev->rx_q);
+>> >         skb_queue_head_init(&hdev->cmd_q);
+>> >         skb_queue_head_init(&hdev->raw_q);
+>> > +       skb_queue_head_init(&hdev->dump_q);
 
-Showing all locks held in the system:
-1 lock held by rcu_tasks_kthre/12:
- #0: ffffffff8bd84cd0 (rcu_tasks.tasks_gp_mutex){+.+.}-{3:3}, at: rcu_tasks_one_gp+0x26/0xc70 kernel/rcu/tasks.h:502
-1 lock held by rcu_tasks_trace/13:
- #0: ffffffff8bd84950 (rcu_tasks_trace.tasks_gp_mutex){+.+.}-{3:3}, at: rcu_tasks_one_gp+0x26/0xc70 kernel/rcu/tasks.h:502
-1 lock held by khungtaskd/29:
- #0: ffffffff8bd85820 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
-2 locks held by getty/3356:
- #0: ffff88814bb09098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
- #1: ffffc90002ce62e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xe50/0x13c0 drivers/tty/n_tty.c:2118
-3 locks held by kworker/u5:1/3691:
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88802520a938 ((wq_completion)hci4){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc90002f5fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff88801e529048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
-3 locks held by kworker/u5:2/3694:
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88807eb0f138 ((wq_completion)hci1){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000307fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff88801e165048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
-3 locks held by kworker/u5:3/3696:
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88807ad37938 ((wq_completion)hci2){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000309fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff88807d985048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
-3 locks held by kworker/u5:5/5430:
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88805b8c0938 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc90002e3fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff888075741048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
+Perhaps it is a better idea to have this fields as part of a dedicated
+struct for coredumps e.g. struct hci_devcoredump, also perhaps they
+need to be conditional to CONFIG_DEV_COREDUMP otherwise it just adds
+things like a delayed work that will never going to be used, this just
+reinforces the need of proper CI tests so we can exercise this code
+with the likes of the emulator.
 
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 PID: 29 Comm: khungtaskd Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
- nmi_trigger_cpumask_backtrace+0x1e6/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:220 [inline]
- watchdog+0xc22/0xf90 kernel/hung_task.c:378
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 8 Comm: kworker/u4:0 Not tainted 5.18.0-rc5-next-20220502-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:__lock_acquire+0xd51/0x5660 kernel/locking/lockdep.c:5063
-Code: 03 0f b6 04 02 84 c0 74 0d 3c 03 7f 09 48 8b 3c 24 e8 63 78 69 00 41 8b 85 58 0a 00 00 83 c0 01 83 f8 2f 41 89 85 58 0a 00 00 <0f> 87 eb 0b 00 00 3b 05 53 e2 1e 0e 41 be 01 00 00 00 0f 86 c8 00
-RSP: 0018:ffffc900000d7748 EFLAGS: 00000097
-RAX: 0000000000000006 RBX: ffffffff8f3c6c00 RCX: ffffffff815ddcee
-RDX: 1ffff110021e1c5b RSI: 0000000000000001 RDI: ffffffff8f3c6c18
-RBP: 000000000000f5e5 R08: 0000000000000000 R09: ffffffff9007b897
-R10: fffffbfff200f712 R11: 0000000000000001 R12: ffff888010f0e3a8
-R13: ffff888010f0d880 R14: 0000000000000000 R15: d4985ce4c67f0360
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000c001d7d000 CR3: 000000000ba8e000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- lock_acquire kernel/locking/lockdep.c:5665 [inline]
- lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5630
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:354 [inline]
- __get_locked_pte+0x154/0x270 mm/memory.c:1830
- get_locked_pte include/linux/mm.h:2127 [inline]
- __text_poke+0x1ae/0x8c0 arch/x86/kernel/alternative.c:1038
- text_poke arch/x86/kernel/alternative.c:1121 [inline]
- text_poke_bp_batch+0x433/0x6b0 arch/x86/kernel/alternative.c:1436
- text_poke_flush arch/x86/kernel/alternative.c:1542 [inline]
- text_poke_flush arch/x86/kernel/alternative.c:1539 [inline]
- text_poke_finish+0x16/0x30 arch/x86/kernel/alternative.c:1549
- arch_jump_label_transform_apply+0x13/0x20 arch/x86/kernel/jump_label.c:146
- jump_label_update+0x32f/0x410 kernel/jump_label.c:830
- static_key_disable_cpuslocked+0x152/0x1b0 kernel/jump_label.c:207
- static_key_disable+0x16/0x20 kernel/jump_label.c:215
- toggle_allocation_gate mm/kfence/core.c:809 [inline]
- toggle_allocation_gate+0x183/0x390 mm/kfence/core.c:787
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	03 0f                	add    (%rdi),%ecx
-   2:	b6 04                	mov    $0x4,%dh
-   4:	02 84 c0 74 0d 3c 03 	add    0x33c0d74(%rax,%rax,8),%al
-   b:	7f 09                	jg     0x16
-   d:	48 8b 3c 24          	mov    (%rsp),%rdi
-  11:	e8 63 78 69 00       	callq  0x697879
-  16:	41 8b 85 58 0a 00 00 	mov    0xa58(%r13),%eax
-  1d:	83 c0 01             	add    $0x1,%eax
-  20:	83 f8 2f             	cmp    $0x2f,%eax
-  23:	41 89 85 58 0a 00 00 	mov    %eax,0xa58(%r13)
-* 2a:	0f 87 eb 0b 00 00    	ja     0xc1b <-- trapping instruction
-  30:	3b 05 53 e2 1e 0e    	cmp    0xe1ee253(%rip),%eax        # 0xe1ee289
-  36:	41 be 01 00 00 00    	mov    $0x1,%r14d
-  3c:	0f                   	.byte 0xf
-  3d:	86 c8                	xchg   %cl,%al
+>> >         init_waitqueue_head(&hdev->req_wait_q);
+>> >
+>> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> > index 8f4c5698913d..ec03fa871ef0 100644
+>> > --- a/net/bluetooth/hci_sync.c
+>> > +++ b/net/bluetooth/hci_sync.c
+>> > @@ -3877,6 +3877,8 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+>> >                 goto done;
+>> >         }
+>> >
+>> > +       hci_devcoredump_reset(hdev);
+>> > +
+>> >         set_bit(HCI_RUNNING, &hdev->flags);
+>> >         hci_sock_dev_event(hdev, HCI_DEV_OPEN);
+>> >
+>> > --
+>> > 2.35.1.894.gb6a874cedc-goog
+>> >
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Regards,
+> Manish.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+--=20
+Luiz Augusto von Dentz
