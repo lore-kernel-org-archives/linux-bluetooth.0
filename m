@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E09B1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 23:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA71FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 23:06:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386583AbiEEXJn (ORCPT
+        id S1386593AbiEEXJn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 5 May 2022 19:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46414 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378983AbiEEXJl (ORCPT
+        with ESMTP id S1383013AbiEEXJl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 5 May 2022 19:09:41 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E94B5C65A
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B24FB5EDC5
         for <linux-bluetooth@vger.kernel.org>; Thu,  5 May 2022 16:05:58 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id z26so6351997iot.8
+Received: by mail-il1-x134.google.com with SMTP id h11so3822495ila.5
         for <linux-bluetooth@vger.kernel.org>; Thu, 05 May 2022 16:05:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=XIac5/qOu9ije8/KxE5DLXPmXpRGnDyogI5v+IVRgDQ=;
-        b=NoeXNemWs4FtwFQ0aMmHv5xMCgoHzX86teEngoY1rD+K3gKSLkSvdOxm4zerh/LHfT
-         CvfVV3PlaYOlu8pJZjSeNnJvRvg66m2IA620c1yA7dpWVLDJ1PypGaCWU931Ql6Uh/MH
-         8GBU7104i6iJoBstygpoy6CAmE6LHB+cWDUVHki/+OeWGZmzpXbxIiZz2CNdpAyc0yNh
-         6KiOvQbTTiOSY3XQ89+Gezq0hcWXqoCtd2aU66WmpG/A/B8uQsSKnMq2y+7WhDu7X7Qy
-         eAykrhrvrHyuuEWw6V9+KdkYYNZPm58gK0zBA1yAWY1VGlgh5vRo90bojaeBb0VSIaJg
-         6lEg==
+        bh=s3r/aLwpKQWT36vpwz2uGXLW3l0ccUu0W5Td7g2mUz4=;
+        b=nV3tS8zpJO31xedUYM9pQ3QZydZvv2MOj6ljtiuDr0Ej0Jzz3IZ2O/XUZLlSf+VzLQ
+         wK49a5eOpumq9SNMqSFnAyhNsl6zTwAIs4i8AG9AkfeM2vI4jWVyp4puvxsX9EaN989R
+         XF6VIktbmVGlgmDmF66xsEe6kzjiGbIJdrqSF3LRH2fOSWINfcKqViaN5IqcohwI5dXJ
+         RimmgHtoUP9HdgLo1WbYvaAKYC+gD95aSF914huYo8QttBjzHURvMcJ7ttsf1jgjlBNa
+         FtST3Hj5p33KmbAdQJMnpcdpG/uHP5YBm7zdTKmHqxL5CzzWqao2NHDApB9oj/Ve203S
+         0Gug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XIac5/qOu9ije8/KxE5DLXPmXpRGnDyogI5v+IVRgDQ=;
-        b=Oa2PkllgmKcKNXrZU26Aw8hIpqk5SvWWNT3alR96UauWT+rGJmuHOd++Avwk/dtBKY
-         2zB6NLe97/+zkTOyKC/BKOLPyBM1rMRJI9QCGo/W81O5RFQ0xE+L61d/Vw2dJ0EFsSpe
-         uHx3iL7XZPZgM6frXW8jgSlw4V3k4R4TwYlcSMKcaSR2Nhw2iygFEnQBAB438fm2kdoH
-         qa8Jcn9h5Q2dps4EenMlcm4/rhW4Bxg55U1QgLpkS/qd9YEWlCWkonDiVsgTVkv0Myk3
-         q02cpSx1j1OdN3RN3Z2cU4WTUnBtu4iTzEJYm5HfRhg9PPaFncIUhS6qiCRebCyGeO3O
-         e+Lg==
-X-Gm-Message-State: AOAM533vkN95eYheWI2J8vGcpAc5Tw5zERcP1wx29LJyH86VzS2E2SFh
-        RC2WWwkrW+KJsAE/vhkXB7SoVLdQS6U=
-X-Google-Smtp-Source: ABdhPJzLpaJQPDBKBeDcl+mXirfyaChaq/mlXgzL8ipNSvWNZ9qvdgwTobI0ClQRWW4qq3RRO7Fn0w==
-X-Received: by 2002:a05:6638:1207:b0:32b:7c4e:4088 with SMTP id n7-20020a056638120700b0032b7c4e4088mr217511jas.122.1651791955495;
-        Thu, 05 May 2022 16:05:55 -0700 (PDT)
+        bh=s3r/aLwpKQWT36vpwz2uGXLW3l0ccUu0W5Td7g2mUz4=;
+        b=Kk9F1u7/eU58HG0rDkqUiwxYC5Sij2gpFDBwTFWr+SRGbYFwDoqgkLlMnWlEDLh8i7
+         ZBrQ+Xv5rgynSr7s8Gmlot1zoeIctn+NMZ6lxsDTyrOcONDUFRLgg1L2x8H/rq0u7YET
+         AjPPbJ87XE4/al4ZMfNE415PJ07kmJ3c4RCpeNtUg0yC0bc+NlSmucAjo13KzDJdC2wx
+         31hq5vxSOjKBXkvajZzfVnmdZztdUoVWKLXtQ+tRVaLL9pEC0OQu1j7/gx39l6P4/RGk
+         B2BY6eZeuU5WzT2L9bf6H7fQVvLdHDvQqSDtSTyr0DLnJlt8Bu6ORLcVlIC/as5Kv/UR
+         nGow==
+X-Gm-Message-State: AOAM533wvz6OSO+28scp2YS7JApWnFzy6HoHDG7pF2qHNc40Rvuo7IR8
+        HCXtkUqC0u+NQbB15qw20h+kacv3FFU=
+X-Google-Smtp-Source: ABdhPJyYptRHgslwmvsUUy5F9XQ6jaGcbPQzdzXfdsW4NfjAaC9n9wnPNh692joM0cRnNeOSDa18GA==
+X-Received: by 2002:a92:c264:0:b0:2cf:7188:d3ad with SMTP id h4-20020a92c264000000b002cf7188d3admr196755ild.118.1651791956804;
+        Thu, 05 May 2022 16:05:56 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id l10-20020a92d8ca000000b002cde6e352bfsm780757ilo.9.2022.05.05.16.05.53
+        by smtp.gmail.com with ESMTPSA id l10-20020a92d8ca000000b002cde6e352bfsm780757ilo.9.2022.05.05.16.05.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 May 2022 16:05:54 -0700 (PDT)
+        Thu, 05 May 2022 16:05:56 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/8] Bluetooth: Add initial implementation of CIS connections
-Date:   Thu,  5 May 2022 16:05:45 -0700
-Message-Id: <20220505230550.3450617-3-luiz.dentz@gmail.com>
+Subject: [PATCH 4/8] Bluetooth: Add BTPROTO_ISO socket type
+Date:   Thu,  5 May 2022 16:05:46 -0700
+Message-Id: <20220505230550.3450617-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220505230550.3450617-1-luiz.dentz@gmail.com>
 References: <20220505230550.3450617-1-luiz.dentz@gmail.com>
@@ -66,1717 +66,1782 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the initial implementation of CIS connections and introduces
-the ISO packets/links.
+This introduces a new socket type BTPROTO_ISO which can be enabled with
+use of ISO Socket experiemental UUID, it can used to initiate/accept
+connections and transfer packets between userspace and kernel similarly
+to how BTPROTO_SCO works:
 
-== Central: Set CIG Parameters, create a CIS and Setup Data Path ==
+Central -> uses connect with address set to destination bdaddr:
+> tools/isotest -s 00:AA:01:00:00:00
 
-> tools/isotest -s <address>
-
-< HCI Command: LE Extended Create... (0x08|0x0043) plen 26
-...
-> HCI Event: Command Status (0x0f) plen 4
-      LE Extended Create Connection (0x08|0x0043) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 31
-      LE Enhanced Connection Complete (0x0a)
-      ...
-< HCI Command: LE Create Connected... (0x08|0x0064) plen 5
-...
-> HCI Event: Command Status (0x0f) plen 4
-      LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 29
-      LE Connected Isochronous Stream Established (0x19)
-      ...
-< HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
-...
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 257
-< HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
-...
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 257
-
-== Peripheral: Accept CIS and Setup Data Path ==
-
+Peripheral -> uses listen:
 > tools/isotest -d
-
- HCI Event: LE Meta Event (0x3e) plen 7
-      LE Connected Isochronous Stream Request (0x1a)
-...
-< HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
-...
-> HCI Event: LE Meta Event (0x3e) plen 29
-      LE Connected Isochronous Stream Established (0x19)
-...
-< HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
-...
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 257
-< HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
-...
-> HCI Event: Command Complete (0x0e) plen 6
-      LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-        Status: Success (0x00)
-        Handle: 257
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |  33 ++-
- include/net/bluetooth/hci.h       |  28 +-
- include/net/bluetooth/hci_core.h  | 107 +++++++-
- include/net/bluetooth/hci_sock.h  |   2 +
- include/net/bluetooth/hci_sync.h  |   3 +
- net/bluetooth/Kconfig             |   1 +
- net/bluetooth/af_bluetooth.c      |   4 +-
- net/bluetooth/hci_conn.c          | 430 ++++++++++++++++++++++++++++++
- net/bluetooth/hci_core.c          | 225 ++++++++++++----
- net/bluetooth/hci_event.c         | 309 ++++++++++++++++++++-
- net/bluetooth/hci_sync.c          |  49 +++-
- 11 files changed, 1135 insertions(+), 56 deletions(-)
+ include/net/bluetooth/bluetooth.h |   21 +
+ include/net/bluetooth/hci_core.h  |   18 +-
+ include/net/bluetooth/iso.h       |   36 +
+ net/bluetooth/Makefile            |    1 +
+ net/bluetooth/af_bluetooth.c      |    2 +
+ net/bluetooth/hci_core.c          |    7 +-
+ net/bluetooth/hci_event.c         |    4 +-
+ net/bluetooth/iso.c               | 1471 +++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c              |   70 +-
+ 9 files changed, 1623 insertions(+), 7 deletions(-)
+ create mode 100644 include/net/bluetooth/iso.h
+ create mode 100644 net/bluetooth/iso.c
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 6b48d9e2aab9..e69555e422e4 100644
+index e69555e422e4..0acf20a1ad6c 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -55,6 +55,8 @@
- #define BTPROTO_CMTP	5
- #define BTPROTO_HIDP	6
- #define BTPROTO_AVDTP	7
-+#define BTPROTO_ISO	8
-+#define BTPROTO_LAST	BTPROTO_ISO
+@@ -589,6 +589,27 @@ static inline void sco_exit(void)
+ }
+ #endif
  
- #define SOL_HCI		0
- #define SOL_L2CAP	6
-@@ -149,10 +151,39 @@ struct bt_voice {
- #define BT_MODE_LE_FLOWCTL	0x03
- #define BT_MODE_EXT_FLOWCTL	0x04
++#if IS_ENABLED(CONFIG_BT_LE)
++int iso_init(void);
++int iso_exit(void);
++bool iso_enabled(void);
++#else
++static inline int iso_init(void)
++{
++	return 0;
++}
++
++static inline int iso_exit(void)
++{
++	return 0;
++}
++
++static inline bool iso_enabled(void)
++{
++	return false;
++}
++#endif
++
+ int mgmt_init(void);
+ void mgmt_exit(void);
  
--#define BT_PKT_STATUS          16
-+#define BT_PKT_STATUS           16
- 
- #define BT_SCM_PKT_STATUS	0x03
- 
-+#define BT_ISO_QOS		17
-+
-+#define BT_ISO_QOS_CIG_UNSET	0xff
-+#define BT_ISO_QOS_CIS_UNSET	0xff
-+
-+struct bt_iso_io_qos {
-+	__u32 interval;
-+	__u16 latency;
-+	__u16 sdu;
-+	__u8  phy;
-+	__u8  rtn;
-+};
-+
-+struct bt_iso_qos {
-+	__u8  cig;
-+	__u8  cis;
-+	__u8  sca;
-+	__u8  packing;
-+	__u8  framing;
-+	struct bt_iso_io_qos in;
-+	struct bt_iso_io_qos out;
-+};
-+
-+#define BT_ISO_PHY_1M		0x01
-+#define BT_ISO_PHY_2M		0x02
-+#define BT_ISO_PHY_CODED	0x04
-+#define BT_ISO_PHY_ANY		(BT_ISO_PHY_1M | BT_ISO_PHY_2M | \
-+				 BT_ISO_PHY_CODED)
-+
- #define BT_CODEC	19
- 
- struct	bt_codec_caps {
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index fe7935be7dc4..aeb601524d24 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1998,7 +1998,7 @@ struct hci_rp_le_read_iso_tx_sync {
- struct hci_cis_params {
- 	__u8    cis_id;
- 	__le16  c_sdu;
--	__le16  p_pdu;
-+	__le16  p_sdu;
- 	__u8    c_phy;
- 	__u8    p_phy;
- 	__u8    c_rtn;
-@@ -2009,7 +2009,7 @@ struct hci_cp_le_set_cig_params {
- 	__u8    cig_id;
- 	__u8    c_interval[3];
- 	__u8    p_interval[3];
--	__u8    wc_sca;
-+	__u8    sca;
- 	__u8    packing;
- 	__u8    framing;
- 	__le16  c_latency;
-@@ -2052,6 +2052,30 @@ struct hci_cp_le_reject_cis {
- 	__u8    reason;
- } __packed;
- 
-+#define HCI_OP_LE_SETUP_ISO_PATH		0x206e
-+struct hci_cp_le_setup_iso_path {
-+	__le16  handle;
-+	__u8    direction;
-+	__u8    path;
-+	__u8    codec;
-+	__le16  codec_cid;
-+	__le16  codec_vid;
-+	__u8    delay[3];
-+	__u8    codec_cfg_len;
-+	__u8    codec_cfg[0];
-+} __attribute__ ((packed));
-+
-+struct hci_rp_le_setup_iso_path {
-+	__u8    status;
-+	__le16  handle;
-+} __attribute__ ((packed));
-+
-+#define HCI_OP_LE_SET_HOST_FEATURE		0x2074
-+struct hci_cp_le_set_host_feature {
-+	__u8     bit_number;
-+	__u8     bit_value;
-+} __packed;
-+
- /* ---- HCI Events ---- */
- struct hci_ev_status {
- 	__u8    status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 8838aa2cd594..d2a29d9dad5a 100644
+index d2a29d9dad5a..4aebd1015100 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -123,6 +123,7 @@ struct hci_conn_hash {
- 	unsigned int     acl_num;
- 	unsigned int     amp_num;
- 	unsigned int     sco_num;
-+	unsigned int     iso_num;
- 	unsigned int     le_num;
- 	unsigned int     le_num_peripheral;
- };
-@@ -463,13 +464,16 @@ struct hci_dev {
- 	unsigned int	acl_cnt;
- 	unsigned int	sco_cnt;
- 	unsigned int	le_cnt;
-+	unsigned int	iso_cnt;
- 
- 	unsigned int	acl_mtu;
- 	unsigned int	sco_mtu;
- 	unsigned int	le_mtu;
-+	unsigned int	iso_mtu;
- 	unsigned int	acl_pkts;
- 	unsigned int	sco_pkts;
- 	unsigned int	le_pkts;
-+	unsigned int	iso_pkts;
- 
- 	__u16		block_len;
- 	__u16		block_mtu;
-@@ -648,6 +652,7 @@ enum conn_reasons {
- 	CONN_REASON_PAIR_DEVICE,
- 	CONN_REASON_L2CAP_CHAN,
- 	CONN_REASON_SCO_CONNECT,
-+        CONN_REASON_ISO_CONNECT,
- };
- 
- struct hci_conn {
-@@ -700,6 +705,7 @@ struct hci_conn {
- 	__s8		rssi;
- 	__s8		tx_power;
- 	__s8		max_tx_power;
-+	struct bt_iso_qos iso_qos;
- 	unsigned long	flags;
- 
- 	enum conn_reasons conn_reason;
-@@ -730,6 +736,7 @@ struct hci_conn {
- 	struct hci_dev	*hdev;
- 	void		*l2cap_data;
- 	void		*sco_data;
-+	void		*iso_data;
- 	struct amp_mgr	*amp_mgr;
- 
- 	struct hci_conn	*link;
-@@ -738,6 +745,8 @@ struct hci_conn {
- 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
- 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
- 	void (*disconn_cfm_cb)	(struct hci_conn *conn, u8 reason);
-+
-+	void (*cleanup)		(struct hci_conn *conn);
- };
- 
- struct hci_chan {
-@@ -945,6 +954,9 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
- 	case ESCO_LINK:
- 		h->sco_num++;
- 		break;
-+	case ISO_LINK:
-+		h->iso_num++;
-+		break;
- 	}
+@@ -834,6 +834,21 @@ static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
  }
+ #endif
  
-@@ -971,6 +983,9 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
- 	case ESCO_LINK:
- 		h->sco_num--;
- 		break;
-+	case ISO_LINK:
-+		h->iso_num--;
-+		break;
- 	}
- }
- 
-@@ -987,6 +1002,8 @@ static inline unsigned int hci_conn_num(struct hci_dev *hdev, __u8 type)
- 	case SCO_LINK:
- 	case ESCO_LINK:
- 		return h->sco_num;
-+	case ISO_LINK:
-+		return h->iso_num;
- 	default:
- 		return 0;
- 	}
-@@ -996,7 +1013,7 @@ static inline unsigned int hci_conn_count(struct hci_dev *hdev)
- {
- 	struct hci_conn_hash *c = &hdev->conn_hash;
- 
--	return c->acl_num + c->amp_num + c->sco_num + c->le_num;
-+	return c->acl_num + c->amp_num + c->sco_num + c->le_num + c->iso_num;
- }
- 
- static inline __u8 hci_conn_lookup_type(struct hci_dev *hdev, __u16 handle)
-@@ -1082,6 +1099,53 @@ static inline struct hci_conn *hci_conn_hash_lookup_le(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+static inline struct hci_conn *hci_conn_hash_lookup_cis(struct hci_dev *hdev,
-+						        bdaddr_t *ba,
-+						        __u8 ba_type)
++#if IS_ENABLED(CONFIG_BT_LE)
++int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
++void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
++#else
++static inline int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				  __u8 *flags)
 +{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn  *c;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->type != ISO_LINK)
-+		       continue;
-+
-+		if (ba_type == c->dst_type && !bacmp(&c->dst, ba)) {
-+			rcu_read_unlock();
-+			return c;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return NULL;
++	return 0;
 +}
-+
-+static inline struct hci_conn *hci_conn_hash_lookup_cig(struct hci_dev *hdev,
-+						        __u8 handle)
++static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
++			    u16 flags)
 +{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn  *c;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->type != ISO_LINK)
-+		       continue;
-+
-+		if (handle == c->iso_qos.cig) {
-+			rcu_read_unlock();
-+			return c;
-+		}
-+	}
-+
-+	rcu_read_unlock();
-+
-+	return NULL;
 +}
++#endif
 +
- static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
- 							__u8 type, __u16 state)
- {
-@@ -1102,6 +1166,27 @@ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
- 	return NULL;
- }
- 
-+typedef void (*hci_conn_func_t)(struct hci_conn *conn, void *data);
-+static inline void hci_conn_hash_list_state(struct hci_dev *hdev,
-+					    hci_conn_func_t func, __u8 type,
-+					    __u16 state, void *data)
-+{
-+	struct hci_conn_hash *h = &hdev->conn_hash;
-+	struct hci_conn  *c;
-+
-+	if (!func)
-+		return;
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(c, &h->list, list) {
-+		if (c->type == type && c->state == state)
-+			func(c, data);
-+	}
-+
-+	rcu_read_unlock();
-+}
-+
- static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
-@@ -1125,6 +1210,8 @@ static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
- int hci_disconnect(struct hci_conn *conn, __u8 reason);
- bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
- void hci_sco_setup(struct hci_conn *conn, __u8 status);
-+bool hci_iso_setup_path(struct hci_conn *conn);
-+int hci_le_create_cis(struct hci_conn *conn);
- 
- struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 			      u8 role);
-@@ -1149,6 +1236,10 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 				 enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting, struct bt_codec *codec);
-+struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
-+			      __u8 dst_type, struct bt_iso_qos *qos);
-+struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
-+				 __u8 dst_type, struct bt_iso_qos *qos);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-@@ -1517,6 +1608,15 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
- 					 ext_adv_capable(dev))
- 
-+/* CIS Master/Slave support */
-+#define iso_capable(dev) (cis_capable(dev))
-+#define cis_capable(dev) \
-+	(cis_central_capable(dev) || cis_peripheral_capable(dev))
-+#define cis_central_capable(dev) \
-+	((dev)->le_features[3] & HCI_LE_CIS_CENTRAL)
-+#define cis_peripheral_capable(dev) \
-+	((dev)->le_features[3] & HCI_LE_CIS_PERIPHERAL)
-+
- /* ----- HCI protocols ----- */
- #define HCI_PROTO_DEFER             0x01
- 
-@@ -1531,6 +1631,10 @@ static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	case ESCO_LINK:
+ /* ----- Inquiry cache ----- */
+ #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
+ #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
+@@ -1632,8 +1647,7 @@ static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
  		return sco_connect_ind(hdev, bdaddr, flags);
  
-+	case ISO_LINK:
-+		/* TODO: Handle connection indication */
-+		return -EINVAL;
-+
+ 	case ISO_LINK:
+-		/* TODO: Handle connection indication */
+-		return -EINVAL;
++		return iso_connect_ind(hdev, bdaddr, flags);
+ 
  	default:
  		BT_ERR("unknown link type %d", type);
- 		return -EINVAL;
-@@ -1738,6 +1842,7 @@ int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
- 		 const void *param);
- void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
- void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
-+void hci_send_iso(struct hci_conn *conn, struct sk_buff *skb);
- 
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- void *hci_recv_event_data(struct hci_dev *hdev, __u8 event);
-diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
-index 9949870f7d78..0520e21ab698 100644
---- a/include/net/bluetooth/hci_sock.h
-+++ b/include/net/bluetooth/hci_sock.h
-@@ -124,6 +124,8 @@ struct hci_dev_info {
- 	__u16 acl_pkts;
- 	__u16 sco_mtu;
- 	__u16 sco_pkts;
-+	__u16 iso_mtu;
-+	__u16 iso_pkts;
- 
- 	struct hci_dev_stats stat;
- };
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 2492e3b46a8f..a32678c69135 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -106,3 +106,6 @@ int hci_resume_sync(struct hci_dev *hdev);
- struct hci_conn;
- 
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn);
+diff --git a/include/net/bluetooth/iso.h b/include/net/bluetooth/iso.h
+new file mode 100644
+index 000000000000..a4fed59dea8f
+--- /dev/null
++++ b/include/net/bluetooth/iso.h
+@@ -0,0 +1,36 @@
++/*
++   BlueZ - Bluetooth protocol stack for Linux
++   Copyright (C) 2020 Intel Corporation
 +
-+int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle);
-+int hci_le_remove_cig(struct hci_dev *hdev, u8 handle);
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index e0ab4cd7afc3..ae3bdc6dfc92 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -29,6 +29,7 @@ menuconfig BT
- 		SCO audio links
- 		L2CAP (Logical Link Control and Adaptation Protocol)
- 		SMP (Security Manager Protocol) on LE (Low Energy) links
-+		ISO isochronous links
- 	     HCI Device drivers (Interface to the hardware)
- 	     RFCOMM Module (RFCOMM Protocol)  
- 	     BNEP Module (Bluetooth Network Encapsulation Protocol)
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index b506409bb498..28bd8196eec2 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -38,7 +38,7 @@
- #include "selftest.h"
- 
- /* Bluetooth sockets */
--#define BT_MAX_PROTO	8
-+#define BT_MAX_PROTO	BTPROTO_LAST + 1
- static const struct net_proto_family *bt_proto[BT_MAX_PROTO];
- static DEFINE_RWLOCK(bt_proto_lock);
- 
-@@ -52,6 +52,7 @@ static const char *const bt_key_strings[BT_MAX_PROTO] = {
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_CMTP",
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_HIDP",
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_AVDTP",
-+	"sk_lock-AF_BLUETOOTH-BTPROTO_ISO",
- };
- 
- static struct lock_class_key bt_slock_key[BT_MAX_PROTO];
-@@ -64,6 +65,7 @@ static const char *const bt_slock_key_strings[BT_MAX_PROTO] = {
- 	"slock-AF_BLUETOOTH-BTPROTO_CMTP",
- 	"slock-AF_BLUETOOTH-BTPROTO_HIDP",
- 	"slock-AF_BLUETOOTH-BTPROTO_AVDTP",
-+	"slock-AF_BLUETOOTH-BTPROTO_ISO",
- };
- 
- void bt_sock_reclassify_lock(struct sock *sk, int proto)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 882a7df13005..510847588e9b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -122,6 +122,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 
- 	hci_conn_hash_del(hdev, conn);
- 
-+	if (conn->cleanup)
-+		conn->cleanup(conn);
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 as
++   published by the Free Software Foundation;
 +
- 	if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
- 		switch (conn->setting & SCO_AIRMODE_MASK) {
- 		case SCO_AIRMODE_CVSD:
-@@ -719,6 +722,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 		conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
- 		break;
- 	case LE_LINK:
-+	case ISO_LINK:
- 		/* conn->src should reflect the local identity address */
- 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
- 		break;
-@@ -1228,6 +1232,432 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	return sco;
- }
- 
-+struct iso_list_data {
-+	u8  cig;
-+	u8  cis;
-+	int count;
-+	struct {
-+		struct hci_cp_le_set_cig_params cp;
-+		struct hci_cis_params cis[0x11];
-+	} pdu;
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
++   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++
++   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
++   SOFTWARE IS DISCLAIMED.
++*/
++
++#ifndef __ISO_H
++#define __ISO_H
++
++/* ISO defaults */
++#define ISO_DEFAULT_MTU		251
++
++/* ISO socket address */
++struct sockaddr_iso {
++	sa_family_t	iso_family;
++	bdaddr_t	iso_bdaddr;
++	__u8		iso_bdaddr_type;
 +};
 +
-+static void cis_add(struct iso_list_data *d, struct bt_iso_qos *qos)
++#endif /* __ISO_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index a52bba8500e1..0e7b7db42750 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -18,6 +18,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	eir.o hci_sync.o
+ 
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
++bluetooth-$(CONFIG_BT_LE) += iso.o
+ bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+ bluetooth-$(CONFIG_BT_LEDS) += leds.o
+ bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 28bd8196eec2..7208114a2c00 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -780,6 +780,8 @@ static void __exit bt_exit(void)
+ {
+ 	mgmt_exit();
+ 
++	iso_exit();
++
+ 	sco_exit();
+ 
+ 	l2cap_exit();
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f533c7b88518..be37f84a97c6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3822,8 +3822,11 @@ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 	conn = hci_conn_hash_lookup_handle(hdev, handle);
+ 	hci_dev_unlock(hdev);
+ 
+-	/* TODO: Send to upper protocol */
+-	if (!conn) {
++	if (conn) {
++		/* Send to upper protocol */
++		iso_recv(conn, skb, flags);
++		return;
++	} else {
+ 		bt_dev_err(hdev, "ISO packet for unknown connection handle %d",
+ 			   handle);
+ 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0d9a98790c8b..23699b025774 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3827,8 +3827,8 @@ static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
+ 
+ 		conn->handle = __le16_to_cpu(rp->handle[i++]);
+ 
+-		BT_DBG("%p handle 0x%4.4x link %p state %u", conn, conn->handle,
+-		       conn->link, conn->link->state);
++		bt_dev_dbg(hdev, "%p handle 0x%4.4x link %p state %u", conn,
++			   conn->handle, conn->link, conn->link->state);
+ 
+ 		/* Create CIS if LE is already connected */
+ 		if (conn->link->state == BT_CONNECTED)
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+new file mode 100644
+index 000000000000..a88cc5d1c493
+--- /dev/null
++++ b/net/bluetooth/iso.c
+@@ -0,0 +1,1471 @@
++/*
++   BlueZ - Bluetooth protocol stack for Linux
++   Copyright (C) 2020 Intel Corporation
++
++   This program is free software; you can redistribute it and/or modify
++   it under the terms of the GNU General Public License version 2 as
++   published by the Free Software Foundation;
++
++   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
++   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS.
++   IN NO EVENT SHALL THE COPYRIGHT HOLDER(S) AND AUTHOR(S) BE LIABLE FOR ANY
++   CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES
++   WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
++   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
++   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
++
++   ALL LIABILITY, INCLUDING LIABILITY FOR INFRINGEMENT OF ANY PATENTS,
++   COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS, RELATING TO USE OF THIS
++   SOFTWARE IS DISCLAIMED.
++*/
++
++/* Bluetooth ISO sockets. */
++
++#include <linux/module.h>
++#include <linux/debugfs.h>
++#include <linux/seq_file.h>
++#include <linux/sched/signal.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include <net/bluetooth/iso.h>
++
++static const struct proto_ops iso_sock_ops;
++
++static struct bt_sock_list iso_sk_list = {
++	.lock = __RW_LOCK_UNLOCKED(iso_sk_list.lock)
++};
++
++/* ---- ISO connections ---- */
++struct iso_conn {
++	struct hci_conn	*hcon;
++
++	spinlock_t	lock;
++	struct sock	*sk;
++
++	struct delayed_work	timeout_work;
++
++	struct sk_buff	*rx_skb;
++	__u32		rx_len;
++	__u16		tx_sn;
++};
++
++#define iso_conn_lock(c)	spin_lock(&c->lock);
++#define iso_conn_unlock(c)	spin_unlock(&c->lock);
++
++static void iso_sock_close(struct sock *sk);
++static void iso_sock_kill(struct sock *sk);
++
++/* ----- ISO socket info ----- */
++#define iso_pi(sk) ((struct iso_pinfo *) sk)
++
++struct iso_pinfo {
++	struct bt_sock		bt;
++	bdaddr_t		src;
++	__u8			src_type;
++	bdaddr_t		dst;
++	__u8			dst_type;
++	__u32			flags;
++	struct bt_iso_qos	qos;
++	struct iso_conn		*conn;
++};
++
++/* ---- ISO timers ---- */
++#define ISO_CONN_TIMEOUT	(HZ * 40)
++#define ISO_DISCONN_TIMEOUT	(HZ * 2)
++
++static void iso_sock_timeout(struct work_struct *work)
 +{
-+	struct hci_cis_params *cis = &d->pdu.cis[d->pdu.cp.num_cis];
++	struct iso_conn *conn = container_of(work, struct iso_conn,
++					     timeout_work.work);
++	struct sock *sk;
 +
-+	cis->cis_id = qos->cis;
-+	cis->c_sdu  = qos->out.sdu;
-+	cis->p_sdu  = qos->in.sdu;
-+	cis->c_phy  = qos->out.phy;
-+	cis->p_phy  = qos->in.phy;
-+	cis->c_rtn  = qos->out.rtn;
-+	cis->p_rtn  = qos->in.rtn;
++	iso_conn_lock(conn);
++	sk = conn->sk;
++	if (sk)
++		sock_hold(sk);
++	iso_conn_unlock(conn);
 +
-+	d->pdu.cp.num_cis++;
-+}
-+
-+static void cis_list(struct hci_conn *conn, void *data)
-+{
-+	struct iso_list_data *d = data;
-+
-+	if (d->cig != conn->iso_qos.cig || d->cis == BT_ISO_QOS_CIS_UNSET ||
-+	    d->cis != conn->iso_qos.cis)
++	if (!sk)
 +		return;
 +
-+	d->count++;
++	BT_DBG("sock %p state %d", sk, sk->sk_state);
 +
-+	if (d->pdu.cp.cig_id == BT_ISO_QOS_CIG_UNSET ||
-+	    d->count >= ARRAY_SIZE(d->pdu.cis))
++	lock_sock(sk);
++	sk->sk_err = ETIMEDOUT;
++	sk->sk_state_change(sk);
++	release_sock(sk);
++	sock_put(sk);
++}
++
++static void iso_sock_set_timer(struct sock *sk, long timeout)
++{
++	if (!iso_pi(sk)->conn)
 +		return;
 +
-+	cis_add(d, &conn->iso_qos);
++	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
++	cancel_delayed_work(&iso_pi(sk)->conn->timeout_work);
++	schedule_delayed_work(&iso_pi(sk)->conn->timeout_work, timeout);
 +}
 +
-+static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
++static void iso_sock_clear_timer(struct sock *sk)
 +{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct iso_list_data data;
-+
-+	memset(&data, 0, sizeof(data));
-+
-+	/* Allocate a CIG if not set */
-+	if (qos->cig == BT_ISO_QOS_CIG_UNSET) {
-+		for (data.cig = 0x00; data.cig < 0xff; data.cig++) {
-+			data.count = 0;
-+			data.cis = 0xff;
-+
-+			hci_conn_hash_list_state(hdev, cis_list, ISO_LINK,
-+						 BT_BOUND, &data);
-+			if (data.count)
-+				continue;
-+
-+			hci_conn_hash_list_state(hdev, cis_list, ISO_LINK,
-+						 BT_CONNECTED, &data);
-+			if (!data.count)
-+				break;
-+		}
-+
-+		if (data.cig == 0xff)
-+			return false;
-+
-+		/* Update CIG */
-+		qos->cig = data.cig;
-+	}
-+
-+	data.pdu.cp.cig_id = qos->cig;
-+	hci_cpu_to_le24(qos->out.interval, data.pdu.cp.c_interval);
-+	hci_cpu_to_le24(qos->in.interval, data.pdu.cp.p_interval);
-+	data.pdu.cp.sca = qos->sca;
-+	data.pdu.cp.packing = qos->packing;
-+	data.pdu.cp.framing = qos->framing;
-+	data.pdu.cp.c_latency = cpu_to_le16(qos->out.latency);
-+	data.pdu.cp.p_latency = cpu_to_le16(qos->in.latency);
-+
-+	if (qos->cis != BT_ISO_QOS_CIS_UNSET) {
-+		data.count = 0;
-+		data.cig = qos->cig;
-+		data.cis = qos->cis;
-+
-+		hci_conn_hash_list_state(hdev, cis_list, ISO_LINK, BT_BOUND,
-+					 &data);
-+		if (data.count)
-+			return false;
-+
-+		cis_add(&data, qos);
-+	}
-+
-+	/* Reprogram all CIS(s) with the same CIG */
-+	for (data.cig = qos->cig, data.cis = 0x00; data.cis < 0x11;
-+	     data.cis++) {
-+		data.count = 0;
-+
-+		hci_conn_hash_list_state(hdev, cis_list, ISO_LINK, BT_BOUND,
-+					 &data);
-+		if (data.count)
-+			continue;
-+
-+		/* Allocate a CIS if not set */
-+		if (qos->cis == BT_ISO_QOS_CIS_UNSET) {
-+			/* Update CIS */
-+			qos->cis = data.cis;
-+			cis_add(&data, qos);
-+		}
-+	}
-+
-+	if (qos->cis == BT_ISO_QOS_CIS_UNSET || !data.pdu.cp.num_cis)
-+		return false;
-+
-+	if (hci_send_cmd(hdev, HCI_OP_LE_SET_CIG_PARAMS,
-+			 sizeof(data.pdu.cp) +
-+			 (data.pdu.cp.num_cis * sizeof(*data.pdu.cis)),
-+			 &data.pdu) < 0)
-+		return false;
-+
-+	return true;
-+}
-+
-+static void find_cis(struct hci_conn *conn, void *data)
-+{
-+	struct iso_list_data *d = data;
-+
-+	/* Ignore broadcast */
-+	if (!bacmp(&conn->dst, BDADDR_ANY))
++	if (!iso_pi(sk)->conn)
 +		return;
 +
-+	d->count++;
++	BT_DBG("sock %p state %d", sk, sk->sk_state);
++	cancel_delayed_work(&iso_pi(sk)->conn->timeout_work);
 +}
 +
-+static int remove_cig_sync(struct hci_dev *hdev, void *data)
++/* ---- ISO connections ---- */
++static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
 +{
-+	u8 handle = PTR_ERR(data);
++	struct iso_conn *conn = hcon->iso_data;
 +
-+	return hci_le_remove_cig_sync(hdev, handle);
-+}
++	if (conn)
++		return conn;
 +
-+int hci_le_remove_cig(struct hci_dev *hdev, u8 handle)
-+{
-+	bt_dev_dbg(hdev, "handle 0x%2.2x", handle);
-+
-+	return hci_cmd_sync_queue(hdev, remove_cig_sync, ERR_PTR(handle), NULL);
-+}
-+
-+static void cis_cleanup(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct iso_list_data d;
-+
-+	memset(&d, 0, sizeof(d));
-+	d.cig = conn->iso_qos.cig;
-+
-+	/* Check if ISO connection is a CIS and remove CIG if there are
-+	 * no other connections using it.
-+	 */
-+	hci_conn_hash_list_state(hdev, find_cis, ISO_LINK, BT_CONNECTED, &d);
-+	if (d.count)
-+		return;
-+
-+	hci_le_remove_cig(hdev, conn->iso_qos.cig);
-+}
-+
-+struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
-+			      __u8 dst_type, struct bt_iso_qos *qos)
-+{
-+	struct hci_conn *cis;
-+
-+	cis = hci_conn_hash_lookup_cis(hdev, dst, dst_type);
-+	if (!cis) {
-+		cis = hci_conn_add(hdev, ISO_LINK, dst, HCI_ROLE_MASTER);
-+		if (!cis) {
-+			return ERR_PTR(-ENOMEM);
-+		}
-+		cis->cleanup = cis_cleanup;
-+	}
-+
-+	if (cis->state == BT_CONNECTED)
-+		return cis;
-+
-+	/* Check if CIS has been set and the settings matches */
-+	if (cis->state == BT_BOUND &&
-+	    !memcmp(&cis->iso_qos, qos, sizeof(*qos)))
-+		return cis;
-+
-+	/* Update LINK PHYs according to QoS preference */
-+	cis->le_tx_phy = qos->out.phy;
-+	cis->le_rx_phy = qos->in.phy;
-+
-+	/* Mirror PHYs that are disabled as SDU will be set to 0 */
-+	if (!qos->in.phy)
-+		qos->in.phy = qos->out.phy;
-+
-+	if (!qos->out.phy)
-+		qos->out.phy = qos->in.phy;
-+
-+	if (!hci_le_set_cig_params(cis, qos)) {
-+		hci_conn_drop(cis);
++	conn = kzalloc(sizeof(struct iso_conn), GFP_KERNEL);
++	if (!conn)
 +		return NULL;
-+	}
 +
-+	cis->iso_qos = *qos;
-+	cis->state = BT_BOUND;
++	spin_lock_init(&conn->lock);
++	INIT_DELAYED_WORK(&conn->timeout_work, iso_sock_timeout);
 +
-+	return cis;
++	hcon->iso_data = conn;
++	conn->hcon = hcon;
++	conn->tx_sn = 0;
++
++	BT_DBG("hcon %p conn %p", hcon, conn);
++
++	return conn;
 +}
 +
-+bool hci_iso_setup_path(struct hci_conn *conn)
++/* Delete channel.
++ * Must be called on the locked socket. */
++static void iso_chan_del(struct sock *sk, int err)
 +{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_cp_le_setup_iso_path cmd;
++	struct iso_conn *conn;
 +
-+	memset(&cmd, 0, sizeof(cmd));
++	conn = iso_pi(sk)->conn;
 +
-+	if (conn->iso_qos.out.sdu) {
-+		cmd.handle = cpu_to_le16(conn->handle);
-+		cmd.direction = 0x00; /* Input (Host to Controller) */
-+		cmd.path = 0x00; /* HCI path if enabled */
-+		cmd.codec = 0x03; /* Transparent Data */
++	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
 +
-+		if (hci_send_cmd(hdev, HCI_OP_LE_SETUP_ISO_PATH, sizeof(cmd),
-+				 &cmd) < 0)
-+			return false;
++	if (conn) {
++		iso_conn_lock(conn);
++		conn->sk = NULL;
++		iso_pi(sk)->conn = NULL;
++		iso_conn_unlock(conn);
++
++		if (conn->hcon)
++			hci_conn_drop(conn->hcon);
 +	}
 +
-+	if (conn->iso_qos.in.sdu) {
-+		cmd.handle = cpu_to_le16(conn->handle);
-+		cmd.direction = 0x01; /* Output (Controller to Host) */
-+		cmd.path = 0x00; /* HCI path if enabled */
-+		cmd.codec = 0x03; /* Transparent Data */
++	sk->sk_state = BT_CLOSED;
++	sk->sk_err   = err;
++	sk->sk_state_change(sk);
 +
-+		if (hci_send_cmd(hdev, HCI_OP_LE_SETUP_ISO_PATH, sizeof(cmd),
-+				 &cmd) < 0)
-+			return false;
-+	}
-+
-+	return true;
++	sock_set_flag(sk, SOCK_ZAPPED);
 +}
 +
-+static int hci_create_cis_sync(struct hci_dev *hdev, void *data)
++static void iso_conn_del(struct hci_conn *hcon, int err)
 +{
-+	struct {
-+		struct hci_cp_le_create_cis cp;
-+		struct hci_cis cis[0x1f];
-+	} cmd;
-+	struct hci_conn *conn = data;
-+	u8 cig;
++	struct iso_conn *conn = hcon->iso_data;
++	struct sock *sk;
 +
-+	memset(&cmd, 0, sizeof(cmd));
-+	cmd.cis[0].acl_handle = cpu_to_le16(conn->link->handle);
-+	cmd.cis[0].cis_handle = cpu_to_le16(conn->handle);
-+	cmd.cp.num_cis++;
-+	cig = conn->iso_qos.cig;
++	if (!conn)
++		return;
 +
-+	hci_dev_lock(hdev);
++	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
 +
-+	rcu_read_lock();
++	/* Kill socket */
++	iso_conn_lock(conn);
++	sk = conn->sk;
++	if (sk)
++		sock_hold(sk);
++	iso_conn_unlock(conn);
 +
-+	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-+		struct hci_cis *cis = &cmd.cis[cmd.cp.num_cis];
-+
-+		if (conn == data || conn->type != ISO_LINK ||
-+		    conn->state == BT_CONNECTED || conn->iso_qos.cig != cig)
-+			continue;
-+
-+		/* Check if all CIS(s) belonging to a CIG are ready */
-+		if (conn->link->state != BT_CONNECTED ||
-+		    conn->state != BT_CONNECT) {
-+			cmd.cp.num_cis = 0;
-+			break;
-+		}
-+
-+		/* Group all CIS with state BT_CONNECT since the spec don't
-+		 * allow to send them individually:
-+		 *
-+		 * BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-+		 * page 2566:
-+		 *
-+		 * If the Host issues this command before all the
-+		 * HCI_LE_CIS_Established events from the previous use of the
-+		 * command have been generated, the Controller shall return the
-+		 * error code Command Disallowed (0x0C).
-+		 */
-+		cis->acl_handle = cpu_to_le16(conn->link->handle);
-+		cis->cis_handle = cpu_to_le16(conn->handle);
-+		cmd.cp.num_cis++;
++	if (sk) {
++		lock_sock(sk);
++		iso_sock_clear_timer(sk);
++		iso_chan_del(sk, err);
++		release_sock(sk);
++		sock_put(sk);
 +	}
 +
-+	rcu_read_unlock();
++	/* Ensure no more work items will run before freeing conn. */
++	cancel_delayed_work_sync(&conn->timeout_work);
 +
-+	hci_dev_unlock(hdev);
-+
-+	if (!cmd.cp.num_cis)
-+		return 0;
-+
-+	return hci_send_cmd(hdev, HCI_OP_LE_CREATE_CIS, sizeof(cmd.cp) +
-+			    sizeof(cmd.cis[0]) * cmd.cp.num_cis, &cmd);
++	hcon->iso_data = NULL;
++	kfree(conn);
 +}
 +
-+int hci_le_create_cis(struct hci_conn *conn)
++static int __iso_chan_add(struct iso_conn *conn, struct sock *sk,
++			  struct sock *parent)
 +{
-+	struct hci_conn *cis;
-+	struct hci_dev *hdev = conn->hdev;
-+	int err;
++	BT_DBG("conn %p", conn);
 +
-+	if (conn->type == ISO_LINK)
-+		cis = conn;
-+	else if (conn->type != LE_LINK || !conn->link ||
-+		 conn->state != BT_CONNECTED)
-+		return -EINVAL;
-+	else
-+		cis = conn->link;
++	if (conn->sk) {
++		BT_ERR("conn->sk already set");
++		return -EBUSY;
++	}
 +
-+	if (cis->state == BT_CONNECT)
-+		return 0;
++	iso_pi(sk)->conn = conn;
++	conn->sk = sk;
 +
-+	/* Queue Create CIS */
-+	err = hci_cmd_sync_queue(hdev, hci_create_cis_sync, cis, NULL);
-+	if (err)
-+		return err;
-+
-+	cis->state = BT_CONNECT;
++	if (parent)
++		bt_accept_enqueue(parent, sk, true);
 +
 +	return 0;
 +}
 +
-+static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
-+			      struct bt_iso_io_qos *qos, __u8 phy)
++static int iso_chan_add(struct iso_conn *conn, struct sock *sk,
++			struct sock *parent)
 +{
-+	/* Only set MTU if PHY is enabled */
-+	if (!qos->sdu && qos->phy) {
-+		if (hdev->iso_mtu > 0)
-+			qos->sdu = hdev->iso_mtu;
-+		else if (hdev->le_mtu > 0)
-+			qos->sdu = hdev->le_mtu;
-+		else
-+			qos->sdu = hdev->acl_mtu;
-+	}
++	int err;
 +
-+	/* Use the same PHY as ACL if set to any */
-+	if (qos->phy == BT_ISO_PHY_ANY)
-+		qos->phy = phy;
++	iso_conn_lock(conn);
++	err = __iso_chan_add(conn, sk, parent);
++	iso_conn_unlock(conn);
 +
-+	/* Use LE ACL connection interval if not set */
-+	if (!qos->interval)
-+		/* ACL interval unit in 1.25 ms to us */
-+		qos->interval = conn->le_conn_interval * 1250;
-+
-+	/* Use LE ACL connection latency if not set */
-+	if (!qos->latency)
-+		qos->latency = conn->le_conn_latency;
++	return err;
 +}
 +
-+struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
-+				 __u8 dst_type, struct bt_iso_qos *qos)
++
++static int iso_connect(struct sock *sk)
 +{
-+	struct hci_conn *le;
-+	struct hci_conn *cis;
++	struct iso_conn *conn;
++	struct hci_conn *hcon;
++	struct hci_dev  *hdev;
++	int err;
 +
-+	/* Convert from ISO socket address type to HCI address type  */
-+	if (dst_type == BDADDR_LE_PUBLIC)
-+		dst_type = ADDR_LE_DEV_PUBLIC;
-+	else
-+		dst_type = ADDR_LE_DEV_RANDOM;
++	BT_DBG("%pMR -> %pMR", &iso_pi(sk)->src, &iso_pi(sk)->dst);
 +
-+	if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		le = hci_connect_le(hdev, dst, dst_type, false,
-+				    BT_SECURITY_LOW,
-+				    HCI_LE_CONN_TIMEOUT,
-+				    HCI_ROLE_SLAVE);
-+	else
-+		le = hci_connect_le_scan(hdev, dst, dst_type,
-+					  BT_SECURITY_LOW,
-+					  HCI_LE_CONN_TIMEOUT,
-+                                          CONN_REASON_ISO_CONNECT);
-+	if (IS_ERR(le))
-+		return le;
-+
-+	/* If output interval is not set use the input interval as it cannot be
-+	 * 0x000000.
-+	 */
-+	if (!qos->out.interval)
-+		qos->out.interval = qos->in.interval;
-+
-+	/* If input interval is not set use the output interval as it cannot be
-+	 * 0x000000.
-+	 */
-+	if (!qos->in.interval)
-+		qos->in.interval = qos->out.interval;
-+
-+	/* If output latency is not set use the input latency as it cannot be
-+	 * 0x0000.
-+	 */
-+	if (!qos->out.latency)
-+		qos->out.latency = qos->in.latency;
-+
-+	/* If input latency is not set use the output latency as it cannot be
-+	 * 0x0000.
-+	 */
-+	if (!qos->in.latency)
-+		qos->in.latency = qos->out.latency;
-+
-+	hci_iso_qos_setup(hdev, le, &qos->out,
-+			  le->le_tx_phy ? le->le_tx_phy : hdev->le_tx_def_phys);
-+	hci_iso_qos_setup(hdev, le, &qos->in,
-+			  le->le_rx_phy ? le->le_rx_phy : hdev->le_rx_def_phys);
-+
-+	cis = hci_bind_cis(hdev, dst, dst_type, qos);
-+	if (!cis) {
-+		hci_conn_drop(le);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	le->link = cis;
-+	cis->link = le;
-+
-+	hci_conn_hold(cis);
-+
-+	return cis;
-+}
-+
- /* Check link security requirement */
- int hci_conn_check_link_mode(struct hci_conn *conn)
- {
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 12266f95a3c1..f533c7b88518 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -607,7 +607,10 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
- 		hdev->flush(hdev);
- 
- 	atomic_set(&hdev->cmd_cnt, 1);
--	hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
-+	hdev->acl_cnt = 0;
-+	hdev->sco_cnt = 0;
-+	hdev->le_cnt = 0;
-+	hdev->iso_cnt = 0;
- 
- 	ret = hci_reset_sync(hdev);
- 
-@@ -3161,9 +3164,117 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb)
- 	queue_work(hdev->workqueue, &hdev->tx_work);
- }
- 
-+/* Send ISO data */
-+static void hci_add_iso_hdr(struct sk_buff *skb, __u16 handle, __u8 flags)
-+{
-+	struct hci_iso_hdr *hdr;
-+	int len = skb->len;
-+
-+	skb_push(skb, HCI_ISO_HDR_SIZE);
-+	skb_reset_transport_header(skb);
-+	hdr = (struct hci_iso_hdr *)skb_transport_header(skb);
-+	hdr->handle = cpu_to_le16(hci_handle_pack(handle, flags));
-+	hdr->dlen   = cpu_to_le16(len);
-+}
-+
-+static void hci_queue_iso(struct hci_conn *conn, struct sk_buff_head *queue,
-+			  struct sk_buff *skb)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct sk_buff *list;
-+	__u16 flags;
-+
-+	skb->len = skb_headlen(skb);
-+	skb->data_len = 0;
-+
-+	hci_skb_pkt_type(skb) = HCI_ISODATA_PKT;
-+
-+	list = skb_shinfo(skb)->frag_list;
-+
-+	flags = hci_iso_flags_pack(list ? ISO_START : ISO_SINGLE, 0x00);
-+	hci_add_iso_hdr(skb, conn->handle, flags);
-+
-+	if (!list) {
-+		/* Non fragmented */
-+		BT_DBG("%s nonfrag skb %p len %d", hdev->name, skb, skb->len);
-+
-+		skb_queue_tail(queue, skb);
-+	} else {
-+		/* Fragmented */
-+		BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+
-+		skb_shinfo(skb)->frag_list = NULL;
-+
-+		__skb_queue_tail(queue, skb);
-+
-+		do {
-+			skb = list; list = list->next;
-+
-+			hci_skb_pkt_type(skb) = HCI_ISODATA_PKT;
-+			flags = hci_iso_flags_pack(list ? ISO_CONT : ISO_END,
-+						   0x00);
-+			hci_add_iso_hdr(skb, conn->handle, flags);
-+
-+			BT_DBG("%s frag %p len %d", hdev->name, skb, skb->len);
-+
-+			__skb_queue_tail(queue, skb);
-+		} while (list);
-+	}
-+}
-+
-+void hci_send_iso(struct hci_conn *conn, struct sk_buff *skb)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("%s len %d", hdev->name, skb->len);
-+
-+	hci_queue_iso(conn, &conn->data_q, skb);
-+
-+	queue_work(hdev->workqueue, &hdev->tx_work);
-+}
-+
- /* ---- HCI TX task (outgoing data) ---- */
- 
- /* HCI Connection scheduler */
-+static inline void hci_quote_sent(struct hci_conn *conn, int num, int *quote)
-+{
-+	struct hci_dev *hdev;
-+	int cnt, q;
-+
-+	if (!conn) {
-+		*quote = 0;
-+		return;
-+	}
-+
-+	hdev = conn->hdev;
-+
-+	switch (conn->type) {
-+	case ACL_LINK:
-+		cnt = hdev->acl_cnt;
-+		break;
-+	case AMP_LINK:
-+		cnt = hdev->block_cnt;
-+		break;
-+	case SCO_LINK:
-+	case ESCO_LINK:
-+		cnt = hdev->sco_cnt;
-+		break;
-+	case LE_LINK:
-+		cnt = hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
-+		break;
-+	case ISO_LINK:
-+		cnt = hdev->iso_mtu ? hdev->iso_cnt :
-+			hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
-+		break;
-+	default:
-+		cnt = 0;
-+		bt_dev_err(hdev, "unknown link type %d", conn->type);
-+	}
-+
-+	q = cnt / num;
-+	*quote = q ? q : 1;
-+}
-+
- static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
- 				     int *quote)
- {
-@@ -3196,29 +3307,7 @@ static struct hci_conn *hci_low_sent(struct hci_dev *hdev, __u8 type,
- 
- 	rcu_read_unlock();
- 
--	if (conn) {
--		int cnt, q;
--
--		switch (conn->type) {
--		case ACL_LINK:
--			cnt = hdev->acl_cnt;
--			break;
--		case SCO_LINK:
--		case ESCO_LINK:
--			cnt = hdev->sco_cnt;
--			break;
--		case LE_LINK:
--			cnt = hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
--			break;
--		default:
--			cnt = 0;
--			bt_dev_err(hdev, "unknown link type %d", conn->type);
--		}
--
--		q = cnt / num;
--		*quote = q ? q : 1;
--	} else
--		*quote = 0;
-+	hci_quote_sent(conn, num, quote);
- 
- 	BT_DBG("conn %p quote %d", conn, *quote);
- 	return conn;
-@@ -3252,7 +3341,7 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
- 	struct hci_chan *chan = NULL;
- 	unsigned int num = 0, min = ~0, cur_prio = 0;
- 	struct hci_conn *conn;
--	int cnt, q, conn_num = 0;
-+	int conn_num = 0;
- 
- 	BT_DBG("%s", hdev->name);
- 
-@@ -3302,27 +3391,8 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
- 	if (!chan)
- 		return NULL;
- 
--	switch (chan->conn->type) {
--	case ACL_LINK:
--		cnt = hdev->acl_cnt;
--		break;
--	case AMP_LINK:
--		cnt = hdev->block_cnt;
--		break;
--	case SCO_LINK:
--	case ESCO_LINK:
--		cnt = hdev->sco_cnt;
--		break;
--	case LE_LINK:
--		cnt = hdev->le_mtu ? hdev->le_cnt : hdev->acl_cnt;
--		break;
--	default:
--		cnt = 0;
--		bt_dev_err(hdev, "unknown link type %d", chan->conn->type);
--	}
-+	hci_quote_sent(chan->conn, num, quote);
- 
--	q = cnt / num;
--	*quote = q ? q : 1;
- 	BT_DBG("chan %p quote %d", chan, *quote);
- 	return chan;
- }
-@@ -3611,18 +3681,46 @@ static void hci_sched_le(struct hci_dev *hdev)
- 		hci_prio_recalculate(hdev, LE_LINK);
- }
- 
-+/* Schedule CIS */
-+static void hci_sched_iso(struct hci_dev *hdev)
-+{
-+	struct hci_conn *conn;
-+	struct sk_buff *skb;
-+	int quote, *cnt;
-+
-+	BT_DBG("%s", hdev->name);
-+
-+	if (!hci_conn_num(hdev, ISO_LINK))
-+		return;
-+
-+	cnt = hdev->iso_pkts ? &hdev->iso_cnt :
-+		hdev->le_pkts ? &hdev->le_cnt : &hdev->acl_cnt;
-+	while (*cnt && (conn = hci_low_sent(hdev, ISO_LINK, &quote))) {
-+		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
-+			BT_DBG("skb %p len %d", skb, skb->len);
-+			hci_send_frame(hdev, skb);
-+
-+			conn->sent++;
-+			if (conn->sent == ~0)
-+				conn->sent = 0;
-+			(*cnt)--;
-+		}
-+	}
-+}
-+
- static void hci_tx_work(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev, tx_work);
- 	struct sk_buff *skb;
- 
--	BT_DBG("%s acl %d sco %d le %d", hdev->name, hdev->acl_cnt,
--	       hdev->sco_cnt, hdev->le_cnt);
-+	BT_DBG("%s acl %d sco %d le %d iso %d", hdev->name, hdev->acl_cnt,
-+	       hdev->sco_cnt, hdev->le_cnt, hdev->iso_cnt);
- 
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		/* Schedule queues and send stuff to HCI driver */
- 		hci_sched_sco(hdev);
- 		hci_sched_esco(hdev);
-+		hci_sched_iso(hdev);
- 		hci_sched_acl(hdev);
- 		hci_sched_le(hdev);
- 	}
-@@ -3705,6 +3803,34 @@ static void hci_scodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	kfree_skb(skb);
- }
- 
-+static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_iso_hdr *hdr = (void *) skb->data;
-+	struct hci_conn *conn;
-+	__u16 handle, flags;
-+
-+	skb_pull(skb, HCI_ISO_HDR_SIZE);
-+
-+	handle = __le16_to_cpu(hdr->handle);
-+	flags  = hci_flags(handle);
-+	handle = hci_handle(handle);
-+
-+	BT_DBG("%s len %d handle 0x%4.4x flags 0x%4.4x", hdev->name, skb->len,
-+	       handle, flags);
++	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
++			     iso_pi(sk)->src_type);
++	if (!hdev)
++		return -EHOSTUNREACH;
 +
 +	hci_dev_lock(hdev);
-+	conn = hci_conn_hash_lookup_handle(hdev, handle);
-+	hci_dev_unlock(hdev);
 +
-+	/* TODO: Send to upper protocol */
-+	if (!conn) {
-+		bt_dev_err(hdev, "ISO packet for unknown connection handle %d",
-+			   handle);
++	if (!cis_central_capable(hdev)) {
++		err = -EOPNOTSUPP;
++		goto done;
 +	}
 +
++	/* Fail if either PHYs are marked as disabled */
++	if (!iso_pi(sk)->qos.in.phy && !iso_pi(sk)->qos.out.phy) {
++		err = -EINVAL;
++		goto done;
++	}
++
++	/* Just bind if DEFER_SETUP has been set */
++	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
++		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
++				    iso_pi(sk)->dst_type, &iso_pi(sk)->qos);
++		if (IS_ERR(hcon))
++			err = PTR_ERR(hcon);
++		else
++			err = 0;
++		goto done;
++	}
++
++	hcon = hci_connect_cis(hdev, &iso_pi(sk)->dst, iso_pi(sk)->dst_type,
++			       &iso_pi(sk)->qos);
++	if (IS_ERR(hcon)) {
++		err = PTR_ERR(hcon);
++		goto done;
++	}
++
++	conn = iso_conn_add(hcon);
++	if (!conn) {
++		hci_conn_drop(hcon);
++		err = -ENOMEM;
++		goto done;
++	}
++
++	/* Update source addr of the socket */
++	bacpy(&iso_pi(sk)->src, &hcon->src);
++
++	err = iso_chan_add(conn, sk, NULL);
++	if (err)
++		goto done;
++
++	if (hcon->state == BT_CONNECTED) {
++		iso_sock_clear_timer(sk);
++		sk->sk_state = BT_CONNECTED;
++	} else {
++		sk->sk_state = BT_CONNECT;
++		iso_sock_set_timer(sk, sk->sk_sndtimeo);
++	}
++
++done:
++	hci_dev_unlock(hdev);
++	hci_dev_put(hdev);
++	return err;
++}
++
++static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
++{
++	struct iso_conn *conn = iso_pi(sk)->conn;
++	struct hci_iso_data_hdr *hdr;
++	int len = 0;
++
++	BT_DBG("sk %p len %d", sk, skb->len);
++
++	if (skb->len > iso_pi(sk)->qos.out.sdu)
++		return -EMSGSIZE;
++
++	len = skb->len;
++
++	/* Push ISO data header */
++	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
++	hdr->sn = cpu_to_le16(conn->tx_sn++);
++	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
++						      HCI_ISO_STATUS_VALID));
++
++	if (sk->sk_state == BT_CONNECTED)
++		hci_send_iso(conn->hcon, skb);
++	else
++		len = -ENOTCONN;
++
++	return len;
++}
++
++static void iso_recv_frame(struct iso_conn *conn, struct sk_buff *skb)
++{
++	struct sock *sk;
++
++	iso_conn_lock(conn);
++	sk = conn->sk;
++	iso_conn_unlock(conn);
++
++	if (!sk)
++		goto drop;
++
++	BT_DBG("sk %p len %d", sk, skb->len);
++
++	if (sk->sk_state != BT_CONNECTED)
++		goto drop;
++
++	if (!sock_queue_rcv_skb(sk, skb))
++		return;
++
++drop:
 +	kfree_skb(skb);
 +}
 +
- static bool hci_req_is_complete(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -3859,6 +3985,11 @@ static void hci_rx_work(struct work_struct *work)
- 			hci_scodata_packet(hdev, skb);
- 			break;
- 
-+		case HCI_ISODATA_PKT:
-+			BT_DBG("%s ISO data packet", hdev->name);
-+			hci_isodata_packet(hdev, skb);
-+			break;
-+
- 		default:
- 			kfree_skb(skb);
- 			break;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8b39b9d31879..0d9a98790c8b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3774,6 +3774,124 @@ static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
- 	}
- }
- 
-+static u8 hci_cc_le_read_buffer_size_v2(struct hci_dev *hdev, void *data,
-+					struct sk_buff *skb)
++/* -------- Socket interface ---------- */
++static struct sock *__iso_get_sock_listen_by_addr(bdaddr_t *ba)
 +{
-+	struct hci_rp_le_read_buffer_size_v2 *rp = data;
++	struct sock *sk;
 +
-+	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-+
-+	if (rp->status)
-+		return rp->status;
-+
-+	hdev->le_mtu   = __le16_to_cpu(rp->acl_mtu);
-+	hdev->le_pkts  = __le16_to_cpu(rp->acl_max_pkt);
-+	hdev->iso_mtu  = __le16_to_cpu(rp->iso_mtu);
-+	hdev->iso_pkts = __le16_to_cpu(rp->iso_max_pkt);
-+
-+	hdev->le_cnt  = hdev->le_pkts;
-+	hdev->iso_cnt = hdev->iso_pkts;
-+
-+	BT_DBG("%s acl mtu %d:%d iso mtu %d:%d", hdev->name, hdev->acl_mtu,
-+	       hdev->acl_pkts, hdev->iso_mtu, hdev->iso_pkts);
-+
-+	return rp->status;
-+}
-+
-+static u8 hci_cc_le_set_cig_params(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
-+{
-+	struct hci_rp_le_set_cig_params *rp = data;
-+	struct hci_conn *conn;
-+	int i = 0;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (rp->status) {
-+		while ((conn = hci_conn_hash_lookup_cig(hdev, rp->cig_id))) {
-+			conn->state = BT_CLOSED;
-+			hci_connect_cfm(conn, rp->status);
-+			hci_conn_del(conn);
-+		}
-+		goto unlock;
-+	}
-+
-+	rcu_read_lock();
-+
-+	list_for_each_entry_rcu(conn, &hdev->conn_hash.list, list) {
-+		if (conn->type != ISO_LINK || conn->iso_qos.cig != rp->cig_id ||
-+		    conn->state == BT_CONNECTED)
++	sk_for_each(sk, &iso_sk_list.head) {
++		if (sk->sk_state != BT_LISTEN)
 +			continue;
 +
-+		conn->handle = __le16_to_cpu(rp->handle[i++]);
-+
-+		BT_DBG("%p handle 0x%4.4x link %p state %u", conn, conn->handle,
-+		       conn->link, conn->link->state);
-+
-+		/* Create CIS if LE is already connected */
-+		if (conn->link->state == BT_CONNECTED)
-+			hci_le_create_cis(conn->link);
-+
-+		if (i == rp->num_handles)
-+			break;
++		if (!bacmp(&iso_pi(sk)->src, ba))
++			return sk;
 +	}
 +
-+	rcu_read_unlock();
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+
-+	return rp->status;
++	return NULL;
 +}
 +
-+static u8 hci_cc_le_setup_iso_path(struct hci_dev *hdev, void *data,
-+				   struct sk_buff *skb)
++/* Find socket listening on source bdaddr.
++ * Returns closest match.
++ */
++static struct sock *iso_get_sock_listen(bdaddr_t *src)
 +{
-+	struct hci_rp_le_setup_iso_path *rp = data;
-+	struct hci_cp_le_setup_iso_path *cp;
-+	struct hci_conn *conn;
++	struct sock *sk = NULL, *sk1 = NULL;
 +
-+	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++	read_lock(&iso_sk_list.lock);
 +
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SETUP_ISO_PATH);
-+	if (!cp)
-+		return rp->status;
++	sk_for_each(sk, &iso_sk_list.head) {
++		if (sk->sk_state != BT_LISTEN)
++			continue;
 +
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	if (rp->status) {
-+		hci_connect_cfm(conn, rp->status);
-+		hci_conn_del(conn);
-+		goto unlock;
-+	}
-+
-+	switch (cp->direction) {
-+	/* Input (Host to Controller) */
-+	case 0x00:
-+		/* Only confirm connection if output only */
-+		if (conn->iso_qos.out.sdu && !conn->iso_qos.in.sdu)
-+			hci_connect_cfm(conn, rp->status);
-+		break;
-+	/* Output (Controller to Host) */
-+	case 0x01:
-+		/* Confirm connection since conn->iso_qos is always configured
-+		 * last.
-+		 */
-+		hci_connect_cfm(conn, rp->status);
-+		break;
-+	}
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+	return rp->status;
-+}
-+
- #define HCI_CC_VL(_op, _func, _min, _max) \
- { \
- 	.op = _op, \
-@@ -3949,7 +4067,13 @@ static const struct hci_cc {
- 	HCI_CC_STATUS(HCI_OP_LE_CLEAR_ADV_SETS, hci_cc_le_clear_adv_sets),
- 	HCI_CC(HCI_OP_LE_READ_TRANSMIT_POWER, hci_cc_le_read_transmit_power,
- 	       sizeof(struct hci_rp_le_read_transmit_power)),
--	HCI_CC_STATUS(HCI_OP_LE_SET_PRIVACY_MODE, hci_cc_le_set_privacy_mode)
-+	HCI_CC_STATUS(HCI_OP_LE_SET_PRIVACY_MODE, hci_cc_le_set_privacy_mode),
-+	HCI_CC(HCI_OP_LE_READ_BUFFER_SIZE_V2, hci_cc_le_read_buffer_size_v2,
-+	       sizeof(struct hci_rp_le_read_buffer_size_v2)),
-+	HCI_CC_VL(HCI_OP_LE_SET_CIG_PARAMS, hci_cc_le_set_cig_params,
-+		  sizeof(struct hci_rp_le_set_cig_params), HCI_MAX_EVENT_SIZE),
-+	HCI_CC(HCI_OP_LE_SETUP_ISO_PATH, hci_cc_le_setup_iso_path,
-+	       sizeof(struct hci_rp_le_setup_iso_path)),
- };
- 
- static u8 hci_cc_func(struct hci_dev *hdev, const struct hci_cc *cc,
-@@ -4012,6 +4136,40 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
- 		queue_work(hdev->workqueue, &hdev->cmd_work);
- }
- 
-+static void hci_cs_le_create_cis(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_le_create_cis *cp;
-+	int i;
-+
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-+
-+	if (!status)
-+		return;
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_CREATE_CIS);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	/* Remove connection if command failed */
-+	for (i = 0; cp->num_cis; cp->num_cis--, i++) {
-+		struct hci_conn *conn;
-+		u16 handle;
-+
-+		handle = __le16_to_cpu(cp->cis[i].cis_handle);
-+
-+		conn = hci_conn_hash_lookup_handle(hdev, handle);
-+		if (conn) {
-+			conn->state = BT_CLOSED;
-+			hci_connect_cfm(conn, status);
-+			hci_conn_del(conn);
-+		}
-+	}
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- #define HCI_CS(_op, _func) \
- { \
- 	.op = _op, \
-@@ -4041,7 +4199,8 @@ static const struct hci_cs {
- 	HCI_CS(HCI_OP_LE_CREATE_CONN, hci_cs_le_create_conn),
- 	HCI_CS(HCI_OP_LE_READ_REMOTE_FEATURES, hci_cs_le_read_remote_features),
- 	HCI_CS(HCI_OP_LE_START_ENC, hci_cs_le_start_enc),
--	HCI_CS(HCI_OP_LE_EXT_CREATE_CONN, hci_cs_le_ext_create_conn)
-+	HCI_CS(HCI_OP_LE_EXT_CREATE_CONN, hci_cs_le_ext_create_conn),
-+	HCI_CS(HCI_OP_LE_CREATE_CIS, hci_cs_le_create_cis),
- };
- 
- static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
-@@ -4177,6 +4336,22 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 				hdev->sco_cnt = hdev->sco_pkts;
- 			break;
- 
-+		case ISO_LINK:
-+			if (hdev->iso_pkts) {
-+				hdev->iso_cnt += count;
-+				if (hdev->iso_cnt > hdev->iso_pkts)
-+					hdev->iso_cnt = hdev->iso_pkts;
-+			} if (hdev->le_pkts) {
-+				hdev->le_cnt += count;
-+				if (hdev->le_cnt > hdev->le_pkts)
-+					hdev->le_cnt = hdev->le_pkts;
-+			} else {
-+				hdev->acl_cnt += count;
-+				if (hdev->acl_cnt > hdev->acl_pkts)
-+					hdev->acl_cnt = hdev->acl_pkts;
-+			}
++		/* Exact match. */
++		if (!bacmp(&iso_pi(sk)->src, src))
 +			break;
 +
- 		default:
- 			bt_dev_err(hdev, "unknown type %d conn %p",
- 				   conn->type, conn);
-@@ -6477,6 +6652,128 @@ static void hci_le_phy_update_evt(struct hci_dev *hdev, void *data,
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_le_cis_estabilished_evt(struct hci_dev *hdev, void *data,
-+					struct sk_buff *skb)
++		/* Closest match */
++		if (!bacmp(&iso_pi(sk)->src, BDADDR_ANY))
++			sk1 = sk;
++	}
++
++	read_unlock(&iso_sk_list.lock);
++
++	return sk ? sk : sk1;
++}
++
++static void iso_sock_destruct(struct sock *sk)
 +{
-+	struct hci_evt_le_cis_established *ev = data;
-+	struct hci_conn *conn;
-+	u16 handle = __le16_to_cpu(ev->handle);
++	BT_DBG("sk %p", sk);
 +
-+	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
++	skb_queue_purge(&sk->sk_receive_queue);
++	skb_queue_purge(&sk->sk_write_queue);
++}
 +
-+	hci_dev_lock(hdev);
++static void iso_sock_cleanup_listen(struct sock *parent)
++{
++	struct sock *sk;
 +
-+	conn = hci_conn_hash_lookup_handle(hdev, handle);
-+	if (!conn) {
-+		bt_dev_err(hdev,
-+			   "Unable to find connection with handle 0x%4.4x",
-+			   handle);
++	BT_DBG("parent %p", parent);
++
++	/* Close not yet accepted channels */
++	while ((sk = bt_accept_dequeue(parent, NULL))) {
++		iso_sock_close(sk);
++		iso_sock_kill(sk);
++	}
++
++	parent->sk_state  = BT_CLOSED;
++	sock_set_flag(parent, SOCK_ZAPPED);
++}
++
++/* Kill socket (only if zapped and orphan)
++ * Must be called on unlocked socket.
++ */
++static void iso_sock_kill(struct sock *sk)
++{
++	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket ||
++	    sock_flag(sk, SOCK_DEAD))
++		return;
++
++	BT_DBG("sk %p state %d", sk, sk->sk_state);
++
++	/* Kill poor orphan */
++	bt_sock_unlink(&iso_sk_list, sk);
++	sock_set_flag(sk, SOCK_DEAD);
++	sock_put(sk);
++}
++
++static void __iso_sock_close(struct sock *sk)
++{
++	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
++
++	switch (sk->sk_state) {
++	case BT_LISTEN:
++		iso_sock_cleanup_listen(sk);
++		break;
++
++	case BT_CONNECTED:
++	case BT_CONFIG:
++		if (iso_pi(sk)->conn->hcon) {
++			sk->sk_state = BT_DISCONN;
++			iso_sock_set_timer(sk, ISO_DISCONN_TIMEOUT);
++			iso_conn_lock(iso_pi(sk)->conn);
++			hci_conn_drop(iso_pi(sk)->conn->hcon);
++			iso_pi(sk)->conn->hcon = NULL;
++			iso_conn_unlock(iso_pi(sk)->conn);
++		} else
++			iso_chan_del(sk, ECONNRESET);
++		break;
++
++	case BT_CONNECT2:
++	case BT_CONNECT:
++	case BT_DISCONN:
++		iso_chan_del(sk, ECONNRESET);
++		break;
++
++	default:
++		sock_set_flag(sk, SOCK_ZAPPED);
++		break;
++	}
++}
++
++/* Must be called on unlocked socket. */
++static void iso_sock_close(struct sock *sk)
++{
++	iso_sock_clear_timer(sk);
++	lock_sock(sk);
++	__iso_sock_close(sk);
++	release_sock(sk);
++	iso_sock_kill(sk);
++}
++
++static void iso_sock_init(struct sock *sk, struct sock *parent)
++{
++	BT_DBG("sk %p", sk);
++
++	if (parent) {
++		sk->sk_type = parent->sk_type;
++		bt_sk(sk)->flags = bt_sk(parent)->flags;
++		security_sk_clone(parent, sk);
++	}
++}
++
++static struct proto iso_proto = {
++	.name		= "ISO",
++	.owner		= THIS_MODULE,
++	.obj_size	= sizeof(struct iso_pinfo)
++};
++
++#define DEFAULT_IO_QOS \
++{ \
++	.interval	= 10000u, \
++	.latency	= 10u, \
++	.sdu		= 40u, \
++	.phy		= BT_ISO_PHY_2M, \
++	.rtn		= 2u, \
++}
++
++static struct bt_iso_qos default_qos = {
++	.cig		= BT_ISO_QOS_CIG_UNSET,
++	.cis		= BT_ISO_QOS_CIS_UNSET,
++	.sca		= 0x00,
++	.packing	= 0x00,
++	.framing	= 0x00,
++	.in		= DEFAULT_IO_QOS,
++	.out		= DEFAULT_IO_QOS,
++};
++
++static struct sock *iso_sock_alloc(struct net *net, struct socket *sock,
++				   int proto, gfp_t prio, int kern)
++{
++	struct sock *sk;
++
++	sk = sk_alloc(net, PF_BLUETOOTH, prio, &iso_proto, kern);
++	if (!sk)
++		return NULL;
++
++	sock_init_data(sock, sk);
++	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
++
++	sk->sk_destruct = iso_sock_destruct;
++	sk->sk_sndtimeo = ISO_CONN_TIMEOUT;
++
++	sock_reset_flag(sk, SOCK_ZAPPED);
++
++	sk->sk_protocol = proto;
++	sk->sk_state    = BT_OPEN;
++
++	/* Set address type as public as default src address is BDADDR_ANY */
++	iso_pi(sk)->src_type = BDADDR_LE_PUBLIC;
++
++	iso_pi(sk)->qos = default_qos;
++
++	bt_sock_link(&iso_sk_list, sk);
++	return sk;
++}
++
++static int iso_sock_create(struct net *net, struct socket *sock, int protocol,
++			   int kern)
++{
++	struct sock *sk;
++
++	BT_DBG("sock %p", sock);
++
++	sock->state = SS_UNCONNECTED;
++
++	if (sock->type != SOCK_SEQPACKET)
++		return -ESOCKTNOSUPPORT;
++
++	sock->ops = &iso_sock_ops;
++
++	sk = iso_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern);
++	if (!sk)
++		return -ENOMEM;
++
++	iso_sock_init(sk, NULL);
++	return 0;
++}
++
++static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
++			 int addr_len)
++{
++	struct sockaddr_iso *sa = (struct sockaddr_iso *) addr;
++	struct sock *sk = sock->sk;
++	int err = 0;
++
++	BT_DBG("sk %p %pMR type %u", sk, &sa->iso_bdaddr, sa->iso_bdaddr_type);
++
++	if (!addr || addr_len < sizeof(struct sockaddr_iso) ||
++	    addr->sa_family != AF_BLUETOOTH)
++		return -EINVAL;
++
++	lock_sock(sk);
++
++	if (sk->sk_state != BT_OPEN) {
++		err = -EBADFD;
++		goto done;
++	}
++
++	if (sk->sk_type != SOCK_SEQPACKET) {
++		err = -EINVAL;
++		goto done;
++	}
++
++	/* Check if the address type is of LE type */
++	if (!bdaddr_type_is_le(sa->iso_bdaddr_type)) {
++		err = -EINVAL;
++		goto done;
++	}
++
++	bacpy(&iso_pi(sk)->src, &sa->iso_bdaddr);
++	iso_pi(sk)->src_type = sa->iso_bdaddr_type;
++
++	sk->sk_state = BT_BOUND;
++
++done:
++	release_sock(sk);
++	return err;
++}
++
++static int iso_sock_connect(struct socket *sock, struct sockaddr *addr,
++			    int alen, int flags)
++{
++	struct sockaddr_iso *sa = (struct sockaddr_iso *) addr;
++	struct sock *sk = sock->sk;
++	int err;
++
++	BT_DBG("sk %p", sk);
++
++	if (alen < sizeof(struct sockaddr_iso) ||
++	    addr->sa_family != AF_BLUETOOTH)
++		return -EINVAL;
++
++	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
++		return -EBADFD;
++
++	if (sk->sk_type != SOCK_SEQPACKET)
++		return -EINVAL;
++
++	/* Check if the address type is of LE type */
++	if (!bdaddr_type_is_le(sa->iso_bdaddr_type))
++		return -EINVAL;
++
++	lock_sock(sk);
++
++	bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
++	iso_pi(sk)->dst_type = sa->iso_bdaddr_type;
++
++	err = iso_connect(sk);
++	if (err)
++		goto done;
++
++	err = bt_sock_wait_state(sk, BT_CONNECTED,
++				 sock_sndtimeo(sk, flags & O_NONBLOCK));
++
++done:
++	release_sock(sk);
++	return err;
++}
++
++static int iso_sock_listen(struct socket *sock, int backlog)
++{
++	struct sock *sk = sock->sk;
++	bdaddr_t *src = &iso_pi(sk)->src;
++	int err = 0;
++
++	BT_DBG("sk %p backlog %d", sk, backlog);
++
++	lock_sock(sk);
++
++	if (sk->sk_state != BT_BOUND) {
++		err = -EBADFD;
++		goto done;
++	}
++
++	if (sk->sk_type != SOCK_SEQPACKET) {
++		err = -EINVAL;
++		goto done;
++	}
++
++	write_lock(&iso_sk_list.lock);
++
++	if (__iso_get_sock_listen_by_addr(src)) {
++		err = -EADDRINUSE;
 +		goto unlock;
 +	}
 +
-+	if (conn->role == HCI_ROLE_SLAVE) {
-+		__le32 interval;
++	sk->sk_max_ack_backlog = backlog;
++	sk->sk_ack_backlog = 0;
 +
-+		memset(&interval, 0, sizeof(interval));
-+
-+		memcpy(&interval, ev->c_latency, sizeof(ev->c_latency));
-+		conn->iso_qos.in.interval = le32_to_cpu(interval);
-+		memcpy(&interval, ev->p_latency, sizeof(ev->p_latency));
-+		conn->iso_qos.out.interval = le32_to_cpu(interval);
-+		conn->iso_qos.in.latency = le16_to_cpu(ev->interval);
-+		conn->iso_qos.out.latency = le16_to_cpu(ev->interval);
-+		conn->iso_qos.in.sdu = ev->c_mtu;
-+		conn->iso_qos.out.sdu = ev->p_mtu;
-+		conn->iso_qos.in.phy = ev->c_phy;
-+		conn->iso_qos.out.phy = ev->p_phy;
-+	}
-+
-+	if (!ev->status) {
-+		conn->state = BT_CONNECTED;
-+		hci_debugfs_create_conn(conn);
-+		hci_conn_add_sysfs(conn);
-+		hci_iso_setup_path(conn);
-+		goto unlock;
-+	}
-+
-+	hci_connect_cfm(conn, ev->status);
-+	hci_conn_del(conn);
++	sk->sk_state = BT_LISTEN;
 +
 +unlock:
-+	hci_dev_unlock(hdev);
++	write_unlock(&iso_sk_list.lock);
++
++done:
++	release_sock(sk);
++	return err;
 +}
 +
-+static void hci_le_reject_cis(struct hci_dev *hdev, __le16 handle)
++static int iso_sock_accept(struct socket *sock, struct socket *newsock,
++			   int flags, bool kern)
 +{
-+	struct hci_cp_le_reject_cis cp;
++	DEFINE_WAIT_FUNC(wait, woken_wake_function);
++	struct sock *sk = sock->sk, *ch;
++	long timeo;
++	int err = 0;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+	cp.reason = HCI_ERROR_REJ_BAD_ADDR;
-+	hci_send_cmd(hdev, HCI_OP_LE_REJECT_CIS, sizeof(cp), &cp);
-+}
++	lock_sock(sk);
 +
-+static void hci_le_accept_cis(struct hci_dev *hdev, __le16 handle)
-+{
-+	struct hci_cp_le_accept_cis cp;
++	timeo = sock_rcvtimeo(sk, flags & O_NONBLOCK);
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = handle;
-+	hci_send_cmd(hdev, HCI_OP_LE_ACCEPT_CIS, sizeof(cp), &cp);
-+}
++	BT_DBG("sk %p timeo %ld", sk, timeo);
 +
-+static void hci_le_cis_req_evt(struct hci_dev *hdev, void *data,
-+			       struct sk_buff *skb)
-+{
-+	struct hci_evt_le_cis_req *ev = data;
-+	u16 acl_handle, cis_handle;
-+	struct hci_conn *acl, *cis;
-+	int mask;
-+	__u8 flags = 0;
-+
-+	acl_handle = __le16_to_cpu(ev->acl_handle);
-+	cis_handle = __le16_to_cpu(ev->cis_handle);
-+
-+	bt_dev_dbg(hdev,"acl_handle 0x%4.4x cis_handle 0x%4.4x cig_id 0x%2.2x "
-+		   "cis_id 0x%2.2x", acl_handle, cis_handle, ev->cig_id,
-+		   ev->cis_id);
-+
-+	hci_dev_lock(hdev);
-+
-+	acl = hci_conn_hash_lookup_handle(hdev, acl_handle);
-+	if (!acl)
-+		goto unlock;
-+
-+	mask = hci_proto_connect_ind(hdev, &acl->dst, ISO_LINK, &flags);
-+	if (!(mask & HCI_LM_ACCEPT)) {
-+		hci_le_reject_cis(hdev, ev->cis_handle);
-+		goto unlock;
-+	}
-+
-+	cis = hci_conn_hash_lookup_handle(hdev, cis_handle);
-+	if (!cis) {
-+		cis = hci_conn_add(hdev, ISO_LINK, &acl->dst, HCI_ROLE_SLAVE);
-+		if (!cis) {
-+			hci_le_reject_cis(hdev, ev->cis_handle);
-+			goto unlock;
++	/* Wait for an incoming connection. (wake-one). */
++	add_wait_queue_exclusive(sk_sleep(sk), &wait);
++	while (1) {
++		if (sk->sk_state != BT_LISTEN) {
++			err = -EBADFD;
++			break;
 +		}
-+		cis->handle = cis_handle;
++
++		ch = bt_accept_dequeue(sk, newsock);
++		if (ch)
++			break;
++
++		if (!timeo) {
++			err = -EAGAIN;
++			break;
++		}
++
++		if (signal_pending(current)) {
++			err = sock_intr_errno(timeo);
++			break;
++		}
++
++		release_sock(sk);
++
++		timeo = wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
++		lock_sock(sk);
 +	}
++	remove_wait_queue(sk_sleep(sk), &wait);
 +
-+	cis->iso_qos.cig = ev->cig_id;
-+	cis->iso_qos.cis = ev->cis_id;
++	if (err)
++		goto done;
 +
-+	if (!(flags & HCI_PROTO_DEFER)) {
-+		hci_le_accept_cis(hdev, ev->cis_handle);
++	newsock->state = SS_CONNECTED;
++
++	BT_DBG("new socket %p", ch);
++
++done:
++	release_sock(sk);
++	return err;
++}
++
++static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
++			    int peer)
++{
++	struct sockaddr_iso *sa = (struct sockaddr_iso *) addr;
++	struct sock *sk = sock->sk;
++
++	BT_DBG("sock %p, sk %p", sock, sk);
++
++	addr->sa_family = AF_BLUETOOTH;
++
++	if (peer) {
++		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->dst);
++		sa->iso_bdaddr_type = iso_pi(sk)->dst_type;
 +	} else {
-+		cis->state = BT_CONNECT2;
-+		hci_connect_cfm(cis, 0);
++		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->src);
++		sa->iso_bdaddr_type = iso_pi(sk)->src_type;
 +	}
 +
-+unlock:
-+	hci_dev_unlock(hdev);
++	return sizeof(struct sockaddr_iso);
 +}
 +
- #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
- [_op] = { \
- 	.func = _func, \
-@@ -6540,6 +6837,12 @@ static const struct hci_le_ev {
- 	/* [0x12 = HCI_EV_LE_EXT_ADV_SET_TERM] */
- 	HCI_LE_EV(HCI_EV_LE_EXT_ADV_SET_TERM, hci_le_ext_adv_term_evt,
- 		  sizeof(struct hci_evt_le_ext_adv_set_term)),
-+	/* [0x19 = HCI_EVT_LE_CIS_ESTABLISHED] */
-+	HCI_LE_EV(HCI_EVT_LE_CIS_ESTABLISHED, hci_le_cis_estabilished_evt,
-+		  sizeof(struct hci_evt_le_cis_established)),
-+	/* [0x1a = HCI_EVT_LE_CIS_REQ] */
-+	HCI_LE_EV(HCI_EVT_LE_CIS_REQ, hci_le_cis_req_evt,
-+		  sizeof(struct hci_evt_le_cis_req)),
- };
- 
- static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
-@@ -6578,11 +6881,11 @@ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
- 	if (skb->len > subev->max_len)
- 		bt_dev_warn(hdev, "unexpected subevent 0x%2.2x length: %u > %u",
- 			    ev->subevent, skb->len, subev->max_len);
--
- 	data = hci_le_ev_skb_pull(hdev, skb, ev->subevent, subev->min_len);
- 	if (!data)
- 		return;
- 
++static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
++			    size_t len)
++{
++	struct sock *sk = sock->sk;
++	struct iso_conn *conn = iso_pi(sk)->conn;
++	struct sk_buff *skb, **frag;
++	int err, sent = 0;
 +
- 	subev->func(hdev, data, skb);
- }
- 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a6ada9dcede5..e8c27f65a371 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2761,6 +2761,12 @@ static const struct hci_init_stage amp_init2[] = {
- /* Read Buffer Size (ACL mtu, max pkt, etc.) */
- static int hci_read_buffer_size_sync(struct hci_dev *hdev)
- {
-+	/* Use Read LE Buffer Size V2 if supported */
-+	if (hdev->commands[41] & 0x20)
-+		return __hci_cmd_sync_status(hdev,
-+					     HCI_OP_LE_READ_BUFFER_SIZE_V2,
-+					     0, NULL, HCI_CMD_TIMEOUT);
++	BT_DBG("sock %p, sk %p", sock, sk);
 +
- 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_BUFFER_SIZE,
- 				     0, NULL, HCI_CMD_TIMEOUT);
- }
-@@ -3012,6 +3018,10 @@ static int hci_init2_sync(struct hci_dev *hdev)
- 	if (hdev->dev_type == HCI_AMP)
- 		return hci_init_stage_sync(hdev, amp_init2);
- 
-+	err = hci_init_stage_sync(hdev, hci_init2);
++	err = sock_error(sk);
 +	if (err)
 +		return err;
 +
- 	if (lmp_bredr_capable(hdev)) {
- 		err = hci_init_stage_sync(hdev, br_init2);
- 		if (err)
-@@ -3029,7 +3039,7 @@ static int hci_init2_sync(struct hci_dev *hdev)
- 			hci_dev_set_flag(hdev, HCI_LE_ENABLED);
- 	}
- 
--	return hci_init_stage_sync(hdev, hci_init2);
-+	return 0;
- }
- 
- static int hci_set_event_mask_sync(struct hci_dev *hdev)
-@@ -3350,6 +3360,12 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
- 	if (ext_adv_capable(hdev))
- 		events[2] |= 0x02;	/* LE Advertising Set Terminated */
- 
-+	if (cis_capable(hdev)) {
-+		events[3] |= 0x01;	/* LE CIS Established */
-+		if (cis_peripheral_capable(hdev))
-+			events[3] |= 0x02; /* LE CIS Request */
++	if (msg->msg_flags & MSG_OOB)
++		return -EOPNOTSUPP;
++
++	if (sk->sk_state != BT_CONNECTED)
++		return -ENOTCONN;
++
++	skb = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
++			     HCI_ISO_DATA_HDR_SIZE, 0);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	sent += skb->len;
++	len -= skb->len;
++
++	BT_DBG("skb %p len %d", sk, skb->len);
++
++	/* Continuation fragments */
++	frag = &skb_shinfo(skb)->frag_list;
++	while (len) {
++		struct sk_buff *tmp;
++
++		tmp = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
++				     0, 0);
++		if (IS_ERR(tmp)) {
++			kfree_skb(skb);
++			return PTR_ERR(tmp);
++		}
++
++		*frag = tmp;
++
++		sent += tmp->len;
++		len  -= tmp->len;
++
++		skb->len += tmp->len;
++		skb->data_len += tmp->len;
++
++		BT_DBG("frag %p len %d", *frag, tmp->len);
++
++		frag = &(*frag)->next;
 +	}
 +
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
- 				     sizeof(events), events, HCI_CMD_TIMEOUT);
- }
-@@ -3490,6 +3506,24 @@ static int hci_set_le_support_sync(struct hci_dev *hdev)
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- }
- 
-+/* LE Set Host Feature */
-+static int hci_le_set_host_feature_sync(struct hci_dev *hdev)
-+{
-+	struct hci_cp_le_set_host_feature cp;
++	lock_sock(sk);
 +
-+	if (!iso_capable(hdev))
++	if (sk->sk_state == BT_CONNECTED)
++		err = iso_send_frame(sk, skb);
++	else
++		err = -ENOTCONN;
++
++	release_sock(sk);
++
++	if (err < 0)
++		kfree_skb(skb);
++	return err;
++}
++
++static void iso_conn_defer_accept(struct hci_conn *conn)
++{
++	struct hci_cp_le_accept_cis cp;
++	struct hci_dev *hdev = conn->hdev;
++
++	BT_DBG("conn %p", conn);
++
++	conn->state = BT_CONFIG;
++
++	cp.handle = cpu_to_le16(conn->handle);
++
++	hci_send_cmd(hdev, HCI_OP_LE_ACCEPT_CIS, sizeof(cp), &cp);
++}
++
++static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
++			    size_t len, int flags)
++{
++	struct sock *sk = sock->sk;
++	struct iso_pinfo *pi = iso_pi(sk);
++
++	lock_sock(sk);
++
++	if (sk->sk_state == BT_CONNECT2 &&
++	    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
++		iso_conn_defer_accept(pi->conn->hcon);
++		sk->sk_state = BT_CONFIG;
++
++		release_sock(sk);
++		return 0;
++	}
++
++	release_sock(sk);
++
++	return bt_sock_recvmsg(sock, msg, len, flags);
++}
++
++static bool check_io_qos(struct bt_iso_io_qos *qos)
++{
++	/* If no PHY is enable SDU must be 0 */
++	if (!qos->phy && qos->sdu)
++		return false;
++
++	if (qos->interval && (qos->interval < 0xff || qos->interval > 0xfffff))
++		return false;
++
++	if (qos->latency && (qos->latency < 0x05 || qos->latency > 0xfa0))
++		return false;
++
++	if (qos->phy > BT_ISO_PHY_ANY)
++		return false;
++
++	return true;
++}
++
++static bool check_qos(struct bt_iso_qos *qos)
++{
++	/* CIS shall not be set */
++	if (qos->cis != BT_ISO_QOS_CIS_UNSET)
++		return false;
++
++	if (qos->sca > 0x07)
++		return false;
++
++	if (qos->packing > 0x01)
++		return false;
++
++	if (qos->framing > 0x01)
++		return false;
++
++	if (!check_io_qos(&qos->in))
++		return false;
++
++	if (!check_io_qos(&qos->out))
++		return false;
++
++	return true;
++}
++
++static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
++			       sockptr_t optval, unsigned int optlen)
++{
++	struct sock *sk = sock->sk;
++	int len, err = 0;
++	struct bt_iso_qos qos;
++	u32 opt;
++
++	BT_DBG("sk %p", sk);
++
++	lock_sock(sk);
++
++	switch (optname) {
++
++	case BT_DEFER_SETUP:
++		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (opt)
++			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
++		else
++			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
++		break;
++
++	case BT_ISO_QOS:
++		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
++		    sk->sk_state != BT_CONNECT2) {
++			err = -EINVAL;
++			break;
++		}
++
++		len = min_t(unsigned int, sizeof(qos), optlen);
++		if (len != sizeof(qos))
++			return -EINVAL;
++
++		memset(&qos, 0, sizeof(qos));
++
++		if (copy_from_sockptr(&qos, optval, len)) {
++			err = -EFAULT;
++			break;
++		}
++
++		if (!check_qos(&qos)) {
++			err = -EINVAL;
++			break;
++		}
++
++		iso_pi(sk)->qos = qos;
++
++		break;
++
++	default:
++		err = -ENOPROTOOPT;
++		break;
++	}
++
++	release_sock(sk);
++	return err;
++}
++
++static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
++			       char __user *optval, int __user *optlen)
++{
++	struct sock *sk = sock->sk;
++	int len, err = 0;
++	struct bt_iso_qos qos;
++
++	BT_DBG("sk %p", sk);
++
++	if (get_user(len, optlen))
++		return -EFAULT;
++
++	lock_sock(sk);
++
++	switch (optname) {
++
++	case BT_DEFER_SETUP:
++		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
++			     (u32 __user *)optval))
++			err = -EFAULT;
++
++		break;
++
++	case BT_ISO_QOS:
++		if (sk->sk_state == BT_CONNECTED)
++			qos = iso_pi(sk)->conn->hcon->iso_qos;
++		else
++			qos = iso_pi(sk)->qos;
++
++		len = min_t(unsigned int, len, sizeof(qos));
++		if (copy_to_user(optval, (char *)&qos, len))
++			err = -EFAULT;
++
++		break;
++
++	default:
++		err = -ENOPROTOOPT;
++		break;
++	}
++
++	release_sock(sk);
++	return err;
++}
++
++static int iso_sock_shutdown(struct socket *sock, int how)
++{
++	struct sock *sk = sock->sk;
++	int err = 0;
++
++	BT_DBG("sock %p, sk %p", sock, sk);
++
++	if (!sk)
 +		return 0;
 +
-+	memset(&cp, 0, sizeof(cp));
++	sock_hold(sk);
++	lock_sock(sk);
 +
-+	/* Isochronous Channels (Host Support) */
-+	cp.bit_number = 32;
-+	cp.bit_value = 1;
++	if (!sk->sk_shutdown) {
++		sk->sk_shutdown = SHUTDOWN_MASK;
++		iso_sock_clear_timer(sk);
++		__iso_sock_close(sk);
 +
-+	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_HOST_FEATURE,
-+				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
++		    !(current->flags & PF_EXITING))
++			err = bt_sock_wait_state(sk, BT_CLOSED,
++						 sk->sk_lingertime);
++	}
++
++	release_sock(sk);
++	sock_put(sk);
++
++	return err;
 +}
 +
- /* LE Controller init stage 3 command sequence */
- static const struct hci_init_stage le_init3[] = {
- 	/* HCI_OP_LE_SET_EVENT_MASK */
-@@ -3516,6 +3550,8 @@ static const struct hci_init_stage le_init3[] = {
- 	HCI_INIT(hci_le_read_num_support_adv_sets_sync),
- 	/* HCI_OP_WRITE_LE_HOST_SUPPORTED */
- 	HCI_INIT(hci_set_le_support_sync),
-+	/* HCI_OP_LE_SET_HOST_FEATURE */
-+	HCI_INIT(hci_le_set_host_feature_sync),
- 	{}
++static int iso_sock_release(struct socket *sock)
++{
++	struct sock *sk = sock->sk;
++	int err = 0;
++
++	BT_DBG("sock %p, sk %p", sock, sk);
++
++	if (!sk)
++		return 0;
++
++	iso_sock_close(sk);
++
++	if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
++	    !(current->flags & PF_EXITING)) {
++		lock_sock(sk);
++		err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);
++		release_sock(sk);
++	}
++
++	sock_orphan(sk);
++	iso_sock_kill(sk);
++	return err;
++}
++
++static void iso_sock_ready(struct sock *sk)
++{
++	BT_DBG("sk %p", sk);
++
++	if (!sk)
++		return;
++
++	lock_sock(sk);
++	iso_sock_clear_timer(sk);
++	sk->sk_state = BT_CONNECTED;
++	sk->sk_state_change(sk);
++	release_sock(sk);
++}
++
++struct iso_list_data {
++	struct hci_conn *hcon;
++	int count;
++};
++
++static void iso_conn_ready(struct iso_conn *conn)
++{
++	struct sock *parent;
++	struct sock *sk = conn->sk;
++
++	BT_DBG("conn %p", conn);
++
++	if (sk) {
++		iso_sock_ready(conn->sk);
++	} else {
++		iso_conn_lock(conn);
++
++		if (!conn->hcon) {
++			iso_conn_unlock(conn);
++			return;
++		}
++
++		parent = iso_get_sock_listen(&conn->hcon->src);
++		if (!parent) {
++			iso_conn_unlock(conn);
++			return;
++		}
++
++		lock_sock(parent);
++
++		sk = iso_sock_alloc(sock_net(parent), NULL,
++				    BTPROTO_ISO, GFP_ATOMIC, 0);
++		if (!sk) {
++			release_sock(parent);
++			iso_conn_unlock(conn);
++			return;
++		}
++
++		iso_sock_init(sk, parent);
++
++		bacpy(&iso_pi(sk)->src, &conn->hcon->src);
++		iso_pi(sk)->src_type = conn->hcon->src_type;
++		bacpy(&iso_pi(sk)->dst, &conn->hcon->dst);
++		iso_pi(sk)->dst_type = conn->hcon->dst_type;
++
++		hci_conn_hold(conn->hcon);
++		__iso_chan_add(conn, sk, parent);
++
++		if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
++			sk->sk_state = BT_CONNECT2;
++		else
++			sk->sk_state = BT_CONNECTED;
++
++		/* Wake up parent */
++		parent->sk_data_ready(parent);
++
++		release_sock(parent);
++
++		iso_conn_unlock(conn);
++	}
++}
++
++/* ----- ISO interface with lower layer (HCI) ----- */
++int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
++{
++	struct sock *sk;
++	int lm = 0;
++
++	BT_DBG("hdev %s, bdaddr %pMR", hdev->name, bdaddr);
++
++	/* Find listening sockets */
++	read_lock(&iso_sk_list.lock);
++	sk_for_each(sk, &iso_sk_list.head) {
++		if (sk->sk_state != BT_LISTEN)
++			continue;
++
++		if (!bacmp(&iso_pi(sk)->src, &hdev->bdaddr) ||
++		    !bacmp(&iso_pi(sk)->src, BDADDR_ANY)) {
++			lm |= HCI_LM_ACCEPT;
++
++			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
++				*flags |= HCI_PROTO_DEFER;
++			break;
++		}
++	}
++	read_unlock(&iso_sk_list.lock);
++
++	return lm;
++}
++
++static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
++{
++	if (hcon->type != ISO_LINK) {
++		if (hcon->type != LE_LINK)
++			return;
++
++		/* Check if LE link has failed */
++		if (status && hcon->link) {
++			iso_conn_del(hcon->link, bt_to_errno(status));
++			return;
++		}
++
++		/* Create CIS if pending */
++		hci_le_create_cis(hcon);
++		return;
++	}
++
++	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
++
++	if (!status) {
++		struct iso_conn *conn;
++
++		conn = iso_conn_add(hcon);
++		if (conn)
++			iso_conn_ready(conn);
++	} else
++		iso_conn_del(hcon, bt_to_errno(status));
++}
++
++static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
++{
++	if (hcon->type != ISO_LINK)
++		return;
++
++	BT_DBG("hcon %p reason %d", hcon, reason);
++
++	iso_conn_del(hcon, bt_to_errno(reason));
++}
++
++void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
++{
++	struct iso_conn *conn = hcon->iso_data;
++	struct hci_iso_data_hdr *hdr;
++	__u16 pb, ts, len;
++
++	if (!conn)
++		goto drop;
++
++	pb     = hci_iso_flags_pb(flags);
++	ts     = hci_iso_flags_ts(flags);
++
++	BT_DBG("conn %p len %d pb 0x%x ts 0x%x", conn, skb->len, pb, ts);
++
++	switch (pb) {
++	case ISO_START:
++	case ISO_SINGLE:
++		if (conn->rx_len) {
++			BT_ERR("Unexpected start frame (len %d)", skb->len);
++			kfree_skb(conn->rx_skb);
++			conn->rx_skb = NULL;
++			conn->rx_len = 0;
++		}
++
++		/* Start fragment always begin with ISO data header */
++		if ((ts && skb->len < HCI_ISO_TS_DATA_HDR_SIZE) ||
++		    skb->len < HCI_ISO_DATA_HDR_SIZE) {
++			BT_ERR("Frame is too short (len %d)", skb->len);
++			goto drop;
++		}
++
++		if (ts) {
++			/* TODO: add timestamp to the packet? */
++			hdr = (void *) skb->data + 4;
++			skb_pull(skb, HCI_ISO_TS_DATA_HDR_SIZE);
++		} else {
++			hdr = (void *) skb->data;
++			skb_pull(skb, HCI_ISO_DATA_HDR_SIZE);
++		}
++
++		len    = __le16_to_cpu(hdr->slen);
++		flags  = hci_iso_data_flags(len);
++		len    = hci_iso_data_len(len);
++
++		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
++		       skb->len, flags);
++
++		if (len == skb->len) {
++			/* Complete frame received */
++			iso_recv_frame(conn, skb);
++			return;
++		}
++
++		if (pb == ISO_SINGLE) {
++			BT_ERR("Frame malformed (len %d, expected len %d)",
++			       skb->len, len);
++			goto drop;
++		}
++
++		if (skb->len > len) {
++			BT_ERR("Frame is too long (len %d, expected len %d)",
++			       skb->len, len);
++			goto drop;
++		}
++
++		/* Allocate skb for the complete frame (with header) */
++		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
++		if (!conn->rx_skb)
++			goto drop;
++
++		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
++					  skb->len);
++		conn->rx_len = len - skb->len;
++		break;
++
++	case ISO_CONT:
++		BT_DBG("Cont: frag len %d (expecting %d)", skb->len,
++		       conn->rx_len);
++
++		if (!conn->rx_len) {
++			BT_ERR("Unexpected continuation frame (len %d)",
++			       skb->len);
++			goto drop;
++		}
++
++		if (skb->len > conn->rx_len) {
++			BT_ERR("Fragment is too long (len %d, expected %d)",
++			       skb->len, conn->rx_len);
++			kfree_skb(conn->rx_skb);
++			conn->rx_skb = NULL;
++			conn->rx_len = 0;
++			goto drop;
++		}
++
++		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
++					  skb->len);
++		conn->rx_len -= skb->len;
++		return;
++
++	case ISO_END:
++		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
++					  skb->len);
++		conn->rx_len -= skb->len;
++
++		if (!conn->rx_len) {
++			/* Complete frame received. iso_recv_frame
++			 * takes ownership of the skb so set the global
++			 * rx_skb pointer to NULL first.
++			 */
++			struct sk_buff *rx_skb = conn->rx_skb;
++			conn->rx_skb = NULL;
++			iso_recv_frame(conn, rx_skb);
++		}
++		break;
++	}
++
++drop:
++	kfree_skb(skb);
++}
++
++static struct hci_cb iso_cb = {
++	.name		= "ISO",
++	.connect_cfm	= iso_connect_cfm,
++	.disconn_cfm	= iso_disconn_cfm,
++};
++
++static int iso_debugfs_show(struct seq_file *f, void *p)
++{
++	struct sock *sk;
++
++	read_lock(&iso_sk_list.lock);
++
++	sk_for_each(sk, &iso_sk_list.head) {
++		seq_printf(f, "%pMR %pMR %d\n", &iso_pi(sk)->src,
++			   &iso_pi(sk)->dst, sk->sk_state);
++	}
++
++	read_unlock(&iso_sk_list.lock);
++
++	return 0;
++}
++
++DEFINE_SHOW_ATTRIBUTE(iso_debugfs);
++
++static struct dentry *iso_debugfs;
++
++static const struct proto_ops iso_sock_ops = {
++	.family		= PF_BLUETOOTH,
++	.owner		= THIS_MODULE,
++	.release	= iso_sock_release,
++	.bind		= iso_sock_bind,
++	.connect	= iso_sock_connect,
++	.listen		= iso_sock_listen,
++	.accept		= iso_sock_accept,
++	.getname	= iso_sock_getname,
++	.sendmsg	= iso_sock_sendmsg,
++	.recvmsg	= iso_sock_recvmsg,
++	.poll		= bt_sock_poll,
++	.ioctl		= bt_sock_ioctl,
++	.mmap		= sock_no_mmap,
++	.socketpair	= sock_no_socketpair,
++	.shutdown	= iso_sock_shutdown,
++	.setsockopt	= iso_sock_setsockopt,
++	.getsockopt	= iso_sock_getsockopt
++};
++
++static const struct net_proto_family iso_sock_family_ops = {
++	.family	= PF_BLUETOOTH,
++	.owner	= THIS_MODULE,
++	.create	= iso_sock_create,
++};
++
++static bool iso_inited;
++
++bool iso_enabled(void)
++{
++	return iso_inited;
++}
++
++int iso_init(void)
++{
++	int err;
++
++	BUILD_BUG_ON(sizeof(struct sockaddr_iso) > sizeof(struct sockaddr));
++
++	if (iso_inited)
++		return -EALREADY;
++
++	err = proto_register(&iso_proto, 0);
++	if (err < 0)
++		return err;
++
++	err = bt_sock_register(BTPROTO_ISO, &iso_sock_family_ops);
++	if (err < 0) {
++		BT_ERR("ISO socket registration failed");
++		goto error;
++	}
++
++	err = bt_procfs_init(&init_net, "iso", &iso_sk_list, NULL);
++	if (err < 0) {
++		BT_ERR("Failed to create ISO proc file");
++		bt_sock_unregister(BTPROTO_ISO);
++		goto error;
++	}
++
++	BT_INFO("ISO socket layer initialized");
++
++	hci_register_cb(&iso_cb);
++
++	if (IS_ERR_OR_NULL(bt_debugfs))
++		return 0;
++
++	iso_debugfs = debugfs_create_file("iso", 0444, bt_debugfs,
++					  NULL, &iso_debugfs_fops);
++
++	iso_inited = true;
++
++	return 0;
++
++error:
++	proto_unregister(&iso_proto);
++	return err;
++}
++
++int iso_exit(void)
++{
++	if (!iso_inited)
++		return -EALREADY;
++
++	bt_procfs_cleanup(&init_net, "iso");
++
++	debugfs_remove(iso_debugfs);
++
++	hci_unregister_cb(&iso_cb);
++
++	bt_sock_unregister(BTPROTO_ISO);
++
++	proto_unregister(&iso_proto);
++
++	return 0;
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d2d390534e54..bf653e615630 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3925,10 +3925,16 @@ static const u8 rpa_resolution_uuid[16] = {
+ 	0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
  };
  
-@@ -5348,3 +5384,14 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	hci_resume_advertising_sync(hdev);
++/* 6fbaf188-05e0-496a-9885-d6ddfdb4e03e */
++static const u8 iso_socket_uuid[16] = {
++	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6, 0x85, 0x98,
++	0x6a, 0x49, 0xe0, 0x05, 0x88, 0xf1, 0xba, 0x6f,
++};
++
+ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				  void *data, u16 data_len)
+ {
+-	char buf[102];   /* Enough space for 5 features: 2 + 20 * 5 */
++	char buf[122];   /* Enough space for 6 features: 2 + 20 * 6 */
+ 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
+ 	u16 idx = 0;
+ 	u32 flags;
+@@ -3992,6 +3998,13 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
+ 	}
+ 
++	if (IS_ENABLED(CONFIG_BT_LE)) {
++		flags = iso_enabled() ? BIT(0) : 0;
++		memcpy(rp->features[idx].uuid, iso_socket_uuid, 16);
++		rp->features[idx].flags = cpu_to_le32(flags);
++		idx++;
++	}
++
+ 	rp->feature_count = cpu_to_le16(idx);
+ 
+ 	/* After reading the experimental features information, enable
+@@ -4383,6 +4396,58 @@ static int set_le_simultaneous_roles_func(struct sock *sk, struct hci_dev *hdev,
  	return err;
  }
-+
-+int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle)
+ 
++#ifdef CONFIG_BT_LE
++static int set_iso_socket_func(struct sock *sk, struct hci_dev *hdev,
++			       struct mgmt_cp_set_exp_feature *cp, u16 data_len)
 +{
-+	struct hci_cp_le_remove_cig cp;
++	struct mgmt_rp_set_exp_feature rp;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.cig_id = handle;
++	bool val, changed;
++	int err;
 +
-+	return __hci_cmd_sync_status(hdev, HCI_OP_LE_REMOVE_CIG, sizeof(cp),
-+				     &cp, HCI_CMD_TIMEOUT);
++	/* Command requires to use the non-controller index */
++	if (hdev)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_EXP_FEATURE,
++				       MGMT_STATUS_INVALID_INDEX);
++
++	/* Parameters are limited to a single octet */
++	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
++		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++				       MGMT_OP_SET_EXP_FEATURE,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	/* Only boolean on/off is supported */
++	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
++		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++				       MGMT_OP_SET_EXP_FEATURE,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	val = cp->param[0] ? true : false;
++	if (val)
++		err = iso_init();
++	else
++		err = iso_exit();
++
++	if (!err)
++		changed = true;
++
++	memcpy(rp.uuid, iso_socket_uuid, 16);
++	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
++
++	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++
++	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
++				MGMT_OP_SET_EXP_FEATURE, 0,
++				&rp, sizeof(rp));
++
++	if (changed)
++		exp_feature_changed(hdev, iso_socket_uuid, val, sk);
++
++	return err;
 +}
++#endif
++
+ static const struct mgmt_exp_feature {
+ 	const u8 *uuid;
+ 	int (*set_func)(struct sock *sk, struct hci_dev *hdev,
+@@ -4396,6 +4461,9 @@ static const struct mgmt_exp_feature {
+ 	EXP_FEAT(quality_report_uuid, set_quality_report_func),
+ 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
+ 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
++#ifdef CONFIG_BT_LE
++	EXP_FEAT(iso_socket_uuid, set_iso_socket_func),
++#endif
+ 
+ 	/* end with a null feature */
+ 	EXP_FEAT(NULL, NULL)
 -- 
 2.35.1
 
