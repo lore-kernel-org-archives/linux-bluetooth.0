@@ -2,123 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BECAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 06:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C26C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 13:11:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244119AbiEEGLm (ORCPT
+        id S1378824AbiEENPC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 May 2022 02:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60924 "EHLO
+        Thu, 5 May 2022 09:15:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230304AbiEEGLm (ORCPT
+        with ESMTP id S1376871AbiEENPA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 May 2022 02:11:42 -0400
-Received: from mail-0201.mail-europe.com (mail-0201.mail-europe.com [51.77.79.158])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CA0537BC0;
-        Wed,  4 May 2022 23:08:03 -0700 (PDT)
-Date:   Thu, 05 May 2022 06:07:52 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail2; t=1651730879;
-        bh=7wV3nEqPSepuWRAWthSPZD1tqykwAgSdmFsPCIxH7/8=;
-        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
-         References:Feedback-ID:From:To:Cc:Date:Subject:Reply-To:
-         Feedback-ID:Message-ID;
-        b=m5ncVI+42u1olzmIdRjOX7p/YpFN8gJhka+4KasJ4F9b/8M8Wbr+EHNLponmiC1p2
-         0HelPzW8rdUyEdAj8Plbx4pVoXPeevt35PmsWEhQoUXeGWAayOGScA5Iwaqo+2W6Tj
-         L1/mjeGT2klut1BMqZgTw0RcTg4QUKvy3siiemP1ohX/i27G6KT79GT91emgtEtnJq
-         q6VXdb4srwETpPE5hZfSsqO5nsb5DfyPZ57JOrQxSEB9rERMTjNBd5v3dwXk/Gn5aM
-         s346iSqeWMTq71yTlQweFGtAgyCFKFVsJQy/OxUV8epgrPgusJmZiT+HoGCCPVVW3F
-         FYD3P/5JI1olw==
-To:     Marcel Holtmann <marcel@holtmann.org>
-From:   Juerg Haefliger <juergh@protonmail.com>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Reply-To: Juerg Haefliger <juergh@protonmail.com>
-Subject: Re: [PATCH RESEND] Bluetooth: ath3k: Add MODULE_FIRMWARE for patch and config files
-Message-ID: <20220505080744.0343a857@smeagol>
-In-Reply-To: <6A323366-2AB3-443E-A605-C18EA7A2E161@holtmann.org>
-References: <20220504074606.15505-1-juergh@protonmail.com> <6A323366-2AB3-443E-A605-C18EA7A2E161@holtmann.org>
-Feedback-ID: 10260306:user:proton
+        Thu, 5 May 2022 09:15:00 -0400
+Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9AC27B2C;
+        Thu,  5 May 2022 06:11:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1651756277; x=1683292277;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=xsOMw0gRr0SLaJWZpts/Mm92RAFuNPJLPsaz21uD8Ww=;
+  b=FBTSHmIlIdE832JlYBLV7yOCvXGSjOOwpLTBWKHtzOzjmCfjmz9rzAKT
+   0BurVxBjCa9jduMfm3+7mZHyRjYUAjriT8gY/3ybC5xmgdipJWU2AsiEa
+   NX3XcawdsVI08o9UUxR4Dv6ixanp/bGT2Wb3Fs5tjNkHWFaZ4JkqBtHWF
+   Y=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10337"; a="119355111"
+X-IronPort-AV: E=Sophos;i="5.91,201,1647298800"; 
+   d="scan'208";a="119355111"
+Received: from unknown (HELO mucxv001.muc.infineon.com) ([172.23.11.16])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 15:11:12 +0200
+Received: from MUCSE812.infineon.com (MUCSE812.infineon.com [172.23.29.38])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv001.muc.infineon.com (Postfix) with ESMTPS;
+        Thu,  5 May 2022 15:11:12 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE812.infineon.com
+ (172.23.29.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Thu, 5 May 2022
+ 15:11:12 +0200
+Received: from [10.160.221.24] (172.23.8.247) by MUCSE807.infineon.com
+ (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Thu, 5 May 2022
+ 15:11:11 +0200
+Message-ID: <1e8cfbc6-8452-0e87-9713-536d235e5b51@infineon.com>
+Date:   Thu, 5 May 2022 15:11:09 +0200
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_8zeict0kE8yCg0ChFWUkcf4Hel9dCyVf4xhoRkb9k"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add property
+ for autobaud mode
+Content-Language: en-US
+To:     Linus Walleij <linus.walleij@linaro.org>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <cover.1651647576.git.hakan.jansson@infineon.com>
+ <64b59ca66cc22e6433a044e7bba2b3e97c810dc2.1651647576.git.hakan.jansson@infineon.com>
+ <CACRpkdY3xPcyNcJfdGbSP5rdcUV6hr87yJNDVDGZdRCfN+MqLA@mail.gmail.com>
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+In-Reply-To: <CACRpkdY3xPcyNcJfdGbSP5rdcUV6hr87yJNDVDGZdRCfN+MqLA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE805.infineon.com (172.23.29.31) To
+ MUCSE807.infineon.com (172.23.29.33)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
+Hi Linus,
 
---b1_8zeict0kE8yCg0ChFWUkcf4Hel9dCyVf4xhoRkb9k
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Thanks for responding.
 
-Hi Marcel,
-
-
-> Hi Juerg,
+On 5/5/2022 12:15 AM, Linus Walleij wrote:
+> On Wed, May 4, 2022 at 11:04 AM Hakan Jansson
+> <hakan.jansson@infineon.com> wrote:
 >
-> > The ath3k driver loads patch and configuration files so add MODULE_FIRM=
-WARE
-> > macros to povide that information via modinfo.
-> >
-> > Signed-off-by: Juerg Haefliger <juergh@protonmail.com>
-> > ---
-> > RESEND:
-> >  Resend from protonmail email account to please the test bot.
-> > ---
-> > drivers/bluetooth/ath3k.c | 2 ++
-> > 1 file changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> > index 88262d3a9392..56e9a64177ae 100644
-> > --- a/drivers/bluetooth/ath3k.c
-> > +++ b/drivers/bluetooth/ath3k.c
-> > @@ -538,3 +538,5 @@ MODULE_DESCRIPTION("Atheros AR30xx firmware driver"=
-);
-> > MODULE_VERSION(VERSION);
-> > MODULE_LICENSE("GPL");
-> > MODULE_FIRMWARE(ATH3K_FIRMWARE);
-> > +MODULE_FIRMWARE("ar3k/AthrBT_0x*.dfu");
-> > +MODULE_FIRMWARE("ar3k/ramps_0x*_*.dfu");
+>> +  brcm,uses-autobaud-mode:
+>> +    type: boolean
+>> +    description: >
+>> +      The controller should be started in autobaud mode by asserting
+>> +      BT_UART_CTS_N (i.e. host RTS) during startup. Only HCI commands supported
+>> +      in autobaud mode should be used until patch FW has been loaded.
+> Things like gnss uses the current-speed attribute to set a serial link speed,
+> maybe also Bluetooth?
+As far as I can tell, not many Bluetooth drivers use the current-speed 
+attribute yet but perhaps it would be a good idea to start using it more 
+broadly in the future to set the initial serial link speed.
+
 >
-> I am still not convinced by the glob file matching. How would that actual=
-ly work?
-
-In my case I need to remove firmware blobs that the kernel doesn't need to
-reduce disk usage. This information helps. While it might retain unneeded
-versions it's still better than nothing.
-
-...Juerg
-
-
-> Regards
+> Would it make sense to use
 >
-> Marcel
+> current-speed-auto;
 >
+> As a flag for these things in general?
+I suppose a general flag could be useful but to be honest I don't know 
+if any other devices besides the ones using the Broadcom driver has any 
+use for it. You would probably also still want to be able to use 
+current-speed to set the link speed and end up using both 
+current-speed=x and current-speed-auto at the same time, which might 
+look a little confusing?
 
+Please let me know if you'd still prefer "current-speed-auto" over 
+"brcm,uses-autobaud-mode" and I'll revise the patch and rename it!
 
---b1_8zeict0kE8yCg0ChFWUkcf4Hel9dCyVf4xhoRkb9k
-Content-Type: application/pgp-signature; name=attachment.sig
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=attachment.sig
+>
+> Yours,
+> Linus Walleij
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
-cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbUp6YWJBQUNna1FEOU9MQ1F1bQ0KUXJjcEpCQUFxVnl6K1dE
-K20yUEd1TGgvVituQzc1eHVNT3NGeURWcjNTYm9rcGZ5UGxyUCtUUFRpTmxWeE5vUg0KdjRBejNm
-b3BLamh1Vit6bDFwSWl0bUE0Ym9wOTNHbnFTeFlpbEVJdzdYZ1o5NlJTYVVqQ3ZwWHpsZTd3ZXJY
-Zw0KT040TkFqY1pjbk56V2dIckdaYnZWL1AxZ3ZaaXpiL3h4MWNwSFVUT3huS1FPVjR6MkZtWVRB
-ZlZESFJVenlqag0KSHg4ZzJuazFJSGlNaDlyampSYjdhWTBxWkdIeWhNNlFHVWlKMHBRTWkzT0xo
-eEhDWnN0NkFzWnBYM3kvRFNZNw0KeVRVWXd4eWp6K2NHSHo3cDRhZ1BPOCt0LzRjaCs4YzIxalVJ
-K3d0b1NnZG5XZnJJWWhkYUhxMkljK21sazZoeQ0KVHB4ekRvdkRJQ1B1WTVvc2luek9IcHN0dGpI
-MEJ6cXY2b2ZhcUpScytTenBRZ0NaSlBlOWloSUNQQ3pJVldnaw0KWCtFb3ljRDFUZG04ZnFYMk50
-czR3UkxDTm9tdkZ2WjNXVHJpQTJwWFliSnA0bVpCZ2d6VEZ0YVRob1N4WVlDaw0KazRnN09mNnlH
-UXZPQjk4ZGNLTDBPWERwU2Z1S29oSkZTSjE0Tkl5OEVXMFh0V01YczQvN1hibDkybGpVMnMrag0K
-Ty91TjlFcHIvVm1KY0M0ZFc3M1VrSUUyTEJLUVk2cGpPRDZ3d0JrV01NbkF3Y05mUC9yempsNnVw
-cUY2ZDlneQ0KU01TYW1keFgvaFRxMnlLRnN4a2NoV0dUMWYzOXBsNDRSSFB6d080b2FpUXpDelUw
-b0k2bllqenVzTWZZajhpeg0KTFRkbXVvMmQ4UUJqOWRaZXdxRXVSVkFNRnJjdzZLYXNBMlFuM05z
-U3NGTnZPR0F4MFRvPQ0KPXVwSDkNCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
-
---b1_8zeict0kE8yCg0ChFWUkcf4Hel9dCyVf4xhoRkb9k--
-
+Thanks,
+Håkan
