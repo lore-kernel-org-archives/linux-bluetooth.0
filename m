@@ -2,103 +2,211 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B36A4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 02:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 831D2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 03:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239865AbiEECtK (ORCPT
+        id S240838AbiEEDSj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 22:49:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54108 "EHLO
+        Wed, 4 May 2022 23:18:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239845AbiEECsy (ORCPT
+        with ESMTP id S240710AbiEEDSf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 May 2022 22:48:54 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17944E6F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 19:45:16 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id o18so2293211qtk.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 19:45:16 -0700 (PDT)
+        Wed, 4 May 2022 23:18:35 -0400
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C6515005C
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 20:14:55 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id x18so4363794wrc.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 20:14:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Y+mbQoQIFF8qAAh3qR/O5FA6PUemecmQpeavLg+zVvU=;
-        b=H+qx87Nu+EYJQkGt0zgI0HzFCzTh/vN7gqQDs72NkP+8JBe1YCo8gX0rUdMrGX8zfF
-         42p6rxW4G/5HX1gKnmBOA1chRW0iQ0fCr93+nPv9lPxoDB7bmhG6L6pbJnQIDbmoD+4R
-         j7jBAYqwBcDuwbiIGKy+oJLvYaRXg3c+TSEZyi3V1yCU2F5u9U38vSeKvQ+39nZe0rD7
-         wXiHNzM7gb212Wc/a5Phw0gMEgt+9eotH5QAzH/Dgr4RpM/zSRC8J/zm3WJmLhufPaZu
-         oemiSAjzEljY+rHm9BSHmneHTuZ9fSyJ+nJfP0H7fwlCD2+ggfRalooQHLsca3wCh8WS
-         GY3A==
+        d=paul-moore-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6ucVUJA/3XuUnAZZDdzrSa00V5OM/xNG80G7w+rY/AM=;
+        b=TuxTKLvOuI4WPEKhesTppN+S/ZTkV+RZI5Wf5W2p+hsrw7/gyfISF8EIiT+rnx8Zu6
+         zyyiN1wYwPcxjcCA2Sf5xnxirRkddqYIXy2R06dd7qAEUind0ZWDkOOMEqGzEQWPzWzC
+         ZTGq5qihhGmXwhHHxuYfhzg3wQjnC+ThZO+LDVhD9+QIb89VKx3wO1YbUFwWrxXrBCMa
+         SL8UA4+69pMFcpj8M2pJPoNe1J5xXeNZwxQABf1kR5+ALPhLTrYwt5fLtjpY8BeYkBF4
+         nHH6g/sC5IM5M9d/Ecm/JssJwuDneWf8+Vn5nXmTehGUz+AEuc9+Pt2ztZNda+z83bgG
+         KQkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Y+mbQoQIFF8qAAh3qR/O5FA6PUemecmQpeavLg+zVvU=;
-        b=gR/IAuCPmcQqDCieoXpdM8nM4Jjqkaj1mZM+nzq5S+2W60KxR/DrSsXzL7tYdZE8kg
-         TxB4Krz1ytWKphK5YKMOXDJ3pl2N5HlJYDZSX92uybs9u7F+VT96FMTAaSapbcSJ/Ae/
-         Dg2F05fDhRaJCA6m5YxPP0lSACfNtMDcphpGClQ4jvtOe4G6gx0+Z8qqIlkVSDzHM1Vw
-         FWEDTtdD6v8LjB5pnbNMU16ejR8Q8sJ3secSRb6to5PDJm9KyappNBC7tC5a0CuUMNij
-         N+5tohA2pwTWq69RHvpUyLyTjKhdFE20Y3vPoEJb47VZMLx29Fj0yB7iSuuN0BmIpPJp
-         m0bA==
-X-Gm-Message-State: AOAM530Fc453v9uSN4F51139Mf3EuwAx39M9z5U9ck89IWD4S4eolzmv
-        MeYxJle6S6iON+gIWYn04mSUO6oV8Rg=
-X-Google-Smtp-Source: ABdhPJxsdsXrjCddrQsj6BGNpqmv4K0w1bwcyssj6CvhlikN0ZU+iiwROnZPVtFM0OUmtromat9WnQ==
-X-Received: by 2002:ac8:5c4d:0:b0:2e0:71b7:2829 with SMTP id j13-20020ac85c4d000000b002e071b72829mr21775328qtj.323.1651718715087;
-        Wed, 04 May 2022 19:45:15 -0700 (PDT)
-Received: from [172.17.0.2] ([52.232.195.241])
-        by smtp.gmail.com with ESMTPSA id f5-20020a37d205000000b0069fc13ce21esm169905qkj.79.2022.05.04.19.45.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 19:45:14 -0700 (PDT)
-Message-ID: <62733a3a.1c69fb81.d59fc.0e1a@mx.google.com>
-Date:   Wed, 04 May 2022 19:45:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7119214395130189612=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6ucVUJA/3XuUnAZZDdzrSa00V5OM/xNG80G7w+rY/AM=;
+        b=WSTSNdYWZUBByNeycwjq2JTn1gI+b0qmL/80cIPa17Jw1jx3Aw0hCehE5Fpa82acjL
+         seFQIo1aNvMkYqDaIljADKbFAUo8PVUzi9Zl9EI4rO02uT3FSK6WESTmEWgHvWrh+xoQ
+         bEgSMcQ1VXw1HGFppZmZ7SV3FFIXhyeznXAvRBfhFzT5LjoqyHXRyYB8bm7h4KAfjPIS
+         GHht6J62Huu76P11TN1WML6c0KsKo4YNd7jInhzgAs7oCXBrWVWL/vBj33Z8fuyse8Qy
+         viY73omnpShzYdSywSflpnSlWGNtNhzf8oXP9w2ffqNB8/wQHqHanLmyUxqLnyx7iFvV
+         qRWg==
+X-Gm-Message-State: AOAM531vlwrgeyo5kXCIbiNw4bTz2DSFf7XWLO/ylVLRvcUDTU4h0Yr+
+        SRjEYIgt3OaPj5Rn0vo6nz9Gf3jBknFr0KK46dFv
+X-Google-Smtp-Source: ABdhPJzVMX+BMHIo/6Rx3rt/EGt5DUCiA1Xs3vZE5oz5hLJkbM0bMmp2okAEnKI/au/mDAitpvRIKuXqsxBU1V8TuLw=
+X-Received: by 2002:a5d:590d:0:b0:20a:c3eb:2584 with SMTP id
+ v13-20020a5d590d000000b0020ac3eb2584mr18412244wrd.18.1651720493308; Wed, 04
+ May 2022 20:14:53 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: eir: Add helpers for managing service data
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220505000629.2903297-2-luiz.dentz@gmail.com>
-References: <20220505000629.2903297-2-luiz.dentz@gmail.com>
+References: <20220504014440.3697851-1-keescook@chromium.org>
+ <20220504014440.3697851-29-keescook@chromium.org> <CAHC9VhT5Y=ENiSyb=S-NVbGX63sLOv4nVuR_GS-yww6tiz0wYA@mail.gmail.com>
+ <20220504234324.GA12556@embeddedor>
+In-Reply-To: <20220504234324.GA12556@embeddedor>
+From:   Paul Moore <paul@paul-moore.com>
+Date:   Wed, 4 May 2022 23:14:42 -0400
+Message-ID: <CAHC9VhRJC4AxeDsGpdphfJD4WzgaeBsdONHnixBzft5u_cE-Dw@mail.gmail.com>
+Subject: Re: [PATCH 28/32] selinux: Use mem_to_flex_dup() with xfrm and sidtab
+To:     "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Xiu Jianfeng <xiujianfeng@huawei.com>,
+        =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>,
+        netdev@vger.kernel.org, selinux@vger.kernel.org,
+        Alexei Starovoitov <ast@kernel.org>,
+        alsa-devel@alsa-project.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Gabbasov <andrew_gabbasov@mentor.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Arend van Spriel <aspriel@gmail.com>,
+        Baowen Zheng <baowen.zheng@corigine.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Bradley Grove <linuxdrivers@attotech.com>,
+        brcm80211-dev-list.pdl@broadcom.com,
+        Christian Brauner <brauner@kernel.org>,
+        Christian Lamparter <chunkeey@googlemail.com>,
+        Chris Zankel <chris@zankel.net>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Daniel Axtens <dja@axtens.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Dan Williams <dan.j.williams@intel.com>,
+        David Gow <davidgow@google.com>,
+        David Howells <dhowells@redhat.com>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        devicetree@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Francis Laniel <laniel_francis@privacyrequired.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gregory Greenman <gregory.greenman@intel.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Hante Meuleman <hante.meuleman@broadcom.com>,
+        Hulk Robot <hulkci@huawei.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        John Keeping <john@metanate.com>,
+        Juergen Gross <jgross@suse.com>, Kalle Valo <kvalo@kernel.org>,
+        Keith Packard <keithp@keithp.com>, keyrings@vger.kernel.org,
+        kunit-dev@googlegroups.com,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Lee Jones <lee.jones@linaro.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-xtensa@linux-xtensa.org, llvm@lists.linux.dev,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Louis Peens <louis.peens@corigine.com>,
+        Luca Coelho <luciano.coelho@intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Mark Brown <broonie@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rich Felker <dalias@aerifal.cx>,
+        Rob Herring <robh+dt@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        SHA-cyfmac-dev-list@infineon.com,
+        Simon Horman <simon.horman@corigine.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Takashi Iwai <tiwai@suse.com>, Tom Rix <trix@redhat.com>,
+        Udipto Goswami <quic_ugoswami@quicinc.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        wcn36xx@lists.infradead.org, Wei Liu <wei.liu@kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Yang Yingliang <yangyingliang@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7119214395130189612==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, May 4, 2022 at 7:34 PM Gustavo A. R. Silva
+<gustavoars@kernel.org> wrote:
+>
+> Hi Paul,
+>
+> On Wed, May 04, 2022 at 06:57:28PM -0400, Paul Moore wrote:
+> > On Tue, May 3, 2022 at 9:57 PM Kees Cook <keescook@chromium.org> wrote:
+>
+> [..]
+>
+> > > +++ b/include/uapi/linux/xfrm.h
+> > > @@ -31,9 +31,9 @@ struct xfrm_id {
+> > >  struct xfrm_sec_ctx {
+> > >         __u8    ctx_doi;
+> > >         __u8    ctx_alg;
+> > > -       __u16   ctx_len;
+> > > +       __DECLARE_FLEX_ARRAY_ELEMENTS_COUNT(__u16, ctx_len);
+> > >         __u32   ctx_sid;
+> > > -       char    ctx_str[0];
+> > > +       __DECLARE_FLEX_ARRAY_ELEMENTS(char, ctx_str);
+> > >  };
+> >
+> > While I like the idea of this in principle, I'd like to hear about the
+> > testing you've done on these patches.  A previous flex array
+> > conversion in the audit uapi headers ended up causing a problem with
+>
+> I'm curious about which commit caused those problems...?
 
-This is automated email and please do not reply to this email!
+Commit ed98ea2128b6 ("audit: replace zero-length array with
+flexible-array member"), however, as I said earlier, the problem was
+actually with SWIG, it just happened to be triggered by the kernel
+commit.  There was a brief fedora-devel mail thread about the problem,
+see the link below:
 
-Dear submitter,
+* https://www.spinics.net/lists/fedora-devel/msg297991.html
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=638503
+To reiterate, I'm supportive of changes like this, but I would like to
+hear how it was tested to ensure there are no unexpected problems with
+userspace.  If there are userspace problems it doesn't mean we can't
+make changes like this, it just means we need to ensure that the
+userspace issues are resolved first.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.85 seconds
-GitLint                       PASS      0.99 seconds
-SubjectPrefix                 PASS      0.86 seconds
-BuildKernel                   PASS      32.21 seconds
-BuildKernel32                 PASS      29.10 seconds
-Incremental Build with patchesPASS      38.34 seconds
-TestRunner: Setup             PASS      475.83 seconds
-TestRunner: l2cap-tester      PASS      17.45 seconds
-TestRunner: bnep-tester       PASS      6.18 seconds
-TestRunner: mgmt-tester       PASS      102.95 seconds
-TestRunner: rfcomm-tester     PASS      9.73 seconds
-TestRunner: sco-tester        PASS      9.52 seconds
-TestRunner: smp-tester        PASS      9.53 seconds
-TestRunner: userchan-tester   PASS      6.60 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7119214395130189612==--
+-- 
+paul-moore.com
