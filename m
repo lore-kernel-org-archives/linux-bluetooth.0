@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C92C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 00:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEF7BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 00:06:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229912AbiEEAKc (ORCPT
+        id S229951AbiEEAKd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 May 2022 20:10:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59380 "EHLO
+        Wed, 4 May 2022 20:10:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230357AbiEEAKV (ORCPT
+        with ESMTP id S230505AbiEEAKV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 4 May 2022 20:10:21 -0400
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1366ABE3A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 17:06:32 -0700 (PDT)
-Received: by mail-io1-xd2f.google.com with SMTP id c125so3193535iof.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 17:06:32 -0700 (PDT)
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A444193F2
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 May 2022 17:06:33 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id f2so3192939ioh.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 May 2022 17:06:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=5E9/QWTff8XTUl3YMv8DsMWpigkqx7PC7kzC5bE9vX8=;
-        b=nioaqjqLdY/wp4Axj57RP1u4no4YkH7ktCK5JxBPAOl4FLeNaXUk+TVbVj6y6N7qtP
-         3jfVco0a4P5gn73Bt/HM/BW0WrnH0ZNfAio2G0R/gB6zyPGpZsvWnv5G5Cb/dvjqynjY
-         DuiN/86qZUxB2cqNsT+P9TxF5XKms9V25Ipv450YPEzYMLxRkNcZdXESzeWSciFcUzCs
-         hXABrOLIhT9TKQXQ7mHB0WJ8uIdZSnTmAkpixuyPoGfeFb9xWNQXN+bvb/BwsLZv1WaW
-         n6ZanavTHPfslDpsiODOP3jUfIuZtA4zbR8XEBaEnreXiChFXmzHvUcx2SDKhuvyCDQ+
-         69lw==
+        bh=PHw6Ja1gV4BwAEbVqGX7HauFqMEnbEUQr0i4Ezt55rU=;
+        b=nVT0gpZA/t6SqKVmn6Ee5tzIFIlQwzk/txcq9AXwfb6/r6Bwz0uGDeJq0HG2gnDsU2
+         Jrty+KgdkVuY3yvAxqgTOFaQQ3eUeNXUMEIMrVHnnrzfMLxp9TI6ky/LYT0z9pbhmvOZ
+         dLSDRyBtOGf9o9GTiUM/zCTZUodl/K5LrgY4YX94Wn76fxM9HyxLnNfRUTQqxPON/ut8
+         GkrgLvLuYudwnB6eYzwDO6+sj8ZbqkJjk+VL+nA34dw4iLGR8P6MfQ40M/KMklHi5BFm
+         syYy5uYRAPz928wVLABS/rI66MoKzC1lS0u9m2fgK+6OIQI8B+jLUOW2h7YI/ZTj+FG/
+         Zx6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5E9/QWTff8XTUl3YMv8DsMWpigkqx7PC7kzC5bE9vX8=;
-        b=ulH3AqiCWvHfIJ4r3Uq+5XzGSQLOlDbnMOy7idNCa3a4z3WL97McgsnY0MrUlOR4ip
-         Ye/fneBC7Qa74DsRl8zC7LjxC+ITAVPEs++tulmDfKNEQRUo++Y2W8xKRG7cmgO2nQR+
-         xEtu/ePBVODfr5FzfuEWIM9NOmrYfMg1nvbw54G6xR/SVlh2Rs/NjbDgQ2YTh3Db8wzF
-         whbjCwXnEXQqe123sEZSUfqugNZBLnbcnm6cgbNd9eJM0KCLojd/v7PWRrM+zLBhL0c9
-         mb60RsELVLcMAKPPsLLDGOw1L2v1qXEA94+tCBJXEklywfvotaxcPerAuD5XSbt4CpB8
-         UEqA==
-X-Gm-Message-State: AOAM531yatv+cJtujtM6DOX6ahPty2pC3N334aTENnOF4W/anVR1bWtY
-        fX5/3alzWyYLYvwv4siyJw7/gJKId58=
-X-Google-Smtp-Source: ABdhPJw2iLavymU1fF8D4eUHIsuFqUS0x2//J8q4OM7f8aP+2WUw0GlxHkQDHUsDumWFtFWN8u2Ccw==
-X-Received: by 2002:a05:6638:5b3:b0:323:a07d:6747 with SMTP id b19-20020a05663805b300b00323a07d6747mr9721111jar.252.1651709191154;
-        Wed, 04 May 2022 17:06:31 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=PHw6Ja1gV4BwAEbVqGX7HauFqMEnbEUQr0i4Ezt55rU=;
+        b=GupTdWRaJ8SOXMGZKwnz0yd490vzz1npeW7jhEhqSJHHeCKqPsQh8pGJIho1sk1wS7
+         M5mbkIySmKbOTzZjQjBYhks0YhhEVs3YQuEpffE6cJio78zC9cWo9+58Z1dZxh03ymt0
+         +9sYHMKsff0ywF8Iofkblpy8js4L0/iGtQcCLCDVtBEFnUo4Z4yEl+q6oHK3iqKKmyUd
+         rviv6jyN008xUfsO3y5CfHvurhRszw+SMmJT5fh17IwMFlPhsON7blyM/4aCKKurPZr0
+         eINA1iUa37i83VXRb8w5oKetKhwVJejnjW3esboirVrJsVRuaaL6RHZJPFtIm5mai1uI
+         jqug==
+X-Gm-Message-State: AOAM531PS5aRXUSBPx4K8MjQ06WRknGeFmGqXtzxAQHnX3AHIr3S5UUt
+        bBvaAO+O1wwtze6mDgMu6zdafo9cDws=
+X-Google-Smtp-Source: ABdhPJxYu6O/zAsdmRiG+xlyWem5zwxHqBWUCYhLnTrqNwDwMnzm6wIzb4Pey+XqsHOeu/NFuqu8kw==
+X-Received: by 2002:a5d:9647:0:b0:649:484e:6194 with SMTP id d7-20020a5d9647000000b00649484e6194mr9222832ios.125.1651709192518;
+        Wed, 04 May 2022 17:06:32 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f5-20020a056e020b4500b002cde6e352d2sm57926ilu.28.2022.05.04.17.06.30
+        by smtp.gmail.com with ESMTPSA id f5-20020a056e020b4500b002cde6e352d2sm57926ilu.28.2022.05.04.17.06.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 May 2022 17:06:30 -0700 (PDT)
+        Wed, 04 May 2022 17:06:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Add bt_status
-Date:   Wed,  4 May 2022 17:06:27 -0700
-Message-Id: <20220505000629.2903297-1-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: eir: Add helpers for managing service data
+Date:   Wed,  4 May 2022 17:06:28 -0700
+Message-Id: <20220505000629.2903297-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220505000629.2903297-1-luiz.dentz@gmail.com>
+References: <20220505000629.2903297-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,109 +66,93 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_status which can be used to convert Unix errno to
-Bluetooth status.
+This adds helpers for accessing and appending service data (0x16) ad
+type.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/lib.c               | 71 +++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/eir.c         | 31 +++++++++++++++++++++++++++++++
+ net/bluetooth/eir.h         |  4 ++++
+ 3 files changed, 36 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 6b48d9e2aab9..cfe6159f26bc 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -521,6 +521,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 62a9bb022aed..fe7935be7dc4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -625,6 +625,7 @@ enum {
+ #define EIR_SSP_RAND_R192	0x0F /* Simple Pairing Randomizer R-192 */
+ #define EIR_DEVICE_ID		0x10 /* device ID */
+ #define EIR_APPEARANCE		0x19 /* Device appearance */
++#define EIR_SERVICE_DATA	0x16 /* Service Data */
+ #define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
+ #define EIR_LE_ROLE		0x1C /* LE role */
+ #define EIR_SSP_HASH_C256	0x1D /* Simple Pairing Hash C-256 */
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 7e930f77ecab..7d77fb00c2bf 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -55,6 +55,19 @@ u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
+ 	return eir_append_le16(ptr, ad_len, EIR_APPEARANCE, hdev->appearance);
  }
  
- int bt_to_errno(u16 code);
-+__u8 bt_status(int err);
- 
- void hci_sock_set_flag(struct sock *sk, int nr);
- void hci_sock_clear_flag(struct sock *sk, int nr);
-diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
-index 5326f41a58b7..469a0c95b6e8 100644
---- a/net/bluetooth/lib.c
-+++ b/net/bluetooth/lib.c
-@@ -135,6 +135,77 @@ int bt_to_errno(__u16 code)
- }
- EXPORT_SYMBOL(bt_to_errno);
- 
-+/* Unix errno to Bluetooth error codes mapping */
-+__u8 bt_status(int err)
++u8 eir_append_service_data(u8 *eir, u16 eir_len, u16 uuid, u8 *data,
++			   u8 data_len)
 +{
-+	/* Don't convert if already positive value */
-+	if (err >= 0)
-+		return err;
++	eir[eir_len++] = sizeof(u8) + sizeof(uuid) + data_len;
++	eir[eir_len++] = EIR_SERVICE_DATA;
++	put_unaligned_le16(uuid, &eir[eir_len]);
++	eir_len += sizeof(uuid);
++	memcpy(&eir[eir_len], data, data_len);
++	eir_len += data_len;
 +
-+	switch (err) {
-+	case -EBADRQC:
-+		return 0x01;
-+
-+	case -ENOTCONN:
-+		return 0x02;
-+
-+	case -EIO:
-+		return 0x03;
-+
-+	case -EHOSTDOWN:
-+		return 0x04;
-+
-+	case -EACCES:
-+		return 0x05;
-+
-+	case -EBADE:
-+		return 0x06;
-+
-+	case -ENOMEM:
-+		return 0x07;
-+
-+	case -ETIMEDOUT:
-+		return 0x08;
-+
-+	case -EMLINK:
-+		return 0x09;
-+
-+	case EALREADY:
-+		return 0x0b;
-+
-+	case -EBUSY:
-+		return 0x0c;
-+
-+	case -ECONNREFUSED:
-+		return 0x0d;
-+
-+	case -EOPNOTSUPP:
-+		return 0x11;
-+
-+	case -EINVAL:
-+		return 0x12;
-+
-+	case -ECONNRESET:
-+		return 0x13;
-+
-+	case -ECONNABORTED:
-+		return 0x16;
-+
-+	case ELOOP:
-+		return 0x17;
-+
-+	case -EPROTONOSUPPORT:
-+		return 0x1a;
-+
-+	case -EPROTO:
-+		return 0x19;
-+
-+	default:
-+		return 0x1f;
-+	}
++	return eir_len;
 +}
-+EXPORT_SYMBOL(bt_status);
 +
- void bt_info(const char *format, ...)
+ static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
  {
- 	struct va_format vaf;
+ 	u8 *ptr = data, *uuids_start = NULL;
+@@ -333,3 +346,21 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ 
+ 	return scan_rsp_len;
+ }
++
++void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
++{
++	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, len))) {
++		u16 value = get_unaligned_le16(eir);
++
++		if (uuid == value) {
++			if (len)
++				*len -= 2;
++			return &eir[2];
++		}
++
++		eir += *len;
++		eir_len -= *len;
++	}
++
++	return NULL;
++}
+diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
+index 43f1945bffc5..62f2374078f2 100644
+--- a/net/bluetooth/eir.h
++++ b/net/bluetooth/eir.h
+@@ -14,6 +14,8 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ 
+ u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
+ u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
++u8 eir_append_service_data(u8 *eir, u16 eir_len, u16 uuid, u8 *data,
++			   u8 data_len);
+ 
+ static inline u16 eir_precalc_len(u8 data_len)
+ {
+@@ -92,3 +94,5 @@ static inline void *eir_get_data(u8 *eir, size_t eir_len, u8 type,
+ 
+ 	return NULL;
+ }
++
++void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len);
 -- 
 2.35.1
 
