@@ -2,109 +2,211 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79A02C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 14:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C252C43219
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 May 2022 15:21:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380473AbiEEORX (ORCPT
+        id S1353178AbiEEPZf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 May 2022 10:17:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41938 "EHLO
+        Thu, 5 May 2022 11:25:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380471AbiEEORV (ORCPT
+        with ESMTP id S232495AbiEEPZd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 May 2022 10:17:21 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1BAC5A165
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 May 2022 07:13:39 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id y2so7833586ybi.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 May 2022 07:13:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lW6YmRKgJEIh2eED/+IVKB8oDvU0WH+BiMyppYMx/nM=;
-        b=zRf9tcadFcwynKQBoYA64Lhbx0xApTOpYvVH3ChFo8G0O3Q42LTXvPFy2avUIosaxs
-         eI/9NDOOxChHWnLG9j4KMH1uDozXcWHLqD3rKvkn5P23hu+BjPvG80E6Hlt4re4yEGOF
-         a79yE0QSTarwGHbPm6yGYVug/rEklsGNWdDx5+KZ4wjvdY+EUhliF6eG0s+GFTq4eJkF
-         Rt+Z8xSbn0iWUAUnW5ICTnVTzmiWmGIB1xU4+yGAfmm94gCu/hhO/dPsjt5+9naj70cu
-         6K/ixeB/Yxgj6A+L3PD1a7oxLfQNvwRRGO8f5qfrT4DvlUlG/WVwVNWxp6EBMIP9b6AY
-         Y8eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lW6YmRKgJEIh2eED/+IVKB8oDvU0WH+BiMyppYMx/nM=;
-        b=TVaQX4KQX0EXUqtuQN5UjDSSJBsRoQ/Ez0gQxH9uDN2ZWX9GPni7BTk6F1Uq/BpSZB
-         swbHcdZch/6QzHlWtZkQLp+51Ad9IUE9T0tm1rxt/XvJyY1oeQh93+Xu4qiF17Hkca4U
-         VSfAhRtSI6x+ue8eC5upuN69dsSsMEy8UOaA+haTuwKBl1DURv66tV/TL1cc0MOHH1cQ
-         CIjr3ogsbzCIz6r+iqxBxadBfQ64RrTygLr4sCq/hNqfJtcaAb274qcaT9uaOWXtt3ip
-         BjEb11aqYiUCHSEvfVYp4dOcvXfoGvrthu7Vrq442VuDDU4Ayj2RVTrqXTeSSrPUi/CX
-         NuMw==
-X-Gm-Message-State: AOAM533xT/tug/boyMwNlgareYbe3lhM5k+QM6Zf+A3KCLSMxjwSxEl9
-        ff8W4vE9pLu4jE5MSKD/Vr1RzMvWfJMWO9QX9b/ILA==
-X-Google-Smtp-Source: ABdhPJxQAuCxjgHTzW1wkwTxSKVB4kNQ0PrFCSz6LO6VQMK/t4AKo5edK5uR1u6CXZQ9Z3o/wrUqc+6yWQKD7cWSC+8=
-X-Received: by 2002:a25:bcc7:0:b0:648:d728:d39 with SMTP id
- l7-20020a25bcc7000000b00648d7280d39mr22100634ybm.514.1651760019039; Thu, 05
- May 2022 07:13:39 -0700 (PDT)
-MIME-Version: 1.0
-References: <cover.1651647576.git.hakan.jansson@infineon.com>
- <64b59ca66cc22e6433a044e7bba2b3e97c810dc2.1651647576.git.hakan.jansson@infineon.com>
- <CACRpkdY3xPcyNcJfdGbSP5rdcUV6hr87yJNDVDGZdRCfN+MqLA@mail.gmail.com> <1e8cfbc6-8452-0e87-9713-536d235e5b51@infineon.com>
-In-Reply-To: <1e8cfbc6-8452-0e87-9713-536d235e5b51@infineon.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Thu, 5 May 2022 16:13:26 +0200
-Message-ID: <CACRpkda4ByrS8RGAunno_S59+Y2yado4eObzwsVkM2Q=n-B+CQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add property
- for autobaud mode
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        Thu, 5 May 2022 11:25:33 -0400
+X-Greylist: delayed 338 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 05 May 2022 08:21:52 PDT
+Received: from elaine.keithp.com (home.keithp.com [63.227.221.253])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91427554A8;
+        Thu,  5 May 2022 08:21:52 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by elaine.keithp.com (Postfix) with ESMTP id 373F23F3296A;
+        Thu,  5 May 2022 08:16:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+        t=1651763774; bh=O3aXJOWYxVTqOu3VmcXxOiZZOhMrUjqY/t6cXMT24+E=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=M3zB+WUy+cYZq4HgtgtbfmLljWbRpIeJ5Zkg9r1D71YqvPlgOkiQ4tXheXCRGUa8+
+         RMuby4CqFAMCoPUIrwdzYTZDTf78io+RFFo6OcdGBDUFDZRaGhZfKKcTtwdj7WCFy4
+         6tn6om4NwF6owZoCYEHNTlN4dA5iODmOFbhrxNDmu4q/fHHXFfSRYzNqzWEthWHBp3
+         hB3E0o3k1G8NwFJfKh9rQpVZYZLwPg6CF6he0rk/+KFPQLpotGYN+CgB1L7QQOYecl
+         ymeV9rACfLcKoB95CZdy6K628IEeM8t07ROlSN+X9O0IbQydzX/BQ3xj9k+MYZwzPf
+         UxJC+uQh0iuJw==
+X-Virus-Scanned: Debian amavisd-new at keithp.com
+Received: from elaine.keithp.com ([127.0.0.1])
+        by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id AExLuWAu_LJ4; Thu,  5 May 2022 08:16:13 -0700 (PDT)
+Received: from keithp.com (koto.keithp.com [192.168.11.2])
+        by elaine.keithp.com (Postfix) with ESMTPSA id 046443F32465;
+        Thu,  5 May 2022 08:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+        t=1651763773; bh=O3aXJOWYxVTqOu3VmcXxOiZZOhMrUjqY/t6cXMT24+E=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=krSTvH+KcMYcsYiJs+brgDawkHD6ep7gtAt/7ImbSH+PVnVS6n5TIWQoiUP+PjBfQ
+         TTV9zZEzFSNSLzQmSsEIJT24ancVfic/4tw1+i19H4UqIv2Soci174vL3i+L8WgOn3
+         3GAVx4Wwdu1vRPL7EVqx5qPLOOTreMDXIScBgNd+X5AcHfMZWw538tPrPoKpSSqHZH
+         dCLZclbzdDsdQUL6m86l3cbny8WccVcefFqv7gslHwR8P3ZsfbW/X+4PLXD3hTeyro
+         XMqcEagdrGN5NURX0L6R0oPpkf8LkkkUJo0DYZf6b68EQ+TuLV1TgvwIq/q3gwMiYO
+         4YgvEK7vCGplw==
+Received: by keithp.com (Postfix, from userid 1000)
+        id 4874D1E601B9; Thu,  5 May 2022 08:16:12 -0700 (PDT)
+From:   Keith Packard <keithp@keithp.com>
+To:     Johannes Berg <johannes@sipsolutions.net>,
+        Kees Cook <keescook@chromium.org>
+Cc:     "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+        Francis Laniel <laniel_francis@privacyrequired.com>,
+        Daniel Axtens <dja@axtens.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vincenzo Frascino <vincenzo.frascino@arm.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Tadeusz Struk <tadeusz.struk@linaro.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        alsa-devel@alsa-project.org, Al Viro <viro@zeniv.linux.org.uk>,
+        Andrew Gabbasov <andrew_gabbasov@mentor.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lavr <andy.lavr@gmail.com>,
+        Arend van Spriel <aspriel@gmail.com>,
+        Baowen Zheng <baowen.zheng@corigine.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Bradley Grove <linuxdrivers@attotech.com>,
+        brcm80211-dev-list.pdl@broadcom.com,
+        Christian Brauner <brauner@kernel.org>,
+        Christian =?utf-8?Q?G=C3=B6ttsche?= <cgzones@googlemail.com>,
+        Christian Lamparter <chunkeey@googlemail.com>,
+        Chris Zankel <chris@zankel.net>,
+        Cong Wang <cong.wang@bytedance.com>,
+        David Gow <davidgow@google.com>,
+        David Howells <dhowells@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+        devicetree@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        Eli Cohen <elic@nvidia.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Eric Paris <eparis@parisplace.org>,
+        Eugeniu Rosca <erosca@de.adit-jv.com>,
+        Felipe Balbi <balbi@kernel.org>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gregory Greenman <gregory.greenman@intel.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Hante Meuleman <hante.meuleman@broadcom.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hulk Robot <hulkci@huawei.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
         Johan Hedberg <johan.hedberg@gmail.com>,
+        John Keeping <john@metanate.com>,
+        Juergen Gross <jgross@suse.com>, Kalle Valo <kvalo@kernel.org>,
+        keyrings@vger.kernel.org, kunit-dev@googlegroups.com,
+        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Lars-Peter Clausen <lars@metafoo.de>,
+        Lee Jones <lee.jones@linaro.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        linux1394-devel@lists.sourceforge.net,
+        linux-afs@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
+        linux-integrity@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-xtensa@linux-xtensa.org, llvm@lists.linux.dev,
+        Loic Poulain <loic.poulain@linaro.org>,
+        Louis Peens <louis.peens@corigine.com>,
+        Luca Coelho <luciano.coelho@intel.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Marc Dionne <marc.dionne@auristor.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Mark Brown <broonie@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Nathan Chancellor <nathan@kernel.org>, netdev@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nuno =?utf-8?Q?S=C3=A1?= <nuno.sa@analog.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Paul Moore <paul@paul-moore.com>,
+        Rich Felker <dalias@aerifal.cx>,
+        Rob Herring <robh+dt@kernel.org>,
+        Russell King <linux@armlinux.org.uk>, selinux@vger.kernel.org,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        SHA-cyfmac-dev-list@infineon.com,
+        Simon Horman <simon.horman@corigine.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Stefan Richter <stefanr@s5r6.in-berlin.de>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Stephen Smalley <stephen.smalley.work@gmail.com>,
+        Takashi Iwai <tiwai@suse.com>, Tom Rix <trix@redhat.com>,
+        Udipto Goswami <quic_ugoswami@quicinc.com>,
+        wcn36xx@lists.infradead.org, Wei Liu <wei.liu@kernel.org>,
+        xen-devel@lists.xenproject.org,
+        Xiu Jianfeng <xiujianfeng@huawei.com>,
+        Yang Yingliang <yangyingliang@huawei.com>
+Subject: Re: [PATCH 02/32] Introduce flexible array struct memcpy() helpers
+In-Reply-To: <970a674df04271b5fd1971b495c6b11a996c20c2.camel@sipsolutions.net>
+References: <20220504014440.3697851-1-keescook@chromium.org>
+ <20220504014440.3697851-3-keescook@chromium.org>
+ <d3b73d80f66325fdfaf2d1f00ea97ab3db03146a.camel@sipsolutions.net>
+ <202205040819.DEA70BD@keescook>
+ <970a674df04271b5fd1971b495c6b11a996c20c2.camel@sipsolutions.net>
+Date:   Thu, 05 May 2022 08:16:11 -0700
+Message-ID: <871qx8qabo.fsf@keithp.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+        micalg=pgp-sha256; protocol="application/pgp-signature"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, May 5, 2022 at 3:11 PM Hakan Jansson <hakan.jansson@infineon.com> wrote:
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-> I suppose a general flag could be useful but to be honest I don't know
-> if any other devices besides the ones using the Broadcom driver has any
-> use for it. You would probably also still want to be able to use
-> current-speed to set the link speed and end up using both
-> current-speed=x and current-speed-auto at the same time, which might
-> look a little confusing?
+Johannes Berg <johannes@sipsolutions.net> writes:
 
-I do not think it is more confusing than being able to use
-current-speed and brcm,uses-autobaud-mode at the same time.
+> Yeah, dunno, I guess I'm slightly more on the side of not requiring it,
+> since we don't do the same for kmalloc() etc. and probably really
+> wouldn't want to add kmalloc_s() that does it ;-)
 
-> Please let me know if you'd still prefer "current-speed-auto" over
-> "brcm,uses-autobaud-mode" and I'll revise the patch and rename it!
+I suspect the number of bugs this catches will be small, but they'll be
+in places where the flow of control is complicated. What we want is to
+know that there's no "real" value already present. I'd love it if we
+could make the macro declare a new name (yeah, I know, mixing
+declarations and code).
 
-It actually depends a bit.
+Of course, we could also end up with people writing a wrapping macro
+that sets the variable to NULL before invoking the underlying macro...
 
-This:
+=2D-=20
+=2Dkeith
 
-> >> +      The controller should be started in autobaud mode by asserting
-> >> +      BT_UART_CTS_N (i.e. host RTS) during startup. Only HCI commands supported
-> >> +      in autobaud mode should be used until patch FW has been loaded.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-sounds a bit vague?
+-----BEGIN PGP SIGNATURE-----
 
-Does it mean that CTS is asserted, then you send a bit (CTS then goes low)
-and then CTS is asserted again when the device is ready to receieve more
-data? i.e is this some kind of one-bit mode, because it doesn't sound like
-it is using CTS as it was used in legacy modems.
-
-Some more explanation of this mode is needed so we can understand if
-this is something generic or a BRCM-only thing.
-
-Yours,
-Linus Walleij
+iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAmJz6jsACgkQ2yIaaQAA
+ABGQAg/+NFgE01jSUQAsZc8G2KY9qfifpQ5rzrWtedUNXoOhcAo33tvPHnED0AxP
+Q4MXv/X4TRCTOD/5aBjZeKgy9I9G2jYbZq9iYf5uaD9zIECpE5XyznDZzo15cWBE
+B+W7olq9dqiARf6CuwNpYCjB8zv2ubR42c+faTCJNM63owpN9xpGT/7OEbE0HoKg
+TawmusqNU2nOkT82kjh1iVoK0BbmPSATiKkCH9ZpUVQYOQvsyieFtAlQREms/pip
+ccnHssDAaV1dgAg2NlKDzU30XA3rIIsfX+v3Bh+CWoj77Az7IO8+/V+nmNm5GHyy
+bs8LUQY3Z7/otHyGVfjVN9eU6LcEvstr7tOPLWxF0h+YxJk12uKhUZnmt4NisYrL
+uOcx/MC4y6tx9+kdn1U5KoV+O/ekhW/N/WwYcE6YUYZeol3Ahpve77B7uzLbwyOj
+TMLF83DtVqGLwl1y5mdKUfdeUeYhVMYo+eaq0ChKHdYdKj9ra2BaL1oiTc3lKqVW
+FdHX7C9qLA4LsTzfuDiEQDOrnwMDXhvtQrysTOjlQLIcivarCfxIKQw0co8Vubug
+sceCDXCr5qY2cCr51YqbDSVqEXK5Dos7IGlIyIlZH0YCktIbgOGTEPZDcidplXy2
+LWWWFIK6Viz1AgjSRxRU24qmTbFCFLZdboKDuzsCHG8HDByLmNM=
+=BTwc
+-----END PGP SIGNATURE-----
+--=-=-=--
