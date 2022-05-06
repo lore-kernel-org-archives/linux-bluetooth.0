@@ -2,167 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB02BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 02:26:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDF4DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 03:16:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388079AbiEFCaC (ORCPT
+        id S1388474AbiEFDUS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 May 2022 22:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43350 "EHLO
+        Thu, 5 May 2022 23:20:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235264AbiEFCaA (ORCPT
+        with ESMTP id S1388465AbiEFDUO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 May 2022 22:30:00 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A0224BFE
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 May 2022 19:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1651803979; x=1683339979;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=eryJz/9RtHuOB6CRWfiag+ngqeXaVhYaOUx7ooJ0ABs=;
-  b=TKVlrCGDb1htGQNLtlKR3FvWnCcrBS+1JKrIiMVbIGVNonRYBZ+JiFpg
-   Yzb2iy+VF623YatTVabrx1LJ/DFSXaB1X+sIb493KL/zE/wZFr73Ezuyp
-   ki3pj9hGSceQ4k3TjOuYppouFgKzH1/kZb5JaW2KC7CxVhJTIygyK0NiQ
-   ZDDdYCW3QA2BRhXDUmNzr6TlwrGj1tPryZWvpgTRyNLvAK+AeHfWMNBp3
-   PjbxZ2bEtGtMYM0VWzMgECKCE75As3241QRtwm7dkXlq1HyvFj7sXcf7N
-   4BFSGsbzBYbqylX2VrgZm1IXxC5ivg+5bjuImpflG8s7AVsn/JLyU4vxC
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10338"; a="293528004"
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="293528004"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 May 2022 19:26:19 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,203,1647327600"; 
-   d="scan'208";a="735325957"
-Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 05 May 2022 19:26:17 -0700
-Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nmnfd-000Czk-3Z;
-        Fri, 06 May 2022 02:26:17 +0000
-Date:   Fri, 6 May 2022 10:25:34 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     kbuild-all@lists.01.org
-Subject: Re: [PATCH 6/8] Bluetooth: ISO: Add broadcast support
-Message-ID: <202205061022.2EG8sVaE-lkp@intel.com>
-References: <20220505230550.3450617-6-luiz.dentz@gmail.com>
+        Thu, 5 May 2022 23:20:14 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C0911A816
+        for <linux-bluetooth@vger.kernel.org>; Thu,  5 May 2022 20:16:31 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id h3so5072357qtn.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 05 May 2022 20:16:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=4mexQ/GlM57KRSw+jrxlxJ9K/NlFS0grIfOADe/BCcA=;
+        b=G5z1Zp4wkcgqMs/q04lbQ0kdayXFsHX45rWzILca+d3eS+DW37z2h+QugdsmlnYsO2
+         YDVsMqIsLTeJyAbqGo729aAqyexfFNzUlnBxeDuvDLkoxrSCJkD9PwdxuZlywnPdvZnp
+         sBuVh5EktbSrxgIzamKc5RFbr+Tefiw83PxYdPjajzTguBgGNafYMKGA5qMjEv8BaGM6
+         CR5gxYjAe1ODv2QqkIFyEfDnQd0vTy/HtbsOSddQyPOABcoUSW7v7qMYiblx5kjyGBt/
+         av5VskEt4RdlzatpSkUPcBRhxLK+WK20rCEXb0f5KOu/32yWPzfUckYolO+ptEvTsSyd
+         IAeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=4mexQ/GlM57KRSw+jrxlxJ9K/NlFS0grIfOADe/BCcA=;
+        b=jqAeQ8jOS50ShNg6oS/4j0FXGe82chJ5d56E4ryAlf+FNFiYeF0uheoewOZUmUnsHG
+         JY/pk9DeWY5nGRSSu2U/3zr09zTTz00LQqq78eAxzlHGQM/0jaf8C/80Y5b4U10rev5f
+         Y0dPAULU5FTwj7NkIXVRvgxMRPqjsXFgwtxFzAZ2OyfGiDUUOoRs0fISOA93Or7JOSzc
+         CCBUsZrcWGrKjrtYjk+n7Hj6VPr7FX+ekTATFpYfSZYSeOyMYUi+euCAZw3Pr6s1ivKg
+         zppmVHRV92igzJHVwvxTrYjKgWu6Z2Z6vShmiXf6YSWvNbo7kvXN10reZc8ExwVN8Z6B
+         /uOg==
+X-Gm-Message-State: AOAM532D/iTt91tkcChxLB0GHfMMwQyXrv1oF9jH/qOIWLkzAynQfO4R
+        fFIgrG9w+Zc6uMv5lSNl1H/TYPSM6LM=
+X-Google-Smtp-Source: ABdhPJyMssrDaYAZ80bjRgRolqA9HHfzAy/iW/JIJP1N2f3LoYoPIVV4EJR7yE7pGTRAbtkX4J8h1Q==
+X-Received: by 2002:ac8:7d4e:0:b0:2e1:ba47:d757 with SMTP id h14-20020ac87d4e000000b002e1ba47d757mr1094418qtb.248.1651806990502;
+        Thu, 05 May 2022 20:16:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.65.66.2])
+        by smtp.gmail.com with ESMTPSA id i19-20020a05620a0a1300b0069fc13ce226sm1791416qka.87.2022.05.05.20.16.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 May 2022 20:16:30 -0700 (PDT)
+Message-ID: <6274930e.1c69fb81.79fcf.a5d5@mx.google.com>
+Date:   Thu, 05 May 2022 20:16:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7270095866849796900=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220505230550.3450617-6-luiz.dentz@gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/7] lib: Add definitions for ISO socket
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220505224727.3369989-1-luiz.dentz@gmail.com>
+References: <20220505224727.3369989-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============7270095866849796900==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I love your patch! Perhaps something to improve:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on bluetooth/master v5.18-rc5 next-20220505]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-eir-Add-helpers-for-managing-service-data/20220506-070828
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: x86_64-randconfig-a013 (https://download.01.org/0day-ci/archive/20220506/202205061022.2EG8sVaE-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.2.0-20) 11.2.0
-reproduce (this is a W=1 build):
-        # https://github.com/intel-lab-lkp/linux/commit/c9952abdb0e8adbeadc722ce26b2ee5a64244860
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-eir-Add-helpers-for-managing-service-data/20220506-070828
-        git checkout c9952abdb0e8adbeadc722ce26b2ee5a64244860
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash net/bluetooth/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=638906
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    FAIL      13.32 seconds
+GitLint                       PASS      7.35 seconds
+Prep - Setup ELL              PASS      59.71 seconds
+Build - Prep                  PASS      0.70 seconds
+Build - Configure             PASS      8.68 seconds
+Build - Make                  PASS      1450.44 seconds
+Make Check                    PASS      11.91 seconds
+Make Check w/Valgrind         PASS      454.93 seconds
+Make Distcheck                FAIL      191.58 seconds
+Build w/ext ELL - Configure   PASS      9.59 seconds
+Build w/ext ELL - Make        PASS      1400.13 seconds
+Incremental Build with patchesPASS      10106.17 seconds
 
-   net/bluetooth/iso.c: In function 'iso_sock_getsockopt':
->> net/bluetooth/iso.c:1214:13: warning: variable 'base' set but not used [-Wunused-but-set-variable]
-    1214 |         u8 *base;
-         |             ^~~~
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,6/7] tools: Add isotest tool
+ERROR:INITIALISED_STATIC: do not initialise statics to 0
+#182: FILE: tools/isotest.c:65:
++static int defer_setup = 0;
+
+ERROR:INITIALISED_STATIC: do not initialise statics to 0
+#183: FILE: tools/isotest.c:66:
++static int sndbuf = 0;
+
+ERROR:INITIALISED_STATIC: do not initialise statics to false
+#185: FILE: tools/isotest.c:68:
++static bool quiet = false;
+
+ERROR:GLOBAL_INITIALISERS: do not initialise globals to NULL
+#187: FILE: tools/isotest.c:70:
++struct bt_iso_qos *iso_qos = NULL;
+
+ERROR:SPACING: space required after that ',' (ctx:VxV)
+#709: FILE: tools/isotest.c:592:
++		syslog(LOG_INFO,"Send is behind: %zd us - skip sleep",
+ 		               ^
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1224: FILE: tools/isotest.c:1107:
++		/* Fallthrough */
+
+/github/workspace/src/12840293.patch total: 5 errors, 1 warnings, 1221 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12840293.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-vim +/base +1214 net/bluetooth/iso.c
+##############################
+Test: Make Distcheck - FAIL
+Desc: Run distcheck to check the distribution
+Output:
+make[2]: *** No rule to make target 'tools/isotest.1', needed by 'all-am'.  Stop.
+make[1]: *** [Makefile:4342: all] Error 2
+make: *** [Makefile:11250: distcheck] Error 1
 
-  1206	
-  1207	static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
-  1208				       char __user *optval, int __user *optlen)
-  1209	{
-  1210		struct sock *sk = sock->sk;
-  1211		int len, err = 0;
-  1212		struct bt_iso_qos qos;
-  1213		u8 base_len;
-> 1214		u8 *base;
-  1215	
-  1216		BT_DBG("sk %p", sk);
-  1217	
-  1218		if (get_user(len, optlen))
-  1219			return -EFAULT;
-  1220	
-  1221		lock_sock(sk);
-  1222	
-  1223		switch (optname) {
-  1224	
-  1225		case BT_DEFER_SETUP:
-  1226			if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-  1227				err = -EINVAL;
-  1228				break;
-  1229			}
-  1230	
-  1231			if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
-  1232				     (u32 __user *)optval))
-  1233				err = -EFAULT;
-  1234	
-  1235			break;
-  1236	
-  1237		case BT_ISO_QOS:
-  1238			if (sk->sk_state == BT_CONNECTED)
-  1239				qos = iso_pi(sk)->conn->hcon->iso_qos;
-  1240			else
-  1241				qos = iso_pi(sk)->qos;
-  1242	
-  1243			len = min_t(unsigned int, len, sizeof(qos));
-  1244			if (copy_to_user(optval, (char *)&qos, len))
-  1245				err = -EFAULT;
-  1246	
-  1247			break;
-  1248	
-  1249		case BT_ISO_BASE:
-  1250			if (sk->sk_state == BT_CONNECTED) {
-  1251				base_len = iso_pi(sk)->conn->hcon->le_per_adv_data_len;
-  1252				base = iso_pi(sk)->conn->hcon->le_per_adv_data;
-  1253			} else {
-  1254				base_len = iso_pi(sk)->base_len;
-  1255				base = iso_pi(sk)->base;
-  1256			}
-  1257	
-  1258			len = min_t(unsigned int, len, base_len);
-  1259			if (copy_to_user(optval, (char *)&qos, len))
-  1260				err = -EFAULT;
-  1261	
-  1262			break;
-  1263	
-  1264		default:
-  1265			err = -ENOPROTOOPT;
-  1266			break;
-  1267		}
-  1268	
-  1269		release_sock(sk);
-  1270		return err;
-  1271	}
-  1272	
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7270095866849796900==--
