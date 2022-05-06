@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 772E7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 22:32:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE263C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 22:32:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1444782AbiEFWgh (ORCPT
+        id S1444783AbiEFWgi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 May 2022 18:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
+        Fri, 6 May 2022 18:36:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444778AbiEFWgf (ORCPT
+        with ESMTP id S1444775AbiEFWgf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 6 May 2022 18:36:35 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D1785B898
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 May 2022 15:32:51 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id r27so9571870iot.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 May 2022 15:32:51 -0700 (PDT)
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4132528F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 May 2022 15:32:50 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id e15so9574130iob.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 May 2022 15:32:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=vvRnIZ14qQwpmNqfTRjQS+GOr22GgxtCuDvEgGckJUE=;
-        b=H/2tGTbDuHnTaI9QBPRr9t1pRFnHJGew/FnYfA9kDPGAAT89a9zg0zE6TnPQc2q2AM
-         fh4gIWuyQG5Dk7RJwIPn5ZeWnNLRYZQ9YifDD1it7eqM5f2AQLiHu8gOMzeZG1ZCoGPM
-         CbZt3ZbyTzcJjPm9FAlbjQ8DQBIjvadsMp281gVZ7zXCDtb3p2Qro6ec9qJELvXTJ8a/
-         0HFGqegdZKUDFw/Iqrm3IcFLXnbqwjaOL9KQj4/W8UhWhmfFdhw7IN1sInDeWyRuwqmi
-         +sELCrkVUTma7zChwsmvK+6z63ZetohZskZUpLS1k0DNv839YIVB7Fr2uSuLoPZ3kkTh
-         Dwyg==
+        bh=EhF9CMCiGnnsQMWw2AcnUTFA1xJBYKvdFqXkKgpPp6A=;
+        b=AF62WD7wrxJiHW0G9b13f9SZtEx+evKmp9lLgtWmfiaWa4u7NHW4Ba1ADwZQI3oteF
+         9z67zhZWiwpHLNilRHzBqoXkz+5W8z18nXR9A1VgPGjS6hCHye5NqlQDDSYB8U+4j1H0
+         z5gBx6x+xrFRik8AJykyWBKvuo+DXHhuBzowZHNcuKXbydBESW/rK8wfP+SKP+VLDmFz
+         3yCLnfZIzODlcCIfxd/hVePS1ovtp1R6rd6lGzQJn4qLGLO8rtIGo1J3bIzEYZzKOCc7
+         0XecTwTZ2a+gRlWMOyFERLe1TsH93PfdJjPB/+STcYWvIj7F2V5vU9UCOpK9P2ntP3yg
+         wWvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vvRnIZ14qQwpmNqfTRjQS+GOr22GgxtCuDvEgGckJUE=;
-        b=sQz2Tl4gykB3VJEoiYnLfUAURSsvwpT9fPEPPNqOlgS9yYe8XSQEgUmnzRQoaJy05Z
-         Gq2cSbZ7zcmY8i9jiKM6iG2a9IEj/1QJGdJUaMIGMMsER13sMC/lrjVrOJvTWIqJNnZj
-         Smu7qy1Nn5SxLnP56UMeDviMezSLzjWY55Jeuk3J61jmK4NLsFHu7SKgh7tNs8Zoi9VH
-         sw0ZaH67wcMqKs6fxIGd1Tspaxvl+SucHfHGeA8cS1BO1QtX3rrZEQN9QgAMRoFm88Yp
-         Szebgd7qf9V7tRD0ErFu8f1kwsHs0k/mVY1ncJX/GcGR/daguEGYV0hWXnWDqQuyv/mb
-         YyTw==
-X-Gm-Message-State: AOAM531HMRgAG2T+nAgjjSovDSgskfEph57ZLkoJ4WeVDtiPowg0HxPK
-        rNfc1VCTTLhRIWFff7JbQirvnayxvtA=
-X-Google-Smtp-Source: ABdhPJz3YHtBuWieTVqKUkf8b8SFsuBK7a8pX7NxG0NiVFT3FjFXhYCoOj7SSozEBte+cxUZW+38Aw==
-X-Received: by 2002:a05:6638:38a2:b0:32b:a5a4:7d97 with SMTP id b34-20020a05663838a200b0032ba5a47d97mr2508085jav.276.1651876370822;
-        Fri, 06 May 2022 15:32:50 -0700 (PDT)
+        bh=EhF9CMCiGnnsQMWw2AcnUTFA1xJBYKvdFqXkKgpPp6A=;
+        b=6ziis8FY7mqyVh16RZSpYMy4+kmUo6BO4vl9Y7t90YpQmKGMG+R7ltwqbHoPHgoXlP
+         1HSaAsGwVXo3Op9O8/TueTiFk4XlA5QUz3/0nOsT9OE4vD1+64nkcczBTT0YWtrEZVxY
+         AlTy9JlN9EW5KI5QUYRDTJ4frOqO7j/hncvgee2dr8lXw2v4mELj/DB6t1XHRxEqKjiS
+         ijAatMwGya5PonifyIDgz4c4GUMoE2vo9Hy0tGEEZbBTBTZio13gE7LSmBsDajl2irE/
+         oHnuQ6foGr/FHAi9zHCoPn0ULlH8+LwNvj/i5VhdzV9Y5uKP9+x3iWQe7n0jSUrPySdb
+         hfjg==
+X-Gm-Message-State: AOAM532ruox3G5nBVTIm3J/oz9p/ZpeGB7C5NTQMSTjpSd79bcbCKWk9
+        v6HtUPWwA/lyN2hUWVcwRlFV45n9PyY=
+X-Google-Smtp-Source: ABdhPJyxmhzOCp7oxnpRBV3DlouFl6GvLG1dIZfPCKjmc2vRFyhEYvlbALUb/UMxDjaAOhPZRba3mg==
+X-Received: by 2002:a05:6602:2b8c:b0:649:4310:602f with SMTP id r12-20020a0566022b8c00b006494310602fmr2264031iov.13.1651876369955;
+        Fri, 06 May 2022 15:32:49 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x20-20020a056638249400b0032b3a7817d3sm1647254jat.151.2022.05.06.15.32.50
+        by smtp.gmail.com with ESMTPSA id x20-20020a056638249400b0032b3a7817d3sm1647254jat.151.2022.05.06.15.32.49
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 May 2022 15:32:50 -0700 (PDT)
+        Fri, 06 May 2022 15:32:49 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 BlueZ 4/8] adapter: Add support for setting ISO Socket experimental feature
-Date:   Fri,  6 May 2022 15:32:41 -0700
-Message-Id: <20220506223245.3950871-4-luiz.dentz@gmail.com>
+Subject: [PATCH v3 BlueZ 3/8] mgmt-tester: Fix Read Exp Feature tests
+Date:   Fri,  6 May 2022 15:32:40 -0700
+Message-Id: <20220506223245.3950871-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220506223245.3950871-1-luiz.dentz@gmail.com>
 References: <20220506223245.3950871-1-luiz.dentz@gmail.com>
@@ -66,105 +66,54 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for setting ISO Socket experimental UUID which
-enables the use of BTPROTO_ISO on the system.
+This adds ISO Socket UUID as response to Read Exp Feature.
 ---
- src/adapter.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- src/main.c    |  1 +
- src/main.conf |  1 +
- 3 files changed, 44 insertions(+)
+ tools/mgmt-tester.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index db2624c60..1ede58494 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -141,6 +141,13 @@ static const struct mgmt_exp_uuid codec_offload_uuid = {
- 	.str = "a6695ace-ee7f-4fb9-881a-5fac66c629af"
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index e5319d123..bfa5905e0 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -9798,7 +9798,7 @@ static const struct generic_data set_dev_flags_fail_3 = {
  };
  
-+/* 6fbaf188-05e0-496a-9885-d6ddfdb4e03e */
-+static const struct mgmt_exp_uuid iso_socket_uuid = {
-+	.val = { 0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6, 0x85, 0x98,
-+		0x6a, 0x49, 0xe0, 0x05, 0x88, 0xf1, 0xba, 0x6f },
-+	.str = "6fbaf188-05e0-496a-9885-d6ddfdb4e03e"
-+};
-+
- static DBusConnection *dbus_conn = NULL;
- 
- static uint32_t kernel_features = 0;
-@@ -9691,6 +9698,40 @@ static void codec_offload_func(struct btd_adapter *adapter, uint8_t action)
- 	btd_error(adapter->dev_id, "Failed to set Codec Offload");
- }
- 
-+static void iso_socket_complete(uint8_t status, uint16_t len,
-+				const void *param, void *user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+	uint8_t action = btd_opts.experimental ? 0x01 : 0x00;
-+
-+	if (status != 0) {
-+		error("Set ISO Socket failed with status 0x%02x (%s)",
-+						status, mgmt_errstr(status));
-+		return;
-+	}
-+
-+	DBG("ISO Socket successfully set");
-+
-+	if (action)
-+		queue_push_tail(adapter->exps, (void *)iso_socket_uuid.val);
-+}
-+
-+static void iso_socket_func(struct btd_adapter *adapter, uint8_t action)
-+{
-+	struct mgmt_cp_set_exp_feature cp;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(cp.uuid, iso_socket_uuid.val, 16);
-+	cp.action = action;
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
-+			MGMT_INDEX_NONE, sizeof(cp), &cp,
-+			iso_socket_complete, adapter, NULL) > 0)
-+		return;
-+
-+	btd_error(adapter->dev_id, "Failed to set ISO Socket");
-+}
-+
- static const struct exp_feat {
- 	const struct mgmt_exp_uuid *uuid;
- 	void (*func)(struct btd_adapter *adapter, uint8_t action);
-@@ -9701,6 +9742,7 @@ static const struct exp_feat {
- 	EXP_FEAT(&quality_report_uuid, quality_report_func),
- 	EXP_FEAT(&rpa_resolution_uuid, rpa_resolution_func),
- 	EXP_FEAT(&codec_offload_uuid, codec_offload_func),
-+	EXP_FEAT(&iso_socket_uuid, iso_socket_func),
+ static const uint8_t read_exp_feat_param_success[] = {
+-	0x03, 0x00,				/* Feature Count */
++	0x04, 0x00,				/* Feature Count */
+ 	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,	/* UUID - Simultaneous */
+ 	0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,	/* Central Peripheral */
+ 	0xb5, 0x10, 0x1b, 0x67,
+@@ -9810,7 +9810,11 @@ static const uint8_t read_exp_feat_param_success[] = {
+ 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f,	/* UUID - Codec Offload */
+ 	0x1a, 0x88, 0xb9, 0x4f, 0x7f, 0xee,
+ 	0xce, 0x5a, 0x69, 0xa6,
+-	0x00, 0x00, 0x00, 0x00			/* Flags */
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6,	/* UUID - ISO Socket */
++	0x85, 0x98, 0x6a, 0x49, 0xe0, 0x05,
++	0x88, 0xf1, 0xba, 0x6f,
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
  };
  
- static void read_exp_features_complete(uint8_t status, uint16_t length,
-diff --git a/src/main.c b/src/main.c
-index 12cc21372..011d66d5a 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -606,6 +606,7 @@ static const char *valid_uuids[] = {
- 	"15c0a148-c273-11ea-b3de-0242ac130004",
- 	"330859bc-7506-492d-9370-9a6f0614037f",
- 	"a6695ace-ee7f-4fb9-881a-5fac66c629af",
-+	"6fbaf188-05e0-496a-9885-d6ddfdb4e03e",
- 	"*"
+ static const struct generic_data read_exp_feat_success = {
+@@ -9822,11 +9826,15 @@ static const struct generic_data read_exp_feat_success = {
+ 
+ 
+ static const uint8_t read_exp_feat_param_success_index_none[] = {
+-	0x01, 0x00,				/* Feature Count */
++	0x02, 0x00,				/* Feature Count */
+ 	0x1c, 0xda, 0x47, 0x1c, 0x48, 0x6c,	/* UUID - Debug */
+ 	0x01, 0xab, 0x9f, 0x46, 0xec, 0xb9,
+ 	0x30, 0x25, 0x99, 0xd4,
+ 	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6,	/* UUID - ISO Socket */
++	0x85, 0x98, 0x6a, 0x49, 0xe0, 0x05,
++	0x88, 0xf1, 0xba, 0x6f,
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
  };
  
-diff --git a/src/main.conf b/src/main.conf
-index 91b98b8c4..9d0319318 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -120,6 +120,7 @@
- # 15c0a148-c273-11ea-b3de-0242ac130004 (BlueZ Experimental LL privacy)
- # 330859bc-7506-492d-9370-9a6f0614037f (BlueZ Experimental Bluetooth Quality Report)
- # a6695ace-ee7f-4fb9-881a-5fac66c629af (BlueZ Experimental Offload Codecs)
-+# 6fbaf188-05e0-496a-9885-d6ddfdb4e03e (BlueZ Experimental ISO socket)
- # Defaults to false.
- #Experimental = false
- 
+ static const struct generic_data read_exp_feat_success_index_none = {
 -- 
 2.35.1
 
