@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F1FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 21:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 723CCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 May 2022 21:57:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356960AbiEFWBd (ORCPT
+        id S1359689AbiEFWBe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 May 2022 18:01:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49010 "EHLO
+        Fri, 6 May 2022 18:01:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444626AbiEFWBb (ORCPT
+        with ESMTP id S1444627AbiEFWBc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 May 2022 18:01:31 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17AE3EBA3
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 May 2022 14:57:46 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id e15so9504327iob.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 May 2022 14:57:46 -0700 (PDT)
+        Fri, 6 May 2022 18:01:32 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D520D3F883
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 May 2022 14:57:47 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id h85so9473427iof.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 May 2022 14:57:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=KCvHkTgUJPXdUl27Xc90pd5nJnvEbH2ygjEL3W2BokQ=;
-        b=mOzTYD0XlP+XyZLNWHdDbBr706vcnB7VS9Wnc8cbSK6SaGlyi1IOMxuVeSkJQoMKE/
-         PbotlYO2Z4AnaCFF1mBo3Uyzl5uKBDnDfxd9s4OP+L4ZTBcJmh8tAUNS95P8Gv6vQVjx
-         0fzHQ0XQN11p3ZqJ3jGFnRRB+UvA7PzENJZHUcXyPuUS38pnRAgCNfwpyHP7AHTN1Ahv
-         fiqKGm/+UfMNLmN0Mu9tZJ9Ijkuq+pc5zS4xbETLNjJAYRScgMYmyWpIDPjEUS5QMjcH
-         MA7kh57Tmb9vAuJM3MvJT2es4+HkrHoJd3+HcmefG+Ok89HawHVN+Lvy7YYybKNyaME1
-         jwCQ==
+        bh=UGs3eWnzMlMcYy7o1gP5HPjZRQpD9Txg0Es5X9kruBM=;
+        b=V+ZG56G+9u/gtOoarUYFWBv3Azhwda/1dv2LdSRTnrGTM4FvJl0NrMensEukJlF7nb
+         ULg95i0eF05H6Xme/+mLoGCSZ4xxmJEPO7gbbJ7nuRoB8MrTl4ZWO1lXnvbd38jkAf7x
+         9sPVF10Sor6v8jjo3gCfHaOrlZ0FGDgqa0T/ShqydCm5sB0ZUojiENFvqTe/1WclwQf1
+         g1xYfPi7UnJPCym3KTHiUC02e6EiKayHqImLtkFCo6y5F7dcsOU28pkEM2U7jGOd+Bsj
+         MNgxYhhn421XhPLEgYBRKD+EGYUeAGQd0N9emJjull6WhOP6Z9xnOH4aBJyBJQAwNWVG
+         Vm4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=KCvHkTgUJPXdUl27Xc90pd5nJnvEbH2ygjEL3W2BokQ=;
-        b=u8q4LjifqkmmtspZbS9xOFVWlLuA0Oc98a4HQNdGoog+5n6j7+SkL1muHWMHPV787M
-         fNjtNEWIn8fgrq7P1EBpXlCawgx7t69djGK2ka/zt+FWqwFpQy7WpnGdREH1RNwXfofm
-         fJigdgUUIpwsW/ERlPh+RuXg5e4QYn67aIwsMpYCY3x9PLYJ3/Pa8iMTLMtLSAc86seg
-         6AhXOTo16WFF3uAYquVPILBASdXJsc7eUjc+1Q5DRPo2tumoQXt+deQ5Rzzkn76WuG/O
-         VntQr8CjmX8fdXfgUsPDhoY6NM+rgE5bb3zR9Ru9JUSR2aDLsYwpi4ESJffykpqorirI
-         w9hA==
-X-Gm-Message-State: AOAM531BKaL9sa6TAV7o+iVhxnrG7rWcwU0/iT0csMVCOjMgm39YAi0R
-        CarokeGtmPSJZ7VnL9ST3VKCuPy6ye4=
-X-Google-Smtp-Source: ABdhPJyBEndyl14H+/GQJR5nnar3IiaS2qlS8wBudDGLeJJ6tpGwz09Qkg6iJIp3Ng22rTUSZvchTA==
-X-Received: by 2002:a02:8605:0:b0:32b:1dd7:fc31 with SMTP id e5-20020a028605000000b0032b1dd7fc31mr2256425jai.174.1651874265733;
-        Fri, 06 May 2022 14:57:45 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=UGs3eWnzMlMcYy7o1gP5HPjZRQpD9Txg0Es5X9kruBM=;
+        b=H0FmPrMLu+iKzk5sBxi05XKrRQdCdtFqVramXkEYsNKFUKQhv2q8HgLeVW7hLHVQuN
+         0BDvtnUWIFVul8LTh5xvyDyu1/2RP/Q+aUQiq21989Oa3yrpoC+3m4+aqSCHMOLdTAsB
+         SneMhmohNuLhXMjBJ/1akgU+bnM8mJNJYupIRdOpjWYfiKMhKl/uJdsZjDmo+pnvapcR
+         z/TMmJO/phLmjyaRF1nVEvto2IpsF84tFMVA5VXfliVC5o2x6J3sYKV2gReixmhKCcXT
+         +1k2WMPq2qEXA8FoP6Zh9ZGeq2g69kAms4n2VaEP8UcupymoaIm+npoFsiD4cOfuw8d1
+         uMzA==
+X-Gm-Message-State: AOAM532298aX+QQI5xHFC+QQCtmRCsgVfwPNbZayA6U2eWJhyMraWQ5o
+        sTJo40VOXGQRh7mEEelzr/fwZD5ukLo=
+X-Google-Smtp-Source: ABdhPJzZXDhWxwClWueeWOxz2d/YW4yPndOHBRbvRyliKKXpGv0AZiIigIVKLqakAghkAYPytrZNUw==
+X-Received: by 2002:a05:6638:2723:b0:32b:d0c6:23a9 with SMTP id m35-20020a056638272300b0032bd0c623a9mr1007296jav.319.1651874266918;
+        Fri, 06 May 2022 14:57:46 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id s14-20020a5e980e000000b0065aab053448sm1572281ioj.21.2022.05.06.14.57.44
+        by smtp.gmail.com with ESMTPSA id s14-20020a5e980e000000b0065aab053448sm1572281ioj.21.2022.05.06.14.57.46
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 May 2022 14:57:44 -0700 (PDT)
+        Fri, 06 May 2022 14:57:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/8] Bluetooth: eir: Add helpers for managing service data
-Date:   Fri,  6 May 2022 14:57:36 -0700
-Message-Id: <20220506215743.3870212-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/8] Bluetooth: hci_core: Introduce hci_recv_event_data
+Date:   Fri,  6 May 2022 14:57:37 -0700
+Message-Id: <20220506215743.3870212-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220506215743.3870212-1-luiz.dentz@gmail.com>
+References: <20220506215743.3870212-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,95 +66,101 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds helpers for accessing and appending service data (0x16) ad
-type.
+This introduces hci_recv_event_data to make it simpler to access the
+contents of last received event rather than having to pass its contents
+to the likes of *_ind/*_cfm callbacks.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-v2: Fixes CI/kernel test robot findings
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 32 ++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  3 +++
+ 3 files changed, 37 insertions(+)
 
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/eir.c         | 31 +++++++++++++++++++++++++++++++
- net/bluetooth/eir.h         |  4 ++++
- 3 files changed, 36 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 62a9bb022aed..fe7935be7dc4 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -625,6 +625,7 @@ enum {
- #define EIR_SSP_RAND_R192	0x0F /* Simple Pairing Randomizer R-192 */
- #define EIR_DEVICE_ID		0x10 /* device ID */
- #define EIR_APPEARANCE		0x19 /* Device appearance */
-+#define EIR_SERVICE_DATA	0x16 /* Service Data */
- #define EIR_LE_BDADDR		0x1B /* LE Bluetooth device address */
- #define EIR_LE_ROLE		0x1C /* LE role */
- #define EIR_SSP_HASH_C256	0x1D /* Simple Pairing Hash C-256 */
-diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-index 7e930f77ecab..7d77fb00c2bf 100644
---- a/net/bluetooth/eir.c
-+++ b/net/bluetooth/eir.c
-@@ -55,6 +55,19 @@ u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
- 	return eir_append_le16(ptr, ad_len, EIR_APPEARANCE, hdev->appearance);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 64d3a63759a8..8838aa2cd594 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -516,6 +516,7 @@ struct hci_dev {
+ 	struct sk_buff_head	cmd_q;
+ 
+ 	struct sk_buff		*sent_cmd;
++	struct sk_buff		*recv_event;
+ 
+ 	struct mutex		req_lock;
+ 	wait_queue_head_t	req_wait_q;
+@@ -1739,6 +1740,7 @@ void hci_send_acl(struct hci_chan *chan, struct sk_buff *skb, __u16 flags);
+ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
+ 
+ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
++void *hci_recv_event_data(struct hci_dev *hdev, __u8 event);
+ 
+ u32 hci_conn_get_phy(struct hci_conn *conn);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ad4f4ab0afca..377c0712bf3b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2738,6 +2738,7 @@ void hci_release_dev(struct hci_dev *hdev)
+ 
+ 	ida_simple_remove(&hci_index_ida, hdev->id);
+ 	kfree_skb(hdev->sent_cmd);
++	kfree_skb(hdev->recv_event);
+ 	kfree(hdev);
+ }
+ EXPORT_SYMBOL(hci_release_dev);
+@@ -3022,6 +3023,37 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
+ 	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
  }
  
-+u8 eir_append_service_data(u8 *eir, u16 eir_len, u16 uuid, u8 *data,
-+			   u8 data_len)
++/* Get data from last received event */
++void *hci_recv_event_data(struct hci_dev *hdev, __u8 event)
 +{
-+	eir[eir_len++] = sizeof(u8) + sizeof(uuid) + data_len;
-+	eir[eir_len++] = EIR_SERVICE_DATA;
-+	put_unaligned_le16(uuid, &eir[eir_len]);
-+	eir_len += sizeof(uuid);
-+	memcpy(&eir[eir_len], data, data_len);
-+	eir_len += data_len;
++	struct hci_event_hdr *hdr;
++	int offset;
 +
-+	return eir_len;
-+}
++	if (!hdev->recv_event)
++		return NULL;
 +
- static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
- {
- 	u8 *ptr = data, *uuids_start = NULL;
-@@ -333,3 +346,21 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
- 
- 	return scan_rsp_len;
- }
++	hdr = (void *)hdev->recv_event->data;
++	offset = sizeof(*hdr);
 +
-+void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len)
-+{
-+	while ((eir = eir_get_data(eir, eir_len, EIR_SERVICE_DATA, len))) {
-+		u16 value = get_unaligned_le16(eir);
++	if (hdr->evt != event) {
++		/* In case of LE metaevent check the subevent match */
++		if (hdr->evt == HCI_EV_LE_META) {
++			struct hci_ev_le_meta *ev;
 +
-+		if (uuid == value) {
-+			if (len)
-+				*len -= 2;
-+			return &eir[2];
++			ev = (void *)hdev->recv_event->data + offset;
++			offset += sizeof(*ev);
++			if (ev->subevent == event)
++				goto found;
 +		}
-+
-+		eir += *len;
-+		eir_len -= *len;
++		return NULL;
 +	}
 +
-+	return NULL;
-+}
-diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
-index 43f1945bffc5..62f2374078f2 100644
---- a/net/bluetooth/eir.h
-+++ b/net/bluetooth/eir.h
-@@ -14,6 +14,8 @@ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
- 
- u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
- u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
-+u8 eir_append_service_data(u8 *eir, u16 eir_len, u16 uuid, u8 *data,
-+			   u8 data_len);
- 
- static inline u16 eir_precalc_len(u8 data_len)
- {
-@@ -92,3 +94,5 @@ static inline void *eir_get_data(u8 *eir, size_t eir_len, u8 type,
- 
- 	return NULL;
- }
++found:
++	bt_dev_dbg(hdev, "event 0x%2.2x", event);
 +
-+void *eir_get_service_data(u8 *eir, size_t eir_len, u16 uuid, size_t *len);
++	return hdev->recv_event->data + offset;
++}
++
+ /* Send ACL data */
+ static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
+ {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0270e597c285..8b39b9d31879 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -6933,6 +6933,9 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto done;
+ 	}
+ 
++	kfree_skb(hdev->recv_event);
++	hdev->recv_event = skb_clone(skb, GFP_KERNEL);
++
+ 	event = hdr->evt;
+ 	if (!event) {
+ 		bt_dev_warn(hdev, "Received unexpected HCI Event 0x%2.2x",
 -- 
 2.35.1
 
