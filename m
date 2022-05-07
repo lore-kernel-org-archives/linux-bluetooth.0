@@ -2,124 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 849F9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 May 2022 02:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16F58C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  7 May 2022 12:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445296AbiEGCHZ (ORCPT
+        id S242692AbiEGMhQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 May 2022 22:07:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44438 "EHLO
+        Sat, 7 May 2022 08:37:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445295AbiEGCHY (ORCPT
+        with ESMTP id S233048AbiEGMhN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 May 2022 22:07:24 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6934606C2
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 May 2022 19:03:38 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id a76so7147542qkg.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 May 2022 19:03:38 -0700 (PDT)
+        Sat, 7 May 2022 08:37:13 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808FD10FE4
+        for <linux-bluetooth@vger.kernel.org>; Sat,  7 May 2022 05:33:27 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id q23so13399456wra.1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 07 May 2022 05:33:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=35KFD7ZTTqJhAlmYebtseCoj/LSgykLTjBBpnuJLpcU=;
-        b=dbLDBso8I5Chv9KwgHdCuz7nOtA3YM1ZIsWkU65L6hoovN9DjN/8l80uQ+8ulMbzoT
-         OV4DDN6O1rDHyhtnUUwfjyTXyuYsO8k0P/IBFkopNd/D+jy4rIL+Jf81irON+RxtKwif
-         8eodm0uqVXnTB2+ioZB25jsmcDwWOakebpyucVmo0t2u/tvUxMzFovP1bD+DdgrNjIXu
-         fkBjICbiGqVOn232ayrjLgMMjWqTeWw88Xs19fQjpeOWHY3LOBELgugKaZTqzOY4nreW
-         uqlVz2N2jR41CdjQVvUbfG/FNPBaJIfwHciOceA4AVxOWehl7ljTrgBejnP+agj+dz2s
-         VEPA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uAMT/vodZl+FVN3nPbHGuvnaOQU0eGLHYODulInt4eo=;
+        b=lswj+Q4jSef9nhVSApy1E0vCvwMzfYWnzPMhYS7zHHnvUz3oGF7n7H0Q7dqe3o1NzI
+         cjlgsU+/jvfZWSUmNjAow2sVVrgOHX8PyNMxmat7faOQES8btohZC7qR/DLc+8zxGyzD
+         3Vm1CNeP0Q/2SVJmKtlK8cOUWI4cZ587VhICcXzJORJsco8kuIrM/Cxr4Tt9KHzQTqiM
+         Dj82AdY8TQYIcXOBXZb5GUxSgW2c5LFY5qAzE6j3cqqRBvRkAneqf8K83U+ZSaIhJYha
+         zEwskHUST6QWaMNH4iIgnFhamOmRS+9AKbklJFgapnwanC5tLsrTA+nKMgl8yY3cUYvO
+         msCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=35KFD7ZTTqJhAlmYebtseCoj/LSgykLTjBBpnuJLpcU=;
-        b=MnR6mLevIBauAhqf2+GDRraxXl1bbRKqwKjHbQKvSMDahqo6Yhfg9QiJedL2PvoEia
-         kYoTF1cf2arlIRdiIV/QFGOeH9DI3CdhwoOSrQnsNxs+K+sCmDu2KnqWvYFKN4GJJLbh
-         pkEPc88v+LfP2bYolif3mEDb9owxa7tlNEpzJSTCymx0vLuW5KZabJWOdsJgMLGL7to7
-         PrbDA/SG5nxXBik3eyQ5paAq3Hm6iQd0G2c3W2YaA3rY6kcKuqo61c6FZhtl9yG7nSD5
-         6pJbyPdQLOAxnzVQaaKC6MHlqbUBQJSBADr5nmK1hygkeCkQxVJqwUUofGe6bSnEVfS1
-         Chkg==
-X-Gm-Message-State: AOAM532Ysk5FqO5p1WhG9PISHkON5r8iVa0G1/vfYh/Bdmetp9NR0V+2
-        be6LcfGS014udfngdfNsTWa4D+yxXKipSA==
-X-Google-Smtp-Source: ABdhPJxopSPjBoepSTYY3TIkguXHEunU1EHV51IqqHvPpt8E+hymB/g8LORzUKATCZ9F59cPtzYK/w==
-X-Received: by 2002:ae9:ed0a:0:b0:69f:ae24:87e0 with SMTP id c10-20020ae9ed0a000000b0069fae2487e0mr4574409qkg.705.1651889017977;
-        Fri, 06 May 2022 19:03:37 -0700 (PDT)
-Received: from [172.17.0.2] ([40.87.25.103])
-        by smtp.gmail.com with ESMTPSA id t134-20020a37aa8c000000b0069fc13ce23bsm3341278qke.108.2022.05.06.19.03.37
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uAMT/vodZl+FVN3nPbHGuvnaOQU0eGLHYODulInt4eo=;
+        b=EFVezFIjyezbGIVjxhlLXsk3BE/GS59sfohKzwFd7sGMxgJgH+W9oy+Vx5mXNGfFng
+         kwhLX3v1Vhn4UDd8MsVW+7YeDl0prRSqJgz8jwOlUPTOFxehuoZEOgFLGOulkWFn0R/x
+         xxcjcioDhzaTGhwfobtfGzvV0lo6KXp9E14WL7i96KVJR320XQ6ZnujmroeiDHss0va6
+         0IG9gjUWWb8RirytNr7Ejkgu0nLtUTLWDURtUbh1gQJme6f3AwlLj8LYQgGkJr/omwm5
+         NC4W/3Vqseo4+aXhU/YnHTkkt82ggdJoaJl6vRDPVhkP7OnkCPvYeF8gZVzimYy7ZaON
+         fQ5Q==
+X-Gm-Message-State: AOAM533a4axkfh08Q0W00G0D5+iPS3z4/E90Qj7uQ1mBbqs1lypniQyu
+        KfpGIug8GBPWumrs1C1yTgfmWGMxUov6Uw==
+X-Google-Smtp-Source: ABdhPJzXmwyDLaS5SnSLu417d9nBSXGEB1gR+H12IEVvugqD8dbYDolYAPSurCUtM8Kb0bMkjEeXyA==
+X-Received: by 2002:a05:6000:2a7:b0:20c:4d42:189b with SMTP id l7-20020a05600002a700b0020c4d42189bmr6613107wry.16.1651926805822;
+        Sat, 07 May 2022 05:33:25 -0700 (PDT)
+Received: from localhost.localdomain ([176.228.146.249])
+        by smtp.gmail.com with ESMTPSA id bw26-20020a0560001f9a00b0020ac8c19ecfsm5699140wrb.3.2022.05.07.05.33.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 May 2022 19:03:37 -0700 (PDT)
-Message-ID: <6275d379.1c69fb81.651ad.233a@mx.google.com>
-Date:   Fri, 06 May 2022 19:03:37 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6132503075366029321=="
+        Sat, 07 May 2022 05:33:25 -0700 (PDT)
+From:   Itay Iellin <ieitayie@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com
+Subject: [PATCH] Bluetooth: Fix the creation of hdev->name
+Date:   Sat,  7 May 2022 08:32:48 -0400
+Message-Id: <20220507123248.432213-1-ieitayie@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,BlueZ,1/7] lib: Add definitions for ISO socket
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220506221818.3933843-1-luiz.dentz@gmail.com>
-References: <20220506221818.3933843-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6132503075366029321==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Set a size limit of 8 bytes of the written buffer to "hdev->name"
+including the terminating null byte, as the size of "hdev->name" is 8
+bytes. If an id value which is greater than 9999 is allocated,
+then the "snprintf(hdev->name, sizeof(hdev->name), "hci%d", id)"
+function call would lead to a truncation of the id value in decimal
+notation.
 
-This is automated email and please do not reply to this email!
+Set an explicit maximum id parameter in the id allocation function call.
+The id allocation function defines the maximum allocated id value as the
+maximum id parameter value minus one. Therefore, HCI_MAX_ID is defined
+as 10000.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=639253
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      12.99 seconds
-GitLint                       PASS      7.20 seconds
-Prep - Setup ELL              PASS      40.08 seconds
-Build - Prep                  PASS      0.70 seconds
-Build - Configure             PASS      8.26 seconds
-Build - Make                  PASS      1347.34 seconds
-Make Check                    PASS      11.18 seconds
-Make Check w/Valgrind         PASS      407.45 seconds
-Make Distcheck                PASS      217.19 seconds
-Build w/ext ELL - Configure   PASS      8.40 seconds
-Build w/ext ELL - Make        PASS      1337.26 seconds
-Incremental Build with patchesPASS      9576.02 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[v2,BlueZ,6/7] tools: Add isotest tool
-WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
-#1222: FILE: tools/isotest.c:1106:
-+		/* fall through */
-
-/github/workspace/src/12841684.patch total: 0 errors, 1 warnings, 1219 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12841684.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Itay Iellin <ieitayie@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ include/net/bluetooth/hci_core.h | 3 +++
+ net/bluetooth/hci_core.c         | 6 +++---
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 64d3a63759a8..5a52a2018b56 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -36,6 +36,9 @@
+ /* HCI priority */
+ #define HCI_PRIO_MAX	7
+ 
++/* HCI maximum id value */
++#define HCI_MAX_ID 10000
++
+ /* HCI Core structures */
+ struct inquiry_data {
+ 	bdaddr_t	bdaddr;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index ad4f4ab0afca..5abb2ca5b129 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2555,10 +2555,10 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	 */
+ 	switch (hdev->dev_type) {
+ 	case HCI_PRIMARY:
+-		id = ida_simple_get(&hci_index_ida, 0, 0, GFP_KERNEL);
++		id = ida_simple_get(&hci_index_ida, 0, HCI_MAX_ID, GFP_KERNEL);
+ 		break;
+ 	case HCI_AMP:
+-		id = ida_simple_get(&hci_index_ida, 1, 0, GFP_KERNEL);
++		id = ida_simple_get(&hci_index_ida, 1, HCI_MAX_ID, GFP_KERNEL);
+ 		break;
+ 	default:
+ 		return -EINVAL;
+@@ -2567,7 +2567,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	if (id < 0)
+ 		return id;
+ 
+-	sprintf(hdev->name, "hci%d", id);
++	snprintf(hdev->name, sizeof(hdev->name), "hci%d", id);
+ 	hdev->id = id;
+ 
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
+-- 
+2.30.2
 
---===============6132503075366029321==--
