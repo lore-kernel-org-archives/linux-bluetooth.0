@@ -2,86 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13125C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  8 May 2022 19:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1ABC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 May 2022 13:13:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231402AbiEHT0r (ORCPT
+        id S235303AbiEINRa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 8 May 2022 15:26:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51004 "EHLO
+        Mon, 9 May 2022 09:17:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230172AbiEHT03 (ORCPT
+        with ESMTP id S234316AbiEINR3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 8 May 2022 15:26:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6729913CD4
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 May 2022 12:15:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 19C50B80EA2
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 May 2022 19:15:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B95FDC385A4
-        for <linux-bluetooth@vger.kernel.org>; Sun,  8 May 2022 19:15:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652037302;
-        bh=R2ehK08qzj7wb1+KNvz8NGn9TUvCecosWM6lI/mR2RE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Y9nwyj7MzVUfOezUfES+ICrs/ObaJ/XgmhuOTnvfA96ltg0fP1yz0XbHm7sFfx6co
-         e6INdiGtlfXS8LxzNu2Hz8jdzlWvusUW/Yj/jR0k1RSgVv0msxOxJOPFXzizakwgu6
-         yCUO1EbMnFLn+bwwnc5r9KtLNpFDgNxvnPm9Jk/QYbiP8QQCzqGHBx8Vdx1untmJH/
-         kjjkC7TpNj+4UQ9BR8xq2+hiYAOsUB8DgzWG01YKcroI0Dw1y98mS5dxepcgvzvCFe
-         MGD8uXaKhe3b8HIVuxabn0T7Tdhp4g4gPLB2gKlLXt7UTs63Gah7as5XOGWXtyhWpt
-         aRyZDIflYjLiQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id A4353CC13AF; Sun,  8 May 2022 19:15:02 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Mon, 9 May 2022 09:17:29 -0400
+Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB0081B1F60
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 May 2022 06:13:34 -0700 (PDT)
+X-QQ-mid: bizesmtp78t1652102006tia3f2ix
+Received: from localhost.localdomain ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Mon, 09 May 2022 21:12:52 +0800 (CST)
+X-QQ-SSF: 00400000002000B0D000B00A0000000
+X-QQ-FEAT: RKCwGdK8Yficw090mszTO6r6yITclOhvVTCgkfv5o6awD7CH0w4w7wTGBbb+v
+        yEEbdom/jfdkkiOow505z0xD2ACkcERpku6bWRVHKfwgsKkqJG4YRtexmaWzVwqCaF1Rlrs
+        Spi2pqrg5WSJk1FZ07L0PH8sEUGxuX89l7RllEhej6YzlXwJBKjZixpkGX4w47K9pqXIaiD
+        rYdawYduxUA6Z+75WJP8svqnbSceTEnZaz52pUdUo6yaBpXKcl5SgbQ8wnfbFHkR04l45tf
+        JHE2nEDcCE0J0RFWErbX+xZBBCgzxOYiUBO7KKzSI5GVHkxKlPp+DXxG/1NIL3YB/LnyLB9
+        zSnazwJ
+X-QQ-GoodBg: 2
+From:   wangyouwan <wangyouwan@uniontech.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215189] hci0: unexpected event for opcode 0xfc2f
-Date:   Sun, 08 May 2022 19:15:02 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: shwoseph@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215189-62941-naMJGkqQu1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215189-62941@https.bugzilla.kernel.org/>
-References: <bug-215189-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     wangyouwan <wangyouwan@uniontech.com>
+Subject: [PATCH] =?UTF-8?q?device:=20Fix=20the=20problem=20that=20pairing?= =?UTF-8?q?=20has=20failed=20due=20to=20the=20error=20of=E3=80=80Already?= =?UTF-8?q?=20Paired=20(0x13)?=
+Date:   Mon,  9 May 2022 21:12:39 +0800
+Message-Id: <20220509131239.12189-1-wangyouwan@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign9
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215189
+After connect the Bluetooth mouse, open two Bluetoothctl at the same time,
+when remove the mouse, quickly go to power off,
+try to paired the mouse again when I was power on,
+found that the error 0x13 was always reported.
+try to connect directly,can connect successfully.
+but use the info command to query the information of the mouse
+and find that the pairing status of the mouse is No.
+so I try to delete the paired information in the kernel
+through the "* cancel_pairing()" interface.
 
-shwoseph@gmail.com changed:
+Signed-off-by: wangyouwan <wangyouwan@uniontech.com>
+---
+ src/device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |shwoseph@gmail.com
+diff --git a/src/device.c b/src/device.c
+index 6da5c380b..cd150ec3e 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -3107,7 +3107,12 @@ static DBusMessage *cancel_pairing(DBusConnection *conn, DBusMessage *msg,
+ 	DBG("");
+ 
+ 	if (!req)
++	{
++		btd_adapter_remove_bonding(device->adapter, &device->bdaddr,
++						device->bdaddr_type);
++
+ 		return btd_error_does_not_exist(msg);
++	}
+ 
+ 	device_cancel_bonding(device, MGMT_STATUS_CANCELLED);
+ 
+-- 
+2.20.1
 
---- Comment #2 from shwoseph@gmail.com ---
-I am suffering from this issue as well. It wouldn=E2=80=99t be so bad excep=
-t that the
-message gets printed out to tty1 and messes up my login console on wake from
-sleep.
 
---=20
-You may reply to this email to add a comment.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
