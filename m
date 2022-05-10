@@ -2,334 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8F5C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 09:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDE8C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 10:58:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239252AbiEJJvQ (ORCPT
+        id S240459AbiEJLCM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 May 2022 05:51:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42258 "EHLO
+        Tue, 10 May 2022 07:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239331AbiEJJvN (ORCPT
+        with ESMTP id S240286AbiEJLCI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 May 2022 05:51:13 -0400
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-eopbgr150087.outbound.protection.outlook.com [40.107.15.87])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700392370D7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 May 2022 02:47:16 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OeaWsY6NMah7I58NXxYqQe7l0sP8Ew5YZ7CprWqfORQ5TcS7sTdXwv+YzO0lhJoitSWp6MgkxaETZQgqMtYqHoxD1fJ9ivlVAVuWZYAT1IvXl8iOif6/ZDqtU6hFyC45DcbgTXZBCwAH3F84f3FaP+FSAQ2Zfdrvp946M/Rr8HSjCS+GTowqT8fG/AhpgLrDyZ929BzDiTtVrfTml9GlPNs/m3lcBXl02XyuJ0St6it/N/Djeyp2miisYbe+3C74raAMykRpO8/j/NVdsrWqHz3FV362klUXBJ6hsMURm70Q8b4N9zLWP8beBZjJiRKaoCMCTKfRgBY2wbt5gJl7aA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HHLFy5nTP2LOSKHg/n5RLqpn6jw8ToMf1Ec36DPH0ss=;
- b=V1vzWpO+kxYarVnl8DH/Tys/n71cq68/oy8hTi2PF64dmhYKXz+Vu3u8PWmzAQeHPgxJVtdcXuBvk02y5fOczy+6qjUx+O/w8nGJB8/XJSFI6xFzVcG8rIlFwtrfksBmqEW+SMvpl9rYmSzJagKLh50d9owa1nUqWQC47U1c1oB99QotFqADYxVaA0oKrKm0ftjmegRPaav0BAf9b78/vLDVS5fPulpia+0bawny828dPbhLZnROoh7oCVciJ60p+0Cr9UWtfDIN4dVXtGhy5R+BGnYiBBqVc5vRZcD9c8itboH315I8Mh5ImcDRLHupATEgZvdeQAyJaFU8AJVSzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HHLFy5nTP2LOSKHg/n5RLqpn6jw8ToMf1Ec36DPH0ss=;
- b=rlz4UMzfPZCS8dxmnACLkNIOStJ8kKXxOkcdARWmPhXA+V36253WkNhIvEIq9JbZ2jAejar97Xf/O3L/7dVgAJKcN/KXtUkNjIcMAyFOMdqTOg4bhFHypmL+gjkfdID8JWED0P3Nvjaxi29f41dkFiE2iEDFfDe3ymN9w86peek=
-Received: from AS8PR04MB8404.eurprd04.prod.outlook.com (2603:10a6:20b:3f8::7)
- by DU2PR04MB8549.eurprd04.prod.outlook.com (2603:10a6:10:2d4::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23; Tue, 10 May
- 2022 09:47:14 +0000
-Received: from AS8PR04MB8404.eurprd04.prod.outlook.com
- ([fe80::881e:9703:7584:80d5]) by AS8PR04MB8404.eurprd04.prod.outlook.com
- ([fe80::881e:9703:7584:80d5%6]) with mapi id 15.20.5227.023; Tue, 10 May 2022
- 09:47:14 +0000
-From:   Sherry Sun <sherry.sun@nxp.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: observe the kernel panic (use-after-free in hci_le_conn_failed) when
- connect the BLE device failed on L5.17.0-rc8 
-Thread-Topic: observe the kernel panic (use-after-free in hci_le_conn_failed)
- when connect the BLE device failed on L5.17.0-rc8 
-Thread-Index: AdhkUtoL7lAi/117QumjYlgpO3ds9A==
-Date:   Tue, 10 May 2022 09:47:13 +0000
-Message-ID: <AS8PR04MB8404AB7E63BB4533852BB4C992C99@AS8PR04MB8404.eurprd04.prod.outlook.com>
-Accept-Language: zh-CN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3eed8089-6a5f-48db-c66b-08da326a0fdb
-x-ms-traffictypediagnostic: DU2PR04MB8549:EE_
-x-microsoft-antispam-prvs: <DU2PR04MB854996A51A69220B27DA23C892C99@DU2PR04MB8549.eurprd04.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: vAsh6hoRwUngMDW40LToQE7UHIG+Kf5ju8CN++JbLJpZkVcVI6EWINHXfK0SKkIRekkxse4/ap02JNShfb5sw+fvmbX6xr2f2bFVcs5L5UqAZSKntxV1MTkCALkFfYdLGYipvgbRQlL9JGUZz/e07ntTQ6vnhTijab6cFNEqEHIohNJhM0V8hnR0M0owGplkx3NLwricwD9CF5lBXPJeTCve1St2lxT0RGtLTyC7SWhZALev+XicE0C03InuOJByGOWmqshjO+uLwfOG4pteyFbJf0sALHAPO4YXMqt66Q3G4Bak0AOVPBOyCC0ZdDf+cvkPzjtLRLZWMKFlVofjw/nyFZHuynNUE4Swpe4tIyTMgj0AyAYWvkJR1RVW60Gs7QhvNpnNOOKoU936U4Se1KqPs3F7yOpGy/Y3YFy4By7T2ix4Ik3yafKEd+vWxLCAWSr0IytRs2GEbRyKvNmVHXIMTxwxTAyGejeESFCv+mSaVUsu94wccU5AugaJZ+owLkA+Z2U9Sxwc/8/5qivtgDekSXoGfIwLtp50rb16vBFPoP/0iFlaClRLyGo+IP/kazig81ZMIVp6n0zkIWlQIv7yY1qx4+TVG7/mMZ2kR6jqP7QeJ8hZTMFEY1fD1k4y2kSMT0n3D6Shx1i9LchsTs2ENJV6CDP4+bmAP30T33A8wTWQJelhp9XRpcSjF+gqCK1V9ERCdjlsC3EJoP48DA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR04MB8404.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(122000001)(2906002)(44832011)(52536014)(8936002)(55016003)(38070700005)(38100700002)(5660300002)(83380400001)(508600001)(4326008)(45080400002)(33656002)(186003)(66946007)(76116006)(66446008)(64756008)(66476007)(66556008)(8676002)(316002)(54906003)(6916009)(7696005)(6506007)(9686003)(26005)(4743002)(71200400001)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6oqNz+vicPu0c2+eeTsi81HzTo4GVF6hy7tQvsb3bA3WYWGLkc5B6GfExZEv?=
- =?us-ascii?Q?0hLkRmIc+ETBo+6grtZpZieZC1zlvWCpnZUaqsS4OE9QPH4Bbb+LfzhMYPXK?=
- =?us-ascii?Q?2f86cwiAaSmwZe7w9gOVfmvM1So/xGACmRl+ISxVb/Nv/JhhChbVkkVy2FA1?=
- =?us-ascii?Q?CoE0qm9x84U4h+s/6fTzeN7hHAH2ie2rBEK0pqXYCwzIWF20xTY7KyGwnaK3?=
- =?us-ascii?Q?oBGILHyxhrTDJkHn4DqI+Ox+0XzEsJObvH2SQPfvMQN1pbypPKg3gwupcsVr?=
- =?us-ascii?Q?1WD7netAaWSk9oqkdssr1VHKqcn3PVRfHXnVDluKeDEa0KoVplTLfEE0ukue?=
- =?us-ascii?Q?rUVeA7l2Ho44AduGW1/WamxfU++p+vP0kiYiL9AGqQl0ixteS6BKmnVBhJDe?=
- =?us-ascii?Q?jxDKo5Duid/pUX/vbsw6FiQ0JSK3qR5rmR8C+TWdZfkjO+1px+AzNGeBihOu?=
- =?us-ascii?Q?PjBniYXSc8Fd+bZscYSjFJ0jPn0/NbfALSSgHLjNxWkwI/Xu0rhP1IxpeAdZ?=
- =?us-ascii?Q?J4Ljwzv1T0bBTbEcgWfMOBmk5LWOdxl9V984AGX+T32SNFlK53XFhauhojDR?=
- =?us-ascii?Q?c43C+TlxZ3F9SuiJl+kja7ThoBctrnEyRQLS0Nw5tqMmjeQpgZZ6z12Ab2uq?=
- =?us-ascii?Q?u2vrw6l4LtxNUBT5NZcCLDUGa9oalyqQJuO+KnA9sfBHLvXNwD2Ev6XzeoDJ?=
- =?us-ascii?Q?hOk9DE31Z0d9f3qTnpvstFXvicfWb6g4nzOUxu5tXlzVN9XUU/2bA6g6wcEu?=
- =?us-ascii?Q?8W6hDyYrIwzo/ml/OUtb/+b5v9sdTHfRTddmIlPA0OW958uiXK555YOXYrDb?=
- =?us-ascii?Q?gkkyTqf4F3iq745NvFldqTOAqdtdoTYdMdMMaWHp76VIoeobZ5y1PU6+cEh6?=
- =?us-ascii?Q?pJmRJ/SpJq/wKS2DYugtSLiEx31H3bSaO/u5G1xZsXArl36zQz4T7U2WZR5X?=
- =?us-ascii?Q?M9ejxV+PgrtfukZKEi3T936dtwg+gJyLUb6mVscBkUjAsNA47PMGglUMJX1v?=
- =?us-ascii?Q?KDH7NZArOgAqeb55f/Stt0w8FlmqfIE7CgLFUM3sO0tRSLTJTXnVGw4SbncM?=
- =?us-ascii?Q?kbHoKAsNEM9YXBiyHTlblIA9swoKFEvOdOdN6CaE1krp5rtegWQBiAZjlqE8?=
- =?us-ascii?Q?r8VPVCecCAwe2EfsDQPRWT2ICv61sV+CesoxKVLQeiSAELDvy10p0Rj/Omph?=
- =?us-ascii?Q?Wjx959yNUVbRG4ZUfvzhzyqznTR0r5BL0dUolheJXXuv9yuNUo4/CnCU0S7R?=
- =?us-ascii?Q?XnGjQxb+bnCJnmIwmaGU+jMUnb+hjnUjCkHDwzxzvE+3N94kS4SXaG0GKqgP?=
- =?us-ascii?Q?jefsgRnPFF84oBaidvzVho7+oV5AFq5M2VZqX6591Dsqwp/Yk8LSgogBgcqJ?=
- =?us-ascii?Q?/aCgkIkEVJg25sGcI8MsxhhjklOZRoTgJFb8+scU9k5rFoW7Nb+RheMxNVh/?=
- =?us-ascii?Q?eop6DSs9A371DWfmBNx/NyjVNYA2rR69e4VsH88rBIV1/zIqE5BT6nThlY3C?=
- =?us-ascii?Q?Nn3u42u57IHzT8HNhxEknogZNMOyxC1/KAWHtcZ6JFAQ/F+yYcGHYCRpBKG3?=
- =?us-ascii?Q?qEtaVECokP1Ls17SiFMD3s26/eWmA74lKRnKM89z83Wtn0xbkeLJcljIb+Wf?=
- =?us-ascii?Q?qjfWqKoPPvDmH8Quj5Dv36iK0OlEnfc6K1wdUvkfk8Lf7nosKbaf7p5TSgaY?=
- =?us-ascii?Q?i3jeYzwjlXTHW6YC30535+Lmm5PfRfo68OLKZ2RIvaW2p1HachmdP3rxPwRh?=
- =?us-ascii?Q?eCu3oaJh4A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 10 May 2022 07:02:08 -0400
+X-Greylist: delayed 1306 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 May 2022 03:58:07 PDT
+Received: from fallback17.mail.ru (fallback17.m.smailru.net [94.100.176.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1298201E80
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 May 2022 03:58:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail4;
+        h=Content-Transfer-Encoding:Content-Type:In-Reply-To:Subject:References:Cc:To:From:MIME-Version:Date:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=L3YmQNDwiCXO4DrGfWrJfqXFeboZlajyEeIQAv4zh6I=;
+        t=1652180287;x=1652785687; 
+        b=y/LJGn3l6lgzXRsRVACPrP8pqMOGMJ4uXtt71opGDccDMQwnN0ZkVmH0qMfQiuLdTwYnFVQ0d+3EHULGXcW/sx9RUKs8oQvwoDQoB+r5RwI8yTILe8IAuC38fU2FRqnHlaYtf9TjR5vGhvulIAn8xF+xgDBWNMZ5N+5QppMDR7zOlhauY6AYrEVh5wYOh9ZVBEBIEG+z/HhsFCBw/8FN9As+Ge1VZMNimrLJ3iaGdOkn3K7f7//Hj2oT+sDWO+xYgVzosTtT336t5CZm4Q3Vqh8tz3PbpTXwzUd5I6A3nY1pkq7MVUYLGv9sL/ZeroTTtLF5kbLr6ug6lIapQ+HXYQ==;
+Received: from [10.161.22.25] (port=52130 helo=smtp55.i.mail.ru)
+        by fallback17.m.smailru.net with esmtp (envelope-from <joey.corleone@mail.ru>)
+        id 1noNE2-0000d8-Rb; Tue, 10 May 2022 13:36:19 +0300
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail4;
+        h=Content-Transfer-Encoding:Content-Type:In-Reply-To:Subject:References:Cc:To:From:MIME-Version:Date:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=L3YmQNDwiCXO4DrGfWrJfqXFeboZlajyEeIQAv4zh6I=;
+        t=1652178978;x=1652784378; 
+        b=c6Y6GKXYf2PKVL2nju60r4yfaF/V5wVdm2SJYcbYmI2h8YWXcD09tHu6y5llaOsx8rI8DJnHDWZmrV8/ryKP5mLsOtvPH4hxKsPZ0ESQjE+RwgzO+tAEUHtp8u/xb0NoccrY4RVtgYx1Zd8ScgZOhRPaiIep5rWvkcTD1xWO9cqrHyZufDWFgW1HyrLic49oOSiNjfj7GsFyllMXH0N312T0Umr/HyhVm1+rAuenD01Vq4wQ207qE3Xdbf2paeIdZmrp7M3ryj8CsMkyviH75mUlVJcsFJ915n3LeRFOmfLM6gy0quA88ByRU1mgr+3OKP/f/Trb67GqSe3tfSBWUg==;
+Received: by smtp55.i.mail.ru with esmtpa (envelope-from <joey.corleone@mail.ru>)
+        id 1noNDu-0008Hi-Dg; Tue, 10 May 2022 13:36:10 +0300
+Message-ID: <44f9b7f2-ac5f-55e9-e72b-cebe1d9bda80@mail.ru>
+Date:   Tue, 10 May 2022 12:36:00 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS8PR04MB8404.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3eed8089-6a5f-48db-c66b-08da326a0fdb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 May 2022 09:47:13.9705
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O4qHYku9CA+8eN/M0BVgxD22M577wVtFNxcq12v6gtkTtGceC6nUve+erxeOoPE6XKNZYQY9sf4k98JohhddVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8549
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+From:   Joey Corleone <joey.corleone@mail.ru>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
+References: <20220224151147.119619-1-luiz.dentz@gmail.com>
+ <46FADD2F-2B35-4CC7-BC01-CACB81FC6FAE@holtmann.org>
+Content-Language: en-US
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
+In-Reply-To: <46FADD2F-2B35-4CC7-BC01-CACB81FC6FAE@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-7564579A: B8F34718100C35BD
+X-77F55803: 4F1203BC0FB41BD9D611630AF6200BAFEFCD3CDEC2FEE866C771F55010ECFC94182A05F5380850402CF28C8A5930B01A9DDCACC9FB0DEEA6B072943EE4690130EEA4FD5B542D4146
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7B9D6DADD6B53929DEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F79006378D70459434292EC88638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8823A546A550F282323EF34CCF4084A1E6F9789CCF6C18C3F8528715B7D10C86878DA827A17800CE73D04F0695778128A9FA2833FD35BB23D9E625A9149C048EE26055571C92BF10FE5D25F19253116ADD2E47CDBA5A96583BD4B6F7A4D31EC0BC014FD901B82EE079FA2833FD35BB23D27C277FBC8AE2E8B1A9C11735BBA05FBA471835C12D1D977C4224003CC836476EB9C4185024447017B076A6E789B0E975F5C1EE8F4F765FC3991949FB789967B3AA81AA40904B5D9CF19DD082D7633A078D18283394535A93AA81AA40904B5D98AA50765F790063785F20CC23D277B7AD81D268191BDAD3D698AB9A7B718F8C4D1B931868CE1C5781A620F70A64A45A98AA50765F79006372E808ACE2090B5E1725E5C173C3A84C3C5EA940A35A165FF2DBA43225CD8A89F3A8A7E6F3D1559285E1C53F199C2BB95B5C8C57E37DE458BEDA766A37F9254B7
+X-8FC586DF: 6EFBBC1D9D64D975
+X-C1DE0DAB: 0D63561A33F958A5B6B223FAFB34206065F2405749FDEA057DF03EECB07794F8D59269BC5F550898D99A6476B3ADF6B4886A5961035A09600383DAD389E261318FB05168BE4CE3AF
+X-C8649E89: 4E36BF7865823D7055A7F0CF078B5EC49A30900B95165D34E69981C39E7B068A20F1BDFA68636FB1CAB9E203EB8402CD2ACAF1466146AB6B339942E759AC44901D7E09C32AA3244C66BE0F5804BAEEC57D2C10FFBBD72D877C0C08F7987826B9927AC6DF5659F194
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojHSSTTj/1E5JGQrZ1zheX/g==
+X-Mailru-Sender: DED7486378921B4FACC540DC0644B2C119F1615C1900E78F689C242C3A78447776A57DEB513830E0C7BD54E8F9380F2338FA998476DAE4F3C2C748B250BAC47DFBB808E5A3D83AADCC0C6A881B01D7986DAEE9A828B31F4FEAB4BC95F72C04283CDA0F3B3F5B9367
+X-Mras: Ok
+X-7564579A: 646B95376F6C166E
+X-77F55803: 6242723A09DB00B47675259DE6CCD0836881391AB7CA884DE0CE0B444BB75180049FFFDB7839CE9E119AD1F268BF77D671CFDD5739A4F042048EA7E7AEE0660A1D782E1076260C94
+X-7FA49CB5: 0D63561A33F958A58A6242602D53BFBEBD3AC8C4F66E4175AFDF1CC2358EC69DCACD7DF95DA8FC8BD5E8D9A59859A8B64071617579528AACCC7F00164DA146DAFE8445B8C89999728AA50765F790063706CBA4EB72A0A67C389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC8A5ED62E35AC703CCF6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA73AA81AA40904B5D9A18204E546F3947C9D50A20087A7B80B6E0066C2D8992A164AD6D5ED66289B52698AB9A7B718F8C442539A7722CA490CD5E8D9A59859A8B60049E179A48B82B7089D37D7C0E48F6C5571747095F342E88FB05168BE4CE3AF
+X-C1DE0DAB: 0D63561A33F958A58A6242602D53BFBEBD3AC8C4F66E4175A32048312F3CC41BD59269BC5F550898D99A6476B3ADF6B4886A5961035A09600383DAD389E261318FB05168BE4CE3AF
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojHSSTTj/1E5KbgjyZsl51+A==
+X-Mailru-MI: 8000000000000800
+X-Mras: Ok
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, Bluetooth community:
+On 24.02.22 21:08, Marcel Holtmann wrote:
+> Hi Luiz,
+> 
+>> hci_update_accept_list_sync is returning the filter based on the error
+>> but that gets overwritten by hci_le_set_addr_resolution_enable_sync
+>> return instead of using the actual result of the likes of
+>> hci_le_add_accept_list_sync which was intended.
+>>
+>> Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
+>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> ---
+>> v2: Use u8 filter_policy instead of int ret as variable to store the result.
+>>
+>> net/bluetooth/hci_sync.c | 5 ++++-
+>> 1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> patch has been applied to bluetooth-stable tree.
+> 
+> Regards
+> 
+> Marcel
 
-When I try to connect the BLE device to i.MX8mm platform on L5.17.0-rc8 ker=
-nel, sometimes BLE connection may fail, at which point I can observe an ker=
-nel panic (Unable to handle kernel paging request at virtual address 000780=
-24e000003b), then I enabled the KASAN, found there is a use-after-free issu=
-e in hci_le_conn_failed(), check the following error logs for details.
-There is no such issue with the L5.15 kernel. Has anyone observed the simil=
-ar issue on L5.17.0-rc8 kernel? Or have any idea regarding this issue? Many=
- thanks.
+Just to put you in the loop in case you have not noticed it yet: there 
+seems to be some kind of regression introduced by this patch. See 
+comment #5 of ticket 215768 where Damien Thébault bisected the kernel [1].
 
-Error logs:
-[bluetooth]# connect E3:BD:5B:22:90:68
-Attempting to connect to E3:BD:5B:22:90:68
-[bluetooth]# [  552.446716] Bluetooth: hci0: Opcode 0x200d failed: -110
-Failed to connect: org.bluez.Error.Failed=20
-[  552.467725] Bluetooth: hci0: request failed to create LE connection: err=
- -110
-[  552.481726] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[  552.488966] BUG: KASAN: use-after-free in hci_le_conn_failed+0x4b0/0x5a0
-[  552.495695] Read of size 8 at addr ffff0000126da570 by task kworker/u9:0=
-/73
-[  552.502667]
-[  552.504169] CPU: 2 PID: 73 Comm: kworker/u9:0 Tainted: G           O    =
-  5.17.0-rc8-next-20220315-00001-g7c4f5ebecd82-dirty #245
-[  552.515834] Hardware name: FSL i.MX8MM EVK board (DT)
-[  552.520894] Workqueue: hci0 hci_cmd_sync_work
-[  552.525275] Call trace:
-[  552.527727]  dump_backtrace.part.0+0x210/0x220
-[  552.532190]  show_stack+0x18/0x6c
-[  552.535518]  dump_stack_lvl+0x68/0x84
-[  552.539199]  print_report+0x160/0x5bc
-[  552.542878]  kasan_report+0xa4/0xf0
-[  552.546378]  __asan_report_load8_noabort+0x3c/0x50
-[  552.551185]  hci_le_conn_failed+0x4b0/0x5a0
-[  552.555378]  create_le_conn_complete+0x60/0xb0
-[  552.559836]  hci_cmd_sync_work+0x128/0x210
-[  552.563945]  process_one_work+0x60c/0xf04
-[  552.567971]  worker_thread+0x3bc/0xe1c
-[  552.571731]  kthread+0x278/0x2e0
-[  552.574976]  ret_from_fork+0x10/0x20
-[  552.578568]
-[  552.580065] Allocated by task 518:
-[  552.583474]  kasan_save_stack+0x2c/0x54
-[  552.587323]  __kasan_kmalloc+0x90/0xbc
-[  552.591086]  hci_conn_add+0x70/0xe50
-[  552.594670]  hci_connect_le_scan+0x23c/0x71c
-[  552.598952]  l2cap_chan_connect+0xbe8/0x11ec
-[  552.603238]  l2cap_sock_connect+0x298/0x57c
-[  552.607434]  __sys_connect+0x1e4/0x240
-[  552.611198]  __arm64_sys_connect+0x6c/0xa0
-[  552.615306]  invoke_syscall+0x6c/0x260
-[  552.619073]  el0_svc_common.constprop.0+0x17c/0x280
-[  552.623962]  do_el0_svc+0xa0/0xd0
-[  552.627292]  el0_svc+0x4c/0x8c
-[  552.630360]  el0t_64_sync_handler+0xa4/0x130
-[  552.634649]  el0t_64_sync+0x18c/0x190
-[  552.638325]
-[  552.639821] Freed by task 476:
-[  552.642882]  kasan_save_stack+0x2c/0x54
-[  552.646731]  kasan_set_track+0x2c/0x40
-[  552.650494]  kasan_set_free_info+0x28/0x50
-[  552.654603]  __kasan_slab_free+0xec/0x13c
-[  552.658625]  kfree+0xd4/0x280
-[  552.661605]  bt_link_release+0x2c/0x3c
-[  552.665366]  device_release+0xe4/0x1f0
-[  552.669131]  kobject_put+0x130/0x244
-[  552.672722]  put_device+0x18/0x30
-[  552.676049]  hci_conn_cleanup+0x230/0x4d4
-[  552.680068]  hci_conn_del+0x46c/0x4a4
-[  552.683740]  hci_le_conn_failed+0x318/0x5a0
-[  552.687935]  le_conn_complete_evt.part.0+0x778/0x15a0
-[  552.693008]  hci_le_enh_conn_complete_evt+0x224/0x330
-[  552.698075]  hci_le_meta_evt+0x1cc/0x40c
-[  552.702011]  hci_event_packet+0x3e0/0x165c
-[  552.706123]  hci_rx_work+0x2e0/0x580
-[  552.709715]  process_one_work+0x60c/0xf04
-[  552.713735]  worker_thread+0x3bc/0xe1c
-[  552.717495]  kthread+0x278/0x2e0
-[  552.720739]  ret_from_fork+0x10/0x20
-[  552.724330]
-[  552.725824] Last potentially related work creation:
-[  552.730708]  kasan_save_stack+0x2c/0x54
-[  552.734557]  __kasan_record_aux_stack+0xa0/0xd0
-[  552.739100]  kasan_record_aux_stack_noalloc+0x14/0x20
-[  552.744168]  __queue_work+0x428/0xd14
-[  552.747846]  __queue_delayed_work+0x144/0x220
-[  552.752216]  queue_delayed_work_on+0xa0/0xe0
-[  552.756498]  l2cap_chan_del+0x4b8/0xb50
-[  552.760343]  l2cap_conn_del+0x254/0x694
-[  552.764187]  l2cap_connect_cfm+0x698/0xb10
-[  552.768299]  hci_le_conn_failed+0x2c4/0x5a0
-[  552.772494]  le_conn_complete_evt.part.0+0x778/0x15a0
-[  552.777565]  hci_le_enh_conn_complete_evt+0x224/0x330
-[  552.782630]  hci_le_meta_evt+0x1cc/0x40c
-[  552.786567]  hci_event_packet+0x3e0/0x165c
-[  552.790680]  hci_rx_work+0x2e0/0x580
-[  552.794273]  process_one_work+0x60c/0xf04
-[  552.798292]  worker_thread+0x3bc/0xe1c
-[  552.802056]  kthread+0x278/0x2e0
-[  552.805295]  ret_from_fork+0x10/0x20
-[  552.808883]
-[  552.810380] Second to last potentially related work creation:
-[  552.816133]  kasan_save_stack+0x2c/0x54
-[  552.819984]  __kasan_record_aux_stack+0xa0/0xd0
-[  552.824526]  kasan_record_aux_stack_noalloc+0x14/0x20
-[  552.829592]  __queue_work+0x428/0xd14
-[  552.833264]  delayed_work_timer_fn+0x68/0xa0
-[  552.837546]  call_timer_fn.constprop.0+0x54/0x15c
-[  552.842269]  __run_timers.part.0+0x3f4/0x604
-[  552.846553]  run_timer_softirq+0x78/0x110
-[  552.850580]  _stext+0x29c/0x7d8
-[  552.853734]
-[  552.855229] The buggy address belongs to the object at ffff0000126da000
-[  552.855229]  which belongs to the cache kmalloc-2k of size 2048
-[  552.867759] The buggy address is located 1392 bytes inside of
-[  552.867759]  2048-byte region [ffff0000126da000, ffff0000126da800)
-[  552.879683]
-[  552.881180] The buggy address belongs to the physical page:
-[  552.886761] page:00000000bc19f159 refcount:1 mapcount:0 mapping:00000000=
-00000000 index:0x0 pfn:0x526d8
-[  552.896083] head:00000000bc19f159 order:3 compound_mapcount:0 compound_p=
-incount:0
-[  552.903576] flags: 0x3fffc0000010200(slab|head|node=3D0|zone=3D0|lastcpu=
-pid=3D0xffff)
-[  552.910910] raw: 03fffc0000010200 dead000000000100 dead000000000122 ffff=
-000008002900
-[  552.918663] raw: 0000000000000000 0000000080080008 00000001ffffffff 0000=
-000000000000
-[  552.926413] page dumped because: kasan: bad access detected
-[  552.931989]
-[  552.933486] Memory state around the buggy address:
-[  552.938285]  ffff0000126da400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb=
- fb fb
-[  552.945518]  ffff0000126da480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb=
- fb fb
-[  552.952752] >ffff0000126da500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb=
- fb fb
-[  552.959980]                                                             =
- ^
-[  552.966862]  ffff0000126da580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb=
- fb fb
-[  552.974093]  ffff0000126da600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb=
- fb fb
-[  552.981323] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[  552.988700] Disabling lock debugging due to kernel taint
-[  552.994223] hci0 hcon 00000000c12ea080 handle 65535
-[  552.994267] Unable to handle kernel paging request at virtual address 00=
-078024e000003b
-[  553.007176] Mem abort info:
-[  553.009986]   ESR =3D 0x96000004
-[  553.013078]   EC =3D 0x25: DABT (current EL), IL =3D 32 bits
-[  553.018460]   SET =3D 0, FnV =3D 0
-[  553.021615]   EA =3D 0, S1PTW =3D 0
-[  553.024845]   FSC =3D 0x04: level 0 translation fault
-[  553.029772] Data abort info:
-[  553.032726]   ISV =3D 0, ISS =3D 0x00000004
-[  553.036617]   CM =3D 0, WnR =3D 0
-[  553.039651] [00078024e000003b] address between user and kernel address r=
-anges
-[  553.046850] Internal error: Oops: 96000004 [#1] PREEMPT SMP
-[  553.052450] Modules linked in: moal(O) mlan(O)
-[  553.056948] CPU: 3 PID: 73 Comm: kworker/u9:0 Tainted: G    B      O    =
-  5.17.0-rc8-next-20220315-00001-g7c4f5ebecd82-dirty #245
-[  553.056965] Hardware name: FSL i.MX8MM EVK board (DT)
-[  553.056974] Workqueue: hci0 hci_cmd_sync_work
-[  553.073677] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=
-=3D--)
-[  553.085004] pc : hci_conn_cleanup+0x128/0x4d4
-[  553.085019] lr : hci_conn_cleanup+0x42c/0x4d4
-[  553.093734] sp : ffff80000d797ae0
-[  553.093740] x29: ffff80000d797ae0 x28: ffff00000e85f938 x27: 00000000000=
-00002
-[  553.104206] x26: 1fffe00001d0bf27 x25: ffff000010a78000 x24: ffff000010a=
-78000
-[  553.104227] x23: dfff800000000000 x22: ffff0000126da0e8 x21: ffff00000f9=
-8d000
-[  553.104249] x20: ffff0000126da000 x19: a0400127000001dc x18: 00000000000=
-00000
-[  553.118534] x17: ffff80000ac1f008 x16: ffff80000ac1ed74 x15: 00000000000=
-00007
-[  553.132821] x14: 0000000000000000 x13: 0000000000000007 x12: ffff6000024=
-db41d
-[  553.139981] x11: 1fffe000024db41c x10: ffff6000024db41c x9 : dfff8000000=
-00000
-[  553.140000] x8 : ffff0000126da0e4 x7 : 0000000000000001 x6 : 00000000000=
-00004
-[  553.154287] x5 : ffff0000126da0e4 x4 : 0000000000000000 x3 : ffff80000ab=
-714cc
-[  553.154318] x2 : 0000000000000001 x1 : 14080024e000003b x0 : dfff8000000=
-00000
-[  553.168614] Call trace:
-[  553.168625]  hci_conn_cleanup+0x128/0x4d4
-[  553.175094]  hci_conn_del+0x46c/0x4a4
-[  553.178775]  hci_le_conn_failed+0x318/0x5a0
-[  553.182970]  create_le_conn_complete+0x60/0xb0
-[  553.187425]  hci_cmd_sync_work+0x128/0x210
+Joey
 
-Message from syslogd@  at Fri Nov 19 17:28:03 2021 ...
-: Internal error: Oops: 96000004 [#1] PREEMPT SMP
-[  553.201344]  process_one_work+0x60c/0xf04
-[  553.205379]  worker_thread+0x3bc/0xe1c
-[  553.209137]  kthread+0x278/0x2e0
-[  553.212378]  ret_from_fork+0x10/0x20
-[  553.215973] Code: d343fe61 d2d00000 f2fbffe0 f90006b3 (38e06820)
-[  553.222079] ---[ end trace 0000000000000000 ]---
-
-Message from syslogd@  at Fri Nov 19 17:28:03 2021 ...
-: Code: d343fe61 d2d00000 f2fbffe0 f90006b3 (38e06820)
-
-Best regards
-Sherry
-
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=215768#c5
