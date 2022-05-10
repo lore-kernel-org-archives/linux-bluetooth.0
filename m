@@ -2,96 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FDE8C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 10:58:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 085AAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 15:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240459AbiEJLCM (ORCPT
+        id S1345817AbiEJPfC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 May 2022 07:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46304 "EHLO
+        Tue, 10 May 2022 11:35:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240286AbiEJLCI (ORCPT
+        with ESMTP id S1345804AbiEJPea (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 May 2022 07:02:08 -0400
-X-Greylist: delayed 1306 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 10 May 2022 03:58:07 PDT
-Received: from fallback17.mail.ru (fallback17.m.smailru.net [94.100.176.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1298201E80
-        for <linux-bluetooth@vger.kernel.org>; Tue, 10 May 2022 03:58:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail4;
-        h=Content-Transfer-Encoding:Content-Type:In-Reply-To:Subject:References:Cc:To:From:MIME-Version:Date:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=L3YmQNDwiCXO4DrGfWrJfqXFeboZlajyEeIQAv4zh6I=;
-        t=1652180287;x=1652785687; 
-        b=y/LJGn3l6lgzXRsRVACPrP8pqMOGMJ4uXtt71opGDccDMQwnN0ZkVmH0qMfQiuLdTwYnFVQ0d+3EHULGXcW/sx9RUKs8oQvwoDQoB+r5RwI8yTILe8IAuC38fU2FRqnHlaYtf9TjR5vGhvulIAn8xF+xgDBWNMZ5N+5QppMDR7zOlhauY6AYrEVh5wYOh9ZVBEBIEG+z/HhsFCBw/8FN9As+Ge1VZMNimrLJ3iaGdOkn3K7f7//Hj2oT+sDWO+xYgVzosTtT336t5CZm4Q3Vqh8tz3PbpTXwzUd5I6A3nY1pkq7MVUYLGv9sL/ZeroTTtLF5kbLr6ug6lIapQ+HXYQ==;
-Received: from [10.161.22.25] (port=52130 helo=smtp55.i.mail.ru)
-        by fallback17.m.smailru.net with esmtp (envelope-from <joey.corleone@mail.ru>)
-        id 1noNE2-0000d8-Rb; Tue, 10 May 2022 13:36:19 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mail.ru; s=mail4;
-        h=Content-Transfer-Encoding:Content-Type:In-Reply-To:Subject:References:Cc:To:From:MIME-Version:Date:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=L3YmQNDwiCXO4DrGfWrJfqXFeboZlajyEeIQAv4zh6I=;
-        t=1652178978;x=1652784378; 
-        b=c6Y6GKXYf2PKVL2nju60r4yfaF/V5wVdm2SJYcbYmI2h8YWXcD09tHu6y5llaOsx8rI8DJnHDWZmrV8/ryKP5mLsOtvPH4hxKsPZ0ESQjE+RwgzO+tAEUHtp8u/xb0NoccrY4RVtgYx1Zd8ScgZOhRPaiIep5rWvkcTD1xWO9cqrHyZufDWFgW1HyrLic49oOSiNjfj7GsFyllMXH0N312T0Umr/HyhVm1+rAuenD01Vq4wQ207qE3Xdbf2paeIdZmrp7M3ryj8CsMkyviH75mUlVJcsFJ915n3LeRFOmfLM6gy0quA88ByRU1mgr+3OKP/f/Trb67GqSe3tfSBWUg==;
-Received: by smtp55.i.mail.ru with esmtpa (envelope-from <joey.corleone@mail.ru>)
-        id 1noNDu-0008Hi-Dg; Tue, 10 May 2022 13:36:10 +0300
-Message-ID: <44f9b7f2-ac5f-55e9-e72b-cebe1d9bda80@mail.ru>
-Date:   Tue, 10 May 2022 12:36:00 +0200
+        Tue, 10 May 2022 11:34:30 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76BF5E5291
+        for <linux-bluetooth@vger.kernel.org>; Tue, 10 May 2022 08:29:21 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1noRna-0003Ij-9F; Tue, 10 May 2022 17:29:18 +0200
+Message-ID: <7583787f-0bc5-c2fc-3f78-3ed566eae152@leemhuis.info>
+Date:   Tue, 10 May 2022 17:29:17 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-From:   Joey Corleone <joey.corleone@mail.ru>
-To:     Marcel Holtmann <marcel@holtmann.org>,
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
+Content-Language: en-US
+To:     Joey Corleone <joey.corleone@mail.ru>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org, regressions@lists.linux.dev
 References: <20220224151147.119619-1-luiz.dentz@gmail.com>
  <46FADD2F-2B35-4CC7-BC01-CACB81FC6FAE@holtmann.org>
-Content-Language: en-US
-Subject: Re: [PATCH v2] Bluetooth: hci_sync: Fix hci_update_accept_list_sync
-In-Reply-To: <46FADD2F-2B35-4CC7-BC01-CACB81FC6FAE@holtmann.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <44f9b7f2-ac5f-55e9-e72b-cebe1d9bda80@mail.ru>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+In-Reply-To: <44f9b7f2-ac5f-55e9-e72b-cebe1d9bda80@mail.ru>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-7564579A: B8F34718100C35BD
-X-77F55803: 4F1203BC0FB41BD9D611630AF6200BAFEFCD3CDEC2FEE866C771F55010ECFC94182A05F5380850402CF28C8A5930B01A9DDCACC9FB0DEEA6B072943EE4690130EEA4FD5B542D4146
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7B9D6DADD6B53929DEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F79006378D70459434292EC88638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8823A546A550F282323EF34CCF4084A1E6F9789CCF6C18C3F8528715B7D10C86878DA827A17800CE73D04F0695778128A9FA2833FD35BB23D9E625A9149C048EE26055571C92BF10FE5D25F19253116ADD2E47CDBA5A96583BD4B6F7A4D31EC0BC014FD901B82EE079FA2833FD35BB23D27C277FBC8AE2E8B1A9C11735BBA05FBA471835C12D1D977C4224003CC836476EB9C4185024447017B076A6E789B0E975F5C1EE8F4F765FC3991949FB789967B3AA81AA40904B5D9CF19DD082D7633A078D18283394535A93AA81AA40904B5D98AA50765F790063785F20CC23D277B7AD81D268191BDAD3D698AB9A7B718F8C4D1B931868CE1C5781A620F70A64A45A98AA50765F79006372E808ACE2090B5E1725E5C173C3A84C3C5EA940A35A165FF2DBA43225CD8A89F3A8A7E6F3D1559285E1C53F199C2BB95B5C8C57E37DE458BEDA766A37F9254B7
-X-8FC586DF: 6EFBBC1D9D64D975
-X-C1DE0DAB: 0D63561A33F958A5B6B223FAFB34206065F2405749FDEA057DF03EECB07794F8D59269BC5F550898D99A6476B3ADF6B4886A5961035A09600383DAD389E261318FB05168BE4CE3AF
-X-C8649E89: 4E36BF7865823D7055A7F0CF078B5EC49A30900B95165D34E69981C39E7B068A20F1BDFA68636FB1CAB9E203EB8402CD2ACAF1466146AB6B339942E759AC44901D7E09C32AA3244C66BE0F5804BAEEC57D2C10FFBBD72D877C0C08F7987826B9927AC6DF5659F194
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojHSSTTj/1E5JGQrZ1zheX/g==
-X-Mailru-Sender: DED7486378921B4FACC540DC0644B2C119F1615C1900E78F689C242C3A78447776A57DEB513830E0C7BD54E8F9380F2338FA998476DAE4F3C2C748B250BAC47DFBB808E5A3D83AADCC0C6A881B01D7986DAEE9A828B31F4FEAB4BC95F72C04283CDA0F3B3F5B9367
-X-Mras: Ok
-X-7564579A: 646B95376F6C166E
-X-77F55803: 6242723A09DB00B47675259DE6CCD0836881391AB7CA884DE0CE0B444BB75180049FFFDB7839CE9E119AD1F268BF77D671CFDD5739A4F042048EA7E7AEE0660A1D782E1076260C94
-X-7FA49CB5: 0D63561A33F958A58A6242602D53BFBEBD3AC8C4F66E4175AFDF1CC2358EC69DCACD7DF95DA8FC8BD5E8D9A59859A8B64071617579528AACCC7F00164DA146DAFE8445B8C89999728AA50765F790063706CBA4EB72A0A67C389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC8A5ED62E35AC703CCF6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA73AA81AA40904B5D9A18204E546F3947C9D50A20087A7B80B6E0066C2D8992A164AD6D5ED66289B52698AB9A7B718F8C442539A7722CA490CD5E8D9A59859A8B60049E179A48B82B7089D37D7C0E48F6C5571747095F342E88FB05168BE4CE3AF
-X-C1DE0DAB: 0D63561A33F958A58A6242602D53BFBEBD3AC8C4F66E4175A32048312F3CC41BD59269BC5F550898D99A6476B3ADF6B4886A5961035A09600383DAD389E261318FB05168BE4CE3AF
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojHSSTTj/1E5KbgjyZsl51+A==
-X-Mailru-MI: 8000000000000800
-X-Mras: Ok
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1652196561;17134a94;
+X-HE-SMSGID: 1noRna-0003Ij-9F
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 24.02.22 21:08, Marcel Holtmann wrote:
-> Hi Luiz,
-> 
->> hci_update_accept_list_sync is returning the filter based on the error
->> but that gets overwritten by hci_le_set_addr_resolution_enable_sync
->> return instead of using the actual result of the likes of
->> hci_le_add_accept_list_sync which was intended.
+On 10.05.22 12:36, Joey Corleone wrote:
+> On 24.02.22 21:08, Marcel Holtmann wrote:
+
+>>> hci_update_accept_list_sync is returning the filter based on the error
+>>> but that gets overwritten by hci_le_set_addr_resolution_enable_sync
+>>> return instead of using the actual result of the likes of
+>>> hci_le_add_accept_list_sync which was intended.
+>>>
+>>> Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when
+>>> LL privacy is enabled")
+>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> ---
+>>> v2: Use u8 filter_policy instead of int ret as variable to store the
+>>> result.
+>>>
+>>> net/bluetooth/hci_sync.c | 5 ++++-
+>>> 1 file changed, 4 insertions(+), 1 deletion(-)
 >>
->> Fixes: ad383c2c65a5b ("Bluetooth: hci_sync: Enable advertising when LL privacy is enabled")
->> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->> ---
->> v2: Use u8 filter_policy instead of int ret as variable to store the result.
+>> patch has been applied to bluetooth-stable tree.
 >>
->> net/bluetooth/hci_sync.c | 5 ++++-
->> 1 file changed, 4 insertions(+), 1 deletion(-)
+>> Regards
+>>
+>> Marcel
 > 
-> patch has been applied to bluetooth-stable tree.
-> 
-> Regards
-> 
-> Marcel
+> Just to put you in the loop in case you have not noticed it yet: there
+> seems to be some kind of regression introduced by this patch. See
+> comment #5 of ticket 215768 where Damien Thébault bisected the kernel [1].
 
-Just to put you in the loop in case you have not noticed it yet: there 
-seems to be some kind of regression introduced by this patch. See 
-comment #5 of ticket 215768 where Damien Thébault bisected the kernel [1].
+Thx for CCing the regressions list.
 
-Joey
+[TLDR: I'm adding this regression report to the list of tracked
+regressions; all text from me you find below is based on a few templates
+paragraphs you might have encountered already already in similar form.]
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=215768#c5
+To be sure below issue doesn't fall through the cracks unnoticed, I'm
+adding it to regzbot, my Linux kernel regression tracking bot:
+
+#regzbot ^introduced 80740ebb7e1ad
+#regzbot title net: bluetooth: can't suspend while bluetooth is enabled.
+#regzbot ignore-activity
+#regzbot from: plum <plumerlis@gmail.com>
+#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215768
+
+This isn't a regression? This issue or a fix for it are already
+discussed somewhere else? It was fixed already? You want to clarify when
+the regression started to happen? Or point out I got the title or
+something else totally wrong? Then just reply -- ideally with also
+telling regzbot about it, as explained here:
+https://linux-regtracking.leemhuis.info/tracked-regression/
+
+Reminder for developers: When fixing the issue, add 'Link:' tags
+pointing to the report (the mail this one replied to), as the kernel's
+documentation call for; above page explains why this is important for
+tracked regressions.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+
+P.S.: As the Linux kernel's regression tracker I deal with a lot of
+reports and sometimes miss something important when writing mails like
+this. If that's the case here, don't hesitate to tell me in a public
+reply, it's in everyone's interest to set the public record straight.
