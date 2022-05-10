@@ -2,153 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38837C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 03:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01B5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 03:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235290AbiEJDV1 (ORCPT
+        id S235779AbiEJEDd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 May 2022 23:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
+        Tue, 10 May 2022 00:03:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235283AbiEJDVY (ORCPT
+        with ESMTP id S230185AbiEJEDb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 May 2022 23:21:24 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD57615828
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 May 2022 20:17:26 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id w19so27013964lfu.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 May 2022 20:17:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Ls/SMjFj6heZoySKcqmoqFtaszIPQaljVTG5Re0rH9M=;
-        b=EB1ROIutBjcQZmj6LJr9SUFDRILRUz/dzhbYK+KW34P/HGB5VYjQOYia914IABPKHm
-         ZB2rJYgCDwhzeTK1YSlNZCVpAtHmbUntOvkPoj0MeZhIc5THiAljwEScvUbZU5unm1E0
-         78ioKS9u3eFHR3yEy1e3LjpgEBGiS3yUMMS3M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Ls/SMjFj6heZoySKcqmoqFtaszIPQaljVTG5Re0rH9M=;
-        b=zGUzzxB8TLwV37xJNWjkFIgJTH9VVCFMzeBwGFgtstsVLS5fXwkZVohSgbYopjNx3N
-         dEGGZeoaDrFD6UvRr3JAS25AG20tOmCGR6QHOkVPQo3yKkcNd267V28dgpwKw37mUOL3
-         zhMiLtngGK9DmZuNr8KfMuWvPhrp1le9dQ87mt0ynw9zSyjYpmzpNzIbsJri2yVMl+SG
-         DMEalUX/aQq/8lWdcrmtDfc319InP7wMioEuIqjQug4hQeLAPPCueMNYI5/eu8YeTMiS
-         6HRhO0luYGhcL6eQtkrXJ+VquD7EjThesnyInF3fkGe6eYQms6WtBDvvzMjbPVhmTPsW
-         gXhQ==
-X-Gm-Message-State: AOAM5301umYDSuG0THMPHW9bQzmAyVGV/AJi9OHH9luen6XvbzWqKMFI
-        wBtfatme8K+atOgEvN4paZRzWzR3iS3g4JhOChZstg==
-X-Google-Smtp-Source: ABdhPJw1K7QAlE5QAiZCLMLRs+tK1ZtQMIflSjgCESXPl/YsTyscWXUV+ShFFygPmv2BiT+hQUxJJ2+IPMYpxQps+Qk=
-X-Received: by 2002:a05:6512:3f86:b0:44a:f5bf:ec9a with SMTP id
- x6-20020a0565123f8600b0044af5bfec9amr15376918lfa.490.1652152645011; Mon, 09
- May 2022 20:17:25 -0700 (PDT)
+        Tue, 10 May 2022 00:03:31 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042352AA2E4
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 May 2022 20:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652155176; x=1683691176;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vA4KazMFZ4xoCVMMB6a8YjavOAeqsDzEJNiclWnSX4w=;
+  b=EAlb2Bvp1WTgUpDGbmJ6MU62dI3jDaxzkZV0rHt5mzr4LiAE8fIw3KkL
+   oDaD43/SViqZ9JJMdhRPK4gRXChmaxXE91oYb6tlPGG5TZb8zK/MTUwH3
+   IE35kOPL+yfgmYq127iOZ4A6sE9M88cxoczGpG7eMtKg2j5nbuRMqGG51
+   34Bgw/SGtXJpS3R4g0fH2Pt5yROUyNCOmV6Xst0QyBfBEy/g1JK2UG29C
+   E1Y7A2A7xlMqelh6qLQbRaJmVucFYbLyUGQ6j8CZyt46oFPY9+2lCajHk
+   chg4PfIKYDAvphjVcbYZCwq4DzS1P/quabvUhTnJXJgvk6+wWCQWlGv0/
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10342"; a="329846429"
+X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
+   d="scan'208";a="329846429"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 May 2022 20:59:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,213,1647327600"; 
+   d="scan'208";a="602273669"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 09 May 2022 20:59:33 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1noH25-000HGk-7q;
+        Tue, 10 May 2022 03:59:33 +0000
+Date:   Tue, 10 May 2022 11:59:17 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Brian Gix <brian.gix@intel.com>, linux-bluetooth@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, marcel@holtmann.org, luiz.dentz@gmail.com,
+        brian.gix@intel.com
+Subject: Re: [PATCH v2 1/2] Bluetooth: Implement support for Mesh
+Message-ID: <202205101155.NLcENnfd-lkp@intel.com>
+References: <20220509220512.482695-2-brian.gix@intel.com>
 MIME-Version: 1.0
-References: <1651228073-1999-1-git-send-email-quic_bgodavar@quicinc.com>
- <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
- <0D3D8346-0F64-4CAF-8BED-940F189A3E97@holtmann.org> <SJ0PR02MB713538E5BBB40CDEF2E050A0F8FF9@SJ0PR02MB7135.namprd02.prod.outlook.com>
-In-Reply-To: <SJ0PR02MB713538E5BBB40CDEF2E050A0F8FF9@SJ0PR02MB7135.namprd02.prod.outlook.com>
-From:   Miao-chen Chou <mcchou@chromium.org>
-Date:   Mon, 9 May 2022 20:17:13 -0700
-Message-ID: <CABmPvSFiAC474WthmMX0nE20UEOxUD5dEYBVbiKh7HOovCnCkA@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: WAR to handle WCN6750 HW issue
-To:     "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Andy Gross <agross@kernel.org>,
-        "robh+dt@kernel.org" <robh+dt@kernel.org>,
-        "bjorn.andersson@linaro.org" <bjorn.andersson@linaro.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "mka@chromium.org" <mka@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
-        "Sai Teja Aluvala (Temp) (QUIC)" <quic_saluvala@quicinc.com>,
-        quic_rjliao <quic_rjliao@quicinc.com>,
-        Alain Michaud <alainmichaud@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220509220512.482695-2-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bala,
+Hi Brian,
 
-When is the estimated start date and timeline of the driver development?
+Thank you for the patch! Perhaps something to improve:
 
-Thanks,
-Miao
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master v5.18-rc6 next-20220509]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-On Fri, Apr 29, 2022 at 8:09 PM Balakrishna Godavarthi (QUIC)
-<quic_bgodavar@quicinc.com> wrote:
->
-> Hi Marcel,
->
-> -----Original Message-----
-> From: Marcel Holtmann <marcel@holtmann.org>
-> Sent: Friday, April 29, 2022 8:24 PM
-> To: Balakrishna Godavarthi (QUIC) <quic_bgodavar@quicinc.com>
-> Cc: Andy Gross <agross@kernel.org>; robh+dt@kernel.org; bjorn.andersson@l=
-inaro.org; linux-arm-msm@vger.kernel.org; devicetree@vger.kernel.org; linux=
--kernel@vger.kernel.org; Johan Hedberg <johan.hedberg@gmail.com>; mka@chrom=
-ium.org; linux-bluetooth@vger.kernel.org; Hemant Gupta (QUIC) <quic_hemantg=
-@quicinc.com>; Sai Teja Aluvala (Temp) (QUIC) <quic_saluvala@quicinc.com>; =
-quic_rjliao <quic_rjliao@quicinc.com>; mcchou@chromium.org
-> Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: WAR to handle WCN6750 HW =
-issue
->
-> Hi Balakrishna,
->
-> > The patch is workaround for hardware issue on WCN6750.
-> > On WCN6750 sometimes observed AON power source takes 100ms time to
-> > fully discharge voltage during OFF. As WCN6750 is combo chip for WLAN
-> > and BT. If any of the tech area ON is triggered during discharge
-> > phase, it fails to turn ON.
-> > To overcome this hardware issue, During BT ON, driver check for
-> > WLAN_EN pin status. If it high, it will pull BT_EN to high immediately
-> > else it will wait for 100ms assuming WLAN was just powered OFF and
-> > then BT_EN will be pulled to high.
-> >
-> > Fixes: d8f97da1b92d2 ("Bluetooth: hci_qca: Add support for QTI
-> > Bluetooth chip wcn6750")
-> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> > Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> > Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-> > ---
-> > drivers/bluetooth/hci_qca.c | 30 ++++++++++++++++++++++++------
-> > 1 file changed, 24 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> > index eab34e2..c3862d1 100644
-> > --- a/drivers/bluetooth/hci_qca.c
-> > +++ b/drivers/bluetooth/hci_qca.c
-> > @@ -219,6 +219,7 @@ struct qca_serdev {
-> >       struct hci_uart  serdev_hu;
-> >       struct gpio_desc *bt_en;
-> >       struct gpio_desc *sw_ctrl;
-> > +     struct gpio_desc *wlan_en;
-> >       struct clk       *susclk;
-> >       enum qca_btsoc_type btsoc_type;
-> >       struct qca_power *bt_power;
->
-> I am really against these intermixing of Bluetooth and WiFi details. Ther=
-e is work ongoing to do some sequence power procedure. Maybe that is someth=
-ing you should look into. This is a mess.
->
-> And again, we are still hacking around hci_qca.c instead of writing a cle=
-an serdev only driver for this hardware. I have the feeling that nobody lis=
-tens to review comments these days. It is just hacking patches together to =
-get hardware enabled somehow and then disappear.
->
-> [Bala]: We are working on serdev like driver for our QCA platform.  We ar=
-e in initial stages of discussion, and soon we will start the driver develo=
-pment work.
-> In mean to stop stability or functional issues we are trying to add these=
- HACKs in QCA driver.
->
-> Regards
->
-> Marcel
->
+url:    https://github.com/intel-lab-lkp/linux/commits/Brian-Gix/Add-Mesh-functionality-to-net-bluetooth/20220510-060608
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+config: arc-randconfig-s031-20220509 (https://download.01.org/0day-ci/archive/20220510/202205101155.NLcENnfd-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 11.3.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/ec86301e787dba99c6afd77e40a4b5af142ef944
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Brian-Gix/Add-Mesh-functionality-to-net-bluetooth/20220510-060608
+        git checkout ec86301e787dba99c6afd77e40a4b5af142ef944
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=arc SHELL=/bin/bash net/bluetooth/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+   net/bluetooth/mgmt.c:4102:29: sparse: sparse: restricted __le16 degrades to integer
+   net/bluetooth/mgmt.c:4841:9: sparse: sparse: cast to restricted __le32
+>> net/bluetooth/mgmt.c:10121:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le64 [usertype] instant @@     got unsigned int [usertype] instant @@
+   net/bluetooth/mgmt.c:10121:21: sparse:     expected restricted __le64 [usertype] instant
+   net/bluetooth/mgmt.c:10121:21: sparse:     got unsigned int [usertype] instant
+
+vim +10121 net/bluetooth/mgmt.c
+
+ 10069	
+ 10070	static void mesh_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 10071			       u8 addr_type, s8 rssi, u32 flags, u8 *eir, u16 eir_len,
+ 10072			       u8 *scan_rsp, u8 scan_rsp_len, u32 instant)
+ 10073	{
+ 10074		struct sk_buff *skb;
+ 10075		struct mgmt_ev_mesh_device_found *ev;
+ 10076		int i, j;
+ 10077	
+ 10078		if (!hdev->mesh_ad_types[0])
+ 10079			goto accepted;
+ 10080	
+ 10081		/* Scan for requested AD types */
+ 10082		if (eir_len > 0) {
+ 10083			for (i = 0; i + 1 < eir_len; i += eir[i] + 1) {
+ 10084				for (j = 0; j < sizeof(hdev->mesh_ad_types); j++) {
+ 10085					if (!hdev->mesh_ad_types[j])
+ 10086						break;
+ 10087	
+ 10088					if (hdev->mesh_ad_types[j] == eir[i + 1])
+ 10089						goto accepted;
+ 10090				}
+ 10091			}
+ 10092		}
+ 10093	
+ 10094		if (scan_rsp_len > 0) {
+ 10095			for (i = 0; i + 1 < scan_rsp_len; i += scan_rsp[i] + 1) {
+ 10096				for (j = 0; j < sizeof(hdev->mesh_ad_types); j++) {
+ 10097					if (!hdev->mesh_ad_types[j])
+ 10098						break;
+ 10099	
+ 10100					if (hdev->mesh_ad_types[j] == scan_rsp[i + 1])
+ 10101						goto accepted;
+ 10102				}
+ 10103			}
+ 10104		}
+ 10105	
+ 10106		return;
+ 10107	
+ 10108	
+ 10109	accepted:
+ 10110		skb = mgmt_alloc_skb(hdev, MGMT_EV_MESH_DEVICE_FOUND,
+ 10111				     sizeof(*ev) + eir_len + scan_rsp_len);
+ 10112		if (!skb)
+ 10113			return;
+ 10114	
+ 10115		ev = skb_put(skb, sizeof(*ev));
+ 10116	
+ 10117		bacpy(&ev->addr.bdaddr, bdaddr);
+ 10118		ev->addr.type = link_to_bdaddr(LE_LINK, addr_type);
+ 10119		ev->rssi = rssi;
+ 10120		ev->flags = cpu_to_le32(flags);
+ 10121		ev->instant = instant;
+ 10122	
+ 10123		if (eir_len > 0)
+ 10124			/* Copy EIR or advertising data into event */
+ 10125			skb_put_data(skb, eir, eir_len);
+ 10126	
+ 10127		if (scan_rsp_len > 0)
+ 10128			/* Append scan response data to event */
+ 10129			skb_put_data(skb, scan_rsp, scan_rsp_len);
+ 10130	
+ 10131		ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
+ 10132	
+ 10133		mgmt_event_skb(skb, NULL);
+ 10134	}
+ 10135	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
