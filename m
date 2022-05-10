@@ -2,101 +2,153 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D26BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 03:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38837C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 May 2022 03:17:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235080AbiEJDFn (ORCPT
+        id S235290AbiEJDV1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 May 2022 23:05:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38502 "EHLO
+        Mon, 9 May 2022 23:21:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233964AbiEJDFj (ORCPT
+        with ESMTP id S235283AbiEJDVY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 May 2022 23:05:39 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83BFE506C6
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 May 2022 20:01:43 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id 185so2892610qke.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 May 2022 20:01:43 -0700 (PDT)
+        Mon, 9 May 2022 23:21:24 -0400
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD57615828
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 May 2022 20:17:26 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id w19so27013964lfu.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 May 2022 20:17:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=xluTuZbjjC9Ejxo+ju1vrlm07/AcYaXPqZkNiXUSlp0=;
-        b=oIDJbl4g1EScqQCLAuJpLhyjbmrMBNH6FFb/kjHfFz90rATnWxzn7Gt3DH3X+/dC1h
-         SiNtzol4gx5rPynIcHKauLa6N9OnWVO+9s14Vg0Fs7/RJwXhESwuEEWE8NQoTUyrD12G
-         9fdgBETCyssFwQY+13NpCP/oxsKod7b6CXaOf/YbsTfFmRiduIkJFcOkl7V4WFnC3coZ
-         A4vGKR9UgxrGQrgGOCxM88fmdmUqqGuVKtbSsQNiQ83exnwWrYi+FUFCkyQPDrceF8aL
-         ICXy04mAFqmiimtUphD6/7CYYfsysNLxltVMe22AaYgblUOqzqiZvyUu8FeLnnhQ/ODH
-         wMqQ==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Ls/SMjFj6heZoySKcqmoqFtaszIPQaljVTG5Re0rH9M=;
+        b=EB1ROIutBjcQZmj6LJr9SUFDRILRUz/dzhbYK+KW34P/HGB5VYjQOYia914IABPKHm
+         ZB2rJYgCDwhzeTK1YSlNZCVpAtHmbUntOvkPoj0MeZhIc5THiAljwEScvUbZU5unm1E0
+         78ioKS9u3eFHR3yEy1e3LjpgEBGiS3yUMMS3M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=xluTuZbjjC9Ejxo+ju1vrlm07/AcYaXPqZkNiXUSlp0=;
-        b=3sUmx2xoTc1yZXZeuvXZEyz6gvkkMAx+4Mm5dTkFsHaeZueQvZHwpoxrPt68HoJoiO
-         et3xsBqF3d2P7+lhePRRGuu3Vh65LYIgtay+pq3P68mvAmSy5cfm9+LDbw+YZ8C65aR7
-         ePc44YY77leBdpvFrEQpyW1DzCJTwJTrd/KFN5Z74UZt0C/s59yM6MiZAQcA/y/ciKDb
-         Ueq+xqhPaBwyEYZaJpo8JS8us0vub2xaFV69HZ+cdrw4JsOtm/4y2JKrQC9voY+GZvNR
-         czlqPQ+m76pdcZKjRMoTK2fjhZugna1nJUVKcdb5SaFrg/2LkPkgoCKbG8aHAUIcSxYt
-         NyLA==
-X-Gm-Message-State: AOAM531HqSzPN8whUz7HWFzV6HU/hyQEbI1UqemIWTxPBX4MAuCTRN9Y
-        68XcDykjBQuZR/Fp7JnAPtaKKikc73wZVA==
-X-Google-Smtp-Source: ABdhPJxojUYng4fklbqf8J7ksPnsOc2lH398xISAgMHU4RRyp2YDlltoMLbOxOkvB8mLgGVpoYljfg==
-X-Received: by 2002:a37:278d:0:b0:69f:7705:61a9 with SMTP id n135-20020a37278d000000b0069f770561a9mr14527355qkn.190.1652151702183;
-        Mon, 09 May 2022 20:01:42 -0700 (PDT)
-Received: from [172.17.0.2] ([20.124.232.222])
-        by smtp.gmail.com with ESMTPSA id w75-20020a37624e000000b0069fc13ce237sm7919810qkb.104.2022.05.09.20.01.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 May 2022 20:01:41 -0700 (PDT)
-Message-ID: <6279d595.1c69fb81.7678a.8645@mx.google.com>
-Date:   Mon, 09 May 2022 20:01:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7711041441650369195=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Ls/SMjFj6heZoySKcqmoqFtaszIPQaljVTG5Re0rH9M=;
+        b=zGUzzxB8TLwV37xJNWjkFIgJTH9VVCFMzeBwGFgtstsVLS5fXwkZVohSgbYopjNx3N
+         dEGGZeoaDrFD6UvRr3JAS25AG20tOmCGR6QHOkVPQo3yKkcNd267V28dgpwKw37mUOL3
+         zhMiLtngGK9DmZuNr8KfMuWvPhrp1le9dQ87mt0ynw9zSyjYpmzpNzIbsJri2yVMl+SG
+         DMEalUX/aQq/8lWdcrmtDfc319InP7wMioEuIqjQug4hQeLAPPCueMNYI5/eu8YeTMiS
+         6HRhO0luYGhcL6eQtkrXJ+VquD7EjThesnyInF3fkGe6eYQms6WtBDvvzMjbPVhmTPsW
+         gXhQ==
+X-Gm-Message-State: AOAM5301umYDSuG0THMPHW9bQzmAyVGV/AJi9OHH9luen6XvbzWqKMFI
+        wBtfatme8K+atOgEvN4paZRzWzR3iS3g4JhOChZstg==
+X-Google-Smtp-Source: ABdhPJw1K7QAlE5QAiZCLMLRs+tK1ZtQMIflSjgCESXPl/YsTyscWXUV+ShFFygPmv2BiT+hQUxJJ2+IPMYpxQps+Qk=
+X-Received: by 2002:a05:6512:3f86:b0:44a:f5bf:ec9a with SMTP id
+ x6-20020a0565123f8600b0044af5bfec9amr15376918lfa.490.1652152645011; Mon, 09
+ May 2022 20:17:25 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: device: Fix pairing has failed due to the error of Already Paired (0x13)
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220510012735.1698-1-wangyouwan@uniontech.com>
-References: <20220510012735.1698-1-wangyouwan@uniontech.com>
+References: <1651228073-1999-1-git-send-email-quic_bgodavar@quicinc.com>
+ <1651228073-1999-4-git-send-email-quic_bgodavar@quicinc.com>
+ <0D3D8346-0F64-4CAF-8BED-940F189A3E97@holtmann.org> <SJ0PR02MB713538E5BBB40CDEF2E050A0F8FF9@SJ0PR02MB7135.namprd02.prod.outlook.com>
+In-Reply-To: <SJ0PR02MB713538E5BBB40CDEF2E050A0F8FF9@SJ0PR02MB7135.namprd02.prod.outlook.com>
+From:   Miao-chen Chou <mcchou@chromium.org>
+Date:   Mon, 9 May 2022 20:17:13 -0700
+Message-ID: <CABmPvSFiAC474WthmMX0nE20UEOxUD5dEYBVbiKh7HOovCnCkA@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: WAR to handle WCN6750 HW issue
+To:     "Balakrishna Godavarthi (QUIC)" <quic_bgodavar@quicinc.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Andy Gross <agross@kernel.org>,
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "bjorn.andersson@linaro.org" <bjorn.andersson@linaro.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "mka@chromium.org" <mka@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Hemant Gupta (QUIC)" <quic_hemantg@quicinc.com>,
+        "Sai Teja Aluvala (Temp) (QUIC)" <quic_saluvala@quicinc.com>,
+        quic_rjliao <quic_rjliao@quicinc.com>,
+        Alain Michaud <alainmichaud@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7711041441650369195==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Bala,
 
-This is automated email and please do not reply to this email!
+When is the estimated start date and timeline of the driver development?
 
-Dear submitter,
+Thanks,
+Miao
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=639955
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.40 seconds
-GitLint                       PASS      1.03 seconds
-Prep - Setup ELL              PASS      53.23 seconds
-Build - Prep                  PASS      0.85 seconds
-Build - Configure             PASS      10.89 seconds
-Build - Make                  PASS      1805.67 seconds
-Make Check                    PASS      12.83 seconds
-Make Check w/Valgrind         PASS      537.08 seconds
-Make Distcheck                PASS      282.72 seconds
-Build w/ext ELL - Configure   PASS      10.84 seconds
-Build w/ext ELL - Make        PASS      1707.43 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7711041441650369195==--
+On Fri, Apr 29, 2022 at 8:09 PM Balakrishna Godavarthi (QUIC)
+<quic_bgodavar@quicinc.com> wrote:
+>
+> Hi Marcel,
+>
+> -----Original Message-----
+> From: Marcel Holtmann <marcel@holtmann.org>
+> Sent: Friday, April 29, 2022 8:24 PM
+> To: Balakrishna Godavarthi (QUIC) <quic_bgodavar@quicinc.com>
+> Cc: Andy Gross <agross@kernel.org>; robh+dt@kernel.org; bjorn.andersson@l=
+inaro.org; linux-arm-msm@vger.kernel.org; devicetree@vger.kernel.org; linux=
+-kernel@vger.kernel.org; Johan Hedberg <johan.hedberg@gmail.com>; mka@chrom=
+ium.org; linux-bluetooth@vger.kernel.org; Hemant Gupta (QUIC) <quic_hemantg=
+@quicinc.com>; Sai Teja Aluvala (Temp) (QUIC) <quic_saluvala@quicinc.com>; =
+quic_rjliao <quic_rjliao@quicinc.com>; mcchou@chromium.org
+> Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: WAR to handle WCN6750 HW =
+issue
+>
+> Hi Balakrishna,
+>
+> > The patch is workaround for hardware issue on WCN6750.
+> > On WCN6750 sometimes observed AON power source takes 100ms time to
+> > fully discharge voltage during OFF. As WCN6750 is combo chip for WLAN
+> > and BT. If any of the tech area ON is triggered during discharge
+> > phase, it fails to turn ON.
+> > To overcome this hardware issue, During BT ON, driver check for
+> > WLAN_EN pin status. If it high, it will pull BT_EN to high immediately
+> > else it will wait for 100ms assuming WLAN was just powered OFF and
+> > then BT_EN will be pulled to high.
+> >
+> > Fixes: d8f97da1b92d2 ("Bluetooth: hci_qca: Add support for QTI
+> > Bluetooth chip wcn6750")
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
+> > Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+> > ---
+> > drivers/bluetooth/hci_qca.c | 30 ++++++++++++++++++++++++------
+> > 1 file changed, 24 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> > index eab34e2..c3862d1 100644
+> > --- a/drivers/bluetooth/hci_qca.c
+> > +++ b/drivers/bluetooth/hci_qca.c
+> > @@ -219,6 +219,7 @@ struct qca_serdev {
+> >       struct hci_uart  serdev_hu;
+> >       struct gpio_desc *bt_en;
+> >       struct gpio_desc *sw_ctrl;
+> > +     struct gpio_desc *wlan_en;
+> >       struct clk       *susclk;
+> >       enum qca_btsoc_type btsoc_type;
+> >       struct qca_power *bt_power;
+>
+> I am really against these intermixing of Bluetooth and WiFi details. Ther=
+e is work ongoing to do some sequence power procedure. Maybe that is someth=
+ing you should look into. This is a mess.
+>
+> And again, we are still hacking around hci_qca.c instead of writing a cle=
+an serdev only driver for this hardware. I have the feeling that nobody lis=
+tens to review comments these days. It is just hacking patches together to =
+get hardware enabled somehow and then disappear.
+>
+> [Bala]: We are working on serdev like driver for our QCA platform.  We ar=
+e in initial stages of discussion, and soon we will start the driver develo=
+pment work.
+> In mean to stop stability or functional issues we are trying to add these=
+ HACKs in QCA driver.
+>
+> Regards
+>
+> Marcel
+>
