@@ -2,43 +2,46 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EFE2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 May 2022 22:07:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27DBFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 May 2022 22:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345282AbiEKWHl (ORCPT
+        id S1348681AbiEKWW1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 May 2022 18:07:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37894 "EHLO
+        Wed, 11 May 2022 18:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbiEKWHj (ORCPT
+        with ESMTP id S1348678AbiEKWW0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 May 2022 18:07:39 -0400
+        Wed, 11 May 2022 18:22:26 -0400
 Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 933FA4D62B;
-        Wed, 11 May 2022 15:07:32 -0700 (PDT)
-X-UUID: 096709289fa3446ab99edd9ac2c9e535-20220512
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B473E528A;
+        Wed, 11 May 2022 15:22:23 -0700 (PDT)
+X-UUID: b85aee54ed8d442d866d81aa4441db2b-20220512
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.4,REQID:1477c602-2e3b-4a26-b1bf-2304d04a2719,OB:0,LO
-        B:0,IP:0,URL:5,TC:0,Content:-20,EDM:0,RT:0,SF:100,FILE:0,RULE:Release_Ham,
-        ACTION:release,TS:85
-X-CID-INFO: VERSION:1.1.4,REQID:1477c602-2e3b-4a26-b1bf-2304d04a2719,OB:0,LOB:
-        0,IP:0,URL:5,TC:0,Content:-20,EDM:0,RT:0,SF:100,FILE:0,RULE:Spam_GS981B3D,
-        ACTION:quarantine,TS:85
-X-CID-META: VersionHash:faefae9,CLOUDID:479123e6-38f2-431d-8de7-bf8fac490b0a,C
-        OID:0aec2402639b,Recheck:0,SF:28|16|19|48,TC:nil,Content:1,EDM:-3,File:nil
+X-CID-O-INFO: VERSION:1.1.4,REQID:3e91916c-83d9-4f10-a804-e3ddb5006d76,OB:0,LO
+        B:10,IP:0,URL:5,TC:0,Content:-20,EDM:0,RT:0,SF:100,FILE:0,RULE:Release_Ham
+        ,ACTION:release,TS:85
+X-CID-INFO: VERSION:1.1.4,REQID:3e91916c-83d9-4f10-a804-e3ddb5006d76,OB:0,LOB:
+        10,IP:0,URL:5,TC:0,Content:-20,EDM:0,RT:0,SF:100,FILE:0,RULE:Spam_GS981B3D
+        ,ACTION:quarantine,TS:85
+X-CID-META: VersionHash:faefae9,CLOUDID:831c78b3-56b5-4c9e-8d83-0070b288eb6a,C
+        OID:6d935a507c4f,Recheck:0,SF:28|16|19|48,TC:nil,Content:1,EDM:-3,File:nil
         ,QS:0,BEC:nil
-X-UUID: 096709289fa3446ab99edd9ac2c9e535-20220512
+X-UUID: b85aee54ed8d442d866d81aa4441db2b-20220512
 Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1047916408; Thu, 12 May 2022 06:07:28 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.792.3;
- Thu, 12 May 2022 06:07:26 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.792.3 via Frontend Transport; Thu, 12 May 2022 06:07:26 +0800
+        with ESMTP id 685863023; Thu, 12 May 2022 06:22:18 +0800
+Received: from mtkmbs07n1.mediatek.inc (172.21.101.16) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Thu, 12 May 2022 06:22:17 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 12 May 2022 06:22:16 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 12 May 2022 06:22:16 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
@@ -54,10 +57,11 @@ CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Yake Yang <yake.yang@mediatek.com>
-Subject: [PATCH] Bluetooth: btmtksdio: fix use-after-free at btmtksdio_recv_event
-Date:   Thu, 12 May 2022 06:07:25 +0800
-Message-ID: <25f3428482241cd449bffa39ad964240ee28483a.1652306557.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>,
+        "Yake Yang" <yake.yang@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btmtksdio: fix use-after-free at btmtksdio_recv_event
+Date:   Thu, 12 May 2022 06:22:15 +0800
+Message-ID: <f8bf12f9682a01de8905d4c0d7a0a1ff0502ba5f.1652307131.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -111,9 +115,12 @@ called.
 [   39.636039] The buggy address is located 13 bytes inside of
                 512-byte region [ffffff80cf28a600, ffffff80cf28a800)
 
+Fixes: 9aebfd4a2200 ("Bluetooth: mediatek: add support for MediaTek MT7663S and MT7668S SDIO devices")
 Co-developed-by: Yake Yang <yake.yang@mediatek.com>
 Signed-off-by: Yake Yang <yake.yang@mediatek.com>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+v2: add Fixes tag
 ---
  drivers/bluetooth/btmtksdio.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
