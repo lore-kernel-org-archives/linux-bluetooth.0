@@ -2,79 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04D8AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 May 2022 21:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5AEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 May 2022 21:23:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233055AbiEKVUQ (ORCPT
+        id S244920AbiEKVXu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 May 2022 17:20:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43818 "EHLO
+        Wed, 11 May 2022 17:23:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231319AbiEKVUO (ORCPT
+        with ESMTP id S231319AbiEKVXt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 May 2022 17:20:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29D661632
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 14:20:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 66D4A61B65
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 21:20:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B94EEC340EE;
-        Wed, 11 May 2022 21:20:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652304012;
-        bh=0RD5/BDWxPNDwx8k3amJR0gICDu3rfG47Oi8pxxQJxk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jOd47t+c26XeuHYZ6vpzaPKkp0GBpjEmH5yac5x5eA4q/QxA7veNn3q+NYH7GyaxE
-         cvEKanI2LFNUYLX+h89Yxx6Ogfh9nla16tHud9fsfjMt2Hj+q7T+KQ0878mLC9TcyT
-         uXNxzvl20kZVchRmkiN9PBSnWWI8gdTqK8JRSmr9j2TJNuced6/YbhVXRHKDf4ljjv
-         H0EzZK9BrwP5o8PTPcndSmYE8aWXeIlGSfIlXEgqWwi8wZV3aUX8Bcx6DM9J9C3sGL
-         xIxcNa3RGNxs/5SSPh3ahgqadK8cwhrfHxon1EC4nqSbfVrA+xIIzw41/ZTacPLTcQ
-         1I9tvW8nP1ELA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C223F03933;
-        Wed, 11 May 2022 21:20:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 11 May 2022 17:23:49 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D09C5DD34;
+        Wed, 11 May 2022 14:23:48 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id cq17-20020a17090af99100b001dc0386cd8fso3143826pjb.5;
+        Wed, 11 May 2022 14:23:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VvDCd/At1ikMVmsEgnubdI0TPPYRdjzMNNE8etT+OBU=;
+        b=bsjlM7Pq6U03CPBLLJDkeXSVF+7dcAW8JJvWtSeLe3wG3Wk4iITnyn6kHrORor7KUb
+         Yd+6z2UzXJz6Wbpu6MmN/4Kd23s9shnjUqgHH+9ZlGemr+n0h8vk/tmlGOUaAddX+WZm
+         e3kTtx1ThpBpq/dWwZBa3DYxz4fIR02c+fbvwHeJEY9wpb91YbSBcqTRW2A3zTO8kCJG
+         fG5lUcM5XLXBkeMLi7R6hodzQSLbq78d2QkLIR9vKcYMQ9nrj3MiTjiaXN+oqBkfAGDb
+         EXYfZTMKCL2mgMTE6Wmj78hLWa0k+IBEK+uwsjjEpUNL4me04Oj8K3KYdKi5P6VyVBb4
+         bluw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VvDCd/At1ikMVmsEgnubdI0TPPYRdjzMNNE8etT+OBU=;
+        b=zHWqJCD43Ojg+U51x2MkBUZ46y4MDyrSmqjypf5+o/eMERXRVrS3C+hrC04/MTaTp9
+         tdK5k0qjiT52Wl0gfE4YHHPodOMsPwJynDKw45xFl42Q0zsVVOdT+vJBg90ETJwXsGpk
+         AJZlm4XKSCxmtBmjW4r9t1p6xDjErCyfXC5TTJsqW+a7UC3CfhPFl3056pymLEeigNz+
+         pEhe5vv2kkxk0N5/5WfgTbnk9Ar/OAmM9X/tGqX3AnvMKQmumB7JBxU0SKIYzG/G2EcI
+         ivMdioQNFVEqYgyTTxLLOfp62XM9Nhbty7gdL22JFtBWEHsHqgejMWuQNXO4E5yFH/hV
+         LpKg==
+X-Gm-Message-State: AOAM533v2JuZhCrZbn4hOEp3C5DGdCx1kg1YIlp03QD56oaSAv7sWOsT
+        abQ+5LAeT9dysVUxXUG+gftAfiH0A2cncPcGhn8=
+X-Google-Smtp-Source: ABdhPJzH3GqZYny/2c0KD7LAm2yheDLy0TMd0D9kGLu2hsACI+zrLgcPCJAau+hJ0XZIcfaMBR8jTv7d+hKy66JgZHU=
+X-Received: by 2002:a17:90a:528f:b0:1dc:9a7c:4a3 with SMTP id
+ w15-20020a17090a528f00b001dc9a7c04a3mr7244557pjh.112.1652304227558; Wed, 11
+ May 2022 14:23:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: Fix the creation of hdev->name
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165230401262.9704.4260040171569468709.git-patchwork-notify@kernel.org>
-Date:   Wed, 11 May 2022 21:20:12 +0000
-References: <20220507123248.432213-1-ieitayie@gmail.com>
-In-Reply-To: <20220507123248.432213-1-ieitayie@gmail.com>
-To:     Itay Iellin <ieitayie@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20220509140403.1.I28d2ec514ad3b612015b28b8de861b8955033a19@changeid>
+In-Reply-To: <20220509140403.1.I28d2ec514ad3b612015b28b8de861b8955033a19@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 11 May 2022 14:23:35 -0700
+Message-ID: <CABBYNZ+qpWTX-FQ8QCiey0kf_rghDMnfQi3tt8zsv-5cuudbtg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix Adv Monitor msft_add/remove_monitor_sync()
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Manish,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Mon, May 9, 2022 at 2:05 PM Manish Mandlik <mmandlik@google.com> wrote:
+>
+> Do not call skb_pull() in msft_add_monitor_sync() as
+> msft_le_monitor_advertisement_cb() expects 'status' to be
+> part of the skb.
+>
+> Same applies for msft_remove_monitor_sync().
+>
+> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+> ---
+>
+>  net/bluetooth/msft.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> index f43994523b1f..9990924719aa 100644
+> --- a/net/bluetooth/msft.c
+> +++ b/net/bluetooth/msft.c
+> @@ -387,7 +387,6 @@ static int msft_remove_monitor_sync(struct hci_dev *hdev,
+>                 return PTR_ERR(skb);
+>
+>         status = skb->data[0];
+> -       skb_pull(skb, 1);
+>
+>         msft_le_cancel_monitor_advertisement_cb(hdev, status, hdev->msft_opcode,
+>                                                 skb);
+> @@ -506,7 +505,6 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
+>                 return PTR_ERR(skb);
+>
+>         status = skb->data[0];
+> -       skb_pull(skb, 1);
 
-On Sat,  7 May 2022 08:32:48 -0400 you wrote:
-> Set a size limit of 8 bytes of the written buffer to "hdev->name"
-> including the terminating null byte, as the size of "hdev->name" is 8
-> bytes. If an id value which is greater than 9999 is allocated,
-> then the "snprintf(hdev->name, sizeof(hdev->name), "hci%d", id)"
-> function call would lead to a truncation of the id value in decimal
-> notation.
-> 
-> [...]
+Well if it expects it to be part of the skb then there is no reason to
+pass it as argument in addition to the skb itself.
 
-Here is the summary with links:
-  - Bluetooth: Fix the creation of hdev->name
-    https://git.kernel.org/bluetooth/bluetooth-next/c/29aff7408263
+>         msft_le_monitor_advertisement_cb(hdev, status, hdev->msft_opcode, skb);
+>
+> --
+> 2.36.0.512.ge40c2bad7a-goog
+>
 
-You are awesome, thank you!
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Luiz Augusto von Dentz
