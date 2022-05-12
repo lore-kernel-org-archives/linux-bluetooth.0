@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 955BBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 00:28:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D908C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 00:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349653AbiELA2f (ORCPT
+        id S1349665AbiELA3G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 May 2022 20:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
+        Wed, 11 May 2022 20:29:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349652AbiELA2e (ORCPT
+        with ESMTP id S1349666AbiELA3D (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 May 2022 20:28:34 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 819311A6AD7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 17:28:33 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id cu23-20020a17090afa9700b001d98d8e53b7so4987340pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 17:28:33 -0700 (PDT)
+        Wed, 11 May 2022 20:29:03 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B781C15CA;
+        Wed, 11 May 2022 17:29:02 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id p8so3346491pfh.8;
+        Wed, 11 May 2022 17:29:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=blac2gkekiCR/N+3veVySx5+NNNuZs8L9MfqZlFBgdc=;
-        b=irfI1QRFl4Tjv05wzuIRdfz3UkOSb367d7ooSE+K2AldjVsLgjUQdkrLpIR26itHQ5
-         5NTKYnrKBhedmozeKHy/pTPIZeByXkjmo93h8tcDMcGezqDWx+HGP2SFIssmNOypqoAM
-         agukAgZJEWd+PSkyZ5CuUTaWlhpzFWW0rgmUINMtK4FJ0W2ZyxtSiBrRFW5Qn161eQUV
-         w9Zmdo2CJY435RMc/6b6FDIyXLMcF9U7g/lH/w+V4A8ud9oEwRlqfXwp0nEi40M7CN99
-         n7xTEGChcZOEc+8J44p34gAplegc71UfX8YlhL39k9wS0JPLpR45T8skyGgPz3PjvDZ9
-         vNNA==
+        b=ErtLfWYHEru3ngKWye3L/NmbpYu9MrH4FVyanHO3x+jzZXRObQI0c190tQzgr+tYqR
+         /xIP6GjQKvA/6uVA1DThFv7+i7fWBZBWI757UTZx5ysP0DNBluXwals5Uj8qBbTyJZCa
+         FiCC90sUEq9GHqOKotW2R4YqiPt0n81JSGE61fCrmXgDH1Fu8RMlzUWg2j1/FAlOlm7R
+         V/GiDxea1Msj1PGqu5d08cD/T9CM7CSlbwHbA7dZvAtJUJgqMixVd21g5rJC1PLn8KBR
+         XnF1h85jYwwPjc2bHWGMNz7NHDdoHVofhRzt3V+EGVIiCDiIc9vUgMqKR+d4rReF8c19
+         fCmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=blac2gkekiCR/N+3veVySx5+NNNuZs8L9MfqZlFBgdc=;
-        b=tSCngj5LbYJWzq4l98PJFHukNZsYOsmXyUgYwWmvc1NmyzG2Z1xoy7J1/8cMHSzA3T
-         1wWtQrBNOgxgunzbSxkUOz/rVvmlCp+4Bo4xht95E65pFKR9R7fXkuZis28qcdTRrkTZ
-         yoK9zVpfVFlS3jale2DGRz30H9UnmNJGsBLcDVA8VqihpAVon55iWgzI4BR66edB6jXZ
-         wwoLUuOVqS7FmjnS1NEtkbGhuwRTSj+oXrcCSQ+N3EXFkvgJYs+qW0dR5/tglPbzQn6C
-         7z/w/ucIMnE8xboiTkFvFp2bYIzkpDx/LEPzUICKwizzMwUFAdiVBAAFt+vKC2Y/D46w
-         a7Hw==
-X-Gm-Message-State: AOAM530Nbbq16EEi4vcyEIYK8R/sgDZIBpU5UDPaSXTZwhZiFbnzhpSo
-        7q1ZgAt7VRhifWEXXnF9hEQZIRP0viY=
-X-Google-Smtp-Source: ABdhPJwPl7+xZOnISan0xo2YyuxpCedKuBpPFa4n+tIX3t1LIfM9zQb6jc3Ux8mDTLsLBNe/koBE5g==
-X-Received: by 2002:a17:90b:3904:b0:1dc:8fe0:df69 with SMTP id ob4-20020a17090b390400b001dc8fe0df69mr7830260pjb.59.1652315312632;
-        Wed, 11 May 2022 17:28:32 -0700 (PDT)
+        b=dbqXfAvk0lXQMRG6iT7PxPenZW+L/jglM55HreiOAJ0fxmBzFC/g6GimhDxnoZepRi
+         ofGQCcXF1vGTRZyILLl+nXoq56tV8+ZrZlynAN9ZySzUGjJZutflIfWYJRqpOOqKT21e
+         mqtTTpt3hbV2dw6yFV8YJzeCfjeXOUbkZQG1tSGm042PCQ0WuBotu4B7WMmnbpVE//Pb
+         EbcWgHu10IbiLDdlry/S0uS7t22RjRzAgYt4H6V4Ylf6jQxIpRxNS12DurGaGuGJRyiQ
+         lzpKMWBvyrCYY1ORTb5WcYfv6U1eq+PL6hItzPTBCDMJ6LvggTxGyfIxm44lJSMf9gKS
+         h05A==
+X-Gm-Message-State: AOAM530eSRqTsfn8HVzEY/1vmsyChfZjzL3uMlKmcsZIB/q1NgVis+TU
+        eJuAgZ1DlN+kksblXGn6y40=
+X-Google-Smtp-Source: ABdhPJxjw5DL0azT6MqkGH4IytZ++zQmhTi9ippotGj6tp4J2OrVQkw080E24I9W40xx5VKwMVH6Yg==
+X-Received: by 2002:a63:5:0:b0:3c6:dcb2:428 with SMTP id 5-20020a630005000000b003c6dcb20428mr11021960pga.73.1652315342027;
+        Wed, 11 May 2022 17:29:02 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 4-20020aa79104000000b0050dc76281d5sm2353721pfh.175.2022.05.11.17.28.31
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id c19-20020aa78c13000000b0050dc762812csm2371951pfd.6.2022.05.11.17.29.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 May 2022 17:28:32 -0700 (PDT)
+        Wed, 11 May 2022 17:29:01 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Subject: pull request: bluetooth 2022-05-11
-Date:   Wed, 11 May 2022 17:28:31 -0700
-Message-Id: <20220512002831.823565-1-luiz.dentz@gmail.com>
+Date:   Wed, 11 May 2022 17:29:01 -0700
+Message-Id: <20220512002901.823647-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
