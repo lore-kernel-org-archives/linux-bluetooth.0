@@ -2,110 +2,160 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC86DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 03:17:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9C2BC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 04:36:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242503AbiELDQ7 (ORCPT
+        id S1347238AbiELEgN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 May 2022 23:16:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
+        Thu, 12 May 2022 00:36:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231807AbiELDQ6 (ORCPT
+        with ESMTP id S1346868AbiELEf7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 May 2022 23:16:58 -0400
-Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AECC67D2F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 20:16:55 -0700 (PDT)
-Received: by mail-qt1-x829.google.com with SMTP id g3so2193329qtb.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 May 2022 20:16:55 -0700 (PDT)
+        Thu, 12 May 2022 00:35:59 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B088A645E;
+        Wed, 11 May 2022 21:35:55 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id cq17-20020a17090af99100b001dc0386cd8fso3808482pjb.5;
+        Wed, 11 May 2022 21:35:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=J6BEHoNhTyg6RXmNNM/ZjsxjCWDLxVsUNbPfAQLslH4=;
-        b=ov/rShXGt6acMBvp8DvbeiUI8UO6rhz9MS+I35d+zk5e+1tBTYrViS9kinvmg68XZE
-         VRBbWCus+Ao+iycNzkFLSW8d5wShL/icFJPapHYpfZplTcYfVPQHV+YJcfOxiEq9L0ka
-         qC8KsIAQI8BBJeixFfi6cGHulxNcxp4h2xeF9QYmkwaaaJaZOnxlSrDeKztlIUy7VIdW
-         fd6YlWNKWdAkr8qk1/2cd/oF583vNGNtkL6EWAgkdJkT7h/lp+axx7jSYJYdgK9i4yWo
-         IPt5npV4y/+yfCVXz7j2s7wVXWpOhD/8QV2hmNAFnnGM3DkM68Ovd4heDKzGEi5Ru3rw
-         FE5w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=HYujfKEE4FRBcffvvm/ENwPqr1+X2EgAq7QQ3ImY+bQ=;
+        b=jHNmqQtI3JjAQf13WCLhhUg/GhvEmfOIM1kfRhBNBgNtmAi51zl+XJnGjcL7McS6Ar
+         LMPr3XQlMh4JzZi1rdWCZAhI5l6Uv75+2ApXs/spGXnT1ggSZHiU+55cGnCngn8WuC7a
+         iqwyqc8GO4v2p8VDLew+kKz0NybCB6ZqT0P6zdu72hakXr8XvtfpAj5QfIb+hd3C3PQd
+         lxsAOJ2j7YonNfXBAVbpqRLMmL/JGPRt1TtVwU2BeRfPEqRLnolMs/lT1golpwTxKWZy
+         unZtCk7SkTT8aMzo2xP30tsjDyU52WBzQfyh7KpKe6ECaApQHggr0x0IuXbuXHCIZ9mV
+         XRtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=J6BEHoNhTyg6RXmNNM/ZjsxjCWDLxVsUNbPfAQLslH4=;
-        b=2RudBNcx5tHeDGHiSCRbSMOCf+bOLJOvc+qnEAuiTYJExRaSBMns7bb/ayAGtM+pxE
-         Ft1lHRPcR6iNIsLgjLlSy6RLEueXJnb/HJswuNsdSAAWkJ46hNqzZvR6GU9TP1+hQA5c
-         u5A+r+dj/IY+yYZuaBmSrLCoAG3ElUnz+9ejmClDyI0Nv+Oiid/L8/aFqYlVy24O64Gw
-         C8GHAcMlLpuPoBLw4cKKYYvaqsbmaqfe5thVFxzkt6dPAgap9/CMdvAQ7L6zIxhMKUbI
-         W85Ambtngm2W+BLkPCw8BurN9AEfwGzk9HpmA68QbJw2EPlwL7NgclX5gMaVkGnM4nl+
-         Afkg==
-X-Gm-Message-State: AOAM532uoDwErbsxq7F8QrmSBmnHvFhjigC5xAmvsW5BK7F5+n8DkPuP
-        GU6PKT/zvUGzYIsHYNA8c+1+g1w2t9dQVg==
-X-Google-Smtp-Source: ABdhPJwlB9/aO/IhyHsgxgsAanDvNdi5QkomDvbFopjKfnlDVkzJg4NJTPBwpGd0PsRDBkDURy8fHQ==
-X-Received: by 2002:ac8:5913:0:b0:2f3:a402:1054 with SMTP id 19-20020ac85913000000b002f3a4021054mr27258129qty.513.1652325414318;
-        Wed, 11 May 2022 20:16:54 -0700 (PDT)
-Received: from [172.17.0.2] ([20.231.16.59])
-        by smtp.gmail.com with ESMTPSA id bi25-20020a05620a319900b0069fc13ce1e5sm2416055qkb.22.2022.05.11.20.16.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 May 2022 20:16:54 -0700 (PDT)
-Message-ID: <627c7c26.1c69fb81.64cb1.be38@mx.google.com>
-Date:   Wed, 11 May 2022 20:16:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6293214756268335994=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=HYujfKEE4FRBcffvvm/ENwPqr1+X2EgAq7QQ3ImY+bQ=;
+        b=471YYjuUEqKmHdLqZiXCMpnAhFSdFUP6/KHddyFLxwicnhKiTGSG40r1HmTMarSDCi
+         uZkA6oohJOIanthFT+JaWq8N2M00yK7OJ5h0KcIgBno4zbJeZcmTCGHFpHj2XawJAN8G
+         1TsJ9yCmi9nRp/8cvfbzsxtfpIkUkcnMKnjpgtK0OgBXd3IYExpCZSPAl7tfQtGwIfvD
+         xr00WQBd5dFzlkMrQEmDNdPeHLDqkICPpiT+wR7vzfSFU+zjqv/NBZYPLIyEuGOPVd00
+         uY+M7ym52Nr09/Kcyt1I6LlP3GhROEhEOuAtfNscjZ+xy4eSewrOj96GEgY/nbHBmKoY
+         p5vw==
+X-Gm-Message-State: AOAM530LFaGt4eck6CO+9+1ZajWAXfQYvFhUoO5ptVYOjMGuAQmVVbSq
+        bFKQgwtj2oEHbkr8x01AwlrdE4xr7rWhpfN/nMQ=
+X-Google-Smtp-Source: ABdhPJxE1V9btljZ/t5/qYQ28xGw+YiKTMw49we5zx+AI0AipeCM011JF7Jcpuq8Ml06bzMykWZ5YQyq6i+Rpf0FXGc=
+X-Received: by 2002:a17:902:7487:b0:15f:330:5022 with SMTP id
+ h7-20020a170902748700b0015f03305022mr21498706pll.18.1652330155178; Wed, 11
+ May 2022 21:35:55 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] gatt-db: Allow passing Characteristic Value to gatt_db_attribute_get_char_data
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220512005515.844857-1-luiz.dentz@gmail.com>
-References: <20220512005515.844857-1-luiz.dentz@gmail.com>
+References: <20220509140403.1.I28d2ec514ad3b612015b28b8de861b8955033a19@changeid>
+ <CABBYNZ+qpWTX-FQ8QCiey0kf_rghDMnfQi3tt8zsv-5cuudbtg@mail.gmail.com> <CAGPPCLBTec4SuL+UiFPkvq9=Bz8UY_3nQa5JjjHZ_415yt7KjA@mail.gmail.com>
+In-Reply-To: <CAGPPCLBTec4SuL+UiFPkvq9=Bz8UY_3nQa5JjjHZ_415yt7KjA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 11 May 2022 21:35:44 -0700
+Message-ID: <CABBYNZKU5TFYv14bNLksWV7Y5fOdLxdWPWm-bv7qeq0uXApiXg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix Adv Monitor msft_add/remove_monitor_sync()
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6293214756268335994==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Manish,
 
-This is automated email and please do not reply to this email!
+On Wed, May 11, 2022 at 5:56 PM Manish Mandlik <mmandlik@google.com> wrote:
+>
+> Hi Luiz,
+>
+> On Wed, May 11, 2022 at 2:23 PM Luiz Augusto von Dentz <luiz.dentz@gmail.=
+com> wrote:
+>>
+>> Hi Manish,
+>>
+>> On Mon, May 9, 2022 at 2:05 PM Manish Mandlik <mmandlik@google.com> wrot=
+e:
+>> >
+>> > Do not call skb_pull() in msft_add_monitor_sync() as
+>> > msft_le_monitor_advertisement_cb() expects 'status' to be
+>> > part of the skb.
+>> >
+>> > Same applies for msft_remove_monitor_sync().
+>> >
+>> > Signed-off-by: Manish Mandlik <mmandlik@google.com>
+>> > ---
+>> >
+>> >  net/bluetooth/msft.c | 2 --
+>> >  1 file changed, 2 deletions(-)
+>> >
+>> > diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+>> > index f43994523b1f..9990924719aa 100644
+>> > --- a/net/bluetooth/msft.c
+>> > +++ b/net/bluetooth/msft.c
+>> > @@ -387,7 +387,6 @@ static int msft_remove_monitor_sync(struct hci_dev=
+ *hdev,
+>> >                 return PTR_ERR(skb);
+>> >
+>> >         status =3D skb->data[0];
+>> > -       skb_pull(skb, 1);
+>> >
+>> >         msft_le_cancel_monitor_advertisement_cb(hdev, status, hdev->ms=
+ft_opcode,
+>> >                                                 skb);
+>> > @@ -506,7 +505,6 @@ static int msft_add_monitor_sync(struct hci_dev *h=
+dev,
+>> >                 return PTR_ERR(skb);
+>> >
+>> >         status =3D skb->data[0];
+>> > -       skb_pull(skb, 1);
+>>
+>> Well if it expects it to be part of the skb then there is no reason to
+>> pass it as argument in addition to the skb itself.
+>
+> The problem is msft_le_monitor_advertisement_cb() is invoked directly via=
+ msft_add_monitor_sync() and also from __msft_add_monitor_pattern() as a ca=
+llback from hci_req_run_skb(). So, when it is invoked from hci_req_run_skb(=
+) it sends status separately as an argument along with the skb and that's w=
+hy that argument is required.
+>
+> Looks like some parts of msft.c still use the old way i.e. hci_req_run_sk=
+b() instead of __hci_cmd_sync() after hci_sync related refactoring. I am wo=
+ndering if it was left like this intentionally? If not, then we probably ne=
+ed to refactor msft.c to use __hci_cmd_sync() for all hci requests. In that=
+ case, I can work on refactoring and we can discard this patch altogether. =
+Please let me know.
 
-Dear submitter,
+Yes, if you have time please convert it to use hci_sync.c since we
+would like to completely deprecate/remove hci_request.c eventually, if
+you think that will take some time we can perhaps merge this changes
+first though.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=640776
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.66 seconds
-GitLint                       FAIL      1.10 seconds
-Prep - Setup ELL              PASS      52.47 seconds
-Build - Prep                  PASS      0.82 seconds
-Build - Configure             PASS      10.66 seconds
-Build - Make                  PASS      1520.85 seconds
-Make Check                    PASS      13.21 seconds
-Make Check w/Valgrind         PASS      538.52 seconds
-Make Distcheck                PASS      281.07 seconds
-Build w/ext ELL - Configure   PASS      10.57 seconds
-Build w/ext ELL - Make        PASS      1484.25 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[BlueZ] gatt-db: Allow passing Characteristic Value to gatt_db_attribute_get_char_data
-1: T1 Title exceeds max length (86>80): "[BlueZ] gatt-db: Allow passing Characteristic Value to gatt_db_attribute_get_char_data"
+>>
+>> >         msft_le_monitor_advertisement_cb(hdev, status, hdev->msft_opco=
+de, skb);
+>> >
+>> > --
+>> > 2.36.0.512.ge40c2bad7a-goog
+>> >
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+> Regards,
+> Manish.
 
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6293214756268335994==--
+--=20
+Luiz Augusto von Dentz
