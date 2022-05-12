@@ -2,103 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FC71C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 22:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE466C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 22:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359020AbiELWBb (ORCPT
+        id S1353938AbiELWau (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 May 2022 18:01:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48620 "EHLO
+        Thu, 12 May 2022 18:30:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348898AbiELWB3 (ORCPT
+        with ESMTP id S1345057AbiELWat (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 May 2022 18:01:29 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4657F6222A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:01:28 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id w3so5839314qkb.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:01:28 -0700 (PDT)
+        Thu, 12 May 2022 18:30:49 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA54140F9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:30:46 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d25so6049343pfo.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:30:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=WQ2O4rtfSE0+nfVvOT6o7WBA7FT7qC1hINZ/Yf5a+zA=;
-        b=gdbaBF1fabrNt5gZx9gyf29EqdURE84WDnSkg+zEX2x4w1Z+mxhE2wOjEDbB8MNOe8
-         waFWFpf2PLoi3gJHs6thQX0RDSEdylpF3YNrZC7G0wbaAw4thnGhHSDXXU56k8CNsaDs
-         +StAY7U8f3pj85r95kNqhmcbvZTj5+5HX44rG8jcQhFaUzXjTx8eHxAa65fD3R5oztIm
-         TBPhOf7IfEzPvfPleW9PgL11gv642pjfY9gyN3f45gmFddzYPA5pVU0i/m8moK6LSLuv
-         dtoKr0W9VKvvx28Rs8tbpwDoGR10bu0h8oGmMOG1yrHxgz1fvtkdTt6HABc2XkmF029Z
-         W6bg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0tS5GuZAPhDArSYGea5NYia/bze9O9vmhRUhWdUMB3E=;
+        b=IJ/TQYi+EeZ+y5UJR34QksJvqPBkj6wJeY1Dn87rED9bnzcoZu+maNhpuGj8bh5Ksr
+         ycprRLglpAHYnwuEX9C3T6IhLyieYCuFJqe7TEvLC63SNWNNuCnP3MCeLWAAgQWwdQSf
+         PjYuh8EeHxf0gHMmEavTyy+ERoFMiPFvUZB2/3i5+NMenS+r4yBRPBQBTpQGpruf2q3j
+         J6pGG0iZYwbJsPyyvRrKecww3brUtIFsPhU29XYaBMpyay3wxgIgkKTpOrKJ2O5pMhxk
+         yxe06gfN1g14MhjxwinvDaIihp2dX3YgqzYyNaJ4cY4YOGqCkL7H8V+cEXu4XpA0y7j5
+         kJxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=WQ2O4rtfSE0+nfVvOT6o7WBA7FT7qC1hINZ/Yf5a+zA=;
-        b=upxYYNqKIDOi6CtaU4y6sPwsVwhggUZeYu1A8LICqg5PWk3fTE9NZxHqi1hlrrtzw5
-         6gfRI6wDeu+vzRWhfZ9eqdNl/mGAKAlFV5Cl/sJpNkl+gVuO1XKMN7ARa4B8148QlE+O
-         dinKK+bcvaUmbnDxBnMNtjAThteAiL/Fbtr35gHdZ07tWpHb+/yDTYf4a0TcG5QMqR53
-         naxIMjW78X+2Hyk0KfIT4ioK9OAVcvI+9Yz1uE55yyhmMVAcrAo3D5IgpNzSB1sx+hZ8
-         9ywuf4sxF9wZpFsooUAefRidVjMeZSKpV9akfQDbAzUG3WQemkhbPNlzMzG7c/8xpWOi
-         udDA==
-X-Gm-Message-State: AOAM533dpSmCZKkOXabxghUBaXeJvU4nN3UqrMWh6Vdsx7WROwQbLyVF
-        wI36y60oesgbr9JbIz/5JOyslH/fJKs=
-X-Google-Smtp-Source: ABdhPJyikVzhXa7R/BxKMYpTlcfWjWEyx1jYBIUdIUyWW23juoV8+0LCc2+raDuWT/aBulm3Rc9aBA==
-X-Received: by 2002:a37:a4c5:0:b0:69f:dde1:89c0 with SMTP id n188-20020a37a4c5000000b0069fdde189c0mr1690691qke.178.1652392887165;
-        Thu, 12 May 2022 15:01:27 -0700 (PDT)
-Received: from [172.17.0.2] ([20.232.96.98])
-        by smtp.gmail.com with ESMTPSA id r144-20020a37a896000000b0069ff8ebec64sm376502qke.103.2022.05.12.15.01.26
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=0tS5GuZAPhDArSYGea5NYia/bze9O9vmhRUhWdUMB3E=;
+        b=f3M86iUkuJmrxLL6ikqHkbS1ZscAIU5vzjOXFBZNniOC4mncpI12OnRW4pScTD6ftJ
+         4w0EWnYaJi3ViSIyvrd84993bXm413bYXJ+6lxObVQsv2YyZ8TPx+ev2w3qFRFOMMupT
+         /NyRcT3S94U8iBSHAI63d3XJDU4zJ8veehiD22MOg14szelTLlyU6qggxx3oBaYuJT98
+         UtWyZ0kSH79v6nuo72k0VygdWCWBqB3oN2nH2hhVudwKDlarea4lt4sqo9IF7tSW3act
+         j5fK7MaCAU36EJOOfBB99SHewgFMxfK4mfdiQVrDCIwWyF5bvp8ioc2AAw1dIpsfVQfV
+         /+Bg==
+X-Gm-Message-State: AOAM531Y5Ugv5++PdXjRC3JII85+XdY25tSxtyjdqs7w6gRz8xlZBmvv
+        tuR4fxmU0FGivnKV7ELjnQ/JfvTAQSc=
+X-Google-Smtp-Source: ABdhPJxoLouSH2Oai3CGL2+85l2KWtZg/ozBOstX9osRZAWWc2wdyCELQBOHFd0XqCY6ym3c0LR9oQ==
+X-Received: by 2002:a65:6946:0:b0:39d:a0c3:71f with SMTP id w6-20020a656946000000b0039da0c3071fmr1399731pgq.160.1652394645998;
+        Thu, 12 May 2022 15:30:45 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id n11-20020a170902e54b00b0015e8d4eb21asm409848plf.100.2022.05.12.15.30.44
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 15:01:26 -0700 (PDT)
-Message-ID: <627d83b6.1c69fb81.adfe1.271b@mx.google.com>
-Date:   Thu, 12 May 2022 15:01:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7219908043503552656=="
+        Thu, 12 May 2022 15:30:44 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP
+Date:   Thu, 12 May 2022 15:30:42 -0700
+Message-Id: <20220512223043.1020767-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [1/2] Bluetooth: btmtksdio: fix the reset takes too long
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <e26167a3fcefdeae1151162e8676c9a467a8100d.1652390894.git.objelf@gmail.com>
-References: <e26167a3fcefdeae1151162e8676c9a467a8100d.1652390894.git.objelf@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7219908043503552656==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+HCI_CONN_FLAG_REMOTE_WAKEUP can only be set if device can be programmed
+in the allowlist which in case of device using RPA requires LL Privacy
+support to be enabled.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=641161
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.34 seconds
-GitLint                       PASS      2.14 seconds
-SubjectPrefix                 PASS      1.72 seconds
-BuildKernel                   PASS      30.44 seconds
-BuildKernel32                 PASS      30.25 seconds
-Incremental Build with patchesPASS      45.84 seconds
-TestRunner: Setup             PASS      493.42 seconds
-TestRunner: l2cap-tester      PASS      17.46 seconds
-TestRunner: bnep-tester       PASS      6.12 seconds
-TestRunner: mgmt-tester       PASS      106.15 seconds
-TestRunner: rfcomm-tester     PASS      9.66 seconds
-TestRunner: sco-tester        PASS      9.65 seconds
-TestRunner: smp-tester        PASS      10.44 seconds
-TestRunner: userchan-tester   PASS      7.15 seconds
-
-
-
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=215768
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/mgmt.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d2d390534e54..74937a834648 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4529,6 +4529,23 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+ 						le_addr_type(cp->addr.type));
+ 		if (params) {
++			DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
++
++			bitmap_from_u64(flags, current_flags);
++
++			/* Devices using RPAs can only be programmed in the
++			 * acceptlist LL Privacy has been enable otherwise they
++			 * cannot mark HCI_CONN_FLAG_REMOTE_WAKEUP.
++			 */
++			if (test_bit(HCI_CONN_FLAG_REMOTE_WAKEUP, flags) &&
++			    !use_ll_privacy(hdev) &&
++			    hci_find_irk_by_addr(hdev, &params->addr,
++						 params->addr_type)) {
++				bt_dev_warn(hdev,
++					    "Cannot set wakeable for RPA");
++				goto unlock;
++			}
++
+ 			bitmap_from_u64(params->flags, current_flags);
+ 			status = MGMT_STATUS_SUCCESS;
+ 
+@@ -4545,6 +4562,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		}
+ 	}
+ 
++unlock:
+ 	hci_dev_unlock(hdev);
+ 
+ done:
+-- 
+2.35.1
 
---===============7219908043503552656==--
