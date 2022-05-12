@@ -2,184 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB32DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 21:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9FD1C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 22:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243633AbiELVsB (ORCPT
+        id S1358891AbiELWAp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 May 2022 17:48:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53230 "EHLO
+        Thu, 12 May 2022 18:00:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358886AbiELVrv (ORCPT
+        with ESMTP id S1359020AbiELWAn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 May 2022 17:47:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3C6F84EDFF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 14:47:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652392067;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YWzVrdFw3n8EH2Ce8k4daz33bBf83epcMdzHAJNT8tE=;
-        b=KEiVoSOA+oQeklljbLw+SrLVQaBAGzuidwFy6Nb6/D9/Pen6d08B1KDgUcZyZW04A318OS
-        aTttfMu2RS4+my6ot0BIoDg9OUg8S3lUWeuzgryk3XvuxvGpfrSKkj1ISpQfB9j1woVmKC
-        J/vTTEaGabgeDa0OFMFL03OkK39vwvw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-617-E2haYQIaNmW7kVC3uepXEg-1; Thu, 12 May 2022 17:47:46 -0400
-X-MC-Unique: E2haYQIaNmW7kVC3uepXEg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD7EB383328C;
-        Thu, 12 May 2022 21:47:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.37.67])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A13B84010E23;
-        Thu, 12 May 2022 21:47:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20220504014440.3697851-1-keescook@chromium.org>
-References: <20220504014440.3697851-1-keescook@chromium.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Alexei Starovoitov <ast@kernel.org>, alsa-devel@alsa-project.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Andrew Gabbasov <andrew_gabbasov@mentor.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Gross <agross@kernel.org>,
-        Andy Lavr <andy.lavr@gmail.com>,
-        Arend van Spriel <aspriel@gmail.com>,
-        Baowen Zheng <baowen.zheng@corigine.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Bradley Grove <linuxdrivers@attotech.com>,
-        brcm80211-dev-list.pdl@broadcom.com,
-        Christian Brauner <brauner@kernel.org>,
-        Christian =?utf-8?Q?G=C3=B6ttsche?= <cgzones@googlemail.com>,
-        Christian Lamparter <chunkeey@googlemail.com>,
-        Chris Zankel <chris@zankel.net>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Daniel Axtens <dja@axtens.net>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Dan Williams <dan.j.williams@intel.com>,
-        David Gow <davidgow@google.com>,
-        David Howells <dhowells@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-        devicetree@vger.kernel.org, Dexuan Cui <decui@microsoft.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        Eli Cohen <elic@nvidia.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Eric Paris <eparis@parisplace.org>,
-        Eugeniu Rosca <erosca@de.adit-jv.com>,
-        Felipe Balbi <balbi@kernel.org>,
-        Francis Laniel <laniel_francis@privacyrequired.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Franky Lin <franky.lin@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gregory Greenman <gregory.greenman@intel.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Hante Meuleman <hante.meuleman@broadcom.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Hulk Robot <hulkci@huawei.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        John Keeping <john@metanate.com>,
-        Juergen Gross <jgross@suse.com>, Kalle Valo <kvalo@kernel.org>,
-        Keith Packard <keithp@keithp.com>, keyrings@vger.kernel.org,
-        kunit-dev@googlegroups.com,
-        Kuniyuki Iwashima <kuniyu@amazon.co.jp>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Lars-Peter Clausen <lars@metafoo.de>,
-        Lee Jones <lee.jones@linaro.org>,
-        Leon Romanovsky <leon@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        linux1394-devel@lists.sourceforge.net,
-        linux-afs@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-hardening@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-xtensa@linux-xtensa.org, llvm@lists.linux.dev,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Louis Peens <louis.peens@corigine.com>,
-        Luca Coelho <luciano.coelho@intel.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Mark Brown <broonie@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Muchun Song <songmuchun@bytedance.com>,
-        Nathan Chancellor <nathan@kernel.org>, netdev@vger.kernel.org,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Nuno =?utf-8?Q?S=C3=A1?= <nuno.sa@analog.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Paul Moore <paul@paul-moore.com>,
-        Rich Felker <dalias@aerifal.cx>,
-        Rob Herring <robh+dt@kernel.org>,
-        Russell King <linux@armlinux.org.uk>, selinux@vger.kernel.org,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        SHA-cyfmac-dev-list@infineon.com,
-        Simon Horman <simon.horman@corigine.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Stefan Richter <stefanr@s5r6.in-berlin.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Stephen Smalley <stephen.smalley.work@gmail.com>,
-        Tadeusz Struk <tadeusz.struk@linaro.org>,
-        Takashi Iwai <tiwai@suse.com>, Tom Rix <trix@redhat.com>,
-        Udipto Goswami <quic_ugoswami@quicinc.com>,
-        Vincenzo Frascino <vincenzo.frascino@arm.com>,
-        wcn36xx@lists.infradead.org, Wei Liu <wei.liu@kernel.org>,
-        xen-devel@lists.xenproject.org,
-        Xiu Jianfeng <xiujianfeng@huawei.com>,
-        Yang Yingliang <yangyingliang@huawei.com>
-Subject: Re: [PATCH 00/32] Introduce flexible array struct memcpy() helpers
+        Thu, 12 May 2022 18:00:43 -0400
+Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E68D42
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:00:40 -0700 (PDT)
+Received: by mail-qt1-x835.google.com with SMTP id x22so5559910qto.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 15:00:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=p71y2NwAAdUGrA0DvULCOpPhthPTSSEofowXc1BU6vI=;
+        b=aGk3kd6GLxdUHhKzv5abKyARKkTGO6l05CRwMARGoZqy0B/8Lw2XZ0jHtlFlyp7DK9
+         38AvovQYqOKGYysAK9qCFHlasDDyjr/ESFaDfJY63Pf0J81AiJAMG4ZK5dbAyAfqhOMP
+         O9KxynzunGwadtdUkQ4WLNKBE0vZs8TSA3/18XeHteeuWYB3xEFd/e8xpx++Vlk5VF2k
+         YUIQIjz1i7b+n67HUiRlKriQ6P0COmpe6LKMPSjjtcbehvVPSirpNLUVHhlSUoiVEfL8
+         d+9Il5JPQGEP2dnszFN+9NHOW+K6U0CyrzkFhnRy7dkzTB0n6llqO4UrqHAZIsLM9f6B
+         8X2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=p71y2NwAAdUGrA0DvULCOpPhthPTSSEofowXc1BU6vI=;
+        b=stbO7X9Oy0Unj+NA6ojs0feZevINx2jPzL8lkI7y5xCJTb+Muoji6PWdnpf8oASqKq
+         Elj9B4A2OUo2ar0KkSWgOKKtfIUZOOO1f3SC5Ppxl+0/pRdfacmS747TLmUYsV7obOuA
+         Cf7rpL4YWX1HAVHfnp3zr2Bzuz+RK8XDUTumlHeHhc90HiLPMa8Pxb0cAIfPGu1LMuNr
+         Lmld5qjBIlUVvMsz4YqWb1g34UeeFU5l0wIN844vjhH8eWF/6td/lCgzGfYgWPgQfm3F
+         cNNAFJoCZ5TbP+/TrKDDjCVLn4F+/WhN68IQIr0/ehdMw6c+/RL179Xn4j+pHzbx+mcl
+         d1sQ==
+X-Gm-Message-State: AOAM533fmsjzWHcINpT45En0vvV1xqmZQDQaNb5SKh0RZeGXGptLnpeG
+        d9mPL26RXlPfn4rX/nDOTRSpvAxvKvY=
+X-Google-Smtp-Source: ABdhPJzU3mEKB13Q2sjyVb62uipmdMcY+QKImckScD4yGWyPoj534W0OGK2wcGfiTgLqlEcwZVOOcQ==
+X-Received: by 2002:ac8:5b53:0:b0:2f3:f26b:3d25 with SMTP id n19-20020ac85b53000000b002f3f26b3d25mr1913153qtw.357.1652392839643;
+        Thu, 12 May 2022 15:00:39 -0700 (PDT)
+Received: from [172.17.0.2] ([104.45.147.130])
+        by smtp.gmail.com with ESMTPSA id i133-20020a379f8b000000b0069fcdbabdb4sm402482qke.69.2022.05.12.15.00.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 15:00:39 -0700 (PDT)
+Message-ID: <627d8387.1c69fb81.dbef3.2d66@mx.google.com>
+Date:   Thu, 12 May 2022 15:00:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7973511841045018563=="
 MIME-Version: 1.0
-Content-Type: text/plain
-Date:   Thu, 12 May 2022 22:47:31 +0100
-Message-ID: <899235.1652392051@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220512205613.992901-1-luiz.dentz@gmail.com>
+References: <20220512205613.992901-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+--===============7973511841045018563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Kees Cook <keescook@chromium.org> wrote:
+This is automated email and please do not reply to this email!
 
-> I'm happy to also point out that the conversions (patches 5+) are actually
-> a net reduction in lines of code:
->  49 files changed, 154 insertions(+), 244 deletions(-)
+Dear submitter,
 
-That doesn't mean that it's actually code that's clearer to read.  I would say
-that it's actually less clear.  In a bunch of places, you've done something
-like:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=641155
 
--	e = kmalloc(...);
--	if (!e)
-+	if (__mem_to_flex_dup(&e, ...))
+---Test result---
 
-The problem is that, to me at least, it looks like:
+Test Summary:
+CheckPatch                    PASS      1.74 seconds
+GitLint                       PASS      1.00 seconds
+SubjectPrefix                 PASS      0.88 seconds
+BuildKernel                   PASS      33.34 seconds
+BuildKernel32                 PASS      28.56 seconds
+Incremental Build with patchesPASS      37.85 seconds
+TestRunner: Setup             PASS      466.89 seconds
+TestRunner: l2cap-tester      PASS      18.60 seconds
+TestRunner: bnep-tester       PASS      6.03 seconds
+TestRunner: mgmt-tester       PASS      100.03 seconds
+TestRunner: rfcomm-tester     PASS      9.71 seconds
+TestRunner: sco-tester        PASS      9.86 seconds
+TestRunner: smp-tester        PASS      9.80 seconds
+TestRunner: userchan-tester   PASS      6.14 seconds
 
--	e = kmalloc(...);
--	if (kmalloc failed)
-+	if (__mem_to_flex_dup(&e, ...) succeeded)
 
-David
 
+---
+Regards,
+Linux Bluetooth
+
+
+--===============7973511841045018563==--
