@@ -2,111 +2,225 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A502C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 23:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAEEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 May 2022 23:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359345AbiELXEe (ORCPT
+        id S1359520AbiELXsj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 May 2022 19:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52744 "EHLO
+        Thu, 12 May 2022 19:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359344AbiELXEd (ORCPT
+        with ESMTP id S238274AbiELXsi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 May 2022 19:04:33 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84B5EAFAD5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 16:04:32 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id y3so5625815qtn.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 16:04:32 -0700 (PDT)
+        Thu, 12 May 2022 19:48:38 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDEE880F8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 16:48:37 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id n10so6574302pjh.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 May 2022 16:48:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=sBZfVvDpvhXwc09ij3AjgQSPzLvrRO5dHoiiu9cJ0KM=;
-        b=qSsVxFCWfwk7B7F+y+207/7L58m9zZwuPtLdz+dmIqaWOuzlP0Mz8o5GNGsIXSL7x6
-         TIZJIqABeONz9jSZQ2C3zoxSlfJqvQinwdOKyE6MDT3RJLYlkCdsJP5cPgMNlU6o3Jvv
-         T1RLINUTCKw7xs6Yl+tRKRahLSlnLbgq5xBQYW6hb8HHV4gw0CLNKrVntrpWIcpemZk2
-         Jmh3fnx1Jt//O9twxZU4lk5mUd4IvPUdPyTcvo7+Nny/lQvxTt1DKxQ1NK13HUeeWv5r
-         boY0jtxgLGmCmXIBO52mEk1bTlxrWv0N9LIAjvXzPqvdV8+egONx5XKWa6NhCDp+tdxo
-         fVWg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KVKWBQbALvHxNistD9xC6wNABHokBOR7u6QCdSS79Sc=;
+        b=lYZvchYdVCVX7whkCkAQmFjJfqwiermL1Gf/hq/VxQyzNtiEVq3VhmBi2/EmGyPK8Q
+         zQaCi1WgjK7cw9wHTF9oZVL2FPE4spts2s3SCUg85bcfW6d8o3I0LG8Or9vxmdCnGInl
+         h9uzQAlDT2j/W5kOKbFZMuAVDb5OdRVZ99gfX3Xke5L+RvKu6hzEWh1+Bnzbu4eSOgLO
+         MSN0oT3MG4OYZRoNI1Q1ZVHsmNVfX8IKogYy2TGLDwHs0tEXEmhRzbkAgIPTDa+FXVw7
+         HiFaUyKwBm0yeIIEOR8AHw3ezkQWf4Z/qQ+Ih8vBrSoWrVbH9YEh4/u5aD2tDAORxFzv
+         5K0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=sBZfVvDpvhXwc09ij3AjgQSPzLvrRO5dHoiiu9cJ0KM=;
-        b=s/ORbYvpuPnCYDzDYZgTrZzqC52+xsAfwt4Hkp+Z+dPZ2w2WvMMxfisQWL4qnaRn8+
-         uvSFZ68Wl4dev/2XaXlMIAu4wUuo6s6gwjBHo5Y5PNrnCbnHrc8MkDT9kQuKfAlVDA5s
-         aHIPCtQdMzOts9Fc++o1Zy0z6L5CkruruxxF91zReEjspFgFU8bVfHi5bOB8hKBJy9bx
-         Ej9so86BHJy2xCzXwzLDm/D8H7mwc/zZFYrzC4UqHOH3zYBNiZvcmRFO1GZwavmyDajn
-         bBswGM0GUvfFjTNAkmkoLe5VJwlM/LgB5MYxtkRTypMEdEcL+5OcpHn9Hebx73kdV9Wc
-         4pOw==
-X-Gm-Message-State: AOAM530L8/dmPP2/PTeoIebqDq8lgJEzZck3XguyfPaKZhq5+Iqj0Dab
-        tnr7Rbz3G6s5QWrn1OUz7UGmVl0KGWpPVQ==
-X-Google-Smtp-Source: ABdhPJz3IWYYR0mT/jzoEIPblfNDjW8iPj2g2+akGhV7CJdgMtwp6+YTrXUy4sABd27nyVVeqYnEUA==
-X-Received: by 2002:a05:622a:608c:b0:2f1:e3fa:b603 with SMTP id hf12-20020a05622a608c00b002f1e3fab603mr2180696qtb.48.1652396671514;
-        Thu, 12 May 2022 16:04:31 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.250.98])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05622a114600b002f39b99f69esm488734qty.56.2022.05.12.16.04.31
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=KVKWBQbALvHxNistD9xC6wNABHokBOR7u6QCdSS79Sc=;
+        b=lWehfbrT/PE60S1tX+Y3UX4jGobkDQEAZJO37PxXzBMBsM/JK4QdIfmobkLy9AniEe
+         DJQdi45g9bn3AbtPyjGFW7swvG7c+HuJkjo61ploprX19H0CA6GfHZXy7Yfncz4eCoy4
+         Pnp1DWr23JqnBbVCeJeoPUB5PPsOz6MBc4Ds9almGjWWHY7D7DAK1WHkS1PqYftAlDOZ
+         DICsYm8cpJdjujXxF6iWtw8kyRJH8QolxM6+h0iVyC6Le6nkYo+cvPk2LfLmq94jZzeS
+         SEKaNMxG2/c+IdJedSoX9JKrYPMfY50+X5ZNJ7fTMrI4UkWt8tqbL72ShRaOEdYhzhJ3
+         i9cQ==
+X-Gm-Message-State: AOAM531xXv3s57hecbdc3omQZJLXOBtwKyfaQb4U5HWltz9/z7LYP8Pi
+        3RFTmNloJXy1LlbNt6z/u3nB7eTKMGs=
+X-Google-Smtp-Source: ABdhPJyx4rNgMi9QDLxX8C8ofSaHJpXp804TcuYsF+7lEWrhlovhekVZOVPKcrtfstWRVFrR2hyIgA==
+X-Received: by 2002:a17:90b:4c43:b0:1dc:d759:76f2 with SMTP id np3-20020a17090b4c4300b001dcd75976f2mr13525178pjb.191.1652399316873;
+        Thu, 12 May 2022 16:48:36 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id im2-20020a170902bb0200b0015e8d4eb1bdsm498173plb.7.2022.05.12.16.48.36
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 16:04:31 -0700 (PDT)
-Message-ID: <627d927f.1c69fb81.e896e.3477@mx.google.com>
-Date:   Thu, 12 May 2022 16:04:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3243755493222761670=="
+        Thu, 12 May 2022 16:48:36 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] device: Fix enabling wake support without RPA Resolution
+Date:   Thu, 12 May 2022 16:48:35 -0700
+Message-Id: <20220512234835.1042988-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/2] Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220512223134.1021074-1-luiz.dentz@gmail.com>
-References: <20220512223134.1021074-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3243755493222761670==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+If device uses RPA it shall only enable wakeup if RPA Resolution has
+been enabled otherwise it cannot be programmed in the acceptlist which
+can cause suspend to fail.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=641172
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.22 seconds
-GitLint                       FAIL      1.88 seconds
-SubjectPrefix                 PASS      1.70 seconds
-BuildKernel                   PASS      30.90 seconds
-BuildKernel32                 PASS      27.89 seconds
-Incremental Build with patchesPASS      44.22 seconds
-TestRunner: Setup             PASS      469.25 seconds
-TestRunner: l2cap-tester      PASS      17.40 seconds
-TestRunner: bnep-tester       PASS      6.07 seconds
-TestRunner: mgmt-tester       PASS      101.55 seconds
-TestRunner: rfcomm-tester     PASS      9.66 seconds
-TestRunner: sco-tester        PASS      9.48 seconds
-TestRunner: smp-tester        PASS      9.49 seconds
-TestRunner: userchan-tester   PASS      6.37 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 1.88 seconds
-Run gitlint with rule in .gitlint
-[v2,2/2] Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan
-1: T1 Title exceeds max length (84>80): "[v2,2/2] Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan"
-
-
-
-
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=215768
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c | 34 ++++++++++++++++++++++++++++------
+ src/adapter.h | 10 ++++++++++
+ src/device.c  | 14 ++++++++++++++
+ src/device.h  |  1 +
+ 4 files changed, 53 insertions(+), 6 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index db2624c60..f7faaa263 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4761,6 +4761,9 @@ static void load_devices(struct btd_adapter *adapter)
+ 		if (!device)
+ 			goto free;
+ 
++		if (irk_info)
++			device_set_rpa(device, true);
++
+ 		btd_device_set_temporary(device, false);
+ 		adapter_add_device(adapter, device);
+ 
+@@ -9569,8 +9572,9 @@ static bool set_blocked_keys(struct btd_adapter *adapter)
+ 						adapter, NULL);
+ }
+ 
+-#define EXP_FEAT(_uuid, _func) \
++#define EXP_FEAT(_flag, _uuid, _func) \
+ { \
++	.flag = _flag, \
+ 	.uuid = _uuid, \
+ 	.func = _func, \
+ }
+@@ -9692,15 +9696,18 @@ static void codec_offload_func(struct btd_adapter *adapter, uint8_t action)
+ }
+ 
+ static const struct exp_feat {
++	uint32_t flag;
+ 	const struct mgmt_exp_uuid *uuid;
+ 	void (*func)(struct btd_adapter *adapter, uint8_t action);
+ } exp_table[] = {
+-	EXP_FEAT(&debug_uuid, exp_debug_func),
+-	EXP_FEAT(&le_simult_central_peripheral_uuid,
++	EXP_FEAT(EXP_FEAT_DEBUG, &debug_uuid, exp_debug_func),
++	EXP_FEAT(EXP_FEAT_LE_SIMULT_ROLES, &le_simult_central_peripheral_uuid,
+ 		 le_simult_central_peripheral_func),
+-	EXP_FEAT(&quality_report_uuid, quality_report_func),
+-	EXP_FEAT(&rpa_resolution_uuid, rpa_resolution_func),
+-	EXP_FEAT(&codec_offload_uuid, codec_offload_func),
++	EXP_FEAT(EXP_FEAT_BQR, &quality_report_uuid, quality_report_func),
++	EXP_FEAT(EXP_FEAT_RPA_RESOLUTION, &rpa_resolution_uuid,
++		rpa_resolution_func),
++	EXP_FEAT(EXP_FEAT_CODEC_OFFLOAD, &codec_offload_uuid,
++		codec_offload_func),
+ };
+ 
+ static void read_exp_features_complete(uint8_t status, uint16_t length,
+@@ -10451,3 +10458,18 @@ bool btd_has_kernel_features(uint32_t features)
+ {
+ 	return (kernel_features & features) ? true : false;
+ }
++
++bool btd_adapter_has_exp_feature(struct btd_adapter *adapter, uint32_t feature)
++{
++	size_t i;
++
++	for (i = 0; i < ARRAY_SIZE(exp_table); i++) {
++		const struct exp_feat *feat = &exp_table[i];
++
++		if ((feat->flag & feature) && queue_find(adapter->exps, NULL,
++							feat->uuid->val))
++			return true;
++	}
++
++	return false;
++}
+diff --git a/src/adapter.h b/src/adapter.h
+index 35deb1d11..688ed51c6 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -254,6 +254,16 @@ void btd_adapter_for_each_device(struct btd_adapter *adapter,
+ 
+ bool btd_le_connect_before_pairing(void);
+ 
++enum experimental_features {
++	EXP_FEAT_DEBUG			= 1 << 0,
++	EXP_FEAT_LE_SIMULT_ROLES	= 1 << 1,
++	EXP_FEAT_BQR			= 1 << 2,
++	EXP_FEAT_RPA_RESOLUTION		= 1 << 3,
++	EXP_FEAT_CODEC_OFFLOAD		= 1 << 4,
++};
++
++bool btd_adapter_has_exp_feature(struct btd_adapter *adapter, uint32_t feature);
++
+ enum kernel_features {
+ 	KERNEL_CONN_CONTROL		= 1 << 0,
+ 	KERNEL_BLOCKED_KEYS_SUPPORTED	= 1 << 1,
+diff --git a/src/device.c b/src/device.c
+index b0309a1e7..faf071876 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -178,6 +178,7 @@ struct btd_device {
+ 	uint8_t		conn_bdaddr_type;
+ 	bdaddr_t	bdaddr;
+ 	uint8_t		bdaddr_type;
++	bool		rpa;
+ 	char		*path;
+ 	bool		bredr;
+ 	bool		le;
+@@ -1449,6 +1450,12 @@ static bool device_get_wake_support(struct btd_device *device)
+ 
+ void device_set_wake_support(struct btd_device *device, bool wake_support)
+ {
++	if (device->rpa && !btd_adapter_has_exp_feature(device->adapter,
++						EXP_FEAT_RPA_RESOLUTION)) {
++		warn("Unable to set wake_support without RPA resolution");
++		return;
++	}
++
+ 	device->wake_support = wake_support;
+ 
+ 	/* If wake configuration has not been made yet, set the initial
+@@ -4583,11 +4590,18 @@ void device_set_class(struct btd_device *device, uint32_t class)
+ 						DEVICE_INTERFACE, "Icon");
+ }
+ 
++void device_set_rpa(struct btd_device *device, bool value)
++{
++	device->rpa = value;
++}
++
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type)
+ {
+ 	bool auto_connect = device->auto_connect;
+ 
++	device_set_rpa(device, true);
++
+ 	if (!bacmp(bdaddr, &device->bdaddr) &&
+ 					bdaddr_type == device->bdaddr_type)
+ 		return;
+diff --git a/src/device.h b/src/device.h
+index 9cdc0e68d..5e8d1c3e1 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -28,6 +28,7 @@ bool device_name_known(struct btd_device *device);
+ bool device_is_name_resolve_allowed(struct btd_device *device);
+ void device_name_resolve_fail(struct btd_device *device);
+ void device_set_class(struct btd_device *device, uint32_t class);
++void device_set_rpa(struct btd_device *device, bool value);
+ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type);
+ void device_set_bredr_support(struct btd_device *device);
+-- 
+2.35.1
 
---===============3243755493222761670==--
