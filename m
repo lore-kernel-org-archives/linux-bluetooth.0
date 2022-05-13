@@ -2,82 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01EFDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 11:30:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 991D1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 12:44:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379927AbiEMLaU (ORCPT
+        id S232952AbiEMMoF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 May 2022 07:30:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54836 "EHLO
+        Fri, 13 May 2022 08:44:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379924AbiEMLaQ (ORCPT
+        with ESMTP id S1377793AbiEMMnO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 May 2022 07:30:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0352B4CB3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 04:30:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9081D61DF7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 11:30:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F0365C34119;
-        Fri, 13 May 2022 11:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652441414;
-        bh=v3j6IOobd+i4tuCxop3lZLOJYbssSBSH42/WYQ3Eviw=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=H9WXqLa0KvI0lIcsMeVEYJIXrjiNqwPq+O7W9CestdtgqroLANfyaIp755SjP77Po
-         IhoTILSVTFKBUF5ibZ0jnEtckw3IpSlEkCM83mv1MNV/k2oZfl7ikqfa52Twa306nK
-         TB0Q/otQItbO5sjkD/lm9q0sXwcH2x3hbJjonw1cq6Dmy4qG7c8fE01SHS0A3H3yVV
-         SlTUOoq5vYut75edOe/Z7VpFJzhYXA0Ep9x3r8N+7LwEG/GAQaOYIdpX/Q/3EWocYx
-         OE5zpi8AjPjr7NdRTlcRF58o2SiYwInkIkXxtK9+m3WqQ3REs8B+koFCEMT/mab558
-         kx9/rB3fGnjhQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DE419E8DBDA;
-        Fri, 13 May 2022 11:30:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 13 May 2022 08:43:14 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B2B38DB1;
+        Fri, 13 May 2022 05:43:13 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id qe3-20020a17090b4f8300b001dc24e4da73so7816518pjb.1;
+        Fri, 13 May 2022 05:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=h/lzCrNSdK6aw6uu8WZ5885TJVvZQC7khSR0mjKmT9o=;
+        b=Vxd1yiOzjv3kwu8hu9Aj+mCmcbe8+8hiJNTdhvpH25P/4+RNW1VFFYZcdUYDX/bJOS
+         LDRax70bo3c0nHwPfBrxWNLpINvIihr7F7UwUZplDAqsAe7ON9Tvx49rufjwRMzwAAJf
+         GQ4IFoWn/xJumtt9bf1MxXH8zKi+JJXPk+Yi7QTG2Qcu6An2thxl1AHQe6T34DI9Iual
+         ZtEO4UexYc3yAdPFHLXPv05LS5zG6hyNrAlPisSidlTvfeu5oiHlTXp2C67fFrRYVj54
+         /36OKKi61Oe+3IFB70dtVjA5JUE9PcRgQITtLTBgAk/xHhB6DbEvX/iarwogc34IG4tT
+         V6Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=h/lzCrNSdK6aw6uu8WZ5885TJVvZQC7khSR0mjKmT9o=;
+        b=jVo31LdT14dRKYz1R8ehyfDUEX/GNeDqGQ5p19qO+d4COqvTEXLvdAHl+rePAGZjP/
+         UtRVzigowMKkoYbVwWIfTodCbqeXNmvorym+8QfFMnvEp06aGcHMF1ZjuJPgalBR1WZ0
+         KdhCjcNjx9tHKj2/8nYW1PPO+V4XFY2vEeT4wHOQehEGyuKYSZPpKMz60nd3nHV3kT9y
+         cEZba1mLRu9rJsEOmZy6AOL9yGzzhdrd5q8alcl1IDm1I4K64TDwu4Zzjq267ZLquPKK
+         +Y/pCZfwpV4YlNh+71UqMx/FXKccXm9VDM7ZELQrbhJ9hbjVhJiC/xthuPgJ04+E+wit
+         gmyg==
+X-Gm-Message-State: AOAM533S17xhR83iIc7aD/YfZxw31McO0gCpiwbaw8kJss9NUBnwJcbN
+        M1W82evrGObtE+TT/fF87w==
+X-Google-Smtp-Source: ABdhPJw79BFYrocdWto1AapSc9S27/5HmJ8vUy568L6AVdsVn79Ocg7HiJvH5kD4yuoOlyEbwEJNCA==
+X-Received: by 2002:a17:90a:a410:b0:1dc:d03b:5623 with SMTP id y16-20020a17090aa41000b001dcd03b5623mr4830324pjp.95.1652445793339;
+        Fri, 13 May 2022 05:43:13 -0700 (PDT)
+Received: from localhost.localdomain ([144.202.91.207])
+        by smtp.gmail.com with ESMTPSA id g11-20020a170902868b00b0015e8d4eb250sm1748653plo.154.2022.05.13.05.43.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 May 2022 05:43:12 -0700 (PDT)
+From:   Zheyu Ma <zheyuma97@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Zheyu Ma <zheyuma97@gmail.com>
+Subject: [PATCH] bluetooth: bfusb: Check the endpoint type at probe
+Date:   Fri, 13 May 2022 20:43:03 +0800
+Message-Id: <20220513124303.2192981-1-zheyuma97@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/2] Bluetooth: MGMT: Add conditions for setting
- HCI_CONN_FLAG_REMOTE_WAKEUP
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165244141390.14739.9647709531898144836.git-patchwork-notify@kernel.org>
-Date:   Fri, 13 May 2022 11:30:13 +0000
-References: <20220512223134.1021074-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220512223134.1021074-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The driver reported an warning in usb_submit_urb() which is caused by
+wrong endpoint type.
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+[    3.295630] usb 1-1: BOGUS urb xfer, pipe 3 != type 1
+[    3.295916] WARNING: CPU: 0 PID: 33 at drivers/usb/core/urb.c:503 usb_submit_urb+0xcd9/0x18b0
+[    3.298155] RIP: 0010:usb_submit_urb+0xcd9/0x18b0
+[    3.302451] Call Trace:
+[    3.302580]  <TASK>
+[    3.302698]  bfusb_rx_submit+0x24e/0x390 [bfusb]
+[    3.302938]  bfusb_open+0x50/0x90 [bfusb]
 
-On Thu, 12 May 2022 15:31:33 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> HCI_CONN_FLAG_REMOTE_WAKEUP can only be set if device can be programmed
-> in the allowlist which in case of device using RPA requires LL Privacy
-> support to be enabled.
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=215768
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> [...]
+Fix this by checking the endpoint type at first.
 
-Here is the summary with links:
-  - [v2,1/2] Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a9a347655d22
-  - [v2,2/2] Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3b42055388c3
+Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
+---
+ drivers/bluetooth/bfusb.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index cab93935cc7f..447b6876c552 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -613,7 +613,9 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
+ 	bulk_out_ep = &intf->cur_altsetting->endpoint[0];
+ 	bulk_in_ep  = &intf->cur_altsetting->endpoint[1];
+ 
+-	if (!bulk_out_ep || !bulk_in_ep) {
++	if (!bulk_out_ep || !bulk_in_ep ||
++		!usb_endpoint_is_bulk_out(&bulk_out_ep->desc) ||
++		!usb_endpoint_is_bulk_in(&bulk_in_ep->desc)) {
+ 		BT_ERR("Bulk endpoints not found");
+ 		goto done;
+ 	}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
