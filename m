@@ -2,80 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06010C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 11:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7408DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 11:21:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358219AbiEMLPj convert rfc822-to-8bit (ORCPT
+        id S1379864AbiEMLVm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 May 2022 07:15:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56434 "EHLO
+        Fri, 13 May 2022 07:21:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344410AbiEMLPh (ORCPT
+        with ESMTP id S1379863AbiEMLVl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 May 2022 07:15:37 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B95C5DA12;
-        Fri, 13 May 2022 04:15:34 -0700 (PDT)
-Received: from smtpclient.apple (p4ff9f69b.dip0.t-ipconnect.de [79.249.246.155])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 40C18CED39;
-        Fri, 13 May 2022 13:15:33 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
-Subject: Re: [PATCH] Bluetooth: btintel: Correctly declare all module firmware
- files.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220509163259.1513242-1-dimitri.ledkov@canonical.com>
-Date:   Fri, 13 May 2022 13:15:32 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3EA82A93-D167-482D-AAF4-D781B77A4646@holtmann.org>
-References: <20220509163259.1513242-1-dimitri.ledkov@canonical.com>
-To:     Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-X-Mailer: Apple Mail (2.3696.80.82.1.1)
+        Fri, 13 May 2022 07:21:41 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD714F477;
+        Fri, 13 May 2022 04:21:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D11A161D7B;
+        Fri, 13 May 2022 11:21:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3DBA8C36AE2;
+        Fri, 13 May 2022 11:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652440899;
+        bh=PVTCAHuDpC7TKyqJJ6yfKKs+p30+5tiQZTFIZV159oQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=TnM8HoUNbVYxdTfg0b+rnan7vn3FmRPLuc3+jS73RubnADXWLI9nzvgXXO1VyRZyM
+         kjGMeB8BfAvNS62ZVPFyVv8ktAfKLD8Kb69viEBnHaxS6odD40foB5mmxlbyMBeliU
+         x2k6BMb9QHixVfqPWE5XTLfshNLNrPje+QV17xuKs5QBw9+jDWQhTd18Hnlo+aPJ1X
+         zPZsZxfLHvgjeg7n4fCt8PBaL5oUSPSJDggPQP1JyDjbti1uHS96RNhHDs/AzwcuZ/
+         X8ZgPc9NnyMcciYpYCdpZScmmerBVJRVghnAlFf1Tqc4YvypKGw00wrs+StI7kzhkF
+         2QhHh764cbZrw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1E0F3E8DBDA;
+        Fri, 13 May 2022 11:21:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: btbcm: Add entry for BCM4373A0 UART Bluetooth
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165244089911.8477.8063070079009637517.git-patchwork-notify@kernel.org>
+Date:   Fri, 13 May 2022 11:21:39 +0000
+References: <20220505195010.31329-1-tharvey@gateworks.com>
+In-Reply-To: <20220505195010.31329-1-tharvey@gateworks.com>
+To:     Tim Harvey <tharvey@gateworks.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dimitri,
+Hello:
 
-> Correctly declare wildcard of module firmwares to include, as the
-> driver & linux-firmware ship many sfi/ddc files for many different
-> devices which are dynamically calculated and loaded by the driver.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
+
+On Thu,  5 May 2022 12:50:10 -0700 you wrote:
+> This patch adds the device ID for the BCM4373A0 module, found e.g. in
+> the Infineon (Cypress) CYW4373E chip. The required firmware file is
+> named 'BCM4373A0.hcd'.
 > 
-> This especially affects environments that only install firmware files
-> declared and referenced by the kernel module. In such environments,
-> only the declared firmware files were copied resulting in most Intel
-> Bluetooth devices not working. I.e. host-only dracut-install initrds,
-> or Ubuntu Core kernel snaps.
-> 
-> BugLink: https://bugs.launchpad.net/bugs/1970819
-> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+> Signed-off-by: Tim Harvey <tharvey@gateworks.com>
 > ---
-> drivers/bluetooth/btintel.c | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 06514ed66022..9f5fc1ab154d 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2654,7 +2654,5 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
-> MODULE_VERSION(VERSION);
-> MODULE_LICENSE("GPL");
-> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
-> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
-> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
-> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
-> +MODULE_FIRMWARE("intel/ibt-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-*.ddc");
+>  drivers/bluetooth/btbcm.c | 1 +
+>  1 file changed, 1 insertion(+)
 
-NAK, we should just declare any missing firmwares. The tables inside the driver are pretty clear on what hardware is marked as supported. It just seems someone forgot to add the firmware files for it.
+Here is the summary with links:
+  - Bluetooth: btbcm: Add entry for BCM4373A0 UART Bluetooth
+    https://git.kernel.org/bluetooth/bluetooth-next/c/0d37ddfc50d9
 
-Regards
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Marcel
 
