@@ -2,110 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7611C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 13:25:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CBCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 May 2022 13:50:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380675AbiEMNZY (ORCPT
+        id S238781AbiEMNur (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 May 2022 09:25:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41082 "EHLO
+        Fri, 13 May 2022 09:50:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346448AbiEMNZV (ORCPT
+        with ESMTP id S1382485AbiEMNsi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 May 2022 09:25:21 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ECC5C9EC4;
-        Fri, 13 May 2022 06:25:20 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id d22so7920206plr.9;
-        Fri, 13 May 2022 06:25:20 -0700 (PDT)
+        Fri, 13 May 2022 09:48:38 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3A19FD3C
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 06:48:37 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id hh4so6809438qtb.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 06:48:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M2Uq3anO9XsQ/izX2BhZt6ctVSGq//1grHAsTj5b3w0=;
-        b=GQhMzNiBhd6HkxmvVKKiAYtBGSqks4sziBmI/N6TTtOwxKE1oYKX6hmOGQrswXBmOC
-         Mwvy3HLOp1fl+gtgR4zP/QKxKXcwzHw3kfT/FLHb4gDPd+7n0gQtgGsRbP9pjDPVe9uI
-         IWnsHIX2WyDZfl8ysop9xkBHih3GEJVqlzO2UMnZOkARlyFrW/wQ6UnDesD0ff/QVeVp
-         /djBbBf9A5FYjmXPl5JeaLeGD6O1hQQmRfZ/pF0HkanD6a4ydjfTSn0V2h2/B0XPBI9n
-         +VeWS3i/m+geDIjUgH2Kji5wImr8mfmpVMWyEKB52ZztadHOOUmWMtwJLFRp6URpQ+Ug
-         obDA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=LSlZipp+0AE0zGb3icKCc1YkuSTgVLSHy2KGqRk6I4Y=;
+        b=oz2ehdPAUMrdhTlZzXCqOiGsYkm6PLehtfQP/pXpPWiCxbnA1uvbK0hOTPUhAPofM3
+         UtiC3Ly9cuC6yL5pwTzRrWoKNSBC5PArKns52RsQ5NuIgg+UWyWOHVZ04CakRppV1Shc
+         RIV59GiYCj8zL3fJHXv+yJgz29HoUkKbFmZW9SmqUixmfqCo4Y8dGINZcqct1/iOltHs
+         rT6mQD8QNjuX4sF0gw1QPbLecmDc5nCIt8Nw+QRQYg6SJw+8+59y+IDxUInA/PI9N1JF
+         MOL4jk0ftt1zLvFY0V0SUiF4SvJI7c/ae42RV1gcZZWnJA+jgSjjqXkD/O3bw0N45XYo
+         Y+Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M2Uq3anO9XsQ/izX2BhZt6ctVSGq//1grHAsTj5b3w0=;
-        b=zITT56hSS1CKkR6INSX/u/pttxJdd6d1Kh7pDWjNYi4YiS4HFfP3hn0lUx8tK4ZGYu
-         Db87SsaRTk0Ede2jylspcyyaTAEamddnc6S+Qri/PBy0ApS5F3CCSNhEiyjpOe9jqKk4
-         nzEvrh4EVIUunyJvYU3HA77m6XFM3YKGRMDlP/bI5DYA9sL8BWkU9DZjeUm/4vjmQsLE
-         Ht+7ZY+8GMA9rosL/Qym7kaWtNYY36jb0BfvCnenIWRdz4VDFWrgKRH8uPTylui8BmKk
-         JLuIFUNDzGlkZzGPk9VWb7R1DVK38y90nV7mIgKGuXkinnJ0fWUT88qU/yAJxspvwqEF
-         HnUw==
-X-Gm-Message-State: AOAM530stHG6u94gA2f+nymVhhFBgomD3nS8ZP4zMQr124e/W54pHbKf
-        oRGJfuY87RzsMlHgs5x0rnEjg6Hav3NFN3H0nQ==
-X-Google-Smtp-Source: ABdhPJzlPJMtmgNFFRsuCblpOfj4Uc8gFbbJSUP+a66fiJ9tu2Ns/kxPMQZVKTRmRB5P0RXrYb1bDL4IHDJvenJNoYs=
-X-Received: by 2002:a17:90a:db45:b0:1d9:29d0:4c6e with SMTP id
- u5-20020a17090adb4500b001d929d04c6emr4965915pjx.46.1652448319067; Fri, 13 May
- 2022 06:25:19 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=LSlZipp+0AE0zGb3icKCc1YkuSTgVLSHy2KGqRk6I4Y=;
+        b=mDljjdvlhCPi00OQZeQcoVUXiAbySQkuge7G8Z8ghavXBqOXXaz+hL6yj9+aw5Lb9g
+         rhBQ4r4njuSYV0Dbd7dzpcUtnsgEwpMbidpri9L69R6jHuNcQTY48JLI9s9K4psQicYI
+         cLBw+ylk199UXlUwfjLZEyw8IeQnPX8Fvg3iHaJ4rPQF7szl38MMLxHacD89CBUCB9x8
+         bTTEai0KurRzd3v2WEInneQRaFfJY4l1ZsaCARKIXMop+nSVzGzYY6uOj0kDxETnaF/k
+         2jCPSbLL5DKP2V3caO9vzatbUQkkewSkTJXgwRwIFePWD8z/m7zYD3czooateDDLnleE
+         XsdQ==
+X-Gm-Message-State: AOAM532g+pWzkZZOBSIPQlKXlyYy4tXoJKVb7VZR/3a1bfTxL7BjrBfu
+        DbBGblGw1Q92Ly2q8k5Jm0Colt0Pjak=
+X-Google-Smtp-Source: ABdhPJyIOxYMyjTKPkkee3ZCFs/wqvHSF33wtqNkhKYIMnZ/SZY3fkZtR28T1uZDBsxb9ieBo0vwHw==
+X-Received: by 2002:a05:622a:285:b0:2f3:ddbd:b632 with SMTP id z5-20020a05622a028500b002f3ddbdb632mr4547325qtw.217.1652449716612;
+        Fri, 13 May 2022 06:48:36 -0700 (PDT)
+Received: from [172.17.0.2] ([52.152.132.128])
+        by smtp.gmail.com with ESMTPSA id bk41-20020a05620a1a2900b0069fc13ce23bsm1357035qkb.108.2022.05.13.06.48.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 May 2022 06:48:36 -0700 (PDT)
+Message-ID: <627e61b4.1c69fb81.40c5f.731e@mx.google.com>
+Date:   Fri, 13 May 2022 06:48:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1248649774355339365=="
 MIME-Version: 1.0
-References: <20220513124303.2192981-1-zheyuma97@gmail.com> <E8995590-F2D5-4E8E-80EF-874AFFB72784@holtmann.org>
-In-Reply-To: <E8995590-F2D5-4E8E-80EF-874AFFB72784@holtmann.org>
-From:   Zheyu Ma <zheyuma97@gmail.com>
-Date:   Fri, 13 May 2022 21:25:08 +0800
-Message-ID: <CAMhUBjm_XrOg=EGTZoAe=BprtffAFu+qB2r4Zi_6V_e4Kns+SA@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: bfusb: Check the endpoint type at probe
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, zheyuma97@gmail.com
+Subject: RE: bluetooth: bfusb: Check the endpoint type at probe
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220513124303.2192981-1-zheyuma97@gmail.com>
+References: <20220513124303.2192981-1-zheyuma97@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 13, 2022 at 8:53 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Zheyu,
->
-> > The driver reported an warning in usb_submit_urb() which is caused by
-> > wrong endpoint type.
-> >
-> > [    3.295630] usb 1-1: BOGUS urb xfer, pipe 3 != type 1
-> > [    3.295916] WARNING: CPU: 0 PID: 33 at drivers/usb/core/urb.c:503 usb_submit_urb+0xcd9/0x18b0
-> > [    3.298155] RIP: 0010:usb_submit_urb+0xcd9/0x18b0
-> > [    3.302451] Call Trace:
-> > [    3.302580]  <TASK>
-> > [    3.302698]  bfusb_rx_submit+0x24e/0x390 [bfusb]
-> > [    3.302938]  bfusb_open+0x50/0x90 [bfusb]
-> >
-> > Fix this by checking the endpoint type at first.
-> >
-> > Signed-off-by: Zheyu Ma <zheyuma97@gmail.com>
-> > ---
-> > drivers/bluetooth/bfusb.c | 4 +++-
-> > 1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-> > index cab93935cc7f..447b6876c552 100644
-> > --- a/drivers/bluetooth/bfusb.c
-> > +++ b/drivers/bluetooth/bfusb.c
-> > @@ -613,7 +613,9 @@ static int bfusb_probe(struct usb_interface *intf, const struct usb_device_id *i
-> >       bulk_out_ep = &intf->cur_altsetting->endpoint[0];
-> >       bulk_in_ep  = &intf->cur_altsetting->endpoint[1];
-> >
-> > -     if (!bulk_out_ep || !bulk_in_ep) {
-> > +     if (!bulk_out_ep || !bulk_in_ep ||
-> > +             !usb_endpoint_is_bulk_out(&bulk_out_ep->desc) ||
-> > +             !usb_endpoint_is_bulk_in(&bulk_in_ep->desc)) {
-> >               BT_ERR("Bulk endpoints not found");
-> >               goto done;
-> >       }
->
-> how are you getting this. This driver only works on one specific piece of hardware.
+--===============1248649774355339365==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Actually, I used a virtual device to test the driver, and got the above warning.
-The USB device may be programmable and malicious, so the driver should
-carefully treat the input that the device provided.
+This is automated email and please do not reply to this email!
 
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=641391
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.62 seconds
+GitLint                       FAIL      1.00 seconds
+SubjectPrefix                 FAIL      0.85 seconds
+BuildKernel                   PASS      37.39 seconds
+BuildKernel32                 PASS      32.48 seconds
+Incremental Build with patchesPASS      43.17 seconds
+TestRunner: Setup             PASS      542.39 seconds
+TestRunner: l2cap-tester      PASS      19.03 seconds
+TestRunner: bnep-tester       PASS      6.79 seconds
+TestRunner: mgmt-tester       PASS      116.84 seconds
+TestRunner: rfcomm-tester     PASS      10.85 seconds
+TestRunner: sco-tester        PASS      10.37 seconds
+TestRunner: smp-tester        PASS      10.63 seconds
+TestRunner: userchan-tester   PASS      7.00 seconds
+
+Details
+##############################
+Test: GitLint - FAIL - 1.00 seconds
+Run gitlint with rule in .gitlint
+bluetooth: bfusb: Check the endpoint type at probe
+7: B1 Line exceeds max length (96>80): "[    3.295916] WARNING: CPU: 0 PID: 33 at drivers/usb/core/urb.c:503 usb_submit_urb+0xcd9/0x18b0"
+
+
+##############################
+Test: SubjectPrefix - FAIL - 0.85 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
+---
 Regards,
-Zheyu Ma
+Linux Bluetooth
+
+
+--===============1248649774355339365==--
