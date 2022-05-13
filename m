@@ -2,142 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F343EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 May 2022 01:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C192EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 May 2022 01:41:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229464AbiENBBq (ORCPT
+        id S229625AbiENBln (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 May 2022 21:01:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53808 "EHLO
+        Fri, 13 May 2022 21:41:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiENBBo (ORCPT
+        with ESMTP id S229610AbiENBlm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 May 2022 21:01:44 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C08934219C
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 17:37:37 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id v66so12078855oib.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 17:37:37 -0700 (PDT)
+        Fri, 13 May 2022 21:41:42 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5B936DCDD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 16:46:27 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id o190so10336879iof.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 May 2022 16:46:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TDw2EF76bFWlKcTGV1GJw+KjAOlIdVUgMjVyObR6IxQ=;
-        b=m2IJNQSqV8ZtytcWwjcL8T+UFI2hCAn+ImvKgKrwV7KnLjRwyS6sJeLkQITZNRgst9
-         FXp9FfKuWgv99fqIbj4JVJY2xLQSeBv+Wq4aaPPl0+WH6pvyVvi+pbAm2bFsOqa3Ub3O
-         OfDUL70xfoep22Bbb49T+qXvvb9IQJGgi9LYeH9eEjlAPBtvgz56fDalW74xpN+W5PYF
-         mX7VTPvTrtHD0s/2mTZSCaeK4aIgp6Nf4/gmR/1gaA2BDkX9yNOL3T3XZYRv5C3yAvsZ
-         XkKgkYMBAS4y2DXPhtWcmiCm7BQCkO7udpk/SBtJ6aDGgRomsCjNxszzvrLrTD2kRqvQ
-         j3pg==
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=VlFyv9ldND/lJmA77XlE+D6MAlUKWPX9DalQosILKag=;
+        b=jvPJb5/FrbHeypd7sMc4l6Cli6Izcz+IphxhKGAkhetMXNO16wnUcANno3TIYVR62l
+         xKu0MUwQCdbdFxyalxjNtUbdFShSAEhzDcluZTfWL659bGUkH7rBIJ7FaCRF7gXp9WtJ
+         AnG0mNV0XgquAmjmCor5EBxKdeDLc1+A+P2OqDSkanyfPhsowbtw7o7xJcrKJWKTSd+d
+         TP1gosSV32D8YhtSVVBQY0EHtdrHURsbfWahM3Z0HfqTMhpc1838Nkcrsc4CslUo136W
+         QxK+pu10vZFr1ILY7zo5LG/GqIwUvv1ejBmjKfMrD8jkioSPW3vcUr7WqKNADw0Ox0be
+         Lovw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TDw2EF76bFWlKcTGV1GJw+KjAOlIdVUgMjVyObR6IxQ=;
-        b=RJ8MYcLN3QPW5MhjxS0Xe/INKgKJyCIuoLaXlrAfwZoACC0jgXpP8Of17XJqS3I7HT
-         vmHLM6OlVpVMCHGqWFMpt488it3+OG2xrsvYVqbzMPJWAVYFYbDd8sh+e8G+JOVBaAoR
-         JntfoA+KLGp5OSPgcVgu4CxpPHnBTsKa2NIl6ggzrAzYNBiJkYi5WdbWfEoLYuGHSt3s
-         VL8A628gaqWY2kKNiBtixMctYuzPu1KhAmacaJ/HkfYEnLzdbtvJ6J8RXh15vc3TrkmN
-         v1X5OFfuGlcfu2Ey/pAImuKUxM/PUJIRt894EhBcBcgdXqXQQHH4tbpaJNcnMjti9td9
-         bPvg==
-X-Gm-Message-State: AOAM5303EpiwXpbe5jzGJrTohRaDZ2qsZXUs/Y5WNs1FBGTpoEqtezom
-        XTxbBTxhBRzbYYo30w3foXaXD7EvuftMRuysbG+M13CU
-X-Google-Smtp-Source: ABdhPJyuKC8Ns+pNRJDYiqswUb2AE7azGoZ3Dn231AOWbsE5rJKHE6RMVQAjyzIGjGn+llIh94pfgYn4ZrZ8PfYbc8g=
-X-Received: by 2002:a17:90b:4b83:b0:1dc:4cc8:16d9 with SMTP id
- lr3-20020a17090b4b8300b001dc4cc816d9mr7395293pjb.4.1652486277357; Fri, 13 May
- 2022 16:57:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
- <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com> <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
-In-Reply-To: <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VlFyv9ldND/lJmA77XlE+D6MAlUKWPX9DalQosILKag=;
+        b=cM+kWAjaHcdtEyGTRvMHlz0YjjfcNo6HausfSWRT+SeCZWDdJ0OTVct3mNYgf+eu0C
+         sADuvTW5tv173aaAF1yi+3Owbucdch7mBUcLvctqv3WCpa6Cjbg89n7eAch9xgapZqJd
+         83Xr80i5bNxln7LPDQRxdXHEan5aIrDpo+BqGY7YWwyGcZUeztiDNeo0lCU32vfyh7eT
+         Ga2CC7EdWPAkcmtIkQZx3jBPFYZStNSNSAPzKGFLyGcGaaZQ8YN4jlSWhsWO7oiT5FFK
+         hzx2JKMkGlYHFP0rnA/tNT5/mqq/yQhppi6VeC+9G1xq7n+ojUZZ3lsFilem51T8IZ2G
+         mJwA==
+X-Gm-Message-State: AOAM530x/0wwZ4DimwGzvX3T9jx8VoAiElVVUQ37OuV71Rj2H3ypbchu
+        BpaVZ1/ciVD+HeLXJWbprWY+8sK/VVg=
+X-Google-Smtp-Source: ABdhPJxFfRQUOgcsn3QvrmF2E20B0h7Plg6quvaSDj24VT5uANVvdLWj0OatdQP5vYR6QMTH/7yvIg==
+X-Received: by 2002:a05:6602:15c6:b0:611:591d:1d9a with SMTP id f6-20020a05660215c600b00611591d1d9amr3258465iow.177.1652485577028;
+        Fri, 13 May 2022 16:46:17 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id k9-20020a02cb49000000b0032b3a78178fsm1045203jap.83.2022.05.13.16.46.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 May 2022 16:46:16 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 13 May 2022 16:57:45 -0700
-Message-ID: <CABBYNZJHOyv-z31hNWBJ_fd=CX-S6J_GQyOquO-TEiLWAEoS+A@mail.gmail.com>
-Subject: Re: [BUG] BLE device unpairing triggers kernel panic
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] Bluetooth: hci_conn: Fix hci_connect_le_sync
+Date:   Fri, 13 May 2022 16:46:11 -0700
+Message-Id: <20220513234611.1360704-3-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220513234611.1360704-1-luiz.dentz@gmail.com>
+References: <20220513234611.1360704-1-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, May 13, 2022 at 4:52 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Ahmad,
->
-> On Fri, May 13, 2022 at 1:14 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Ahmad,
-> >
-> > On Fri, May 13, 2022 at 7:10 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> > >
-> > > Hello,
-> > >
-> > > On Linux v5.18-rc5, I can reliably crash the kernel on the second (un)pairing
-> > > with a customer's BLE device. I have bisected the issue and found two commits:
-> > >
-> > > - Commit 6cd29ec6ae5e ("Bluetooth: hci_sync: Wait for proper events when
-> > >   connecting LE") causes previously working pairing to time out, presumably
-> > >   because it keeps waiting for the wrong event.
-> >
-> > Can you describe in more details what is the second pairing, are you
-> > pairing 2 devices concurrently? I recall someone for nxp having
-> > similar problem, at least the traces look pretty similar, the problem
-> > seems to be the expected event don't match the event the controller
-> > send, in this case hci_le_enh_conn_complete_evt, so hci_event process
-> > it and frees the hci_conn instead of first running the callback.
->
-> Looks like my memory failed me on this one, the sync callback is run
-> last so we shouldn't cleanup the hci_conn at that point, perhaps
-> something like the following should fix the crash:
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 0270e597c285..c1634af670b8 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -5632,10 +5632,8 @@ static void le_conn_complete_evt(struct hci_dev
-> *hdev, u8 status,
->                 status = HCI_ERROR_INVALID_PARAMETERS;
->         }
->
-> -       if (status) {
-> -               hci_conn_failed(conn, status);
-> +       if (status)
->                 goto unlock;
-> -       }
->
->         if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
->                 addr_type = BDADDR_LE_PUBLIC;
->
-> > > - Commit a56a1138cbd8 ("Bluetooth: hci_sync: Fix not using conn_timeout")
-> > >   fixes, despite the title, what event is waited on. First Pairing works now,
-> > >   but the second pairing times out and crashes the kernel:
-> > >
-> > >   [   84.191684] Bluetooth: hci0: Opcode 0x200d failed: -110
-> > >   [   84.230478] Bluetooth: hci0: request failed to create LE connection: err -110
-> > >   [   84.237690] Unable to handle kernel read from unreadable memory at virtual address 0000000000000ca8
->
-> That said the error -110 mean -ETIMEDOUT
+The handling of connection failures shall be handled by the request
+completion callback as already done by hci_cs_le_create_conn, also make
+sure to use hci_conn_failed instead of hci_le_conn_failed as the later
+don't actually call hci_conn_del to cleanup.
 
-We might want to incorporate some test to the likes of mgmt-tester to
-check this behavior, afaik the crash can be triggered by just causing
-a le_conn_complete event with status != 0 which perhaps we need to
-extend bthost.c to be able to reject connections.
+Fixes: 8e8b92ee60de5 ("Bluetooth: hci_sync: Add hci_le_create_conn_sync")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c  | 2 +-
+ net/bluetooth/hci_event.c | 8 +++++---
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4a5193499b77..c981f3616bb1 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -946,7 +946,7 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ 	if (!conn)
+ 		goto done;
+ 
+-	hci_le_conn_failed(conn, bt_status(err));
++	hci_conn_failed(conn, bt_status(err));
+ 
+ done:
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0270e597c285..af17dfb20e01 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5632,10 +5632,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		status = HCI_ERROR_INVALID_PARAMETERS;
+ 	}
+ 
+-	if (status) {
+-		hci_conn_failed(conn, status);
++	/* All connection failure handling is taken care of by the
++	 * hci_conn_failed function which is triggered by the HCI
++	 * request completion callbacks used for connecting.
++	 */
++	if (status)
+ 		goto unlock;
+-	}
+ 
+ 	if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
+ 		addr_type = BDADDR_LE_PUBLIC;
 -- 
-Luiz Augusto von Dentz
+2.35.1
+
