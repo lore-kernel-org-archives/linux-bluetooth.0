@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDDFC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 May 2022 22:34:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41054C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 May 2022 23:47:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230398AbiENWeA (ORCPT
+        id S231889AbiENXmL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 May 2022 18:34:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33212 "EHLO
+        Sat, 14 May 2022 19:42:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiENWd7 (ORCPT
+        with ESMTP id S229698AbiENXmJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 May 2022 18:33:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C7165BE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 15:33:57 -0700 (PDT)
+        Sat, 14 May 2022 19:42:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 795FD64C1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 16:42:06 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2BA9760C74
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 22:33:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 87E1DC341C5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 22:33:56 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 77EA460C6A
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 23:42:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C98D1C36AEF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 14 May 2022 23:42:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652567636;
-        bh=m0SCiEqVAfBG7XLDjqLefwoXETXLocp8m2NxOIsWbqU=;
+        s=k20201202; t=1652571725;
+        bh=tTD6C2UUDIynHy21R2fTyUYNderSeMex1P68/XIK6jk=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=g3edN8Y2LKkG59UQgOz7C2jRpyRZ6yGTDhud0wGYlJP2p05Zcp3Lt7YyKDrrA2Ldt
-         0nZKIvywOZLoYcLt9fpboh5sEe3IOleMS4UEx2yxaqvW9dVQw0nV355jfdHFEpoZtu
-         5yzFOuX6BEo7al/AmeJo4HbisIQCJifB0gfXTkHS5rZtdJ/GsjYQ1ZiRvk0oUZB3Kn
-         7ufqc1ck/ExzkrtCJUga1flzyriFVblHZeI+yFiNr9x/VW9mKcrDNjME4TjL+SQx+E
-         2hgOMnmsgrmaH0JcNBKU/swoB+w9IUxdnjA2KGsM5WDF1UhhieMUSwANr3F1EtAUjG
-         K+AYLjKVcF4xg==
+        b=mkaXJMeU/eBN6wHYgFqCStv7hu/DCqTFlEDTrznhCdMqTk2bl3EH0AJOQAH93fLXC
+         Xj1p2sZBUceaRclsOmIGCdjEhcCqaUU4Ju7KGnAki5YXyhCTmKKPci4W6iDkai/+pl
+         ZZsE1iiz9Dnt9PSP0LH2TXjLDV4aOzm9IUyTdhsOtQT1qCffAAw7l1xVUpC9+f4/i/
+         CyGVt9FDip7/4kV0IyrnWmt7/kNAHTUr4hxi7dpzE1gih4v2KSGyFZfG4nQWGj7N78
+         18kGzZgmZCme/5tiabfB0N2qAlaefBZcvBmGQuqLB9NR/QRGOWmmyoGRFpr1h29VVb
+         NR1gGhcZpnNPQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 743C2CC13B0; Sat, 14 May 2022 22:33:56 +0000 (UTC)
+        id BB1CCC05FD0; Sat, 14 May 2022 23:42:05 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 200039] BT advertising packet wakes up the system from S3 and
  suspend-to-idle
-Date:   Sat, 14 May 2022 22:33:55 +0000
+Date:   Sat, 14 May 2022 23:42:05 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -54,8 +54,8 @@ X-Bugzilla-Resolution:
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-200039-62941-z15hloCprH@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-200039-62941-efY3L50qCr@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-200039-62941@https.bugzilla.kernel.org/>
 References: <bug-200039-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,19 +69,14 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D200039
 
-Bernie Innocenti (bernie@codewiz.org) changed:
+--- Comment #41 from Bernie Innocenti (bernie@codewiz.org) ---
+(In reply to Bernie Innocenti from comment #40)
+> Not sure if I'm seeing the same bug, but my Lenovo X1 Gen7 wakes up
+> immediately after entering S3 when a BT headphone is paired.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |bernie@codewiz.org
-
---- Comment #40 from Bernie Innocenti (bernie@codewiz.org) ---
-Not sure if I'm seeing the same bug, but my Lenovo X1 Gen7 wakes up immedia=
-tely
-after entering S3 when a BT headphone is paired.
-
-The Bluetooth adapter is the same: Intel 8087:0aaa
-Kernel version: 5.17.7-300.fc36.x86_64
+I found the same bug documented here:
+https://wiki.archlinux.org/title/Lenovo_ThinkPad_X1_Carbon_(Gen_7)#S3_Suspe=
+nd_Bug_with_Bluetooth_Devices
 
 --=20
 You may reply to this email to add a comment.
