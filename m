@@ -2,148 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E989C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 May 2022 17:05:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49F88C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 May 2022 17:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344128AbiEPRFG (ORCPT
+        id S230463AbiEPR1x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 May 2022 13:05:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53612 "EHLO
+        Mon, 16 May 2022 13:27:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344135AbiEPRFA (ORCPT
+        with ESMTP id S1344276AbiEPR1t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 May 2022 13:05:00 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16A42A272
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 10:04:54 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id v10so14636069pgl.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 10:04:54 -0700 (PDT)
+        Mon, 16 May 2022 13:27:49 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 762A136B43
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 10:27:48 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id u3so2343684qta.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 10:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9+uANn3l31var8yu5aBA2DkhqU3A/cNGB0PonZfMGTs=;
-        b=ZIan1eYZKgT5Z/Ki4DHW5zjuv6pwcpOR6lGq964tVI8T7cNC3OMV7aBX9+kYU8cK+8
-         Xt6r37CVNQWOMFWbnGuWsSNzv/sEnnqfcbm5To4E7yHPgs3QBuudnsXaOVw/nVit7Sy/
-         i5RVdXoP+HgimLcQoprmiIGT3vozRlAdAeVRDqf2V3PwdQWFL+5UXMN8z0GOBCjoVEf0
-         iZikvhyZ7wtFqhPrZ6kLDY3Z3ru/mXUvaiALE4vD7IyCQBWIhEPoZlxjT1LC2iAznQFl
-         dn1U1kx3IRdyGBljXJUYFJdoJkxDd50OxmppiTYgn53J2ENW0EBrKPQtfN4xRrTR/uAf
-         pigQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=OepNvauf18XuzHjZUEg2aAp4q0gbGgUD8E4hqQTZBGA=;
+        b=hjQ/2EiXfrADShBZRyRiPDUiuBFGd2PbpJKgL2oo0N63dN4UlBAjR25dUdFvTFUfzJ
+         1b1GkWCvzEWo38hi7oPCOf6S8bB0fTtzFbMoKNxsBr7+N2Ag1l+FKZp/6dPIniyruodu
+         mgi5uU4DK9w1rwgv31RoO6d2je/1ujc+vNCWh+KBbcuGImrYNr4I0a3Msh4pBRuom0V1
+         y5/hA51HUAM/VHezwbsOrzHBX4jLrJxvigSfIlP+blXjZJXAKgAa6FdAoMM5ykR/WxTc
+         zmVI77emxgnJKrj1ETfkBEXxXYrRiGj8RdP1/jHumcB8XzZr2hYKs1vJkA/FqChZIyfd
+         r5/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9+uANn3l31var8yu5aBA2DkhqU3A/cNGB0PonZfMGTs=;
-        b=CLosJwodifuFShfPUN0NuYo7GQ8eMWWchkDJsDcJD4IgR+4nstJYUa+sWsJVqJMdYX
-         wYd6yXTYmecP8PIojG3zTJHq5gP1IQCn3Tn/7c553o7+ddj57Yom29Fu+1fRDOW1YS3M
-         oueHA+8SOPz0IclI+BpWtA4+eB/GVYvj1Ls1GW0RdCa1we5b+negFDhQk/n5z4E5AYfZ
-         iKVBVhOwTeArqOnDOYSvRKVG3Iunh+uVsQ+E6bQguR04YQwYIkC23ptCH8GKMPsFvsCD
-         bkWJsldrJcE/xUtTu8UOV7gzZBULTGvZn/t4XyRFlBgYwwjSbuvZPHYsjERiR78JaDs2
-         mEIw==
-X-Gm-Message-State: AOAM531QkO+DgaybIFf8hn9oYEXS2MDMLGUW/ZwAYQy4fIynUkJH0B9V
-        yEUXsZZ/hGQfjIH8pYcLpqhkDxHkd7s=
-X-Google-Smtp-Source: ABdhPJw15/SEbmab4vdiRlDlMPH16g/QdQa/rPiDzlXySlw6bFwafykvmyexwcYQ3jBhvEAm1p1Mzw==
-X-Received: by 2002:a05:6a00:2310:b0:4fa:7eb1:e855 with SMTP id h16-20020a056a00231000b004fa7eb1e855mr18716531pfh.14.1652720694063;
-        Mon, 16 May 2022 10:04:54 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id cv15-20020a17090afd0f00b001df67a6da6asm1691119pjb.7.2022.05.16.10.04.53
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=OepNvauf18XuzHjZUEg2aAp4q0gbGgUD8E4hqQTZBGA=;
+        b=5Qnw8Ik2eDRARy2RnQ9+4QaBPvC5phkxJoLsmum5xDmYcbdIlTNLD2FyX95rM2QSNs
+         J8TF3OWPVNdx+RyFghs1M6iJuNATOlHrszxuQ9HITqm+Ki2Kuk1tcDq/iDrOMpi1xyVL
+         R/6GXxImGHht7QD4dv+o87XcCCt3fV3A9Wj5XF8LyjP10TZGsdKpJztwE59iAxVsbELV
+         hQJi13xHi55Eija+SWPv9XOF0bPnU9nE04FaxB33nem94ZIJLAv9NXpNRqiXAN1DuXSH
+         f4kiQfdlqawwHLGFESf+lFSxvx2Eg4+wNIVNS6DmuRcjxJ8x05IbHRWIjj6gIP8mNEfO
+         b2PQ==
+X-Gm-Message-State: AOAM530Vs1dseAFV/YfGCmSsZoTRm170UMeEr4cCcOJro/W0hufo/e+i
+        FezYh0BzrZ5gDc6xXbVPrp3cQLZuc4ReZg==
+X-Google-Smtp-Source: ABdhPJyPYIpFGRHMnFJIkUBtDVLZZgEzWARhJza2rtI1GmJ8i4ZsLYIxu8hShth95HNc0DoxNxLGdQ==
+X-Received: by 2002:ac8:5948:0:b0:2f3:cd85:f244 with SMTP id 8-20020ac85948000000b002f3cd85f244mr16298953qtz.149.1652722067049;
+        Mon, 16 May 2022 10:27:47 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.87.3])
+        by smtp.gmail.com with ESMTPSA id d195-20020a379bcc000000b0069fc13ce235sm6124273qke.102.2022.05.16.10.27.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 10:04:53 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: MGMT: Replace uses of bitmap_from_u64 with bitmap_from_arr32
-Date:   Mon, 16 May 2022 10:04:52 -0700
-Message-Id: <20220516170452.1642546-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 16 May 2022 10:27:46 -0700 (PDT)
+Message-ID: <62828992.1c69fb81.54873.08e5@mx.google.com>
+Date:   Mon, 16 May 2022 10:27:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8624693831984572850=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: MGMT: Replace uses of bitmap_from_u64 with bitmap_from_arr32
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220516170452.1642546-1-luiz.dentz@gmail.com>
+References: <20220516170452.1642546-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============8624693831984572850==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-bitmap_from_u64 expects at least 8 bytes to be declared since it doesn't
-take any parameter regarding the number of bits causing the following
-warnings:
+This is automated email and please do not reply to this email!
 
-In file included from include/linux/cpumask.h:12,
-                 from include/linux/mm_types_task.h:14,
-                 from include/linux/mm_types.h:5,
-                 from include/linux/buildid.h:5,
-                 from include/linux/module.h:14,
-                 from net/bluetooth/mgmt.c:27:
-In function 'bitmap_copy',
-    inlined from 'bitmap_copy_clear_tail' at include/linux/bitmap.h:270:2,
-    inlined from 'bitmap_from_u64' at include/linux/bitmap.h:622:2,
-    inlined from 'set_device_flags' at net/bluetooth/mgmt.c:4534:4:
-include/linux/bitmap.h:261:9: warning: 'memcpy' forming offset [4, 7] is
-out of the bounds [0, 4] of object 'flags' with type
-'long unsigned int[1]' [-Warray-bounds]
-  261 |         memcpy(dst, src, len);
-      |         ^~~~~~~~~~~~~~~~~~~~~
-In file included from include/linux/kasan-checks.h:5,
-                 from include/asm-generic/rwonce.h:26,
-                 from ./arch/arm/include/generated/asm/rwonce.h:1,
-                 from include/linux/compiler.h:248,
-                 from include/linux/build_bug.h:5,
-                 from include/linux/container_of.h:5,
-                 from include/linux/list.h:5,
-                 from include/linux/module.h:12,
-                 from net/bluetooth/mgmt.c:27:
-net/bluetooth/mgmt.c: In function 'set_device_flags':
-net/bluetooth/mgmt.c:4532:40: note: 'flags' declared here
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=642045
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.73 seconds
+GitLint                       PASS      1.04 seconds
+SubjectPrefix                 PASS      0.86 seconds
+BuildKernel                   PASS      41.16 seconds
+BuildKernel32                 PASS      35.46 seconds
+Incremental Build with patchesPASS      47.01 seconds
+TestRunner: Setup             PASS      580.07 seconds
+TestRunner: l2cap-tester      PASS      19.69 seconds
+TestRunner: bnep-tester       PASS      7.22 seconds
+TestRunner: mgmt-tester       PASS      121.58 seconds
+TestRunner: rfcomm-tester     PASS      11.36 seconds
+TestRunner: sco-tester        PASS      10.91 seconds
+TestRunner: smp-tester        PASS      10.89 seconds
+TestRunner: userchan-tester   PASS      7.73 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.73 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+Bluetooth: MGMT: Replace uses of bitmap_from_u64 with bitmap_from_arr32\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#111: 
  4532 |                         DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
-      |                                        ^~~~~
-include/linux/types.h:11:23: note: in definition of macro 'DECLARE_BITMAP'
-   11 |         unsigned long name[BITS_TO_LONGS(bits)]
-      |                       ^~~~
 
-In order to fix the above this replaces the uses of bitmap_from_u64 with
-bitmap_from_arr32 wich does takes the properly take the number of bits.
-
-Fixes: a9a347655d22 ("Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP")
+WARNING:BAD_SIGN_OFF: 'Reported-by:' is the preferred signature form
+#121: 
 Reported-By: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+total: 0 errors, 2 warnings, 0 checks, 27 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12851256.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- net/bluetooth/mgmt.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 74937a834648..878be1cac5b7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4519,7 +4519,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 							      cp->addr.type);
- 
- 		if (br_params) {
--			bitmap_from_u64(br_params->flags, current_flags);
-+			bitmap_from_arr32(br_params->flags, &current_flags,
-+					  __HCI_CONN_NUM_FLAGS);
- 			status = MGMT_STATUS_SUCCESS;
- 		} else {
- 			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
-@@ -4531,7 +4532,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (params) {
- 			DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
- 
--			bitmap_from_u64(flags, current_flags);
-+			bitmap_from_arr32(flags, &current_flags,
-+					  __HCI_CONN_NUM_FLAGS);
- 
- 			/* Devices using RPAs can only be programmed in the
- 			 * acceptlist LL Privacy has been enable otherwise they
-@@ -4546,7 +4548,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 				goto unlock;
- 			}
- 
--			bitmap_from_u64(params->flags, current_flags);
-+			bitmap_from_arr32(params->flags, &current_flags,
-+					  __HCI_CONN_NUM_FLAGS);
- 			status = MGMT_STATUS_SUCCESS;
- 
- 			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
--- 
-2.35.1
 
+--===============8624693831984572850==--
