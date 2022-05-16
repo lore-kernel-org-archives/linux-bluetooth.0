@@ -2,215 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF284C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 May 2022 19:31:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 746F7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 May 2022 10:33:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231330AbiEOTbf (ORCPT
+        id S240501AbiEPKdy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 15 May 2022 15:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
+        Mon, 16 May 2022 06:33:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229536AbiEOTbd (ORCPT
+        with ESMTP id S239845AbiEPKdr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 15 May 2022 15:31:33 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83301DE94
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 May 2022 12:31:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652643092; x=1684179092;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HztGZrIfh3cpz3JxZF0qkrMfbHu/usinFdRCb3IjCSk=;
-  b=PVAg9Sb4yZornJV/e48e/rMm4fPv8+T9Zv7cBgO5gcpRCY1MkE8U05j0
-   HIbgmSK8KYwVJ+shz7O7KfpbzFQDYGm1MCFd1rC50Br5AYukmwyb9nRhp
-   0NXjBMkngc7ILD6bymBeHppq/8tTaZkRsglj1jIMC956qYnRXwBgC8tOk
-   vONDevZefk+/E4Wr4TINNdZyPW7Alv+3v2YR8xdnTmTZOmN3dUWp5vWkw
-   3CB3B/ZDSZxY5NGcs5vJ5d+KCbaaXdE7Nmh1stW0/CmtshgphuZ4wvGpN
-   npPrCmIOMwAJbkUVZrOBZHYzEr4bVeMjkYB39KrY9rwxwUeI17AaJ52fa
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10348"; a="251182729"
-X-IronPort-AV: E=Sophos;i="5.91,229,1647327600"; 
-   d="scan'208";a="251182729"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 May 2022 12:31:32 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,228,1647327600"; 
-   d="scan'208";a="604581530"
-Received: from lkp-server01.sh.intel.com (HELO d1462bc4b09b) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 15 May 2022 12:31:29 -0700
-Received: from kbuild by d1462bc4b09b with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nqJxh-0001vu-BF;
-        Sun, 15 May 2022 19:31:29 +0000
-Date:   Mon, 16 May 2022 03:30:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 3b42055388c30f2761a2d9cd9af2c99611dfe457
-Message-ID: <628154ea.cI+qL4p6GweROQlF%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Mon, 16 May 2022 06:33:47 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 248A01C934
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 03:33:45 -0700 (PDT)
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 11F453F21D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 10:33:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1652697223;
+        bh=TUibuYqafZinFeGpIWxhluJu+JS1ezOTLiTJU5+HIcw=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=X0r3/+eYktM99g4TBpwyQzNVctB1jyt/CTEbYjUI9NbgA9tZdj13e+geAbS0MCTh4
+         M4A5pzuSSbm7eZS/QVb/squwCFttFKQGtUBUop59aFsG1Zzgj54PdfgowXlG3of5VM
+         I5xxb2dXF6GsqnVmryI5rF1jNoE9sGrNp39/2JUHCDjV/xV9iZw21kypfKnrcvdd4B
+         OXQFvctLP9UkCn+/+VjTmJw3aBqBGEbwtXqMLs2krn9TZHnKZyjmkp978y39d/MLm4
+         SM4NGWD3frtLeIGUJCae41Bat7aGJ7qdeCap5lf10+T5w4eHqYE/R7CVAaAnii6z5p
+         3JYuVhmgIU9Gg==
+Received: by mail-wm1-f72.google.com with SMTP id z23-20020a05600c221700b003942fd37764so10131216wml.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 03:33:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TUibuYqafZinFeGpIWxhluJu+JS1ezOTLiTJU5+HIcw=;
+        b=Eo9Eb0V1BZfN4ECuBnYBvTE5B6ZsWyTPBW6fEjD7n9yQgt4c+ehi1GYXlQpkgmXqoQ
+         e/WGuCcaxYx38etYVOMXgyT6DZaoQP4lo5Q4Sj43oK9LwD6E0Wyf+ucczV2ScqZrUzrD
+         HMq+eNLUdP5GmmZWdD0iDAHZUTtEBmuzu0s8xFDcvnzVCz1v2YvE/TDhBbwp+qKfE92s
+         uOufExbmtDPQyIfEHD6trjungg7WNnRbpD+d5PW7655LzvuOQOgglBGXHm2Fz3lF9tsr
+         i/E3iUwp2Lubb3cyyhbtu12OfVyg8GYXXEyILiH912I5v9Yc/Ch7EMnPeV+FPN+0UHW5
+         SB9g==
+X-Gm-Message-State: AOAM530uoaJt/tPHiAGEi4wW+eGrHPKr3CEwQ9ZbZqjy1rQqEeQEskfC
+        N8hhTBxIvXsqsnKaAQAaj0Opmf96rBSPaQ1tDXj2WdV+KRHtRbnLeD1mfwBnbDC4Z943fivVUzb
+        u3sTy4Vuz22l5kiGFXyoJPzoEpCgg9JPdbuKxYhBpasOOyg==
+X-Received: by 2002:a7b:cb86:0:b0:394:5d8c:2e7f with SMTP id m6-20020a7bcb86000000b003945d8c2e7fmr9436169wmi.12.1652697222606;
+        Mon, 16 May 2022 03:33:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxkcXelD3dwbQ8Cwohp0cha7dw/NgqjzbvQwTaNhAl5joQ1Ktb75rro6N/OaCwW4Q3YxhlciQ==
+X-Received: by 2002:a7b:cb86:0:b0:394:5d8c:2e7f with SMTP id m6-20020a7bcb86000000b003945d8c2e7fmr9436159wmi.12.1652697222385;
+        Mon, 16 May 2022 03:33:42 -0700 (PDT)
+Received: from localhost ([2a01:4b00:85fd:d700:83e2:e0d8:37ed:a918])
+        by smtp.gmail.com with ESMTPSA id a4-20020a05600c348400b003942a244ec4sm9810296wmq.9.2022.05.16.03.33.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 03:33:41 -0700 (PDT)
+From:   Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btintel: Correctly declare all module firmware files
+Date:   Mon, 16 May 2022 11:33:29 +0100
+Message-Id: <20220516103329.516952-1-dimitri.ledkov@canonical.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 3b42055388c30f2761a2d9cd9af2c99611dfe457  Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan
+Strictly encode patterns of supported hw_variants of firmware files
+the kernel driver supports requesting. This now includes many missing
+and previously undeclared module firmware files for 0x07, 0x08,
+0x11-0x14 hw_variants.
 
-elapsed time: 3334m
+This especially affects environments that only install firmware files
+declared and referenced by the kernel modules. In such environments,
+only the declared firmware files are copied resulting in most Intel
+Bluetooth devices not working. I.e. host-only dracut-install initrds,
+or Ubuntu Core kernel snaps.
 
-configs tested: 134
-configs skipped: 3
+BugLink: https://bugs.launchpad.net/bugs/1970819
+Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+---
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+ Changes since v1:
+ - encode strict patterns of supported firmware files for each of the
+   supported hw_variant generations.
 
-gcc tested configs:
-arm64                               defconfig
-arm64                            allyesconfig
-arm                              allmodconfig
-arm                                 defconfig
-arm                              allyesconfig
-i386                          randconfig-c001
-arm                           stm32_defconfig
-csky                                defconfig
-riscv             nommu_k210_sdcard_defconfig
-powerpc                     tqm8555_defconfig
-arm                          simpad_defconfig
-arm                        cerfcube_defconfig
-sh                          r7785rp_defconfig
-sh                          urquell_defconfig
-h8300                     edosk2674_defconfig
-arm                            hisi_defconfig
-mips                        bcm47xx_defconfig
-sh                              ul2_defconfig
-sh                      rts7751r2d1_defconfig
-sh                           se7712_defconfig
-mips                             allyesconfig
-mips                         tb0226_defconfig
-sh                   secureedge5410_defconfig
-ia64                          tiger_defconfig
-m68k                           sun3_defconfig
-powerpc                       eiger_defconfig
-openrisc                            defconfig
-i386                             alldefconfig
-ia64                         bigsur_defconfig
-m68k                        mvme147_defconfig
-sh                         ecovec24_defconfig
-powerpc                     taishan_defconfig
-sparc                       sparc32_defconfig
-arm                             ezx_defconfig
-sh                          lboxre2_defconfig
-sh                        sh7763rdp_defconfig
-powerpc                           allnoconfig
-powerpc                 mpc837x_mds_defconfig
-powerpc                     stx_gp3_defconfig
-xtensa                  cadence_csp_defconfig
-arm                        oxnas_v6_defconfig
-sh                          rsk7264_defconfig
-sh                           se7751_defconfig
-parisc                generic-32bit_defconfig
-sh                            hp6xx_defconfig
-x86_64                        randconfig-c001
-arm                  randconfig-c002-20220512
-ia64                                defconfig
-ia64                             allmodconfig
-ia64                             allyesconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-nios2                               defconfig
-arc                              allyesconfig
-nios2                            allyesconfig
-alpha                               defconfig
-alpha                            allyesconfig
-h8300                            allyesconfig
-xtensa                           allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-s390                                defconfig
-s390                             allmodconfig
-parisc                              defconfig
-parisc64                            defconfig
-parisc                           allyesconfig
-s390                             allyesconfig
-sparc                               defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-x86_64                        randconfig-a011
-x86_64                        randconfig-a013
-x86_64                        randconfig-a015
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-s390                 randconfig-r044-20220512
-riscv                randconfig-r042-20220512
-arc                  randconfig-r043-20220512
-riscv                               defconfig
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-riscv                             allnoconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                          rhel-8.3-func
-x86_64                           rhel-8.3-syz
-x86_64                                  kexec
-x86_64                              defconfig
-x86_64                           allyesconfig
-x86_64                         rhel-8.3-kunit
-x86_64                               rhel-8.3
+ v1 submission link
+  https://lore.kernel.org/linux-bluetooth/20220509163259.1513242-1-dimitri.ledkov@canonical.com/
 
-clang tested configs:
-powerpc              randconfig-c003-20220512
-x86_64                        randconfig-c007
-riscv                randconfig-c006-20220512
-mips                 randconfig-c004-20220512
-i386                          randconfig-c001
-arm                  randconfig-c002-20220512
-arm                      pxa255-idp_defconfig
-arm                  colibri_pxa270_defconfig
-arm                        magician_defconfig
-arm                       netwinder_defconfig
-riscv                    nommu_virt_defconfig
-arm                           spitz_defconfig
-mips                  cavium_octeon_defconfig
-powerpc                     tqm8540_defconfig
-riscv                             allnoconfig
-arm                        mvebu_v5_defconfig
-powerpc                 mpc8315_rdb_defconfig
-arm                          moxart_defconfig
-powerpc                   lite5200b_defconfig
-mips                   sb1250_swarm_defconfig
-powerpc                      ppc44x_defconfig
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-hexagon              randconfig-r045-20220512
-hexagon              randconfig-r041-20220512
+ drivers/bluetooth/btintel.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 06514ed66022..17022758b5bd 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2654,7 +2654,22 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+-MODULE_FIRMWARE("intel/ibt-11-5.sfi");
+-MODULE_FIRMWARE("intel/ibt-11-5.ddc");
+-MODULE_FIRMWARE("intel/ibt-12-16.sfi");
+-MODULE_FIRMWARE("intel/ibt-12-16.ddc");
++/* hw_variant 0x07 0x08 */
++MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
++MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
++/* hw_variant 0x0b 0x0c */
++MODULE_FIRMWARE("intel/ibt-11-*.sfi");
++MODULE_FIRMWARE("intel/ibt-12-*.sfi");
++MODULE_FIRMWARE("intel/ibt-11-*.ddc");
++MODULE_FIRMWARE("intel/ibt-12-*.ddc");
++/* hw_variant 0x11 0x12 0x13 0x14 */
++MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
++MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
++MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.32.0
+
