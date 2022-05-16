@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 989ACC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 May 2022 22:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD91DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 May 2022 22:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347603AbiEPWNK (ORCPT
+        id S242735AbiEPWNL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 May 2022 18:13:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41964 "EHLO
+        Mon, 16 May 2022 18:13:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244688AbiEPWNJ (ORCPT
+        with ESMTP id S1348403AbiEPWNK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 May 2022 18:13:09 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 253442A729
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 15:13:07 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id d3so11474980ilr.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 15:13:07 -0700 (PDT)
+        Mon, 16 May 2022 18:13:10 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA0FB2AC51
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 15:13:09 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id a10so17499078ioe.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 May 2022 15:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=PBJ/Wp/6u6XOk/PHHgeBysn9tgdoUlUaIXGE1lqECgw=;
-        b=FMVAAqHih5pUffYZrAecJOenImJfptKj/Yxm89ue//XcwGRLAaqZKYWRxI1CzCRAmK
-         NiC/k2FF8/o9mzK/1RIOOHWM7u1hwrxTARlSWz3iqcfPetapEFVbeFKGuqvBg1zsX5y3
-         j6pap7JROx1PLCrWerLD5fEbigqL1Sr/2JPy/wvqGfNp+x+gDHLK4FP0p41hV1UZuAde
-         fYdI6yCJW085oNaVzMJjePK6DadkKW3gLpSdieXIS2/+6NJsmVJLFw83p4ZNaSANKe2b
-         ocO3/6kJhb+CDuqOCgIaZaBJj9PZdOJd/ky+RN60nZXJlS7gKihikUyxGs/cslxuVP71
-         pRuQ==
+        bh=EhF9CMCiGnnsQMWw2AcnUTFA1xJBYKvdFqXkKgpPp6A=;
+        b=Qk5Z/zwR3m4rsDmULTuJ2LmOorUIPwOU3bJLkJNmLJuiFuOQMiMItqEEHk4k9LoFw5
+         hEznVu0NBuS5HCWAnvOrZZeV3wpt/3L7+fszr+blBZRG4Ztckl7YarY3lszs7RUw6UTw
+         R4WBVpnGEZcFL12mLfR1By4fHYIWb1DU9g/lZ2ibqHc8N5BY2cRaTM0FeINCGH7+qOMP
+         PGu5qyRaqhRFyEB/N0YjjGXw/j/W0wczslWZE+eA8Zwv9d7eZbTxdgVLZPVFuNfb/MaO
+         uTjidlueJNz+2wRmlyF8VcU1+/F36HDtjo5jf7gGRod3KAufSrnxqV4nW226Ow7y41er
+         kKKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=PBJ/Wp/6u6XOk/PHHgeBysn9tgdoUlUaIXGE1lqECgw=;
-        b=xwEbCeX+lWmJAfxQkjplwr+fFzyy/3YA4JXqCz92oTfOGP+Uh1GGkVj3QlOBFOAibz
-         FepDQmwUQsjh2J7QhRsPQFivIfOjz1QabdCwAez2P72ugrvrKYevVECZIbXCOX6qy9t9
-         M6AQ8hiksFW/83Ob+JxjwoXGJzWsUDw8+kRmgWiaG0zw0+puPfN9Q8cNKjnw7zNzHtZb
-         DS9vuHYuSYWzu1/cMrV7PhjK5MwEMp160BEsxj4ePzuvYeB/HANBkHJchc8UgneMRR+U
-         hEkRXzCVYPa6AulScKtJfFrbsxoSQsTfIKn4PwE/xibomIbQ+TTj+qEvpBvUN+nz26+8
-         yRSw==
-X-Gm-Message-State: AOAM532POeJZry4uGM0CO779RphYnP9jDDtRi1i1Vu9+wSYb3unzZYy3
-        ypbyvjytakw6v89Rbgyk9QV9nVF4WtI=
-X-Google-Smtp-Source: ABdhPJwd8547Cmi+Ag32XOalgfkEIltBk9Hfg2QFLj1AoQv1rjLuV5pHmOL6gTuHMRSNvKQ2TX0JDA==
-X-Received: by 2002:a05:6e02:1685:b0:2cf:32bc:eb56 with SMTP id f5-20020a056e02168500b002cf32bceb56mr10372084ila.243.1652739186096;
-        Mon, 16 May 2022 15:13:06 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=EhF9CMCiGnnsQMWw2AcnUTFA1xJBYKvdFqXkKgpPp6A=;
+        b=eDU30vNNxKNs+qH1AVoQtoCMBKfRVbN1mI/x8Ov8hCvyYKJ2PdiWRg2SV8jjh7CNSM
+         e82Ng3hGeCZ0hj4vtF+qwdcbxE0ubastG9E9Zwyqs/aO8mtX0Tzcmh1f8C70jJxDGHCV
+         CUqgq81S7gHEhowXPP5pJEE3R8vzkDnWpUYo5AgEzG4V/9Xinfwd948boIefbN3uJANR
+         EsctZBiXGwEhnlKnU9VDAK4d4IeXUfgNbpoPw0RILbU0JFsjPsdSsymMyY2mgvVSXqeM
+         4tYA93MWP+n8p959Iben31UiwO7XUkqRCnK8+ZozX48UCl6GIiqrMq1zPPmBmqNPdZOp
+         +YNA==
+X-Gm-Message-State: AOAM533Xp5KIvDX+/RcS/s1ihTfuuPIw45okgQNsAj/shOI8U32GXlAk
+        Q/81AhBWBUWW9YZuf6z/7MX9E0ucZk8=
+X-Google-Smtp-Source: ABdhPJwZD7a4DvgohBjwJ9TQMkgzPPAfQ+jEeKpz7lo9w34jZYrJxgUKCfv7SrJgowdgaO1bF08RNg==
+X-Received: by 2002:a05:6638:411d:b0:32b:7465:fee2 with SMTP id ay29-20020a056638411d00b0032b7465fee2mr11073711jab.318.1652739188491;
+        Mon, 16 May 2022 15:13:08 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id t9-20020a6b5f09000000b005e1729b55ccsm166426iob.1.2022.05.16.15.13.05
+        by smtp.gmail.com with ESMTPSA id t9-20020a6b5f09000000b005e1729b55ccsm166426iob.1.2022.05.16.15.13.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 15:13:05 -0700 (PDT)
+        Mon, 16 May 2022 15:13:07 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/8] lib: Add definitions for ISO socket
-Date:   Mon, 16 May 2022 15:12:57 -0700
-Message-Id: <20220516221304.1744026-1-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/8] mgmt-tester: Fix Read Exp Feature tests
+Date:   Mon, 16 May 2022 15:12:59 -0700
+Message-Id: <20220516221304.1744026-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220516221304.1744026-1-luiz.dentz@gmail.com>
+References: <20220516221304.1744026-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,148 +66,54 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds ISO Socket UUID as response to Read Exp Feature.
 ---
-v2: Fix CI findings.
-v3: Add patch fixing mgmt-tester Read EXP Features tests.
-v4: Rebase and add flag EXP_FEAT_ISO_SOCKET
+ tools/mgmt-tester.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
- Makefile.am     |  2 +-
- lib/bluetooth.h | 38 +++++++++++++++++++++++++++++++++++++-
- lib/iso.h       | 42 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 80 insertions(+), 2 deletions(-)
- create mode 100644 lib/iso.h
-
-diff --git a/Makefile.am b/Makefile.am
-index 82125c482..c7b369606 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -69,7 +69,7 @@ lib_headers = lib/bluetooth.h lib/hci.h lib/hci_lib.h \
- 		lib/sco.h lib/l2cap.h lib/sdp.h lib/sdp_lib.h \
- 		lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
- 
--extra_headers = lib/mgmt.h lib/uuid.h lib/a2mp.h lib/amp.h
-+extra_headers = lib/mgmt.h lib/uuid.h lib/a2mp.h lib/amp.h lib/iso.h
- extra_sources = lib/uuid.c
- 
- local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 0fcf412c6..73297c147 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -37,6 +37,7 @@ extern "C" {
- #define BTPROTO_CMTP	5
- #define BTPROTO_HIDP	6
- #define BTPROTO_AVDTP	7
-+#define BTPROTO_ISO	8
- 
- #define SOL_HCI		0
- #define SOL_L2CAP	6
-@@ -140,7 +141,39 @@ struct bt_voice {
- 
- #define BT_SCM_PKT_STATUS	0x03
- 
--#define BT_CODEC 19
-+#define BT_ISO_QOS		17
-+
-+#define BT_ISO_QOS_CIG_UNSET	0xff
-+#define BT_ISO_QOS_CIS_UNSET	0xff
-+
-+struct bt_iso_io_qos {
-+	uint32_t interval;
-+	uint16_t latency;
-+	uint16_t sdu;
-+	uint8_t  phy;
-+	uint8_t  rtn;
-+};
-+
-+struct bt_iso_qos {
-+	union {
-+		uint8_t  cig;
-+		uint8_t  big;
-+	};
-+	union {
-+		uint8_t  cis;
-+		uint8_t  bis;
-+	};
-+	union {
-+		uint8_t  sca;
-+		uint8_t  sync_interval;
-+	};
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos in;
-+	struct bt_iso_io_qos out;
-+};
-+
-+#define BT_CODEC		19
- struct bt_codec {
- 	uint8_t id;
- 	uint16_t cid;
-@@ -158,6 +191,7 @@ struct bt_codecs {
- 	struct bt_codec codecs[];
- } __attribute__((packed));
- 
-+
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-@@ -171,6 +205,8 @@ enum {
- 	BT_CLOSED
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index e5319d123..bfa5905e0 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -9798,7 +9798,7 @@ static const struct generic_data set_dev_flags_fail_3 = {
  };
  
-+#define BT_ISO_BASE		20
-+
- /* Byte order conversions */
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- #define htobs(d)  (d)
-diff --git a/lib/iso.h b/lib/iso.h
-new file mode 100644
-index 000000000..1e9f79ce5
---- /dev/null
-+++ b/lib/iso.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *
-+ */
-+
-+#ifndef __ISO_H
-+#define __ISO_H
-+
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
-+
-+/* ISO defaults */
-+#define ISO_DEFAULT_MTU		251
-+#define ISO_MAX_NUM_BIS		0x1f
-+
-+/* ISO socket broadcast address */
-+struct sockaddr_iso_bc {
-+	bdaddr_t	bc_bdaddr;
-+	uint8_t		bc_bdaddr_type;
-+	uint8_t		bc_sid;
-+	uint8_t		bc_num_bis;
-+	uint8_t		bc_bis[ISO_MAX_NUM_BIS];
-+};
-+
-+/* ISO socket address */
-+struct sockaddr_iso {
-+	sa_family_t	iso_family;
-+	bdaddr_t	iso_bdaddr;
-+	uint8_t		iso_bdaddr_type;
-+	struct sockaddr_iso_bc iso_bc[];
-+};
-+
-+#ifdef __cplusplus
-+}
-+#endif
-+
-+#endif /* __ISO_H */
+ static const uint8_t read_exp_feat_param_success[] = {
+-	0x03, 0x00,				/* Feature Count */
++	0x04, 0x00,				/* Feature Count */
+ 	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,	/* UUID - Simultaneous */
+ 	0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,	/* Central Peripheral */
+ 	0xb5, 0x10, 0x1b, 0x67,
+@@ -9810,7 +9810,11 @@ static const uint8_t read_exp_feat_param_success[] = {
+ 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f,	/* UUID - Codec Offload */
+ 	0x1a, 0x88, 0xb9, 0x4f, 0x7f, 0xee,
+ 	0xce, 0x5a, 0x69, 0xa6,
+-	0x00, 0x00, 0x00, 0x00			/* Flags */
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6,	/* UUID - ISO Socket */
++	0x85, 0x98, 0x6a, 0x49, 0xe0, 0x05,
++	0x88, 0xf1, 0xba, 0x6f,
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
+ };
+ 
+ static const struct generic_data read_exp_feat_success = {
+@@ -9822,11 +9826,15 @@ static const struct generic_data read_exp_feat_success = {
+ 
+ 
+ static const uint8_t read_exp_feat_param_success_index_none[] = {
+-	0x01, 0x00,				/* Feature Count */
++	0x02, 0x00,				/* Feature Count */
+ 	0x1c, 0xda, 0x47, 0x1c, 0x48, 0x6c,	/* UUID - Debug */
+ 	0x01, 0xab, 0x9f, 0x46, 0xec, 0xb9,
+ 	0x30, 0x25, 0x99, 0xd4,
+ 	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6,	/* UUID - ISO Socket */
++	0x85, 0x98, 0x6a, 0x49, 0xe0, 0x05,
++	0x88, 0xf1, 0xba, 0x6f,
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
+ };
+ 
+ static const struct generic_data read_exp_feat_success_index_none = {
 -- 
 2.35.1
 
