@@ -2,81 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4D6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 May 2022 22:30:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A3AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 May 2022 22:38:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbiERWaQ (ORCPT
+        id S229751AbiERWiG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 May 2022 18:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40772 "EHLO
+        Wed, 18 May 2022 18:38:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbiERWaP (ORCPT
+        with ESMTP id S230075AbiERWiF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 May 2022 18:30:15 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCBA2F002
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 15:30:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 42A69B82223
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 22:30:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E43CCC34113;
-        Wed, 18 May 2022 22:30:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652913011;
-        bh=e+S0Tmo8w6t5TRSGQ3eUMUgtALxkOqcwEPCekR3DBxk=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=YA+jKTT67sbsCXGke85DLLVUTu66BUu59DwOL+Z6IEm6SE/lEiKbjUbZSd9msr9EK
-         tjogUXNxCOZdreURu/AJTi3bRs/XI+ctMAUbAgDIClKRJBdKbZh4XH20xB807DLjXl
-         Xs3q6kuJsiSuLUeCt5PKXkO6qKQmXkx9Ne9pdedYu/fmSUd34Z338xp/ohfbsQfpR9
-         qMGlWfgqxHNx8A34Ti+NxzmIuhHJnImXfjF9GFID1OQ5r9BZbn1ilO/SVDg3/RINc6
-         7YM4wB93jrCThnDUIK4kV/Yj7BP0ovGPyUoVkHz8l8vtSzPEtd2nzKCwLEMb23oQsZ
-         syNWYH8zF/rug==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B9F3DF03935;
-        Wed, 18 May 2022 22:30:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Bluez PATCH] input/device: Notify failure if ctrl disconnect when
- waiting intr
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165291301175.29867.15018263592071447894.git-patchwork-notify@kernel.org>
-Date:   Wed, 18 May 2022 22:30:11 +0000
-References: <20220518123252.Bluez.1.Ie61d0e985d42728b2e705ca6dfd000385cf3870a@changeid>
-In-Reply-To: <20220518123252.Bluez.1.Ie61d0e985d42728b2e705ca6dfd000385cf3870a@changeid>
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        chromeos-bluetooth-upstreaming@chromium.org, apusaka@chromium.org,
-        sonnysasaka@chromium.org
+        Wed, 18 May 2022 18:38:05 -0400
+Received: from out-24.smtp.github.com (out-24.smtp.github.com [192.30.252.207])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E909A8720D
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 15:38:02 -0700 (PDT)
+Received: from github.com (hubbernetes-node-3c312f5.ac4-iad.github.net [10.52.207.59])
+        by smtp.github.com (Postfix) with ESMTPA id 0884F6000AB
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 15:38:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1652913482;
+        bh=usPw4tElOmX+3oP9i1V2pFpmfcljyUGT8jqGsmJ0nMU=;
+        h=Date:From:To:Subject:From;
+        b=TYoApvVIyzZJX+Ly+uf1vsItm5skhlNHL6/GmPi8JSveYJhxXKqPDyP3Q8n3fa6VH
+         W6bNYpyjs8TJQO6+hLinblOMdjASRT4iBAlh/g62JfNi8eg0s7fy+hgyY+jQwfdsoN
+         V5j9wmRBlHFipV3obNGURI5eO7hNuNnPjCOWmhi0=
+Date:   Wed, 18 May 2022 15:38:02 -0700
+From:   apusaka <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/c7955b-c159d7@github.com>
+Subject: [bluez/bluez] c159d7: input/device: Notify failure if ctrl disconnect
+ wh...
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c159d790e8786581cfa5e5a9e7bd71458a343e44
+      https://github.com/bluez/bluez/commit/c159d790e8786581cfa5e5a9e7bd71458a343e44
+  Author: Archie Pusaka <apusaka@chromium.org>
+  Date:   2022-05-18 (Wed, 18 May 2022)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M profiles/input/device.c
 
-On Wed, 18 May 2022 12:33:07 +0800 you wrote:
-> From: Archie Pusaka <apusaka@chromium.org>
-> 
-> On some rare occasions, the peer HID device might disconnect the ctrl
-> channel when we are trying to connect the intr channel. If this
-> happens, interrupt_connect_cb() will not be called by btio, and we
-> will be stuck in "connecting" state. Any future connection attempt to
-> the peer device will fail because of "busy".
-> 
-> [...]
+  Log Message:
+  -----------
+  input/device: Notify failure if ctrl disconnect when waiting intr
 
-Here is the summary with links:
-  - [Bluez] input/device: Notify failure if ctrl disconnect when waiting intr
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c159d790e878
+On some rare occasions, the peer HID device might disconnect the ctrl
+channel when we are trying to connect the intr channel. If this
+happens, interrupt_connect_cb() will not be called by btio, and we
+will be stuck in "connecting" state. Any future connection attempt to
+the peer device will fail because of "busy".
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This patch prevents that by checking if we need to report connection
+failure when the ctrl channel is disconnected.
+
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 
 
