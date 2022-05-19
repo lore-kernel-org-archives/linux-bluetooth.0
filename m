@@ -2,238 +2,181 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC9A3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:16:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89082C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:18:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232896AbiESUQN (ORCPT
+        id S243954AbiESUS0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 May 2022 16:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44162 "EHLO
+        Thu, 19 May 2022 16:18:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231567AbiESUPx (ORCPT
+        with ESMTP id S240765AbiESUSY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 May 2022 16:15:53 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D91C617F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:15:48 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id x143so6018234pfc.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:15:48 -0700 (PDT)
+        Thu, 19 May 2022 16:18:24 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2C6A7354C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:18:23 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id p12so6081254pfn.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:18:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cceYVJX1UQXeFotD1td6P06oyvXPXpq1bSVgFwTMX20=;
-        b=FoX/m6CuvTOk0eaeG/5T8mWCFlV2zjucA1ejMCrZS/t9J1DGM+V4S2buO+AQjc02sd
-         CIx2XkMCC4UbD0obd9OTmxPVLVosE7BEWIzdYALqoEvtI8TevnMIES3uofBcmRIB5NG7
-         Ru3rIQERY5MqL2azTHFfl8xnvBDbzbR8bG0djx/QJgHRY26vS/Pqg9FdmdXvwa3q6UQl
-         Ez5pRNZovlazKLd7GOCXngLYbEkDX0EKnAGyjjOT3xGp9TpNiyYF7ZBjRpgICiRee5CD
-         Yd1wJolayNGLlYMmSawI0bKmEs/9Ed+FOgmUgsv5Ds1gJk/B0LOOYJZsqHQXNjnpeNu1
-         an+w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IWk9rCtHM8WxFMpku6SnqP5gs2RN0avF3Higue4AodM=;
+        b=jkgkV+U7O2/B3foltyd1pF8OCQl9HTaai2zcROEPJhhU4LjC4V/O4n6ErRe7YiPRRM
+         nYj9ZY1Wv0UtrsyTj6dXIc8QzxqfcFg/9brXjt543upficZLyoSY/dD+ae5ccqV0YelV
+         Nr20w36w9xI10O7rDzqkVHiIg5Cm+FOWDy8Lp1RkHqRcuBJb3lf/dcyvXeWLGN9HzEM7
+         iam7suB969MgFlbpAr7Xh0Qrt0NPPe/ddEgvBF0ZCURo6zkNvOG4u7WLiQvIMYtOfOMz
+         pSQLTK3NBKMyZZaUJYQ33kZ11M01p9UOPYsh+5I20XYcsRWNT+gm0sPkKaNl5o8QHwAK
+         dcAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cceYVJX1UQXeFotD1td6P06oyvXPXpq1bSVgFwTMX20=;
-        b=uYCJ45x2n8v/J5FagcPOdeHgo94KsVN7JOwo8hjof+nSYfNuRhS1+ZIZjTFEIZmdbs
-         HZziNlnXbYu24Ouf+j0Bc6liEdEnYCYGqw3ziCePNX3AuNmRGHmHmT0SW0B1FK6Keh1I
-         RZvENyYKqp6QOcH63vv5LKQGML6N83qaqqwNP82vH6JuipeMwDXMZm2NOO0s9hSNoq9u
-         YtfljUA2pCuFlZARa5LX0NRxoghbwD1zX1gHTNJ+jKfHLyTLlDU7Rd/4hwgXVqMwTWm3
-         cBJtJUyfgPwHGYXA7xWu/eO3eGQHrG7zTOGnVR4AKflMKOiPL1jck+BZ2FHO9Ce5QBKO
-         Ka/g==
-X-Gm-Message-State: AOAM531WUeNTrM+iVzmYRgLtZkD5wQqRvenWviMmRw00IHeQUEwO6OWK
-        Psc2sqmM71l0pctfM4wSbvSY/ThQYSM=
-X-Google-Smtp-Source: ABdhPJyXqtDUSiTqUnDGQO9cAr9GghHIeCz8l3cZh5aS4yzmr1cO2VG8BwBR5/OKmkNHJjPpjiJMdw==
-X-Received: by 2002:a63:63c7:0:b0:3f5:faf8:c45e with SMTP id x190-20020a6363c7000000b003f5faf8c45emr5528359pgb.234.1652991347106;
-        Thu, 19 May 2022 13:15:47 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y143-20020a626495000000b0050dc76281c7sm71621pfb.161.2022.05.19.13.15.46
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 13:15:46 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: MGMT: Fix uses of bitmap_from_u64
-Date:   Thu, 19 May 2022 13:15:45 -0700
-Message-Id: <20220519201545.2422259-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IWk9rCtHM8WxFMpku6SnqP5gs2RN0avF3Higue4AodM=;
+        b=aILzb3BVmf3aXOnDiVUSLsMnkPZ3La75yV84gC9j+f7fCIyOMO9RmY+br7VF+4t2/J
+         3LHDW3ZV/mc+PohPPv24tVKS+CIUeAQmUjvE9Lk/kKU1URxdunh3A7zSwwD/VGKJ/8Yd
+         rq+7GnZeP1eX2pY5LGdZ8uOmLQGP70CxkT7IhsWm6n9yiN7BAQ6l8YBLH8Y712ANrJe8
+         pYtSdfU9/sPbIePrywmhAYLfj38X8aPKT6zOmnJw3JQbW0FzB0So5YGEXAy8VhqxTo95
+         d4FisHnJ2sNYFD7qds8MN9LDJXm2+q54qQHRYxVxtlzBefH0BKMr6RGp2Q7ky9LFrcnP
+         8YSg==
+X-Gm-Message-State: AOAM531TSYwl4SaES4VFvJ+GvOpnRw3FGG+nZt1NWdfUNJF0D8pQdWz2
+        7+yVJYSKIb+uXh5sovFgeSeVOIX+nLh7kWNzs+B3uB3B
+X-Google-Smtp-Source: ABdhPJwN2S/XUluNXdq22Wvp+BrwFECvoFypChKx9C1QW+mJP7ph7+N4HxypbeYg5o72BlXlF3wavzvmM53bsB2bdq0=
+X-Received: by 2002:a05:6a00:889:b0:510:91e6:6463 with SMTP id
+ q9-20020a056a00088900b0051091e66463mr6306788pfj.58.1652991503102; Thu, 19 May
+ 2022 13:18:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220513234611.1360704-1-luiz.dentz@gmail.com> <83CE64EC-65DE-4DE9-994B-4729A35A6F64@holtmann.org>
+In-Reply-To: <83CE64EC-65DE-4DE9-994B-4729A35A6F64@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 19 May 2022 13:18:11 -0700
+Message-ID: <CABBYNZ+Pd-5VbptVNwyd+7J2cFYr3rPUtPPc+L2s8cqzbBkKLg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] Bluetooth: Add bt_status
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-bitmap_from_u64 expects at least 8 bytes to be declared since it doesn't
-take any parameter regarding the number of bits causing the following
-warnings:
+On Thu, May 19, 2022 at 11:07 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Luiz,
+>
+> > This adds bt_status which can be used to convert Unix errno to
+> > Bluetooth status.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > include/net/bluetooth/bluetooth.h |  1 +
+> > net/bluetooth/lib.c               | 71 +++++++++++++++++++++++++++++++
+> > 2 files changed, 72 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> > index 6b48d9e2aab9..cfe6159f26bc 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -521,6 +521,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+> > }
+> >
+> > int bt_to_errno(u16 code);
+> > +__u8 bt_status(int err);
+> >
+> > void hci_sock_set_flag(struct sock *sk, int nr);
+> > void hci_sock_clear_flag(struct sock *sk, int nr);
+> > diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+> > index 5326f41a58b7..469a0c95b6e8 100644
+> > --- a/net/bluetooth/lib.c
+> > +++ b/net/bluetooth/lib.c
+> > @@ -135,6 +135,77 @@ int bt_to_errno(__u16 code)
+> > }
+> > EXPORT_SYMBOL(bt_to_errno);
+> >
+> > +/* Unix errno to Bluetooth error codes mapping */
+> > +__u8 bt_status(int err)
+> > +{
+> > +     /* Don't convert if already positive value */
+> > +     if (err >= 0)
+> > +             return err;
+> > +
+> > +     switch (err) {
+> > +     case -EBADRQC:
+> > +             return 0x01;
+> > +
+> > +     case -ENOTCONN:
+> > +             return 0x02;
+> > +
+> > +     case -EIO:
+> > +             return 0x03;
+> > +
+> > +     case -EHOSTDOWN:
+> > +             return 0x04;
+> > +
+> > +     case -EACCES:
+> > +             return 0x05;
+> > +
+> > +     case -EBADE:
+> > +             return 0x06;
+> > +
+> > +     case -ENOMEM:
+> > +             return 0x07;
+> > +
+> > +     case -ETIMEDOUT:
+> > +             return 0x08;
+> > +
+> > +     case -EMLINK:
+> > +             return 0x09;
+> > +
+> > +     case EALREADY:
+> > +             return 0x0b;
+> > +
+> > +     case -EBUSY:
+> > +             return 0x0c;
+> > +
+> > +     case -ECONNREFUSED:
+> > +             return 0x0d;
+> > +
+> > +     case -EOPNOTSUPP:
+> > +             return 0x11;
+> > +
+> > +     case -EINVAL:
+> > +             return 0x12;
+> > +
+> > +     case -ECONNRESET:
+> > +             return 0x13;
+> > +
+> > +     case -ECONNABORTED:
+> > +             return 0x16;
+> > +
+> > +     case ELOOP:
+> > +             return 0x17;
+> > +
+> > +     case -EPROTONOSUPPORT:
+> > +             return 0x1a;
+> > +
+> > +     case -EPROTO:
+> > +             return 0x19;
+> > +
+> > +     default:
+> > +             return 0x1f;
+> > +     }
+> > +}
+> > +EXPORT_SYMBOL(bt_status);
+> > +
+>
+> why are exporting this?
 
-In file included from include/linux/cpumask.h:12,
-                 from include/linux/mm_types_task.h:14,
-                 from include/linux/mm_types.h:5,
-                 from include/linux/buildid.h:5,
-                 from include/linux/module.h:14,
-                 from net/bluetooth/mgmt.c:27:
-In function 'bitmap_copy',
-    inlined from 'bitmap_copy_clear_tail' at include/linux/bitmap.h:270:2,
-    inlined from 'bitmap_from_u64' at include/linux/bitmap.h:622:2,
-    inlined from 'set_device_flags' at net/bluetooth/mgmt.c:4534:4:
-include/linux/bitmap.h:261:9: warning: 'memcpy' forming offset [4, 7] is
-out of the bounds [0, 4] of object 'flags' with type
-'long unsigned int[1]' [-Warray-bounds]
-  261 |         memcpy(dst, src, len);
-      |         ^~~~~~~~~~~~~~~~~~~~~
-In file included from include/linux/kasan-checks.h:5,
-                 from include/asm-generic/rwonce.h:26,
-                 from ./arch/arm/include/generated/asm/rwonce.h:1,
-                 from include/linux/compiler.h:248,
-                 from include/linux/build_bug.h:5,
-                 from include/linux/container_of.h:5,
-                 from include/linux/list.h:5,
-                 from include/linux/module.h:12,
-                 from net/bluetooth/mgmt.c:27:
-net/bluetooth/mgmt.c: In function 'set_device_flags':
-net/bluetooth/mgmt.c:4532:40: note: 'flags' declared here
- 4532 |                         DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
-      |                                        ^~~~~
-include/linux/types.h:11:23: note: in definition of macro 'DECLARE_BITMAP'
-   11 |         unsigned long name[BITS_TO_LONGS(bits)]
-      |                       ^~~~
+Isn't it supposed to be exported since it is part of lib.c? All
+functions in this file use it.
 
-In order to fix the above this initializes a variable using
-DECLARE_BITMAP with the current_flags and then uses bitmap_subset to
-check if the flags being set are a subset of hdev->conn_flags that way
-all the checks are performed using bitmap APIs and conversion to u32
-only happen when really needed.
+> Regards
+>
+> Marcel
+>
 
-Fixes: a9a347655d22 ("Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Suggested-by: Yury Norov <yury.norov@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/mgmt.c | 45 +++++++++++++++++++-------------------------
- 1 file changed, 19 insertions(+), 26 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 74937a834648..cd1b300b9be7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4476,9 +4476,16 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- static void device_flags_changed(struct sock *sk, struct hci_dev *hdev,
- 				 bdaddr_t *bdaddr, u8 bdaddr_type,
--				 u32 supported_flags, u32 current_flags)
-+				 unsigned long *flags)
- {
- 	struct mgmt_ev_device_flags_changed ev;
-+	u32 supported_flags, current_flags = 0;
-+
-+	bitmap_to_arr32(&supported_flags, hdev->conn_flags,
-+			__HCI_CONN_NUM_FLAGS);
-+
-+	if (flags)
-+		bitmap_to_arr32(&current_flags, flags, __HCI_CONN_NUM_FLAGS);
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
- 	ev.addr.type = bdaddr_type;
-@@ -4495,19 +4502,15 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct bdaddr_list_with_flags *br_params;
- 	struct hci_conn_params *params;
- 	u8 status = MGMT_STATUS_INVALID_PARAMS;
--	u32 supported_flags;
- 	u32 current_flags = __le32_to_cpu(cp->current_flags);
-+	DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS) = { current_flags };
- 
- 	bt_dev_dbg(hdev, "Set device flags %pMR (type 0x%x) = 0x%x",
--		   &cp->addr.bdaddr, cp->addr.type,
--		   __le32_to_cpu(current_flags));
-+		   &cp->addr.bdaddr, cp->addr.type, current_flags);
- 
--	bitmap_to_arr32(&supported_flags, hdev->conn_flags,
--			__HCI_CONN_NUM_FLAGS);
--
--	if ((supported_flags | current_flags) != supported_flags) {
--		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
--			    current_flags, supported_flags);
-+	if (bitmap_subset(hdev->conn_flags, flags, __HCI_CONN_NUM_FLAGS)) {
-+		bt_dev_warn(hdev, "Bad flag given (0x%lx) vs supported (0x%lx)",
-+			    *hdev->conn_flags, *flags);
- 		goto done;
- 	}
- 
-@@ -4519,7 +4522,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 							      cp->addr.type);
- 
- 		if (br_params) {
--			bitmap_from_u64(br_params->flags, current_flags);
-+			bitmap_copy(br_params->flags, flags,
-+				    __HCI_CONN_NUM_FLAGS);
- 			status = MGMT_STATUS_SUCCESS;
- 		} else {
- 			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
-@@ -4529,10 +4533,6 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
- 						le_addr_type(cp->addr.type));
- 		if (params) {
--			DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
--
--			bitmap_from_u64(flags, current_flags);
--
- 			/* Devices using RPAs can only be programmed in the
- 			 * acceptlist LL Privacy has been enable otherwise they
- 			 * cannot mark HCI_CONN_FLAG_REMOTE_WAKEUP.
-@@ -4546,7 +4546,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 				goto unlock;
- 			}
- 
--			bitmap_from_u64(params->flags, current_flags);
-+			bitmap_copy(params->flags, flags, __HCI_CONN_NUM_FLAGS);
- 			status = MGMT_STATUS_SUCCESS;
- 
- 			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
-@@ -4568,7 +4568,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- done:
- 	if (status == MGMT_STATUS_SUCCESS)
- 		device_flags_changed(sk, hdev, &cp->addr.bdaddr, cp->addr.type,
--				     supported_flags, current_flags);
-+				     flags);
- 
- 	return mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_FLAGS, status,
- 				 &cp->addr, sizeof(cp->addr));
-@@ -7079,10 +7079,8 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- {
- 	struct mgmt_cp_add_device *cp = data;
- 	u8 auto_conn, addr_type;
--	struct hci_conn_params *params;
-+	struct hci_conn_params *params = NULL;
- 	int err;
--	u32 current_flags = 0;
--	u32 supported_flags;
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
- 
-@@ -7153,9 +7151,6 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 	} else {
- 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
- 						addr_type);
--		if (params)
--			bitmap_to_arr32(&current_flags, params->flags,
--					__HCI_CONN_NUM_FLAGS);
- 	}
- 
- 	err = hci_cmd_sync_queue(hdev, add_device_sync, NULL, NULL);
-@@ -7164,10 +7159,8 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 
- added:
- 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
--	bitmap_to_arr32(&supported_flags, hdev->conn_flags,
--			__HCI_CONN_NUM_FLAGS);
- 	device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
--			     supported_flags, current_flags);
-+			     params ? params->flags : NULL);
- 
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
- 				MGMT_STATUS_SUCCESS, &cp->addr,
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
