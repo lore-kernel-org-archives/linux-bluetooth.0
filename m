@@ -2,86 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FE1C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 05:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ED2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 06:05:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234050AbiESFkt (ORCPT
+        id S233546AbiESGFD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 May 2022 01:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45308 "EHLO
+        Thu, 19 May 2022 02:05:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232611AbiESFkr (ORCPT
+        with ESMTP id S232839AbiESGFC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 May 2022 01:40:47 -0400
-Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58EBD389;
-        Wed, 18 May 2022 22:40:45 -0700 (PDT)
+        Thu, 19 May 2022 02:05:02 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D956D1AA
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:05:02 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id 11so1901014qtp.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:05:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1652938846; x=1684474846;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=N95pkwbu4izN6QqsZsdSNkwCyLorSYTPgc1DJCQgzAw=;
-  b=kymqE7XshrKlB7qmXm+2Amdp/Dd/pE2cwO9/rJb8fXwZPfCrcWCMbxMK
-   21L9JpdAHXEiu1lEE1DLBjGBqITQ+aE+7BKdqTyK+lXExuZmbeZP4Pj65
-   dDy83W7k4PJ1yaRTgu8Z3nnr55fqCGYHyihb7NzY1KezJMS/ygFBIN3hC
-   Y=;
-Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 18 May 2022 22:40:45 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 22:40:45 -0700
-Received: from bgodavar-linux.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Wed, 18 May 2022 22:40:41 -0700
-From:   Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-CC:     <mka@chromium.org>, <linux-bluetooth@vger.kernel.org>,
-        <quic_hemantg@quicinc.com>, <quic_bgodavar@quicinc.com>,
-        <quic_rjliao@quicinc.com>, <mcchou@chromium.org>
-Subject: [PATCH v1] MAINTAINERS: add maintainers for qualcomm uart based BT drivers
-Date:   Thu, 19 May 2022 11:10:24 +0530
-Message-ID: <1652938824-28976-1-git-send-email-quic_bgodavar@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=0Y9ZBsmX6MFXVYj+n3qQR3o1daPIU5gYzyQSTlYSYb4=;
+        b=XgZhcdMOAvUvNm2JwfL2M82GTB2MIINzZDsL2aVVV5rrw8Pc2GByKToHIzg6JdnI5Q
+         4zk1Lz2/t6yLomTAB5GMVF8RcxiYlVRq+0MU7V8XJxwLP5OktMGXzUH8jEH1n5opF2Pq
+         NdgBSbtj8+RICe2CsD7EX4phZHT+fsGT6OMKZZ12E8G3nsaxoO++E/7Bbk4Ux/hl1RN5
+         4uFXTbSiImJwXTTSR+IIHMOvQuBDw49x8v/YRVHKsVbthv+IoBSc4LtDS89hCmMpVE5D
+         cFLj1guqD3U+LsFE5UZH7mZ0hSDk0NlxgnguqiNlFro/ApgFnHy6igxLNF4Dj0YHkIc5
+         sXcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=0Y9ZBsmX6MFXVYj+n3qQR3o1daPIU5gYzyQSTlYSYb4=;
+        b=YvDzvHJa3VKHS10uGUBtUyIuOCDzQEE/yguc6dqx8XzhNuPpHzsBPGsmDo3yPBq8tI
+         OcDIEdZq6/EqofIQuP0W3no6uHVDbkdq383CFpceRfPCH2wl/UH8TnLyyr8Ep+yqdGo2
+         /Fa9VBFrA+WngfoJt2+pTTVsbMQBzSYPgPWzPPRo0wanKB4HobF0OdHdWkWg7w0WW97C
+         cBHAiQviBfc/u1RSjKrM0DX8z/QrwM1gY93aQOUnGu8z368Z0Fm7vCD4QDCWJi6a2+w4
+         wm8bNRaXkg7SIDwW7QaLyeLysgylaK15zFjiDC4stJDVRppcZuYky4j49pPNT8kzxroh
+         sCwg==
+X-Gm-Message-State: AOAM533UQFB7IpwHM95oJkz+Pe0imycsM0DJ2+ZU2/hfTPQNqM0qQRH3
+        YxuAWzokUYq1jXyvijDjSz/oYvYncMpzRA==
+X-Google-Smtp-Source: ABdhPJyz24POIwqhrjRXXseNQzwzlL0tfKW2ly1jcuNFC93jvvnq/vnf6tfsjViU6fFgreoNhJbUoA==
+X-Received: by 2002:ac8:5c91:0:b0:2f3:bd33:f412 with SMTP id r17-20020ac85c91000000b002f3bd33f412mr2666519qta.15.1652940301070;
+        Wed, 18 May 2022 23:05:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.232.181.170])
+        by smtp.gmail.com with ESMTPSA id y1-20020a379601000000b006a323e60e29sm761087qkd.135.2022.05.18.23.05.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 May 2022 23:05:00 -0700 (PDT)
+Message-ID: <6285de0c.1c69fb81.e8715.3916@mx.google.com>
+Date:   Wed, 18 May 2022 23:05:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2940699804670887687=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_bgodavar@quicinc.com
+Subject: RE: [v1] MAINTAINERS: add maintainers for qualcomm uart based BT drivers
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1652938824-28976-1-git-send-email-quic_bgodavar@quicinc.com>
+References: <1652938824-28976-1-git-send-email-quic_bgodavar@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adding myself and rocky Liao as a maintainers for qualcomm
-uart based bluetooth drivers.
+--===============2940699804670887687==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=642979
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.55 seconds
+GitLint                       PASS      1.03 seconds
+SubjectPrefix                 FAIL      0.81 seconds
+BuildKernel                   PASS      31.36 seconds
+BuildKernel32                 PASS      27.71 seconds
+Incremental Build with patchesPASS      37.72 seconds
+TestRunner: Setup             PASS      457.55 seconds
+TestRunner: l2cap-tester      PASS      17.04 seconds
+TestRunner: bnep-tester       PASS      5.89 seconds
+TestRunner: mgmt-tester       PASS      98.10 seconds
+TestRunner: rfcomm-tester     PASS      9.31 seconds
+TestRunner: sco-tester        PASS      9.12 seconds
+TestRunner: smp-tester        PASS      9.02 seconds
+TestRunner: userchan-tester   PASS      6.00 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.81 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- MAINTAINERS | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 69b597a..22d4d00 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16295,6 +16295,16 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/net/qcom,bam-dmux.yaml
- F:	drivers/net/wwan/qcom_bam_dmux.c
- 
-+QUALCOMM BLUETOOTH DRIVER
-+M:	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-+M:	Rocky Liao <quic_rjliao@quicinc.com>
-+L:	linux-bluetooth@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-+F:	drivers/bluetooth/btqca.c
-+F:	drivers/bluetooth/btqca.h
-+F:	drivers/bluetooth/hci_qca.c
-+
- QUALCOMM CAMERA SUBSYSTEM DRIVER
- M:	Robert Foss <robert.foss@linaro.org>
- M:	Todor Tomov <todor.too@gmail.com>
--- 
-2.7.4
 
+--===============2940699804670887687==--
