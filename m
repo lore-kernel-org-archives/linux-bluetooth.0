@@ -2,109 +2,183 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ED2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 06:05:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6378DC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 06:31:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233546AbiESGFD (ORCPT
+        id S234089AbiESGbq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 May 2022 02:05:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57132 "EHLO
+        Thu, 19 May 2022 02:31:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232839AbiESGFC (ORCPT
+        with ESMTP id S230032AbiESGbp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 May 2022 02:05:02 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11D956D1AA
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:05:02 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id 11so1901014qtp.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:05:02 -0700 (PDT)
+        Thu, 19 May 2022 02:31:45 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF89C25285
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:31:42 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id g16so5073063lja.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 May 2022 23:31:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=0Y9ZBsmX6MFXVYj+n3qQR3o1daPIU5gYzyQSTlYSYb4=;
-        b=XgZhcdMOAvUvNm2JwfL2M82GTB2MIINzZDsL2aVVV5rrw8Pc2GByKToHIzg6JdnI5Q
-         4zk1Lz2/t6yLomTAB5GMVF8RcxiYlVRq+0MU7V8XJxwLP5OktMGXzUH8jEH1n5opF2Pq
-         NdgBSbtj8+RICe2CsD7EX4phZHT+fsGT6OMKZZ12E8G3nsaxoO++E/7Bbk4Ux/hl1RN5
-         4uFXTbSiImJwXTTSR+IIHMOvQuBDw49x8v/YRVHKsVbthv+IoBSc4LtDS89hCmMpVE5D
-         cFLj1guqD3U+LsFE5UZH7mZ0hSDk0NlxgnguqiNlFro/ApgFnHy6igxLNF4Dj0YHkIc5
-         sXcw==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=naZDnEoCjMXx13Y1+051NuNh/YR239ab6tyhsA1Bwj8=;
+        b=Fbs2aVMU4cPjCMiljTBfCDS6deeUI+7jucOmpU9q1W+ptFqc83lQz0uSgCGSIfrf20
+         zd63SsWiz/mIBngU8Uyjv/hP3q7oFtmI9nu/6pafHtYTWv+r4n91Tj9Sqrp6CncR+FKy
+         jaZLbIPJaqVxGhyA9VApM/3/t8Kjdk3PP4JMCW0OwCNV4ss/2dxkKUGKpl+LJXir6BiJ
+         QrNkWN81erHvWlU3S2mJ4LzepybjkQnwm9A5yEKj0r7XzT10r9XIJFBKG3t/jP7BYqaM
+         87oTIQrxYBFWNAHYHxNaQkr7s5t+6ES8lcNaAHQCtQVUAO82EigJheMXDX1htuZkpxpP
+         Qwnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=0Y9ZBsmX6MFXVYj+n3qQR3o1daPIU5gYzyQSTlYSYb4=;
-        b=YvDzvHJa3VKHS10uGUBtUyIuOCDzQEE/yguc6dqx8XzhNuPpHzsBPGsmDo3yPBq8tI
-         OcDIEdZq6/EqofIQuP0W3no6uHVDbkdq383CFpceRfPCH2wl/UH8TnLyyr8Ep+yqdGo2
-         /Fa9VBFrA+WngfoJt2+pTTVsbMQBzSYPgPWzPPRo0wanKB4HobF0OdHdWkWg7w0WW97C
-         cBHAiQviBfc/u1RSjKrM0DX8z/QrwM1gY93aQOUnGu8z368Z0Fm7vCD4QDCWJi6a2+w4
-         wm8bNRaXkg7SIDwW7QaLyeLysgylaK15zFjiDC4stJDVRppcZuYky4j49pPNT8kzxroh
-         sCwg==
-X-Gm-Message-State: AOAM533UQFB7IpwHM95oJkz+Pe0imycsM0DJ2+ZU2/hfTPQNqM0qQRH3
-        YxuAWzokUYq1jXyvijDjSz/oYvYncMpzRA==
-X-Google-Smtp-Source: ABdhPJyz24POIwqhrjRXXseNQzwzlL0tfKW2ly1jcuNFC93jvvnq/vnf6tfsjViU6fFgreoNhJbUoA==
-X-Received: by 2002:ac8:5c91:0:b0:2f3:bd33:f412 with SMTP id r17-20020ac85c91000000b002f3bd33f412mr2666519qta.15.1652940301070;
-        Wed, 18 May 2022 23:05:01 -0700 (PDT)
-Received: from [172.17.0.2] ([20.232.181.170])
-        by smtp.gmail.com with ESMTPSA id y1-20020a379601000000b006a323e60e29sm761087qkd.135.2022.05.18.23.05.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 23:05:00 -0700 (PDT)
-Message-ID: <6285de0c.1c69fb81.e8715.3916@mx.google.com>
-Date:   Wed, 18 May 2022 23:05:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2940699804670887687=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=naZDnEoCjMXx13Y1+051NuNh/YR239ab6tyhsA1Bwj8=;
+        b=C37g5vHJtcJveKMKoG2h9QeYHbvxYsV74NP+npGEs72PW75OSsBH/8aY+ugKl+IDdw
+         gWRvpab927I2xC25XO6vM89zG72yzBbUqWorxnJ+Em+bxPOaW4fcpTd/BaUnylk5Iv9J
+         XPvxdmwHmVJd7HUBhCAc41xDIfsPLRbjyXmKVQA4FgviRphU5iJN6pbt+BcFXMZqMtCP
+         Dn+eohVhajA5kfO2qC+A/ElhlaJejvE0PlZAdzoWKJ5i1Ej8xXqu2QeB+0D5dx44Ryhd
+         hONysewMDjkimlBnas57SoiLeuhoUHQvfW35NVGakxSFciUywmFL1spr5vzNfADyDH/S
+         7a8A==
+X-Gm-Message-State: AOAM533juofoBkTTxT/zwU0mA6IxYiAZzA5lsvEzeeJ209b3cPPCRv2M
+        ZdxblB8DoUlYZbZz6CrsZxkQfacpyLvJik0c+AoBOw==
+X-Google-Smtp-Source: ABdhPJxZT6ot/IRbzSDhxEEopdx454QnWK1oePLTWm48P9Js7gUl7Na5CK9zAGOuKBgVVFLly+DTXzFkqHk/TayAodY=
+X-Received: by 2002:a05:651c:1612:b0:253:d535:d7c0 with SMTP id
+ f18-20020a05651c161200b00253d535d7c0mr870589ljq.33.1652941901043; Wed, 18 May
+ 2022 23:31:41 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_bgodavar@quicinc.com
-Subject: RE: [v1] MAINTAINERS: add maintainers for qualcomm uart based BT drivers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1652938824-28976-1-git-send-email-quic_bgodavar@quicinc.com>
-References: <1652938824-28976-1-git-send-email-quic_bgodavar@quicinc.com>
+References: <00000000000056758e05d301dd90@google.com>
+In-Reply-To: <00000000000056758e05d301dd90@google.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Thu, 19 May 2022 08:31:29 +0200
+Message-ID: <CACT4Y+bRrWXYGgKdbK3AFQLNUumJbSzujEJ=+37dcDBjzJg72A@mail.gmail.com>
+Subject: Re: [syzbot] general protection fault in hci_inquiry_result_with_rssi_evt
+To:     syzbot <syzbot+e3cad3a4e3f03bc00562@syzkaller.appspotmail.com>
+Cc:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        =?UTF-8?Q?Tam=C3=A1s_Koczka?= <poprdi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2940699804670887687==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, 13 Dec 2021 at 08:17, syzbot
+<syzbot+e3cad3a4e3f03bc00562@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    4eee8d0b64ec Add linux-next specific files for 20211208
+> git tree:       linux-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=130203e5b00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=20b74d9da4ce1ef1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e3cad3a4e3f03bc00562
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101eb355b00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b8f805b00000
+>
+> The issue was bisected to:
+>
+> commit 3e54c5890c87a30b1019a3de9dab968ff2b21e06
+> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Date:   Wed Dec 1 18:55:03 2021 +0000
+>
+>     Bluetooth: hci_event: Use of a function table to handle HCI events
+>
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=150100bab00000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=170100bab00000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=130100bab00000
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+e3cad3a4e3f03bc00562@syzkaller.appspotmail.com
+> Fixes: 3e54c5890c87 ("Bluetooth: hci_event: Use of a function table to handle HCI events")
 
-This is automated email and please do not reply to this email!
+Presumably this was fixed by Luiz's patch:
+https://github.com/torvalds/linux/commit/72279d17df54d5e4e7910b39c61a3f3464e36633
 
-Dear submitter,
+Let's close on syzbot to get new reports in future:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=642979
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.55 seconds
-GitLint                       PASS      1.03 seconds
-SubjectPrefix                 FAIL      0.81 seconds
-BuildKernel                   PASS      31.36 seconds
-BuildKernel32                 PASS      27.71 seconds
-Incremental Build with patchesPASS      37.72 seconds
-TestRunner: Setup             PASS      457.55 seconds
-TestRunner: l2cap-tester      PASS      17.04 seconds
-TestRunner: bnep-tester       PASS      5.89 seconds
-TestRunner: mgmt-tester       PASS      98.10 seconds
-TestRunner: rfcomm-tester     PASS      9.31 seconds
-TestRunner: sco-tester        PASS      9.12 seconds
-TestRunner: smp-tester        PASS      9.02 seconds
-TestRunner: userchan-tester   PASS      6.00 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL - 0.81 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
----
-Regards,
-Linux Bluetooth
+#syz fix: Bluetooth: hci_event: Rework hci_inquiry_result_with_rssi_evt
 
 
---===============2940699804670887687==--
+> Bluetooth: hci0: unexpected cc 0x1001 length: 249 > 9
+> Bluetooth: hci0: unexpected cc 0x0c23 length: 249 > 4
+> Bluetooth: hci0: unexpected cc 0x0c25 length: 249 > 3
+> Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2
+> general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+> CPU: 0 PID: 6545 Comm: kworker/u5:1 Not tainted 5.16.0-rc4-next-20211208-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> Workqueue: hci0 hci_rx_work
+> RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x970 net/bluetooth/hci_event.c:4520
+> Code: 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 88 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 ea 48 c1 ea 03 <0f> b6 04 02 4c 89 ea 83 e2 07 38 d0 7f 08 84 c0 0f 85 1b 07 00 00
+> RSP: 0018:ffffc90001aafad0 EFLAGS: 00010246
+> RAX: dffffc0000000000 RBX: ffff88807e754000 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: ffffffff883588a8 RDI: ffff88807e754000
+> RBP: ffff88807e754000 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffffffff88376f27 R11: 0000000000000000 R12: ffff88807015eb40
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007ffd653f7000 CR3: 0000000071f88000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  hci_event_func net/bluetooth/hci_event.c:6812 [inline]
+>  hci_event_packet+0x817/0xe90 net/bluetooth/hci_event.c:6860
+>  hci_rx_work+0x4fa/0xd30 net/bluetooth/hci_core.c:3817
+>  process_one_work+0x9b2/0x1690 kernel/workqueue.c:2318
+>  worker_thread+0x658/0x11f0 kernel/workqueue.c:2465
+>  kthread+0x405/0x4f0 kernel/kthread.c:345
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 403a15c54e29c5c4 ]---
+> RIP: 0010:hci_inquiry_result_with_rssi_evt+0xbc/0x970 net/bluetooth/hci_event.c:4520
+> Code: 00 fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 88 07 00 00 48 8b 04 24 4c 8b 28 48 b8 00 00 00 00 00 fc ff df 4c 89 ea 48 c1 ea 03 <0f> b6 04 02 4c 89 ea 83 e2 07 38 d0 7f 08 84 c0 0f 85 1b 07 00 00
+> RSP: 0018:ffffc90001aafad0 EFLAGS: 00010246
+> RAX: dffffc0000000000 RBX: ffff88807e754000 RCX: 0000000000000000
+> RDX: 0000000000000000 RSI: ffffffff883588a8 RDI: ffff88807e754000
+> RBP: ffff88807e754000 R08: 0000000000000000 R09: 0000000000000000
+> R10: ffffffff88376f27 R11: 0000000000000000 R12: ffff88807015eb40
+> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f2bb803f018 CR3: 000000001d893000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> ----------------
+> Code disassembly (best guess), 4 bytes skipped:
+>    0:   48 c1 ea 03             shr    $0x3,%rdx
+>    4:   80 3c 02 00             cmpb   $0x0,(%rdx,%rax,1)
+>    8:   0f 85 88 07 00 00       jne    0x796
+>    e:   48 8b 04 24             mov    (%rsp),%rax
+>   12:   4c 8b 28                mov    (%rax),%r13
+>   15:   48 b8 00 00 00 00 00    movabs $0xdffffc0000000000,%rax
+>   1c:   fc ff df
+>   1f:   4c 89 ea                mov    %r13,%rdx
+>   22:   48 c1 ea 03             shr    $0x3,%rdx
+> * 26:   0f b6 04 02             movzbl (%rdx,%rax,1),%eax <-- trapping instruction
+>   2a:   4c 89 ea                mov    %r13,%rdx
+>   2d:   83 e2 07                and    $0x7,%edx
+>   30:   38 d0                   cmp    %dl,%al
+>   32:   7f 08                   jg     0x3c
+>   34:   84 c0                   test   %al,%al
+>   36:   0f 85 1b 07 00 00       jne    0x757
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> syzbot can test patches for this issue, for details see:
+> https://goo.gl/tpsmEJ#testing-patches
