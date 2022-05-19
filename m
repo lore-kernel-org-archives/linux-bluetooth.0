@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A14ACC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0D81C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244682AbiESUXB (ORCPT
+        id S244685AbiESUXC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 May 2022 16:23:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59222 "EHLO
+        Thu, 19 May 2022 16:23:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244553AbiESUXA (ORCPT
+        with ESMTP id S244683AbiESUXB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 May 2022 16:23:00 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0871E9419B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:23:00 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id l7-20020a17090aaa8700b001dd1a5b9965so6203895pjq.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:23:00 -0700 (PDT)
+        Thu, 19 May 2022 16:23:01 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1847FA2046
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:23:01 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id m1so5734862plx.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:23:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=J5KE7dwc120qeok1CZgQ5szINl5mYleYsk/m0GI/AVY=;
-        b=SqOqcjCkbdqtsRjpAbUZjmpsaRD81ksU2rLh+A31lOwjWwjFSumDNMVrVa5O9rzjo3
-         pZ/+4KwX/o95zVyWWctrc0+ppCTOffjoXP39jBW60BFv8pmezWMmElVMyeCkKEN0K/XZ
-         ps+OOW9whxRNFObK9OovrAfm1waogTBZJPbnEEE4k3R7ofa9ZGI/5VedFaqkZTroRnJf
-         B6j7f8L6IClN7AR4d7yN4iSv+AwgsVDPFAnZ5PuyCcDA6NIqkiVsLV5jpQ119gK9rK/0
-         R5XA9z6D7f0wsDzI9BicSMYncJ3Qi5+ILoonWnAoYAm+m3f0T4CbaZYbh/0SSMSquLb9
-         h3Rw==
+        bh=5E9/QWTff8XTUl3YMv8DsMWpigkqx7PC7kzC5bE9vX8=;
+        b=iRZDT+44Vk10DYjyMpUfbZrisL0WeLbZU0HIqTNIGw3vMoc/E9Q6LMqLYD4dGrf/9p
+         wLSYPRG9OIMUGKzFXVHTjFLnVJ9b7IlDBkN/bv7jfdEJTLKzimDek6452v9v7t+V3biS
+         NIyS+kkI1b7C6AD0nf4keSfwdXPxXisbigfxmp1A/GjJ/J51WCw9QJh5mZhWJ/LcYTST
+         XUDtUYwe3lDVJwT7M4+aKpZhA91auKFCW2a76J12xrcRYZh+0WFCYCntCAwWuiUP8Rli
+         2svCiSqWx3eVQC1kAhgUFXNEPnoPtVM1VA+psMSjEoQSRF2B7aFG6MI0Hw2UWKGo1gy8
+         2FTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=J5KE7dwc120qeok1CZgQ5szINl5mYleYsk/m0GI/AVY=;
-        b=iAZ08DWJWSm+BBBs05H4xvVJga8vr/yFfZlVR27D/4E+RwjL73pFEGQcGguz+zZOw0
-         UUjFUq4W8Xwa4VOVKyaZw71rGhxq425Xgde0dN/M65uXCWnlpY69pJ+CJkiCzVZjA6I6
-         QTuIvupuxED2Cxz7H6fEVfWqsn/HkUfQq7JMscGDrwuRxTlOEBj5pdoX4Ci+nFGXAVdw
-         2AnyIPk11k8ukH1JrCSrGpdfV8KTV2hu/4EuxQg9US1dUstjGJdzjWOX9UQ1qADmTzk+
-         +8FfrDP7O2FNoUPZnB9gnlTKNuFKDUpKB/y05wVPPUWxaY6LvtTL6hkJwzhpCi5zIKSP
-         ISPA==
-X-Gm-Message-State: AOAM531fr9eOKERIWOsPXKt/hIdLyEZFN6JUhCFpBpM/cWXS3UhVdXPk
-        h/qTYnRX93cjZ2qrbgNo5H1adDqM1qo=
-X-Google-Smtp-Source: ABdhPJwkfvcYgOku0JGnvJAm0rf4GXpyACsJ0M3H6dl0XvOS4gn5oTtcf7jgdwKobUttKswB9gT+wg==
-X-Received: by 2002:a17:90b:164a:b0:1dc:981d:f197 with SMTP id il10-20020a17090b164a00b001dc981df197mr7498591pjb.228.1652991779209;
-        Thu, 19 May 2022 13:22:59 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5E9/QWTff8XTUl3YMv8DsMWpigkqx7PC7kzC5bE9vX8=;
+        b=0i9tWFzRee8TQMvSgVJK3PYvnWhctcAuY1KsoquoSzm+tdvC9PDjWRnycK4vmyYigX
+         kW+sZKD0nBGg/nDMPK3e7VqbPZttP2eZ3RULC52uH7r+4Ev7J3rkv4fPDGRbTldQ9Mpa
+         QCXchl5h9NGYpE2LwcGhkHdvybZC1A68ibQtSVEyqZ6aabXDDezllcI5gBnrbPTSPD1O
+         1apUePtHt6ADURUooWYALv4+hxkGGbX8wnVioYUkD/T7bSSXUI9tmonZ3XU4GhFIZCth
+         KlPUsCz1hO8RH/3ULLOTIrZta7br9SnCt9x3r3+kR3hSf28IRTZ+h2325ICnMyKcrdhZ
+         4FGw==
+X-Gm-Message-State: AOAM530f5vHkDN6zVniNe3aJgCTR94iSsD0Qjk6EhaCnqy2gR4I1zmJ5
+        2Uwfn8U/Iqq2A61ineggnuHKPLAcSyI=
+X-Google-Smtp-Source: ABdhPJziBXRA9miUItpmA2o1G2f1w/IiqlFqHCeJyCPVaOFIh6BvMaVeoFG2tR3P1g9bdlwnbm8AVQ==
+X-Received: by 2002:a17:903:d1:b0:15f:3277:fae with SMTP id x17-20020a17090300d100b0015f32770faemr6497110plc.69.1652991780253;
+        Thu, 19 May 2022 13:23:00 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i6-20020a62c106000000b0050dc762816csm98003pfg.70.2022.05.19.13.22.58
+        by smtp.gmail.com with ESMTPSA id i6-20020a62c106000000b0050dc762816csm98003pfg.70.2022.05.19.13.22.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 13:22:58 -0700 (PDT)
+        Thu, 19 May 2022 13:22:59 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] Bluetooth: hci_conn: Fix hci_connect_le_sync
-Date:   Thu, 19 May 2022 13:22:56 -0700
-Message-Id: <20220519202258.2459530-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/3] Bluetooth: Add bt_status
+Date:   Thu, 19 May 2022 13:22:57 -0700
+Message-Id: <20220519202258.2459530-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220519202258.2459530-1-luiz.dentz@gmail.com>
+References: <20220519202258.2459530-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,56 +66,109 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The handling of connection failures shall be handled by the request
-completion callback as already done by hci_cs_le_create_conn, also make
-sure to use hci_conn_failed instead of hci_le_conn_failed as the later
-don't actually call hci_conn_del to cleanup.
+This adds bt_status which can be used to convert Unix errno to
+Bluetooth status.
 
-Fixes: 8e8b92ee60de5 ("Bluetooth: hci_sync: Add hci_le_create_conn_sync")
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_conn.c  | 5 +++--
- net/bluetooth/hci_event.c | 8 +++++---
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/lib.c               | 71 +++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 882a7df13005..ac06c9724c7f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -943,10 +943,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 6b48d9e2aab9..cfe6159f26bc 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -521,6 +521,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+ }
  
- 	bt_dev_err(hdev, "request failed to create LE connection: err %d", err);
+ int bt_to_errno(u16 code);
++__u8 bt_status(int err);
  
--	if (!conn)
-+	/* Check if connection is still pending */
-+	if (conn != hci_lookup_le_connect(hdev))
- 		goto done;
+ void hci_sock_set_flag(struct sock *sk, int nr);
+ void hci_sock_clear_flag(struct sock *sk, int nr);
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index 5326f41a58b7..469a0c95b6e8 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -135,6 +135,77 @@ int bt_to_errno(__u16 code)
+ }
+ EXPORT_SYMBOL(bt_to_errno);
  
--	hci_le_conn_failed(conn, err);
-+	hci_conn_failed(conn, err);
- 
- done:
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0270e597c285..af17dfb20e01 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5632,10 +5632,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 		status = HCI_ERROR_INVALID_PARAMETERS;
- 	}
- 
--	if (status) {
--		hci_conn_failed(conn, status);
-+	/* All connection failure handling is taken care of by the
-+	 * hci_conn_failed function which is triggered by the HCI
-+	 * request completion callbacks used for connecting.
-+	 */
-+	if (status)
- 		goto unlock;
--	}
- 
- 	if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
- 		addr_type = BDADDR_LE_PUBLIC;
++/* Unix errno to Bluetooth error codes mapping */
++__u8 bt_status(int err)
++{
++	/* Don't convert if already positive value */
++	if (err >= 0)
++		return err;
++
++	switch (err) {
++	case -EBADRQC:
++		return 0x01;
++
++	case -ENOTCONN:
++		return 0x02;
++
++	case -EIO:
++		return 0x03;
++
++	case -EHOSTDOWN:
++		return 0x04;
++
++	case -EACCES:
++		return 0x05;
++
++	case -EBADE:
++		return 0x06;
++
++	case -ENOMEM:
++		return 0x07;
++
++	case -ETIMEDOUT:
++		return 0x08;
++
++	case -EMLINK:
++		return 0x09;
++
++	case EALREADY:
++		return 0x0b;
++
++	case -EBUSY:
++		return 0x0c;
++
++	case -ECONNREFUSED:
++		return 0x0d;
++
++	case -EOPNOTSUPP:
++		return 0x11;
++
++	case -EINVAL:
++		return 0x12;
++
++	case -ECONNRESET:
++		return 0x13;
++
++	case -ECONNABORTED:
++		return 0x16;
++
++	case ELOOP:
++		return 0x17;
++
++	case -EPROTONOSUPPORT:
++		return 0x1a;
++
++	case -EPROTO:
++		return 0x19;
++
++	default:
++		return 0x1f;
++	}
++}
++EXPORT_SYMBOL(bt_status);
++
+ void bt_info(const char *format, ...)
+ {
+ 	struct va_format vaf;
 -- 
 2.35.1
 
