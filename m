@@ -2,58 +2,57 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E61FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A05E6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 May 2022 20:11:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230395AbiESULG (ORCPT
+        id S238814AbiESULa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 May 2022 16:11:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38384 "EHLO
+        Thu, 19 May 2022 16:11:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244628AbiESULD (ORCPT
+        with ESMTP id S230395AbiESUL3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 May 2022 16:11:03 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BF437A9F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:11:02 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id w17-20020a17090a529100b001db302efed6so6167248pjh.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:11:02 -0700 (PDT)
+        Thu, 19 May 2022 16:11:29 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0642F5D180
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:11:28 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id a23-20020a17090acb9700b001df4e9f4870so6193238pju.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 13:11:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=eqNnxwHUF2vIG80fm9H283NXSVlNrFJ9/fZa8sWn2Xg=;
-        b=R8fgU3KdiaVJBbqUn+cONpWzaEx8TGxhLyWjB/40M61FQfHkWu6LuEOY5OXfQ5tKFF
-         E/KACAQUWai6LJIkYkSkYfZc1h8xK3LyfYveJXiK83aVfJHeK1vb0Vx1oscEQRykoiNF
-         Lj3qShFbEOT/5IpYKN8NvEY4rKXkwcKe/mr5n65Vw6xuMAQMyEBxjFr9xWnYr7AueG+l
-         ZpVjfbvlF0i0LkktBvTPt28jiXmyQUEJ2K3u3Z3mL7pD5UU14VaAdapIhWHLo0UBdluR
-         VN9U0Uhz+eb83I/mjwaJL2a+5jtjbofTJ/qv1+mbcD8wyi1hHaSmnpULXmuuZDvOmDfz
-         bB0Q==
+        bh=6NKFVPLlK/wL0rXlq/LRtafC4sP9xV5yvd6JHhV7cOw=;
+        b=aJ+ChbDoCbrgHuUFTt4Z9+NxfOZD4RooaHvAAf+NUzrcpObFTKeRLXEH/rBHuoEq+G
+         uNtTPk1bcJAuerEsYtOnTd6E4+NGfEhfoql6MBhGzJta4nbeNn9I8igMtzqPxHra/dla
+         W5FCfuivAM5stm4dr4yuB/WV5Eq4OC3zw7Fr4nMNbbyhFxwHPVD5liWz58tukJJeduLD
+         GrhKQ55ymSlI44HNIopBNAhrxRl5Sqvq4PS5pHeXPZHyj/VbkwTeMyEPAJntHBB/h4/A
+         GXQmlR2lbmEjSxxe3yzeUJeoc7t+I4ptYXyKDJoWxfVULjPONOxh0Pb8lClNPWatiPJO
+         iVcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=eqNnxwHUF2vIG80fm9H283NXSVlNrFJ9/fZa8sWn2Xg=;
-        b=L/2lDIZDGPjnbTrRqLAk9/YWv+ws9PP/t9tH9Lqd/OY8KNGX6uaVzRfSZ2PBnzAZrD
-         6pZBs0cv22ayNMuxZmpFGkq4oonkWsQWd9Za4XzUYBK9biU0kbqARtSGawiAAHrCbYEl
-         x/+L0z8eztCCaDeh7Dj0PF+ZpIZSl2SKqUpmqXrzGkKG55Jm4CmTRDvmdyIcm9MXJcLQ
-         uEY1AgS9Btui5OBUuUM62fkyINsWZeLslzvexfxJk00vxT+OLT8DmtWmOZRddtFkrEeC
-         pP5EOPTvb/3s3p8+43j7eviBccJTK51ijtoKSrEgdMvDNVcXmSKl8e7dqsmcUgkZpdJK
-         6cEg==
-X-Gm-Message-State: AOAM5333qXRM8xyAikD/XWub9ULAAO96j5jq/Pvxvi4XqOH+hOjEsHK/
-        8l2ggL45R3Hd1d44KhxkbEUblLaelUXRwrFs6Zi6uJqR
-X-Google-Smtp-Source: ABdhPJwlezn9AiB/O1v8UDhhXzRQMkz5dln9N3IrGMzKrrewODpyboX/G/dh+DLDpE/3l/GZpECFr5XsCa8ntr6LuY0=
-X-Received: by 2002:a17:902:da8b:b0:15e:c0e8:d846 with SMTP id
- j11-20020a170902da8b00b0015ec0e8d846mr6445261plx.34.1652991061858; Thu, 19
- May 2022 13:11:01 -0700 (PDT)
+        bh=6NKFVPLlK/wL0rXlq/LRtafC4sP9xV5yvd6JHhV7cOw=;
+        b=iVgojRhLLfA+/Bu1KipCxrokUTRAsybTT+8zpPLflYwIS8D71PPAj0MaXieNNieRzC
+         zUVRLiozcUR1n+aaKrN65UxWBsLDNc1SWIsgdUag6+RWSBKGHW22cUaOQPIahch2SeG+
+         ZJn7z3ohZHhzURrsaJIpPHhFH1V5p9D2HZbU/k1AFNEV47LvIob9FY9VgCG37gQSzYQe
+         Hn3G46/0sqCL1ZyYCuyPo6HKAnvOKms3ms9ZJPwBt5145o+KWIhxF60QVHLQn5nj03+x
+         +Yzey7z+qkB8AQ80f5nsPWU+MvZL1jUEz0PSPEjMnTU3h6Ze93YFMtCWmq3/Qz8mR6oI
+         QA1g==
+X-Gm-Message-State: AOAM533teLDpyQp3CJ5PuDup5CuR4DBgD2RqGWCbZMbx+pmXME5EmeEp
+        s7tQeZELWShvLCUIgCDO8/m3+VZ3gwNkUM7AIYkGLEro
+X-Google-Smtp-Source: ABdhPJx72n46WgRHKXfllxmFdutXKFbLa1Qu7xJUZrTx7DfOFIGEq9Z87ZQQJFXYbLWCAbgBhxpK98OFSEP2Y1xKlfE=
+X-Received: by 2002:a17:90a:4803:b0:1dc:b4c9:1958 with SMTP id
+ a3-20020a17090a480300b001dcb4c91958mr7295969pjh.61.1652991087449; Thu, 19 May
+ 2022 13:11:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220513235125.1364692-1-luiz.dentz@gmail.com>
- <20220513235125.1364692-3-luiz.dentz@gmail.com> <6A7CED55-0DC1-48F1-95FF-A1B2ED3B280C@holtmann.org>
-In-Reply-To: <6A7CED55-0DC1-48F1-95FF-A1B2ED3B280C@holtmann.org>
+References: <20220516203539.1708251-1-luiz.dentz@gmail.com> <4A5486C7-C1E8-41A3-9E7F-E627BBA79503@holtmann.org>
+In-Reply-To: <4A5486C7-C1E8-41A3-9E7F-E627BBA79503@holtmann.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 19 May 2022 13:10:50 -0700
-Message-ID: <CABBYNZKFy3JqXBsvqu7jp+NuZ8riJWtsznNEiqJqGbkyvSOkVw@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] Bluetooth: hci_conn: Fix hci_connect_le_sync
+Date:   Thu, 19 May 2022 13:11:16 -0700
+Message-ID: <CABBYNZKbRhOaUz263-rS9GOUh=rbwNs2NfUWyaZ0Rgrt_Zm0fg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: MGMT: Fix uses of bitmap_from_u64
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -63,65 +62,63 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
-On Thu, May 19, 2022 at 11:08 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+On Thu, May 19, 2022 at 11:09 AM Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Luiz,
 >
-> > The handling of connection failures shall be handled by the request
-> > completion callback as already done by hci_cs_le_create_conn, also make
-> > sure to use hci_conn_failed instead of hci_le_conn_failed as the later
-> > don't actually call hci_conn_del to cleanup.
+> > bitmap_from_u64 expects at least 8 bytes to be declared since it doesn't
+> > take any parameter regarding the number of bits causing the following
+> > warnings:
 > >
-> > Fixes: 8e8b92ee60de5 ("Bluetooth: hci_sync: Add hci_le_create_conn_sync")
+> > In file included from include/linux/cpumask.h:12,
+> >                 from include/linux/mm_types_task.h:14,
+> >                 from include/linux/mm_types.h:5,
+> >                 from include/linux/buildid.h:5,
+> >                 from include/linux/module.h:14,
+> >                 from net/bluetooth/mgmt.c:27:
+> > In function 'bitmap_copy',
+> >    inlined from 'bitmap_copy_clear_tail' at include/linux/bitmap.h:270:2,
+> >    inlined from 'bitmap_from_u64' at include/linux/bitmap.h:622:2,
+> >    inlined from 'set_device_flags' at net/bluetooth/mgmt.c:4534:4:
+> > include/linux/bitmap.h:261:9: warning: 'memcpy' forming offset [4, 7] is
+> > out of the bounds [0, 4] of object 'flags' with type
+> > 'long unsigned int[1]' [-Warray-bounds]
+> >  261 |         memcpy(dst, src, len);
+> >      |         ^~~~~~~~~~~~~~~~~~~~~
+> > In file included from include/linux/kasan-checks.h:5,
+> >                 from include/asm-generic/rwonce.h:26,
+> >                 from ./arch/arm/include/generated/asm/rwonce.h:1,
+> >                 from include/linux/compiler.h:248,
+> >                 from include/linux/build_bug.h:5,
+> >                 from include/linux/container_of.h:5,
+> >                 from include/linux/list.h:5,
+> >                 from include/linux/module.h:12,
+> >                 from net/bluetooth/mgmt.c:27:
+> > net/bluetooth/mgmt.c: In function 'set_device_flags':
+> > net/bluetooth/mgmt.c:4532:40: note: 'flags' declared here
+> > 4532 |                         DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
+> >      |                                        ^~~~~
+> > include/linux/types.h:11:23: note: in definition of macro 'DECLARE_BITMAP'
+> >   11 |         unsigned long name[BITS_TO_LONGS(bits)]
+> >      |                       ^~~~
+> >
+> > In order to fix the above this initializes a variable using
+> > DECLARE_BITMAP with the current_flags and then uses bitmap_subset to
+> > check if the flags being set are a subset of hdev->conn_flags that way
+> > all the checks are performed using bitmap APIs and conversion to u32
+> > only happen when really needed.
+> >
+> > Fixes: a9a347655d22 ("Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP")
+> > Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> > Suggested-by: Yury Norov <yury.norov@gmail.com>
 > > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > > ---
-> > net/bluetooth/hci_conn.c  | 5 +++--
-> > net/bluetooth/hci_event.c | 8 +++++---
-> > 2 files changed, 8 insertions(+), 5 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 4a5193499b77..a36297368c58 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -943,10 +943,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
-> >
-> >       bt_dev_err(hdev, "request failed to create LE connection: err %d", err);
-> >
-> > -     if (!conn)
-> > +     /* Check if connection is still pending */
-> > +     if (conn != hci_lookup_le_connect(hdev))
-> >               goto done;
-> >
-> > -     hci_le_conn_failed(conn, bt_status(err));
-> > +     hci_conn_failed(conn, bt_status(err));
-> >
-> > done:
-> >       hci_dev_unlock(hdev);
-> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > index 0270e597c285..af17dfb20e01 100644
-> > --- a/net/bluetooth/hci_event.c
-> > +++ b/net/bluetooth/hci_event.c
-> > @@ -5632,10 +5632,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
-> >               status = HCI_ERROR_INVALID_PARAMETERS;
-> >       }
-> >
-> > -     if (status) {
-> > -             hci_conn_failed(conn, status);
-> > +     /* All connection failure handling is taken care of by the
-> > +      * hci_conn_failed function which is triggered by the HCI
-> > +      * request completion callbacks used for connecting.
-> > +      */
-> > +     if (status)
-> >               goto unlock;
-> > -     }
-> >
-> >       if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
-> >               addr_type = BDADDR_LE_PUBLIC;
+> > net/bluetooth/mgmt.c | 43 ++++++++++++++++++-------------------------
+> > 1 file changed, 18 insertions(+), 25 deletions(-)
 >
-> can apply this patch alone and push it to -stable?
+> what is up with the kbot issues?
 
-Sure, but note that it is using bt_status so perhaps I can rebase it
-to stop using bt_status first?
+Will fix that.
 
 > Regards
 >
