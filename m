@@ -2,307 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2017C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 17:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F68C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 18:37:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352318AbiETRnk (ORCPT
+        id S1352913AbiETShS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 May 2022 13:43:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
+        Fri, 20 May 2022 14:37:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352316AbiETRnh (ORCPT
+        with ESMTP id S1352929AbiETShQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 May 2022 13:43:37 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2059.outbound.protection.outlook.com [40.107.220.59])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46C05132A29
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 10:43:32 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AeCvh0qxQrzAjVlSzmdjHFKmLAtFKOUGfBti8cJ9lOlqOnBIeA+mA+D4CAbyxbCYNGzW3xowV6OOYV1MQxf9h5rbRAFJS7fBhrum7W5vqWXJzj1UIzE6nEVAja1SoTiBwUInK/AxGzoU7ToKNnwpY13NGdmgpD51wR//tCEW/QmhXngGCVxrodWbGkfeh+4QRKHYGnCBRjFhYQv2ooI7TaDWDRS/03yqu2lghuElMi1VYwYu+usTyvugXMFd+IUvdaOp5zz/uwUqvri+QBbkK3yU/q6QHjlF9Z5w1M7GHF/D12hrlJwl0/t2FeSqfGtFhY3JlR6k2XRdgAUq6uTPuQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nNYPIcmpZbsObrqz/pEaMrBEDrCqyG7wXX+xQ8Rtnjo=;
- b=A6MMgbfSlsH1f1EMRzTNe0D+oRy+n18ktw6zO+4+uFiwGDycjB4dAhzSOFvhOOmJm99FLdtsmtj+610ynuv4+wbRER/1NnZpa6j8D4Jl7Pc5YQH8aCA6KhW/UQiapZUOCAsxBskBrpiFXEyc2aWlHfF5wK/MeHW6y1GypA0hIt6Ev21Jd2ivdrY115pdkRkH2yNpF0jLIRPCy9i6kBwC2nndfZelyvWKGlYD9ShzVAD+ZLVBlWL+HVTaque5mIBlGFVKNA/5nDW9ZsF2+vt6p/a4eAUVvp3gUhw5WxlOmpw7O8rEHFbSp+sklr+nlWuAXHxlDyV2o7KnC7HAYs8iQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=sorenson.com; dmarc=pass action=none header.from=sorenson.com;
- dkim=pass header.d=sorenson.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sorenson.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nNYPIcmpZbsObrqz/pEaMrBEDrCqyG7wXX+xQ8Rtnjo=;
- b=KH/c6GcAFYWca0OKpuMg5wE4f1zbaNlrjui8/6lgfgN9t1kzGpj0ot5087nwd0R8MRHhGt+Y2RPQVt7ACPwqtwgEoUPVf+eYihdszUPFVA58Qy7cjhqtpn9Jod0+4C17Xgy2ggh4Q9DRgLwZUmX73oNqKl7f1P51UT6b5/A9kZcRAVD5YyhD9dbnoKWPw6ijtaHtCGgIO7WQ1ktPQgjRr2gr7OBcka8/hgZwsgX5A6zN+fjxEXlJKd5i+tPEK9rJbAe/Gjrrn/77It/jxWwpgp0RVzT0j/jaDpbU00X6DaBy7V4fpPSPycWnbL72Uk1YvxqvscpYeQsYVpTP3BgLmg==
-From:   Thomas Green <TGreen2@Sorenson.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Strange remove problem
-Thread-Topic: Strange remove problem
-Thread-Index: AdhsbdioXFPwJEWGQoysNz4PF3fIDA==
-Date:   Fri, 20 May 2022 17:43:29 +0000
-Message-ID: <BYAPR04MB527025DD1E821C76A01987999FD39@BYAPR04MB5270.namprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=Sorenson.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 43e27feb-1980-486d-91aa-08da3a884054
-x-ms-traffictypediagnostic: CO6PR04MB7617:EE_
-x-microsoft-antispam-prvs: <CO6PR04MB76179692929EA473CDE2E07B9FD39@CO6PR04MB7617.namprd04.prod.outlook.com>
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR04MB5270.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(122000001)(2906002)(7116003)(71200400001)(6916009)(42186006)(64756008)(30864003)(316002)(86362001)(508600001)(38100700002)(38070700005)(66556008)(66446008)(76116006)(26005)(9686003)(186003)(66946007)(66476007)(5660300002)(52536014)(8936002)(3480700007)(8676002)(33656002);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MLggMsIzhO4FIWd3P475bgRIwB7L0rw9iJy7EeRu30hkfqlHRgQyp52Rs4rNiC0g4ijuVt9Txee+3QD9mws+uQVVkdwF6kmMfax+dkiQsP1SF+Y1szaK5DanKn4U5uhydRe+ZNlWgZjQMAwtFQouSfHdZE8dklaj9hfWxQLSsrhSd1VsX2ZHWeMgHaflvTWWHladQCt/1CmhAEN6NMrmOCDu/G4scCEI97KsyAK0swGSca9PUUVobHdINGmQ1K/zcWhN28sHZenN/4eW/UMQZXTaglGtCBlFJap3KL0bgXPlc6L3RsXYUP3m5+sRh2ZbMpibFmSGWqfNeXgMKg9mCwQXw1wXEtDZgowr8/7DG6KVchy5TqnsOC4fRT6SM4XXwvViqiaSvpNtaL9WWpiP90OkRu+dP98i4FsaCtUIy3XOeZRcveGhV3t+8wPqEcnKVbXz48F0danCHoeqP4wDslF4pxDUdfsMSZ1tnggSTezj0Dc1aiUYaTSnOjk2wukbowwafHgRBaz3aPuv4TzNAWJi8Bna4hE+zkqEVdHtxVjG0UnoFbCxKqGZUhWXOdHhN1pa+a8fVIAVDxsx0yMEf/UU8HjjFVa0PGJH7F4GimIk3BfgMLi+1i/VFlc1ZH/pQdUzXCD/JvgEBTWNThbd5TcOV7ZcfpZL5X/2lzZbYCrygeYb3MkkPNDvBwRlqi+h
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uXTeXNmbrolQfVshA3hIUjC2ez0x+dwvhgdeh5XzSN0dzFVBLiDnJy9cRR4s?=
- =?us-ascii?Q?9r64E0x/qn4Ky0+Uwr3HwxSazcXAIGZedd20qMGMwuMU1INxsvtL8r6XEYuc?=
- =?us-ascii?Q?Fn26g55j+OXBQsvvN35hvFtEn0oqFU0E4L187eKgajBikFpW3reJGt2+i55I?=
- =?us-ascii?Q?k9K++GH1wG2SLr7S3xyZ9GDgs6XNDpffKIEOm1zjN+9sPZPfI5QfehGnop3W?=
- =?us-ascii?Q?vMCNZxWBmSaYChINsawGWzMriF46h9DLvw3n94+vJuT5g5U2iKOW3tj8TPh5?=
- =?us-ascii?Q?GLSj2vwwGbpaSFhwvCuOOt+z3Zew+FFRwmT/bjWRzQJI25Pe45lb4waGQnjD?=
- =?us-ascii?Q?k0erwqFfg3eh8stAVGffIs2VUehxk+RWVmCNwFanZQasuA/+Eokya+ViR/oK?=
- =?us-ascii?Q?0WqUCZsE5OBdMftNDBXUatY7XTaFZ9arf+dMvkSxRa3C5G97L/xKIzX8wgW+?=
- =?us-ascii?Q?RLexV+fkeoKoIhnebRT69/TuISzI5TCqREDdAm/k/KpfPLsxWOLWwCz6v5Rz?=
- =?us-ascii?Q?Xvn0j8s1Dz4hZ58w0ntQ8cIsHdgG4korJCzI6gGvzvWzKgduyhUCnFw3DgxA?=
- =?us-ascii?Q?t9M+WQSIoX4zDTa0B4ZRk/o100ownF+Z0HMKxVcNe+/Q5c/Tlj+LQ1Puw5J/?=
- =?us-ascii?Q?K48CrFcHcGks5oL65o5EOHWFvm4qd4JxYn3F8YMX9KByl2OnrFdSYTHcGOvg?=
- =?us-ascii?Q?DS+4/ayWVW4GBLZIu7sdPvGY3i2MqfiK+Zims+O/6kBHy314RpSdVhVgp0PZ?=
- =?us-ascii?Q?bJ0QciBJU5CdXo56tZYaWjHTFpRd2Oji4K9bqu4YqXK98paaN9FHwlEX45jp?=
- =?us-ascii?Q?7OGCxICbiDS1Y6/j9gRPZ1VNv8NO0wH/6cgpdOwbX4C0Iz96sIHTmU40RQVP?=
- =?us-ascii?Q?WkGftnyszfi8H/m4m1vcMXcpWKepP8Dsl6rQmQfmDKPeDfTwCnBNPuyi1ggd?=
- =?us-ascii?Q?8oJBPF5yhvlZtH1FZ/lh+BaijZLnyCSJ1wKmyKSdqzB8Qs4oU6fjldwDUhbl?=
- =?us-ascii?Q?VCEzrlW3CZVtTrt9yvSzHv39qug/ssPPD9mtYQj++PTQORqvSSrcwLor7LCL?=
- =?us-ascii?Q?0cHZp7GXdTNQWk5ry0WUEz3AU0sN/zv3LVTZuiputzdrSdNC9g3VXlLesOXR?=
- =?us-ascii?Q?04z6nsYl7/dkSZ4osxDeGRv5zRbnv2Rc1owrfnAU9qmjqO8DA4MQvEwRQyx5?=
- =?us-ascii?Q?yLPSFzcuNCAo/sYJe7kivBhLLO+6+STs4PqeO7BdtMZrhwEHFfw8ZuXDaLUK?=
- =?us-ascii?Q?xbmJauZKo73IpN5YbOIe5TpjUIjWgcpx2J67Cwe9ir8hUoGHu3cI/L7gmFL2?=
- =?us-ascii?Q?06wMKzYzAYihkIAALtG6ZN5VPfNToynlhVSZ4PIjd5tPrVDeIgfjJclzJNvG?=
- =?us-ascii?Q?xcQCmzENHvimg5IAzPqUNfZAjSDw/E1pqqxfUb1QQSGP+xikHTbmfaDPWkT5?=
- =?us-ascii?Q?tGDgDlK+veKW+ELp8/ZJjl1YzIQyfrvOctx+Mmwc8F3x+eYEMwB8QYSA/rRN?=
- =?us-ascii?Q?Ka+doVT0ddEYFPEFbyvKO0N9F3RRd1Rkmg+57mfA/aVxZUNle9Z8T3VrqW28?=
- =?us-ascii?Q?bTHr9JRwcwngA2MxwCFmw2095sB9MScsg2qNGOsh8Sg5hxwdnTKjbuOq68zW?=
- =?us-ascii?Q?vGENWBGqYyr5W9yZOSMpjgIcMRGHdatEiaVgGXQpRoXZimB8wvqd2ACWrF0E?=
- =?us-ascii?Q?CeC7hXLPxsTKt7kiiFQseSd6UPqucEiMyqLIgXtL3n42ctWqqICy4sjA6aho?=
- =?us-ascii?Q?E6lkwegf+Q=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 20 May 2022 14:37:16 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3106620E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 11:37:15 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id y199so8423568pfb.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 11:37:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5uFVZfx3Yq4qswI1QmeoBn2aetKWGS/wSaKxIfc98rc=;
+        b=Cmn16T3PSycAByRlAuFO5xbzl3UBFevSHdW4u9vLE1FYtFrf209QBmvbJ4dMWxVysi
+         yo6jIBpvsvOxqyZwGLtz34wbDfwM783lVWe8lTw1fK1kiZ/HDO/JgIFg077m+fFL0dyJ
+         j5+Y5hybOtjlZ0FUNpPzqnE8lTNW600qvXTNMDufkm7n93CZ6I7LzwIrTsce8/iD/SKV
+         7ZehbvN7glcAJmgb3XlL2oaEyawVMHSOKeJjz5ftrT/LKeD0nrIUDD/qfUrZljugyYKG
+         F3LbfTdSOAqu7iDe8vWk9KdDp9X2LZA6IWPprqkmTM6h31+UrX2aZPkQMTa4UrO9YC1s
+         kDOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5uFVZfx3Yq4qswI1QmeoBn2aetKWGS/wSaKxIfc98rc=;
+        b=gvrqvLYAtexbd/Q0tXWd26gFse4i6lTcdROSXaq75CO1QzUBviYa3r4cNxD2owyQrX
+         l8DhAV8e/ezX2xIje4jGZri9O0aOhxQGRkta6YrB+0iwmKhriCrYaMaDC94HlLqqeoZw
+         Om9OhO68wYIOAUAyp6Q9PM3M4ixItMgN6QTwnIgqiklth80Zywgto7R7WsNHr04VeoI0
+         GTpC4GUwFgJPDLdWIMBT7xr6KzqOpJUnb5NmnMrbVwKnLcm8qjkU2xF8WPn77loRaerl
+         7kRBvpjEltRXG2gHrSZFwa+hTszDesjMDjUF4JXUSpxSahmMtw5rcWKHXqzObkz1UkSc
+         SMew==
+X-Gm-Message-State: AOAM531zvO45uey7msoVJRavZoiE19uWDgLlVKCqymV2g+QFxHurRARD
+        dbBAVei0L8Z6XhpV79RBwuBD7z0IaJo=
+X-Google-Smtp-Source: ABdhPJw+Q4gdOSXNnuKZOP60LGJ1sravnw5zZFt4mjiOPXYl1OOiOBwveoGJYy55VV1kOxgg29NWFw==
+X-Received: by 2002:a63:e614:0:b0:3f6:3479:6673 with SMTP id g20-20020a63e614000000b003f634796673mr8775381pgh.528.1653071834543;
+        Fri, 20 May 2022 11:37:14 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id b2-20020aa78702000000b0050dc76281fcsm2097319pfo.214.2022.05.20.11.37.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 11:37:13 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH-stable] Bluetooth: hci_conn: Fix hci_connect_le_sync
+Date:   Fri, 20 May 2022 11:37:13 -0700
+Message-Id: <20220520183713.2641513-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-X-OriginatorOrg: sorenson.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR04MB5270.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43e27feb-1980-486d-91aa-08da3a884054
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 May 2022 17:43:29.5437
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d0f7f33f-8d1f-4ac0-bccd-2ecda8bf422b
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Yd2D2KFNEfpooGYJgc1eb8a+C8gLycb5fCf/vxHbBkNCLeTHhJ1qNdiihAopIRZUMWoKienrB4JjwN/fh/Q1AA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7617
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi.... I have problem when removing a device from use.  I have two identica=
-l devices connected to my host.  For each of them I disconnect the device, =
-then remove it.  Sometimes it works just fine, and sometimes it seems somet=
-hing doesn't finish, and a timeout error is returned.  When it doesn't fini=
-sh, I can't do anything any more.  A scan doesn't do anything, and if I try=
- to turn off the scan I get an InProgress error.  Here is a log produced by=
- running=20
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bluetoothd -experimanal -debug -n
+The handling of connection failures shall be handled by the request
+completion callback as already done by hci_cs_le_create_conn, also make
+sure to use hci_conn_failed instead of hci_le_conn_failed as the later
+don't actually call hci_conn_del to cleanup.
 
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_set_temporary() tem=
-porary 1
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bead0=
-: device C4:33:13:80:17:20 profile gap-profile state changed: connected -> =
-disconnecting (0)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bead0=
-: device C4:33:13:80:17:20 profile gap-profile state changed: disconnecting=
- -> disconnected (0)
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:dev_disconnected() Device C4:=
-33:13:80:17:20 disconnected, reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection()=20
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection() R=
-emoving temporary device /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_remove() Removing devic=
-e /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bead0=
-: device C4:33:13:80:17:20 profile gap-profile state changed: disconnected =
--> unavailable (0)
-bluetoothd[3432]: ../bluez-5.50/profiles/gap/gas.c:gap_remove() GAP profile=
- remove (C4:33:13:80:17:20)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:btd_service_unref() 0x55fffe0=
-bead0: ref=3D0
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b4dc0=
-: device C4:33:13:80:17:20 profile :1.70/ntouch/app/6e400001-b5a3-f393-e0a9=
--e50e24dcca9e state changed: connecting -> disconnected (-103)
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_profile_connected() :1.=
-70/ntouch/app/6e400001-b5a3-f393-e0a9-e50e24dcca9e Software caused connecti=
-on abort (103)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b4dc0=
-: device C4:33:13:80:17:20 profile :1.70/ntouch/app/6e400001-b5a3-f393-e0a9=
--e50e24dcca9e state changed: disconnected -> unavailable (0)
-bluetoothd[3432]: ../bluez-5.50/src/gatt-database.c:profile_device_remove()=
- :1.70/ntouch/app/6e400001-b5a3-f393-e0a9-e50e24dcca9e removed
-bluetoothd[3432]: ../bluez-5.50/src/service.c:btd_service_unref() 0x55fffe0=
-b4dc0: ref=3D0
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_unref() Freeing dev=
-ice /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000a
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000b
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_33_13_80_17_20/serv=
-ice000b/char000c
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000b/=
-char000c/desc000e
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000f
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_33_13_80_17_20/serv=
-ice000f/char0010
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_33_13_80_17_20/serv=
-ice000f/char0012
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_unref() own=
-er :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_free() owne=
-r :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000f/=
-char0012/desc0014
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_33_13_80_17_20/serv=
-ice000f/char0015
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_unref() own=
-er :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_free() owne=
-r :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_33_13_80_17_20/service000f/=
-char0015/desc0017
-bluetoothd[3432]: ../bluez-5.50/attrib/gattrib.c:g_attrib_unref() 0x55fffe0=
-c3bf0: g_attrib_unref=3D0=20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_free() 0x55fffe0b99d0
-bluetoothd[3432]: ../bluez-5.50/plugins/policy.c:disconnect_cb() reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:bonding_attempt_complete() hc=
-i0 bdaddr C4:33:13:80:17:20 type 2 status 0xe
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:resume_discovery()=20
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:connected_callback() hci0 dev=
-ice C4:33:13:80:17:20 connected eir_len 23
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_create() dst C4:33:13:8=
-0:17:20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_new() address C4:33:13:=
-80:17:20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_new() Creating device /=
-org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:dev_disconnected() Device C4:=
-33:13:80:17:20 disconnected, reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection()=20
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection() R=
-emoving temporary device /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_remove() Removing devic=
-e /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_unref() Freeing dev=
-ice /org/bluez/hci0/dev_C4_33_13_80_17_20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_free() 0x55fffe0d5640
-bluetoothd[3432]: ../bluez-5.50/plugins/policy.c:disconnect_cb() reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:bonding_attempt_complete() hc=
-i0 bdaddr C4:33:13:80:17:20 type 2 status 0xe
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:resume_discovery()=20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_set_temporary() tem=
-porary 1
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bcbe0=
-: device C4:53:23:00:38:10 profile gap-profile state changed: connected -> =
-disconnecting (0)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bcbe0=
-: device C4:53:23:00:38:10 profile gap-profile state changed: disconnecting=
- -> disconnected (0)
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:dev_disconnected() Device C4:=
-53:23:00:38:10 disconnected, reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection()=20
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:adapter_remove_connection() R=
-emoving temporary device /org/bluez/hci0/dev_C4_53_23_00_38_10
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_remove() Removing devic=
-e /org/bluez/hci0/dev_C4_53_23_00_38_10
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0bcbe0=
-: device C4:53:23:00:38:10 profile gap-profile state changed: disconnected =
--> unavailable (0)
-bluetoothd[3432]: ../bluez-5.50/profiles/gap/gas.c:gap_remove() GAP profile=
- remove (C4:53:23:00:38:10)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:btd_service_unref() 0x55fffe0=
-bcbe0: ref=3D0
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b3770=
-: device C4:53:23:00:38:10 profile :1.70/ntouch/app/6e400001-b5a3-f393-e0a9=
--e50e24dcca9e state changed: connecting -> disconnected (-103)
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_profile_connected() :1.=
-70/ntouch/app/6e400001-b5a3-f393-e0a9-e50e24dcca9e Software caused connecti=
-on abort (103)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b3770=
-: device C4:53:23:00:38:10 profile :1.70/ntouch/app/6e400001-b5a3-f393-e0a9=
--e50e24dcca9e state changed: disconnected -> unavailable (0)
-bluetoothd[3432]: ../bluez-5.50/src/gatt-database.c:profile_device_remove()=
- :1.70/ntouch/app/6e400001-b5a3-f393-e0a9-e50e24dcca9e removed
-bluetoothd[3432]: ../bluez-5.50/src/service.c:btd_service_unref() 0x55fffe0=
-b3770: ref=3D0
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_unref() Freeing dev=
-ice /org/bluez/hci0/dev_C4_53_23_00_38_10
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000a
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000b
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_53_23_00_38_10/serv=
-ice000b/char000c
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000b/=
-char000c/desc000e
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_service() Remo=
-ving GATT service: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000f
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_53_23_00_38_10/serv=
-ice000f/char0010
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_53_23_00_38_10/serv=
-ice000f/char0012
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_unref() own=
-er :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_free() owne=
-r :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000f/=
-char0012/desc0014
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_characteristic=
-() Removing GATT characteristic: /org/bluez/hci0/dev_C4_53_23_00_38_10/serv=
-ice000f/char0015
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_unref() own=
-er :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:notify_client_free() owne=
-r :1.70
-bluetoothd[3432]: ../bluez-5.50/src/gatt-client.c:unregister_descriptor() R=
-emoving GATT descriptor: /org/bluez/hci0/dev_C4_53_23_00_38_10/service000f/=
-char0015/desc0017
-bluetoothd[3432]: ../bluez-5.50/attrib/gattrib.c:g_attrib_unref() 0x55fffe0=
-ab990: g_attrib_unref=3D0=20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:device_free() 0x55fffe0bc500
-bluetoothd[3432]: ../bluez-5.50/plugins/policy.c:disconnect_cb() reason 2
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:bonding_attempt_complete() hc=
-i0 bdaddr C4:53:23:00:38:10 type 2 status 0xe
-bluetoothd[3432]: ../bluez-5.50/src/adapter.c:resume_discovery()=20
-bluetoothd[3432]: ../bluez-5.50/src/device.c:btd_device_set_temporary() tem=
-porary 1
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b9880=
-: device C4:53:23:00:56:A0 profile gap-profile state changed: connected -> =
-disconnecting (0)
-bluetoothd[3432]: ../bluez-5.50/src/service.c:change_state() 0x55fffe0b9880=
-: device C4:53:23:00:56:A0 profile gap-profile state changed: disconnecting=
- -> disconnected (0)
+Link: https://github.com/bluez/bluez/issues/340
+Fixes: 8e8b92ee60de5 ("Bluetooth: hci_sync: Add hci_le_create_conn_sync")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_conn.c  | 5 +++--
+ net/bluetooth/hci_event.c | 8 +++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 882a7df13005..ac06c9724c7f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -943,10 +943,11 @@ static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ 
+ 	bt_dev_err(hdev, "request failed to create LE connection: err %d", err);
+ 
+-	if (!conn)
++	/* Check if connection is still pending */
++	if (conn != hci_lookup_le_connect(hdev))
+ 		goto done;
+ 
+-	hci_le_conn_failed(conn, err);
++	hci_conn_failed(conn, err);
+ 
+ done:
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 0270e597c285..af17dfb20e01 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5632,10 +5632,12 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		status = HCI_ERROR_INVALID_PARAMETERS;
+ 	}
+ 
+-	if (status) {
+-		hci_conn_failed(conn, status);
++	/* All connection failure handling is taken care of by the
++	 * hci_conn_failed function which is triggered by the HCI
++	 * request completion callbacks used for connecting.
++	 */
++	if (status)
+ 		goto unlock;
+-	}
+ 
+ 	if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
+ 		addr_type = BDADDR_LE_PUBLIC;
+-- 
+2.35.1
 
-If you could help me figure out why it works in once instance and not the s=
-econd, I would very much appreciate it.
-
-Tom Green
