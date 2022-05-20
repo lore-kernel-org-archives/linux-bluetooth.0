@@ -2,193 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88BCEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 21:06:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788CDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 21:20:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353571AbiETVGl (ORCPT
+        id S1346297AbiETVUO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 May 2022 17:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57950 "EHLO
+        Fri, 20 May 2022 17:20:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353567AbiETVGd (ORCPT
+        with ESMTP id S236005AbiETVUN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 May 2022 17:06:33 -0400
-Received: from out-27.smtp.github.com (out-27.smtp.github.com [192.30.252.210])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ACFD7CDEC
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 14:06:31 -0700 (PDT)
-Received: from github.com (hubbernetes-node-9807900.ash1-iad.github.net [10.56.208.81])
-        by smtp.github.com (Postfix) with ESMTPA id 79F19900303
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 14:06:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1653080790;
-        bh=MwPhUZO2Jr6aMm/MKi0nuZCKCbEjtSOR9feAYTbWZwA=;
-        h=Date:From:To:Subject:From;
-        b=DFFCT8y70RxgPdofvyPcfwK/rXbFblBhiPcMS9tf8kDylFf2fvDOocN2MJY9MzJDk
-         mOCiiiNEsWFeNd3Cz6uiXwu1TtG/vYw76cXz5qv9gCjVDVaUsEol0vkGqte7nAK5GN
-         5CBM2d9hw1bp4VzSj/gHH4s3BtaYBgl3moUcd7CI=
-Date:   Fri, 20 May 2022 14:06:30 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/c159d7-bd6b90@github.com>
-Subject: [bluez/bluez] 02017e: settings: Add btd_settings_gatt_db_{store,load}
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Fri, 20 May 2022 17:20:13 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27F4519C752
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 14:20:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B683061D71
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 21:20:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 237A7C34115;
+        Fri, 20 May 2022 21:20:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653081612;
+        bh=nt+vj4pxFn3V+Awukk8qgK5cwC/k2L2Oreo+pabLfZM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=tT0M5N8f0KCuWtXRi02FHjBtFRrRdUPMzVQI9WXuT2G7mCFpLNKq1b/HZ2T/+2ObU
+         HaRX8Uo0ibmBDdKp1ZGJ3TbgeYR/dKWwGQo1M9w2Cd0IwIe0vQSzQCyNDeWuZR8t7Q
+         oKFmdV5hKWY6qCP4Cm5YZyZ55TvUYZNbs9ivf93XkIb94Uao6uZOq09V0giz04f+1a
+         PqkDBVGNJv+iiVLhKhuIIJwsnnRWdWuTE5hY/ULQVAEtM05Rx1PEANsxeNLcfLHIOR
+         D8UOwlssGJLj9yozroEMrRUWEwgeR7z7rFv71N8Vi20deqIjfszRjdZelGeBQeGxPV
+         vjhuf+R1Hfylw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0192FF03937;
+        Fri, 20 May 2022 21:20:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] gatt-server: Fix crash while disconnecting
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165308161200.31176.4427175768508209959.git-patchwork-notify@kernel.org>
+Date:   Fri, 20 May 2022 21:20:12 +0000
+References: <20220519214002.2525857-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220519214002.2525857-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 02017e320b4d503b2686e08188a41644c87faac0
-      https://github.com/bluez/bluez/commit/02017e320b4d503b2686e08188a41644c87faac0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
+Hello:
 
-  Changed paths:
-    M Makefile.am
-    M src/device.c
-    A src/settings.c
-    A src/settings.h
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  settings: Add btd_settings_gatt_db_{store,load}
+On Thu, 19 May 2022 14:40:02 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> If there is a pending notify multiple the code was not removing before
+> freeing the object causing the following crash:
+> 
+> Invalid read of size 8
+>    at 0x4A3D10: notify_multiple (gatt-server.c:1703)
+>    by 0x4D05F0: timeout_callback (timeout-glib.c:25)
+>    by 0x4956900: ??? (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x49560AE: g_main_context_dispatch
+>    (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x49AB307: ??? (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x49557C2: g_main_loop_run
+>    (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x4D0A34: mainloop_run (mainloop-glib.c:66)
+>    by 0x4D0F2B: mainloop_run_with_signal (mainloop-notify.c:188)
+>    by 0x2B0CD1: main (main.c:1276)
+>  Address 0x6ca35c8 is 136 bytes inside a block of size 144 free'd
+>    at 0x48470E4: free (vg_replace_malloc.c:872)
+>    by 0x415E73: gatt_server_cleanup (device.c:698)
+>    by 0x415E73: attio_cleanup (device.c:715)
+>    by 0x47745B: queue_foreach (queue.c:207)
+>    by 0x490C54: disconnect_cb (att.c:701)
+>    by 0x4CF4AF: watch_callback (io-glib.c:157)
+>    by 0x49560AE: g_main_context_dispatch
+>    (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x49AB307: ??? (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x49557C2: g_main_loop_run
+>    (in /usr/lib64/libglib-2.0.so.0.7000.5)
+>    by 0x4D0A34: mainloop_run (mainloop-glib.c:66)
+>    by 0x4D0F2B: mainloop_run_with_signal (mainloop-notify.c:188)
+>    by 0x2B0CD1: main (main.c:1276)
+> 
+> [...]
 
-This adds helper functions to store and load from/to file so they can
-get reused by the likes of gatt-database.c and btmon.
+Here is the summary with links:
+  - [BlueZ] gatt-server: Fix crash while disconnecting
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=f1069c4fe106
 
-
-  Commit: f66673878a9f3745c9cb3cfaa85b5b8f99a929d6
-      https://github.com/bluez/bluez/commit/f66673878a9f3745c9cb3cfaa85b5b8f99a929d6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
-
-  Changed paths:
-    M src/gatt-database.c
-
-  Log Message:
-  -----------
-  gatt: Store local GATT database
-
-This enables storing the local (adapter) GATT database which later will
-be used by btmon to decode GATT handles.
-
-
-  Commit: 0247ed333ea9dc0ac914bae68225d5cb3f288f80
-      https://github.com/bluez/bluez/commit/0247ed333ea9dc0ac914bae68225d5cb3f288f80
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
-
-  Changed paths:
-    M monitor/display.h
-    M monitor/l2cap.c
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: Move print_hex_field to display.h
-
-This moves print_hex_field to display.h and removes the duplicated code
-from packet.c and l2cap.c.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: 5efc737f49d4cb98c9b1658d68b226ed4f4c74cf
-      https://github.com/bluez/bluez/commit/5efc737f49d4cb98c9b1658d68b226ed4f4c74cf
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
-
-  Changed paths:
-    M Makefile.tools
-    A monitor/att.c
-    A monitor/att.h
-    M monitor/l2cap.c
-    M monitor/l2cap.h
-
-  Log Message:
-  -----------
-  monitor: Move ATT decoding function into its own file
-
-This moves ATT decoding function from l2cap.c to att.c.
-
-
-  Commit: 1cf5ceeef363cbbf71b1a6f71ef48e01f171988a
-      https://github.com/bluez/bluez/commit/1cf5ceeef363cbbf71b1a6f71ef48e01f171988a
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
-
-  Changed paths:
-    M monitor/broadcom.c
-    M monitor/intel.c
-    M monitor/msft.c
-    M monitor/packet.c
-    M monitor/packet.h
-    M monitor/vendor.h
-
-  Log Message:
-  -----------
-  monitor: Cache connection information
-
-This caches connection information including the device addres so it can
-be printed alongside the handle:
-
-> HCI Event: Disconnect Complete (0x05) plen 4
-        Status: Success (0x00)
-        Handle: 3585 Address: 68:79:12:XX:XX:XX (OUI 68-79-12)
-        Reason: Connection Terminated By Local Host (0x16)
-
-
-  Commit: 0bd5350459c3207260503a24ec3660f83a548d62
-      https://github.com/bluez/bluez/commit/0bd5350459c3207260503a24ec3660f83a548d62
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-18 (Wed, 18 May 2022)
-
-  Changed paths:
-    M Makefile.tools
-    M monitor/att.c
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor/att: Decode attribute type
-
-This attempt to decode the attribute type if its gatt_db can be loaded:
-
-< ACL Data TX: Handle 3585 flags 0x00 dlen 9
-      ATT: Write Request (0x12) len 4
-        Handle: 0x000b Type: Client Characteristic Configuration (0x2902)
-          Data: 0200
-
-
-  Commit: bd6b90595e14eb7dfef29e5c56ee6f55fa37c0a3
-      https://github.com/bluez/bluez/commit/bd6b90595e14eb7dfef29e5c56ee6f55fa37c0a3
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-05-19 (Thu, 19 May 2022)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Add decoding support for CCC
-
-This adds decoding support for CCC so its value can be decoded:
-
-< ACL Data TX: Handle 3585 flags 0x00 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x002c Type: Client Characteristic Configuration (0x2902)
-> ACL Data RX: Handle 3585 flags 0x02 dlen 6
-      ATT: Read Response (0x0b) len 1
-        Value: 01
-            Notification (0x01)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 9
-      ATT: Write Request (0x12) len 4
-        Handle: 0x002c Type: Client Characteristic Configuration (0x2902)
-          Data: 0100
-            Notification (0x01)
-
-
-Compare: https://github.com/bluez/bluez/compare/c159d790e878...bd6b90595e14
