@@ -2,281 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2976C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 15:07:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7631BC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 16:10:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350638AbiETPHo (ORCPT
+        id S1351418AbiETQKE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 May 2022 11:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55102 "EHLO
+        Fri, 20 May 2022 12:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350529AbiETPHh (ORCPT
+        with ESMTP id S1351395AbiETQKB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 May 2022 11:07:37 -0400
-Received: from smtp2.infineon.com (smtp2.infineon.com [IPv6:2a00:18f0:1e00:4::4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C411666BF;
-        Fri, 20 May 2022 08:07:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1653059255; x=1684595255;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TVGD+RI7ONjcaP+2ro4ykcSv7oyzWhgaxYsaQqzuMlk=;
-  b=FANOTozyfjjfoBG6pXyMaN0imEwc5pmxvJj9qyWhEmSW9FS8ZMKHKhi9
-   OlCsBhBIwo7XXQZPmM9HCfx9gWrY+66+TMEBxzgW3b9iBgLP80Q+d38o4
-   590TmfgBGrJfku/tsvf287ocNwA/37KNduej41BYu4SZNVpCfPWwDYFAa
-   0=;
-X-SBRS: None
-X-IronPort-AV: E=McAfee;i="6400,9594,10353"; a="179026253"
-X-IronPort-AV: E=Sophos;i="5.91,239,1647298800"; 
-   d="scan'208";a="179026253"
-Received: from unknown (HELO mucxv003.muc.infineon.com) ([172.23.11.20])
-  by smtp2.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 17:07:33 +0200
-Received: from MUCSE822.infineon.com (MUCSE822.infineon.com [172.23.29.53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mucxv003.muc.infineon.com (Postfix) with ESMTPS;
-        Fri, 20 May 2022 17:07:33 +0200 (CEST)
-Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE822.infineon.com
- (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Fri, 20 May
- 2022 17:07:33 +0200
-Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
- MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Fri, 20 May 2022 17:07:31 +0200
-From:   Hakan Jansson <hakan.jansson@infineon.com>
-CC:     Hakan Jansson <hakan.jansson@infineon.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH v2 2/2] Bluetooth: hci_bcm: Add support for FW loading in autobaud mode
-Date:   Fri, 20 May 2022 17:07:14 +0200
-Message-ID: <996c7e5f1eaffbb1a1af40c004f897029f586d58.1653057480.git.hakan.jansson@infineon.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1653057480.git.hakan.jansson@infineon.com>
-References: <cover.1653057480.git.hakan.jansson@infineon.com>
+        Fri, 20 May 2022 12:10:01 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C188D17CE78
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 09:10:00 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id e17so6961661qvj.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 09:10:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=92Pw4pNAX95qiS9x7BsjOAYPP0fxa1Y04Mu4i4Oco84=;
+        b=pEs0wfRjPvuSPu32CHLxD5WQihO04AvzFRKJR1lgh/0TbVKB4yDqPDDLMSj+X5W0HF
+         EKFZl17RCdFiL3j13dEcw09NGx+VQLICHdOGdv8+lPqOnWDf42HbMuPDtayJBRUnhv0A
+         pvLtz73LD13VRGi/R1/Tdbs8uXUV+LyCLSbt6vwtmu93aHF92rijSq5+mVqzThxaw+Qh
+         AFL/1s/rhgkb6WV1avQXD5BOKCxG8pgoCs1WECG0p2fAFrFLrB9jAcSAhgVN4+UyJugp
+         cS1cKMv5JqKDrBiFAPdkPcKB9rxPX3b6QXu1FVlKUO2XJSSK2F2cPtbSnYWmvwadLVxt
+         8YEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=92Pw4pNAX95qiS9x7BsjOAYPP0fxa1Y04Mu4i4Oco84=;
+        b=H9rWKAQAUn+mDrrq1Zd3GlL9A4vYjXmyDTYtGgYMKxQGg2FQpo3RGhfMXzKBz0o3EG
+         TvVyf1qjG7sDwyyruG7ac1bqOAVWW1+PguH/mMJLj4FHt2kvwD+xoOiuzB1fssd0wDzR
+         V8wCuDz/6Gn5FFdktbFZmntvvyE78XhxQSrCEXFD29t1unLDVfSw6XcIFF7HdfntTF2F
+         JgOd9XqN6IB0jvg2fEVnRf/eDSEWEsk2C8e2qnyscgb2Yz8B/P7WHK0QioD3Bxdk86Gi
+         Ad+Bp3dcX2xT1BvNGLbjfw7e2ji3JDavBmhoG2PN8l8uNDVMZcPuQ5zIxw/wOQWPsScr
+         APwg==
+X-Gm-Message-State: AOAM530YurzbipfscOoL3M4Qgw4RnMCcznERlSKdpaMuQsSJJX+Osa0j
+        RuNQ/1/F58bT6GN9kfP6tCCkBzuuLOYjJg==
+X-Google-Smtp-Source: ABdhPJzDIuLcWx+sjdILwUisQRj/ulUah/Q3YWV6Jc1IoPanRDF7nYJXQ3FzF1wP6hOKIzFHV02xsQ==
+X-Received: by 2002:a05:6214:1cc4:b0:431:4cbc:1d91 with SMTP id g4-20020a0562141cc400b004314cbc1d91mr8666083qvd.64.1653062999603;
+        Fri, 20 May 2022 09:09:59 -0700 (PDT)
+Received: from [172.17.0.2] ([40.121.86.90])
+        by smtp.gmail.com with ESMTPSA id n22-20020a37a416000000b0069fc13ce1e8sm2871694qke.25.2022.05.20.09.09.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 09:09:59 -0700 (PDT)
+Message-ID: <6287bd57.1c69fb81.a6ee2.0f35@mx.google.com>
+Date:   Fri, 20 May 2022 09:09:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8545357891181623628=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.23.8.247]
-X-ClientProxiedBy: MUCSE815.infineon.com (172.23.29.41) To
- MUCSE807.infineon.com (172.23.29.33)
-To:     unlisted-recipients:; (no To-header on input)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hakan.jansson@infineon.com
+Subject: RE: Bluetooth: hci_bcm: Autobaud mode support
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <cb20a6f49c91521d54c847ee4dc14451b0ee91dd.1653057480.git.hakan.jansson@infineon.com>
+References: <cb20a6f49c91521d54c847ee4dc14451b0ee91dd.1653057480.git.hakan.jansson@infineon.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
-Autobaud mode can also be required on some boards where the controller
-device is using a non-standard baud rate when first powered on.
+--===============8545357891181623628==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Only a limited subset of HCI commands are supported in autobaud mode.
+This is automated email and please do not reply to this email!
 
-This patch looks for a DT property, "brcm,uses-autobaud-mode", to enable
-autobaud mode selection. If the property is present, the device is started
-in autobaud mode by keeping RTS asserted while powering on the device. The
-patch also prevents the use of unsupported commands for devices started in
-autobaud mode.
+Dear submitter,
 
-Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=643647
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.61 seconds
+GitLint                       PASS      1.98 seconds
+SubjectPrefix                 FAIL      0.89 seconds
+BuildKernel                   PASS      35.16 seconds
+BuildKernel32                 PASS      31.24 seconds
+Incremental Build with patchesPASS      51.57 seconds
+TestRunner: Setup             PASS      512.66 seconds
+TestRunner: l2cap-tester      PASS      18.90 seconds
+TestRunner: bnep-tester       PASS      7.01 seconds
+TestRunner: mgmt-tester       PASS      113.17 seconds
+TestRunner: rfcomm-tester     PASS      10.72 seconds
+TestRunner: sco-tester        PASS      10.46 seconds
+TestRunner: smp-tester        PASS      10.39 seconds
+TestRunner: userchan-tester   PASS      7.18 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.89 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
-V1 -> V2: No changes, submitted as part of updated patch series
+Regards,
+Linux Bluetooth
 
- drivers/bluetooth/btbcm.c   | 31 +++++++++++++++++++++++--------
- drivers/bluetooth/btbcm.h   |  8 ++++----
- drivers/bluetooth/hci_bcm.c | 15 ++++++++++++---
- 3 files changed, 39 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index 92a2b7e81757..0c0958030c0a 100644
---- a/drivers/bluetooth/btbcm.c
-+++ b/drivers/bluetooth/btbcm.c
-@@ -403,6 +403,13 @@ static int btbcm_read_info(struct hci_dev *hdev)
- 	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
- 	kfree_skb(skb);
- 
-+	return 0;
-+}
-+
-+static int btbcm_print_controller_features(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+
- 	/* Read Controller Features */
- 	skb = btbcm_read_controller_features(hdev);
- 	if (IS_ERR(skb))
-@@ -513,7 +520,7 @@ static const char *btbcm_get_board_name(struct device *dev)
- #endif
- }
- 
--int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
-+int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode)
- {
- 	u16 subver, rev, pid, vid;
- 	struct sk_buff *skb;
-@@ -550,9 +557,16 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
- 		if (err)
- 			return err;
- 	}
--	err = btbcm_print_local_name(hdev);
--	if (err)
--		return err;
-+
-+	if (!use_autobaud_mode) {
-+		err = btbcm_print_controller_features(hdev);
-+		if (err)
-+			return err;
-+
-+		err = btbcm_print_local_name(hdev);
-+		if (err)
-+			return err;
-+	}
- 
- 	bcm_subver_table = (hdev->bus == HCI_USB) ? bcm_usb_subver_table :
- 						    bcm_uart_subver_table;
-@@ -635,13 +649,13 @@ int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
- }
- EXPORT_SYMBOL_GPL(btbcm_initialize);
- 
--int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done)
-+int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode)
- {
- 	int err;
- 
- 	/* Re-initialize if necessary */
- 	if (*fw_load_done) {
--		err = btbcm_initialize(hdev, fw_load_done);
-+		err = btbcm_initialize(hdev, fw_load_done, use_autobaud_mode);
- 		if (err)
- 			return err;
- 	}
-@@ -657,15 +671,16 @@ EXPORT_SYMBOL_GPL(btbcm_finalize);
- int btbcm_setup_patchram(struct hci_dev *hdev)
- {
- 	bool fw_load_done = false;
-+	bool use_autobaud_mode = false;
- 	int err;
- 
- 	/* Initialize */
--	err = btbcm_initialize(hdev, &fw_load_done);
-+	err = btbcm_initialize(hdev, &fw_load_done, use_autobaud_mode);
- 	if (err)
- 		return err;
- 
- 	/* Re-initialize after loading Patch */
--	return btbcm_finalize(hdev, &fw_load_done);
-+	return btbcm_finalize(hdev, &fw_load_done, use_autobaud_mode);
- }
- EXPORT_SYMBOL_GPL(btbcm_setup_patchram);
- 
-diff --git a/drivers/bluetooth/btbcm.h b/drivers/bluetooth/btbcm.h
-index 8bf01565fdfc..b4cb24231a20 100644
---- a/drivers/bluetooth/btbcm.h
-+++ b/drivers/bluetooth/btbcm.h
-@@ -62,8 +62,8 @@ int btbcm_write_pcm_int_params(struct hci_dev *hdev,
- int btbcm_setup_patchram(struct hci_dev *hdev);
- int btbcm_setup_apple(struct hci_dev *hdev);
- 
--int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done);
--int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done);
-+int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode);
-+int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode);
- 
- #else
- 
-@@ -104,12 +104,12 @@ static inline int btbcm_setup_apple(struct hci_dev *hdev)
- 	return 0;
- }
- 
--static inline int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done)
-+static inline int btbcm_initialize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode)
- {
- 	return 0;
- }
- 
--static inline int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done)
-+static inline int btbcm_finalize(struct hci_dev *hdev, bool *fw_load_done, bool use_autobaud_mode)
- {
- 	return 0;
- }
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 785f445dd60d..0230cfcc8e3e 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -99,6 +99,7 @@ struct bcm_device_data {
-  * @no_early_set_baudrate: don't set_baudrate before setup()
-  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
-  * @pcm_int_params: keep the initial PCM configuration
-+ * @use_autobaud_mode: start Bluetooth device in autobaud mode
-  */
- struct bcm_device {
- 	/* Must be the first member, hci_serdev.c expects this. */
-@@ -136,6 +137,7 @@ struct bcm_device {
- #endif
- 	bool			no_early_set_baudrate;
- 	bool			drive_rts_on_open;
-+	bool			use_autobaud_mode;
- 	u8			pcm_int_params[5];
- };
- 
-@@ -472,7 +474,9 @@ static int bcm_open(struct hci_uart *hu)
- 
- out:
- 	if (bcm->dev) {
--		if (bcm->dev->drive_rts_on_open)
-+		if (bcm->dev->use_autobaud_mode)
-+			hci_uart_set_flow_control(hu, false);	/* Assert BT_UART_CTS_N */
-+		else if (bcm->dev->drive_rts_on_open)
- 			hci_uart_set_flow_control(hu, true);
- 
- 		hu->init_speed = bcm->dev->init_speed;
-@@ -564,6 +568,7 @@ static int bcm_setup(struct hci_uart *hu)
- {
- 	struct bcm_data *bcm = hu->priv;
- 	bool fw_load_done = false;
-+	bool use_autobaud_mode = (bcm->dev ? bcm->dev->use_autobaud_mode : 0);
- 	unsigned int speed;
- 	int err;
- 
-@@ -572,7 +577,7 @@ static int bcm_setup(struct hci_uart *hu)
- 	hu->hdev->set_diag = bcm_set_diag;
- 	hu->hdev->set_bdaddr = btbcm_set_bdaddr;
- 
--	err = btbcm_initialize(hu->hdev, &fw_load_done);
-+	err = btbcm_initialize(hu->hdev, &fw_load_done, use_autobaud_mode);
- 	if (err)
- 		return err;
- 
-@@ -616,7 +621,7 @@ static int bcm_setup(struct hci_uart *hu)
- 		btbcm_write_pcm_int_params(hu->hdev, &params);
- 	}
- 
--	err = btbcm_finalize(hu->hdev, &fw_load_done);
-+	err = btbcm_finalize(hu->hdev, &fw_load_done, use_autobaud_mode);
- 	if (err)
- 		return err;
- 
-@@ -1197,6 +1202,10 @@ static int bcm_acpi_probe(struct bcm_device *dev)
- 
- static int bcm_of_probe(struct bcm_device *bdev)
- {
-+	bdev->use_autobaud_mode = device_property_read_bool(bdev->dev, "brcm,uses-autobaud-mode");
-+	if (bdev->use_autobaud_mode)
-+		bdev->no_early_set_baudrate = true;
-+
- 	device_property_read_u32(bdev->dev, "max-speed", &bdev->oper_speed);
- 	device_property_read_u8_array(bdev->dev, "brcm,bt-pcm-int-params",
- 				      bdev->pcm_int_params, 5);
--- 
-2.25.1
-
+--===============8545357891181623628==--
