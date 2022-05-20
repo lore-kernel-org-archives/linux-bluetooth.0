@@ -2,57 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB7DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 09:18:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F25BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 15:07:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346856AbiETJSb convert rfc822-to-8bit (ORCPT
+        id S1350612AbiETPHi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 May 2022 05:18:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46278 "EHLO
+        Fri, 20 May 2022 11:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239056AbiETJS3 (ORCPT
+        with ESMTP id S242315AbiETPHg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 May 2022 05:18:29 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F39368CCDA
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 May 2022 02:18:05 -0700 (PDT)
-Received: from smtpclient.apple (p4ff9fb9d.dip0.t-ipconnect.de [79.249.251.157])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 131A3CED09;
-        Fri, 20 May 2022 11:18:05 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
-Subject: Re: [PATCH v2 1/3] Bluetooth: hci_conn: Fix hci_connect_le_sync
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220519202258.2459530-1-luiz.dentz@gmail.com>
-Date:   Fri, 20 May 2022 11:18:04 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4A64967D-9487-4E8E-80F1-64B0389B2D95@holtmann.org>
-References: <20220519202258.2459530-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3696.100.31)
+        Fri, 20 May 2022 11:07:36 -0400
+Received: from smtp2.infineon.com (smtp2.infineon.com [IPv6:2a00:18f0:1e00:4::4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB8B16F93A;
+        Fri, 20 May 2022 08:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1653059255; x=1684595255;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3K84TAUIKPuR5hEf0cY3ZPMTrE3YV21Mg2XlWai4oE8=;
+  b=beEwY4PcL7v64qU6w/7pEUsl1a6Ly32+gRYehkwNjGJckyUr8tKexsva
+   AbEljmrwOBfmjdhk32kQI+EIZbwDYIEUEOOu9sgBkcvBk16h6TinYEsLi
+   Mw5he81FeCCsFbLvdrnD6b0Z18Ek1z83OIarjQFsjMbYQ193T/wuUJ8Da
+   U=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10353"; a="179026240"
+X-IronPort-AV: E=Sophos;i="5.91,239,1647298800"; 
+   d="scan'208";a="179026240"
+Received: from unknown (HELO mucxv001.muc.infineon.com) ([172.23.11.16])
+  by smtp2.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 May 2022 17:07:31 +0200
+Received: from MUCSE805.infineon.com (MUCSE805.infineon.com [172.23.29.31])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv001.muc.infineon.com (Postfix) with ESMTPS;
+        Fri, 20 May 2022 17:07:30 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE805.infineon.com
+ (172.23.29.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Fri, 20 May
+ 2022 17:07:30 +0200
+Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
+ MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Fri, 20 May 2022 17:07:29 +0200
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+CC:     Hakan Jansson <hakan.jansson@infineon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v2 0/2] Bluetooth: hci_bcm: Autobaud mode support
+Date:   Fri, 20 May 2022 17:07:12 +0200
+Message-ID: <cover.1653057480.git.hakan.jansson@infineon.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE815.infineon.com (172.23.29.41) To
+ MUCSE807.infineon.com (172.23.29.33)
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
+Autobaud mode can also be required on some boards where the controller
+device is using a non-standard baud rate when first powered on.
 
-> The handling of connection failures shall be handled by the request
-> completion callback as already done by hci_cs_le_create_conn, also make
-> sure to use hci_conn_failed instead of hci_le_conn_failed as the later
-> don't actually call hci_conn_del to cleanup.
-> 
-> Fixes: 8e8b92ee60de5 ("Bluetooth: hci_sync: Add hci_le_create_conn_sync")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/hci_conn.c  | 5 +++--
-> net/bluetooth/hci_event.c | 8 +++++---
-> 2 files changed, 8 insertions(+), 5 deletions(-)
+Only a limited subset of HCI commands are supported in autobaud mode.
 
-you are making a bit mess with yet another v2 of this. I rather have you mark this as [PATCH -stable] or something so that we get this one into that tree and then later the rest into -next.
+These patches add a DT property, "brcm,uses-autobaud-mode", to control
+autobaud mode selection.
 
-Regards
+Changes v1 -> v2:
+- Modify description in binding document
 
-Marcel
+Hakan Jansson (2):
+  dt-bindings: net: broadcom-bluetooth: Add property for autobaud mode
+  Bluetooth: hci_bcm: Add support for FW loading in autobaud mode
+
+ .../bindings/net/broadcom-bluetooth.yaml      |  9 ++++++
+ drivers/bluetooth/btbcm.c                     | 31 ++++++++++++++-----
+ drivers/bluetooth/btbcm.h                     |  8 ++---
+ drivers/bluetooth/hci_bcm.c                   | 15 +++++++--
+ 4 files changed, 48 insertions(+), 15 deletions(-)
+
+
+base-commit: 48b57999e38745b707abe233019786cc097df3c9
+-- 
+2.25.1
 
