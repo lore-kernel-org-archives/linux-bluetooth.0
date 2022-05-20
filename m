@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4399CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 04:17:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1907BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 May 2022 04:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234210AbiETERK (ORCPT
+        id S234517AbiETERL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 May 2022 00:17:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38154 "EHLO
+        Fri, 20 May 2022 00:17:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233029AbiETERG (ORCPT
+        with ESMTP id S234146AbiETERJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 May 2022 00:17:06 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02EFD6B670
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 21:17:04 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id s14so6403292plk.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 21:17:03 -0700 (PDT)
+        Fri, 20 May 2022 00:17:09 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7BA76B7ED
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 21:17:08 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id v5-20020a17090a7c0500b001df84fa82f8so6888008pjf.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 May 2022 21:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=80Rc8wrOrqHpcMINX27MgcDRfkMFIB557PHl9IiT88g=;
-        b=P1tXFUWvMRfR7i/J2LswdvzHlThIOBskbLKdIwQerYugTL4SQuSF0lXmZ2YOT1xMyJ
-         Z6bGOozMvwHyE/EWSt/0ZtOCjxbBcc+C5UE6T6Sk5LJjnDtE/h77Lx9ZaBtI+a2i0B4K
-         e+Qem+4TR77/lC5/e3oGhSvPiyD0LSnwp5b9q/+B4jzEUyEE4v1IsvlV+MB66f/UoCos
-         1kiyLVSmuAk6dbxJGR4CO2bESzBAq+JkADe2Vt5INApIeT7yzvYvUoTyzpxlnHuf9H9m
-         SgpICeH5Xh3tzO3n2FuFYkHM/no2jUto3+dGF/1MBs8bbdFD6EnvkRLOgnMmLXzro054
-         +jlA==
+        bh=ChJFvNq/Wsh2RG3EOPiLBgjC/bQ3ZyP8oD3/t6vqWuA=;
+        b=A6sByZCSfMiODYNxLgBGWdtakZad5HElCVnNy7JaTLSNIC67QDorJzGhDuS9u6/Rao
+         eg2SVmTT75mJ25M7Zm54ud2LvDa0FhKdIG7/a1kQlPytuXlBZFxf3QuKCu+4vnmwDe9+
+         0A9CnvyPbmjjJNvPHg+H9eMJq/QObyfUY5pXeG/v7fngR465zsyKMthaVn3S/rosMUTb
+         xbI+5T8kxTOz8Dlk1XmyjURYqqajJPdXFXpdKuz/nbEt8yyD6CvO38DpFF4VJpPJvBMJ
+         WrbOyhBNuzNHiRwqTQK6I6z7coO4n6mj8Mv7itGuFHh0JFZHZGz06s01cy0CnIIinXLw
+         xQKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=80Rc8wrOrqHpcMINX27MgcDRfkMFIB557PHl9IiT88g=;
-        b=xnANHfZ9UCcJEAqIw59dhu7z+oK0KtWbVZmQ00Xlg35qaUhQCPPoDxBFhGkLXo+1lz
-         I4VOBjNjhiG8ZtG0V+kq23WnTQB57zAxSj290jj7X0NuU4iMLADlZfj0rsInN5cx5dbj
-         nvP5j6CcqxGRxIlOcdCiZuVT24+b2uWQ+caieqg0juXjYXNDKu6xQOt9L0Oz70XSBkeh
-         zZZ63LTRHoMqJ+H9ChvFT/h5ovQlUTp8r4wAGOAPvmAyz98sgQguSpar5WDgQU4mU8QR
-         H/81o+25tzbDKcG9GFcuIsv5409tRu0qP1SKRSE2i5p7CSt6qBExoCJj1I7kIg4HBrU+
-         oSzw==
-X-Gm-Message-State: AOAM533rseKyNT10/SauCGnCVZ3lipH6JRW+hGeJ7lSVXBEzVdyfFrgq
-        ydjMyDyfJuWlzT/LIwDfs5B10b0IcIM=
-X-Google-Smtp-Source: ABdhPJxCdaClm0OhU5EGKbs82dwZ3aRbPnwk/xQqUkBy4lFkZGIcrbuRAbecsUd/6R+dyfHkWwfLLw==
-X-Received: by 2002:a17:90b:314c:b0:1dc:767d:a7d9 with SMTP id ip12-20020a17090b314c00b001dc767da7d9mr8640504pjb.99.1653020222685;
-        Thu, 19 May 2022 21:17:02 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ChJFvNq/Wsh2RG3EOPiLBgjC/bQ3ZyP8oD3/t6vqWuA=;
+        b=7BGAN0fO2Eq6E9bYL2tPRbcIpsI76gyyjuL3JkqduTIMbP04shSBrxw09b5RnK8gGr
+         BQaGTQO3H+OdZ9FmPJGSO9ImgRgBXysuI8HQk/+x7ytkrO0DPllD6rQ1jU8Fs92s/jSN
+         07REWzakFK0elhczXJBEcy8a5fiXliO197qj15yMF1FoTac2lnZZntZta7n/9U+VTVXH
+         e7TODLi8P82WSnyWeSFAYaEmFZ4SHchqwhDWxDP27Fb+Fo9H4o6Tdkx0fN5bWBRj+LxC
+         /AC/TT9b2o2iMJTUTMU5sVt+J2oAjdHQNQaxiryGwFiwN7PRZ38RNX7f8TBx3pSmMud1
+         c9yw==
+X-Gm-Message-State: AOAM532sR8lR/FuAYLTfb8+oLwJ52xMpD9KYuZeLK8IWZ2ZdJpJ25h3M
+        xgqqMReIwTTF0z9vAYJPuZEN+aBI+KM=
+X-Google-Smtp-Source: ABdhPJxDjf25TXP4W8VJVqpCiXoy0TZF4GiBYMmK+CfSNQbozE231vYbn3Oud9HrhEBpZC0u9hLozw==
+X-Received: by 2002:a17:902:f70a:b0:153:88c7:774 with SMTP id h10-20020a170902f70a00b0015388c70774mr7929647plo.166.1653020227786;
+        Thu, 19 May 2022 21:17:07 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id u13-20020a17090a450d00b001df955c28f6sm381405pjg.37.2022.05.19.21.17.01
+        by smtp.gmail.com with ESMTPSA id u13-20020a17090a450d00b001df955c28f6sm381405pjg.37.2022.05.19.21.17.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 May 2022 21:17:01 -0700 (PDT)
+        Thu, 19 May 2022 21:17:07 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/7] settings: Add btd_settings_gatt_db_{store,load}
-Date:   Thu, 19 May 2022 21:16:55 -0700
-Message-Id: <20220520041701.2572197-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 6/7] monitor/att: Decode attribute type
+Date:   Thu, 19 May 2022 21:17:00 -0700
+Message-Id: <20220520041701.2572197-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220520041701.2572197-1-luiz.dentz@gmail.com>
+References: <20220520041701.2572197-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,1119 +66,286 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds helper functions to store and load from/to file so they can
-get reused by the likes of gatt-database.c and btmon.
----
- Makefile.am    |   3 +-
- src/device.c   | 499 ++---------------------------------------------
- src/settings.c | 510 +++++++++++++++++++++++++++++++++++++++++++++++++
- src/settings.h |  11 ++
- 4 files changed, 534 insertions(+), 489 deletions(-)
- create mode 100644 src/settings.c
- create mode 100644 src/settings.h
+This attempt to decode the attribute type if its gatt_db can be loaded:
 
-diff --git a/Makefile.am b/Makefile.am
-index 82125c482..0074ea3ac 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -322,7 +322,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
- 			src/adv_monitor.h src/adv_monitor.c \
--			src/battery.h src/battery.c
-+			src/battery.h src/battery.c \
-+			src/settings.h src/settings.c
- src_bluetoothd_LDADD = lib/libbluetooth-internal.la \
- 			gdbus/libgdbus-internal.la \
- 			src/libshared-glib.la \
-diff --git a/src/device.c b/src/device.c
-index 638bad061..0d7c62c9c 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -63,6 +63,7 @@
- #include "textfile.h"
- #include "storage.h"
- #include "eir.h"
-+#include "settings.h"
- 
- #define DISCONNECT_TIMER	2
- #define DISCOVERY_TIMER		1
-@@ -74,11 +75,6 @@
- 
- #define RSSI_THRESHOLD		8
- 
--#define GATT_PRIM_SVC_UUID_STR "2800"
--#define GATT_SND_SVC_UUID_STR  "2801"
--#define GATT_INCLUDE_UUID_STR "2802"
--#define GATT_CHARAC_UUID_STR "2803"
--
- static DBusConnection *dbus_conn = NULL;
- static unsigned service_state_cb_id;
- 
-@@ -2517,171 +2513,10 @@ static void store_services(struct btd_device *device)
- 	g_key_file_free(key_file);
- }
- 
--struct gatt_saver {
--	struct btd_device *device;
--	uint16_t ext_props;
--	GKeyFile *key_file;
--};
--
--static void db_hash_read_value_cb(struct gatt_db_attribute *attrib,
--						int err, const uint8_t *value,
--						size_t length, void *user_data)
--{
--	const uint8_t **hash = user_data;
--
--	if (err || (length != 16))
--		return;
--
--	*hash = value;
--}
--
--static void store_desc(struct gatt_db_attribute *attr, void *user_data)
--{
--	struct gatt_saver *saver = user_data;
--	GKeyFile *key_file = saver->key_file;
--	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
--	const bt_uuid_t *uuid;
--	bt_uuid_t ext_uuid;
--	uint16_t handle_num;
--
--	handle_num = gatt_db_attribute_get_handle(attr);
--	sprintf(handle, "%04hx", handle_num);
--
--	uuid = gatt_db_attribute_get_type(attr);
--	bt_uuid_to_string(uuid, uuid_str, sizeof(uuid_str));
--
--	bt_uuid16_create(&ext_uuid, GATT_CHARAC_EXT_PROPER_UUID);
--	if (!bt_uuid_cmp(uuid, &ext_uuid) && saver->ext_props)
--		sprintf(value, "%04hx:%s", saver->ext_props, uuid_str);
--	else
--		sprintf(value, "%s", uuid_str);
--
--	g_key_file_set_string(key_file, "Attributes", handle, value);
--}
--
--static void store_chrc(struct gatt_db_attribute *attr, void *user_data)
--{
--	struct gatt_saver *saver = user_data;
--	GKeyFile *key_file = saver->key_file;
--	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
--	uint16_t handle_num, value_handle;
--	uint8_t properties;
--	bt_uuid_t uuid, hash_uuid;
--
--	if (!gatt_db_attribute_get_char_data(attr, &handle_num, &value_handle,
--						&properties, &saver->ext_props,
--						&uuid)) {
--		warn("Error storing characteristic - can't get data");
--		return;
--	}
--
--	sprintf(handle, "%04hx", handle_num);
--	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
--
--	/* Store Database Hash  value if available */
--	bt_uuid16_create(&hash_uuid, GATT_CHARAC_DB_HASH);
--	if (!bt_uuid_cmp(&uuid, &hash_uuid)) {
--		const uint8_t *hash = NULL;
--
--		attr = gatt_db_get_attribute(saver->device->db, value_handle);
--
--		gatt_db_attribute_read(attr, 0, BT_ATT_OP_READ_REQ, NULL,
--					db_hash_read_value_cb, &hash);
--		if (hash)
--			sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:"
--				"%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
--				"%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
--				"%02hhx%02hhx:%s", value_handle, properties,
--				hash[0], hash[1], hash[2], hash[3],
--				hash[4], hash[5], hash[6], hash[7],
--				hash[8], hash[9], hash[10], hash[11],
--				hash[12], hash[13], hash[14], hash[15],
--				uuid_str);
--		else
--			sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:%s",
--				value_handle, properties, uuid_str);
--
--	} else
--		sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:%s",
--				value_handle, properties, uuid_str);
--
--	g_key_file_set_string(key_file, "Attributes", handle, value);
--
--	gatt_db_service_foreach_desc(attr, store_desc, saver);
--}
--
--static void store_incl(struct gatt_db_attribute *attr, void *user_data)
--{
--	struct gatt_saver *saver = user_data;
--	GKeyFile *key_file = saver->key_file;
--	struct gatt_db_attribute *service;
--	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
--	uint16_t handle_num, start, end;
--	bt_uuid_t uuid;
--
--	if (!gatt_db_attribute_get_incl_data(attr, &handle_num, &start, &end)) {
--		warn("Error storing included service - can't get data");
--		return;
--	}
--
--	service = gatt_db_get_attribute(saver->device->db, start);
--	if (!service) {
--		warn("Error storing included service - can't find it");
--		return;
--	}
--
--	sprintf(handle, "%04hx", handle_num);
--
--	gatt_db_attribute_get_service_uuid(service, &uuid);
--	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
--	sprintf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%s", start,
--								end, uuid_str);
--
--	g_key_file_set_string(key_file, "Attributes", handle, value);
--}
--
--static void store_service(struct gatt_db_attribute *attr, void *user_data)
--{
--	struct gatt_saver *saver = user_data;
--	GKeyFile *key_file = saver->key_file;
--	char uuid_str[MAX_LEN_UUID_STR], handle[6], value[256];
--	uint16_t start, end;
--	bt_uuid_t uuid;
--	bool primary;
--	char *type;
--
--	if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
--								&uuid)) {
--		warn("Error storing service - can't get data");
--		return;
--	}
--
--	sprintf(handle, "%04hx", start);
--
--	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
--
--	if (primary)
--		type = GATT_PRIM_SVC_UUID_STR;
--	else
--		type = GATT_SND_SVC_UUID_STR;
--
--	sprintf(value, "%s:%04hx:%s", type, end, uuid_str);
--
--	g_key_file_set_string(key_file, "Attributes", handle, value);
--
--	gatt_db_service_foreach_incl(attr, store_incl, saver);
--	gatt_db_service_foreach_char(attr, store_chrc, saver);
--}
--
- static void store_gatt_db(struct btd_device *device)
- {
- 	char filename[PATH_MAX];
- 	char dst_addr[18];
--	GKeyFile *key_file;
--	GError *gerr = NULL;
--	char *data;
--	gsize length = 0;
--	struct gatt_saver saver;
- 
- 	if (device_address_is_private(device)) {
- 		DBG("Can't store GATT db for private addressed device %s",
-@@ -2699,33 +2534,9 @@ static void store_gatt_db(struct btd_device *device)
- 				dst_addr);
- 	create_file(filename, 0600);
- 
--	key_file = g_key_file_new();
--	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
--		error("Unable to load key file from %s: (%s)", filename,
--								gerr->message);
--		g_clear_error(&gerr);
--	}
--
--	/* Remove current attributes since it might have changed */
--	g_key_file_remove_group(key_file, "Attributes", NULL);
--
--	saver.key_file = key_file;
--	saver.device = device;
--
--	gatt_db_foreach_service(device->db, NULL, store_service, &saver);
--
--	data = g_key_file_to_data(key_file, &length, NULL);
--	if (!g_file_set_contents(filename, data, length, &gerr)) {
--		error("Unable set contents for %s: (%s)", filename,
--								gerr->message);
--		g_error_free(gerr);
--	}
--
--	g_free(data);
--	g_key_file_free(key_file);
-+	btd_settings_gatt_db_store(device->db, filename);
- }
- 
--
- static void browse_request_complete(struct browse_req *req, uint8_t type,
- 						uint8_t bdaddr_type, int err)
- {
-@@ -3797,288 +3608,11 @@ static void add_primary(struct gatt_db_attribute *attr, void *user_data)
- 	*new_services = g_slist_append(*new_services, prim);
- }
- 
--static void load_desc_value(struct gatt_db_attribute *attrib,
--						int err, void *user_data)
--{
--	if (err)
--		warn("loading descriptor value to db failed");
--}
--
--static ssize_t str2val(const char *str, uint8_t *val, size_t len)
--{
--	const char *pos = str;
--	size_t i;
--
--	for (i = 0; i < len; i++) {
--		if (sscanf(pos, "%2hhx", &val[i]) != 1)
--			break;
--		pos += 2;
--	}
--
--	return i;
--}
--
--static int load_desc(char *handle, char *value,
--					struct gatt_db_attribute *service)
--{
--	char uuid_str[MAX_LEN_UUID_STR];
--	struct gatt_db_attribute *att;
--	uint16_t handle_int;
--	uint16_t val;
--	bt_uuid_t uuid, ext_uuid;
--
--	if (sscanf(handle, "%04hx", &handle_int) != 1)
--		return -EIO;
--
--	/* Check if there is any value stored, otherwise it is just the UUID */
--	if (sscanf(value, "%04hx:%36s", &val, uuid_str) != 2) {
--		if (sscanf(value, "%36s", uuid_str) != 1)
--			return -EIO;
--		val = 0;
--	}
--
--	DBG("loading descriptor handle: 0x%04x, value: 0x%04x, value uuid: %s",
--				handle_int, val, uuid_str);
--
--	bt_string_to_uuid(&uuid, uuid_str);
--	bt_uuid16_create(&ext_uuid, GATT_CHARAC_EXT_PROPER_UUID);
--
--	/* If it is CEP then it must contain the value */
--	if (!bt_uuid_cmp(&uuid, &ext_uuid) && !val) {
--		warn("cannot load CEP descriptor without value");
--		return -EIO;
--	}
--
--	att = gatt_db_service_insert_descriptor(service, handle_int, &uuid,
--							0, NULL, NULL, NULL);
--	if (!att || gatt_db_attribute_get_handle(att) != handle_int) {
--		warn("loading descriptor to db failed");
--		return -EIO;
--	}
--
--	if (val) {
--		if (!gatt_db_attribute_write(att, 0, (uint8_t *)&val,
--						sizeof(val), 0, NULL,
--						load_desc_value, NULL))
--			return -EIO;
--	}
--
--	return 0;
--}
--
--static int load_chrc(char *handle, char *value,
--					struct gatt_db_attribute *service)
--{
--	uint16_t properties, value_handle, handle_int;
--	char uuid_str[MAX_LEN_UUID_STR];
--	struct gatt_db_attribute *att;
--	char val_str[33];
--	uint8_t val[16];
--	size_t val_len;
--	bt_uuid_t uuid;
--
--	if (sscanf(handle, "%04hx", &handle_int) != 1)
--		return -EIO;
--
--	/* Check if there is any value stored */
--	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%36s",
--			&value_handle, &properties, val_str, uuid_str) != 4) {
--		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%36s",
--				&value_handle, &properties, uuid_str) != 3)
--			return -EIO;
--		val_len = 0;
--	} else
--		val_len = str2val(val_str, val, sizeof(val));
--
--	bt_string_to_uuid(&uuid, uuid_str);
--
--	/* Log debug message. */
--	DBG("loading characteristic handle: 0x%04x, value handle: 0x%04x,"
--				" properties 0x%04x value: %s uuid: %s",
--				handle_int, value_handle, properties,
--				val_len ? val_str : "", uuid_str);
--
--	att = gatt_db_service_insert_characteristic(service, value_handle,
--							&uuid, 0, properties,
--							NULL, NULL, NULL);
--	if (!att || gatt_db_attribute_get_handle(att) != value_handle) {
--		warn("loading characteristic to db failed");
--		return -EIO;
--	}
--
--	if (val_len) {
--		if (!gatt_db_attribute_write(att, 0, val, val_len, 0, NULL,
--						load_desc_value, NULL))
--			return -EIO;
--	}
--
--	return 0;
--}
--
--static int load_incl(struct gatt_db *db, char *handle, char *value,
--					struct gatt_db_attribute *service)
--{
--	char uuid_str[MAX_LEN_UUID_STR];
--	struct gatt_db_attribute *att;
--	uint16_t start, end;
--
--	if (sscanf(handle, "%04hx", &start) != 1)
--		return -EIO;
--
--	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%36s", &start,
--							&end, uuid_str) != 3)
--		return -EIO;
--
--	/* Log debug message. */
--	DBG("loading included service: 0x%04x, end: 0x%04x, uuid: %s", start,
--								end, uuid_str);
--
--	att = gatt_db_get_attribute(db, start);
--	if (!att) {
--		warn("loading included service to db failed - no such service");
--		return -EIO;
--	}
--
--	att = gatt_db_service_add_included(service, att);
--	if (!att) {
--		warn("loading included service to db failed");
--		return -EIO;
--	}
--
--	return 0;
--}
--
--static int load_service(struct gatt_db *db, char *handle, char *value)
--{
--	struct gatt_db_attribute *att;
--	uint16_t start, end;
--	char type[MAX_LEN_UUID_STR], uuid_str[MAX_LEN_UUID_STR];
--	bt_uuid_t uuid;
--	bool primary;
--
--	if (sscanf(handle, "%04hx", &start) != 1)
--		return -EIO;
--
--	if (sscanf(value, "%[^:]:%04hx:%36s", type, &end, uuid_str) != 3)
--		return -EIO;
--
--	if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR))
--		primary = true;
--	else if (g_str_equal(type, GATT_SND_SVC_UUID_STR))
--		primary = false;
--	else
--		return -EIO;
--
--	bt_string_to_uuid(&uuid, uuid_str);
--
--	/* Log debug message. */
--	DBG("loading service: 0x%04x, end: 0x%04x, uuid: %s",
--							start, end, uuid_str);
--
--	att = gatt_db_insert_service(db, start, &uuid, primary,
--							end - start + 1);
--	if (!att) {
--		error("Unable load service into db!");
--		return -EIO;
--	}
--
--	return 0;
--}
--
--static int load_gatt_db_impl(GKeyFile *key_file, char **keys,
--							struct gatt_db *db)
--{
--	struct gatt_db_attribute *current_service;
--	char **handle, *value, type[MAX_LEN_UUID_STR];
--	int ret;
--
--	/* first load service definitions */
--	for (handle = keys; *handle; handle++) {
--		value = g_key_file_get_string(key_file, "Attributes", *handle,
--									NULL);
--
--		if (sscanf(value, "%[^:]:", type) != 1) {
--			warn("Missing Type in attribute definition");
--			g_free(value);
--			return -EIO;
--		}
--
--		if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR) ||
--				g_str_equal(type, GATT_SND_SVC_UUID_STR)) {
--			ret = load_service(db, *handle, value);
--			if (ret) {
--				g_free(value);
--				return ret;
--			}
--		}
--
--		g_free(value);
--	}
--
--	current_service = NULL;
--	/* then fill them with data*/
--	for (handle = keys; *handle; handle++) {
--		value = g_key_file_get_string(key_file, "Attributes", *handle,
--									NULL);
--
--		if (sscanf(value, "%[^:]:", type) != 1) {
--			warn("Missing Type in attribute definition");
--			g_free(value);
--			return -EIO;
--		}
--
--		if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR) ||
--				g_str_equal(type, GATT_SND_SVC_UUID_STR)) {
--			uint16_t tmp;
--			uint16_t start, end;
--			bool primary;
--			bt_uuid_t uuid;
--			char uuid_str[MAX_LEN_UUID_STR];
--
--			if (sscanf(*handle, "%04hx", &tmp) != 1) {
--				warn("Unable to parse attribute handle");
--				g_free(value);
--				return -EIO;
--			}
--
--			if (current_service)
--				gatt_db_service_set_active(current_service,
--									true);
--
--			current_service = gatt_db_get_attribute(db, tmp);
--
--			gatt_db_attribute_get_service_data(current_service,
--							&start, &end,
--							&primary, &uuid);
--
--			bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
--		} else if (g_str_equal(type, GATT_INCLUDE_UUID_STR)) {
--			ret = load_incl(db, *handle, value, current_service);
--		} else if (g_str_equal(type, GATT_CHARAC_UUID_STR)) {
--			ret = load_chrc(*handle, value, current_service);
--		} else {
--			ret = load_desc(*handle, value, current_service);
--		}
--
--		g_free(value);
--		if (ret) {
--			gatt_db_clear(db);
--			return ret;
--		}
--	}
--
--	if (current_service)
--		gatt_db_service_set_active(current_service, true);
--
--	return 0;
--}
--
- static void load_gatt_db(struct btd_device *device, const char *local,
- 							const char *peer)
- {
--	char **keys, filename[PATH_MAX];
--	GKeyFile *key_file;
--	GError *gerr = NULL;
-+	char filename[PATH_MAX];
-+	int err;
- 
- 	if (!gatt_cache_is_enabled(device))
- 		return;
-@@ -4087,25 +3621,14 @@ static void load_gatt_db(struct btd_device *device, const char *local,
- 
- 	create_filename(filename, PATH_MAX, "/%s/cache/%s", local, peer);
- 
--	key_file = g_key_file_new();
--	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
--		error("Unable to load key file from %s: (%s)", filename,
--								gerr->message);
--		g_error_free(gerr);
-+	err = btd_settings_gatt_db_load(device->db, filename);
-+	if (err < 0) {
-+		if (err == -ENOENT)
-+			return;
-+
-+		warn("Error loading db from cache for %s: %s (%d)", peer,
-+						strerror(-err), err);
- 	}
--	keys = g_key_file_get_keys(key_file, "Attributes", NULL, NULL);
--
--	if (!keys) {
--		warn("No cache for %s", peer);
--		g_key_file_free(key_file);
--		return;
--	}
--
--	if (load_gatt_db_impl(key_file, keys, device->db))
--		warn("Unable to load gatt db from file for %s", peer);
--
--	g_strfreev(keys);
--	g_key_file_free(key_file);
- 
- 	g_slist_free_full(device->primaries, g_free);
- 	device->primaries = NULL;
-diff --git a/src/settings.c b/src/settings.c
-new file mode 100644
-index 000000000..0f0530006
---- /dev/null
-+++ b/src/settings.c
-@@ -0,0 +1,510 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
+< ACL Data TX: Handle 3585 flags 0x00 dlen 9
+      ATT: Write Request (0x12) len 4
+        Handle: 0x000b Type: Client Characteristic Configuration (0x2902)
+          Data: 0200
+---
+ Makefile.tools   |   5 +-
+ monitor/att.c    | 145 +++++++++++++++++++++++++++++++++++++++++++----
+ monitor/packet.c |   2 +-
+ 3 files changed, 138 insertions(+), 14 deletions(-)
+
+diff --git a/Makefile.tools b/Makefile.tools
+index a152dad6f..4b513366f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -49,7 +49,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/msft.h monitor/msft.c \
+ 				monitor/jlink.h monitor/jlink.c \
+ 				monitor/tty.h monitor/emulator.h \
+-				monitor/att.h monitor/att.c
++				monitor/att.h monitor/att.c \
++				src/log.h src/log.c \
++				src/textfile.h src/textfile.c \
++				src/settings.h src/settings.c
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-mainloop.la \
+ 				$(GLIB_LIBS) $(UDEV_LIBS) -ldl
+diff --git a/monitor/att.c b/monitor/att.c
+index 5ad8244db..304c37319 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -18,11 +18,21 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <inttypes.h>
 +#include <stdbool.h>
 +#include <errno.h>
-+
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
-+
-+#include "log.h"
++#include <linux/limits.h>
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
++#include "lib/hci.h"
++#include "lib/hci_lib.h"
+ 
+ #include "src/shared/util.h"
 +#include "src/shared/queue.h"
 +#include "src/shared/att.h"
 +#include "src/shared/gatt-db.h"
-+#include "settings.h"
-+
-+#define GATT_PRIM_SVC_UUID_STR "2800"
-+#define GATT_SND_SVC_UUID_STR  "2801"
-+#define GATT_INCLUDE_UUID_STR "2802"
-+#define GATT_CHARAC_UUID_STR "2803"
-+
-+static ssize_t str2val(const char *str, uint8_t *val, size_t len)
-+{
-+	const char *pos = str;
-+	size_t i;
-+
-+	for (i = 0; i < len; i++) {
-+		if (sscanf(pos, "%2hhx", &val[i]) != 1)
-+			break;
-+		pos += 2;
-+	}
-+
-+	return i;
-+}
-+
-+static void load_desc_value(struct gatt_db_attribute *attrib, int err,
-+							void *user_data)
-+{
-+}
-+
-+static int load_desc(struct gatt_db *db, char *handle, char *value,
-+					struct gatt_db_attribute *service)
-+{
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	struct gatt_db_attribute *att;
-+	uint16_t handle_int;
-+	uint16_t val;
-+	bt_uuid_t uuid, ext_uuid;
-+
-+	if (sscanf(handle, "%04hx", &handle_int) != 1)
-+		return -EIO;
-+
-+	/* Check if there is any value stored, otherwise it is just the UUID */
-+	if (sscanf(value, "%04hx:%36s", &val, uuid_str) != 2) {
-+		if (sscanf(value, "%36s", uuid_str) != 1)
-+			return -EIO;
-+		val = 0;
-+	}
-+
-+	DBG("loading descriptor handle: 0x%04x, value: 0x%04x, value uuid: %s",
-+						handle_int, val, uuid_str);
-+
-+	bt_string_to_uuid(&uuid, uuid_str);
-+	bt_uuid16_create(&ext_uuid, GATT_CHARAC_EXT_PROPER_UUID);
-+
-+	/* If it is CEP then it must contain the value */
-+	if (!bt_uuid_cmp(&uuid, &ext_uuid) && !val)
-+		return -EIO;
-+
-+	att = gatt_db_service_insert_descriptor(service, handle_int, &uuid,
-+							0, NULL, NULL, NULL);
-+	if (!att || gatt_db_attribute_get_handle(att) != handle_int)
-+		return -EIO;
-+
-+	if (val) {
-+		if (!gatt_db_attribute_write(att, 0, (uint8_t *)&val,
-+						sizeof(val), 0, NULL,
-+						load_desc_value, NULL))
-+			return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int load_chrc(struct gatt_db *db, char *handle, char *value,
-+					struct gatt_db_attribute *service)
-+{
-+	uint16_t properties, value_handle, handle_int;
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	struct gatt_db_attribute *att;
-+	char val_str[33];
-+	uint8_t val[16];
-+	size_t val_len;
-+	bt_uuid_t uuid;
-+
-+	if (sscanf(handle, "%04hx", &handle_int) != 1)
-+		return -EIO;
-+
-+	/* Check if there is any value stored */
-+	if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%32s:%36s",
-+			&value_handle, &properties, val_str, uuid_str) != 4) {
-+		if (sscanf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hx:%36s",
-+				&value_handle, &properties, uuid_str) != 3)
-+			return -EIO;
-+		val_len = 0;
-+	} else
-+		val_len = str2val(val_str, val, sizeof(val));
-+
-+	bt_string_to_uuid(&uuid, uuid_str);
-+
-+	/* Log debug message. */
-+	DBG("loading characteristic handle: 0x%04x, value handle: 0x%04x, "
-+				"properties 0x%04x value: %s uuid: %s",
-+				handle_int, value_handle,
-+				properties, val_len ? val_str : "", uuid_str);
-+
-+	att = gatt_db_service_insert_characteristic(service, value_handle,
-+							&uuid, 0, properties,
-+							NULL, NULL, NULL);
-+	if (!att || gatt_db_attribute_get_handle(att) != value_handle)
-+		return -EIO;
-+
-+	if (val_len) {
-+		if (!gatt_db_attribute_write(att, 0, val, val_len, 0, NULL,
-+						load_desc_value, NULL))
-+			return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int load_incl(struct gatt_db *db, char *handle, char *value,
-+					struct gatt_db_attribute *service)
-+{
-+	char uuid_str[MAX_LEN_UUID_STR];
-+	struct gatt_db_attribute *att;
-+	uint16_t start, end;
-+
-+	if (sscanf(handle, "%04hx", &start) != 1)
-+		return -EIO;
-+
-+	if (sscanf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%36s", &start,
-+							&end, uuid_str) != 3)
-+		return -EIO;
-+
-+	/* Log debug message. */
-+	DBG("loading included service: 0x%04x, end: 0x%04x, uuid: %s",
-+						start, end, uuid_str);
-+
-+	att = gatt_db_get_attribute(db, start);
-+	if (!att)
-+		return -EIO;
-+
-+	att = gatt_db_service_add_included(service, att);
-+	if (!att)
-+		return -EIO;
-+
-+	return 0;
-+}
-+
-+static int load_service(struct gatt_db *db, char *handle, char *value)
-+{
-+	struct gatt_db_attribute *att;
-+	uint16_t start, end;
-+	char type[MAX_LEN_UUID_STR], uuid_str[MAX_LEN_UUID_STR];
-+	bt_uuid_t uuid;
-+	bool primary;
-+
-+	if (sscanf(handle, "%04hx", &start) != 1)
-+		return -EIO;
-+
-+	if (sscanf(value, "%[^:]:%04hx:%36s", type, &end, uuid_str) != 3)
-+		return -EIO;
-+
-+	if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR))
-+		primary = true;
-+	else if (g_str_equal(type, GATT_SND_SVC_UUID_STR))
-+		primary = false;
-+	else
-+		return -EIO;
-+
-+	bt_string_to_uuid(&uuid, uuid_str);
-+
-+	/* Log debug message. */
-+	DBG("loading service: 0x%04x, end: 0x%04x, uuid: %s", start, end,
-+								uuid_str);
-+
-+	att = gatt_db_insert_service(db, start, &uuid, primary,
-+							end - start + 1);
-+	if (!att) {
-+		DBG("Unable load service into db!");
-+		return -EIO;
-+	}
-+
-+	return 0;
-+}
-+
-+static int gatt_db_load(struct gatt_db *db, GKeyFile *key_file, char **keys)
-+{
-+	struct gatt_db_attribute *current_service;
-+	char **handle, *value, type[MAX_LEN_UUID_STR];
-+	int ret;
-+
-+	/* first load service definitions */
-+	for (handle = keys; *handle; handle++) {
-+		value = g_key_file_get_string(key_file, "Attributes", *handle,
-+									NULL);
-+
-+		if (sscanf(value, "%[^:]:", type) != 1) {
-+			g_free(value);
-+			return -EIO;
-+		}
-+
-+		if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR) ||
-+				g_str_equal(type, GATT_SND_SVC_UUID_STR)) {
-+			ret = load_service(db, *handle, value);
-+			if (ret) {
-+				g_free(value);
-+				return ret;
-+			}
-+		}
-+
-+		g_free(value);
-+	}
-+
-+	current_service = NULL;
-+	/* then fill them with data*/
-+	for (handle = keys; *handle; handle++) {
-+		value = g_key_file_get_string(key_file, "Attributes", *handle,
-+									NULL);
-+
-+		if (sscanf(value, "%[^:]:", type) != 1) {
-+			g_free(value);
-+			return -EIO;
-+		}
-+
-+		if (g_str_equal(type, GATT_PRIM_SVC_UUID_STR) ||
-+				g_str_equal(type, GATT_SND_SVC_UUID_STR)) {
-+			uint16_t tmp;
-+			uint16_t start, end;
-+			bool primary;
-+			bt_uuid_t uuid;
-+			char uuid_str[MAX_LEN_UUID_STR];
-+
-+			if (sscanf(*handle, "%04hx", &tmp) != 1) {
-+				g_free(value);
-+				return -EIO;
-+			}
-+
-+			if (current_service)
-+				gatt_db_service_set_active(current_service,
-+									true);
-+
-+			current_service = gatt_db_get_attribute(db, tmp);
-+
-+			gatt_db_attribute_get_service_data(current_service,
-+							&start, &end,
-+							&primary, &uuid);
-+
-+			bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+		} else if (g_str_equal(type, GATT_INCLUDE_UUID_STR)) {
-+			ret = load_incl(db, *handle, value, current_service);
-+		} else if (g_str_equal(type, GATT_CHARAC_UUID_STR)) {
-+			ret = load_chrc(db, *handle, value, current_service);
-+		} else {
-+			ret = load_desc(db, *handle, value, current_service);
-+		}
-+
-+		g_free(value);
-+		if (ret) {
-+			gatt_db_clear(db);
-+			return ret;
-+		}
-+	}
-+
-+	if (current_service)
-+		gatt_db_service_set_active(current_service, true);
-+
-+	return 0;
-+}
-+
-+int btd_settings_gatt_db_load(struct gatt_db *db, const char *filename)
-+{
-+	char **keys;
-+	GKeyFile *key_file;
-+	GError *gerr = NULL;
-+	int err;
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
-+		DBG("Unable to load key file from %s: (%s)", filename,
-+								gerr->message);
-+		g_clear_error(&gerr);
-+	}
-+
-+	keys = g_key_file_get_keys(key_file, "Attributes", NULL, NULL);
-+
-+	if (!keys) {
-+		g_key_file_free(key_file);
-+		return -ENOENT;
-+	}
-+
-+	err = gatt_db_load(db, key_file, keys);
-+
-+	g_strfreev(keys);
-+	g_key_file_free(key_file);
-+
-+	return err;
-+}
-+
-+struct gatt_saver {
-+	struct gatt_db *db;
-+	uint16_t ext_props;
-+	GKeyFile *key_file;
++#include "src/textfile.h"
++#include "src/settings.h"
+ #include "bt.h"
+ #include "packet.h"
+ #include "display.h"
+@@ -316,11 +326,123 @@ static void att_read_type_rsp(const struct l2cap_frame *frame)
+ 					frame->data + 1, frame->size - 1);
+ }
+ 
++struct att_conn_data {
++	struct gatt_db *ldb;
++	struct gatt_db *rdb;
 +};
 +
-+static void db_hash_read_value_cb(struct gatt_db_attribute *attrib,
-+						int err, const uint8_t *value,
-+						size_t length, void *user_data)
++static void att_conn_data_free(void *data)
 +{
-+	const uint8_t **hash = user_data;
++	struct att_conn_data *att_data = data;
 +
-+	if (err || (length != 16))
-+		return;
-+
-+	*hash = value;
++	gatt_db_unref(att_data->rdb);
++	gatt_db_unref(att_data->ldb);
++	free(att_data);
 +}
 +
-+static void store_desc(struct gatt_db_attribute *attr, void *user_data)
++static void load_gatt_db(struct packet_conn_data *conn)
 +{
-+	struct gatt_saver *saver = user_data;
-+	GKeyFile *key_file = saver->key_file;
-+	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
-+	const bt_uuid_t *uuid;
-+	bt_uuid_t ext_uuid;
-+	uint16_t handle_num;
++	struct att_conn_data *data;
++	char filename[PATH_MAX];
++	bdaddr_t src;
++	char local[18];
++	char peer[18];
 +
-+	handle_num = gatt_db_attribute_get_handle(attr);
-+	sprintf(handle, "%04hx", handle_num);
++	if (hci_devba(conn->index, &src) < 0)
++		return;
++
++	data = new0(struct att_conn_data, 1);
++	data->rdb = gatt_db_new();
++	data->ldb = gatt_db_new();
++	conn->data = data;
++	conn->destroy = att_conn_data_free;
++
++	ba2str(&src, local);
++
++	create_filename(filename, PATH_MAX, "/%s/attributes", local);
++
++	btd_settings_gatt_db_load(data->ldb, filename);
++
++	ba2str((bdaddr_t *)conn->dst, peer);
++
++	create_filename(filename, PATH_MAX, "/%s/cache/%s", local, peer);
++
++	btd_settings_gatt_db_load(data->rdb, filename);
++}
++
++static struct gatt_db_attribute *get_attribute(const struct l2cap_frame *frame,
++						uint16_t handle, bool rsp)
++{
++	struct packet_conn_data *conn;
++	struct att_conn_data *data;
++	struct gatt_db *db;
++
++	conn = packet_get_conn_data(frame->handle);
++	if (!conn)
++		return NULL;
++
++	data = conn->data;
++	/* Try loading local and remote gatt_db if not loaded yet */
++	if (!data) {
++		load_gatt_db(conn);
++		data = conn->data;
++		if (!data)
++			return NULL;
++	}
++
++	if (frame->in) {
++		if (rsp)
++			db = data->rdb;
++		else
++			db = data->ldb;
++	} else {
++		if (rsp)
++			db = data->ldb;
++		else
++			db = data->rdb;
++	}
++
++	return gatt_db_get_attribute(db, handle);
++}
++
++static void print_handle(const struct l2cap_frame *frame, uint16_t handle,
++								bool rsp)
++{
++	struct gatt_db_attribute *attr;
++	const bt_uuid_t *uuid;
++	char label[21];
++
++	attr = get_attribute(frame, handle, rsp);
++	if (!attr)
++		goto done;
 +
 +	uuid = gatt_db_attribute_get_type(attr);
-+	bt_uuid_to_string(uuid, uuid_str, sizeof(uuid_str));
++	if (!uuid)
++		goto done;
 +
-+	bt_uuid16_create(&ext_uuid, GATT_CHARAC_EXT_PROPER_UUID);
-+	if (!bt_uuid_cmp(uuid, &ext_uuid) && saver->ext_props)
-+		sprintf(value, "%04hx:%s", saver->ext_props, uuid_str);
-+	else
-+		sprintf(value, "%s", uuid_str);
-+
-+	g_key_file_set_string(key_file, "Attributes", handle, value);
-+}
-+
-+static void store_chrc(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct gatt_saver *saver = user_data;
-+	GKeyFile *key_file = saver->key_file;
-+	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
-+	uint16_t handle_num, value_handle;
-+	uint8_t properties;
-+	bt_uuid_t uuid, hash_uuid;
-+
-+	if (!gatt_db_attribute_get_char_data(attr, &handle_num, &value_handle,
-+						&properties, &saver->ext_props,
-+						&uuid)) {
-+		DBG("Unable to locate Characteristic data");
++	switch (uuid->type) {
++	case BT_UUID16:
++		sprintf(label, "Handle: 0x%4.4x Type", handle);
++		print_uuid(label, &cpu_to_le16(uuid->value.u16), 2);
 +		return;
-+	}
-+
-+	sprintf(handle, "%04hx", handle_num);
-+	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+
-+	/* Store Database Hash  value if available */
-+	bt_uuid16_create(&hash_uuid, GATT_CHARAC_DB_HASH);
-+	if (!bt_uuid_cmp(&uuid, &hash_uuid)) {
-+		const uint8_t *hash = NULL;
-+
-+		attr = gatt_db_get_attribute(saver->db, value_handle);
-+
-+		gatt_db_attribute_read(attr, 0, BT_ATT_OP_READ_REQ, NULL,
-+					db_hash_read_value_cb, &hash);
-+		if (hash)
-+			sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:"
-+				"%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
-+				"%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"
-+				"%02hhx%02hhx:%s", value_handle, properties,
-+				hash[0], hash[1], hash[2], hash[3],
-+				hash[4], hash[5], hash[6], hash[7],
-+				hash[8], hash[9], hash[10], hash[11],
-+				hash[12], hash[13], hash[14], hash[15],
-+				uuid_str);
-+		else
-+			sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:%s",
-+				value_handle, properties, uuid_str);
-+
-+	} else
-+		sprintf(value, GATT_CHARAC_UUID_STR ":%04hx:%02hhx:%s",
-+				value_handle, properties, uuid_str);
-+
-+	g_key_file_set_string(key_file, "Attributes", handle, value);
-+
-+	gatt_db_service_foreach_desc(attr, store_desc, saver);
-+}
-+
-+static void store_incl(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct gatt_saver *saver = user_data;
-+	GKeyFile *key_file = saver->key_file;
-+	struct gatt_db_attribute *service;
-+	char handle[6], value[100], uuid_str[MAX_LEN_UUID_STR];
-+	uint16_t handle_num, start, end;
-+	bt_uuid_t uuid;
-+
-+	if (!gatt_db_attribute_get_incl_data(attr, &handle_num, &start, &end)) {
-+		DBG("Unable to locate Included data");
++	case BT_UUID128:
++		sprintf(label, "Handle: 0x%4.4x Type", handle);
++		print_uuid(label, &uuid->value.u128, 16);
 +		return;
++	case BT_UUID_UNSPEC:
++	case BT_UUID32:
++		break;
 +	}
 +
-+	service = gatt_db_get_attribute(saver->db, start);
-+	if (!service) {
-+		DBG("Unable to locate Included Service");
-+		return;
-+	}
-+
-+	sprintf(handle, "%04hx", handle_num);
-+
-+	gatt_db_attribute_get_service_uuid(service, &uuid);
-+	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+	sprintf(value, GATT_INCLUDE_UUID_STR ":%04hx:%04hx:%s", start,
-+								end, uuid_str);
-+
-+	g_key_file_set_string(key_file, "Attributes", handle, value);
++done:
++	print_field("Handle: 0x%4.4x", handle);
 +}
 +
-+static void store_service(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct gatt_saver *saver = user_data;
-+	GKeyFile *key_file = saver->key_file;
-+	char uuid_str[MAX_LEN_UUID_STR], handle[6], value[256];
-+	uint16_t start, end;
-+	bt_uuid_t uuid;
-+	bool primary;
-+	char *type;
-+
-+	if (!gatt_db_attribute_get_service_data(attr, &start, &end, &primary,
-+								&uuid)) {
-+		DBG("Unable to locate Service data");
-+		return;
-+	}
-+
-+	sprintf(handle, "%04hx", start);
-+
-+	bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
-+
-+	if (primary)
-+		type = GATT_PRIM_SVC_UUID_STR;
-+	else
-+		type = GATT_SND_SVC_UUID_STR;
-+
-+	sprintf(value, "%s:%04hx:%s", type, end, uuid_str);
-+
-+	g_key_file_set_string(key_file, "Attributes", handle, value);
-+
-+	gatt_db_service_foreach_incl(attr, store_incl, saver);
-+	gatt_db_service_foreach_char(attr, store_chrc, saver);
-+}
-+
-+void btd_settings_gatt_db_store(struct gatt_db *db, const char *filename)
-+{
-+	GKeyFile *key_file;
-+	GError *gerr = NULL;
-+	char *data;
-+	gsize length = 0;
-+	struct gatt_saver saver;
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
-+		DBG("Unable to load key file from %s: (%s)", filename,
-+								gerr->message);
-+		g_clear_error(&gerr);
-+	}
-+
-+	/* Remove current attributes since it might have changed */
-+	g_key_file_remove_group(key_file, "Attributes", NULL);
-+
-+	saver.key_file = key_file;
-+	saver.db = db;
-+
-+	gatt_db_foreach_service(db, NULL, store_service, &saver);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	if (!g_file_set_contents(filename, data, length, &gerr)) {
-+		DBG("Unable set contents for %s: (%s)", filename,
-+								gerr->message);
-+		g_error_free(gerr);
-+	}
-+
-+	g_free(data);
-+	g_key_file_free(key_file);
-+}
-diff --git a/src/settings.h b/src/settings.h
-new file mode 100644
-index 000000000..675f643a6
---- /dev/null
-+++ b/src/settings.h
-@@ -0,0 +1,11 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *
-+ */
-+
-+int btd_settings_gatt_db_load(struct gatt_db *db, const char *filename);
-+void btd_settings_gatt_db_store(struct gatt_db *db, const char *filename);
+ static void att_read_req(const struct l2cap_frame *frame)
+ {
+ 	const struct bt_l2cap_att_read_req *pdu = frame->data;
+ 
+-	print_field("Handle: 0x%4.4x", le16_to_cpu(pdu->handle));
++	print_handle(frame, le16_to_cpu(pdu->handle), false);
+ }
+ 
+ static void att_read_rsp(const struct l2cap_frame *frame)
+@@ -330,7 +452,7 @@ static void att_read_rsp(const struct l2cap_frame *frame)
+ 
+ static void att_read_blob_req(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), false);
+ 	print_field("Offset: 0x%4.4x", get_le16(frame->data + 2));
+ }
+ 
+@@ -346,8 +468,7 @@ static void att_read_multiple_req(const struct l2cap_frame *frame)
+ 	count = frame->size / 2;
+ 
+ 	for (i = 0; i < count; i++)
+-		print_field("Handle: 0x%4.4x",
+-					get_le16(frame->data + (i * 2)));
++		print_handle(frame, get_le16(frame->data + (i * 2)), false);
+ }
+ 
+ static void att_read_group_type_req(const struct l2cap_frame *frame)
+@@ -390,7 +511,7 @@ static void att_read_group_type_rsp(const struct l2cap_frame *frame)
+ 
+ static void att_write_req(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), false);
+ 	print_hex_field("  Data", frame->data + 2, frame->size - 2);
+ }
+ 
+@@ -400,14 +521,14 @@ static void att_write_rsp(const struct l2cap_frame *frame)
+ 
+ static void att_prepare_write_req(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), false);
+ 	print_field("Offset: 0x%4.4x", get_le16(frame->data + 2));
+ 	print_hex_field("  Data", frame->data + 4, frame->size - 4);
+ }
+ 
+ static void att_prepare_write_rsp(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), true);
+ 	print_field("Offset: 0x%4.4x", get_le16(frame->data + 2));
+ 	print_hex_field("  Data", frame->data + 4, frame->size - 4);
+ }
+@@ -436,7 +557,7 @@ static void att_handle_value_notify(const struct l2cap_frame *frame)
+ {
+ 	const struct bt_l2cap_att_handle_value_notify *pdu = frame->data;
+ 
+-	print_field("Handle: 0x%4.4x", le16_to_cpu(pdu->handle));
++	print_handle(frame, le16_to_cpu(pdu->handle), true);
+ 	print_hex_field("  Data", frame->data + 2, frame->size - 2);
+ }
+ 
+@@ -444,7 +565,7 @@ static void att_handle_value_ind(const struct l2cap_frame *frame)
+ {
+ 	const struct bt_l2cap_att_handle_value_ind *pdu = frame->data;
+ 
+-	print_field("Handle: 0x%4.4x", le16_to_cpu(pdu->handle));
++	print_handle(frame, le16_to_cpu(pdu->handle), true);
+ 	print_hex_field("  Data", frame->data + 2, frame->size - 2);
+ }
+ 
+@@ -463,7 +584,7 @@ static void att_multiple_vl_rsp(const struct l2cap_frame *frame)
+ 		if (!l2cap_frame_get_le16(f, &handle))
+ 			return;
+ 
+-		print_field("Handle: 0x%4.4x", handle);
++		print_handle(frame, get_le16(frame->data), true);
+ 
+ 		if (!l2cap_frame_get_le16(f, &len))
+ 			return;
+@@ -484,13 +605,13 @@ static void att_multiple_vl_rsp(const struct l2cap_frame *frame)
+ 
+ static void att_write_command(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), false);
+ 	print_hex_field("  Data", frame->data + 2, frame->size - 2);
+ }
+ 
+ static void att_signed_write_command(const struct l2cap_frame *frame)
+ {
+-	print_field("Handle: 0x%4.4x", get_le16(frame->data));
++	print_handle(frame, get_le16(frame->data), false);
+ 	print_hex_field("  Data", frame->data + 2, frame->size - 2 - 12);
+ 	print_hex_field("  Signature", frame->data + frame->size - 12, 12);
+ }
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 8608cf2ef..e854c1a8e 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -765,7 +765,7 @@ static void print_handle_native(uint16_t handle)
+ 	}
+ 
+ 	sprintf(label, "Handle: %d Address", handle);
+-	print_addr("  Address", conn->dst, conn->dst_type);
++	print_addr(label, conn->dst, conn->dst_type);
+ }
+ 
+ static void print_handle(uint16_t handle)
 -- 
 2.35.1
 
