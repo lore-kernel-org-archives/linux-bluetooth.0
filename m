@@ -2,141 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02DE5C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 May 2022 08:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44CCC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 May 2022 21:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241122AbiEVIOK (ORCPT
+        id S240123AbiEVVDo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 May 2022 04:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37642 "EHLO
+        Sun, 22 May 2022 17:03:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240093AbiEVIOI (ORCPT
+        with ESMTP id S242846AbiEVVDm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 May 2022 04:14:08 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 011A32A267
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 01:14:05 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id u30so20799415lfm.9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 01:14:05 -0700 (PDT)
+        Sun, 22 May 2022 17:03:42 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAAD13A189
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 14:03:40 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id a3so22327295ybg.5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 14:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Et+7DOTTQH1JqVpXKSqRPgxVrV1oOzeHvnh2fubRt1A=;
-        b=k7F8Fidfxb4gmUhFCDJVU0LHLtsVdZsyeamFnEqSX+/iUh9u/66KhhnLYfQkaVuM9B
-         aUT5IqNMGTJ/4Ewd0Vfqc7W05jnqVT27dax0L/Fxh8ZF271LiGTSyOptKN9UK6LQKBJW
-         fYp1vuJzrnTbDPpeEPeHa+2Y7apTU2k6uF/gfoAAdrPLdsWeMpG8LuGhciDFaJ3I8q7F
-         kO5mbYKP3eZiE9xwPOo5ueHOk5GyBlewRHeGDqbU+U/LOfkis6wsyF4hEN66W+QTHnUa
-         yaevaJ1FRUuoWRSfbL1pN5GPlq6ZPB295vwB7buySPS8wf2XTY4ucyU9kQwWTlYixKQ6
-         xoHQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mxiplx6RkaytXlrRSYKEQ3O7D7iVT1tPh1nthwSj52s=;
+        b=RbDrWXHdFHp710mS+KTiAsacnf8zZILcSCFAvEkg5tmJgLLY/OtbMort7xqYxWhFm1
+         B63F83m/TsJitosRLG9h1UU7sTJgEl2o0kxZLELo45zT7IQbsHmvcQLe85BW4Hwg39R3
+         RF6agLIV8dwzLNzS0ZneQZfYKDN+0zJEyEqF4KrbH/7NdQbPKsgTypg7ov0+ZyIxNfn0
+         K4Yx7/ANDGLxI4vpoC8vaRzg4kQer11hgvl5J5PUOZQ886qcziOGaC4DbWnyJ6iRGiwm
+         Pwv5e1iC13g8GFOolW4/mrl5DycCQ0GMGRuBZ+H/CRK/dzIRiT/h/UN6Kqcdak6QtZCu
+         AcSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Et+7DOTTQH1JqVpXKSqRPgxVrV1oOzeHvnh2fubRt1A=;
-        b=5ExxtTjBEGZSGdlaR6xOY2g8VbtHbymfXmztxYkKr7HcwD7HcwPRgJgpRvaSDCgw+4
-         HmOO32Gts9kOfB32lCMJT8pmGMWKMctzGxqagsEOZIvnpRZ0kWWxJs6PNVNIlKr8KDTd
-         HOQHHoQ1/bf4yPiD+arXOWTA01Q09s30cPJceTr9y+bsJX2qS9veWSj/hkDGGXtREdac
-         l+SRpgxGk/hdNL/ZlAYRxLjmjOMdz5E8XmtmJYTb+Pi/3Mr9qs0GirOjUDSvY72dLS3s
-         BblQIRKnnlnETEs2QpbzBZfR0a8xyPQjsyhKeyKaoSCEp+zdsRazz9P+ahjRoOaTzy+O
-         c9MA==
-X-Gm-Message-State: AOAM530pq6qjXg2xRn1s8nClp8e9OGIK6JY4H12iGOH8s7Cu49e8ccQl
-        Yetv3b5rtlB1pEVbfy6ld+TKcg==
-X-Google-Smtp-Source: ABdhPJw7AMfd8auxqz+NezYyJzs8m23LxjPNettf01T47OdWMoQSUrsWnhIz5oOq++dKWhKByY0tGg==
-X-Received: by 2002:a19:640d:0:b0:472:75e:7373 with SMTP id y13-20020a19640d000000b00472075e7373mr12289744lfb.46.1653207244246;
-        Sun, 22 May 2022 01:14:04 -0700 (PDT)
-Received: from [192.168.0.17] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.gmail.com with ESMTPSA id m25-20020ac24299000000b0047255d2117csm1362254lfh.171.2022.05.22.01.14.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 May 2022 01:14:03 -0700 (PDT)
-Message-ID: <996ac5f2-3cf3-e67a-144b-4fdac9bbc20d@linaro.org>
-Date:   Sun, 22 May 2022 10:14:02 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mxiplx6RkaytXlrRSYKEQ3O7D7iVT1tPh1nthwSj52s=;
+        b=0hvTk8Rza0N63MSC2k8PSP3evTB4+1B3z5+vT6kKOORJ7IxC8nnEWpofDw5JleeqAH
+         ofD+ESbUdfSIN116p0aMs42oYmM4lUhXEzWMxl8Q8Kfagv9zFvJ/lpG7OH53qlkipTqf
+         dlEUXsc2pH20KimtelJBT25KMz/erJvfHX6XU58IDImPprZZaMB2tieZzquF41HPK2tG
+         nsIiQrjmYZc+F/qcm5uT1Nw196Ye5bpkJlOBll9ifk1dyKO4/0+iNh9R9Pk5iuRlwnx2
+         jOYvURaFVM5mGOAVI0p5I7QUyZNeWCkasJ9ipgvaqPIw0GDhQq2e29Ugw52o5N5Mh3jC
+         cFvQ==
+X-Gm-Message-State: AOAM530x2DO37LYIYunopk5qg3M429yVYFIs/h/9gMG2qsx2miyZHN7a
+        heh2T02jL77Iy7bsErR9xO4N7DuHR/J3JySceDSNZQ==
+X-Google-Smtp-Source: ABdhPJwTBwnyeOqQ+H1oLaBkNCWS83VGkpo6Am+xihPb5+nNh3oq+bfFbsJAeD9vmSzwzBPnHIMQc7QlkN/SRG5gFlU=
+X-Received: by 2002:a5b:302:0:b0:64b:a20a:fcd9 with SMTP id
+ j2-20020a5b0302000000b0064ba20afcd9mr18570383ybp.492.1653253419976; Sun, 22
+ May 2022 14:03:39 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: broadcom-bluetooth: Add property
- for autobaud mode
-Content-Language: en-US
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+References: <20220521200734.421223-1-a.fatoum@pengutronix.de>
+In-Reply-To: <20220521200734.421223-1-a.fatoum@pengutronix.de>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Sun, 22 May 2022 23:03:28 +0200
+Message-ID: <CACRpkdbKUHu-T2whY4wgk5xnR7X-hptEg+Jm5Hudq8ieQi3VwA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT binding
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <cover.1653057480.git.hakan.jansson@infineon.com>
- <cb20a6f49c91521d54c847ee4dc14451b0ee91dd.1653057480.git.hakan.jansson@infineon.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <cb20a6f49c91521d54c847ee4dc14451b0ee91dd.1653057480.git.hakan.jansson@infineon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        devicetree@vger.kernel.org, kernel@pengutronix.de,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 20/05/2022 17:07, Hakan Jansson wrote:
-> Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
+On Sat, May 21, 2022 at 10:07 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
 
-Which devices support this? You probably need allOf:if:then.
+> The BCM4349B1 chip is a single-chip Bluetooth 5.0 controller and
+> Transceiver. It is contained in the CYW/BCM89359 WiFi+BT package.
 
-> Autobaud mode can also be required on some boards where the controller
-> device is using a non-standard baud rate when first powered on.
-> 
-> This patch adds a property, "brcm,uses-autobaud-mode", to enable autobaud
-> mode selection.
+So the BT and the package have two different names.
 
-Don't use "This patch":
-https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+> +      - brcm,bcm4349-bt
 
-> 
-> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
-> ---
-> V1 -> V2: Modify property description
-> 
->  .../devicetree/bindings/net/broadcom-bluetooth.yaml      | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> index 5aac094fd217..a29f059c21cc 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> @@ -92,6 +92,15 @@ properties:
->         pcm-sync-mode: slave, master
->         pcm-clock-mode: slave, master
->  
-> +  brcm,uses-autobaud-mode:
+Then why do you have to tag on "-bt" on this compatible?
 
-Based on description, I understand the host triggers using autobaud.
-However here you word it as "uses", so it is independent of host, it
-looks like property of a device. The commit msg describes it even
-different - "require autobaud".
+That is typically used when the wifi and bt has the *same* name, so
+the only way to distinguish between them is a suffix.
 
-This leads to second issue - it looks like there is some hardware
-property (requiring to use autobaud) which should be described by
-bindings. But instead you describe desired operational feature.
-
-> +    type: boolean
-> +    description: >
-
-No need for '>'.
-
-> +      Setting this property will make the host (driver) assert the controller
-> +      chip's BT_UART_CTS_N prior to asserting BT_REG_ON. This will make the
-> +      controller start up in autobaud mode. The controller will then detect the
-> +      baud rate of the first incoming (HCI Reset) command from the host and
-> +      subsequently use that baud rate.
-> +
->    interrupts:
->      items:
->        - description: Handle to the line HOST_WAKE used to wake
-
-
-Best regards,
-Krzysztof
+Yours,
+Linus Walleij
