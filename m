@@ -2,100 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8347C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 03:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A861C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 08:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354985AbiEWD4m (ORCPT
+        id S231993AbiEWIjN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 May 2022 23:56:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33246 "EHLO
+        Mon, 23 May 2022 04:39:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiEWD4k (ORCPT
+        with ESMTP id S231867AbiEWIjM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 May 2022 23:56:40 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2582B7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 20:56:38 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id m20so26014476ejj.10
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 20:56:38 -0700 (PDT)
+        Mon, 23 May 2022 04:39:12 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4353CFFE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 01:39:08 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2fee9fe48c2so139966297b3.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 01:39:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=LKAJkiWmW+IPGP1bXDKaiFUYpV46xzegx9oR3356eFs=;
-        b=gVnl8EntcpMgwE29/c+bjMIurGfrhaKvHuVgNwokXlHj8f0HpRtVO2iTuf2t84JtcC
-         4T8IWNKbLcn4nS8C8o54KCWd2cK+9MGM+jMuIbj4JCyR7HUtw+Hfe5LSZl4Mo/IfVzMY
-         D4Ai8Dmf6YrLPSwpNE0xjpX1Lrp517SuOajXI=
+        bh=9ms1xiGnp9VFH8Q9WvnNJjHzsFoHcObvaufuDxPzB8s=;
+        b=Uet4r7oIXi/ElVe63yV1mWhDRZ+fGIgc5OZMp+pGq/pwPrZ33OPF1HDuE/BKkaKPXK
+         jQDEkdFsjwaDOM0WHhuA6doA6kC9TMW7VHOC3aArWFo8rD/XFve21eGHC2NVQEFM2Fsa
+         2BBCBMxfigeAO9ep6xDQ7mXqxxb34jwF1pEXTfDTPfYT9Kc/Ugs23KFhBZSXh10RM9Zx
+         AIEUjNNEc3uDMKeQMajmp/JwzZqX9O+cG6X1BA+62WhYx8hK945ueObKZ6qjPB/0xKbQ
+         2KETO5q4v/umXdZUIidDW+RgYqN91R5iY8+h+dRBlHq3TGczK5IM4T4WU7a8EIkNSg9q
+         r69Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=LKAJkiWmW+IPGP1bXDKaiFUYpV46xzegx9oR3356eFs=;
-        b=LzPndYjwDT+9Zr8266mYKqKSAi/3H4pg4zLISGuePxbncKGlqFZNYReXNhKxXlckWu
-         UROwLYvEqBpTUvxqAD/Cs6LTJ24OcD5lZ+AHirWWZ5SkUOVkDjMTXDLKVPGnN+OzlS+c
-         D8t+BtaQPfO7BSFk0BPeoaeAY1AqWuOkVPUwtgneSF2ivtxt0Q+Nrun7Vzn48plNZ01x
-         hw9uKT0HsAMH2DfLMEMjwD2PNEWDg56pCM9eYED86dMd3wOeDNcPLbYnhmrYSyNTGSm2
-         JN/UnBQj6b3tDT1kvIG6ZTezKtUkYWW09fWAgSfyASkrGK4DN9saDTeJlvBY7pzUNAPC
-         iq1Q==
-X-Gm-Message-State: AOAM5313RfAxmrSHRQXQcGlcZew+b1Q1FOqYUSSHXfff4ajtJnPu0z6K
-        PCv8y6vU+q+MfsZBJK9uE5t98o/pOq5H559B
-X-Google-Smtp-Source: ABdhPJzHkjDfebGhwhicZmxaFcluC5BkpqrmQzdSWQ5rL5p7kayGfKz3R34MPZ0bl8iKman0jZZ8qQ==
-X-Received: by 2002:a17:907:971e:b0:6fe:b652:7d51 with SMTP id jg30-20020a170907971e00b006feb6527d51mr10582101ejc.356.1653278196611;
-        Sun, 22 May 2022 20:56:36 -0700 (PDT)
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com. [209.85.221.52])
-        by smtp.gmail.com with ESMTPSA id z7-20020a05640235c700b0042b0fcfe966sm4916637edc.37.2022.05.22.20.56.35
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 May 2022 20:56:35 -0700 (PDT)
-Received: by mail-wr1-f52.google.com with SMTP id p10so827712wrg.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 22 May 2022 20:56:35 -0700 (PDT)
-X-Received: by 2002:a5d:5484:0:b0:20f:bf64:cae1 with SMTP id
- h4-20020a5d5484000000b0020fbf64cae1mr10390593wrv.281.1653278194596; Sun, 22
- May 2022 20:56:34 -0700 (PDT)
+        bh=9ms1xiGnp9VFH8Q9WvnNJjHzsFoHcObvaufuDxPzB8s=;
+        b=6xyvhCSnSFGC2EnOGlh/5+aYy+ACMcO0m04+QEYF0QzpKdyGMNrFDiFKG/YwL0ioIK
+         LRU2UNDbIQMj15aaDu9dc39drsgz9Cp0e2M7wkzGRhWDxWyybX8oJvYJCu9aFkj7TZ/A
+         8J/Mi2fYvZlGTCykI90RMa3ILWriIb1bc4rHsWj0S6da6RFt0bArxys2meUDU87FbZNe
+         IkY9tsZHgo3Vg4HEROJXbKsWmTUwLdkWJvJVQxy3oKaiN6s3mNVvTjP2e+VkkHDl6ssu
+         bq0NQXDALEzuEgybmjkATVQZt4LlFEhydsLk4cOVJE0vMC3taE09J1y+nC/1YNFAwt7j
+         QoiQ==
+X-Gm-Message-State: AOAM530vQisgD//lIMtI2AM2sPat1PLtpNnfdanmh8oED3zL6bmxyQCQ
+        9fWqzGluAnvAWvw0NwpBjdBVaVCiqpktm6MP7qXK3A==
+X-Google-Smtp-Source: ABdhPJzVCJisNVWwF/tRYhS+3OQBbnOrRKNdHmqe9UxkbvUyiNZVzi+GLJWTPkxmpI2apsjpExrpugAd+DKqFmDQJAE=
+X-Received: by 2002:a81:a107:0:b0:2ff:e11d:3ad8 with SMTP id
+ y7-20020a81a107000000b002ffe11d3ad8mr5164601ywg.448.1653295147509; Mon, 23
+ May 2022 01:39:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <000000000000c1925305ac997812@google.com> <000000000000b6b4eb05dfa1b325@google.com>
-In-Reply-To: <000000000000b6b4eb05dfa1b325@google.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Sun, 22 May 2022 20:56:18 -0700
-X-Gmail-Original-Message-ID: <CAHk-=whH5pmgyzE6+6C==p2VQFUgGiPhSwX=R2zKs+iHZuX7_A@mail.gmail.com>
-Message-ID: <CAHk-=whH5pmgyzE6+6C==p2VQFUgGiPhSwX=R2zKs+iHZuX7_A@mail.gmail.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in corrupted (4)
-To:     syzbot <syzbot+48135e34de22e3a82c99@syzkaller.appspotmail.com>
-Cc:     applications@thinkbigglobal.in, David Miller <davem@davemloft.net>,
-        gustavo@padovan.org, Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.com>,
-        Netdev <netdev@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Will Deacon <will@kernel.org>
+References: <20220521200734.421223-1-a.fatoum@pengutronix.de>
+ <CACRpkdbKUHu-T2whY4wgk5xnR7X-hptEg+Jm5Hudq8ieQi3VwA@mail.gmail.com> <80306a31-462c-4ce3-5c54-c0f74ad828f8@pengutronix.de>
+In-Reply-To: <80306a31-462c-4ce3-5c54-c0f74ad828f8@pengutronix.de>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Mon, 23 May 2022 10:38:56 +0200
+Message-ID: <CACRpkdbR_pbQ7L4m8oYt3PN4QT0oXx2-ESHWNTt=QRcpH_gOrg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT binding
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        devicetree@vger.kernel.org, kernel@pengutronix.de,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, May 22, 2022 at 4:01 PM syzbot
-<syzbot+48135e34de22e3a82c99@syzkaller.appspotmail.com> wrote:
+On Mon, May 23, 2022 at 12:16 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> On 22.05.22 23:03, Linus Walleij wrote:
+> > On Sat, May 21, 2022 at 10:07 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >
+> >> The BCM4349B1 chip is a single-chip Bluetooth 5.0 controller and
+> >> Transceiver. It is contained in the CYW/BCM89359 WiFi+BT package.
+> >
+> > So the BT and the package have two different names.
 >
-> The issue was bisected to:
+> The package also goes by the name BCM4349B1 apparently.
+> Cypress support had later confirmed BCM4349B1 and BCM89359 to
+> be the same chipset. I should probably rephrase the commit message.
 >
-> commit c470abd4fde40ea6a0846a2beab642a578c0b8cd
-> Author: Linus Torvalds <torvalds@linux-foundation.org>
-> Date:   Sun Feb 19 22:34:00 2017 +0000
 >
->     Linux 4.10
+> >> +      - brcm,bcm4349-bt
+> >
+> > Then why do you have to tag on "-bt" on this compatible?
+> >
+> > That is typically used when the wifi and bt has the *same* name, so
+> > the only way to distinguish between them is a suffix.
 
-Heh. That looks very unlikely, so the bisection seems to sadly have
-failed at some point.
+> I think that's the case here too.
 
-At least one of the KASAN reports (that "final oops") does look very
-much like the bug fixed by commit 1bff51ea59a9 ("Bluetooth: fix
-use-after-free error in lock_sock_nested()"), so this may already be
-fixed, but who knows...
+OK then!
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-But that "update Makefile to 4.10" is not the cause...
-
-               Linus
+Yours,
+Linus Walleij
