@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CC7C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 20:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5193C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 20:42:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232071AbiEWUDx (ORCPT
+        id S233454AbiEWUl6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 May 2022 16:03:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        Mon, 23 May 2022 16:41:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232060AbiEWUDw (ORCPT
+        with ESMTP id S233385AbiEWUlz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 May 2022 16:03:52 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58596FD05;
-        Mon, 23 May 2022 13:03:51 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id gg20so14983987pjb.1;
-        Mon, 23 May 2022 13:03:51 -0700 (PDT)
+        Mon, 23 May 2022 16:41:55 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE40AA006C;
+        Mon, 23 May 2022 13:41:53 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id q76so14635970pgq.10;
+        Mon, 23 May 2022 13:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=bgGL9vPmn7It6mSSxr4xGr9tZVsKClEQVSniSkYH9fU=;
-        b=GE86hsPlFU9fmFoSIlqWDWgt2YfjoQRW+B5ylZy5SX1PT1Vy/rvDKs37FuWU6c74it
-         jMIpVcCh6G0kB3SSJH9F+NMRpdSsJt4uCe/TLFwrq28xBfejN4Wo+mMiJf+CNpveUWTz
-         M43C3XJeYVMGmb3+zQzN8hvT7NZMFQgFp+KFHENUofAelFMr5GQLTQNZAEFxEWOaqsAl
-         dsTBFchscGvi6lGY9NKISv2AmVTRgTplD95uqQHQhdNqlogxfn/nc6Bhnl0L7bjEL5tB
-         xnTv8dsE9m1rZHybus+M55rlspWZ0tJ38xpqWB+Dj1cw6v2EPpgTNx+Yq7R6s9r4Lq/7
-         Zh9w==
+        bh=mb/diutsKCyaTxghxZj5uB5jLkGYXFK+bGmVJLUN/+g=;
+        b=HZBKsqeTDcQ7ErVYYohSGjxwy5bkobYkYr9TOMlfQAI8dmfc1+hqcBUepVkweyji49
+         9U41dBh0CuwdHLmXqZ/frie4ifkkO8F92w8A2jS7awgFEbkaFbWT9pCRLDnX0OFwDPNE
+         ZjZFjbzkVUxd7d9zHsO53KPNKOCuI36oQeU/dHXgJttHPWiDTtSITHiXnOeqID28vqxZ
+         6qdqSS2yOoqVlfvXIzc7vhf83h/BhYUmN+UHet9KQkhzQcst4LZx7dGvgGrJChHKsTAV
+         /sd1v1jCdqzHY4QV0utC5IrOI/OyZFF9rZZhd7rfkxpI02ITn7yJEKCIqbZQpozRAvaF
+         2YwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=bgGL9vPmn7It6mSSxr4xGr9tZVsKClEQVSniSkYH9fU=;
-        b=HRa7jONrdOY0iuX+GHwO/GOzotezl5TxC8OLuJxzMbyQfJ2/EAqfjmAlavuGhACFlu
-         09XHDwRYzkbBNqx0iYJE2AtbpgQg1FeJzOGahyf/ASkeZUopxYTF+Jo5X04ePZavzqsE
-         aver1poMEEOby8adj6acaJTXZx5Ba0fesg5OmeIM79BC/exLM9SlYXv+QbhceG56DCAi
-         4GRlRb9nN/5Sjvl3SVzZ3y4B80R8OL3XvND1uHRKJTd1XOEKW3hj4QH34Ji1RSlPhupM
-         fOqhdTeimcqkqqtrWbUEVlQTrr6AA6HM0TPO86NhP2wkr0gfZ7JFE0RUcR9FmszZquWs
-         qZaQ==
-X-Gm-Message-State: AOAM532vhQR6OOE3VhknERHm6T1VSC8ZQ5fj1eT7xCz0csLeEJTipj88
-        +PYkQtsFrbqVNldOYvEEGUc=
-X-Google-Smtp-Source: ABdhPJxcIHbC9EvTvMnGhbgmpbygP3NhEXAyMP5iKCGiKLYCCVb0xq8q1edxgLSOQP93nvBri5lkBw==
-X-Received: by 2002:a17:902:ef45:b0:155:cede:5a9d with SMTP id e5-20020a170902ef4500b00155cede5a9dmr24005769plx.93.1653336231305;
-        Mon, 23 May 2022 13:03:51 -0700 (PDT)
+        bh=mb/diutsKCyaTxghxZj5uB5jLkGYXFK+bGmVJLUN/+g=;
+        b=TWwGLEVa1OVg9l5njKH7CqW4Q4Fc3DR3+Dnt94UjJEyGYLwRNyxeEGiJ+oJqBqF8Mz
+         4ighflKqi7S79vT1xoS02+Wdy9FyiZWiUbGRuZ2peYGns/l5ey6ii12jwIelebdmOX25
+         JiJwIW+KkkO3eDOAsl99lNV7bFE9/odB0lOIDU3hoHvkNmPr7koV6saZ+rv/I8LUZa6Z
+         Yc6Sl/JWCbCtmYYckNbWsAuFpYuiJMjBSeogJ1ZR1ZK7nxKu4tf9h8uRftv6tAXZ3MME
+         LwHQkTnsWt2PrGoTsXYfMySYs0QRddfjBfcIYnwvnO4Z8iU6YptcTZmSiSWcpoZGwyJW
+         q5vg==
+X-Gm-Message-State: AOAM531B5D2RHSvdZ6XtkL1uDdOm5g5ebYwkwdDBEVUm4NwgjTrR+s5A
+        asc03E3zCmpPVf/gwA65PFk5+dTB7Je9tQ==
+X-Google-Smtp-Source: ABdhPJzeSjWd37n4H5dP6zzteNEJnmggRi13DNtc7dIc0eH9zeUCSGvg9yX9ddRZP/ax4KvnGsUJ9Q==
+X-Received: by 2002:a05:6a00:1146:b0:4c9:ede0:725a with SMTP id b6-20020a056a00114600b004c9ede0725amr25013016pfm.35.1653338512619;
+        Mon, 23 May 2022 13:41:52 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id l17-20020a629111000000b0050dc76281ccsm7507465pfe.166.2022.05.23.13.03.50
+        by smtp.gmail.com with ESMTPSA id y21-20020a056a001c9500b00518895f0dabsm4908489pfw.59.2022.05.23.13.41.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 13:03:50 -0700 (PDT)
+        Mon, 23 May 2022 13:41:51 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     davem@davemloft.net, kuba@kernel.org
 Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2022-05-23
-Date:   Mon, 23 May 2022 13:03:49 -0700
-Message-Id: <20220523200349.3322806-1-luiz.dentz@gmail.com>
+Subject: pull request: bluetooth-next 2022-05-23
+Date:   Mon, 23 May 2022 13:41:51 -0700
+Message-Id: <20220523204151.3327345-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -62,27 +62,98 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 8c3b8dc5cc9bf6d273ebe18b16e2d6882bcfb36d:
+The following changes since commit 49bb39bddad214304bb523258f02f57cd25ed88b:
 
-  net/smc: fix listen processing for SMC-Rv2 (2022-05-23 10:08:33 +0100)
+  selftests: fib_nexthops: Make the test more robust (2022-05-13 11:59:32 +0100)
 
 are available in the Git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-05-23
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-05-23
 
-for you to fetch changes up to c9f73a2178c12fb24d2807634209559d6a836e08:
+for you to fetch changes up to edcb185fa9c4f8fa1301f032fb503d2597a92b1e:
 
-  Bluetooth: hci_conn: Fix hci_connect_le_sync (2022-05-23 12:52:06 -0700)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - Fix crash when an LE Connection fails to be established.
+  Bluetooth: hci_sync: use hci_skb_event() helper (2022-05-23 17:21:59 +0200)
 
 ----------------------------------------------------------------
-Luiz Augusto von Dentz (1):
-      Bluetooth: hci_conn: Fix hci_connect_le_sync
+bluetooth-next pull request for net-next:
 
- net/bluetooth/hci_conn.c  | 5 +++--
- net/bluetooth/hci_event.c | 8 +++++---
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ - Add support for Realtek 8761BUV
+ - Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk
+ - Add support for RTL8852C
+ - Add a new PID/VID 0489/e0c8 for MT7921
+ - Add support for Qualcomm WCN785x
+
+----------------------------------------------------------------
+Ahmad Fatoum (1):
+      Bluetooth: hci_sync: use hci_skb_event() helper
+
+Brian Gix (1):
+      Bluetooth: Keep MGMT pending queue ordered FIFO
+
+Ismael Luceno (1):
+      Bluetooth: btusb: Add 0x0bda:0x8771 Realtek 8761BUV devices
+
+Linus Walleij (1):
+      Bluetooth: btbcm: Support per-board firmware variants
+
+Luiz Augusto von Dentz (6):
+      Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk
+      Bluetooth: Print broken quirks
+      Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for QCA
+      Bluetooth: MGMT: Add conditions for setting HCI_CONN_FLAG_REMOTE_WAKEUP
+      Bluetooth: hci_sync: Fix attempting to suspend with unfiltered passive scan
+      Bluetooth: eir: Add helpers for managing service data
+
+Max Chou (1):
+      Bluetooth: btrtl: Add support for RTL8852C
+
+Niels Dossche (3):
+      Bluetooth: use hdev lock in activate_scan for hci_is_adv_monitoring
+      Bluetooth: use hdev lock for accept_list and reject_list in conn req
+      Bluetooth: protect le accept and resolv lists with hdev->lock
+
+Rikard Falkeborn (1):
+      Bluetooth: btintel: Constify static struct regmap_bus
+
+Sean Wang (5):
+      Bluetooth: mt7921s: Fix the incorrect pointer check
+      Bluetooth: btusb: Add a new PID/VID 0489/e0c8 for MT7921
+      Bluetooth: btmtksdio: fix use-after-free at btmtksdio_recv_event
+      Bluetooth: btmtksdio: fix possible FW initialization failure
+      Bluetooth: btmtksdio: fix the reset takes too long
+
+Steven Rostedt (1):
+      Bluetooth: hci_qca: Use del_timer_sync() before freeing
+
+Tim Harvey (1):
+      Bluetooth: btbcm: Add entry for BCM4373A0 UART Bluetooth
+
+Vasyl Vavrychuk (1):
+      Bluetooth: core: Fix missing power_on work cancel on HCI close
+
+Ying Hsu (1):
+      Bluetooth: fix dangling sco_conn and use-after-free in sco_sock_timeout
+
+Zijun Hu (2):
+      Bluetooth: btusb: add support for Qualcomm WCN785x
+      Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA
+
+ drivers/bluetooth/btbcm.c        | 53 ++++++++++++++++++++++-
+ drivers/bluetooth/btintel.c      |  2 +-
+ drivers/bluetooth/btmtksdio.c    | 26 +++++++-----
+ drivers/bluetooth/btrtl.c        | 13 ++++++
+ drivers/bluetooth/btusb.c        | 23 +++++++++-
+ drivers/bluetooth/hci_qca.c      |  4 +-
+ include/net/bluetooth/hci.h      | 10 +++++
+ include/net/bluetooth/hci_core.h |  8 +++-
+ net/bluetooth/eir.c              | 31 ++++++++++++++
+ net/bluetooth/eir.h              |  4 ++
+ net/bluetooth/hci_conn.c         |  2 +-
+ net/bluetooth/hci_core.c         |  2 -
+ net/bluetooth/hci_event.c        | 27 +++++++++---
+ net/bluetooth/hci_request.c      |  4 +-
+ net/bluetooth/hci_sync.c         | 90 +++++++++++++++++++++++++++++++++-------
+ net/bluetooth/mgmt.c             | 18 ++++++++
+ net/bluetooth/mgmt_util.c        |  2 +-
+ net/bluetooth/sco.c              | 23 ++++++----
+ 18 files changed, 289 insertions(+), 53 deletions(-)
