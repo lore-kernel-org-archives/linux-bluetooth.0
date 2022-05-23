@@ -2,99 +2,178 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A861C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 08:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28B9DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 09:22:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231993AbiEWIjN (ORCPT
+        id S232947AbiEWJWB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 May 2022 04:39:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53788 "EHLO
+        Mon, 23 May 2022 05:22:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231867AbiEWIjM (ORCPT
+        with ESMTP id S232871AbiEWJWA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 May 2022 04:39:12 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4353CFFE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 01:39:08 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2fee9fe48c2so139966297b3.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 01:39:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9ms1xiGnp9VFH8Q9WvnNJjHzsFoHcObvaufuDxPzB8s=;
-        b=Uet4r7oIXi/ElVe63yV1mWhDRZ+fGIgc5OZMp+pGq/pwPrZ33OPF1HDuE/BKkaKPXK
-         jQDEkdFsjwaDOM0WHhuA6doA6kC9TMW7VHOC3aArWFo8rD/XFve21eGHC2NVQEFM2Fsa
-         2BBCBMxfigeAO9ep6xDQ7mXqxxb34jwF1pEXTfDTPfYT9Kc/Ugs23KFhBZSXh10RM9Zx
-         AIEUjNNEc3uDMKeQMajmp/JwzZqX9O+cG6X1BA+62WhYx8hK945ueObKZ6qjPB/0xKbQ
-         2KETO5q4v/umXdZUIidDW+RgYqN91R5iY8+h+dRBlHq3TGczK5IM4T4WU7a8EIkNSg9q
-         r69Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9ms1xiGnp9VFH8Q9WvnNJjHzsFoHcObvaufuDxPzB8s=;
-        b=6xyvhCSnSFGC2EnOGlh/5+aYy+ACMcO0m04+QEYF0QzpKdyGMNrFDiFKG/YwL0ioIK
-         LRU2UNDbIQMj15aaDu9dc39drsgz9Cp0e2M7wkzGRhWDxWyybX8oJvYJCu9aFkj7TZ/A
-         8J/Mi2fYvZlGTCykI90RMa3ILWriIb1bc4rHsWj0S6da6RFt0bArxys2meUDU87FbZNe
-         IkY9tsZHgo3Vg4HEROJXbKsWmTUwLdkWJvJVQxy3oKaiN6s3mNVvTjP2e+VkkHDl6ssu
-         bq0NQXDALEzuEgybmjkATVQZt4LlFEhydsLk4cOVJE0vMC3taE09J1y+nC/1YNFAwt7j
-         QoiQ==
-X-Gm-Message-State: AOAM530vQisgD//lIMtI2AM2sPat1PLtpNnfdanmh8oED3zL6bmxyQCQ
-        9fWqzGluAnvAWvw0NwpBjdBVaVCiqpktm6MP7qXK3A==
-X-Google-Smtp-Source: ABdhPJzVCJisNVWwF/tRYhS+3OQBbnOrRKNdHmqe9UxkbvUyiNZVzi+GLJWTPkxmpI2apsjpExrpugAd+DKqFmDQJAE=
-X-Received: by 2002:a81:a107:0:b0:2ff:e11d:3ad8 with SMTP id
- y7-20020a81a107000000b002ffe11d3ad8mr5164601ywg.448.1653295147509; Mon, 23
- May 2022 01:39:07 -0700 (PDT)
+        Mon, 23 May 2022 05:22:00 -0400
+Received: from smtp11.infineon.com (smtp11.infineon.com [IPv6:2a00:18f0:1e00:4::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7135F18E20;
+        Mon, 23 May 2022 02:21:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1653297719; x=1684833719;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=AqqWInH/uvloVFBojaLNSCFPdNJZctY6O5Ve4B8YJfc=;
+  b=TFCUQtSsdIim14QjfDQMgV4SVWsL4xELclaoxCszXx+bzLu7nq3hGk4P
+   Ql5VfQa8q5OX7QoU7KxUbqbrGCamJskMrAutL+kmj8Hz/qt7C3+i6DO54
+   MnFQpyzRAmhojsyCcXmerJ17Zpek/qtLTwZEBFj8WDvZCCc/VXxHt2ZV6
+   g=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10355"; a="297247087"
+X-IronPort-AV: E=Sophos;i="5.91,246,1647298800"; 
+   d="scan'208";a="297247087"
+Received: from unknown (HELO mucxv002.muc.infineon.com) ([172.23.11.17])
+  by smtp11.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 11:21:57 +0200
+Received: from MUCSE819.infineon.com (MUCSE819.infineon.com [172.23.29.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv002.muc.infineon.com (Postfix) with ESMTPS;
+        Mon, 23 May 2022 11:21:56 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE819.infineon.com
+ (172.23.29.45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 23 May
+ 2022 11:21:56 +0200
+Received: from [10.160.230.235] (172.23.8.247) by MUCSE807.infineon.com
+ (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 23 May
+ 2022 11:21:55 +0200
+Message-ID: <b090ec5a-6d9a-71e3-d4d0-e491b14b558e@infineon.com>
+Date:   Mon, 23 May 2022 11:21:54 +0200
 MIME-Version: 1.0
-References: <20220521200734.421223-1-a.fatoum@pengutronix.de>
- <CACRpkdbKUHu-T2whY4wgk5xnR7X-hptEg+Jm5Hudq8ieQi3VwA@mail.gmail.com> <80306a31-462c-4ce3-5c54-c0f74ad828f8@pengutronix.de>
-In-Reply-To: <80306a31-462c-4ce3-5c54-c0f74ad828f8@pengutronix.de>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Mon, 23 May 2022 10:38:56 +0200
-Message-ID: <CACRpkdbR_pbQ7L4m8oYt3PN4QT0oXx2-ESHWNTt=QRcpH_gOrg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT binding
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        devicetree@vger.kernel.org, kernel@pengutronix.de,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: broadcom-bluetooth: Add property
+ for autobaud mode
+Content-Language: en-US
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+CC:     "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <cover.1653057480.git.hakan.jansson@infineon.com>
+ <cb20a6f49c91521d54c847ee4dc14451b0ee91dd.1653057480.git.hakan.jansson@infineon.com>
+ <996ac5f2-3cf3-e67a-144b-4fdac9bbc20d@linaro.org>
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+In-Reply-To: <996ac5f2-3cf3-e67a-144b-4fdac9bbc20d@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE824.infineon.com (172.23.29.55) To
+ MUCSE807.infineon.com (172.23.29.33)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, May 23, 2022 at 12:16 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> On 22.05.22 23:03, Linus Walleij wrote:
-> > On Sat, May 21, 2022 at 10:07 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
-> >
-> >> The BCM4349B1 chip is a single-chip Bluetooth 5.0 controller and
-> >> Transceiver. It is contained in the CYW/BCM89359 WiFi+BT package.
-> >
-> > So the BT and the package have two different names.
->
-> The package also goes by the name BCM4349B1 apparently.
-> Cypress support had later confirmed BCM4349B1 and BCM89359 to
-> be the same chipset. I should probably rephrase the commit message.
->
->
-> >> +      - brcm,bcm4349-bt
-> >
-> > Then why do you have to tag on "-bt" on this compatible?
-> >
-> > That is typically used when the wifi and bt has the *same* name, so
-> > the only way to distinguish between them is a suffix.
+Hi Krzysztof,
 
-> I think that's the case here too.
+Thanks for responding.
 
-OK then!
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+On 5/22/2022 10:14 AM, Krzysztof Kozlowski wrote:
+>> Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
+> Which devices support this? You probably need allOf:if:then.
 
-Yours,
-Linus Walleij
+Most devices _support_ autobaud mode but I don't have a definitive list. 
+The CYW5557x is the first device family to _require_ autobaud mode for 
+FW loading as far as I know.
+
+>> Autobaud mode can also be required on some boards where the controller
+>> device is using a non-standard baud rate when first powered on.
+>>
+>> This patch adds a property, "brcm,uses-autobaud-mode", to enable autobaud
+>> mode selection.
+> Don't use "This patch":
+> https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+
+Sorry, will change in next rev.
+
+>> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+>> ---
+>> V1 -> V2: Modify property description
+>>
+>>   .../devicetree/bindings/net/broadcom-bluetooth.yaml      | 9 +++++++++
+>>   1 file changed, 9 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>> index 5aac094fd217..a29f059c21cc 100644
+>> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>> @@ -92,6 +92,15 @@ properties:
+>>          pcm-sync-mode: slave, master
+>>          pcm-clock-mode: slave, master
+>>
+>> +  brcm,uses-autobaud-mode:
+> Based on description, I understand the host triggers using autobaud.
+
+Correct, the host triggers using autobaud.
+
+> However here you word it as "uses", so it is independent of host, it
+> looks like property of a device.
+
+I've been thinking of it as a a property of a specific board HW, 
+inherited either from a property of the device being used or from a 
+property of the HW design (e.g. a PCB using an alternate crystal 
+frequency yielding a non-standard baud rate).
+
+>   The commit msg describes it even
+> different - "require autobaud".
+
+Yes, the commit message describes two separate reasons why autobaud mode 
+would be required:
+
+1. Requirement coming from Device: "Some devices (e.g. CYW5557x) require 
+autobaud mode to enable FW loading."
+
+2. Requirement coming from HW design: "Autobaud mode can also be 
+required on some boards where the controller device is using a 
+non-standard baud rate when first powered on."
+
+> This leads to second issue - it looks like there is some hardware
+> property (requiring to use autobaud) which should be described by
+> bindings. But instead you describe desired operational feature.
+
+Sorry about that. I've really been struggling with what should go into 
+the description. Any suggestions or hints would be much appreciated.
+
+How about, changing the property name to "brcm,requires-autobaud-mode" 
+and the description to:
+"Set this property if autobaud mode is required. Autobaud mode is 
+required if the device's baud rate in normal mode is not supported by 
+the host or if the device requires autobaud mode startup before loading FW."
+
+Would that be an appropriate name and description?
+
+>> +    type: boolean
+>> +    description: >
+> No need for '>'.
+
+Ok, will remove in next rev.
+
+>> +      Setting this property will make the host (driver) assert the controller
+>> +      chip's BT_UART_CTS_N prior to asserting BT_REG_ON. This will make the
+>> +      controller start up in autobaud mode. The controller will then detect the
+>> +      baud rate of the first incoming (HCI Reset) command from the host and
+>> +      subsequently use that baud rate.
+>> +
+>>     interrupts:
+>>       items:
+>>         - description: Handle to the line HOST_WAKE used to wake
+>
+
+Thanks,
+Håkan
