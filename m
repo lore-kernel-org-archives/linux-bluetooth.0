@@ -2,60 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03416C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 21:04:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE043C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 21:40:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230362AbiEWVEz (ORCPT
+        id S230230AbiEWVka (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 May 2022 17:04:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
+        Mon, 23 May 2022 17:40:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230330AbiEWVEy (ORCPT
+        with ESMTP id S230499AbiEWVkU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 May 2022 17:04:54 -0400
-Received: from smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2D9274DD0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 14:04:51 -0700 (PDT)
-Received: from github.com (hubbernetes-node-aac8d94.ac4-iad.github.net [10.52.205.36])
-        by smtp.github.com (Postfix) with ESMTPA id 012107205E3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 14:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1653339891;
-        bh=B78KIdLHQUJ8LcM8TSO1ac69ZT38dBxLUzBMVQ0UhaU=;
-        h=Date:From:To:Subject:From;
-        b=Xnv5xW5GmI4mtvQpaUCau5kiJQZ66oGfQ2JznYzC1F5ijUePkEMuod3qzUXHDeOgg
-         Q41uArxVpIYywX7TznRdKTQ2hvMBW1NTH4vfcXtfb4brgGs2cJcQi3Sm+QZ97SuqRO
-         CiUMbId5hkBjPLlZ0h6A51AWm5TOBZ1JSbssqOdc=
-Date:   Mon, 23 May 2022 14:04:50 -0700
-From:   inga-s <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/bbdd18-79fe52@github.com>
-Subject: [bluez/bluez] 79fe52: client: Fix setting of advertisement interval
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Mon, 23 May 2022 17:40:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C515DD32;
+        Mon, 23 May 2022 14:40:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D7437B8169E;
+        Mon, 23 May 2022 21:40:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 79D72C3411A;
+        Mon, 23 May 2022 21:40:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653342013;
+        bh=g7vbqwPB9Sr+7PEF+y9piN4eQKpUYLA914+AgtfLkKI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=e2EKnBvACplQ4TDCPRN8pFT6kIZCkNCiLzn6F2JhPAz0IoIEYwufUeqSY7yXTrFuU
+         mC3J33O1OBkUDAO4sQEq3ycucPaA5bDvxBrXKjHdUrT+LubnuLf26FWKejNdHFA/pa
+         AKVsiLsJig6hHXeX9D4/dS5l83lMoRe8MfuZd6z2Ul3hzMsPcC/bVZjHE/TFDj1Sdm
+         jfXz5PV5BI9jF3TixM2KXsdzPdqE8aLAZWW0cgzNvflWTs8V6BzvqvQZiPokLoj93e
+         2CxiVG9I6r93HwBKj0q5YgdLkkD97aFyOnrKtQc2IbQuH9ohIzkyfdwwT+FtpFfg9o
+         GVyZCjBUisdeQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 63CA3F03938;
+        Mon, 23 May 2022 21:40:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull request: bluetooth 2022-05-23
+From:   patchwork-bot+netdevbpf@kernel.org
+Message-Id: <165334201340.19887.13283028863120702469.git-patchwork-notify@kernel.org>
+Date:   Mon, 23 May 2022 21:40:13 +0000
+References: <20220523200349.3322806-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220523200349.3322806-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 79fe529d64855e1e482d3c265d89b7bbe7c99ab9
-      https://github.com/bluez/bluez/commit/79fe529d64855e1e482d3c265d89b7bbe7c99ab9
-  Author: Inga Stotland <inga.stotland@intel.com>
-  Date:   2022-05-23 (Mon, 23 May 2022)
+Hello:
 
-  Changed paths:
-    M client/main.c
+This pull request was applied to netdev/net.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  Log Message:
-  -----------
-  client: Fix setting of advertisement interval
+On Mon, 23 May 2022 13:03:49 -0700 you wrote:
+> The following changes since commit 8c3b8dc5cc9bf6d273ebe18b16e2d6882bcfb36d:
+> 
+>   net/smc: fix listen processing for SMC-Rv2 (2022-05-23 10:08:33 +0100)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-05-23
+> 
+> [...]
 
-This fixes incorrect argument read when using "interval" command
-in "advertisement" submenu
+Here is the summary with links:
+  - pull request: bluetooth 2022-05-23
+    https://git.kernel.org/netdev/net/c/7fb0269720d7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
