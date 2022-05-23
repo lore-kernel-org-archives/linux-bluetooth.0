@@ -2,80 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6326DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 16:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84CC7C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 20:03:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238312AbiEWQAW (ORCPT
+        id S232071AbiEWUDx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 May 2022 12:00:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
+        Mon, 23 May 2022 16:03:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238319AbiEWQAS (ORCPT
+        with ESMTP id S232060AbiEWUDw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 May 2022 12:00:18 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A18B6161F;
-        Mon, 23 May 2022 09:00:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id BF31ECE1677;
-        Mon, 23 May 2022 16:00:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26CFFC36AF5;
-        Mon, 23 May 2022 16:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653321612;
-        bh=nl764TnpF5LojCBXNEfM9nqApgfA6vTtKzmYaLebMMs=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=H1BFu1N71NZN+cnf9UEkLvODfBePH5cKiIQa6fqar02y2dKrM/VSrBNUSoNHfFWsU
-         oAysoKYwik2+4DJwKDb0I0BS5D4PK5TR0GM+oDUUZEligvIfGFIF9U6kBa25bGH3V6
-         E30dTClN9YIC+r/V97G8P3xJbMmx0zhKKmaXS7a0xFcmpfqdXAQNgyj1shAuu04IiN
-         1p6s6VsaHs5UBf4LBME+Q4v6mbRcYJrRFBOHfOkToUn/145T5cD5zE58a0ZcIXmKBb
-         o53+0cTtF717sXBLXQf9FDOvD8dCyemvagK/aMfInC0aYnobRYGZZbqxF1jCO1W+5O
-         xZGmwkXu7/+mQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0E6A9EAC081;
-        Mon, 23 May 2022 16:00:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 23 May 2022 16:03:52 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58596FD05;
+        Mon, 23 May 2022 13:03:51 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id gg20so14983987pjb.1;
+        Mon, 23 May 2022 13:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bgGL9vPmn7It6mSSxr4xGr9tZVsKClEQVSniSkYH9fU=;
+        b=GE86hsPlFU9fmFoSIlqWDWgt2YfjoQRW+B5ylZy5SX1PT1Vy/rvDKs37FuWU6c74it
+         jMIpVcCh6G0kB3SSJH9F+NMRpdSsJt4uCe/TLFwrq28xBfejN4Wo+mMiJf+CNpveUWTz
+         M43C3XJeYVMGmb3+zQzN8hvT7NZMFQgFp+KFHENUofAelFMr5GQLTQNZAEFxEWOaqsAl
+         dsTBFchscGvi6lGY9NKISv2AmVTRgTplD95uqQHQhdNqlogxfn/nc6Bhnl0L7bjEL5tB
+         xnTv8dsE9m1rZHybus+M55rlspWZ0tJ38xpqWB+Dj1cw6v2EPpgTNx+Yq7R6s9r4Lq/7
+         Zh9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bgGL9vPmn7It6mSSxr4xGr9tZVsKClEQVSniSkYH9fU=;
+        b=HRa7jONrdOY0iuX+GHwO/GOzotezl5TxC8OLuJxzMbyQfJ2/EAqfjmAlavuGhACFlu
+         09XHDwRYzkbBNqx0iYJE2AtbpgQg1FeJzOGahyf/ASkeZUopxYTF+Jo5X04ePZavzqsE
+         aver1poMEEOby8adj6acaJTXZx5Ba0fesg5OmeIM79BC/exLM9SlYXv+QbhceG56DCAi
+         4GRlRb9nN/5Sjvl3SVzZ3y4B80R8OL3XvND1uHRKJTd1XOEKW3hj4QH34Ji1RSlPhupM
+         fOqhdTeimcqkqqtrWbUEVlQTrr6AA6HM0TPO86NhP2wkr0gfZ7JFE0RUcR9FmszZquWs
+         qZaQ==
+X-Gm-Message-State: AOAM532vhQR6OOE3VhknERHm6T1VSC8ZQ5fj1eT7xCz0csLeEJTipj88
+        +PYkQtsFrbqVNldOYvEEGUc=
+X-Google-Smtp-Source: ABdhPJxcIHbC9EvTvMnGhbgmpbygP3NhEXAyMP5iKCGiKLYCCVb0xq8q1edxgLSOQP93nvBri5lkBw==
+X-Received: by 2002:a17:902:ef45:b0:155:cede:5a9d with SMTP id e5-20020a170902ef4500b00155cede5a9dmr24005769plx.93.1653336231305;
+        Mon, 23 May 2022 13:03:51 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id l17-20020a629111000000b0050dc76281ccsm7507465pfe.166.2022.05.23.13.03.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 May 2022 13:03:50 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-05-23
+Date:   Mon, 23 May 2022 13:03:49 -0700
+Message-Id: <20220523200349.3322806-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: hci_sync: use hci_skb_event() helper
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165332161205.20224.14103410632009923897.git-patchwork-notify@kernel.org>
-Date:   Mon, 23 May 2022 16:00:12 +0000
-References: <20220521201050.424197-1-a.fatoum@pengutronix.de>
-In-Reply-To: <20220521201050.424197-1-a.fatoum@pengutronix.de>
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, kernel@pengutronix.de,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit 8c3b8dc5cc9bf6d273ebe18b16e2d6882bcfb36d:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+  net/smc: fix listen processing for SMC-Rv2 (2022-05-23 10:08:33 +0100)
 
-On Sat, 21 May 2022 22:10:50 +0200 you wrote:
-> This instance is the only opencoded version of the macro, so have it
-> follow suit.
-> 
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
->  net/bluetooth/hci_request.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+are available in the Git repository at:
 
-Here is the summary with links:
-  - Bluetooth: hci_sync: use hci_skb_event() helper
-    https://git.kernel.org/bluetooth/bluetooth-next/c/edcb185fa9c4
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-05-23
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to c9f73a2178c12fb24d2807634209559d6a836e08:
 
+  Bluetooth: hci_conn: Fix hci_connect_le_sync (2022-05-23 12:52:06 -0700)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix crash when an LE Connection fails to be established.
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (1):
+      Bluetooth: hci_conn: Fix hci_connect_le_sync
+
+ net/bluetooth/hci_conn.c  | 5 +++--
+ net/bluetooth/hci_event.c | 8 +++++---
+ 2 files changed, 8 insertions(+), 5 deletions(-)
