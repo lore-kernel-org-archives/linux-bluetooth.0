@@ -2,82 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2AC6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 23:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619AFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 23:44:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242968AbiEXXmx (ORCPT
+        id S241164AbiEXXog (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 May 2022 19:42:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51866 "EHLO
+        Tue, 24 May 2022 19:44:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242965AbiEXXmj (ORCPT
+        with ESMTP id S241044AbiEXXoc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 May 2022 19:42:39 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5972F6D39A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 16:42:37 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso3590538pjg.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 16:42:37 -0700 (PDT)
+        Tue, 24 May 2022 19:44:32 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D02359B91
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 16:44:31 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d22so17134877plr.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 16:44:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=rLUVYqYHRnzGASa+xEa0kNbzG+5aKTi4kEy4BTKnH7Q=;
-        b=KKbkzFxiYbPyTUYn+tS+VTzXMIY+fiqcQ8YitcBmyjt/9mN+RUwOrPnGUbgpSsoL1U
-         BkKx3QiBmGGf5pW4ckOT0up0i+UnqmmjVSX/sfREyQBEas9ypM6YnRlmUPngGGE8h6AH
-         F/oopUe7MuXlZ8IyiblAfOOl2/C1xOimx7Vc2sx8bkeuPDOd3Netl86mFC1mc8W6xazV
-         PGBWSvwJeFyxDpTtcys71KKufpVPPVcKGBZY8DzannkzmovUWXAgDp7y/3l9U/PmmBE/
-         eygn44v6RCiVAjBPrzzHAnC0nbK3CCr5rsTRss070PoV9Ej3b5Dji+MKh+vR6ntEJhyu
-         6BeQ==
+        bh=FKHMTFjQws0f0fEqUojYEp1QD0ZQeUAbjgeH93iNZT4=;
+        b=Gq44dh8wvT218pHmcPKQiQ9Wy4ZuLdJCV2bBqPPmx1FsLynTk7NIg0K5KQFVLxB0Hn
+         /eSUTqbUQ8hU3L7E/xMmZiu1yJDZxh6aFBqJOZiHD6M11ny7c0e6DurnnoXTKBf8ByFn
+         kwhYHcdu8qDegpKMRYTXiOwHuO9UVxOxEfN0o/Lw2eBgzZi3T02+yD2S7U4x46uLwm8Q
+         grXbDjIIzs+1oFS3UuX4Y8I7eg7bSmYp6wuFTE+SM3ljTDiYT02seHRNjHio9MdcBumR
+         C/40vNGAYZe+1cpUhEERWweX7+xfuWAV/D+maFI7Aw+pI3GIff7e3YQG605PGvXIC1o7
+         LT5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=rLUVYqYHRnzGASa+xEa0kNbzG+5aKTi4kEy4BTKnH7Q=;
-        b=2MIj78QcDRsnyesFlYPLPxpQaaOLNUXTOq+iIiKpbSzGQap+HDykLU73CAMqrGa/EO
-         jOLiCDb4P47QDhTS/GzRzjeTS+nvP/yUYe05m54YFaVBYZW/GLDuWz8a7d/Hy8AmFgJw
-         ejMG07djAlHqLOTYS4t0feSR84wwEJLdN//29ODn8y7U2L3W5N6s9m/YR99xmFAmvR9O
-         vMfuNzm2Dy6ta0TFEIYH814Tqhy4rDa5KRzwaMGXcYMdgA0IcnVURgzwpe3hCsbwt70p
-         HgMLMbDpYkZ86+cYbUcwiS1x2krPPZHYm3JianVaPrv+Nj43JBhhPHQ+jYf15UaTxFoK
-         cZng==
-X-Gm-Message-State: AOAM532v5kF3M8WqYjst1BBNv+UtVc1mIOOy2jrRvwylFkNcGKxGuyRI
-        7ofV7VQdLHNb33NV5gM3Jg7kb36F+Yc5oF5mJGRGLvlI
-X-Google-Smtp-Source: ABdhPJxMPeWmeMbwfLWNEqQUV9K/hMNGJTrEZI7MwiGoTMmGsiiS/rqFIM3Qzt+3172vts5hcc8j/w9iI8RGe5yMqRI=
-X-Received: by 2002:a17:90a:3cce:b0:1df:8f80:ef7a with SMTP id
- k14-20020a17090a3cce00b001df8f80ef7amr7286993pjd.4.1653435756728; Tue, 24 May
- 2022 16:42:36 -0700 (PDT)
+        bh=FKHMTFjQws0f0fEqUojYEp1QD0ZQeUAbjgeH93iNZT4=;
+        b=p8UU8R9tPJavpM3HFP456rgKsz2fNARid91j/KutCnn8qaAIuPzoCheryaBrsNN6gk
+         NU50jU6LQIMPbU6RA+Gnb/TjmEhhQbXRneRvK74DHgOI51V+IPJtldWuswCudF8oFC1R
+         oBqRaAJWM1I6X7xUsOgsddqbrus0R2664w3ZGDP4ZBTV6TjabHNzCGPoZR6DxdwLQ9i4
+         /KH07hJg0OfE3Is0eLQAb4LJ5vu6pAY5nfrCCcu6LvF9eR4gDKff1VR1PvpB6h21CxU3
+         nCzTdzcyjxiRGH9ieIZ0T+mZfT7+pWNGhgN+QQaGUEVQBspa/0adg7msoy7yzeLWfDg3
+         rsPw==
+X-Gm-Message-State: AOAM530cbCi6XLnoaVPHo2pJnbxONKVAra/q0kgleOThZOT7aXTIh0By
+        zMw5spIL0XrAUj+WrEHuCnqi97UZ95CT5blWwE0=
+X-Google-Smtp-Source: ABdhPJyfT7ax3jUOnXTyAaFn/OD9c9/hqe+9y07qqKQ4YIF6ZY5wPcVO/mJiBfsRvsJyARtEhBmqtPaaSPYpHQQjzPA=
+X-Received: by 2002:a17:90b:3506:b0:1e0:51a1:a8ee with SMTP id
+ ls6-20020a17090b350600b001e051a1a8eemr7087062pjb.112.1653435870981; Tue, 24
+ May 2022 16:44:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220524202630.3569412-1-luiz.dentz@gmail.com>
- <CABBYNZKZajJyuenwyv+1T6Gt1SYyLz39yMJF9_LYdTubk+e_rw@mail.gmail.com> <20220524142128.01acb75a@hermes.local>
-In-Reply-To: <20220524142128.01acb75a@hermes.local>
+References: <20220520183713.2641513-1-luiz.dentz@gmail.com>
+ <148a9f76-0784-1d17-22cd-80343895aa37@pengutronix.de> <9e5b51ae-5089-dc91-57cb-52b0d76249d8@pengutronix.de>
+ <CABBYNZ+DNOvguwKXie+1NVJ6xQjOYQiUCroBcBNEyUuKjt2+_Q@mail.gmail.com> <f5730712-1967-9d1b-3e04-9fcb6b4a3070@pengutronix.de>
+In-Reply-To: <f5730712-1967-9d1b-3e04-9fcb6b4a3070@pengutronix.de>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 24 May 2022 16:42:24 -0700
-Message-ID: <CABBYNZLs-1Pkf=qKwt7t5b6_wxiZiF4Xzr+K2jMFr_WEDpfaQw@mail.gmail.com>
-Subject: Re: [PATCH-stable] Bluetooth: eir: Fix using strlen with hdev->{dev_name,short_name}
-To:     Stephen Hemminger <stephen@networkplumber.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 24 May 2022 16:44:19 -0700
+Message-ID: <CABBYNZJpgsZnGuJDJ4GyQm=_kJ8xgJJ=gorE9PXmwzCv3YcsUA@mail.gmail.com>
+Subject: Re: [PATCH-stable] Bluetooth: hci_conn: Fix hci_connect_le_sync
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stephen,
+Hi Ahmad,
 
-On Tue, May 24, 2022 at 2:21 PM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
+On Tue, May 24, 2022 at 3:01 PM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
 >
-> On Tue, 24 May 2022 13:55:57 -0700
-> Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hello Luiz,
 >
-> > Here is a tentative fix, I do wonder though why you were trying to set
-> > the name directly and not using the likes of bluetoothctl/btmgmt?
-> > bluetoothd don't seem to bother setting a shortname so it is probably
-> > not reproducible with it but btmgmt does:
+> On 24.05.22 20:08, Luiz Augusto von Dentz wrote:
+> > On Tue, May 24, 2022 at 8:55 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+> >> On 24.05.22 16:48, Ahmad Fatoum wrote:
+> >> I see now that this fix doesn't build for v5.17 because hci_conn_failed
+> >> was only introduced in v5.18. Can the hci_conn.c hunk be safely dropped?
+> >
+> > Are you talking about:
+> >
+> >         if (status) {
+> > -               hci_le_conn_failed(conn, status);
+> > +               hci_conn_failed(conn, status);
+> >                 goto unlock;
+> >         }
+> >
+> > You just need to replace hci_conn_failed with hci_le_conn_failed or
+> > well in the code above the end result is the same since it is not
+> > supposed to cleanup in the event handler.
 >
-> Not me. I just forward reports from bugzilla.
-> Any networking related bug reports end up going to me, and I filter/forward them.
+> Yes, that cleanup in le_conn_complete_evt() needs to be removed.
+> I am talking about the other hunk in hci_conn.c:
+>
+>   -    if (!conn)
+>   +    /* Check if connection is still pending */
+>   +    if (conn != hci_lookup_le_connect(hdev))
+>                goto done;
+>
+>    -    hci_le_conn_failed(conn, err);
+>    +    hci_conn_failed(conn, err);
+>
+>     done:
+>         hci_dev_unlock(hdev);
+>
+>
+> Can this be dropped for v5.17?
 
-Sorry, I guess we should forward this to Tom then.
+I guess it should be alright but perhaps keep if (conn !=
+hci_lookup_le_connect(hdev)) just in case.
+
+> Cheers,
+> Ahmad
+>
+> --
+> Pengutronix e.K.                           |                             |
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
+
 
 -- 
 Luiz Augusto von Dentz
