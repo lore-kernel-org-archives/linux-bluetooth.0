@@ -2,203 +2,170 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3ECEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 May 2022 22:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FB0C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 04:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbiEWW2h (ORCPT
+        id S233268AbiEXEYI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 May 2022 18:28:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45472 "EHLO
+        Tue, 24 May 2022 00:24:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiEWW2g (ORCPT
+        with ESMTP id S231564AbiEXEYH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 May 2022 18:28:36 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38BAF7DE2F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 15:28:35 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id nk9-20020a17090b194900b001df2fcdc165so506894pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 15:28:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4tgSXRbyfiUubChzxKJ/M2AvX5PKjAuiVPNHMDuyWXw=;
-        b=e+6YtQY0D4EK7ncPkoQz0e8eDExV7q7Dij+wzTBC6cF1jYh9Q9/+TuoDJLvK4ENi/Z
-         arHeXQ4MSyMdxmnLDqdnKx81wuqNA+MKIbjwyQi4+xFwGsAX1iYIIyKZTQl5bLL8timn
-         uUufAEIumEI5AkZkrEl0ic6K6QSEmG+yQvsjLDspux5WhW/0Ne1PrG1F47a9RchJLPfU
-         f+uVNuOy6TjqjZEHrZe0a36BVJmIO+Tma/AlT4VW987QmU/u9gRbvdRCZiEdrdfziH7A
-         zJw4bvrgAnn1SQB1uyrZZWC+4BL69yy/HB2LWK9UMvdn0GtS4Vi941jiFQXOFsw51Jb1
-         1eDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4tgSXRbyfiUubChzxKJ/M2AvX5PKjAuiVPNHMDuyWXw=;
-        b=6oePWYwxI60ZC/G/eY8+zodqh7Ah0W8GyCeCArconNepcWTczmWQFa3XNLiZCrzn+q
-         ZPXwMoMsUG1J+VZPUuLMlQK88FhS/AjcIIBKuCemdodfAWOhWC2KeOlNyQn0NKg9Pn9a
-         vWAyaFVf1YA9N7b2QL8UpTkGEnTqbzBxVXsA8s9zNdvbM7GEERPqiDSoRQbmsVA+f5q6
-         FifAKJ4EIM9z1PcuIWUGPQw+Kmb2QOz6XqzLdY2NkYYKwalOYrNiKPhIENMimstOQUSm
-         dWJVVT02UkOwpKceGqs1XoRVv4Qujao/DRtA0e9IRGuCPAAt9ARM/pbQcjujgWNDN9Vf
-         zLhg==
-X-Gm-Message-State: AOAM5320YQcBgvi6f21oMlmKcfgPTBvcxcNxiocMqMCkAgACZ9Z4bI2v
-        x0aYQ721n16QMjAP34FpAxN2jQ==
-X-Google-Smtp-Source: ABdhPJzDrkMUqcEevYwEWyIVnPaERz3SkIUv7jA+udrj1/wZS9YzxSQpMoJDYS+slMKsrHcMmwqOLw==
-X-Received: by 2002:a17:90b:17c6:b0:1e0:28bf:d429 with SMTP id me6-20020a17090b17c600b001e028bfd429mr1201566pjb.239.1653344914766;
-        Mon, 23 May 2022 15:28:34 -0700 (PDT)
-Received: from hermes.local (204-195-112-199.wavecable.com. [204.195.112.199])
-        by smtp.gmail.com with ESMTPSA id o62-20020a62cd41000000b0051850716942sm7899743pfg.140.2022.05.23.15.28.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 15:28:34 -0700 (PDT)
-Date:   Mon, 23 May 2022 15:28:32 -0700
-From:   Stephen Hemminger <stephen@networkplumber.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Tue, 24 May 2022 00:24:07 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF1C8021D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 23 May 2022 21:24:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653366245; x=1684902245;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xxCxrykvvt6Jh+Wv4e/q0g39fN3F7Qg+5gn/Sp4w0qA=;
+  b=PkBs7Ao62J5Q3tj3vnSAj8IXDZojx/pes1IJvnfNaiLeVJOlor52lgcg
+   RY3lgGK84W8lElusERgzpB5RFVNqzlUZXRhtwFljUWwbI6A4R+yNSajBr
+   rCNkhAcSTBD4SylBTpmfWZFIeOSdv7+iBZeGrZKwWOdOBK/ZcmrRRW37e
+   1FXO/toTr90Rare3WFP9vLGy/97XrXUUEXUBSDqk2IRF5PHWwdXWB1tVU
+   TBAGbwWD2lIieDF6QGRrZdTlO5yzTil3XhZtwKYb/QgQrGNV8tqb5Ye0t
+   ONnKmv54Fosb90lv+qdxt0D420rTyNYfwFAsNMv3MDL3HZ6ivOHGRahu4
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="359821863"
+X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
+   d="scan'208";a="359821863"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 21:24:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,248,1647327600"; 
+   d="scan'208";a="703309279"
+Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 23 May 2022 21:24:03 -0700
+Received: from kbuild by db63a1be7222 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1ntM5S-0001is-Uw;
+        Tue, 24 May 2022 04:24:02 +0000
+Date:   Tue, 24 May 2022 12:23:33 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth@vger.kernel.org
-Subject: Fw: [Bug 216018] New: Bluetooth: strlen in append_eir_data_to_buf
- causes calling process to freeze when short/longname does not have double
- NUL termination.
-Message-ID: <20220523152832.199b93bf@hermes.local>
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ edcb185fa9c4f8fa1301f032fb503d2597a92b1e
+Message-ID: <628c5dc5.Jxwsk+xWdRizvvfD%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: edcb185fa9c4f8fa1301f032fb503d2597a92b1e  Bluetooth: hci_sync: use hci_skb_event() helper
 
+elapsed time: 726m
 
-Begin forwarded message:
+configs tested: 93
+configs skipped: 3
 
-Date: Mon, 23 May 2022 15:32:38 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 216018] New: Bluetooth: strlen in append_eir_data_to_buf causes calling process to freeze when short/longname does not have double NUL termination.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
+gcc tested configs:
+arm                                 defconfig
+arm64                               defconfig
+arm                              allmodconfig
+arm                              allyesconfig
+arm64                            allyesconfig
+ia64                                defconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+nios2                               defconfig
+arc                              allyesconfig
+csky                                defconfig
+nios2                            allyesconfig
+alpha                               defconfig
+alpha                            allyesconfig
+h8300                            allyesconfig
+xtensa                           allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+s390                                defconfig
+s390                             allmodconfig
+parisc                              defconfig
+parisc64                            defconfig
+parisc                           allyesconfig
+s390                             allyesconfig
+sparc                               defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+i386                                defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                           allnoconfig
+powerpc                          allmodconfig
+powerpc                          allyesconfig
+x86_64               randconfig-a004-20220523
+x86_64               randconfig-a003-20220523
+x86_64               randconfig-a006-20220523
+x86_64               randconfig-a005-20220523
+x86_64               randconfig-a001-20220523
+x86_64               randconfig-a002-20220523
+i386                 randconfig-a001-20220523
+i386                 randconfig-a006-20220523
+i386                 randconfig-a002-20220523
+i386                 randconfig-a005-20220523
+i386                 randconfig-a003-20220523
+i386                 randconfig-a004-20220523
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
+x86_64                        randconfig-a013
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+arc                  randconfig-r043-20220523
+arc                  randconfig-r043-20220522
+s390                 randconfig-r044-20220522
+riscv                randconfig-r042-20220522
+riscv                               defconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+riscv                             allnoconfig
+riscv                            allmodconfig
+riscv                            allyesconfig
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                                  kexec
+x86_64                              defconfig
+x86_64                           allyesconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                           rhel-8.3-syz
+x86_64                    rhel-8.3-kselftests
+x86_64                         rhel-8.3-kunit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=216018
-
-            Bug ID: 216018
-           Summary: Bluetooth: strlen in append_eir_data_to_buf causes
-                    calling process to freeze when short/longname does not
-                    have double NUL termination.
-           Product: Networking
-           Version: 2.5
-    Kernel Version: 5.17.6-1-MANJARO #1
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Other
-          Assignee: stephen@networkplumber.org
-          Reporter: tomu1@verifone.com
-        Regression: No
-
-Created attachment 301019
-  --> https://bugzilla.kernel.org/attachment.cgi?id=301019&action=edit  
-Program to cause strlen Kernel Bug
-
-The process I use to set the bluetooth short/longname via HCI freezes with a
-kernel bug.
-I have investigated this problem and have possibly found the issue.
-
-When writing the bluetooth localname to the kernel via HCI, the userspace is
-required to
-write the command to the HCI socket in the following way
-(https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/mgmt-api.txt):
-
-
-"
-Command Code:           0x000F
-        Controller Index:       <controller id>
-        Command Parameters:     Name (249 Octets)
-                                Short_Name (11 Octets)
-        Return Parameters:      Name (249 Octets)
-                                Short_Name (11 Octets))
-
-[...]
-
-The values of name and short name will be remembered when
-        switching the controller off and back on again. So the name
-        and short name only have to be set once when a new controller
-        is found and will stay until removed.                           
-"
-
-It is requested that both Name and Short_Name are zero terminated.
-
-When this command is sent via the HCI socket eventually set_local_name is
-called in the kernel:
-
-static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
-                          u16 len)
-{
-        struct mgmt_cp_set_local_name *cp = data;
-
-The structures which are important here are hci_dev and mgmt_cp_set_local_name:
-
-struct hci_dev (excerpt):
-The relevant struct is defined as such:
-        __u8            dev_name[HCI_MAX_NAME_LENGTH];
-        __u8            short_name[HCI_MAX_SHORT_NAME_LENGTH];
-
-The length macros are defined as such:
-#define HCI_MAX_NAME_LENGTH             248
-#define HCI_MAX_SHORT_NAME_LENGTH       10
-
-struct mgmt_cp_set_local_name {
-        __u8    name[MGMT_MAX_NAME_LENGTH];
-        __u8    short_name[MGMT_MAX_SHORT_NAME_LENGTH];
-} __packed;
-
-Its length macros are the following:
-
-/* Reserve one extra byte for names in management messages so that they
- * are always guaranteed to be nul-terminated */
-#define MGMT_MAX_NAME_LENGTH            (HCI_MAX_NAME_LENGTH + 1)
-#define MGMT_MAX_SHORT_NAME_LENGTH      (HCI_MAX_SHORT_NAME_LENGTH + 1)
-
-When set_local_name (net/bluetooth/mgmt.c) is called an memcpy is used to
-transfer
-the names:
-
-memcpy(hdev->short_name, cp->short_name, sizeof(hdev->short_name));
-if (!hdev_is_powered(hdev)) {
-                memcpy(hdev->dev_name, cp->name, sizeof(hdev->dev_name));
-
-This would not be a problem in of itself,
-however when ext_info_changed is called in the same function (and possibly
-elsewhere), it internally uses append_eir_data_to_buf, which uses 
-strlen to determine the length of the device/shortname:
-
-static u16 append_eir_data_to_buf(struct hci_dev *hdev, u8 *eir)
-...
-name_len = strlen(hdev->dev_name);
-....
-name_len = strlen(hdev->short_name);
-
-As such, when the userspace gives a name which does not have 2 NUL bytes
-at the end of long(dev)name and shortname, then the strlen will search
-over the size of the buffer, as internal structure does not have a NUL
-byte, which, sadly, causes my started hci process
-to completely freeze (unrecoverable) due to kernel hardening
-kicking in.
-
-An easy wasy to reproduce this issue is by executing the attached program.
-Please note blueZ and all of these Bluetooth grabbing services need to be
-disabled and the controller itself must be powered off.
-
-A temporary workaround is to terminate the sent names with two NUL
-bytes.
-
-It would be very kind of you to take a look at this issue.
-
-Thank you for your time,
-Tom Unbehau
+clang tested configs:
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+i386                 randconfig-a014-20220523
+i386                 randconfig-a011-20220523
+i386                 randconfig-a013-20220523
+i386                 randconfig-a016-20220523
+i386                 randconfig-a012-20220523
+i386                 randconfig-a015-20220523
+hexagon              randconfig-r045-20220523
+hexagon              randconfig-r045-20220522
+hexagon              randconfig-r041-20220523
+hexagon              randconfig-r041-20220522
+riscv                randconfig-r042-20220523
+s390                 randconfig-r044-20220523
+x86_64                        randconfig-a005
+x86_64                        randconfig-a003
+x86_64                        randconfig-a001
 
 -- 
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
+0-DAY CI Kernel Test Service
+https://01.org/lkp
