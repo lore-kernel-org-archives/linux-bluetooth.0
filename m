@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73961C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:38:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 976A2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241956AbiEXVi3 convert rfc822-to-8bit (ORCPT
+        id S241974AbiEXVkX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 May 2022 17:38:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48856 "EHLO
+        Tue, 24 May 2022 17:40:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241949AbiEXVi1 (ORCPT
+        with ESMTP id S241951AbiEXVkV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 May 2022 17:38:27 -0400
+        Tue, 24 May 2022 17:40:21 -0400
 Received: from sender11-of-o53.zoho.eu (sender11-of-o53.zoho.eu [31.186.226.239])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63CF7C178
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:38:26 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; t=1653427341; cv=none; 
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 555127C17D
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:40:19 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1653427343; cv=none; 
         d=zohomail.eu; s=zohoarc; 
-        b=b0vA92DoaPGCbvh5GAQDzhj1RCYG3rkzYb53XhGgWwjAavb8ZmW2JW2ea/EpUjRtgISSz5QuEO1+8hlKd9G/4tfL+vDfewikWr+8j7gOSSbUINqSkTi/9jsGQzH+pLofSmSs8Nou+zjLqPo4+gSBCIsOkGvmSwTk1uxzOV5a1bw=
+        b=kqM4+zIYq7/2DiNmY1b/2BUBM7CawdxeHcYf2GLk1PZ3EwHkzorjAsqoQa9il+fnqqrFtkHi1QLzQrdqtHUQeEeK5+bYmp2Tbw5Y0NX5Ire1Iavm4lZHDWZtcsCiMmkTpsGt4nr7cdTNAAG9LwgSSKFhKefrH6BT2poKaBKBSZg=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-        t=1653427341; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=mGz9geOh9bVL8VNTmK+t7n+LCbps3NKlP/XHOE2cdBw=; 
-        b=JEUXSn1ZMumJ6Oyn2vEVEr/EKWQljGc/Rc3dtTbq7jsdn+guzK8uhRx9fuz/Duz/PDZAuspWC7dRl/D0q3OQJ5Ej04EJ+zeOXN4yK2aByeCuXOxr5xvdPHe+nrHiPp45zgR2EjPH0C3N2PNncKDNOsdc+qPUO5Wn7ve+/oyQzio=
+        t=1653427343; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=p78ImhfqTFopguatUP5w6vRv8Q5bGiDPqYuQUSvDOYo=; 
+        b=N78zQsuV7d3OmTg7HQwYpF2M6PEkJraykhYRvjXZvNGjklgzOs0FMDoOxReAN9Ia3JaisU9qFc47uE4DAwNP7EyAzckycdibreXlGIWBhv0DlOG+pQNuBzgM/zan3+VYdUFNbW3qpMXDDpPiUPBDSZDLQT+QqLTzwZo4M/orsVs=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
         spf=pass  smtp.mailfrom=hostmaster@neglo.de;
         dmarc=pass header.from=<bage@debian.org>
 Received: from localhost.localdomain (port-92-194-239-176.dynamic.as20676.net [92.194.239.176]) by mx.zoho.eu
-        with SMTPS id 1653427340856773.1976815347725; Tue, 24 May 2022 23:22:20 +0200 (CEST)
+        with SMTPS id 1653427342834591.1104242641796; Tue, 24 May 2022 23:22:22 +0200 (CEST)
 From:   Bastian Germann <bage@debian.org>
 To:     Rob Herring <robh+dt@kernel.org>,
         Maxime Ripard <mripard@kernel.org>,
@@ -40,9 +40,9 @@ To:     Rob Herring <robh+dt@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
         Bastian Germann <bage@debian.org>
-Message-ID: <20220524212155.16944-2-bage@debian.org>
-Subject: [PATCH v2 1/3] Bluetooth: Add new quirk for broken local ext features max_page
-Date:   Tue, 24 May 2022 23:21:52 +0200
+Message-ID: <20220524212155.16944-4-bage@debian.org>
+Subject: [PATCH v2 3/3] arm64: allwinner: a64: enable Bluetooth On Pinebook
+Date:   Tue, 24 May 2022 23:21:54 +0200
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20220524212155.16944-1-bage@debian.org>
 References: <20220524212155.16944-1-bage@debian.org>
@@ -55,53 +55,43 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Vasily Khoruzhick <anarsoul@gmail.com>
 
-Some adapters (e.g. RTL8723CS) advertise that they have more than
-2 pages for local ext features, but they don't support any features
-declared in these pages. RTL8723CS reports max_page = 2 and declares
-support for sync train and secure connection, but it responds with
-either garbage or with error in status on corresponding commands.
+Pinebook has an RTL8723CS WiFi + BT chip, BT is connected to UART1
+and uses PL5 as device wake GPIO, PL6 as host wake GPIO the I2C
+controlling signals are connected to R_I2C bus.
+
+Enable it in the device tree.
 
 Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
-[rebase on current tree]
+[add uart-has-rtscts]
 Signed-off-by: Bastian Germann <bage@debian.org>
 ---
- include/net/bluetooth/hci.h | 7 +++++++
- net/bluetooth/hci_event.c   | 4 +++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ .../boot/dts/allwinner/sun50i-a64-pinebook.dts      | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 69ef31cea582..af26e8051905 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -265,6 +265,13 @@ enum {
- 	 * runtime suspend, because event filtering takes place there.
- 	 */
- 	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
-+
-+	/* When this quirk is set, max_page for local extended features
-+	 * is set to 1, even if controller reports higher number. Some
-+	 * controllers (e.g. RTL8723CS) report more pages, but they
-+	 * don't actually support features declared there.
-+	 */
-+	HCI_QUIRK_BROKEN_LOCAL_EXT_FTR_MAX_PAGE,
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts b/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
+index 63571df24da4..70d823f8c837 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
++++ b/arch/arm64/boot/dts/allwinner/sun50i-a64-pinebook.dts
+@@ -406,6 +406,19 @@ &uart0 {
+ 	status = "okay";
  };
  
- /* HCI device flags */
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 66451661283c..52b358c33344 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -837,7 +837,9 @@ static u8 hci_cc_read_local_ext_features(struct hci_dev *hdev, void *data,
- 	if (rp->status)
- 		return rp->status;
- 
--	if (hdev->max_page < rp->max_page)
-+	if (!test_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FTR_MAX_PAGE,
-+		      &hdev->quirks) &&
-+	    hdev->max_page < rp->max_page)
- 		hdev->max_page = rp->max_page;
- 
- 	if (rp->page < HCI_MAX_PAGES)
++&uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&uart1_pins>, <&uart1_rts_cts_pins>;
++	uart-has-rtscts;
++	status = "okay";
++
++	bluetooth {
++		compatible = "realtek,rtl8723cs-bt";
++		device-wake-gpios = <&r_pio 0 5 GPIO_ACTIVE_LOW>; /* PL5 */
++		host-wake-gpios = <&r_pio 0 6 GPIO_ACTIVE_HIGH>; /* PL6 */
++	};
++};
++
+ &usb_otg {
+ 	dr_mode = "host";
+ };
 -- 
 2.36.1
 
