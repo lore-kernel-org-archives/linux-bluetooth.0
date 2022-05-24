@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5175C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 20:25:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E3FCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 20:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241429AbiEXUZv (ORCPT
+        id S240614AbiEXU0g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 May 2022 16:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39694 "EHLO
+        Tue, 24 May 2022 16:26:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237701AbiEXUZu (ORCPT
+        with ESMTP id S237701AbiEXU0f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 May 2022 16:25:50 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6575D653
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 13:25:50 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id p13-20020a17090a284d00b001e0817e77f6so2188363pjf.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 13:25:50 -0700 (PDT)
+        Tue, 24 May 2022 16:26:35 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239E43A70E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 13:26:33 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id b5so9763758plx.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 13:26:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=7670BzM1lZFWkcIEKUthoaKaWjKyu9miEYfM3UOiXq4=;
-        b=XIbebF35N1/3WkdC2LC0rzIAR5I5KfYRska6SVB2/rdYgKHm5t6EgAnjghozBpbgO6
-         FZxXC3gp17NPYmiL2pGgxLJ4hF8Lp14C+rdwNlMlfFL9V1SGAgal4CGNLt8yAh6Wzht/
-         ZR9eKdafh7FBnkJMIbKNXbW6HQhrAX37CiWGIAtqPAmNL9smKmoNAtV1L1wIeF3NPZhv
-         a4iubU3rb6vPnYpvPmiKs2DrlQ5knZfUzOhZ1gmiIaHfGPs3Qgoj3yX2YEN1h7q+I1qE
-         id8TrrmPPnq0cEbcfTOV7a+qNbw1yqlLtpMjiH7nZtw/6bFzz3923F76BtWsYGjinSCE
-         98yg==
+        b=i1HRUnBQDhvCNmQzZY2pYbko/Sm8Esn2jNG1RxvNFK4orfYvJJbeA88aMMyzsiipOC
+         sR3ntiHmxI9ayyPv+SgyVCL40Yoppw2sq0gxxxb5afjH33ufJRb8zvscf2gqb5Oxi+ND
+         OfE+rjJVF3q6aMH8BamUk/cluHoNn70ZaT7URh/uo9kHqsPQY6COpQHIUbYd5u+M8JfC
+         95H7D1ww1g+vmP8n0iDri/ZSXjf0ViKJ766gODTJ+zuJmiWyNW4e9aZrbQWMGJlgGa3t
+         nIzjTCRlPuqF2XWrjLyFm7f8Q4jlh5vRET347wUtni+5PKIX++YQCPz2VDeZ3RnprTnb
+         ssoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=7670BzM1lZFWkcIEKUthoaKaWjKyu9miEYfM3UOiXq4=;
-        b=AmnYITjcevycnrr8C5AG8KhjoGIvwjdzPG7f0MAizMucMrU+HfnSlSbmBQfNmqqU2x
-         Nz1WD+eL9PzVNAE9aHJFSjWvQrMHYDLhF9eeUgGysUb2dF49ZJb4ooZDGANwdEAr8VDs
-         QmgNnEka0GhkqIwkqI41gznr04N8tNHVk+9v/v+bXdFrR+nwOU47sNQM2sCAODaFdrAa
-         v9OyQ1CbJSaLsi83Iq/QlfF9ur1Hsq+V0mhsml6IfUDApyKJ3384dWdQrPuDeVwaEFb1
-         5Q3OluN8dnSUTVEwL+Doko/YuLZFevOCF936UOiBejUqF2QTiCUbYV7DeX05OuMG1UHs
-         Q7gQ==
-X-Gm-Message-State: AOAM531aoJ/TyZrOCXpv6QvbmPObF6/HdmZbd1ayluNcGe0LQM3oOPDS
-        p+QPagiuPxu8QZARYzUrl0uVODjgyyo=
-X-Google-Smtp-Source: ABdhPJzXz5+RqVE+pt7nmRull8SIsKOiVwtBCiq90ByIpSlJQsjzEp0eTfLVbnfJoAaXgTRcZ7OoGA==
-X-Received: by 2002:a17:903:110c:b0:15f:f15:30ec with SMTP id n12-20020a170903110c00b0015f0f1530ecmr29341282plh.162.1653423949203;
-        Tue, 24 May 2022 13:25:49 -0700 (PDT)
+        b=5A8ncuOkOG3hS9oJfj8uhhZlrvbCLPLYFyhguyqULZGKtpNIvDUxqiUDFbBVCOJ56H
+         uKDHkSopItgeJJTFCPotcOJ1t773v5+QoYOKi6iQtPxb81pfiEAVQr9vX59LACSwQSik
+         dXJ8fXx2GlpvQvyJPQxEHVDRxvxDa68n6Br6ok3Gfjbul1WdckBME6hcNPFt1+oGYZE3
+         +bl681uMbVg4c04bluf/C8wAsXhXhxDRcVcV0cLwocY98669tuACTkipUZrsGHKPxsOA
+         j+3q1605QT9aXT0Cw6QbpontohCM7nbjeddc9i+6OLyFQ44UlaHLDG4Bxzxy62yP1UC9
+         hl3Q==
+X-Gm-Message-State: AOAM533rX2QVy+aOvY3NE7b+2qh9X8CKii/c7eLynVBTWL5jyAF8iALm
+        lN5wqYbMRvDVzBoNZb8w3L6cpqkhs0w=
+X-Google-Smtp-Source: ABdhPJzoTNZon/N9Hl7dlnrNug5YBUpoEFresBu5Lv2v+BrexhjrBowraVmpQ7AqjllIW6XB9xQVOw==
+X-Received: by 2002:a17:90b:946:b0:1df:4b91:9924 with SMTP id dw6-20020a17090b094600b001df4b919924mr6325601pjb.180.1653423992322;
+        Tue, 24 May 2022 13:26:32 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e10-20020a170902b78a00b0016196bcf743sm7562487pls.275.2022.05.24.13.25.48
+        by smtp.gmail.com with ESMTPSA id u18-20020a17090341d200b0015f2b3bc97asm7886322ple.13.2022.05.24.13.26.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 13:25:48 -0700 (PDT)
+        Tue, 24 May 2022 13:26:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: eir: Fix using strlen with hdev->{dev_name,short_name}
-Date:   Tue, 24 May 2022 13:25:48 -0700
-Message-Id: <20220524202548.3569218-1-luiz.dentz@gmail.com>
+Subject: [PATCH-stable] Bluetooth: eir: Fix using strlen with hdev->{dev_name,short_name}
+Date:   Tue, 24 May 2022 13:26:30 -0700
+Message-Id: <20220524202630.3569412-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
