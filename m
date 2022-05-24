@@ -2,33 +2,32 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E7AC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73961C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:38:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241939AbiEXViZ convert rfc822-to-8bit (ORCPT
+        id S241956AbiEXVi3 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 May 2022 17:38:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48792 "EHLO
+        Tue, 24 May 2022 17:38:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241945AbiEXViX (ORCPT
+        with ESMTP id S241949AbiEXVi1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 May 2022 17:38:23 -0400
-X-Greylist: delayed 917 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 24 May 2022 14:38:22 PDT
+        Tue, 24 May 2022 17:38:27 -0400
 Received: from sender11-of-o53.zoho.eu (sender11-of-o53.zoho.eu [31.186.226.239])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985F57C173
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:38:22 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A63CF7C178
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:38:26 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; t=1653427341; cv=none; 
         d=zohomail.eu; s=zohoarc; 
-        b=RDDY9bThuyuptIf+ctqCWHQ+TX2DXrCRDM475nm00NC9aIXdMxh8kCFdzYARvieGZjc1UbwDkHu8DK8hmH4cwhfBTIek/TxRuOHHOJCXECu2EaaFSpYA1bFEfZ8j+FnXWcD2lQOQlydnRAH90Mu0PmiEvPF6nqYA5DnAaB0BGks=
+        b=b0vA92DoaPGCbvh5GAQDzhj1RCYG3rkzYb53XhGgWwjAavb8ZmW2JW2ea/EpUjRtgISSz5QuEO1+8hlKd9G/4tfL+vDfewikWr+8j7gOSSbUINqSkTi/9jsGQzH+pLofSmSs8Nou+zjLqPo4+gSBCIsOkGvmSwTk1uxzOV5a1bw=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
-        t=1653427341; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
-        bh=eUsYtGvjMVMeiJbcfkFwYYtNYc+bXWXsUkZz7xnU2AE=; 
-        b=bx7m7ovII/BQ4+3ZQfx9WOO/sNeWbeEGaMPNItlzzN5+mm1hf5CxuMtuPyNSRGxnvF3tq/aoGLlFkIBdmXjNg5GQgvOEHs+lG86eyJK6XMQ76o7wSZAwKF6VoxioQRzAyRs3io4aMKhMY//taRESiiOf0UmifqLiwaQDkRe5cn8=
+        t=1653427341; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=mGz9geOh9bVL8VNTmK+t7n+LCbps3NKlP/XHOE2cdBw=; 
+        b=JEUXSn1ZMumJ6Oyn2vEVEr/EKWQljGc/Rc3dtTbq7jsdn+guzK8uhRx9fuz/Duz/PDZAuspWC7dRl/D0q3OQJ5Ej04EJ+zeOXN4yK2aByeCuXOxr5xvdPHe+nrHiPp45zgR2EjPH0C3N2PNncKDNOsdc+qPUO5Wn7ve+/oyQzio=
 ARC-Authentication-Results: i=1; mx.zohomail.eu;
         spf=pass  smtp.mailfrom=hostmaster@neglo.de;
         dmarc=pass header.from=<bage@debian.org>
 Received: from localhost.localdomain (port-92-194-239-176.dynamic.as20676.net [92.194.239.176]) by mx.zoho.eu
-        with SMTPS id 165342733992663.21335406305718; Tue, 24 May 2022 23:22:19 +0200 (CEST)
+        with SMTPS id 1653427340856773.1976815347725; Tue, 24 May 2022 23:22:20 +0200 (CEST)
 From:   Bastian Germann <bage@debian.org>
 To:     Rob Herring <robh+dt@kernel.org>,
         Maxime Ripard <mripard@kernel.org>,
@@ -39,12 +38,14 @@ To:     Rob Herring <robh+dt@kernel.org>,
         Jakub Kicinski <kubakici@wp.pl>, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Cc:     Bastian Germann <bage@debian.org>,
-        Vasily Khoruzhick <anarsoul@gmail.com>
-Message-ID: <20220524212155.16944-1-bage@debian.org>
-Subject: [PATCH v2 0/3] arm64: allwinner: a64: add bluetooth support for Pinebook
-Date:   Tue, 24 May 2022 23:21:51 +0200
+Cc:     Vasily Khoruzhick <anarsoul@gmail.com>,
+        Bastian Germann <bage@debian.org>
+Message-ID: <20220524212155.16944-2-bage@debian.org>
+Subject: [PATCH v2 1/3] Bluetooth: Add new quirk for broken local ext features max_page
+Date:   Tue, 24 May 2022 23:21:52 +0200
 X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220524212155.16944-1-bage@debian.org>
+References: <20220524212155.16944-1-bage@debian.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8BIT
 Content-Type: text/plain; charset=utf8
@@ -52,34 +53,55 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Pinebook uses RTL8723CS for WiFi and bluetooth. Unfortunately RTL8723CS
-has broken BT-4.1 support, so it requires a quirk.
+From: Vasily Khoruzhick <anarsoul@gmail.com>
 
-Add a quirk, wire up 8723CS support in btrtl and enable bluetooth
-in Pinebook dts.
+Some adapters (e.g. RTL8723CS) advertise that they have more than
+2 pages for local ext features, but they don't support any features
+declared in these pages. RTL8723CS reports max_page = 2 and declares
+support for sync train and secure connection, but it responds with
+either garbage or with error in status on corresponding commands.
 
-This series was sent in July 2020 by Vasily Khoruzhick.
-This is a rebase on the current tree.
-I have tested it to work on the Pinebook.
+Signed-off-by: Vasily Khoruzhick <anarsoul@gmail.com>
+[rebase on current tree]
+Signed-off-by: Bastian Germann <bage@debian.org>
+---
+ include/net/bluetooth/hci.h | 7 +++++++
+ net/bluetooth/hci_event.c   | 4 +++-
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-Changelog:
-v2:
-   * Rebase
-   * Add uart-has-rtscts to device tree as requested by reviewer
-
-Vasily Khoruzhick (3):
-  Bluetooth: Add new quirk for broken local ext features max_page
-  Bluetooth: btrtl: add support for the RTL8723CS
-  arm64: allwinner: a64: enable Bluetooth On Pinebook
-
- .../dts/allwinner/sun50i-a64-pinebook.dts     |  13 ++
- drivers/bluetooth/btrtl.c                     | 120 +++++++++++++++++-
- drivers/bluetooth/btrtl.h                     |   5 +
- drivers/bluetooth/hci_h5.c                    |   4 +
- include/net/bluetooth/hci.h                   |   7 +
- net/bluetooth/hci_event.c                     |   4 +-
- 6 files changed, 148 insertions(+), 5 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 69ef31cea582..af26e8051905 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -265,6 +265,13 @@ enum {
+ 	 * runtime suspend, because event filtering takes place there.
+ 	 */
+ 	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
++
++	/* When this quirk is set, max_page for local extended features
++	 * is set to 1, even if controller reports higher number. Some
++	 * controllers (e.g. RTL8723CS) report more pages, but they
++	 * don't actually support features declared there.
++	 */
++	HCI_QUIRK_BROKEN_LOCAL_EXT_FTR_MAX_PAGE,
+ };
+ 
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 66451661283c..52b358c33344 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -837,7 +837,9 @@ static u8 hci_cc_read_local_ext_features(struct hci_dev *hdev, void *data,
+ 	if (rp->status)
+ 		return rp->status;
+ 
+-	if (hdev->max_page < rp->max_page)
++	if (!test_bit(HCI_QUIRK_BROKEN_LOCAL_EXT_FTR_MAX_PAGE,
++		      &hdev->quirks) &&
++	    hdev->max_page < rp->max_page)
+ 		hdev->max_page = rp->max_page;
+ 
+ 	if (rp->page < HCI_MAX_PAGES)
 -- 
 2.36.1
 
