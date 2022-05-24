@@ -2,77 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762B8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87E7AC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 May 2022 21:38:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241899AbiEXVVe (ORCPT
+        id S241939AbiEXViZ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 May 2022 17:21:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48842 "EHLO
+        Tue, 24 May 2022 17:38:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241900AbiEXVVc (ORCPT
+        with ESMTP id S241945AbiEXViX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 May 2022 17:21:32 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AF0D37A0B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:21:32 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id y199so17510745pfb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:21:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=8LVh5+uHWDfw3tFgRQN+VQcoc4Kz7ETRMta9HJRagE4=;
-        b=ji3FdMFqIbZFfZBEfv3Y+ltTybqA7UMCmJ1ViBwfZTMDm4eAwHw2xTuIxZb0vJ5aCg
-         +FqK/QM3+ZZ+IrtKHSygIXoroTcTzq9iW34GoBWD+ebRqj6u9K8qa4SQUCAOXQoOAZJn
-         qIxGA64BzapaLFUKnZQWn/qWSYPn+5Ka7BGVEvBfrrJJAFa7OL4y5ug5K61RNtF2DzV0
-         YBjAIz0TlB4Jv150ylgNNo/2cDSG6x7kwelEsP8FONIVnqcMunyU7o2cAwyW/Kdk89hr
-         R/fyIevGJZ928M9rDN3+rfJwrpNYJbsS0HhtbZzXKq4/2uiJDoAl15I0+vIzh9r4j9RL
-         KCVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=8LVh5+uHWDfw3tFgRQN+VQcoc4Kz7ETRMta9HJRagE4=;
-        b=x60sR5WCCf91g511aaKQ+vYMkJli3c47nXEGmKjPDz30f+Zbgbozq2rX0VL8WKkpSy
-         YzrrwfC1MZ9e5X445gFH2JBFxGiktLIVCUwaLXebRo9MFxN0DhYOZUqkrBcTv329n8PN
-         +BwXnJpKoWqSGUVAFAEKfmh+B8L2KeExDxvbdQ69qqDxgFxpKF8IiKv1jVFMEeT/oxUj
-         Ikxv7mYlVBYgwNPxJ+Ka9ou5CGi/ziEeRK+yND3yEDWlNw2cL1K2y/IBVLxdWTOtI9RP
-         fex0O9gA8QWzcwqbL0aWvBHedYS78suNc1F9a70lLZmNHaUktCAnAjthNsIllSCqxAkJ
-         5cCg==
-X-Gm-Message-State: AOAM530LkcbUHKdvgo0RskYE2dlSOTgkfcQAW+0WUMJkadufjtx5vsVC
-        1PX2AHbu9LMfArwL02sKwgI/gQ==
-X-Google-Smtp-Source: ABdhPJyWaSA+5br2d2z/7q3xuvUYQFFdmCTh3SJeuCbrgyqGCp7VmnVaoOaxueoo6EM5HlDEuxV9YQ==
-X-Received: by 2002:aa7:82d9:0:b0:4fa:2c7f:41e with SMTP id f25-20020aa782d9000000b004fa2c7f041emr30730013pfn.1.1653427291489;
-        Tue, 24 May 2022 14:21:31 -0700 (PDT)
-Received: from hermes.local (204-195-112-199.wavecable.com. [204.195.112.199])
-        by smtp.gmail.com with ESMTPSA id s32-20020a056a0017a000b0050dc762814asm9986464pfg.36.2022.05.24.14.21.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 14:21:31 -0700 (PDT)
-Date:   Tue, 24 May 2022 14:21:28 -0700
-From:   Stephen Hemminger <stephen@networkplumber.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH-stable] Bluetooth: eir: Fix using strlen with
- hdev->{dev_name,short_name}
-Message-ID: <20220524142128.01acb75a@hermes.local>
-In-Reply-To: <CABBYNZKZajJyuenwyv+1T6Gt1SYyLz39yMJF9_LYdTubk+e_rw@mail.gmail.com>
-References: <20220524202630.3569412-1-luiz.dentz@gmail.com>
-        <CABBYNZKZajJyuenwyv+1T6Gt1SYyLz39yMJF9_LYdTubk+e_rw@mail.gmail.com>
+        Tue, 24 May 2022 17:38:23 -0400
+X-Greylist: delayed 917 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 24 May 2022 14:38:22 PDT
+Received: from sender11-of-o53.zoho.eu (sender11-of-o53.zoho.eu [31.186.226.239])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985F57C173
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 May 2022 14:38:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1653427341; cv=none; 
+        d=zohomail.eu; s=zohoarc; 
+        b=RDDY9bThuyuptIf+ctqCWHQ+TX2DXrCRDM475nm00NC9aIXdMxh8kCFdzYARvieGZjc1UbwDkHu8DK8hmH4cwhfBTIek/TxRuOHHOJCXECu2EaaFSpYA1bFEfZ8j+FnXWcD2lQOQlydnRAH90Mu0PmiEvPF6nqYA5DnAaB0BGks=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.eu; s=zohoarc; 
+        t=1653427341; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=eUsYtGvjMVMeiJbcfkFwYYtNYc+bXWXsUkZz7xnU2AE=; 
+        b=bx7m7ovII/BQ4+3ZQfx9WOO/sNeWbeEGaMPNItlzzN5+mm1hf5CxuMtuPyNSRGxnvF3tq/aoGLlFkIBdmXjNg5GQgvOEHs+lG86eyJK6XMQ76o7wSZAwKF6VoxioQRzAyRs3io4aMKhMY//taRESiiOf0UmifqLiwaQDkRe5cn8=
+ARC-Authentication-Results: i=1; mx.zohomail.eu;
+        spf=pass  smtp.mailfrom=hostmaster@neglo.de;
+        dmarc=pass header.from=<bage@debian.org>
+Received: from localhost.localdomain (port-92-194-239-176.dynamic.as20676.net [92.194.239.176]) by mx.zoho.eu
+        with SMTPS id 165342733992663.21335406305718; Tue, 24 May 2022 23:22:19 +0200 (CEST)
+From:   Bastian Germann <bage@debian.org>
+To:     Rob Herring <robh+dt@kernel.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kubakici@wp.pl>, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Cc:     Bastian Germann <bage@debian.org>,
+        Vasily Khoruzhick <anarsoul@gmail.com>
+Message-ID: <20220524212155.16944-1-bage@debian.org>
+Subject: [PATCH v2 0/3] arm64: allwinner: a64: add bluetooth support for Pinebook
+Date:   Tue, 24 May 2022 23:21:51 +0200
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=utf8
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 24 May 2022 13:55:57 -0700
-Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+Pinebook uses RTL8723CS for WiFi and bluetooth. Unfortunately RTL8723CS
+has broken BT-4.1 support, so it requires a quirk.
 
-> Here is a tentative fix, I do wonder though why you were trying to set
-> the name directly and not using the likes of bluetoothctl/btmgmt?
-> bluetoothd don't seem to bother setting a shortname so it is probably
-> not reproducible with it but btmgmt does:
+Add a quirk, wire up 8723CS support in btrtl and enable bluetooth
+in Pinebook dts.
 
-Not me. I just forward reports from bugzilla.
-Any networking related bug reports end up going to me, and I filter/forward them.
+This series was sent in July 2020 by Vasily Khoruzhick.
+This is a rebase on the current tree.
+I have tested it to work on the Pinebook.
+
+Changelog:
+v2:
+   * Rebase
+   * Add uart-has-rtscts to device tree as requested by reviewer
+
+Vasily Khoruzhick (3):
+  Bluetooth: Add new quirk for broken local ext features max_page
+  Bluetooth: btrtl: add support for the RTL8723CS
+  arm64: allwinner: a64: enable Bluetooth On Pinebook
+
+ .../dts/allwinner/sun50i-a64-pinebook.dts     |  13 ++
+ drivers/bluetooth/btrtl.c                     | 120 +++++++++++++++++-
+ drivers/bluetooth/btrtl.h                     |   5 +
+ drivers/bluetooth/hci_h5.c                    |   4 +
+ include/net/bluetooth/hci.h                   |   7 +
+ net/bluetooth/hci_event.c                     |   4 +-
+ 6 files changed, 148 insertions(+), 5 deletions(-)
+
+-- 
+2.36.1
+
+
