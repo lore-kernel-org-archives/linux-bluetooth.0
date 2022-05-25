@@ -2,91 +2,355 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE254C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 08:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D33D5C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 10:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235153AbiEYIQh (ORCPT
+        id S236230AbiEYKp6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 May 2022 04:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50042 "EHLO
+        Wed, 25 May 2022 06:45:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240601AbiEYIQO (ORCPT
+        with ESMTP id S235505AbiEYKp4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 May 2022 04:16:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 437B98D6AA
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 01:15:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 891F8B81CEF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 08:15:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C8DCC34116
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 08:15:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653466544;
-        bh=5Bxb9Y5raTZY/PZHJSesbwXMRczA0OeCHz5xiIqVrEA=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=G3IyuTIL7PJDwu3uq/meu8YrK9ezgpOciXavqzPfTEnpZufmvDBZRR6zaDdgzZFD5
-         vbNIqCXJ7sxtOzSZLUbrXZnCfoKa9jT+aMpuSGqNuaLQuA9LwK6SJp10hYwxTWCJwp
-         xDf3ASfK9s2fwMchdOwRYujEWURkS3htN0rA2e9XLS+lNP5KnlsRv6TTOT26tAxUnH
-         u881T0JdATycf9p+f8EgN3ftH++3Mi7jGh39fHCygM1L2EJxcXwmeNhO6rMSOtwAsZ
-         5mDyM2e+Z9abY3YrxqbM+QV7FqiiunPGYcjCeRO0wxOs54oC2t4T/KK7/fs+0RCrb+
-         Tk/3nq8dDNjdA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id E5452C05FD5; Wed, 25 May 2022 08:15:43 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216022] JBL Live 660NC
-Date:   Wed, 25 May 2022 08:15:43 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: INVALID
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216022-62941-dEIP6LxEI0@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216022-62941@https.bugzilla.kernel.org/>
-References: <bug-216022-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 25 May 2022 06:45:56 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD86A996A7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:45:54 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id p8so18870777pfh.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eZHHJ8xZ0WLnM7kImTEfhllSgT1hYk7RJ6GDlALdclU=;
+        b=kIwQ0plu4qoXAnCshP2TSrFMPv3H7erjIb4M8UZRo0gPSgdP4mlHQ4ZSXgCGx1b7Yt
+         CfApB0TbHw5L4fq+ZFp0SLG3YuxVMbpDyKUPru2o76+7mB+KvWU8Ngf1kQyAgN0gTBP5
+         VRqqfQfBduqFCgV+eSEGwbTGTEK4dePoYvk+U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eZHHJ8xZ0WLnM7kImTEfhllSgT1hYk7RJ6GDlALdclU=;
+        b=Eux2GjVkuTQBe8oDsTNS9UDsXtfNTqpsnOmaEazcr4FFJHEoV30qG0NIMJZ3yqn3+Y
+         e2cfeikQRfe5/sY/EucvDymDrsQObg1T2rPwQzDeW12QqPr0zoT2h3/0hHgn6Xch5YO4
+         JjfVzTc2dyO1yZxYKbG/swrvY8PebPh/4duEymNGCZluc6uCR/v+ZJx/DJof4Ts4Syv3
+         Teqxj4wszr+pbGYJEEN1Fw7EpdGIeBTCztVNdUavNrOKpwcwHaTIbb59RC2aNt0nML+H
+         QHc0sAADfaZm5vUAy3gYimCzSrBIVR8JJH1Czb4KU6WaKFWKu6xaN4CYwWBU8X9CsImd
+         2TAQ==
+X-Gm-Message-State: AOAM531/XrOmoJUyFZfItlpi5wxSnkrYMFQuu98fgwDpFzKPGmJO2tv4
+        1F3cwdbAQ+wGNjL1+1nbOCGP7WHL64d/1A==
+X-Google-Smtp-Source: ABdhPJzJj4xTqY5JKJDxbBncKjKBUh4qwknmOLSqdd/djycNTbStDWrdY3V22flQf8h+rzraqTWtXg==
+X-Received: by 2002:a63:535c:0:b0:3db:69da:1ef7 with SMTP id t28-20020a63535c000000b003db69da1ef7mr28668131pgl.239.1653475553811;
+        Wed, 25 May 2022 03:45:53 -0700 (PDT)
+Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
+        by smtp.gmail.com with UTF8SMTPSA id f7-20020a6547c7000000b003db8691008esm8006519pgs.12.2022.05.25.03.45.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 May 2022 03:45:53 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
+        Joseph Hwang <josephsih@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v5 1/5] Bluetooth: mgmt: add MGMT_OP_SET_QUALITY_REPORT for quality report
+Date:   Wed, 25 May 2022 18:45:41 +0800
+Message-Id: <20220525104545.2314653-1-josephsih@chromium.org>
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216022
+This patch adds a new set_quality_report mgmt handler to set
+the quality report feature. The feature is removed from the
+experimental features at the same time.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+---
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |INVALID
+Changes in v5:
+- This patch becomes the first patch.
+- Remove useless hdev check in get_supported_settings().
+- An additional patch will make quality report survive power off/on
+  cycles.
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-Bluetooth has two major audio profiles:
+Changes in v4:
+- return current settings for set_quality_report.
 
-* High Fidelity Playback (only for playing audio, mic is not available)
-* Headset Head Unit (horrible audio quality, only suitable for making calls,
-mic is available)
+Changes in v3:
+- This is a new patch to enable the quality report feature.
+  The reading and setting of the quality report feature are
+  removed from the experimental features.
 
-Looks like you're using the first and naturally there will be no microphone
-available.
+ include/net/bluetooth/mgmt.h |   7 ++
+ net/bluetooth/mgmt.c         | 167 +++++++++++++++--------------------
+ 2 files changed, 80 insertions(+), 94 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7c1ad0f6fcec..c1c2fd72d9e3 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -109,6 +109,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
+ #define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
++#define MGMT_SETTING_QUALITY_REPORT	0x00040000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -838,6 +839,12 @@ struct mgmt_cp_add_adv_patterns_monitor_rssi {
+ } __packed;
+ #define MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE	8
+ 
++#define MGMT_OP_SET_QUALITY_REPORT		0x0057
++struct mgmt_cp_set_quality_report {
++	__u8	action;
++} __packed;
++#define MGMT_SET_QUALITY_REPORT_SIZE		1
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d2d390534e54..1ad84f34097f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -857,6 +857,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 
+ 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
+ 
++	if (aosp_has_quality_report(hdev) || hdev->set_quality_report)
++		settings |= MGMT_SETTING_QUALITY_REPORT;
++
+ 	return settings;
+ }
+ 
+@@ -928,6 +931,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
+ 		settings |= MGMT_SETTING_WIDEBAND_SPEECH;
+ 
++	if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
++		settings |= MGMT_SETTING_QUALITY_REPORT;
++
+ 	return settings;
+ }
+ 
+@@ -3901,12 +3907,6 @@ static const u8 debug_uuid[16] = {
+ };
+ #endif
+ 
+-/* 330859bc-7506-492d-9370-9a6f0614037f */
+-static const u8 quality_report_uuid[16] = {
+-	0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
+-	0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
+-};
+-
+ /* a6695ace-ee7f-4fb9-881a-5fac66c629af */
+ static const u8 offload_codecs_uuid[16] = {
+ 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f, 0x1a, 0x88,
+@@ -3928,7 +3928,7 @@ static const u8 rpa_resolution_uuid[16] = {
+ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				  void *data, u16 data_len)
+ {
+-	char buf[102];   /* Enough space for 5 features: 2 + 20 * 5 */
++	char buf[82];   /* Enough space for 4 features: 2 + 20 * 4 */
+ 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
+ 	u16 idx = 0;
+ 	u32 flags;
+@@ -3969,18 +3969,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
+ 	}
+ 
+-	if (hdev && (aosp_has_quality_report(hdev) ||
+-		     hdev->set_quality_report)) {
+-		if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
+-			flags = BIT(0);
+-		else
+-			flags = 0;
+-
+-		memcpy(rp->features[idx].uuid, quality_report_uuid, 16);
+-		rp->features[idx].flags = cpu_to_le32(flags);
+-		idx++;
+-	}
+-
+ 	if (hdev && hdev->get_data_path_id) {
+ 		if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
+ 			flags = BIT(0);
+@@ -4193,80 +4181,6 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
+-				   struct mgmt_cp_set_exp_feature *cp,
+-				   u16 data_len)
+-{
+-	struct mgmt_rp_set_exp_feature rp;
+-	bool val, changed;
+-	int err;
+-
+-	/* Command requires to use a valid controller index */
+-	if (!hdev)
+-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_INDEX);
+-
+-	/* Parameters are limited to a single octet */
+-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+-	/* Only boolean on/off is supported */
+-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+-	hci_req_sync_lock(hdev);
+-
+-	val = !!cp->param[0];
+-	changed = (val != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
+-
+-	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
+-		err = mgmt_cmd_status(sk, hdev->id,
+-				      MGMT_OP_SET_EXP_FEATURE,
+-				      MGMT_STATUS_NOT_SUPPORTED);
+-		goto unlock_quality_report;
+-	}
+-
+-	if (changed) {
+-		if (hdev->set_quality_report)
+-			err = hdev->set_quality_report(hdev, val);
+-		else
+-			err = aosp_set_quality_report(hdev, val);
+-
+-		if (err) {
+-			err = mgmt_cmd_status(sk, hdev->id,
+-					      MGMT_OP_SET_EXP_FEATURE,
+-					      MGMT_STATUS_FAILED);
+-			goto unlock_quality_report;
+-		}
+-
+-		if (val)
+-			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
+-		else
+-			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+-	}
+-
+-	bt_dev_dbg(hdev, "quality report enable %d changed %d", val, changed);
+-
+-	memcpy(rp.uuid, quality_report_uuid, 16);
+-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
+-
+-	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_EXP_FEATURE, 0,
+-				&rp, sizeof(rp));
+-
+-	if (changed)
+-		exp_feature_changed(hdev, quality_report_uuid, val, sk);
+-
+-unlock_quality_report:
+-	hci_req_sync_unlock(hdev);
+-	return err;
+-}
+-
+ static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
+ 				  struct mgmt_cp_set_exp_feature *cp,
+ 				  u16 data_len)
+@@ -4393,7 +4307,6 @@ static const struct mgmt_exp_feature {
+ 	EXP_FEAT(debug_uuid, set_debug_func),
+ #endif
+ 	EXP_FEAT(rpa_resolution_uuid, set_rpa_resolution_func),
+-	EXP_FEAT(quality_report_uuid, set_quality_report_func),
+ 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
+ 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
+ 
+@@ -8664,6 +8577,71 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
+ 				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
+ }
+ 
++static int set_quality_report(struct sock *sk, struct hci_dev *hdev,
++			      void *data, u16 data_len)
++{
++	struct mgmt_cp_set_quality_report *cp = data;
++	bool enable, changed;
++	int err;
++
++	/* Command requires to use a valid controller index */
++	if (!hdev)
++		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++				       MGMT_OP_SET_QUALITY_REPORT,
++				       MGMT_STATUS_INVALID_INDEX);
++
++	/* Only 0 (off) and 1 (on) is supported */
++	if (cp->action != 0x00 && cp->action != 0x01)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_QUALITY_REPORT,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	hci_req_sync_lock(hdev);
++
++	enable = !!cp->action;
++	changed = (enable != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
++
++	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_QUALITY_REPORT,
++				      MGMT_STATUS_NOT_SUPPORTED);
++		goto unlock_quality_report;
++	}
++
++	if (changed) {
++		if (hdev->set_quality_report)
++			err = hdev->set_quality_report(hdev, enable);
++		else
++			err = aosp_set_quality_report(hdev, enable);
++
++		if (err) {
++			err = mgmt_cmd_status(sk, hdev->id,
++					      MGMT_OP_SET_QUALITY_REPORT,
++					      MGMT_STATUS_FAILED);
++			goto unlock_quality_report;
++		}
++
++		if (enable)
++			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
++		else
++			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
++	}
++
++	bt_dev_dbg(hdev, "quality report enable %d changed %d",
++		   enable, changed);
++
++	err = send_settings_rsp(sk, MGMT_OP_SET_QUALITY_REPORT, hdev);
++	if (err < 0)
++		goto unlock_quality_report;
++
++	if (changed)
++		err = new_settings(hdev, sk);
++
++unlock_quality_report:
++	hci_req_sync_unlock(hdev);
++	return err;
++}
++
+ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ NULL }, /* 0x0000 (no command) */
+ 	{ read_version,            MGMT_READ_VERSION_SIZE,
+@@ -8790,6 +8768,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ add_adv_patterns_monitor_rssi,
+ 				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ set_quality_report,      MGMT_SET_QUALITY_REPORT_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
+-- 
+2.36.1.124.g0e6072fb45-goog
 
-You are receiving this mail because:
-You are the assignee for the bug.=
