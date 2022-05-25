@@ -2,86 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 314E3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 13:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA1F2C43217
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 20:07:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244390AbiEYNoi (ORCPT
+        id S242983AbiEYUHV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 May 2022 09:44:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43664 "EHLO
+        Wed, 25 May 2022 16:07:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232257AbiEYNog (ORCPT
+        with ESMTP id S1345032AbiEYUHS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 May 2022 09:44:36 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F22DE6D4CD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 06:44:35 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9E413B81DA7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 13:44:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3B287C341C8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 13:44:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653486273;
-        bh=LuEpDBeoWyctO/QDazVxXkKavraxhYnlorElPm+TaDA=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=j1aNPwuSVwB/1Jqqe9OqusvyWcSMIzPWtaq770ci8a7dJq/tfV0+S2GoIpdamagC4
-         n+Hqa04IXhVqYEhbBMK6il6OlOzSDN+FdZF6uu/7846qVxjlYoBWgbn7F1bp/pKLQl
-         0ByE5mZyGAqZk5BMHa7sOZ5qC6myAzL0Nn0+sqyUl4KARoAk28PByii9ncb/AGkJL4
-         k6iRaeDmiGoRQilcvpwf6GUZtZBZrobJ3lQYLFd40N5q3DstArSmSsaBy4CuTHvWbI
-         Ahnzkjot+fhbJof2b3HT3Y1ygp7OciSiT8MsgRxsKw41dnAdBfZW62Wi8o3ItocqCN
-         4oPf7Ht19voWg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2AEABCC13B4; Wed, 25 May 2022 13:44:33 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Wed, 25 May 2022 16:07:18 -0400
+Received: from smtp.github.com (out-17.smtp.github.com [192.30.252.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3A86B7E0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 13:07:11 -0700 (PDT)
+Received: from github.com (hubbernetes-node-225289b.va3-iad.github.net [10.48.125.47])
+        by smtp.github.com (Postfix) with ESMTPA id 011C05C0D13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 13:07:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1653509231;
+        bh=mmWWs0eEk7OfZnuvSZcAaGySefUgd3Z5OhBZa9La0kY=;
+        h=Date:From:To:Subject:From;
+        b=vqxbwrSyML+CzljkM3v4Iq1oy1B7BDsazZWzzXWd5bz/LyFWkk8QeiWLGgdpz4qDA
+         kPEC2eQpvRvLNHP0EdDtTCd+YFc3OREvS08xNLL71x24I7O7o/zIbywkuyYirAsN0Q
+         s9e/tfA5nj5VSwjfhCI5cUFzRQZ/ykls/pmqmMHs=
+Date:   Wed, 25 May 2022 13:07:10 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Wed, 25 May 2022 13:44:32 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jmennius@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215167-62941-OMm4E2smZY@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
-References: <bug-215167-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+Message-ID: <bluez/bluez/push/refs/heads/master/79fe52-1ffd74@github.com>
+Subject: [bluez/bluez] 2894f1: monitor/att: Attempt to reload if database is
+ empty
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2894f1392fbe5e570039e9a753c7065cb8fcbf01
+      https://github.com/bluez/bluez/commit/2894f1392fbe5e570039e9a753c7065cb8fcbf01
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-05-25 (Wed, 25 May 2022)
 
---- Comment #36 from Ievgen Popovych (jmennius@gmail.com) ---
-I was just looping suspend (mem_sleep deep) trying to reproduce with btmon
-trace - no luck (13 times).
+  Changed paths:
+    M monitor/att.c
 
-I've noticed that
-> kernel: Bluetooth: hci0: command 0x0c01 tx timeout
-> kernel: Bluetooth: hci0: Opcode 0x c01 failed: -110
-and
-> kernel: Bluetooth: hci0: command 0x0c1a tx timeout
-> kernel: Bluetooth: hci0: Opcode 0x c1a failed: -110
-occur when exiting suspend and BT is working fine.
+  Log Message:
+  -----------
+  monitor/att: Attempt to reload if database is empty
 
---=20
-You may reply to this email to add a comment.
+If database is empty attempt to reload since the daemon may have
+updated its cache in the meantime.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+  Commit: 1ffd74a6d4212a165763dc53e58a1b49b6fc5a98
+      https://github.com/bluez/bluez/commit/1ffd74a6d4212a165763dc53e58a1b49b6fc5a98
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-05-25 (Wed, 25 May 2022)
+
+  Changed paths:
+    M monitor/att.c
+    M monitor/l2cap.h
+
+  Log Message:
+  -----------
+  monitor/att: Fix parsing of notifications
+
+If there are multiple notifications in the same frame the callback may
+alter it when using l2cap_frame_pull helpers, so instead this passes a
+cloned frame with just the expected length so callbacks cannot alter
+original frame.
+
+
+Compare: https://github.com/bluez/bluez/compare/79fe529d6485...1ffd74a6d421
