@@ -2,172 +2,179 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA22C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 10:46:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CB51C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 May 2022 10:50:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242959AbiEYKqe (ORCPT
+        id S229736AbiEYKub (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 May 2022 06:46:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53400 "EHLO
+        Wed, 25 May 2022 06:50:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242566AbiEYKq1 (ORCPT
+        with ESMTP id S229604AbiEYKua (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 May 2022 06:46:27 -0400
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58100D9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:46:09 -0700 (PDT)
-Received: by mail-pl1-x629.google.com with SMTP id q4so18212504plr.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:46:09 -0700 (PDT)
+        Wed, 25 May 2022 06:50:30 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596FC1C6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:50:29 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id gk22so922237pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 03:50:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=nfd8GuZibV93hv9RFZEH/5/7YZjQFYEI7fvZmGryy4s=;
-        b=TfAvOXi/gD7eAIll7QchzF7Eta8mzPE79DQuQGqufw9MAXxEiSBkUhihxhjy4hVKku
-         Ww6UrrdG8O2dEu71e4mxTyAq68P3xddG05R270g4Jq+MiOX6Ty6F43Xii72x4LZkgUS4
-         QfN498OGx3DN3QY0WPRX0i9eYTrnyKFkAVBVo=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/S9U3Gf8VokdT11z/FTy2YkWPpZtI3hDdvP6QmYOARw=;
+        b=kAAkzLjGVsaTeOmvN4qaWDZxsyzTbN6+/fJ2VbXIm7HBUjxtomGjv87eFXypj7GB/m
+         DUHGdaj0uK4yOsPP6HwTXL6XoTThWcfmR3qQLzERH9rNeW6+8k0LK5wmg8LIXEugKJ0/
+         yPQwEin6hCqvVd10Ei8lqjXPxJzfL4JNHEsYo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=nfd8GuZibV93hv9RFZEH/5/7YZjQFYEI7fvZmGryy4s=;
-        b=Xo9Jr0mAnOCBlItSPBqxAMGW6cgu+EJYU7INgxHPef+6DvbA02CmzftR+485gEPG9Z
-         0zFKG8XbxMhA7Z8FNh3IGuh7Z9wz531DLjHkRUakB2mvzp/N/hkCPkvJXwOK07LZGmbc
-         9ILIXr/Hjdi3rIPPFCuY9P7549OnjDaKFEcbrP0KSPX4zLpthteWyjWnLqwxL1lkUMru
-         cAWEfvSfOAfYvJs+gIRLFvVV+lF3Khnv8vJCNPrtJSm1saN9OxrOiZ9Ly3eZTgDQ+/rR
-         oBIWlZ2MPd9zpj5vudlFYIuTO8Cr2MPIKJkQhEsAeIw+1pUKxvSDzJPHh38Wy2TD3l16
-         Sk7A==
-X-Gm-Message-State: AOAM532AxCLS52rIhE4101AmaBzg5iCWtQ8ifGDsPZwgWDdtVansqq1f
-        8s8/MkEttqz2dE4th7KfJkKqCmwkRUac7w==
-X-Google-Smtp-Source: ABdhPJx+kR3HjBYxdXGooCC+ftVmy/otgl5MmgHXHeoEREOhHWmbCkk17kKT61UumNXFsaWtKwwJGw==
-X-Received: by 2002:a17:90b:4f81:b0:1e0:7643:36ae with SMTP id qe1-20020a17090b4f8100b001e0764336aemr8297282pjb.124.1653475568108;
-        Wed, 25 May 2022 03:46:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/S9U3Gf8VokdT11z/FTy2YkWPpZtI3hDdvP6QmYOARw=;
+        b=7gNhTYOQcA4iT1CQoLmx3sR7Kx86RVxgSiaAj3uhS0UYu92eTL2oZgjHJCOeAWgUXN
+         +k+vw6DvcEP7RGrk1BUfHPOA+BybXwRCVl1fTUJPOV5bs1no+FL06ntEZfOKeC3UZ7CX
+         5JCi0X1oCPyRL6aC7OLFjmupppkMJtT+UJqalRbCv0j5X7VcBKQ12Gr3xvdHiaU3mliT
+         DS1DR30RqQPCO+YtdGHkudo/OSafABQ6lnLW7hp+jPfFL8VjVZY6fw35o2O+DRsY1JaR
+         KYwAwxxa4BIk9+SC6T25SigHJFaJ8As6emzDnkzcJ+EqYXW3Om76+A2L8j92kd2yIsaD
+         l/lw==
+X-Gm-Message-State: AOAM530aX5JLBGg1cZG+cqkt96F6ZRE3G8/a2fwCottOVjno3TaxPt5l
+        Mjy9qftOC1rMmX8cvgOgx7nyaGpuWbpZ5g==
+X-Google-Smtp-Source: ABdhPJy6aQ7UjkSlbeV/TNGavDFllf6QGicJ5wDbD1QRqDuihIkMWWBE+2j7oJSysCT1jwz8IDDsOQ==
+X-Received: by 2002:a17:90b:3ecd:b0:1dc:945e:41b1 with SMTP id rm13-20020a17090b3ecd00b001dc945e41b1mr9815653pjb.208.1653475828702;
+        Wed, 25 May 2022 03:50:28 -0700 (PDT)
 Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id a21-20020a637055000000b003c14af505fesm8151397pgn.22.2022.05.25.03.46.05
+        by smtp.gmail.com with UTF8SMTPSA id z13-20020a056a00240d00b0050dc762819bsm11217510pfh.117.2022.05.25.03.50.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 May 2022 03:46:07 -0700 (PDT)
+        Wed, 25 May 2022 03:50:28 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
-Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
-        Joseph Hwang <josephsih@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v5 5/5] Bluetooth: let HCI_QUALITY_REPORT persist over adapter power cycle
-Date:   Wed, 25 May 2022 18:45:45 +0800
-Message-Id: <20220525104545.2314653-3-josephsih@chromium.org>
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>
+Subject: [BlueZ PATCH v5 1/8] doc: Introduce the quality report command and event
+Date:   Wed, 25 May 2022 18:50:08 +0800
+Message-Id: <20220525105015.2315987-1-josephsih@chromium.org>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
-In-Reply-To: <20220525104545.2314653-1-josephsih@chromium.org>
-References: <20220525104545.2314653-1-josephsih@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The quality report specifications, including AOSP Bluetooth Quality
-Report and Intel Telemetry Event, do not define what happen when
-the adapter is turned off and then on. To be consistent among
-different specifications and vendors, the quality report feature is
-turned off when the adapter is powered off and is turned on when
-the adapter is powered on if the feature has been on before power
-cycle.
+Add the MGMT quality report command and event in doc/mgmt-api.txt.
 
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 ---
 
 Changes in v5:
-- This is a new patch in this series changes version.
+- Use Quality_Report instead of Action in mgmt-api.txt.
+- Modify the description of Set Quality Report Command.
 
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_sync.c         | 35 +++++++++++++++++++++++++++++++-
- 2 files changed, 34 insertions(+), 2 deletions(-)
+Changes in v4:
+- Use "Quality Report Event" without the prefix "Bluetooth" word.
+- Combine both MGMT quality report command and event changes in a
+  single patch.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 9e48d606591e..5788350efa68 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -807,7 +807,6 @@ extern struct mutex hci_cb_list_lock;
- 		hci_dev_clear_flag(hdev, HCI_LE_ADV);		\
- 		hci_dev_clear_flag(hdev, HCI_LL_RPA_RESOLUTION);\
- 		hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);	\
--		hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);	\
- 	} while (0)
+Changes in v3:
+- Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
+- Add 5 new patches (5/9 - 9/9) to enable the quality report
+  feature via MGMT_OP_SET_QUALITY_REPORT instead of through the
+  experimental features.
+
+Changes in v2:
+- This is a new patch for adding the event in doc/mgmt-api.txt
+
+ doc/mgmt-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ebe56afa4..a429f0ef3 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -332,6 +332,7 @@ Read Controller Information Command
+ 		15	Static Address
+ 		16	PHY Configuration
+ 		17	Wideband Speech
++		18	Quality Report
  
- #define hci_dev_le_state_simultaneous(hdev) \
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index a6ada9dcede5..12a18d046bb6 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3849,6 +3849,31 @@ static const struct {
- 			 "advertised, but not supported.")
- };
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -2924,6 +2925,7 @@ Read Extended Controller Information Command
+ 		15	Static Address
+ 		16	PHY Configuration
+ 		17	Wideband Speech
++		18	Quality Report
  
-+static void suspend_resume_quality_report(struct hci_dev *hdev, bool enable)
-+{
-+	int err;
+ 	The EIR_Data field contains information about class of device,
+ 	local name and other values. Not all of them might be present. For
+@@ -3858,6 +3860,45 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
+ 				Invalid Parameters
+ 
+ 
++Set Quality Report Command
++==========================
 +
-+	/* Suspend and resume quality report only when the feature has
-+	 * already been enabled. The HCI_QUALITY_REPORT flag, as an indicator
-+	 * whether to re-enable the feature after resume, is not changed by
-+	 * suspend/resume.
-+	 */
-+	if (!hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
-+		return;
++	Command Code:		0x0057
++	Controller Index:	<controller id>
++	Command Parameters:	Quality_Report (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
 +
-+	if (hdev->set_quality_report)
-+		err = hdev->set_quality_report(hdev, enable);
-+	else
-+		err = aosp_set_quality_report(hdev, enable);
++	This command is used to enable and disable the controller's quality
++	report feature. The allowed values for the Quality_Report command
++	parameter are 0x00 and 0x01. All other values will return Invalid
++	Parameters.
 +
-+	if (err)
-+		bt_dev_err(hdev, "%s quality report error %d",
-+			   enable ? "resume" : "suspend", err);
-+	else
-+		bt_dev_info(hdev, "%s quality report",
-+			    enable ? "resume" : "suspend");
-+}
++	The value 0x00 disables the Quality Report, and the value 0x01
++	enables the Quality Report feature.
 +
- int hci_dev_open_sync(struct hci_dev *hdev)
- {
- 	int ret = 0;
-@@ -4013,6 +4038,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
- 		msft_do_open(hdev);
- 		aosp_do_open(hdev);
-+		suspend_resume_quality_report(hdev, true);
- 	}
- 
- 	clear_bit(HCI_INIT, &hdev->flags);
-@@ -4095,6 +4121,14 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 
- 	hci_request_cancel_all(hdev);
- 
-+	/* Disable quality report and close aosp before shutdown()
-+	 * is called. Otherwise, some chips may panic.
-+	 */
-+	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		suspend_resume_quality_report(hdev, false);
-+		aosp_do_close(hdev);
-+	}
++	This command is only available for the controllers that support
++	either AOSP Bluetooth quality report or Intel telemetry event.
++	It is supported if the supported_settings indicate support for it.
 +
- 	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
- 	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
- 	    test_bit(HCI_UP, &hdev->flags)) {
-@@ -4158,7 +4192,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
++	This command requires to use a valid controller index. Otherwise,
++	an Invalid Index status will be returned.
++
++	The command is sent to the controller to enable/disable the quality
++	report feature, and generates a Command Complete event on success.
++	If the controller failed to execute the action, a Failed status will
++	be returned.
++
++	The quality report state is maintained by the kernel over the adapter
++	power cycle. When the adapter is powered off, the quality report
++	feature is disabled by the kernel. When the adapter is powered on, it
++	is enabled again by the kernel if it was enabled before.
++
++	Possible errors:	Failed
++				Invalid Index
++				Invalid Parameters
++				Not Supported
++
++
+ Command Complete Event
+ ======================
  
- 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
--		aosp_do_close(hdev);
- 		msft_do_close(hdev);
- 	}
+@@ -4978,3 +5019,22 @@ Advertisement Monitor Device Lost Event
+ 		2	LE Random
  
+ 	This event will be sent to all management sockets.
++
++
++Quality Report Event
++====================
++
++	Event code:		0x0031
++	Controller Index:	<controller_id>
++	Event Parameters:	Quality_Spec (1 Octet)
++				Report_Len (2 Octets)
++				Report (0-65535 Octets)
++
++	This event carries the Bluetooth quality report sent by the
++	controller.
++
++	Possible values for the Quality_Spec parameter:
++		0	AOSP Bluetooth Quality Report Event
++		1	Intel Telemetry Event
++
++	This event will be sent to all management sockets.
 -- 
 2.36.1.124.g0e6072fb45-goog
 
