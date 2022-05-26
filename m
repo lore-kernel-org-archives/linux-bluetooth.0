@@ -2,80 +2,359 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE09C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 09:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54614C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 11:21:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239582AbiEZJuO (ORCPT
+        id S243126AbiEZLVt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 May 2022 05:50:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56656 "EHLO
+        Thu, 26 May 2022 07:21:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231214AbiEZJuO (ORCPT
+        with ESMTP id S240771AbiEZLVr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 May 2022 05:50:14 -0400
-Received: from mail-m973.mail.163.com (mail-m973.mail.163.com [123.126.97.3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D0846558B;
-        Thu, 26 May 2022 02:50:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=Di6y9
-        LmpgXQ4/BEcC3oV3UoBlBH0yPqVOabL8M117+A=; b=EZPjLzAPCOi4AlHgX6qbU
-        SjQHFuz4h3Y+YZC9aoQz8DWoxh7+OlCSC6l5VK3QLNpphNjFaLFud+l3qCp/vU2z
-        XLJRHx4xpuecJEv3OTAU3NsSzWVZdLOJXWmeOYk0qSR23pqQr6lDAf9T6HAyYadE
-        Vi0nRvSmQ8Db9OFEV+etis=
-Received: from localhost.localdomain (unknown [123.112.69.106])
-        by smtp3 (Coremail) with SMTP id G9xpCgDXpnghTY9iJIzYEg--.5546S4;
-        Thu, 26 May 2022 17:49:43 +0800 (CST)
-From:   Jianglei Nie <niejianglei2021@163.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jianglei Nie <niejianglei2021@163.com>
-Subject: [PATCH] Bluetooth: hci_conn: fix potential double free in le_scan_cleanup()
-Date:   Thu, 26 May 2022 17:49:18 +0800
-Message-Id: <20220526094918.482971-1-niejianglei2021@163.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 26 May 2022 07:21:47 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DA47D75
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:46 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id m1so1198361plx.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2iK0JmSQYTB7W/NddouTDmgmSdRkfZFIZ90UVQfjdRo=;
+        b=WgHNCvPUwm6A5Bpdync/k62mv4R2FuM2AVS3mf1foVPgeo5O1GL6Bnnn+fpHzPysiw
+         MH5A9YPPnv7CRFnOb2UEAahdhf7xNUejM+t/NhW47jz83y0AM3gSrN7k9IuGMZnkhvsU
+         ExZRnDghSqDcjchcObjeuPGweoBRQXKXFTHzg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2iK0JmSQYTB7W/NddouTDmgmSdRkfZFIZ90UVQfjdRo=;
+        b=J/tlvgAFDyR7ISVdowlE4anUpKHlzVhHQ0VTmHLDbpo0LDblLW3Z6/+DYzGzg4kP37
+         gzYp6/Oj+mQ8PDKK+KyY3Q+V2QSW4FtAIGN8gpgn994+0Z1XgfSYVUfuD36OlKdWw8MX
+         bvDPA3s7d97NUd3rEDT/1ww0dBWO2uVcTlft5tMNfxa4+m0ixwdRCAyzbPgoUOjHqS+A
+         mFCnD3UC9KBnjIivArimjkjkeJprZGfuYkK+WyWzFFIv7Y+cLRbWAF+7lY26GCN+GYUa
+         2lOyQHwAS+5Natrve1sejeTYbtt8XqO9N82CY97gs4EyQWnXLXlmzgsay7GoaUoJQmJ/
+         oYkQ==
+X-Gm-Message-State: AOAM530kCvuI4icdAYW6jO/VjDCjhn4ZZqtedaY49tC8Uo/hAqJucUGP
+        WuySVWrGPrCZOsLzPZv8YD1zfTqILoz2qg==
+X-Google-Smtp-Source: ABdhPJz0joFdyuqT2P3YS2oo8Vyn34AHb81YGCz6tLkSAdfACCIxBNJeHTIiA9QXZXIPI+Fh3o2ULA==
+X-Received: by 2002:a17:902:b692:b0:14c:935b:2b03 with SMTP id c18-20020a170902b69200b0014c935b2b03mr37389995pls.81.1653564105228;
+        Thu, 26 May 2022 04:21:45 -0700 (PDT)
+Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
+        by smtp.gmail.com with UTF8SMTPSA id w23-20020aa78597000000b0050dc7628150sm1217985pfn.42.2022.05.26.04.21.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 May 2022 04:21:44 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH v6 1/5] Bluetooth: mgmt: add MGMT_OP_SET_QUALITY_REPORT for quality report
+Date:   Thu, 26 May 2022 19:21:30 +0800
+Message-Id: <20220526112135.2486883-1-josephsih@chromium.org>
+X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: G9xpCgDXpnghTY9iJIzYEg--.5546S4
-X-Coremail-Antispam: 1Uf129KBjvdXoWruFWfZFy8tw48AF48AryftFb_yoWfKrcEv3
-        sa9F4S9w4DZ395CanIya15A3y8Jwn3ZFykJa12qry5K3s0vFnrGr4xXr1kKryUWw4UZr1f
-        Crs8Gr1kZw17tjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xREsqXtUUUUU==
-X-Originating-IP: [123.112.69.106]
-X-CM-SenderInfo: xqlhyxxdqjzvrlsqjii6rwjhhfrp/1tbi6xcNjFXl1rDewQAAs0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When "c == conn" is true, hci_conn_cleanup() is called. The
-hci_conn_cleanup() calls hci_dev_put() and hci_conn_put() in
-its function implementation. hci_dev_put() and hci_conn_put()
-will free the relevant resource if the reference count reaches
-zero, which may lead to a double free when hci_dev_put() and
-hci_conn_put() are called again.
+This patch adds a new set_quality_report mgmt handler to set
+the quality report feature. The feature is removed from the
+experimental features at the same time.
 
-We should add a return to this function after hci_conn_cleanup()
-is called.
-
-Signed-off-by: Jianglei Nie <niejianglei2021@163.com>
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
- net/bluetooth/hci_conn.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index fe803bee419a..7b3e91eb9fa3 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -166,6 +166,7 @@ static void le_scan_cleanup(struct work_struct *work)
- 	if (c == conn) {
- 		hci_connect_le_scan_cleanup(conn);
- 		hci_conn_cleanup(conn);
-+		return;
+Changes in v6:
+- No update in this patch. The patch 2/5 is updated to fix
+  a sparse check warning.
+
+Changes in v5:
+- This patch becomes the first patch.
+- Remove useless hdev check in get_supported_settings().
+- An additional patch will make quality report survive power off/on
+  cycles.
+
+Changes in v4:
+- return current settings for set_quality_report.
+
+Changes in v3:
+- This is a new patch to enable the quality report feature.
+  The reading and setting of the quality report feature are
+  removed from the experimental features.
+
+ include/net/bluetooth/mgmt.h |   7 ++
+ net/bluetooth/mgmt.c         | 167 +++++++++++++++--------------------
+ 2 files changed, 80 insertions(+), 94 deletions(-)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7c1ad0f6fcec..c1c2fd72d9e3 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -109,6 +109,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
+ #define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
++#define MGMT_SETTING_QUALITY_REPORT	0x00040000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -838,6 +839,12 @@ struct mgmt_cp_add_adv_patterns_monitor_rssi {
+ } __packed;
+ #define MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE	8
+ 
++#define MGMT_OP_SET_QUALITY_REPORT		0x0057
++struct mgmt_cp_set_quality_report {
++	__u8	action;
++} __packed;
++#define MGMT_SET_QUALITY_REPORT_SIZE		1
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d2d390534e54..1ad84f34097f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -857,6 +857,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 
+ 	settings |= MGMT_SETTING_PHY_CONFIGURATION;
+ 
++	if (aosp_has_quality_report(hdev) || hdev->set_quality_report)
++		settings |= MGMT_SETTING_QUALITY_REPORT;
++
+ 	return settings;
+ }
+ 
+@@ -928,6 +931,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED))
+ 		settings |= MGMT_SETTING_WIDEBAND_SPEECH;
+ 
++	if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
++		settings |= MGMT_SETTING_QUALITY_REPORT;
++
+ 	return settings;
+ }
+ 
+@@ -3901,12 +3907,6 @@ static const u8 debug_uuid[16] = {
+ };
+ #endif
+ 
+-/* 330859bc-7506-492d-9370-9a6f0614037f */
+-static const u8 quality_report_uuid[16] = {
+-	0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
+-	0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
+-};
+-
+ /* a6695ace-ee7f-4fb9-881a-5fac66c629af */
+ static const u8 offload_codecs_uuid[16] = {
+ 	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f, 0x1a, 0x88,
+@@ -3928,7 +3928,7 @@ static const u8 rpa_resolution_uuid[16] = {
+ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				  void *data, u16 data_len)
+ {
+-	char buf[102];   /* Enough space for 5 features: 2 + 20 * 5 */
++	char buf[82];   /* Enough space for 4 features: 2 + 20 * 4 */
+ 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
+ 	u16 idx = 0;
+ 	u32 flags;
+@@ -3969,18 +3969,6 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
  	}
  
- 	hci_dev_unlock(hdev);
+-	if (hdev && (aosp_has_quality_report(hdev) ||
+-		     hdev->set_quality_report)) {
+-		if (hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
+-			flags = BIT(0);
+-		else
+-			flags = 0;
+-
+-		memcpy(rp->features[idx].uuid, quality_report_uuid, 16);
+-		rp->features[idx].flags = cpu_to_le32(flags);
+-		idx++;
+-	}
+-
+ 	if (hdev && hdev->get_data_path_id) {
+ 		if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
+ 			flags = BIT(0);
+@@ -4193,80 +4181,6 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
+-				   struct mgmt_cp_set_exp_feature *cp,
+-				   u16 data_len)
+-{
+-	struct mgmt_rp_set_exp_feature rp;
+-	bool val, changed;
+-	int err;
+-
+-	/* Command requires to use a valid controller index */
+-	if (!hdev)
+-		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_INDEX);
+-
+-	/* Parameters are limited to a single octet */
+-	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+-	/* Only boolean on/off is supported */
+-	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_EXP_FEATURE,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+-	hci_req_sync_lock(hdev);
+-
+-	val = !!cp->param[0];
+-	changed = (val != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
+-
+-	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
+-		err = mgmt_cmd_status(sk, hdev->id,
+-				      MGMT_OP_SET_EXP_FEATURE,
+-				      MGMT_STATUS_NOT_SUPPORTED);
+-		goto unlock_quality_report;
+-	}
+-
+-	if (changed) {
+-		if (hdev->set_quality_report)
+-			err = hdev->set_quality_report(hdev, val);
+-		else
+-			err = aosp_set_quality_report(hdev, val);
+-
+-		if (err) {
+-			err = mgmt_cmd_status(sk, hdev->id,
+-					      MGMT_OP_SET_EXP_FEATURE,
+-					      MGMT_STATUS_FAILED);
+-			goto unlock_quality_report;
+-		}
+-
+-		if (val)
+-			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
+-		else
+-			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+-	}
+-
+-	bt_dev_dbg(hdev, "quality report enable %d changed %d", val, changed);
+-
+-	memcpy(rp.uuid, quality_report_uuid, 16);
+-	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
+-
+-	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_EXP_FEATURE, 0,
+-				&rp, sizeof(rp));
+-
+-	if (changed)
+-		exp_feature_changed(hdev, quality_report_uuid, val, sk);
+-
+-unlock_quality_report:
+-	hci_req_sync_unlock(hdev);
+-	return err;
+-}
+-
+ static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
+ 				  struct mgmt_cp_set_exp_feature *cp,
+ 				  u16 data_len)
+@@ -4393,7 +4307,6 @@ static const struct mgmt_exp_feature {
+ 	EXP_FEAT(debug_uuid, set_debug_func),
+ #endif
+ 	EXP_FEAT(rpa_resolution_uuid, set_rpa_resolution_func),
+-	EXP_FEAT(quality_report_uuid, set_quality_report_func),
+ 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
+ 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
+ 
+@@ -8664,6 +8577,71 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
+ 				 MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
+ }
+ 
++static int set_quality_report(struct sock *sk, struct hci_dev *hdev,
++			      void *data, u16 data_len)
++{
++	struct mgmt_cp_set_quality_report *cp = data;
++	bool enable, changed;
++	int err;
++
++	/* Command requires to use a valid controller index */
++	if (!hdev)
++		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++				       MGMT_OP_SET_QUALITY_REPORT,
++				       MGMT_STATUS_INVALID_INDEX);
++
++	/* Only 0 (off) and 1 (on) is supported */
++	if (cp->action != 0x00 && cp->action != 0x01)
++		return mgmt_cmd_status(sk, hdev->id,
++				       MGMT_OP_SET_QUALITY_REPORT,
++				       MGMT_STATUS_INVALID_PARAMS);
++
++	hci_req_sync_lock(hdev);
++
++	enable = !!cp->action;
++	changed = (enable != hci_dev_test_flag(hdev, HCI_QUALITY_REPORT));
++
++	if (!aosp_has_quality_report(hdev) && !hdev->set_quality_report) {
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_QUALITY_REPORT,
++				      MGMT_STATUS_NOT_SUPPORTED);
++		goto unlock_quality_report;
++	}
++
++	if (changed) {
++		if (hdev->set_quality_report)
++			err = hdev->set_quality_report(hdev, enable);
++		else
++			err = aosp_set_quality_report(hdev, enable);
++
++		if (err) {
++			err = mgmt_cmd_status(sk, hdev->id,
++					      MGMT_OP_SET_QUALITY_REPORT,
++					      MGMT_STATUS_FAILED);
++			goto unlock_quality_report;
++		}
++
++		if (enable)
++			hci_dev_set_flag(hdev, HCI_QUALITY_REPORT);
++		else
++			hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
++	}
++
++	bt_dev_dbg(hdev, "quality report enable %d changed %d",
++		   enable, changed);
++
++	err = send_settings_rsp(sk, MGMT_OP_SET_QUALITY_REPORT, hdev);
++	if (err < 0)
++		goto unlock_quality_report;
++
++	if (changed)
++		err = new_settings(hdev, sk);
++
++unlock_quality_report:
++	hci_req_sync_unlock(hdev);
++	return err;
++}
++
+ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ NULL }, /* 0x0000 (no command) */
+ 	{ read_version,            MGMT_READ_VERSION_SIZE,
+@@ -8790,6 +8768,7 @@ static const struct hci_mgmt_handler mgmt_handlers[] = {
+ 	{ add_adv_patterns_monitor_rssi,
+ 				   MGMT_ADD_ADV_PATTERNS_MONITOR_RSSI_SIZE,
+ 						HCI_MGMT_VAR_LEN },
++	{ set_quality_report,      MGMT_SET_QUALITY_REPORT_SIZE },
+ };
+ 
+ void mgmt_index_added(struct hci_dev *hdev)
 -- 
-2.25.1
+2.36.1.124.g0e6072fb45-goog
 
