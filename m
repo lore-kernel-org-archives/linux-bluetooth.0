@@ -2,65 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3ECAC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 11:22:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 620A2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 11:22:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347125AbiEZLWL (ORCPT
+        id S1347199AbiEZLW0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 May 2022 07:22:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47550 "EHLO
+        Thu, 26 May 2022 07:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346964AbiEZLWH (ORCPT
+        with ESMTP id S1347108AbiEZLWH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 26 May 2022 07:22:07 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9BFF2B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:55 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id c65so885402pfb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:55 -0700 (PDT)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AD49FD4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:58 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id b5so1173017plx.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:21:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=kNtuB840A1q3OEONvZZSgOOnkUcYtuWuq+G8qAKrj5A=;
-        b=IHDSwip5ZkMn+jZZWR3D8OeVtPwjy0QmHUMctL7i0m0Ofx9wv7he/E0B26+bpNyLRp
-         EkT6a4FMkj5BKxgLtPinkFF4jZl88m2X8+3acFoDhKQdFiP/IfosuMC6/fGLcuuDablW
-         Nlb6FCR+IE/aOvnQSBVdgpyq35OilOjJQbduU=
+        bh=Mbhrm+CLA8t+9GLitrwDqbWvNobA6cA9mph1bfmQ5TM=;
+        b=Eh5SZzypXw0UcbLVvJxJEddJVCDpq4fbOGvVw0aDcbOl/qnNh1h+ixeA/KTpGKUQcG
+         dBPTc/oQJc1qiqr9zQP/p0Y332vrzl6B+m0mk1xNHMfsayDZhoHAmZazKHyf7zfNosii
+         s/GQYvY47rMleGOVtq4VYaB/N+3qdzRLYu3Es=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kNtuB840A1q3OEONvZZSgOOnkUcYtuWuq+G8qAKrj5A=;
-        b=a40MkQyD1prkdPtHSGmmmSkZCkhtvJi/ANp5KdHBV7B/RfliAPuaT6kP8enwUtBwvi
-         3F2sg9kqI3ty+Mg5SFeyBF5umS8MTZ48HXlpZOSptsa2yGrUp/TfSKJkz72t7Tu1YSVz
-         rqI3O3DnHc22AB7AzdFxVFqM1PuC6ZhbuXf6wPu2NX5zScIx/tZ/zDNQ863/K9F1UPOt
-         QukUvhhpMEIDEd1iX4KaeqR8XQ7EsMwkd4FR2RH41i9twZL61sxhSvTo6WOZ95XdQHqy
-         pioWdZnktSQcc1HNDg1S0pRSQ58+gttP2ROefgf4K7hEGSxjgf8JmzRncoaO7bu/sLRS
-         rhbQ==
-X-Gm-Message-State: AOAM5338TWxQaeRhOmn1VaDk/J5r7ElXucyvrKX8/4+5YllwqR3GmVjH
-        RRxQoU16eCWEotxvVv4ddKu6pkdjMotscQ==
-X-Google-Smtp-Source: ABdhPJzwGrsjJ7DYpbm/S3lJ4MxlWN/pogwg1wixchK7IkXIlj7XbhGDsW+3B9oczPekcFPg3c/90g==
-X-Received: by 2002:a63:5415:0:b0:3fb:971:460a with SMTP id i21-20020a635415000000b003fb0971460amr3226121pgb.86.1653564114093;
-        Thu, 26 May 2022 04:21:54 -0700 (PDT)
+        bh=Mbhrm+CLA8t+9GLitrwDqbWvNobA6cA9mph1bfmQ5TM=;
+        b=KRzOaawQQsU9skl23bBmCO8ZFNWwomgF2RyzrwPUBiPTOdBswLqucMdm0GfRcdhM8y
+         8pwQ9/ttM72dUtnAmL+uMsXOmbE0p53tIwarmbupedZvAMabGYrQitm/QIHiOrXTn2wI
+         2xr93paxbhgrf1dvp1g1pa7cX+eqIwiNuMtk3nONbxctDMyQMMRhC0xaKdugUU9DqitK
+         LfGpjV9ifqyRh1aq2JXFCvybnmF/0bunErX1zYC5aaPBFHxMYl6eBg+4rFunb4yugx3S
+         rT/4QsKTN2RKkckRs8FX4sq4Rb7q6qLk8aiihuBQWGX4sdRfFR8+u0cIXJxESxGv0snl
+         M1Lw==
+X-Gm-Message-State: AOAM533Ffv3TbJN7VTj8HybBo2VgaU83pt1MFFIlWnKGS5kK4cg6rMsv
+        Q/+kpipGzkxRPfXP2XiWXS4M5I6mzOd04A==
+X-Google-Smtp-Source: ABdhPJwF4C0Ao0UWmUsX5P87Fr6Ks1ODu7AcLgsB9mdefwx5MTubXNDU0JkVJIylhfSzr17F29Q5lA==
+X-Received: by 2002:a17:902:d547:b0:162:306f:ae15 with SMTP id z7-20020a170902d54700b00162306fae15mr16688944plf.154.1653564117245;
+        Thu, 26 May 2022 04:21:57 -0700 (PDT)
 Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id y20-20020a170903011400b0015e8d4eb22fsm1229917plc.121.2022.05.26.04.21.51
+        by smtp.gmail.com with UTF8SMTPSA id i4-20020a655b84000000b003faf4acac63sm1293909pgr.13.2022.05.26.04.21.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 May 2022 04:21:53 -0700 (PDT)
+        Thu, 26 May 2022 04:21:56 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
         Joseph Hwang <josephsih@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v6 3/5] Bluetooth: hci_event: Add vendor functions to handle vendor events
-Date:   Thu, 26 May 2022 19:21:32 +0800
-Message-Id: <20220526192047.v6.3.I63681490281b2392aa1ac05dff91a126394ab649@changeid>
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v6 4/5] Bluetooth: btintel: setup vendor_get_prefix and vendor_evt
+Date:   Thu, 26 May 2022 19:21:33 +0800
+Message-Id: <20220526112135.2486883-2-josephsih@chromium.org>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
 In-Reply-To: <20220526112135.2486883-1-josephsih@chromium.org>
 References: <20220526112135.2486883-1-josephsih@chromium.org>
@@ -70,110 +65,132 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds vendor_get_prefix and vendor_evt in the evt_prefixes
-table so that any vendor driver can set up the functions to handle
-particular vendor events.
-
-The hci_vendor_evt function checks if a vendor event matches
-the vendor prefix returned by vendor_get_prefix. If yes, the
-event is pushed down to the driver's vendor_evt function to handle.
-The driver function will call hdev->hci_recv_quality_report to
-pass data through mgmt if needed.
+This patch sets up vendor_get_prefix and vendor_evt in btintel
+to surface Intel telemetry events.
 
 Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 ---
 
 (no changes since v5)
 
 Changes in v5:
-- Use vendor_get_ext_prefix and vendor_evt to invoke callbacks from
-  drivers to handle vendor events.
-- Use hdev->hci_recv_quality_report to pass vendor event data
-  from drivers back to the kernel. The mgmt_quality_report is then
-  used to surface the data through the mgmt socket.
-- Remove the unnecessary "void *data" portion from vendor_evt.
-- The Intel specifics are pushed down to the driver and are
-  implemented in a separate subsequent patch.
+- This is a new patch that holds the Intel specifics in the driver.
+- This patch sets up vendor_get_ext_prefix and vendor_evt.
+- INTEL_PREFIX is defined in little endian for convenience.
+- Define intel_ext_prefix to contain Intel prefix and the telemetry
+  subcode which will be returned by btintel_get_ext_prefix().
+- Remove the unnecessary "void *data" portion and the double space
+  from btintel_vendor_evt.
+- Remove some unnecessary checking in btintel_vendor_evt.
+- As to stripping off the prefix, that was what was done in
+  "Series-version: 1". Previous comment about the AOSP function in
+  pulling off the prefix header from the skb was "just do a basic
+  length check and then move on. The kernel has no interest in this
+  data." So that is why the whole skb->data is sent to the user space
+  for further handling. This is to be consistent with what AOSP does
+  there.
 
-Changes in v3:
-- Move intel_vendor_evt() from hci_event.c to the btintel driver.
+ drivers/bluetooth/btintel.c | 50 +++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h | 13 ++++++++++
+ 2 files changed, 63 insertions(+)
 
-Changes in v2:
-- Drop the pull_quality_report_data function from hci_dev.
-  Do not bother hci_dev with it. Do not bleed the details
-  into the core.
-
- include/net/bluetooth/hci_core.h |  5 +++++
- net/bluetooth/hci_core.c         |  1 +
- net/bluetooth/hci_event.c        | 19 +++++++++++++++++++
- 3 files changed, 25 insertions(+)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index f89738c6b973..9e48d606591e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -642,6 +642,11 @@ struct hci_dev {
- 	void (*cmd_timeout)(struct hci_dev *hdev);
- 	bool (*wakeup)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
-+	struct ext_vendor_prefix *(*vendor_get_ext_prefix)(
-+							struct hci_dev *hdev);
-+	void (*vendor_evt)(struct hci_dev *hdev, struct sk_buff *skb);
-+	int (*hci_recv_quality_report)(struct hci_dev *hdev, void *data,
-+				       u32 data_len, u8 quality_spec);
- 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
- 	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
- 				     struct bt_codec *codec, __u8 *vnd_len,
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ad4f4ab0afca..3e22b4b452f1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2650,6 +2650,7 @@ int hci_register_dev(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 818681c89db8..7c39cb7352fd 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2404,6 +2404,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	/* Set up the quality report callback for Intel devices */
+ 	hdev->set_quality_report = btintel_set_quality_report;
  
- 	idr_init(&hdev->adv_monitors_idr);
- 	msft_register(hdev);
-+	hdev->hci_recv_quality_report = mgmt_quality_report;
- 
- 	return id;
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8398971eddf4..85c205ea9c59 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4260,6 +4260,20 @@ static void hci_num_comp_blocks_evt(struct hci_dev *hdev, void *data,
- 	queue_work(hdev->workqueue, &hdev->tx_work);
- }
- 
-+static struct ext_vendor_prefix *vendor_get_ext_prefix(struct hci_dev *hdev)
-+{
-+	if (hdev->vendor_get_ext_prefix)
-+		return hdev->vendor_get_ext_prefix(hdev);
++	/* Set up the vendor event callbacks for Intel devices */
++	hdev->vendor_get_ext_prefix = btintel_get_ext_prefix;
++	hdev->vendor_evt = btintel_vendor_evt;
 +
+ 	/* For Legacy device, check the HW platform value and size */
+ 	if (skb->len == sizeof(ver) && skb->data[1] == 0x37) {
+ 		bt_dev_dbg(hdev, "Read the legacy Intel version information");
+@@ -2650,6 +2654,52 @@ void btintel_secure_send_result(struct hci_dev *hdev,
+ }
+ EXPORT_SYMBOL_GPL(btintel_secure_send_result);
+ 
++/* INTEL_PREFIX below is defined in little endian. */
++static unsigned char INTEL_PREFIX[] = { 0x87, 0x80 };
++
++/* Define any Intel sub-opcodes here. */
++#define TELEMETRY_CODE		0x03
++static unsigned char INTEL_SUBCODES[] = { TELEMETRY_CODE };
++
++static struct ext_vendor_prefix intel_ext_prefix = {
++	.prefix         = INTEL_PREFIX,
++	.prefix_len     = sizeof(INTEL_PREFIX),
++	.subcodes       = INTEL_SUBCODES,
++	.subcodes_len   = sizeof(INTEL_SUBCODES),
++};
++
++struct ext_vendor_prefix *btintel_get_ext_prefix(struct hci_dev *hdev)
++{
++	return &intel_ext_prefix;
++}
++EXPORT_SYMBOL_GPL(btintel_get_ext_prefix);
++
++/* An Intel vendor event with prefix has the following structure. */
++struct intel_prefix_evt_data {
++	__le16 prefix; /* INTEL_PREFIX */
++	__u8 subcode;
++	__u8 data[];   /* a number of struct intel_tlv subevents */
++} __packed;
++
++void btintel_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct intel_prefix_evt_data *ev;
++
++	if (skb->len < sizeof(struct intel_prefix_evt_data))
++		return;
++
++	if (memcmp(skb->data, INTEL_PREFIX, sizeof(INTEL_PREFIX)))
++		return;
++
++	/* Only interested in the telemetry event for now. */
++	ev = (struct intel_prefix_evt_data *)skb->data;
++	if (ev->subcode == TELEMETRY_CODE) {
++		hdev->hci_recv_quality_report(hdev, skb->data, skb->len,
++					      QUALITY_SPEC_INTEL_TELEMETRY);
++	}
++}
++EXPORT_SYMBOL_GPL(btintel_vendor_evt);
++
+ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index e0060e58573c..040c41f11e91 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -211,6 +211,8 @@ void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
+ void btintel_secure_send_result(struct hci_dev *hdev,
+ 				const void *ptr, unsigned int len);
+ int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
++struct ext_vendor_prefix *btintel_get_ext_prefix(struct hci_dev *hdev);
++void btintel_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -306,4 +308,15 @@ static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
+ {
+ 	return -ENODEV;
+ }
++
++static inline struct ext_vendor_prefix *btintel_get_ext_prefix(
++							struct hci_dev *hdev)
++{
 +	return NULL;
 +}
 +
-+static void vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
++static inline void btintel_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
 +{
-+	if (hdev->vendor_evt)
-+		hdev->vendor_evt(hdev, skb);
 +}
 +
- /* Every distinct vendor specification must have a well-defined vendor
-  * event prefix to determine if a vendor event meets the specification.
-  * Some vendor prefixes are fixed values while some other vendor prefixes
-@@ -4276,6 +4290,11 @@ static struct ext_vendor_event_prefix {
- 	{ aosp_get_ext_prefix, aosp_vendor_evt },
- 	{ msft_get_ext_prefix, msft_vendor_evt },
- 
-+	/* Any vendor driver that handles particular vendor events should set
-+	 * up hdev->vendor_get_prefix and hdev->vendor_evt callbacks in driver.
-+	 */
-+	{ vendor_get_ext_prefix, vendor_evt },
-+
- 	/* end with a null entry */
- 	{},
- };
+ #endif
 -- 
 2.36.1.124.g0e6072fb45-goog
 
