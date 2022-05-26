@@ -2,1085 +2,670 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE780C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 00:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB82C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 00:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241614AbiEZAjl (ORCPT
+        id S241521AbiEZAqP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 May 2022 20:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59038 "EHLO
+        Wed, 25 May 2022 20:46:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237862AbiEZAjh (ORCPT
+        with ESMTP id S242220AbiEZAqN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 May 2022 20:39:37 -0400
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E007A7769
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:35 -0700 (PDT)
-Received: by mail-pf1-x429.google.com with SMTP id b135so371188pfb.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:35 -0700 (PDT)
+        Wed, 25 May 2022 20:46:13 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D76713D;
+        Wed, 25 May 2022 17:46:10 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id l9-20020a056830268900b006054381dd35so68801otu.4;
+        Wed, 25 May 2022 17:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=LI0uzJIHzthsNZrOxCXS+LBzMElGfK5RhEaz7solcQE=;
-        b=bQpl/TCdZcSCe79+ivATdHoRpk6S4WBnB6UKnVYP6NM4KOeLcaxlBD9uRgXNjYsqLn
-         jTcQCZ0DzbuLU4EfuZh8BSRXj9YbIy+tmkLaH/lUxmmW6kgo3aBQ1RZPBVEGGwkW7lG2
-         bsS2Da7uUsqznK7JnouIvzYVyI3Ox23uhoS9pBFMfswgNN8h2k1vwdXSM9bOtMLHuR9q
-         qO9xmhyXXsklQp/fKfAjaPgmCDhiA0qnNg5xMOmVxDbR6LVkM30mPoJ2RD8QDX8VEQb4
-         mcvzk811xaIcbdhcMo4yT8wzzRoxYqyRm/byrFPY8aBu4HHwpD/SDOPnpWOcEH9PFma8
-         g/Qg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=30bg4htc+GqeVawYTVf2uP3UU/3aL7/8QbHqn1X0cFA=;
+        b=F8K8u1irb3tsWKbvW/NRT8if7RznVwcwltZUHNhA7Qh1joteGdVEdTLCAbu7bwUKaE
+         2v34Z4ARa8Yitz4D6s7fTRJAe9C/8HUG56jBGSt4PwIMZOM6vqnqVO3TyaE0kFYIjjK5
+         RHPbmRy3IdukleSVeEM66XUZTQDgNUDfcR4zeKYkaa1uu+acImoQxivZDJDjeJp0MgLQ
+         GS3Op78r8qXHSOzD59agjgl8WjKZUknmU4OaN1NcG3pWWOQeOHKuj4s9BvYf9nGuRxXv
+         8BZ1KCi9oxnuu3We0I7t7dateh6n8URXeLgMbds5cH20m6HnP5pMI0aCy75M16xiYtBx
+         OnZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=LI0uzJIHzthsNZrOxCXS+LBzMElGfK5RhEaz7solcQE=;
-        b=XCyYEXX9ErrkQd1tsM7sav65O/o4WJys+pqcCt63BsmH8WOgaOdhljlSz6li7Binfx
-         4Z+mjNLELkuZNCBx6FdqNaZcaSvKnCn2oE2XgbyGdDxeZq4XpbgXGmqOORSLonNAU3yB
-         MCIjiy4H5fSiNQSJ+EJK8AUttLenNABSxQ/+lUaNq7z8xKU+ZkKn+s/bzCKQ1RE1D3i8
-         GcijczG/9iRX80V0gRBv1IGGkfuclHcagr+Q8v3hFcsPIuvxGEA/EqdkaipLq4wfpl94
-         l2LZXS63SPaUM8k/hZAtUNmSTimrQBwK/YQna4eLdkxE5AC+Rgj8dh6/Qm/G/sqJ/Jn0
-         QY+g==
-X-Gm-Message-State: AOAM5324HNgu9WukK7t3c4rhTYUz364sfxkKhECOj7tXTmMn7gqbQd5T
-        YdnM9BiYiVbagJUyYRfuABdExILcqgU=
-X-Google-Smtp-Source: ABdhPJxB2E7dCX2VlDV6vnjCqjefTLz6BwiVerXeVXfz/5gFSohpH/BY0EYNJMqXjgrQMcSw9d/k2Q==
-X-Received: by 2002:a63:560f:0:b0:3fa:6738:a199 with SMTP id k15-20020a63560f000000b003fa6738a199mr14007145pgb.282.1653525573855;
-        Wed, 25 May 2022 17:39:33 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f12-20020a170902860c00b00162529828aesm13339plo.109.2022.05.25.17.39.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 May 2022 17:39:32 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] monitor/att: Add decoding support for ASE Control Point
-Date:   Wed, 25 May 2022 17:39:27 -0700
-Message-Id: <20220526003927.3972965-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220526003927.3972965-1-luiz.dentz@gmail.com>
-References: <20220526003927.3972965-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=30bg4htc+GqeVawYTVf2uP3UU/3aL7/8QbHqn1X0cFA=;
+        b=aOhqaf8hBnlj5Ko8twQj6Qf+idLtfH8v/HbOU5l6Dqctzub2d/aRnsO1RmLqikBSEx
+         58rl3kS93/W2F8JY5oiT82KI/so5IB5+15NpT45ajVv/a/YvKyFKGBHaBeeJSFSO0YLm
+         AMfJDeaXi3o2Nzh9RLE4CC52u0VNpS28etQOlSpYWtiAocMflyJyPddDpQPAaqHujA/u
+         hsg+/NPn6FEKdBmhzwPZQLwxmNt7TKgiCOAWD4Nre3Mu9/XGYRzL35IjLx3PTjbjfMfW
+         az5kKIIFr7rdkbFGMv1cGugZKqCmZkyI8jomBucsYRUekMwytwETUnUE2kXw2PE1hY6o
+         Y1qA==
+X-Gm-Message-State: AOAM530x6taTG4jsgyz0qsey/xqRY8zXt2MI7svkCm5mTChIwwRr5YLa
+        e4URkIKtow4B5XLk0ZdWC/yvlsWRFIDEnmY2i1k=
+X-Google-Smtp-Source: ABdhPJzavCLAfO/RpAsY/gUw9wphiQ00Lo81kRgipFgb5Fv1EuVxY+R7IOo4dc1HSWfV7tIB/FZVVaFP6u1tYf4wRcw=
+X-Received: by 2002:a05:6830:2647:b0:60b:22cc:a9c2 with SMTP id
+ f7-20020a056830264700b0060b22cca9c2mr4451483otu.324.1653525969668; Wed, 25
+ May 2022 17:46:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220524131406.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
+In-Reply-To: <20220524131406.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 25 May 2022 17:45:56 -0700
+Message-ID: <CABBYNZ+Z7j0VjNQitBRwpJDTGv=sJoj9jgKECtGEcQA2h3FUWg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_sync: Refactor add Adv Monitor
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Manish,
 
-This adds decoding support for ASE Control Point attribute:
+On Tue, May 24, 2022 at 1:14 PM Manish Mandlik <mmandlik@google.com> wrote:
+>
+> Make use of hci_cmd_sync_queue for adding an advertisement monitor.
 
-> ACL Data RX: Handle 42 flags 0x02 dlen 30
-      Channel: 64 len 26 sdu 24 [PSM 39 mode Enhanced Credit (0x81)] {chan 1}
-      ATT: Write Command (0x52) len 23
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 010103020206000000000a02010302020103042800
-            Opcode: Codec Configuration (0x01)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            Target Latency: Balance Latency/Reliability (0x02)
-            PHY: 0x02
-            LE 2M PHY (0x02)
-            Codec: LC3 (0x06)
-            Codec Specific Configuration #0: len 0x02 type 0x01
-            Codec Specific Configuration: 03
-            Codec Specific Configuration #1: len 0x02 type 0x02
-            Codec Specific Configuration: 01
-            Codec Specific Configuration #2: len 0x03 type 0x04
-            Codec Specific Configuration: 2800
-< ACL Data TX: Handle 42 flags 0x00 dlen 55
-      Channel: 64 len 51 sdu 49 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
-      ATT: Handle Multiple Value Notification (0x23) len 48
-        Length: 0x0005
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 0101030000
-            Opcode: Codec Configuration (0x01)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            ASE Response Code: Success (0x00)
-            ASE Response Reason: None (0x00)
-> ACL Data RX: Handle 42 flags 0x02 dlen 27
-      Channel: 64 len 23 sdu 21 [PSM 39 mode Enhanced Credit (0x81)] {chan 1}
-      ATT: Write Command (0x52) len 20
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 020103000010270000022800020a00409c00
-            Opcode: QoS Configuration (0x02)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            CIG ID: 0x00
-            CIS ID: 0x00
-            SDU Interval: 10000 usec
-            Framing: Unframed (0x00)
-            PHY: 0x02
-            LE 2M PHY (0x02)
-            Max SDU: 40
-            RTN: 2
-            Max Transport Latency: 10
-            Presentation Delay: 40000 us
-< ACL Data TX: Handle 42 flags 0x00 dlen 37
-      Channel: 64 len 33 sdu 31 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
-      ATT: Handle Multiple Value Notification (0x23) len 30
-        Length: 0x0005
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 0201030000
-            Opcode: QoS Configuration (0x02)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            ASE Response Code: Success (0x00)
-            ASE Response Reason: None (0x00)
-> ACL Data RX: Handle 42 flags 0x02 dlen 17
-      Channel: 64 len 13 sdu 11 [PSM 39 mode Enhanced Credit (0x81)] {chan 1}
-      ATT: Write Command (0x52) len 10
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 0301030403020200
-            Opcode: Enable (0x03)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            Metadata #0: len 0x03 type 0x02
-            Metadata: 0200
-< ACL Data TX: Handle 42 flags 0x00 dlen 33
-      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
-      ATT: Handle Multiple Value Notification (0x23) len 26
-        Length: 0x0005
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 0301030000
-            Opcode: Enable (0x03)
-            Number of ASE(s): 1
-            ASE: #0
-            ASE ID: 0x03
-            ASE Response Code: Success (0x00)
-            ASE Response Reason: None (0x00)
-> ACL Data RX: Handle 42 flags 0x02 dlen 12
-      Channel: 64 len 8 sdu 6 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
-      ATT: Write Command (0x52) len 5
-        Handle: 0x0030 Type: ASE Control Point (0x2bc6)
-          Data: 050101
-            Opcode: Disable (0x05)
-            Number of ASE(s): 1
----
- monitor/att.c | 773 ++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 588 insertions(+), 185 deletions(-)
+Im a little lost here, it seems you end up not really using
+hci_cmd_sync_queue are you assuming these functions are already run
+from a safe context?
 
-diff --git a/monitor/att.c b/monitor/att.c
-index fb0961102..e77bc4633 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -255,7 +255,7 @@ static void gatt_ccc_write(const struct l2cap_frame *frame)
- 	print_ccc_value(value);
- }
- 
--static bool print_codec(const struct l2cap_frame *frame)
-+static bool print_ase_codec(const struct l2cap_frame *frame)
- {
- 	uint8_t codec_id;
- 	uint16_t codec_cid, codec_vid;
-@@ -287,6 +287,36 @@ static bool print_codec(const struct l2cap_frame *frame)
- 	return true;
- }
- 
-+static bool print_ase_lv(const struct l2cap_frame *frame, const char *label)
-+{
-+	struct bt_hci_lv_data *lv;
-+
-+	lv = l2cap_frame_pull((void *)frame, frame, sizeof(*lv));
-+	if (!lv) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	if (!l2cap_frame_pull((void *)frame, frame, lv->len)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	packet_print_ltv(label, lv->data, lv->len);
-+
-+	return true;
-+}
-+
-+static bool print_ase_cc(const struct l2cap_frame *frame)
-+{
-+	return print_ase_lv(frame, "    Codec Specific Configuration");
-+}
-+
-+static bool print_ase_metadata(const struct l2cap_frame *frame)
-+{
-+	return print_ase_lv(frame, "    Metadata");
-+}
-+
- static void print_pac(const struct l2cap_frame *frame)
- {
- 	uint8_t num = 0, i;
-@@ -299,42 +329,16 @@ static void print_pac(const struct l2cap_frame *frame)
- 	print_field("  Number of PAC(s): %u", num);
- 
- 	for (i = 0; i < num; i++) {
--		struct bt_hci_lv_data *cc;
--		struct bt_hci_lv_data *meta;
--
- 		print_field("  PAC #%u:", i);
- 
--		if (!print_codec(frame))
-+		if (!print_ase_codec(frame))
- 			goto done;
- 
--		cc = l2cap_frame_pull((void *)frame, frame, sizeof(*cc));
--		if (!cc) {
--			print_text(COLOR_ERROR,
--				"Codec Specific Configuration: invalid size");
--			goto done;
--		}
-+		if (!print_ase_cc(frame))
-+			break;
- 
--		if (!l2cap_frame_pull((void *)frame, frame, cc->len)) {
--			print_text(COLOR_ERROR,
--				"Codec Specific Configuration: invalid size");
--			goto done;
--		}
--
--		packet_print_ltv("    Codec Specific Configuration", cc->data,
--								cc->len);
--
--		meta = l2cap_frame_pull((void *)frame, frame, sizeof(*meta));
--		if (!meta) {
--			print_text(COLOR_ERROR, "Metadata: invalid size");
--			goto done;
--		}
--
--		if (!l2cap_frame_pull((void *)frame, frame, meta->len)) {
--			print_text(COLOR_ERROR, "Metadata: invalid size");
--			goto done;
--		}
--
--		packet_print_ltv("    Metadata", meta->data, meta->len);
-+		if (!print_ase_metadata(frame))
-+			break;
- 	}
- 
- done:
-@@ -352,20 +356,28 @@ static void pac_notify(const struct l2cap_frame *frame)
- 	print_pac(frame);
- }
- 
--static void print_prefer_framing(uint8_t value)
-+static bool print_prefer_framing(const struct l2cap_frame *frame)
- {
--	switch (value) {
--	case 0x00:
--		print_field("    Framing: Unframed ISOAL PDUs supported "
--							"(0x%2.2x)", value);
--		return;
--	case 0x01:
--		print_field("    Framing: Unframed ISOAL PDUs not supported "
--							"(0x%2.2x)", value);
--		return;
--	default:
--		print_field("    Framing: Reserved (0x%2.2x)", value);
-+	uint8_t framing;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
-+		print_text(COLOR_ERROR, "    Framing: invalid size");
-+		return false;
- 	}
-+
-+	switch (framing) {
-+	case 0x00:
-+		print_field("    Framing: Unframed PDUs supported (0x00)");
-+		break;
-+	case 0x01:
-+		print_field("    Framing: Unframed PDUs not supported (0x01)");
-+		break;
-+	default:
-+		print_field("    Framing: Reserved (0x%2.2x)", framing);
-+		break;
-+	}
-+
-+	return true;
- }
- 
- static const struct bitfield_data prefer_phy_table[] = {
-@@ -375,112 +387,122 @@ static const struct bitfield_data prefer_phy_table[] = {
- 	{ }
- };
- 
--static void print_prefer_phy(uint8_t phy)
-+static bool print_prefer_phy(const struct l2cap_frame *frame)
- {
--	uint8_t mask;
-+	uint8_t phy, mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
-+		print_text(COLOR_ERROR, "PHY: invalid size");
-+		return false;
-+	}
-+
-+	print_field("    PHY: 0x%2.2x", phy);
- 
- 	mask = print_bitfield(4, phy, prefer_phy_table);
- 	if (mask)
- 		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
- 								mask);
-+
-+	return true;
-+}
-+
-+static bool print_ase_rtn(const struct l2cap_frame *frame, const char *label)
-+{
-+	uint8_t rtn;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &rtn)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: %u", label, rtn);
-+
-+	return true;
-+}
-+
-+static bool print_ase_latency(const struct l2cap_frame *frame,
-+						const char *label)
-+{
-+	uint16_t latency;
-+
-+	if (!l2cap_frame_get_le16((void *)frame, &latency)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: %u", label, latency);
-+
-+	return true;
-+}
-+
-+static bool print_ase_pd(const struct l2cap_frame *frame, const char *label)
-+{
-+	uint32_t pd;
-+
-+	if (!l2cap_frame_get_le24((void *)frame, &pd)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: %u us", label, pd);
-+
-+	return true;
- }
- 
- static void print_ase_config(const struct l2cap_frame *frame)
- {
--	uint8_t framing, phy, rtn;
--	uint16_t latency;
--	uint32_t pd_min, pd_max, ppd_min, ppd_max;
--	struct bt_hci_lv_data *cc;
--
--	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
--		print_text(COLOR_ERROR, "Framing: invalid size");
--		return;
--	}
--
--	print_prefer_framing(framing);
--
--	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
--		print_text(COLOR_ERROR, "PHY: invalid size");
--		return;
--	}
--
--	print_prefer_phy(phy);
--
--	if (!l2cap_frame_get_u8((void *)frame, &rtn)) {
--		print_text(COLOR_ERROR, "RTN: invalid size");
--		return;
--	}
--
--	print_field("    RTN: %u", rtn);
--
--	if (!l2cap_frame_get_le16((void *)frame, &latency)) {
--		print_text(COLOR_ERROR, "RTN: invalid size");
--		return;
--	}
--
--	print_field("    Max Transport Latency: %u ms", latency);
--
--	if (!l2cap_frame_get_le24((void *)frame, &pd_min)) {
--		print_text(COLOR_ERROR, "Presentation Delay Min: invalid size");
--		return;
--	}
--
--	print_field("    Presentation Delay Min: %u us", pd_min);
--
--	if (!l2cap_frame_get_le24((void *)frame, &pd_max)) {
--		print_text(COLOR_ERROR, "Presentation Delay Max: invalid size");
--		return;
--	}
--
--	print_field("    Presentation Delay Max: %u us", pd_max);
--
--	if (!l2cap_frame_get_le24((void *)frame, &ppd_min)) {
--		print_text(COLOR_ERROR,
--			"Preferred Presentation Delay Min: invalid size");
--		return;
--	}
--
--	print_field("    Preferred Presentation Delay Min: %u us", ppd_min);
--
--	if (!l2cap_frame_get_le24((void *)frame, &ppd_max)) {
--		print_text(COLOR_ERROR,
--			"Preferred Presentation Delay Max: invalid size");
--		return;
--	}
--
--	print_field("    Preferred Presentation Delay Max: %u us", ppd_max);
--
--	if (!print_codec(frame))
-+	if (!print_prefer_framing(frame))
- 		return;
- 
--	cc = l2cap_frame_pull((void *)frame, frame, sizeof(*cc));
--	if (!cc) {
--		print_text(COLOR_ERROR,
--				"Codec Specific Configuration: invalid size");
-+	if (!print_prefer_phy(frame))
- 		return;
--	}
- 
--	if (!l2cap_frame_pull((void *)frame, frame, cc->len)) {
--		print_text(COLOR_ERROR,
--				"Codec Specific Configuration: invalid size");
-+	if (!print_ase_rtn(frame, "    RTN"))
- 		return;
--	}
- 
--	packet_print_ltv("    Codec Specific Configuration", cc->data, cc->len);
-+	if (!print_ase_latency(frame, "    Max Transport Latency"))
-+		return;
-+
-+	if (!print_ase_pd(frame, "    Presentation Delay Min"))
-+		return;
-+
-+	if (!print_ase_pd(frame, "    Presentation Delay Max"))
-+		return;
-+
-+	if (!print_ase_pd(frame, "    Preferred Presentation Delay Min"))
-+		return;
-+
-+	if (!print_ase_pd(frame, "    Preferred Presentation Delay Max"))
-+		return;
-+
-+	if (!print_ase_codec(frame))
-+		return;
-+
-+	print_ase_cc(frame);
- }
- 
--static void print_framing(uint8_t value)
-+static bool print_ase_framing(const struct l2cap_frame *frame,
-+						const char *label)
- {
--	switch (value) {
-+	uint8_t framing;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	switch (framing) {
- 	case 0x00:
--		print_field("    Framing: Unframed (0x%2.2x)", value);
-+		print_field("%s: Unframed (0x00)", label);
- 		break;
- 	case 0x01:
--		print_field("    Framing: Framed (0x%2.2x)", value);
-+		print_field("%s: Framed (0x01)", label);
- 		break;
- 	default:
--		print_field("    Framing: Reserved (0x%2.2x)", value);
-+		print_field("%s: Reserved (0x%2.2x)", label, framing);
- 	}
-+
-+	return true;
- }
- 
- static const struct bitfield_data phy_table[] = {
-@@ -490,100 +512,92 @@ static const struct bitfield_data phy_table[] = {
- 	{ }
- };
- 
--static void print_phy(uint8_t phy)
-+static bool print_ase_phy(const struct l2cap_frame *frame, const char *label)
- {
--	uint8_t mask;
-+	uint8_t phy, mask;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: 0x%2.2x", label, phy);
- 
- 	mask = print_bitfield(4, phy, phy_table);
- 	if (mask)
- 		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
- 								mask);
-+
-+	return true;
-+}
-+
-+static bool print_ase_interval(const struct l2cap_frame *frame,
-+						const char *label)
-+{
-+	uint32_t interval;
-+
-+	if (!l2cap_frame_get_le24((void *)frame, &interval)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: %u usec", label, interval);
-+
-+	return true;
-+}
-+
-+static bool print_ase_sdu(const struct l2cap_frame *frame, const char *label)
-+{
-+	uint16_t sdu;
-+
-+	if (!l2cap_frame_get_le16((void *)frame, &sdu)) {
-+		print_text(COLOR_ERROR, "%s: invalid size", label);
-+		return false;
-+	}
-+
-+	print_field("%s: %u", label, sdu);
-+
-+	return true;
- }
- 
- static void print_ase_qos(const struct l2cap_frame *frame)
- {
--	uint8_t framing, phy, rtn;
--	uint16_t sdu, latency;
--	uint32_t interval, pd;
--
- 	if (!l2cap_frame_print_u8((void *)frame, "    CIG ID"))
- 		return;
- 
- 	if (!l2cap_frame_print_u8((void *)frame, "    CIS ID"))
- 		return;
- 
--	if (!l2cap_frame_get_le24((void *)frame, &interval)) {
--		print_text(COLOR_ERROR, "SDU Interval: invalid size");
-+	if (!print_ase_interval(frame, "    SDU Interval"))
- 		return;
--	}
- 
--	print_field("    SDU Interval: %u us", interval);
--
--	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
--		print_text(COLOR_ERROR, "Framing: invalid size");
-+	if (!print_ase_framing(frame, "    Framing"))
- 		return;
--	}
- 
--	print_framing(framing);
--
--	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
--		print_text(COLOR_ERROR, "PHY: invalid size");
-+	if (!print_ase_phy(frame, "    PHY"))
- 		return;
--	}
- 
--	print_phy(phy);
--
--	if (!l2cap_frame_get_le16((void *)frame, &sdu)) {
--		print_text(COLOR_ERROR, "Max SDU: invalid size");
-+	if (!print_ase_sdu(frame, "    Max SDU"))
- 		return;
--	}
- 
--	print_field("    Max SDU: %u", sdu);
--
--	if (!l2cap_frame_get_u8((void *)frame, &rtn)) {
--		print_text(COLOR_ERROR, "RTN: invalid size");
-+	if (!print_ase_rtn(frame, "    RTN"))
- 		return;
--	}
- 
--	print_field("    RTN: %u", rtn);
--
--	if (!l2cap_frame_get_le16((void *)frame, &latency)) {
--		print_text(COLOR_ERROR, "Max Transport Latency: invalid size");
-+	if (!print_ase_latency(frame, "    Max Transport Latency"))
- 		return;
--	}
- 
--	print_field("    Max Transport Latency: %u", sdu);
--
--	if (!l2cap_frame_get_le24((void *)frame, &pd)) {
--		print_text(COLOR_ERROR, "Presentation Delay: invalid size");
--		return;
--	}
--
--	print_field("    Presentation Delay: %u us", pd);
-+	print_ase_pd(frame, "    Presentation Delay");
- }
- 
--static void print_ase_metadata(const struct l2cap_frame *frame)
-+static void print_ase_metadata_status(const struct l2cap_frame *frame)
- {
--	struct bt_hci_lv_data *meta;
--
- 	if (!l2cap_frame_print_u8((void *)frame, "    CIG ID"))
- 		return;
- 
- 	if (!l2cap_frame_print_u8((void *)frame, "    CIS ID"))
- 		return;
- 
--	meta = l2cap_frame_pull((void *)frame, frame, sizeof(*meta));
--	if (!meta) {
--		print_text(COLOR_ERROR, "Metadata: invalid size");
--		return;
--	}
--
--	if (!l2cap_frame_pull((void *)frame, frame, meta->len)) {
--		print_text(COLOR_ERROR, "Metadata: invalid size");
--		return;
--	}
--
--	packet_print_ltv("    Metadata", meta->data, meta->len);
-+	print_ase_metadata(frame);
- }
- 
- static void print_ase_status(const struct l2cap_frame *frame)
-@@ -620,17 +634,17 @@ static void print_ase_status(const struct l2cap_frame *frame)
- 	/* ASE_Status = 0x03 (Enabling) */
- 	case 0x03:
- 		print_field("    State: Enabling (0x03)");
--		print_ase_metadata(frame);
-+		print_ase_metadata_status(frame);
- 		break;
- 	/* ASE_Status = 0x04 (Streaming) */
- 	case 0x04:
- 		print_field("    State: Streaming (0x04)");
--		print_ase_metadata(frame);
-+		print_ase_metadata_status(frame);
- 		break;
- 	/* ASE_Status = 0x05 (Disabling) */
- 	case 0x05:
- 		print_field("    State: Disabling (0x05)");
--		print_ase_metadata(frame);
-+		print_ase_metadata_status(frame);
- 		break;
- 	/* ASE_Status = 0x06 (Releasing) */
- 	case 0x06:
-@@ -656,6 +670,394 @@ static void ase_notify(const struct l2cap_frame *frame)
- 	print_ase_status(frame);
- }
- 
-+static bool print_ase_target_latency(const struct l2cap_frame *frame)
-+{
-+	uint8_t latency;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &latency)) {
-+		print_text(COLOR_ERROR, "    Target Latency: invalid size");
-+		return false;
-+	}
-+
-+	switch (latency) {
-+	case 0x01:
-+		print_field("    Target Latency: Low Latency (0x01)");
-+		break;
-+	case 0x02:
-+		print_field("    Target Latency: Balance Latency/Reliability "
-+								"(0x02)");
-+		break;
-+	case 0x03:
-+		print_field("    Target Latency: High Reliability (0x03)");
-+		break;
-+	default:
-+		print_field("    Target Latency: Reserved (0x%2.2x)", latency);
-+		break;
-+	}
-+
-+	return true;
-+}
-+
-+static bool ase_config_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	if (!print_ase_target_latency(frame))
-+		return false;
-+
-+	if (!print_ase_phy(frame, "    PHY"))
-+		return false;
-+
-+	if (!print_ase_codec(frame))
-+		return false;
-+
-+	if (!print_ase_cc(frame))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_qos_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	if (!l2cap_frame_print_u8((void *)frame, "    CIG ID"))
-+		return false;
-+
-+	if (!l2cap_frame_print_u8((void *)frame, "    CIS ID"))
-+		return false;
-+
-+	if (!print_ase_interval(frame, "    SDU Interval"))
-+		return false;
-+
-+	if (!print_ase_framing(frame, "    Framing"))
-+		return false;
-+
-+	if (!print_ase_phy(frame, "    PHY"))
-+		return false;
-+
-+	if (!print_ase_sdu(frame, "    Max SDU"))
-+		return false;
-+
-+	if (!print_ase_rtn(frame, "    RTN"))
-+		return false;
-+
-+	if (!print_ase_latency(frame, "    Max Transport Latency"))
-+		return false;
-+
-+	if (!print_ase_pd(frame, "    Presentation Delay"))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_enable_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	if (!print_ase_metadata(frame))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_start_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_disable_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_stop_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_metadata_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	if (!print_ase_metadata(frame))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool ase_release_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+		return false;
-+
-+	return true;
-+}
-+
-+#define ASE_CMD(_op, _desc, _func) \
-+[_op] = { \
-+	.desc = _desc, \
-+	.func = _func, \
-+}
-+
-+struct ase_cmd {
-+	const char *desc;
-+	bool (*func)(const struct l2cap_frame *frame);
-+} ase_cmd_table[] = {
-+	/* Opcode = 0x01 (Codec Configuration) */
-+	ASE_CMD(0x01, "Codec Configuration", ase_config_cmd),
-+	/* Opcode = 0x02 (QoS Configuration) */
-+	ASE_CMD(0x02, "QoS Configuration", ase_qos_cmd),
-+	/* Opcode = 0x03 (Enable) */
-+	ASE_CMD(0x03, "Enable", ase_enable_cmd),
-+	/* Opcode = 0x04 (Receiver Start Ready) */
-+	ASE_CMD(0x04, "Receiver Start Ready", ase_start_cmd),
-+	/* Opcode = 0x05 (Disable) */
-+	ASE_CMD(0x05, "Disable", ase_disable_cmd),
-+	/* Opcode = 0x06 (Receiver Stop Ready) */
-+	ASE_CMD(0x06, "Receiver Stop Ready", ase_stop_cmd),
-+	/* Opcode = 0x07 (Update Metadata) */
-+	ASE_CMD(0x07, "Update Metadata", ase_metadata_cmd),
-+	/* Opcode = 0x08 (Release) */
-+	ASE_CMD(0x08, "Release", ase_release_cmd),
-+};
-+
-+static struct ase_cmd *ase_get_cmd(uint8_t op)
-+{
-+	if (op > ARRAY_SIZE(ase_cmd_table))
-+		return NULL;
-+
-+	return &ase_cmd_table[op];
-+}
-+
-+static void print_ase_cmd(const struct l2cap_frame *frame)
-+{
-+	uint8_t op, num, i;
-+	struct ase_cmd *cmd;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &op)) {
-+		print_text(COLOR_ERROR, "opcode: invalid size");
-+		goto done;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &num)) {
-+		print_text(COLOR_ERROR, "num: invalid size");
-+		goto done;
-+	}
-+
-+	cmd = ase_get_cmd(op);
-+	if (!cmd) {
-+		print_field("    Opcode: Reserved (0x%2.2x)", op);
-+		goto done;
-+	}
-+
-+	print_field("    Opcode: %s (0x%2.2x)", cmd->desc, op);
-+	print_field("    Number of ASE(s): %u", num);
-+
-+	for (i = 0; i < num && frame->size; i++) {
-+		print_field("    ASE: #%u", i);
-+
-+		if (!cmd->func(frame))
-+			break;
-+	}
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void ase_cp_write(const struct l2cap_frame *frame)
-+{
-+	print_ase_cmd(frame);
-+}
-+
-+static bool print_ase_cp_rsp_code(const struct l2cap_frame *frame)
-+{
-+	uint8_t code;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &code)) {
-+		print_text(COLOR_ERROR, "    ASE Response Code: invalid size");
-+		return false;
-+	}
-+
-+	switch (code) {
-+	case 0x00:
-+		print_field("    ASE Response Code: Success (0x00)");
-+		break;
-+	case 0x01:
-+		print_field("    ASE Response Code: Unsupported Opcode (0x01)");
-+		break;
-+	case 0x02:
-+		print_field("    ASE Response Code: Invalid Length (0x02)");
-+		break;
-+	case 0x03:
-+		print_field("    ASE Response Code: Invalid ASE ID (0x03)");
-+		break;
-+	case 0x04:
-+		print_field("    ASE Response Code: Invalid ASE State (0x04)");
-+		break;
-+	case 0x05:
-+		print_field("    ASE Response Code: Invalid ASE Direction "
-+								"(0x05)");
-+		break;
-+	case 0x06:
-+		print_field("    ASE Response Code: Unsupported Audio "
-+							"Capabilities (0x06)");
-+		break;
-+	case 0x07:
-+		print_field("    ASE Response Code: Unsupported Configuration "
-+								"(0x07)");
-+		break;
-+	case 0x08:
-+		print_field("    ASE Response Code: Rejected Configuration "
-+								"(0x08)");
-+		break;
-+	case 0x09:
-+		print_field("    ASE Response Code: Invalid Configuration "
-+								"(0x09)");
-+		break;
-+	case 0x0a:
-+		print_field("    ASE Response Code: Unsupported Metadata "
-+								"(0x0a)");
-+		break;
-+	case 0x0b:
-+		print_field("    ASE Response Code: Rejected Metadata (0x0b)");
-+		break;
-+	case 0x0c:
-+		print_field("    ASE Response Code: Invalid Metadata (0x0c)");
-+		break;
-+	case 0x0d:
-+		print_field("    ASE Response Code: Insufficient Resources "
-+								"(0x0d)");
-+		break;
-+	case 0x0e:
-+		print_field("    ASE Response Code: Unspecified Error (0x0e)");
-+		break;
-+	default:
-+		print_field("    ASE Response Code: Reserved (0x%2.2x)", code);
-+		break;
-+	}
-+
-+	return true;
-+}
-+
-+static bool print_ase_cp_rsp_reason(const struct l2cap_frame *frame)
-+{
-+	uint8_t reason;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &reason)) {
-+		print_text(COLOR_ERROR,
-+				"    ASE Response Reason: invalid size");
-+		return false;
-+	}
-+
-+	switch (reason) {
-+	case 0x00:
-+		print_field("    ASE Response Reason: None (0x00)");
-+		break;
-+	case 0x01:
-+		print_field("    ASE Response Reason: ASE ID (0x01)");
-+		break;
-+	case 0x02:
-+		print_field("    ASE Response Reason: Codec Specific "
-+						"Configuration (0x02)");
-+		break;
-+	case 0x03:
-+		print_field("    ASE Response Reason: SDU Interval (0x03)");
-+		break;
-+	case 0x04:
-+		print_field("    ASE Response Reason: Framing (0x04)");
-+		break;
-+	case 0x05:
-+		print_field("    ASE Response Reason: PHY (0x05)");
-+		break;
-+	case 0x06:
-+		print_field("    ASE Response Reason: Max SDU (0x06)");
-+		break;
-+	case 0x07:
-+		print_field("    ASE Response Reason: RTN (0x07)");
-+		break;
-+	case 0x08:
-+		print_field("    ASE Response Reason: Max Transport Latency "
-+								"(0x08)");
-+		break;
-+	case 0x09:
-+		print_field("    ASE Response Reason: Presentation Delay "
-+								"(0x09)");
-+		break;
-+	case 0x0a:
-+		print_field("    ASE Response Reason: Invalid ASE/CIS Mapping "
-+								"(0x0a)");
-+		break;
-+	default:
-+		print_field("    ASE Response Reason: Reserved (0x%2.2x)",
-+								reason);
-+		break;
-+	}
-+
-+	return true;
-+}
-+
-+static void print_ase_cp_rsp(const struct l2cap_frame *frame)
-+{
-+	uint8_t op, num, i;
-+	struct ase_cmd *cmd;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &op)) {
-+		print_text(COLOR_ERROR, "    opcode: invalid size");
-+		goto done;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &num)) {
-+		print_text(COLOR_ERROR, "    Number of ASE(s): invalid size");
-+		goto done;
-+	}
-+
-+	cmd = ase_get_cmd(op);
-+	if (!cmd) {
-+		print_field("    Opcode: Reserved (0x%2.2x)", op);
-+		goto done;
-+	}
-+
-+	print_field("    Opcode: %s (0x%2.2x)", cmd->desc, op);
-+	print_field("    Number of ASE(s): %u", num);
-+
-+	for (i = 0; i < num && frame->size; i++) {
-+		print_field("    ASE: #%u", i);
-+
-+		if (!l2cap_frame_print_u8((void *)frame, "    ASE ID"))
-+			break;
-+
-+		if (!print_ase_cp_rsp_code(frame))
-+			break;
-+
-+		if (!print_ase_cp_rsp_reason(frame))
-+			break;
-+	}
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void ase_cp_notify(const struct l2cap_frame *frame)
-+{
-+	print_ase_cp_rsp(frame);
-+}
-+
- #define GATT_HANDLER(_uuid, _read, _write, _notify) \
- { \
- 	.uuid = { \
-@@ -679,6 +1081,7 @@ struct gatt_handler {
- 	GATT_HANDLER(PAC_SOURCE_CHRC_UUID, pac_read, NULL, pac_notify),
- 	GATT_HANDLER(ASE_SINK_UUID, ase_read, NULL, ase_notify),
- 	GATT_HANDLER(ASE_SOURCE_UUID, ase_read, NULL, ase_notify),
-+	GATT_HANDLER(ASE_CP_UUID, NULL, ase_cp_write, ase_cp_notify),
- };
- 
- static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
+> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+> Reviewed-by: Miao-chen Chou <mcchou@google.com>
+> ---
+>
+>  include/net/bluetooth/hci_core.h |   5 +-
+>  net/bluetooth/hci_core.c         |  47 ++++-----
+>  net/bluetooth/mgmt.c             | 121 +++++++----------------
+>  net/bluetooth/msft.c             | 161 ++++++++-----------------------
+>  4 files changed, 98 insertions(+), 236 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 5a52a2018b56..59953a7a6328 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1410,10 +1410,8 @@ bool hci_adv_instance_is_scannable(struct hci_dev *hdev, u8 instance);
+>
+>  void hci_adv_monitors_clear(struct hci_dev *hdev);
+>  void hci_free_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
+> -int hci_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
+>  int hci_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
+> -bool hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
+> -                       int *err);
+> +int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
+>  bool hci_remove_single_adv_monitor(struct hci_dev *hdev, u16 handle, int *err);
+>  bool hci_remove_all_adv_monitor(struct hci_dev *hdev, int *err);
+>  bool hci_is_adv_monitoring(struct hci_dev *hdev);
+> @@ -1875,7 +1873,6 @@ void mgmt_advertising_removed(struct sock *sk, struct hci_dev *hdev,
+>                               u8 instance);
+>  void mgmt_adv_monitor_removed(struct hci_dev *hdev, u16 handle);
+>  int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
+> -int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
+>  int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
+>  void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
+>                                   bdaddr_t *bdaddr, u8 addr_type);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5abb2ca5b129..bbbbe3203130 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1873,11 +1873,6 @@ void hci_free_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+>         kfree(monitor);
+>  }
+>
+> -int hci_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status)
+> -{
+> -       return mgmt_add_adv_patterns_monitor_complete(hdev, status);
+> -}
+> -
+>  int hci_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status)
+>  {
+>         return mgmt_remove_adv_monitor_complete(hdev, status);
+> @@ -1885,49 +1880,49 @@ int hci_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status)
+>
+>  /* Assigns handle to a monitor, and if offloading is supported and power is on,
+>   * also attempts to forward the request to the controller.
+> - * Returns true if request is forwarded (result is pending), false otherwise.
+> - * This function requires the caller holds hdev->lock.
+>   */
+> -bool hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
+> -                        int *err)
+> +int hci_add_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+>  {
+>         int min, max, handle;
+> +       int status = 0;
+>
+> -       *err = 0;
+> +       if (!monitor)
+> +               return -EINVAL;
+>
+> -       if (!monitor) {
+> -               *err = -EINVAL;
+> -               return false;
+> -       }
+> +       hci_dev_lock(hdev);
+>
+>         min = HCI_MIN_ADV_MONITOR_HANDLE;
+>         max = HCI_MIN_ADV_MONITOR_HANDLE + HCI_MAX_ADV_MONITOR_NUM_HANDLES;
+>         handle = idr_alloc(&hdev->adv_monitors_idr, monitor, min, max,
+>                            GFP_KERNEL);
+> -       if (handle < 0) {
+> -               *err = handle;
+> -               return false;
+> -       }
+> +
+> +       hci_dev_unlock(hdev);
+> +
+> +       if (handle < 0)
+> +               return handle;
+>
+>         monitor->handle = handle;
+>
+>         if (!hdev_is_powered(hdev))
+> -               return false;
+> +               return status;
+>
+>         switch (hci_get_adv_monitor_offload_ext(hdev)) {
+>         case HCI_ADV_MONITOR_EXT_NONE:
+> -               hci_update_passive_scan(hdev);
+> -               bt_dev_dbg(hdev, "%s add monitor status %d", hdev->name, *err);
+> +               bt_dev_dbg(hdev, "%s add monitor %d status %d", hdev->name,
+> +                          monitor->handle, status);
+>                 /* Message was not forwarded to controller - not an error */
+> -               return false;
+> +               break;
+> +
+>         case HCI_ADV_MONITOR_EXT_MSFT:
+> -               *err = msft_add_monitor_pattern(hdev, monitor);
+> -               bt_dev_dbg(hdev, "%s add monitor msft status %d", hdev->name,
+> -                          *err);
+> +               hci_req_sync_lock(hdev);
+> +               status = msft_add_monitor_pattern(hdev, monitor);
+> +               hci_req_sync_unlock(hdev);
+> +               bt_dev_dbg(hdev, "%s add monitor %d msft status %d", hdev->name,
+> +                          monitor->handle, status);
+>                 break;
+>         }
+>
+> -       return (*err == 0);
+> +       return status;
+>  }
+>
+>  /* Attempts to tell the controller and free the monitor. If somehow the
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 74937a834648..d04f90698a87 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4653,75 +4653,21 @@ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+>         return err;
+>  }
+>
+> -int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status)
+> -{
+> -       struct mgmt_rp_add_adv_patterns_monitor rp;
+> -       struct mgmt_pending_cmd *cmd;
+> -       struct adv_monitor *monitor;
+> -       int err = 0;
+> -
+> -       hci_dev_lock(hdev);
+> -
+> -       cmd = pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI, hdev);
+> -       if (!cmd) {
+> -               cmd = pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR, hdev);
+> -               if (!cmd)
+> -                       goto done;
+> -       }
+> -
+> -       monitor = cmd->user_data;
+> -       rp.monitor_handle = cpu_to_le16(monitor->handle);
+> -
+> -       if (!status) {
+> -               mgmt_adv_monitor_added(cmd->sk, hdev, monitor->handle);
+> -               hdev->adv_monitors_cnt++;
+> -               if (monitor->state == ADV_MONITOR_STATE_NOT_REGISTERED)
+> -                       monitor->state = ADV_MONITOR_STATE_REGISTERED;
+> -               hci_update_passive_scan(hdev);
+> -       }
+> -
+> -       err = mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode,
+> -                               mgmt_status(status), &rp, sizeof(rp));
+> -       mgmt_pending_remove(cmd);
+> -
+> -done:
+> -       hci_dev_unlock(hdev);
+> -       bt_dev_dbg(hdev, "add monitor %d complete, status %u",
+> -                  rp.monitor_handle, status);
+> -
+> -       return err;
+> -}
+> -
+>  static int __add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+> -                                     struct adv_monitor *m, u8 status,
+> -                                     void *data, u16 len, u16 op)
+> +                                     struct adv_monitor *m, void *data,
+> +                                     u16 len, u16 op)
+>  {
+>         struct mgmt_rp_add_adv_patterns_monitor rp;
+> -       struct mgmt_pending_cmd *cmd;
+> +       u8 status = MGMT_STATUS_SUCCESS;
+>         int err;
+> -       bool pending;
+> -
+> -       hci_dev_lock(hdev);
+> -
+> -       if (status)
+> -               goto unlock;
+>
+>         if (pending_find(MGMT_OP_SET_LE, hdev) ||
+> -           pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR, hdev) ||
+> -           pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI, hdev) ||
+>             pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev)) {
+>                 status = MGMT_STATUS_BUSY;
+> -               goto unlock;
+> -       }
+> -
+> -       cmd = mgmt_pending_add(sk, op, hdev, data, len);
+> -       if (!cmd) {
+> -               status = MGMT_STATUS_NO_RESOURCES;
+> -               goto unlock;
+> +               goto done;
+>         }
+>
+> -       cmd->user_data = m;
+> -       pending = hci_add_adv_monitor(hdev, m, &err);
+> +       err = hci_add_adv_monitor(hdev, m);
+>         if (err) {
+>                 if (err == -ENOSPC || err == -ENOMEM)
+>                         status = MGMT_STATUS_NO_RESOURCES;
+> @@ -4730,30 +4676,29 @@ static int __add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+>                 else
+>                         status = MGMT_STATUS_FAILED;
+>
+> -               mgmt_pending_remove(cmd);
+> -               goto unlock;
+> +               goto done;
+>         }
+>
+> -       if (!pending) {
+> -               mgmt_pending_remove(cmd);
+> -               rp.monitor_handle = cpu_to_le16(m->handle);
+> -               mgmt_adv_monitor_added(sk, hdev, m->handle);
+> -               m->state = ADV_MONITOR_STATE_REGISTERED;
+> -               hdev->adv_monitors_cnt++;
+> +       hci_dev_lock(hdev);
+>
+> -               hci_dev_unlock(hdev);
+> -               return mgmt_cmd_complete(sk, hdev->id, op, MGMT_STATUS_SUCCESS,
+> -                                        &rp, sizeof(rp));
+> -       }
+> +       rp.monitor_handle = cpu_to_le16(m->handle);
+> +       mgmt_adv_monitor_added(sk, hdev, m->handle);
+> +       if (m->state == ADV_MONITOR_STATE_NOT_REGISTERED)
+> +               m->state = ADV_MONITOR_STATE_REGISTERED;
+> +       hdev->adv_monitors_cnt++;
+> +       hci_update_passive_scan(hdev);
+>
+>         hci_dev_unlock(hdev);
+>
+> -       return 0;
+> +done:
+> +       bt_dev_dbg(hdev, "add monitor %d complete, status %u", m->handle,
+> +                  status);
+>
+> -unlock:
+> -       hci_free_adv_monitor(hdev, m);
+> -       hci_dev_unlock(hdev);
+> -       return mgmt_cmd_status(sk, hdev->id, op, status);
+> +       if (status)
+> +               return mgmt_cmd_status(sk, hdev->id, op, status);
+> +
+> +       return mgmt_cmd_complete(sk, hdev->id, op, MGMT_STATUS_SUCCESS, &rp,
+> +                                sizeof(rp));
+>  }
+>
+>  static void parse_adv_monitor_rssi(struct adv_monitor *m,
+> @@ -4817,7 +4762,7 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+>  {
+>         struct mgmt_cp_add_adv_patterns_monitor *cp = data;
+>         struct adv_monitor *m = NULL;
+> -       u8 status = MGMT_STATUS_SUCCESS;
+> +       int status = MGMT_STATUS_SUCCESS;
+>         size_t expected_size = sizeof(*cp);
+>
+>         BT_DBG("request for %s", hdev->name);
+> @@ -4843,10 +4788,14 @@ static int add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+>
+>         parse_adv_monitor_rssi(m, NULL);
+>         status = parse_adv_monitor_pattern(m, cp->pattern_count, cp->patterns);
+> +       if (status)
+> +               goto done;
+> +
+> +       status = __add_adv_patterns_monitor(sk, hdev, m, data, len,
+> +                                           MGMT_OP_ADD_ADV_PATTERNS_MONITOR);
+>
+>  done:
+> -       return __add_adv_patterns_monitor(sk, hdev, m, status, data, len,
+> -                                         MGMT_OP_ADD_ADV_PATTERNS_MONITOR);
+> +       return status;
+>  }
+>
+>  static int add_adv_patterns_monitor_rssi(struct sock *sk, struct hci_dev *hdev,
+> @@ -4854,7 +4803,7 @@ static int add_adv_patterns_monitor_rssi(struct sock *sk, struct hci_dev *hdev,
+>  {
+>         struct mgmt_cp_add_adv_patterns_monitor_rssi *cp = data;
+>         struct adv_monitor *m = NULL;
+> -       u8 status = MGMT_STATUS_SUCCESS;
+> +       int status = MGMT_STATUS_SUCCESS;
+>         size_t expected_size = sizeof(*cp);
+>
+>         BT_DBG("request for %s", hdev->name);
+> @@ -4880,10 +4829,14 @@ static int add_adv_patterns_monitor_rssi(struct sock *sk, struct hci_dev *hdev,
+>
+>         parse_adv_monitor_rssi(m, &cp->rssi);
+>         status = parse_adv_monitor_pattern(m, cp->pattern_count, cp->patterns);
+> +       if (status)
+> +               goto done;
+>
+> -done:
+> -       return __add_adv_patterns_monitor(sk, hdev, m, status, data, len,
+> +       status = __add_adv_patterns_monitor(sk, hdev, m, data, len,
+>                                          MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI);
+> +
+> +done:
+> +       return status;
+>  }
+>
+>  int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status)
+> @@ -4933,9 +4886,7 @@ static int remove_adv_monitor(struct sock *sk, struct hci_dev *hdev,
+>         hci_dev_lock(hdev);
+>
+>         if (pending_find(MGMT_OP_SET_LE, hdev) ||
+> -           pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev) ||
+> -           pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR, hdev) ||
+> -           pending_find(MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI, hdev)) {
+> +           pending_find(MGMT_OP_REMOVE_ADV_MONITOR, hdev)) {
+>                 status = MGMT_STATUS_BUSY;
+>                 goto unlock;
+>         }
+> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+> index f43994523b1f..9abea16c4305 100644
+> --- a/net/bluetooth/msft.c
+> +++ b/net/bluetooth/msft.c
+> @@ -106,8 +106,6 @@ struct msft_data {
+>         __u8 filter_enabled;
+>  };
+>
+> -static int __msft_add_monitor_pattern(struct hci_dev *hdev,
+> -                                     struct adv_monitor *monitor);
+>  static int __msft_remove_monitor(struct hci_dev *hdev,
+>                                  struct adv_monitor *monitor, u16 handle);
+>
+> @@ -164,34 +162,6 @@ static bool read_supported_features(struct hci_dev *hdev,
+>         return false;
+>  }
+>
+> -static void reregister_monitor(struct hci_dev *hdev, int handle)
+> -{
+> -       struct adv_monitor *monitor;
+> -       struct msft_data *msft = hdev->msft_data;
+> -       int err;
+> -
+> -       while (1) {
+> -               monitor = idr_get_next(&hdev->adv_monitors_idr, &handle);
+> -               if (!monitor) {
+> -                       /* All monitors have been resumed */
+> -                       msft->resuming = false;
+> -                       hci_update_passive_scan(hdev);
+> -                       return;
+> -               }
+> -
+> -               msft->pending_add_handle = (u16)handle;
+> -               err = __msft_add_monitor_pattern(hdev, monitor);
+> -
+> -               /* If success, we return and wait for monitor added callback */
+> -               if (!err)
+> -                       return;
+> -
+> -               /* Otherwise remove the monitor and keep registering */
+> -               hci_free_adv_monitor(hdev, monitor);
+> -               handle++;
+> -       }
+> -}
+> -
+>  /* is_mgmt = true matches the handle exposed to userspace via mgmt.
+>   * is_mgmt = false matches the handle used by the msft controller.
+>   * This function requires the caller holds hdev->lock
+> @@ -243,14 +213,14 @@ static int msft_monitor_device_del(struct hci_dev *hdev, __u16 mgmt_handle,
+>         return count;
+>  }
+>
+> -static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
+> -                                            u8 status, u16 opcode,
+> -                                            struct sk_buff *skb)
+> +static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
+> +                                           struct sk_buff *skb)
+>  {
+>         struct msft_rp_le_monitor_advertisement *rp;
+>         struct adv_monitor *monitor;
+>         struct msft_monitor_advertisement_handle_data *handle_data;
+>         struct msft_data *msft = hdev->msft_data;
+> +       int status = 0;
+>
+>         hci_dev_lock(hdev);
+>
+> @@ -262,15 +232,16 @@ static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
+>                 goto unlock;
+>         }
+>
+> -       if (status)
+> -               goto unlock;
+> -
+>         rp = (struct msft_rp_le_monitor_advertisement *)skb->data;
+>         if (skb->len < sizeof(*rp)) {
+>                 status = HCI_ERROR_UNSPECIFIED;
+>                 goto unlock;
+>         }
+>
+> +       status = rp->status;
+> +       if (status)
+> +               goto unlock;
+> +
+>         handle_data = kmalloc(sizeof(*handle_data), GFP_KERNEL);
+>         if (!handle_data) {
+>                 status = HCI_ERROR_UNSPECIFIED;
+> @@ -290,8 +261,7 @@ static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
+>
+>         hci_dev_unlock(hdev);
+>
+> -       if (!msft->resuming)
+> -               hci_add_adv_patterns_monitor_complete(hdev, status);
+> +       return status;
+>  }
+>
+>  static void msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
+> @@ -463,7 +433,7 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
+>         ptrdiff_t offset = 0;
+>         u8 pattern_count = 0;
+>         struct sk_buff *skb;
+> -       u8 status;
+> +       struct msft_data *msft = hdev->msft_data;
+>
+>         if (!msft_monitor_pattern_valid(monitor))
+>                 return -EINVAL;
+> @@ -505,20 +475,40 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
+>         if (IS_ERR(skb))
+>                 return PTR_ERR(skb);
+>
+> -       status = skb->data[0];
+> -       skb_pull(skb, 1);
+> +       msft->pending_add_handle = monitor->handle;
+>
+> -       msft_le_monitor_advertisement_cb(hdev, status, hdev->msft_opcode, skb);
+> +       return msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode, skb);
+> +}
+>
+> -       return status;
+> +static void reregister_monitor(struct hci_dev *hdev)
+> +{
+> +       struct adv_monitor *monitor;
+> +       struct msft_data *msft = hdev->msft_data;
+> +       int handle = 0;
+> +
+> +       if (!msft)
+> +               return;
+> +
+> +       msft->resuming = true;
+> +
+> +       while (1) {
+> +               monitor = idr_get_next(&hdev->adv_monitors_idr, &handle);
+> +               if (!monitor)
+> +                       break;
+> +
+> +               msft_add_monitor_sync(hdev, monitor);
+> +
+> +               handle++;
+> +       }
+> +
+> +       /* All monitors have been reregistered */
+> +       msft->resuming = false;
+>  }
+>
+>  /* This function requires the caller holds hci_req_sync_lock */
+>  int msft_resume_sync(struct hci_dev *hdev)
+>  {
+>         struct msft_data *msft = hdev->msft_data;
+> -       struct adv_monitor *monitor;
+> -       int handle = 0;
+>
+>         if (!msft || !msft_monitor_supported(hdev))
+>                 return 0;
+> @@ -533,24 +523,12 @@ int msft_resume_sync(struct hci_dev *hdev)
+>
+>         hci_dev_unlock(hdev);
+>
+> -       msft->resuming = true;
+> -
+> -       while (1) {
+> -               monitor = idr_get_next(&hdev->adv_monitors_idr, &handle);
+> -               if (!monitor)
+> -                       break;
+> -
+> -               msft_add_monitor_sync(hdev, monitor);
+> -
+> -               handle++;
+> -       }
+> -
+> -       /* All monitors have been resumed */
+> -       msft->resuming = false;
+> +       reregister_monitor(hdev);
+>
+>         return 0;
+>  }
+>
+> +/* This function requires the caller holds hci_req_sync_lock */
+>  void msft_do_open(struct hci_dev *hdev)
+>  {
+>         struct msft_data *msft = hdev->msft_data;
+> @@ -583,7 +561,7 @@ void msft_do_open(struct hci_dev *hdev)
+>                 /* Monitors get removed on power off, so we need to explicitly
+>                  * tell the controller to re-monitor.
+>                  */
+> -               reregister_monitor(hdev, 0);
+> +               reregister_monitor(hdev);
+>         }
+>  }
+>
+> @@ -829,66 +807,7 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+>         hci_dev_unlock(hdev);
+>  }
+>
+> -/* This function requires the caller holds hdev->lock */
+> -static int __msft_add_monitor_pattern(struct hci_dev *hdev,
+> -                                     struct adv_monitor *monitor)
+> -{
+> -       struct msft_cp_le_monitor_advertisement *cp;
+> -       struct msft_le_monitor_advertisement_pattern_data *pattern_data;
+> -       struct msft_le_monitor_advertisement_pattern *pattern;
+> -       struct adv_pattern *entry;
+> -       struct hci_request req;
+> -       struct msft_data *msft = hdev->msft_data;
+> -       size_t total_size = sizeof(*cp) + sizeof(*pattern_data);
+> -       ptrdiff_t offset = 0;
+> -       u8 pattern_count = 0;
+> -       int err = 0;
+> -
+> -       if (!msft_monitor_pattern_valid(monitor))
+> -               return -EINVAL;
+> -
+> -       list_for_each_entry(entry, &monitor->patterns, list) {
+> -               pattern_count++;
+> -               total_size += sizeof(*pattern) + entry->length;
+> -       }
+> -
+> -       cp = kmalloc(total_size, GFP_KERNEL);
+> -       if (!cp)
+> -               return -ENOMEM;
+> -
+> -       cp->sub_opcode = MSFT_OP_LE_MONITOR_ADVERTISEMENT;
+> -       cp->rssi_high = monitor->rssi.high_threshold;
+> -       cp->rssi_low = monitor->rssi.low_threshold;
+> -       cp->rssi_low_interval = (u8)monitor->rssi.low_threshold_timeout;
+> -       cp->rssi_sampling_period = monitor->rssi.sampling_period;
+> -
+> -       cp->cond_type = MSFT_MONITOR_ADVERTISEMENT_TYPE_PATTERN;
+> -
+> -       pattern_data = (void *)cp->data;
+> -       pattern_data->count = pattern_count;
+> -
+> -       list_for_each_entry(entry, &monitor->patterns, list) {
+> -               pattern = (void *)(pattern_data->data + offset);
+> -               /* the length also includes data_type and offset */
+> -               pattern->length = entry->length + 2;
+> -               pattern->data_type = entry->ad_type;
+> -               pattern->start_byte = entry->offset;
+> -               memcpy(pattern->pattern, entry->value, entry->length);
+> -               offset += sizeof(*pattern) + entry->length;
+> -       }
+> -
+> -       hci_req_init(&req, hdev);
+> -       hci_req_add(&req, hdev->msft_opcode, total_size, cp);
+> -       err = hci_req_run_skb(&req, msft_le_monitor_advertisement_cb);
+> -       kfree(cp);
+> -
+> -       if (!err)
+> -               msft->pending_add_handle = monitor->handle;
+> -
+> -       return err;
+> -}
+> -
+> -/* This function requires the caller holds hdev->lock */
+> +/* This function requires the caller holds hci_req_sync_lock */
+>  int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
+>  {
+>         struct msft_data *msft = hdev->msft_data;
+> @@ -899,7 +818,7 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, struct adv_monitor *monitor)
+>         if (msft->resuming || msft->suspending)
+>                 return -EBUSY;
+>
+> -       return __msft_add_monitor_pattern(hdev, monitor);
+> +       return msft_add_monitor_sync(hdev, monitor);
+>  }
+>
+>  /* This function requires the caller holds hdev->lock */
+> --
+> 2.36.1.124.g0e6072fb45-goog
+>
+
+
 -- 
-2.35.1
-
+Luiz Augusto von Dentz
