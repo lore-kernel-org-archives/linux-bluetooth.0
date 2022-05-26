@@ -2,109 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5F8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 17:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77324C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 20:12:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238447AbiEZR0J (ORCPT
+        id S1348906AbiEZUMO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 May 2022 13:26:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41926 "EHLO
+        Thu, 26 May 2022 16:12:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233201AbiEZR0G (ORCPT
+        with ESMTP id S1348874AbiEZUMI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 May 2022 13:26:06 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6ACA22BD9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 10:26:05 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id m13so2554236qtx.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 10:26:05 -0700 (PDT)
+        Thu, 26 May 2022 16:12:08 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA9EC5DB9;
+        Thu, 26 May 2022 13:12:07 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so2574231pjt.4;
+        Thu, 26 May 2022 13:12:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=M1XxUGIXbtR0u55oVYA3AOTqC/+Nl+4G7NhJ+4h85vY=;
-        b=ivQAx/ppIgVQmJnEDbcBT7rccYmELklAWk1r5MVpYW90fn9OgykK6/YtGi6wUTgj4/
-         BSQ3vdkivREsVuBDLdVllYgYfGILtgLrHcNWDxG6RhsvdKhLN2y3orwoCILdMKYaNq3V
-         Dtsmp97XGwSTFGCxb1DZEV5HpoheZOYl8uMY1VrcRknfB10vV1Ejg9+fau6CkaPnIDnc
-         InKcDRmB07BsaIdPq7lRE21xvWvxM2ZOl8lztO11jxrCA26cf2Rs6b2OHHsmgS+5AZug
-         hjOnKIi7zMRCUY6Mu/a+yDBiYqR86wBfVkFrUGv/snocJcMckuRnWWCaiKr3Vyi9tGrR
-         kdQA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Ym1mSZ1N+gDIg7RPoqcZ6DASQgrFGhS7kPRYey05Jig=;
+        b=U1xGut8jUgrl5aH8rrFlvVXLlKZ7koIFTkdaMNaSFb8co+fPLt4WOdT87pgdLm6qh/
+         T5NtkOndjxddPXrFuQIIF0BxTtiH2PPpuJU4fsZpIT/NmHbDkvkP04pJxo3w8ZXXearK
+         kMXiE6Hh5pvG5yBWpANTZX3wgyqrKqbM8ya8yowLKKrQOEz0A3Hd4+1yEqTStNr0ieYv
+         7/baUY8jkz09C99Gw4+4utqAiIqoDRP8JanN0EoMKt1diGcDbyXxcTDIvTv9ws+1qJ31
+         UQUqHbQNlGGzEId1tuQe/ERjK/CIo/eHN5u9tNsEezabBNv7BphITj4I/SyMZRUEcxlX
+         /T7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=M1XxUGIXbtR0u55oVYA3AOTqC/+Nl+4G7NhJ+4h85vY=;
-        b=dq9iIiMOlwtMOz0XDlR9a4HW8OBcDBihj8Dl5w4iOW58vqnAdwmJ1Blf3iN/XODzX2
-         jNdVfGzV10xzqmzN65iK9eudOYVJhu1Qhc4tULNoWDg9v1A7lTKWSHlGAqFZdwdhea6r
-         ULJxpDcmRoSt6yT8mzMbw/YAK+WPdgrcu1f68O7F033Dnkm3XReC4+4Vt0DTqbN51cub
-         7AbV4RiWWXdGmHysH+eXAbAeleEsG9SsHciufFUJNjBUm0sq8HJOF0JwogcSYvVxEkGS
-         Kr/N3rFeJqVs7m/oD3AQRA61h40vGSXG93GO5pXbi4YjtsfIwHdXITcDRebXGAwwiVPo
-         FPtg==
-X-Gm-Message-State: AOAM532kGEJDjXUk3a4zrAgCuwxFG4KfQDKVJpiHdrAKWxz2yeFQgcxA
-        rcslvs5vwiD/KwrTocSi/IwI7KMRMko0Ow==
-X-Google-Smtp-Source: ABdhPJzbUT7zTXvbfVlSkYmLZgpKpTIQNM52XRJ3Y7PcU9jRGJTIfZwmhJaaxvv+CIFC5Z9iWwGeZg==
-X-Received: by 2002:ac8:7fc2:0:b0:2f3:d47d:487c with SMTP id b2-20020ac87fc2000000b002f3d47d487cmr29675171qtk.157.1653585964773;
-        Thu, 26 May 2022 10:26:04 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.25.165])
-        by smtp.gmail.com with ESMTPSA id 17-20020a370711000000b0069fc13ce1f2sm1464076qkh.35.2022.05.26.10.26.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 10:26:04 -0700 (PDT)
-Message-ID: <628fb82c.1c69fb81.79ebf.887b@mx.google.com>
-Date:   Thu, 26 May 2022 10:26:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5235381562928145683=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Ym1mSZ1N+gDIg7RPoqcZ6DASQgrFGhS7kPRYey05Jig=;
+        b=twQJiG/y+MXWHGFtdSibf+/NSl3Eml3r+NyyvuL6OHZvVXz8YU7lq/v2QLdDf1ZQhe
+         KhSA6Q27sXBWYBbUHBt8m9xHqmPuEIPFqyVpbXZXLslMz8ujzmUAkZ050DH8XOXSlCx0
+         7+Xey39LanoU0z829boeS73yWe81STAFwZU0RpKZuM/nBFpFmQrng0XTRZ2YzFfMZck5
+         qTiTKBYTYghn2MzFb0NtK7abrWjMjhdO2SEC22jchENEh7ul+N2daHJyGK7aFVP7Flj+
+         i5fK0438pLDDTdSx4DlHog+fkNNAchTb2z83/tZV+LQv6QUb5Ty2y0GsZ5COWcp0668G
+         pG1A==
+X-Gm-Message-State: AOAM5328KOA0AblWsCLd6hLX9O1bAyGtZifFJiBNOfhOiTQsP5PeOZ9r
+        vu2cfmwLagKCzw66b+3ENDC01hHK7kUOBHi1wFWCpup8
+X-Google-Smtp-Source: ABdhPJxBECFKdSI1IJ8bWSn4XNDvgl0Y71qedIzUHn9db1kEWuBdaTXj/Sa82JHFeVa7k0aeyBGlKXFKI5ofxC7eGCg=
+X-Received: by 2002:a17:902:d5c1:b0:162:64e:8c21 with SMTP id
+ g1-20020a170902d5c100b00162064e8c21mr27987572plh.34.1653595927124; Thu, 26
+ May 2022 13:12:07 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jukka.rissanen@linux.intel.com
-Subject: RE: MAINTAINERS: Remove me as maintainer of 6lowpan
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220526162806.16618-1-jukka.rissanen@linux.intel.com>
-References: <20220526162806.16618-1-jukka.rissanen@linux.intel.com>
+References: <20220526094918.482971-1-niejianglei2021@163.com> <081b216e6496e8cc2284df191dcc2d8b604d04f7.camel@redhat.com>
+In-Reply-To: <081b216e6496e8cc2284df191dcc2d8b604d04f7.camel@redhat.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 26 May 2022 13:11:56 -0700
+Message-ID: <CABBYNZJ+E6KMyqODib_nhGJuZzWssSrswKR9MoqPrM7tuEpDcg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_conn: fix potential double free in le_scan_cleanup()
+To:     Paolo Abeni <pabeni@redhat.com>
+Cc:     Jianglei Nie <niejianglei2021@163.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5235381562928145683==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Thu, May 26, 2022 at 4:24 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>
+> On Thu, 2022-05-26 at 17:49 +0800, Jianglei Nie wrote:
+> > When "c == conn" is true, hci_conn_cleanup() is called. The
+> > hci_conn_cleanup() calls hci_dev_put() and hci_conn_put() in
+> > its function implementation. hci_dev_put() and hci_conn_put()
+> > will free the relevant resource if the reference count reaches
+> > zero, which may lead to a double free when hci_dev_put() and
+> > hci_conn_put() are called again.
+> >
+> > We should add a return to this function after hci_conn_cleanup()
+> > is called.
+> >
+> > Signed-off-by: Jianglei Nie <niejianglei2021@163.com>
+> > ---
+> >  net/bluetooth/hci_conn.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> > index fe803bee419a..7b3e91eb9fa3 100644
+> > --- a/net/bluetooth/hci_conn.c
+> > +++ b/net/bluetooth/hci_conn.c
+> > @@ -166,6 +166,7 @@ static void le_scan_cleanup(struct work_struct *work)
+> >       if (c == conn) {
+> >               hci_connect_le_scan_cleanup(conn);
+> >               hci_conn_cleanup(conn);
+> > +             return;
+>
+> This looks not correct. At very least you should release the
+> hci_dev_lock.
 
-Dear submitter,
+Yep, it should probably use break instead of return.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=645314
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.60 seconds
-GitLint                       PASS      1.03 seconds
-SubjectPrefix                 FAIL      0.87 seconds
-BuildKernel                   PASS      37.90 seconds
-BuildKernel32                 PASS      34.77 seconds
-Incremental Build with patchesPASS      49.77 seconds
-TestRunner: Setup             PASS      566.65 seconds
-TestRunner: l2cap-tester      PASS      19.64 seconds
-TestRunner: bnep-tester       PASS      7.04 seconds
-TestRunner: mgmt-tester       PASS      115.42 seconds
-TestRunner: rfcomm-tester     PASS      11.07 seconds
-TestRunner: sco-tester        PASS      10.83 seconds
-TestRunner: smp-tester        PASS      10.69 seconds
-TestRunner: userchan-tester   PASS      7.39 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL - 0.87 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
----
-Regards,
-Linux Bluetooth
+> Cheers,
+>
+> Paolo
+>
 
 
---===============5235381562928145683==--
+-- 
+Luiz Augusto von Dentz
