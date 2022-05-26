@@ -2,183 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62273C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 11:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2738DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 11:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347093AbiEZLZF (ORCPT
+        id S1347092AbiEZLZG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 May 2022 07:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56048 "EHLO
+        Thu, 26 May 2022 07:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237552AbiEZLZC (ORCPT
+        with ESMTP id S1345927AbiEZLZE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 May 2022 07:25:02 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84643CF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:25:01 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id c14so1470729pfn.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:25:01 -0700 (PDT)
+        Thu, 26 May 2022 07:25:04 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E7E7CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:25:04 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id c22so1141715pgu.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 04:25:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SJBvj6G+GQCxUKbSubCwcRd/ln0obOikcaZZWNEA07o=;
-        b=alb94opfuKa0czBSgKs3+KHG1ZSHM2tA86Vg9nm4CD4XzXxUeaJBBJqPmohC9TrN7F
-         qGzIbVvQLtxMf8F9HASEq6sg3CWdkNJ5uu0Sfos3wV2z6OrN+kHRaqfmYNji9HZEXyiz
-         QXMqpEayUBi5t+VCMCQQH+TOdiirh9dekdDbo=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3TriAZF2PfVsPnINlTHwFuM9S9AZnTdcYqC1UFJFAXc=;
+        b=M89WWL7b2E3m6buRd6RewTNCGrmubDSCSMDtW9heca052jN09flKiSuxdwMKUHxoHO
+         X2xMTnkfHQCW6KHYxVof8JUtP1XGhHG+E9bFhQ+VRL6NfaK3HEqO7Dxqff3/6rnFQaVP
+         TqXi9LiPIiDLbzg35+/pUjdr2UwuCaKrgUErw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SJBvj6G+GQCxUKbSubCwcRd/ln0obOikcaZZWNEA07o=;
-        b=CQciomRe9rhZm7gTPw0njyTl3K2fZFrs2GWnn+NujfecyYI16UrcHeus94vr0Hn+mu
-         E1JKIkBJehZMZXzqXY6LiYt+08WvgFbYgHhKEMhyIwsQHq8nFrRd9I/TCh6eI0bN7yQW
-         2hQZJNHNFZQerJLzRBPdkHUiEvCuGizwk4X4eprJwWP46PaHxotGaaRnUsxFlzl18Dud
-         0LBEXeFHmy8EyTyHRfDPnM8f3f8IWHtbwHufXRNtdQzOryoqmn4MBHm67FzmnnhekO/U
-         pUxRI8qhet+hfgEDdXlswZnr88IX3Fv0ilk/MyyM6Cmo/hodILijx2T3NVRL71fkhBMa
-         Tggw==
-X-Gm-Message-State: AOAM5333cUnaQhjeBRVlHLsGSgVY3DvJZmiecJkwEHLw3TlOiE/sfpk9
-        LMLNW2kpmFaItECv+FGu+CWiY8SV0ndAzg==
-X-Google-Smtp-Source: ABdhPJzEWhNGfNSDX685jC2sCnWt11akQ2mHs/KEKZz55IeQR1g2vXjWUzc2RS3YDddjvGiMeyRSjA==
-X-Received: by 2002:a65:6d0d:0:b0:3fb:1477:5191 with SMTP id bf13-20020a656d0d000000b003fb14775191mr2548410pgb.541.1653564300868;
-        Thu, 26 May 2022 04:25:00 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3TriAZF2PfVsPnINlTHwFuM9S9AZnTdcYqC1UFJFAXc=;
+        b=N0PgznUuHUb9eeCX6hbphNc3QkTlzpvMgIEikdXKcD45MpGdk0nErahO6mZJb7Ndn8
+         amBOG3fZ8irOCKaKxf8gmWByJXy8R5ZnfFsPYbU9G9D6rUkE0xxOOgKqnPK7SshEARr1
+         W+vp2dZ8ippm7YAxXr2WAy3OZaD+J9UiznSKCztPJrQQ6MPkVIjERP3zAXYcHRmgMQDw
+         Gz6f8eHOFarmst/g1m/ABrR5XnpBgisn64/d+NlVhS1Ny0GF360ShtYI0onq5QQEgg38
+         WLYkAHJjcDMUNmNP5938A6yXg+Cam4gp7Ckk5Uo14RQh3leUxNnDObOBijc6ag4F5hk2
+         NOmg==
+X-Gm-Message-State: AOAM530I8BrDInk6+0j57jkHY/qfY+rAPgwfElSLJR+FXisTUhL5IJO5
+        D7ztWJFByS4GUfVQY7ruNwBQpDRbalWS1w==
+X-Google-Smtp-Source: ABdhPJxuweiqjemal3OlYRToT5wkfaHHdHfCsrwZJSg7DS57KuG0Jxk8ywvOeUFPtCmelHJw8q421w==
+X-Received: by 2002:a63:716:0:b0:3fa:1604:c9ab with SMTP id 22-20020a630716000000b003fa1604c9abmr20722914pgh.518.1653564303438;
+        Thu, 26 May 2022 04:25:03 -0700 (PDT)
 Received: from localhost (174.71.80.34.bc.googleusercontent.com. [34.80.71.174])
-        by smtp.gmail.com with UTF8SMTPSA id m5-20020a63f605000000b003faebbb772esm1315159pgh.25.2022.05.26.04.24.59
+        by smtp.gmail.com with UTF8SMTPSA id d20-20020a056a00199400b0051829b1595dsm1353114pfl.130.2022.05.26.04.25.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 May 2022 04:25:00 -0700 (PDT)
+        Thu, 26 May 2022 04:25:03 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
         Joseph Hwang <josephsih@chromium.org>
-Subject: [BlueZ PATCH v6 1/8] doc: Introduce the quality report command and event
-Date:   Thu, 26 May 2022 19:24:49 +0800
-Message-Id: <20220526112456.2488536-1-josephsih@chromium.org>
+Subject: [BlueZ PATCH v6 2/8] lib: Add structures and constants for quality report command and event
+Date:   Thu, 26 May 2022 19:24:50 +0800
+Message-Id: <20220526112456.2488536-2-josephsih@chromium.org>
 X-Mailer: git-send-email 2.36.1.124.g0e6072fb45-goog
+In-Reply-To: <20220526112456.2488536-1-josephsih@chromium.org>
+References: <20220526112456.2488536-1-josephsih@chromium.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add the MGMT quality report command and event in doc/mgmt-api.txt.
+Add the new MGMT struct and constants to lib/mgmt.h.
 
 ---
 
-Changes in v6:
-- No update in this patch. The patch 3/8 is updated to resolve a
-  patch conflict.
+(no changes since v5)
 
 Changes in v5:
-- Use Quality_Report instead of Action in mgmt-api.txt.
-- Modify the description of Set Quality Report Command.
+- Use quality_report instead of action in struct
+  mgmt_cp_set_quality_report.
+- Declare "const uint8_t data[];"
 
 Changes in v4:
-- Use "Quality Report Event" without the prefix "Bluetooth" word.
-- Combine both MGMT quality report command and event changes in a
-  single patch.
+- Combine both MGMT command and event changes in a single patch.
+- Fix namings of QUALITY_SPEC_AOSP and QUALITY_SPEC_INTEL.
+- Use "Quality Report" without the prefix "Bluetooth".
 
 Changes in v3:
 - Swap AOSP Bluetooth Quality Report Event and Intel Telemetry Event.
-- Add 5 new patches (5/9 - 9/9) to enable the quality report
-  feature via MGMT_OP_SET_QUALITY_REPORT instead of through the
-  experimental features.
 
 Changes in v2:
-- This is a new patch for adding the event in doc/mgmt-api.txt
+- This is a new patch for adding the new struct and constants.
 
- doc/mgmt-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ lib/mgmt.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ebe56afa4..a429f0ef3 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -332,6 +332,7 @@ Read Controller Information Command
- 		15	Static Address
- 		16	PHY Configuration
- 		17	Wideband Speech
-+		18	Quality Report
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 922a24367..fd59ef6fa 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -96,6 +96,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_STATIC_ADDRESS	0x00008000
+ #define MGMT_SETTING_PHY_CONFIGURATION	0x00010000
+ #define MGMT_SETTING_WIDEBAND_SPEECH	0x00020000
++#define MGMT_SETTING_QUALITY_REPORT	0x00040000
  
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -2924,6 +2925,7 @@ Read Extended Controller Information Command
- 		15	Static Address
- 		16	PHY Configuration
- 		17	Wideband Speech
-+		18	Quality Report
+ #define MGMT_OP_READ_INFO		0x0004
+ struct mgmt_rp_read_info {
+@@ -757,6 +758,14 @@ struct mgmt_cp_add_adv_patterns_monitor_rssi {
+ 	struct mgmt_adv_pattern patterns[0];
+ } __packed;
  
- 	The EIR_Data field contains information about class of device,
- 	local name and other values. Not all of them might be present. For
-@@ -3858,6 +3860,45 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
- 				Invalid Parameters
++#define MGMT_OP_SET_QUALITY_REPORT		0x0057
++struct mgmt_cp_set_quality_report {
++	uint8_t quality_report;
++} __packed;
++struct mgmt_rp_set_quality_report {
++	uint32_t current_settings;
++} __packed;
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	uint16_t opcode;
+@@ -1032,6 +1041,15 @@ struct mgmt_ev_adv_monitor_device_lost {
+ 	struct mgmt_addr_info addr;
+ } __packed;
  
++#define MGMT_EV_QUALITY_REPORT			0x0031
++#define QUALITY_SPEC_AOSP			0x0
++#define QUALITY_SPEC_INTEL			0x1
++struct mgmt_ev_quality_report {
++	uint8_t quality_spec;
++	uint32_t data_len;
++	const uint8_t data[];
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1172,6 +1190,7 @@ static const char *mgmt_ev[] = {
+ 	"Controller Resume",
+ 	"Advertisement Monitor Device Found",		/* 0x002f */
+ 	"Advertisement Monitor Device Lost",
++	"Quality Report",				/* 0x0031 */
+ };
  
-+Set Quality Report Command
-+==========================
-+
-+	Command Code:		0x0057
-+	Controller Index:	<controller id>
-+	Command Parameters:	Quality_Report (1 Octet)
-+	Return Parameters:	Current_Settings (4 Octets)
-+
-+	This command is used to enable and disable the controller's quality
-+	report feature. The allowed values for the Quality_Report command
-+	parameter are 0x00 and 0x01. All other values will return Invalid
-+	Parameters.
-+
-+	The value 0x00 disables the Quality Report, and the value 0x01
-+	enables the Quality Report feature.
-+
-+	This command is only available for the controllers that support
-+	either AOSP Bluetooth quality report or Intel telemetry event.
-+	It is supported if the supported_settings indicate support for it.
-+
-+	This command requires to use a valid controller index. Otherwise,
-+	an Invalid Index status will be returned.
-+
-+	The command is sent to the controller to enable/disable the quality
-+	report feature, and generates a Command Complete event on success.
-+	If the controller failed to execute the action, a Failed status will
-+	be returned.
-+
-+	The quality report state is maintained by the kernel over the adapter
-+	power cycle. When the adapter is powered off, the quality report
-+	feature is disabled by the kernel. When the adapter is powered on, it
-+	is enabled again by the kernel if it was enabled before.
-+
-+	Possible errors:	Failed
-+				Invalid Index
-+				Invalid Parameters
-+				Not Supported
-+
-+
- Command Complete Event
- ======================
- 
-@@ -4978,3 +5019,22 @@ Advertisement Monitor Device Lost Event
- 		2	LE Random
- 
- 	This event will be sent to all management sockets.
-+
-+
-+Quality Report Event
-+====================
-+
-+	Event code:		0x0031
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Quality_Spec (1 Octet)
-+				Report_Len (2 Octets)
-+				Report (0-65535 Octets)
-+
-+	This event carries the Bluetooth quality report sent by the
-+	controller.
-+
-+	Possible values for the Quality_Spec parameter:
-+		0	AOSP Bluetooth Quality Report Event
-+		1	Intel Telemetry Event
-+
-+	This event will be sent to all management sockets.
+ static const char *mgmt_status[] = {
 -- 
 2.36.1.124.g0e6072fb45-goog
 
