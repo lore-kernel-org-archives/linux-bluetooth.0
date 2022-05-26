@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBA5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 00:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AA2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 May 2022 00:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238483AbiEZAjg (ORCPT
+        id S238805AbiEZAjj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 May 2022 20:39:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59022 "EHLO
+        Wed, 25 May 2022 20:39:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232937AbiEZAje (ORCPT
+        with ESMTP id S232537AbiEZAjf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 May 2022 20:39:34 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848D5AE264
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:31 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id w2-20020a17090ac98200b001e0519fe5a8so391641pjt.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:31 -0700 (PDT)
+        Wed, 25 May 2022 20:39:35 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594A812A86
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:33 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id u12-20020a17090a1d4c00b001df78c7c209so3082322pju.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 May 2022 17:39:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=0BslgsBKGZNxVg2pXEhy2GHC93u0ntQzBrl2q1A/4j4=;
-        b=adr5q/VunQHolufh0Y5INdqvnhKu1e28sl/NLEuQLHy1Qpy83k3mG+UHYhc2mtHgP9
-         aVRPy2mkyEq6xPLR/42oYK5M6fECFInH3UmxH0zBZC6BpCsBMfZYcZTFy/9HMOpmd4PL
-         a0pKmAC0aLGEtz26Xublza0vrO4/QsYZP9LwEUAiH6rzNPiJkGYpQvGLMeCmXjEzpt73
-         RuSogBblNyZlLPsrqIxkweYjT9Gg5O4vbq+UlIqAgNp4t+jD8Yvd2DH1dTivaqOyjrWJ
-         NAGs9jY2t8zVNtPNXQcUvEC15iA3zQhIbp2ant4S6rfWvPmXuyOIzadGMbcGLJJBbgpZ
-         l3uw==
+        bh=aor+DmfdnpQY23FakMl48aNCnIGNZ2bX6fBl02wuj14=;
+        b=gzzbMyFNOylo3KpzRbGcpulb5gkd/XkkxurNzaj9NMim9E+MowSQvqdEx98B8riLup
+         ThbaEZVM4coi4agcmqD6koGsDnNVAHbZzL6nr1zX853IDbSPwM2tfyUxf7PUPVm7H2CM
+         YhgKi9F35Oi6BiLV5O/W5c0RCNT6IDW2kwXkeVA5RpD+CJ4Slw0+U5AmRDQftStyWkHA
+         WwotRj7STDRv5CsggPyAZ9RF1PVeObkgAV2LVNK38/2S4bQsstojrslrDNcByDt/L691
+         ywOgIm0TZOOKMnqPdJ1f3N38e3P4xb79D72w4R1zCyESVcsvCaSlJsoYB/Wmxq3BF9A1
+         MVGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0BslgsBKGZNxVg2pXEhy2GHC93u0ntQzBrl2q1A/4j4=;
-        b=makFVIPOMfnVLSX2pbwmWjRSL0n2j2Wd/d/GvT60YiTHOcTpKjAQ9gDNlZmBm4yMXP
-         L65CHzjxL0zZFjZxV2yArvbUhCGsQUVNu9s4deIBayohdss7rGOqX/lGn2L+Q61xbbXQ
-         YKT76b7znXaKdUaByjtGkk9hc2mfGtRXoLowipwjzHQ8jNkWRPx8v5CDAtAPyLLoFQV9
-         Q3xH4nbdsESwSmbYcyEK6B6e9mMb+omt7utQDoY1DFuY/RI0EeJeL7wQXO3dmBnVDj6P
-         ByhAW4i06/vaCw7ZpTIhFytDC0UxMZYWRYbsFHarJulr0cS+YPTAk9gHEEZ5KzKKO1nI
-         tmOQ==
-X-Gm-Message-State: AOAM531eAO7KTGqPzKgge3pV15tRlJamLmYF5AKA8cXz+3HT30KbKt2e
-        480BvIFqzJut3B0/mNPgYTYmrYY8tAY=
-X-Google-Smtp-Source: ABdhPJzElrUBDD2fTw/KyynTfb/i1zndJpZxYiLQ/Sr/H0xrS3167znkmezX+lY8/eBI6WB7ksGobg==
-X-Received: by 2002:a17:90b:1c92:b0:1dd:10ff:8f13 with SMTP id oo18-20020a17090b1c9200b001dd10ff8f13mr13224206pjb.54.1653525570382;
-        Wed, 25 May 2022 17:39:30 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aor+DmfdnpQY23FakMl48aNCnIGNZ2bX6fBl02wuj14=;
+        b=TGF/smM+c0CeZiDxo8cRNM0uIhMtPbI7t5877Y/GvtsABduHHSxMyHo9SGtwSpe0CI
+         HrH915XWDBcP3dvx0dZmUUd8Qzu/aQ1v3MXJ9pxfdGn6vNEL0jbx9VXXwyvbmvmMRX0a
+         uGKECEKttFX05203YrJ06rRHp6f/1M5nhdc5jn/aw4htNe0Z0n/EXcfycCHIN1pqJFND
+         Kk0DwzJu4P0B8rR1aBJHFzvwiV8fnj1esn2YNrvcz9Bc5ZFvhFmi3qmmeIEhGp/2HwqE
+         Xr9G9mtzI6u3XMOl9uiW4aFiBBEP9AOo4YrvCm6HIyvs2gtZcdCMw5RGoihurLwbn0SF
+         +UcQ==
+X-Gm-Message-State: AOAM531HUjbS9lnvco9YCWW09pR3xLyw+S+jHw2z+C4EKCqnqR7Ben7K
+        5WBMdtOUE6cjjLdipck6mRSyGGTvyzs=
+X-Google-Smtp-Source: ABdhPJyWs2aPd4DJGvH0hNvl0fNildSJNTbD37PoMNyd+vw2A9/NOczEWxOUfrBWOl6/mxolMxGQcA==
+X-Received: by 2002:a17:90b:4a4a:b0:1df:a250:e583 with SMTP id lb10-20020a17090b4a4a00b001dfa250e583mr13203272pjb.172.1653525572162;
+        Wed, 25 May 2022 17:39:32 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f12-20020a170902860c00b00162529828aesm13339plo.109.2022.05.25.17.39.28
+        by smtp.gmail.com with ESMTPSA id f12-20020a170902860c00b00162529828aesm13339plo.109.2022.05.25.17.39.30
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 May 2022 17:39:28 -0700 (PDT)
+        Wed, 25 May 2022 17:39:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] monitor/att: Add decoding support for PAC Sink/Source
-Date:   Wed, 25 May 2022 17:39:25 -0700
-Message-Id: <20220526003927.3972965-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] monitor/att: Add decoding support for ASE Sink/Source
+Date:   Wed, 25 May 2022 17:39:26 -0700
+Message-Id: <20220526003927.3972965-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220526003927.3972965-1-luiz.dentz@gmail.com>
+References: <20220526003927.3972965-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,116 +66,494 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds decoding support for PAC Sink/Source attributes:
+This adds decoding support for ASE Sink/Source attributes:
 
- < ACL Data TX: Handle 42 flags 0x00 dlen 9
-      Channel: 64 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)]
-      {chan 0}
+> ACL Data RX: Handle 42 flags 0x02 dlen 9
+      Channel: 65 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
       ATT: Read Request (0x0a) len 2
-        Handle: 0x0017 Type: Sink PAC (0x2bc9)
-> ACL Data RX: Handle 42 flags 0x02 dlen 31
-      Channel: 65 len 27 sdu 25 [PSM 39 mode Enhanced Credit (0x81)]
-      {chan 0}
-        Value: 010600000000100301ff0002020302030305041e00f00000
-          Number of PAC(s): 1
-          PAC #0:
+        Handle: 0x002a Type: Sink ASE (0x2bc4)
+< ACL Data TX: Handle 42 flags 0x00 dlen 9
+      Channel: 64 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Read Response (0x0b) len 2
+        Value: 0300
+            ASE ID: 1
+            State: Idle (0x00)
+< ACL Data TX: Handle 42 flags 0x00 dlen 55
+      Channel: 64 len 51 sdu 49 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Handle Multiple Value Notification (0x23) len 48
+        Length: 0x0023
+        Handle: 0x0024 Type: Sink ASE (0x2bc4)
+          Data: 01010000000a00204e00409c00204e00409c0006000000000a02010302020103042800
+            ASE ID: 1
+            State: Codec Configured (0x01)
+            Framing: Unframed PDUs supported (0x00)
+            PHY: 0x00
+            RTN: 0
+            Max Transport Latency: 10
+            Presentation Delay Min: 20000 us
+            Presentation Delay Max: 40000 us
+            Preferred Presentation Delay Min: 20000 us
+            Preferred Presentation Delay Max: 40000 us
             Codec: LC3 (0x06)
-            Codec Specific Configuration #0: len 0x03 type 0x01
-            Codec Specific Configuration: ff00
+            Codec Specific Configuration #0: len 0x02 type 0x01
+            Codec Specific Configuration: 03
             Codec Specific Configuration #1: len 0x02 type 0x02
-            Codec Specific Configuration: 03
-            Codec Specific Configuration #2: len 0x02 type 0x03
-            Codec Specific Configuration: 03
-            Codec Specific Configuration #3: len 0x05 type 0x04
-            Codec Specific Configuration: 1e00f000
+            Codec Specific Configuration: 01
+            Codec Specific Configuration #2: len 0x03 type 0x04
+            Codec Specific Configuration: 2800
+< ACL Data TX: Handle 42 flags 0x00 dlen 37
+      Channel: 64 len 33 sdu 31 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Handle Multiple Value Notification (0x23) len 30
+        Length: 0x0011
+        Handle: 0x0024 Type: Sink ASE (0x2bc4)
+          Data: 0102000010270000022800020a00409c00
+            ASE ID: 1
+            State: QoS Configured (0x02)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            SDU Interval: 10000 usec
+            Framing: Unframed (0x00)
+            PHY: 0x02
+            LE 2M PHY (0x02)
+            Max SDU: 40
+            RTN: 2
+            Max Transport Latency: 10
+            Presentation Delay: 40000 us
+< ACL Data TX: Handle 42 flags 0x00 dlen 33
+      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Handle Multiple Value Notification (0x23) len 26
+        Length: 0x000d
+        Handle: 0x002a Type: Source ASE (0x2bc5)
+          Data: 03030000060304030202000000
+            ASE ID: 3
+            State: Enabling (0x03)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            Metadata #0: len 0x03 type 0x04
+            Metadata: 0302
+            Metadata #1: len 0x02 type 0x00
+< ACL Data TX: Handle 42 flags 0x00 dlen 39
+      Channel: 64 len 35 sdu 33 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Handle Multiple Value Notification (0x23) len 32
+        Length: 0x000d
+        Handle: 0x002a Type: Source ASE (0x2bc5)
+          Data: 03040000060304030202000000
+            ASE ID: 3
+            State: Streaming (0x04)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            Metadata #0: len 0x03 type 0x04
+            Metadata: 0302
+            Metadata #1: len 0x02 type 0x00
+< ACL Data TX: Handle 42 flags 0x00 dlen 33
+      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
+      ATT: Handle Multiple Value Notification (0x23) len 26
+        Length: 0x000d
+        Handle: 0x002a Type: Source ASE (0x2bc5)
+          Data: 03050000060304030202000000
+            ASE ID: 3
+            State: Disabling (0x05)
+            CIG ID: 0x00
+            CIS ID: 0x00
+            Metadata #0: len 0x03 type 0x04
+            Metadata: 0302
+            Metadata #1: len 0x02 type 0x00
 ---
- monitor/att.c    | 94 +++++++++++++++++++++++++++++++++++++++++++++++-
- monitor/l2cap.h  | 10 +++++-
- monitor/packet.c | 10 ++++++
- monitor/packet.h |  2 ++
- 4 files changed, 114 insertions(+), 2 deletions(-)
+ lib/bluetooth.h   |   4 +
+ monitor/att.c     | 365 ++++++++++++++++++++++++++++++++++++++++++----
+ monitor/l2cap.h   | 163 +++++++++++++++++++++
+ src/shared/ascs.h |   4 +-
+ 4 files changed, 508 insertions(+), 28 deletions(-)
 
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 73297c147..af5fbcfbc 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -413,6 +413,10 @@ void bt_free(void *ptr);
+ int bt_error(uint16_t code);
+ const char *bt_compidtostr(int id);
+ 
++typedef struct {
++	uint8_t data[3];
++} uint24_t;
++
+ typedef struct {
+ 	uint8_t data[16];
+ } uint128_t;
 diff --git a/monitor/att.c b/monitor/att.c
-index df3e65057..2b1e21d05 100644
+index 2b1e21d05..fb0961102 100644
 --- a/monitor/att.c
 +++ b/monitor/att.c
-@@ -255,6 +255,96 @@ static void gatt_ccc_write(const struct l2cap_frame *frame)
+@@ -255,6 +255,38 @@ static void gatt_ccc_write(const struct l2cap_frame *frame)
  	print_ccc_value(value);
  }
  
-+static void print_pac(const struct l2cap_frame *frame)
++static bool print_codec(const struct l2cap_frame *frame)
 +{
-+	uint8_t num = 0, i;
++	uint8_t codec_id;
++	uint16_t codec_cid, codec_vid;
 +
-+	if (!l2cap_frame_get_u8((void *)frame, &num)) {
-+		print_text(COLOR_ERROR, "Number of PAC(s): invalid size");
++	if (!l2cap_frame_get_u8((void *)frame, &codec_id)) {
++		print_text(COLOR_ERROR, "Codec: invalid size");
++		return false;
++	}
++
++	packet_print_codec_id("    Codec", codec_id);
++
++	if (!l2cap_frame_get_le16((void *)frame, &codec_cid)) {
++		print_text(COLOR_ERROR, "Codec Company ID: invalid size");
++		return false;
++	}
++
++	if (!l2cap_frame_get_le16((void *)frame, &codec_vid)) {
++		print_text(COLOR_ERROR, "Codec Vendor ID: invalid size");
++		return false;
++	}
++
++	if (codec_id == 0xff) {
++		print_field("    Codec Company ID: %s (0x%04x)",
++						bt_compidtostr(codec_cid),
++						codec_cid);
++		print_field("    Codec Vendor ID: 0x%04x", codec_vid);
++	}
++
++	return true;
++}
++
+ static void print_pac(const struct l2cap_frame *frame)
+ {
+ 	uint8_t num = 0, i;
+@@ -267,38 +299,13 @@ static void print_pac(const struct l2cap_frame *frame)
+ 	print_field("  Number of PAC(s): %u", num);
+ 
+ 	for (i = 0; i < num; i++) {
+-		uint8_t codec_id;
+-		uint16_t codec_cid, codec_vid;
+ 		struct bt_hci_lv_data *cc;
+ 		struct bt_hci_lv_data *meta;
+ 
+ 		print_field("  PAC #%u:", i);
+ 
+-		if (!l2cap_frame_get_u8((void *)frame, &codec_id)) {
+-			print_text(COLOR_ERROR, "Codec: invalid size");
++		if (!print_codec(frame))
+ 			goto done;
+-		}
+-
+-		packet_print_codec_id("    Codec", codec_id);
+-
+-		if (!l2cap_frame_get_le16((void *)frame, &codec_cid)) {
+-			print_text(COLOR_ERROR,
+-					"Codec Company ID: invalid size");
+-			goto done;
+-		}
+-
+-		if (!l2cap_frame_get_le16((void *)frame, &codec_vid)) {
+-			print_text(COLOR_ERROR,
+-					"Codec Vendor ID: invalid size");
+-			goto done;
+-		}
+-
+-		if (codec_id == 0xff) {
+-			print_field("    Codec Company ID: %s (0x%04x)",
+-						bt_compidtostr(codec_cid),
+-						codec_cid);
+-			print_field("    Codec Vendor ID: 0x%04x", codec_vid);
+-		}
+ 
+ 		cc = l2cap_frame_pull((void *)frame, frame, sizeof(*cc));
+ 		if (!cc) {
+@@ -345,6 +352,310 @@ static void pac_notify(const struct l2cap_frame *frame)
+ 	print_pac(frame);
+ }
+ 
++static void print_prefer_framing(uint8_t value)
++{
++	switch (value) {
++	case 0x00:
++		print_field("    Framing: Unframed ISOAL PDUs supported "
++							"(0x%2.2x)", value);
++		return;
++	case 0x01:
++		print_field("    Framing: Unframed ISOAL PDUs not supported "
++							"(0x%2.2x)", value);
++		return;
++	default:
++		print_field("    Framing: Reserved (0x%2.2x)", value);
++	}
++}
++
++static const struct bitfield_data prefer_phy_table[] = {
++	{  0, "LE 1M PHY preffered (0x01)"		},
++	{  1, "LE 2M PHY preffered (0x02)"		},
++	{  2, "LE Codec PHY preffered (0x04)"		},
++	{ }
++};
++
++static void print_prefer_phy(uint8_t phy)
++{
++	uint8_t mask;
++
++	mask = print_bitfield(4, phy, prefer_phy_table);
++	if (mask)
++		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
++								mask);
++}
++
++static void print_ase_config(const struct l2cap_frame *frame)
++{
++	uint8_t framing, phy, rtn;
++	uint16_t latency;
++	uint32_t pd_min, pd_max, ppd_min, ppd_max;
++	struct bt_hci_lv_data *cc;
++
++	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
++		print_text(COLOR_ERROR, "Framing: invalid size");
++		return;
++	}
++
++	print_prefer_framing(framing);
++
++	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
++		print_text(COLOR_ERROR, "PHY: invalid size");
++		return;
++	}
++
++	print_prefer_phy(phy);
++
++	if (!l2cap_frame_get_u8((void *)frame, &rtn)) {
++		print_text(COLOR_ERROR, "RTN: invalid size");
++		return;
++	}
++
++	print_field("    RTN: %u", rtn);
++
++	if (!l2cap_frame_get_le16((void *)frame, &latency)) {
++		print_text(COLOR_ERROR, "RTN: invalid size");
++		return;
++	}
++
++	print_field("    Max Transport Latency: %u ms", latency);
++
++	if (!l2cap_frame_get_le24((void *)frame, &pd_min)) {
++		print_text(COLOR_ERROR, "Presentation Delay Min: invalid size");
++		return;
++	}
++
++	print_field("    Presentation Delay Min: %u us", pd_min);
++
++	if (!l2cap_frame_get_le24((void *)frame, &pd_max)) {
++		print_text(COLOR_ERROR, "Presentation Delay Max: invalid size");
++		return;
++	}
++
++	print_field("    Presentation Delay Max: %u us", pd_max);
++
++	if (!l2cap_frame_get_le24((void *)frame, &ppd_min)) {
++		print_text(COLOR_ERROR,
++			"Preferred Presentation Delay Min: invalid size");
++		return;
++	}
++
++	print_field("    Preferred Presentation Delay Min: %u us", ppd_min);
++
++	if (!l2cap_frame_get_le24((void *)frame, &ppd_max)) {
++		print_text(COLOR_ERROR,
++			"Preferred Presentation Delay Max: invalid size");
++		return;
++	}
++
++	print_field("    Preferred Presentation Delay Max: %u us", ppd_max);
++
++	if (!print_codec(frame))
++		return;
++
++	cc = l2cap_frame_pull((void *)frame, frame, sizeof(*cc));
++	if (!cc) {
++		print_text(COLOR_ERROR,
++				"Codec Specific Configuration: invalid size");
++		return;
++	}
++
++	if (!l2cap_frame_pull((void *)frame, frame, cc->len)) {
++		print_text(COLOR_ERROR,
++				"Codec Specific Configuration: invalid size");
++		return;
++	}
++
++	packet_print_ltv("    Codec Specific Configuration", cc->data, cc->len);
++}
++
++static void print_framing(uint8_t value)
++{
++	switch (value) {
++	case 0x00:
++		print_field("    Framing: Unframed (0x%2.2x)", value);
++		break;
++	case 0x01:
++		print_field("    Framing: Framed (0x%2.2x)", value);
++		break;
++	default:
++		print_field("    Framing: Reserved (0x%2.2x)", value);
++	}
++}
++
++static const struct bitfield_data phy_table[] = {
++	{  0, "LE 1M PHY (0x01)"		},
++	{  1, "LE 2M PHY (0x02)"		},
++	{  2, "LE Codec PHY (0x04)"		},
++	{ }
++};
++
++static void print_phy(uint8_t phy)
++{
++	uint8_t mask;
++
++	mask = print_bitfield(4, phy, phy_table);
++	if (mask)
++		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%2.2x)",
++								mask);
++}
++
++static void print_ase_qos(const struct l2cap_frame *frame)
++{
++	uint8_t framing, phy, rtn;
++	uint16_t sdu, latency;
++	uint32_t interval, pd;
++
++	if (!l2cap_frame_print_u8((void *)frame, "    CIG ID"))
++		return;
++
++	if (!l2cap_frame_print_u8((void *)frame, "    CIS ID"))
++		return;
++
++	if (!l2cap_frame_get_le24((void *)frame, &interval)) {
++		print_text(COLOR_ERROR, "SDU Interval: invalid size");
++		return;
++	}
++
++	print_field("    SDU Interval: %u us", interval);
++
++	if (!l2cap_frame_get_u8((void *)frame, &framing)) {
++		print_text(COLOR_ERROR, "Framing: invalid size");
++		return;
++	}
++
++	print_framing(framing);
++
++	if (!l2cap_frame_get_u8((void *)frame, &phy)) {
++		print_text(COLOR_ERROR, "PHY: invalid size");
++		return;
++	}
++
++	print_phy(phy);
++
++	if (!l2cap_frame_get_le16((void *)frame, &sdu)) {
++		print_text(COLOR_ERROR, "Max SDU: invalid size");
++		return;
++	}
++
++	print_field("    Max SDU: %u", sdu);
++
++	if (!l2cap_frame_get_u8((void *)frame, &rtn)) {
++		print_text(COLOR_ERROR, "RTN: invalid size");
++		return;
++	}
++
++	print_field("    RTN: %u", rtn);
++
++	if (!l2cap_frame_get_le16((void *)frame, &latency)) {
++		print_text(COLOR_ERROR, "Max Transport Latency: invalid size");
++		return;
++	}
++
++	print_field("    Max Transport Latency: %u", sdu);
++
++	if (!l2cap_frame_get_le24((void *)frame, &pd)) {
++		print_text(COLOR_ERROR, "Presentation Delay: invalid size");
++		return;
++	}
++
++	print_field("    Presentation Delay: %u us", pd);
++}
++
++static void print_ase_metadata(const struct l2cap_frame *frame)
++{
++	struct bt_hci_lv_data *meta;
++
++	if (!l2cap_frame_print_u8((void *)frame, "    CIG ID"))
++		return;
++
++	if (!l2cap_frame_print_u8((void *)frame, "    CIS ID"))
++		return;
++
++	meta = l2cap_frame_pull((void *)frame, frame, sizeof(*meta));
++	if (!meta) {
++		print_text(COLOR_ERROR, "Metadata: invalid size");
++		return;
++	}
++
++	if (!l2cap_frame_pull((void *)frame, frame, meta->len)) {
++		print_text(COLOR_ERROR, "Metadata: invalid size");
++		return;
++	}
++
++	packet_print_ltv("    Metadata", meta->data, meta->len);
++}
++
++static void print_ase_status(const struct l2cap_frame *frame)
++{
++	uint8_t id, state;
++
++	if (!l2cap_frame_get_u8((void *)frame, &id)) {
++		print_text(COLOR_ERROR, "ASE ID: invalid size");
 +		goto done;
 +	}
 +
-+	print_field("  Number of PAC(s): %u", num);
++	print_field("    ASE ID: %u", id);
 +
-+	for (i = 0; i < num; i++) {
-+		uint8_t codec_id;
-+		uint16_t codec_cid, codec_vid;
-+		struct bt_hci_lv_data *cc;
-+		struct bt_hci_lv_data *meta;
++	if (!l2cap_frame_get_u8((void *)frame, &state)) {
++		print_text(COLOR_ERROR, "ASE State: invalid size");
++		goto done;
++	}
 +
-+		print_field("  PAC #%u:", i);
-+
-+		if (!l2cap_frame_get_u8((void *)frame, &codec_id)) {
-+			print_text(COLOR_ERROR, "Codec: invalid size");
-+			goto done;
-+		}
-+
-+		packet_print_codec_id("    Codec", codec_id);
-+
-+		if (!l2cap_frame_get_le16((void *)frame, &codec_cid)) {
-+			print_text(COLOR_ERROR,
-+					"Codec Company ID: invalid size");
-+			goto done;
-+		}
-+
-+		if (!l2cap_frame_get_le16((void *)frame, &codec_vid)) {
-+			print_text(COLOR_ERROR,
-+					"Codec Vendor ID: invalid size");
-+			goto done;
-+		}
-+
-+		if (codec_id == 0xff) {
-+			print_field("    Codec Company ID: %s (0x%04x)",
-+						bt_compidtostr(codec_cid),
-+						codec_cid);
-+			print_field("    Codec Vendor ID: 0x%04x", codec_vid);
-+		}
-+
-+		cc = l2cap_frame_pull((void *)frame, frame, sizeof(*cc));
-+		if (!cc) {
-+			print_text(COLOR_ERROR,
-+				"Codec Specific Configuration: invalid size");
-+			goto done;
-+		}
-+
-+		if (!l2cap_frame_pull((void *)frame, frame, cc->len)) {
-+			print_text(COLOR_ERROR,
-+				"Codec Specific Configuration: invalid size");
-+			goto done;
-+		}
-+
-+		packet_print_ltv("    Codec Specific Configuration", cc->data,
-+								cc->len);
-+
-+		meta = l2cap_frame_pull((void *)frame, frame, sizeof(*meta));
-+		if (!meta) {
-+			print_text(COLOR_ERROR, "Metadata: invalid size");
-+			goto done;
-+		}
-+
-+		if (!l2cap_frame_pull((void *)frame, frame, meta->len)) {
-+			print_text(COLOR_ERROR, "Metadata: invalid size");
-+			goto done;
-+		}
-+
-+		packet_print_ltv("    Metadata", meta->data, meta->len);
++	switch (state) {
++	/* ASE_State = 0x00 (Idle) */
++	case 0x00:
++		print_field("    State: Idle (0x00)");
++		break;
++	/* ASE_State = 0x01 (Codec Configured) */
++	case 0x01:
++		print_field("    State: Codec Configured (0x01)");
++		print_ase_config(frame);
++		break;
++	/* ASE_State = 0x02 (QoS Configured) */
++	case 0x02:
++		print_field("    State: QoS Configured (0x02)");
++		print_ase_qos(frame);
++		break;
++	/* ASE_Status = 0x03 (Enabling) */
++	case 0x03:
++		print_field("    State: Enabling (0x03)");
++		print_ase_metadata(frame);
++		break;
++	/* ASE_Status = 0x04 (Streaming) */
++	case 0x04:
++		print_field("    State: Streaming (0x04)");
++		print_ase_metadata(frame);
++		break;
++	/* ASE_Status = 0x05 (Disabling) */
++	case 0x05:
++		print_field("    State: Disabling (0x05)");
++		print_ase_metadata(frame);
++		break;
++	/* ASE_Status = 0x06 (Releasing) */
++	case 0x06:
++		print_field("    State: Releasing (0x06)");
++		break;
++	default:
++		print_field("    State: Reserved (0x%2.2x)", state);
++		break;
 +	}
 +
 +done:
@@ -181,98 +561,259 @@ index df3e65057..2b1e21d05 100644
 +		print_hex_field("  Data", frame->data, frame->size);
 +}
 +
-+static void pac_read(const struct l2cap_frame *frame)
++static void ase_read(const struct l2cap_frame *frame)
 +{
-+	print_pac(frame);
++	print_ase_status(frame);
 +}
 +
-+static void pac_notify(const struct l2cap_frame *frame)
++static void ase_notify(const struct l2cap_frame *frame)
 +{
-+	print_pac(frame);
++	print_ase_status(frame);
 +}
 +
  #define GATT_HANDLER(_uuid, _read, _write, _notify) \
  { \
  	.uuid = { \
-@@ -273,7 +363,9 @@ struct gatt_handler {
- 	void (*notify)(const struct l2cap_frame *frame);
- } gatt_handlers[] = {
- 	GATT_HANDLER(GATT_CLIENT_CHARAC_CFG_UUID, gatt_ccc_read,
--					gatt_ccc_write, NULL)
-+					gatt_ccc_write, NULL),
-+	GATT_HANDLER(PAC_SINK_CHRC_UUID, pac_read, NULL, pac_notify),
-+	GATT_HANDLER(PAC_SOURCE_CHRC_UUID, pac_read, NULL, pac_notify),
+@@ -366,6 +677,8 @@ struct gatt_handler {
+ 					gatt_ccc_write, NULL),
+ 	GATT_HANDLER(PAC_SINK_CHRC_UUID, pac_read, NULL, pac_notify),
+ 	GATT_HANDLER(PAC_SOURCE_CHRC_UUID, pac_read, NULL, pac_notify),
++	GATT_HANDLER(ASE_SINK_UUID, ase_read, NULL, ase_notify),
++	GATT_HANDLER(ASE_SOURCE_UUID, ase_read, NULL, ase_notify),
  };
  
  static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
 diff --git a/monitor/l2cap.h b/monitor/l2cap.h
-index 1daeb69be..c33d4c57f 100644
+index c33d4c57f..00a8ffbbd 100644
 --- a/monitor/l2cap.h
 +++ b/monitor/l2cap.h
-@@ -48,13 +48,21 @@ static inline void l2cap_frame_clone(struct l2cap_frame *frame,
- 	}
+@@ -78,6 +78,21 @@ static inline bool l2cap_frame_get_u8(struct l2cap_frame *frame, uint8_t *value)
+ 	return true;
  }
  
--static inline void l2cap_frame_pull(struct l2cap_frame *frame,
-+static inline void *l2cap_frame_pull(struct l2cap_frame *frame,
- 				const struct l2cap_frame *source, uint16_t len)
- {
-+	void *data;
-+
- 	l2cap_frame_clone(frame, source);
- 
-+	if (source->size < len)
-+		return NULL;
-+
-+	data = (void *)frame->data;
- 	frame->data = source->data + len;
- 	frame->size = source->size - len;
-+
-+	return data;
- }
- 
- static inline bool l2cap_frame_get_u8(struct l2cap_frame *frame, uint8_t *value)
-diff --git a/monitor/packet.c b/monitor/packet.c
-index e854c1a8e..c7739fba5 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -1377,6 +1377,11 @@ static void print_codec_id(const char *label, uint8_t codec)
- 	print_field("%s: %s (0x%2.2x)", label, str, codec);
- }
- 
-+void packet_print_codec_id(const char *label, uint8_t codec)
++static inline bool l2cap_frame_print_u8(struct l2cap_frame *frame,
++					const char *label)
 +{
-+	print_codec_id(label, codec);
++	uint8_t u8;
++
++	if (!l2cap_frame_get_u8(frame, &u8)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%2.2x", label, u8);
++
++	return true;
 +}
 +
- static const struct bitfield_data codec_transport_table[] = {
- 	{  0, "Codec supported over BR/EDR ACL"		},
- 	{  1, "Codec supported over BR/EDR SCO and eSCO"},
-@@ -3368,6 +3373,11 @@ static void print_ltv(const char *label, const uint8_t *data, uint8_t len)
- 		print_hex_field(label, iov.iov_base, iov.iov_len);
+ static inline bool l2cap_frame_get_be16(struct l2cap_frame *frame,
+ 								uint16_t *value)
+ {
+@@ -92,6 +107,21 @@ static inline bool l2cap_frame_get_be16(struct l2cap_frame *frame,
+ 	return true;
  }
  
-+void packet_print_ltv(const char *label, const uint8_t *data, uint8_t len)
++static inline bool l2cap_frame_print_be16(struct l2cap_frame *frame,
++						const char *label)
 +{
-+	print_ltv(label, data, len);
++	uint16_t u16;
++
++	if (!l2cap_frame_get_be16(frame, &u16)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%4.4x", label, u16);
++
++	return true;
 +}
 +
- static void print_base_annoucement(const uint8_t *data, uint8_t data_len)
+ static inline bool l2cap_frame_get_le16(struct l2cap_frame *frame,
+ 								uint16_t *value)
  {
- 	struct iovec iov;
-diff --git a/monitor/packet.h b/monitor/packet.h
-index a00975eb3..97d683e3a 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -61,6 +61,8 @@ void packet_print_channel_map_lmp(const uint8_t *map);
- void packet_print_channel_map_ll(const uint8_t *map);
- void packet_print_io_capability(uint8_t capability);
- void packet_print_io_authentication(uint8_t authentication);
-+void packet_print_codec_id(const char *label, uint8_t codec);
-+void packet_print_ltv(const char *label, const uint8_t *data, uint8_t len);
+@@ -106,6 +136,79 @@ static inline bool l2cap_frame_get_le16(struct l2cap_frame *frame,
+ 	return true;
+ }
  
- void packet_control(struct timeval *tv, struct ucred *cred,
- 					uint16_t index, uint16_t opcode,
++static inline bool l2cap_frame_print_le16(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint16_t u16;
++
++	if (!l2cap_frame_get_le16(frame, &u16)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%4.4x", label, u16);
++
++	return true;
++}
++
++static inline bool l2cap_frame_get_be24(struct l2cap_frame *frame,
++								uint32_t *value)
++{
++	if (frame->size < sizeof(uint24_t))
++		return false;
++
++	if (value)
++		*value = get_be24(frame->data);
++
++	l2cap_frame_pull(frame, frame, sizeof(uint24_t));
++
++	return true;
++}
++
++static inline bool l2cap_frame_print_be24(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint32_t u24;
++
++	if (!l2cap_frame_get_be24(frame, &u24)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%6.6x", label, u24);
++
++	return true;
++}
++
++static inline bool l2cap_frame_get_le24(struct l2cap_frame *frame,
++								uint32_t *value)
++{
++	if (frame->size < sizeof(uint24_t))
++		return false;
++
++	if (value)
++		*value = get_le24(frame->data);
++
++	l2cap_frame_pull(frame, frame, sizeof(uint24_t));
++
++	return true;
++}
++
++static inline bool l2cap_frame_print_le24(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint32_t u24;
++
++	if (!l2cap_frame_get_le24(frame, &u24)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%6.6x", label, u24);
++
++	return true;
++}
++
+ static inline bool l2cap_frame_get_be32(struct l2cap_frame *frame,
+ 								uint32_t *value)
+ {
+@@ -120,6 +223,21 @@ static inline bool l2cap_frame_get_be32(struct l2cap_frame *frame,
+ 	return true;
+ }
+ 
++static inline bool l2cap_frame_print_be32(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint32_t u32;
++
++	if (!l2cap_frame_get_be32(frame, &u32)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%8.8x", label, u32);
++
++	return true;
++}
++
+ static inline bool l2cap_frame_get_le32(struct l2cap_frame *frame,
+ 								uint32_t *value)
+ {
+@@ -134,6 +252,21 @@ static inline bool l2cap_frame_get_le32(struct l2cap_frame *frame,
+ 	return true;
+ }
+ 
++static inline bool l2cap_frame_print_le32(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint32_t u32;
++
++	if (!l2cap_frame_get_le32(frame, &u32)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%8.8x", label, u32);
++
++	return true;
++}
++
+ static inline bool l2cap_frame_get_be64(struct l2cap_frame *frame,
+ 								uint64_t *value)
+ {
+@@ -148,6 +281,21 @@ static inline bool l2cap_frame_get_be64(struct l2cap_frame *frame,
+ 	return true;
+ }
+ 
++static inline bool l2cap_frame_print_be64(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint64_t u64;
++
++	if (!l2cap_frame_get_be64(frame, &u64)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%zx", label, u64);
++
++	return true;
++}
++
+ static inline bool l2cap_frame_get_le64(struct l2cap_frame *frame,
+ 								uint64_t *value)
+ {
+@@ -162,6 +310,21 @@ static inline bool l2cap_frame_get_le64(struct l2cap_frame *frame,
+ 	return true;
+ }
+ 
++static inline bool l2cap_frame_print_le64(struct l2cap_frame *frame,
++						const char *label)
++{
++	uint64_t u64;
++
++	if (!l2cap_frame_get_le64(frame, &u64)) {
++		print_text(COLOR_ERROR, "%s: invalid size", label);
++		return false;
++	}
++
++	print_field("%s: 0x%zx", label, u64);
++
++	return true;
++}
++
+ static inline bool l2cap_frame_get_be128(struct l2cap_frame *frame,
+ 					uint64_t *lvalue, uint64_t *rvalue)
+ {
+diff --git a/src/shared/ascs.h b/src/shared/ascs.h
+index 230fdfe8a..2c875bd17 100644
+--- a/src/shared/ascs.h
++++ b/src/shared/ascs.h
+@@ -101,8 +101,8 @@ struct bt_ascs_ase_status_qos {
+ 	uint8_t  pd[3];
+ } __packed;
+ 
+-/* ASE_Status = 0x03 (Enabling), 0x04 (Streaming), 0x05 (Disabling), or
+- * 0x06 (Releasing), defined in Table 4.9.
++/* ASE_Status = 0x03 (Enabling), 0x04 (Streaming), or 0x05 (Disabling)
++ * defined in Table 4.9.
+  */
+ struct bt_ascs_ase_status_metadata {
+ 	uint8_t  cig_id;
 -- 
 2.35.1
 
