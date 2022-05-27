@@ -2,153 +2,174 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06A4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 May 2022 00:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A154FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 27 May 2022 03:13:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233305AbiE0Abn (ORCPT
+        id S232437AbiE0DNv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 May 2022 20:31:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51186 "EHLO
+        Thu, 26 May 2022 23:13:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231130AbiE0Abm (ORCPT
+        with ESMTP id S237960AbiE0DNo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 May 2022 20:31:42 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AF0013F7D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 17:31:40 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id h186so2636364pgc.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 17:31:40 -0700 (PDT)
+        Thu, 26 May 2022 23:13:44 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C19C9AE43
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 20:13:42 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id z17so1940184wmf.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 May 2022 20:13:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=l0jfIWG3lQre23iyESSxO1aNkcoPRfMXLo24kgxxbpc=;
-        b=auw6l6xm3O8O4pGj9zKKi8d2Ae7HTN8AOEoH4SO2jqmX+h1iVfJOF3wd7pouObtU8u
-         BlAr6iNb42//7c5WEEN4JKFap9BBxJDlD+Bn/63pdEdxpgf6Ph29pJy3GtSeEHgsCwOH
-         HtRVPopbxd/itbQKReIw7YXskYM4MqrMyyZYxAlKTCbkMGt2Tr7Pq5LGcB6/T6CFUoJ0
-         24BhL7OSsIgFD7n9Wkq/uqZ4nTslI/8tYACiHohWGmNg4fcQvG7agC1RJHtYywGLxmLI
-         2EDkSes5mOGcHc8HxIfEbYdBPnb35wpyO33P0CxVfDavMFPNKqEgRHa6javUdtc/oS1j
-         MPBQ==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hLhbEmB+6oWbSobGhlaOXKWY2MtkxESxzLh0gUWNPjM=;
+        b=tKYMDnDS4oJT8zrK7SQCNKSdT0FwpU8y7JEWwHZdf/bcQrN7IDvd7eaZAnWnKtxXn9
+         59pPqNGkVhnpPrZd/jt9XC7MfKdMnhPCp/6Qj5U8Yl3idwGtDLLadidpcaUbKL93W7xk
+         5z92bH8vLTiW+PGL3CKv6/+ltBOliwojactsb8+3KAy8wsBcHq/5Xe68RSc2HZXFvm6T
+         Z/vaKoYdcTEalcHd+27rw59ErcuzVuxcABEuO9/WVS6cN0LeAGObMtwP6qifWnZi8E2J
+         LfZvIQnljAhq8Pfn/RmQEVqFxNTNobLv0YqFv8NIsmpGZhsQsmwlHuYyeduY68UzgucX
+         G3kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=l0jfIWG3lQre23iyESSxO1aNkcoPRfMXLo24kgxxbpc=;
-        b=G3zG91SLmnmB6J4Q6p3bnVNSbKNgd5i0YnhhSni9KgCdc7RWNmKkgPOlX3zQ3cm/li
-         CVd4bwv48DXuVFgzwy06kT+LAMHjJZ5uU0+SprgFL7lj57p0U5owYTxjEq//ghNmT/ow
-         8tzXg4Mh/2Lj8expvKp7oB4oiI4xD8d6PfvedyWqOIsmOu8b2k47QdzcQwUiPIaR/6zn
-         qxsCp2R7g+KKi/pfFRR9BGnNmchgOeeWxsi5PS7zbrFGpUm2hddSqtFKioHIyHWs3wwr
-         GfTa2/Eex20vdrsi8F21q8U/EgVZfNGEJxWyLtv5viD0hax3YewnEIsfaDEuSWcgJRjo
-         VIkg==
-X-Gm-Message-State: AOAM531KRlUPYje1o+1+/9DR2I/MHaq3NtuT+/hQKbMAqT91hKx5swNn
-        bpSogY1hj0UcbHmcFEYtpj3UQXKIog8=
-X-Google-Smtp-Source: ABdhPJxm2BwmuF2i/C3g7mwcoOTNmmjBWSmpGfL/XV8UM+AyRl27SlIRMd0i4LuDm7f4dPX7PyP1dw==
-X-Received: by 2002:a05:6a02:206:b0:399:3c9:f465 with SMTP id bh6-20020a056a02020600b0039903c9f465mr36072949pgb.388.1653611499688;
-        Thu, 26 May 2022 17:31:39 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.218.34])
-        by smtp.gmail.com with ESMTPSA id cd21-20020a056a00421500b0050dc7628175sm2013121pfb.79.2022.05.26.17.31.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 17:31:39 -0700 (PDT)
-Message-ID: <62901beb.1c69fb81.6a4cc.4fbc@mx.google.com>
-Date:   Thu, 26 May 2022 17:31:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1127574747056670399=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hLhbEmB+6oWbSobGhlaOXKWY2MtkxESxzLh0gUWNPjM=;
+        b=chrx8k4Q6CCbYaJTuREvSDLO01fEqqtRni+DJyomZlq1eKQqv5eT2GzjXnyP/LfWvm
+         +bYOAVdYISisbDUn4+FlSlBEx8dGZSy60onnaGtkxBZwocczqYf8D+l6ulFiBq2mcRiG
+         Qh6HrDJMsJTCwXxnu6vJN4WFfxWg+6dlMkSG+Aw6JToqFoI4tvXgB7Z9NCdhqQOsMBsA
+         pCw58rCrz/5NwJXUi8CMjNlezLAq+YVt3rHkISf1felYyhWpKeKxayniFbBBqgVlz4gX
+         b8nqMgpvZywbmLpOHYNbwkdwqlaWJYg90GujGGvIR8vyXFXOQTd3sTFZff0xInwRdwAn
+         I6fA==
+X-Gm-Message-State: AOAM531FzYjkXgQtJPlG7ajRtCtrjP4GBbnGkhg3z7Cdj4gHKpEO66pz
+        NxV0sYEanahb3e+hN8RAHjsOUqlJOcy9YlLB4wF4P2A9i9VUuA==
+X-Google-Smtp-Source: ABdhPJxVfU2NZajY56XPrv2/sBKTdjTTpks2AM7CUGy07OWgS/vNj8jPKJtm3GPGdOmbLTydo/V6dmW8Vg/pCaOiso0=
+X-Received: by 2002:a05:600c:19cd:b0:397:83f8:ec5c with SMTP id
+ u13-20020a05600c19cd00b0039783f8ec5cmr3461246wmq.9.1653621220786; Thu, 26 May
+ 2022 20:13:40 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2,1/4] monitor/att: Simplify CCC decoders
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220526205937.4159665-1-luiz.dentz@gmail.com>
-References: <20220526205937.4159665-1-luiz.dentz@gmail.com>
+References: <20220526112456.2488536-1-josephsih@chromium.org>
+ <20220526112456.2488536-3-josephsih@chromium.org> <CABBYNZ+jxkXvsmKxka0McLDgZOXp=aJ9Q3pT0P-2_0k79+2Q5g@mail.gmail.com>
+In-Reply-To: <CABBYNZ+jxkXvsmKxka0McLDgZOXp=aJ9Q3pT0P-2_0k79+2Q5g@mail.gmail.com>
+From:   Joseph Hwang <josephsih@google.com>
+Date:   Fri, 27 May 2022 11:13:30 +0800
+Message-ID: <CAHFy41_D_JRxe34hUheg0pGVRk9ns0GWUvZPkCQe1G7iZHAitQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v6 3/8] adapter: remove quality report from
+ experimental features
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1127574747056670399==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Thanks Luiz for the comment! Does it mean that bluez should 1) try to
+use MGMT_OP_SET_QUALITY_REPORT; and if it failed, use the experimental
+feature EXP_FEAT_BQR instead?
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=645406
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.81 seconds
-GitLint                       FAIL      1.81 seconds
-Prep - Setup ELL              PASS      50.69 seconds
-Build - Prep                  PASS      0.58 seconds
-Build - Configure             PASS      9.45 seconds
-Build - Make                  PASS      1699.16 seconds
-Make Check                    PASS      12.03 seconds
-Make Check w/Valgrind         PASS      505.71 seconds
-Make Distcheck                PASS      265.28 seconds
-Build w/ext ELL - Configure   PASS      9.39 seconds
-Build w/ext ELL - Make        PASS      1683.63 seconds
-Incremental Build with patchesPASS      6830.77 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[v2,3/4] monitor/att: Add decoding support for ASE Sink/Source
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#95: 
-      Channel: 64 len 51 sdu 49 [PSM 39 mode Enhanced Credit (0x81)] {chan 0}
-
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#188: FILE: lib/bluetooth.h:380:
-+typedef struct {
-
-/github/workspace/src/12862782.patch total: 0 errors, 2 warnings, 610 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12862782.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-[v2,4/4] monitor/att: Add decoding support for ASE Control Point
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#86: 
-      Channel: 64 len 26 sdu 24 [PSM 39 mode Enhanced Credit (0x81)] {chan 1}
-
-/github/workspace/src/12862783.patch total: 0 errors, 1 warnings, 904 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12862783.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[v2,3/4] monitor/att: Add decoding support for ASE Sink/Source
-22: B1 Line exceeds max length (86>80): "          Data: 01010000000a00204e00409c00204e00409c0006000000000a02010302020103042800"
-
-
-
-
----
 Regards,
-Linux Bluetooth
+Joseph
 
 
---===============1127574747056670399==--
+On Fri, May 27, 2022 at 4:31 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Joseph,
+>
+> On Thu, May 26, 2022 at 4:25 AM Joseph Hwang <josephsih@chromium.org> wrote:
+> >
+> > The quality report feature is now enabled through
+> > MGMT_OP_SET_QUALITY_REPORT instead of through the experimental
+> > features.
+> >
+> > ---
+> >
+> > Changes in v6:
+> > - Fixed a patch conflict.
+> >
+> > Changes in v5:
+> > - Move is_quality_report_supported() implementation to next patch.
+> >   The function does not belong to this patch.
+> >
+> > Changes in v4:
+> > - Move forward this patch in the patch series so that this
+> >   command patch is prior to the quality report event patches.
+> >
+> > Changes in v3:
+> > - This is a new patch that enables the quality report feature via
+> >   MGMT_OP_SET_QUALITY_REPORT.
+> >
+> >  src/adapter.c | 14 --------------
+> >  src/adapter.h |  1 -
+> >  2 files changed, 15 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index f7faaa263..2ceea6e1c 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -120,13 +120,6 @@ static const struct mgmt_exp_uuid le_simult_central_peripheral_uuid = {
+> >         .str = "671b10b5-42c0-4696-9227-eb28d1b049d6"
+> >  };
+> >
+> > -/* 330859bc-7506-492d-9370-9a6f0614037f */
+> > -static const struct mgmt_exp_uuid quality_report_uuid = {
+> > -       .val = { 0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
+> > -               0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33 },
+> > -       .str = "330859bc-7506-492d-9370-9a6f0614037f"
+> > -};
+> > -
+> >  /* 15c0a148-c273-11ea-b3de-0242ac130004 */
+> >  static const struct mgmt_exp_uuid rpa_resolution_uuid = {
+> >         .val = { 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
+> > @@ -9621,12 +9614,6 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
+> >                                 (void *)le_simult_central_peripheral_uuid.val);
+> >  }
+> >
+> > -static void quality_report_func(struct btd_adapter *adapter, uint8_t action)
+> > -{
+> > -       if (action)
+> > -               queue_push_tail(adapter->exps, (void *)quality_report_uuid.val);
+> > -}
+> > -
+> >  static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
+> >                                         const void *param, void *user_data)
+> >  {
+> > @@ -9703,7 +9690,6 @@ static const struct exp_feat {
+> >         EXP_FEAT(EXP_FEAT_DEBUG, &debug_uuid, exp_debug_func),
+> >         EXP_FEAT(EXP_FEAT_LE_SIMULT_ROLES, &le_simult_central_peripheral_uuid,
+> >                  le_simult_central_peripheral_func),
+> > -       EXP_FEAT(EXP_FEAT_BQR, &quality_report_uuid, quality_report_func),
+> >         EXP_FEAT(EXP_FEAT_RPA_RESOLUTION, &rpa_resolution_uuid,
+> >                 rpa_resolution_func),
+> >         EXP_FEAT(EXP_FEAT_CODEC_OFFLOAD, &codec_offload_uuid,
+> > diff --git a/src/adapter.h b/src/adapter.h
+> > index 688ed51c6..3d53a962d 100644
+> > --- a/src/adapter.h
+> > +++ b/src/adapter.h
+> > @@ -257,7 +257,6 @@ bool btd_le_connect_before_pairing(void);
+> >  enum experimental_features {
+> >         EXP_FEAT_DEBUG                  = 1 << 0,
+> >         EXP_FEAT_LE_SIMULT_ROLES        = 1 << 1,
+> > -       EXP_FEAT_BQR                    = 1 << 2,
+> >         EXP_FEAT_RPA_RESOLUTION         = 1 << 3,
+> >         EXP_FEAT_CODEC_OFFLOAD          = 1 << 4,
+> >  };
+>
+> We can't remove existing experimental features since there could be
+> kernels which don't support MGMT_OP_SET_QUALITY_REPORT, so this will
+> need to stay for as long as we support such kernels versions.
+>
+> > --
+> > 2.36.1.124.g0e6072fb45-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
+
+-- 
+
+Joseph Shyh-In Hwang
+Email: josephsih@google.com
