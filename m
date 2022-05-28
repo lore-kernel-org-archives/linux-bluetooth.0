@@ -2,167 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE3AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 May 2022 07:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DCBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 May 2022 15:48:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbiE1Hir (ORCPT
+        id S243709AbiE1Psw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 May 2022 03:38:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39384 "EHLO
+        Sat, 28 May 2022 11:48:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229618AbiE1Hip (ORCPT
+        with ESMTP id S233172AbiE1Psv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 28 May 2022 03:38:45 -0400
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E44F72DF9
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 May 2022 00:38:42 -0700 (PDT)
-Received: from [192.168.0.21] (ip5f5af60f.dynamic.kabel-deutschland.de [95.90.246.15])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id A0FB161EA192D;
-        Sat, 28 May 2022 09:38:39 +0200 (CEST)
-Message-ID: <7c90bc97-555f-8dc5-5e27-cfb6cdb0e428@molgen.mpg.de>
-Date:   Sat, 28 May 2022 09:38:38 +0200
+        Sat, 28 May 2022 11:48:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DBB52AD
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 May 2022 08:48:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653752929;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=5GAhpNoL6mVubSpwZ4APr5XIqQJTwS8OwKgO1Q7qWXM=;
+        b=dZdtc9faiWDozjJPa+MUOQ8Ltp750xU6GcX/ayYXhB3tOExhpKRD7abRY3vbj02lsZD9jq
+        JVCR6ELvSvY3/4xnLu8CA4O2d7FSEhu931dye2U0mu6GZ3y2aMYdmGlGqyE0eqZJ4xifPV
+        yzBdmSOFa5JVld4xvWszgX8djRt44rE=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-120-yTebxjixOZafsppPLYhu8g-1; Sat, 28 May 2022 11:48:48 -0400
+X-MC-Unique: yTebxjixOZafsppPLYhu8g-1
+Received: by mail-qk1-f200.google.com with SMTP id bl27-20020a05620a1a9b00b0069994eeb30cso5922578qkb.11
+        for <linux-bluetooth@vger.kernel.org>; Sat, 28 May 2022 08:48:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5GAhpNoL6mVubSpwZ4APr5XIqQJTwS8OwKgO1Q7qWXM=;
+        b=UruKZJoKnm3wOjd1a/AkjZL6bPJW+feCQNcX4sdueMaRMtPJVT5THmsrrMqmGqTtiW
+         p7ELMLlFUkMKVnfdTkL57Xs/O/cb74tZBH3uGPD6fcOT7UW35nM6Bm8HCdx9e0w3yGeg
+         1B3B4d774dHAvkHZDCcYlMGaqHDeHehYegd0PRV6m/RFN04q9tdc0amPNazzn1OCbqCL
+         XYgbgX6vDAzALbvYIgp84FqFYG8lDNz6N6Q4avzJ/GJ2ESYu2nSm5HmYVhg9B3f9fSnJ
+         mc7G5vX0Tj267Ytv9+JjxVB/0uMSzRHoQKSKpsb6re+XV8FEHGdipqJJQEzWsJZifuYV
+         0QZA==
+X-Gm-Message-State: AOAM533MTs+/U0Gt9UurV/fayEXOGnZy2v0f4VXLFrKgV/gsGxhmaM+O
+        j7MCrh8QpKnhUY6Pm8e4aiDebwBa7fy1og4/HNotVatZMR1AiJbTiI76j+GhP1XuZxpf36OCMwG
+        0Qzvcm3OBHZ2ZuJIahkCSMVeGVz7FEcwJZIWduEo0uvOO
+X-Received: by 2002:ac8:5750:0:b0:2f9:410b:7101 with SMTP id 16-20020ac85750000000b002f9410b7101mr19892462qtx.291.1653752927535;
+        Sat, 28 May 2022 08:48:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwmAsucB7ng/+qB+vvkMRhBKq3xcdUohmtwPZcqjrboA1dOIsdMeoqf6NSF/fuav7Oq7do5fGX9GQQTQ5RsLU8=
+X-Received: by 2002:ac8:5750:0:b0:2f9:410b:7101 with SMTP id
+ 16-20020ac85750000000b002f9410b7101mr19892448qtx.291.1653752927345; Sat, 28
+ May 2022 08:48:47 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH-stable v2] Bluetooth: eir: Fix using strlen with
- hdev->{dev_name,short_name}
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <20220528003528.571351-1-luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20220528003528.571351-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220526162806.16618-1-jukka.rissanen@linux.intel.com> <20220527075625.9693-1-jukka.rissanen@linux.intel.com>
+In-Reply-To: <20220527075625.9693-1-jukka.rissanen@linux.intel.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Sat, 28 May 2022 11:48:36 -0400
+Message-ID: <CAK-6q+icAttyjPFx6LXLTUu4b6WBpj9kwKNxUS9WE=cPz6=DnA@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: Remove Jukka Rissanen as 6lowpan maintainer
+To:     Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Cc:     Alexander Aring <alex.aring@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        pmenzel@molgen.mpg.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Luiz,
+Hi,
 
+On Fri, May 27, 2022 at 3:58 AM Jukka Rissanen
+<jukka.rissanen@linux.intel.com> wrote:
+>
+> I no longer work on this so better update the file.
+>
 
-Thank you for your patch.
+> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 
-Am 28.05.22 um 02:35 schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Both dev_name and short_name are not guaranteed to be NULL terminated so
-> this instead use strnlen and then attempt to determine if the resulting
+Acked-by: Alexander Aring <aahringo@redhat.com>
 
-The *this* does not seem to belong into the sentence.
+:'-(
 
-> string needs to be truncated or not.
-> 
-> Link: https://bugzilla.kernel.org/show_bug.cgi?id=216018
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+- Alex
 
-Should this be tagged for the stable series?
-
-
-Kind regards,
-
-Paul
-
-
-> ---
->   net/bluetooth/eir.c  | 41 ++++++++++++++++++++++++++---------------
->   net/bluetooth/mgmt.c |  4 ++--
->   2 files changed, 28 insertions(+), 17 deletions(-)
-> 
-> diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-> index 7d77fb00c2bf..776d27f7e18d 100644
-> --- a/net/bluetooth/eir.c
-> +++ b/net/bluetooth/eir.c
-> @@ -13,6 +13,20 @@
->   
->   #define PNP_INFO_SVCLASS_ID		0x1200
->   
-> +static u8 eir_append_name(u8 *eir, u16 eir_len, u8 type, u8 *data, u8 data_len)
-> +{
-> +	u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
-> +
-> +	/* If data is already NULL terminated just pass it directly */
-> +	if (data[data_len - 1] == '\0')
-> +		return eir_append_data(eir, eir_len, type, data, data_len);
-> +
-> +	memcpy(name, data, HCI_MAX_SHORT_NAME_LENGTH);
-> +	name[HCI_MAX_SHORT_NAME_LENGTH] = '\0';
-> +
-> +	return eir_append_data(eir, eir_len, type, name, sizeof(name));
-> +}
-> +
->   u8 eir_append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
->   {
->   	size_t short_len;
-> @@ -23,29 +37,26 @@ u8 eir_append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
->   		return ad_len;
->   
->   	/* use complete name if present and fits */
-> -	complete_len = strlen(hdev->dev_name);
-> +	complete_len = strnlen(hdev->dev_name, sizeof(hdev->dev_name));
->   	if (complete_len && complete_len <= HCI_MAX_SHORT_NAME_LENGTH)
-> -		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
-> +		return eir_append_name(ptr, ad_len, EIR_NAME_COMPLETE,
->   				       hdev->dev_name, complete_len + 1);
->   
->   	/* use short name if present */
-> -	short_len = strlen(hdev->short_name);
-> +	short_len = strnlen(hdev->short_name, sizeof(hdev->short_name));
->   	if (short_len)
-> -		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
-> -				       hdev->short_name, short_len + 1);
-> +		return eir_append_name(ptr, ad_len, EIR_NAME_SHORT,
-> +				       hdev->short_name,
-> +				       short_len == HCI_MAX_SHORT_NAME_LENGTH ?
-> +				       short_len : short_len + 1);
->   
->   	/* use shortened full name if present, we already know that name
->   	 * is longer then HCI_MAX_SHORT_NAME_LENGTH
->   	 */
-> -	if (complete_len) {
-> -		u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
-> -
-> -		memcpy(name, hdev->dev_name, HCI_MAX_SHORT_NAME_LENGTH);
-> -		name[HCI_MAX_SHORT_NAME_LENGTH] = '\0';
-> -
-> -		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT, name,
-> -				       sizeof(name));
-> -	}
-> +	if (complete_len)
-> +		return eir_append_name(ptr, ad_len, EIR_NAME_SHORT,
-> +				       hdev->dev_name,
-> +				       HCI_MAX_SHORT_NAME_LENGTH);
->   
->   	return ad_len;
->   }
-> @@ -181,7 +192,7 @@ void eir_create(struct hci_dev *hdev, u8 *data)
->   	u8 *ptr = data;
->   	size_t name_len;
->   
-> -	name_len = strlen(hdev->dev_name);
-> +	name_len = strnlen(hdev->dev_name, sizeof(hdev->dev_name));
->   
->   	if (name_len > 0) {
->   		/* EIR Data type */
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index cd1b300b9be7..82cc645193f2 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -1082,11 +1082,11 @@ static u16 append_eir_data_to_buf(struct hci_dev *hdev, u8 *eir)
->   		eir_len = eir_append_le16(eir, eir_len, EIR_APPEARANCE,
->   					  hdev->appearance);
->   
-> -	name_len = strlen(hdev->dev_name);
-> +	name_len = strnlen(hdev->dev_name, sizeof(hdev->dev_name));
->   	eir_len = eir_append_data(eir, eir_len, EIR_NAME_COMPLETE,
->   				  hdev->dev_name, name_len);
->   
-> -	name_len = strlen(hdev->short_name);
-> +	name_len = strnlen(hdev->short_name, sizeof(hdev->short_name));
->   	eir_len = eir_append_data(eir, eir_len, EIR_NAME_SHORT,
->   				  hdev->short_name, name_len);
->   
