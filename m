@@ -2,365 +2,204 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EEA0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 May 2022 05:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7206C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 May 2022 11:42:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230403AbiE2Fz0 (ORCPT
+        id S230106AbiE2Lmu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 May 2022 01:55:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54930 "EHLO
+        Sun, 29 May 2022 07:42:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbiE2FzZ (ORCPT
+        with ESMTP id S229952AbiE2Lmt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 May 2022 01:55:25 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4866E59BAC
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 May 2022 22:55:23 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id n19-20020a056602341300b0066850b49e09so2567443ioz.12
-        for <linux-bluetooth@vger.kernel.org>; Sat, 28 May 2022 22:55:23 -0700 (PDT)
+        Sun, 29 May 2022 07:42:49 -0400
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAB6B33368
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 May 2022 04:42:44 -0700 (PDT)
+Received: by mail-vs1-xe34.google.com with SMTP id 67so8337238vsh.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 May 2022 04:42:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=foxdogstudios-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=qPnJWXlchheONIM69Dn09IN35UzsBae6ZWx+bklufmA=;
+        b=BIYe1s4M4w0VlCW1mFz9MOZ2cFK0dbIEsZUF7BJkv0QL87hJ4eqeOs2iqzbnGy55tT
+         JMTfghQiPoj/JGeAW3MUIpWdyWApNWMBy63yylqn2S8cEWosr4y3mZE4vUtzjcgRB81x
+         TCtnP+lu66VUBTsXfXeIH9Yta9va3E9qkbU/8DxroPdkyxuHTLoCryp2GLATkAxGcN5i
+         3qs/liyP45NHyb6YTqoiR/umkMsEs3PJgGBjI3MWLP8qj0NZi2fi+tejTvi2jFRaCwzg
+         z1bKG0+xbEV2cA13PhZ43mrIGMdfzJC5TMpTYsV5jc6X3IReq6rXN/QKIZy7WeOTS75A
+         tcaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=2THofbMjmyuoo5sodONiinlu0c+1Y5g183/8XLnwBQ8=;
-        b=Cq4PANqxdQVZ+hhFKCDUXyyf7WaCkyzJXldJDrQWtYO6JhXi/i43JInljQmCqGNxaw
-         gm/UcSWqre81R9uG/pHYn476YJ8yp0mUM/9xEFV4S26I26TUOm2YC3xHlw8xYibmlTzB
-         VPqCVLFV13pwlbI811L6QZq/aQ1jOkDoFN1l4TtRHy6ev8vTdk1tCwqG3JDq1J1JrG/E
-         Rh86GN9QTqQMRUn3JleEyJoRmBJM/+5jYI1RokejRGDPOsLIhMa5EiXQeCIqARYHZ8Md
-         2E+J7EL7VG9cd0nUlvCCNGfQtMBJGBGWUifv63OTPYkxgGngTESidpEg69W2+pzuTfej
-         m2Xg==
-X-Gm-Message-State: AOAM533uonNN+kzVjeH8SKawXwTH+4XJAJIfbfHS0DQYSIdze46T7yKR
-        diSOKc/ISNk0nRyZtYwWnnXY9tNp/hRHl9XxZLT4aOEeJtL7
-X-Google-Smtp-Source: ABdhPJwAWrCSzU/aY+Y7DewhaEWv0bRRSBRPR1q/ztMhd4lTUW/KOAfksNq1fE9VLkWbfYIarsF632wGile3bjI3LrtJmyV/HO6W
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=qPnJWXlchheONIM69Dn09IN35UzsBae6ZWx+bklufmA=;
+        b=izfZ8mIMEgXYMpTFjWzdvYyCCBuaWFUW0OCJ02M/A6QkO9iIwulJcNVWC2tyN5PIs5
+         bLuK9omeX5lmNSI1PvF8Qa2UgEu16wstKBkLf7zEprG5joqOMURuCgDVCIpMoEqJzZ/D
+         PsqsDLUEKbh9WuMlLKBKrmmEXIP91wZqHSWZXRSf8k9UO31zVfEVWEWuimcmsBnpA+S5
+         GrkJumwOKhnz6krS7kbpnUsllDYYpb0RHauTeQcqqdBLT6+4gSGuQ+6EIEjA3Ub9pdvA
+         XF1x7F7yvdU4vw+xqsEdHuFdpKnYABKZxiFVUdsYGUOWdX3MOX6gflDt3t/UAJz9qybg
+         QVvA==
+X-Gm-Message-State: AOAM530YFRn6QOWD4hBFrf442OQyxmYx3BT0rpXcd4FGKl7uEbQEfCZD
+        355s5kR/Lzr+M/T0XRwP+hGxo5NZilyJVFNYpe4/WABZvdJlEQ==
+X-Google-Smtp-Source: ABdhPJzKBDFgDBV4fOqC9Fy/2/VPdcSB59E04Yh/dLM9XoWpH1NMo8YsTu484wFbKOOTw5ERwqCqHcUqvvOrInFmYws=
+X-Received: by 2002:a67:d91e:0:b0:337:935e:517a with SMTP id
+ t30-20020a67d91e000000b00337935e517amr16894341vsj.19.1653824563958; Sun, 29
+ May 2022 04:42:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:80a:b0:665:7139:4c4b with SMTP id
- z10-20020a056602080a00b0066571394c4bmr12468885iow.134.1653803722262; Sat, 28
- May 2022 22:55:22 -0700 (PDT)
-Date:   Sat, 28 May 2022 22:55:22 -0700
-In-Reply-To: <000000000000d59b7105de1e6d3a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000064cf4505e0202fe7@google.com>
-Subject: Re: [syzbot] INFO: task hung in hci_dev_close_sync
-From:   syzbot <syzbot+c56f6371c48cad0420f9@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, dvyukov@google.com, edumazet@google.com,
-        hdanton@sina.com, johan.hedberg@gmail.com, johannes.berg@intel.com,
-        johannes@sipsolutions.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, luiz.dentz@gmail.com, marcel@holtmann.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        penguin-kernel@I-love.SAKURA.ne.jp,
-        syzkaller-bugs@googlegroups.com, tj@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   Peter Sutton <peter@foxdogstudios.com>
+Date:   Sun, 29 May 2022 12:42:33 +0100
+Message-ID: <CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com>
+Subject: [Bug] [Deadlock] Kernel thread deadlock in rfcomm socket release when
+ connect interrupted
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matthew Leach <matthew@mattleach.net>,
+        Lloyd Henning <lloyd@foxdogstudios.com>
+Content-Type: multipart/mixed; boundary="000000000000a8034b05e02509e7"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+--000000000000a8034b05e02509e7
+Content-Type: text/plain; charset="UTF-8"
 
-HEAD commit:    9d004b2f4fea Merge tag 'cxl-for-5.19' of git://git.kernel...
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=12fe6d23f00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d5ef46f0e355ceff
-dashboard link: https://syzkaller.appspot.com/bug?extid=c56f6371c48cad0420f9
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17c258f5f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=144f1233f00000
+Hi,
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c56f6371c48cad0420f9@syzkaller.appspotmail.com
+Compile the attached C program (gcc -lbluetooth bug.c) and execute:
 
-INFO: task kworker/u5:1:3610 blocked for more than 143 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:1    state:D stack:27304 pid: 3610 ppid:     2 flags:0x00004000
-Workqueue: hci9 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3075
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3162
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4091
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-INFO: task kworker/u5:3:3617 blocked for more than 144 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:3    state:D stack:27568 pid: 3617 ppid:     2 flags:0x00004000
-Workqueue: hci8 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3075
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3162
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4091
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-INFO: task kworker/u5:4:3619 blocked for more than 144 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:kworker/u5:4    state:D stack:27192 pid: 3619 ppid:     2 flags:0x00004000
-Workqueue: hci7 hci_power_on
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- __flush_work+0x56c/0xb10 kernel/workqueue.c:3075
- __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3162
- hci_dev_close_sync+0x8d/0x1150 net/bluetooth/hci_sync.c:4091
- hci_dev_do_close+0x32/0x70 net/bluetooth/hci_core.c:553
- hci_power_on+0x1c0/0x630 net/bluetooth/hci_core.c:981
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-INFO: task syz-executor921:3700 blocked for more than 145 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor921 state:D stack:27944 pid: 3700 ppid:  3603 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x3ed/0x13a0 kernel/workqueue.c:2861
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1169
- sock_ioctl+0x2f1/0x640 net/socket.c:1286
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f595e7f37e7
-RSP: 002b:00007ffc76721138 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f595e7f37e7
-RDX: 0000000000000009 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000004 R08: 00007f595e7a0700 R09: 00007f595e7a0700
-R10: 00007f595e7a09d0 R11: 0000000000000246 R12: 6c616b7a79732f2e
-R13: 585858582e72656c R14: 00007ffc76721164 R15: 00007ffc767211a0
- </TASK>
-INFO: task syz-executor921:3701 blocked for more than 145 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor921 state:D stack:27944 pid: 3701 ppid:  3603 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x3ed/0x13a0 kernel/workqueue.c:2861
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1169
- sock_ioctl+0x2f1/0x640 net/socket.c:1286
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f595e7f37e7
-RSP: 002b:00007ffc76721138 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f595e7f37e7
-RDX: 0000000000000007 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000004 R08: 00007f595e7a0700 R09: 00007f595e7a0700
-R10: 00007f595e7a09d0 R11: 0000000000000246 R12: 6c616b7a79732f2e
-R13: 585858582e72656c R14: 00007ffc76721164 R15: 00007ffc767211a0
- </TASK>
-INFO: task syz-executor921:3702 blocked for more than 145 seconds.
-      Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor921 state:D stack:26648 pid: 3702 ppid:  3603 flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5116 [inline]
- __schedule+0xa00/0x4b30 kernel/sched/core.c:6431
- schedule+0xd2/0x1f0 kernel/sched/core.c:6503
- schedule_timeout+0x1db/0x2a0 kernel/time/timer.c:1911
- do_wait_for_common kernel/sched/completion.c:85 [inline]
- __wait_for_common+0x378/0x530 kernel/sched/completion.c:106
- flush_workqueue+0x3ed/0x13a0 kernel/workqueue.c:2861
- hci_dev_open+0xdb/0x300 net/bluetooth/hci_core.c:526
- hci_sock_ioctl+0x62c/0x910 net/bluetooth/hci_sock.c:1027
- sock_do_ioctl+0xcc/0x230 net/socket.c:1169
- sock_ioctl+0x2f1/0x640 net/socket.c:1286
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f595e7f37e7
-RSP: 002b:00007ffc76721138 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f595e7f37e7
-RDX: 0000000000000008 RSI: 00000000400448c9 RDI: 0000000000000003
-RBP: 0000000000000004 R08: 00007f595e7a0700 R09: 00007f595e7a0700
-R10: 00007f595e7a09d0 R11: 0000000000000246 R12: 6c616b7a79732f2e
-R13: 585858582e72656c R14: 00007ffc76721164 R15: 00007ffc767211a0
- </TASK>
+$ ./a.out
 
-Showing all locks held in the system:
-1 lock held by khungtaskd/29:
- #0: ffffffff8bd86860 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6491
-2 locks held by getty/3285:
- #0: ffff88814c09b098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
- #1: ffffc90002cd62e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xcea/0x1230 drivers/tty/n_tty.c:2075
-2 locks held by sshd/3597:
-3 locks held by kworker/u5:1/3610:
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88807898c138 ((wq_completion)hci9){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000302fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff88801a3f9048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
-3 locks held by kworker/u5:3/3617:
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff888076411138 ((wq_completion)hci8){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000312fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff88807421d048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
-3 locks held by kworker/u5:4/3619:
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff888076414138 ((wq_completion)hci7){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc9000315fda8 ((work_completion)(&hdev->power_on)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
- #2: ffff888074219048 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close+0x2a/0x70 net/bluetooth/hci_core.c:551
+Interrupt (^C/SIGINT) during the connect. The process should hang and
+the Bluetooth socket will now be in deadlock.
 
-=============================================
+Kernel thread stack:
 
-NMI backtrace for cpu 1
-CPU: 1 PID: 29 Comm: khungtaskd Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
- nmi_trigger_cpumask_backtrace+0x1e6/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:220 [inline]
- watchdog+0xc22/0xf90 kernel/hung_task.c:378
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 3599 Comm: strace-static-x Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:memory_is_poisoned_n mm/kasan/generic.c:129 [inline]
-RIP: 0010:memory_is_poisoned mm/kasan/generic.c:159 [inline]
-RIP: 0010:check_region_inline mm/kasan/generic.c:180 [inline]
-RIP: 0010:kasan_check_range+0x55/0x180 mm/kasan/generic.c:189
-Code: 86 05 01 00 00 49 83 e9 01 48 89 fd 48 b8 00 00 00 00 00 fc ff df 4d 89 ca 48 c1 ed 03 49 c1 ea 03 48 01 c5 49 01 c2 48 89 e8 <49> 8d 5a 01 48 89 da 48 29 ea 48 83 fa 10 7e 63 41 89 eb 41 83 e3
-RSP: 0018:ffffc90002eff9c8 EFLAGS: 00000082
-RAX: fffffbfff1b77492 RBX: 0000000000000000 RCX: ffffffff815e5141
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff8dbba490
-RBP: fffffbfff1b77492 R08: 0000000000000000 R09: ffffffff8dbba497
-R10: fffffbfff1b77492 R11: 0000000000000000 R12: ffff8880b9c39ed8
-R13: ffff8880b9c39ec0 R14: ffff88802525a298 R15: ffff888025259d80
-FS:  0000000000757340(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005555566c1608 CR3: 0000000073fd2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- instrument_atomic_read include/linux/instrumented.h:71 [inline]
- test_bit include/asm-generic/bitops/instrumented-non-atomic.h:134 [inline]
- cpumask_test_cpu include/linux/cpumask.h:379 [inline]
- cpu_online include/linux/cpumask.h:921 [inline]
- trace_lock_release include/trace/events/lock.h:69 [inline]
- lock_release+0xa1/0x780 kernel/locking/lockdep.c:5676
- prepare_lock_switch kernel/sched/core.c:4860 [inline]
- context_switch kernel/sched/core.c:5113 [inline]
- __schedule+0x9cd/0x4b30 kernel/sched/core.c:6431
- preempt_schedule_common+0x45/0xc0 kernel/sched/core.c:6596
- preempt_schedule_thunk+0x16/0x18 arch/x86/entry/thunk_64.S:35
- try_to_wake_up+0xa04/0x1800 kernel/sched/core.c:4201
- ptrace_resume+0x27d/0x2d0 kernel/ptrace.c:895
- ptrace_request+0x180/0xef0 kernel/ptrace.c:1230
- arch_ptrace+0x36/0x510 arch/x86/kernel/ptrace.c:828
- __do_sys_ptrace kernel/ptrace.c:1321 [inline]
- __se_sys_ptrace kernel/ptrace.c:1286 [inline]
- __x64_sys_ptrace+0x178/0x310 kernel/ptrace.c:1286
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x4e6c1a
-Code: Unable to access opcode bytes at RIP 0x4e6bf0.
-RSP: 002b:00007ffdb7543730 EFLAGS: 00000206 ORIG_RAX: 0000000000000065
-RAX: ffffffffffffffda RBX: 00000000007572f8 RCX: 00000000004e6c1a
-RDX: 0000000000000000 RSI: 0000000000000e2e RDI: 0000000000000018
-RBP: 0000000000000018 R08: 0000000000000017 R09: 0000000000000002
-R10: 0000000000000000 R11: 0000000000000206 R12: 0000000000759380
-R13: 0000000000000000 R14: 000000000000857f R15: 0000000000617180
- </TASK>
-INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 1.132 msecs
-----------------
-Code disassembly (best guess):
-   0:	86 05 01 00 00 49    	xchg   %al,0x49000001(%rip)        # 0x49000007
-   6:	83 e9 01             	sub    $0x1,%ecx
-   9:	48 89 fd             	mov    %rdi,%rbp
-   c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  13:	fc ff df
-  16:	4d 89 ca             	mov    %r9,%r10
-  19:	48 c1 ed 03          	shr    $0x3,%rbp
-  1d:	49 c1 ea 03          	shr    $0x3,%r10
-  21:	48 01 c5             	add    %rax,%rbp
-  24:	49 01 c2             	add    %rax,%r10
-  27:	48 89 e8             	mov    %rbp,%rax
-* 2a:	49 8d 5a 01          	lea    0x1(%r10),%rbx <-- trapping instruction
-  2e:	48 89 da             	mov    %rbx,%rdx
-  31:	48 29 ea             	sub    %rbp,%rdx
-  34:	48 83 fa 10          	cmp    $0x10,%rdx
-  38:	7e 63                	jle    0x9d
-  3a:	41 89 eb             	mov    %ebp,%r11d
-  3d:	41                   	rex.B
-  3e:	83                   	.byte 0x83
-  3f:	e3                   	.byte 0xe3
+[May29 12:23] INFO: task krfcommd:902 blocked for more than 122 seconds.
+[  +0.000009]       Tainted: P           OE     5.18.0-arch1-1 #1
+[  +0.000004] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[  +0.000002] task:krfcommd        state:D stack:    0 pid:  902 ppid:
+    2 flags:0x00004000
+[  +0.000010] Call Trace:
+[  +0.000003]  <TASK>
+[  +0.000007]  __schedule+0x37c/0x11f0
+[  +0.000013]  ? __schedule+0x384/0x11f0
+[  +0.000012]  ? l2cap_chan_create+0x138/0x180 [bluetooth
+da0a812fd33c72f9c94149bd973bd9835fc8aa63]
+[  +0.000104]  schedule+0x4f/0xb0
+[  +0.000008]  schedule_preempt_disabled+0x15/0x20
+[  +0.000009]  __mutex_lock.constprop.0+0x2d0/0x480
+[  +0.000012]  rfcomm_run+0x152/0x1900 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000018]  ? ttwu_do_wakeup+0x17/0x160
+[  +0.000011]  ? _raw_spin_rq_lock_irqsave+0x20/0x20
+[  +0.000010]  ? rfcomm_check_accept+0xa0/0xa0 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000015]  kthread+0xde/0x110
+[  +0.000011]  ? kthread_complete_and_exit+0x20/0x20
+[  +0.000010]  ret_from_fork+0x22/0x30
+[  +0.000012]  </TASK>
 
+Task stack:
+
+[  +0.000003] INFO: task a.out:1035 blocked for more than 122 seconds.
+[  +0.000004]       Tainted: P           OE     5.18.0-arch1-1 #1
+[  +0.000003] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[  +0.000001] task:a.out           state:D stack:    0 pid: 1035 ppid:
+  817 flags:0x00004006
+[  +0.000008] Call Trace:
+[  +0.000002]  <TASK>
+[  +0.000003]  __schedule+0x37c/0x11f0
+[  +0.000009]  ? __mod_memcg_state+0x2f/0x70
+[  +0.000008]  schedule+0x4f/0xb0
+[  +0.000007]  __lock_sock+0x7d/0xc0
+[  +0.000010]  ? cpuacct_percpu_seq_show+0x20/0x20
+[  +0.000009]  lock_sock_nested+0x48/0x50
+[  +0.000009]  rfcomm_sk_state_change+0x2b/0x120 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000018]  __rfcomm_dlc_close+0x99/0x210 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000015]  rfcomm_dlc_close+0x6e/0xb0 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000015]  __rfcomm_sock_close+0x2e/0xe0 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000017]  rfcomm_sock_shutdown+0x65/0xa0 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000016]  rfcomm_sock_release+0x32/0xb0 [rfcomm
+70c711e71e4c70ddabda45ec756f02d9606ec257]
+[  +0.000016]  __sock_release+0x3d/0xa0
+[  +0.000010]  sock_close+0x15/0x20
+[  +0.000009]  __fput+0x89/0x240
+[  +0.000011]  task_work_run+0x60/0x90
+[  +0.000007]  do_exit+0x337/0xac0
+[  +0.000010]  ? del_timer_sync+0x73/0xb0
+[  +0.000006]  do_group_exit+0x31/0xa0
+[  +0.000009]  get_signal+0x986/0x990
+[  +0.000007]  ? bt_sock_wait_state+0x124/0x1a0 [bluetooth
+da0a812fd33c72f9c94149bd973bd9835fc8aa63]
+[  +0.000060]  ? wake_up_q+0x90/0x90
+[  +0.000010]  arch_do_signal_or_restart+0x48/0x760
+[  +0.000012]  exit_to_user_mode_prepare+0xd3/0x140
+[  +0.000008]  syscall_exit_to_user_mode+0x26/0x50
+[  +0.000006]  do_syscall_64+0x6b/0x90
+[  +0.000009]  ? exc_page_fault+0x74/0x170
+[  +0.000009]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  +0.000007] RIP: 0033:0x7f4ab4f13557
+[  +0.000006] RSP: 002b:00007fff5b37cc38 EFLAGS: 00000246 ORIG_RAX:
+000000000000002a
+[  +0.000007] RAX: fffffffffffffffc RBX: 00007fff5b37cd78 RCX: 00007f4ab4f13557
+[  +0.000004] RDX: 000000000000000a RSI: 00007fff5b37cc4e RDI: 0000000000000003
+[  +0.000004] RBP: 00007fff5b37cc60 R08: 0fffffffffffffff R09: 0000000000000000
+[  +0.000003] R10: 00007f4ab4e075e0 R11: 0000000000000246 R12: 0000000000000000
+[  +0.000003] R13: 00007fff5b37cd88 R14: 0000562da1cefde0 R15: 00007f4ab5214000
+[  +0.000007]  </TASK>
+
+Process stack:
+
+[<0>] __lock_sock+0x7d/0xc0
+[<0>] lock_sock_nested+0x48/0x50
+[<0>] rfcomm_sk_state_change+0x2b/0x120 [rfcomm]
+[<0>] __rfcomm_dlc_close+0x99/0x210 [rfcomm]
+[<0>] rfcomm_dlc_close+0x6e/0xb0 [rfcomm]
+[<0>] __rfcomm_sock_close+0x2e/0xe0 [rfcomm]
+[<0>] rfcomm_sock_shutdown+0x65/0xa0 [rfcomm]
+[<0>] rfcomm_sock_release+0x32/0xb0 [rfcomm]
+[<0>] __sock_release+0x3d/0xa0
+[<0>] sock_close+0x15/0x20
+[<0>] __fput+0x89/0x240
+[<0>] task_work_run+0x60/0x90
+[<0>] do_exit+0x337/0xac0
+[<0>] do_group_exit+0x31/0xa0
+[<0>] get_signal+0x986/0x990
+[<0>] arch_do_signal_or_restart+0x48/0x760
+[<0>] exit_to_user_mode_prepare+0xd3/0x140
+[<0>] syscall_exit_to_user_mode+0x26/0x50
+[<0>] do_syscall_64+0x6b/0x90
+[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+Replicated by Matt (CC'ed running 5.15.39) on different hardware and
+Lloyd (CC'ed) on same hardware with same stack trace. Tested on
+up-to-date Arch Linux (5.18.0).
+
+Let me know if you need anything else. Cheers
+--
+Pete.
+
+--000000000000a8034b05e02509e7
+Content-Type: text/x-csrc; charset="US-ASCII"; name="bug.c"
+Content-Disposition: attachment; filename="bug.c"
+Content-Transfer-Encoding: base64
+Content-ID: <f_l3r857pq0>
+X-Attachment-Id: f_l3r857pq0
+
+I2luY2x1ZGUgPHVuaXN0ZC5oPgojaW5jbHVkZSA8c3lzL3NvY2tldC5oPgojaW5jbHVkZSA8Ymx1
+ZXRvb3RoL2JsdWV0b290aC5oPgojaW5jbHVkZSA8Ymx1ZXRvb3RoL3JmY29tbS5oPgoKaW50IG1h
+aW4oKSB7CiAgaW50IHNvY2sgPSBzb2NrZXQoQUZfQkxVRVRPT1RILCBTT0NLX1NUUkVBTSwgQlRQ
+Uk9UT19SRkNPTU0pOwogIGlmIChzb2NrID09IC0xKSByZXR1cm4gMTsKICBzdHJ1Y3Qgc29ja2Fk
+ZHJfcmMgYWRkcjsKICBhZGRyLnJjX2ZhbWlseSA9IEFGX0JMVUVUT09USDsKICBhZGRyLnJjX2No
+YW5uZWwgPSAxOwogIHN0cjJiYSgiMDE6MjM6NDU6Njc6ODk6QUIiLCAmYWRkci5yY19iZGFkZHIp
+OwogIGNvbm5lY3Qoc29jaywgKHN0cnVjdCBzb2NrYWRkciAqKSAmYWRkciwgc2l6ZW9mKGFkZHIp
+KTsKICBjbG9zZShzb2NrKTsKfQo=
+--000000000000a8034b05e02509e7--
