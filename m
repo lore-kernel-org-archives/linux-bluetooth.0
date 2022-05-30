@@ -2,39 +2,39 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 740ACC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 May 2022 08:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AECCAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 May 2022 08:12:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233184AbiE3IMa (ORCPT
+        id S233193AbiE3IMe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 May 2022 04:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41692 "EHLO
+        Mon, 30 May 2022 04:12:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233178AbiE3IM3 (ORCPT
+        with ESMTP id S233180AbiE3IMa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 May 2022 04:12:29 -0400
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C57753151E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 May 2022 01:12:28 -0700 (PDT)
+        Mon, 30 May 2022 04:12:30 -0400
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9A34536E3E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 May 2022 01:12:29 -0700 (PDT)
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-145-82c8eLv6MkisC8Hwy_VHcQ-1; Mon, 30 May 2022 04:12:26 -0400
-X-MC-Unique: 82c8eLv6MkisC8Hwy_VHcQ-1
+ us-mta-500-CWPOlZH8MOauUSWExRM0Zw-1; Mon, 30 May 2022 04:12:23 -0400
+X-MC-Unique: CWPOlZH8MOauUSWExRM0Zw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3176F3C02185;
-        Mon, 30 May 2022 08:12:26 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8A2B29ABA2A;
+        Mon, 30 May 2022 08:12:22 +0000 (UTC)
 Received: from localhost.localdomain.com (unknown [10.64.242.130])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BB8671410F36;
-        Mon, 30 May 2022 08:12:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5752B1415100;
+        Mon, 30 May 2022 08:12:19 +0000 (UTC)
 From:   Gopal Tiwari <gopalkrishna.tiwari@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, gtiwari@redhat.com
-Subject: [Bluez 03/13] Fixing memroy leak in jlink.c
-Date:   Mon, 30 May 2022 13:41:59 +0530
-Message-Id: <20220530081209.560465-4-gopalkrishna.tiwari@gmail.com>
+Subject: [Bluez 02/13] Fixing memory leakage in appkey.c
+Date:   Mon, 30 May 2022 13:41:58 +0530
+Message-Id: <20220530081209.560465-3-gopalkrishna.tiwari@gmail.com>
 In-Reply-To: <20220530081209.560465-1-gopalkrishna.tiwari@gmail.com>
 References: <20220530081209.560465-1-gopalkrishna.tiwari@gmail.com>
 MIME-Version: 1.0
@@ -46,36 +46,41 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Gopal Tiwari <gtiwari@redhat.com>
 
-While performing static tool analysis using coverity found following reports for resouse leak
+While performing the static analysis using the coverity tool found following memroy leak reports
 
-bluez-5.64/monitor/jlink.c:111: leaked_storage: Variable "so" going out of scope leaks the storage it points to.
+bluez-5.64/mesh/appkey.c:143: leaked_storage: Variable "key" going out of scope leaks the storage it points to.
 
-bluez-5.64/monitor/jlink.c:113: leaked_storage: Variable "so" going out of scope leaks the storage it points to.
+Error: RESOURCE_LEAK (CWE-772):
+bluez-5.64/mesh/appkey.c:146: leaked_storage: Variable "key" going out of scope leaks the storage it points to.
 
 Fixing them.
 
 Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
 ---
- monitor/jlink.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ mesh/appkey.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/monitor/jlink.c b/monitor/jlink.c
-index 9aaa4ebd8..672097004 100644
---- a/monitor/jlink.c
-+++ b/monitor/jlink.c
-@@ -107,9 +107,12 @@ int jlink_init(void)
- 			!jlink.tif_select || !jlink.setspeed ||
- 			!jlink.connect || !jlink.getsn ||
- 			!jlink.emu_getproductname ||
--			!jlink.rtterminal_control || !jlink.rtterminal_read)
-+			!jlink.rtterminal_control || !jlink.rtterminal_read) {
-+		dlclose(so);
- 		return -EIO;
+diff --git a/mesh/appkey.c b/mesh/appkey.c
+index 5088a1812..52fed8c31 100644
+--- a/mesh/appkey.c
++++ b/mesh/appkey.c
+@@ -139,11 +139,15 @@ bool appkey_key_init(struct mesh_net *net, uint16_t net_idx, uint16_t app_idx,
+ 	key->net_idx = net_idx;
+ 	key->app_idx = app_idx;
+ 
+-	if (key_value && !set_key(key, app_idx, key_value, false))
++	if (key_value && !set_key(key, app_idx, key_value, false)) {
++		appkey_key_free(key);
+ 		return false;
 +	}
  
-+	dlclose(so)
- 	return 0;
- }
+-	if (new_key_value && !set_key(key, app_idx, new_key_value, true))
++	if (new_key_value && !set_key(key, app_idx, new_key_value, true)) {
++		appkey_key_free(key);
+ 		return false;
++	}
+ 
+ 	l_queue_push_tail(app_keys, key);
  
 -- 
 2.26.2
