@@ -2,144 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E3AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 May 2022 13:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C37C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 May 2022 15:47:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238757AbiE3Nx0 (ORCPT
+        id S242267AbiE3Prz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 May 2022 09:53:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34778 "EHLO
+        Mon, 30 May 2022 11:47:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239340AbiE3Nv2 (ORCPT
+        with ESMTP id S242725AbiE3PrW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 May 2022 09:51:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74F6B21E09;
-        Mon, 30 May 2022 06:36:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Mon, 30 May 2022 11:47:22 -0400
+Received: from smtp11.infineon.com (smtp11.infineon.com [IPv6:2a00:18f0:1e00:4::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B70C5985B7;
+        Mon, 30 May 2022 08:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1653922978; x=1685458978;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=VzB5TwT9laR/+mLY14M2Ys1oLWi5u4DgIFh1SEuLlZM=;
+  b=e4eUN8oWlYtviprCi3xOM7POunpEfoTJHBulurq3IZJowq3MOxcgtezq
+   MZGp/bhGV95KeIsP4S5w1Z/OBJqgra/4O/w8DUlAHfSZ6wtV2cjipcms/
+   Aq/MUNR0du8dZhr/3RX+dJewQy7Q9Cq5ZuHN5SISJtjm1mmzBrJaMsi4d
+   k=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10363"; a="298846059"
+X-IronPort-AV: E=Sophos;i="5.91,263,1647298800"; 
+   d="scan'208";a="298846059"
+Received: from unknown (HELO mucxv003.muc.infineon.com) ([172.23.11.20])
+  by smtp11.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 May 2022 17:02:54 +0200
+Received: from MUCSE822.infineon.com (MUCSE822.infineon.com [172.23.29.53])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 12F8060F81;
-        Mon, 30 May 2022 13:36:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A53C385B8;
-        Mon, 30 May 2022 13:36:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653917796;
-        bh=rQOzDbigvvxG6jMxeqztHkPaTTETYnr8ntAiHYX1pbw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=oHD4hLwmAjRJv6R3nbyVU3Mk36b2fnDGot90q6y34Vei9hQQ8o3PqDbp9d+YyF0oo
-         nDxIbuMmSimVCbUkE21UCSImgOK0vpfaUmRXbOV74/3TEZomHPgNUjtposQdn0aYgC
-         brHAA00y6MQ6O4uklY9mi7axVn5RT47P2xLRbPE1KD8Xr75r2rgzeTicsZiPuOTTeD
-         QjJ6E3Gahw9XYfavFSrAaXbgLQf/qltxNbpqNOKT+Lm814bjKVRLeXgyoxo/agICiG
-         1trLM+h488MKHacuUdCyoyA+hmXpPcf5jx+Qq26fDz6Yym+IWrVXTMnbgVaFn9cq7E
-         PcRq9vyb0nf3g==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        by mucxv003.muc.infineon.com (Postfix) with ESMTPS;
+        Mon, 30 May 2022 17:02:54 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE822.infineon.com
+ (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 30 May
+ 2022 17:02:54 +0200
+Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
+ MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.26; Mon, 30 May 2022 17:02:53 +0200
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+CC:     Hakan Jansson <hakan.jansson@infineon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.17 100/135] Bluetooth: HCI: Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk
-Date:   Mon, 30 May 2022 09:30:58 -0400
-Message-Id: <20220530133133.1931716-100-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220530133133.1931716-1-sashal@kernel.org>
-References: <20220530133133.1931716-1-sashal@kernel.org>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v3 1/2] dt-bindings: net: broadcom-bluetooth: Add property for autobaud mode
+Date:   Mon, 30 May 2022 17:02:17 +0200
+Message-ID: <f395ffd03a6594ee11975b708721a33ccf8a4871.1653916330.git.hakan.jansson@infineon.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1653916330.git.hakan.jansson@infineon.com>
+References: <cover.1653916330.git.hakan.jansson@infineon.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE808.infineon.com (172.23.29.34) To
+ MUCSE807.infineon.com (172.23.29.33)
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Add property, "brcm,requires-autobaud-mode", to enable autobaud mode
+selection.
 
-[ Upstream commit 05abad857277dda198063017b00ba5b9fed2c0cb ]
+Some devices (e.g. CYW5557x) require autobaud mode to enable FW loading.
+Autobaud mode can also be required on some boards where the controller
+device is using a non-standard baud rate when first powered on.
 
-This adds HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN quirk which can be
-used to mark HCI_Enhanced_Setup_Synchronous_Connection as broken even
-if its support command bit are set since some controller report it as
-supported but the command don't work properly with some configurations
-(e.g. BT_VOICE_TRANSPARENT/mSBC).
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
 ---
- include/net/bluetooth/hci.h      | 9 +++++++++
- include/net/bluetooth/hci_core.h | 8 ++++++--
- net/bluetooth/hci_conn.c         | 2 +-
- net/bluetooth/sco.c              | 2 +-
- 4 files changed, 17 insertions(+), 4 deletions(-)
+V2 -> V3:
+  - Rename DT property and modify description
+    https://lore.kernel.org/linux-devicetree/e6e83743-1441-dc53-fd1f-cdfb9a24932a@linaro.org/
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 69ef31cea582..62a9bb022aed 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -265,6 +265,15 @@ enum {
- 	 * runtime suspend, because event filtering takes place there.
- 	 */
- 	HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL,
+V1 -> V2:
+  - Modify property description
+
+ .../devicetree/bindings/net/broadcom-bluetooth.yaml        | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+index 5aac094fd217..0a58d0fbcbc4 100644
+--- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+@@ -92,6 +92,13 @@ properties:
+        pcm-sync-mode: slave, master
+        pcm-clock-mode: slave, master
+ 
++  brcm,requires-autobaud-mode:
++    type: boolean
++    description:
++      Set this property if autobaud mode is required. Autobaud mode is required
++      if the device's initial baud rate in normal mode is not supported by the
++      host or if the device requires autobaud mode startup before loading FW.
 +
-+	/*
-+	 * When this quirk is set, disables the use of
-+	 * HCI_OP_ENHANCED_SETUP_SYNC_CONN command to setup SCO connections.
-+	 *
-+	 * This quirk can be set before hci_register_dev is called or
-+	 * during the hdev->setup vendor callback.
-+	 */
-+	HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
- };
- 
- /* HCI device flags */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 131514913430..49a88b2f4678 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1483,8 +1483,12 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
- 				   (hdev->commands[39] & 0x04))
- 
--/* Use enhanced synchronous connection if command is supported */
--#define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
-+/* Use enhanced synchronous connection if command is supported and its quirk
-+ * has not been set.
-+ */
-+#define enhanced_sync_conn_capable(dev) \
-+	(((dev)->commands[29] & 0x08) && \
-+	 !test_bit(HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN, &(dev)->quirks))
- 
- /* Use ext scanning if set ext scan param and ext scan enable is supported */
- #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 84312c836549..cd51bf2a709b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -481,7 +481,7 @@ static bool hci_setup_sync_conn(struct hci_conn *conn, __u16 handle)
- 
- bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
- {
--	if (enhanced_sco_capable(conn->hdev))
-+	if (enhanced_sync_conn_capable(conn->hdev))
- 		return hci_enhanced_setup_sync_conn(conn, handle);
- 
- 	return hci_setup_sync_conn(conn, handle);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8eabf41b2993..2a58c7d88433 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -885,7 +885,7 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 			err = -EBADFD;
- 			break;
- 		}
--		if (enhanced_sco_capable(hdev) &&
-+		if (enhanced_sync_conn_capable(hdev) &&
- 		    voice.setting == BT_VOICE_TRANSPARENT)
- 			sco_pi(sk)->codec.id = BT_CODEC_TRANSPARENT;
- 		hci_dev_put(hdev);
+   interrupts:
+     items:
+       - description: Handle to the line HOST_WAKE used to wake
 -- 
-2.35.1
+2.25.1
 
