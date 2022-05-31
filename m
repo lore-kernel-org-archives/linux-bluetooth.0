@@ -2,194 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE74C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 May 2022 21:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B305FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 May 2022 03:40:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243200AbiE3VDQ (ORCPT
+        id S237697AbiEaDk5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 May 2022 17:03:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49214 "EHLO
+        Mon, 30 May 2022 23:40:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231630AbiE3VDK (ORCPT
+        with ESMTP id S232208AbiEaDk5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 May 2022 17:03:10 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 359DB5F47
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 May 2022 14:03:08 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 129so6750472pgc.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 30 May 2022 14:03:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+qmsvgomiZ/viHPe+NJZB01OGjh/MHHkDfU9RKsPecA=;
-        b=mwj4rqspx7/M+mPDrID2VhTBOAUHLHJNRWO1ghabYs1hcDCrvp43tl607bILMJLNUd
-         4Kg75l40AbR5/5WsmgW5jnNbkjqwrsy1dLBet8EaqthlHViFx+sAXXIXdq4jNAQplukT
-         VgLiqMNlMFYzHkyPufpjJrp+huSfRHtbbvNRKTAvu5FXOSzX7CvXggBs5HVsSva04bw5
-         OynHWUdkydNDDDV3ArMNRoipeHgPcnKTJzUvdPc3RrVH7iWdGIZ5ycAGBSmew04xL0da
-         YR5Ke2tTpthf37z1gQLCHHGG9KbhHJutqhD4YYwHVgI25VDCo2pwojufGwryurjq4aBm
-         LYBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+qmsvgomiZ/viHPe+NJZB01OGjh/MHHkDfU9RKsPecA=;
-        b=xDPDDSaqy/O4oxPUqJCLrMiH8OyMDlx8GTItDxjUpXn26vfAoF0e54q1Dw20kLP6jk
-         zK9FsR9i1pDZtkskMP+QokQhXw7ww67fFYlvKfk/YdCpcXIeLQlouPV/GhkR5o/e/Pcn
-         3tWgBgGqT6oqfrqwZqokqlXvgPO3W3K0V5WrcAixppLoosopjVnLG7NjqOUVYoFltabF
-         ie1axNqIC76Cn66TgKpTbqUk7Jam3DgukwRYr3Pir51Sc4zXBTpKJNuD1u1N4jmMhdKN
-         cDs1ZrzSfFvriujH0Ag198WXGbLoR3bavQLj58Q89pfEe8q20bBqlwMSlZo8bOWXntlQ
-         y58w==
-X-Gm-Message-State: AOAM531Yd+PwbcrZJwTnh3oIvPkyP0d8nkhgiyOyNmT98nB6/VTS/yoI
-        ViLv6tL0OTnJ0eQuprCF/3fzsq+CGBhRYD8C5hvd60SLiC4=
-X-Google-Smtp-Source: ABdhPJz97pJSGXCkZsBW4xS961TVosxmXMWOtRnaP19COh8Z2LUwmB7JDf/JeSYQiUr5nnVqHu53ga279QQ6djMvh0k=
-X-Received: by 2002:a65:6d08:0:b0:3c6:8a08:3b9f with SMTP id
- bf8-20020a656d08000000b003c68a083b9fmr50080397pgb.147.1653944588374; Mon, 30
- May 2022 14:03:08 -0700 (PDT)
+        Mon, 30 May 2022 23:40:57 -0400
+X-Greylist: delayed 501 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 30 May 2022 20:40:55 PDT
+Received: from cstnet.cn (smtp23.cstnet.cn [159.226.251.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 299B18E195
+        for <linux-bluetooth@vger.kernel.org>; Mon, 30 May 2022 20:40:54 -0700 (PDT)
+Received: from localhost.localdomain (unknown [124.16.138.126])
+        by APP-03 (Coremail) with SMTP id rQCowACniHVOjJVior1vCw--.27597S2;
+        Tue, 31 May 2022 11:32:30 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH] iBluetooth: hci_intel: Add check for platform_driver_register
+Date:   Tue, 31 May 2022 11:32:28 +0800
+Message-Id: <20220531033228.1939386-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20220526112456.2488536-1-josephsih@chromium.org>
- <20220526112456.2488536-3-josephsih@chromium.org> <CABBYNZ+jxkXvsmKxka0McLDgZOXp=aJ9Q3pT0P-2_0k79+2Q5g@mail.gmail.com>
- <CAHFy41_D_JRxe34hUheg0pGVRk9ns0GWUvZPkCQe1G7iZHAitQ@mail.gmail.com>
-In-Reply-To: <CAHFy41_D_JRxe34hUheg0pGVRk9ns0GWUvZPkCQe1G7iZHAitQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 30 May 2022 14:02:56 -0700
-Message-ID: <CABBYNZLh_J2_y_RcAaMshgiQVYKWGmxyGSZ23p1gs9+D5sUp=A@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v6 3/8] adapter: remove quality report from
- experimental features
-To:     Joseph Hwang <josephsih@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: rQCowACniHVOjJVior1vCw--.27597S2
+X-Coremail-Antispam: 1UD129KBjvdXoWrtw18uF43GFy5urWDAw4Utwb_yoWfArg_Cr
+        1rua43JrWrGrsxCF1jyw43u340vFsYgrZ3Jr12qFyag3sxGrnxGw1UZrZrJa48Wryjq34D
+        Ar1DWr1xAry3GjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbcxFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AKxVW8Jr
+        0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+        6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
+        0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkIecxEwVAFwVW8
+        GwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r
+        1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIxkGc2Ij
+        64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+        0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r4j6FyUMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+        0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7VUj75r7UUUUU==
+X-Originating-IP: [124.16.138.126]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+As platform_driver_register() could fail, it should be better
+to deal with the return value in order to maintain the code
+consisitency.
 
-On Thu, May 26, 2022 at 8:13 PM Joseph Hwang <josephsih@google.com> wrote:
->
-> Thanks Luiz for the comment! Does it mean that bluez should 1) try to
-> use MGMT_OP_SET_QUALITY_REPORT; and if it failed, use the experimental
-> feature EXP_FEAT_BQR instead?
+Fixes: 1ab1f239bf17 ("Bluetooth: hci_intel: Add support for platform driver")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+---
+ drivers/bluetooth/hci_intel.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Yep, in fact you should probably keep the existing code as it since it
-only set BQR if the kernel supports it anyway, that said how you are
-planning to support MGMT_OP_SET_QUALITY_REPORT since that is not
-enabled via UUID even if we can detect its support by the kernel Ive
-assumed it wouldn't be enabled all the time or that safe to be always
-enabled?
-
-> Regards,
-> Joseph
->
->
-> On Fri, May 27, 2022 at 4:31 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Joseph,
-> >
-> > On Thu, May 26, 2022 at 4:25 AM Joseph Hwang <josephsih@chromium.org> wrote:
-> > >
-> > > The quality report feature is now enabled through
-> > > MGMT_OP_SET_QUALITY_REPORT instead of through the experimental
-> > > features.
-> > >
-> > > ---
-> > >
-> > > Changes in v6:
-> > > - Fixed a patch conflict.
-> > >
-> > > Changes in v5:
-> > > - Move is_quality_report_supported() implementation to next patch.
-> > >   The function does not belong to this patch.
-> > >
-> > > Changes in v4:
-> > > - Move forward this patch in the patch series so that this
-> > >   command patch is prior to the quality report event patches.
-> > >
-> > > Changes in v3:
-> > > - This is a new patch that enables the quality report feature via
-> > >   MGMT_OP_SET_QUALITY_REPORT.
-> > >
-> > >  src/adapter.c | 14 --------------
-> > >  src/adapter.h |  1 -
-> > >  2 files changed, 15 deletions(-)
-> > >
-> > > diff --git a/src/adapter.c b/src/adapter.c
-> > > index f7faaa263..2ceea6e1c 100644
-> > > --- a/src/adapter.c
-> > > +++ b/src/adapter.c
-> > > @@ -120,13 +120,6 @@ static const struct mgmt_exp_uuid le_simult_central_peripheral_uuid = {
-> > >         .str = "671b10b5-42c0-4696-9227-eb28d1b049d6"
-> > >  };
-> > >
-> > > -/* 330859bc-7506-492d-9370-9a6f0614037f */
-> > > -static const struct mgmt_exp_uuid quality_report_uuid = {
-> > > -       .val = { 0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
-> > > -               0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33 },
-> > > -       .str = "330859bc-7506-492d-9370-9a6f0614037f"
-> > > -};
-> > > -
-> > >  /* 15c0a148-c273-11ea-b3de-0242ac130004 */
-> > >  static const struct mgmt_exp_uuid rpa_resolution_uuid = {
-> > >         .val = { 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
-> > > @@ -9621,12 +9614,6 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
-> > >                                 (void *)le_simult_central_peripheral_uuid.val);
-> > >  }
-> > >
-> > > -static void quality_report_func(struct btd_adapter *adapter, uint8_t action)
-> > > -{
-> > > -       if (action)
-> > > -               queue_push_tail(adapter->exps, (void *)quality_report_uuid.val);
-> > > -}
-> > > -
-> > >  static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
-> > >                                         const void *param, void *user_data)
-> > >  {
-> > > @@ -9703,7 +9690,6 @@ static const struct exp_feat {
-> > >         EXP_FEAT(EXP_FEAT_DEBUG, &debug_uuid, exp_debug_func),
-> > >         EXP_FEAT(EXP_FEAT_LE_SIMULT_ROLES, &le_simult_central_peripheral_uuid,
-> > >                  le_simult_central_peripheral_func),
-> > > -       EXP_FEAT(EXP_FEAT_BQR, &quality_report_uuid, quality_report_func),
-> > >         EXP_FEAT(EXP_FEAT_RPA_RESOLUTION, &rpa_resolution_uuid,
-> > >                 rpa_resolution_func),
-> > >         EXP_FEAT(EXP_FEAT_CODEC_OFFLOAD, &codec_offload_uuid,
-> > > diff --git a/src/adapter.h b/src/adapter.h
-> > > index 688ed51c6..3d53a962d 100644
-> > > --- a/src/adapter.h
-> > > +++ b/src/adapter.h
-> > > @@ -257,7 +257,6 @@ bool btd_le_connect_before_pairing(void);
-> > >  enum experimental_features {
-> > >         EXP_FEAT_DEBUG                  = 1 << 0,
-> > >         EXP_FEAT_LE_SIMULT_ROLES        = 1 << 1,
-> > > -       EXP_FEAT_BQR                    = 1 << 2,
-> > >         EXP_FEAT_RPA_RESOLUTION         = 1 << 3,
-> > >         EXP_FEAT_CODEC_OFFLOAD          = 1 << 4,
-> > >  };
-> >
-> > We can't remove existing experimental features since there could be
-> > kernels which don't support MGMT_OP_SET_QUALITY_REPORT, so this will
-> > need to stay for as long as we support such kernels versions.
-> >
-> > > --
-> > > 2.36.1.124.g0e6072fb45-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
->
-> --
->
-> Joseph Shyh-In Hwang
-> Email: josephsih@google.com
-
-
-
+diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
+index 7249b91d9b91..d4801b26cc8e 100644
+--- a/drivers/bluetooth/hci_intel.c
++++ b/drivers/bluetooth/hci_intel.c
+@@ -1217,7 +1217,11 @@ static struct platform_driver intel_driver = {
+ 
+ int __init intel_init(void)
+ {
+-	platform_driver_register(&intel_driver);
++	int ret;
++
++	ret = platform_driver_register(&intel_driver);
++	if (ret)
++		return ret;
+ 
+ 	return hci_uart_register_proto(&intel_proto);
+ }
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
