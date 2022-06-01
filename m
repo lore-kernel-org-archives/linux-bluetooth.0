@@ -2,114 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD7ECCA470
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 13:51:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3294CCA477
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 15:12:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353357AbiFANvb (ORCPT
+        id S1354293AbiFAPMj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Jun 2022 09:51:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48248 "EHLO
+        Wed, 1 Jun 2022 11:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352972AbiFANv3 (ORCPT
+        with ESMTP id S1351739AbiFAPMh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Jun 2022 09:51:29 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D3A6EC75
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jun 2022 06:51:28 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id v4-20020a1cac04000000b00397001398c0so3064370wme.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jun 2022 06:51:28 -0700 (PDT)
+        Wed, 1 Jun 2022 11:12:37 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D56D488AB
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jun 2022 08:12:36 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id i5-20020ac85c05000000b00304bbcc1b72so1487702qti.17
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jun 2022 08:12:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=vrp+XKlrC28VPKzB31gc6GZw4V9Xd+q7p21Hsrobnd4=;
-        b=FpFvX4hFfUH6VWvkQhTYbU3f+XhlhYR/2tnLxnA8032oH+YHZQHsQaxTqDV71rZPmh
-         nMYVbgoQVI2dKS5A5zkqszLi6M+/tvBTKZkZpIdyuqbJzNBe8SglccWtsFvmGhZBluXx
-         7bdEtJreXPPhVcDi6U+HdF3/TfwJJxqwyDWrBXUuwB6YahptuRrMe0GfYlw1MEdzrsK6
-         B50k+ke1HaJJyLPD3DigT7OtPaMrkU20wu7kBmvk2Uk36jDInXr78Tb6nCGUAPema74n
-         5poFlCdWrMQ3fvXDB8NDTC5ANX+5PoGBDVdJHxpwW1OUvqTN6dlmHZ6pM8bXu3AnIFKA
-         0W+w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=kgeENkTKQF5CH/ji/s7eILYDZxj2xanbyJLZhsasnkA=;
+        b=FJxMPGLt2Bpvw2/0+tJdREvb+DvBVoSgL11uuMKQGGTKHhbzS1I+Kb5IoBEB8FEwZl
+         5PL30L7Ye9wlkvHJ1x3wx36AWb/z3moL84nUSqZlHzJrad66C9/VQ9u7QQzKEvTSXlW7
+         rvy4jBfDlCdSiT+XDVTD+i2XLVhe3o0D/1rXCHKitF61d49rYkx8M4L4h2HqRjpXDL3m
+         uY3Cm8nhLzAqLc+TY/4QGvQR9at5NiE8yWTOylrD8Iz9Y/wIZrRIccGo4Da7Y1jFL1N9
+         JODWH9iZODIrQCpWLK80EzwKYOygFwR434EKMuiqMbBMbutxv5twhC1Q2gU+37CZx135
+         StQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vrp+XKlrC28VPKzB31gc6GZw4V9Xd+q7p21Hsrobnd4=;
-        b=wxRNa+bbjdZ49RN+I3b8TDBburHulO96fB1FBwq9ixSIxrilIRj77QliWqbZxR6RMD
-         28bqcVP/vN3RVcaBEhLb9ocPNC8aADylfHCKY/Gzn6Kbnf32Fs2XjxY570sc9V/nPnYR
-         Lg41oTt9S2srR1hHZx7nseG+QMNvN/R43mtuGjAjUo6xyOhBgxypOpfVsH+kOWqVeNLZ
-         T4WStGvrbcPLsGlfKK5PJrc02T8hwftK8QDZUWBmJaB6R81RcbAZDqXNprJ3SklRPDun
-         JEGI6grWrktzWm/t13SIAmnibVG4HZxDSHRWDuuFMQ4IOofCgRc8ca95F8YIQpYDagWz
-         YqzA==
-X-Gm-Message-State: AOAM530FTqY3BLs3ja7X0bg2tRvQ+26SJ2G2XS5NSODM6WW3bpqB3BW7
-        bTZyLAbTer03I3WP+cASWJHncw==
-X-Google-Smtp-Source: ABdhPJzVyw5pIrFFSo6BlJP0awDsWCHEctDO99hX8Sjr5Plkug/ABPLsyvMQsahyZa100CqafVezzA==
-X-Received: by 2002:a7b:c5cb:0:b0:397:47ae:188f with SMTP id n11-20020a7bc5cb000000b0039747ae188fmr28614746wmk.137.1654091486522;
-        Wed, 01 Jun 2022 06:51:26 -0700 (PDT)
-Received: from nogikh.google.com (216.131.76.34.bc.googleusercontent.com. [34.76.131.216])
-        by smtp.gmail.com with ESMTPSA id h12-20020a05600c2cac00b0039749256d74sm5754412wmc.2.2022.06.01.06.51.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 06:51:25 -0700 (PDT)
-Date:   Wed, 1 Jun 2022 13:51:20 +0000
-From:   Aleksandr Nogikh <nogikh@google.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     syzbot <syzbot+48135e34de22e3a82c99@syzkaller.appspotmail.com>,
-        applications@thinkbigglobal.in, David Miller <davem@davemloft.net>,
-        gustavo@padovan.org, Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=kgeENkTKQF5CH/ji/s7eILYDZxj2xanbyJLZhsasnkA=;
+        b=44Hs2zxrbUT1oHDMIuKoqTdsas4FkQRE++VqNsZObjtXPIHVLw096C2gbfUoZc1N6H
+         wKbHnEEepoeeOgeY/JGmArNxW6N/aOeFOuXIY2p37mpPvTKiWPd7f3irsfDv41tLwKe+
+         J5G3g7AWDdXmXKNx6ywCY2hOVEGWJWnHAACEBYtZw8O/m78V6R/CAeRLssMcgCnawzRT
+         jzbju/kgH/xGzq1jMFzAQ5omMzgHaMgf0lNsqMlaNKz4wHn+OYEbqTmogkqt2eb3vOE2
+         UzWa9dtuDcSiGq03fjJ6EcmbRyTR8DO4RXY5DaiuOd4mJfSUDnCxyQwG8F25fjLOnmvK
+         /2gQ==
+X-Gm-Message-State: AOAM5322QbYS1dDmx+LDQX/Yfx9Ds0py1wJExrKrPM8QoRlVdR6GIvV/
+        gQm+6S4s5lJIfIMadkhqOrjlXXkh0XmL4QVATi6afiWGzL6HuJ52MlA8MzcmvDMCYfSIsXe/moA
+        4/YbBWb84PxRgiss1g29w4ITEbaWxqm6c+N6xFsIfw0wjHEK/JUrhT8bUuB3Va/siY0b0tjYB2/
+        lbW42Lo7XTZYhpvQ==
+X-Google-Smtp-Source: ABdhPJzoNig3fFGatBX6poNGyFUAGYYb28s9k+CvU/LWYXulZuecUpb6DYnP8BHOpM1XCl11+luMa+37t/YNT9crnFU=
+X-Received: from alainmic.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2890])
+ (user=alainmichaud job=sendgmr) by 2002:ad4:5b8e:0:b0:464:50c4:c568 with SMTP
+ id 14-20020ad45b8e000000b0046450c4c568mr13309768qvp.115.1654096355448; Wed,
+ 01 Jun 2022 08:12:35 -0700 (PDT)
+Date:   Wed,  1 Jun 2022 15:11:27 +0000
+Message-Id: <20220601151115.1.Ia503b15be0f366563b4e7c9f93cbec5e756bb0ae@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
+Subject: [PATCH] Bluetooth: clear the temporary linkkey in hci_conn_cleanup
+From:   Alain Michaud <alainmichaud@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Alain Michaud <alainm@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.com>,
-        Netdev <netdev@vger.kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Will Deacon <will@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Aleksandr Nogikh <nogikh@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in corrupted (4)
-Message-ID: <Ypdu2H6fUOCZck1j@nogikh.google.com>
-References: <000000000000c1925305ac997812@google.com>
- <000000000000b6b4eb05dfa1b325@google.com>
- <CAHk-=whH5pmgyzE6+6C==p2VQFUgGiPhSwX=R2zKs+iHZuX7_A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=whH5pmgyzE6+6C==p2VQFUgGiPhSwX=R2zKs+iHZuX7_A@mail.gmail.com>
-User-Agent: Mutt/2.1.4 (2021-12-11)
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Linus,
+From: Alain Michaud <alainm@chromium.org>
 
-Thank you for looking at the syzbot's email!
+If a hardware error occurs and the connections are flushed without a
+disconnection_complete event being signaled, the temporary linkkeys are
+not flushed.
 
-The bisection info was indeed included in this case by mistake. We have fixed this, now the bot should not mention bisections that point to release commits and thefefore won't be pinging you as the commit author.
+This change ensures that any outstanding flushable linkkeys are flushed
+when the connection are flushed from the hash table.
 
+Signed-off-by: Alain Michaud <alainm@chromium.org>
 
-Best Regards,
-Aleksandr
+---
 
-On Sun, May 22, 2022 at 08:56PM -0700, Linus Torvalds wrote:
-> On Sun, May 22, 2022 at 4:01 PM syzbot
-> <syzbot+48135e34de22e3a82c99@syzkaller.appspotmail.com> wrote:
-> >
-> > The issue was bisected to:
-> >
-> > commit c470abd4fde40ea6a0846a2beab642a578c0b8cd
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Sun Feb 19 22:34:00 2017 +0000
-> >
-> >     Linux 4.10
-> 
-> Heh. That looks very unlikely, so the bisection seems to sadly have
-> failed at some point.
-> 
-> At least one of the KASAN reports (that "final oops") does look very
-> much like the bug fixed by commit 1bff51ea59a9 ("Bluetooth: fix
-> use-after-free error in lock_sock_nested()"), so this may already be
-> fixed, but who knows...
-> 
-> But that "update Makefile to 4.10" is not the cause...
-> 
->                Linus
+ net/bluetooth/hci_conn.c  | 3 +++
+ net/bluetooth/hci_event.c | 4 +++-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 352d7d612128..85dc1af90fcb 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -118,6 +118,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
+ 	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
+ 		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
+ 
++	if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
++		hci_remove_link_key(hdev, &conn->dst);
++
+ 	hci_chan_list_flush(conn);
+ 
+ 	hci_conn_hash_del(hdev, conn);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6b83f9b0082c..09f4ff71e747 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3372,8 +3372,10 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
+ 				reason, mgmt_connected);
+ 
+ 	if (conn->type == ACL_LINK) {
+-		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
++		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags)) {
+ 			hci_remove_link_key(hdev, &conn->dst);
++			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++		}
+ 
+ 		hci_req_update_scan(hdev);
+ 	}
+-- 
+2.36.1.255.ge46751e96f-goog
+
