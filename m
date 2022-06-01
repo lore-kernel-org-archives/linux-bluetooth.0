@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 537ACC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 21:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3245AC43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 21:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231313AbiFAVMe (ORCPT
+        id S231442AbiFAVW6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Jun 2022 17:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36170 "EHLO
+        Wed, 1 Jun 2022 17:22:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbiFAVMc (ORCPT
+        with ESMTP id S231435AbiFAVW5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Jun 2022 17:12:32 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE8BE5BD23
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jun 2022 14:12:31 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id u18so2879719plb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jun 2022 14:12:31 -0700 (PDT)
+        Wed, 1 Jun 2022 17:22:57 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C80AD2ADB
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jun 2022 14:22:56 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id u12-20020a17090a1d4c00b001df78c7c209so7504104pju.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jun 2022 14:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=RIxGrmNBg/91TDmPlkpGK2bw1iCjCrFVedNSq1scBaI=;
-        b=LFXdACnqMruRzM00aJcydRM7c63GV9bT16zujKOZmXNWTtolLTkIayq9UebFPVOUTV
-         t2jU0GBoZ66k9OfwcsK9RPHjXiTeT+XlFVjArjSX6pDnRudLVJnZISOoEukRHLkK775h
-         6jP2rE+bgix2lWrP5/44plgSCgr0wURmJ41BLxas60jTEaC2zlnqhyx2vnUFQKHmdrqf
-         GAVDDPYS8CeJcIsa6P7BRu2U30f/Q6e7C3OZkqCbsO8BY70RRnrJRNMcBqh9IX0xuR0J
-         7lnI92MY0TGyzlY2Zv8wZ08PNy/BMDsRRrEvhs1n2DmKHsPzpPOT89/WMCXeFwqx50A0
-         +nug==
+        bh=gES99xrNSJ18ruTbh4NezxpzBfZc63RCDVbHgxPY/eI=;
+        b=T5wjSEs+W1vAL6tHEBlcppWH9ubzGzdr+4ohGjMDWiphArP8ciNiNI6rQYNggS8hCU
+         VyJ7wFelHaC9keqJDxRMCaJRyJMhVw1kMWtD7Ajsk8xtMniJuT0IAicuMnxsauHQBpX1
+         zMh9fS/2tgFLL1dUb/4kjlKXNS9UxDZW6JO1vqNha94OtUKOOJ2fK8JvN/e8OjRVKq3w
+         sRqX+XWjHztJOFvD8WPZCHp3Idq30trFB4KbEpscZ1lNzf+N1gHO3LcvJf4fAlvsjcaW
+         BdSeUObaI23tQjUQhAAeMQ6kjfv5g/l3UbbC2bxnIfS5pYurlf3hzia+mNy3z+tewvRs
+         dy3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=RIxGrmNBg/91TDmPlkpGK2bw1iCjCrFVedNSq1scBaI=;
-        b=NPMBhcdiDBnUQ2RTLF2NL58Cjj1BVOWYUx5yvSiBQxCFkUyd1JHtMSy4JjjMA5N8SO
-         r7lMWi3bLkINZAQL8wn7AAY9NvNoSJbkMc731cPACocHQmDarlyh5L49FSGPFzQRLc31
-         /aD7h05ROZDSC+Je9ZmtfA3Sa9FzrIQ+Drp9TnuSGv8gyC/2BooaMb86nkDk+2Z9PnNb
-         o6i/7xBLFhFAmVucF8322347lvNWJ/pL6H6V+RreH/K4xUSncH35rEoiS4vlx7ibcj/p
-         oFeFDBD1RTekvhTyesfAwEBsM+W7rEVyEj/6mZEVarhCJv7fRsqO/zViK7n8z572yvKu
-         K5YA==
-X-Gm-Message-State: AOAM5314HYmDdrEIc0yIZWQvUsgwm+zynLKYuhb/DNG/yhakpb0Coa7V
-        het4rZRQ0na3zctksWobVeGUMgnsCVI=
-X-Google-Smtp-Source: ABdhPJzBMEOBCvK1Ys05MgsfgCJE6o2JVGNiy08AQVKuY0Io4qnEEllciw/ix1hFj50n1sNqLoHLdw==
-X-Received: by 2002:a17:903:1252:b0:154:ca85:59a0 with SMTP id u18-20020a170903125200b00154ca8559a0mr1308138plh.169.1654117951199;
-        Wed, 01 Jun 2022 14:12:31 -0700 (PDT)
+        bh=gES99xrNSJ18ruTbh4NezxpzBfZc63RCDVbHgxPY/eI=;
+        b=GbcFoWSkEP3Kn2Wj6znAo4PNJmzNGfMzx0xOyIspcccZNvtZM4/0tr3HoDIy0Ku9LJ
+         V0BcfbIS0EpokiRG9Vn2eq12k58UHmJW5/PfyYjK9esqjUArP/x37HtqJJ0954XCJ1Jp
+         Yg3FrEWPwq1MC0XkR+Blx1hMZI3vEcr1c1Sii/ai9tf49c/tKn8iDr3P8N55HwGuk25x
+         gdTdeF595bAw9Ptk1qGzGflEmvK3iaYKfwYxCpSHzivstZAENQ0oY44qHZ6A3xYCmjlC
+         MVTJ27wydvDOmnDvhrRAW4NyCXZeIkhbGjDxxAN0oZxsX0anWKzBlW2F85oKVMHW3Na0
+         KTRw==
+X-Gm-Message-State: AOAM530Zc+qKrZyvF/BX0m/kvxuEKOmqzY4CxN4staKbmB3fEOXLrgRn
+        EnupIfA783p1LK2QCRwTCHe3JY0IWdg=
+X-Google-Smtp-Source: ABdhPJy5jJ8fKG1SaFmovc7rcwRFf+O3K/p1cGXH5b7LKJ1A9HF/jNf8T00f1ndmndmXiBjSftaryg==
+X-Received: by 2002:a17:90a:9b08:b0:1e2:837f:bcce with SMTP id f8-20020a17090a9b0800b001e2837fbccemr1433617pjp.144.1654118575996;
+        Wed, 01 Jun 2022 14:22:55 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id iq18-20020a17090afb5200b001e31f4cc977sm1740065pjb.56.2022.06.01.14.12.30
+        by smtp.gmail.com with ESMTPSA id o10-20020a170902d4ca00b00161fab018dfsm1951048plg.256.2022.06.01.14.22.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 14:12:30 -0700 (PDT)
+        Wed, 01 Jun 2022 14:22:55 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] test-runner: Fix not waiting for system_bus_socket
-Date:   Wed,  1 Jun 2022 14:12:30 -0700
-Message-Id: <20220601211230.1355268-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] test-runner: Enable BT_HCIUART and BT_HCIUART_H4
+Date:   Wed,  1 Jun 2022 14:22:55 -0700
+Message-Id: <20220601212255.1356507-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,33 +64,39 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes test-runner wait for system_bus_socket to be available before
-continuing otherwise the likes of bluetoothd would likely fail to start.
+These options are required when running with -u option since that uses
+H4 headers to serialize the communication of host and guest.
 ---
- tools/test-runner.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ doc/test-runner.txt | 2 ++
+ doc/tester.config   | 2 ++
+ 2 files changed, 4 insertions(+)
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 1f1a8c36f..945a16a77 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -452,13 +452,13 @@ static pid_t start_dbus_daemon(void)
+diff --git a/doc/test-runner.txt b/doc/test-runner.txt
+index fe0a0d479..683c622a2 100644
+--- a/doc/test-runner.txt
++++ b/doc/test-runner.txt
+@@ -41,6 +41,8 @@ For Bluetooth functionality:
+ 	CONFIG_BT_HIDP=y
+ 	CONFIG_BT_LE=y
  
- 		if (!stat("/run/dbus/system_bus_socket", &st)) {
- 			printf("Found D-Bus daemon socket\n");
--			break;
-+			return pid;
- 		}
++	CONFIG_BT_HCIUART=y
++	CONFIG_BT_HCIUART_H4=y
+ 	CONFIG_BT_HCIVHCI=y
  
--		usleep(25 * 1000);
-+		sleep(1);
- 	}
+ 	CONFIG_CRYPTO_CMAC=y
+diff --git a/doc/tester.config b/doc/tester.config
+index 011475661..4429a7222 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -34,6 +34,8 @@ CONFIG_BT_MSFTEXT=y
+ CONFIG_BT_AOSPEXT=y
+ CONFIG_BT_FEATURE_DEBUG=y
  
--	return pid;
-+	return -1;
- }
++CONFIG_BT_HCIUART=y
++CONFIG_BT_HCIUART_H4=y
+ CONFIG_BT_HCIVHCI=y
  
- static const char *daemon_table[] = {
+ CONFIG_CRYPTO_CMAC=y
 -- 
 2.35.1
 
