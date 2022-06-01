@@ -2,135 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D187C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 21:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA0BC43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 21:48:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231823AbiFAVpW (ORCPT
+        id S231851AbiFAVsh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Jun 2022 17:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57852 "EHLO
+        Wed, 1 Jun 2022 17:48:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231779AbiFAVpV (ORCPT
+        with ESMTP id S231825AbiFAVsg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Jun 2022 17:45:21 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E067A455;
-        Wed,  1 Jun 2022 14:45:20 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id s14so2914058plk.8;
-        Wed, 01 Jun 2022 14:45:20 -0700 (PDT)
+        Wed, 1 Jun 2022 17:48:36 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651B8138B78;
+        Wed,  1 Jun 2022 14:48:31 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id p8so3107276pfh.8;
+        Wed, 01 Jun 2022 14:48:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=fZXF7GPcAcaOPScOAplIm+VORKBsYKZ17YpBBud/XGc=;
-        b=cglP+0SLTIabqtnre/RPxQwVASYfan1tRkC3a/xHKvzzcQ4zJkgkk/DO+wTxzyHp2w
-         sS8j3NL7AinwOMUiJylKl1FX+vx1p6YiNM8/2Z1XMI2ceczdnhrQX07a+yMJ11N3mCb4
-         byUjIzK6oRruE52OOjVpRmgqQtM8d45cBEj6hBXRJuHMKyGi+c6dHd8F4lXmBOumWkMc
-         vaGXS1rowJTmumxKI0Ev9ngKWPSDrHqkAr5TrM8INGMzFYhd511sUTyzpXnDhLQkA9fS
-         uJ7U1cewiMaSc2YTtgG6VKDAxX8oRa2M1iOIKMIEeFB4QZeBqFaDYWqrXoSV12cFhiTe
-         GX8A==
+        bh=i+j/j6ZZcvT2tG9PIt5jSStCPIw8EMJF296f9+fp4xk=;
+        b=QiV+SoVT+7RDqwtcK3p/Ag7A49ajVYHRyjInvVrE+ZGzSX5BZPtW+vtc2lE8Y84IwG
+         CD62exlqS5vhxgKqvBeRAmypZa13Yjm2WTOBVQxrNqXC2RdRAiykTt7E+USkpWhtbh2R
+         CMlshdH8HdKkj20FsQdEoGpsUMLfNSP8/8Jkm6JkrOHEOtk0fppikAWPY0dwSRZhg7Jl
+         iDEGC0WTZGnss2Kbc77E0EHEiF+N3NDcYBniKRmzUXqxbpwUa7NV9XN8955Gn0caNDrm
+         awSgSh/wExkrOIiqUg05Trdm3xFAghnwERrgxb+YaIMqQSfxoNrRGDWScX9wyruikOZl
+         LeTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=fZXF7GPcAcaOPScOAplIm+VORKBsYKZ17YpBBud/XGc=;
-        b=KSMMtDWu89gBdPOO/OHHM44Q7XFj7HRXig/k9P4eYME80U8AWz3ihaKUYd0ktoZIyS
-         V3zQT8tzb2D/zL2Yp69qz+R0RdIvjnbukXj528yCexVeB/rlAHE+jcejJsk0k/dt4EUV
-         Ogb9lLPVZycsKpptwhPwFcraBFQXBDDnVElkE7iU6Z7a5FX6DrtMrq64QWjIbzyFu8sD
-         3kXzOr22sUhHvjob4gzozk9x29/8EdLpQ1TPhI58Wdk2V883gaeUui+WImebLhm0jPwf
-         yb3ITIgGT468RW82vWXr7ZwgZQM1WBV0xo1Okvp4Y91OeBu9VUpm2M2pcc+hOBFW4JCL
-         xBlg==
-X-Gm-Message-State: AOAM532lyrc+LzyRbAex6/tulxnXAeJIMUa8N0lmjVksrHmnPLqjBqeP
-        kJwcREWRWkFgcOxtmu0gs7WZzJnmmY8h9eBJmhw=
-X-Google-Smtp-Source: ABdhPJySKb591WiK5yBnvRM3WULITW2hegH76WE1JdVYYBbOG6RaJ5hNdMH8s4JKilAocELskGoumioo5HP+Dx/UkHk=
-X-Received: by 2002:a17:903:244f:b0:162:4daf:f8bb with SMTP id
- l15-20020a170903244f00b001624daff8bbmr1525626pls.20.1654119919850; Wed, 01
- Jun 2022 14:45:19 -0700 (PDT)
+        bh=i+j/j6ZZcvT2tG9PIt5jSStCPIw8EMJF296f9+fp4xk=;
+        b=hZhiouWvCgWrwjQsYBltzMMVM2LI8iIy4SVHykg6SkTHwDUYRAUKoFiaO+QP72RB3m
+         ukSwv+KbwWAYwwULYh/ZuaeGFlZaahyY0W6I0T2lj22+MUtGVTdwCoFzRaLTl1IHwElz
+         9pUQsT3R313eOH+2Z/E6Wc98eow1OH7s6VSr4LIwhDaZ65pwfd/dEIR+UhzAkxmVGNT4
+         bngWX76RExn3v3QuDJAKIszL7wKPaGHKm738jVtKeAIAx9bpT1hk/z8yxB1vofvkMSPt
+         mgh/B3qZaw6Oxynt7O3jm97/usSV4k46EYhnY1k6es3gN95S85citRqfWpILChzHgIv1
+         NXMQ==
+X-Gm-Message-State: AOAM530AUNvbkPI8hn4Ei/Jpn8Tu4uIRH5YuIE744yKj0xwPqSxmvHfA
+        xXoFMHjw7GsvIO8XVxx2+hTRzpHiKJtZJBlRPKk=
+X-Google-Smtp-Source: ABdhPJyQhJj8zhj19F7GxI8Oj/0ApFN96qTqcsXb4yAGSygWr068t64O0Y3kTBb/KnsKV8r+jYKLEioMnrI5LBAFgM8=
+X-Received: by 2002:a62:3001:0:b0:51b:b142:88ad with SMTP id
+ w1-20020a623001000000b0051bb14288admr1619585pfw.52.1654120110918; Wed, 01 Jun
+ 2022 14:48:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220601151115.1.Ia503b15be0f366563b4e7c9f93cbec5e756bb0ae@changeid>
-In-Reply-To: <20220601151115.1.Ia503b15be0f366563b4e7c9f93cbec5e756bb0ae@changeid>
+References: <20220428030534.3220410-1-aahringo@redhat.com> <06164dbe-3c11-c627-0929-a399414c01bf@datenfreihafen.org>
+In-Reply-To: <06164dbe-3c11-c627-0929-a399414c01bf@datenfreihafen.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 1 Jun 2022 14:45:08 -0700
-Message-ID: <CABBYNZK8=RCC0bS3KVyn8y93nW_rSR0DDb=Yyp6CgFLaJGz5bA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: clear the temporary linkkey in hci_conn_cleanup
-To:     Alain Michaud <alainmichaud@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Date:   Wed, 1 Jun 2022 14:48:19 -0700
+Message-ID: <CABBYNZKCoj+W1MygU4eZZxGVSrWuRfEWx-fLOXvV-vXXY72vmw@mail.gmail.com>
+Subject: Re: [PATCH bluetooth-next 0/3] net: 6lowpan: simplify lookup by nhc id
+To:     Stefan Schmidt <stefan@datenfreihafen.org>
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Stefan,
 
-On Wed, Jun 1, 2022 at 8:12 AM Alain Michaud <alainmichaud@google.com> wrote:
+On Wed, Jun 1, 2022 at 2:37 PM Stefan Schmidt <stefan@datenfreihafen.org> wrote:
 >
-> From: Alain Michaud <alainm@chromium.org>
+> Hello.
 >
-> If a hardware error occurs and the connections are flushed without a
-> disconnection_complete event being signaled, the temporary linkkeys are
-> not flushed.
+> On 28.04.22 05:05, Alexander Aring wrote:
+> > Hi,
+> >
+> > this patch series removes the rb data structure for looking up a nhc by
+> > nhc id. Instead we using the existing nexthdr lookup array by iterating
+> > over it and find the right nhc by nhc id. It's simply not worth it to
+> > use such complex handling for such small amount of nhc. As we only
+> > support nhc ids which fits into 1 byte and there are not two byte nhc
+> > ids values specified yet, we let the nhc layer only handle 1 byte values.
+> > If there is the need for 2 byte nhc values we can add support for it.
+> >
+> > - Alex
+> >
+> > Alexander Aring (3):
+> >    net: 6lowpan: remove const from scalars
+> >    net: 6lowpan: use array for find nhc id
+> >    net: 6lowpan: constify lowpan_nhc structures
 >
-> This change ensures that any outstanding flushable linkkeys are flushed
-> when the connection are flushed from the hash table.
+> Marcel, Luiz, are you still picking up generic 6lowpan patches or only
+> the ones for bluetooth?
 >
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
+> These three have been around for over a month and acked by me and Jukka,
+> but I can't find them anywhere in bluetooth-next or Linus tree.
 >
-> ---
->
->  net/bluetooth/hci_conn.c  | 3 +++
->  net/bluetooth/hci_event.c | 4 +++-
->  2 files changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 352d7d612128..85dc1af90fcb 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -118,6 +118,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
->         if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
->                 hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
->
-> +       if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-> +               hci_remove_link_key(hdev, &conn->dst);
-> +
->         hci_chan_list_flush(conn);
->
->         hci_conn_hash_del(hdev, conn);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 6b83f9b0082c..09f4ff71e747 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3372,8 +3372,10 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
->                                 reason, mgmt_connected);
->
->         if (conn->type == ACL_LINK) {
-> -               if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-> +               if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags)) {
->                         hci_remove_link_key(hdev, &conn->dst);
-> +                       clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
-> +               }
+> If 6lowpan is of less concern for you I can route them through my
+> ieee80254 tree as well.
 
-Could we use test_and_clean_bit instead? In theory there could be
-other threads trying to clean up so I guess it would be safer to
-reduce the risk of having concurrency problems although hci_dev_lock
-would prevent that, better to be safe than sorry.
-
->                 hci_req_update_scan(hdev);
->         }
-> --
-> 2.36.1.255.ge46751e96f-goog
->
-
+Up to you, I was not aware they normally were merged thru
+bluetooth-next but I would be fine merging those as well.
 
 -- 
 Luiz Augusto von Dentz
