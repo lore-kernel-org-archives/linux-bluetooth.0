@@ -2,95 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 753ECC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 16:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F68C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Jun 2022 21:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbiFBQAT (ORCPT
+        id S231213AbiFAVQ3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 12:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
+        Wed, 1 Jun 2022 17:16:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45988 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236745AbiFBQAQ (ORCPT
+        with ESMTP id S231207AbiFAVQ2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 12:00:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853BB1451EE
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 09:00:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4396FB81FE4
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 16:00:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EAE9FC385A5;
-        Thu,  2 Jun 2022 16:00:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654185613;
-        bh=9Of1YxoKKXaXbUWdmBuE1s5iaiuMbG81Sq8qhibv1qc=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jY7RDlEUdRV0Agd13vCc/3l/V/VeyBIGeTwBgIiRQZNWBzE3KCnXyVjpaYnVp/hu+
-         zuLEPrUwv/o72m8c+Hk3fjraagE9qzIVqlgmCYvvUc2cxVtnYP3aZO/Qz8fD8VMhsw
-         jz2m50P9P7w18+LcC5A4Bl0DthzzcZCJQkaWQvK3pM/Mow5XJrx0ueo/W2Jpn4DeCl
-         +VmVEQ+wMkEsR4RDhhpAft5uTWq+If+Ri2ZuknbuIhJkoLJloj2yaJnzBUGhIJrsjA
-         lvEQuzoYqck5YO8iD/k7xFx8IXKaaE0rm9pRq2MZXQJXxNX7UrZWXH6A6BtJbC1Qh4
-         aH8f1QkNvBnCg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE06AEAC09C;
-        Thu,  2 Jun 2022 16:00:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 1 Jun 2022 17:16:28 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5169CE3B
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Jun 2022 14:16:27 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id y19so6256554ejq.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Jun 2022 14:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=mZ3wqB4NmL7z6lpFr/h15h1rYqsZKafJnUpMVahbEPg=;
+        b=BmztHPEiN3O2TWICvZq9QvpxxkTkU4FlxkTrJ+7cQV/jPXLvgGVFpAZY0rJWfrRJB5
+         ffgqf/SDJRVV6XJvGVlUul4Ay/Ksg9LTROfayXfQ21DWFgf7yxNJdR1MKV1GiFd4gbBI
+         9KFJD/viA4KTzN+YILcCKUi6mY92/l8ZlAsk45dTXhzhO/zF4BuECwajrKO+8SVwcZft
+         oG1Fw3P3Btnm0ltZJQkeiY1rMot1UFuiM0YpQ2nnSNwRfVZQaigf+GqNwL4UavWpS8kw
+         H2iOhGIkkQUnfAbNAw7gfRXj5At/G3JXBiJsVcL+Ozs/SBSWkOtqNp5crheVmE1nPf3l
+         zMRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=mZ3wqB4NmL7z6lpFr/h15h1rYqsZKafJnUpMVahbEPg=;
+        b=ucF8p70m4zECDV9p7Lg91dx6yxqoE5idhQQVsr62Mt5JCfORrr/kcagtc7mxEi4vy8
+         C6gR5WfXpGSSitZOsn8TbnOmCz51vbUCqqa9H/WECAgHmMs/FFPvXHh53AScsccSUY4H
+         obXuUuS8MGVhTiGC3GMjG5nL2Ota9gTAu6BKtCgP7cpiAYy37jOLiO4t0abhEaAFasHU
+         stwSgreHMS2b6z2ijSn5T0whdn52btG+svEWK5I+mAbOIdSvGBO8BJoOXEVzcEUhpvkD
+         iJJQums+U/WT9ZPCIQ0On59OH66mSU9IlworYLOwGWlpeR8s1YPeKcf+ww92+o0Z+Y3v
+         y0/A==
+X-Gm-Message-State: AOAM531D/8ljigZzUxSupKaeEhL81EmOrqDZh9vtFOYJBWei+N97a8M3
+        4QXNciPrOEMVW3OT6gjkI0zDCxLB5nIoB3tknoc=
+X-Google-Smtp-Source: ABdhPJyJbHUM5lGitca6BYdqIjm00xo4XVYPC+gmuuxlB5E4q3qYFLJ16AIx6Bp84+DaqCGBsyXqvVP74HYQ8vqCELU=
+X-Received: by 2002:a17:907:1b0c:b0:6fe:25bf:b3e5 with SMTP id
+ mp12-20020a1709071b0c00b006fe25bfb3e5mr1357005ejc.689.1654118185936; Wed, 01
+ Jun 2022 14:16:25 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [BlueZ PATCH v6 1/8] doc: Introduce the quality report command and
- event
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165418561283.15613.7221303146796113568.git-patchwork-notify@kernel.org>
-Date:   Thu, 02 Jun 2022 16:00:12 +0000
-References: <20220526112456.2488536-1-josephsih@chromium.org>
-In-Reply-To: <20220526112456.2488536-1-josephsih@chromium.org>
-To:     Joseph Hwang <josephsih@chromium.org>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org, josephsih@google.com,
-        chromeos-bluetooth-upstreaming@chromium.org
+Received: by 2002:a50:2550:0:0:0:0:0 with HTTP; Wed, 1 Jun 2022 14:16:25 -0700 (PDT)
+Reply-To: tonywenn@asia.com
+From:   Tony Wen <ezhejianghuayan@gmail.com>
+Date:   Wed, 1 Jun 2022 17:16:25 -0400
+Message-ID: <CAF6pdHzpPfYCvgeW77owrr0qXy1_=Mzf+Koay4Y5R+R5zk_x_A@mail.gmail.com>
+Subject: services
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
-
-This series was applied to bluetooth/bluez.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
-
-On Thu, 26 May 2022 19:24:49 +0800 you wrote:
-> Add the MGMT quality report command and event in doc/mgmt-api.txt.
-> 
-> ---
-> 
-> Changes in v6:
-> - No update in this patch. The patch 3/8 is updated to resolve a
->   patch conflict.
-> 
-> [...]
-
-Here is the summary with links:
-  - [BlueZ,v6,1/8] doc: Introduce the quality report command and event
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=93850c827d54
-  - [BlueZ,v6,2/8] lib: Add structures and constants for quality report command and event
-    (no matching commit)
-  - [BlueZ,v6,3/8] adapter: remove quality report from experimental features
-    (no matching commit)
-  - [BlueZ,v6,4/8] adapter: support AOSP MGMT_EV_QUALITY_REPORT
-    (no matching commit)
-  - [BlueZ,v6,5/8] adapter: support Intel MGMT_EV_QUALITY_REPORT
-    (no matching commit)
-  - [BlueZ,v6,6/8] tools/btmgmt: fix quality report command
-    (no matching commit)
-  - [BlueZ,v6,7/8] monitor: print quality report cmd
-    (no matching commit)
-  - [BlueZ,v6,8/8] monitor: packet: add missing decodings of MGMT commands to todo
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Can I engage your services?
