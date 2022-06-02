@@ -2,92 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 750FACCA47E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AC3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236618AbiFBPuV (ORCPT
+        id S236686AbiFBP7a convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 11:50:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51012 "EHLO
+        Thu, 2 Jun 2022 11:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231797AbiFBPuR (ORCPT
+        with ESMTP id S230011AbiFBP73 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 11:50:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D63F2E6B3
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 08:50:15 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5C8BCB81FB6
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 15:50:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A250C3411A;
-        Thu,  2 Jun 2022 15:50:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654185013;
-        bh=3IcmI6aTuTaZ9jT8NsJcigQPndxrKj7HswxoA95i+34=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LodZVhqVBaO0Y9KZXYE+Gsj34bPo+ScTnpLKOMXipjuB+ygTgs0si4KFi0Yv4MHuI
-         nJj9tlHJJrakJQrL+YBnZ0gjxoUGpPKj8k50ucUK35Fyq8Qfnt/qo9SHd6B08PgUt1
-         wBdY7w+KFZzmP41m9Bt3mxr+HN7iXGHIHbdBkuUNimtAaLgGeHU9ZMNMkEMwydwa8P
-         S7Y46o6MneFOas6n5tdhTxDD/WV7xdh6EGRgdFpu8pkqu4kA4ZQXiU5AZ5hBkRYK7p
-         iGFTdXqtKeoKCufD8YyVcKa/P/LOMABnF9T3G9W3E55qtMwDrGS1ve3GOBX9VmOCol
-         6npDQBujhdEDg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDA51F0394F;
-        Thu,  2 Jun 2022 15:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: Add support of IMC Networks PID 0x3568
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165418501290.10758.3267160679920762449.git-patchwork-notify@kernel.org>
-Date:   Thu, 02 Jun 2022 15:50:12 +0000
-References: <20220602092822.953521-1-aaron.ma@canonical.com>
-In-Reply-To: <20220602092822.953521-1-aaron.ma@canonical.com>
-To:     Aaron Ma <aaron.ma@canonical.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com,
-        luiz.dentz@gmail.com, johan.hedberg@gmail.com, marcel@holtmann.org
+        Thu, 2 Jun 2022 11:59:29 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47C17D02BB;
+        Thu,  2 Jun 2022 08:59:25 -0700 (PDT)
+Received: from smtpclient.apple (p4ff9fc30.dip0.t-ipconnect.de [79.249.252.48])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2E1E8CED19;
+        Thu,  2 Jun 2022 17:59:24 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
+Subject: Re: [PATCH v6 5/5] Bluetooth: let HCI_QUALITY_REPORT persist over
+ adapter power cycle
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20220526112135.2486883-3-josephsih@chromium.org>
+Date:   Thu, 2 Jun 2022 17:59:23 +0200
+Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <0DB8D064-222A-4420-8F9F-2BEEA63DF76A@holtmann.org>
+References: <20220526112135.2486883-1-josephsih@chromium.org>
+ <20220526112135.2486883-3-josephsih@chromium.org>
+To:     Joseph Hwang <josephsih@chromium.org>
+X-Mailer: Apple Mail (2.3696.100.31)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Joseph,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
-
-On Thu,  2 Jun 2022 17:28:22 +0800 you wrote:
-> It is 13d3:3568 for MediaTek MT7922 USB Bluetooth chip.
+> The quality report specifications, including AOSP Bluetooth Quality
+> Report and Intel Telemetry Event, do not define what happen when
+> the adapter is turned off and then on. To be consistent among
+> different specifications and vendors, the quality report feature is
+> turned off when the adapter is powered off and is turned on when
+> the adapter is powered on if the feature has been on before power
+> cycle.
 > 
-> T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480 MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3568 Rev=01.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=...
-> C:  #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> ---
 > 
-> [...]
+> (no changes since v5)
+> 
+> Changes in v5:
+> - This is a new patch in this series changes version.
+> 
+> include/net/bluetooth/hci_core.h |  1 -
+> net/bluetooth/hci_sync.c         | 35 +++++++++++++++++++++++++++++++-
+> 2 files changed, 34 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 9e48d606591e..5788350efa68 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -807,7 +807,6 @@ extern struct mutex hci_cb_list_lock;
+> 		hci_dev_clear_flag(hdev, HCI_LE_ADV);		\
+> 		hci_dev_clear_flag(hdev, HCI_LL_RPA_RESOLUTION);\
+> 		hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);	\
+> -		hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);	\
+> 	} while (0)
 
-Here is the summary with links:
-  - Bluetooth: btusb: Add support of IMC Networks PID 0x3568
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d60ea31cb434
+this really need to go into your 1/5 patch.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> #define hci_dev_le_state_simultaneous(hdev) \
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index a6ada9dcede5..12a18d046bb6 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3849,6 +3849,31 @@ static const struct {
+> 			 "advertised, but not supported.")
+> };
+> 
+> +static void suspend_resume_quality_report(struct hci_dev *hdev, bool enable)
+> +{
+> +	int err;
+> +
+> +	/* Suspend and resume quality report only when the feature has
+> +	 * already been enabled. The HCI_QUALITY_REPORT flag, as an indicator
+> +	 * whether to re-enable the feature after resume, is not changed by
+> +	 * suspend/resume.
+> +	 */
+> +	if (!hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
+> +		return;
+> +
+> +	if (hdev->set_quality_report)
+> +		err = hdev->set_quality_report(hdev, enable);
+> +	else
+> +		err = aosp_set_quality_report(hdev, enable);
+> +
+> +	if (err)
+> +		bt_dev_err(hdev, "%s quality report error %d",
+> +			   enable ? "resume" : "suspend", err);
+> +	else
+> +		bt_dev_info(hdev, "%s quality report",
+> +			    enable ? "resume" : "suspend");
 
+Do you really need this “debug” output?
+
+> +}
+> +
+> int hci_dev_open_sync(struct hci_dev *hdev)
+> {
+> 	int ret = 0;
+> @@ -4013,6 +4038,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+> 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> 		msft_do_open(hdev);
+> 		aosp_do_open(hdev);
+> +		suspend_resume_quality_report(hdev, true);
+> 	}
+> 
+> 	clear_bit(HCI_INIT, &hdev->flags);
+> @@ -4095,6 +4121,14 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+> 
+> 	hci_request_cancel_all(hdev);
+> 
+> +	/* Disable quality report and close aosp before shutdown()
+> +	 * is called. Otherwise, some chips may panic.
+> +	 */
+> +	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> +		suspend_resume_quality_report(hdev, false);
+> +		aosp_do_close(hdev);
+> +	}
+> +
+
+Why move aosp_do_close here. I prefer to keep it where it was.
+
+> 	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> 	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> 	    test_bit(HCI_UP, &hdev->flags)) {
+> @@ -4158,7 +4192,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+> 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
+> 
+> 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> -		aosp_do_close(hdev);
+> 		msft_do_close(hdev);
+> 	}
+
+Regards
+
+Marcel
 
