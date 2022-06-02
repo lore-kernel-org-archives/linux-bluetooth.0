@@ -2,206 +2,206 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABBDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 20:45:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FC4C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 20:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234632AbiFBUpv (ORCPT
+        id S229981AbiFBU4I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 16:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47012 "EHLO
+        Thu, 2 Jun 2022 16:56:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229944AbiFBUpt (ORCPT
+        with ESMTP id S229520AbiFBU4G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 16:45:49 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D828FA2
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 13:45:47 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id a10so5901309pju.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 13:45:47 -0700 (PDT)
+        Thu, 2 Jun 2022 16:56:06 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A1833EB4;
+        Thu,  2 Jun 2022 13:56:04 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id cx11so5938980pjb.1;
+        Thu, 02 Jun 2022 13:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=v1FHdFMdEE/JMWWujz9oOl3mtg84SZg9LKBOYtQhMLI=;
-        b=kiVjzhRopyep6+t1BYbaXwGJGEWwYARCmEme5u0NThV14Oe8t1NydcwhC6UzkCNK71
-         kaaCkSWw6xqoDQhin3FPe4IIPh2MZGRXgO1tBkpmeQRYvSKIMd5CsMB2CJYBkHe7gZ7J
-         /7v5ONtqAN16m/dqXXEWTxw5bd/N3wI8bDY6sttrhDGgJqIJpGO8zmpkdBoi7e7DR/MQ
-         pEoV++/Ej8GvfhRA+C4VytPOYhMAgcp0h3LOvtwxoZmPSCVgdn1u+XhMP40rZGHXuBzB
-         dQIr9M2Ywf06tIGyrFwLS+L6RYT6cCg8rnvI12CVR2ZHs0eU5r6e+OLN6fmd9+otsGBV
-         9tGA==
+         :cc;
+        bh=Dw6l8zIZ5qVjCuzEpteWubruDjlOh5Cx0mWoCv3VXRs=;
+        b=DitXn94UgChiQHx73iW+wOBCS3ZRS2C8sTau6bp8IOuFeYK3QqLmHmk64o4S25D2yK
+         2iqfThFqVg5nDlvLjxEScm4MaGpJSOljYolinO3E0rqlcPu2HdN12Ljxpt7Wk3Zi0I+f
+         jRfseuMfZC7CV9PJpxzEbWXiVKXitbwpSlOiJmKcsjITWMkTM4KgbIRDv+KY9vMQKU9r
+         DEeelPRFYT9hMsks/pZdh5V4PN4XCjMnAUM7BspHxrA7njoAL8bwaxQznnXyi4bfXPJy
+         dzZMn3/BJXKStS1gQFEx0Aq2D3Inu7stCg3LtK26oQzCzFK1y8zzhDSwaWWfiwSRCHYN
+         URnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=v1FHdFMdEE/JMWWujz9oOl3mtg84SZg9LKBOYtQhMLI=;
-        b=ksMxV9hCn6D3cQVSwYpqIMbXaU3/PISU7CMjbar/zW+NL/whztmtrKKMB3tO8HFK0R
-         R8cRT1+62ExriLviI02zX1JL8lIvlEOzRb2pfE43UmhNbnX4bCeWJupOD5x3Wwn3i7tP
-         ZWFOKquZQryficVh5sGfvjXrrVyg6Glhxcf3e1okrG29pDy1Kv8dhvLfLrGrG0Rzto9L
-         dJzNap6LyEgcry29+4QBgbFh0Xy6TedUOKnwWP0V2eI84yLssEDrJc2f0yxKkRBq7GhO
-         I2gMpGOQjRp3klkM75Q9rdDau8IZXQfAG+h7E64AimXbhYKl1ejTKs2EWq3vh0dj/h8U
-         WkQQ==
-X-Gm-Message-State: AOAM530iHjebku6Sru9gbCkrA3xI5aQruRZfKZ1agNC9jOWTYV1+3rF5
-        Hl8U5KjLw1dQUsSAq6dmaG7p+ECBcdHi2sqc/pu8uB2H
-X-Google-Smtp-Source: ABdhPJxldhDYKR0fp49ZXkjrwtn6GmVeZMPqp3TGHvBefQvLTwp6tGa47/dQE+np4nT7Oo7AjV84bonngp+1pWivCb8=
-X-Received: by 2002:a17:90b:3507:b0:1e3:4b80:5c7a with SMTP id
- ls7-20020a17090b350700b001e34b805c7amr7287725pjb.4.1654202747222; Thu, 02 Jun
- 2022 13:45:47 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=Dw6l8zIZ5qVjCuzEpteWubruDjlOh5Cx0mWoCv3VXRs=;
+        b=5pLg+c5LbgMmHwk9DxhmSpYkUx9FZ7f8+Wq12w7tKqjdWcTs5z7jFogpYAJjXVdHH9
+         JTbGwrOnSPDclgVWlG7ZKrfM9tQ+arWhX6m4pUkkAHSksfKlQIE7Yw/K8Np8zrwYqfx3
+         f0UMhje5s5hKJGAUAVPYpXeXul24aL3gOR1xvvBK+Yk7OwGAiO+IocSLsRRxQXleRRN8
+         MbeczWaNLQFOfT1vdREWgWiz1NDmnM26xKn3Vv+KCFBZ6h5v1cIqz2Z5k5zKr210P62y
+         mw3pCEF7NgPFWQBXh6C6IcSYc3cQWxiiAr3I+S20A4amyYvWdONV1DIM9HyLcfnp89xN
+         3/YQ==
+X-Gm-Message-State: AOAM5336skOUsqAweEk9wRJ10wu+zCjKyBIfgtR0mC9r2MqUbg1Tn2yt
+        inl9MqF1J9bXffSHuHatvrNOEMRfHXDDntr+Tq0=
+X-Google-Smtp-Source: ABdhPJwXTEG4AY9RTeveA2AmonaIPfEMCfEchsXw+7hhOaD4a05RE9O8akifcB6h9IqG5fhRxvTFiLHVSLh3GVxbXcE=
+X-Received: by 2002:a17:90a:4803:b0:1dc:b4c9:1958 with SMTP id
+ a3-20020a17090a480300b001dcb4c91958mr41970103pjh.61.1654203363967; Thu, 02
+ Jun 2022 13:56:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220602152613.79718-1-frederic.danis@collabora.com>
-In-Reply-To: <20220602152613.79718-1-frederic.danis@collabora.com>
+References: <20220602191949.31311-1-schspa@gmail.com>
+In-Reply-To: <20220602191949.31311-1-schspa@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 2 Jun 2022 13:45:36 -0700
-Message-ID: <CABBYNZJuhnwOpzU_fjuo648O-9-gH+HU0vbH-ueQXU=z1gSYSQ@mail.gmail.com>
-Subject: Re: [PATCH] btproxy: Allow to select multiple BT controllers
-To:     =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 2 Jun 2022 13:55:52 -0700
+Message-ID: <CABBYNZJw=bY8T_HkWF2cTbFNg=973Deu0sHPUa2R5k7T13-WKA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: When HCI work queue is drained, only queue
+ chained work
+To:     Schspa Shi <schspa@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        syzbot+63bed493aebbf6872647@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Fr=C3=A9d=C3=A9ric,
+Hi Schspa,
 
-On Thu, Jun 2, 2022 at 9:08 AM Fr=C3=A9d=C3=A9ric Danis
-<frederic.danis@collabora.com> wrote:
+On Thu, Jun 2, 2022 at 12:20 PM Schspa Shi <schspa@gmail.com> wrote:
 >
-> When running on a computer with a real Bluetooth controller (e.g. hci0) a=
-nd
-> multiple emulators (e.g. hci1 and hci2) it isn't possible to use the
-> emulators with 2 test-runner vms.
-> If btproxy is started without index parameter the first test-runner will
-> use hci0, and btprox can't be started with multiple index parameters
-> (e.g. -i1 -i2).
+> The HCI command, event, and data packet processing workqueue is drained
+> to avoid deadlock in commit
+> 76727c02c1e1 ("Bluetooth: Call drain_workqueue() before resetting state").
 >
-> This patch allows to select the controllers to be used by btproxy.
-
-Does it keep the old behavior and adds the possibility to enter -i
-command line option multiple times?
-
+> There is another delayed work, which will queue command to this drained
+> workqueue. Which results in the following error report:
+>
+> Bluetooth: hci2: command 0x040f tx timeout
+> WARNING: CPU: 1 PID: 18374 at kernel/workqueue.c:1438 __queue_work+0xdad/0x1140
+> Workqueue: events hci_cmd_timeout
+> RIP: 0010:__queue_work+0xdad/0x1140
+> RSP: 0000:ffffc90002cffc60 EFLAGS: 00010093
+> RAX: 0000000000000000 RBX: ffff8880b9d3ec00 RCX: 0000000000000000
+> RDX: ffff888024ba0000 RSI: ffffffff814e048d RDI: ffff8880b9d3ec08
+> RBP: 0000000000000008 R08: 0000000000000000 R09: 00000000b9d39700
+> R10: ffffffff814f73c6 R11: 0000000000000000 R12: ffff88807cce4c60
+> R13: 0000000000000000 R14: ffff8880796d8800 R15: ffff8880796d8800
+> FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000c0174b4000 CR3: 000000007cae9000 CR4: 00000000003506e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  ? queue_work_on+0xcb/0x110
+>  ? lockdep_hardirqs_off+0x90/0xd0
+>  queue_work_on+0xee/0x110
+>  process_one_work+0x996/0x1610
+>  ? pwq_dec_nr_in_flight+0x2a0/0x2a0
+>  ? rwlock_bug.part.0+0x90/0x90
+>  ? _raw_spin_lock_irq+0x41/0x50
+>  worker_thread+0x665/0x1080
+>  ? process_one_work+0x1610/0x1610
+>  kthread+0x2e9/0x3a0
+>  ? kthread_complete_and_exit+0x40/0x40
+>  ret_from_fork+0x1f/0x30
+>  </TASK>
+>
+> To fix this, we can add a new HCI_DRAIN_WQ flag, and don't queue the
+> timeout workqueue while command workqueue is draining.
+>
+> Fixes: 76727c02c1e1 ("Bluetooth: Call drain_workqueue() before resetting state")
+> Reported-by: syzbot+63bed493aebbf6872647@syzkaller.appspotmail.com
+> Signed-off-by: Schspa Shi <schspa@gmail.com>
+>
+> Changelog:
+> v1 -> v2:
+>         - Move the workqueue drain flag to controller flags, and use hci_dev_*_flag.
+>         - Add missing ncmd_timer cancel.
+>         - Clear DRAIN_WORKQUEUE flag after device command flushed.
 > ---
->  tools/btproxy.c | 48 ++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 34 insertions(+), 14 deletions(-)
+>  include/net/bluetooth/hci.h |  1 +
+>  net/bluetooth/hci_core.c    | 10 +++++++++-
+>  net/bluetooth/hci_event.c   |  5 +++--
+>  3 files changed, 13 insertions(+), 3 deletions(-)
 >
-> diff --git a/tools/btproxy.c b/tools/btproxy.c
-> index 94ca1c7fd..c09a504ff 100644
-> --- a/tools/btproxy.c
-> +++ b/tools/btproxy.c
-> @@ -48,6 +48,7 @@ struct sockaddr_hci {
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fe7935be7dc4..4a45c48eb0d2 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -361,6 +361,7 @@ enum {
+>         HCI_QUALITY_REPORT,
+>         HCI_OFFLOAD_CODECS_ENABLED,
+>         HCI_LE_SIMULTANEOUS_ROLES,
+> +       HCI_CMD_DRAIN_WORKQUEUE,
+>
+>         __HCI_NUM_FLAGS,
 >  };
->  #define HCI_CHANNEL_USER       1
->  #define HCI_INDEX_NONE         0xffff
-> +#define HCI_INDEX_MAX          15
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5abb2ca5b129..e908fdc4625c 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -593,6 +593,11 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+>         skb_queue_purge(&hdev->rx_q);
+>         skb_queue_purge(&hdev->cmd_q);
 >
->  static uint16_t hci_index =3D HCI_INDEX_NONE;
->  static bool client_active =3D false;
-> @@ -533,13 +534,28 @@ static bool setup_proxy(int host_fd, bool host_shut=
-down,
->         return true;
->  }
->
-> -static int open_channel(uint16_t index)
-> +static int get_next_hci_index(int index)
-> +{
-> +       while (++index <=3D HCI_INDEX_MAX) {
-> +               if (hci_index & (1 << index))
-> +                       return index;
-> +       }
-> +
-> +       return -1;
-> +}
+> +       /* Cancel these not cahined pending work */
+> +       hci_dev_set_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
 
-Perhaps use util_get_uid?
+There seems to be a typo on the comment line 'cahined', also perhaps
+you test it before setting it so we don't risk flushing multiple
+times?
 
+> +       cancel_delayed_work(&hdev->cmd_timer);
+> +       cancel_delayed_work(&hdev->ncmd_timer);
 > +
-> +static int open_channel(int index)
->  {
->         struct sockaddr_hci addr;
->         int fd, err;
+>         /* Avoid potential lockdep warnings from the *_flush() calls by
+>          * ensuring the workqueue is empty up front.
+>          */
+> @@ -606,6 +611,8 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+>         if (hdev->flush)
+>                 hdev->flush(hdev);
 >
-> -       if (index =3D=3D HCI_INDEX_NONE)
-> -               index =3D 0;
-> +       if (index =3D=3D HCI_INDEX_NONE) {
-> +               index =3D get_next_hci_index(-1);
-> +               if (index < 0) {
-> +                       perror("No controller available");
-> +                       return -1;
-> +               }
-> +       }
+> +       hci_dev_clear_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE);
+> +
+>         atomic_set(&hdev->cmd_cnt, 1);
+>         hdev->acl_cnt = 0; hdev->sco_cnt = 0; hdev->le_cnt = 0;
 >
->         printf("Opening user channel for hci%u\n", index);
+> @@ -3861,7 +3868,8 @@ static void hci_cmd_work(struct work_struct *work)
+>                         if (res < 0)
+>                                 __hci_cmd_sync_cancel(hdev, -res);
 >
-> @@ -561,9 +577,10 @@ static int open_channel(uint16_t index)
->                 /* Open next available controller if no specific index wa=
-s
->                  * provided and the error indicates that the controller.
->                  */
-> -               if (hci_index =3D=3D HCI_INDEX_NONE &&
-> +               index =3D get_next_hci_index(index);
-> +               if (index >=3D0 &&
->                                 (err =3D=3D -EBUSY || err =3D=3D -EUSERS)=
-)
-> -                       return open_channel(++index);
-> +                       return open_channel(index);
->
->                 perror("Failed to bind Bluetooth socket");
->                 return -1;
-> @@ -601,13 +618,7 @@ static void server_callback(int fd, uint32_t events,=
- void *user_data)
->                 return;
->         }
->
-> -       if (client_active && hci_index !=3D HCI_INDEX_NONE) {
-> -               fprintf(stderr, "Active client already present\n");
-> -               close(host_fd);
-> -               return;
-> -       }
-> -
-> -       dev_fd =3D open_channel(hci_index);
-> +       dev_fd =3D open_channel(HCI_INDEX_NONE);
->         if (dev_fd < 0) {
->                 close(host_fd);
->                 return;
-> @@ -800,6 +811,7 @@ int main(int argc, char *argv[])
->
->         for (;;) {
->                 int opt;
-> +               int index;
->
->                 opt =3D getopt_long(argc, argv, "rc:l::u::p:i:aezdvh",
->                                                 main_options, NULL);
-> @@ -844,7 +856,15 @@ int main(int argc, char *argv[])
->                                 usage();
->                                 return EXIT_FAILURE;
->                         }
-> -                       hci_index =3D atoi(str);
-> +                       index =3D atoi(str);
-> +                       if (index > HCI_INDEX_MAX) {
-> +                               fprintf(stderr, "Invalid controller index=
-\n");
-> +                               usage();
-> +                               return EXIT_FAILURE;
-> +                       }
-> +                       if (hci_index =3D=3D HCI_INDEX_NONE)
-> +                               hci_index =3D 0;
-> +                       hci_index |=3D 1 << index;
->                         break;
->                 case 'a':
->                         type =3D HCI_AMP;
-> @@ -892,7 +912,7 @@ int main(int argc, char *argv[])
->                 if (use_redirect) {
->                         printf("Creating local redirect\n");
->
-> -                       dev_fd =3D open_channel(hci_index);
-> +                       dev_fd =3D open_channel(HCI_INDEX_NONE);
+> -                       if (test_bit(HCI_RESET, &hdev->flags))
+> +                       if (test_bit(HCI_RESET, &hdev->flags) ||
+> +                           hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
+>                                 cancel_delayed_work(&hdev->cmd_timer);
+>                         else
+>                                 schedule_delayed_work(&hdev->cmd_timer,
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index af17dfb20e01..7cb956d3abb2 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3768,8 +3768,9 @@ static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
+>                         cancel_delayed_work(&hdev->ncmd_timer);
+>                         atomic_set(&hdev->cmd_cnt, 1);
 >                 } else {
->                         printf("Connecting to %s:%u\n", connect_address,
->                                                                 tcp_port)=
-;
+> -                       schedule_delayed_work(&hdev->ncmd_timer,
+> -                                             HCI_NCMD_TIMEOUT);
+> +                       if (!hci_dev_test_flag(hdev, HCI_CMD_DRAIN_WORKQUEUE))
+> +                               schedule_delayed_work(&hdev->ncmd_timer,
+> +                                                     HCI_NCMD_TIMEOUT);
+>                 }
+>         }
+>  }
 > --
-> 2.25.1
+> 2.24.3 (Apple Git-128)
 >
 
 
---=20
+-- 
 Luiz Augusto von Dentz
