@@ -2,113 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D46C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 17:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96ABCCCA47B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 17:38:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237545AbiFBR0N (ORCPT
+        id S237540AbiFBRic (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 13:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
+        Thu, 2 Jun 2022 13:38:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237543AbiFBR0M (ORCPT
+        with ESMTP id S232302AbiFBRib (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 13:26:12 -0400
-Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFA5270F3D
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 10:26:10 -0700 (PDT)
-Received: by mail-qv1-xf2c.google.com with SMTP id el14so3982293qvb.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 10:26:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=2aYrLKVYdpDSbu+rFxBf5fwRjb8QcnIJuwEjnmxYoDI=;
-        b=j+k4TLfk4+7pkwXOvVKTCKfFVAkHR8jz+0bnfZu3ss8g2Mqm3PlnJi0cmrShoY3385
-         GQEo7kxPeoxSUAdC77r8ezgB0cV9RXbzrGUqdTVbb7vOmP29S3CCU5ZOXbKm4RRbQ7nS
-         tTf4BK612pXoLokdMjevCw/bExXHCTwjxW1yAJDQ8AdHBgAdpyPz9rH+QX6I2yMxdBha
-         tylxHaMjNtedkoymY9WmSDzM8vDNFR8C3Z/4o82RrRlrOxN/fnA3CASTh7FQecjL0uGN
-         ESNNPiaA/a381uDpdzrYigGpFRxTD/ygvKsVqgnPNRtFKMXo/G5y7vUV5BoyzjKhIjWF
-         gdXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=2aYrLKVYdpDSbu+rFxBf5fwRjb8QcnIJuwEjnmxYoDI=;
-        b=FYLuJ7H/ErA8hH/i7vGJ24h8JyesXHoXhFaD0Hk0zg6BFugd8TkpWlDp/A+SrWa82l
-         dB6exbGIv3UU7t/VS+W475hw2V1RCygLDj5otYN0J7VS3tgjMvc8dM+z+iYRmli8R91P
-         K94p6YSWDU01IIKYypaMgtdzrZbZVSp711/H6iHu2DbdfskzpokdRDmRI3CeRVgsaQpA
-         0pY5hegY0hgQAblk8sVSOdKFKTCqZnc6UDD03/1S33MlWPA+LsjX4/CIEVfq/1eVarMW
-         RgAugsWZO8y39Jfj8V9z2zTMXX8j11IveEerxReb7KCmT9WcXG+Xh8Shm+9h/165a4IV
-         BIIQ==
-X-Gm-Message-State: AOAM531x788wHQX/ILVnEta4CQXNOHAWJ9O72Ov9/6kKCPGdmJ4+Owh/
-        4RK/cK9JeN9I0/xJyfNlk+UzdWKA/qgPMA==
-X-Google-Smtp-Source: ABdhPJzzfO0NrFY9goN2lzZtIU8FOEDigcbHVKuhzt90cboJ1daZG55WaQi0DSuMhPAoRMzFPowATg==
-X-Received: by 2002:a05:6214:224f:b0:43f:d536:d014 with SMTP id c15-20020a056214224f00b0043fd536d014mr59921042qvc.50.1654190769913;
-        Thu, 02 Jun 2022 10:26:09 -0700 (PDT)
-Received: from [172.17.0.2] ([20.242.79.134])
-        by smtp.gmail.com with ESMTPSA id fb11-20020a05622a480b00b002fbf0114477sm3289775qtb.3.2022.06.02.10.26.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 10:26:09 -0700 (PDT)
-Message-ID: <6298f2b1.1c69fb81.cf74d.e5fd@mx.google.com>
-Date:   Thu, 02 Jun 2022 10:26:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6689649105319084393=="
+        Thu, 2 Jun 2022 13:38:31 -0400
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D2F11C0F;
+        Thu,  2 Jun 2022 10:38:28 -0700 (PDT)
+Received: from [IPV6:2003:e9:d738:31bf:d5a9:1442:9319:c966] (p200300e9d73831bfd5a914429319c966.dip0.t-ipconnect.de [IPv6:2003:e9:d738:31bf:d5a9:1442:9319:c966])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: stefan@datenfreihafen.org)
+        by proxima.lasnet.de (Postfix) with ESMTPSA id 56ABCC05A1;
+        Thu,  2 Jun 2022 19:38:26 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+        s=2021; t=1654191506;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Y8uGKYq3zLyS48gMXz1D+2XcOy5wkh53quO7bcbPfV0=;
+        b=qz/Wci9t+F4t7jKWTfZLuPDxNJJ3FYSOpVV4euqx5NNdJbKTg0xUT4cg56SMMqSrs9EPK4
+        GFS2Uu7Gzd4VjTPZvJCTK8vLa59af+fwy0c8KkNO07JJPcLWy5/78bPYQnmVxngymT/mt5
+        7/m87pK2QWOTix18ab/wbxm8LwyYYpPQQxSW89/2Ct3PRyFtj0CTJnIQq5/Sor75JAttJS
+        dyBXyEZ3iLn1wkufxJzqfPSik5By8TOm9BtqyhblBghGzGj//hgmYsh/AAV/YonfGf3/cx
+        rM8bDCnh63FR+IAsVo37dp6l88W4tQLOaG3Nh90TRUZkq+SwLtvXoKpg2kssxg==
+Message-ID: <0b31b950-ab72-251e-f085-9a86538d9a6f@datenfreihafen.org>
+Date:   Thu, 2 Jun 2022 19:38:25 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
-Subject: RE: [1/2] Bluetooth: Fix index added after unregister
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220602094645.1.I7d191480c15b45a237b927e26aa26ba806409efb@changeid>
-References: <20220602094645.1.I7d191480c15b45a237b927e26aa26ba806409efb@changeid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH bluetooth-next 0/3] net: 6lowpan: simplify lookup by nhc
+ id
+Content-Language: en-US
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Alexander Aring <aahringo@redhat.com>,
+        Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        Linus Torvalds <torvalds@linuxfoundation.org>
+References: <20220428030534.3220410-1-aahringo@redhat.com>
+ <06164dbe-3c11-c627-0929-a399414c01bf@datenfreihafen.org>
+ <CABBYNZKCoj+W1MygU4eZZxGVSrWuRfEWx-fLOXvV-vXXY72vmw@mail.gmail.com>
+ <3b5d28c4-1877-ba8f-dcb3-d5c3cbc06a1f@datenfreihafen.org>
+ <CABBYNZK1uWjxmvJUBPaUdMvj8B-p=TtRKTUwQ0szCgLhh+7CcA@mail.gmail.com>
+ <89A5D478-0611-4F20-B2BF-3CF3E3E82F9C@holtmann.org>
+From:   Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <89A5D478-0611-4F20-B2BF-3CF3E3E82F9C@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6689649105319084393==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Marcel
 
-This is automated email and please do not reply to this email!
+On 02.06.22 17:27, Marcel Holtmann wrote:
+> Hi Stefan,
+> 
+>>>>>> this patch series removes the rb data structure for looking up a nhc by
+>>>>>> nhc id. Instead we using the existing nexthdr lookup array by iterating
+>>>>>> over it and find the right nhc by nhc id. It's simply not worth it to
+>>>>>> use such complex handling for such small amount of nhc. As we only
+>>>>>> support nhc ids which fits into 1 byte and there are not two byte nhc
+>>>>>> ids values specified yet, we let the nhc layer only handle 1 byte values.
+>>>>>> If there is the need for 2 byte nhc values we can add support for it.
+>>>>>>
+>>>>>> - Alex
+>>>>>>
+>>>>>> Alexander Aring (3):
+>>>>>> net: 6lowpan: remove const from scalars
+>>>>>> net: 6lowpan: use array for find nhc id
+>>>>>> net: 6lowpan: constify lowpan_nhc structures
+>>>>>
+>>>>> Marcel, Luiz, are you still picking up generic 6lowpan patches or only
+>>>>> the ones for bluetooth?
+>>>>>
+>>>>> These three have been around for over a month and acked by me and Jukka,
+>>>>> but I can't find them anywhere in bluetooth-next or Linus tree.
+>>>>>
+>>>>> If 6lowpan is of less concern for you I can route them through my
+>>>>> ieee80254 tree as well.
+>>>>
+>>>> Up to you, I was not aware they normally were merged thru
+>>>> bluetooth-next but I would be fine merging those as well.
+>>>
+>>> If you and Marcel don't mind I would like to switch this over to being
+>>> merged through ieee802154. Mostly because 6lowpan is vital for the 15.4
+>>> work we have.
+>>>
+>>> With Jukka stepping down from co-maintaining this part (thanks a lot for
+>>> your work!) this will most likely be reviewed by Alex and me anyway.
+>>>
+>>> We still need to ensure that patches are hitting wpan as well as
+>>> bluetooth mailing list, but the MAINTAINERS file handles this already.
+>>>
+>>> Let me know if you are unhappy with the switch. If not I will start with
+>>> merging these three as well as the MAINTAINERS update from Jukka.
+>>
+>> I have no problem with that.
+> 
+> go for it. Lets just keep the mailing list in MAINTAINERS file so we are aware of patches in this area.
 
-Dear submitter,
+Yup, that's the plan. Taking the pending patch in now.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=646945
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.66 seconds
-GitLint                       FAIL      1.03 seconds
-SubjectPrefix                 PASS      1.74 seconds
-BuildKernel                   PASS      31.77 seconds
-BuildKernel32                 PASS      28.08 seconds
-Incremental Build with patchesPASS      65.60 seconds
-TestRunner: Setup             PASS      475.78 seconds
-TestRunner: l2cap-tester      PASS      17.44 seconds
-TestRunner: bnep-tester       PASS      6.11 seconds
-TestRunner: mgmt-tester       PASS      101.81 seconds
-TestRunner: rfcomm-tester     PASS      9.61 seconds
-TestRunner: sco-tester        PASS      9.37 seconds
-TestRunner: smp-tester        PASS      9.40 seconds
-TestRunner: userchan-tester   PASS      6.41 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 1.03 seconds
-Run gitlint with rule in .gitlint
-[1/2] Bluetooth: Fix index added after unregister
-24: B1 Line exceeds max length (82>80): "    @ MGMT Open: bt_stack_manage (privileged) version 1.14     {0x0003} 682.437223"
-25: B1 Line exceeds max length (82>80): "    @ MGMT Command: Read Controller Index List (0x0003) plen 0 {0x0003} 682.437230"
-26: B1 Line exceeds max length (82>80): "    @ MGMT Event: Command Complete (0x0001) plen 5             {0x0003} 682.437232"
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6689649105319084393==--
+regards
+Stefan Schmidt
