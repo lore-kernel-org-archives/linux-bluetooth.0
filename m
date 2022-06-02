@@ -2,101 +2,206 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7749C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 20:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABBDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 20:45:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239227AbiFBUko (ORCPT
+        id S234632AbiFBUpv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 16:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55994 "EHLO
+        Thu, 2 Jun 2022 16:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239311AbiFBUkh (ORCPT
+        with ESMTP id S229944AbiFBUpt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 16:40:37 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0787321E02
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 13:40:21 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id a184so991284qkg.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 13:40:20 -0700 (PDT)
+        Thu, 2 Jun 2022 16:45:49 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D828FA2
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 13:45:47 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id a10so5901309pju.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 13:45:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=P/0CRSsWR309VEfdTvmkAH62VoVLPO+9yFTnb7mMTGQ=;
-        b=IpvQtHvCxj2V/eKSsvPocTbodlXc7hvPsHfwjWSX2kvJlWwR3mE4uD/RGpP2C1s3q1
-         FxgxolZAqx7mhmgdmTe4NzJ+hf5fEIKLbgdLpAD35cBYbnn8zvy8/QM1zTxegKpF4qmi
-         41iiyuwoWfNjq3sJO3sPmWiSKFm13n/gFXDQoPBQEx0nYqZne+mkiaKu5gpfa6Z+r3rd
-         OZmwiqPxU6YB+Q0bvEeH3JSev2nGSUvtIwDH5SypMoBzGF3N/NgwQh1BKrUw5PszwfsT
-         MgwvYu47+Wlnx53LnildlfaWQu+NuwNWiUB/wSgouRrdcbASBOUp822ccRK7vvkGDqSr
-         0QSA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=v1FHdFMdEE/JMWWujz9oOl3mtg84SZg9LKBOYtQhMLI=;
+        b=kiVjzhRopyep6+t1BYbaXwGJGEWwYARCmEme5u0NThV14Oe8t1NydcwhC6UzkCNK71
+         kaaCkSWw6xqoDQhin3FPe4IIPh2MZGRXgO1tBkpmeQRYvSKIMd5CsMB2CJYBkHe7gZ7J
+         /7v5ONtqAN16m/dqXXEWTxw5bd/N3wI8bDY6sttrhDGgJqIJpGO8zmpkdBoi7e7DR/MQ
+         pEoV++/Ej8GvfhRA+C4VytPOYhMAgcp0h3LOvtwxoZmPSCVgdn1u+XhMP40rZGHXuBzB
+         dQIr9M2Ywf06tIGyrFwLS+L6RYT6cCg8rnvI12CVR2ZHs0eU5r6e+OLN6fmd9+otsGBV
+         9tGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=P/0CRSsWR309VEfdTvmkAH62VoVLPO+9yFTnb7mMTGQ=;
-        b=YO9SY7gYHEc2nYX8IMMJORH3EomHAmU6YspsafXqt2Jna32GK2fdriCizoDPtZCea2
-         USg4uYTR5zezCS0l18kLmGo6DMkmh/8f8zfMmdq49m+5XUtpsMVTpZAUG2BjSRO3Rxch
-         So5etmk3hneMXa40Wvoje2rtIhdLfm8u8Yd+Yacps5IhtXWegESaEEnIVquXQQZ4DhLH
-         qhtem1+SytnQPrTJwptN4nIp/5wbCAGl/x3bcBXKwWIYBGxPFz+6Iomzynfy1pe26RB/
-         Mfx38B2QIM4w2AL7aXz/s+oSEddm9gBQxHl4oi+e3qu4M4QMUbyseKT6reAHOSm4fDou
-         CdiA==
-X-Gm-Message-State: AOAM530GdE5KdF9oiP2QkYgQDYw74szJkw4teSYWyEa8Kw9qeizxmYBl
-        bE987QlfJJtBJPB4EIPiozpJlpjZejyz/w==
-X-Google-Smtp-Source: ABdhPJyKqWbAIKPgIAtmGORMfioTT2yfchEtkWvOfNW2gnKo7TngyNS7XYXX1TDDeOOmS4Sovv8GbA==
-X-Received: by 2002:a05:620a:251:b0:6a6:8f5e:d56f with SMTP id q17-20020a05620a025100b006a68f5ed56fmr1888820qkn.315.1654202419990;
-        Thu, 02 Jun 2022 13:40:19 -0700 (PDT)
-Received: from [172.17.0.2] ([23.101.150.67])
-        by smtp.gmail.com with ESMTPSA id i8-20020a05620a404800b006a69aba9f19sm94716qko.80.2022.06.02.13.40.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 13:40:19 -0700 (PDT)
-Message-ID: <62992033.1c69fb81.c2711.0833@mx.google.com>
-Date:   Thu, 02 Jun 2022 13:40:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8453168007326788688=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=v1FHdFMdEE/JMWWujz9oOl3mtg84SZg9LKBOYtQhMLI=;
+        b=ksMxV9hCn6D3cQVSwYpqIMbXaU3/PISU7CMjbar/zW+NL/whztmtrKKMB3tO8HFK0R
+         R8cRT1+62ExriLviI02zX1JL8lIvlEOzRb2pfE43UmhNbnX4bCeWJupOD5x3Wwn3i7tP
+         ZWFOKquZQryficVh5sGfvjXrrVyg6Glhxcf3e1okrG29pDy1Kv8dhvLfLrGrG0Rzto9L
+         dJzNap6LyEgcry29+4QBgbFh0Xy6TedUOKnwWP0V2eI84yLssEDrJc2f0yxKkRBq7GhO
+         I2gMpGOQjRp3klkM75Q9rdDau8IZXQfAG+h7E64AimXbhYKl1ejTKs2EWq3vh0dj/h8U
+         WkQQ==
+X-Gm-Message-State: AOAM530iHjebku6Sru9gbCkrA3xI5aQruRZfKZ1agNC9jOWTYV1+3rF5
+        Hl8U5KjLw1dQUsSAq6dmaG7p+ECBcdHi2sqc/pu8uB2H
+X-Google-Smtp-Source: ABdhPJxldhDYKR0fp49ZXkjrwtn6GmVeZMPqp3TGHvBefQvLTwp6tGa47/dQE+np4nT7Oo7AjV84bonngp+1pWivCb8=
+X-Received: by 2002:a17:90b:3507:b0:1e3:4b80:5c7a with SMTP id
+ ls7-20020a17090b350700b001e34b805c7amr7287725pjb.4.1654202747222; Thu, 02 Jun
+ 2022 13:45:47 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [V2] btproxy: Allow to select multiple BT controllers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220602192501.90288-1-frederic.danis@collabora.com>
-References: <20220602192501.90288-1-frederic.danis@collabora.com>
+References: <20220602152613.79718-1-frederic.danis@collabora.com>
+In-Reply-To: <20220602152613.79718-1-frederic.danis@collabora.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 2 Jun 2022 13:45:36 -0700
+Message-ID: <CABBYNZJuhnwOpzU_fjuo648O-9-gH+HU0vbH-ueQXU=z1gSYSQ@mail.gmail.com>
+Subject: Re: [PATCH] btproxy: Allow to select multiple BT controllers
+To:     =?UTF-8?B?RnLDqWTDqXJpYyBEYW5pcw==?= <frederic.danis@collabora.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8453168007326788688==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Fr=C3=A9d=C3=A9ric,
 
-This is automated email and please do not reply to this email!
+On Thu, Jun 2, 2022 at 9:08 AM Fr=C3=A9d=C3=A9ric Danis
+<frederic.danis@collabora.com> wrote:
+>
+> When running on a computer with a real Bluetooth controller (e.g. hci0) a=
+nd
+> multiple emulators (e.g. hci1 and hci2) it isn't possible to use the
+> emulators with 2 test-runner vms.
+> If btproxy is started without index parameter the first test-runner will
+> use hci0, and btprox can't be started with multiple index parameters
+> (e.g. -i1 -i2).
+>
+> This patch allows to select the controllers to be used by btproxy.
 
-Dear submitter,
+Does it keep the old behavior and adds the possibility to enter -i
+command line option multiple times?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=646971
+> ---
+>  tools/btproxy.c | 48 ++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 34 insertions(+), 14 deletions(-)
+>
+> diff --git a/tools/btproxy.c b/tools/btproxy.c
+> index 94ca1c7fd..c09a504ff 100644
+> --- a/tools/btproxy.c
+> +++ b/tools/btproxy.c
+> @@ -48,6 +48,7 @@ struct sockaddr_hci {
+>  };
+>  #define HCI_CHANNEL_USER       1
+>  #define HCI_INDEX_NONE         0xffff
+> +#define HCI_INDEX_MAX          15
+>
+>  static uint16_t hci_index =3D HCI_INDEX_NONE;
+>  static bool client_active =3D false;
+> @@ -533,13 +534,28 @@ static bool setup_proxy(int host_fd, bool host_shut=
+down,
+>         return true;
+>  }
+>
+> -static int open_channel(uint16_t index)
+> +static int get_next_hci_index(int index)
+> +{
+> +       while (++index <=3D HCI_INDEX_MAX) {
+> +               if (hci_index & (1 << index))
+> +                       return index;
+> +       }
+> +
+> +       return -1;
+> +}
 
----Test result---
+Perhaps use util_get_uid?
 
-Test Summary:
-CheckPatch                    PASS      1.50 seconds
-GitLint                       PASS      1.02 seconds
-Prep - Setup ELL              PASS      43.07 seconds
-Build - Prep                  PASS      0.69 seconds
-Build - Configure             PASS      8.38 seconds
-Build - Make                  PASS      1350.13 seconds
-Make Check                    PASS      11.96 seconds
-Make Check w/Valgrind         PASS      440.72 seconds
-Make Distcheck                PASS      228.27 seconds
-Build w/ext ELL - Configure   PASS      8.47 seconds
-Build w/ext ELL - Make        PASS      1339.38 seconds
-Incremental Build with patchesPASS      0.00 seconds
+> +
+> +static int open_channel(int index)
+>  {
+>         struct sockaddr_hci addr;
+>         int fd, err;
+>
+> -       if (index =3D=3D HCI_INDEX_NONE)
+> -               index =3D 0;
+> +       if (index =3D=3D HCI_INDEX_NONE) {
+> +               index =3D get_next_hci_index(-1);
+> +               if (index < 0) {
+> +                       perror("No controller available");
+> +                       return -1;
+> +               }
+> +       }
+>
+>         printf("Opening user channel for hci%u\n", index);
+>
+> @@ -561,9 +577,10 @@ static int open_channel(uint16_t index)
+>                 /* Open next available controller if no specific index wa=
+s
+>                  * provided and the error indicates that the controller.
+>                  */
+> -               if (hci_index =3D=3D HCI_INDEX_NONE &&
+> +               index =3D get_next_hci_index(index);
+> +               if (index >=3D0 &&
+>                                 (err =3D=3D -EBUSY || err =3D=3D -EUSERS)=
+)
+> -                       return open_channel(++index);
+> +                       return open_channel(index);
+>
+>                 perror("Failed to bind Bluetooth socket");
+>                 return -1;
+> @@ -601,13 +618,7 @@ static void server_callback(int fd, uint32_t events,=
+ void *user_data)
+>                 return;
+>         }
+>
+> -       if (client_active && hci_index !=3D HCI_INDEX_NONE) {
+> -               fprintf(stderr, "Active client already present\n");
+> -               close(host_fd);
+> -               return;
+> -       }
+> -
+> -       dev_fd =3D open_channel(hci_index);
+> +       dev_fd =3D open_channel(HCI_INDEX_NONE);
+>         if (dev_fd < 0) {
+>                 close(host_fd);
+>                 return;
+> @@ -800,6 +811,7 @@ int main(int argc, char *argv[])
+>
+>         for (;;) {
+>                 int opt;
+> +               int index;
+>
+>                 opt =3D getopt_long(argc, argv, "rc:l::u::p:i:aezdvh",
+>                                                 main_options, NULL);
+> @@ -844,7 +856,15 @@ int main(int argc, char *argv[])
+>                                 usage();
+>                                 return EXIT_FAILURE;
+>                         }
+> -                       hci_index =3D atoi(str);
+> +                       index =3D atoi(str);
+> +                       if (index > HCI_INDEX_MAX) {
+> +                               fprintf(stderr, "Invalid controller index=
+\n");
+> +                               usage();
+> +                               return EXIT_FAILURE;
+> +                       }
+> +                       if (hci_index =3D=3D HCI_INDEX_NONE)
+> +                               hci_index =3D 0;
+> +                       hci_index |=3D 1 << index;
+>                         break;
+>                 case 'a':
+>                         type =3D HCI_AMP;
+> @@ -892,7 +912,7 @@ int main(int argc, char *argv[])
+>                 if (use_redirect) {
+>                         printf("Creating local redirect\n");
+>
+> -                       dev_fd =3D open_channel(hci_index);
+> +                       dev_fd =3D open_channel(HCI_INDEX_NONE);
+>                 } else {
+>                         printf("Connecting to %s:%u\n", connect_address,
+>                                                                 tcp_port)=
+;
+> --
+> 2.25.1
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8453168007326788688==--
+--=20
+Luiz Augusto von Dentz
