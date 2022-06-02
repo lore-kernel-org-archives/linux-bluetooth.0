@@ -2,165 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AC3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:59:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 753ECC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 16:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236686AbiFBP7a convert rfc822-to-8bit (ORCPT
+        id S230011AbiFBQAT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 11:59:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59960 "EHLO
+        Thu, 2 Jun 2022 12:00:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbiFBP73 (ORCPT
+        with ESMTP id S236745AbiFBQAQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 11:59:29 -0400
-Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 47C17D02BB;
-        Thu,  2 Jun 2022 08:59:25 -0700 (PDT)
-Received: from smtpclient.apple (p4ff9fc30.dip0.t-ipconnect.de [79.249.252.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2E1E8CED19;
-        Thu,  2 Jun 2022 17:59:24 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
-Subject: Re: [PATCH v6 5/5] Bluetooth: let HCI_QUALITY_REPORT persist over
- adapter power cycle
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20220526112135.2486883-3-josephsih@chromium.org>
-Date:   Thu, 2 Jun 2022 17:59:23 +0200
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Joseph Hwang <josephsih@google.com>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <0DB8D064-222A-4420-8F9F-2BEEA63DF76A@holtmann.org>
-References: <20220526112135.2486883-1-josephsih@chromium.org>
- <20220526112135.2486883-3-josephsih@chromium.org>
+        Thu, 2 Jun 2022 12:00:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853BB1451EE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 09:00:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4396FB81FE4
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 16:00:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EAE9FC385A5;
+        Thu,  2 Jun 2022 16:00:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654185613;
+        bh=9Of1YxoKKXaXbUWdmBuE1s5iaiuMbG81Sq8qhibv1qc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=jY7RDlEUdRV0Agd13vCc/3l/V/VeyBIGeTwBgIiRQZNWBzE3KCnXyVjpaYnVp/hu+
+         zuLEPrUwv/o72m8c+Hk3fjraagE9qzIVqlgmCYvvUc2cxVtnYP3aZO/Qz8fD8VMhsw
+         jz2m50P9P7w18+LcC5A4Bl0DthzzcZCJQkaWQvK3pM/Mow5XJrx0ueo/W2Jpn4DeCl
+         +VmVEQ+wMkEsR4RDhhpAft5uTWq+If+Ri2ZuknbuIhJkoLJloj2yaJnzBUGhIJrsjA
+         lvEQuzoYqck5YO8iD/k7xFx8IXKaaE0rm9pRq2MZXQJXxNX7UrZWXH6A6BtJbC1Qh4
+         aH8f1QkNvBnCg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CE06AEAC09C;
+        Thu,  2 Jun 2022 16:00:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [BlueZ PATCH v6 1/8] doc: Introduce the quality report command and
+ event
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165418561283.15613.7221303146796113568.git-patchwork-notify@kernel.org>
+Date:   Thu, 02 Jun 2022 16:00:12 +0000
+References: <20220526112456.2488536-1-josephsih@chromium.org>
+In-Reply-To: <20220526112456.2488536-1-josephsih@chromium.org>
 To:     Joseph Hwang <josephsih@chromium.org>
-X-Mailer: Apple Mail (2.3696.100.31)
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org, josephsih@google.com,
+        chromeos-bluetooth-upstreaming@chromium.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+Hello:
 
-> The quality report specifications, including AOSP Bluetooth Quality
-> Report and Intel Telemetry Event, do not define what happen when
-> the adapter is turned off and then on. To be consistent among
-> different specifications and vendors, the quality report feature is
-> turned off when the adapter is powered off and is turned on when
-> the adapter is powered on if the feature has been on before power
-> cycle.
+This series was applied to bluetooth/bluez.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
+
+On Thu, 26 May 2022 19:24:49 +0800 you wrote:
+> Add the MGMT quality report command and event in doc/mgmt-api.txt.
 > 
-> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
 > ---
 > 
-> (no changes since v5)
+> Changes in v6:
+> - No update in this patch. The patch 3/8 is updated to resolve a
+>   patch conflict.
 > 
-> Changes in v5:
-> - This is a new patch in this series changes version.
-> 
-> include/net/bluetooth/hci_core.h |  1 -
-> net/bluetooth/hci_sync.c         | 35 +++++++++++++++++++++++++++++++-
-> 2 files changed, 34 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 9e48d606591e..5788350efa68 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -807,7 +807,6 @@ extern struct mutex hci_cb_list_lock;
-> 		hci_dev_clear_flag(hdev, HCI_LE_ADV);		\
-> 		hci_dev_clear_flag(hdev, HCI_LL_RPA_RESOLUTION);\
-> 		hci_dev_clear_flag(hdev, HCI_PERIODIC_INQ);	\
-> -		hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);	\
-> 	} while (0)
+> [...]
 
-this really need to go into your 1/5 patch.
+Here is the summary with links:
+  - [BlueZ,v6,1/8] doc: Introduce the quality report command and event
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=93850c827d54
+  - [BlueZ,v6,2/8] lib: Add structures and constants for quality report command and event
+    (no matching commit)
+  - [BlueZ,v6,3/8] adapter: remove quality report from experimental features
+    (no matching commit)
+  - [BlueZ,v6,4/8] adapter: support AOSP MGMT_EV_QUALITY_REPORT
+    (no matching commit)
+  - [BlueZ,v6,5/8] adapter: support Intel MGMT_EV_QUALITY_REPORT
+    (no matching commit)
+  - [BlueZ,v6,6/8] tools/btmgmt: fix quality report command
+    (no matching commit)
+  - [BlueZ,v6,7/8] monitor: print quality report cmd
+    (no matching commit)
+  - [BlueZ,v6,8/8] monitor: packet: add missing decodings of MGMT commands to todo
+    (no matching commit)
 
-> 
-> #define hci_dev_le_state_simultaneous(hdev) \
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index a6ada9dcede5..12a18d046bb6 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -3849,6 +3849,31 @@ static const struct {
-> 			 "advertised, but not supported.")
-> };
-> 
-> +static void suspend_resume_quality_report(struct hci_dev *hdev, bool enable)
-> +{
-> +	int err;
-> +
-> +	/* Suspend and resume quality report only when the feature has
-> +	 * already been enabled. The HCI_QUALITY_REPORT flag, as an indicator
-> +	 * whether to re-enable the feature after resume, is not changed by
-> +	 * suspend/resume.
-> +	 */
-> +	if (!hci_dev_test_flag(hdev, HCI_QUALITY_REPORT))
-> +		return;
-> +
-> +	if (hdev->set_quality_report)
-> +		err = hdev->set_quality_report(hdev, enable);
-> +	else
-> +		err = aosp_set_quality_report(hdev, enable);
-> +
-> +	if (err)
-> +		bt_dev_err(hdev, "%s quality report error %d",
-> +			   enable ? "resume" : "suspend", err);
-> +	else
-> +		bt_dev_info(hdev, "%s quality report",
-> +			    enable ? "resume" : "suspend");
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Do you really need this “debug” output?
-
-> +}
-> +
-> int hci_dev_open_sync(struct hci_dev *hdev)
-> {
-> 	int ret = 0;
-> @@ -4013,6 +4038,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
-> 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> 		msft_do_open(hdev);
-> 		aosp_do_open(hdev);
-> +		suspend_resume_quality_report(hdev, true);
-> 	}
-> 
-> 	clear_bit(HCI_INIT, &hdev->flags);
-> @@ -4095,6 +4121,14 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> 
-> 	hci_request_cancel_all(hdev);
-> 
-> +	/* Disable quality report and close aosp before shutdown()
-> +	 * is called. Otherwise, some chips may panic.
-> +	 */
-> +	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> +		suspend_resume_quality_report(hdev, false);
-> +		aosp_do_close(hdev);
-> +	}
-> +
-
-Why move aosp_do_close here. I prefer to keep it where it was.
-
-> 	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> 	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> 	    test_bit(HCI_UP, &hdev->flags)) {
-> @@ -4158,7 +4192,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
-> 
-> 	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> -		aosp_do_close(hdev);
-> 		msft_do_close(hdev);
-> 	}
-
-Regards
-
-Marcel
 
