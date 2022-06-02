@@ -2,136 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAAFCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:30:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DD5C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:30:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236409AbiFBPaK (ORCPT
+        id S236409AbiFBPam convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 11:30:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58350 "EHLO
+        Thu, 2 Jun 2022 11:30:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235527AbiFBPaI (ORCPT
+        with ESMTP id S234580AbiFBPal (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 11:30:08 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A38D13C351
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 08:30:07 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-30026cf9af8so45581047b3.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 08:30:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=2nAGCZ2HRmIXfv8rT8uSoEGsDABE/p5lJinXX/zQGnA=;
-        b=IfIrft4dh0L+HPBnonus5+t8id1FCITlCEYwqDadPZIb9negqKU7CN3IGx3i8hTnhR
-         kB6ouvKEZZZP0zF0B8cw1UOa/f8y3XVDhpPK7cRzGLWUcglbKxAbMtNc0hniyy5/hL7F
-         Osuhj77CqUU9jyA7mlllRNA736rv4LPVJjfzC0DsNurQR5dVgRYPdP8tdusDwF0hE3ZR
-         qyCRo4MI1G6T2kSnla0yA76He3F+Fquw4jlhF3DudC+aK0Md+LME2aC1Bi/fTYB2sq+0
-         HQb17wBXpRy+YvXh3tfiB/Nk1Ba3q4rmQZEtl92xvisIC2C60EziP4l54dD3Um39VU9G
-         pPSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=2nAGCZ2HRmIXfv8rT8uSoEGsDABE/p5lJinXX/zQGnA=;
-        b=07HC6nzHVwfu7kp4A5PoDL40I73RsTBd2w65iLECnMrpPiRRPd8iEUgnyMZCRnsleq
-         ovr0RSwLHhEGU0290JmQrGpyB+z7GFzkeOHJaXrrtrBFC8dEtmYMKASefK79G8B/40X0
-         bHqJ4ToXAgOCGo9QijYKNvm2965Ipkx01bA8WHcrek+ocud7CwcqRjVV3ibQhKIJlibH
-         EnoOBIPKxe3Mu5JQ7x2vEuHhyQPSKyvNxQWkIeu0isHCFQ7sUPHBoFtESi0129BNAMh4
-         KQ2dE5eVzLPXXVo0GKN16r87G16U+8IIjgb19JLvbfd3wR44HvkiiNQNDddRRL49iLYR
-         AsPg==
-X-Gm-Message-State: AOAM531E8akIMxqJZ02SkgTpT62DEJI84X8NQS3tpjrVnPxDYCsTacKW
-        bzCwf6JtRBDFZuytMTRE2b858JEXO7d+d8gh44fgrhg88h7QmOHUCVpJoLhA6UAK+J83Ra6uqMu
-        PrYL/aAcK5DiTHkwQQN0JoRym7DW8oLo9T0o8iQ9MIpK4QNGXsP2CVozHE6IDEQzSl5seIdq+um
-        U6lyUFn5okSvux9A==
-X-Google-Smtp-Source: ABdhPJx9WENoVblAMpg4ET+k1EH0awq1ra4yhT0qlJy920LyMKD8OOajT85XeuhNvx8xInBSN3eh9VZql+trNKSgB1w=
-X-Received: from alainmic.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2890])
- (user=alainmichaud job=sendgmr) by 2002:a25:2c4c:0:b0:65d:3767:2ef2 with SMTP
- id s73-20020a252c4c000000b0065d37672ef2mr5957046ybs.570.1654183806234; Thu,
- 02 Jun 2022 08:30:06 -0700 (PDT)
-Date:   Thu,  2 Jun 2022 15:30:03 +0000
-Message-Id: <20220602152952.v3.1.I9f2f4ef058af96a5ad610a90c6938ed17a7d103f@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v3] Bluetooth: clear the temporary linkkey in hci_conn_cleanup
-From:   Alain Michaud <alainmichaud@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 2 Jun 2022 11:30:41 -0400
+Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D418913C1FA
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 08:30:38 -0700 (PDT)
+Received: from smtpclient.apple (p4ff9fc30.dip0.t-ipconnect.de [79.249.252.48])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5068CCED1B;
+        Thu,  2 Jun 2022 17:30:38 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
+Subject: Re: [PATCH 1/3] Bluetooth: Add bt_status
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLurFxPz6MKzX3RmCO_usvayZoxK29eVBahWN_WFu4LtA@mail.gmail.com>
+Date:   Thu, 2 Jun 2022 17:30:37 +0200
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <D618974A-6335-4EE1-B980-F84808E0437E@holtmann.org>
+References: <20220513234611.1360704-1-luiz.dentz@gmail.com>
+ <83CE64EC-65DE-4DE9-994B-4729A35A6F64@holtmann.org>
+ <CABBYNZ+Pd-5VbptVNwyd+7J2cFYr3rPUtPPc+L2s8cqzbBkKLg@mail.gmail.com>
+ <56E87E28-21A2-400B-AB1B-EBEE2DBBC849@holtmann.org>
+ <CABBYNZLurFxPz6MKzX3RmCO_usvayZoxK29eVBahWN_WFu4LtA@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3696.100.31)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Alain Michaud <alainm@chromium.org>
+Hi Luiz,
 
-If a hardware error occurs and the connections are flushed without a
-disconnection_complete event being signaled, the temporary linkkeys are
-not flushed.
+>>>>> This adds bt_status which can be used to convert Unix errno to
+>>>>> Bluetooth status.
+>>>>> 
+>>>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>>>> ---
+>>>>> include/net/bluetooth/bluetooth.h | 1 +
+>>>>> net/bluetooth/lib.c | 71 +++++++++++++++++++++++++++++++
+>>>>> 2 files changed, 72 insertions(+)
+>>>>> 
+>>>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+>>>>> index 6b48d9e2aab9..cfe6159f26bc 100644
+>>>>> --- a/include/net/bluetooth/bluetooth.h
+>>>>> +++ b/include/net/bluetooth/bluetooth.h
+>>>>> @@ -521,6 +521,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+>>>>> }
+>>>>> 
+>>>>> int bt_to_errno(u16 code);
+>>>>> +__u8 bt_status(int err);
+>>>>> 
+>>>>> void hci_sock_set_flag(struct sock *sk, int nr);
+>>>>> void hci_sock_clear_flag(struct sock *sk, int nr);
+>>>>> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+>>>>> index 5326f41a58b7..469a0c95b6e8 100644
+>>>>> --- a/net/bluetooth/lib.c
+>>>>> +++ b/net/bluetooth/lib.c
+>>>>> @@ -135,6 +135,77 @@ int bt_to_errno(__u16 code)
+>>>>> }
+>>>>> EXPORT_SYMBOL(bt_to_errno);
+>>>>> 
+>>>>> +/* Unix errno to Bluetooth error codes mapping */
+>>>>> +__u8 bt_status(int err)
+>>>>> +{
+>>>>> + /* Don't convert if already positive value */
+>>>>> + if (err >= 0)
+>>>>> + return err;
+>>>>> +
+>>>>> + switch (err) {
+>>>>> + case -EBADRQC:
+>>>>> + return 0x01;
+>>>>> +
+>>>>> + case -ENOTCONN:
+>>>>> + return 0x02;
+>>>>> +
+>>>>> + case -EIO:
+>>>>> + return 0x03;
+>>>>> +
+>>>>> + case -EHOSTDOWN:
+>>>>> + return 0x04;
+>>>>> +
+>>>>> + case -EACCES:
+>>>>> + return 0x05;
+>>>>> +
+>>>>> + case -EBADE:
+>>>>> + return 0x06;
+>>>>> +
+>>>>> + case -ENOMEM:
+>>>>> + return 0x07;
+>>>>> +
+>>>>> + case -ETIMEDOUT:
+>>>>> + return 0x08;
+>>>>> +
+>>>>> + case -EMLINK:
+>>>>> + return 0x09;
+>>>>> +
+>>>>> + case EALREADY:
+>>>>> + return 0x0b;
+>>>>> +
+>>>>> + case -EBUSY:
+>>>>> + return 0x0c;
+>>>>> +
+>>>>> + case -ECONNREFUSED:
+>>>>> + return 0x0d;
+>>>>> +
+>>>>> + case -EOPNOTSUPP:
+>>>>> + return 0x11;
+>>>>> +
+>>>>> + case -EINVAL:
+>>>>> + return 0x12;
+>>>>> +
+>>>>> + case -ECONNRESET:
+>>>>> + return 0x13;
+>>>>> +
+>>>>> + case -ECONNABORTED:
+>>>>> + return 0x16;
+>>>>> +
+>>>>> + case ELOOP:
+>>>>> + return 0x17;
+>>>>> +
+>>>>> + case -EPROTONOSUPPORT:
+>>>>> + return 0x1a;
+>>>>> +
+>>>>> + case -EPROTO:
+>>>>> + return 0x19;
+>>>>> +
+>>>>> + default:
+>>>>> + return 0x1f;
+>>>>> + }
+>>>>> +}
+>>>>> +EXPORT_SYMBOL(bt_status);
+>>>>> +
+>>>> 
+>>>> why are exporting this?
+>>> 
+>>> Isn't it supposed to be exported since it is part of lib.c? All
+>>> functions in this file use it.
+>> 
+>> is it used outside of bluetooth.ko?
+> 
+> Currently not, I just thought it would be convenient to have it
+> accessible for the drivers as well since it is complementary to
+> bt_to_errno.
 
-This change ensures that any outstanding flushable linkkeys are flushed
-when the connection are flushed from the hash table.
+drivers should really not need this. They should not have to look at HCI error status. They are pure transport drivers.
 
-Additionally, this also makes use of test_and_clear_bit to avoid
-multiple attempts to delete the link key that's already been flushed.
+Regards
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
-
----
-
-Changes in v3:
--Adding test_and_clear_bit to the commit description based on Marcel's
-feedback
-
-Changes in v2:
--Address Feedback from Luiz
-
- net/bluetooth/hci_conn.c  | 3 +++
- net/bluetooth/hci_event.c | 4 ++--
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 352d7d612128..5911ca0c5239 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -118,6 +118,9 @@ static void hci_conn_cleanup(struct hci_conn *conn)
- 	if (test_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags))
- 		hci_conn_params_del(conn->hdev, &conn->dst, conn->dst_type);
- 
-+	if (test_and_clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-+		hci_remove_link_key(hdev, &conn->dst);
-+
- 	hci_chan_list_flush(conn);
- 
- 	hci_conn_hash_del(hdev, conn);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 6b83f9b0082c..b67fdd1ad8da 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2729,7 +2729,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- 	mgmt_conn = test_and_clear_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags);
- 
- 	if (conn->type == ACL_LINK) {
--		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-+		if (test_and_clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
- 			hci_remove_link_key(hdev, &conn->dst);
- 	}
- 
-@@ -3372,7 +3372,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, void *data,
- 				reason, mgmt_connected);
- 
- 	if (conn->type == ACL_LINK) {
--		if (test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
-+		if (test_and_clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
- 			hci_remove_link_key(hdev, &conn->dst);
- 
- 		hci_req_update_scan(hdev);
--- 
-2.36.1.255.ge46751e96f-goog
+Marcel
 
