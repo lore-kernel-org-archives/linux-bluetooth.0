@@ -2,159 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DD5C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 027CFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Jun 2022 15:37:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236409AbiFBPam convert rfc822-to-8bit (ORCPT
+        id S236476AbiFBPhy convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 11:30:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60922 "EHLO
+        Thu, 2 Jun 2022 11:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234580AbiFBPal (ORCPT
+        with ESMTP id S233446AbiFBPhx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 11:30:41 -0400
+        Thu, 2 Jun 2022 11:37:53 -0400
 Received: from mail.holtmann.org (coyote.holtmann.net [212.227.132.17])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D418913C1FA
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 08:30:38 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F63C6C0E5;
+        Thu,  2 Jun 2022 08:37:52 -0700 (PDT)
 Received: from smtpclient.apple (p4ff9fc30.dip0.t-ipconnect.de [79.249.252.48])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5068CCED1B;
-        Thu,  2 Jun 2022 17:30:38 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A443ACED19;
+        Thu,  2 Jun 2022 17:37:51 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.100.31\))
-Subject: Re: [PATCH 1/3] Bluetooth: Add bt_status
+Subject: Re: [PATCH] Bluetooth: When HCI work queue is drained, only queue
+ chained work.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZLurFxPz6MKzX3RmCO_usvayZoxK29eVBahWN_WFu4LtA@mail.gmail.com>
-Date:   Thu, 2 Jun 2022 17:30:37 +0200
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20220531184124.20577-1-schspa@gmail.com>
+Date:   Thu, 2 Jun 2022 17:37:51 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+63bed493aebbf6872647@syzkaller.appspotmail.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <D618974A-6335-4EE1-B980-F84808E0437E@holtmann.org>
-References: <20220513234611.1360704-1-luiz.dentz@gmail.com>
- <83CE64EC-65DE-4DE9-994B-4729A35A6F64@holtmann.org>
- <CABBYNZ+Pd-5VbptVNwyd+7J2cFYr3rPUtPPc+L2s8cqzbBkKLg@mail.gmail.com>
- <56E87E28-21A2-400B-AB1B-EBEE2DBBC849@holtmann.org>
- <CABBYNZLurFxPz6MKzX3RmCO_usvayZoxK29eVBahWN_WFu4LtA@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <4E08D734-E534-4EB7-A12A-7F5D232358ED@holtmann.org>
+References: <20220531184124.20577-1-schspa@gmail.com>
+To:     Schspa Shi <schspa@gmail.com>
 X-Mailer: Apple Mail (2.3696.100.31)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Schspa,
 
->>>>> This adds bt_status which can be used to convert Unix errno to
->>>>> Bluetooth status.
->>>>> 
->>>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>> ---
->>>>> include/net/bluetooth/bluetooth.h | 1 +
->>>>> net/bluetooth/lib.c | 71 +++++++++++++++++++++++++++++++
->>>>> 2 files changed, 72 insertions(+)
->>>>> 
->>>>> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->>>>> index 6b48d9e2aab9..cfe6159f26bc 100644
->>>>> --- a/include/net/bluetooth/bluetooth.h
->>>>> +++ b/include/net/bluetooth/bluetooth.h
->>>>> @@ -521,6 +521,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
->>>>> }
->>>>> 
->>>>> int bt_to_errno(u16 code);
->>>>> +__u8 bt_status(int err);
->>>>> 
->>>>> void hci_sock_set_flag(struct sock *sk, int nr);
->>>>> void hci_sock_clear_flag(struct sock *sk, int nr);
->>>>> diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
->>>>> index 5326f41a58b7..469a0c95b6e8 100644
->>>>> --- a/net/bluetooth/lib.c
->>>>> +++ b/net/bluetooth/lib.c
->>>>> @@ -135,6 +135,77 @@ int bt_to_errno(__u16 code)
->>>>> }
->>>>> EXPORT_SYMBOL(bt_to_errno);
->>>>> 
->>>>> +/* Unix errno to Bluetooth error codes mapping */
->>>>> +__u8 bt_status(int err)
->>>>> +{
->>>>> + /* Don't convert if already positive value */
->>>>> + if (err >= 0)
->>>>> + return err;
->>>>> +
->>>>> + switch (err) {
->>>>> + case -EBADRQC:
->>>>> + return 0x01;
->>>>> +
->>>>> + case -ENOTCONN:
->>>>> + return 0x02;
->>>>> +
->>>>> + case -EIO:
->>>>> + return 0x03;
->>>>> +
->>>>> + case -EHOSTDOWN:
->>>>> + return 0x04;
->>>>> +
->>>>> + case -EACCES:
->>>>> + return 0x05;
->>>>> +
->>>>> + case -EBADE:
->>>>> + return 0x06;
->>>>> +
->>>>> + case -ENOMEM:
->>>>> + return 0x07;
->>>>> +
->>>>> + case -ETIMEDOUT:
->>>>> + return 0x08;
->>>>> +
->>>>> + case -EMLINK:
->>>>> + return 0x09;
->>>>> +
->>>>> + case EALREADY:
->>>>> + return 0x0b;
->>>>> +
->>>>> + case -EBUSY:
->>>>> + return 0x0c;
->>>>> +
->>>>> + case -ECONNREFUSED:
->>>>> + return 0x0d;
->>>>> +
->>>>> + case -EOPNOTSUPP:
->>>>> + return 0x11;
->>>>> +
->>>>> + case -EINVAL:
->>>>> + return 0x12;
->>>>> +
->>>>> + case -ECONNRESET:
->>>>> + return 0x13;
->>>>> +
->>>>> + case -ECONNABORTED:
->>>>> + return 0x16;
->>>>> +
->>>>> + case ELOOP:
->>>>> + return 0x17;
->>>>> +
->>>>> + case -EPROTONOSUPPORT:
->>>>> + return 0x1a;
->>>>> +
->>>>> + case -EPROTO:
->>>>> + return 0x19;
->>>>> +
->>>>> + default:
->>>>> + return 0x1f;
->>>>> + }
->>>>> +}
->>>>> +EXPORT_SYMBOL(bt_status);
->>>>> +
->>>> 
->>>> why are exporting this?
->>> 
->>> Isn't it supposed to be exported since it is part of lib.c? All
->>> functions in this file use it.
->> 
->> is it used outside of bluetooth.ko?
+> The HCI command, event, and data packet processing workqueue is drained
+> to avoid deadlock in commit
+> 76727c02c1e1 ("Bluetooth: Call drain_workqueue() before resetting state").
 > 
-> Currently not, I just thought it would be convenient to have it
-> accessible for the drivers as well since it is complementary to
-> bt_to_errno.
+> There is another delayed work, which will queue command to this drained
+> workqueue. Which results in the following error report:
+> 
+> Bluetooth: hci2: command 0x040f tx timeout
+> WARNING: CPU: 1 PID: 18374 at kernel/workqueue.c:1438 __queue_work+0xdad/0x1140
+> Modules linked in:
+> CPU: 1 PID: 18374 Comm: kworker/1:9 Not tainted 5.18.0-rc6-next-20220516-syzkaller #0
+> Workqueue: events hci_cmd_timeout
+> RIP: 0010:__queue_work+0xdad/0x1140
+> RSP: 0000:ffffc90002cffc60 EFLAGS: 00010093
+> RAX: 0000000000000000 RBX: ffff8880b9d3ec00 RCX: 0000000000000000
+> RDX: ffff888024ba0000 RSI: ffffffff814e048d RDI: ffff8880b9d3ec08
+> RBP: 0000000000000008 R08: 0000000000000000 R09: 00000000b9d39700
+> R10: ffffffff814f73c6 R11: 0000000000000000 R12: ffff88807cce4c60
+> R13: 0000000000000000 R14: ffff8880796d8800 R15: ffff8880796d8800
+> FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000c0174b4000 CR3: 000000007cae9000 CR4: 00000000003506e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> ? queue_work_on+0xcb/0x110
+> ? lockdep_hardirqs_off+0x90/0xd0
+> queue_work_on+0xee/0x110
+> process_one_work+0x996/0x1610
+> ? pwq_dec_nr_in_flight+0x2a0/0x2a0
+> ? rwlock_bug.part.0+0x90/0x90
+> ? _raw_spin_lock_irq+0x41/0x50
+> worker_thread+0x665/0x1080
+> ? process_one_work+0x1610/0x1610
+> kthread+0x2e9/0x3a0
+> ? kthread_complete_and_exit+0x40/0x40
+> ret_from_fork+0x1f/0x30
+> </TASK>
+> 
+> To fix this, we can add a new HCI_DRAIN_WQ flag, and don't queue the
+> timeout workqueue while command workqueue is draining.
+> 
+> Fixes: 76727c02c1e1 ("Bluetooth: Call drain_workqueue() before resetting state")
+> Reported-by: syzbot+63bed493aebbf6872647@syzkaller.appspotmail.com
+> Signed-off-by: Schspa Shi <schspa@gmail.com>
+> ---
+> include/net/bluetooth/hci.h | 1 +
+> net/bluetooth/hci_core.c    | 8 +++++++-
+> net/bluetooth/hci_event.c   | 5 +++--
+> 3 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index fe7935be7dc4..c2cba0a621d3 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -291,6 +291,7 @@ enum {
+> 	HCI_RAW,
+> 
+> 	HCI_RESET,
+> +	HCI_DRAIN_WQ,
+> };
 
-drivers should really not need this. They should not have to look at HCI error status. They are pure transport drivers.
+no addition to this enum please. This is ABI. Use the other one and hci_dev_{set,clear}_flag.
+
+> 
+> /* HCI socket flags */
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5abb2ca5b129..ef3bd543ce04 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -593,6 +593,10 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+> 	skb_queue_purge(&hdev->rx_q);
+> 	skb_queue_purge(&hdev->cmd_q);
+> 
+> +	hci_dev_lock(hdev);
+> +	set_bit(HCI_DRAIN_WQ, &hdev->flags);
+> +	hci_dev_unlock(hdev);
+> +	cancel_delayed_work(&hdev->cmd_timer);
+
+Do you need to the locking here?
+
+> 	/* Avoid potential lockdep warnings from the *_flush() calls by
+> 	 * ensuring the workqueue is empty up front.
+> 	 */
+> @@ -601,6 +605,7 @@ static int hci_dev_do_reset(struct hci_dev *hdev)
+> 	hci_dev_lock(hdev);
+> 	hci_inquiry_cache_flush(hdev);
+> 	hci_conn_hash_flush(hdev);
+> +	clear_bit(HCI_DRAIN_WQ, &hdev->flags);
+> 	hci_dev_unlock(hdev);
+> 
+> 	if (hdev->flush)
+> @@ -3861,7 +3866,8 @@ static void hci_cmd_work(struct work_struct *work)
+> 			if (res < 0)
+> 				__hci_cmd_sync_cancel(hdev, -res);
+> 
+> -			if (test_bit(HCI_RESET, &hdev->flags))
+> +			if (test_bit(HCI_RESET, &hdev->flags) ||
+> +			    test_bit(HCI_DRAIN_WQ, &hdev->flags))
+> 				cancel_delayed_work(&hdev->cmd_timer);
+> 			else
+> 				schedule_delayed_work(&hdev->cmd_timer,
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index af17dfb20e01..700cd01df3a1 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3768,8 +3768,9 @@ static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
+> 			cancel_delayed_work(&hdev->ncmd_timer);
+> 			atomic_set(&hdev->cmd_cnt, 1);
+> 		} else {
+> -			schedule_delayed_work(&hdev->ncmd_timer,
+> -					      HCI_NCMD_TIMEOUT);
+> +			if (!test_bit(HCI_DRAIN_WQ, &hdev->flags))
+> +				schedule_delayed_work(&hdev->ncmd_timer,
+> +						      HCI_NCMD_TIMEOUT);
+> 		}
+> 	}
+> }
 
 Regards
 
