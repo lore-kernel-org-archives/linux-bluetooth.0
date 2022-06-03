@@ -2,101 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171FAC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 16:27:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36B12C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 21:26:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343912AbiFCQ1p (ORCPT
+        id S1346758AbiFCV0u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jun 2022 12:27:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33058 "EHLO
+        Fri, 3 Jun 2022 17:26:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238628AbiFCQ1o (ORCPT
+        with ESMTP id S1346661AbiFCV0t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jun 2022 12:27:44 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C8465159C
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jun 2022 09:27:42 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id r84so6354581qke.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jun 2022 09:27:42 -0700 (PDT)
+        Fri, 3 Jun 2022 17:26:49 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3432A7
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jun 2022 14:26:47 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id p130so2557076iod.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jun 2022 14:26:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ZBeoa+ieNcNVExpqwFvj5k+MJ+rM73ohVm4dejk1Qpk=;
-        b=c1Bmhgqk9QExal9Or44txzo7n63CVpO+d12hViOtA+Hh3CRj8O0ywGgfgsrOxx+Icb
-         BeRa1uL3aH9dLZQa/A6Y54Hxg6nGA4Ks+ZX5yty9BuC8G7MeYhSFXlMbiYsB+Pfwxyhv
-         ox+a61GKtio5i0G3ouzKNMXyXZgJBxDIN/cNyjR7FmTZrWeVy47TuchEVmlSPnSPKPf9
-         vDgUye/2TFy9BNedh+xbIJ4M+tuClCZY9JofsaOjxdxRimaiff99Nr5hBtdPhYv4Jyvt
-         Rd5ctQ+dO0z38PzlnGS/vl4MfRtNjqvSFbzlm/uVQGQ/WW9m6lnu9hjL22g83A0Dw0sa
-         gLSw==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mnufs1BjSjdmozj6JABcVVrpVW6MAUqL07hbBNcOciU=;
+        b=UHxFjtdBWGl+XyZQJgo1tVG54QqU8Gjiqvd290y46RDAS3li60l3aWxhyMA2D1sX47
+         RV2fm36ADUpn95DDrz1d1IrxqNsODEnZ0l+qmhmUuMYjIgkZHX6imPCKGpmdiM6FN6Eg
+         k77oLKWRkip4M5wFWrqidCS0IpoDSkMDk/RBogmTbz/KTFdNW7sHLVJ00ZSE+IdlxP2S
+         x6Z842kLxuUfhO26BsYVxIYD9ryjpCAnl8MBl4WI5ZcWOpYmA7Xas90yCycKJlWg3VwK
+         5SaY3AlhrR6Iy9CXWfShHLEXDHAvfKEZoCODymr/atAF4SvpAMljfXCM2reOGK33uvnK
+         SMgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ZBeoa+ieNcNVExpqwFvj5k+MJ+rM73ohVm4dejk1Qpk=;
-        b=po9QhAOTt684+gWk3xFSpBGy/bDTbmZYqbPuTextbct92P/hPBGjNg7jLYCBMYjBpu
-         7xnPaDCbTPgoiYnuK0cMCjZkYb5SwwOHlcIoSU1Flcc5RKeTOZXhNUZq0vNxdhax3+jQ
-         /faWKK7GQPyKEunhDFxJvwenqvUs2bY1ehhyQnFMnbgWpXbBfJHbFIbBtMef6HFyh4H1
-         shWJbIegOe7170j26HxXvh65N4VXI1Dq9jk25T+tJtnz3qUQ1BLN6HTdCuPSDifPGVLq
-         sZQhKgPKEA6TejoSi4sEd1qfKPc5BW0DGmqimf/3IfoUrWgBrp+TjIlrpCwkyrUQqf6q
-         WERw==
-X-Gm-Message-State: AOAM532Zb4DJ7CNMiwypmtVK01gch5o7SLNvhfsZiefNNzkWDlZn9eH1
-        b4aKJ/Wz9wNVVhlApXw/ux4fAaZ4sf1wxQ==
-X-Google-Smtp-Source: ABdhPJwzYSIIJhfUfSfxPwRI3ba1jAXkSvsRw5k+dWxjp6bkwaaWsI5mF1bg01JdfYyiLcWxoHNnJw==
-X-Received: by 2002:a37:6341:0:b0:6a6:7636:f347 with SMTP id x62-20020a376341000000b006a67636f347mr6506049qkb.48.1654273661402;
-        Fri, 03 Jun 2022 09:27:41 -0700 (PDT)
-Received: from [172.17.0.2] ([52.167.125.251])
-        by smtp.gmail.com with ESMTPSA id ca27-20020a05622a1f1b00b00304e43ac0a5sm29305qtb.79.2022.06.03.09.27.40
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mnufs1BjSjdmozj6JABcVVrpVW6MAUqL07hbBNcOciU=;
+        b=UFw5cb/n7JTPERDM50A9lNnvEkc68ceZgasrMjBPhYhnlnoqulu+snCRmEugZ70Nir
+         PkGb5ym810nUpgM9PxnoLmWta6elnJxBdKhC/5sXWdJIi2ryX8ypwXNhb92Ud8qwjtej
+         VoMuz4GB5wMR6tRLh+BewW1xmNPxTDBwAIl6+ZYTN23YTtC3WmIx8gfqgfsxEk3W7jeH
+         w5RxcGuXPlkfC0VIfyVmk7iVf5FbTxjeML1aE2nBL82vjUAuKak4Z6JDUhFcd4M/drNE
+         /dbMM4DkCSy7583y7/0GL8Iz+6QTKsKNJZIAMK8c1ubxN3+i/HVfr7ZSDouZdqNAAtZW
+         SDqA==
+X-Gm-Message-State: AOAM530iYsbo/iurh7tSmImzCzKnzaR0XBQJVh32NJ+71iarYLUkT7+J
+        tXe5iZHyFlRgRfcBS+0d4u8HeiNrvB4=
+X-Google-Smtp-Source: ABdhPJwfADS1hhq0efjk6Mic85gp10D4GrjcKVx9E0Btj5sVqYlIiA2KvYpNBDSFC4UtAMGesPg6bw==
+X-Received: by 2002:a05:6638:300b:b0:317:a127:53ac with SMTP id r11-20020a056638300b00b00317a12753acmr6380841jak.77.1654291606751;
+        Fri, 03 Jun 2022 14:26:46 -0700 (PDT)
+Received: from localhost.localdomain (c-68-47-51-143.hsd1.mn.comcast.net. [68.47.51.143])
+        by smtp.gmail.com with ESMTPSA id t17-20020a92c0d1000000b002d3da8e4af5sm2981806ilf.23.2022.06.03.14.26.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jun 2022 09:27:40 -0700 (PDT)
-Message-ID: <629a367c.1c69fb81.c1344.0377@mx.google.com>
-Date:   Fri, 03 Jun 2022 09:27:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1299158536062313690=="
+        Fri, 03 Jun 2022 14:26:46 -0700 (PDT)
+From:   Michael Brudevold <puffy.taco@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Michael Brudevold <michael.brudevold@veranexsolutions.com>
+Subject: [PATCH] doc/coding-style: Update URL to kernel coding style
+Date:   Fri,  3 Jun 2022 16:26:04 -0500
+Message-Id: <20220603212604.13758-1-puffy.taco@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, frederic.danis@collabora.com
-Subject: RE: [v3] btproxy: Allow to select multiple BT controllers
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220603145447.45655-1-frederic.danis@collabora.com>
-References: <20220603145447.45655-1-frederic.danis@collabora.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1299158536062313690==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=647234
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.55 seconds
-GitLint                       PASS      1.03 seconds
-Prep - Setup ELL              PASS      42.53 seconds
-Build - Prep                  PASS      0.68 seconds
-Build - Configure             PASS      8.56 seconds
-Build - Make                  PASS      1398.83 seconds
-Make Check                    PASS      11.29 seconds
-Make Check w/Valgrind         PASS      442.76 seconds
-Make Distcheck                PASS      229.56 seconds
-Build w/ext ELL - Configure   PASS      8.57 seconds
-Build w/ext ELL - Make        PASS      1377.99 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
+From: Michael Brudevold <michael.brudevold@veranexsolutions.com>
 
 ---
-Regards,
-Linux Bluetooth
+ doc/coding-style.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
+diff --git a/doc/coding-style.txt b/doc/coding-style.txt
+index f0bf880e3..e73158840 100644
+--- a/doc/coding-style.txt
++++ b/doc/coding-style.txt
+@@ -7,14 +7,14 @@ some level of consistency among developers so that code can be easily
+ understood and maintained.
+ 
+ First of all, BlueZ coding style must follow every rule for Linux kernel
+-(http://www.kernel.org/doc/Documentation/CodingStyle). There also exists a tool
+-named checkpatch.pl to help you check the compliance with it. Just type
+-"checkpatch.pl --no-tree patch_name" to check your patch. In theory, you need
+-to clean up all the warnings and errors except this one: "ERROR: Missing
+-Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
+-them is actually an error.  In certain circumstances one can ignore the 80
+-character per line limit.  This is generally only allowed if the alternative
+-would make the code even less readable.
++(https://www.kernel.org/doc/Documentation/process/coding-style.rst). There also
++exists a tool named checkpatch.pl to help you check the compliance with it.
++Just type "checkpatch.pl --no-tree patch_name" to check your patch. In theory,
++you need to clean up all the warnings and errors except this one: "ERROR:
++Missing Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so
++including them is actually an error.  In certain circumstances one can ignore
++the 80 character per line limit.  This is generally only allowed if the
++alternative would make the code even less readable.
+ 
+ Besides the kernel coding style above, BlueZ has special flavors for its own.
+ Some of them are mandatory (marked as 'M'), while some others are optional
+-- 
+2.25.1
 
---===============1299158536062313690==--
