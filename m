@@ -2,89 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6BAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 01:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E52B9C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 02:44:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240807AbiFCBZC (ORCPT
+        id S234935AbiFCCon (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Jun 2022 21:25:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43060 "EHLO
+        Thu, 2 Jun 2022 22:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235464AbiFCBYx (ORCPT
+        with ESMTP id S229714AbiFCCom (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Jun 2022 21:24:53 -0400
-Received: from cstnet.cn (smtp23.cstnet.cn [159.226.251.23])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B3C03B297;
-        Thu,  2 Jun 2022 18:24:50 -0700 (PDT)
-Received: from localhost.localdomain (unknown [124.16.138.126])
-        by APP-03 (Coremail) with SMTP id rQCowACniT7YYplitu8TAA--.28879S2;
-        Fri, 03 Jun 2022 09:24:46 +0800 (CST)
-From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
-To:     marcel@holtmann.org
-Cc:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jiasheng Jiang <jiasheng@iscas.ac.cn>
-Subject: [PATCH v2] Bluetooth: hci_intel: Add check for platform_driver_register
-Date:   Fri,  3 Jun 2022 09:24:36 +0800
-Message-Id: <20220603012436.3332620-1-jiasheng@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+        Thu, 2 Jun 2022 22:44:42 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E5F33360
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Jun 2022 19:44:41 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id v7so4659340ilo.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Jun 2022 19:44:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=2cNX7Xz45dnGbXPNyDWO02vOyqkZl5UKtTQqPFHjjTs=;
+        b=F91rYZtAmUP0Zz1mBcu97yXIZA7OVaK6qEFuRQTjdLzq5dgDyX2SYTiSYhHYf86n3f
+         POfF6zWBZHB0rll7YR1O0g8VoZ7zMXSQohmVZGawQ+h9VhJXdKoNMHDHQ8WQf44QLdUu
+         QzBZ2ur0DeO8ha3yPszx28IIFWMGoCBAzQH90lGjEu/+eC7BP9ldRkfJqMs0WciLlnuG
+         saDd8nLH2qzHaDdDDewFaXlYbBEPEtATv/S1JME0yTIM3TCMRHccJ9p120YXyjd67Kpq
+         KLb5u/pGwF1bPsgCtXHqme5hWIXas43JiFVf4MJW8Kvf63usyjlH8MGYaayD8iPVYSgO
+         HF6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=2cNX7Xz45dnGbXPNyDWO02vOyqkZl5UKtTQqPFHjjTs=;
+        b=Md0dyXVtCRn/x4sn/Py7YllpYIySAP8RUvVvCX+Q3KUmdkLEZ3O/352YSfqveC8dHB
+         5up0Y8WGqPJQDWtLWmXDmhVfJLCGQEKMRGSAasVCnn4k8xAAR6t5x9NEk7wp2P9JzQdx
+         TDWRPT38wMoK1MFbNVe9yc8uyIFEdV4bxjtqiGf8bH/zJLW4MCmJP8cWsgKqJ+hXzCPl
+         GRJdqFGXfq83I1g0pTe6J1lMt0qAAZDQ4yk0S9ZQO+Lfjom7RwO83/ExFaCqxR9lQkdD
+         QZTmFtgmmGRfrjqX+NM3wTYoFncIu1NNuolOYXJqsShjWuAi8HKF4lrZFvzcW6h2jaBL
+         nfFA==
+X-Gm-Message-State: AOAM530D0hTuiiQCU2g3GErNtnnRUwvsReb4gHOUcyWUslwhrg0f773D
+        DxXQ8TDlSD+kYtkejCIto9gYQPvEV3A=
+X-Google-Smtp-Source: ABdhPJxDgwiF7YeB2hBcnr1dbTbF5ARG3Hs/L/ugcpfnR7VLJ1xCQZOK7X81Nd8gCPkJS1rjVF8/VQ==
+X-Received: by 2002:a92:d743:0:b0:2b8:4642:8e3c with SMTP id e3-20020a92d743000000b002b846428e3cmr4574897ilq.244.1654224280473;
+        Thu, 02 Jun 2022 19:44:40 -0700 (PDT)
+Received: from [172.17.0.2] ([40.122.167.238])
+        by smtp.gmail.com with ESMTPSA id g23-20020a02bb97000000b0032e1e0ac289sm2028395jan.8.2022.06.02.19.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 19:44:40 -0700 (PDT)
+Message-ID: <62997598.1c69fb81.6f0e.5d9d@mx.google.com>
+Date:   Thu, 02 Jun 2022 19:44:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3102007990657842610=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: rQCowACniT7YYplitu8TAA--.28879S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrtw18uF43GFy5urWDXr18Zrb_yoWDArX_ur
-        1rZa43A3y8GFn3CF1jya13u34Yy3Z0grZ3XwnFqFyag3sxCrnxXw1UZrW7t3WxWryjqryD
-        Ar1DWFyxAr13GjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUIcSsGvfJTRUUUbwAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-        A2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
-        Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
-        1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-        jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-        1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxAIw28IcxkI7VAKI48J
-        MxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-        AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-        0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-        v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-        14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x0JUywZ7UUUUU=
-X-Originating-IP: [124.16.138.126]
-X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiasheng@iscas.ac.cn
+Subject: RE: [v2] Bluetooth: hci_intel: Add check for platform_driver_register
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220603012436.3332620-1-jiasheng@iscas.ac.cn>
+References: <20220603012436.3332620-1-jiasheng@iscas.ac.cn>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-As platform_driver_register() could fail, it should be better
-to deal with the return value in order to maintain the code
-consisitency.
+--===============3102007990657842610==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 1ab1f239bf17 ("Bluetooth: hci_intel: Add support for platform driver")
-Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=647016
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.28 seconds
+GitLint                       PASS      0.81 seconds
+SubjectPrefix                 PASS      0.65 seconds
+BuildKernel                   PASS      31.91 seconds
+BuildKernel32                 PASS      28.40 seconds
+Incremental Build with patchesPASS      38.03 seconds
+TestRunner: Setup             PASS      470.96 seconds
+TestRunner: l2cap-tester      PASS      17.18 seconds
+TestRunner: bnep-tester       PASS      6.01 seconds
+TestRunner: mgmt-tester       PASS      101.15 seconds
+TestRunner: rfcomm-tester     PASS      9.53 seconds
+TestRunner: sco-tester        PASS      9.37 seconds
+TestRunner: smp-tester        PASS      9.34 seconds
+TestRunner: userchan-tester   PASS      6.27 seconds
+
+
+
 ---
-Changelog:
+Regards,
+Linux Bluetooth
 
-v1 -> v2
 
-*Change 1. Change "iBluetooth" to "Bluetooth" in title.
-*Change 2. Change "ret" to "err" in code.
----
- drivers/bluetooth/hci_intel.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/hci_intel.c b/drivers/bluetooth/hci_intel.c
-index 7249b91d9b91..78afb9a348e7 100644
---- a/drivers/bluetooth/hci_intel.c
-+++ b/drivers/bluetooth/hci_intel.c
-@@ -1217,7 +1217,11 @@ static struct platform_driver intel_driver = {
- 
- int __init intel_init(void)
- {
--	platform_driver_register(&intel_driver);
-+	int err;
-+
-+	err = platform_driver_register(&intel_driver);
-+	if (err)
-+		return err;
- 
- 	return hci_uart_register_proto(&intel_proto);
- }
--- 
-2.25.1
-
+--===============3102007990657842610==--
