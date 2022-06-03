@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050B1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 22:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EBD2C43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Jun 2022 22:33:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349081AbiFCWcr (ORCPT
+        id S1349411AbiFCWdC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Jun 2022 18:32:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32980 "EHLO
+        Fri, 3 Jun 2022 18:33:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231882AbiFCWcq (ORCPT
+        with ESMTP id S1349402AbiFCWdA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Jun 2022 18:32:46 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EF9D29CBB
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jun 2022 15:32:45 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id h7so819951ila.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jun 2022 15:32:45 -0700 (PDT)
+        Fri, 3 Jun 2022 18:33:00 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 860542E9E7
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Jun 2022 15:32:58 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id f12so8418117ilj.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Jun 2022 15:32:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CthkhlRxZHKfmVUvwmEZ1uekjvuetDlWmyTRyQCf7Zc=;
-        b=SQ7PUshqEhXGPH/5m6qMrxb99LYLyHk7cp0jrCv+HnFeSpOT7SAzo/HDOrdKTd9L10
-         6hUKXqYdIjLBN3/f2aWY+U91CS02RuUmc0gFVdnoxgfqo7lIIjlnUMZ37Svht2Smk3hw
-         SqdQI73WHaMi3kRspxRYFHiv1kkTkl8uC2v1y+ws8Z1qBT47OtzwjBrIcFx+aveNnx9P
-         MrCBRZMiGyHuSgHJgBlp50oie5GGkhHlcBUROtho7SvzplZnixrvbmX8VJrDIszVjuku
-         xr2IXgzKQXZ3glWFCypsSCr3ll1rsAnmdvb9t7kvQ6KtFnv+vcuVogC+AmdMeeb9mu3d
-         6mJA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=RlbUKdRYhbuwJ9+pYBI5bv47N10bmhbx1OOaPiYvwaQ=;
+        b=iEeNT++T5TxtCWnbb6Q2ERYU3cNGF9ySxdFYzMHxGMIWlRYDfifvpc6G5Rau6Z0ga5
+         J8c6V+i2Cu7zbYZei5p4WiGuAx1sJCtJ5OY3visObfzG6qbL0y8ZBAvIJv/RWs4ZZxdm
+         TpqIalBhGV1DCT6unCZKF49UloTQUwCA0A9cq9Ta9+3sVFt8IkPXGNCoMkZBdE3B0rEC
+         hywJ2DCQki1Yy1WnKuxUBYNrPPkLQiyuLSj9Oph1t300u6tcsIWvRO6y10nZlrHgBLWW
+         af4t/mjdFytbrHaoxufJKhDkhd488Zb7rsBJpCsDbrSkpndjkdA0uLUO3B4wxbVU2SdB
+         rg/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=CthkhlRxZHKfmVUvwmEZ1uekjvuetDlWmyTRyQCf7Zc=;
-        b=4nk1wLlrQRev/BCaUzuYwPFF+nEeIIZ9CvuPYasnk9JItZ6f6bVQ0ngfUtw296D42I
-         +QZDgXSQZ0FELT0cbplh72NB07unZNh5bpB0ZHH/0EqM4RGlDC280jYECnnyb6Qbg7ic
-         3ZmMcjXk34lLX9e4Rvp+Zi1t1VRj6zxu/gInhxp2nDAHus45+zj9Mwz0B4F2DW+Y6BjQ
-         lK/JWFLxqBIiRj0H4rxEuR5I0XyOBxvJSHhK1ZfVmgCrg7BoNxg+HHdzbrEy8oRMeDQT
-         ShDmUTPxj5xdnfqvlvZ6fzW3ne+oUEzU24sDl5zEHJAF2KN8VW7M02eEJmZsEYXzKPma
-         urcQ==
-X-Gm-Message-State: AOAM532vdO/9/U+Jy2NSOvs96AxNnyypKpd7M85gHlgaib4rmVeKcVEx
-        HA3B70mDfRsujbv1rfxiUICSMgOZgfA=
-X-Google-Smtp-Source: ABdhPJzgmQsxyyFqgXmLPcAtd2NsSD7yyd3FPmxZEbGk/6DOIcOA8RP6nbdOnO+rmWfp+O8PZjrFAg==
-X-Received: by 2002:a05:6e02:16cc:b0:2d1:9a4c:db79 with SMTP id 12-20020a056e0216cc00b002d19a4cdb79mr7184509ilx.175.1654295564699;
-        Fri, 03 Jun 2022 15:32:44 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=RlbUKdRYhbuwJ9+pYBI5bv47N10bmhbx1OOaPiYvwaQ=;
+        b=MKc5dk81yslElHNQFDtMETz2yATAM7xLHh7xpwNIlv4e5sH0MfSP4yNEqBuHr+NpN0
+         HqT/kFkJUuSd1IU6nqj6ZnSRq7Kd7N0T6ieSZ3sNnSrTcTi6yougyDlLWfZzLQRFdJUX
+         g6nBupkkwHineXepv52FrNpxK9WLK+qKK9e6tV6Fzmyjc2ALvUW+zKWxy5kTeGaXta7r
+         e8mmRp0rwUzcn3KlkMv3GHoP3zzIVtimG/M+sG3g4IsSf7+IF4K/dn7HcoReskpnYtG/
+         DjX6rYx0oOvDlLfcqZcYWNt1T1dogWG4SJIv87kvLJYsJp+my7VxFiiKVtsSgb9fwUT5
+         wfTA==
+X-Gm-Message-State: AOAM5302gGKgjb10bYuD+swg3pqEdPm66DFjMIwF32hFeQrlUAO2jmxl
+        tkaqnJdc84MNbWRTKvuCCU9N+JKDqX4=
+X-Google-Smtp-Source: ABdhPJwQQfzOKralCJVmGkpPO4ebVuYMWPhGzdY1Ti55Mre6Bz04z8O0JdOOHYJYbeyCKaFcxebgug==
+X-Received: by 2002:a92:c847:0:b0:2d3:a915:39f7 with SMTP id b7-20020a92c847000000b002d3a91539f7mr6701013ilq.103.1654295577909;
+        Fri, 03 Jun 2022 15:32:57 -0700 (PDT)
 Received: from localhost.localdomain (c-68-47-51-143.hsd1.mn.comcast.net. [68.47.51.143])
-        by smtp.gmail.com with ESMTPSA id f2-20020a02b782000000b003315c00e885sm2825352jam.0.2022.06.03.15.32.44
+        by smtp.gmail.com with ESMTPSA id f2-20020a02b782000000b003315c00e885sm2825352jam.0.2022.06.03.15.32.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jun 2022 15:32:44 -0700 (PDT)
+        Fri, 03 Jun 2022 15:32:57 -0700 (PDT)
 From:   Michael Brudevold <puffy.taco@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Michael Brudevold <michael.brudevold@veranexsolutions.com>
-Subject: [PATCH 0/3] LE OOB pairing support
-Date:   Fri,  3 Jun 2022 17:32:22 -0500
-Message-Id: <20220603223225.20296-1-puffy.taco@gmail.com>
+Subject: [PATCH 1/3] eir: parse data types for LE OOB pairing
+Date:   Fri,  3 Jun 2022 17:32:23 -0500
+Message-Id: <20220603223225.20296-2-puffy.taco@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220603223225.20296-1-puffy.taco@gmail.com>
+References: <20220603223225.20296-1-puffy.taco@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,27 +66,75 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Michael Brudevold <michael.brudevold@veranexsolutions.com>
 
-This patch series implements userspace support for LE OOB pairing. It was
-tested against an nRF52 dev kit with Nordic's NFC pairing example. Support is
-only for reading a tag; generating and sending back OOB information was not
-implemented.
+---
+ src/eir.c | 21 +++++++++++++++++++++
+ src/eir.h |  4 ++++
+ 2 files changed, 25 insertions(+)
 
-Overall, LE EIR data is not dissimilar to BREDR, but the OOB blob starts off
-slightly differently necessitating a different code path before reaching the
-EIR parser.
-
-Michael Brudevold (3):
-  eir: parse data types for LE OOB pairing
-  Accept LE formatted EIR data with neard plugin
-  neard: Update D-Bus path and interface
-
- plugins/neard.c | 64 +++++++++++++++++++++++++++++++++++++++++++------
- src/adapter.c   |  3 ++-
- src/adapter.h   |  2 +-
- src/eir.c       | 21 ++++++++++++++++
- src/eir.h       |  4 ++++
- 5 files changed, 85 insertions(+), 9 deletions(-)
-
+diff --git a/src/eir.c b/src/eir.c
+index 2f9ee036f..fabfd6402 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -342,6 +342,15 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+ 			eir->did_version = data[6] | (data[7] << 8);
+ 			break;
+ 
++		case EIR_LE_DEVICE_ADDRESS:
++			if (data_len < sizeof(bdaddr_t) + 1)
++				break;
++
++			memcpy(&eir->addr, data, sizeof(bdaddr_t));
++			eir->addr_type = data[sizeof(bdaddr_t)] & 0x1 ?
++					BDADDR_LE_RANDOM : BDADDR_LE_PUBLIC;
++			break;
++
+ 		case EIR_SVC_DATA16:
+ 			eir_parse_uuid16_data(eir, data, data_len);
+ 			break;
+@@ -354,6 +363,18 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+ 			eir_parse_uuid128_data(eir, data, data_len);
+ 			break;
+ 
++		case EIR_LE_SC_CONF:
++			if (data_len < 16)
++				break;
++			eir->hash = util_memdup(data, 16);
++			break;
++
++		case EIR_LE_SC_RAND:
++			if (data_len < 16)
++				break;
++			eir->randomizer = util_memdup(data, 16);
++			break;
++
+ 		case EIR_MANUFACTURER_DATA:
+ 			eir_parse_msd(eir, data, data_len);
+ 			break;
+diff --git a/src/eir.h b/src/eir.h
+index 6154e23ec..241e6fac9 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -33,9 +33,12 @@
+ #define EIR_PUB_TRGT_ADDR           0x17  /* LE: Public Target Address */
+ #define EIR_RND_TRGT_ADDR           0x18  /* LE: Random Target Address */
+ #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
++#define EIR_LE_DEVICE_ADDRESS       0x1B  /* LE: Bluetooth Device Address */
+ #define EIR_SOLICIT32               0x1F  /* LE: Solicit UUIDs, 32-bit */
+ #define EIR_SVC_DATA32              0x20  /* LE: Service data, 32-bit UUID */
+ #define EIR_SVC_DATA128             0x21  /* LE: Service data, 128-bit UUID */
++#define EIR_LE_SC_CONF              0x22  /* LE: Secure Connections Confirmation Value */
++#define EIR_LE_SC_RAND              0x23  /* LE: Secure Connections Random Value */
+ #define EIR_TRANSPORT_DISCOVERY     0x26  /* Transport Discovery Service */
+ #define EIR_MANUFACTURER_DATA       0xFF  /* Manufacturer Specific Data */
+ 
+@@ -80,6 +83,7 @@ struct eir_data {
+ 	uint8_t *hash;
+ 	uint8_t *randomizer;
+ 	bdaddr_t addr;
++	uint8_t addr_type;
+ 	uint16_t did_vendor;
+ 	uint16_t did_product;
+ 	uint16_t did_version;
 -- 
 2.25.1
 
