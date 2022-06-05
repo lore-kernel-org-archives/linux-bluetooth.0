@@ -2,156 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB35C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Jun 2022 10:30:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7998EC43334
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Jun 2022 04:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234830AbiFDKad (ORCPT
+        id S243844AbiFEEuR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Jun 2022 06:30:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47390 "EHLO
+        Sun, 5 Jun 2022 00:50:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbiFDKac (ORCPT
+        with ESMTP id S233427AbiFEEuQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Jun 2022 06:30:32 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A08D36B55
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Jun 2022 03:30:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1654338632; x=1685874632;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=V5J1kQs4YGBIiiClAaQBghITW1ZUFoafiDQMrSJt7yc=;
-  b=agrOhrz+AQAmrhPEDIDdlmjySBEPmhkhdR57HEE/OushcDcoLq4+ZfjL
-   bKVC4XFRJezg6emKuqM2vdONybIJr6/GHwyNZ1rKxXa1Ly5K4X9AVsayy
-   S7+Vwcw9YR9rSJdkvNvd5q2ojRjUHNN+HB/7uSCnLlQ7ssPVr6PhyphMA
-   Hu1FI2eeuWGD35pDIwod+7VyCWuDpEgGEViNzElITdx5JCHfoIzN1dzMV
-   JAvkhqcyQsUu8jRcuSr6qMQRY1dGv7EU2ZR9wRMPCJW0Yoi/mh3NREq8h
-   CBd7P8LjJWbXbt+cp+ZvaLm9AiXj8kl+0xycFElmG26sRkuV22l5gApDs
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10367"; a="275220452"
-X-IronPort-AV: E=Sophos;i="5.91,277,1647327600"; 
-   d="scan'208";a="275220452"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2022 03:30:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,277,1647327600"; 
-   d="scan'208";a="668800870"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 04 Jun 2022 03:30:30 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nxR38-000AfZ-3M;
-        Sat, 04 Jun 2022 10:30:30 +0000
-Date:   Sat, 04 Jun 2022 18:29:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dba7abaead13f9dbf4e946f874127eae427d9947
-Message-ID: <629b341e.n6TTMCNzdCJBCJDm%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sun, 5 Jun 2022 00:50:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964E02B255;
+        Sat,  4 Jun 2022 21:50:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4DF2FB80B1B;
+        Sun,  5 Jun 2022 04:50:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DA623C3411D;
+        Sun,  5 Jun 2022 04:50:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654404612;
+        bh=RX2wEaBw82qW8ojxQw9653S7XMkj3wRobXYqpSRQXHY=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Egz0oID1xgX3HW6VgujboCzNGYko9LjV06+5OEQl7pDIhGxPeoXK1fR0ILGnN3m4P
+         v7HA1i7YdI+kxT2FifkSxNhApGx7OAavtLgd5EboylGcj83eXhcS/kwdfFqhl0LKM+
+         4gD1vX0mGNYAlKgzT7J4TQ/Q14pBjG5tzjBMn3ak3g6IDSrCI8jUC0cBarEeb6UBGJ
+         Q4uDsUztxufbv8GX47JN2N6YVj6hFvOyXZh27MWMY7GeobnsB5nGpOb/aWKb1xVuVP
+         80ukjIls+QU18BePxPxd0tUIbqzSEjDk+vcMHW2LzEwK0mhK7SNIjVfg9W2XIK3XUp
+         LuWEmWZIC1mrQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BFFEFF03875;
+        Sun,  5 Jun 2022 04:50:12 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT
+ binding
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165440461278.31102.12185070226615381233.git-patchwork-notify@kernel.org>
+Date:   Sun, 05 Jun 2022 04:50:12 +0000
+References: <20220524055642.1574769-1-a.fatoum@pengutronix.de>
+In-Reply-To: <20220524055642.1574769-1-a.fatoum@pengutronix.de>
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     kernel@pengutronix.de, krzysztof.kozlowski@linaro.org,
+        linus.walleij@linaro.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, davem@davemloft.net,
+        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+        robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+        devicetree@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dba7abaead13f9dbf4e946f874127eae427d9947  Bluetooth: When HCI work queue is drained, only queue chained work
+Hello:
 
-elapsed time: 1117m
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
 
-configs tested: 79
-configs skipped: 3
+On Tue, 24 May 2022 07:56:40 +0200 you wrote:
+> The BCM4349B1, aka CYW/BCM89359, is a WiFi+BT chip and its Bluetooth
+> portion can be controlled over serial.
+> Extend the binding with its DT compatible.
+> 
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> 
+> [...]
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Here is the summary with links:
+  - [v2,1/2] dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT binding
+    https://git.kernel.org/bluetooth/bluetooth-next/c/534fdae369a8
+  - [v2,2/2] Bluetooth: hci_bcm: Add BCM4349B1 variant
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a589ee43644c
 
-gcc tested configs:
-mips                             allyesconfig
-nios2                               defconfig
-alpha                               defconfig
-m68k                             allyesconfig
-xtensa                           allyesconfig
-csky                                defconfig
-arc                              allyesconfig
-sh                               allmodconfig
-alpha                            allyesconfig
-arc                                 defconfig
-nios2                            allyesconfig
-m68k                             allmodconfig
-h8300                            allyesconfig
-m68k                                defconfig
-mips                             allmodconfig
-parisc                              defconfig
-riscv                             allnoconfig
-riscv                            allyesconfig
-riscv                            allmodconfig
-riscv                    nommu_k210_defconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-s390                             allyesconfig
-riscv                          rv32_defconfig
-riscv                    nommu_virt_defconfig
-parisc64                            defconfig
-riscv                               defconfig
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-um                           x86_64_defconfig
-sparc                            allyesconfig
-um                             i386_defconfig
-sparc                               defconfig
-i386                   debian-10.3-kselftests
-powerpc                          allyesconfig
-i386                              debian-10.3
-i386                                defconfig
-i386                             allyesconfig
-arm64                               defconfig
-ia64                             allmodconfig
-arm                              allmodconfig
-ia64                                defconfig
-arm                              allyesconfig
-ia64                             allyesconfig
-arm64                            allyesconfig
-arm                                 defconfig
-i386                          randconfig-a001
-x86_64                        randconfig-a004
-i386                          randconfig-a003
-i386                          randconfig-a005
-x86_64                        randconfig-a002
-x86_64                        randconfig-a011
-x86_64                        randconfig-a008
-i386                          randconfig-a009
-i386                          randconfig-a010
-i386                          randconfig-a007
-x86_64                        randconfig-a006
-i386                          randconfig-a012
-x86_64                    rhel-8.3-kselftests
-x86_64                           rhel-8.3-syz
-x86_64                          rhel-8.3-func
-x86_64                         rhel-8.3-kunit
-x86_64                              defconfig
-x86_64                                  kexec
-x86_64                               rhel-8.3
-x86_64                           allyesconfig
-
-clang tested configs:
-i386                          randconfig-a002
-x86_64                        randconfig-a009
-x86_64                        randconfig-a007
-i386                          randconfig-a006
-x86_64                        randconfig-a010
-i386                          randconfig-a011
-x86_64                        randconfig-a005
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-i386                          randconfig-a008
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
