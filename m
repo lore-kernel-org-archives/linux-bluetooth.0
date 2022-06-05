@@ -2,101 +2,200 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 855E3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Jun 2022 14:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 027DEC43334
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Jun 2022 16:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245675AbiFEOVa (ORCPT
+        id S1351216AbiFEQZp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Jun 2022 10:21:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34248 "EHLO
+        Sun, 5 Jun 2022 12:25:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235486AbiFEOV2 (ORCPT
+        with ESMTP id S243238AbiFEQZo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Jun 2022 10:21:28 -0400
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C1D4889F
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Jun 2022 07:21:25 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id j2so8769579qvp.9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Jun 2022 07:21:25 -0700 (PDT)
+        Sun, 5 Jun 2022 12:25:44 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 526614B1D7;
+        Sun,  5 Jun 2022 09:25:41 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id x75so6040407qkb.12;
+        Sun, 05 Jun 2022 09:25:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=5rb1V9K0n9E+icb1CaQbnvv1HkmwsdjKly1i12KGywc=;
-        b=HePcYgK+aPmdm83QnEQsElwAScLoJNxgd8wWF6/CA4SKcRiwO/1gcxqD1sJ0F8XVCN
-         gMUKezAEYhov+Lz0yRQ7LkHVBRjh5Iz4knkS+bXQ59zdZrDh/Mc3gGWhx7mnfrLSLn4M
-         nBZezpYFwh7IK6/MFXOBMLfYishuoIIlQZvTrfa+RsvGuXKblNbqLoMUjwjt7SZ830sm
-         mZVezT88vc2o2GgnK66IRxTK/IGo5V+7gWz9/zo6gpI0dHcJq3QXRJLFB8pqac+NJTER
-         GtyDBMfO5hm4paCyqXEshIyzZ+oqPxW+lSpMPravZsstzq+K4Vbu8S9rjJey0i2wFABk
-         LDbg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jzeOZTwN2f/J/OJcQ9lpgGCRe+zk8pQI2TCaiI73TRE=;
+        b=VESAxWS8qarvWfNFu+/pNRu1oyDb4QAYE20AGmuwGmmwtvgDBIRdINCzScuCqhrQEP
+         nbSG/eWvfIV5IwD2Q6ELfgUbJ/QwBpMevOuJcrn2Tngbym4mYmsGCZTLJ3LY57euVqhz
+         BNV/sUJ3z6FfgMKAUKKs6Zve6jpr7mwQZ/1faxmZN7hTQBmvONTBwrpz0r2l/DwQF5kL
+         eSg4WAvBUJ8smR1gnsbOLCG0J2qQ2XNlhflL1x6qhXBeaCyDbq0JO4fPIpUEpg64L13Q
+         VQc9SsexygxMUL6+inGUiJlHsPRdMR3VouzVHHG1VZJqh0y/2yySFMlDkxK8bSjos+N8
+         mCVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=5rb1V9K0n9E+icb1CaQbnvv1HkmwsdjKly1i12KGywc=;
-        b=k02TgPmHO3E5p+BWKkt0fpMtxgNkftm5CsclEMOnwdxO/skz6uRb0DuefrF9mcQRct
-         C7RjDtEAYXgIF9JkUjDI8Fdc40iDOKK4InASlhwOD6vI1O78yyU8VvvgDoq3sFMVxXAO
-         muVUIj1H/WzFE9TwMVPR6oNe0HrslQea6WScQiM33oaGnUnVi1eRDgU5ApPQ6o9Zu/GT
-         hlLi8obKrT8aS0lqe0LBzF7LPSi32uAuTWiwjAsFA8oY95IxBIEnWcvxNq0jKcSNwQaD
-         NHl3X34tTwu0N0zv0BmIEu4aAvwXB9NeSsJwOG0qwoilNfFIS1Og50eOP2TiA9+ilP3/
-         yv0g==
-X-Gm-Message-State: AOAM531mMrWrlHGMf96RaUaC/vaCLKVpGVYHBHYBzClqVrwhR00I05oK
-        GuzpnaupZDkAUlWUk6oNrmmnaljLSIg=
-X-Google-Smtp-Source: ABdhPJx0ylZy1cCHEgGoExh7TPbNQFLvGEX8qrNKsH1kOBw/TA0Gg4IjUsL4haOEb/lQTzaqBC3hAA==
-X-Received: by 2002:ad4:5447:0:b0:461:d7a7:f0ec with SMTP id h7-20020ad45447000000b00461d7a7f0ecmr69499348qvt.21.1654438884930;
-        Sun, 05 Jun 2022 07:21:24 -0700 (PDT)
-Received: from [172.17.0.2] ([20.121.215.143])
-        by smtp.gmail.com with ESMTPSA id w19-20020a05620a445300b006a6b794dbc0sm1178551qkp.87.2022.06.05.07.21.24
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jzeOZTwN2f/J/OJcQ9lpgGCRe+zk8pQI2TCaiI73TRE=;
+        b=HMRH90a9gBVoXPEAMB47m5ZpZeDS/R/t7nE1uEYTCUojDlEr8nEQAVaTLjtQObV6Ub
+         nbnV2arqv5q709H9O1Np+5+Y9osZ+v0rezP0KdLzWvjyJp0XDkW0XskD7XnDOYeDh0kX
+         /oaBAJaESkFQVlJu9a/9k/lLfahpWjMVTBOza2KIZz4JTaQDt2qX8gLBnS6lm7YUrfGc
+         fTq9w4y/897OhgkqRTgG8qnNmq+0ABniob1mdUU6wfs13SiIMOM6Us5CNOn+76vghh4u
+         WjJJ8wjkzkzfkjrJ17zggjaH/57rGVdvnXl+mX4MeKNXX4sseh06fLK7QVXxC89GYiou
+         Reug==
+X-Gm-Message-State: AOAM530Dvgh5iXzwH+k59wbYVoV+UhhaeISGrcAaadFcbwAnCUDNzC9V
+        mnQ0M+xHSzfsez3onox3WjE=
+X-Google-Smtp-Source: ABdhPJwCwdzIOy3Bqh7K3E9XuHVpb5kIfVWzXT4od4LeMn8TqqOzG0zxkJg3OHcxYC2bclNuuBBwQg==
+X-Received: by 2002:a37:742:0:b0:6a6:9ed5:14ee with SMTP id 63-20020a370742000000b006a69ed514eemr8450287qkh.124.1654446340313;
+        Sun, 05 Jun 2022 09:25:40 -0700 (PDT)
+Received: from localhost (c-69-254-185-160.hsd1.fl.comcast.net. [69.254.185.160])
+        by smtp.gmail.com with ESMTPSA id 21-20020ac84e95000000b002f90a33c78csm9341222qtp.67.2022.06.05.09.25.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Jun 2022 07:21:24 -0700 (PDT)
-Message-ID: <629cbbe4.1c69fb81.c63d3.3037@mx.google.com>
-Date:   Sun, 05 Jun 2022 07:21:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8327341362679233533=="
+        Sun, 05 Jun 2022 09:25:39 -0700 (PDT)
+From:   Yury Norov <yury.norov@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Guo Ren <guoren@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-csky@vger.kernel.org
+Cc:     Yury Norov <yury.norov@gmail.com>,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        torvalds@linux-foundation.org
+Subject: [PATCH] net/bluetooth: fix erroneous use of bitmap_from_u64()
+Date:   Sun,  5 Jun 2022 09:25:37 -0700
+Message-Id: <20220605162537.1604762-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, pav@iki.fi
-Subject: RE: [BlueZ,1/2] a2dp: disallow multiple SetConfiguration to same local SEP
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220605122927.110627-1-pav@iki.fi>
-References: <20220605122927.110627-1-pav@iki.fi>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8327341362679233533==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The commit 0a97953fd221 ("lib: add bitmap_{from,to}_arr64") changed
+implementation of bitmap_from_u64(), so that it doesn't typecast
+argument to u64, and actually dereferences memory.
 
-This is automated email and please do not reply to this email!
+With that change, compiler spotted few places in bluetooth code
+where bitmap_from_u64 is called for 32-bit variable.
 
-Dear submitter,
+As reported by Sudip Mukherjee:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=647442
+"arm allmodconfig" fails with the error:
 
----Test result---
+In file included from ./include/linux/string.h:253,
+                 from ./include/linux/bitmap.h:11,
+                 from ./include/linux/cpumask.h:12,
+                 from ./include/linux/smp.h:13,
+                 from ./include/linux/lockdep.h:14,
+                 from ./include/linux/mutex.h:17,
+                 from ./include/linux/rfkill.h:35,
+                 from net/bluetooth/hci_core.c:29:
+In function 'fortify_memcpy_chk',
+    inlined from 'bitmap_copy' at ./include/linux/bitmap.h:254:2,
+    inlined from 'bitmap_copy_clear_tail' at ./include/linux/bitmap.h:263:2,
+    inlined from 'bitmap_from_u64' at ./include/linux/bitmap.h:540:2,
+    inlined from 'hci_bdaddr_list_add_with_flags' at net/bluetooth/hci_core.c:2156:2:
+./include/linux/fortify-string.h:344:25: error: call to '__write_overflow_field' declared with attribute warning:
++detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror=attribute-warning]
+  344 |                         __write_overflow_field(p_size_field, size);
 
-Test Summary:
-CheckPatch                    PASS      2.91 seconds
-GitLint                       PASS      1.84 seconds
-Prep - Setup ELL              PASS      43.36 seconds
-Build - Prep                  PASS      0.69 seconds
-Build - Configure             PASS      8.69 seconds
-Build - Make                  PASS      1280.99 seconds
-Make Check                    PASS      11.99 seconds
-Make Check w/Valgrind         PASS      445.82 seconds
-Make Distcheck                PASS      233.21 seconds
-Build w/ext ELL - Configure   PASS      8.80 seconds
-Build w/ext ELL - Make        PASS      1287.67 seconds
-Incremental Build with patchesPASS      2641.51 seconds
+And, "csky allmodconfig" fails with the error:
 
+In file included from ./include/linux/cpumask.h:12,
+                 from ./include/linux/mm_types_task.h:14,
+                 from ./include/linux/mm_types.h:5,
+                 from ./include/linux/buildid.h:5,
+                 from ./include/linux/module.h:14,
+                 from net/bluetooth/mgmt.c:27:
+In function 'bitmap_copy',
+    inlined from 'bitmap_copy_clear_tail' at ./include/linux/bitmap.h:263:2,
+    inlined from 'bitmap_from_u64' at ./include/linux/bitmap.h:540:2,
+    inlined from 'set_device_flags' at net/bluetooth/mgmt.c:4534:4:
+./include/linux/bitmap.h:254:9: error: 'memcpy' forming offset [4, 7] is out of the bounds [0, 4] of object 'flags'
++with type 'long unsigned int[1]' [-Werror=array-bounds]
+  254 |         memcpy(dst, src, len);
+      |         ^~~~~~~~~~~~~~~~~~~~~
+In file included from ./include/linux/kasan-checks.h:5,
+                 from ./include/asm-generic/rwonce.h:26,
+                 from ./arch/csky/include/generated/asm/rwonce.h:1,
+                 from ./include/linux/compiler.h:248,
+                 from ./include/linux/build_bug.h:5,
+                 from ./include/linux/container_of.h:5,
+                 from ./include/linux/list.h:5,
+                 from ./include/linux/module.h:12,
+                 from net/bluetooth/mgmt.c:27:
+net/bluetooth/mgmt.c: In function 'set_device_flags':
+net/bluetooth/mgmt.c:4532:40: note: 'flags' declared here
+ 4532 |                         DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
+      |                                        ^~~~~
+./include/linux/types.h:11:23: note: in definition of macro 'DECLARE_BITMAP'
+   11 |         unsigned long name[BITS_TO_LONGS(bits)]
 
+Fix it by replacing bitmap_from_u64 with bitmap_from_arr32.
 
+Reported-by: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 2 +-
+ net/bluetooth/mgmt.c     | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 5abb2ca5b129..2de7e1ec4035 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2153,7 +2153,7 @@ int hci_bdaddr_list_add_with_flags(struct list_head *list, bdaddr_t *bdaddr,
+ 
+ 	bacpy(&entry->bdaddr, bdaddr);
+ 	entry->bdaddr_type = type;
+-	bitmap_from_u64(entry->flags, flags);
++	bitmap_from_arr32(entry->flags, &flags, 32);
+ 
+ 	list_add(&entry->list, list);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 74937a834648..b63025c70c2c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4519,7 +4519,8 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 							      cp->addr.type);
+ 
+ 		if (br_params) {
+-			bitmap_from_u64(br_params->flags, current_flags);
++			bitmap_from_arr32(br_params->flags, &current_flags,
++					  __HCI_CONN_NUM_FLAGS);
+ 			status = MGMT_STATUS_SUCCESS;
+ 		} else {
+ 			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
+@@ -4531,7 +4532,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (params) {
+ 			DECLARE_BITMAP(flags, __HCI_CONN_NUM_FLAGS);
+ 
+-			bitmap_from_u64(flags, current_flags);
++			bitmap_from_arr32(flags, &current_flags, __HCI_CONN_NUM_FLAGS);
+ 
+ 			/* Devices using RPAs can only be programmed in the
+ 			 * acceptlist LL Privacy has been enable otherwise they
+@@ -4546,7 +4547,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				goto unlock;
+ 			}
+ 
+-			bitmap_from_u64(params->flags, current_flags);
++			bitmap_from_arr32(params->flags, &current_flags, __HCI_CONN_NUM_FLAGS);
+ 			status = MGMT_STATUS_SUCCESS;
+ 
+ 			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
+-- 
+2.32.0
 
---===============8327341362679233533==--
