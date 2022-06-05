@@ -2,83 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2FBC43334
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Jun 2022 04:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1D0C43334
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Jun 2022 06:56:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348971AbiFEEus (ORCPT
+        id S244245AbiFEG4Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Jun 2022 00:50:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
+        Sun, 5 Jun 2022 02:56:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243886AbiFEEuq (ORCPT
+        with ESMTP id S233243AbiFEG4Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Jun 2022 00:50:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5AD830549;
-        Sat,  4 Jun 2022 21:50:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 69D45B80B1E;
-        Sun,  5 Jun 2022 04:50:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E32ACC3411E;
-        Sun,  5 Jun 2022 04:50:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654404612;
-        bh=dcwSlAM5U/7L22E5xajUTM+Pauz9nH1K/BMqy+7wPyI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=mOsDVRbjz5GwqQvoPcx7EqqMXPf9HkN8EK1Z1c43r+4ryOBsbI30CCbaMjm5sV01k
-         F+i97c/Sdtod0bmakwgVMfD4O23whRRtIYmgXSUMTItihHTVGRusV96a/P5V9UPNyo
-         5D54mfOUnCpYzQaOKhwl/d6STWBPKTh+4PGyyKtyul70ku1ZLbaaxcAs1VV57uVBme
-         1stgadTt3efGwGnRTpc8V9Eg4YMmOC+I8cFYTmRjHkeN9NT95F22rgEMqZ1VLR6Hq4
-         DokZq+fdZBQBa7LTtLLuW1Rp1S+V230WE0BVPhQjo0WNIS9kQf8Idw/ODkLYc7ToqG
-         wPejng/EB8bXA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CAEECF5F177;
-        Sun,  5 Jun 2022 04:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Sun, 5 Jun 2022 02:56:24 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2486220BD4;
+        Sat,  4 Jun 2022 23:56:23 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id i1so9856492plg.7;
+        Sat, 04 Jun 2022 23:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mxNx/eu/+3jETThuZa71za5QJF8vd3IjqfaM5dMqnqk=;
+        b=Mp6NYVdXLrUrL7C1roe06pjMkSyBVQ/2fz0wh1lUh+HggBAcRPfF/C32aiQayJF4sw
+         gBrEuipC/tRivmIXfhOpqt6s4uDjZbVIaiVdGLEV1jVIhJKnKHmKzTzIzQhKYqxsn47H
+         pej6gfvFc71nKOP2Elh1uivP7eUc1tthIOi7/eNhKz00gBfWmFjRyP/9rBz2W1aC+rAo
+         bDc3McutohoWMJtGYdPzYc34bOk1snVrXhjUhN7Hyuw4lxZ/kV6XoHRY3cibARu8u4Ew
+         TjtobaRJebTk6xBBgSpnhpg61ujtVr4pgR9N1DLX1m1xf9BtgDe8HuRYn3qxztuODBf3
+         mO6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mxNx/eu/+3jETThuZa71za5QJF8vd3IjqfaM5dMqnqk=;
+        b=lnrAWMtcXdXGI61XqUIPEQHkpYcYVNS3bzBgb4jwiA+qEdGCmVPFwxs6AQRWFENegC
+         Q/mm6zVPCCr7eEYdQsArmJilfp8863cOfnkO/Rf+PrWw9T0ngdPWhIzQ3pOFTrvKHLzU
+         zA7Yh4KB6bBduw5sDtOppQ/2Ix0NlS4Q0stleQonqmtef4m/Laf8dL1efWOLQgkKnaUn
+         ixfLQt9L9AMerPbPaa/eoyu9ybiAcl4oE2TjRFGQQLs6W5KZYdcQNbnwJ4B393bBHo6u
+         udggoBC0xo6D16OtQ8OYHqFck51DgWblmp+KocNM9mR8i3i4ZTD4MX2CuXR6XJ2+c1uX
+         6Tfw==
+X-Gm-Message-State: AOAM532PuEB7Uu3TsIxOS+RyF2AqsGlqO/S9gGMvjq5DGuCUTu+5EG4j
+        CNE96o/YjPn+MS6mrloWeEg=
+X-Google-Smtp-Source: ABdhPJxivFGKaULMkM3wSdRQeNIS7sRldLfuI2XMX39T38Nn7ulyFHC7xdXCcB9raJA3YQm2LoEZxg==
+X-Received: by 2002:a17:90a:4a0b:b0:1df:7168:9888 with SMTP id e11-20020a17090a4a0b00b001df71689888mr55014212pjh.16.1654412182543;
+        Sat, 04 Jun 2022 23:56:22 -0700 (PDT)
+Received: from localhost.localdomain ([202.120.234.246])
+        by smtp.googlemail.com with ESMTPSA id q11-20020a170902a3cb00b0015f0dcd1579sm8239871plb.9.2022.06.04.23.56.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Jun 2022 23:56:21 -0700 (PDT)
+From:   Miaoqian Lin <linmq006@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     linmq006@gmail.com
+Subject: [PATCH] Bluetooth: btbcm: Fix refcount leak in btbcm_get_board_name
+Date:   Sun,  5 Jun 2022 10:56:13 +0400
+Message-Id: <20220605065614.1332-1-linmq006@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] Bluetooth: Fix index added after unregister
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165440461282.31102.17462326993445996139.git-patchwork-notify@kernel.org>
-Date:   Sun, 05 Jun 2022 04:50:12 +0000
-References: <20220602094645.1.I7d191480c15b45a237b927e26aa26ba806409efb@changeid>
-In-Reply-To: <20220602094645.1.I7d191480c15b45a237b927e26aa26ba806409efb@changeid>
-To:     Abhishek Pandit-Subedi <abhishekpandit@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, abhishekpandit@chromium.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        johan.hedberg@gmail.com, pabeni@redhat.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+of_find_node_by_path() returns a node pointer with refcount incremented,
+we should use of_node_put() on it when not need anymore.
+Add missing of_node_put() in the error path to avoid refcount leak.
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Marcel Holtmann <marcel@holtmann.org>:
+Fixes: 63fac3343b99 ("Bluetooth: btbcm: Support per-board firmware variants")
+Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+---
+ drivers/bluetooth/btbcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Thu,  2 Jun 2022 09:46:49 -0700 you wrote:
-> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> When a userchannel socket is released, we should check whether the hdev
-> is already unregistered before sending out an IndexAdded.
-> 
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [1/2] Bluetooth: Fix index added after unregister
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8d4b73539cca
-  - [2/2] Bluetooth: Unregister suspend with userchannel
-    https://git.kernel.org/bluetooth/bluetooth-next/c/d6bb2a91f95b
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 76fbb046bdbe..6f05054794e8 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -495,8 +495,10 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	if (!root)
+ 		return NULL;
+ 
+-	if (of_property_read_string_index(root, "compatible", 0, &tmp))
++	if (of_property_read_string_index(root, "compatible", 0, &tmp)) {
++		of_node_put(root);
+ 		return NULL;
++	}
+ 
+ 	/* get rid of any '/' in the compatible string */
+ 	len = strlen(tmp) + 1;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
