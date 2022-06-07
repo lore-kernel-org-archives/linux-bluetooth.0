@@ -2,125 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2ADC43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 06:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6ABC43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 07:44:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236035AbiFGGkf (ORCPT
+        id S237845AbiFGHon convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jun 2022 02:40:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43546 "EHLO
+        Tue, 7 Jun 2022 03:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237163AbiFGGk1 (ORCPT
+        with ESMTP id S237838AbiFGHon (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jun 2022 02:40:27 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA02DB35A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jun 2022 23:40:16 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id v22so29521809ybd.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jun 2022 23:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wEc7mGmsNlxPGgRKnQouLQVLN0FyFFR8zWtxf+XLT5Y=;
-        b=VQj7yiUvQgoiAFcdz7ifEFWqZ+y0VZzKesE/2UODgVLs6F7vG0DKMgDEVIGf76/DE5
-         iMYM+Daqcyf6MRRrzUbWhmfM9wvehOqeVorRfylT4d6EsI5JJPCFMEE5UGr6cxwzhrIU
-         NnX+KsnAI6ZM/fES0xf0lgZDkWf3+pM5MC/Cj2P3fRJiIBIYD0ANf29DdlaRroTKWv+i
-         S7xCs6CXlvp4LYCvCy6tFAoTXLfAoeNwCDRn1rv3pd7UDqeGrOMVzAj/OV/6UpDblPHo
-         LvEXqi/Hohj0RY6uHknuMCQ5KjzrGwbe92Hmb8FzGpRPkrDh+o8WJRZvVIyP6uZi57qn
-         Y2oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wEc7mGmsNlxPGgRKnQouLQVLN0FyFFR8zWtxf+XLT5Y=;
-        b=P4L9bkv0N5zN4Xbfm3WukAsyk+1zRBr8qMjldPh6sLE6ASquL7jMHcfuqoKs/8hqIZ
-         72yekfeAzZiPQ15cUw4J5OKVvGiMLeRf80Vf3tlPjplBAu28K72THDK+4bfwVDr/oPtp
-         MW26j37ckMnjkdgMixbSTXu3l0B9HdlTQXZyDUBZj6O1FJz/Pu1E9EleG3VK1bk4/5oS
-         IEH0zYAPdQMpRcSEYlRctVk3cqcIncUl9t0bBJe3+ZLLsZZMszRe7AkNr90V8GHfvKgB
-         cPv06wGREaofNcmV6JzPwHExxrvSSaf/J4P7fMlaVCtvrB5w+rOCMvHUMj04eTPFUY/C
-         eCqQ==
-X-Gm-Message-State: AOAM532/MmdX0HfAN9Y+HkNX6Y1M0+oi5DYpPYBjnTxRiYS8YZRfJwGM
-        qt2IkTopv2zaFSgaOr3p5PlMM+BgzghYdIq6QxFp1W6l13MH1g==
-X-Google-Smtp-Source: ABdhPJwPdrDiLaYd3HSf/i6sxrTLFp0xHhw+fCEH5ebNWy+b4QDFcH/Jznd1yceQcN6Hk1AN51jkQ3OnOiRZEHFeyBM=
-X-Received: by 2002:a25:9ac8:0:b0:64d:fee6:1c8 with SMTP id
- t8-20020a259ac8000000b0064dfee601c8mr28674355ybo.344.1654584015888; Mon, 06
- Jun 2022 23:40:15 -0700 (PDT)
+        Tue, 7 Jun 2022 03:44:43 -0400
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86262ED4A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 00:44:40 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id AFEF924002C
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 09:44:38 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4LHMnH6QLKz6tnP
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 09:44:19 +0200 (CEST)
+Date:   Tue, 07 Jun 2022 07:44:18 +0000
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_BlueZ_1/2=5D_a2dp=3A_disallow_mul?= =?US-ASCII?Q?tiple_SetConfiguration_to_same_local_SEP?=
+In-Reply-To: <CABBYNZJ4f-wxZwPdYWzxQWHfG+x46HMiPZ=TmG7S74DGhPVW2A@mail.gmail.com>
+References: <20220605122927.110627-1-pav@iki.fi> <CABBYNZJ4f-wxZwPdYWzxQWHfG+x46HMiPZ=TmG7S74DGhPVW2A@mail.gmail.com>
+Message-ID: <4869E0D3-587C-4361-ABDE-12FE73C16390@iki.fi>
 MIME-Version: 1.0
-References: <20220526112456.2488536-1-josephsih@chromium.org> <165418561283.15613.7221303146796113568.git-patchwork-notify@kernel.org>
-In-Reply-To: <165418561283.15613.7221303146796113568.git-patchwork-notify@kernel.org>
-From:   Joseph Hwang <josephsih@google.com>
-Date:   Tue, 7 Jun 2022 14:40:04 +0800
-Message-ID: <CAHFy41-LJLt4r5_wsHgg9pCH4jZL0+uKH-guNGGOH8pAFvn_2A@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v6 1/8] doc: Introduce the quality report command
- and event
-To:     patchwork-bot+bluetooth@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel:
+Hi Luiz,
 
-  Do you mean to apply the first patch in the series or to apply the 8
-patches in the whole series?
-
-  It seems that only the first patch was applied in
-https://git.kernel.org/pub/scm/bluetooth/bluez.git
-
-  Just would like to confirm with you. Thanks!
-
-Regards,
-Joseph
-
-On Fri, Jun 3, 2022 at 12:00 AM <patchwork-bot+bluetooth@kernel.org> wrote:
+7. kesäkuuta 2022 8.33.46 GMT+03:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com> kirjoitti:
+>Hi Pauli,
 >
-> Hello:
+>On Sun, Jun 5, 2022 at 9:47 PM Pauli Virtanen <pav@iki.fi> wrote:
+>>
+>> Using the remote SEP SetConfiguration DBus API, it's possible to make
+>> multiple remote endpoints use the same local SEP, if they are endpoints
+>> from different connected devices. This is invalid: successful
+>> configuration shall prevent a different device configuring the same SEP
+>> (AVDTP v1.3 Sec. 5.3).  Moreover, this breaks the assumption in the
+>> AVDTP code that each SEP has at most a single stream, and causes
+>> misbehavior later on (subsequent transport acquires fail with EPERM).
 >
-> This series was applied to bluetooth/bluez.git (master)
-> by Marcel Holtmann <marcel@holtmann.org>:
->
-> On Thu, 26 May 2022 19:24:49 +0800 you wrote:
-> > Add the MGMT quality report command and event in doc/mgmt-api.txt.
-> >
-> > ---
-> >
-> > Changes in v6:
-> > - No update in this patch. The patch 3/8 is updated to resolve a
-> >   patch conflict.
-> >
-> > [...]
->
-> Here is the summary with links:
->   - [BlueZ,v6,1/8] doc: Introduce the quality report command and event
->     https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=93850c827d54
->   - [BlueZ,v6,2/8] lib: Add structures and constants for quality report command and event
->     (no matching commit)
->   - [BlueZ,v6,3/8] adapter: remove quality report from experimental features
->     (no matching commit)
->   - [BlueZ,v6,4/8] adapter: support AOSP MGMT_EV_QUALITY_REPORT
->     (no matching commit)
->   - [BlueZ,v6,5/8] adapter: support Intel MGMT_EV_QUALITY_REPORT
->     (no matching commit)
->   - [BlueZ,v6,6/8] tools/btmgmt: fix quality report command
->     (no matching commit)
->   - [BlueZ,v6,7/8] monitor: print quality report cmd
->     (no matching commit)
->   - [BlueZ,v6,8/8] monitor: packet: add missing decodings of MGMT commands to todo
->     (no matching commit)
->
-> You are awesome, thank you!
-> --
-> Deet-doot-dot, I am a bot.
-> https://korg.docs.kernel.org/patchwork/pwbot.html
->
->
+>Not sure I follow I follow why it would be invalid for a stack to
+>enable connecting the same local SEP with different remote SEP, afaik
+>this depends only if the underline codec does support multiple
+>streams, as far I can remember the folks at BMW were actually the ones
+>proposing such a change back in the days so perhaps something broke
+>the proper support so we should be able to fix it. If, and only if,
+>the codec itself don't support multiple simultaneous stream then it
+>should reject the SetConfiguration by replying with an error.
+
+My understanding here derives just from AVDTP spec 5.3 stating that "On successful termination of the configuration procedure, resources in both Device A and Device B shall be allocated (locked), and neither SEP v in Device A nor SEP z in Device B could be configured for another stream connection e.g. by a third device." which seems to forbid it. Maybe this reading is not correct?
+
+It however doesnt't work (see below), and the SelectConfiguration mechanism explicitly skips in-use local endpoints (see avdtp_find_remote_sep), so it appears current code is not consistent on whether to allow it or not.
+
+Technically, the problem is that struct avdtp_local_sep has only the struct avdtp_stream pointer, which just gets overwritten on every SetConfiguration. This later prevents acquiring the transport for the stream whose pointer is not there. stream_free will also set the pointer to NULL, so disconnecting one of the two devices breaks the other.
+
+In principle if this is intended to work, the streams could just be looked up from the streams list instead, and one could just remove the reference in avdtp_stream. Also things like the inuse flag etc. shouldn't be shared, so it seems it needs a bit more work.
+
+Things work when connecting to different adapters, as then the lsep is not the same.
 
 
--- 
+Best,
+Pauli
 
-Joseph Shyh-In Hwang
-Email: josephsih@google.com
+
+
+
+>
+>> Fix this by first checking the SEP is free before proceeding in the DBus
+>> API call.  Also add a sanity check in avdtp_set_configuration, to reject
+>> configuring an already configured SEP similarly as in avdtp_setconf_cmd.
+>> ---
+>>
+>> Notes:
+>>     E.g. trying to set the same codec for two simultaneously connected
+>>     devices for the same adapter in Pulseaudio, causes the A2DP
+>>     connection of the first device stop working, as its transport
+>>     acquires start failing with EPERM. Disconnecting the first device
+>>     also breaks the second device connection.
+>>     This patch fixes it so that only the invalid SetConfiguration fails.
+>>
+>>  profiles/audio/a2dp.c  | 5 +++++
+>>  profiles/audio/avdtp.c | 3 +++
+>>  2 files changed, 8 insertions(+)
+>>
+>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>> index 6f5b13711..f3e2cdd9e 100644
+>> --- a/profiles/audio/a2dp.c
+>> +++ b/profiles/audio/a2dp.c
+>> @@ -1843,6 +1843,11 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
+>>         GSList *l;
+>>         int err;
+>>
+>> +       /* Check SEP not used by a different session */
+>> +       if (lsep->stream && chan->session &&
+>> +           !avdtp_has_stream(chan->session, lsep->stream))
+>> +               return -EBUSY;
+>> +
+>>         setup = a2dp_setup_get(chan->session);
+>>         if (!setup)
+>>                 return -ENOMEM;
+>> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+>> index da4114e0f..bc7afad81 100644
+>> --- a/profiles/audio/avdtp.c
+>> +++ b/profiles/audio/avdtp.c
+>> @@ -3523,6 +3523,9 @@ int avdtp_set_configuration(struct avdtp *session,
+>>         if (!(lsep && rsep))
+>>                 return -EINVAL;
+>>
+>> +       if (lsep->stream)
+>> +               return -EBUSY;
+>> +
+>>         DBG("%p: int_seid=%u, acp_seid=%u", session,
+>>                         lsep->info.seid, rsep->seid);
+>>
+>> --
+>> 2.36.1
+>>
+>
+>
