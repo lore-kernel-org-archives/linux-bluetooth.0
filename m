@@ -2,117 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C508C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 10:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8403C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 11:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241250AbiFGKkm (ORCPT
+        id S242584AbiFGLJK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jun 2022 06:40:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55100 "EHLO
+        Tue, 7 Jun 2022 07:09:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241304AbiFGKkW (ORCPT
+        with ESMTP id S242622AbiFGLIr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jun 2022 06:40:22 -0400
-Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CBDE27BE
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 03:40:20 -0700 (PDT)
-Received: by mail-wm1-x34a.google.com with SMTP id u12-20020a05600c19cc00b0038ec265155fso12595045wmq.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 03:40:20 -0700 (PDT)
+        Tue, 7 Jun 2022 07:08:47 -0400
+Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8ADA10F36A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 04:04:48 -0700 (PDT)
+Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-fb6b4da1dfso4713423fac.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 04:04:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=vp9jkXdHUO1DqPeSha9qftW6M3HjLENX1BSG2nBOYec=;
-        b=L/d7E0ruhw+z2PEX2oHfo6yWRopH97esndR0q5+CmlZeJcbqdrUV8/COiJxOtIG0mm
-         uYwk+VyPn16RgA4huLOrZrZsXIOaCruMp49r6YxJBKthhqGSZVrcrXq3PbT4xtHWV6eU
-         aUqXBTKpn5cHoj6AVfsSTU/PGYHPETZtbWXB/ghILI84Y8mvyJgnnCJNcA4HbhmN4DsE
-         RYLEcz0t08E8DrBIIZ4JUfbmd65v7ZrH0y/k8WU3/PMgrCBj8jsCtq70X/5K4CD42JPY
-         2a5dsw7c0NDzrOcLlNqWxsmUwmtOrOCrT1qaKzFBilsVDLx79rkdiI/Fvo976sYI3ojk
-         oJAQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=WsU1d6AxtsI1kNnbErTqKMalyUuoPghz7ZZoqU8ZE6Y=;
+        b=INVJ6YJYX3XRYgAXtmjDjhcWumflqsAXHUWd5KffSTUlbxAfzpd7Dqk795Yq0Fmeh/
+         c6HPT3KI1ut9LmwjPIVfwkNeXeLB4ssCmrj4mDHNVc73cKvGA8O2DG7eXUi5ma3CA49x
+         FEweMn+6N1CznhDeE/uy/4k1rLdu9Oxhz6BQC49ROvxJfSn0i17RSGstwVqUMNLdH7W5
+         dCP9qSNWOIcEgFrU2xgaFKrtP1dSOViwbFVoo2kXZWFNJYC4Uj1pMbbFcFtrq/eiSiqI
+         RKyrEYpA0BU5TI/qOjPOCjMPc4cZXP3tTYHyojBmhfsSmtVfk+h4P/W5+G1MEfInYQ+q
+         RFLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=vp9jkXdHUO1DqPeSha9qftW6M3HjLENX1BSG2nBOYec=;
-        b=ACPPjFO5775re6CdPOfpH1CxREgmzDn3YJXRRtFA+1xK3IgNSUr8nmChQ0rTGbj25J
-         RlgmikTqq6qnVKxXjp+S7iP58Xxy7UAime7fFeCCeAALFvzfRf9yktk6ZgyQCmkJ/eHg
-         hPWf2FBiOCaqk8SMwLkKqeBuKdmh3w1cwZxycUjMMDihCcNZH6bP7UsNyvpcfLsIU0VC
-         Ys0UVzH47NbWAbI/HEA3FtGf1r7KwaEPRqE/Oire/xulf+bN+MYRF2/lQek4MSobaV3S
-         X6in1aEq97ytPRp4QxTcKUfGEo/hDN2U17ajOhDSdTneEgbSsDqgAnyNvJa1uAcQT3A/
-         J/xA==
-X-Gm-Message-State: AOAM530LElM07/pqKFgdUUwCaMJvYOUQiKtZjGinY+AIHzQAeV1N7Sk/
-        R35InD3BJ0Imv105HOE6TiHpIN3XFig=
-X-Google-Smtp-Source: ABdhPJxvgrwfIpz22Ce0KF1SX3sfY5UznmDI7jTzxHwiwBUCn7AzSj/qJzgUh+eQCswzXd/lic9iRHAa+Xc=
-X-Received: from rax.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2a98])
- (user=poprdi job=sendgmr) by 2002:a7b:cd83:0:b0:39c:46d2:6ebb with SMTP id
- y3-20020a7bcd83000000b0039c46d26ebbmr17251855wmj.187.1654598419076; Tue, 07
- Jun 2022 03:40:19 -0700 (PDT)
-Date:   Tue,  7 Jun 2022 10:40:15 +0000
-Message-Id: <20220607104015.2126118-1-poprdi@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
-Subject: [PATCH v2] Bluetooth: Collect kcov coverage from hci_rx_work
-From:   Tamas Koczka <poprdi@google.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, theflow@google.com,
-        nogikh@google.com, Tamas Koczka <poprdi@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=WsU1d6AxtsI1kNnbErTqKMalyUuoPghz7ZZoqU8ZE6Y=;
+        b=fn/SU96j1soJvynrWYto6jvvK4CgRMQjIN8N9F5m75mRjD08EagYrzllcR376GGSVP
+         3kS84a3z6VahyHHgWIGLUtPua2Y/2lj3cmQ2+sGxbZjePhZeuOkSgt1XJy6mpvyvhyak
+         KRZRPlgVItLl+WWajoKN2/cAys5chl4hmV02uYJiBw8CdToa1MX16T8H3WbzXuUKUvLl
+         wg9V7uuPz2aRZTTW4lKVS1VtOOrXy0Yh4f+BF5xwSvZvqHQwlug1shCkmzza4KhT9Sws
+         eYY9VeA6P7Qf6B1CiJSnAALffrAguyoHZWnWXweMX0AvYhlKDYcJIbHjcL2PJ7T7VmAw
+         Qf6Q==
+X-Gm-Message-State: AOAM531Xlwbx65ONMgQj7w2OfucXou26r7uNUQJHzpu39yq0KYUrhtfS
+        lFyJ1DBhtpPlYzGNFBqnWWyq/b4K4GazHA==
+X-Google-Smtp-Source: ABdhPJx5DhEmFB3TdTGjj97y/ZJomfEv/I7KnQeY9S3YsB/yd1ApYtXW658ElRYUfbldBVJKUwYinw==
+X-Received: by 2002:a05:6870:9608:b0:f1:5a7b:92ea with SMTP id d8-20020a056870960800b000f15a7b92eamr15880680oaq.175.1654599887367;
+        Tue, 07 Jun 2022 04:04:47 -0700 (PDT)
+Received: from [172.17.0.2] ([20.97.14.47])
+        by smtp.gmail.com with ESMTPSA id l14-20020a0568302b0e00b0060b66e2eaaesm9186418otv.38.2022.06.07.04.04.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jun 2022 04:04:47 -0700 (PDT)
+Message-ID: <629f30cf.1c69fb81.f8003.1167@mx.google.com>
+Date:   Tue, 07 Jun 2022 04:04:47 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8070351250089003196=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, poprdi@google.com
+Subject: RE: [v2] Bluetooth: Collect kcov coverage from hci_rx_work
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220607104015.2126118-1-poprdi@google.com>
+References: <20220607104015.2126118-1-poprdi@google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_stop()
-calls, so remote KCOV coverage is collected while processing the rx_q
-queue which is the main incoming Bluetooth packet queue.
+--===============8070351250089003196==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Coverage is associated with the thread which created the packet skb.
+This is automated email and please do not reply to this email!
 
-The collected extra coverage helps kernel fuzzing efforts in finding
-vulnerabilities.
+Dear submitter,
 
-Signed-off-by: Tamas Koczka <poprdi@google.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=647954
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.24 seconds
+GitLint                       PASS      0.84 seconds
+SubjectPrefix                 PASS      0.62 seconds
+BuildKernel                   PASS      30.66 seconds
+BuildKernel32                 PASS      27.33 seconds
+Incremental Build with patchesPASS      37.37 seconds
+TestRunner: Setup             PASS      467.41 seconds
+TestRunner: l2cap-tester      PASS      17.70 seconds
+TestRunner: bnep-tester       PASS      5.98 seconds
+TestRunner: mgmt-tester       PASS      100.14 seconds
+TestRunner: rfcomm-tester     PASS      9.56 seconds
+TestRunner: sco-tester        PASS      9.27 seconds
+TestRunner: smp-tester        PASS      9.32 seconds
+TestRunner: userchan-tester   PASS      6.25 seconds
+
+
+
 ---
-Changelog since v1:
- - add comment about why kcov_remote functions are called
+Regards,
+Linux Bluetooth
 
-v1: https://lore.kernel.org/all/20220517094532.2729049-1-poprdi@google.com/
 
- net/bluetooth/hci_core.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 45c2dd2e1590..0af43844c55a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -29,6 +29,7 @@
- #include <linux/rfkill.h>
- #include <linux/debugfs.h>
- #include <linux/crypto.h>
-+#include <linux/kcov.h>
- #include <linux/property.h>
- #include <linux/suspend.h>
- #include <linux/wait.h>
-@@ -3780,7 +3781,14 @@ static void hci_rx_work(struct work_struct *work)
- 
- 	BT_DBG("%s", hdev->name);
- 
--	while ((skb = skb_dequeue(&hdev->rx_q))) {
-+	/* The kcov_remote functions used for collecting packet parsing
-+	 * coverage information from this background thread and associate
-+	 * the coverage with the syscall's thread which originally injected
-+	 * the packet. This helps fuzzing the kernel.
-+	 */
-+	for (; (skb = skb_dequeue(&hdev->rx_q)); kcov_remote_stop()) {
-+		kcov_remote_start_common(skb_get_kcov_handle(skb));
-+
- 		/* Send copy to monitor */
- 		hci_send_to_monitor(hdev, skb);
- 
--- 
-2.36.1.255.ge46751e96f-goog
-
+--===============8070351250089003196==--
