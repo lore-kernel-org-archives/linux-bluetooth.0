@@ -2,103 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AC6C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 16:08:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F1CCCA482
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 21:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344776AbiFGQIO (ORCPT
+        id S1378710AbiFGVHT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jun 2022 12:08:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43744 "EHLO
+        Tue, 7 Jun 2022 17:07:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344779AbiFGQIM (ORCPT
+        with ESMTP id S1379802AbiFGVG1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jun 2022 12:08:12 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D49D2C642
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 09:08:11 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id 2so12984681qtw.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 09:08:11 -0700 (PDT)
+        Tue, 7 Jun 2022 17:06:27 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBC70211100
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 11:50:20 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id v25so24170568eda.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 11:50:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Imp8zSdFyTuumRDbNdzzEX10InYOARhy/orbLdGWCCQ=;
-        b=Sz9j3RN8wAPMYCGEGbKVuxaZx42TNp5C9vF6AHrgXXChepTvRFmR751LVekMwarfWy
-         H7WHApbr8xiz0hl7Q9X2tMSifWcKJj3IuoJlehPoWzMvvhRN/ics1me5A8aHDFppzHr1
-         xfAIOiXgEYYaQOPFM9AKYMdpMTqpW1hAZyobwG3stcalEaODsG8CXWkcReRKzZngoT/I
-         bOyH4ioU+q1ql/B3IyUcUdKJXOJXYMztZAMq4XD1kg5A8gEeq03JR3WKT8Zr/0gGCgJS
-         GTnhYNyyblmc9kcxiCRRJQ+H0O1xkU73M8+KCuXPXoludr3NMNzdW9Ux13otTKdMo4vH
-         EmlQ==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=lxgwqXrTE5CS81OOTZfgrmr4rRv5j2bUa4aaRbpCvDQ=;
+        b=UIn4bvZhXW7AF2rT52jP/vHIPjI8XyKoA3dn2Q+Bi0s2HH11YyOvGVEVe86JVSoGKI
+         BaaWsQh6OrE4aTrQmY6fkIGKtAYybadmY8CgsBkfKkdrn9/E2Hw2YgipoxbbIFvguJ8i
+         wugGZSlCqni+gcqC9Yso1tIQl10wVmmIOsHm0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Imp8zSdFyTuumRDbNdzzEX10InYOARhy/orbLdGWCCQ=;
-        b=2bNf1BBZG4QLE9+gXEpqXRy0sgDXAqi8+2hvIzQ5E7q2LDbfjtG3zyo7xue/7EPUeL
-         gOED+bbV52Aw2NQvbMALf3lH/KGPaT00FetDm0Z9llYykOGZK8m+u+YDDRcWqtcEh39G
-         WYtZevYDduropxrOkiOjUUnRRelco6GhiYG64J+ztmzphg4QSBduYbTExUQ08fayw1CR
-         BZV93lez4TH766q3dCfp7Shpx0bdF+7V3JEwBecua+bsknWr2qvTwbVdWxv6IAmVFk2J
-         mTlteMAViaIku410HzaSFQNoXaLh0v/4fja65Bmqt6JOQUT0GAI2OmlIjbDglb20zoPC
-         Vp7g==
-X-Gm-Message-State: AOAM530k0W0PUvMY5+Z94coZWAgPekqpNeu3u7e5+TBXy+VaO0CX0Kqp
-        bPUyJ5aA9LZjTmZ0Ri2x6efIlso3aJ4X7g==
-X-Google-Smtp-Source: ABdhPJyRXuc5ZtuUfen4AWWEyST/adViH6mDzAPfwIxtZwajJuVgj4O3EeKtVFfCh+JQJn5Kw6z08w==
-X-Received: by 2002:a05:622a:508:b0:2f9:1cc0:2d50 with SMTP id l8-20020a05622a050800b002f91cc02d50mr23615281qtx.66.1654618090197;
-        Tue, 07 Jun 2022 09:08:10 -0700 (PDT)
-Received: from [172.17.0.2] ([40.71.43.67])
-        by smtp.gmail.com with ESMTPSA id w26-20020ac843da000000b00304fa21762csm1270811qtn.53.2022.06.07.09.08.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 09:08:09 -0700 (PDT)
-Message-ID: <629f77e9.1c69fb81.2a3d5.3bce@mx.google.com>
-Date:   Tue, 07 Jun 2022 09:08:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2276775071105603952=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=lxgwqXrTE5CS81OOTZfgrmr4rRv5j2bUa4aaRbpCvDQ=;
+        b=ZEVqypHEA9z857YmwEGJaalLHSP6uO99NcmMutSQfb6s+LJiUIFL24T1krB4t/Ge1K
+         PFeGv+opvKs9xfH8EPXG8DQAaERdxZop6DAgz20IxMxxhK1g/B8lRC6se17Mjj6GE0ap
+         wODLP7Vh6X2W4sZqWFL9PscaaX3Jo9/iOhTMa3lhZ2hBfAxmrE+nrA1IVhXEY/DqrFCV
+         2KMWTuwdhj4HX0pbNODTnCXeNvSxiMjlztYLfsAVvSoniRLQYPnbc9vS6TXJDoHgDSIP
+         iDFw6GSsR1HCFVNMv5b/nfYPVk4JapWLQ8WxaDMWu5EHQYpai2xuChpeofzWrixYpQAw
+         QgAA==
+X-Gm-Message-State: AOAM533RdW43/GW5Nwh+nTUO/b174nk2S2woZnhYMeJi/dAlKlcR2bUo
+        D2/CYCfXBOuV5MOZlcuqlgSkjJbABros+fdwMrA=
+X-Google-Smtp-Source: ABdhPJxamfO7+lW1nXD386uo8akJRRFQVBWjqIrUj4D7leXgJdCBUqffS68U3vjBFhJQkgQ83FW4hg==
+X-Received: by 2002:a05:6402:2892:b0:42d:c871:78f4 with SMTP id eg18-20020a056402289200b0042dc87178f4mr35811900edb.192.1654627815174;
+        Tue, 07 Jun 2022 11:50:15 -0700 (PDT)
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com. [209.85.221.51])
+        by smtp.gmail.com with ESMTPSA id m11-20020a056402050b00b0042dd7e13391sm10828040edv.45.2022.06.07.11.50.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Jun 2022 11:50:14 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id m26so13941021wrb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 11:50:13 -0700 (PDT)
+X-Received: by 2002:a05:6000:1b0f:b0:210:313a:ef2a with SMTP id
+ f15-20020a0560001b0f00b00210313aef2amr28815309wrz.281.1654627813569; Tue, 07
+ Jun 2022 11:50:13 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ruc_zhangxiaohui@163.com
-Subject: RE: [1/1] Bluetooth: use memset avoid memory leaks
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220607153020.29430-1-ruc_zhangxiaohui@163.com>
-References: <20220607153020.29430-1-ruc_zhangxiaohui@163.com>
+References: <20220605162537.1604762-1-yury.norov@gmail.com>
+ <CAHk-=whqgEA=OOPQs7JF=xps3VxjJ5uUnfXgzTv4gqTDhraZFA@mail.gmail.com>
+ <CAHk-=wib4F=71sXhamdPzLEZ9S4Lw4Dv3N2jLxv6-i8fHfMeDQ@mail.gmail.com>
+ <CAHk-=wicWxvuaL7GCj+1uEvpvpntdcB=AHot_h3j4wpenwyZ2Q@mail.gmail.com> <CABBYNZJfqAU-o7f9HhLCgTmL46WfwNQbM5NsCACsVVDLACMLYw@mail.gmail.com>
+In-Reply-To: <CABBYNZJfqAU-o7f9HhLCgTmL46WfwNQbM5NsCACsVVDLACMLYw@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Tue, 7 Jun 2022 11:49:57 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whcV=BE6bkyd50eZZnggaczKdpU_PevFRWw_hjJS72UPw@mail.gmail.com>
+Message-ID: <CAHk-=whcV=BE6bkyd50eZZnggaczKdpU_PevFRWw_hjJS72UPw@mail.gmail.com>
+Subject: Re: [PATCH] net/bluetooth: fix erroneous use of bitmap_from_u64()
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Yury Norov <yury.norov@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Guo Ren <guoren@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-csky@vger.kernel.org,
+        Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2276775071105603952==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Jun 6, 2022 at 11:00 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Right, thanks for fixing it. About some of the changes perhaps we
+> should use BIT when declaring values in enum hci_conn_flags?
 
-This is automated email and please do not reply to this email!
+That sounds sane, although with just two flag values I'm not sure it matters.
 
-Dear submitter,
+But I guess it would document the fact that it's a bitmask, not an
+ordinal value, and it looks like that header is already using BIT()
+elsewhere so there are no new header file dependencies..
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=648077
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.70 seconds
-GitLint                       PASS      1.05 seconds
-SubjectPrefix                 PASS      0.96 seconds
-BuildKernel                   PASS      37.83 seconds
-BuildKernel32                 PASS      33.95 seconds
-Incremental Build with patchesPASS      47.39 seconds
-TestRunner: Setup             PASS      565.52 seconds
-TestRunner: l2cap-tester      PASS      19.79 seconds
-TestRunner: bnep-tester       PASS      7.36 seconds
-TestRunner: mgmt-tester       PASS      114.34 seconds
-TestRunner: rfcomm-tester     PASS      10.98 seconds
-TestRunner: sco-tester        PASS      10.72 seconds
-TestRunner: smp-tester        PASS      10.86 seconds
-TestRunner: userchan-tester   PASS      7.54 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2276775071105603952==--
+              Linus
