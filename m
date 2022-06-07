@@ -2,132 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D6ABC43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 07:44:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C508C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 10:40:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237845AbiFGHon convert rfc822-to-8bit (ORCPT
+        id S241250AbiFGKkm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jun 2022 03:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42944 "EHLO
+        Tue, 7 Jun 2022 06:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237838AbiFGHon (ORCPT
+        with ESMTP id S241304AbiFGKkW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jun 2022 03:44:43 -0400
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D86262ED4A
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 00:44:40 -0700 (PDT)
-Received: from submission (posteo.de [185.67.36.169]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id AFEF924002C
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 09:44:38 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4LHMnH6QLKz6tnP
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 09:44:19 +0200 (CEST)
-Date:   Tue, 07 Jun 2022 07:44:18 +0000
-From:   Pauli Virtanen <pav@iki.fi>
-To:     linux-bluetooth@vger.kernel.org
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_BlueZ_1/2=5D_a2dp=3A_disallow_mul?= =?US-ASCII?Q?tiple_SetConfiguration_to_same_local_SEP?=
-In-Reply-To: <CABBYNZJ4f-wxZwPdYWzxQWHfG+x46HMiPZ=TmG7S74DGhPVW2A@mail.gmail.com>
-References: <20220605122927.110627-1-pav@iki.fi> <CABBYNZJ4f-wxZwPdYWzxQWHfG+x46HMiPZ=TmG7S74DGhPVW2A@mail.gmail.com>
-Message-ID: <4869E0D3-587C-4361-ABDE-12FE73C16390@iki.fi>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 8BIT
+        Tue, 7 Jun 2022 06:40:22 -0400
+Received: from mail-wm1-x34a.google.com (mail-wm1-x34a.google.com [IPv6:2a00:1450:4864:20::34a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98CBDE27BE
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Jun 2022 03:40:20 -0700 (PDT)
+Received: by mail-wm1-x34a.google.com with SMTP id u12-20020a05600c19cc00b0038ec265155fso12595045wmq.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Jun 2022 03:40:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=vp9jkXdHUO1DqPeSha9qftW6M3HjLENX1BSG2nBOYec=;
+        b=L/d7E0ruhw+z2PEX2oHfo6yWRopH97esndR0q5+CmlZeJcbqdrUV8/COiJxOtIG0mm
+         uYwk+VyPn16RgA4huLOrZrZsXIOaCruMp49r6YxJBKthhqGSZVrcrXq3PbT4xtHWV6eU
+         aUqXBTKpn5cHoj6AVfsSTU/PGYHPETZtbWXB/ghILI84Y8mvyJgnnCJNcA4HbhmN4DsE
+         RYLEcz0t08E8DrBIIZ4JUfbmd65v7ZrH0y/k8WU3/PMgrCBj8jsCtq70X/5K4CD42JPY
+         2a5dsw7c0NDzrOcLlNqWxsmUwmtOrOCrT1qaKzFBilsVDLx79rkdiI/Fvo976sYI3ojk
+         oJAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=vp9jkXdHUO1DqPeSha9qftW6M3HjLENX1BSG2nBOYec=;
+        b=ACPPjFO5775re6CdPOfpH1CxREgmzDn3YJXRRtFA+1xK3IgNSUr8nmChQ0rTGbj25J
+         RlgmikTqq6qnVKxXjp+S7iP58Xxy7UAime7fFeCCeAALFvzfRf9yktk6ZgyQCmkJ/eHg
+         hPWf2FBiOCaqk8SMwLkKqeBuKdmh3w1cwZxycUjMMDihCcNZH6bP7UsNyvpcfLsIU0VC
+         Ys0UVzH47NbWAbI/HEA3FtGf1r7KwaEPRqE/Oire/xulf+bN+MYRF2/lQek4MSobaV3S
+         X6in1aEq97ytPRp4QxTcKUfGEo/hDN2U17ajOhDSdTneEgbSsDqgAnyNvJa1uAcQT3A/
+         J/xA==
+X-Gm-Message-State: AOAM530LElM07/pqKFgdUUwCaMJvYOUQiKtZjGinY+AIHzQAeV1N7Sk/
+        R35InD3BJ0Imv105HOE6TiHpIN3XFig=
+X-Google-Smtp-Source: ABdhPJxvgrwfIpz22Ce0KF1SX3sfY5UznmDI7jTzxHwiwBUCn7AzSj/qJzgUh+eQCswzXd/lic9iRHAa+Xc=
+X-Received: from rax.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:2a98])
+ (user=poprdi job=sendgmr) by 2002:a7b:cd83:0:b0:39c:46d2:6ebb with SMTP id
+ y3-20020a7bcd83000000b0039c46d26ebbmr17251855wmj.187.1654598419076; Tue, 07
+ Jun 2022 03:40:19 -0700 (PDT)
+Date:   Tue,  7 Jun 2022 10:40:15 +0000
+Message-Id: <20220607104015.2126118-1-poprdi@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.36.1.255.ge46751e96f-goog
+Subject: [PATCH v2] Bluetooth: Collect kcov coverage from hci_rx_work
+From:   Tamas Koczka <poprdi@google.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, theflow@google.com,
+        nogikh@google.com, Tamas Koczka <poprdi@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_stop()
+calls, so remote KCOV coverage is collected while processing the rx_q
+queue which is the main incoming Bluetooth packet queue.
 
-7. kesäkuuta 2022 8.33.46 GMT+03:00 Luiz Augusto von Dentz <luiz.dentz@gmail.com> kirjoitti:
->Hi Pauli,
->
->On Sun, Jun 5, 2022 at 9:47 PM Pauli Virtanen <pav@iki.fi> wrote:
->>
->> Using the remote SEP SetConfiguration DBus API, it's possible to make
->> multiple remote endpoints use the same local SEP, if they are endpoints
->> from different connected devices. This is invalid: successful
->> configuration shall prevent a different device configuring the same SEP
->> (AVDTP v1.3 Sec. 5.3).  Moreover, this breaks the assumption in the
->> AVDTP code that each SEP has at most a single stream, and causes
->> misbehavior later on (subsequent transport acquires fail with EPERM).
->
->Not sure I follow I follow why it would be invalid for a stack to
->enable connecting the same local SEP with different remote SEP, afaik
->this depends only if the underline codec does support multiple
->streams, as far I can remember the folks at BMW were actually the ones
->proposing such a change back in the days so perhaps something broke
->the proper support so we should be able to fix it. If, and only if,
->the codec itself don't support multiple simultaneous stream then it
->should reject the SetConfiguration by replying with an error.
+Coverage is associated with the thread which created the packet skb.
 
-My understanding here derives just from AVDTP spec 5.3 stating that "On successful termination of the configuration procedure, resources in both Device A and Device B shall be allocated (locked), and neither SEP v in Device A nor SEP z in Device B could be configured for another stream connection e.g. by a third device." which seems to forbid it. Maybe this reading is not correct?
+The collected extra coverage helps kernel fuzzing efforts in finding
+vulnerabilities.
 
-It however doesnt't work (see below), and the SelectConfiguration mechanism explicitly skips in-use local endpoints (see avdtp_find_remote_sep), so it appears current code is not consistent on whether to allow it or not.
+Signed-off-by: Tamas Koczka <poprdi@google.com>
+---
+Changelog since v1:
+ - add comment about why kcov_remote functions are called
 
-Technically, the problem is that struct avdtp_local_sep has only the struct avdtp_stream pointer, which just gets overwritten on every SetConfiguration. This later prevents acquiring the transport for the stream whose pointer is not there. stream_free will also set the pointer to NULL, so disconnecting one of the two devices breaks the other.
+v1: https://lore.kernel.org/all/20220517094532.2729049-1-poprdi@google.com/
 
-In principle if this is intended to work, the streams could just be looked up from the streams list instead, and one could just remove the reference in avdtp_stream. Also things like the inuse flag etc. shouldn't be shared, so it seems it needs a bit more work.
+ net/bluetooth/hci_core.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Things work when connecting to different adapters, as then the lsep is not the same.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 45c2dd2e1590..0af43844c55a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -29,6 +29,7 @@
+ #include <linux/rfkill.h>
+ #include <linux/debugfs.h>
+ #include <linux/crypto.h>
++#include <linux/kcov.h>
+ #include <linux/property.h>
+ #include <linux/suspend.h>
+ #include <linux/wait.h>
+@@ -3780,7 +3781,14 @@ static void hci_rx_work(struct work_struct *work)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
+-	while ((skb = skb_dequeue(&hdev->rx_q))) {
++	/* The kcov_remote functions used for collecting packet parsing
++	 * coverage information from this background thread and associate
++	 * the coverage with the syscall's thread which originally injected
++	 * the packet. This helps fuzzing the kernel.
++	 */
++	for (; (skb = skb_dequeue(&hdev->rx_q)); kcov_remote_stop()) {
++		kcov_remote_start_common(skb_get_kcov_handle(skb));
++
+ 		/* Send copy to monitor */
+ 		hci_send_to_monitor(hdev, skb);
+ 
+-- 
+2.36.1.255.ge46751e96f-goog
 
-
-Best,
-Pauli
-
-
-
-
->
->> Fix this by first checking the SEP is free before proceeding in the DBus
->> API call.  Also add a sanity check in avdtp_set_configuration, to reject
->> configuring an already configured SEP similarly as in avdtp_setconf_cmd.
->> ---
->>
->> Notes:
->>     E.g. trying to set the same codec for two simultaneously connected
->>     devices for the same adapter in Pulseaudio, causes the A2DP
->>     connection of the first device stop working, as its transport
->>     acquires start failing with EPERM. Disconnecting the first device
->>     also breaks the second device connection.
->>     This patch fixes it so that only the invalid SetConfiguration fails.
->>
->>  profiles/audio/a2dp.c  | 5 +++++
->>  profiles/audio/avdtp.c | 3 +++
->>  2 files changed, 8 insertions(+)
->>
->> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
->> index 6f5b13711..f3e2cdd9e 100644
->> --- a/profiles/audio/a2dp.c
->> +++ b/profiles/audio/a2dp.c
->> @@ -1843,6 +1843,11 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
->>         GSList *l;
->>         int err;
->>
->> +       /* Check SEP not used by a different session */
->> +       if (lsep->stream && chan->session &&
->> +           !avdtp_has_stream(chan->session, lsep->stream))
->> +               return -EBUSY;
->> +
->>         setup = a2dp_setup_get(chan->session);
->>         if (!setup)
->>                 return -ENOMEM;
->> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
->> index da4114e0f..bc7afad81 100644
->> --- a/profiles/audio/avdtp.c
->> +++ b/profiles/audio/avdtp.c
->> @@ -3523,6 +3523,9 @@ int avdtp_set_configuration(struct avdtp *session,
->>         if (!(lsep && rsep))
->>                 return -EINVAL;
->>
->> +       if (lsep->stream)
->> +               return -EBUSY;
->> +
->>         DBG("%p: int_seid=%u, acp_seid=%u", session,
->>                         lsep->info.seid, rsep->seid);
->>
->> --
->> 2.36.1
->>
->
->
