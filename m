@@ -2,135 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D66C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 05:34:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8065C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Jun 2022 05:41:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233343AbiFGFeC (ORCPT
+        id S235212AbiFGFl3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Jun 2022 01:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51722 "EHLO
+        Tue, 7 Jun 2022 01:41:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229930AbiFGFeB (ORCPT
+        with ESMTP id S229973AbiFGFl3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Jun 2022 01:34:01 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2823CB716C
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jun 2022 22:33:59 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id e9so4155916pju.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jun 2022 22:33:59 -0700 (PDT)
+        Tue, 7 Jun 2022 01:41:29 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D8BFB0A7D
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Jun 2022 22:41:28 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id c196so14587332pfb.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Jun 2022 22:41:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EyxY25byEgH9PupGgRfXpgr6xzg5W4K5+h4sm2X9mxs=;
-        b=PPDfKeVHjScLHvr06n11D9khp+Ud+obtP+9KhWZeVWNy1VHhcvZzOAXXlq2HFtYHEo
-         lNb8QCxuzJ6qRNOhkrkF3GfS39AmUYP6mL6HyFvIi1OWkRiNc0u34Fnrj0QsWsiRCPH1
-         FuoIEOXkZigr/TEPAHSkseBQ+7SZE8fbDEyOBTrS00aI0zQytfXjE0u+pJ7XduYKHWpp
-         DKNjV5HQ9M8xo1In4kzhQ29W4yUETpS/C98J2WCvUThFYA4fahSS/xzuxtv/TskkT+aH
-         scMmravcxfuL33NCnDtI6gUWB3XHyG3UkDcZdKuDY/GtvzvaeJhtgS5MHvT1adNAYWWr
-         GFBQ==
+        bh=gbTJEcfY01ogSuU+DNg5ahC/a116BhM3r6sWtjnTiaE=;
+        b=YIsydpsA5M/DrsgQ8ZUHBPq6hr9eZYiUmzOKD6Fj7hzdN13kg/phpDdLVD3sLHzDRW
+         lNGiSkh0RhshqTyqac8y+yWECAcFrTZ5K/HaAMqHtbHDoXQpwizQHyxB0EALuFfUJpBx
+         KLnUXJiU9lsHvAFQS1a5/UwSaQbTJmDlVOORn3qY6qCXSFbQ8ssZkhExhqhv96DV3dGh
+         ySmyJ0brv5t1+rwpKLfa9efuYBBA9Emb4U3u0cDhO5zhhv1BSn4fVWIfZ5dNbyDEnhMj
+         c+6xU0CNz//xsI1/EGnfE5SFk1+OwhuP/26tzLN5EXmblmLgQhbEcU/kffjyjzwKmXDZ
+         N0mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EyxY25byEgH9PupGgRfXpgr6xzg5W4K5+h4sm2X9mxs=;
-        b=YQH2XNXcgnHxdSS3JtWKtE2ZAPTt1JH4Ks4YfVPL8oLamyTLPlbNL5BDYLVsPZDT8P
-         YDsc2AdgrK/EmoJeqCnqy0fXAu/j/l3Ph+IH/TipBuifCTlAH6z6/5RUA1hAGKrfm5h7
-         csI1XByAlC0W9UWKLHBt88gTqEJcLwvjUwKQ/0J4cRJHtMTVO7hbpzXellN+8MvkyA4P
-         Oi+OKDljiKvknn8+RKhRqgtbVxVY0WFNIwxqmCDM4wINtbxnCiGqSPsMVyTuO4Xw0lwS
-         pwQwqzfNioSiw7X87hdYHASAb4aPFLSjfYu+M9tpaUmeOcq6asJK/rADe/Axc60BSA7l
-         jRgw==
-X-Gm-Message-State: AOAM533N1XtuZALBDuyJTXsW0sittSvVVjvnV+HxZcSQk8KzomX3y25i
-        /22ySsFzpKjGk82TLnbVkK5FhE0QioUPvXh/rPXAZ/LU
-X-Google-Smtp-Source: ABdhPJw6DMSCOt2efrT2HrwOMM5Bx6hll1sd0ULKEaLUHz58sZaJCmKmYm93fDGVkvS/8aFFApB4JWGq4Unk15OGE8I=
-X-Received: by 2002:a17:902:7884:b0:167:4d5b:7a2f with SMTP id
- q4-20020a170902788400b001674d5b7a2fmr20160425pll.18.1654580038503; Mon, 06
- Jun 2022 22:33:58 -0700 (PDT)
+        bh=gbTJEcfY01ogSuU+DNg5ahC/a116BhM3r6sWtjnTiaE=;
+        b=J9JTR8aGl7yMarzUuaTPePUm6bbYNUnXYYBuOx4NSSb6b4Zq7LH++CaBCw+L3UGrsB
+         wggzV9V2D4DywjP+tHCuTaUo1KrvU74ENqEfaWe4XRszyPT4E+1lEjLnKCeFtS8+HADE
+         nSCWqqbs2tRycwKYzXZkKaWSm/2G0xb4yiVw890sd7tZDkBto0PXF8gPCVBcf5u+fNFt
+         G0h3pub5utlCGqDYDbmfqc5fziOhIQLFEK4udst7dZXo90Xh62VbbbySuYJGZWOkMfx2
+         oqo7kHMxVTmxtz6kSxDS0ap6VNBRrwG9/WgT7/0j1qkFw9cxu0GX+tIP+DAiGRvAZrpc
+         p4jg==
+X-Gm-Message-State: AOAM53124Hf2Gmgr7yi4bARGdf5b8U+CwRQrZCYktNwanozlMspvdiK1
+        V6V+hmbrva8pkUigJkmXscf9YPWtk4/ZmDcMKgPGp9F6
+X-Google-Smtp-Source: ABdhPJyAoUU4q8ouQW7YJVMGkVlTuFk8+U5ozl+Kp5lfEAif9jPwOhYuHoo4VzVYHQ+N9dencT33ZaXGPiKPv+pApos=
+X-Received: by 2002:a63:688a:0:b0:3fa:a80c:a228 with SMTP id
+ d132-20020a63688a000000b003faa80ca228mr23272689pgc.182.1654580487355; Mon, 06
+ Jun 2022 22:41:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220605122927.110627-1-pav@iki.fi>
-In-Reply-To: <20220605122927.110627-1-pav@iki.fi>
+References: <20220603212604.13758-1-puffy.taco@gmail.com> <629a8c92.1c69fb81.37f6b.cfd2@mx.google.com>
+In-Reply-To: <629a8c92.1c69fb81.37f6b.cfd2@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 6 Jun 2022 22:33:46 -0700
-Message-ID: <CABBYNZJ4f-wxZwPdYWzxQWHfG+x46HMiPZ=TmG7S74DGhPVW2A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] a2dp: disallow multiple SetConfiguration to
- same local SEP
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 6 Jun 2022 22:41:15 -0700
+Message-ID: <CABBYNZL4Qv1TTxOYisY_3UV4XcHoxecPfokW=Riu5NUhkwspxg@mail.gmail.com>
+Subject: Re: doc/coding-style: Update URL to kernel coding style
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Mike <puffy.taco@gmail.com>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi Tedd,
 
-On Sun, Jun 5, 2022 at 9:47 PM Pauli Virtanen <pav@iki.fi> wrote:
+On Sun, Jun 5, 2022 at 5:31 AM <bluez.test.bot@gmail.com> wrote:
 >
-> Using the remote SEP SetConfiguration DBus API, it's possible to make
-> multiple remote endpoints use the same local SEP, if they are endpoints
-> from different connected devices. This is invalid: successful
-> configuration shall prevent a different device configuring the same SEP
-> (AVDTP v1.3 Sec. 5.3).  Moreover, this breaks the assumption in the
-> AVDTP code that each SEP has at most a single stream, and causes
-> misbehavior later on (subsequent transport acquires fail with EPERM).
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=647329
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      1.41 seconds
+> GitLint                       PASS      0.96 seconds
+> Prep - Setup ELL              PASS      40.26 seconds
+> Build - Prep                  PASS      0.68 seconds
+> Build - Configure             PASS      7.98 seconds
+> Build - Make                  PASS      1210.43 seconds
+> Make Check                    PASS      11.64 seconds
+> Make Check w/Valgrind         PASS      405.55 seconds
+> Make Distcheck                PASS      222.88 seconds
+> Build w/ext ELL - Configure   PASS      8.39 seconds
+> Build w/ext ELL - Make        PASS      1183.08 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> doc/coding-style: Update URL to kernel coding style
+> WARNING:BAD_SIGN_OFF: '-signed-off-by:' is the preferred signature form
+> #95: FILE: doc/coding-style.txt:9:
+> -Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
+>
+> ERROR:BAD_SIGN_OFF: Unrecognized email address: 'line(s)". BlueZ does not used Signed-Off lines, so including'
+> #95: FILE: doc/coding-style.txt:9:
+> -Signed-off-by: line(s)". BlueZ does not used Signed-Off lines, so including
 
-Not sure I follow I follow why it would be invalid for a stack to
-enable connecting the same local SEP with different remote SEP, afaik
-this depends only if the underline codec does support multiple
-streams, as far I can remember the folks at BMW were actually the ones
-proposing such a change back in the days so perhaps something broke
-the proper support so we should be able to fix it. If, and only if,
-the codec itself don't support multiple simultaneous stream then it
-should reject the SetConfiguration by replying with an error.
+This one is quite funny, it seems checkpatch.pl does actually end up
+checking for Signed-off-by: lines even on the patch contents rather
+than limiting it to just the git commit not sure if there is something
+we can do about it but this is the exact thing the patches wants to
+prevent.
 
-> Fix this by first checking the SEP is free before proceeding in the DBus
-> API call.  Also add a sanity check in avdtp_set_configuration, to reject
-> configuring an already configured SEP similarly as in avdtp_setconf_cmd.
+> /github/workspace/src/12869423.patch total: 1 errors, 1 warnings, 22 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12869423.patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+>
+>
 > ---
->
-> Notes:
->     E.g. trying to set the same codec for two simultaneously connected
->     devices for the same adapter in Pulseaudio, causes the A2DP
->     connection of the first device stop working, as its transport
->     acquires start failing with EPERM. Disconnecting the first device
->     also breaks the second device connection.
->     This patch fixes it so that only the invalid SetConfiguration fails.
->
->  profiles/audio/a2dp.c  | 5 +++++
->  profiles/audio/avdtp.c | 3 +++
->  2 files changed, 8 insertions(+)
->
-> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> index 6f5b13711..f3e2cdd9e 100644
-> --- a/profiles/audio/a2dp.c
-> +++ b/profiles/audio/a2dp.c
-> @@ -1843,6 +1843,11 @@ static int a2dp_reconfig(struct a2dp_channel *chan, const char *sender,
->         GSList *l;
->         int err;
->
-> +       /* Check SEP not used by a different session */
-> +       if (lsep->stream && chan->session &&
-> +           !avdtp_has_stream(chan->session, lsep->stream))
-> +               return -EBUSY;
-> +
->         setup = a2dp_setup_get(chan->session);
->         if (!setup)
->                 return -ENOMEM;
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index da4114e0f..bc7afad81 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -3523,6 +3523,9 @@ int avdtp_set_configuration(struct avdtp *session,
->         if (!(lsep && rsep))
->                 return -EINVAL;
->
-> +       if (lsep->stream)
-> +               return -EBUSY;
-> +
->         DBG("%p: int_seid=%u, acp_seid=%u", session,
->                         lsep->info.seid, rsep->seid);
->
-> --
-> 2.36.1
+> Regards,
+> Linux Bluetooth
 >
 
 
