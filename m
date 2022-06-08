@@ -2,101 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F05C43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jun 2022 09:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C6FCCA47B
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jun 2022 09:24:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233445AbiFHJAh (ORCPT
+        id S234956AbiFHJYk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jun 2022 05:00:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55758 "EHLO
+        Wed, 8 Jun 2022 05:24:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234055AbiFHI7Q (ORCPT
+        with ESMTP id S235522AbiFHJYB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jun 2022 04:59:16 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5773F4673
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 01:19:36 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id x65so15003897qke.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jun 2022 01:19:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=bZfUyS1tPT4tPvEf5wQPWIhxVBpBeKTE8q6oOtrN07o=;
-        b=UzFm7R6mMfehN6byw/uph1bY1QBNzwlp2WfSkSnjiBJcmm/9yIptNRr2OStcQHF5jp
-         P5Ecwec4pEj0abrc/dJzC+S5B2MqLj/OQGImMx6VlxGCV4/9p5Z826CxxUVcnXkmOCEn
-         u0oVu5/Y0cNPVI1jcIIVSE9ZM+scEd1h4+2iajC1PxD22gwWDUSOSGHi1MOC2OxtY7nE
-         c+695gyy2/qFUdld6hK9gWxsEEwpy7gjsgxLEP7sWuynbWcYDRmgl4PmL9N3e2nOp9QT
-         I6wyvF38kIPPI634tvEpkyYJEAi0B4MXERM7TblLTC3H72zG7xRoAVOdSe8F7K+34e50
-         gCzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=bZfUyS1tPT4tPvEf5wQPWIhxVBpBeKTE8q6oOtrN07o=;
-        b=Fj8byN4XLeJPwYBapifm1OSvSeiq3cvLLHDpZnOGLcWNUvQtvnY1SdWfdq4oKfgs8l
-         yjd76AQVsDJYn7XUXUxBywezapIFzEcgjjOZygexFc9+I3ZuYiSs7aHak+fAk+MoYT6N
-         RX0f4yo/62Si8MMsTsJpF2pK76b18vv4Xj/KCLYdU6ylhkegj7DYsSAwRkE+5bWUu3UD
-         rfXXDEovy8J1ppNwahgYXf7BcB5Q8mOT6vtL07rq7QZidnJnLOp/l5cD8WN4pYIjtAmc
-         2DlA0z/Li4VYacEVUN0p5WEuft2q0+jxkwdjjanb3PSJCjRGKirMLwvvJkpkB05KGxmX
-         aoMw==
-X-Gm-Message-State: AOAM531/hwERwO6heP4ulQ1WFyQ0Y05kqztDGpEVdBiIsdV48p5wxxAy
-        pi0YwH5SOOzpBTLbwLAFG0OPp+hU2NrJmg==
-X-Google-Smtp-Source: ABdhPJzVB+b+xFk5gE8NnFPfoS9WBPgZBdQp7VnFMIXbK9/w7VIjtazd5r4Awx7b8GtO3yonQ7XCPA==
-X-Received: by 2002:a05:620a:2681:b0:67e:95f2:7ce2 with SMTP id c1-20020a05620a268100b0067e95f27ce2mr21669468qkp.223.1654676372687;
-        Wed, 08 Jun 2022 01:19:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.159.206])
-        by smtp.gmail.com with ESMTPSA id f23-20020ac84717000000b002fcb0d95f65sm10653891qtp.90.2022.06.08.01.19.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jun 2022 01:19:31 -0700 (PDT)
-Message-ID: <62a05b93.1c69fb81.75efe.44ec@mx.google.com>
-Date:   Wed, 08 Jun 2022 01:19:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1198302393832995326=="
+        Wed, 8 Jun 2022 05:24:01 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F4AF274D75
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 01:45:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C9AF9616FF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 08:45:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3826AC385A2
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 08:45:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654677923;
+        bh=iUO258RXI9gPrWF+Shz4CnQYN7bsealxftifqg0eAb4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=U0nYcjbeCNvk7R3A7BziZWNKSYsICBXhSpxXV2UoM7aX4fNVJ0rsxyVmoXTZx9xWy
+         nWrV17Jqqj+9/x8wOjS/UzelxEVGHO1boZKsEclmljMLs8CIW+sTSq1hQw52+YF+Nr
+         EbZQYlic/p5oTYwW6FU1Np+qdY82NqolWWOKuBNChpn8YesMVl2TLWMRhQ3fdrhlLB
+         nWg3/CWLNPIcwgHwz8yH9shVXhfsrdl8O4Waf+UaRusZ80tjWbmf44Ceu76Fbz6jyO
+         9p9EO7RVTHxgGGqxb6viGRgHIbulJpNKS/9vnqNt0nOko9UWweRK23CA3WcgQlo8+P
+         m68ZDKyqmGatQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 1EBE3CBF854; Wed,  8 Jun 2022 08:45:23 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
+ after each reboot
+Date:   Wed, 08 Jun 2022 08:45:19 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hyperair@ubuntu.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209745-62941-NhFslXbwwo@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
+References: <bug-209745-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ] device: Fix not deleting the folder after removing the device
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220608051418.197426-1-hj.tedd.an@gmail.com>
-References: <20220608051418.197426-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1198302393832995326==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
 
-This is automated email and please do not reply to this email!
+--- Comment #21 from Chow Loong Jin (hyperair@ubuntu.com) ---
+I was facing this issue with my Logitech MX Master 3 as well, but applying =
+this
+patch[1] seems to make it work, quoted here for posterity:
 
-Dear submitter,
+-------------------8<---------------------
+diff --git a/include/net/bluetooth/hci_core.h
+b/include/net/bluetooth/hci_core.h
+index 9873e1c8cd16..7ed862135110 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1363,7 +1363,7 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+                         ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=648310
+ /* Use LL Privacy based address resolution if supported */
+-#define use_ll_privacy(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
++#define use_ll_privacy(dev) (0)
 
----Test result---
+ /* Use ext scanning if set ext scan param and ext scan enable is supported=
+ */
+ #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
+------------------->8---------------------
 
-Test Summary:
-CheckPatch                    PASS      1.41 seconds
-GitLint                       PASS      1.05 seconds
-Prep - Setup ELL              PASS      41.93 seconds
-Build - Prep                  PASS      0.73 seconds
-Build - Configure             PASS      8.38 seconds
-Build - Make                  PASS      1238.96 seconds
-Make Check                    PASS      11.58 seconds
-Make Check w/Valgrind         PASS      426.43 seconds
-Make Distcheck                PASS      224.82 seconds
-Build w/ext ELL - Configure   PASS      8.46 seconds
-Build w/ext ELL - Make        PASS      1243.24 seconds
-Incremental Build with patchesPASS      0.00 seconds
+I'm not entirely sure if the issue is in Logitech's implementation of Bluet=
+ooth
+ LL Privacy, or the kernel's, but it doesn't seem to work very well togethe=
+r.
 
+The other workaround of removing the IdentityResolvingKey as documented in =
+the
+ArchLinux wiki[2] seems to also work, but not quite as well as the mouse
+frequently disconnects and reconnects randomly, especially when scrolling f=
+or a
+long time.
 
+[1] https://bbs.archlinux.org/viewtopic.php?pid=3D1932543#p1932543
+[2]
+https://wiki.archlinux.org/title/bluetooth#Problems_with_all_BLE_devices_on=
+_kernel_5.9+
 
----
-Regards,
-Linux Bluetooth
+--=20
+You may reply to this email to add a comment.
 
-
---===============1198302393832995326==--
+You are receiving this mail because:
+You are the assignee for the bug.=
