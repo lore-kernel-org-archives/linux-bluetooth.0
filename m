@@ -2,101 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70BB8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jun 2022 15:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B254FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jun 2022 17:14:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244520AbiFHPej (ORCPT
+        id S231754AbiFHRO3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jun 2022 11:34:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35492 "EHLO
+        Wed, 8 Jun 2022 13:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244502AbiFHPef (ORCPT
+        with ESMTP id S231737AbiFHROR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jun 2022 11:34:35 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 090B543AF4
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 08:34:08 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id r82so37068351ybc.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Jun 2022 08:34:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zwaOg0v+LS5lJPRAqgeypP/Y8OpoKTps9ME8AQzY9yY=;
-        b=cdS+m5mjlllB8E00wiMO7TPvS4XlWhncaVWc0nfzqcDdMka0zwSIeVHn09oHhbLqG2
-         ZNw7H/c6rcnqq1qtENPaXfHfkhDQWhDY14cn7tk1I/KntivXsTwaOnDvHYLP7XiKTVoJ
-         lJHKmlFVZoJ+ooCoZuz16RX4wvLRbOqfushN+8MCaKsD9bJiEMDimRo9WwvVCbIrkyKg
-         IYnThb3jxhlVZXReYpqUq94CLffvtUIJryZrthc5Zi4Va5ARIwO/eurGGfkKdTHtJeHl
-         sFRRwWdeGBhym0xrQcgTzStCQPzVi0DeccAk/kCNGad40NMyU+cefqL88XmfIN/JbIym
-         TH8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zwaOg0v+LS5lJPRAqgeypP/Y8OpoKTps9ME8AQzY9yY=;
-        b=ots4bxXek/8myQlfX0bdCsN5NcU7AAmfVLZ77yyH6Ydqkz5GcGN0GkaIxgmINGA3Zi
-         HS8ugxisMaHDZS2rskJJGh9FNDbcIc76heCuu/PR8iXS69Plub7W6D1/PQ0I+a1ir0pu
-         1EFxOC5rB0sU4ew4S39fSmwtwuISYR8nFjfeQ5Df0MJkzYocPKxhCJ+9mXe0oJ2wXPwv
-         b+rDHIQTWE8WZfNTh6VDdjbV0TtLzm3m27315oqJ4vqeTsiiP2yCDlpQkukNqwFvV002
-         bOMZsQcuaA31hrgma+0CgbNgmggFhSoz5a7tvwZ9E8pcrpLa7QZ7b7JLSW4cV+QDXq5q
-         +lXQ==
-X-Gm-Message-State: AOAM533s1zMbCHKedAPuxfo/3xFoGs7wh0Er2pdkVfSPMSHScKSf227V
-        Z2QQMeksbMs6sDQoWoexISZ1qU4XbNSmEsiAbfz+dg==
-X-Google-Smtp-Source: ABdhPJw7LBk5nIc8Ywm4xee3EF7vXV2w9g4Eybv3/NaMTe3+fmxqs6oR9sErU2lOx29CKb7ylJ99ySo87A7hyC+80kQ=
-X-Received: by 2002:a25:d649:0:b0:65c:9e37:8bb3 with SMTP id
- n70-20020a25d649000000b0065c9e378bb3mr36654912ybg.387.1654702447381; Wed, 08
- Jun 2022 08:34:07 -0700 (PDT)
+        Wed, 8 Jun 2022 13:14:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE1F26F37B;
+        Wed,  8 Jun 2022 10:00:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D10E61AC1;
+        Wed,  8 Jun 2022 17:00:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BF5EC341C5;
+        Wed,  8 Jun 2022 17:00:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654707614;
+        bh=Pe3mMFVoHSFwdO+nJFPdZhMmjIrPdDigiIO3eldq3vs=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=jg0zgtzquzYjJChvLjewLKAxoyVC+K75RE0IrzoqspTWP75phVHf+4GoX/t+qbeqP
+         DM7WJUiAxspXd9EviTrSrFgp/IgLVf/HqyBd/qxgxnP58fTKSOJ4FXNY58K/mofmxX
+         whUuZD2YUnT/LYhrT9Y4osVo2By/lKFC+KZk0OsFnJlpO+gjV7n/8Xcq+N3EudgezK
+         d6nwmboQBxqgu0td9u3ip/vUL4HbDGfKouPDwagLxlmSsB8PEpQECEuUciCdHllrcd
+         t5VHlBry0i9KRwfh9wK5uqvrBdTlh9in7bLKCtWZ2fz0QEXrhmlEU5VIWg8IYsE5Z3
+         IhOuZggsRTSyw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72B1BE73800;
+        Wed,  8 Jun 2022 17:00:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220608135105.146452-1-soenke.huster@eknoes.de>
-In-Reply-To: <20220608135105.146452-1-soenke.huster@eknoes.de>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Wed, 8 Jun 2022 08:33:56 -0700
-Message-ID: <CANn89iJ2gf4JfU8KZUYFSA8KgS-gEjhBZtX9WvUmWv2c8kPkJQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: RFCOMM: Use skb_trim to trim checksum
-To:     Soenke Huster <soenke.huster@eknoes.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH -next] Bluetooth: hci_core: Fix error return code in
+ hci_register_dev()
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165470761446.24378.861317142054344061.git-patchwork-notify@kernel.org>
+Date:   Wed, 08 Jun 2022 17:00:14 +0000
+References: <20220606134807.4102807-1-yangyingliang@huawei.com>
+In-Reply-To: <20220606134807.4102807-1-yangyingliang@huawei.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        abhishekpandit@chromium.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jun 8, 2022 at 6:51 AM Soenke Huster <soenke.huster@eknoes.de> wrote:
->
-> Use the skb helper instead of direct manipulation. This fixes the
-> following page fault, when connecting my Android phone:
->
->     BUG: unable to handle page fault for address: ffffed1021de29ff
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
->
-> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
-> ---
->  net/bluetooth/rfcomm/core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-> index 7324764384b6..7360e905d045 100644
-> --- a/net/bluetooth/rfcomm/core.c
-> +++ b/net/bluetooth/rfcomm/core.c
-> @@ -1747,8 +1747,8 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
->         type = __get_type(hdr->ctrl);
->
->         /* Trim FCS */
-> -       skb->len--; skb->tail--;
-> -       fcs = *(u8 *)skb_tail_pointer(skb);
-> +       skb_trim(skb, skb->len - 1);
-> +       fcs = *(skb->data + skb->len);
->
+Hello:
 
-Hmmm... I do not see any difference before/after in term of memory
-dereference to get fcs.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Marcel Holtmann <marcel@holtmann.org>:
 
-I think you should give more details on how exactly the bug triggers.
+On Mon, 6 Jun 2022 21:48:07 +0800 you wrote:
+> If hci_register_suspend_notifier() fails, it should return error
+> code in hci_register_dev().
+> 
+> Fixes: d6bb2a91f95b ("Bluetooth: Unregister suspend with userchannel")
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [-next] Bluetooth: hci_core: Fix error return code in hci_register_dev()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ad564394b3db
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
