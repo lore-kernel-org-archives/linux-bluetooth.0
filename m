@@ -2,137 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA43EC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:57:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29AFCC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 09:11:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240412AbiFII5R (ORCPT
+        id S237430AbiFIJLi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 04:57:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
+        Thu, 9 Jun 2022 05:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238556AbiFII4v (ORCPT
+        with ESMTP id S231308AbiFIJLf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:56:51 -0400
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA2616A519
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 01:56:19 -0700 (PDT)
-Date:   Thu, 09 Jun 2022 08:56:06 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-        s=protonmail3; t=1654764975; x=1655024175;
-        bh=0fGVsCOsJ783x4T1usRFr8i+QZzgtmK7SsF2ZzEkCqM=;
-        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
-         References:Feedback-ID:From:To:Cc:Date:Subject:Reply-To:
-         Feedback-ID:Message-ID;
-        b=G46JYp0go5QwvIJ0K9+zx1ct3gJsf+sUOOHXsGc6Gz03a1zVTwxHUA8VJ3IPopPqQ
-         DzQxx40+iMLv1EzAI1nsXawAK0oMQN8u+nMMzJccbQDf69zL//Q7+GbzRE4T8w8guz
-         lRVZxYcjR88U/fy3d09mhftdMBz9Oz+r5/3Dy6so28Pgjwc+EMuJt+GbjVtTEPyLSg
-         GSF3gYAA/9IrRTMefyke3veBaX64H75WXG8GiMTf9pDDsB9YeE25ZQuKNvd6Qd/Lbf
-         gxlBm5ON82OTMjwBHvfPjVBmvh9UoIK86XKuwUFvXx7kzP6N3GWZ2RD9nANCX+FM7Z
-         Sp4WS+HHEFhog==
-To:     Marcel Holtmann <marcel@holtmann.org>
-From:   Juerg Haefliger <juergh@proton.me>
-Cc:     Juerg Haefliger <juergh@protonmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Reply-To: Juerg Haefliger <juergh@proton.me>
-Subject: Re: [PATCH RESEND] Bluetooth: ath3k: Add MODULE_FIRMWARE for patch and config files
-Message-ID: <20220609104941.46bda87f@smeagol>
-In-Reply-To: <20220505080744.0343a857@smeagol>
-References: <20220504074606.15505-1-juergh@protonmail.com> <6A323366-2AB3-443E-A605-C18EA7A2E161@holtmann.org> <20220505080744.0343a857@smeagol>
-Feedback-ID: 45149698:user:proton
+        Thu, 9 Jun 2022 05:11:35 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987501706B
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 02:11:34 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id 15so20576176pfy.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jun 2022 02:11:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=RrZeng+LszYKUwErlcfezo997Bwj8hvRAFcvywdwLh8=;
+        b=G07STlTSxX72GJiQ1cPoW7YEWXhufRmM7AbJDiwwZXRLtiDYOb9zPB1LBL882cNu4Q
+         NM00EsaVd7RAVYdYsgrQJzbdrRLNlYZuEwmogQe+vfgZoMd1jBdxS/MxXaa0XxEmM7Pw
+         tgaXEx07POww1rx6Dnp/CiLLV4gajb9bfwXXPEsoj0PDcNFRhCYFbpDx03JULi2qt7ZM
+         6mGwyyJwHvdKu1OzwxaMZjdzGP4NSt47a4Zfkj4Pu/d7dWP/H6hOhwrMbcLlbScV/gGS
+         xeSFB+YwVFawkf2p/9c4JADg+yBK+RbxbVlMqF3OOENqkYajyH62zAP4GFUa8DizFJ+z
+         fFTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=RrZeng+LszYKUwErlcfezo997Bwj8hvRAFcvywdwLh8=;
+        b=xoOyxna2f0m7XZU7t7dW/M3Q7iND/itx/6Rg7hS7pO7nIu8TVFwXd1kTbMTzyWuZ+6
+         nk1KhRD6YOMM97glhFmoBuf/hTvI2ZlVNCHm0FSpd5DyE8+F4qyhYiXBEITqPJqRIaVe
+         4DPUUkkHoNNzhr3OQDSu0GIkiOqnIYsZpGZUWUCz8/fCgL5pxs/B316f168O7lvaX9WG
+         ZgqMPgwDrufqNnAiq/xoQd1VSBu+avqdqkZ61VwSxwsNqZHO8M9IFkoc28gPznIzcXKe
+         j5Pnk1KArtHrvoQcmkz2x8lfKs56XpALWVaUOrDXY/5lCQfkQ0q6Ru1/CdOoOtfoITLT
+         KKvg==
+X-Gm-Message-State: AOAM530pqdFX+2GPnxga2uFMpotZJQSRZ/el74/ll/hxELtJsmezKtZT
+        Dtd5tEYcBuU1NfKkBDFnjwR/vCaQrr8=
+X-Google-Smtp-Source: ABdhPJxXuS0BJA1B5MxFpi1Z2UdrLNiEPePbyPjVQl184SJ6l3/yAP3H0fAgQ7QT+HfZpaIb+yUCyg==
+X-Received: by 2002:a63:b51:0:b0:3fc:cd1d:884 with SMTP id a17-20020a630b51000000b003fccd1d0884mr33670730pgl.98.1654765893895;
+        Thu, 09 Jun 2022 02:11:33 -0700 (PDT)
+Received: from [172.17.0.2] ([20.125.131.19])
+        by smtp.gmail.com with ESMTPSA id z17-20020aa79911000000b0050dc7628179sm16836258pff.83.2022.06.09.02.11.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 02:11:33 -0700 (PDT)
+Message-ID: <62a1b945.1c69fb81.9ab4d.2041@mx.google.com>
+Date:   Thu, 09 Jun 2022 02:11:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3728682709809356201=="
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v1] Bluetooth: hci_sync: Fix setup CVSD SCO failure
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1654762252-19603-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1654762252-19603-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
+--===============3728682709809356201==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
---b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+This is automated email and please do not reply to this email!
 
-On Thu, 05 May 2022 06:07:52 +0000
-"Juerg Haefliger" <juergh@protonmail.com> wrote:
+Dear submitter,
 
-> Hi Marcel,
->
->
-> > Hi Juerg,
-> >
-> > > The ath3k driver loads patch and configuration files so add MODULE_FI=
-RMWARE
-> > > macros to povide that information via modinfo.
-> > >
-> > > Signed-off-by: Juerg Haefliger <juergh@protonmail.com>
-> > > ---
-> > > RESEND:
-> > >  Resend from protonmail email account to please the test bot.
-> > > ---
-> > > drivers/bluetooth/ath3k.c | 2 ++
-> > > 1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> > > index 88262d3a9392..56e9a64177ae 100644
-> > > --- a/drivers/bluetooth/ath3k.c
-> > > +++ b/drivers/bluetooth/ath3k.c
-> > > @@ -538,3 +538,5 @@ MODULE_DESCRIPTION("Atheros AR30xx firmware drive=
-r");
-> > > MODULE_VERSION(VERSION);
-> > > MODULE_LICENSE("GPL");
-> > > MODULE_FIRMWARE(ATH3K_FIRMWARE);
-> > > +MODULE_FIRMWARE("ar3k/AthrBT_0x*.dfu");
-> > > +MODULE_FIRMWARE("ar3k/ramps_0x*_*.dfu");
-> >
-> > I am still not convinced by the glob file matching. How would that actu=
-ally work?
->
-> In my case I need to remove firmware blobs that the kernel doesn't need t=
-o
-> reduce disk usage. This information helps. While it might retain unneeded
-> versions it's still better than nothing.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=648738
 
-Ping. So what do you suggest? Hard-code all filenames based on what's
-currently in linux-firmware? Given the HW is quite old that might not chang=
-e
-very often...
+---Test result---
 
-...Juerg
-
->
-> ...Juerg
->
->
-> > Regards
-> >
-> > Marcel
-> >
->
+Test Summary:
+CheckPatch                    PASS      0.94 seconds
+GitLint                       PASS      0.53 seconds
+SubjectPrefix                 PASS      0.40 seconds
+BuildKernel                   PASS      31.51 seconds
+BuildKernel32                 PASS      28.05 seconds
+Incremental Build with patchesPASS      38.59 seconds
+TestRunner: Setup             PASS      471.67 seconds
+TestRunner: l2cap-tester      PASS      17.03 seconds
+TestRunner: bnep-tester       PASS      5.80 seconds
+TestRunner: mgmt-tester       PASS      98.08 seconds
+TestRunner: rfcomm-tester     PASS      9.28 seconds
+TestRunner: sco-tester        PASS      9.06 seconds
+TestRunner: smp-tester        PASS      9.11 seconds
+TestRunner: userchan-tester   PASS      5.97 seconds
 
 
---b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM
-Content-Type: application/pgp-signature; name=attachment.sig
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=attachment.sig
 
-LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
-cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbUtodFowQUNna1FEOU9MQ1F1bQ0KUXJjNHZCQUFnVDI2bXpE
-TnYwL0FXRzMyTElXdnBGZ3BtUEhKMVdmT0kyRFJDbVd0ZGJDTk0yMFVCNnRMc1VYRQ0KU1VhSExt
-VC96QlFTMzdaNStId2VPc3J0SXJGbVhQbmxuTTVDVnhWNHhQVGFnaURndGNaNm51QTFSUDB0S29v
-Yg0KK0N5Q2lDb0VNMWFTY3VCREJVbnVsWjU3YSt0R3VERTN5cUZxdkdodWNneENHYTZUTHpBKytz
-ZEkxQkx2Z0ZYeg0KZGU1OGE0UW5ET1Z4ZXh6YzZJMlhjRFB6UDQ2N0FDSGZlR2xMSEZTaUNWYmh3
-N3BVNGt0SjBVbkswaGcyZDZuQg0KQUgvVHhwTm42WWU1SWRJNVpmVHYyYllheVZLaGZCOGUzYWRF
-a2drblNwYS90UWJOaE51cEUyblhzcjdPUlBhMw0KWnhQZE1zOVFERlZZbEYwelNQci9DNzdBT1Z2
-T3ZkUTdDNUpBN204bXc1eStYano4TWJweHdRUEJFZURXOUZqRQ0Kb3RqemQyM2NIaEptTkM3eU1O
-bWJpUzZXdmsrMThkWWtZZ1BMSGhVVHlaUUJaMnFXcmovdU1KKyt1S3NMT0hZdA0KOTV3NVpMV0hs
-dFdnMTlsOENObEI1RWFEbEJqOTZjSkRaNmU2M3BJQ1owT3Ria0w5bUVTRGhOTk5zNnJDbHdMeA0K
-azEvMnhlQWVnOE5ISmtXL2lTUzJMcjhWemRlZ3o1SXpNclNocUhqSkFpbFl0STY0Vys2WkVpQ1dD
-RGRlQWQ5Zg0KVCtNLzVZZW9xd1h5RkNWT096TFJFaVJuVGV3TExNdTNQSXQrSVZiTzdFNmRWZHNT
-aVNYOGQ0YjZROFhmT0V2dg0KQXgwYUYwN2s4U3o4S1NVKzZFRDVqRXNGYnYrRHVqQm1hVStoSFQw
-MEl5L0RJVzNBZGlrPQ0KPWhveW8NCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+---
+Regards,
+Linux Bluetooth
 
---b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM--
 
+--===============3728682709809356201==--
