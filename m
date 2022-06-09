@@ -2,86 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F6CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Jun 2022 20:12:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 220ACC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:11:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234374AbiFHUM1 (ORCPT
+        id S239343AbiFIILD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Jun 2022 16:12:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36366 "EHLO
+        Thu, 9 Jun 2022 04:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbiFHUM0 (ORCPT
+        with ESMTP id S238326AbiFIILB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Jun 2022 16:12:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C79DE86E3
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 13:12:25 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2FD05B829F9
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 20:12:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EA999C3411F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Jun 2022 20:12:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654719143;
-        bh=pMzYSI4XjlV8McLPVz5FjqBFvTATXZ9i7u1lXMACSEY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=POrnB2zPhHvOxm/Ok+JC8Y6EW+s8+CeERG5f2W8unX08r6s9P/t64I5t4b37UZbNV
-         zm8mBLJ+OxKJJhBt1qnP1Kv7iti+/XxpMsiiFr0yn+25tqri+hJ+enm3rBYs6FumqO
-         aZML6DMOdGHgCzDn7H6P2AgdCvmlul3xNg7rtJgutwmkahAyXDqyNGF8xeEnJsusLJ
-         4dZmhDdYGe5icZ45bhht50md+SuySQtir3XCYIRiGwWMNjsIDJfyH35eZMIka/ow9l
-         g+eRcek0mZOqDOm3TtVoPHQgQw3pZRBeEpJhPky9Qg2pJjdBgiCmFaqiKS28NI+rVj
-         4gG6HnQNwMT5Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id C947ECC13B1; Wed,  8 Jun 2022 20:12:22 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215872] QCA6390 firmware crashes after some time
-Date:   Wed, 08 Jun 2022 20:12:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kubakici@wp.pl
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215872-62941-5N4OMG7yLf@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215872-62941@https.bugzilla.kernel.org/>
-References: <bug-215872-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 9 Jun 2022 04:11:01 -0400
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86C0853C52;
+        Thu,  9 Jun 2022 01:11:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1654762260; x=1686298260;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=e+JkSVlZ0ILKrfOYCDty5E6/0yflhO624/4X9MCZut8=;
+  b=McBtuxpTr8QkNC+v/LmUl2/pOH5PMMsRdqoynAWo6/FyNZsJ2eCT8rPq
+   yCSYR+n2v3kPvw4QjPiNQNsPG9AqOai2hV7CLHG5EhqHEwrXKxTTU68Dd
+   COJVjjWkRnBHw7ONUWgDydZdq1C9fW0twXt03GaIaO3UL2mH87WPaGF58
+   I=;
+Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
+  by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Jun 2022 01:11:00 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg05-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 01:10:59 -0700
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Thu, 9 Jun 2022 01:10:57 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1] Bluetooth: hci_sync: Fix setup CVSD SCO failure
+Date:   Thu, 9 Jun 2022 16:10:52 +0800
+Message-ID: <1654762252-19603-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215872
+It will setup SCO after all CVSD eSCO attempts failure, but
+still fails to setup SCO finally due to wrong D1/D0 @retrans_effort
+within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
+Invalid HCI Command Parameters error.
 
-Jakub Kicinski (kubakici@wp.pl) changed:
+< HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
+        Handle: 3
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 65535
+        Setting: 0x0060
+          Input Coding: Linear
+          Input Data Format: 2's complement
+          Input Sample Size: 16-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: CVSD
+        Retransmission effort: Optimize for power consumption (0x01)
+        Packet type: 0x03c4
+          HV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4               #3428
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
+        Status: Invalid HCI Command Parameters (0x12)
+        Handle: 0
+        Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+        Link type: SCO (0x00)
+        Transmission interval: 0x00
+        Retransmission window: 0x00
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: u-law log (0x00)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kubakici@wp.pl
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ net/bluetooth/hci_conn.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---- Comment #5 from Jakub Kicinski (kubakici@wp.pl) ---
-I believe this is closed by
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/=
-?id=3Dd44e1dbda36fff5d7c2586683c4adc0963aef908
-upstream.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7829433d54c1..2627d5ac15d6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+-	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
+-	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
++	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
++	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
+ };
+ 
+ static const struct sco_param sco_param_cvsd[] = {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
