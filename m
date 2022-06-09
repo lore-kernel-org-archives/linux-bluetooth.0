@@ -2,124 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48D81C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 11:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BFD7CCA473
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 11:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234368AbiFILCn (ORCPT
+        id S235777AbiFILD2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 07:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35826 "EHLO
+        Thu, 9 Jun 2022 07:03:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229654AbiFILCn (ORCPT
+        with ESMTP id S243418AbiFILDZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 07:02:43 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 275271C904
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 04:02:42 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-f2cbceefb8so30509022fac.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jun 2022 04:02:42 -0700 (PDT)
+        Thu, 9 Jun 2022 07:03:25 -0400
+Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF7B2DAA5;
+        Thu,  9 Jun 2022 04:03:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/cosRkRDax5R+lWd45JDayIkT0EwMTUAaN9ZKy3500k=;
-        b=L0J0VpeMdKeIMM0PfQkMp1Mkdzomu1wZ4/KbSKba9IKrjMvV/7v2wTX/UD8Jd/MZWf
-         U4Y8tci3SQT/Mw3lCYJu+stUDQofHN9H4Ef32cJa1HTXgAjZcBwOD0O7ERjBhMTFox2F
-         2jLSOhwqQAv7h0M0wcnDmTY5BjBhq/yu6JUjE+FEfNCIhifSaGl84gnXYdUNOH4nZ1Ac
-         Kii9VAyu/hD9J8PA+MSV2Q6TVgTsqKVKh+R3lLYl3w34uGlzSuTTbwEujbg3ZkHCKdFh
-         nQT5CNwQMdnBsOM7OkgQs0BqSdMzudTRPxJCRvu3ls6XfsY5jcGO5DBeJrIoBC6gLGgn
-         SZgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/cosRkRDax5R+lWd45JDayIkT0EwMTUAaN9ZKy3500k=;
-        b=rvU5+AXIT8/dJYmhis7nGuQUXWJYBqFSC8nQAY81swZ69587h2TH0lh1tZAaN16JOk
-         yWgDfoyudharXW1DjvQYhc/QQnOz+AUhLtHPUuAeinOMRqRli6WyDkC35vWJXuQhZwAq
-         CSFUxqPa51rsseYhDd3f7e0eQD831nzR7jiG5V41rlcyumWpNJCPL636P9ESv+Lb5ZG6
-         hMipSmAx/d/qvRZVMi1pSzMVqBbTeTGzUoTXRpS74kyVQpSbpbgBBe4Mhi3EkPa1ZHpc
-         f4EoUVjUyd6QWa15fKhXgoeqBtGeOdtD8qJ1pBppVc9lWiCGjJTYrQT6Y+XamTn7glVM
-         7nWw==
-X-Gm-Message-State: AOAM5327Zl4WAUpvQsqJUW+vjKO+JPNzUg9D9k0TJYOWz0lk5XTvpatK
-        f7L3nH8qDof5sil15P5n5EnC3PGgDdjeHQ==
-X-Google-Smtp-Source: ABdhPJwkpCL+HrSMF/XEDWkK0IkK7rQkkYvrUu7J1yJtYtjZrDqJFY3KcO0kL3iToPdkXPPys7GTjw==
-X-Received: by 2002:a05:6871:149:b0:f5:d454:d5ac with SMTP id z9-20020a056871014900b000f5d454d5acmr1379211oab.76.1654772561234;
-        Thu, 09 Jun 2022 04:02:41 -0700 (PDT)
-Received: from [172.17.0.2] ([20.225.221.108])
-        by smtp.gmail.com with ESMTPSA id k11-20020a0568080e8b00b00328a7641583sm13150355oil.32.2022.06.09.04.02.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 04:02:39 -0700 (PDT)
-Message-ID: <62a1d34f.1c69fb81.12673.e987@mx.google.com>
-Date:   Thu, 09 Jun 2022 04:02:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4205125478144966060=="
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1654772604; x=1686308604;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=tiH6fLWycgZOWONZkC/uzfuzboRGK08l+FrKtOqNvGk=;
+  b=AUX8Xz2PN0aXQrBMv+sUa1mehpvqhh1JR96QipnZfvcqku+zgVErnaqy
+   unbiFU/hCrI2IfNU6KpaPf8Ds04ttDyLq8weKnw+rHkFWZ9IJhr+jreuo
+   8liCNX3EH19qk2ay4orHG1y3ckFfcLlvM+Xv2PuD7FRxs8QxfP+M6n07/
+   M=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+  by alexa-out-sd-01.qualcomm.com with ESMTP; 09 Jun 2022 04:03:24 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 04:03:24 -0700
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Thu, 9 Jun 2022 04:03:21 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1] Bluetooth: Fix CVSD SCO setup failure
+Date:   Thu, 9 Jun 2022 19:03:16 +0800
+Message-ID: <1654772596-10019-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jonas@dptechnics.com
-Subject: RE: Fix bug where bluetooth-meshd stops sending
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220609090832.9945-2-jonas@dptechnics.com>
-References: <20220609090832.9945-2-jonas@dptechnics.com>
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4205125478144966060==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+It will set up SCO after all CVSD eSCO attempts failure, but
+still fails to setup SCO finally due to wrong D1/D0 @retrans_effort
+within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
+Invalid HCI Command Parameters error.
 
-This is automated email and please do not reply to this email!
+< HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
+        Handle: 3
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 65535
+        Setting: 0x0060
+          Input Coding: Linear
+          Input Data Format: 2's complement
+          Input Sample Size: 16-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: CVSD
+        Retransmission effort: Optimize for power consumption (0x01)
+        Packet type: 0x03c4
+          HV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4               #3428
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
+        Status: Invalid HCI Command Parameters (0x12)
+        Handle: 0
+        Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+        Link type: SCO (0x00)
+        Transmission interval: 0x00
+        Retransmission window: 0x00
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: u-law log (0x00)
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=648769
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.04 seconds
-GitLint                       PASS      0.74 seconds
-Prep - Setup ELL              PASS      52.08 seconds
-Build - Prep                  PASS      0.72 seconds
-Build - Configure             PASS      10.12 seconds
-Build - Make                  PASS      1878.37 seconds
-Make Check                    PASS      12.93 seconds
-Make Check w/Valgrind         PASS      530.30 seconds
-Make Distcheck                PASS      280.29 seconds
-Build w/ext ELL - Configure   PASS      10.22 seconds
-Build w/ext ELL - Make        PASS      1835.88 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,1/1] Fix bug where bluetooth-meshd stops sending
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#111: FILE: mesh/mesh-io-generic.c:746:
-+							l_queue_isempty(pvt->tx_pkts) &&
-
-/github/workspace/src/12875093.patch total: 0 errors, 1 warnings, 36 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12875093.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_conn.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7829433d54c1..2627d5ac15d6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+-	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
+-	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
++	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
++	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
+ };
+ 
+ static const struct sco_param sco_param_cvsd[] = {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
---===============4205125478144966060==--
