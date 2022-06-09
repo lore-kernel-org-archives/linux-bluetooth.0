@@ -2,114 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC27C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 11:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A7AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 11:58:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236455AbiFILJo (ORCPT
+        id S244511AbiFIL6C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 07:09:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37206 "EHLO
+        Thu, 9 Jun 2022 07:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbiFILJn (ORCPT
+        with ESMTP id S243905AbiFIL6B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 07:09:43 -0400
-Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F792EB687;
-        Thu,  9 Jun 2022 04:09:41 -0700 (PDT)
+        Thu, 9 Jun 2022 07:58:01 -0400
+Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A6B6327
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 04:58:00 -0700 (PDT)
+Received: by mail-qk1-x72e.google.com with SMTP id n197so10452607qke.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Jun 2022 04:58:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1654772981; x=1686308981;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=tncl9kad/y74ql+gojdikvuwM+22yplMfh9FoFhlAyQ=;
-  b=FPKEaBIViQQdi17FFcYGy02zIYL2n8yZ6aYi5qArh6vAaHNgn/3zPHbr
-   xUyngcpX/HeKl8cBcIqRIpp8jZlX5MzxPXzl4FDtNAQHWLMeY211uJT9e
-   t9rA6ZCikK6ZvsLKH3veRPx2Lh9eCgD4FnG6mPr4pxblGiz2g0HhhelBg
-   U=;
-Received: from unknown (HELO ironmsg05-sd.qualcomm.com) ([10.53.140.145])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 09 Jun 2022 04:09:41 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg05-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 04:09:41 -0700
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Thu, 9 Jun 2022 04:09:37 -0700
-From:   Zijun Hu <quic_zijuhu@quicinc.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v2] Bluetooth: Fix CVSD SCO setup failure
-Date:   Thu, 9 Jun 2022 19:09:34 +0800
-Message-ID: <1654772974-10357-1-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=aTgm1p8YvlTUt2+erN6z4eyezL/iWE75cDZv1FHsqQ0=;
+        b=CrDzbZbHJ22uLVSjJXAKLRAZ372Gkh+hB+FEtwEDM/OGL722jFIxd1LHhl0WrEHVDY
+         gGLnXR8hKmG8qliYP7dhneQ6eG71U1QDqfeujz+F9LjLRvCtAkuQHPJZtZaxBmQrAHdP
+         Qyfp9EWk0W0XTnA8hHB1ARYo7NhjhqVoAySab5IJ39Cn2LWrl5zmBNme6m9i2tmOjXJK
+         ynTJHRg7kJtKGAU9WkUUUQor3VkVQ2tjszjbV3A/I8fmXUNTnlguhQKZEAt0b7gb2jri
+         2XoSsbdtoBOWBXrm0OD/ambyzSbEu0tL3LCi727BKiIjqEE+kdFzlkmCOKy+3wfKfROI
+         Zk5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=aTgm1p8YvlTUt2+erN6z4eyezL/iWE75cDZv1FHsqQ0=;
+        b=cQu+yiodwMLJlyd+Y5b0nLTHLeDsiGPVIYsOjABzv+jk+vs1+vyLMGbN7Oqbf74EuP
+         FErJdScfV5CtjZZcOfxGgPPiiyJ+hAwMlcJ1ODpXoOr3F7mR2csMHlF7nNCqmvVOklEP
+         tChjehd5YJKXWD/zEN49lmQvHNlXDJvzpkBRer3JuCF3fhJK+0VlCtXwrJcqCD0C78vU
+         Ng15Y575OtalG81SKREIgk9ZRWlcVWEbzH/7hSkpl47Ticz6ScVlI30OowUnLff81YfC
+         D6UewQPbmDui2xIVuVLCwf9SIHaIytVaJRoCMISFnKtCOgOLX6zQbWJs/Hw3iQ/SD77S
+         ziow==
+X-Gm-Message-State: AOAM533+68oxeWLhgDmMShb+nTClA0dHb2W0ZrAAM8ZFVy+7dlM1AF6G
+        LyGdJ5R28ulKvChM/9EYMTvO/HnIpy4VDQ==
+X-Google-Smtp-Source: ABdhPJzDpB9JjH33joEP0e2s4S3S8XztyCnAGfBH4alAjz9xHqeExjFMS6xOr6s5jwHXjJHErqXksw==
+X-Received: by 2002:a37:e202:0:b0:6a6:ab87:113d with SMTP id g2-20020a37e202000000b006a6ab87113dmr18947816qki.605.1654775879424;
+        Thu, 09 Jun 2022 04:57:59 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.136.186])
+        by smtp.gmail.com with ESMTPSA id c8-20020ac86e88000000b00304f55e56e4sm6163989qtv.40.2022.06.09.04.57.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 04:57:59 -0700 (PDT)
+Message-ID: <62a1e047.1c69fb81.d08bb.f2f1@mx.google.com>
+Date:   Thu, 09 Jun 2022 04:57:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8519234370847345739=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v2] Bluetooth: Fix CVSD SCO setup failure
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1654772974-10357-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1654772974-10357-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It will set up SCO after all CVSD eSCO attempts failure, but
-still fails to set up SCO finally due to wrong D1/D0 @retrans_effort
-within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
-Invalid HCI Command Parameters error.
+--===============8519234370847345739==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-< HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
-        Handle: 3
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 65535
-        Setting: 0x0060
-          Input Coding: Linear
-          Input Data Format: 2's complement
-          Input Sample Size: 16-bit
-          # of bits padding at MSB: 0
-          Air Coding Format: CVSD
-        Retransmission effort: Optimize for power consumption (0x01)
-        Packet type: 0x03c4
-          HV3 may be used
-          2-EV3 may not be used
-          3-EV3 may not be used
-          2-EV5 may not be used
-          3-EV5 may not be used
-> HCI Event: Command Status (0x0f) plen 4               #3428
-      Setup Synchronous Connection (0x01|0x0028) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
-        Status: Invalid HCI Command Parameters (0x12)
-        Handle: 0
-        Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
-        Link type: SCO (0x00)
-        Transmission interval: 0x00
-        Retransmission window: 0x00
-        RX packet length: 0
-        TX packet length: 0
-        Air mode: u-law log (0x00)
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=648809
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.79 seconds
+GitLint                       PASS      0.98 seconds
+SubjectPrefix                 PASS      0.86 seconds
+BuildKernel                   PASS      31.08 seconds
+BuildKernel32                 PASS      27.29 seconds
+Incremental Build with patchesPASS      37.60 seconds
+TestRunner: Setup             PASS      459.51 seconds
+TestRunner: l2cap-tester      PASS      16.90 seconds
+TestRunner: bnep-tester       PASS      5.82 seconds
+TestRunner: mgmt-tester       PASS      97.39 seconds
+TestRunner: rfcomm-tester     PASS      9.27 seconds
+TestRunner: sco-tester        PASS      9.08 seconds
+TestRunner: smp-tester        PASS      9.04 seconds
+TestRunner: userchan-tester   PASS      6.01 seconds
+
+
+
 ---
- net/bluetooth/hci_conn.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 7829433d54c1..2627d5ac15d6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
- 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
- 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
- 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
--	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
--	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
-+	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
-+	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
- };
- 
- static const struct sco_param sco_param_cvsd[] = {
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
+--===============8519234370847345739==--
