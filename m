@@ -2,167 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EAD5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA43EC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:57:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237248AbiFIIur (ORCPT
+        id S240412AbiFII5R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 04:50:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42568 "EHLO
+        Thu, 9 Jun 2022 04:57:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232405AbiFIIuk (ORCPT
+        with ESMTP id S238556AbiFII4v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:50:40 -0400
-Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D9352945D3;
-        Thu,  9 Jun 2022 01:47:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1654764461; x=1686300461;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jwiDmz5pKMi/E7+NzTlVzvRpVv2gzJ5DrLPjuQhFOQA=;
-  b=qhaSypqtE/2wMW7FnQeX9RBPm2gatgE2CTuFsvlrQmr078Y7CO3CyWSH
-   K70Pas5AwkdlK0zPBbn41meGRi5fJH/j+NhnQpqJTZ27WZQH7MTgROsNw
-   LvD8Pe/L4JU87dvmlJ4eoK04cxeSl8U7mQFwnQ8YDZ1gYWOp+ui0RNknF
-   8=;
-Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 09 Jun 2022 01:47:40 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg04-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 01:47:40 -0700
-Received: from [10.253.77.106] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Thu, 9 Jun 2022
- 01:47:38 -0700
-Message-ID: <600aa8db-6cfd-0e62-7936-e14c4a8c70ed@quicinc.com>
-Date:   Thu, 9 Jun 2022 16:47:36 +0800
+        Thu, 9 Jun 2022 04:56:51 -0400
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABA2616A519
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 01:56:19 -0700 (PDT)
+Date:   Thu, 09 Jun 2022 08:56:06 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+        s=protonmail3; t=1654764975; x=1655024175;
+        bh=0fGVsCOsJ783x4T1usRFr8i+QZzgtmK7SsF2ZzEkCqM=;
+        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
+         References:Feedback-ID:From:To:Cc:Date:Subject:Reply-To:
+         Feedback-ID:Message-ID;
+        b=G46JYp0go5QwvIJ0K9+zx1ct3gJsf+sUOOHXsGc6Gz03a1zVTwxHUA8VJ3IPopPqQ
+         DzQxx40+iMLv1EzAI1nsXawAK0oMQN8u+nMMzJccbQDf69zL//Q7+GbzRE4T8w8guz
+         lRVZxYcjR88U/fy3d09mhftdMBz9Oz+r5/3Dy6so28Pgjwc+EMuJt+GbjVtTEPyLSg
+         GSF3gYAA/9IrRTMefyke3veBaX64H75WXG8GiMTf9pDDsB9YeE25ZQuKNvd6Qd/Lbf
+         gxlBm5ON82OTMjwBHvfPjVBmvh9UoIK86XKuwUFvXx7kzP6N3GWZ2RD9nANCX+FM7Z
+         Sp4WS+HHEFhog==
+To:     Marcel Holtmann <marcel@holtmann.org>
+From:   Juerg Haefliger <juergh@proton.me>
+Cc:     Juerg Haefliger <juergh@protonmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Reply-To: Juerg Haefliger <juergh@proton.me>
+Subject: Re: [PATCH RESEND] Bluetooth: ath3k: Add MODULE_FIRMWARE for patch and config files
+Message-ID: <20220609104941.46bda87f@smeagol>
+In-Reply-To: <20220505080744.0343a857@smeagol>
+References: <20220504074606.15505-1-juergh@protonmail.com> <6A323366-2AB3-443E-A605-C18EA7A2E161@holtmann.org> <20220505080744.0343a857@smeagol>
+Feedback-ID: 45149698:user:proton
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Fix setup CVSD SCO failure
-Content-Language: en-US
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>
-References: <1654762252-19603-1-git-send-email-quic_zijuhu@quicinc.com>
- <1403aa05-19ec-62f7-42a6-8b224574eb1e@molgen.mpg.de>
-From:   quic_zijuhu <quic_zijuhu@quicinc.com>
-In-Reply-To: <1403aa05-19ec-62f7-42a6-8b224574eb1e@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+Content-Type: multipart/mixed;
+ boundary="b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 6/9/2022 4:15 PM, Paul Menzel wrote:
-> Dear Zijun,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 09.06.22 um 10:10 schrieb Zijun Hu:
-> 
-> Maybe for the summary:
-> 
-> Bluetooth: Fix CVSD SCO setup failure
-> 
->> It will setup SCO after all CVSD eSCO attempts failure, but
-> 
-will correct it within v2 patch
-> The verb is spelled with a space: set up
-> 
->> still fails to setup SCO finally due to wrong D1/D0 @retrans_effort
-> 
-> Ditto.
-> 
-see above reply
->> within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
->> Invalid HCI Command Parameters error.
->>
->> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
->>          Handle: 3
->>          Transmit bandwidth: 8000
->>          Receive bandwidth: 8000
->>          Max latency: 65535
->>          Setting: 0x0060
->>            Input Coding: Linear
->>            Input Data Format: 2's complement
->>            Input Sample Size: 16-bit
->>            # of bits padding at MSB: 0
->>            Air Coding Format: CVSD
->>          Retransmission effort: Optimize for power consumption (0x01)
->>          Packet type: 0x03c4
->>            HV3 may be used
->>            2-EV3 may not be used
->>            3-EV3 may not be used
->>            2-EV5 may not be used
->>            3-EV5 may not be used
->>> HCI Event: Command Status (0x0f) plen 4               #3428
->>        Setup Synchronous Connection (0x01|0x0028) ncmd 1
->>          Status: Success (0x00)
->>> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
->>          Status: Invalid HCI Command Parameters (0x12)
->>          Handle: 0
->>          Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
->>          Link type: SCO (0x00)
->>          Transmission interval: 0x00
->>          Retransmission window: 0x00
->>          RX packet length: 0
->>          TX packet length: 0
->>          Air mode: u-law log (0x00)
-> 
-> What is your test setup to reproduce it?
-> 
-this issue is reported by our tester.
-this issue only happens with some kinds of headsets which says it support eSCO but seems no actually.
-it can be reproduced by UBUNTU BT settings UI
+This is a multi-part message in MIME format.
 
-D1/D0 @retrans_effort within @esco_param_cvsd are wrong compared with present below definition：
-static const struct sco_param sco_param_cvsd[] = {
-	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
-	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
-};
+--b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-additionally, based on BT core spec：
-0x00 No retransmissions (SCO or eSCO connection allowed)
-0x01 At least one retransmission, optimize for power consumption (eSCO connection required).
-0x02 At least one retransmission, optimize for link quality (eSCO connection
-required)
-0xFF Don’t care (SCO or eSCO connection allowed)
-All other values Reserved for future use
+On Thu, 05 May 2022 06:07:52 +0000
+"Juerg Haefliger" <juergh@protonmail.com> wrote:
 
-for SCO, @retrans_effort is 0x00 or 0xff, must not be 0x01.
-thanks
+> Hi Marcel,
+>
+>
+> > Hi Juerg,
+> >
+> > > The ath3k driver loads patch and configuration files so add MODULE_FI=
+RMWARE
+> > > macros to povide that information via modinfo.
+> > >
+> > > Signed-off-by: Juerg Haefliger <juergh@protonmail.com>
+> > > ---
+> > > RESEND:
+> > >  Resend from protonmail email account to please the test bot.
+> > > ---
+> > > drivers/bluetooth/ath3k.c | 2 ++
+> > > 1 file changed, 2 insertions(+)
+> > >
+> > > diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> > > index 88262d3a9392..56e9a64177ae 100644
+> > > --- a/drivers/bluetooth/ath3k.c
+> > > +++ b/drivers/bluetooth/ath3k.c
+> > > @@ -538,3 +538,5 @@ MODULE_DESCRIPTION("Atheros AR30xx firmware drive=
+r");
+> > > MODULE_VERSION(VERSION);
+> > > MODULE_LICENSE("GPL");
+> > > MODULE_FIRMWARE(ATH3K_FIRMWARE);
+> > > +MODULE_FIRMWARE("ar3k/AthrBT_0x*.dfu");
+> > > +MODULE_FIRMWARE("ar3k/ramps_0x*_*.dfu");
+> >
+> > I am still not convinced by the glob file matching. How would that actu=
+ally work?
+>
+> In my case I need to remove firmware blobs that the kernel doesn't need t=
+o
+> reduce disk usage. This information helps. While it might retain unneeded
+> versions it's still better than nothing.
 
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->>   net/bluetooth/hci_conn.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index 7829433d54c1..2627d5ac15d6 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
->>       { EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,    0x01 }, /* S3 */
->>       { EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,    0x01 }, /* S2 */
->>       { EDR_ESCO_MASK | ESCO_EV3,   0x0007,    0x01 }, /* S1 */
->> -    { EDR_ESCO_MASK | ESCO_HV3,   0xffff,    0x01 }, /* D1 */
->> -    { EDR_ESCO_MASK | ESCO_HV1,   0xffff,    0x01 }, /* D0 */
->> +    { EDR_ESCO_MASK | ESCO_HV3,   0xffff,    0xff }, /* D1 */
->> +    { EDR_ESCO_MASK | ESCO_HV1,   0xffff,    0xff }, /* D0 */
->>   };
->>     static const struct sco_param sco_param_cvsd[] = {
-> 
-> 
-> Kind regards,
-> 
-> Paul
+Ping. So what do you suggest? Hard-code all filenames based on what's
+currently in linux-firmware? Given the HW is quite old that might not chang=
+e
+very often...
+
+...Juerg
+
+>
+> ...Juerg
+>
+>
+> > Regards
+> >
+> > Marcel
+> >
+>
+
+
+--b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM
+Content-Type: application/pgp-signature; name=attachment.sig
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=attachment.sig
+
+LS0tLS1CRUdJTiBQR1AgU0lHTkFUVVJFLS0tLS0NCg0KaVFJekJBRUJDZ0FkRmlFRWhaZlU5Nkl1
+cHJ2aUxkZUxEOU9MQ1F1bVFyY0ZBbUtodFowQUNna1FEOU9MQ1F1bQ0KUXJjNHZCQUFnVDI2bXpE
+TnYwL0FXRzMyTElXdnBGZ3BtUEhKMVdmT0kyRFJDbVd0ZGJDTk0yMFVCNnRMc1VYRQ0KU1VhSExt
+VC96QlFTMzdaNStId2VPc3J0SXJGbVhQbmxuTTVDVnhWNHhQVGFnaURndGNaNm51QTFSUDB0S29v
+Yg0KK0N5Q2lDb0VNMWFTY3VCREJVbnVsWjU3YSt0R3VERTN5cUZxdkdodWNneENHYTZUTHpBKytz
+ZEkxQkx2Z0ZYeg0KZGU1OGE0UW5ET1Z4ZXh6YzZJMlhjRFB6UDQ2N0FDSGZlR2xMSEZTaUNWYmh3
+N3BVNGt0SjBVbkswaGcyZDZuQg0KQUgvVHhwTm42WWU1SWRJNVpmVHYyYllheVZLaGZCOGUzYWRF
+a2drblNwYS90UWJOaE51cEUyblhzcjdPUlBhMw0KWnhQZE1zOVFERlZZbEYwelNQci9DNzdBT1Z2
+T3ZkUTdDNUpBN204bXc1eStYano4TWJweHdRUEJFZURXOUZqRQ0Kb3RqemQyM2NIaEptTkM3eU1O
+bWJpUzZXdmsrMThkWWtZZ1BMSGhVVHlaUUJaMnFXcmovdU1KKyt1S3NMT0hZdA0KOTV3NVpMV0hs
+dFdnMTlsOENObEI1RWFEbEJqOTZjSkRaNmU2M3BJQ1owT3Ria0w5bUVTRGhOTk5zNnJDbHdMeA0K
+azEvMnhlQWVnOE5ISmtXL2lTUzJMcjhWemRlZ3o1SXpNclNocUhqSkFpbFl0STY0Vys2WkVpQ1dD
+RGRlQWQ5Zg0KVCtNLzVZZW9xd1h5RkNWT096TFJFaVJuVGV3TExNdTNQSXQrSVZiTzdFNmRWZHNT
+aVNYOGQ0YjZROFhmT0V2dg0KQXgwYUYwN2s4U3o4S1NVKzZFRDVqRXNGYnYrRHVqQm1hVStoSFQw
+MEl5L0RJVzNBZGlrPQ0KPWhveW8NCi0tLS0tRU5EIFBHUCBTSUdOQVRVUkUtLS0tLQ0K
+
+--b1_X5QaQZmVeY2aDI7edktz7aPJvWCC92D1dICoI1MbEM--
 
