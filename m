@@ -2,109 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE61C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F9BC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 08:35:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233260AbiFIIU7 (ORCPT
+        id S241153AbiFIIfY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 04:20:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33846 "EHLO
+        Thu, 9 Jun 2022 04:35:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231641AbiFIIU4 (ORCPT
+        with ESMTP id S241804AbiFIIfM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 04:20:56 -0400
-Received: from giacobini.uberspace.de (giacobini.uberspace.de [185.26.156.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAB4D3B9269
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 01:20:50 -0700 (PDT)
-Received: (qmail 26772 invoked by uid 990); 9 Jun 2022 08:20:48 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-Message-ID: <d950a0cb-72d3-aa1a-24c1-5a9380681dfd@eknoes.de>
-Date:   Thu, 9 Jun 2022 10:20:47 +0200
+        Thu, 9 Jun 2022 04:35:12 -0400
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15BC22B7AC;
+        Thu,  9 Jun 2022 01:35:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1654763705; x=1686299705;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=tiH6fLWycgZOWONZkC/uzfuzboRGK08l+FrKtOqNvGk=;
+  b=Chl+IZTFx3pxMNpeIlE43O8rW72zG+vW6TX/7etv779orAc1SgcRR9C9
+   s7ek1apL28xtVH3dOwJp/XXt8szY6V4gYItg6avwbSiffcbC0Q+1Cm4L4
+   s7qy+C6DEALn1yr/ReSzEGJY+PqSknqSgsTJtd6YGjkUNod0CDHkm1F7y
+   Q=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+  by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Jun 2022 01:35:04 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jun 2022 01:35:04 -0700
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Thu, 9 Jun 2022 01:35:01 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v2] Bluetooth: hci_sync: Fix set up CVSD SCO failure
+Date:   Thu, 9 Jun 2022 16:32:38 +0800
+Message-ID: <1654763558-20721-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH] Bluetooth: RFCOMM: Use skb_trim to trim checksum
-Content-Language: en-US
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220608135105.146452-1-soenke.huster@eknoes.de>
- <CANn89iJ2gf4JfU8KZUYFSA8KgS-gEjhBZtX9WvUmWv2c8kPkJQ@mail.gmail.com>
-From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
-In-Reply-To: <CANn89iJ2gf4JfU8KZUYFSA8KgS-gEjhBZtX9WvUmWv2c8kPkJQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Bar: /
-X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-1.07202) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: 0.327979
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Thu, 09 Jun 2022 10:20:48 +0200
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Eric,
+It will set up SCO after all CVSD eSCO attempts failure, but
+still fails to setup SCO finally due to wrong D1/D0 @retrans_effort
+within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
+Invalid HCI Command Parameters error.
 
-On 08.06.22 17:33, Eric Dumazet wrote:
-> On Wed, Jun 8, 2022 at 6:51 AM Soenke Huster <soenke.huster@eknoes.de> wrote:
->>
->> Use the skb helper instead of direct manipulation. This fixes the
->> following page fault, when connecting my Android phone:
->>
->>     BUG: unable to handle page fault for address: ffffed1021de29ff
->>     #PF: supervisor read access in kernel mode
->>     #PF: error_code(0x0000) - not-present page
->>     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
->>
->> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
->> ---
->>  net/bluetooth/rfcomm/core.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
->> index 7324764384b6..7360e905d045 100644
->> --- a/net/bluetooth/rfcomm/core.c
->> +++ b/net/bluetooth/rfcomm/core.c
->> @@ -1747,8 +1747,8 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
->>         type = __get_type(hdr->ctrl);
->>
->>         /* Trim FCS */
->> -       skb->len--; skb->tail--;
->> -       fcs = *(u8 *)skb_tail_pointer(skb);
->> +       skb_trim(skb, skb->len - 1);
->> +       fcs = *(skb->data + skb->len);
->>
-> 
-> Hmmm... I do not see any difference before/after in term of memory
-> dereference to get fcs.
-> 
-> I think you should give more details on how exactly the bug triggers.
+< HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
+        Handle: 3
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 65535
+        Setting: 0x0060
+          Input Coding: Linear
+          Input Data Format: 2's complement
+          Input Sample Size: 16-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: CVSD
+        Retransmission effort: Optimize for power consumption (0x01)
+        Packet type: 0x03c4
+          HV3 may be used
+          2-EV3 may not be used
+          3-EV3 may not be used
+          2-EV5 may not be used
+          3-EV5 may not be used
+> HCI Event: Command Status (0x0f) plen 4               #3428
+      Setup Synchronous Connection (0x01|0x0028) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
+        Status: Invalid HCI Command Parameters (0x12)
+        Handle: 0
+        Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+        Link type: SCO (0x00)
+        Transmission interval: 0x00
+        Retransmission window: 0x00
+        RX packet length: 0
+        TX packet length: 0
+        Air mode: u-law log (0x00)
 
-Sorry, yesterday I was not able to track down why exactly it crashes,
-but by now I think I figured it out.
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ net/bluetooth/hci_conn.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The crash happens when using Bluetooth in a virtual machine.
-On connecting my Android phone to the physical controller which I use 
-inside the virtual machine via the VirtIO driver, after some seconds
-the crash occurs.
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7829433d54c1..2627d5ac15d6 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+ 	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+ 	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+-	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
+-	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
++	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
++	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
+ };
+ 
+ static const struct sco_param sco_param_cvsd[] = {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
-Before the trimming step, I examined the skb in gdb and saw, that 
-skb->tail is zero. Thus, skb->tail--; modifies the unsigned integer to -1
-resp. MAX_UINT. In skb_tail_pointer, skb->head + skb->tail is calculated
-which results in the page fault.
-
-By using skb_trim, skb->tail is set to the accurate value and thus the
-issue is fixed.
-
-I am not an expert in the Linux kernel area, do you think there is an
-underlying issue anywhere else? When using my Android phone on my host
-computer, I do not have that problem - it might be in some 
-(e.g. virtio_bt?) driver? On the other hand, with the patch my problem
-is solved and the phone is usable in the virtual machine!
