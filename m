@@ -2,94 +2,689 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA490C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 20:30:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC56C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Jun 2022 21:16:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344656AbiFIUaH (ORCPT
+        id S233939AbiFIVQb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Jun 2022 16:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54088 "EHLO
+        Thu, 9 Jun 2022 17:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235192AbiFIUaF (ORCPT
+        with ESMTP id S229844AbiFIVQb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Jun 2022 16:30:05 -0400
-Received: from proxima.lasnet.de (proxima.lasnet.de [IPv6:2a01:4f8:121:31eb:3::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAD9B28D6B3;
-        Thu,  9 Jun 2022 13:30:03 -0700 (PDT)
-Received: from localhost.localdomain.datenfreihafen.local (p200300e9d72f7220bc8f3831994f1895.dip0.t-ipconnect.de [IPv6:2003:e9:d72f:7220:bc8f:3831:994f:1895])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: stefan@sostec.de)
-        by proxima.lasnet.de (Postfix) with ESMTPSA id 034D2C03A0;
-        Thu,  9 Jun 2022 22:30:00 +0200 (CEST)
-From:   Stefan Schmidt <stefan@datenfreihafen.org>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-wpan@vger.kernel.org, alex.aring@gmail.com,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Subject: pull-request: ieee802154-next 2022-06-09
-Date:   Thu,  9 Jun 2022 22:29:56 +0200
-Message-Id: <20220609202956.1512156-1-stefan@datenfreihafen.org>
-X-Mailer: git-send-email 2.35.3
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 9 Jun 2022 17:16:31 -0400
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4FC3A6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 14:16:28 -0700 (PDT)
+Received: from github.com (hubbernetes-node-d24210e.ash1-iad.github.net [10.56.212.81])
+        by smtp.github.com (Postfix) with ESMTPA id 5B7F39004C9
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Jun 2022 14:16:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1654809388;
+        bh=pPhsezGNiaT4KI5C6EQ+3KntI8PQWQeNn8p4WQY2s1w=;
+        h=Date:From:To:Subject:From;
+        b=HYoJZBEZpKBhYHGUKzkjF5mK3IDXVKjU7P7DvI93qJQk6zqHvr64cPaTd07H0V7/T
+         IXT+uslwthIIEVuOm4f3vwwp3yFw3sUM/DXt6YRvJZFco4vYbRiEv5doISN6reUooc
+         iKzIieoz65Xulw7A9caBpqHqAxMA2ToctI3QptQo=
+Date:   Thu, 09 Jun 2022 14:16:28 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/1ffd74-ab31e2@github.com>
+Subject: [bluez/bluez] 53c28e: monitor/att: Simplify CCC decoders
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Dave, Jakub.
+  Branch: refs/heads/master=0D
+  Home:   https://github.com/bluez/bluez=0D
+  Commit: 53c28e3d868396fe5676751a44171dd67a7255a0=0D
+      https://github.com/bluez/bluez/commit/53c28e3d868396fe5676751a44171=
+dd67a7255a0=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-05-26 (Thu, 26 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M monitor/att.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  monitor/att: Simplify CCC decoders=0D
+=0D
+This simplify callbacks moving the decoding of the value to=0D
+print_ccc_value.=0D
+=0D
+=0D
+  Commit: 13bdb9f3bee1763143ec5af4db3bb4e213261fe7=0D
+      https://github.com/bluez/bluez/commit/13bdb9f3bee1763143ec5af4db3bb=
+4e213261fe7=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-05-26 (Thu, 26 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M monitor/att.c=0D
+    M monitor/l2cap.h=0D
+    M monitor/packet.c=0D
+    M monitor/packet.h=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  monitor/att: Add decoding support for PAC Sink/Source=0D
+=0D
+This adds decoding support for PAC Sink/Source attributes:=0D
+=0D
+ < ACL Data TX: Handle 42 flags 0x00 dlen 9=0D
+      Channel: 64 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)]=0D
+      {chan 0}=0D
+      ATT: Read Request (0x0a) len 2=0D
+        Handle: 0x0017 Type: Sink PAC (0x2bc9)=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 31=0D
+      Channel: 65 len 27 sdu 25 [PSM 39 mode Enhanced Credit (0x81)]=0D
+      {chan 0}=0D
+        Value: 010600000000100301ff0002020302030305041e00f00000=0D
+          Number of PAC(s): 1=0D
+          PAC #0:=0D
+            Codec: LC3 (0x06)=0D
+            Codec Specific Configuration #0: len 0x03 type 0x01=0D
+            Codec Specific Configuration: ff00=0D
+            Codec Specific Configuration #1: len 0x02 type 0x02=0D
+            Codec Specific Configuration: 03=0D
+            Codec Specific Configuration #2: len 0x02 type 0x03=0D
+            Codec Specific Configuration: 03=0D
+            Codec Specific Configuration #3: len 0x05 type 0x04=0D
+            Codec Specific Configuration: 1e00f000=0D
+=0D
+=0D
+  Commit: ba32b25a61eb75277cedc1fea7ed5d35fd1e726e=0D
+      https://github.com/bluez/bluez/commit/ba32b25a61eb75277cedc1fea7ed5=
+d35fd1e726e=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-05-26 (Thu, 26 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M lib/bluetooth.h=0D
+    M monitor/att.c=0D
+    M monitor/l2cap.h=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  monitor/att: Add decoding support for ASE Sink/Source=0D
+=0D
+This adds decoding support for ASE Sink/Source attributes:=0D
+=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 9=0D
+      Channel: 65 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)] {chan =
+0}=0D
+      ATT: Read Request (0x0a) len 2=0D
+        Handle: 0x002a Type: Sink ASE (0x2bc4)=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 9=0D
+      Channel: 64 len 5 sdu 3 [PSM 39 mode Enhanced Credit (0x81)] {chan =
+0}=0D
+      ATT: Read Response (0x0b) len 2=0D
+        Value: 0300=0D
+            ASE ID: 1=0D
+            State: Idle (0x00)=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 55=0D
+      Channel: 64 len 51 sdu 49 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 48=0D
+        Length: 0x0023=0D
+        Handle: 0x0024 Type: Sink ASE (0x2bc4)=0D
+          Data: 01010000000a00204e00409c00204e00409c0006000000000a0201030=
+2020103042800=0D
+            ASE ID: 1=0D
+            State: Codec Configured (0x01)=0D
+            Framing: Unframed PDUs supported (0x00)=0D
+            PHY: 0x00=0D
+            RTN: 0=0D
+            Max Transport Latency: 10=0D
+            Presentation Delay Min: 20000 us=0D
+            Presentation Delay Max: 40000 us=0D
+            Preferred Presentation Delay Min: 20000 us=0D
+            Preferred Presentation Delay Max: 40000 us=0D
+            Codec: LC3 (0x06)=0D
+            Codec Specific Configuration #0: len 0x02 type 0x01=0D
+            Codec Specific Configuration: 03=0D
+            Codec Specific Configuration #1: len 0x02 type 0x02=0D
+            Codec Specific Configuration: 01=0D
+            Codec Specific Configuration #2: len 0x03 type 0x04=0D
+            Codec Specific Configuration: 2800=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 37=0D
+      Channel: 64 len 33 sdu 31 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 30=0D
+        Length: 0x0011=0D
+        Handle: 0x0024 Type: Sink ASE (0x2bc4)=0D
+          Data: 0102000010270000022800020a00409c00=0D
+            ASE ID: 1=0D
+            State: QoS Configured (0x02)=0D
+            CIG ID: 0x00=0D
+            CIS ID: 0x00=0D
+            SDU Interval: 10000 usec=0D
+            Framing: Unframed (0x00)=0D
+            PHY: 0x02=0D
+            LE 2M PHY (0x02)=0D
+            Max SDU: 40=0D
+            RTN: 2=0D
+            Max Transport Latency: 10=0D
+            Presentation Delay: 40000 us=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 33=0D
+      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 26=0D
+        Length: 0x000d=0D
+        Handle: 0x002a Type: Source ASE (0x2bc5)=0D
+          Data: 03030000060304030202000000=0D
+            ASE ID: 3=0D
+            State: Enabling (0x03)=0D
+            CIG ID: 0x00=0D
+            CIS ID: 0x00=0D
+            Metadata #0: len 0x03 type 0x04=0D
+            Metadata: 0302=0D
+            Metadata #1: len 0x02 type 0x00=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 39=0D
+      Channel: 64 len 35 sdu 33 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 32=0D
+        Length: 0x000d=0D
+        Handle: 0x002a Type: Source ASE (0x2bc5)=0D
+          Data: 03040000060304030202000000=0D
+            ASE ID: 3=0D
+            State: Streaming (0x04)=0D
+            CIG ID: 0x00=0D
+            CIS ID: 0x00=0D
+            Metadata #0: len 0x03 type 0x04=0D
+            Metadata: 0302=0D
+            Metadata #1: len 0x02 type 0x00=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 33=0D
+      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 26=0D
+        Length: 0x000d=0D
+        Handle: 0x002a Type: Source ASE (0x2bc5)=0D
+          Data: 03050000060304030202000000=0D
+            ASE ID: 3=0D
+            State: Disabling (0x05)=0D
+            CIG ID: 0x00=0D
+            CIS ID: 0x00=0D
+            Metadata #0: len 0x03 type 0x04=0D
+            Metadata: 0302=0D
+            Metadata #1: len 0x02 type 0x00=0D
+=0D
+=0D
+  Commit: 21f65f7b2fca8201291bc5b630d3c20e209d515d=0D
+      https://github.com/bluez/bluez/commit/21f65f7b2fca8201291bc5b630d3c=
+20e209d515d=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-05-26 (Thu, 26 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M monitor/att.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  monitor/att: Add decoding support for ASE Control Point=0D
+=0D
+This adds decoding support for ASE Control Point attribute:=0D
+=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 30=0D
+      Channel: 64 len 26 sdu 24 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 1}=0D
+      ATT: Write Command (0x52) len 23=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 010103020206000000000a02010302020103042800=0D
+            Opcode: Codec Configuration (0x01)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            Target Latency: Balance Latency/Reliability (0x02)=0D
+            PHY: 0x02=0D
+            LE 2M PHY (0x02)=0D
+            Codec: LC3 (0x06)=0D
+            Codec Specific Configuration #0: len 0x02 type 0x01=0D
+            Codec Specific Configuration: 03=0D
+            Codec Specific Configuration #1: len 0x02 type 0x02=0D
+            Codec Specific Configuration: 01=0D
+            Codec Specific Configuration #2: len 0x03 type 0x04=0D
+            Codec Specific Configuration: 2800=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 55=0D
+      Channel: 64 len 51 sdu 49 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 48=0D
+        Length: 0x0005=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 0101030000=0D
+            Opcode: Codec Configuration (0x01)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            ASE Response Code: Success (0x00)=0D
+            ASE Response Reason: None (0x00)=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 27=0D
+      Channel: 64 len 23 sdu 21 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 1}=0D
+      ATT: Write Command (0x52) len 20=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 020103000010270000022800020a00409c00=0D
+            Opcode: QoS Configuration (0x02)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            CIG ID: 0x00=0D
+            CIS ID: 0x00=0D
+            SDU Interval: 10000 usec=0D
+            Framing: Unframed (0x00)=0D
+            PHY: 0x02=0D
+            LE 2M PHY (0x02)=0D
+            Max SDU: 40=0D
+            RTN: 2=0D
+            Max Transport Latency: 10=0D
+            Presentation Delay: 40000 us=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 37=0D
+      Channel: 64 len 33 sdu 31 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 30=0D
+        Length: 0x0005=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 0201030000=0D
+            Opcode: QoS Configuration (0x02)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            ASE Response Code: Success (0x00)=0D
+            ASE Response Reason: None (0x00)=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 17=0D
+      Channel: 64 len 13 sdu 11 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 1}=0D
+      ATT: Write Command (0x52) len 10=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 0301030403020200=0D
+            Opcode: Enable (0x03)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            Metadata #0: len 0x03 type 0x02=0D
+            Metadata: 0200=0D
+< ACL Data TX: Handle 42 flags 0x00 dlen 33=0D
+      Channel: 64 len 29 sdu 27 [PSM 39 mode Enhanced Credit (0x81)] {cha=
+n 0}=0D
+      ATT: Handle Multiple Value Notification (0x23) len 26=0D
+        Length: 0x0005=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 0301030000=0D
+            Opcode: Enable (0x03)=0D
+            Number of ASE(s): 1=0D
+            ASE: #0=0D
+            ASE ID: 0x03=0D
+            ASE Response Code: Success (0x00)=0D
+            ASE Response Reason: None (0x00)=0D
+> ACL Data RX: Handle 42 flags 0x02 dlen 12=0D
+      Channel: 64 len 8 sdu 6 [PSM 39 mode Enhanced Credit (0x81)] {chan =
+0}=0D
+      ATT: Write Command (0x52) len 5=0D
+        Handle: 0x0030 Type: ASE Control Point (0x2bc6)=0D
+          Data: 050101=0D
+            Opcode: Disable (0x05)=0D
+            Number of ASE(s): 1=0D
+=0D
+=0D
+  Commit: b4233bca181580800b483a228ca5377efcfeb844=0D
+      https://github.com/bluez/bluez/commit/b4233bca181580800b483a228ca53=
+77efcfeb844=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M client/gatt.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  client/gatt: Fix memory leak issues=0D
+=0D
+While performing the static tool analysis using coverity tool=0D
+found following reports=0D
+=0D
+Error: RESOURCE_LEAK (CWE-772):=0D
+bluez-5.64/client/gatt.c:1531: leaked_storage: Variable "service"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+Error: RESOURCE_LEAK (CWE-772):=0D
+bluez-5.64/client/gatt.c:2626: leaked_storage: Variable "chrc"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+Error: RESOURCE_LEAK (CWE-772):=0D
+bluez-5.64/client/gatt.c:2906: leaked_storage: Variable "desc"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: 5eb96b3ec8545047a74d7204664267c7aa749070=0D
+      https://github.com/bluez/bluez/commit/5eb96b3ec8545047a74d720466426=
+7c7aa749070=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M mesh/appkey.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  mesh/appkey: Fix memory leaks=0D
+=0D
+While performing the static analysis using the coverity tool found=0D
+following memory leak reports=0D
+=0D
+bluez-5.64/mesh/appkey.c:143: leaked_storage: Variable "key" going=0D
+out of scope leaks the storage it points to.=0D
+=0D
+Error: RESOURCE_LEAK (CWE-772):=0D
+bluez-5.64/mesh/appkey.c:146: leaked_storage: Variable "key" going=0D
+out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: 6f02010ce0043ec2e17eb15f2a1dd42f6c64e223=0D
+      https://github.com/bluez/bluez/commit/6f02010ce0043ec2e17eb15f2a1dd=
+42f6c64e223=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M monitor/jlink.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  monitor: Fix memory leaks=0D
+=0D
+While performing static tool analysis using coverity=0D
+found following reports for resouse leak=0D
+=0D
+bluez-5.64/monitor/jlink.c:111: leaked_storage: Variable "so"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+bluez-5.64/monitor/jlink.c:113: leaked_storage: Variable "so"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: fc57aa92a4f32f7c0f38198e6d26b529b537a047=0D
+      https://github.com/bluez/bluez/commit/fc57aa92a4f32f7c0f38198e6d26b=
+529b537a047=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M plugins/sixaxis.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  sixaxis: Fix memory leaks=0D
+=0D
+While performing static tool analysis using coverity=0D
+found following reports for resouse leak=0D
+=0D
+bluez-5.64/plugins/sixaxis.c:425: alloc_arg:=0D
+"get_pairing_type_for_device" allocates memory that is=0D
+stored into "sysfs_path".=0D
+=0D
+bluez-5.64/plugins/sixaxis.c:428: leaked_storage: Variable "sysfs_path"=0D=
 
-An update from ieee802154 for your *net-next* tree.
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: f4743109f381a4d53b476c5b77c7c68a6aa40b59=0D
+      https://github.com/bluez/bluez/commit/f4743109f381a4d53b476c5b77c7c=
+68a6aa40b59=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/cltest.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  cltest: Fix leaked_handle=0D
+=0D
+While performing static tool analysis using coverity found=0D
+following reports for resouse leak=0D
+=0D
+bluez-5.64/tools/cltest.c:75: leaked_handle: Handle variable "fd"=0D
+going out of scope leaks the handle.=0D
+=0D
+=0D
+  Commit: 4ae130455b173650f564d92f7908a7ca4f7b1ee6=0D
+      https://github.com/bluez/bluez/commit/4ae130455b173650f564d92f7908a=
+7ca4f7b1ee6=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/create-image.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  create-image: Fix leaked_handle=0D
+=0D
+While performing static tool analysis using coverity found following=0D
+reports for resouse leak=0D
+=0D
+bluez-5.64/tools/create-image.c:124: leaked_storage: Variable "map"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: 4334be027ae1ad50193025c90e77a76b64464b53=0D
+      https://github.com/bluez/bluez/commit/4334be027ae1ad50193025c90e77a=
+76b64464b53=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/l2cap-tester.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  l2cap-tester: Fix leaked_handle=0D
+=0D
+While performing static tool analysis using coverity found following=0D
+reports for resouse leak=0D
+=0D
+bluez-5.64/tools/l2cap-tester.c:1712: leaked_handle: Handle variable=0D
+"new_sk" going out of scope leaks the handle.=0D
+=0D
+=0D
+  Commit: 35cbfd9660949fca23418bfa32fd51d81ed91208=0D
+      https://github.com/bluez/bluez/commit/35cbfd9660949fca23418bfa32fd5=
+1d81ed91208=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/mesh/mesh-db.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  mesh/mesh-db: Fix resource leaks=0D
+=0D
+While performing static tool analysis using coverity found following=0D
+reports for resouse leak=0D
+=0D
+bluez-5.64/tools/mesh/mesh-db.c:2388: leaked_handle: Handle variable=0D
+"fd" going out of scope leaks the handle.=0D
+=0D
+bluez-5.64/tools/mesh/mesh-db.c:2388: leaked_storage: Variable "str"=0D
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: 39b638526d9a45d54d2d6e3f175fd7eb057ef8f0=0D
+      https://github.com/bluez/bluez/commit/39b638526d9a45d54d2d6e3f175fd=
+7eb057ef8f0=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/obex-client-tool.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  obex-client: Fix leaked_handle=0D
+=0D
+While performing static tool analysis using coverity found following=0D
+reports for resouse leak=0D
+=0D
+bluez-5.64/tools/obex-client-tool.c:315: leaked_handle: Handle variable=0D=
 
-This is a separate pull request for 6lowpan changes. We agreed with the
-bluetooth maintainers to switch the trees these changing are going into
-from bluetooth to ieee802154.
+"sk" going out of scope leaks the handle.=0D
+=0D
+=0D
+  Commit: 06d3c7429ad6bdf6eef1bcedee327e74a33c40bf=0D
+      https://github.com/bluez/bluez/commit/06d3c7429ad6bdf6eef1bcedee327=
+e74a33c40bf=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M obexd/client/pbap.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  pbap: Fix memory leak=0D
+=0D
+Reported by coverity tool as follows:=0D
+=0D
+bluez-5.64/obexd/client/pbap.c:929: leaked_storage: Variable "apparam"=0D=
 
-Jukka Rissanen stepped down as a co-maintainer of 6lowpan (Thanks for the
-work!). Alexander is staying as maintainer.
+going out of scope leaks the storage it points to.=0D
+=0D
+=0D
+  Commit: 56bda20ce9e3e5c4684b37cffd4527264c2b4c1e=0D
+      https://github.com/bluez/bluez/commit/56bda20ce9e3e5c4684b37cffd452=
+7264c2b4c1e=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/meshctl.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  meshctl: Fix possible use_after_free=0D
+=0D
+Reported by coverity tool as follows :=0D
+=0D
+bluez-5.64/tools/meshctl.c:1968: freed_arg: "g_free" frees "mesh_dir".=0D=
 
-Alexander reworked the nhc_id lookup in 6lowpan to be way simpler.
-Moved the data structure from rb to an array, which is all we need in this
-case.
+=0D
+bluez-5.64/tools/meshctl.c:2018: double_free: Calling "g_free" frees=0D
+pointer "mesh_dir" which has already been freed.=0D
+=0D
+=0D
+  Commit: 5cdaeaefc350ea3c42719284b88406579d032fb6=0D
+      https://github.com/bluez/bluez/commit/5cdaeaefc350ea3c42719284b8840=
+6579d032fb6=0D
+  Author: Gopal Tiwari <gtiwari@redhat.com>=0D
+  Date:   2022-05-31 (Tue, 31 May 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/mesh-gatt/prov-db.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  mesh-gatt: Fix use_after_free=0D
+=0D
+Following scenario happens when prov is false and we have double free as=0D=
 
-regards
-Stefan Schmidt
+mentioned in the below=0D
+=0D
+bluez-5.64/tools/mesh-gatt/prov-db.c:847: freed_arg: "g_free" frees=0D
+"in_str".=0D
+=0D
+bluez-5.64/tools/mesh-gatt/prov-db.c:867: double_free: Calling "g_free"=0D=
 
-The following changes since commit 0530a683fc858aa641d88ad83315ea53c27bce10:
+frees pointer "in_str" which has already been freed.=0D
+=0D
+=0D
+  Commit: 93850c827d549115f0396da42c4a0529feeed1a3=0D
+      https://github.com/bluez/bluez/commit/93850c827d549115f0396da42c4a0=
+529feeed1a3=0D
+  Author: Joseph Hwang <josephsih@chromium.org>=0D
+  Date:   2022-06-02 (Thu, 02 Jun 2022)=0D
+=0D
+  Changed paths:=0D
+    M doc/mgmt-api.txt=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  doc: Introduce the quality report command and event=0D
+=0D
+Add the MGMT quality report command and event in doc/mgmt-api.txt.=0D
+=0D
+=0D
+  Commit: 7bcd32e67e9388c49212e5dd5dd431c9ec079eb0=0D
+      https://github.com/bluez/bluez/commit/7bcd32e67e9388c49212e5dd5dd43=
+1c9ec079eb0=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-06-02 (Thu, 02 Jun 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/test-runner.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  test-runner: Fix not waiting for system_bus_socket=0D
+=0D
+This makes test-runner wait for system_bus_socket to be available before=0D=
 
-  Merge branch 'vsock-virtio-add-support-for-device-suspend-resume' (2022-05-02 16:04:37 -0700)
+continuing otherwise the likes of bluetoothd would likely fail to start.=0D=
 
-are available in the Git repository at:
+=0D
+=0D
+  Commit: 67b325c614e5fdac255798fb9280b32e704895e1=0D
+      https://github.com/bluez/bluez/commit/67b325c614e5fdac255798fb9280b=
+32e704895e1=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-06-02 (Thu, 02 Jun 2022)=0D
+=0D
+  Changed paths:=0D
+    M doc/test-runner.txt=0D
+    M doc/tester.config=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  test-runner: Enable BT_HCIUART and BT_HCIUART_H4=0D
+=0D
+These options are required when running with -u option since that uses=0D=
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/sschmidt/wpan-next.git tags/ieee802154-for-net-next-2022-06-09
+H4 headers to serialize the communication of host and guest.=0D
+=0D
+=0D
+  Commit: ab31e2f7e828df3d971cba6f12859edc69f149d5=0D
+      https://github.com/bluez/bluez/commit/ab31e2f7e828df3d971cba6f12859=
+edc69f149d5=0D
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
+  Date:   2022-06-02 (Thu, 02 Jun 2022)=0D
+=0D
+  Changed paths:=0D
+    M tools/mgmt-tester.c=0D
+=0D
+  Log Message:=0D
+  -----------=0D
+  mgmt-tester: Fix build error=0D
+=0D
+This fixes the following build error:=0D
+=0D
+CC    tools/mgmt-tester.o=0D
+tools/mgmt-tester.c: In function =E2=80=98setup_command_generic=E2=80=99:=
+=0D
+tools/mgmt-tester.c:7503:16: error: the comparison will always evaluate=0D=
 
-for you to fetch changes up to 260b5c694bd41fd53b1aa21fbea369568c7b5a4a:
-
-  MAINTAINERS: Remove Jukka Rissanen as 6lowpan maintainer (2022-06-09 21:53:28 +0200)
-
-----------------------------------------------------------------
-Alexander Aring (3):
-      net: 6lowpan: remove const from scalars
-      net: 6lowpan: use array for find nhc id
-      net: 6lowpan: constify lowpan_nhc structures
-
-Jukka Rissanen (1):
-      MAINTAINERS: Remove Jukka Rissanen as 6lowpan maintainer
-
- MAINTAINERS                     |   1 -
- net/6lowpan/nhc.c               | 103 ++++++++--------------------------------
- net/6lowpan/nhc.h               |  38 ++++++---------
- net/6lowpan/nhc_dest.c          |   9 +---
- net/6lowpan/nhc_fragment.c      |   9 +---
- net/6lowpan/nhc_ghc_ext_dest.c  |   9 +---
- net/6lowpan/nhc_ghc_ext_frag.c  |  11 +----
- net/6lowpan/nhc_ghc_ext_hop.c   |   9 +---
- net/6lowpan/nhc_ghc_ext_route.c |   9 +---
- net/6lowpan/nhc_ghc_icmpv6.c    |   9 +---
- net/6lowpan/nhc_ghc_udp.c       |   9 +---
- net/6lowpan/nhc_hop.c           |   9 +---
- net/6lowpan/nhc_ipv6.c          |  11 +----
- net/6lowpan/nhc_mobility.c      |   9 +---
- net/6lowpan/nhc_routing.c       |   9 +---
- net/6lowpan/nhc_udp.c           |   9 +---
- 16 files changed, 48 insertions(+), 215 deletions(-)
+as =E2=80=98true=E2=80=99 for the pointer operand in=0D
+=E2=80=98(const struct setup_mgmt_cmd *)test->setup_mgmt_cmd_arr +=0D
+(sizetype)(i * 24)=E2=80=99 must not be NULL [-Werror=3Daddress]=0D
+ 7503 |     for (; test->setup_mgmt_cmd_arr + i; ++i) {=0D
+   |        ^~~~=0D
+=0D
+=0D
+Compare: https://github.com/bluez/bluez/compare/1ffd74a6d421...ab31e2f7e8=
+28=0D
