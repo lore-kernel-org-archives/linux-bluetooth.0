@@ -2,113 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07BF5C43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 11:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6481C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 14:01:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240567AbiFJL5t (ORCPT
+        id S1344318AbiFJOBY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jun 2022 07:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54800 "EHLO
+        Fri, 10 Jun 2022 10:01:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241978AbiFJL5r (ORCPT
+        with ESMTP id S1349147AbiFJN7q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jun 2022 07:57:47 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC3413E0F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 04:57:47 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 129so24580717pgc.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 04:57:47 -0700 (PDT)
+        Fri, 10 Jun 2022 09:59:46 -0400
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F9AF25FC6F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 06:59:42 -0700 (PDT)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-3137eb64b67so71620537b3.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 06:59:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=igzCllVRZ/Iftq2E4CRi0LLTYy5lp/pHxz7UxtsP51k=;
-        b=AMHpDk9qHv4rnINo0J+czujxSJ5L1vIr4mcyRxfGpGhF/Aj+B3KLVP1Mc85bVv1ciD
-         m8LQ9GEoo9bRzqFVvjozjIV8VxDxxEylklPsG7alvRajANIQjbVtK2PjQm0qDYkHwnSD
-         lzzPGxXJJmAcCDlE0yjlaveSDcViegjnsadOG6gPPukJsk+WZqg06YO73RiKBRai9KH0
-         pypB4izDuwD1667UwBvGGpx+4Xc9NS0S2LmeyOBc/CwPjwJk7QAAA7hbliMsIQGIc/EE
-         918NvBa57pjju0K6RVsJfZW3/NM0UnWXiLO29EUIYVL6Fotty9vS+lXggn6IZvaCGUtv
-         tjmg==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OWEPC7SAufrCkjFU0SfT1ySX9jvLl/PM1GkMbPRUTlE=;
+        b=EVitkBKz9HTETcRAjD4jGW+cco0VlHX2iLKnRGHPQGm6CKoryiObuhFKTAHjd+LGLi
+         6zYOTYLEbsUluzdHJgAz9ZvvMk29rs749HjMBKdzGaPX9cgem3LHcsh2HMGSdaxXyRJn
+         5YuSeynELes+xuZW7GEs4pT8lndKHz81Wjepfu6WP0UvgZm89gNVRHe/9+00BCNqtxJy
+         ETi3leVwScGZNzvk/MJrdTAKM9ui19dbzxWDfS2KaWRhNOArXj3sqyJMln0aBNlmxCwH
+         iQBVpK3e0RfcWIOTE3ebm+YXYmyEWbN0WcotgIMyCtpJbrsoD5JWvelbGJQWnS6mCwe5
+         EGOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=igzCllVRZ/Iftq2E4CRi0LLTYy5lp/pHxz7UxtsP51k=;
-        b=iSfeEMSfU7ofFNRGHtGbgLMdusEWoLA4su9YwP/bTkdNvW8xOxCYh9t8kDcmyKTmam
-         HnVZaRM9ewdTmimYCVwN0Ts0posjNl/TtNXgS69kP+6YgNG7pMYYssEC/z18oMB6Hs3Q
-         QKlKEM+Vpf/jz0zFBbiM3bvi+g//JwbcniGTkqHgLK4z2HTws9Tew5ReSb1ZCxDhA81n
-         ooXWENcIQ3io9GAUAwrT5LssGywIy0dZAq4oCdvxMpCqMSbjQvp9kkjX7tjzL2//pJNm
-         pZAKjq4+3a8MoC/1yg3/FY+e5Qy9Sl4SsKtcGNt4mMB8hiDHF5ULfy37lz4e/rb9xNK8
-         9T5g==
-X-Gm-Message-State: AOAM533UE9bgXY0TM3Wqi1C1UvTPhdT6ilOQXbXUZV/dtvORvkqvBNiX
-        JWuWEGQB9X44LEq02zUiHqsbjMsnChk=
-X-Google-Smtp-Source: ABdhPJwW94agBEXWe1eF1KOLz4qzyxonadu3UN/oau3OcaUn+a+eZsJC5dpkbmGotsbd4TKYGAnpMQ==
-X-Received: by 2002:a05:6a00:140b:b0:4e1:2cbd:30ba with SMTP id l11-20020a056a00140b00b004e12cbd30bamr45784722pfu.46.1654862266473;
-        Fri, 10 Jun 2022 04:57:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.90.34])
-        by smtp.gmail.com with ESMTPSA id h11-20020a170902f7cb00b0015e8d4eb2d8sm1565166plw.290.2022.06.10.04.57.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Jun 2022 04:57:46 -0700 (PDT)
-Message-ID: <62a331ba.1c69fb81.67749.24cf@mx.google.com>
-Date:   Fri, 10 Jun 2022 04:57:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8467504198797606930=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OWEPC7SAufrCkjFU0SfT1ySX9jvLl/PM1GkMbPRUTlE=;
+        b=Co1mpLjz1E1MgqB8Qa/9K00BDUyGlRqiywSyCuZSCswlEzy/xb8t1g5EPZZPdlnx4c
+         oOqBqMSncliWcHAhwjcP9fS7BGNY/zbxNmyaF2fd8e+ZJt0SLu6IVXQRkMB10xkR+uWT
+         ZutmR7SqLHlSSTSBwwh5NkAJ9w9qchwj8MB5LjbC/obun0L58YgIN5JBqZXbHsN8Q6AK
+         8/pPmc9DxXKjaFcYhic4fpyIisN/jKPDNR6rrOme2zKDDlwohxeNOigcZGEpWmsmNNHE
+         NVfpMg+uBCmud6+aKMmojz4+xMyvZ42bSrf0lObqEZey05mgdgxBwByWhWcwF83cdLdk
+         Bd+g==
+X-Gm-Message-State: AOAM5317rl5oNBjQTe8A7kxuWaclMEsq+Nk6nbThzUKBgB6ek4iF7Iav
+        333tiiBG+UliEO3uciwHdcBnndq4CiuGo9fSzvm6Xw==
+X-Google-Smtp-Source: ABdhPJzpokt62wF8w51PGFxOhJ4bvWwLARVlE5z03nqvvSEUQRP60Ws5kIgElWNEyhTSKx+UNMTvrNFzYJ1PAxe6uqw=
+X-Received: by 2002:a81:7b86:0:b0:310:e75:3abb with SMTP id
+ w128-20020a817b86000000b003100e753abbmr42924798ywc.332.1654869581103; Fri, 10
+ Jun 2022 06:59:41 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, soenke.huster@eknoes.de
-Subject: RE: [v2] Bluetooth: RFCOMM: Use skb_trim to trim checksum
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220610110749.110881-1-soenke.huster@eknoes.de>
 References: <20220610110749.110881-1-soenke.huster@eknoes.de>
+In-Reply-To: <20220610110749.110881-1-soenke.huster@eknoes.de>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Fri, 10 Jun 2022 06:59:29 -0700
+Message-ID: <CANn89i+YHqMddY68Qk1rZexqhYYX9gah-==WGttFbp4urLS7Qg@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: RFCOMM: Use skb_trim to trim checksum
+To:     Soenke Huster <soenke.huster@eknoes.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8467504198797606930==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, Jun 10, 2022 at 4:08 AM Soenke Huster <soenke.huster@eknoes.de> wrote:
+>
+> As skb->tail might be zero, it can underflow. This leads to a page
+> fault: skb_tail_pointer simply adds skb->tail (which is now MAX_UINT)
+> to skb->head.
+>
+>     BUG: unable to handle page fault for address: ffffed1021de29ff
+>     #PF: supervisor read access in kernel mode
+>     #PF: error_code(0x0000) - not-present page
+>     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
+>
+> By using skb_trim instead of the direct manipulation, skb->tail
+> is reset. Thus, the correct pointer to the checksum is used.
+>
+> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+> ---
+> v2: Clarified how the bug triggers, minimize code change
+>
+>  net/bluetooth/rfcomm/core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index 7324764384b6..443b55edb3ab 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -1747,7 +1747,7 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
+>         type = __get_type(hdr->ctrl);
+>
+>         /* Trim FCS */
+> -       skb->len--; skb->tail--;
+> +       skb_trim(skb, skb->len - 1);
+>         fcs = *(u8 *)skb_tail_pointer(skb);
+>
+>         if (__check_fcs(skb->data, type, fcs)) {
+> --
+> 2.36.1
+>
 
-This is automated email and please do not reply to this email!
+Again, I do not see how skb->tail could possibly zero at this point.
 
-Dear submitter,
+If it was, skb with illegal layout has been queued in the first place,
+we need to fix the producer, not the consumer.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=649266
+A driver missed an skb_put() perhaps.
 
----Test result---
+Can you please dump the skb here  ?
 
-Test Summary:
-CheckPatch                    PASS      0.78 seconds
-GitLint                       PASS      0.42 seconds
-SubjectPrefix                 PASS      0.31 seconds
-BuildKernel                   PASS      31.50 seconds
-BuildKernel32                 PASS      30.28 seconds
-Incremental Build with patchesPASS      39.69 seconds
-TestRunner: Setup             PASS      487.85 seconds
-TestRunner: l2cap-tester      PASS      18.02 seconds
-TestRunner: bnep-tester       PASS      5.79 seconds
-TestRunner: mgmt-tester       FAIL      106.97 seconds
-TestRunner: rfcomm-tester     PASS      9.38 seconds
-TestRunner: sco-tester        PASS      9.27 seconds
-TestRunner: smp-tester        PASS      9.11 seconds
-TestRunner: userchan-tester   PASS      6.15 seconds
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 7324764384b6773074032ad671777bf86bd3360e..358ccb4fe7214aea0bb4084188c7658316fe0ff7
+100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -1746,6 +1746,11 @@ static struct rfcomm_session
+*rfcomm_recv_frame(struct rfcomm_session *s,
+        dlci = __get_dlci(hdr->addr);
+        type = __get_type(hdr->ctrl);
 
-Details
-##############################
-Test: TestRunner: mgmt-tester - FAIL - 106.97 seconds
-Run test-runner with mgmt-tester
-Total: 493, Passed: 491 (99.6%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Add Advertising - Success (Name+data+appear)         Timed out    2.769 seconds
-Add Ext Advertising - Success (Name+data+appear)     Timed out    2.405 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8467504198797606930==--
++       if (!skb->tail) {
++               DO_ONCE_LITE(skb_dump(KERN_ERR, skb, false));
++               kfree_skb(skb);
++               return s;
++       }
+        /* Trim FCS */
+        skb->len--; skb->tail--;
+        fcs = *(u8 *)skb_tail_pointer(skb);
