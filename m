@@ -2,99 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D43C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 16:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5781CC43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 16:38:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348795AbiFJQhO (ORCPT
+        id S1349654AbiFJQik (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jun 2022 12:37:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42710 "EHLO
+        Fri, 10 Jun 2022 12:38:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345068AbiFJQhJ (ORCPT
+        with ESMTP id S1349818AbiFJQif (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jun 2022 12:37:09 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A78957171
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 09:37:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 10 Jun 2022 12:38:35 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50439579A9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 09:38:31 -0700 (PDT)
+Received: from localhost.localdomain (67.227.121.78.rev.sfr.net [78.121.227.67])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 425DFB83654
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 16:37:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED4BDC341C4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 16:37:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654879026;
-        bh=SwEjhRap3x2aUWYcqtFetsNysmTePGay1THeP61hKsI=;
+        (Authenticated sender: fdanis)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 8AD5B6601726
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 17:38:30 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1654879110;
+        bh=Ennfx6R5it+STbujT8TaTPJ+N0XXO/K1XoxzAwfznz4=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=q9yE/uv4umlQR7+mH3brhkDmhLTyiI64y53M6bWKX5mASzm0LEAxgcrwRp6lsr55b
-         PRrDWuwUe90lzGSQyoBfc1kFJhC7O3gxxS1rp2QvS5AdEbLjQzjxPWDY7obCet5HnB
-         kMB02AyKoyZK5EuWtXXJBtbrjmH/Yy0rDRe7o0eB0kVUIouiTgE3FLBzZ9IckYZBvD
-         vJJ53mesixPIzuqJCGPhg113MFlmGgLi/MOKiCNvulM2POz6Y/BWyqKd6bZh4fRkyP
-         KOlxmLYsuN4Z28seVI8oqXlyzhzl7ruDRMrIBLBkOr+SNyqqQJDHBIAFVY8qgLRqQI
-         CJpeu+cFNbSBw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id DA46DC05FD5; Fri, 10 Jun 2022 16:37:05 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        b=NKu99Ne6N6x9F32KvinAmUQYDoSDMHG2CpdCMAL357dkZajHj4m4S2MdHWdvXYhpV
+         dn0+tRawx0hELRRdC5d2AjCJfHFUGbSLwLZVeIsD92K2BVricjXDu59D1dCF18AWW1
+         8LFevIzb0s/9IJeaAnfWIL2FTZGr3r1e5TQ70RL7x2skc0QMmTZCMNhgYlSv4pSUFb
+         0AK3f8YO3o+2wu37pKN685HjA98WflXWpVkSDoeA4y0iYR1X/zVUSFzUnH2pUeJW/d
+         YRSZDti9qf01HYtop+LPS7GdmpnD1AtIRusRpToPAH5UYgY8W+TSzjIPqnlFUOvfQj
+         zvf5Np/3u6R8w==
+From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
+        <frederic.danis@collabora.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Fri, 10 Jun 2022 16:37:05 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-209745-62941-yfteIfFRoJ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ v3 3/4] test-runner: Add audio card support
+Date:   Fri, 10 Jun 2022 18:38:19 +0200
+Message-Id: <20220610163820.79105-4-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220610163820.79105-1-frederic.danis@collabora.com>
+References: <20220610163820.79105-1-frederic.danis@collabora.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
+With this commit audio daemons can detect an audio card with output and
+input, allowing to test interaction between BlueZ and the audio daemon.
+---
+ tools/test-runner.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-Luiz Von Dentz (luiz.dentz@gmail.com) changed:
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 9fc8e7b33..bbbca5b5d 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -54,6 +54,7 @@ static bool start_monitor = false;
+ static int num_devs = 0;
+ static const char *qemu_binary = NULL;
+ static const char *kernel_image = NULL;
++static bool audio_support;
+ 
+ static const char *qemu_table[] = {
+ 	"qemu-system-x86_64",
+@@ -261,6 +262,7 @@ static void start_qemu(void)
+ 				run_auto, testargs);
+ 
+ 	argv = alloca(sizeof(qemu_argv) +
++				(audio_support ? 4 : 0) +
+ 				(sizeof(char *) * (4 + (num_devs * 4))));
+ 	memcpy(argv, qemu_argv, sizeof(qemu_argv));
+ 
+@@ -268,6 +270,20 @@ static void start_qemu(void)
+ 
+ 	argv[0] = (char *) qemu_binary;
+ 
++	if (audio_support) {
++		char *xdg_runtime_dir, *audiodev;
++
++		xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
++		audiodev = alloca(40 + strlen(xdg_runtime_dir));
++		sprintf(audiodev, "id=audio,driver=pa,server=%s/pulse/native",
++				xdg_runtime_dir);
++
++		argv[pos++] = "-audiodev";
++		argv[pos++] = audiodev;
++		argv[pos++] = "-device";
++		argv[pos++] = "AC97,audiodev=audio";
++	}
++
+ 	argv[pos++] = "-kernel";
+ 	argv[pos++] = (char *) kernel_image;
+ 	argv[pos++] = "-append";
+@@ -990,6 +1006,7 @@ static void usage(void)
+ 		"\t-u, --unix [path]      Provide serial device\n"
+ 		"\t-q, --qemu <path>      QEMU binary\n"
+ 		"\t-k, --kernel <image>   Kernel image (bzImage)\n"
++		"\t-A, --audio            Add audio support\n"
+ 		"\t-h, --help             Show help options\n");
+ }
+ 
+@@ -1004,6 +1021,7 @@ static const struct option main_options[] = {
+ 	{ "monitor", no_argument,       NULL, 'm' },
+ 	{ "qemu",    required_argument, NULL, 'q' },
+ 	{ "kernel",  required_argument, NULL, 'k' },
++	{ "audio",   no_argument,       NULL, 'A' },
+ 	{ "version", no_argument,       NULL, 'v' },
+ 	{ "help",    no_argument,       NULL, 'h' },
+ 	{ }
+@@ -1023,7 +1041,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "aubdslmq:k:vh", main_options,
++		opt = getopt_long(argc, argv, "aubdslmq:k:Avh", main_options,
+ 								NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -1057,6 +1075,9 @@ int main(int argc, char *argv[])
+ 		case 'k':
+ 			kernel_image = optarg;
+ 			break;
++		case 'A':
++			audio_support = true;
++			break;
+ 		case 'v':
+ 			printf("%s\n", VERSION);
+ 			return EXIT_SUCCESS;
+-- 
+2.25.1
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |luiz.dentz@gmail.com
-
---- Comment #23 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-(In reply to Massimo Burcheri from comment #22)
-> Somehow I got it solved without removing IdentityResolvingKey with these
-> settings in /etc/bluetooth/main.conf:
-> AutoEnable=3Dtrue
-> Experimental =3D false
-> I guess the Experimental flag is important. However after restarting the
-> machine, the pointer device was just connected and working.
-
-It seems the problem is LL Privacy (aka. Address Resolution), when that is
-enabled certain controller seem to be unable to resolve addresses so the ho=
-st
-stack is unable to reconnect. I guess we should be splitting the kernel
-experimental features from userspace experimental features, anyway Experime=
-ntal
-is never meant to be enabled by default so if anyone is shipping with it
-enabled on main.conf please reconsider.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
