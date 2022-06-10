@@ -2,75 +2,211 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F33EC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 16:38:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AABEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Jun 2022 16:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349751AbiFJQin (ORCPT
+        id S1349933AbiFJQ4B (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Jun 2022 12:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52018 "EHLO
+        Fri, 10 Jun 2022 12:56:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349835AbiFJQih (ORCPT
+        with ESMTP id S245376AbiFJQz7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Jun 2022 12:38:37 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5063E5932E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 09:38:31 -0700 (PDT)
-Received: from localhost.localdomain (67.227.121.78.rev.sfr.net [78.121.227.67])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: fdanis)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 485D46601724
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 17:38:30 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1654879110;
-        bh=TYvfHpLsV7jiR7wDzcPhKTa6mm+IINJaaS2N4SEONZk=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=N+0Ft4mZcptdzYRn5+BhECekLeSbamM7ZTFjdBbAti4EVw60q/188IBvCQ9QREsET
-         Ralw7auDHDy9hAL86KV4dHN66gtHEio292QalrQb2sB2eZri+ZRQDQL6yF72G6SYgw
-         zrm6PrUpo3dPf3RFiafv+wmxRvAk4hrdV1dz/YNnCruarGbZYcJsYC9WDSbDOBThod
-         48Ri8m7gUJ5XDUIS0BTGIGRT3Jlt4zTGO9ylcb7ye44BHiF73dE3pSU8nc/cDQJTUq
-         M6/e9i9RQ+WXluBoLCNvC8VXwCFjx2eEQCKW/iYv8U0jqmyKyKxWvkzc3zfak80aJm
-         L39kXwrf0/oTQ==
-From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
-        <frederic.danis@collabora.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/4] doc/test-runner: Add audio config options
-Date:   Fri, 10 Jun 2022 18:38:18 +0200
-Message-Id: <20220610163820.79105-3-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220610163820.79105-1-frederic.danis@collabora.com>
-References: <20220610163820.79105-1-frederic.danis@collabora.com>
+        Fri, 10 Jun 2022 12:55:59 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CA112FE52
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 09:55:58 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id w2so47947552ybi.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Jun 2022 09:55:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=8MXmjtpRfIxwcwc7y+xo5axaJXjza99CVzvE1CrLJRI=;
+        b=bgt7SVNh+TwNPxhgV3yb7XHMWJAo6MNucdlJ0caato+KCJi6CeiV2OVXzjQdYEeAVw
+         +kqjmbExf7bhABraxQxguCsq9PY/7FdS/nippLpQas89j83fChYSA+Sv46EsnXBwiD57
+         sDhmQekh8sk2rvwQbc5gnkaNYX65G47bJL5Xy5JG0KngsDnOn46cCgxpHC0Hjm5SHWYV
+         CBGOQYx0ksSl8gyNGafOHbxJTRTQc+C8rFJ6O8Fge1/h/aKpUibtUXywfXrbjp37hsog
+         16PrfqWPOOxzUdsgrbe6mjTcMFYwTLsICzTuYAKn2BVAE4bcRkun77+qB0Fj0Cs2IP1r
+         IbUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8MXmjtpRfIxwcwc7y+xo5axaJXjza99CVzvE1CrLJRI=;
+        b=dGFYaOgEjm6cMZlu8G4YrFrtFEJwb3fBfmhkvwpeuCyVS+NuJ6jeC10NBd4CTU7r/B
+         mOIAJtJgjtxXfKrpZvo32CYcNTledptlgEQTTCi3voxQ3Fn13r5B2ANCOHJZVpMdhz/t
+         7QQDtJGzlGiToR37IpkEDh9Fnq+TAOzap2nGTAMnTEDPS8q7msgvvm5UkwpKVT6zdIh7
+         MMwO82UQ1n4wi0hrLblbPjtG9k5U/wbgojehAR5FNLz3Jb10beCkZpp0Td6PyGYDpeLH
+         x/N4hGvBocP6D11pMU5IBos+tnfZNr6snZ5Fuat8+SR1Zpi35sbkJW9vIe590svdDK4l
+         TDww==
+X-Gm-Message-State: AOAM531OIy2zOjXWZ6MtUUaUXNJi4RR/histUzBqsFrunUPBSpuX/RYS
+        RilJZrfP4XouhkscadHuU0Q0I1RZeLFT51mxwp/UEg==
+X-Google-Smtp-Source: ABdhPJyS8+Va+4h1aZ/hweAj1xdgCMTPAx+JLHUda7xQdp6/8TdYxfAHT4fhn0Smewx+lCcAqaNuxuJNpeWtgTlbYfk=
+X-Received: by 2002:a25:aa32:0:b0:65c:af6a:3502 with SMTP id
+ s47-20020a25aa32000000b0065caf6a3502mr46009854ybi.598.1654880157232; Fri, 10
+ Jun 2022 09:55:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20220610110749.110881-1-soenke.huster@eknoes.de>
+ <CANn89i+YHqMddY68Qk1rZexqhYYX9gah-==WGttFbp4urLS7Qg@mail.gmail.com> <9f214837-dc68-ef1a-0199-27d6af582115@eknoes.de>
+In-Reply-To: <9f214837-dc68-ef1a-0199-27d6af582115@eknoes.de>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Fri, 10 Jun 2022 09:55:45 -0700
+Message-ID: <CANn89iKS7npfHvBJNP2PBtR9RAQGsVdykELX8mK8DQbFbLeybA@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: RFCOMM: Use skb_trim to trim checksum
+To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-List the build options for an AC97 audio card necessary for test with
-audio daemon.
----
- doc/test-runner.txt | 5 +++++
- 1 file changed, 5 insertions(+)
+On Fri, Jun 10, 2022 at 8:35 AM S=C3=B6nke Huster <soenke.huster@eknoes.de>=
+ wrote:
+>
+> Hi Eric,
+>
+> On 10.06.22 15:59, Eric Dumazet wrote:
+> > On Fri, Jun 10, 2022 at 4:08 AM Soenke Huster <soenke.huster@eknoes.de>=
+ wrote:
+> >>
+> >> As skb->tail might be zero, it can underflow. This leads to a page
+> >> fault: skb_tail_pointer simply adds skb->tail (which is now MAX_UINT)
+> >> to skb->head.
+> >>
+> >>     BUG: unable to handle page fault for address: ffffed1021de29ff
+> >>     #PF: supervisor read access in kernel mode
+> >>     #PF: error_code(0x0000) - not-present page
+> >>     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:175=
+1)
+> >>
+> >> By using skb_trim instead of the direct manipulation, skb->tail
+> >> is reset. Thus, the correct pointer to the checksum is used.
+> >>
+> >> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+> >> ---
+> >> v2: Clarified how the bug triggers, minimize code change
+> >>
+> >>  net/bluetooth/rfcomm/core.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>
+> >> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> >> index 7324764384b6..443b55edb3ab 100644
+> >> --- a/net/bluetooth/rfcomm/core.c
+> >> +++ b/net/bluetooth/rfcomm/core.c
+> >> @@ -1747,7 +1747,7 @@ static struct rfcomm_session *rfcomm_recv_frame(=
+struct rfcomm_session *s,
+> >>         type =3D __get_type(hdr->ctrl);
+> >>
+> >>         /* Trim FCS */
+> >> -       skb->len--; skb->tail--;
+> >> +       skb_trim(skb, skb->len - 1);
+> >>         fcs =3D *(u8 *)skb_tail_pointer(skb);
+> >>
+> >>         if (__check_fcs(skb->data, type, fcs)) {
+> >> --
+> >> 2.36.1
+> >>
+> >
+> > Again, I do not see how skb->tail could possibly zero at this point.
+> >
+> > If it was, skb with illegal layout has been queued in the first place,
+> > we need to fix the producer, not the consumer.
+> >
+>
+> Sorry, I thought that might be a right place as there is not much code in=
+ the kernel
+> that manipulates ->tail directly.
+>
+> > A driver missed an skb_put() perhaps.
+> >
+>
+> I am using the (I guess quite unused) virtio_bt driver, and figured out t=
+hat the following
+> fixes the bug:
+>
+> --- a/drivers/bluetooth/virtio_bt.c
+> +++ b/drivers/bluetooth/virtio_bt.c
+> @@ -219,7 +219,7 @@ static void virtbt_rx_work(struct work_struct *work)
+>         if (!skb)
+>                 return;
+>
+> -       skb->len =3D len;
+> +       skb_put(skb, len);
 
-diff --git a/doc/test-runner.txt b/doc/test-runner.txt
-index 683c622a2..019c23188 100644
---- a/doc/test-runner.txt
-+++ b/doc/test-runner.txt
-@@ -54,6 +54,11 @@ For Bluetooth functionality:
- 
- 	CONFIG_UHID=y
- 
-+For Audio functionality:
-+	CONFIG_SYSVIPC=y
-+	CONFIG_SOUND=y
-+	CONFIG_SND=y
-+	CONFIG_SND_INTEL8X0=y
- 
- These options should be installed as .config in the kernel source directory
- followed by this command.
--- 
-2.25.1
+Removing skb->len=3Dlen seems about right.
+But skb_put() should be done earlier.
 
+We are approaching the skb producer :)
+
+Now you have to find/check who added this illegal skb in the virt queue.
+
+Maybe virtbt_add_inbuf() ?
+
+Also there is kernel info leak I think.
+
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 67c21263f9e0f250f0719b8e7f1fe15b0eba5ee0..c9b832c447ee451f027430b284d=
+7bb246f6ecb24
+100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -37,6 +37,9 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt)
+        if (!skb)
+                return -ENOMEM;
+
++       skb_put(skb, 1000);
++       memset(skb->data, 0, 1000);
++
+        sg_init_one(sg, skb->data, 1000);
+
+        err =3D virtqueue_add_inbuf(vq, sg, 1, skb, GFP_KERNEL);
+
+
+>         virtbt_rx_handle(vbt, skb);
+>
+>         if (virtbt_add_inbuf(vbt) < 0)
+>
+> I guess this is the root cause? I just used Bluetooth for a while in the =
+VM
+> and no error occurred, everything worked fine.
+>
+> > Can you please dump the skb here  ?
+> >
+> > diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> > index 7324764384b6773074032ad671777bf86bd3360e..358ccb4fe7214aea0bb4084=
+188c7658316fe0ff7
+> > 100644
+> > --- a/net/bluetooth/rfcomm/core.c
+> > +++ b/net/bluetooth/rfcomm/core.c
+> > @@ -1746,6 +1746,11 @@ static struct rfcomm_session
+> > *rfcomm_recv_frame(struct rfcomm_session *s,
+> >         dlci =3D __get_dlci(hdr->addr);
+> >         type =3D __get_type(hdr->ctrl);
+> >
+> > +       if (!skb->tail) {
+> > +               DO_ONCE_LITE(skb_dump(KERN_ERR, skb, false));
+> > +               kfree_skb(skb);
+> > +               return s;
+> > +       }
+> >         /* Trim FCS */
+> >         skb->len--; skb->tail--;
+> >         fcs =3D *(u8 *)skb_tail_pointer(skb);
+>
+> If it might still help:
+>
+> skb len=3D4 headroom=3D9 headlen=3D4 tailroom=3D1728
+> mac=3D(-1,-1) net=3D(0,-1) trans=3D-1
+> shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=3D0))
+> csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 level=3D0)
+> hash(0x0 sw=3D0 l4=3D0) proto=3D0x0000 pkttype=3D0 iif=3D0
+> skb linear:   00000000: 03 3f 01 1c
+>
