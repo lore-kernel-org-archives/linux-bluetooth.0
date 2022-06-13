@@ -2,103 +2,240 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CE0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 23:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A5FC43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 23:34:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232286AbiFMXEJ (ORCPT
+        id S244210AbiFMXel (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 19:04:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39312 "EHLO
+        Mon, 13 Jun 2022 19:34:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbiFMXEJ (ORCPT
+        with ESMTP id S238631AbiFMXeg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 19:04:09 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4403631502
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 16:04:08 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id gd1so6971336pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 16:04:08 -0700 (PDT)
+        Mon, 13 Jun 2022 19:34:36 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 579E7326FE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 16:34:24 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d13so6344385plh.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 16:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=pwj/JSXOmZFr6N9sGZZvgEIFR39igWIQ706TxsdZj6o=;
-        b=YPRYFGgIf3UbEdUe96NK1Uj0bm6bQ5vg3KYXTXSJDlNGce58DaMdgELicBYOq8ly4/
-         H/IrpcVV/eayJ8HRrpmIWVbvoUy0FJ41239mp7CMXmmkon1QKtsCociFT5+bNIdUCagP
-         hDPTIU/m99D7cvCPzGBOGVUt4d+xNQdGuoJduksZYh/pd0wf3/ENhzkRBU+QMlnFup73
-         SH9boNlQtq+KyekVlYCeCNmr5dUQg6pkNupWqMyVNZeMmvIw0CV0mg6DCFM7UQsSl1zH
-         i9hyTYusTZGlbIewUN7g0WaiCeHi+tHF9s7Ju+6fjghmCOtWPZbEkSvp5Fih6S9sDSao
-         eUbA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/msugjDXCR2JcbdU30lPMalv5JtW0EsxUeVgX8tsjEE=;
+        b=pT1LIiGQe257sR3V/TXrU6VNPvDFyNL+nl8rEu2M19dY3NRNSLeqr2oOqoKzNU8QRD
+         xMKttV7y9+5qUgjINY288rJxF7fyeyOF4LKkrL6OwC16buwmeBmjqApgFPPt64nz84ZH
+         iqzKniDRTcL4KNzOqqcDxdSTiHfAcvKA2oufZDBeRK//KuKqUvYEh4Wc4FUVDEXhEhpm
+         Z8wdMr7dpRaZ8BcsCNUknuYonOItPQexqKRh2gYHOVuU2m6HOH1W0UHIB8ZCSLOpCCgY
+         1YalUgI8HpiOoTEeQwaDILmWnqRU0sYgxfJSdx9xKEAQ3bCf4MWGp1sKxc3LNrVQHkvI
+         ZHmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=pwj/JSXOmZFr6N9sGZZvgEIFR39igWIQ706TxsdZj6o=;
-        b=eJSO/tABYzLuE35cqTF217xN841Jov7hA3n81a8ZilymX2YzYybONJPkxk1oMkskNm
-         2SDF0kOI6PUu2dAlMCgzXWHb9t9olijdvXrYdo4IMrifJjbVwvQdibcSQYGjUCGQr0wM
-         DDM3N2QhO17hm1iuwQeC0rA+TSKecdVt7oH8G7vc/ywu48rImhRL9yHYnmxy7V6gX6Ha
-         qGzBiMnblbmKFcOWvDyBjAYEQwUYj98xHh27PdDxkcSEkqF1z04WE4ZWNVSGdK5Tl6Wl
-         hF9MesbKxA32U3ZL21Xd/xbHwKGjiu1yZrSkRywRaRApHhu6N7zm0/YWPQblkrO2LD86
-         xxtw==
-X-Gm-Message-State: AJIora/Lo1DZ62ULcUfdSopDdZSfU5TvATM/N3RIIRwhOICCbMV1yN0v
-        UwOn5DJq6ZWrfUQzrpZihtZMvzkTWeQ=
-X-Google-Smtp-Source: AGRyM1u37pASa/Gg4hG1zNWKOChxiU8NigiWSCtxgTVHJjeM0mZDy8H2RGhUBWJNZ9/Gguo3eq6zMw==
-X-Received: by 2002:a17:90b:214b:b0:1e2:d777:934f with SMTP id kt11-20020a17090b214b00b001e2d777934fmr1104117pjb.193.1655161447469;
-        Mon, 13 Jun 2022 16:04:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.141.221])
-        by smtp.gmail.com with ESMTPSA id r8-20020a63b108000000b00404fd2138afsm6098510pgf.40.2022.06.13.16.04.06
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/msugjDXCR2JcbdU30lPMalv5JtW0EsxUeVgX8tsjEE=;
+        b=wgV5aQ+0Zx3Bj17rC+lxafyHrSLCKFPlIYG5gAZyA9bUTfML107vu+dCgqo76yOLVR
+         Fteh0UVPDkD0UayfuLN55mgHIj6dFsshFJy3Ugt0B6JRrOANjIjvToUsG41T9E/ik5J7
+         2tDqm2Z49WXnxtFArW9NGyM1z+wHXxExTlmztdmL8voytlYs+yKshFPQds6z3ccBAwlr
+         oyYQr0VUusW6mMEvgYUISC5bihIX2syVganrMFdXvfhtbib/03ETn01ClAR5LYIsjr+o
+         viOcFbYqw3jiFqtBMPCmck9hOJ5JIW05/31BaQj7ApMRRWjLi/znlU7MekOTThIrRPXA
+         YP+g==
+X-Gm-Message-State: AJIora9giHcJGdXYdiMUyehmcd+ovu/INRc2bcCclEAL2jmOR5z+DzEe
+        lFKCW8yLF7R01dvnYI1301YQwGA3zfM=
+X-Google-Smtp-Source: AGRyM1u4dHxFcwqOEnreyY418zkQiPRvdUfX6YonxvrsYtnyRg5iMLU9ImJH7MTddqwSKWqdbLPHOg==
+X-Received: by 2002:a17:902:eb85:b0:168:b028:573b with SMTP id q5-20020a170902eb8500b00168b028573bmr1680935plg.158.1655163262875;
+        Mon, 13 Jun 2022 16:34:22 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id j12-20020a170902c3cc00b00163ffe73300sm5691017plj.137.2022.06.13.16.34.20
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 16:04:07 -0700 (PDT)
-Message-ID: <62a7c267.1c69fb81.47545.6fbd@mx.google.com>
-Date:   Mon, 13 Jun 2022 16:04:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2612369225780395913=="
+        Mon, 13 Jun 2022 16:34:21 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] device: Add connectable flag to bearer state
+Date:   Mon, 13 Jun 2022 16:34:18 -0700
+Message-Id: <20220613233419.177421-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
-Subject: RE: Fix refresh cached connection info
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220613144322.kernel.v1.1.Ia621daca5b03278ee09314c59659b64c901408cf@changeid>
-References: <20220613144322.kernel.v1.1.Ia621daca5b03278ee09314c59659b64c901408cf@changeid>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2612369225780395913==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=649987
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.86 seconds
-GitLint                       PASS      0.46 seconds
-SubjectPrefix                 PASS      0.30 seconds
-BuildKernel                   PASS      38.53 seconds
-BuildKernel32                 PASS      34.31 seconds
-Incremental Build with patchesPASS      45.95 seconds
-TestRunner: Setup             PASS      572.80 seconds
-TestRunner: l2cap-tester      PASS      19.34 seconds
-TestRunner: bnep-tester       PASS      6.96 seconds
-TestRunner: mgmt-tester       PASS      116.57 seconds
-TestRunner: rfcomm-tester     PASS      10.94 seconds
-TestRunner: sco-tester        PASS      10.47 seconds
-TestRunner: smp-tester        PASS      10.43 seconds
-TestRunner: userchan-tester   PASS      7.09 seconds
-
-
-
+This adds connectable flag to state so it can be used to detect which is
+the last seen connectable bearer.
 ---
-Regards,
-Linux Bluetooth
+ src/adapter.c |  6 +++---
+ src/device.c  | 41 +++++++++++++++++++++++------------------
+ src/device.h  |  3 ++-
+ 3 files changed, 28 insertions(+), 22 deletions(-)
 
+diff --git a/src/adapter.c b/src/adapter.c
+index a75dd61bf..aeef6b7a8 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3484,7 +3484,7 @@ static void device_connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 
+ 	/* continue with service discovery and connection */
+ 	btd_device_set_temporary(device, false);
+-	device_update_last_seen(device, data->dst_type);
++	device_update_last_seen(device, data->dst_type, true);
+ 
+ 	if (data->dst_type != BDADDR_BREDR){
+ 		g_io_channel_set_close_on_unref(io, FALSE);
+@@ -6994,7 +6994,7 @@ void btd_adapter_update_found_device(struct btd_adapter *adapter,
+ 		return;
+ 	}
+ 
+-	device_update_last_seen(dev, bdaddr_type);
++	device_update_last_seen(dev, bdaddr_type, !not_connectable);
+ 
+ 	/*
+ 	 * FIXME: We need to check for non-zero flags first because
+@@ -7006,7 +7006,7 @@ void btd_adapter_update_found_device(struct btd_adapter *adapter,
+ 					!(eir_data.flags & EIR_BREDR_UNSUP)) {
+ 		device_set_bredr_support(dev);
+ 		/* Update last seen for BR/EDR in case its flag is set */
+-		device_update_last_seen(dev, BDADDR_BREDR);
++		device_update_last_seen(dev, BDADDR_BREDR, !not_connectable);
+ 	}
+ 
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+diff --git a/src/device.c b/src/device.c
+index 3da09578f..7b451e458 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -155,6 +155,8 @@ struct bearer_state {
+ 	bool connected;
+ 	bool svc_resolved;
+ 	bool initiator;
++	bool connectable;
++	time_t last_seen;
+ };
+ 
+ struct csrk_info {
+@@ -255,9 +257,6 @@ struct btd_device {
+ 
+ 	sdp_list_t	*tmp_records;
+ 
+-	time_t		bredr_seen;
+-	time_t		le_seen;
+-
+ 	gboolean	trusted;
+ 	gboolean	blocked;
+ 	gboolean	auto_connect;
+@@ -2273,14 +2272,14 @@ static uint8_t select_conn_bearer(struct btd_device *dev)
+ 	if (dev->bdaddr_type == BDADDR_LE_RANDOM)
+ 		return dev->bdaddr_type;
+ 
+-	if (dev->bredr_seen) {
+-		bredr_last = current - dev->bredr_seen;
++	if (dev->bredr_state.last_seen) {
++		bredr_last = current - dev->bredr_state.last_seen;
+ 		if (bredr_last > SEEN_TRESHHOLD)
+ 			bredr_last = NVAL_TIME;
+ 	}
+ 
+-	if (dev->le_seen) {
+-		le_last = current - dev->le_seen;
++	if (dev->le_state.last_seen) {
++		le_last = current - dev->le_state.last_seen;
+ 		if (le_last > SEEN_TRESHHOLD)
+ 			le_last = NVAL_TIME;
+ 	}
+@@ -3022,7 +3021,7 @@ void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type)
+ {
+ 	struct bearer_state *state = get_state(dev, bdaddr_type);
+ 
+-	device_update_last_seen(dev, bdaddr_type);
++	device_update_last_seen(dev, bdaddr_type, true);
+ 
+ 	if (state->connected) {
+ 		char addr[18];
+@@ -3151,7 +3150,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+ 	if (device->bredr_state.connected || device->le_state.connected)
+ 		return;
+ 
+-	device_update_last_seen(device, bdaddr_type);
++	device_update_last_seen(device, bdaddr_type, true);
+ 
+ 	g_slist_free_full(device->eir_uuids, g_free);
+ 	device->eir_uuids = NULL;
+@@ -4168,7 +4167,7 @@ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 
+ void device_set_bredr_support(struct btd_device *device)
+ {
+-	if (device->bredr)
++	if (btd_opts.mode == BT_MODE_LE || device->bredr)
+ 		return;
+ 
+ 	device->bredr = true;
+@@ -4177,7 +4176,7 @@ void device_set_bredr_support(struct btd_device *device)
+ 
+ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type)
+ {
+-	if (device->le)
++	if (btd_opts.mode == BT_MODE_BREDR || device->le)
+ 		return;
+ 
+ 	device->le = true;
+@@ -4186,12 +4185,15 @@ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type)
+ 	store_device_info(device);
+ }
+ 
+-void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type)
++void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type,
++							bool connectable)
+ {
+-	if (bdaddr_type == BDADDR_BREDR)
+-		device->bredr_seen = time(NULL);
+-	else
+-		device->le_seen = time(NULL);
++	struct bearer_state *state;
++
++	state = get_state(device, bdaddr_type);
++
++	state->last_seen = time(NULL);
++	state->connectable = connectable;
+ 
+ 	if (!device_is_temporary(device))
+ 		return;
+@@ -5902,14 +5904,17 @@ void device_set_flags(struct btd_device *device, uint8_t flags)
+ 
+ bool device_is_connectable(struct btd_device *device)
+ {
++	struct bearer_state *state;
++
+ 	if (!device)
+ 		return false;
+ 
+ 	if (device->bredr)
+ 		return true;
+ 
+-	/* Check if either Limited or General discoverable are set */
+-	return (device->ad_flags[0] & 0x03);
++	state = get_state(device, device->bdaddr_type);
++
++	return state->connectable;
+ }
+ 
+ static bool start_discovery(gpointer user_data)
+diff --git a/src/device.h b/src/device.h
+index 5e8d1c3e1..1bf7b3989 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -33,7 +33,8 @@ void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type);
+ void device_set_bredr_support(struct btd_device *device);
+ void device_set_le_support(struct btd_device *device, uint8_t bdaddr_type);
+-void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type);
++void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type,
++							bool last_seen);
+ void device_merge_duplicate(struct btd_device *dev, struct btd_device *dup);
+ uint32_t btd_device_get_class(struct btd_device *device);
+ uint16_t btd_device_get_vendor(struct btd_device *device);
+-- 
+2.35.3
 
---===============2612369225780395913==--
