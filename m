@@ -2,155 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B601C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 18:38:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06457C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 18:42:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240682AbiFMSiH (ORCPT
+        id S1343628AbiFMSmi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:38:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35500 "EHLO
+        Mon, 13 Jun 2022 14:42:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343549AbiFMShy (ORCPT
+        with ESMTP id S1343491AbiFMSmT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:37:54 -0400
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB8A13F19
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:39:13 -0700 (PDT)
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 596BD3F210
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 15:39:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1655134751;
-        bh=qIyjHtlgmZ2mGqkFBQdbyeKZViSqALiGs38sp6wvC98=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=hhHS9wDWo1T9emOiQdZR2fVXZEHA+VXzYtoFnKfticEc/tHOBat/vtYjbgmiUUh0y
-         awfmyrhnFMGQWX2KTL9OgvUPQp+UfF7KRECmbN1YFHG9N1Y2cWByTR37Gf9hcGl798
-         cdsyQRryMMmcsC4566uGX2i8F0ioQV1cjbJYIhcE7tlxJd2NBQ/qJ1NpM1ggBQBHs1
-         QCtbCyTfDPUdQbNHuPgVijITEAXqGl+YEVO9ZUvGMamEcG9Mw5SiOzJ6HDzwqSUhhy
-         blOgDukk0xa7OfO0gEfJ7HT1Ng66yYyfhW6xijBqujtlEbOgqesXjcOjH6wpHs1Eru
-         ALNT28DOWg4jw==
-Received: by mail-il1-f197.google.com with SMTP id i18-20020a926d12000000b002d1b13b896cso4815501ilc.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:39:11 -0700 (PDT)
+        Mon, 13 Jun 2022 14:42:19 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055BA1180C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:01:41 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so4422972pjl.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=MbxCebj4QvQ/wsPQfSSWhp2gdTAHx3IHDG+PH/2j1qc=;
+        b=G9G32IzfVRKAwAHHNm73DAPRw8O5LPL+tDBVmEAyBQO0t27fmA5Trz/6h23abHezvS
+         TYOGjgQORrzNIhc4Etp65ddxWRlykv02A1BjDnG6sIpiMiE7ePXiMy8ymJeoNyUYNJzF
+         dDWGvzl3NswyDdH7r5UXW9Vi6d0kVqjdbr+z13ad7p7usbEf07ItxUaXot3PeMomY26D
+         XAVBNX+xpVyAZVUuD49avQG/kUeJv9c69iHZIvBc5P2PGUCeGZx9rClz2GudQOk8FSiU
+         NglaPDFtbiDafizRv+WXLW1RUfIo/X04IuKWhEDFkaUR8XH2OtWP38j/57fXMv4QiLvs
+         Nxmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qIyjHtlgmZ2mGqkFBQdbyeKZViSqALiGs38sp6wvC98=;
-        b=psHFG18M0/mh491lRNYhJOGFRLNvS4T7vjWgAD75Mj/FgoSgFYsuixicNmxw/V93NA
-         C26eBXQPLcFjwXhCGfIkyZdnxK3c0XXtbIuT5dU5QDvlfEYgD6fm1j0hD9m2Xwl1a3im
-         v7Tw+4M27tkcRWXU7tlyrsFqf90POaOEr1ZqYXKPTd5wJf/HprAdlrsJpnm0BII35J2v
-         78vtQaIIMDdu8hs/aBfwNiBkQaNCF0YUGnxm1Lf9OhTsMm/rUWJYUrl5QN4424zoHCVQ
-         +KOumk9LzOOGEzAZ5HfYf8NaPwVspBtNT2ELR2amPIFq71K4i3ioQRnQXNdN5mbdvb04
-         sPzg==
-X-Gm-Message-State: AOAM5318aoevbqgLJMNXYypPyZL6nOFfCH8Iqjeq88zRJPuoXli97B4m
-        7PgvnPydR2hPtzxTckQS/WIFzoH82XO0blKwSDu27RM+66igxIb7gtcN9RiImHeCLfgl9St0sB8
-        +svqHOpA3iS8gyrdl2Z8ADP/cVTXkXr1LaHh5Mc2u62r0tezBcoukRBSmOWtJ9g==
-X-Received: by 2002:a05:6638:144d:b0:332:fa9:28a9 with SMTP id l13-20020a056638144d00b003320fa928a9mr201874jad.237.1655134749715;
-        Mon, 13 Jun 2022 08:39:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwXNtA+ciI6OWgaT4ebrOdHTZuUKQ3+cRYrYw1j3M7psuLRVjd2hmONX/3HkZzlJ0grCgnTwnE68cXxcjLf3ns=
-X-Received: by 2002:a05:6638:144d:b0:332:fa9:28a9 with SMTP id
- l13-20020a056638144d00b003320fa928a9mr201863jad.237.1655134749505; Mon, 13
- Jun 2022 08:39:09 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=MbxCebj4QvQ/wsPQfSSWhp2gdTAHx3IHDG+PH/2j1qc=;
+        b=LLLjmZTaXzV4PtuS7Y/Y6cKSjidjsuw7xoeASjcZyClrsxoVdf+U2hsHy2R0o8LmAS
+         XL17xyf0TjF5tkdiLzKFVMy2Cqm3UDgrEjpKoNG/Sj2gzHs70Ox7Vai5S7uHueYcN+7h
+         I8FYys9kYVvp776R0qfYbudHwfE4U6Tu3FfhysAuPfBtX25tiOuZJ/8BtrhTxHnu4x3S
+         zNtW0fQMTPJDHATCz/ZoU32dBoKC3GyaEJyRDqisxYBobUczgGVbUaizMbxsl5A3buTS
+         I8NrSIG7bAOU259dBcSVweaT1uNLFg4zecbe7+YXmA1flZD96yGK8+HimMo24TSkE+lv
+         c5Nw==
+X-Gm-Message-State: AJIora+BHs2Ut2bfbZptiPbEv1cLZUPC5cuGnnrqSd5JHd0DDBHUNeGN
+        6kemmuwNxuar5tT4lS/H5hbf5uduA6I=
+X-Google-Smtp-Source: AGRyM1speL/Rxdw0Qw3gqTrdjdmglN5Rc0rMQeJ5akbtqXvIpVrRmPd4ccirGAkwcIt8573DSDIqDw==
+X-Received: by 2002:a17:902:bc84:b0:167:80c6:aedd with SMTP id bb4-20020a170902bc8400b0016780c6aeddmr82074plb.97.1655132500234;
+        Mon, 13 Jun 2022 08:01:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.253.186.142])
+        by smtp.gmail.com with ESMTPSA id n23-20020aa78a57000000b0051c01aa7d31sm5524289pfa.46.2022.06.13.08.01.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Jun 2022 08:01:39 -0700 (PDT)
+Message-ID: <62a75153.1c69fb81.75bf2.6148@mx.google.com>
+Date:   Mon, 13 Jun 2022 08:01:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1300054500486836366=="
 MIME-Version: 1.0
-References: <20220516103329.516952-1-dimitri.ledkov@canonical.com>
-In-Reply-To: <20220516103329.516952-1-dimitri.ledkov@canonical.com>
-From:   =?UTF-8?B?RGltaXRyaSBKb2huIExlZGtvdiDwn4+z77iP4oCN8J+MiA==?= 
-        <dimitri.ledkov@canonical.com>
-Date:   Mon, 13 Jun 2022 16:38:33 +0100
-Message-ID: <CADWks+ZBZo1OQyV4wwx9=tnXa4Vn+KVNpQyAZq7HULJmO1D97A@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btintel: Correctly declare all module
- firmware files
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
+Subject: RE: obexd: Fix callback->func =! NULL in the xfer_complete() func
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220613112242.9407-1-wangyouwan@uniontech.com>
+References: <20220613112242.9407-1-wangyouwan@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel
+--===============1300054500486836366==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Does this v2 patch address the concerns you mentioned in your review
-of the v1 patch at
-https://lore.kernel.org/linux-bluetooth/3EA82A93-D167-482D-AAF4-D781B77A4646@holtmann.org/
-?
+This is automated email and please do not reply to this email!
 
-Or can you explain a bit more how I misunderstood your request?
+Dear submitter,
 
-This patch correctly documents the strict patterns of dozens or so
-existing firmware files which this driver can load for each of the hw
-variants.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=649824
 
-On Mon, 16 May 2022 at 11:33, Dimitri John Ledkov
-<dimitri.ledkov@canonical.com> wrote:
->
-> Strictly encode patterns of supported hw_variants of firmware files
-> the kernel driver supports requesting. This now includes many missing
-> and previously undeclared module firmware files for 0x07, 0x08,
-> 0x11-0x14 hw_variants.
->
-> This especially affects environments that only install firmware files
-> declared and referenced by the kernel modules. In such environments,
-> only the declared firmware files are copied resulting in most Intel
-> Bluetooth devices not working. I.e. host-only dracut-install initrds,
-> or Ubuntu Core kernel snaps.
->
-> BugLink: https://bugs.launchpad.net/bugs/1970819
-> Signed-off-by: Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-> ---
->
->  Changes since v1:
->  - encode strict patterns of supported firmware files for each of the
->    supported hw_variant generations.
->
->  v1 submission link
->   https://lore.kernel.org/linux-bluetooth/20220509163259.1513242-1-dimitri.ledkov@canonical.com/
->
->  drivers/bluetooth/btintel.c | 23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 06514ed66022..17022758b5bd 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2654,7 +2654,22 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
->  MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
->  MODULE_VERSION(VERSION);
->  MODULE_LICENSE("GPL");
-> -MODULE_FIRMWARE("intel/ibt-11-5.sfi");
-> -MODULE_FIRMWARE("intel/ibt-11-5.ddc");
-> -MODULE_FIRMWARE("intel/ibt-12-16.sfi");
-> -MODULE_FIRMWARE("intel/ibt-12-16.ddc");
-> +/* hw_variant 0x07 0x08 */
-> +MODULE_FIRMWARE("intel/ibt-hw-37.7.*-fw-*.*.*.*.*.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.7.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.8.*-fw-*.*.*.*.*.bseq");
-> +MODULE_FIRMWARE("intel/ibt-hw-37.8.bseq");
-> +/* hw_variant 0x0b 0x0c */
-> +MODULE_FIRMWARE("intel/ibt-11-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-12-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-11-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-12-*.ddc");
-> +/* hw_variant 0x11 0x12 0x13 0x14 */
-> +MODULE_FIRMWARE("intel/ibt-17-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-18-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-19-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-20-*-*.sfi");
-> +MODULE_FIRMWARE("intel/ibt-17-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-18-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-19-*-*.ddc");
-> +MODULE_FIRMWARE("intel/ibt-20-*-*.ddc");
-> --
-> 2.32.0
->
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.66 seconds
+GitLint                       PASS      0.46 seconds
+Prep - Setup ELL              PASS      54.03 seconds
+Build - Prep                  PASS      0.62 seconds
+Build - Configure             PASS      10.20 seconds
+Build - Make                  PASS      1870.58 seconds
+Make Check                    PASS      13.00 seconds
+Make Check w/Valgrind         PASS      552.84 seconds
+Make Distcheck                PASS      292.56 seconds
+Build w/ext ELL - Configure   PASS      10.64 seconds
+Build w/ext ELL - Make        PASS      1821.67 seconds
+Incremental Build with patchesPASS      0.00 seconds
 
 
--- 
-Happy Pride,
 
-Dimitri
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1300054500486836366==--
