@@ -2,82 +2,98 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2C6C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 08:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A412CCA47F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 13:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240217AbiFMIga (ORCPT
+        id S1376327AbiFMNYz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 04:36:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45334 "EHLO
+        Mon, 13 Jun 2022 09:24:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240240AbiFMIgX (ORCPT
+        with ESMTP id S1377052AbiFMNYO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 04:36:23 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557391EC72
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 01:36:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DBA5F61220
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:36:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43EF0C341CF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:36:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655109375;
-        bh=qpvFvh2wfWtecddaVf1b7LAOWnELMTIcuBCWFjT5ou0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=UL9KGQoA62IeqJ2sHUz7hwv2HVgEtOOE9+gTEvyPSOaROGnfVlh3bQ0ugP9uiINbp
-         n4yB6uLAiGYYKum9K7PyZWBgeNmOO6nLy3sjrM+sWVejbZosePGYZDwK3deuqDL8Jw
-         Zqc9yEcVHpOKXt159b50+SapNMfinPGKwcXI8Q7HkgY7D2JWI4Nz3zHHIVWfCcoCkS
-         JyLKMAb89qOFuq11uepzz3UrTdUXyHGBvcmjnF/Ug0bcv5Fo+5hT2Z3sscDEt+JMNR
-         2StRy7yLgh4F0/2lcQx1rWQ/3EqjocntOeDjvLz5jejcXgNuQNv33P2JJ7u4RA8TlT
-         gpaBdiRjfWVFw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 326E2C05FD5; Mon, 13 Jun 2022 08:36:15 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Mon, 13 Jun 2022 09:24:14 -0400
+Received: from smtpproxy21.qq.com (smtpbg701.qq.com [203.205.195.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8A56B7EB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 04:23:56 -0700 (PDT)
+X-QQ-mid: bizesmtp87t1655119399trh68o5p
+Received: from localhost.localdomain ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Mon, 13 Jun 2022 19:22:47 +0800 (CST)
+X-QQ-SSF: 00400000002000C0D000B00A0000000
+X-QQ-FEAT: 8nRPapzIrE2CE+SmV7HzIOTRIYAAjjVJutUwegxmRc2aIU9K4oPj7AhQOv5aT
+        NQDwV6RPlkHMLkJ1jJNd3T2rx67KQzAA2pXD+OCkdjQZgSgy4MFhHYTvQchvoOhxNXt8EeI
+        ChXhwOa1MeI4QjblPxdhRoyomMx+Vj+I13F+LXjajzBITBO6R9A8J9lMR1XYcpiiyX4T5FI
+        adJ30u1CI0TY3eiwe4Uuy65txBBvKJNdRwvbeHbaadf1WUpSHXXBHorsIXkKe9sKHMSl7dl
+        0a5m6MsCqhV9Cw/qT536jffoUKZ+bieGD+abOgA/14jOZSa/CTEZLhZSkbTg9YWxCAF+sQ1
+        G8SIB1K
+X-QQ-GoodBg: 2
+From:   wangyouwan <wangyouwan@uniontech.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Mon, 13 Jun 2022 08:36:14 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hyperair@ubuntu.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-209745-62941-crLt7UT6Pf@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     wangyouwan <wangyouwan@uniontech.com>
+Subject: [PATCH] obexd: Fix callback->func =! NULL in the xfer_complete() func
+Date:   Mon, 13 Jun 2022 19:22:42 +0800
+Message-Id: <20220613112242.9407-1-wangyouwan@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign4
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
+xfer_complete (obex=0x557d242c8cf0, err=0x557d242ca470,
+user_data=0x557d242ca300) at obexd/client/transfer.c:659
+659     obexd/client/transfer.c: 没有那个文件或目录.
+(gdb) n
+661     in obexd/client/transfer.c
+(gdb) n
+663     in obexd/client/transfer.c
+(gdb) p callback->func
+$1 = (transfer_callback_t) 0x0
+(gdb) n
+668     in obexd/client/transfer.c
+(gdb) n
+671     in obexd/client/transfer.c
+(gdb) n
+672     in obexd/client/transfer.c
+(gdb) n
+676     in obexd/client/transfer.c
+(gdb) n
+677     in obexd/client/transfer.c
+(gdb) n
+0x0000000000000000 in ?? ()
+(gdb) s
+Cannot find bounds of current function
+(gdb) c
+Continuing.
 
---- Comment #24 from Chow Loong Jin (hyperair@ubuntu.com) ---
-Looks like I have `bluetoothd` running with `-E`, probably from my initial
-setup of Pipewire's HFP/HSP stuff. I guess that's what the issue was on my =
-end.
-I haven't rebooted into a kernel that doesn't have this patch to test the
-theory, but it seems plausible.
+Program received signal SIGSEGV, Segmentation fault.
+---
+ obexd/client/transfer.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
+index dccce03b4..a7a85a0c0 100644
+--- a/obexd/client/transfer.c
++++ b/obexd/client/transfer.c
+@@ -666,7 +666,10 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
+ 	else
+ 		transfer_set_status(transfer, TRANSFER_STATUS_COMPLETE);
+ 
+-	if (callback)
++	if (callback == NULL)
++		return;
++
++	if (callback->func)
+ 		callback->func(transfer, err, callback->data);
+ }
+ 
+-- 
+2.20.1
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+
+
