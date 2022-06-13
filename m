@@ -2,400 +2,331 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 955F5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 21:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 902C7C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 21:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345190AbiFMVgl (ORCPT
+        id S233678AbiFMVml (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
+        Mon, 13 Jun 2022 17:42:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346144AbiFMVgf (ORCPT
+        with ESMTP id S234840AbiFMVmj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:36:35 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C7171C3;
-        Mon, 13 Jun 2022 14:36:31 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id 20so10892540lfz.8;
-        Mon, 13 Jun 2022 14:36:31 -0700 (PDT)
+        Mon, 13 Jun 2022 17:42:39 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871B02AD4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 14:42:38 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id a15so10906015lfb.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 14:42:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=y4KQ3QQGxvSTObAOJVektW1D7yFig3ypCvu9bU90Cv0=;
-        b=YvSDEHvk3ZH2Mhra1J5bIt+rPIPye7evoR2H5b26S7CWCuinSNrncCqslxYkLea7rR
-         rwKhFEcgU8EeUBJU/x4XbkuKgTkjNEybsfqdvEHj06KgafFhMEwjM+fcOb+uSSDTSZ7g
-         h5wnfFK2PLRoMVqeFFuvhqcvrCnUery3vbpZ6spIiuDswXL4z+VG+HBtGeu+hiCEryE5
-         MH7eD5Doul1kluhBMlgjhppVgmuuPyeXABYkL3JbIgdMOpkcjKDvFJvVG9HWh+gvg7Vn
-         lPjdAbc+L4H8jRto/3eMw+yYu/qWJ2zY9zBBuEpGsslI/XUdbclYSDexPDZAXqdIKLEl
-         z8XA==
+         :cc;
+        bh=1eejamA9keoec6s/80lqMX8m6igLyc/WBKCrHFnJdxo=;
+        b=ZwMGGDx5sbxUgKNl67duU43XP/iw0QUTLRUS8wJtIf5uRZ7mDclozwObeGBb9pmRK9
+         Dy3wI+2rcacZgPXbtbCAg4sINrtcV3WAY8doRzpkKRzGiP6ad0iXII9UByScDy1+CWyd
+         pKh3sgLyzehl0ixpA0g3F6gai87g4X1vekmpy1j1Ae1w4MTfw5RC/WdF+zFY0Xd65Qkw
+         XKm0k77SZTrcoxx0zHPQPlNVgXjpt9WBQeXhBqu6DiuyqGwZqO5uk9UzWySCC/QhvX6v
+         +HlbdhLjLGkba7qpJoNaTBjRj+SJTuPshzl8+CQS9e6Php61qfjig/zpntDMdeiDDS1q
+         2nrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=y4KQ3QQGxvSTObAOJVektW1D7yFig3ypCvu9bU90Cv0=;
-        b=RCGelwLNNygwlMMmYE7JFV+WuV5dmu8kjoVg9/pviMfpQABXEwE7FLamyaUzJsjefx
-         /qrGbV3BTPImZMNw+64PC8JEpNUMfpH48+jMKyVFXoeuFvz9wwxe576o5DgPfwtycFQK
-         yqfQ+hrzZnuzcH9FKHW5CDUPmlto6wTvGg8N7drFD3FY2119eKrw7ogh7p4eYUDrjUjc
-         CgqfCh/LD9xC9jznob4ZJXDrplrC0dhTA927j7segaMGhre1+U8Sm+snOXia3rJTMWU6
-         gKnZf9RK7HGiHJaz1X6hIJZJZWniSzIi2l9eHsHmSPaiHYRp9Nvzm7WtDS9iSa0mwNXT
-         3D1Q==
-X-Gm-Message-State: AJIora+uHPB88BewMeRUoQHgRJdM9Jn8jSXiZB7RQL3J7/N2C7MjI2Yb
-        esCLEEoyzrAm0z5bYjj8bshNI5r4Z5PVn8HK+JU=
-X-Google-Smtp-Source: AGRyM1tHUcOqgf6aR4pfYGBZ7rLNPluzGCcqBQyjtQTnSoh4GParF7FVJjZJPvQgFte8n8CBkoXCtc55+kDVYkc5Zmc=
-X-Received: by 2002:a05:6512:e94:b0:478:f6ad:c9d7 with SMTP id
- bi20-20020a0565120e9400b00478f6adc9d7mr1087643lfb.198.1655156189930; Mon, 13
- Jun 2022 14:36:29 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=1eejamA9keoec6s/80lqMX8m6igLyc/WBKCrHFnJdxo=;
+        b=ZlMIP1HbzAD6taqBtpfi2/MqteV7XUIFeJRxZ7HIS+WCsqsGVyAh86IWxdiuUVIhuK
+         Zf56mGlH+EPp8sWbV+DVPmfTb5T44EUhzW+6dyuJ2y6gNMMK8rIWZCenJjgohOhZ/os9
+         dKBTljdCqnpOiC9OoSF65cH54BdJvrrs5qdwPcJ2riiYMsmWZvgA0n7Z8k3QjyGrxDjA
+         EY9xlnRHSsyBGTq0xMivBRl1K67ZvTpfJ/FhOPMAqREsRchjc0K34Fb+GXPeJUeZfC4a
+         42ABDedB2AULJuSi3/zVymFXtAKv1VcSardZVSaNGHtuGjiJC8miKtwHJ0VO92AHMP9m
+         VzZA==
+X-Gm-Message-State: AJIora9xujRSqHNO4hu1xXd7BI7ew9ZcHPvsGS6c2vKvpTuylzaDnlVS
+        mXxQ4kTLFbt1m3haScYGuALUOWM/INOW4GtZTqE6eudm2CE=
+X-Google-Smtp-Source: AGRyM1t3UypRRK91MLRLZP9UNk4hJyYwlEUNbMMN2wrz7owxejGx8WIiUGzcJZoV7xagbEjk3x55MyIYb4COEymud+M=
+X-Received: by 2002:a05:6512:1155:b0:479:2b1d:5d17 with SMTP id
+ m21-20020a056512115500b004792b1d5d17mr1096659lfg.23.1655156556730; Mon, 13
+ Jun 2022 14:42:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191202193628.GI50317@dtor-ws> <20191202230947.ld5ibnczdpkekfcm@pali>
- <20191203173821.4u6uzxeaqnt3gyz3@pali> <20191203191112.GJ50317@dtor-ws>
- <20191205105206.slibwytrcteicx6y@pali> <CANFp7mXyaqoMDBs4m_Dfm9+4U88g9WoJVcV1g_4KM4xzFhiGXQ@mail.gmail.com>
- <20191206091114.kh255jrmerruumnq@pali> <20191206174048.GQ50317@dtor-ws>
- <20191218110224.44vcgdxh3j4bn7rw@pali> <20191218112659.crabhqkbcnxd6fo6@pali> <20200322154734.mquwgzc63nzddiy5@pali>
-In-Reply-To: <20200322154734.mquwgzc63nzddiy5@pali>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 13 Jun 2022 14:36:18 -0700
-Message-ID: <CABBYNZ+E3knrqWpNDKfX9qQOrrh=VLUSQAgUB=kXgK7=jwgQ9w@mail.gmail.com>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-To:     =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
-Cc:     Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-input@vger.kernel.org,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Kirill Smelkov <kirr@nexedi.com>
+References: <20220610221124.18591-1-puffy.taco@gmail.com> <20220610221124.18591-2-puffy.taco@gmail.com>
+ <CABBYNZKZ6jHeQMO3r_NC1phA03Vg67o9dejKSGpJ1i9LCq_aOQ@mail.gmail.com>
+In-Reply-To: <CABBYNZKZ6jHeQMO3r_NC1phA03Vg67o9dejKSGpJ1i9LCq_aOQ@mail.gmail.com>
+From:   Mike Brudevold <puffy.taco@gmail.com>
+Date:   Mon, 13 Jun 2022 16:42:22 -0500
+Message-ID: <CAB7rCTg4+gmzD3emRB6rxfo7RiaJsU+4oBWVQBEut3nr-WqqRA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] eir: parse data types for LE OOB pairing
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Michael Brudevold <michael.brudevold@veranexsolutions.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Luiz,
 
-On Sun, Mar 22, 2020 at 8:47 AM Pali Roh=C3=A1r <pali.rohar@gmail.com> wrot=
-e:
+On Sat, Jun 11, 2022 at 3:27 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> On Wednesday 18 December 2019 12:26:59 Pali Roh=C3=A1r wrote:
-> > On Wednesday 18 December 2019 12:02:24 Pali Roh=C3=A1r wrote:
-> > > On Friday 06 December 2019 09:40:48 Dmitry Torokhov wrote:
-> > > > On Fri, Dec 06, 2019 at 10:11:14AM +0100, Pali Roh=C3=A1r wrote:
-> > > > > On Thursday 05 December 2019 12:03:05 Abhishek Pandit-Subedi wrot=
-e:
-> > > > > > On Thu, Dec 5, 2019 at 2:52 AM Pali Roh=C3=A1r <pali.rohar@gmai=
-l.com> wrote:
-> > > > > > >
-> > > > > > > On Tuesday 03 December 2019 11:11:12 Dmitry Torokhov wrote:
-> > > > > > > > On Tue, Dec 03, 2019 at 06:38:21PM +0100, Pali Roh=C3=A1r w=
-rote:
-> > > > > > > > > On Tuesday 03 December 2019 00:09:47 Pali Roh=C3=A1r wrot=
-e:
-> > > > > > > > >
-> > > > > > > > > Hi Dmitry!
-> > > > > > > > >
-> > > > > > > > > I was looking again at those _IOW defines for ioctl calls=
- and I have
-> > > > > > > > > another argument why not specify 'char *' in _IOW:
-> > > > > > > > >
-> > > > > > > > > All ioctls in _IOW() specify as a third macro argument ty=
-pe which is
-> > > > > > > > > passed as pointer to the third argument for ioctl() sysca=
-ll.
-> > > > > > > > >
-> > > > > > > > > So e.g.:
-> > > > > > > > >
-> > > > > > > > >   #define EVIOCSCLOCKID _IOW('E', 0xa0, int)
-> > > > > > > > >
-> > > > > > > > > is called from userspace as:
-> > > > > > > > >
-> > > > > > > > >   int val;
-> > > > > > > > >   ioctl(fd, EVIOCSCLOCKID, &val);
-> > > > > > > > >
-> > > > > > > > > Or
-> > > > > > > > >
-> > > > > > > > >   #define EVIOCSMASK _IOW('E', 0x93, struct input_mask)
-> > > > > > > > >
-> > > > > > > > > is called as:
-> > > > > > > > >
-> > > > > > > > >   struct input_mask val;
-> > > > > > > > >   ioctl(fd, EVIOCSMASK, &val);
-> > > > > > > > >
-> > > > > > > > > So basically third argument for _IOW specify size of byte=
- buffer passed
-> > > > > > > > > as third argument for ioctl(). In _IOW is not specified p=
-ointer to
-> > > > > > > > > struct input_mask, but struct input_mask itself.
-> > > > > > > > >
-> > > > > > > > > And in case you define
-> > > > > > > > >
-> > > > > > > > >   #define MY_NEW_IOCTL _IOW(UINPUT_IOCTL_BASE, 200, char*=
-)
-> > > > > > > > >
-> > > > > > > > > then you by above usage you should pass data as:
-> > > > > > > > >
-> > > > > > > > >   char *val =3D "DATA";
-> > > > > > > > >   ioctl(fd, MY_NEW_IOCTL, &val);
-> > > > > > > > >
-> > > > > > > > > Which is not same as just:
-> > > > > > > > >
-> > > > > > > > >   ioctl(fd, MY_NEW_IOCTL, "DATA");
-> > > > > > > > >
-> > > > > > > > > As in former case you passed pointer to pointer to data a=
-nd in later
-> > > > > > > > > case you passed only pointer to data.
-> > > > > > > > >
-> > > > > > > > > It just mean that UI_SET_PHYS is already defined inconsis=
-tently which is
-> > > > > > > > > also reason why compat ioctl for it was introduced.
-> > > > > > > >
-> > > > > > > > Yes, you are right. UI_SET_PHYS is messed up. I guess the q=
-uestion is
-> > > > > > > > what to do with all of this...
-> > > > > > > >
-> > > > > > > > Maybe we should define
-> > > > > > > >
-> > > > > > > > #define UI_SET_PHYS_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL=
-_BASE, 111, len)
-> > > > > > > > #define UI_SET_UNIQ_STR(len)  _IOC(_IOC_WRITE, UINPUT_IOCTL=
-_BASE, 112, len)
-> > > > > > >
-> > > > > > > I'm not sure if this is ideal. Normally in C strings are nul-=
-termined,
-> > > > > > > so functions/macros do not take buffer length.
-> > > > > > Except strncpy, strndup, snprintf, etc. all expect a buffer len=
-gth. At
-> > > > >
-> > > > > This is something different as for these functions you pass buffe=
-r and
-> > > > > length of buffer which is used in write mode -- not for read mode=
-.
-> > > > >
-> > > > > > the user to kernel boundary of ioctl, I think we should require=
- size
-> > > > > > of the user buffer regardless of the data type.
-> > > > > >
-> > > > > > > _STR therefore in names looks inconsistent.
-> > > > > > The _STR suffix is odd (what to name UI_SET_PHYS_STR then??) bu=
-t
-> > > > > > requiring the length seems to be common across various ioctls.
-> > > > > > * input.h requires a length when requesting the phys and uniq
-> > > > > > (https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux=
-.git/tree/include/uapi/linux/input.h#n138)
-> > > > > > * Same with HIDRAW when setting and getting features:
-> > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.=
-git/tree/include/uapi/linux/hidraw.h#n40,
-> > > > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.=
-git/tree/samples/hidraw/hid-example.c#n88
-> > > > >
-> > > > > All these ioctls where is passed length are in opposite direction
-> > > > > (_IOC_READ) as our PHYS and UNIQ (_IOC_WRITE).
-> > > > >
-> > > > > I fully agree that when you need to read something from kernel
-> > > > > (_IOC_READ) and then writing it to userspace, you need to specify=
- length
-> > > > > of userspace buffer. Exactly same as with userspace functions lik=
-e
-> > > > > memcpy, snprintf, etc... as you pointed. Otherwise you get buffer
-> > > > > overflow as callee does not know length of buffer.
-> > > > >
-> > > > > But here we we have there quite different problem, we need to wri=
-te
-> > > > > something to kernel from userspace (_IOC_WRITE) and we are passin=
-g
-> > > > > nul-term string. So in this case specifying size is not required =
-as it
-> > > > > is implicitly specified as part of passed string.
-> > > >
-> > > > With the new IOCTL definitions it does not need to be a NULL-termin=
-ated
-> > > > string. It can be a buffer of characters with given length, and ker=
-nel
-> > > > will NULL-terminate as this it what it wants, not what the caller h=
-as to
-> > > > give.
-> > >
-> > > Hi Dmitry! I was thinking more about this problem and I will propose
-> > > alternative solution, but first with details...
-> > >
-> > > I think that we should use NULL terminated strings. Or better disallo=
-w
-> > > NULL byte inside string. Reason: all userspace application expects th=
-at
-> > > input device name would be NULL terminated which implies that in the
-> > > middle of name cannot be NULL byte.
-> > >
-> > > So this must apply also for new PHYS / UNIQ ioctl API. If we want in =
-our
-> > > ioctl API to use buffer + size (with upper bound limit for size) inst=
-ead
-> > > of passing NULL term string (with upper bound limit for string size)
-> > > then kernel have to add a leading NULL byte to string, plus check tha=
-t
-> > > in the buffer there is no NULL byte. I guess this a very little
-> > > complicate code, but nothing which is problematic.
-> > >
-> > > And on the userspace part. Now when userspace want to pass constant
-> > > string for device name, it just call
-> > >
-> > >   ioctl(fd, UI_SET_PHYS, "my name of device");
-> > >
-> > > After adding a new ioctl with buffer + size API, userspace would have=
- to
-> > > call:
-> > >
-> > >   ioctl(fd, UI_SET_PHYS_STR(strlen("my name of device")), "my name of=
- device");
-> > >
-> > > which looks strange, so programmers would had to move device name int=
-o
-> > > new variable:
-> > >
-> > >   const char *name =3D "my name of device";
-> > >   ioctl(fd, UI_SET_PHYS_STR(strlen(name)), name);
-> > >
-> > > For me the old ioctl API looks easier to use (no need for strlen() or
-> > > extra variable), but this is just my preference of usage -- as it is
-> > > simpler for me. Maybe you would have different opinion...
-> > >
-> > > And now question: Why we have uinput_compat_ioctl()? It is there only
-> > > because size part of IOCTL number is different on 32bit and 64bit
-> > > systems. As we know size part of UI_SET_PHYS is wrong and does not ma=
-ke
-> > > sense...
-> > >
-> > > Would not it be better to change size of UI_SET_PHYS to just zero and
-> > > then when matching ioctl number just ignore size for this UI_SET_PHYS
-> > > ioctl? Same for UI_BEGIN_FF_UPLOAD_COMPAT and UI_END_FF_UPLOAD_COMPAT
-> > > added in: https://git.kernel.org/tip/tip/c/7c7da40
-> > >
-> > > And we would not have to deal with uinput_compat_ioctl() at all.
-> >
-> > Below is example how change for removing UI_SET_PHYS_COMPAT may look
-> > like. As header file is not changed and UI_SET_PHYS accepts any size
-> > argument, it therefore accept also 32bit and 64bit integer. So no
-> > existing 32bit applications which use UI_SET_PHYS on 64bit kernel would
-> > not be broken...
-> >
-> > Is not this better change then introducing a new UI_SET_PHYS_STR ioctl
-> > number? Because introduction of new IOCTL number has one big
-> > disadvantage: Userspace applications needs to support fallback to old
-> > number as older versions of kernels would be in use for a long time. An=
-d
-> > because kernel does not have to remove old IOCTL number for backward
-> > compatibility there is basically no need for userspace application to
-> > user new UI_SET_PHYS_STR IOCTL number...
+> Hi Michael,
 >
-> Hello! I would like to remind this discussion as problem around a new
-> UI_SET_UNIQ ioctl is not solved yet and uniq property is really useful
-> for e.g. bluetooth (uinput) devices.
->
-> Dmitry, when you have a time, could you please look at this discussion
-> and decide how to go ahead?
-
-Have we decided not to move further with these changes? I actually
-have a bug in BlueZ related to it since right now we are inconsistent
-with respect to how we handle uhid vs uinput:
-
-https://github.com/bluez/bluez/issues/352
-
-> > diff --git a/drivers/input/misc/uinput.c b/drivers/input/misc/uinput.c
-> > index fd253781b..b645210d5 100644
-> > --- a/drivers/input/misc/uinput.c
-> > +++ b/drivers/input/misc/uinput.c
-> > @@ -915,22 +915,6 @@ static long uinput_ioctl_handler(struct file *file=
-, unsigned int cmd,
-> >               retval =3D uinput_set_bit(arg, propbit, INPUT_PROP_MAX);
-> >               goto out;
+> On Fri, Jun 10, 2022 at 3:49 PM Michael Brudevold <puffy.taco@gmail.com> wrote:
 > >
-> > -     case UI_SET_PHYS:
-> > -             if (udev->state =3D=3D UIST_CREATED) {
-> > -                     retval =3D -EINVAL;
-> > -                     goto out;
-> > -             }
-> > -
-> > -             phys =3D strndup_user(p, 1024);
-> > -             if (IS_ERR(phys)) {
-> > -                     retval =3D PTR_ERR(phys);
-> > -                     goto out;
-> > -             }
-> > -
-> > -             kfree(udev->dev->phys);
-> > -             udev->dev->phys =3D phys;
-> > -             goto out;
-> > -
-> >       case UI_BEGIN_FF_UPLOAD:
-> >               retval =3D uinput_ff_upload_from_user(p, &ff_up);
-> >               if (retval)
-> > @@ -1023,6 +1007,22 @@ static long uinput_ioctl_handler(struct file *fi=
-le, unsigned int cmd,
-> >       case UI_ABS_SETUP & ~IOCSIZE_MASK:
-> >               retval =3D uinput_abs_setup(udev, p, size);
-> >               goto out;
+> > From: Michael Brudevold <michael.brudevold@veranexsolutions.com>
+> >
+> > LE support added for P-256 and split out from existing BREDR support for
+> > P-192
+> >
+> > Also attempt to free any existing values before setting new values
+> > ---
+> >  plugins/neard.c |  8 ++++----
+> >  src/eir.c       | 41 +++++++++++++++++++++++++++++++++++------
+> >  src/eir.h       | 10 ++++++++--
+> >  3 files changed, 47 insertions(+), 12 deletions(-)
+> >
+> > diff --git a/plugins/neard.c b/plugins/neard.c
+> > index 99762482c..11d9e91c4 100644
+> > --- a/plugins/neard.c
+> > +++ b/plugins/neard.c
+> > @@ -352,11 +352,11 @@ static int process_eir(uint8_t *eir, size_t size, struct oob_params *remote)
+> >         remote->services = eir_data.services;
+> >         eir_data.services = NULL;
+> >
+> > -       remote->hash = eir_data.hash;
+> > -       eir_data.hash = NULL;
+> > +       remote->hash = eir_data.hash192;
+> > +       eir_data.hash192 = NULL;
+> >
+> > -       remote->randomizer = eir_data.randomizer;
+> > -       eir_data.randomizer = NULL;
+> > +       remote->randomizer = eir_data.randomizer192;
+> > +       eir_data.randomizer192 = NULL;
+> >
+> >         eir_data_free(&eir_data);
+> >
+> > diff --git a/src/eir.c b/src/eir.c
+> > index 2f9ee036f..79d423074 100644
+> > --- a/src/eir.c
+> > +++ b/src/eir.c
+> > @@ -53,10 +53,14 @@ void eir_data_free(struct eir_data *eir)
+> >         eir->services = NULL;
+> >         g_free(eir->name);
+> >         eir->name = NULL;
+> > -       free(eir->hash);
+> > -       eir->hash = NULL;
+> > -       free(eir->randomizer);
+> > -       eir->randomizer = NULL;
+> > +       free(eir->hash192);
+> > +       eir->hash192 = NULL;
+> > +       free(eir->randomizer192);
+> > +       eir->randomizer192 = NULL;
+> > +       free(eir->hash256);
+> > +       eir->hash256 = NULL;
+> > +       free(eir->randomizer256);
+> > +       eir->randomizer256 = NULL;
+> >         g_slist_free_full(eir->msd_list, g_free);
+> >         eir->msd_list = NULL;
+> >         g_slist_free_full(eir->sd_list, sd_free);
+> > @@ -323,13 +327,15 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+> >                 case EIR_SSP_HASH:
+> >                         if (data_len < 16)
+> >                                 break;
+> > -                       eir->hash = util_memdup(data, 16);
+> > +                       free(eir->hash192);
+> > +                       eir->hash192 = util_memdup(data, 16);
+> >                         break;
+> >
+> >                 case EIR_SSP_RANDOMIZER:
+> >                         if (data_len < 16)
+> >                                 break;
+> > -                       eir->randomizer = util_memdup(data, 16);
+> > +                       free(eir->randomizer192);
+> > +                       eir->randomizer192 = util_memdup(data, 16);
+> >                         break;
+> >
+> >                 case EIR_DEVICE_ID:
+> > @@ -342,6 +348,15 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+> >                         eir->did_version = data[6] | (data[7] << 8);
+> >                         break;
+> >
+> > +               case EIR_LE_DEVICE_ADDRESS:
+> > +                       if (data_len < sizeof(bdaddr_t) + 1)
+> > +                               break;
 > > +
-> > +     case UI_SET_PHYS & ~IOCSIZE_MASK:
-> > +             if (udev->state =3D=3D UIST_CREATED) {
-> > +                     retval =3D -EINVAL;
-> > +                     goto out;
-> > +             }
+> > +                       memcpy(&eir->addr, data, sizeof(bdaddr_t));
+> > +                       eir->addr_type = data[sizeof(bdaddr_t)] & 0x1 ?
+> > +                                       BDADDR_LE_RANDOM : BDADDR_LE_PUBLIC;
+> > +                       break;
 > > +
-> > +             phys =3D strndup_user(p, 1024);
-> > +             if (IS_ERR(phys)) {
-> > +                     retval =3D PTR_ERR(phys);
-> > +                     goto out;
-> > +             }
+> >                 case EIR_SVC_DATA16:
+> >                         eir_parse_uuid16_data(eir, data, data_len);
+> >                         break;
+> > @@ -354,6 +369,20 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+> >                         eir_parse_uuid128_data(eir, data, data_len);
+> >                         break;
+> >
+> > +               case EIR_LE_SC_CONF:
+> > +                       if (data_len < 16)
+> > +                               break;
+> > +                       free(eir->hash256);
+> > +                       eir->hash256 = util_memdup(data, 16);
+> > +                       break;
 > > +
-> > +             kfree(udev->dev->phys);
-> > +             udev->dev->phys =3D phys;
-> > +             goto out;
-> >       }
+> > +               case EIR_LE_SC_RAND:
+> > +                       if (data_len < 16)
+> > +                               break;
+> > +                       free(eir->randomizer256);
+> > +                       eir->randomizer256 = util_memdup(data, 16);
+> > +                       break;
+> > +
+> >                 case EIR_MANUFACTURER_DATA:
+> >                         eir_parse_msd(eir, data, data_len);
+> >                         break;
+> > diff --git a/src/eir.h b/src/eir.h
+> > index 6154e23ec..b2cf00f37 100644
+> > --- a/src/eir.h
+> > +++ b/src/eir.h
+> > @@ -33,9 +33,12 @@
+> >  #define EIR_PUB_TRGT_ADDR           0x17  /* LE: Public Target Address */
+> >  #define EIR_RND_TRGT_ADDR           0x18  /* LE: Random Target Address */
+> >  #define EIR_GAP_APPEARANCE          0x19  /* GAP appearance */
+> > +#define EIR_LE_DEVICE_ADDRESS       0x1B  /* LE: Bluetooth Device Address */
+> >  #define EIR_SOLICIT32               0x1F  /* LE: Solicit UUIDs, 32-bit */
+> >  #define EIR_SVC_DATA32              0x20  /* LE: Service data, 32-bit UUID */
+> >  #define EIR_SVC_DATA128             0x21  /* LE: Service data, 128-bit UUID */
+> > +#define EIR_LE_SC_CONF              0x22  /* LE: Secure Connections Confirmation Value */
+> > +#define EIR_LE_SC_RAND              0x23  /* LE: Secure Connections Random Value */
+> >  #define EIR_TRANSPORT_DISCOVERY     0x26  /* Transport Discovery Service */
+> >  #define EIR_MANUFACTURER_DATA       0xFF  /* Manufacturer Specific Data */
 > >
-> >       retval =3D -EINVAL;
-> > @@ -1042,8 +1042,6 @@ static long uinput_ioctl(struct file *file, unsig=
-ned int cmd, unsigned long arg)
-> >   * These IOCTLs change their size and thus their numbers between
-> >   * 32 and 64 bits.
-> >   */
-> > -#define UI_SET_PHYS_COMPAT           \
-> > -     _IOW(UINPUT_IOCTL_BASE, 108, compat_uptr_t)
-> >  #define UI_BEGIN_FF_UPLOAD_COMPAT    \
-> >       _IOWR(UINPUT_IOCTL_BASE, 200, struct uinput_ff_upload_compat)
-> >  #define UI_END_FF_UPLOAD_COMPAT              \
-> > @@ -1053,9 +1051,6 @@ static long uinput_compat_ioctl(struct file *file=
-,
-> >                               unsigned int cmd, unsigned long arg)
-> >  {
-> >       switch (cmd) {
-> > -     case UI_SET_PHYS_COMPAT:
-> > -             cmd =3D UI_SET_PHYS;
-> > -             break;
-> >       case UI_BEGIN_FF_UPLOAD_COMPAT:
-> >               cmd =3D UI_BEGIN_FF_UPLOAD;
-> >               break;
-> > diff --git a/include/uapi/linux/uinput.h b/include/uapi/linux/uinput.h
-> > index c9e677e3a..6bda2a142 100644
-> > --- a/include/uapi/linux/uinput.h
-> > +++ b/include/uapi/linux/uinput.h
-> > @@ -142,6 +142,8 @@ struct uinput_abs_setup {
-> >  #define UI_SET_LEDBIT                _IOW(UINPUT_IOCTL_BASE, 105, int)
-> >  #define UI_SET_SNDBIT                _IOW(UINPUT_IOCTL_BASE, 106, int)
-> >  #define UI_SET_FFBIT         _IOW(UINPUT_IOCTL_BASE, 107, int)
-> > +/* Argument is nul-term string and for backward compatibility is there
-> > + * specified char*, but size argument (char *) is ignored by this ioct=
-l */
-> >  #define UI_SET_PHYS          _IOW(UINPUT_IOCTL_BASE, 108, char*)
-> >  #define UI_SET_SWBIT         _IOW(UINPUT_IOCTL_BASE, 109, int)
-> >  #define UI_SET_PROPBIT               _IOW(UINPUT_IOCTL_BASE, 110, int)
-> >
-> >
+> > @@ -77,9 +80,12 @@ struct eir_data {
+> >         uint16_t appearance;
+> >         bool name_complete;
+> >         int8_t tx_power;
+> > -       uint8_t *hash;
+> > -       uint8_t *randomizer;
+> > +       uint8_t *hash192;
+> > +       uint8_t *randomizer192;
+> > +       uint8_t *hash256;
+> > +       uint8_t *randomizer256;
+> >         bdaddr_t addr;
+> > +       uint8_t addr_type;
+> >         uint16_t did_vendor;
+> >         uint16_t did_product;
+> >         uint16_t did_version;
+> > --
+> > 2.25.1
 >
-> --
-> Pali Roh=C3=A1r
-> pali.rohar@gmail.com
+> It might be better to handle this via bt_ad instance instead of
+> eir_data, in fact the plan was always to switch to bt_ad but it seems
+> we forgot about it at some point.
 
+Are you thinking something like below (doesn't fully compile,
+name2utf8 is static in eir so I did nothing about that yet)?
+Basically where the ad code parses the EIR data, but the neard plugin
+still manages what to do with the data?  The alternative would be
+where device.c became smarter to consume the ad struct itself and the
+neard plugin becomes a simple conduit for the ad data.
 
+index 77a4630da..3d4064515 100644
+--- a/plugins/neard.c
++++ b/plugins/neard.c
+@@ -31,6 +31,7 @@
+ #include "src/agent.h"
+ #include "src/btd.h"
+ #include "src/shared/util.h"
++#include "src/shared/ad.h"
 
---=20
-Luiz Augusto von Dentz
+ #define NEARD_NAME "org.neard"
+ #define NEARD_PATH "/org/neard"
+@@ -336,6 +337,52 @@ static int check_device(struct btd_device *device)
+        return 0;
+ }
+
++static void process_oob_adv(void *data, void *user_data)
++{
++       struct bt_ad_data *ad_data = data;
++       struct oob_params *remote = user_data;
++       uint8_t name_len;
++
++       switch (ad_data->type) {
++       case EIR_NAME_SHORT:
++       case EIR_NAME_COMPLETE:
++               name_len = ad_data->len;
++
++               /* Some vendors put a NUL byte terminator into
++                       * the name */
++               while (name_len > 0 && ad_data->data[name_len - 1] == '\0')
++                       name_len--;
++
++               g_free(remote->name);
++
++               remote->name = name2utf8(ad_data->data, name_len);
++               break;
++
++       case BT_AD_LE_DEVICE_ADDRESS:
++               if (ad_data->len < sizeof(bdaddr_t) + 1)
++                       break;
++
++               memcpy(&remote->address, ad_data->data, sizeof(bdaddr_t));
++               remote->address_type = ad_data->data[sizeof(bdaddr_t)] & 0x1 ?
++                               BDADDR_LE_RANDOM : BDADDR_LE_PUBLIC;
++               break;
++
++       case EIR_LE_SC_CONF:
++               if (ad_data->len < 16)
++                       break;
++               free(remote->hash256);
++               remote->hash256 = util_memdup(ad_data->data, 16);
++               break;
++
++       case EIR_LE_SC_RAND:
++               if (ad_data->len < 16)
++                       break;
++               free(remote->randomizer256);
++               remote->randomizer256 = util_memdup(ad_data->data, 16);
++               break;
++       }
++}
++
+ static int process_eir(uint8_t *eir, size_t size, struct oob_params *remote)
+ {
+        struct eir_data eir_data;
+@@ -370,32 +417,17 @@ static int process_eir(uint8_t *eir, size_t
+size, struct oob_params *remote)
+
+ static void process_eir_le(uint8_t *eir, size_t size, struct
+oob_params *remote)
+ {
+-       struct eir_data eir_data;
++       struct bt_ad *ad;
+
+        DBG("size %zu", size);
+
+-       memset(&eir_data, 0, sizeof(eir_data));
+-
+-       eir_parse(&eir_data, eir, size);
+-
+-       bacpy(&remote->address, &eir_data.addr);
+-       remote->address_type = eir_data.addr_type;
+-
+-       remote->class = eir_data.class;
+-
+-       remote->name = eir_data.name;
+-       eir_data.name = NULL;
+-
+-       remote->services = eir_data.services;
+-       eir_data.services = NULL;
+-
+-       remote->hash256 = eir_data.hash256;
+-       eir_data.hash256 = NULL;
++       ad = bt_ad_new_with_data(size, eir);
+
+-       remote->randomizer256 = eir_data.randomizer256;
+-       eir_data.randomizer256 = NULL;
++       if (ad) {
++               bt_ad_foreach_data(ad, process_oob_adv, remote);
+
+-       eir_data_free(&eir_data);
++               bt_ad_unref(ad);
++       }
+ }
