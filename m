@@ -2,97 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9FAFCCA483
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 14:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D81CCA47C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 14:52:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380558AbiFMOB0 (ORCPT
+        id S1385894AbiFMOws (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 10:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41566 "EHLO
+        Mon, 13 Jun 2022 10:52:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380580AbiFMN7H (ORCPT
+        with ESMTP id S1385909AbiFMOvC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 09:59:07 -0400
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED1A88CB3B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 04:37:48 -0700 (PDT)
-X-QQ-mid: bizesmtp71t1655120243t64ph5p5
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Mon, 13 Jun 2022 19:37:19 +0800 (CST)
-X-QQ-SSF: 01400000002000C0D000000A0000000
-X-QQ-FEAT: ZHWZeLXy+8eClACgNhm8bHQa+2IVq2ogrW+ASiRZsqDdEMufljUNbTf7czw5t
-        XmefJOiRD6P6fGL1pqQHtcwGsqELBcXaC8+YZ42lj1QCFTQnEIO6kAQ/O7tmhdy1WjlKISo
-        FeSLm9NAuHOp4tDgPnzXBdKfQDv4C3UpW4DfHS/CSFGQVpI6cQHp2Mfr02cfnrsYyMhCAOa
-        Gp3sbAz99bSa5n/8OhRmJQ15LRn4jNUdcXUnORPBTE1+9GWJeLFKbO1a8XCuGHm5SSkTTG5
-        klx7uFvNDXP+QCbiyjqln0JwV42b8BifYZ9AQiHuPUeoYnpUayaqurZakwFNmXjk54VyhTU
-        fXPJH+kjTW52nNKwkI=
-X-QQ-GoodBg: 1
-From:   wangyouwan <wangyouwan@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     wangyouwan <wangyouwan@uniontech.com>
-Subject: [PATCH] obexd: Fix callback->func =! NULL in the xfer_complete() func
-Date:   Mon, 13 Jun 2022 19:37:13 +0800
-Message-Id: <20220613113713.13681-1-wangyouwan@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 13 Jun 2022 10:51:02 -0400
+X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 13 Jun 2022 04:55:27 PDT
+Received: from mx.kernkonzept.com (serv1.kernkonzept.com [IPv6:2a01:4f8:1c1c:b490::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69DE2ED65;
+        Mon, 13 Jun 2022 04:55:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=kernkonzept.com; s=mx1; h=Content-Transfer-Encoding:MIME-Version:Message-Id
+        :Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=1O+xm8OX+p7BlrqyEqCZKZj5xafZ91tAT8H1qJFm4Pw=; b=GGxftj7vG/t264Yay8zk+3rEiD
+        uRPM2vt+3LhK4f4EuK0mcfE3JrjpqQEwjeWdJKVPHopnMpUhULah65d1a1h7L8LxtnBFAZZe1Gwjj
+        EWJL3qcFHJpyboZjReZ9b0uFJEM6VPpWkMAX0YCLRR7uNoXZMM0bsCUMrj9A/Aag8594togSe+25i
+        ItJ+gBY0543KiVnQha10sCj+Y+Ll5GulAh870c7sRJTV7bfATUI9veFjFQJ6Q+u0FwNRK9MYdwgC/
+        dBSB8P+gakxUV8V/oZPwe90YSyZYZoCs2FgabB3H088kNHPfGZ0kLHiftNK2Sf66FkREnOqVMtqHH
+        F4swSQ5w==;
+Received: from [10.22.3.24] (helo=kernkonzept.com)
+        by mx.kernkonzept.com with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256) (Exim 4.94.2)
+        id 1o0hwS-0051cL-49; Mon, 13 Jun 2022 13:09:08 +0200
+From:   Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Stephan Gerhold <stephan@gerhold.net>,
+        Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+Subject: [PATCH] Bluetooth: btqcomsmd: Fix command timeout after setting BD address
+Date:   Mon, 13 Jun 2022 13:07:45 +0200
+Message-Id: <20220613110745.3778356-1-stephan.gerhold@kernkonzept.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign8
-X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-xfer_complete (obex=0x557d242c8cf0, err=0x557d242ca470,
-user_data=0x557d242ca300) at obexd/client/transfer.c:659
-659     obexd/client/transfer.c:
-(gdb) n
-661     in obexd/client/transfer.c
-(gdb) n
-663     in obexd/client/transfer.c
-(gdb) p callback->func
-$1 = (transfer_callback_t) 0x0
-(gdb) n
-668     in obexd/client/transfer.c
-(gdb) n
-671     in obexd/client/transfer.c
-(gdb) n
-672     in obexd/client/transfer.c
-(gdb) n
-676     in obexd/client/transfer.c
-(gdb) n
-677     in obexd/client/transfer.c
-(gdb) n
-0x0000000000000000 in ?? ()
-(gdb) s
-Cannot find bounds of current function
-(gdb) c
-Continuing.
+The Bluetooth firmware seems to become unresponsive for a while after
+setting the BD address. At least on recent kernel versions this often
+causes timeouts for subsequent commands, e.g. the HCI reset sent by
+the Bluetooth core during initialization:
 
-Program received signal SIGSEGV, Segmentation fault.
+	Bluetooth: hci0: Opcode 0x c03 failed: -110
+
+Unfortunately this behavior does not seem to be documented anywhere.
+Experimentation suggests that the minimum necessary delay to avoid
+the problem is ~150us. However, to be sure add a sleep for > 1ms
+in case it is a bit longer on other firmware versions.
+
+Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
+Signed-off-by: Stephan Gerhold <stephan.gerhold@kernkonzept.com>
 ---
- obexd/client/transfer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I tested this using a script that reboots repeatedly and checks for the
+error. With this patch, BT shows up successfully for 100+ consecutive
+boots. Without this patch it usually fails after 1-5 boots (or even
+always on some boards).
+---
+ drivers/bluetooth/btqcomsmd.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index dccce03b4..a7a85a0c0 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -666,7 +666,10 @@ static void xfer_complete(GObex *obex, GError *err, gpointer user_data)
- 	else
- 		transfer_set_status(transfer, TRANSFER_STATUS_COMPLETE);
- 
--	if (callback)
-+	if (callback == NULL)
-+		return;
-+
-+	if (callback->func)
- 		callback->func(transfer, err, callback->data);
+diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+index 2acb719e596f..11c7e04bf394 100644
+--- a/drivers/bluetooth/btqcomsmd.c
++++ b/drivers/bluetooth/btqcomsmd.c
+@@ -122,6 +122,21 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
+ 	return 0;
  }
  
++static int btqcomsmd_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	int ret;
++
++	ret = qca_set_bdaddr_rome(hdev, bdaddr);
++	if (ret)
++		return ret;
++
++	/* The firmware stops responding for a while after setting the bdaddr,
++	 * causing timeouts for subsequent commands. Sleep a bit to avoid this.
++	 */
++	usleep_range(1000, 10000);
++	return 0;
++}
++
+ static int btqcomsmd_probe(struct platform_device *pdev)
+ {
+ 	struct btqcomsmd *btq;
+@@ -162,7 +177,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+ 	hdev->close = btqcomsmd_close;
+ 	hdev->send = btqcomsmd_send;
+ 	hdev->setup = btqcomsmd_setup;
+-	hdev->set_bdaddr = qca_set_bdaddr_rome;
++	hdev->set_bdaddr = btqcomsmd_set_bdaddr;
+ 
+ 	ret = hci_register_dev(hdev);
+ 	if (ret < 0)
 -- 
-2.20.1
-
-
+2.30.2
 
