@@ -2,101 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0A65C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 18:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CD5CCA47D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Jun 2022 18:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344861AbiFMSoZ (ORCPT
+        id S242969AbiFMS7X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:44:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51448 "EHLO
+        Mon, 13 Jun 2022 14:59:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347827AbiFMSoH (ORCPT
+        with ESMTP id S1346082AbiFMS6g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:44:07 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7AE8DE331
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:18:13 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id e24so5949495pjt.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Jun 2022 08:18:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=0f2HQ5QyzTAw5GHRuNhK7+HuO9hgcAvoxf3F82iNyjI=;
-        b=RVN2yFoNX9gMS1eXqOXXLqC8CNsA+Fw601cxeZ9lgFTL194v5/nIi4lysCQlNRCqxK
-         03AGsI+Y4dG/D86JRp4FzserRY5LBue9H7jmHfbKhnjBBnzVRsqRKlxM3rkziXCApvT2
-         e7Nv71nyyJxQASqIp1rQA2BojvGWoNka43Mu5ROHIT9QbEqR9UddMzYhcjmbV4A3NoAn
-         Pi6Fka6p8933LjM2em20ahyyeYd2/WsOHsRzcyxynMv7/5qVArvJdE9XW/qGkztUSJfv
-         Le0ybxwQewNUlkisNKbq85BiizUe47vKEZwj3nH3Irlg5MJs+QjyCpgGRBFma6RdEWEk
-         lp+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=0f2HQ5QyzTAw5GHRuNhK7+HuO9hgcAvoxf3F82iNyjI=;
-        b=d5owYGo4bhOuHxr2QcAEmIFDsQVDZFBVDZ9MZOx5TeI6dAZiQbVjqfToveSHGGyooc
-         z1OxTfkAGc6g/DtUiIg9wXUrcdNytNlKe6ZEsYZU+umNMNbOitq4UF4vs8ZKb/NBN4nk
-         XFjpZavFGlFuuAZ7s3dKrNBOHJQ125Y9DlqZEUu3zy4RHaYT+hIs9lmzP/uV+lSgrx3/
-         b55L5t0j0EzHCwOotdeUjXfUEKmqNXj4iQxfPBq7i9xtiETVjDP1oPefnGJ7Aq7y9gR2
-         cW6pdu++Gtp+IioljQ0QE4ZzWAtE3qu5k/EsLyF5Y8xh4Wduutsku+gFDRmobS9EdVPp
-         T++A==
-X-Gm-Message-State: AOAM530mDcI3qyyb47VRQjXI5ZD+8ZDG9v6KQJ2nE3oS44IHRFj4TvRS
-        7D7yKMZEpVq1HU8cPQ00OlvPz/XCXT4=
-X-Google-Smtp-Source: ABdhPJy6kNI7fA8Nu3H8+JF1mwGM1g7W6PEWD1dgTLM0rdRgMHSyAFRfLeDnwJZyWhvZ/MDYafek/w==
-X-Received: by 2002:a17:902:cec8:b0:163:e4c1:b302 with SMTP id d8-20020a170902cec800b00163e4c1b302mr59514663plg.123.1655133493077;
-        Mon, 13 Jun 2022 08:18:13 -0700 (PDT)
-Received: from [172.17.0.2] ([20.118.134.211])
-        by smtp.gmail.com with ESMTPSA id mn20-20020a17090b189400b001d954837197sm7755327pjb.22.2022.06.13.08.18.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 08:18:12 -0700 (PDT)
-Message-ID: <62a75534.1c69fb81.c0ce6.929a@mx.google.com>
-Date:   Mon, 13 Jun 2022 08:18:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7304942822088907345=="
+        Mon, 13 Jun 2022 14:58:36 -0400
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADEB88DDD8;
+        Mon, 13 Jun 2022 09:09:36 -0700 (PDT)
+Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 0ED2261EA192C;
+        Mon, 13 Jun 2022 18:09:34 +0200 (CEST)
+Message-ID: <9d8238ba-500e-3490-8a25-e7b72bab175f@molgen.mpg.de>
+Date:   Mon, 13 Jun 2022 18:09:33 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: obexd: Fix callback->func =! NULL in the xfer_complete() func
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220613113713.13681-1-wangyouwan@uniontech.com>
-References: <20220613113713.13681-1-wangyouwan@uniontech.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] Bluetooth: btqcomsmd: Fix command timeout after setting
+ BD address
+Content-Language: en-US
+To:     Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Stephan Gerhold <stephan@gerhold.net>
+References: <20220613110745.3778356-1-stephan.gerhold@kernkonzept.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20220613110745.3778356-1-stephan.gerhold@kernkonzept.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7304942822088907345==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=649838
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.78 seconds
-GitLint                       PASS      0.51 seconds
-Prep - Setup ELL              PASS      41.52 seconds
-Build - Prep                  PASS      0.47 seconds
-Build - Configure             PASS      8.00 seconds
-Build - Make                  PASS      1212.26 seconds
-Make Check                    PASS      11.20 seconds
-Make Check w/Valgrind         PASS      438.49 seconds
-Make Distcheck                PASS      228.62 seconds
-Build w/ext ELL - Configure   PASS      8.06 seconds
-Build w/ext ELL - Make        PASS      1178.65 seconds
-Incremental Build with patchesPASS      0.00 seconds
+Dear Stephan,
 
 
+Thank you for the patch.
 
----
-Regards,
-Linux Bluetooth
+Am 13.06.22 um 13:07 schrieb Stephan Gerhold:
+> The Bluetooth firmware seems to become unresponsive for a while after
+
+Please mention the device with the problematic firmware.
+
+> setting the BD address. At least on recent kernel versions this often
+
+The commit referenced in the Fixes tag is in Linux 4.9. Can you please 
+name the oldest Linux kernel version you experienced the problem with.
+
+> causes timeouts for subsequent commands, e.g. the HCI reset sent by
+> the Bluetooth core during initialization:
+> 
+> 	Bluetooth: hci0: Opcode 0x c03 failed: -110
+> 
+> Unfortunately this behavior does not seem to be documented anywhere.
+> Experimentation suggests that the minimum necessary delay to avoid
+> the problem is ~150us. However, to be sure add a sleep for > 1ms
+> in case it is a bit longer on other firmware versions.
+> 
+> Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
+> Signed-off-by: Stephan Gerhold <stephan.gerhold@kernkonzept.com>
+> ---
+> I tested this using a script that reboots repeatedly and checks for the
+> error. With this patch, BT shows up successfully for 100+ consecutive
+> boots. Without this patch it usually fails after 1-5 boots (or even
+> always on some boards).
+> ---
+>   drivers/bluetooth/btqcomsmd.c | 17 ++++++++++++++++-
+>   1 file changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index 2acb719e596f..11c7e04bf394 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -122,6 +122,21 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
+>   	return 0;
+>   }
+>   
+> +static int btqcomsmd_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> +{
+> +	int ret;
+> +
+> +	ret = qca_set_bdaddr_rome(hdev, bdaddr);
+> +	if (ret)
+> +		return ret;
+> +
+> +	/* The firmware stops responding for a while after setting the bdaddr,
+> +	 * causing timeouts for subsequent commands. Sleep a bit to avoid this.
+> +	 */
+> +	usleep_range(1000, 10000);
+> +	return 0;
+> +}
+> +
+>   static int btqcomsmd_probe(struct platform_device *pdev)
+>   {
+>   	struct btqcomsmd *btq;
+> @@ -162,7 +177,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
+>   	hdev->close = btqcomsmd_close;
+>   	hdev->send = btqcomsmd_send;
+>   	hdev->setup = btqcomsmd_setup;
+> -	hdev->set_bdaddr = qca_set_bdaddr_rome;
+> +	hdev->set_bdaddr = btqcomsmd_set_bdaddr;
+>   
+>   	ret = hci_register_dev(hdev);
+>   	if (ret < 0)
 
 
---===============7304942822088907345==--
+Kind regards,
+
+Paul
