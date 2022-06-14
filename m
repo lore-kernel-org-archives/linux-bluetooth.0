@@ -2,90 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9A2CCA47A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 21:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09990C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 23:57:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240455AbiFNV4U (ORCPT
+        id S232804AbiFNX5b (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jun 2022 17:56:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50800 "EHLO
+        Tue, 14 Jun 2022 19:57:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234572AbiFNV4S (ORCPT
+        with ESMTP id S229950AbiFNX53 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jun 2022 17:56:18 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3062B19F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 14:56:15 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id l3so5799369qtp.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 14:56:15 -0700 (PDT)
+        Tue, 14 Jun 2022 19:57:29 -0400
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D802DC
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 16:57:26 -0700 (PDT)
+Received: by mail-io1-xd2e.google.com with SMTP id d123so11054143iof.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 16:57:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=6T2S4hfFD2xREDyL6cndCDUIOdoiywfBXL+HAGS8mRY=;
-        b=TSiPp52y4viYQi03Uow0XbSRqNlAN73YjxF5fJjuuCiJQCqDJFtYzN7vIgNFvrooow
-         TpngZc1hzDx+gVlLz+ePWy/rPuNGM00Q4gCMHWWVvzSipZ0tfG94imUJTOXAB03CuO/3
-         3f9xwzNQ6vrXB40EwRfnfwE/id8yYRYQ1n4xyc1H7kd3KH94lecBwbrQqI9BvUxBK01R
-         OhQ9WsGk7sfoad2QRHAlpfPLwseRAQJ7KMSYAzpK9d7C/eCXIxfK/Jr+iJ14Posa85S9
-         YCRR7ywnmXAks+OHBjazRbHIIXzLpVDH/wA6RgBs9CJlhE6x4qPPifeQErWITHTLJP+a
-         3Ahw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=6fliBuTpe343Dll7hYjwXImUB9c34AME6Lb07FBV8io=;
+        b=RAeEw4aQjl9azed4BvSrV00Ew3fR/PVlj5rBbE1SUZLwkOQk8ZqeTlEfDjh4fOKPaf
+         q9BZjdm7L/X8dqswdWW0wGr33TAGykcgd00OyfCS91RIwTqNgoc6EyvWG3XZ55WCgrfz
+         JfcybI0nFjikAFdXfFJ6GLAxq4yKKHp2cFODKomKpOeHD8MZid/6Pq9ewlylXtayoUDq
+         LcuLXP6oFfP1Lg501JKet3KbUV2pTEmroCV+GQCZC9vmcum3BqFF5F4ofKXKL7RnV7UI
+         24/VnuEKYzL1NN94lv+p05mfTg00b8xQObQQ30Fk2xxaAADhI5qIk7n3JXy8MxHb98NC
+         xEhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6T2S4hfFD2xREDyL6cndCDUIOdoiywfBXL+HAGS8mRY=;
-        b=Nmlxo6pI66XzMbskoELtdzcPaQELVwuXYOEpIXETt0EW24501AaYZMh7sThay+Nfph
-         6K65nlv/uUjVGesNrXg1fuR5meYEu1fqffWiYoR2nrLdqFNqwT0J8kJHv34mDG69WEkd
-         n1xtpYLzFdJWx2v66kk7E5mKCD3eB8Czt1sePP60n2r7zGVqD8DtKQoU3UbkOFWDOiNZ
-         Z4Hr+/BL9b9BqdfGl84MRXC69Kp6co47ELlAEWdDEIMwO8NoU029Lovlyn56zy6ZMWWj
-         t2tulGBBlf7A7f64UFhJj+/XKVJSgts54krPdALXPOqw0k+6QfLuoyqnukLLUzo0eLfl
-         4wEA==
-X-Gm-Message-State: AOAM533ZwAttYuFQdrT3cfHEbs6yioeDdAeULPQ46U9EbFaCjOkKrMiA
-        7lemH+wGFrfmyc8JOAO+e0Pd9caL6I0=
-X-Google-Smtp-Source: ABdhPJyZ033++/LPK4RRSYsXSgGE+Nnfz34Ak0ppcR5hyPkg/WR9NZuVXLcXYRnBW6J26pXKyoVCzQ==
-X-Received: by 2002:a05:622a:248:b0:305:fa0:1294 with SMTP id c8-20020a05622a024800b003050fa01294mr6048007qtx.564.1655243773719;
-        Tue, 14 Jun 2022 14:56:13 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id l3-20020a05620a28c300b006a780aa9fc4sm8446126qkp.96.2022.06.14.14.56.12
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=6fliBuTpe343Dll7hYjwXImUB9c34AME6Lb07FBV8io=;
+        b=7xL0Vq1ZHFfQ/LYCpcGRa9petBnKZw+l+uWQaH6/NWZEc4EVuzLiHX++oWIUz+iqaS
+         Nr+BQsa/SqFb2uLhRrG4MOZ+qmownxB2G3IX0gM7lZcg77CTBNcALdHgQiXWb+eBoPcT
+         XQ6SfHNLGud9Hc7gURnuX/4SDKwchzF0rdoP6AQPH7pnbEXhDDeQLTiLVEo1mzg/wvui
+         NMaGzF9VVNC5Y9govsQpSlQ2vLZDbIwCU1Sl6voCaEOdmMBCG10++g1Ngm6c+VK2breq
+         3MoHGl8ilN+/IqUKoy4kxfQjmjJ/IesrBZkLlbTCl/tWSwu7FUU5eDNWod0dEfa6WFq/
+         SJhw==
+X-Gm-Message-State: AOAM533n0+wJ1Qf3iAhp81SmLP67Ot7sDQ1HnQhbx6sDojyJLjfwANHG
+        brTU7UZrPd8FezagbVaElX6KGSWrKeU=
+X-Google-Smtp-Source: ABdhPJy18hT9pzCp1URW9I/hkYTq31bwC1xWrhBOKAoZImIrQsebVUY+vteorGeMyWOXegGsHGH51Q==
+X-Received: by 2002:a05:6638:238c:b0:333:ebba:879d with SMTP id q12-20020a056638238c00b00333ebba879dmr4329289jat.36.1655251045619;
+        Tue, 14 Jun 2022 16:57:25 -0700 (PDT)
+Received: from [172.17.0.2] ([104.208.24.14])
+        by smtp.gmail.com with ESMTPSA id g11-20020a02b70b000000b003318614511bsm5424218jam.161.2022.06.14.16.57.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jun 2022 14:56:13 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] bluetoothd.rst: Document -K/--kernel option
-Date:   Tue, 14 Jun 2022 14:56:09 -0700
-Message-Id: <20220614215609.596687-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        Tue, 14 Jun 2022 16:57:25 -0700 (PDT)
+Message-ID: <62a92065.1c69fb81.f862c.6307@mx.google.com>
+Date:   Tue, 14 Jun 2022 16:57:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7239504280235197298=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] main.conf: Split Kernel Experimental UUIDs from Experimental
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20220614215609.596687-1-luiz.dentz@gmail.com>
 References: <20220614215609.596687-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7239504280235197298==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This documents -K/--kernel experimental features options.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=650352
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.32 seconds
+GitLint                       PASS      1.58 seconds
+Prep - Setup ELL              PASS      41.64 seconds
+Build - Prep                  PASS      0.59 seconds
+Build - Configure             PASS      8.10 seconds
+Build - Make                  PASS      1198.21 seconds
+Make Check                    PASS      11.70 seconds
+Make Check w/Valgrind         PASS      441.76 seconds
+Make Distcheck                PASS      228.39 seconds
+Build w/ext ELL - Configure   PASS      8.13 seconds
+Build w/ext ELL - Make        PASS      1183.39 seconds
+Incremental Build with patchesPASS      2414.49 seconds
+
+
+
 ---
- src/bluetoothd.rst.in | 4 ++++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/bluetoothd.rst.in b/src/bluetoothd.rst.in
-index 6bce349ef..7a0fa1b24 100644
---- a/src/bluetoothd.rst.in
-+++ b/src/bluetoothd.rst.in
-@@ -67,6 +67,10 @@ OPTIONS
- -E, --experimental  Enable experimental interfaces. Those interfaces are not
-                     guaranteed to be compatible or present in future releases.
- 
-+-K, --kernel=<uuid1>,<uuid2>,...
-+    Enable Kernel experimental features. Kernel experimental features are
-+    considered unstable and may be removed from future kernel releases.
-+
- FILES
- =====
- 
--- 
-2.35.3
 
+--===============7239504280235197298==--
