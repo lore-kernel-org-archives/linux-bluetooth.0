@@ -2,198 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D98F5C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 13:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D42B0CCA47A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 13:51:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236475AbiFNNmz (ORCPT
+        id S236030AbiFNNvO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jun 2022 09:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        Tue, 14 Jun 2022 09:51:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230318AbiFNNmy (ORCPT
+        with ESMTP id S229671AbiFNNvN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jun 2022 09:42:54 -0400
-Received: from giacobini.uberspace.de (giacobini.uberspace.de [185.26.156.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C19DB205DB
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 06:42:51 -0700 (PDT)
-Received: (qmail 12563 invoked by uid 990); 14 Jun 2022 13:42:49 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-Message-ID: <22131ee2-914c-3aad-d2c3-f340ad0c8ad0@eknoes.de>
-Date:   Tue, 14 Jun 2022 15:42:45 +0200
+        Tue, 14 Jun 2022 09:51:13 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE37B3701E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 06:51:12 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id z11so6592022ilq.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 06:51:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=x+mh/OSVjk8/FQPFL27wt3FKCJbGS/QNv7zxnCPnbkk=;
+        b=pBNwZ4xxxFAjo97lPpVKEpWSKhmgptIpl8MdbKxqefaStIY4lK5ZNV9ujKfKoNLYev
+         3tVCUL0eeaiiOYD/zCabzCPFzsAp4JVDcIYWaXiG+buhbHJ38pisRIcVsTkwJzMTS5jV
+         D++6NbU4kzhd8KMP/UrXXAkG8PDglZwweiln23TS7mqXecPlDm+zDaCSjRiR1tR0EeM2
+         lQeHfKBbFSn1ESxpSZ0UGwW7lKRwxBHZuLYAro/7Tfh+qWuHPpj3CO9zm66xSVjAX+0Y
+         nNLJhM/51pxYgJQjebXQfSMhkfv/FUdFmGEPXKQZPSwlBP/nYfNVnAkHzzyi+qGQdXZL
+         Dd3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=x+mh/OSVjk8/FQPFL27wt3FKCJbGS/QNv7zxnCPnbkk=;
+        b=IePfIT6JQjXSMwrmFuumSyj5xILfK1q64exXKrLE62nVLtBoUL6cjWc7ZuusL+3loo
+         tUXew3XQFt0Zcclpi1awMuvLqt2ilNcPRI0QdcsS2SsAlFR9ib6TXCm5UqxA9Hnd2G0W
+         Y2MsXuq/a3ggHbGoBPe1M4+JQUEFRxapvtkYEdoL8j2TrIDYmskrfGAcFj1OysF/1bL4
+         e6YPYJTWI/9wS8izw5yV+MQTubtcznkJQWnqfKwXzpnlgjskx3flTs5RVrFm3GAbdKXV
+         GZs61ROhteuTMVOK4mIc6yE3OsNnDExkbRnj1ZEk98esc6i0rB09JtHTp7+IVMkHbgND
+         zd1g==
+X-Gm-Message-State: AJIora+ZBeuLwRx/gzqJopu41ZojcT8eRanppcBi3om2VZlMe1F1pxCd
+        j78ciF39inatGMCZkL0j4Aha+aJkx872kg==
+X-Google-Smtp-Source: AGRyM1vszTi+FRxryHJRX2e/MBFDtDAqePOHFJY3lI+o/YUhrHqKEVC9k9zvdTorS69UI+8PT+0jNQ==
+X-Received: by 2002:a05:6e02:1207:b0:2d3:b5fb:a802 with SMTP id a7-20020a056e02120700b002d3b5fba802mr3082961ilq.319.1655214671903;
+        Tue, 14 Jun 2022 06:51:11 -0700 (PDT)
+Received: from [172.17.0.2] ([20.29.117.97])
+        by smtp.gmail.com with ESMTPSA id y3-20020a02ce83000000b0032e7d0a79basm4850744jaq.158.2022.06.14.06.51.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jun 2022 06:51:11 -0700 (PDT)
+Message-ID: <62a8924f.1c69fb81.b559c.4bd8@mx.google.com>
+Date:   Tue, 14 Jun 2022 06:51:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6132865025644794441=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-References: <20220610110749.110881-1-soenke.huster@eknoes.de>
- <CANn89i+YHqMddY68Qk1rZexqhYYX9gah-==WGttFbp4urLS7Qg@mail.gmail.com>
- <9f214837-dc68-ef1a-0199-27d6af582115@eknoes.de>
- <CANn89iKS7npfHvBJNP2PBtR9RAQGsVdykELX8mK8DQbFbLeybA@mail.gmail.com>
-From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
-Subject: Re: [PATCH v2] Bluetooth: RFCOMM: Use skb_trim to trim checksum
-In-Reply-To: <CANn89iKS7npfHvBJNP2PBtR9RAQGsVdykELX8mK8DQbFbLeybA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: -
-X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-2.992468) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: -1.592468
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Tue, 14 Jun 2022 15:42:49 +0200
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
+Subject: RE: obexd: Fix transfer has been free during transfer_abort_response func
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220614114914.30497-1-wangyouwan@uniontech.com>
+References: <20220614114914.30497-1-wangyouwan@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Eric,
+--===============6132865025644794441==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On 10.06.22 18:55, Eric Dumazet wrote:
-> On Fri, Jun 10, 2022 at 8:35 AM Sönke Huster <soenke.huster@eknoes.de> wrote:
->>
->> Hi Eric,
->>
->> On 10.06.22 15:59, Eric Dumazet wrote:
->>> On Fri, Jun 10, 2022 at 4:08 AM Soenke Huster <soenke.huster@eknoes.de> wrote:
->>>>
->>>> As skb->tail might be zero, it can underflow. This leads to a page
->>>> fault: skb_tail_pointer simply adds skb->tail (which is now MAX_UINT)
->>>> to skb->head.
->>>>
->>>>     BUG: unable to handle page fault for address: ffffed1021de29ff
->>>>     #PF: supervisor read access in kernel mode
->>>>     #PF: error_code(0x0000) - not-present page
->>>>     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
->>>>
->>>> By using skb_trim instead of the direct manipulation, skb->tail
->>>> is reset. Thus, the correct pointer to the checksum is used.
->>>>
->>>> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
->>>> ---
->>>> v2: Clarified how the bug triggers, minimize code change
->>>>
->>>>  net/bluetooth/rfcomm/core.c | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
->>>> index 7324764384b6..443b55edb3ab 100644
->>>> --- a/net/bluetooth/rfcomm/core.c
->>>> +++ b/net/bluetooth/rfcomm/core.c
->>>> @@ -1747,7 +1747,7 @@ static struct rfcomm_session *rfcomm_recv_frame(struct rfcomm_session *s,
->>>>         type = __get_type(hdr->ctrl);
->>>>
->>>>         /* Trim FCS */
->>>> -       skb->len--; skb->tail--;
->>>> +       skb_trim(skb, skb->len - 1);
->>>>         fcs = *(u8 *)skb_tail_pointer(skb);
->>>>
->>>>         if (__check_fcs(skb->data, type, fcs)) {
->>>> --
->>>> 2.36.1
->>>>
->>>
->>> Again, I do not see how skb->tail could possibly zero at this point.
->>>
->>> If it was, skb with illegal layout has been queued in the first place,
->>> we need to fix the producer, not the consumer.
->>>
->>
->> Sorry, I thought that might be a right place as there is not much code in the kernel
->> that manipulates ->tail directly.
->>
->>> A driver missed an skb_put() perhaps.
->>>
->>
->> I am using the (I guess quite unused) virtio_bt driver, and figured out that the following
->> fixes the bug:
->>
->> --- a/drivers/bluetooth/virtio_bt.c
->> +++ b/drivers/bluetooth/virtio_bt.c
->> @@ -219,7 +219,7 @@ static void virtbt_rx_work(struct work_struct *work)
->>         if (!skb)
->>                 return;
->>
->> -       skb->len = len;
->> +       skb_put(skb, len);
-> 
-> Removing skb->len=len seems about right.
-> But skb_put() should be done earlier.
-> 
-> We are approaching the skb producer :)
-> 
-> Now you have to find/check who added this illegal skb in the virt queue.
-> 
-> Maybe virtbt_add_inbuf() ?
+This is automated email and please do not reply to this email!
 
-I think here, the length of the skb can't really be known - an empty SKB is put into
-the virtqueue, and then filled with data in the device, which is implemented in a Hypervisor.
-Maybe my implementation of that device might then be wrong, on the other hand I am pretty
-sure the driver should be the one that sets the length of the skb. But the driver only
-knows it in virtbt_rx_work, as it learns the size of the added buffer there for the first time.
+Dear submitter,
 
-> 
-> Also there is kernel info leak I think.
-> 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=650185
 
-I think your are right!
+---Test result---
 
-> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-> index 67c21263f9e0f250f0719b8e7f1fe15b0eba5ee0..c9b832c447ee451f027430b284d7bb246f6ecb24
-> 100644
-> --- a/drivers/bluetooth/virtio_bt.c
-> +++ b/drivers/bluetooth/virtio_bt.c
-> @@ -37,6 +37,9 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt)
->         if (!skb)
->                 return -ENOMEM;
-> 
-> +       skb_put(skb, 1000);
-> +       memset(skb->data, 0, 1000);
-> +
->         sg_init_one(sg, skb->data, 1000);
-> 
->         err = virtqueue_add_inbuf(vq, sg, 1, skb, GFP_KERNEL);
-> 
-> 
->>         virtbt_rx_handle(vbt, skb);
->>
->>         if (virtbt_add_inbuf(vbt) < 0)
->>
->> I guess this is the root cause? I just used Bluetooth for a while in the VM
->> and no error occurred, everything worked fine.
->>
->>> Can you please dump the skb here  ?
->>>
->>> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
->>> index 7324764384b6773074032ad671777bf86bd3360e..358ccb4fe7214aea0bb4084188c7658316fe0ff7
->>> 100644
->>> --- a/net/bluetooth/rfcomm/core.c
->>> +++ b/net/bluetooth/rfcomm/core.c
->>> @@ -1746,6 +1746,11 @@ static struct rfcomm_session
->>> *rfcomm_recv_frame(struct rfcomm_session *s,
->>>         dlci = __get_dlci(hdr->addr);
->>>         type = __get_type(hdr->ctrl);
->>>
->>> +       if (!skb->tail) {
->>> +               DO_ONCE_LITE(skb_dump(KERN_ERR, skb, false));
->>> +               kfree_skb(skb);
->>> +               return s;
->>> +       }
->>>         /* Trim FCS */
->>>         skb->len--; skb->tail--;
->>>         fcs = *(u8 *)skb_tail_pointer(skb);
->>
->> If it might still help:
->>
->> skb len=4 headroom=9 headlen=4 tailroom=1728
->> mac=(-1,-1) net=(0,-1) trans=-1
->> shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
->> csum(0x0 ip_summed=0 complete_sw=0 valid=0 level=0)
->> hash(0x0 sw=0 l4=0) proto=0x0000 pkttype=0 iif=0
->> skb linear:   00000000: 03 3f 01 1c
->>
+Test Summary:
+CheckPatch                    FAIL      1.06 seconds
+GitLint                       FAIL      0.77 seconds
+Prep - Setup ELL              PASS      43.82 seconds
+Build - Prep                  PASS      0.58 seconds
+Build - Configure             PASS      8.55 seconds
+Build - Make                  PASS      1426.59 seconds
+Make Check                    PASS      12.09 seconds
+Make Check w/Valgrind         PASS      440.91 seconds
+Make Distcheck                PASS      233.61 seconds
+Build w/ext ELL - Configure   PASS      8.59 seconds
+Build w/ext ELL - Make        PASS      1391.37 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+obexd: Fix transfer has been free during transfer_abort_response func
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#64: 
+Breakpoint 3, transfer_complete (transfer=0x5555555f5f40, err=0x5555555f6d60)
+
+WARNING:LONG_LINE: line length of 82 exceeds 80 columns
+#158: FILE: gobex/gobex-transfer.c:96:
++		transfer->complete_func(transfer->obex, err, transfer->user_data);
+
+/github/workspace/src/12880945.patch total: 0 errors, 2 warnings, 10 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12880945.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+obexd: Fix transfer has been free during transfer_abort_response func
+35: B1 Line exceeds max length (82>80): "Breakpoint 5, transfer_free (transfer=0x5555555f5f40) at gobex/gobex-transfer.c:61"
+44: B1 Line exceeds max length (88>80): "Breakpoint 2, transfer_abort_response (obex=0x5555555f5b50, err=0x0, rsp=0x5555555f0810,"
+54: B1 Line exceeds max length (106>80): "Breakpoint 3, transfer_complete (transfer=0x5555555f5f40, err=0x5555555f6f00) at gobex/gobex-transfer.c:99"
+59: B1 Line exceeds max length (95>80): "Breakpoint 4, xfer_complete (obex=0x5555555f5b50, err=0x5555555f6f00, user_data=0x5555555f7000)"
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6132865025644794441==--
