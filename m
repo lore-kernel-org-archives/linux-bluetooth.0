@@ -2,44 +2,43 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93809C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 11:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A3FAC43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 13:16:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242960AbiFNLtg (ORCPT
+        id S243805AbiFNNQN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jun 2022 07:49:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38546 "EHLO
+        Tue, 14 Jun 2022 09:16:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242858AbiFNLtf (ORCPT
+        with ESMTP id S244132AbiFNNQM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jun 2022 07:49:35 -0400
-X-Greylist: delayed 87941 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 14 Jun 2022 04:49:29 PDT
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93BF8340FF
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 04:49:29 -0700 (PDT)
-X-QQ-mid: bizesmtp71t1655207363tl1pkr59
+        Tue, 14 Jun 2022 09:16:12 -0400
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5354F381A3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 06:16:10 -0700 (PDT)
+X-QQ-mid: bizesmtp69t1655212556tp9f1ec5
 Received: from localhost.localdomain ( [113.57.152.160])
         by bizesmtp.qq.com (ESMTP) with 
-        id ; Tue, 14 Jun 2022 19:49:17 +0800 (CST)
-X-QQ-SSF: 01400000002000C0D000B00A0000000
-X-QQ-FEAT: T/61Y8rdSIt9rUqv+Wg5aQQSsWs3GtE7InD7BiTZ8lpXwGhbMijkggiTNwDBV
-        7vj4nVj1asYSHYe+ScjHM0y3fuMClxOI0kYLwR3MS9RD8hV1EL5/+hVT5wsmAQSFl28raP4
-        1wYomWveEksQCu/neZHyXoPWEOTJmC+A91rgdbfY53Ra1WwJp/eoGDiTWFP58prw+ZlXen5
-        u6G11q4pink5pSf7ZhSVM048BYCesZ+c3BaK80jzzzvqpSUPMemljfpdkvEH0YOHT8rpBWp
-        1oGLRyIUffV1ogN2ftYx8URCUT+PqVOmIzkhDY6IzzKfQBoBuJrltqYbrMw7Dp2gWnGs9t5
-        0Hw9b3F
-X-QQ-GoodBg: 2
+        id ; Tue, 14 Jun 2022 21:15:51 +0800 (CST)
+X-QQ-SSF: 01400000002000C0D000000A0000000
+X-QQ-FEAT: wpAWin5TxhugTPsp85FyeoqPR9MJGDpEWdvW91+U/rzuYmhEfHjomxsqpOZ4h
+        ox0ci0pt4JZey6UlmmGF2TMX+rliSn0gAgT/jIDLjX4KajF14UFWHwDaEzIZkQ28PHQ0Xfx
+        k2N3ugn4X7Q+e6LodrpRa556sQxURfSNqm/dLtUo/VI7wlnF5hzZmLxexeP4dXLLCK66HJe
+        zt1Ez42hVStzyE75eQve/z1edZGwjfIYnHkY1AWwe11t0pHLdpI8Ag6NL9s9ozeXStHz7Op
+        QJvZwx2aqXuZicNMDGjfKJ9Mkrlk7rQttUHgwhnp4k9bGrPlfqq2LyYsLBJr8ShzCXAAGjp
+        xI/gWXkUvyItOivzJOw4rZ/2F2TnQ==
+X-QQ-GoodBg: 1
 From:   wangyouwan <wangyouwan@uniontech.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     wangyouwan <wangyouwan@uniontech.com>
-Subject: [PATCH] obexd: Fix transfer has been free during transfer_abort_response func
-Date:   Tue, 14 Jun 2022 19:49:14 +0800
-Message-Id: <20220614114914.30497-1-wangyouwan@uniontech.com>
+Subject: [PATCH] obexd: Fix transfer has been free in transfer_abort_response
+Date:   Tue, 14 Jun 2022 21:15:49 +0800
+Message-Id: <20220614131549.22054-1-wangyouwan@uniontech.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign4
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign3
 X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -52,8 +51,8 @@ at gobex/gobex-transfer.c:254
 (gdb) c
 Continuing.
 
-Breakpoint 3, transfer_complete (transfer=0x5555555f5f40, err=0x5555555f6d60)
-at gobex/gobex-transfer.c:99
+Breakpoint 3, transfer_complete (transfer=0x5555555f5f40,
+err=0x5555555f6d60) at gobex/gobex-transfer.c:99
 99      in gobex/gobex-transfer.c
 (gdb) c
 Continuing.
@@ -77,7 +76,8 @@ user_data=0x5555555f48d0) at obexd/client/session.c:964
 (gdb) c
 Continuing.
 
-Breakpoint 5, transfer_free (transfer=0x5555555f5f40) at gobex/gobex-transfer.c:61
+Breakpoint 5, transfer_free (transfer=0x5555555f5f40) at
+gobex/gobex-transfer.c:61
 61      gobex/gobex-transfer.c:
 (gdb) n
 63      in gobex/gobex-transfer.c
@@ -86,8 +86,8 @@ $18 = 1
 (gdb) c
 Continuing.
 
-Breakpoint 2, transfer_abort_response (obex=0x5555555f5b50, err=0x0, rsp=0x5555555f0810,
-user_data=0x5555555f5f40) at gobex/gobex-transfer.c:116
+Breakpoint 2, transfer_abort_response (obex=0x5555555f5b50, err=0x0,
+rsp=0x5555555f0810, user_data=0x5555555f5f40) at gobex/gobex-transfer.c:116
 116     in gobex/gobex-transfer.c
 (gdb) n
 118     in gobex/gobex-transfer.c
@@ -96,12 +96,14 @@ $19 = 1432314080
 (gdb) c
 Continuing.
 
-Breakpoint 3, transfer_complete (transfer=0x5555555f5f40, err=0x5555555f6f00) at gobex/gobex-transfer.c:99
+Breakpoint 3, transfer_complete (transfer=0x5555555f5f40, err=0x5555555f6f00)
+at gobex/gobex-transfer.c:99
 99      in gobex/gobex-transfer.c
 (gdb) c
 Continuing.
 
-Breakpoint 4, xfer_complete (obex=0x5555555f5b50, err=0x5555555f6f00, user_data=0x5555555f7000)
+Breakpoint 4, xfer_complete (obex=0x5555555f5b50, err=0x5555555f6f00,
+user_data=0x5555555f7000)
 at obexd/client/transfer.c:659
 659     obexd/client/transfer.c:
 (gdb) n
