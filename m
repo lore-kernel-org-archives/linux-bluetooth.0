@@ -2,49 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C32FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 17:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A0C2C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 17:46:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238438AbiFNRNz (ORCPT
+        id S245621AbiFNRqu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jun 2022 13:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35678 "EHLO
+        Tue, 14 Jun 2022 13:46:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234159AbiFNRNy (ORCPT
+        with ESMTP id S232984AbiFNRqu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jun 2022 13:13:54 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1D51FA79
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 10:13:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655226833; x=1686762833;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=5mMsQrPr+sQP3R2iBlzsvxR1A+6STqAHDTUQIgeRwAI=;
-  b=kAQc13pyTPbm5NcIbSF0nEqH1FoQx8SiKPOfjFKZfQtO5jFxHJdW6Xan
-   kmMqcZv26s5L4bg067ZgIBqhGl9VVlfEsnhY0J6OgDOa2FkpNI/mZf1q7
-   kDDuhfQcVAMoGAiWCUXM31xQNT5oq51YZdXIIue1pbnwhAGudKa73ejpT
-   0uDCrgJzMfGXUu0v+9Cxqkx/ZReXx+dxBUK6cmOD49J+9TOPcVlHSN3OM
-   zK+b5YYSVUH5b9vQkQ7qum8OnuesP1cGe4Ej64Ew95ZUti9ee/vgFXW/1
-   nza36OfuBmJTUC2CawTkEA99XG+4KAymp2y2HAA1eJeL/7xP5jnnpPTBm
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="259137453"
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
-   d="scan'208";a="259137453"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 10:13:53 -0700
-X-IronPort-AV: E=Sophos;i="5.91,300,1647327600"; 
-   d="scan'208";a="570095481"
-Received: from kjirish-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.156.199])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 10:13:52 -0700
-From:   Brian Gix <brian.gix@intel.com>
+        Tue, 14 Jun 2022 13:46:50 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21BA940E6B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 10:46:49 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id x4so9188181pfj.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 10:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NHwS31x9zJjvTs6bruI9Ze7jthhDWC8YQgh98IC0AUM=;
+        b=U29nWZM0MJXQPqSfOEh5OIUtYdqEyPSeVO17T9lxMsNXjetXb+7pnWSH/LQgrsdTat
+         ZiK5norARSg0NC1m+Ru5hh5KZSFFtGlOR0diCPsVt/gQlB22lKdK5o89j6DJVCgSSUeh
+         0CmtOxD4aUyObBqTVl4G/GRwQyDYEicDgENf6rGvfWaB4E3hpFgA7eTrzIrpNBYWbmCo
+         tKIMLmX5iaNZKL/TkHj8x+qnVb12pG91X3wf2r+wKGqTgbG49SigI/fWw9j+MiknMh/+
+         LZBdfeKXzSfgAu9Lx04t1h5ZHIw15WsnnXYSUboQuEVRiDk4cBXWwBGaAcdkhhWsUJEu
+         GM8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NHwS31x9zJjvTs6bruI9Ze7jthhDWC8YQgh98IC0AUM=;
+        b=ncwqQ7jPKspMT06aUyjF51VINqzRw904ooZ2aTvwgERW0rml6qP+5iP4FOYXpa0LzA
+         eENQpgo/l7SEf5C0UerVvLJsyYPSiW1dnF7LI79M4m+toftx8gTOc2VzgtkdtGp2CsaI
+         Qg50PT9Ne/IWWSi3Kjlgh71btQuy5yZWQ4t+U4T5t7txlsbVgBNapHW6YrY7pIjUpfVH
+         L0ReQ8W9vePAC/qzBNuqknceUA+M7E+wfSAuOq+aMIrjrX9w1m4zdTD7n2a5NJhmnUCQ
+         TblJY0N3t9H3ts5OZ71ISdGYLcxENvzl7n937qyTHpWD2bElSP56FFIOzJ7vK5JRpZKw
+         jGpA==
+X-Gm-Message-State: AOAM5334RV5DhPtSbT/Tm159xheEmvkQjEsZuAGookMm8DwY7v/4ljmY
+        p6Ye4aQOGYVHJEHLZULtc4jjfXtCg8Q=
+X-Google-Smtp-Source: ABdhPJynllNFhwhzdBeOHIDifY9bOSB69i2Jp0RNImnJ/xiWBWjejwFNs/O2nYHT115UJqzKRwJ0Tw==
+X-Received: by 2002:a05:6a00:b8c:b0:51c:2d3d:4595 with SMTP id g12-20020a056a000b8c00b0051c2d3d4595mr5724894pfj.80.1655228807969;
+        Tue, 14 Jun 2022 10:46:47 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h14-20020a170902680e00b00167736c8568sm7526344plk.70.2022.06.14.10.46.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jun 2022 10:46:47 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com,
-        tedd.an@intel.com
-Subject: [PATCH BlueZ] mesh: Fix keyring snprintf usage range checking
-Date:   Tue, 14 Jun 2022 10:13:38 -0700
-Message-Id: <20220614171338.177983-1-brian.gix@intel.com>
+Subject: [PATCH v2] Bluetooth: HCI: Fix not always setting Scan Response/Advertising Data
+Date:   Tue, 14 Jun 2022 10:46:45 -0700
+Message-Id: <20220614174645.518132-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -52,211 +62,232 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-snprintf performs it's own range checking and returns a negative value
-if string construction fails. Not checking the return value throws a
-warning at compile time on GCC 12 and later. This patch removes
-redundent range chacking and checks all snprintf return values.
----
- mesh/keyring.c | 68 +++++++++++++++++++++++++++++---------------------
- 1 file changed, 40 insertions(+), 28 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 6d539e74e..995a4b88f 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -39,26 +39,24 @@ static int open_key_file(struct mesh_node *node, const char *key_dir,
- {
- 	const char *node_path;
- 	char fname[PATH_MAX];
--	int len;
-+	int ret;
+The scan response and advertising data needs to be tracked on a per
+instance (adv_info) since when these instaces are removed so are their
+data, to fix that new flags are introduced which is used to mark when
+the data changes and then checked to confirm when the data needs to be
+synced with the controller.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Mark scan_rsp_changed when either MGMT_ADV_FLAG_APPEARANCE or
+MGMT_ADV_FLAG_LOCAL_NAME have been set.
+
+ include/net/bluetooth/hci_core.h | 11 ++++++
+ net/bluetooth/hci_core.c         | 42 ++++++++++----------
+ net/bluetooth/hci_sync.c         | 66 ++++++++++++++++++++++----------
+ 3 files changed, 76 insertions(+), 43 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5b92a9abe141..15237ee5f761 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -246,8 +246,10 @@ struct adv_info {
+ 	__u16	duration;
+ 	__u16	adv_data_len;
+ 	__u8	adv_data[HCI_MAX_EXT_AD_LENGTH];
++	bool	adv_data_changed;
+ 	__u16	scan_rsp_len;
+ 	__u8	scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
++	bool	scan_rsp_changed;
+ 	__s8	tx_power;
+ 	__u32   min_interval;
+ 	__u32   max_interval;
+@@ -261,6 +263,15 @@ struct adv_info {
  
- 	if (!node)
- 		return -1;
+ #define HCI_ADV_TX_POWER_NO_PREFERENCE 0x7F
  
- 	node_path = node_get_storage_dir(node);
- 
--	if (strlen(node_path) + strlen(key_dir) + 1 + 3 >= PATH_MAX)
--		return -1;
--
- 	if (flags & O_CREAT) {
--		len = snprintf(fname, PATH_MAX, "%s%s", node_path, key_dir);
--		if (len >= PATH_MAX)
-+		ret = snprintf(fname, PATH_MAX, "%s%s", node_path, key_dir);
-+		if (ret < 0)
- 			return -1;
++#define DATA_CMP(_d1, _l1, _d2, _l2) \
++	(_l1 == _l2 ? memcmp(_d1, _d2, _l1) : _l1 - _l2)
 +
- 		if (mkdir(fname, 0755) != 0 && errno != EEXIST)
- 			l_error("Failed to create dir(%d): %s", errno, fname);
++#define ADV_DATA_CMP(_adv, _data, _len) \
++	DATA_CMP((_adv)->adv_data, (_adv)->adv_data_len, _data, _len)
++
++#define SCAN_RSP_CMP(_adv, _data, _len) \
++	DATA_CMP((_adv)->scan_rsp_data, (_adv)->scan_rsp_len, _data, _len)
++
+ struct monitored_device {
+ 	struct list_head list;
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6faae50d933d..05c13f639b94 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1727,18 +1727,12 @@ int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
  	}
  
--	len = snprintf(fname, PATH_MAX, "%s%s/%3.3x", node_path, key_dir, idx);
--	if (len >= PATH_MAX)
-+	ret = snprintf(fname, PATH_MAX, "%s%s/%3.3x", node_path, key_dir, idx);
-+	if (ret < 0)
- 		return -1;
+ 	adv_instance->flags = flags;
+-	adv_instance->adv_data_len = adv_data_len;
+-	adv_instance->scan_rsp_len = scan_rsp_len;
+ 	adv_instance->min_interval = min_interval;
+ 	adv_instance->max_interval = max_interval;
+ 	adv_instance->tx_power = tx_power;
  
- 	if (flags & O_CREAT)
-@@ -157,7 +155,7 @@ bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_idx)
- 	const char *node_path;
- 	char key_dir[PATH_MAX];
- 	DIR *dir;
--	int dir_fd;
-+	int ret, dir_fd;
- 	struct dirent *entry;
- 
- 	if (!node)
-@@ -165,10 +163,10 @@ bool keyring_finalize_app_keys(struct mesh_node *node, uint16_t net_idx)
- 
- 	node_path = node_get_storage_dir(node);
- 
--	if (strlen(node_path) + strlen(app_key_dir) + 1 >= PATH_MAX)
-+	ret = snprintf(key_dir, PATH_MAX, "%s%s", node_path, app_key_dir);
-+	if (ret < 0)
- 		return false;
- 
--	snprintf(key_dir, PATH_MAX, "%s%s", node_path, app_key_dir);
- 	dir = opendir(key_dir);
- 	if (!dir) {
- 		if (errno == ENOENT)
-@@ -197,7 +195,7 @@ bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 	const char *node_path;
- 	char key_file[PATH_MAX];
- 	bool result = true;
--	int fd, i;
-+	int ret, fd, i;
- 
- 	if (!IS_UNICAST_RANGE(unicast, count))
- 		return false;
-@@ -207,17 +205,19 @@ bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 
- 	node_path = node_get_storage_dir(node);
- 
--	if (strlen(node_path) + strlen(dev_key_dir) + 1 + 4 >= PATH_MAX)
-+	ret = snprintf(key_file, PATH_MAX, "%s%s", node_path, dev_key_dir);
-+	if (ret < 0)
- 		return false;
- 
--	snprintf(key_file, PATH_MAX, "%s%s", node_path, dev_key_dir);
+-	if (adv_data_len)
+-		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
 -
- 	if (mkdir(key_file, 0755) != 0 && errno != EEXIST)
- 		l_error("Failed to create dir(%d): %s", errno, key_file);
+-	if (scan_rsp_len)
+-		memcpy(adv_instance->scan_rsp_data,
+-		       scan_rsp_data, scan_rsp_len);
++	hci_set_adv_instance_data(hdev, instance, adv_data_len, adv_data,
++				  scan_rsp_len, scan_rsp_data);
  
- 	for (i = 0; i < count; i++) {
--		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
-+		ret = snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
- 						dev_key_dir, unicast + i);
-+		if (ret < 0)
-+			return false;
-+
- 		l_debug("Put Dev Key %s", key_file);
- 
- 		fd = open(key_file, O_WRONLY | O_CREAT | O_TRUNC, 0600);
-@@ -272,7 +272,7 @@ bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 	const char *node_path;
- 	char key_file[PATH_MAX];
- 	bool result = false;
--	int fd;
-+	int ret, fd;
- 
- 	if (!IS_UNICAST(unicast))
- 		return false;
-@@ -282,8 +282,11 @@ bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 
- 	node_path = node_get_storage_dir(node);
- 
--	snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path, dev_key_dir,
-+	ret = snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path, dev_key_dir,
- 								unicast);
-+	if (ret < 0)
-+		return false;
-+
- 	fd = open(key_file, O_RDONLY);
- 	if (fd >= 0) {
- 		if (read(fd, dev_key, 16) == 16)
-@@ -299,13 +302,17 @@ bool keyring_del_net_key(struct mesh_node *node, uint16_t net_idx)
+ 	adv_instance->timeout = timeout;
+ 	adv_instance->remaining_time = timeout;
+@@ -1761,29 +1755,33 @@ int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
+ 			      u16 adv_data_len, u8 *adv_data,
+ 			      u16 scan_rsp_len, u8 *scan_rsp_data)
  {
- 	const char *node_path;
- 	char key_file[PATH_MAX];
-+	int ret;
+-	struct adv_info *adv_instance;
++	struct adv_info *adv;
  
- 	if (!node)
- 		return false;
+-	adv_instance = hci_find_adv_instance(hdev, instance);
++	adv = hci_find_adv_instance(hdev, instance);
  
- 	node_path = node_get_storage_dir(node);
--	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
-+	ret = snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, net_key_dir,
- 								net_idx);
-+	if (ret < 0)
-+		return false;
-+
- 	l_debug("RM Net Key %s", key_file);
- 	remove(key_file);
+ 	/* If advertisement doesn't exist, we can't modify its data */
+-	if (!adv_instance)
++	if (!adv)
+ 		return -ENOENT;
  
-@@ -319,13 +326,17 @@ bool keyring_del_app_key(struct mesh_node *node, uint16_t app_idx)
- {
- 	const char *node_path;
- 	char key_file[PATH_MAX];
-+	int ret;
- 
- 	if (!node)
- 		return false;
- 
- 	node_path = node_get_storage_dir(node);
--	snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
-+	ret = snprintf(key_file, PATH_MAX, "%s%s/%3.3x", node_path, app_key_dir,
- 								app_idx);
-+	if (ret < 0)
-+		return false;
-+
- 	l_debug("RM App Key %s", key_file);
- 	remove(key_file);
- 
-@@ -337,7 +348,7 @@ bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- {
- 	const char *node_path;
- 	char key_file[PATH_MAX];
--	int i;
-+	int ret, i;
- 
- 	if (!IS_UNICAST_RANGE(unicast, count))
- 		return false;
-@@ -348,8 +359,11 @@ bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
- 	node_path = node_get_storage_dir(node);
- 
- 	for (i = 0; i < count; i++) {
--		snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
-+		ret = snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path,
- 						dev_key_dir, unicast + i);
-+		if (ret < 0)
-+			return false;
-+
- 		l_debug("RM Dev Key %s", key_file);
- 		remove(key_file);
+-	if (adv_data_len) {
+-		memset(adv_instance->adv_data, 0,
+-		       sizeof(adv_instance->adv_data));
+-		memcpy(adv_instance->adv_data, adv_data, adv_data_len);
+-		adv_instance->adv_data_len = adv_data_len;
++	if (adv_data_len && ADV_DATA_CMP(adv, adv_data, adv_data_len)) {
++		memset(adv->adv_data, 0, sizeof(adv->adv_data));
++		memcpy(adv->adv_data, adv_data, adv_data_len);
++		adv->adv_data_len = adv_data_len;
++		adv->adv_data_changed = true;
  	}
-@@ -361,18 +375,16 @@ static DIR *open_key_dir(const char *node_path, const char *key_dir_name)
- {
- 	char dir_path[PATH_MAX];
- 	DIR *key_dir;
-+	int ret;
  
--	if (strlen(node_path) + strlen(key_dir_name) + 1 >= PATH_MAX)
-+	ret = snprintf(dir_path, PATH_MAX, "%s%s", node_path, key_dir_name);
-+	if (ret < 0)
- 		return NULL;
+-	if (scan_rsp_len) {
+-		memset(adv_instance->scan_rsp_data, 0,
+-		       sizeof(adv_instance->scan_rsp_data));
+-		memcpy(adv_instance->scan_rsp_data,
+-		       scan_rsp_data, scan_rsp_len);
+-		adv_instance->scan_rsp_len = scan_rsp_len;
++	if (scan_rsp_len && SCAN_RSP_CMP(adv, scan_rsp_data, scan_rsp_len)) {
++		memset(adv->scan_rsp_data, 0, sizeof(adv->scan_rsp_data));
++		memcpy(adv->scan_rsp_data, scan_rsp_data, scan_rsp_len);
++		adv->scan_rsp_len = scan_rsp_len;
++		adv->scan_rsp_changed = true;
+ 	}
  
--	snprintf(dir_path, PATH_MAX, "%s%s", node_path, key_dir_name);
--
- 	key_dir = opendir(dir_path);
--	if (!key_dir) {
-+	if (!key_dir)
- 		l_error("Failed to open keyring storage directory: %s",
- 								dir_path);
--		return NULL;
--	}
- 
- 	return key_dir;
++	/* Mark as changed if there are flags which would affect it */
++	if (((adv->flags & MGMT_ADV_FLAG_APPEARANCE) && hdev->appearance) ||
++	    adv->flags & MGMT_ADV_FLAG_LOCAL_NAME)
++		adv->scan_rsp_changed = true;
++
+ 	return 0;
  }
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 0fa013816a9b..e974a888c0f3 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -849,26 +849,38 @@ static int hci_set_ext_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+ 		u8 data[HCI_MAX_EXT_AD_LENGTH];
+ 	} pdu;
+ 	u8 len;
++	struct adv_info *adv = NULL;
++	int err;
+ 
+ 	memset(&pdu, 0, sizeof(pdu));
+ 
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv || !adv->scan_rsp_changed)
++			return 0;
++	}
++
+ 	len = eir_create_scan_rsp(hdev, instance, pdu.data);
+ 
+-	if (hdev->scan_rsp_data_len == len &&
+-	    !memcmp(pdu.data, hdev->scan_rsp_data, len))
+-		return 0;
+-
+-	memcpy(hdev->scan_rsp_data, pdu.data, len);
+-	hdev->scan_rsp_data_len = len;
+-
+ 	pdu.cp.handle = instance;
+ 	pdu.cp.length = len;
+ 	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+ 	pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA,
+-				     sizeof(pdu.cp) + len, &pdu.cp,
+-				     HCI_CMD_TIMEOUT);
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA,
++				    sizeof(pdu.cp) + len, &pdu.cp,
++				    HCI_CMD_TIMEOUT);
++	if (err)
++		return err;
++
++	if (adv) {
++		adv->scan_rsp_changed = false;
++	} else {
++		memcpy(hdev->scan_rsp_data, pdu.data, len);
++		hdev->scan_rsp_data_len = len;
++	}
++
++	return 0;
+ }
+ 
+ static int __hci_set_scan_rsp_data_sync(struct hci_dev *hdev, u8 instance)
+@@ -1119,27 +1131,39 @@ static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
+ 		u8 data[HCI_MAX_EXT_AD_LENGTH];
+ 	} pdu;
+ 	u8 len;
++	struct adv_info *adv = NULL;
++	int err;
+ 
+ 	memset(&pdu, 0, sizeof(pdu));
+ 
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv || !adv->adv_data_changed)
++			return 0;
++	}
++
+ 	len = eir_create_adv_data(hdev, instance, pdu.data);
+ 
+-	/* There's nothing to do if the data hasn't changed */
+-	if (hdev->adv_data_len == len &&
+-	    memcmp(pdu.data, hdev->adv_data, len) == 0)
+-		return 0;
+-
+-	memcpy(hdev->adv_data, pdu.data, len);
+-	hdev->adv_data_len = len;
+-
+ 	pdu.cp.length = len;
+ 	pdu.cp.handle = instance;
+ 	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+ 	pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+-	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
+-				     sizeof(pdu.cp) + len, &pdu.cp,
+-				     HCI_CMD_TIMEOUT);
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_DATA,
++				    sizeof(pdu.cp) + len, &pdu.cp,
++				    HCI_CMD_TIMEOUT);
++	if (err)
++		return err;
++
++	/* Update data if the command succeed */
++	if (adv) {
++		adv->adv_data_changed = false;
++	} else {
++		memcpy(hdev->adv_data, pdu.data, len);
++		hdev->adv_data_len = len;
++	}
++
++	return 0;
+ }
+ 
+ static int hci_set_adv_data_sync(struct hci_dev *hdev, u8 instance)
 -- 
 2.35.3
 
