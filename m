@@ -2,86 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AACD0C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 19:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E54E6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Jun 2022 20:16:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357627AbiFNTA1 (ORCPT
+        id S1357165AbiFNUQr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Jun 2022 15:00:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
+        Tue, 14 Jun 2022 16:16:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357869AbiFNTAL (ORCPT
+        with ESMTP id S1357170AbiFNUQg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Jun 2022 15:00:11 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 912CF4A91F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 11:53:24 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id x18so6780722qtj.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 11:53:24 -0700 (PDT)
+        Tue, 14 Jun 2022 16:16:36 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE3C4DF59
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 13:14:49 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 129so9504816pgc.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Jun 2022 13:14:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:subject:reply-to:from:to:in-reply-to
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=PAn+Kc0LFHIf71uX7yKin8Eax5Gq3W6bCIHSgnsFmks=;
-        b=CzYZ6B/TimH58ew89JxBHBBssGu3ZAVqT20N1h0VAE3j+4VPoLEWla0HHtpHy98Qnu
-         dUrrBbG24HmS/sZHXr1WE9bzdXoSQJcd8YMlj4Lw3mogM3ko9/ebC7GZVtpBYAQ4LUbl
-         Bs71rt8FoKeen/W/N/oNGfsQ8vKrGcRYvxWkIWfbMW72LoKvZXEAIHAUpkfY2/dsx1wU
-         5CyDGL8N/9AtNb2LgP0rQd7eNUEgmm3RDbKx0beRQtxjVBxHDCBe0U+0xeTv/Oc1do5+
-         OXxaT/nNOc88tX9FQExhbXY/9h8W2X7B6E+bXPFaIgk0Jn9W5s2n4vfDipobwBL91QV1
-         Kh5A==
+        bh=Z7IdfvjEqeEQcx6uNTzHSCZgfm01bjIu7F+5wYNb5bg=;
+        b=gAbJ9uSof2pqJjc6SdxW0/W4KE0uL4efjGHKBwC+1t2WK1PwN7iYswUDHpUFN+N1Oj
+         TfXumaBSfjcr8AyHoNtj6mcerV2cpK2Kl75kakkqqwMuITlrRq6fAxjHQDUR7ALeGted
+         Wl+xJGxKBae7rjmuFymN4BxxaDcxXOzhDe/aij2VsOSuBsvhUPBOH+sbZpQnEUWabfVs
+         skKnmYe9VOQgegTWZVmbdeNL8sOjBAmn6clg4B2OKc+TDHJ6lCNRcwO7A1WLv4WoL1hQ
+         9ZLG2hKBQsPog6PspfG+PfpF0q8EGj+gghbFaIBAajssfHLOprWztS5GiH29Fq/sTdKH
+         s/3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:subject:reply-to
-         :from:to:in-reply-to:references;
-        bh=PAn+Kc0LFHIf71uX7yKin8Eax5Gq3W6bCIHSgnsFmks=;
-        b=dGGSAhPoEIejCPJOCllwEPLLlRj7/DzpE+C2gl6deoc/PFPIh/OWs9PhqA30xhxcpK
-         RSzTj/5qOPUh5ZismL/s3tc6ZRYhvE6XyvwkBWpA/782Qnoekgw9JjLFzzGYIpJ6ri+R
-         b3Bt5Bp9Dta0EYoj6K6paxIS9YguQhmzAtzTn+arzd3dsAq8k75BngOyQ//Tz1+p8dxR
-         duOK4upQ5wnQkySGi0sZewiWTGyQHS2IxdrsFQhJ9aMNL4aCzkvsuWDHFWbFujy+lCyT
-         l1gjxwfOvbeCUoOu/cdmkAGTjzp8wgi6Dk6B/ZNYEcXzIAFooNYH9inGT3/BuR8Ty7EL
-         FIFQ==
-X-Gm-Message-State: AOAM531daSPNvEBfx6cQMc92OTLFnroY5Ojm+dohPTuITr+Flv3j6A61
-        EdcEjzeiaxdVVjsshnvj0ie5Vg7/+F8=
-X-Google-Smtp-Source: ABdhPJx/0V6MzGz8AkFwRU4eJzM0gkMKswfDnlR1SLko5x7tmVscAWK5lHanh3Hl+fqioxbOQ/QZ7Q==
-X-Received: by 2002:a05:622a:1994:b0:304:f463:148c with SMTP id u20-20020a05622a199400b00304f463148cmr5451547qtc.358.1655232803542;
-        Tue, 14 Jun 2022 11:53:23 -0700 (PDT)
-Received: from [172.17.0.2] ([20.65.53.189])
-        by smtp.gmail.com with ESMTPSA id y18-20020ac85f52000000b003050bd1f7c9sm8004787qta.76.2022.06.14.11.53.23
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Z7IdfvjEqeEQcx6uNTzHSCZgfm01bjIu7F+5wYNb5bg=;
+        b=dL0R5Z/kDxCQZ2VEEIcBWzGRUVh4uGtQAOA/2nPGuy+AOg5+svXFFfidyiD+1h+chb
+         o/nJK2bPdQMuA6C1OndiZjxz6FETcDuDK4gAfIOicvODaYJ1xdNpBcrMqEcAZFGMEFev
+         gQ43VDO/T4gGff7vvzNuqHGfoURPMNUZAkWBoIvlWyrylUctiMERoR1UId/hGd/f5fAM
+         vJNagwCGP2xyTZUgM1PJFMoi/dSyiUc5rnFke3ZNRJzb+4hEBTTJh6Ryq816xGLkSZzw
+         jsZ03rXDWw+DtT7owK/ANsGxLiQfiF1Yc+g9xCgPtL1Nn7idwyNAgAOfld8a7WGJDmK9
+         +k6A==
+X-Gm-Message-State: AOAM533q7qBshPhRP26ftf/4giMn/y7C4zhCC49M9SbwbdwZDuuKdnOd
+        ke9LFaWwvZ/sOB43JXIU7i41/T8gkx4=
+X-Google-Smtp-Source: ABdhPJwsQm6/8+2kxD2XWl9CMxtHEhfVWMlxazKWrSZ6LQ8S+FYYh8nAHiWYbu2MSdnyjYsn5fi0kA==
+X-Received: by 2002:a63:1819:0:b0:3fd:ac29:e9e9 with SMTP id y25-20020a631819000000b003fdac29e9e9mr5892817pgl.171.1655237689255;
+        Tue, 14 Jun 2022 13:14:49 -0700 (PDT)
+Received: from [172.17.0.2] ([20.125.124.213])
+        by smtp.gmail.com with ESMTPSA id bi7-20020a170902bf0700b00161ccdc172dsm7633570plb.300.2022.06.14.13.14.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jun 2022 11:53:23 -0700 (PDT)
-Message-ID: <62a8d923.1c69fb81.7be7c.e3a9@mx.google.com>
-Date:   Tue, 14 Jun 2022 11:53:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8272274052684745175=="
+        Tue, 14 Jun 2022 13:14:48 -0700 (PDT)
+Message-ID: <62a8ec38.1c69fb81.41b8f.9857@mx.google.com>
+Date:   Tue, 14 Jun 2022 13:14:48 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8279082146898383513=="
 MIME-Version: 1.0
-Subject: RE: [v1] Revert "Bluetooth: core: Fix missing power_on work cancel on HCI close"
-Reply-To: linux-bluetooth@vger.kernel.org
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, max.oss.09@gmail.com
-In-Reply-To: <20220614181706.26513-1-max.oss.09@gmail.com>
-References: <20220614181706.26513-1-max.oss.09@gmail.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] advertising: Fix attempting to set scan_rsp
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220614185140.535390-1-luiz.dentz@gmail.com>
+References: <20220614185140.535390-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8272274052684745175==
+--===============8279082146898383513==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-This is an automated email and please do not reply to this email.
+This is automated email and please do not reply to this email!
 
-Dear Submitter,
+Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=650321
 
------ Output -----
-error: patch failed: net/bluetooth/hci_core.c:2675
-error: net/bluetooth/hci_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.77 seconds
+GitLint                       FAIL      0.55 seconds
+Prep - Setup ELL              PASS      41.57 seconds
+Build - Prep                  PASS      0.47 seconds
+Build - Configure             PASS      7.95 seconds
+Build - Make                  PASS      1199.70 seconds
+Make Check                    PASS      11.30 seconds
+Make Check w/Valgrind         PASS      438.74 seconds
+Make Distcheck                PASS      228.21 seconds
+Build w/ext ELL - Configure   PASS      8.03 seconds
+Build w/ext ELL - Make        PASS      1169.13 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ] advertising: Fix attempting to set scan_rsp
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#99: 
+        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)
+
+/github/workspace/src/12881378.patch total: 0 errors, 1 warnings, 68 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12881378.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
-Please resolve the issue and submit the patches again.
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[BlueZ] advertising: Fix attempting to set scan_rsp
+23: B1 Line exceeds max length (89>80): "        Filter policy: Allow Scan Request from Any, Allow Connect Request from Any (0x00)"
+
+
 
 
 ---
@@ -89,4 +130,4 @@ Regards,
 Linux Bluetooth
 
 
---===============8272274052684745175==--
+--===============8279082146898383513==--
