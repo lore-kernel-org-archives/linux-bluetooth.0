@@ -2,101 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6175AC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jun 2022 14:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66045C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Jun 2022 21:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242364AbiFOOjI (ORCPT
+        id S243817AbiFOVuu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Jun 2022 10:39:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54296 "EHLO
+        Wed, 15 Jun 2022 17:50:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234028AbiFOOjI (ORCPT
+        with ESMTP id S239060AbiFOVut (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:39:08 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA94B7EC
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jun 2022 07:39:06 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id g15so7467865qke.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jun 2022 07:39:06 -0700 (PDT)
+        Wed, 15 Jun 2022 17:50:49 -0400
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2CA35ABE
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jun 2022 14:50:47 -0700 (PDT)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-30c2f288f13so74541537b3.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Jun 2022 14:50:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=gGzwqwtiqVriQQcjUlzXxKGSL/vBaRa0g4/1OUaoiPY=;
-        b=CCC3zHOEaynAwgIgONkOGMZj+rX4f4/PLJi8/c/TiljN+MY5ju3KubdAfKNigwZaSc
-         wY9jOjwNv+QtoO0hcg+R2qR5ar1CYwPdqRxDbYFhn28zfmONl3DMCFJDjB2Zta1avvhc
-         UmOMjjFASG8eU5ZgMcbP9JvgjCR6jQC33YlRa5fAUZoGR5s161ytY7mdK21FVsDXEWv7
-         /+eRMF0fLas3I4p7Ykc3IcJ4eMVeOQQZJzcKME5c425Zay9gkv1rvSZXw3mBXNaQyRvf
-         Nwf1tpBmMWAYPjMwOHv0jbQLMfTgtYksM3oigSEqB1jyGYB9Y5WbfOBANfrCM9ZyCWcq
-         OUCQ==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4Ni2+Z4+FaOrYaNl57ZOrcI8cGb5LUVcfY4BS8e4nlo=;
+        b=mp0HpJP8UE2fb0XRQO3zKlah6eEzCXVh044OB/QP6MB05Fpq09DUqH6TUogHVp9cKy
+         IbM7+vCQemOiCaPMWWc+wUB2foSdxCLhimA33Lamy537FVIvAVfRS8SDyb/5wtaHu+Jo
+         RJLY2j/dsY+oU4Okqv0FyiECbKeWNDopstSLEUNGZ6q6s4CzmpB5v9yyIWsO++IV2spb
+         CuPnF2wamKmHT4qBiuh5bUSQWDJzJvwwxwR3tvZ+VKXlqRmZGZLbax27a1j6nNoq6wNN
+         VyL4UHSP8kV2vqyo/QcaBGj22IxNK6ZbTC7a/QxCA8JT6sxuytktLjrX55166xTMsVc4
+         FW+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=gGzwqwtiqVriQQcjUlzXxKGSL/vBaRa0g4/1OUaoiPY=;
-        b=VXmAdI9aP0WsHXIVeXxpMGTyC3oLUH0+cGigrIabaemNhIHKVyvLhihPPRHPx5czct
-         d/P7YVnl0dCHU7kb97rTCIeKi7NwU2aA6B+9fWZEjy7jOprgu/nnh1ky5ZLRHDPa1Ny1
-         SHb4cPXiYlNPjW+wRDXbIX/7VJATPMHhntjGKmfMQor7iyQaB5ijPtQCYg7hQGdQBCkD
-         1VejqpSIosJRk/KyE02uYKMjTbe8X/PDZgja7m8NCAAYXpC2+MjwBcyJOh4SzNLpfpiD
-         mfK0WCil+4RcFL+zE7974hMCsf0tmawG3YF4ffKkq0011f1Dn3v5Psea89LojxbF9C2E
-         uwLQ==
-X-Gm-Message-State: AOAM5302La+5pQG8McsehvhWG8b2V9/6JO2gTnquEFEFNvMYuaYXDsFa
-        dI7ic8GRPuxTIJqrBPyP4mjP1jeWFWU0Ww==
-X-Google-Smtp-Source: ABdhPJwDOfQqZXbG8PoTGBzNd2Drz1C5chPIMWnOQJiRM7KsRDBKyFx4gF64ZBaTTcfqydCE0esMXg==
-X-Received: by 2002:a37:9f50:0:b0:6a6:886a:7aae with SMTP id i77-20020a379f50000000b006a6886a7aaemr8162341qke.419.1655303945326;
-        Wed, 15 Jun 2022 07:39:05 -0700 (PDT)
-Received: from [172.17.0.2] ([20.7.76.239])
-        by smtp.gmail.com with ESMTPSA id r145-20020a37a897000000b006a760640118sm11319500qke.27.2022.06.15.07.39.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 07:39:04 -0700 (PDT)
-Message-ID: <62a9ef08.1c69fb81.ef43e.3c14@mx.google.com>
-Date:   Wed, 15 Jun 2022 07:39:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6080375911616762916=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4Ni2+Z4+FaOrYaNl57ZOrcI8cGb5LUVcfY4BS8e4nlo=;
+        b=UwJzBC7xNtGLqdlRfUv4JZ0bsn01O9aMn1/40Oyuk+VjPc0E9zVQDb3/Pw+TRxENd0
+         SYQV+BGxMAvDjF/9eU3Vw13I1HNiymlXo3xL9cjwz2uSnK0HrnZQNole6S8UwBjJXKj1
+         mVzZfZZrMX2kAavfwIlxSb9nQHRZoZFpGidYYtdufCudfBbMMxSxUko9pwe70bgejJXS
+         7rX3M4RfN8Fd2PaRsSfyBLe3VafgPnDH+2NZOgOZ71zhFFCmv8tqZLeVX+zRTBDC04BE
+         tgoiUdyPFg9HkP8fBm5lwmo/5n47oQJu6H6Ut0TYz5bjQBj49etm5dCvkwSK98MXekQg
+         j02w==
+X-Gm-Message-State: AJIora+VK6Xt6fzNtFd9vLESumiaMQXIAqCvKRBNmWrKWAMYgKY7WgBu
+        kI/bkuHUGzXH5yEvdBk9A5o7wSxkUKsdl7YA0OQIig==
+X-Google-Smtp-Source: AGRyM1tPI14LkQ/YvBg6NCQBgZzoaWvTWprhy0E9Xqj/xLnij0vQRJL/A1uMejKt8IaEDtT6RUxPtyH5EIOpWXxJ+uE=
+X-Received: by 2002:a81:830f:0:b0:313:3918:5cf with SMTP id
+ t15-20020a81830f000000b00313391805cfmr2079347ywf.126.1655329847132; Wed, 15
+ Jun 2022 14:50:47 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: obexd: Fix crash of transfer pointer has being freed
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220615124902.17347-1-wangyouwan@uniontech.com>
-References: <20220615124902.17347-1-wangyouwan@uniontech.com>
+References: <YqmXmsTX7dD+5HjN@kili>
+In-Reply-To: <YqmXmsTX7dD+5HjN@kili>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Wed, 15 Jun 2022 23:50:35 +0200
+Message-ID: <CACRpkdbStsAF2Jngohh7Lsg6xs0Vsc-v_SR3WC3ndbZEhx9tEg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btbcm: Use strreplace() in btbcm_get_board_name()
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6080375911616762916==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Jun 15, 2022 at 10:26 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
 
-This is automated email and please do not reply to this email!
+> The original code works but it's a bit iffy.  The end of loop test
+> should be something like "board_type[i] != '\0'" but instead it is
+> is "i < board_type[i]".  Fortunately, those two tests are equivalent so
+> long as the "board_type" is not an empty string.
+>
+> It's much simpler to just call strreplace() instead.
+>
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 
-Dear submitter,
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=650581
+I think I just copied this code from the BRCM wifi driver for the combo
+chip, did you patch that too?
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.42 seconds
-GitLint                       PASS      0.93 seconds
-Prep - Setup ELL              PASS      42.31 seconds
-Build - Prep                  PASS      0.67 seconds
-Build - Configure             PASS      8.38 seconds
-Build - Make                  PASS      1244.74 seconds
-Make Check                    PASS      11.39 seconds
-Make Check w/Valgrind         PASS      463.73 seconds
-Make Distcheck                PASS      236.82 seconds
-Build w/ext ELL - Configure   PASS      9.33 seconds
-Build w/ext ELL - Make        PASS      1265.84 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6080375911616762916==--
+Yours,
+Linus Walleij
