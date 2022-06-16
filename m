@@ -2,84 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF42C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jun 2022 13:04:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C01E3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jun 2022 16:34:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376754AbiFPNEg (ORCPT
+        id S233727AbiFPQeb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jun 2022 09:04:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39652 "EHLO
+        Thu, 16 Jun 2022 12:34:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229838AbiFPNEf (ORCPT
+        with ESMTP id S233842AbiFPQe3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jun 2022 09:04:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318AD20F5F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 06:04:35 -0700 (PDT)
+        Thu, 16 Jun 2022 12:34:29 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E1C42F018;
+        Thu, 16 Jun 2022 09:34:27 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C916D61BF5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 13:04:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3AD81C3411C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 13:04:34 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id EFD78CE263E;
+        Thu, 16 Jun 2022 16:34:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB7F4C34114;
+        Thu, 16 Jun 2022 16:34:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655384674;
-        bh=LD9ddQlonCM6j+iZE6AefjJvUAFqYon8GJh7kgkEc88=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=PaUw6tvmJKq34Rkvh6qRD0MdEtviydmrA+45K07EbuMVaFPJ+5OEPxXu/YOYwUpce
-         uN/VBNuFtwnq4HMyQ6Nfv4Bjv7klD/DgC4mM0GUk3r8tWUsux+XfUv1JRdRWTgF2/A
-         ChfeM4wnZRNvCROEKy1+xQWGsSK7WKa4B61ap8HxqS1F2r0U7s4Q4SUuO6UwWbfEMs
-         rXvMMh9PY08c+MNRjoksFuLZ6RrkkxqLaNAFD9Rl9gURKtOOw5NJsSwYD8wOK3F2jQ
-         STsnHUy0DcMjjis2ck3uS9FdA/MVxWg4zkC1HSRk1ispCIQgBO2CXa8Q1bfO87YrpL
-         wwd/Eag+HR/Ng==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 26BE6CC13B3; Thu, 16 Jun 2022 13:04:34 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 204589] Bluetooth touchpad (Apple Magic Trackpad) disconnects
- every few minutes
-Date:   Thu, 16 Jun 2022 13:04:33 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: heavy@ungoverned.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-204589-62941-IkDwSTHudO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-204589-62941@https.bugzilla.kernel.org/>
-References: <bug-204589-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        s=k20201202; t=1655397264;
+        bh=29T+OZ2dJ8xYgp5r7/nDFbsxSnK+qN8k/QH2sDJqclU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nkaBP3DydJciNyiYD+He/cemq7jOl1vFjzycfaq7HUEXNmaAiTvhL3KFqt3U4pdmx
+         OkwvanYXO5S9uINrPZ6QSpIzF1KAc16/FflMYMVBxWSeZOxLiTVb0/cEMfzsSsyyRe
+         wrMkldTF5Khbat6folXjrqr9MSQONZokoOYqvHV3DvksPSDteRuNhIjP0Bgp1s7BFp
+         G4DzVGbeLBy1QKQJ1QaI9Smr/GPCEzMmoi4lST1ncKbeksUoDTNP+Nmp/Ambtg1ovM
+         8exV2SmcP+4c8ooLPW42RRn+BzPvbXqis4Lr2yvKhlbYKCmVVH24CGspp0ayB1FD1S
+         qWGEzDk8NYLSA==
+Date:   Thu, 16 Jun 2022 09:34:22 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Alexander Aring <aahringo@redhat.com>
+Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org,
+        Network Development <netdev@vger.kernel.org>
+Subject: Re: 6lowpan netlink
+Message-ID: <20220616093422.2e9ec948@kernel.org>
+In-Reply-To: <CAK-6q+h7497czku9rf9E4E=up5k5gm_NT0agPU2bUZr4ADKioQ@mail.gmail.com>
+References: <CAK-6q+g1jy-Q911SWTGVV1nw8GAbEAVYSAKqss54+8ehPw9RDA@mail.gmail.com>
+        <e3efe652-eb22-4a3f-a121-be858fe2696b@datenfreihafen.org>
+        <CAK-6q+h7497czku9rf9E4E=up5k5gm_NT0agPU2bUZr4ADKioQ@mail.gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D204589
+On Thu, 16 Jun 2022 09:00:08 -0400 Alexander Aring wrote:
+> > > I want to spread around that I started to work on some overdue
+> > > implementation, a netlink 6lowpan configuration interface, because
+> > > rtnetlink is not enough... it's for configuring very specific 6lowpan
+> > > device settings.  
+> >
+> > Great, looking forward to it!  
+> 
+> I would like to trigger a discussion about rtnetlink or generic. I can
+> put a nested rtnetlink for some device specific settings but then the
+> whole iproute2 (as it's currently is) would maintain a specific
+> 6lowpan setting which maybe the user never wants...
+> I think we should follow this way when there is a strict ipv6 device
+> specific setting e.g. l2 neighbor information in ipv6 ndisc.
 
---- Comment #8 from heavy@ungoverned.org ---
-And it is still happening for me on Fedora 36. Same experience as before, w=
-here
-it seemed to be working better initially after upgrading, but after some
-time/updates it is back to being very spotty. I'm not sure if this is my
-imagination or not, but I always get my hopes up that it is fixed, only to =
-have
-them dashed.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Unless you'll have to repeat attributes which are already present 
+in rtnetlink in an obvious way genetlink > rtnetlink.
