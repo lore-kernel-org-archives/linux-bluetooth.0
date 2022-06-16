@@ -2,111 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 094ECC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jun 2022 10:06:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60529C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Jun 2022 10:38:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359830AbiFPKGc (ORCPT
+        id S1376305AbiFPKig (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Jun 2022 06:06:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54410 "EHLO
+        Thu, 16 Jun 2022 06:38:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376269AbiFPKG2 (ORCPT
+        with ESMTP id S1359853AbiFPKi1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Jun 2022 06:06:28 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4755D5F2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 03:06:25 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id mh16-20020a17090b4ad000b001e8313301f1so5032546pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 03:06:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=kTCTuScGxOSV5yar5Bw1bpdMMYcIFlh5UtR4+Q1tuvA=;
-        b=p8pYrSyIDZ4QGwbY9UKvkADM1TQI3k2XXIcgVYsq0EY2lih6FDgKzQX5AjNM4uhBAM
-         I6QwN93lenVIJermoKYVEEJYSeEo3ma7ZAyZ/vSG56x/sflq8xmcNDz5NB/oEmc0fNkv
-         YM+LvonftrxKRBemOBJYnvDLa/wDw/hIlD9Nqv6QJi2EihlAnmtrUWOHtYSBz8h1EKUG
-         wgdeb9D8jyi6bU30R5kMwDF5l4XNwzOh0ohB7eaYeWY1NhuKp0f1XSY7UKk53dg0sU/O
-         RxI3QZGIjriFv/7ljy2a7k2G+iB3zHhohJ+TYCP/tzyIu9x7tdOrChgW6TxVwxJTr3y8
-         a0qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=kTCTuScGxOSV5yar5Bw1bpdMMYcIFlh5UtR4+Q1tuvA=;
-        b=OFm9R5gn+0aXv1YaSNxbp2Ap2Lg3S5LppwaWKhrMMxjr/iDvyAYB/0C4sO5poUqcaz
-         xK7H5JaiYRfgqwlpq1jwvwKAaZeYTy8eVkZ1aNxJcf4qLiv80M+m+riW/3N6eKvE/8ZN
-         scpoBJnAerEL168VVOns9eWnBeSA3ssupQT3dvOCaava9YtCoS7xAVGjjOtBLIIBpNNC
-         DAvnqpguSLj0jAZPAAQWrqcHIE2n5Er/v4j+7CCeQcfsnmOknZLqp0jxPoAMEze0Rxt+
-         ht6nnh7kokmClHW2iMoPQ3ASbUlXhjJMvmdQiZHNanduBEE2bsyVoGmhEXUi9GkFMQ/b
-         5k9g==
-X-Gm-Message-State: AJIora/n16TLpJqQ91+A1VsEUL6dE/3QfBLyLtM9AnFpHz9WlvP5soAE
-        Y7LgRUYFahjR7xoqmqFMfN/jxTWeuKg=
-X-Google-Smtp-Source: AGRyM1smuRadPN0KwmQMk/JlLiEeS8or0MWQEpBr6IrZ8XiM9Gd+/ZGsCRhHMe1P4hBEjFMZQRGHVQ==
-X-Received: by 2002:a17:90b:4c8a:b0:1e3:60f:58c3 with SMTP id my10-20020a17090b4c8a00b001e3060f58c3mr4190604pjb.230.1655373984567;
-        Thu, 16 Jun 2022 03:06:24 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.14.152])
-        by smtp.gmail.com with ESMTPSA id c18-20020a170902b69200b0015ee24acf38sm1221855pls.212.2022.06.16.03.06.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jun 2022 03:06:24 -0700 (PDT)
-Message-ID: <62ab00a0.1c69fb81.285a1.1af2@mx.google.com>
-Date:   Thu, 16 Jun 2022 03:06:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0127421641728898243=="
+        Thu, 16 Jun 2022 06:38:27 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A3E3193EB
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Jun 2022 03:38:25 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1o1mtL-0006Uh-On; Thu, 16 Jun 2022 12:38:23 +0200
+Message-ID: <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+Date:   Thu, 16 Jun 2022 12:38:21 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, stephan.gerhold@kernkonzept.com
-Subject: RE: [v2] Bluetooth: btqcomsmd: Fix command timeout after setting BD address
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220616093936.1294824-1-stephan.gerhold@kernkonzept.com>
-References: <20220616093936.1294824-1-stephan.gerhold@kernkonzept.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>
+References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
+ <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
+ <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+ <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
+Content-Language: en-US
+In-Reply-To: <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0127421641728898243==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Luiz,
 
-This is automated email and please do not reply to this email!
+On 16.05.22 18:37, Ahmad Fatoum wrote:
+>>>> - Commit a56a1138cbd8 ("Bluetooth: hci_sync: Fix not using conn_timeout")
+>>>>   fixes, despite the title, what event is waited on. First Pairing works now,
+>>>>   but the second pairing times out and crashes the kernel:
+>>>>
+>>>>   [   84.191684] Bluetooth: hci0: Opcode 0x200d failed: -110
+>>>>   [   84.230478] Bluetooth: hci0: request failed to create LE connection: err -110
+>>>>   [   84.237690] Unable to handle kernel read from unreadable memory at virtual address 0000000000000ca8
+>>
+>> That said the error -110 mean -ETIMEDOUT
+> 
+> Yes, this issue remains still. I feel better about my revert
+> knowing that the crash is fixed, but I'd like this regression
+> here fixed upstream as well. I'll try to collect some more
+> information and report back.
 
-Dear submitter,
+I've now found time to revisit this and sprinkle around some
+extra logging. This is the initial pairing that works:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=650946
+  Bluetooth: entered hci_le_create_conn_sync()
+  Bluetooth: hci0: opcode 0x200d plen 25
+  Bluetooth: hci0: event 0x0f (sent = 0x0a)
+  Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
+  Bluetooth: hci0: event 0x3e (sent = 0x0a)
+  Bluetooth: hci0: BT: subevent 0x0a (sent 0x0a)
+  Bluetooth: entered hci_le_meta_evt(event=0x0a) completion clause
 
----Test result---
+I unpaired on device side and then retried pairing:
 
-Test Summary:
-CheckPatch                    PASS      0.90 seconds
-GitLint                       FAIL      0.47 seconds
-SubjectPrefix                 PASS      0.35 seconds
-BuildKernel                   PASS      36.72 seconds
-BuildKernel32                 PASS      33.63 seconds
-Incremental Build with patchesPASS      45.84 seconds
-TestRunner: Setup             PASS      577.07 seconds
-TestRunner: l2cap-tester      PASS      19.73 seconds
-TestRunner: bnep-tester       PASS      6.61 seconds
-TestRunner: mgmt-tester       PASS      118.63 seconds
-TestRunner: rfcomm-tester     PASS      11.13 seconds
-TestRunner: sco-tester        PASS      10.79 seconds
-TestRunner: smp-tester        PASS      10.38 seconds
-TestRunner: userchan-tester   PASS      7.18 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 0.47 seconds
-Run gitlint with rule in .gitlint
-[v2] Bluetooth: btqcomsmd: Fix command timeout after setting BD address
-32: B1 Line exceeds max length (101>80): "v1: https://lore.kernel.org/linux-bluetooth/20220613110745.3778356-1-stephan.gerhold@kernkonzept.com/"
-
+  Bluetooth: entered hci_le_create_conn_sync()
+  Bluetooth: hci0: opcode 0x200d plen 25
+  Bluetooth: hci0: event 0x0f (sent = 0x0a)
+  Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
+  Bluetooth: entered hci_abort_conn()
+  Bluetooth: hci0: opcode hci_req_add_ev 0x200e
+  Bluetooth: hci0: event 0x0e (sent = 0x00)
+  Bluetooth: hci0: event 0x3e (sent = 0x00)
+  Bluetooth: hci0: BT: subevent 0x0a (sent 0x00)
+  Bluetooth: __hci_cmd_sync_sk pending (event = 0x0a status=1, err=-110)
+  Bluetooth: hci0: Opcode 0x200d failed: -110
+  Bluetooth: hci0: opcode 0x2006 plen 15
+  Bluetooth: hci0: event 0x0e (sent = 0x00)
+  Bluetooth: hci0: opcode 0x200a plen 1
+  Bluetooth: hci0: event 0x0e (sent = 0x00)
+  Bluetooth: hci0: request failed to create LE connection: err -110
 
 
+But now it times out as reported. It looks like the
+intermittent hci_abort_conn() is at fault here. My theory is
+that replacing hci->sent_cmd is the problem here, as other
+events can't be matched anymore.
 
----
-Regards,
-Linux Bluetooth
+We've been deploying the revert for a while now and I just posted
+it to the mailing list[1]. There have been other reports
+of this issue with different hardware too and fixing sent_cmd
+would likely be too complicated/time intensive for me.
+
+I am happy to test future patches that fix this properly though.
+
+[1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
+
+Cheers,
+Ahmad
 
 
---===============0127421641728898243==--
+
+> 
+> Cheers,
+> Ahmad
+> 
+
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
