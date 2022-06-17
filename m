@@ -2,96 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F517C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jun 2022 19:49:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC15C43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jun 2022 20:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234027AbiFQTtp (ORCPT
+        id S1383377AbiFQUs5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jun 2022 15:49:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
+        Fri, 17 Jun 2022 16:48:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234172AbiFQTtm (ORCPT
+        with ESMTP id S1381762AbiFQUsz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jun 2022 15:49:42 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C764286E0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 12:49:38 -0700 (PDT)
-Received: from localhost.localdomain (67.227.121.78.rev.sfr.net [78.121.227.67])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: fdanis)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id CF993660179B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 20:49:36 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1655495376;
-        bh=LZEWs6sDWy32jeWlvKDEMbHToL9/xzBo22z0mEsZWZk=;
-        h=From:To:Subject:Date:From;
-        b=TberD4DqCFjUm18M6SY6Uas0A2MDyBnCx/XpFLer7+aE4Ed0AzNvZMxpvL6hemJxo
-         UXJ+TkAI6bJwV+YaCSWkkPHCstplhGnoqm3ACwm4mrVK+iTSOwiDLPuGQGlPV3/awh
-         00W2zv0WyLLZpeOk4/fccdr+OOuxGeD/RzRWZR1a5AwmFsS5zPUUZ4eWtVQOHy2LY3
-         AS7iTy9q7Ory8kwroT7Eav2lM8kALxLyIQpS3uelz6D989T03vfUWg7PVkZDaze9h/
-         WBypwTfOfmuqFJXeUJEkcPQ1GH6UxGJRGCMG9tJP4YboSsa2+BQ1dfLclGHHLdzl3K
-         LCNu0RrXrH2IQ==
-From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
-        <frederic.danis@collabora.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] test-runner: Fix issues found by coverity
-Date:   Fri, 17 Jun 2022 21:49:29 +0200
-Message-Id: <20220617194929.95991-1-frederic.danis@collabora.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 17 Jun 2022 16:48:55 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E97045DBCE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 13:48:50 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id m25so5883683lji.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 13:48:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZvlmhjX5WrHl156XHjI+XlN+ZCT9UnRn+tpViHipDk4=;
+        b=AQvbQNqjOh+vs7nV5O4ZkPwpwVG3IY/XB6qUsKlo+u+PXBU59U7UGX2SeOkfGtUFhe
+         OGLyR7EAaHiOA5PfWmMV9H4KzkryFkxzdJuYgfRXa/59tlGXShywPbvDJszBRZ4Y4PmJ
+         5Uh1/5YSEVpF9HtIFUpQl5jVL1LgshkzaXE8mTSaMAsJsVDYf1dznDACdEtMyavCHglw
+         zLEBZkjGuJ3sck9feEMZr/8ui88ly3fhgPHM0P0etLAyf1Jnm423P+biHDflkD+4PGjq
+         KuUI5Noeudu3KiO6beAYGEY0aG5QvAcdsLv9JT0D4EKsoIkZmf0WqC0GffegxYkKqatF
+         kUYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZvlmhjX5WrHl156XHjI+XlN+ZCT9UnRn+tpViHipDk4=;
+        b=vj66VqMNjELHBStc//BysPKpCae7/lI1wzeuoWPB9jCf306n10Pl5Wh/L+h8ZZSfXv
+         MECmpmcwPnOD7UBtP/JSmLQ2VD2yAVlOAL+QwvS6JiIVgKDt7Co4g5rA7HJR4YglMqOa
+         F3U6Mmvk/oHJS7qfvQ7/7Q8ZtqwBxnuSoR/61wfJTL2auXQpQo+HCKVQXN02tTk/DaV8
+         6sZIYGwnu8i4itCe1tooj5wnO19CHH/3vaeGTbTktzkLAokqCQkjzhCAETw871FWFuyx
+         JaX1/cWSdrCbNhcbriwDl9e+Y6lfMruRb+NgblpagXA2dJxtWkhKlL4OenVMdBN0m00C
+         f5JQ==
+X-Gm-Message-State: AJIora8nohoe6cH77eudA+F5lroK21cnW6yhaHo1L++8xQ1fBtqQoOqn
+        hX79ZzS1DqCcPjZeYn2T0Tl6UqG0uhSk1F/X1NqJ6z+d
+X-Google-Smtp-Source: AGRyM1sIFKriab8YwDUFvTn5R/ggwO4Y3nbrPnazNRow1Hj2WUYgE/JWWUOSKjHrCuDG+m3YpP66//FiqDgh8tckehc=
+X-Received: by 2002:a05:651c:549:b0:255:bbd2:fb8 with SMTP id
+ q9-20020a05651c054900b00255bbd20fb8mr5859838ljp.305.1655498928997; Fri, 17
+ Jun 2022 13:48:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
+ <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
+ <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+ <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de> <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+In-Reply-To: <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 17 Jun 2022 13:48:37 -0700
+Message-ID: <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
+Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+To:     Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- tools/test-runner.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+Hi Ahmad,
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 49fc21325..6886d66c6 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -275,6 +275,10 @@ static void start_qemu(void)
- 		char *xdg_runtime_dir, *audiodev;
- 
- 		xdg_runtime_dir = getenv("XDG_RUNTIME_DIR");
-+		if (!xdg_runtime_dir) {
-+			fprintf(stderr, "XDG_RUNTIME_DIR not set\n");
-+			exit(1);
-+		}
- 		audiodev = alloca(40 + strlen(xdg_runtime_dir));
- 		sprintf(audiodev, "id=audio,driver=pa,server=%s/pulse/native",
- 				xdg_runtime_dir);
-@@ -474,8 +478,14 @@ static void create_dbus_session_conf(void)
- 				"/usr/share/dbus-1/session.conf") < 0)
- 		perror("Failed to create session.conf symlink");
- 
--	mkdir("/run/user", 0755);
--	mkdir("/run/user/0", 0755);
-+	if (mkdir("/run/user", 0755) < 0) {
-+		fprintf(stderr, "unable to create /run/user directory\n");
-+		return;
-+	}
-+	if (mkdir("/run/user/0", 0755) < 0) {
-+		fprintf(stderr, "unable to create /run/user/0 directory\n");
-+		return;
-+	}
- }
- 
- static pid_t start_dbus_daemon(bool session)
-@@ -919,7 +929,7 @@ start_next:
- 
- 		if (corpse == dbus_session_pid) {
- 			printf("D-Bus session daemon terminated\n");
--			dbus_pid = -1;
-+			dbus_session_pid = -1;
- 		}
- 
- 		if (corpse == daemon_pid) {
+On Thu, Jun 16, 2022 at 3:38 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>
+> Hello Luiz,
+>
+> On 16.05.22 18:37, Ahmad Fatoum wrote:
+> >>>> - Commit a56a1138cbd8 ("Bluetooth: hci_sync: Fix not using conn_timeout")
+> >>>>   fixes, despite the title, what event is waited on. First Pairing works now,
+> >>>>   but the second pairing times out and crashes the kernel:
+> >>>>
+> >>>>   [   84.191684] Bluetooth: hci0: Opcode 0x200d failed: -110
+> >>>>   [   84.230478] Bluetooth: hci0: request failed to create LE connection: err -110
+> >>>>   [   84.237690] Unable to handle kernel read from unreadable memory at virtual address 0000000000000ca8
+> >>
+> >> That said the error -110 mean -ETIMEDOUT
+> >
+> > Yes, this issue remains still. I feel better about my revert
+> > knowing that the crash is fixed, but I'd like this regression
+> > here fixed upstream as well. I'll try to collect some more
+> > information and report back.
+>
+> I've now found time to revisit this and sprinkle around some
+> extra logging. This is the initial pairing that works:
+>
+>   Bluetooth: entered hci_le_create_conn_sync()
+>   Bluetooth: hci0: opcode 0x200d plen 25
+>   Bluetooth: hci0: event 0x0f (sent = 0x0a)
+>   Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
+>   Bluetooth: hci0: event 0x3e (sent = 0x0a)
+>   Bluetooth: hci0: BT: subevent 0x0a (sent 0x0a)
+>   Bluetooth: entered hci_le_meta_evt(event=0x0a) completion clause
+>
+> I unpaired on device side and then retried pairing:
+>
+>   Bluetooth: entered hci_le_create_conn_sync()
+>   Bluetooth: hci0: opcode 0x200d plen 25
+>   Bluetooth: hci0: event 0x0f (sent = 0x0a)
+>   Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
+>   Bluetooth: entered hci_abort_conn()
+>   Bluetooth: hci0: opcode hci_req_add_ev 0x200e
+>   Bluetooth: hci0: event 0x0e (sent = 0x00)
+>   Bluetooth: hci0: event 0x3e (sent = 0x00)
+>   Bluetooth: hci0: BT: subevent 0x0a (sent 0x00)
+>   Bluetooth: __hci_cmd_sync_sk pending (event = 0x0a status=1, err=-110)
+>   Bluetooth: hci0: Opcode 0x200d failed: -110
+>   Bluetooth: hci0: opcode 0x2006 plen 15
+>   Bluetooth: hci0: event 0x0e (sent = 0x00)
+>   Bluetooth: hci0: opcode 0x200a plen 1
+>   Bluetooth: hci0: event 0x0e (sent = 0x00)
+>   Bluetooth: hci0: request failed to create LE connection: err -110
+>
+>
+> But now it times out as reported. It looks like the
+> intermittent hci_abort_conn() is at fault here. My theory is
+> that replacing hci->sent_cmd is the problem here, as other
+> events can't be matched anymore.
+
+Yep, unpair command uses hci_abort_conn when it should really be using
+hci_abort_conn_sync, the problem is if we do that then it probably no
+longer work because it would have to wait for sync queue to complete
+so it would only be able to disconnect after the connect command
+completes, well perhaps that is acceptable otherwise we need a
+different queue to handle command that abort/cancel other already in
+the queue.
+
+> We've been deploying the revert for a while now and I just posted
+> it to the mailing list[1]. There have been other reports
+> of this issue with different hardware too and fixing sent_cmd
+> would likely be too complicated/time intensive for me.
+>
+> I am happy to test future patches that fix this properly though.
+>
+> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
+>
+> Cheers,
+> Ahmad
+>
+>
+>
+> >
+> > Cheers,
+> > Ahmad
+> >
+>
+>
+> --
+> Pengutronix e.K.                           |                             |
+> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+
+
+
 -- 
-2.25.1
-
+Luiz Augusto von Dentz
