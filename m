@@ -2,93 +2,178 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B54BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jun 2022 22:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB44C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Jun 2022 22:58:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237569AbiFQWqL (ORCPT
+        id S237412AbiFQW6h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Jun 2022 18:46:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53598 "EHLO
+        Fri, 17 Jun 2022 18:58:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244720AbiFQWqK (ORCPT
+        with ESMTP id S1382620AbiFQW6e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Jun 2022 18:46:10 -0400
-Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423125F258
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 15:46:10 -0700 (PDT)
-Received: by mail-oo1-xc29.google.com with SMTP id o137-20020a4a2c8f000000b0041ba4b996b6so1028307ooo.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 15:46:10 -0700 (PDT)
+        Fri, 17 Jun 2022 18:58:34 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69C159BBB
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 15:58:32 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id c2so8979222lfk.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Jun 2022 15:58:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:subject:reply-to:from:to:in-reply-to
-         :references;
-        bh=IYZRMEYfOlIWw5glnoJsDzGViWTLnH4hPiDGcp4S+54=;
-        b=QPIF1Z1EDPpv4z4cMEad6twnZHChrhP/c5VCWlv2nOcyu7gaCYRdC5DmSKYYHFeoqi
-         cfTnDzbIaUL2VSjrLrX7ln3t/+NoWWgZGwk3dv/fMztU1Kj1vOY8eh+DVlCQFLcqNpqC
-         4XJnE1OTq515Gh1s3l21IhumRJetxswPwSghgmskbfBD5ZIqKIVYoHy/o1o4WcpuPBFh
-         HDoym0RvnXs5IKdCa5zgBz5QGie4Bur5OcCaPsfRKVr0/BcGgJB+E5e85z5PaxYBINE/
-         AC4MzN3fSSD96sYy4wOKsHbHogqfIZttyh/V93KGp7630dg+3vqLVdBtUf6Uf5wVn+G4
-         Y6nw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SayFkkcIzYfgBsXA/3aeID8z4Bad9GXKziytId6aGR8=;
+        b=eBaD9dyPKUvLerQdzqLSPLb0Z7ffSLk5K8g0TZdiDcCZNO8msukRQANInTnCHtQVD3
+         UCIi4cA/pBG327Mg2OqcJj3CxzIEEmu/v/XeuCWZYzx5SpvaOBrnEjKJs+sfgbpZn59g
+         mjg0EDM2dc6Dxa4aSIVA+TTu5KSyAwfy6FbO2JiNFEbInz+/3tjtvk7CO76h7MgcVf5A
+         64H4eOXMNOKpCrnDvR04Mal64q5N+z02Q1rPtjEE3FIJLhvr75x+nTVj1Z05hcRFR/Gv
+         TmBJZOgd65rJ8bdneRQZPVqeGzInmh+jhHCSwM0e1u4WX/t30PRHBj88tWlCRPuDDyvL
+         IWhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:subject:reply-to
-         :from:to:in-reply-to:references;
-        bh=IYZRMEYfOlIWw5glnoJsDzGViWTLnH4hPiDGcp4S+54=;
-        b=wjUxtOSEA7e99wTZKKU5gUnJ7+Rck0tsxG6Of4j3kqXPfpOxw9uW2UC1iZt6JpcwWD
-         GPjeRAY0SF7xyYhF782Q8d9azDCXuZkxPvT7Y6fGi2h/a2OjLxK2xzCylX+Q+eImoqhk
-         8yk/3Sqhq95/xma5kfVEenGO5PXvFDN2cWhI1bY5QWf7c1/xqQrCCcdzWCh0I1e7dkhw
-         egSU0CNXIG7UwoChi0VPL9ZVbTAdULrul8nDNhRV8p1pcD7qN1XEdioHd/PHrOLSXUKS
-         d+IPLLyuZBDNws8olWITopEX+AqxtdA0fHlLZCjAk/Yr2z8pkVP3/HnVSRB7w1SdWK+o
-         kcLQ==
-X-Gm-Message-State: AJIora/kajnsVC8+wBxkuIQbIXYUR2fO1WiUd6ojzvNrsi0E/DFEnkrI
-        R0/Pu4kHrW+zowTvlKPfkavaQ8gYb1A=
-X-Google-Smtp-Source: AGRyM1tcy1L9VBW3c2kUzFwPnsk4YHFCz0PytQfYt+caPjSOrmkVJazmVpMwKJAJ7RuFty9oc76ndA==
-X-Received: by 2002:a4a:b818:0:b0:41b:e634:f90a with SMTP id g24-20020a4ab818000000b0041be634f90amr4775826oop.28.1655505969434;
-        Fri, 17 Jun 2022 15:46:09 -0700 (PDT)
-Received: from [172.17.0.2] ([20.225.132.56])
-        by smtp.gmail.com with ESMTPSA id k6-20020a056870a4c600b00101b3c76674sm1202358oal.26.2022.06.17.15.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 15:46:09 -0700 (PDT)
-Message-ID: <62ad0431.1c69fb81.c9c8e.334e@mx.google.com>
-Date:   Fri, 17 Jun 2022 15:46:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7112054205386700859=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SayFkkcIzYfgBsXA/3aeID8z4Bad9GXKziytId6aGR8=;
+        b=iAN3qyQ+4ErMXTS/E0DR5omIaNqPyDSohEYgXE5RojwQpkGj/jj6/DevauC+0Y6aPf
+         Z5EIjBkf1Z+iDfXEub0EE4oGldLvIWUOEIiaeVWmO/j0XxqAqqfypaQlPVRgx32Sa5WX
+         9HIjR8B0zE4NIE2gq1Rc/zQvFhEB1UdcUE5fmikpvZV7pSc0wqp0mBjYsBsPVQm9tieK
+         iUf4h5Eta9OT92niUsPE5TXKNM/5NR1dQbyJNDNXEB8yje1VTwPNKGvHaVl9IvlRmvgy
+         JACbkye5+uyI3czECjksqwdBTZIvikDi3x9N+xwC991SkCdvc0ybh6GUrWvuBYgYjVZ5
+         gDDg==
+X-Gm-Message-State: AJIora+cmYO5VaMgxwo/34d6uMV/3To+Es7pOHxfqlE2bSVQkwAJMxZn
+        RlpK8j0GlYLWR6RVmf87Dblgz79ptksRiH5qeEZOMYgJ9XA=
+X-Google-Smtp-Source: AGRyM1uUB058A9NoFLSZrlVMzbpFZvKhqyE9S49S0Ii58ANNeo8LqVEQUqf5erXjGYrIP/5oyB0t/Q8vdHCT8dddyZc=
+X-Received: by 2002:a05:6512:2204:b0:479:7c21:bff8 with SMTP id
+ h4-20020a056512220400b004797c21bff8mr6936853lfu.251.1655506710875; Fri, 17
+ Jun 2022 15:58:30 -0700 (PDT)
 MIME-Version: 1.0
-Subject: RE: [v3,1/7] Bluetooth: hci_core: Introduce hci_recv_event_data
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-In-Reply-To: <20220617221712.1394014-1-luiz.dentz@gmail.com>
-References: <20220617221712.1394014-1-luiz.dentz@gmail.com>
+References: <20220615124902.17347-1-wangyouwan@uniontech.com>
+In-Reply-To: <20220615124902.17347-1-wangyouwan@uniontech.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 17 Jun 2022 15:58:19 -0700
+Message-ID: <CABBYNZK+8KHiDcz8yoMP-g3PFzxFTXXPaUEnECU+wmKtLo3cPA@mail.gmail.com>
+Subject: Re: [PATCH] obexd: Fix crash of transfer pointer has being freed
+To:     Youwan Wang <wangyouwan@uniontech.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7112054205386700859==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Youwan,
 
-This is an automated email and please do not reply to this email.
+On Wed, Jun 15, 2022 at 5:54 AM Youwan Wang <wangyouwan@uniontech.com> wrote:
+>
+> PC1 -> PC2 in the process of transferring the file,
+> PC2 terminate the reception.
+> It is found that PC1 will receive the Rcvd
+> Forbiden message.
+> transfer_response func is called and go to failed:
+> transfer_complete func is called and go to transfer_free
+>
+> Invalid read of size 8
+>     at 0x129C9B: put_get_data (gobex-transfer.c:138)
+>     by 0x128675: get_body (gobex-packet.c:397)
+>     by 0x128675: g_obex_packet_encode (gobex-packet.c:451)
+>     by 0x1264ED: write_data (gobex.c:461)
+>     by 0x1264ED: write_data (gobex.c:431)
+>     by 0x49B7E97: g_main_context_dispatch ()
+>     by 0x49B8287: ??? ()
+>     by 0x49B8581: g_main_loop_run ()
+>     by 0x120834: main (main.c:322)
+>   Address 0x7300028 is 56 bytes inside a block of size 64 free'd
+>     at 0x48369AB: free (vg_replace_malloc.c:530)
+>     by 0x12A404: transfer_response (gobex-transfer.c:245)
+>     by 0x126B02: handle_response (gobex.c:1128)
+>     by 0x127087: incoming_data (gobex.c:1373)
+>     by 0x49B7E97: g_main_context_dispatch ()
+>     by 0x49B8287: ??? ()
+>     by 0x49B8581: g_main_loop_run ()
+>     by 0x120834: main (main.c:322)
+>   Block was alloc'd at
+>     at 0x4837B65: calloc (vg_replace_malloc.c:752)
+>     by 0x49BD9D8: g_malloc0 ()
+>     by 0x129A49: transfer_new (gobex-transfer.c:258)
+>     by 0x12A612: g_obex_put_req_pkt (gobex-transfer.c:282)
+>     by 0x12A612: g_obex_put_req_pkt (gobex-transfer.c:271)
+>     by 0x145862: transfer_start_put (transfer.c:880)
+>     by 0x145862: obc_transfer_start (transfer.c:911)
+>     by 0x13B487: session_process_transfer (session.c:836)
+>     by 0x13C128: session_process_queue (session.c:887)
+>     by 0x13C128: session_process_queue (session.c:872)
+>     by 0x13C18F: session_process (session.c:820)
+>     by 0x49B7E97: g_main_context_dispatch (in /usr/lib/x86_64-linux-gnu/)
+>     by 0x49B8287: ??? (in /usr/lib/x86_64-linux-gnu/)
+>     by 0x49B8581: g_main_loop_run (in /usr/lib/x86_64-linux-gnu/)
+>     by 0x120834: main (main.c:322)
+> ---
+>  gobex/gobex-transfer.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+> index c94d018b2..8e97fc73e 100644
+> --- a/gobex/gobex-transfer.c
+> +++ b/gobex/gobex-transfer.c
+> @@ -197,6 +197,14 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+>         }
+>
+>         rspcode = g_obex_packet_get_operation(rsp, &final);
+> +       if (rspcode == G_OBEX_RSP_FORBIDDEN) {
+> +               err = g_error_new(G_OBEX_ERROR, rspcode, "%s",
+> +                                               g_obex_strerror(rspcode));
+> +               g_obex_debug(G_OBEX_DEBUG_ERROR, "%s", err->message);
+> +               g_error_free(err);
+> +               return;
+> +       }
 
-Dear Submitter,
+This is not quite right, in fact the if statement below already treat
+such errors, we might be missing something like final:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+/* Reset if final so it can no longer be cancelled */
+if (final_rsp)
+obex->pending_req = NULL;
 
------ Output -----
-error: patch failed: include/net/bluetooth/hci_core.h:251
-error: include/net/bluetooth/hci_core.h: patch does not apply
-error: patch failed: net/bluetooth/hci_core.c:1700
-error: net/bluetooth/hci_core.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+This would be a problem on the remote implementation which is
+indicating that perhaps it is just a temporary failure, anyway then:
+
+id = transfer->req_id;
+transfer->req_id = 0;
+
+This resets the req_id so on transfer_free the following code is not run:
+
+if (transfer->req_id > 0)
+g_obex_cancel_req(transfer->obex, transfer->req_id, TRUE);
+
+So either we have to restore the transfer->req_id = id or not reset it
+to 0, so perhaps something like this works better:
+
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index c94d018b2..8fae65d8d 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -200,6 +200,11 @@ static void transfer_response(GObex *obex, GError
+*err, GObexPacket *rsp,
+        if (rspcode != G_OBEX_RSP_SUCCESS && rspcode != G_OBEX_RSP_CONTINUE) {
+                err = g_error_new(G_OBEX_ERROR, rspcode, "%s",
+                                                g_obex_strerror(rspcode));
++               /* If not marked as final response but transfer_complete gonna
++                * be called restore the req_id so it can be properly cancelled
++                */
++               if (!final)
++                       transport->req_id = id;
+                goto failed;
+        }
+
+> +
+>         if (rspcode != G_OBEX_RSP_SUCCESS && rspcode != G_OBEX_RSP_CONTINUE) {
+>                 err = g_error_new(G_OBEX_ERROR, rspcode, "%s",
+>                                                 g_obex_strerror(rspcode));
+> --
+> 2.20.1
+>
+>
+>
 
 
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7112054205386700859==--
+-- 
+Luiz Augusto von Dentz
