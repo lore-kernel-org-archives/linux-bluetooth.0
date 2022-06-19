@@ -2,108 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42CD8C43334
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Jun 2022 11:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7820DC43334
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Jun 2022 16:46:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236936AbiFSL5i (ORCPT
+        id S235171AbiFSQqf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 19 Jun 2022 07:57:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41930 "EHLO
+        Sun, 19 Jun 2022 12:46:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231256AbiFSL5d (ORCPT
+        with ESMTP id S229490AbiFSQqe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 19 Jun 2022 07:57:33 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EA8F120B3;
-        Sun, 19 Jun 2022 04:57:32 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1o2tYW-0001jE-BM; Sun, 19 Jun 2022 13:57:28 +0200
-Message-ID: <43d48a1e-d5a6-3dbe-b3d5-6157f34d15c1@leemhuis.info>
-Date:   Sun, 19 Jun 2022 13:57:27 +0200
+        Sun, 19 Jun 2022 12:46:34 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 580E9D11B
+        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Jun 2022 09:46:33 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EBFA8611FD
+        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Jun 2022 16:46:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 55D9DC341D0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Jun 2022 16:46:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655657192;
+        bh=7v1/7NKZy2tWqtwMDF/+3RZOrlnG+vpot6V8xybY9+w=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=dDBfKfQscqEpjVsGZestu138eZZwGovg3Ku8XvxZczS6qnS73EH+3UjH4KSIfptMH
+         uyTl2bFj42LX8exW5tG2uPjtg0a37TeFBAhEQ5L2zqccrjxDHxTbz62VpFv14POwU5
+         nqK4aPwLf3A76VM302iG5TYCr4p/F9brLpcf4A40GDRLRcd/3R1Qb37/JVlucKxNfV
+         J+eInF4XIxpTJAtghM3q35Yuzh1sRvtswtKhA/yUhXERvM/EqtsMQJu/VqxpVfiMvy
+         v+bdLXOvpgEjmdH6oAzfVBYKRsTseEtpM721Ul5zOzNsNHaclJs1OHpO4SO+yOKdb8
+         gXGfAgi33yVmg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 442C5CC13B3; Sun, 19 Jun 2022 16:46:32 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215576] HSP/HFP mSBC profile broken with QCA6174
+Date:   Sun, 19 Jun 2022 16:46:31 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215576-62941-dVtmbbSb96@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215576-62941@https.bugzilla.kernel.org/>
+References: <bug-215576-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] Bluetooth: hci_sync: complete LE connection on any event
-Content-Language: en-US
-To:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     kernel@pengutronix.de, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220616092418.738877-1-a.fatoum@pengutronix.de>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <20220616092418.738877-1-a.fatoum@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1655639852;befdf198;
-X-HE-SMSGID: 1o2tYW-0001jE-BM
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215576
 
-On 16.06.22 11:24, Ahmad Fatoum wrote:
-> Commit 6cd29ec6ae5e ("Bluetooth: hci_sync: Wait for proper events when
-> connecting LE") changed HCI core to wait for specific events before
-> posting completion for a new LE connection. This commit introduced
-> regressions partially fixed in commits a56a1138cbd8
-> ("Bluetooth: hci_sync: Fix not using conn_timeout") and
-> and c9f73a2178c1 ("Bluetooth: hci_conn: Fix hci_connect_le_sync").
-> 
-> Yet, a regression still remains where devices that worked previously
-> now timeout[1][2]. Restore working order by reverting the commit in
-> question until this issue can be properly resolved.
-> 
-> [1]: https://lore.kernel.org/linux-bluetooth/a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de/
-> [2]: https://github.com/bluez/bluez/issues/340
+--- Comment #16 from The Linux kernel's regression tracker (Thorsten Leemhu=
+is) (regressions@leemhuis.info) ---
+(In reply to wavexx from comment #15)
+> Created attachment 301217 [details]
+> Add HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN to btmtk to fix mSBC
 
-That way regzbot will miss the tags and not associate the fix with the
-regression. You can leave it like that and add these, as explained in
-the kernel docs (see for example submitting-patches.rst):
+Thx. FWIW, this might easily get lost here. Would be really good if you cou=
+ld
+sent this to the bluetooth maintainers, ideally as a proper patch with
+changelog and everything:
 
-Link:
-https://lore.kernel.org/linux-bluetooth/a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de/
-Link: https://github.com/bluez/bluez/issues/340
 
-Or your remove the two footnotes and do it like this:
+BLUETOOTH DRIVERS
+M:      Marcel Holtmann <marcel@holtmann.org>
+M:      Johan Hedberg <johan.hedberg@gmail.com>
+M:      Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+L:      linux-bluetooth@vger.kernel.org
+S:      Supported
+W:      http://www.bluez.org/
+T:      git
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git
+T:      git
+git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git
+F:      drivers/bluetooth/
 
-Link:
-https://lore.kernel.org/linux-bluetooth/a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de/
-[1]
-Link: https://github.com/bluez/bluez/issues/340 [2]
+--=20
+You may reply to this email to add a comment.
 
-> Fixes: 6cd29ec6ae5e ("Bluetooth: hci_sync: Wait for proper events when connecting LE")
-> Signed-off-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
-> Event callbacks like hci_le_meta_evt() use hci_skb_event(hdev->sent_cmd)
-> for matching. I suspect the timeout is due to intermittent frames,
-> e.g. because of remote unpairing, replacing the sent_cmd and thus
-> breaking renewed pairing as the frames couldn't be matched. This is too
-> complex for me to fix and we have been carrying this fix for a month now,
-> so I think it's best we revert this upstream for now.
-> 
-> #regzb Link: https://lore.kernel.org/linux-bluetooth/a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de/
-
-Thx for trying to do the right thing, but that didn't work out, as
-"Link:" doesn't need a "#regzb". Maybe regzbot should handle this, not
-sure, will keep it in mind.
-
-Anyway, let's make regzbot aware of this thread, as you intended (thx
-again):
-
-#regzbot ^backmonitor
-https://lore.kernel.org/linux-bluetooth/a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de/
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-
-P.S.: As the Linux kernel's regression tracker I deal with a lot of
-reports and sometimes miss something important when writing mails like
-this. If that's the case here, don't hesitate to tell me in a public
-reply, it's in everyone's interest to set the public record straight.
+You are receiving this mail because:
+You are the assignee for the bug.=
