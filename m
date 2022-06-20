@@ -2,109 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A97C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jun 2022 12:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B1BCCA479
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jun 2022 14:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241247AbiFTMcS (ORCPT
+        id S1344753AbiFTOW0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jun 2022 08:32:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46912 "EHLO
+        Mon, 20 Jun 2022 10:22:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240064AbiFTMcR (ORCPT
+        with ESMTP id S1350194AbiFTOVx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jun 2022 08:32:17 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 056FFE031
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 05:32:16 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id me5so20821301ejb.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 05:32:15 -0700 (PDT)
+        Mon, 20 Jun 2022 10:21:53 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D8648317
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 06:36:41 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so10333383pjz.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 06:36:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=7YmAtGuUNzr3gUuWPc4KOL752YfmuI3qBOWH+yd3+h4=;
-        b=EdLy5fr5XGxx/vVcT9Ub07TMY29cEaIzuTeee7orZoxugcQhL+oVPwN4wMMA7rBVgn
-         /7yynxstyPpM1V9Ys56bcDhJbPddSxRIXBdC3/CX/qMhk3qmJmvhW975A7ifL6IBbZf0
-         6xfhkFZpSdlWxJeKHyTT8XATMgrqA5f4n1Bnx7z6DLSmKyQugO0XM8s3YH5k3uCe+bH5
-         pumdCpJNJt8ciAycv0oz/ZnfHDGTZLgYuV4kFvUex89gCqEmDaAYUbT2f5xhi9oLTUaV
-         8+U/j1Xc5SNq+TUxkwO5VxJ7bEOg11qiGFUGK4xpeGNOP+9WrfnXUOCavwGW8VXDfCZU
-         wkmg==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=q2c28c9ycIykB8rvaKzW2SHtPCiH50fTzVxDFaCeLQU=;
+        b=S578dw56q7QL7xegVMXvysC7JnxdIKF1si3uGtgxPVC0YsmG0QQgkUwthWlxI3EXqW
+         LpCZkoNikDg+JfiHaUdWq9VwTG+jQjdQhO6OfCDQlC9fDQJ2+ZuVnUO4dNKXHVkhgfRy
+         Xw7qdgcxU87vdrNdQc9DsvxJCyBkHpyCXWwXf9mPl4HxG/sweltqZ9mpAB/ChuZGApA6
+         pjxwrLNZLVp73Ya96Hudw24JlN+gd9hONREVEhI3SX0LSEuyqDTuRf/uQNqp7c5xfOEB
+         lgQ912xhEt1hsD+1AHyDFGoEQH4mP2xF+wewxv25hiokqRWCNWX3Tn//4C3aYuRQjPIF
+         HoAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7YmAtGuUNzr3gUuWPc4KOL752YfmuI3qBOWH+yd3+h4=;
-        b=6tgYVLoFIHnLLmMSHAfgWHKrRkcrqYraEeeJ9qNV36lL+sdibk4yjMJfQWkyZy8EH/
-         llFLRuYgddgRhVbKPJE6Th5VmiBLnddpyqeAoKBFohhSSFLoyTK/SuQ4CtQt9EF42EAa
-         e9GPYF0ucCaukjL0s5CzPuB7WvYf+9HUN8qIg0YQVb7nN/B9SugDs3YJvacsDiXtuakv
-         U73I6D5mFYC+S4Uqo4WtUrEWrtKyfm1ABCRAyup6CWmDsYEYwmpTSLpgriZsPPAf7Ox7
-         itVpkNpqmLqvIRN6A/hba7sn8DwnshwgvYK+lWLepHLwukLVRwZfvy2PXsVLFG5e1n9R
-         6DkQ==
-X-Gm-Message-State: AJIora/K934ZI9R1qGwYv4kbsPi6HtvKShaNkHRNViqMCYwDcE3/yS/8
-        r5Rq3sji6Cr6+PvdGLI5wKlYZg==
-X-Google-Smtp-Source: AGRyM1tYfe/5BEzRAUIPHntlRJzpoZstl5iSVvRMrTdqa/N6fL2lTjOUrfsUX3SJbLvtR9lARKYlrw==
-X-Received: by 2002:a17:907:6295:b0:703:92b8:e113 with SMTP id nd21-20020a170907629500b0070392b8e113mr21027834ejc.594.1655728334584;
-        Mon, 20 Jun 2022 05:32:14 -0700 (PDT)
-Received: from [192.168.0.210] (xdsl-188-155-176-92.adslplus.ch. [188.155.176.92])
-        by smtp.gmail.com with ESMTPSA id o26-20020a1709061b1a00b0070c4abe4706sm5811842ejg.158.2022.06.20.05.32.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Jun 2022 05:32:13 -0700 (PDT)
-Message-ID: <2c753258-b68e-b2ad-c4cc-f0a437769bc2@linaro.org>
-Date:   Mon, 20 Jun 2022 14:32:12 +0200
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=q2c28c9ycIykB8rvaKzW2SHtPCiH50fTzVxDFaCeLQU=;
+        b=hQAai7r51iFttGq1mLbKP4MbEt4eHmSkkRCTroxpXYmQ3CusvfMPGciwaD02HYJeSB
+         UtHPQiIxqLEiAC++v09HAQU+IZywdrYTUwdLbsNZF7xheK+Dpukfm6eM4kew8uOFob3F
+         3iIc79pb8zf6DSWCpPD7brvnv7w+EidpRu1DWoPtNyDaNhKcMRJQgxgjqBkhRFvX7SAs
+         ji8qf7x2SQ7HYdmslyJ5tE9/Zvx1JT/0kwrsc2b1EKm2lcsa85VfoKs56XM/P8a8q/7q
+         H4XqbIcd45SMAPTLGGURG7TWzPApG9Mt7B57iK4lqnZKAcKKbP0Q9OjdCIbx03wYmcxA
+         N+Tg==
+X-Gm-Message-State: AJIora/KmjOIX8tbP2aB1NEHq6v/mUJqZD031BDyoP7hMKejoqp524Vd
+        kBqy5ySKUXK8gDk2jesWK1gr++xWCOo=
+X-Google-Smtp-Source: AGRyM1tLn0awd3aOA2aU9nGUpDj64nGd9InQchWqgMNQEhUj3xwTDN1gVhSX9oTih/kzIVXTGW7M4w==
+X-Received: by 2002:a17:90a:408f:b0:1e3:23a:2370 with SMTP id l15-20020a17090a408f00b001e3023a2370mr26813833pjg.84.1655732200866;
+        Mon, 20 Jun 2022 06:36:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.66.88.83])
+        by smtp.gmail.com with ESMTPSA id x6-20020a1709029a4600b0015e8d4eb1d1sm8719948plv.27.2022.06.20.06.36.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jun 2022 06:36:40 -0700 (PDT)
+Message-ID: <62b077e8.1c69fb81.662ed.c149@mx.google.com>
+Date:   Mon, 20 Jun 2022 06:36:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8220641837283958859=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 1/4] dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT
- binding
-Content-Language: en-US
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <cover.1655723462.git.hakan.jansson@infineon.com>
- <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hakan.jansson@infineon.com
+Subject: RE: Bluetooth: hci_bcm: Improve FW load time on CYW55572
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 20/06/2022 14:01, Hakan Jansson wrote:
-> CYW55572 is a Wi-Fi + Bluetooth combo device from Infineon.
-> Extend the binding with its DT compatible.
-> 
-> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
-> ---
->  Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> index df59575840fe..71fe9b17f8f1 100644
-> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> @@ -24,6 +24,7 @@ properties:
->        - brcm,bcm43540-bt
->        - brcm,bcm4335a0
->        - brcm,bcm4349-bt
-> +      - infineon,cyw55572-bt
+--===============8220641837283958859==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Patch is okay, but just to be sure - is it entirely different device
-from Infineon or some variant of Broadcom block? Are all existing
-properties applicable to it as well?
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=651965
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.18 seconds
+GitLint                       PASS      1.74 seconds
+SubjectPrefix                 FAIL      0.30 seconds
+BuildKernel                   PASS      33.93 seconds
+BuildKernel32                 PASS      31.21 seconds
+Incremental Build with patchesPASS      60.36 seconds
+TestRunner: Setup             PASS      509.25 seconds
+TestRunner: l2cap-tester      PASS      17.92 seconds
+TestRunner: bnep-tester       PASS      6.17 seconds
+TestRunner: mgmt-tester       PASS      107.42 seconds
+TestRunner: rfcomm-tester     PASS      10.00 seconds
+TestRunner: sco-tester        PASS      9.60 seconds
+TestRunner: smp-tester        PASS      9.57 seconds
+TestRunner: userchan-tester   PASS      6.40 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.30 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
 
 
-Best regards,
-Krzysztof
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8220641837283958859==--
