@@ -2,164 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C410C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jun 2022 10:06:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1184CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Jun 2022 12:02:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240780AbiFTKGW (ORCPT
+        id S242138AbiFTMCp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Jun 2022 06:06:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37928 "EHLO
+        Mon, 20 Jun 2022 08:02:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240739AbiFTKGL (ORCPT
+        with ESMTP id S242039AbiFTMCf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Jun 2022 06:06:11 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FA7313F16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 03:06:10 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1o3EIK-0002S5-Fk; Mon, 20 Jun 2022 12:06:08 +0200
-Message-ID: <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
-Date:   Mon, 20 Jun 2022 12:06:06 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-Subject: Re: [BUG] BLE device unpairing triggers kernel panic
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Mon, 20 Jun 2022 08:02:35 -0400
+Received: from smtp11.infineon.com (smtp11.infineon.com [IPv6:2a00:18f0:1e00:4::5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B36186E4;
+        Mon, 20 Jun 2022 05:02:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1655726555; x=1687262555;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bkHDpmBEWnraMUb/Sst3HBAGHKmFjwjIRjj6H3I//YI=;
+  b=CzlbhINuGDysLD0xQygc2g1PgBzP7hWBT75uDOjJX312w0R4uKfpl1nh
+   v+F9qtJ1YB+0c5AQJwdySAgP3PDoKyyozM4SOcPeBUdeIzVySsdDYoNZe
+   oukrQGDDdjxkvxZpuXjHQV6c7k6GHlnDYfSY/y//N/hKM2ZA24WDMFCUS
+   E=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="301894347"
+X-IronPort-AV: E=Sophos;i="5.92,306,1650924000"; 
+   d="scan'208";a="301894347"
+Received: from unknown (HELO mucxv002.muc.infineon.com) ([172.23.11.17])
+  by smtp11.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2022 14:02:33 +0200
+Received: from MUCSE812.infineon.com (MUCSE812.infineon.com [172.23.29.38])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv002.muc.infineon.com (Postfix) with ESMTPS;
+        Mon, 20 Jun 2022 14:02:32 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE812.infineon.com
+ (172.23.29.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Mon, 20 Jun
+ 2022 14:02:31 +0200
+Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
+ MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.26; Mon, 20 Jun 2022 14:02:30 +0200
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+CC:     Hakan Jansson <hakan.jansson@infineon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>
-References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
- <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
- <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
- <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
- <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
- <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
-Content-Language: en-US
-In-Reply-To: <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH 0/4] Bluetooth: hci_bcm: Improve FW load time on CYW55572
+Date:   Mon, 20 Jun 2022 14:01:25 +0200
+Message-ID: <cover.1655723462.git.hakan.jansson@infineon.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE805.infineon.com (172.23.29.31) To
+ MUCSE807.infineon.com (172.23.29.33)
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+These patches add an optional device specific data member to specify max
+baudrate of a device when in autobaud mode. This allows the host to set a
+first baudrate higher than "init speed" to improve FW load time.
 
-On 17.06.22 22:48, Luiz Augusto von Dentz wrote:
-> On Thu, Jun 16, 2022 at 3:38 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> On 16.05.22 18:37, Ahmad Fatoum wrote:
->>>>>> - Commit a56a1138cbd8 ("Bluetooth: hci_sync: Fix not using conn_timeout")
->>>>>>   fixes, despite the title, what event is waited on. First Pairing works now,
->>>>>>   but the second pairing times out and crashes the kernel:
->>>>>>
->>>>>>   [   84.191684] Bluetooth: hci0: Opcode 0x200d failed: -110
->>>>>>   [   84.230478] Bluetooth: hci0: request failed to create LE connection: err -110
->>>>>>   [   84.237690] Unable to handle kernel read from unreadable memory at virtual address 0000000000000ca8
->>>>
->>>> That said the error -110 mean -ETIMEDOUT
->>>
->>> Yes, this issue remains still. I feel better about my revert
->>> knowing that the crash is fixed, but I'd like this regression
->>> here fixed upstream as well. I'll try to collect some more
->>> information and report back.
->>
->> I've now found time to revisit this and sprinkle around some
->> extra logging. This is the initial pairing that works:
->>
->>   Bluetooth: entered hci_le_create_conn_sync()
->>   Bluetooth: hci0: opcode 0x200d plen 25
->>   Bluetooth: hci0: event 0x0f (sent = 0x0a)
->>   Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
->>   Bluetooth: hci0: event 0x3e (sent = 0x0a)
->>   Bluetooth: hci0: BT: subevent 0x0a (sent 0x0a)
->>   Bluetooth: entered hci_le_meta_evt(event=0x0a) completion clause
->>
->> I unpaired on device side and then retried pairing:
->>
->>   Bluetooth: entered hci_le_create_conn_sync()
->>   Bluetooth: hci0: opcode 0x200d plen 25
->>   Bluetooth: hci0: event 0x0f (sent = 0x0a)
->>   Bluetooth: hci0: BT: opcode 0x200d (sent: 0x0a)
->>   Bluetooth: entered hci_abort_conn()
->>   Bluetooth: hci0: opcode hci_req_add_ev 0x200e
->>   Bluetooth: hci0: event 0x0e (sent = 0x00)
->>   Bluetooth: hci0: event 0x3e (sent = 0x00)
->>   Bluetooth: hci0: BT: subevent 0x0a (sent 0x00)
->>   Bluetooth: __hci_cmd_sync_sk pending (event = 0x0a status=1, err=-110)
->>   Bluetooth: hci0: Opcode 0x200d failed: -110
->>   Bluetooth: hci0: opcode 0x2006 plen 15
->>   Bluetooth: hci0: event 0x0e (sent = 0x00)
->>   Bluetooth: hci0: opcode 0x200a plen 1
->>   Bluetooth: hci0: event 0x0e (sent = 0x00)
->>   Bluetooth: hci0: request failed to create LE connection: err -110
->>
->>
->> But now it times out as reported. It looks like the
->> intermittent hci_abort_conn() is at fault here. My theory is
->> that replacing hci->sent_cmd is the problem here, as other
->> events can't be matched anymore.
-> 
-> Yep, unpair command uses hci_abort_conn when it should really be using
-> hci_abort_conn_sync, the problem is if we do that then it probably no
-> longer work because it would have to wait for sync queue to complete
-> so it would only be able to disconnect after the connect command
-> completes, well perhaps that is acceptable
+The host baudrate will later be changed to "init speed" (as usual) once FW
+loading is complete and the device has been reset to begin normal
+operation.
 
-Disconnect of connection #1 being processed after new connection #2
-concluded sounds wrong. Would I be able to reconnect
-afterwards or would all connections, but the first, be directly
-disconnected...?
+Hakan Jansson (4):
+  dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT binding
+  Bluetooth: hci_bcm: Add DT compatible for CYW55572
+  Bluetooth: hci_bcm: Prevent early baudrate setting in autobaud mode
+  Bluetooth: hci_bcm: Increase host baudrate for CYW55572 in autobaud
+    mode
 
-> otherwise we need a
-> different queue to handle command that abort/cancel other already in
-> the queue.
-
-Is the revert an acceptable interim solution or are there issues
-I am missing?
-
-Cheers,
-Ahmad
-
-> 
->> We've been deploying the revert for a while now and I just posted
->> it to the mailing list[1]. There have been other reports
->> of this issue with different hardware too and fixing sent_cmd
->> would likely be too complicated/time intensive for me.
->>
->> I am happy to test future patches that fix this properly though.
->>
->> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
->>
->> Cheers,
->> Ahmad
->>
->>
->>
->>>
->>> Cheers,
->>> Ahmad
->>>
->>
->>
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-> 
-> 
-> 
+ .../bindings/net/broadcom-bluetooth.yaml      |  1 +
+ drivers/bluetooth/hci_bcm.c                   | 24 +++++++++++++------
+ 2 files changed, 18 insertions(+), 7 deletions(-)
 
 
+base-commit: 0b537674e072a37dec2fcefef4df2317b58aaa3f
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.25.1
+
