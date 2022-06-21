@@ -2,124 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 970EBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 22:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFB4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 22:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354787AbiFUWoz (ORCPT
+        id S1354897AbiFUWwA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 18:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44320 "EHLO
+        Tue, 21 Jun 2022 18:52:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354574AbiFUWoy (ORCPT
+        with ESMTP id S1354853AbiFUWv7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 18:44:54 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F411631DE3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 15:44:52 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id f16so12956005pjj.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 15:44:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=bKHACVXIFtdB3STW2PakBcJYhyXM+9UIqdBfEUhdye8=;
-        b=Et10tJYPJFp4jTDx+smGZKwCHa/Nzu/nCTwxLzj1as6JA2nUKRn11Om5Sx8HWaDA5T
-         PbC+U3W63cmlvao9iTfc/aF8ERRjeofgLCtaHl92E2JnRpAPuSJGf/G3lJBe938URM4f
-         F3bQ3Yx/wojNamvWvMQw7pKfD4YHd8XSTcoMGQNZRMU96zljnpbGaqQ/K81ff+1iM8nM
-         H8N7+CIavatcCZgNZJjOvTVIYCSg2XsjpTxLrtFxaMqjC8ZI19pVjarbFxVi1S00GQf7
-         iJ5Y/k75TaJ4UovcSPQ/LnLViV4BcGssNlaPTTv7/i+oB4u9D21G3WNzZ4at0GIK5t3v
-         Ggbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=bKHACVXIFtdB3STW2PakBcJYhyXM+9UIqdBfEUhdye8=;
-        b=J4mRdMvPLHgTn4AfS13mPCzjU/aFMHzixn36lXuMt6gpdQ8amZIvuRvOcmes2jfCdk
-         JlGzd1S8roZeJX6vdpgoeOr8HeYUP/999BxM53aswrgEGMdkbyT+j+PWSPlswYfqpxnX
-         cWXNGPQApks9a9uzA0r6OZsVtWKs9kK7vPjAJQpFGXphWQ5nFxixs67QL8CBVtPmrKwH
-         p3zpepwz/RerP5oHUEx1/wweA7JWHQhBBDZa16IZ5DJ2JQ8E3T7gsDcdpaF2YHQM60vV
-         VRVYzd+usJe04mMwJggOhlKLs9M001n4xSv4zvAVzaiUswm6bHBZjrMPLE3exB49ehP3
-         f8wQ==
-X-Gm-Message-State: AJIora8+iRXLrQPYQekukQcPUleRiufX1gEwiq5F2Nkp8Y5+0xBqNruv
-        /qAqSaKkPM+IZtmXExXzMolH5KFJJMM=
-X-Google-Smtp-Source: AGRyM1so2vgsbVn/aWmcCuHPblFIE9D44DIPLuwUSii8ZZ/2DMwo+8P3iasLsF9L0VC1G3ZJNGVVVg==
-X-Received: by 2002:a17:90b:4d8b:b0:1e3:31df:c98a with SMTP id oj11-20020a17090b4d8b00b001e331dfc98amr46087846pjb.175.1655851492199;
-        Tue, 21 Jun 2022 15:44:52 -0700 (PDT)
-Received: from [172.17.0.2] ([20.125.139.60])
-        by smtp.gmail.com with ESMTPSA id ja13-20020a170902efcd00b0016a087cfad8sm8810254plb.264.2022.06.21.15.44.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 15:44:51 -0700 (PDT)
-Message-ID: <62b249e3.1c69fb81.30094.c3a1@mx.google.com>
-Date:   Tue, 21 Jun 2022 15:44:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0564716482051998011=="
+        Tue, 21 Jun 2022 18:51:59 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1763E31DDB;
+        Tue, 21 Jun 2022 15:51:53 -0700 (PDT)
+X-UUID: c04db7f580fa40d2b9b608109c8c9ce5-20220622
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.6,REQID:d82d7fd8-68cf-49b0-9104-196a679d57cd,OB:10,L
+        OB:0,IP:0,URL:5,TC:0,Content:3,EDM:0,RT:0,SF:51,FILE:0,RULE:Release_Ham,AC
+        TION:release,TS:59
+X-CID-INFO: VERSION:1.1.6,REQID:d82d7fd8-68cf-49b0-9104-196a679d57cd,OB:10,LOB
+        :0,IP:0,URL:5,TC:0,Content:3,EDM:0,RT:0,SF:51,FILE:0,RULE:Release_Ham,ACTI
+        ON:release,TS:59
+X-CID-META: VersionHash:b14ad71,CLOUDID:db4ead2d-1756-4fa3-be7f-474a6e4be921,C
+        OID:f9af49f95651,Recheck:0,SF:28|17|19|48,TC:nil,Content:3,EDM:-3,IP:nil,U
+        RL:1,File:nil,QS:nil,BEC:nil,COL:0
+X-UUID: c04db7f580fa40d2b9b608109c8c9ce5-20220622
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 372402516; Wed, 22 Jun 2022 06:51:47 +0800
+Received: from mtkmbs07n1.mediatek.inc (172.21.101.16) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Wed, 22 Jun 2022 06:51:45 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Wed, 22 Jun 2022 06:51:45 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.792.3 via Frontend Transport; Wed, 22 Jun 2022 06:51:45 +0800
+From:   <sean.wang@mediatek.com>
+To:     <pmenzel@molgen.mpg.de>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Eric.Liang@mediatek.com>, <Stella.Chang@mediatek.com>,
+        <Tom.Chou@mediatek.com>, <steve.lee@mediatek.com>,
+        <jsiuda@google.com>, <frankgor@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: btmtksdio: Add in-band wakeup support
+Date:   Wed, 22 Jun 2022 06:51:44 +0800
+Message-ID: <1655851904-15022-1-git-send-email-sean.wang@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <1472eccd-429b-0a18-565c-7de2e5ed44f2@molgen.mpg.de--annotate>
+References: <1472eccd-429b-0a18-565c-7de2e5ed44f2@molgen.mpg.de--annotate>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client/player: Enable acquiring multiple transports
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220621211221.2382613-1-luiz.dentz@gmail.com>
-References: <20220621211221.2382613-1-luiz.dentz@gmail.com>
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0564716482051998011==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is automated email and please do not reply to this email!
+>Dear Sean,
+>
+>
+>Thank you for the patch.
+>
+>Am 10.06.22 um 02:17 schrieb sean.wang@mediatek.com:
+>> From: Sean Wang <sean.wang@mediatek.com>
+>>
+>> 'ce64b3e94919 ("Bluetooth: mt7921s: Support wake on bluetooth")'
+>> have added the waken-on-bluetooth via dedicated GPIO.
+>
+>Maybe:
+>
+>Commit ce64b3e94919 ("Bluetooth: mt7921s: Support wake on bluetooth") adds the wake on bluethooth via a dedicated GPIO.
 
-Dear submitter,
+Thanks! Look good to me. I will add it in the next version.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=652512
+>
+>> The patch extends the function to the waken-on-bluetooth via SDIO DAT1
+>> pin (inband wakeup) when the SDIO host driver is able to support.
+>
+>Maybe:
+>
+>Extend the wake-on-bluetooth to use the SDIO DAT1 pin (in-band wakeup), when supported by the SDIO host driver.
+>
 
----Test result---
+Thanks! Look good to me. I will add it in the next version.
 
-Test Summary:
-CheckPatch                    FAIL      1.04 seconds
-GitLint                       PASS      0.55 seconds
-Prep - Setup ELL              PASS      44.75 seconds
-Build - Prep                  PASS      0.47 seconds
-Build - Configure             PASS      8.57 seconds
-Build - Make                  PASS      1393.59 seconds
-Make Check                    PASS      10.92 seconds
-Make Check w/Valgrind         PASS      466.88 seconds
-Make Distcheck                PASS      251.43 seconds
-Build w/ext ELL - Configure   PASS      8.76 seconds
-Build w/ext ELL - Make        PASS      1379.13 seconds
-Incremental Build with patchesPASS      0.00 seconds
+>How did you test this? In what datasheet is it documented?
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] client/player: Enable acquiring multiple transports
-ERROR:INITIALISED_STATIC: do not initialise statics to NULL
-#94: FILE: client/player.c:80:
-+static struct queue *ios = NULL;
+We tested it on the MT8186 platform with wakening up by the keyboard or mouse when the platform is in the suspend state.
 
-/github/workspace/src/12889833.patch total: 1 errors, 0 warnings, 401 lines checked
+We can see the details on SDIO DAT1 pin in SDIO specification ver 3.00 section 8.2 Asynchronous Interrupt:
+During the asynchronous interrupt period, the host can stop providing an SD clock to the card and the card
+can generate an interrupt via SDIO DATA1 without SD clock.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+or you can check the patch ("mmc: mediatek: add support for SDIO eint wakup IRQ")
+in https://patchwork.kernel.org/project/linux-arm-kernel/patch/20220523074017.12649-4-axe.yang@mediatek.com/
+that is the actual patch btmtksdio was tested against on MT8186 platfrom.
 
-/github/workspace/src/12889833.patch has style problems, please review.
+>
+>> Co-developed-by: Yake Yang <yake.yang@mediatek.com>
+>> Signed-off-by: Yake Yang <yake.yang@mediatek.com>
+>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+>> ---
+>>   drivers/bluetooth/btmtksdio.c | 8 ++++++++
+>>   1 file changed, 8 insertions(+)
+>>
+>> diff --git a/drivers/bluetooth/btmtksdio.c
+>> b/drivers/bluetooth/btmtksdio.c index d6700efcfe8c..9ed3af4ba51a
+>> 100644
+>> --- a/drivers/bluetooth/btmtksdio.c
+>> +++ b/drivers/bluetooth/btmtksdio.c
+>> @@ -118,6 +118,7 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
+>>   #define BTMTKSDIO_FUNC_ENABLED		3
+>>   #define BTMTKSDIO_PATCH_ENABLED		4
+>>   #define BTMTKSDIO_HW_RESET_ACTIVE	5
+>> +#define BTMTKSDIO_INBAND_WAKEUP		6
+>>
+>>   struct mtkbtsdio_hdr {
+>>	__le16	len;
+>> @@ -1294,6 +1295,9 @@ static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
+>>		.wakeup_delay = cpu_to_le16(0x20),
+>>	};
+>>
+>> +	if (test_bit(BTMTKSDIO_INBAND_WAKEUP, &bdev->tx_state))
+>> +		return may_wakeup;
+>> +
+>>	if (may_wakeup && bdev->data->chipid == 0x7921) {
+>>		struct sk_buff *skb;
+>>
+>> @@ -1384,6 +1388,10 @@ static int btmtksdio_probe(struct sdio_func *func,
+>>	 */
+>>	pm_runtime_put_noidle(bdev->dev);
+>>
+>> +	/* Mark if the mmc host can support waken by SDIO */
+>
+>Maybe:
+>
+>Mark if MMC host supports wake on bluetooth by SDIO
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+Thanks! Look good to me. I will add it in the next version.
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0564716482051998011==--
+>
+>> +	if (device_can_wakeup(func->card->host->parent))
+>> +		set_bit(BTMTKSDIO_INBAND_WAKEUP, &bdev->tx_state);
+>> +
+>>	err = device_init_wakeup(bdev->dev, true);
+>>	if (err)
+>>		bt_dev_err(hdev, "failed to initialize device wakeup");
+>
+>
+>Kind regards,
+>
+>Paul
+>
+>
