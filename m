@@ -2,95 +2,156 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFB1C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 15:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78BCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 17:15:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352669AbiFUPVX (ORCPT
+        id S1352798AbiFURPk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 11:21:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59224 "EHLO
+        Tue, 21 Jun 2022 13:15:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352661AbiFUPVV (ORCPT
+        with ESMTP id S234333AbiFURPj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:21:21 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0AC286D7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 08:21:20 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id c1so20453542qvi.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 08:21:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Tx4eBPJsEbRebrV3Fp++ZnArAXnMIZudf6we4l0dGjI=;
-        b=oDtdCLIYAg1eN9WzslR0/AC1R4YYOMZ8vTNjep4XgkF608TifZq/cq119BdC+tKlF9
-         aOMBOlYsTLYuBz5jrhgbMo3wrYNZNuNY8GWBDX7JbNjfsaqcvwbeRO4REkA5wmsFB3hp
-         nhTHNs7zFU4r3aM3rZmqqUBnFaDIkJl6nEgXaa1O7lG0vKp/sSv6yN5tD2Ynp6EXwu/v
-         2ibjCe3ziTuOo8NIBsSxu44dptUDXK/cbDU/cphTYbePhXTPipK9ayNSPwx7UuI51lUO
-         5lRD6gl+2E6/ChxvBPpZBr9qbd2JIr1BTEatOmrA/WVbOnaN0SGpgu0XkdjNM6ZiUqin
-         tShg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Tx4eBPJsEbRebrV3Fp++ZnArAXnMIZudf6we4l0dGjI=;
-        b=wRwjtDd0eecyuN1XD9Cj5GA7UqKppaGLs9Y161DR+V+DLt61YiVkW8VsyGVSamFFYs
-         vGMd5Go/rCX600mm1msYT5zyclqjNq7iHBJ3sU1+53YhyOA5v0hwXdO3fEH5OKRJau9Q
-         yJuwc2MEsIliPY6ZgXYxbuuvqCeSfqZEdUusI/mzh1AL8jiFV5MYWRTOlkzoAOe+gVLG
-         T3gDN+F1LpDgVxa3Z25mKwwIqyO2x91cnZLkeQ2GJ5rXjhLp48bLYYxLxG9CmOTmN9Wz
-         NtbYiS2P6LfFc4Sncelyr/q0Kx3sIGmmUZtULi79HBgZ6NvqNCuU4cw112WV5ee1LL0L
-         A22Q==
-X-Gm-Message-State: AJIora+gUuLpFxBGnEOj/GPZPpGMMhko8Ws6PENvnpS93PLwz+9Pl/G9
-        ZKosBgrYQNZzlVCkjjmxNazIEtT2NFRsSg==
-X-Google-Smtp-Source: AGRyM1sCiJ9RCRGpPsvgptiNmCteHtNBp+Vhq6hvPxW16JyTH4IfK6hwpbtfN50L5eaegbjnQVEX/g==
-X-Received: by 2002:ac8:4e94:0:b0:305:fca:8740 with SMTP id 20-20020ac84e94000000b003050fca8740mr24776718qtp.378.1655824879195;
-        Tue, 21 Jun 2022 08:21:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.63.167])
-        by smtp.gmail.com with ESMTPSA id i3-20020a05622a08c300b002f92b74ba99sm12325270qte.13.2022.06.21.08.21.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 08:21:18 -0700 (PDT)
-Message-ID: <62b1e1ee.1c69fb81.1dd09.5d50@mx.google.com>
-Date:   Tue, 21 Jun 2022 08:21:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2266728231524586676=="
+        Tue, 21 Jun 2022 13:15:39 -0400
+Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E5B2A409;
+        Tue, 21 Jun 2022 10:15:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1655831739; x=1687367739;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Oa2rFnX3lqAyXLuHHr44CEvOkTd44U44GyCOxUF6RI0=;
+  b=JgfNab0jsVFLcg6DAs9p0mv7ewySupTyrNWB+hYGj/rep0czFeU+wAyK
+   ORJIrjyMTxCeqylZKwmroMTEHl3vd/UWBa2YSqax/HRdZBX4sB/hJhAYJ
+   44mADZVLLyzDRE66yXYpwwA8e3gJNWRNsATADYxL5VPZCaJqWrLWODJpk
+   A=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="127395062"
+X-IronPort-AV: E=Sophos;i="5.92,209,1650924000"; 
+   d="scan'208";a="127395062"
+Received: from unknown (HELO mucxv001.muc.infineon.com) ([172.23.11.16])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2022 19:15:36 +0200
+Received: from MUCSE822.infineon.com (MUCSE822.infineon.com [172.23.29.53])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv001.muc.infineon.com (Postfix) with ESMTPS;
+        Tue, 21 Jun 2022 19:15:36 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE822.infineon.com
+ (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 21 Jun
+ 2022 19:15:35 +0200
+Received: from [10.160.196.13] (172.23.8.247) by MUCSE807.infineon.com
+ (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 21 Jun
+ 2022 19:15:34 +0200
+Message-ID: <72cd312f-f843-6a85-b9e7-db8fcb952af8@infineon.com>
+Date:   Tue, 21 Jun 2022 19:15:33 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: device: Fix timeout=1 to remove the device immediately
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220621134818.11515-1-wangyouwan@uniontech.com>
-References: <20220621134818.11515-1-wangyouwan@uniontech.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 4/4] Bluetooth: hci_bcm: Increase host baudrate for
+ CYW55572 in autobaud mode
+Content-Language: en-US
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <cover.1655723462.git.hakan.jansson@infineon.com>
+ <386b205422099c795272ad8b792091b692def3cd.1655723462.git.hakan.jansson@infineon.com>
+ <1a554d8e-c479-f646-ce9d-25871affbcee@molgen.mpg.de>
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+In-Reply-To: <1a554d8e-c479-f646-ce9d-25871affbcee@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE824.infineon.com (172.23.29.55) To
+ MUCSE807.infineon.com (172.23.29.33)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2266728231524586676==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Paul,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjUyMzkwCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMS40NiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIEZB
-SUwgICAgICAwLjk5IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDM5Ljg2IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuNjUgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgNy43
-NSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAxMjk3LjM5
-IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDExLjM2IHNl
-Y29uZHMKTWFrZSBDaGVjayB3L1ZhbGdyaW5kICAgICAgICAgUEFTUyAgICAgIDQwMy44NCBzZWNv
-bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMTYuMDUgc2Vjb25k
-cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgOC4yNiBzZWNvbmRzCkJ1
-aWxkIHcvZXh0IEVMTCAtIE1ha2UgICAgICAgIFBBU1MgICAgICAxMzA5LjAxIHNlY29uZHMKSW5j
-cmVtZW50YWwgQnVpbGQgd2l0aCBwYXRjaGVzUEFTUyAgICAgIDAuMDAgc2Vjb25kcwoKRGV0YWls
-cwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIEZBSUwKRGVz
-YzogUnVuIGdpdGxpbnQgd2l0aCBydWxlIGluIC5naXRsaW50Ck91dHB1dDoKZGV2aWNlOiBGaXgg
-dGltZW91dD0xIHRvIHJlbW92ZSB0aGUgZGV2aWNlIGltbWVkaWF0ZWx5Cjk6IEIzIExpbmUgY29u
-dGFpbnMgaGFyZCB0YWIgY2hhcmFjdGVycyAoXHQpOiAiCWlmICghdGltZW91dCkiCjEwOiBCMyBM
-aW5lIGNvbnRhaW5zIGhhcmQgdGFiIGNoYXJhY3RlcnMgKFx0KTogIgkJcmV0dXJuOyIKMTM6IEIy
-IExpbmUgaGFzIHRyYWlsaW5nIHdoaXRlc3BhY2U6ICIg44CAIgoKCgoKLS0tClJlZ2FyZHMsCkxp
-bnV4IEJsdWV0b290aAoK
+On 6/20/2022 2:21 PM, Paul Menzel wrote:
+>> Add device specific data for max baudrate in autobaud mode. This 
+>> allows the
+>> host to use a baudrate higher than "init speed" when loading FW in 
+>> autobaud
+>> mode.
+>
+> Please mention 921600 in the commit message, and maybe also document
+> what the current default is.
 
---===============2266728231524586676==--
+Sure, I can do that if I submit a new rev. The default is 115200.
+
+> Please also add the measurement data to the commit message, that means,
+> how much is the time to load the firmware decreased.
+
+The actual load time will depend on the specific FW used but I could add 
+an example. It would be in the order of seconds.
+
+>> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+>> ---
+>>   drivers/bluetooth/hci_bcm.c | 20 ++++++++++++++++----
+>>   1 file changed, 16 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+>> index 0ae627c293c5..d7e0b75db8a6 100644
+>> --- a/drivers/bluetooth/hci_bcm.c
+>> +++ b/drivers/bluetooth/hci_bcm.c
+>> @@ -53,10 +53,12 @@
+>>    * struct bcm_device_data - device specific data
+>>    * @no_early_set_baudrate: Disallow set baudrate before driver setup()
+>>    * @drive_rts_on_open: drive RTS signal on ->open() when platform 
+>> requires it
+>> + * @max_autobaud_speed: max baudrate supported by device in autobaud 
+>> mode
+>>    */
+>>   struct bcm_device_data {
+>>       bool    no_early_set_baudrate;
+>>       bool    drive_rts_on_open;
+>> +     u32     max_autobaud_speed;
+>
+> Why specify the length, and not just `unsigned int`? Maybe also add the
+> unit to the variable name?
+
+See below.
+
+>>   };
+>>
+>>   /**
+>> @@ -100,6 +102,7 @@ struct bcm_device_data {
+>>    * @drive_rts_on_open: drive RTS signal on ->open() when platform 
+>> requires it
+>>    * @pcm_int_params: keep the initial PCM configuration
+>>    * @use_autobaud_mode: start Bluetooth device in autobaud mode
+>> + * @max_autobaud_speed: max baudrate supported by device in autobaud 
+>> mode
+>>    */
+>>   struct bcm_device {
+>>       /* Must be the first member, hci_serdev.c expects this. */
+>> @@ -139,6 +142,7 @@ struct bcm_device {
+>>       bool                    drive_rts_on_open;
+>>       bool                    use_autobaud_mode;
+>>       u8                      pcm_int_params[5];
+>> +     u32                     max_autobaud_speed;
+>
+> Ditto.
+
+I'm trying to following the style of the existing code which already had 
+struct members "oper_speed" and "init_speed" declared as u32.
+
+
+Regards,
+Håkan
