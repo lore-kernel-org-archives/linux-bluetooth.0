@@ -2,140 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8018FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 08:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D69C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 09:06:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347788AbiFUIcJ (ORCPT
+        id S1347120AbiFUJGD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 04:32:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48982 "EHLO
+        Tue, 21 Jun 2022 05:06:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346183AbiFUIcJ (ORCPT
+        with ESMTP id S1348009AbiFUJGC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 04:32:09 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 707D21573A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 01:32:08 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1o3ZIs-00019W-LJ; Tue, 21 Jun 2022 10:32:06 +0200
-Message-ID: <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
-Date:   Tue, 21 Jun 2022 10:32:04 +0200
+        Tue, 21 Jun 2022 05:06:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E309186D0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 02:06:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 883336157F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 09:06:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EDF44C341C6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 09:06:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655802361;
+        bh=JF/axrrJ5KSoPO7eoMzUmWnF837IdlLpP17QKTFe/bk=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=qN9vLfUxrN/F0UMOFm/cmApgcmpJsyKbLf+Sifn2Sh69FbkySdqmWBosj+vawHX0O
+         f8VpH8agxxDtzPj1mvHqKlUkFogI8cOxb/so8GnR7kyhyZJTCvDt9ysF8DqCWQiv/u
+         MfL3mzBSnL5x4kjlTcuE93ZYWkP513U1JcOgzwg2XnB/3Ft6OYib6DuWnhEOyqFsTX
+         kn/u5T182cC2tu49ssd0+eyCjFJp6L105sqothRWE3md2mn+YHnHGttF7SSzYeeC0P
+         YQHI6gI2UT5x6Ln+iwsI2boN+5/Mh2B2AABHgSQLSows8swxispcEKtgfx/xurUhk1
+         lwdrg5pYIoYEw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id CFB3DCC13AD; Tue, 21 Jun 2022 09:06:00 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
+ after each reboot
+Date:   Tue, 21 Jun 2022 09:05:57 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: Krzysztof.Krason@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209745-62941-NS7fxrZ9v5@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
+References: <bug-209745-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [BUG] BLE device unpairing triggers kernel panic
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>
-References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
- <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
- <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
- <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
- <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
- <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
- <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
- <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
 
-On 20.06.22 22:18, Luiz Augusto von Dentz wrote:
-> On Mon, Jun 20, 2022 at 3:06 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> Disconnect of connection #1 being processed after new connection #2
->> concluded sounds wrong. Would I be able to reconnect
->> afterwards or would all connections, but the first, be directly
->> disconnected...?
-> 
-> That depends on the order you have queued the commands, it will be
-> processed in the exact order it is received, that why I said it is
-> single queue design, and it is done like that to prevent messing up
-> with states since we know the exact order the commands will be sent.
-> 
->>> otherwise we need a
->>> different queue to handle command that abort/cancel other already in
->>> the queue.
->>
->> Is the revert an acceptable interim solution or are there issues
->> I am missing?
-> 
-> Afaik there were problem with concurrent connections request, so what
-> would really help us here is to have some tests to emulate this
-> scenario with our CI, in the meantime please check if the following
-> fixes your problem:
-> 
-> https://gist.github.com/Vudentz/b4fff292c7f4ad55ca3299fd5ab797ae
+--- Comment #27 from Krzysztof.Krason@gmail.com ---
+Just adding one another note.
+I didn't have the issue for few months (I'm not sure what I did back then) =
+and
+now when I upgraded to kernel 5.18.5 the issue is back :(
 
-Doesn't help unfortunately. First pairing works as before.
-Second still fails:
+I need to manually connect to my mouse (MX Master 3) and also keyboard (MX =
+Keys
+Mini) and also my bluetooth set (Jabra Elite Active 65t). So it looks like a
+general issue with bluetooth.
 
-  Bluetooth: hci0: Opcode 0x200d failed: -110
-  Bluetooth: hci0: request failed to create LE connection: err -110
+I'm on old Ubuntu 20.04.
 
-Cheers,
-Ahmad
+--=20
+You may reply to this email to add a comment.
 
-> 
->> Cheers,
->> Ahmad
->>
->>>
->>>> We've been deploying the revert for a while now and I just posted
->>>> it to the mailing list[1]. There have been other reports
->>>> of this issue with different hardware too and fixing sent_cmd
->>>> would likely be too complicated/time intensive for me.
->>>>
->>>> I am happy to test future patches that fix this properly though.
->>>>
->>>> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
->>>>
->>>> Cheers,
->>>> Ahmad
->>>>
->>>>
->>>>
->>>>>
->>>>> Cheers,
->>>>> Ahmad
->>>>>
->>>>
->>>>
->>>> --
->>>> Pengutronix e.K.                           |                             |
->>>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->>>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->>>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
->>>
->>>
->>>
->>
->>
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-> 
-> 
-> 
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+You are receiving this mail because:
+You are the assignee for the bug.=
