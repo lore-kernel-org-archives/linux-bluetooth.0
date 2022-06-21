@@ -2,76 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED4E1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 04:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 323DEC43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 05:59:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343796AbiFUEbv (ORCPT
+        id S1344804AbiFUF7j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 00:31:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50860 "EHLO
+        Tue, 21 Jun 2022 01:59:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236377AbiFUEbt (ORCPT
+        with ESMTP id S1344286AbiFUF7c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 00:31:49 -0400
-X-Greylist: delayed 9211 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 20 Jun 2022 21:31:48 PDT
-Received: from smtpbgjp3.qq.com. (smtpbgjp3.qq.com [54.92.39.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50226B7FD
-        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 21:31:48 -0700 (PDT)
-X-QQ-mid: bizesmtp75t1655785902tfvg4y03
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Tue, 21 Jun 2022 12:31:42 +0800 (CST)
-X-QQ-SSF: 01400000000000D0G000000A0000000
-X-QQ-FEAT: xoS364mEyr2n0PaWh1CKP6IurI0fr8dGujIheX7snLbSk9VKXkZQ0SnS9qZIy
-        EcVlo9hN6FonT5IkQ8HQ1UGpCion17MFWT0jfOgwDUDHV9AzG5By/4B8mgSFzxcKC/AzZu8
-        hhFC3K1Ksj4gmEbMLwAEUehW4Iqvt1W2CxRh1VIPt0rm4/h2QRG61MLq8LmOvllOyUnp4gX
-        WHvLBVzPlP/5HVe8FKGP1R5rExWIIlz6gLTZDovfgwTuny6C5jJLKxqWxmnKIIL/pBMWOrU
-        XNNdc9NAJpXf3l9SArQHnizcNEeNq7KP+cHBLY+HQoXYlD+qzX8u43ukLvDBERBnfBc/USM
-        JHUEeYbwqUrqp/bPcw11zmHeGYcjA==
-X-QQ-GoodBg: 1
-From:   Chengyi Zhao <zhaochengyi@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Chengyi <zhaochengyi@uniontech.com>
-Subject: [PATCH BlueZ 1/1] avdtp: Free discover when send_request returns error
-Date:   Tue, 21 Jun 2022 12:31:33 +0800
-Message-Id: <20220621043133.7720-2-zhaochengyi@uniontech.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20220621043133.7720-1-zhaochengyi@uniontech.com>
-References: <20220621043133.7720-1-zhaochengyi@uniontech.com>
+        Tue, 21 Jun 2022 01:59:32 -0400
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E149220C6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 22:59:31 -0700 (PDT)
+Received: by mail-oi1-x236.google.com with SMTP id j10so10117oih.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 20 Jun 2022 22:59:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=3Vsf3RGFHWXEYZaqcAqV/CnpmNdx66mZqeUvbavLKO8=;
+        b=MF1j9hoGXrhIfB1TotBNYdvDwlZW6piiMDbadpPCFxp/PMqL+jUgR0zDdUozgesksl
+         T5VLIHHpHxO9kRLtMZeACgT7jr07zL/chaUr8Dub9UT06Ph4LOzZFBgUn3f3FQ+gl5bb
+         aSge/dtvl3ZDM80dyT7tRpIkJ8LdeUwVnHIU/GsFt0geN2UOXvd9O2y6xrgc0zX6NxXr
+         XPi3UbCzr8x6uLfujNzJQ3pq9C8DpYp9lmccD5uz+crjlG4Qe8cx0vZuxZDCjcfeYCkj
+         s+4RvtYSL1migZcvObz86Xrh0CcitqUuYXWl2CQBPqYcGcI+hNesy13VCuHQL8M8M99G
+         0HSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=3Vsf3RGFHWXEYZaqcAqV/CnpmNdx66mZqeUvbavLKO8=;
+        b=Zt1AgDzA1INJJTnUQQ7ULIL9qURynNyNhiEk2sworck1+dqycfajoXpx1wGpyfBnOl
+         S2l47/zL6w/mwhAt0VYril5APGJJhoFHkq44GAmU6wNMpGmuKLv3T33TNM3V/6WdKnBk
+         GR2ETFLDOn/F+ZXpP4a2UH01qe8FAPnHEn0rrII3WjZzdGfNBqaY6slCx67m9XmJIzwO
+         prmJXPF+fgYgHi2Cpxa+PF6VYDhpm2QbIqvSbEqFg5hMp8kX7R/bPS/AJa5z6PzNh6jo
+         shZb/ETxlpp022Uwvj2KVWcXfa6A/1YorCABM4vmsGd5DqaeUzNA41gNRiHnDPqrumpI
+         1V1g==
+X-Gm-Message-State: AOAM530LW0LWh3+xnGe4FJQ2ntgcPexJJa9yEF5cUw+1tfyR3R49Yi63
+        Y4IZ011S5zfKFbsE6/itFC/1e4MDoaZ+9w==
+X-Google-Smtp-Source: ABdhPJxBcmXCc3cmcOeRQUaCXZ8jLY0CrfsHEM3Gbi8Y61k1ZIE5++piJBvR4uVSYkR7etWrt8qrFQ==
+X-Received: by 2002:aca:da85:0:b0:32e:b063:2451 with SMTP id r127-20020acada85000000b0032eb0632451mr17190748oig.159.1655791170368;
+        Mon, 20 Jun 2022 22:59:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.225.248.15])
+        by smtp.gmail.com with ESMTPSA id 97-20020a9d04ea000000b0060c1798849dsm8868306otm.73.2022.06.20.22.59.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 20 Jun 2022 22:59:30 -0700 (PDT)
+Message-ID: <62b15e42.1c69fb81.f4b69.1a1e@mx.google.com>
+Date:   Mon, 20 Jun 2022 22:59:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9157124559411884977=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign9
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, zhaochengyi@uniontech.com
+Subject: RE: avdtp: Free discover when send_request returns error
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220621043133.7720-2-zhaochengyi@uniontech.com>
+References: <20220621043133.7720-2-zhaochengyi@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chengyi <zhaochengyi@uniontech.com>
+--===============9157124559411884977==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When send_request returns an error, session->discover should
-be released here, so that the next time the program enters
-avdtp_discover, the -EBUSY error will not be returned.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=652185
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.03 seconds
+GitLint                       PASS      0.70 seconds
+Prep - Setup ELL              PASS      49.02 seconds
+Build - Prep                  PASS      0.69 seconds
+Build - Configure             PASS      9.57 seconds
+Build - Make                  PASS      1701.01 seconds
+Make Check                    PASS      11.90 seconds
+Make Check w/Valgrind         PASS      510.19 seconds
+Make Distcheck                PASS      271.21 seconds
+Build w/ext ELL - Configure   PASS      9.61 seconds
+Build w/ext ELL - Make        PASS      1674.08 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- profiles/audio/avdtp.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index bc7afad81..0d2213ea2 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3429,6 +3429,9 @@ int avdtp_discover(struct avdtp *session, avdtp_discover_cb_t cb,
- 	if (err == 0) {
- 		session->discover->cb = cb;
- 		session->discover->user_data = user_data;
-+	} else if (session->discover) {
-+		g_free(session->discover);
-+		session->discover = NULL;
- 	}
- 
- 	return err;
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============9157124559411884977==--
