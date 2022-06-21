@@ -2,159 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EB7FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 14:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EFB1C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 15:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351755AbiFUOiw (ORCPT
+        id S1352669AbiFUPVX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 10:38:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47644 "EHLO
+        Tue, 21 Jun 2022 11:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351744AbiFUOiv (ORCPT
+        with ESMTP id S1352661AbiFUPVV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 10:38:51 -0400
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABEFD22B34
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 07:38:50 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id q15so7620976wmj.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 07:38:50 -0700 (PDT)
+        Tue, 21 Jun 2022 11:21:21 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F0AC286D7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 08:21:20 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id c1so20453542qvi.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Jun 2022 08:21:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=fgAsmHRa0I7boS8KfaFAiezDw43TzbbHvdTT8A1mzvc=;
-        b=fjgiTzrSnM0+9EZN4+GD2LFTOVMK6/CYnddY6bA6LT3kVBxneVuAR/IRd7DD19M95T
-         etHmCVpCNdZ9q5zwc2CgcesKFVzR/mWRY3Tg/G+djiXjlKgzSh6Adex56jqTAVfvnWVo
-         EVy5XBKOS+v2vxkkfIlUKIYUk8i6aNrT2ESpuOJQajB8p9/7uyAPhPqwy4SCWIAt36JN
-         MI4Rmegi1hVM2YKX7ZlqJ+1aFXsKgmSl1JZx9Brrx8KOLUIo9zkWxZ5Q1LruWNj146hr
-         KoqrgsjsXSPzqQH+WE8gng4QpOrnGwIlLzVt+2q7tD+XdE9S9vpp4L+T0jBfNWfX6nlZ
-         vxqA==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Tx4eBPJsEbRebrV3Fp++ZnArAXnMIZudf6we4l0dGjI=;
+        b=oDtdCLIYAg1eN9WzslR0/AC1R4YYOMZ8vTNjep4XgkF608TifZq/cq119BdC+tKlF9
+         aOMBOlYsTLYuBz5jrhgbMo3wrYNZNuNY8GWBDX7JbNjfsaqcvwbeRO4REkA5wmsFB3hp
+         nhTHNs7zFU4r3aM3rZmqqUBnFaDIkJl6nEgXaa1O7lG0vKp/sSv6yN5tD2Ynp6EXwu/v
+         2ibjCe3ziTuOo8NIBsSxu44dptUDXK/cbDU/cphTYbePhXTPipK9ayNSPwx7UuI51lUO
+         5lRD6gl+2E6/ChxvBPpZBr9qbd2JIr1BTEatOmrA/WVbOnaN0SGpgu0XkdjNM6ZiUqin
+         tShg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=fgAsmHRa0I7boS8KfaFAiezDw43TzbbHvdTT8A1mzvc=;
-        b=mHsgx/hjxLc7Nde4nnXK6U85Ge/yYlJp1R/LVUlT+B6KPbGGqpWQ/cUmyCQYT2wvpS
-         Fu9gYa6GXJ3n/VYrzMBvrL6KfsSXrSGIsdWu2rXs9ediS2G8CoXsyMhfyQZWLhq5EuCU
-         Cpyz4o0OTmajmcpN8cPxv4BQJKO4YzCUwdKJH2cRFPhp88O1QqW9rHphKBsRC7VvRi/M
-         NqVvYWjiI40E1PPmvNjzxJDY5ht5lEUbwk5///y4rjYx0eD6K63RZFN6uZL0L6repB2Z
-         tZe273UFW48I50KGT207Lra2aZ7A3+Ch/sKrMowLm7gprUCnDS7o2tnLrWApF+OIizld
-         /xlw==
-X-Gm-Message-State: AJIora9fKC6H4/vtC97c6LobJAq9CQEgiciLMwYJ3olelR0TAVbxcYJZ
-        HEwMfnlpBBw9Od5zUkdPLIvQBg==
-X-Google-Smtp-Source: AGRyM1sNQRrQWpqX4g8bgwJGWY0NhrzcXOBJO6ADZYtWQl2HzembPJy9LgFIsb3r+3mbwmURTA5n3w==
-X-Received: by 2002:a05:600c:a182:b0:39e:fea2:c5d6 with SMTP id id2-20020a05600ca18200b0039efea2c5d6mr12746841wmb.54.1655822329201;
-        Tue, 21 Jun 2022 07:38:49 -0700 (PDT)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id e16-20020adfdbd0000000b0021b91ec8f6esm5175694wrj.67.2022.06.21.07.38.48
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Tx4eBPJsEbRebrV3Fp++ZnArAXnMIZudf6we4l0dGjI=;
+        b=wRwjtDd0eecyuN1XD9Cj5GA7UqKppaGLs9Y161DR+V+DLt61YiVkW8VsyGVSamFFYs
+         vGMd5Go/rCX600mm1msYT5zyclqjNq7iHBJ3sU1+53YhyOA5v0hwXdO3fEH5OKRJau9Q
+         yJuwc2MEsIliPY6ZgXYxbuuvqCeSfqZEdUusI/mzh1AL8jiFV5MYWRTOlkzoAOe+gVLG
+         T3gDN+F1LpDgVxa3Z25mKwwIqyO2x91cnZLkeQ2GJ5rXjhLp48bLYYxLxG9CmOTmN9Wz
+         NtbYiS2P6LfFc4Sncelyr/q0Kx3sIGmmUZtULi79HBgZ6NvqNCuU4cw112WV5ee1LL0L
+         A22Q==
+X-Gm-Message-State: AJIora+gUuLpFxBGnEOj/GPZPpGMMhko8Ws6PENvnpS93PLwz+9Pl/G9
+        ZKosBgrYQNZzlVCkjjmxNazIEtT2NFRsSg==
+X-Google-Smtp-Source: AGRyM1sCiJ9RCRGpPsvgptiNmCteHtNBp+Vhq6hvPxW16JyTH4IfK6hwpbtfN50L5eaegbjnQVEX/g==
+X-Received: by 2002:ac8:4e94:0:b0:305:fca:8740 with SMTP id 20-20020ac84e94000000b003050fca8740mr24776718qtp.378.1655824879195;
+        Tue, 21 Jun 2022 08:21:19 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.63.167])
+        by smtp.gmail.com with ESMTPSA id i3-20020a05622a08c300b002f92b74ba99sm12325270qte.13.2022.06.21.08.21.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 07:38:48 -0700 (PDT)
-Date:   Tue, 21 Jun 2022 15:38:46 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     linux-kernel@vger.kernel.org, stable@kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/1] Bluetooth: Use chan_list_lock to protect the whole
- put/destroy invokation
-Message-ID: <YrHX9pj/f0tkqJis@google.com>
-References: <20220607134709.373344-1-lee.jones@linaro.org>
+        Tue, 21 Jun 2022 08:21:18 -0700 (PDT)
+Message-ID: <62b1e1ee.1c69fb81.1dd09.5d50@mx.google.com>
+Date:   Tue, 21 Jun 2022 08:21:18 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2266728231524586676=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220607134709.373344-1-lee.jones@linaro.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
+Subject: RE: device: Fix timeout=1 to remove the device immediately
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220621134818.11515-1-wangyouwan@uniontech.com>
+References: <20220621134818.11515-1-wangyouwan@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 07 Jun 2022, Lee Jones wrote:
+--===============2266728231524586676==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-> This change prevents a use-after-free caused by one of the worker
-> threads starting up (see below) *after* the final channel reference
-> has been put() during sock_close() but *before* the references to the
-> channel have been destroyed.
-> 
->   refcount_t: increment on 0; use-after-free.
->   BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
->   Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
-> 
->   CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.234-00003-g1fb6d0bd49a4-dirty #28
->   Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google Inc. MSM sm8150 Flame DVT (DT)
->   Workqueue: hci0 hci_rx_work
->   Call trace:
->    dump_backtrace+0x0/0x378
->    show_stack+0x20/0x2c
->    dump_stack+0x124/0x148
->    print_address_description+0x80/0x2e8
->    __kasan_report+0x168/0x188
->    kasan_report+0x10/0x18
->    __asan_load4+0x84/0x8c
->    refcount_dec_and_test+0x20/0xd0
->    l2cap_chan_put+0x48/0x12c
->    l2cap_recv_frame+0x4770/0x6550
->    l2cap_recv_acldata+0x44c/0x7a4
->    hci_acldata_packet+0x100/0x188
->    hci_rx_work+0x178/0x23c
->    process_one_work+0x35c/0x95c
->    worker_thread+0x4cc/0x960
->    kthread+0x1a8/0x1c4
->    ret_from_fork+0x10/0x18
-> 
-> Cc: stable@kernel.org
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> ---
->  net/bluetooth/l2cap_core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjUyMzkwCgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMS40NiBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIEZB
+SUwgICAgICAwLjk5IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDM5Ljg2IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNjUgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgNy43
+NSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIFBBU1MgICAgICAxMjk3LjM5
+IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgUEFTUyAgICAgIDExLjM2IHNl
+Y29uZHMKTWFrZSBDaGVjayB3L1ZhbGdyaW5kICAgICAgICAgUEFTUyAgICAgIDQwMy44NCBzZWNv
+bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMTYuMDUgc2Vjb25k
+cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgOC4yNiBzZWNvbmRzCkJ1
+aWxkIHcvZXh0IEVMTCAtIE1ha2UgICAgICAgIFBBU1MgICAgICAxMzA5LjAxIHNlY29uZHMKSW5j
+cmVtZW50YWwgQnVpbGQgd2l0aCBwYXRjaGVzUEFTUyAgICAgIDAuMDAgc2Vjb25kcwoKRGV0YWls
+cwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIEZBSUwKRGVz
+YzogUnVuIGdpdGxpbnQgd2l0aCBydWxlIGluIC5naXRsaW50Ck91dHB1dDoKZGV2aWNlOiBGaXgg
+dGltZW91dD0xIHRvIHJlbW92ZSB0aGUgZGV2aWNlIGltbWVkaWF0ZWx5Cjk6IEIzIExpbmUgY29u
+dGFpbnMgaGFyZCB0YWIgY2hhcmFjdGVycyAoXHQpOiAiCWlmICghdGltZW91dCkiCjEwOiBCMyBM
+aW5lIGNvbnRhaW5zIGhhcmQgdGFiIGNoYXJhY3RlcnMgKFx0KTogIgkJcmV0dXJuOyIKMTM6IEIy
+IExpbmUgaGFzIHRyYWlsaW5nIHdoaXRlc3BhY2U6ICIg44CAIgoKCgoKLS0tClJlZ2FyZHMsCkxp
+bnV4IEJsdWV0b290aAoK
 
-No reply for 2 weeks.
-
-Is this patch being considered at all?
-
-Can I help in any way?
-
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index ae78490ecd3d4..82279c5919fd8 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
->  
->  	BT_DBG("chan %p", chan);
->  
-> -	write_lock(&chan_list_lock);
->  	list_del(&chan->global_l);
-> -	write_unlock(&chan_list_lock);
->  
->  	kfree(chan);
->  }
-> @@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
->  {
->  	BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
->  
-> +	write_lock(&chan_list_lock);
->  	kref_put(&c->kref, l2cap_chan_destroy);
-> +	write_unlock(&chan_list_lock);
->  }
->  EXPORT_SYMBOL_GPL(l2cap_chan_put);
->  
-
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+--===============2266728231524586676==--
