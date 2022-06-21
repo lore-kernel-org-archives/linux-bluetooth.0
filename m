@@ -2,156 +2,170 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D78BCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 17:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5BC1C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Jun 2022 18:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352798AbiFURPk (ORCPT
+        id S236077AbiFUSgG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Jun 2022 13:15:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49898 "EHLO
+        Tue, 21 Jun 2022 14:36:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234333AbiFURPj (ORCPT
+        with ESMTP id S229869AbiFUSgF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Jun 2022 13:15:39 -0400
-Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4E5B2A409;
-        Tue, 21 Jun 2022 10:15:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
-  t=1655831739; x=1687367739;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Oa2rFnX3lqAyXLuHHr44CEvOkTd44U44GyCOxUF6RI0=;
-  b=JgfNab0jsVFLcg6DAs9p0mv7ewySupTyrNWB+hYGj/rep0czFeU+wAyK
-   ORJIrjyMTxCeqylZKwmroMTEHl3vd/UWBa2YSqax/HRdZBX4sB/hJhAYJ
-   44mADZVLLyzDRE66yXYpwwA8e3gJNWRNsATADYxL5VPZCaJqWrLWODJpk
-   A=;
-X-SBRS: None
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="127395062"
-X-IronPort-AV: E=Sophos;i="5.92,209,1650924000"; 
-   d="scan'208";a="127395062"
-Received: from unknown (HELO mucxv001.muc.infineon.com) ([172.23.11.16])
-  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2022 19:15:36 +0200
-Received: from MUCSE822.infineon.com (MUCSE822.infineon.com [172.23.29.53])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mucxv001.muc.infineon.com (Postfix) with ESMTPS;
-        Tue, 21 Jun 2022 19:15:36 +0200 (CEST)
-Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE822.infineon.com
- (172.23.29.53) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 21 Jun
- 2022 19:15:35 +0200
-Received: from [10.160.196.13] (172.23.8.247) by MUCSE807.infineon.com
- (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 21 Jun
- 2022 19:15:34 +0200
-Message-ID: <72cd312f-f843-6a85-b9e7-db8fcb952af8@infineon.com>
-Date:   Tue, 21 Jun 2022 19:15:33 +0200
+        Tue, 21 Jun 2022 14:36:05 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07787255B5;
+        Tue, 21 Jun 2022 11:36:04 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id i18so10187732lfu.8;
+        Tue, 21 Jun 2022 11:36:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=PS4K/kn6NjTOzcvIzP8OtIS0qJRtLD3yztBTOV02sn0=;
+        b=Nq5uuomhRWpTGO5FdD6ZpSa4orNR0MwFc72q0jeWthe6EygDTAoquDA7zuLlBZGodf
+         IUpoAwirz8aJze/1c24QdNHFglnC/sjYb8zNoktRXoRPf9O6Ez5LlAzte3UqM0zKN+VD
+         YzKuVqeofQ0K7md8ZX4biOGanq1y8kUTBfIbjFbok4QSQ4ow6lFx0zk0o12LBwwopiTE
+         SGJx9APggg3RXKy6mQjlgZvAUaF/GYXCikTZdE3KWfF5vV1qoWgzHSAU6v1kmuV0vQht
+         zllSuQu5xi8vc8l7enQJSjQqAie22nuFJNAdLLvRVtcUqFr3xKNXtx5zGN5HjXZC2cfV
+         sVOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=PS4K/kn6NjTOzcvIzP8OtIS0qJRtLD3yztBTOV02sn0=;
+        b=l+zJaGJSHx3nFVOouOEq2suM6n3/4Ni/OS4w0nMTqKPivKEZ61kZ/FdD0b27qFg5/i
+         jswEK3E5tiSgVXlfAtCxewtE+zf+vxemdrO2XleBXeHbRa08rC3RNMYzTPZx18sDcjXJ
+         7H3GQZMbcgMxrZ62D3Jho6HYbAi0TVhilVaqkDnlQoyGQmFvcYE8/7tk/Mqj3yZJxOmD
+         PrSyak0x+qqgOqbuc0OQsEn2hpUx7/0+jgC3WpHrpwM2oKATvW6l5tG4ZXX61qrC8vHS
+         jvlSRQteVN55PrF99H8zifai++2ZOzQCDjIR0zgeUZYCMaWxzEu7N2erF6L8f170a99U
+         NqYw==
+X-Gm-Message-State: AJIora+NGSdFteohKAcfndqTD91QEN5cg9kXLRsDEQxrbtQ4HSAPXOxb
+        skg8+wFK6Zqvj7ym/Sl67L/48d2L+9EeJbTsiCk=
+X-Google-Smtp-Source: AGRyM1saO3ekyPYvPVEk/8JJxJyEo1kLCKqH6Kzv9ytrVjroEiwKVpa9pdmKB2tTW5G77v/3hY33HkdbULtR+DuvCAw=
+X-Received: by 2002:a05:6512:31d4:b0:479:78d:9c96 with SMTP id
+ j20-20020a05651231d400b00479078d9c96mr17716632lfe.121.1655836562193; Tue, 21
+ Jun 2022 11:36:02 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 4/4] Bluetooth: hci_bcm: Increase host baudrate for
- CYW55572 in autobaud mode
-Content-Language: en-US
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-CC:     "David S. Miller" <davem@davemloft.net>,
+References: <20220607134709.373344-1-lee.jones@linaro.org> <YrHX9pj/f0tkqJis@google.com>
+In-Reply-To: <YrHX9pj/f0tkqJis@google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 21 Jun 2022 11:35:50 -0700
+Message-ID: <CABBYNZKniL5Y8r0ztFC0s2PEx3GA5YtKeG7of_vMRvqArjeMpw@mail.gmail.com>
+Subject: Re: [PATCH 1/1] Bluetooth: Use chan_list_lock to protect the whole
+ put/destroy invokation
+To:     Lee Jones <lee.jones@linaro.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        stable@kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>
-References: <cover.1655723462.git.hakan.jansson@infineon.com>
- <386b205422099c795272ad8b792091b692def3cd.1655723462.git.hakan.jansson@infineon.com>
- <1a554d8e-c479-f646-ce9d-25871affbcee@molgen.mpg.de>
-From:   Hakan Jansson <hakan.jansson@infineon.com>
-In-Reply-To: <1a554d8e-c479-f646-ce9d-25871affbcee@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [172.23.8.247]
-X-ClientProxiedBy: MUCSE824.infineon.com (172.23.29.55) To
- MUCSE807.infineon.com (172.23.29.33)
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+Hi Lee,
 
-On 6/20/2022 2:21 PM, Paul Menzel wrote:
->> Add device specific data for max baudrate in autobaud mode. This 
->> allows the
->> host to use a baudrate higher than "init speed" when loading FW in 
->> autobaud
->> mode.
+On Tue, Jun 21, 2022 at 7:38 AM Lee Jones <lee.jones@linaro.org> wrote:
 >
-> Please mention 921600 in the commit message, and maybe also document
-> what the current default is.
-
-Sure, I can do that if I submit a new rev. The default is 115200.
-
-> Please also add the measurement data to the commit message, that means,
-> how much is the time to load the firmware decreased.
-
-The actual load time will depend on the specific FW used but I could add 
-an example. It would be in the order of seconds.
-
->> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
->> ---
->>   drivers/bluetooth/hci_bcm.c | 20 ++++++++++++++++----
->>   1 file changed, 16 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
->> index 0ae627c293c5..d7e0b75db8a6 100644
->> --- a/drivers/bluetooth/hci_bcm.c
->> +++ b/drivers/bluetooth/hci_bcm.c
->> @@ -53,10 +53,12 @@
->>    * struct bcm_device_data - device specific data
->>    * @no_early_set_baudrate: Disallow set baudrate before driver setup()
->>    * @drive_rts_on_open: drive RTS signal on ->open() when platform 
->> requires it
->> + * @max_autobaud_speed: max baudrate supported by device in autobaud 
->> mode
->>    */
->>   struct bcm_device_data {
->>       bool    no_early_set_baudrate;
->>       bool    drive_rts_on_open;
->> +     u32     max_autobaud_speed;
+> On Tue, 07 Jun 2022, Lee Jones wrote:
 >
-> Why specify the length, and not just `unsigned int`? Maybe also add the
-> unit to the variable name?
-
-See below.
-
->>   };
->>
->>   /**
->> @@ -100,6 +102,7 @@ struct bcm_device_data {
->>    * @drive_rts_on_open: drive RTS signal on ->open() when platform 
->> requires it
->>    * @pcm_int_params: keep the initial PCM configuration
->>    * @use_autobaud_mode: start Bluetooth device in autobaud mode
->> + * @max_autobaud_speed: max baudrate supported by device in autobaud 
->> mode
->>    */
->>   struct bcm_device {
->>       /* Must be the first member, hci_serdev.c expects this. */
->> @@ -139,6 +142,7 @@ struct bcm_device {
->>       bool                    drive_rts_on_open;
->>       bool                    use_autobaud_mode;
->>       u8                      pcm_int_params[5];
->> +     u32                     max_autobaud_speed;
+> > This change prevents a use-after-free caused by one of the worker
+> > threads starting up (see below) *after* the final channel reference
+> > has been put() during sock_close() but *before* the references to the
+> > channel have been destroyed.
+> >
+> >   refcount_t: increment on 0; use-after-free.
+> >   BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
+> >   Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
+> >
+> >   CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.2=
+34-00003-g1fb6d0bd49a4-dirty #28
+> >   Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google In=
+c. MSM sm8150 Flame DVT (DT)
+> >   Workqueue: hci0 hci_rx_work
+> >   Call trace:
+> >    dump_backtrace+0x0/0x378
+> >    show_stack+0x20/0x2c
+> >    dump_stack+0x124/0x148
+> >    print_address_description+0x80/0x2e8
+> >    __kasan_report+0x168/0x188
+> >    kasan_report+0x10/0x18
+> >    __asan_load4+0x84/0x8c
+> >    refcount_dec_and_test+0x20/0xd0
+> >    l2cap_chan_put+0x48/0x12c
+> >    l2cap_recv_frame+0x4770/0x6550
+> >    l2cap_recv_acldata+0x44c/0x7a4
+> >    hci_acldata_packet+0x100/0x188
+> >    hci_rx_work+0x178/0x23c
+> >    process_one_work+0x35c/0x95c
+> >    worker_thread+0x4cc/0x960
+> >    kthread+0x1a8/0x1c4
+> >    ret_from_fork+0x10/0x18
+> >
+> > Cc: stable@kernel.org
+> > Cc: Marcel Holtmann <marcel@holtmann.org>
+> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > Cc: linux-bluetooth@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
+> > ---
+> >  net/bluetooth/l2cap_core.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> Ditto.
+> No reply for 2 weeks.
+>
+> Is this patch being considered at all?
+>
+> Can I help in any way?
 
-I'm trying to following the style of the existing code which already had 
-struct members "oper_speed" and "init_speed" declared as u32.
+Could you please resend to trigger CI, looks like CI missed this one
+for some reason.
+
+>
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index ae78490ecd3d4..82279c5919fd8 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
+> >
+> >       BT_DBG("chan %p", chan);
+> >
+> > -     write_lock(&chan_list_lock);
+> >       list_del(&chan->global_l);
+> > -     write_unlock(&chan_list_lock);
+> >
+> >       kfree(chan);
+> >  }
+> > @@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
+> >  {
+> >       BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
+> >
+> > +     write_lock(&chan_list_lock);
+> >       kref_put(&c->kref, l2cap_chan_destroy);
+> > +     write_unlock(&chan_list_lock);
+> >  }
+> >  EXPORT_SYMBOL_GPL(l2cap_chan_put);
+> >
+>
+> --
+> Lee Jones [=E6=9D=8E=E7=90=BC=E6=96=AF]
+> Principal Technical Lead - Developer Services
+> Linaro.org =E2=94=82 Open source software for Arm SoCs
+> Follow Linaro: Facebook | Twitter | Blog
 
 
-Regards,
-Håkan
+
+--=20
+Luiz Augusto von Dentz
