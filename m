@@ -2,175 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F675C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 07:51:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18786CCA47D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 08:29:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351776AbiFVHvq (ORCPT
+        id S1352459AbiFVI3a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jun 2022 03:51:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
+        Wed, 22 Jun 2022 04:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350126AbiFVHvl (ORCPT
+        with ESMTP id S1354199AbiFVI2b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jun 2022 03:51:41 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36761150
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 00:51:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655884300; x=1687420300;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=e2syKXDtdhHzZq0jk82oQln9zKq/BcWeQDZ5bs7oYcw=;
-  b=Ssc63UG5jD/riPJ92sRxklflEi5hMf19Xgi04KtEICG7u2gealICpKfq
-   CouJtdKFldyBQ9KW8hp3Cyun5zlTSQ35y8jAlAjTy2xUD6O9R8uHvucKg
-   NTtslao0Y07tBKOpcQTvgdkIItwgWSHkg1F5zNACEHxkjYcfCt/5vAFib
-   ksn72Ci2Z9Kmzcv7UTMe0hM37tyCHN4qJycDwwlvIVUMvSo9+5Z8oJXzM
-   iTqEnwI2WSYo9BB6bvkX9vsFvQiEhBhp/x2iMuba5kvnCLqKqbe5lJdWo
-   CV5YYi0oxH8miBMwOMOVYzAL5RmuyOGAtZ/3iEIrc4cKK5amuccYN+40N
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="344336626"
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="344336626"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2022 00:51:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,212,1650956400"; 
-   d="scan'208";a="538362319"
-Received: from lkp-server02.sh.intel.com (HELO a67cc04a5eeb) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 22 Jun 2022 00:51:39 -0700
-Received: from kbuild by a67cc04a5eeb with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o3v9G-000114-0j;
-        Wed, 22 Jun 2022 07:51:38 +0000
-Date:   Wed, 22 Jun 2022 15:51:27 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- d9cc9d78ca85210132c7a7cbe75975db16464390
-Message-ID: <62b2c9ff.hcWou28kl7qhjZWo%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 22 Jun 2022 04:28:31 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7022339172
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 01:27:26 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id j24so1572802wrb.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 01:27:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yHEkZ4f8EPJnKRi58/HD9Y5sbQwKZUo9tMe5hK1B3uM=;
+        b=djvq1G5LNo0VLBefGWrMkuEjf+FmzOFlU/laH4dizg7t8aPiRpSXSR/nA2db8bbc03
+         SxIXVGW7jQ2IHOd96Gt6nccU4AKYsAScPf0KJiObTCicw5Ym9B23j8JwkSBhABa7QwW+
+         RD5EHro7doNCDsSiGd6bkAK4nwDNAF7jbkOnl23Hzi6kVEypyGpJvlhBM8MQJ9LfPGTl
+         zbX1+/1620eJpyCWSFHX94C4dHTZo8g+RH8bnxFGgDIuTcIkDz+xX/SYzDe/6JVg3CXL
+         C4YJyynPnFPVqvNu1e/8B+lEoQwswodoj3fSqxBf8iEs0Y0yjZ3wmCD0JqdQSwTv40n+
+         KgNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yHEkZ4f8EPJnKRi58/HD9Y5sbQwKZUo9tMe5hK1B3uM=;
+        b=ZoVa90qAq/Jxe1ayG9Q5ceOH8A/8VggrMVIQ61Wt/Qk9d6aOS2xc6Bh0RZBfF2vFHT
+         Mym7J7uECnh4WWq9kDm+b/KSEaa4iq38TMVSdrY16nP8srjZczF9BicePiMCkOigCqfU
+         3I3k8HuWONw3iZ9cMbqbHinkJvHuKNxwodvsJ7kKzVoWJxKN1D0NLkRpr6sYrQxynOf2
+         mAYsBkxgvo1uH0TuFXU54O98mNcil0pofhEokBoi+M8ceTqe9krADkHc/hu16wvasD7O
+         XvUCZjpvu4Byo5gKHBzcLickWVyjOwgb7EGpfwmm8nm5W7o4WSKzoAs8a9XohK2kaViK
+         c+yg==
+X-Gm-Message-State: AJIora8Vn5GeU3q1NluHCHhF3H6hNdbwPSocyIU+RvKJWUeCNspEi+Ou
+        JrqZwn0odeNvuf5Ktx83vG+Qaw==
+X-Google-Smtp-Source: AGRyM1soJWg//Zzca+Z03MzWthu6TXIUlwOvwmKxduEf/gUdv2NVMtKrSG7Fur/W2gUv96vBiSkPNQ==
+X-Received: by 2002:a5d:52d2:0:b0:21b:8507:a68 with SMTP id r18-20020a5d52d2000000b0021b85070a68mr1998726wrv.643.1655886440423;
+        Wed, 22 Jun 2022 01:27:20 -0700 (PDT)
+Received: from joneslee-l.cable.virginm.net (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
+        by smtp.gmail.com with ESMTPSA id x5-20020a5d54c5000000b0021b88ec99cesm11145871wrv.94.2022.06.22.01.27.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 01:27:20 -0700 (PDT)
+From:   Lee Jones <lee.jones@linaro.org>
+To:     lee.jones@linaro.org
+Cc:     linux-kernel@vger.kernel.org, stable@kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [RESEND 1/1] Bluetooth: Use chan_list_lock to protect the whole put/destroy invokation
+Date:   Wed, 22 Jun 2022 09:27:16 +0100
+Message-Id: <20220622082716.478486-1-lee.jones@linaro.org>
+X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: d9cc9d78ca85210132c7a7cbe75975db16464390  Bluetooth: mgmt: Fix refresh cached connection info
+This change prevents a use-after-free caused by one of the worker
+threads starting up (see below) *after* the final channel reference
+has been put() during sock_close() but *before* the references to the
+channel have been destroyed.
 
-elapsed time: 724m
+  refcount_t: increment on 0; use-after-free.
+  BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
+  Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
 
-configs tested: 98
-configs skipped: 3
+  CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.234-00003-g1fb6d0bd49a4-dirty #28
+  Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google Inc. MSM sm8150 Flame DVT (DT)
+  Workqueue: hci0 hci_rx_work
+  Call trace:
+   dump_backtrace+0x0/0x378
+   show_stack+0x20/0x2c
+   dump_stack+0x124/0x148
+   print_address_description+0x80/0x2e8
+   __kasan_report+0x168/0x188
+   kasan_report+0x10/0x18
+   __asan_load4+0x84/0x8c
+   refcount_dec_and_test+0x20/0xd0
+   l2cap_chan_put+0x48/0x12c
+   l2cap_recv_frame+0x4770/0x6550
+   l2cap_recv_acldata+0x44c/0x7a4
+   hci_acldata_packet+0x100/0x188
+   hci_rx_work+0x178/0x23c
+   process_one_work+0x35c/0x95c
+   worker_thread+0x4cc/0x960
+   kthread+0x1a8/0x1c4
+   ret_from_fork+0x10/0x18
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Cc: stable@kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Lee Jones <lee.jones@linaro.org>
+---
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-gcc tested configs:
-arm64                            allyesconfig
-arm                                 defconfig
-arm                              allyesconfig
-i386                          randconfig-c001
-sh                           se7780_defconfig
-powerpc                 mpc8540_ads_defconfig
-powerpc                     mpc83xx_defconfig
-sh                          urquell_defconfig
-sparc                       sparc64_defconfig
-m68k                          multi_defconfig
-alpha                            alldefconfig
-mips                       bmips_be_defconfig
-powerpc                      mgcoge_defconfig
-arm                        shmobile_defconfig
-arc                          axs103_defconfig
-arm                           stm32_defconfig
-ia64                             alldefconfig
-sh                                  defconfig
-ia64                      gensparse_defconfig
-mips                           ci20_defconfig
-xtensa                  nommu_kc705_defconfig
-sh                           se7724_defconfig
-arm                        realview_defconfig
-powerpc                     redwood_defconfig
-powerpc                 mpc837x_rdb_defconfig
-powerpc                         wii_defconfig
-sh                          sdk7786_defconfig
-arm                         axm55xx_defconfig
-arc                 nsimosci_hs_smp_defconfig
-sh                   sh7770_generic_defconfig
-powerpc                      ppc6xx_defconfig
-mips                            ar7_defconfig
-arm                      integrator_defconfig
-um                             i386_defconfig
-arm                         vf610m4_defconfig
-powerpc                      pasemi_defconfig
-m68k                            q40_defconfig
-sh                          kfr2r09_defconfig
-riscv                               defconfig
-arm                         lubbock_defconfig
-m68k                        mvme147_defconfig
-sh                          rsk7201_defconfig
-x86_64                        randconfig-c001
-arm                  randconfig-c002-20220622
-riscv                             allnoconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-m68k                             allyesconfig
-powerpc                           allnoconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-sh                               allmodconfig
-i386                             allyesconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                        randconfig-a015
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-arc                  randconfig-r043-20220622
-riscv                    nommu_virt_defconfig
-riscv                          rv32_defconfig
-riscv                    nommu_k210_defconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-x86_64                              defconfig
-x86_64                           allyesconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-
-clang tested configs:
-s390                             alldefconfig
-mips                        qi_lb60_defconfig
-mips                      maltaaprp_defconfig
-x86_64                        randconfig-k001
-x86_64                        randconfig-a005
-x86_64                        randconfig-a003
-x86_64                        randconfig-a001
-i386                          randconfig-a002
-i386                          randconfig-a006
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a011
-i386                          randconfig-a013
-i386                          randconfig-a015
-hexagon              randconfig-r041-20220622
-s390                 randconfig-r044-20220622
-hexagon              randconfig-r045-20220622
-riscv                randconfig-r042-20220622
-
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ae78490ecd3d4..82279c5919fd8 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
+ 
+ 	BT_DBG("chan %p", chan);
+ 
+-	write_lock(&chan_list_lock);
+ 	list_del(&chan->global_l);
+-	write_unlock(&chan_list_lock);
+ 
+ 	kfree(chan);
+ }
+@@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
+ {
+ 	BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
+ 
++	write_lock(&chan_list_lock);
+ 	kref_put(&c->kref, l2cap_chan_destroy);
++	write_unlock(&chan_list_lock);
+ }
+ EXPORT_SYMBOL_GPL(l2cap_chan_put);
+ 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.36.1.255.ge46751e96f-goog
+
