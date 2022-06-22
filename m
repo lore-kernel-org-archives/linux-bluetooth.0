@@ -2,146 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E306FC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 19:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF6AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 19:43:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377540AbiFVTA5 (ORCPT
+        id S1376300AbiFVTnN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jun 2022 15:00:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48170 "EHLO
+        Wed, 22 Jun 2022 15:43:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1377503AbiFVTA4 (ORCPT
+        with ESMTP id S1359347AbiFVTnL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jun 2022 15:00:56 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2F633C709
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 12:00:55 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id t21so10647234pfq.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 12:00:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=h9NldJzkM5PkmiLllXyVKHbrFwborg8k7+tu71hGN7k=;
-        b=hRPEgwsD5iByPt6DlT52cpQTddM4yrC2Voyh4zi56dtLI7T2xIB8W+GQOvpxPH6ZHg
-         jRMTysWIFPAe3GOezBr7GMD/toWo/toyNF8f1FFntzeA5icZmK3bwP0xTMPPDWpeMdAJ
-         nBR6etWf3xuAOpTtlABYktL3hGSRPO+2mshFyFnLYdsMeqqYWmxrTNPdZYQSf/D8aYgN
-         jRJKQ3SKCQo+L43NRCyZaj6uX1HdDA8kRmxUPlk9BzOMyK+aB+ozsdB1RMtzVab6jOcb
-         CV7q5wsZ7hBb1YUdGru6aExA0auD5gDFvgM2Mj1XA1aaqAAMyWIUSoM5enSYrppexSYc
-         JpSA==
+        Wed, 22 Jun 2022 15:43:11 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8741013E27
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 12:43:09 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id b11-20020a92340b000000b002d3dbbc7b15so11656999ila.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 12:43:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=h9NldJzkM5PkmiLllXyVKHbrFwborg8k7+tu71hGN7k=;
-        b=hrXVITVos8/QM5lkQom7dTRtL0+/PHPxE4maExMDvcW7FgO0DBh8KyGB87Qdw6ruXy
-         tiMO2pj3z82DGbhQvjis4b1CxS2z3ZHJ9+y0Equ9klUggPJ+NiBJY/j3H3r5gJPnV8Oz
-         wiZwcs0mNzEQ1GJxejrV536YImalhgl+zzOS2WI+fwipRq5XdAEkAXVRSdy3Fj+mcRxN
-         olG5fCAlECpf0R6i5SEXPRaJjtrMGOZ76ov+z2bu+oEPnQGYTIPGZ8l8rWKXw9NkC+E1
-         qbaakaEjPrMzqUMWXbIFWB5Vg5AlxlkykRWniiWGvZcITkj3fIY5f92lJrEC0KG1qE0T
-         CuOw==
-X-Gm-Message-State: AJIora9DAyt1sLuWuVFqGwnvusGMnprmhfbI6w9aPNJhNgdbiM6AkDOa
-        jkRPyBV1ujYZOjYqgvZmIc+Q+Xzyv734fA==
-X-Google-Smtp-Source: AGRyM1vk7O+3Irc8mD3YiH6UR+Rox4zaFe6Pj4CeG0v7p4PilOF58yTNE9o0uyBHkcWO76XKRcsiig==
-X-Received: by 2002:a05:6a00:2447:b0:520:6b82:6dfd with SMTP id d7-20020a056a00244700b005206b826dfdmr36804106pfj.39.1655924454842;
-        Wed, 22 Jun 2022 12:00:54 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902a3c500b0016a38fa3f95sm3991999plb.118.2022.06.22.12.00.54
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 12:00:54 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] device: Fix not removing when connected
-Date:   Wed, 22 Jun 2022 12:00:53 -0700
-Message-Id: <20220622190053.2605233-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=4OG3JNBrKZLM5Nj65eYO+3GhL5W3BfIxkELhNmo04tU=;
+        b=yR76Ve+2tcHeGF0dMqc2ONb7XLfZYUxK6iW9V7X06eFCfuXtAhi0o8VeCilJ91Y4sE
+         uo5SkraoxP19EOAmO1pjCo6oryYrzO1T+vPzL9KmTse0d2g9hpsRpw/BHy1abxFOuuYl
+         qJzG/gYNeOWEDMT7H3nVNzSbKawMqmp4vy1ltATVflS0kwqSJB7o1CZD983bd5RKZ2Dt
+         tgeSi13qAxuc6pOvxfAYuNPIMkDJUk9S9kcPMbgwlBXBeHyy068WMEwUiyUDZUFGCUCC
+         vvprmrTkaRwhfVAzCOa/dsWQ3tmd8VDDPBPVgw8SrQ+CBAkgpXvaJkKEE8c+G46pUIRl
+         MTIQ==
+X-Gm-Message-State: AJIora/7PGNttXp8RuLLgDgl/Oyt3dgARukDsT19qCHxs34V9QL1Ijvx
+        0PqcxfifixSfpWLkEWS/rlJKJ7bo4me9bLWlqtaIgxNglP01
+X-Google-Smtp-Source: AGRyM1tWX1L/At4A4DeZPe1TDB+uFjQewlzP9hHMsstdwwNphBkwnvetr+rGJG2CdxKpB9VzzNafv8p3hXEeIlPx0GLeSO17pEGo
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:5:b0:339:e628:b96c with SMTP id
+ z5-20020a056638000500b00339e628b96cmr533882jao.203.1655926988375; Wed, 22 Jun
+ 2022 12:43:08 -0700 (PDT)
+Date:   Wed, 22 Jun 2022 12:43:08 -0700
+In-Reply-To: <000000000000113adf05e0704621@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ea8d3305e20e8bfa@google.com>
+Subject: Re: [syzbot] INFO: task hung in hci_power_on
+From:   syzbot <syzbot+8d7b9ced2a99394b0a50@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, hdanton@sina.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+syzbot has bisected this issue to:
 
-RemoveDevice causes the device to disconnect when connected but that
-would result in calling set_temporary_timer with 0 timeout which would
-only clear the timer but it doesn't program a timeout so
-device_disappeared is never called, so instead of using temporary
-timeout to cleanup this passes a variable which is set when to indicate
-that the device shall be removed.
----
- src/adapter.c | 9 ++++++++-
- src/device.c  | 7 ++++---
- src/device.h  | 3 ++-
- 3 files changed, 14 insertions(+), 5 deletions(-)
+commit d0b137062b2de75b264b84143d21c98abc5f5ad2
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Wed Oct 27 23:58:59 2021 +0000
 
-diff --git a/src/adapter.c b/src/adapter.c
-index afefa1d5d..43884cf15 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7171,6 +7171,8 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 						struct btd_device *device,
- 						uint8_t bdaddr_type)
- {
-+	bool remove;
-+
- 	DBG("");
- 
- 	if (!g_slist_find(adapter->connections, device)) {
-@@ -7178,7 +7180,12 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		return;
- 	}
- 
--	device_remove_connection(device, bdaddr_type);
-+	device_remove_connection(device, bdaddr_type, &remove);
-+
-+	if (remove) {
-+		btd_adapter_remove_device(adapter, device);
-+		return;
-+	}
- 
- 	if (device_is_authenticating(device))
- 		device_cancel_authentication(device, TRUE);
-diff --git a/src/device.c b/src/device.c
-index 7b451e458..24b49ed79 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3073,7 +3073,8 @@ static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
- 								dev, NULL);
- }
- 
--void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-+void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
-+								bool *remove)
- {
- 	struct bearer_state *state = get_state(device, bdaddr_type);
- 	DBusMessage *reply;
-@@ -3158,8 +3159,8 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 						DEVICE_INTERFACE, "Connected");
- 
--	if (remove_device)
--		set_temporary_timer(device, 0);
-+	if (remove_device && remove)
-+		*remove = true;
- }
- 
- guint device_add_disconnect_watch(struct btd_device *device,
-diff --git a/src/device.h b/src/device.h
-index 960255d2b..d7f886224 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -123,7 +123,8 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
- void device_cancel_authentication(struct btd_device *device, gboolean aborted);
- gboolean device_is_authenticating(struct btd_device *device);
- void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type);
--void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type);
-+void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type,
-+								bool *remove);
- void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
- bool device_is_disconnecting(struct btd_device *device);
- void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
--- 
-2.35.3
+    Bluetooth: hci_sync: Rework init stages
 
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1674ba1ff00000
+start commit:   9d004b2f4fea Merge tag 'cxl-for-5.19' of git://git.kernel...
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1574ba1ff00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1174ba1ff00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3c367f7c347f1679
+dashboard link: https://syzkaller.appspot.com/bug?extid=8d7b9ced2a99394b0a50
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=103f3755f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f4cf3df00000
+
+Reported-by: syzbot+8d7b9ced2a99394b0a50@syzkaller.appspotmail.com
+Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
