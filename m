@@ -2,174 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C4ACCCA47E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 10:20:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C569C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Jun 2022 14:45:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231434AbiFVKUn (ORCPT
+        id S234468AbiFVOp5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jun 2022 06:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41458 "EHLO
+        Wed, 22 Jun 2022 10:45:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229864AbiFVKUj (ORCPT
+        with ESMTP id S231462AbiFVOpz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jun 2022 06:20:39 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09E253AA6D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 03:20:34 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id z16so3491238ile.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 03:20:34 -0700 (PDT)
+        Wed, 22 Jun 2022 10:45:55 -0400
+Received: from mail2.multitech.com (spx.multitech.com [65.126.90.11])
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id 154A23C4B0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 07:45:54 -0700 (PDT)
+Received: from mail2.multitech.com (localhost.localdomain [127.0.0.1])
+        by localhost (Email Security Appliance) with SMTP id 9CEEA585439_2B32B22B;
+        Wed, 22 Jun 2022 14:45:54 +0000 (GMT)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2172.outbound.protection.outlook.com [104.47.57.172])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail.protection.outlook.com", Issuer "DigiCert Cloud Services CA-1" (verified OK))
+        by mail2.multitech.com (Sophos Email Appliance) with ESMTPS id 371985853B2_2B32B22F;
+        Wed, 22 Jun 2022 14:45:54 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lkEtroHars1GKijKwC3T8hbyNnBVBtwIXH6eugqzofutJes4C/ThLLKmT9DknYyEa72AVZnjVTBa7E64GjvNi/wUQkZGINe3/Krxc+jjHHzIXJCB1EKmbhk7OhnGqFp00u6u0MulJRo1KRxFiUfXnrOD2wsAB2HhUpZ2HL4haIzYdrWDtr8Q1CZSkdeCV5K98MJN/A2VpfW2WrScC2De5/9pe417lvYJL81mFmYSsgS93TXRGYZ+O7rQMzrMGBgmsq78CHiPevZMdh4uSJY2lvecxAIpXGkxWSxSt13+IJMVUiHla7CX3kOhTjuZR4RASVMEXY6TMl+Z+fA3vYui3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BdhQvUc47O+iL8dZeGPN5Q0olunc7TFycmkoS8R4coU=;
+ b=hxxfd9EyFPH4xEwe6K18oqcMw2VJF75IcbYPxtvqaVN62yoQgXX7zlDcg0nqVzrzICMR7hQeAKra8BRuAXl2O7stmFStLc9Rnj81DqLdpYswHZG4aL9hLPE+qQsWo5wB8X8tk55NhgDOgOv3Ooj1F4ojWfDrj2hK9ZP9ZNLyd9Tm90rD/kFt8IYWfxLrnM5tudjwJUihUmsIuSifbdsdSybmdSDIIenclReJG4LhzvvNdPXLaigjAGJLdE5flRL1BaCxrFnOCY4AYvfLZHa49Ba6+gnE2mZYZTksu8XLGXluN34hYR0PsaHnWPVfnjKK+v6jBBtR9RcNBJWmzKiQAw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=multitech.com; dmarc=pass action=none
+ header.from=multitech.com; dkim=pass header.d=multitech.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Hbo3bnQKBNV6Tqr0l1RInVBr0FV0QXzKbFlMjhPdNYc=;
-        b=bFeZ6HHtsVE5eIf2XgCYMp1WD7dwSCvnA+mdiyg55GOgz25oSnkTcY+xtLCmgr/gjy
-         4PaxThwJfy8RV0iS7SqD8rQCzQ46KfgEbPr2ctANBmC8VtQ6FYs8XOZMtwjmktso0kGH
-         Pn04gKBix6xHCo9bqV5T+6GWvOVLNBVPGO8jU8vPDkhcAr+RnbLCR1kVG8dD3G/2E9We
-         aR2NcUgqZqi7gigz7d3Zfbur9iZ3AZKoeTCdADa6O9xuiEBGIlz4oBeNb2TLQCdKiKE5
-         STHd3sHbfTNVudPO2c3vHafJZvhvfGRoZgV3OPcMNiFv374lg3oEykOPPpmhoyWXzAkR
-         rMCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Hbo3bnQKBNV6Tqr0l1RInVBr0FV0QXzKbFlMjhPdNYc=;
-        b=rubafO1CVrTtIZUsJlpGUlLHxA7KLPs2QXsLhnIzTYgdXemhF4mPzXY7mQZR2uP0mF
-         lJHWmPxlCSTevz5xRPJF2jlpLLgnViSUzMVp4VcysufNJ5OYwu4VrXvRzuxCDm8AVbgv
-         78ytB1TUnyAeIMDThZIsQrMJs0tsB1aQWIS2AkK6J11tjQIggWgN3Uy+62pWFE/Q6nme
-         sqYRIX2lCUd6M3LUAyDoHfGy/tDYmgo13hnXhxtjyQx+VNEsaRKkJYpXku8hpuzA5z0t
-         DDYJPbmEFuOG+iDvN5Q9CezWAMdwG2GrpnVI81LlajDD6MvLoNTZxRXs2eyuFj1NdavR
-         2gJw==
-X-Gm-Message-State: AJIora/hW1VbOf0Pi61Igses8ZwMb8usO56LYZuchZoz/fSeUrQIPtm9
-        KMEzlZ23vrR/0cKqBBcBAEE9aHNfRqQ0Sba2kbOk6A==
-X-Google-Smtp-Source: AGRyM1sXeSQw6KYHS4znHE4W3JRadaDk+4aVoboZXFZJ+Q/TGW2Sm/R4VoeOXijwAbllyRaJf0iqqkRU7RpD/8evvBk=
-X-Received: by 2002:a92:90d:0:b0:2d9:3458:7f79 with SMTP id
- y13-20020a92090d000000b002d934587f79mr1658534ilg.123.1655893233347; Wed, 22
- Jun 2022 03:20:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220607104015.2126118-1-poprdi@google.com> <CAPUC6bJbVMPn1FMLYnXg2GUX4ikesMSRjj=oPOOrS5H2DOx_bA@mail.gmail.com>
- <CAPUC6b+xMnk8VDGv_7p9j4GHD75FrxG3hWKpTSF2zHj508=x9A@mail.gmail.com>
-In-Reply-To: <CAPUC6b+xMnk8VDGv_7p9j4GHD75FrxG3hWKpTSF2zHj508=x9A@mail.gmail.com>
-From:   Aleksandr Nogikh <nogikh@google.com>
-Date:   Wed, 22 Jun 2022 12:20:22 +0200
-Message-ID: <CANp29Y7gb7cop8p8k-LqR1WoLwOLxi+QGRGLEZrbYW8Tw6_i2w@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Collect kcov coverage from hci_rx_work
-To:     =?UTF-8?Q?Tam=C3=A1s_Koczka?= <poprdi@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Andy Nguyen <theflow@google.com>
-Content-Type: text/plain; charset="UTF-8"
+ d=multitechsystems.onmicrosoft.com;
+ s=selector1-multitechsystems-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BdhQvUc47O+iL8dZeGPN5Q0olunc7TFycmkoS8R4coU=;
+ b=cMcimZDN67PDUx/YV8MqAhxQSZHTIBM+/ox5kUuxvPCkIVLJP/2dhBL0qbFksVeeMcsAocorFqairGScWiCiWXZzQN64jXLDC+OszepUl/lV5ery7RnMu0FOQ+EWpsmaCJrdS1VkyR3CGPUUTuItx1Ja/Bam2EIciGdbTb5NBHc=
+Received: from SJ0PR13MB5755.namprd13.prod.outlook.com (2603:10b6:a03:40e::15)
+ by PH0PR13MB5897.namprd13.prod.outlook.com (2603:10b6:510:164::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.9; Wed, 22 Jun
+ 2022 14:45:51 +0000
+Received: from SJ0PR13MB5755.namprd13.prod.outlook.com
+ ([fe80::980d:52c2:2f5d:f4b2]) by SJ0PR13MB5755.namprd13.prod.outlook.com
+ ([fe80::980d:52c2:2f5d:f4b2%4]) with mapi id 15.20.5373.009; Wed, 22 Jun 2022
+ 14:45:51 +0000
+From:   John Klug <John.Klug@multitech.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     Linux-Bluetooth MailingList <linux-bluetooth@vger.kernel.org>
+Subject: Re: Is there an attribute for the name field in bluetoothctl?
+Thread-Topic: Is there an attribute for the name field in bluetoothctl?
+Thread-Index: AQHYhb2zHja7qealAUSxpq1rsMtkZK1ahSeAgAADEf2AAGqqAIAAjQ2M
+Date:   Wed, 22 Jun 2022 14:45:51 +0000
+Message-ID: <SJ0PR13MB575503F5C2DE6B229D7DFE40FEB29@SJ0PR13MB5755.namprd13.prod.outlook.com>
+References: <SJ0PR13MB5755B778B99B396FF0FF6E55FEB39@SJ0PR13MB5755.namprd13.prod.outlook.com>
+ <CABBYNZL=kGNjpR-E94tuTtU23PYn0d4qyxoDkc-O_EuxS6eZMA@mail.gmail.com>
+ <SJ0PR13MB57552921E32DE0017E2584E7FEB39@SJ0PR13MB5755.namprd13.prod.outlook.com>
+ <CABBYNZJ3_U8jdT+Xqp-DuBj8vHq9UAu9Us=kqR66v=4VBfp5ww@mail.gmail.com>
+In-Reply-To: <CABBYNZJ3_U8jdT+Xqp-DuBj8vHq9UAu9Us=kqR66v=4VBfp5ww@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+suggested_attachment_session_id: c89e7d9f-cdba-878b-2114-8a269d9fd8ad
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=multitech.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 54ee2cf2-626d-4f1b-19b2-08da545de750
+x-ms-traffictypediagnostic: PH0PR13MB5897:EE_
+x-microsoft-antispam-prvs: <PH0PR13MB5897D20573EF2857B41DE13AFEB29@PH0PR13MB5897.namprd13.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2uS8JjZ0sGNYtaUy2BOMYy10KpyqWkoLZnrP40N4Tn6PPgqdzgYrhHCXIvhCpGJlIGmpp3vBQCWzhlkJ3ioxpWfsJA+NU0wMWB1evoNaBHfHWcDIqSKnQK5XNd9YNwHy2Hb+eQ1Iqv3gCMZ3Qpc7YRf36StMZwHLOz9h+0owbelJM6BKZz/bz/Qc5npUeDGF1hpou7X+uFen4eAbtLYLasY2fHXkOyQTkFmEFXhn7hpg3F6GInAwJRJXLbcKRBd3HASD7IsEii1yVqQl87KAdzi0yzBiMVVO6YztMq8/zhSEApXtQSf+p5OJMlc6WopwRrpfAaNNEHf7AQYd/V3JxApbr1lewt/aBnAlzTWRP3DBbozGFG/KK9SHLZOJrmza0UjrCuj6xbWu326NE2lAjisPm1gK0gJyOtArznY9Nfb3D2iUVcPt8CxsVgwQo5t20UCqYfbPbk2IuPBrdrEabGJ3wnAkAtkst3EWolRaU0y2mXcrU3XfXcllEatLHjn24hxXuhVdiMEM7ExhBF8JGN/DQr7inZ0XibI8OUNUvSsqJWxpdOvPRSFQx1tJHz1UHG7+a8JqKZhocic+t1ha9m5wz++7QGJpTm75C2iIYFycjOClzcVZqe0/3CLykng1Vz4Pax003UikKQF1psqn4aDlbuMHxhkXQVJ1ij60Nh7543YOfY/bgJmjnmVdS4HQBqRFdYuIkWYNM+Y8/XQehBvOEP6VHwEHayHZLKWHSFGH+Bstrcb7OYRNpfYOJp0+joM5EjlZSCLGExLSYUpDbukjMy2qMK6sqxgp04QyhfNC7XOLbZJ5L4fjwuNe+89X
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR13MB5755.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(396003)(376002)(346002)(39840400004)(366004)(136003)(26005)(76116006)(2906002)(8676002)(6506007)(66946007)(7696005)(38070700005)(316002)(91956017)(66446008)(66556008)(64756008)(6916009)(4326008)(41300700001)(38100700002)(8936002)(66476007)(5660300002)(55016003)(186003)(86362001)(52536014)(478600001)(83380400001)(9686003)(558084003)(122000001)(71200400001)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?ybNCHdBEfi8UPioCXxFOrxx3F0bOHajmoecTqZDACpG3x0K/aHxsNrIZgz?=
+ =?iso-8859-1?Q?a2w4SRx3D/m4N3BEIP3B863SI+SMpJE5ipw+zCgcRqFy9GvdrUJg4fGi9G?=
+ =?iso-8859-1?Q?u7Ita4NpGpzqg8lQpcIbLaTB3ut9vbwnE3QuV28BC++J8yaOOxKuVgBx/R?=
+ =?iso-8859-1?Q?W1qA0WaNxQit4h4cCjo3I+sj1wdC9FS7raNiDDh9Z/k3bkvPOzkYX8OTfL?=
+ =?iso-8859-1?Q?QAKZZcun3svPWICqYmjY6JHqgPtN3ITecLqYRbzMx0Or4wDFgXY9VQPNzi?=
+ =?iso-8859-1?Q?lP9rvxkeOq8oFHwpUm0ZUccu6eez+Kz4vetWHq5yIJ6THeV0sGz0EiQsob?=
+ =?iso-8859-1?Q?RyzkHRmNtD2gP3rNf4h2fK+NFozf0m48mvdE6NE5cQOKGD19OXPXpOPyDZ?=
+ =?iso-8859-1?Q?aGsleak8Pva+/4LxaPVFKw0Mcqu8MQtEP4O1D3xiPXxm+nCKktC5TZiSyB?=
+ =?iso-8859-1?Q?G8UhZNW8MX3hUND7cUFPsjYKCe5R3cdl812+2slm25d9KP6gqp233/iNzG?=
+ =?iso-8859-1?Q?rJHl9DWOZNSOWlzi96iy1ZbwvRGEBIKAr6dcmkEa9RaTzUES9bEPIu5BZC?=
+ =?iso-8859-1?Q?tXnw6PkBjbN0FLqyoiksU7iTQKxkipuINDPegyvRtI7LTLy8K0rut7WjOL?=
+ =?iso-8859-1?Q?O0+GoI4xg6jnq0LebFyf7A3aL34mTVHqBPVCBjBVWM+aAmXfs3Hb/9jOti?=
+ =?iso-8859-1?Q?zeAWdfGUn881bENZNPlc4VjBNrDnBLOgghxKTDLjx3u7t95GtYYR3ie12D?=
+ =?iso-8859-1?Q?Gwex/N1mnNMgK4sIRXA3+msLur2j1AOIq556/HXtYHvLwnjxha569FTQJW?=
+ =?iso-8859-1?Q?+IvIZ4ORfbpfGnBLHRLCqHOtUkfvpFZ+4EDQpRWYQImaoFGqdsnWDZBbRs?=
+ =?iso-8859-1?Q?sL8vxXL5xcuxyyX+VazAXCTTFUDrqn+OIp+F9Gz8KKi1PcL7dKGlMWgQqb?=
+ =?iso-8859-1?Q?VqLkdlsuuT1s6sgG9IJkRXJ19lpl03y0twhtUOMcc5N6uz63Cl0WrlMpOA?=
+ =?iso-8859-1?Q?dLZJMqUdke18KK6dHoYTXEkrFgUhc20K27xPP3AaGR8ouor4xi4Nl9fggY?=
+ =?iso-8859-1?Q?c6H1faejyggsHu/S8FcLXPOTOJD51Gtx5LRHUQm/BxchnRsg6ePV48xCOs?=
+ =?iso-8859-1?Q?D/iKLmgwWbZCxvDCHBBJUA3l2tBC+Dm3Y6/2B08lJW7UefSQ1rZN2+WSKj?=
+ =?iso-8859-1?Q?yukbJNHO6wke61rQSv7w5JQv4uvnIqPiI0zezQFP2LIh2iQWmdtdsHBjoG?=
+ =?iso-8859-1?Q?3kJXhQKK7OvnBbUgNOMo3ctOoRIDTtTF/MZDeUGbtT2yUtCV/p0ID1ulgR?=
+ =?iso-8859-1?Q?f068k/MK7oo5hGCOLOAXNlRQX1ETvyN6wkrY2XONdTWUn6FCl4DeL18QaG?=
+ =?iso-8859-1?Q?caKxAjrS4GNdm1NXpJQgg7+OqhS+dP7dKwWXOUgqngp6FbYXQ6CTI1UePH?=
+ =?iso-8859-1?Q?uOjcUUabkSRsNyxGJZS1/VTX+2dZMet0vb/tOQEy2oiLBE5Zz9g44nfb6/?=
+ =?iso-8859-1?Q?w0gDsjFj3C/92ZvcoaebhRaadytGiSLWjSRljbcGAhBd2e3ciuoendITZi?=
+ =?iso-8859-1?Q?NbA2W+f1PxBRTveVri4KfrvDVH0WmbyZE2s0Tb6nEop83USyXRpT59fRFC?=
+ =?iso-8859-1?Q?y44eKIzwuWJ9M=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: multitech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR13MB5755.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54ee2cf2-626d-4f1b-19b2-08da545de750
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2022 14:45:51.5668
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f802e804-804f-4d1e-b625-870b4d57fd00
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ya6mllIIfXAVptlP5dsYAs/Mi0rsRJCQmIuVnukkpEyvqOwJONIkxZCT56bJQ6R9hKgoXp6U4YpujpscGSk7rQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5897
+X-SASI-RCODE: 200
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-(Resending the reply I sent to the v1 of the patch. I sent it by
-mistake with HTML content, so it did not reach lore.)
-
-I checked out v5.18.1, applied this patch and fuzzed it with syzkaller
-for a day. The fuzzer was indeed able to find and report more coverage
-of the BT subsystem than without the patch.
-
-Tested-by: Aleksandr Nogikh <nogikh@google.com>
-
-
-On Tue, Jun 14, 2022 at 3:34 PM Tam=C3=A1s Koczka <poprdi@google.com> wrote=
-:
->
-> Hello Marcel,
->
-> I hope this was the change you originally requested, and I did not
-> misunderstand anything, but if you need any additional modification to
-> the code or the commit, please feel free to let me know!
->
-> Thank you,
-> Tamas
->
-> On Tue, Jun 7, 2022 at 1:44 PM Tam=C3=A1s Koczka <poprdi@google.com> wrot=
-e:
-> >
-> > Hello Marcel,
-> >
-> > I added some comments into the code about what the kcov_remote calls do=
- and
-> > why they were implemented and I also added some reasoning to the commit
-> > message.
-> >
-> > I did not mention in the commit but these functions only run if the ker=
-nel
-> > is compiled with CONFIG_KCOV.
-> >
-> > Thank you again for reviewing the patch!
-> >
-> > --
-> > Tamas
-> >
-> > On Tue, Jun 7, 2022 at 12:40 PM Tamas Koczka <poprdi@google.com> wrote:
-> > >
-> > > Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_stop(=
-)
-> > > calls, so remote KCOV coverage is collected while processing the rx_q
-> > > queue which is the main incoming Bluetooth packet queue.
-> > >
-> > > Coverage is associated with the thread which created the packet skb.
-> > >
-> > > The collected extra coverage helps kernel fuzzing efforts in finding
-> > > vulnerabilities.
-> > >
-> > > Signed-off-by: Tamas Koczka <poprdi@google.com>
-> > > ---
-> > > Changelog since v1:
-> > >  - add comment about why kcov_remote functions are called
-> > >
-> > > v1: https://lore.kernel.org/all/20220517094532.2729049-1-poprdi@googl=
-e.com/
-> > >
-> > >  net/bluetooth/hci_core.c | 10 +++++++++-
-> > >  1 file changed, 9 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > > index 45c2dd2e1590..0af43844c55a 100644
-> > > --- a/net/bluetooth/hci_core.c
-> > > +++ b/net/bluetooth/hci_core.c
-> > > @@ -29,6 +29,7 @@
-> > >  #include <linux/rfkill.h>
-> > >  #include <linux/debugfs.h>
-> > >  #include <linux/crypto.h>
-> > > +#include <linux/kcov.h>
-> > >  #include <linux/property.h>
-> > >  #include <linux/suspend.h>
-> > >  #include <linux/wait.h>
-> > > @@ -3780,7 +3781,14 @@ static void hci_rx_work(struct work_struct *wo=
-rk)
-> > >
-> > >         BT_DBG("%s", hdev->name);
-> > >
-> > > -       while ((skb =3D skb_dequeue(&hdev->rx_q))) {
-> > > +       /* The kcov_remote functions used for collecting packet parsi=
-ng
-> > > +        * coverage information from this background thread and assoc=
-iate
-> > > +        * the coverage with the syscall's thread which originally in=
-jected
-> > > +        * the packet. This helps fuzzing the kernel.
-> > > +        */
-> > > +       for (; (skb =3D skb_dequeue(&hdev->rx_q)); kcov_remote_stop()=
-) {
-> > > +               kcov_remote_start_common(skb_get_kcov_handle(skb));
-> > > +
-> > >                 /* Send copy to monitor */
-> > >                 hci_send_to_monitor(hdev, skb);
-> > >
-> > > --
-> > > 2.36.1.255.ge46751e96f-goog
-> > >
+Thank you Luiz:=0A=
+>Anyway,=0A=
+>bluetoothd will read the name and update it on device information e.g.=0A=
+>info <address>=0A=
+=0A=
+info <address> does produce the correct result for the name:=0A=
+=0A=
+=A0 Name: SensorTag 2.0=0A=
+=0A=
+Thank you for answering my question.=0A=
