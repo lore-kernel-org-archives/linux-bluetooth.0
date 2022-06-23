@@ -2,101 +2,134 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F759C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 08:08:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C463AC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 08:42:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231217AbiFWII5 (ORCPT
+        id S230172AbiFWImd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jun 2022 04:08:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52874 "EHLO
+        Thu, 23 Jun 2022 04:42:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbiFWIIy (ORCPT
+        with ESMTP id S229704AbiFWImc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jun 2022 04:08:54 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBFE47AD3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jun 2022 01:08:35 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-101ec2d6087so15213574fac.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Jun 2022 01:08:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=8mdWB1OqVq05y0S84yVHcnfN+UvIDA4VxMed814s7wI=;
-        b=JhOy6kaZ9uURv8tvtAKjRkbospE0oqK4eEx/a+RZ+a0dFhYm+4P/JGBO0m+Z57rLhJ
-         V1MduzhHSyVDxr4GpmSwCIq0MiF1acNGB/dEJ0+pQbehY4Sr1ttGWNziaBLtEgOptVHX
-         zUUd/aMhJjghv8Ak5rCdIu8Lx25Ej2I5bWRu6/tiAsQQ9VGFONAEQVmDmwooChg3B4u0
-         PMzIYKxpEq+yhsuZFC2EA1u/zs/csHp9jRSVN0mqpcnkprYKZWZPYZllqvxfICkrN3Hl
-         gwwCursZWP43JTs6AMC+xA0h5hrJ3HOonSx9/M/03gHAjvLh17W0BegEfyJd9yq8aX0K
-         mWRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=8mdWB1OqVq05y0S84yVHcnfN+UvIDA4VxMed814s7wI=;
-        b=ITLONTciXLntr+9kI38U1RAZO74wwy2y47t61Snlu3NyIIquFLJUmBJk+0PFombRz+
-         rMfgONirUdfl3XcyjEKWoEA8UXn1hNuUd6KrhIluRQkLXh3cYulla6sR9FtMxpKwY8/x
-         AhLDdILny6aXZRvV+F+wUUxUD/nYnRLNiXGGABef8vmTbohl4jcFOuQgjNiylx2AEnk7
-         VS2GlZ5aFIFEz+L0k8Rz4izXrYlbjpzgTvx4qR3zjPgUgJPDCr2W1t560yYyk8YBE51g
-         NM/+nPxx2I8M7QOAy3+Mu9ajRhEvKovtoTcrZRiiDghINf113c+BAbDkUHRuJNZu5lZC
-         NQsA==
-X-Gm-Message-State: AJIora858yeFtsQkm5Q7/I6wE0pggelbCKzkW153NZbhQwv21ahppsIR
-        q9NNiZvXrdNwabkBm2KMJkxnSydJiso=
-X-Google-Smtp-Source: AGRyM1uwB//ilgNooxtCMuukPRwl3mQvlciLCrcVeKTLb+79tfzI94ejoi86vhnb+5mn6WFDa8I/GQ==
-X-Received: by 2002:a05:6870:8914:b0:106:9d06:fe63 with SMTP id i20-20020a056870891400b001069d06fe63mr1642635oao.103.1655971714309;
-        Thu, 23 Jun 2022 01:08:34 -0700 (PDT)
-Received: from [172.17.0.2] ([13.66.22.48])
-        by smtp.gmail.com with ESMTPSA id p187-20020acabfc4000000b0033326435494sm8726235oif.41.2022.06.23.01.08.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 01:08:33 -0700 (PDT)
-Message-ID: <62b41f81.1c69fb81.95099.210f@mx.google.com>
-Date:   Thu, 23 Jun 2022 01:08:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4855537233971688887=="
+        Thu, 23 Jun 2022 04:42:32 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D9248E74;
+        Thu, 23 Jun 2022 01:42:31 -0700 (PDT)
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: kholk11)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 968FB6601792;
+        Thu, 23 Jun 2022 09:42:28 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1655973749;
+        bh=a3qg+o/OwgqXslU/4j4RlR9cUNoRYrfj19YE44y2v3E=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=XKQK0beGg3vTWSmevrEBFXfg7Q50EHWuJlc9pwCXzaWUO+VBLRPh9p4Oy3qQRBUsS
+         2W7qVoYtzbfrOv/1RrewUg21ryne4VDHhJZdOO+WEWkFcAQl8p6YG9Y+YzRVi4CRh7
+         77J6K81IQ+QSFtfhS/4wVHmTXZUfaz5CxrZSyP/VVqdmpOArk9s+lvIvrNdEEYSOfr
+         CBDGOw97CVusucf5EYiBq65amZ8Ldr1FtzeutiCuujc2zWnCK1610hxEMZth5xs6pP
+         VkcNlnAigF0gFT5diFw0gsC73kN0Q+5Xn4BKM5vlj5aMhsn+c4uYuAv4ZZxidv0ULF
+         dzHKBOcezZn1w==
+Message-ID: <c379dca6-88a7-8ed6-c585-714ea411bd02@collabora.com>
+Date:   Thu, 23 Jun 2022 10:42:26 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: device: Fix not removing connected device
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220623062953.13419-1-wangyouwan@uniontech.com>
-References: <20220623062953.13419-1-wangyouwan@uniontech.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2] Bluetooth: btmtksdio: Add in-band wakeup support
+Content-Language: en-US
+To:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com
+Cc:     Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, abhishekpandit@google.com,
+        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Yake Yang <yake.yang@mediatek.com>
+References: <52b63a1be094a1ccbb20f2c89472580d95f0652a.1655934689.git.objelf@gmail.com>
+From:   AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <52b63a1be094a1ccbb20f2c89472580d95f0652a.1655934689.git.objelf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4855537233971688887==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Il 22/06/22 23:56, sean.wang@mediatek.com ha scritto:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
+> Commit ce64b3e94919 ("Bluetooth: mt7921s: Support wake on bluetooth")
+> adds the wake on bluethooth via a dedicated GPIO.
+> 
+> Extend the wake-on-bluetooth to use the SDIO DAT1 pin (in-band wakeup),
+> when supported by the SDIO host driver.
+> 
+> Co-developed-by: Yake Yang <yake.yang@mediatek.com>
+> Signed-off-by: Yake Yang <yake.yang@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+> v2: enhance the patch description and comments
+> ---
+>   drivers/bluetooth/btmtksdio.c | 8 ++++++++
+>   1 file changed, 8 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index d6700efcfe8c..9d79c9107b3a 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -118,6 +118,7 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
+>   #define BTMTKSDIO_FUNC_ENABLED		3
+>   #define BTMTKSDIO_PATCH_ENABLED		4
+>   #define BTMTKSDIO_HW_RESET_ACTIVE	5
+> +#define BTMTKSDIO_INBAND_WAKEUP		6
+>   
+>   struct mtkbtsdio_hdr {
+>   	__le16	len;
+> @@ -1294,6 +1295,9 @@ static bool btmtksdio_sdio_wakeup(struct hci_dev *hdev)
+>   		.wakeup_delay = cpu_to_le16(0x20),
+>   	};
+>   
+> +	if (test_bit(BTMTKSDIO_INBAND_WAKEUP, &bdev->tx_state))
+> +		return may_wakeup;
+> +
 
-This is automated email and please do not reply to this email!
+Uhm... this flag is either *always* set, or *always not set*... and we decide that
+during probe time... and we use it in just one function as well.
 
-Dear submitter,
+At this point, I would just avoid the addition of the BTMTKSDIO_INBAND_WAKEUP flag
+and add a new function for handling the .wakeup() callback - something like:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=653038
+static bool btmtksdio_sdio_inband_wakeup(struct hci_dev *hdev)
+{
+	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
 
----Test result---
+	return device_may_wakeup(bdev->dev);
+}
 
-Test Summary:
-CheckPatch                    PASS      1.13 seconds
-GitLint                       PASS      0.75 seconds
-Prep - Setup ELL              PASS      51.93 seconds
-Build - Prep                  PASS      0.83 seconds
-Build - Configure             PASS      10.19 seconds
-Build - Make                  PASS      1774.49 seconds
-Make Check                    PASS      12.25 seconds
-Make Check w/Valgrind         PASS      528.82 seconds
-Make Distcheck                PASS      281.37 seconds
-Build w/ext ELL - Configure   PASS      10.19 seconds
-Build w/ext ELL - Make        PASS      1750.64 seconds
-Incremental Build with patchesPASS      0.00 seconds
+static int btmtksdio_probe(...)
+{
+	.... code ....
 
+	/*
+	 * If SDIO controller supports wake on Bluetooth, sending a wakeon
+	 * command is not necessary.
+	 */
+	if (device_can_wakeup(func->card->host->parent))
+		hdev->wakeup = btmtksdio_sdio_inband_wakeup;
+	else
+		hdev->wakeup = btmtksdio_sdio_wakeup;
 
+	.... etc ....
+}
 
----
 Regards,
-Linux Bluetooth
-
-
---===============4855537233971688887==--
+Angelo
