@@ -2,99 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA5CC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 05:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F680C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 06:22:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbiFWFBA (ORCPT
+        id S229765AbiFWGWe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Jun 2022 01:01:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35556 "EHLO
+        Thu, 23 Jun 2022 02:22:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229712AbiFWFAd (ORCPT
+        with ESMTP id S229451AbiFWGWd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Jun 2022 01:00:33 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19435496B9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 21:45:22 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id s185so12295696pgs.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 21:45:22 -0700 (PDT)
+        Thu, 23 Jun 2022 02:22:33 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB927B4AF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 23:22:31 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id 59so5864093qvb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 23:22:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=/9qFyabmBcibChahYmaud4vPnIfjnmUdYUKhUTjcTys=;
-        b=B4iQFshue5+ocH1qvrbcRq/LTKcTziF7ORkG1R/P+gI1Vo0E43UAVQymwggvHC7ghN
-         0jwy5eSOaQUCfNM09AQQ2xjFIZ+Snh2f8XWS3VRSV3rE35QXt83ag5Vzvs/6CHcFwqv6
-         HoY1oP71HaWZCYRYl/vm1hZcowC5MBSCkrQGOYZO46CPMksKO2Lynbs9yCKcoGXLXPX7
-         9mIBUFGqYIdrswy5z0fWnvEfxL2pR6ZzsXBcQ4qObjOBpBoHDA1fZAG6qbb3zW4lgM7L
-         XqMxTpxJgqREhNH8mAOvaw6aGsXXqHVYYJc1ojq3/ocBquHmuXtscKCzNEyp8QZBqvLO
-         Is8g==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=q/v9ZNZMCUOBR3VX6zkj6LA42HSbiSiZ6LFmBXEeFOs=;
+        b=maiANHx3M5bPCnZ7cSJVcIde7D7w363QQ3isBvluSH0CDSkGv3GlB5mzfqi89QMYbs
+         WiysKagZBzai4DSy1ElzX701+kfPlo67+uxYyvYlffDcL4ApcDLmqDYKZbOvxUTgazz2
+         YBycmvqI5w5sZEpupU/kZMIYBj5Co74LYZtV1BmKnlHtoqQgWRUs/ddA0e5Hotvn22jd
+         vWlJBvrrKsfkUloc9yXxWf758s9/DV19SLAa6Te7pNcpcsh8omjRE8eYOu8zZP1fXop1
+         SYQR+vMtAbV08h9snMxx8wI/PKksraRh2P/rtJoWP5tMfQdcNSJh5WrQmFdQwCRdN4d9
+         mtXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=/9qFyabmBcibChahYmaud4vPnIfjnmUdYUKhUTjcTys=;
-        b=VHIajiyO2zjELAsZWo9hAWqH6ZnDCmU7NVBr0K/onBKEDzbA6U2HNdpTyFgUU98XW6
-         J7byS2xTJg8BFp3EkCN+HvedUuq2aXiZqyLmn7tOe0pik2SNOtO2A2neXsMlMLWroji+
-         VdL4QLwU8Scoqtt1Hiovt2wX2kxpN+j9Guig/RrNS4Z8odWIrqZqH/YjiiPdldokIlgL
-         TxBAyrtApg5+0++6GXmWPU0O69ayhneZrXXsJdePPadwrSGc4NkYhEINFdTViOGGqo4g
-         WSYGtZAXUW0ZJRgnvbU91p/aaPqKRJ5eIii+tvei35rqeRs8wYWAwdp7Wm87MbAXp+cF
-         ORLA==
-X-Gm-Message-State: AJIora8m6ykDjP0Ck/QeSlMgevBN9gGYf+dY8edHpMAa1hmaINuVMyrl
-        MYtSPcA3TYE36WcyY+eqZpDTXzPrVzI=
-X-Google-Smtp-Source: AGRyM1vZjmG/kZ/frQFQ0A0N44HhdJ9EZrFHbfa8ukAnLK+kKZoaVvND+HZEr4TItivjkDUfudNQpA==
-X-Received: by 2002:a63:8c47:0:b0:40d:2d4:e3a2 with SMTP id q7-20020a638c47000000b0040d02d4e3a2mr6183819pgn.2.1655959521355;
-        Wed, 22 Jun 2022 21:45:21 -0700 (PDT)
-Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:29c0:aef5:a13f:9fde])
-        by smtp.gmail.com with ESMTPSA id b3-20020a170902e94300b00168adae4eb2sm13646213pll.262.2022.06.22.21.45.20
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=q/v9ZNZMCUOBR3VX6zkj6LA42HSbiSiZ6LFmBXEeFOs=;
+        b=CvDP/kXRSxbLXdyotHtEdh6+ObrvZsRpHQGDz2tA70p6ojZMHFnpixXT9fQP1sMS53
+         M+0d1h9DELJAeBeq4conRrQtC8D6HuZRixBwmFjciNu3jyIcTlbLz7jrLw4i27vQOxaO
+         LrrL0Q57xb3MObOQxq+i8GZWU/KHbq+E5xjfPFSbnOn0A5ShTz44qfTkL2ZpqDeYQZKw
+         5Agol+GQNQD/+6KuGP1BgvbwkvlODnk+HeppEO/GrU1bRC2DJry3pIMQBjUSVyrMQT8C
+         awAhIR58pHgqvFTCL0X/fgw8dk2ymBLamaNc3T5kaDSmYbsYAXo7DlgYAhE80JAcAU/X
+         lLYA==
+X-Gm-Message-State: AJIora8AunhCgc3/RaaSJEW3Cdif9j8ZsF7iSUzAZiwJJg2Y5ZqWIXDm
+        AOV/7GNGpUWpx25wnS2EcIEb310uuF8cHA==
+X-Google-Smtp-Source: AGRyM1vaFtsaSCvONXdUzG9CF4e6/3YNNEtDEJKMv9VejDWUjmQGcCcT9D7lqjHRDKL/tk/7T9Xdxw==
+X-Received: by 2002:a0c:ac45:0:b0:470:84e1:10d6 with SMTP id m5-20020a0cac45000000b0047084e110d6mr187845qvb.131.1655965350923;
+        Wed, 22 Jun 2022 23:22:30 -0700 (PDT)
+Received: from [172.17.0.2] ([20.230.33.97])
+        by smtp.gmail.com with ESMTPSA id l16-20020a05620a28d000b006a6cadd89efsm19420221qkp.82.2022.06.22.23.22.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 21:45:21 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH] mgmt-tester: Fix null dereference issue reported by scan-build
-Date:   Wed, 22 Jun 2022 21:45:20 -0700
-Message-Id: <20220623044520.458626-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 22 Jun 2022 23:22:30 -0700 (PDT)
+Message-ID: <62b406a6.1c69fb81.d81f0.813b@mx.google.com>
+Date:   Wed, 22 Jun 2022 23:22:30 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4118514912692321773=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
+Subject: RE: device: Fix not removing connected device
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220623031300.11581-1-wangyouwan@uniontech.com>
+References: <20220623031300.11581-1-wangyouwan@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+--===============4118514912692321773==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch fixes the null dereference reported by the scan-build.
+This is automated email and please do not reply to this email!
 
-tools/mgmt-tester.c:12025:28: warning: Access to field 'cap_len' results
-in a dereference of a null pointer (loaded from variable 'rp')
-[core.NullDereference]
+Dear submitter,
 
-        if (sizeof(rp->cap_len) + rp->cap_len != length) {
-                                  ^~~~~~~~~~~
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=653025
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.49 seconds
+GitLint                       PASS      0.95 seconds
+Prep - Setup ELL              PASS      41.48 seconds
+Build - Prep                  PASS      0.68 seconds
+Build - Configure             PASS      8.06 seconds
+Build - Make                  PASS      1196.70 seconds
+Make Check                    PASS      11.80 seconds
+Make Check w/Valgrind         PASS      439.72 seconds
+Make Distcheck                PASS      228.36 seconds
+Build w/ext ELL - Configure   PASS      8.08 seconds
+Build w/ext ELL - Make        PASS      1187.94 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+device: Fix not removing connected device
+WARNING:LONG_LINE: line length of 91 exceeds 80 columns
+#131: FILE: src/device.c:3076:
++void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type, bool *remove)
+
+/github/workspace/src/12891800.patch total: 0 errors, 1 warnings, 54 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12891800.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- tools/mgmt-tester.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index f45a6c015..6018327f1 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -12020,12 +12020,14 @@ static void read_50_controller_cap_complete(uint8_t status, uint16_t length,
- 		tester_warn("Failed to read advertising features: %s (0x%02x)",
- 						mgmt_errstr(status), status);
- 		tester_test_failed();
-+		return;
- 	}
- 
- 	if (sizeof(rp->cap_len) + rp->cap_len != length) {
- 		tester_warn("Controller capabilities malformed, size %zu != %u",
- 				sizeof(rp->cap_len) + rp->cap_len, length);
- 		tester_test_failed();
-+		return;
- 	}
- 
- 	while (offset < rp->cap_len) {
--- 
-2.34.1
 
+--===============4118514912692321773==--
