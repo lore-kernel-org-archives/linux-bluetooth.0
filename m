@@ -2,153 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB30FC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 01:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E833DC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Jun 2022 02:48:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357635AbiFWBod (ORCPT
+        id S1377584AbiFWCsj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Jun 2022 21:44:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60774 "EHLO
+        Wed, 22 Jun 2022 22:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233045AbiFWBob (ORCPT
+        with ESMTP id S1377467AbiFWCs3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Jun 2022 21:44:31 -0400
-Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 914A9434A1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 18:44:22 -0700 (PDT)
-X-QQ-mid: bizesmtp70t1655948652t9u6kciw
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Thu, 23 Jun 2022 09:44:05 +0800 (CST)
-X-QQ-SSF: 01400000000000C0E000000A0000000
-X-QQ-FEAT: aKI6GfWslkPO6K6qoxQgVkp8DYkSkxiX17OaUuw0GjwEmbXaKn1N9RNMuDkDB
-        ttySbK9aRAYCNBanigkpy9KCukIfdTAWNk6oHUOXvqDjl97zdxVHycXTsOt3hWHqTpBO7l7
-        8SkwpWoq+8Huh4WWP3vs5KY1mpy5wR4k1DVhoYDO1fLyNLMHhpAPznc3f+xMrX8TACL5zKY
-        5yTIEi1lAHWlnXcMuvfHD6CmzVv5uJjtY4CrlCEKuiltaINtdBjYUYi8ERV+7yi+k3l0VbU
-        ODB3Uhz/tRGPq0rzjmO61nvsoOoJuCJZ4Ao2vUiIW0xrX7QSUYJVwQRblBy+TGapVg0J1ld
-        a0S0BcB
-X-QQ-GoodBg: 1
-From:   Youwan Wang <wangyouwan@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Youwan Wang <wangyouwan@uniontech.com>
-Subject: [PATCH] device: Fix not removing connected device
-Date:   Thu, 23 Jun 2022 09:44:03 +0800
-Message-Id: <20220623014403.22360-1-wangyouwan@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Wed, 22 Jun 2022 22:48:29 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D03B12AFF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 19:48:24 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id p128so19579212iof.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Jun 2022 19:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=GuA5K3irYgB2NhF9lQ1COy+9zyoOzSh/Trt0FToOJ8A=;
+        b=gN2Lz9vwBQt2EvnbnUIuii/eqY40EiPYpaXvR50pp48RG0wFgV4WvJuUwESltoZHnl
+         Z9X52KzGYk8RmZ/SG7U79FwRmnRMa6nZ9Hqq99eWoNRiok2I3uENFiZbMXoqzR5kiFvP
+         4xqxalOwgCzlKQXsjP5Vo7i0tSFX9k2E+Fr//T+pCu7jKAXvRd0YSZbpuvRRq0YwxIUg
+         yZ4/WpKBRvdrgJ+U9RXDQAu+gt17Q3rhLBJC1Exz1tmqsk6vtz5WOgMzxBGKOqRQhjCW
+         9ZQsXdooqViNkxFw/gB3GdMYuq7uKWcg3ylYNNmL1LBIyoKEoYxHzvTsm8rzWC8rIERK
+         dMsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=GuA5K3irYgB2NhF9lQ1COy+9zyoOzSh/Trt0FToOJ8A=;
+        b=ZnlpoR2KkYqRQf/XdSC6FlyOw9oXwBHPFqprlwyjBEI5oYzVY87F6bAdLTmT3OZ4e6
+         z86jsLtN5SiE9eRI5mQGH7h+BhPpOgStEmfDs2OqFfa4NWfxRmlKRoWldZni8BXWy36P
+         UbpAMhYGZkuwgi9Q8Uyrn5wUwKRQs5xKH+eKcHuaJX/pL7vfLbHY2Iuf7LFczGu8ZbeJ
+         /ViH6VnOY0ouxC0Q0Rp5D9+rHyeJysAiZbfZ1NSsmPdXnX7wsTiXVZFpdk7bmjfAojTU
+         Z7Nneyc8fQtgddAQfJat8znn0iZHtWz6uSBs5rzWnxUMO8Aah19JxvdhO7Nj9T2YJlMt
+         XSgQ==
+X-Gm-Message-State: AJIora9xQ2YFzE1YkHFFx1RE6rUPqYbuarADIF+O5zF1Vfmrz1Mg/wCE
+        u+ISJ8K5z5sOW5OOdAsQgSEo77lY15o=
+X-Google-Smtp-Source: AGRyM1t39MCjVApiwjh0fSZHg0QvFSOfgYAaPvjitBhHuO7lfXKtJ522VMDcmOVg6AUllBckwKQlcQ==
+X-Received: by 2002:a05:6638:480f:b0:339:b0ed:749e with SMTP id cp15-20020a056638480f00b00339b0ed749emr4084046jab.150.1655952503269;
+        Wed, 22 Jun 2022 19:48:23 -0700 (PDT)
+Received: from [172.17.0.2] ([40.86.84.20])
+        by smtp.gmail.com with ESMTPSA id x5-20020a0566022c4500b0065a47e16f49sm10116227iov.27.2022.06.22.19.48.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 19:48:22 -0700 (PDT)
+Message-ID: <62b3d476.1c69fb81.a6035.cf43@mx.google.com>
+Date:   Wed, 22 Jun 2022 19:48:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7165231824755464524=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign10
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v7,1/8] lib: Add definitions for ISO socket
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220622222801.2676431-1-luiz.dentz@gmail.com>
+References: <20220622222801.2676431-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[bluetooth]# connect 40:EF:4C:0C:11:F0
-Attempting to connect to 40:EF:4C:0C:11:F0
-[CHG] Device 40:EF:4C:0C:11:F0 Connected: yes
-Connection successful
-[CHG] Device 40:EF:4C:0C:11:F0 ServicesResolved: yes
-[UFO]# remove 40:EF:4C:0C:11:F0
-[CHG] Device 40:EF:4C:0C:11:F0 ServicesResolved: no
-Device has been removed
-[CHG] Device 40:EF:4C:0C:11:F0 Connected: no
-[bluetooth]# info 40:EF:4C:0C:11:F0
-Device 40:EF:4C:0C:11:F0 (public)
-        Name: UFO
-        Alias: UFO
-        Class: 0x00240418
-        Icon: audio-headphones
-        Paired: yes
-        Trusted: no
-        Blocked: no
-        Connected: no
-        LegacyPairing: no
-        UUID: Headset
-        UUID: Audio Sink
-        UUID: A/V Remote Control Target
-        UUID: A/V Remote Control
-        UUID: Handsfree
-        UUID: Phonebook Access Server
+--===============7165231824755464524==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=652952
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      11.43 seconds
+GitLint                       PASS      6.04 seconds
+Prep - Setup ELL              PASS      39.41 seconds
+Build - Prep                  PASS      0.55 seconds
+Build - Configure             PASS      7.67 seconds
+Build - Make                  PASS      1383.85 seconds
+Make Check                    PASS      11.42 seconds
+Make Check w/Valgrind         PASS      419.42 seconds
+Make Distcheck                PASS      215.01 seconds
+Build w/ext ELL - Configure   PASS      7.90 seconds
+Build w/ext ELL - Make        PASS      1346.91 seconds
+Incremental Build with patchesPASS      11082.79 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,v7,7/8] tools: Add isotest tool
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1235: FILE: tools/isotest.c:1118:
++		/* fall through */
+
+/github/workspace/src/12891547.patch total: 0 errors, 1 warnings, 1233 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12891547.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- src/adapter.c | 11 ++++++++++-
- src/device.c  |  4 ++--
- src/device.h  |  2 +-
- 3 files changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/src/adapter.c b/src/adapter.c
-index afefa1d5d..16da20034 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -7171,6 +7171,8 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 						struct btd_device *device,
- 						uint8_t bdaddr_type)
- {
-+	bool remove_device = false;
-+
- 	DBG("");
- 
- 	if (!g_slist_find(adapter->connections, device)) {
-@@ -7178,7 +7180,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		return;
- 	}
- 
--	device_remove_connection(device, bdaddr_type);
-+	device_remove_connection(device, bdaddr_type, &remove_device);
- 
- 	if (device_is_authenticating(device))
- 		device_cancel_authentication(device, TRUE);
-@@ -7188,6 +7190,13 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		return;
- 
- 	adapter->connections = g_slist_remove(adapter->connections, device);
-+
-+	if (remove_device) {
-+		const char *path = device_get_path(device);
-+
-+		DBG("Removing temporary device %s", path);
-+		btd_adapter_remove_device(adapter, device);
-+	}
- }
- 
- static void adapter_stop(struct btd_adapter *adapter)
-diff --git a/src/device.c b/src/device.c
-index 7b451e458..24d88929e 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3073,7 +3073,7 @@ static void set_temporary_timer(struct btd_device *dev, unsigned int timeout)
- 								dev, NULL);
- }
- 
--void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
-+void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type, bool *remove)
- {
- 	struct bearer_state *state = get_state(device, bdaddr_type);
- 	DBusMessage *reply;
-@@ -3159,7 +3159,7 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
- 						DEVICE_INTERFACE, "Connected");
- 
- 	if (remove_device)
--		set_temporary_timer(device, 0);
-+		*remove = remove_device;
- }
- 
- guint device_add_disconnect_watch(struct btd_device *device,
-diff --git a/src/device.h b/src/device.h
-index 960255d2b..fdf18d8e6 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -123,7 +123,7 @@ int device_notify_pincode(struct btd_device *device, gboolean secure,
- void device_cancel_authentication(struct btd_device *device, gboolean aborted);
- gboolean device_is_authenticating(struct btd_device *device);
- void device_add_connection(struct btd_device *dev, uint8_t bdaddr_type);
--void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type);
-+void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type, bool *remove);
- void device_request_disconnect(struct btd_device *device, DBusMessage *msg);
- bool device_is_disconnecting(struct btd_device *device);
- void device_set_ltk_enc_size(struct btd_device *device, uint8_t enc_size);
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============7165231824755464524==--
