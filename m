@@ -2,103 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC23CC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jun 2022 12:02:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DEEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jun 2022 12:53:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbiFXMCQ (ORCPT
+        id S230425AbiFXMxe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Jun 2022 08:02:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50774 "EHLO
+        Fri, 24 Jun 2022 08:53:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230073AbiFXMCP (ORCPT
+        with ESMTP id S230137AbiFXMx3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Jun 2022 08:02:15 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED80A7E01D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jun 2022 05:02:12 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id w6so2391754pfw.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jun 2022 05:02:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Prf/VJHcLzNPGHd30LHc6CkPP70FQ31JOcQkyJz5r1Y=;
-        b=ZMLMeNt6RtlsL14qoMvedhTvWPVBBEEs3g+//IDXjruGnPhGtevC1Cg+HOYV7Io6Ja
-         y/2L8upyImiNqQV9/Ggb16rjZDlNyzvcQ34awAslRsNb+52tYswivK2wUlgIurdQSxx6
-         qEWGD2v+CntsI4d9t9tYRe4Ymj+s9KxymG7loBQvpOC8I924lbq+ChC4UrvKCdAT/4/n
-         9mwcsJZ9CWaDHQO84w+ELwQEIVx7JSd5mSvezjM7zlitJ3mytwg4myqpELeXr2fvqt/C
-         MfuFRAB84synI3czy9SL2kbbHX4q1ZtibA1i7Rav5VuYuv3SqhE0IQx2IK0eOHg/g8iK
-         cpcQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Prf/VJHcLzNPGHd30LHc6CkPP70FQ31JOcQkyJz5r1Y=;
-        b=45yRkK8/EfprRTCM7qpXJ2SaQH5cw8V66Ge5RL0Ws3a2K3m4nyR+83dcibty5F88Ol
-         vPReeCngg/kVJOJ2TCJXaWSeThwWbhXQH1jk/S0K/jOq5lgTdcWrEORtfTKo+2RK7N1l
-         XBUT6mTR9pMIMkWbddPnAAKIM/IyBciyQ1sXqhlhgSskU9I9DFeWmMVHn08YRY8qXAtr
-         FlK02M1OEqXCsM4DcfEQImXMOhhdQptAuC0aVGKp7IWDaeo/0IxTMKPQh+0q38hu5LdJ
-         kGUR6LNU3N5y9uv/AFKDmDc1aSBy52Sz64NfuPQcwS1x3iUg/aSgMG1p5HjtXWb83rp3
-         7t9g==
-X-Gm-Message-State: AJIora/5uKOWDxAA626w2Bp3fUB55MocKaP2WqTHcJK76StVNxxn5fRb
-        5kjxz1KxKEC6IQdQbYYGcSfxX5ZID1s=
-X-Google-Smtp-Source: AGRyM1ti0RFTgCEqxkqGVgIGOi3QHP5vzR5L/9VyUoXe+HhjMTCbPxAHHb6UmbxazOnxULgag5sM8A==
-X-Received: by 2002:a63:7844:0:b0:40c:9792:5d6d with SMTP id t65-20020a637844000000b0040c97925d6dmr11655355pgc.360.1656072131984;
-        Fri, 24 Jun 2022 05:02:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.81.64])
-        by smtp.gmail.com with ESMTPSA id bf3-20020a170902b90300b0015f2b3bc97asm1654262plb.13.2022.06.24.05.02.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jun 2022 05:02:11 -0700 (PDT)
-Message-ID: <62b5a7c3.1c69fb81.f92ea.293d@mx.google.com>
-Date:   Fri, 24 Jun 2022 05:02:11 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1948628232478483973=="
+        Fri, 24 Jun 2022 08:53:29 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEB3167F5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jun 2022 05:53:27 -0700 (PDT)
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
+        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
+        (envelope-from <a.fatoum@pengutronix.de>)
+        id 1o4ioQ-0006Q1-5U; Fri, 24 Jun 2022 14:53:26 +0200
+Message-ID: <1a5ec80d-690f-285c-3da8-ccdaf5516d85@pengutronix.de>
+Date:   Fri, 24 Jun 2022 14:53:23 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: Bluetooth: btmrvl_sdio: Remove hci_{suspend|resume}_dev
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220624192010.1.I9afcc6142cb963cf7014aa09edf61a94f5684799@changeid>
-References: <20220624192010.1.I9afcc6142cb963cf7014aa09edf61a94f5684799@changeid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
+ <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
+ <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+ <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
+ <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+ <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
+ <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
+ <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
+ <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
+ <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
+From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1948628232478483973==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Tedd, Luiz,
 
-This is automated email and please do not reply to this email!
+On 21.06.22 20:52, Luiz Augusto von Dentz wrote:
+> Hi Ahmad, Tedd,
+> 
+> On Tue, Jun 21, 2022 at 1:32 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>
+>> Hello Luiz,
+>>
+>> On 20.06.22 22:18, Luiz Augusto von Dentz wrote:
+>>> On Mon, Jun 20, 2022 at 3:06 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>> Disconnect of connection #1 being processed after new connection #2
+>>>> concluded sounds wrong. Would I be able to reconnect
+>>>> afterwards or would all connections, but the first, be directly
+>>>> disconnected...?
+>>>
+>>> That depends on the order you have queued the commands, it will be
+>>> processed in the exact order it is received, that why I said it is
+>>> single queue design, and it is done like that to prevent messing up
+>>> with states since we know the exact order the commands will be sent.
+>>>
+>>>>> otherwise we need a
+>>>>> different queue to handle command that abort/cancel other already in
+>>>>> the queue.
+>>>>
+>>>> Is the revert an acceptable interim solution or are there issues
+>>>> I am missing?
+>>>
+>>> Afaik there were problem with concurrent connections request, so what
+>>> would really help us here is to have some tests to emulate this
+>>> scenario with our CI, in the meantime please check if the following
+>>> fixes your problem:
+>>>
+>>> https://gist.github.com/Vudentz/b4fff292c7f4ad55ca3299fd5ab797ae
+>>
+>> Doesn't help unfortunately. First pairing works as before.
+>> Second still fails:
+>>
+>>   Bluetooth: hci0: Opcode 0x200d failed: -110
+>>   Bluetooth: hci0: request failed to create LE connection: err -110
+> 
+> Can we try to add a test in mgmt-tester to reproduce the error above?
 
-Dear submitter,
+I am not familiar with mgmt-tester. What information do you
+need to reproduce? In the meantime, can we revert the commit?
+I understand that this may break other uses, but I believe
+previously working stuff should have precedence..
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=653560
+Cheers,
+Ahmad
 
----Test result---
+> 
+>> Cheers,
+>> Ahmad
+>>
+>>>
+>>>> Cheers,
+>>>> Ahmad
+>>>>
+>>>>>
+>>>>>> We've been deploying the revert for a while now and I just posted
+>>>>>> it to the mailing list[1]. There have been other reports
+>>>>>> of this issue with different hardware too and fixing sent_cmd
+>>>>>> would likely be too complicated/time intensive for me.
+>>>>>>
+>>>>>> I am happy to test future patches that fix this properly though.
+>>>>>>
+>>>>>> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
+>>>>>>
+>>>>>> Cheers,
+>>>>>> Ahmad
+>>>>>>
+>>>>>>
+>>>>>>
+>>>>>>>
+>>>>>>> Cheers,
+>>>>>>> Ahmad
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>> --
+>>>>>> Pengutronix e.K.                           |                             |
+>>>>>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+>>>>>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+>>>>>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>>>>>
+>>>>>
+>>>>>
+>>>>
+>>>>
+>>>> --
+>>>> Pengutronix e.K.                           |                             |
+>>>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+>>>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+>>>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+>>>
+>>>
+>>>
+>>
+>>
+>> --
+>> Pengutronix e.K.                           |                             |
+>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> 
+> 
+> 
 
-Test Summary:
-CheckPatch                    PASS      0.86 seconds
-GitLint                       PASS      0.45 seconds
-SubjectPrefix                 PASS      0.30 seconds
-BuildKernel                   PASS      37.93 seconds
-BuildKernel32                 PASS      34.14 seconds
-Incremental Build with patchesPASS      45.35 seconds
-TestRunner: Setup             PASS      576.13 seconds
-TestRunner: l2cap-tester      PASS      19.26 seconds
-TestRunner: bnep-tester       PASS      6.85 seconds
-TestRunner: mgmt-tester       PASS      119.32 seconds
-TestRunner: rfcomm-tester     PASS      10.85 seconds
-TestRunner: sco-tester        PASS      10.35 seconds
-TestRunner: smp-tester        PASS      10.45 seconds
-TestRunner: userchan-tester   PASS      7.09 seconds
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1948628232478483973==--
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
