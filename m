@@ -2,171 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DEEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jun 2022 12:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23113CCA473
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Jun 2022 15:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230425AbiFXMxe (ORCPT
+        id S232559AbiFXPMj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Jun 2022 08:53:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33010 "EHLO
+        Fri, 24 Jun 2022 11:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbiFXMx3 (ORCPT
+        with ESMTP id S232478AbiFXPMd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Jun 2022 08:53:29 -0400
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAEB3167F5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Jun 2022 05:53:27 -0700 (PDT)
-Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[127.0.0.1])
-        by metis.ext.pengutronix.de with esmtp (Exim 4.92)
-        (envelope-from <a.fatoum@pengutronix.de>)
-        id 1o4ioQ-0006Q1-5U; Fri, 24 Jun 2022 14:53:26 +0200
-Message-ID: <1a5ec80d-690f-285c-3da8-ccdaf5516d85@pengutronix.de>
-Date:   Fri, 24 Jun 2022 14:53:23 +0200
+        Fri, 24 Jun 2022 11:12:33 -0400
+Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093CF4D9C6;
+        Fri, 24 Jun 2022 08:12:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1656083553; x=1687619553;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=RCpAULu+w1rxPcpxp+L8sVNGICCPU38qWIgGSWnp7mE=;
+  b=b19ardBcYiML+Quxyslthyu2p8idR2chefYG72mXDlcZcviG7tMUbgfB
+   Fug8iJpm8b9CU/tJXv/hsezJFUna54S2YAX1qHBNvlD8PxXXUME1jaB5V
+   PtZBq5K2iZmgPU/5PqqqYhAZvKA0ZrmiXWVw6qQ6DAqHEfdgOqSKQOyrJ
+   0=;
+Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
+  by alexa-out-sd-01.qualcomm.com with ESMTP; 24 Jun 2022 08:12:32 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2022 08:12:32 -0700
+Received: from [10.253.8.98] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Fri, 24 Jun
+ 2022 08:12:29 -0700
+Message-ID: <5eb95408-6e49-8e59-5684-c21e49f443a3@quicinc.com>
+Date:   Fri, 24 Jun 2022 23:12:27 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v2] Bluetooth: Fix CVSD SCO setup failure
 Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
- <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
- <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
- <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
- <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
- <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
- <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
- <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
- <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
- <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
-From:   Ahmad Fatoum <a.fatoum@pengutronix.de>
-In-Reply-To: <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>
+References: <1654772974-10357-1-git-send-email-quic_zijuhu@quicinc.com>
+From:   quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <1654772974-10357-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
-X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-bluetooth@vger.kernel.org
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd, Luiz,
-
-On 21.06.22 20:52, Luiz Augusto von Dentz wrote:
-> Hi Ahmad, Tedd,
+On 6/9/2022 7:09 PM, Zijun Hu wrote:
+> It will set up SCO after all CVSD eSCO attempts failure, but
+> still fails to set up SCO finally due to wrong D1/D0 @retrans_effort
+> within @esco_param_cvsd, so change it from 0x1 to 0xff to avoid
+> Invalid HCI Command Parameters error.
 > 
-> On Tue, Jun 21, 2022 at 1:32 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>
->> Hello Luiz,
->>
->> On 20.06.22 22:18, Luiz Augusto von Dentz wrote:
->>> On Mon, Jun 20, 2022 at 3:06 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>>> Disconnect of connection #1 being processed after new connection #2
->>>> concluded sounds wrong. Would I be able to reconnect
->>>> afterwards or would all connections, but the first, be directly
->>>> disconnected...?
->>>
->>> That depends on the order you have queued the commands, it will be
->>> processed in the exact order it is received, that why I said it is
->>> single queue design, and it is done like that to prevent messing up
->>> with states since we know the exact order the commands will be sent.
->>>
->>>>> otherwise we need a
->>>>> different queue to handle command that abort/cancel other already in
->>>>> the queue.
->>>>
->>>> Is the revert an acceptable interim solution or are there issues
->>>> I am missing?
->>>
->>> Afaik there were problem with concurrent connections request, so what
->>> would really help us here is to have some tests to emulate this
->>> scenario with our CI, in the meantime please check if the following
->>> fixes your problem:
->>>
->>> https://gist.github.com/Vudentz/b4fff292c7f4ad55ca3299fd5ab797ae
->>
->> Doesn't help unfortunately. First pairing works as before.
->> Second still fails:
->>
->>   Bluetooth: hci0: Opcode 0x200d failed: -110
->>   Bluetooth: hci0: request failed to create LE connection: err -110
+> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427
+>         Handle: 3
+>         Transmit bandwidth: 8000
+>         Receive bandwidth: 8000
+>         Max latency: 65535
+>         Setting: 0x0060
+>           Input Coding: Linear
+>           Input Data Format: 2's complement
+>           Input Sample Size: 16-bit
+>           # of bits padding at MSB: 0
+>           Air Coding Format: CVSD
+>         Retransmission effort: Optimize for power consumption (0x01)
+>         Packet type: 0x03c4
+>           HV3 may be used
+>           2-EV3 may not be used
+>           3-EV3 may not be used
+>           2-EV5 may not be used
+>           3-EV5 may not be used
+>> HCI Event: Command Status (0x0f) plen 4               #3428
+>       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+>         Status: Success (0x00)
+>> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429
+>         Status: Invalid HCI Command Parameters (0x12)
+>         Handle: 0
+>         Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+>         Link type: SCO (0x00)
+>         Transmission interval: 0x00
+>         Retransmission window: 0x00
+>         RX packet length: 0
+>         TX packet length: 0
+>         Air mode: u-law log (0x00)
 > 
-> Can we try to add a test in mgmt-tester to reproduce the error above?
-
-I am not familiar with mgmt-tester. What information do you
-need to reproduce? In the meantime, can we revert the commit?
-I understand that this may break other uses, but I believe
-previously working stuff should have precedence..
-
-Cheers,
-Ahmad
-
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  net/bluetooth/hci_conn.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
->> Cheers,
->> Ahmad
->>
->>>
->>>> Cheers,
->>>> Ahmad
->>>>
->>>>>
->>>>>> We've been deploying the revert for a while now and I just posted
->>>>>> it to the mailing list[1]. There have been other reports
->>>>>> of this issue with different hardware too and fixing sent_cmd
->>>>>> would likely be too complicated/time intensive for me.
->>>>>>
->>>>>> I am happy to test future patches that fix this properly though.
->>>>>>
->>>>>> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
->>>>>>
->>>>>> Cheers,
->>>>>> Ahmad
->>>>>>
->>>>>>
->>>>>>
->>>>>>>
->>>>>>> Cheers,
->>>>>>> Ahmad
->>>>>>>
->>>>>>
->>>>>>
->>>>>> --
->>>>>> Pengutronix e.K.                           |                             |
->>>>>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->>>>>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->>>>>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
->>>>>
->>>>>
->>>>>
->>>>
->>>>
->>>> --
->>>> Pengutronix e.K.                           |                             |
->>>> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->>>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->>>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
->>>
->>>
->>>
->>
->>
->> --
->> Pengutronix e.K.                           |                             |
->> Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
->> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
->> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
-> 
-> 
-> 
-
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 7829433d54c1..2627d5ac15d6 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
+>  	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,	0x01 }, /* S3 */
+>  	{ EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,	0x01 }, /* S2 */
+>  	{ EDR_ESCO_MASK | ESCO_EV3,   0x0007,	0x01 }, /* S1 */
+> -	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0x01 }, /* D1 */
+> -	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0x01 }, /* D0 */
+> +	{ EDR_ESCO_MASK | ESCO_HV3,   0xffff,	0xff }, /* D1 */
+> +	{ EDR_ESCO_MASK | ESCO_HV1,   0xffff,	0xff }, /* D0 */
+>  };
+>  
+>  static const struct sco_param sco_param_cvsd[] = {
+could you code review for this change?
