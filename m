@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B62D3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jun 2022 08:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EFDC43334
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 25 Jun 2022 09:04:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231858AbiFYIAO (ORCPT
+        id S232341AbiFYJEJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 25 Jun 2022 04:00:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
+        Sat, 25 Jun 2022 05:04:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231340AbiFYIAN (ORCPT
+        with ESMTP id S231934AbiFYJEI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 25 Jun 2022 04:00:13 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A54640A11;
-        Sat, 25 Jun 2022 01:00:13 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id w24so4720554pjg.5;
-        Sat, 25 Jun 2022 01:00:13 -0700 (PDT)
+        Sat, 25 Jun 2022 05:04:08 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791B231374;
+        Sat, 25 Jun 2022 02:04:05 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 184so4490306pga.12;
+        Sat, 25 Jun 2022 02:04:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=lDWMJLL7b7hzJh8tds1bD8xBhXjv7hAzXFZafEyqTtY=;
-        b=Ycp4G604pbCfOxrLUxAxT1vjBm3cpZnW0nl+pR1bzU0NHOscfe7tpVRhSsu5jjHThZ
-         AIdE77P32o3JYo0ENsz9faJTT7DRXgn9mk+Tag+cqpcUWXVz0e/p4q6YdXee7J/pDrTd
-         8XIATfWRHdbNqCFGplFk29hnymizhTE2M9yKLW0mK0ikoYe2/4OzL8sXyttvTAvmYfVb
-         wWXoT0op0rl6zptNAOPhgznaPCUULsPj2v9os7hn34rAQZjELZ9WOY6+F2hRrKtQaToc
-         bNRsgOQhyuJ5F30Egb583Ov8QC+47ZIA3VkVXoq2iDsIR+ndK2jLH4s2WOMq2J56vnKM
-         CFIQ==
+        bh=PxyMneeFLZ1Him14wA/vaqAtLh6smrx5mXTdl7jbmeM=;
+        b=eRu2Ta4mZyZ7borRVGbN1C1efQXR+klT/iliBLQtfzujyuP5iIl8xotq8DV1BMZq0Q
+         B38m7L/JutSdFDHhM0DKpFiBoYebjt13Ikcwl2aWjOeau/wTXVrjjDGe3exTJxqwwesY
+         WLyh9MDasoEDd+jm6MOFsYNoz/vYArosduWEVW7KjtLliagDRoVMRRII3Pen5ZpnolPk
+         pdsW4ACN9f8PrVK5nJU6GR5pM165kVo5KOZgrS8RTQohmVCpPq6KX59bHcWo4352BNtJ
+         HmpRL9TdC3sVXS20e977a9dDwh0EEO+5RLgGwsq5px3wPN80XOJ5JAU8NhDkRoP0NU3b
+         YLWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=lDWMJLL7b7hzJh8tds1bD8xBhXjv7hAzXFZafEyqTtY=;
-        b=nLi74DXX8b6WtbKYNKixoqqQqRWpXh7x+X5JBoVBSWFOjCma/QZjWPCY+YDdnb1sip
-         gOA2Rmm4iPc2S1KKoxZFWr7V3sblP0ulPy4u9d8ry9voXvmcz+u3zB2ale4nSGTGnQmg
-         oxVm/oIeLBm9PidjfvT1UKQ86NYzNQbtzo9ewPX8eMD2nNRype7nHcfo9lY8JiuB8tRM
-         DV9OBDvr8QukZbn6n0vXmUuiN8rsfose32mNRJW3I2+Vxkls1LJOgZdFNM/hu4QnhnBD
-         EsYF7KoWGhtcx2D5GI619byFkO80nxf/nOcjRHMDuzfyjKbjjRaji8FExVSzjVi08kKD
-         40Ww==
-X-Gm-Message-State: AJIora8Z61vN8x2fBzV3lyt0KFz8WunA56SnSpqbXRX5HrU8R076KN9J
-        IVtJrwuaCgmX91iLM5S1sWV+yvPprmlFhboC
-X-Google-Smtp-Source: AGRyM1ussrHM2mCJLvFwHuyIiXYjXD9pt2aFNG01Hq845ui6eHFtrqYCgpGaoi/Qu6v06DBUe34gHw==
-X-Received: by 2002:a17:90a:c981:b0:1e6:75f0:d4f1 with SMTP id w1-20020a17090ac98100b001e675f0d4f1mr3340993pjt.62.1656144012593;
-        Sat, 25 Jun 2022 01:00:12 -0700 (PDT)
+        bh=PxyMneeFLZ1Him14wA/vaqAtLh6smrx5mXTdl7jbmeM=;
+        b=UNNw/pKhKVoRs3Ieuq+d7ceOxuNNHbeCoBFK7xx9H8BBP+ByFeNS4bNw/az9caAsi6
+         rKbZg55nG+qUMlPntrspGmNL2ceW7BfL2k0D1u6KRneM8CDMiFWGby8VzWbDmjs2epoI
+         lUt7y9Ea9C10THP5BSdxXYEI8jpOrzt8gBWb8NvqCk1V3/V/dDQB/89a92lYipGk4m1J
+         yO6f1CgdLpFRihLoINQPIE6IQQU2hn8Y9TzJBZfEFeKQ73myfMgpD5eTpKh03ABZKira
+         n9kckFFbR4jJ1LjJeBvFr96nPrN2EyatDJoNdCVQyLnbLf2PnD3BgM90Ung4XkVxPB2W
+         ibdw==
+X-Gm-Message-State: AJIora8Nn4hhgh/LVrkFCdK+GiV0CDRFw9m9TXDzb8CUpOflRs6w3joh
+        QBiqmZ0NJxBTptp23wr2PC5QzJCCSd47bw==
+X-Google-Smtp-Source: AGRyM1uAw3KjZ1St9BZsASG20Q7hiSOWE/GnoUyPQgT5ZJyzutxL4AHeYm+O2bpMjAxP50ac2mNNnQ==
+X-Received: by 2002:a63:ff0c:0:b0:3fd:29dd:c478 with SMTP id k12-20020a63ff0c000000b003fd29ddc478mr2849728pgi.291.1656147844935;
+        Sat, 25 Jun 2022 02:04:04 -0700 (PDT)
 Received: from ZEN.. ([23.225.169.79])
-        by smtp.googlemail.com with ESMTPSA id n8-20020a17090a394800b001e85f38bc79sm5223100pjf.41.2022.06.25.01.00.10
+        by smtp.googlemail.com with ESMTPSA id t13-20020a17090340cd00b00166496ba268sm3130433pld.285.2022.06.25.02.04.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jun 2022 01:00:12 -0700 (PDT)
+        Sat, 25 Jun 2022 02:04:04 -0700 (PDT)
 From:   xhe <xw897002528@gmail.com>
 Cc:     xw897002528@gmail.com, Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Add a new VID/PID 0489/e0e2 for MT7922
-Date:   Sat, 25 Jun 2022 16:00:03 +0800
-Message-Id: <20220625080003.7104-1-xw897002528@gmail.com>
+Subject: [PATCH v4] Bluetooth: btusb: Add a new VID/PID 0489/e0e2 for MT7922
+Date:   Sat, 25 Jun 2022 17:03:57 +0800
+Message-Id: <20220625090358.9373-1-xw897002528@gmail.com>
 X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,6 +64,8 @@ To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
+
+From: He Wang <xw897002528@gmail.com>
 
 Add VID/PID 0489:e0e2 for MediaTek MT7922 Bluetooth chip. Found and
 tested with Asus UM5302TA.
