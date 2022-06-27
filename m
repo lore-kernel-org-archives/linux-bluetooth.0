@@ -2,87 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED03C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 03:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 862E4C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 08:25:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231602AbiF0DOw (ORCPT
+        id S233524AbiF0IZo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Jun 2022 23:14:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
+        Mon, 27 Jun 2022 04:25:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232554AbiF0DOv (ORCPT
+        with ESMTP id S233445AbiF0IZn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Jun 2022 23:14:51 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BAF558A
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jun 2022 20:14:50 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 187EFB80EAB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 03:14:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C6E01C341D4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 03:14:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656299687;
-        bh=Q8B41qHDbywOq0VyiSVCNETR1ReNQXbBR00+D/upL/k=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=QQoAi7laQ+32jqy3I673C9TY/LTmlFBEEZMiGp7J7zvNN8VauSKkiIuWt83l0YPbB
-         M5FSoIpFEdcP74g+MC+bh94AobnBvQtpf8IoP+jhZyJw4EpKJo5HB+M0CvVa62gVsh
-         chT/S0NgnJhNlM1qgf2/Gt10tIdrOK/j8SaJx4ALzlYHx8bOQHQKP8p5lBIohJ+nTR
-         ZtlgyC7xj0Yr/cr7RqcTg5URKTNHsxigDYvX3SqmNwztHh2KbiKqApTvh2kTInQFtM
-         GYnVh6zSMTGyKLLW2tWyGdgvWsKtqZmy7/8NkvyCXY5TmR1gXR7t1Mp+Y2V7mx1HKC
-         7BZFNW9t5TREQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B9066CC13AD; Mon, 27 Jun 2022 03:14:47 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215768] Kernel 5.17 can't suspend while bluetooth is enabled.
-Date:   Mon, 27 Jun 2022 03:14:47 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rui.zhang@intel.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc component assigned_to product
-Message-ID: <bug-215768-62941-WihItvzAC6@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215768-62941@https.bugzilla.kernel.org/>
-References: <bug-215768-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 27 Jun 2022 04:25:43 -0400
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71395624C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 01:25:42 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id ge10so17480441ejb.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 01:25:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=X1ZYkcNonUi8xla4l6VyX6ObjubtgJP9qSKvTS81tEE=;
+        b=qcv/o90ghpVt01BbEpMD//elgBIgDHmgKUPCZku7voePNkcvYFyJCBIyYBvkSPWsUj
+         /W6mNFBweq3/vDo2C7FeUxTH1lgqLLWe2rxnCpSvFPN1uYZ2bH3FXWpiUCq0iw+Bwlkj
+         cJgVHGz6CgC8v4GwraQP74jdPigICksmChnjjoKkcotBtxOjdhcaTTeRDTfLLpZyhYua
+         QGz5oe8i7N/D2wvGCd6BHQWIVQ5WJwOtS5V5lzp5PDgnnVYLQYcyIuaEKfF1VSGEY7EW
+         Hw/oo+roDh4rwRdhaYdU3p0ojATQzW7EI8hpdgz9aSjAbcKfJeGO8xVG5UIOHLd1eXas
+         5hXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=X1ZYkcNonUi8xla4l6VyX6ObjubtgJP9qSKvTS81tEE=;
+        b=DTh/kQxAdujDa+LcAn5sQS4oSjzYXVkKMuXs5KD13RG1SbNrVj5A4ihFC7GZ+bvlCu
+         d1MXNW9zGA0oqCzhxdtAGFRHOKrn4iRM7DcFZokpWZdMVLd9dU6bRmfzyV4RT8d887ZX
+         rSRjMjmQC+4rDLNEVNZBik/15wR4VGFSBuC+5SfEXP4+weXmKajYKyD4SBtxt/154lhN
+         fiMA0ZcR4N3BBABUNtXMe1KN3eHDnyLXtCIo4MkFE4E8IxdgU/bI63vzHt7ZT+FHs+MM
+         sQ1j3Ba9AIcr4SvL0gCf1rGfGOF4OwEuvkVO2HNxIyQSgWROE7h/kdJ8rd1Iq5d+T4bu
+         vD2w==
+X-Gm-Message-State: AJIora82UMycrOzF8KjkHiWC6EENi+MLr9eKNAKZHPm9K5qp3MHkDKfk
+        QU76n/QZVzdTP1FglTavq5JtPD7PZ7xpCdJig1iYnUXmTB8=
+X-Google-Smtp-Source: AGRyM1sc6D2LofDp8Q0cwop/sZdvGhath9iK/LBlZLUhmwbp3Uu6MsQGLTb46M7EL9sZ4M7H5Ovg4pm1MAW8saZFv70=
+X-Received: by 2002:a17:907:7e9d:b0:726:9a17:6a0e with SMTP id
+ qb29-20020a1709077e9d00b007269a176a0emr6046819ejc.257.1656318340958; Mon, 27
+ Jun 2022 01:25:40 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220624082541.51687-1-szymon.janc@codecoup.pl> <62b583e4.1c69fb81.57c65.133d@mx.google.com>
+In-Reply-To: <62b583e4.1c69fb81.57c65.133d@mx.google.com>
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+Date:   Mon, 27 Jun 2022 10:25:30 +0200
+Message-ID: <CAAEJBhKeyY6Y0CAqunH1TXW-f04Of8+mHs-4r=195TE2q=-Rug@mail.gmail.com>
+Subject: Re: monitor: Fix crash when using RTT backend
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
+Hi,
 
-Zhang Rui (rui.zhang@intel.com) changed:
+On Fri, 24 Jun 2022 at 11:29, <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=653494
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      1.09 seconds
+> GitLint                       PASS      0.73 seconds
+> Prep - Setup ELL              PASS      43.22 seconds
+> Build - Prep                  PASS      0.55 seconds
+> Build - Configure             PASS      8.74 seconds
+> Build - Make                  PASS      1280.85 seconds
+> Make Check                    PASS      11.53 seconds
+> Make Check w/Valgrind         PASS      433.72 seconds
+> Make Distcheck                PASS      225.36 seconds
+> Build w/ext ELL - Configure   PASS      8.31 seconds
+> Build w/ext ELL - Make        PASS      1228.49 seconds
+> Incremental Build with patchesPASS      0.00 seconds
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
+>
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |rui.zhang@intel.com
-          Component|Power-Sleep-Wake            |Bluetooth
-           Assignee|acpi_power-sleep-wake@kerne |linux-bluetooth@vger.kernel
-                   |l-bugs.osdl.org             |.org
-            Product|ACPI                        |Drivers
+Applied.
 
---- Comment #31 from Zhang Rui (rui.zhang@intel.com) ---
-reassign to bluetooth experts.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+pozdrawiam
+Szymon K. Janc
