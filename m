@@ -2,117 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA12CCA47E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 17:34:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66473C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 22:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238945AbiF0Ren (ORCPT
+        id S241038AbiF0WVj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jun 2022 13:34:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45804 "EHLO
+        Mon, 27 Jun 2022 18:21:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236463AbiF0Rel (ORCPT
+        with ESMTP id S239498AbiF0WVj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jun 2022 13:34:41 -0400
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A64D1B1CD;
-        Mon, 27 Jun 2022 10:34:39 -0700 (PDT)
-Received: by mail-io1-f43.google.com with SMTP id p69so10277998iod.10;
-        Mon, 27 Jun 2022 10:34:39 -0700 (PDT)
+        Mon, 27 Jun 2022 18:21:39 -0400
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A7427642
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 15:21:38 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id z21so18974769lfb.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 15:21:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xu1JabfQktiq3T8ewN1VpCN6WZC8dJYUy/VoQzZK1eQ=;
+        b=V5Hj4guq+lWQNWkK+vd3iNxzGS75AZYC/fKAe2tmyGycnAnRo3xmd3eqdMP2ARJ8ml
+         0+xSK1jSjhlYnSJa3QzXcNWDZ8GLR9MVUK4hfCtSA9OLyYeJC5P2f32BFQ3CXGEPwHdw
+         FuA3eXZzx1qbDrOmLLtbDskwsuV2bE68e9xtDC5rXu0Y7N/lNdCVt6NHmVBmuvrOZuD7
+         qrSJYHuvqk9nC7kJ4hN+C4f7BnIa6Sf408utjjaFZ6ZtdTsH4UW6meWuIWh3PE8pDpWK
+         yew2/z6+DZfpOxeet5alvV4DUoQh7+oiarbFhamhXqIkAk+/FJbmBrrhK+lgGO8irj9c
+         Di/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=a/8X5CuFWSs44Wf8DabrTq3lrtrQa6yryAnIBK8XrMM=;
-        b=dpTwiJs0sVdT1dprtR6W49mKRmiOZLvX5QJCz7jLaFoMhZ613SSTKyOjtjAveo6f9A
-         QPxBnkiAQXYnLrS+bZKV5vhwtPD/menrEhc7E0mDpeMR2SETfT/cM4GQxRRj8bX4wkTU
-         b/eCoCRC/RbBKBU2SHKxRGq8sVjwQl2vdyBlFv5gEEwlP4bWZWta0xqIeGC78IcaSAtz
-         OVRMszn/hNqDJDDA2yV0uSaQCdG+tBhNBVnwkugxeCGpz9IiNUL0E3Sw9R+KMVwAUtqX
-         /qIhBATsJkFj8VMAb+53kmuODivn4ojdzNuz9q5R/hOIOvfu4CGibjST1azv2xe2eHz/
-         1e/g==
-X-Gm-Message-State: AJIora8k2Xj/cnpRQnvlyI9Hu7EPJd9KBbf7EHwXKJFXG8RTmpb74Tam
-        QaTvFEEOrW4RuxVmz/oQetcRCiGmGw==
-X-Google-Smtp-Source: AGRyM1sywh7nza/vYaLVKSMTgBH/gRL4kZTOpa021AlwH6FPO+QZDC2J6Bq3pJHgENIJ1ZNse6UfLQ==
-X-Received: by 2002:a5e:c60a:0:b0:674:fd9d:e31f with SMTP id f10-20020a5ec60a000000b00674fd9de31fmr7164558iok.148.1656351278940;
-        Mon, 27 Jun 2022 10:34:38 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id i39-20020a023b67000000b00339e90e57e6sm4946959jaf.104.2022.06.27.10.34.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jun 2022 10:34:38 -0700 (PDT)
-Received: (nullmailer pid 2637344 invoked by uid 1000);
-        Mon, 27 Jun 2022 17:34:36 -0000
-Date:   Mon, 27 Jun 2022 11:34:36 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] dt-bindings: net: broadcom-bluetooth: Add CYW55572
- DT binding
-Message-ID: <20220627173436.GA2616639-robh@kernel.org>
-References: <cover.1655723462.git.hakan.jansson@infineon.com>
- <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
- <2c753258-b68e-b2ad-c4cc-f0a437769bc2@linaro.org>
- <cb973352-36f9-8d70-95ac-5b63a566422c@infineon.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xu1JabfQktiq3T8ewN1VpCN6WZC8dJYUy/VoQzZK1eQ=;
+        b=Kmyxn30DwiDtJEU5KLBrTfSpijmglD7jrmysMizdFbimeuxDe8U4oito/e50HKqUhg
+         Gp9R4+xwfnqeIZCDLghBlW/kJuIEquCYnoLURgNIptpcErfyG7u7gC7lX03JrxEUa4QO
+         qX1XnLryOrk2yeoQTLzDlYkj0BL6pLmyX3kfxFgEcJqssJkEs0yNZtSlm9axqJ0k8kGb
+         B6oI0wuu8k1ifSBjIsBY5h7zvYbjGRN1LG5IecnuADWUMDi+Mt2ip52dCUuKxmTV145t
+         bDn0ps/hmtNCvHIHaeveHqrfpjUMrP0mqJC3fJDjNzeFrFrTRzPeKyqA0pfcQVNTA3vY
+         aaiQ==
+X-Gm-Message-State: AJIora/HjmIYpIkbRKQ1BsrE8gLn47ZiGUKGMOQaovF4tpOnAkN0aTHF
+        HVqp0796PdJJKpOQhmXX2g6CjCX7ut5LNDnyKwM=
+X-Google-Smtp-Source: AGRyM1sYAUDnRwraWkXDXgp2CfdnTIkD7EsHg0SlMohg381Uv3GQDEpooenvnJYt0lzf/jeJdsSmuP8cnn+H/YAqnh0=
+X-Received: by 2002:a05:6512:2392:b0:47f:b8f8:5052 with SMTP id
+ c18-20020a056512239200b0047fb8f85052mr9125270lfv.106.1656368496360; Mon, 27
+ Jun 2022 15:21:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb973352-36f9-8d70-95ac-5b63a566422c@infineon.com>
+References: <GV0P278MB0129C9B8851F33EE8C3BA54095B99@GV0P278MB0129.CHEP278.PROD.OUTLOOK.COM>
+In-Reply-To: <GV0P278MB0129C9B8851F33EE8C3BA54095B99@GV0P278MB0129.CHEP278.PROD.OUTLOOK.COM>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 27 Jun 2022 15:21:25 -0700
+Message-ID: <CABBYNZLtL=MTCDka3xhMfhxfEHpzaY=bSn_Zat_=HD54=JhRVg@mail.gmail.com>
+Subject: Re: BlueZ bluetooth qualification
+To:     Isak Westin <karl.westin@loytec.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 04:06:25PM +0200, Hakan Jansson wrote:
-> Hi Krzysztof,
-> 
-> Thanks for replying.
-> 
-> On 6/20/2022 2:32 PM, Krzysztof Kozlowski wrote:
-> > > CYW55572 is a Wi-Fi + Bluetooth combo device from Infineon.
-> > > Extend the binding with its DT compatible.
-> > > 
-> > > Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
-> > > ---
-> > >   Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
-> > >   1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> > > index df59575840fe..71fe9b17f8f1 100644
-> > > --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> > > +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-> > > @@ -24,6 +24,7 @@ properties:
-> > >         - brcm,bcm43540-bt
-> > >         - brcm,bcm4335a0
-> > >         - brcm,bcm4349-bt
-> > > +      - infineon,cyw55572-bt
-> > Patch is okay, but just to be sure - is it entirely different device
-> > from Infineon or some variant of Broadcom block?
-> 
-> CYW55572 is a new device from Infineon. It is not the same as any Broadcom
-> device.
-> 
-> >   Are all existing
-> > properties applicable to it as well?
-> 
-> Yes, all existing properties are applicable.
+Hi Isak,
 
-Including 'brcm,bt-pcm-int-params'? I don't see a BT reset signal 
-either, but maybe that's not pinned out in the AzureWave module which 
-was the only documentation details I could find[1].
+On Mon, Jun 27, 2022 at 5:32 AM Isak Westin <karl.westin@loytec.com> wrote:
+>
+> Hi,
+>
+> My company wants to release a product where the BlueZ daemons are running as a host subsystem (both bluetoothd and bluetooth-meshd). So the product needs to be qualified.
+> I have looked on the web-page and searched in the archive of this mailing list but didn't really find any up-to-date information about this. So I wanted to ask if you have some new information that could help.
+> What are the general guidelines to qualify a product that is using the BlueZ stack? Is there a version that is already qualified that can be referred to? Or is the best way to qualify it ourselves using PTS testing?
 
-I think a separate doc will be better as it can be more precise as to 
-what's allowed or not. It's fine to reuse the same property names 
-though.
+Upstream don't qualify BlueZ by itself, usually it is the individual
+companies that qualify it based on the kernel and userspace version
+they intend to use. That said we do want to properly support the likes
+of auto-pts with BlueZ to automate the process of qualifying with PTS,
+and perhaps in the future even use it with our CI if we managed to
+emulate the PTS environment inside github.
 
-Rob
+@Tedd Ho-Jeong An can you update Isak where we stand regarding using
+auto-pts with BlueZ?
 
-[1] https://www.azurewave.com/img/infineon/AW-XH316_DS_DF_A_STD.pdf
+-- 
+Luiz Augusto von Dentz
