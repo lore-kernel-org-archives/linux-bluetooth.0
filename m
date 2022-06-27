@@ -2,102 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC84C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 02:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED03C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 03:14:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231880AbiF0Cbp (ORCPT
+        id S231602AbiF0DOw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Jun 2022 22:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51144 "EHLO
+        Sun, 26 Jun 2022 23:14:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbiF0Cbo (ORCPT
+        with ESMTP id S232554AbiF0DOv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Jun 2022 22:31:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E60CB2BE9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jun 2022 19:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1656297103;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NbmH8eeNH9GCNyJEMJVIoZ6jzBY1Wwznz8gCyxIKlQM=;
-        b=DrjXV66dKehKrYyMP9VKK/gHV2fxQFOANue0FvsMbzaPQ0/i4hoX3NK27eON0WdAaR75IY
-        V8vNHFpqncKhqMuJJBX3suBJpKsXTqTf0IaHo8vQujbnQR1G61csfm2+q6vnXEI19YfrEd
-        CqmbYXGy5t0iVE15TLRZfC66bRoLXAE=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-399-g9yryrwZN6uK2W9cPScnKw-1; Sun, 26 Jun 2022 22:31:41 -0400
-X-MC-Unique: g9yryrwZN6uK2W9cPScnKw-1
-Received: by mail-qk1-f198.google.com with SMTP id ay8-20020a05620a178800b006a76e584761so8916275qkb.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jun 2022 19:31:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NbmH8eeNH9GCNyJEMJVIoZ6jzBY1Wwznz8gCyxIKlQM=;
-        b=QJyC4nY3y9PVA2+eE2WeRsIRRcDbrhpQ9zLe0HI7J/fzBdolDiQ8CvXaPSYQPTv9DX
-         YIif/TQviBb9eP6W8WOKYFcCidkW05qY/FjsftMuS+FKaouCXNEuZL1UzHAm+bkn7x73
-         BgA18szzv3v6wErspewotv70X8JllaUD9VoSGLIOC0gqJomD6IXm+FzgpNI243wycVng
-         8GK7qb/1B9YXC+jbZX3UPKZNYa9X88JND4ZsH65tcl/QspkpQycTGIGnkbeRwtghi7JK
-         mDmnq038v8rNwWqAfvqNsoZfM0IAw+pMQ5BPghF1Y0ALnCdPpaZ5+sCOmOMKdi+mbj7S
-         /TdQ==
-X-Gm-Message-State: AJIora8qpdqIO2Na9tSeJ3rRh7fhE7VSaZxCzW17ZuREPU3R61kxsdwU
-        OcFks5q+pMUZ16cft7/M7zgaZv7B7/qzxfv5+eTWfzntubZUwqFbTYX+n0S+zAOCHqvrXUeFSy+
-        CAJYWsZfgXKB0rSSA8RIyELJjqsm7cZtEf/Xufcy8nKh0
-X-Received: by 2002:a0c:dc83:0:b0:470:aa91:9ea5 with SMTP id n3-20020a0cdc83000000b00470aa919ea5mr5787255qvk.28.1656297101020;
-        Sun, 26 Jun 2022 19:31:41 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1sckSJl+2KxDYqzywLJ6Cgs+wC5jgXtSANOYX1ODyEpm+4+KD8q/ct4paXz1mgZ94SHRCAZ8XaT/QePmQ65Nnw=
-X-Received: by 2002:a0c:dc83:0:b0:470:aa91:9ea5 with SMTP id
- n3-20020a0cdc83000000b00470aa919ea5mr5787245qvk.28.1656297100859; Sun, 26 Jun
- 2022 19:31:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAK-6q+g1jy-Q911SWTGVV1nw8GAbEAVYSAKqss54+8ehPw9RDA@mail.gmail.com>
- <e3efe652-eb22-4a3f-a121-be858fe2696b@datenfreihafen.org> <CAK-6q+h7497czku9rf9E4E=up5k5gm_NT0agPU2bUZr4ADKioQ@mail.gmail.com>
- <20220616093422.2e9ec948@kernel.org>
-In-Reply-To: <20220616093422.2e9ec948@kernel.org>
-From:   Alexander Aring <aahringo@redhat.com>
-Date:   Sun, 26 Jun 2022 22:31:29 -0400
-Message-ID: <CAK-6q+hvw-3EtSoQA-01w+RPCZ1mUDtPEyw-um9a6ocOzW+ovg@mail.gmail.com>
-Subject: Re: 6lowpan netlink
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-wpan - ML <linux-wpan@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        Network Development <netdev@vger.kernel.org>
+        Sun, 26 Jun 2022 23:14:51 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63BAF558A
+        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Jun 2022 20:14:50 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 187EFB80EAB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 03:14:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C6E01C341D4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 03:14:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656299687;
+        bh=Q8B41qHDbywOq0VyiSVCNETR1ReNQXbBR00+D/upL/k=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=QQoAi7laQ+32jqy3I673C9TY/LTmlFBEEZMiGp7J7zvNN8VauSKkiIuWt83l0YPbB
+         M5FSoIpFEdcP74g+MC+bh94AobnBvQtpf8IoP+jhZyJw4EpKJo5HB+M0CvVa62gVsh
+         chT/S0NgnJhNlM1qgf2/Gt10tIdrOK/j8SaJx4ALzlYHx8bOQHQKP8p5lBIohJ+nTR
+         ZtlgyC7xj0Yr/cr7RqcTg5URKTNHsxigDYvX3SqmNwztHh2KbiKqApTvh2kTInQFtM
+         GYnVh6zSMTGyKLLW2tWyGdgvWsKtqZmy7/8NkvyCXY5TmR1gXR7t1Mp+Y2V7mx1HKC
+         7BZFNW9t5TREQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id B9066CC13AD; Mon, 27 Jun 2022 03:14:47 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215768] Kernel 5.17 can't suspend while bluetooth is enabled.
+Date:   Mon, 27 Jun 2022 03:14:47 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: rui.zhang@intel.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc component assigned_to product
+Message-ID: <bug-215768-62941-WihItvzAC6@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215768-62941@https.bugzilla.kernel.org/>
+References: <bug-215768-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
 
-On Thu, Jun 16, 2022 at 12:34 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Thu, 16 Jun 2022 09:00:08 -0400 Alexander Aring wrote:
-> > > > I want to spread around that I started to work on some overdue
-> > > > implementation, a netlink 6lowpan configuration interface, because
-> > > > rtnetlink is not enough... it's for configuring very specific 6lowpan
-> > > > device settings.
-> > >
-> > > Great, looking forward to it!
-> >
-> > I would like to trigger a discussion about rtnetlink or generic. I can
-> > put a nested rtnetlink for some device specific settings but then the
-> > whole iproute2 (as it's currently is) would maintain a specific
-> > 6lowpan setting which maybe the user never wants...
-> > I think we should follow this way when there is a strict ipv6 device
-> > specific setting e.g. l2 neighbor information in ipv6 ndisc.
->
-> Unless you'll have to repeat attributes which are already present
-> in rtnetlink in an obvious way genetlink > rtnetlink.
+Zhang Rui (rui.zhang@intel.com) changed:
 
-I think this is not the case, I do not implement a new protocol
-family... I just need to manipulate some 6lowpan stack settings that
-aren't part of the current ipv6 protocol familty rtnetlink operations.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |rui.zhang@intel.com
+          Component|Power-Sleep-Wake            |Bluetooth
+           Assignee|acpi_power-sleep-wake@kerne |linux-bluetooth@vger.kernel
+                   |l-bugs.osdl.org             |.org
+            Product|ACPI                        |Drivers
 
-Thanks.
+--- Comment #31 from Zhang Rui (rui.zhang@intel.com) ---
+reassign to bluetooth experts.
 
- - Alex
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
