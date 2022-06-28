@@ -2,88 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC53C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jun 2022 12:32:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EB68C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jun 2022 14:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345686AbiF1Mcx (ORCPT
+        id S1347362AbiF1OEE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Jun 2022 08:32:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60196 "EHLO
+        Tue, 28 Jun 2022 10:04:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345720AbiF1Mc3 (ORCPT
+        with ESMTP id S1347363AbiF1OED (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Jun 2022 08:32:29 -0400
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70B82ED59
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jun 2022 05:32:27 -0700 (PDT)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-3178acf2a92so115272987b3.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Jun 2022 05:32:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RVfbgOitG18bb87yWBkH35J4JenCkCxRi/ygXGcpbt4=;
-        b=tGDyMj1XdbwFx5ENUdMBx7m0pmv1IRVf63OHKrsDLJaeKTSSU2j33ObLxTEK/a1s7Y
-         jrOPoEx2nYoNwN/ceD5w9u66ehVEcvbB7E3vPaR+lDZvoKpzNs1eTK0ER7hkvQe6m/VL
-         vc+wfNUJ6WJ7Sye6jdDw4Ow3y/KAqjzKYuY6qwnQ9WhqpoeIWOqI32MWXDG6n7fy9Cpk
-         6D931yS1B2I3am70V095kXKMLaW15fL1j0Hmj65paVEps+dGjAg7uti5JJ/xTsZ3ffcU
-         /T1xlJJOoIPNCE4UuUNFGc1XtroA22QdqISWZXog6bvdHHDaXe0g6WdCDKQnW7q4V5ah
-         E3Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RVfbgOitG18bb87yWBkH35J4JenCkCxRi/ygXGcpbt4=;
-        b=jFHbVNvHg+Ey3TM53d4kbxkq+cKXPoXTtMsrAvt2oFXQ+eWjq+dIwVbDhrZV++ohhs
-         b7dNeu1Sj5vS2+xhDiTtFKIFk0UnSU6vAiHRf05ZbqX5BKNCLTPps022BKSTiHxlcnWp
-         +YgSZiD/ItwcXxiQZgiwzSdkvFiM5xCS/P7xlA1EjhibwWWi/IQibmHpbdGcuuNJ7VID
-         0cIsiClt7PwlSbC4bgoP+FT3olM7NWUOK95xxEKvAVJE4XuZx0M1AVgo8ir4K41PtB9B
-         S87rYtifI2tLUq61mG4xe6VKiUMIMK0V1BXReFal51dgMOO/To0gDZSQ8EPIGq7ZbyTX
-         P+0w==
-X-Gm-Message-State: AJIora9ZjQy7L+J2n8BmxH9DjT52LlZbngYCBaQiGBiGhm7aahZxNZLG
-        fAIgJj6DksFFhsZqmqc2fmbwidAKsw0vfwEXyGS7xA==
-X-Google-Smtp-Source: AGRyM1tZOg8a8akbWJ6uq2aHl4kzEALWqREo/NhIhOnARsOJw9Xp0MQNW5ZunAPwLkiwJuL6LtQs7iavkhL0jCc/bFc=
-X-Received: by 2002:a81:d05:0:b0:317:76a1:9507 with SMTP id
- 5-20020a810d05000000b0031776a19507mr21222754ywn.151.1656419547105; Tue, 28
- Jun 2022 05:32:27 -0700 (PDT)
+        Tue, 28 Jun 2022 10:04:03 -0400
+Received: from smtp2.infineon.com (smtp2.infineon.com [IPv6:2a00:18f0:1e00:4::4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8355723BF5;
+        Tue, 28 Jun 2022 07:04:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1656425042; x=1687961042;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Nwmp6fTrRlPdkRkvJ5PRlNiLaOSIpMk1wa/T6KNjPRI=;
+  b=EJqtDXbxaYFoLV+8+8RxYqMlEjmEq8Sxp/3Eg78Nh90+Fj8oRQxVN7Ds
+   7y8eDU88j+7P0p2crsFG1R62S1oypm3Rsu8FWkDUEyG/1uCKeELN6rwgk
+   0ItymCfDN8Qk0yC2XFweP20bXRk3R3d0//LUCxOs1yUGUG7i41nK8EOfg
+   M=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10391"; a="186094378"
+X-IronPort-AV: E=Sophos;i="5.92,227,1650924000"; 
+   d="scan'208";a="186094378"
+Received: from unknown (HELO mucxv002.muc.infineon.com) ([172.23.11.17])
+  by smtp2.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2022 16:03:59 +0200
+Received: from MUCSE805.infineon.com (MUCSE805.infineon.com [172.23.29.31])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv002.muc.infineon.com (Postfix) with ESMTPS;
+        Tue, 28 Jun 2022 16:03:59 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE805.infineon.com
+ (172.23.29.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 28 Jun
+ 2022 16:03:59 +0200
+Received: from [10.160.193.107] (172.23.8.247) by MUCSE807.infineon.com
+ (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Tue, 28 Jun
+ 2022 16:03:58 +0200
+Message-ID: <6e3a557a-fb0e-3b28-68f2-32804b071cfb@infineon.com>
+Date:   Tue, 28 Jun 2022 16:03:57 +0200
 MIME-Version: 1.0
-References: <cover.1655723462.git.hakan.jansson@infineon.com> <0e3c48f0f38b167d83feb102284eaf24caa8c500.1655723462.git.hakan.jansson@infineon.com>
-In-Reply-To: <0e3c48f0f38b167d83feb102284eaf24caa8c500.1655723462.git.hakan.jansson@infineon.com>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Tue, 28 Jun 2022 14:32:15 +0200
-Message-ID: <CACRpkdZu9RrmWN+AZi_wy-UsJtdsfBHW+27Nj+n7YRSRXpoSEQ@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: hci_bcm: Prevent early baudrate setting in
- autobaud mode
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/4] dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT
+ binding
+Content-Language: en-US
+To:     Rob Herring <robh@kernel.org>
+CC:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
         Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <cover.1655723462.git.hakan.jansson@infineon.com>
+ <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
+ <2c753258-b68e-b2ad-c4cc-f0a437769bc2@linaro.org>
+ <cb973352-36f9-8d70-95ac-5b63a566422c@infineon.com>
+ <20220627173436.GA2616639-robh@kernel.org>
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+In-Reply-To: <20220627173436.GA2616639-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE803.infineon.com (172.23.29.29) To
+ MUCSE807.infineon.com (172.23.29.33)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 2:02 PM Hakan Jansson
-<hakan.jansson@infineon.com> wrote:
+Hi Rob,
 
-> Always prevent trying to set device baudrate before calling setup() when
-> using autobaud mode.
+On 6/27/2022 7:34 PM, Rob Herring wrote:
+> On Mon, Jun 20, 2022 at 04:06:25PM +0200, Hakan Jansson wrote:
+>> Hi Krzysztof,
+>>
+>> Thanks for replying.
+>>
+>> On 6/20/2022 2:32 PM, Krzysztof Kozlowski wrote:
+>>>> CYW55572 is a Wi-Fi + Bluetooth combo device from Infineon.
+>>>> Extend the binding with its DT compatible.
+>>>>
+>>>> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+>>>> ---
+>>>>    Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
+>>>>    1 file changed, 1 insertion(+)
+>>>>
+>>>> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>> index df59575840fe..71fe9b17f8f1 100644
+>>>> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>> @@ -24,6 +24,7 @@ properties:
+>>>>          - brcm,bcm43540-bt
+>>>>          - brcm,bcm4335a0
+>>>>          - brcm,bcm4349-bt
+>>>> +      - infineon,cyw55572-bt
+>>> Patch is okay, but just to be sure - is it entirely different device
+>>> from Infineon or some variant of Broadcom block?
+>> CYW55572 is a new device from Infineon. It is not the same as any Broadcom
+>> device.
+>>
+>>>    Are all existing
+>>> properties applicable to it as well?
+>> Yes, all existing properties are applicable.
+> Including 'brcm,bt-pcm-int-params'?
+
+Yes, 'brcm,bt-pcm-int-params' is also applicable to CYW55572.
+
+> I don't see a BT reset signal
+> either, but maybe that's not pinned out in the AzureWave module which
+> was the only documentation details I could find[1].
+
+That's correct, CYW55572 does not have a BT reset signal. Most of the 
+existing listed compatible devices does not seem to have a BT reset 
+signal either so I think this is in line with the intention of the 
+existing document and driver implementation.
+
+> I think a separate doc will be better as it can be more precise as to
+> what's allowed or not. It's fine to reuse the same property names
+> though.
+
+I don't really see anything besides the optional BT reset property that 
+would be changed in a separate doc.  As a separate doc would mean a 
+duplication of data that would need to be maintained in two more or less 
+identical docs, perhaps it would be better to modify the existing doc to 
+clarify for which compatible devices that the BT reset property applies? 
+(Which I believe are only these three: bcm20702a1, bcm4329-bt and 
+bcm4330-bt)
+
+> Rob
 >
-> This was previously happening for devices which had device specific data
-> with member no_early_set_baudrate set to 0.
->
-> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+> [1] https://www.azurewave.com/img/infineon/AW-XH316_DS_DF_A_STD.pdf
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-
-Yours,
-Linus Walleij
+Thanks,
+Håkan
