@@ -2,205 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEDCC43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Jun 2022 23:40:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Jun 2022 04:59:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241097AbiF0XkL (ORCPT
+        id S244556AbiF1E7Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Jun 2022 19:40:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51750 "EHLO
+        Tue, 28 Jun 2022 00:59:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231842AbiF0XkK (ORCPT
+        with ESMTP id S244539AbiF1E7X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Jun 2022 19:40:10 -0400
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C00D913CC9;
-        Mon, 27 Jun 2022 16:40:09 -0700 (PDT)
-Received: by mail-lf1-x135.google.com with SMTP id t25so19276089lfg.7;
-        Mon, 27 Jun 2022 16:40:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=g9TIf+3x3caizlqAmKMq5kNmA2BfpsDTk6Fwe26qpEo=;
-        b=IwQQhKq3UNveZs7dOmZGfBcnIBnkaCMDK7sKXtpazmL8V1T02SjSdtk8IuICV817Op
-         JPxmob5AgOLVm9L4BuKk5FOaUYazy/zHzqHFrWBAY6KiLq0NYAsMbc2uJMhpK4a7Hsh2
-         7yOyU9xT9VN7y/84DT3SDqxuzLVPLE0dgxfN+s0ElDRT80u24N2C2d1DTVUJHSTzVci0
-         rZMUcESMqSJFrGPe2tSvHddJjO4ny4Rz6p8wELk0+frpcBTMp+hY6ur0albcdVmetZ23
-         A4EE/hJVLWDFJOXkHs/uUSZq1zS+FK8qgJJevLCyDTwZ2Pw6T/zQzosEzs3JunEqZKyp
-         m24w==
+        Tue, 28 Jun 2022 00:59:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 300CC2BFD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 21:59:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656392361;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rZNQqZ1BHUSITCdYmtKN1bf6mH2E51IBmEGFR1jGCIs=;
+        b=fS5moFwYRj7tYD42Izf1dxCh6jajjagrufmowXuRQ8XQaQtcIvd0v3Y29ygolmxGG6Kcg2
+        I3o7iRzDL2ul66qkfHLV5dgqI2KHgJE4iYLiHv6w9A6HPYztkmE2MfpEqzZe8KcLPtaHEU
+        m/1NVp0fOBeawqXOKTaB0uyBLJ9aeZs=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-187-vMU-72u3OhWbWlpEzw8CkA-1; Tue, 28 Jun 2022 00:59:15 -0400
+X-MC-Unique: vMU-72u3OhWbWlpEzw8CkA-1
+Received: by mail-wr1-f70.google.com with SMTP id o1-20020adfba01000000b0021b90bd28d2so1438799wrg.14
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Jun 2022 21:59:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=g9TIf+3x3caizlqAmKMq5kNmA2BfpsDTk6Fwe26qpEo=;
-        b=c8gfGr2Rq1mJrRkcDDFdm+YHAyY4a+KZqLauWI0D6efsStAqEehbtJ14eRZp7Jpkyg
-         f8oMLqtkuAXofipiSeRILmO1/GFCjKME1UpU6JKYplWzRT5ICSxEa8vTGjAXjJcWHjRy
-         Uh/MOfndnOJYv6WkIdeqNFRAz4CwKZED3uS1wwBPgdG2Ls9ChuFOIvFfOUBTSbzmZz17
-         Sc6QymAxTeeX/N4+DnQYQpPDEZXqVtk4cUdcxYCuES60Ezd9zQ9um3e+njWGc2bxt+Zx
-         wjSkKQksqY+XTwf8lPKN2/9h+n4xDKpkvJiHjLmCgFAIyADIijgUfj+YIRsxatQBwKkG
-         s+ZQ==
-X-Gm-Message-State: AJIora/aR2ZWoygGeorEtKxvVqjqsdK/8qxd3XHdhW6KKG6y8/mdPH+o
-        50pbiezk4H/guTeHAP695lCtyfI2C7PPi/uXYLaiH9cX1ZS42w==
-X-Google-Smtp-Source: AGRyM1vSrDGCaf8Egi8rgU5w2J/m/P1YNJS3w5Hnouvho4Wlr31ukVPtiAd29Pm3PrW7vqS8JheZoYzwLM5ShTF55UI=
-X-Received: by 2002:a05:6512:39ca:b0:47f:a9e1:e3b8 with SMTP id
- k10-20020a05651239ca00b0047fa9e1e3b8mr9443878lfu.564.1656373207989; Mon, 27
- Jun 2022 16:40:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220622082716.478486-1-lee.jones@linaro.org> <CANn89iK-uFP6Swgc0ZeEC38UsuywJ3wbybSNouH202Wa7X7Tzg@mail.gmail.com>
-In-Reply-To: <CANn89iK-uFP6Swgc0ZeEC38UsuywJ3wbybSNouH202Wa7X7Tzg@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 27 Jun 2022 16:39:56 -0700
-Message-ID: <CABBYNZ+C=MQ7577Fr5_W8tQ4iWRSDBSiC4fkRBY3x=9ph+YAzA@mail.gmail.com>
-Subject: Re: [RESEND 1/1] Bluetooth: Use chan_list_lock to protect the whole
- put/destroy invokation
-To:     Eric Dumazet <edumazet@google.com>
-Cc:     Lee Jones <lee.jones@linaro.org>,
-        LKML <linux-kernel@vger.kernel.org>, stable@kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=rZNQqZ1BHUSITCdYmtKN1bf6mH2E51IBmEGFR1jGCIs=;
+        b=hRfQBBCl2TxM0/E8VK4UvX+LMl8ldz34K1jIjUgDp/ch7lRmbjcHERgYpRD+DZnEGG
+         IxO5aEbl9p7NFmIiDIjyZobj6dbrLH27MdYFikC6MR7vq5SZwSS2G68qMc1soAD5clgT
+         eZcFABmx8VIrjn/N9c/D/CyFSb1Zgd9+mVMSWfqbPifAsf7U+dsr39USij8qWckXOl1d
+         JNO7BUjDsJhQOksXLPQBnGyIHALvK5tzqIe4C7JtD+qBjDgie/xmuVUmam0zVrh7TQpL
+         iF1MZt7AJlw4+lA//l9bpsnoj4xKsrRl1XgVkjTNvH48UqthuUl9ZXXzwUGS0PvAK/2f
+         E2Mg==
+X-Gm-Message-State: AJIora9jhnrhF9BxaQRfF6KycPSe05ofJroYEeQOzZMSKK+kn02u6eK6
+        yxYQq76fBHAC/zz4rw2skHHoDa8SfKRODhYvqhviuPUsQ9VihGG/YS/cK9hS67NiRVSHztHHOes
+        ZMZH9YuGKtrmFT7czo5xErJZpllA6
+X-Received: by 2002:a5d:6d46:0:b0:21b:933d:7950 with SMTP id k6-20020a5d6d46000000b0021b933d7950mr15613696wri.679.1656392354608;
+        Mon, 27 Jun 2022 21:59:14 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tyGGHEzmhFr36J5MuQpBJ//xCFRhKGBlqfoxm4YRVwOh1Ip5cEC8bLfCjZ0wmo1x6Rb/zEWA==
+X-Received: by 2002:a5d:6d46:0:b0:21b:933d:7950 with SMTP id k6-20020a5d6d46000000b0021b933d7950mr15613676wri.679.1656392354311;
+        Mon, 27 Jun 2022 21:59:14 -0700 (PDT)
+Received: from redhat.com ([2.52.23.204])
+        by smtp.gmail.com with ESMTPSA id m20-20020a05600c4f5400b0039747cf8354sm16024450wmq.39.2022.06.27.21.59.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 21:59:13 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 00:59:10 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>
+Subject: Re: [PATCH] Bluetooth: virtio_bt: fix device removal
+Message-ID: <20220628005837-mutt-send-email-mst@kernel.org>
+References: <20211125174200.133230-1-mst@redhat.com>
+ <F52F65FE-6A07-486B-8E84-684ED85709E9@holtmann.org>
+ <20211209162149-mutt-send-email-mst@kernel.org>
+ <20211213054357-mutt-send-email-mst@kernel.org>
+ <20211213185620-mutt-send-email-mst@kernel.org>
+ <FF8BA713-6DD2-485B-9ADC-02006126BC60@holtmann.org>
+ <20220114151142-mutt-send-email-mst@kernel.org>
+ <20220613025539-mutt-send-email-mst@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220613025539-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Eric, Lee,
+On Mon, Jun 13, 2022 at 02:58:59AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jan 14, 2022 at 03:12:47PM -0500, Michael S. Tsirkin wrote:
+> > On Thu, Dec 16, 2021 at 08:58:31PM +0100, Marcel Holtmann wrote:
+> > > Hi Michael,
+> > > 
+> > > >>>>> Device removal is clearly out of virtio spec: it attempts to remove
+> > > >>>>> unused buffers from a VQ before invoking device reset. To fix, make
+> > > >>>>> open/close NOPs and do all cleanup/setup in probe/remove.
+> > > >>>> 
+> > > >>>> so the virtbt_{open,close} as NOP is not really what a driver is suppose
+> > > >>>> to be doing. These are transport enable/disable callbacks from the BT
+> > > >>>> Core towards the driver. It maps to a device being enabled/disabled by
+> > > >>>> something like bluetoothd for example. So if disabled, I expect that no
+> > > >>>> resources/queues are in use.
+> > > >>>> 
+> > > >>>> Maybe I misunderstand the virtio spec in that regard, but I would like
+> > > >>>> to keep this fundamental concept of a Bluetooth driver. It does work
+> > > >>>> with all other transports like USB, SDIO, UART etc.
+> > > >>>> 
+> > > >>>>> The cost here is a single skb wasted on an unused bt device - which
+> > > >>>>> seems modest.
+> > > >>>> 
+> > > >>>> There should be no buffer used if the device is powered off. We also don’t
+> > > >>>> have any USB URBs in-flight if the transport is not active.
+> > > >>>> 
+> > > >>>>> NB: with this fix in place driver still suffers from a race condition if
+> > > >>>>> an interrupt triggers while device is being reset. Work on a fix for
+> > > >>>>> that issue is in progress.
+> > > >>>> 
+> > > >>>> In the virtbt_close() callback we should deactivate all interrupts.
+> > > >>>> 
+> > > >>>> Regards
+> > > >>>> 
+> > > >>>> Marcel
+> > > >>> 
+> > > >>> So Marcel, do I read it right that you are working on a fix
+> > > >>> and I can drop this patch for now?
+> > > >> 
+> > > >> ping
+> > > > 
+> > > > 
+> > > > If I don't hear otherwise I'll queue my version - it might not
+> > > > be ideal but it at least does not violate the spec.
+> > > > We can work on not allocating/freeing buffers later
+> > > > as appropriate.
+> > > 
+> > > I have a patch, but it is not fully tested yet.
+> > > 
+> > > Regards
+> > > 
+> > > Marcel
+> > 
+> > ping
+> > 
+> > it's been a month ...
+> > 
+> > I'm working on cleaning up module/device removal in virtio and bt
+> > is kind of sticking out.
+> 
+> I am inclined to make this driver depend on BROKEN for now.
+> Any objections?
 
-On Mon, Jun 27, 2022 at 7:41 AM Eric Dumazet <edumazet@google.com> wrote:
->
-> On Wed, Jun 22, 2022 at 10:27 AM Lee Jones <lee.jones@linaro.org> wrote:
-> >
-> > This change prevents a use-after-free caused by one of the worker
-> > threads starting up (see below) *after* the final channel reference
-> > has been put() during sock_close() but *before* the references to the
-> > channel have been destroyed.
-> >
-> >   refcount_t: increment on 0; use-after-free.
-> >   BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
-> >   Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
-> >
-> >   CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.234-00003-g1fb6d0bd49a4-dirty #28
-> >   Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google Inc. MSM sm8150 Flame DVT (DT)
-> >   Workqueue: hci0 hci_rx_work
-> >   Call trace:
-> >    dump_backtrace+0x0/0x378
-> >    show_stack+0x20/0x2c
-> >    dump_stack+0x124/0x148
-> >    print_address_description+0x80/0x2e8
-> >    __kasan_report+0x168/0x188
-> >    kasan_report+0x10/0x18
-> >    __asan_load4+0x84/0x8c
-> >    refcount_dec_and_test+0x20/0xd0
-> >    l2cap_chan_put+0x48/0x12c
-> >    l2cap_recv_frame+0x4770/0x6550
-> >    l2cap_recv_acldata+0x44c/0x7a4
-> >    hci_acldata_packet+0x100/0x188
-> >    hci_rx_work+0x178/0x23c
-> >    process_one_work+0x35c/0x95c
-> >    worker_thread+0x4cc/0x960
-> >    kthread+0x1a8/0x1c4
-> >    ret_from_fork+0x10/0x18
-> >
-> > Cc: stable@kernel.org
->
-> When was the bug added ? (Fixes: tag please)
->
-> > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Cc: netdev@vger.kernel.org
-> > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > ---
-> >  net/bluetooth/l2cap_core.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > index ae78490ecd3d4..82279c5919fd8 100644
-> > --- a/net/bluetooth/l2cap_core.c
-> > +++ b/net/bluetooth/l2cap_core.c
-> > @@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
-> >
-> >         BT_DBG("chan %p", chan);
-> >
-> > -       write_lock(&chan_list_lock);
-> >         list_del(&chan->global_l);
-> > -       write_unlock(&chan_list_lock);
-> >
-> >         kfree(chan);
-> >  }
-> > @@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
-> >  {
-> >         BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
-> >
-> > +       write_lock(&chan_list_lock);
-> >         kref_put(&c->kref, l2cap_chan_destroy);
-> > +       write_unlock(&chan_list_lock);
-> >  }
-> >  EXPORT_SYMBOL_GPL(l2cap_chan_put);
-> >
-> > --
-> > 2.36.1.255.ge46751e96f-goog
-> >
->
-> I do not think this patch is correct.
->
-> a kref does not need to be protected by a write lock.
->
-> This might shuffle things enough to work around a particular repro you have.
->
-> If the patch was correct why not protect kref_get() sides ?
->
-> Before the &hdev->rx_work is scheduled (queue_work(hdev->workqueue,
-> &hdev->rx_work),
-> a reference must be taken.
->
-> Then this reference must be released at the end of hci_rx_work() or
-> when hdev->workqueue
-> is canceled.
->
-> This refcount is not needed _if_ the workqueue is properly canceled at
-> device dismantle,
-> in a synchronous way.
->
-> I do not see this hdev->rx_work being canceled, maybe this is the real issue.
->
-> There is a call to drain_workqueue() but this is not enough I think,
-> because hci_recv_frame()
-> can re-arm
->    queue_work(hdev->workqueue, &hdev->rx_work);
+OK patch incoming.
 
-I suspect this likely a refcount problem, we do l2cap_get_chan_by_scid:
+> 
+> > -- 
+> > MST
 
-/* Find channel with given SCID.
- * Returns locked channel. */
-static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn
-*conn, u16 cid)
-
-So we return a locked channel but that doesn't prevent another thread
-to call l2cap_chan_put which doesn't care about l2cap_chan_lock so
-perhaps we actually need to host a reference while we have the lock,
-at least we do something like that on l2cap_sock.c:
-
-l2cap_chan_hold(chan);
-l2cap_chan_lock(chan);
-
-__clear_chan_timer(chan);
-l2cap_chan_close(chan, ECONNRESET);
-l2cap_sock_kill(sk);
-
-l2cap_chan_unlock(chan);
-l2cap_chan_put(chan);
-
-
--- 
-Luiz Augusto von Dentz
