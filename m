@@ -2,125 +2,303 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5162C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jun 2022 20:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92330C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jun 2022 21:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbiF2UP5 (ORCPT
+        id S230073AbiF2VC7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Jun 2022 16:15:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
+        Wed, 29 Jun 2022 17:02:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbiF2UP5 (ORCPT
+        with ESMTP id S229725AbiF2VC6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Jun 2022 16:15:57 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216E52E6A1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jun 2022 13:15:56 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id i64so16106187pfc.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jun 2022 13:15:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/R9AKFwQBDwqpt0QWjfJNZpi/8XJxjFOPf5R7hVJpkg=;
-        b=UZymtQVuJlGinFuNXUwPAbwS0LiPD9s7vqgWAmuOhEVacAOeORK8aJZWUIWvZxgQng
-         IRjyvYThfWEsohKnv7JkC3vsor29Zf1ICm7ylJbM9lX3zhGj/fNsSBp9G3sEiy6oNJ5j
-         mqL81Wo0UR+8PUqi3+eyoEl1xv2DM1WVUR5rh6NXn1pQPtbdwwVqbNcnTiDcZd3Mm6wQ
-         AaWU7hHNfRBZcVaxgudKtqKVRQnOwWOipdTP7jHJdGgxcubQPfZVIC+Lv4jKTXPtJdmj
-         ipaWVxO3BF1W37tJGFUDNNx0IA90E1GLHaG3ZaJjDWt8ThjRIQabq3pbb8bPpq/tQOhp
-         UIeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/R9AKFwQBDwqpt0QWjfJNZpi/8XJxjFOPf5R7hVJpkg=;
-        b=LDTjYTQHlUfTHGyt5WBvbyDC+lsG+Elz7pJPzz59gkrWfXAFc27tRFb1RRkt/OTEWV
-         0lyLdA9dzj3x9+VH7EWDnjfPC71QxbgOGh6GCyup65SJp5SnqtLxrXgns9ct6jJ0BAQP
-         HmJ5kQv8ZA/gPrEf1t1qlGupJwGNr+Y985LW3jBs03k+4x6i5UE1RSmGIW00IKr20IXR
-         JqK4n6JgSCq3bExESpw0ps4QjH+UXhD7qQbSqS1UkZ9ieWjXq1BoHM+iCMQThmUQpBmh
-         wdxqIKHQIiF/sTrCV/23hXMY4Bz+oeSBrDnmfLPszFKEPJdDP/lgfqxn9tebTfitGTCq
-         8MYQ==
-X-Gm-Message-State: AJIora/BiPX/ekemfdz0mlSoWQ4MM9re+7xWL0Rocj1X3vPjcaPQR6zv
-        keBeuCKLBi6o0j9BGqTWDmdswBbIhAU=
-X-Google-Smtp-Source: AGRyM1vGhasusO8SV2bB7qpxqGfvSFsGTL0oOLYwl94tq6XTFMtBbObJgSQGtfaEaHYq/b/6cBvT4Q==
-X-Received: by 2002:a63:854a:0:b0:40d:1d04:769 with SMTP id u71-20020a63854a000000b0040d1d040769mr4406534pgd.151.1656533755205;
-        Wed, 29 Jun 2022 13:15:55 -0700 (PDT)
-Received: from [172.17.0.2] ([20.118.165.54])
-        by smtp.gmail.com with ESMTPSA id u3-20020a17090a1f0300b001ecfea03d85sm66418pja.37.2022.06.29.13.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 13:15:54 -0700 (PDT)
-Message-ID: <62bcb2fa.1c69fb81.4ffd.029b@mx.google.com>
-Date:   Wed, 29 Jun 2022 13:15:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5668549091075857746=="
+        Wed, 29 Jun 2022 17:02:58 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7ED73FBCC
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Jun 2022 14:02:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656536577; x=1688072577;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=qwt6CVN+UeIjI4WII29bHzW6O8UAUQ7I3ruzMpLdPYc=;
+  b=dmAqhOUiCg+GwgmWpK66UxoMZWIiimIF4sz6V5FoTN5txHd/EvU20Jn+
+   CjCxRstLySrAOWSfBScCEmP4aPrLKQxL2XJtxJnerzhLHj+FiZM3gHuoj
+   6qeMmfelP+eXwEoHIi/cMD2FRBZmIvPSSe+TcTwklzthWQtwqKRst5vtv
+   8iAzYC/UThvVykbDsUgJopu/M7iNNJz0kCaZm1XwSkcSaWmvxXCj+YCc5
+   HCWIxq1eg2SK/AlepLZsKkiKKB5L328X3brKMjFuhSd7QPCezozY/z+RQ
+   hB40tgqFwoSFyG7/U89CIKKKPHz3UImjMatfME1k+aAfZcVSvOy4YgwaI
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="368473500"
+X-IronPort-AV: E=Sophos;i="5.92,232,1650956400"; 
+   d="scan'208";a="368473500"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 14:02:49 -0700
+X-IronPort-AV: E=Sophos;i="5.92,232,1650956400"; 
+   d="scan'208";a="680682969"
+Received: from bshamoun-mobl2.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.96.196])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 14:02:49 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     inga.stotland@gmail.com, brian.gix@intel.com
+Subject: [PATCH BlueZ v2] mesh: Fix snprintf return values not being checked
+Date:   Wed, 29 Jun 2022 14:02:37 -0700
+Message-Id: <20220629210237.63236-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [BlueZ] mesh: Fix snprintf return values not being checked
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220629190046.14198-1-brian.gix@intel.com>
-References: <20220629190046.14198-1-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5668549091075857746==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655140
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.82 seconds
-GitLint                       PASS      0.54 seconds
-Prep - Setup ELL              PASS      41.91 seconds
-Build - Prep                  PASS      0.45 seconds
-Build - Configure             PASS      8.07 seconds
-Build - Make                  PASS      1222.12 seconds
-Make Check                    PASS      11.65 seconds
-Make Check w/Valgrind         PASS      441.75 seconds
-Make Distcheck                PASS      230.08 seconds
-Build w/ext ELL - Configure   PASS      8.10 seconds
-Build w/ext ELL - Make        PASS      1197.84 seconds
-Incremental Build with patchesPASS      0.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] mesh: Fix snprintf return values not being checked
-WARNING:UNNECESSARY_ELSE: else is not generally useful after a break or return
-#101: FILE: mesh/mesh-config-json.c:184:
-+		return NULL;
-+	else
-
-/github/workspace/src/12900623.patch total: 0 errors, 1 warnings, 220 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12900623.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Some versions of the GCC compiler complain when the return value of
+snprintf is not checked. This patch cleans up the Mesh JSON parser.
 ---
-Regards,
-Linux Bluetooth
+ mesh/mesh-config-json.c | 88 ++++++++++++++++++++++++++---------------
+ 1 file changed, 57 insertions(+), 31 deletions(-)
 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index f142f0e1f..5bb1e5ce0 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -156,7 +156,7 @@ static json_object *get_element_model(json_object *jnode, int ele_idx,
+ 						uint32_t mod_id, bool vendor)
+ {
+ 	json_object *jelements, *jelement, *jmodels;
+-	int i, num_mods;
++	int i, num_mods, ret;
+ 	size_t len;
+ 	char buf[9];
+ 
+@@ -174,13 +174,15 @@ static json_object *get_element_model(json_object *jnode, int ele_idx,
+ 	if (!num_mods)
+ 		return NULL;
+ 
+-	if (!vendor) {
+-		snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
+-		len = 4;
+-	} else {
+-		snprintf(buf, 9, "%8.8x", mod_id);
+-		len = 8;
+-	}
++	if (!vendor)
++		ret = snprintf(buf, 5, "%4.4x", (uint16_t)mod_id);
++	else
++		ret = snprintf(buf, 9, "%8.8x", mod_id);
++
++	if (ret < 0)
++		return NULL;
++
++	len = ret;
+ 
+ 	for (i = 0; i < num_mods; ++i) {
+ 		json_object *jmodel, *jvalue;
+@@ -818,7 +820,7 @@ bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 							uint16_t app_idx)
+ {
+ 	json_object *jnode, *jmodel, *jstring, *jarray = NULL;
+-	int ele_idx;
++	int ele_idx, ret;
+ 	char buf[5];
+ 
+ 	if (!cfg)
+@@ -826,6 +828,10 @@ bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 
+ 	jnode = cfg->jnode;
+ 
++	ret = snprintf(buf, 5, "%4.4x", app_idx);
++	if (ret < 0)
++		return false;
++
+ 	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+@@ -834,8 +840,6 @@ bool mesh_config_model_binding_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 	if (!jmodel)
+ 		return false;
+ 
+-	snprintf(buf, 5, "%4.4x", app_idx);
+-
+ 	json_object_object_get_ex(jmodel, "bind", &jarray);
+ 	if (jarray && jarray_has_string(jarray, buf, 4))
+ 		return true;
+@@ -863,7 +867,7 @@ bool mesh_config_model_binding_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 							uint16_t app_idx)
+ {
+ 	json_object *jnode, *jmodel, *jarray;
+-	int ele_idx;
++	int ele_idx, ret;
+ 	char buf[5];
+ 
+ 	if (!cfg)
+@@ -871,6 +875,10 @@ bool mesh_config_model_binding_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 
+ 	jnode = cfg->jnode;
+ 
++	ret = snprintf(buf, 5, "%4.4x", app_idx);
++	if (ret < 0)
++		return false;
++
+ 	ele_idx = get_element_index(jnode, ele_addr);
+ 	if (ele_idx < 0)
+ 		return false;
+@@ -882,8 +890,6 @@ bool mesh_config_model_binding_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 	if (!json_object_object_get_ex(jmodel, "bind", &jarray))
+ 		return true;
+ 
+-	snprintf(buf, 5, "%4.4x", app_idx);
+-
+ 	jarray_string_del(jarray, buf, 4);
+ 
+ 	if (!json_object_array_length(jarray))
+@@ -1415,9 +1421,13 @@ static bool write_uint16_hex(json_object *jobj, const char *desc,
+ 								uint16_t value)
+ {
+ 	json_object *jstring;
++	int ret;
+ 	char buf[5];
+ 
+-	snprintf(buf, 5, "%4.4x", value);
++	ret = snprintf(buf, 5, "%4.4x", value);
++	if (ret < 0)
++		return false;
++
+ 	jstring = json_object_new_string(buf);
+ 	if (!jstring)
+ 		return false;
+@@ -1430,9 +1440,13 @@ static bool write_uint16_hex(json_object *jobj, const char *desc,
+ static bool write_uint32_hex(json_object *jobj, const char *desc, uint32_t val)
+ {
+ 	json_object *jstring;
++	int ret;
+ 	char buf[9];
+ 
+-	snprintf(buf, 9, "%8.8x", val);
++	ret = snprintf(buf, 9, "%8.8x", val);
++	if (ret < 0)
++		return false;
++
+ 	jstring = json_object_new_string(buf);
+ 	if (!jstring)
+ 		return false;
+@@ -1716,22 +1730,24 @@ struct mesh_config *mesh_config_create(const char *cfgdir_name,
+ 	char uuid_buf[33];
+ 	char name_buf[PATH_MAX];
+ 	struct mesh_config *cfg;
+-	size_t max_len = strlen(cfgnode_name) + strlen(bak_ext);
++	int ret;
+ 
+ 	if (!hex2str((uint8_t *) uuid, 16, uuid_buf, sizeof(uuid_buf)))
+ 		return NULL;
+ 
+-	snprintf(name_buf, PATH_MAX, "%s/%s", cfgdir_name, uuid_buf);
+-
+-	if (strlen(name_buf) + max_len >= PATH_MAX)
++	ret = snprintf(name_buf, PATH_MAX, "%s/%s", cfgdir_name, uuid_buf);
++	if (ret < 0)
+ 		return NULL;
+ 
+ 	/* Create a new directory and node.json file */
+ 	if (mkdir(name_buf, 0755) != 0)
+ 		return NULL;
+ 
+-	snprintf(name_buf, PATH_MAX, "%s/%s%s", cfgdir_name, uuid_buf,
++	ret = snprintf(name_buf, PATH_MAX, "%s/%s%s", cfgdir_name, uuid_buf,
+ 								cfgnode_name);
++	if (ret < 0)
++		return NULL;
++
+ 	l_debug("New node config %s", name_buf);
+ 
+ 	cfg = create_config(name_buf, uuid, db_node);
+@@ -1904,12 +1920,14 @@ bool mesh_config_model_pub_del(struct mesh_config *cfg, uint16_t addr,
+ static void del_page(json_object *jarray, uint8_t page)
+ {
+ 	char buf[3];
+-	int i, len;
++	int i, len, ret;
+ 
+ 	if (!jarray)
+ 		return;
+ 
+-	snprintf(buf, 3, "%2.2x", page);
++	ret = snprintf(buf, 3, "%2.2x", page);
++	if (ret < 0)
++		return;
+ 
+ 	len = json_object_array_length(jarray);
+ 
+@@ -1931,7 +1949,7 @@ bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
+ {
+ 	json_object *jnode, *jstring, *jarray = NULL;
+ 	char *buf;
+-	int len;
++	int len, ret;
+ 
+ 	if (!cfg)
+ 		return false;
+@@ -1942,7 +1960,10 @@ bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
+ 
+ 	len = (size * 2) + 3;
+ 	buf = l_malloc(len);
+-	snprintf(buf, len, "%2.2x", page);
++	ret = snprintf(buf, len, "%2.2x", page);
++	if (ret < 0)
++		return false;
++
+ 	hex2str(data, size, buf + 2, len - 2);
+ 
+ 	if (jarray && jarray_has_string(jarray, buf, len)) {
+@@ -1967,12 +1988,16 @@ bool mesh_config_comp_page_mv(struct mesh_config *cfg, uint8_t old, uint8_t nw)
+ 	uint8_t *data;
+ 	char *str;
+ 	char old_buf[3];
+-	int i, len, dlen = 0;
++	int i, len, ret, dlen = 0;
+ 	bool status = true;
+ 
+ 	if (!cfg || old == nw)
+ 		return false;
+ 
++	ret = snprintf(old_buf, 3, "%2.2x", old);
++	if (ret < 0)
++		return false;
++
+ 	jnode = cfg->jnode;
+ 
+ 	json_object_object_get_ex(jnode, "pages", &jarray);
+@@ -1980,7 +2005,6 @@ bool mesh_config_comp_page_mv(struct mesh_config *cfg, uint8_t old, uint8_t nw)
+ 	if (!jarray)
+ 		return false;
+ 
+-	snprintf(old_buf, 3, "%2.2x", old);
+ 	data = l_malloc(MAX_MSG_LEN);
+ 
+ 	len = json_object_array_length(jarray);
+@@ -2030,8 +2054,9 @@ bool mesh_config_model_sub_add(struct mesh_config *cfg, uint16_t ele_addr,
+ 		return false;
+ 
+ 	if (!sub->virt) {
+-		snprintf(buf, 5, "%4.4x", sub->addr.grp);
+-		len = 4;
++		len = snprintf(buf, 5, "%4.4x", sub->addr.grp);
++		if (len < 0)
++			return false;
+ 	} else {
+ 		hex2str(sub->addr.label, 16, buf, 33);
+ 		len = 32;
+@@ -2084,8 +2109,9 @@ bool mesh_config_model_sub_del(struct mesh_config *cfg, uint16_t ele_addr,
+ 		return true;
+ 
+ 	if (!sub->virt) {
+-		snprintf(buf, 5, "%4.4x", sub->addr.grp);
+-		len = 4;
++		len = snprintf(buf, 5, "%4.4x", sub->addr.grp);
++		if (len < 0)
++			return false;
+ 	} else {
+ 		hex2str(sub->addr.label, 16, buf, 33);
+ 		len = 32;
+-- 
+2.36.1
 
---===============5668549091075857746==--
