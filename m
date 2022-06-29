@@ -2,65 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97741C43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jun 2022 09:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3283C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Jun 2022 10:29:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232825AbiF2Jib (ORCPT
+        id S232446AbiF2K3i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Jun 2022 05:38:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        Wed, 29 Jun 2022 06:29:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbiF2Jia (ORCPT
+        with ESMTP id S229828AbiF2K3h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Jun 2022 05:38:30 -0400
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6805822289;
-        Wed, 29 Jun 2022 02:38:28 -0700 (PDT)
-Received: from relay5-d.mail.gandi.net (unknown [217.70.183.197])
-        by mslow1.mail.gandi.net (Postfix) with ESMTP id BBBEDCDF5A;
-        Wed, 29 Jun 2022 09:31:43 +0000 (UTC)
-Received: (Authenticated sender: sendmail@ipik.org)
-        by mail.gandi.net (Postfix) with ESMTPSA id CFCC41C0014;
-        Wed, 29 Jun 2022 09:31:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ipik.org; s=gm1;
-        t=1656495081;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7n1ncJ+RgD1gQjuPUVKXfyucE9dYx9coqdYqvgdgAK0=;
-        b=P3QWpIZeiiT5pVVU4KpeJVjxhUQHN7vKWt3YAqFuZsc7gUMAonYfCRU1qVYSuhW5vBqtjC
-        Z3RBhJMgdx9vQLpFGwepPQw21JZiN/Pza/xKpbWrTkstckp9IemFDW3PJJpL/4eOeZ+jHa
-        gzE9F2GpgjRHEioVx8cxJjoFgQldgK8Nmx1SKJk8lni8OShO12hqY1UJTR4/jGBeyMzLgj
-        Q3H0oD1UnRdjqSBYsrEMocx9F8ckspxp4tYSb38a5dLQz/GqF5vItGXvK+ysLYJ5wY1cZ+
-        WrsJtGNOP9cKCq/DjuU8fhLxgi1WROrgmrp5vjPPm6jsu2lR1kHAFsOCaoNnuw==
-Message-ID: <ddc4f559-f03c-8d40-73a7-93d767b45bd6@ipik.org>
-Date:   Wed, 29 Jun 2022 11:31:16 +0200
+        Wed, 29 Jun 2022 06:29:37 -0400
+Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FDEE3DDCB;
+        Wed, 29 Jun 2022 03:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1656498576; x=1688034576;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6z7jW+xFVUIPRN6xY5/GMDD9lYAIYUh7aTFgycfE2KY=;
+  b=lLUEJcdx8FMANgi1s+66u7P8P+CawWgZtu7A0vOwMoYjq45TcoGLv6NS
+   VXdo6QjrOp7To9u1SBbdOOqAFBUnZ+Sz1CJaeZK+ToG7Q2i7ZJuYSd3dZ
+   g9Ot7jZW0NiIVQfXR1JYCrbxbzZ++HaYf5WTwXMH31ewXfOG7TBXRRjCg
+   o=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10392"; a="128909583"
+X-IronPort-AV: E=Sophos;i="5.92,231,1650924000"; 
+   d="scan'208";a="128909583"
+Received: from unknown (HELO mucxv001.muc.infineon.com) ([172.23.11.16])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2022 12:29:33 +0200
+Received: from MUCSE803.infineon.com (MUCSE803.infineon.com [172.23.29.29])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv001.muc.infineon.com (Postfix) with ESMTPS;
+        Wed, 29 Jun 2022 12:29:33 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE803.infineon.com
+ (172.23.29.29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 29 Jun
+ 2022 12:29:33 +0200
+Received: from [10.160.193.107] (172.23.8.247) by MUCSE807.infineon.com
+ (172.23.29.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Wed, 29 Jun
+ 2022 12:29:32 +0200
+Message-ID: <174363bc-e8e5-debd-f8f6-a252d2bbddb9@infineon.com>
+Date:   Wed, 29 Jun 2022 12:29:31 +0200
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-To:     Jiri Kosina <jikos@jikos.cz>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        dmitry.torokhov@gmail.com
-Cc:     andrew.smirnov@gmail.com, enric.balletbo@collabora.com,
-        kirr@nexedi.com, linux-bluetooth@vger.kernel.org,
-        linux-input@vger.kernel.org, linux-kernel@vger.kernel.org,
-        logang@deltatee.com, luiz.dentz@gmail.com, pali.rohar@gmail.com,
-        tglx@linutronix.de, abhishekpandit@chromium.org
-References: <20191127185139.65048-1-abhishekpandit@chromium.org>
-Subject: Re: [PATCH] Input: uinput - Add UI_SET_UNIQ ioctl handler
-Content-Language: en-GB
-From:   macmpi <spam@ipik.org>
-In-Reply-To: <20191127185139.65048-1-abhishekpandit@chromium.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/4] dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT
+ binding
+Content-Language: en-US
+To:     Rob Herring <robh@kernel.org>
+CC:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+References: <cover.1655723462.git.hakan.jansson@infineon.com>
+ <acd9e85b1ba82875e83ca68ae2aa62d828bfdfa3.1655723462.git.hakan.jansson@infineon.com>
+ <2c753258-b68e-b2ad-c4cc-f0a437769bc2@linaro.org>
+ <cb973352-36f9-8d70-95ac-5b63a566422c@infineon.com>
+ <20220627173436.GA2616639-robh@kernel.org>
+ <6e3a557a-fb0e-3b28-68f2-32804b071cfb@infineon.com>
+ <20220628224110.GD963202-robh@kernel.org>
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+In-Reply-To: <20220628224110.GD963202-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE813.infineon.com (172.23.29.39) To
+ MUCSE807.infineon.com (172.23.29.33)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi!
+On 6/29/2022 12:41 AM, Rob Herring wrote:
+> On Tue, Jun 28, 2022 at 04:03:57PM +0200, Hakan Jansson wrote:
+>> Hi Rob,
+>>
+>> On 6/27/2022 7:34 PM, Rob Herring wrote:
+>>> On Mon, Jun 20, 2022 at 04:06:25PM +0200, Hakan Jansson wrote:
+>>>> Hi Krzysztof,
+>>>>
+>>>> Thanks for replying.
+>>>>
+>>>> On 6/20/2022 2:32 PM, Krzysztof Kozlowski wrote:
+>>>>>> CYW55572 is a Wi-Fi + Bluetooth combo device from Infineon.
+>>>>>> Extend the binding with its DT compatible.
+>>>>>>
+>>>>>> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+>>>>>> ---
+>>>>>>     Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
+>>>>>>     1 file changed, 1 insertion(+)
+>>>>>>
+>>>>>> diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>>>> index df59575840fe..71fe9b17f8f1 100644
+>>>>>> --- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>>>> +++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+>>>>>> @@ -24,6 +24,7 @@ properties:
+>>>>>>           - brcm,bcm43540-bt
+>>>>>>           - brcm,bcm4335a0
+>>>>>>           - brcm,bcm4349-bt
+>>>>>> +      - infineon,cyw55572-bt
+>>>>> Patch is okay, but just to be sure - is it entirely different device
+>>>>> from Infineon or some variant of Broadcom block?
+>>>> CYW55572 is a new device from Infineon. It is not the same as any Broadcom
+>>>> device.
+>>>>
+>>>>>     Are all existing
+>>>>> properties applicable to it as well?
+>>>> Yes, all existing properties are applicable.
+>>> Including 'brcm,bt-pcm-int-params'?
+>> Yes, 'brcm,bt-pcm-int-params' is also applicable to CYW55572.
+>>
+>>> I don't see a BT reset signal
+>>> either, but maybe that's not pinned out in the AzureWave module which
+>>> was the only documentation details I could find[1].
+>> That's correct, CYW55572 does not have a BT reset signal. Most of the
+>> existing listed compatible devices does not seem to have a BT reset signal
+>> either so I think this is in line with the intention of the existing
+>> document and driver implementation.
+>>
+>>> I think a separate doc will be better as it can be more precise as to
+>>> what's allowed or not. It's fine to reuse the same property names
+>>> though.
+>> I don't really see anything besides the optional BT reset property that
+>> would be changed in a separate doc.  As a separate doc would mean a
+>> duplication of data that would need to be maintained in two more or less
+>> identical docs, perhaps it would be better to modify the existing doc to
+>> clarify for which compatible devices that the BT reset property applies?
+>> (Which I believe are only these three: bcm20702a1, bcm4329-bt and
+>> bcm4330-bt)
+> Okay, I guess this is fine in the same doc. Any conditionals to tighten
+> up the constraints would be welcome.
+>
+> Rob
 
-Bug 216134 has been been submitted on this issue 
-https://bugzilla.kernel.org/show_bug.cgi?id=216134
+Ok, I'll add a patch with conditionals and resubmit a new rev of the 
+patch series.
 
-Thanks for consideration and feedback.
+/Håkan
