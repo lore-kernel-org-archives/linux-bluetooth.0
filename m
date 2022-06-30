@@ -2,308 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11549CCA473
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 22:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1407C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 23:05:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230268AbiF3WPH (ORCPT
+        id S230092AbiF3XF0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 18:15:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39998 "EHLO
+        Thu, 30 Jun 2022 19:05:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230305AbiF3WPG (ORCPT
+        with ESMTP id S229607AbiF3XFZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 18:15:06 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CF948821
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:15:05 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id b12-20020a17090a6acc00b001ec2b181c98so4521884pjm.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:15:04 -0700 (PDT)
+        Thu, 30 Jun 2022 19:05:25 -0400
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D4E53EFE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 16:05:20 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id b125so569747qkg.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 16:05:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=pf1spZWRVVmzlCkdIoNQHP94yvKyL48SphUGzWr78oI=;
-        b=OOb/HwCB9rPlqRxA2AZtPvldPiz/E1l0YkXYif4aCB90ZpWBfZpkLR4yc+gylXMnAc
-         X5TtIIA+aN3sATuwVR5abOtrv+49SyquRvnN00A9Oz0nrV1APeLJUvGdfjjTks+RvMEL
-         yZQvzEgB9lYTOk2Q1ErRQ67e8v8UKRVUKeSHSYgru5XsVDCfGkRmyONRyOyOUl5ToRX+
-         RJ2tmOhoklxLjLSk2KVKlwr5hiJvfuWaczAm9ABxxzNPOTWLDaZ2iUEia5eNkn9gcj+V
-         kTO6WH0IiDDezrjcvl1ID5iwsgv6nJWRqBAA3Z7BGfvvJPQ1jMIcjFrxeuXzH0LiKADr
-         rxiQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=K5XWvyHLVVweLvFUkB3cA0cc/km/OaXQSRa0tmmmZ2U=;
+        b=QF5/UEnf+IPCh/49VYXt2KE6MA8G90eXk8sIFuSS/Wmzk1W1QL1bQGvScAIZcjngJz
+         cWKhxQDSVzVMDCkTDVVHLHcqZYvHrD4I1UU8kqN6///Pp2KkYRBijyDTp1FTwLdD1jh7
+         K/fk4M2xaD80eR/XSGZ9xBpAy0BO+m+pgGTnAQcqrC0v2cF3xreONfXgsHt9tZkHIT4D
+         uO3LAgnl8F/R6QkV8S7I7l+h/rrRfnAG6QslIbLc8MUzbxjYPwifjtUxgDsa7txRec9v
+         6TIHeOgRcRJNniV6+Ene9RpRvkj5S2PpIs5kZKGCBD1e8U9zx/LBhYu4bxJS2POyNs3w
+         d1Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pf1spZWRVVmzlCkdIoNQHP94yvKyL48SphUGzWr78oI=;
-        b=d+PPiORuWfKLiQpXY4yBouyx6eTEpdcICdYpc3MfWVLAilH60N7tk1/8jNOKf2BBY4
-         lU+/v5/DE5QVu5zw0JqnBR6X6hxZv1NZmJaz+bwvuQ+/j3eO/WXKB+NI9MzkumShk907
-         6dYMMZ/rKPaLLWyD3zPpJ6typjRYUI1RasNatDytZ/Es2+bU2aQo+7BmLORMKvAIC7FW
-         nigVFS4S8xtJ0ToWGCVWItGD3JdBNCWsrXpjcduGiPv8upflHQbuZy5V7Xz5F7unJaqP
-         9YwlBhxVxIvrGNxPCQM5S1MKeZ8CJUzgHDx29TghxW4i7wRWt1lDoKofLpA+zVBFDNF+
-         IV0Q==
-X-Gm-Message-State: AJIora+7hVNHElNrrQ7z40GbZAGTHPlyeTOkQESUzwP8SXb1TuGe3JWz
-        M0HfM6xsQYis7tNXR/NnVzyqR2zFwX1hpQ==
-X-Google-Smtp-Source: AGRyM1srPdslVCYlz8ybPPG+m+RrioU1EN4spyXS0G3ZyAqKgXwXeeQLw2xDJ4wInLtK49S3sAZe1w==
-X-Received: by 2002:a17:902:7604:b0:16a:f36d:73f3 with SMTP id k4-20020a170902760400b0016af36d73f3mr16879996pll.170.1656627303941;
-        Thu, 30 Jun 2022 15:15:03 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id me3-20020a17090b17c300b001ec84b0f199sm3460333pjb.1.2022.06.30.15.15.02
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=K5XWvyHLVVweLvFUkB3cA0cc/km/OaXQSRa0tmmmZ2U=;
+        b=XnetKEy4dBa4C3QPxvYhB89Ck4Pnmom3tI3Ct+0H1gBUiMW8+8+qvlsPYsbhozNGIN
+         vYU2R1Ud2X0j9B95tPyHsBv44FYDRMfTug2tWrtpgxTahIDpJ6Jx+Np51c2TlxLcSIX/
+         Uw+SUgKFAbQVOhdJZ4k+pg55KQmsuarUvVqXJKvVWkKtvgch6j/Nir+2AjaG41IWYzQx
+         JJMBVSuRNxhCO1i4yMV2F2B63bxbzLpd63J3TllCSVpCzt5+ihsRHScIVRfsS1z0MCCz
+         NnPCJF/iF1+Hv+skEj6IOuqghMWCtAw+UO8Kn4icliCGXscNouDN79Mg+qq34bsxwJvy
+         Nlpg==
+X-Gm-Message-State: AJIora9gxJvyR8w/oX4f3y/PdEdT75nBrSrPVjC+k4v2HhAjS/JEkiBc
+        eUW95Lrux3gA9VViiSxEqFtGtbx+iX6yrw==
+X-Google-Smtp-Source: AGRyM1vIWVdFuq0uUiNZCIv7kKhSDNswx255Dh2EMUpI/cz6qVrTt+xtKjJirfOm478aMUbUAIEh7w==
+X-Received: by 2002:a05:620a:459f:b0:6b1:f5c1:6e61 with SMTP id bp31-20020a05620a459f00b006b1f5c16e61mr5258755qkb.436.1656630319760;
+        Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
+Received: from [172.17.0.2] ([52.168.129.219])
+        by smtp.gmail.com with ESMTPSA id x2-20020ae9e902000000b006a6a6f148e6sm16112929qkf.17.2022.06.30.16.05.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 15:15:03 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v8 8/8] isotest: Add documentation
-Date:   Thu, 30 Jun 2022 15:14:52 -0700
-Message-Id: <20220630221452.638591-8-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220630221452.638591-1-luiz.dentz@gmail.com>
-References: <20220630221452.638591-1-luiz.dentz@gmail.com>
+        Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
+Message-ID: <62be2c2f.1c69fb81.34875.5959@mx.google.com>
+Date:   Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2571514315463940376=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v4,1/7] Bluetooth: hci_core: Introduce hci_recv_event_data
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220630221415.638408-1-luiz.dentz@gmail.com>
+References: <20220630221415.638408-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2571514315463940376==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds isotest.rst which documents the modes and options of
-isotest(1) and is then converted isotest.1 manpage.
----
- Makefile.tools    |   4 +-
- tools/isotest.rst | 202 ++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 204 insertions(+), 2 deletions(-)
- create mode 100644 tools/isotest.rst
+This is automated email and please do not reply to this email!
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 4e5ff73b0..9412aed36 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -325,7 +325,7 @@ profiles_iap_iapd_SOURCES = profiles/iap/main.c
- profiles_iap_iapd_LDADD = gdbus/libgdbus-internal.la $(GLIB_LIBS) $(DBUS_LIBS)
- 
- if MANPAGES
--man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1
-+man_MANS += tools/rctest.1 tools/l2ping.1 tools/btattach.1 tools/isotest.1
- endif
- 
- if MESH
-@@ -443,7 +443,7 @@ manual_pages += tools/hciattach.1 tools/hciconfig.1 \
- 			tools/hcitool.1 tools/hcidump.1 \
- 			tools/rfcomm.1 tools/sdptool.1 tools/ciptool.1 \
- 			tools/rctest.1 tools/l2ping.1 tools/btattach.1 \
--			tools/bdaddr.1
-+			tools/bdaddr.1 tools/isotest.1
- 
- if HID2HCI
- udevdir = $(UDEV_DIR)
-diff --git a/tools/isotest.rst b/tools/isotest.rst
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655563
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      15.26 seconds
+GitLint                       PASS      7.39 seconds
+SubjectPrefix                 PASS      6.50 seconds
+BuildKernel                   PASS      33.18 seconds
+BuildKernel32                 PASS      29.69 seconds
+Incremental Build with patchesPASS      167.58 seconds
+TestRunner: Setup             PASS      485.21 seconds
+TestRunner: l2cap-tester      PASS      17.74 seconds
+TestRunner: bnep-tester       PASS      6.15 seconds
+TestRunner: mgmt-tester       FAIL      103.90 seconds
+TestRunner: rfcomm-tester     PASS      9.76 seconds
+TestRunner: sco-tester        PASS      9.57 seconds
+TestRunner: smp-tester        PASS      9.58 seconds
+TestRunner: userchan-tester   PASS      6.35 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 15.26 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+[v4,3/7] Bluetooth: Add BTPROTO_ISO socket type\Traceback (most recent call last):
+  File "scripts/spdxcheck.py", line 6, in <module>
+    from ply import lex, yacc
+ModuleNotFoundError: No module named 'ply'
+Traceback (most recent call last):
+  File "scripts/spdxcheck.py", line 6, in <module>
+    from ply import lex, yacc
+ModuleNotFoundError: No module named 'ply'
+WARNING:FILE_PATH_CHANGES: added, moved or deleted file(s), does MAINTAINERS need updating?
+#176: 
 new file mode 100644
-index 000000000..b2f4e4b38
---- /dev/null
-+++ b/tools/isotest.rst
-@@ -0,0 +1,202 @@
-+=======
-+isotest
-+=======
-+
-+-----------
-+ISO testing
-+-----------
-+
-+:Authors: - Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>
-+:Version: BlueZ
-+:Copyright: Free use of this software is granted under ther terms of the GNU
-+            Lesser General Public Licenses (LGPL).
-+:Date: May 4, 2022
-+:Manual section: 1
-+:Manual group: Linux System Administration
-+
-+SYNOPSIS
-+========
-+
-+**isotest** <*MODE*> [*OPTIONS*] [*bdaddr*] [*bdaddr1*]...
-+
-+DESCRIPTION
-+===========
-+
-+**isotest(1)** is used to test Isochronous (CIS/BIS) communications on the
-+BlueZ stack
-+
-+MODES
-+=====
-+
-+-d, --dump=[FILE]        Listen and dump incoming data
-+                         (CIS server/BIS broadcaster) and optionally save the
-+			 contents to *FILE*.
-+
-+-c, --reconnect          Reconnect (CIS client).
-+
-+-m, --multiple           Multiple connects (CIS client).
-+
-+-r, --receive=[FILE]     Receive (CIS server/BIS broadcast receiver) and
-+                         optionally save the contents to *FILE*.
-+
-+-s, --send=[FILE]        Connect and send (CIS client/BIS broadcaster), can
-+                         optionally use contents from *FILE*.
-+
-+-n, --silent             Connect and be silent (CIS client/BIS broadcaster).
-+
-+OPTIONS
-+=======
-+
-+-b, --bytes=<SIZE>      Send or Receive packet size
-+
-+-i, --index=<NUM>        Select the specified HCI device index. *hciNUM* is
-+                         also acceptable.
-+
-+-j, --jitter=<JITTER>    Socket jitter buffer.
-+
-+-h, --help
-+
-+-q, --quiet              Disables packet logging.
-+
-+-t, --timeout=<USEC>     Socket send timeout.
-+
-+-C, --continue           Continuously send packets starting over in case of a
-+                         file.
-+
-+-W, --defer=<SEC>        Enable deferred setup.
-+
-+-M, --mtu=<SDU>          Socket QoS SDU.
-+
-+-S, --sca/adv-interval=<SCA/INTERVAL>
-+                         Socket QoS CIS SCA/BIS advertising interval.
-+
-+-P, --packing=<PACKING>  Socket QoS Packing.
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+   :align: left
-+
-+   * - *PACKING*
-+     - Description
-+
-+   * - **0x00**
-+     - Sequential
-+
-+   * - **0x01**
-+     - Interleaved
-+
-+-F, --framing=<FRAMING>  Socket QoS Framing.
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+   :align: left
-+
-+   * - *FRAMING*
-+     - Description
-+
-+   * - **0x00**
-+     - Unframed
-+
-+   * - **0x01**
-+     - Framed
-+
-+-I, --interval=<USEC>    Socket QoS Interval.
-+
-+-L, --latency=<MSEC>     Socket QoS Latency.
-+
-+-Y, --phy=<PHY>          Socket QoS PHY.
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+   :align: left
-+
-+   * - *PHY*
-+     - Description
-+
-+   * - **0x01**
-+     - LE 1M
-+
-+   * - **0x02**
-+     - LE 2M
-+
-+   * - **0x03**
-+     - LE Coded
-+
-+-R, --rtn=<NUM>          Socket QoS retransmissions.
-+
-+-B, --preset=<PRESET>    Socket QoS preset.
-+
-+-G, --CIG/BIG=<ID>       Socket QoS CIG/BIG ID.
-+
-+-T, --CIS/BIS=<ID>       Socket QoS CIS/BIS ID.
-+
-+-V, --type=<TYPE>        Socket destination address type:
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+   :align: left
-+
-+   * - *TYPE*
-+     - Description
-+
-+   * - **le_public**
-+     - LE Public Address
-+
-+   * - **le_random**
-+     - LE Random Address
-+
-+EXAMPLES
-+========
-+
-+Unicast Central
-+---------------
-+
-+.. code-block::
-+
-+    $ tools/isotest -s XX:XX:XX:XX:XX:XX
-+
-+Unicast Central connecting to 2 peers using CIG 0x01
-+----------------------------------------------------
-+
-+.. code-block::
-+
-+    $ tools/isotest -G 0x01 -s XX:XX:XX:XX:XX:XX YY:YY:YY:YY:YY:YY
-+
-+Unicast Peripheral
-+------------------
-+
-+.. code-block::
-+
-+    $ tools/isotest -d
-+
-+Broadcaster
-+-----------
-+
-+.. code-block::
-+
-+    $ tools/isotest -s 00:00:00:00:00:00
-+
-+Broadcast Receiver using hci1
-+-----------------------------
-+
-+.. code-block::
-+
-+    $ tools/isotest -i hci1 -d XX:XX:XX:XX:XX:XX
-+
-+RESOURCES
-+=========
-+
-+http://www.bluez.org
-+
-+REPORTING BUGS
-+==============
-+
-+linux-bluetooth@vger.kernel.org
--- 
-2.35.3
 
+total: 0 errors, 1 warnings, 0 checks, 1718 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12902307.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+[v4,4/7] Bluetooth: Add initial implementation of BIS connections\WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
+#848: FILE: net/bluetooth/hci_conn.c:817:
++ * */
+
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#1877: FILE: net/bluetooth/hci_sync.c:1031:
++		struct adv_info *adv = hci_find_adv_instance(hdev, instance);
++		if (!adv || !adv->periodic)
+
+total: 0 errors, 2 warnings, 0 checks, 1873 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12902310.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: TestRunner: mgmt-tester - FAIL - 103.90 seconds
+Run test-runner with mgmt-tester
+Total: 494, Passed: 492 (99.6%), Failed: 2, Not Run: 0
+
+Failed Test Cases
+Read Exp Feature - Success                           Failed       0.099 seconds
+Read Exp Feature - Success (Index None)              Failed       0.102 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2571514315463940376==--
