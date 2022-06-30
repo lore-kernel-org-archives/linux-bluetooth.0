@@ -2,101 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21638C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 09:37:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116C3CCA47B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 12:46:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234434AbiF3Jhk (ORCPT
+        id S234958AbiF3MqL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 05:37:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40920 "EHLO
+        Thu, 30 Jun 2022 08:46:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234479AbiF3Jhi (ORCPT
+        with ESMTP id S234645AbiF3MqK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 05:37:38 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D344433A9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 02:37:37 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id z7so13957730qko.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 02:37:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=6Kk/z88UnX2YKJB59FB69slbPvCFaRQjne6XoFsyjCA=;
-        b=FWykSB0GgcayMnM+Ur5e/35ACJNLYuORpiut8i0/g/UHSWn7cUMpHaBhnOHRctSRJL
-         LbebQCaW/Gb3Nf8NtFAl/su7aKmjy6urNBf56Nq/apO/0t2L/J0ryjjfE+Y2M3dpgi6Z
-         B2gtlF50J9/kiY9mjpNqD/02cjpUvfdjo3wA6Uy5nE3l+tbSFMGc4h3IbJvOCVIGE494
-         yYzxZNxyF/PiK/bMUiKuYPzO6melK7PRXyUwRm/o7NcmO2kIKvzDAwEyM+Fqv6Gm+4zI
-         /6nDcBqFTtKZAzUaCaLGRHGY5pxi01+44SGNei29dCpJWlVhpvHkvrf/h5x/tRgxS6+0
-         OTZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=6Kk/z88UnX2YKJB59FB69slbPvCFaRQjne6XoFsyjCA=;
-        b=7GNx5JZF5ncsVWzcJMSyVcKa4QQ1sM8fxxDHaw5PFVnsT5fH+bz6dhvd6WkM/zAI2C
-         d6G6hWX6OeFC2G5XsZISffOyN3il3O5SReMMirfT/kDis0BaegYWVC8lAdR33xjF/+iR
-         9oPAIKRxlaLX5tXKV4VmJwrbbe2wA0tolSeb2HeckNuo7mbMjtUe6wTak/DYUvaspmU3
-         /O5KVUpjX5xdUDKAYwXk4U8sJspPerZY23HC+9Lb2bYAVWkCXFbSSKNk8Ni1MkyvwGLX
-         In4s/pt3iBoiJWvEHU0vfvF5r9BTJDyT5ura/ysEjY3rDGAh7Hh3JBhABW4eR6tiRxLS
-         ZA+Q==
-X-Gm-Message-State: AJIora/1pxOTID3gx6EzCGs0pffEk+aG98BQvbzRQXBwcZnWEtV8rjCN
-        JZ6tP+br3NenKphnG1219vGVq8SL8puNhg==
-X-Google-Smtp-Source: AGRyM1u9545VulHDHu7e4mhpy7wjfB+TeDLx9pjRFctOmP/6MEn4V9Ib6v87NtqjTrxTV8y/sf6DKg==
-X-Received: by 2002:a05:620a:130e:b0:6ae:e56a:f90b with SMTP id o14-20020a05620a130e00b006aee56af90bmr5289134qkj.137.1656581856048;
-        Thu, 30 Jun 2022 02:37:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.113.196])
-        by smtp.gmail.com with ESMTPSA id cb24-20020a05622a1f9800b003187c484027sm6849190qtb.73.2022.06.30.02.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 02:37:35 -0700 (PDT)
-Message-ID: <62bd6edf.1c69fb81.7c418.0d04@mx.google.com>
-Date:   Thu, 30 Jun 2022 02:37:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2218364102184982669=="
+        Thu, 30 Jun 2022 08:46:10 -0400
+Received: from smtp14.infineon.com (smtp14.infineon.com [IPv6:2a00:18f0:1e00:4::6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D1E21E26;
+        Thu, 30 Jun 2022 05:46:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=infineon.com; i=@infineon.com; q=dns/txt; s=IFXMAIL;
+  t=1656593169; x=1688129169;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QnKUrF1xtCRy+TRTqlyWJSzVsbsYzCUcUrYS+EXrtGc=;
+  b=pzfroQz0VBN7n3OSG0EVsJSCLZvne6JedFDmdW0uXZhEECUJU9usoJr9
+   mUaZS5Z7bX6fTzk15MjP37JYWiPg0SungtQO5qpMQX5jXXbOwYQGURWJH
+   OXo6FeH6/pEubYLRPrr1pawiMW4iULEdw4I3BUjYdaSpZTyGYKbCBGEMd
+   0=;
+X-SBRS: None
+X-IronPort-AV: E=McAfee;i="6400,9594,10393"; a="129108385"
+X-IronPort-AV: E=Sophos;i="5.92,234,1650924000"; 
+   d="scan'208";a="129108385"
+Received: from unknown (HELO mucxv003.muc.infineon.com) ([172.23.11.20])
+  by smtp14.infineon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 14:46:06 +0200
+Received: from MUCSE819.infineon.com (MUCSE819.infineon.com [172.23.29.45])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mucxv003.muc.infineon.com (Postfix) with ESMTPS;
+        Thu, 30 Jun 2022 14:46:05 +0200 (CEST)
+Received: from MUCSE807.infineon.com (172.23.29.33) by MUCSE819.infineon.com
+ (172.23.29.45) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.26; Thu, 30 Jun
+ 2022 14:46:05 +0200
+Received: from ISCNPF0RJXQS.infineon.com (172.23.8.247) by
+ MUCSE807.infineon.com (172.23.29.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.26; Thu, 30 Jun 2022 14:46:03 +0200
+From:   Hakan Jansson <hakan.jansson@infineon.com>
+CC:     Hakan Jansson <hakan.jansson@infineon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v2 0/5] Bluetooth: hci_bcm: Improve FW load time on CYW55572
+Date:   Thu, 30 Jun 2022 14:45:19 +0200
+Message-ID: <cover.1656583541.git.hakan.jansson@infineon.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, adrake@adrake.org
-Subject: RE: [BlueZ] adapter: Fix advertising monitor on Linux 5.12-5.17
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220630073958.34468-1-adrake@adrake.org>
-References: <20220630073958.34468-1-adrake@adrake.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.23.8.247]
+X-ClientProxiedBy: MUCSE824.infineon.com (172.23.29.55) To
+ MUCSE807.infineon.com (172.23.29.33)
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2218364102184982669==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+These patches add an optional device specific data member to specify max
+baudrate of a device when in autobaud mode. This allows the host to set a
+first baudrate higher than "init speed" to improve FW load time.
 
-This is automated email and please do not reply to this email!
+The host baudrate will later be changed to "init speed" (as usual) once FW
+loading is complete and the device has been reset to begin normal
+operation.
 
-Dear submitter,
+Changes v1 -> v2:
+- Add patch to tighten DT binding constraints after feedback in:
+    https://lore.kernel.org/linux-devicetree/174363bc-e8e5-debd-f8f6-a252d2bbddb9@infineon.com/
+- Add actual baud rates and example FW load time in commit message:
+    https://lore.kernel.org/linux-devicetree/72cd312f-f843-6a85-b9e7-db8fcb952af8@infineon.com/
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655292
+Hakan Jansson (5):
+  dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT binding
+  dt-bindings: net: broadcom-bluetooth: Add conditional constraints
+  Bluetooth: hci_bcm: Add DT compatible for CYW55572
+  Bluetooth: hci_bcm: Prevent early baudrate setting in autobaud mode
+  Bluetooth: hci_bcm: Increase host baudrate for CYW55572 in autobaud
+    mode
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.45 seconds
-GitLint                       PASS      1.01 seconds
-Prep - Setup ELL              PASS      43.79 seconds
-Build - Prep                  PASS      0.66 seconds
-Build - Configure             PASS      8.75 seconds
-Build - Make                  PASS      1446.34 seconds
-Make Check                    PASS      11.94 seconds
-Make Check w/Valgrind         PASS      451.64 seconds
-Make Distcheck                PASS      238.86 seconds
-Build w/ext ELL - Configure   PASS      8.74 seconds
-Build w/ext ELL - Make        PASS      1428.94 seconds
-Incremental Build with patchesPASS      0.00 seconds
+ .../bindings/net/broadcom-bluetooth.yaml      | 17 +++++++++++++
+ drivers/bluetooth/hci_bcm.c                   | 24 +++++++++++++------
+ 2 files changed, 34 insertions(+), 7 deletions(-)
 
 
+base-commit: 681ec6abcd7f051f7fc318068a3ac09772ebef7e
+-- 
+2.25.1
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2218364102184982669==--
