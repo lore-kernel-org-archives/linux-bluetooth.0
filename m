@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993BCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 22:14:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A145C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 22:15:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbiF3WO5 (ORCPT
+        id S230099AbiF3WPC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 18:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39716 "EHLO
+        Thu, 30 Jun 2022 18:15:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiF3WO4 (ORCPT
+        with ESMTP id S230186AbiF3WPB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 18:14:56 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9EC14D170
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:14:54 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id x20so609763plx.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:14:54 -0700 (PDT)
+        Thu, 30 Jun 2022 18:15:01 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A635E57225
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:15:00 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 65so676038pfw.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 15:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=4gghVsBCpB8GXN4ZB22T+23lGvU75meE2wp9k97nad8=;
-        b=IzuI7fIbyBUtlqF4MfzZU/XBXmRi5KBmu/2hXSTED+l8qNm2/uvzUatGl/+zLM6NOX
-         CvIrSPtPvAgARIxG9RRlaAzY67WNIYrA/M+7n65IOD5VVKdRk/xtKAdzXCFL46NVd11h
-         T9+qocYezz1jveof8pXT51lv31qFrcvSIERDv1zMMK7O4oSHZtZQy1oo7JhQ5OTIWKCY
-         h9kSGyDDSHwgiJ02eattz3lyT+wE1Ixe+fi/qpqKOIHCNM61cnGRiiIcmiPgz8GgNa4P
-         EuDw3z0+hgkSQkmlt88mU4qnel2KAz74nOhbVSbHL3pj+ceUE0nMgnGUC/wtr8f0Hh8s
-         jecQ==
+        bh=qFU4X5Jet99DUVNJJQD7gbd258rKVrHhsozdK9XpRy0=;
+        b=dZSTQYzbEsf9PWSqO6zv5plAwO/LSMHJJQUOGPqDqixRHnY/pHTfLXbyprsJ8xw/px
+         wrzauWLRWsM8fyAqYPpCjfg2UCzExwWAehgEuwykkfQIL+vlXP1x95gft4N4FopDmDGU
+         xv9akvqTcYpWeGOXN2babT73cZUULBXwEUizR6HfhzVY2byFWn0IcGyNB7/UM9mRioQs
+         Z6omlW7Li+/5Qh41QGQZ0hFocTDuaic53C7ZFctFmmEoEE6qIO9Kw3EvK92CYeSRVsW2
+         DdhkTxMBJqCEjc6CaIcA4nWgsDueMoJ2p2zVITvhhPZKKBDzFmu09j0j9hgS/hQ2J4rt
+         3+KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=4gghVsBCpB8GXN4ZB22T+23lGvU75meE2wp9k97nad8=;
-        b=e/vBqrcWIYgr9MtL6vUl37r61UpSsTm5lfv49IFEjg95REPhuPSBZfI0z22NMaYakc
-         etB6HV9furN/RMXbORVdWGCpNLnnHeiM9pSArdZDa6k41w4T4VTQhjE3+1l/OQKTNmpH
-         RzfEsCscovvyTTGdKliwYymZ/nEE1xKxj7M/5gEUJul6Ti+ni/ma7zPk2C7jiE5YagH4
-         Prprp7c8bZ0XkvHrFsnKLsi3O0c9XZgC+WbsOYN7gF1sbD55CXMGZ70wWjqG+ujoTv4u
-         QjNXL8wdVNZ3nKw/Pr3g+TCMjfE+WhZu7/fShtPZfyngHfc59bwg0sdEQorZbIVyUXCp
-         1b9Q==
-X-Gm-Message-State: AJIora+5Oo6Tjnaa9Du4UEbjKLCndvd2vIv605vx0orP1Cs3KWud6BDH
-        R1AKuJ/9qePYfzWMwQH0psF6A+RiI5ifzA==
-X-Google-Smtp-Source: AGRyM1sB054woES/ukbfdzOjETyxczL7K5DMnyr3brikIUU9l0VcICy7xWYdXFktz9bg8dSsih4uWw==
-X-Received: by 2002:a17:903:1246:b0:16b:a568:4f74 with SMTP id u6-20020a170903124600b0016ba5684f74mr8559151plh.0.1656627293963;
-        Thu, 30 Jun 2022 15:14:53 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=qFU4X5Jet99DUVNJJQD7gbd258rKVrHhsozdK9XpRy0=;
+        b=W3dnccEF1sBiMxF52Q1lPJFDrU5L3efZp4UZk/H8of4R9xBeE106Jhh+u1bRT59+ah
+         wFmSQjlWIsCxYewDGaocvAdwUXVt+nDQ90oDriAJwU/DPLkVFoV4HvJxj2BWMvSBrRtV
+         6Z+3sVIFFaARr14RjTnzf8teBLFAxYkPx+QykMFiQAnCVhBG9J5ssqXwsYViCFD9+PrS
+         b1OnRuWlkZYnOeUaWRlPDjP5pz+dNxhIDi0d0ORmuDqn1Fe2gYOQoSMUvCtMthYfK1Z6
+         4Y8p1ycaSmVLHM8zsn0UB6m1t1bqIWbjLCrOow37b8Rf4+fJgPS68f702jsAs6ie2sif
+         ouig==
+X-Gm-Message-State: AJIora/huUD0yYIrUyHjeehjBU6dHUZhNeuXk4wiGhsbob1QgEhGFvZ+
+        BtsEf5PuxB/a+oyIxaXebQLNDJzfBM+hkw==
+X-Google-Smtp-Source: AGRyM1u80LIImCBdTwlaohzrg2slpE3rBuXyE64gATgdvP+BzdK1jpBWbJDnc9iwVmxoeboSxuxz1A==
+X-Received: by 2002:a63:8142:0:b0:40d:311c:39be with SMTP id t63-20020a638142000000b0040d311c39bemr9565890pgd.378.1656627299571;
+        Thu, 30 Jun 2022 15:14:59 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id me3-20020a17090b17c300b001ec84b0f199sm3460333pjb.1.2022.06.30.15.14.52
+        by smtp.gmail.com with ESMTPSA id me3-20020a17090b17c300b001ec84b0f199sm3460333pjb.1.2022.06.30.15.14.58
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 15:14:53 -0700 (PDT)
+        Thu, 30 Jun 2022 15:14:58 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v8 1/8] lib: Add definitions for ISO socket
-Date:   Thu, 30 Jun 2022 15:14:45 -0700
-Message-Id: <20220630221452.638591-1-luiz.dentz@gmail.com>
+Subject: [BlueZ PATCH v8 5/8] btio: Add support for ISO sockets
+Date:   Thu, 30 Jun 2022 15:14:49 -0700
+Message-Id: <20220630221452.638591-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20220630221452.638591-1-luiz.dentz@gmail.com>
+References: <20220630221452.638591-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,154 +66,492 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds support to create objects that map to ISO sockets.
 ---
-v2: Fix CI findings.
-v3: Add patch fixing mgmt-tester Read EXP Features tests.
-v4: Rebase and add flag EXP_FEAT_ISO_SOCKET
-v5: Add BT_DEFER_SETUP tests to iso-tester
-v6: Make iso-tester disable ISO Socket experimental UUID after each test
-v7: Fix scan-build findings
-v8: Add tests Defer and Defer send which use DEFER_SETUP when connecting which
-emulates the QoS state of BAP where a SetCIGParameter shall be used without
-CreateCIS which is left to just Enabling state.
+ btio/btio.c      | 175 ++++++++++++++++++++++++++++++++++++++++++++++-
+ btio/btio.h      |   4 +-
+ tools/btiotest.c | 110 +++++++++++++++++++++++++++++
+ 3 files changed, 286 insertions(+), 3 deletions(-)
 
- Makefile.am     |  2 +-
- lib/bluetooth.h | 38 +++++++++++++++++++++++++++++++++++++-
- lib/iso.h       | 42 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 80 insertions(+), 2 deletions(-)
- create mode 100644 lib/iso.h
-
-diff --git a/Makefile.am b/Makefile.am
-index 0074ea3ac..cead4b8c6 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -69,7 +69,7 @@ lib_headers = lib/bluetooth.h lib/hci.h lib/hci_lib.h \
- 		lib/sco.h lib/l2cap.h lib/sdp.h lib/sdp_lib.h \
- 		lib/rfcomm.h lib/bnep.h lib/cmtp.h lib/hidp.h
+diff --git a/btio/btio.c b/btio/btio.c
+index f4f53574c..1ad42728d 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -27,6 +27,7 @@
+ #include "lib/l2cap.h"
+ #include "lib/rfcomm.h"
+ #include "lib/sco.h"
++#include "lib/iso.h"
  
--extra_headers = lib/mgmt.h lib/uuid.h lib/a2mp.h lib/amp.h
-+extra_headers = lib/mgmt.h lib/uuid.h lib/a2mp.h lib/amp.h lib/iso.h
- extra_sources = lib/uuid.c
+ #include "btio.h"
  
- local_headers = $(foreach file,$(lib_headers), lib/bluetooth/$(notdir $(file)))
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index e6171cef0..af5fbcfbc 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -37,6 +37,7 @@ extern "C" {
- #define BTPROTO_CMTP	5
- #define BTPROTO_HIDP	6
- #define BTPROTO_AVDTP	7
-+#define BTPROTO_ISO	8
+@@ -44,6 +45,7 @@ typedef enum {
+ 	BT_IO_L2CAP,
+ 	BT_IO_RFCOMM,
+ 	BT_IO_SCO,
++	BT_IO_ISO,
+ 	BT_IO_INVALID,
+ } BtIOType;
  
- #define SOL_HCI		0
- #define SOL_L2CAP	6
-@@ -140,7 +141,39 @@ struct bt_voice {
- 
- #define BT_SCM_PKT_STATUS	0x03
- 
--#define BT_CODEC 19
-+#define BT_ISO_QOS		17
-+
-+#define BT_ISO_QOS_CIG_UNSET	0xff
-+#define BT_ISO_QOS_CIS_UNSET	0xff
-+
-+struct bt_iso_io_qos {
-+	uint32_t interval;
-+	uint16_t latency;
-+	uint16_t sdu;
-+	uint8_t  phy;
-+	uint8_t  rtn;
-+};
-+
-+struct bt_iso_qos {
-+	union {
-+		uint8_t  cig;
-+		uint8_t  big;
-+	};
-+	union {
-+		uint8_t  cis;
-+		uint8_t  bis;
-+	};
-+	union {
-+		uint8_t  sca;
-+		uint8_t  sync_interval;
-+	};
-+	uint8_t  packing;
-+	uint8_t  framing;
-+	struct bt_iso_io_qos in;
-+	struct bt_iso_io_qos out;
-+};
-+
-+#define BT_CODEC		19
- struct bt_codec {
- 	uint8_t id;
- 	uint16_t cid;
-@@ -158,6 +191,7 @@ struct bt_codecs {
- 	struct bt_codec codecs[];
- } __attribute__((packed));
- 
-+
- /* Connection and socket states */
- enum {
- 	BT_CONNECTED = 1, /* Equal to TCP_ESTABLISHED to make net code happy */
-@@ -171,6 +205,8 @@ enum {
- 	BT_CLOSED
+@@ -66,6 +68,7 @@ struct set_opts {
+ 	int flushable;
+ 	uint32_t priority;
+ 	uint16_t voice;
++	struct bt_iso_qos qos;
  };
  
-+#define BT_ISO_BASE		20
+ struct connect {
+@@ -123,6 +126,8 @@ static BtIOType bt_io_get_type(GIOChannel *io, GError **gerr)
+ 		return BT_IO_SCO;
+ 	case BTPROTO_L2CAP:
+ 		return BT_IO_L2CAP;
++	case BTPROTO_ISO:
++		return BT_IO_ISO;
+ 	default:
+ 		g_set_error(gerr, BT_IO_ERROR, EINVAL,
+ 					"Unknown BtIO socket type");
+@@ -763,6 +768,24 @@ static int sco_bind(int sock, const bdaddr_t *src, GError **err)
+ 	return 0;
+ }
+ 
++static int iso_bind(int sock, const bdaddr_t *src, uint8_t src_type,
++							GError **err)
++{
++	struct sockaddr_iso addr;
 +
- /* Byte order conversions */
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- #define htobs(d)  (d)
-diff --git a/lib/iso.h b/lib/iso.h
-new file mode 100644
-index 000000000..1e9f79ce5
---- /dev/null
-+++ b/lib/iso.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation.
-+ *
-+ */
++	memset(&addr, 0, sizeof(addr));
++	addr.iso_family = AF_BLUETOOTH;
++	bacpy(&addr.iso_bdaddr, src);
++	addr.iso_bdaddr_type = src_type;
 +
-+#ifndef __ISO_H
-+#define __ISO_H
++	if (!bind(sock, (struct sockaddr *) &addr, sizeof(addr)))
++		return 0;
 +
-+#ifdef __cplusplus
-+extern "C" {
-+#endif
++	ERROR_FAILED(err, "iso_bind", errno);
 +
-+/* ISO defaults */
-+#define ISO_DEFAULT_MTU		251
-+#define ISO_MAX_NUM_BIS		0x1f
-+
-+/* ISO socket broadcast address */
-+struct sockaddr_iso_bc {
-+	bdaddr_t	bc_bdaddr;
-+	uint8_t		bc_bdaddr_type;
-+	uint8_t		bc_sid;
-+	uint8_t		bc_num_bis;
-+	uint8_t		bc_bis[ISO_MAX_NUM_BIS];
-+};
-+
-+/* ISO socket address */
-+struct sockaddr_iso {
-+	sa_family_t	iso_family;
-+	bdaddr_t	iso_bdaddr;
-+	uint8_t		iso_bdaddr_type;
-+	struct sockaddr_iso_bc iso_bc[];
-+};
-+
-+#ifdef __cplusplus
++	return -errno;
 +}
-+#endif
 +
-+#endif /* __ISO_H */
+ static int sco_connect(int sock, const bdaddr_t *dst)
+ {
+ 	struct sockaddr_sco addr;
+@@ -779,6 +802,23 @@ static int sco_connect(int sock, const bdaddr_t *dst)
+ 	return 0;
+ }
+ 
++static int iso_connect(int sock, const bdaddr_t *dst, uint8_t dst_type)
++{
++	struct sockaddr_iso addr;
++	int err;
++
++	memset(&addr, 0, sizeof(addr));
++	addr.iso_family = AF_BLUETOOTH;
++	bacpy(&addr.iso_bdaddr, dst);
++	addr.iso_bdaddr_type = dst_type;
++
++	err = connect(sock, (struct sockaddr *) &addr, sizeof(addr));
++	if (err < 0 && !(errno == EAGAIN || errno == EINPROGRESS))
++		return -errno;
++
++	return 0;
++}
++
+ static gboolean sco_set(int sock, uint16_t mtu, uint16_t voice, GError **err)
+ {
+ 	struct sco_options sco_opt;
+@@ -817,6 +857,17 @@ voice:
+ 	return TRUE;
+ }
+ 
++static gboolean iso_set(int sock, struct bt_iso_qos *qos, GError **err)
++{
++	if (setsockopt(sock, SOL_BLUETOOTH, BT_ISO_QOS, qos,
++				sizeof(*qos)) < 0) {
++		ERROR_FAILED(err, "setsockopt(BT_ISO_QOS)", errno);
++		return FALSE;
++	}
++
++	return TRUE;
++}
++
+ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 						BtIOOption opt1, va_list args)
+ {
+@@ -894,6 +945,13 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 			break;
+ 		case BT_IO_OPT_MODE:
+ 			opts->mode = va_arg(args, int);
++			if (opts->mode == BT_IO_MODE_ISO) {
++				opts->type = BT_IO_ISO;
++				if (opts->src_type == BDADDR_BREDR)
++					opts->src_type = BDADDR_LE_PUBLIC;
++				if (opts->dst_type == BDADDR_BREDR)
++					opts->dst_type = BDADDR_LE_PUBLIC;
++			}
+ 			break;
+ 		case BT_IO_OPT_FLUSHABLE:
+ 			opts->flushable = va_arg(args, gboolean);
+@@ -904,6 +962,9 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 		case BT_IO_OPT_VOICE:
+ 			opts->voice = va_arg(args, int);
+ 			break;
++		case BT_IO_OPT_QOS:
++			opts->qos = *va_arg(args, struct bt_iso_qos *);
++			break;
+ 		case BT_IO_OPT_INVALID:
+ 		case BT_IO_OPT_KEY_SIZE:
+ 		case BT_IO_OPT_SOURCE_CHANNEL:
+@@ -1227,6 +1288,7 @@ parse_opts:
+ 		case BT_IO_OPT_DEST_CHANNEL:
+ 		case BT_IO_OPT_MTU:
+ 		case BT_IO_OPT_VOICE:
++		case BT_IO_OPT_QOS:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+ 					"Unknown option %d", opt);
+@@ -1380,6 +1442,7 @@ static gboolean rfcomm_get(int sock, GError **err, BtIOOption opt1,
+ 		case BT_IO_OPT_FLUSHABLE:
+ 		case BT_IO_OPT_PRIORITY:
+ 		case BT_IO_OPT_VOICE:
++		case BT_IO_OPT_QOS:
+ 		case BT_IO_OPT_INVALID:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1489,6 +1552,95 @@ static gboolean sco_get(int sock, GError **err, BtIOOption opt1, va_list args)
+ 		case BT_IO_OPT_FLUSHABLE:
+ 		case BT_IO_OPT_PRIORITY:
+ 		case BT_IO_OPT_VOICE:
++		case BT_IO_OPT_QOS:
++		case BT_IO_OPT_INVALID:
++		default:
++			g_set_error(err, BT_IO_ERROR, EINVAL,
++					"Unknown option %d", opt);
++			return FALSE;
++		}
++
++		opt = va_arg(args, int);
++	}
++
++	return TRUE;
++}
++
++static gboolean iso_get(int sock, GError **err, BtIOOption opt1, va_list args)
++{
++	BtIOOption opt = opt1;
++	struct sockaddr_iso src, dst;
++	struct bt_iso_qos qos;
++	socklen_t len;
++	uint32_t phy;
++
++	len = sizeof(qos);
++	memset(&qos, 0, len);
++	if (getsockopt(sock, SOL_BLUETOOTH, BT_ISO_QOS, &qos, &len) < 0) {
++		ERROR_FAILED(err, "getsockopt(BT_ISO_QOS)", errno);
++		return FALSE;
++	}
++
++	if (!get_src(sock, &src, sizeof(src), err))
++		return FALSE;
++
++	if (!get_dst(sock, &dst, sizeof(dst), err))
++		return FALSE;
++
++	while (opt != BT_IO_OPT_INVALID) {
++		switch (opt) {
++		case BT_IO_OPT_SOURCE:
++			ba2str(&src.iso_bdaddr, va_arg(args, char *));
++			break;
++		case BT_IO_OPT_SOURCE_BDADDR:
++			bacpy(va_arg(args, bdaddr_t *), &src.iso_bdaddr);
++			break;
++		case BT_IO_OPT_SOURCE_TYPE:
++			*(va_arg(args, uint8_t *)) = src.iso_bdaddr_type;
++			break;
++		case BT_IO_OPT_DEST:
++			ba2str(&dst.iso_bdaddr, va_arg(args, char *));
++			break;
++		case BT_IO_OPT_DEST_BDADDR:
++			bacpy(va_arg(args, bdaddr_t *), &dst.iso_bdaddr);
++			break;
++		case BT_IO_OPT_DEST_TYPE:
++			*(va_arg(args, uint8_t *)) = dst.iso_bdaddr_type;
++			break;
++		case BT_IO_OPT_MTU:
++			*(va_arg(args, uint16_t *)) = qos.out.sdu;
++			break;
++		case BT_IO_OPT_IMTU:
++			*(va_arg(args, uint16_t *)) = qos.in.sdu;
++			break;
++		case BT_IO_OPT_OMTU:
++			*(va_arg(args, uint16_t *)) = qos.out.sdu;
++			break;
++		case BT_IO_OPT_PHY:
++			if (get_phy(sock, &phy) < 0) {
++				ERROR_FAILED(err, "get_phy", errno);
++				return FALSE;
++			}
++			*(va_arg(args, uint32_t *)) = phy;
++			break;
++		case BT_IO_OPT_QOS:
++			*(va_arg(args, struct bt_iso_qos *)) = qos;
++			break;
++		case BT_IO_OPT_HANDLE:
++		case BT_IO_OPT_CLASS:
++		case BT_IO_OPT_DEFER_TIMEOUT:
++		case BT_IO_OPT_SEC_LEVEL:
++		case BT_IO_OPT_KEY_SIZE:
++		case BT_IO_OPT_CHANNEL:
++		case BT_IO_OPT_SOURCE_CHANNEL:
++		case BT_IO_OPT_DEST_CHANNEL:
++		case BT_IO_OPT_PSM:
++		case BT_IO_OPT_CID:
++		case BT_IO_OPT_CENTRAL:
++		case BT_IO_OPT_MODE:
++		case BT_IO_OPT_FLUSHABLE:
++		case BT_IO_OPT_PRIORITY:
++		case BT_IO_OPT_VOICE:
+ 		case BT_IO_OPT_INVALID:
+ 		default:
+ 			g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1516,6 +1668,8 @@ static gboolean get_valist(GIOChannel *io, BtIOType type, GError **err,
+ 		return rfcomm_get(sock, err, opt1, args);
+ 	case BT_IO_SCO:
+ 		return sco_get(sock, err, opt1, args);
++	case BT_IO_ISO:
++		return iso_get(sock, err, opt1, args);
+ 	case BT_IO_INVALID:
+ 	default:
+ 		g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1584,6 +1738,8 @@ gboolean bt_io_set(GIOChannel *io, GError **err, BtIOOption opt1, ...)
+ 		return rfcomm_set(sock, opts.sec_level, opts.central, err);
+ 	case BT_IO_SCO:
+ 		return sco_set(sock, opts.mtu, opts.voice, err);
++	case BT_IO_ISO:
++		return iso_set(sock, &opts.qos, err);
+ 	case BT_IO_INVALID:
+ 	default:
+ 		g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1655,6 +1811,17 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+ 		if (!sco_set(sock, opts->mtu, opts->voice, err))
+ 			goto failed;
+ 		break;
++	case BT_IO_ISO:
++		sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_ISO);
++		if (sock < 0) {
++			ERROR_FAILED(err, "socket(SEQPACKET, ISO)", errno);
++			return NULL;
++		}
++		if (iso_bind(sock, &opts->src, opts->src_type, err) < 0)
++			goto failed;
++		if (!iso_set(sock, &opts->qos, err))
++			goto failed;
++		break;
+ 	case BT_IO_INVALID:
+ 	default:
+ 		g_set_error(err, BT_IO_ERROR, EINVAL,
+@@ -1699,8 +1866,9 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
+ 
+ 	sock = g_io_channel_unix_get_fd(io);
+ 
+-	/* Use DEFER_SETUP when connecting using Ext-Flowctl */
+-	if (opts.mode == BT_IO_MODE_EXT_FLOWCTL && opts.defer) {
++	/* Use DEFER_SETUP when connecting using Ext-Flowctl or ISO */
++	if ((opts.mode == BT_IO_MODE_EXT_FLOWCTL && opts.defer) ||
++			(opts.mode == BT_IO_MODE_ISO && opts.defer)) {
+ 		if (setsockopt(sock, SOL_BLUETOOTH, BT_DEFER_SETUP,
+ 					&opts.defer, sizeof(opts.defer)) < 0) {
+ 			ERROR_FAILED(gerr, "setsockopt(BT_DEFER_SETUP)", errno);
+@@ -1719,6 +1887,9 @@ GIOChannel *bt_io_connect(BtIOConnect connect, gpointer user_data,
+ 	case BT_IO_SCO:
+ 		err = sco_connect(sock, &opts.dst);
+ 		break;
++	case BT_IO_ISO:
++		err = iso_connect(sock, &opts.dst, opts.dst_type);
++		break;
+ 	case BT_IO_INVALID:
+ 	default:
+ 		g_set_error(gerr, BT_IO_ERROR, EINVAL,
+diff --git a/btio/btio.h b/btio/btio.h
+index 50a2a4dc0..9636fd467 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -44,6 +44,7 @@ typedef enum {
+ 	BT_IO_OPT_PRIORITY,
+ 	BT_IO_OPT_VOICE,
+ 	BT_IO_OPT_PHY,
++	BT_IO_OPT_QOS,
+ } BtIOOption;
+ 
+ typedef enum {
+@@ -58,7 +59,8 @@ typedef enum {
+ 	BT_IO_MODE_ERTM,
+ 	BT_IO_MODE_STREAMING,
+ 	BT_IO_MODE_LE_FLOWCTL,
+-	BT_IO_MODE_EXT_FLOWCTL
++	BT_IO_MODE_EXT_FLOWCTL,
++	BT_IO_MODE_ISO
+ } BtIOMode;
+ 
+ typedef void (*BtIOConfirm)(GIOChannel *io, gpointer user_data);
+diff --git a/tools/btiotest.c b/tools/btiotest.c
+index 70d74ffbe..193e1395b 100644
+--- a/tools/btiotest.c
++++ b/tools/btiotest.c
+@@ -29,6 +29,25 @@
+ #define DEFAULT_ACCEPT_TIMEOUT 2
+ static int opt_update_sec = 0;
+ 
++#define DEFAULT_IO_QOS \
++{ \
++	.interval = 10000, \
++	.latency = 10, \
++	.sdu = 40, \
++	.phy = 0x02, \
++	.rtn = 2, \
++}
++
++struct bt_iso_qos qos = {
++	.cig = BT_ISO_QOS_CIG_UNSET,
++	.cis = BT_ISO_QOS_CIG_UNSET,
++	.sca = 0x07,
++	.packing = 0x00,
++	.framing = 0x00,
++	.in = DEFAULT_IO_QOS,
++	.out = DEFAULT_IO_QOS,
++};
++
+ struct io_data {
+ 	guint ref;
+ 	GIOChannel *io;
+@@ -36,6 +55,7 @@ struct io_data {
+ 	int disconn;
+ 	int accept;
+ 	int voice;
++	struct bt_iso_qos *qos;
+ };
+ 
+ static void io_data_unref(struct io_data *data)
+@@ -67,6 +87,7 @@ static struct io_data *io_data_new(GIOChannel *io, int reject, int disconn,
+ 	data->reject = reject;
+ 	data->disconn = disconn;
+ 	data->accept = accept;
++	data->qos = &qos;
+ 
+ 	return io_data_ref(data);
+ }
+@@ -530,9 +551,88 @@ static void sco_listen(const char *src, gboolean defer, int reject,
+ 	g_io_channel_unref(sco_srv);
+ }
+ 
++static void iso_connect(const char *src, const char *dst, int disconn)
++{
++	struct io_data *data;
++	GError *err = NULL;
++
++	printf("Connecting ISO to %s\n", dst);
++
++	data = io_data_new(NULL, -1, disconn, -1);
++
++	if (src)
++		data->io = bt_io_connect(connect_cb, data,
++						(GDestroyNotify) io_data_unref,
++						&err,
++						BT_IO_OPT_SOURCE, src,
++						BT_IO_OPT_DEST, dst,
++						BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++						BT_IO_OPT_QOS, data->qos,
++						BT_IO_OPT_INVALID);
++	else
++		data->io = bt_io_connect(connect_cb, data,
++						(GDestroyNotify) io_data_unref,
++						&err,
++						BT_IO_OPT_DEST, dst,
++						BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++						BT_IO_OPT_QOS, data->qos,
++						BT_IO_OPT_INVALID);
++
++	if (!data->io) {
++		printf("Connecting to %s failed: %s\n", dst, err->message);
++		g_error_free(err);
++		exit(EXIT_FAILURE);
++	}
++}
++
++static void iso_listen(const char *src, gboolean defer, int reject,
++				int disconn, int accept)
++{
++	struct io_data *data;
++	BtIOConnect conn;
++	BtIOConfirm cfm;
++	GIOChannel *iso_srv;
++	GError *err = NULL;
++
++	printf("Listening for ISO connections\n");
++
++	if (defer) {
++		conn = NULL;
++		cfm = confirm_cb;
++	} else {
++		conn = connect_cb;
++		cfm = NULL;
++	}
++
++	data = io_data_new(NULL, reject, disconn, accept);
++
++	if (src)
++		iso_srv = bt_io_listen(conn, cfm, data,
++					(GDestroyNotify) io_data_unref,
++					&err,
++					BT_IO_OPT_SOURCE, src,
++					BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++					BT_IO_OPT_INVALID);
++	else
++		iso_srv = bt_io_listen(conn, cfm, data,
++					(GDestroyNotify) io_data_unref,
++					&err,
++					BT_IO_OPT_MODE, BT_IO_MODE_ISO,
++					BT_IO_OPT_INVALID);
++
++	if (!iso_srv) {
++		printf("Listening failed: %s\n", err->message);
++		g_error_free(err);
++		exit(EXIT_FAILURE);
++	}
++
++	g_io_channel_unref(iso_srv);
++}
++
+ static int opt_channel = -1;
+ static int opt_psm = 0;
+ static gboolean opt_sco = FALSE;
++static gboolean opt_iso = FALSE;
+ static gboolean opt_defer = FALSE;
+ static gint opt_voice = 0;
+ static char *opt_dev = NULL;
+@@ -559,6 +659,8 @@ static GOptionEntry options[] = {
+ 				"(0 BR/EDR 1 LE Public 2 LE Random" },
+ 	{ "sco", 's', 0, G_OPTION_ARG_NONE, &opt_sco,
+ 				"Use SCO" },
++	{ "iso", 'o', 0, G_OPTION_ARG_NONE, &opt_iso,
++				"Use ISO" },
+ 	{ "defer", 'd', 0, G_OPTION_ARG_NONE, &opt_defer,
+ 				"Use DEFER_SETUP for incoming connections" },
+ 	{ "voice", 'V', 0, G_OPTION_ARG_INT, &opt_voice,
+@@ -637,6 +739,14 @@ int main(int argc, char *argv[])
+ 					opt_disconn, opt_accept, opt_voice);
+ 	}
+ 
++	if (opt_iso) {
++		if (argc > 1)
++			iso_connect(opt_dev, argv[1], opt_disconn);
++		else
++			iso_listen(opt_dev, opt_defer, opt_reject,
++					opt_disconn, opt_accept);
++	}
++
+ 	signal(SIGTERM, sig_term);
+ 	signal(SIGINT, sig_term);
+ 
 -- 
 2.35.3
 
