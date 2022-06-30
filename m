@@ -2,106 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71632C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 07:40:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DE8C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 08:37:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbiF3Hkl (ORCPT
+        id S233600AbiF3IhE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 03:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32788 "EHLO
+        Thu, 30 Jun 2022 04:37:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231572AbiF3Hkk (ORCPT
+        with ESMTP id S233826AbiF3IhC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 03:40:40 -0400
-Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291C43A73A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 00:40:39 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.nyi.internal (Postfix) with ESMTP id 79BB55C01F8;
-        Thu, 30 Jun 2022 03:40:36 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Thu, 30 Jun 2022 03:40:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=adrake.org; h=cc
-        :cc:content-transfer-encoding:date:date:from:from:in-reply-to
-        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
-         s=fm2; t=1656574836; x=1656661236; bh=4RjzQkICd6JShLQpf6JLO602P
-        G9BdxNyoon3ms2HCpg=; b=TpGYmn8u+3UHzo+Ze40VKHbwgK6HnpDhBQ6EyDcdw
-        nq0791CYVg+OC3T84WvVXF1fJrQWTTkorvIodLYyBoBqD2jco4kBCWn/bVBLqxm6
-        sl3oiIbz3DO/aSoP0+6NU2DyfNr4LDqcoWPLXB3slkIS/IAQjep4qbCl4GLr8L95
-        a6u3qPQMmFjJqxIUcr/upd85n7XSDfqNBc9gD94aqtNEaWOlwS+4Kmd9alp68C3s
-        VABo4mWK0N0mg5mkdcZ7q22+5iGsqiyhZeOY9ghj+hOYjfosZebnw/Lf+2pdbz94
-        6fu3bXqzNVcgu4np5Pw7PAZsGkMbpX1JAmD0i91S8SoUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-        1656574836; x=1656661236; bh=4RjzQkICd6JShLQpf6JLO602PG9BdxNyoon
-        3ms2HCpg=; b=b99zl0qxz0UbwTJO2gIGCaYOF6/oxUGLtijr1dhVXSh5ydb5688
-        ybcpZsWjgU1tZfw1uLrTckyx39V2xxaFseUgzOtjh3LZCdEpCkGLQg1XtfEB1756
-        rIh2XgCL3AuUPGFs4ZWjtogQlhm5kLSIFQd8m3hzwU9vHi0+72KbxHb4KShfFJt/
-        r+/nxVYZ0vxWSXvNlkuI06mOoV2wSBaddD1KuuNrryYbeRrozfzoeivDPyPpaEcv
-        0Q3AZnseWLRCCB0V2AaJLDE+f5/fvJBjn6gx9MrihnSqqVyB4VzCBZEDLptikUrl
-        yQNvPzhWMkHjP1+icRKp8Gkp6Fo/0h1LEIA==
-X-ME-Sender: <xms:dFO9YtYIDoc0UhXzin98M8ob_tuZHSfif6IA-eWQtXU_0d0yeW6BMQ>
-    <xme:dFO9YkYjKB58sbsl1t8klmz-DhC4rVILuybdAcl-_zaL0YlFqG2R8n-rI52XETbGY
-    IpqhXsHCQtHfIZkeg>
-X-ME-Received: <xmr:dFO9Yv9AsBa-tefaOHsUO4Sxr4jepxFWgjEvcgaEYDkI6Rqryl-44TcOBcQVRorg0rHuL8actF2vLhoaS-TQLnDneAb2KyhujmId5wFt>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrudehtddguddvgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecunecujfgurhephffvvefufffkofgggfestdekre
-    dtredttdenucfhrhhomheptehnughrvgifucffrhgrkhgvuceorggurhgrkhgvsegrughr
-    rghkvgdrohhrgheqnecuggftrfgrthhtvghrnhepueevvdfhteetjeekudehteelffeuud
-    evffeggfevleegffeitdefffffgeehtdegnecuffhomhgrihhnpehgihhthhhusgdrtgho
-    mhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrug
-    hrrghkvgesrggurhgrkhgvrdhorhhg
-X-ME-Proxy: <xmx:dFO9YroyaFUlU57MChsgZkT5rKMJpYemTo3Xk-hEDdUgssb8L10fmQ>
-    <xmx:dFO9Yop5rEa_OxciMl1P6PV1NG6KCukX4YWE7Qy_ouESl-te8DOx1g>
-    <xmx:dFO9YhRYwES1Ohydo1QxGPynNqC2DkVPOKJEyZDlwBmc-EBb0lIrlg>
-    <xmx:dFO9YvTePlOSkn4zhXY9v5lrkLiiYOEx_ntqMOKBxmiLpeTkoJKIFw>
-Feedback-ID: i7cac4098:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 30 Jun 2022 03:40:35 -0400 (EDT)
-From:   Andrew Drake <adrake@adrake.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Andrew Drake <adrake@adrake.org>
-Subject: [PATCH BlueZ] adapter: Fix advertising monitor on Linux 5.12-5.17
-Date:   Thu, 30 Jun 2022 00:39:58 -0700
-Message-Id: <20220630073958.34468-1-adrake@adrake.org>
-X-Mailer: git-send-email 2.35.3
+        Thu, 30 Jun 2022 04:37:02 -0400
+Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1DEC205F7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 01:37:00 -0700 (PDT)
+Received: by mail-qv1-xf30.google.com with SMTP id q4so28646328qvq.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 01:37:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=a67MMKc0cCaYJ0r07Ipb4KTN7jNCQeuGH8/jZqYO5RM=;
+        b=MthkAjEnVYyH7NZW0aKffP+ZQ5gtAr/4VHHKF15QO9RP0/VoYNvYJzDRl2s0KrDR8g
+         Cuj5teDM3Zuext79+hZ7iT40PyoyNGQGcEAjFkUjrAaxe/ia/dwI38XgRZbTqYbcDHev
+         Y0BJG78kvb9x2lTzIi8srSRD5zNr8v0aUm3w53OlL9wToVCjfo+zpvUSuoEd4vrc3ad+
+         RF8J8KNQttLiJV9CZfNISb8RbV9V9deor7z2hwBMRq2+76HumPKeC5vH/15iLBfYRI3l
+         TPWBjQTIpq+WOd4U4DtD33zUHh6t9LyOc+YqKbl1cozFdWyklGwe/4XlDz3VPhDfNHDj
+         U7iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=a67MMKc0cCaYJ0r07Ipb4KTN7jNCQeuGH8/jZqYO5RM=;
+        b=A53aDcYMQ8WMXlCPXh3ZwSDBdUQwiLSfedru+YJLB8pu3SFXThgQwFt0ryMHA6ePk3
+         y+MhQgHIMtxyjXlmg01gsal/oflI7g8VPHgZfmRRIJhaTqsKhVb1Y/FA+Qq2yvfLbzTb
+         U4yqPgRfOnGik9835hXMqZtG79S0UKSgLsVRfCi5Rc3smfZDbRocDqPTM4PMKCNX3qEj
+         s+WbTAYSmNepNpaX9jngAReMlDKLkTHA0a75m7xIuLU0kIQ4JJC/UwaXRzW4Hi6E1IOX
+         jXNFUuHfnq8z9zhsL/ubB+AoVBP0Lx1EVKiSKNv6L3t08sGZA2jMKsO84YY73DPtOTgd
+         Sj0A==
+X-Gm-Message-State: AJIora83K6UX+++ke2bgXjqsKjK9ioo91QTnL6aWT4JYPYXMxNFnfFfE
+        E5lnfxyZz11DySmNuh17FdAbM3+HGICPNg==
+X-Google-Smtp-Source: AGRyM1vk6lSSAEE0S8g/OOgTFtORujaS4nCZED43/iO+1ikzionYy9IbZcYky3W7cmEgxt4v/VSAmA==
+X-Received: by 2002:ac8:5f10:0:b0:31d:2a6a:76d1 with SMTP id x16-20020ac85f10000000b0031d2a6a76d1mr2550287qta.317.1656578219829;
+        Thu, 30 Jun 2022 01:36:59 -0700 (PDT)
+Received: from [172.17.0.2] ([20.7.203.97])
+        by smtp.gmail.com with ESMTPSA id c190-20020ae9edc7000000b006a743b360bcsm14215274qkg.136.2022.06.30.01.36.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jun 2022 01:36:59 -0700 (PDT)
+Message-ID: <62bd60ab.1c69fb81.c8494.e6ab@mx.google.com>
+Date:   Thu, 30 Jun 2022 01:36:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2480083096961125774=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, isak.westin@hotmail.com
+Subject: RE: mesh: Use correct net_id in ctl_received
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <VI1PR09MB423902850B3FAEAAC0190EE3E3BA9@VI1PR09MB4239.eurprd09.prod.outlook.com>
+References: <VI1PR09MB423902850B3FAEAAC0190EE3E3BA9@VI1PR09MB4239.eurprd09.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The existing code assumes that, if a device supports advertising monitor
-offload, DEVICE_FOUND events can be ignored since the kernel will send
-ADV_MONITOR_DEVICE_FOUND events instead. Unfortunately, these new events
-were added in 5.18, but offload was added in 5.12. This patch adds a
-check on the MGMT API version so we can process the older DEVICE_FOUND
-events when the new events are not supported.
+--===============2480083096961125774==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: https://github.com/bluez/bluez/issues/357
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655288
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.47 seconds
+GitLint                       PASS      1.07 seconds
+Prep - Setup ELL              PASS      42.45 seconds
+Build - Prep                  PASS      0.67 seconds
+Build - Configure             PASS      8.46 seconds
+Build - Make                  PASS      1263.52 seconds
+Make Check                    PASS      11.28 seconds
+Make Check w/Valgrind         PASS      442.87 seconds
+Make Distcheck                PASS      220.49 seconds
+Build w/ext ELL - Configure   PASS      8.13 seconds
+Build w/ext ELL - Make        PASS      1219.91 seconds
+Incremental Build with patchesPASS      0.00 seconds
+
+
+
 ---
- src/adapter.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 16da20034..62ca42ffb 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6909,7 +6909,9 @@ void btd_adapter_update_found_device(struct btd_adapter *adapter,
- 	bool duplicate = false;
- 	struct queue *matched_monitors = NULL;
- 
--	if (!btd_adv_monitor_offload_enabled(adapter->adv_monitor_manager)) {
-+	if (!btd_adv_monitor_offload_enabled(adapter->adv_monitor_manager) ||
-+				(MGMT_VERSION(mgmt_version, mgmt_revision) <
-+							MGMT_VERSION(1, 22))) {
- 		if (bdaddr_type != BDADDR_BREDR)
- 			ad = bt_ad_new_with_data(data_len, data);
- 
--- 
-2.35.3
 
+--===============2480083096961125774==--
