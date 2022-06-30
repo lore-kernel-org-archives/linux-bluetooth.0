@@ -2,162 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1407C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 23:05:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD16AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 23:39:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230092AbiF3XF0 (ORCPT
+        id S231516AbiF3Xja (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 19:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53244 "EHLO
+        Thu, 30 Jun 2022 19:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbiF3XFZ (ORCPT
+        with ESMTP id S230186AbiF3Xj3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 19:05:25 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D4E53EFE
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 16:05:20 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id b125so569747qkg.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 16:05:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=K5XWvyHLVVweLvFUkB3cA0cc/km/OaXQSRa0tmmmZ2U=;
-        b=QF5/UEnf+IPCh/49VYXt2KE6MA8G90eXk8sIFuSS/Wmzk1W1QL1bQGvScAIZcjngJz
-         cWKhxQDSVzVMDCkTDVVHLHcqZYvHrD4I1UU8kqN6///Pp2KkYRBijyDTp1FTwLdD1jh7
-         K/fk4M2xaD80eR/XSGZ9xBpAy0BO+m+pgGTnAQcqrC0v2cF3xreONfXgsHt9tZkHIT4D
-         uO3LAgnl8F/R6QkV8S7I7l+h/rrRfnAG6QslIbLc8MUzbxjYPwifjtUxgDsa7txRec9v
-         6TIHeOgRcRJNniV6+Ene9RpRvkj5S2PpIs5kZKGCBD1e8U9zx/LBhYu4bxJS2POyNs3w
-         d1Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=K5XWvyHLVVweLvFUkB3cA0cc/km/OaXQSRa0tmmmZ2U=;
-        b=XnetKEy4dBa4C3QPxvYhB89Ck4Pnmom3tI3Ct+0H1gBUiMW8+8+qvlsPYsbhozNGIN
-         vYU2R1Ud2X0j9B95tPyHsBv44FYDRMfTug2tWrtpgxTahIDpJ6Jx+Np51c2TlxLcSIX/
-         Uw+SUgKFAbQVOhdJZ4k+pg55KQmsuarUvVqXJKvVWkKtvgch6j/Nir+2AjaG41IWYzQx
-         JJMBVSuRNxhCO1i4yMV2F2B63bxbzLpd63J3TllCSVpCzt5+ihsRHScIVRfsS1z0MCCz
-         NnPCJF/iF1+Hv+skEj6IOuqghMWCtAw+UO8Kn4icliCGXscNouDN79Mg+qq34bsxwJvy
-         Nlpg==
-X-Gm-Message-State: AJIora9gxJvyR8w/oX4f3y/PdEdT75nBrSrPVjC+k4v2HhAjS/JEkiBc
-        eUW95Lrux3gA9VViiSxEqFtGtbx+iX6yrw==
-X-Google-Smtp-Source: AGRyM1vIWVdFuq0uUiNZCIv7kKhSDNswx255Dh2EMUpI/cz6qVrTt+xtKjJirfOm478aMUbUAIEh7w==
-X-Received: by 2002:a05:620a:459f:b0:6b1:f5c1:6e61 with SMTP id bp31-20020a05620a459f00b006b1f5c16e61mr5258755qkb.436.1656630319760;
-        Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
-Received: from [172.17.0.2] ([52.168.129.219])
-        by smtp.gmail.com with ESMTPSA id x2-20020ae9e902000000b006a6a6f148e6sm16112929qkf.17.2022.06.30.16.05.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
-Message-ID: <62be2c2f.1c69fb81.34875.5959@mx.google.com>
-Date:   Thu, 30 Jun 2022 16:05:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2571514315463940376=="
+        Thu, 30 Jun 2022 19:39:29 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D9B444A3D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 16:39:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656632365; x=1688168365;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=lvm9py/P6xDFjy3ilmHS9mO7mQQ3hlDVtCIcPB8KDgE=;
+  b=acMgy4bgsECw3TgjyKQ+xFTwgD+eBKyRg6d7PSfiCOGDLOKbE6tPho5k
+   9QtUPn5O7lPkpUahDv58cWE/620GS9mqSKtqssO+HG310N8QwYWg8AlQu
+   fgB3kp8MJCzSVKtrRSs453Pc+zldiyzfH89+kca6C7aOY8VdPH4iUU+G1
+   nviksHGV7XT6zAsHCsIyHQgn0T/uprdkrjv0cfDlGyrpwR2H58e8LeFov
+   rcHRDfF8UCxpEeRekaJO25ds83xPYF3Ab6Bt2CKcng/qSAmooOioBR7p+
+   9EeTTPZsnNJsxXIRbUGpeXwWCfveoLeL+VUykQpWnNrNbk3paormWTtVV
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="281262409"
+X-IronPort-AV: E=Sophos;i="5.92,235,1650956400"; 
+   d="scan'208";a="281262409"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 16:39:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,235,1650956400"; 
+   d="scan'208";a="837810627"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 30 Jun 2022 16:39:15 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o73kh-000DJQ-7c;
+        Thu, 30 Jun 2022 23:39:15 +0000
+Date:   Fri, 1 Jul 2022 07:38:27 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     kbuild-all@lists.01.org
+Subject: Re: [PATCH v4 4/7] Bluetooth: Add initial implementation of BIS
+ connections
+Message-ID: <202207010714.VP7EmpRd-lkp@intel.com>
+References: <20220630221415.638408-4-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v4,1/7] Bluetooth: hci_core: Introduce hci_recv_event_data
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220630221415.638408-1-luiz.dentz@gmail.com>
-References: <20220630221415.638408-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220630221415.638408-4-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2571514315463940376==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+I love your patch! Perhaps something to improve:
 
-Dear submitter,
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on next-20220630]
+[cannot apply to bluetooth/master linus/master v5.19-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655563
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-hci_core-Introduce-hci_recv_event_data/20220701-061626
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+config: sparc64-randconfig-r032-20220629 (https://download.01.org/0day-ci/archive/20220701/202207010714.VP7EmpRd-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/71de20339d16663211f831340ed16ed442bd3f35
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-hci_core-Introduce-hci_recv_event_data/20220701-061626
+        git checkout 71de20339d16663211f831340ed16ed442bd3f35
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=sparc64 SHELL=/bin/bash net/bluetooth/
 
----Test result---
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-Test Summary:
-CheckPatch                    FAIL      15.26 seconds
-GitLint                       PASS      7.39 seconds
-SubjectPrefix                 PASS      6.50 seconds
-BuildKernel                   PASS      33.18 seconds
-BuildKernel32                 PASS      29.69 seconds
-Incremental Build with patchesPASS      167.58 seconds
-TestRunner: Setup             PASS      485.21 seconds
-TestRunner: l2cap-tester      PASS      17.74 seconds
-TestRunner: bnep-tester       PASS      6.15 seconds
-TestRunner: mgmt-tester       FAIL      103.90 seconds
-TestRunner: rfcomm-tester     PASS      9.76 seconds
-TestRunner: sco-tester        PASS      9.57 seconds
-TestRunner: smp-tester        PASS      9.58 seconds
-TestRunner: userchan-tester   PASS      6.35 seconds
+All warnings (new ones prefixed by >>):
 
-Details
-##############################
-Test: CheckPatch - FAIL - 15.26 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[v4,3/7] Bluetooth: Add BTPROTO_ISO socket type\Traceback (most recent call last):
-  File "scripts/spdxcheck.py", line 6, in <module>
-    from ply import lex, yacc
-ModuleNotFoundError: No module named 'ply'
-Traceback (most recent call last):
-  File "scripts/spdxcheck.py", line 6, in <module>
-    from ply import lex, yacc
-ModuleNotFoundError: No module named 'ply'
-WARNING:FILE_PATH_CHANGES: added, moved or deleted file(s), does MAINTAINERS need updating?
-#176: 
-new file mode 100644
-
-total: 0 errors, 1 warnings, 0 checks, 1718 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12902307.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-[v4,4/7] Bluetooth: Add initial implementation of BIS connections\WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
-#848: FILE: net/bluetooth/hci_conn.c:817:
-+ * */
-
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#1877: FILE: net/bluetooth/hci_sync.c:1031:
-+		struct adv_info *adv = hci_find_adv_instance(hdev, instance);
-+		if (!adv || !adv->periodic)
-
-total: 0 errors, 2 warnings, 0 checks, 1873 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12902310.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>> net/bluetooth/hci_conn.c:1365:18: warning: no previous prototype for 'hci_add_bis' [-Wmissing-prototypes]
+    1365 | struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
+         |                  ^~~~~~~~~~~
+>> net/bluetooth/hci_conn.c:1907:18: warning: no previous prototype for 'hci_bind_bis' [-Wmissing-prototypes]
+    1907 | struct hci_conn *hci_bind_bis(struct hci_conn *conn, struct bt_iso_qos *qos)
+         |                  ^~~~~~~~~~~~
+--
+>> net/bluetooth/hci_sync.c:1066:5: warning: no previous prototype for 'hci_adv_bcast_annoucement' [-Wmissing-prototypes]
+    1066 | int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
+         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-##############################
-Test: TestRunner: mgmt-tester - FAIL - 103.90 seconds
-Run test-runner with mgmt-tester
-Total: 494, Passed: 492 (99.6%), Failed: 2, Not Run: 0
+vim +/hci_add_bis +1365 net/bluetooth/hci_conn.c
 
-Failed Test Cases
-Read Exp Feature - Success                           Failed       0.099 seconds
-Read Exp Feature - Success (Index None)              Failed       0.102 seconds
+  1363	
+  1364	/* This function requires the caller holds hdev->lock */
+> 1365	struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
+  1366				     struct bt_iso_qos *qos)
+  1367	{
+  1368		struct hci_conn *conn;
+  1369		struct iso_list_data data;
+  1370		int err;
+  1371	
+  1372		/* Let's make sure that le is enabled.*/
+  1373		if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+  1374			if (lmp_le_capable(hdev))
+  1375				return ERR_PTR(-ECONNREFUSED);
+  1376			return ERR_PTR(-EOPNOTSUPP);
+  1377		}
+  1378	
+  1379		err = qos_set_big(hdev, qos);
+  1380		if (err)
+  1381			return ERR_PTR(err);
+  1382	
+  1383		err = qos_set_bis(hdev, qos);
+  1384		if (err)
+  1385			return ERR_PTR(err);
+  1386	
+  1387		data.big = qos->big;
+  1388		data.bis = qos->bis;
+  1389		data.count = 0;
+  1390	
+  1391		/* Check if there is already a matching BIG/BIS */
+  1392		hci_conn_hash_list_state(hdev, bis_list, ISO_LINK, BT_BOUND, &data);
+  1393		if (data.count)
+  1394			return ERR_PTR(-EADDRINUSE);
+  1395	
+  1396		conn = hci_conn_hash_lookup_bis(hdev, dst, qos->big, qos->bis);
+  1397		if (conn)
+  1398			return ERR_PTR(-EADDRINUSE);
+  1399	
+  1400		conn = hci_conn_add(hdev, ISO_LINK, dst, HCI_ROLE_MASTER);
+  1401		if (!conn)
+  1402			return ERR_PTR(-ENOMEM);
+  1403	
+  1404		set_bit(HCI_CONN_PER_ADV, &conn->flags);
+  1405		conn->state = BT_CONNECT;
+  1406	
+  1407		hci_conn_hold(conn);
+  1408		return conn;
+  1409	}
+  1410	
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2571514315463940376==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
