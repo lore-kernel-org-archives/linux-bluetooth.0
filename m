@@ -2,103 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B8EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 21:03:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCF25C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Jun 2022 21:14:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236254AbiF3VDQ (ORCPT
+        id S237183AbiF3VOw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 17:03:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54354 "EHLO
+        Thu, 30 Jun 2022 17:14:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236408AbiF3VDP (ORCPT
+        with ESMTP id S236786AbiF3VOv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 17:03:15 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14B3F1900F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 14:03:15 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id s17so390501iob.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 14:03:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=SiRIEah7V7ikXmAe2ubi9LTBDnAhjo3m+aXQsYCKa7Y=;
-        b=KPri+lEFtQ2kmLKWnALAbTyo6a4Vrq4/hScrPEZ3WKZ0570weyxEc7gJRqiQ+vyYI5
-         UnQUck8UsE0K8Vyp4lcRDXcy80uLmB2IQaCWuV0KmE3G/J7/MjG9NkrvHSRCudQoWK39
-         BnnxwQwneYRH4KuMn7b7yHEvuSRGHHi7E1/7PoAccybE/QBN+IuMo1OH1nKgmy60MKvI
-         MYHWt804RMvwWGQti77RsIJfenC5nT9ycEl0HxWFkP+9Xp+Bt62bu2es3Nf/3htG+Dg3
-         bNY9jjNbsXEJHz5qjBswusC7aX/+4ik7sUrYyuxecM22v1bfkbRZWIbVGNapAqC5GGVQ
-         Nw0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=SiRIEah7V7ikXmAe2ubi9LTBDnAhjo3m+aXQsYCKa7Y=;
-        b=2BIu5ch1g+pICJIVjSFekCO01o+atprDPYKS99XS4tfklA24rUtrqOARDih4sjhuC3
-         aUhbD8whpBJxGkpgsRm53pj7yzsLMsFVEfOEIjOyrbnXbWvjjsyj1q3T4I8elTRiBxbA
-         C1URxjozDKieE70dsXkezQD6ThyigGiAA61z3sArvAMa3u7jXRdYy8n7hI9waUSsiPjb
-         DnXxMy7a9H/7lsK2qOpQ466XoiLJMWaLyu6IuOTXvm54d3h4VPpvFiE3UDSm6DaPDkPq
-         FLVaNgB3M4ui/X0CQlnPnmIEukOCvpa8Z141bEAF16JG2ZvAizpGbElVdSOlnk4IYk6o
-         zO8g==
-X-Gm-Message-State: AJIora83VKvzgztUEqsp5CXQch8Mgo1808z2qQ6/sYcj+HO2SfsfLHTv
-        t2UvARYE/PGh44uHbxHu/Al1NG7UsatzoQ==
-X-Google-Smtp-Source: AGRyM1uEtAinR5ZhTKEYu7oVBC9XT54RzDCqDa7l6w29ZmwAl6igepYJbPUbO7nDS8matmy2WXr61Q==
-X-Received: by 2002:a05:6638:1a8b:b0:33c:9a15:1ad2 with SMTP id ce11-20020a0566381a8b00b0033c9a151ad2mr6582833jab.38.1656622994189;
-        Thu, 30 Jun 2022 14:03:14 -0700 (PDT)
-Received: from [172.17.0.2] ([52.173.149.126])
-        by smtp.gmail.com with ESMTPSA id x26-20020a0566380cba00b00339e18d2c9bsm9078681jad.115.2022.06.30.14.03.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 14:03:13 -0700 (PDT)
-Message-ID: <62be0f91.1c69fb81.8aa16.c3e6@mx.google.com>
-Date:   Thu, 30 Jun 2022 14:03:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3506412397783420784=="
+        Thu, 30 Jun 2022 17:14:51 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE2CD1FCCF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 14:14:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1656623690; x=1688159690;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=XUIWS8InKYLfjv9sCg+brF2VZPzCPp+3MPNXux8fhN4=;
+  b=RykVFf4mCvyYdm706oRNY4vEVhfGxZPOMGA+9ni15ueQ+aju8c9mvMoM
+   6ng4aWu/AqXF1//paVrqjPGUCYBaSMp/3FQ1by0fXavl59ffB+j3yD6Fk
+   h14H3Koj4AAdUEVE5mOSh09nYjTa2oXIG4chFDy9ElfiPWA5owDfG9Jta
+   km+cLLzlYWEoKNMcIq+qYl3AZyHGKoAeTshWDdvl2PfV5qZ3wZGZ9un5r
+   J07fduVICrCeEI/E99GIm3OZJDIeVqIVVE72/S6LlBY7UFT+ZfVIM/9+O
+   nGlYpHXNulg53k6Ec2oedt+gmpx6JH5dWEYtZYs8XkOUqzWCIRdFieA+p
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10394"; a="271242786"
+X-IronPort-AV: E=Sophos;i="5.92,235,1650956400"; 
+   d="scan'208";a="271242786"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 14:14:49 -0700
+X-IronPort-AV: E=Sophos;i="5.92,235,1650956400"; 
+   d="scan'208";a="733788061"
+Received: from ikipnis-mobl2.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.122.213])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2022 14:14:49 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.von.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH BlueZ] mesh: Fix potential memory leak
+Date:   Thu, 30 Jun 2022 14:13:13 -0700
+Message-Id: <20220630211313.210017-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mst@redhat.com
-Subject: RE: Bluetooth: virtio_bt: mark broken
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220630202700.18187-1-mst@redhat.com>
-References: <20220630202700.18187-1-mst@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3506412397783420784==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655536
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.20 seconds
-GitLint                       PASS      0.73 seconds
-SubjectPrefix                 PASS      0.67 seconds
-BuildKernel                   PASS      31.50 seconds
-BuildKernel32                 PASS      28.18 seconds
-Incremental Build with patchesPASS      38.07 seconds
-TestRunner: Setup             PASS      460.18 seconds
-TestRunner: l2cap-tester      PASS      16.66 seconds
-TestRunner: bnep-tester       PASS      5.62 seconds
-TestRunner: mgmt-tester       PASS      98.63 seconds
-TestRunner: rfcomm-tester     PASS      9.03 seconds
-TestRunner: sco-tester        PASS      8.92 seconds
-TestRunner: smp-tester        PASS      8.96 seconds
-TestRunner: userchan-tester   PASS      5.86 seconds
-
-
-
+This memory leak will never happen, however since we added a new
+return from function that malloc'd memory, the free should still be
+done.
 ---
-Regards,
-Linux Bluetooth
+ mesh/mesh-config-json.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/mesh/mesh-config-json.c b/mesh/mesh-config-json.c
+index 5bb1e5ce0..7f46c8582 100644
+--- a/mesh/mesh-config-json.c
++++ b/mesh/mesh-config-json.c
+@@ -1961,8 +1961,10 @@ bool mesh_config_comp_page_add(struct mesh_config *cfg, uint8_t page,
+ 	len = (size * 2) + 3;
+ 	buf = l_malloc(len);
+ 	ret = snprintf(buf, len, "%2.2x", page);
+-	if (ret < 0)
++	if (ret < 0) {
++		l_free(buf);
+ 		return false;
++	}
+ 
+ 	hex2str(data, size, buf + 2, len - 2);
+ 
+-- 
+2.36.1
 
---===============3506412397783420784==--
