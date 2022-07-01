@@ -2,121 +2,258 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B01C43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 20:14:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 031ABC43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 22:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231455AbiGAUOg (ORCPT
+        id S231567AbiGAW2c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Jul 2022 16:14:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48196 "EHLO
+        Fri, 1 Jul 2022 18:28:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231995AbiGAUOY (ORCPT
+        with ESMTP id S231485AbiGAW2b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Jul 2022 16:14:24 -0400
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E9AD53EC7;
-        Fri,  1 Jul 2022 13:13:48 -0700 (PDT)
-Received: by mail-io1-f41.google.com with SMTP id p69so3265270iod.10;
-        Fri, 01 Jul 2022 13:13:48 -0700 (PDT)
+        Fri, 1 Jul 2022 18:28:31 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78DAE1FCFB
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Jul 2022 15:28:30 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id a4so6145995lfm.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Jul 2022 15:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GruWYOBngfLfDfK1U4G6/+LRagw1AuDAR7ngA7eWRQE=;
+        b=mayFNLkAzNQsvo4lL7Hbg4kkyHQuQpeO3Cqgp1+5nsETpovfXqQXPhHk1EjYBBy3CV
+         tYM7eDOUV7rxzjzuFBaQsfRUVLcKfm69fDljr4wJPrDvre4tPA85lba2C9qEzU3zvNIp
+         /zqCX1ULpA4eLtOXwastp29mDpj55bXBe6Fdg0ZgtiCb4nkw/qGgzDGQyNVemnv8vAvt
+         KRR9BFy6J3JSMrcz/zBTOtGFaGzKgXn5FwOpNBQYO9ckdoJBTfF0Oqx962gp00sjhuv+
+         55qjKwdyCc2UznjO5tkxP14T/gxkx8BRWHPYMKNN8UWy0GszZrsfAL3yU6PHW88VS3EJ
+         +qhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DNuTvSAhKqaeh8an0UHIXFque8gigbNFefwCGJLX870=;
-        b=7of5dhCcjLlFkNyE0XRR0hgYW755WHhgKc02gobJoYKhkcS9QDQIPbl9yS6dVlPIu4
-         kCdP2bakGwyEIHETu95sTTFY4CB57auR+t/R4Kl4spe1PCwBR2mz4yH7Ag37wwN0uM0E
-         6U/gNl5grpMi40+2jRYJ6XIJ+mi1KL63Tk6UYnTKJ+RD/Jvz9stel96UdO3vC5S4EKpW
-         h77WpouNOV/IFoUxoyfpn7jth5Ya0O1E/1+D3pAQDRLpnqEg0WBy4ebKsnuxUgp1M1uh
-         DtxA5CwKl74usTvbKYFt3uLRocpKF/1wunvuWqLmKK/nwtdcHM+ue8ZfAqS37gIzhswt
-         MGhg==
-X-Gm-Message-State: AJIora8I9FvVzbwj36VnPPP4hQa6l6e4LDtpZ2o7Vbh5GlzzTSuNr0GZ
-        Z3dui3afAENvaqaLaz2TSQ==
-X-Google-Smtp-Source: AGRyM1vIBtg3Ypbd9CpVxhbsSFzEWn0sS5SvHIidEptWRxBhklVI/Yccx6FHkpkREi2quKrUGor8Ow==
-X-Received: by 2002:a05:6638:1415:b0:33c:cc68:993d with SMTP id k21-20020a056638141500b0033ccc68993dmr9593137jad.243.1656706427745;
-        Fri, 01 Jul 2022 13:13:47 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.248])
-        by smtp.gmail.com with ESMTPSA id n41-20020a056602342900b00669536b0d71sm10613290ioz.14.2022.07.01.13.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Jul 2022 13:13:47 -0700 (PDT)
-Received: (nullmailer pid 1443679 invoked by uid 1000);
-        Fri, 01 Jul 2022 20:13:45 -0000
-Date:   Fri, 1 Jul 2022 14:13:45 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Rob Herring <robh+dt@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v2 2/5] dt-bindings: net: broadcom-bluetooth: Add
- conditional constraints
-Message-ID: <20220701201345.GA1443626-robh@kernel.org>
-References: <cover.1656583541.git.hakan.jansson@infineon.com>
- <3591c206eeccdacb8b4e702494d799792b752661.1656583541.git.hakan.jansson@infineon.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GruWYOBngfLfDfK1U4G6/+LRagw1AuDAR7ngA7eWRQE=;
+        b=UZh/FQqTeiwOM1DTD0dFO658C1fK15wmf33V5lZ6xIRdzEqH5isJs6ggGf2CsVP/9o
+         ET0kYcJ77PXKrqAbdwdP4ZSfheG/gw2rYkGcbupc7vC0H67e1aCsImERjEGEYeA+s9JX
+         QeA5reMNE+HTHITx9BJGlsxNhn42hcbTqrdUJBydEl/Jrx+Xtf8iLSS0HibO9lQNZQp1
+         HoMgTl7ptMzvOsp/Gh6s8OTTxE0id2HEZfGwxl1Kxfmn85iAKgc0cmePRgJ7C+ulX6yW
+         eVnEN/TmGoUXYAFEdV0mEikMZXUiKH8v5vEQmck9JRKRub2H9urPAIPaCc7tXPvREzLp
+         qRwA==
+X-Gm-Message-State: AJIora/iEhKnkKvrMNM3YhnVqr8AHg/8wcnARqAYn4Pl9m95CVxElrRf
+        +t0OYyex+sc8lCU+LGkvXXiROIyvKLtqBY8iNW/ed78e
+X-Google-Smtp-Source: AGRyM1viSa0VI2seKxHtKMnmPonOqVDvFRmfzx9Fekdl4Vc9Q9Rg9aNuhTl1MiJXoigQFlV23H6BXEzuari2aTBxeM0=
+X-Received: by 2002:a05:6512:31d0:b0:47f:92c6:99f1 with SMTP id
+ j16-20020a05651231d000b0047f92c699f1mr11174859lfe.198.1656714508637; Fri, 01
+ Jul 2022 15:28:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3591c206eeccdacb8b4e702494d799792b752661.1656583541.git.hakan.jansson@infineon.com>
+References: <20220701080601.3010-1-wangyouwan@uniontech.com>
+In-Reply-To: <20220701080601.3010-1-wangyouwan@uniontech.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 1 Jul 2022 15:28:17 -0700
+Message-ID: <CABBYNZ+wAGTuXHHs4xZQDp1APJfAgxhh1Opoj7cE0kohY2EGmw@mail.gmail.com>
+Subject: Re: [PATCH] obexd: fix crashed after cancel the on-going transfer
+To:     Youwan Wang <wangyouwan@uniontech.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 30 Jun 2022 14:45:21 +0200, Hakan Jansson wrote:
-> Add conditional constraint to make property "reset-gpios" available only
-> for compatible devices acually having the reset pin.
-> 
-> Make property "brcm,requires-autobaud-mode" depend on property
-> "shutdown-gpios" as the shutdown pin is required to enter autobaud mode.
-> 
-> I looked at all compatible devices and compiled the matrix below before
-> formulating the conditional constraint. This was a pure paper exercise and
-> no verification testing has been performed.
-> 
->                                 d
->                                 e
->                                 v h
->                                 i o
->                                 c s
->                             s   e t
->                             h   - -
->                             u   w w       v
->                             t r a a     v d
->                             d e k k     b d
->                             o s e e     a i
->                             w e u u     t o
->                             n t p p     - -
->                             - - - -     s s
->                             g g g g     u u
->                             p p p p t   p p
->                             i i i i x l p p
->                             o o o o c p l l
->                             s s s s o o y y
->     ---------------------------------------
->     brcm,bcm20702a1         X X X X X X X X
->     brcm,bcm4329-bt         X X X X X X X X
->     brcm,bcm4330-bt         X X X X X X X X
->     brcm,bcm4334-bt         X - X X X X X X
->     brcm,bcm43438-bt        X - X X X X X X
->     brcm,bcm4345c5          X - X X X X X X
->     brcm,bcm43540-bt        X - X X X X X X
->     brcm,bcm4335a0          X - X X X X X X
->     brcm,bcm4349-bt         X - X X X X X X
->     infineon,cyw55572-bt    X - X X X X X X
-> 
-> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
-> ---
-> V1 -> V2:
->   - New patch added to series
-> 
->  .../bindings/net/broadcom-bluetooth.yaml         | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
-> 
+Hi Youwan,
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+On Fri, Jul 1, 2022 at 1:18 AM Youwan Wang <wangyouwan@uniontech.com> wrote:
+>
+> There is a use after released.transfer->req_id different
+> obex->pending_req->id,See the following log,
+> The packages is removd in cancel_complete func
+> are not the same package in req_timeout func,
+> but transfer pointer is released.
+>
+> log:
+> g_obex_cancel_req()
+> transfer->req_id 23 id 22 obex->pending_req(0x55b642c3e100)
+>
+> g_obex_cancel_req()
+> match->data (0x55b642c344a0)
+>
+> g_obex_ref() ref 4
+>
+> cancel_complete()
+> pending req timeout 176 id 22 obex(0x55b642c3e100)
+>
+> transfer_response()
+> obex 0x55b642c36480 transfer(0x55b642c3d000)
+>
+> g_obex_drop_tx_queue()
+>
+> g_obex_unref() obex 0x55b642c36480
+> g_obex_unref() ref 3
+>
+> transfer_free()
+> obex 0x55b642c36480 transfer 0x55b642c3d000
+>
+> g_obex_unref() obex 0x55b642c36480
+> g_obex_unref() ref 2
+>
+> pending_pkt_free()
+> timeout_id 0 pending_pkt (0x55b642c344a0)
+>
+> step:
+> [obex]# connect 28:33:34:1E:96:98
+> Attempting to connect to 28:33:34:1E:96:98
+> [NEW] Session /org/bluez/obex/client/session2 [default]
+> [NEW] ObjectPush /org/bluez/obex/client/session2
+> Connection successful
+> [28:33:34:1E:96:98]# send /home/uos/Desktop/systemd.zip
+> Attempting to send /home/uos/Desktop/systemd.zip
+> [NEW] Transfer /org/bluez/obex/client/session2/transfer2
+> Transfer /org/bluez/obex/client/session2/transfer2
+>         Status: queued
+>         Name: systemd.zip
+>         Size: 33466053
+>         Filename: /home/uos/Desktop/systemd.zip
+>         Session: /org/bluez/obex/client/session2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> [CHG] Transfer /org/bluez/obex/client/session2/transfer2
+> er2 33:34:1E:96:98]# cancel /org/bluez/obex/client/sessi
+> Attempting to cancel transfer /org/bluez/obex/client/s
+> Cancel successful
+>
+> valgrind trace:
+> ==11431== Invalid read of size 4
+> ==11431==    at 0x12B442: transfer_response ()
+> ==11431==    by 0x127764: req_timeout ()
+> ==11431==    by 0x49B8922: ??? ( )
+> ==11431==    by 0x49B7E97: g_main_context_dispatch ()
+> ==11431==    by 0x49B8287: ??? (in )
+> ==11431==    by 0x49B8581: g_main_loop_run ()
+> ==11431==    by 0x121834: main (main.c:322)
+> ==11431==  Address 0x7344fa0 is 16 bytes inside a block of size
+> ==11431==    at 0x48369AB: free ()
+> ==11431==    by 0x12B459: transfer_response ()
+> ==11431==    by 0x127B3D: cancel_complete ()
+> ==11431==    by 0x49B7E97: g_main_context_dispatch ()
+> ==11431==    by 0x49B8287: ??? ()
+> ==11431==    by 0x49B8581: g_main_loop_run ()
+> ==11431==    by 0x121834: main (main.c:322)
+> ==11431==  Block was alloc'd at
+> ==11431==    at 0x4837B65: calloc ()
+> ==11431==    by 0x49BD9D8: g_malloc0 ()
+> ==11431==    by 0x12AB89: transfer_new ()
+> ==11431==    by 0x12B732: g_obex_put_req_pkt ()
+> ==11431==    by 0x12B732: g_obex_put_req_pkt ()
+> ==11431==    by 0x146982: transfer_start_put ()
+> ==11431==    by 0x146982: obc_transfer_start ()
+> ==11431==    by 0x13C5A7: session_process_transfer ()
+> ==11431==    by 0x13D248: session_process_queue ()
+> ==11431==    by 0x13D248: session_process_queue ()
+> ==11431==    by 0x13D2AF: session_process ()
+> ==11431==    by 0x49B7E97: g_main_context_dispatch ()
+> ==11431==    by 0x49B8287: ??? (i)
+> ==11431==    by 0x49B8581: g_main_loop_run ()
+> ==11431==    by 0x121834: main ()
+> ==11431==
+> ==11431== (action on error) vgdb me ...
+> ---
+>  gobex/gobex-transfer.c | 23 ++++++++++-------------
+>  1 file changed, 10 insertions(+), 13 deletions(-)
+>
+> diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+> index c94d018b2..a7d6c103a 100644
+> --- a/gobex/gobex-transfer.c
+> +++ b/gobex/gobex-transfer.c
+> @@ -83,15 +83,20 @@ static struct transfer *find_transfer(guint id)
+>
+>  static void transfer_complete(struct transfer *transfer, GError *err)
+>  {
+> -       guint id = transfer->id;
+> +       guint id;
+>
+> -       g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
+> +       if (!g_slist_find(transfers, transfer))
+> +               return;
+
+If we have to do a lookup then something is wrong already and the
+transfer_complete shall not called.
+
+> +       transfer->req_id = 0;
+> +       g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+>
+>         if (err) {
+>                 /* No further tx must be performed */
+>                 g_obex_drop_tx_queue(transfer->obex);
+>         }
+>
+> +       id = transfer->id;
+>         transfer->complete_func(transfer->obex, err, transfer->user_data);
+>         /* Check if the complete_func removed the transfer */
+>         if (find_transfer(id) == NULL)
+> @@ -106,9 +111,6 @@ static void transfer_abort_response(GObex *obex, GError *err, GObexPacket *rsp,
+>         struct transfer *transfer = user_data;
+>
+>         g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+> -
+> -       transfer->req_id = 0;
+> -
+>         /* Intentionally override error */
+>         err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+>                                                 "Operation was aborted");
+> @@ -184,12 +186,6 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+>         struct transfer *transfer = user_data;
+>         GObexPacket *req;
+>         gboolean rspcode, final;
+> -       guint id;
+> -
+> -       g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+> -
+> -       id = transfer->req_id;
+> -       transfer->req_id = 0;
+
+Don't think this is right, also I'm not sure why you are removing the
+transfer? If the transfer has been freed then there is something
+already quite wrong.
+
+>         if (err != NULL) {
+>                 transfer_complete(transfer, err);
+> @@ -203,6 +199,9 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+>                 goto failed;
+>         }
+>
+> +       if (!g_slist_find(transfers, transfer))
+> +               return;
+> +
+>         if (transfer->opcode == G_OBEX_OP_GET) {
+>                 handle_get_body(transfer, rsp, &err);
+>                 if (err != NULL)
+> @@ -222,8 +221,6 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+>                 req = g_obex_packet_new(transfer->opcode, TRUE,
+>                                                         G_OBEX_HDR_INVALID);
+>         } else {
+> -               /* Keep id since request still outstanting */
+> -               transfer->req_id = id;
+
+Not sure why you are removing this line?
+
+>                 return;
+>         }
+>
+> --
+> 2.20.1
+>
+>
+>
+
+
+-- 
+Luiz Augusto von Dentz
