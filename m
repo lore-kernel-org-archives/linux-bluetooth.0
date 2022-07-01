@@ -2,60 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D3EC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 00:43:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FB1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 00:43:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231665AbiGAAn6 (ORCPT
+        id S231726AbiGAAn6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 30 Jun 2022 20:43:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44232 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbiGAAn4 (ORCPT
+        with ESMTP id S229868AbiGAAn4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 30 Jun 2022 20:43:56 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DDEC24BC4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 17:43:55 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id z14so984109pgh.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 17:43:55 -0700 (PDT)
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F61426123
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 17:43:56 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id i8-20020a17090aee8800b001ecc929d14dso4272991pjz.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 17:43:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=tldd8hQ2wUn25jo82acAyXTHIBMdYLaXJm4pX84uJh0=;
-        b=OZ2R2vAbl3j1N9ro9m3UBiFhQk4tKZFk2yEf179rAF/wmMKRoDt81P7AwQoHRb4g5Y
-         vzxUI+w8NCphm3AzCilM1yoGnZXHE95zmBOCanBEHP6Rzf/869+VPOQA90rQQ0U4Aing
-         ZCd8UF8Jjj4sEbXcxVlxGSj6MueHH6EKL0yNU196kdOk+MdZgsqHFfpCT+MSPOIOsUuH
-         ULZTToPUd6yccgxvVQDvewrt5GOYL0HwXME+JZbDYjFuka/8kBtswsQyhgF4GwHtg7qU
-         thqlduWqndFl48Crr0FPrUjcRzUwyu55msilMYfGH/L0TQUNd0OGoxxcBG66tAcRKePs
-         8LXw==
+        bh=O8PU/ggPY0R+xiJOK44jO1NRQzX5A/Mptp3KOu8Cp8U=;
+        b=SdgJZ60+kEDrMYC715trnY2XBfHIMk4QILPkF719y72p1vebzJi9mnvCcYGGD6uqOy
+         /ruvRr7//nMo0FTRUUZhkEw/YggIFWxyLdARzBdhKnk8DkKazKEuuCK+gSuFmM9LB5pL
+         6f5Ll59B3TLkGp3kOwBaQdng7Vp/LB8OKdem7DvcqhT8leRHm39HBlPohdyr1Nvq2t1X
+         PKcRwVtRc3lqux1SWcY1zvWtSMzz5WFyEKx9t1ddGCLKieT6CD/8poTf0tUq+v7piyBK
+         x5zlxXedwmJ6/dnxcOEEj1V9xxzbzg+V1mvGM92SaubFTcs84hQAgKJd/raWf1lX54C2
+         w/nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=tldd8hQ2wUn25jo82acAyXTHIBMdYLaXJm4pX84uJh0=;
-        b=cBG8UIlBjhujn/uNFiJQe1yDPY418hlmwqZXNiecQKu/nkOLjth0OqFm8hb8o9VyxD
-         FwIqz/8FS39fnJRijZ60G/XkX4Cw6OvRR7EXPv76xuBJRbA6dq8CMLjhTRbiAvw9xuGp
-         pnB9kE73bBSGfiie6BUo0OsFqNf3I3fV5NHx5nH/Nd0HHlAuYlyr1Y4FhMW7WdSY6kV3
-         4yIYClrbFyEPeUXL/+Bu2mHGfez1ntT6BAlM7PLXhQfTPoBz7lFYi6OpYkQk60DgzgXT
-         OF3EvlLYA3FP1HZEsfuf3g28KSIU9htpw9e8SX/4we9s0gGDOAFZ4kfOfFmLokV0TmUz
-         gL9A==
-X-Gm-Message-State: AJIora/MQXB+Xh7PmqsS9DvTvOInVOgsR7Tp1+Z4hUgLSgP/HkjkWuNQ
-        ncBBh4UvGBiygbO/i1AaYeRW4/nfhTk=
-X-Google-Smtp-Source: AGRyM1smJ3I6c4J2js9DY1uy2laVOFty9rZA4HWc71rXDPcBJ7Ec6GjnIn6cBXH2pvr/XagxqPbURQ==
-X-Received: by 2002:a63:9516:0:b0:40c:c3b9:f984 with SMTP id p22-20020a639516000000b0040cc3b9f984mr10062309pgd.116.1656636234559;
-        Thu, 30 Jun 2022 17:43:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=O8PU/ggPY0R+xiJOK44jO1NRQzX5A/Mptp3KOu8Cp8U=;
+        b=HZkryC81bJ/jecyA34tE+6hpAtDLvCdLkDCuXzhDf1sK1guD0tAHJCxxxx30Iikf74
+         fkNaSx0NdqJfjMsodOwYwWWYDs1JRgdZqQDJweiOvxYXiAcN43YqYZsmAMXDe+VFAfGV
+         NMLpI5GehxumrC9nxGQrt1jd6oA5QGaeXS182bk028Fppit8nXOd+eIw5qJ+JkBB0RR7
+         9QziIa8082GtJJ2Sv0EQ/K6Y3AIHEMm54Gt9sGeJPa3l97eQZFRYAHcwM/btd7JfTZFI
+         WKWpVl/hFxaIQnSqmj/pcZeFDw80DLKJBfqolUbc25h6IQVSGhdqrw6LclDK/P9swP7t
+         5JXw==
+X-Gm-Message-State: AJIora/pqVZpWTyddauzKBXHuDR43uwP3aivGB3bmriYXJmbvB+2YWwv
+        rIVoZCQ6fb0hfn262hWjI2qA6zSjP48=
+X-Google-Smtp-Source: AGRyM1t75rxz+/rJ4/Sl7DkoNHAKYJ3Bbrr8ver9HP1fVAP/aa5fe4QEEZXyHq6z/03gtzD7EQyrRg==
+X-Received: by 2002:a17:90b:4d8d:b0:1ec:ce0f:790f with SMTP id oj13-20020a17090b4d8d00b001ecce0f790fmr15292283pjb.116.1656636235330;
+        Thu, 30 Jun 2022 17:43:55 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:6a2e:d91e:28c5:a052])
-        by smtp.gmail.com with ESMTPSA id z11-20020aa7888b000000b0052516db7123sm14181442pfe.35.2022.06.30.17.43.53
+        by smtp.gmail.com with ESMTPSA id z11-20020aa7888b000000b0052516db7123sm14181442pfe.35.2022.06.30.17.43.54
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 30 Jun 2022 17:43:54 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] tools/btmgmt: Fix errors reported by scan-build
-Date:   Thu, 30 Jun 2022 17:43:51 -0700
-Message-Id: <20220701004352.2253107-1-hj.tedd.an@gmail.com>
+Subject: [PATCH BlueZ 2/2] tools/test-runner: Fix errors reported by scan-build
+Date:   Thu, 30 Jun 2022 17:43:52 -0700
+Message-Id: <20220701004352.2253107-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220701004352.2253107-1-hj.tedd.an@gmail.com>
+References: <20220701004352.2253107-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -66,164 +68,74 @@ From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
 This patch fixes the errors reported by the scan-build.
 
-tools/btmgmt.c:2699:2: warning: Value stored to 'argc' is never read
-[deadcode.DeadStores]
-        argc -= optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:2859:2: warning: Value stored to 'argc' is never read
-[deadcode.DeadStores]
-        argc -= optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:2860:2: warning: Value stored to 'argv' is never read
-[deadcode.DeadStores]
-        argv += optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:2934:2: warning: Value stored to 'argc' is never read
-[deadcode.DeadStores]
-        argc -= optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:2935:2: warning: Value stored to 'argv' is never read
-[deadcode.DeadStores]
-        argv += optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:3000:2: warning: Value stored to 'argc' is never read
-[deadcode.DeadStores]
-        argc -= optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:3001:2: warning: Value stored to 'argv' is never read
-[deadcode.DeadStores]
-        argv += optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:3261:11: warning: Value stored to 'index' during its
-initialization is never read [deadcode.DeadStores]
-        uint16_t index = mgmt_index;
-                 ^~~~~   ~~~~~~~~~~
-
-tools/btmgmt.c:3450:2: warning: Value stored to 'argc' is never read
-[deadcode.DeadStores]
-        argc -= optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:3451:2: warning: Value stored to 'argv' is never read
-[deadcode.DeadStores]
-        argv += optind;
-        ^       ~~~~~~
-
-tools/btmgmt.c:4822:2: warning: Null pointer passed to 2nd parameter
+tools/test-runner.c:315:2: warning: Null pointer passed to 1st parameter
 expecting 'nonnull' [core.NonNullParamChecker]
-        memcpy(cp->data + uuid_bytes, adv_data, adv_len);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        execve(argv[0], argv, qemu_envp);
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-tools/btmgmt.c:4823:2: warning: Null pointer passed to 2nd parameter
+tools/test-runner.c:554:6: warning: Null pointer passed to 1st parameter
 expecting 'nonnull' [core.NonNullParamChecker]
-        memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if (chdir(home + 5) < 0) {
+            ^~~~~~~~~~~~~~~
 
-tools/btmgmt.c:5244:2: warning: Null pointer passed to 2nd parameter
+tools/test-runner.c:638:6: warning: Null pointer passed to 1st parameter
 expecting 'nonnull' [core.NonNullParamChecker]
-        memcpy(cp->data + uuid_bytes, adv_data, adv_len);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if (chdir(home + 5) < 0) {
+            ^~~~~~~~~~~~~~~
 
-tools/btmgmt.c:5245:2: warning: Null pointer passed to 2nd parameter
+tools/test-runner.c:695:6: warning: Null pointer passed to 1st parameter
 expecting 'nonnull' [core.NonNullParamChecker]
-        memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
-        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        if (chdir(home + 5) < 0) {
+            ^~~~~~~~~~~~~~~
+
+tools/test-runner.c:984:3: warning: Value stored to 'serial_fd' is never
+read [deadcode.DeadStores]
+                serial_fd = -1;
+                ^           ~~
 ---
- tools/btmgmt.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ tools/test-runner.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 3bf2c21c1..ebef3888f 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2696,7 +2696,6 @@ static void cmd_disconnect(int argc, char **argv)
- 		}
- 	}
+diff --git a/tools/test-runner.c b/tools/test-runner.c
+index 6886d66c6..5ab8e57a0 100644
+--- a/tools/test-runner.c
++++ b/tools/test-runner.c
+@@ -269,6 +269,11 @@ static void start_qemu(void)
  
--	argc -= optind;
- 	argv += optind;
- 	optind = 0;
+ 	pos = (sizeof(qemu_argv) / sizeof(char *)) - 1;
  
-@@ -2856,8 +2855,6 @@ static void cmd_find_service(int argc, char **argv)
- 		}
- 	}
++	/* Make sure qemu_binary is not null */
++	if (!qemu_binary) {
++		fprintf(stderr, "No QEMU binary is set\n");
++		exit(1);
++	}
+ 	argv[0] = (char *) qemu_binary;
  
--	argc -= optind;
--	argv += optind;
- 	optind = 0;
+ 	if (audio_support) {
+@@ -800,6 +805,11 @@ static void run_command(char *cmdname, char *home)
+ 	pid_t pid, dbus_pid, daemon_pid, monitor_pid, emulator_pid,
+ 	      dbus_session_pid, udevd_pid;
  
- 	cp = (void *) buf;
-@@ -2931,8 +2928,6 @@ static void cmd_find(int argc, char **argv)
- 		}
- 	}
- 
--	argc -= optind;
--	argv += optind;
- 	optind = 0;
- 
- 	memset(&cp, 0, sizeof(cp));
-@@ -2997,8 +2992,6 @@ static void cmd_stop_find(int argc, char **argv)
- 		}
- 	}
- 
--	argc -= optind;
--	argv += optind;
- 	optind = 0;
- 
- 	memset(&cp, 0, sizeof(cp));
-@@ -3258,7 +3251,7 @@ static void cmd_unpair(int argc, char **argv)
- 	struct mgmt_cp_unpair_device cp;
- 	uint8_t type = BDADDR_BREDR;
- 	int opt;
--	uint16_t index = mgmt_index;
-+	uint16_t index;
- 
- 	while ((opt = getopt_long(argc, argv, "+t:h", unpair_options,
- 								NULL)) != -1) {
-@@ -3447,8 +3440,6 @@ static void cmd_irks(int argc, char **argv)
- 		}
- 	}
- 
--	argc -= optind;
--	argv += optind;
- 	optind = 0;
- 
- 	cp->irk_count = cpu_to_le16(count);
-@@ -4819,8 +4810,11 @@ static void cmd_add_adv(int argc, char **argv)
- 		memcpy(cp->data + 2, uuids, uuid_bytes - 2);
- 	}
- 
--	memcpy(cp->data + uuid_bytes, adv_data, adv_len);
--	memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
-+	if (adv_len)
-+		memcpy(cp->data + uuid_bytes, adv_data, adv_len);
++	if (!home) {
++		perror("Invalid parameter: TESTHOME");
++		return;
++	}
 +
-+	if (scan_rsp_len)
-+		memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
+ 	if (num_devs) {
+ 		const char *node = "/dev/ttyS1";
+ 		unsigned int basic_flags, extra_flags;
+@@ -979,10 +989,8 @@ start_next:
+ 	if (udevd_pid > 0)
+ 		kill(udevd_pid, SIGTERM);
  
- 	if (!mgmt_send(mgmt, MGMT_OP_ADD_ADVERTISING, index, cp_len, cp,
- 						add_adv_rsp, NULL, NULL)) {
-@@ -5241,8 +5235,11 @@ static void cmd_add_ext_adv_data(int argc, char **argv)
- 		memcpy(cp->data + 2, uuids, uuid_bytes - 2);
- 	}
+-	if (serial_fd >= 0) {
++	if (serial_fd >= 0)
+ 		close(serial_fd);
+-		serial_fd = -1;
+-	}
+ }
  
--	memcpy(cp->data + uuid_bytes, adv_data, adv_len);
--	memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
-+	if (adv_len)
-+		memcpy(cp->data + uuid_bytes, adv_data, adv_len);
-+
-+	if (scan_rsp_len)
-+		memcpy(cp->data + uuid_bytes + adv_len, scan_rsp, scan_rsp_len);
- 
- 	if (!mgmt_send(mgmt, MGMT_OP_ADD_EXT_ADV_DATA, index, cp_len, cp,
- 					add_ext_adv_data_rsp, NULL, NULL)) {
+ static void run_tests(void)
 -- 
 2.34.1
 
