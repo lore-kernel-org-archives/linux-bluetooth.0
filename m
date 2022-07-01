@@ -2,117 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FBE1C43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 10:25:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23B01C43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 20:14:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235788AbiGAKZ0 (ORCPT
+        id S231455AbiGAUOg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Jul 2022 06:25:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46658 "EHLO
+        Fri, 1 Jul 2022 16:14:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233730AbiGAKZZ (ORCPT
+        with ESMTP id S231995AbiGAUOY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Jul 2022 06:25:25 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DE5A45528
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Jul 2022 03:25:24 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id z7so1487777qko.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Jul 2022 03:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=EMud3wYbmmKUtZK4+742RRT2iUBgELQBvtu+iVfg9wU=;
-        b=FHhehVSdEpNiZJ8TiHYGDLh6kII6UW7Uy/lcrEl1Bv3mJ1T5/Kcr8lMzg/gRnvZbdy
-         /ao5Q3SNyzwfS90bh/Ni8C+Yi7VmwfEB9b/9nn6fB0KOTpnTtDZSmNXl0p4EVqiUXZSL
-         ASSt2F2fSNHqbKGzfkND4kkOeHIO0/zj5nOIo6bXWHPG/hPE52/L3aUqxMNinEv4q+go
-         YAer41I1ey4MaAvHpxYU1S0lzH+yXnE7GuAeJfx20oSoc7SoRTgn1mum6KTNoY5VD3Ca
-         EnTlPAryxzcX8OG/AQTToMJwAIkwnelBCGFnGNpJqvDFhx+/oIWcVC4kCGreWfU1LLTM
-         TayA==
+        Fri, 1 Jul 2022 16:14:24 -0400
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E9AD53EC7;
+        Fri,  1 Jul 2022 13:13:48 -0700 (PDT)
+Received: by mail-io1-f41.google.com with SMTP id p69so3265270iod.10;
+        Fri, 01 Jul 2022 13:13:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=EMud3wYbmmKUtZK4+742RRT2iUBgELQBvtu+iVfg9wU=;
-        b=ZTs6TWgCwjOWiLt6+DsQiOdG3AS0f3GfLQRtNjo6rhTTImjAAXINcpFLOmOv+cLSYo
-         2UGvrX1gw69yTN5NwKxYreSz7FwBITRsjUBZ78LhkOuL5h9xnzJv2BPXPtfW9O4BdSSJ
-         5k+tNcdm3BI9/1hUPQF3jhZH8TwmRRJzPkf9h89DNBsCJR+sLfy2jrRRHZ13nhFCenKj
-         fM08m6KVnpYxCahBfmrEeQS7W8InsFXpxSgtGen1UdKrKyeFjyB360mQZISDSj5dGwz2
-         HilZtRXw9Ix84oieCl2YWJERrYMjE7GbbE/b/qnTIRKRs7FcIBFLHkQoLJ1jDwl+uiTi
-         +xVg==
-X-Gm-Message-State: AJIora+g46fNNNTG68QdjgXb4te1aAQJxE4nttzYEytHQYCXO0DGc77V
-        r2XzOadunXiMgKFDwD+t5AmyqL/IJpI=
-X-Google-Smtp-Source: AGRyM1uWtlSPZRJKJ89By6MnfnG6RomT1C3/zho/zqId74uw9qh4tcRhrXTt1oU8aPWrAMbyiJ3DNA==
-X-Received: by 2002:a05:620a:1374:b0:6ae:e8e5:5e3c with SMTP id d20-20020a05620a137400b006aee8e55e3cmr9788995qkl.607.1656671123191;
-        Fri, 01 Jul 2022 03:25:23 -0700 (PDT)
-Received: from [172.17.0.2] ([20.7.141.97])
-        by smtp.gmail.com with ESMTPSA id bs36-20020a05620a472400b006a6ab8f761csm18369946qkb.62.2022.07.01.03.25.22
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=DNuTvSAhKqaeh8an0UHIXFque8gigbNFefwCGJLX870=;
+        b=7of5dhCcjLlFkNyE0XRR0hgYW755WHhgKc02gobJoYKhkcS9QDQIPbl9yS6dVlPIu4
+         kCdP2bakGwyEIHETu95sTTFY4CB57auR+t/R4Kl4spe1PCwBR2mz4yH7Ag37wwN0uM0E
+         6U/gNl5grpMi40+2jRYJ6XIJ+mi1KL63Tk6UYnTKJ+RD/Jvz9stel96UdO3vC5S4EKpW
+         h77WpouNOV/IFoUxoyfpn7jth5Ya0O1E/1+D3pAQDRLpnqEg0WBy4ebKsnuxUgp1M1uh
+         DtxA5CwKl74usTvbKYFt3uLRocpKF/1wunvuWqLmKK/nwtdcHM+ue8ZfAqS37gIzhswt
+         MGhg==
+X-Gm-Message-State: AJIora8I9FvVzbwj36VnPPP4hQa6l6e4LDtpZ2o7Vbh5GlzzTSuNr0GZ
+        Z3dui3afAENvaqaLaz2TSQ==
+X-Google-Smtp-Source: AGRyM1vIBtg3Ypbd9CpVxhbsSFzEWn0sS5SvHIidEptWRxBhklVI/Yccx6FHkpkREi2quKrUGor8Ow==
+X-Received: by 2002:a05:6638:1415:b0:33c:cc68:993d with SMTP id k21-20020a056638141500b0033ccc68993dmr9593137jad.243.1656706427745;
+        Fri, 01 Jul 2022 13:13:47 -0700 (PDT)
+Received: from robh.at.kernel.org ([64.188.179.248])
+        by smtp.gmail.com with ESMTPSA id n41-20020a056602342900b00669536b0d71sm10613290ioz.14.2022.07.01.13.13.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Jul 2022 03:25:22 -0700 (PDT)
-Message-ID: <62becb92.1c69fb81.cd732.a3fe@mx.google.com>
-Date:   Fri, 01 Jul 2022 03:25:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8927846409546783534=="
+        Fri, 01 Jul 2022 13:13:47 -0700 (PDT)
+Received: (nullmailer pid 1443679 invoked by uid 1000);
+        Fri, 01 Jul 2022 20:13:45 -0000
+Date:   Fri, 1 Jul 2022 14:13:45 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Hakan Jansson <hakan.jansson@infineon.com>
+Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v2 2/5] dt-bindings: net: broadcom-bluetooth: Add
+ conditional constraints
+Message-ID: <20220701201345.GA1443626-robh@kernel.org>
+References: <cover.1656583541.git.hakan.jansson@infineon.com>
+ <3591c206eeccdacb8b4e702494d799792b752661.1656583541.git.hakan.jansson@infineon.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
-Subject: RE: obexd: fix crashed after cancel the on-going transfer
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220701094102.25917-1-wangyouwan@uniontech.com>
-References: <20220701094102.25917-1-wangyouwan@uniontech.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3591c206eeccdacb8b4e702494d799792b752661.1656583541.git.hakan.jansson@infineon.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8927846409546783534==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 30 Jun 2022 14:45:21 +0200, Hakan Jansson wrote:
+> Add conditional constraint to make property "reset-gpios" available only
+> for compatible devices acually having the reset pin.
+> 
+> Make property "brcm,requires-autobaud-mode" depend on property
+> "shutdown-gpios" as the shutdown pin is required to enter autobaud mode.
+> 
+> I looked at all compatible devices and compiled the matrix below before
+> formulating the conditional constraint. This was a pure paper exercise and
+> no verification testing has been performed.
+> 
+>                                 d
+>                                 e
+>                                 v h
+>                                 i o
+>                                 c s
+>                             s   e t
+>                             h   - -
+>                             u   w w       v
+>                             t r a a     v d
+>                             d e k k     b d
+>                             o s e e     a i
+>                             w e u u     t o
+>                             n t p p     - -
+>                             - - - -     s s
+>                             g g g g     u u
+>                             p p p p t   p p
+>                             i i i i x l p p
+>                             o o o o c p l l
+>                             s s s s o o y y
+>     ---------------------------------------
+>     brcm,bcm20702a1         X X X X X X X X
+>     brcm,bcm4329-bt         X X X X X X X X
+>     brcm,bcm4330-bt         X X X X X X X X
+>     brcm,bcm4334-bt         X - X X X X X X
+>     brcm,bcm43438-bt        X - X X X X X X
+>     brcm,bcm4345c5          X - X X X X X X
+>     brcm,bcm43540-bt        X - X X X X X X
+>     brcm,bcm4335a0          X - X X X X X X
+>     brcm,bcm4349-bt         X - X X X X X X
+>     infineon,cyw55572-bt    X - X X X X X X
+> 
+> Signed-off-by: Hakan Jansson <hakan.jansson@infineon.com>
+> ---
+> V1 -> V2:
+>   - New patch added to series
+> 
+>  .../bindings/net/broadcom-bluetooth.yaml         | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655762
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.71 seconds
-GitLint                       PASS      1.01 seconds
-Prep - Setup ELL              PASS      32.21 seconds
-Build - Prep                  PASS      0.90 seconds
-Build - Configure             PASS      10.07 seconds
-Build - Make                  PASS      952.54 seconds
-Make Check                    PASS      12.37 seconds
-Make Check w/Valgrind         PASS      331.34 seconds
-Make Distcheck                PASS      274.42 seconds
-Build w/ext ELL - Configure   PASS      10.30 seconds
-Build w/ext ELL - Make        PASS      94.52 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    WARNING   564.04 seconds
-
-Details
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-gobex/gobex-transfer.c:421:7: warning: Use of memory after it is freed
-        if (!g_slist_find(transfers, transfer))
-             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8927846409546783534==--
+Reviewed-by: Rob Herring <robh@kernel.org>
