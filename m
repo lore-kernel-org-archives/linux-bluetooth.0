@@ -2,124 +2,221 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7801AC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 02:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DA24C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Jul 2022 03:33:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233006AbiGAC2h (ORCPT
+        id S234024AbiGADdd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Jun 2022 22:28:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55752 "EHLO
+        Thu, 30 Jun 2022 23:33:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232589AbiGAC2g (ORCPT
+        with ESMTP id S232859AbiGADdc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Jun 2022 22:28:36 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D42599EE
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 19:28:35 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id jh14so1074309plb.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 19:28:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=fnut58ZmQ207qXLvXfpC5o5EI/qzf92FttfqieUVlZk=;
-        b=Utyn9Qub17K7t1Y+LSSv9l230vtbEgS3Qq09TSDI9yGKQmgNnJ+YwRFRsmti6Z4Hgi
-         ocM5YipYniRcaedJnWuSKMwM+d1bISMhN9HCCI2mJOOiEk3wq9hsppJm0kVufhyuOeLh
-         HANAkJTpRV1eG/J3+RsgjCUMJ9kRIDpW7hTTL0ry5sBsFhvPCS8lL0GFsJY50uVbPN77
-         YkksEPWWCiToWppyJAs90gLS1XVOPYIFJDif2iz2mkbodNcyr6947SI5hMZmJijM8a2f
-         4fh+V4/nx+Z1asgxsamsBPsebpXP6YF8lgIU+xtO4W/RjE186PEi/R+FF6aUQImSyaWj
-         HYRw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=fnut58ZmQ207qXLvXfpC5o5EI/qzf92FttfqieUVlZk=;
-        b=Thh+EefQ9FgfxCWCzfb62W0wo3CsNLK20YHlZbzK/8rm/nF6wieobekSFIehaiBkK/
-         5nflUuBmWL2yC7TXi2ZZ6Y72r1Pt1kDNu7cPMzxe2bYJjmL7Dn/pNFVlNRbK9RMly1Pu
-         MxgvwFA5lbgLXW6F3gE1sx2gJcl+M208Pa9nS3PBLE6/ALfOYiHrXHdnXMCacWrLESc9
-         oYOjMFwdsW94cqzunPNGGTGNCb5fAaIzYo1J3I2uBZhz8xsYX3n1D0j9wQbPPu9onyaB
-         j8L4Z25L8OhYduZYJoWT0WkR4swIMF5e4tG57rN/QpXNTJlroot8fmu/MWfBANQvgrEL
-         U8UQ==
-X-Gm-Message-State: AJIora+95zbFquy4CfrI3W2B0fDu8NS38gM1O4Q0w8m9Va6oe93cXvup
-        Jktk7a1+K2gEiqTyij+BJEdq6qOPWSo=
-X-Google-Smtp-Source: AGRyM1toa3jVlmRve7GgAyRYAiuXNFSgFd812iibZ/n9VQ3Uv9VPRgThtXtg+sVm/GITWrVFixiV+g==
-X-Received: by 2002:a17:902:f813:b0:169:8f5d:c343 with SMTP id ix19-20020a170902f81300b001698f5dc343mr18708807plb.98.1656642514282;
-        Thu, 30 Jun 2022 19:28:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.134.96])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b0016797c33b6csm14105442plb.116.2022.06.30.19.28.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jun 2022 19:28:33 -0700 (PDT)
-Message-ID: <62be5bd1.1c69fb81.d3322.4a1b@mx.google.com>
-Date:   Thu, 30 Jun 2022 19:28:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3273229432014457905=="
+        Thu, 30 Jun 2022 23:33:32 -0400
+Received: from smtpproxy21.qq.com (smtpbg701.qq.com [203.205.195.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3EE1836A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Jun 2022 20:33:30 -0700 (PDT)
+X-QQ-mid: bizesmtp65t1656646404trfrkf7r
+Received: from localhost.localdomain ( [113.57.152.160])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Fri, 01 Jul 2022 11:33:19 +0800 (CST)
+X-QQ-SSF: 01400000000000C0E000000A0000000
+X-QQ-FEAT: s9hFaa1TJfASRycwlmP84uXCzhmvqkeS+jny0KWFTwwU/ts3wX2yHbXMwrFO5
+        fskdMu+jWQAhe/R4spVROuPDEeL8STbFVSnyv9cnpvxgbd5qq5M2iFipQ78leXsSAvg1Dtb
+        A/bccjUByTa1q5qR3mmQ8PPgazjqfxXMoCT+wX6f5Z9XSI+DrfdLH3DmZA1l0cmhfOioNdT
+        sQwGQZpc4cvMuSleSVnwoSIRejB1lC75a2pxRwOYFuu4+OquxLXDTMydSIHt/goXdbomUoN
+        5erm0NLBrRhjUXPuHuO1+mUNmc42dH1G+z4ToJrC+Cyz4BQKzqA4e+tfQyNwslrIXKaT/sQ
+        11cmeRFCZVXEkWC+wQ=
+X-QQ-GoodBg: 1
+From:   Youwan Wang <wangyouwan@uniontech.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Youwan Wang <wangyouwan@uniontech.com>
+Subject: [PATCH] obexd: fix crashed after cancel the on-going transfer
+Date:   Fri,  1 Jul 2022 11:33:17 +0800
+Message-Id: <20220701033317.13013-1-wangyouwan@uniontech.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v8,1/8] lib: Add definitions for ISO socket
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220630221452.638591-1-luiz.dentz@gmail.com>
-References: <20220630221452.638591-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign10
+X-QQ-Bgrelay: 1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3273229432014457905==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+There is a use after released.transfer->req_id different
+obex->pending_req->id,See the following log,
+The packages is removd in cancel_complete func
+are not the same package in req_timeout func,
+but transfer pointer is released.
 
-This is automated email and please do not reply to this email!
+log:
+g_obex_cancel_req()
+transfer->req_id 23 id 22 obex->pending_req(0x55b642c3e100)
 
-Dear submitter,
+g_obex_cancel_req()
+match->data (0x55b642c344a0)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=655564
+g_obex_ref() ref 4
 
----Test result---
+cancel_complete()
+pending req timeout 176 id 22 obex(0x55b642c3e100)
 
-Test Summary:
-CheckPatch                    FAIL      9.01 seconds
-GitLint                       PASS      4.39 seconds
-Prep - Setup ELL              PASS      42.53 seconds
-Build - Prep                  PASS      0.52 seconds
-Build - Configure             PASS      8.20 seconds
-Build - Make                  PASS      1358.39 seconds
-Make Check                    PASS      10.99 seconds
-Make Check w/Valgrind         PASS      421.57 seconds
-Make Distcheck                PASS      224.30 seconds
-Build w/ext ELL - Configure   PASS      7.92 seconds
-Build w/ext ELL - Make        PASS      1321.74 seconds
-Incremental Build with patchesPASS      11076.32 seconds
+transfer_response()
+obex 0x55b642c36480 transfer(0x55b642c3d000)
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,v8,7/8] tools: Add isotest tool
-WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
-#1235: FILE: tools/isotest.c:1118:
-+		/* fall through */
+g_obex_drop_tx_queue()
 
-/github/workspace/src/12902316.patch total: 0 errors, 1 warnings, 1233 lines checked
+g_obex_unref() obex 0x55b642c36480
+g_obex_unref() ref 3
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+transfer_free()
+obex 0x55b642c36480 transfer 0x55b642c3d000
 
-/github/workspace/src/12902316.patch has style problems, please review.
+g_obex_unref() obex 0x55b642c36480
+g_obex_unref() ref 2
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+pending_pkt_free()
+timeout_id 0 pending_pkt (0x55b642c344a0)
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+step:
+[obex]# connect 28:33:34:1E:96:98
+Attempting to connect to 28:33:34:1E:96:98
+[NEW] Session /org/bluez/obex/client/session2 [default]
+[NEW] ObjectPush /org/bluez/obex/client/session2
+Connection successful
+[28:33:34:1E:96:98]# send /home/uos/Desktop/systemd.zip
+Attempting to send /home/uos/Desktop/systemd.zip
+[NEW] Transfer /org/bluez/obex/client/session2/transfer2
+Transfer /org/bluez/obex/client/session2/transfer2
+        Status: queued
+        Name: systemd.zip
+        Size: 33466053
+        Filename: /home/uos/Desktop/systemd.zip
+        Session: /org/bluez/obex/client/session2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+[CHG] Transfer /org/bluez/obex/client/session2/transfer2
+er2 33:34:1E:96:98]# cancel /org/bluez/obex/client/sessi
+Attempting to cancel transfer /org/bluez/obex/client/s
+Cancel successful
 
-
-
-
+valgrind trace:
+==11431== Invalid read of size 4
+==11431==    at 0x12B442: transfer_response ()
+==11431==    by 0x127764: req_timeout ()
+==11431==    by 0x49B8922: ??? ( )
+==11431==    by 0x49B7E97: g_main_context_dispatch ()
+==11431==    by 0x49B8287: ??? (in )
+==11431==    by 0x49B8581: g_main_loop_run ()
+==11431==    by 0x121834: main (main.c:322)
+==11431==  Address 0x7344fa0 is 16 bytes inside a block of size
+==11431==    at 0x48369AB: free ()
+==11431==    by 0x12B459: transfer_response ()
+==11431==    by 0x127B3D: cancel_complete ()
+==11431==    by 0x49B7E97: g_main_context_dispatch ()
+==11431==    by 0x49B8287: ??? ()
+==11431==    by 0x49B8581: g_main_loop_run ()
+==11431==    by 0x121834: main (main.c:322)
+==11431==  Block was alloc'd at
+==11431==    at 0x4837B65: calloc ()
+==11431==    by 0x49BD9D8: g_malloc0 ()
+==11431==    by 0x12AB89: transfer_new ()
+==11431==    by 0x12B732: g_obex_put_req_pkt ()
+==11431==    by 0x12B732: g_obex_put_req_pkt ()
+==11431==    by 0x146982: transfer_start_put ()
+==11431==    by 0x146982: obc_transfer_start ()
+==11431==    by 0x13C5A7: session_process_transfer ()
+==11431==    by 0x13D248: session_process_queue ()
+==11431==    by 0x13D248: session_process_queue ()
+==11431==    by 0x13D2AF: session_process ()
+==11431==    by 0x49B7E97: g_main_context_dispatch ()
+==11431==    by 0x49B8287: ??? (i)
+==11431==    by 0x49B8581: g_main_loop_run ()
+==11431==    by 0x121834: main ()
+==11431==
+==11431== (action on error) vgdb me ...
 ---
-Regards,
-Linux Bluetooth
+ gobex/gobex-transfer.c | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index c94d018b2..0868e94b0 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -83,15 +83,18 @@ static struct transfer *find_transfer(guint id)
+ 
+ static void transfer_complete(struct transfer *transfer, GError *err)
+ {
+-	guint id = transfer->id;
++	if (!g_slist_find(transfers, transfer))
++	return;
+ 
+-	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", id);
++	transfer->req_id = 0;
++	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+ 
+ 	if (err) {
+ 		/* No further tx must be performed */
+ 		g_obex_drop_tx_queue(transfer->obex);
+ 	}
+ 
++	guint id = transfer->id;
+ 	transfer->complete_func(transfer->obex, err, transfer->user_data);
+ 	/* Check if the complete_func removed the transfer */
+ 	if (find_transfer(id) == NULL)
+@@ -106,9 +109,6 @@ static void transfer_abort_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	struct transfer *transfer = user_data;
+ 
+ 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+-
+-	transfer->req_id = 0;
+-
+ 	/* Intentionally override error */
+ 	err = g_error_new(G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED,
+ 						"Operation was aborted");
+@@ -186,11 +186,6 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	gboolean rspcode, final;
+ 	guint id;
+ 
+-	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
+-
+-	id = transfer->req_id;
+-	transfer->req_id = 0;
+-
+ 	if (err != NULL) {
+ 		transfer_complete(transfer, err);
+ 		return;
+@@ -203,6 +198,9 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 		goto failed;
+ 	}
+ 
++	if (!g_slist_find(transfers, transfer))
++		return;
++
+ 	if (transfer->opcode == G_OBEX_OP_GET) {
+ 		handle_get_body(transfer, rsp, &err);
+ 		if (err != NULL)
+@@ -222,8 +220,6 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 		req = g_obex_packet_new(transfer->opcode, TRUE,
+ 							G_OBEX_HDR_INVALID);
+ 	} else {
+-		/* Keep id since request still outstanting */
+-		transfer->req_id = id;
+ 		return;
+ 	}
+ 
+-- 
+2.20.1
 
 
---===============3273229432014457905==--
+
