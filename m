@@ -2,125 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4341EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 11:07:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A325C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 12:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233555AbiGDLHG (ORCPT
+        id S232123AbiGDMMx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Jul 2022 07:07:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55140 "EHLO
+        Mon, 4 Jul 2022 08:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233535AbiGDLHF (ORCPT
+        with ESMTP id S233943AbiGDMMm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Jul 2022 07:07:05 -0400
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0DE2EE20
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jul 2022 04:07:03 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id c13so9395533qtq.10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Jul 2022 04:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=gd9Mi6lDb0YC9AyBGh1VthKifPLSPoEgWAvb8Q5t96c=;
-        b=M+ynDERYcoF3uKE6UefxweZX95U86uTjRTLNNwYxEf4U2MQiPXxYJ/99oyB4RtqK52
-         /bHk+Cg/UwQ0kE124YzAxB5jCqQeo3fwvXBIaZwvEbJ05fO4gr4k/xVnUfMhc4VJTcyd
-         0OKN5vlCpFzgjG/nTsb/v/9ppNId+i1gWo3kSl/WVC9ZEz+eLU6m+tro430ZHRsrQJDc
-         HIJNvBjMrIVLekYCkQJpXu+ztTxd1yoDrekpYfuPl5h3WPJiFT8O0LkaA1C4p8BdY6sm
-         JQXO9E1hIPdbH+J+kIV8L5YFRbrNjlXqzqg9hzdZkPlgfik4mqJ7n3GjvBe0y6V/IOcE
-         oL+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=gd9Mi6lDb0YC9AyBGh1VthKifPLSPoEgWAvb8Q5t96c=;
-        b=hF9NOuYRjiJ3wdqSSMpYri07Dp3qyiKOMKms5Xxi5qOC62vF32fFnpwyp1g0KBWmhQ
-         F4zCRbpMWXJN+x++n0Shx2pBRWIUj40TZtvk70X0UTqWoEPLQtbDaKc6CY5Ky7XAcbBw
-         V/tS4QKypigZhdvxgxOihCLklsHhQbmFnbaGs+bhNZuBjtfYuN8mV2HqbUplZbHZMihH
-         /+TeGcQb5Q8kMmRZv4P628HFDAt7ivcR3QXZ30g2XJQPuAN0UF5Prnc5Y2hFXkuL2cwg
-         40aJdPFXIb7wpHmvAj3i9xmrhdmWK6z33vLfYkKY06PAG7FOG49CGrBqBpfqaxbH4ZAp
-         qi/g==
-X-Gm-Message-State: AJIora9ExUXUpaSlUT6KRJos4phNZa5CiC481LUmhXdlHhw9gNfyB/XL
-        xs7JAVVmOhRD7waHbLm8Ax5QbyGtBdcfVg==
-X-Google-Smtp-Source: AGRyM1u2p6HOjh248kTJ+fScb4q+baZGPVcbRLcxqatdMa1sS5zVobf7OrUcto5SgwMGE05yGuh2VQ==
-X-Received: by 2002:a05:622a:1650:b0:31b:823b:62b2 with SMTP id y16-20020a05622a165000b0031b823b62b2mr23310184qtj.109.1656932822653;
-        Mon, 04 Jul 2022 04:07:02 -0700 (PDT)
-Received: from [172.17.0.2] ([23.100.22.173])
-        by smtp.gmail.com with ESMTPSA id x9-20020a05620a448900b006a708baa069sm19070638qkp.101.2022.07.04.04.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Jul 2022 04:07:02 -0700 (PDT)
-Message-ID: <62c2c9d6.1c69fb81.9177.d9be@mx.google.com>
-Date:   Mon, 04 Jul 2022 04:07:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6324254257187938560=="
+        Mon, 4 Jul 2022 08:12:42 -0400
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4500E1260B
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jul 2022 05:11:34 -0700 (PDT)
+Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1o8KvM-0005Uz-ER; Mon, 04 Jul 2022 14:11:32 +0200
+Message-ID: <b7b080ff-a5da-a10c-674b-c3bb653f0aeb@leemhuis.info>
+Date:   Mon, 4 Jul 2022 14:11:31 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yinghsu@chromium.org
-Subject: RE: Bluetooth: Add default wakeup callback for HCI UART driver
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220704183320.1.Ib7423c21f71003643a5bbe954ed0538ee532b29c@changeid>
-References: <20220704183320.1.Ib7423c21f71003643a5bbe954ed0538ee532b29c@changeid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Ahmad Fatoum <a.fatoum@pengutronix.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
+ <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
+ <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
+ <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
+ <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
+ <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
+ <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
+ <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
+ <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
+ <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
+ <1a5ec80d-690f-285c-3da8-ccdaf5516d85@pengutronix.de>
+ <CABBYNZJQKc9ozReXLeESWY8U648eQytKfGB4WmhZi4M+YOW7jw@mail.gmail.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+Subject: Re: [BUG] BLE device unpairing triggers kernel panic
+In-Reply-To: <CABBYNZJQKc9ozReXLeESWY8U648eQytKfGB4WmhZi4M+YOW7jw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1656936694;b5d26f92;
+X-HE-SMSGID: 1o8KvM-0005Uz-ER
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6324254257187938560==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi, this is your Linux kernel regression tracker. Top-posting for once,
+to make this easily accessible to everyone.
 
-This is automated email and please do not reply to this email!
+Looks like the discussions to fix this regression got stuck. What can be
+done to get thing rolling again? Or has progress been made and I just
+missed it? Ciao, Thorsten
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=656284
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.75 seconds
-GitLint                       PASS      0.96 seconds
-SubjectPrefix                 PASS      0.80 seconds
-BuildKernel                   PASS      31.48 seconds
-BuildKernel32                 PASS      26.88 seconds
-Incremental Build with patchesPASS      37.68 seconds
-TestRunner: Setup             PASS      463.74 seconds
-TestRunner: l2cap-tester      PASS      16.58 seconds
-TestRunner: bnep-tester       PASS      5.69 seconds
-TestRunner: mgmt-tester       PASS      94.94 seconds
-TestRunner: rfcomm-tester     PASS      9.05 seconds
-TestRunner: sco-tester        PASS      8.93 seconds
-TestRunner: smp-tester        PASS      8.91 seconds
-TestRunner: userchan-tester   PASS      5.92 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.75 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-Bluetooth: Add default wakeup callback for HCI UART driver\ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: unsaf ("ace/src' is owned by someone else)")'
-#82: 
-callback since 'commit 4539ca67fe8e ("Bluetooth: Rename driver
-.prevent_wake to .wakeup")'. This patch adds a default wakeup callback
-
-total: 1 errors, 0 warnings, 23 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12905037.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6324254257187938560==--
+On 24.06.22 21:59, Luiz Augusto von Dentz wrote:
+> On Fri, Jun 24, 2022 at 5:53 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>> On 21.06.22 20:52, Luiz Augusto von Dentz wrote:
+>>> On Tue, Jun 21, 2022 at 1:32 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>> On 20.06.22 22:18, Luiz Augusto von Dentz wrote:
+>>>>> On Mon, Jun 20, 2022 at 3:06 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
+>>>>>> Disconnect of connection #1 being processed after new connection #2
+>>>>>> concluded sounds wrong. Would I be able to reconnect
+>>>>>> afterwards or would all connections, but the first, be directly
+>>>>>> disconnected...?
+>>>>>
+>>>>> That depends on the order you have queued the commands, it will be
+>>>>> processed in the exact order it is received, that why I said it is
+>>>>> single queue design, and it is done like that to prevent messing up
+>>>>> with states since we know the exact order the commands will be sent.
+>>>>>
+>>>>>>> otherwise we need a
+>>>>>>> different queue to handle command that abort/cancel other already in
+>>>>>>> the queue.
+>>>>>>
+>>>>>> Is the revert an acceptable interim solution or are there issues
+>>>>>> I am missing?
+>>>>>
+>>>>> Afaik there were problem with concurrent connections request, so what
+>>>>> would really help us here is to have some tests to emulate this
+>>>>> scenario with our CI, in the meantime please check if the following
+>>>>> fixes your problem:
+>>>>>
+>>>>> https://gist.github.com/Vudentz/b4fff292c7f4ad55ca3299fd5ab797ae
+>>>>
+>>>> Doesn't help unfortunately. First pairing works as before.
+>>>> Second still fails:
+>>>>
+>>>>   Bluetooth: hci0: Opcode 0x200d failed: -110
+>>>>   Bluetooth: hci0: request failed to create LE connection: err -110
+>>>
+>>> Can we try to add a test in mgmt-tester to reproduce the error above?
+>>
+>> I am not familiar with mgmt-tester. What information do you
+>> need to reproduce? In the meantime, can we revert the commit?
+>> I understand that this may break other uses, but I believe
+>> previously working stuff should have precedence..
+> 
+> Have a looks at:
+> 
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/test-runner.txt
+> 
+> And then run with:
+> 
+> sudo tools/test-runner -k <pathyto/bzImage> -- tools/mgmt-tester
+> 
+> Btw, can we have the exact steps to reproduce it using bluetoothctl if possible?
+> 
+>> Cheers,
+>> Ahmad
+>>
+>>>
+>>>> Cheers,
+>>>> Ahmad
+>>>>
+>>>>>
+>>>>>> Cheers,
+>>>>>> Ahmad
+>>>>>>
+>>>>>>>
+>>>>>>>> We've been deploying the revert for a while now and I just posted
+>>>>>>>> it to the mailing list[1]. There have been other reports
+>>>>>>>> of this issue with different hardware too and fixing sent_cmd
+>>>>>>>> would likely be too complicated/time intensive for me.
+>>>>>>>>
+>>>>>>>> I am happy to test future patches that fix this properly though.
+>>>>>>>>
+>>>>>>>> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
