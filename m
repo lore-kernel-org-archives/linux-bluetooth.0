@@ -2,136 +2,205 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A325C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 12:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE454C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 12:54:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbiGDMMx (ORCPT
+        id S232937AbiGDMyA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Jul 2022 08:12:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45026 "EHLO
+        Mon, 4 Jul 2022 08:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233943AbiGDMMm (ORCPT
+        with ESMTP id S233176AbiGDMxq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Jul 2022 08:12:42 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4500E1260B
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jul 2022 05:11:34 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1o8KvM-0005Uz-ER; Mon, 04 Jul 2022 14:11:32 +0200
-Message-ID: <b7b080ff-a5da-a10c-674b-c3bb653f0aeb@leemhuis.info>
-Date:   Mon, 4 Jul 2022 14:11:31 +0200
+        Mon, 4 Jul 2022 08:53:46 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D6A12773
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Jul 2022 05:53:09 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id r82so12861927oig.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Jul 2022 05:53:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=ZvGPHzqXOjO0+1seQCszr1VbWo5HG6fo0/oOceTIlxI=;
+        b=DzYh9WvYkucJEo1Xux7VQItw8IFc5+GEOk3dWV8oaIG8y1h8e/tOO9J1qRSXkQj5n2
+         jraaPaLFRdRg67fFcbmK3VbbuH1y/juhUq+F4MrXEr7hirF8zS571i57uzweOod1S8S4
+         RPPjsu8uf+9KE2UkxQk7q2ZqszGac9RBvxo7tNO6nxRsKAl+U5pG8mzOoEZ6Fp8X2MZ0
+         qyrvqdk9DC21MPEewATS291wS+ekCCIY5DDkl/8FbEH+gjk86XG80sm3xsy3RwP1h5w4
+         eT2emv4/4iEIuBlJYAUuWKFqxp1Lu/LFYoCkauctfLpPPIpFTsiXw+f36mzQonhLhxiw
+         IlNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=ZvGPHzqXOjO0+1seQCszr1VbWo5HG6fo0/oOceTIlxI=;
+        b=1QjkBPylLmrRrKpl/yu1A9awb0+m2Qinw+DQI8wDH0f9a6REG8uWs0Pg3CZ2lvHH8k
+         UPEoMif2OZD5l8CdmXQ7R546KtnSzl4WW57ZXuBqZQMAoJbvpHoSjUSe2s3nof9F7tlt
+         YoJs89xKvV0FdECqiKMceN0Z9g2AdcGtigFrXlrox5SEPFxcPOSRl5MCbUOHA5pwkxt5
+         pTW9QALsQPZrMaCvFD+2d/JhTIQnYbvZDsP9pXu8353D7f5s5RTLhglX569BcdM0VPSD
+         cNMWowf0GtK2W64ATi7o+6T8FQe/EuLEZCg1gNnxTBWQAFnYz/PwiH20Sk00aDO4pvuy
+         RipA==
+X-Gm-Message-State: AJIora/4EcJ1rWZsGtsgNX6jQLshd5fp2wNyusYUCllf2rRM0KQMFJPo
+        Pg/H5zAiVERuWY9DbokcOA+oQVZXkHlF3POt7l5Cgq+O2nTGYgZI
+X-Google-Smtp-Source: AGRyM1uHniRW1a2E9ScUGtXXGttDuZbOISycUxLl7bqwCgMINEt/GiaEPBtw94Z4fYLR2Ex5XTh4H4eP2InoBIuayBw=
+X-Received: by 2002:a05:6808:181c:b0:335:710d:e107 with SMTP id
+ bh28-20020a056808181c00b00335710de107mr18804789oib.154.1656939184593; Mon, 04
+ Jul 2022 05:53:04 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Ahmad Fatoum <a.fatoum@pengutronix.de>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-References: <a1ce1743-e450-6cdb-dfab-56a3e3eb9aed@pengutronix.de>
- <CABBYNZ+z8kBUKGXbZSfb0ynJaTnPQRp0wFDUb12AW1ymbNx1eg@mail.gmail.com>
- <CABBYNZ+zsuggTpaUSPsZKeL=qqvM1=sgMWzdWEqaS_oh6dhY2g@mail.gmail.com>
- <8d5c4724-d511-39b1-21d7-116c91cada45@pengutronix.de>
- <b0cb4fb0-6b89-b9df-9ae6-421ac52b0100@pengutronix.de>
- <CABBYNZ+ubN2rc=zoN_53Pmp6kt3L5UcY3knbtjhhVOjPBpJv4Q@mail.gmail.com>
- <d5654901-6b1f-a1fa-0101-8b52b345af7b@pengutronix.de>
- <CABBYNZ+8dpPBqaQMr-Hz_DJRxT-0ucCjgAJH50FUaN7Sn9H6rA@mail.gmail.com>
- <1d1b76cf-df6f-3935-5cd2-c45ea78f2c33@pengutronix.de>
- <CABBYNZLdy-rndKczoG_WiWXQmacX+vzCbftQKvzJ3B6imtZopw@mail.gmail.com>
- <1a5ec80d-690f-285c-3da8-ccdaf5516d85@pengutronix.de>
- <CABBYNZJQKc9ozReXLeESWY8U648eQytKfGB4WmhZi4M+YOW7jw@mail.gmail.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-Subject: Re: [BUG] BLE device unpairing triggers kernel panic
-In-Reply-To: <CABBYNZJQKc9ozReXLeESWY8U648eQytKfGB4WmhZi4M+YOW7jw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1656936694;b5d26f92;
-X-HE-SMSGID: 1o8KvM-0005Uz-ER
+References: <20220607104015.2126118-1-poprdi@google.com> <CAPUC6bJbVMPn1FMLYnXg2GUX4ikesMSRjj=oPOOrS5H2DOx_bA@mail.gmail.com>
+ <CAPUC6b+xMnk8VDGv_7p9j4GHD75FrxG3hWKpTSF2zHj508=x9A@mail.gmail.com>
+ <CANp29Y7gb7cop8p8k-LqR1WoLwOLxi+QGRGLEZrbYW8Tw6_i2w@mail.gmail.com> <CACT4Y+b3LHerJNwcPuUSxWMXRKFAunK83BHEXiwGs53Jves6QQ@mail.gmail.com>
+In-Reply-To: <CACT4Y+b3LHerJNwcPuUSxWMXRKFAunK83BHEXiwGs53Jves6QQ@mail.gmail.com>
+From:   =?UTF-8?Q?Tam=C3=A1s_Koczka?= <poprdi@google.com>
+Date:   Mon, 4 Jul 2022 14:52:53 +0200
+Message-ID: <CAPUC6bJNhgM3ydSb+KHVMiY--GWvgHW_NRPYz8K7gAZL9=JrmQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Collect kcov coverage from hci_rx_work
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Aleksandr Nogikh <nogikh@google.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Andy Nguyen <theflow@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker. Top-posting for once,
-to make this easily accessible to everyone.
+Hello,
 
-Looks like the discussions to fix this regression got stuck. What can be
-done to get thing rolling again? Or has progress been made and I just
-missed it? Ciao, Thorsten
+If you need any clarification about the patch or if you have questions
+or if the patch needs to be modified, please feel free to tell me.
 
-On 24.06.22 21:59, Luiz Augusto von Dentz wrote:
-> On Fri, Jun 24, 2022 at 5:53 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->> On 21.06.22 20:52, Luiz Augusto von Dentz wrote:
->>> On Tue, Jun 21, 2022 at 1:32 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>>> On 20.06.22 22:18, Luiz Augusto von Dentz wrote:
->>>>> On Mon, Jun 20, 2022 at 3:06 AM Ahmad Fatoum <a.fatoum@pengutronix.de> wrote:
->>>>>> Disconnect of connection #1 being processed after new connection #2
->>>>>> concluded sounds wrong. Would I be able to reconnect
->>>>>> afterwards or would all connections, but the first, be directly
->>>>>> disconnected...?
->>>>>
->>>>> That depends on the order you have queued the commands, it will be
->>>>> processed in the exact order it is received, that why I said it is
->>>>> single queue design, and it is done like that to prevent messing up
->>>>> with states since we know the exact order the commands will be sent.
->>>>>
->>>>>>> otherwise we need a
->>>>>>> different queue to handle command that abort/cancel other already in
->>>>>>> the queue.
->>>>>>
->>>>>> Is the revert an acceptable interim solution or are there issues
->>>>>> I am missing?
->>>>>
->>>>> Afaik there were problem with concurrent connections request, so what
->>>>> would really help us here is to have some tests to emulate this
->>>>> scenario with our CI, in the meantime please check if the following
->>>>> fixes your problem:
->>>>>
->>>>> https://gist.github.com/Vudentz/b4fff292c7f4ad55ca3299fd5ab797ae
->>>>
->>>> Doesn't help unfortunately. First pairing works as before.
->>>> Second still fails:
->>>>
->>>>   Bluetooth: hci0: Opcode 0x200d failed: -110
->>>>   Bluetooth: hci0: request failed to create LE connection: err -110
->>>
->>> Can we try to add a test in mgmt-tester to reproduce the error above?
->>
->> I am not familiar with mgmt-tester. What information do you
->> need to reproduce? In the meantime, can we revert the commit?
->> I understand that this may break other uses, but I believe
->> previously working stuff should have precedence..
-> 
-> Have a looks at:
-> 
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/test-runner.txt
-> 
-> And then run with:
-> 
-> sudo tools/test-runner -k <pathyto/bzImage> -- tools/mgmt-tester
-> 
-> Btw, can we have the exact steps to reproduce it using bluetoothctl if possible?
-> 
->> Cheers,
->> Ahmad
->>
->>>
->>>> Cheers,
->>>> Ahmad
->>>>
->>>>>
->>>>>> Cheers,
->>>>>> Ahmad
->>>>>>
->>>>>>>
->>>>>>>> We've been deploying the revert for a while now and I just posted
->>>>>>>> it to the mailing list[1]. There have been other reports
->>>>>>>> of this issue with different hardware too and fixing sent_cmd
->>>>>>>> would likely be too complicated/time intensive for me.
->>>>>>>>
->>>>>>>> I am happy to test future patches that fix this properly though.
->>>>>>>>
->>>>>>>> [1]: https://lore.kernel.org/linux-bluetooth/20220616092418.738877-1-a.fatoum@pengutronix.de/T/#t
+Basically the patch should not have any effect on a kernel which is
+not compiled with CONFIG_KCOV and we'd like to use the patch to make
+the coverage of the hci_rx_work background thread visible to
+Syzkaller, because the BT packet parsing / handling logic happens
+there and this way Syzkaller will be able to more effectively mutate
+the packets used for fuzzing, hopefully reaching new code paths, maybe
+discovering and reporting new vulnerabilities before they reach the
+mainline.
+
+Thank you,
+Tamas
+
+
+On Thu, Jun 23, 2022 at 11:18 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+> On Wed, 22 Jun 2022 at 12:20, Aleksandr Nogikh <nogikh@google.com> wrote:
+> >
+> > (Resending the reply I sent to the v1 of the patch. I sent it by
+> > mistake with HTML content, so it did not reach lore.)
+> >
+> > I checked out v5.18.1, applied this patch and fuzzed it with syzkaller
+> > for a day. The fuzzer was indeed able to find and report more coverage
+> > of the BT subsystem than without the patch.
+> >
+> > Tested-by: Aleksandr Nogikh <nogikh@google.com>
+> >
+> >
+> > On Tue, Jun 14, 2022 at 3:34 PM Tam=C3=A1s Koczka <poprdi@google.com> w=
+rote:
+> > >
+> > > Hello Marcel,
+> > >
+> > > I hope this was the change you originally requested, and I did not
+> > > misunderstand anything, but if you need any additional modification t=
+o
+> > > the code or the commit, please feel free to let me know!
+> > >
+> > > Thank you,
+> > > Tamas
+> > >
+> > > On Tue, Jun 7, 2022 at 1:44 PM Tam=C3=A1s Koczka <poprdi@google.com> =
+wrote:
+> > > >
+> > > > Hello Marcel,
+> > > >
+> > > > I added some comments into the code about what the kcov_remote call=
+s do and
+> > > > why they were implemented and I also added some reasoning to the co=
+mmit
+> > > > message.
+> > > >
+> > > > I did not mention in the commit but these functions only run if the=
+ kernel
+> > > > is compiled with CONFIG_KCOV.
+> > > >
+> > > > Thank you again for reviewing the patch!
+> > > >
+> > > > --
+> > > > Tamas
+> > > >
+> > > > On Tue, Jun 7, 2022 at 12:40 PM Tamas Koczka <poprdi@google.com> wr=
+ote:
+> > > > >
+> > > > > Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_s=
+top()
+> > > > > calls, so remote KCOV coverage is collected while processing the =
+rx_q
+> > > > > queue which is the main incoming Bluetooth packet queue.
+> > > > >
+> > > > > Coverage is associated with the thread which created the packet s=
+kb.
+> > > > >
+> > > > > The collected extra coverage helps kernel fuzzing efforts in find=
+ing
+> > > > > vulnerabilities.
+> > > > >
+> > > > > Signed-off-by: Tamas Koczka <poprdi@google.com>
+> > > > > ---
+> > > > > Changelog since v1:
+> > > > >  - add comment about why kcov_remote functions are called
+> > > > >
+> > > > > v1: https://lore.kernel.org/all/20220517094532.2729049-1-poprdi@g=
+oogle.com/
+> > > > >
+> > > > >  net/bluetooth/hci_core.c | 10 +++++++++-
+> > > > >  1 file changed, 9 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > > > index 45c2dd2e1590..0af43844c55a 100644
+> > > > > --- a/net/bluetooth/hci_core.c
+> > > > > +++ b/net/bluetooth/hci_core.c
+> > > > > @@ -29,6 +29,7 @@
+> > > > >  #include <linux/rfkill.h>
+> > > > >  #include <linux/debugfs.h>
+> > > > >  #include <linux/crypto.h>
+> > > > > +#include <linux/kcov.h>
+> > > > >  #include <linux/property.h>
+> > > > >  #include <linux/suspend.h>
+> > > > >  #include <linux/wait.h>
+> > > > > @@ -3780,7 +3781,14 @@ static void hci_rx_work(struct work_struct=
+ *work)
+> > > > >
+> > > > >         BT_DBG("%s", hdev->name);
+> > > > >
+> > > > > -       while ((skb =3D skb_dequeue(&hdev->rx_q))) {
+> > > > > +       /* The kcov_remote functions used for collecting packet p=
+arsing
+> > > > > +        * coverage information from this background thread and a=
+ssociate
+> > > > > +        * the coverage with the syscall's thread which originall=
+y injected
+> > > > > +        * the packet. This helps fuzzing the kernel.
+> > > > > +        */
+> > > > > +       for (; (skb =3D skb_dequeue(&hdev->rx_q)); kcov_remote_st=
+op()) {
+> > > > > +               kcov_remote_start_common(skb_get_kcov_handle(skb)=
+);
+> > > > > +
+> > > > >                 /* Send copy to monitor */
+> > > > >                 hci_send_to_monitor(hdev, skb);
+>
+> Looks good to me.
+> Anything else needed to merge this patch?
+>
+> Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
