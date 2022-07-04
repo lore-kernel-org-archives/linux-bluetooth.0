@@ -2,184 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAA08C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 03:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 136D2C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Jul 2022 04:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229740AbiGDDX1 (ORCPT
+        id S229694AbiGDEep (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Jul 2022 23:23:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
+        Mon, 4 Jul 2022 00:34:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiGDDX0 (ORCPT
+        with ESMTP id S229461AbiGDEen (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Jul 2022 23:23:26 -0400
-Received: from smtpproxy21.qq.com (smtpbg703.qq.com [203.205.195.89])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155932BCC
-        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Jul 2022 20:23:21 -0700 (PDT)
-X-QQ-mid: bizesmtp63t1656904995tvzjfdk2
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Mon, 04 Jul 2022 11:23:11 +0800 (CST)
-X-QQ-SSF: 01400000000000C0E000000A0000000
-X-QQ-FEAT: FXvDfBZI5O7R3bCWQbqcR6YoqaWDsbGdVcdSC/sEssas5teZg1ar9AF41tkxy
-        9lEzDCfApbNb4Wv4dRjC16TvFwS+1txPNcut8NL20dx9ozy988RA79li2lYU2BszZvtXV9h
-        SDA7ptfnTjYbqoQ56wFuWvRKtSIOwg1bn7o0KtjLrQ/Dl9JxSfTs/uQ07RzDd9lDAkpQ51l
-        cpl2o1fwDwvxU4n65ObODpIbVrFYPZMcAdHDAi87tHnhiut9s/8WCSBgtgpECcv8PjR7don
-        HkZoST+gOdiKQakjxjGFa23E2HKQgcpr1lCYM6jyQiYZujMoPPKftTTdelre0iEXAUWRo3J
-        FwCIomxQBGbzmXFgOU=
-X-QQ-GoodBg: 1
-From:   Youwan Wang <wangyouwan@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Youwan Wang <wangyouwan@uniontech.com>
-Subject: [PATCH] obexd: fix crashed after cancel the on-going transfer
-Date:   Mon,  4 Jul 2022 11:23:08 +0800
-Message-Id: <20220704032308.2781-1-wangyouwan@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 4 Jul 2022 00:34:43 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1596A5F57
+        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Jul 2022 21:34:42 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id v6so6096067qkh.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Jul 2022 21:34:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=fZsAwp18Y+DBNakK+Runhcbctu97dgMx71+8JM0xZCs=;
+        b=MN7HTp079iIz05IiY9b3zUg4keKJ4/H+AC1Y/d0lQjOC2XzYc65VynUS4ZfiBWeL2E
+         8S4KcMKPvvnfzpHcpDbf9CekS4kZLuCbpTUmOPX7gFesqC+YzHw+ImjGBcHhpbwbCBMT
+         aGHpVnjXvTQOnsNlBSXbRSG1cdMEkf0MtSUQEScTkZK58g10GlmY/cz8QxxUMfPnz3eX
+         8yxCm0t58MazwxDcLI3ufBJowU+4vi66bvtscDO297+OtdvAiGNn7HCp4NJVUd/z30B2
+         pt9aP2RyjHLAHs1HuQgbHEI7jgF6rQwuUUZlKnOmh7dyxscAka5aHbfHsHblrSK/arYC
+         luDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=fZsAwp18Y+DBNakK+Runhcbctu97dgMx71+8JM0xZCs=;
+        b=Y2R3bi1e62xVyKrzqcaIlI1yaWmn/NJm1T3nZPTMPMlFyvgk0mckfFBrrIHZS7tJwa
+         qIzM2hTtutFYIooYcEp1dvDLkevm1h04ZMoM1TSnCTFcOiIrKFvtZbsa2dBSbWQBImaF
+         IolmG7F2WPJaiEQOdUgQJWMfxFdFDDLd8w9MO1+gVVxHZJ6QoEbzTQqHjxa3qi/GjqRG
+         7W1xlfi65seEA/sWeTx+0j5pdebUoDMQe97Nm9C90pUUefXmjWj8F+jnYAXq5GjDKYAg
+         JFsC97NWiTCsuF/GPj3q12Ew0BvQgw4/hd8k8TQnlU6s+3soLXWVKeViTxFfNO5Kf4Db
+         QI8A==
+X-Gm-Message-State: AJIora9y1lnD1fePN/2KxVtMii/zHBFXyGw2gX2+AR05xC6PYFLjn+Mq
+        Dv7H3ojNiNc0nNfzqxZWTSF7zAjcMJn+iw==
+X-Google-Smtp-Source: AGRyM1t1CmMBYSZqVfPNt96GUFV7KhiFMfm10X7kOFNkusVCUanQJ7QzE5ILji6K3bcSInmGk2DeVQ==
+X-Received: by 2002:a05:620a:78c:b0:6b4:7012:97bd with SMTP id 12-20020a05620a078c00b006b4701297bdmr267852qka.135.1656909280888;
+        Sun, 03 Jul 2022 21:34:40 -0700 (PDT)
+Received: from [172.17.0.2] ([20.231.222.0])
+        by smtp.gmail.com with ESMTPSA id y17-20020a05620a25d100b006a6a5d1e240sm26032933qko.34.2022.07.03.21.34.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Jul 2022 21:34:40 -0700 (PDT)
+Message-ID: <62c26de0.1c69fb81.ebc37.959a@mx.google.com>
+Date:   Sun, 03 Jul 2022 21:34:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5063564700099228125=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign4
-X-QQ-Bgrelay: 1
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, wangyouwan@uniontech.com
+Subject: RE: obexd: fix crashed after cancel the on-going transfer
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220704032308.2781-1-wangyouwan@uniontech.com>
+References: <20220704032308.2781-1-wangyouwan@uniontech.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-There is a use after released.transfer->req_id different
-obex->pending_req->id,See the following log,
-The packages is removd in cancel_complete func
-are not the same package in req_timeout func,
-but transfer pointer is released.
+--===============5063564700099228125==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-log:
-g_obex_cancel_req()
-transfer->req_id 23 id 22 obex->pending_req(0x55b642c3e100)
+This is automated email and please do not reply to this email!
 
-g_obex_cancel_req()
-match->data (0x55b642c344a0)
+Dear submitter,
 
-g_obex_ref() ref 4
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=656183
 
-cancel_complete()
-pending req timeout 176 id 22 obex(0x55b642c3e100)
+---Test result---
 
-transfer_response()
-obex 0x55b642c36480 transfer(0x55b642c3d000)
+Test Summary:
+CheckPatch                    PASS      1.55 seconds
+GitLint                       PASS      1.01 seconds
+Prep - Setup ELL              PASS      27.01 seconds
+Build - Prep                  PASS      0.83 seconds
+Build - Configure             PASS      8.58 seconds
+Build - Make                  PASS      834.50 seconds
+Make Check                    PASS      11.58 seconds
+Make Check w/Valgrind         PASS      283.43 seconds
+Make Distcheck                PASS      233.21 seconds
+Build w/ext ELL - Configure   PASS      8.67 seconds
+Build w/ext ELL - Make        PASS      80.27 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    WARNING   476.20 seconds
 
-g_obex_drop_tx_queue()
+Details
+##############################
+Test: Scan Build - WARNING
+Desc: Run Scan Build with patches
+Output:
+*****************************************************************************
+The bugs reported by the scan-build may or may not be caused by your patches.
+Please check the list and fix the bugs if they are caused by your patch.
+*****************************************************************************
+gobex/gobex-transfer.c:426:7: warning: Use of memory after it is freed
+        if (!g_slist_find(transfers, transfer))
+             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
 
-g_obex_unref() obex 0x55b642c36480
-g_obex_unref() ref 3
 
-transfer_free()
-obex 0x55b642c36480 transfer 0x55b642c3d000
 
-g_obex_unref() obex 0x55b642c36480
-g_obex_unref() ref 2
 
-pending_pkt_free()
-timeout_id 0 pending_pkt (0x55b642c344a0)
-
-step:
-[obex]# connect 28:33:34:1E:96:98
-Attempting to connect to 28:33:34:1E:96:98
-[NEW] Session /org/bluez/obex/client/session2 [default]
-[NEW] ObjectPush /org/bluez/obex/client/session2
-Connection successful
-[28:33:34:1E:96:98]# send /home/uos/Desktop/systemd.zip
-Attempting to send /home/uos/Desktop/systemd.zip
-[NEW] Transfer /org/bluez/obex/client/session2/transfer2
-Transfer /org/bluez/obex/client/session2/transfer2
-        Status: queued
-        Name: systemd.zip
-        Size: 33466053
-        Filename: /home/uos/Desktop/systemd.zip
-        Session: /org/bluez/obex/client/session2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-er2 33:34:1E:96:98]# cancel /org/bluez/obex/client/sessi
-Attempting to cancel transfer /org/bluez/obex/client/s
-Cancel successful
-
-valgrind trace:
-==11431== Invalid read of size 4
-==11431==    at 0x12B442: transfer_response ()
-==11431==    by 0x127764: req_timeout ()
-==11431==    by 0x49B8922: ??? ( )
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? (in )
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main (main.c:322)
-==11431==  Address 0x7344fa0 is 16 bytes inside a block of size
-==11431==    at 0x48369AB: free ()
-==11431==    by 0x12B459: transfer_response ()
-==11431==    by 0x127B3D: cancel_complete ()
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? ()
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main (main.c:322)
-==11431==  Block was alloc'd at
-==11431==    at 0x4837B65: calloc ()
-==11431==    by 0x49BD9D8: g_malloc0 ()
-==11431==    by 0x12AB89: transfer_new ()
-==11431==    by 0x12B732: g_obex_put_req_pkt ()
-==11431==    by 0x12B732: g_obex_put_req_pkt ()
-==11431==    by 0x146982: transfer_start_put ()
-==11431==    by 0x146982: obc_transfer_start ()
-==11431==    by 0x13C5A7: session_process_transfer ()
-==11431==    by 0x13D248: session_process_queue ()
-==11431==    by 0x13D248: session_process_queue ()
-==11431==    by 0x13D2AF: session_process ()
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? (i)
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main ()
-==11431==
-==11431== (action on error) vgdb me ...
 ---
- gobex/gobex-transfer.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index c94d018b2..2f5c3e725 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -186,16 +186,19 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
- 	gboolean rspcode, final;
- 	guint id;
- 
--	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
--
--	id = transfer->req_id;
--	transfer->req_id = 0;
--
- 	if (err != NULL) {
-+		if (!g_slist_find(transfers, transfer))
-+			return;
-+
-+		transfer->req_id = 0;
- 		transfer_complete(transfer, err);
- 		return;
- 	}
- 
-+	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
-+
-+	id = transfer->req_id;
-+	transfer->req_id = 0;
- 	rspcode = g_obex_packet_get_operation(rsp, &final);
- 	if (rspcode != G_OBEX_RSP_SUCCESS && rspcode != G_OBEX_RSP_CONTINUE) {
- 		err = g_error_new(G_OBEX_ERROR, rspcode, "%s",
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
+--===============5063564700099228125==--
