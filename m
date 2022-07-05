@@ -2,77 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1870C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 19:13:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A13C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 20:27:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233435AbiGETNe (ORCPT
+        id S230186AbiGEU1F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 15:13:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48496 "EHLO
+        Tue, 5 Jul 2022 16:27:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232433AbiGETNb (ORCPT
+        with ESMTP id S229872AbiGEU1E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 15:13:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151B71B7B5;
-        Tue,  5 Jul 2022 12:13:30 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A5C3C61B18;
-        Tue,  5 Jul 2022 19:13:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55818C341C7;
-        Tue,  5 Jul 2022 19:13:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657048409;
-        bh=2fD47EYJ8DU5PxNdFvZQ3nFWOAQNfiU3a87fuXvip1Y=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OrFaTXZ8tUO1+ZVEJelT78P/UuxyQydx5O3S0+mHCYqrg5GJkn/azari59H/6zW33
-         oxm1RbFB5t0Gj58Sxu/1NAgRi/3zx2dJFMztVLIgAurUSiQKxpymUTKQLm+70w/HX1
-         hOvAu0h5siF3JqnpuNCCd+a6XTGr1mynLyTa3DOpMj8KdTULy41rIVBldGyT66/jVK
-         CpyjxU5VmV5BF/yb+ZiYEv34O3lb0WR2f93JOVnGRIqm/ntP0JQZDSNbRnQc6VaF3o
-         1SikloQ4+HdZRIhfvv6BvCsL92ng9kHUwZM7kLoTVZFr40jGGDoGO+gif8TA2ZsyqD
-         vlThvK5g01S0Q==
-Date:   Tue, 5 Jul 2022 12:13:27 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Francesco Dolcini <francesco.dolcini@toradex.com>,
-        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Max Krummenacher <max.oss.09@gmail.com>,
-        Mateusz =?UTF-8?B?Sm/FhGN6eWs=?= <mat.jonczyk@o2.pl>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        max.krummenacher@toradex.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to
- `cancel_work_sync(&hdev->power_on)` from hci_power_on_sync.
-Message-ID: <20220705121327.5b8029e4@kernel.org>
-In-Reply-To: <CABBYNZL9yir6tbEnwu8sQMnNG+h-8bMdnkK1Tsqo8AOtc5goGw@mail.gmail.com>
-References: <20220614181706.26513-1-max.oss.09@gmail.com>
-        <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
-        <20220705151446.GA28605@francesco-nb.int.toradex.com>
-        <CABBYNZJDkmU_Fgfszrau9CK6DSQM2xGaGwfVyVkjNo7MVtBd8w@mail.gmail.com>
-        <20220705113829.4af55980@kernel.org>
-        <CABBYNZL9yir6tbEnwu8sQMnNG+h-8bMdnkK1Tsqo8AOtc5goGw@mail.gmail.com>
+        Tue, 5 Jul 2022 16:27:04 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32DFB19C04;
+        Tue,  5 Jul 2022 13:27:03 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id y14-20020a17090a644e00b001ef775f7118so9769022pjm.2;
+        Tue, 05 Jul 2022 13:27:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4I/vTUX5/VX521F5N8ofDJR9PHwj5AGCwWWyLQBWNyU=;
+        b=ok0BgEqQmI6FnWWvJQKvLaVsAC0SNtK+qdzMA8rmadg4we4PNa3OK6ZqUjEUJxebi1
+         0OR0ufr1y+KJNh5Rs3Tr3DFQD06T+6vg74eAyZIMUUP3jXgvVBOl57EnbI1IxFDOTrqy
+         bs//Qo4EXHP1D55KEMNWaFO/7oG6XMuEbJtQgFhrAFKatmsuAEDe4oceA2uHgiDpy2Vr
+         mzgh8tyxGks8KcpZRQpM+XFE/QdIwugWDXpb71WtbudqJ/Uldq9Zi9uI5UujnetnokUP
+         8Kw8QxCrE0tXPmlifsYfkQOjebolWD/N/cnJO41ebeccNqaYkcXc2zfMIxOZDGHANg3J
+         gOcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4I/vTUX5/VX521F5N8ofDJR9PHwj5AGCwWWyLQBWNyU=;
+        b=IAACA4uO+6dm75pytCkKDysAXA2vEnMGkBSJrkOw3CmCnRcs3SQD3VSa+9cS82zGRx
+         rMv58rZVyehOWSlN6Z6o8piadDRcinGozKKV8ecrbjiM1liCdQyW6Nn+dvaUubJQ4y2i
+         t62jHUc+syT15nJxsR3imIGLxTXbHsf8HVfRdmhZf5TlA4kewRBo/416IBKwhVRc/ePo
+         PWfphdKLwk8sPV4gCi9tB4I9YfxSBhVBc/BCVGiBYf13vum+S6lCAROPBULdqFPGzl3U
+         zXUAMZUM/GhzMg1lDnhHFHkDC1STu3Jo7r14WMuMURwpfDmMwKzlnmymAJdHyRmtnDzf
+         6Jmw==
+X-Gm-Message-State: AJIora+jXjZgKodLmf/39HVpQHVbR77QglPDwbil3H1tIp8sZ/0I/KrX
+        PjYqi1p9DanA6QAJsaUgW7+0KuCWkagzog==
+X-Google-Smtp-Source: AGRyM1uwDtLWN/wn3Mse1jNB9FnsmxRZcwVHH5moijxgBaZ2cQpFyw54PM3pS+MUGSmwkGoGXD2S1w==
+X-Received: by 2002:a17:90b:390c:b0:1ec:ae13:c5aa with SMTP id ob12-20020a17090b390c00b001ecae13c5aamr45144367pjb.64.1657052822616;
+        Tue, 05 Jul 2022 13:27:02 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id m10-20020a170902f64a00b0016bf01394e1sm2380879plg.124.2022.07.05.13.27.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jul 2022 13:27:02 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-07-05
+Date:   Tue,  5 Jul 2022 13:27:00 -0700
+Message-Id: <20220705202700.1689796-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 5 Jul 2022 12:00:43 -0700 Luiz Augusto von Dentz wrote:
-> > > Ive rebased the patch on top of bluetooth-next and fixed the hash,
-> > > lets see if passes CI I might just go ahead and push it.  
-> >
-> > Thanks for pushing it along, the final version can got thru bluetooth ->  
-> > -> net and into 5.19, right?  
-> 
-> Yep, I will send the pull request in a moment.
+The following changes since commit 029cc0963412c4f989d2731759ce4578f7e1a667:
 
-Perfect, thank you!!
+  Merge branch 'fix-bridge_vlan_aware-sh-and-bridge_vlan_unaware-sh-with-iff_unicast_flt' (2022-07-05 11:52:35 +0200)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-07-05
+
+for you to fetch changes up to e36bea6e78ab2b6c9c7396972fee231eae551cfc:
+
+  Bluetooth: core: Fix deadlock on hci_power_on_sync. (2022-07-05 13:20:03 -0700)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix deadlock when powering on.
+
+----------------------------------------------------------------
+Vasyl Vavrychuk (1):
+      Bluetooth: core: Fix deadlock on hci_power_on_sync.
+
+ net/bluetooth/hci_core.c | 3 +++
+ net/bluetooth/hci_sync.c | 1 -
+ 2 files changed, 3 insertions(+), 1 deletion(-)
