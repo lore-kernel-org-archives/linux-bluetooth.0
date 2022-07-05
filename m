@@ -2,110 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBCDC43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 18:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE96C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 19:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232958AbiGESjR (ORCPT
+        id S232149AbiGETA6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 14:39:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44624 "EHLO
+        Tue, 5 Jul 2022 15:00:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232817AbiGESjP (ORCPT
+        with ESMTP id S230205AbiGETA5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 14:39:15 -0400
-Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880E21F2C4
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 11:39:02 -0700 (PDT)
-Received: (wp-smtpd smtp.tlen.pl 8985 invoked from network); 5 Jul 2022 20:38:58 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
-          t=1657046338; bh=WWwtFu5inTGYYHR/P6xpZs+1V1TpiM1KVqGs6QWQJP4=;
-          h=Subject:To:Cc:From;
-          b=r0ig7VGT6CmM+AW0kQSIPZOUUY77GPXcRzY9cQdeZwaExr8ASpSw++z4W5Unf3viy
-           CLf5mkqTzrRMI38RuY14xKAhN68AZj60y1VKq9h0U00kTHtEGbtc9HBP8iPtJ20BPr
-           9QjNzQh3HO288IrQ18p9/CLeXcx69+NezqM3jLl0=
-Received: from aafi210.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.138.210])
-          (envelope-sender <mat.jonczyk@o2.pl>)
-          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <vasyl.vavrychuk@opensynergy.com>; 5 Jul 2022 20:38:58 +0200
-Message-ID: <494b21fb-896e-5c80-ff53-b5f914663736@o2.pl>
-Date:   Tue, 5 Jul 2022 20:38:48 +0200
+        Tue, 5 Jul 2022 15:00:57 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD9110562;
+        Tue,  5 Jul 2022 12:00:56 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id n15so15667266ljg.8;
+        Tue, 05 Jul 2022 12:00:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WEj3MTeauhExkBserJBm2mHNQmfNXNb400mZ4q4xVQU=;
+        b=e5skRiv7zczl7Whp4FFH9dAke4mOOkz4WwNSJe5yk6Hj3c0o1cd7oqIYD5ltGWMWN4
+         HQguZDg1AAEHwpSMIPJ4nBjLtr+AwGCgVEyl0E7Xdt1Oyj1ruGUBuS1STjnx376aEvcD
+         R5kvV7pQacl2DOjysQyhIIZUX9IM0de3gO2d3eSekt2TaNqvsclWrrgkeYjQvmvIEiMH
+         q2mdlDUPHN2ld++lK00cpiZy5Ne6dtCIFO/2HPKUMyS0ydW3hOcVTTiRRuDnZ9myq+Y9
+         8jNloEsioFjkDosa1ivZhGVdj2F1vFkC/BWpn2IcleewUIQ2rCIwIM4615qI/GAN0zGW
+         UiAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WEj3MTeauhExkBserJBm2mHNQmfNXNb400mZ4q4xVQU=;
+        b=1NQeqDIjXAl31HC1cKwKakrmQGG0OeugG8CYmu/Pk0R0jfm7VAm8crPABrQm/7b2lA
+         JPM0JtEzjuAXqXfhlO35DrHnn/5toce5CAq8MwK7mEKKue1JX8VGg23+unyyqexGgu8M
+         dUaPw9A+jrn4bLabehvUy1sJXIRToV+m0XGLEsrFJ59vV+EtAd+kiHlAhujiUEq+xEIP
+         2TJPvOa6wnnit4zI7ImeRsRuXab7vQi2r2QN6DKluTShk/LpJHZdB6bOFjFprGlBMTim
+         J9I9n5M0IavvrQsHrPXgXAVoP4n5CQeX9/ajd14KiAyIiDEqCJbZFvq511fJDJtNoEWS
+         L03Q==
+X-Gm-Message-State: AJIora+GmvaWsqMrnLNcO1a4sUMarbg3Ew9rvJffspnkU5dt6HlrZavV
+        dB4/TzpFk3RCBh69OScIx/nOtpAW9Hw0txNfmN8=
+X-Google-Smtp-Source: AGRyM1t/OvFyegNmc24Kwkr8qMvrpENb5ZMI7VWRnKfmciNg7frWyk1pTeKAkg7btGf4egBYhItuEqx6x8re93rLsCE=
+X-Received: by 2002:a2e:a78a:0:b0:25b:c51a:2c0a with SMTP id
+ c10-20020a2ea78a000000b0025bc51a2c0amr21411914ljf.432.1657047654983; Tue, 05
+ Jul 2022 12:00:54 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.0
-Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to
- `cancel_work_sync(&hdev->power_on)` from hci_power_on_sync.
-Content-Language: en-GB
-To:     Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org,
+References: <20220614181706.26513-1-max.oss.09@gmail.com> <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
+ <20220705151446.GA28605@francesco-nb.int.toradex.com> <CABBYNZJDkmU_Fgfszrau9CK6DSQM2xGaGwfVyVkjNo7MVtBd8w@mail.gmail.com>
+ <20220705113829.4af55980@kernel.org>
+In-Reply-To: <20220705113829.4af55980@kernel.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 5 Jul 2022 12:00:43 -0700
+Message-ID: <CABBYNZL9yir6tbEnwu8sQMnNG+h-8bMdnkK1Tsqo8AOtc5goGw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to `cancel_work_sync(&hdev->power_on)`
+ from hci_power_on_sync.
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     Francesco Dolcini <francesco.dolcini@toradex.com>,
+        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Max Krummenacher <max.oss.09@gmail.com>,
-        Francesco Dolcini <francesco.dolcini@toradex.com>,
-        Jakub Kicinski <kuba@kernel.org>,
+        =?UTF-8?Q?Mateusz_Jo=C5=84czyk?= <mat.jonczyk@o2.pl>,
         Marcel Holtmann <marcel@holtmann.org>,
-        max.krummenacher@toradex.com
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        max.krummenacher@toradex.com,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>
-References: <20220614181706.26513-1-max.oss.09@gmail.com>
- <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
-From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
-In-Reply-To: <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-WP-MailID: ea507a630c026762668487bc76baf600
-X-WP-AV: skaner antywirusowy Poczty o2
-X-WP-SPAM: NO 000000A [IRNk]                               
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-W dniu 5.07.2022 o 14:59, Vasyl Vavrychuk pisze:
-> `cancel_work_sync(&hdev->power_on)` was moved to hci_dev_close_sync in
-> commit [1] to ensure that power_on work is canceled after HCI interface
-> down.
->
-> But, in certain cases power_on work function may call hci_dev_close_sync
-> itself: hci_power_on -> hci_dev_do_close -> hci_dev_close_sync ->
-> cancel_work_sync(&hdev->power_on), causing deadlock. In particular, this
-> happens when device is rfkilled on boot. To avoid deadlock, move
-> power_on work canceling out of hci_dev_do_close/hci_dev_close_sync.
->
-> Deadlock introduced by commit [1] was reported in [2,3] as broken
-> suspend. Suspend did not work because `hdev->req_lock` held as result of
-> `power_on` work deadlock. In fact, other BT features were not working.
-> It was not observed when testing [1] since it was verified without
-> rfkill in place.
->
-> NOTE: It is not needed to cancel power_on work from other places where
-> hci_dev_do_close/hci_dev_close_sync is called in case:
-> * Requests were serialized due to `hdev->req_workqueue`. The power_on
-> work is first in that workqueue.
-> * hci_rfkill_set_block which won't close device anyway until HCI_SETUP
-> is on.
-> * hci_sock_release which runs after hci_sock_bind which ensures
-> HCI_SETUP was cleared.
->
-> As result, behaviour is the same as in pre-dd06ed7 commit, except
-> power_on work cancel added to hci_dev_close.
->
-> [1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
-> [2]: https://lore.kernel.org/lkml/20220614181706.26513-1-max.oss.09@gmail.com/
-> [2]: https://lore.kernel.org/lkml/1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl/
->
-> Fixes: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
-> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
-> Reported-by: Max Krummenacher <max.krummenacher@toradex.com>
-> Reported-by: Mateusz Jonczyk <mat.jonczyk@o2.pl>
+Hi Jakub,
 
-Works well: suspend (with bluetooth on and also off), hibernation, sending files, rfkill.
+On Tue, Jul 5, 2022 at 11:38 AM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 5 Jul 2022 10:26:08 -0700 Luiz Augusto von Dentz wrote:
+> > On Tue, Jul 5, 2022 at 8:14 AM Francesco Dolcini
+> > <francesco.dolcini@toradex.com> wrote:
+> > >
+> > > Hello Vasyl,
+> > >
+> > > On Tue, Jul 05, 2022 at 03:59:31PM +0300, Vasyl Vavrychuk wrote:
+> > > > Fixes: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> > >
+> > > This fixes tag is broken, dd06ed7ad057 does not exist on
+> > > torvalds/master, and the `commit` word should be removed.
+> > >
+> > > Should be:
+> > >
+> > > Fixes: ff7f2926114d ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> >
+> > Ive rebased the patch on top of bluetooth-next and fixed the hash,
+> > lets see if passes CI I might just go ahead and push it.
+>
+> Thanks for pushing it along, the final version can got thru bluetooth ->
+> -> net and into 5.19, right?
 
-Thank you.
+Yep, I will send the pull request in a moment.
 
-Reported-and-tested-by: Mateusz Jończyk <mat.jonczyk@o2.pl>
-
-Greetings,
-
-Mateusz Jończyk
-
+-- 
+Luiz Augusto von Dentz
