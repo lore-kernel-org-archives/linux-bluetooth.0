@@ -2,300 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4CAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 17:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC845C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 17:25:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232375AbiGERVd (ORCPT
+        id S229925AbiGERZG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 13:21:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43474 "EHLO
+        Tue, 5 Jul 2022 13:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229866AbiGERVc (ORCPT
+        with ESMTP id S229730AbiGERZF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 13:21:32 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29EAA1F639;
-        Tue,  5 Jul 2022 10:21:30 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id j13so2173207ljo.7;
-        Tue, 05 Jul 2022 10:21:30 -0700 (PDT)
+        Tue, 5 Jul 2022 13:25:05 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9EA1C925
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 10:25:05 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id v126so11938927pgv.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jul 2022 10:25:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BJiLtE764551pODrU/Uui/Vx48pMc8mhIb1OPxIuC6c=;
-        b=fmZdn0N4RA+nLTjfP1iauDv593GW1tWx2twoVgKrV6B+jxHuIftpnWriqQhLWJUvOA
-         jhtAOGBtUw46u0cR3uxgb5KkQUqAqAHAIXmzEHJrBBP47GDnSqnFDHjpNZEFjmnvIBF/
-         lI9jKAUt5tKBbZQFoy4dfgLiCf9s+OqpNqemjOji1FvIU6z54lAmbm6KraY5pi6cYAtI
-         KNx5OLkkBVrLg5z2LXFbIt4yF3WYdG4+rl3YM4lWGprw1xULzmLpccjlLZtrD+4CKK/+
-         dcPtaYRd8+SZrta3iD5Azzrv08x1h2G3dwWRFFqCb2k8eTv3pi48GcasutOZCfaTeNDo
-         URBw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ctcnAJL7+WGYl0TtSsvKCpfo0oPIAkNGw9R2E6cLGUM=;
+        b=osBSaUn/9hDlK891+XccdhMQ7GCyWnnGE3uBhWRJpfe700PGh/AHnuAQlbWZtV+YoH
+         q4vDNkRS2J0c2tPUPXJu1yarqm/fZYtPXTP4B5m90B7HkyG8Cch7XQeKFtpWaAxvPwJO
+         55Xyp+h6FrPie7w4BUbfyXHE3xAmBUMO1j5uBKGBHA/D/tXHIb8RxPRFVBrrXNTJcu7l
+         ySIJzXj2SKsTfe85DWj9pMCU1yaKVBJlqnlRYDDTnW5CBLvFkV7aJWNMUYE9ozwRFpsV
+         izf/XexqrGWxnEhD0teMsJ7E8QJubu3mOPO+nUIazM7oWpHjoLRtpeux8zITiG3frzEI
+         3kpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BJiLtE764551pODrU/Uui/Vx48pMc8mhIb1OPxIuC6c=;
-        b=iWKMdn0NI9ey1nT6TIqb5lBcwsszp4hCcjJ2c9ybfQZxG0Ioqz+L2Zy+ENXW+o6yzq
-         z/ZLFikEAbhK3CF8Z1E6rb5LrC45zCVBq9xPr4x1t3+sk09VTTeUF7/fXfvWFTmkIodT
-         cCD0IGNVtnXMpDYzqAeWPbrnMjcobHO6qd7xIbOgaSK9huT6GYfOkKlioLBAO+EHQ3hH
-         hWlxxCt7kFbXyFG4bm6ftmGl2uyieLE9BnvEK/aVYLlapl5mcG3dP6sziDujeP7IPZBs
-         cDISGWiQ0TmuI3FEZ1SvQSGpS8gFYz6QOE9E7Amlsp1XAQPZhKKufs+uKs9eKlPoIYkM
-         AZbg==
-X-Gm-Message-State: AJIora93QwUpe2REbEswoSukvRt5eVJ68fIoxUhx0p4nuYG81Sjn48wk
-        kUAwsRi/Il4xRRYIB1eCOzmDVHdQ5tYNTtsBoBc=
-X-Google-Smtp-Source: AGRyM1shPPJ8+8JOYYkUBZmp2EOJAR9+2qt8IIhwd6+mZyxsKx4JJeCqZf2hLrBLJ17pjSAZtAk7n7fx4c+hEEyI/Bc=
-X-Received: by 2002:a05:651c:507:b0:25d:3043:ead9 with SMTP id
- o7-20020a05651c050700b0025d3043ead9mr3174706ljp.65.1657041688321; Tue, 05 Jul
- 2022 10:21:28 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220622082716.478486-1-lee.jones@linaro.org> <CANn89iK-uFP6Swgc0ZeEC38UsuywJ3wbybSNouH202Wa7X7Tzg@mail.gmail.com>
- <CABBYNZ+C=MQ7577Fr5_W8tQ4iWRSDBSiC4fkRBY3x=9ph+YAzA@mail.gmail.com>
- <CABBYNZLysdh3NFK+G8=NUQ=G=hvS8X0PdMp=bVqiwPDPCAokmg@mail.gmail.com> <YrxvgIiWuFVlXBaQ@google.com>
-In-Reply-To: <YrxvgIiWuFVlXBaQ@google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ctcnAJL7+WGYl0TtSsvKCpfo0oPIAkNGw9R2E6cLGUM=;
+        b=JjRIQ0pRIwLwQvYq73df/+HcjKn/5WDuNs5oYpbzBPwDHaLF0+ax3klAKNq+WYOIjb
+         zmJnxs3/O1p6wUHm7HwMjMUUJCHiiAKVNzL6Ykr4tPrS7noP64M4m/QfJMyA9MgA9nNt
+         SQsd/1QKROlDRTmxe0p/G68RRaTBv6FTHlnxSTrBS4Dws7Y9zaUjDcJDNzwZQrskFsFt
+         RKmIr4aZ9Qtzk2XnEB5zPfcuAkcfp1WaMqaS3IhWA+R3ow1+e/Fm+mE8yTODpRY96ytA
+         ftX9kiZ1s4108d96gu7DsQx3uEojZvCri9HkvdsM4fjGWEc8v3CHF7KObsrEScobAeaT
+         jp5A==
+X-Gm-Message-State: AJIora/IXqZmfJ/1mcSn3kTn9YYEmRV559h3MtPuizdoFoTYSDnKncDX
+        8NbHe40aBsu9PaddIolkx8G5c0Pyty2Img==
+X-Google-Smtp-Source: AGRyM1uAL6tLOPrjjx38VIStJwxCLaFs3aGV/uHuGL1fvCVLWIHGztzhSaSJoYJsU2KAQrH5koP00Q==
+X-Received: by 2002:a63:2bd0:0:b0:412:2f70:f0ac with SMTP id r199-20020a632bd0000000b004122f70f0acmr11489572pgr.465.1657041904045;
+        Tue, 05 Jul 2022 10:25:04 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p2-20020a1709027ec200b00168f08d0d12sm20856740plb.89.2022.07.05.10.25.02
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jul 2022 10:25:03 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 5 Jul 2022 10:21:16 -0700
-Message-ID: <CABBYNZJFSxk9=3Gj7jOj__s=iJGmhrZ=CA7Mb74_-Y0sg+N40g@mail.gmail.com>
-Subject: Re: [RESEND 1/1] Bluetooth: Use chan_list_lock to protect the whole
- put/destroy invokation
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, stable@kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000003610eb05e3121524"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: core: Fix deadlock on hci_power_on_sync.
+Date:   Tue,  5 Jul 2022 10:25:01 -0700
+Message-Id: <20220705172501.1610923-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---0000000000003610eb05e3121524
-Content-Type: text/plain; charset="UTF-8"
+From: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
 
-Hi Lee,
+`cancel_work_sync(&hdev->power_on)` was moved to hci_dev_close_sync in
+commit [1] to ensure that power_on work is canceled after HCI interface
+down.
 
-On Wed, Jun 29, 2022 at 8:28 AM Lee Jones <lee.jones@linaro.org> wrote:
->
-> On Tue, 28 Jun 2022, Luiz Augusto von Dentz wrote:
->
-> > Hi Eric, Lee,
-> >
-> > On Mon, Jun 27, 2022 at 4:39 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> > >
-> > > Hi Eric, Lee,
-> > >
-> > > On Mon, Jun 27, 2022 at 7:41 AM Eric Dumazet <edumazet@google.com> wrote:
-> > > >
-> > > > On Wed, Jun 22, 2022 at 10:27 AM Lee Jones <lee.jones@linaro.org> wrote:
-> > > > >
-> > > > > This change prevents a use-after-free caused by one of the worker
-> > > > > threads starting up (see below) *after* the final channel reference
-> > > > > has been put() during sock_close() but *before* the references to the
-> > > > > channel have been destroyed.
-> > > > >
-> > > > >   refcount_t: increment on 0; use-after-free.
-> > > > >   BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
-> > > > >   Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
-> > > > >
-> > > > >   CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.234-00003-g1fb6d0bd49a4-dirty #28
-> > > > >   Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google Inc. MSM sm8150 Flame DVT (DT)
-> > > > >   Workqueue: hci0 hci_rx_work
-> > > > >   Call trace:
-> > > > >    dump_backtrace+0x0/0x378
-> > > > >    show_stack+0x20/0x2c
-> > > > >    dump_stack+0x124/0x148
-> > > > >    print_address_description+0x80/0x2e8
-> > > > >    __kasan_report+0x168/0x188
-> > > > >    kasan_report+0x10/0x18
-> > > > >    __asan_load4+0x84/0x8c
-> > > > >    refcount_dec_and_test+0x20/0xd0
-> > > > >    l2cap_chan_put+0x48/0x12c
-> > > > >    l2cap_recv_frame+0x4770/0x6550
-> > > > >    l2cap_recv_acldata+0x44c/0x7a4
-> > > > >    hci_acldata_packet+0x100/0x188
-> > > > >    hci_rx_work+0x178/0x23c
-> > > > >    process_one_work+0x35c/0x95c
-> > > > >    worker_thread+0x4cc/0x960
-> > > > >    kthread+0x1a8/0x1c4
-> > > > >    ret_from_fork+0x10/0x18
-> > > > >
-> > > > > Cc: stable@kernel.org
-> > > >
-> > > > When was the bug added ? (Fixes: tag please)
-> > > >
-> > > > > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > > > > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > > > > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > > > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > > > Cc: Eric Dumazet <edumazet@google.com>
-> > > > > Cc: Jakub Kicinski <kuba@kernel.org>
-> > > > > Cc: Paolo Abeni <pabeni@redhat.com>
-> > > > > Cc: linux-bluetooth@vger.kernel.org
-> > > > > Cc: netdev@vger.kernel.org
-> > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > ---
-> > > > >  net/bluetooth/l2cap_core.c | 4 ++--
-> > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > > > > index ae78490ecd3d4..82279c5919fd8 100644
-> > > > > --- a/net/bluetooth/l2cap_core.c
-> > > > > +++ b/net/bluetooth/l2cap_core.c
-> > > > > @@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
-> > > > >
-> > > > >         BT_DBG("chan %p", chan);
-> > > > >
-> > > > > -       write_lock(&chan_list_lock);
-> > > > >         list_del(&chan->global_l);
-> > > > > -       write_unlock(&chan_list_lock);
-> > > > >
-> > > > >         kfree(chan);
-> > > > >  }
-> > > > > @@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
-> > > > >  {
-> > > > >         BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
-> > > > >
-> > > > > +       write_lock(&chan_list_lock);
-> > > > >         kref_put(&c->kref, l2cap_chan_destroy);
-> > > > > +       write_unlock(&chan_list_lock);
-> > > > >  }
-> > > > >  EXPORT_SYMBOL_GPL(l2cap_chan_put);
-> > > > >
-> > > > >
-> > > >
-> > > > I do not think this patch is correct.
-> > > >
-> > > > a kref does not need to be protected by a write lock.
-> > > >
-> > > > This might shuffle things enough to work around a particular repro you have.
-> > > >
-> > > > If the patch was correct why not protect kref_get() sides ?
-> > > >
-> > > > Before the &hdev->rx_work is scheduled (queue_work(hdev->workqueue,
-> > > > &hdev->rx_work),
-> > > > a reference must be taken.
-> > > >
-> > > > Then this reference must be released at the end of hci_rx_work() or
-> > > > when hdev->workqueue
-> > > > is canceled.
-> > > >
-> > > > This refcount is not needed _if_ the workqueue is properly canceled at
-> > > > device dismantle,
-> > > > in a synchronous way.
-> > > >
-> > > > I do not see this hdev->rx_work being canceled, maybe this is the real issue.
-> > > >
-> > > > There is a call to drain_workqueue() but this is not enough I think,
-> > > > because hci_recv_frame()
-> > > > can re-arm
-> > > >    queue_work(hdev->workqueue, &hdev->rx_work);
-> > >
-> > > I suspect this likely a refcount problem, we do l2cap_get_chan_by_scid:
-> > >
-> > > /* Find channel with given SCID.
-> > >  * Returns locked channel. */
-> > > static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn
-> > > *conn, u16 cid)
-> > >
-> > > So we return a locked channel but that doesn't prevent another thread
-> > > to call l2cap_chan_put which doesn't care about l2cap_chan_lock so
-> > > perhaps we actually need to host a reference while we have the lock,
-> > > at least we do something like that on l2cap_sock.c:
-> > >
-> > > l2cap_chan_hold(chan);
-> > > l2cap_chan_lock(chan);
-> > >
-> > > __clear_chan_timer(chan);
-> > > l2cap_chan_close(chan, ECONNRESET);
-> > > l2cap_sock_kill(sk);
-> > >
-> > > l2cap_chan_unlock(chan);
-> > > l2cap_chan_put(chan);
-> >
-> > Perhaps something like this:
->
-> I'm struggling to apply this for test:
->
->   "error: corrupt patch at line 6"
+But, in certain cases power_on work function may call hci_dev_close_sync
+itself: hci_power_on -> hci_dev_do_close -> hci_dev_close_sync ->
+cancel_work_sync(&hdev->power_on), causing deadlock. In particular, this
+happens when device is rfkilled on boot. To avoid deadlock, move
+power_on work canceling out of hci_dev_do_close/hci_dev_close_sync.
 
-Check with the attached patch.
+Deadlock introduced by commit [1] was reported in [2,3] as broken
+suspend. Suspend did not work because `hdev->req_lock` held as result of
+`power_on` work deadlock. In fact, other BT features were not working.
+It was not observed when testing [1] since it was verified without
+rfkill in place.
 
+NOTE: It is not needed to cancel power_on work from other places where
+hci_dev_do_close/hci_dev_close_sync is called in case:
+* Requests were serialized due to `hdev->req_workqueue`. The power_on
+work is first in that workqueue.
+* hci_rfkill_set_block which won't close device anyway until HCI_SETUP
+is on.
+* hci_sock_release which runs after hci_sock_bind which ensures
+HCI_SETUP was cleared.
 
+As result, behaviour is the same as in pre-dd06ed7 commit, except
+power_on work cancel added to hci_dev_close.
+
+[1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+[2]: https://lore.kernel.org/lkml/20220614181706.26513-1-max.oss.09@gmail.com/
+[2]: https://lore.kernel.org/lkml/1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl/
+
+Fixes: ff7f2926114d ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+Reported-by: Max Krummenacher <max.krummenacher@toradex.com>
+Reported-by: Mateusz Jonczyk <mat.jonczyk@o2.pl>
+Tested-by: Max Krummenacher <max.krummenacher@toradex.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c | 3 +++
+ net/bluetooth/hci_sync.c | 1 -
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 05c13f639b94..27e90eb4bf4c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -571,6 +571,7 @@ int hci_dev_close(__u16 dev)
+ 		goto done;
+ 	}
+ 
++	cancel_work_sync(&hdev->power_on);
+ 	if (hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF))
+ 		cancel_delayed_work(&hdev->power_off);
+ 
+@@ -2677,6 +2678,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
+ 
++	cancel_work_sync(&hdev->power_on);
++
+ 	hci_cmd_sync_clear(hdev);
+ 
+ 	hci_unregister_suspend_notifier(hdev);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 489c420b477c..dcaeb0c18292 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4139,7 +4139,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+ 
+ 	bt_dev_dbg(hdev, "");
+ 
+-	cancel_work_sync(&hdev->power_on);
+ 	cancel_delayed_work(&hdev->power_off);
+ 	cancel_delayed_work(&hdev->ncmd_timer);
+ 
 -- 
-Luiz Augusto von Dentz
+2.35.3
 
---0000000000003610eb05e3121524
-Content-Type: text/x-patch; charset="US-ASCII"; name="0001-Bluetooth-L2CAP-WIP.patch"
-Content-Disposition: attachment; filename="0001-Bluetooth-L2CAP-WIP.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l58ftrys0>
-X-Attachment-Id: f_l58ftrys0
-
-RnJvbSA4OGNmNmI0ZjJiMGM5ZWQwYmQ3ZWYzYjBkMzg1NzRiNDEyMjY0NjA5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
-ekBpbnRlbC5jb20+CkRhdGU6IFR1ZSwgMjggSnVuIDIwMjIgMTU6NDY6MDQgLTA3MDAKU3ViamVj
-dDogW1BBVENIXSBCbHVldG9vdGg6IEwyQ0FQOiBXSVAKClNpZ25lZC1vZmYtYnk6IEx1aXogQXVn
-dXN0byB2b24gRGVudHogPGx1aXoudm9uLmRlbnR6QGludGVsLmNvbT4KLS0tCiBuZXQvYmx1ZXRv
-b3RoL2wyY2FwX2NvcmUuYyB8IDI1ICsrKysrKysrKysrKysrKysrKystLS0tLS0KIDEgZmlsZSBj
-aGFuZ2VkLCAxOSBpbnNlcnRpb25zKCspLCA2IGRlbGV0aW9ucygtKQoKZGlmZiAtLWdpdCBhL25l
-dC9ibHVldG9vdGgvbDJjYXBfY29yZS5jIGIvbmV0L2JsdWV0b290aC9sMmNhcF9jb3JlLmMKaW5k
-ZXggMDllY2FmNTU2ZGU1Li4zNTlmYjFjZTQzNzIgMTAwNjQ0Ci0tLSBhL25ldC9ibHVldG9vdGgv
-bDJjYXBfY29yZS5jCisrKyBiL25ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jCkBAIC0xMTEsNyAr
-MTExLDggQEAgc3RhdGljIHN0cnVjdCBsMmNhcF9jaGFuICpfX2wyY2FwX2dldF9jaGFuX2J5X3Nj
-aWQoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiB9CiAKIC8qIEZpbmQgY2hhbm5lbCB3aXRoIGdp
-dmVuIFNDSUQuCi0gKiBSZXR1cm5zIGxvY2tlZCBjaGFubmVsLiAqLworICogUmV0dXJucyBhIHJl
-ZmVyZW5jZSBsb2NrZWQgY2hhbm5lbC4KKyAqLwogc3RhdGljIHN0cnVjdCBsMmNhcF9jaGFuICps
-MmNhcF9nZXRfY2hhbl9ieV9zY2lkKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCQkJCQkJIHUx
-NiBjaWQpCiB7CkBAIC0xMTksMTUgKzEyMCwxNyBAQCBzdGF0aWMgc3RydWN0IGwyY2FwX2NoYW4g
-KmwyY2FwX2dldF9jaGFuX2J5X3NjaWQoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAKIAltdXRl
-eF9sb2NrKCZjb25uLT5jaGFuX2xvY2spOwogCWMgPSBfX2wyY2FwX2dldF9jaGFuX2J5X3NjaWQo
-Y29ubiwgY2lkKTsKLQlpZiAoYykKKwlpZiAoYykgeworCQlsMmNhcF9jaGFuX2hvbGQoYyk7CiAJ
-CWwyY2FwX2NoYW5fbG9jayhjKTsKKwl9CiAJbXV0ZXhfdW5sb2NrKCZjb25uLT5jaGFuX2xvY2sp
-OwogCiAJcmV0dXJuIGM7CiB9CiAKIC8qIEZpbmQgY2hhbm5lbCB3aXRoIGdpdmVuIERDSUQuCi0g
-KiBSZXR1cm5zIGxvY2tlZCBjaGFubmVsLgorICogUmV0dXJucyBhIHJlZmVyZW5jZSBsb2NrZWQg
-Y2hhbm5lbC4KICAqLwogc3RhdGljIHN0cnVjdCBsMmNhcF9jaGFuICpsMmNhcF9nZXRfY2hhbl9i
-eV9kY2lkKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCQkJCQkJIHUxNiBjaWQpCkBAIC0xMzYs
-OCArMTM5LDEwIEBAIHN0YXRpYyBzdHJ1Y3QgbDJjYXBfY2hhbiAqbDJjYXBfZ2V0X2NoYW5fYnlf
-ZGNpZChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwKIAogCW11dGV4X2xvY2soJmNvbm4tPmNoYW5f
-bG9jayk7CiAJYyA9IF9fbDJjYXBfZ2V0X2NoYW5fYnlfZGNpZChjb25uLCBjaWQpOwotCWlmIChj
-KQorCWlmIChjKSB7CisJCWwyY2FwX2NoYW5faG9sZChjKTsKIAkJbDJjYXBfY2hhbl9sb2NrKGMp
-OworCX0KIAltdXRleF91bmxvY2soJmNvbm4tPmNoYW5fbG9jayk7CiAKIAlyZXR1cm4gYzsKQEAg
-LTQ0NjQsNiArNDQ2OSw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX2NvbmZpZ19yZXEoc3Ry
-dWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAKIHVubG9jazoKIAlsMmNhcF9jaGFuX3VubG9jayhjaGFu
-KTsKKwlsMmNhcF9jaGFuX3B1dChjaGFuKTsKIAlyZXR1cm4gZXJyOwogfQogCkBAIC00NTc4LDYg
-KzQ1ODQsNyBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9jb25maWdfcnNwKHN0cnVjdCBsMmNh
-cF9jb25uICpjb25uLAogCiBkb25lOgogCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOworCWwyY2Fw
-X2NoYW5fcHV0KGNoYW4pOwogCXJldHVybiBlcnI7CiB9CiAKQEAgLTUzMDUsNiArNTMxMiw3IEBA
-IHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX21vdmVfY2hhbm5lbF9yZXEoc3RydWN0IGwyY2FwX2Nv
-bm4gKmNvbm4sCiAJbDJjYXBfc2VuZF9tb3ZlX2NoYW5fcnNwKGNoYW4sIHJlc3VsdCk7CiAKIAls
-MmNhcF9jaGFuX3VubG9jayhjaGFuKTsKKwlsMmNhcF9jaGFuX3B1dChjaGFuKTsKIAogCXJldHVy
-biAwOwogfQpAQCAtNTM5Nyw2ICs1NDA1LDcgQEAgc3RhdGljIHZvaWQgbDJjYXBfbW92ZV9jb250
-aW51ZShzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwgdTE2IGljaWQsIHUxNiByZXN1bHQpCiAJfQog
-CiAJbDJjYXBfY2hhbl91bmxvY2soY2hhbik7CisJbDJjYXBfY2hhbl9wdXQoY2hhbik7CiB9CiAK
-IHN0YXRpYyB2b2lkIGwyY2FwX21vdmVfZmFpbChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwgdTgg
-aWRlbnQsIHUxNiBpY2lkLApAQCAtNTQ4OSw2ICs1NDk4LDcgQEAgc3RhdGljIGludCBsMmNhcF9t
-b3ZlX2NoYW5uZWxfY29uZmlybShzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwKIAlsMmNhcF9zZW5k
-X21vdmVfY2hhbl9jZm1fcnNwKGNvbm4sIGNtZC0+aWRlbnQsIGljaWQpOwogCiAJbDJjYXBfY2hh
-bl91bmxvY2soY2hhbik7CisJbDJjYXBfY2hhbl9wdXQoY2hhbik7CiAKIAlyZXR1cm4gMDsKIH0K
-QEAgLTU1MjQsNiArNTUzNCw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX21vdmVfY2hhbm5l
-bF9jb25maXJtX3JzcChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwKIAl9CiAKIAlsMmNhcF9jaGFu
-X3VubG9jayhjaGFuKTsKKwlsMmNhcF9jaGFuX3B1dChjaGFuKTsKIAogCXJldHVybiAwOwogfQpA
-QCAtNTg5NiwxMiArNTkwNywxMSBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9sZV9jcmVkaXRz
-KHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCWlmIChjcmVkaXRzID4gbWF4X2NyZWRpdHMpIHsK
-IAkJQlRfRVJSKCJMRSBjcmVkaXRzIG92ZXJmbG93Iik7CiAJCWwyY2FwX3NlbmRfZGlzY29ubl9y
-ZXEoY2hhbiwgRUNPTk5SRVNFVCk7Ci0JCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOwogCiAJCS8q
-IFJldHVybiAwIHNvIHRoYXQgd2UgZG9uJ3QgdHJpZ2dlciBhbiB1bm5lY2Vzc2FyeQogCQkgKiBj
-b21tYW5kIHJlamVjdCBwYWNrZXQuCiAJCSAqLwotCQlyZXR1cm4gMDsKKwkJZ290byB1bmxvY2s7
-CiAJfQogCiAJY2hhbi0+dHhfY3JlZGl0cyArPSBjcmVkaXRzOwpAQCAtNTkxMiw3ICs1OTIyLDkg
-QEAgc3RhdGljIGlubGluZSBpbnQgbDJjYXBfbGVfY3JlZGl0cyhzdHJ1Y3QgbDJjYXBfY29ubiAq
-Y29ubiwKIAlpZiAoY2hhbi0+dHhfY3JlZGl0cykKIAkJY2hhbi0+b3BzLT5yZXN1bWUoY2hhbik7
-CiAKK3VubG9jazoKIAlsMmNhcF9jaGFuX3VubG9jayhjaGFuKTsKKwlsMmNhcF9jaGFuX3B1dChj
-aGFuKTsKIAogCXJldHVybiAwOwogfQpAQCAtNzU5OCw2ICs3NjEwLDcgQEAgc3RhdGljIHZvaWQg
-bDJjYXBfZGF0YV9jaGFubmVsKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLCB1MTYgY2lkLAogCiBk
-b25lOgogCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOworCWwyY2FwX2NoYW5fcHV0KGNoYW4pOwog
-fQogCiBzdGF0aWMgdm9pZCBsMmNhcF9jb25sZXNzX2NoYW5uZWwoc3RydWN0IGwyY2FwX2Nvbm4g
-KmNvbm4sIF9fbGUxNiBwc20sCi0tIAoyLjM1LjMKCg==
---0000000000003610eb05e3121524--
