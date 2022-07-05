@@ -2,86 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FC6C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 18:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEBCDC43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 18:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232380AbiGESig (ORCPT
+        id S232958AbiGESjR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 14:38:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43772 "EHLO
+        Tue, 5 Jul 2022 14:39:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231959AbiGESif (ORCPT
+        with ESMTP id S232817AbiGESjP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 14:38:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89521EEDA;
-        Tue,  5 Jul 2022 11:38:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 845C8619AF;
-        Tue,  5 Jul 2022 18:38:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C2D4C341C7;
-        Tue,  5 Jul 2022 18:38:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657046310;
-        bh=n2FYaXwhaELmE4/t8hrvpE36wLbFiYnyvmWCIE9/OT0=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=YKfgh9MyAL+9CBQfpaOE+UB1LSJQLgBgwHWdRGvkoHxvwP9EJSy6b5CXBuLiZ3TQw
-         HTvhCWnI7sgMKN+MenLlrM5UVl1oI8GNAZfaRV+Ib42fHvfyG3gl/MtZoBYioNxSN+
-         aIBppKadfHO59uKDyPjluq5Sz2LSwAekL00+ws7cG+zPsYvkBiYYoSBswmCLKByrwk
-         +o3zyar4Urcc7rcBwLta2r3mMBMrPuH9vx4cO/AntFdevfIR4sI15lyAgdnBgMezZf
-         nn4aoFk4HN0QXg51XZag0l0Z+QnjzT72qgd8ht5nbXF3GBewgoIrMER11nLUYn1mQg
-         o0sNESu7IZVHQ==
-Date:   Tue, 5 Jul 2022 11:38:29 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Francesco Dolcini <francesco.dolcini@toradex.com>,
-        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tue, 5 Jul 2022 14:39:15 -0400
+Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880E21F2C4
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 11:39:02 -0700 (PDT)
+Received: (wp-smtpd smtp.tlen.pl 8985 invoked from network); 5 Jul 2022 20:38:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
+          t=1657046338; bh=WWwtFu5inTGYYHR/P6xpZs+1V1TpiM1KVqGs6QWQJP4=;
+          h=Subject:To:Cc:From;
+          b=r0ig7VGT6CmM+AW0kQSIPZOUUY77GPXcRzY9cQdeZwaExr8ASpSw++z4W5Unf3viy
+           CLf5mkqTzrRMI38RuY14xKAhN68AZj60y1VKq9h0U00kTHtEGbtc9HBP8iPtJ20BPr
+           9QjNzQh3HO288IrQ18p9/CLeXcx69+NezqM3jLl0=
+Received: from aafi210.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.138.210])
+          (envelope-sender <mat.jonczyk@o2.pl>)
+          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
+          for <vasyl.vavrychuk@opensynergy.com>; 5 Jul 2022 20:38:58 +0200
+Message-ID: <494b21fb-896e-5c80-ff53-b5f914663736@o2.pl>
+Date:   Tue, 5 Jul 2022 20:38:48 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0
+Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to
+ `cancel_work_sync(&hdev->power_on)` from hci_power_on_sync.
+Content-Language: en-GB
+To:     Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org,
         Max Krummenacher <max.oss.09@gmail.com>,
-        Mateusz =?UTF-8?B?Sm/FhGN6eWs=?= <mat.jonczyk@o2.pl>,
+        Francesco Dolcini <francesco.dolcini@toradex.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        max.krummenacher@toradex.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        max.krummenacher@toradex.com
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Paolo Abeni <pabeni@redhat.com>,
         Eric Dumazet <edumazet@google.com>
-Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to
- `cancel_work_sync(&hdev->power_on)` from hci_power_on_sync.
-Message-ID: <20220705113829.4af55980@kernel.org>
-In-Reply-To: <CABBYNZJDkmU_Fgfszrau9CK6DSQM2xGaGwfVyVkjNo7MVtBd8w@mail.gmail.com>
 References: <20220614181706.26513-1-max.oss.09@gmail.com>
-        <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
-        <20220705151446.GA28605@francesco-nb.int.toradex.com>
-        <CABBYNZJDkmU_Fgfszrau9CK6DSQM2xGaGwfVyVkjNo7MVtBd8w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+ <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
+From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
+In-Reply-To: <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-WP-MailID: ea507a630c026762668487bc76baf600
+X-WP-AV: skaner antywirusowy Poczty o2
+X-WP-SPAM: NO 000000A [IRNk]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 5 Jul 2022 10:26:08 -0700 Luiz Augusto von Dentz wrote:
-> On Tue, Jul 5, 2022 at 8:14 AM Francesco Dolcini
-> <francesco.dolcini@toradex.com> wrote:
-> >
-> > Hello Vasyl,
-> >
-> > On Tue, Jul 05, 2022 at 03:59:31PM +0300, Vasyl Vavrychuk wrote:  
-> > > Fixes: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")  
-> >
-> > This fixes tag is broken, dd06ed7ad057 does not exist on
-> > torvalds/master, and the `commit` word should be removed.
-> >
-> > Should be:
-> >
-> > Fixes: ff7f2926114d ("Bluetooth: core: Fix missing power_on work cancel on HCI close")  
-> 
-> Ive rebased the patch on top of bluetooth-next and fixed the hash,
-> lets see if passes CI I might just go ahead and push it.
+W dniu 5.07.2022 o 14:59, Vasyl Vavrychuk pisze:
+> `cancel_work_sync(&hdev->power_on)` was moved to hci_dev_close_sync in
+> commit [1] to ensure that power_on work is canceled after HCI interface
+> down.
+>
+> But, in certain cases power_on work function may call hci_dev_close_sync
+> itself: hci_power_on -> hci_dev_do_close -> hci_dev_close_sync ->
+> cancel_work_sync(&hdev->power_on), causing deadlock. In particular, this
+> happens when device is rfkilled on boot. To avoid deadlock, move
+> power_on work canceling out of hci_dev_do_close/hci_dev_close_sync.
+>
+> Deadlock introduced by commit [1] was reported in [2,3] as broken
+> suspend. Suspend did not work because `hdev->req_lock` held as result of
+> `power_on` work deadlock. In fact, other BT features were not working.
+> It was not observed when testing [1] since it was verified without
+> rfkill in place.
+>
+> NOTE: It is not needed to cancel power_on work from other places where
+> hci_dev_do_close/hci_dev_close_sync is called in case:
+> * Requests were serialized due to `hdev->req_workqueue`. The power_on
+> work is first in that workqueue.
+> * hci_rfkill_set_block which won't close device anyway until HCI_SETUP
+> is on.
+> * hci_sock_release which runs after hci_sock_bind which ensures
+> HCI_SETUP was cleared.
+>
+> As result, behaviour is the same as in pre-dd06ed7 commit, except
+> power_on work cancel added to hci_dev_close.
+>
+> [1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> [2]: https://lore.kernel.org/lkml/20220614181706.26513-1-max.oss.09@gmail.com/
+> [2]: https://lore.kernel.org/lkml/1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl/
+>
+> Fixes: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+> Reported-by: Max Krummenacher <max.krummenacher@toradex.com>
+> Reported-by: Mateusz Jonczyk <mat.jonczyk@o2.pl>
 
-Thanks for pushing it along, the final version can got thru bluetooth ->
--> net and into 5.19, right?
+Works well: suspend (with bluetooth on and also off), hibernation, sending files, rfkill.
+
+Thank you.
+
+Reported-and-tested-by: Mateusz Jończyk <mat.jonczyk@o2.pl>
+
+Greetings,
+
+Mateusz Jończyk
+
