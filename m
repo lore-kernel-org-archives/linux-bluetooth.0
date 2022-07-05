@@ -2,92 +2,160 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2DB6CCA47B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 14:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDDBCCA47F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 14:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233511AbiGEOPo (ORCPT
+        id S231731AbiGEORw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 10:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40576 "EHLO
+        Tue, 5 Jul 2022 10:17:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233491AbiGEOP1 (ORCPT
+        with ESMTP id S232908AbiGEORR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 10:15:27 -0400
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8D9B21A3;
-        Tue,  5 Jul 2022 07:09:57 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id z21so20689480lfb.12;
-        Tue, 05 Jul 2022 07:09:57 -0700 (PDT)
+        Tue, 5 Jul 2022 10:17:17 -0400
+Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE319235;
+        Tue,  5 Jul 2022 07:12:55 -0700 (PDT)
+Received: by mail-lf1-x131.google.com with SMTP id f39so20791615lfv.3;
+        Tue, 05 Jul 2022 07:12:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=mkpYMkRu/76pOOu+MHLe2oZToj5Yt5Dx7rgEtnCdrPQ=;
-        b=IKQoY/My2mvs2KygiBq4kvXiSv0KM+0Qeikhdsnx5XPID6cmubAFjIW0/HaD7POAY5
-         SsmKNSvgWfWg6VjKuWxZuE+KQS8WhIoy/i6vIWMrshxduSxnHjtRKOr5UkQttb5McMea
-         ki4r58st9mM8U7P/rRgKEw9QYn4mbhKQQ4DNcb8hL9HfvZEmVGjs+i8XWY1eE2jGOfOW
-         iYofhYXGteHTKOOSQNUopEfeMGP/9VR9FFZdu47Z6nPqeMtuVt1aTtAAPSij6x+IPXlA
-         ObmXDPU7XjGGtZQDYl501/GRpe00ttnaam5qB2wVso11bT+Pnp4Mw23E+f6j+1qWpXNj
-         /juA==
+         :cc;
+        bh=oyeclLFZhGs7UcPSZg23Ramue8jnRUpUIOwptQLH1Io=;
+        b=VGlelE8yDbqD+DKIKudaPJvE+DeQMn3wB93n5X+mEpDz6bzLthw17F18OJE7U/oP0D
+         DRoOiiPWe4toIuvS5cXGksNfMOPMeb3m3HN9YDVQ1LaW1ldaIbKDOgu36tUcvUZh6/+u
+         Zz1uQdHkEJIdRR0cIcYXdICuNyyrzoiytw1DBSPmhiLH8oAFJsRFceWafDEnFMZ5FOeF
+         +FZF3eyFDn8ZaMg6d6f5/11gZ9/4BsJeGr9Qqc4j4GjagTVV2A9iLGOUcQ5pCyQiHVnm
+         N4cDffKQlEEIu49zR31b3aA7cqRM3Z/kSZe+Q3B9kTSP+VTTvzSMe2ZbMTw0yuKN5b3Y
+         7goA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=mkpYMkRu/76pOOu+MHLe2oZToj5Yt5Dx7rgEtnCdrPQ=;
-        b=v58n3HVTQKtJbJsT0sBd/4cmBZ845aIbtkWWeuN7zrTCeVgEgNiiQDgMaCIaFRtlVI
-         96QyxPY9ihYaYMXpyFuTx4dcGNC9ORe2D2LQQDsmFL87+GAMXj9zj0h/9et/LRdS0TZE
-         8fdmXtUPl6IWbPvz2ksl/nK+WwEKZWHQAj6sP5n1kgnuORtgiKGaGyzrIWLQwmQhlHnc
-         Ay4T+9lB/fK+ndNCr13+/f8JTP6+RYBHXMXy62pJG3Ppdm2y4QWzh6Kb4eNLU0aQTSl0
-         dzrd+OOKh6qZsMIHuUogVyxIOMvBkWcPUvHS6D2/4+hXQahu8yo/7MhtZyngZZ1x6nBR
-         W78w==
-X-Gm-Message-State: AJIora/eq8FjRXGmH/Lhd+qriVPogirKZZXXWET5bM9rKJkc3hUNtzyv
-        mFc4O6PpTz8HDnutesco4K5BT5ESNF/PfDx0pWw=
-X-Google-Smtp-Source: AGRyM1tSIs7PI67WcqIU/JRHnYrMgswH/xmh7JqI+2SJSmBmNqBBi68lT4gRWIzylYRqVXC5Pn0RPBLpngzyVN3P5uw=
-X-Received: by 2002:a05:6512:b14:b0:482:a9b1:ea3 with SMTP id
- w20-20020a0565120b1400b00482a9b10ea3mr9893588lfu.353.1657030195926; Tue, 05
- Jul 2022 07:09:55 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=oyeclLFZhGs7UcPSZg23Ramue8jnRUpUIOwptQLH1Io=;
+        b=zCUGBvSvkCIYVrq63dKA+KkvgTtO1wQdNySAU0rrXmkBMoSkfFy3vk6K1T1rx9Cpf1
+         jm6U7etUoY5viZFihiYOd8kw96dp3dszUH59x5it2SlUp/3yRyFj+HNzvK5f9gzAkZlh
+         oVDboVvkbri0UUqYhVphCl8gnYthiSjO32y2POWlnrHtng25xVYpvLcmpsvx7NBtogTj
+         dRhDVQD7nyqrpcShcPEI+YUvCify3CNcoxcstvCA0Ur1TOQsCT440PPIY/HMLg2JYpGE
+         WItAkS+orYO5hICfLtC3unYXfBRld92y9DtXF6EzKrYzyNZjM+exJgT9n0i6Kh8rrx4y
+         ZGHg==
+X-Gm-Message-State: AJIora81HViDBEsCDu0xdNpIyKTr5BJ2FR+DVyi2PpYL9CcMQy6tK42x
+        pQMTV2jypWdBRdYxsx7MeuzlAyLYqkGvhxERF0U=
+X-Google-Smtp-Source: AGRyM1vH3GybcpyJQODfunZbTC1eaVMg/RZHlTCu27cJXX7YAwLol2URLo0KM+OLvegbCy4h7bRwHLhdDpR0v38M0a8=
+X-Received: by 2002:a05:6512:12c9:b0:480:3b03:a0bc with SMTP id
+ p9-20020a05651212c900b004803b03a0bcmr22184083lfg.381.1657030372741; Tue, 05
+ Jul 2022 07:12:52 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220614181706.26513-1-max.oss.09@gmail.com> <1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl>
-In-Reply-To: <1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl>
+References: <20220614181706.26513-1-max.oss.09@gmail.com> <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
+In-Reply-To: <20220705125931.3601-1-vasyl.vavrychuk@opensynergy.com>
 From:   Max Krummenacher <max.oss.09@gmail.com>
-Date:   Tue, 5 Jul 2022 16:09:44 +0200
-Message-ID: <CAEHkU3VEg=LU6U-rB6HWGy59=jZJkUe_qW5faLi+Xx4Ka+i5qg@mail.gmail.com>
-Subject: Re: [PATCH v1] Revert "Bluetooth: core: Fix missing power_on work
- cancel on HCI close"
-To:     =?UTF-8?Q?Mateusz_Jo=C5=84czyk?= <mat.jonczyk@o2.pl>
-Cc:     Max Krummenacher <max.krummenacher@toradex.com>,
-        Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
+Date:   Tue, 5 Jul 2022 16:12:41 +0200
+Message-ID: <CAEHkU3XGEgRzG8pRW30BJhw6CMTPNJX1K8bLiEkoXpp19A6FHA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: core: Fix deadlock due to `cancel_work_sync(&hdev->power_on)`
+ from hci_power_on_sync.
+To:     Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Francesco Dolcini <francesco.dolcini@toradex.com>,
+        =?UTF-8?Q?Mateusz_Jo=C5=84czyk?= <mat.jonczyk@o2.pl>,
         Jakub Kicinski <kuba@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Max Krummenacher <max.krummenacher@toradex.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
+        "David S. Miller" <davem@davemloft.net>,
         Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
+        Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jul 4, 2022 at 9:57 PM Mateusz Jo=C5=84czyk <mat.jonczyk@o2.pl> wro=
-te:
+On Tue, Jul 5, 2022 at 3:00 PM Vasyl Vavrychuk
+<vasyl.vavrychuk@opensynergy.com> wrote:
 >
-> W dniu 14.06.2022 o 20:17, Max Krummenacher pisze:
-> > From: Max Krummenacher <max.krummenacher@toradex.com>
-> >
-> > This reverts commit ff7f2926114d3a50f5ffe461a9bce8d761748da5.
-> >
-> > The commit ff7f2926114d ("Bluetooth: core: Fix missing power_on work
-> > cancel on HCI close") introduced between v5.18 and v5.19-rc1 makes
-> > going to suspend freeze. v5.19-rc2 is equally affected.
+> `cancel_work_sync(&hdev->power_on)` was moved to hci_dev_close_sync in
+> commit [1] to ensure that power_on work is canceled after HCI interface
+> down.
+>
+> But, in certain cases power_on work function may call hci_dev_close_sync
+> itself: hci_power_on -> hci_dev_do_close -> hci_dev_close_sync ->
+> cancel_work_sync(&hdev->power_on), causing deadlock. In particular, this
+> happens when device is rfkilled on boot. To avoid deadlock, move
+> power_on work canceling out of hci_dev_do_close/hci_dev_close_sync.
+>
+> Deadlock introduced by commit [1] was reported in [2,3] as broken
+> suspend. Suspend did not work because `hdev->req_lock` held as result of
+> `power_on` work deadlock. In fact, other BT features were not working.
+> It was not observed when testing [1] since it was verified without
+> rfkill in place.
+>
+> NOTE: It is not needed to cancel power_on work from other places where
+> hci_dev_do_close/hci_dev_close_sync is called in case:
+> * Requests were serialized due to `hdev->req_workqueue`. The power_on
+> work is first in that workqueue.
+> * hci_rfkill_set_block which won't close device anyway until HCI_SETUP
+> is on.
+> * hci_sock_release which runs after hci_sock_bind which ensures
+> HCI_SETUP was cleared.
+>
+> As result, behaviour is the same as in pre-dd06ed7 commit, except
+> power_on work cancel added to hci_dev_close.
+>
+> [1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> [2]: https://lore.kernel.org/lkml/20220614181706.26513-1-max.oss.09@gmail.com/
+> [2]: https://lore.kernel.org/lkml/1236061d-95dd-c3ad-a38f-2dae7aae51ef@o2.pl/
+>
+> Fixes: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+> Signed-off-by: Vasyl Vavrychuk <vasyl.vavrychuk@opensynergy.com>
+> Reported-by: Max Krummenacher <max.krummenacher@toradex.com>
+> Reported-by: Mateusz Jonczyk <mat.jonczyk@o2.pl>
+> ---
+>  net/bluetooth/hci_core.c | 3 +++
+>  net/bluetooth/hci_sync.c | 1 -
+>  2 files changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 59a5c1341c26..a0f99baafd35 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -571,6 +571,7 @@ int hci_dev_close(__u16 dev)
+>                 goto done;
+>         }
+>
+> +       cancel_work_sync(&hdev->power_on);
+>         if (hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF))
+>                 cancel_delayed_work(&hdev->power_off);
+>
+> @@ -2675,6 +2676,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+>         list_del(&hdev->list);
+>         write_unlock(&hci_dev_list_lock);
+>
+> +       cancel_work_sync(&hdev->power_on);
+> +
+>         hci_cmd_sync_clear(hdev);
+>
+>         if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks))
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 286d6767f017..1739e8cb3291 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -4088,7 +4088,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
+>
+>         bt_dev_dbg(hdev, "");
+>
+> -       cancel_work_sync(&hdev->power_on);
+>         cancel_delayed_work(&hdev->power_off);
+>         cancel_delayed_work(&hdev->ncmd_timer);
+>
+> --
+> 2.30.2
+>
 
-The following follow up commit fixes the issue for me without the revert.
-https://lore.kernel.org/all/20220705125931.3601-1-vasyl.vavrychuk@opensyner=
-gy.com/
+This fixes the issue I described in [1]. I.e. The kernel no longer
+freezes while going to suspend.
+Tested-by: Max Krummenacher <max.krummenacher@toradex.com>
 
-Thanks
+Thanks!
 Max
