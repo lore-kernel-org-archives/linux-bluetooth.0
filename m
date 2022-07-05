@@ -2,86 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2B0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 17:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2784C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Jul 2022 18:20:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbiGERq0 (ORCPT
+        id S230074AbiGESU3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Jul 2022 13:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36280 "EHLO
+        Tue, 5 Jul 2022 14:20:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbiGERqY (ORCPT
+        with ESMTP id S229456AbiGESU2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Jul 2022 13:46:24 -0400
-Received: from smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEE91BEAB
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 10:46:23 -0700 (PDT)
-Received: from github.com (hubbernetes-node-559464a.ash1-iad.github.net [10.56.224.28])
-        by smtp.github.com (Postfix) with ESMTPA id EE3575E0AAB
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 10:46:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1657043182;
-        bh=Iu9pdYep8Du9Of8DrthTzK5btpY68DKjkOQy6Y6FrUA=;
-        h=Date:From:To:Subject:From;
-        b=dBBx4Z2NCdktmveWw9gtoBfZoMfu3E4Uc5HmlDJsK6YJSbqKoQ/CfzQew42DGBx7Y
-         M1DvpSM8oZLtMpqdJEjKL4LeUTE3To6zjjQ2Lc3VW2ro3/f2WkoYjS4Hx83pmG7cn0
-         pgsTmY1MIQ+fqJk4hw3oT5Q3pfmPEULlY8933h2M=
-Date:   Tue, 05 Jul 2022 10:46:22 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/575778-e681fa@github.com>
-Subject: [bluez/bluez] 6270ad: client: Fix build warning
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 5 Jul 2022 14:20:28 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B620F1408B
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Jul 2022 11:20:26 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id u20so11887447iob.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Jul 2022 11:20:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=8nwCtKEovSswwjhDZQ7mWaEO/0exoCee83qQoxYOe0Y=;
+        b=RNWsz06ogSx8FeuEBf2mYSiFahu1bBjv1zH1F5u3Ef40Q+7p4qUY0kBN5SgNLkAWw/
+         SeYzDbW8QTpBl/L4AfdcpF1gBM0+D1GJCMcJk5RUEVOSTPqxXh6YEXK61hgNwvuAt7xo
+         pzPxBlgCz4cj9MjoPRjWqW5H1Dhm7HQJ62dDQGoSp1tZUCNz5RCTcmRDRNuQaVSk3uVM
+         SeDurM9kuMEPU3aN4wUyDhjYsM2aUh/3TeXgPJRw4j/hXGqXDuKNAmSfXALrLArdCEew
+         WfHHyV8VPZQxlg7teVgVYkbvXymCUgwJ/iJZL/R1JG0Tzav8hoe8iGY5aTngJqM+sYWt
+         vmmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=8nwCtKEovSswwjhDZQ7mWaEO/0exoCee83qQoxYOe0Y=;
+        b=NDFEZOHwQFwRWns86NfrsFoxLUucEfXKwkdDP+noHFj4hwPX/bNAlFHlxwsKbKw0hV
+         d6Lfp5I8TckL3B9kn37KxIwnTTBfCxUn8i8PVgAn2xMgEY8lqxUyRLPDpeuJxu5iE1+Q
+         ItvnW79wYxpaNBiQIVbYs6W63j4WuYCs849JfGYKa4r8600ufLeU0HQjKJaYM1mwBD7s
+         9dHrNU7MDM6yfY6mTQaqn0acaZfpgho78y0ZwcK7aQLKxPeqRdaAOw3pa5Pa9zw5uWdk
+         f3gdm0WobLfOSKCu7w3nL+k0bwKIT6lGWCPsH8x41/iSyCkgG7uC+ckDtkQk7vwqx+E3
+         Lfyg==
+X-Gm-Message-State: AJIora+GzQnEYGiaCL2EACo6SV5SHOmhIl4+p7e4HOz0s/YDM3srnmH3
+        9m4nElan1p4Ui9TopS7XYcNEE8XK9ro=
+X-Google-Smtp-Source: AGRyM1tZnGfFIV/aYL420BQz0S4ZbdKSYmDob9cdnCtl0XUDthRgKWQljD2zwHzsJvZzQdMERr6Wjw==
+X-Received: by 2002:a05:6602:1355:b0:63d:a9ab:7e30 with SMTP id i21-20020a056602135500b0063da9ab7e30mr20128064iov.119.1657045225769;
+        Tue, 05 Jul 2022 11:20:25 -0700 (PDT)
+Received: from [172.17.0.2] ([13.89.44.111])
+        by smtp.gmail.com with ESMTPSA id m18-20020a056638409200b0033ed4aa6ab1sm2718120jam.93.2022.07.05.11.20.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Jul 2022 11:20:25 -0700 (PDT)
+Message-ID: <62c480e9.1c69fb81.b96e9.2f1a@mx.google.com>
+Date:   Tue, 05 Jul 2022 11:20:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0269673463146966855=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: core: Fix deadlock on hci_power_on_sync.
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220705172501.1610923-1-luiz.dentz@gmail.com>
+References: <20220705172501.1610923-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master=0D
-  Home:   https://github.com/bluez/bluez=0D
-  Commit: 6270ad35b2f7b71dbc0a76b825f2f3ca07f936d2=0D
-      https://github.com/bluez/bluez/commit/6270ad35b2f7b71dbc0a76b825f2f=
-3ca07f936d2=0D
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
-  Date:   2022-07-05 (Tue, 05 Jul 2022)=0D
-=0D
-  Changed paths:=0D
-    M client/player.c=0D
-=0D
-  Log Message:=0D
-  -----------=0D
-  client: Fix build warning=0D
-=0D
-This fixes the following build warning:=0D
-=0D
-      warning: =E2=80=98g_memdup=E2=80=99 is deprecated: Use 'g_memdup2' =
-instead=0D
-      [-Wdeprecated-declarations]=0D
-=0D
-=0D
-  Commit: e681fae6bcceb73ebab16e6f8c4eabd6265dd40f=0D
-      https://github.com/bluez/bluez/commit/e681fae6bcceb73ebab16e6f8c4ea=
-bd6265dd40f=0D
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>=0D
-  Date:   2022-07-05 (Tue, 05 Jul 2022)=0D
-=0D
-  Changed paths:=0D
-    M monitor/att.c=0D
-=0D
-  Log Message:=0D
-  -----------=0D
-  monitor: Fix build error in some targets=0D
-=0D
-This fixes the following error:=0D
-=0D
-monitor/att.c: In function 'print_attribute':=0D
-monitor/att.c:1850:35: error: lvalue required as unary '&' operand=0D
-                 print_uuid(label, &cpu_to_le16(uuid->value.u16), 2);=0D
-=0D
-=0D
-Compare: https://github.com/bluez/bluez/compare/575778a45f84...e681fae6bc=
-ce=0D
+--===============0269673463146966855==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=656752
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.57 seconds
+GitLint                       FAIL      0.78 seconds
+SubjectPrefix                 PASS      0.80 seconds
+BuildKernel                   PASS      31.82 seconds
+BuildKernel32                 PASS      27.22 seconds
+Incremental Build with patchesPASS      40.95 seconds
+TestRunner: Setup             PASS      466.79 seconds
+TestRunner: l2cap-tester      PASS      16.42 seconds
+TestRunner: bnep-tester       PASS      5.59 seconds
+TestRunner: mgmt-tester       PASS      95.09 seconds
+TestRunner: rfcomm-tester     PASS      9.00 seconds
+TestRunner: sco-tester        PASS      8.75 seconds
+TestRunner: smp-tester        PASS      8.95 seconds
+TestRunner: userchan-tester   PASS      5.74 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.57 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+Bluetooth: core: Fix deadlock on hci_power_on_sync.\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#108: 
+[1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: unsaf ("ace/src' is owned by someone else)")'
+#108: 
+[1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")
+
+total: 1 errors, 1 warnings, 0 checks, 22 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12906901.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL - 0.78 seconds
+Run gitlint with rule in .gitlint
+Bluetooth: core: Fix deadlock on hci_power_on_sync.
+1: T3 Title has trailing punctuation (.): "Bluetooth: core: Fix deadlock on hci_power_on_sync."
+33: B1 Line exceeds max length (91>80): "[1]: commit dd06ed7ad057 ("Bluetooth: core: Fix missing power_on work cancel on HCI close")"
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0269673463146966855==--
