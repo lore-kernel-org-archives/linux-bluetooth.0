@@ -2,377 +2,187 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFCA9C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jul 2022 20:58:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A29C6C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Jul 2022 22:23:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234359AbiGFU6n (ORCPT
+        id S234207AbiGFWXp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Jul 2022 16:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59356 "EHLO
+        Wed, 6 Jul 2022 18:23:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbiGFU6m (ORCPT
+        with ESMTP id S234184AbiGFWXo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Jul 2022 16:58:42 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AD613FAA;
-        Wed,  6 Jul 2022 13:58:40 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id j21so27943634lfe.1;
-        Wed, 06 Jul 2022 13:58:40 -0700 (PDT)
+        Wed, 6 Jul 2022 18:23:44 -0400
+Received: from mail2.multitech.com (mail2.multitech.com [65.126.90.11])
+        by lindbergh.monkeyblade.net (Postfix) with SMTP id C68C4248C3
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jul 2022 15:23:42 -0700 (PDT)
+Received: from mail2.multitech.com (localhost.localdomain [127.0.0.1])
+        by localhost (Email Security Appliance) with SMTP id E8C32585F2F_2C60B6DB
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jul 2022 22:23:41 +0000 (GMT)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2108.outbound.protection.outlook.com [104.47.55.108])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client CN "mail.protection.outlook.com", Issuer "DigiCert Cloud Services CA-1" (verified OK))
+        by mail2.multitech.com (Sophos Email Appliance) with ESMTPS id 09F09585F05_2C60B6DF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Jul 2022 22:23:41 +0000 (GMT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fcmEnFcWZ+Fy7QYgcieqiYWrJZ8UDb18o5FkoNOvwJQu4oC/YjF5Cwmi1Mon9fIECSg+zmfqTYD3iBwpS9R8SmgjAue02VzB3Y6Y1Ik2Jdbyo3XhhlYw4P1v1HDsUQMecaKpfPjiuL9XsWVBku5tkUmqstY5C44wxdK/kQIrb03LcowyY4zA62jYCHT4XkkZozPfEcuIF+XiOW0rEvIP4F2EvkA0GEqiLHBXEPp8byY5YrT0eh0a9RtdEJLsa0FiegMdwyxoLHb1nV00Um9jDcifk3eu7nU1h+k1YWSJ5YrOWAFwQkgZb/xshi+gi9gvQz5P37TD1kKfV3b+sOeSWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PoOiYjO+rGFTyq+P6mTzaWj/WlDs/m9esisDkq4g7wk=;
+ b=FYPzjac8BeElmVEEaxT8hETRy+xJiGmK21dt850/ZvFMIYou4OWMFZUPjlTBXDuGACfcgqzEiVcmwz1Ol75C68QGe90FphnXeI+KuDYNTULvLQOLXkfZhbx0rs8m8/c8kRd7yBuOzS6tCS2PAtYPEpLIb7QfFODSo3OdvAkAnYg0umqpVv0sB8083fMXEoHNkRc7yRUzFOB8v6oPs1BSCuvq96+jCocxpOere2MIdb074p+xtmXGT2Sbi0hv51kExtXUvXXlYg5IUqMjlQ2oBUx0C5ulWSKgwP6Uh6HFkOsGncPccZr6qVm1zJ2yQTaiMWrO7uI0RsoBtxhzzvqJoA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=multitech.com; dmarc=pass action=none
+ header.from=multitech.com; dkim=pass header.d=multitech.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C01ffpOgx4WvDOiZmitZs4G9/ytDkF+3lkhWoP9eI5Y=;
-        b=NDGh6xZkLxznP6/c1nBFBT7xOLTrBP28nYJEV3pRLdxcr45HQnbjLjziU7VWo56OIu
-         8WjTp+3BQ4POe6GXTi9uEM4UIc/vxicAagk3XMnNsdXJestHz/T0okwXDpg52HJBKquy
-         rbhubK7zXfcP6golFd6U4B81Y16RbMdqpmXqn6wWq3n3BrRE7pSdHVehWK6T74OxUV/S
-         PFssE2Mau6uOiBSBqsnAcL/6bXZbNhvbD+QEjUOuaOuKHEwj1ycrdSx1+6LSgGKxB/b4
-         h63lVnDk0u0TS2F/CIsZJZF0KXHvLb1FKG2xTZx3QL1gnJI/wkKhE9Z0KwOGjhIrch/6
-         50Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C01ffpOgx4WvDOiZmitZs4G9/ytDkF+3lkhWoP9eI5Y=;
-        b=0lEUknsJIs2TSZhhdcHhcnaKSiLUhmyBqMRDpat6ot0Yd59OdX9Gw7PazsH6vOEJkc
-         2ofheWpyF3ilC+uS84SbJ2b3QEcIdJtFVazxbzgM9dLBFDnh32z3nD8KyXxVgOElh7VE
-         UrMbifJ3ocz4lIzYFY3+dDm4XxoiwYiTb5Wpv74uKvqPvCZcWEdH2E2OYUlaa4HRI2Yt
-         6hJbrCk7M5+Ik1eQPj/j/F6JMsN6JZHva1NDPgUR4ZOqggNcrL1uU9LSLHTUeHuR83c7
-         80lQBWZknzyn1uyp4FlvPstWlkDpvKx+iWaIdZWppKreI7lZ/3BP+6z/qV4NqeFQt78i
-         BI2A==
-X-Gm-Message-State: AJIora+rwYj89o6G3OPSVNq69cXqyFGPxMrBMB6Kq+G6wjErJkfmUcf3
-        JF8qC6R1EwoeBcNg6hemTCVVbxODKopAmTKRbwM=
-X-Google-Smtp-Source: AGRyM1u3/bFPcIHtTv5VDMx/votS18IU995bwjeY7VxkjcAO/uO0fK8rC+SejQAP6rLKxuQXwrhOAyXInZAej42i3DQ=
-X-Received: by 2002:a05:6512:3b9f:b0:483:9ecc:6740 with SMTP id
- g31-20020a0565123b9f00b004839ecc6740mr7158535lfv.57.1657141119096; Wed, 06
- Jul 2022 13:58:39 -0700 (PDT)
+ d=multitechsystems.onmicrosoft.com;
+ s=selector1-multitechsystems-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PoOiYjO+rGFTyq+P6mTzaWj/WlDs/m9esisDkq4g7wk=;
+ b=AVFDFMbr/lh34NOsla4+PHXPOOylAuTJu0/vKApCZpP0/eklZbncogPDFlE4HYdnXCHpDjr08J9hvrw1DhhNfFaoHtykg8VpTaOGdLTT2gm/9cqJpc9ACcyJqpU0y/oVpTuHsi1d4OSoywtXn965lQqg75TuExqKaOGBtdZo3Ew=
+Received: from SJ0PR13MB5755.namprd13.prod.outlook.com (2603:10b6:a03:40e::15)
+ by CH0PR13MB5219.namprd13.prod.outlook.com (2603:10b6:610:fb::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5417.8; Wed, 6 Jul
+ 2022 22:23:38 +0000
+Received: from SJ0PR13MB5755.namprd13.prod.outlook.com
+ ([fe80::980d:52c2:2f5d:f4b2]) by SJ0PR13MB5755.namprd13.prod.outlook.com
+ ([fe80::980d:52c2:2f5d:f4b2%5]) with mapi id 15.20.5417.013; Wed, 6 Jul 2022
+ 22:23:38 +0000
+From:   John Klug <John.Klug@multitech.com>
+To:     Linux-Bluetooth MailingList <linux-bluetooth@vger.kernel.org>
+Subject: [BUG] Extended Scan Hangs
+Thread-Topic: [BUG] Extended Scan Hangs
+Thread-Index: AQHYkYPWWftWQokBQUOT5vMZZwl4BA==
+Date:   Wed, 6 Jul 2022 22:23:38 +0000
+Message-ID: <SJ0PR13MB5755B252BAE811BDFE22E3F7FE809@SJ0PR13MB5755.namprd13.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+suggested_attachment_session_id: 3be51df3-c9b3-279f-f8d3-f09679a870a8
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=multitech.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5d903a57-8655-4ca2-3777-08da5f9e2c98
+x-ms-traffictypediagnostic: CH0PR13MB5219:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 329h39Qf4KXAe/2FFlJC2L2yxasX0NwGNU1ZMROU1DseUpGr8p9qi9pVPvzFudTw2q68CYBQLe3sANhSnPtQki+pCYH7vs8YRsGYvXc25QOKlTzkrTrXbqlWXqWi5v5gKT3R8rttc7gphrpttd+g4+AzHqpL9GUgJBFAewyGhbvNU3CE/ntH5YMG5mVH7ckmIArNIJf3oD51SLtB/4sE+LjyXSWp6heJLaniy6VldlEYB4WvLqXqQwNWMS1laNPtsHfQqtSWHYieaGdS2mQaDGBena76OvYPwm4FnygKy7MNe7MFXh+uMhacBQtB/iBcZ66Grdhcchb2S0rsvBI9J7jJvM81OHan9lDuY/WLpn4dJFCDn+jwi/GQ/Nm43Ri88WsiWO2HEhyf/unRBROLdszEpR1irVPHS8eHP42YIJ18gwG85yuzt0ioen1d+Mjkk6TeaTkr6Qr7mu+8H7JG58rNxDgtx19VNFxiDUWt+ftVqgiOKvbQ5xB09QtreGWjW5XS1uR4YEp9bjOsfEcQCk1ZlHW4NPPtIx7+rD1YlrWmMoIqsJ4YDCED42fYJ6EEIM8WP24VZ1f1YvhLbHzWVFtaoGbNOK2l7VapA4hYVUvn3oxHE9husAJ8ZPZBW3tOTmGEHT0ecleALu9iqZDWT7l9qPELwZZXqCFICg52klIZ9H/9wfTxD3Vj3ofF8tYQbOwQAuBsqKJTDMWAzLqehdsVuomisGtC9eCMJkEfEDnCAs6Yll6PnddMyLA5DCw6LZRYG2vLl4NSqmschxurtgOxGfwA8KMk9uZCKlpPx89OvCFAvb69N2CC+boPs37s
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR13MB5755.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(366004)(396003)(376002)(39850400004)(136003)(346002)(41300700001)(2906002)(316002)(33656002)(38100700002)(8676002)(122000001)(66946007)(38070700005)(5660300002)(66476007)(66556008)(71200400001)(66446008)(186003)(55016003)(52536014)(26005)(7696005)(6506007)(9686003)(6916009)(8936002)(76116006)(91956017)(478600001)(86362001)(64756008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?/vh5ZAWaCJHcT5bblPd2oqB+jUIKnCx23hmysFFNe+2QxLI0buMrileHNg?=
+ =?iso-8859-1?Q?mwamV9pcxS/449FpOoXed/tGS0vCYozOcKuylMx5LQV83PWx0xcj/B2H2o?=
+ =?iso-8859-1?Q?LAPmeOHrgOMEPT92Z9FluBWiAZq1K1vj8uI2vh/hfVRJYcjuUBs0jVcJjO?=
+ =?iso-8859-1?Q?J8viRG8vkSSTQkiFyFO1JR/UPV6EELaqw1RAt0/zFTgYwA53/mdpr9hjrR?=
+ =?iso-8859-1?Q?TzgIvsPwLouov8x1kWzuh2vaNmA19pcognNSdkeR32/rFaXJtQRHmeFMo2?=
+ =?iso-8859-1?Q?sddH1vFmAEbSaOdKpjp0mWl/Raty6wOsg/DuqSRRDRf+zi2rNSTT3b78E4?=
+ =?iso-8859-1?Q?mz9wg6pT9wjoeK7OX0M8RHxlBgs03lMmXyUXj7RJUpduwAoC1I6pPl1zxh?=
+ =?iso-8859-1?Q?dvx1ETRAPv9m9jPM3euAWWnH7oILP20N9IIvVynJAZH1v9YDuqtwHfY71C?=
+ =?iso-8859-1?Q?VnGpWBlvd5x2FgEy2co45XLzy3QuMGlSzHMyZTaNHeWGmhW42RPwKyobz/?=
+ =?iso-8859-1?Q?99caC1G2mm837/Fk3zFtTzOIazbm7BtMDtXgCYthpkIIhLPT+LoJdBo8mO?=
+ =?iso-8859-1?Q?/0Jub0WtTpf5RgLOR7kdsaBolJj0nWtkQBkivrlo3m/JFQxO3u/Gqdom8o?=
+ =?iso-8859-1?Q?cioqFq7H8ruJcN8xqHjGT1e3JD/G0o/TfpuAjzo6FNiW9q3vuJsQCum2FN?=
+ =?iso-8859-1?Q?lu+62kqq+o/taQ/cv5342rqMl1vLKpYapXcUap1R5SBT11SnQTxeql2hPs?=
+ =?iso-8859-1?Q?Vj7NEoAk0MIJMyQ6ZeibXM7aU8QCLbAjZ6O/TCGVVfnyD1FMJiRlttLq/r?=
+ =?iso-8859-1?Q?CKTfVSnXWKiStghKQuYIfGyQXKhNtzkN5Ia67tnofnGm3SeKUumGFSk47s?=
+ =?iso-8859-1?Q?uQWSllQWtUYVj03MKUbi3hOXIjWd9adC4uHFWdSxF0ZcvH7h7CwbNwY5Om?=
+ =?iso-8859-1?Q?z5GH2RW07zXuWkv7dYlOMaJoxugrFaftuWsGuGEGPVp+LH23dcvTx+4oBO?=
+ =?iso-8859-1?Q?AoPjnaTxghYV03hCEl67xWWiHjpLA2Kv0hFaiYRaGmQxeIKK5jwMYkhPsA?=
+ =?iso-8859-1?Q?eQUjQEZJBQWiT9aNCFN0Nfb8DPeRCR5UTKmcmGiK5Ij34XhxpPsD44nmso?=
+ =?iso-8859-1?Q?qEGFJGbu/W425uQeEa5cutz3qdLoKAv6VOjEr+blfLvFUSswkrckXRbtVo?=
+ =?iso-8859-1?Q?PFLMuh+ePGo37UDcvrx+rZ5dODkE04NtgPt6TPrUoQQX9pnBYw8dIluI/B?=
+ =?iso-8859-1?Q?qEP9f8TYtWNkz88oDZ+k4DGMVo/fuKfLQA2ZstdjZQReFB4JpFTZVFarXa?=
+ =?iso-8859-1?Q?G3FGnPdXoxmwlg2fNLt3KFdEdCJ1PrSlJ+6Ye1BX0ZTA5lTDN9wLhn77h0?=
+ =?iso-8859-1?Q?Js0SEQhN6mwstq+S0U8kSWt3DgLl6iWTEtm82kaw+aMkbGp1cX9Hu8ls+r?=
+ =?iso-8859-1?Q?lJnSPU1bZ1sND4b0ke55mwlfk4l+9RnMR7l0rsAxWYpG+8/LGHxypjRTvk?=
+ =?iso-8859-1?Q?k/TfxIXsPuVVK+quCx0gnA8YlIF8boFzZATfomz9yoF/Qno0GPUXdVqFyX?=
+ =?iso-8859-1?Q?EgobjHMNrXqL4ENax2ZTCGrfGuLCjy9JClM7/2eyWD3hWqUBAQo6JtvvDf?=
+ =?iso-8859-1?Q?K+sSyCmXXvwRE=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20220622082716.478486-1-lee.jones@linaro.org> <CANn89iK-uFP6Swgc0ZeEC38UsuywJ3wbybSNouH202Wa7X7Tzg@mail.gmail.com>
- <CABBYNZ+C=MQ7577Fr5_W8tQ4iWRSDBSiC4fkRBY3x=9ph+YAzA@mail.gmail.com>
- <CABBYNZLysdh3NFK+G8=NUQ=G=hvS8X0PdMp=bVqiwPDPCAokmg@mail.gmail.com>
- <YrxvgIiWuFVlXBaQ@google.com> <CABBYNZJFSxk9=3Gj7jOj__s=iJGmhrZ=CA7Mb74_-Y0sg+N40g@mail.gmail.com>
- <YsVptCjpzHjR8Scv@google.com> <CABBYNZKvVKRRdWnX3uFWdTXJ_S+oAj6z72zgyV148VmFtUnPpA@mail.gmail.com>
-In-Reply-To: <CABBYNZKvVKRRdWnX3uFWdTXJ_S+oAj6z72zgyV148VmFtUnPpA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 6 Jul 2022 13:58:27 -0700
-Message-ID: <CABBYNZLTzW3afEPVfg=uS=xsPP-JpW6UBp6W=Urhhab+ai+dcA@mail.gmail.com>
-Subject: Re: [RESEND 1/1] Bluetooth: Use chan_list_lock to protect the whole
- put/destroy invokation
-To:     Lee Jones <lee.jones@linaro.org>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, stable@kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="000000000000bf4c2605e3293b50"
+X-OriginatorOrg: multitech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR13MB5755.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d903a57-8655-4ca2-3777-08da5f9e2c98
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2022 22:23:38.3678
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: f802e804-804f-4d1e-b625-870b4d57fd00
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: R68WcfB/Wpo7FX5gCOy8wck61Fk6ubDoNVv7gAJunubyZci3Z+JpJmMgAXBjSdMwnehM6OHlpDXH7YinyXp55g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR13MB5219
+X-SASI-RCODE: 200
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---000000000000bf4c2605e3293b50
-Content-Type: text/plain; charset="UTF-8"
-
-Hi,
-
-On Wed, Jul 6, 2022 at 1:36 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Lee,
->
-> On Wed, Jul 6, 2022 at 3:53 AM Lee Jones <lee.jones@linaro.org> wrote:
-> >
-> > On Tue, 05 Jul 2022, Luiz Augusto von Dentz wrote:
-> >
-> > > Hi Lee,
-> > >
-> > > On Wed, Jun 29, 2022 at 8:28 AM Lee Jones <lee.jones@linaro.org> wrote:
-> > > >
-> > > > On Tue, 28 Jun 2022, Luiz Augusto von Dentz wrote:
-> > > >
-> > > > > Hi Eric, Lee,
-> > > > >
-> > > > > On Mon, Jun 27, 2022 at 4:39 PM Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Eric, Lee,
-> > > > > >
-> > > > > > On Mon, Jun 27, 2022 at 7:41 AM Eric Dumazet <edumazet@google.com> wrote:
-> > > > > > >
-> > > > > > > On Wed, Jun 22, 2022 at 10:27 AM Lee Jones <lee.jones@linaro.org> wrote:
-> > > > > > > >
-> > > > > > > > This change prevents a use-after-free caused by one of the worker
-> > > > > > > > threads starting up (see below) *after* the final channel reference
-> > > > > > > > has been put() during sock_close() but *before* the references to the
-> > > > > > > > channel have been destroyed.
-> > > > > > > >
-> > > > > > > >   refcount_t: increment on 0; use-after-free.
-> > > > > > > >   BUG: KASAN: use-after-free in refcount_dec_and_test+0x20/0xd0
-> > > > > > > >   Read of size 4 at addr ffffffc114f5bf18 by task kworker/u17:14/705
-> > > > > > > >
-> > > > > > > >   CPU: 4 PID: 705 Comm: kworker/u17:14 Tainted: G S      W       4.14.234-00003-g1fb6d0bd49a4-dirty #28
-> > > > > > > >   Hardware name: Qualcomm Technologies, Inc. SM8150 V2 PM8150 Google Inc. MSM sm8150 Flame DVT (DT)
-> > > > > > > >   Workqueue: hci0 hci_rx_work
-> > > > > > > >   Call trace:
-> > > > > > > >    dump_backtrace+0x0/0x378
-> > > > > > > >    show_stack+0x20/0x2c
-> > > > > > > >    dump_stack+0x124/0x148
-> > > > > > > >    print_address_description+0x80/0x2e8
-> > > > > > > >    __kasan_report+0x168/0x188
-> > > > > > > >    kasan_report+0x10/0x18
-> > > > > > > >    __asan_load4+0x84/0x8c
-> > > > > > > >    refcount_dec_and_test+0x20/0xd0
-> > > > > > > >    l2cap_chan_put+0x48/0x12c
-> > > > > > > >    l2cap_recv_frame+0x4770/0x6550
-> > > > > > > >    l2cap_recv_acldata+0x44c/0x7a4
-> > > > > > > >    hci_acldata_packet+0x100/0x188
-> > > > > > > >    hci_rx_work+0x178/0x23c
-> > > > > > > >    process_one_work+0x35c/0x95c
-> > > > > > > >    worker_thread+0x4cc/0x960
-> > > > > > > >    kthread+0x1a8/0x1c4
-> > > > > > > >    ret_from_fork+0x10/0x18
-> > > > > > > >
-> > > > > > > > Cc: stable@kernel.org
-> > > > > > >
-> > > > > > > When was the bug added ? (Fixes: tag please)
-> > > > > > >
-> > > > > > > > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > > > > > > > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > > > > > > > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > > > > > > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > > > > > > Cc: Eric Dumazet <edumazet@google.com>
-> > > > > > > > Cc: Jakub Kicinski <kuba@kernel.org>
-> > > > > > > > Cc: Paolo Abeni <pabeni@redhat.com>
-> > > > > > > > Cc: linux-bluetooth@vger.kernel.org
-> > > > > > > > Cc: netdev@vger.kernel.org
-> > > > > > > > Signed-off-by: Lee Jones <lee.jones@linaro.org>
-> > > > > > > > ---
-> > > > > > > >  net/bluetooth/l2cap_core.c | 4 ++--
-> > > > > > > >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> > > > > > > > index ae78490ecd3d4..82279c5919fd8 100644
-> > > > > > > > --- a/net/bluetooth/l2cap_core.c
-> > > > > > > > +++ b/net/bluetooth/l2cap_core.c
-> > > > > > > > @@ -483,9 +483,7 @@ static void l2cap_chan_destroy(struct kref *kref)
-> > > > > > > >
-> > > > > > > >         BT_DBG("chan %p", chan);
-> > > > > > > >
-> > > > > > > > -       write_lock(&chan_list_lock);
-> > > > > > > >         list_del(&chan->global_l);
-> > > > > > > > -       write_unlock(&chan_list_lock);
-> > > > > > > >
-> > > > > > > >         kfree(chan);
-> > > > > > > >  }
-> > > > > > > > @@ -501,7 +499,9 @@ void l2cap_chan_put(struct l2cap_chan *c)
-> > > > > > > >  {
-> > > > > > > >         BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
-> > > > > > > >
-> > > > > > > > +       write_lock(&chan_list_lock);
-> > > > > > > >         kref_put(&c->kref, l2cap_chan_destroy);
-> > > > > > > > +       write_unlock(&chan_list_lock);
-> > > > > > > >  }
-> > > > > > > >  EXPORT_SYMBOL_GPL(l2cap_chan_put);
-> > > > > > > >
-> > > > > > > >
-> > > > > > >
-> > > > > > > I do not think this patch is correct.
-> > > > > > >
-> > > > > > > a kref does not need to be protected by a write lock.
-> > > > > > >
-> > > > > > > This might shuffle things enough to work around a particular repro you have.
-> > > > > > >
-> > > > > > > If the patch was correct why not protect kref_get() sides ?
-> > > > > > >
-> > > > > > > Before the &hdev->rx_work is scheduled (queue_work(hdev->workqueue,
-> > > > > > > &hdev->rx_work),
-> > > > > > > a reference must be taken.
-> > > > > > >
-> > > > > > > Then this reference must be released at the end of hci_rx_work() or
-> > > > > > > when hdev->workqueue
-> > > > > > > is canceled.
-> > > > > > >
-> > > > > > > This refcount is not needed _if_ the workqueue is properly canceled at
-> > > > > > > device dismantle,
-> > > > > > > in a synchronous way.
-> > > > > > >
-> > > > > > > I do not see this hdev->rx_work being canceled, maybe this is the real issue.
-> > > > > > >
-> > > > > > > There is a call to drain_workqueue() but this is not enough I think,
-> > > > > > > because hci_recv_frame()
-> > > > > > > can re-arm
-> > > > > > >    queue_work(hdev->workqueue, &hdev->rx_work);
-> > > > > >
-> > > > > > I suspect this likely a refcount problem, we do l2cap_get_chan_by_scid:
-> > > > > >
-> > > > > > /* Find channel with given SCID.
-> > > > > >  * Returns locked channel. */
-> > > > > > static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn
-> > > > > > *conn, u16 cid)
-> > > > > >
-> > > > > > So we return a locked channel but that doesn't prevent another thread
-> > > > > > to call l2cap_chan_put which doesn't care about l2cap_chan_lock so
-> > > > > > perhaps we actually need to host a reference while we have the lock,
-> > > > > > at least we do something like that on l2cap_sock.c:
-> > > > > >
-> > > > > > l2cap_chan_hold(chan);
-> > > > > > l2cap_chan_lock(chan);
-> > > > > >
-> > > > > > __clear_chan_timer(chan);
-> > > > > > l2cap_chan_close(chan, ECONNRESET);
-> > > > > > l2cap_sock_kill(sk);
-> > > > > >
-> > > > > > l2cap_chan_unlock(chan);
-> > > > > > l2cap_chan_put(chan);
-> > > > >
-> > > > > Perhaps something like this:
-> > > >
-> > > > I'm struggling to apply this for test:
-> > > >
-> > > >   "error: corrupt patch at line 6"
-> > >
-> > > Check with the attached patch.
-> >
-> > With the patch applied:
-> >
-> > [  188.825418][   T75] refcount_t: addition on 0; use-after-free.
-> > [  188.825418][   T75] refcount_t: addition on 0; use-after-free.
->
-> Looks like the changes just make the issue more visible since we are
-> trying to add a refcount when it is already 0 so this proves the
-> design is not quite right since it is removing the object from the
-> list only when destroying it while we probably need to do it before.
->
-> How about we use kref_get_unless_zero as it appears it was introduced
-> exactly for such cases (patch attached.)
-
-Looks like I missed a few places like l2cap_global_chan_by_psm so here
-is another version.
-
-> Luiz Augusto von Dentz
-
-
-
--- 
-Luiz Augusto von Dentz
-
---000000000000bf4c2605e3293b50
-Content-Type: text/x-patch; charset="US-ASCII"; name="0001-Bluetooth-L2CAP-WIP.patch"
-Content-Disposition: attachment; filename="0001-Bluetooth-L2CAP-WIP.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l5a30y210>
-X-Attachment-Id: f_l5a30y210
-
-RnJvbSAyMzU5MzdhYzdhMzlkMTZlNWRhYmJmY2EwYWMxZDU4ZTRjYzgxNGQ5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBMdWl6IEF1Z3VzdG8gdm9uIERlbnR6IDxsdWl6LnZvbi5kZW50
-ekBpbnRlbC5jb20+CkRhdGU6IFR1ZSwgMjggSnVuIDIwMjIgMTU6NDY6MDQgLTA3MDAKU3ViamVj
-dDogW1BBVENIXSBCbHVldG9vdGg6IEwyQ0FQOiBXSVAKClNpZ25lZC1vZmYtYnk6IEx1aXogQXVn
-dXN0byB2b24gRGVudHogPGx1aXoudm9uLmRlbnR6QGludGVsLmNvbT4KLS0tCiBpbmNsdWRlL25l
-dC9ibHVldG9vdGgvbDJjYXAuaCB8ICAxICsKIG5ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jICAg
-IHwgNTggKysrKysrKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0KIDIgZmlsZXMgY2hhbmdl
-ZCwgNDYgaW5zZXJ0aW9ucygrKSwgMTMgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvaW5jbHVk
-ZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmggYi9pbmNsdWRlL25ldC9ibHVldG9vdGgvbDJjYXAuaApp
-bmRleCAzYzRmNTUwZTVhOGIuLjJmNzY2ZTM0MzdjZSAxMDA2NDQKLS0tIGEvaW5jbHVkZS9uZXQv
-Ymx1ZXRvb3RoL2wyY2FwLmgKKysrIGIvaW5jbHVkZS9uZXQvYmx1ZXRvb3RoL2wyY2FwLmgKQEAg
-LTg0Nyw2ICs4NDcsNyBAQCBlbnVtIHsKIH07CiAKIHZvaWQgbDJjYXBfY2hhbl9ob2xkKHN0cnVj
-dCBsMmNhcF9jaGFuICpjKTsKK3N0cnVjdCBsMmNhcF9jaGFuICpsMmNhcF9jaGFuX2hvbGRfdW5s
-ZXNzX3plcm8oc3RydWN0IGwyY2FwX2NoYW4gKmMpOwogdm9pZCBsMmNhcF9jaGFuX3B1dChzdHJ1
-Y3QgbDJjYXBfY2hhbiAqYyk7CiAKIHN0YXRpYyBpbmxpbmUgdm9pZCBsMmNhcF9jaGFuX2xvY2so
-c3RydWN0IGwyY2FwX2NoYW4gKmNoYW4pCmRpZmYgLS1naXQgYS9uZXQvYmx1ZXRvb3RoL2wyY2Fw
-X2NvcmUuYyBiL25ldC9ibHVldG9vdGgvbDJjYXBfY29yZS5jCmluZGV4IDA5ZWNhZjU1NmRlNS4u
-M2U1ZDgxZTk3MWNjIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2wyY2FwX2NvcmUuYworKysg
-Yi9uZXQvYmx1ZXRvb3RoL2wyY2FwX2NvcmUuYwpAQCAtMTExLDcgKzExMSw4IEBAIHN0YXRpYyBz
-dHJ1Y3QgbDJjYXBfY2hhbiAqX19sMmNhcF9nZXRfY2hhbl9ieV9zY2lkKHN0cnVjdCBsMmNhcF9j
-b25uICpjb25uLAogfQogCiAvKiBGaW5kIGNoYW5uZWwgd2l0aCBnaXZlbiBTQ0lELgotICogUmV0
-dXJucyBsb2NrZWQgY2hhbm5lbC4gKi8KKyAqIFJldHVybnMgYSByZWZlcmVuY2UgbG9ja2VkIGNo
-YW5uZWwuCisgKi8KIHN0YXRpYyBzdHJ1Y3QgbDJjYXBfY2hhbiAqbDJjYXBfZ2V0X2NoYW5fYnlf
-c2NpZChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwKIAkJCQkJCSB1MTYgY2lkKQogewpAQCAtMTE5
-LDE1ICsxMjAsMTkgQEAgc3RhdGljIHN0cnVjdCBsMmNhcF9jaGFuICpsMmNhcF9nZXRfY2hhbl9i
-eV9zY2lkKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCiAJbXV0ZXhfbG9jaygmY29ubi0+Y2hh
-bl9sb2NrKTsKIAljID0gX19sMmNhcF9nZXRfY2hhbl9ieV9zY2lkKGNvbm4sIGNpZCk7Ci0JaWYg
-KGMpCi0JCWwyY2FwX2NoYW5fbG9jayhjKTsKKwlpZiAoYykgeworCQkvKiBPbmx5IGxvY2sgaWYg
-Y2hhbiByZWZlcmVuY2UgaXMgbm90IDAgKi8KKwkJYyA9IGwyY2FwX2NoYW5faG9sZF91bmxlc3Nf
-emVybyhjKTsKKwkJaWYgKGMpCisJCQlsMmNhcF9jaGFuX2xvY2soYyk7CisJfQogCW11dGV4X3Vu
-bG9jaygmY29ubi0+Y2hhbl9sb2NrKTsKIAogCXJldHVybiBjOwogfQogCiAvKiBGaW5kIGNoYW5u
-ZWwgd2l0aCBnaXZlbiBEQ0lELgotICogUmV0dXJucyBsb2NrZWQgY2hhbm5lbC4KKyAqIFJldHVy
-bnMgYSByZWZlcmVuY2UgbG9ja2VkIGNoYW5uZWwuCiAgKi8KIHN0YXRpYyBzdHJ1Y3QgbDJjYXBf
-Y2hhbiAqbDJjYXBfZ2V0X2NoYW5fYnlfZGNpZChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwKIAkJ
-CQkJCSB1MTYgY2lkKQpAQCAtMTM2LDggKzE0MSwxMiBAQCBzdGF0aWMgc3RydWN0IGwyY2FwX2No
-YW4gKmwyY2FwX2dldF9jaGFuX2J5X2RjaWQoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAKIAlt
-dXRleF9sb2NrKCZjb25uLT5jaGFuX2xvY2spOwogCWMgPSBfX2wyY2FwX2dldF9jaGFuX2J5X2Rj
-aWQoY29ubiwgY2lkKTsKLQlpZiAoYykKLQkJbDJjYXBfY2hhbl9sb2NrKGMpOworCWlmIChjKSB7
-CisJCS8qIE9ubHkgbG9jayBpZiBjaGFuIHJlZmVyZW5jZSBpcyBub3QgMCAqLworCQljID0gbDJj
-YXBfY2hhbl9ob2xkX3VubGVzc196ZXJvKGMpOworCQlpZiAoYykKKwkJCWwyY2FwX2NoYW5fbG9j
-ayhjKTsKKwl9CiAJbXV0ZXhfdW5sb2NrKCZjb25uLT5jaGFuX2xvY2spOwogCiAJcmV0dXJuIGM7
-CkBAIC0xNjIsOCArMTcxLDEyIEBAIHN0YXRpYyBzdHJ1Y3QgbDJjYXBfY2hhbiAqbDJjYXBfZ2V0
-X2NoYW5fYnlfaWRlbnQoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAKIAltdXRleF9sb2NrKCZj
-b25uLT5jaGFuX2xvY2spOwogCWMgPSBfX2wyY2FwX2dldF9jaGFuX2J5X2lkZW50KGNvbm4sIGlk
-ZW50KTsKLQlpZiAoYykKLQkJbDJjYXBfY2hhbl9sb2NrKGMpOworCWlmIChjKSB7CisJCS8qIE9u
-bHkgbG9jayBpZiBjaGFuIHJlZmVyZW5jZSBpcyBub3QgMCAqLworCQljID0gbDJjYXBfY2hhbl9o
-b2xkX3VubGVzc196ZXJvKGMpOworCQlpZiAoYykKKwkJCWwyY2FwX2NoYW5fbG9jayhjKTsKKwl9
-CiAJbXV0ZXhfdW5sb2NrKCZjb25uLT5jaGFuX2xvY2spOwogCiAJcmV0dXJuIGM7CkBAIC00OTcs
-NiArNTEwLDE2IEBAIHZvaWQgbDJjYXBfY2hhbl9ob2xkKHN0cnVjdCBsMmNhcF9jaGFuICpjKQog
-CWtyZWZfZ2V0KCZjLT5rcmVmKTsKIH0KIAorc3RydWN0IGwyY2FwX2NoYW4gKmwyY2FwX2NoYW5f
-aG9sZF91bmxlc3NfemVybyhzdHJ1Y3QgbDJjYXBfY2hhbiAqYykKK3sKKwlCVF9EQkcoImNoYW4g
-JXAgb3JpZyByZWZjbnQgJXUiLCBjLCBrcmVmX3JlYWQoJmMtPmtyZWYpKTsKKworCWlmICgha3Jl
-Zl9nZXRfdW5sZXNzX3plcm8oJmMtPmtyZWYpKQorCQlyZXR1cm4gTlVMTDsKKworCXJldHVybiBj
-OworfQorCiB2b2lkIGwyY2FwX2NoYW5fcHV0KHN0cnVjdCBsMmNhcF9jaGFuICpjKQogewogCUJU
-X0RCRygiY2hhbiAlcCBvcmlnIHJlZmNudCAldSIsIGMsIGtyZWZfcmVhZCgmYy0+a3JlZikpOwpA
-QCAtMTk2OSw3ICsxOTkyLDcgQEAgc3RhdGljIHN0cnVjdCBsMmNhcF9jaGFuICpsMmNhcF9nbG9i
-YWxfY2hhbl9ieV9wc20oaW50IHN0YXRlLCBfX2xlMTYgcHNtLAogCQkJc3JjX21hdGNoID0gIWJh
-Y21wKCZjLT5zcmMsIHNyYyk7CiAJCQlkc3RfbWF0Y2ggPSAhYmFjbXAoJmMtPmRzdCwgZHN0KTsK
-IAkJCWlmIChzcmNfbWF0Y2ggJiYgZHN0X21hdGNoKSB7Ci0JCQkJbDJjYXBfY2hhbl9ob2xkKGMp
-OworCQkJCWMgPSBsMmNhcF9jaGFuX2hvbGRfdW5sZXNzX3plcm8oYyk7CiAJCQkJcmVhZF91bmxv
-Y2soJmNoYW5fbGlzdF9sb2NrKTsKIAkJCQlyZXR1cm4gYzsKIAkJCX0KQEAgLTE5ODQsNyArMjAw
-Nyw3IEBAIHN0YXRpYyBzdHJ1Y3QgbDJjYXBfY2hhbiAqbDJjYXBfZ2xvYmFsX2NoYW5fYnlfcHNt
-KGludCBzdGF0ZSwgX19sZTE2IHBzbSwKIAl9CiAKIAlpZiAoYzEpCi0JCWwyY2FwX2NoYW5faG9s
-ZChjMSk7CisJCWMxID0gbDJjYXBfY2hhbl9ob2xkX3VubGVzc196ZXJvKGMxKTsKIAogCXJlYWRf
-dW5sb2NrKCZjaGFuX2xpc3RfbG9jayk7CiAKQEAgLTQ0NjQsNiArNDQ4Nyw3IEBAIHN0YXRpYyBp
-bmxpbmUgaW50IGwyY2FwX2NvbmZpZ19yZXEoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAKIHVu
-bG9jazoKIAlsMmNhcF9jaGFuX3VubG9jayhjaGFuKTsKKwlsMmNhcF9jaGFuX3B1dChjaGFuKTsK
-IAlyZXR1cm4gZXJyOwogfQogCkBAIC00NTc4LDYgKzQ2MDIsNyBAQCBzdGF0aWMgaW5saW5lIGlu
-dCBsMmNhcF9jb25maWdfcnNwKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCiBkb25lOgogCWwy
-Y2FwX2NoYW5fdW5sb2NrKGNoYW4pOworCWwyY2FwX2NoYW5fcHV0KGNoYW4pOwogCXJldHVybiBl
-cnI7CiB9CiAKQEAgLTUzMDUsNiArNTMzMCw3IEBAIHN0YXRpYyBpbmxpbmUgaW50IGwyY2FwX21v
-dmVfY2hhbm5lbF9yZXEoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAJbDJjYXBfc2VuZF9tb3Zl
-X2NoYW5fcnNwKGNoYW4sIHJlc3VsdCk7CiAKIAlsMmNhcF9jaGFuX3VubG9jayhjaGFuKTsKKwls
-MmNhcF9jaGFuX3B1dChjaGFuKTsKIAogCXJldHVybiAwOwogfQpAQCAtNTM5Nyw2ICs1NDIzLDcg
-QEAgc3RhdGljIHZvaWQgbDJjYXBfbW92ZV9jb250aW51ZShzdHJ1Y3QgbDJjYXBfY29ubiAqY29u
-biwgdTE2IGljaWQsIHUxNiByZXN1bHQpCiAJfQogCiAJbDJjYXBfY2hhbl91bmxvY2soY2hhbik7
-CisJbDJjYXBfY2hhbl9wdXQoY2hhbik7CiB9CiAKIHN0YXRpYyB2b2lkIGwyY2FwX21vdmVfZmFp
-bChzdHJ1Y3QgbDJjYXBfY29ubiAqY29ubiwgdTggaWRlbnQsIHUxNiBpY2lkLApAQCAtNTQyNiw2
-ICs1NDUzLDcgQEAgc3RhdGljIHZvaWQgbDJjYXBfbW92ZV9mYWlsKHN0cnVjdCBsMmNhcF9jb25u
-ICpjb25uLCB1OCBpZGVudCwgdTE2IGljaWQsCiAJbDJjYXBfc2VuZF9tb3ZlX2NoYW5fY2ZtKGNo
-YW4sIEwyQ0FQX01DX1VOQ09ORklSTUVEKTsKIAogCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOwor
-CWwyY2FwX2NoYW5fcHV0KGNoYW4pOwogfQogCiBzdGF0aWMgaW50IGwyY2FwX21vdmVfY2hhbm5l
-bF9yc3Aoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCkBAIC01NDg5LDYgKzU1MTcsNyBAQCBzdGF0
-aWMgaW50IGwyY2FwX21vdmVfY2hhbm5lbF9jb25maXJtKHN0cnVjdCBsMmNhcF9jb25uICpjb25u
-LAogCWwyY2FwX3NlbmRfbW92ZV9jaGFuX2NmbV9yc3AoY29ubiwgY21kLT5pZGVudCwgaWNpZCk7
-CiAKIAlsMmNhcF9jaGFuX3VubG9jayhjaGFuKTsKKwlsMmNhcF9jaGFuX3B1dChjaGFuKTsKIAog
-CXJldHVybiAwOwogfQpAQCAtNTUyNCw2ICs1NTUzLDcgQEAgc3RhdGljIGlubGluZSBpbnQgbDJj
-YXBfbW92ZV9jaGFubmVsX2NvbmZpcm1fcnNwKHN0cnVjdCBsMmNhcF9jb25uICpjb25uLAogCX0K
-IAogCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOworCWwyY2FwX2NoYW5fcHV0KGNoYW4pOwogCiAJ
-cmV0dXJuIDA7CiB9CkBAIC01ODk2LDEyICs1OTI2LDExIEBAIHN0YXRpYyBpbmxpbmUgaW50IGwy
-Y2FwX2xlX2NyZWRpdHMoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4sCiAJaWYgKGNyZWRpdHMgPiBt
-YXhfY3JlZGl0cykgewogCQlCVF9FUlIoIkxFIGNyZWRpdHMgb3ZlcmZsb3ciKTsKIAkJbDJjYXBf
-c2VuZF9kaXNjb25uX3JlcShjaGFuLCBFQ09OTlJFU0VUKTsKLQkJbDJjYXBfY2hhbl91bmxvY2so
-Y2hhbik7CiAKIAkJLyogUmV0dXJuIDAgc28gdGhhdCB3ZSBkb24ndCB0cmlnZ2VyIGFuIHVubmVj
-ZXNzYXJ5CiAJCSAqIGNvbW1hbmQgcmVqZWN0IHBhY2tldC4KIAkJICovCi0JCXJldHVybiAwOwor
-CQlnb3RvIHVubG9jazsKIAl9CiAKIAljaGFuLT50eF9jcmVkaXRzICs9IGNyZWRpdHM7CkBAIC01
-OTEyLDcgKzU5NDEsOSBAQCBzdGF0aWMgaW5saW5lIGludCBsMmNhcF9sZV9jcmVkaXRzKHN0cnVj
-dCBsMmNhcF9jb25uICpjb25uLAogCWlmIChjaGFuLT50eF9jcmVkaXRzKQogCQljaGFuLT5vcHMt
-PnJlc3VtZShjaGFuKTsKIAordW5sb2NrOgogCWwyY2FwX2NoYW5fdW5sb2NrKGNoYW4pOworCWwy
-Y2FwX2NoYW5fcHV0KGNoYW4pOwogCiAJcmV0dXJuIDA7CiB9CkBAIC03NTk4LDYgKzc2MjksNyBA
-QCBzdGF0aWMgdm9pZCBsMmNhcF9kYXRhX2NoYW5uZWwoc3RydWN0IGwyY2FwX2Nvbm4gKmNvbm4s
-IHUxNiBjaWQsCiAKIGRvbmU6CiAJbDJjYXBfY2hhbl91bmxvY2soY2hhbik7CisJbDJjYXBfY2hh
-bl9wdXQoY2hhbik7CiB9CiAKIHN0YXRpYyB2b2lkIGwyY2FwX2Nvbmxlc3NfY2hhbm5lbChzdHJ1
-Y3QgbDJjYXBfY29ubiAqY29ubiwgX19sZTE2IHBzbSwKQEAgLTgwODYsNyArODExOCw3IEBAIHN0
-YXRpYyBzdHJ1Y3QgbDJjYXBfY2hhbiAqbDJjYXBfZ2xvYmFsX2ZpeGVkX2NoYW4oc3RydWN0IGwy
-Y2FwX2NoYW4gKmMsCiAJCWlmIChzcmNfdHlwZSAhPSBjLT5zcmNfdHlwZSkKIAkJCWNvbnRpbnVl
-OwogCi0JCWwyY2FwX2NoYW5faG9sZChjKTsKKwkJYyA9IGwyY2FwX2NoYW5faG9sZF91bmxlc3Nf
-emVybyhjKTsKIAkJcmVhZF91bmxvY2soJmNoYW5fbGlzdF9sb2NrKTsKIAkJcmV0dXJuIGM7CiAJ
-fQotLSAKMi4zNS4zCgo=
---000000000000bf4c2605e3293b50--
+Bluez5 from master on 27 June 2022=0A=
+1d6cfb8e625a944010956714c1802bc1e1fc6c4f=0A=
+monitor: Fix crash when using RTT backend=0A=
+=0A=
+=0A=
+Kernel:=0A=
+5.4.199=0A=
+=0A=
+After turning scan on, after a short time it hangs.=A0 Here are the packets=
+ to start discovery:=0A=
+=0A=
+< HCI Command: LE Set Exte.. (0x08|0x0042) plen 6 =A0#1777 [hci0] 11:06:02.=
+731748=0A=
+=A0 =A0 =A0 =A0 Extended scan: Enabled (0x01)=0A=
+=A0 =A0 =A0 =A0 Filter duplicates: Enabled (0x01)=0A=
+=A0 =A0 =A0 =A0 Duration: 0 msec (0x0000)=0A=
+=A0 =A0 =A0 =A0 Period: 0.00 sec (0x0000)=0A=
+> HCI Event: Command Complete (0x0e) plen 4 =A0 =A0 =A0 =A0#1778 [hci0] 11:=
+06:02.741529=0A=
+=A0 =A0 =A0 LE Set Extended Scan Enable (0x08|0x0042) ncmd 1=0A=
+=A0 =A0 =A0 =A0 Status: Success (0x00)=0A=
+@ MGMT Event: Command Complete (0x0001) plen 4 =A0{0x0001} [hci0] 11:06:02.=
+741819=0A=
+=A0 =A0 =A0 Start Discovery (0x0023) plen 1=0A=
+=A0 =A0 =A0 =A0 Status: Success (0x00)=0A=
+=A0 =A0 =A0 =A0 Address type: 0x06=0A=
+=A0 =A0 =A0 =A0 =A0 LE Public=0A=
+=A0 =A0 =A0 =A0 =A0 LE Random=0A=
+@ MGMT Event: Discovering (0x0013) plen 2 =A0 =A0 =A0 {0x0001} [hci0] 11:06=
+:02.741899=0A=
+=A0 =A0 =A0 =A0 Address type: 0x06=0A=
+=A0 =A0 =A0 =A0 =A0 LE Public=0A=
+=A0 =A0 =A0 =A0 =A0 LE Random=0A=
+=A0 =A0 =A0 =A0 Discovery: Enabled (0x01)=0A=
+=0A=
+=0A=
+After a short time and 1215 devices found (0x0012), no commands may be exec=
+uted:=0A=
+=0A=
+bluetooth]# scan off=0A=
+Failed to stop discovery: org.bluez.Error.InProgress=0A=
+=0A=
+btmon output looks stuck.=A0 Often the output stops in the middle of an eve=
+nt:=0A=
+=0A=
+> HCI Event: LE Meta Event (0x3e) plen 41 =A0 =A0 =A0 =A0 =A0#3484 [hci0] 1=
+1:06:13.493567=0A=
+=A0 =A0 =A0 LE Extended Advertising Report (0x0d)=0A=
+=A0 =A0 =A0 =A0 Num reports: 1=0A=
+=A0 =A0 =A0 =A0 Entry 0=0A=
+=A0 =A0 =A0 =A0 =A0 Event type: 0x0010=0A=
+=A0 =A0 =A0 =A0 =A0 =A0 Props: 0x0010=0A=
+=A0 =A0 =A0 =A0 =A0 =A0 =A0 Use legacy advertising PDUs=0A=
+=A0 =A0 =A0 =A0 =A0 =A0 Data status: ^[[0;32mComplete^[[0m=0A=
+=A0 =A0 =A0 =A0 =A0 Legacy PDU Type: ADV_NONCONN_IND (0x0010)=0A=
+=A0 =A0 =A0 =A0 =A0 Address type: Random (0x01)=0A=
+=A0 =A0 =A0 =A0 =A0 Address: 0C:7D:02:DB:5A:57 (Non-Resolvable)=0A=
+=A0 =A0 =A0 =A0 =A0 Prima=0A=
+=0A=
+Note that "Primary PHY" is incomplete.=0A=
+=0A=
+The hang during scan happens 100% of the time.=0A=
+=0A=
+=0A=
+=0A=
+John Klug=0A=
+=0A=
