@@ -2,91 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2F4C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jul 2022 20:27:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5D2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Jul 2022 20:29:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236597AbiGGU1G (ORCPT
+        id S236298AbiGGU3w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Jul 2022 16:27:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
+        Thu, 7 Jul 2022 16:29:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236527AbiGGU1D (ORCPT
+        with ESMTP id S236277AbiGGU3v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Jul 2022 16:27:03 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CC72A940
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Jul 2022 13:27:02 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id z25so15473166lfr.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Jul 2022 13:27:02 -0700 (PDT)
+        Thu, 7 Jul 2022 16:29:51 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7831D18359
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Jul 2022 13:29:50 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id e12so33064249lfr.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Jul 2022 13:29:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=EIXz3j3gvSzpEfFLZOiBRHBJHtYNJ4jD1XNeoWqpLec=;
-        b=XrWpYY2CSy0XPgliWbUa7RxYVHjAjDOOWQswo06yDBzF8i0ovoYJk1tDjpgGlFPnHD
-         7rBBObr2nIPsgBcwDvFDpIqj9p9BJhk7I3FUhyDtqoiKKhu/d64peohrOkJGIRSUOcS9
-         Uw3n+eS1DHWzfnkE/tL18KNFsTYPe7jDooSo57AaTpL44DWz8G/wYrHc/US7uEq7ukqO
-         7ZZJNWNk+YVtBkvLZ1FBSNtyTy7XmctIU04b2JIXrJ6dUUn4H504xcnHB7vUmvGSsBbn
-         xCJtK4DCQRz5/gNqf7nDJ4rVJRItYzTaj7z3hyZjVxluXZkSRxwCqW+eb54fnWRixaow
-         fOww==
+         :cc;
+        bh=QdZJ/yhMGlSlA8iHn3Uhn3zlOQ94GKVsXmFUHo4Ri3A=;
+        b=SbfnQXTf2i8vBS/r86z6z6+ptUQo5EjkMDHf6r/sFef27fpjYUSE2zapXyEcwhiyzO
+         iZpD7rpwnJj/o5zhxFRaj4bYMir9/kw0otvV4kXNfAcwRLFMBGVBPEr822B6GwAzo0xN
+         NNOijPoQx0xf4rEdHM0yKNtxYLybWNIXI4sLXznUUfPIBW87U/5DfPZF/0AXgrUmQDf7
+         8CETyShPYTsYlViu/PFhmRcYG8dx+ozeRtiPY7c1vbZcBINGDPJnNsDwaLiMyiDvT5CW
+         U0/ZjPeKkaXOtxA2vpBNXcjyiVRGem2dtPFzSY63igSdzS/D77OtzqYaCqpqme/HG8B5
+         DbdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=EIXz3j3gvSzpEfFLZOiBRHBJHtYNJ4jD1XNeoWqpLec=;
-        b=iZ1E+opiA1lnGqZzknJZ1wph27y3ZQRF612ytX4hZxDlPMNhjesw2b3mUHJ5STlWze
-         sIWr5IHDgcPf5hD++8sHzSzKsWey553ANIIcujxxI3wn36sxNBRbsPypdj6lAVE3MKH2
-         8rKpmxqT90LM9Sfi7u586D4KGb4YpCdRgZyZ3OU0vKydq+5ZwVbP8/DeOVJXbS+qwUut
-         G5h+G7MLJw2mBYCVYVq0rIcGvuviR3ujxKtsUrlGg/s/qOpB3i3HEG/xbmqJUUUyQ/Hp
-         muNWuqyIyPSgQHYenb+Smle6i3cY2Vi19zs1vJC0ttV3QoUGu8OwakUX4aAc9Qu3BPPI
-         Xd2A==
-X-Gm-Message-State: AJIora9zC3gtQr5A4wKhueIBPUVR5zwe7aHC3Z5gOM5zpcbIrGfW+UnN
-        /+RMuNPF3JbzyLX7qsB/G+8OGbndOe2J6jFOcFo=
-X-Google-Smtp-Source: AGRyM1tltY1wZyyFRqSJ/NHMqzMG0xgr/g01YN1S6H5heCk9N4SzB7Jq5fkVKljpSrEQGTTV2tNrNlkjz5+YBVbenQo=
-X-Received: by 2002:a05:6512:108d:b0:481:6f3:e641 with SMTP id
- j13-20020a056512108d00b0048106f3e641mr29629467lfg.251.1657225621055; Thu, 07
- Jul 2022 13:27:01 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=QdZJ/yhMGlSlA8iHn3Uhn3zlOQ94GKVsXmFUHo4Ri3A=;
+        b=4bvC1f2Vlk/OqAMietz4R7ac+ENrvV5qeiMaEKBAjsbqmoolXyCa3pyPMrHcmSBcIq
+         W7eowQ+/mqnpoZjs3mjsfB82rk/1VGiSwXQfdNcF/gM4v3VPQrq8/Y4S4mjvhWcVcCTO
+         QwBTffzLltjzrUcrCPVDuNbWYRGeyEywMd+Im0ZTLDRfgIzbQpa827q4PGCoMHwE7SAP
+         +n/SlxXIgpJmJpGc/SzVUJBoFZ8BgLjXbKMxdjDqTosRmnJda9LC8Hq5RqU0TD70dGvI
+         X/0MQBd8flKYp2aw3I+a1hrVmb2hx9BFR0fT2JidcK15SGw6wzq0b1XJ05h7eEZaVMxR
+         2Wcw==
+X-Gm-Message-State: AJIora8yuGiiuKQt01K7TCHXwbVkh5dtb5AMi4E5eBrU2/ag0AmArPY5
+        etFC+4UL1M9ANjB0+Vz26tPFW9Mj/R1F6sSYMISD0wmz
+X-Google-Smtp-Source: AGRyM1ucYkM1Q/g9M8EopVWMIlzxiQtEn7qCzgHd5O8RBf0NtJ/LmnakmuazF1nik6JAG6N2Jt4nDwQXLSAcxs1xFYQ=
+X-Received: by 2002:a05:6512:3b9f:b0:483:9ecc:6740 with SMTP id
+ g31-20020a0565123b9f00b004839ecc6740mr10969554lfv.57.1657225788719; Thu, 07
+ Jul 2022 13:29:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <SJ0PR13MB575532A88E75738299CB1636FEB49@SJ0PR13MB5755.namprd13.prod.outlook.com>
- <0b943515-915b-8bdd-2e60-a6f38e0db17a@eknoes.de>
-In-Reply-To: <0b943515-915b-8bdd-2e60-a6f38e0db17a@eknoes.de>
+References: <SJ0PR13MB5755B252BAE811BDFE22E3F7FE809@SJ0PR13MB5755.namprd13.prod.outlook.com>
+ <SJ0PR13MB5755BDD8A189504972CCAF8DFE809@SJ0PR13MB5755.namprd13.prod.outlook.com>
+In-Reply-To: <SJ0PR13MB5755BDD8A189504972CCAF8DFE809@SJ0PR13MB5755.namprd13.prod.outlook.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 7 Jul 2022 13:26:49 -0700
-Message-ID: <CABBYNZKVQKT2GD7hCei+1r08d5PoFjD8U76G=nLrGw4wQFCGuw@mail.gmail.com>
-Subject: Re: Linux v5.4.199: Bluetooth: hci_event: Ignore multiple conn
- complete events
-To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
-Cc:     John Klug <John.Klug@multitech.com>,
-        Linux-Bluetooth MailingList <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 7 Jul 2022 13:29:37 -0700
+Message-ID: <CABBYNZ+1+z++f-uDJ+AHpF1swwVBigqRe4jUTL55GUa0o1tfvg@mail.gmail.com>
+Subject: Re: [BUG] Extended Scan Hangs
+To:     John Klug <John.Klug@multitech.com>
+Cc:     Linux-Bluetooth MailingList <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi John,
 
-On Tue, Jun 28, 2022 at 11:35 PM S=C3=B6nke Huster <soenke.huster@eknoes.de=
-> wrote:
+On Wed, Jul 6, 2022 at 3:56 PM John Klug <John.Klug@multitech.com> wrote:
 >
-> Hi John,
+> I was running btmon through pcat to avoid running out of space on the device.  I think this was causing packets to be cut off midstream at the end.
 >
-> On 25.06.22 00:46, John Klug wrote:
-> > This patch updated for the 5.4.199 kernel on Friday, 24 June 2022 by
-> > John Klug <john.klug@multitech.com>
+> Here is the btmon output when turning scan off:
 >
-> Thanks for backporting! I do not know how the process is for backporting =
-patches to stable releases - do you need my Tested-by or Reviewed-by or sim=
-ilar? I'll test it in the afternoon.
->
-> Furthermore, I think it must go to stable, and there seem to be some guid=
-ance how that works over here:
-> https://www.kernel.org/doc/html/v4.17/process/stable-kernel-rules.html#op=
-tion-3
+>       LE Extended Advertising Report (0x0d)
+>         Num reports: 1
+>         Entry 0
+>           Event type: 0x0010
+>             Props: 0x0010
+>               Use legacy advertising PDUs
+>             Data status: Complete
+>           Legacy PDU Type: ADV_NONCONN_IND (0x0010)
+>           Address type: Random (0x01)
+>           Address: 06:62:7D:C6:64:48 (Non-Resolvable)
+>           Primary PHY: LE 1M
+>           Secondary PHY: No packets
+>           SID: no ADI field (0xff)
+>           TX power: 127 dBm
+>           RSSI: -68 dBm (0xbc)
+>           Periodic advertising interval: 0.00 msec (0x0000)
+>           Direct address type: Public (0x00)
+>           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+>           Data length: 0x1f
+>         1e ff 06 00 01 09 20 02 74 f5 eb a3 76 9d e7 b5  ...... .t...v...
+>         11 e6 85 a0 41 ca 09 4d 27 f1 f6 dc a5 5f bc     ....A..M'...._.
+>         Company: Microsoft (6)
+>           Data: 0109200274f5eba3769de7b511e685a041ca094d27f1f6dca55fbc
+> @ MGMT Command: Stop Discovery (0x0024) plen 1                                                                                                           {0x0001} [hci0] 159.216816
+>         Address type: 0x06
+>           LE Public
+>           LE Random
+> @ MGMT Event: Command Complete (0x0001) plen 4                                                                                                           {0x0001} [hci0] 159.220056
+>       Stop Discovery (0x0024) plen 1
+>         Status: Rejected (0x0b)
+>         Address type: 0x06
+>           LE Public
+>           LE Random
 
-This probably should be sent to stable tree directly, at least our CI
-won't be able to test it as it expects to be applied to
-bluetooth-next.
-
---=20
-Luiz Augusto von Dentz
+Looks like a bug in the kernel since it is rejecting the stop
+discovery, have you checked if there are any fixes for it later on?
