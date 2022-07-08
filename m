@@ -2,169 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A15C43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jul 2022 06:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C7F1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Jul 2022 06:52:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237314AbiGHG0Q (ORCPT
+        id S237413AbiGHGwf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Jul 2022 02:26:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54052 "EHLO
+        Fri, 8 Jul 2022 02:52:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237296AbiGHG0O (ORCPT
+        with ESMTP id S237414AbiGHGwe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Jul 2022 02:26:14 -0400
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DF8D31344
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Jul 2022 23:26:11 -0700 (PDT)
-X-QQ-mid: bizesmtp77t1657261560teupx0up
-Received: from localhost.localdomain ( [113.57.152.160])
-        by bizesmtp.qq.com (ESMTP) with 
-        id ; Fri, 08 Jul 2022 14:25:51 +0800 (CST)
-X-QQ-SSF: 01400000002000C0E000B00A0000000
-X-QQ-FEAT: HHPuPN/BfjX/PPSZVb4UP2q4RU9Nu4uW5g4AKSPAx2iI4EFoC/OrwbxIBgDxV
-        RHLSifeUcJ8pzO/FEjG5gm4iiNlxRax0uW5wbVC33P2X9ygcLBcR2xwrCqSaGvDoDFvDRkr
-        lYrCq2qbus0UUtN/QgEpXf08FWRdw0xqezso6/tRvuuy99N8+FD3mrll5N0bK8ic8Gg3qcx
-        qA0n90AaboUeL1eAXjucYn2XkMonCXgrflSij1coro9fJDAMC+l4IAzjXABurzSMOEQeeUZ
-        vR5yh70tY41/JLadeBPNlVCQxIIgubsAaxjcpeDfWn01z6Ewo+3dQ7oA8sA8ZuwJbSDAZY3
-        GtskeJQ2bw2SEG/Sq+9muu6zPw/JmMk+0vt0RXknlk1P17gJCw=
-X-QQ-GoodBg: 2
-From:   Youwan Wang <wangyouwan@uniontech.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Youwan Wang <wangyouwan@uniontech.com>
-Subject: [PATCH] obexd: fix crashed after cancel the on-going transfer
-Date:   Fri,  8 Jul 2022 14:25:48 +0800
-Message-Id: <20220708062548.31167-1-wangyouwan@uniontech.com>
-X-Mailer: git-send-email 2.20.1
+        Fri, 8 Jul 2022 02:52:34 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF006EE9C;
+        Thu,  7 Jul 2022 23:52:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1657263153; x=1688799153;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=QIOfrS9Mg8mDpfgg0AWFxkQHpTHuQeEmTtCHCmLAbsc=;
+  b=EtjtPgeGc73fbn3ugI0CXgz6Sx7nreQ31HvzReNgj/roLiNUAKHuoiK0
+   vuR/4T0KZJo6ORII2iSqPgp3ANiAajdCU7vvjmXgBtoMELpCxzO8ydNhG
+   XEq8BQ9UuFa9DNe0nrNy6NjVcZ3OVjtN2HArYQ8G7Zi+RnLB2WCH0UyP2
+   MH5ZbbDd9nm+L+o+oFu6cxVWD/MVmzeillq4JMkcyuVjeZAQ7i06rxgGi
+   JnNg9/IyN5P5B+US3CfgDuB7I3K3/KAkP0Dp4qxhR/Z46sklylwfQoRPI
+   IMp9LX4NwGKJ/xEX0H1KC89t6Hg9Lzp2G5R0z52gSKXxHuSfikpuvO+YI
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10401"; a="284949289"
+X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
+   d="scan'208";a="284949289"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2022 23:52:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,254,1650956400"; 
+   d="scan'208";a="736239583"
+Received: from lkp-server01.sh.intel.com (HELO 68b931ab7ac1) ([10.239.97.150])
+  by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2022 23:52:30 -0700
+Received: from kbuild by 68b931ab7ac1 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o9hqn-000N3q-OY;
+        Fri, 08 Jul 2022 06:52:29 +0000
+Date:   Fri, 8 Jul 2022 14:52:10 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     kbuild-all@lists.01.org, linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Manish Mandlik <mmandlik@google.com>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] Bluetooth: Add sysfs entry to enable/disable
+ devcoredump
+Message-ID: <202207081448.MghkbBvn-lkp@intel.com>
+References: <20220707151420.v3.2.I39885624992dacff236aed268bdaa69107cd1310@changeid>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybgforeign:qybgforeign10
-X-QQ-Bgrelay: 1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220707151420.v3.2.I39885624992dacff236aed268bdaa69107cd1310@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Pointer is reused after release.
-After the transfer pointer is released,
-remove the response function in pending_pkg
-to avoid the 'p->rsp_func' is reused
+Hi Manish,
 
-step:
-[obex]# connect 28:33:34:1E:96:98
-Attempting to connect to 28:33:34:1E:96:98
-[NEW] Session /org/bluez/obex/client/session2 [default]
-[NEW] ObjectPush /org/bluez/obex/client/session2
-Connection successful
-[28:33:34:1E:96:98]# send /home/uos/Desktop/systemd.zip
-Attempting to send /home/uos/Desktop/systemd.zip
-[NEW] Transfer /org/bluez/obex/client/session2/transfer2
-Transfer /org/bluez/obex/client/session2/transfer2
-        Status: queued
-        Name: systemd.zip
-        Size: 33466053
-        Filename: /home/uos/Desktop/systemd.zip
-        Session: /org/bluez/obex/client/session2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-[CHG] Transfer /org/bluez/obex/client/session2/transfer2
-er2 33:34:1E:96:98]# cancel /org/bluez/obex/client/sessi
-Attempting to cancel transfer /org/bluez/obex/client/s
-Cancel successful
+Thank you for the patch! Perhaps something to improve:
 
-valgrind trace:
-==11431== Invalid read of size 4
-==11431==    at 0x12B442: transfer_response ()
-==11431==    by 0x127764: req_timeout ()
-==11431==    by 0x49B8922: ??? ( )
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? (in )
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main (main.c:322)
-==11431==  Address 0x7344fa0 is 16 bytes inside a block of size
-==11431==    at 0x48369AB: free ()
-==11431==    by 0x12B459: transfer_response ()
-==11431==    by 0x127B3D: cancel_complete ()
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? ()
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main (main.c:322)
-==11431==  Block was alloc'd at
-==11431==    at 0x4837B65: calloc ()
-==11431==    by 0x49BD9D8: g_malloc0 ()
-==11431==    by 0x12AB89: transfer_new ()
-==11431==    by 0x12B732: g_obex_put_req_pkt ()
-==11431==    by 0x12B732: g_obex_put_req_pkt ()
-==11431==    by 0x146982: transfer_start_put ()
-==11431==    by 0x146982: obc_transfer_start ()
-==11431==    by 0x13C5A7: session_process_transfer ()
-==11431==    by 0x13D248: session_process_queue ()
-==11431==    by 0x13D248: session_process_queue ()
-==11431==    by 0x13D2AF: session_process ()
-==11431==    by 0x49B7E97: g_main_context_dispatch ()
-==11431==    by 0x49B8287: ??? (i)
-==11431==    by 0x49B8581: g_main_loop_run ()
-==11431==    by 0x121834: main ()
-==11431==
-==11431== (action on error) vgdb me ...
----
- gobex/gobex-transfer.c | 2 ++
- gobex/gobex.c          | 6 ++++++
- gobex/gobex.h          | 1 +
- 3 files changed, 9 insertions(+)
+[auto build test WARNING on bluetooth/master]
+[also build test WARNING on bluetooth-next/master linus/master v5.19-rc5 next-20220707]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
-index c94d018b2..38c23785c 100644
---- a/gobex/gobex-transfer.c
-+++ b/gobex/gobex-transfer.c
-@@ -64,6 +64,8 @@ static void transfer_free(struct transfer *transfer)
- 		g_obex_remove_request_function(transfer->obex,
- 							transfer->abort_id);
- 
-+	g_obex_remove_responsefunc(transfer->obex);
-+
- 	g_obex_unref(transfer->obex);
- 	g_free(transfer);
- }
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index bc4d52551..54ce484f2 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -533,6 +533,12 @@ void g_obex_drop_tx_queue(GObex *obex)
- 		pending_pkt_free(p);
- }
- 
-+void g_obex_remove_responsefunc(GObex *obex)
-+{
-+	if (obex->pending_req)
-+		obex->pending_req->rsp_func = NULL;
-+}
-+
- static gboolean g_obex_send_internal(GObex *obex, struct pending_pkt *p,
- 								GError **err)
- {
-diff --git a/gobex/gobex.h b/gobex/gobex.h
-index f16e4426c..1f7ae513a 100644
---- a/gobex/gobex.h
-+++ b/gobex/gobex.h
-@@ -51,6 +51,7 @@ void g_obex_suspend(GObex *obex);
- void g_obex_resume(GObex *obex);
- gboolean g_obex_srm_active(GObex *obex);
- void g_obex_drop_tx_queue(GObex *obex);
-+void g_obex_remove_responsefunc(GObex *obex);
- 
- GObex *g_obex_new(GIOChannel *io, GObexTransportType transport_type,
- 						gssize rx_mtu, gssize tx_mtu);
+url:    https://github.com/intel-lab-lkp/linux/commits/Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220708-061724
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+config: i386-randconfig-s002 (https://download.01.org/0day-ci/archive/20220708/202207081448.MghkbBvn-lkp@intel.com/config)
+compiler: gcc-11 (Debian 11.3.0-3) 11.3.0
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.4-39-gce1a6720-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/0d785cbd11ed3a6de29aeb05926177440ab26d54
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Manish-Mandlik/Bluetooth-Add-support-for-devcoredump/20220708-061724
+        git checkout 0d785cbd11ed3a6de29aeb05926177440ab26d54
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=i386 SHELL=/bin/bash net/bluetooth/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+>> net/bluetooth/hci_sysfs.c:118:1: sparse: sparse: symbol 'dev_attr_enable_coredump' was not declared. Should it be static?
+
 -- 
-2.20.1
-
-
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
