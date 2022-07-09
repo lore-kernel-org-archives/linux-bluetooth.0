@@ -2,201 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8874FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Jul 2022 19:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5022C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  9 Jul 2022 19:30:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbiGITXZ (ORCPT
+        id S229476AbiGITaL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 9 Jul 2022 15:23:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44978 "EHLO
+        Sat, 9 Jul 2022 15:30:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbiGITXY (ORCPT
+        with ESMTP id S229450AbiGITaK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 9 Jul 2022 15:23:24 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DA71580A
-        for <linux-bluetooth@vger.kernel.org>; Sat,  9 Jul 2022 12:23:23 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id l26so1284962qkl.10
-        for <linux-bluetooth@vger.kernel.org>; Sat, 09 Jul 2022 12:23:23 -0700 (PDT)
+        Sat, 9 Jul 2022 15:30:10 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0AAEE32
+        for <linux-bluetooth@vger.kernel.org>; Sat,  9 Jul 2022 12:30:08 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id b9so1681200pfp.10
+        for <linux-bluetooth@vger.kernel.org>; Sat, 09 Jul 2022 12:30:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=ZT6S++CL1C724LxUdqJ5ns5twannFi9zkOe00uX6HMY=;
-        b=dJ31deP/QXPlaGtCY9YGIH8iFjJGR3sKaWvgjH27UnREWgdYsyhO+w4in+E020pMcy
-         u3asFij+JLfZ7eWhfjFFnKZt6Fc3BTh3PJJxza5F9tlUZVRL/r/09Ej8hHhy+Uhz51tk
-         Ip/Y7oDmAQfmdsza9qKH0eYmel6i9elLlqi9MYIojYMC61dzRLVjsypqbY7K5nlpUupJ
-         bMHrdfhkLQ2KbcSFyTPC9O3wBZpIh+AkG3giik+eTBqHVz1ztf0It0jbta9paoz2zC0y
-         mWqKsdBYi83f6V2agSvn05wZFzIPb1xZepv6wvcHBXJ9D+KHmlLyVtVko53jbmc1FtXM
-         AhlA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=c1xZXROHvfD3b1AAcDLV7ulORsCqYCLvJ7U++NizIC4=;
+        b=CJC7R/OmVEIif+5fEo8qML2gid6nKYESo746qseEeKugRY/li6eGeqyGyWDksBdoYy
+         z3rmtJVPi7x0Y56Y8dpvk0plZL3e2kdXK6jDc0MufL653PBILwjfTTpNLAIyhVWrJX5Z
+         Hr2+KPZgHRhI6mGuzBYkKIk3rj8/ZjrENc+scRnvev937CrUnm/Mg73YVOtV/3nBiWO6
+         0JkQrNU8QzYs140cdJc6I8K7H36ni9mVIvXvFaWD0sQCdoz6YGQ4DliIVeeWcWJD0Nsu
+         v9zm1wowI8UU3ZgjorA+u+2lHuY19LTVktc9wKRaITKign8fr82xwWa2M5I6Z9uopKez
+         RTfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ZT6S++CL1C724LxUdqJ5ns5twannFi9zkOe00uX6HMY=;
-        b=dzmpmJQfAJCAjAXauncoKRUw4YVuwhOWTDCije0ysoGLI+xkFWC5AtdyAHmlbbSXPs
-         IvFk7rN1hltr57hITXBNiayTzEp2GCrfWSyR+JXEV7/PqRCZWRg4VInxRqRw5LHqbFB5
-         Grcxms7FT4tF+0ghQTj/Cu+VQ2EgqyXANUAMsVISHB22+bBecbDS7yl+uXX1Hfqdd4Za
-         fJHbEP0B+JdgERfPfvT38Ui+iSWW+Tslli9pW1PaWDNHoNn6ax0tJ00Wbpx8GnTRHb72
-         /YPGwZ3nZxB5cN5LqgWoKxrxzJ9u82c4LwHHJMxY4UC0rk1cQz0n7TALoGgXPIo2JX+A
-         wMUw==
-X-Gm-Message-State: AJIora/wMHAuetuRv8XfPPLy6NpzwdNBQQl8gDc2vCoh1FNi7p+ilxp9
-        2sWumSynw2/QrKlEMm1fnTHaMJFjgMdtMCLO
-X-Google-Smtp-Source: AGRyM1u4niOrixd8ExFF60QgpWBdc0aBE2TuX74pBWV3+YL6HqhBpC7y4/jqCQZbT02112IS/we93Q==
-X-Received: by 2002:a05:620a:bcb:b0:6a9:8f2a:ecf9 with SMTP id s11-20020a05620a0bcb00b006a98f2aecf9mr6773719qki.351.1657394602907;
-        Sat, 09 Jul 2022 12:23:22 -0700 (PDT)
-Received: from robotnik.. ([209.23.56.93])
-        by smtp.gmail.com with ESMTPSA id w3-20020ac857c3000000b00317c519be8bsm1933554qta.66.2022.07.09.12.23.22
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=c1xZXROHvfD3b1AAcDLV7ulORsCqYCLvJ7U++NizIC4=;
+        b=tgCFTyR/AD8tHdjL02IJwwJpINtPhosPyIdxd2brx4t12R1sxA/UML2MzThY8JQSjy
+         aZNY/yrV0cCUO1AiM3tZn6RSkXfmA1n4ZQ3/GJMpnPyEscufvTCx5GK8XKiSJ95Ruo9f
+         yEaMGAQNdnX04eQ3SvMuDXduVcJVykhU7gQ8sMISxr7iBoQQ36GsnfgMiTnN1LKGIazN
+         u6upaH2aN8vid3ZDng9f/L8uDaQJM4p3he9aonR/z/Y9dTprTURc9Pgd+L7PCwCOD57Z
+         7RSn0SQPthjxFNN3rRTqH+Do0PXbQCawwo+GSrtIDbS3YSadiNT+s/iaMfXWYkef7m71
+         bhMQ==
+X-Gm-Message-State: AJIora+Kd+pGKm1/iwZ0JmffkG/Byt+QPCe2iBJc6eSlQfwCPpUB8H3E
+        Te+qIl/IheT7f1YvInBIl1WIZxeigyY=
+X-Google-Smtp-Source: AGRyM1vhI+8WKaoffOt2SOl+PSeGmqlF7iwM6mtB/7vh3AzfL5AvMlP7WgUMdxQ72MNvmr1uAoX2pQ==
+X-Received: by 2002:a63:5818:0:b0:412:3c6a:8d0 with SMTP id m24-20020a635818000000b004123c6a08d0mr8893709pgb.155.1657395007723;
+        Sat, 09 Jul 2022 12:30:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.158.144])
+        by smtp.gmail.com with ESMTPSA id d22-20020a17090a02d600b001ef95232570sm3776891pjd.52.2022.07.09.12.30.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Jul 2022 12:23:22 -0700 (PDT)
-From:   shwoseph <shwoseph@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     shwoseph@gmail.com
-Subject: [PATCH BlueZ 1/1] [v3] ExcludeAdapter configuration setting for input profile
-Date:   Sat,  9 Jul 2022 15:23:17 -0400
-Message-Id: <20220709192317.1704-2-shwoseph@gmail.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20220709192317.1704-1-shwoseph@gmail.com>
-References: <20220709192317.1704-1-shwoseph@gmail.com>
+        Sat, 09 Jul 2022 12:30:07 -0700 (PDT)
+Message-ID: <62c9d73f.1c69fb81.c40a2.5c0e@mx.google.com>
+Date:   Sat, 09 Jul 2022 12:30:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2126856281251700236=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, shwoseph@gmail.com
+Subject: RE: ExcludeAdapter configuration setting for input plugin
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220709183524.13900-2-shwoseph@gmail.com>
+References: <20220709183524.13900-2-shwoseph@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- profiles/input/device.c   | 22 ++++++++++++++++++++++
- profiles/input/device.h   |  4 ++++
- profiles/input/input.conf |  4 ++++
- profiles/input/manager.c  | 34 +++++++++++++++++++++++++++++++++-
- 4 files changed, 63 insertions(+), 1 deletion(-)
+--===============2126856281251700236==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index e2ac6ea60..0192e7977 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -82,6 +82,8 @@ struct input_device {
- static int idle_timeout = 0;
- static bool uhid_enabled = false;
- static bool classic_bonded_only = false;
-+static char **exclude_adapters;
-+static gsize num_exclude_adapters;
- 
- void input_set_idle_timeout(int timeout)
- {
-@@ -103,6 +105,26 @@ bool input_get_classic_bonded_only(void)
- 	return classic_bonded_only;
- }
- 
-+char **input_get_exclude_adapters(void)
-+{
-+	return exclude_adapters;
-+}
-+
-+void input_set_exclude_adapters(char **adapters)
-+{
-+	exclude_adapters = adapters;
-+}
-+
-+gsize input_get_num_exclude_adapters(void)
-+{
-+	return num_exclude_adapters;
-+}
-+
-+void input_set_num_exclude_adapters(gsize num)
-+{
-+	num_exclude_adapters = num;
-+}
-+
- static void input_device_enter_reconnect_mode(struct input_device *idev);
- static int connection_disconnect(struct input_device *idev, uint32_t flags);
- static int uhid_disconnect(struct input_device *idev);
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index cf0389417..04fe41e2d 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -19,6 +19,10 @@ void input_enable_userspace_hid(bool state);
- void input_set_classic_bonded_only(bool state);
- bool input_get_classic_bonded_only(void);
- void input_set_auto_sec(bool state);
-+char **input_get_exclude_adapters(void);
-+void input_set_exclude_adapters(char **address);
-+gsize input_get_num_exclude_adapters(void);
-+void input_set_num_exclude_adapters(gsize address);
- 
- int input_device_register(struct btd_service *service);
- void input_device_unregister(struct btd_service *service);
-diff --git a/profiles/input/input.conf b/profiles/input/input.conf
-index 4c70bc561..c8ec5ee30 100644
---- a/profiles/input/input.conf
-+++ b/profiles/input/input.conf
-@@ -24,3 +24,7 @@
- # Enables upgrades of security automatically if required.
- # Defaults to true to maximize device compatibility.
- #LEAutoSecurity=true
-+
-+# Exclude adapters
-+# Disables input plugin on adapters with specified bdaddrs
-+#ExcludeAdapters=00:00:00:00:00:00,00:00:00:00:00:01
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 92789a003..b6e8f4fc1 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -32,7 +32,22 @@
- 
- static int hid_server_probe(struct btd_profile *p, struct btd_adapter *adapter)
- {
--	return server_start(btd_adapter_get_address(adapter));
-+	const bdaddr_t *address;
-+	char addr[18];
-+	char **exclude_adapters;
-+	gsize num_exclude_adapters;
-+
-+	address = btd_adapter_get_address(adapter);
-+	ba2str(address, addr);
-+	exclude_adapters = input_get_exclude_adapters();
-+	num_exclude_adapters = input_get_num_exclude_adapters();
-+
-+	for (gsize i = 0; i < num_exclude_adapters; i++) {
-+		if (strcmp(addr, exclude_adapters[i]))
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=658204
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.78 seconds
+GitLint                       PASS      0.45 seconds
+Prep - Setup ELL              PASS      31.19 seconds
+Build - Prep                  PASS      0.78 seconds
+Build - Configure             PASS      9.53 seconds
+Build - Make                  PASS      1033.85 seconds
+Make Check                    PASS      11.76 seconds
+Make Check w/Valgrind         PASS      325.07 seconds
+Make Distcheck                PASS      270.26 seconds
+Build w/ext ELL - Configure   PASS      9.60 seconds
+Build w/ext ELL - Make        PASS      95.31 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      601.49 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,1/1,v2] ExcludeAdapter configuration setting for input profile
+ERROR:TRAILING_WHITESPACE: trailing whitespace
+#167: FILE: profiles/input/manager.c:39:
++^I$
+
+WARNING:BRACES: braces {} are not necessary for single statement blocks
+#174: FILE: profiles/input/manager.c:46:
++		if (strcmp(addr, exclude_adapters[i])) {
 +			return 0;
-+	}
-+
-+	return server_start(address);
- }
- 
- static void hid_server_remove(struct btd_profile *p,
-@@ -83,6 +98,9 @@ static int input_init(void)
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
- 		int idle_timeout;
-+		char *exclude_adapters_str;
-+		char **exclude_adapters;
-+		gsize num_exclude_adapters;
- 		gboolean uhid_enabled, classic_bonded_only, auto_sec;
- 
- 		idle_timeout = g_key_file_get_integer(config, "General",
-@@ -121,6 +139,20 @@ static int input_init(void)
- 		} else
- 			g_clear_error(&err);
- 
-+		g_key_file_set_list_separator(config, ',');
-+
-+		exclude_adapters_str = g_key_file_get_string(config, "General",
-+				"ExcludeAdapters", &err);
-+		exclude_adapters = g_key_file_get_string_list(config, "General",
-+				"ExcludeAdapters", &num_exclude_adapters, &err);
-+
-+		if (!err) {
-+			DBG("input.conf: ExcludeAdapters=%s",
-+					exclude_adapters_str);
-+			input_set_exclude_adapters(exclude_adapters);
-+			input_set_num_exclude_adapters(num_exclude_adapters);
-+		} else
-+			g_clear_error(&err);
- 	}
- 
- 	btd_profile_register(&input_profile);
--- 
-2.32.0
++		}
 
+ERROR:TRAILING_WHITESPACE: trailing whitespace
+#178: FILE: profiles/input/manager.c:50:
++^I$
+
+ERROR:TRAILING_WHITESPACE: trailing whitespace
+#198: FILE: profiles/input/manager.c:144:
++^I^I$
+
+WARNING:LONG_LINE: line length of 84 exceeds 80 columns
+#205: FILE: profiles/input/manager.c:151:
++			DBG("input.conf: ExcludeAdapters=%s", exclude_adapters_str);
+
+/github/workspace/src/12912299.patch total: 3 errors, 2 warnings, 103 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+NOTE: Whitespace errors detected.
+      You may wish to use scripts/cleanpatch or scripts/cleanfile
+
+/github/workspace/src/12912299.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2126856281251700236==--
