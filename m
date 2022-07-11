@@ -2,77 +2,67 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 419F2C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Jul 2022 16:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4415FC43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Jul 2022 17:33:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229616AbiGKQkP (ORCPT
+        id S230126AbiGKRdv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Jul 2022 12:40:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59088 "EHLO
+        Mon, 11 Jul 2022 13:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229470AbiGKQkO (ORCPT
+        with ESMTP id S229887AbiGKRde (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Jul 2022 12:40:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0752DA99
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 09:40:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id CA379612B8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 16:40:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 32ED7C341C8;
-        Mon, 11 Jul 2022 16:40:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657557613;
-        bh=xwZq9LEqoZ/hX2D3nJP2ymZ3rQXZpnMeaMUpxz40rC0=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=XL5oyrWRH+qJbhaQBXAz2D+QzSOlnn9cMyWudY6W9rZWEIfsVehTQzuuxZdw4H2ir
-         IVduFHqw1p1uLqzD4wpILNa6PbnZKVE7NYUPvD3BbK4WMk24BAE2tY4bEBSmEIBVvK
-         asUyxebt1eMLpnnsUEYRVIoZo6/6T0fTXik3iR7uKZxt6prXRYq7GV+PLGLx2W6Abp
-         j3EJOiHOnYh+ZRQZ7WVtDvcZnDyKNOGDpaUJrPeXtAhl82syf8mW4hwxjdH89OjnVN
-         NZsFpYckjLZ+WpEP3C2FMtfIvFIbPqeb+AULk4LQHDwYf2B3zH6rFo/Y/Mkyu3GsHi
-         +SSc/OUVkEopA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 13C9EE4521F;
-        Mon, 11 Jul 2022 16:40:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] btdev: Fix not checking if a CIG has any active CIS
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165755761307.19082.15759142680740158998.git-patchwork-notify@kernel.org>
-Date:   Mon, 11 Jul 2022 16:40:13 +0000
-References: <20220708002751.2308369-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220708002751.2308369-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Mon, 11 Jul 2022 13:33:34 -0400
+Received: from smtp.github.com (out-26.smtp.github.com [192.30.252.209])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 083D3CD0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 10:33:32 -0700 (PDT)
+Received: from github.com (hubbernetes-node-655f4a4.ash1-iad.github.net [10.56.14.49])
+        by smtp.github.com (Postfix) with ESMTPA id EE9A05E03B6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 10:33:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1657560812;
+        bh=2qAXoQFDsrlZy5JSQXKABtgRQG/XhfgCee5QnrPNnvQ=;
+        h=Date:From:To:Subject:From;
+        b=O5yEZTzp/chv7RHfoMLEZHZL4oPdvfVotkA1rFJ7QHu/f59eexRlB1T8rsUy0UEOY
+         /bEf7yrbE/Szv5T0QK+ozKjcfasRZHS8ivKNcS19OrKI1sQlgenlWNY0tzJXfbmEal
+         zf03Eu3Ok9loa1BZ5ABunxcZOEvpQE1HXOblWg9U=
+Date:   Mon, 11 Jul 2022 10:33:31 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/e681fa-163de8@github.com>
+Subject: [bluez/bluez] 163de8: btdev: Fix not checking if a CIG has any active
+ CIS
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 163de8e231e6e138ebfea710df8211f22d4b9b4e
+      https://github.com/bluez/bluez/commit/163de8e231e6e138ebfea710df8211f22d4b9b4e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-07-11 (Mon, 11 Jul 2022)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M emulator/btdev.c
 
-On Thu,  7 Jul 2022 17:27:51 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Bluetooth Core specification says the CIG must be in configurable state
-> in order to accept the SetCIGParameters:
-> 
-> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2553:
-> 
-> [...]
+  Log Message:
+  -----------
+  btdev: Fix not checking if a CIG has any active CIS
 
-Here is the summary with links:
-  - [BlueZ] btdev: Fix not checking if a CIG has any active CIS
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=163de8e231e6
+Bluetooth Core specification says the CIG must be in configurable state
+in order to accept the SetCIGParameters:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2553:
+
+ 'If the Host issues this command when the CIG is not in the
+  configurable state, the Controller shall return the error
+  code Command Disallowed (0x0C).'
 
 
