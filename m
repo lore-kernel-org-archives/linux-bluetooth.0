@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF62ACCA480
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Jul 2022 23:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF64CC43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Jul 2022 23:35:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbiGKXfv (ORCPT
+        id S230229AbiGKXfx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Jul 2022 19:35:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53004 "EHLO
+        Mon, 11 Jul 2022 19:35:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230080AbiGKXfq (ORCPT
+        with ESMTP id S230117AbiGKXfr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Jul 2022 19:35:46 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F102B27C
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 16:35:42 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id w185so6048941pfb.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 16:35:41 -0700 (PDT)
+        Mon, 11 Jul 2022 19:35:47 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 130942B608
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 16:35:44 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id o3-20020a17090a744300b001ef8f7f3dddso6321494pjk.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 16:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=SMKRcqdbBOG/hQV2yyyhmIVgddjQleoy+rjA/Fm+7Dc=;
-        b=M99Myo7tYmOw1/QSqThHWktHNe0jN5EUSVVnR2aJlWoPkECV/eOruw9MSLf7SQiCvw
-         hMrXsc/b9lh15fBShSIm/jj4+0+8AfWw8oX424EJOm1BdX0I7dJHpC8OJnMO2KO+9eXo
-         zBSLL9gOx1GCPDEmUq7JXnKNiQJfz5OxXlhdDBkbFdUYelsY3NDbeTXW5yTCr+sgZrT1
-         /csR8cWMae0EsypY1kcUvdmvjUYKl4ydRrd6vGGT3APtZodw2/x+t7Xw+nVOXAJP3BRa
-         h2akTkEXw0vZa0NyQX6Pl/vG7h+DahPPyNaBw4StEMpbSe9FjLRUAyPhRcz+/DqzVf+E
-         Zc5A==
+        bh=w7IsR/FK3pHCgjYhNfqpOkYy/V5VDZPg1SyV//WK4mY=;
+        b=bmkjy7oRHafR4gjgTCjGg0PlvBd1L9NUGpFT6c5r2/xiuC2+DGx8mv4l59cRlhquCd
+         F4y5Mtg6CMNeA/Xygn3zKEttYQthoKUXH4gujFQyZ3d1qbAX7Bu2Koixi9oR5x0rnElx
+         WQ7AYWas7nMz1A/cPihDpDRAiPVBbUWoiC88G5ofYpVdXIeue+XyVk+5lZr9G7343Jsm
+         7JsMUIDWVILNjrdp1jxpKVibAwFL/RN4sw8BKc6P90V9gzkXsm0acvMsnVpRgsvG8rZq
+         niVUt+gdvu+7Jo8FpecKNaWv5xdgyUxHNNRaTf9Ld7LbV5wppSLMeixJ0nzHLNW2zM94
+         oZ4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SMKRcqdbBOG/hQV2yyyhmIVgddjQleoy+rjA/Fm+7Dc=;
-        b=50E130SAKFyFjql2CalXN8PoEfoDPHWXU3fIgp4ebzqySZskbj9dXvLPg3ISPaLQ4w
-         7EGykpk1w/7p16fi398id7PiV7nacCnX6M0MYYF7T6QxQwW5N2aj+Bu6MvVtlWIZeUJG
-         Cyn8HL0h/7x+A6NHPtrPkeWju2jN9X7sRkcurGnUrbwg+Bog+AwpUGW6LN1dPbIiOajw
-         CwHMzYoq8FnUjANo56n/lxbN196iW+24UBgyhVJbubXqL8Nrnjhhdk0Pv4TIB8d/Tn4Q
-         GAAa9saWUADFpk5jLvA8s413wHh55I0Kb9YARWNlstP+C7WdVhr4t1daqkpeszYRkL+H
-         17vg==
-X-Gm-Message-State: AJIora+dKxfQThKG42f2/J9dIIFR1ULl0LSrtb6BkraWZU+PdoAFfVIW
-        2nTk2VLpYo8RP8MThii8W6Dug5n/k74=
-X-Google-Smtp-Source: AGRyM1sdDhlaMztbPfydj/1Z98Z+KRMQAgD/0ICo0QnffkuBdx0UbymAcBWQGqYgG0m4arOa/9hJBg==
-X-Received: by 2002:a05:6a00:3488:b0:528:3c8b:7b3a with SMTP id cp8-20020a056a00348800b005283c8b7b3amr20948321pfb.57.1657582540350;
-        Mon, 11 Jul 2022 16:35:40 -0700 (PDT)
+        bh=w7IsR/FK3pHCgjYhNfqpOkYy/V5VDZPg1SyV//WK4mY=;
+        b=MrSbc8WbJ+kZnCLxhtVSt4WXJO6KpqaP2igDj2KczIUQdVYihNYOTgUY/7IkoXWaNF
+         exBq+8/tNsAABa3A6tYupZJnfmlSd0qls0gRzCcoWGZH4VT0O1t7YyadJmHoCdj7e6qa
+         CWlZF47tAjRBrlrRdZcEG5Cib/4duEWFOnXwwDiIhfR9RX84ySctNJqxX2FWImBWCyb3
+         adQOndFyzVL6P0Y7L5IsZ6mTcXwr/lKNngN4fXIfTVvgdtM8/RnUWxMIQCfjtfxRq9hu
+         PkOC40EBm7VufDJ0ie4QG0w0QCEfSFB2kcM8x51gSFHLR6lhF5jU040foNEUpH6q3xvM
+         37Ug==
+X-Gm-Message-State: AJIora8QhjLqeewn6Y4PVy6CAz5pVLr3LfwsGr8yfbBLuc/VumNSU6Dx
+        l1MEqe4ZtLpO+sri/SCvg/3pFT5a63w=
+X-Google-Smtp-Source: AGRyM1tLGvcTN4L5RMAeUQdpvT17zGrBIRZbNklGNKZFUQE8zMrhZWTdfBkag/NBDtfv9PlFLeG8ng==
+X-Received: by 2002:a17:90a:8048:b0:1ef:79e7:ecf6 with SMTP id e8-20020a17090a804800b001ef79e7ecf6mr887278pjw.188.1657582542029;
+        Mon, 11 Jul 2022 16:35:42 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id q93-20020a17090a17e600b001e33e264fd6sm5446281pja.40.2022.07.11.16.35.39
+        by smtp.gmail.com with ESMTPSA id q93-20020a17090a17e600b001e33e264fd6sm5446281pja.40.2022.07.11.16.35.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Jul 2022 16:35:39 -0700 (PDT)
+        Mon, 11 Jul 2022 16:35:41 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v7 3/7] Bluetooth: Add BTPROTO_ISO socket type
-Date:   Mon, 11 Jul 2022 16:35:31 -0700
-Message-Id: <20220711233535.3134546-3-luiz.dentz@gmail.com>
+Subject: [PATCH v7 4/7] Bluetooth: Add initial implementation of BIS connections
+Date:   Mon, 11 Jul 2022 16:35:32 -0700
+Message-Id: <20220711233535.3134546-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20220711233535.3134546-1-luiz.dentz@gmail.com>
 References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
@@ -66,1800 +66,2082 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces a new socket type BTPROTO_ISO which can be enabled with
-use of ISO Socket experiemental UUID, it can used to initiate/accept
-connections and transfer packets between userspace and kernel similarly
-to how BTPROTO_SCO works:
+This adds initial support for BIS/BIG which includes:
 
-Central -> uses connect with address set to destination bdaddr:
-> tools/isotest -s 00:AA:01:00:00:00
+== Broadcaster role: Setup a periodic advertising and create a BIG ==
 
-Peripheral -> uses listen:
-> tools/isotest -d
+> tools/isotest -s 00:00:00:00:00:00
+isotest[63]: Connected [00:00:00:00:00:00]
+isotest[63]: QoS BIG 0x00 BIS 0x00 Packing 0x00 Framing 0x00]
+isotest[63]: Output QoS [Interval 10000 us Latency 10 ms SDU 40 PHY 0x02
+RTN 2]
+isotest[63]: Sending ...
+isotest[63]: Number of packets: 1
+isotest[63]: Socket jitter buffer: 80 buffer
+< HCI Command: LE Set Perio.. (0x08|0x003e) plen 7
+...
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Periodic Advertising Parameters (0x08|0x003e) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Perio.. (0x08|0x003f) plen 7
+...
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Periodic Advertising Data (0x08|0x003f) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Perio.. (0x08|0x0040) plen 2
+...
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Periodic Advertising Enable (0x08|0x0040) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Create B.. (0x08|0x0068) plen 31
+...
+> HCI Event: Command Status (0x0f) plen 4
+      LE Create Broadcast Isochronous Group (0x08|0x0068) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 21
+      LE Broadcast Isochronous Group Complete (0x1b)
+      ...
+
+== Broadcast Receiver role: Create a PA Sync and BIG Sync ==
+
+> tools/isotest -i hci1 -d 00:AA:01:00:00:00
+isotest[66]: Waiting for connection 00:AA:01:00:00:00...
+< HCI Command: LE Periodic Advert.. (0x08|0x0044) plen 14
+...
+> HCI Event: Command Status (0x0f) plen 4
+      LE Periodic Advertising Create Sync (0x08|0x0044) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Extended Sca.. (0x08|0x0041) plen 8
+...
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
+        Status: Success (0x00)
+< HCI Command: LE Set Extended Sca.. (0x08|0x0042) plen 6
+...
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Enable (0x08|0x0042) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 29
+      LE Extended Advertising Report (0x0d)
+      ...
+> HCI Event: LE Meta Event (0x3e) plen 16
+      LE Periodic Advertising Sync Established (0x0e)
+      ...
+< HCI Command: LE Broadcast Isoch.. (0x08|0x006b) plen 25
+...
+> HCI Event: Command Status (0x0f) plen 4
+      LE Broadcast Isochronous Group Create Sync (0x08|0x006b) ncmd 1
+        Status: Success (0x00)
+> HCI Event: LE Meta Event (0x3e) plen 17
+      LE Broadcast Isochronous Group Sync Estabilished (0x1d)
+      ...
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |   21 +
- include/net/bluetooth/hci_core.h  |   18 +-
- include/net/bluetooth/iso.h       |   21 +
- net/bluetooth/Makefile            |    1 +
- net/bluetooth/af_bluetooth.c      |    4 +-
- net/bluetooth/hci_core.c          |    6 +-
- net/bluetooth/iso.c               | 1501 +++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c              |   69 +-
- 8 files changed, 1636 insertions(+), 5 deletions(-)
- create mode 100644 include/net/bluetooth/iso.h
- create mode 100644 net/bluetooth/iso.c
+ include/net/bluetooth/bluetooth.h |  18 +-
+ include/net/bluetooth/hci.h       | 162 ++++++++-
+ include/net/bluetooth/hci_core.h  |  89 ++++-
+ include/net/bluetooth/hci_sync.h  |  12 +-
+ net/bluetooth/eir.c               |  21 ++
+ net/bluetooth/eir.h               |   1 +
+ net/bluetooth/hci_conn.c          | 561 +++++++++++++++++++++++++++---
+ net/bluetooth/hci_core.c          |  80 +++--
+ net/bluetooth/hci_event.c         | 206 +++++++++++
+ net/bluetooth/hci_request.c       |  36 +-
+ net/bluetooth/hci_request.h       |   9 +
+ net/bluetooth/hci_sync.c          | 249 ++++++++++++-
+ net/bluetooth/mgmt.c              |  15 +-
+ 13 files changed, 1333 insertions(+), 126 deletions(-)
 
 diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index a3ebd7fa152d..bab566ebe10e 100644
+index bab566ebe10e..2a0f8d8e52a5 100644
 --- a/include/net/bluetooth/bluetooth.h
 +++ b/include/net/bluetooth/bluetooth.h
-@@ -590,6 +590,27 @@ static inline void sco_exit(void)
- }
- #endif
+@@ -160,6 +160,9 @@ struct bt_voice {
+ #define BT_ISO_QOS_CIG_UNSET	0xff
+ #define BT_ISO_QOS_CIS_UNSET	0xff
  
-+#if IS_ENABLED(CONFIG_BT_LE)
-+int iso_init(void);
-+int iso_exit(void);
-+bool iso_enabled(void);
-+#else
-+static inline int iso_init(void)
-+{
-+	return 0;
-+}
++#define BT_ISO_QOS_BIG_UNSET	0xff
++#define BT_ISO_QOS_BIS_UNSET	0xff
 +
-+static inline int iso_exit(void)
-+{
-+	return 0;
-+}
-+
-+static inline bool iso_enabled(void)
-+{
-+	return false;
-+}
-+#endif
-+
- int mgmt_init(void);
- void mgmt_exit(void);
+ struct bt_iso_io_qos {
+ 	__u32 interval;
+ 	__u16 latency;
+@@ -169,9 +172,18 @@ struct bt_iso_io_qos {
+ };
  
+ struct bt_iso_qos {
+-	__u8  cig;
+-	__u8  cis;
+-	__u8  sca;
++	union {
++		__u8  cig;
++		__u8  big;
++	};
++	union {
++		__u8  cis;
++		__u8  bis;
++	};
++	union {
++		__u8  sca;
++		__u8  sync_interval;
++	};
+ 	__u8  packing;
+ 	__u8  framing;
+ 	struct bt_iso_io_qos in;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 9896e7fbe254..f928dbcc7f95 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -327,6 +327,7 @@ enum {
+ 	HCI_USER_CHANNEL,
+ 	HCI_EXT_CONFIGURED,
+ 	HCI_LE_ADV,
++	HCI_LE_PER_ADV,
+ 	HCI_LE_SCAN,
+ 	HCI_SSP_ENABLED,
+ 	HCI_SC_ENABLED,
+@@ -349,6 +350,7 @@ enum {
+ 	HCI_LE_SCAN_INTERRUPTED,
+ 	HCI_WIDEBAND_SPEECH_ENABLED,
+ 	HCI_EVENT_FILTER_CONFIGURED,
++	HCI_PA_SYNC,
+ 
+ 	HCI_DUT_MODE,
+ 	HCI_VENDOR_DIAG,
+@@ -529,9 +531,11 @@ enum {
+ #define HCI_LE_PHY_2M			0x01
+ #define HCI_LE_PHY_CODED		0x08
+ #define HCI_LE_EXT_ADV			0x10
++#define HCI_LE_PERIODIC_ADV		0x20
+ #define HCI_LE_CHAN_SEL_ALG2		0x40
+ #define HCI_LE_CIS_CENTRAL		0x10
+ #define HCI_LE_CIS_PERIPHERAL		0x20
++#define HCI_LE_ISO_BROADCASTER		0x40
+ 
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+@@ -1875,6 +1879,22 @@ struct hci_cp_le_ext_conn_param {
+ 	__le16 max_ce_len;
+ } __packed;
+ 
++#define HCI_OP_LE_PA_CREATE_SYNC	0x2044
++struct hci_cp_le_pa_create_sync {
++	__u8      options;
++	__u8      sid;
++	__u8      addr_type;
++	bdaddr_t  addr;
++	__le16    skip;
++	__le16    sync_timeout;
++	__u8      sync_cte_type;
++} __packed;
++
++#define HCI_OP_LE_PA_TERM_SYNC		0x2046
++struct hci_cp_le_pa_term_sync {
++	__le16    handle;
++} __packed;
++
+ #define HCI_OP_LE_READ_NUM_SUPPORTED_ADV_SETS	0x203b
+ struct hci_rp_le_read_num_supported_adv_sets {
+ 	__u8  status;
+@@ -1909,13 +1929,6 @@ struct hci_rp_le_set_ext_adv_params {
+ 	__u8  tx_power;
+ } __packed;
+ 
+-#define HCI_OP_LE_SET_EXT_ADV_ENABLE		0x2039
+-struct hci_cp_le_set_ext_adv_enable {
+-	__u8  enable;
+-	__u8  num_of_sets;
+-	__u8  data[];
+-} __packed;
+-
+ struct hci_cp_ext_adv_set {
+ 	__u8  handle;
+ 	__le16 duration;
+@@ -1942,6 +1955,37 @@ struct hci_cp_le_set_ext_scan_rsp_data {
+ 	__u8  data[];
+ } __packed;
+ 
++#define HCI_OP_LE_SET_EXT_ADV_ENABLE		0x2039
++struct hci_cp_le_set_ext_adv_enable {
++	__u8  enable;
++	__u8  num_of_sets;
++	__u8  data[];
++} __packed;
++
++#define HCI_OP_LE_SET_PER_ADV_PARAMS		0x203e
++struct hci_cp_le_set_per_adv_params {
++	__u8      handle;
++	__le16    min_interval;
++	__le16    max_interval;
++	__le16    periodic_properties;
++} __packed;
++
++#define HCI_MAX_PER_AD_LENGTH	252
++
++#define HCI_OP_LE_SET_PER_ADV_DATA		0x203f
++struct hci_cp_le_set_per_adv_data {
++	__u8  handle;
++	__u8  operation;
++	__u8  length;
++	__u8  data[];
++} __packed;
++
++#define HCI_OP_LE_SET_PER_ADV_ENABLE		0x2040
++struct hci_cp_le_set_per_adv_enable {
++	__u8  enable;
++	__u8  handle;
++} __packed;
++
+ #define LE_SET_ADV_DATA_OP_COMPLETE	0x03
+ 
+ #define LE_SET_ADV_DATA_NO_FRAG		0x01
+@@ -2053,6 +2097,49 @@ struct hci_cp_le_reject_cis {
+ 	__u8    reason;
+ } __packed;
+ 
++#define HCI_OP_LE_CREATE_BIG			0x2068
++struct hci_bis {
++	__u8    sdu_interval[3];
++	__le16  sdu;
++	__le16  latency;
++	__u8    rtn;
++	__u8    phy;
++	__u8    packing;
++	__u8    framing;
++	__u8    encryption;
++	__u8    bcode[16];
++} __packed;
++
++struct hci_cp_le_create_big {
++	__u8    handle;
++	__u8    adv_handle;
++	__u8    num_bis;
++	struct hci_bis bis;
++} __packed;
++
++#define HCI_OP_LE_TERM_BIG			0x206a
++struct hci_cp_le_term_big {
++	__u8    handle;
++	__u8    reason;
++} __packed;
++
++#define HCI_OP_LE_BIG_CREATE_SYNC		0x206b
++struct hci_cp_le_big_create_sync {
++	__u8    handle;
++	__le16  sync_handle;
++	__u8    encryption;
++	__u8    bcode[16];
++	__u8    mse;
++	__le16  timeout;
++	__u8    num_bis;
++	__u8    bis[0];
++} __packed;
++
++#define HCI_OP_LE_BIG_TERM_SYNC			0x206c
++struct hci_cp_le_big_term_sync {
++	__u8    handle;
++} __packed;
++
+ #define HCI_OP_LE_SETUP_ISO_PATH		0x206e
+ struct hci_cp_le_setup_iso_path {
+ 	__le16  handle;
+@@ -2605,6 +2692,18 @@ struct hci_ev_le_ext_adv_report {
+ 	struct hci_ev_le_ext_adv_info info[];
+ } __packed;
+ 
++#define HCI_EV_LE_PA_SYNC_ESTABLISHED	0x0e
++struct hci_ev_le_pa_sync_established {
++	__u8      status;
++	__le16    handle;
++	__u8      sid;
++	__u8      bdaddr_type;
++	bdaddr_t  bdaddr;
++	__u8      phy;
++	__le16    interval;
++	__u8      clock_accuracy;
++} __packed;
++
+ #define HCI_EV_LE_ENHANCED_CONN_COMPLETE    0x0a
+ struct hci_ev_le_enh_conn_complete {
+ 	__u8      status;
+@@ -2656,6 +2755,55 @@ struct hci_evt_le_cis_req {
+ 	__u8  cis_id;
+ } __packed;
+ 
++#define HCI_EVT_LE_CREATE_BIG_COMPLETE	0x1b
++struct hci_evt_le_create_big_complete {
++	__u8    status;
++	__u8    handle;
++	__u8    sync_delay[3];
++	__u8    transport_delay[3];
++	__u8    phy;
++	__u8    nse;
++	__u8    bn;
++	__u8    pto;
++	__u8    irc;
++	__le16  max_pdu;
++	__le16  interval;
++	__u8    num_bis;
++	__le16  bis_handle[];
++} __packed;
++
++#define HCI_EVT_LE_BIG_SYNC_ESTABILISHED 0x1d
++struct hci_evt_le_big_sync_estabilished {
++	__u8    status;
++	__u8    handle;
++	__u8    latency[3];
++	__u8    nse;
++	__u8    bn;
++	__u8    pto;
++	__u8    irc;
++	__le16  max_pdu;
++	__le16  interval;
++	__u8    num_bis;
++	__le16  bis[];
++} __packed;
++
++#define HCI_EVT_LE_BIG_INFO_ADV_REPORT	0x22
++struct hci_evt_le_big_info_adv_report {
++	__le16  sync_handle;
++	__u8    num_bis;
++	__u8    nse;
++	__le16  iso_interval;
++	__u8    bn;
++	__u8    pto;
++	__u8    irc;
++	__le16  max_pdu;
++	__u8    sdu_interval[3];
++	__le16  max_sdu;
++	__u8    phy;
++	__u8    framing;
++	__u8    encryption;
++} __packed;
++
+ #define HCI_EV_VENDOR			0xff
+ 
+ /* Internal events generated by Bluetooth stack */
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 955311409e5d..87f22a996158 100644
+index 87f22a996158..6abef4579184 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -848,6 +848,21 @@ static inline void sco_recv_scodata(struct hci_conn *hcon, struct sk_buff *skb)
- }
- #endif
+@@ -238,8 +238,9 @@ struct oob_data {
  
-+#if IS_ENABLED(CONFIG_BT_LE)
-+int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags);
-+void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags);
-+#else
-+static inline int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+				  __u8 *flags)
-+{
-+	return 0;
-+}
-+static inline void iso_recv(struct hci_conn *hcon, struct sk_buff *skb,
-+			    u16 flags)
-+{
-+}
-+#endif
-+
- /* ----- Inquiry cache ----- */
- #define INQUIRY_CACHE_AGE_MAX   (HZ*30)   /* 30 seconds */
- #define INQUIRY_ENTRY_AGE_MAX   (HZ*60)   /* 60 seconds */
-@@ -1648,8 +1663,7 @@ static inline int hci_proto_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 		return sco_connect_ind(hdev, bdaddr, flags);
+ struct adv_info {
+ 	struct list_head list;
+-	bool enabled;
+-	bool pending;
++	bool	enabled;
++	bool	pending;
++	bool	periodic;
+ 	__u8	instance;
+ 	__u32	flags;
+ 	__u16	timeout;
+@@ -251,6 +252,8 @@ struct adv_info {
+ 	__u16	scan_rsp_len;
+ 	__u8	scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
+ 	bool	scan_rsp_changed;
++	__u16	per_adv_data_len;
++	__u8	per_adv_data[HCI_MAX_PER_AD_LENGTH];
+ 	__s8	tx_power;
+ 	__u32   min_interval;
+ 	__u32   max_interval;
+@@ -599,6 +602,8 @@ struct hci_dev {
+ 	__u8			adv_data_len;
+ 	__u8			scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__u8			scan_rsp_data_len;
++	__u8			per_adv_data[HCI_MAX_PER_AD_LENGTH];
++	__u8			per_adv_data_len;
  
- 	case ISO_LINK:
--		/* TODO: Handle connection indication */
--		return -EINVAL;
-+		return iso_connect_ind(hdev, bdaddr, flags);
- 
- 	default:
- 		BT_ERR("unknown link type %d", type);
-diff --git a/include/net/bluetooth/iso.h b/include/net/bluetooth/iso.h
-new file mode 100644
-index 000000000000..13b22d54aab5
---- /dev/null
-+++ b/include/net/bluetooth/iso.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2022 Intel Corporation
-+ */
-+
-+#ifndef __ISO_H
-+#define __ISO_H
-+
-+/* ISO defaults */
-+#define ISO_DEFAULT_MTU		251
-+
-+/* ISO socket address */
-+struct sockaddr_iso {
-+	sa_family_t	iso_family;
-+	bdaddr_t	iso_bdaddr;
-+	__u8		iso_bdaddr_type;
-+};
-+
-+#endif /* __ISO_H */
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index a52bba8500e1..0e7b7db42750 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -18,6 +18,7 @@ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	eir.o hci_sync.o
- 
- bluetooth-$(CONFIG_BT_BREDR) += sco.o
-+bluetooth-$(CONFIG_BT_LE) += iso.o
- bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
- bluetooth-$(CONFIG_BT_LEDS) += leds.o
- bluetooth-$(CONFIG_BT_MSFTEXT) += msft.o
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index b506409bb498..dc65974f5adb 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -38,7 +38,7 @@
- #include "selftest.h"
- 
- /* Bluetooth sockets */
--#define BT_MAX_PROTO	8
-+#define BT_MAX_PROTO	(BTPROTO_LAST + 1)
- static const struct net_proto_family *bt_proto[BT_MAX_PROTO];
- static DEFINE_RWLOCK(bt_proto_lock);
- 
-@@ -52,6 +52,7 @@ static const char *const bt_key_strings[BT_MAX_PROTO] = {
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_CMTP",
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_HIDP",
- 	"sk_lock-AF_BLUETOOTH-BTPROTO_AVDTP",
-+	"sk_lock-AF_BLUETOOTH-BTPROTO_ISO",
+ 	struct list_head	adv_instances;
+ 	unsigned int		adv_instance_cnt;
+@@ -684,6 +689,7 @@ struct hci_conn {
+ 	__u8		resp_addr_type;
+ 	__u8		adv_instance;
+ 	__u16		handle;
++	__u16		sync_handle;
+ 	__u16		state;
+ 	__u8		mode;
+ 	__u8		type;
+@@ -714,6 +720,8 @@ struct hci_conn {
+ 	__u16		le_supv_timeout;
+ 	__u8		le_adv_data[HCI_MAX_AD_LENGTH];
+ 	__u8		le_adv_data_len;
++	__u8		le_per_adv_data[HCI_MAX_PER_AD_LENGTH];
++	__u8		le_per_adv_data_len;
+ 	__u8		le_tx_phy;
+ 	__u8		le_rx_phy;
+ 	__s8		rssi;
+@@ -947,6 +955,7 @@ enum {
+ 	HCI_CONN_NEW_LINK_KEY,
+ 	HCI_CONN_SCANNING,
+ 	HCI_CONN_AUTH_FAILURE,
++	HCI_CONN_PER_ADV,
  };
  
- static struct lock_class_key bt_slock_key[BT_MAX_PROTO];
-@@ -64,6 +65,7 @@ static const char *const bt_slock_key_strings[BT_MAX_PROTO] = {
- 	"slock-AF_BLUETOOTH-BTPROTO_CMTP",
- 	"slock-AF_BLUETOOTH-BTPROTO_HIDP",
- 	"slock-AF_BLUETOOTH-BTPROTO_AVDTP",
-+	"slock-AF_BLUETOOTH-BTPROTO_ISO",
- };
- 
- void bt_sock_reclassify_lock(struct sock *sk, int proto)
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 05256fb8cd21..fafa8b2ab1d3 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3852,12 +3852,16 @@ static void hci_isodata_packet(struct hci_dev *hdev, struct sk_buff *skb)
- 	conn = hci_conn_hash_lookup_handle(hdev, handle);
- 	hci_dev_unlock(hdev);
- 
--	/* TODO: Send to upper protocol */
- 	if (!conn) {
- 		bt_dev_err(hdev, "ISO packet for unknown connection handle %d",
- 			   handle);
-+		goto drop;
- 	}
- 
-+	/* Send to upper protocol */
-+	iso_recv(conn, skb, flags);
-+	return;
-+
- drop:
- 	kfree_skb(skb);
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+@@ -1065,6 +1074,29 @@ static inline __u8 hci_conn_lookup_type(struct hci_dev *hdev, __u16 handle)
+ 	return type;
  }
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-new file mode 100644
-index 000000000000..caaaa670cc2c
---- /dev/null
-+++ b/net/bluetooth/iso.c
-@@ -0,0 +1,1501 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2022 Intel Corporation
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/debugfs.h>
-+#include <linux/seq_file.h>
-+#include <linux/sched/signal.h>
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/iso.h>
-+
-+static const struct proto_ops iso_sock_ops;
-+
-+static struct bt_sock_list iso_sk_list = {
-+	.lock = __RW_LOCK_UNLOCKED(iso_sk_list.lock)
-+};
-+
-+/* ---- ISO connections ---- */
-+struct iso_conn {
-+	struct hci_conn	*hcon;
-+
-+	/* @lock: spinlock protecting changes to iso_conn fields */
-+	spinlock_t	lock;
-+	struct sock	*sk;
-+
-+	struct delayed_work	timeout_work;
-+
-+	struct sk_buff	*rx_skb;
-+	__u32		rx_len;
-+	__u16		tx_sn;
-+};
-+
-+#define iso_conn_lock(c)	spin_lock(&(c)->lock)
-+#define iso_conn_unlock(c)	spin_unlock(&(c)->lock)
-+
-+static void iso_sock_close(struct sock *sk);
-+static void iso_sock_kill(struct sock *sk);
-+
-+/* ----- ISO socket info ----- */
-+#define iso_pi(sk) ((struct iso_pinfo *)sk)
-+
-+struct iso_pinfo {
-+	struct bt_sock		bt;
-+	bdaddr_t		src;
-+	__u8			src_type;
-+	bdaddr_t		dst;
-+	__u8			dst_type;
-+	__u32			flags;
-+	struct bt_iso_qos	qos;
-+	struct iso_conn		*conn;
-+};
-+
-+/* ---- ISO timers ---- */
-+#define ISO_CONN_TIMEOUT	(HZ * 40)
-+#define ISO_DISCONN_TIMEOUT	(HZ * 2)
-+
-+static void iso_sock_timeout(struct work_struct *work)
+ 
++static inline struct hci_conn *hci_conn_hash_lookup_bis(struct hci_dev *hdev,
++							bdaddr_t *ba,
++							__u8 big, __u8 bis)
 +{
-+	struct iso_conn *conn = container_of(work, struct iso_conn,
-+					     timeout_work.work);
-+	struct sock *sk;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
 +
-+	iso_conn_lock(conn);
-+	sk = conn->sk;
-+	if (sk)
-+		sock_hold(sk);
-+	iso_conn_unlock(conn);
++	rcu_read_lock();
 +
-+	if (!sk)
-+		return;
-+
-+	BT_DBG("sock %p state %d", sk, sk->sk_state);
-+
-+	lock_sock(sk);
-+	sk->sk_err = ETIMEDOUT;
-+	sk->sk_state_change(sk);
-+	release_sock(sk);
-+	sock_put(sk);
-+}
-+
-+static void iso_sock_set_timer(struct sock *sk, long timeout)
-+{
-+	if (!iso_pi(sk)->conn)
-+		return;
-+
-+	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
-+	cancel_delayed_work(&iso_pi(sk)->conn->timeout_work);
-+	schedule_delayed_work(&iso_pi(sk)->conn->timeout_work, timeout);
-+}
-+
-+static void iso_sock_clear_timer(struct sock *sk)
-+{
-+	if (!iso_pi(sk)->conn)
-+		return;
-+
-+	BT_DBG("sock %p state %d", sk, sk->sk_state);
-+	cancel_delayed_work(&iso_pi(sk)->conn->timeout_work);
-+}
-+
-+/* ---- ISO connections ---- */
-+static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
-+{
-+	struct iso_conn *conn = hcon->iso_data;
-+
-+	if (conn)
-+		return conn;
-+
-+	conn = kzalloc(sizeof(*conn), GFP_KERNEL);
-+	if (!conn)
-+		return NULL;
-+
-+	spin_lock_init(&conn->lock);
-+	INIT_DELAYED_WORK(&conn->timeout_work, iso_sock_timeout);
-+
-+	hcon->iso_data = conn;
-+	conn->hcon = hcon;
-+	conn->tx_sn = 0;
-+
-+	BT_DBG("hcon %p conn %p", hcon, conn);
-+
-+	return conn;
-+}
-+
-+/* Delete channel. Must be called on the locked socket. */
-+static void iso_chan_del(struct sock *sk, int err)
-+{
-+	struct iso_conn *conn;
-+
-+	conn = iso_pi(sk)->conn;
-+
-+	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
-+
-+	if (conn) {
-+		iso_conn_lock(conn);
-+		conn->sk = NULL;
-+		iso_pi(sk)->conn = NULL;
-+		iso_conn_unlock(conn);
-+
-+		if (conn->hcon)
-+			hci_conn_drop(conn->hcon);
-+	}
-+
-+	sk->sk_state = BT_CLOSED;
-+	sk->sk_err   = err;
-+	sk->sk_state_change(sk);
-+
-+	sock_set_flag(sk, SOCK_ZAPPED);
-+}
-+
-+static void iso_conn_del(struct hci_conn *hcon, int err)
-+{
-+	struct iso_conn *conn = hcon->iso_data;
-+	struct sock *sk;
-+
-+	if (!conn)
-+		return;
-+
-+	BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
-+
-+	/* Kill socket */
-+	iso_conn_lock(conn);
-+	sk = conn->sk;
-+	if (sk)
-+		sock_hold(sk);
-+	iso_conn_unlock(conn);
-+
-+	if (sk) {
-+		lock_sock(sk);
-+		iso_sock_clear_timer(sk);
-+		iso_chan_del(sk, err);
-+		release_sock(sk);
-+		sock_put(sk);
-+	}
-+
-+	/* Ensure no more work items will run before freeing conn. */
-+	cancel_delayed_work_sync(&conn->timeout_work);
-+
-+	hcon->iso_data = NULL;
-+	kfree(conn);
-+}
-+
-+static int __iso_chan_add(struct iso_conn *conn, struct sock *sk,
-+			  struct sock *parent)
-+{
-+	BT_DBG("conn %p", conn);
-+
-+	if (iso_pi(sk)->conn == conn && conn->sk == sk)
-+		return 0;
-+
-+	if (conn->sk) {
-+		BT_ERR("conn->sk already set");
-+		return -EBUSY;
-+	}
-+
-+	iso_pi(sk)->conn = conn;
-+	conn->sk = sk;
-+
-+	if (parent)
-+		bt_accept_enqueue(parent, sk, true);
-+
-+	return 0;
-+}
-+
-+static int iso_chan_add(struct iso_conn *conn, struct sock *sk,
-+			struct sock *parent)
-+{
-+	int err;
-+
-+	iso_conn_lock(conn);
-+	err = __iso_chan_add(conn, sk, parent);
-+	iso_conn_unlock(conn);
-+
-+	return err;
-+}
-+
-+static int iso_connect(struct sock *sk)
-+{
-+	struct iso_conn *conn;
-+	struct hci_conn *hcon;
-+	struct hci_dev  *hdev;
-+	int err;
-+
-+	BT_DBG("%pMR -> %pMR", &iso_pi(sk)->src, &iso_pi(sk)->dst);
-+
-+	hdev = hci_get_route(&iso_pi(sk)->dst, &iso_pi(sk)->src,
-+			     iso_pi(sk)->src_type);
-+	if (!hdev)
-+		return -EHOSTUNREACH;
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!cis_central_capable(hdev)) {
-+		err = -EOPNOTSUPP;
-+		goto done;
-+	}
-+
-+	/* Fail if either PHYs are marked as disabled */
-+	if (!iso_pi(sk)->qos.in.phy && !iso_pi(sk)->qos.out.phy) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	/* Just bind if DEFER_SETUP has been set */
-+	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-+		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
-+				    iso_pi(sk)->dst_type, &iso_pi(sk)->qos);
-+		if (IS_ERR(hcon)) {
-+			err = PTR_ERR(hcon);
-+			goto done;
-+		}
-+	} else {
-+		hcon = hci_connect_cis(hdev, &iso_pi(sk)->dst,
-+				       iso_pi(sk)->dst_type, &iso_pi(sk)->qos);
-+		if (IS_ERR(hcon)) {
-+			err = PTR_ERR(hcon);
-+			goto done;
-+		}
-+	}
-+
-+	conn = iso_conn_add(hcon);
-+	if (!conn) {
-+		hci_conn_drop(hcon);
-+		err = -ENOMEM;
-+		goto done;
-+	}
-+
-+	/* Update source addr of the socket */
-+	bacpy(&iso_pi(sk)->src, &hcon->src);
-+
-+	err = iso_chan_add(conn, sk, NULL);
-+	if (err)
-+		goto done;
-+
-+	if (hcon->state == BT_CONNECTED) {
-+		iso_sock_clear_timer(sk);
-+		sk->sk_state = BT_CONNECTED;
-+	} else if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-+		iso_sock_clear_timer(sk);
-+		sk->sk_state = BT_CONNECT;
-+	} else {
-+		sk->sk_state = BT_CONNECT;
-+		iso_sock_set_timer(sk, sk->sk_sndtimeo);
-+	}
-+
-+done:
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+	return err;
-+}
-+
-+static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
-+{
-+	struct iso_conn *conn = iso_pi(sk)->conn;
-+	struct hci_iso_data_hdr *hdr;
-+	int len = 0;
-+
-+	BT_DBG("sk %p len %d", sk, skb->len);
-+
-+	if (skb->len > iso_pi(sk)->qos.out.sdu)
-+		return -EMSGSIZE;
-+
-+	len = skb->len;
-+
-+	/* Push ISO data header */
-+	hdr = skb_push(skb, HCI_ISO_DATA_HDR_SIZE);
-+	hdr->sn = cpu_to_le16(conn->tx_sn++);
-+	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
-+						      HCI_ISO_STATUS_VALID));
-+
-+	if (sk->sk_state == BT_CONNECTED)
-+		hci_send_iso(conn->hcon, skb);
-+	else
-+		len = -ENOTCONN;
-+
-+	return len;
-+}
-+
-+static void iso_recv_frame(struct iso_conn *conn, struct sk_buff *skb)
-+{
-+	struct sock *sk;
-+
-+	iso_conn_lock(conn);
-+	sk = conn->sk;
-+	iso_conn_unlock(conn);
-+
-+	if (!sk)
-+		goto drop;
-+
-+	BT_DBG("sk %p len %d", sk, skb->len);
-+
-+	if (sk->sk_state != BT_CONNECTED)
-+		goto drop;
-+
-+	if (!sock_queue_rcv_skb(sk, skb))
-+		return;
-+
-+drop:
-+	kfree_skb(skb);
-+}
-+
-+/* -------- Socket interface ---------- */
-+static struct sock *__iso_get_sock_listen_by_addr(bdaddr_t *ba)
-+{
-+	struct sock *sk;
-+
-+	sk_for_each(sk, &iso_sk_list.head) {
-+		if (sk->sk_state != BT_LISTEN)
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (bacmp(&c->dst, ba) || c->type != ISO_LINK)
 +			continue;
 +
-+		if (!bacmp(&iso_pi(sk)->src, ba))
-+			return sk;
++		if (c->iso_qos.big == big && c->iso_qos.bis == bis) {
++			rcu_read_unlock();
++			return c;
++		}
 +	}
++	rcu_read_unlock();
 +
 +	return NULL;
 +}
 +
-+/* Find socket listening on source bdaddr.
-+ * Returns closest match.
-+ */
-+static struct sock *iso_get_sock_listen(bdaddr_t *src)
+ static inline struct hci_conn *hci_conn_hash_lookup_handle(struct hci_dev *hdev,
+ 								__u16 handle)
+ {
+@@ -1175,6 +1207,29 @@ static inline struct hci_conn *hci_conn_hash_lookup_cig(struct hci_dev *hdev,
+ 	return NULL;
+ }
+ 
++static inline struct hci_conn *hci_conn_hash_lookup_big(struct hci_dev *hdev,
++							__u8 handle)
 +{
-+	struct sock *sk = NULL, *sk1 = NULL;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
 +
-+	read_lock(&iso_sk_list.lock);
++	rcu_read_lock();
 +
-+	sk_for_each(sk, &iso_sk_list.head) {
-+		if (sk->sk_state != BT_LISTEN)
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (bacmp(&c->dst, BDADDR_ANY) || c->type != ISO_LINK)
 +			continue;
 +
-+		/* Exact match. */
-+		if (!bacmp(&iso_pi(sk)->src, src))
-+			break;
-+
-+		/* Closest match */
-+		if (!bacmp(&iso_pi(sk)->src, BDADDR_ANY))
-+			sk1 = sk;
++		if (handle == c->iso_qos.big) {
++			rcu_read_unlock();
++			return c;
++		}
 +	}
 +
-+	read_unlock(&iso_sk_list.lock);
++	rcu_read_unlock();
 +
-+	return sk ? sk : sk1;
++	return NULL;
 +}
 +
-+static void iso_sock_destruct(struct sock *sk)
+ static inline struct hci_conn *hci_conn_hash_lookup_state(struct hci_dev *hdev,
+ 							__u8 type, __u16 state)
+ {
+@@ -1269,6 +1324,13 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 			      __u8 dst_type, struct bt_iso_qos *qos);
+ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 __u8 dst_type, struct bt_iso_qos *qos);
++struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
++				 __u8 dst_type, struct bt_iso_qos *qos,
++				 __u8 data_len, __u8 *data);
++int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
++		       __u8 sid);
++int hci_le_big_create_sync(struct hci_dev *hdev, struct bt_iso_qos *qos,
++			   __u16 sync_handle, __u8 num_bis, __u8 bis[]);
+ int hci_conn_check_link_mode(struct hci_conn *conn);
+ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
+ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
+@@ -1515,11 +1577,14 @@ int hci_remove_remote_oob_data(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ void hci_adv_instances_clear(struct hci_dev *hdev);
+ struct adv_info *hci_find_adv_instance(struct hci_dev *hdev, u8 instance);
+ struct adv_info *hci_get_next_instance(struct hci_dev *hdev, u8 instance);
+-int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+-			 u16 adv_data_len, u8 *adv_data,
+-			 u16 scan_rsp_len, u8 *scan_rsp_data,
+-			 u16 timeout, u16 duration, s8 tx_power,
+-			 u32 min_interval, u32 max_interval);
++struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
++				      u32 flags, u16 adv_data_len, u8 *adv_data,
++				      u16 scan_rsp_len, u8 *scan_rsp_data,
++				      u16 timeout, u16 duration, s8 tx_power,
++				      u32 min_interval, u32 max_interval);
++struct adv_info *hci_add_per_instance(struct hci_dev *hdev, u8 instance,
++				      u32 flags, u8 data_len, u8 *data,
++				      u32 min_interval, u32 max_interval);
+ int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
+ 			 u16 adv_data_len, u8 *adv_data,
+ 			 u16 scan_rsp_len, u8 *scan_rsp_data);
+@@ -1639,14 +1704,18 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define use_enhanced_conn_complete(dev) (ll_privacy_capable(dev) || \
+ 					 ext_adv_capable(dev))
+ 
+-/* CIS Master/Slave support */
+-#define iso_capable(dev) (cis_capable(dev))
++/* Periodic advertising support */
++#define per_adv_capable(dev) (((dev)->le_features[1] & HCI_LE_PERIODIC_ADV))
++
++/* CIS Master/Slave and BIS support */
++#define iso_capable(dev) (cis_capable(dev) || bis_capable(dev))
+ #define cis_capable(dev) \
+ 	(cis_central_capable(dev) || cis_peripheral_capable(dev))
+ #define cis_central_capable(dev) \
+ 	((dev)->le_features[3] & HCI_LE_CIS_CENTRAL)
+ #define cis_peripheral_capable(dev) \
+ 	((dev)->le_features[3] & HCI_LE_CIS_PERIPHERAL)
++#define bis_capable(dev) ((dev)->le_features[3] & HCI_LE_ISO_BROADCASTER)
+ 
+ /* ----- HCI protocols ----- */
+ #define HCI_PROTO_DEFER             0x01
+@@ -1934,6 +2003,8 @@ void hci_mgmt_chan_unregister(struct hci_mgmt_chan *c);
+ #define DISCOV_LE_RESTART_DELAY		msecs_to_jiffies(200)	/* msec */
+ #define DISCOV_LE_FAST_ADV_INT_MIN	0x00A0	/* 100 msec */
+ #define DISCOV_LE_FAST_ADV_INT_MAX	0x00F0	/* 150 msec */
++#define DISCOV_LE_PER_ADV_INT_MIN	0x00A0	/* 200 msec */
++#define DISCOV_LE_PER_ADV_INT_MAX	0x00A0	/* 200 msec */
+ 
+ #define NAME_RESOLVE_DURATION		msecs_to_jiffies(10240)	/* 10.24 sec */
+ 
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index a32678c69135..bf45133ee82c 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -65,6 +65,10 @@ int hci_enable_ext_advertising_sync(struct hci_dev *hdev, u8 instance);
+ int hci_enable_advertising_sync(struct hci_dev *hdev);
+ int hci_enable_advertising(struct hci_dev *hdev);
+ 
++int hci_start_per_adv_sync(struct hci_dev *hdev, u8 instance, u8 data_len,
++			   u8 *data, u32 flags, u16 min_interval,
++			   u16 max_interval, u16 sync_interval);
++
+ int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
+ 				u8 instance, bool force);
+ int hci_disable_advertising_sync(struct hci_dev *hdev);
+@@ -82,6 +86,7 @@ int hci_update_scan_sync(struct hci_dev *hdev);
+ int hci_write_le_host_supported_sync(struct hci_dev *hdev, u8 le, u8 simul);
+ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 				     struct sock *sk);
++int hci_remove_ext_adv_instance(struct hci_dev *hdev, u8 instance);
+ struct sk_buff *hci_read_local_oob_data_sync(struct hci_dev *hdev, bool ext,
+ 					     struct sock *sk);
+ 
+@@ -108,4 +113,9 @@ struct hci_conn;
+ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn);
+ 
+ int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle);
+-int hci_le_remove_cig(struct hci_dev *hdev, u8 handle);
++
++int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason);
++
++int hci_le_big_terminate_sync(struct hci_dev *hdev, u8 handle);
++
++int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle);
+diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
+index 776d27f7e18d..8a85f6cdfbc1 100644
+--- a/net/bluetooth/eir.c
++++ b/net/bluetooth/eir.c
+@@ -236,6 +236,27 @@ void eir_create(struct hci_dev *hdev, u8 *data)
+ 	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
+ }
+ 
++u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
 +{
-+	BT_DBG("sk %p", sk);
++	struct adv_info *adv = NULL;
++	u8 ad_len = 0;
 +
-+	skb_queue_purge(&sk->sk_receive_queue);
-+	skb_queue_purge(&sk->sk_write_queue);
-+}
-+
-+static void iso_sock_cleanup_listen(struct sock *parent)
-+{
-+	struct sock *sk;
-+
-+	BT_DBG("parent %p", parent);
-+
-+	/* Close not yet accepted channels */
-+	while ((sk = bt_accept_dequeue(parent, NULL))) {
-+		iso_sock_close(sk);
-+		iso_sock_kill(sk);
++	/* Return 0 when the current instance identifier is invalid. */
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv)
++			return 0;
 +	}
 +
-+	parent->sk_state  = BT_CLOSED;
-+	sock_set_flag(parent, SOCK_ZAPPED);
++	if (adv) {
++		memcpy(ptr, adv->per_adv_data, adv->per_adv_data_len);
++		ad_len += adv->per_adv_data_len;
++		ptr += adv->per_adv_data_len;
++	}
++
++	return ad_len;
 +}
 +
-+/* Kill socket (only if zapped and orphan)
-+ * Must be called on unlocked socket.
-+ */
-+static void iso_sock_kill(struct sock *sk)
+ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
+ {
+ 	struct adv_info *adv = NULL;
+diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
+index 62f2374078f2..0df19f2f4af9 100644
+--- a/net/bluetooth/eir.h
++++ b/net/bluetooth/eir.h
+@@ -11,6 +11,7 @@ void eir_create(struct hci_dev *hdev, u8 *data);
+ 
+ u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
++u8 eir_create_per_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
+ 
+ u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
+ u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 97568723ddb0..f54864e19866 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -30,10 +30,13 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/l2cap.h>
++#include <net/bluetooth/iso.h>
++#include <net/bluetooth/mgmt.h>
+ 
+ #include "hci_request.h"
+ #include "smp.h"
+ #include "a2mp.h"
++#include "eir.h"
+ 
+ struct sco_param {
+ 	u16 pkt_type;
+@@ -684,6 +687,199 @@ static void le_conn_timeout(struct work_struct *work)
+ 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
+ }
+ 
++struct iso_list_data {
++	union {
++		u8  cig;
++		u8  big;
++	};
++	union {
++		u8  cis;
++		u8  bis;
++		u16 sync_handle;
++	};
++	int count;
++	struct {
++		struct hci_cp_le_set_cig_params cp;
++		struct hci_cis_params cis[0x11];
++	} pdu;
++};
++
++static void bis_list(struct hci_conn *conn, void *data)
 +{
-+	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket ||
-+	    sock_flag(sk, SOCK_DEAD))
++	struct iso_list_data *d = data;
++
++	/* Skip if not broadcast/ANY address */
++	if (bacmp(&conn->dst, BDADDR_ANY))
 +		return;
 +
-+	BT_DBG("sk %p state %d", sk, sk->sk_state);
++	if (d->big != conn->iso_qos.big || d->bis == BT_ISO_QOS_BIS_UNSET ||
++	    d->bis != conn->iso_qos.bis)
++		return;
 +
-+	/* Kill poor orphan */
-+	bt_sock_unlink(&iso_sk_list, sk);
-+	sock_set_flag(sk, SOCK_DEAD);
-+	sock_put(sk);
++	d->count++;
 +}
 +
-+static void iso_conn_defer_reject(struct hci_conn *conn)
++static void find_bis(struct hci_conn *conn, void *data)
 +{
-+	struct hci_cp_le_reject_cis cp;
++	struct iso_list_data *d = data;
 +
-+	BT_DBG("conn %p", conn);
++	/* Ignore unicast */
++	if (bacmp(&conn->dst, BDADDR_ANY))
++		return;
 +
-+	memset(&cp, 0, sizeof(cp));
-+	cp.handle = cpu_to_le16(conn->handle);
-+	cp.reason = HCI_ERROR_REJ_BAD_ADDR;
-+	hci_send_cmd(conn->hdev, HCI_OP_LE_REJECT_CIS, sizeof(cp), &cp);
++	d->count++;
 +}
 +
-+static void __iso_sock_close(struct sock *sk)
++static int terminate_big_sync(struct hci_dev *hdev, void *data)
 +{
-+	BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socket);
++	struct iso_list_data *d = data;
 +
-+	switch (sk->sk_state) {
-+	case BT_LISTEN:
-+		iso_sock_cleanup_listen(sk);
-+		break;
++	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", d->big, d->bis);
 +
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (iso_pi(sk)->conn->hcon) {
-+			sk->sk_state = BT_DISCONN;
-+			iso_sock_set_timer(sk, ISO_DISCONN_TIMEOUT);
-+			iso_conn_lock(iso_pi(sk)->conn);
-+			hci_conn_drop(iso_pi(sk)->conn->hcon);
-+			iso_pi(sk)->conn->hcon = NULL;
-+			iso_conn_unlock(iso_pi(sk)->conn);
-+		} else {
-+			iso_chan_del(sk, ECONNRESET);
-+		}
-+		break;
++	hci_remove_ext_adv_instance_sync(hdev, d->bis, NULL);
 +
-+	case BT_CONNECT2:
-+		if (iso_pi(sk)->conn->hcon)
-+			iso_conn_defer_reject(iso_pi(sk)->conn->hcon);
-+		iso_chan_del(sk, ECONNRESET);
-+		break;
-+	case BT_CONNECT:
-+		/* In case of DEFER_SETUP the hcon would be bound to CIG which
-+		 * needs to be removed so just call hci_conn_del so the cleanup
-+		 * callback do what is needed.
-+		 */
-+		if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags) &&
-+		    iso_pi(sk)->conn->hcon) {
-+			hci_conn_del(iso_pi(sk)->conn->hcon);
-+			iso_pi(sk)->conn->hcon = NULL;
-+		}
++	/* Check if ISO connection is a BIS and terminate BIG if there are
++	 * no other connections using it.
++	 */
++	hci_conn_hash_list_state(hdev, find_bis, ISO_LINK, BT_CONNECTED, d);
++	if (d->count)
++		return 0;
 +
-+		iso_chan_del(sk, ECONNRESET);
-+		break;
-+	case BT_DISCONN:
-+		iso_chan_del(sk, ECONNRESET);
-+		break;
-+
-+	default:
-+		sock_set_flag(sk, SOCK_ZAPPED);
-+		break;
-+	}
++	return hci_le_terminate_big_sync(hdev, d->big,
++					 HCI_ERROR_LOCAL_HOST_TERM);
 +}
 +
-+/* Must be called on unlocked socket. */
-+static void iso_sock_close(struct sock *sk)
++static void terminate_big_destroy(struct hci_dev *hdev, void *data, int err)
 +{
-+	iso_sock_clear_timer(sk);
-+	lock_sock(sk);
-+	__iso_sock_close(sk);
-+	release_sock(sk);
-+	iso_sock_kill(sk);
++	kfree(data);
 +}
 +
-+static void iso_sock_init(struct sock *sk, struct sock *parent)
++static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
 +{
-+	BT_DBG("sk %p", sk);
++	struct iso_list_data *d;
 +
-+	if (parent) {
-+		sk->sk_type = parent->sk_type;
-+		bt_sk(sk)->flags = bt_sk(parent)->flags;
-+		security_sk_clone(parent, sk);
-+	}
-+}
++	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
 +
-+static struct proto iso_proto = {
-+	.name		= "ISO",
-+	.owner		= THIS_MODULE,
-+	.obj_size	= sizeof(struct iso_pinfo)
-+};
-+
-+#define DEFAULT_IO_QOS \
-+{ \
-+	.interval	= 10000u, \
-+	.latency	= 10u, \
-+	.sdu		= 40u, \
-+	.phy		= BT_ISO_PHY_2M, \
-+	.rtn		= 2u, \
-+}
-+
-+static struct bt_iso_qos default_qos = {
-+	.cig		= BT_ISO_QOS_CIG_UNSET,
-+	.cis		= BT_ISO_QOS_CIS_UNSET,
-+	.sca		= 0x00,
-+	.packing	= 0x00,
-+	.framing	= 0x00,
-+	.in		= DEFAULT_IO_QOS,
-+	.out		= DEFAULT_IO_QOS,
-+};
-+
-+static struct sock *iso_sock_alloc(struct net *net, struct socket *sock,
-+				   int proto, gfp_t prio, int kern)
-+{
-+	struct sock *sk;
-+
-+	sk = sk_alloc(net, PF_BLUETOOTH, prio, &iso_proto, kern);
-+	if (!sk)
-+		return NULL;
-+
-+	sock_init_data(sock, sk);
-+	INIT_LIST_HEAD(&bt_sk(sk)->accept_q);
-+
-+	sk->sk_destruct = iso_sock_destruct;
-+	sk->sk_sndtimeo = ISO_CONN_TIMEOUT;
-+
-+	sock_reset_flag(sk, SOCK_ZAPPED);
-+
-+	sk->sk_protocol = proto;
-+	sk->sk_state    = BT_OPEN;
-+
-+	/* Set address type as public as default src address is BDADDR_ANY */
-+	iso_pi(sk)->src_type = BDADDR_LE_PUBLIC;
-+
-+	iso_pi(sk)->qos = default_qos;
-+
-+	bt_sock_link(&iso_sk_list, sk);
-+	return sk;
-+}
-+
-+static int iso_sock_create(struct net *net, struct socket *sock, int protocol,
-+			   int kern)
-+{
-+	struct sock *sk;
-+
-+	BT_DBG("sock %p", sock);
-+
-+	sock->state = SS_UNCONNECTED;
-+
-+	if (sock->type != SOCK_SEQPACKET)
-+		return -ESOCKTNOSUPPORT;
-+
-+	sock->ops = &iso_sock_ops;
-+
-+	sk = iso_sock_alloc(net, sock, protocol, GFP_ATOMIC, kern);
-+	if (!sk)
++	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	if (!d)
 +		return -ENOMEM;
 +
-+	iso_sock_init(sk, NULL);
++	memset(d, 0, sizeof(*d));
++	d->big = big;
++	d->bis = bis;
++
++	return hci_cmd_sync_queue(hdev, terminate_big_sync, d,
++				  terminate_big_destroy);
++}
++
++static int big_terminate_sync(struct hci_dev *hdev, void *data)
++{
++	struct iso_list_data *d = data;
++
++	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", d->big,
++		   d->sync_handle);
++
++	/* Check if ISO connection is a BIS and terminate BIG if there are
++	 * no other connections using it.
++	 */
++	hci_conn_hash_list_state(hdev, find_bis, ISO_LINK, BT_CONNECTED, d);
++	if (d->count)
++		return 0;
++
++	hci_le_big_terminate_sync(hdev, d->big);
++
++	return hci_le_pa_terminate_sync(hdev, d->sync_handle);
++}
++
++static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
++{
++	struct iso_list_data *d;
++
++	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
++
++	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	if (!d)
++		return -ENOMEM;
++
++	memset(d, 0, sizeof(*d));
++	d->big = big;
++	d->sync_handle = sync_handle;
++
++	return hci_cmd_sync_queue(hdev, big_terminate_sync, d,
++				  terminate_big_destroy);
++}
++
++/* Cleanup BIS connection
++ *
++ * Detects if there any BIS left connected in a BIG
++ * broadcaster: Remove advertising instance and terminate BIG.
++ * broadcaster receiver: Teminate BIG sync and terminate PA sync.
++ */
++static void bis_cleanup(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	bt_dev_dbg(hdev, "conn %p", conn);
++
++	if (conn->role == HCI_ROLE_MASTER) {
++		if (!test_and_clear_bit(HCI_CONN_PER_ADV, &conn->flags))
++			return;
++
++		hci_le_terminate_big(hdev, conn->iso_qos.big,
++				     conn->iso_qos.bis);
++	} else {
++		hci_le_big_terminate(hdev, conn->iso_qos.big,
++				     conn->sync_handle);
++	}
++}
++
++static int remove_cig_sync(struct hci_dev *hdev, void *data)
++{
++	u8 handle = PTR_ERR(data);
++
++	return hci_le_remove_cig_sync(hdev, handle);
++}
++
++static int hci_le_remove_cig(struct hci_dev *hdev, u8 handle)
++{
++	bt_dev_dbg(hdev, "handle 0x%2.2x", handle);
++
++	return hci_cmd_sync_queue(hdev, remove_cig_sync, ERR_PTR(handle), NULL);
++}
++
++static void find_cis(struct hci_conn *conn, void *data)
++{
++	struct iso_list_data *d = data;
++
++	/* Ignore broadcast */
++	if (!bacmp(&conn->dst, BDADDR_ANY))
++		return;
++
++	d->count++;
++}
++
++/* Cleanup CIS connection:
++ *
++ * Detects if there any CIS left connected in a CIG and remove it.
++ */
++static void cis_cleanup(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++	struct iso_list_data d;
++
++	memset(&d, 0, sizeof(d));
++	d.cig = conn->iso_qos.cig;
++
++	/* Check if ISO connection is a CIS and remove CIG if there are
++	 * no other connections using it.
++	 */
++	hci_conn_hash_list_state(hdev, find_cis, ISO_LINK, BT_CONNECTED, &d);
++	if (d.count)
++		return;
++
++	hci_le_remove_cig(hdev, conn->iso_qos.cig);
++}
++
+ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 			      u8 role)
+ {
+@@ -725,9 +921,19 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 		conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
+ 		break;
+ 	case LE_LINK:
++		/* conn->src should reflect the local identity address */
++		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
++		break;
+ 	case ISO_LINK:
+ 		/* conn->src should reflect the local identity address */
+ 		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
++
++		/* set proper cleanup function */
++		if (!bacmp(dst, BDADDR_ANY))
++			conn->cleanup = bis_cleanup;
++		else if (conn->role == HCI_ROLE_MASTER)
++			conn->cleanup = cis_cleanup;
++
+ 		break;
+ 	case SCO_LINK:
+ 		if (lmp_esco_capable(hdev))
+@@ -1100,6 +1306,108 @@ static int hci_explicit_conn_params_set(struct hci_dev *hdev,
+ 	return 0;
+ }
+ 
++static int qos_set_big(struct hci_dev *hdev, struct bt_iso_qos *qos)
++{
++	struct iso_list_data data;
++
++	/* Allocate a BIG if not set */
++	if (qos->big == BT_ISO_QOS_BIG_UNSET) {
++		for (data.big = 0x00; data.big < 0xef; data.big++) {
++			data.count = 0;
++			data.bis = 0xff;
++
++			hci_conn_hash_list_state(hdev, bis_list, ISO_LINK,
++						 BT_BOUND, &data);
++			if (!data.count)
++				break;
++		}
++
++		if (data.big == 0xef)
++			return -EADDRNOTAVAIL;
++
++		/* Update BIG */
++		qos->big = data.big;
++	}
++
 +	return 0;
 +}
 +
-+static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
-+			 int addr_len)
++static int qos_set_bis(struct hci_dev *hdev, struct bt_iso_qos *qos)
 +{
-+	struct sockaddr_iso *sa = (struct sockaddr_iso *)addr;
-+	struct sock *sk = sock->sk;
-+	int err = 0;
++	struct iso_list_data data;
 +
-+	BT_DBG("sk %p %pMR type %u", sk, &sa->iso_bdaddr, sa->iso_bdaddr_type);
++	/* Allocate BIS if not set */
++	if (qos->bis == BT_ISO_QOS_BIS_UNSET) {
++		/* Find an unused adv set to advertise BIS, skip instance 0x00
++		 * since it is reserved as general purpose set.
++		 */
++		for (data.bis = 0x01; data.bis < hdev->le_num_of_adv_sets;
++		     data.bis++) {
++			data.count = 0;
 +
-+	if (!addr || addr_len < sizeof(struct sockaddr_iso) ||
-+	    addr->sa_family != AF_BLUETOOTH)
-+		return -EINVAL;
++			hci_conn_hash_list_state(hdev, bis_list, ISO_LINK,
++						 BT_BOUND, &data);
++			if (!data.count)
++				break;
++		}
 +
-+	lock_sock(sk);
++		if (data.bis == hdev->le_num_of_adv_sets)
++			return -EADDRNOTAVAIL;
 +
-+	if (sk->sk_state != BT_OPEN) {
-+		err = -EBADFD;
-+		goto done;
++		/* Update BIS */
++		qos->bis = data.bis;
 +	}
 +
-+	if (sk->sk_type != SOCK_SEQPACKET) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	/* Check if the address type is of LE type */
-+	if (!bdaddr_type_is_le(sa->iso_bdaddr_type)) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	bacpy(&iso_pi(sk)->src, &sa->iso_bdaddr);
-+	iso_pi(sk)->src_type = sa->iso_bdaddr_type;
-+
-+	sk->sk_state = BT_BOUND;
-+
-+done:
-+	release_sock(sk);
-+	return err;
++	return 0;
 +}
 +
-+static int iso_sock_connect(struct socket *sock, struct sockaddr *addr,
-+			    int alen, int flags)
++/* This function requires the caller holds hdev->lock */
++static struct hci_conn *hci_add_bis(struct hci_dev *hdev, bdaddr_t *dst,
++				    struct bt_iso_qos *qos)
 +{
-+	struct sockaddr_iso *sa = (struct sockaddr_iso *)addr;
-+	struct sock *sk = sock->sk;
++	struct hci_conn *conn;
++	struct iso_list_data data;
 +	int err;
 +
-+	BT_DBG("sk %p", sk);
-+
-+	if (alen < sizeof(struct sockaddr_iso) ||
-+	    addr->sa_family != AF_BLUETOOTH)
-+		return -EINVAL;
-+
-+	if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND)
-+		return -EBADFD;
-+
-+	if (sk->sk_type != SOCK_SEQPACKET)
-+		return -EINVAL;
-+
-+	/* Check if the address type is of LE type */
-+	if (!bdaddr_type_is_le(sa->iso_bdaddr_type))
-+		return -EINVAL;
-+
-+	lock_sock(sk);
-+
-+	bacpy(&iso_pi(sk)->dst, &sa->iso_bdaddr);
-+	iso_pi(sk)->dst_type = sa->iso_bdaddr_type;
-+
-+	err = iso_connect(sk);
-+	if (err)
-+		goto done;
-+
-+	if (!test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-+		err = bt_sock_wait_state(sk, BT_CONNECTED,
-+					 sock_sndtimeo(sk, flags & O_NONBLOCK));
++	/* Let's make sure that le is enabled.*/
++	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
++		if (lmp_le_capable(hdev))
++			return ERR_PTR(-ECONNREFUSED);
++		return ERR_PTR(-EOPNOTSUPP);
 +	}
 +
-+done:
-+	release_sock(sk);
-+	return err;
++	err = qos_set_big(hdev, qos);
++	if (err)
++		return ERR_PTR(err);
++
++	err = qos_set_bis(hdev, qos);
++	if (err)
++		return ERR_PTR(err);
++
++	data.big = qos->big;
++	data.bis = qos->bis;
++	data.count = 0;
++
++	/* Check if there is already a matching BIG/BIS */
++	hci_conn_hash_list_state(hdev, bis_list, ISO_LINK, BT_BOUND, &data);
++	if (data.count)
++		return ERR_PTR(-EADDRINUSE);
++
++	conn = hci_conn_hash_lookup_bis(hdev, dst, qos->big, qos->bis);
++	if (conn)
++		return ERR_PTR(-EADDRINUSE);
++
++	conn = hci_conn_add(hdev, ISO_LINK, dst, HCI_ROLE_MASTER);
++	if (!conn)
++		return ERR_PTR(-ENOMEM);
++
++	set_bit(HCI_CONN_PER_ADV, &conn->flags);
++	conn->state = BT_CONNECT;
++
++	hci_conn_hold(conn);
++	return conn;
 +}
 +
-+static int iso_sock_listen(struct socket *sock, int backlog)
+ /* This function requires the caller holds hdev->lock */
+ struct hci_conn *hci_connect_le_scan(struct hci_dev *hdev, bdaddr_t *dst,
+ 				     u8 dst_type, u8 sec_level,
+@@ -1236,16 +1544,6 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
+ 	return sco;
+ }
+ 
+-struct iso_list_data {
+-	u8  cig;
+-	u8  cis;
+-	int count;
+-	struct {
+-		struct hci_cp_le_set_cig_params cp;
+-		struct hci_cis_params cis[0x11];
+-	} pdu;
+-};
+-
+ static void cis_add(struct iso_list_data *d, struct bt_iso_qos *qos)
+ {
+ 	struct hci_cis_params *cis = &d->pdu.cis[d->pdu.cp.num_cis];
+@@ -1265,6 +1563,10 @@ static void cis_list(struct hci_conn *conn, void *data)
+ {
+ 	struct iso_list_data *d = data;
+ 
++	/* Skip if broadcast/ANY address */
++	if (!bacmp(&conn->dst, BDADDR_ANY))
++		return;
++
+ 	if (d->cig != conn->iso_qos.cig || d->cis == BT_ISO_QOS_CIS_UNSET ||
+ 	    d->cis != conn->iso_qos.cis)
+ 		return;
+@@ -1278,6 +1580,29 @@ static void cis_list(struct hci_conn *conn, void *data)
+ 	cis_add(d, &conn->iso_qos);
+ }
+ 
++static int hci_le_create_big(struct hci_conn *conn, struct bt_iso_qos *qos)
 +{
-+	struct sock *sk = sock->sk;
-+	bdaddr_t *src = &iso_pi(sk)->src;
-+	int err = 0;
++	struct hci_dev *hdev = conn->hdev;
++	struct hci_cp_le_create_big cp;
 +
-+	BT_DBG("sk %p backlog %d", sk, backlog);
++	memset(&cp, 0, sizeof(cp));
 +
-+	lock_sock(sk);
++	cp.handle = qos->big;
++	cp.adv_handle = qos->bis;
++	cp.num_bis  = 0x01;
++	hci_cpu_to_le24(qos->out.interval, cp.bis.sdu_interval);
++	cp.bis.sdu = cpu_to_le16(qos->out.sdu);
++	cp.bis.latency =  cpu_to_le16(qos->out.latency);
++	cp.bis.rtn  = qos->out.rtn;
++	cp.bis.phy  = qos->out.phy;
++	cp.bis.packing = qos->packing;
++	cp.bis.framing = qos->framing;
++	cp.bis.encryption = 0x00;
++	memset(&cp.bis.bcode, 0, sizeof(cp.bis.bcode));
 +
-+	if (sk->sk_state != BT_BOUND) {
-+		err = -EBADFD;
-+		goto done;
++	return hci_send_cmd(hdev, HCI_OP_LE_CREATE_BIG, sizeof(cp), &cp);
++}
++
+ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ {
+ 	struct hci_dev *hdev = conn->hdev;
+@@ -1361,49 +1686,6 @@ static bool hci_le_set_cig_params(struct hci_conn *conn, struct bt_iso_qos *qos)
+ 	return true;
+ }
+ 
+-static void find_cis(struct hci_conn *conn, void *data)
+-{
+-	struct iso_list_data *d = data;
+-
+-	/* Ignore broadcast */
+-	if (!bacmp(&conn->dst, BDADDR_ANY))
+-		return;
+-
+-	d->count++;
+-}
+-
+-static int remove_cig_sync(struct hci_dev *hdev, void *data)
+-{
+-	u8 handle = PTR_ERR(data);
+-
+-	return hci_le_remove_cig_sync(hdev, handle);
+-}
+-
+-int hci_le_remove_cig(struct hci_dev *hdev, u8 handle)
+-{
+-	bt_dev_dbg(hdev, "handle 0x%2.2x", handle);
+-
+-	return hci_cmd_sync_queue(hdev, remove_cig_sync, ERR_PTR(handle), NULL);
+-}
+-
+-static void cis_cleanup(struct hci_conn *conn)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-	struct iso_list_data d;
+-
+-	memset(&d, 0, sizeof(d));
+-	d.cig = conn->iso_qos.cig;
+-
+-	/* Check if ISO connection is a CIS and remove CIG if there are
+-	 * no other connections using it.
+-	 */
+-	hci_conn_hash_list_state(hdev, find_cis, ISO_LINK, BT_CONNECTED, &d);
+-	if (d.count)
+-		return;
+-
+-	hci_le_remove_cig(hdev, conn->iso_qos.cig);
+-}
+-
+ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 			      __u8 dst_type, struct bt_iso_qos *qos)
+ {
+@@ -1622,6 +1904,179 @@ static void hci_iso_qos_setup(struct hci_dev *hdev, struct hci_conn *conn,
+ 		qos->latency = conn->le_conn_latency;
+ }
+ 
++static struct hci_conn *hci_bind_bis(struct hci_conn *conn,
++				     struct bt_iso_qos *qos)
++{
++	/* Update LINK PHYs according to QoS preference */
++	conn->le_tx_phy = qos->out.phy;
++	conn->le_tx_phy = qos->out.phy;
++	conn->iso_qos = *qos;
++	conn->state = BT_BOUND;
++
++	return conn;
++}
++
++static int create_big_sync(struct hci_dev *hdev, void *data)
++{
++	struct hci_conn *conn = data;
++	struct bt_iso_qos *qos = &conn->iso_qos;
++	u16 interval, sync_interval = 0;
++	u32 flags = 0;
++	int err;
++
++	if (qos->out.phy == 0x02)
++		flags |= MGMT_ADV_FLAG_SEC_2M;
++
++	/* Align intervals */
++	interval = qos->out.interval / 1250;
++
++	if (qos->bis)
++		sync_interval = qos->sync_interval * 1600;
++
++	err = hci_start_per_adv_sync(hdev, qos->bis, conn->le_per_adv_data_len,
++				     conn->le_per_adv_data, flags, interval,
++				     interval, sync_interval);
++	if (err)
++		return err;
++
++	return hci_le_create_big(conn, &conn->iso_qos);
++}
++
++static void create_pa_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct hci_cp_le_pa_create_sync *cp = data;
++
++	bt_dev_dbg(hdev, "");
++
++	if (err)
++		bt_dev_err(hdev, "Unable to create PA: %d", err);
++
++	kfree(cp);
++}
++
++static int create_pa_sync(struct hci_dev *hdev, void *data)
++{
++	struct hci_cp_le_pa_create_sync *cp = data;
++	int err;
++
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_PA_CREATE_SYNC,
++				    sizeof(*cp), cp, HCI_CMD_TIMEOUT);
++	if (err) {
++		hci_dev_clear_flag(hdev, HCI_PA_SYNC);
++		return err;
 +	}
 +
-+	if (sk->sk_type != SOCK_SEQPACKET) {
-+		err = -EINVAL;
-+		goto done;
++	return hci_update_passive_scan_sync(hdev);
++}
++
++int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
++		       __u8 sid)
++{
++	struct hci_cp_le_pa_create_sync *cp;
++
++	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
++		return -EBUSY;
++
++	cp = kmalloc(sizeof(*cp), GFP_KERNEL);
++	if (!cp) {
++		hci_dev_clear_flag(hdev, HCI_PA_SYNC);
++		return -ENOMEM;
 +	}
 +
-+	write_lock(&iso_sk_list.lock);
++	/* Convert from ISO socket address type to HCI address type  */
++	if (dst_type == BDADDR_LE_PUBLIC)
++		dst_type = ADDR_LE_DEV_PUBLIC;
++	else
++		dst_type = ADDR_LE_DEV_RANDOM;
 +
-+	if (__iso_get_sock_listen_by_addr(src)) {
-+		err = -EADDRINUSE;
++	memset(cp, 0, sizeof(*cp));
++	cp->sid = sid;
++	cp->addr_type = dst_type;
++	bacpy(&cp->addr, dst);
++
++	/* Queue start pa_create_sync and scan */
++	return hci_cmd_sync_queue(hdev, create_pa_sync, cp, create_pa_complete);
++}
++
++int hci_le_big_create_sync(struct hci_dev *hdev, struct bt_iso_qos *qos,
++			   __u16 sync_handle, __u8 num_bis, __u8 bis[])
++{
++	struct _packed {
++		struct hci_cp_le_big_create_sync cp;
++		__u8  bis[0x11];
++	} pdu;
++	int err;
++
++	if (num_bis > sizeof(pdu.bis))
++		return -EINVAL;
++
++	err = qos_set_big(hdev, qos);
++	if (err)
++		return err;
++
++	memset(&pdu, 0, sizeof(pdu));
++	pdu.cp.handle = qos->big;
++	pdu.cp.sync_handle = cpu_to_le16(sync_handle);
++	pdu.cp.num_bis = num_bis;
++	memcpy(pdu.bis, bis, num_bis);
++
++	return hci_send_cmd(hdev, HCI_OP_LE_BIG_CREATE_SYNC,
++			    sizeof(pdu.cp) + num_bis, &pdu);
++}
++
++static void create_big_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct hci_conn *conn = data;
++
++	bt_dev_dbg(hdev, "conn %p", conn);
++
++	if (err) {
++		bt_dev_err(hdev, "Unable to create BIG: %d", err);
++		hci_connect_cfm(conn, err);
++		hci_conn_del(conn);
++	}
++}
++
++struct hci_conn *hci_connect_bis(struct hci_dev *hdev, bdaddr_t *dst,
++				 __u8 dst_type, struct bt_iso_qos *qos,
++				 __u8 base_len, __u8 *base)
++{
++	struct hci_conn *conn;
++	int err;
++
++	/* We need hci_conn object using the BDADDR_ANY as dst */
++	conn = hci_add_bis(hdev, dst, qos);
++	if (IS_ERR(conn))
++		return conn;
++
++	conn = hci_bind_bis(conn, qos);
++	if (!conn) {
++		hci_conn_drop(conn);
++		return ERR_PTR(-ENOMEM);
++	}
++
++	/* Add Basic Announcement into Peridic Adv Data if BASE is set */
++	if (base_len && base) {
++		base_len = eir_append_service_data(conn->le_per_adv_data, 0,
++						   0x1851, base, base_len);
++		conn->le_per_adv_data_len = base_len;
++	}
++
++	/* Queue start periodic advertising and create BIG */
++	err = hci_cmd_sync_queue(hdev, create_big_sync, conn,
++				 create_big_complete);
++	if (err < 0) {
++		hci_conn_drop(conn);
++		return ERR_PTR(err);
++	}
++
++	hci_iso_qos_setup(hdev, conn, &qos->out,
++			  conn->le_tx_phy ? conn->le_tx_phy :
++			  hdev->le_tx_def_phys);
++
++	return conn;
++}
++
+ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 				 __u8 dst_type, struct bt_iso_qos *qos)
+ {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fafa8b2ab1d3..21f9fb80d036 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1701,57 +1701,77 @@ static void adv_instance_rpa_expired(struct work_struct *work)
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+-int hci_add_adv_instance(struct hci_dev *hdev, u8 instance, u32 flags,
+-			 u16 adv_data_len, u8 *adv_data,
+-			 u16 scan_rsp_len, u8 *scan_rsp_data,
+-			 u16 timeout, u16 duration, s8 tx_power,
+-			 u32 min_interval, u32 max_interval)
++struct adv_info *hci_add_adv_instance(struct hci_dev *hdev, u8 instance,
++				      u32 flags, u16 adv_data_len, u8 *adv_data,
++				      u16 scan_rsp_len, u8 *scan_rsp_data,
++				      u16 timeout, u16 duration, s8 tx_power,
++				      u32 min_interval, u32 max_interval)
+ {
+-	struct adv_info *adv_instance;
++	struct adv_info *adv;
+ 
+-	adv_instance = hci_find_adv_instance(hdev, instance);
+-	if (adv_instance) {
+-		memset(adv_instance->adv_data, 0,
+-		       sizeof(adv_instance->adv_data));
+-		memset(adv_instance->scan_rsp_data, 0,
+-		       sizeof(adv_instance->scan_rsp_data));
++	adv = hci_find_adv_instance(hdev, instance);
++	if (adv) {
++		memset(adv->adv_data, 0, sizeof(adv->adv_data));
++		memset(adv->scan_rsp_data, 0, sizeof(adv->scan_rsp_data));
++		memset(adv->per_adv_data, 0, sizeof(adv->per_adv_data));
+ 	} else {
+ 		if (hdev->adv_instance_cnt >= hdev->le_num_of_adv_sets ||
+ 		    instance < 1 || instance > hdev->le_num_of_adv_sets)
+-			return -EOVERFLOW;
++			return ERR_PTR(-EOVERFLOW);
+ 
+-		adv_instance = kzalloc(sizeof(*adv_instance), GFP_KERNEL);
+-		if (!adv_instance)
+-			return -ENOMEM;
++		adv = kzalloc(sizeof(*adv), GFP_KERNEL);
++		if (!adv)
++			return ERR_PTR(-ENOMEM);
+ 
+-		adv_instance->pending = true;
+-		adv_instance->instance = instance;
+-		list_add(&adv_instance->list, &hdev->adv_instances);
++		adv->pending = true;
++		adv->instance = instance;
++		list_add(&adv->list, &hdev->adv_instances);
+ 		hdev->adv_instance_cnt++;
+ 	}
+ 
+-	adv_instance->flags = flags;
+-	adv_instance->min_interval = min_interval;
+-	adv_instance->max_interval = max_interval;
+-	adv_instance->tx_power = tx_power;
++	adv->flags = flags;
++	adv->min_interval = min_interval;
++	adv->max_interval = max_interval;
++	adv->tx_power = tx_power;
+ 
+ 	hci_set_adv_instance_data(hdev, instance, adv_data_len, adv_data,
+ 				  scan_rsp_len, scan_rsp_data);
+ 
+-	adv_instance->timeout = timeout;
+-	adv_instance->remaining_time = timeout;
++	adv->timeout = timeout;
++	adv->remaining_time = timeout;
+ 
+ 	if (duration == 0)
+-		adv_instance->duration = hdev->def_multi_adv_rotation_duration;
++		adv->duration = hdev->def_multi_adv_rotation_duration;
+ 	else
+-		adv_instance->duration = duration;
++		adv->duration = duration;
+ 
+-	INIT_DELAYED_WORK(&adv_instance->rpa_expired_cb,
+-			  adv_instance_rpa_expired);
++	INIT_DELAYED_WORK(&adv->rpa_expired_cb, adv_instance_rpa_expired);
+ 
+ 	BT_DBG("%s for %dMR", hdev->name, instance);
+ 
+-	return 0;
++	return adv;
++}
++
++/* This function requires the caller holds hdev->lock */
++struct adv_info *hci_add_per_instance(struct hci_dev *hdev, u8 instance,
++				      u32 flags, u8 data_len, u8 *data,
++				      u32 min_interval, u32 max_interval)
++{
++	struct adv_info *adv;
++
++	adv = hci_add_adv_instance(hdev, instance, flags, 0, NULL, 0, NULL,
++				   0, 0, HCI_ADV_TX_POWER_NO_PREFERENCE,
++				   min_interval, max_interval);
++	if (IS_ERR(adv))
++		return adv;
++
++	adv->periodic = true;
++	adv->per_adv_data_len = data_len;
++
++	if (data)
++		memcpy(adv->per_adv_data, data, data_len);
++
++	return adv;
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2709450ebd71..6cf8daa94f62 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3893,6 +3893,57 @@ static u8 hci_cc_le_setup_iso_path(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static void hci_cs_le_create_big(struct hci_dev *hdev, u8 status)
++{
++	bt_dev_dbg(hdev, "status 0x%2.2x", status);
++}
++
++static u8 hci_cc_set_per_adv_param(struct hci_dev *hdev, void *data,
++				   struct sk_buff *skb)
++{
++	struct hci_ev_status *rp = data;
++	struct hci_cp_le_set_per_adv_params *cp;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_PER_ADV_PARAMS);
++	if (!cp)
++		return rp->status;
++
++	/* TODO: set the conn state */
++	return rp->status;
++}
++
++static u8 hci_cc_le_set_per_adv_enable(struct hci_dev *hdev, void *data,
++				       struct sk_buff *skb)
++{
++	struct hci_ev_status *rp = data;
++	__u8 *sent;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", rp->status);
++
++	if (rp->status)
++		return rp->status;
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_PER_ADV_ENABLE);
++	if (!sent)
++		return rp->status;
++
++	hci_dev_lock(hdev);
++
++	if (*sent)
++		hci_dev_set_flag(hdev, HCI_LE_PER_ADV);
++	else
++		hci_dev_clear_flag(hdev, HCI_LE_PER_ADV);
++
++	hci_dev_unlock(hdev);
++
++	return rp->status;
++}
++
+ #define HCI_CC_VL(_op, _func, _min, _max) \
+ { \
+ 	.op = _op, \
+@@ -4066,6 +4117,9 @@ static const struct hci_cc {
+ 		      hci_cc_le_set_adv_set_random_addr),
+ 	HCI_CC_STATUS(HCI_OP_LE_REMOVE_ADV_SET, hci_cc_le_remove_adv_set),
+ 	HCI_CC_STATUS(HCI_OP_LE_CLEAR_ADV_SETS, hci_cc_le_clear_adv_sets),
++	HCI_CC_STATUS(HCI_OP_LE_SET_PER_ADV_PARAMS, hci_cc_set_per_adv_param),
++	HCI_CC_STATUS(HCI_OP_LE_SET_PER_ADV_ENABLE,
++		      hci_cc_le_set_per_adv_enable),
+ 	HCI_CC(HCI_OP_LE_READ_TRANSMIT_POWER, hci_cc_le_read_transmit_power,
+ 	       sizeof(struct hci_rp_le_read_transmit_power)),
+ 	HCI_CC_STATUS(HCI_OP_LE_SET_PRIVACY_MODE, hci_cc_le_set_privacy_mode),
+@@ -4202,6 +4256,7 @@ static const struct hci_cs {
+ 	HCI_CS(HCI_OP_LE_START_ENC, hci_cs_le_start_enc),
+ 	HCI_CS(HCI_OP_LE_EXT_CREATE_CONN, hci_cs_le_ext_create_conn),
+ 	HCI_CS(HCI_OP_LE_CREATE_CIS, hci_cs_le_create_cis),
++	HCI_CS(HCI_OP_LE_CREATE_BIG, hci_cs_le_create_big),
+ };
+ 
+ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+@@ -6425,6 +6480,39 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static int hci_le_pa_term_sync(struct hci_dev *hdev, __le16 handle)
++{
++	struct hci_cp_le_pa_term_sync cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = handle;
++
++	return hci_send_cmd(hdev, HCI_OP_LE_PA_TERM_SYNC, sizeof(cp), &cp);
++}
++
++static void hci_le_pa_sync_estabilished_evt(struct hci_dev *hdev, void *data,
++					    struct sk_buff *skb)
++{
++	struct hci_ev_le_pa_sync_established *ev = data;
++	int mask = hdev->link_mode;
++	__u8 flags = 0;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
++
++	if (ev->status)
++		return;
++
++	hci_dev_lock(hdev);
++
++	hci_dev_clear_flag(hdev, HCI_PA_SYNC);
++
++	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ISO_LINK, &flags);
++	if (!(mask & HCI_LM_ACCEPT))
++		hci_le_pa_term_sync(hdev, ev->handle);
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev, void *data,
+ 					    struct sk_buff *skb)
+ {
+@@ -6776,6 +6864,105 @@ static void hci_le_cis_req_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void hci_le_create_big_complete_evt(struct hci_dev *hdev, void *data,
++					   struct sk_buff *skb)
++{
++	struct hci_evt_le_create_big_complete *ev = data;
++	struct hci_conn *conn;
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
++
++	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_CREATE_BIG_COMPLETE,
++				flex_array_size(ev, bis_handle, ev->num_bis)))
++		return;
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_big(hdev, ev->handle);
++	if (!conn)
++		goto unlock;
++
++	if (ev->num_bis)
++		conn->handle = __le16_to_cpu(ev->bis_handle[0]);
++
++	if (!ev->status) {
++		conn->state = BT_CONNECTED;
++		hci_debugfs_create_conn(conn);
++		hci_conn_add_sysfs(conn);
++		hci_iso_setup_path(conn);
 +		goto unlock;
 +	}
 +
-+	sk->sk_max_ack_backlog = backlog;
-+	sk->sk_ack_backlog = 0;
-+
-+	sk->sk_state = BT_LISTEN;
++	hci_connect_cfm(conn, ev->status);
++	hci_conn_del(conn);
 +
 +unlock:
-+	write_unlock(&iso_sk_list.lock);
-+
-+done:
-+	release_sock(sk);
-+	return err;
++	hci_dev_unlock(hdev);
 +}
 +
-+static int iso_sock_accept(struct socket *sock, struct socket *newsock,
-+			   int flags, bool kern)
++static void hci_le_big_sync_established_evt(struct hci_dev *hdev, void *data,
++					    struct sk_buff *skb)
 +{
-+	DEFINE_WAIT_FUNC(wait, woken_wake_function);
-+	struct sock *sk = sock->sk, *ch;
-+	long timeo;
-+	int err = 0;
++	struct hci_evt_le_big_sync_estabilished *ev = data;
++	struct hci_conn *bis;
++	int i;
 +
-+	lock_sock(sk);
++	bt_dev_dbg(hdev, "status 0x%2.2x", ev->status);
 +
-+	timeo = sock_rcvtimeo(sk, flags & O_NONBLOCK);
-+
-+	BT_DBG("sk %p timeo %ld", sk, timeo);
-+
-+	/* Wait for an incoming connection. (wake-one). */
-+	add_wait_queue_exclusive(sk_sleep(sk), &wait);
-+	while (1) {
-+		if (sk->sk_state != BT_LISTEN) {
-+			err = -EBADFD;
-+			break;
-+		}
-+
-+		ch = bt_accept_dequeue(sk, newsock);
-+		if (ch)
-+			break;
-+
-+		if (!timeo) {
-+			err = -EAGAIN;
-+			break;
-+		}
-+
-+		if (signal_pending(current)) {
-+			err = sock_intr_errno(timeo);
-+			break;
-+		}
-+
-+		release_sock(sk);
-+
-+		timeo = wait_woken(&wait, TASK_INTERRUPTIBLE, timeo);
-+		lock_sock(sk);
-+	}
-+	remove_wait_queue(sk_sleep(sk), &wait);
-+
-+	if (err)
-+		goto done;
-+
-+	newsock->state = SS_CONNECTED;
-+
-+	BT_DBG("new socket %p", ch);
-+
-+done:
-+	release_sock(sk);
-+	return err;
-+}
-+
-+static int iso_sock_getname(struct socket *sock, struct sockaddr *addr,
-+			    int peer)
-+{
-+	struct sockaddr_iso *sa = (struct sockaddr_iso *)addr;
-+	struct sock *sk = sock->sk;
-+
-+	BT_DBG("sock %p, sk %p", sock, sk);
-+
-+	addr->sa_family = AF_BLUETOOTH;
-+
-+	if (peer) {
-+		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->dst);
-+		sa->iso_bdaddr_type = iso_pi(sk)->dst_type;
-+	} else {
-+		bacpy(&sa->iso_bdaddr, &iso_pi(sk)->src);
-+		sa->iso_bdaddr_type = iso_pi(sk)->src_type;
-+	}
-+
-+	return sizeof(struct sockaddr_iso);
-+}
-+
-+static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
-+			    size_t len)
-+{
-+	struct sock *sk = sock->sk;
-+	struct iso_conn *conn = iso_pi(sk)->conn;
-+	struct sk_buff *skb, **frag;
-+	int err;
-+
-+	BT_DBG("sock %p, sk %p", sock, sk);
-+
-+	err = sock_error(sk);
-+	if (err)
-+		return err;
-+
-+	if (msg->msg_flags & MSG_OOB)
-+		return -EOPNOTSUPP;
-+
-+	if (sk->sk_state != BT_CONNECTED)
-+		return -ENOTCONN;
-+
-+	skb = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
-+			     HCI_ISO_DATA_HDR_SIZE, 0);
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	len -= skb->len;
-+
-+	BT_DBG("skb %p len %d", sk, skb->len);
-+
-+	/* Continuation fragments */
-+	frag = &skb_shinfo(skb)->frag_list;
-+	while (len) {
-+		struct sk_buff *tmp;
-+
-+		tmp = bt_skb_sendmsg(sk, msg, len, conn->hcon->hdev->iso_mtu,
-+				     0, 0);
-+		if (IS_ERR(tmp)) {
-+			kfree_skb(skb);
-+			return PTR_ERR(tmp);
-+		}
-+
-+		*frag = tmp;
-+
-+		len  -= tmp->len;
-+
-+		skb->len += tmp->len;
-+		skb->data_len += tmp->len;
-+
-+		BT_DBG("frag %p len %d", *frag, tmp->len);
-+
-+		frag = &(*frag)->next;
-+	}
-+
-+	lock_sock(sk);
-+
-+	if (sk->sk_state == BT_CONNECTED)
-+		err = iso_send_frame(sk, skb);
-+	else
-+		err = -ENOTCONN;
-+
-+	release_sock(sk);
-+
-+	if (err < 0)
-+		kfree_skb(skb);
-+	return err;
-+}
-+
-+static void iso_conn_defer_accept(struct hci_conn *conn)
-+{
-+	struct hci_cp_le_accept_cis cp;
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	conn->state = BT_CONFIG;
-+
-+	cp.handle = cpu_to_le16(conn->handle);
-+
-+	hci_send_cmd(hdev, HCI_OP_LE_ACCEPT_CIS, sizeof(cp), &cp);
-+}
-+
-+static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
-+			    size_t len, int flags)
-+{
-+	struct sock *sk = sock->sk;
-+	struct iso_pinfo *pi = iso_pi(sk);
-+	int err;
-+
-+	BT_DBG("sk %p", sk);
-+
-+	lock_sock(sk);
-+
-+	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
-+		switch (sk->sk_state) {
-+		case BT_CONNECT2:
-+			iso_conn_defer_accept(pi->conn->hcon);
-+			sk->sk_state = BT_CONFIG;
-+			release_sock(sk);
-+			return 0;
-+		case BT_CONNECT:
-+			err = iso_connect(sk);
-+			release_sock(sk);
-+			return err;
-+		}
-+	}
-+
-+	release_sock(sk);
-+
-+	return bt_sock_recvmsg(sock, msg, len, flags);
-+}
-+
-+static bool check_io_qos(struct bt_iso_io_qos *qos)
-+{
-+	/* If no PHY is enable SDU must be 0 */
-+	if (!qos->phy && qos->sdu)
-+		return false;
-+
-+	if (qos->interval && (qos->interval < 0xff || qos->interval > 0xfffff))
-+		return false;
-+
-+	if (qos->latency && (qos->latency < 0x05 || qos->latency > 0xfa0))
-+		return false;
-+
-+	if (qos->phy > BT_ISO_PHY_ANY)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool check_qos(struct bt_iso_qos *qos)
-+{
-+	/* CIS shall not be set */
-+	if (qos->cis != BT_ISO_QOS_CIS_UNSET)
-+		return false;
-+
-+	if (qos->sca > 0x07)
-+		return false;
-+
-+	if (qos->packing > 0x01)
-+		return false;
-+
-+	if (qos->framing > 0x01)
-+		return false;
-+
-+	if (!check_io_qos(&qos->in))
-+		return false;
-+
-+	if (!check_io_qos(&qos->out))
-+		return false;
-+
-+	return true;
-+}
-+
-+static int iso_sock_setsockopt(struct socket *sock, int level, int optname,
-+			       sockptr_t optval, unsigned int optlen)
-+{
-+	struct sock *sk = sock->sk;
-+	int len, err = 0;
-+	struct bt_iso_qos qos;
-+	u32 opt;
-+
-+	BT_DBG("sk %p", sk);
-+
-+	lock_sock(sk);
-+
-+	switch (optname) {
-+	case BT_DEFER_SETUP:
-+		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+		if (opt)
-+			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-+		else
-+			clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
-+		break;
-+
-+	case BT_ISO_QOS:
-+		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
-+		    sk->sk_state != BT_CONNECT2) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		len = min_t(unsigned int, sizeof(qos), optlen);
-+		if (len != sizeof(qos))
-+			return -EINVAL;
-+
-+		memset(&qos, 0, sizeof(qos));
-+
-+		if (copy_from_sockptr(&qos, optval, len)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+
-+		if (!check_qos(&qos)) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		iso_pi(sk)->qos = qos;
-+
-+		break;
-+
-+	default:
-+		err = -ENOPROTOOPT;
-+		break;
-+	}
-+
-+	release_sock(sk);
-+	return err;
-+}
-+
-+static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
-+			       char __user *optval, int __user *optlen)
-+{
-+	struct sock *sk = sock->sk;
-+	int len, err = 0;
-+	struct bt_iso_qos qos;
-+
-+	BT_DBG("sk %p", sk);
-+
-+	if (get_user(len, optlen))
-+		return -EFAULT;
-+
-+	lock_sock(sk);
-+
-+	switch (optname) {
-+	case BT_DEFER_SETUP:
-+		if (sk->sk_state != BT_BOUND && sk->sk_state != BT_LISTEN) {
-+			err = -EINVAL;
-+			break;
-+		}
-+
-+		if (put_user(test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags),
-+			     (u32 __user *)optval))
-+			err = -EFAULT;
-+
-+		break;
-+
-+	case BT_ISO_QOS:
-+		if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
-+			qos = iso_pi(sk)->conn->hcon->iso_qos;
-+		else
-+			qos = iso_pi(sk)->qos;
-+
-+		len = min_t(unsigned int, len, sizeof(qos));
-+		if (copy_to_user(optval, (char *)&qos, len))
-+			err = -EFAULT;
-+
-+		break;
-+
-+	default:
-+		err = -ENOPROTOOPT;
-+		break;
-+	}
-+
-+	release_sock(sk);
-+	return err;
-+}
-+
-+static int iso_sock_shutdown(struct socket *sock, int how)
-+{
-+	struct sock *sk = sock->sk;
-+	int err = 0;
-+
-+	BT_DBG("sock %p, sk %p", sock, sk);
-+
-+	if (!sk)
-+		return 0;
-+
-+	sock_hold(sk);
-+	lock_sock(sk);
-+
-+	if (!sk->sk_shutdown) {
-+		sk->sk_shutdown = SHUTDOWN_MASK;
-+		iso_sock_clear_timer(sk);
-+		__iso_sock_close(sk);
-+
-+		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
-+		    !(current->flags & PF_EXITING))
-+			err = bt_sock_wait_state(sk, BT_CLOSED,
-+						 sk->sk_lingertime);
-+	}
-+
-+	release_sock(sk);
-+	sock_put(sk);
-+
-+	return err;
-+}
-+
-+static int iso_sock_release(struct socket *sock)
-+{
-+	struct sock *sk = sock->sk;
-+	int err = 0;
-+
-+	BT_DBG("sock %p, sk %p", sock, sk);
-+
-+	if (!sk)
-+		return 0;
-+
-+	iso_sock_close(sk);
-+
-+	if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
-+	    !(current->flags & PF_EXITING)) {
-+		lock_sock(sk);
-+		err = bt_sock_wait_state(sk, BT_CLOSED, sk->sk_lingertime);
-+		release_sock(sk);
-+	}
-+
-+	sock_orphan(sk);
-+	iso_sock_kill(sk);
-+	return err;
-+}
-+
-+static void iso_sock_ready(struct sock *sk)
-+{
-+	BT_DBG("sk %p", sk);
-+
-+	if (!sk)
++	if (!hci_le_ev_skb_pull(hdev, skb, HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
++				flex_array_size(ev, bis, ev->num_bis)))
 +		return;
 +
-+	lock_sock(sk);
-+	iso_sock_clear_timer(sk);
-+	sk->sk_state = BT_CONNECTED;
-+	sk->sk_state_change(sk);
-+	release_sock(sk);
-+}
-+
-+struct iso_list_data {
-+	struct hci_conn *hcon;
-+	int count;
-+};
-+
-+static void iso_conn_ready(struct iso_conn *conn)
-+{
-+	struct sock *parent;
-+	struct sock *sk = conn->sk;
-+
-+	BT_DBG("conn %p", conn);
-+
-+	if (sk) {
-+		iso_sock_ready(conn->sk);
-+	} else {
-+		iso_conn_lock(conn);
-+
-+		if (!conn->hcon) {
-+			iso_conn_unlock(conn);
-+			return;
-+		}
-+
-+		parent = iso_get_sock_listen(&conn->hcon->src);
-+		if (!parent) {
-+			iso_conn_unlock(conn);
-+			return;
-+		}
-+
-+		lock_sock(parent);
-+
-+		sk = iso_sock_alloc(sock_net(parent), NULL,
-+				    BTPROTO_ISO, GFP_ATOMIC, 0);
-+		if (!sk) {
-+			release_sock(parent);
-+			iso_conn_unlock(conn);
-+			return;
-+		}
-+
-+		iso_sock_init(sk, parent);
-+
-+		bacpy(&iso_pi(sk)->src, &conn->hcon->src);
-+		iso_pi(sk)->src_type = conn->hcon->src_type;
-+		bacpy(&iso_pi(sk)->dst, &conn->hcon->dst);
-+		iso_pi(sk)->dst_type = conn->hcon->dst_type;
-+
-+		hci_conn_hold(conn->hcon);
-+		__iso_chan_add(conn, sk, parent);
-+
-+		if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
-+			sk->sk_state = BT_CONNECT2;
-+		else
-+			sk->sk_state = BT_CONNECTED;
-+
-+		/* Wake up parent */
-+		parent->sk_data_ready(parent);
-+
-+		release_sock(parent);
-+
-+		iso_conn_unlock(conn);
-+	}
-+}
-+
-+/* ----- ISO interface with lower layer (HCI) ----- */
-+int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
-+{
-+	struct sock *sk;
-+	int lm = 0;
-+
-+	BT_DBG("hdev %s, bdaddr %pMR", hdev->name, bdaddr);
-+
-+	/* Find listening sockets */
-+	read_lock(&iso_sk_list.lock);
-+	sk_for_each(sk, &iso_sk_list.head) {
-+		if (sk->sk_state != BT_LISTEN)
-+			continue;
-+
-+		if (!bacmp(&iso_pi(sk)->src, &hdev->bdaddr) ||
-+		    !bacmp(&iso_pi(sk)->src, BDADDR_ANY)) {
-+			lm |= HCI_LM_ACCEPT;
-+
-+			if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags))
-+				*flags |= HCI_PROTO_DEFER;
-+			break;
-+		}
-+	}
-+	read_unlock(&iso_sk_list.lock);
-+
-+	return lm;
-+}
-+
-+static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
-+{
-+	if (hcon->type != ISO_LINK) {
-+		if (hcon->type != LE_LINK)
-+			return;
-+
-+		/* Check if LE link has failed */
-+		if (status) {
-+			if (hcon->link)
-+				iso_conn_del(hcon->link, bt_to_errno(status));
-+			return;
-+		}
-+
-+		/* Create CIS if pending */
-+		hci_le_create_cis(hcon);
-+		return;
-+	}
-+
-+	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
-+
-+	if (!status) {
-+		struct iso_conn *conn;
-+
-+		conn = iso_conn_add(hcon);
-+		if (conn)
-+			iso_conn_ready(conn);
-+	} else {
-+		iso_conn_del(hcon, bt_to_errno(status));
-+	}
-+}
-+
-+static void iso_disconn_cfm(struct hci_conn *hcon, __u8 reason)
-+{
-+	if (hcon->type != ISO_LINK)
++	if (ev->status)
 +		return;
 +
-+	BT_DBG("hcon %p reason %d", hcon, reason);
++	hci_dev_lock(hdev);
 +
-+	iso_conn_del(hcon, bt_to_errno(reason));
-+}
++	for (i = 0; i < ev->num_bis; i++) {
++		u16 handle = le16_to_cpu(ev->bis[i]);
++		__le32 interval;
 +
-+void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
-+{
-+	struct iso_conn *conn = hcon->iso_data;
-+	struct hci_iso_data_hdr *hdr;
-+	__u16 pb, ts, len;
-+
-+	if (!conn)
-+		goto drop;
-+
-+	pb     = hci_iso_flags_pb(flags);
-+	ts     = hci_iso_flags_ts(flags);
-+
-+	BT_DBG("conn %p len %d pb 0x%x ts 0x%x", conn, skb->len, pb, ts);
-+
-+	switch (pb) {
-+	case ISO_START:
-+	case ISO_SINGLE:
-+		if (conn->rx_len) {
-+			BT_ERR("Unexpected start frame (len %d)", skb->len);
-+			kfree_skb(conn->rx_skb);
-+			conn->rx_skb = NULL;
-+			conn->rx_len = 0;
++		bis = hci_conn_hash_lookup_handle(hdev, handle);
++		if (!bis) {
++			bis = hci_conn_add(hdev, ISO_LINK, BDADDR_ANY,
++					   HCI_ROLE_SLAVE);
++			if (!bis)
++				continue;
++			bis->handle = handle;
 +		}
 +
-+		if (ts) {
-+			/* TODO: add timestamp to the packet? */
-+			hdr = skb_pull_data(skb, HCI_ISO_TS_DATA_HDR_SIZE);
-+			if (!hdr) {
-+				BT_ERR("Frame is too short (len %d)", skb->len);
-+				goto drop;
-+			}
++		bis->iso_qos.big = ev->handle;
++		memset(&interval, 0, sizeof(interval));
++		memcpy(&interval, ev->latency, sizeof(ev->latency));
++		bis->iso_qos.in.interval = le32_to_cpu(interval);
++		/* Convert ISO Interval (1.25 ms slots) to latency (ms) */
++		bis->iso_qos.in.latency = le16_to_cpu(ev->interval) * 125 / 100;
++		bis->iso_qos.in.sdu = le16_to_cpu(ev->max_pdu);
 +
-+		} else {
-+			hdr = skb_pull_data(skb, HCI_ISO_DATA_HDR_SIZE);
-+			if (!hdr) {
-+				BT_ERR("Frame is too short (len %d)", skb->len);
-+				goto drop;
-+			}
-+		}
-+
-+		len    = __le16_to_cpu(hdr->slen);
-+		flags  = hci_iso_data_flags(len);
-+		len    = hci_iso_data_len(len);
-+
-+		BT_DBG("Start: total len %d, frag len %d flags 0x%4.4x", len,
-+		       skb->len, flags);
-+
-+		if (len == skb->len) {
-+			/* Complete frame received */
-+			iso_recv_frame(conn, skb);
-+			return;
-+		}
-+
-+		if (pb == ISO_SINGLE) {
-+			BT_ERR("Frame malformed (len %d, expected len %d)",
-+			       skb->len, len);
-+			goto drop;
-+		}
-+
-+		if (skb->len > len) {
-+			BT_ERR("Frame is too long (len %d, expected len %d)",
-+			       skb->len, len);
-+			goto drop;
-+		}
-+
-+		/* Allocate skb for the complete frame (with header) */
-+		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
-+		if (!conn->rx_skb)
-+			goto drop;
-+
-+		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
-+					  skb->len);
-+		conn->rx_len = len - skb->len;
-+		break;
-+
-+	case ISO_CONT:
-+		BT_DBG("Cont: frag len %d (expecting %d)", skb->len,
-+		       conn->rx_len);
-+
-+		if (!conn->rx_len) {
-+			BT_ERR("Unexpected continuation frame (len %d)",
-+			       skb->len);
-+			goto drop;
-+		}
-+
-+		if (skb->len > conn->rx_len) {
-+			BT_ERR("Fragment is too long (len %d, expected %d)",
-+			       skb->len, conn->rx_len);
-+			kfree_skb(conn->rx_skb);
-+			conn->rx_skb = NULL;
-+			conn->rx_len = 0;
-+			goto drop;
-+		}
-+
-+		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
-+					  skb->len);
-+		conn->rx_len -= skb->len;
-+		return;
-+
-+	case ISO_END:
-+		skb_copy_from_linear_data(skb, skb_put(conn->rx_skb, skb->len),
-+					  skb->len);
-+		conn->rx_len -= skb->len;
-+
-+		if (!conn->rx_len) {
-+			struct sk_buff *rx_skb = conn->rx_skb;
-+
-+			/* Complete frame received. iso_recv_frame
-+			 * takes ownership of the skb so set the global
-+			 * rx_skb pointer to NULL first.
-+			 */
-+			conn->rx_skb = NULL;
-+			iso_recv_frame(conn, rx_skb);
-+		}
-+		break;
++		hci_connect_cfm(bis, ev->status);
 +	}
 +
-+drop:
-+	kfree_skb(skb);
++	hci_dev_unlock(hdev);
 +}
 +
-+static struct hci_cb iso_cb = {
-+	.name		= "ISO",
-+	.connect_cfm	= iso_connect_cfm,
-+	.disconn_cfm	= iso_disconn_cfm,
-+};
-+
-+static int iso_debugfs_show(struct seq_file *f, void *p)
++static void hci_le_big_info_adv_report_evt(struct hci_dev *hdev, void *data,
++					   struct sk_buff *skb)
 +{
-+	struct sock *sk;
++	struct hci_evt_le_big_info_adv_report *ev = data;
++	int mask = hdev->link_mode;
++	__u8 flags = 0;
 +
-+	read_lock(&iso_sk_list.lock);
++	bt_dev_dbg(hdev, "sync_handle 0x%4.4x", le16_to_cpu(ev->sync_handle));
 +
-+	sk_for_each(sk, &iso_sk_list.head) {
-+		seq_printf(f, "%pMR %pMR %d\n", &iso_pi(sk)->src,
-+			   &iso_pi(sk)->dst, sk->sk_state);
-+	}
++	hci_dev_lock(hdev);
 +
-+	read_unlock(&iso_sk_list.lock);
++	mask |= hci_proto_connect_ind(hdev, BDADDR_ANY, ISO_LINK, &flags);
++	if (!(mask & HCI_LM_ACCEPT))
++		hci_le_pa_term_sync(hdev, ev->sync_handle);
 +
-+	return 0;
++	hci_dev_unlock(hdev);
 +}
 +
-+DEFINE_SHOW_ATTRIBUTE(iso_debugfs);
-+
-+static struct dentry *iso_debugfs;
-+
-+static const struct proto_ops iso_sock_ops = {
-+	.family		= PF_BLUETOOTH,
-+	.owner		= THIS_MODULE,
-+	.release	= iso_sock_release,
-+	.bind		= iso_sock_bind,
-+	.connect	= iso_sock_connect,
-+	.listen		= iso_sock_listen,
-+	.accept		= iso_sock_accept,
-+	.getname	= iso_sock_getname,
-+	.sendmsg	= iso_sock_sendmsg,
-+	.recvmsg	= iso_sock_recvmsg,
-+	.poll		= bt_sock_poll,
-+	.ioctl		= bt_sock_ioctl,
-+	.mmap		= sock_no_mmap,
-+	.socketpair	= sock_no_socketpair,
-+	.shutdown	= iso_sock_shutdown,
-+	.setsockopt	= iso_sock_setsockopt,
-+	.getsockopt	= iso_sock_getsockopt
-+};
-+
-+static const struct net_proto_family iso_sock_family_ops = {
-+	.family	= PF_BLUETOOTH,
-+	.owner	= THIS_MODULE,
-+	.create	= iso_sock_create,
-+};
-+
-+static bool iso_inited;
-+
-+bool iso_enabled(void)
-+{
-+	return iso_inited;
-+}
-+
-+int iso_init(void)
-+{
-+	int err;
-+
-+	BUILD_BUG_ON(sizeof(struct sockaddr_iso) > sizeof(struct sockaddr));
-+
-+	if (iso_inited)
-+		return -EALREADY;
-+
-+	err = proto_register(&iso_proto, 0);
-+	if (err < 0)
-+		return err;
-+
-+	err = bt_sock_register(BTPROTO_ISO, &iso_sock_family_ops);
-+	if (err < 0) {
-+		BT_ERR("ISO socket registration failed");
-+		goto error;
-+	}
-+
-+	err = bt_procfs_init(&init_net, "iso", &iso_sk_list, NULL);
-+	if (err < 0) {
-+		BT_ERR("Failed to create ISO proc file");
-+		bt_sock_unregister(BTPROTO_ISO);
-+		goto error;
-+	}
-+
-+	BT_INFO("ISO socket layer initialized");
-+
-+	hci_register_cb(&iso_cb);
-+
-+	if (IS_ERR_OR_NULL(bt_debugfs))
-+		return 0;
-+
-+	if (!iso_debugfs) {
-+		iso_debugfs = debugfs_create_file("iso", 0444, bt_debugfs,
-+						  NULL, &iso_debugfs_fops);
-+	}
-+
-+	iso_inited = true;
-+
-+	return 0;
-+
-+error:
-+	proto_unregister(&iso_proto);
-+	return err;
-+}
-+
-+int iso_exit(void)
-+{
-+	if (!iso_inited)
-+		return -EALREADY;
-+
-+	bt_procfs_cleanup(&init_net, "iso");
-+
-+	debugfs_remove(iso_debugfs);
-+	iso_debugfs = NULL;
-+
-+	hci_unregister_cb(&iso_cb);
-+
-+	bt_sock_unregister(BTPROTO_ISO);
-+
-+	proto_unregister(&iso_proto);
-+
-+	iso_inited = false;
-+
-+	return 0;
-+}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ef8371975c4e..70ef1c80b484 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3925,10 +3925,16 @@ static const u8 rpa_resolution_uuid[16] = {
- 	0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
+ #define HCI_LE_EV_VL(_op, _func, _min_len, _max_len) \
+ [_op] = { \
+ 	.func = _func, \
+@@ -6836,6 +7023,10 @@ static const struct hci_le_ev {
+ 	HCI_LE_EV_VL(HCI_EV_LE_EXT_ADV_REPORT, hci_le_ext_adv_report_evt,
+ 		     sizeof(struct hci_ev_le_ext_adv_report),
+ 		     HCI_MAX_EVENT_SIZE),
++	/* [0x0e = HCI_EV_LE_PA_SYNC_ESTABLISHED] */
++	HCI_LE_EV(HCI_EV_LE_PA_SYNC_ESTABLISHED,
++		  hci_le_pa_sync_estabilished_evt,
++		  sizeof(struct hci_ev_le_pa_sync_established)),
+ 	/* [0x12 = HCI_EV_LE_EXT_ADV_SET_TERM] */
+ 	HCI_LE_EV(HCI_EV_LE_EXT_ADV_SET_TERM, hci_le_ext_adv_term_evt,
+ 		  sizeof(struct hci_evt_le_ext_adv_set_term)),
+@@ -6845,6 +7036,21 @@ static const struct hci_le_ev {
+ 	/* [0x1a = HCI_EVT_LE_CIS_REQ] */
+ 	HCI_LE_EV(HCI_EVT_LE_CIS_REQ, hci_le_cis_req_evt,
+ 		  sizeof(struct hci_evt_le_cis_req)),
++	/* [0x1b = HCI_EVT_LE_CREATE_BIG_COMPLETE] */
++	HCI_LE_EV_VL(HCI_EVT_LE_CREATE_BIG_COMPLETE,
++		     hci_le_create_big_complete_evt,
++		     sizeof(struct hci_evt_le_create_big_complete),
++		     HCI_MAX_EVENT_SIZE),
++	/* [0x1d = HCI_EV_LE_BIG_SYNC_ESTABILISHED] */
++	HCI_LE_EV_VL(HCI_EVT_LE_BIG_SYNC_ESTABILISHED,
++		     hci_le_big_sync_established_evt,
++		     sizeof(struct hci_evt_le_big_sync_estabilished),
++		     HCI_MAX_EVENT_SIZE),
++	/* [0x22 = HCI_EVT_LE_BIG_INFO_ADV_REPORT] */
++	HCI_LE_EV_VL(HCI_EVT_LE_BIG_INFO_ADV_REPORT,
++		     hci_le_big_info_adv_report_evt,
++		     sizeof(struct hci_evt_le_big_info_adv_report),
++		     HCI_MAX_EVENT_SIZE),
  };
  
-+/* 6fbaf188-05e0-496a-9885-d6ddfdb4e03e */
-+static const u8 iso_socket_uuid[16] = {
-+	0x3e, 0xe0, 0xb4, 0xfd, 0xdd, 0xd6, 0x85, 0x98,
-+	0x6a, 0x49, 0xe0, 0x05, 0x88, 0xf1, 0xba, 0x6f,
-+};
-+
- static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 				  void *data, u16 data_len)
+ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 635cc5fb451e..4bfa9c379b1c 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -827,7 +827,6 @@ void __hci_req_disable_advertising(struct hci_request *req)
  {
--	char buf[102];   /* Enough space for 5 features: 2 + 20 * 5 */
-+	char buf[122];   /* Enough space for 6 features: 2 + 20 * 6 */
- 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
- 	u16 idx = 0;
- 	u32 flags;
-@@ -3992,6 +3998,13 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 		idx++;
+ 	if (ext_adv_capable(req->hdev)) {
+ 		__hci_req_disable_ext_adv_instance(req, 0x00);
+-
+ 	} else {
+ 		u8 enable = 0x00;
+ 
+@@ -1338,15 +1337,15 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	bdaddr_t random_addr;
+ 	u8 own_addr_type;
+ 	int err;
+-	struct adv_info *adv_instance;
+-	bool secondary_adv;
++	struct adv_info *adv;
++	bool secondary_adv, require_privacy;
+ 
+ 	if (instance > 0) {
+-		adv_instance = hci_find_adv_instance(hdev, instance);
+-		if (!adv_instance)
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv)
+ 			return -EINVAL;
+ 	} else {
+-		adv_instance = NULL;
++		adv = NULL;
  	}
  
-+	if (IS_ENABLED(CONFIG_BT_LE)) {
-+		flags = iso_enabled() ? BIT(0) : 0;
-+		memcpy(rp->features[idx].uuid, iso_socket_uuid, 16);
-+		rp->features[idx].flags = cpu_to_le32(flags);
-+		idx++;
-+	}
+ 	flags = hci_adv_instance_flags(hdev, instance);
+@@ -1364,18 +1363,24 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 	 * advertising is used. In that case it is fine to use a
+ 	 * non-resolvable private address.
+ 	 */
+-	err = hci_get_random_address(hdev, !connectable,
+-				     adv_use_rpa(hdev, flags), adv_instance,
++	require_privacy = !connectable;
 +
- 	rp->feature_count = cpu_to_le16(idx);
++	/* Don't require privacy for periodic adv? */
++	if (adv && adv->periodic)
++		require_privacy = false;
++
++	err = hci_get_random_address(hdev, require_privacy,
++				     adv_use_rpa(hdev, flags), adv,
+ 				     &own_addr_type, &random_addr);
+ 	if (err < 0)
+ 		return err;
  
- 	/* After reading the experimental features information, enable
-@@ -4383,6 +4396,57 @@ static int set_le_simultaneous_roles_func(struct sock *sk, struct hci_dev *hdev,
- 	return err;
+ 	memset(&cp, 0, sizeof(cp));
+ 
+-	if (adv_instance) {
+-		hci_cpu_to_le24(adv_instance->min_interval, cp.min_interval);
+-		hci_cpu_to_le24(adv_instance->max_interval, cp.max_interval);
+-		cp.tx_power = adv_instance->tx_power;
++	if (adv) {
++		hci_cpu_to_le24(adv->min_interval, cp.min_interval);
++		hci_cpu_to_le24(adv->max_interval, cp.max_interval);
++		cp.tx_power = adv->tx_power;
+ 	} else {
+ 		hci_cpu_to_le24(hdev->le_adv_min_interval, cp.min_interval);
+ 		hci_cpu_to_le24(hdev->le_adv_max_interval, cp.max_interval);
+@@ -1396,7 +1401,8 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 		else
+ 			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_SCAN_IND);
+ 	} else {
+-		if (secondary_adv)
++		/* Secondary and periodic cannot use legacy PDUs */
++		if (secondary_adv || (adv && adv->periodic))
+ 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_NON_CONN_IND);
+ 		else
+ 			cp.evt_properties = cpu_to_le16(LE_LEGACY_NONCONN_IND);
+@@ -1426,8 +1432,8 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
+ 		struct hci_cp_le_set_adv_set_rand_addr cp;
+ 
+ 		/* Check if random address need to be updated */
+-		if (adv_instance) {
+-			if (!bacmp(&random_addr, &adv_instance->random_addr))
++		if (adv) {
++			if (!bacmp(&random_addr, &adv->random_addr))
+ 				return 0;
+ 		} else {
+ 			if (!bacmp(&random_addr, &hdev->random_addr))
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 7f8df258e295..2c47dac3bf83 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -85,6 +85,9 @@ void __hci_req_enable_advertising(struct hci_request *req);
+ void __hci_req_disable_advertising(struct hci_request *req);
+ void __hci_req_update_adv_data(struct hci_request *req, u8 instance);
+ int hci_req_update_adv_data(struct hci_dev *hdev, u8 instance);
++int hci_req_start_per_adv(struct hci_dev *hdev, u8 instance, u32 flags,
++			  u16 min_interval, u16 max_interval,
++			  u16 sync_interval);
+ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance);
+ 
+ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
+@@ -94,8 +97,14 @@ void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
+ 				bool force);
+ 
+ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
++int __hci_req_setup_per_adv_instance(struct hci_request *req, u8 instance,
++				     u16 min_interval, u16 max_interval);
+ int __hci_req_start_ext_adv(struct hci_request *req, u8 instance);
++int __hci_req_start_per_adv(struct hci_request *req, u8 instance, u32 flags,
++			    u16 min_interval, u16 max_interval,
++			    u16 sync_interval);
+ int __hci_req_enable_ext_advertising(struct hci_request *req, u8 instance);
++int __hci_req_enable_per_advertising(struct hci_request *req, u8 instance);
+ int __hci_req_disable_ext_adv_instance(struct hci_request *req, u8 instance);
+ int __hci_req_remove_ext_adv_instance(struct hci_request *req, u8 instance);
+ void __hci_req_clear_ext_adv_sets(struct hci_request *req);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 95b391ed84ec..392fc3b770d4 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -977,6 +977,187 @@ int hci_start_ext_adv_sync(struct hci_dev *hdev, u8 instance)
+ 	return hci_enable_ext_advertising_sync(hdev, instance);
  }
  
-+#ifdef CONFIG_BT_LE
-+static int set_iso_socket_func(struct sock *sk, struct hci_dev *hdev,
-+			       struct mgmt_cp_set_exp_feature *cp, u16 data_len)
++static int hci_disable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
 +{
-+	struct mgmt_rp_set_exp_feature rp;
-+	bool val, changed = false;
++	struct hci_cp_le_set_per_adv_enable cp;
++
++	/* If periodic advertising already disabled there is nothing to do. */
++	if (!hci_dev_test_flag(hdev, HCI_LE_PER_ADV))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.enable = 0x00;
++	cp.handle = instance;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PER_ADV_ENABLE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_set_per_adv_params_sync(struct hci_dev *hdev, u8 instance,
++				       u16 min_interval, u16 max_interval)
++{
++	struct hci_cp_le_set_per_adv_params cp;
++
++	memset(&cp, 0, sizeof(cp));
++
++	if (!min_interval)
++		min_interval = DISCOV_LE_PER_ADV_INT_MIN;
++
++	if (!max_interval)
++		max_interval = DISCOV_LE_PER_ADV_INT_MAX;
++
++	cp.handle = instance;
++	cp.min_interval = cpu_to_le16(min_interval);
++	cp.max_interval = cpu_to_le16(max_interval);
++	cp.periodic_properties = 0x0000;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PER_ADV_PARAMS,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_set_per_adv_data_sync(struct hci_dev *hdev, u8 instance)
++{
++	struct {
++		struct hci_cp_le_set_per_adv_data cp;
++		u8 data[HCI_MAX_PER_AD_LENGTH];
++	} pdu;
++	u8 len;
++
++	memset(&pdu, 0, sizeof(pdu));
++
++	if (instance) {
++		struct adv_info *adv = hci_find_adv_instance(hdev, instance);
++
++		if (!adv || !adv->periodic)
++			return 0;
++	}
++
++	len = eir_create_per_adv_data(hdev, instance, pdu.data);
++
++	pdu.cp.length = len;
++	pdu.cp.handle = instance;
++	pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PER_ADV_DATA,
++				     sizeof(pdu.cp) + len, &pdu,
++				     HCI_CMD_TIMEOUT);
++}
++
++static int hci_enable_per_advertising_sync(struct hci_dev *hdev, u8 instance)
++{
++	struct hci_cp_le_set_per_adv_enable cp;
++
++	/* If periodic advertising already enabled there is nothing to do. */
++	if (hci_dev_test_flag(hdev, HCI_LE_PER_ADV))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.enable = 0x01;
++	cp.handle = instance;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PER_ADV_ENABLE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++/* Checks if periodic advertising data contains a Basic Announcement and if it
++ * does generates a Broadcast ID and add Broadcast Announcement.
++ */
++static int hci_adv_bcast_annoucement(struct hci_dev *hdev, struct adv_info *adv)
++{
++	u8 bid[3];
++	u8 ad[4 + 3];
++
++	/* Skip if NULL adv as instance 0x00 is used for general purpose
++	 * advertising so it cannot used for the likes of Broadcast Announcement
++	 * as it can be overwritten at any point.
++	 */
++	if (!adv)
++		return 0;
++
++	/* Check if PA data doesn't contains a Basic Audio Announcement then
++	 * there is nothing to do.
++	 */
++	if (!eir_get_service_data(adv->per_adv_data, adv->per_adv_data_len,
++				  0x1851, NULL))
++		return 0;
++
++	/* Check if advertising data already has a Broadcast Announcement since
++	 * the process may want to control the Broadcast ID directly and in that
++	 * case the kernel shall no interfere.
++	 */
++	if (eir_get_service_data(adv->adv_data, adv->adv_data_len, 0x1852,
++				 NULL))
++		return 0;
++
++	/* Generate Broadcast ID */
++	get_random_bytes(bid, sizeof(bid));
++	eir_append_service_data(ad, 0, 0x1852, bid, sizeof(bid));
++	hci_set_adv_instance_data(hdev, adv->instance, sizeof(ad), ad, 0, NULL);
++
++	return hci_update_adv_data_sync(hdev, adv->instance);
++}
++
++int hci_start_per_adv_sync(struct hci_dev *hdev, u8 instance, u8 data_len,
++			   u8 *data, u32 flags, u16 min_interval,
++			   u16 max_interval, u16 sync_interval)
++{
++	struct adv_info *adv = NULL;
 +	int err;
++	bool added = false;
 +
-+	/* Command requires to use the non-controller index */
-+	if (hdev)
-+		return mgmt_cmd_status(sk, hdev->id,
-+				       MGMT_OP_SET_EXP_FEATURE,
-+				       MGMT_STATUS_INVALID_INDEX);
++	hci_disable_per_advertising_sync(hdev, instance);
 +
-+	/* Parameters are limited to a single octet */
-+	if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
-+		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-+				       MGMT_OP_SET_EXP_FEATURE,
-+				       MGMT_STATUS_INVALID_PARAMS);
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		/* Create an instance if that could not be found */
++		if (!adv) {
++			adv = hci_add_per_instance(hdev, instance, flags,
++						   data_len, data,
++						   sync_interval,
++						   sync_interval);
++			if (IS_ERR(adv))
++				return PTR_ERR(adv);
++			added = true;
++		}
++	}
 +
-+	/* Only boolean on/off is supported */
-+	if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
-+		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
-+				       MGMT_OP_SET_EXP_FEATURE,
-+				       MGMT_STATUS_INVALID_PARAMS);
++	/* Only start advertising if instance 0 or if a dedicated instance has
++	 * been added.
++	 */
++	if (!adv || added) {
++		err = hci_start_ext_adv_sync(hdev, instance);
++		if (err < 0)
++			goto fail;
 +
-+	val = cp->param[0] ? true : false;
-+	if (val)
-+		err = iso_init();
-+	else
-+		err = iso_exit();
++		err = hci_adv_bcast_annoucement(hdev, adv);
++		if (err < 0)
++			goto fail;
++	}
 +
-+	if (!err)
-+		changed = true;
++	err = hci_set_per_adv_params_sync(hdev, instance, min_interval,
++					  max_interval);
++	if (err < 0)
++		goto fail;
 +
-+	memcpy(rp.uuid, iso_socket_uuid, 16);
-+	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
++	err = hci_set_per_adv_data_sync(hdev, instance);
++	if (err < 0)
++		goto fail;
 +
-+	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	err = hci_enable_per_advertising_sync(hdev, instance);
++	if (err < 0)
++		goto fail;
 +
-+	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
-+				MGMT_OP_SET_EXP_FEATURE, 0,
-+				&rp, sizeof(rp));
++	return 0;
 +
-+	if (changed)
-+		exp_feature_changed(hdev, iso_socket_uuid, val, sk);
++fail:
++	if (added)
++		hci_remove_adv_instance(hdev, instance);
 +
 +	return err;
 +}
-+#endif
 +
- static const struct mgmt_exp_feature {
- 	const u8 *uuid;
- 	int (*set_func)(struct sock *sk, struct hci_dev *hdev,
-@@ -4396,6 +4460,9 @@ static const struct mgmt_exp_feature {
- 	EXP_FEAT(quality_report_uuid, set_quality_report_func),
- 	EXP_FEAT(offload_codecs_uuid, set_offload_codec_func),
- 	EXP_FEAT(le_simultaneous_roles_uuid, set_le_simultaneous_roles_func),
-+#ifdef CONFIG_BT_LE
-+	EXP_FEAT(iso_socket_uuid, set_iso_socket_func),
-+#endif
+ static int hci_start_adv_sync(struct hci_dev *hdev, u8 instance)
+ {
+ 	int err;
+@@ -1116,6 +1297,42 @@ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+ 					HCI_CMD_TIMEOUT, sk);
+ }
  
- 	/* end with a null feature */
- 	EXP_FEAT(NULL, NULL)
++static int remove_ext_adv_sync(struct hci_dev *hdev, void *data)
++{
++	struct adv_info *adv = data;
++	u8 instance = 0;
++
++	if (adv)
++		instance = adv->instance;
++
++	return hci_remove_ext_adv_instance_sync(hdev, instance, NULL);
++}
++
++int hci_remove_ext_adv_instance(struct hci_dev *hdev, u8 instance)
++{
++	struct adv_info *adv = NULL;
++
++	if (instance) {
++		adv = hci_find_adv_instance(hdev, instance);
++		if (!adv)
++			return -EINVAL;
++	}
++
++	return hci_cmd_sync_queue(hdev, remove_ext_adv_sync, adv, NULL);
++}
++
++int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
++{
++	struct hci_cp_le_term_big cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = handle;
++	cp.reason = reason;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_TERM_BIG,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ static void cancel_adv_timeout(struct hci_dev *hdev)
+ {
+ 	if (hdev->adv_instance_timeout) {
+@@ -2195,7 +2412,8 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
+ 
+ 	if (list_empty(&hdev->pend_le_conns) &&
+ 	    list_empty(&hdev->pend_le_reports) &&
+-	    !hci_is_adv_monitoring(hdev)) {
++	    !hci_is_adv_monitoring(hdev) &&
++	    !hci_dev_test_flag(hdev, HCI_PA_SYNC)) {
+ 		/* If there is no pending LE connections or devices
+ 		 * to be scanned for or no ADV monitors, we should stop the
+ 		 * background scanning.
+@@ -3389,6 +3607,13 @@ static int hci_le_set_event_mask_sync(struct hci_dev *hdev)
+ 			events[3] |= 0x02; /* LE CIS Request */
+ 	}
+ 
++	if (bis_capable(hdev)) {
++		events[3] |= 0x04;	/* LE Create BIG Complete */
++		events[3] |= 0x08;	/* LE Terminate BIG Complete */
++		events[3] |= 0x10;	/* LE BIG Sync Established */
++		events[3] |= 0x20;	/* LE BIG Sync Loss */
++	}
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EVENT_MASK,
+ 				     sizeof(events), events, HCI_CMD_TIMEOUT);
+ }
+@@ -5471,3 +5696,25 @@ int hci_le_remove_cig_sync(struct hci_dev *hdev, u8 handle)
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_REMOVE_CIG, sizeof(cp),
+ 				     &cp, HCI_CMD_TIMEOUT);
+ }
++
++int hci_le_big_terminate_sync(struct hci_dev *hdev, u8 handle)
++{
++	struct hci_cp_le_big_term_sync cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = handle;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_BIG_TERM_SYNC,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle)
++{
++	struct hci_cp_le_pa_term_sync cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.handle = cpu_to_le16(handle);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PA_TERM_SYNC,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 70ef1c80b484..26aa729715f1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8166,7 +8166,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	u16 timeout, duration;
+ 	unsigned int prev_instance_cnt;
+ 	u8 schedule_instance = 0;
+-	struct adv_info *next_instance;
++	struct adv_info *adv, *next_instance;
+ 	int err;
+ 	struct mgmt_pending_cmd *cmd;
+ 
+@@ -8217,7 +8217,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	prev_instance_cnt = hdev->adv_instance_cnt;
+ 
+-	err = hci_add_adv_instance(hdev, cp->instance, flags,
++	adv = hci_add_adv_instance(hdev, cp->instance, flags,
+ 				   cp->adv_data_len, cp->data,
+ 				   cp->scan_rsp_len,
+ 				   cp->data + cp->adv_data_len,
+@@ -8225,7 +8225,7 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
+ 				   HCI_ADV_TX_POWER_NO_PREFERENCE,
+ 				   hdev->le_adv_min_interval,
+ 				   hdev->le_adv_max_interval);
+-	if (err < 0) {
++	if (IS_ERR(adv)) {
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
+ 				      MGMT_STATUS_FAILED);
+ 		goto unlock;
+@@ -8356,6 +8356,7 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
+ 	struct mgmt_cp_add_ext_adv_params *cp = data;
+ 	struct mgmt_rp_add_ext_adv_params rp;
+ 	struct mgmt_pending_cmd *cmd = NULL;
++	struct adv_info *adv;
+ 	u32 flags, min_interval, max_interval;
+ 	u16 timeout, duration;
+ 	u8 status;
+@@ -8425,11 +8426,11 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
+ 		   HCI_ADV_TX_POWER_NO_PREFERENCE;
+ 
+ 	/* Create advertising instance with no advertising or response data */
+-	err = hci_add_adv_instance(hdev, cp->instance, flags,
+-				   0, NULL, 0, NULL, timeout, duration,
+-				   tx_power, min_interval, max_interval);
++	adv = hci_add_adv_instance(hdev, cp->instance, flags, 0, NULL, 0, NULL,
++				   timeout, duration, tx_power, min_interval,
++				   max_interval);
+ 
+-	if (err < 0) {
++	if (IS_ERR(adv)) {
+ 		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_EXT_ADV_PARAMS,
+ 				      MGMT_STATUS_FAILED);
+ 		goto unlock;
 -- 
 2.35.3
 
