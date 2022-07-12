@@ -2,126 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3945C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Jul 2022 00:05:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D33C43334
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Jul 2022 03:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230407AbiGLAFt (ORCPT
+        id S230310AbiGLDFe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Jul 2022 20:05:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41244 "EHLO
+        Mon, 11 Jul 2022 23:05:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiGLAFk (ORCPT
+        with ESMTP id S231486AbiGLDF3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Jul 2022 20:05:40 -0400
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D47BDF2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 17:05:39 -0700 (PDT)
-Received: by mail-pg1-x54a.google.com with SMTP id 9-20020a631449000000b00412b1418c79so2490078pgu.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Jul 2022 17:05:39 -0700 (PDT)
+        Mon, 11 Jul 2022 23:05:29 -0400
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E25135B7BA;
+        Mon, 11 Jul 2022 20:05:21 -0700 (PDT)
+Received: by mail-lf1-x12b.google.com with SMTP id n18so10054669lfq.1;
+        Mon, 11 Jul 2022 20:05:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=1JpwXxBfHL+adQw1k/M4Xx4GgPy74dDIIx1BqOfF6HE=;
-        b=qdJg+sV1ZLY12NdCbWtFBRr9HAPtVRoRvyYrjzWV5P4xFPENTKzw4kkMuCxv8lkuUi
-         /B5kQ+fqovXQvljejTKCF0jeYXsS2p6J7khkTKAYhg99QjaOx3b7BTUDSe7/sbkdqkWh
-         74Ex8ZdqJ3HX6T1LMVG2pzp06jJabgMAmjomYh9tLZ1f+QFtK4B4f7edSEzxie1HMwrP
-         lOh9Et7UzZkKXQ9bRards3gFFNzLuIezTHcOGIHFtAnMmpV7FIuuL2ITptWZM27N9ZKQ
-         k7OUnqswKWMn0vb8WyzvdOdHOS9/x/eqY2ytET2xYjaJfUMiXFu0lcBXVqmgEHGp2jPN
-         SHrQ==
+        bh=YoTTltPsqg9i+vMO+2k1XGkEPtLOgLm70bL2HmR/2po=;
+        b=L6D6YTRAzy4tsp2EqX9g3Pk80hDnEM50H6fw1xDnXl5xIvTD7LzrRgDc4TA7g7o1nt
+         N0zek6j/tvgUkIvbaQ4XRjTy0c2VoL9HfZ5dFNbi3bfUYB11h+zYy8oXwyrlP3k7Arie
+         L/+SD0hVQaDQpEWZR6eYI7g+umKighuZjiGreR984GfblGchXCI3bn/Xc+q/LbQCIJJn
+         4Co8InrYn1Rf4OodkJmKr86TAI97D4TF4vZe1gAHC+JOOVK4s31hXuQW21elj+OtpuQt
+         XN4wwhZbYS/gY9JHd/+1mboTr1Mllc2ugxAmqm0hHwImln39Umn/5CSmyhUes1tRDEBw
+         btJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=1JpwXxBfHL+adQw1k/M4Xx4GgPy74dDIIx1BqOfF6HE=;
-        b=HYcDiR8K4pO0+YoLRxhSyxW79KxT5JwdLAgk0L6L4xgEmK/ebjtRoO6p/vddEPqg50
-         y3CdAaY04AzbmTJK9bdRSTrfEmm86sgKOHRttPSRetq8VDcCV/sY35UQ40/DctCbTQ5d
-         lxwSpcnTOt7XQrN7d1Q5V6J5Np52UOzJUb9LTL4iHYDIjmVqcCXiZ6UPea4Up3Spz970
-         q7rNkdzg5KNoLWp2C7L8UgulwoZffiUJ1ndJ/0l2gAq1t9oul27pn8xlH6kmbOYpw9T7
-         1mPI5xpWWMFK7AGAWAcwekVK0lO6Hgcmo2GrFTKfxs79YaZmPjhIqmI6yjpuzGpe76X3
-         QUag==
-X-Gm-Message-State: AJIora+zkta0e2LG0qjpcGAf51bXvAXj93wrS1xSFzlh5dNDS5lgzT6R
-        temhVGyBg4YO33px061DXQXI9LTJ3rcVK/LAlFIhMfGCJx6Ewd0FXIAPlVFDZ4pWfHRHMFmn9Iq
-        a/ZxLKA7vISzG02El5vYk/rAR7rV2mkGjEXKDqH1bMQbPXPOxiW8DMZgkqNW3vAcEuQkx6cuqOX
-        Qk
-X-Google-Smtp-Source: AGRyM1uGAR/JbTrCYF7Tx9Cdkawj0T2Adl/a47tKgYYcay8WPmViBUBPkz1Kd7e+gWfuSLW7XDoOkMwdD3/7
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
- (user=jiangzp job=sendgmr) by 2002:a17:90a:bc04:b0:1f0:506d:78b9 with SMTP id
- w4-20020a17090abc0400b001f0506d78b9mr1065616pjr.4.1657584338428; Mon, 11 Jul
- 2022 17:05:38 -0700 (PDT)
-Date:   Mon, 11 Jul 2022 17:05:30 -0700
-In-Reply-To: <20220712000530.2531197-1-jiangzp@google.com>
-Message-Id: <20220711170515.kernel.v2.1.Ia489394ab4176efa5a39ce8d08bb4c4b7bee23b9@changeid>
-Mime-Version: 1.0
-References: <20220712000530.2531197-1-jiangzp@google.com>
-X-Mailer: git-send-email 2.37.0.144.g8ac04bfd2-goog
-Subject: [kernel PATCH v2 1/1] Bluetooth: hci_sync: Fix resuming scan after
- suspend resume
-From:   Zhengping Jiang <jiangzp@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     Zhengping Jiang <jiangzp@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YoTTltPsqg9i+vMO+2k1XGkEPtLOgLm70bL2HmR/2po=;
+        b=Bdc8xvYjgw+sZ8HLq87ExJa5zkU/K0dUFELay1yZJWMhhPA8A2U5R352OgD90Q2QDP
+         eqNsYrn+ZGk7wHZBygP6tLqDD4YOeXPeEE04CBFwPAd/meChr+k4mGBLqa/PL2IL/kbY
+         QFzYe6AutJCJurIW2zoIifEEqSPDXJxRoel5z/LCGYmxwn1Ki7Iqi4I1AvFQYxwxgMf6
+         PjwCNnRZtMpzhRYtg4ogdxy3Q6jmakjVVmR+B3Xh+5Ng8bqTzHz62pAKgr1sZ4QdICKK
+         WpoT390RG8LRRYNanN76MHp5hz4CqmiMtZdmjtoLgro8GpqRgpfCHKafIaVbWKOHZbpo
+         uSwQ==
+X-Gm-Message-State: AJIora9fcFFlmdGozsa90HUcUfD6r8S9tvusbetmDbUDSbFLvfwrmGeb
+        Q283hqUTQhZHOC+nUQ2OXzfAqdSU2ka+Emnb1spA8rUX08k=
+X-Google-Smtp-Source: AGRyM1vh5CLlDcDB4y/T06kpLm0eXF+Zwt32CXlwZERnHuT1IBZ8LUmvNecrk1cWT0INXt1bicXwGKCb+jJUbKK+g/A=
+X-Received: by 2002:ac2:4288:0:b0:489:da8b:293a with SMTP id
+ m8-20020ac24288000000b00489da8b293amr6007885lfh.106.1657595120089; Mon, 11
+ Jul 2022 20:05:20 -0700 (PDT)
+MIME-Version: 1.0
+References: <db3b4f30-cd32-fa24-5ed0-038d4925860f@molgen.mpg.de>
+In-Reply-To: <db3b4f30-cd32-fa24-5ed0-038d4925860f@molgen.mpg.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 11 Jul 2022 20:05:07 -0700
+Message-ID: <CABBYNZKibt14eHLFMUre9CZ+XNmUvsh_BNaDz+LzDtHB0NMBDQ@mail.gmail.com>
+Subject: Re: [REGRESSION] hci0 hci_power_on [bluetooth] blocks for more than 2
+ min preventing suspend and shutdown
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-wireless@vger.kernel.org, regressions@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-After resuming, remove setting scanning_paused to false, because it is
-checked and set to false in hci_resume_scan_sync. Also move setting
-the value to false before updating passive scan, because the value is
-used when resuming passive scan.
+Hi Paul,
 
-Fixes: 3b42055388c30 (Bluetooth: hci_sync: Fix attempting to suspend with
-unfiltered passive scan)
+On Mon, Jul 11, 2022 at 12:14 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Linux folks,
+>
+>
+> On a Dell Latitude E7250 with
+>
+>       Bus 001 Device 003: ID 8087:0a2a Intel Corp. Bluetooth wireless
+> interface
+>
+> with Debian sid/unstable upgrading from Linux 5.18.5 to 5.19-rc4 results
+> in a regression, where the system does not suspend or does not power
+> off. Linux logs earlier:
+>
+> ```
+> [  242.677813] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+> disables this message.
+> [  242.677818] task:kworker/u9:1    state:D stack:    0 pid:  379 ppid:
+>     2 flags:0x00004000
+> [  242.677831] Workqueue: hci0 hci_power_on [bluetooth]
+> [  242.677934] Call Trace:
+> [  242.677938]  <TASK>
+> [  242.677946]  __schedule+0x30b/0x9f0
+> [  242.677961]  ? enqueue_entity+0x1a1/0x520
+> [  242.677973]  schedule+0x4e/0xb0
+> [  242.677981]  schedule_timeout+0x115/0x150
+> [  242.677993]  ? resched_curr+0x20/0xb0
+> [  242.678004]  ? preempt_count_add+0x68/0xa0
+> [  242.678013]  __wait_for_common+0x93/0x1d0
+> [  242.678022]  ? usleep_range_state+0x90/0x90
+> [  242.678034]  __flush_work.isra.0+0x160/0x220
+> [  242.678044]  ? flush_workqueue_prep_pwqs+0x110/0x110
+> [  242.678052]  __cancel_work_timer+0x104/0x190
+> [  242.678060]  ? led_trigger_event+0x1d/0x60
+> [  242.678067]  ? led_trigger_event+0x1d/0x60
+> [  242.678073]  hci_dev_close_sync+0x27/0x540 [bluetooth]
+> [  242.678183]  hci_dev_do_close+0x26/0x60 [bluetooth]
+> [  242.678253]  hci_power_on+0x8c/0x260 [bluetooth]
+> [  242.678337]  ? __schedule+0x313/0x9f0
+> [  242.678347]  process_one_work+0x1e5/0x3b0
+> [  242.678357]  ? rescuer_thread+0x390/0x390
+> [  242.678364]  worker_thread+0x50/0x3a0
+> [  242.678373]  ? rescuer_thread+0x390/0x390
+> [  242.678380]  kthread+0xe8/0x110
+> [  242.678387]  ? kthread_complete_and_exit+0x20/0x20
+> [  242.678394]  ret_from_fork+0x22/0x30
+> [  242.678409]  </TASK>
+> ```
+>
+> `sudo modprobe -r btusb` also hangs:
+>
+>       [ 4115.987537] usbcore: deregistering interface driver btusb
+>       [ 4116.128277] Bluetooth: hci0: urb 00000000434e95f7 failed to
+> resubmit (2)
+>
+> Please find the output of `dmesg` attached.
 
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git/commit/?id=e36bea6e78ab2b6c9c7396972fee231eae551cfc
 
-Changes in v2:
-- Reduce title length
 
-Changes in v1:
-- Fix updating passive scan after suspend resume
-
- net/bluetooth/hci_sync.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 7cb3100518799..212b0cdb25f5e 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5063,13 +5063,13 @@ static int hci_resume_scan_sync(struct hci_dev *hdev)
- 	if (!hdev->scanning_paused)
- 		return 0;
- 
-+	hdev->scanning_paused = false;
-+
- 	hci_update_scan_sync(hdev);
- 
- 	/* Reset passive scanning to normal */
- 	hci_update_passive_scan_sync(hdev);
- 
--	hdev->scanning_paused = false;
--
- 	return 0;
- }
- 
-@@ -5088,7 +5088,6 @@ int hci_resume_sync(struct hci_dev *hdev)
- 		return 0;
- 
- 	hdev->suspended = false;
--	hdev->scanning_paused = false;
- 
- 	/* Restore event mask */
- 	hci_set_event_mask_sync(hdev);
 -- 
-2.37.0.144.g8ac04bfd2-goog
-
+Luiz Augusto von Dentz
