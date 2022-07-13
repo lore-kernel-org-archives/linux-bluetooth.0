@@ -2,103 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B83C43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 16:11:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3688BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 20:00:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237127AbiGMQLA (ORCPT
+        id S236653AbiGMUAh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Jul 2022 12:11:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46202 "EHLO
+        Wed, 13 Jul 2022 16:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236733AbiGMQK5 (ORCPT
+        with ESMTP id S231772AbiGMUAf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Jul 2022 12:10:57 -0400
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCDA83F33C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 09:10:56 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id f62-20020a9d03c4000000b0061c2c94ab8dso8649458otf.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 09:10:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ifuYpJUtElMYdMNC6sKRDHNgJjC8EhNCTL3azpJwLDQ=;
-        b=irwyGLjS2B7ic0e0nme2rmlnKj6r9Q05IbuZ9qkr/72vddHpnO9eb/WK+iTrPfw4rs
-         a+Vk6MK2OWDqLRzu+Hnd/fYF1LanC6WlmyUVOohvBtAcFHzsZBuxwLlsWGB7z6sEVvpZ
-         R1Xlyk7uSJEer5w4+otlj0SuldGxk4gnNssh6zJX6ESMsTE2U4kgOB/lo2DJQyw+UED/
-         QbHYJVBpoFSk62luwM4XTQEqr35eR9E9vJVgxi9PZAYJmKA6clrrYzWWthN/wEthXAbR
-         3O2IPISOVHD+5KL8wRTjf3ELt4O00YF8dPASVCmoEcyvPLdbFBIx3wRQFX++L10Sma8Y
-         O8zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ifuYpJUtElMYdMNC6sKRDHNgJjC8EhNCTL3azpJwLDQ=;
-        b=pYLO4ZPIkySJ1wpVg3OPn02KtosZo9QWuQtw+UlcVKD1ZpjjfZ9bqxMqt1VphQbzJs
-         5Yzl6Xl4sdJ0eSxXbXeNMdAc/CUV2tskgMo8gOYtkDTiS2PxBb4emRqkYv42akak6DgQ
-         co0nvcHQTJcZNZjfor1Zr1GftBoQq18V0yanFVLwQcLIebwvJWCZ61Ier30Ng8JlxjVG
-         fG5FIUCV1VX4liYXwxClZM+l89bXATsyCWpk+akM22FqupF0xiQLrLUwojET2NxnbFhi
-         oyuKRstdrU3cGnAzu+TW571VmSdOK/CQ5EFxCE3xaxJruTiLR2LuKiM02JXAmtmrGHLR
-         qpVw==
-X-Gm-Message-State: AJIora9JWu8QYo97o/dPz6o7HrHJNFvtO/ulNmDckZEO7jo5Q8sZ0oRX
-        iS1y4p99zp9MB6anFb/8vxqln3r5k4Y=
-X-Google-Smtp-Source: AGRyM1t5SMMJH5ng9p47FA73+nXjJJIE1yQQfAOg1w/esJFarZ9JpSZxnTIJ7MPtDK15NASIv9lJJg==
-X-Received: by 2002:a05:6830:1da4:b0:61c:388c:cb1f with SMTP id z4-20020a0568301da400b0061c388ccb1fmr1575756oti.210.1657728655644;
-        Wed, 13 Jul 2022 09:10:55 -0700 (PDT)
-Received: from [172.17.0.2] ([23.98.182.119])
-        by smtp.gmail.com with ESMTPSA id x11-20020a056870e38b00b0010c289aafbcsm6099227oad.16.2022.07.13.09.10.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Jul 2022 09:10:55 -0700 (PDT)
-Message-ID: <62ceee8f.1c69fb81.95746.4807@mx.google.com>
-Date:   Wed, 13 Jul 2022 09:10:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3567558411658209295=="
+        Wed, 13 Jul 2022 16:00:35 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BF4A10FC2;
+        Wed, 13 Jul 2022 13:00:28 -0700 (PDT)
+X-UUID: b54785a67f5240e99cc2435e6ca6acb2-20220714
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.8,REQID:a0f31061-8a8f-48ec-b948-d03f7cb9a207,OB:0,LO
+        B:0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,RULE:Release_Ham,ACTI
+        ON:release,TS:5
+X-CID-META: VersionHash:0f94e32,CLOUDID:ced6e632-b9e4-42b8-b28a-6364427c76bb,C
+        OID:IGNORED,Recheck:0,SF:nil,TC:nil,Content:0,EDM:-3,IP:nil,URL:1,File:nil
+        ,QS:nil,BEC:nil,COL:0
+X-UUID: b54785a67f5240e99cc2435e6ca6acb2-20220714
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 1792792266; Thu, 14 Jul 2022 04:00:23 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.792.15; Thu, 14 Jul 2022 04:00:22 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 14 Jul 2022 04:00:21 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <mcchou@chromium.org>,
+        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, "Jing Cai" <jing.cai@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btusb: mediatek: fix shutdown failure during runtime suspend
+Date:   Thu, 14 Jul 2022 04:00:20 +0800
+Message-ID: <3f1ee6737f092ae6312a7ae6079d341b81c791a5.1657670957.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wavexx@thregr.org
-Subject: RE: [v2] Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for MTK
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220713152913.87328-1-wavexx@thregr.org>
-References: <20220713152913.87328-1-wavexx@thregr.org>
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3567558411658209295==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is automated email and please do not reply to this email!
+Fix the WMT command timed out during Bluetooth was being shutdown while USB
+was in runtime suspend state.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=659388
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.58 seconds
-GitLint                       PASS      0.74 seconds
-SubjectPrefix                 PASS      0.61 seconds
-BuildKernel                   PASS      40.10 seconds
-BuildKernel32                 PASS      34.51 seconds
-Incremental Build with patchesPASS      47.48 seconds
-TestRunner: Setup             PASS      590.85 seconds
-TestRunner: l2cap-tester      PASS      19.21 seconds
-TestRunner: bnep-tester       PASS      7.11 seconds
-TestRunner: mgmt-tester       PASS      112.79 seconds
-TestRunner: rfcomm-tester     PASS      10.82 seconds
-TestRunner: sco-tester        PASS      10.50 seconds
-TestRunner: smp-tester        PASS      10.52 seconds
-TestRunner: userchan-tester   PASS      7.35 seconds
-
-
-
+Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
+Co-developed-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fb1a67189412..b1161853c6ab 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2795,10 +2795,15 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 
+ static int btusb_mtk_shutdown(struct hci_dev *hdev)
+ {
++	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct btmtk_hci_wmt_params wmt_params;
+ 	u8 param = 0;
+ 	int err;
+ 
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		return err;
++
+ 	/* Disable the device */
+ 	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
+ 	wmt_params.flag = 0;
+@@ -2807,12 +2812,12 @@ static int btusb_mtk_shutdown(struct hci_dev *hdev)
+ 	wmt_params.status = NULL;
+ 
+ 	err = btusb_mtk_hci_wmt_sync(hdev, &wmt_params);
+-	if (err < 0) {
++	if (err < 0)
+ 		bt_dev_err(hdev, "Failed to send wmt func ctrl (%d)", err);
+-		return err;
+-	}
+ 
+-	return 0;
++	usb_autopm_put_interface(data->intf);
++
++	return err;
+ }
+ 
+ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+-- 
+2.25.1
 
---===============3567558411658209295==--
