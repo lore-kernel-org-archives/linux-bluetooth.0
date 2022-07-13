@@ -2,77 +2,67 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36C3CC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 21:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BAFC43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 21:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232210AbiGMVaR (ORCPT
+        id S231860AbiGMVmF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Jul 2022 17:30:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51306 "EHLO
+        Wed, 13 Jul 2022 17:42:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230142AbiGMVaQ (ORCPT
+        with ESMTP id S231194AbiGMVmE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Jul 2022 17:30:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1902E22526
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 14:30:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D189DB82164
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 21:30:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9857BC3411E;
-        Wed, 13 Jul 2022 21:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657747813;
-        bh=/792nyPC6YrjUe79m2cJ7mTF6PTa4Ld0sW5V9G1lctA=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=kqfSYD+q/O0M+B2GHFn17aPC9FOy5GHsvHb9glKVjc2i+ucZ1HjUoV8rn7D84sezw
-         nBp9vfpA4MTab570xOYeG8ZNf0bVL8Fn7wqZikEHRHpR4qUpzOxQQJZMMFzY9fyqzm
-         O8p2UuI1NYT90zShx8lzHSTeOPlD6bqKQHI4D4d2BpGhhY6ktqxZih8eIm5BmGY6g6
-         RF29XeHQgmOnO8Em3cCeUItl04O/EZDcvfgGKCNCF2uy2uIJ10ub+/L+Q9yJ9jM7Jy
-         pvvk2CmwTngl0R8fdLH/zVY1elPE0J2K2+nylGuHS2KQHl89LPULDZswcbNZaA6gaX
-         FEEB8gWWC/Dkw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7AB28E4521F;
-        Wed, 13 Jul 2022 21:30:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] adapter: Fix advertising monitor on Linux 5.12-5.17
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165774781349.16220.9847778229088259152.git-patchwork-notify@kernel.org>
-Date:   Wed, 13 Jul 2022 21:30:13 +0000
-References: <20220630073958.34468-1-adrake@adrake.org>
-In-Reply-To: <20220630073958.34468-1-adrake@adrake.org>
-To:     Andrew Drake <adrake@adrake.org>
-Cc:     linux-bluetooth@vger.kernel.org
+        Wed, 13 Jul 2022 17:42:04 -0400
+Received: from smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E802495E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 14:42:02 -0700 (PDT)
+Received: from github.com (hubbernetes-node-dba4b96.ac4-iad.github.net [10.52.125.35])
+        by smtp.github.com (Postfix) with ESMTPA id 2F6CA5204FF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 14:42:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1657748522;
+        bh=tLZvMmz/oYZ40s21TJFIVY9nTkVtT8O4k6cb98sEQEg=;
+        h=Date:From:To:Subject:From;
+        b=TZYQYLuYvfOoaUsr9vgF2s4ALidQEDpn3jvQwW/Z3ajxIGvfSjfKHAFq03QC/RAZW
+         Td0yk2DoT3l0knVeMc9l4tgH7Nfrh3ce63IOwpD+ao4kOUVqEqnTN2UMzqaaMM3hOB
+         Gs36wmdtjN2PMyx/sEehKGDE/ILSuSEuFhwCI9Lo=
+Date:   Wed, 13 Jul 2022 14:42:02 -0700
+From:   Andrew Drake <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/163de8-a69fa6@github.com>
+Subject: [bluez/bluez] a69fa6: adapter: Fix advertising monitor on Linux
+ 5.12-5.17
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: a69fa692b094347e3a1dbcd9198d426f671dec0c
+      https://github.com/bluez/bluez/commit/a69fa692b094347e3a1dbcd9198d426f671dec0c
+  Author: Andrew Drake <adrake@adrake.org>
+  Date:   2022-07-13 (Wed, 13 Jul 2022)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/adapter.c
 
-On Thu, 30 Jun 2022 00:39:58 -0700 you wrote:
-> The existing code assumes that, if a device supports advertising monitor
-> offload, DEVICE_FOUND events can be ignored since the kernel will send
-> ADV_MONITOR_DEVICE_FOUND events instead. Unfortunately, these new events
-> were added in 5.18, but offload was added in 5.12. This patch adds a
-> check on the MGMT API version so we can process the older DEVICE_FOUND
-> events when the new events are not supported.
-> 
-> [...]
+  Log Message:
+  -----------
+  adapter: Fix advertising monitor on Linux 5.12-5.17
 
-Here is the summary with links:
-  - [BlueZ] adapter: Fix advertising monitor on Linux 5.12-5.17
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=a69fa692b094
+The existing code assumes that, if a device supports advertising monitor
+offload, DEVICE_FOUND events can be ignored since the kernel will send
+ADV_MONITOR_DEVICE_FOUND events instead. Unfortunately, these new events
+were added in 5.18, but offload was added in 5.12. This patch adds a
+check on the MGMT API version so we can process the older DEVICE_FOUND
+events when the new events are not supported.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Fixes: https://github.com/bluez/bluez/issues/357
 
 
