@@ -2,83 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0664C43334
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Jul 2022 20:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF3EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 06:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234049AbiGLUKT (ORCPT
+        id S234501AbiGMGxp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Jul 2022 16:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50476 "EHLO
+        Wed, 13 Jul 2022 02:53:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233984AbiGLUKR (ORCPT
+        with ESMTP id S234412AbiGMGxX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Jul 2022 16:10:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07F92BE69C;
-        Tue, 12 Jul 2022 13:10:17 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B0670B81BDB;
-        Tue, 12 Jul 2022 20:10:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 53213C341C0;
-        Tue, 12 Jul 2022 20:10:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657656614;
-        bh=L5dgNUIPOO5+bcxU5e2mjPSXK+Hb0hcBjyW4aG3Fe14=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=ETU5eSIywau8832XHDxUwoHI9bK1HdQnIw7GpvG94/izbB9Wa472arLNdNgW7EFzD
-         YSsV8fOgrULJXDhmf5eL+pileXu2MOU/Ifz7rjPzaorrAOsQl9lsx60iR56aFt6TGV
-         Uy7xlqFOsE64xF2h3eggToUi5FPDnth43ivwbhR7qZ0j4UWYBxNT6fThkL3vuKRnqP
-         PWEMBW6HhSm8D6YufAsa9ZlWSvZcbKm0UoFGcAAB3cfUMzAoH0bByH0h+tDDlPU7dd
-         zPSdCUOpIRATwWdA0Kx1kdJxkNyrbZbHDLLGTmetpC+MqYde4gBUHZ1YbvrUJy0ZGs
-         4Ddq1YnbB6D9g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29A7EE4522E;
-        Tue, 12 Jul 2022 20:10:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 13 Jul 2022 02:53:23 -0400
+Received: from alexa-out-sd-02.qualcomm.com (alexa-out-sd-02.qualcomm.com [199.106.114.39])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E442AE0F45;
+        Tue, 12 Jul 2022 23:53:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1657695203; x=1689231203;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=8n8+PO3A95/qKneSFHtNBTYCjF+JHU9XIFkvb+rLAQ8=;
+  b=uPq9DHAsMbPbm87n+OZip+1/u9dmsK3nj53IvftZlE2uj4BdP+9/FOFD
+   V2u5BCQY/lzi38vaGYLbCWEM3TMfqwZA4ah24JUyLk7CZnTRafs8iQui8
+   nMj6moLFz3AM2T+WYj1/hMTbN7n9h5k1fyM7XIMgOAGwi8Iq/sDPkwRjR
+   s=;
+Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
+  by alexa-out-sd-02.qualcomm.com with ESMTP; 12 Jul 2022 23:53:22 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2022 23:53:22 -0700
+Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Tue, 12 Jul 2022 23:53:19 -0700
+From:   Zijun Hu <quic_zijuhu@quicinc.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <luiz.von.dentz@intel.com>, <quic_zijuhu@quicinc.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH v1] Bluetooth: hci_sync: Correct hci_set_event_mask_page_2_sync() event mask
+Date:   Wed, 13 Jul 2022 14:53:14 +0800
+Message-ID: <1657695194-25801-1-git-send-email-quic_zijuhu@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [kernel PATCH v1 0/1] This patch fixes a previous patch which did not
- remove setting
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165765661416.22843.5459975711518356370.git-patchwork-notify@kernel.org>
-Date:   Tue, 12 Jul 2022 20:10:14 +0000
-References: <20220711225359.996974-1-jiangzp@google.com>
-In-Reply-To: <20220711225359.996974-1-jiangzp@google.com>
-To:     Zhengping Jiang <jiangzp@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, pabeni@redhat.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Event HCI_Truncated_Page_Complete should belong to central
+and HCI_Peripheral_Page_Response_Timeout should belong to
+peripheral, but hci_set_event_mask_page_2_sync() take these
+two events for wrong roles, so correct it by this change.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ net/bluetooth/hci_sync.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Mon, 11 Jul 2022 15:53:58 -0700 you wrote:
-> scanning_paused to false after resuming. So after setting the value,
-> the function to update scan will always quit.
-> Also need to set the value first before updating passive scan.
-> 
-> BUG=b:236868580,b:236340454
-> TEST=verified suspend is fixed in volteer with LE mouse
-> TEST=bluetooth_AdapterSRHealth.sr_peer_wake_le_hid
-> TEST=bluetooth_AdapterCLHealth.cl_adapter_pairing_suspend_resume_test
-> 
-> [...]
-
-Here is the summary with links:
-  - [kernel,v1,1/1] Bluetooth: hci_sync: Fix resuming passive scan after suspend resume
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0cc323d985f9
-
-You are awesome, thank you!
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 7cb310051879..c72533bb9834 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3602,7 +3602,7 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
+ 	if (lmp_cpb_central_capable(hdev)) {
+ 		events[1] |= 0x40;	/* Triggered Clock Capture */
+ 		events[1] |= 0x80;	/* Synchronization Train Complete */
+-		events[2] |= 0x10;	/* Peripheral Page Response Timeout */
++		events[2] |= 0x08;	/* Truncated Page Complete */
+ 		events[2] |= 0x20;	/* CPB Channel Map Change */
+ 		changed = true;
+ 	}
+@@ -3614,7 +3614,7 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
+ 		events[2] |= 0x01;	/* Synchronization Train Received */
+ 		events[2] |= 0x02;	/* CPB Receive */
+ 		events[2] |= 0x04;	/* CPB Timeout */
+-		events[2] |= 0x08;	/* Truncated Page Complete */
++		events[2] |= 0x10;	/* Peripheral Page Response Timeout */
+ 		changed = true;
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
