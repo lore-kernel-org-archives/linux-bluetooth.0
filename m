@@ -2,67 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BAFC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 21:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70FA3C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Jul 2022 23:47:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231860AbiGMVmF (ORCPT
+        id S231543AbiGMXq7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Jul 2022 17:42:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
+        Wed, 13 Jul 2022 19:46:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbiGMVmE (ORCPT
+        with ESMTP id S229598AbiGMXq6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Jul 2022 17:42:04 -0400
-Received: from smtp.github.com (out-21.smtp.github.com [192.30.252.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1E802495E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 14:42:02 -0700 (PDT)
-Received: from github.com (hubbernetes-node-dba4b96.ac4-iad.github.net [10.52.125.35])
-        by smtp.github.com (Postfix) with ESMTPA id 2F6CA5204FF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 14:42:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1657748522;
-        bh=tLZvMmz/oYZ40s21TJFIVY9nTkVtT8O4k6cb98sEQEg=;
-        h=Date:From:To:Subject:From;
-        b=TZYQYLuYvfOoaUsr9vgF2s4ALidQEDpn3jvQwW/Z3ajxIGvfSjfKHAFq03QC/RAZW
-         Td0yk2DoT3l0knVeMc9l4tgH7Nfrh3ce63IOwpD+ao4kOUVqEqnTN2UMzqaaMM3hOB
-         Gs36wmdtjN2PMyx/sEehKGDE/ILSuSEuFhwCI9Lo=
-Date:   Wed, 13 Jul 2022 14:42:02 -0700
-From:   Andrew Drake <noreply@github.com>
+        Wed, 13 Jul 2022 19:46:58 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 181494D4D3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 16:46:58 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id j3so362182pfb.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Jul 2022 16:46:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HdixbbZvtGlXGP8eHFKNvYUlG3YTInq1yE7M+Npu2xY=;
+        b=eDAJIi9FXsyhpC9+CeiGVn1x9Itn1R4MyD6X+kYtilpcsgMIvUXzYKmTPS54KQw4kt
+         IqX+NhRrNe5V3l9DAPiaqt9P3IL792kdn+mCANXEKcsym4l5HOKca2GfbGn99dphtB4b
+         X6hhmhi79SQbn8TlbLKPHsFHK0wR7kG/u/TePDVxzX2oFo2D65CyS3jAEqwCbMPfP/R9
+         vW0OezKishIwaSTiaeYEJszqiMa6c6ZClNL4rgadb4eYw8eVr0Gk0zMe0Vw1q4bLKX69
+         5drAWNGJOF1soKCENuu6hGF+8wgQEFL0pk3twxTUkEawjAA7rfgzScbZ9714aXO8lt6+
+         c50w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=HdixbbZvtGlXGP8eHFKNvYUlG3YTInq1yE7M+Npu2xY=;
+        b=qEqXVUHikf6307sHyHCwDxNDNRlmXmQ8846gdlDbp0BEYl5uOUpbZsX5nRE4YIBd3C
+         GIuD3UeXSfCi8HdomZ8irz4IRSBf5voC9+9imsz2dDYTUP2Cmbw7rtuzm0mP3kMc55mG
+         qJmTvmuBlyw5AQefWnuakhBkuZlkmP0doMDXd/Hi9KgXNQIElkHY7YEiEhil9dRGgXlh
+         p24i7MnWfpjuqZNu0mjahbL4Zqp3TIv4md1XyRYb9zSlHnFCFJ3IgmIyXxaJleHpfWdy
+         71f5fHdhfWN0TSJZG1Z2PWEo2SZTmT5/AAp1Bf1J8CAXiqVy4MquABYOpqkmVRbdKs9s
+         SiNg==
+X-Gm-Message-State: AJIora9GpdFzYVm1VhxdnuUSd8igDRJTjAGXpQLOGsve4dWzelcJK/qu
+        mklTEc7PzwDiCMeMB2SROjVn8XlxGQg=
+X-Google-Smtp-Source: AGRyM1vHyFexTL/tXR44AlN5SuBncvO/Tf8qODiNO7e38+8cEBN38nT6xDyWUnOO7twtyfIr/QWJrA==
+X-Received: by 2002:a05:6a00:1aca:b0:528:1f7d:4ffe with SMTP id f10-20020a056a001aca00b005281f7d4ffemr5753830pfv.16.1657756017090;
+        Wed, 13 Jul 2022 16:46:57 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s5-20020a170902ea0500b0016a058b7547sm9534770plg.294.2022.07.13.16.46.56
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Jul 2022 16:46:56 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/163de8-a69fa6@github.com>
-Subject: [bluez/bluez] a69fa6: adapter: Fix advertising monitor on Linux
- 5.12-5.17
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Subject: [PATCH BlueZ] main: Default device_privacy to true
+Date:   Wed, 13 Jul 2022 16:46:55 -0700
+Message-Id: <20220713234655.3524356-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.35.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: a69fa692b094347e3a1dbcd9198d426f671dec0c
-      https://github.com/bluez/bluez/commit/a69fa692b094347e3a1dbcd9198d426f671dec0c
-  Author: Andrew Drake <adrake@adrake.org>
-  Date:   2022-07-13 (Wed, 13 Jul 2022)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/adapter.c
+If privacy mode is not strictly set to network set it to device
+otherwise network mode would prevent reconnections if the the identity
+address is used:
 
-  Log Message:
-  -----------
-  adapter: Fix advertising monitor on Linux 5.12-5.17
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part B page 2837-2838
 
-The existing code assumes that, if a device supports advertising monitor
-offload, DEVICE_FOUND events can be ignored since the kernel will send
-ADV_MONITOR_DEVICE_FOUND events instead. Unfortunately, these new events
-were added in 5.18, but offload was added in 5.12. This patch adds a
-check on the MGMT API version so we can process the older DEVICE_FOUND
-events when the new events are not supported.
+ 'The Host specifies the privacy mode to be used with each peer
+ identity on the resolving list. If it specifies that device privacy
+ mode is to be used, then the Controller shall accept both the peer's
+ device Identity Address and a resolvable private address generated by
+ the peer device using its distributed IRK. Otherwise, network privacy
+ mode is used: the Controller shall only accept resolvable private
+ addresses generated by the peer device using its distributed IRK.'
+---
+ src/main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Fixes: https://github.com/bluez/bluez/issues/357
-
+diff --git a/src/main.c b/src/main.c
+index 34a54d43f..4ee96bc6a 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -699,6 +699,7 @@ static void parse_config(GKeyFile *config)
+ 		DBG("%s", err->message);
+ 		g_clear_error(&err);
+ 		btd_opts.privacy = 0x00;
++		btd_opts.device_privacy = true;
+ 	} else {
+ 		DBG("privacy=%s", str);
+ 
+@@ -722,6 +723,7 @@ static void parse_config(GKeyFile *config)
+ 			btd_opts.device_privacy = true;
+ 		} else if (!strcmp(str, "off")) {
+ 			btd_opts.privacy = 0x00;
++			btd_opts.device_privacy = true;
+ 		} else {
+ 			DBG("Invalid privacy option: %s", str);
+ 			btd_opts.privacy = 0x00;
+-- 
+2.35.3
 
