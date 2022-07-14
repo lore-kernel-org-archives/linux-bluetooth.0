@@ -2,151 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27994C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 20:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22183C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 21:01:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240689AbiGNUxB (ORCPT
+        id S232729AbiGNVBp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jul 2022 16:53:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34082 "EHLO
+        Thu, 14 Jul 2022 17:01:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232633AbiGNUxB (ORCPT
+        with ESMTP id S230310AbiGNVBn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jul 2022 16:53:01 -0400
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03D4D6758F;
-        Thu, 14 Jul 2022 13:53:00 -0700 (PDT)
-Received: by mail-lj1-x233.google.com with SMTP id w2so3553037ljj.7;
-        Thu, 14 Jul 2022 13:52:59 -0700 (PDT)
+        Thu, 14 Jul 2022 17:01:43 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCB76C110
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 14:01:42 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id f65so2635677pgc.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 14:01:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qoOEVRog5Z9OnfGA667isDqDOO6aHHg3XsYmCVgJlPE=;
-        b=ZnNjcqwzm3TIowpCiyQqSnvZJMN8vS+WW7Ol5NU9/gR8pS4CKS1AmfxY0Ro7cTwsMP
-         I+bTKCR2CO8lFyZUwUd/Av5EltJz6B1oH0nmmT20JY0XdWEhPL1XROurGi9xgJe6uwPY
-         uuUjY7EsmJkzrWH5EvWDtEqeXLPU4Y35BsZnW6ZLGkrFZ8QSQAcCNpkA2eAi4olMWEjH
-         UG1zufCHg0GGv87BI7dMsHPZSr/u6uYawXe6qwD6JMc9Ld7e4GwTSn5yNN2V806qUxHN
-         QedKIBMvV4S3OJJVgvN74CHFg1+yR9zON2h7pUz2nSyYRXCGkiBtZ/6wI0lUi+buMmL7
-         ZGFA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Ai8DdO9ypvTI4f3jjW61IIaEhqvO354viuFr1/UavmY=;
+        b=Nxqh60LxdbzqpWokPKatoZm3BAax7cFeO5+pB81e0Lvh2yyGxoyD76fMYQLNH9ipnd
+         pla1SyGlZL6D83zIvdozVJekSDCfLu7K6yU4EdA6avqhb2OuJJoyhK/jV1f++la+hErm
+         8cnvt043/zBRpR/nVTFeafuF2I1D8qfm4QoyZ9FFRay88a7ilymIu8m/+8dIJicShxVj
+         wk0FzBB5GCaAd42NPegK3YsaWM5/3KaluxhNAXlNezlXIfThrTjaGNvIXz5kWxfeZ3lk
+         xZpNpFDtOdNo0cZI3T8evTOKNuS/z1gQlGzPbszux2CZFWzRgPGhUin9CE3g8E5WSRzW
+         ++zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qoOEVRog5Z9OnfGA667isDqDOO6aHHg3XsYmCVgJlPE=;
-        b=NoJBwFv7ZYJtiUrl5oFT1vwWUk9TsHDh66AVSV5juFMduX/NeY3RxL6R5+BO5mP0Cx
-         0euI6RMIJYPzAJJbPjena02UiepM0bUZhK1Yxh5j1G9c/I9VVpeAS5SDHGcVGmQDmz4T
-         VEBcArkYtKmVn+LfKusV09Vmy64xKWYWscW9RYTeFQOTFGsZxWNUYH/jcOW6QODbvrlC
-         5hVQGhxTsQV/HG99qqMKNu87Xa/NElPyp2AldQ2pVfCvsuKFgc1LbYQkQd3Q42VDqW90
-         4MC3yxKKZ3Vx2sJnAcD6KhL6n2VeF+UzInYTc8ZPi0hh5uLyRSDyfuHRKVrMTiN8miVJ
-         ezbw==
-X-Gm-Message-State: AJIora+n2AOvcPXArDfuE+8YIN6LpKBUVq/FN7fI2D4uKoKvScRYMVcS
-        BoXSpJKtRurYCWd1JHIDnhUAB5ZUN8o8Yb//WUo=
-X-Google-Smtp-Source: AGRyM1thlr1wx3tNWOgTqSb+LfcRI9DpbpLJcE7Mm1Jj8QhbF8tPjEwhNX8pwgBS9xHXodTA61eMiwahhYDfUcb+YKs=
-X-Received: by 2002:a05:651c:1691:b0:25d:8240:6b3a with SMTP id
- bd17-20020a05651c169100b0025d82406b3amr5020152ljb.305.1657831978184; Thu, 14
- Jul 2022 13:52:58 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Ai8DdO9ypvTI4f3jjW61IIaEhqvO354viuFr1/UavmY=;
+        b=OLnV2naY181QefNPWBMasNYG49NXrahOJLrHxOGRcIJQU4+FiNr7LhSCHbkNkXaIpC
+         vup9XcXepSpwIH6hgLU9yEph6OCEN7LRfwun35/NCETe3ADk69ktjsC2cKfewSw/RxFZ
+         RBdvlIbIctIki2UhODGZRiGkrceMJxML8Pa6OSF7gFqQCELG93DrS+FrhaiQBrw1EQwB
+         j03pnwVpNkripLPJOkxSGuFEJZC1PhRZT2cDmDncbY4ruX0M8sdA5Z8F3mS86wiqMyTR
+         XxCsf5Qx24bNCICZ8S0dK8oIcCZ+j9J//MGETXxdNTcooiCisCJSEbWZq3iHSa6f2RoC
+         Pr1g==
+X-Gm-Message-State: AJIora9NB/faau1jchvlNkWi6I8rhLb5CryCmrGEXGpL/dMyp+djVlnU
+        hOMJh9ckm3R5g1hjy1EiNC11Bcty41U=
+X-Google-Smtp-Source: AGRyM1tQdDSUtusHfK5Dd0lpDCSrK2sIa/hYFP0mvwVPvSRRp9pn81r5+xMu53UFibLoOg8xUBYzHQ==
+X-Received: by 2002:a05:6a00:1747:b0:52b:3208:40bd with SMTP id j7-20020a056a00174700b0052b320840bdmr1662135pfc.23.1657832501484;
+        Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
+Received: from [172.17.0.2] ([20.125.122.3])
+        by smtp.gmail.com with ESMTPSA id g4-20020a1709026b4400b0016bdcb8fbcdsm1887425plt.47.2022.07.14.14.01.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
+Message-ID: <62d08435.1c69fb81.9347c.3080@mx.google.com>
+Date:   Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8345256852428876995=="
 MIME-Version: 1.0
-References: <1657774452-4497-1-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1657774452-4497-1-git-send-email-quic_zijuhu@quicinc.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 14 Jul 2022 13:52:46 -0700
-Message-ID: <CABBYNZJG8uKv-270u1P4NTr-gML5=uR2Syhjs=x4LMhJOnqSxA@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: hci_sync: Remove redundant func definition
-To:     Zijun Hu <quic_zijuhu@quicinc.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RFC] Bluetooth: hci_sock: Fix cookie generation
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220714203035.3859253-1-luiz.dentz@gmail.com>
+References: <20220714203035.3859253-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+--===============8345256852428876995==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 13, 2022 at 9:54 PM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
->
-> both hci_request.c and hci_sync.c have the same definition
-> for disconnected_accept_list_entries(), so remove a redundant
-> copy.
->
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  net/bluetooth/hci_request.c |  2 +-
->  net/bluetooth/hci_request.h |  2 ++
->  net/bluetooth/hci_sync.c    | 18 ------------------
->  3 files changed, 3 insertions(+), 19 deletions(-)
+This is automated email and please do not reply to this email!
 
-We are actually deprecating hci_request functions in favor of hci_sync
-ones so this is going in the opposite direction.
+Dear submitter,
 
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 635cc5fb451e..38e6c66a3327 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -1784,7 +1784,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
->         return 0;
->  }
->
-> -static bool disconnected_accept_list_entries(struct hci_dev *hdev)
-> +bool disconnected_accept_list_entries(struct hci_dev *hdev)
->  {
->         struct bdaddr_list *b;
->
-> diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-> index 7f8df258e295..e80b500878d9 100644
-> --- a/net/bluetooth/hci_request.h
-> +++ b/net/bluetooth/hci_request.h
-> @@ -120,6 +120,8 @@ void __hci_req_update_scan(struct hci_request *req);
->  int hci_update_random_address(struct hci_request *req, bool require_privacy,
->                               bool use_rpa, u8 *own_addr_type);
->
-> +bool disconnected_accept_list_entries(struct hci_dev *hdev);
-> +
->  int hci_abort_conn(struct hci_conn *conn, u8 reason);
->  void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
->                       u8 reason);
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 212b0cdb25f5..99ffac6c5e8c 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2419,24 +2419,6 @@ int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable)
->         return err;
->  }
->
-> -static bool disconnected_accept_list_entries(struct hci_dev *hdev)
-> -{
-> -       struct bdaddr_list *b;
-> -
-> -       list_for_each_entry(b, &hdev->accept_list, list) {
-> -               struct hci_conn *conn;
-> -
-> -               conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
-> -               if (!conn)
-> -                       return true;
-> -
-> -               if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-> -                       return true;
-> -       }
-> -
-> -       return false;
-> -}
-> -
->  static int hci_write_scan_enable_sync(struct hci_dev *hdev, u8 val)
->  {
->         return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SCAN_ENABLE,
-> --
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=659854
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.26 seconds
+GitLint                       PASS      0.59 seconds
+SubjectPrefix                 PASS      0.44 seconds
+BuildKernel                   PASS      30.98 seconds
+BuildKernel32                 PASS      27.31 seconds
+Incremental Build with patchesPASS      37.68 seconds
+TestRunner: Setup             PASS      470.65 seconds
+TestRunner: l2cap-tester      PASS      16.60 seconds
+TestRunner: bnep-tester       PASS      5.45 seconds
+TestRunner: mgmt-tester       PASS      97.05 seconds
+TestRunner: rfcomm-tester     PASS      8.92 seconds
+TestRunner: sco-tester        PASS      8.73 seconds
+TestRunner: smp-tester        PASS      8.78 seconds
+TestRunner: userchan-tester   PASS      5.77 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.26 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+[RFC] Bluetooth: hci_sock: Fix cookie generation\ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Luiz Augusto von Dentz <luiz.von.dentz@intel.com'
+#197: 
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com
+
+ERROR:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal patch author 'Luiz Augusto von Dentz <luiz.von.dentz@intel.com>'
+
+total: 2 errors, 0 warnings, 0 checks, 394 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12918480.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
--- 
-Luiz Augusto von Dentz
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8345256852428876995==--
