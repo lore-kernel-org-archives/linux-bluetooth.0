@@ -2,24 +2,24 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C62C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 11:25:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA53AC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 11:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238712AbiGNLZr (ORCPT
+        id S238711AbiGNLZq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jul 2022 07:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34156 "EHLO
+        Thu, 14 Jul 2022 07:25:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238458AbiGNLZm (ORCPT
+        with ESMTP id S238442AbiGNLZl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jul 2022 07:25:42 -0400
+        Thu, 14 Jul 2022 07:25:41 -0400
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A48B52FC2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68CFD52DCF;
         Thu, 14 Jul 2022 04:25:38 -0700 (PDT)
 Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 26EBPRVv8023300, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 26EBPRVt8023300, This message is accepted by code: ctloc85258
 Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 26EBPRVv8023300
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 26EBPRVt8023300
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
         Thu, 14 Jul 2022 19:25:27 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
@@ -36,9 +36,9 @@ CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
         <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
         <kidman@realtek.com>
-Subject: [PATCH v2 3/5] Bluetooth: btusb: Add Realtek RTL8852C support ID 0x0CB8:0xC558
-Date:   Thu, 14 Jul 2022 19:25:21 +0800
-Message-ID: <20220714112523.13242-4-hildawu@realtek.com>
+Subject: [PATCH v2 2/5] Bluetooth: btusb: Add Realtek RTL8852C support ID 0x04C5:0x1675
+Date:   Thu, 14 Jul 2022 19:25:20 +0800
+Message-ID: <20220714112523.13242-3-hildawu@realtek.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20220714112523.13242-1-hildawu@realtek.com>
 References: <20220714112523.13242-1-hildawu@realtek.com>
@@ -68,14 +68,14 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Hilda Wu <hildawu@realtek.com>
 
-Add the support ID(0x0CB8, 0xC558) to usb_device_id table for
+Add the support ID(0x04c5, 0x1675) to usb_device_id table for
 Realtek RTL8852C.
 
 The device info from /sys/kernel/debug/usb/devices as below.
 
 T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
 D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cb8 ProdID=c558 Rev= 0.00
+P:  Vendor=04c5 ProdID=1675 Rev= 0.00
 S:  Manufacturer=Realtek
 S:  Product=Bluetooth Radio
 S:  SerialNumber=00e04c000001
@@ -109,14 +109,14 @@ Signed-off-by: Hilda Wu <hildawu@realtek.com>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fe0434eeac78..50f2b0094cc7 100644
+index f3a68d755099..fe0434eeac78 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -432,6 +432,8 @@ static const struct usb_device_id blacklist_table[] = {
+@@ -430,6 +430,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* Realtek 8852CE Bluetooth devices */
+ 	{ USB_DEVICE(0x04ca, 0x4007), .driver_info = BTUSB_REALTEK |
  						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x04c5, 0x1675), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0cb8, 0xc558), .driver_info = BTUSB_REALTEK |
++	{ USB_DEVICE(0x04c5, 0x1675), .driver_info = BTUSB_REALTEK |
 +						     BTUSB_WIDEBAND_SPEECH },
  
  	/* Realtek Bluetooth devices */
