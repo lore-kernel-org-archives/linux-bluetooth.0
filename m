@@ -2,78 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8BBC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 22:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3474C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 22:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232302AbiGNWaQ (ORCPT
+        id S240845AbiGNWm0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jul 2022 18:30:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45146 "EHLO
+        Thu, 14 Jul 2022 18:42:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiGNWaP (ORCPT
+        with ESMTP id S240907AbiGNWmV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jul 2022 18:30:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06255466D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 15:30:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DADE62036
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 22:30:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ABF6CC341C6;
-        Thu, 14 Jul 2022 22:30:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1657837813;
-        bh=JJLzzIMlvIlFK1MgQulsmMUwZEFYpiHx8hETSHWebBg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LdyU2MsPysKp547VZ23oKyzwZUcviZ+sf0eaMg8j7041aornHioBMteScgVsiygS0
-         JA4KgXGFHlJSsLGU1hpsnttb2P9sw3m07mDvAq/LvY1yBPCdiOO8Nf1GON0CxF+VGR
-         3MTGSbu70K4PzD7xCFIAulKM6Bn1zQITsh7Cyqz5RaqHi7+x+RCTvKHUJlHIVxc+l4
-         ZY3jnzJSt9kIETmT9cITfQugh25RHsyriVGWZganGKzef5xRjQxKq9mWBDD8BPLzvT
-         KAzhx6XGdZ46cctf6S34dbR0a+vRunTFZTUPUuA3LcLTEIuD2FKjeGjwb386IYJbj/
-         KvN3nxvMHBWnw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9270CE45227;
-        Thu, 14 Jul 2022 22:30:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] main: Default device_privacy to true
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165783781359.2596.16132188136596521441.git-patchwork-notify@kernel.org>
-Date:   Thu, 14 Jul 2022 22:30:13 +0000
-References: <20220713234655.3524356-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220713234655.3524356-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Thu, 14 Jul 2022 18:42:21 -0400
+Received: from smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B62CA72EDA
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 15:42:20 -0700 (PDT)
+Received: from github.com (hubbernetes-node-3a9f456.ac4-iad.github.net [10.52.201.38])
+        by smtp.github.com (Postfix) with ESMTPA id 25BE25200AC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 15:42:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1657838540;
+        bh=XjGkV7Hz3vV/wkID+Ns6q653iaZLUnJXhNtMkIiyxug=;
+        h=Date:From:To:Subject:From;
+        b=CB3oZJvnLGVKUXlVhp6C44I8aNScypPYiN1mPcf1ne/h4XYXgoNtCkYi8j7MutjDW
+         AbiM8FNeYXJh6LlVUuJxTuBBWPeUvqIVlWRsP8nUQZyiS8JpX5yX67LRO4Gvg4mC/H
+         juxhR1MY0NqMKgmZ1sfwEgO1+C8ZPtGlaakW2VWE=
+Date:   Thu, 14 Jul 2022 15:42:20 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/a69fa6-af998f@github.com>
+Subject: [bluez/bluez] af998f: main: Default device_privacy to true
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: af998fd32c34f739002865b7288183e006c2ef53
+      https://github.com/bluez/bluez/commit/af998fd32c34f739002865b7288183e006c2ef53
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-07-13 (Wed, 13 Jul 2022)
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Changed paths:
+    M src/main.c
 
-On Wed, 13 Jul 2022 16:46:55 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If privacy mode is not strictly set to network set it to device
-> otherwise network mode would prevent reconnections if the the identity
-> address is used:
-> 
-> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part B page 2837-2838
-> 
-> [...]
+  Log Message:
+  -----------
+  main: Default device_privacy to true
 
-Here is the summary with links:
-  - [BlueZ] main: Default device_privacy to true
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=af998fd32c34
+If privacy mode is not strictly set to network set it to device
+otherwise network mode would prevent reconnections if the the identity
+address is used:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 6, Part B page 2837-2838
+
+ 'The Host specifies the privacy mode to be used with each peer
+ identity on the resolving list. If it specifies that device privacy
+ mode is to be used, then the Controller shall accept both the peer's
+ device Identity Address and a resolvable private address generated by
+ the peer device using its distributed IRK. Otherwise, network privacy
+ mode is used: the Controller shall only accept resolvable private
+ addresses generated by the peer device using its distributed IRK.'
 
 
