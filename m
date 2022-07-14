@@ -2,126 +2,259 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22183C43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 21:01:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F9A1C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 21:24:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232729AbiGNVBp (ORCPT
+        id S240211AbiGNVYb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jul 2022 17:01:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40276 "EHLO
+        Thu, 14 Jul 2022 17:24:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230310AbiGNVBn (ORCPT
+        with ESMTP id S239483AbiGNVY3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jul 2022 17:01:43 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCB76C110
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 14:01:42 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id f65so2635677pgc.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 14:01:42 -0700 (PDT)
+        Thu, 14 Jul 2022 17:24:29 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D152131907;
+        Thu, 14 Jul 2022 14:24:27 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id y11so4870415lfs.6;
+        Thu, 14 Jul 2022 14:24:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Ai8DdO9ypvTI4f3jjW61IIaEhqvO354viuFr1/UavmY=;
-        b=Nxqh60LxdbzqpWokPKatoZm3BAax7cFeO5+pB81e0Lvh2yyGxoyD76fMYQLNH9ipnd
-         pla1SyGlZL6D83zIvdozVJekSDCfLu7K6yU4EdA6avqhb2OuJJoyhK/jV1f++la+hErm
-         8cnvt043/zBRpR/nVTFeafuF2I1D8qfm4QoyZ9FFRay88a7ilymIu8m/+8dIJicShxVj
-         wk0FzBB5GCaAd42NPegK3YsaWM5/3KaluxhNAXlNezlXIfThrTjaGNvIXz5kWxfeZ3lk
-         xZpNpFDtOdNo0cZI3T8evTOKNuS/z1gQlGzPbszux2CZFWzRgPGhUin9CE3g8E5WSRzW
-         ++zg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KmMdFk8G2KWuImmWS/3z+3mHwuhXIUfq+ZzcZznCa7M=;
+        b=JhjgNgUcWpT6UpJ6+xGlUp9j5fyCOhvvjY/msLRbgnNAZALpEsEv+pC0uaAyH5U6Fu
+         Ko235YJKjQUY2BY/cKBnFx4ZnOMPtLoeZpWvuX8Gav3kKasqrUC9PIbNScisgcbGJ613
+         EqtaLLPzDYiQhLYQNsKMmjWBv3rWhNGuWm4Hcih9FMEqFAdAI10R0piqU2COSv/L6/H5
+         bZEgNmgFrlEaLyyMKtX/FZoGzx+BWxRk0+y0kqJf4+Hubl9Jmx/Ok0WJLABV2WapFCj3
+         qiijIC4S23Kekxw4AsB9nj5Vmxy2k6Y0zgnMN+3CkHjXF2a8cetE3WRUDFlPxNZrbq4Q
+         aRfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Ai8DdO9ypvTI4f3jjW61IIaEhqvO354viuFr1/UavmY=;
-        b=OLnV2naY181QefNPWBMasNYG49NXrahOJLrHxOGRcIJQU4+FiNr7LhSCHbkNkXaIpC
-         vup9XcXepSpwIH6hgLU9yEph6OCEN7LRfwun35/NCETe3ADk69ktjsC2cKfewSw/RxFZ
-         RBdvlIbIctIki2UhODGZRiGkrceMJxML8Pa6OSF7gFqQCELG93DrS+FrhaiQBrw1EQwB
-         j03pnwVpNkripLPJOkxSGuFEJZC1PhRZT2cDmDncbY4ruX0M8sdA5Z8F3mS86wiqMyTR
-         XxCsf5Qx24bNCICZ8S0dK8oIcCZ+j9J//MGETXxdNTcooiCisCJSEbWZq3iHSa6f2RoC
-         Pr1g==
-X-Gm-Message-State: AJIora9NB/faau1jchvlNkWi6I8rhLb5CryCmrGEXGpL/dMyp+djVlnU
-        hOMJh9ckm3R5g1hjy1EiNC11Bcty41U=
-X-Google-Smtp-Source: AGRyM1tQdDSUtusHfK5Dd0lpDCSrK2sIa/hYFP0mvwVPvSRRp9pn81r5+xMu53UFibLoOg8xUBYzHQ==
-X-Received: by 2002:a05:6a00:1747:b0:52b:3208:40bd with SMTP id j7-20020a056a00174700b0052b320840bdmr1662135pfc.23.1657832501484;
-        Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
-Received: from [172.17.0.2] ([20.125.122.3])
-        by smtp.gmail.com with ESMTPSA id g4-20020a1709026b4400b0016bdcb8fbcdsm1887425plt.47.2022.07.14.14.01.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
-Message-ID: <62d08435.1c69fb81.9347c.3080@mx.google.com>
-Date:   Thu, 14 Jul 2022 14:01:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8345256852428876995=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=KmMdFk8G2KWuImmWS/3z+3mHwuhXIUfq+ZzcZznCa7M=;
+        b=yOXs9DFvYMapZtjCQTQAhll04ONpAZJS/lrd56S0ZeRhPjWrtHKKpUZ31n/PCV0C+s
+         o5LyPggsPuqOgXJTmiuEYiue5mVmrqGRd0y/rYa2XYTgOwa2VPpAcdjen/evJI49x+4L
+         niTHQ0jcr8+TF1XKOF5KhtTwUGCRqbKlLUgTUaSsxnFhnic2lfYhUYZ7yokxs4BWSYsu
+         OFRPN0scbKx/RAcxQlbDxDMjtgiRZmcw2wTO0m1UJEqR/Suj/SARbWJXOsBxmilbeMyI
+         4CjVzzbmsht0khI1GIbesMHaoJ7nbyIweJpIUV2zoklBBfuO4HaD6DZ8QBtfBIIp4Onb
+         GlFA==
+X-Gm-Message-State: AJIora+u6zlVH0pXURpUDf2wAIUMjNJwfTG6MdACud2i1k5z1KcERNqw
+        2C9mjrx0w9ygTyB37CCDsX8mKvXT+6l9KjDcWCump11wMa5eDQ==
+X-Google-Smtp-Source: AGRyM1tKDoCwBiJw79GFxlAUQnD00JvhrzmBQ3hgkUDZEDwskW2jn16eIBqhnl38acb3siyZPggfyuEsVz/JoTG1lU4=
+X-Received: by 2002:a05:6512:22c8:b0:488:e69b:9311 with SMTP id
+ g8-20020a05651222c800b00488e69b9311mr5960155lfu.564.1657833866078; Thu, 14
+ Jul 2022 14:24:26 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC] Bluetooth: hci_sock: Fix cookie generation
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220714203035.3859253-1-luiz.dentz@gmail.com>
-References: <20220714203035.3859253-1-luiz.dentz@gmail.com>
+References: <1657782880-28234-1-git-send-email-quic_zijuhu@quicinc.com>
+In-Reply-To: <1657782880-28234-1-git-send-email-quic_zijuhu@quicinc.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 14 Jul 2022 14:24:14 -0700
+Message-ID: <CABBYNZKn6NUJdtdOASSDs4+h_rZVvamcVPW1KZdmXkALEpCEmg@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: Fix cvsd sco setup failure
+To:     Zijun Hu <quic_zijuhu@quicinc.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8345256852428876995==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Zijun,
 
-This is automated email and please do not reply to this email!
+On Thu, Jul 14, 2022 at 12:14 AM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+>
+> A cvsd sco setup failure issue is reported as shown by
+> below btmon log, it firstly tries to set up cvsd esco with
+> S3/S2/S1 configs sequentially, but these attempts are all
+> failed with error code "Unspecified Error (0x1f)", then it
+> tries to set up cvsd sco with D1 config, unfortunately, it
+> still fails to set up sco with error code
+> "Invalid HCI Command Parameters (0x12)", this error code
+> terminates attempt with remaining D0 config and marks overall
+> sco/esco setup failure.
+>
+> It is wrong D1/D0 @retrans_effort 0x01 within @esco_param_cvsd
+> that causes D1 config failure with error code
+> "Invalid HCI Command Parameters (0x12)", D1/D0 sco @retrans_effort
+> must not be 0x01 based on spec, so fix this issue by changing D1/D0
+> @retrans_effort from 0x01 to 0xff as present @sco_param_cvsd.
 
-Dear submitter,
+Please quote the spec regarding the invalid parameters:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=659854
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+page 1891
 
----Test result---
+0x01 At least one retransmission, optimize for power consumption (eSCO con-
+nection required).
 
-Test Summary:
-CheckPatch                    FAIL      1.26 seconds
-GitLint                       PASS      0.59 seconds
-SubjectPrefix                 PASS      0.44 seconds
-BuildKernel                   PASS      30.98 seconds
-BuildKernel32                 PASS      27.31 seconds
-Incremental Build with patchesPASS      37.68 seconds
-TestRunner: Setup             PASS      470.65 seconds
-TestRunner: l2cap-tester      PASS      16.60 seconds
-TestRunner: bnep-tester       PASS      5.45 seconds
-TestRunner: mgmt-tester       PASS      97.05 seconds
-TestRunner: rfcomm-tester     PASS      8.92 seconds
-TestRunner: sco-tester        PASS      8.73 seconds
-TestRunner: smp-tester        PASS      8.78 seconds
-TestRunner: userchan-tester   PASS      5.77 seconds
+> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3405 [hci0]
+>         Handle: 3
+>         Transmit bandwidth: 8000
+>         Receive bandwidth: 8000
+>         Max latency: 10
+>         Setting: 0x0060
+>           Input Coding: Linear
+>           Input Data Format: 2's complement
+>           Input Sample Size: 16-bit
+>           # of bits padding at MSB: 0
+>           Air Coding Format: CVSD
+>         Retransmission effort: Optimize for power consumption (0x01)
+>         Packet type: 0x0380
+>           3-EV3 may not be used
+>           2-EV5 may not be used
+>           3-EV5 may not be used
+> > HCI Event: Command Status (0x0f) plen 4               #3406 [hci0]
+>       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+>         Status: Success (0x00)
+> > HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3408 [hci0]
+>         Status: Unspecified Error (0x1f)
+>         Handle: 4
+>         Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+>         Link type: eSCO (0x02)
+>         Transmission interval: 0x00
+>         Retransmission window: 0x00
+>         RX packet length: 0
+>         TX packet length: 0
+>         Air mode: CVSD (0x02)
+> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3409 [hci0]
+>         Handle: 3
+>         Transmit bandwidth: 8000
+>         Receive bandwidth: 8000
+>         Max latency: 7
+>         Setting: 0x0060
+>           Input Coding: Linear
+>           Input Data Format: 2's complement
+>           Input Sample Size: 16-bit
+>           # of bits padding at MSB: 0
+>           Air Coding Format: CVSD
+>         Retransmission effort: Optimize for power consumption (0x01)
+>         Packet type: 0x0380
+>           3-EV3 may not be used
+>           2-EV5 may not be used
+>           3-EV5 may not be used
+> > HCI Event: Command Status (0x0f) plen 4               #3410 [hci0]
+>       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+>         Status: Success (0x00)
+> > HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3416 [hci0]
+>         Status: Unspecified Error (0x1f)
+>         Handle: 4
+>         Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+>         Link type: eSCO (0x02)
+>         Transmission interval: 0x00
+>         Retransmission window: 0x00
+>         RX packet length: 0
+>         TX packet length: 0
+>         Air mode: CVSD (0x02)
+> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3417 [hci0]
+>         Handle: 3
+>         Transmit bandwidth: 8000
+>         Receive bandwidth: 8000
+>         Max latency: 7
+>         Setting: 0x0060
+>           Input Coding: Linear
+>           Input Data Format: 2's complement
+>           Input Sample Size: 16-bit
+>           # of bits padding at MSB: 0
+>           Air Coding Format: CVSD
+>         Retransmission effort: Optimize for power consumption (0x01)
+>         Packet type: 0x03c8
+>           EV3 may be used
+>           2-EV3 may not be used
+>           3-EV3 may not be used
+>           2-EV5 may not be used
+>           3-EV5 may not be used
+> > HCI Event: Command Status (0x0f) plen 4               #3419 [hci0]
+>       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+>         Status: Success (0x00)
+> > HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3426 [hci0]
+>         Status: Unspecified Error (0x1f)
+>         Handle: 4
+>         Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+>         Link type: eSCO (0x02)
+>         Transmission interval: 0x00
+>         Retransmission window: 0x00
+>         RX packet length: 0
+>         TX packet length: 0
+>         Air mode: CVSD (0x02)
+> < HCI Command: Setup Synchrono.. (0x01|0x0028) plen 17  #3427 [hci0]
+>         Handle: 3
+>         Transmit bandwidth: 8000
+>         Receive bandwidth: 8000
+>         Max latency: 65535
+>         Setting: 0x0060
+>           Input Coding: Linear
+>           Input Data Format: 2's complement
+>           Input Sample Size: 16-bit
+>           # of bits padding at MSB: 0
+>           Air Coding Format: CVSD
+>         Retransmission effort: Optimize for power consumption (0x01)
+>         Packet type: 0x03c4
+>           HV3 may be used
+>           2-EV3 may not be used
+>           3-EV3 may not be used
+>           2-EV5 may not be used
+>           3-EV5 may not be used
+> > HCI Event: Command Status (0x0f) plen 4               #3428 [hci0]
+>       Setup Synchronous Connection (0x01|0x0028) ncmd 1
+>         Status: Success (0x00)
+> > HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #3429 [hci0]
+>         Status: Invalid HCI Command Parameters (0x12)
+>         Handle: 0
+>         Address: 14:3F:A6:47:56:15 (OUI 14-3F-A6)
+>         Link type: SCO (0x00)
+>         Transmission interval: 0x00
+>         Retransmission window: 0x00
+>         RX packet length: 0
+>         TX packet length: 0
+>         Air mode: u-law log (0x00)
 
-Details
-##############################
-Test: CheckPatch - FAIL - 1.26 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[RFC] Bluetooth: hci_sock: Fix cookie generation\ERROR:BAD_SIGN_OFF: Unrecognized email address: 'Luiz Augusto von Dentz <luiz.von.dentz@intel.com'
-#197: 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com
+This really sounds like the controller fault, it seem to be picking up
+SCO based on packet type alone instead of checking if retransmission
+is suggesting to use eSCO instead, otherwise there is no use to define
+D1/D0 for both eSCO and SCO since the controller will always pick SCO
+instead.
 
-ERROR:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal patch author 'Luiz Augusto von Dentz <luiz.von.dentz@intel.com>'
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> Tested-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  net/bluetooth/hci_conn.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 7829433d54c1..2627d5ac15d6 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -45,8 +45,8 @@ static const struct sco_param esco_param_cvsd[] = {
+>         { EDR_ESCO_MASK & ~ESCO_2EV3, 0x000a,   0x01 }, /* S3 */
+>         { EDR_ESCO_MASK & ~ESCO_2EV3, 0x0007,   0x01 }, /* S2 */
+>         { EDR_ESCO_MASK | ESCO_EV3,   0x0007,   0x01 }, /* S1 */
+> -       { EDR_ESCO_MASK | ESCO_HV3,   0xffff,   0x01 }, /* D1 */
+> -       { EDR_ESCO_MASK | ESCO_HV1,   0xffff,   0x01 }, /* D0 */
+> +       { EDR_ESCO_MASK | ESCO_HV3,   0xffff,   0xff }, /* D1 */
+> +       { EDR_ESCO_MASK | ESCO_HV1,   0xffff,   0xff }, /* D0 */
+>  };
 
-total: 2 errors, 0 warnings, 0 checks, 394 lines checked
+This doesn't seem right, you are changing the parameters for eSCO
+table not SCO, which further reinforce this is probably the controller
+not really doing its job and checking if retransmission is actually
+meant for eSCO rather than SCO.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12918480.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>  static const struct sco_param sco_param_cvsd[] = {
+> --
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+>
 
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8345256852428876995==--
+-- 
+Luiz Augusto von Dentz
