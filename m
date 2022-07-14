@@ -2,125 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA53AC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 11:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A04CDC43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Jul 2022 11:55:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238711AbiGNLZq (ORCPT
+        id S239099AbiGNLzz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Jul 2022 07:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34152 "EHLO
+        Thu, 14 Jul 2022 07:55:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238442AbiGNLZl (ORCPT
+        with ESMTP id S229472AbiGNLzx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Jul 2022 07:25:41 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 68CFD52DCF;
-        Thu, 14 Jul 2022 04:25:38 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 26EBPRVt8023300, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 26EBPRVt8023300
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-        Thu, 14 Jul 2022 19:25:27 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Thu, 14 Jul 2022 19:25:30 +0800
-Received: from localhost.localdomain (172.21.132.192) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.27; Thu, 14 Jul 2022 19:25:29 +0800
-From:   <hildawu@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
-        <kidman@realtek.com>
-Subject: [PATCH v2 2/5] Bluetooth: btusb: Add Realtek RTL8852C support ID 0x04C5:0x1675
-Date:   Thu, 14 Jul 2022 19:25:20 +0800
-Message-ID: <20220714112523.13242-3-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220714112523.13242-1-hildawu@realtek.com>
-References: <20220714112523.13242-1-hildawu@realtek.com>
+        Thu, 14 Jul 2022 07:55:53 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23495A2F3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 04:55:52 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id y14-20020a17090a644e00b001ef775f7118so8437259pjm.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Jul 2022 04:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=es82VCqe5109I8TWoT6aJL+CwuMRLGOEosyVTz1Nlk4=;
+        b=cuF44sQRWckxNROI43+gZYEaN1NujT8N+jR8si34oMywv0hkEMTRbXcP0r3Y7KvGTJ
+         233cQFV9IfbpsDypRI9SfapYYyoda++HJULWhO7YN+2JN1eHvAWSu7HQ/MSKsUyBmtH+
+         oAyz+2cu67GbvKGqnRi5u2hKrHT6aGVl4ocDh1NYmU6LvBdaf/1Vkf8G2Gbrytq1i6eP
+         JReDLQXngvwGK9nhEm3d1N7UYZc4JLLT8ieElyjSKqPKwgcryCcFpwoEniqdCZ2oL+Yp
+         UqndRcPDs6EueivvSeKOjoMlEiEiVQH+mkd7l/kp0YZcTtm1pw2v+5vUFJZNngAATFqG
+         5bQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=es82VCqe5109I8TWoT6aJL+CwuMRLGOEosyVTz1Nlk4=;
+        b=xXx6LUtq+qZ9dOK5eWgVcWhAU+8qlFIJzKRNZx0MEh3MGEFJqXE5PctOG73iF5HRiA
+         iJFYIOhTT99fw0WJ6U0AtB5yIVkNKR1gAQkB0Ho8TdCeyEY77J8dsBLWUc3YoMFTTHU8
+         saSktiArmnqqBBlF31FjXHAJtwHhp/ddzYJk544+jzRwxSN5d+NE+l0wfis4vyg7EOhk
+         Zkrhz10Z1Z4G2StsZTJwOdySkpLZrX5bIFT3eprry6FQHoAlXZUulmGcik6dA68YK+uz
+         OrSx36L1ItkeJxlML8z/I40AuIOv/j28rvCGcukb2C6LO3HlNfU2Ln5P8X/qOKMGYKNn
+         dpAw==
+X-Gm-Message-State: AJIora/l+pdLfi9YK4bipUYSn4Cmcu8Q912wUL4wMvrbOUWf4xU3qsFL
+        YNkSYnwDyxlg86xhXhPq7Nz4oQg0hGE=
+X-Google-Smtp-Source: AGRyM1ssEsg5Fzsj3kVW5nzUzPya4BVx1JYp6TwOaRI7KIlUWWZ4NATR0xeLYxH9+JK7F2jpRmIjRw==
+X-Received: by 2002:a17:90a:cf17:b0:1ef:bd2b:1a59 with SMTP id h23-20020a17090acf1700b001efbd2b1a59mr9669807pju.144.1657799752027;
+        Thu, 14 Jul 2022 04:55:52 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.154.28])
+        by smtp.gmail.com with ESMTPSA id l6-20020a622506000000b0052b2bf4cc42sm343104pfl.111.2022.07.14.04.55.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Jul 2022 04:55:51 -0700 (PDT)
+Message-ID: <62d00447.1c69fb81.d74df.0795@mx.google.com>
+Date:   Thu, 14 Jul 2022 04:55:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1530653385445203649=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.192]
-X-ClientProxiedBy: RTEXH36504.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 07/14/2022 11:06:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzcvMTQgpFekyCAwOTowNTowMA==?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, poprdi@google.com
+Subject: RE: [v2] Bluetooth: Collect kcov coverage from hci_rx_work
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220714104814.1296858-1-poprdi@google.com>
+References: <20220714104814.1296858-1-poprdi@google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hilda Wu <hildawu@realtek.com>
+--===============1530653385445203649==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add the support ID(0x04c5, 0x1675) to usb_device_id table for
-Realtek RTL8852C.
+This is automated email and please do not reply to this email!
 
-The device info from /sys/kernel/debug/usb/devices as below.
+Dear submitter,
 
-T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=04c5 ProdID=1675 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=659660
 
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.26 seconds
+GitLint                       FAIL      0.56 seconds
+SubjectPrefix                 PASS      0.39 seconds
+BuildKernel                   PASS      31.70 seconds
+BuildKernel32                 PASS      27.34 seconds
+Incremental Build with patchesPASS      37.80 seconds
+TestRunner: Setup             PASS      468.97 seconds
+TestRunner: l2cap-tester      PASS      16.30 seconds
+TestRunner: bnep-tester       PASS      5.46 seconds
+TestRunner: mgmt-tester       PASS      95.42 seconds
+TestRunner: rfcomm-tester     PASS      8.90 seconds
+TestRunner: sco-tester        PASS      8.60 seconds
+TestRunner: smp-tester        PASS      8.65 seconds
+TestRunner: userchan-tester   PASS      5.65 seconds
+
+Details
+##############################
+Test: GitLint - FAIL - 0.56 seconds
+Run gitlint with rule in .gitlint
+[v2] Bluetooth: Collect kcov coverage from hci_rx_work
+24: B1 Line exceeds max length (132>80): "Note: this is a resubmission of https://lore.kernel.org/netdev/CAPUC6bJbVMPn1FMLYnXg2GUX4ikesMSRjj=oPOOrS5H2DOx_bA@mail.gmail.com/T/"
+
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f3a68d755099..fe0434eeac78 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -430,6 +430,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Realtek 8852CE Bluetooth devices */
- 	{ USB_DEVICE(0x04ca, 0x4007), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x04c5, 0x1675), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Realtek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
--- 
-2.17.1
 
+--===============1530653385445203649==--
