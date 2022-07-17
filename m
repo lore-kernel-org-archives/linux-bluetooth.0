@@ -2,115 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED5C4C43334
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Jul 2022 13:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA02AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Jul 2022 14:04:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232644AbiGQNiQ (ORCPT
+        id S233102AbiGQOE2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 Jul 2022 09:38:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55504 "EHLO
+        Sun, 17 Jul 2022 10:04:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiGQNiP (ORCPT
+        with ESMTP id S233098AbiGQOE1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 Jul 2022 09:38:15 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA64613CCF;
-        Sun, 17 Jul 2022 06:38:14 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id y15so2197434plp.10;
-        Sun, 17 Jul 2022 06:38:14 -0700 (PDT)
+        Sun, 17 Jul 2022 10:04:27 -0400
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7066A13E2F
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Jul 2022 07:04:26 -0700 (PDT)
+Received: by mail-il1-x134.google.com with SMTP id r4so649847ilb.10
+        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Jul 2022 07:04:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pjCptrwTCqzyeOFeqcjeBA84+aupixrF+Oo0LbeI1pA=;
-        b=D8MVRPT8Eb3HOVIq+fyV26qLXpi3Zy/EAKcQbh9oVpIobBFwBWKecS4bDBRio8cg6N
-         V3vDXu80PjakXJM12wXxipbS+T2rgwnHcRzrFmj/vfp0FRPM/TZcUd2j6ai6ztPl/dla
-         /xNGAUEQktbnjz6pwVLz5SFgmdOmnxEInGv2Lg2zscmDls6wgtqAmMSs8c4QdDBHHwSu
-         hyukifsrUsJdewr5wIYSIezsSkTM6FTN8GYfTXVYlTtmbtBNC5jrdjZjhtCazWkF2E58
-         h6lO1qA4uOs6p6pyxafaO5xnFBXCryWdUHwfaqQVGGQGNwwloGqweU7c0AJrRTyWlE6l
-         WpNw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=9eNsrk0dKkLmfftdJt5rrWXDWUpVCPR2pReXymCbUCQ=;
+        b=gzJlnbScD0yE9c65ihhobOmEkwBkBlerIk4vkbqN7PhBpbDvp4awviobQHz7nWc9t8
+         ntoYvsP0Deu3gxp4WStw6LG4rBJKalM1zM0HNUgfFdjdkVDxyljjQbbvIOW/KRvwdmhb
+         pvwdx3My7tYG4LH1qLBFWTW0JaWrUkRrtQlZTvoB8JZN36a2XODvkXgfvHutP5yPe0E4
+         Xbm9zSqvWOaLwSXRM5Tvcump9ENrWBOXZ0DX7ZE7P1TD5swihSExtJrzAQo5u/cduvl+
+         rw7PrveEj/dhmTHNUoodMMO3JjFjalWummpKoG6WcZrLUHdvAEIweLhYXs3QvP9sNXsb
+         Dsqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pjCptrwTCqzyeOFeqcjeBA84+aupixrF+Oo0LbeI1pA=;
-        b=2ZvTfxR3/fjFkG57xB0wssCfXKpszzik4r+TSYi8aHUEEScncKkJgC6NFFbGTMbeig
-         eoMSEBWTtUlmJ6el2VU+8cp1l2KRftEYBYRaQQvlxASm40lspt9LzseAIXz0gLZa8Q/k
-         xEyfqx4UYMTus+lpLuGq+c7FU4UfefF6B3wPXVDH3LHnL/EBKG1CE8CjShPGpWoej3Oi
-         xj7cm/dCS+js4H2TIivqPO/nfUSi8tZFPwjX6ju/VWknMmnLX1uqbgPc1I17Ev8R2Bmy
-         GfBML+iCFPkFlF03BUEFfEUUN9O7Pv8AdRlFjsM1VFMnIw4tOV1Q4e/DXjekBuDXJCcK
-         r6vQ==
-X-Gm-Message-State: AJIora+TbSN0VALeNoo2/lmSCP83CnoUqqa6Tm/9uOuLU6Ev3Ld5xgBs
-        aOM1/dKogJsVhijeZ+Dxuno=
-X-Google-Smtp-Source: AGRyM1u3D5EsZy5ThFn9Gz06wyR2U7uyzcynnndletJOt8PrBO5LQm0fCb7NVZ1yb/88RWcymkKJIw==
-X-Received: by 2002:a17:90b:3807:b0:1f0:a86:6875 with SMTP id mq7-20020a17090b380700b001f00a866875mr33281553pjb.103.1658065094159;
-        Sun, 17 Jul 2022 06:38:14 -0700 (PDT)
-Received: from fedora.. ([103.159.189.134])
-        by smtp.gmail.com with ESMTPSA id r16-20020aa79890000000b005254e44b748sm7279166pfl.84.2022.07.17.06.38.07
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=9eNsrk0dKkLmfftdJt5rrWXDWUpVCPR2pReXymCbUCQ=;
+        b=8Pl98Q9hNsCJV8jgC0vX8pqysTh3c/Dzn4+olyXuWPIgbkh3QIa8IeqdwqZgUbM5Wd
+         s1ZiMzzx64tOc5hNdEvWfK4BEsZGxd5ttAhsELMaZUGrzMMUs849yVBw+ft4DA6zvIdo
+         uT8U9/mJ7ZqNmHzRu8xiawhJdnnhmzZFAn0E8xHx1Pzn+CLZxl4xVBUqeD8XVMC74g7/
+         9xaDZUJSpysd2nri9ViV9HWBj8VSBQmTSF6Fi5Qx2aVbsK0aW9ucx9FNghHrj6dtrYy6
+         8sNb3Le3d3fjK4iNYp5aCT2a/SmJFduNM76f+gr46lWILTgInvayOy5JYnfD1bOcImaI
+         A0xA==
+X-Gm-Message-State: AJIora8sPsDX6yo3HfzYT3mofJR2xu/gfWvQ6G5aDi+naiMYQMnAAp+T
+        vm6lLADFt/IdA/x4vfCiu5eb9oDOmT0=
+X-Google-Smtp-Source: AGRyM1tQpnFvNzBr2vsb6siXWd9IrfP0VIZ0VZ36vIFEEXEFa9Xyc4W7LUuiBXActXdn3quDIJPT9g==
+X-Received: by 2002:a92:6603:0:b0:2da:82b6:34a3 with SMTP id a3-20020a926603000000b002da82b634a3mr11514404ilc.250.1658066665482;
+        Sun, 17 Jul 2022 07:04:25 -0700 (PDT)
+Received: from [172.17.0.2] ([52.173.131.15])
+        by smtp.gmail.com with ESMTPSA id t1-20020a056e02060100b002dc251040besm3789337ils.46.2022.07.17.07.04.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Jul 2022 06:38:13 -0700 (PDT)
-From:   Khalid Masum <khalid.masum.92@gmail.com>
-To:     linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org
-Cc:     Shuah Khan <skhan@linuxfoundation.org>,
-        Pavel Skripkin <paskripkin@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Khalid Masum <khalid.masum.92@gmail.com>
-Subject: [PATCH] Bluetooth: hci_core: Use ERR_PTR instead of NULL
-Date:   Sun, 17 Jul 2022 19:37:58 +0600
-Message-Id: <20220717133759.8479-1-khalid.masum.92@gmail.com>
-X-Mailer: git-send-email 2.36.1
+        Sun, 17 Jul 2022 07:04:25 -0700 (PDT)
+Message-ID: <62d416e9.1c69fb81.b292d.39c4@mx.google.com>
+Date:   Sun, 17 Jul 2022 07:04:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6323641962129503077=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, khalid.masum.92@gmail.com
+Subject: RE: Bluetooth: hci_core: Use ERR_PTR instead of NULL
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220717133759.8479-1-khalid.masum.92@gmail.com>
+References: <20220717133759.8479-1-khalid.masum.92@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Failure of kzalloc to allocate memory is not reported. Return Error
-pointer to ENOMEM if memory allocation fails. This will increase
-readability and will make the function easier to use in future.
+--===============6323641962129503077==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Khalid Masum <khalid.masum.92@gmail.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=660435
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.44 seconds
+GitLint                       PASS      0.84 seconds
+SubjectPrefix                 PASS      0.65 seconds
+BuildKernel                   PASS      31.55 seconds
+BuildKernel32                 PASS      27.58 seconds
+Incremental Build with patchesPASS      37.85 seconds
+TestRunner: Setup             PASS      468.67 seconds
+TestRunner: l2cap-tester      PASS      16.39 seconds
+TestRunner: bnep-tester       PASS      5.54 seconds
+TestRunner: mgmt-tester       PASS      94.94 seconds
+TestRunner: rfcomm-tester     PASS      8.95 seconds
+TestRunner: sco-tester        PASS      8.67 seconds
+TestRunner: smp-tester        PASS      8.79 seconds
+TestRunner: userchan-tester   PASS      5.78 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 4 ++--
- net/bluetooth/hci_core.c  | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e25fcd49db70..3407762b3b15 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3692,8 +3692,8 @@ static int btusb_probe(struct usb_interface *intf,
- 	data->recv_acl = hci_recv_frame;
- 
- 	hdev = hci_alloc_dev_priv(priv_size);
--	if (!hdev)
--		return -ENOMEM;
-+	if (IS_ERR(hdev))
-+		return PTR_ERR(hdev);
- 
- 	hdev->bus = HCI_USB;
- 	hci_set_drvdata(hdev, data);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a0f99baafd35..ea50767e02bf 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2419,7 +2419,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 
- 	hdev = kzalloc(alloc_size, GFP_KERNEL);
- 	if (!hdev)
--		return NULL;
-+		return ERR_PTR(-ENOMEM);
- 
- 	hdev->pkt_type  = (HCI_DM1 | HCI_DH1 | HCI_HV1);
- 	hdev->esco_type = (ESCO_HV1);
--- 
-2.36.1
 
+--===============6323641962129503077==--
