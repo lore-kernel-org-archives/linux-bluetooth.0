@@ -2,160 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6487C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Jul 2022 23:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CB2C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Jul 2022 23:20:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236379AbiGRXMz (ORCPT
+        id S233875AbiGRXUQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Jul 2022 19:12:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37754 "EHLO
+        Mon, 18 Jul 2022 19:20:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230165AbiGRXMy (ORCPT
+        with ESMTP id S230230AbiGRXUP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Jul 2022 19:12:54 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5AF333368;
-        Mon, 18 Jul 2022 16:12:53 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id bp17so21967115lfb.3;
-        Mon, 18 Jul 2022 16:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tdCumMkGDtxwvFkZJRFbFv4L/guo6vY9nBfv53e1qHk=;
-        b=MNb/r7HdgU2ylim64tzSUsoIlfAL0CGlCiXdIER51EOlv6vZH4GRJUpKxmmlSR2Fs+
-         wf12WcjpU3KyyeETxz+SkWM6281RSoWRgl3/IsQyVQPEfrxw5HL3Regb2CvOP8wG5Kia
-         KCidYinJq2cxB2kqyWcs8bJ3ahPsNrbtrBqguxNuyyCoC3M/u+xKy9IekY2tQC9hTWYG
-         9f510gstrcizEFqkjLuvGu5GSAk0+I3gWuwA6+OGDIofmyLO7E/uPBXCOc6ZoyX0Y117
-         bhkPnnE2Gloh5/NAfZL8yxfcKPevhQiDx6Vj7yVnewVzAo9Wva49XQXhKad1jhWZ0AID
-         qxhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tdCumMkGDtxwvFkZJRFbFv4L/guo6vY9nBfv53e1qHk=;
-        b=rLDQsZDoEgqqkpN3ZThrPipCGqdTngttrxhmM37qpSL1CmrTvlPUbKo4tLXGzILtZ5
-         4bTKl5/e61u8IIveNR6STe2PVBAz7pV8a/3qFaVBHtkHQ2HXgbGWygl8oZClMIwBv3WR
-         +6ygr0WvDGCbRwCYydL4bdYXFgxCpITrC9Eplze+u2/WMxCf3cuEznY1KUrShUMdKYMR
-         4rpS+t5VWmqQK3ewzTKeSfmyPvOuUeYcphb5MN2IvthRFQ0yt/0Fsr2O3r1zOe0OXiz1
-         YSRVIlSXHRosddodLUTo20/EuAezM4OS3u6ikevn3diDszw7qTEm0hwXg8VBuWc+RvTq
-         OPog==
-X-Gm-Message-State: AJIora8cqsbD431PKKk9eBKzjW24TX5hgNzKDEwBR5E1uXxgdIcXtCbQ
-        ixHN3I2FvVv2cWNmdZeL5yTomFI7YWNhiX7NS2gDu311R+MUqw==
-X-Google-Smtp-Source: AGRyM1u/UX/2/zEXz6/lD8zuEp0We7LzyP9lhw5gFziM+I+EVpupn0uSaExp9ad9Jm+RiNlqrZrWSE08W6orK5vu2AI=
-X-Received: by 2002:a05:6512:2621:b0:47f:d228:bdeb with SMTP id
- bt33-20020a056512262100b0047fd228bdebmr14931135lfb.121.1658185971888; Mon, 18
- Jul 2022 16:12:51 -0700 (PDT)
+        Mon, 18 Jul 2022 19:20:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 293282CCA4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Jul 2022 16:20:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id B39926159E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Jul 2022 23:20:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 00F59C341C0;
+        Mon, 18 Jul 2022 23:20:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658186414;
+        bh=tNvK8omt4EvDTQMPjsW7/SCEqLoQPBItwIEHXAzmuIY=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=ks8EafD/kNS28XoIpsM++DDvrEsifxPnJDd3nyJ7gCpupKpGBs+UsL2riwO8YeTcm
+         J/v5exw4PLrKwM6Z6/yT+Tgo+PmNRKI1UMgcNPgfakDN/l+4x6BjvFNiI/J4aYlwo4
+         pHXrK6LJJrs4by7S8zrh+Lo8HV/Ejh6qaIRkUNsdIQPNp6wCyH5L6Ly7ME45zXsH7T
+         cs2bvoP5kxg++EOrhQritvsBA0NqCFdZj5Z5xXKS0NCWPU1P6JwRXqkeH8pa2AqBwO
+         YpsNbP0bPnx0O9ydWslqQnhGRTOK6Bvqlb13V/E8cOzivHTF9PtFNDVPmSb6nV3rYX
+         r6hzPa8l3d0cw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DDDA0E451B3;
+        Mon, 18 Jul 2022 23:20:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <1657871102-26907-1-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1657871102-26907-1-git-send-email-quic_zijuhu@quicinc.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 18 Jul 2022 16:12:40 -0700
-Message-ID: <CABBYNZ+YcrGn09hxB9t7rn1ccY4xtv1WCLQrOLvyUXdQNA_usw@mail.gmail.com>
-Subject: Re: [PATCH v4] Bluetooth: hci_sync: Remove redundant func definition
-To:     Zijun Hu <quic_zijuhu@quicinc.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_sync: Fix not updating privacy_mode
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165818641390.5411.16922601141768984270.git-patchwork-notify@kernel.org>
+Date:   Mon, 18 Jul 2022 23:20:13 +0000
+References: <20220714181224.3793757-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220714181224.3793757-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hello:
 
-On Fri, Jul 15, 2022 at 12:45 AM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
->
-> both hci_request.c and hci_sync.c have the same definition for
-> disconnected_accept_list_entries(), so remove a redundant copy.
->
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> v3->v4
->  -use 75 characters per line for Linux commit message bodies
-> v2->v3
->  -remove table char to solve gitlint checking failure
-> v1->v2
->  -remove the func copy within hci_request.c instead of hci_sync.c
->  net/bluetooth/hci_request.c | 18 ------------------
->  net/bluetooth/hci_request.h |  2 ++
->  net/bluetooth/hci_sync.c    |  2 +-
->  3 files changed, 3 insertions(+), 19 deletions(-)
->
-> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-> index 635cc5fb451e..edec0447aaa7 100644
-> --- a/net/bluetooth/hci_request.c
-> +++ b/net/bluetooth/hci_request.c
-> @@ -1784,24 +1784,6 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
->         return 0;
->  }
->
-> -static bool disconnected_accept_list_entries(struct hci_dev *hdev)
-> -{
-> -       struct bdaddr_list *b;
-> -
-> -       list_for_each_entry(b, &hdev->accept_list, list) {
-> -               struct hci_conn *conn;
-> -
-> -               conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &b->bdaddr);
-> -               if (!conn)
-> -                       return true;
-> -
-> -               if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-> -                       return true;
-> -       }
-> -
-> -       return false;
-> -}
-> -
->  void __hci_req_update_scan(struct hci_request *req)
->  {
->         struct hci_dev *hdev = req->hdev;
-> diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-> index 7f8df258e295..e80b500878d9 100644
-> --- a/net/bluetooth/hci_request.h
-> +++ b/net/bluetooth/hci_request.h
-> @@ -120,6 +120,8 @@ void __hci_req_update_scan(struct hci_request *req);
->  int hci_update_random_address(struct hci_request *req, bool require_privacy,
->                               bool use_rpa, u8 *own_addr_type);
->
-> +bool disconnected_accept_list_entries(struct hci_dev *hdev);
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I rather not add anything to hci_request.h since we want to deprecate
-its functions, in fact we might as well try to start removing the code
-paths that attempt to access things like
-disconnected_accept_list_entries since I think most of the code is
-already in place in hci_sync.c things like __hci_req_update_scan if it
-is no longer used anywhere else.
+On Thu, 14 Jul 2022 11:12:23 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> When programming a new entry into the resolving list it shall default
+> to network mode since the params may contain the mode programmed when
+> the device was last added to the resolving list.
+> 
+> Link: https://bugzilla.kernel.org/show_bug.cgi?id=209745
+> Fixes: 853b70b506a20 ("Bluetooth: hci_sync: Set Privacy Mode when updating the resolving list")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Tested-by: Zhengping Jiang <jiangzp@google.com>
+> 
+> [...]
 
->  int hci_abort_conn(struct hci_conn *conn, u8 reason);
->  void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
->                       u8 reason);
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 212b0cdb25f5..48a262f0ae49 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -2419,7 +2419,7 @@ int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable)
->         return err;
->  }
->
-> -static bool disconnected_accept_list_entries(struct hci_dev *hdev)
-> +bool disconnected_accept_list_entries(struct hci_dev *hdev)
->  {
->         struct bdaddr_list *b;
->
-> --
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
->
+Here is the summary with links:
+  - [v2,1/2] Bluetooth: hci_sync: Fix not updating privacy_mode
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ab345b04433d
+  - [v2,2/2] Bluetooth: hci_sync: Don't remove connected devices from accept list
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ff1688aab0d1
 
-
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
