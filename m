@@ -2,363 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19919CCA485
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 11:53:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A21D0C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 12:02:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238645AbiGTLxC (ORCPT
+        id S231877AbiGTMCt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jul 2022 07:53:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34822 "EHLO
+        Wed, 20 Jul 2022 08:02:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiGTLxB (ORCPT
+        with ESMTP id S231373AbiGTMCs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jul 2022 07:53:01 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1875A58874
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 04:53:00 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id id17so3606938wmb.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 04:52:59 -0700 (PDT)
+        Wed, 20 Jul 2022 08:02:48 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FFAB6B743
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 05:02:47 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id w7so2312903plp.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 05:02:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=o/9FYDVOj8aBxuVSKmyhf3uzb4f3pNgZKLHtlhhRQ3E=;
-        b=xvcJAu+Qskv+1eNh9ZMVuC/HmoybiaZQ6g0E9qPMKM7uDNNcUdMhFZ6gl3tr6/TyVU
-         5wX6w8hWiR/+X+IH5FX1lMNDrE/PyOkbDgefKVbez3GN19My+meGSSkibMckI3MUznCb
-         TY9/uCEkFBxhVKjw73voua+wljf5P2Ht9L1Dt8gtqRhT9my0w0sA8D9UyAFQB1/X9QuK
-         ct2tBvHp7QpBuFjmB26K4XKN9WIa7c995DVVzeBS2ofdcaL8oTjkd0YKUTD/VAwffSnB
-         zjmkPWlIlx31YJDhVuhn4NwpG/zNzL5U7NosTwuwkyaczaqGV4j+j5oNtOrUKQVpKfIa
-         AvSA==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=U7MR7ftLSlDA9QakmRQfEDQ4twvLgc8Uuu/iYvq/gKE=;
+        b=OWEEdFzIz0b/7agESLz4ajuZrLiG5LWmFKcEJH3rqUb9kR9jP/6R4hEtu/nvZOyYpQ
+         6mlwGed1/F+0/Y7UYV7H1Jup9ooHvUcgAR4vFHXKUSVDbpH54qQZbl3inpMYlj9vJRdz
+         Pfh1glGj+ETUv8R8kat7LBF86YTgIf7MdgLW769oe0yMiVFJ6cpvJ6F+xDYWby6i5NjC
+         HohqksheWpSKlF3eNWhJH+iCK78/3KoZT4qS+vkuoak16hSsL/n+6vhXhs1g7LsBlEkt
+         W5qjSzRiOw+Lr5Frhups/9IYYDKeShGVlnsXInXKxnRjgVjpTivPolilcH/NAqX7A/E3
+         OMNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=o/9FYDVOj8aBxuVSKmyhf3uzb4f3pNgZKLHtlhhRQ3E=;
-        b=nD+eydptnfprN+JJdUU+UzZYAmQjGV/TfuQeifp/t3k7SvRqARWBRvJF99DpV3i/cr
-         mLk+7sz5KzmwzKheFHhUoV25ZDZqfiu2pDR2dd/OR6joTVCucyUXpi8+8PJViGVGqxpj
-         iyDGyzEa/DazZmvwy4MeSReCdQV71kDWW4YGuBfpsZm+F2X3OLmf0RHtlWuaVnINLBfh
-         frQ+pFO2zEwLiacdtRV+o1hksEbbWmzeP3mXZ1C7EbYe99ElLE96S2VQ22Li2gC0tNkA
-         KdneaY+rXrqShX47NJcZP6jMbCqZR1ACD87vvOv8xGqe4CuHDOKDrSv+IUdvUiP9bXnc
-         aXJQ==
-X-Gm-Message-State: AJIora9uu0jqadwvTmmUy+ouLLfLMmOQuZORbEaKxQK0c7tcgFwUuVxh
-        x5QAtUEvy+J7zHjyGVF2KuoIiw==
-X-Google-Smtp-Source: AGRyM1uWD+31hUS6VrnlMJFxU/T3UP2geBMzbKElXXstS2rdYsWKqiJhQy5epa1UpJ4GxR9/ARly6A==
-X-Received: by 2002:a1c:e902:0:b0:3a0:2d95:49d4 with SMTP id q2-20020a1ce902000000b003a02d9549d4mr3574000wmc.189.1658317978548;
-        Wed, 20 Jul 2022 04:52:58 -0700 (PDT)
-Received: from google.com (cpc155339-bagu17-2-0-cust87.1-3.cable.virginm.net. [86.27.177.88])
-        by smtp.gmail.com with ESMTPSA id x16-20020adfec10000000b0021e4edba1e5sm622156wrn.111.2022.07.20.04.52.57
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=U7MR7ftLSlDA9QakmRQfEDQ4twvLgc8Uuu/iYvq/gKE=;
+        b=stJEdv++2OpDQ8RH2kEt9N+s1ylWJWdpiV4Bb0l7wSBhsBN9ZJsuQieBlpZKOu/w3f
+         hIfSQwKt1N24Ii0zU7+4cf895FLg2qjOXHL3AQsaSL0ZcTvTW0I6prL/fgPAgQycohX9
+         e1hLZQkn2WGVrFtQZoiQCGYWJje4R29cPeQCoVhA0pQF/TxicJDvD7sLVhAJTH3VQPYh
+         fsyKITVGaZMA0XEM+57BWekqXTwvs1bk8kJEAsI9T+UkD/OVczRs5nqESVQjJ4XtT/AV
+         aQF6LeZGh89fr93vtuiP+bXQcjfYP5gbyQghAfsM1FVtOOx1x+FuXqw4ksp96Usf77Q1
+         OGUQ==
+X-Gm-Message-State: AJIora8RDSoQ2iGB4YxOnpYbIGVUqYd4Ve+qukxpMY9xUyWDz+b6CVae
+        IGKVoVxytTVNYWeQHHC4EUDHmN/gnWQ=
+X-Google-Smtp-Source: AGRyM1uDemRN3fYoilZSPihkAxD4gXDGq5cKQ/4oSu2RuSOm0IeFEFDgXW1wJo2h8j3Y1n+ONsaN9w==
+X-Received: by 2002:a17:902:f681:b0:16c:1fcd:eff7 with SMTP id l1-20020a170902f68100b0016c1fcdeff7mr38130999plg.86.1658318566261;
+        Wed, 20 Jul 2022 05:02:46 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.247.143])
+        by smtp.gmail.com with ESMTPSA id d3-20020a170903230300b0015ee985999dsm13843827plh.97.2022.07.20.05.02.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 04:52:58 -0700 (PDT)
-Date:   Wed, 20 Jul 2022 12:52:56 +0100
-From:   Lee Jones <lee.jones@linaro.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Eric Dumazet <edumazet@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, stable@kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Subject: Re: [RESEND 1/1] Bluetooth: Use chan_list_lock to protect the whole
- put/destroy invokation
-Message-ID: <YtfsmHt4R/WxJOTV@google.com>
-References: <20220622082716.478486-1-lee.jones@linaro.org>
- <CANn89iK-uFP6Swgc0ZeEC38UsuywJ3wbybSNouH202Wa7X7Tzg@mail.gmail.com>
- <CABBYNZ+C=MQ7577Fr5_W8tQ4iWRSDBSiC4fkRBY3x=9ph+YAzA@mail.gmail.com>
- <CABBYNZLysdh3NFK+G8=NUQ=G=hvS8X0PdMp=bVqiwPDPCAokmg@mail.gmail.com>
- <YrxvgIiWuFVlXBaQ@google.com>
- <CABBYNZJFSxk9=3Gj7jOj__s=iJGmhrZ=CA7Mb74_-Y0sg+N40g@mail.gmail.com>
- <YsVptCjpzHjR8Scv@google.com>
- <CABBYNZKvVKRRdWnX3uFWdTXJ_S+oAj6z72zgyV148VmFtUnPpA@mail.gmail.com>
- <CABBYNZLTzW3afEPVfg=uS=xsPP-JpW6UBp6W=Urhhab+ai+dcA@mail.gmail.com>
+        Wed, 20 Jul 2022 05:02:45 -0700 (PDT)
+Message-ID: <62d7eee5.1c69fb81.98fe7.4b47@mx.google.com>
+Date:   Wed, 20 Jul 2022 05:02:45 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0367760083996236932=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CABBYNZLTzW3afEPVfg=uS=xsPP-JpW6UBp6W=Urhhab+ai+dcA@mail.gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, dan.carpenter@oracle.com
+Subject: RE: Bluetooth: clean up error pointer checking
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <YtflxRosxskh2CoH@kili>
+References: <YtflxRosxskh2CoH@kili>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 06 Jul 2022, Luiz Augusto von Dentz wrote:
-> > > > > > Perhaps something like this:
-> > > > >
-> > > > > I'm struggling to apply this for test:
-> > > > >
-> > > > >   "error: corrupt patch at line 6"
-> > > >
-> > > > Check with the attached patch.
-> > >
-> > > With the patch applied:
-> > >
-> > > [  188.825418][   T75] refcount_t: addition on 0; use-after-free.
-> > > [  188.825418][   T75] refcount_t: addition on 0; use-after-free.
-> >
-> > Looks like the changes just make the issue more visible since we are
-> > trying to add a refcount when it is already 0 so this proves the
-> > design is not quite right since it is removing the object from the
-> > list only when destroying it while we probably need to do it before.
-> >
-> > How about we use kref_get_unless_zero as it appears it was introduced
-> > exactly for such cases (patch attached.)
-> 
-> Looks like I missed a few places like l2cap_global_chan_by_psm so here
-> is another version.
+--===============0367760083996236932==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Okay, with the patch below the kernel doesn't produce a back-trace.
+This is automated email and please do not reply to this email!
 
-Only this, which I assume is expected?
+Dear submitter,
 
-[  535.398255][  T495] Bluetooth: hci0: unexpected cc 0x0c03 length: 249 > 1                                                          
-[  535.398255][  T495] Bluetooth: hci0: unexpected cc 0x0c03 length: 249 > 1                                                          
-[  535.417007][  T495] Bluetooth: hci0: unexpected cc 0x1003 length: 249 > 9                                                          
-[  535.417007][  T495] Bluetooth: hci0: unexpected cc 0x1003 length: 249 > 9                                                          
-[  535.434810][  T495] Bluetooth: hci0: unexpected cc 0x1001 length: 249 > 9                                                          
-[  535.434810][  T495] Bluetooth: hci0: unexpected cc 0x1001 length: 249 > 9                                                          
-[  535.452886][  T495] Bluetooth: hci0: unexpected cc 0x0c23 length: 249 > 4                                                          
-[  535.452886][  T495] Bluetooth: hci0: unexpected cc 0x0c23 length: 249 > 4                                                          
-[  535.470574][  T495] Bluetooth: hci0: unexpected cc 0x0c25 length: 249 > 3                                                          
-[  535.470574][  T495] Bluetooth: hci0: unexpected cc 0x0c25 length: 249 > 3                                                          
-[  535.488009][  T495] Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2                                                          
-[  535.488009][  T495] Bluetooth: hci0: unexpected cc 0x0c38 length: 249 > 2                                                          
-[  537.551677][   T74] Bluetooth: hci0: command 0x0409 tx timeout                                                                     
-[  537.551677][   T74] Bluetooth: hci0: command 0x0409 tx timeout                                                                     
-[  539.641362][  T373] Bluetooth: hci0: command 0x041b tx timeout                                                                     
-[  539.641362][  T373] Bluetooth: hci0: command 0x041b tx timeout                                                                     
-[  541.711056][  T274] Bluetooth: hci0: command 0x040f tx timeout                                                                     
-[  541.711056][  T274] Bluetooth: hci0: command 0x040f tx timeout                                                                     
-[  543.790939][   T66] Bluetooth: hci0: command 0x0419 tx timeout                                                                     
-[  543.790939][   T66] Bluetooth: hci0: command 0x0419 tx timeout
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=661424
 
-> From 235937ac7a39d16e5dabbfca0ac1d58e4cc814d9 Mon Sep 17 00:00:00 2001
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date: Tue, 28 Jun 2022 15:46:04 -0700
-> Subject: [PATCH] Bluetooth: L2CAP: WIP
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/l2cap.h |  1 +
->  net/bluetooth/l2cap_core.c    | 58 +++++++++++++++++++++++++++--------
->  2 files changed, 46 insertions(+), 13 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 3c4f550e5a8b..2f766e3437ce 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -847,6 +847,7 @@ enum {
->  };
->  
->  void l2cap_chan_hold(struct l2cap_chan *c);
-> +struct l2cap_chan *l2cap_chan_hold_unless_zero(struct l2cap_chan *c);
->  void l2cap_chan_put(struct l2cap_chan *c);
->  
->  static inline void l2cap_chan_lock(struct l2cap_chan *chan)
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 09ecaf556de5..3e5d81e971cc 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -111,7 +111,8 @@ static struct l2cap_chan *__l2cap_get_chan_by_scid(struct l2cap_conn *conn,
->  }
->  
->  /* Find channel with given SCID.
-> - * Returns locked channel. */
-> + * Returns a reference locked channel.
-> + */
->  static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
->  						 u16 cid)
->  {
-> @@ -119,15 +120,19 @@ static struct l2cap_chan *l2cap_get_chan_by_scid(struct l2cap_conn *conn,
->  
->  	mutex_lock(&conn->chan_lock);
->  	c = __l2cap_get_chan_by_scid(conn, cid);
-> -	if (c)
-> -		l2cap_chan_lock(c);
-> +	if (c) {
-> +		/* Only lock if chan reference is not 0 */
-> +		c = l2cap_chan_hold_unless_zero(c);
-> +		if (c)
-> +			l2cap_chan_lock(c);
-> +	}
->  	mutex_unlock(&conn->chan_lock);
->  
->  	return c;
->  }
->  
->  /* Find channel with given DCID.
-> - * Returns locked channel.
-> + * Returns a reference locked channel.
->   */
->  static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
->  						 u16 cid)
-> @@ -136,8 +141,12 @@ static struct l2cap_chan *l2cap_get_chan_by_dcid(struct l2cap_conn *conn,
->  
->  	mutex_lock(&conn->chan_lock);
->  	c = __l2cap_get_chan_by_dcid(conn, cid);
-> -	if (c)
-> -		l2cap_chan_lock(c);
-> +	if (c) {
-> +		/* Only lock if chan reference is not 0 */
-> +		c = l2cap_chan_hold_unless_zero(c);
-> +		if (c)
-> +			l2cap_chan_lock(c);
-> +	}
->  	mutex_unlock(&conn->chan_lock);
->  
->  	return c;
-> @@ -162,8 +171,12 @@ static struct l2cap_chan *l2cap_get_chan_by_ident(struct l2cap_conn *conn,
->  
->  	mutex_lock(&conn->chan_lock);
->  	c = __l2cap_get_chan_by_ident(conn, ident);
-> -	if (c)
-> -		l2cap_chan_lock(c);
-> +	if (c) {
-> +		/* Only lock if chan reference is not 0 */
-> +		c = l2cap_chan_hold_unless_zero(c);
-> +		if (c)
-> +			l2cap_chan_lock(c);
-> +	}
->  	mutex_unlock(&conn->chan_lock);
->  
->  	return c;
-> @@ -497,6 +510,16 @@ void l2cap_chan_hold(struct l2cap_chan *c)
->  	kref_get(&c->kref);
->  }
->  
-> +struct l2cap_chan *l2cap_chan_hold_unless_zero(struct l2cap_chan *c)
-> +{
-> +	BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
-> +
-> +	if (!kref_get_unless_zero(&c->kref))
-> +		return NULL;
-> +
-> +	return c;
-> +}
-> +
->  void l2cap_chan_put(struct l2cap_chan *c)
->  {
->  	BT_DBG("chan %p orig refcnt %u", c, kref_read(&c->kref));
-> @@ -1969,7 +1992,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
->  			src_match = !bacmp(&c->src, src);
->  			dst_match = !bacmp(&c->dst, dst);
->  			if (src_match && dst_match) {
-> -				l2cap_chan_hold(c);
-> +				c = l2cap_chan_hold_unless_zero(c);
->  				read_unlock(&chan_list_lock);
->  				return c;
->  			}
-> @@ -1984,7 +2007,7 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
->  	}
->  
->  	if (c1)
-> -		l2cap_chan_hold(c1);
-> +		c1 = l2cap_chan_hold_unless_zero(c1);
->  
->  	read_unlock(&chan_list_lock);
->  
-> @@ -4464,6 +4487,7 @@ static inline int l2cap_config_req(struct l2cap_conn *conn,
->  
->  unlock:
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  	return err;
->  }
->  
-> @@ -4578,6 +4602,7 @@ static inline int l2cap_config_rsp(struct l2cap_conn *conn,
->  
->  done:
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  	return err;
->  }
->  
-> @@ -5305,6 +5330,7 @@ static inline int l2cap_move_channel_req(struct l2cap_conn *conn,
->  	l2cap_send_move_chan_rsp(chan, result);
->  
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  
->  	return 0;
->  }
-> @@ -5397,6 +5423,7 @@ static void l2cap_move_continue(struct l2cap_conn *conn, u16 icid, u16 result)
->  	}
->  
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  }
->  
->  static void l2cap_move_fail(struct l2cap_conn *conn, u8 ident, u16 icid,
-> @@ -5426,6 +5453,7 @@ static void l2cap_move_fail(struct l2cap_conn *conn, u8 ident, u16 icid,
->  	l2cap_send_move_chan_cfm(chan, L2CAP_MC_UNCONFIRMED);
->  
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  }
->  
->  static int l2cap_move_channel_rsp(struct l2cap_conn *conn,
-> @@ -5489,6 +5517,7 @@ static int l2cap_move_channel_confirm(struct l2cap_conn *conn,
->  	l2cap_send_move_chan_cfm_rsp(conn, cmd->ident, icid);
->  
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  
->  	return 0;
->  }
-> @@ -5524,6 +5553,7 @@ static inline int l2cap_move_channel_confirm_rsp(struct l2cap_conn *conn,
->  	}
->  
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  
->  	return 0;
->  }
-> @@ -5896,12 +5926,11 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
->  	if (credits > max_credits) {
->  		BT_ERR("LE credits overflow");
->  		l2cap_send_disconn_req(chan, ECONNRESET);
-> -		l2cap_chan_unlock(chan);
->  
->  		/* Return 0 so that we don't trigger an unnecessary
->  		 * command reject packet.
->  		 */
-> -		return 0;
-> +		goto unlock;
->  	}
->  
->  	chan->tx_credits += credits;
-> @@ -5912,7 +5941,9 @@ static inline int l2cap_le_credits(struct l2cap_conn *conn,
->  	if (chan->tx_credits)
->  		chan->ops->resume(chan);
->  
-> +unlock:
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  
->  	return 0;
->  }
-> @@ -7598,6 +7629,7 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
->  
->  done:
->  	l2cap_chan_unlock(chan);
-> +	l2cap_chan_put(chan);
->  }
->  
->  static void l2cap_conless_channel(struct l2cap_conn *conn, __le16 psm,
-> @@ -8086,7 +8118,7 @@ static struct l2cap_chan *l2cap_global_fixed_chan(struct l2cap_chan *c,
->  		if (src_type != c->src_type)
->  			continue;
->  
-> -		l2cap_chan_hold(c);
-> +		c = l2cap_chan_hold_unless_zero(c);
->  		read_unlock(&chan_list_lock);
->  		return c;
->  	}
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.37 seconds
+GitLint                       PASS      0.56 seconds
+SubjectPrefix                 PASS      0.30 seconds
+BuildKernel                   PASS      45.84 seconds
+BuildKernel32                 PASS      40.97 seconds
+Incremental Build with patchesPASS      69.34 seconds
+TestRunner: Setup             PASS      676.66 seconds
+TestRunner: l2cap-tester      PASS      19.85 seconds
+TestRunner: bnep-tester       PASS      7.13 seconds
+TestRunner: mgmt-tester       PASS      118.69 seconds
+TestRunner: rfcomm-tester     PASS      11.35 seconds
+TestRunner: sco-tester        PASS      11.69 seconds
+TestRunner: smp-tester        PASS      11.14 seconds
+TestRunner: userchan-tester   PASS      7.73 seconds
 
 
--- 
-Lee Jones [李琼斯]
-Principal Technical Lead - Developer Services
-Linaro.org │ Open source software for Arm SoCs
-Follow Linaro: Facebook | Twitter | Blog
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0367760083996236932==--
