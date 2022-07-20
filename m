@@ -2,112 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A236C43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 15:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B85E0CCA482
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 16:20:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236040AbiGTPiP (ORCPT
+        id S239024AbiGTQUU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jul 2022 11:38:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46790 "EHLO
+        Wed, 20 Jul 2022 12:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235929AbiGTPiO (ORCPT
+        with ESMTP id S233552AbiGTQUT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jul 2022 11:38:14 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 652E22FFE1;
-        Wed, 20 Jul 2022 08:38:13 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id e28so30836686lfj.4;
-        Wed, 20 Jul 2022 08:38:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=38iTN6e5RVRnFpyB3AzTyzUK2iU07sRGeD+ht98rJLM=;
-        b=OeIEXclTCOZsmRxunFCydVc7FBgYAN5L19I7RWf1k4e7aig2RX7gHchFoNQqWi6ATP
-         RzIhyMB6iSBxjPYHOjivcDDk9IzLvKgfbFxmg/n4gheSybaX2eud51xTIL1+vebWQfrj
-         HXXHoX8p0SYPG/4FYhGRbJDBji+C1Y1rK5t8Nc5VNmizf8EdLx0V6gYPm5zoAfdq0Zi7
-         AP+1zo/Q3/3HU7Fz0Y0uc6/SUG2am/c5ybAgL3B/gTmeWT9OdlNsNzu5Hza1lBswvIVY
-         JT/+95lN01UMvUQvH+E6iM9NhPHfw5x2Aj4VD4Dmxfkn4Gp5hso0zYoiA9StvKG6DWVJ
-         4SqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=38iTN6e5RVRnFpyB3AzTyzUK2iU07sRGeD+ht98rJLM=;
-        b=OAqFfZ4+CEzCbPjZ0v6RrLhXMemGwu3vo0DuC39E4ae2rLlErKJNUfuqMR1esWqNTO
-         Z+y5qhUFzFpAWiRiyFpfg1lgwnAbPxxhrb6tO6j++HM1TggxqRjCn/+5kEWJ05VGaMkQ
-         vc5ZwaOTlGZIGa8FKgA8Creal+9ScmvnUo8aN0O5JM3H6WOK19M9CRUF27Psi8/g5r+R
-         YZa6FuDk7Vdu4q4oqhqUKJRHuxy1buMb7/u5HZ7i6U5c0IKV1Pazd82F1MUxtWxqdkOg
-         z3DN5qKxkct7UQgwXQe32JtDiEnk/iZt4fua4VwLhyaIYOS7vcpY0/qpgMfoDB7vWuYT
-         +EZA==
-X-Gm-Message-State: AJIora8Rwcs4NhNO1cxPe65JYZLFLJHlbP9up64/bDbFKIBNy3+15Wyc
-        gzyLn5SOjq9Z9DLvyA171sZcuwL8Saf3YQUQmvc=
-X-Google-Smtp-Source: AGRyM1uEvI2dqMocc3hPmbDB1apJE/wE7korCP7jP5Q7g/ZgyZtE2X/AbemMGmcOL2O+iRdAmqj0bQLyG9zZMqwrS5k=
-X-Received: by 2002:a05:6512:3409:b0:489:c549:4693 with SMTP id
- i9-20020a056512340900b00489c5494693mr19375109lfr.26.1658331491543; Wed, 20
- Jul 2022 08:38:11 -0700 (PDT)
+        Wed, 20 Jul 2022 12:20:19 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64255DE99;
+        Wed, 20 Jul 2022 09:20:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0052161D7C;
+        Wed, 20 Jul 2022 16:20:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 54604C341D0;
+        Wed, 20 Jul 2022 16:20:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658334017;
+        bh=BYcsMcijnL0pP/PiWG5nGWH7n3G0OWC2Q7MrG+Nlvj0=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=gGZxmosbDLlniOH0n0Z2mWELtNt2g2Yiu+vasUz2lXZoC6r/ND4Sbm53IyTN1fQiQ
+         JFwzRSYKrt/j8Rfmxy79FGrFD5NSE+QXn6FENpSmvcoIjCDn6AsSXtfSCBibNnJwDJ
+         HANbFFlCSR8f5wTlKRtoOS82U9Yfdf5Q+lWjhuIKej98CQX5dvq8YUcvisl8pPAOPE
+         jz9fGU8Xy0q756JqdSWbMpSbKJXH3tcntD7DMl5HkTXaEtg42McVoBjOI5cQCgKY7N
+         gK11foWL6nbBGyeJoFZf8Mm9bNznXk45XXdKN0ogumzNkygmvv4ZCZ0Wf/tkRAoBBe
+         KvRisABq9/xzA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3CF98E451BD;
+        Wed, 20 Jul 2022 16:20:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <1658326045-9931-1-git-send-email-quic_zijuhu@quicinc.com> <1658326045-9931-4-git-send-email-quic_zijuhu@quicinc.com>
-In-Reply-To: <1658326045-9931-4-git-send-email-quic_zijuhu@quicinc.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 20 Jul 2022 08:38:01 -0700
-Message-ID: <CABBYNZJ9Re7PZOFXhj-2tRwJ1UU2kY+QhB4dJT-=GyCYqb_Hhw@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] Bluetooth: btusb: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING
- for fake CSR
-To:     Zijun Hu <quic_zijuhu@quicinc.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
-        swyterzone@gmail.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/5] Bluetooth: hci_bcm: Improve FW load time on CYW55572
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165833401724.6265.284056488301192508.git-patchwork-notify@kernel.org>
+Date:   Wed, 20 Jul 2022 16:20:17 +0000
+References: <cover.1656583541.git.hakan.jansson@infineon.com>
+In-Reply-To: <cover.1656583541.git.hakan.jansson@infineon.com>
+To:     Hakan Jansson <hakan.jansson@infineon.com>
+Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, robh+dt@kernel.org,
+        krzysztof.kozlowski+dt@linaro.org, linus.walleij@linaro.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hello:
 
-On Wed, Jul 20, 2022 at 7:07 AM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
->
-> Fake CSR BT controllers do not enable feature "Erroneous Data Reporting"
-> currently, BT core driver will check the feature bit instead of the quirk
-> to decide if HCI command HCI_Read|Write_Default_Erroneous_Data_Reporting
-> work fine, so remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR.
->
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
->  drivers/bluetooth/btusb.c | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index f0f86c5c3b37..f2b3d31d56cf 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2072,7 +2072,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->                  * without these the controller will lock up.
->                  */
->                 set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
-> -               set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
->                 set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
->                 set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-You will probably need to remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING
-last otherwise it breaks the build in between patches, and please
-double check if there are no other instances of driver using it or
-perhaps leave it defined in case the feature is broken for some reason
-but then we need a macro that checks both the quirk and the feature
-bit.
+On Thu, 30 Jun 2022 14:45:19 +0200 you wrote:
+> These patches add an optional device specific data member to specify max
+> baudrate of a device when in autobaud mode. This allows the host to set a
+> first baudrate higher than "init speed" to improve FW load time.
+> 
+> The host baudrate will later be changed to "init speed" (as usual) once FW
+> loading is complete and the device has been reset to begin normal
+> operation.
+> 
+> [...]
 
-> --
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
->
+Here is the summary with links:
+  - [v2,1/5] dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT binding
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c6480829cda7
+  - [v2,2/5] dt-bindings: net: broadcom-bluetooth: Add conditional constraints
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f5d25901c5cc
+  - [v2,3/5] Bluetooth: hci_bcm: Add DT compatible for CYW55572
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7386459d24b3
+  - [v2,4/5] Bluetooth: hci_bcm: Prevent early baudrate setting in autobaud mode
+    https://git.kernel.org/bluetooth/bluetooth-next/c/31e65c6d44a2
+  - [v2,5/5] Bluetooth: hci_bcm: Increase host baudrate for CYW55572 in autobaud mode
+    https://git.kernel.org/bluetooth/bluetooth-next/c/719a11a62d19
 
-
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
