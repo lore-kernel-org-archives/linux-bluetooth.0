@@ -2,88 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85E0CCA482
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 16:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCFDCCA480
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 16:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239024AbiGTQUU (ORCPT
+        id S239702AbiGTQUW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jul 2022 12:20:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50168 "EHLO
+        Wed, 20 Jul 2022 12:20:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233552AbiGTQUT (ORCPT
+        with ESMTP id S232130AbiGTQUT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 20 Jul 2022 12:20:19 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64255DE99;
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E32CDED8;
         Wed, 20 Jul 2022 09:20:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0052161D7C;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 08AE161D73;
         Wed, 20 Jul 2022 16:20:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 54604C341D0;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 633B4C341D2;
         Wed, 20 Jul 2022 16:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1658334017;
-        bh=BYcsMcijnL0pP/PiWG5nGWH7n3G0OWC2Q7MrG+Nlvj0=;
+        bh=Eq1CrZBYHVgUb8wkqf7U2YxMfT3RrB/v/kRt/ZdO6a4=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=gGZxmosbDLlniOH0n0Z2mWELtNt2g2Yiu+vasUz2lXZoC6r/ND4Sbm53IyTN1fQiQ
-         JFwzRSYKrt/j8Rfmxy79FGrFD5NSE+QXn6FENpSmvcoIjCDn6AsSXtfSCBibNnJwDJ
-         HANbFFlCSR8f5wTlKRtoOS82U9Yfdf5Q+lWjhuIKej98CQX5dvq8YUcvisl8pPAOPE
-         jz9fGU8Xy0q756JqdSWbMpSbKJXH3tcntD7DMl5HkTXaEtg42McVoBjOI5cQCgKY7N
-         gK11foWL6nbBGyeJoFZf8Mm9bNznXk45XXdKN0ogumzNkygmvv4ZCZ0Wf/tkRAoBBe
-         KvRisABq9/xzA==
+        b=uqFvl2SIYVZrr50cCP8ivcJgSy8qNpLzifYGLWDtJbiia0m7b7vkCMWaH26/KyxsA
+         GptKiGmbLHnRNGe9AZReKo8aUq2KkS1Ht2oDSYF0OSdlF5vKJA6a6Vl/dc4PijQlWh
+         bBWyM+yRgQyDzU/N6ziqdOuBZsefDCgFW15OIZKrdmCmq3CjIJ+YfjJmKLyHKS7e03
+         2KMHvZTfi2iVdvr49SVIOxr/6Zu2LoHgZLa0D9mGs+nUUD50Ql8hoPfbv4QgEEMt2a
+         9IfbBUA8io1DCijMfmtm4oCij6+kOOMYWmAn+ouycj4PhyLh8MN/zHQFbxhpFwaI+0
+         BxkghESjiKGJg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3CF98E451BD;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 47294E45200;
         Wed, 20 Jul 2022 16:20:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/5] Bluetooth: hci_bcm: Improve FW load time on CYW55572
+Subject: Re: [PATCH] Bluetooth: clean up error pointer checking
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165833401724.6265.284056488301192508.git-patchwork-notify@kernel.org>
+Message-Id: <165833401728.6265.9737720058353472000.git-patchwork-notify@kernel.org>
 Date:   Wed, 20 Jul 2022 16:20:17 +0000
-References: <cover.1656583541.git.hakan.jansson@infineon.com>
-In-Reply-To: <cover.1656583541.git.hakan.jansson@infineon.com>
-To:     Hakan Jansson <hakan.jansson@infineon.com>
-Cc:     davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, robh+dt@kernel.org,
-        krzysztof.kozlowski+dt@linaro.org, linus.walleij@linaro.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
+References: <YtflxRosxskh2CoH@kili>
+In-Reply-To: <YtflxRosxskh2CoH@kili>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Thu, 30 Jun 2022 14:45:19 +0200 you wrote:
-> These patches add an optional device specific data member to specify max
-> baudrate of a device when in autobaud mode. This allows the host to set a
-> first baudrate higher than "init speed" to improve FW load time.
+On Wed, 20 Jul 2022 14:23:49 +0300 you wrote:
+> The bt_skb_sendmsg() function can't return NULL so there is no need to
+> check for that.  Several of these checks were removed previously but
+> this one was missed.
 > 
-> The host baudrate will later be changed to "init speed" (as usual) once FW
-> loading is complete and the device has been reset to begin normal
-> operation.
-> 
-> [...]
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  include/net/bluetooth/bluetooth.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [v2,1/5] dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT binding
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c6480829cda7
-  - [v2,2/5] dt-bindings: net: broadcom-bluetooth: Add conditional constraints
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f5d25901c5cc
-  - [v2,3/5] Bluetooth: hci_bcm: Add DT compatible for CYW55572
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7386459d24b3
-  - [v2,4/5] Bluetooth: hci_bcm: Prevent early baudrate setting in autobaud mode
-    https://git.kernel.org/bluetooth/bluetooth-next/c/31e65c6d44a2
-  - [v2,5/5] Bluetooth: hci_bcm: Increase host baudrate for CYW55572 in autobaud mode
-    https://git.kernel.org/bluetooth/bluetooth-next/c/719a11a62d19
+  - Bluetooth: clean up error pointer checking
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3c7ec89ab45e
 
 You are awesome, thank you!
 -- 
