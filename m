@@ -2,84 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A3EDC43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 14:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2851C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 14:10:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240735AbiGTOHw (ORCPT
+        id S230522AbiGTOK4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jul 2022 10:07:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55286 "EHLO
+        Wed, 20 Jul 2022 10:10:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240624AbiGTOHp (ORCPT
+        with ESMTP id S229752AbiGTOKz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jul 2022 10:07:45 -0400
-Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A79A452E68;
-        Wed, 20 Jul 2022 07:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1658326064; x=1689862064;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version;
-  bh=PjMPKvWi5vAXqVZ6LoVjoOI+KfwuCV4UV2/qnaQwIsA=;
-  b=RcsbhLiOE2TqFEh90JCoEgG9fZq2YvVJnaTRwq9wy59V60Kd1z7lCtO/
-   LXt8D02MXS9Kawj73LLNpxuvLhS29xHjBdIE/ZSiGJiN1YfNpxFiUnO7m
-   6RVbZzMn+PBQU5XTutX5+DvOMan02snzejB/eECwyErbxwQLEYT8TvO8H
-   k=;
-Received: from unknown (HELO ironmsg-SD-alpha.qualcomm.com) ([10.53.140.30])
-  by alexa-out-sd-01.qualcomm.com with ESMTP; 20 Jul 2022 07:07:44 -0700
-X-QCInternal: smtphost
-Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
-  by ironmsg-SD-alpha.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2022 07:07:44 -0700
-Received: from zijuhu-gv.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.22; Wed, 20 Jul 2022 07:07:41 -0700
-From:   Zijun Hu <quic_zijuhu@quicinc.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <luiz.von.dentz@intel.com>, <swyterzone@gmail.com>,
-        <quic_zijuhu@quicinc.com>
-CC:     <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [PATCH v1 3/3] Bluetooth: btusb: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR
-Date:   Wed, 20 Jul 2022 22:07:25 +0800
-Message-ID: <1658326045-9931-4-git-send-email-quic_zijuhu@quicinc.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1658326045-9931-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1658326045-9931-1-git-send-email-quic_zijuhu@quicinc.com>
+        Wed, 20 Jul 2022 10:10:55 -0400
+Received: from smtpbg.qq.com (biz-43-154-54-12.mail.qq.com [43.154.54.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73FBD3AB27
+        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 07:10:48 -0700 (PDT)
+X-QQ-mid: bizesmtp64t1658326237t3asgal3
+Received: from localhost.localdomain ( [182.148.15.157])
+        by bizesmtp.qq.com (ESMTP) with 
+        id ; Wed, 20 Jul 2022 22:10:34 +0800 (CST)
+X-QQ-SSF: 01000000002000409000B00A0000000
+X-QQ-FEAT: 3M0okmaRx3h3LaiaLjLG9iCaclxlrlQqIfk1pj0QVz7a7EASekiK1y303eWSg
+        VuVicnWn2XCtqWMbPlsb0y/IRCGZQ7T7Ycb/ueg/IX2oNTYdHNP7pKTChtCxHIDcV4QJZgB
+        j/d/SUTemG/vuna2D9Eg2F8a9B6O6aZ4So2VvjUD/mL8+VCDoyzqC1W4NvLiQu8UzYG/HZT
+        fzxPdEJFyjv6PUC8Ha5CcdIeD1Cmf72rMtIwREsGN/dBYFQJsR8xsa+l3+UIViTN/WOwxpm
+        uUU+HAjRPCzm/Yp11OWrsW8xCkiEyvgEe3yQZqCRFvMJ6tO7c4HR5RAdm1yltaN/Xuo+BDv
+        QVfT6R+V7eKTaIgHHcWZSkx8XjS32YZcf/Mxrm5Dy5feQC/G0VsWKu0RELg1g==
+X-QQ-GoodBg: 0
+From:   shaomin Deng <dengshaomin@cdjrlc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Cc:     shaomin Deng <dengshaomin@cdjrlc.com>
+Subject: [PATCH] Bluetooth: btrtl: Fix typo in comment
+Date:   Wed, 20 Jul 2022 10:10:33 -0400
+Message-Id: <20220720141033.12521-1-dengshaomin@cdjrlc.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:cdjrlc.com:qybglogicsvr:qybglogicsvr4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fake CSR BT controllers do not enable feature "Erroneous Data Reporting"
-currently, BT core driver will check the feature bit instead of the quirk
-to decide if HCI command HCI_Read|Write_Default_Erroneous_Data_Reporting
-work fine, so remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR.
+Delete the repeated word "that" in comments.
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+Signed-off-by: shaomin Deng <dengshaomin@cdjrlc.com>
 ---
- drivers/bluetooth/btusb.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/bluetooth/btrtl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f0f86c5c3b37..f2b3d31d56cf 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2072,7 +2072,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 		 * without these the controller will lock up.
- 		 */
- 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
--		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
- 		set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
- 
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 47c28fd8f006..fb52313a1d45 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -330,7 +330,7 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 	/* Loop from the end of the firmware parsing instructions, until
+ 	 * we find an instruction that identifies the "project ID" for the
+ 	 * hardware supported by this firwmare file.
+-	 * Once we have that, we double-check that that project_id is suitable
++	 * Once we have that, we double-check that project_id is suitable
+ 	 * for the hardware we are working with.
+ 	 */
+ 	while (fwptr >= btrtl_dev->fw_data + (sizeof(*epatch_info) + 3)) {
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.35.1
+
 
