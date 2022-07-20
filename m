@@ -2,89 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07396C43334
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 01:10:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB6D4C43334
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Jul 2022 03:11:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238699AbiGTBKh (ORCPT
+        id S237590AbiGTDLY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Jul 2022 21:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60608 "EHLO
+        Tue, 19 Jul 2022 23:11:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231806AbiGTBKg (ORCPT
+        with ESMTP id S242417AbiGTDKw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Jul 2022 21:10:36 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7DDC481FA;
-        Tue, 19 Jul 2022 18:10:34 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id x185so9214025oig.1;
-        Tue, 19 Jul 2022 18:10:34 -0700 (PDT)
+        Tue, 19 Jul 2022 23:10:52 -0400
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C52A7AB1C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jul 2022 20:08:01 -0700 (PDT)
+Received: by mail-io1-xd35.google.com with SMTP id n138so12126130iod.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Jul 2022 20:08:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OU+/gjfai01z34lLexG+BxAsHjhJYkOiU0JxFwo1+l0=;
-        b=NyodhQaxGxiGLbB5IERYcQxMjT7Qg5/9x5cMZ0TFkg/66ju+b2OcGZ4MshzV10NrrQ
-         6j8ZI164SjqC5GMX/CDOgFt0TsBej9cQdwHPQQeOWiGkneTDeDGNgM5GGUqOo5ucvax8
-         WjqUagVgTshsiCNS8RKScg1LauT5E0npbMpsLqSjHO6wNHjt1470+hDM22+f1l3KOg8g
-         1+UrsqZ5KbjrvIlZu/9tXWDiywoXUutB+5BVN1IP49SGrY/cKcgYzWXqJQb2kLKGJkK5
-         5P75SU7BZbkzQZT/r6MM0CHEoaBaLJciCHZrq4WiK2QTP0ouI7qSvzKUImcueiHCL5cB
-         9IPA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=tAekEPxBk+zOiyfXcS4QMftqKgjMWB028UeBqlkuxcY=;
+        b=nZd7o7NhdfZtua1i4hDWi2xRg90Xd4qcO1un5W2lJG855S9tqUgOWMcnANZ0n3j9Rf
+         DFx6HaLFvtWmuvrwunowPVYvpCaW099gZcMqBSiP6NkiGHP+k3AfkcAxAqJpEyyLBLMD
+         XffaHdv3/fKUp9ndyay11RZRj1pJeoxlZ+zumzDRb8u1vQQPDmGyi6929BtkrNXY21r2
+         OSPScfmmLjFzyYpl5qMlz6R+7WruqgQgAxPoQmfiJp/wgP1yzJh/RxAR0qiEv/9RdOq4
+         QYcUuReDrmQ4a9FHB02Oo2RTHwbX8fzuU1LTx67r3PSsUVG6tWfK/TlXEiV9tTqIkaON
+         nNeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=OU+/gjfai01z34lLexG+BxAsHjhJYkOiU0JxFwo1+l0=;
-        b=WXmOEV3Erxi511IzeIZw3Xd1JZMfynaTDP6m9vIvk847sR292l5eoP5k+ZPL8HYnvW
-         ZVQs0ZKCozzN5y7Htdq8K8OSsNypZkMuBQEjAQRMMAS3Vuw4PT6u8XOBQBzRswTM9PfF
-         ycv1dCxOAV2/v/Hxs67S/8N5rw/mBK2ncIa0bwUaS/JPIVLjs+rZbCgVevV+vWEwwc2v
-         O3JHPcYd3ek55FxRGILP0NjG0eEbdpzSy6ZK0aIA//ZMuPk1OwxeQOqjFQeYkAAuILpA
-         0uNkfQeFKjaOMa42DHb36u/h+dtb+d1CGM0mZcgDEnWp2dDyEqFPjk2P58ELE9gvjnnp
-         KXFw==
-X-Gm-Message-State: AJIora8EayRhELxY+IOvAyERL0OlmPoHsLLdz9fNztOcyCx9y9qUYmUY
-        rbsf1oogtBgDEmZ2SgXdY5c=
-X-Google-Smtp-Source: AGRyM1sE6ufK5TO11SBv0E88cCRLOQPRdJAIDIWjrG1Szk6NVnZTkBr+2+dO79e2SGCY7s8f2MuvkA==
-X-Received: by 2002:a05:6808:f8a:b0:33a:3b5d:d5f5 with SMTP id o10-20020a0568080f8a00b0033a3b5dd5f5mr1164801oiw.287.1658279434127;
-        Tue, 19 Jul 2022 18:10:34 -0700 (PDT)
-Received: from localhost ([2600:1700:7130:4fa0::43])
-        by smtp.gmail.com with ESMTPSA id p13-20020a0568708a0d00b0010cb6fa9166sm8715216oaq.0.2022.07.19.18.10.33
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=tAekEPxBk+zOiyfXcS4QMftqKgjMWB028UeBqlkuxcY=;
+        b=w0s3ynmL2/tSuWa62kYC87Vb1jZfgijCLN33cw206xXs+m6DfkP8wDRGLonLaJrwhI
+         UpnuMTW/f+rHCcNGKjOI4rniB3Y+gXiffxXYZzFD83IjLsvUt8U3dM2089s/x8St/B1h
+         YAg0vm6i2Q3tw+2OrX1jr0GFKCTzh+Mmx+28aoW4IpPA6NYE+hd3LkLdwG2/aj+gBxTm
+         putIuJPBg7XEhnFlhez8VXnNsGdpJkpMYHIjuU8VC3ByiYIufzmVFW0kY1ilZo11aGd7
+         06l1uKQ/Q1nPMDPaJDamZYRnVGfe55TdYaFSnONBiwu21eImr/88kdPrid10TfKuwnu1
+         9a/Q==
+X-Gm-Message-State: AJIora+6xXtUUtTiJ/UZy5U9jqIB70Z/l1cZ6LyMooFq/1nZ0SAPmUJJ
+        QXEaIqirfMBx+vA10YYHFvOUbOMrgAA=
+X-Google-Smtp-Source: AGRyM1vOA3vDyoSnZ3ib8zRkirIMC+jr+Zvq9Vkr0IcjMMlw4LsG2V/7q7fgaR8EUrZ7q9TQYSMV0g==
+X-Received: by 2002:a05:6638:3820:b0:33f:7caa:7912 with SMTP id i32-20020a056638382000b0033f7caa7912mr18382999jav.227.1658286480039;
+        Tue, 19 Jul 2022 20:08:00 -0700 (PDT)
+Received: from [172.17.0.2] ([52.165.5.91])
+        by smtp.gmail.com with ESMTPSA id n14-20020a056638264e00b0033f5c35704esm7414290jat.54.2022.07.19.20.07.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Jul 2022 18:10:33 -0700 (PDT)
-From:   Fae <faenkhauser@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Fae <faenkhauser@gmail.com>
-Subject: [PATCH] drivers/bluetooth: Add PID of Foxconn bluetooth Adapter
-Date:   Tue, 19 Jul 2022 20:10:02 -0500
-Message-Id: <20220720011002.5221-1-faenkhauser@gmail.com>
-X-Mailer: git-send-email 2.36.1
+        Tue, 19 Jul 2022 20:07:59 -0700 (PDT)
+Message-ID: <62d7718f.1c69fb81.55c6.7e70@mx.google.com>
+Date:   Tue, 19 Jul 2022 20:07:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0617153077713217335=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, faenkhauser@gmail.com
+Subject: RE: drivers/bluetooth: Add PID of Foxconn bluetooth Adapter
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220720011002.5221-1-faenkhauser@gmail.com>
+References: <20220720011002.5221-1-faenkhauser@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fixes bluetooth on HP Envy ey0xxx
+--===============0617153077713217335==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=661295
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.63 seconds
+GitLint                       PASS      0.83 seconds
+SubjectPrefix                 FAIL      0.63 seconds
+BuildKernel                   PASS      34.64 seconds
+BuildKernel32                 PASS      28.81 seconds
+Incremental Build with patchesPASS      40.77 seconds
+TestRunner: Setup             PASS      494.12 seconds
+TestRunner: l2cap-tester      PASS      16.89 seconds
+TestRunner: bnep-tester       PASS      5.67 seconds
+TestRunner: mgmt-tester       PASS      96.20 seconds
+TestRunner: rfcomm-tester     PASS      9.09 seconds
+TestRunner: sco-tester        PASS      8.71 seconds
+TestRunner: smp-tester        PASS      8.82 seconds
+TestRunner: userchan-tester   PASS      5.79 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 2.63 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+drivers/bluetooth: Add PID of Foxconn bluetooth Adapter\ERROR:MISSING_SIGN_OFF: Missing Signed-off-by: line(s)
+
+total: 1 errors, 0 warnings, 9 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12923221.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: SubjectPrefix - FAIL - 0.63 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
 
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e25fcd49db70..973d122c738f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -454,6 +454,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0c8), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0e0), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x04ca, 0x3802), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
--- 
-2.36.1
 
+--===============0617153077713217335==--
