@@ -2,157 +2,241 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1962FCCA485
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 22:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 288A9C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 22:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229946AbiGUWlM (ORCPT
+        id S232024AbiGUW5i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jul 2022 18:41:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
+        Thu, 21 Jul 2022 18:57:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233520AbiGUWlK (ORCPT
+        with ESMTP id S229739AbiGUW5h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jul 2022 18:41:10 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC13178589
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 15:41:09 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id bp17so5049978lfb.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 15:41:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5C4cxe+SIKwFqqDzcnUQnDBoYOsEdyQ06UoX6upJT20=;
-        b=NP3VvhI8UbXY0390Hym9wzA1VoCG2qOz+KByR+9v/jWD6Cs8d05T2w6QwyAHj0psCg
-         38Ts3bn61k8CRefFsXcRgpSeRIiLx2H8OBb7bPVLGyl6KEO1Im+ESVXWrCSGAKwv52NW
-         JlaIGV0+nNqz2mfkYTdudtyenBfz3e9W0V6MpAHyCbVSUlwjzBDSUh/xqHU5xsWdJoq/
-         79+9icSZo7hh2S16tgta1ziYRQgm8rGFigaYjBTZ16aHwoejxFMyvO2FZcVJHUh1bsMF
-         VmunKsuwy7TiQKN8Ihup/KGzVWspKSsQFIFwpB2q6A6qkGmyTrBybOnx2AjVU/sc3jcr
-         HyEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5C4cxe+SIKwFqqDzcnUQnDBoYOsEdyQ06UoX6upJT20=;
-        b=UWhEe9Wbdo6n+9AUiqC6xtk1khTCI6eNOavCzvvx6Y8oYAInzBxW1ljDd0E93XOEJs
-         wwCocgjTVDmMjuCisDq/YxM76I7Fl/hZ9+C+T5FwkaEk72cPjHYtqYs6USKH22+SIjjb
-         rZfF1gVgqTqL60ONrf6akPkUmiFma+O7ez1MtiHHRV62HrXbpJob0p1mYdxc4qxAVIDw
-         Zdh78aJhpbu06OXbBiCF95Fqf7At6B3+sHQspYiyt6PFOEuqc3q7lPw2aCr7Jx8ECXFO
-         aU5mkFQq2lBeD0GpXFwsa6MIKfRQMfYDYOMljubRisk5I2/+/KtsI6joP1qv2JFG0Eqo
-         nSCg==
-X-Gm-Message-State: AJIora+J6UtMSroWgu0dWejTV/JHCNaIKPEB1Mm8REEjzmbC9NajRhZI
-        ERGa5d30gDI38JhLN+5rFqMa1ejkfaJnzzvJotu7kmac3GXXNg==
-X-Google-Smtp-Source: AGRyM1uHvnCGGs6K3OXGbzSEi2qdMP+pjuxSiAYNoTIRnQTC18s6YhUGyzwQaWHmfGR6tacACEuc9gM9k881txyAx4E=
-X-Received: by 2002:a19:5f4d:0:b0:48a:7001:dbf8 with SMTP id
- a13-20020a195f4d000000b0048a7001dbf8mr188314lfj.251.1658443268148; Thu, 21
- Jul 2022 15:41:08 -0700 (PDT)
+        Thu, 21 Jul 2022 18:57:37 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 231608E1E7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 15:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658444256; x=1689980256;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oUnDghkAdX3J79VH+QJzFotsgQoXuVGIOuKWvP4LkUo=;
+  b=UYbrUxe+VprmmMc45vE7dtzdx0gMUtQ7c1X98GDWb+UktdO8nOFQQ6Zi
+   G3s9x3X/LwNC3tKYMAqWxW0IxrfaszWzYMaOVC5u5K/h3PqfTlPKhp4uH
+   /w/fxKKPB65l5tVMfeaizIfLjYvBwNWd+CSYhg/dkcKIq1wicuFsT513U
+   W/T79QiniGqyP+7h14IBEGTy8dQ4pmOkHpKVpnvRNnOyP5bJNKEoqE8bN
+   NlZi7tf3HhfsFZQ0nL6I4s3mJxBdA/DdWdxu/h3fueJXKIeAiph3vEPEQ
+   ybHqGE+B/WKQJwdjPJcE1j8EYXtylzNx2a6SpgmCKJDjxIIWXT8fwhr7E
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10415"; a="267586483"
+X-IronPort-AV: E=Sophos;i="5.93,184,1654585200"; 
+   d="scan'208";a="267586483"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2022 15:57:19 -0700
+X-IronPort-AV: E=Sophos;i="5.93,184,1654585200"; 
+   d="scan'208";a="548961969"
+Received: from chialing-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.213.171.1])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jul 2022 15:57:19 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH 3/3] Bluetooth: Convert delayed discov_off to hci_sync
+Date:   Thu, 21 Jul 2022 15:57:05 -0700
+Message-Id: <20220721225705.602002-4-brian.gix@intel.com>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220721225705.602002-1-brian.gix@intel.com>
+References: <20220721225705.602002-1-brian.gix@intel.com>
 MIME-Version: 1.0
-References: <20220720233601.3648471-1-jiangzp@google.com> <20220720163548.kernel.v1.1.I4058a198aa4979ee74a219fe6e315fad1184d78d@changeid>
- <CABBYNZ+ao6r4ZHaVNGRe-Wp6077R2xmkYufOK7tN=B8rEJL1yg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+ao6r4ZHaVNGRe-Wp6077R2xmkYufOK7tN=B8rEJL1yg@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 21 Jul 2022 15:40:56 -0700
-Message-ID: <CABBYNZKhB82i12981ediTXgtOoepE9OjwK0UJQFY2wyDELKUbg@mail.gmail.com>
-Subject: Re: [kernel PATCH v1 1/1] Bluetooth: Fix get clock info
-To:     Zhengping Jiang <jiangzp@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "Gix, Brian" <brian.gix@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zhengping,
+The timed ending of Discoverability was handled in hci_requst.c, with
+calls using the deprecated hci_req_add() mechanism. Converted to live
+inside mgmt.c using the same delayed work queue, but with hci_sync
+version of hci_update_discoverable().
 
-On Thu, Jul 21, 2022 at 3:20 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Zhengping,
->
-> On Wed, Jul 20, 2022 at 4:36 PM Zhengping Jiang <jiangzp@google.com> wrote:
-> >
-> > If connection exists, set the connection data before calling
-> > get_clock_info_sync, so it can be verified the connection is still
-> > connected, before retrieving clock info.
-> >
-> > Signed-off-by: Zhengping Jiang <jiangzp@google.com>
-> > ---
-> >
-> > Changes in v1:
-> > - Fix input connection data
-> >
-> >  net/bluetooth/mgmt.c | 13 +++++++------
-> >  1 file changed, 7 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index ef8371975c4eb..947d700574c54 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -6971,11 +6971,16 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
-> >         }
-> >
-> >         cmd = mgmt_pending_new(sk, MGMT_OP_GET_CLOCK_INFO, hdev, data, len);
-> > -       if (!cmd)
-> > +       if (!cmd) {
-> >                 err = -ENOMEM;
-> > -       else
-> > +       } else {
-> > +               if (conn) {
-> > +                       hci_conn_hold(conn);
-> > +                       cmd->user_data = hci_conn_get(conn);
-> > +               }
-> >                 err = hci_cmd_sync_queue(hdev, get_clock_info_sync, cmd,
-> >                                          get_clock_info_complete);
-> > +       }
->
-> Having seconds though if this is actually the right thing to do,
-> hci_cmd_sync_queue will queue the command so get_clock_info_sync
-> shouldn't execute immediately if that happens that actually would be
-> quite a problem since we are holding the hci_dev_lock so if the
-> callback executes and blocks waiting a command that would likely cause
-> a deadlock because no command can be completed while hci_dev_lock is
-> being held, in fact I don't really like the idea of holding hci_conn
-> reference either since we are doing a lookup by address on
-> get_clock_info_sync Id probably just remove this code as it seem
-> unnecessary.
->
-> Btw, there are tests for this command in mgmt-tester so if this is
-> actually attempting to fix a problem Id like to have a test to
-> reproduce it.
+Signed-off-by: Brian Gix <brian.gix@intel.com>
+---
+ net/bluetooth/hci_request.c | 89 -------------------------------------
+ net/bluetooth/mgmt.c        | 32 +++++++++++++
+ 2 files changed, 32 insertions(+), 89 deletions(-)
 
-Looks at the other change you submitted that has a similar code
-pattern I did the following change:
-
-https://gist.github.com/Vudentz/91cd57373d5b0116e2c34b6fb6adaa07
-
-And mgmt-tester seems to run just fine with these changes.
-
->
-> >         if (err < 0) {
-> >                 err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_CLOCK_INFO,
-> > @@ -6984,12 +6989,8 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
-> >                 if (cmd)
-> >                         mgmt_pending_free(cmd);
-> >
-> > -       } else if (conn) {
-> > -               hci_conn_hold(conn);
-> > -               cmd->user_data = hci_conn_get(conn);
-> >         }
-> >
-> > -
-> >  unlock:
-> >         hci_dev_unlock(hdev);
-> >         return err;
-> > --
-> > 2.37.0.170.g444d1eabd0-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
-
-
-
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 379eb388633f..ef790978fc99 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1903,69 +1903,6 @@ void __hci_req_update_class(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
+ }
+ 
+-static void write_iac(struct hci_request *req)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_write_current_iac_lap cp;
+-
+-	if (!hci_dev_test_flag(hdev, HCI_DISCOVERABLE))
+-		return;
+-
+-	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE)) {
+-		/* Limited discoverable mode */
+-		cp.num_iac = min_t(u8, hdev->num_iac, 2);
+-		cp.iac_lap[0] = 0x00;	/* LIAC */
+-		cp.iac_lap[1] = 0x8b;
+-		cp.iac_lap[2] = 0x9e;
+-		cp.iac_lap[3] = 0x33;	/* GIAC */
+-		cp.iac_lap[4] = 0x8b;
+-		cp.iac_lap[5] = 0x9e;
+-	} else {
+-		/* General discoverable mode */
+-		cp.num_iac = 1;
+-		cp.iac_lap[0] = 0x33;	/* GIAC */
+-		cp.iac_lap[1] = 0x8b;
+-		cp.iac_lap[2] = 0x9e;
+-	}
+-
+-	hci_req_add(req, HCI_OP_WRITE_CURRENT_IAC_LAP,
+-		    (cp.num_iac * 3) + 1, &cp);
+-}
+-
+-static int discoverable_update(struct hci_request *req, unsigned long opt)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-
+-	hci_dev_lock(hdev);
+-
+-	if (hci_dev_test_flag(hdev, HCI_BREDR_ENABLED)) {
+-		write_iac(req);
+-		__hci_req_update_scan(req);
+-		__hci_req_update_class(req);
+-	}
+-
+-	/* Advertising instances don't use the global discoverable setting, so
+-	 * only update AD if advertising was enabled using Set Advertising.
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_ADVERTISING)) {
+-		__hci_req_update_adv_data(req, 0x00);
+-
+-		/* Discoverable mode affects the local advertising
+-		 * address in limited privacy mode.
+-		 */
+-		if (hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY)) {
+-			if (ext_adv_capable(hdev))
+-				__hci_req_start_ext_adv(req, 0x00);
+-			else
+-				__hci_req_enable_advertising(req);
+-		}
+-	}
+-
+-	hci_dev_unlock(hdev);
+-
+-	return 0;
+-}
+-
+ void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
+ 		      u8 reason)
+ {
+@@ -2349,33 +2286,8 @@ int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec)
+ 	return err;
+ }
+ 
+-static void discov_off(struct work_struct *work)
+-{
+-	struct hci_dev *hdev = container_of(work, struct hci_dev,
+-					    discov_off.work);
+-
+-	bt_dev_dbg(hdev, "");
+-
+-	hci_dev_lock(hdev);
+-
+-	/* When discoverable timeout triggers, then just make sure
+-	 * the limited discoverable flag is cleared. Even in the case
+-	 * of a timeout triggered from general discoverable, it is
+-	 * safe to unconditionally clear the flag.
+-	 */
+-	hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
+-	hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
+-	hdev->discov_timeout = 0;
+-
+-	hci_dev_unlock(hdev);
+-
+-	hci_req_sync(hdev, discoverable_update, 0, HCI_CMD_TIMEOUT, NULL);
+-	mgmt_new_settings(hdev);
+-}
+-
+ void hci_request_setup(struct hci_dev *hdev)
+ {
+-	INIT_DELAYED_WORK(&hdev->discov_off, discov_off);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable_work);
+ 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart_work);
+ 	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
+@@ -2386,7 +2298,6 @@ void hci_request_cancel_all(struct hci_dev *hdev)
+ {
+ 	__hci_cmd_sync_cancel(hdev, ENODEV);
+ 
+-	cancel_delayed_work_sync(&hdev->discov_off);
+ 	cancel_delayed_work_sync(&hdev->le_scan_disable);
+ 	cancel_delayed_work_sync(&hdev->le_scan_restart);
+ 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e81491d24904..9478e204b1b5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1084,6 +1084,31 @@ static void mesh_send_done(struct work_struct *work)
+ 	hci_cmd_sync_queue(hdev, mesh_send_done_sync, NULL, mesh_next);
+ }
+ 
++static void discov_off(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    discov_off.work);
++
++	bt_dev_dbg(hdev, "");
++
++	hci_dev_lock(hdev);
++
++	/* When discoverable timeout triggers, then just make sure
++	 * the limited discoverable flag is cleared. Even in the case
++	 * of a timeout triggered from general discoverable, it is
++	 * safe to unconditionally clear the flag.
++	 */
++	hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
++	hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
++	hdev->discov_timeout = 0;
++
++	hci_update_discoverable(hdev);
++
++	mgmt_new_settings(hdev);
++
++	hci_dev_unlock(hdev);
++}
++
+ static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
+ {
+ 	if (hci_dev_test_and_set_flag(hdev, HCI_MGMT))
+@@ -1091,6 +1116,7 @@ static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
+ 
+ 	BT_INFO("MGMT ver %d.%d", MGMT_VERSION, MGMT_REVISION);
+ 
++	INIT_DELAYED_WORK(&hdev->discov_off, discov_off);
+ 	INIT_DELAYED_WORK(&hdev->service_cache, service_cache_off);
+ 	INIT_DELAYED_WORK(&hdev->rpa_expired, rpa_expired);
+ 	INIT_DELAYED_WORK(&hdev->mesh_send_done, mesh_send_done);
+@@ -9345,6 +9371,12 @@ void mgmt_index_removed(struct hci_dev *hdev)
+ 
+ 	mgmt_index_event(MGMT_EV_EXT_INDEX_REMOVED, hdev, &ev, sizeof(ev),
+ 			 HCI_MGMT_EXT_INDEX_EVENTS);
++
++	/* Cancel any remaining timed work */
++	cancel_delayed_work_sync(&hdev->discov_off);
++	cancel_delayed_work_sync(&hdev->service_cache);
++	cancel_delayed_work_sync(&hdev->rpa_expired);
++	cancel_delayed_work_sync(&hdev->mesh_send_done);
+ }
+ 
+ void mgmt_power_on(struct hci_dev *hdev, int err)
 -- 
-Luiz Augusto von Dentz
+2.36.1
+
