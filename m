@@ -2,125 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D00FDC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 09:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 993D7C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 10:16:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232788AbiGUJHI (ORCPT
+        id S233188AbiGUKQU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jul 2022 05:07:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
+        Thu, 21 Jul 2022 06:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232435AbiGUJHH (ORCPT
+        with ESMTP id S233185AbiGUKQS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jul 2022 05:07:07 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A9F3B944
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 02:07:03 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b10so998094pjq.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 02:07:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=7Oot2FEHxE+6jDIkcA+Hhg8tHdpSsGd2pZ5aN+mnqZ4=;
-        b=K1086hwujIa5vQ3Vf8AzE4ff7eY8m5+lRQyea/jAWI7OGy3gbIThd5DcLWSkk2XLAX
-         SKWVTS6rUt2XHCOX415r7Sh+wuWP1XX4SU/14mpzQkGYBBTVT2Sb0LdKIP8cK9QWwUBm
-         EJbMXRjNBAT6PEYfgC/+UN9mb8+2Xl2OYLVP71mB4TR6IA4c/DO90COmMRh9o2t5sdgC
-         iOERLu2G0O6Hu2QuS4WYOYw8QxwmhTYDzAnlfcFsV/WXfdd8EkqUyVu3rbozDA5lClHL
-         Eq1fvWYYRe9FgG+fCMr5kA30Rt8hFsM+7c1egLbRwt4X1sPJXLyjitHbJBmKw6UQb8mG
-         Kadg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=7Oot2FEHxE+6jDIkcA+Hhg8tHdpSsGd2pZ5aN+mnqZ4=;
-        b=ry81QYJUFCW1x1iKwRFnjjbDSSIfa1OD297sdz+3FUSHEceT3MWb0nUGVsvIw90jfh
-         UtFCvcWu89ySPLQvgOVDqdL46InsHHugPEiDelVuJJ/CEGjNZcjdlPjZyBjLPGEDHxmL
-         hzq8GRdVjOCYDjlmTA450JkC5NTDLDA643qVLl29KZawXjoEQ07fIiC70VGQwuclwVuF
-         MnN9JPONJPc3QD8dL02f3UaHhi9e++9p/97u+xGCyJdFrEr1Z5FJQUHGsPy9DWe6rOwW
-         /kZp4J4ciRcJNsgHzu9Em+ScwAWeOCfYJuCpj1QpxJCNjhrexcc9I0hGh5R8hqSYoXQM
-         OSUQ==
-X-Gm-Message-State: AJIora99ZBPYh6+oPgyDVLTfJpq/jr5bbXmMxiWkGc3ek1UJWoJZ/utd
-        xGDu/rHr2xHiSLvOEFfNgT2QgVKc0+s=
-X-Google-Smtp-Source: AGRyM1t+oZQKZWkvgaHxxViZbREemnZ19pw1SSqJLI2/KozaiIEq5UOz6pFg4fh36fPb1JIxiB+q3g==
-X-Received: by 2002:a17:902:dc81:b0:16c:7132:cc57 with SMTP id n1-20020a170902dc8100b0016c7132cc57mr43404184pld.87.1658394422992;
-        Thu, 21 Jul 2022 02:07:02 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.182.19])
-        by smtp.gmail.com with ESMTPSA id y184-20020a62cec1000000b0052ab912b0fasm1188344pfg.2.2022.07.21.02.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Jul 2022 02:07:02 -0700 (PDT)
-Message-ID: <62d91736.1c69fb81.06ce.23cc@mx.google.com>
-Date:   Thu, 21 Jul 2022 02:07:02 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7217178794236141617=="
+        Thu, 21 Jul 2022 06:16:18 -0400
+Received: from giacobini.uberspace.de (giacobini.uberspace.de [185.26.156.129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158BF82387
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 03:16:12 -0700 (PDT)
+Received: (qmail 28149 invoked by uid 990); 21 Jul 2022 10:16:10 -0000
+Authentication-Results: giacobini.uberspace.de;
+        auth=pass (plain)
+Message-ID: <01bb77a3-f138-7488-9ca9-71ec4f7d21a7@eknoes.de>
+Date:   Thu, 21 Jul 2022 12:16:05 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, michal.lowas-rzechonek@silvair.com
-Subject: RE: [BlueZ] mesh: Set global bus earlier
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220721080331.790277-1-michal.lowas-rzechonek@silvair.com>
-References: <20220721080331.790277-1-michal.lowas-rzechonek@silvair.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
+Subject: [BUG] Null pointer deref in aosp_do_open/msft_do_open
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: +
+X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-0.188866) R_MIXED_CHARSET(0.555555) SUSPICIOUS_RECIPS(1.5)
+X-Rspamd-Score: 1.766689
+Received: from unknown (HELO unkown) (::1)
+        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Thu, 21 Jul 2022 12:16:10 +0200
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7217178794236141617==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+My fuzzer found two null pointer exceptions in aosp_do_open and msft_do_open, both triggered by the
+same frame sequence on the current bluetooth-next master.
 
-Dear submitter,
+      BUG: kernel NULL pointer dereference, address: 0000000000000070
+      #PF: supervisor read access in kernel mode
+      #PF: error_code(0x0000) - not-present page
+      PGD 0 P4D 0 
+      Oops: 0000 [#1] PREEMPT SMP NOPTI
+      CPU: 0 PID: 41 Comm: kworker/u3:0 Not tainted 5.18.0-rc7-00850-g33b44d809538 #1
+      Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+      Workqueue: hci0 hci_power_on
+      RIP: 0010:aosp_do_open+0x7e/0x230
+      Call Trace:
+       <TASK>
+       hci_dev_open_sync+0x98b/0x1060
+       hci_power_on+0x84/0x350
+       process_one_work+0x2a6/0x5d0
+       worker_thread+0x4a/0x3d0
+       ? process_one_work+0x5d0/0x5d0
+       kthread+0xed/0x120
+       ? kthread_complete_and_exit+0x20/0x20
+       ret_from_fork+0x22/0x30
+       </TASK>
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=661746
+The null pointer deref occurs in the skb length check (net/bluetooth/aosp.c:64), the skb returned
+previously by __hci_cmd_sync is null: 
 
----Test result---
+	/* LE Get Vendor Capabilities Command */
+	skb = __hci_cmd_sync(hdev, hci_opcode_pack(0x3f, 0x153), 0, NULL,
+			     HCI_CMD_TIMEOUT);
+	if (IS_ERR(skb)) {
+		bt_dev_err(hdev, "AOSP get vendor capabilities (%ld)",
+			   PTR_ERR(skb));
+		return;
+	}
 
-Test Summary:
-CheckPatch                    FAIL      0.76 seconds
-GitLint                       PASS      0.53 seconds
-Prep - Setup ELL              PASS      31.33 seconds
-Build - Prep                  PASS      0.69 seconds
-Build - Configure             PASS      10.05 seconds
-Build - Make                  PASS      772.96 seconds
-Make Check                    PASS      11.92 seconds
-Make Check w/Valgrind         PASS      295.51 seconds
-Make Distcheck                PASS      251.78 seconds
-Build w/ext ELL - Configure   PASS      9.79 seconds
-Build w/ext ELL - Make        PASS      87.49 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      507.15 seconds
+	/* A basic length check */
+	if (skb->len < VENDOR_CAPA_BASE_SIZE)
+	
+Bisected to: [d0b137062b2de75b264b84143d21c98abc5f5ad2] Bluetooth: hci_sync: Rework init stages
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] mesh: Set global bus earlier
-ERROR:INITIALISED_STATIC: do not initialise statics to NULL
-#98: FILE: mesh/dbus.c:24:
-+static struct l_dbus *dbus = NULL;
+It occurs when an AOSP resp. MSFT capable controller sends the following two different
+Command Status (0x0f) for Reset (0x0c03) on initialization:
 
-/github/workspace/src/12924841.patch total: 1 errors, 0 warnings, 43 lines checked
+Status Octet: Unknown HCI Command (0x01)
+0000   04 0f 04 01 02 03 0c
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+Status Octet: Pending (0x00)
+0000   04 0f 04 00 02 03 0c
 
-/github/workspace/src/12924841.patch has style problems, please review.
+The problem seems to be that __hci_cmd_sync returns null, and not an PTR_ERR. The affected code
+for msft_do_open is similar (msft.c:128ff):
 
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, sizeof(cp), &cp,
+			     HCI_CMD_TIMEOUT);
+	if (IS_ERR(skb)) {
+		bt_dev_err(hdev, "Failed to read MSFT supported features (%ld)",
+			   PTR_ERR(skb));
+		return false;
+	}
 
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+	if (skb->len < sizeof(*rp)) {
 
+Which one is triggered depends on the device reporting itself as either AOSP or MSFT capable.
+If it indicates both, it depends on timing.
 
+I think that can only be triggered by a malicious or broken Bluetooth controller, but there
+might be an underlying issue with __hci_cmd_sync returning null instead of an ERR_PTR.
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7217178794236141617==--
+Best
+Sönke
