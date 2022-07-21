@@ -2,130 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2584C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 18:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A1D6C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 21:20:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232508AbiGUSUr (ORCPT
+        id S233812AbiGUVUR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Jul 2022 14:20:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42660 "EHLO
+        Thu, 21 Jul 2022 17:20:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231642AbiGUSUq (ORCPT
+        with ESMTP id S233304AbiGUVUP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Jul 2022 14:20:46 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E3B018E0A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 11:20:45 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id u13so4095038lfn.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Jul 2022 11:20:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UQk6x6BgTRGeuaeYI4xS5sh5HscwRl74pRGyiIhNUiI=;
-        b=DBwMO1V7b3QYH+kvZXHLMpwc6rYYcNUcF3YzMBSe1oQEV1UH+yY52zqqr3mKwAzjZJ
-         IR/3XcGTOf++FhOpX3EPvaCGGGL7rOQ9oFfS7iACO3VY/VqYq9Xl0IhD1J0uYypcNqWD
-         gpXAqKlNJ3M/GPJOiDRd+bWxkq76bRFCXWYD8TNJKfjbqH1jxfnHXjLdp6eXqOCY26/C
-         tA28NL2gwugY2bZAMypq8KnXICg4CIdL8015OQuydqXRW8gsLXPFFz1jxXr5S1TNjuww
-         vcRtZeZnYYTmL+iKvL18U9LRLq1Jf3/R5qeUfqXKJ39gnain6Qpp05frRtJZyTPMK48f
-         bb/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UQk6x6BgTRGeuaeYI4xS5sh5HscwRl74pRGyiIhNUiI=;
-        b=Au66c+SECYWI4VcNSPuWSKrctKPWq8WhWMQy2uSdnmpgYnicaiHmBIqzFG/GYCectW
-         9DV+RCkeXd355EBn94a5aRsypeXZ6568wyH8drMNtOBuROiqUtxG6/L6deAv/H/0/Prt
-         pbWpgSfmK91zfQ4h1FMaY9b+LsbzVSJzKVuKMx0bMftgy49bK3gNEX9Y7NBLqLK9+qt+
-         HRfX3OKBvlVCIDn/Rqp2FUtiFolfbb4M7IQaxGyhGmEG5G7KRtbDSZnyfvwC/mSKW+xR
-         izwmC3UV1TCW5KbVLOl9iyS1H0qSkbh/n+ePexHYu/7I8nGTEn2c4Q9OCaUeNhHrKRFN
-         dmAQ==
-X-Gm-Message-State: AJIora+uUxrj9Mvk3F8I4OHauktCQzgA96jGhG6pIIhJQKHhyuh70Ywk
-        JUFdP7pURPuhCqJuTeCWYK1jbXSGnmxEMrQ+xjowQtLY12T67w==
-X-Google-Smtp-Source: AGRyM1tHD6KyTumFqRNrqqpVsg33DB3pvEAA7atBF0sm3wkR6eYQIlL8UTl7d8gMJ7HtjFbcd5/KnfkjWx2Za2hwcRc=
-X-Received: by 2002:a19:5f4d:0:b0:48a:7001:dbf8 with SMTP id
- a13-20020a195f4d000000b0048a7001dbf8mr1580192lfj.251.1658427643285; Thu, 21
- Jul 2022 11:20:43 -0700 (PDT)
+        Thu, 21 Jul 2022 17:20:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AD715838;
+        Thu, 21 Jul 2022 14:20:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 98BE96181D;
+        Thu, 21 Jul 2022 21:20:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EA372C341C0;
+        Thu, 21 Jul 2022 21:20:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658438414;
+        bh=HUuVCf8AwAMI2usXH0mlaxaxdAySQiYPiu5NUkSZYro=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=cxO5QSNahJG1CTiuTmit/uJ3/vQpQbwD3RXU/9tHvGJH3OXy750qY2796yxEvtD3d
+         qlyAU+BpEEQk6DM8O3lFi9Hzz5XNcGjZ6OQdsHOPACaMgiuSd/j563x2cZQafOECxt
+         6KFIUAtPcAWy9Bz4mZADCkN5HS78lAxXtmnJex4FzRAQhhYqkwxBdzAsXd6qixrWW7
+         SHGsuTNoUJw2nVzJ13spduBAIPtzZP80RlNnNcMJLBTj85IkUcHZepJsmqwoCXTFrp
+         aZzIosXvq9SMCdamLDUSufweNuBjwz6KCgFhd2yvu3WSZWOyhN4NtZjGSIuldq2ofI
+         69PqoSGcYmLBg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFB9DD9DDDD;
+        Thu, 21 Jul 2022 21:20:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220720011002.5221-1-faenkhauser@gmail.com> <62d7718f.1c69fb81.55c6.7e70@mx.google.com>
-In-Reply-To: <62d7718f.1c69fb81.55c6.7e70@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 21 Jul 2022 11:20:31 -0700
-Message-ID: <CABBYNZLMvy0s=52ByxoW4rwaEAmKCpiKhvAXY0EZM+GGMzBRQw@mail.gmail.com>
-Subject: Re: drivers/bluetooth: Add PID of Foxconn bluetooth Adapter
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     faenkhauser@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 1/2] Bluetooth: hci_sync: Refactor add Adv Monitor
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165843841384.2414.3327226907905248679.git-patchwork-notify@kernel.org>
+Date:   Thu, 21 Jul 2022 21:20:13 +0000
+References: <20220720162102.v2.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
+In-Reply-To: <20220720162102.v2.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org, mcchou@google.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        johan.hedberg@gmail.com, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hello:
 
-On Tue, Jul 19, 2022 at 8:13 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=661295
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      2.63 seconds
-> GitLint                       PASS      0.83 seconds
-> SubjectPrefix                 FAIL      0.63 seconds
-> BuildKernel                   PASS      34.64 seconds
-> BuildKernel32                 PASS      28.81 seconds
-> Incremental Build with patchesPASS      40.77 seconds
-> TestRunner: Setup             PASS      494.12 seconds
-> TestRunner: l2cap-tester      PASS      16.89 seconds
-> TestRunner: bnep-tester       PASS      5.67 seconds
-> TestRunner: mgmt-tester       PASS      96.20 seconds
-> TestRunner: rfcomm-tester     PASS      9.09 seconds
-> TestRunner: sco-tester        PASS      8.71 seconds
-> TestRunner: smp-tester        PASS      8.82 seconds
-> TestRunner: userchan-tester   PASS      5.79 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL - 2.63 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
-> drivers/bluetooth: Add PID of Foxconn bluetooth Adapter\ERROR:MISSING_SIGN_OFF: Missing Signed-off-by: line(s)
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-You will need to config you email address and set Signed-off-by (e.g.
-git commit -s), also please add the information such as:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=b4e7b216fd4c560e2c30c00b29be9909178e3dc7
-
-> total: 1 errors, 0 warnings, 9 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12923221.patch has style problems, please review.
->
-> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: SubjectPrefix - FAIL - 0.63 seconds
-> Check subject contains "Bluetooth" prefix
-> "Bluetooth: " is not specified in the subject
->
->
->
+On Wed, 20 Jul 2022 16:21:13 -0700 you wrote:
+> Make use of hci_cmd_sync_queue for adding an advertisement monitor.
+> 
+> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+> Reviewed-by: Miao-chen Chou <mcchou@google.com>
 > ---
-> Regards,
-> Linux Bluetooth
->
+> 
+> Changes in v2:
+> - Refactored to correctly use hci_cmd_sync_queue
+> 
+> [...]
 
+Here is the summary with links:
+  - [v2,1/2] Bluetooth: hci_sync: Refactor add Adv Monitor
+    https://git.kernel.org/bluetooth/bluetooth-next/c/75d2509cd04e
+  - [v2,2/2] Bluetooth: hci_sync: Refactor remove Adv Monitor
+    https://git.kernel.org/bluetooth/bluetooth-next/c/6b88eff43704
 
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
