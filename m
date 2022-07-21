@@ -2,103 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB58BC43334
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 00:09:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 376A7C43334
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Jul 2022 01:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbiGUAJ1 (ORCPT
+        id S229876AbiGUB2i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Jul 2022 20:09:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48232 "EHLO
+        Wed, 20 Jul 2022 21:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229970AbiGUAJ1 (ORCPT
+        with ESMTP id S229515AbiGUB2h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Jul 2022 20:09:27 -0400
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C1C74E0E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 17:09:26 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id k25-20020a056830169900b0061c6f68f451so11580otr.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 20 Jul 2022 17:09:26 -0700 (PDT)
+        Wed, 20 Jul 2022 21:28:37 -0400
+Received: from alexa-out-sd-01.qualcomm.com (alexa-out-sd-01.qualcomm.com [199.106.114.38])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4DD974CD8;
+        Wed, 20 Jul 2022 18:28:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Q23TsMNUauDXsUNFUCBC5sl2WEZhIXa1eCgkeEVUPzU=;
-        b=MRGfboke6mCm0dP1ZgAEAVtm407DG9ekky6SLEXLaYJiGAb4JJ0zvG559umiKNDNEV
-         R64Bm2QX+E1JozB2UZNA6Jc2RK3QSFRIw5alRl8H/+HWEcq/Owvk+BD5ig7stGaCkcZ3
-         0OoT6FCmF2QU6MtRkJr8hpCSfykDUKEKhNYAP3t3ov269zigYBvJFXWklYSBxurw0prh
-         73AEhFRPSvDzJzxNfuq+iiGYIyYCTBOQETkii/oMMUzYVoAYUVRjaaTHb3ahQB2MF6rW
-         WO3zMNTTauS6V9BlAL8QZgpOZcKV4WQyGA6deQVk/Ra+x6IGulwGdPy13emg2Uzm+9vb
-         W/uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Q23TsMNUauDXsUNFUCBC5sl2WEZhIXa1eCgkeEVUPzU=;
-        b=fpOZDcT9FQNxJT+WOir7bHSo0uwp+z4bbFDzSF50x4htmFM1Dg4Vh+VI00fp6IIHL/
-         QOH9rSPgFLH8abjiukYqyDvafBVjFTmcYt9Q2lEO7rSG+8NzYwd9k3kW6HMb2zXN0JOW
-         IAVbwqhGBjovHYTnPGvEIx1EPCU/pqZS4dIZIqBwbJkN/ekgW03iD/LJcF/1MLskrmsy
-         vvt4T8F82EUbU1OYauZHwSmazXMfmPGMB/te4ALTZPaqXfGFpWg7LvJk7kD4iAdK7h6x
-         ykJcrgHRMu4tYcNi7RPJ4eAEQ1af9v9RyJWgaxigW0zID0kiqCbwudIfsmM/t97Brhrt
-         8bgw==
-X-Gm-Message-State: AJIora9IeF0Fk2CY1DzdGr+HB2MhM1dUeETDQWBrLaEOjjPuRw1bXf6q
-        ZjnimetAABv9bOPM2irCHqZFFOejHuw=
-X-Google-Smtp-Source: AGRyM1u2fO+rLhLKcdwcUyULS8LOwzUZf4EYT8GJ7eLcIcDAI4QwcSAHBpeUA4NI6pBKv7BXfFU69A==
-X-Received: by 2002:a9d:6e84:0:b0:61c:8fdc:de7c with SMTP id a4-20020a9d6e84000000b0061c8fdcde7cmr10454127otr.334.1658362165449;
-        Wed, 20 Jul 2022 17:09:25 -0700 (PDT)
-Received: from [172.17.0.2] ([52.171.221.38])
-        by smtp.gmail.com with ESMTPSA id n10-20020acabd0a000000b0033a80567b7asm58861oif.46.2022.07.20.17.09.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Jul 2022 17:09:25 -0700 (PDT)
-Message-ID: <62d89935.1c69fb81.fb8c1.037a@mx.google.com>
-Date:   Wed, 20 Jul 2022 17:09:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9096080418897784158=="
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1658366916; x=1689902916;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2taxh7mCw2+GLKWNabZXLdL/LDPI6ZOkmkd+dAwnLEA=;
+  b=LtQZf1ZuNv0J+sxdinA3UMIQzgjsHIRbkROouUIX8Ya7e5f+yUW1sOSZ
+   gvmbJLtEE9lbHOVVxqDVkjW8oW/YbMcfNMLDzr6kBA/uOwkJszm7b7t5H
+   2i3CzCvYZs55qOImdQulgEnihdPZq08ENlw4/r5Smi64N7JTzTdK0wycB
+   I=;
+Received: from unknown (HELO ironmsg04-sd.qualcomm.com) ([10.53.140.144])
+  by alexa-out-sd-01.qualcomm.com with ESMTP; 20 Jul 2022 18:28:36 -0700
+X-QCInternal: smtphost
+Received: from unknown (HELO nasanex01a.na.qualcomm.com) ([10.52.223.231])
+  by ironmsg04-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jul 2022 18:28:36 -0700
+Received: from [10.253.78.99] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Wed, 20 Jul
+ 2022 18:28:33 -0700
+Message-ID: <311eba1b-d62f-7029-9775-e4843d71befa@quicinc.com>
+Date:   Thu, 21 Jul 2022 09:28:31 +0800
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: [v2,1/2] Bluetooth: hci_sync: Refactor add Adv Monitor
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220720162102.v2.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
-References: <20220720162102.v2.1.If745ed1d05d98c002fc84ba60cef99eb786b7caa@changeid>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1 3/3] Bluetooth: btusb: Remove
+ HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Luiz Augusto Von Dentz <luiz.von.dentz@intel.com>,
+        <swyterzone@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+References: <1658326045-9931-1-git-send-email-quic_zijuhu@quicinc.com>
+ <1658326045-9931-4-git-send-email-quic_zijuhu@quicinc.com>
+ <CABBYNZJ9Re7PZOFXhj-2tRwJ1UU2kY+QhB4dJT-=GyCYqb_Hhw@mail.gmail.com>
+From:   quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <CABBYNZJ9Re7PZOFXhj-2tRwJ1UU2kY+QhB4dJT-=GyCYqb_Hhw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============9096080418897784158==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 7/20/2022 11:38 PM, Luiz Augusto von Dentz wrote:
+> Hi Zijun,
+> 
+> On Wed, Jul 20, 2022 at 7:07 AM Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+>>
+>> Fake CSR BT controllers do not enable feature "Erroneous Data Reporting"
+>> currently, BT core driver will check the feature bit instead of the quirk
+>> to decide if HCI command HCI_Read|Write_Default_Erroneous_Data_Reporting
+>> work fine, so remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR.
+>>
+>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>> ---
+>>  drivers/bluetooth/btusb.c | 1 -
+>>  1 file changed, 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index f0f86c5c3b37..f2b3d31d56cf 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -2072,7 +2072,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+>>                  * without these the controller will lock up.
+>>                  */
+>>                 set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
+>> -               set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
+>>                 set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
+>>                 set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+> 
+> You will probably need to remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING
+> last otherwise it breaks the build in between patches, and please
+> double check if there are no other instances of driver using it or
+> perhaps leave it defined in case the feature is broken for some reason
+> but then we need a macro that checks both the quirk and the feature
+> bit.
+> 
+okay, i will split this change to solve build error between patches.
 
-This is automated email and please do not reply to this email!
+yes.  only QCA and CSR device with USB I/F use it. no other driver use it
 
-Dear submitter,
+the quirk was introduced to mark HCI_Read|Write_Default_Erroneous_Data_Reporting
+broken, but the reason why these two HCI commands don't work fine is that the feature
+"Erroneous Data Reporting" is not enabled by firmware.
+so we need to check the feature bit instead of the quirk and don't also need the quirk.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=661630
+>> --
+>> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+>>
+> 
+> 
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.71 seconds
-GitLint                       PASS      1.64 seconds
-SubjectPrefix                 PASS      1.55 seconds
-BuildKernel                   PASS      44.64 seconds
-BuildKernel32                 PASS      39.90 seconds
-Incremental Build with patchesPASS      92.10 seconds
-TestRunner: Setup             PASS      669.01 seconds
-TestRunner: l2cap-tester      PASS      21.49 seconds
-TestRunner: bnep-tester       PASS      7.88 seconds
-TestRunner: mgmt-tester       PASS      125.69 seconds
-TestRunner: rfcomm-tester     PASS      11.54 seconds
-TestRunner: sco-tester        PASS      12.25 seconds
-TestRunner: smp-tester        PASS      11.31 seconds
-TestRunner: userchan-tester   PASS      7.82 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============9096080418897784158==--
