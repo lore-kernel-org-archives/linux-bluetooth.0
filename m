@@ -2,111 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A9AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 17:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D0F3C43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 18:24:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235843AbiGVR7v (ORCPT
+        id S236187AbiGVSYo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jul 2022 13:59:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51206 "EHLO
+        Fri, 22 Jul 2022 14:24:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232888AbiGVR7u (ORCPT
+        with ESMTP id S235096AbiGVSYm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jul 2022 13:59:50 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67AC45B071
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 10:59:49 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id bp15so9845363ejb.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 10:59:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=fZJdpPztTTADq7IALobyoafTWbKHD8Wm/RY3Y465v+c=;
-        b=mGr+06EWo+rJOIDf2PYwWfOKJh6azmYPJMH6rKun5MclwLx2xzGNzFm54w5TJjZeLO
-         CCKDX6RP4l2b8swrmG77z4PgXjuwgzx8+7USTaKQhPNnLBt2taS+WwcWig2l6kPM05Rk
-         +T1DkIzikusDSM2wgFT0dJ6x4XtAE2RQ2jnGB6k/SkFzcefRjJAAD383xASO3XrveYjH
-         NGGYgERJktN6kPP9UW8CFUFtaPntlbDJfDTMfYPWf3arkRulGzaZgyy22ny7xgLmXNl6
-         /+p/3uBkTMsIO79tWTj17dYinvHw4UufDmV8AvN9vnjymBA/M50bASpJGL/LkU5h3L9F
-         32rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=fZJdpPztTTADq7IALobyoafTWbKHD8Wm/RY3Y465v+c=;
-        b=S0Y0CdHdnJ0Tg/apibbjA09KZCQl0r6SCrBgVGnlbEt3IgHeZ8+IYegRzPnCvTpu3i
-         TWTt1+QwQzCfdU51yy2/t56Um2xYcy3mdjRLtap5QrtIj9mcYNbm4OwCorCgtQ7XdSN/
-         fOVs2NvRC09OWoPUezewd25SaFbs8EoaKPR3/lTI5qR+H98818kUvTTMjvjZ3cM1TTCk
-         ELasws2xhFjO6zauHZwj1tMp+X/oXMJJFKWDTcshP3D5FpTL2b+ecpIcaVi2oBdXeh8G
-         i4PDHWxjHCTFZ8FOE4KPycxA4xpY177J1RI/tZoIZmfPm+OKaGRy4i3g7fCfV89ZeNok
-         Dmyw==
-X-Gm-Message-State: AJIora9N4XIcajnC16fexmACB+GrtOpHEqABMWqVDPp7BPNyFy/FtoL6
-        yB2/xgtjfYNxbuxF8sUo2EjRZO4TCFfuuu4wg7sG8JDW9WM=
-X-Google-Smtp-Source: AGRyM1vQ2fneC/lOKETdfTS7Z7JUAqwqRgeBmT1/6mhLCZ/ojiRT+NujB4lc0oCZHDTCS+yiryTBKR7LJpJFX8SKSvo=
-X-Received: by 2002:a17:907:7617:b0:72b:49fe:fdf7 with SMTP id
- jx23-20020a170907761700b0072b49fefdf7mr836680ejc.25.1658512787906; Fri, 22
- Jul 2022 10:59:47 -0700 (PDT)
+        Fri, 22 Jul 2022 14:24:42 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423C39E2AA
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 11:24:41 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 042A8B82971
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 18:24:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A93C8C341C7;
+        Fri, 22 Jul 2022 18:24:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658514278;
+        bh=xqurs5dJFEhcmxSNk4maCMnuFqp+BpZepW7sxUjm8aU=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=mfDmJa9IoX+MP0K/ITNf53DFa6IfFc2aH48YyEaWleqxqTJSbNbIlY0oWdAZg7FQg
+         uljuQxPNtfJBVkyJEY2iF/cN0xn5wlPlKLxBnt/u3Rb2OuxleCabXsxz0ekJc800Xh
+         eNwChvnTXXJfXDKjlQV0FLfB+8X7uLRPQda0N7myPl4ZOlVxK6TQlncWjOQzBSx9Pb
+         M7d4zaPCSXZdBptlF7z6xJjCcby3tJ3h4ktwrbrEYa5rJ7mO62LRB7syRZjvi03YCp
+         S0RmHgOxLdTaFE1gaB0MN5Ijf4QCQ72YxNNOqn0aTty9Fwkqc2oYihV7oO13D1smEZ
+         RUM4pUwd5XNhA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A597E451B9;
+        Fri, 22 Jul 2022 18:24:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220614145253.132230-1-soenke.huster@eknoes.de> <67219c6e-7eef-ee5c-693c-215a4d4c1b3e@eknoes.de>
-In-Reply-To: <67219c6e-7eef-ee5c-693c-215a4d4c1b3e@eknoes.de>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 22 Jul 2022 10:59:35 -0700
-Message-ID: <CABBYNZ+x1eph+bzSB2SU1qNe4M8K-rtinSrOrq4=fTW+U9uEyg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: virtio_bt: Use skb_put to set length
-To:     =?UTF-8?Q?S=C3=B6nke_Huster?= <soenke.huster@eknoes.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: MGMT: Fix helding hci_conn reference while
+ command is queued
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165851427856.3449.804628076680082896.git-patchwork-notify@kernel.org>
+Date:   Fri, 22 Jul 2022 18:24:38 +0000
+References: <20220722002600.632792-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220722002600.632792-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi S=C3=B6nke,
+Hello:
 
-On Fri, Jul 22, 2022 at 4:59 AM S=C3=B6nke Huster <soenke.huster@eknoes.de>=
- wrote:
->
-> On 14.06.22 16:52, Soenke Huster wrote:
-> > By using skb_put we ensure that skb->tail is set
-> > correctly. Currently, skb->tail is always zero, which
-> > leads to errors, such as the following page fault in
-> > rfcomm_recv_frame:
-> >
-> >     BUG: unable to handle page fault for address: ffffed1021de29ff
-> >     #PF: supervisor read access in kernel mode
-> >     #PF: error_code(0x0000) - not-present page
-> >     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751=
-)
-> >
-> > Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
-> > ---
-> >  drivers/bluetooth/virtio_bt.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_b=
-t.c
-> > index 67c21263f9e0..fd281d439505 100644
-> > --- a/drivers/bluetooth/virtio_bt.c
-> > +++ b/drivers/bluetooth/virtio_bt.c
-> > @@ -219,7 +219,7 @@ static void virtbt_rx_work(struct work_struct *work=
-)
-> >       if (!skb)
-> >               return;
-> >
-> > -     skb->len =3D len;
-> > +     skb_put(skb, len);
-> >       virtbt_rx_handle(vbt, skb);
-> >
-> >       if (virtbt_add_inbuf(vbt) < 0)
->
-> Are there any issues with it, or is there another reason why it is not me=
-rged yet?
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-It appears it was removed from PW due to 30 days inactivity, when that
-happens you should resend the patch since it needs to be retested by
-CI.
+On Thu, 21 Jul 2022 17:26:00 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This removes the use of hci_conn_hold from Get Conn Info and Get Clock
+> Info since the callback can just do a lookup by address using the cmd
+> data and only then set cmd->user_data to pass to the complete callback.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> [...]
 
---=20
-Luiz Augusto von Dentz
+Here is the summary with links:
+  - [v2] Bluetooth: MGMT: Fix helding hci_conn reference while command is queued
+    https://git.kernel.org/bluetooth/bluetooth-next/c/7b445e220db9
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
