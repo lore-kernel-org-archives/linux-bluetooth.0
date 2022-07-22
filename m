@@ -2,76 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D16DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 11:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0855FC43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 12:02:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230251AbiGVL7u (ORCPT
+        id S234532AbiGVMCC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jul 2022 07:59:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56614 "EHLO
+        Fri, 22 Jul 2022 08:02:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230151AbiGVL7t (ORCPT
+        with ESMTP id S234270AbiGVMCB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jul 2022 07:59:49 -0400
-Received: from giacobini.uberspace.de (giacobini.uberspace.de [185.26.156.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F2849D1D6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 04:59:47 -0700 (PDT)
-Received: (qmail 13189 invoked by uid 990); 22 Jul 2022 11:59:45 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-Message-ID: <67219c6e-7eef-ee5c-693c-215a4d4c1b3e@eknoes.de>
-Date:   Fri, 22 Jul 2022 13:59:40 +0200
+        Fri, 22 Jul 2022 08:02:01 -0400
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42EC621E3E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 05:02:00 -0700 (PDT)
+Received: by mail-qv1-xf2d.google.com with SMTP id j11so3274652qvt.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 05:02:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=yDtfjOlNmC0XJd4MMqOO04842YAQfjJs0ZDmGWWTEzk=;
+        b=IdgPVduL2DrvbHpZbF7Qx87cVZ0/oxqivWoOq+MVzvZZctDxsi+mdujL/fcakBe7Pb
+         hEeGPKQRxdaPkxPUJIO4I+TZ7V7qXyWrdQj64MSnHZmvejJPy1kGMjOnxUJLbtWqGbGg
+         I89a+Hk5+t70YR6iN2KHv5T2eymCPJlv0a8g0OOjFH8rlDvYn6qMB+tASEMqtAc4bOdZ
+         A/nQuN6GlmcDewyBxwWo/WbfmC9lbF2mafBngKPh/BdIQS/dB3qs2pG5FMI9aexaS8NJ
+         gdiPXa4RrDX0sSDANZZMpuF6HI2b8/b0XWXAs45kn86d7W6CwlLrAK0uUEBvI77aP8zy
+         8nSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=yDtfjOlNmC0XJd4MMqOO04842YAQfjJs0ZDmGWWTEzk=;
+        b=2sNhNUPkXAblR4cYIBts1rTruQcn88ikf8at7Djd8hLN/Beke/MYTUZ7Kqx8rM0X7E
+         96sv2jR6mOAet75D/Fta+y59ryT31iZEBjxKjbp7OWNGZpIy+LIyk5qBCrHDgqfCCVYk
+         T5SR1Gk67GL/YFGDHMZ4otknlynV9808IaePajW2cywXWyX4EVH2qU0NuuMfw1fCFK97
+         pJmWKAraplsq1GF4ZaOyVaCPuFmugMWDKtlBJxQo7Xx8PXyVUOCkasmTtD6kRQ0EghL0
+         cOY9jghg+RfdRogSsYMgCCIgS6OVKZJts+Svq04ybQCWUCauDZVFbV6mUGfwcq45T4tR
+         VQIg==
+X-Gm-Message-State: AJIora/mEb73YrjQFo08D6Vf+f+ND0Jy6RixhFVJl7LsaED/Tw6i2edf
+        zCa29bYyZpRr/GmJteLva1OscMoMztE=
+X-Google-Smtp-Source: AGRyM1v1wItCdlTkyPJ3gIv9Wk3RCxEWkc3NrmroEAqGxQvTsOxyk8iolYIcmhzz+EVOTWRjzTy5jA==
+X-Received: by 2002:a0c:c506:0:b0:470:8e86:de0 with SMTP id x6-20020a0cc506000000b004708e860de0mr166571qvi.104.1658491318990;
+        Fri, 22 Jul 2022 05:01:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.22.199.74])
+        by smtp.gmail.com with ESMTPSA id e19-20020a05620a12d300b006b5905999easm3053005qkl.121.2022.07.22.05.01.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 05:01:58 -0700 (PDT)
+Message-ID: <62da91b6.1c69fb81.ecf26.855e@mx.google.com>
+Date:   Fri, 22 Jul 2022 05:01:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3515496915187409801=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] Bluetooth: virtio_bt: Use skb_put to set length
-Content-Language: en-US
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-References: <20220614145253.132230-1-soenke.huster@eknoes.de>
-From:   =?UTF-8?Q?S=c3=b6nke_Huster?= <soenke.huster@eknoes.de>
-In-Reply-To: <20220614145253.132230-1-soenke.huster@eknoes.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Rspamd-Bar: -
-X-Rspamd-Report: MIME_GOOD(-0.1) BAYES_HAM(-2.93036) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: -1.53036
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Fri, 22 Jul 2022 13:59:45 +0200
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
+Subject: RE: [v5] Bluetooth: hci_sync: Remove redundant func definition
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1658488552-24691-1-git-send-email-quic_zijuhu@quicinc.com>
+References: <1658488552-24691-1-git-send-email-quic_zijuhu@quicinc.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 14.06.22 16:52, Soenke Huster wrote:
-> By using skb_put we ensure that skb->tail is set
-> correctly. Currently, skb->tail is always zero, which
-> leads to errors, such as the following page fault in
-> rfcomm_recv_frame:
-> 
->     BUG: unable to handle page fault for address: ffffed1021de29ff
->     #PF: supervisor read access in kernel mode
->     #PF: error_code(0x0000) - not-present page
->     RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
-> 
-> Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
-> ---
->  drivers/bluetooth/virtio_bt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-> index 67c21263f9e0..fd281d439505 100644
-> --- a/drivers/bluetooth/virtio_bt.c
-> +++ b/drivers/bluetooth/virtio_bt.c
-> @@ -219,7 +219,7 @@ static void virtbt_rx_work(struct work_struct *work)
->  	if (!skb)
->  		return;
->  
-> -	skb->len = len;
-> +	skb_put(skb, len);
->  	virtbt_rx_handle(vbt, skb);
->  
->  	if (virtbt_add_inbuf(vbt) < 0)
+--===============3515496915187409801==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Are there any issues with it, or is there another reason why it is not merged yet?
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=662214
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.01 seconds
+GitLint                       PASS      1.07 seconds
+SubjectPrefix                 PASS      0.91 seconds
+BuildKernel                   PASS      35.23 seconds
+BuildKernel32                 PASS      31.05 seconds
+Incremental Build with patchesPASS      49.16 seconds
+TestRunner: Setup             PASS      535.85 seconds
+TestRunner: l2cap-tester      PASS      17.28 seconds
+TestRunner: bnep-tester       PASS      6.05 seconds
+TestRunner: mgmt-tester       PASS      101.05 seconds
+TestRunner: rfcomm-tester     PASS      9.41 seconds
+TestRunner: sco-tester        PASS      9.45 seconds
+TestRunner: smp-tester        PASS      9.24 seconds
+TestRunner: userchan-tester   PASS      6.07 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3515496915187409801==--
