@@ -2,123 +2,226 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 695BCC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4529BC43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233805AbiGVUxS (ORCPT
+        id S231478AbiGVUxp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jul 2022 16:53:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40938 "EHLO
+        Fri, 22 Jul 2022 16:53:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiGVUxQ (ORCPT
+        with ESMTP id S229522AbiGVUxn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jul 2022 16:53:16 -0400
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0502AF708;
-        Fri, 22 Jul 2022 13:53:10 -0700 (PDT)
-X-UUID: 9242fd9632124bd99d83cc7842e0163a-20220723
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.8,REQID:d0aa9e4c-7dfc-44f1-b7a0-daa25181b502,OB:0,LO
-        B:0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,RULE:Release_Ham,ACTI
-        ON:release,TS:5
-X-CID-META: VersionHash:0f94e32,CLOUDID:b28e9829-fd69-41f1-91fc-8b8a329d3a88,C
-        OID:IGNORED,Recheck:0,SF:nil,TC:nil,Content:0,EDM:-3,IP:nil,URL:1,File:nil
-        ,QS:nil,BEC:nil,COL:0
-X-UUID: 9242fd9632124bd99d83cc7842e0163a-20220723
-Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 2030280754; Sat, 23 Jul 2022 04:53:06 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
- Sat, 23 Jul 2022 04:53:04 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 23 Jul 2022 04:53:04 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
-        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
-        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
-        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
-        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
-        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <abhishekpandit@google.com>,
-        <michaelfsun@google.com>, <mcchou@chromium.org>,
-        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Jing Cai <jing.cai@mediatek.com>
-Subject: [PATCH v2] Bluetooth: btusb: mediatek: fix WMT command failure during runtime suspend
-Date:   Sat, 23 Jul 2022 04:53:02 +0800
-Message-ID: <d78a3734ffb59fcb1d19bacf59d217957d7b4091.1658515026.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
+        Fri, 22 Jul 2022 16:53:43 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B637461738
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:53:42 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id g12so5423860pfb.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:53:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XunZYN18xVq5E9Gg2sKwwr3NassRtXFbRrHXf6W4tBY=;
+        b=HzFig1wtVhoOewVGSuf0qNCDKIoElDltJDtKMg9Swv2OI14vwjDaR/aksLeOh/UiQ5
+         zOK6fu9A8F4PnlBmKwhuCWAuJ3GeOpIKMfT14rXlptH8jUbNnuneaG36HEymk36g80QT
+         fNs0ozqnhHAYuQPteiUeDquPxz5M1nd0XLgiLB6b3m/mtRRcE3qcBPhte4OuxBYagN0K
+         BlS2N0vQFVMJ9/i/cEiZq3r+N17chTgpw/Yxipk7hnX/vHI85UdGr5T9F/zipZSYFoOW
+         MqXDadFpHWo+rXEKQyVvRa6N4+zJCVTnx6jTGVBxKh9D/EHZIhampkN3l5hd0R8L5Q7Q
+         lWQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XunZYN18xVq5E9Gg2sKwwr3NassRtXFbRrHXf6W4tBY=;
+        b=p3YP6YmhKav9hb5DcxHsCUiZL+3FowJDcsnFKda4hlUsoTtlpgZFhExU4Q0WH2aMph
+         hykSQywDtn+HEg7SQsOkSRLcPrKqxr/lyIpKOACBm4HChfNMIcRwv2VNulUSv+vT2IvN
+         67JvtVNPmFerfnUoEzCXGsm7aeTKWbfXmva7aKhNHWrXmisboCO5CpxzFhWx4U5H9DJe
+         l9p1ME5BXeUPMfbxBj+k+D8UW/Bmb6A83d+ey8Sw6lY8VynAMTchAxDWyo9/r0HIOgIn
+         CVQxa7sgLvPzpUJpPURrisVV1EGoMr8bR6KQKq4yHujjR1rJ+EdhJqaptxrj2MC6L47q
+         9OzA==
+X-Gm-Message-State: AJIora9A6gNTYt9dI9WPdI9Zt4as7l/gLEyl2UpethLlIDt0XgRtO3Gm
+        olyihqtLvBtembatzNN+cUK/7U3gC9UgUA==
+X-Google-Smtp-Source: AGRyM1vS4qQWvnse6+Ps4sN3C+0JgduAyH1t+wfeHdGvTIPfq9sbF8LmpJgRL7vAUGOmHvLV4aMS/Q==
+X-Received: by 2002:a05:6a00:230a:b0:52a:d0e8:c936 with SMTP id h10-20020a056a00230a00b0052ad0e8c936mr1753153pfh.67.1658523221481;
+        Fri, 22 Jul 2022 13:53:41 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d2-20020a17090a3b0200b001f1abb8de2bsm5799930pjc.49.2022.07.22.13.53.40
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Jul 2022 13:53:40 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: pull request: bluetooth-next 2022-07-22
+Date:   Fri, 22 Jul 2022 13:53:39 -0700
+Message-Id: <20220722205339.846915-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+The following changes since commit 6e0e846ee2ab01bc44254e6a0a6a6a0db1cba16d:
 
-WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
-needs constantly polling control pipe until the host received the WMT
-event, thus, we should require to specifically acquire PM counter on the
-USB to prevent the interface from entering auto suspended while WMT
-cmd/event in progress.
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2022-07-21 13:03:39 -0700)
 
-Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
-Co-developed-by: Jing Cai <jing.cai@mediatek.com>
-Signed-off-by: Jing Cai <jing.cai@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
-v2:
-1. move usb_autopm_[get, put]_interface to btusb_mtk_hci_wmt_sync whenever
-wmt cmd is invoked.
-2. add the explanation why we needed the specific
-usb_autopm_[get, put]_interface there.
----
- drivers/bluetooth/btusb.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+are available in the Git repository at:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 480ea891c09a..bdcfc3deea6c 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2453,15 +2453,29 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 
- 	set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
- 
-+	/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
-+	 * it needs constantly polling control pipe until the host received the
-+	 * WMT event, thus, we should require to specifically acquire PM counter
-+	 * on the USB to prevent the interface from entering auto suspended
-+	 * while WMT cmd/event in progress.
-+	 */
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		goto err_free_wc;
-+
- 	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
- 
- 	if (err < 0) {
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
-+		usb_autopm_put_interface(data->intf);
- 		goto err_free_wc;
- 	}
- 
- 	/* Submit control IN URB on demand to process the WMT event */
- 	err = btusb_mtk_submit_wmt_recv_urb(hdev);
-+
-+	usb_autopm_put_interface(data->intf);
-+
- 	if (err < 0)
- 		goto err_free_wc;
- 
--- 
-2.25.1
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-07-22
 
+for you to fetch changes up to 768677808478ee7ffabf9c9128f345b7ec62b5f3:
+
+  Bluetooth: btusb: Detect if an ACL packet is in fact an ISO packet (2022-07-22 13:24:55 -0700)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add support for IM Networks PID 0x3568
+ - Add support for BCM4349B1
+ - Add support for CYW55572
+ - Add support for MT7922 VID/PID 0489/e0e2
+ - Add support for Realtek RTL8852C
+ - Initial support for Isochronous Channels/ISO sockets
+ - Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING quirk
+
+----------------------------------------------------------------
+Aaron Ma (1):
+      Bluetooth: btusb: Add support of IMC Networks PID 0x3568
+
+Abhishek Pandit-Subedi (2):
+      Bluetooth: Fix index added after unregister
+      Bluetooth: Unregister suspend with userchannel
+
+Ahmad Fatoum (2):
+      dt-bindings: bluetooth: broadcom: Add BCM4349B1 DT binding
+      Bluetooth: hci_bcm: Add BCM4349B1 variant
+
+Alain Michaud (1):
+      Bluetooth: clear the temporary linkkey in hci_conn_cleanup
+
+Brian Gix (3):
+      Bluetooth: Remove dead code from hci_request.c
+      Bluetooth: Remove update_scan hci_request dependancy
+      Bluetooth: Convert delayed discov_off to hci_sync
+
+Dan Carpenter (2):
+      Bluetooth: fix an error code in hci_register_dev()
+      Bluetooth: clean up error pointer checking
+
+Hakan Jansson (7):
+      dt-bindings: net: broadcom-bluetooth: Add property for autobaud mode
+      Bluetooth: hci_bcm: Add support for FW loading in autobaud mode
+      dt-bindings: net: broadcom-bluetooth: Add CYW55572 DT binding
+      dt-bindings: net: broadcom-bluetooth: Add conditional constraints
+      Bluetooth: hci_bcm: Add DT compatible for CYW55572
+      Bluetooth: hci_bcm: Prevent early baudrate setting in autobaud mode
+      Bluetooth: hci_bcm: Increase host baudrate for CYW55572 in autobaud mode
+
+He Wang (1):
+      Bluetooth: btusb: Add a new VID/PID 0489/e0e2 for MT7922
+
+Hilda Wu (5):
+      Bluetooth: btusb: Add Realtek RTL8852C support ID 0x04CA:0x4007
+      Bluetooth: btusb: Add Realtek RTL8852C support ID 0x04C5:0x1675
+      Bluetooth: btusb: Add Realtek RTL8852C support ID 0x0CB8:0xC558
+      Bluetooth: btusb: Add Realtek RTL8852C support ID 0x13D3:0x3587
+      Bluetooth: btusb: Add Realtek RTL8852C support ID 0x13D3:0x3586
+
+Jiasheng Jiang (1):
+      Bluetooth: hci_intel: Add check for platform_driver_register
+
+Luiz Augusto von Dentz (16):
+      Bluetooth: eir: Fix using strlen with hdev->{dev_name,short_name}
+      Bluetooth: HCI: Fix not always setting Scan Response/Advertising Data
+      Bluetooth: hci_sync: Fix not updating privacy_mode
+      Bluetooth: hci_sync: Don't remove connected devices from accept list
+      Bluetooth: hci_sync: Split hci_dev_open_sync
+      Bluetooth: Add bt_status
+      Bluetooth: Use bt_status to convert from errno
+      Bluetooth: mgmt: Fix using hci_conn_abort
+      Bluetooth: MGMT: Fix holding hci_conn reference while command is queued
+      Bluetooth: hci_core: Introduce hci_recv_event_data
+      Bluetooth: Add initial implementation of CIS connections
+      Bluetooth: Add BTPROTO_ISO socket type
+      Bluetooth: Add initial implementation of BIS connections
+      Bluetooth: ISO: Add broadcast support
+      Bluetooth: btusb: Add support for ISO packets
+      Bluetooth: btusb: Detect if an ACL packet is in fact an ISO packet
+
+Manish Mandlik (2):
+      Bluetooth: hci_sync: Refactor add Adv Monitor
+      Bluetooth: hci_sync: Refactor remove Adv Monitor
+
+Sai Teja Aluvala (1):
+      Bluetooth: hci_qca: Return wakeup for qca_wakeup
+
+Schspa Shi (1):
+      Bluetooth: When HCI work queue is drained, only queue chained work
+
+Sean Wang (1):
+      Bluetooth: btmtksdio: Add in-band wakeup support
+
+Tamas Koczka (1):
+      Bluetooth: Collect kcov coverage from hci_rx_work
+
+Xiaohui Zhang (1):
+      Bluetooth: use memset avoid memory leaks
+
+Ying Hsu (1):
+      Bluetooth: Add default wakeup callback for HCI UART driver
+
+Yuri D'Elia (1):
+      Bluetooth: btusb: Set HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN for MTK
+
+Zhengping Jiang (2):
+      Bluetooth: mgmt: Fix refresh cached connection info
+      Bluetooth: hci_sync: Fix resuming scan after suspend resume
+
+Zijun Hu (5):
+      Bluetooth: hci_sync: Correct hci_set_event_mask_page_2_sync() event mask
+      Bluetooth: hci_sync: Check LMP feature bit instead of quirk
+      Bluetooth: btusb: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for QCA
+      Bluetooth: btusb: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR
+      Bluetooth: hci_sync: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING
+
+shaomin Deng (1):
+      Bluetooth: btrtl: Fix typo in comment
+
+ .../bindings/net/broadcom-bluetooth.yaml           |   25 +
+ drivers/bluetooth/btbcm.c                          |   33 +-
+ drivers/bluetooth/btbcm.h                          |    8 +-
+ drivers/bluetooth/btmtksdio.c                      |   15 +
+ drivers/bluetooth/btrtl.c                          |    2 +-
+ drivers/bluetooth/btusb.c                          |   45 +-
+ drivers/bluetooth/hci_bcm.c                        |   35 +-
+ drivers/bluetooth/hci_intel.c                      |    6 +-
+ drivers/bluetooth/hci_qca.c                        |    2 +-
+ drivers/bluetooth/hci_serdev.c                     |   11 +
+ include/net/bluetooth/bluetooth.h                  |   71 +-
+ include/net/bluetooth/hci.h                        |  203 ++-
+ include/net/bluetooth/hci_core.h                   |  234 ++-
+ include/net/bluetooth/hci_sock.h                   |    2 +
+ include/net/bluetooth/hci_sync.h                   |   16 +
+ include/net/bluetooth/iso.h                        |   32 +
+ net/bluetooth/Kconfig                              |    1 +
+ net/bluetooth/Makefile                             |    1 +
+ net/bluetooth/af_bluetooth.c                       |    4 +-
+ net/bluetooth/eir.c                                |   62 +-
+ net/bluetooth/eir.h                                |    1 +
+ net/bluetooth/hci_conn.c                           |  900 +++++++++-
+ net/bluetooth/hci_core.c                           |  569 ++++--
+ net/bluetooth/hci_event.c                          |  529 +++++-
+ net/bluetooth/hci_request.c                        |  429 +----
+ net/bluetooth/hci_request.h                        |   16 +-
+ net/bluetooth/hci_sock.c                           |   11 +-
+ net/bluetooth/hci_sync.c                           |  628 +++++--
+ net/bluetooth/iso.c                                | 1824 ++++++++++++++++++++
+ net/bluetooth/l2cap_core.c                         |    1 +
+ net/bluetooth/lib.c                                |   71 +
+ net/bluetooth/mgmt.c                               |  338 ++--
+ net/bluetooth/msft.c                               |  269 +--
+ net/bluetooth/msft.h                               |    6 +-
+ 34 files changed, 5224 insertions(+), 1176 deletions(-)
+ create mode 100644 include/net/bluetooth/iso.h
+ create mode 100644 net/bluetooth/iso.c
