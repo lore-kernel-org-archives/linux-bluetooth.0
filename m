@@ -2,229 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13633C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:43:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 695BCC43334
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:53:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232335AbiGVUn0 (ORCPT
+        id S233805AbiGVUxS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jul 2022 16:43:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35518 "EHLO
+        Fri, 22 Jul 2022 16:53:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40938 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbiGVUnZ (ORCPT
+        with ESMTP id S229522AbiGVUxQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jul 2022 16:43:25 -0400
-Received: from smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548C1AF704
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:43:24 -0700 (PDT)
-Received: from github.com (hubbernetes-node-9ce04c5.ash1-iad.github.net [10.56.14.83])
-        by smtp.github.com (Postfix) with ESMTPA id B1C065E02A4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:43:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1658522603;
-        bh=Oi89NZ6CVEl1gWi1GzaAOkp/yZPcByl7MJ2CpXsd5+I=;
-        h=Date:From:To:Subject:From;
-        b=QFVtOwgB709yaXbrTgUHa6QdZUGuytUj4EeN4VhdK88CuxJ+NCANGgGdNG+5T58z8
-         0vDP6DleD3kGVN9fWr5RNw9b8f52dtILhbv/A9HKL//FgA/7K4Z8N9uTpVHEW1TB2W
-         tI3wnPeMdgsR4gHrfiNK25df7brBpurmNgguOAJg=
-Date:   Fri, 22 Jul 2022 13:43:23 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/af998f-4314f7@github.com>
-Subject: [bluez/bluez] b031e4: lib: Add definitions for ISO socket
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Fri, 22 Jul 2022 16:53:16 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0502AF708;
+        Fri, 22 Jul 2022 13:53:10 -0700 (PDT)
+X-UUID: 9242fd9632124bd99d83cc7842e0163a-20220723
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.8,REQID:d0aa9e4c-7dfc-44f1-b7a0-daa25181b502,OB:0,LO
+        B:0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,RULE:Release_Ham,ACTI
+        ON:release,TS:5
+X-CID-META: VersionHash:0f94e32,CLOUDID:b28e9829-fd69-41f1-91fc-8b8a329d3a88,C
+        OID:IGNORED,Recheck:0,SF:nil,TC:nil,Content:0,EDM:-3,IP:nil,URL:1,File:nil
+        ,QS:nil,BEC:nil,COL:0
+X-UUID: 9242fd9632124bd99d83cc7842e0163a-20220723
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+        with ESMTP id 2030280754; Sat, 23 Jul 2022 04:53:06 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Sat, 23 Jul 2022 04:53:04 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Sat, 23 Jul 2022 04:53:04 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <mcchou@chromium.org>,
+        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Jing Cai <jing.cai@mediatek.com>
+Subject: [PATCH v2] Bluetooth: btusb: mediatek: fix WMT command failure during runtime suspend
+Date:   Sat, 23 Jul 2022 04:53:02 +0800
+Message-ID: <d78a3734ffb59fcb1d19bacf59d217957d7b4091.1658515026.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
+MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b031e4dc8c4ef9cdce40b34a8699c6174c850202
-      https://github.com/bluez/bluez/commit/b031e4dc8c4ef9cdce40b34a8699c6174c850202
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
+From: Sean Wang <sean.wang@mediatek.com>
 
-  Changed paths:
-    M Makefile.am
-    M lib/bluetooth.h
-    A lib/iso.h
+WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
+needs constantly polling control pipe until the host received the WMT
+event, thus, we should require to specifically acquire PM counter on the
+USB to prevent the interface from entering auto suspended while WMT
+cmd/event in progress.
 
-  Log Message:
-  -----------
-  lib: Add definitions for ISO socket
+Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek MT7668U USB devices")
+Co-developed-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+v2:
+1. move usb_autopm_[get, put]_interface to btusb_mtk_hci_wmt_sync whenever
+wmt cmd is invoked.
+2. add the explanation why we needed the specific
+usb_autopm_[get, put]_interface there.
+---
+ drivers/bluetooth/btusb.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 480ea891c09a..bdcfc3deea6c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2453,15 +2453,29 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 
+ 	set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
+ 
++	/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
++	 * it needs constantly polling control pipe until the host received the
++	 * WMT event, thus, we should require to specifically acquire PM counter
++	 * on the USB to prevent the interface from entering auto suspended
++	 * while WMT cmd/event in progress.
++	 */
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		goto err_free_wc;
++
+ 	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
+ 
+ 	if (err < 0) {
+ 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
++		usb_autopm_put_interface(data->intf);
+ 		goto err_free_wc;
+ 	}
+ 
+ 	/* Submit control IN URB on demand to process the WMT event */
+ 	err = btusb_mtk_submit_wmt_recv_urb(hdev);
++
++	usb_autopm_put_interface(data->intf);
++
+ 	if (err < 0)
+ 		goto err_free_wc;
+ 
+-- 
+2.25.1
 
-  Commit: cc482ad3780b788e0e03ec34c04697d90a65f3af
-      https://github.com/bluez/bluez/commit/cc482ad3780b788e0e03ec34c04697d90a65f3af
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M src/shared/util.c
-
-  Log Message:
-  -----------
-  shared/util: Decode BlueZ Experimental ISO Socket UUID
-
-This adds BlueZ experimental ISO Socket UUID to uuid128_table so it is
-decoded by the likes of btmon.
-
-
-  Commit: 9c65bad7a8784b492ca417e82944eb192a7e1bfc
-      https://github.com/bluez/bluez/commit/9c65bad7a8784b492ca417e82944eb192a7e1bfc
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M tools/mgmt-tester.c
-
-  Log Message:
-  -----------
-  mgmt-tester: Fix Read Exp Feature tests
-
-This adds ISO Socket UUID as response to Read Exp Feature.
-
-
-  Commit: 8dc5b5e1ba6b500ee2126bde11601d152cc5d973
-      https://github.com/bluez/bluez/commit/8dc5b5e1ba6b500ee2126bde11601d152cc5d973
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M src/adapter.c
-    M src/adapter.h
-    M src/main.c
-    M src/main.conf
-
-  Log Message:
-  -----------
-  adapter: Add support for setting ISO Socket experimental feature
-
-This adds support for setting ISO Socket experimental UUID which
-enables the use of BTPROTO_ISO on the system.
-
-
-  Commit: b1b575cf1720521bfe7ae58f6d2276d07add326b
-      https://github.com/bluez/bluez/commit/b1b575cf1720521bfe7ae58f6d2276d07add326b
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M btio/btio.c
-    M btio/btio.h
-    M tools/btiotest.c
-
-  Log Message:
-  -----------
-  btio: Add support for ISO sockets
-
-This adds support to create objects that map to ISO sockets.
-
-
-  Commit: 26ee34d7be40ec189811908d7351ec24d11b5db0
-      https://github.com/bluez/bluez/commit/26ee34d7be40ec189811908d7351ec24d11b5db0
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M Makefile.tools
-    A tools/iso-tester.c
-    M tools/test-runner.c
-
-  Log Message:
-  -----------
-  tools: Add iso-tester
-
-This adds iso-tester which tests BTPROTO_ISO socket:
-
-Basic Framework - Success
-Basic ISO Socket - Success
-Basic ISO Get Socket Option - Success
-Basic ISO Set Socket Option - Success
-ISO QoS 8_1_1 - Success
-ISO QoS 8_2_1 - Success
-ISO QoS 16_1_1 - Success
-ISO QoS 16_2_1 - Success
-ISO QoS 16_2_1 CIG 0x01 - Success
-ISO QoS 16_2_1 CIG 0x01 CIS 0x01 - Success
-ISO QoS 24_1_1 - Success
-ISO QoS 24_2_1 - Success
-ISO QoS 32_1_1 - Success
-ISO QoS 32_2_1 - Success
-ISO QoS 44_1_1 - Success
-ISO QoS 44_2_1 - Success
-ISO QoS 48_1_1 - Success
-ISO QoS 48_2_1 - Success
-ISO QoS 48_3_1 - Success
-ISO QoS 48_4_1 - Success
-ISO QoS 48_5_1 - Success
-ISO QoS 48_6_1 - Success
-ISO QoS 8_1_2 - Success
-ISO QoS 8_2_2 - Success
-ISO QoS 16_1_2 - Success
-ISO QoS 16_2_2 - Success
-ISO QoS 24_1_2 - Success
-ISO QoS 24_2_2 - Success
-ISO QoS 32_1_2 - Success
-ISO QoS 32_2_2 - Success
-ISO QoS 44_1_2 - Success
-ISO QoS 44_2_2 - Success
-ISO QoS 48_1_2 - Success
-ISO QoS 48_2_2 - Success
-ISO QoS 48_3_2 - Success
-ISO QoS 48_4_2 - Success
-ISO QoS 48_5_2 - Success
-ISO QoS 48_6_2 - Success
-ISO QoS - Invalid
-ISO Connect2 CIG 0x01 - Success
-ISO Send - Success
-ISO Receive - Success
-ISO Defer - Success
-ISO Defer Send - Success
-ISO Defer Receive - Success
-ISO Defer Reject - Success
-ISO Send and Receive - Success
-ISO Broadcaster - Success
-ISO Broadcaster BIG 0x01 - Success
-ISO Broadcaster BIG 0x01 BIS 0x01 - Success
-ISO Broadcaster Receiver - Success
-
-
-  Commit: 037ed8c5b12a1c80791af5df50fa93428dbc9f17
-      https://github.com/bluez/bluez/commit/037ed8c5b12a1c80791af5df50fa93428dbc9f17
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M Makefile.tools
-    A tools/isotest.c
-
-  Log Message:
-  -----------
-  tools: Add isotest tool
-
-This adds isotest tool which can be used to test ISO sockets.
-
-
-  Commit: 4314f70667217549054f61def6575085a7a18d78
-      https://github.com/bluez/bluez/commit/4314f70667217549054f61def6575085a7a18d78
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-07-22 (Fri, 22 Jul 2022)
-
-  Changed paths:
-    M Makefile.tools
-    A tools/isotest.rst
-
-  Log Message:
-  -----------
-  isotest: Add documentation
-
-This adds isotest.rst which documents the modes and options of
-isotest(1) and is then converted isotest.1 manpage.
-
-
-Compare: https://github.com/bluez/bluez/compare/af998fd32c34...4314f7066721
