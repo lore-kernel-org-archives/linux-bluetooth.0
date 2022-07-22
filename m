@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4529BC43334
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CCCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Jul 2022 20:54:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231478AbiGVUxp (ORCPT
+        id S233805AbiGVUyE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Jul 2022 16:53:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41382 "EHLO
+        Fri, 22 Jul 2022 16:54:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiGVUxn (ORCPT
+        with ESMTP id S229522AbiGVUyD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Jul 2022 16:53:43 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B637461738
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:53:42 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id g12so5423860pfb.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Jul 2022 13:53:42 -0700 (PDT)
+        Fri, 22 Jul 2022 16:54:03 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 723F861738;
+        Fri, 22 Jul 2022 13:54:02 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id k16so5500269pls.8;
+        Fri, 22 Jul 2022 13:54:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=XunZYN18xVq5E9Gg2sKwwr3NassRtXFbRrHXf6W4tBY=;
-        b=HzFig1wtVhoOewVGSuf0qNCDKIoElDltJDtKMg9Swv2OI14vwjDaR/aksLeOh/UiQ5
-         zOK6fu9A8F4PnlBmKwhuCWAuJ3GeOpIKMfT14rXlptH8jUbNnuneaG36HEymk36g80QT
-         fNs0ozqnhHAYuQPteiUeDquPxz5M1nd0XLgiLB6b3m/mtRRcE3qcBPhte4OuxBYagN0K
-         BlS2N0vQFVMJ9/i/cEiZq3r+N17chTgpw/Yxipk7hnX/vHI85UdGr5T9F/zipZSYFoOW
-         MqXDadFpHWo+rXEKQyVvRa6N4+zJCVTnx6jTGVBxKh9D/EHZIhampkN3l5hd0R8L5Q7Q
-         lWQg==
+        b=Qt9A/HBwz0Bzb5o7eDK9WCvcKS7ZXQ5Da21ut5GM/a9L95/DeM0L5XAK1NgDN2XTGz
+         YNWTTb3Ko5nf8ja2JhfWKp+JYODdUm7QTUELZmCzgofSXm5nGBWD57TQz5aZ1Ce409La
+         zUrfAr7X+VCXJnu63e3nMsmuz+E44xGQD+Wf2CcuWloCSooDdzOLsTkfS+XQ7sjav2WL
+         7HNt4XQ9S8oH/3m7s/0H4KGYrgTeGqOEzde6OBLlCwiNcIxasnbgAZuAhgMi1IfuGMEt
+         T0HHFYz9j7a3q5/dllAbAYIyJNOIL4l/RpS+fZ+1e7rGtWcMi868Xmc++I0hKxgq9czI
+         fKsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=XunZYN18xVq5E9Gg2sKwwr3NassRtXFbRrHXf6W4tBY=;
-        b=p3YP6YmhKav9hb5DcxHsCUiZL+3FowJDcsnFKda4hlUsoTtlpgZFhExU4Q0WH2aMph
-         hykSQywDtn+HEg7SQsOkSRLcPrKqxr/lyIpKOACBm4HChfNMIcRwv2VNulUSv+vT2IvN
-         67JvtVNPmFerfnUoEzCXGsm7aeTKWbfXmva7aKhNHWrXmisboCO5CpxzFhWx4U5H9DJe
-         l9p1ME5BXeUPMfbxBj+k+D8UW/Bmb6A83d+ey8Sw6lY8VynAMTchAxDWyo9/r0HIOgIn
-         CVQxa7sgLvPzpUJpPURrisVV1EGoMr8bR6KQKq4yHujjR1rJ+EdhJqaptxrj2MC6L47q
-         9OzA==
-X-Gm-Message-State: AJIora9A6gNTYt9dI9WPdI9Zt4as7l/gLEyl2UpethLlIDt0XgRtO3Gm
-        olyihqtLvBtembatzNN+cUK/7U3gC9UgUA==
-X-Google-Smtp-Source: AGRyM1vS4qQWvnse6+Ps4sN3C+0JgduAyH1t+wfeHdGvTIPfq9sbF8LmpJgRL7vAUGOmHvLV4aMS/Q==
-X-Received: by 2002:a05:6a00:230a:b0:52a:d0e8:c936 with SMTP id h10-20020a056a00230a00b0052ad0e8c936mr1753153pfh.67.1658523221481;
-        Fri, 22 Jul 2022 13:53:41 -0700 (PDT)
+        b=FMy7Qehg2AaLMLioDzm9WwbyrFAqyTLO964mv+SLbvGxv8I5UktcMIJziwxWdJE0xh
+         Hp819QGok/PBdIHFR0hcrY9O944Qo8JA463HjbpmWY5VBC2kN2IdGbwUCwKd/qT4vpJf
+         saNpVzwkwPxu4HUtiCkFe/qPAXmOEcjUPUXdKsY83zM+wnRBUkmqfShbQeezVGvHuzdF
+         6voUUllddGp6cPiPZB1US6KlsBY4bKUBK9FpdRq4aFLP6LEjSIoDi5FEGOtE2uXTWCpf
+         hgGR5OUi3oI0GWNVu42N/tj7cK43L5hrrBxINxT7k9ICsIrFs0/u/QO3ZvwDeQzq17xn
+         k3XA==
+X-Gm-Message-State: AJIora8wGZWkO+cnwPFWnoldK52GPpLcyfpxM3jY6KDwGrPaMq3OdnCD
+        0CFiR2UCx7xq7OdALoLnBlmL1Uq+6PORIA==
+X-Google-Smtp-Source: AGRyM1vU++s/jL3uPmYNRrFDvJyx4eTV7oUAzhvhl2Tcpeh0LoK3OPUg7zRkqOoriyyopr5WIqc2ZA==
+X-Received: by 2002:a17:902:f641:b0:16d:351d:c1ea with SMTP id m1-20020a170902f64100b0016d351dc1eamr1268759plg.174.1658523241763;
+        Fri, 22 Jul 2022 13:54:01 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id d2-20020a17090a3b0200b001f1abb8de2bsm5799930pjc.49.2022.07.22.13.53.40
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id i23-20020a17090a059700b001f1acb6c3ebsm3806777pji.34.2022.07.22.13.54.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Jul 2022 13:53:40 -0700 (PDT)
+        Fri, 22 Jul 2022 13:54:01 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Subject: pull request: bluetooth-next 2022-07-22
-Date:   Fri, 22 Jul 2022 13:53:39 -0700
-Message-Id: <20220722205339.846915-1-luiz.dentz@gmail.com>
+Date:   Fri, 22 Jul 2022 13:54:00 -0700
+Message-Id: <20220722205400.847019-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
