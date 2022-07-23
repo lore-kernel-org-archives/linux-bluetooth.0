@@ -2,145 +2,174 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD34FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Jul 2022 10:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39534C43334
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 23 Jul 2022 13:31:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237288AbiGWKyS (ORCPT
+        id S233293AbiGWNbc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 23 Jul 2022 06:54:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59862 "EHLO
+        Sat, 23 Jul 2022 09:31:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230399AbiGWKyQ (ORCPT
+        with ESMTP id S229469AbiGWNba (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 23 Jul 2022 06:54:16 -0400
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB5D11441;
-        Sat, 23 Jul 2022 03:54:14 -0700 (PDT)
-Received: by mail-io1-xd2e.google.com with SMTP id n7so5293533ioo.7;
-        Sat, 23 Jul 2022 03:54:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YL9wCFcJM1S8aQnJbcoxTMo6SNRCJK/vq4C87hsQwpU=;
-        b=icTe+7uDRr7EXvhDnSXmpnK61DUvZdhBUV1EG52pxLeRH5b4Fp++sDQy0J4X6UI8Eh
-         uGZ7po3LSPCe4MqV6mvQgXp1tKpRTebwdxMFJqJnbVMiOOXYa56IKetWOYEVjupA+mbG
-         twO9t0rDvPLv/LnZwpC1PRjDAm98sUoNPLu5bilwe8uwhUF/REZaKCxGvUR+DG4GwupY
-         96lp4Ne9iS5xiYgOuBNA8rdG3KGBiukHG3Dv1+RXor7fuWoy4onvrQzoGHG68D12evdN
-         qopZqWfKVBQL30UA+lFKUymH1m/li+cOtP1l6Nh3OB+i2U+cnnDaysukc+2hdfwqKlvW
-         HKMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YL9wCFcJM1S8aQnJbcoxTMo6SNRCJK/vq4C87hsQwpU=;
-        b=fet/zYR/MdL65rLypuuwdS1sVnKizFS5itMVT6eLBp3mJD2ioFOkRfXJuKSSZizSrS
-         N1918QxgOWSsRXE/Y2J077OsTQ8OHi82NuW8PxJmyKbMXH25xmB+QSBCZml41tEkFpWL
-         meQ4MoAO2p02fVLqVw83TgewTIQdxGajPG5HSJ6t4ID1P6cNXZA/8nEtXczDe//OXOeQ
-         qWlV3lWXfbe9rRq6gM/W1Sc+bNyRJV47d6uvIRAvNs4HDYfMrAOpn36hQJxSlDsjxtLJ
-         CfQulUJoOilyChWeguQ5i63jQ4Y24qv/L/LNrK9KBDlTbSxml2gDqJCHIPMWP/wbrAOc
-         0Jkw==
-X-Gm-Message-State: AJIora/tK2fYHnenzpMrE5fhRXgPxpm95H2HTranHVHZB7MwFuhESIMy
-        5aVGUDfcWpTqdm4z20vsofcC+NHORPIDQfj0reE=
-X-Google-Smtp-Source: AGRyM1szkUECVWGAESedupd4SaLkQ477HkV5GtL8kMwaKob8JG7T9RM44BdYJtK/AyD8uGaMcylKdTpDzbiO3Mi3N/w=
-X-Received: by 2002:a05:6638:1602:b0:341:3e1f:d862 with SMTP id
- x2-20020a056638160200b003413e1fd862mr1696518jas.24.1658573654111; Sat, 23 Jul
- 2022 03:54:14 -0700 (PDT)
+        Sat, 23 Jul 2022 09:31:30 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB6CF63B8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 23 Jul 2022 06:31:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658583089; x=1690119089;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=W/RibUQfeWyict+S8i2n5qwEASmFoss65sVyhxpIE0E=;
+  b=Yj4Ga1lrvjRg2vFu64e9+SW80ppQtF7S3GdX6uzcqb6h6GOKEzeur6s+
+   Ckms0pOBDOIS7ItNGrBHIjpWeXZoqxSjJMAjtkAd0kT+iRxerNEqffxzE
+   lOy2RIFysLQfdIYgCCk9Kz1yqSh2oMHPkj5GJKZEb9GfAb1bwJiRxo4wq
+   WEEru3XXaoY4T06Sa3En68khz+kV1NV9tiIVhp96qZxkn3K5RAq0Xov+v
+   4gdXff5x6jq7vVQWrLNOVaRfhH3zboHV8H926tX+Ol4zmZrsVCG76+QzL
+   C28t0YNYrHaGOoP8jAIK5nBMQWOW80B/IyXH/oi8pfDKsr1SQopHP1kOt
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10417"; a="274326714"
+X-IronPort-AV: E=Sophos;i="5.93,188,1654585200"; 
+   d="scan'208";a="274326714"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2022 06:31:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,188,1654585200"; 
+   d="scan'208";a="549464485"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 23 Jul 2022 06:31:26 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oFFE5-0002dZ-1v;
+        Sat, 23 Jul 2022 13:31:25 +0000
+Date:   Sat, 23 Jul 2022 21:30:54 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 14202eff214e1e941fefa0366d4c3bc4b1a0d500
+Message-ID: <62dbf80e.VHpQsauSMxWvjS9O%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <20220717133759.8479-1-khalid.masum.92@gmail.com>
- <3ea0ea90-48bf-ce19-e014-9443d732e831@gmail.com> <CAABMjtHiet1_SRvLBhoNxeEh865rwtZCkb510JmFPkHFMd5chQ@mail.gmail.com>
- <CABBYNZJVv=pJv60P6fYZh65JU+BV5agGfXEh4VenxELEXqtDsA@mail.gmail.com>
-In-Reply-To: <CABBYNZJVv=pJv60P6fYZh65JU+BV5agGfXEh4VenxELEXqtDsA@mail.gmail.com>
-From:   Khalid Masum <khalid.masum.92@gmail.com>
-Date:   Sat, 23 Jul 2022 16:54:03 +0600
-Message-ID: <CAABMjtEDHLRGVHrjPaCyuTX0SBODVcS+U+G+xS+YQH=23zk=hg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_core: Use ERR_PTR instead of NULL
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Pavel Skripkin <paskripkin@gmail.com>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Jul 19, 2022 at 5:04 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Khalid,
->
-> On Sun, Jul 17, 2022 at 11:34 AM Khalid Masum <khalid.masum.92@gmail.com> wrote:
-> >
-> > On Sun, Jul 17, 2022 at 10:17 PM Pavel Skripkin <paskripkin@gmail.com> wrote:
-> > >
-> > > Hi Khalid,
-> > >
-> > > Khalid Masum <khalid.masum.92@gmail.com> says:
-> > > > Failure of kzalloc to allocate memory is not reported. Return Error
-> > > > pointer to ENOMEM if memory allocation fails. This will increase
-> > > > readability and will make the function easier to use in future.
-> > > >
-> > > > Signed-off-by: Khalid Masum <khalid.masum.92@gmail.com>
-> > > > ---
-> > >
-> > > [snip]
-> > >
-> > > > index a0f99baafd35..ea50767e02bf 100644
-> > > > --- a/net/bluetooth/hci_core.c
-> > > > +++ b/net/bluetooth/hci_core.c
-> > > > @@ -2419,7 +2419,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
-> > > >
-> > > >       hdev = kzalloc(alloc_size, GFP_KERNEL);
-> > > >       if (!hdev)
-> > > > -             return NULL;
-> > > > +             return ERR_PTR(-ENOMEM);
-> > > >
-> > >
-> > > This will break all callers of hci_alloc_dev(). All callers expect NULL
-> > > in case of an error, so you will leave them with wrong pointer.
-> >
-> > You are right. All callers of hci_alloc_dev() need to be able to handle
-> > the error pointer. I shall send a V2 with all the callers of hci_alloc_dev
-> > handling the ERR_PTR.
-> >
-> > > Also, allocation functionS return an error only in case of ENOMEM, so
-> > > initial code is fine, IMO
-> > >
->
-> If there just a single error like ENOMEM then Id say this is fine,
-> just as it is fine for kzalloc.
->
-> > I think it makes the memory allocation error handling look to be a bit
-> > different from what we usually do while allocating memory which is,
-> > returning an error or an error pointer. Here we are returning a NULL
-> > without any context, making it a bit unreadable. So I think returning
-> > an error pointer is better. If I am not mistaken, this also complies with
-> > the return convention:
-> > https://www.kernel.org/doc/htmldocs/kernel-hacking/convention-returns.html
->
-> Not sure if that would apply to code that is basically a wrapper of kzalloc.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 14202eff214e1e941fefa0366d4c3bc4b1a0d500  Bluetooth: btusb: Detect if an ACL packet is in fact an ISO packet
 
-I got you.
-> > > Thanks,
-> > > --Pavel Skripkin
-> >
-> >
-> > Thanks,
-> >   -- Khalid Masum
->
->
->
-> --
-> Luiz Augusto von Dentz
+elapsed time: 722m
 
-Thanks,
-  -- Khalid Masum
+configs tested: 97
+configs skipped: 2
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm64                            allyesconfig
+arm                                 defconfig
+arm                              allyesconfig
+i386                          randconfig-c001
+powerpc              randconfig-c003-20220722
+m68k                          atari_defconfig
+sparc                       sparc64_defconfig
+sh                          r7785rp_defconfig
+m68k                                defconfig
+powerpc                 mpc834x_itx_defconfig
+arm                       imx_v6_v7_defconfig
+powerpc                      tqm8xx_defconfig
+arc                      axs103_smp_defconfig
+m68k                        m5407c3_defconfig
+mips                           jazz_defconfig
+powerpc                 mpc8540_ads_defconfig
+openrisc                 simple_smp_defconfig
+nios2                         3c120_defconfig
+sh                        apsh4ad0a_defconfig
+powerpc                     pq2fads_defconfig
+alpha                            alldefconfig
+openrisc                            defconfig
+sh                             sh03_defconfig
+xtensa                           alldefconfig
+arm                       omap2plus_defconfig
+xtensa                              defconfig
+powerpc                 mpc837x_rdb_defconfig
+powerpc                     asp8347_defconfig
+powerpc                       ppc64_defconfig
+csky                                defconfig
+arm                          gemini_defconfig
+powerpc                      mgcoge_defconfig
+sh                           se7751_defconfig
+arc                    vdk_hs38_smp_defconfig
+alpha                               defconfig
+parisc64                         alldefconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+riscv                             allnoconfig
+i386                              debian-10.3
+loongarch                           defconfig
+loongarch                         allnoconfig
+i386                          debian-10.3-kvm
+i386                        debian-10.3-kunit
+i386                         debian-10.3-func
+csky                              allnoconfig
+alpha                             allnoconfig
+arc                               allnoconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+powerpc                           allnoconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+sh                               allmodconfig
+i386                                defconfig
+i386                             allyesconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+arc                  randconfig-r043-20220721
+x86_64                    rhel-8.3-kselftests
+x86_64                           allyesconfig
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                           rhel-8.3-kvm
+x86_64                          rhel-8.3-func
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+
+clang tested configs:
+arm                      pxa255-idp_defconfig
+mips                      maltaaprp_defconfig
+arm                       mainstone_defconfig
+mips                        bcm63xx_defconfig
+powerpc                     ksi8560_defconfig
+arm                       spear13xx_defconfig
+mips                     loongson1c_defconfig
+mips                         tb0287_defconfig
+arm                         hackkit_defconfig
+arm                  colibri_pxa300_defconfig
+x86_64                        randconfig-k001
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+hexagon              randconfig-r041-20220721
+hexagon              randconfig-r045-20220721
+riscv                randconfig-r042-20220721
+s390                 randconfig-r044-20220721
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
