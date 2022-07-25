@@ -2,103 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD518C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 22:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E363C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 22:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbiGYWGK (ORCPT
+        id S236826AbiGYW2s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Jul 2022 18:06:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49104 "EHLO
+        Mon, 25 Jul 2022 18:28:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229580AbiGYWGH (ORCPT
+        with ESMTP id S237021AbiGYW2p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Jul 2022 18:06:07 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C549FED
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 15:06:05 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q41-20020a17090a1b2c00b001f2043c727aso11511025pjq.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 15:06:05 -0700 (PDT)
+        Mon, 25 Jul 2022 18:28:45 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C2D255AD;
+        Mon, 25 Jul 2022 15:28:44 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id c12so8345512ede.3;
+        Mon, 25 Jul 2022 15:28:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=wcr6btsjB46HRJg5TlOClM8kQW/E3U/48EaD5DuqsUg=;
-        b=PFsZE38yEZk/KmJaIXrwuCLfYAY8398AS0c5Qrxq3ZVpj4TCPKVeRRxnQqDG1s9fo7
-         mjLxaSwvAK1iFFu/tHgy/ycUmX7eQhf2+MS/HwvcBmWyVFI2dTT/DfXN87nfc5KLXu+P
-         VoKMEQJ3X+LYWt/lj0aleQ3nVXbBsji+RL2/k2Ci8UKafqkSpoL2F0dsoQOIxoa4ifiS
-         xTqmWdcd4+CQGV9wHDp6qInQT81jFWVzRJvbLB6CenAlaCA9h3qlbw/xoQzOmCPZYSfj
-         k0A7HHS9oIlRcepgOR+KDwi0YM60h6vN3neOvANGIFjfsUEdZZ4Pb5iK7B9RtBefHxtA
-         PNzA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=s5F5bTPmIWsgz/PHUFTiPwn7ArH62vLQlD0Ro1hOzT8=;
+        b=EYVKVy9GR8tIisHmLoKIAUDGdhGTgA+V+O8Z1DMo3OCm/8lIX+f2pBj5Fg2PBSooVF
+         VzXhmo5+5SRh+gS/j/TCjZm9g3wuPPfIJR/lHwPjJL/VEagtHu4Dj8nzh2Yo4SFJGt3q
+         zAUrZThxpZhnqya/xFcQ4ZsSQixW2/qBTznI3inG+qxqjP1qimuGWnkE5ilwBjyN3+/y
+         raASv3WxXlCYKvPPX5tYi45XmgelBIcFRlQ0HkBw+VCjLX907GaOeSAK/FU3cnRM4b9W
+         MPdErn+DQYwABxF4eRq6GZgzE3ovur6veftazbNX8N0e8zULCGOPcg3f8KMdCnw0nJuq
+         TVHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=wcr6btsjB46HRJg5TlOClM8kQW/E3U/48EaD5DuqsUg=;
-        b=6WojrwuM/+nfdU6cnTDOOatJgN2wLDi3JmrVSLVj13BKyCPVBUGktgW9OxvED7RmeM
-         RsmiiMz+IoDEehlQ3oMgfwDuygG8JM1hjGNd6qFCbimLOeXYelxzaVc0J7H/ECVud6IS
-         1myaU4daXzXcGEYM4uoBZJbc+7Zk1DPopOY+WPFnVCb4U0UeCmD8Y2f4etG1vkr/5/kJ
-         opNAojLQ24wyqc2Ynt8UfGDVomCJPIwBXocr3ISV/rAMCptXkCcnDhOZ9qyqGvpCW/Ow
-         yDC4UFll4LJqXpJ/Yqzp0m2dcKFo/LkADxorMtTrPwtDOcaSawVa4EJDYvY9RfW1dCWs
-         O3OQ==
-X-Gm-Message-State: AJIora9YNOQoMnnTBVAvzgVXstztMcx6wEVk5eeTKRAUH5cIamh2DaHF
-        PoiDXRKbwX0mf9tE0wGOza3274KUVl8=
-X-Google-Smtp-Source: AGRyM1uOV+pPplwir5HYi56h8QiPVuou3Vnw4DF8BJ7zHXrOHzgfVsMCJixYAorxbyqzCp0oLpG5mw==
-X-Received: by 2002:a17:90b:360c:b0:1f2:6436:9e54 with SMTP id ml12-20020a17090b360c00b001f264369e54mr14432928pjb.186.1658786764718;
-        Mon, 25 Jul 2022 15:06:04 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.127.250])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b0015e8d4eb1d3sm9818222plg.29.2022.07.25.15.06.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jul 2022 15:06:04 -0700 (PDT)
-Message-ID: <62df13cc.1c69fb81.474bc.f52a@mx.google.com>
-Date:   Mon, 25 Jul 2022 15:06:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3186610675752153858=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=s5F5bTPmIWsgz/PHUFTiPwn7ArH62vLQlD0Ro1hOzT8=;
+        b=sP+54nMD81yYcOMQuGpRqWintABlzDRcMesavl3I5iFmQMlSdzYeadGPvN5mIQqygq
+         aa+2d8s4VD700HGOk5ckr+ulKjj5JbExyeBnGuiPJ0UUNKmDNLMwqHN/I8d3Ui7kWOmL
+         e6KR6t45hI7U6JqErsi5+nuGw4CZAAJHXMoNgRnWfnSZmvNpIvjy4uMYBY1Kd95u3s97
+         lA8BPU6viHRrt22jCAgz1RvPu1T9IFAVy8zk0ABzXaMfjq3XxalAfN2FKwHQoyYBTmZr
+         wBdtwfskFhvd8DB1MaA+Y57rFbZ6zQ77eVVaBFUzZZ1dzpNO8lwmZ82T5cBaGqPV3Wro
+         xdpA==
+X-Gm-Message-State: AJIora/VUpFaMZVQvlXAwXoTTOvhT2csd25Z1943Q4Lz+mW5qAFP7FgZ
+        LBgzfIrrttKIAiEHKskuYvYL1gNuHGSuyH8huP4=
+X-Google-Smtp-Source: AGRyM1tyT5tOI9pZi4I45uufPdEI2vvTki7s66xiQ+IU6rwz2Xy9oHm51p5RXCfq5CLrCpa0+X/RHhv6nZlPcKRiYtg=
+X-Received: by 2002:a05:6402:5412:b0:435:5997:ccb5 with SMTP id
+ ev18-20020a056402541200b004355997ccb5mr14756047edb.167.1658788122613; Mon, 25
+ Jul 2022 15:28:42 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
-Subject: RE: Bluetooth: Always set event mask on suspend
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220725135026.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
 References: <20220725135026.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
+In-Reply-To: <20220725135026.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 25 Jul 2022 15:28:31 -0700
+Message-ID: <CABBYNZLWUM4JJjm5H=f7szt_7bgSFcAknk4AcVUmO5iPJzQVcQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Always set event mask on suspend
+To:     Abhishek Pandit-Subedi <abhishekpandit@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3186610675752153858==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Abhishek,
 
-This is automated email and please do not reply to this email!
+On Mon, Jul 25, 2022 at 1:50 PM Abhishek Pandit-Subedi
+<abhishekpandit@google.com> wrote:
+>
+> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+>
+> When suspending, always set the event mask once disconnects are
+> successful. Otherwise, if wakeup is disallowed, the event mask is not
+> set before suspend continues and can result in an early wakeup.
+>
 
-Dear submitter,
+Please include the commit hash it fixes, also it may be a good idea to
+tag it for stable as well.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=662855
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
+> Observed on ChromeOS as follows:
+>
+> < HCI Command: Disconnect (0x01|0x0006) plen 3
+>         Handle: 256
+>         Reason: Remote Device Terminated due to Power Off (0x15)
+> > HCI Event: Command Status (0x0f) plen 4
+>       Disconnect (0x01|0x0006) ncmd 1
+>         Status: Success (0x00)
+> @ MGMT Event: Device Disconnected (0x000c) plen 8
+>         BR/EDR Address: 04:52:C7:C3:65:B5 (Bose Corporation)
+>         Reason: Connection terminated by local host for suspend (0x05)
+> @ MGMT Event: Controller Suspended (0x002d) plen 1
+>         Suspend state: Disconnected and not scanning (1)
+> > HCI Event: Disconnect Complete (0x05) plen 4
+>         Status: Success (0x00)
+>         Handle: 256
+>         Reason: Connection Terminated By Local Host (0x16)
+>
+> The expectation is that we should see Set Event Mask before completing
+> the suspend so that the `Disconnect Complete` doesn't wake us up.
+>
+>
+>  net/bluetooth/hci_sync.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 148ce629a59f..e6d804b82b67 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -5297,6 +5297,9 @@ int hci_suspend_sync(struct hci_dev *hdev)
+>                 return err;
+>         }
+>
+> +       /* Update event mask so only the allowed event can wakeup the host */
+> +       hci_set_event_mask_sync(hdev);
+> +
+>         /* Only configure accept list if disconnect succeeded and wake
+>          * isn't being prevented.
+>          */
+> @@ -5308,9 +5311,6 @@ int hci_suspend_sync(struct hci_dev *hdev)
+>         /* Unpause to take care of updating scanning params */
+>         hdev->scanning_paused = false;
+>
+> -       /* Update event mask so only the allowed event can wakeup the host */
+> -       hci_set_event_mask_sync(hdev);
+> -
+>         /* Enable event filter for paired devices */
+>         hci_update_event_filter_sync(hdev);
+>
+> --
+> 2.37.1.359.gd136c6c3e2-goog
+>
 
----Test result---
 
-Test Summary:
-CheckPatch                    PASS      1.09 seconds
-GitLint                       PASS      0.46 seconds
-SubjectPrefix                 PASS      0.30 seconds
-BuildKernel                   PASS      44.63 seconds
-BuildKernel32                 PASS      38.89 seconds
-Incremental Build with patchesPASS      53.29 seconds
-TestRunner: Setup             PASS      648.91 seconds
-TestRunner: l2cap-tester      PASS      21.11 seconds
-TestRunner: bnep-tester       PASS      8.16 seconds
-TestRunner: mgmt-tester       PASS      128.88 seconds
-TestRunner: rfcomm-tester     PASS      12.28 seconds
-TestRunner: sco-tester        PASS      11.97 seconds
-TestRunner: smp-tester        PASS      11.86 seconds
-TestRunner: userchan-tester   PASS      8.47 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3186610675752153858==--
+-- 
+Luiz Augusto von Dentz
