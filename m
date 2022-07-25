@@ -2,108 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70DB2C43334
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 10:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA63C43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 20:51:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234610AbiGYKKY (ORCPT
+        id S237133AbiGYUu7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Jul 2022 06:10:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38054 "EHLO
+        Mon, 25 Jul 2022 16:50:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234786AbiGYKKC (ORCPT
+        with ESMTP id S232640AbiGYUu6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Jul 2022 06:10:02 -0400
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56C641836B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 03:09:58 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id l23so19669122ejr.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 03:09:58 -0700 (PDT)
+        Mon, 25 Jul 2022 16:50:58 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853F3140BD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 13:50:57 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id r142-20020a632b94000000b0041a18177a5dso5466266pgr.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jul 2022 13:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=sLw8Yfzm3c8kou871/a66dUzbZwPUL/eRicOlobjC40=;
-        b=rNPx12rA0JA1rhlipxU/3mPh+AskwJ44Bks9qWvCObOesppBf4cnHDrZ2h29VEONx7
-         MLC0UOa95uzVUTQu5eiflxrNjY7d4YVXKIvwT2IsnJo+6PrBHyak9XmDpC0Cvm/R/4o/
-         HCpIN5cvN+7uTri6ksW3XMcrgjLUmGFJjza/WPrMCSh8PTKJA8RotvW5rraIRFpUoDL2
-         +SKrKL1Hczv056hEIAgkBAB+BoCi9BnHvuxtecN8JAPYVzdnBdgKLEC3+rwPZnEMViMW
-         8qXn6rIkOTtiYzl1qUmIpX+wxAJCiwOjLwpfj1VlVFetFd/0dgA9oyFTiFm7HeAmlhM3
-         W76w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=1Za1Aa1XyejlriGsxVodfndQYPiCoycbGfY9ypYSrVk=;
+        b=WCjWFx92rpMcqBq+k47HLwVRSXboTSm3ylECC4lQ8uG8VugsZjAt8ZTygSLtkrtTw+
+         GUn12mwOjnk7iexUKu4lDqJGDE1MMRZ14RpZsnTY32JcJDWV2M1soLipxHmSyhBBx4Tg
+         hEFacU4wAzTwRUXfg5Ge0vYJalqQjMgMj0PfzCneZUhGct4pTkF38zDZBVJX7u2IxbfO
+         C4XsFNgFvbKxNuX6G8k1rtCntwBHrDXg6xrE5yUxWbVXDuwcpBSRbn6UhqkojYj2tbA+
+         vjj/rhDU/RrK318zoUQJpwBxoDrnkpXyBOT/AMoSTMJEsJ/u2EDFSANIl/39N51EkPLH
+         bRrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=sLw8Yfzm3c8kou871/a66dUzbZwPUL/eRicOlobjC40=;
-        b=6FCJoyFEf1c8Qo71C0k/THy/MUf44P8yNFjvzbYZt/wl7Cs88CizlGZPnZ05WrFNn1
-         757Ldl0Izf5ust2N/9DAPJIAPdx9I1lRYHQs0q4Zsyvl7FoGsX58oFg5emYV8xWRJynD
-         ja2F2YVLiCiSd2ueB8m81f4uPb4oeCPhbm7c55RC+yhOWzgH7bXGed2r7DLS9Cs+9E6I
-         FiJOvteYbCflmUjHQMt1h/f8HQTVvfPK+INGA0XSI7RkdYVMXixoQKmjAeP/HJm9esuM
-         xsSDPPHHjRevP/pLQoDk2GXaHFs0hhzmLIY+HwDCUyCINO61iY3TjxvuUD0+mc7dvlqY
-         XoZw==
-X-Gm-Message-State: AJIora/30nK/v+iKSPMTf22+IA+oaITz+XBBVawrs4gZZ/eaDRI/R7KO
-        j3l0lIQKZal7EJkfNaZxHR/VVQJjJevV/3JWBZSeCw==
-X-Google-Smtp-Source: AGRyM1v/DspXr7LSCx0zgVSUMOuoILyjQqe7u4bZntAclyVf6lbwv8tujUS1qi3NrDamF82/VHxr1m4z2orqDMaAHsY=
-X-Received: by 2002:a17:907:9606:b0:72f:826d:21b4 with SMTP id
- gb6-20020a170907960600b0072f826d21b4mr9600818ejc.510.1658743796375; Mon, 25
- Jul 2022 03:09:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220722182248.1.I20e96c839200bb75cd6af80384f16c8c01498f57@changeid>
- <CABBYNZ+k+ZOVNi+GYgdiK+B+tqKQXTWYp1QG4JSE_7EwZHNBMw@mail.gmail.com>
-In-Reply-To: <CABBYNZ+k+ZOVNi+GYgdiK+B+tqKQXTWYp1QG4JSE_7EwZHNBMw@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Mon, 25 Jul 2022 18:09:44 +0800
-Message-ID: <CAJQfnxFdnjHdPTdfgE+v=ero01H0dE6LsJ9z3K5LCZ28gogYtw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Use safe loop when adding accept list
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Zhengping Jiang <jiangzp@google.com>,
-        Michael Sun <michaelfsun@google.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=1Za1Aa1XyejlriGsxVodfndQYPiCoycbGfY9ypYSrVk=;
+        b=2lF1fi1UQXIP2R2pDdtKD0rQqsy2eVPn/rls2FEv7vgUeUWZhyHv4TTyEAnk1K72G/
+         zz72AoHNvp5f37qGLQj2oDbA8h5PfNLklC+mx6MqNsOA2Rv1KeVCub4kFfxCQ2h966Yc
+         nHZULa84aeZ9MFrAjZPIQskF4LrhwXGM7dGmgx01thXtjzR0U3VFmwsUjQgsK35xFHBn
+         17UyEH2NhoaoCex1p7KXdJPs8SQgWvYIkDvX20WQ8eCBjSpLts9/RZqPrvyeizAWLA9X
+         5GKIdvLhY60Bx3zWHGYHyEBC4NuQgV9zTNmCMHQLz1xqNauxDwh+0IAjqK73otj+tWS7
+         Pceg==
+X-Gm-Message-State: AJIora8fP4nFZ5ihgTlPtFWe7M2/DLArUqTZxpf09MxMBMsh7zRSH+PY
+        GcF5KaLCYcATkjsKZMdiQ5agzQikyV+ReYVfwv/pgQ==
+X-Google-Smtp-Source: AGRyM1u5w6mYXW8nAhYXzl2hi+FZuzSjQ9f1UdWsS8eXCiGWHFPrLpmxbhYNP8MbCxND8xggcBp+ZKXBE3KkCVt39U3WAA==
+X-Received: from abps.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:9b4])
+ (user=abhishekpandit job=sendgmr) by 2002:a05:6a00:892:b0:52b:c986:c781 with
+ SMTP id q18-20020a056a00089200b0052bc986c781mr14664144pfj.64.1658782257066;
+ Mon, 25 Jul 2022 13:50:57 -0700 (PDT)
+Date:   Mon, 25 Jul 2022 13:50:53 -0700
+Message-Id: <20220725135026.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.359.gd136c6c3e2-goog
+Subject: [PATCH] Bluetooth: Always set event mask on suspend
+From:   Abhishek Pandit-Subedi <abhishekpandit@google.com>
+To:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Eric and Luiz,
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
->  "the userspace can still remove devices" is a bit vague.
-I mean removing devices via MGMT command.
+When suspending, always set the event mask once disconnects are
+successful. Otherwise, if wakeup is disallowed, the event mask is not
+set before suspend continues and can result in an early wakeup.
 
-> It seems that the issue at hand is that hci_le_add_accept_list_sync() can
-> move the current item from  pend_le_conns / pend_le_reports lists ?
-The issue is, hci_le_add_accept_list_sync() is iterating the lists
-when the content is being removed elsewhere.
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
+Observed on ChromeOS as follows:
 
-> Hopefully these lists can not be changed by other threads while
-> hci_update_accept_list_sync() is running ?
-Probably. Looks like Luiz also thinks the same way.
+< HCI Command: Disconnect (0x01|0x0006) plen 3
+        Handle: 256
+        Reason: Remote Device Terminated due to Power Off (0x15)
+> HCI Event: Command Status (0x0f) plen 4
+      Disconnect (0x01|0x0006) ncmd 1
+        Status: Success (0x00)
+@ MGMT Event: Device Disconnected (0x000c) plen 8
+        BR/EDR Address: 04:52:C7:C3:65:B5 (Bose Corporation)
+        Reason: Connection terminated by local host for suspend (0x05)
+@ MGMT Event: Controller Suspended (0x002d) plen 1
+        Suspend state: Disconnected and not scanning (1)
+> HCI Event: Disconnect Complete (0x05) plen 4
+        Status: Success (0x00)
+        Handle: 256
+        Reason: Connection Terminated By Local Host (0x16)
 
-> Please add a Fixes: tag
-Unfortunately I don't know when this is introduced.
+The expectation is that we should see Set Event Mask before completing
+the suspend so that the `Disconnect Complete` doesn't wake us up.
 
-> Hmm if this happens it means other threads are actually interfering
-> with cmd_sync queue which is something that is probably a bug since
-> the whole point of cmd_sync is to serialize the commands making it
-> easier to do more complex state updates (such accept+resolve list
-> updates)
-Thanks, I haven't fully grasped the intention of having hci_sync and
-how to properly use it.
 
-> we could perhaps still apply this change as a workaround but
-> ultimately I think it would be better to add a mgmt-tester reproducing
-> the issue and have a proper fix of the code updating the list from a
-> different thread.
-Agree. Having said that, I don't think currently I have the time to
-invest in writing a test and a proper fix, so my apologies on this.
+ net/bluetooth/hci_sync.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Best,
-Archie
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 148ce629a59f..e6d804b82b67 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5297,6 +5297,9 @@ int hci_suspend_sync(struct hci_dev *hdev)
+ 		return err;
+ 	}
+ 
++	/* Update event mask so only the allowed event can wakeup the host */
++	hci_set_event_mask_sync(hdev);
++
+ 	/* Only configure accept list if disconnect succeeded and wake
+ 	 * isn't being prevented.
+ 	 */
+@@ -5308,9 +5311,6 @@ int hci_suspend_sync(struct hci_dev *hdev)
+ 	/* Unpause to take care of updating scanning params */
+ 	hdev->scanning_paused = false;
+ 
+-	/* Update event mask so only the allowed event can wakeup the host */
+-	hci_set_event_mask_sync(hdev);
+-
+ 	/* Enable event filter for paired devices */
+ 	hci_update_event_filter_sync(hdev);
+ 
+-- 
+2.37.1.359.gd136c6c3e2-goog
+
