@@ -2,113 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8933BCCA473
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 05:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55AFEC43334
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jul 2022 06:19:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229694AbiGYFvH (ORCPT
+        id S230176AbiGYGTj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Jul 2022 01:51:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34290 "EHLO
+        Mon, 25 Jul 2022 02:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbiGYFvG (ORCPT
+        with ESMTP id S230058AbiGYGTg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Jul 2022 01:51:06 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E35332DC1;
-        Sun, 24 Jul 2022 22:51:02 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 4F6275C0092;
-        Mon, 25 Jul 2022 01:51:02 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Mon, 25 Jul 2022 01:51:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sholland.org; h=
-        cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
-        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
-         s=fm1; t=1658728262; x=1658814662; bh=69zKIkJkrsurUh1tsYk3dVN3W
-        f+GthColtIIHhnoVFs=; b=Jd2BhkQLuYEXV0dbJW09eooHfpL/3DTknKNft6aW8
-        /UoH9TF5FwzdRxntrJ4eq0jBybQMro1Xp7xYFDwExhKaF2eVIVv2Y5dh9W9A4/rD
-        CGphoewDJ+mSpz0S+TqOH6ptObLPHKp4OSplOaZOLmyi47Tw+WUiYAp5w6ZPxT9u
-        3Uj2+ahuPhV+O3kyDvpXQFy1r/deso4M78Wls+4A3KcfbNE1LCQTKto96/mYcIT9
-        Dm/qFp5mWYLDbuIef456VixJaVU0cvODaJa/ppYvrarJ+Z5wntJAvElEcCQd+QZZ
-        7akM3ZzkFITI7iTdFMUwyu+DWnBnWtQT769J13+iMOEUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-        1658728262; x=1658814662; bh=69zKIkJkrsurUh1tsYk3dVN3Wf+GthColtI
-        IHhnoVFs=; b=Wk6sJDgBtmqRlExCsXsgznTMJCsHD0VBzH5mvl79QIaCmcj2dUu
-        nOZleopxLVZkCq8qRELUYGbbmULaxPGtAUiIkTWOkUp93Kn0M1DJCXWiZ4pG/wmN
-        nFH7Og/uH0O3C8TR8Jd49/IurERzBKh39x5HdInqsoA6PDEWxY4tj34dWp3gbm1l
-        g3gkwtOWZQi6OrxEUFr1x9goZ3KNbTEa5PcvkkbD+Xv3zOkeewkQ+vySqjz51WSw
-        gSqAr61cFihUQNsvoV7Dh0gYJQQLD/DhNz7WfUzPUDaStiUnvd3l5sqIOIyVzS8g
-        1viZB9ocREVN18cnmKvmdHJVKxyXvFpTQmw==
-X-ME-Sender: <xms:RS_eYoVkzjUt_GHFdQPdAyZtrcMUrAahpX2A47MKXGH6eG3fPwLLVw>
-    <xme:RS_eYslmwp9AzAA5CPirsSltbtRgVD3XoILvYpBWHpAMcyX_rSJUL_aSIfIG2QJun
-    cu93oAFCLeo2gePFA>
-X-ME-Received: <xmr:RS_eYsaxyrRMHdr3H-uLrqlnrAZhP4c9pRK_T2GYgiJ7HwdIhOtUudiJ6RGaEg61ja0Eg-rJkKdXu_rXjlN4yVM13GlmH_x_c8cbQAY3wB73N_sU5ARL4T6yLhzXIvqmlYgm1A>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvddtjedguddtvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefurghmuhgv
-    lhcujfholhhlrghnugcuoehsrghmuhgvlhesshhhohhllhgrnhgurdhorhhgqeenucggtf
-    frrghtthgvrhhnpeekveelhfejueelleetvdejvdeffeetgeelheeujeffhefgffefkeeh
-    hffhkeekgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsrghmuhgvlhesshhhohhllhgrnhgurdhorhhg
-X-ME-Proxy: <xmx:RS_eYnUBcfFBXn3abAB6imnMMuNEMlR3Sc97t95_A0IaQZ0diWsSYw>
-    <xmx:RS_eYimBjF5mM9jnGzLODa5MSGQa3Ls4c54CP5NmN6fEz-F6YZGxrw>
-    <xmx:RS_eYsdwkJ47XWrnCSWmZqbbXaQqvpiVmqBuF87DW5GnpS5Sf9OvQw>
-    <xmx:Ri_eYn83IMOQALPn13Oluk9lAzyQVS0YfVOWgMeRmF71ZxTTcOzcGQ>
-Feedback-ID: i0ad843c9:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 25 Jul 2022 01:51:00 -0400 (EDT)
-From:   Samuel Holland <samuel@sholland.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Samuel Holland <samuel@sholland.org>,
-        Alistair Francis <alistair@alistair23.me>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH] dt-bindings: net: bluetooth: realtek: Add RTL8723DS
-Date:   Mon, 25 Jul 2022 00:50:59 -0500
-Message-Id: <20220725055059.57498-1-samuel@sholland.org>
-X-Mailer: git-send-email 2.35.1
+        Mon, 25 Jul 2022 02:19:36 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A458DFEC
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jul 2022 23:19:35 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id c24so7933338qkm.4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jul 2022 23:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=NdOnNWI+/Gyb0+2RaKoPujjuby3km/m/DDadh54u8go=;
+        b=ZlxDBf19mxN76nDUMaFKyfLOJVarojrvjV1lXAYvn8JAMPAw4OrfhnSyzJ3TWOF+Ss
+         jr3+UFOjfdPvLJQoG/+w6PLXgfgQ8hS1arvBaecI8tq7RN0Fhvrt0mfU7m+omUaKs5Ls
+         DYA4dRPzN4tAvQCrF69xb7gN6Fwhckv7XDHOWi7iTVS9pVjRusrw/e3nlOeIfE8EweQ4
+         9B32KyOy/9YZirgWGWuEp3jg41GCAetplmkXxfTtXoJOzbN+bMSvB9+YnNIgLw1/FUuY
+         Ac2nfOl8FdORO8sf14KhlKTCm1ko/BgU/h/jlVQpbCoQvH4/EuvQH4ejSNhacgjecCsz
+         gAFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=NdOnNWI+/Gyb0+2RaKoPujjuby3km/m/DDadh54u8go=;
+        b=E+im1PqU0goo5XMWdm8kb0rTHJj+zlOz72z63NoCDs6vr+46F30Ui43NjYbFxCJjzy
+         CsrVcI1kqjd4RMAV9A104npmk6mAQELVoVnz+pKAPpqd/RqPR5IY5V/a5FktG6xQbEXl
+         3dnVcyN28L8LnOKjKTQYlHjxd1+p9F/Kd2+HhDB1itomAdDWwauQSvxycyDzMtbimps0
+         cgfa0yCXOXvfhfKwwn4P7v5ur1o5iJUwr7ja0wyf64rL2ZQeUoey7RKAmgNwiVMoHqa1
+         ZQ4tjgnYIDIjLAM9aNkzM+piF/JEIQapQ4l2IXZdYB29Yd7duMwou8kfCyRt9A2niC3q
+         yVTg==
+X-Gm-Message-State: AJIora8GZJsUDcJuPENtJtN55qrg/2d2Rh0M5f11YdDO/BvOKMtyfuS5
+        tjT1bl1DVVQZiQeB95kNt08hs0t0bcM=
+X-Google-Smtp-Source: AGRyM1vRvGHi5Tt+fTdZFfGnOr/QsgVxgMPpdJusDsyOoEEvxNZs9l6GQusiRED6Y4Mzoq+rDW1hhg==
+X-Received: by 2002:ae9:e313:0:b0:6b5:e41b:64fe with SMTP id v19-20020ae9e313000000b006b5e41b64femr7951549qkf.323.1658729974185;
+        Sun, 24 Jul 2022 23:19:34 -0700 (PDT)
+Received: from [172.17.0.2] ([20.7.184.40])
+        by smtp.gmail.com with ESMTPSA id ec5-20020a05620a484500b006b61bf3153bsm6594461qkb.112.2022.07.24.23.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Jul 2022 23:19:33 -0700 (PDT)
+Message-ID: <62de35f5.1c69fb81.71e58.ee67@mx.google.com>
+Date:   Sun, 24 Jul 2022 23:19:33 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0234323810395036346=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, samuel@sholland.org
+Subject: RE: dt-bindings: net: bluetooth: realtek: Add RTL8723DS
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220725055059.57498-1-samuel@sholland.org>
+References: <20220725055059.57498-1-samuel@sholland.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RTL8723DS is another version of the RTL8723 WiFi + Bluetooth chip. It is
-already supported by the hci_uart/btrtl driver. Document the compatible.
+--===============0234323810395036346==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Samuel Holland <samuel@sholland.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=662655
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.85 seconds
+GitLint                       PASS      1.03 seconds
+SubjectPrefix                 FAIL      0.85 seconds
+BuildKernel                   PASS      37.79 seconds
+BuildKernel32                 PASS      33.93 seconds
+Incremental Build with patchesPASS      53.12 seconds
+TestRunner: Setup             PASS      564.78 seconds
+TestRunner: l2cap-tester      PASS      17.91 seconds
+TestRunner: bnep-tester       PASS      6.67 seconds
+TestRunner: mgmt-tester       PASS      105.07 seconds
+TestRunner: rfcomm-tester     PASS      10.16 seconds
+TestRunner: sco-tester        PASS      9.92 seconds
+TestRunner: smp-tester        PASS      9.87 seconds
+TestRunner: userchan-tester   PASS      6.98 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.85 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- Documentation/devicetree/bindings/net/realtek-bluetooth.yaml | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-index 157d606bf9cb..8ac633b7e917 100644
---- a/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/realtek-bluetooth.yaml
-@@ -20,6 +20,7 @@ properties:
-     enum:
-       - realtek,rtl8723bs-bt
-       - realtek,rtl8723cs-bt
-+      - realtek,rtl8723ds-bt
-       - realtek,rtl8822cs-bt
- 
-   device-wake-gpios:
--- 
-2.35.1
-
+--===============0234323810395036346==--
