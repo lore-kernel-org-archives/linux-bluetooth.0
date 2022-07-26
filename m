@@ -2,95 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7053DC00140
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jul 2022 18:58:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563BAC00144
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jul 2022 22:05:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239739AbiGZS6R (ORCPT
+        id S239581AbiGZWFg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jul 2022 14:58:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38446 "EHLO
+        Tue, 26 Jul 2022 18:05:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231810AbiGZS6Q (ORCPT
+        with ESMTP id S229550AbiGZWFf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jul 2022 14:58:16 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B9A326CA;
-        Tue, 26 Jul 2022 11:58:15 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id oy13so27807404ejb.1;
-        Tue, 26 Jul 2022 11:58:15 -0700 (PDT)
+        Tue, 26 Jul 2022 18:05:35 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B688FD11A;
+        Tue, 26 Jul 2022 15:05:33 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id e15so19289646edj.2;
+        Tue, 26 Jul 2022 15:05:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NpCxpmlQCyedzlNasXRk3F6fZpn0WKk2SVo9s1oYm6s=;
-        b=Xu7vR+/HKrmKn7M7OhSBw+AcEeonFYetINX54aNyXSoWWONG5LtW2kGte7JsRv89i2
-         0AIMTVY6zDCiNd/KZGPdKQnirToJKaKalj1us/Mf5qg6SGp+aECDX/QPlKvwqF/eYoK9
-         6s6puNea3dFjUCR4FCoqnqXO3rOv+Q/WFPAiynaO9Re4HsuDU6Wt9MekXaQt/nOySSig
-         4q2cnz3G0tDEHOXSFzH1QUB/dV5G7KiVgcxOabAn7zWKnQBZoXFec5JhCzDd4x0RB/bc
-         +XcLRI1gqXoIULYZ3jCXuRNN/aCVTjBRmVL2K8wxJbYFSA1OZepMNsmTyfXnVMQgLZES
-         EUgQ==
+        bh=eQt6/BLDfWWoSEvNSqGD+0elD2uRjzfpfOppU3TGo8Y=;
+        b=i/8GQGGCMNRAPffqp6/BlozDKMEpjmjhBbqc5gDRq4i/u14B83GmAsSqZ03F6mh8wI
+         uh5QOq8S2veK4Tf/0u4sl7xMXaSwZEz1XZSaVui+eVxvNtGOeF3H0dYhiJ4sbQnkY1JS
+         75VAknKS82mUkxDjBmqp1tS4vZKTw79Me9KoNs0DZo+IEyI3QdgB7INIhD+SrUH8Msv0
+         izxL2UJqsg9ibXzrvoyNLWijKlJmsvkSICy1Bdzjke5N8pqlipjBYMpvE6leVb53CEQc
+         NQj+XLMRpMXWYpbekaibZX07kV0RTHITPFJBHDTGkRJhUDnw6r6+zsS8A3DO0vWv4sC2
+         RLJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NpCxpmlQCyedzlNasXRk3F6fZpn0WKk2SVo9s1oYm6s=;
-        b=pIag0VBFeB5NzB7EGO2d+cs3dOWOHXlT7/SfB36cQ3uZHZZ+Xwe4FiUlY+jH0dCEZD
-         qNnxIq8sk6Mn85sdJlrB0A+NGuprtkRdna7tz57YH0uo6fIXcZkzunY7OqRaB1gsuMGS
-         orRYHZBU6na6fxdjNRZBASxXtFE/45a8J+kRSHjaSH+QkvIuXnK3l7Gi4x3PpSy2AduN
-         EwEuoc98WTWSAt1Og5CMvyqQl/SpHT15ZUsL+Q2QQi5QFOfVhT1+zkBWcHYYtzHlfHDk
-         Zq9mWzBz6HqxPpli/UtHNkG33thnkS9eCmL6mV7lk0UAze6Wt5oiWzRaB8twEMiU5aS0
-         Pxow==
-X-Gm-Message-State: AJIora8ntFs2jI2xmLmWOTPnUHI293PsSylJHhetuRWJ0Pof5XlVYw7c
-        Odej/lo6938x3JCFdvm0/rHkcSA4k7jCMw/6Fh8=
-X-Google-Smtp-Source: AGRyM1sU42+OzTG9svgkqIEbnaGqkvaxb2LXaphAFSmXNb23CBIvyWek8GCjWmfTm+qhid3kWEd5ZKoIcpI+QeDw/0Q=
-X-Received: by 2002:a17:907:7255:b0:72b:50b8:82d6 with SMTP id
- ds21-20020a170907725500b0072b50b882d6mr15682244ejc.677.1658861893692; Tue, 26
- Jul 2022 11:58:13 -0700 (PDT)
+        bh=eQt6/BLDfWWoSEvNSqGD+0elD2uRjzfpfOppU3TGo8Y=;
+        b=b6RTAkAAkrOj0Fryia1VFg/TiEYuFnVBIf+7m8poG472HbZ2LUS44ucP4DctZCCjFp
+         TIVi5ZVFBJ0QGUb1LnHe12VChrGGruRIdjPZAZVxkGx2nZSnarO/znC0/G09Rh+2wP2h
+         eotjE9yU7Q3LdV8xmz2Jsbkv5mtQK0dPItmJJ3Ctgnt0pt7pK+WuSjhG82KjVsEZNZok
+         Fh6vk7UMfkZgm+cYMpEblIccRfueL9jIto6qeqtUhrwZiXfVAiw/Rt9iv5JOb3kFgdth
+         /sNNPTbN5zu14Y+S5EPcXYjkAGCxFiyq/WaDChnNAqhWT1u7KwRgKFMhE5AzlaHQMPnR
+         bwiA==
+X-Gm-Message-State: AJIora/WnCSMo4eAsR+/K5VpQtB7GHrVUb4oCtIkwHMCi7lv+lofb8jc
+        M7LHF3eBfuieM87F1+MKQRw9290w06HyrvJ0HGE=
+X-Google-Smtp-Source: AGRyM1sm7m7c6x9uLm36/c49v1qQ8S0NMAKm+pPDKtz5n0rkLowtN7RSJbgIthQckShS5A1Bgttwh+SbY7pngcYNb2I=
+X-Received: by 2002:a05:6402:5412:b0:435:5997:ccb5 with SMTP id
+ ev18-20020a056402541200b004355997ccb5mr19303029edb.167.1658873130692; Tue, 26
+ Jul 2022 15:05:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220724212639.29269-1-ismael@iodev.co.uk>
-In-Reply-To: <20220724212639.29269-1-ismael@iodev.co.uk>
+References: <20220722205400.847019-1-luiz.dentz@gmail.com> <20220722165510.191fad93@kernel.org>
+ <CABBYNZLj2z_81p=q0iSxEBgVW_L3dw8UKGwQKOEDj9fgDLYJ0g@mail.gmail.com>
+ <20220722171919.04493224@kernel.org> <CABBYNZJ5-yPzxd0mo4E+wXuEwo1my+iaiW8YOwYP05Uhmtd98Q@mail.gmail.com>
+ <20220722175003.5d4ba0e0@kernel.org>
+In-Reply-To: <20220722175003.5d4ba0e0@kernel.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 26 Jul 2022 11:58:02 -0700
-Message-ID: <CABBYNZ+jim_8KZT-2-9egsCyo9JV26F2A7Ymr=T5tBRVwAd8DQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Fix opcode format in debug message
-To:     Ismael Luceno <ismael@iodev.co.uk>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+Date:   Tue, 26 Jul 2022 15:05:17 -0700
+Message-ID: <CABBYNZ+74ndrzdx=4dGLE6oQbZ2w6SGnUGeS0OSqH6EnND4qJw@mail.gmail.com>
+Subject: Re: pull request: bluetooth-next 2022-07-22
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     David Miller <davem@davemloft.net>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ismael,
+Hi Jakub,
 
-On Sun, Jul 24, 2022 at 2:26 PM Ismael Luceno <ismael@iodev.co.uk> wrote:
+On Fri, Jul 22, 2022 at 5:50 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Fri, 22 Jul 2022 17:25:57 -0700 Luiz Augusto von Dentz wrote:
+> > > > Crap, let me fix them.
+> > >
+> > > Do you mean i should hold off with pushing or you'll follow up?
+> >
+> > Ive just fixup the original patch that introduced it, btw how do you
+> > run sparse to capture such errors?
+>
+> We run builds with W=1 C=1 in the CI and then diff the outputs.
+> That's pretty noisy so we have a regex which counts number of
+> warnings per file, that makes it possible to locate the exact new
+> warning. At least most of the time...
 
-Add some description, perhaps the debug output before and after the changes.
+Hmm, is there any way to trigger net CI, either that or we need to
+duplicate the same test under our CI to avoid these last minute
+findings when we are attempting to merge something.
 
-> Signed-off-by: Ismael Luceno <ismael@iodev.co.uk>
-> ---
->  net/bluetooth/hci_sync.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > Yep, that happens when I rebase on top of net-next so I would have to
+> > > > redo all the Signed-off-by lines if the patches were originally
+> > > > applied by Marcel, at least I don't know of any option to keep the
+> > > > original committer while rebasing?
+> > >
+> > > I think the most common way is to avoid rebasing. Do you rebase to get
+> > > rid of revised patches or such?
+> >
+> > So we don't need to rebase?
 >
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 351c2390164d..d86d819465e8 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -150,7 +150,7 @@
->         struct sk_buff *skb;
->         int err = 0;
+> No, not usually. After we pull from you, you should pull back from us
+> (git pull --ff-only $net-or-net-next depending on the tree you
+> targeted), and that's it. The only patches that go into your tree then
+> are bluetooth patches, everything else is fed via pulling back from us.
 >
-> -       bt_dev_dbg(hdev, "Opcode 0x%4x", opcode);
-> +       bt_dev_dbg(hdev, "Opcode 0x%04x", opcode);
+> > There were some patches already applied via bluetooth.git so at least
+> > I do it to remove them
 >
->         hci_req_init(&req, hdev);
->
-> --
-> 2.36.0
->
+> Normally you'd not apply bluetooth fixes to bluetooth-next, apply
+> them to bluetooth and send us a PR. Then once a week we'll merge
+> net (containing your fixes) into net-next, at which point you can
+> send a bluetooth-next PR and get the fixes into bluetooth-next.
+> FWIW from our perspective there's no limit on how often you send PRs.
 
+Are you saying we should be using merge commits instead of rebase then?
+
+> Alternatively you could apply the fixes into bluetooth and then
+> merge bluetooth into bluetooth-next. If you never rebase either tree,
+> git will be able to figure out that it's the same commit hash even if
+> it makes it to the tree twice (once thru direct merge and once via
+> net). That said, I believe Linus does not like cross tree merges, i.e.
+> merges which are not fast forwards to the downstream tree. So it's
+> better to take the long road via bt ->  net -> net-next -> bt-next.
+
+Well I got the impression that merge commits shall be avoided, but
+rebase overwrites the committer, so the two option seem to have
+drawbacks, well we can just resign on rebase as well provided git
+doesn't duplicate Signed-off-by if I use something like exec="git
+commit -s --amend".
+
+> > and any possible conflicts if there were
+> > changes introduced to the bluetooth directories that can eventually
+> > come from some other tree.
+>
+> Conflicts are not a worry, just let us know in the PR description how
+> to resolve them.
+
+Not really following, how can we anticipate a merge conflict if we
+don't rebase? With merge strategy it seem that the one pulling needs
+to resolve the conflicts rather than the submitter which I think would
+lead to bad interaction between subsystems, expect if we do a merge
+[-> resolve conflict] -> pull request -> [resolve conflicts ->] merge
+which sounds a little too complicated since we have to resolve
+conflicts in both directions.
+
+In my opinion rebase strategy is cleaner and is what we recommend for
+possible clones of bluetooth-next and bluetooth trees including CI so
+possible conflicts are fixed in place rather on the time the trees are
+merged.
 
 -- 
 Luiz Augusto von Dentz
