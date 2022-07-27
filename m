@@ -2,128 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6195FC04A68
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 19:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF288C19F29
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 19:51:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237134AbiG0TWH (ORCPT
+        id S231496AbiG0Tvr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jul 2022 15:22:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41582 "EHLO
+        Wed, 27 Jul 2022 15:51:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231382AbiG0TVh (ORCPT
+        with ESMTP id S229898AbiG0Tvp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jul 2022 15:21:37 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E71EB12A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 12:19:34 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id z1-20020a6b6501000000b0067c6495c03dso6080220iob.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 12:19:34 -0700 (PDT)
+        Wed, 27 Jul 2022 15:51:45 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC1D56BB8;
+        Wed, 27 Jul 2022 12:51:44 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id ss3so33237445ejc.11;
+        Wed, 27 Jul 2022 12:51:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hfdYfW+eLA7FgQQsAh15YN9rCKIS6IXGot7C5LjHDn4=;
+        b=BCz9kQjvyZHZawq3s69SRwOJmd1O1vpBZ9ktgivhTgBA8RPSKJOOpqXo2WVkuy58CN
+         l6GunFUUUTkt3Yp6XK8pg5IJjSdymnCKlVk5pTaaffC1yn5GwBHqk1zK42bMDl5w3YFi
+         26AU4n9nT16W0q2fucH5qmE7+KG/aMChB5OHhgPyXpibjBTZ+12rrNWtI4CAEIidCphh
+         Z2gqMBqguN1F202dQ/QZHk6qaYVlgHtRs3VYu1gachSG8hqoYWUKnBo3YC0qClfB5SFL
+         wgpDCrhYKKxYi8zbJ8X69DeRnHrz3pfE8uwR+TlD3YdzUoISzAKasbV5cbt/nOJluaWe
+         fsuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=o43XWvJVL8LwKlq5bumFX0EQAFLVg3mZ27QbfKs8DQc=;
-        b=Yga5lYRUF/BXp/qwPk7Kx567Lx0voMQQe+ZqBG0djrrMSmv/v6q5ZeTWfL4AozsLRP
-         ELvf6MwMFppWyXw+5szP0YkzPfnbjRTPVOA8gArfKnoBD3lv17/qTqXElwPak2K6rg0D
-         Cdz0ygK2H8+BZ6WwHc7fqQs+GqrL73smgvIhQHDH/fToIm7rttq9Ur8ee6C8DiuuBxhs
-         fxCo9YAT9q2iqFnyaWTsBcoOu/xei/uhQ72rcVa65Fz02FGKocrCAOqdSKiUjDZ7cnNT
-         mf45G0fpg01KLZIahVxSDhPa6NAgU7Bv42GL2ZRyjDEsEkwAIzdqpDD3+ok8qYsyNrGn
-         DKEA==
-X-Gm-Message-State: AJIora9d1rDmkNO4gpxmPj0me5tRYNqf3iFDZY5EUqqJtOq3uYS/keb/
-        ZKT+VjwvAoZil+x2/OVKL5iEsmVGsA/rTvtho2NIMOx6FF4M
-X-Google-Smtp-Source: AGRyM1v5uCM0Wuc6zGYRo8FNpjNaavvdu4uhgQHYq5S/47WubisEac7MsJsjRlNCKDbzhQfhRVrcKH5YkA5hR+OgRgueFTZAgP4P
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hfdYfW+eLA7FgQQsAh15YN9rCKIS6IXGot7C5LjHDn4=;
+        b=ff1vHWdXz2cig0TIbOfjGr3jiCH+vRO23S/TFdvZIrRtyomYU85ZhPjAzbCU2xQh+I
+         tR1WtG0mA6oBZtImaMJCgkmKXQJpBx2d1WOWZGqmKQ/gohUOo+umE+YluYiqUsS1699z
+         s8P0P/ox7KobhKrk/O14NrHb+fuuv3zA4rtRpL0rf6jO3rjgAvjgF+j5+PzdJ5SGL9lM
+         dxpUq7poaD28qvKx3FoF5lt7kqiZu/8MD8wdpw6N5fBuHGg8kQh1xDDFpnMLCGezPTzV
+         dV5qfQhfBbRQqVrPSf57FdqZveFos6i5a1AZ9TLR7/ndudWcZ7tA0PC1UwsWbO3SVriX
+         UaKQ==
+X-Gm-Message-State: AJIora8xwAK9SzCNo51DdIUAi6+q7n/KKCvvUn7+BTvbI+23qavtljNC
+        XZzXVWt6EqufzbvCGH/USwEm/qjOG+WK5Ae3NdKAADbL+dUw0Q==
+X-Google-Smtp-Source: AGRyM1sJzG4h98xoiCI9QQECHrkP65HPdlCL1385J1vvnBs9s0XVDa4Iosdl0OTUSZzLrzDbB39TPurjUM6eZ4mmQMo=
+X-Received: by 2002:a17:907:a40d:b0:72b:7f56:650 with SMTP id
+ sg13-20020a170907a40d00b0072b7f560650mr18592955ejc.132.1658951502443; Wed, 27
+ Jul 2022 12:51:42 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a02:970a:0:b0:33f:42a8:a63f with SMTP id
- x10-20020a02970a000000b0033f42a8a63fmr9638103jai.115.1658949572807; Wed, 27
- Jul 2022 12:19:32 -0700 (PDT)
-Date:   Wed, 27 Jul 2022 12:19:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000fcd12c05e4ce4bde@google.com>
-Subject: [syzbot] bpf-next test error: WARNING: ODEBUG bug in mgmt_index_removed
-From:   syzbot <syzbot+1f966ab7943f7bc5441a@syzkaller.appspotmail.com>
-To:     ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-        edumazet@google.com, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+References: <YuEq2Aey0VOrxPB+@kili> <YuErMEjse5lgAMO3@kili>
+In-Reply-To: <YuErMEjse5lgAMO3@kili>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 27 Jul 2022 12:51:30 -0700
+Message-ID: <CABBYNZ+bdU4sVjbQfOHtz5P7X+BkZj2DG6f3hNJzdjx+DSVtGw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] Bluetooth: ISO: fix info leak in iso_sock_getsockopt()
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi Dan,
 
-syzbot found the following issue on:
+On Wed, Jul 27, 2022 at 5:10 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> The "qos" struct has holes after the in and out struct members.  Zero
+> out those holes to prevent leaking stack information.
+>
+> The C standard rules for when struct holes are zeroed out are slightly
+> weird.  The existing assignments might initialize everything, but GCC
+> is allowed to (and does sometimes) leave the struct holes uninitialized.
+> However, when you have a struct initializer that doesn't initialize
+> every member then the holes must be zeroed.
+>
+> Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>  net/bluetooth/iso.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+> index 19d003727b50..c982087d3b52 100644
+> --- a/net/bluetooth/iso.c
+> +++ b/net/bluetooth/iso.c
+> @@ -1235,7 +1235,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+>  {
+>         struct sock *sk = sock->sk;
+>         int len, err = 0;
+> -       struct bt_iso_qos qos;
+> +       struct bt_iso_qos qos = {}; /* zero out struct holes */
+>         u8 base_len;
+>         u8 *base;
+>
+> --
+> 2.35.1
 
-HEAD commit:    40b09653b197 selftests/bpf: Adjust vmtest.sh to use local ..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1283ab26080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c904647431ba900b
-dashboard link: https://syzkaller.appspot.com/bug?extid=1f966ab7943f7bc5441a
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Interesting, did you get a report from static analyzer or something?
+The variable gets assigned in the code below which has the exact same
+size thus I don't see how it would leave anything uninitialized:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1f966ab7943f7bc5441a@syzkaller.appspotmail.com
+        if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
+            qos = iso_pi(sk)->conn->hcon->iso_qos;
+        else
+            qos = iso_pi(sk)->qos;
 
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 0 PID: 3608 at lib/debugobjects.c:502 debug_print_object+0x16e/0x250 lib/debugobjects.c:502
-Modules linked in:
-CPU: 0 PID: 3608 Comm: syz-executor.0 Not tainted 5.19.0-rc7-syzkaller-01906-g40b09653b197 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/29/2022
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:502
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 60 88 28 8a 4c 89 ee 48 c7 c7 40 7c 28 8a e8 de 95 36 05 <0f> 0b 83 05 55 ac bb 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc9000397f6e0 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: ffff888021ea0000 RSI: ffffffff8160d9c8 RDI: fffff5200072fece
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 0000000000000001 R12: ffffffff89ced480
-R13: ffffffff8a2882c0 R14: ffffffff8169b640 R15: 1ffff9200072fee7
-FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000c000335010 CR3: 000000001ca55000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init lib/debugobjects.c:892 [inline]
- debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:863
- debug_timer_assert_init kernel/time/timer.c:792 [inline]
- debug_assert_init kernel/time/timer.c:837 [inline]
- del_timer+0x6d/0x110 kernel/time/timer.c:1257
- try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1275
- __cancel_work_timer+0xa6/0x570 kernel/workqueue.c:3121
- mgmt_index_removed+0x187/0x2e0 net/bluetooth/mgmt.c:8940
- hci_unregister_dev+0x467/0x550 net/bluetooth/hci_core.c:2688
- vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
- __fput+0x277/0x9d0 fs/file_table.c:317
- task_work_run+0xdd/0x1a0 kernel/task_work.c:177
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xade/0x29d0 kernel/exit.c:795
- do_group_exit+0xd2/0x2f0 kernel/exit.c:925
- get_signal+0x2542/0x2600 kernel/signal.c:2857
- arch_do_signal_or_restart+0x82/0x2300 arch/x86/kernel/signal.c:869
- exit_to_user_mode_loop kernel/entry/common.c:166 [inline]
- exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:201
- __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
- syscall_exit_to_user_mode+0x19/0x50 kernel/entry/common.c:294
- do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f4086088b77
-Code: Unable to access opcode bytes at RIP 0x7f4086088b4d.
-RSP: 002b:00007fffcc0f9c08 EFLAGS: 00000207 ORIG_RAX: 0000000000000107
-RAX: 0000000000000000 RBX: 0000000000000065 RCX: 00007f4086088b77
-RDX: 0000000000000200 RSI: 00007fffcc0fad90 RDI: 00000000ffffff9c
-RBP: 00007fffcc0f9cd0 R08: 0000000000000000 R09: 00007fffcc0f9aa0
-R10: 0000555556a578e3 R11: 0000000000000207 R12: 00007f40860e22a6
-R13: 00007fffcc0fad90 R14: 0000555556a57810 R15: 00007fffcc0fadd0
- </TASK>
+Well perhaps it would have been better to use a pointer though so we
+don't have to copy anything:
 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index ff09c353e64e..0e4ec46ef273 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1233,7 +1233,7 @@ static int iso_sock_getsockopt(struct socket
+*sock, int level, int optname,
+ {
+        struct sock *sk = sock->sk;
+        int len, err = 0;
+-       struct bt_iso_qos qos;
++       struct bt_iso_qos *qos;
+        u8 base_len;
+        u8 *base;
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+@@ -1259,12 +1259,12 @@ static int iso_sock_getsockopt(struct socket
+*sock, int level, int optname,
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+        case BT_ISO_QOS:
+                if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
+-                       qos = iso_pi(sk)->conn->hcon->iso_qos;
++                       qos = &iso_pi(sk)->conn->hcon->iso_qos;
+                else
+-                       qos = iso_pi(sk)->qos;
++                       qos = &iso_pi(sk)->qos;
+
+                len = min_t(unsigned int, len, sizeof(qos));
+-               if (copy_to_user(optval, (char *)&qos, len))
++               if (copy_to_user(optval, (char *)qos, len))
+                        err = -EFAULT;
+
+                break;
+
+-- 
+Luiz Augusto von Dentz
