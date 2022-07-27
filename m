@@ -2,171 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32713C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 12:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0670C04A68
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 13:27:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232733AbiG0MKp (ORCPT
+        id S233730AbiG0N12 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jul 2022 08:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
+        Wed, 27 Jul 2022 09:27:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232160AbiG0MKm (ORCPT
+        with ESMTP id S232453AbiG0N11 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jul 2022 08:10:42 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612A323BCE;
-        Wed, 27 Jul 2022 05:10:39 -0700 (PDT)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 26RAA2LY010359;
-        Wed, 27 Jul 2022 12:10:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : content-type : in-reply-to : mime-version;
- s=corp-2022-7-12; bh=qwufezThziH4vemZu2PBSKmMwCVobasDhEymouxYAbk=;
- b=Wp8jbX5yEe/yVt3PZz3ftw0N0REii80WNTNR4Pss0u9zFex5M1reUA/OFbyl/Q57saeA
- 5AvfsWOTq7ACUQH1UFqK8W3wKlHJV3qH3lVZfTbHzJHgCLgE76Zw9Nx91mskT56J9aRF
- i2CVDFHta5h/+NkgkzDClVVUptIXVnhPhA9DInUP14xQ5c8V8Cn+qhXYAboFPj5AxA7N
- FWMnvyn6aXtmaU/4lJAuDriLoSaL1YcurUhckuqMhHjFiTRpH4DJK4qauqB1edva3KXg
- guvAE/de1i02uEzPNqksPHRoa5Tu/WB4DLaezeHwTB42yQYSyvqmOKsidSS+qcQS01Nz TA== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3hg9a9hcm5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Jul 2022 12:10:36 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 26RAhL5h034503;
-        Wed, 27 Jul 2022 12:10:35 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2046.outbound.protection.outlook.com [104.47.66.46])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3hh6346ttq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Jul 2022 12:10:35 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ENwiLcDGJivFXrRyf1tVfgyPPIn22QMZDyt2vprcXxoIWjcWnz4ohFIjkYr/We6nS6TYElRQbxjYR0B+Ve1hj2XU2k1L5D8/TKP7QUX1oZSn3GeZmShSWbfIhndoyFG2KgIT6PRZkA5GWRYMUuJmtak1QKAiHK4xUdmABynKYYKAJiWOLC05QdrjYWLrkcriO+lBFKLqdAbDbS+qSztGDitXlAeoNEIX4tEAiQYLbI/DZ0ckpZKyNbp0EF4tkkfxo2h7Sor41YjwXiUDZ+86sqvQ2YkgkU4J/6rACGcLqkdbvkUIXLl/cnsFGTG/xiNyK5l4IhSA3bmniwM8KkqGFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qwufezThziH4vemZu2PBSKmMwCVobasDhEymouxYAbk=;
- b=NSWZXRrjl4ixWvHyZsRcN4y/dPoX4lfGuwdmolctb7xfDHiJqqW0RJZJJH2FwmzFVRJgTbd0K4eaxFuHkvv0yx7RI/KTaz11NZbzwmrJFhm01Rh/1WNSsj2uDrg/Tny8nO6TMwPyGRE283MpDYYAWyGVYhPhJLEjRel0vBU7RJsADnaRrw+QMqmVyGWt3yadU6GJFtTBfG4APnLdXUpdZPT46ecIB7S1cAK7yHdytbBmAQ5K6sgCUNl/CJDDw6pU3BJ0kvsWzHUX2+VoVAWu09VHE0B8uYcGeiiopu4wdMhmRt4dm6JqV3Lyl06kYGT6JWmEcekqAFkCxxnDGzwE2g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qwufezThziH4vemZu2PBSKmMwCVobasDhEymouxYAbk=;
- b=vbEqaTwnkroPbDQXhq4UmtGgTlk+0bJISEEE68mANBFK99GnSj7+CaBL0bKqZqzggFQ8Y6HlgCLK1Ae8fAR/H+ebrMbe54WKV6Ro4iW66soU2EJfHjuO50YzjZsRX8JaUzi9sQvZt2YUuQbt7Gr61/VVLOLXuBCr8pLMUmrTfRM=
-Received: from CY4PR1001MB2358.namprd10.prod.outlook.com
- (2603:10b6:910:4a::32) by BYAPR10MB3205.namprd10.prod.outlook.com
- (2603:10b6:a03:14d::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5482.6; Wed, 27 Jul
- 2022 12:10:33 +0000
-Received: from CY4PR1001MB2358.namprd10.prod.outlook.com
- ([fe80::eccc:6ecd:41f7:ed02]) by CY4PR1001MB2358.namprd10.prod.outlook.com
- ([fe80::eccc:6ecd:41f7:ed02%5]) with mapi id 15.20.5458.024; Wed, 27 Jul 2022
- 12:10:33 +0000
-Date:   Wed, 27 Jul 2022 15:10:24 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: ISO: fix info leak in iso_sock_getsockopt()
-Message-ID: <YuErMEjse5lgAMO3@kili>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YuEq2Aey0VOrxPB+@kili>
-X-Mailer: git-send-email haha only kidding
-X-ClientProxiedBy: ZR0P278CA0151.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:41::12) To CY4PR1001MB2358.namprd10.prod.outlook.com
- (2603:10b6:910:4a::32)
+        Wed, 27 Jul 2022 09:27:27 -0400
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68D7126AE1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 06:27:26 -0700 (PDT)
+Received: by mail-il1-f200.google.com with SMTP id k11-20020a92c24b000000b002dd46b47e01so6194273ilo.14
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 06:27:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=/OsG81id+thzUuw3/IQ3pX805IzReT+1axT06GNhNfI=;
+        b=oO5v5B2vwfknkP0evnYvEye5oNv1kE1ognK8iaiIgOJw9cU51vkV77O+9YBSN23y/d
+         LOjg4Uk7qIOF5fcsCEncntaX4yOpyeN/qrVvOdxPz3qOBK2HqlBMjm2QSI5pBom9oZ7Q
+         H2CV4wJdfjWRHEZZ+knymhffKDXFRQi6ctw9ZBs3MmlF5IJgNRid/gPdiVdwXdLKmHR6
+         s15QVmF9ALTdjBN3rYLtg7brgFzqK0OEjsF9IABlmasab9VH55Wz6l7/BRT3Okb74lva
+         YcyfMrUlxOrjjuHyaGMRRSg5i1+kGLnBG8CJNoZD2Lj4Lj3h+Qz2yP1Gy3fDEvMCzhCF
+         o5Dw==
+X-Gm-Message-State: AJIora/7r4PbvBCS9a6OJ2KysR9v/lYVL8uXwoP4lU96PEY0hil/zhVA
+        f5qDs/uFjuLZ/G1JGdfRbzdWhII8/y9qJ39vDAS9H3ru4B/p
+X-Google-Smtp-Source: AGRyM1vcDr5E/VcbeSSrOxrfQ9EAAueP0+rQF9ND8vTZweD2N7iLVxHEU8dKhBSn489SZE9J2y08+qOo1/skuLR+PeekVA+oB9QA
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c8169027-a0ff-4796-b669-08da6fc90178
-X-MS-TrafficTypeDiagnostic: BYAPR10MB3205:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: z3ZP3Cdvesvzk3h4w6z404h1mlRs/5/IVgEsWRcQXvM/bO90b9aBXAZuUvyFnOP3LYsehBgyk567staKAacqwoj6g0TsnAk1OGhs7IZCWJodGW+ZBOkQQSX0gILDb47E3ITHjUmUPe4374u0RpvIM9wo10uyUt4AtFr8cPF+zZHLoTBmMpL7X4VZRt0QBh50LQu3OE/RuCWvA+HkXj2jPEcRr7TJ7k8S9wnOof227yHQwOPBe0nNTAu56QzRq0K2r9pYMEF4uFYCjbkS2wSqsQTje09gKoJcVLSpqGkCM4y1P8TV8QhPmkXWfjSiRDTIgFWLHibu4MgQkWEysgbRwuTdVj+Nnj2huciXh7miUuQwyrdrtRoDaIRXFJ85sOn5HQXlIZ7AC9sX6V9MRR3l6SMNkzCNRorQZRg3+g9cgTuYnrYRTjzHYbCTVovYNJtW9MVRKBLDnveXW1iGrl2JMHyZxEypKgL3zLYv6q91PS0mzNZ3GiwPZ9bxzrD1HM1m2fMs/NVKd1biE7Dq5cGuu5l9N+9yXD1ATBqKeNzC5r+2nA/SJ5EgwxTLxHpKNnKyF5QqVogDwhNp2DFtYZzo9Hqzm+HJa3jEe1oPe2vcoE48JUpdAurUk56S/FOhNLsFWbDuUhDMKQ/vcl+UT23jgfdZU5uTzQtgQKo0fRZ7+dl6n1N+KNa/Re7Yqgq6ioNrcL38pOgAEKq7OylFYJsmcigxkM3btKapLsJsMH+5lu7B/VR7KfTyZko8Nywf8dVcFC5i1ddGFiWsejwr1W3pFx7l/whLJHK/swxP/h29MczXGrB0/K37VJP7XHdpSH2N
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1001MB2358.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(39860400002)(366004)(136003)(396003)(346002)(376002)(52116002)(6916009)(54906003)(86362001)(6486002)(478600001)(8936002)(41300700001)(26005)(6512007)(9686003)(6506007)(6666004)(186003)(38350700002)(2906002)(83380400001)(38100700002)(33716001)(66556008)(4326008)(316002)(8676002)(66476007)(66946007)(44832011)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XYiVWXWOnincdodNeYMJxkS5niOZ6jv2QEeglkRGzXMbC4wg6USNKWfiX4j0?=
- =?us-ascii?Q?fijaHuDXUf02nYmqrdaqwjnUSxtRjoutiXk9s61r9jSpZ983X+uDybphh5fx?=
- =?us-ascii?Q?vdffI8HQBy/OEVSO40aSEwU9g+eV3TyVYseOvyEtRv9mr5DqJ9VEw1TeDrfC?=
- =?us-ascii?Q?iaOmx1an8YZpVNKvZsBTt4sXbVyqJZLH+QklsS7EZmkRfdhm/SpzGjOpAih2?=
- =?us-ascii?Q?M4MSBnc5iDwhtWrVMSiOthVxjAeYi4aT+OXpDNiFcszGBszBY6oYUBIL/fyx?=
- =?us-ascii?Q?cU9LHFLzwqR2WaL80y1W0IOg2583bvdaOUiStWx5224VWiSt6KEwKJz/ZEqE?=
- =?us-ascii?Q?W2/9aN6PIia2C5obAThyenQr+fPianNOXjARseZ+oh/uX+CH8CQft/gU9VUq?=
- =?us-ascii?Q?Kx09U45JcVZNDxfS+4QyTwSASMxjVM+gCXp2fYlicqAAgV1Knf6a4mfljJCm?=
- =?us-ascii?Q?ba7mkW1rb5uVxIfHhpFMkT12eF4y3b5GnDwqg2GfGdN8TjxNa0yqlPaHbLl4?=
- =?us-ascii?Q?0+LwnTuw0sl0mpK7mExcNZVswQunIgKmPFfZCSRGLQZiLRFva3DJRM0lDiKb?=
- =?us-ascii?Q?DEWpfXWMXTdOksO5r0mNoGS4XX9YucJ9Zr00Di8cbpqSfHlQdwQapi7cnUli?=
- =?us-ascii?Q?K+UL3LFlhWAYN5vD1SBxxwr1JsoCq+DOXc8XqRJfTVr6jcksF9viOjleigcD?=
- =?us-ascii?Q?aSb/aOb5GZYIWmsIMr/jumDaGjmgjeYo1Qid9+SkCFobeG/R5hVp+bU6TKrY?=
- =?us-ascii?Q?NXHS9kdAx2Al2Tzdn+MKAMDezAK9sGjyEwD8hxlXHg7s7IDGPcGPUBaliyOj?=
- =?us-ascii?Q?cRuMrDPQIk29MCL+iyABjSZAi4txyt4+vD7s2dwyNHayD6v9hjydDBJDXrkz?=
- =?us-ascii?Q?jfqvKy7LId/1o+zOqGYSfX72L0pKfpyGLoRp+JKtsVFskf1BJJL/ee3Gy/t3?=
- =?us-ascii?Q?z85Zey0i2xGDRc8bdyx0y4IISn8Mzy+w8PPzhqjBILvygqBWD40GVf5kSnzS?=
- =?us-ascii?Q?xEhcojh6B0ze+knsDF+TQOlPLHKxxibMRgbMOQXc31QjLNbccNLJZ2/x/gkU?=
- =?us-ascii?Q?MaOr7t+ij48r/iy4svL4i8Aeh1cWVqTeUoorynGxI3CeI+45QYIYHiLgMVNq?=
- =?us-ascii?Q?S1tV6UJfSwYAtnVpNnEnZ5r/qBxJ5kzHVWCvWN8S8fvo5i2qC3o3JTSQzGDn?=
- =?us-ascii?Q?9epVYI7sS3bGg8aOItAFFbwflM8P5vUfalI1Et+/qhdUMs2LOHs/BOVT0RMc?=
- =?us-ascii?Q?dkBEfPQimq8MF/n1eq94MMQKG4x0fyO3AYWaXRElU1PbSzqKYc7VPQQXWtwd?=
- =?us-ascii?Q?29pDuisBFkJW0JlsOcF0leKaV2/WRA80/Q7SE6Efwk/fS2EUpzxQtm1rhkNf?=
- =?us-ascii?Q?lxEItkHyl/lnrkTigocnF0hNiG5BmOI1M9qoj6axj5A52xZldwGV/6brz0/b?=
- =?us-ascii?Q?uJmQdcJkbxBtkFR9yT53/HzfBTVDLe6DauApH5lda0gKW7ObyONmvt0GZ7fZ?=
- =?us-ascii?Q?sCo4vx3Yi6e+A0LML0jM9dMTYT0fiMZWoNFAdFkZT9LFPSP7+2qECw20CLSm?=
- =?us-ascii?Q?x276MNv2nNGaolpK0JjuG+YmOdEemlrvxQfgxpJJkbMmsv40EoA1TaapCCS4?=
- =?us-ascii?Q?Fw=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c8169027-a0ff-4796-b669-08da6fc90178
-X-MS-Exchange-CrossTenant-AuthSource: CY4PR1001MB2358.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jul 2022 12:10:33.4987
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: t9R0nrwVCiaTEeSWH9V/WwcwSEoCRkkoNNS6BND9MW0cOme1JukdvFQlXKCVRo09iOYnNDeAwex/BubVyWZl4tGCDwog2aT2lJXYpWOWQG4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR10MB3205
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-07-27_03,2022-07-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 bulkscore=0 malwarescore=0
- adultscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2206140000
- definitions=main-2207270051
-X-Proofpoint-GUID: u_Nqr9-Gr2Zvc9kkZQvC_8cYKvkeMBh4
-X-Proofpoint-ORIG-GUID: u_Nqr9-Gr2Zvc9kkZQvC_8cYKvkeMBh4
+X-Received: by 2002:a05:6602:395:b0:67b:d0c6:50cb with SMTP id
+ f21-20020a056602039500b0067bd0c650cbmr8150634iov.110.1658928445836; Wed, 27
+ Jul 2022 06:27:25 -0700 (PDT)
+Date:   Wed, 27 Jul 2022 06:27:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b8d26905e4c96064@google.com>
+Subject: [syzbot] net-next test error: WARNING: ODEBUG bug in mgmt_index_removed
+From:   syzbot <syzbot+e6fedd64b4d23cc9185c@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The "qos" struct has holes after the in and out struct members.  Zero
-out those holes to prevent leaking stack information.
+Hello,
 
-The C standard rules for when struct holes are zeroed out are slightly
-weird.  The existing assignments might initialize everything, but GCC
-is allowed to (and does sometimes) leave the struct holes uninitialized.
-However, when you have a struct initializer that doesn't initialize
-every member then the holes must be zeroed.
+syzbot found the following issue on:
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+HEAD commit:    5ffcba41de55 Merge branch 'smc-updates'
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13ca0752080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c904647431ba900b
+dashboard link: https://syzkaller.appspot.com/bug?extid=e6fedd64b4d23cc9185c
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e6fedd64b4d23cc9185c@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
+WARNING: CPU: 0 PID: 3610 at lib/debugobjects.c:502 debug_print_object+0x16e/0x250 lib/debugobjects.c:502
+Modules linked in:
+CPU: 0 PID: 3610 Comm: syz-executor.0 Not tainted 5.19.0-rc7-syzkaller-01937-g5ffcba41de55 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/29/2022
+RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:502
+Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 60 88 48 8a 4c 89 ee 48 c7 c7 40 7c 48 8a e8 fe e8 36 05 <0f> 0b 83 05 75 b3 db 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
+RSP: 0018:ffffc9000427f6e0 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
+RDX: ffff88807d233b00 RSI: ffffffff8160d9c8 RDI: fffff5200084fece
+RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffffffff89eed480
+R13: ffffffff8a4882c0 R14: ffffffff8169b640 R15: 1ffff9200084fee7
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c00074d000 CR3: 000000001cceb000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ debug_object_assert_init lib/debugobjects.c:892 [inline]
+ debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:863
+ debug_timer_assert_init kernel/time/timer.c:792 [inline]
+ debug_assert_init kernel/time/timer.c:837 [inline]
+ del_timer+0x6d/0x110 kernel/time/timer.c:1257
+ try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1275
+ __cancel_work_timer+0xa6/0x570 kernel/workqueue.c:3121
+ mgmt_index_removed+0x187/0x2e0 net/bluetooth/mgmt.c:8940
+ hci_unregister_dev+0x467/0x550 net/bluetooth/hci_core.c:2688
+ vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
+ __fput+0x277/0x9d0 fs/file_table.c:317
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:177
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xade/0x29d0 kernel/exit.c:795
+ do_group_exit+0xd2/0x2f0 kernel/exit.c:925
+ get_signal+0x2542/0x2600 kernel/signal.c:2857
+ arch_do_signal_or_restart+0x82/0x2300 arch/x86/kernel/signal.c:869
+ exit_to_user_mode_loop kernel/entry/common.c:166 [inline]
+ exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:201
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+ syscall_exit_to_user_mode+0x19/0x50 kernel/entry/common.c:294
+ do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f443528a677
+Code: Unable to access opcode bytes at RIP 0x7f443528a64d.
+RSP: 002b:00007ffc080f4ed8 EFLAGS: 00000246 ORIG_RAX: 00000000000000a6
+RAX: ffffffffffffffea RBX: 0000000000000003 RCX: 00007f443528a677
+RDX: 00007ffc080f4fac RSI: 000000000000000a RDI: 00007ffc080f4fa0
+RBP: 00007ffc080f4fa0 R08: 00000000ffffffff R09: 00007ffc080f4d70
+R10: 0000555556dcc853 R11: 0000000000000246 R12: 00007f44352e22a6
+R13: 00007ffc080f6060 R14: 0000555556dcc810 R15: 00007ffc080f60a0
+ </TASK>
+
+
 ---
- net/bluetooth/iso.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 19d003727b50..c982087d3b52 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1235,7 +1235,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- {
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
--	struct bt_iso_qos qos;
-+	struct bt_iso_qos qos = {}; /* zero out struct holes */
- 	u8 base_len;
- 	u8 *base;
- 
--- 
-2.35.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
