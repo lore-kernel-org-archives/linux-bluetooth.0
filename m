@@ -2,65 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CB6C00144
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 02:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D35C00144
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 02:47:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233554AbiG0C2A (ORCPT
+        id S240119AbiG0Cr1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jul 2022 22:28:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
+        Tue, 26 Jul 2022 22:47:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231965AbiG0C16 (ORCPT
+        with ESMTP id S233331AbiG0Cr0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jul 2022 22:27:58 -0400
-X-Greylist: delayed 566 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 26 Jul 2022 19:27:57 PDT
-Received: from mx1.librem.one (mx1.librem.one [138.201.176.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E1A03C8CD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jul 2022 19:27:57 -0700 (PDT)
-Received: from smtp.librem.one (unknown [192.241.214.14])
-        by mx1.librem.one (Postfix) with ESMTPS id ED1E181E8E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jul 2022 19:18:27 -0700 (PDT)
-Authentication-Results: name mx1.librem.one; dmarc=fail (p=none dis=none) header.from=librem.one
-Authentication-Results: mx1.librem.one;
-        dkim=pass (2048-bit key; unprotected) header.d=librem.one header.i=@librem.one header.b="FR7KMZUb";
-        dkim-atps=neutral
-From:   Zach DeCook <zachdecook@librem.one>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=librem.one; s=smtp;
-        t=1658888305; bh=v1a+dKwrV3CxewJ0OEAzU3FuVV7SRlsmaeyaUFvVn2w=;
-        h=From:To:Cc:Subject:Date:From;
-        b=FR7KMZUbyZEOlj4y67mpj7axpwXbPDnvGQfn9BEKkiyiUP+fofV/oaU//PPC0UntJ
-         otic8CKZKSe6kRhaWF6DwY7bdL/dptYcCSoAs3k/KEaCgXqJZK0BK5Fc2D/8S0myRg
-         heKXi0sjHxgNG5YBK/KtO9WeWzzT9n0uWuSGuKa9H5oCOocMxtbuU+zksmM2PtHJ4Z
-         ow2kmxA/4fCviynoh2EMf6aL73aCiJSLoSYrilR1vOl24gCq/FgTh8FLTn/4f7fVJb
-         xI0AAtP8IOz8bRwxL0O0VAOx/wtot5Pti1iLA8DGQAMJ1rd5LQx1xvj4LkCq0aPeUs
-         jRlgvFEx4Eesg==
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Zach DeCook <zachdecook@librem.one>
-Subject: [PATCH] dbus-common: Add icon for watches
-Date:   Tue, 26 Jul 2022 22:18:01 -0400
-Message-Id: <20220727021801.3564-1-zachdecook@librem.one>
-Content-Transfer-Encoding: 8bit
+        Tue, 26 Jul 2022 22:47:26 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3CC926558;
+        Tue, 26 Jul 2022 19:47:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B79961766;
+        Wed, 27 Jul 2022 02:47:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A1AC433C1;
+        Wed, 27 Jul 2022 02:47:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1658890044;
+        bh=2j7hAK9n+nEEJAGpo0so/NxZzWK0KHstyi50HWjaQa8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=hSYOOpJvcGn5ntipQlBeXj8dHlM2eUrebgEcCyvOLb7BU0ls0agZpmIqI5leVmc4n
+         yL2thNiS54BIm6sCynKOmkrtjZvXznM3UhmKA+e/kqleQEl60afA1cKQwyAvdYPVFf
+         /q1y3ITHqVmu2UHVkrYdb0f3KCu10nBbsFmZpvz8vF+3HtEEwBriDdW6EiU8D1hTrA
+         BfsCV9jwGrMtz6EZyE+BnaJsqVxNFJXpv4dLJeEktR9tGLW7eMo1YGO6yw6YMIKbYZ
+         aRxBZ1uRqOqILa6lxBJIBAEf0rMswV/2dvgVvt/dOte5KUBf7AxwrBBYt9mYDlwoBO
+         Jra6DGWQZQICA==
+Date:   Tue, 26 Jul 2022 19:47:23 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>,
+        David Miller <davem@davemloft.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: pull request: bluetooth-next 2022-07-22
+Message-ID: <20220726194723.717ea49a@kernel.org>
+In-Reply-To: <CABBYNZJoAe+XDp_Zq4bfepizxpmUiB_Vo-ix1A2TyJXjzQVe+Q@mail.gmail.com>
+References: <20220722205400.847019-1-luiz.dentz@gmail.com>
+        <20220722165510.191fad93@kernel.org>
+        <CABBYNZLj2z_81p=q0iSxEBgVW_L3dw8UKGwQKOEDj9fgDLYJ0g@mail.gmail.com>
+        <20220722171919.04493224@kernel.org>
+        <CABBYNZJ5-yPzxd0mo4E+wXuEwo1my+iaiW8YOwYP05Uhmtd98Q@mail.gmail.com>
+        <20220722175003.5d4ba0e0@kernel.org>
+        <CABBYNZ+74ndrzdx=4dGLE6oQbZ2w6SGnUGeS0OSqH6EnND4qJw@mail.gmail.com>
+        <20220726153140.7fefd4b4@kernel.org>
+        <CABBYNZJoAe+XDp_Zq4bfepizxpmUiB_Vo-ix1A2TyJXjzQVe+Q@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
----
- src/dbus-common.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Tue, 26 Jul 2022 18:06:47 -0700 Luiz Augusto von Dentz wrote:
+> > No strong preference here as long as we can keep the sign-offs etc in
+> > control. Note that I'm not aware of any other tree we pull rebasing,
+> > tho, so you may run into unique issues.  
+> 
+> Maybe I need to get in touch with other maintainers to know what they
+> are doing, but how about net-next, how does it gets updated? Is that
+> done via git merge or git pull alone is enough?
 
-diff --git a/src/dbus-common.c b/src/dbus-common.c
-index 5e2c83d52..a4b6eccfb 100644
---- a/src/dbus-common.c
-+++ b/src/dbus-common.c
-@@ -123,6 +123,8 @@ const char *gap_appearance_to_icon(uint16_t appearance)
- 		return "phone";
- 	case 0x02:
- 		return "computer";
-+	case 0x03:
-+		return "watch";
- 	case 0x05:
- 		return "video-display";
- 	case 0x0a:
--- 
-2.36.2
-
+git pull, if you mean upstream trees making their wait into net-next.
+And afterwards submitter does git pull --ff-only to update their tree.
