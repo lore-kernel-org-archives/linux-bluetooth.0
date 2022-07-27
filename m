@@ -2,125 +2,188 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C19CC00144
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 00:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9969DC00144
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 01:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239726AbiG0ADk (ORCPT
+        id S233398AbiG0BHD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jul 2022 20:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56200 "EHLO
+        Tue, 26 Jul 2022 21:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233398AbiG0ADj (ORCPT
+        with ESMTP id S230315AbiG0BHC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jul 2022 20:03:39 -0400
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 981393A4A9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jul 2022 17:03:37 -0700 (PDT)
-Received: by mail-qk1-x732.google.com with SMTP id e16so12229594qka.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jul 2022 17:03:37 -0700 (PDT)
+        Tue, 26 Jul 2022 21:07:02 -0400
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5934F1EADE;
+        Tue, 26 Jul 2022 18:07:01 -0700 (PDT)
+Received: by mail-ed1-x52a.google.com with SMTP id i13so10479983edj.11;
+        Tue, 26 Jul 2022 18:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=pH/IUzawaT0Oi60soy0K8eouAvO3puqx8YlWTH9jpl4=;
-        b=O7dB0QXoF3xW4mikfO9W85vYkoq6u5Qezw6hQEMD4703J/KNTcvmZ9hZjEC9n9MeEc
-         lgiV0d/su08JjeBnHVA266D5XDY8l8uPpVugx/QByR7eGf983lEbO4fupmGwTyrhPVzt
-         fsmelwEWwwagj7FTKk74daKvRaN1JCXcQ0WZoLa1zlR5eALgq6NcxOMQjhBjlNd+CVQu
-         LzxiletUznW3GlHcR880FLKUaq8/R+iPu3bRO3Nsih8Y0TPiffrW9ppTeUfozxmjktCV
-         SZu8zfyWoiU35TlZzMq7lO0f1GlYN4fVzDEXrxOrbsJrsCbmYb7iahrlVt0dpHtVCXRB
-         AXxw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ekYNeHLDyYQ/qWETVipiFhBwDmDlj2s7iWCnbv0joSQ=;
+        b=qx/+m0k4f3ZGmJLA/K7DiSmxbuGCa7FZvs4YpEDIWjQgGpVwCcX6hNmusb0FPYzRVa
+         bNK6mLM2zR21tDGc4iRIJI+UnocjtXp6TLRrd6gUv3Y0DjFMglETbsJ968K82329S/uS
+         SbW3gaoWGZ9lo/6CWZrLluvN+OIGebNRCQwvprsyMvvN4NVZ9squRaeDpwxktjxIEwvd
+         8ChzJ8rQHi1UjrigsESPNSehWPIueqxPxxhP5sK+Q3/vlGQxX7v3/RcRDwMA5wuUtnPj
+         mu4Nbpcmo1/dvP6NnPLSceqdi8GB6a8mPv3IEL+adAWBBpnm6Sn4LzidezjeQH7f0qTz
+         drSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=pH/IUzawaT0Oi60soy0K8eouAvO3puqx8YlWTH9jpl4=;
-        b=B8NLXIyZllXIDIBLRp/und/4br4t1p2M3NRaoXu/ZVyJj25FhxodrlP7T3IAeLFNEY
-         F8+XjqSFV5yRkpruU0P9BOpXVM0zWXuF2n7LU94F0MR2gZNpv+NJgpcS30BU+8XTgds5
-         mtOQz/7Qa9E0Y6eI0HU+olg0mOkvhNzx9iXEPr+M5TjnCur4l5ZogEwCCeUkLkLktRdn
-         hfp0Dw1weMWCbLKr7c2F83X8k+6vhRTLsMvAuaekkUWgOJOsg9XOB2FHTygJ7/HF5cxt
-         pHOjRDzdBMNmsfIJ6jJ3q7x2AXwodt3INcJoJKQhO0fWK1OBUyF/yoAPfcbQUuQl6L09
-         1UiQ==
-X-Gm-Message-State: AJIora+tBmI3D/pwDdOdDdnl28CwYr21UuZZsKLeaFXejANOasTKBA0Q
-        Cv7BTjO+xz+T4z3fPrsBOvzdEKkc5YM=
-X-Google-Smtp-Source: AGRyM1vJvQh9Ul6TYBeHaoOJIBgrXurNbj3Z3O1KP3N8FvNFn1lFts5ZiCxHSoDpir6e5OulI6e/bw==
-X-Received: by 2002:a05:620a:261a:b0:6b2:6e4d:b607 with SMTP id z26-20020a05620a261a00b006b26e4db607mr15363497qko.414.1658880216134;
-        Tue, 26 Jul 2022 17:03:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.217.140])
-        by smtp.gmail.com with ESMTPSA id t4-20020a37ea04000000b006b66293d79dsm4287054qkj.80.2022.07.26.17.03.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jul 2022 17:03:35 -0700 (PDT)
-Message-ID: <62e080d7.1c69fb81.343ed.dcf7@mx.google.com>
-Date:   Tue, 26 Jul 2022 17:03:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4794373140156207777=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ekYNeHLDyYQ/qWETVipiFhBwDmDlj2s7iWCnbv0joSQ=;
+        b=gI5kppHLfXdZKdF6VGqVn7RnCn+xIsk0ewhM1TgoJ6kRq/MnwaHzYTZYhMwuTa1YFZ
+         PI6KH6pie6K8K+5UffyC+uv2kxSeodLMnYRrUTLrBZFaQurFxdQc+xpN5CrpbEToyhso
+         3r2+zZc2wdCiPvAll0MP21WUGBzxYrkQKbZ7xF4O48oh+mUoosU5tJ4chDmdWYVcDFIf
+         WlmLlWi55TZLcDX2MgkfUc9k8wRkCxX1B98YD92KXoTSFU2+9SsIetjGq1QfeCfSs6fB
+         tXX9vBhbyrlT1Ppyxs3NBgmywxzT+PckkL3MCiMisd6R8GFY94ERBl+l0n/gs7hlmDNe
+         2iSQ==
+X-Gm-Message-State: AJIora8H9IAe2+7CSzHLdDrarPaUedfe/tr9Khsjs/fItPYyqAbMCxhG
+        MyMEw+OGT5CrsqCXkaUZdM4b6/4SLTYb9Ep73Bi157zdFYA=
+X-Google-Smtp-Source: AGRyM1vaoI29eWRvqUdfE7BBVkZaUWdpLMNwTFgIJzQqejC8dy3FWZLU/IJEWBHOoBqk2HFllrVTKdwwOGXGNuyBL8A=
+X-Received: by 2002:a05:6402:2405:b0:43a:86c6:862 with SMTP id
+ t5-20020a056402240500b0043a86c60862mr20484110eda.210.1658884019599; Tue, 26
+ Jul 2022 18:06:59 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: Clean-up stale/unused hci_request.c code
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220726230140.205481-2-brian.gix@intel.com>
-References: <20220726230140.205481-2-brian.gix@intel.com>
+References: <20220722205400.847019-1-luiz.dentz@gmail.com> <20220722165510.191fad93@kernel.org>
+ <CABBYNZLj2z_81p=q0iSxEBgVW_L3dw8UKGwQKOEDj9fgDLYJ0g@mail.gmail.com>
+ <20220722171919.04493224@kernel.org> <CABBYNZJ5-yPzxd0mo4E+wXuEwo1my+iaiW8YOwYP05Uhmtd98Q@mail.gmail.com>
+ <20220722175003.5d4ba0e0@kernel.org> <CABBYNZ+74ndrzdx=4dGLE6oQbZ2w6SGnUGeS0OSqH6EnND4qJw@mail.gmail.com>
+ <20220726153140.7fefd4b4@kernel.org>
+In-Reply-To: <20220726153140.7fefd4b4@kernel.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 26 Jul 2022 18:06:47 -0700
+Message-ID: <CABBYNZJoAe+XDp_Zq4bfepizxpmUiB_Vo-ix1A2TyJXjzQVe+Q@mail.gmail.com>
+Subject: Re: pull request: bluetooth-next 2022-07-22
+To:     Jakub Kicinski <kuba@kernel.org>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     David Miller <davem@davemloft.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4794373140156207777==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Jakub,
 
-This is automated email and please do not reply to this email!
+On Tue, Jul 26, 2022 at 3:31 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Tue, 26 Jul 2022 15:05:17 -0700 Luiz Augusto von Dentz wrote:
+> > > > Ive just fixup the original patch that introduced it, btw how do you
+> > > > run sparse to capture such errors?
+> > >
+> > > We run builds with W=1 C=1 in the CI and then diff the outputs.
+> > > That's pretty noisy so we have a regex which counts number of
+> > > warnings per file, that makes it possible to locate the exact new
+> > > warning. At least most of the time...
+> >
+> > Hmm, is there any way to trigger net CI, either that or we need to
+> > duplicate the same test under our CI to avoid these last minute
+> > findings when we are attempting to merge something.
+>
+> The code is at:
+>
+> https://github.com/kuba-moo/nipa
+>
+> But it hardcodes net and bpf tree maching in places. You may want
+> to steal just the build script, its in bash.
 
-Dear submitter,
+We can either incorporate it on our own CI or start to consolidate
+everything in one place since there are quite a few tests that apply
+tree wide, though we would need to add support for subsystem specific
+tests as well, anyway I leave for @Tedd Ho-Jeong An to comment on this
+when he is back from vacation.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663264
+> > > > So we don't need to rebase?
+> > >
+> > > No, not usually. After we pull from you, you should pull back from us
+> > > (git pull --ff-only $net-or-net-next depending on the tree you
+> > > targeted), and that's it. The only patches that go into your tree then
+> > > are bluetooth patches, everything else is fed via pulling back from us.
+> > >
+> > > > There were some patches already applied via bluetooth.git so at least
+> > > > I do it to remove them
+> > >
+> > > Normally you'd not apply bluetooth fixes to bluetooth-next, apply
+> > > them to bluetooth and send us a PR. Then once a week we'll merge
+> > > net (containing your fixes) into net-next, at which point you can
+> > > send a bluetooth-next PR and get the fixes into bluetooth-next.
+> > > FWIW from our perspective there's no limit on how often you send PRs.
+> >
+> > Are you saying we should be using merge commits instead of rebase then?
+>
+> Not sure what merge commits would mean in this case.
+>
+> > > Alternatively you could apply the fixes into bluetooth and then
+> > > merge bluetooth into bluetooth-next. If you never rebase either tree,
+> > > git will be able to figure out that it's the same commit hash even if
+> > > it makes it to the tree twice (once thru direct merge and once via
+> > > net). That said, I believe Linus does not like cross tree merges, i.e.
+> > > merges which are not fast forwards to the downstream tree. So it's
+> > > better to take the long road via bt ->  net -> net-next -> bt-next.
+> >
+> > Well I got the impression that merge commits shall be avoided, but
+>
+> There's many schools of thought, but upstream there's very little
+> rebasing of "official" branches (i.e. main/master branches, not
+> testing or other unstable branches) AFAIK.
+>
+> > rebase overwrites the committer, so the two option seem to have
+> > drawbacks, well we can just resign on rebase as well provided git
+> > doesn't duplicate Signed-off-by if I use something like exec="git
+> > commit -s --amend".
+>
+> Sure, be careful tho because I think it doesn't check the signoff
+> history, IIRC just the most recent tag. So you may end up with multiple
+> signoffs from yourself and Marcel.
 
----Test result---
+Yep, I thought that was a bug though since I doubt there is any use
+for duplicated signoffs.
 
-Test Summary:
-CheckPatch                    FAIL      7.47 seconds
-GitLint                       PASS      3.87 seconds
-SubjectPrefix                 PASS      3.45 seconds
-BuildKernel                   PASS      31.82 seconds
-BuildKernel32                 PASS      27.62 seconds
-Incremental Build with patchesPASS      68.28 seconds
-TestRunner: Setup             PASS      456.12 seconds
-TestRunner: l2cap-tester      PASS      16.76 seconds
-TestRunner: bnep-tester       PASS      6.28 seconds
-TestRunner: mgmt-tester       PASS      98.34 seconds
-TestRunner: rfcomm-tester     PASS      9.62 seconds
-TestRunner: sco-tester        PASS      9.38 seconds
-TestRunner: smp-tester        PASS      9.51 seconds
-TestRunner: userchan-tester   PASS      6.91 seconds
+> > > > and any possible conflicts if there were
+> > > > changes introduced to the bluetooth directories that can eventually
+> > > > come from some other tree.
+> > >
+> > > Conflicts are not a worry, just let us know in the PR description how
+> > > to resolve them.
+> >
+> > Not really following, how can we anticipate a merge conflict if we
+> > don't rebase?
+>
+> If your trees are hooked up to linux-next (I presume not 'cause Stephen
+> would probably scream at you for rebasing?) - Stephen will tell you
+> there's a conflict within a day or two.
+>
+> Obviously sometimes you'll notice right away when applying patches that
+> two patches touch the same function.
+>
+> > With merge strategy it seem that the one pulling needs
+> > to resolve the conflicts rather than the submitter which I think would
+> > lead to bad interaction between subsystems, expect if we do a merge
+> > [-> resolve conflict] -> pull request -> [resolve conflicts ->] merge
+> > which sounds a little too complicated since we have to resolve
+> > conflicts in both directions.
+>
+> The pulling back should always be a fast-forward so there's no merge
+> commit or conflicts (git pull --ff-only). Only the actual downstream
+> tree (netdev) has to resolve conflicts, which is not all that bad
+> thanks for Stephen's advanced notices.
+>
+> > In my opinion rebase strategy is cleaner and is what we recommend for
+> > possible clones of bluetooth-next and bluetooth trees including CI so
+> > possible conflicts are fixed in place rather on the time the trees are
+> > merged.
+>
+> No strong preference here as long as we can keep the sign-offs etc in
+> control. Note that I'm not aware of any other tree we pull rebasing,
+> tho, so you may run into unique issues.
 
-Details
-##############################
-Test: CheckPatch - FAIL - 7.47 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[v3,4/4] Bluetooth: Convert SCO configure_datapath to hci_sync\CHECK:PARENTHESIS_ALIGNMENT: Alignment should match open parenthesis
-#128: FILE: net/bluetooth/hci_conn.c:354:
-+	err = __hci_cmd_sync_status(hdev, HCI_CONFIGURE_DATA_PATH,
-+			      sizeof(*cmd) + vnd_len, cmd, HCI_CMD_TIMEOUT);
+Maybe I need to get in touch with other maintainers to know what they
+are doing, but how about net-next, how does it gets updated? Is that
+done via git merge or git pull alone is enough?
 
-total: 0 errors, 0 warnings, 1 checks, 200 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12929916.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4794373140156207777==--
+-- 
+Luiz Augusto von Dentz
