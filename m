@@ -2,103 +2,185 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4356C04A68
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 08:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 724B4C3F6B0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 08:20:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbiG0IF5 (ORCPT
+        id S229955AbiG0IUx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jul 2022 04:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58832 "EHLO
+        Wed, 27 Jul 2022 04:20:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbiG0IFz (ORCPT
+        with ESMTP id S229608AbiG0IUv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jul 2022 04:05:55 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0365DBE26
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 01:05:54 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id y15so15486545plp.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 01:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=w0+MhajKETw/8IGF2KpFs/2SoVoTHXa//3jlac4yXxo=;
-        b=Lil4mCsQMgDDQde3rAfN6pF4XD1sC/Pf+4lUAazTcWM3kzPtJg+SbAV1dKViLKXXCz
-         wiBQciyO6HMpgMPHfnKfnO3CpX7tbiQBDhhrxq6ZLSQLdmg45vM8zhDcx6ied07D47Uj
-         IBhDUN+SsgcRZy9j55RNjYbisxcviyAM/Q6BMmz7sLGfI38lMAOJOxz2VjP76Q/yMG0e
-         mMq0fWQe7S4rmkLZqzCL/EVC20BJenc33ikUkIGHh2zjdNghnK3iGG2ZatxeKPp9vzeG
-         cbo28aMhZJx3B7LTF2Yp8K/sqWjve7RbEkKvvUCO7YrWKXykTG5nzBiYXO96U+XKtuLl
-         8eAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=w0+MhajKETw/8IGF2KpFs/2SoVoTHXa//3jlac4yXxo=;
-        b=uW9dl9kdcPjAm/Vq9Hgr1CMervl3+cORtiM2+AoIABa70jtGe0S1QqKXIZbMqd03i2
-         7Ja6k3IeHYH+p+ZzzFWFQBZB3dOJ6VPFPEKuPNlq6+lfdFEVQ7XXL151fN4lULToIztu
-         dYFys1PJzSdy791g+WY46b6r34gMK/WyKIf2I1fYDAhCHC5rXGrKnacffz9l8Petk+ez
-         0FxgE2RMBaGCKY7WsaW0FSKn4JlITTZ7zu4lYPgc6/jQ6aCpVSaHtpzLjeEpN8CCmKKF
-         STtWrGUOyCB8ATzspgC53UXK+0/fxrgxt29nEb/+DnYbzOjb+pzA2LyaLm0FPRKvu2r/
-         jl/Q==
-X-Gm-Message-State: AJIora9DbrFLAH7apmoPLXKcnGBWBu8AXUSHx5B1zLI0Gnf9RIsu0eI5
-        arih+PMuMDi3qjXnmW7CnmL0XzVw5FY=
-X-Google-Smtp-Source: AGRyM1vR+cZv3dnsVbcy52jmAjoZxLjm8TsDKetfDAxCnQX5o5l/Up8KazjtzJkTxJaBVIY0J2IcdA==
-X-Received: by 2002:a17:90a:d155:b0:1f2:4741:3b74 with SMTP id t21-20020a17090ad15500b001f247413b74mr3112995pjw.201.1658909153089;
-        Wed, 27 Jul 2022 01:05:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.163.50.197])
-        by smtp.gmail.com with ESMTPSA id c1-20020a17090a674100b001f262f6f717sm1009862pjm.3.2022.07.27.01.05.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jul 2022 01:05:52 -0700 (PDT)
-Message-ID: <62e0f1e0.170a0220.bf72.19f6@mx.google.com>
-Date:   Wed, 27 Jul 2022 01:05:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4977310238609724618=="
+        Wed, 27 Jul 2022 04:20:51 -0400
+X-Greylist: delayed 529 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 27 Jul 2022 01:20:51 PDT
+Received: from wnew3-smtp.messagingengine.com (wnew3-smtp.messagingengine.com [64.147.123.17])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D563C16C;
+        Wed, 27 Jul 2022 01:20:50 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailnew.west.internal (Postfix) with ESMTP id 777522B05A15;
+        Wed, 27 Jul 2022 04:11:57 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute1.internal (MEProxy); Wed, 27 Jul 2022 04:11:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+        :cc:content-type:date:date:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to; s=fm3; t=1658909516; x=1658916716; bh=Ujzoa7+jS8
+        fYmceJHmeFpMQR3KXUNY5FvTEHQqyR5LA=; b=dShcvtJbMiAa/sWG9PWNR0OApg
+        TpLcNilzPqQpkfuZSb/81vFuDInCf8BtqJceCIEfUa7XwE9GKoI0pjJjLe+GTTuE
+        jcYylFUpwwvRDHCAf1b/wqbQezuJy6DitsrfkAuHNw6QYEXIw9lXpgEQMdNHaYzY
+        0G4M+aAyVlT5n0WkWLnPV7ueGXnhV+UO9Oio9dEUcmkfwDcQSjSqrwBmMHM2qCKS
+        AFXm29HcOXAuuU322Ayy6mk319CsysJwIp3fJzypa69551CeWt+1elQR1x5wLY+f
+        VNSPq36+IMoKzYDSBitWi+ouxCHdrWn/0G0H6A5XA4JSUqujwHWrsZyAvuDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1658909516; x=1658916716; bh=Ujzoa7+jS8fYmceJHmeFpMQR3KXU
+        NY5FvTEHQqyR5LA=; b=bbNjEDBGaZ3eYhYSuh4TkgaXzlzMxSsV2LJP1cpRmk3y
+        U6St2BVN4edJlkhzHfUIKp9PJVaGyZql44Vz8z+2dpxiPeTq9rYa6tNJUBlWZ8cc
+        1SVtumVOHzw8G2WTnAk5j4XKKwzu58O5x3HySJdNAPGZM2Olh1P3hP0m9BChS7SK
+        GW4g89IhaQNJB6rLL5HSVd04reHBTEmL1zLsaUWJeeusDJGJjrk4XtpLGup1z/R6
+        G5SKmq23h+9yj9kcvI8uAue8HWLGJnjjFg7K5SZaOBfhhxpyI+qzRmvK3J4oYj4Y
+        LLQ+wLRh36t9SkFQzZy4MNzfJDOzfkjmLHxueEUdLg==
+X-ME-Sender: <xms:TPPgYieolKFn6F3EyXwB0m0NXzlQLQR3-HCvZUjbsOpMAvah5bGqFA>
+    <xme:TPPgYsO-SHloPHsbkim72Pa4mhksLjr1ttpUFMPX0VqLQHzmcXjwtf-LX4HH-hgFX
+    FieU2wlH6rjzQ>
+X-ME-Received: <xmr:TPPgYjjDgOxD9hH-fdaHJJrVIawEOczrePbw3TckFHx0cgRt3ruS3nhu-dTi2uEyjCrpPC-usOSPMFPgTo_v4u9XTnAm9yIe>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvdduvdcutefuodetggdotefrodftvfcurf
+    hrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecuuegr
+    ihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjug
+    hrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpefirhgvghcumffj
+    uceoghhrvghgsehkrhhorghhrdgtohhmqeenucggtffrrghtthgvrhhnpeegheeuhefgtd
+    eluddtleekfeegjeetgeeikeehfeduieffvddufeefleevtddtvdenucffohhmrghinhep
+    khgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrg
+    hilhhfrhhomhepghhrvghgsehkrhhorghhrdgtohhm
+X-ME-Proxy: <xmx:TPPgYv_aui7llQbtInQMN-hRgl3ecjvyJdivxgPuAidPYfvFlEHNlQ>
+    <xmx:TPPgYuscqAfDhAkUmX67YKm9AxpISPuZePYNgvs5UGIu2XlMu-94Rw>
+    <xmx:TPPgYmEOGkDvf0lKeCCwuBzcwzEQIua7gQMpdtD4MgjZs04SEUfgLw>
+    <xmx:TPPgYvOxUA4gRVcWSqLtQPRcYTKSTM8lAvMeyD3Q7w0Q6YwlocvmcYL7P7E>
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 27 Jul 2022 04:11:56 -0400 (EDT)
+Date:   Wed, 27 Jul 2022 10:11:33 +0200
+From:   Greg KH <greg@kroah.com>
+To:     Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc:     stable@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>, johan.hedberg@gmail.com,
+        harshit.m.mogalapalli@gmail.com,
+        Ramanan Govindarajan <ramanan.govindarajan@oracle.com>,
+        linux-bluetooth@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        George Kennedy <george.kennedy@oracle.com>,
+        John Donnelly <john.p.donnelly@oracle.com>
+Subject: Re: Backport request to fix a WARNING in sco_sock_sendmsg on LTS
+Message-ID: <YuDzNUkeEv37sR2S@kroah.com>
+References: <fd01f110-05ce-569c-4910-722a5fab9f1c@oracle.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, soenke.huster@eknoes.de
-Subject: RE: [v2] Bluetooth: virtio_bt: Use skb_put to set length
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220727070541.6450-1-soenke.huster@eknoes.de>
-References: <20220727070541.6450-1-soenke.huster@eknoes.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fd01f110-05ce-569c-4910-722a5fab9f1c@oracle.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4977310238609724618==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Jul 27, 2022 at 01:26:49PM +0530, Harshit Mogalapalli wrote:
+> Hi,
+> 
+> We have seen a WARNING message while fuzzing with syzkaller.
+> 
+> 
+> Kernel 5.15.54 on an x86_64
+> 
+> localhost login: [  104.557712] ------------[ cut here ]------------
+> [  104.558404] WARNING: CPU: 1 PID: 15544 at mm/page_alloc.c:5358
+> __alloc_pages+0x38a/0x410
+> [  104.559584] Modules linked in:
+> [  104.560030] CPU: 1 PID: 15544 Comm: repro Not tainted 5.15.54 #1
+> [  104.560896] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.11.0-2.el7 04/01/2014
+> [  104.562190] RIP: 0010:__alloc_pages+0x38a/0x410
+> [  104.562864] Code: ff 4c 89 fa 44 89 f6 89 ef 89 6c 24 48 c6 44 24 78 00
+> 4c 89 6c 24 60 e8 c4 e5 ff ff 49 89 c4 e9 43 fe ff ff 40 80 e5 3f eb c5 <0f>
+> 0b eb a5 4c 89 e7 44 89 f6 45 31 e4 e8 c4 9f ff ff e9 4a fe ff
+> [  104.565421] RSP: 0018:ffff88801b4577f0 EFLAGS: 00010246
+> [  104.566182] RAX: 0000000000000000 RBX: 1ffff1100368aeff RCX:
+> dffffc0000000000
+> [  104.567177] RDX: 0000000000000000 RSI: 0000000000000012 RDI:
+> 0000000000040cc0
+> [  104.568185] RBP: 0000000000000000 R08: 0000000000000000 R09:
+> 0000000000000000
+> [  104.569196] R10: fffffff900000000 R11: 0000000000000001 R12:
+> 0000000000000001
+> [  104.570194] R13: 0000000000000000 R14: 0000000000000000 R15:
+> 0000000000000000
+> [  104.571201] FS:  00007fda701c7740(0000) GS:ffff888107080000(0000)
+> knlGS:0000000000000000
+> [  104.572330] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  104.573146] CR2: 0000000020004640 CR3: 0000000020c34000 CR4:
+> 00000000000006e0
+> [  104.574149] Call Trace:
+> [  104.574503]  <TASK>
+> [  104.574838]  ? __sanitizer_cov_trace_cmp4+0x25/0x90
+> [  104.575535]  ? __alloc_pages_slowpath.constprop.0+0x16c0/0x16c0
+> [  104.576391]  ? bpf_ksym_find+0x171/0x1c0
+> [  104.576985]  ? selinux_socket_sendmsg+0x207/0x2d0
+> [  104.577938]  ? __sanitizer_cov_trace_const_cmp8+0x27/0x90
+> [  104.578739]  alloc_pages+0x191/0x3f0
+> [  104.579258]  kmalloc_order+0x34/0xb0
+> [  104.579794]  kmalloc_order_trace+0x19/0xa0
+> [  104.580375]  sco_sock_sendmsg+0x10f/0x300
+> [  104.581228]  ? security_socket_sendmsg+0x8e/0xc0
+> 
+> 
+> I have attached the report and the reproducer. A similar warning is seen
+> on some testing previously.
+> 
+> Ref: https://lore.kernel.org/linux-mm/812dab5c-845d-df58-2752-abea7c07890@google.com/
+> 
+> Commit: 99c23da0eed4 ("Bluetooth: sco: Fix lock_sock() blockage by
+> memcpy_from_msg()") is backported to LTS. So we have this bug on LTS
+> branches.
+> 
+> The Fix commit is not backported to LTS.
+> Commit: 0771cbb3b97d ("Bluetooth: SCO: Replace use of memcpy_from_msg
+> with bt_skb_sendmsg")
+> 
+> I have tried backporting onto LTS locally.
+> 
+> Can you please backport the following commits to these branches.
+> 4.14.y, 4.19.y, 5.4.y, 5.10.y, 5.15.y LTS. (applying from 1 to 7)
+> 
+> 1. commit 38f64f650dc0e44c146ff88d15a7339efa325918 upstream
+> 	("Bluetooth: Add bt_skb_sendmsg helper")
+> 2. commit 97e4e80299844bb5f6ce5a7540742ffbffae3d97 upstream
+> 	("Bluetooth: Add bt_skb_sendmmsg helper")
+> 3. commit 0771cbb3b97d3c1d68eecd7f00055f599954c34e upstream
+> 	("Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg")
+> 4. commit 81be03e026dc0c16dc1c64e088b2a53b73caa895 upstream
+> 	("Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg")
+> 5. commit 266191aa8d14b84958aaeb5e96ee4e97839e3d87 upstream
+> 	("Bluetooth: Fix passing NULL to PTR_ERR")
+> 6. commit 037ce005af6b8a3e40ee07c6e9266c8997e6a4d6 upstream
+> 	("Bluetooth: SCO: Fix sco_send_frame returning
+> skb->len")
+> 7. commit 29fb608396d6a62c1b85acc421ad7a4399085b9f upstream
+> 	("Bluetooth: Fix bt_skb_sendmmsg not allocating partial chunks")
+> 
+> 
+> Notes:
+> 3 is the fix for the WARNING.
+> 1,2 are prerequisites for applying 3. At this stage the WARNING is fixed.
+> 4,5,6,7 are necessary as they are fixing newly introduced commits by us.
+> 
+> This is a clean cherry-pick series(7 commits) on all mentioned branches(LTS
+> 4.14->5.15)
+> 
+> I have tested all mentioned LTS branches with the reproducer(only) and the
+> WARNING is fixed after applying these 7 patches.
 
-This is automated email and please do not reply to this email!
+All now queued up, thanks.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663357
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.39 seconds
-GitLint                       PASS      0.69 seconds
-SubjectPrefix                 PASS      0.52 seconds
-BuildKernel                   PASS      33.52 seconds
-BuildKernel32                 PASS      28.96 seconds
-Incremental Build with patchesPASS      41.43 seconds
-TestRunner: Setup             PASS      487.36 seconds
-TestRunner: l2cap-tester      PASS      17.07 seconds
-TestRunner: bnep-tester       PASS      6.20 seconds
-TestRunner: mgmt-tester       PASS      99.23 seconds
-TestRunner: rfcomm-tester     PASS      9.42 seconds
-TestRunner: sco-tester        PASS      9.27 seconds
-TestRunner: smp-tester        PASS      9.29 seconds
-TestRunner: userchan-tester   PASS      6.31 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4977310238609724618==--
+greg k-h
