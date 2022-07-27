@@ -2,103 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB866C04A68
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 13:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC66C19F2D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jul 2022 13:58:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234051AbiG0Nhn (ORCPT
+        id S232692AbiG0N65 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jul 2022 09:37:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44700 "EHLO
+        Wed, 27 Jul 2022 09:58:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233921AbiG0Nhl (ORCPT
+        with ESMTP id S233089AbiG0N6p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jul 2022 09:37:41 -0400
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA2F33E0F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 06:37:36 -0700 (PDT)
-Received: by mail-il1-x12d.google.com with SMTP id w14so952527ilg.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 06:37:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/wOa3CPYbRmAShI0VXNMcOx0o3X9bIcXCObGm9Al13A=;
-        b=eMj37N/5XJeUvTNSKspHHMAJ78i2+PU8HvIC2gxH9gJA5vEUBY+qZfSUSTRZ5rn0Lk
-         yeYHCau8xomWPRHDkavFFYKOogYMnDpwsjB+wUqXJtObbha4SHNbOSVsEYiB0Szc98Vw
-         uJYSytRrI2/dmdaSKgqdSE0jCnVSAyUqK3iL7phnGnNCBeHl0E/WuiUqy7gPH18TPXkJ
-         5EZa2a0rtjBt3quz5ggxaxuE0RtE+fEz9d2+g38Dy+W9vSS7GBvitg0zIvZVt80j0ZDI
-         bBPkYd0TmsuefgnViV6mq3NnheuClgCw03ETYvdCZMW+oqWaH9f2Uo/YsrWvG2PVwvP0
-         VBkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/wOa3CPYbRmAShI0VXNMcOx0o3X9bIcXCObGm9Al13A=;
-        b=4PKmbeq9b3vVTj7TFlxR7x5HABI89WySNJ3dKI7yLjKmQ/GVlTZPapj4XHhkhLfdh4
-         82DMkLHcidLzpb4mVZpGp+LXNHST3xhVW7X0/hR4hlE7hNzfsr+62vSPsDOQnfpwAknm
-         b6EdaHs0yR1e9jVB2muAvS9tkKf0PfQVdnSWrhZX3uLiiQ0pE4fNpIaD8vMYmCXFYeMi
-         uKra18TVIix+AfPHdFhT9gdL0Jr84SFjbHlWGx7a1c+Uj3+NhIu6wCzfj2u7mQwDShfL
-         viDu+02UZEgeguHzZKs0/fzb7FBTSnDZKkEsQL+Ysctse4cjOXgXBcdR+Pm78kSy/oMu
-         RKEg==
-X-Gm-Message-State: AJIora87OWi+f0atydklCpRxL74QUauNJUGQ0rVk/o511x60ZO1pIu+V
-        DVqU2L6C6Tl5r1R7TLwLJc2GvE1yaEo=
-X-Google-Smtp-Source: AGRyM1uMuYtdhMADcZx+nguR6VEUCmLVsXIKupIo6LcKGJRxYbr+rxWW7SxzemYINQUJ3ojMPWtFRQ==
-X-Received: by 2002:a05:6e02:1e0b:b0:2dd:1065:30f1 with SMTP id g11-20020a056e021e0b00b002dd106530f1mr8423575ila.87.1658929056031;
-        Wed, 27 Jul 2022 06:37:36 -0700 (PDT)
-Received: from [172.17.0.2] ([20.9.62.216])
-        by smtp.gmail.com with ESMTPSA id f2-20020a926a02000000b002dc21dec1d9sm6792762ilc.16.2022.07.27.06.37.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jul 2022 06:37:35 -0700 (PDT)
-Message-ID: <62e13f9f.1c69fb81.fd496.8c42@mx.google.com>
-Date:   Wed, 27 Jul 2022 06:37:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7767625105961950769=="
+        Wed, 27 Jul 2022 09:58:45 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34CEC33E37
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jul 2022 06:58:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1658930325; x=1690466325;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LWVMLX40dH07f9AcuVgzOKAC3bgG/LUVNEKInKLHVhY=;
+  b=OQD+xRkYhOnwsLdBPeWsAuobk8ghr1YCF0du4crn5jzu7G9gxRmnvnWg
+   bK+6cu5QhP/t4UO0U86rHMnTzxasETwSW3Dq4nT/2qa6a3B+zM/aetB70
+   3E5G0tnHmh05y+OuKns3VHQ8emwZ8AiyNszMWpiOCyYrRQaEFQ7M+AqO3
+   1eAOlofCCARz8OOoPQ7n4PESj8JLd0EmmCYIMCw7MpG8mZdH5UM8hYiTj
+   /JrXw7YUzOuNXbYnxvC+hSdiJITOgdpSutxcIhGFLb1FYFqtT2AingAKm
+   E2C9ngF/ydlbLJjpoN/tb0+FkuKsGAvwfVWVAvKYhUBPSEZe+MtqYgBR5
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10421"; a="352233000"
+X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
+   d="scan'208";a="352233000"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 06:58:43 -0700
+X-IronPort-AV: E=Sophos;i="5.93,195,1654585200"; 
+   d="scan'208";a="689874786"
+Received: from ksloan-mobl7.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.184.122])
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jul 2022 06:58:43 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH v4 3/4] Bluetooth: Delete unused hci_req_stop_discovery()
+Date:   Wed, 27 Jul 2022 06:58:33 -0700
+Message-Id: <20220727135834.294184-4-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.1
+In-Reply-To: <20220727135834.294184-1-brian.gix@intel.com>
+References: <20220727135834.294184-1-brian.gix@intel.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dan.carpenter@oracle.com
-Subject: RE: [1/2] Bluetooth: ISO: unlock on error path in iso_sock_setsockopt()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <YuEq2Aey0VOrxPB+@kili>
-References: <YuEq2Aey0VOrxPB+@kili>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7767625105961950769==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_req_stop_discovery has been deprecated in favor of
+hci_stop_discovery_sync() as part of transition to hci_sync.c
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663427
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.49 seconds
-GitLint                       PASS      1.67 seconds
-SubjectPrefix                 PASS      1.21 seconds
-BuildKernel                   PASS      35.53 seconds
-BuildKernel32                 PASS      31.02 seconds
-Incremental Build with patchesPASS      48.90 seconds
-TestRunner: Setup             PASS      509.47 seconds
-TestRunner: l2cap-tester      PASS      17.95 seconds
-TestRunner: bnep-tester       PASS      6.84 seconds
-TestRunner: mgmt-tester       PASS      106.23 seconds
-TestRunner: rfcomm-tester     PASS      10.13 seconds
-TestRunner: sco-tester        PASS      9.97 seconds
-TestRunner: smp-tester        PASS      9.88 seconds
-TestRunner: userchan-tester   PASS      6.87 seconds
-
-
-
+Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_request.c | 48 -------------------------------------
+ net/bluetooth/hci_request.h |  2 --
+ 2 files changed, 50 deletions(-)
 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 114af7350363..ef0a5ec067b6 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1975,54 +1975,6 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
+ 	return 0;
+ }
+ 
+-bool hci_req_stop_discovery(struct hci_request *req)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	struct discovery_state *d = &hdev->discovery;
+-	struct hci_cp_remote_name_req_cancel cp;
+-	struct inquiry_entry *e;
+-	bool ret = false;
+-
+-	bt_dev_dbg(hdev, "state %u", hdev->discovery.state);
+-
+-	if (d->state == DISCOVERY_FINDING || d->state == DISCOVERY_STOPPING) {
+-		if (test_bit(HCI_INQUIRY, &hdev->flags))
+-			hci_req_add(req, HCI_OP_INQUIRY_CANCEL, 0, NULL);
+-
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-			cancel_delayed_work(&hdev->le_scan_disable);
+-			cancel_delayed_work(&hdev->le_scan_restart);
+-			hci_req_add_le_scan_disable(req, false);
+-		}
+-
+-		ret = true;
+-	} else {
+-		/* Passive scanning */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-			hci_req_add_le_scan_disable(req, false);
+-			ret = true;
+-		}
+-	}
+-
+-	/* No further actions needed for LE-only discovery */
+-	if (d->type == DISCOV_TYPE_LE)
+-		return ret;
+-
+-	if (d->state == DISCOVERY_RESOLVING || d->state == DISCOVERY_STOPPING) {
+-		e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY,
+-						     NAME_PENDING);
+-		if (!e)
+-			return ret;
+-
+-		bacpy(&cp.bdaddr, &e->data.bdaddr);
+-		hci_req_add(req, HCI_OP_REMOTE_NAME_REQ_CANCEL, sizeof(cp),
+-			    &cp);
+-		ret = true;
+-	}
+-
+-	return ret;
+-}
+-
+ static void config_data_path_complete(struct hci_dev *hdev, u8 status,
+ 				      u16 opcode)
+ {
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 39d001fa3acf..faf6d9a51a91 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -113,8 +113,6 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ void __hci_req_update_class(struct hci_request *req);
+ 
+ /* Returns true if HCI commands were queued */
+-bool hci_req_stop_discovery(struct hci_request *req);
+-
+ int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec);
+ 
+ void __hci_req_update_scan(struct hci_request *req);
+-- 
+2.37.1
 
---===============7767625105961950769==--
