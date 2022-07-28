@@ -2,122 +2,178 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD604C04A68
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 23:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC57C19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 23:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232542AbiG1XDH (ORCPT
+        id S231617AbiG1XqA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jul 2022 19:03:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
+        Thu, 28 Jul 2022 19:46:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbiG1XDE (ORCPT
+        with ESMTP id S230007AbiG1Xp7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jul 2022 19:03:04 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1EC79694
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 16:03:01 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id y10-20020a9d634a000000b006167f7ce0c5so2229106otk.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 16:03:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Xi86JIJcu1EkoaTHpYuiqkPN47gv4PA9I5+RSWPX0f8=;
-        b=FrMakrVqW6gBtHB+/mF+iKjNMLG6aeGSLn4WMzmLRyFmsnkKobGJ1w/g2NNx08hVbt
-         gYbM3bwYCiODL89qeQ6Q7HCrvikJxENxzE2QSYfGlnwXI10kX3XMF3xlHAcqI7kaaQUs
-         iBt33fzr2t5hMX2aD37h37T7FuRRQh6hQAw4YuahPTzyQdREFNmc5ygdocHMNNgk1ZX9
-         jp1jt6DKzeTXrO0zuAN2V4jZZ78Y5cm5Qq2f2az7ymSUEr9mxhjbxSgD202oOyl8/0Os
-         zreRYp1Q2ZhLqMyIaBh23ywqXa0ebt2RSrpywNMjr+eb6R6VYcKmZ24DptzABjNeZdEi
-         lEJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Xi86JIJcu1EkoaTHpYuiqkPN47gv4PA9I5+RSWPX0f8=;
-        b=uItO8L4iQte4ecs8RaPBQSLY61VWzImJ9OTyeIWe0JRsPEUm6VheyccezD4zZeQnVY
-         b0UTuZxb4Xg/EUMe56ofs3GiZsvLDP9HIrm+T+Yvb8xttAEBKpBrBl+2ti06pfcnd0T4
-         wzJGBepFdtf4BJFwEfJAPg7XjTecdChaEzgoUBb2n1UvRem46BsOJUNIePB5Z69H8Jwe
-         0l1s85wimffyEuzT02ab9UxuJaNB4Zx/BlonnkGAMAf0KGxQUXmqWVdPslKLxw/SZwij
-         jOh0DlkOiUH+puMXVoqWnPGLbylNsKRPHZ4NlAIE4i2hVIZVITs28J9voyzp01YylL7N
-         tzEQ==
-X-Gm-Message-State: AJIora+tgMtGwqCZz/l6InaEo2da+DtDCUgZDjro+WqqDHQLz6miz7BK
-        K4LjJkLtpsC906XUI6pSlxxYfw5xmQI=
-X-Google-Smtp-Source: AGRyM1vk2BljK2OucTGcOhVzb1B2OoixsWMuC70SpDWe0dPSD0R52Jil7vKbFgZu2zC011F0ZAJlNA==
-X-Received: by 2002:a05:6830:3183:b0:61c:9cc6:ebf0 with SMTP id p3-20020a056830318300b0061c9cc6ebf0mr432390ots.185.1659049380887;
-        Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.231.58])
-        by smtp.gmail.com with ESMTPSA id u7-20020a056808150700b0033aa53c549dsm800901oiw.25.2022.07.28.16.03.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
-Message-ID: <62e315a4.050a0220.75f5.41f7@mx.google.com>
-Date:   Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7184819413054922352=="
+        Thu, 28 Jul 2022 19:45:59 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94B83B94A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 16:45:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659051958; x=1690587958;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AYza/zZ4j/VeW2yt0uhecbwRqt0+82wHKlHVTkb/BWc=;
+  b=KH09+sSWt+JGvmhiBn7CvhkVDOKb8HusXVSE2XUiI/PGcSy5wDseQQLT
+   EPYrxB1VWK4FTP0JmIbGlgbzU0F9bNTYGF/YseW2PC4N6eh+w4fLnZqGE
+   cQtvY1WdvKnZKh43+beDYl27KFhVLQ3iRXao9FfhALj9UbPGioffA6EEv
+   qbGl6rwjov/CC1rHYeVBQYd9DqHDlxEsXCBgzNoPVeq88XshMdh34xIp7
+   yRWe+jrFcyEPR38Vk27XbBVLKPdZGXvByg9SKGo7sJy21fUZdJqnk2m10
+   o86ySni4Lt2BqjvbzavDMEoHASr6nU7ah+UA8cr/zvW+XWcLPb7Me09T7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10422"; a="268416654"
+X-IronPort-AV: E=Sophos;i="5.93,199,1654585200"; 
+   d="scan'208";a="268416654"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2022 16:45:58 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,199,1654585200"; 
+   d="scan'208";a="669079328"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 28 Jul 2022 16:45:56 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oHDCW-000Aiv-0v;
+        Thu, 28 Jul 2022 23:45:56 +0000
+Date:   Fri, 29 Jul 2022 07:45:02 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 13474ba176c9649479db7cd2cef2210a4c9f3bbc
+Message-ID: <62e31f7e.eTneXAdrFc++cqQ3%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220728221145.1301230-1-luiz.dentz@gmail.com>
-References: <20220728221145.1301230-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7184819413054922352==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 13474ba176c9649479db7cd2cef2210a4c9f3bbc  Bluetooth: ISO: unlock on error path in iso_sock_setsockopt()
 
-This is automated email and please do not reply to this email!
+elapsed time: 1619m
 
-Dear submitter,
+configs tested: 100
+configs skipped: 2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663892
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+gcc tested configs:
+i386                                defconfig
+i386                             allyesconfig
+arc                  randconfig-r043-20220727
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+x86_64                        randconfig-a006
+i386                          randconfig-a001
+i386                          randconfig-a003
+i386                          randconfig-a005
+x86_64                        randconfig-a013
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
+x86_64                          rhel-8.3-func
+x86_64                         rhel-8.3-kunit
+x86_64                    rhel-8.3-kselftests
+x86_64                           rhel-8.3-kvm
+x86_64                           rhel-8.3-syz
+um                             i386_defconfig
+um                           x86_64_defconfig
+powerpc                           allnoconfig
+sh                               allmodconfig
+powerpc                          allmodconfig
+mips                             allyesconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+arm64                            allyesconfig
+arm                                 defconfig
+arm                              allyesconfig
+x86_64                              defconfig
+x86_64                           allyesconfig
+x86_64                               rhel-8.3
+csky                              allnoconfig
+alpha                             allnoconfig
+arc                               allnoconfig
+riscv                             allnoconfig
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+loongarch                           defconfig
+loongarch                         allnoconfig
+arc                           tb10x_defconfig
+powerpc                 mpc8540_ads_defconfig
+m68k                       m5475evb_defconfig
+powerpc                      pasemi_defconfig
+i386                          randconfig-c001
+s390                       zfcpdump_defconfig
+openrisc                         alldefconfig
+ia64                        generic_defconfig
+sh                           se7343_defconfig
+arm                            mps2_defconfig
+openrisc                    or1ksim_defconfig
+xtensa                  cadence_csp_defconfig
+mips                           ip32_defconfig
+arc                            hsdk_defconfig
+sh                 kfr2r09-romimage_defconfig
+sh                     sh7710voipgw_defconfig
+m68k                        m5407c3_defconfig
+powerpc                     taishan_defconfig
+sh                         ap325rxa_defconfig
+powerpc                      tqm8xx_defconfig
+arm                          lpd270_defconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
 
-Test Summary:
-CheckPatch                    FAIL      2.39 seconds
-GitLint                       PASS      0.79 seconds
-SubjectPrefix                 PASS      0.72 seconds
-BuildKernel                   PASS      32.56 seconds
-BuildKernel32                 PASS      28.31 seconds
-Incremental Build with patchesPASS      39.94 seconds
-TestRunner: Setup             PASS      465.81 seconds
-TestRunner: l2cap-tester      PASS      16.35 seconds
-TestRunner: bnep-tester       PASS      6.51 seconds
-TestRunner: mgmt-tester       PASS      101.11 seconds
-TestRunner: rfcomm-tester     PASS      9.82 seconds
-TestRunner: sco-tester        PASS      9.07 seconds
-TestRunner: smp-tester        PASS      9.62 seconds
-TestRunner: userchan-tester   PASS      6.30 seconds
+clang tested configs:
+hexagon              randconfig-r045-20220727
+hexagon              randconfig-r041-20220727
+s390                 randconfig-r044-20220727
+riscv                randconfig-r042-20220727
+x86_64                        randconfig-a005
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+i386                          randconfig-a002
+i386                          randconfig-a004
+i386                          randconfig-a006
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+mips                malta_qemu_32r6_defconfig
+powerpc                    gamecube_defconfig
+arm                          collie_defconfig
+arm                       imx_v4_v5_defconfig
+arm                       versatile_defconfig
+powerpc                      obs600_defconfig
+x86_64                        randconfig-k001
+arm                     davinci_all_defconfig
+powerpc                 mpc836x_mds_defconfig
+riscv                             allnoconfig
+hexagon              randconfig-r041-20220728
+hexagon              randconfig-r045-20220728
+i386                          randconfig-a011
+i386                          randconfig-a013
+i386                          randconfig-a015
+powerpc                     tqm5200_defconfig
+powerpc                        fsp2_defconfig
+powerpc                      katmai_defconfig
+powerpc                   microwatt_defconfig
+powerpc                      ppc64e_defconfig
 
-Details
-##############################
-Test: CheckPatch - FAIL - 2.39 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()\ERROR:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal patch author 'Dan Carpenter <dan.carpenter@oracle.com>'
-
-total: 1 errors, 0 warnings, 0 checks, 24 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12931756.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7184819413054922352==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
