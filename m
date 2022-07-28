@@ -2,103 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57B8AC04A68
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 22:03:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7DFC04A68
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 22:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230312AbiG1WDO (ORCPT
+        id S232332AbiG1WMA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jul 2022 18:03:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45452 "EHLO
+        Thu, 28 Jul 2022 18:12:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51410 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiG1WDN (ORCPT
+        with ESMTP id S232366AbiG1WLz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jul 2022 18:03:13 -0400
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA4D6249C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:03:12 -0700 (PDT)
-Received: by mail-il1-x12a.google.com with SMTP id 1so1598170ill.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:03:12 -0700 (PDT)
+        Thu, 28 Jul 2022 18:11:55 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB731796A6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:11:47 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3532262pjf.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:11:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=G0l4KnLs+guplZ+iuaBgo5yWPQF4ZKMC7KWH31L0/1Q=;
-        b=Ufmb3zYF4F0I7d9o2iOLAoycf5qLhpNrCpaocX63l00asRq2I0HYvRwFfmKJjYWcN7
-         VEs/KZACxEsGyky0QJ7766eW6XX3ZQnjHZYWgp5cUf/nYStF1hlMLG/ZR1z+LIkppp0P
-         FBkLh3Q+DN7jyVOzyO2L9ajId2YaV+a710JjkoKK+aRXLmBkoUWSTXITmLvmGcPkX91A
-         jr4X4K5f3x5fK+o3Xw9IPyCLUsGQTGq23uLBlx1ODx9cp1+YH4zlcWc7Gmyr+S06nESl
-         YCKo2dcHQRD1XCqS07dY1UcaGR6EzxgUit3YftrtcOE/LraQ2l96ZHczHfJ4BFrj+Wqn
-         +8aQ==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hKRR2VzkpItQ1F1vECQmRdUFE46CzeX82qrAqlrMOvQ=;
+        b=Ubm6YL2hUf8SEmp2Snao+tOQs7Ln+b+/1lTFGh+oB1CWgsrmsYinayTDwIx6yEvC/O
+         Vq6KoQRoN8jeq2OY/4w8fUIiqljyx7XCnScNg+OeZg3b7Ul6MTnKG/BmkgpYJ60f4PdX
+         nAwd0lORpJVTXVTTGkve1+KRDxQpVnbn5FA2j02M95TLaV8wGiPtTaoXZnTkFcz1r5k6
+         yy/G6CYN1yEMfeabxgIzm4TAfGHg1pBkqNt8R9QFvlLBRziQvdzctY8UE31qPSFP+cva
+         kftahco0BNVL1FUl171ryLsyLdtfWhegDkDJqU810HvZNq0zjlmH8r8LGKjTtIB4lnvF
+         ab9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=G0l4KnLs+guplZ+iuaBgo5yWPQF4ZKMC7KWH31L0/1Q=;
-        b=A2iTae0h0uoBf23A9zD0dwC6ReOswaAUVkTrIcSsh/w1ifdTLr5Euu9MbPjbhhKqVc
-         UBXkRPhf9v3y/5gXuHBD8X/j1Zx2oYCDQOlCmUu71bCTOtoRZKNn+KfVoeULd+ji2RMb
-         rdME6rAvpkleCnF/KoYcYxgWeZ9sboo90U7Vx3kFxeC2jWNrJKYUgpmGTpJWKlwO8qN4
-         yVpAYj8uSpqz+De7a1N6q+9NG90TeqNLI3yv0plmtN069ArfUIffdlZZUj+sAwSYnQhl
-         zr3d+U66nhxOmNiwUYySiUk7A6CfWDBQhz9fJy/5xnDQPbvI0W76pFP+gBZYOktG5UB9
-         9CTQ==
-X-Gm-Message-State: AJIora/yr9XQ7wxD1vqbr+vj6jikXFTCnOWskUkwIeru8HnGU0xXU8Ss
-        CXiyOKquMCQTAEzHc1ObswDF39qxTMo=
-X-Google-Smtp-Source: AGRyM1tcwLBv2oHNwEJTBu8giYSGO2uNUOcs3GcrHC1FEs2y7M2OVwr16+ObTQ06uc1rE77Esy7FVA==
-X-Received: by 2002:a05:6e02:1ca8:b0:2dd:6674:f1cb with SMTP id x8-20020a056e021ca800b002dd6674f1cbmr271411ill.131.1659045791376;
-        Thu, 28 Jul 2022 15:03:11 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.195.174])
-        by smtp.gmail.com with ESMTPSA id m10-20020a924b0a000000b002dd12857a13sm733468ilg.80.2022.07.28.15.03.10
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hKRR2VzkpItQ1F1vECQmRdUFE46CzeX82qrAqlrMOvQ=;
+        b=yfd+NH+qvsd+EIdemgsHZX7kYwBe+zDUjN3VvjQUNZN8IxyifhafsSAoU5PEcMrgMN
+         DHSH/RxHnJHKnBArBYdAGVFG/S0x2fVG+NhKOLyteUPKWlZ2vbvdKtk+zs99XxHvqh3Y
+         +J3cl9rlDUEO/XKUye001S4yl7ARLzjc2N5Bj2ChGy6dY01/iYlx68TVYW4t6AUhME3/
+         eV/JHwVQ51PBA1q2mkNksSM6dJmcl79an1t45U6TVsT2iC9iGZqmR+yj/CSNXPI4MT8u
+         oi2pOUpi92yVhlKGaLsUtH19i2MDFSlCYexBWmCpKrkm2VbE215UDP/SaVNsm9zEmZBq
+         vKfg==
+X-Gm-Message-State: ACgBeo0FhanRO/bGQRZI6j48FiDgr/ABXLe/xTL6hylGahik8yxkf4+T
+        knOs1A1djCjSOZGl/NrI2IdQ5ZY2tB2cRA==
+X-Google-Smtp-Source: AA6agR4NBywA9v7bx7Xo4nb8G8+ALTszr3tmWIHzKRBovs6ZvWKgN/qe9A7S9XbZaM/KtO6/R8xXKA==
+X-Received: by 2002:a17:902:ce83:b0:16c:2e89:d640 with SMTP id f3-20020a170902ce8300b0016c2e89d640mr853244plg.23.1659046306657;
+        Thu, 28 Jul 2022 15:11:46 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id e14-20020a17090301ce00b0016a5384071bsm1907104plh.1.2022.07.28.15.11.45
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 15:03:10 -0700 (PDT)
-Message-ID: <62e3079e.920a0220.ceff4.1616@mx.google.com>
-Date:   Thu, 28 Jul 2022 15:03:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5849552911395913190=="
+        Thu, 28 Jul 2022 15:11:45 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()
+Date:   Thu, 28 Jul 2022 15:11:45 -0700
+Message-Id: <20220728221145.1301230-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: hci_conn: Fix updating ISO QoS PHY
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220728210556.1236145-1-luiz.dentz@gmail.com>
-References: <20220728210556.1236145-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5849552911395913190==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Dan Carpenter <dan.carpenter@oracle.com>
 
-This is automated email and please do not reply to this email!
+The C standard rules for when struct holes are zeroed out are slightly
+weird.  The existing assignments might initialize everything, but GCC
+is allowed to (and does sometimes) leave the struct holes uninitialized,
+so instead of using yet another variable and copy the QoS settings just
+use a pointer to the stored QoS settings.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663884
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.55 seconds
-GitLint                       PASS      0.88 seconds
-SubjectPrefix                 PASS      0.59 seconds
-BuildKernel                   PASS      33.41 seconds
-BuildKernel32                 PASS      28.76 seconds
-Incremental Build with patchesPASS      40.18 seconds
-TestRunner: Setup             PASS      478.62 seconds
-TestRunner: l2cap-tester      PASS      16.65 seconds
-TestRunner: bnep-tester       PASS      6.22 seconds
-TestRunner: mgmt-tester       PASS      98.96 seconds
-TestRunner: rfcomm-tester     PASS      9.47 seconds
-TestRunner: sco-tester        PASS      9.24 seconds
-TestRunner: smp-tester        PASS      9.25 seconds
-TestRunner: userchan-tester   PASS      6.39 seconds
-
-
-
+Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/iso.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 19d003727b50..dded22cde0d1 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -1235,7 +1235,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+ {
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
+-	struct bt_iso_qos qos;
++	struct bt_iso_qos *qos;
+ 	u8 base_len;
+ 	u8 *base;
+ 
+@@ -1261,12 +1261,12 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
+ 
+ 	case BT_ISO_QOS:
+ 		if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
+-			qos = iso_pi(sk)->conn->hcon->iso_qos;
++			qos = &iso_pi(sk)->conn->hcon->iso_qos;
+ 		else
+-			qos = iso_pi(sk)->qos;
++			qos = &iso_pi(sk)->qos;
+ 
+-		len = min_t(unsigned int, len, sizeof(qos));
+-		if (copy_to_user(optval, (char *)&qos, len))
++		len = min_t(unsigned int, len, sizeof(*qos));
++		if (copy_to_user(optval, qos, len))
+ 			err = -EFAULT;
+ 
+ 		break;
+-- 
+2.37.1
 
---===============5849552911395913190==--
