@@ -2,111 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7DFC04A68
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 22:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD604C04A68
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jul 2022 23:03:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232332AbiG1WMA (ORCPT
+        id S232542AbiG1XDH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jul 2022 18:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51410 "EHLO
+        Thu, 28 Jul 2022 19:03:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232366AbiG1WLz (ORCPT
+        with ESMTP id S231655AbiG1XDE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jul 2022 18:11:55 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB731796A6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:11:47 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id o5-20020a17090a3d4500b001ef76490983so3532262pjf.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 15:11:47 -0700 (PDT)
+        Thu, 28 Jul 2022 19:03:04 -0400
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB1EC79694
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 16:03:01 -0700 (PDT)
+Received: by mail-ot1-x332.google.com with SMTP id y10-20020a9d634a000000b006167f7ce0c5so2229106otk.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Jul 2022 16:03:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hKRR2VzkpItQ1F1vECQmRdUFE46CzeX82qrAqlrMOvQ=;
-        b=Ubm6YL2hUf8SEmp2Snao+tOQs7Ln+b+/1lTFGh+oB1CWgsrmsYinayTDwIx6yEvC/O
-         Vq6KoQRoN8jeq2OY/4w8fUIiqljyx7XCnScNg+OeZg3b7Ul6MTnKG/BmkgpYJ60f4PdX
-         nAwd0lORpJVTXVTTGkve1+KRDxQpVnbn5FA2j02M95TLaV8wGiPtTaoXZnTkFcz1r5k6
-         yy/G6CYN1yEMfeabxgIzm4TAfGHg1pBkqNt8R9QFvlLBRziQvdzctY8UE31qPSFP+cva
-         kftahco0BNVL1FUl171ryLsyLdtfWhegDkDJqU810HvZNq0zjlmH8r8LGKjTtIB4lnvF
-         ab9g==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Xi86JIJcu1EkoaTHpYuiqkPN47gv4PA9I5+RSWPX0f8=;
+        b=FrMakrVqW6gBtHB+/mF+iKjNMLG6aeGSLn4WMzmLRyFmsnkKobGJ1w/g2NNx08hVbt
+         gYbM3bwYCiODL89qeQ6Q7HCrvikJxENxzE2QSYfGlnwXI10kX3XMF3xlHAcqI7kaaQUs
+         iBt33fzr2t5hMX2aD37h37T7FuRRQh6hQAw4YuahPTzyQdREFNmc5ygdocHMNNgk1ZX9
+         jp1jt6DKzeTXrO0zuAN2V4jZZ78Y5cm5Qq2f2az7ymSUEr9mxhjbxSgD202oOyl8/0Os
+         zreRYp1Q2ZhLqMyIaBh23ywqXa0ebt2RSrpywNMjr+eb6R6VYcKmZ24DptzABjNeZdEi
+         lEJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=hKRR2VzkpItQ1F1vECQmRdUFE46CzeX82qrAqlrMOvQ=;
-        b=yfd+NH+qvsd+EIdemgsHZX7kYwBe+zDUjN3VvjQUNZN8IxyifhafsSAoU5PEcMrgMN
-         DHSH/RxHnJHKnBArBYdAGVFG/S0x2fVG+NhKOLyteUPKWlZ2vbvdKtk+zs99XxHvqh3Y
-         +J3cl9rlDUEO/XKUye001S4yl7ARLzjc2N5Bj2ChGy6dY01/iYlx68TVYW4t6AUhME3/
-         eV/JHwVQ51PBA1q2mkNksSM6dJmcl79an1t45U6TVsT2iC9iGZqmR+yj/CSNXPI4MT8u
-         oi2pOUpi92yVhlKGaLsUtH19i2MDFSlCYexBWmCpKrkm2VbE215UDP/SaVNsm9zEmZBq
-         vKfg==
-X-Gm-Message-State: ACgBeo0FhanRO/bGQRZI6j48FiDgr/ABXLe/xTL6hylGahik8yxkf4+T
-        knOs1A1djCjSOZGl/NrI2IdQ5ZY2tB2cRA==
-X-Google-Smtp-Source: AA6agR4NBywA9v7bx7Xo4nb8G8+ALTszr3tmWIHzKRBovs6ZvWKgN/qe9A7S9XbZaM/KtO6/R8xXKA==
-X-Received: by 2002:a17:902:ce83:b0:16c:2e89:d640 with SMTP id f3-20020a170902ce8300b0016c2e89d640mr853244plg.23.1659046306657;
-        Thu, 28 Jul 2022 15:11:46 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e14-20020a17090301ce00b0016a5384071bsm1907104plh.1.2022.07.28.15.11.45
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Xi86JIJcu1EkoaTHpYuiqkPN47gv4PA9I5+RSWPX0f8=;
+        b=uItO8L4iQte4ecs8RaPBQSLY61VWzImJ9OTyeIWe0JRsPEUm6VheyccezD4zZeQnVY
+         b0UTuZxb4Xg/EUMe56ofs3GiZsvLDP9HIrm+T+Yvb8xttAEBKpBrBl+2ti06pfcnd0T4
+         wzJGBepFdtf4BJFwEfJAPg7XjTecdChaEzgoUBb2n1UvRem46BsOJUNIePB5Z69H8Jwe
+         0l1s85wimffyEuzT02ab9UxuJaNB4Zx/BlonnkGAMAf0KGxQUXmqWVdPslKLxw/SZwij
+         jOh0DlkOiUH+puMXVoqWnPGLbylNsKRPHZ4NlAIE4i2hVIZVITs28J9voyzp01YylL7N
+         tzEQ==
+X-Gm-Message-State: AJIora+tgMtGwqCZz/l6InaEo2da+DtDCUgZDjro+WqqDHQLz6miz7BK
+        K4LjJkLtpsC906XUI6pSlxxYfw5xmQI=
+X-Google-Smtp-Source: AGRyM1vk2BljK2OucTGcOhVzb1B2OoixsWMuC70SpDWe0dPSD0R52Jil7vKbFgZu2zC011F0ZAJlNA==
+X-Received: by 2002:a05:6830:3183:b0:61c:9cc6:ebf0 with SMTP id p3-20020a056830318300b0061c9cc6ebf0mr432390ots.185.1659049380887;
+        Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.231.58])
+        by smtp.gmail.com with ESMTPSA id u7-20020a056808150700b0033aa53c549dsm800901oiw.25.2022.07.28.16.03.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Jul 2022 15:11:45 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()
-Date:   Thu, 28 Jul 2022 15:11:45 -0700
-Message-Id: <20220728221145.1301230-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
+Message-ID: <62e315a4.050a0220.75f5.41f7@mx.google.com>
+Date:   Thu, 28 Jul 2022 16:03:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7184819413054922352=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220728221145.1301230-1-luiz.dentz@gmail.com>
+References: <20220728221145.1301230-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Dan Carpenter <dan.carpenter@oracle.com>
+--===============7184819413054922352==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The C standard rules for when struct holes are zeroed out are slightly
-weird.  The existing assignments might initialize everything, but GCC
-is allowed to (and does sometimes) leave the struct holes uninitialized,
-so instead of using yet another variable and copy the QoS settings just
-use a pointer to the stored QoS settings.
+This is automated email and please do not reply to this email!
 
-Fixes: ccf74f2390d6 ("Bluetooth: Add BTPROTO_ISO socket type")
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=663892
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.39 seconds
+GitLint                       PASS      0.79 seconds
+SubjectPrefix                 PASS      0.72 seconds
+BuildKernel                   PASS      32.56 seconds
+BuildKernel32                 PASS      28.31 seconds
+Incremental Build with patchesPASS      39.94 seconds
+TestRunner: Setup             PASS      465.81 seconds
+TestRunner: l2cap-tester      PASS      16.35 seconds
+TestRunner: bnep-tester       PASS      6.51 seconds
+TestRunner: mgmt-tester       PASS      101.11 seconds
+TestRunner: rfcomm-tester     PASS      9.82 seconds
+TestRunner: sco-tester        PASS      9.07 seconds
+TestRunner: smp-tester        PASS      9.62 seconds
+TestRunner: userchan-tester   PASS      6.30 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 2.39 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()\ERROR:NO_AUTHOR_SIGN_OFF: Missing Signed-off-by: line by nominal patch author 'Dan Carpenter <dan.carpenter@oracle.com>'
+
+total: 1 errors, 0 warnings, 0 checks, 24 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12931756.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- net/bluetooth/iso.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 19d003727b50..dded22cde0d1 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -1235,7 +1235,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- {
- 	struct sock *sk = sock->sk;
- 	int len, err = 0;
--	struct bt_iso_qos qos;
-+	struct bt_iso_qos *qos;
- 	u8 base_len;
- 	u8 *base;
- 
-@@ -1261,12 +1261,12 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 
- 	case BT_ISO_QOS:
- 		if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
--			qos = iso_pi(sk)->conn->hcon->iso_qos;
-+			qos = &iso_pi(sk)->conn->hcon->iso_qos;
- 		else
--			qos = iso_pi(sk)->qos;
-+			qos = &iso_pi(sk)->qos;
- 
--		len = min_t(unsigned int, len, sizeof(qos));
--		if (copy_to_user(optval, (char *)&qos, len))
-+		len = min_t(unsigned int, len, sizeof(*qos));
-+		if (copy_to_user(optval, qos, len))
- 			err = -EFAULT;
- 
- 		break;
--- 
-2.37.1
 
+--===============7184819413054922352==--
