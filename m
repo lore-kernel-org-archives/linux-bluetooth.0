@@ -2,111 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF825C00144
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jul 2022 16:12:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 524F9C00144
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jul 2022 18:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236038AbiG2QMC (ORCPT
+        id S237766AbiG2SKr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Jul 2022 12:12:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37722 "EHLO
+        Fri, 29 Jul 2022 14:10:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229818AbiG2QMB (ORCPT
+        with ESMTP id S237042AbiG2SKp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Jul 2022 12:12:01 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3505F48C93
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jul 2022 09:11:58 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id o12so5020947pfp.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jul 2022 09:11:58 -0700 (PDT)
+        Fri, 29 Jul 2022 14:10:45 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C493E17AA7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jul 2022 11:10:44 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id w7so5263965ply.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jul 2022 11:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Bt4wccYnHS2AxbOygAUgNaEQg+sNfjRV1RqmdaX5vkY=;
-        b=EPsmud3ZPwSftzv2GSpgsFK4xeuRSpXjyTW2aluS+X7XgS2Z5Rb2thLN1gojkt+khf
-         bThzgFBMQ3Es069ITLdfiZEoCmc0fh6hGX4u7UUe6xNVq3RvFpZD0/Ng5OfgRG8KlsC1
-         vjMkx+S4yaJ8jgf8Hbhd9WOUHJ1mkPQDkvkqjbyygjCr4A/QegXq0x7lofQS8Posmu7l
-         ndBxMXyMDSb2T1/kFfvqYHibbo2MA3Rm2XHNzu3nxJ/ZdOAhhc0r4YhEgtUEup3qtF3F
-         TeFnK3gGFOwiDhef6MkVQwkznmG8eoBfDDOofwmDmLjzNMKo5KyS6Td6/JCdlmj+eZx4
-         ZQiw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g970CJ/QxOtGbj0HnyeklP/mSzB8FTNV36hJH87eGJs=;
+        b=TSSx5w20zD14HDbmuC0lD2GJvrYm4ymp9RUqQmt+wAtiRRrl6g+890UL+tP8vQduoR
+         ohYsxw5Vu+uilMgyBSJQfGr57XnQ8o2qgDSDq2itEkjzfqLawIzv0Dz2QWEMFoYlOaej
+         uP0eHoRRTnP/6ZgrTejeZrvBEaYylM++nw9OzyCN9dKIs3NdtXuh8v1UK/HuVSX7JbiT
+         FgJxYRkclL+80TfHGGaPmwKQcrgFsFUJ1T0Mr1GVjM1IFx3/s144kl+8qum4mt78Kjat
+         pypwI4cC0FX7eHfpiK9F135LJlfpu2sJm9z03vTibUHdhc3LCDlRZy27ASgQhdzmnMbw
+         SJJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Bt4wccYnHS2AxbOygAUgNaEQg+sNfjRV1RqmdaX5vkY=;
-        b=WFdaG5z+PFlGKpEkEasVLQNbmM2FlAvH6jg2bijWDcvvAZtIlTCv1xo0rq9gSe7LcR
-         S9+fqopMKfcAat/tzoP4M8C1+XcxiV+pklMMNY/lDEZkapXH6oKwVXN/LZgWjzRBa3SC
-         nwaXKi8qpu70a5ztIXOp3gNBSNeMUKKE3QJM+FakTu8xZcBsqyS+7fZ0BO5v0kEpDDcX
-         k1Pv7StgdXyRVkuO9I0WWw6a5U6mED9KYcHGLyEZhixMvFGJy3Y33n6XmESIfaxSePV7
-         ncfsCqFiF56EsHud75jtXKN7GOQfVYtO9R15PDy5jvlCMe1nqPcfJIl5nIAB1XjFlN1i
-         0Xow==
-X-Gm-Message-State: AJIora+DngikpOwdTAsPOD6nrwruqHu+t+4nRF7QBGqriOU8S3i9mg67
-        PHe5AQ9ie1NCN7jesuOZN7aebW0VeS8=
-X-Google-Smtp-Source: AGRyM1sNKTPPLECoybm6aaIabBTRrZXUA0oKVLDD6Wng3jCJgDNdxngcMzwuMlGnVT9m1++9PJq4ug==
-X-Received: by 2002:a05:6a00:2312:b0:52b:928:99dd with SMTP id h18-20020a056a00231200b0052b092899ddmr4100908pfh.77.1659111117285;
-        Fri, 29 Jul 2022 09:11:57 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.167.139])
-        by smtp.gmail.com with ESMTPSA id n12-20020aa7984c000000b0052890d61628sm3069758pfq.60.2022.07.29.09.11.56
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g970CJ/QxOtGbj0HnyeklP/mSzB8FTNV36hJH87eGJs=;
+        b=aFOuib9lfvjPQouPfWp/7xTGawC2eEMJ30vE+Ngsi2QiSNT0TcxZVsqy5/dL+CZ+ky
+         3JWKHgw3rXLFCPmtS+ciFeGhi+GTK9S+y6/1eHRFXUEnvh1Y8RqEUaPGci7CjJuV5YEk
+         XPagXIxNKpvp0DJC6cD13xqe7flWOAVgfeD5cKWmLPYBiYTc4CIOZDZ1od0+MvdfyzAV
+         dURPliRCVMAHXfvr5S49uEw+QLpMxYTlsPfiw1kMc/sziyYyqMzG2QUzcL/gIxfvV7+a
+         xDCwZDdxXo/qKvTmwt3dx63PxW9EM5aoSKqioV6LPgCK1cFHP/6BHBwzvlyN4dN8F27f
+         azSw==
+X-Gm-Message-State: ACgBeo1jdWRCDhhTA0iAbG23P/xRAdKcUa0GMMVtdT3ikcP79irN62V6
+        ZMgZtShzUWYnkJ9XC+MzMWpfcXcZHepTKQ==
+X-Google-Smtp-Source: AA6agR6ki51u2TzqLas883AyhjlEkccqVZvZ8ZEc9098CUafpJnZCHAGIxuyzhm3x83ttV2JSDx3pw==
+X-Received: by 2002:a17:90a:ab8e:b0:1f2:1ffe:51ed with SMTP id n14-20020a17090aab8e00b001f21ffe51edmr5933396pjq.28.1659118243496;
+        Fri, 29 Jul 2022 11:10:43 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id mn20-20020a17090b189400b001f001acc0e2sm6285279pjb.41.2022.07.29.11.10.42
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jul 2022 09:11:56 -0700 (PDT)
-Message-ID: <62e406cc.a70a0220.181a1.4afc@mx.google.com>
-Date:   Fri, 29 Jul 2022 09:11:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4994483733252333795=="
+        Fri, 29 Jul 2022 11:10:42 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: ISO: Fix memory corruption
+Date:   Fri, 29 Jul 2022 11:10:41 -0700
+Message-Id: <20220729181041.1571220-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [RESEND,v3] Bluetooth: btusb: mediatek: fix WMT command failure during runtime suspend
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <96994209776d6643585426b4341bbe2dcd9f5116.1659105441.git.objelf@gmail.com>
-References: <96994209776d6643585426b4341bbe2dcd9f5116.1659105441.git.objelf@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4994483733252333795==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+The following memory corruption can happen since iso_pinfo.base size
+did not account for its headers (4 bytes):
 
-Dear submitter,
+net/bluetooth/eir.c
+    76          memcpy(&eir[eir_len], data, data_len);
+                            ^^^^^^^         ^^^^^^^^
+    77          eir_len += data_len;
+    78
+    79          return eir_len;
+    80  }
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=664093
+The "eir" buffer has 252 bytes and data_len is 252 but we do a memcpy()
+to &eir[4] so this can corrupt 4 bytes beyond the end of the buffer.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.81 seconds
-GitLint                       FAIL      0.55 seconds
-SubjectPrefix                 PASS      0.42 seconds
-BuildKernel                   PASS      39.40 seconds
-BuildKernel32                 PASS      34.29 seconds
-Incremental Build with patchesPASS      46.34 seconds
-TestRunner: Setup             PASS      563.81 seconds
-TestRunner: l2cap-tester      PASS      17.85 seconds
-TestRunner: bnep-tester       PASS      6.79 seconds
-TestRunner: mgmt-tester       PASS      105.84 seconds
-TestRunner: rfcomm-tester     PASS      10.14 seconds
-TestRunner: sco-tester        PASS      9.90 seconds
-TestRunner: smp-tester        PASS      9.74 seconds
-TestRunner: userchan-tester   PASS      6.81 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 0.55 seconds
-Run gitlint with rule in .gitlint
-[RESEND,v3] Bluetooth: btusb: mediatek: fix WMT command failure during runtime suspend
-1: T1 Title exceeds max length (86>80): "[RESEND,v3] Bluetooth: btusb: mediatek: fix WMT command failure during runtime suspend"
-
-
-
-
+Fixes: f764a6c2c1e4: "Bluetooth: ISO: Add broadcast support"
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/iso.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index dded22cde0d1..70c2dd30cb13 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -44,6 +44,9 @@ static void iso_sock_kill(struct sock *sk);
+ /* ----- ISO socket info ----- */
+ #define iso_pi(sk) ((struct iso_pinfo *)sk)
+ 
++#define EIR_SERVICE_DATA_LENGTH 4
++#define BASE_MAX_LENGTH (HCI_MAX_PER_AD_LENGTH - EIR_SERVICE_DATA_LENGTH)
++
+ struct iso_pinfo {
+ 	struct bt_sock		bt;
+ 	bdaddr_t		src;
+@@ -57,7 +60,7 @@ struct iso_pinfo {
+ 	__u32			flags;
+ 	struct bt_iso_qos	qos;
+ 	__u8			base_len;
+-	__u8			base[HCI_MAX_PER_AD_LENGTH];
++	__u8			base[BASE_MAX_LENGTH];
+ 	struct iso_conn		*conn;
+ };
+ 
+-- 
+2.37.1
 
---===============4994483733252333795==--
