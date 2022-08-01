@@ -2,90 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EDCEC00144
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 22:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AAC9C00144
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 22:21:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235309AbiHAWVV (ORCPT
+        id S234509AbiHAWVz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Aug 2022 18:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36552 "EHLO
+        Mon, 1 Aug 2022 18:21:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235057AbiHAWVR (ORCPT
+        with ESMTP id S234322AbiHAWVz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Aug 2022 18:21:17 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4D130565
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 15:21:16 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id q22so3586343plr.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Aug 2022 15:21:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SaUYLzBNL8ysLF5DpFSvdwrHS8jwzSZy/cq88W7EcZI=;
-        b=Rb+HJDRUkGuQunbOwhQqLjnIe9b34p/uoUW1mwYhuRRf79p5DhmI4jOLhWAcyY11Tt
-         +LjnfRBwXWWg2Es0kmB3PKcnGUCdh+Rwj2LAbK6nx/DcEdzOINQJjgMZ+MYApiGE1W6J
-         6osyHooAVfp+AR4clWbEF+u4twaYHDHR6S5QVfPlVl9qFHjo74nHZWzHiM0SwHYJT0dm
-         6uZ4BhzPcpg2TXi+ZkzdKFwe2ekmOWEncucK4oSFKfGIit+YymioshrjgDIAzRI3AsF3
-         h4Z7LZPx4PFmOSLUDzvFhq9SHdCS+Fv3lFX7j0HH2nZALgZNmAGUXp72OzAsbIwEPIWx
-         OArw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SaUYLzBNL8ysLF5DpFSvdwrHS8jwzSZy/cq88W7EcZI=;
-        b=mcDRc+gXuP6Jpoqsa0yWWVPrP6MB7fLcsM3PGd/udarAbQ0GmLc+3QYrwPQthYWZZA
-         zYRzhQodj9yaQotVoTDX2XDz4GAwgJabdGuOy3hESefYqtBD+KMwV6oUJiW9F88PP+So
-         GSxx0XUwCDTEGGoqPX8uyKAwzHfQiMeVm/HUYBhr96yHWr5/goGbz1f4urDT7Mj5zmUL
-         b9krNrWtMOV8H6vXxxmXWrUfZA0Daw3zC7Auv6Vn59nDqjNq24jgnGp5YjwOWyQR4u8Z
-         a5ehmu8Zvodq5TbuvMPvyhTvYkOk0vp1c/7knSFxalzyHQyCh4W9kOKX97p7/Lp8PrBG
-         vgOA==
-X-Gm-Message-State: ACgBeo1ZgX4iLmDSll360DZiIrKUrL9vZcxRfBhKFYPbipVWQGjgvjuk
-        qTXRJxvCx7HLJaNen/YF5YigbpLuvsUhKA==
-X-Google-Smtp-Source: AA6agR4BcDJy/F8p5oWqQsOdt9K2/UBk2hvnICXVCw5goijJIpJfTJcy4dkSx9pZ0M41QRlos4y4fw==
-X-Received: by 2002:a17:902:8f92:b0:16c:e485:7cd2 with SMTP id z18-20020a1709028f9200b0016ce4857cd2mr18993901plo.50.1659392475454;
-        Mon, 01 Aug 2022 15:21:15 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id bg1-20020a056a02010100b00419a6f3c8f5sm7879263pgb.19.2022.08.01.15.21.14
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 15:21:14 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] device: Fix not auto-connecting profile
-Date:   Mon,  1 Aug 2022 15:21:13 -0700
-Message-Id: <20220801222113.2269509-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Mon, 1 Aug 2022 18:21:55 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AECA2B27D
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 15:21:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1659392514; x=1690928514;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UfH+DHt+SfDqvYzGWovR90BoEQp1JLN1BxEU+dw/zT4=;
+  b=jzJ9wvtcoYy18M/ywdmEkejj3R/aQqIo7kb+OQ9L5340m3tVkBPhRWNS
+   noJYfLp9fkkEsqeGrsjzeljMMnTZicSLFx5oZsT2+yB9OI/PTrpACXo8I
+   VTBoNi8Wu/cH50O5O+x5N8BZJI9PMUeD11gtBQbLllA8G8AMI4IwhyJdI
+   y9Yc16mdv8G7jHt65pz/6HwBJRpCs1sQHPhFRBz+ACFiTR12xpzODp44v
+   8/LZ+ez5RVxcr13O1B2FKVPMXOTezBQkrWAdz8XDreykDnIsTb6z7Gucg
+   EBtDTNY4E8MBSeFIDgN3Hku2/qgRJP539m8D5sDyk/RTWbHfYd5UEfV4V
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="289276560"
+X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
+   d="scan'208";a="289276560"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 15:21:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,209,1654585200"; 
+   d="scan'208";a="635066192"
+Received: from lkp-server01.sh.intel.com (HELO e0eace57cfef) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 01 Aug 2022 15:21:52 -0700
+Received: from kbuild by e0eace57cfef with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oIdnL-000FQo-2U;
+        Mon, 01 Aug 2022 22:21:51 +0000
+Date:   Tue, 2 Aug 2022 06:21:15 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     kbuild-all@lists.01.org
+Subject: Re: [PATCH] Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression
+Message-ID: <202208020648.fs6gb987-lkp@intel.com>
+References: <20220801210609.2183766-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220801210609.2183766-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Luiz,
 
-If the profile is registered and marked to auto-connect it shall
-automatically be connected whenever a device is already connected.
+I love your patch! Perhaps something to improve:
 
-Fixes: https://github.com/bluez/bluez/issues/370
----
- src/device.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+[auto build test WARNING on bluetooth-next/master]
+[also build test WARNING on bluetooth/master linus/master v5.19 next-20220728]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/src/device.c b/src/device.c
-index 9a4f2ce45..775003796 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4574,7 +4574,8 @@ void device_probe_profile(gpointer a, gpointer b)
- 
- 	device->services = g_slist_append(device->services, service);
- 
--	if (!profile->auto_connect || !device->general_connect)
-+	if (!profile->auto_connect || (!btd_device_is_connected(device) &&
-+					!device->general_connect))
- 		return;
- 
- 	device->pending = g_slist_append(device->pending, service);
+url:    https://github.com/intel-lab-lkp/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-L2CAP-Fix-l2cap_global_chan_by_psm-regression/20220802-050647
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+config: parisc-randconfig-r024-20220801 (https://download.01.org/0day-ci/archive/20220802/202208020648.fs6gb987-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 12.1.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/075988314335917c0e43d00f6a3a8ef68963b3de
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-L2CAP-Fix-l2cap_global_chan_by_psm-regression/20220802-050647
+        git checkout 075988314335917c0e43d00f6a3a8ef68963b3de
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=parisc SHELL=/bin/bash net/bluetooth/
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   In file included from net/bluetooth/l2cap_core.c:37:
+   In function 'bacmp',
+       inlined from 'l2cap_global_chan_by_psm' at net/bluetooth/l2cap_core.c:2003:15:
+>> include/net/bluetooth/bluetooth.h:347:16: warning: 'memcmp' specified bound 6 exceeds source size 0 [-Wstringop-overread]
+     347 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+vim +/memcmp +347 include/net/bluetooth/bluetooth.h
+
+^1da177e4c3f41 Linus Torvalds 2005-04-16  343  
+^1da177e4c3f41 Linus Torvalds 2005-04-16  344  /* Copy, swap, convert BD Address */
+f53c20e93612f7 David Herrmann 2013-04-06  345  static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
+^1da177e4c3f41 Linus Torvalds 2005-04-16  346  {
+^1da177e4c3f41 Linus Torvalds 2005-04-16 @347  	return memcmp(ba1, ba2, sizeof(bdaddr_t));
+^1da177e4c3f41 Linus Torvalds 2005-04-16  348  }
+f53c20e93612f7 David Herrmann 2013-04-06  349  static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
+^1da177e4c3f41 Linus Torvalds 2005-04-16  350  {
+^1da177e4c3f41 Linus Torvalds 2005-04-16  351  	memcpy(dst, src, sizeof(bdaddr_t));
+^1da177e4c3f41 Linus Torvalds 2005-04-16  352  }
+^1da177e4c3f41 Linus Torvalds 2005-04-16  353  
+
 -- 
-2.37.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
