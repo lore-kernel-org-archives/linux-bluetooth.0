@@ -2,79 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D71A9C19F29
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 21:16:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A4DC00144
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 21:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235103AbiHAVP7 (ORCPT
+        id S234297AbiHAVrD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Aug 2022 17:15:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43662 "EHLO
+        Mon, 1 Aug 2022 17:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233386AbiHAVPu (ORCPT
+        with ESMTP id S232288AbiHAVq6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Aug 2022 17:15:50 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEBA1128;
-        Mon,  1 Aug 2022 14:15:49 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0C3BBB8172B;
-        Mon,  1 Aug 2022 21:15:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6667C43470;
-        Mon,  1 Aug 2022 21:15:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659388546;
-        bh=z4STz0zY+wUTcihzBrpybXxi5b1yhtshpxdoX96QmY8=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LEGvapVFftR0gHZ8QT6u+5VvCJLimGMhel6aU7X4dAVxzUNbuTV38HkNBE82WPeDe
-         N9OBLMlE10iNYx59dfR0gadPYkMhSIo/IghrGIY4WvA2beOIvm2yLFJOW5BGFws0uO
-         /phFOVHx3P6jLkxb7iKKrACNQQhKpOlBHigBoRaAWQp01kJSLJ61fiMK4hC/rcoDLA
-         TygKdvCV9GxeebtK7JjHw3f5NQlMOZA2oroCfDN2saXXWCAhHQWKpLJszJj/b0GUgO
-         fDwYdabK1IYKVnThAcFJMX5W0daVAjCNlG5TlTK12MD/XC3ai5o6nwFmmAAiexUTcQ
-         vRuWxCEHt3ibw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9CCA7C43145;
-        Mon,  1 Aug 2022 21:15:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 1 Aug 2022 17:46:58 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 763A71570E
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 14:46:57 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id r21so9092156qtn.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Aug 2022 14:46:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:from:to:cc;
+        bh=/ReIPcxU/CrsRtgNWp+O0OBshfKA26ufFVbu4sIGeKU=;
+        b=bKFGa7qWN7qe1lvmWsafaZt0zMBG3A+ne5DrBPumQjxQJvNhkzCdYtIVVBMBHum6pX
+         peSRk1cQB4S5UXeJNWMTJCTHjG6Sn7C+/9uM5Jj69L5TtRmIXyjNaSZm+LoFCi7UQlFT
+         Ra1Yps86IdxPxQT545a74MNfGhJgBSNr1IYKD7p79mzw2LQbPu1ZfXxh5et6oDCTFu30
+         890gP9zvsyTo8p36HN0bs4xowe+t//3lX4PhH0s+4tAG7u59VNFi5I6S/oq+y6ld3oOy
+         EUGIQzs0WWz6rAF7vpK9qHpxmqK09UAAAmCH1P5m96j5Sd/j5AZFglmPdZAU1qvHWl7V
+         M5DQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=/ReIPcxU/CrsRtgNWp+O0OBshfKA26ufFVbu4sIGeKU=;
+        b=PttwKIJ/lsFkRoZchFrkSJg7zSmQ13iM0VuryQMDUwLKf4NTIL142MyMbGDXzkUqEZ
+         Sk7vajgsgzGOsuhMC3ykpp+UjbedaJHFdB/hk19yGt3P7xGUrX0BVzZE3Y620mKupaO9
+         pPY/7u6boI/v8FKyU6dH/hu46Uh8IRmS6VZqJUKjhTmMDtnpND3mhWmQB5Kc5NsPtC49
+         FO5wPGd+pADF8mLfwf7X0dKcH1Hmnas/YfFDd1jqtTnXDz9W12lLPTAymP43ml9wR30Z
+         8CeyYksEdTeu54s+/aWCKpYVw3a9E5YzZUpgIIurq7SCnxuzZHRjr7HmrfKgwj4XCu3o
+         liQw==
+X-Gm-Message-State: AJIora/T3ckm2y9tiLMWwmSealQUaVkqhumtuXdBBaqNy6KStsgWpgMl
+        bYzXf+o5vl/DI/Z3GTVXYhZ2i5Xv2sI=
+X-Google-Smtp-Source: AGRyM1tXkj/9Dgjw+b/J8nTICrB8dRosidCqxqUYu00s+IIlAUdzrY5Syi4hyoTNQ5slWq08q1D5ng==
+X-Received: by 2002:ac8:5bca:0:b0:31e:f9e7:da2 with SMTP id b10-20020ac85bca000000b0031ef9e70da2mr15894703qtb.446.1659390416272;
+        Mon, 01 Aug 2022 14:46:56 -0700 (PDT)
+Received: from [172.17.0.2] ([20.242.40.232])
+        by smtp.gmail.com with ESMTPSA id m6-20020a05620a24c600b006b633dc839esm9344500qkn.66.2022.08.01.14.46.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Aug 2022 14:46:55 -0700 (PDT)
+Message-ID: <62e849cf.050a0220.76794.a436@mx.google.com>
+Date:   Mon, 01 Aug 2022 14:46:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2549653869779469137=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth-next 2022-07-22
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165938854663.17345.13441892409944440799.git-patchwork-notify@kernel.org>
-Date:   Mon, 01 Aug 2022 21:15:46 +0000
-References: <20220723002232.964796-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220723002232.964796-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: RE: Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+In-Reply-To: <20220801210609.2183766-1-luiz.dentz@gmail.com>
+References: <20220801210609.2183766-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+--===============2549653869779469137==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This is an automated email and please do not reply to this email.
 
-On Fri, 22 Jul 2022 17:22:32 -0700 you wrote:
-> The following changes since commit 6e0e846ee2ab01bc44254e6a0a6a6a0db1cba16d:
-> 
->   Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2022-07-21 13:03:39 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2022-07-22
-> 
-> [...]
+Dear Submitter,
 
-Here is the summary with links:
-  - pull request: bluetooth-next 2022-07-22
-    https://git.kernel.org/bluetooth/bluetooth-next/c/4a934eca7b39
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+----- Output -----
+error: patch failed: net/bluetooth/l2cap_core.c:1992
+error: net/bluetooth/l2cap_core.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
 
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2549653869779469137==--
