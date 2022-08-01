@@ -2,372 +2,170 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30838C19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 17:15:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FCEC00144
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 17:36:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233214AbiHARPz (ORCPT
+        id S233005AbiHARgT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Aug 2022 13:15:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33188 "EHLO
+        Mon, 1 Aug 2022 13:36:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233158AbiHARPd (ORCPT
+        with ESMTP id S232249AbiHARgQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Aug 2022 13:15:33 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF86B1EA
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 10:15:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1659374129; x=1690910129;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0GxFtdP4mDT3FhE0J3+D/wQEDadUnXxJrbso5YiNoCk=;
-  b=Nb11ojm/jst/zywINGgHhljtkjtLBj3z/m3uUe0mIiRm8u0V7OXmYp4M
-   tJw47PyJrP67KnJ6s99wPoEWoeoCjmIBa9Wb/7pBJpLIWQx9ZShWBf+W9
-   qvKhssEF2snILrHyxSu1OAYKlSWaBlfUrArV2hCrbFx+KE+22blaaioGs
-   t+ACs/lWrz4fn6vE3GMTIDzFetAVPswG4B0EZvw1OPMmm3Biw+A0t34hW
-   LMdjQtMpcYJnrE50wTnZTPYxocwzIEyoWtIEklbzv+ii8yLbP5JXYaEJQ
-   /m32I/7blPxm1CtKT1F0OoLSvO+PJaCo4TftBEim6Et8ecdnU2HZytoLA
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10426"; a="276104779"
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="276104779"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 10:15:17 -0700
-X-IronPort-AV: E=Sophos;i="5.93,208,1654585200"; 
-   d="scan'208";a="847899651"
-Received: from gestarne-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.120.49])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2022 10:15:17 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH v6 10/10] Bluetooth: Convert hci_abort_conn to hci_sync
-Date:   Mon,  1 Aug 2022 10:15:05 -0700
-Message-Id: <20220801171505.1271059-11-brian.gix@intel.com>
-X-Mailer: git-send-email 2.37.1
-In-Reply-To: <20220801171505.1271059-1-brian.gix@intel.com>
-References: <20220801171505.1271059-1-brian.gix@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 1 Aug 2022 13:36:16 -0400
+Received: from out1-smtp.messagingengine.com (out1-smtp.messagingengine.com [66.111.4.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D861E12ADB;
+        Mon,  1 Aug 2022 10:36:14 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 491585C00FC;
+        Mon,  1 Aug 2022 13:36:12 -0400 (EDT)
+Received: from imap47 ([10.202.2.97])
+  by compute2.internal (MEProxy); Mon, 01 Aug 2022 13:36:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1659375372; x=1659461772; bh=Y2
+        57L4d6b5CFZRcEy4JTormzanQNT+CLmxVCxY4oXZQ=; b=g4bHXidTEQtZid/MiU
+        Km2uU51ckhpdCCymYl9CZnQTKMlvu+uJpr/P5nW4iTzjl1vl2e8ieXlyrpXfYsrE
+        i2ewUMNKuXi9h7fs6I8OyyJk0qdyz0Xk640DgQBehTA/5dbT41tICmzo3pwl4MJN
+        4qpe3+T99uf2uQ4MKBtHYokvje5dVU2sSDThBGjByO5035SFXneWI6lJ+FF/Uc0+
+        1bVfqKYJYBDnBiLDN/qochGDy/GLy5ca1FNe/dS5xehVIrakomdfjcE8K1fLkmu5
+        O0Ef9GaLpCJATqeso3YDjcXku+INE8xh2w+SFu+u2YVr9qEXvP/A8H1fH6uqeXa7
+        yM4A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1659375372; x=1659461772; bh=Y257L4d6b5CFZRcEy4JTormzanQN
+        T+CLmxVCxY4oXZQ=; b=W/FfjJ0eKIl/DnkCsoGQA8BXCbnS7+/bgS4IsH8VkUFc
+        WEFgOu9seVvV32WdW8BXLdISTVnxmC7NrzewMn2cYqTWjICiGUdQkYwPmfDDM9i6
+        7Q9OboAhiF4ugSPkxFtpJEzhhVL0L7qXDjAz4fKoZ5N74QHCR5ADne85PHBYZuHX
+        BIwdNSA3kFt0PxjnvkCZoPIgcWYeEkzlLR/ILAHup3SzdbJrjeUUEzXobCU59M7L
+        cEgRBI1hmwIPsAYi7F5pxUir5Azv8ZuckuDCSO0hGSl02LvCw0cOCwMpVXeYWJMi
+        5YSILl8MsCgPKBAh1bKy42hWCyICXQYdT4jbAZaG+A==
+X-ME-Sender: <xms:Cw_oYrr_5aCcl7cEE8iaunfu4F_D1TAzOMyG-iKFo2s8kzoT5W2JBQ>
+    <xme:Cw_oYloaHXmrllphGVNjks4ob5Q4icuVgL8s2XahiBUYr-vwpeoE8npb7JMYNE4HD
+    whi1wwhU0Gvmdg9Agc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrvddvfedgudduhecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfu
+    vhgvnhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtf
+    frrghtthgvrhhnpeefgedugffhjedvfffggfektedutdetueehudeitdfgudefvdduiedt
+    vdeliedvgfenucffohhmrghinhepuggvvhhitggvthhrvggvrdhorhhgnecuvehluhhsth
+    gvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshhvvghnsehsvhgvnhhp
+    vghtvghrrdguvghv
+X-ME-Proxy: <xmx:Cw_oYoNsaQXZJY3jgsO6geqeaJyaheDOg96WD6T7KWUkt0bAAZh1uw>
+    <xmx:Cw_oYu5RCO3SfaN-QC5_LwJh_uAEw1PVWJfcaW1L1IN4YHElfs-mOQ>
+    <xmx:Cw_oYq560o3pp4JroCLxPVfRfAWjZK-k7L6lRy59B9UN7S__p0weBw>
+    <xmx:DA_oYpQDEz816y26wyIy4v7InNIcT-9QSPcwrFPOFJfMwpZdBzLJTQ>
+Feedback-ID: i51094778:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 5A72EA6007C; Mon,  1 Aug 2022 13:36:11 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-758-ge0d20a54e1-fm-20220729.001-ge0d20a54
+Mime-Version: 1.0
+Message-Id: <de5f9eb8-9328-4c1c-a57c-a06d40ec203e@www.fastmail.com>
+In-Reply-To: <20220801152338.GB1031441-robh@kernel.org>
+References: <20220801103633.27772-1-sven@svenpeter.dev>
+ <20220801103633.27772-2-sven@svenpeter.dev>
+ <20220801152338.GB1031441-robh@kernel.org>
+Date:   Mon, 01 Aug 2022 19:35:51 +0200
+From:   "Sven Peter" <sven@svenpeter.dev>
+To:     "Rob Herring" <robh@kernel.org>
+Cc:     "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Hector Martin" <marcan@marcan.st>,
+        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] dt-bindings: net: Add generic Bluetooth controller
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The prior hci_abort_conn() used the deprecated hci_request mechanism.
-This version has been rewritten to use hci_sync.c
+Hi,
 
-Signed-off-by: Brian Gix <brian.gix@intel.com>
----
- include/net/bluetooth/hci_sync.h |   1 +
- net/bluetooth/hci_conn.c         |   6 +-
- net/bluetooth/hci_request.c      |  93 ----------------------
- net/bluetooth/hci_request.h      |   2 -
- net/bluetooth/hci_sync.c         | 130 +++++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |   2 +-
- 6 files changed, 135 insertions(+), 99 deletions(-)
+On Mon, Aug 1, 2022, at 17:23, Rob Herring wrote:
+> On Mon, Aug 01, 2022 at 12:36:29PM +0200, Sven Peter wrote:
+>> Bluetooth controllers share the common local-bd-address property.
+>> Add a generic YAML schema to replace bluetooth.txt for those.
+>> 
+>> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+>> ---
+>> I hope it's fine to list the current Bluetooth maintainers in here
+>> as well.
+>> 
+>>  .../bindings/net/bluetooth-controller.yaml    | 30 +++++++++++++++++++
+>>  .../devicetree/bindings/net/bluetooth.txt     |  6 +---
+>>  2 files changed, 31 insertions(+), 5 deletions(-)
+>>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth-controller.yaml b/Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>> new file mode 100644
+>> index 000000000000..0ea8a20e30f9
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>> @@ -0,0 +1,30 @@
+>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/bluetooth-controller.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Bluetooth Controller Generic Binding
+>> +
+>> +maintainers:
+>> +  - Marcel Holtmann <marcel@holtmann.org>
+>> +  - Johan Hedberg <johan.hedberg@gmail.com>
+>> +  - Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+>> +
+>> +properties:
+>> +  $nodename:
+>> +    pattern: "^bluetooth(@.*)?$"
+>> +
+>> +  local-bd-address:
+>> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+>> +    minItems: 6
+>> +    maxItems: 6
+>> +    description:
+>> +      Specifies the BD address that was uniquely assigned to the Bluetooth
+>> +      device. Formatted with least significant byte first (little-endian), e.g.
+>> +      in order to assign the address 00:11:22:33:44:55 this property must have
+>> +      the value [55 44 33 22 11 00].
+>> +
+>> +additionalProperties: true
+>> +
+>> +...
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth.txt b/Documentation/devicetree/bindings/net/bluetooth.txt
+>> index 94797df751b8..3cb5a7b8e5ad 100644
+>> --- a/Documentation/devicetree/bindings/net/bluetooth.txt
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth.txt
+>> @@ -1,5 +1 @@
+>> -The following properties are common to the Bluetooth controllers:
+>> -
+>> -- local-bd-address: array of 6 bytes, specifies the BD address that was
+>> -  uniquely assigned to the Bluetooth device, formatted with least significant
+>> -  byte first (little-endian).
+>> +This file has been moved to bluetooth-controller.yaml.
+>
+> There's one reference to bluetooth.txt. Update it and remove this file.
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 17f5a4c32f36..1816222c8fbc 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -129,3 +129,4 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason);
- int hci_le_big_terminate_sync(struct hci_dev *hdev, u8 handle);
- 
- int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle);
-+int hci_abort_conn(struct hci_conn *conn, u8 reason, bool async);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2bda50d9e3ab..4fbe35f74f94 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -286,7 +286,7 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
- 			     &clkoff_cp);
- 	}
- 
--	return hci_abort_conn(conn, reason);
-+	return hci_abort_conn(conn, reason, true);
- }
- 
- static void hci_add_sco(struct hci_conn *conn, __u16 handle)
-@@ -662,7 +662,7 @@ static void hci_conn_timeout(struct work_struct *work)
- 		return;
- 	}
- 
--	hci_abort_conn(conn, hci_proto_disconn_ind(conn));
-+	hci_abort_conn(conn, hci_proto_disconn_ind(conn), false);
- }
- 
- /* Enter sniff mode */
-@@ -748,7 +748,7 @@ static void le_conn_timeout(struct work_struct *work)
- 		return;
- 	}
- 
--	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM, false);
- }
- 
- struct iso_list_data {
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index c6bfb2e75e52..064026bb6162 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -272,96 +272,3 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
- 	bt_dev_dbg(req->hdev, "HCI_REQ-0x%4.4x", opcode);
- 	hci_req_add_ev(req, opcode, plen, param, 0);
- }
--
--static void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
--			     u8 reason)
--{
--	switch (conn->state) {
--	case BT_CONNECTED:
--	case BT_CONFIG:
--		if (conn->type == AMP_LINK) {
--			struct hci_cp_disconn_phy_link cp;
--
--			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
--			cp.reason = reason;
--			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
--				    &cp);
--		} else {
--			struct hci_cp_disconnect dc;
--
--			dc.handle = cpu_to_le16(conn->handle);
--			dc.reason = reason;
--			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
--		}
--
--		conn->state = BT_DISCONN;
--
--		break;
--	case BT_CONNECT:
--		if (conn->type == LE_LINK) {
--			if (test_bit(HCI_CONN_SCANNING, &conn->flags))
--				break;
--			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
--				    0, NULL);
--		} else if (conn->type == ACL_LINK) {
--			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
--				break;
--			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
--				    6, &conn->dst);
--		}
--		break;
--	case BT_CONNECT2:
--		if (conn->type == ACL_LINK) {
--			struct hci_cp_reject_conn_req rej;
--
--			bacpy(&rej.bdaddr, &conn->dst);
--			rej.reason = reason;
--
--			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
--				    sizeof(rej), &rej);
--		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
--			struct hci_cp_reject_sync_conn_req rej;
--
--			bacpy(&rej.bdaddr, &conn->dst);
--
--			/* SCO rejection has its own limited set of
--			 * allowed error values (0x0D-0x0F) which isn't
--			 * compatible with most values passed to this
--			 * function. To be safe hard-code one of the
--			 * values that's suitable for SCO.
--			 */
--			rej.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
--
--			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
--				    sizeof(rej), &rej);
--		}
--		break;
--	default:
--		conn->state = BT_CLOSED;
--		break;
--	}
--}
--
--static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
--{
--	if (status)
--		bt_dev_dbg(hdev, "Failed to abort connection: status 0x%2.2x", status);
--}
--
--int hci_abort_conn(struct hci_conn *conn, u8 reason)
--{
--	struct hci_request req;
--	int err;
--
--	hci_req_init(&req, conn->hdev);
--
--	__hci_abort_conn(&req, conn, reason);
--
--	err = hci_req_run(&req, abort_conn_complete);
--	if (err && err != -ENODATA) {
--		bt_dev_err(conn->hdev, "failed to run HCI request: err %d", err);
--		return err;
--	}
--
--	return 0;
--}
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index e5ecd4e4b686..763a9e6db976 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -67,5 +67,3 @@ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 
- struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
- 				const void *param);
--
--int hci_abort_conn(struct hci_conn *conn, u8 reason);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 0b0563a245f7..a5648f5b07c2 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -6140,3 +6140,133 @@ int hci_update_adv_data(struct hci_dev *hdev, u8 instance)
- 	*inst_ptr = instance;
- 	return hci_cmd_sync_queue(hdev, _update_adv_data_sync, inst_ptr, NULL);
- }
-+
-+struct conn_reason {
-+	struct hci_conn *conn;
-+	u8 reason;
-+};
-+
-+static int _abort_conn_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct hci_conn *conn = ((struct conn_reason *)data)->conn;
-+	u8 reason = ((struct conn_reason *)data)->reason;
-+	int err = 0;
-+
-+	kfree(data);
-+
-+	switch (conn->state) {
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (conn->type == AMP_LINK) {
-+			struct hci_cp_disconn_phy_link cp;
-+
-+			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
-+			cp.reason = reason;
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_DISCONN_PHY_LINK,
-+						    sizeof(cp), &cp,
-+						    HCI_CMD_TIMEOUT);
-+		} else {
-+			struct hci_cp_disconnect dc;
-+
-+			dc.handle = cpu_to_le16(conn->handle);
-+			dc.reason = reason;
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_DISCONNECT,
-+						    sizeof(dc), &dc,
-+						    HCI_CMD_TIMEOUT);
-+		}
-+		conn->state = BT_DISCONN;
-+		break;
-+	case BT_CONNECT:
-+		if (conn->type == LE_LINK) {
-+			if (test_bit(HCI_CONN_SCANNING, &conn->flags))
-+				break;
-+
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_LE_CREATE_CONN_CANCEL,
-+						    0, NULL, HCI_CMD_TIMEOUT);
-+		} else if (conn->type == ACL_LINK) {
-+			if (hdev->hci_ver < BLUETOOTH_VER_1_2)
-+				break;
-+
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_CREATE_CONN_CANCEL,
-+						    6, &conn->dst,
-+						    HCI_CMD_TIMEOUT);
-+		}
-+		break;
-+	case BT_CONNECT2:
-+		if (conn->type == ACL_LINK) {
-+			struct hci_cp_reject_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_REJECT_CONN_REQ,
-+						    sizeof(rej), &rej,
-+						    HCI_CMD_TIMEOUT);
-+
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+			struct hci_cp_reject_sync_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+
-+			/* SCO rejection has its own limited set of
-+			 * allowed error values (0x0D-0x0F) which isn't
-+			 * compatible with most values passed to this
-+			 * function. To be safe hard-code one of the
-+			 * values that's suitable for SCO.
-+			 */
-+			rej.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
-+
-+			err = __hci_cmd_sync_status(hdev,
-+						    HCI_OP_REJECT_SYNC_CONN_REQ,
-+						    sizeof(rej), &rej,
-+						    HCI_CMD_TIMEOUT);
-+		}
-+		break;
-+	default:
-+		conn->state = BT_CLOSED;
-+		break;
-+	}
-+
-+	return err;
-+}
-+
-+static void abort_conn_complete(struct hci_dev *hdev, void *data, int err)
-+{
-+	if (err)
-+		bt_dev_dbg(hdev, "Failed to abort connection: err %d", err);
-+}
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason, bool async)
-+{
-+	struct conn_reason *conn_reason = kmalloc(sizeof(*conn_reason),
-+						  GFP_KERNEL);
-+	int err;
-+
-+	if (!conn_reason)
-+		return -ENOMEM;
-+
-+	conn_reason->conn = conn;
-+	conn_reason->reason = reason;
-+
-+	if (async) {
-+		err = hci_cmd_sync_queue(conn->hdev, _abort_conn_sync,
-+					 conn_reason, abort_conn_complete);
-+
-+		if (err)
-+			kfree(conn_reason);
-+	} else {
-+		err = _abort_conn_sync(conn->hdev, conn_reason);
-+	}
-+
-+	if (err && err != -ENODATA) {
-+		bt_dev_err(conn->hdev, "failed to run HCI req: err %d", err);
-+		return err;
-+	}
-+
-+	return 0;
-+}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a6af51d39caa..06d93539f634 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3235,7 +3235,7 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 					      le_addr_type(addr->type));
- 
- 	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
--		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM, true);
- 
- unlock:
- 	hci_dev_unlock(hdev);
--- 
-2.37.1
+Sure, I've just checked and found Documentation/devicetree/bindings/soc/qcom/qcom,wcnss.yaml
+and Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml and will
+update both for v2 and remove bluetooth.txt.
 
+
+Thanks,
+
+
+Sven
