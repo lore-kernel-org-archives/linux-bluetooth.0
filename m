@@ -2,116 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB2BC00144
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 21:06:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25197C19F29
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 21:15:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234486AbiHAVGP (ORCPT
+        id S233932AbiHAVPy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Aug 2022 17:06:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37658 "EHLO
+        Mon, 1 Aug 2022 17:15:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234419AbiHAVGO (ORCPT
+        with ESMTP id S231340AbiHAVPs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Aug 2022 17:06:14 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFAE1408C
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 14:06:13 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id c139so11744342pfc.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Aug 2022 14:06:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=/pyMGEWDoc/FXBebC8GjWdLFxpcW4asNo31zbe5YOvc=;
-        b=FLljusUu77Z2iIGBWH6+236kcOqw6LhbIY44duN1VjuSAwCIdJB5nbFudPFnmrXINz
-         NltzTAUnpycq9Un6J4DXj2bCAudDWCTI+B6BwyUIrO7skYNrUlTeDF4ZaQ6NI1FX09n1
-         lYFRnNcmMxu+pWQGqerXvzMdbfuxK9cDKK2D4KQxFBX9+0bOdBhWczUiYtaJpFctRlKh
-         gmlZnG3Z/yiGO/ZYCTcDiwfZeZ2zR4yP4oZ1YtBUwqmPpCBl4GNvBSGSTNFDipqJf5xs
-         6Tlsond2bwr3VYBnWxyYZqJ1mQlctdDFwn7ulMIksJuHoaBWgqowNdYvTGkmUzCY0tZG
-         SCbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=/pyMGEWDoc/FXBebC8GjWdLFxpcW4asNo31zbe5YOvc=;
-        b=Qfw1WferIUAKpQ1h/E0yRx6Gaq66feuIzlI2f46lSPi2ksMDDzmhlXIOySrIZa8tXf
-         PJkor/YNsy/9ZIl5+8OcniHM+ngugfks2lZ8/f5/J+fxmLifTIyrpI/+iWqBQy0fBAIr
-         gn6gbx1zibhyDvacwTcz8+ApMen4P9GpQZJ3Tpd/EP2CdwEqwbCMgJp7Qqj2VgWoaZJ/
-         0MpJ41VK1OYj11Pojbr28N+NdtgacQgOfsW0HePhjW3DXQBFblG4ngQb3c4HKoYM33Z5
-         Z2tuQ/An4NJXyjkJfIjTWV4BlLkqjTGNe5/VErE0HSo5mVyuIBHfiRluOWN98xhWAoS5
-         SCww==
-X-Gm-Message-State: ACgBeo2MBPwbawLJz1y+B9ePR2ArXYvNvG8xKGPA5tynQDKKM/kUGKSN
-        oztYnBX94yS5x6PDlQJQciB1kRmpNxyY5g==
-X-Google-Smtp-Source: AA6agR6P862VQbc/xky7bo68fH9qe/JZ9KfgWwjJZAchGZuw04DjnRl2/gBBLKaf6o87JZszhCUakQ==
-X-Received: by 2002:aa7:8e91:0:b0:52d:8ebf:29a4 with SMTP id a17-20020aa78e91000000b0052d8ebf29a4mr5127718pfr.1.1659387972633;
-        Mon, 01 Aug 2022 14:06:12 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p1-20020aa79e81000000b0052d96d86836sm2179475pfq.50.2022.08.01.14.06.10
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 14:06:11 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression
-Date:   Mon,  1 Aug 2022 14:06:09 -0700
-Message-Id: <20220801210609.2183766-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Mon, 1 Aug 2022 17:15:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5A41DB9;
+        Mon,  1 Aug 2022 14:15:47 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 513E1612F2;
+        Mon,  1 Aug 2022 21:15:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A39DEC433D7;
+        Mon,  1 Aug 2022 21:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659388546;
+        bh=eP1nsYPf5j0CKCqLcWYUaDg6KQqdKfNltu4AVdSfiS4=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=iQLQBrMn6vISUmf0tbu2ysCJ9og71ez4lLxn7mZFAXeiWujiYhDSIRw9auJu0Lggb
+         NALYLBZrEYNGA+AK8mAXUZM2LSC6OeEKL0crTB7hjMVjgksK2yMgwgIYfwI+kejtZ5
+         0c6cgOe6g0wTv2Yk6/HjKGFWJAG8jmvaSI9C+RPTAyVlTkOZ25c6dYA+okWpYhtT4J
+         UHGspBv+IHexRdLtGG+yg6oFDMZGuDvhAitwIOYYvU9uJpKm3cjjuqGSFs+/36KFbh
+         1pssbBl7hCgHVKjsju1r/BkbeAjzzxONzcCGlhpuMmnE8/L8PJQUNrnc5m6LzZ0aBY
+         IPb410m4rHC8g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 854B6C43144;
+        Mon,  1 Aug 2022 21:15:46 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: Always set event mask on suspend
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165938854654.17345.15374057597659100152.git-patchwork-notify@kernel.org>
+Date:   Mon, 01 Aug 2022 21:15:46 +0000
+References: <20220725153415.v2.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
+In-Reply-To: <20220725153415.v2.1.Ia18502557c4ba9ba7cd2d1da2bae3aeb71b37e4e@changeid>
+To:     Abhishek Pandit-Subedi <abhishekpandit@google.com>
+Cc:     luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org,
+        abhishekpandit@chromium.org, stable@vger.kernel.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        johan.hedberg@gmail.com, marcel@holtmann.org, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-The patch d0be8347c623: "Bluetooth: L2CAP: Fix use-after-free caused
-by l2cap_chan_put" from Jul 21, 2022, leads to the following Smatch
-static checker warning:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-        net/bluetooth/l2cap_core.c:1977 l2cap_global_chan_by_psm()
-        error: we previously assumed 'c' could be null (see line 1996)
+On Mon, 25 Jul 2022 15:34:21 -0700 you wrote:
+> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> 
+> When suspending, always set the event mask once disconnects are
+> successful. Otherwise, if wakeup is disallowed, the event mask is not
+> set before suspend continues and can result in an early wakeup.
+> 
+> Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> 
+> [...]
 
-Fixes: d0be8347c623: "Bluetooth: L2CAP: Fix use-after-free caused by l2cap_chan_put"
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/l2cap_core.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+Here is the summary with links:
+  - [v2] Bluetooth: Always set event mask on suspend
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ef61b6ea1544
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 52668662ae8d..f18d0c72713f 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1969,11 +1969,11 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 						   bdaddr_t *dst,
- 						   u8 link_type)
- {
--	struct l2cap_chan *c, *c1 = NULL;
-+	struct l2cap_chan *c, *tmp, *c1 = NULL;
- 
- 	read_lock(&chan_list_lock);
- 
--	list_for_each_entry(c, &chan_list, global_l) {
-+	list_for_each_entry_safe(c, tmp, &chan_list, global_l) {
- 		if (state && c->state != state)
- 			continue;
- 
-@@ -1992,11 +1992,10 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 			dst_match = !bacmp(&c->dst, dst);
- 			if (src_match && dst_match) {
- 				c = l2cap_chan_hold_unless_zero(c);
--				if (!c)
--					continue;
--
--				read_unlock(&chan_list_lock);
--				return c;
-+				if (c) {
-+					read_unlock(&chan_list_lock);
-+					return c;
-+				}
- 			}
- 
- 			/* Closest match */
+You are awesome, thank you!
 -- 
-2.37.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
