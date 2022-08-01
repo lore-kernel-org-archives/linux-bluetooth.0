@@ -2,103 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C875BC00144
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 18:12:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB2BC00144
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Aug 2022 21:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233804AbiHASMq (ORCPT
+        id S234486AbiHAVGP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Aug 2022 14:12:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50952 "EHLO
+        Mon, 1 Aug 2022 17:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232038AbiHASMo (ORCPT
+        with ESMTP id S234419AbiHAVGO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Aug 2022 14:12:44 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 284EE15FF1
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 11:12:43 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id c185so8995699iof.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Aug 2022 11:12:43 -0700 (PDT)
+        Mon, 1 Aug 2022 17:06:14 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAFAE1408C
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Aug 2022 14:06:13 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id c139so11744342pfc.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Aug 2022 14:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=poxYjFq1FWIil4mSs62y6fmVOp/jyChqb4MrwOSRsd0=;
-        b=SmleJrnIMPjrOpAfpQNT2Ox6keVVl5mizMGG+fZbHlSCtv1Gr335udRiasch80wjlY
-         d8qffFK15oFJkN2NB//ugKl+nh6vJUXS4fX2PCCJ9mbtECNUfWVc+rlWLeTvTw+4EsC5
-         ADkrO4843mj3xDWJ6SNjWT1c3VfFaD8sa17nGNlwe/130+caoMiJB124yQx7RSe0IlmR
-         b4wKwbxHgGK9NkZAlcEjR/0lQam345DBjMtO0Ie26WGFO3hbjvTjyRj1DhFe7s8HyVjd
-         N4PvecBaoEWZH2ley6Fxp6qGDkjdxBOxcn5ogCHv+GT593yDUOe5cFEiYX3QKdr+3Ao0
-         SHnA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/pyMGEWDoc/FXBebC8GjWdLFxpcW4asNo31zbe5YOvc=;
+        b=FLljusUu77Z2iIGBWH6+236kcOqw6LhbIY44duN1VjuSAwCIdJB5nbFudPFnmrXINz
+         NltzTAUnpycq9Un6J4DXj2bCAudDWCTI+B6BwyUIrO7skYNrUlTeDF4ZaQ6NI1FX09n1
+         lYFRnNcmMxu+pWQGqerXvzMdbfuxK9cDKK2D4KQxFBX9+0bOdBhWczUiYtaJpFctRlKh
+         gmlZnG3Z/yiGO/ZYCTcDiwfZeZ2zR4yP4oZ1YtBUwqmPpCBl4GNvBSGSTNFDipqJf5xs
+         6Tlsond2bwr3VYBnWxyYZqJ1mQlctdDFwn7ulMIksJuHoaBWgqowNdYvTGkmUzCY0tZG
+         SCbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=poxYjFq1FWIil4mSs62y6fmVOp/jyChqb4MrwOSRsd0=;
-        b=GcaLXh485pHX7O05fxPp48aVs48dDoCo5rfZAERDoJFP0RlVOIK9g1c9q+0uFYR0eE
-         gnZehYeqQOHRn0VSmDWYODwGeq1rPwvwBOY5EPyEEdE8n1Nd5eZWQqKNOgxjFD+fi7ow
-         jr2qtfAcRTEDhQvq12eL3FyXvrLbkYb80f8qZDDNdwxLcVSYrz7gdflJ1u8rWWiPnMbt
-         pWmiXxmtZ+ZpoDrnMzpzg+M7MRmU7P/h6jGy+hNzv4dxte7h32AIPFvm8IkPa5ERrWbd
-         SbS0NYFBjFEpR+TzgyHgBBYeaUX7nxvE0OvqYfuLSm89hrgXnAL7aGYF1xo729h/T38F
-         8RYw==
-X-Gm-Message-State: AJIora/9o7t4Pe29rV8bRocQFKG/zqGoI1iNjM80RbtPpa29AKGVUXM3
-        UlOJasNgCaGKH1RrzpGCWUJF35VqEUM=
-X-Google-Smtp-Source: AGRyM1sPGKJu2KDQHEdS7stNNL/J8Em75Lf2IUcDyAWeG3zK6AWBz8CsuFPdgMJ9fuanuU5JjAFI7w==
-X-Received: by 2002:a05:6638:4115:b0:33f:8715:cb15 with SMTP id ay21-20020a056638411500b0033f8715cb15mr6982392jab.189.1659377562144;
-        Mon, 01 Aug 2022 11:12:42 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.145.228])
-        by smtp.gmail.com with ESMTPSA id z12-20020a056638214c00b003427f78c30fsm206058jaj.8.2022.08.01.11.12.41
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=/pyMGEWDoc/FXBebC8GjWdLFxpcW4asNo31zbe5YOvc=;
+        b=Qfw1WferIUAKpQ1h/E0yRx6Gaq66feuIzlI2f46lSPi2ksMDDzmhlXIOySrIZa8tXf
+         PJkor/YNsy/9ZIl5+8OcniHM+ngugfks2lZ8/f5/J+fxmLifTIyrpI/+iWqBQy0fBAIr
+         gn6gbx1zibhyDvacwTcz8+ApMen4P9GpQZJ3Tpd/EP2CdwEqwbCMgJp7Qqj2VgWoaZJ/
+         0MpJ41VK1OYj11Pojbr28N+NdtgacQgOfsW0HePhjW3DXQBFblG4ngQb3c4HKoYM33Z5
+         Z2tuQ/An4NJXyjkJfIjTWV4BlLkqjTGNe5/VErE0HSo5mVyuIBHfiRluOWN98xhWAoS5
+         SCww==
+X-Gm-Message-State: ACgBeo2MBPwbawLJz1y+B9ePR2ArXYvNvG8xKGPA5tynQDKKM/kUGKSN
+        oztYnBX94yS5x6PDlQJQciB1kRmpNxyY5g==
+X-Google-Smtp-Source: AA6agR6P862VQbc/xky7bo68fH9qe/JZ9KfgWwjJZAchGZuw04DjnRl2/gBBLKaf6o87JZszhCUakQ==
+X-Received: by 2002:aa7:8e91:0:b0:52d:8ebf:29a4 with SMTP id a17-20020aa78e91000000b0052d8ebf29a4mr5127718pfr.1.1659387972633;
+        Mon, 01 Aug 2022 14:06:12 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p1-20020aa79e81000000b0052d96d86836sm2179475pfq.50.2022.08.01.14.06.10
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Aug 2022 11:12:41 -0700 (PDT)
-Message-ID: <62e81799.050a0220.2e22c.0808@mx.google.com>
-Date:   Mon, 01 Aug 2022 11:12:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4692793719549820468=="
+        Mon, 01 Aug 2022 14:06:11 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression
+Date:   Mon,  1 Aug 2022 14:06:09 -0700
+Message-Id: <20220801210609.2183766-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: Clean-up stale/unused hci_request.c code
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220801171505.1271059-2-brian.gix@intel.com>
-References: <20220801171505.1271059-2-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4692793719549820468==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+The patch d0be8347c623: "Bluetooth: L2CAP: Fix use-after-free caused
+by l2cap_chan_put" from Jul 21, 2022, leads to the following Smatch
+static checker warning:
 
-Dear submitter,
+        net/bluetooth/l2cap_core.c:1977 l2cap_global_chan_by_psm()
+        error: we previously assumed 'c' could be null (see line 1996)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=664552
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      17.22 seconds
-GitLint                       PASS      7.55 seconds
-SubjectPrefix                 PASS      6.28 seconds
-BuildKernel                   PASS      32.10 seconds
-BuildKernel32                 PASS      29.15 seconds
-Incremental Build with patchesPASS      201.28 seconds
-TestRunner: Setup             PASS      480.60 seconds
-TestRunner: l2cap-tester      PASS      16.65 seconds
-TestRunner: bnep-tester       PASS      6.20 seconds
-TestRunner: mgmt-tester       PASS      98.89 seconds
-TestRunner: rfcomm-tester     PASS      9.45 seconds
-TestRunner: sco-tester        PASS      9.14 seconds
-TestRunner: smp-tester        PASS      9.19 seconds
-TestRunner: userchan-tester   PASS      6.43 seconds
-
-
-
+Fixes: d0be8347c623: "Bluetooth: L2CAP: Fix use-after-free caused by l2cap_chan_put"
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/l2cap_core.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 52668662ae8d..f18d0c72713f 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1969,11 +1969,11 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 						   bdaddr_t *dst,
+ 						   u8 link_type)
+ {
+-	struct l2cap_chan *c, *c1 = NULL;
++	struct l2cap_chan *c, *tmp, *c1 = NULL;
+ 
+ 	read_lock(&chan_list_lock);
+ 
+-	list_for_each_entry(c, &chan_list, global_l) {
++	list_for_each_entry_safe(c, tmp, &chan_list, global_l) {
+ 		if (state && c->state != state)
+ 			continue;
+ 
+@@ -1992,11 +1992,10 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
+ 			dst_match = !bacmp(&c->dst, dst);
+ 			if (src_match && dst_match) {
+ 				c = l2cap_chan_hold_unless_zero(c);
+-				if (!c)
+-					continue;
+-
+-				read_unlock(&chan_list_lock);
+-				return c;
++				if (c) {
++					read_unlock(&chan_list_lock);
++					return c;
++				}
+ 			}
+ 
+ 			/* Closest match */
+-- 
+2.37.1
 
---===============4692793719549820468==--
