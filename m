@@ -2,80 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5CD8C19F2C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Aug 2022 09:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC49C19F28
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Aug 2022 11:07:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237802AbiHCJvh (ORCPT
+        id S231706AbiHCLHG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Aug 2022 05:51:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59434 "EHLO
+        Wed, 3 Aug 2022 07:07:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235610AbiHCJvW (ORCPT
+        with ESMTP id S230272AbiHCLHF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Aug 2022 05:51:22 -0400
-Received: from iodev.co.uk (iodev.co.uk [46.30.189.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E811F5A2EB;
-        Wed,  3 Aug 2022 02:49:58 -0700 (PDT)
-Received: from localhost (79.red-83-50-138.dynamicip.rima-tde.net [83.50.138.79])
-        by iodev.co.uk (Postfix) with ESMTPSA id 607ABD7DEC;
-        Wed,  3 Aug 2022 11:49:39 +0200 (CEST)
-From:   Ismael Luceno <ismael@iodev.co.uk>
-To:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Cc:     Ismael Luceno <ismael@iodev.co.uk>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH v2] Bluetooth: hci_sync: Fix opcode format in debug message
-Date:   Wed,  3 Aug 2022 11:49:33 +0200
-Message-Id: <20220803094933.20984-1-ismael@iodev.co.uk>
-X-Mailer: git-send-email 2.37.1
+        Wed, 3 Aug 2022 07:07:05 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C71A721A2
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Aug 2022 04:07:02 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id 17so597914plj.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Aug 2022 04:07:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=dwz/cL4JGBJfRGPZfHkVvPx2aT0sx0e1UkX6HxoG63w=;
+        b=kwj9aPujrbg0xlgzuCsyVfVmsDkg5dz5k+oVgm1dqfyUiBfIPgTSjEDFZDcyEGLtwS
+         FQaCn3QvBpPUfzVMW7AdzmoPaV0qrR0aRK0D/I5gOa2lV22EgiKwlmXr57pfNxi5lXCO
+         RTwyAINSVLxjHlF4iIRypeLS4kUEYQMUw54XQ8ik0o8Q34N3lj0bbLqQEhBSPyoAGnKS
+         /w7evU5jofUqhhNP/nRzrxERJxy2CpgorEF3LiIlwsX9uFvby34rVelkGpdyi4wz2Lum
+         hIqYJy+85l7VAvcXOFffM19vvla9rw0517zGA0s3iLSucKVFCG5Ofw4WKWLQJTZ2U0ao
+         32Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=dwz/cL4JGBJfRGPZfHkVvPx2aT0sx0e1UkX6HxoG63w=;
+        b=2yYoGlHI2coVTdiFER5yXafQ05hL1NFCoPGrmk2NUmCOL4YczSYhvmQMaKgCbXKC78
+         usGkiwlxkGuO6uShL4dmO17OymhVBZ5uGwLl8unXXt+FhmWE2IRp3CvOLW5lKO5eACr/
+         E0utLRgRKieNhY7Bax7qFpCQlF9tMCZPPNunbKmRQUwJDTjujXW1yB/u+0jhuxYoOqq6
+         biCWUbIAc2XMyc6PZW0/qmTiXzs+rmbbtxE3e8EYYhetXh+gboHnN0IYm3JgcRM4oiuj
+         7m12SKKsBtJxi94qUdJcXOzoAEJVyfa+iUEynxRAUsq0QxRXx0bT2SbcP3xKv4eQs4IY
+         eeqQ==
+X-Gm-Message-State: ACgBeo0CFPeLMzs5qkT6B7kUuWnkFoazW0dIDpiZUnJVJZzkYDKtnSSm
+        CdwmhFdqXqImphPo40AY9XwES4nlCI8=
+X-Google-Smtp-Source: AA6agR6LaeJ2U1g+8t9/VsA0ZsYY+jlZiTg7yoVg6PlKfwPuom0lXC/NIc205uT6DvLmQzA1ro3oPA==
+X-Received: by 2002:a17:902:b20d:b0:16d:aefa:8ef6 with SMTP id t13-20020a170902b20d00b0016daefa8ef6mr25913517plr.90.1659524821898;
+        Wed, 03 Aug 2022 04:07:01 -0700 (PDT)
+Received: from [172.17.0.2] ([20.25.140.33])
+        by smtp.gmail.com with ESMTPSA id f11-20020a17090a664b00b001f510175984sm1277837pjm.41.2022.08.03.04.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 04:07:01 -0700 (PDT)
+Message-ID: <62ea56d5.170a0220.5a780.1e59@mx.google.com>
+Date:   Wed, 03 Aug 2022 04:07:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8954302548074304302=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam: Yes
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, ismael@iodev.co.uk
+Subject: RE: [v2] Bluetooth: hci_sync: Fix opcode format in debug message
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220803094933.20984-1-ismael@iodev.co.uk>
+References: <20220803094933.20984-1-ismael@iodev.co.uk>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Pad with zeros instead of spaces. Before:
+--===============8954302548074304302==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-        Bluetooth: hci1: Opcode 0x c01 failed: -110
+This is automated email and please do not reply to this email!
 
-After:
+Dear submitter,
 
-        Bluetooth: hci1: Opcode 0x0c01 failed: -110
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=665046
 
-Signed-off-by: Ismael Luceno <ismael@iodev.co.uk>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.20 seconds
+GitLint                       PASS      0.54 seconds
+SubjectPrefix                 PASS      0.42 seconds
+BuildKernel                   PASS      34.18 seconds
+BuildKernel32                 PASS      28.84 seconds
+Incremental Build with patchesPASS      40.61 seconds
+TestRunner: Setup             PASS      482.93 seconds
+TestRunner: l2cap-tester      PASS      17.02 seconds
+TestRunner: bnep-tester       PASS      6.19 seconds
+TestRunner: mgmt-tester       PASS      100.22 seconds
+TestRunner: rfcomm-tester     PASS      9.49 seconds
+TestRunner: sco-tester        PASS      9.26 seconds
+TestRunner: smp-tester        PASS      9.30 seconds
+TestRunner: userchan-tester   PASS      6.41 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes since v1:
-* Fixed another message
-* Added description
 
- net/bluetooth/hci_sync.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index c17021642234..e5ad6607470e 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -150,7 +150,7 @@
- 	struct sk_buff *skb;
- 	int err = 0;
- 
--	bt_dev_dbg(hdev, "Opcode 0x%4x", opcode);
-+	bt_dev_dbg(hdev, "Opcode 0x%04x", opcode);
- 
- 	hci_req_init(&req, hdev);
- 
-@@ -245,7 +245,7 @@ EXPORT_SYMBOL(__hci_cmd_sync_ev);
- 
- 	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
- 	if (IS_ERR(skb)) {
--		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
-+		bt_dev_err(hdev, "Opcode 0x%04x failed: %ld", opcode,
- 			   PTR_ERR(skb));
- 		return PTR_ERR(skb);
- 	}
--- 
-2.37.1
-
+--===============8954302548074304302==--
