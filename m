@@ -2,103 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1244C19F2B
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Aug 2022 23:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1D0C19F29
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Aug 2022 23:55:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232796AbiHCXFC (ORCPT
+        id S239462AbiHCXzd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Aug 2022 19:05:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45330 "EHLO
+        Wed, 3 Aug 2022 19:55:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbiHCXFB (ORCPT
+        with ESMTP id S239454AbiHCXz2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Aug 2022 19:05:01 -0400
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F10234D818
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Aug 2022 16:04:59 -0700 (PDT)
-Received: by mail-qv1-xf2f.google.com with SMTP id l18so10617754qvt.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Aug 2022 16:04:59 -0700 (PDT)
+        Wed, 3 Aug 2022 19:55:28 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 728A6AE49
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Aug 2022 16:55:26 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id uj29so20962563ejc.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Aug 2022 16:55:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=XRuzGsN1D3UXMpGNkQlR2NJM8xE6M08/GTqchLWd43s=;
-        b=DEVC8iWxPOKxbkJ4CWGzZp/UQywexxyN4pJKhuDFHsqiP5gZIsQ+mc9JSarZ9T1MAH
-         8ubk2Icf8USIMupmpqUSOP+6WgE6nB471ZJ/qIn+PNsvrl349SwS3ac32UV8/pZVfcwY
-         Reiy6Ixc+MHj5ez7tiOgcEoO+KF3VahuUxcatrGyEebEvkM/XXvmMfkGxAFG9ZaO0QZO
-         1MyufjZUp216PcIeuSgLQ0wFc5SV9KM5HCkNFZrm5B12WNh2wYskmB5PjMF4mjLMtmDU
-         NlMdujzImW5+rFQu5N8zKBNjB9qJ2xnhofrlIiyR4P4INGN0UnmZH3xEobVmEHwhTm3/
-         PhhQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UM7/D2EdsiCRDP5Tdb0POGSLbAaxSrRVZRtOEicAKDE=;
+        b=qPiYkH7oFqxuIsIcucqkfIJOrmdKw1PC89Jb7jNy8VERdpY9uEgmQE3XJbWhdkHyb6
+         1sD9tKs5L5F40YYmXK5oeLzTBw0np4Wcp0iW8gp6Ia63lrC+kQUv1UarcgOXnDaE+jqc
+         mBTxGTdztDEhdZPrlJCccUOwy3QnUSIqEho2TumzftVXS+aiTk04lHGFLv3TjGrENhLQ
+         ZDv+fBm35acHeJZef7yq74N+9H/iTd0BUSN0sLwGmRQB1WGtpCZ7dVLEqbWur09/9v4/
+         UXmszZfSDPMsOcltQkewhTJzNo03Ebzq9xkMeRGhVI5SH2QUAWi+aKUqqd/rckFldl4y
+         bsXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=XRuzGsN1D3UXMpGNkQlR2NJM8xE6M08/GTqchLWd43s=;
-        b=ZAT0kgSjsV6MGzq1ZxKFKcLKq3irTvTDGieO436kcgPqlGl3ZoYJHM3luiXmhw4V3N
-         /2XKsocVglx1yZOogmIRSuFmba0WNcRSGve3NrmLbPv+S+3Vej9bjQkyhq55UE6g/WCo
-         w9/jbO6vcNbOqObHTbW7XmDIIg+3RrrSnxsIo408A/PlX+PaovosvN3SJAGpmBQQLsEV
-         zZ36RKdFigEa0CiawavpbCh8YuiQf/UqsOdmTuHBgjfliAiYAPvKcoMPWxXBcUKlTxmG
-         b/WXBbvY4xKlSHdLxIVk/calvtFn/sSgAdHQRwF1/dw2GgPZazFnCY5WEZ4uBNdbAocq
-         4wUQ==
-X-Gm-Message-State: ACgBeo2MciKsxRNE7OcA8ecs3RPP3OzXPZ00deelewG/i6LCa0X1D3ke
-        oiuQ0SwlzUJOtU9jMOgJVT/Ea+8AbEs=
-X-Google-Smtp-Source: AA6agR5Q8r4bg3IKDYGkT4+ZII8jEL67+Rnp3HYQj0nZee2qfdiG9KEXrsa/aEslwWaeLQOTFYrSAw==
-X-Received: by 2002:a05:6214:21ad:b0:477:47ad:c2b6 with SMTP id t13-20020a05621421ad00b0047747adc2b6mr723163qvc.120.1659567898655;
-        Wed, 03 Aug 2022 16:04:58 -0700 (PDT)
-Received: from [172.17.0.2] ([40.117.44.100])
-        by smtp.gmail.com with ESMTPSA id fv18-20020a05622a4a1200b0031ecb90454fsm12033302qtb.70.2022.08.03.16.04.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Aug 2022 16:04:58 -0700 (PDT)
-Message-ID: <62eaff1a.050a0220.e5fb1.2b81@mx.google.com>
-Date:   Wed, 03 Aug 2022 16:04:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8825112580555287449=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UM7/D2EdsiCRDP5Tdb0POGSLbAaxSrRVZRtOEicAKDE=;
+        b=dg6nUpoP4hzAzC2ngPyc8+HtVOYvtvw1zSnz/NmFBg74LnkXkbdximby+0iYpHoR8+
+         ryI/JJMO22QF54Ok2T3SMTooUr+KYLAORpv740vGCXP5xlyves+mqEXXztf/i+Gbi48p
+         aQwqgVBp/uI/jdxsxfNCTpTfbnkPDoIWeOmkf8TKspv0pssN3ifo7RBLNjyYM9ej1/QF
+         VaZpo8ebLsGiLW0RLZZQxNx3GIlfcsYt+UX8sjJEvtSf3tai6Gl9y7LT38Cj4FUaGfum
+         99rgsd2+p5a/Zx4P/gePjaGnMAP+gkuiGWRSYBl/HsByM0hvQvHlvhTv4VBRv2SZksCU
+         pGOQ==
+X-Gm-Message-State: AJIora+PvHyCcPgWOofrFUuWDVltaYm7pqv2rZBCv6CM/lHbsqCLaKW+
+        PQGlbbfbKKpPxIXrixci/hTy+i6GxPu9g3V1M4LlJbjX8e2A9Q==
+X-Google-Smtp-Source: AGRyM1uvZJy17W3EVRJm54uFOhRgdWEeDQb15f2d8BNPmvushYM2nP0/p+beIfzb0LCzcE/ZQhIkk6Fp20MvWqiCzxQ=
+X-Received: by 2002:a17:906:29d:b0:6f0:18d8:7be0 with SMTP id
+ 29-20020a170906029d00b006f018d87be0mr20795863ejf.561.1659570924874; Wed, 03
+ Aug 2022 16:55:24 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [1/2] Bluetooth: hci_event: Fix build warning with C=1
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220803215527.3070932-1-luiz.dentz@gmail.com>
-References: <20220803215527.3070932-1-luiz.dentz@gmail.com>
+References: <20220803225716.1287921-1-vi@endrift.com>
+In-Reply-To: <20220803225716.1287921-1-vi@endrift.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 3 Aug 2022 16:55:12 -0700
+Message-ID: <CABBYNZKcAZeDqjeHzTfqmvKS3Tbur-rRi6+uPL4x4t8MnWp5ug@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] hog-lib: Increase maximum report map size
+To:     Vicki Pfau <vi@endrift.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8825112580555287449==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Vicki,
 
-This is automated email and please do not reply to this email!
+On Wed, Aug 3, 2022 at 4:07 PM Vicki Pfau <vi@endrift.com> wrote:
+>
+> Though a 512 byte report map size seems plenty large, there exist some devices
+> (e.g. Brydge W-Touch) that send larger reports. There is no protocol-defined
+> maximum size so doubling the maximum size is safe, and should hopefully fix
+> most real-world failures.
+> ---
+>  profiles/input/hog-lib.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+> index 4a9c60185..9f3eb428c 100644
+> --- a/profiles/input/hog-lib.c
+> +++ b/profiles/input/hog-lib.c
+> @@ -64,7 +64,7 @@
+>  #define HOG_PROTO_MODE_BOOT    0
+>  #define HOG_PROTO_MODE_REPORT  1
+>
+> -#define HOG_REPORT_MAP_MAX_SIZE        512
+> +#define HOG_REPORT_MAP_MAX_SIZE        1024
+>  #define HID_INFO_SIZE                  4
+>  #define ATT_NOTIFICATION_HEADER_SIZE   3
 
-Dear submitter,
+Afaik 512 is the maximum length an attribute can have even when using
+read long procedure:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=665193
+BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 3, Part F
+page 1416:
 
----Test result---
+The maximum length of an attribute value shall be 512 octets.
 
-Test Summary:
-CheckPatch                    PASS      3.50 seconds
-GitLint                       PASS      2.08 seconds
-SubjectPrefix                 PASS      1.75 seconds
-BuildKernel                   PASS      33.59 seconds
-BuildKernel32                 PASS      29.33 seconds
-Incremental Build with patchesPASS      48.03 seconds
-TestRunner: Setup             PASS      476.72 seconds
-TestRunner: l2cap-tester      PASS      16.95 seconds
-TestRunner: bnep-tester       PASS      6.26 seconds
-TestRunner: mgmt-tester       PASS      98.97 seconds
-TestRunner: rfcomm-tester     PASS      9.69 seconds
-TestRunner: sco-tester        PASS      9.33 seconds
-TestRunner: smp-tester        PASS      9.41 seconds
-TestRunner: userchan-tester   PASS      6.45 seconds
+And
 
+BLUETOOTH SPECIFICATION
+HID Service Specification
+Page 16 of 26
 
+2.6.1 Report Map Characteristic Behavior
+The GATT Read Characteristic Value or Read Long Characteristic Values sub-
+procedures are used to read the Report Map characteristic value.
+The length of the Report Map characteristic value is limited to 512 octets.
 
----
-Regards,
-Linux Bluetooth
+So I believe the device is not compliant and very likely needs to have
+multiple instances of HID Service instead of combining everything in a
+single instance.
+
+> --
+> 2.37.1
+>
 
 
---===============8825112580555287449==--
+-- 
+Luiz Augusto von Dentz
