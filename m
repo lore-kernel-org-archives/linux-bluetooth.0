@@ -2,85 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27CBCC19F2B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 08:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F7BC19F2B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 09:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238528AbiHDI2X (ORCPT
+        id S238727AbiHDJOd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Aug 2022 04:28:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38986 "EHLO
+        Thu, 4 Aug 2022 05:14:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235042AbiHDI2W (ORCPT
+        with ESMTP id S238999AbiHDJO1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Aug 2022 04:28:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C18026580E
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 01:28:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 76FF1B824AE
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 08:28:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 313AAC43470
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 08:28:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659601699;
-        bh=yVBFQjKVHyq2sUWu+g+9F32pDJAVw+Fb1ElUggE2kJw=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Gfe4IoCp1j+LI/g5YvlKhAm280JZty+CBpN+DCI+MI5kuulCAcG158Stcre54g8uf
-         tOdPLorH7wyR3eGIO8+MD0Y5OHDK8n7ZOXZKG1U7WO7hMJDAy8cwYNpS1HkY0Zu8bX
-         6C19/fzcUDc1KWjCevIoBSHGYD8T7M2galRvVZkmXW8oG/3xs/3HZvehP6nbOeTYBK
-         RPmmYk3vjnFTKiEdvdHyZvJ2TZ9N1t54mmUBqSATZL2ClMd1y1MvuKiLm05VTvSShR
-         w0lgK/uMQwnOG5fcwKWbOjsziQuP++p6gI0Bqs95cr1OXHdmqKHDC3o/Jp2YA9xd05
-         rWWAhBh4vVhBg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 211F6C433E4; Thu,  4 Aug 2022 08:28:19 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215768] Kernel 5.17 can't suspend while bluetooth is enabled.
-Date:   Thu, 04 Aug 2022 08:28:18 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: teleyinex@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215768-62941-nA79CrbHrt@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215768-62941@https.bugzilla.kernel.org/>
-References: <bug-215768-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 4 Aug 2022 05:14:27 -0400
+Received: from mail-qv1-xf34.google.com (mail-qv1-xf34.google.com [IPv6:2607:f8b0:4864:20::f34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D281761DA5
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 02:14:26 -0700 (PDT)
+Received: by mail-qv1-xf34.google.com with SMTP id i7so14736870qvr.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Aug 2022 02:14:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=gKAEFuDiSGA+1EGbtaLtu1f8Xf6XHh7Agdp0xmer+Zw=;
+        b=XYOUWMcR1Qr0VNHjm8S3oc/uPQHq2BMhoMFmkFxxjVF1E4p+BYd+sdLE5frGIEnn8V
+         B7z816Xe/OVddyj/xAfr/X/YmJYVZ55z/3oASPG8E/ZNDBHDSbRjcw5ban9ng+24Dc+c
+         KjJjkbFcXCVPkR5LzlPQf1lnKQ+vto1AqzzdVFDHLOE8Vs8r9vMDHZlIlXvd3USNMQj+
+         cxO59v4S2WqEbZ7ej7lhEmmq1Avd0zjDIUFog4z002tmi1/dMNxOWJ5UNp82ROz1m13D
+         xFCjaoUNOzkC6/RzDOBEuXaXeCQPBS9R6NKEGEc0iKlh3b2qc/6HHlyGaTysmLhbgiqy
+         NraA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=gKAEFuDiSGA+1EGbtaLtu1f8Xf6XHh7Agdp0xmer+Zw=;
+        b=VsDsoIY1cDyOjlneewpFuK9pmCEx3GSTgipdoSjFXz+kR/4SfuWV06K1AdWluWqP+Y
+         4tGKla+I77zKXr76rlsSIYHL+6XsangOkLz53vV3s3ArNimYrys3SLHu2lkGKX+tQnFv
+         uN3YPRiuB2NP2CV/OTuZB8YTGFQpwGecYOd9OY6J+vC2lUDGLQiXAGKdrkEZH+m1+2S0
+         wxd7bwZ/o8Hr0UW8QR8X6O5mrzUrbk2p4RPfQMT9XvZl8QQGWjFQH9DhwNjcis1ZAOWY
+         LitvgsKCqBrssgF5T9JnGd0pdGJR4wzd2da1NhnUWjKeCrU8WAZQJ4e7PV/IWhQOjvbZ
+         qdgQ==
+X-Gm-Message-State: ACgBeo20sqCPfboLLIrBtYZViJk7lAS3qcMfYhVXQo1mrnC+gZz0lOtv
+        L/0/dleNAOdd/nuvaZFcNuhUWt58cRo=
+X-Google-Smtp-Source: AA6agR77wFpnS2Bq1HJ4EpSgV9gcYmcbm0ph5fVANzKNBpQtTjw0oeqLIdFFnkAtGImMNriXqybXjQ==
+X-Received: by 2002:a0c:b319:0:b0:473:82bd:327b with SMTP id s25-20020a0cb319000000b0047382bd327bmr621036qve.43.1659604465658;
+        Thu, 04 Aug 2022 02:14:25 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.121.215])
+        by smtp.gmail.com with ESMTPSA id c25-20020ac84e19000000b00338ae1f5421sm341077qtw.0.2022.08.04.02.14.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Aug 2022 02:14:25 -0700 (PDT)
+Message-ID: <62eb8df1.c80a0220.6485f.07fd@mx.google.com>
+Date:   Thu, 04 Aug 2022 02:14:25 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3993120454768552046=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiapeng.chong@linux.alibaba.com
+Subject: RE: Bluetooth: Clean up some inconsistent indenting
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220804081556.94743-1-jiapeng.chong@linux.alibaba.com>
+References: <20220804081556.94743-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
+--===============3993120454768552046==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-teleyinex (teleyinex@gmail.com) changed:
+This is automated email and please do not reply to this email!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |teleyinex@gmail.com
+Dear submitter,
 
---- Comment #33 from teleyinex (teleyinex@gmail.com) ---
-The problem persists in 5.18.15 on X1 Carbon Gen 6, having Bluetooth devices
-connected makes the laptop wake up immediately after suspending as ifaglos
-reported.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=665287
 
---=20
-You may reply to this email to add a comment.
+---Test result---
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Test Summary:
+CheckPatch                    PASS      1.61 seconds
+GitLint                       PASS      0.94 seconds
+SubjectPrefix                 PASS      0.84 seconds
+BuildKernel                   PASS      32.60 seconds
+BuildKernel32                 PASS      28.70 seconds
+Incremental Build with patchesPASS      40.59 seconds
+TestRunner: Setup             PASS      477.31 seconds
+TestRunner: l2cap-tester      PASS      16.88 seconds
+TestRunner: bnep-tester       PASS      6.30 seconds
+TestRunner: mgmt-tester       PASS      99.26 seconds
+TestRunner: rfcomm-tester     PASS      9.72 seconds
+TestRunner: sco-tester        PASS      9.36 seconds
+TestRunner: smp-tester        PASS      9.43 seconds
+TestRunner: userchan-tester   PASS      6.57 seconds
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3993120454768552046==--
