@@ -2,134 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 936F0C19F29
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 00:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87EF0C19F29
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 02:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238733AbiHDApZ (ORCPT
+        id S237100AbiHDCqt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Aug 2022 20:45:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54806 "EHLO
+        Wed, 3 Aug 2022 22:46:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237356AbiHDApY (ORCPT
+        with ESMTP id S231136AbiHDCqs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Aug 2022 20:45:24 -0400
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB4EF273F;
-        Wed,  3 Aug 2022 17:45:21 -0700 (PDT)
-X-UUID: 7865ef6d74ad4fe5aa39fda2c2aa8e70-20220804
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=oCwSMUTsSKd0x8pBNfkjX9e5aRRQUVmVikp4IupcTe0=;
-        b=TEN22Lb2tDrGF5UsbBg0VNk/eQ2GGG1ONvPSoC0bvk9+ItEUCt1Ra2nvhSGs6JDLas2VKvy1l/UdkDdLvRzmMlvnpT4wpqQVEX3/6WYD5XOAZE65XHq7/OeCQ6G6DAzzdb3+V08T1SdesDUGraHs8tIguvjqKdK0t/AfQd5JGdk=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.8,REQID:5477dec8-d936-409b-a915-c2e2a94b9d88,OB:0,LO
-        B:0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,RULE:Release_Ham,ACT
-        ION:release,TS:100
-X-CID-INFO: VERSION:1.1.8,REQID:5477dec8-d936-409b-a915-c2e2a94b9d88,OB:0,LOB:
-        0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,RULE:Spam_GS981B3D,ACT
-        ION:quarantine,TS:100
-X-CID-META: VersionHash:0f94e32,CLOUDID:6b5a29d1-841b-4e95-ad42-8f86e18f54fc,C
-        OID:bdaa387893b3,Recheck:0,SF:28|17|19|48,TC:nil,Content:0,EDM:-3,IP:nil,U
-        RL:1,File:nil,QS:nil,BEC:nil,COL:0
-X-UUID: 7865ef6d74ad4fe5aa39fda2c2aa8e70-20220804
-Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1379116014; Thu, 04 Aug 2022 08:45:14 +0800
-Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
- mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.792.15; Thu, 4 Aug 2022 08:45:12 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
- mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.792.15 via Frontend Transport; Thu, 4 Aug 2022 08:45:12 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
-        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
-        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
-        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
-        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
-        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <abhishekpandit@google.com>,
-        <michaelfsun@google.com>, <mcchou@chromium.org>,
-        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Jing Cai <jing.cai@mediatek.com>
-Subject: [PATCH v4] Bluetooth: btusb: mediatek: fix WMT failure during runtime suspend
-Date:   Thu, 4 Aug 2022 08:45:11 +0800
-Message-ID: <ab9f6acff9c0d5f5b639827ef9d5c2bfecfe95b7.1659573623.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
+        Wed, 3 Aug 2022 22:46:48 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBAAA1EC72
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Aug 2022 19:46:47 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id s204so21900660oif.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Aug 2022 19:46:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:from:to:cc;
+        bh=YP7N8aBZje5bqqLToUNtyqvlGtf/zWrJ8cStjVOr2BA=;
+        b=AnaIf0RoUR3+18HXwXgKAQF76N50Mpm5H8s+6iSYWInLRAk2XRaHb5rTxphQ9RwuMz
+         Tjo8zZ4vgRubu0STxtDkS2ygidT+vlMjLYWyB5tRqfYh9E4j+LPx/CuoXRzDwrYHJYAj
+         9fK2dn7WKp4EgF1jZ5qMDg+ysmTq1aHRriryx6WAfgKV4/m38rU6sFB3vh4eSMbgLZw3
+         YCPPUGw1xOqvmsrg7cB3Q5uy/fD20pBig3edhFh7sAy3twyvDPwm9JfulyCP4plNiNKs
+         rqOAbT2kHqeUtpiHo4yRvhYCre7O8LD7S+nAQQY3EggzSO6wAQtmEIBxWZ4uK1piv26l
+         4RbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=YP7N8aBZje5bqqLToUNtyqvlGtf/zWrJ8cStjVOr2BA=;
+        b=Xy0hVnmeiTv7errxTl60GxA/PnkcbAqdIzt8iUoZt2K/8Jkn15NCbopSLLxPFvMuCW
+         hZb7pfksgFHxdRsPmq5FBGc80/nXEhX4kE4UKkuaJdOFFkm2d/tL7WObiKZnPsOlgMI0
+         /CN7AOLvcEEMLf1RvPDNa+qjPhDe8zEsg+EibqyiB382YAh0qZpavXeBibUKCtGMkGcl
+         eK15IvuPR5MB2GjciLVZjvOxonI20eoJObQK2ZIF2nPgbi6/HwiLywdIkZaWILtlf33N
+         hsto2764CQxiw+Ag+AV7uaTA7nqB6W42wk2Baiwd1aWgZaknQTe5WWB7VcqvER2GrlhI
+         KtzQ==
+X-Gm-Message-State: ACgBeo0rfI/VSE3chGXD58FN7CLj91cWIcOFqSgOAYBxbAehopIJF3tm
+        505syCTBXT3Wl5Xx6ptkDMofPCBrdcVjrg==
+X-Google-Smtp-Source: AA6agR4184+SFPETEYywEHLu+dynhFfIUvkcF0bbYnbEYNh8jfJj/2ooeal9TzMXxlDNSk4NGUQCnA==
+X-Received: by 2002:a17:90b:8c6:b0:1f4:e3d6:cc9c with SMTP id ds6-20020a17090b08c600b001f4e3d6cc9cmr8054574pjb.167.1659581196710;
+        Wed, 03 Aug 2022 19:46:36 -0700 (PDT)
+Received: from [172.17.0.2] ([20.163.92.135])
+        by smtp.gmail.com with ESMTPSA id l7-20020a170902f68700b0016db7f49cc2sm2753798plg.115.2022.08.03.19.46.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Aug 2022 19:46:36 -0700 (PDT)
+Message-ID: <62eb330c.170a0220.d0a8e.535e@mx.google.com>
+Date:   Wed, 03 Aug 2022 19:46:36 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0511140431764142354=="
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Subject: RE: [v4] Bluetooth: btusb: mediatek: fix WMT failure during runtime suspend
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
+In-Reply-To: <ab9f6acff9c0d5f5b639827ef9d5c2bfecfe95b7.1659573623.git.objelf@gmail.com>
+References: <ab9f6acff9c0d5f5b639827ef9d5c2bfecfe95b7.1659573623.git.objelf@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+--===============0511140431764142354==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
-needs constantly polling control pipe until the host received the WMT
-event, thus, we should require to specifically acquire PM counter on the
-USB to prevent the interface from entering auto suspended while WMT
-cmd/event in progress.
+This is an automated email and please do not reply to this email.
 
-Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek
- MT7668U USB devices")
-Co-developed-by: Jing Cai <jing.cai@mediatek.com>
-Signed-off-by: Jing Cai <jing.cai@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+error: patch failed: drivers/bluetooth/btusb.c:2436
+error: drivers/bluetooth/btusb.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+
+Please resolve the issue and submit the patches again.
+
+
 ---
-v2:
-1. move usb_autopm_[get, put]_interface to btusb_mtk_hci_wmt_sync whenever
-wmt cmd is invoked.
-2. add the explanation why we needed the specific
-usb_autopm_[get, put]_interface there.
+Regards,
+Linux Bluetooth
 
-v3: correct the version and there is no logic changed
-v4: fix GitLint fail due to Title exceeds max length
----
- drivers/bluetooth/btusb.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e25fcd49db70..449b0a474cca 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2436,15 +2436,29 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev
- *hdev,
- 
- 	set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
- 
-+	/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
-+	 * it needs constantly polling control pipe until the host received the
-+	 * WMT event, thus, we should require to specifically acquire PM counter
-+	 * on the USB to prevent the interface from entering auto suspended
-+	 * while WMT cmd/event in progress.
-+	 */
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err < 0)
-+		goto err_free_wc;
-+
- 	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
- 
- 	if (err < 0) {
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
-+		usb_autopm_put_interface(data->intf);
- 		goto err_free_wc;
- 	}
- 
- 	/* Submit control IN URB on demand to process the WMT event */
- 	err = btusb_mtk_submit_wmt_recv_urb(hdev);
-+
-+	usb_autopm_put_interface(data->intf);
-+
- 	if (err < 0)
- 		goto err_free_wc;
- 
--- 
-2.25.1
-
+--===============0511140431764142354==--
