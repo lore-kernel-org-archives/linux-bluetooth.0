@@ -2,39 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 172EBC19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 14:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B22C19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Aug 2022 16:30:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239881AbiHDOFS (ORCPT
+        id S233341AbiHDQag (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Aug 2022 10:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59538 "EHLO
+        Thu, 4 Aug 2022 12:30:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233576AbiHDOFR (ORCPT
+        with ESMTP id S231946AbiHDQaP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Aug 2022 10:05:17 -0400
-X-Greylist: delayed 476 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 04 Aug 2022 07:05:15 PDT
-Received: from vmi660873.contaboserver.net (vmi660873.contaboserver.net [161.97.174.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF036D96
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 07:05:15 -0700 (PDT)
-Received: by vmi660873.contaboserver.net (Postfix, from userid 1000)
-        id 7801F7475F7; Thu,  4 Aug 2022 15:57:15 +0200 (CEST)
-To:     linux-bluetooth@vger.kernel.org
-Subject: =?us-ascii?Q?Framework_Roadthemes_"THE_WORLD_FINANCIAL_CRISI?=  =?us-ascii?Q?S_CAN_MAKE_YOU_VERY_RICH!"?=
-Date:   Thu, 4 Aug 2022 13:57:15 +0000
-From:   Framework Roadthemes <wordpress@192.168.1.209>
-Reply-To: demo@roadthemes.com
-Message-ID: <6BuefFOrdw5LmunCf4zZQ9vmO0lHKHZi9vwngaqjxIc@gentlyautos.com>
-X-Mailer: PHPMailer 6.6.0 (https://github.com/PHPMailer/PHPMailer)
+        Thu, 4 Aug 2022 12:30:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2197272D
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 09:30:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3D120614AC
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Aug 2022 16:30:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9EDBFC433B5;
+        Thu,  4 Aug 2022 16:30:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1659630613;
+        bh=65coytVEMdyZ9ofhl/jX64ytfR84M4IlBKL/srw9SEU=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=OKeMj/Iosx3Sm81uMuqcYSk59+WfKhKpISrPbpIb32smhoKw6WBP/FhgpSnVTQPO6
+         4hug093w9MN5eTteufcWu++KG+HQE3Tr5BZiVTtiYe2L31aGEMFG216/qsCkS/obOl
+         eyBLa1CkD6oGkWkGTlixveTsDEqE4ihN7d001pSb8nuOBtaSzwk0LgVIamOIwBE3Ec
+         i+HLhYQrTfWLrjqrti2d8UqPWzds8P7lNE4vt1FLuZl/+W72aSf/gXBQuCGGbEZZ+D
+         wIO2xu58psy0gHBQmSdZ0zZ/kxRZLVuzHVzyZNzHcY/HMzUqxa+hoVNcal/jpKBpHo
+         0CDgFjH2l60lw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7971FC43140;
+        Thu,  4 Aug 2022 16:30:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] iso-tester: Test BT_DEFER_SETUP works with getsockopt
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <165963061349.5660.12889968034767897427.git-patchwork-notify@kernel.org>
+Date:   Thu, 04 Aug 2022 16:30:13 +0000
+References: <20220803172222.2952373-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220803172222.2952373-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Message Body:
-THE WORLD FINANCIAL CRISIS CAN MAKE YOU VERY RICH! https://telegra.ph/Cryptocurrency-makes-people-millionaires-at-15-people-per-hour---Page-659680-08-02
+Hello:
 
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Wed,  3 Aug 2022 10:22:22 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This attempts to test BT_DEFER_SETUP is properly set when the test has
+> defer flag set.
+> ---
+>  tools/iso-tester.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+
+Here is the summary with links:
+  - [BlueZ] iso-tester: Test BT_DEFER_SETUP works with getsockopt
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d9497e0001c0
+
+You are awesome, thank you!
 -- 
-This e-mail was sent from a contact form on Roadthemes(http://demo.roadthemes.com/digitech)
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
