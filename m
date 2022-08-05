@@ -2,48 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1D9C25B08
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 236CDC00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241600AbiHEXmz (ORCPT
+        id S241531AbiHEXm4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Aug 2022 19:42:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55584 "EHLO
+        Fri, 5 Aug 2022 19:42:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241715AbiHEXmv (ORCPT
+        with ESMTP id S241714AbiHEXmw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Aug 2022 19:42:51 -0400
+        Fri, 5 Aug 2022 19:42:52 -0400
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F3557B1E1
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDF102983F
         for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 16:42:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1659742970; x=1691278970;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=TCu+Ccxnf1kJBsitLEgbY/j2cV44ZgEy0gAhm/7gSRE=;
-  b=kLBN1oa2Oquxvya+L9YX+0Ipv/7LnSwvRmEFrzVOskYanuWOmiJXJk+0
-   rFWER13sIP9HGKcVRabl23KpUis6im1HutKOOpT/MGsApJ4+nFZXlayjc
-   Ie7jXrw2t++3rxbiVQnBKVctPyUQHDGogItnXhV4tu3KiJdcGqIyFSGCf
-   jG9g51xV1bzNt9RUkWgtgha4yamkGBpnHVG95lAeECRUck0GbQGt8MoxM
-   zs7NBuqydKxfddlVScH9rabiOJEhbtP3EmjlOqrrm+4VxKcVkSLbqWFjt
-   dNiRexWKyf4JtzfDGqHTrjhys0kn6gpU5g29SqmwgQRqctI2Z/Y2H3O3l
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10430"; a="273362751"
+  bh=lwAl9WTMhGfjC5Ca4i7ov1Raytp01jqclqkgNlNyARs=;
+  b=iDBLNQkA/gRZO0vCGwTdhiiiqTDwK8BtH5X3RoxhhOVJsdNDAP63cNs7
+   1KV0S+xRyd1tXDkEwpI9xaq8iJQwDIR/fuj69dAJUhTlF/9ig6H/2bAh7
+   kLkxA/tLLOlECE9R1TXyAor4nqFUN3nH8VGaAJ9KUAuLcECqZhCZ4KUJZ
+   sTOtNtc6P80GlQdXCXklDL5Lv3H/STDu8puvAF21GAfDXhYBan4hGxmVF
+   Qnxr2LsMJl3ot9djh9qI+aQotA4mx/O6xGJztxoXBpoFuXNlFj9UB8g7O
+   LSI8y5imEe37Uv4KnaE2B9WmDpIRbuAcx2g6APmoJax+4+SdhGJH29eU4
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10430"; a="273362753"
 X-IronPort-AV: E=Sophos;i="5.93,217,1654585200"; 
-   d="scan'208";a="273362751"
+   d="scan'208";a="273362753"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 16:42:49 -0700
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 16:42:50 -0700
 X-IronPort-AV: E=Sophos;i="5.93,217,1654585200"; 
-   d="scan'208";a="636661818"
+   d="scan'208";a="636661825"
 Received: from bkkx-mobl.gar.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.189.232])
   by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2022 16:42:49 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH v7 5/9] Bluetooth: Move Adv Instance timer to hci_sync
-Date:   Fri,  5 Aug 2022 16:42:32 -0700
-Message-Id: <20220805234236.704986-6-brian.gix@intel.com>
+Subject: [PATCH v7 7/9] Bluetooth: move hci_get_random_address() to hci_sync
+Date:   Fri,  5 Aug 2022 16:42:34 -0700
+Message-Id: <20220805234236.704986-8-brian.gix@intel.com>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20220805234236.704986-1-brian.gix@intel.com>
 References: <20220805234236.704986-1-brian.gix@intel.com>
@@ -53,381 +53,422 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Advertising Instance expiration timer adv_instance_expire was
-handled with the deprecated hci_request mechanism, rather than it's
-replacement: hci_sync.
+This function has no dependencies on the deprecated hci_request
+mechanism, so has been moved unchanged to hci_sync.c
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |   3 +-
- net/bluetooth/hci_request.c      | 111 --------------------------
- net/bluetooth/hci_request.h      |   4 -
- net/bluetooth/hci_sync.c         | 129 +++++++++++++++++++++++++++++--
- net/bluetooth/mgmt.c             |   5 +-
- 5 files changed, 125 insertions(+), 127 deletions(-)
+ include/net/bluetooth/hci_sync.h |   5 +
+ net/bluetooth/hci_request.c      | 255 +++++++++++--------------------
+ net/bluetooth/hci_request.h      |   9 --
+ net/bluetooth/hci_sync.c         |  73 +++++++++
+ 4 files changed, 170 insertions(+), 172 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 3843f5060c73..aea950440b9d 100644
+index aea950440b9d..b6b975c2ed3e 100644
 --- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -72,7 +72,8 @@ int hci_start_per_adv_sync(struct hci_dev *hdev, u8 instance, u8 data_len,
- int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
- 				u8 instance, bool force);
- int hci_disable_advertising_sync(struct hci_dev *hdev);
--
-+int hci_clear_adv_instance_sync(struct hci_dev *hdev, struct sock *sk,
-+				u8 instance, bool force);
- int hci_update_passive_scan_sync(struct hci_dev *hdev);
- int hci_update_passive_scan(struct hci_dev *hdev);
- int hci_read_rssi_sync(struct hci_dev *hdev, __le16 handle);
+@@ -16,6 +16,7 @@ struct hci_cmd_sync_work_entry {
+ 	hci_cmd_sync_work_destroy_t destroy;
+ };
+ 
++struct adv_info;
+ /* Function with sync suffix shall not be called with hdev->lock held as they
+  * wait the command to complete and in the meantime an event could be received
+  * which could attempt to acquire hdev->lock causing a deadlock.
+@@ -51,6 +52,10 @@ int hci_update_class_sync(struct hci_dev *hdev);
+ int hci_update_name_sync(struct hci_dev *hdev);
+ int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
+ 
++int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
++			   bool use_rpa, struct adv_info *adv_instance,
++			   u8 *own_addr_type, bdaddr_t *rand_addr);
++
+ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
+ 				   bool rpa, u8 *own_addr_type);
+ 
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index d14e50951aec..be32fb0f5557 100644
+index 685dc0f983b7..b9875224ac7b 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -811,14 +811,6 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 			   addr_resolv);
+@@ -650,6 +650,96 @@ static inline bool hci_is_le_conn_scanning(struct hci_dev *hdev)
+ 	return false;
  }
  
--static void cancel_adv_timeout(struct hci_dev *hdev)
--{
--	if (hdev->adv_instance_timeout) {
--		hdev->adv_instance_timeout = 0;
--		cancel_delayed_work(&hdev->adv_instance_expire);
--	}
--}
--
- static bool adv_cur_instance_is_scannable(struct hci_dev *hdev)
- {
- 	return hci_adv_instance_is_scannable(hdev, hdev->cur_adv_instance);
-@@ -1140,37 +1132,6 @@ void hci_req_reenable_advertising(struct hci_dev *hdev)
- 	hci_req_run(&req, adv_enable_complete);
++static void set_random_addr(struct hci_request *req, bdaddr_t *rpa);
++static int hci_update_random_address(struct hci_request *req,
++				     bool require_privacy, bool use_rpa,
++				     u8 *own_addr_type)
++{
++	struct hci_dev *hdev = req->hdev;
++	int err;
++
++	/* If privacy is enabled use a resolvable private address. If
++	 * current RPA has expired or there is something else than
++	 * the current RPA in use, then generate a new one.
++	 */
++	if (use_rpa) {
++		/* If Controller supports LL Privacy use own address type is
++		 * 0x03
++		 */
++		if (use_ll_privacy(hdev))
++			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
++		else
++			*own_addr_type = ADDR_LE_DEV_RANDOM;
++
++		if (rpa_valid(hdev))
++			return 0;
++
++		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++		if (err < 0) {
++			bt_dev_err(hdev, "failed to generate new RPA");
++			return err;
++		}
++
++		set_random_addr(req, &hdev->rpa);
++
++		return 0;
++	}
++
++	/* In case of required privacy without resolvable private address,
++	 * use an non-resolvable private address. This is useful for active
++	 * scanning and non-connectable advertising.
++	 */
++	if (require_privacy) {
++		bdaddr_t nrpa;
++
++		while (true) {
++			/* The non-resolvable private address is generated
++			 * from random six bytes with the two most significant
++			 * bits cleared.
++			 */
++			get_random_bytes(&nrpa, 6);
++			nrpa.b[5] &= 0x3f;
++
++			/* The non-resolvable private address shall not be
++			 * equal to the public address.
++			 */
++			if (bacmp(&hdev->bdaddr, &nrpa))
++				break;
++		}
++
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		set_random_addr(req, &nrpa);
++		return 0;
++	}
++
++	/* If forcing static address is in use or there is no public
++	 * address use the static address as random address (but skip
++	 * the HCI command if the current random address is already the
++	 * static one.
++	 *
++	 * In case BR/EDR has been disabled on a dual-mode controller
++	 * and a static address has been configured, then use that
++	 * address instead of the public BR/EDR address.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
++	    !bacmp(&hdev->bdaddr, BDADDR_ANY) ||
++	    (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) &&
++	     bacmp(&hdev->static_addr, BDADDR_ANY))) {
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		if (bacmp(&hdev->static_addr, &hdev->random_addr))
++			hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
++				    &hdev->static_addr);
++		return 0;
++	}
++
++	/* Neither privacy nor static address is being used so use a
++	 * public address.
++	 */
++	*own_addr_type = ADDR_LE_DEV_PUBLIC;
++
++	return 0;
++}
++
+ /* Ensure to call hci_req_add_le_scan_disable() first to disable the
+  * controller based address resolution to be able to reconfigure
+  * resolving list.
+@@ -859,79 +949,6 @@ static void interleave_scan_work(struct work_struct *work)
+ 				   &hdev->interleave_scan, timeout);
  }
  
--static void adv_timeout_expire(struct work_struct *work)
+-int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+-			   bool use_rpa, struct adv_info *adv_instance,
+-			   u8 *own_addr_type, bdaddr_t *rand_addr)
 -{
--	struct hci_dev *hdev = container_of(work, struct hci_dev,
--					    adv_instance_expire.work);
--
--	struct hci_request req;
--	u8 instance;
--
--	bt_dev_dbg(hdev, "");
--
--	hci_dev_lock(hdev);
--
--	hdev->adv_instance_timeout = 0;
--
--	instance = hdev->cur_adv_instance;
--	if (instance == 0x00)
--		goto unlock;
--
--	hci_req_init(&req, hdev);
--
--	hci_req_clear_adv_instance(hdev, NULL, &req, instance, false);
--
--	if (list_empty(&hdev->adv_instances))
--		__hci_req_disable_advertising(&req);
--
--	hci_req_run(&req, NULL);
--
--unlock:
--	hci_dev_unlock(hdev);
--}
--
- static int hci_req_add_le_interleaved_scan(struct hci_request *req,
- 					   unsigned long opt)
- {
-@@ -1637,72 +1598,6 @@ int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
- 	return 0;
- }
- 
--/* For a single instance:
-- * - force == true: The instance will be removed even when its remaining
-- *   lifetime is not zero.
-- * - force == false: the instance will be deactivated but kept stored unless
-- *   the remaining lifetime is zero.
-- *
-- * For instance == 0x00:
-- * - force == true: All instances will be removed regardless of their timeout
-- *   setting.
-- * - force == false: Only instances that have a timeout will be removed.
-- */
--void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
--				struct hci_request *req, u8 instance,
--				bool force)
--{
--	struct adv_info *adv_instance, *n, *next_instance = NULL;
 -	int err;
--	u8 rem_inst;
 -
--	/* Cancel any timeout concerning the removed instance(s). */
--	if (!instance || hdev->cur_adv_instance == instance)
--		cancel_adv_timeout(hdev);
+-	bacpy(rand_addr, BDADDR_ANY);
 -
--	/* Get the next instance to advertise BEFORE we remove
--	 * the current one. This can be the same instance again
--	 * if there is only one instance.
+-	/* If privacy is enabled use a resolvable private address. If
+-	 * current RPA has expired then generate a new one.
 -	 */
--	if (instance && hdev->cur_adv_instance == instance)
--		next_instance = hci_get_next_instance(hdev, instance);
+-	if (use_rpa) {
+-		/* If Controller supports LL Privacy use own address type is
+-		 * 0x03
+-		 */
+-		if (use_ll_privacy(hdev))
+-			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
+-		else
+-			*own_addr_type = ADDR_LE_DEV_RANDOM;
 -
--	if (instance == 0x00) {
--		list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances,
--					 list) {
--			if (!(force || adv_instance->timeout))
--				continue;
--
--			rem_inst = adv_instance->instance;
--			err = hci_remove_adv_instance(hdev, rem_inst);
--			if (!err)
--				mgmt_advertising_removed(sk, hdev, rem_inst);
+-		if (adv_instance) {
+-			if (adv_rpa_valid(adv_instance))
+-				return 0;
+-		} else {
+-			if (rpa_valid(hdev))
+-				return 0;
 -		}
--	} else {
--		adv_instance = hci_find_adv_instance(hdev, instance);
 -
--		if (force || (adv_instance && adv_instance->timeout &&
--			      !adv_instance->remaining_time)) {
--			/* Don't advertise a removed instance. */
--			if (next_instance &&
--			    next_instance->instance == instance)
--				next_instance = NULL;
--
--			err = hci_remove_adv_instance(hdev, instance);
--			if (!err)
--				mgmt_advertising_removed(sk, hdev, instance);
+-		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+-		if (err < 0) {
+-			bt_dev_err(hdev, "failed to generate new RPA");
+-			return err;
 -		}
+-
+-		bacpy(rand_addr, &hdev->rpa);
+-
+-		return 0;
 -	}
 -
--	if (!req || !hdev_is_powered(hdev) ||
--	    hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		return;
+-	/* In case of required privacy without resolvable private address,
+-	 * use an non-resolvable private address. This is useful for
+-	 * non-connectable advertising.
+-	 */
+-	if (require_privacy) {
+-		bdaddr_t nrpa;
 -
--	if (next_instance && !ext_adv_capable(hdev))
--		__hci_req_schedule_adv_instance(req, next_instance->instance,
--						false);
+-		while (true) {
+-			/* The non-resolvable private address is generated
+-			 * from random six bytes with the two most significant
+-			 * bits cleared.
+-			 */
+-			get_random_bytes(&nrpa, 6);
+-			nrpa.b[5] &= 0x3f;
+-
+-			/* The non-resolvable private address shall not be
+-			 * equal to the public address.
+-			 */
+-			if (bacmp(&hdev->bdaddr, &nrpa))
+-				break;
+-		}
+-
+-		*own_addr_type = ADDR_LE_DEV_RANDOM;
+-		bacpy(rand_addr, &nrpa);
+-
+-		return 0;
+-	}
+-
+-	/* No privacy so use a public address. */
+-	*own_addr_type = ADDR_LE_DEV_PUBLIC;
+-
+-	return 0;
 -}
 -
- int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 			      bool use_rpa, u8 *own_addr_type)
+ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
  {
-@@ -1977,7 +1872,6 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 
- void hci_request_setup(struct hci_dev *hdev)
- {
--	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
- 	INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
+ 	struct hci_dev *hdev = req->hdev;
+@@ -956,96 +973,8 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
+ 	hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, rpa);
  }
  
-@@ -1985,10 +1879,5 @@ void hci_request_cancel_all(struct hci_dev *hdev)
- {
- 	__hci_cmd_sync_cancel(hdev, ENODEV);
- 
--	if (hdev->adv_instance_timeout) {
--		cancel_delayed_work_sync(&hdev->adv_instance_expire);
--		hdev->adv_instance_timeout = 0;
+-int hci_update_random_address(struct hci_request *req, bool require_privacy,
+-			      bool use_rpa, u8 *own_addr_type)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	int err;
+-
+-	/* If privacy is enabled use a resolvable private address. If
+-	 * current RPA has expired or there is something else than
+-	 * the current RPA in use, then generate a new one.
+-	 */
+-	if (use_rpa) {
+-		/* If Controller supports LL Privacy use own address type is
+-		 * 0x03
+-		 */
+-		if (use_ll_privacy(hdev))
+-			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
+-		else
+-			*own_addr_type = ADDR_LE_DEV_RANDOM;
+-
+-		if (rpa_valid(hdev))
+-			return 0;
+-
+-		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+-		if (err < 0) {
+-			bt_dev_err(hdev, "failed to generate new RPA");
+-			return err;
+-		}
+-
+-		set_random_addr(req, &hdev->rpa);
+-
+-		return 0;
 -	}
 -
- 	cancel_interleave_scan(hdev);
- }
+-	/* In case of required privacy without resolvable private address,
+-	 * use an non-resolvable private address. This is useful for active
+-	 * scanning and non-connectable advertising.
+-	 */
+-	if (require_privacy) {
+-		bdaddr_t nrpa;
+-
+-		while (true) {
+-			/* The non-resolvable private address is generated
+-			 * from random six bytes with the two most significant
+-			 * bits cleared.
+-			 */
+-			get_random_bytes(&nrpa, 6);
+-			nrpa.b[5] &= 0x3f;
+-
+-			/* The non-resolvable private address shall not be
+-			 * equal to the public address.
+-			 */
+-			if (bacmp(&hdev->bdaddr, &nrpa))
+-				break;
+-		}
+-
+-		*own_addr_type = ADDR_LE_DEV_RANDOM;
+-		set_random_addr(req, &nrpa);
+-		return 0;
+-	}
+-
+-	/* If forcing static address is in use or there is no public
+-	 * address use the static address as random address (but skip
+-	 * the HCI command if the current random address is already the
+-	 * static one.
+-	 *
+-	 * In case BR/EDR has been disabled on a dual-mode controller
+-	 * and a static address has been configured, then use that
+-	 * address instead of the public BR/EDR address.
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
+-	    !bacmp(&hdev->bdaddr, BDADDR_ANY) ||
+-	    (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) &&
+-	     bacmp(&hdev->static_addr, BDADDR_ANY))) {
+-		*own_addr_type = ADDR_LE_DEV_RANDOM;
+-		if (bacmp(&hdev->static_addr, &hdev->random_addr))
+-			hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
+-				    &hdev->static_addr);
+-		return 0;
+-	}
+-
+-	/* Neither privacy nor static address is being used so use a
+-	 * public address.
+-	 */
+-	*own_addr_type = ADDR_LE_DEV_PUBLIC;
+-
+-	return 0;
+-}
+-
+-void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
+-		      u8 reason)
++static void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
++			     u8 reason)
+ {
+ 	switch (conn->state) {
+ 	case BT_CONNECTED:
 diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 41e0b84f2042..3d1b3d97ccdd 100644
+index 55205cc9f281..c7185ad77c6e 100644
 --- a/net/bluetooth/hci_request.h
 +++ b/net/bluetooth/hci_request.h
-@@ -90,10 +90,6 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance);
+@@ -74,16 +74,7 @@ void hci_req_add_le_passive_scan(struct hci_request *req);
+ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
  
- int __hci_req_schedule_adv_instance(struct hci_request *req, u8 instance,
- 				    bool force);
--void hci_req_clear_adv_instance(struct hci_dev *hdev, struct sock *sk,
--				struct hci_request *req, u8 instance,
--				bool force);
+ int hci_req_update_adv_data(struct hci_dev *hdev, u8 instance);
+-int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+-			   bool use_rpa, struct adv_info *adv_instance,
+-			   u8 *own_addr_type, bdaddr_t *rand_addr);
 -
- int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance);
- int __hci_req_setup_per_adv_instance(struct hci_request *req, u8 instance,
- 				     u16 min_interval, u16 max_interval);
+-int hci_update_random_address(struct hci_request *req, bool require_privacy,
+-			      bool use_rpa, u8 *own_addr_type);
+ 
+ int hci_abort_conn(struct hci_conn *conn, u8 reason);
+-void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
+-		      u8 reason);
+-
+ void hci_request_setup(struct hci_dev *hdev);
+ void hci_request_cancel_all(struct hci_dev *hdev);
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 75e7c0a01ab1..bc993dd2383d 100644
+index bc993dd2383d..46eb535ff466 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -465,6 +465,121 @@ static void le_scan_restart(struct work_struct *work)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void cancel_adv_timeout(struct hci_dev *hdev)
-+{
-+	if (hdev->adv_instance_timeout) {
-+		hdev->adv_instance_timeout = 0;
-+		cancel_delayed_work(&hdev->adv_instance_expire);
-+	}
-+}
-+
-+/* For a single instance:
-+ * - force == true: The instance will be removed even when its remaining
-+ *   lifetime is not zero.
-+ * - force == false: the instance will be deactivated but kept stored unless
-+ *   the remaining lifetime is zero.
-+ *
-+ * For instance == 0x00:
-+ * - force == true: All instances will be removed regardless of their timeout
-+ *   setting.
-+ * - force == false: Only instances that have a timeout will be removed.
-+ */
-+int hci_clear_adv_instance_sync(struct hci_dev *hdev, struct sock *sk,
-+				u8 instance, bool force)
-+{
-+	struct adv_info *adv_instance, *n, *next_instance = NULL;
-+	int err;
-+	u8 rem_inst;
-+
-+	/* Cancel any timeout concerning the removed instance(s). */
-+	if (!instance || hdev->cur_adv_instance == instance)
-+		cancel_adv_timeout(hdev);
-+
-+	/* Get the next instance to advertise BEFORE we remove
-+	 * the current one. This can be the same instance again
-+	 * if there is only one instance.
-+	 */
-+	if (instance && hdev->cur_adv_instance == instance)
-+		next_instance = hci_get_next_instance(hdev, instance);
-+
-+	if (instance == 0x00) {
-+		list_for_each_entry_safe(adv_instance, n, &hdev->adv_instances,
-+					 list) {
-+			if (!(force || adv_instance->timeout))
-+				continue;
-+
-+			rem_inst = adv_instance->instance;
-+			err = hci_remove_adv_instance(hdev, rem_inst);
-+			if (!err)
-+				mgmt_advertising_removed(sk, hdev, rem_inst);
-+		}
-+	} else {
-+		adv_instance = hci_find_adv_instance(hdev, instance);
-+
-+		if (force || (adv_instance && adv_instance->timeout &&
-+			      !adv_instance->remaining_time)) {
-+			/* Don't advertise a removed instance. */
-+			if (next_instance &&
-+			    next_instance->instance == instance)
-+				next_instance = NULL;
-+
-+			err = hci_remove_adv_instance(hdev, instance);
-+			if (!err)
-+				mgmt_advertising_removed(sk, hdev, instance);
-+		}
-+	}
-+
-+	if (!hdev_is_powered(hdev) || hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		return 0;
-+
-+	if (next_instance && !ext_adv_capable(hdev))
-+		return hci_schedule_adv_instance_sync(hdev,
-+						      next_instance->instance,
-+						      false);
-+
-+	return 0;
-+}
-+
-+static int adv_timeout_expire_sync(struct hci_dev *hdev, void *data)
-+{
-+	u8 instance = *(u8 *)data;
-+
-+	kfree(data);
-+
-+	hci_clear_adv_instance_sync(hdev, NULL, instance, false);
-+
-+	if (list_empty(&hdev->adv_instances))
-+		return hci_disable_advertising_sync(hdev);
-+
-+	return 0;
-+}
-+
-+static void adv_timeout_expire(struct work_struct *work)
-+{
-+	u8 *inst_ptr;
-+	struct hci_dev *hdev = container_of(work, struct hci_dev,
-+					    adv_instance_expire.work);
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	hci_dev_lock(hdev);
-+
-+	hdev->adv_instance_timeout = 0;
-+
-+	if (hdev->cur_adv_instance == 0x00)
-+		goto unlock;
-+
-+	inst_ptr = kmalloc(1, GFP_KERNEL);
-+	if (!inst_ptr)
-+		goto unlock;
-+
-+	*inst_ptr = hdev->cur_adv_instance;
-+	hci_cmd_sync_queue(hdev, adv_timeout_expire_sync, inst_ptr, NULL);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- void hci_cmd_sync_init(struct hci_dev *hdev)
- {
- 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
-@@ -474,6 +589,7 @@ void hci_cmd_sync_init(struct hci_dev *hdev)
- 	INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
- 	INIT_DELAYED_WORK(&hdev->le_scan_disable, le_scan_disable);
- 	INIT_DELAYED_WORK(&hdev->le_scan_restart, le_scan_restart);
-+	INIT_DELAYED_WORK(&hdev->adv_instance_expire, adv_timeout_expire);
- }
- 
- void hci_cmd_sync_clear(struct hci_dev *hdev)
-@@ -1479,14 +1595,6 @@ int hci_le_terminate_big_sync(struct hci_dev *hdev, u8 handle, u8 reason)
+@@ -5992,3 +5992,76 @@ int hci_le_pa_terminate_sync(struct hci_dev *hdev, u16 handle)
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_PA_TERM_SYNC,
  				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
  }
- 
--static void cancel_adv_timeout(struct hci_dev *hdev)
--{
--	if (hdev->adv_instance_timeout) {
--		hdev->adv_instance_timeout = 0;
--		cancel_delayed_work(&hdev->adv_instance_expire);
--	}
--}
--
- static int hci_set_ext_adv_data_sync(struct hci_dev *hdev, u8 instance)
- {
- 	struct {
-@@ -4566,6 +4674,11 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 
- 	hci_request_cancel_all(hdev);
- 
-+	if (hdev->adv_instance_timeout) {
-+		cancel_delayed_work_sync(&hdev->adv_instance_expire);
-+		hdev->adv_instance_timeout = 0;
++
++int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
++			   bool use_rpa, struct adv_info *adv_instance,
++			   u8 *own_addr_type, bdaddr_t *rand_addr)
++{
++	int err;
++
++	bacpy(rand_addr, BDADDR_ANY);
++
++	/* If privacy is enabled use a resolvable private address. If
++	 * current RPA has expired then generate a new one.
++	 */
++	if (use_rpa) {
++		/* If Controller supports LL Privacy use own address type is
++		 * 0x03
++		 */
++		if (use_ll_privacy(hdev))
++			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
++		else
++			*own_addr_type = ADDR_LE_DEV_RANDOM;
++
++		if (adv_instance) {
++			if (adv_rpa_valid(adv_instance))
++				return 0;
++		} else {
++			if (rpa_valid(hdev))
++				return 0;
++		}
++
++		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
++		if (err < 0) {
++			bt_dev_err(hdev, "failed to generate new RPA");
++			return err;
++		}
++
++		bacpy(rand_addr, &hdev->rpa);
++
++		return 0;
 +	}
 +
- 	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
- 	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
- 	    test_bit(HCI_UP, &hdev->flags)) {
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 646d10401b80..11eb6e538518 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2058,6 +2058,8 @@ static int set_le_sync(struct hci_dev *hdev, void *data)
- 	int err;
- 
- 	if (!val) {
-+		hci_clear_adv_instance_sync(hdev, NULL, 0x00, true);
++	/* In case of required privacy without resolvable private address,
++	 * use an non-resolvable private address. This is useful for
++	 * non-connectable advertising.
++	 */
++	if (require_privacy) {
++		bdaddr_t nrpa;
 +
- 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
- 			hci_disable_advertising_sync(hdev);
- 
-@@ -2131,9 +2133,6 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
- 	val = !!cp->val;
- 	enabled = lmp_host_le_capable(hdev);
- 
--	if (!val)
--		hci_req_clear_adv_instance(hdev, NULL, NULL, 0x00, true);
--
- 	if (!hdev_is_powered(hdev) || val == enabled) {
- 		bool changed = false;
- 
++		while (true) {
++			/* The non-resolvable private address is generated
++			 * from random six bytes with the two most significant
++			 * bits cleared.
++			 */
++			get_random_bytes(&nrpa, 6);
++			nrpa.b[5] &= 0x3f;
++
++			/* The non-resolvable private address shall not be
++			 * equal to the public address.
++			 */
++			if (bacmp(&hdev->bdaddr, &nrpa))
++				break;
++		}
++
++		*own_addr_type = ADDR_LE_DEV_RANDOM;
++		bacpy(rand_addr, &nrpa);
++
++		return 0;
++	}
++
++	/* No privacy so use a public address. */
++	*own_addr_type = ADDR_LE_DEV_PUBLIC;
++
++	return 0;
++}
 -- 
 2.37.1
 
