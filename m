@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B482C00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 21:58:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF23C25B08
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 21:59:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241797AbiHEV6q (ORCPT
+        id S241814AbiHEV7E (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Aug 2022 17:58:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44834 "EHLO
+        Fri, 5 Aug 2022 17:59:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241795AbiHEV63 (ORCPT
+        with ESMTP id S241728AbiHEV6l (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Aug 2022 17:58:29 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B107D7B8
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 14:56:15 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id 13so2307778plo.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Aug 2022 14:56:15 -0700 (PDT)
+        Fri, 5 Aug 2022 17:58:41 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CDC680480
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 14:56:26 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id c19-20020a17090ae11300b001f2f94ed5c6so8261926pjz.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Aug 2022 14:56:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=BrZCVXfqfi3oOXZsNJc8r9QljeSz92b3tE/eqB5fI4Y=;
-        b=nTwoeLQtj6EdVs823gaC9uvh83kXM/G7ycYY3Y1jYZGFY8iom5uFVZ58x/idlzfALM
-         V6NHq33xYT2yybCBrgqF9ehtwvbyWUmG5zEUBynUjYeOSz3aa3LYBQkeYUMSRCmdPRZY
-         bJgmBcQLpsiDcgjcCJyzjEAC6hJER2IM/xkaSQ5tcZkb4Wcbq3m/MRJFs3YxxscgHR1h
-         u7iUopO/5Y7XxMfqocHYqTcT+yb5Zrp/SUu9wWQU+SdSEXYBDF8NRVst1Y91rZRr+7Jv
-         cuw4bhKYNdlp0tY9fFykdj17O9VhGmB1EUIH1LR1O5R4nCd8+xntbuacjbSzaahr/mBZ
-         +Ggg==
+        bh=ihsODam4fhUsGf7+sq5s4Ez5Ukgxqbms2G1kVORuuRE=;
+        b=ZTGUqgMkYIN99pth/0dZn5rDsOr4/kaw+SRkIeUYGmWqf/PEAWDb4qammQ/AZkh+tM
+         q70PBKFDC1I5UiaGvt8cRf1M585xqEejOdt8cYgJ9k0P/VbLJQdB54yJqyxPEdfXfZMd
+         vv8mjsjOiSwcK9wsrGt8Ne3RPzclflkzejxLHl7Usnu5MKiG85eJTC5qkL2GXsd25JjY
+         /EjgDIB/VnMu1iRqAtIYHR9uZdsno0U2f+oLJXQlezv2q3pN/9DvuVLy6iJxJTIqcsqq
+         C3ioXo5Z6IhPdghFBPYdDwoJXplIfViodg39DEMcltud882wiAmMi0T8oa57DCauX1gc
+         Grhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=BrZCVXfqfi3oOXZsNJc8r9QljeSz92b3tE/eqB5fI4Y=;
-        b=n/98UOUgt2H/fyO27TF8oU8eaGKwF3aSUzc5uWr589GFSBg0KS7dTTzhG5U4jIxgHp
-         ojGh8yeUAUSQqs+aUZIv2lfITwVQKoREKiLnZl+3Jxu45XbSd02uQUvwUpDtz5jrDMVz
-         HgymJjidgAUvmJtm4jPiuDv29jLPq2UqNJfbrfdZie2Z69ndjt41CFj2Eaq6h2HQjTKy
-         Nq1xL4gemefVkTqFsD3IYVJh7zQ2/xVy+xDmw3aI2w7v4uLQzFGoiV76jiTzbMRup4Th
-         /ZFM3qam2tLAY40zgib4nDDju9XpNPNjsAp67lOuUFJMkNCrjFrPaqIeYth8zrV3P49Y
-         nVug==
-X-Gm-Message-State: ACgBeo24uvJAo+p8rWEOGnUAIHPCAmb9RqpFHHOCSJ7MCTzmjf6hNPjr
-        3nNHQoG/GpaWMaOOWxtHMbMNODplRxdxOQ==
-X-Google-Smtp-Source: AA6agR4B/3jp9EQgTH+l95hw0UjuqCsvYoXdhztfc2n23O11qNTEbRAyGQ4Suv52U2cGWdW/CCyWzw==
-X-Received: by 2002:a17:902:ccc4:b0:16c:5766:51f9 with SMTP id z4-20020a170902ccc400b0016c576651f9mr8625416ple.84.1659736574373;
-        Fri, 05 Aug 2022 14:56:14 -0700 (PDT)
+        bh=ihsODam4fhUsGf7+sq5s4Ez5Ukgxqbms2G1kVORuuRE=;
+        b=qTreyyxpWXmLR0AqzmO6Kap6/qjFxs3SegOYihKjfQDNbcR6eVhPf1X14e8tzFbIah
+         mCZLHTkl3h3HuDJlamk9r55pfopeZhXXacw/hpEVS7GneGe/8Eabj0NWz5ISas3KzV86
+         7EQHwPqxZPe5KRVZv8pII5P3BCp7POjNsn/ungOn7rdotzG+hZ0fjWDv8VX+ctrKZSQ4
+         2qLDl/HBZbdwXxkjzMd3efTh0+oaGlTy8ZJcJ5O9qkQ/iwVXqGkE8FSIB3MgEgx/jaJ5
+         0RKBUVsLsHhgm7/uM4hbDN+CKpXVqj0w7qXCi47HI68x6XaWl9DhvhH10usr3FQ4fOXt
+         g0Tw==
+X-Gm-Message-State: ACgBeo0yTRqD4nvLIqa0jzJ6iu/rxh+d9NncvQvyjQJDG4EiHnREp4yG
+        ZvUrUK9DpUTjLVUh0ur6VYiLN3ECUFyl3g==
+X-Google-Smtp-Source: AA6agR7sfvsNxvZ/CgcEUch0E8fSWxkWll3lJrdxWHQzAxZkLPyMLSaOcKRwxJVNeqkw11EZjbmLHA==
+X-Received: by 2002:a17:90b:3711:b0:1f5:179c:ad64 with SMTP id mg17-20020a17090b371100b001f5179cad64mr17612851pjb.11.1659736585039;
+        Fri, 05 Aug 2022 14:56:25 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m26-20020a62a21a000000b0052e988c1630sm2918153pff.138.2022.08.05.14.56.12
+        by smtp.gmail.com with ESMTPSA id 13-20020a62190d000000b0052d4ffac466sm3447036pfz.188.2022.08.05.14.56.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 14:56:12 -0700 (PDT)
+        Fri, 05 Aug 2022 14:56:23 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: ISO: Fix not using the correct QoS
-Date:   Fri,  5 Aug 2022 14:56:01 -0700
-Message-Id: <20220805215601.3958596-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] bthost: Add qos support to bthost_set_cig_params
+Date:   Fri,  5 Aug 2022 14:56:21 -0700
+Message-Id: <20220805215622.3958723-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -64,59 +64,79 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes using wrong QoS settings when attempting to send frames while
-acting as peripheral since the QoS settings in use are stored in
-hconn->iso_qos not in sk->qos, this is actually properly handled on
-getsockopt(BT_ISO_QOS) but not on iso_send_frame.
-
-Fixes: ccf74f2390d60 ("Bluetooth: Add BTPROTO_ISO socket type")
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This enables setting QoS other then the mandatory 16_2_1.
 ---
- net/bluetooth/iso.c | 16 +++++++++++-----
- 1 file changed, 11 insertions(+), 5 deletions(-)
+ emulator/bthost.c | 26 +++++++++++++++-----------
+ emulator/bthost.h |  4 +++-
+ 2 files changed, 18 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-index 015d1b41bc32..ced8ad4fed4f 100644
---- a/net/bluetooth/iso.c
-+++ b/net/bluetooth/iso.c
-@@ -373,15 +373,24 @@ static int iso_connect_cis(struct sock *sk)
- 	return err;
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 75fa625b1..f067d39a0 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -3131,25 +3131,29 @@ bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr)
  }
  
-+static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
-+{
-+	if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
-+		return &iso_pi(sk)->conn->hcon->iso_qos;
-+
-+	return &iso_pi(sk)->qos;
-+}
-+
- static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
+ void bthost_set_cig_params(struct bthost *bthost, uint8_t cig_id,
+-						uint8_t cis_id)
++				uint8_t cis_id, const struct bt_iso_qos *qos)
  {
- 	struct iso_conn *conn = iso_pi(sk)->conn;
-+	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
- 	struct hci_iso_data_hdr *hdr;
- 	int len = 0;
+ 	struct bt_hci_cmd_le_set_cig_params *cp;
  
- 	BT_DBG("sk %p len %d", sk, skb->len);
+ 	cp = malloc(sizeof(*cp) + sizeof(*cp->cis));
+ 	memset(cp, 0, sizeof(*cp) + sizeof(*cp->cis));
+ 	cp->cig_id = cig_id;
+-	put_le24(10000, cp->c_interval);
+-	put_le24(10000, cp->p_interval);
+-	cp->c_latency = cpu_to_le16(10);
+-	cp->p_latency = cpu_to_le16(10);
++	put_le24(qos->in.interval ? qos->in.interval : qos->out.interval,
++							cp->c_interval);
++	put_le24(qos->out.interval ? qos->out.interval : qos->in.interval,
++							cp->p_interval);
++	cp->c_latency = cpu_to_le16(qos->in.latency ? qos->in.latency :
++							qos->out.latency);
++	cp->p_latency = cpu_to_le16(qos->out.latency ? qos->out.latency :
++							qos->in.latency);
+ 	cp->num_cis = 0x01;
+ 	cp->cis[0].cis_id = cis_id;
+-	cp->cis[0].c_sdu = 40;
+-	cp->cis[0].p_sdu = 40;
+-	cp->cis[0].c_phy = 0x02;
+-	cp->cis[0].p_phy = 0x02;
+-	cp->cis[0].c_rtn = 2;
+-	cp->cis[0].p_rtn = 2;
++	cp->cis[0].c_sdu = qos->in.sdu;
++	cp->cis[0].p_sdu = qos->out.sdu;
++	cp->cis[0].c_phy = qos->in.phy ? qos->in.phy : qos->out.phy;
++	cp->cis[0].p_phy = qos->out.phy ? qos->out.phy : qos->in.phy;
++	cp->cis[0].c_rtn = qos->in.rtn;
++	cp->cis[0].p_rtn = qos->out.rtn;
  
--	if (skb->len > iso_pi(sk)->qos.out.sdu)
-+	if (skb->len > qos->out.sdu)
- 		return -EMSGSIZE;
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_CIG_PARAMS, cp,
+ 				sizeof(*cp) + sizeof(*cp->cis));
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index fd177ac29..3d7a124f0 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -12,6 +12,8 @@
+ #include <stdint.h>
+ #include <sys/uio.h>
  
- 	len = skb->len;
-@@ -1263,10 +1272,7 @@ static int iso_sock_getsockopt(struct socket *sock, int level, int optname,
- 		break;
++#include "lib/bluetooth.h"
++
+ typedef void (*bthost_send_func) (const struct iovec *iov, int iovlen,
+ 							void *user_data);
  
- 	case BT_ISO_QOS:
--		if (sk->sk_state == BT_CONNECTED || sk->sk_state == BT_CONNECT2)
--			qos = &iso_pi(sk)->conn->hcon->iso_qos;
--		else
--			qos = &iso_pi(sk)->qos;
-+		qos = iso_sock_get_qos(sk);
+@@ -101,7 +103,7 @@ void bthost_create_big(struct bthost *bthost, uint8_t num_bis);
+ bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
  
- 		len = min_t(unsigned int, len, sizeof(*qos));
- 		if (copy_to_user(optval, qos, len))
+ void bthost_set_cig_params(struct bthost *bthost, uint8_t cig_id,
+-						uint8_t cis_id);
++				uint8_t cis_id, const struct bt_iso_qos *qos);
+ void bthost_create_cis(struct bthost *bthost, uint16_t cis_handle,
+ 						uint16_t acl_handle);
+ 
 -- 
 2.37.1
 
