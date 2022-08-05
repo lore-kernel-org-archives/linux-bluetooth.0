@@ -2,103 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C810EC00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBF5C00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:20:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238483AbiHEXBS (ORCPT
+        id S241449AbiHEXUL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Aug 2022 19:01:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
+        Fri, 5 Aug 2022 19:20:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231818AbiHEXBQ (ORCPT
+        with ESMTP id S238141AbiHEXUK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Aug 2022 19:01:16 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBCA733A15
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 16:01:15 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id s2so3081808qtx.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Aug 2022 16:01:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=bNMjzy6vwpaDyk5d9EbzDC7IYXuUJIAbfvtSg1JzDEw=;
-        b=HgGr6oOOgSdsSLasBsH4A+62F81gDjVCOTXPgqp2zfdO9xJ8QeiDD7OrK6e5KMKsxt
-         R6eGcAy53UlWBIed5/OivQSLuTDJeyG3CvjO9XJ3T4hQyhwz94mK2Fq+GFvv8yyPb7e4
-         1Vxk4hn9PxiyhZCkp0nITeIZCbwmOKjwy5ecqZrZIMSALoSbtmfCKqFRxmkTViQiaIpK
-         EMZtLrs9o8MYcyWaXaV+nK7eHIrzzYp3zkeiSvAZI+ZI2lkDDZNHbi+S7VkaFyqVOATp
-         OKEIuzU0n+E5TDsnN+E0rMZwws/EppkhJGo5kxxNI/EJolWXi3R7+cCS69453S/QaUs4
-         4TXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=bNMjzy6vwpaDyk5d9EbzDC7IYXuUJIAbfvtSg1JzDEw=;
-        b=6QPZE5sZWryJ8WRx7RkOxlvSzkUDO/v63B9s6IWoJEPCVE3izGbwCNlVrTPAnek2hN
-         c5DvEWNkXnX4pwNrbd8qCdmUf0Z9zMg2WW4aqoG+/WngwpRUcgSaceCEP5upVscIbGuE
-         4YoLFNhpUbu6MpmUnizDBiMEOW2+rkVfP+KUm6JQz93dwtHfCa9Hpw6Rx0bDqH4jltRX
-         Nat9wxbb6aL6tHbR+mTcHE+83nh4GNBXxhwv1kVHsYbi58IRMcLsuiAEtVgM4YW3v/R3
-         tZt3hhvA/k8SS/AtlIXdZbfyw6cZWuXaY5c1U/YO5Uja7S+o7K/x8Av0XzNsA+g7IASQ
-         0gDg==
-X-Gm-Message-State: ACgBeo1PkPJiyrHbDBCG1nwsnFUzhgsSKe7UZMLD8fEGxPeaHddGftPf
-        jRT0JcKJXQkMS0CKHDlVOYSpCojQmI4=
-X-Google-Smtp-Source: AA6agR5SXwjXLDqmaNvNPyh3wqlpo5I4kD0in8SbovuAWW0y++7Fg/ce6J4kt7Qz7ch645ZFgxwu/g==
-X-Received: by 2002:a05:622a:1356:b0:31e:d9b7:4cc with SMTP id w22-20020a05622a135600b0031ed9b704ccmr7628235qtk.51.1659740474335;
-        Fri, 05 Aug 2022 16:01:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.22.230.74])
-        by smtp.gmail.com with ESMTPSA id i25-20020ac84899000000b0033ff6387ab8sm3372450qtq.57.2022.08.05.16.01.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Aug 2022 16:01:14 -0700 (PDT)
-Message-ID: <62eda13a.c80a0220.2ca18.b06e@mx.google.com>
-Date:   Fri, 05 Aug 2022 16:01:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7214587840057197428=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: ISO: Fix not using the correct QoS
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220805215601.3958596-1-luiz.dentz@gmail.com>
-References: <20220805215601.3958596-1-luiz.dentz@gmail.com>
+        Fri, 5 Aug 2022 19:20:10 -0400
+Received: from out-20.smtp.github.com (out-20.smtp.github.com [192.30.252.203])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31FBF11C0E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 16:20:07 -0700 (PDT)
+Received: from github.com (hubbernetes-node-817739a.va3-iad.github.net [10.48.204.29])
+        by smtp.github.com (Postfix) with ESMTPA id 5A416E0408
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 16:20:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1659741607;
+        bh=1k9Rivtg8LXh+OVy1BqeEZVRF4bgVyk0383aSqUr9sI=;
+        h=Date:From:To:Subject:From;
+        b=H05RF+jO5RBSQptWPFUebA5kqCyBScAKDwu1guwY5Etrq8cjv+ZfWIZ57XTuCmgiW
+         un7IRkSFVx1YPzcoVe84yiIncvFuNgOo6164XNkpolyB8atKgtw1bbhojGsTaV9XII
+         kPaJzmnyLDGHR8lZA2syQ1XEKq7Gn8cxbUXvQAYs=
+Date:   Fri, 05 Aug 2022 16:20:07 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/e7fc74-06f646@github.com>
+Subject: [bluez/bluez] 2dfe29: shared/tester: Add tester_setup_io
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7214587840057197428==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 2dfe29197435ebeae5337bed6d965cdf2edc3f89
+      https://github.com/bluez/bluez/commit/2dfe29197435ebeae5337bed6d965cdf2edc3f89
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-08-05 (Fri, 05 Aug 2022)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M src/shared/tester.c
+    M src/shared/tester.h
 
-Dear submitter,
+  Log Message:
+  -----------
+  shared/tester: Add tester_setup_io
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=665768
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.66 seconds
-GitLint                       PASS      0.98 seconds
-SubjectPrefix                 PASS      0.86 seconds
-BuildKernel                   PASS      33.33 seconds
-BuildKernel32                 PASS      28.61 seconds
-Incremental Build with patchesPASS      41.02 seconds
-TestRunner: Setup             PASS      478.76 seconds
-TestRunner: l2cap-tester      PASS      16.98 seconds
-TestRunner: bnep-tester       PASS      6.29 seconds
-TestRunner: mgmt-tester       PASS      99.96 seconds
-TestRunner: rfcomm-tester     PASS      9.65 seconds
-TestRunner: sco-tester        PASS      9.32 seconds
-TestRunner: smp-tester        PASS      9.42 seconds
-TestRunner: userchan-tester   PASS      6.50 seconds
+This adds tester_setup_io which can be used to add a PDU list in the
+form of iovec.
 
 
+  Commit: f07b88abfb89dbd951d65b782076383768bbc8be
+      https://github.com/bluez/bluez/commit/f07b88abfb89dbd951d65b782076383768bbc8be
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-08-05 (Fri, 05 Aug 2022)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M Makefile.am
+    A unit/test-tester.c
+
+  Log Message:
+  -----------
+  test-tester: This add tests for tester
+
+This adds tests for the tester itself:
+
+> unit/test-tester
+
+Test Summary
+------------
+/tester/basic                           Passed       0.000 seconds
+/tester/setup_io                        Passed       0.000 seconds
+/tester/io_send                         Passed       0.000 seconds
+Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.000355 seconds
 
 
---===============7214587840057197428==--
+  Commit: bbbd0512c92d5b9a629a41b6e1afaef94f63a8b4
+      https://github.com/bluez/bluez/commit/bbbd0512c92d5b9a629a41b6e1afaef94f63a8b4
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-08-05 (Fri, 05 Aug 2022)
+
+  Changed paths:
+    M emulator/bthost.c
+    M emulator/bthost.h
+    M tools/iso-tester.c
+
+  Log Message:
+  -----------
+  bthost: Add qos support to bthost_set_cig_params
+
+This enables setting QoS other then the mandatory 16_2_1.
+
+
+  Commit: 06f6460cd121ec8dd7dbeffd1dcd2339c25169d1
+      https://github.com/bluez/bluez/commit/06f6460cd121ec8dd7dbeffd1dcd2339c25169d1
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-08-05 (Fri, 05 Aug 2022)
+
+  Changed paths:
+    M tools/iso-tester.c
+
+  Log Message:
+  -----------
+  iso-tester: Add ISO 48_2_1 Defer Receive - Success
+
+This adds a test to check if different QoS are properly handled when
+acting as peripheral.
+
+
+Compare: https://github.com/bluez/bluez/compare/e7fc74a5dd1b...06f6460cd121
