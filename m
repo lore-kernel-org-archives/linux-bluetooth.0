@@ -2,77 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D980C00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FD4C00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Aug 2022 23:28:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241589AbiHEXUQ (ORCPT
+        id S241618AbiHEX2j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Aug 2022 19:20:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
+        Fri, 5 Aug 2022 19:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238141AbiHEXUP (ORCPT
+        with ESMTP id S238141AbiHEX2i (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Aug 2022 19:20:15 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5188CE3A
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 16:20:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id D585F61378
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Aug 2022 23:20:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 379F8C433B5;
-        Fri,  5 Aug 2022 23:20:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659741613;
-        bh=LyRrp6G10HKo58WrtjgFvKssxtZyBOgvNhkBbyHB+cE=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=LYQIyALUNgfxn57STnZOE3KySA37ATzwt+ssmGm68j14qYyQXIjioUkffjuQsVxSx
-         wPVKVLhEqNKaq4c7j/PYfeSrb/RZn0HVEDlICD309OBtEr6IWJ1tn6NoUK13dMpUPA
-         Y0WGvn9ciC3EQilD5C0/37NQkyQfTZ0tRCs+9CQQSr4tZOejUEJ2cbFNPR3n8EDDYe
-         zBiNJZxUpseYEXAJG+TTjBbnoa3oFKr1z0jxpEVXG9enXXa7tlvnf8SNEW9zBRTdfU
-         UmZrQhMVtkUzfwzQbhEeOtBdOCXEp0NHEh07YoxqCCHWKzzaBWop9BumiUjy1tVTTX
-         g+zuLUKLDn+2Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1DC22C43142;
-        Fri,  5 Aug 2022 23:20:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 5 Aug 2022 19:28:38 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E845175BA;
+        Fri,  5 Aug 2022 16:28:37 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id q9-20020a17090a2dc900b001f58bcaca95so2755564pjm.3;
+        Fri, 05 Aug 2022 16:28:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lX56W+vf9zyDi6j+4csF/9/BmLcJVTV+VtL7UwiF1kU=;
+        b=kSYAoigWbys1J8x42COsIgNq0tj0TDFGrIxsxbOpW89BiNIxYK2CaschD3KPfcrPXR
+         J51wWi3xlYgvhC5m3YMn8+m4uqVysssMVuTlT/LXrp8yCmxfS1T7cm5vJlvbLCC/Pr9b
+         Qb+jJi4JIFkF+rVr+yTy6n+CyLK7L/pAj+EGsmQnEdEYp4AsN6M+DbID6qh3HW/Vw6sl
+         rxZfEdTdeJ8Hay7556tcvm1vXJPiofktxsqxi87s8qi3Ik+OkAgjoijVbG/hqdAIGpPG
+         lShaAxfqglwHhpeNk9wfk6tiTfMFz4LsgnEy/JEVEmN8JS5mZYsPBCd6b+E6sHglUUxu
+         WKFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lX56W+vf9zyDi6j+4csF/9/BmLcJVTV+VtL7UwiF1kU=;
+        b=dMfXkZXrfNlHeUi32p9ukZazsBct0Ast2BVOSqW+BXtYk1JXN9/RW25qbhQxYIXUcj
+         xrNusSMDuxXgl72eSXbtt1WLaTHtMmB+SymUGFmxoCNly1PLsji5u/mfi8rnnNhubB86
+         AXLOS7w2q6Uu8m8bQFhZNy5ZSLORNK/4gEHg/xyNfTmF4aE5uJ7dHCdofWaorurW6Y0u
+         D37sdznR/0Wb1I/T/VoK4kyrK218htZrel8OUv03P4zo7V7lI5QAjfGXm8MoZkNKxgYW
+         a6dNl3eJCwwhbl4loosHoaAbLAtusaS1SHlOa69us7VO6VQj1CVdp/8ibxu16S5EVsIy
+         svhg==
+X-Gm-Message-State: ACgBeo24mhD7l3RZeUwRQHrd1+vsbbAgtZ/zuzRaPQMnaIaxv/n04fwU
+        99APVFpX+QTkwyo4W/L5q1uLuWr0HUGMCA==
+X-Google-Smtp-Source: AA6agR65pIa56/i9mU3EnoLdfy9Ftgghi768bf6UA5fai+49ld34Y8ildj4dGfEinMUUWx/ndeibDg==
+X-Received: by 2002:a17:902:f788:b0:16c:f48b:905e with SMTP id q8-20020a170902f78800b0016cf48b905emr8921616pln.60.1659742116392;
+        Fri, 05 Aug 2022 16:28:36 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u17-20020a170902e5d100b0016c78aaae7fsm3716200plf.23.2022.08.05.16.28.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Aug 2022 16:28:35 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-08-05
+Date:   Fri,  5 Aug 2022 16:28:34 -0700
+Message-Id: <20220805232834.4024091-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: ISO: Fix not using the correct QoS
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <165974161311.5986.16553764464556071427.git-patchwork-notify@kernel.org>
-Date:   Fri, 05 Aug 2022 23:20:13 +0000
-References: <20220805215601.3958596-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220805215601.3958596-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit 2e64fe4624d19bc71212aae434c54874e5c49c5a:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  selftests: add few test cases for tap driver (2022-08-05 08:59:15 +0100)
 
-On Fri,  5 Aug 2022 14:56:01 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This fixes using wrong QoS settings when attempting to send frames while
-> acting as peripheral since the QoS settings in use are stored in
-> hconn->iso_qos not in sk->qos, this is actually properly handled on
-> getsockopt(BT_ISO_QOS) but not on iso_send_frame.
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - Bluetooth: ISO: Fix not using the correct QoS
-    https://git.kernel.org/bluetooth/bluetooth-next/c/aac59090a068
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-08-05
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to 118862122fcb298548ddadf4a3b6c8511b3345b7:
 
+  Bluetooth: ISO: Fix not using the correct QoS (2022-08-05 16:16:54 -0700)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fixes various issues related to ISO channel/socket support
+ - Fixes issues when building with C=1
+ - Fix cancel uninitilized work which blocks syzbot to run
+
+----------------------------------------------------------------
+Dan Carpenter (1):
+      Bluetooth: ISO: unlock on error path in iso_sock_setsockopt()
+
+Luiz Augusto von Dentz (8):
+      Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression
+      Bluetooth: hci_conn: Fix updating ISO QoS PHY
+      Bluetooth: ISO: Fix info leak in iso_sock_getsockopt()
+      Bluetooth: ISO: Fix memory corruption
+      Bluetooth: hci_event: Fix build warning with C=1
+      Bluetooth: MGMT: Fixes build warnings with C=1
+      Bluetooth: ISO: Fix iso_sock_getsockopt for BT_DEFER_SETUP
+      Bluetooth: ISO: Fix not using the correct QoS
+
+Soenke Huster (1):
+      Bluetooth: Fix null pointer deref on unexpected status event
+
+Tetsuo Handa (1):
+      Bluetooth: don't try to cancel uninitialized works at mgmt_index_removed()
+
+ net/bluetooth/aosp.c       | 15 ++++++++++++---
+ net/bluetooth/hci_conn.c   | 11 ++---------
+ net/bluetooth/hci_event.c  |  7 +++++--
+ net/bluetooth/iso.c        | 35 +++++++++++++++++++++++------------
+ net/bluetooth/l2cap_core.c | 13 ++++++-------
+ net/bluetooth/mgmt.c       |  7 ++++---
+ net/bluetooth/msft.c       | 15 ++++++++++++---
+ 7 files changed, 64 insertions(+), 39 deletions(-)
