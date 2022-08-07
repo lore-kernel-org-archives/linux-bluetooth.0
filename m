@@ -2,125 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54821C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 22:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEBE3C25B0C
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 23:01:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbiHGV7G (ORCPT
+        id S231263AbiHGXBF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Aug 2022 17:59:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46912 "EHLO
+        Sun, 7 Aug 2022 19:01:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbiHGV7E (ORCPT
+        with ESMTP id S229530AbiHGXBD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Aug 2022 17:59:04 -0400
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B111463EB
-        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 14:59:02 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id j17so567633qtp.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Aug 2022 14:59:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=ord7tOG9rRtt3Wuq8M1a0HAnbwoEV3A9fTIe5EXa/+4=;
-        b=kUStG+GoduIat6xgWu7l7Mr3SJ1SrPGMDyrpWoztlTGwvFvtFxP5/w27KA9qGNddDc
-         NkGU4GVbKu9YsBKp2P3p9wT+2ZT6uEFKo8PMKa4IgLEFvGyvrxm5cd3N/Yvjv41wKU0K
-         0ZBAfAeRM4pJjRsE8PXS524+3xX9JN4X7WpHvKttpHmah/NeBBlIToogrYFLgpU7IpDg
-         L47Cd85E1ixgKg/rFmef/eYhQtUcrKEraQQ1yHkEiMq8BLvZbn3Gs3imJ7kjXmX/UOXm
-         MLO3SkmncivhII3JFI6d70BCSXYhbFznPU5SNpvIydXt9I/kYLv9ybJ8KyWR+dcmAsJq
-         e9Qw==
+        Sun, 7 Aug 2022 19:01:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0340CEA1
+        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 16:01:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659913261;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Wk/43vXNo+gPgeJbUofxRngA+x+b00pdU9F/OSmIEJg=;
+        b=d4Haw93S6P+Ob9vovI0K6YtUK1YMS9QUndcebBQFJuXycWL4zFfmnmZ5m8I6RT0bag5vZQ
+        SnI/ujRH5rTCulYGcc7eXwvBo9hZjkm4q1ytuL05Xn444tD5aS5CEPl0AjMfI1fHoY9Gc8
+        sEMiIhQ5I+isPuw1QKQUui1aC7JxJkM=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-647-oklUo8uCNoOyZx1kk-J4YQ-1; Sun, 07 Aug 2022 19:00:59 -0400
+X-MC-Unique: oklUo8uCNoOyZx1kk-J4YQ-1
+Received: by mail-wm1-f70.google.com with SMTP id n1-20020a7bcbc1000000b003a4e8c818f5so1086127wmi.6
+        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Aug 2022 16:00:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=ord7tOG9rRtt3Wuq8M1a0HAnbwoEV3A9fTIe5EXa/+4=;
-        b=6H+u10u5lU+RDpJmtXTV+uu5HcnvNKkR2OyzycNyaTnX+gAg6d220Iwdmn3K63OVdV
-         UqxX/SBddPQjemLsIHJIhrVv76JkLRSMOZtDP5WFlOZBePaf9Ric7qhLqOKENiz1zq2x
-         QlY28iZTYiHDk/fhgTnJDnK0fJbuzAC4cStCWAWuM3FCuWxCnvdFriwVHo/tiZtVLDDt
-         e19S59L18ws9Qwza4uNS4VVaVfUavMBYUJVQUhAMHAD9nf7Ojr1BlXb05BYA4xE81N1F
-         y9r7xZJsE2xkeKwrrFX4sIWNJE6CMWvPafinMWWPgM6pBdN6wmYS3x85SISlpqf9DcW9
-         uHkg==
-X-Gm-Message-State: ACgBeo0l3n3tFwd5i1J49iQ5zwsGHawQsftfqK3sZ121qV2n0lROlmSJ
-        vwBNzNyu5Eki5HWFbwZXi+kjXDSeg/s=
-X-Google-Smtp-Source: AA6agR6hXQbtTuzBKcnwEbbbDNMDTF/z+9ACCc2K+/yF02zFrVpto7RzwMM9GgIgCDQDS5W3KGFKAA==
-X-Received: by 2002:a05:622a:178e:b0:33b:1ad8:a58e with SMTP id s14-20020a05622a178e00b0033b1ad8a58emr13856676qtk.454.1659909541329;
-        Sun, 07 Aug 2022 14:59:01 -0700 (PDT)
-Received: from [172.17.0.2] ([20.106.245.98])
-        by smtp.gmail.com with ESMTPSA id x24-20020a05620a0b5800b006b93ff541dasm3232418qkg.8.2022.08.07.14.59.01
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
+        bh=Wk/43vXNo+gPgeJbUofxRngA+x+b00pdU9F/OSmIEJg=;
+        b=TbmI/p/qOHgRzkw47IfQ5KOzYzjCpZRF0nG5kXFDu1KSeq1EqlL8to7U39902p9P9n
+         ZT2O2Eot4HaBDJconDYlThF3evNm7z6liEb2cRrkR2PXazB9hsVsblBiacfAKueRALpV
+         kF5ZEoo73yFkf3V1kWI+Sr00VGqYlEfRmEqF7S5+fuVtvuX8XY5zWCFli9VxiL4RSuT4
+         rbuoclnW/IG8xxKd0YJ1EXHhroNNF/+SdiuiepEq4aMcNGzRvcvn+5iHw8hlUX+LhJUy
+         egCT+bFVzQ6O6oDHmrRq7RIW+7vgErW71YPJRDoTMy8glfgXWJP3Yogy7NkdKdspeBUc
+         17dA==
+X-Gm-Message-State: ACgBeo2rH/6rA4Tx57pnhmNDKD9Nyak0f9MunaerIKdqFtus96W0CXt3
+        19s564gqpedRgZvxdQwCtuHC6Ih6Fhs844+PbsTQvvjmH8ZgLiH/4clb5B1Tn3XR/hUZ7W7h5QQ
+        oSCSAeiE8H0C63y4t0awQVejcfFWb
+X-Received: by 2002:adf:e111:0:b0:21d:665e:2fa5 with SMTP id t17-20020adfe111000000b0021d665e2fa5mr10319218wrz.652.1659913258546;
+        Sun, 07 Aug 2022 16:00:58 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR77jXqn3s6KfigLdRwFaDgPm/WuGZ/eUbqehSUKychxT4mkfEwdiEmUEE/nolidYa5kAcIEuw==
+X-Received: by 2002:adf:e111:0:b0:21d:665e:2fa5 with SMTP id t17-20020adfe111000000b0021d665e2fa5mr10319205wrz.652.1659913258316;
+        Sun, 07 Aug 2022 16:00:58 -0700 (PDT)
+Received: from redhat.com ([2.52.21.123])
+        by smtp.gmail.com with ESMTPSA id u7-20020a05600c210700b003a3561d4f3fsm916915wml.43.2022.08.07.16.00.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Aug 2022 14:59:01 -0700 (PDT)
-Message-ID: <62f035a5.050a0220.aebd4.50b5@mx.google.com>
-Date:   Sun, 07 Aug 2022 14:59:01 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4665828363669088388=="
+        Sun, 07 Aug 2022 16:00:57 -0700 (PDT)
+Date:   Sun, 7 Aug 2022 19:00:54 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Igor Skalkin <Igor.Skalkin@opensynergy.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
+Message-ID: <20220807185846-mutt-send-email-mst@kernel.org>
+References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hdegoede@redhat.com
-Subject: RE: Bluetooth: hci_event: Fix vendor (unknown) opcode status handling
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220807205740.777363-1-hdegoede@redhat.com>
-References: <20220807205740.777363-1-hdegoede@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4665828363669088388==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
+> According to specification [1], "For the device-specific configuration
+> space, the driver MUST use 8 bit wide accesses for 8 bit wide fields,
+> 16 bit wide and aligned accesses for 16 bit wide fields and 32 bit wide
+> and aligned accesses for 32 and 64 bit wide fields.".
+> 
+> Current version of the configuration structure:
+> 
+>     struct virtio_bt_config {
+>         __u8  type;
+>         __u16 vendor;
+>         __u16 msft_opcode;
+>     } __attribute__((packed));
+> 
+> has both 16bit fields non-aligned.
+> 
+> This commit fixes it.
+> 
+> [1] https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.pdf
+> 
+> Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=665926
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.88 seconds
-GitLint                       PASS      1.09 seconds
-SubjectPrefix                 PASS      0.84 seconds
-BuildKernel                   PASS      33.71 seconds
-BuildKernel32                 PASS      29.15 seconds
-Incremental Build with patchesPASS      40.88 seconds
-TestRunner: Setup             PASS      486.89 seconds
-TestRunner: l2cap-tester      PASS      17.54 seconds
-TestRunner: bnep-tester       PASS      6.73 seconds
-TestRunner: mgmt-tester       PASS      104.38 seconds
-TestRunner: rfcomm-tester     PASS      10.12 seconds
-TestRunner: sco-tester        PASS      9.90 seconds
-TestRunner: smp-tester        PASS      9.92 seconds
-TestRunner: userchan-tester   PASS      7.00 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.88 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-Bluetooth: hci_event: Fix vendor (unknown) opcode status handling\ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'Commit fatal: unsaf ("ace/src' is owned by someone else)")'
-#68: 
-Commit c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to
-handle Command Complete") was (presumably) meant to only refactor things
-
-total: 1 errors, 0 warnings, 0 checks, 13 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12938271.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+This is all true enough, but the problem is
+1. changing uapi like this can't be done, will break userspace
+2. the driver has more issues and no one seems to want to
+   maintain it. 
+I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
+to merge it for this release.
 
 
+> ---
+>  include/uapi/linux/virtio_bt.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/linux/virtio_bt.h
+> index a7bd48daa9a9..adc03709cc4f 100644
+> --- a/include/uapi/linux/virtio_bt.h
+> +++ b/include/uapi/linux/virtio_bt.h
+> @@ -23,9 +23,9 @@ enum virtio_bt_config_vendor {
+>  };
+>  
+>  struct virtio_bt_config {
+> -	__u8  type;
+>  	__u16 vendor;
+>  	__u16 msft_opcode;
+> +	__u8  type;
+>  } __attribute__((packed));
+>  
+>  #endif /* _UAPI_LINUX_VIRTIO_BT_H */
+> -- 
+> 2.34.1
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4665828363669088388==--
