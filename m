@@ -2,124 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30914C19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 19:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFDBC19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 19:43:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231941AbiHGTUl (ORCPT
+        id S235434AbiHGTn3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Aug 2022 15:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50718 "EHLO
+        Sun, 7 Aug 2022 15:43:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230012AbiHGTUk (ORCPT
+        with ESMTP id S229898AbiHGTn0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Aug 2022 15:20:40 -0400
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42010EB1
-        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 12:20:37 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id f22so9025454edc.7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Aug 2022 12:20:37 -0700 (PDT)
+        Sun, 7 Aug 2022 15:43:26 -0400
+Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310DB6595
+        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 12:43:26 -0700 (PDT)
+Received: by mail-qv1-xf2e.google.com with SMTP id u8so5153903qvv.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Aug 2022 12:43:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=T29rPU2g6z6jMw1hF0iao34JCtGnL9boIFn0X+u5O5k=;
-        b=pMUhwikt3Vys0Ae3p+4LpgUvvqJzPFReLV9u4P3pgcKj5vA/NYz1NpBD5lCH4PO01s
-         282ySXHNWIXbVvG5AKrWcQcXTec/VtYghKYeCau+vwt0NpE3ZkY+KA3+aKgdfAoST0m+
-         RI7XmJ6QSRqT6aX/I9xfWBEnuFUiJXk+DQS5b20l5ejFeNtShqoD1qgLYaQ0XNARyZzE
-         O1C5XO/Q+jNWTOrYbERw6/lGr3wa4245F4j1RT+1VxaY8iTkNmks5MB8elTu7JqYXibR
-         R/rqbEKmJcBs9MMhHqtJGnP9p4KY9RFH1eLSCk2xq927m9v25er6/ZjKq7S/UsnwHnuZ
-         /+pQ==
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:from:to:cc;
+        bh=nBt2kKr8G1b8ZCw+u45lxxp5XAPH6dyAsnD7kRDtYz0=;
+        b=AjagOwrbLn5Vi0wIlBAwIj08eD+U90RrCOIyRFwyWDwEYJpH6xquQk2YhMzi3nEK18
+         R0R1Bm+O47fYSRoJGDsOlWL0q3qQY78lIat8DAeDXH9afkfLrNQcVavHgZQSE/sYI2iM
+         2fgTCU2Q1F6mF4cOqyIbSB+b9Bv6UMQL1Ikw42nzwpZ+iPDYOXJiee9dOpi+dLoHptjl
+         JbWA2JWVT/NHzfSu+YEK1AMokszECe7yiCqxEz/jct4xULtaPoA0cWWlrmGs7ESsFkHQ
+         9XjHthGvAke4oevi1o8vKfkUT2+DxHKNi3LGat7/Iou/eKLiBrWfPCKLGWyOYKl/C2pB
+         rYAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=T29rPU2g6z6jMw1hF0iao34JCtGnL9boIFn0X+u5O5k=;
-        b=NiNLYOyEt7MyvfiC3NPe3XcfjGjQsPqiV3s/KdI0zvAYMvgTMYQctgUgMD9D4e96Ou
-         Zf9YEkLY8sHeZ2dl7h+N3HWwBpWh+09bIK5Ke/LZthmALntBGGjRHX0iCoLQw+aGfmW0
-         ommR4SGctHC0v7E2j1vxBL+bxwyDFI4KyTzqZVMi3yX2EK9PP1MIThh88lO15i2wrkWZ
-         YqSbHeHMtm9E7ssfLfRv6B6CVVl7pZ54jJIViViFMl+tdlDTSqoTadk3jcpKNknIJbV3
-         7HNBElZiKCbdvejSmY3M8A+4aTPdF7wLTQlDQR8EbOPyzEpMG1izw4q+B/qgxRTHMYjS
-         T2MQ==
-X-Gm-Message-State: ACgBeo1mP3sQ66cPhzNF/vy5xU3ZlxZP02b8WLuZJmwTAhplIKKRKcxS
-        gUIH2GpTUeOo+LPvuLaQ7BE4P2PkkA2rDXqN
-X-Google-Smtp-Source: AA6agR7BkZCASAfIoUJDa+Z3DkFDdp4O/M47mycKQwceoamXU5waerqr5U9V0fO5jVLfaMkz5AC6Jw==
-X-Received: by 2002:a05:6402:2714:b0:43d:ca4f:d2a2 with SMTP id y20-20020a056402271400b0043dca4fd2a2mr15683024edd.185.1659900035515;
-        Sun, 07 Aug 2022 12:20:35 -0700 (PDT)
-Received: from cati.. (5.186.100.144.dhcp.fibianet.dk. [5.186.100.144])
-        by smtp.gmail.com with ESMTPSA id b10-20020a17090630ca00b00730bbd81646sm4082890ejb.87.2022.08.07.12.20.33
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=nBt2kKr8G1b8ZCw+u45lxxp5XAPH6dyAsnD7kRDtYz0=;
+        b=xzM007UcNj2IwfTrGEZk7f9zuaI1bKnChJpBtaUjVjhE365ZxwHTYX2oKewPD1rWt9
+         yL32oKeIhPp8J3NtdiPNPDcZO8xHTWvXE4jGzS5ZbgdH3by7fmqXgR9CKthBWCklnH38
+         EwQh0QB7nmqUjCzJkZFkSnn1J3JetLLMBs9u1tXGcUfidzZu4h9bzS3hOLyA8uOHaWmG
+         b/Z9fYqO20cfPYSkq72V1pcBq9/uiRGwjRpcwHJb1q4W+O/nsKBXCwUdcHQ/QmQwPZUR
+         kNttI45jgn4DRPIra9Xf51q6cAAURfJ4W4hj8RAzsNvrAeCTVvc6OCQoe+NsTU5xcPfC
+         /xXQ==
+X-Gm-Message-State: ACgBeo1wT1kpgiY+3qMTlot8xZapvGtk+yyxTeHdm4rXO8LQl5JxLdCs
+        mKBcQjn2jrR81Cgo8CX24BM2REqruJI=
+X-Google-Smtp-Source: AA6agR7vB5ialgryWUCkLIwE1JLPYLPrrrG0i4bXMqoQ2bU/yb17R+/sB1gHeUTO4rDjL6rLekdLBg==
+X-Received: by 2002:ad4:5b8d:0:b0:47b:2c2c:96f with SMTP id 13-20020ad45b8d000000b0047b2c2c096fmr5381027qvp.80.1659901404997;
+        Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
+Received: from [172.17.0.2] ([20.124.2.43])
+        by smtp.gmail.com with ESMTPSA id bs27-20020ac86f1b000000b00342f58fffe0sm2167686qtb.9.2022.08.07.12.43.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Aug 2022 12:20:34 -0700 (PDT)
-From:   Alicia Boya Garcia <ntrrgc@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Alicia Boya Garcia <ntrrgc@gmail.com>
-Subject: [PATCH BlueZ] client: Fix uninitialized read in attribute handle
-Date:   Sun,  7 Aug 2022 21:20:14 +0200
-Message-Id: <20220807192013.74195-1-ntrrgc@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
+Message-ID: <62f015dc.c80a0220.23a6d.3331@mx.google.com>
+Date:   Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1405101608213167899=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: RE: [BlueZ] client: Fix uninitialized read in attribute handle
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, ntrrgc@gmail.com
+In-Reply-To: <20220807192013.74195-1-ntrrgc@gmail.com>
+References: <20220807192013.74195-1-ntrrgc@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When services, characteristics and descriptors were parsed from DBus
-proxies the client code was calling the print code without initializing
-the `handle` field, which the print functions use.
+--===============1405101608213167899==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This resulted in semi-random or zero handles in all attributes when
-using gatt.list-attributes in bluetoothctl, depending on compilation
-flags.
+This is an automated email and please do not reply to this email.
 
-This patch fixes the problem by parsing the handle from the DBus proxy
-path.
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+error: patch failed: client/gatt.c:259
+error: client/gatt.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- client/gatt.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 21fd38ecf..4c074706c 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -158,6 +158,15 @@ static void print_inc_service(struct service *service, const char *description)
- 					service->uuid, text);
- }
- 
-+static uint16_t handle_from_path(const char *path)
-+{
-+	const char *number = path + strlen(path) - 4;
-+	if (number < path)
-+		return 0;
-+
-+	return (uint16_t) strtol(number, NULL, 16);
-+}
-+
- static void print_service_proxy(GDBusProxy *proxy, const char *description)
- {
- 	struct service service;
-@@ -178,6 +187,7 @@ static void print_service_proxy(GDBusProxy *proxy, const char *description)
- 	service.path = (char *) g_dbus_proxy_get_path(proxy);
- 	service.uuid = (char *) uuid;
- 	service.primary = primary;
-+	service.handle = handle_from_path(service.path);
- 
- 	print_service(&service, description);
- }
-@@ -259,6 +269,7 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
- 
- 	chrc.path = (char *) g_dbus_proxy_get_path(proxy);
- 	chrc.uuid = (char *) uuid;
-+	chrc.handle = handle_from_path(chrc.path);
- 
- 	print_chrc(&chrc, description);
- }
-@@ -352,6 +363,7 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
- 
- 	desc.path = (char *) g_dbus_proxy_get_path(proxy);
- 	desc.uuid = (char *) uuid;
-+	desc.handle = handle_from_path(desc.path);
- 
- 	print_desc(&desc, description);
- }
--- 
-2.37.1
 
+--===============1405101608213167899==--
