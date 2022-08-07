@@ -2,91 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFDBC19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 19:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C78FCC19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Aug 2022 20:57:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235434AbiHGTn3 (ORCPT
+        id S233090AbiHGU54 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Aug 2022 15:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58914 "EHLO
+        Sun, 7 Aug 2022 16:57:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiHGTn0 (ORCPT
+        with ESMTP id S230012AbiHGU5z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Aug 2022 15:43:26 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 310DB6595
-        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 12:43:26 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id u8so5153903qvv.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Aug 2022 12:43:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc;
-        bh=nBt2kKr8G1b8ZCw+u45lxxp5XAPH6dyAsnD7kRDtYz0=;
-        b=AjagOwrbLn5Vi0wIlBAwIj08eD+U90RrCOIyRFwyWDwEYJpH6xquQk2YhMzi3nEK18
-         R0R1Bm+O47fYSRoJGDsOlWL0q3qQY78lIat8DAeDXH9afkfLrNQcVavHgZQSE/sYI2iM
-         2fgTCU2Q1F6mF4cOqyIbSB+b9Bv6UMQL1Ikw42nzwpZ+iPDYOXJiee9dOpi+dLoHptjl
-         JbWA2JWVT/NHzfSu+YEK1AMokszECe7yiCqxEz/jct4xULtaPoA0cWWlrmGs7ESsFkHQ
-         9XjHthGvAke4oevi1o8vKfkUT2+DxHKNi3LGat7/Iou/eKLiBrWfPCKLGWyOYKl/C2pB
-         rYAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=nBt2kKr8G1b8ZCw+u45lxxp5XAPH6dyAsnD7kRDtYz0=;
-        b=xzM007UcNj2IwfTrGEZk7f9zuaI1bKnChJpBtaUjVjhE365ZxwHTYX2oKewPD1rWt9
-         yL32oKeIhPp8J3NtdiPNPDcZO8xHTWvXE4jGzS5ZbgdH3by7fmqXgR9CKthBWCklnH38
-         EwQh0QB7nmqUjCzJkZFkSnn1J3JetLLMBs9u1tXGcUfidzZu4h9bzS3hOLyA8uOHaWmG
-         b/Z9fYqO20cfPYSkq72V1pcBq9/uiRGwjRpcwHJb1q4W+O/nsKBXCwUdcHQ/QmQwPZUR
-         kNttI45jgn4DRPIra9Xf51q6cAAURfJ4W4hj8RAzsNvrAeCTVvc6OCQoe+NsTU5xcPfC
-         /xXQ==
-X-Gm-Message-State: ACgBeo1wT1kpgiY+3qMTlot8xZapvGtk+yyxTeHdm4rXO8LQl5JxLdCs
-        mKBcQjn2jrR81Cgo8CX24BM2REqruJI=
-X-Google-Smtp-Source: AA6agR7vB5ialgryWUCkLIwE1JLPYLPrrrG0i4bXMqoQ2bU/yb17R+/sB1gHeUTO4rDjL6rLekdLBg==
-X-Received: by 2002:ad4:5b8d:0:b0:47b:2c2c:96f with SMTP id 13-20020ad45b8d000000b0047b2c2c096fmr5381027qvp.80.1659901404997;
-        Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
-Received: from [172.17.0.2] ([20.124.2.43])
-        by smtp.gmail.com with ESMTPSA id bs27-20020ac86f1b000000b00342f58fffe0sm2167686qtb.9.2022.08.07.12.43.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
-Message-ID: <62f015dc.c80a0220.23a6d.3331@mx.google.com>
-Date:   Sun, 07 Aug 2022 12:43:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1405101608213167899=="
+        Sun, 7 Aug 2022 16:57:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48E8A6561
+        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Aug 2022 13:57:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1659905872;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=x3LfyWSP4k5UhUXtPDVxn5YG6kmcpVYppmGX/byuoJs=;
+        b=G9m4DjPywvF7h9jQsPsmVk+kNqCNWnWjT42RfY9H8rdGWNo2fpCkdClPB584y8il/x+jYB
+        bu4rWqdqWPjngqwY5w4ocVTsHwmJ1hY1ofyoe2L48Pv/xknhBMyurrtWLfY7IdGEwY9Kd5
+        P1o3OlLs/AnQbeD6kb+8i0w98G++S+A=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-526-AsTxPYrUPCWwm4YOY1M_1Q-1; Sun, 07 Aug 2022 16:57:47 -0400
+X-MC-Unique: AsTxPYrUPCWwm4YOY1M_1Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2664F8037B5;
+        Sun,  7 Aug 2022 20:57:47 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.39.192.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 24F192166B26;
+        Sun,  7 Aug 2022 20:57:45 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [PATCH] Bluetooth: hci_event: Fix vendor (unknown) opcode status handling
+Date:   Sun,  7 Aug 2022 22:57:40 +0200
+Message-Id: <20220807205740.777363-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-Subject: RE: [BlueZ] client: Fix uninitialized read in attribute handle
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ntrrgc@gmail.com
-In-Reply-To: <20220807192013.74195-1-ntrrgc@gmail.com>
-References: <20220807192013.74195-1-ntrrgc@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1405101608213167899==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Commit c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to
+handle Command Complete") was (presumably) meant to only refactor things
+without any functional changes.
 
-This is an automated email and please do not reply to this email.
+But it does have one undesirable side-effect, before *status would always
+be set to skb->data[0] and it might be overridden by some of the opcode
+specific handling. While now it always set by the opcode specific handlers.
+This means that if the opcode is not known *status does not get set any
+more at all!
 
-Dear Submitter,
+This behavior change has broken bluetooth support for BCM4343A0 HCIs,
+the hci_bcm.c code tries to configure UART attached HCIs at a higher
+baudraute using vendor specific opcodes. The BCM4343A0 does not
+support this and this used to simply fail:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+[   25.646442] Bluetooth: hci0: BCM: failed to write clock (-56)
+[   25.646481] Bluetooth: hci0: Failed to set baudrate
 
------ Output -----
-error: patch failed: client/gatt.c:259
-error: client/gatt.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+After which things would continue with the initial baudraute. But now
+that hci_cmd_complete_evt() no longer sets status for unknown opcodes
+*status is left at 0. This causes the hci_bcm.c code to think the baudraute
+has been changed on the HCI side and to also adjust the UART baudrate,
+after which communication with the HCI is broken, leading to:
 
+[   28.579042] Bluetooth: hci0: command 0x0c03 tx timeout
+[   36.961601] Bluetooth: hci0: BCM: Reset failed (-110)
 
-Please resolve the issue and submit the patches again.
+And non working bluetooth. Fix this by restoring the previous
+default "*status = skb->data[0]" handling for unknown opcodes.
 
-
+Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_event.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index af17dfb20e01..fda31d558ded 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3996,6 +3996,13 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
+ 			break;
+ 		}
+ 	}
++	if (i == ARRAY_SIZE(hci_cc_table)) {
++		/* Unknown opcode, assume byte 0 contains the status, so
++		 * that e.g. __hci_cmd_sync() properly returns errors
++		 * for vendor specific commands send by HCI drivers.
++		 */
++		*status = skb->data[0];
++	}
+ 
+ 	handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+ 
+-- 
+2.37.1
 
---===============1405101608213167899==--
