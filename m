@@ -2,157 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF27C00140
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 19:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B85C00140
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 20:09:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243914AbiHHT6e (ORCPT
+        id S243759AbiHHUJO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Aug 2022 15:58:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59344 "EHLO
+        Mon, 8 Aug 2022 16:09:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236856AbiHHT6c (ORCPT
+        with ESMTP id S244144AbiHHUJE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Aug 2022 15:58:32 -0400
-Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19A97A196
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Aug 2022 12:58:31 -0700 (PDT)
-Received: by mail-ej1-x633.google.com with SMTP id j8so18485686ejx.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Aug 2022 12:58:31 -0700 (PDT)
+        Mon, 8 Aug 2022 16:09:04 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 257361A816
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Aug 2022 13:09:01 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id o22so12681104edc.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Aug 2022 13:09:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=jYFh67Z/iJIySYzxW+dvqCfobkF6ZVpVJKcKqS5//xE=;
-        b=f2n8v0zE9INU4TAz02rEJuWKBTOe47H6t/YRS+hKpCYt7/9CYtpPT/z9TmVREcQn7q
-         bfGlYanlc2O4ZzrWMkSZeio4tr+RiWiNXeEgv56GRjjQtiEq7oLZ2zO1puKgPwsE95aM
-         9y7iAtlxKTCYkD3fpl4LNcmm76HdCfPCesQfaUgP4DADdPc1WPhK2Jis7rmvtO08o93h
-         m5woG27hRmtfTOKJBGwc1TFPNwNE1BAV4r5nR5/CstT5E4dLxulcSaAPc+AUHToC4F6B
-         hQ9b1CwTpXYQ60mG+f5Oyl2XQoabwjvD7o5uWdj+/AS8cici678oTmz6Cugq1hCwW5Wu
-         DIQg==
+         :cc;
+        bh=79rXfwytifjHsT/nWSVtUKit1pAtH9HVs1gJvOC1UxY=;
+        b=Lkm9ZXFWid0RwG6ZWU+WMNeaUe1qpu7Rv1OrZvixk8h3EBcBOIhKU26xxIuQRalHgQ
+         pwAuiy32uvQHglgtWIZYZcCPHloEuZGWyegCZi4JkgxzyZLnbiB7uz6kAzU1trM2e9xh
+         W+wW9Ld41f7B3d0KK0cg6DC7KO83n+Xj7r8+fKvk6pTsS+I5uvVV67EiM7ZefNd2BoMS
+         6rE8mA9PskUsL89dVAzS0CNtgk6RhJevDbzytz9fkriz5DSDXL93RQBu9pYRq+Fe3iHq
+         Z4VwrEDAzClipD7ysBNYTk+2D+cIN1GhkKrHXDOdlIPBif07OgVx9IB26LhzIKe3o3oM
+         2Fxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jYFh67Z/iJIySYzxW+dvqCfobkF6ZVpVJKcKqS5//xE=;
-        b=0ZtA5Qa9xOO84ThghDGX2AFitpv6e5HBhbB4zhTJKLrTIBcpCuIlZScjOn6ZJTfOlh
-         RJgPS3Zeo5ND3ft8GVvuL27Fh2zTTh8JqqY/7tq2L+FkRwi8RSGpQR+dX8JfsxpUgHqx
-         rGTqrMSCXgNKleCBnhkL4njVZGV0Re+xInhcJFPor1JjlB+PCkq0cEC04cirabOLBDMf
-         rj4XacuQyoukbA1v/FN+b/iKmallDkDfvECXQ2e96aVFWjf1qMjlJN2U+f47oEXFidwm
-         2JZTKtH48ttNyQ1mERkHio7QagOthqg0oZYd07p9+8rL6wAA2GtvX2X1gw7h0nTw2KJn
-         BIng==
-X-Gm-Message-State: ACgBeo0sx+eCn7nKsYXxpdz3TC45/60c6D1rr+c86L9rDRK8M4G8wkBY
-        UnJKDPjY5oQGUdoZt3+cwuGNN85fcKEG3KGZLFUVv30q/200IA==
-X-Google-Smtp-Source: AA6agR550bE4JpwYa9uQyHJzfiiUj930FHQPRfQ+PYOmalwcF5QCZjouIAvdQHRxPaekfTn54joXVU/cjhk8dXtj39w=
-X-Received: by 2002:a17:907:2707:b0:730:af0b:3572 with SMTP id
- w7-20020a170907270700b00730af0b3572mr14478722ejk.411.1659988709585; Mon, 08
- Aug 2022 12:58:29 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=79rXfwytifjHsT/nWSVtUKit1pAtH9HVs1gJvOC1UxY=;
+        b=L6LY9JfytwJ7e6/qfabKebZT0lkGwq0bvduQxXLpOUP/p7eXy4GUUOPZ/xtfun2Ca0
+         Hwh4Ta3+vZoCBwCum6OV7ftMJWU57jyMt4snHyhGAFofxZpvKwE9pibQAyqygTShjCPN
+         e+Skxu4ckZAxzrmJ/kHA1PmBSGWmqvplVqMIZFggFYNKYVAu69fC0m4x3wUWuBvQ775S
+         IxaPS4CysegwoQH0fQC/+To+pZFpuLcH9abrcQr2FgLqDZ/HMNpu2oU9y5ZYd4MolHsn
+         1H+YR5ie+Y+h+8AYqjFtIkseMIV5YOuNEFLUrsoDdUq2dzLkSgQd9eoIdpql36yE0aB0
+         Jr7A==
+X-Gm-Message-State: ACgBeo1VGsOzpMYRuIjctz4SPSWAsJyUQFU8oxNfrrOkZwcs8oBzv9mI
+        PkqTsdEqIBnnPkt49W/wiKc17ReKtegSjhlDugI=
+X-Google-Smtp-Source: AA6agR44dCc4H2Of5RH0qFijMOh/sTkQkz/0gWI6Jqzdo8jqd1y24AY5V7Ohr2QaFhCdO8dHzugjhQQSFT9sFUpwr10=
+X-Received: by 2002:a05:6402:cb7:b0:440:ad7e:5884 with SMTP id
+ cn23-20020a0564020cb700b00440ad7e5884mr5954963edb.382.1659989339527; Mon, 08
+ Aug 2022 13:08:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220807205740.777363-1-hdegoede@redhat.com>
-In-Reply-To: <20220807205740.777363-1-hdegoede@redhat.com>
+References: <20220808092206.153221-1-ntrrgc@gmail.com>
+In-Reply-To: <20220808092206.153221-1-ntrrgc@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 8 Aug 2022 12:58:18 -0700
-Message-ID: <CABBYNZLwKJcEoaHzihV92LhvPAAOB7p8vfX9rc=8Z_U61Zjt2A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_event: Fix vendor (unknown) opcode status handling
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Mon, 8 Aug 2022 13:08:48 -0700
+Message-ID: <CABBYNZJOGjEgGQ7+tc3SOJ3j7Og1PkHMv+a1EX4JaVg1B3rXwA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client: Fix uninitialized read in attribute handle
+To:     Alicia Boya Garcia <ntrrgc@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hans,
+Hi Alicia,
 
-On Sun, Aug 7, 2022 at 1:57 PM Hans de Goede <hdegoede@redhat.com> wrote:
+On Mon, Aug 8, 2022 at 2:30 AM Alicia Boya Garcia <ntrrgc@gmail.com> wrote:
 >
-> Commit c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to
-> handle Command Complete") was (presumably) meant to only refactor things
-> without any functional changes.
+> When services, characteristics and descriptors were parsed from DBus
+> proxies the client code was calling the print code without initializing
+> the `handle` field, which the print functions use.
 >
-> But it does have one undesirable side-effect, before *status would always
-> be set to skb->data[0] and it might be overridden by some of the opcode
-> specific handling. While now it always set by the opcode specific handler=
-s.
-> This means that if the opcode is not known *status does not get set any
-> more at all!
+> This resulted in semi-random or zero handles in all attributes when
+> using gatt.list-attributes in bluetoothctl, depending on compilation
+> flags.
 >
-> This behavior change has broken bluetooth support for BCM4343A0 HCIs,
-> the hci_bcm.c code tries to configure UART attached HCIs at a higher
-> baudraute using vendor specific opcodes. The BCM4343A0 does not
-> support this and this used to simply fail:
->
-> [   25.646442] Bluetooth: hci0: BCM: failed to write clock (-56)
-> [   25.646481] Bluetooth: hci0: Failed to set baudrate
->
-> After which things would continue with the initial baudraute. But now
-> that hci_cmd_complete_evt() no longer sets status for unknown opcodes
-> *status is left at 0. This causes the hci_bcm.c code to think the baudrau=
-te
-> has been changed on the HCI side and to also adjust the UART baudrate,
-> after which communication with the HCI is broken, leading to:
->
-> [   28.579042] Bluetooth: hci0: command 0x0c03 tx timeout
-> [   36.961601] Bluetooth: hci0: BCM: Reset failed (-110)
->
-> And non working bluetooth. Fix this by restoring the previous
-> default "*status =3D skb->data[0]" handling for unknown opcodes.
->
-> Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to ha=
-ndle Command Complete")
-> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> This patch fixes the problem by parsing the handle from the DBus proxy
+> path.
 > ---
->  net/bluetooth/hci_event.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  client/gatt.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 >
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index af17dfb20e01..fda31d558ded 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3996,6 +3996,13 @@ static void hci_cmd_complete_evt(struct hci_dev *h=
-dev, void *data,
->                         break;
->                 }
->         }
-> +       if (i =3D=3D ARRAY_SIZE(hci_cc_table)) {
-> +               /* Unknown opcode, assume byte 0 contains the status, so
-> +                * that e.g. __hci_cmd_sync() properly returns errors
-> +                * for vendor specific commands send by HCI drivers.
-> +                */
-> +               *status =3D skb->data[0];
-> +       }
-
-The format of return parameters in command is not defined by the spec:
-
-BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-page 2189:
-
-Return_Parameters:
-Size: Depends on command
-
-This is the return parameter(s) for the command specified in the
-Command_Opcode event parameter. See each command=E2=80=99s definition for
-the list of return parameters associated with that command.
-
-So assuming the status is the first by is not quite right, although
-for the standard ones that seems to be valid, I think the best way to
-resolve this would have been to check if it a vendor command and then
-have the driver handle it or perhaps have some means for the driver to
-register it vendor_cc_table, we can perhaps have this as a workaround
-for now and only really change how we parse the cc for vendor commands
-if a vendor decide not to have a status as first parameter but Id
-probably leave a comment that quoting the spec that reminds us this
-code may need changing.
-
->         handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+> diff --git a/client/gatt.c b/client/gatt.c
+> index 4c1efaf75..aaad786b2 100644
+> --- a/client/gatt.c
+> +++ b/client/gatt.c
+> @@ -158,6 +158,16 @@ static void print_inc_service(struct service *service, const char *description)
+>                                         service->uuid, text);
+>  }
 >
+> +static uint16_t handle_from_path(const char *path)
+> +{
+> +       const char *number = path + strlen(path) - 4;
+> +
+> +       if (number < path)
+> +               return 0;
+> +
+> +       return (uint16_t) strtol(number, NULL, 16);
+> +}
+
+Object paths are subject to change so we shouldn't consider them as
+APIs, so what we should aim to do if we really want to expose handles
+of remote attributes is to have it as a D-Bus property Handle like we
+do for the servers:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/gatt-api.txt#n53
+
+>  static void print_service_proxy(GDBusProxy *proxy, const char *description)
+>  {
+>         struct service service;
+> @@ -179,6 +189,7 @@ static void print_service_proxy(GDBusProxy *proxy, const char *description)
+>         service.path = (char *) g_dbus_proxy_get_path(proxy);
+>         service.uuid = (char *) uuid;
+>         service.primary = primary;
+> +       service.handle = handle_from_path(service.path);
+>
+>         print_service(&service, description);
+>  }
+> @@ -261,6 +272,7 @@ static void print_characteristic(GDBusProxy *proxy, const char *description)
+>         memset(&chrc, 0, sizeof(chrc));
+>         chrc.path = (char *) g_dbus_proxy_get_path(proxy);
+>         chrc.uuid = (char *) uuid;
+> +       chrc.handle = handle_from_path(chrc.path);
+>
+>         print_chrc(&chrc, description);
+>  }
+> @@ -355,6 +367,7 @@ static void print_descriptor(GDBusProxy *proxy, const char *description)
+>         memset(&desc, 0, sizeof(desc));
+>         desc.path = (char *) g_dbus_proxy_get_path(proxy);
+>         desc.uuid = (char *) uuid;
+> +       desc.handle = handle_from_path(desc.path);
+>
+>         print_desc(&desc, description);
+>  }
 > --
 > 2.37.1
 >
 
 
---=20
+-- 
 Luiz Augusto von Dentz
