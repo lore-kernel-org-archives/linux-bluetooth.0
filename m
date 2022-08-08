@@ -2,65 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F96C00140
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 21:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 558AAC00140
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 21:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244305AbiHHVaR (ORCPT
+        id S244337AbiHHVgb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Aug 2022 17:30:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
+        Mon, 8 Aug 2022 17:36:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238532AbiHHVaQ (ORCPT
+        with ESMTP id S230391AbiHHVgb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Aug 2022 17:30:16 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D24247;
-        Mon,  8 Aug 2022 14:30:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A2FDFB81057;
-        Mon,  8 Aug 2022 21:30:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18FFAC433C1;
-        Mon,  8 Aug 2022 21:30:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1659994212;
-        bh=8I/6BSCB7QRgGY9y/Ch+UemtT6uX2ke0x7wPLXYO2Jo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=YoQXx1BVTKzcpPWbTYiLLfa6VX1OZVvXYTKfuplpwqucw//VCTfu3BeNLbuAyW9dn
-         2VMwISWtomZOXcFI1XWxDLM4qSGfqxgP160V9KiPw1hV0YOGoeoeegoPhKlAThfkri
-         DgDMQiseGYlbmWn8XxAd4hLaF6C+omW+JwGErkVpUPPKv8JLVaOKzF2KLYl4ZRAV2D
-         hnp8jM6Pp9ai/o7Ss33c5gqvI/nApve37AzDZgXNyQGEiKZ3Ol/TGFz2sU/WO5IEmw
-         LLEhYtLTHnKCot2A3eBjrvNJChQn5GUFCnkKV8I20XHHzDyuaHkRZgT9wlN3zno1SG
-         FPw/OrM1ByXGw==
-Date:   Mon, 8 Aug 2022 14:30:11 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Mon, 8 Aug 2022 17:36:31 -0400
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327721149;
+        Mon,  8 Aug 2022 14:36:30 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id kb8so18968002ejc.4;
+        Mon, 08 Aug 2022 14:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5kxQ+ZvU7Zpdt8jIK6Oo1egCZhgfVZ2VF+eNH9pEI50=;
+        b=W6VUK7kmcFo6VcZMCFFom2f1+KzlGsBn+XlF6hsFbu0asPSx7ESGeHxj3cOPJsxNVP
+         Zk8Tg3jVWO6/ZjlcsNzWywSc4jxzWiWzwjkzLdGPlGY70RcjE0jGiMqoQcufBCH9sKQ6
+         +C5XZlZ0U10Pfa7v2dbe2+wmnmu8ACaCjy0/FJV29RnQYmtUn59mgBuxa/9K7SnJH2V7
+         mec5k9QY37YXbxfzBUBm5LaIZchOZXJzCIm/huc7spmdSWEUobBVugBbldB91687G3XL
+         /ZlRnNy/Or32enGzuMY0bYNa7grvmKbZZxZOBjqL4pL+VaZrsNF2rMIJ+dMGa9SHeqQq
+         5mKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5kxQ+ZvU7Zpdt8jIK6Oo1egCZhgfVZ2VF+eNH9pEI50=;
+        b=ZJvZTAyfFFAIXXEFr9u+XYoxBM7m1fvpZVUdY0neXax/v4o3c3sP6waqOAWJoVmE6s
+         lol02eJA3RePkNQwPJCe9vfW2FtI9/oeT51EsvmBF2yhy/83oO0/xm//WuFnixTT8ShV
+         6iWg9Ao7aWiJUv+ZcLQHxKqq7IRBew6KxJaypxe0vJFAdTUlyoMxIARIeOvYaoZ7qoBX
+         jMW8hpYnaL/daBZSafPwb7tuidgZHMe9vvx+F5VfRc66qVhmzwGpqIoSbCeamPvTvODE
+         jhtzxfZQSDvH8cVivJZfz2SuBZ2Hw3ct2PqhyNo0oUb12HjPyMHu5/dj5BI90WkUzpW/
+         9xQQ==
+X-Gm-Message-State: ACgBeo1Zl4NvvDzEJsRoG3pQlOl3muSzpVzqmfkHPkLybs037063VBpT
+        m6KiTDHZXkUJqxI2sesD9kIFfaHFe3I3DF7VLKqh+BR0RSo=
+X-Google-Smtp-Source: AA6agR5cQ8lkIReExQkPh8ZgvnX5iVWfUNoW16lMAJFjq/5VU5h2xh9wo9+sC2nkvUAuYZEvZI6YR5YFlgGqfUeX5Lg=
+X-Received: by 2002:a17:906:29d:b0:6f0:18d8:7be0 with SMTP id
+ 29-20020a170906029d00b006f018d87be0mr14681700ejf.561.1659994588575; Mon, 08
+ Aug 2022 14:36:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220805232834.4024091-1-luiz.dentz@gmail.com>
+ <20220805174724.12fcb86a@kernel.org> <CABBYNZLPkVHJRtGkfV8eugAgLoSxK+jf_-UwhSoL2n=9J9TFcw@mail.gmail.com>
+ <20220808143011.7136f07a@kernel.org>
+In-Reply-To: <20220808143011.7136f07a@kernel.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 8 Aug 2022 14:36:16 -0700
+Message-ID: <CABBYNZKmuUpmUChz+tixFCOE_pUeaJq0Sbqkvjy54zd9H=GB4A@mail.gmail.com>
+Subject: Re: pull request: bluetooth 2022-08-05
+To:     Jakub Kicinski <kuba@kernel.org>
 Cc:     David Miller <davem@davemloft.net>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: pull request: bluetooth 2022-08-05
-Message-ID: <20220808143011.7136f07a@kernel.org>
-In-Reply-To: <CABBYNZLPkVHJRtGkfV8eugAgLoSxK+jf_-UwhSoL2n=9J9TFcw@mail.gmail.com>
-References: <20220805232834.4024091-1-luiz.dentz@gmail.com>
-        <20220805174724.12fcb86a@kernel.org>
-        <CABBYNZLPkVHJRtGkfV8eugAgLoSxK+jf_-UwhSoL2n=9J9TFcw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 8 Aug 2022 12:38:25 -0700 Luiz Augusto von Dentz wrote:
-> > Did you end up switching to the no-rebase/pull-back model or are you
-> > still rebasing?  
-> 
-> Still rebasing, I thought that didn't make any difference as long as
-> the patches apply.
+Hi Jakub,
 
-Long term the non-rebasing model is probably better since it'd be great
-for the bluetooth tree to be included in linux-next.
+On Mon, Aug 8, 2022 at 2:30 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Mon, 8 Aug 2022 12:38:25 -0700 Luiz Augusto von Dentz wrote:
+> > > Did you end up switching to the no-rebase/pull-back model or are you
+> > > still rebasing?
+> >
+> > Still rebasing, I thought that didn't make any difference as long as
+> > the patches apply.
+>
+> Long term the non-rebasing model is probably better since it'd be great
+> for the bluetooth tree to be included in linux-next.
 
-Since you haven't started using that model, tho, would you mind
-repairing the Fixes tags in this PR? :)
+You mean that bluetooth-next would be pulled directly into linux-next
+rather than net-next?
+
+> Since you haven't started using that model, tho, would you mind
+> repairing the Fixes tags in this PR? :)
+
+Let me fix them.
+
+-- 
+Luiz Augusto von Dentz
