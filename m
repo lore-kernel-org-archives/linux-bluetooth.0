@@ -2,194 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 075E7C00140
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 12:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E43C00140
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Aug 2022 18:04:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242421AbiHHMQR (ORCPT
+        id S238645AbiHHSEN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Aug 2022 08:16:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43754 "EHLO
+        Mon, 8 Aug 2022 14:04:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235719AbiHHMQP (ORCPT
+        with ESMTP id S237965AbiHHSEM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Aug 2022 08:16:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A3B2A62C5
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Aug 2022 05:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1659960973;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KQglINn5qIliFhQxdXnssuNFpnHg6itQvnE5dnSG+xE=;
-        b=FP1n6iFyjMAzd1nqUb8NLw9Lt4Rndo7fzS+J+5s70Dog01aZwPTVMeRJVjZiNcVBDZ32eu
-        7PgKkfEyzZ3xk42sBa8Wcm2YT6W02oHxAlmrZciQRqWCRdhCTWwdPH/9wfqmhMmyTCbahk
-        IajlHigGVgG7I5noxW1u0y2gEO+Uf+8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-615-Oucb125RNd6NAQcilAmy6g-1; Mon, 08 Aug 2022 08:16:12 -0400
-X-MC-Unique: Oucb125RNd6NAQcilAmy6g-1
-Received: by mail-wm1-f70.google.com with SMTP id h126-20020a1c2184000000b003a4f57eaeaaso2885637wmh.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Aug 2022 05:16:12 -0700 (PDT)
+        Mon, 8 Aug 2022 14:04:12 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 082EA17077
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Aug 2022 11:04:11 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id v12-20020a17090a088c00b001f3019a9cf2so3710977pjc.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Aug 2022 11:04:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=i/p7LGLfjb+nLpq/nY6wn3Xfq2spkFdKAOyq1M30HPc=;
+        b=ZePU11aNtEEMiBoUF9W/z+JGVZO6mwi/aizbI8sd6c1J58oZkOlAo3suFI0mVCnQ9k
+         hjWl4ZExNENtkZTZX5SnA5qdpKHh5OOSrnW9yBZ6ztbaGJqdyCk+LuJeFz1zENt1KLYi
+         ScdrmvGS0GM3EtNdZd6Y4LB+VM4aXJGgWxKmSej+RXR+0QT/drtLPChAmpGLsf7tObFC
+         E+PMUj8BygBsd+Aj4Qd6NTRdGq/UJJ0Rf+k4wRLAdZjA/2qmccJP9S/j5BHfETcI0dV5
+         dK9QWK6eZjRf3CLXI5/GgMnlyMzSuhxFJqy+PMcfqn9JpVPIHxzNfZAehDGo4/VPOzgf
+         3Ctg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=KQglINn5qIliFhQxdXnssuNFpnHg6itQvnE5dnSG+xE=;
-        b=g/03HfpPOhNrF2EbX5DZgg037CfTn+ZIJ7bIhxQkTePMXtY/kZ2T2QhCr9UxSAO/+w
-         f1EZ1RghOB3/c7xxDzI87TIfsVY7RM1j+OCeQj/OqER8v/x/wLcStcl/8+iQycR7a5Cc
-         JIQ6A+GIVnov7R2CQiEUPfdd3j793CFrmiLpOlCqwAU+Jo8xkfLP9dK2p2ogzYs1O1ZG
-         soGmmjkFJR337e4Xa2zMKefj8iqbmxiFV+5Cb5qGTYYC9tR56uyyRNF1n5r1qAit6F2s
-         m6DEHK8PPysbIZaaYp43+mkIjZ7kKkdYNPBBdtmnsXSNT5KQp2QRPMcEQP8+GuZ26zfy
-         LoIg==
-X-Gm-Message-State: ACgBeo3jQawkDbER5BNrDUJSqQNedcl2yT/JWdsBwlXhA3eMhlyxB8nh
-        f+C9DdhKAmntgQKzHnazPSykbNy1sEWmXlCsE0hQ/8Rbfp0hzmjs2efzVBgTMu1qYrwYekho/sl
-        KXzeT7YUBnL0TRuNz/3VckT8d31P0
-X-Received: by 2002:adf:ecc7:0:b0:220:5fef:6d40 with SMTP id s7-20020adfecc7000000b002205fef6d40mr11346423wro.5.1659960971201;
-        Mon, 08 Aug 2022 05:16:11 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR4zU6VHrKnAMD/aDkLqilJynNkwCVR51Kx58+rPxKSAaPZ1EV8m5UjTlEMZZCTPAQylrfDvzg==
-X-Received: by 2002:adf:ecc7:0:b0:220:5fef:6d40 with SMTP id s7-20020adfecc7000000b002205fef6d40mr11346410wro.5.1659960970977;
-        Mon, 08 Aug 2022 05:16:10 -0700 (PDT)
-Received: from redhat.com ([2.52.21.123])
-        by smtp.gmail.com with ESMTPSA id c24-20020a7bc018000000b003a53731f273sm5898667wmb.31.2022.08.08.05.16.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Aug 2022 05:16:10 -0700 (PDT)
-Date:   Mon, 8 Aug 2022 08:16:06 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Igor Skalkin <igor.skalkin@opensynergy.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=i/p7LGLfjb+nLpq/nY6wn3Xfq2spkFdKAOyq1M30HPc=;
+        b=nv02CLOMwrcIkbydL5cn8Z5a8673BxShOEdl9iTlPYZK7pjYyf06JbIdT08w+4U/dc
+         iIE5tGhCLiHZ7GibZ9sSB9nVX3lbGnbBNtVlZA2v8K/Q1B4BLPyTHMYEWkG2+UvZ6uLo
+         XFemOt2QlFOqHo0bqXsWuo7E/mA9LBgSp+dozZjInTJFra4R+UHtaleRAFCIJOpqac68
+         eemFu1aBRGZ9Hf2acKWPMGVGj89p3xqFRv/9HlNfHBH6Xfz8XuwWOjDnJGLU1cF47aAI
+         n84wPo7QFfb7BxRAFhAp4PZY4FKIctumaH5fHEBfrzhKz5C2PeX8gmdDaXBfziuLvYLS
+         eepA==
+X-Gm-Message-State: ACgBeo1oKf0WplFc5LEnQkZSBw0efze0i/GVE/x/1e0jruXzQaOSXwFE
+        IuVQVmIzv98YAVnTYwgnlXCF34e33be3pQ/yZp2DYDLdnTLUeN5up8vNHaZFTkDilXnPA3Oi2YV
+        vbFhbpgM8k7H8mF4JhW+FvZpwH5c14cOCi0CdkJWP53V7IWgfxazGCBQo7/YFmxyY2CtZd3taId
+        yWmmLBUyWx+hqByfMHxXU=
+X-Google-Smtp-Source: AA6agR5iJrO+qq8IjTPD5752SDkNL9Rx73THRZnPZLbLwyEIdeGXcwSprgWYBk8V6hjBJX7BSXVzUOFSJ0JVOXOKcfjNJQ==
+X-Received: from abps.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:9b4])
+ (user=abhishekpandit job=sendgmr) by 2002:a17:90b:33c4:b0:1f5:8428:beb9 with
+ SMTP id lk4-20020a17090b33c400b001f58428beb9mr18689282pjb.95.1659981850316;
+ Mon, 08 Aug 2022 11:04:10 -0700 (PDT)
+Date:   Mon,  8 Aug 2022 11:04:05 -0700
+Message-Id: <20220808110315.1.I5a39052e33f6f3c7406f53b0304a32ccf9f340fa@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.37.1.559.g78731f0fdb-goog
+Subject: [PATCH] Bluetooth: Ignore cmd_timeout with HCI_USER_CHANNEL
+From:   Abhishek Pandit-Subedi <abhishekpandit@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, mgo@opensynergy.com
-Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
-Message-ID: <20220808081054-mutt-send-email-mst@kernel.org>
-References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
- <20220807185846-mutt-send-email-mst@kernel.org>
- <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
+        Marcel Holtmann <marcel@holtmann.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Aug 08, 2022 at 02:04:43PM +0200, Igor Skalkin wrote:
-> On 8/8/22 01:00, Michael S. Tsirkin wrote:
-> 
->     On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
-> 
->         According to specification [1], "For the device-specific configuration
->         space, the driver MUST use 8 bit wide accesses for 8 bit wide fields,
->         16 bit wide and aligned accesses for 16 bit wide fields and 32 bit wide
->         and aligned accesses for 32 and 64 bit wide fields.".
-> 
->         Current version of the configuration structure:
-> 
->             struct virtio_bt_config {
->                 __u8  type;
->                 __u16 vendor;
->                 __u16 msft_opcode;
->             } __attribute__((packed));
-> 
->         has both 16bit fields non-aligned.
-> 
->         This commit fixes it.
-> 
->         [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/v1/query?url=https%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1%2fvirtio%2dv1.1.pdf&umid=d1786ace-e8ea-40e8-9665-96c0949174e5&auth=53c7c7de28b92dfd96e93d9dd61a23e634d2fbec-39b15885ceebe9fda9357320aec1ccbac416a470
-> 
->         Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
-> 
->     This is all true enough, but the problem is
->     1. changing uapi like this can't be done, will break userspace
->     2. the driver has more issues and no one seems to want to
->        maintain it.
->     I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
->     to merge it for this release.
-> 
-> This is very sad. We already use this driver in our projects.
+From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 
-Really?  Can you step up to maintain it? Then we can fix the issues
-and it won't be broken.
+When using HCI_USER_CHANNEL, hci traffic is expected to be handled by
+userspace entirely. However, it is still possible (and sometimes
+desirable) to be able to send commands to the controller directly. In
+such cases, the kernel command timeout shouldn't do any error handling.
 
-> Our virtio bluetooth device has two backends - HCI_USER socket backend for one
-> platform and uart backend for the other, and works well (after applying your
-> "[PATCH] Bluetooth: virtio_bt: fix device remove") patch, so this "device
-> removal" problem can probably be considered solved .
+Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
+This was tested by running a userchannel stack and sending commands via
+hcitool cmd on an Intel AX200 controller. Without this change, each
+command sent via hcitool would result in hci_cmd_timeout being called
+and after 5 commands, the controller would reset.
 
-Can you post a Tested-by tag for that?
+Hcitool continues working here because it marks the socket as
+promiscuous and gets a copy of all traffic while the socket is open (and
+does filtering in userspace).
 
-I need to go back and review it, I think I saw some issues but must be
-fixable.
+Tested on Chromebook with 5.4 kernel with patch (and applied cleanly on
+bluetooth-next).
 
-> We could help with the rest of the problems you listed that can be solved
-> (specification, QEMU support).
-> And the only problem that is difficult to solve (because of the need to change
-> UAPI header files) is just this one with unaligned configuration fields.
-> At the moment, it does not reproduce, because without VIRTIO_BT_F_VND_HCI
-> (Indicates vendor command support) feature negotiated, the driver does not
-> read the non-aligned configuration fields.
+ net/bluetooth/hci_core.c | 26 +++++++++++++++++---------
+ 1 file changed, 17 insertions(+), 9 deletions(-)
 
-
-Hmm. So how about this:
-- add a new feature flag
-- add new aligned format
-- mark the old memory reserved in the spec
-
-
-> So, what would you advise us to do? Continuing to use the "marked broken"
-> driver, start writing a specification for a new from scratch, better one?
-> Or is there any way to bring this one back to life?
-
-If someone is prepared to work on this we can bring it back.
-
-
-
-> 
-> 
->         ---
->          include/uapi/linux/virtio_bt.h | 2 +-
->          1 file changed, 1 insertion(+), 1 deletion(-)
-> 
->         diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/linux/virtio_bt.h
->         index a7bd48daa9a9..adc03709cc4f 100644
->         --- a/include/uapi/linux/virtio_bt.h
->         +++ b/include/uapi/linux/virtio_bt.h
->         @@ -23,9 +23,9 @@ enum virtio_bt_config_vendor {
->          };
-> 
->          struct virtio_bt_config {
->         -       __u8  type;
->                 __u16 vendor;
->                 __u16 msft_opcode;
->         +       __u8  type;
->          } __attribute__((packed));
-> 
->          #endif /* _UAPI_LINUX_VIRTIO_BT_H */
->         --
->         2.34.1
-> 
-> --
-> 
-> Best regards,
-> 
-> Igor Skalkin
-> Software Engineer
-> 
-> OpenSynergy GmbH
-> Rotherstr. 20, 10245 Berlin
-> 
-> igor.skalkin@opensynergy.com
-> www.opensynergy.com
-> 
-> registered: Amtsgericht Charlottenburg, HRB 108616B
-> General Management: Rolf Morich, Stefaan Sonck Thiebaut
-> 
-> 
-> Please mind our privacy notice pursuant to Art. 13 GDPR. // Unsere Hinweise zum
-> Datenschutz gem. Art. 13 DSGVO finden Sie hier.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b3a5a3cc9372..c9a15f6633f7 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1481,17 +1481,25 @@ static void hci_cmd_timeout(struct work_struct *work)
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    cmd_timer.work);
+ 
+-	if (hdev->sent_cmd) {
+-		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+-		u16 opcode = __le16_to_cpu(sent->opcode);
++	/* Don't trigger the timeout behavior if it happens while we're in
++	 * userchannel mode. Userspace is responsible for handling any command
++	 * timeouts.
++	 */
++	if (!(hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
++	      test_bit(HCI_UP, &hdev->flags))) {
++		if (hdev->sent_cmd) {
++			struct hci_command_hdr *sent =
++				(void *)hdev->sent_cmd->data;
++			u16 opcode = __le16_to_cpu(sent->opcode);
+ 
+-		bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
+-	} else {
+-		bt_dev_err(hdev, "command tx timeout");
+-	}
++			bt_dev_err(hdev, "command 0x%4.4x tx timeout", opcode);
++		} else {
++			bt_dev_err(hdev, "command tx timeout");
++		}
+ 
+-	if (hdev->cmd_timeout)
+-		hdev->cmd_timeout(hdev);
++		if (hdev->cmd_timeout)
++			hdev->cmd_timeout(hdev);
++	}
+ 
+ 	atomic_set(&hdev->cmd_cnt, 1);
+ 	queue_work(hdev->workqueue, &hdev->cmd_work);
+-- 
+2.37.1.559.g78731f0fdb-goog
 
