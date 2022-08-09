@@ -2,212 +2,212 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6554AC19F2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Aug 2022 17:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C27C25B06
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Aug 2022 19:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245387AbiHIRb6 (ORCPT
+        id S242678AbiHITZK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Aug 2022 13:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40964 "EHLO
+        Tue, 9 Aug 2022 15:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245343AbiHIRbt (ORCPT
+        with ESMTP id S242078AbiHITZI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Aug 2022 13:31:49 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AD724BDA;
-        Tue,  9 Aug 2022 10:31:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 769C3CE1717;
-        Tue,  9 Aug 2022 17:31:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FF0AC433D6;
-        Tue,  9 Aug 2022 17:31:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1660066303;
-        bh=WSWMb0ids8DeK23Wy4CcOG0tMlGvQCT4qwkRsZMZU3s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Xud3U0vrPHT4SeMEdhA4rINYqkk2ErBQC/bsab/89/32NCX12KOkiZQk26Py7i43Z
-         xrfM4c0w0IkejSN1D+TOueIDooqHPlxk5BMuYAQdYyviDlu8S7ffrDb1iG1oK4dNO0
-         /wOpe38KTuieHBgcKqkUoMoEM2sBH5Xx8Bah5sUY=
-Date:   Tue, 9 Aug 2022 19:31:41 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Arend van Spriel <aspriel@gmail.com>, marcel@holtmann.org,
-        luiz.dentz@gmail.com, chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Won Chung <wonchung@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/5] devcoredump: Add per device sysfs entry to
- enable/disable coredump
-Message-ID: <YvKZ/Wu3HR3ha/FC@kroah.com>
-References: <20220809083112.v4.1.I5622b2a92dca4d2703a0f747e24f3ef19303e6df@changeid>
- <20220809083112.v4.2.Ief1110784c6c1c3ac0ee5677c2d28d785af8686d@changeid>
+        Tue, 9 Aug 2022 15:25:08 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA5E196
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 12:25:07 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id dc19so23867802ejb.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Aug 2022 12:25:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vvsGIfc8PtY6uK1UGY855POToe7eD8nSELLE6H6DLx8=;
+        b=WMG6cNfqR3Y5uJjM81plxDQX8USPXb0o2ZItiDDhUJcufg1bSrsAY9lmyOtdSdbbnK
+         uaZKTlEdN9D8oz+3rThorGsxb5T/MUEIg+c/zN6Qv29zrexht3ve+rNwQSYbDcuZtTPW
+         0cQzijA4WX3fpJr/4NhCSwJEx7TR40YSdhYZvV22IhXkrDC9KYrN9bwB0xoWl9NfvGlT
+         om6zUiopG94rq0wv8bTcmKRuDN+m0mabyna6L1gbOrUGTC1uDT/MjIiA4D7txkthMc7k
+         UVkzCiy/O1Yi8xIiXIK1B7T8ozo4v5LS/SHeZ+J2sKD+Z6+QCm1n3Ui+RruPWwkgs0mb
+         KxZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vvsGIfc8PtY6uK1UGY855POToe7eD8nSELLE6H6DLx8=;
+        b=R8vbtHEyrPQ6kf/0FOAcgiQI1suRRQKkGYkRZWQUF9KcbRWURjpik7Mdq7L+MghtBG
+         WfEl0Gtc1SVc1Avq1RTzX7JH+PLWuAJT3yxQ+q5NDYRmfvjMHBmv93lK5Kr7mbQm6Oxl
+         Ls2YNqYiMLpqMHeDeJrWL6qCWuBqUsX1ZaPJwvJS0f2n6pnARxX4lWzFFa233CnHN1HB
+         dSE0uAnhvKaWw91TaoPinbOPgxeeIWIOUpu2CldBPmcbK3a7UKCCbgaypNJMv7R5R5oP
+         7wJb+DdL8THUtlmM3IPqKtSbhUSrnyPgFUWnYYkY7gxDMlSY6GUO+LAtOcv2AXjDe1zW
+         0u3g==
+X-Gm-Message-State: ACgBeo1RXhos+YbZp3CzMOkO3gQlmoYMxU9gQYCCJCnGbU5ep3yP0L7u
+        mcLeDVEteSqxOms47iyPcF8WTwdGCwnMwCsuFWC3jjE3iOol7Q==
+X-Google-Smtp-Source: AA6agR7xIio5M8Mu+RIIyCBXb96JK2Yr3F78LW/fD1eIJEEs1CEsX7M0py8PPNd89AyKDSd6hlKLVNujvaCeLgB67BA=
+X-Received: by 2002:a17:907:a408:b0:730:f106:e692 with SMTP id
+ sg8-20020a170907a40800b00730f106e692mr14839145ejc.132.1660073106245; Tue, 09
+ Aug 2022 12:25:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220809083112.v4.2.Ief1110784c6c1c3ac0ee5677c2d28d785af8686d@changeid>
+References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
+ <CGME20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab@eucas1p1.samsung.com>
+ <20220711233535.3134546-2-luiz.dentz@gmail.com> <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
+In-Reply-To: <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 9 Aug 2022 12:24:54 -0700
+Message-ID: <CABBYNZLsR0KT1-OVVjnUzLp0+U0eHGi0PNqKbfntp_5AHNDawA@mail.gmail.com>
+Subject: Re: [PATCH v7 2/7] Bluetooth: Add initial implementation of CIS connections
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Aug 09, 2022 at 08:35:24AM -0700, Manish Mandlik wrote:
-> The /sys/class/devcoredump/disabled provides only one-way disable
-> functionality. Also, disabling devcoredump using it disables the
-> devcoredump functionality for everyone who is using it.
-> 
-> Provide a way to selectively enable/disable devcoredump for the device
-> which is bound to a driver that implements the '.coredump()' callback.
-> 
-> This adds the 'coredump_disabled' driver attribute. When the driver
-> implements the '.coredump()' callback, 'coredump_disabled' file is added
-> along with the 'coredump' file in the sysfs folder of the device upon
-> driver binding. The file is removed when the driver is unbound.
-> 
-> Drivers can use this attribute to enable/disable devcoredump and the
-> userspace can write 0 or 1 to /sys/devices/.../coredump_disabled sysfs
-> entry to control enabling/disabling of devcoredump for that device.
-> 
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
-> 
-> Changes in v4:
-> - New patch in the series
-> 
->  drivers/base/dd.c          | 43 +++++++++++++++++++++++++++++++++++---
->  drivers/base/devcoredump.c |  2 +-
->  include/linux/device.h     |  4 ++++
->  3 files changed, 45 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
-> index 11b0fb6414d3..c76d1145c6d9 100644
-> --- a/drivers/base/dd.c
-> +++ b/drivers/base/dd.c
-> @@ -426,6 +426,31 @@ static ssize_t coredump_store(struct device *dev, struct device_attribute *attr,
->  }
->  static DEVICE_ATTR_WO(coredump);
->  
-> +static ssize_t coredump_disabled_show(struct device *dev,
-> +				      struct device_attribute *attr,
-> +				      char *buf)
-> +{
-> +	return scnprintf(buf, 3, "%d\n", dev->coredump_disabled);
+Hi Marek,
 
-Also, please use sysfs_emit() for any sysfs file output.  It's in all
-active kernels for a very long time now.
+On Tue, Aug 9, 2022 at 1:55 AM Marek Szyprowski
+<m.szyprowski@samsung.com> wrote:
+>
+> Hi Luiz,
+>
+> On 12.07.2022 01:35, Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This adds the initial implementation of CIS connections and introduces
+> > the ISO packets/links.
+> >
+> > == Central: Set CIG Parameters, create a CIS and Setup Data Path ==
+> >
+> >> tools/isotest -s <address>
+> > < HCI Command: LE Extended Create... (0x08|0x0043) plen 26
+> > ...
+> >> HCI Event: Command Status (0x0f) plen 4
+> >        LE Extended Create Connection (0x08|0x0043) ncmd 1
+> >          Status: Success (0x00)
+> >> HCI Event: LE Meta Event (0x3e) plen 31
+> >        LE Enhanced Connection Complete (0x0a)
+> >        ...
+> > < HCI Command: LE Create Connected... (0x08|0x0064) plen 5
+> > ...
+> >> HCI Event: Command Status (0x0f) plen 4
+> >        LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
+> >          Status: Success (0x00)
+> >> HCI Event: LE Meta Event (0x3e) plen 29
+> >        LE Connected Isochronous Stream Established (0x19)
+> >        ...
+> > < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+> > ...
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >          Status: Success (0x00)
+> >          Handle: 257
+> > < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+> > ...
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >          Status: Success (0x00)
+> >          Handle: 257
+> >
+> > == Peripheral: Accept CIS and Setup Data Path ==
+> >
+> >> tools/isotest -d
+> >   HCI Event: LE Meta Event (0x3e) plen 7
+> >        LE Connected Isochronous Stream Request (0x1a)
+> > ...
+> > < HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
+> > ...
+> >> HCI Event: LE Meta Event (0x3e) plen 29
+> >        LE Connected Isochronous Stream Established (0x19)
+> > ...
+> > < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+> > ...
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >          Status: Success (0x00)
+> >          Handle: 257
+> > < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+> > ...
+> >> HCI Event: Command Complete (0x0e) plen 6
+> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >          Status: Success (0x00)
+> >          Handle: 257
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This patch landed recently in linux-next as commit 26afbd826ee3
+> ("Bluetooth: Add initial implementation of CIS connections").
+> Unfortunately it causes a regression on my test systems. On almost all
+> I've observed that calling a simple 'hcitool scan' command in a shell
+> fails in an unexpected way:
+>
+> $ hcitool scan
+> *** stack smashing detected ***: <unknown> terminated
+> Aborted
 
-> +}
-> +
-> +static ssize_t coredump_disabled_store(struct device *dev,
-> +				       struct device_attribute *attr,
-> +				       const char *buf, size_t count)
-> +{
-> +	long coredump_disabled;
-> +
-> +	if (!kstrtol(buf, 10, &coredump_disabled)) {
-> +		/* Consider any non-zero value as true */
+Not really sure how it would be related to ISO changes though, have
+you even enabled ISO sockets UUID? Perhaps check if there is something
+on dmesg indicating what is going on since I tried here and that
+doesn't seem to cause any problem:
 
-We have a "Y/N/0/1/y/n" check function for sysfs store callbacks that
-you should use instead.
+tools/hcitool scan
+Scanning ...
+
+Perhaps it is a combination of using old userspace tools with new
+kernel, but then again these changes should affect something like
+hcitool.
+
+> $
+>
+> The above 'stack smashing' issue I've observed on Raspberry Pi4 with ARM
+> 32bit kernel.
+>
+> Bisecting this lead me to this commit. Reverting it on top of
+> next-20220808, together with the following commits due to dependencies,
+> fixes the issue:
+>
+> 26afbd826ee326e63a334c37fd45e82e50a615ec "Bluetooth: Add initial
+> implementation of CIS connections"
+> e78165d2ce798451d08ac09d704cd72caa962b81 "Bluetooth: hci_conn: Fix
+> updating ISO QoS PHY"
+> ccf74f2390d60a2f9a75ef496d2564abb478f46a "Bluetooth: Add BTPROTO_ISO
+> socket type"
+> f764a6c2c1e446f560faa3232271a0637369170b "Bluetooth: ISO: Add broadcast
+> support"
+> c85008a4e748051cddc6be6333f55df476f35362 "Bluetooth: ISO: unlock on
+> error path in iso_sock_setsockopt()"
+> 82e07ef4b474f466b4b2955bad76c52d6df98a30 "Bluetooth: ISO: Fix info leak
+> in iso_sock_getsockopt()"
+> c5d36b8a7dbdcf41da7316252b717c60c409992b "Bluetooth: ISO: Fix memory
+> corruption"
+> 8a3fd9bb4fac67ad5d44d6540c7ac20004767076 "Bluetooth: ISO: Fix
+> iso_sock_getsockopt for BT_DEFER_SETUP"
+> aac59090a068139550f9b73d46d1116e31cdd2d1 "Bluetooth: ISO: Fix not using
+> the correct QoS"
+> eca0ae4aea66914515e5e3098ea051b518ee5316 "Bluetooth: Add initial
+> implementation of BIS connections"
+>
+> Let me know if I can help fixing this issue.
+>
+> > ---
+> >   include/net/bluetooth/bluetooth.h |  33 ++-
+> >   include/net/bluetooth/hci.h       |  28 +-
+> >   include/net/bluetooth/hci_core.h  | 107 +++++++-
+> >   include/net/bluetooth/hci_sock.h  |   2 +
+> >   include/net/bluetooth/hci_sync.h  |   3 +
+> >   net/bluetooth/Kconfig             |   1 +
+> >   net/bluetooth/hci_conn.c          | 440 ++++++++++++++++++++++++++++++
+> >   net/bluetooth/hci_core.c          | 230 ++++++++++++----
+> >   net/bluetooth/hci_event.c         | 307 ++++++++++++++++++++-
+> >   net/bluetooth/hci_sync.c          |  49 +++-
+> >   10 files changed, 1145 insertions(+), 55 deletions(-)
+> >
+> > ...
+>
+> Best regards
+> --
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
+>
 
 
-
-> +		if (coredump_disabled)
-> +			dev->coredump_disabled = true;
-> +		else
-> +			dev->coredump_disabled = false;
-> +	}
-> +
-> +	return count;
-> +}
-> +static DEVICE_ATTR_RW(coredump_disabled);
-> +
->  static int driver_sysfs_add(struct device *dev)
->  {
->  	int ret;
-> @@ -448,9 +473,19 @@ static int driver_sysfs_add(struct device *dev)
->  		return 0;
->  
->  	ret = device_create_file(dev, &dev_attr_coredump);
-> -	if (!ret)
-> -		return 0;
-> +	if (ret)
-> +		goto rm_driver;
-> +
-> +	ret = device_create_file(dev, &dev_attr_coredump_disabled);
-
-Please use an attribute group now that you have multiple files.
-
-
-
-> +	if (ret)
-> +		goto rm_coredump;
->  
-> +	return 0;
-> +
-> +rm_coredump:
-> +	device_remove_file(dev, &dev_attr_coredump);
-> +
-> +rm_driver:
->  	sysfs_remove_link(&dev->kobj, "driver");
->  
->  rm_dev:
-> @@ -466,8 +501,10 @@ static void driver_sysfs_remove(struct device *dev)
->  	struct device_driver *drv = dev->driver;
->  
->  	if (drv) {
-> -		if (drv->coredump)
-> +		if (drv->coredump) {
-> +			device_remove_file(dev, &dev_attr_coredump_disabled);
->  			device_remove_file(dev, &dev_attr_coredump);
-> +		}
->  		sysfs_remove_link(&drv->p->kobj, kobject_name(&dev->kobj));
->  		sysfs_remove_link(&dev->kobj, "driver");
->  	}
-> diff --git a/drivers/base/devcoredump.c b/drivers/base/devcoredump.c
-> index f4d794d6bb85..c5e9af9f3181 100644
-> --- a/drivers/base/devcoredump.c
-> +++ b/drivers/base/devcoredump.c
-> @@ -255,7 +255,7 @@ void dev_coredumpm(struct device *dev, struct module *owner,
->  	struct devcd_entry *devcd;
->  	struct device *existing;
->  
-> -	if (devcd_disabled)
-> +	if (devcd_disabled || dev->coredump_disabled)
->  		goto free;
->  
->  	existing = class_find_device(&devcd_class, NULL, dev,
-> diff --git a/include/linux/device.h b/include/linux/device.h
-> index dc941997795c..120dd656f99d 100644
-> --- a/include/linux/device.h
-> +++ b/include/linux/device.h
-> @@ -469,6 +469,8 @@ struct device_physical_location {
->   * 		This identifies the device type and carries type-specific
->   * 		information.
->   * @mutex:	Mutex to synchronize calls to its driver.
-> + * @coredump_disabled: Can be used by drivers to selectively enable/disable the
-> + *		coredump for a particular device via sysfs entry.
->   * @bus:	Type of bus device is on.
->   * @driver:	Which driver has allocated this
->   * @platform_data: Platform data specific to the device.
-> @@ -561,6 +563,8 @@ struct device {
->  	const char		*init_name; /* initial name of the device */
->  	const struct device_type *type;
->  
-> +	bool			coredump_disabled;
-> +
-
-That just hosed the alignment in this structure :(
-
-Please be aware of how memory layouts for common kernel structures are
-managed, and try not to add holes when you do not need to.
-
-thanks,
-
-greg k-h
+-- 
+Luiz Augusto von Dentz
