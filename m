@@ -2,212 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C27C25B06
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Aug 2022 19:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 590F3C25B06
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Aug 2022 22:01:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242678AbiHITZK (ORCPT
+        id S229897AbiHIWAe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Aug 2022 15:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
+        Tue, 9 Aug 2022 18:00:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242078AbiHITZI (ORCPT
+        with ESMTP id S229616AbiHIWAS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Aug 2022 15:25:08 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFA5E196
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 12:25:07 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id dc19so23867802ejb.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Aug 2022 12:25:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vvsGIfc8PtY6uK1UGY855POToe7eD8nSELLE6H6DLx8=;
-        b=WMG6cNfqR3Y5uJjM81plxDQX8USPXb0o2ZItiDDhUJcufg1bSrsAY9lmyOtdSdbbnK
-         uaZKTlEdN9D8oz+3rThorGsxb5T/MUEIg+c/zN6Qv29zrexht3ve+rNwQSYbDcuZtTPW
-         0cQzijA4WX3fpJr/4NhCSwJEx7TR40YSdhYZvV22IhXkrDC9KYrN9bwB0xoWl9NfvGlT
-         om6zUiopG94rq0wv8bTcmKRuDN+m0mabyna6L1gbOrUGTC1uDT/MjIiA4D7txkthMc7k
-         UVkzCiy/O1Yi8xIiXIK1B7T8ozo4v5LS/SHeZ+J2sKD+Z6+QCm1n3Ui+RruPWwkgs0mb
-         KxZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vvsGIfc8PtY6uK1UGY855POToe7eD8nSELLE6H6DLx8=;
-        b=R8vbtHEyrPQ6kf/0FOAcgiQI1suRRQKkGYkRZWQUF9KcbRWURjpik7Mdq7L+MghtBG
-         WfEl0Gtc1SVc1Avq1RTzX7JH+PLWuAJT3yxQ+q5NDYRmfvjMHBmv93lK5Kr7mbQm6Oxl
-         Ls2YNqYiMLpqMHeDeJrWL6qCWuBqUsX1ZaPJwvJS0f2n6pnARxX4lWzFFa233CnHN1HB
-         dSE0uAnhvKaWw91TaoPinbOPgxeeIWIOUpu2CldBPmcbK3a7UKCCbgaypNJMv7R5R5oP
-         7wJb+DdL8THUtlmM3IPqKtSbhUSrnyPgFUWnYYkY7gxDMlSY6GUO+LAtOcv2AXjDe1zW
-         0u3g==
-X-Gm-Message-State: ACgBeo1RXhos+YbZp3CzMOkO3gQlmoYMxU9gQYCCJCnGbU5ep3yP0L7u
-        mcLeDVEteSqxOms47iyPcF8WTwdGCwnMwCsuFWC3jjE3iOol7Q==
-X-Google-Smtp-Source: AA6agR7xIio5M8Mu+RIIyCBXb96JK2Yr3F78LW/fD1eIJEEs1CEsX7M0py8PPNd89AyKDSd6hlKLVNujvaCeLgB67BA=
-X-Received: by 2002:a17:907:a408:b0:730:f106:e692 with SMTP id
- sg8-20020a170907a40800b00730f106e692mr14839145ejc.132.1660073106245; Tue, 09
- Aug 2022 12:25:06 -0700 (PDT)
+        Tue, 9 Aug 2022 18:00:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5245121
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 15:00:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3937860FB6
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 22:00:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E36BC433C1;
+        Tue,  9 Aug 2022 22:00:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1660082415;
+        bh=X+MO6VdxVjdQOFr40fbQmwi3sAby5Yo9D77H0LPciyI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=tBxpKMBiCHcfJK12fjDx3rXsnHMZu/+6EBvmt5ON1ZrtPTsKbUq3gLzfX8tAGyb45
+         uU8yXzdBSnIvhqdBBF5B7czEFNeRwMG+0BUYi7mCAybkEccZxWbCiA2ymzcJJVaNgv
+         CCxjQ2X1pB7X374pFB0tjMDDiD+1lArxyCUiX0pV4ee1gHL7Qq/IioOUtVwvcF77l/
+         gnPrlGJRk+jz+HCLmn8dns7/xs/Mw3Gq9Q6M+2dsDj0ii6ZLOx2xXrORV9uEjkTe7Q
+         CpWSrAQVTBORVZHQOivTmdSyQZj9VpNfk0ugiAyXCHJ9ZBgc2o4jOzO5dFr+DaU31Y
+         1X3cjeClAf1Hg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83F91C43142;
+        Tue,  9 Aug 2022 22:00:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
- <CGME20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab@eucas1p1.samsung.com>
- <20220711233535.3134546-2-luiz.dentz@gmail.com> <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
-In-Reply-To: <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 9 Aug 2022 12:24:54 -0700
-Message-ID: <CABBYNZLsR0KT1-OVVjnUzLp0+U0eHGi0PNqKbfntp_5AHNDawA@mail.gmail.com>
-Subject: Re: [PATCH v7 2/7] Bluetooth: Add initial implementation of CIS connections
-To:     Marek Szyprowski <m.szyprowski@samsung.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v7 0/9] Clean-up stale/unused hci_request.c code
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166008241553.11039.8770757425299965789.git-patchwork-notify@kernel.org>
+Date:   Tue, 09 Aug 2022 22:00:15 +0000
+References: <20220805234236.704986-1-brian.gix@intel.com>
+In-Reply-To: <20220805234236.704986-1-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marek,
+Hello:
 
-On Tue, Aug 9, 2022 at 1:55 AM Marek Szyprowski
-<m.szyprowski@samsung.com> wrote:
->
-> Hi Luiz,
->
-> On 12.07.2022 01:35, Luiz Augusto von Dentz wrote:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This adds the initial implementation of CIS connections and introduces
-> > the ISO packets/links.
-> >
-> > == Central: Set CIG Parameters, create a CIS and Setup Data Path ==
-> >
-> >> tools/isotest -s <address>
-> > < HCI Command: LE Extended Create... (0x08|0x0043) plen 26
-> > ...
-> >> HCI Event: Command Status (0x0f) plen 4
-> >        LE Extended Create Connection (0x08|0x0043) ncmd 1
-> >          Status: Success (0x00)
-> >> HCI Event: LE Meta Event (0x3e) plen 31
-> >        LE Enhanced Connection Complete (0x0a)
-> >        ...
-> > < HCI Command: LE Create Connected... (0x08|0x0064) plen 5
-> > ...
-> >> HCI Event: Command Status (0x0f) plen 4
-> >        LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
-> >          Status: Success (0x00)
-> >> HCI Event: LE Meta Event (0x3e) plen 29
-> >        LE Connected Isochronous Stream Established (0x19)
-> >        ...
-> > < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
-> > ...
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-> >          Status: Success (0x00)
-> >          Handle: 257
-> > < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
-> > ...
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-> >          Status: Success (0x00)
-> >          Handle: 257
-> >
-> > == Peripheral: Accept CIS and Setup Data Path ==
-> >
-> >> tools/isotest -d
-> >   HCI Event: LE Meta Event (0x3e) plen 7
-> >        LE Connected Isochronous Stream Request (0x1a)
-> > ...
-> > < HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
-> > ...
-> >> HCI Event: LE Meta Event (0x3e) plen 29
-> >        LE Connected Isochronous Stream Established (0x19)
-> > ...
-> > < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
-> > ...
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-> >          Status: Success (0x00)
-> >          Handle: 257
-> > < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
-> > ...
-> >> HCI Event: Command Complete (0x0e) plen 6
-> >        LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
-> >          Status: Success (0x00)
-> >          Handle: 257
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This patch landed recently in linux-next as commit 26afbd826ee3
-> ("Bluetooth: Add initial implementation of CIS connections").
-> Unfortunately it causes a regression on my test systems. On almost all
-> I've observed that calling a simple 'hcitool scan' command in a shell
-> fails in an unexpected way:
->
-> $ hcitool scan
-> *** stack smashing detected ***: <unknown> terminated
-> Aborted
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Not really sure how it would be related to ISO changes though, have
-you even enabled ISO sockets UUID? Perhaps check if there is something
-on dmesg indicating what is going on since I tried here and that
-doesn't seem to cause any problem:
+On Fri,  5 Aug 2022 16:42:27 -0700 you wrote:
+> This will be a growing patch-set of conversions and dead-code removal
+> towards the goal of retiring hci_request.c
+> 
+> The patch sets will be split amoung the work queues and delayed work
+> queues as initialized in hci_request_setup(), with the ultimate goal of
+> eliminating hci_request.c entirely.
+> 
+> [...]
 
-tools/hcitool scan
-Scanning ...
+Here is the summary with links:
+  - [v7,1/9] Bluetooth: Convert le_scan_disable timeout to hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/2bf8edacd155
+  - [v7,2/9] Bluetooth: Rework le_scan_restart for hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/89f043b2c6d5
+  - [v7,3/9] Bluetooth: Delete unused hci_req_stop_discovery()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/eed7aab6c517
+  - [v7,4/9] Bluetooth: Convert SCO configure_datapath to hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/71172654bff2
+  - [v7,5/9] Bluetooth: Move Adv Instance timer to hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/8c59889a6b5c
+  - [v7,6/9] Bluetooth: Delete unreferenced hci_request code
+    https://git.kernel.org/bluetooth/bluetooth-next/c/3edf244f8c71
+  - [v7,7/9] Bluetooth: move hci_get_random_address() to hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c7eb26d1285c
+  - [v7,8/9] Bluetooth: convert hci_update_adv_data to hci_sync
+    https://git.kernel.org/bluetooth/bluetooth-next/c/9ec46ac996f5
+  - [v7,9/9] Bluetooth: Convert hci_abort_conn to hci_sync
+    (no matching commit)
 
-Perhaps it is a combination of using old userspace tools with new
-kernel, but then again these changes should affect something like
-hcitool.
-
-> $
->
-> The above 'stack smashing' issue I've observed on Raspberry Pi4 with ARM
-> 32bit kernel.
->
-> Bisecting this lead me to this commit. Reverting it on top of
-> next-20220808, together with the following commits due to dependencies,
-> fixes the issue:
->
-> 26afbd826ee326e63a334c37fd45e82e50a615ec "Bluetooth: Add initial
-> implementation of CIS connections"
-> e78165d2ce798451d08ac09d704cd72caa962b81 "Bluetooth: hci_conn: Fix
-> updating ISO QoS PHY"
-> ccf74f2390d60a2f9a75ef496d2564abb478f46a "Bluetooth: Add BTPROTO_ISO
-> socket type"
-> f764a6c2c1e446f560faa3232271a0637369170b "Bluetooth: ISO: Add broadcast
-> support"
-> c85008a4e748051cddc6be6333f55df476f35362 "Bluetooth: ISO: unlock on
-> error path in iso_sock_setsockopt()"
-> 82e07ef4b474f466b4b2955bad76c52d6df98a30 "Bluetooth: ISO: Fix info leak
-> in iso_sock_getsockopt()"
-> c5d36b8a7dbdcf41da7316252b717c60c409992b "Bluetooth: ISO: Fix memory
-> corruption"
-> 8a3fd9bb4fac67ad5d44d6540c7ac20004767076 "Bluetooth: ISO: Fix
-> iso_sock_getsockopt for BT_DEFER_SETUP"
-> aac59090a068139550f9b73d46d1116e31cdd2d1 "Bluetooth: ISO: Fix not using
-> the correct QoS"
-> eca0ae4aea66914515e5e3098ea051b518ee5316 "Bluetooth: Add initial
-> implementation of BIS connections"
->
-> Let me know if I can help fixing this issue.
->
-> > ---
-> >   include/net/bluetooth/bluetooth.h |  33 ++-
-> >   include/net/bluetooth/hci.h       |  28 +-
-> >   include/net/bluetooth/hci_core.h  | 107 +++++++-
-> >   include/net/bluetooth/hci_sock.h  |   2 +
-> >   include/net/bluetooth/hci_sync.h  |   3 +
-> >   net/bluetooth/Kconfig             |   1 +
-> >   net/bluetooth/hci_conn.c          | 440 ++++++++++++++++++++++++++++++
-> >   net/bluetooth/hci_core.c          | 230 ++++++++++++----
-> >   net/bluetooth/hci_event.c         | 307 ++++++++++++++++++++-
-> >   net/bluetooth/hci_sync.c          |  49 +++-
-> >   10 files changed, 1145 insertions(+), 55 deletions(-)
-> >
-> > ...
->
-> Best regards
-> --
-> Marek Szyprowski, PhD
-> Samsung R&D Institute Poland
->
-
-
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
