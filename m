@@ -2,44 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16C47C25B07
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Aug 2022 16:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6414BC00140
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Aug 2022 16:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233204AbiHJQES (ORCPT
+        id S232069AbiHJQTq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Aug 2022 12:04:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        Wed, 10 Aug 2022 12:19:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233310AbiHJQD5 (ORCPT
+        with ESMTP id S230227AbiHJQTp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Aug 2022 12:03:57 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8493E6580A;
-        Wed, 10 Aug 2022 09:03:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=ATWjZwDzLd1FXTxu36i7ECb5X4VhABeeCLXPqvahL08=;
-        t=1660147436; x=1661357036; b=ppqE0xXY3EffjWZqBNoU7T+g3g2T3n+8KYzJUWL1sNQ95fZ
-        PyDvuRaDFLmTKwfE9SaObb5OKip1oJdYKUOB0p5uvavnXLAyuZFrvc8NQW60zAQnqPJzkpXJwzLOV
-        OVqgRL22ZSmKoZ1uHX8ic6OjZb33gsBtpKlPq9wXV3wcfgYF9RUhm1i0Nk4mh7EQGKAHQXSTGpnHT
-        65Pr/DOSpR0kldRuztn1lpGQRCK1sSWLAlFQ6czIuH/3Lom2ILKGRxRyQGrqGJ/7cVg1NU+FocXZ6
-        KiB0/zdNbGTF0zMJi+P1PtT+mjkjmZ3YhLNtRkrgsYMWwokh+cixq/7/zZrGKzWg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.96)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1oLoBH-004F4D-0T;
-        Wed, 10 Aug 2022 18:03:39 +0200
-Message-ID: <bfc5f964d8dadd6378f2da5b3b6ef4bc9fb847c2.camel@sipsolutions.net>
-Subject: Re: [PATCH v5 1/5] sysfs: Add attribute info for
- /sys/devices/.../coredump_disabled
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Manish Mandlik <mmandlik@google.com>,
-        Arend van Spriel <aspriel@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Wed, 10 Aug 2022 12:19:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16597D1D7;
+        Wed, 10 Aug 2022 09:19:44 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6BA4E61198;
+        Wed, 10 Aug 2022 16:19:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B79AC433C1;
+        Wed, 10 Aug 2022 16:19:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1660148383;
+        bh=mSFaj+NwiQylRGU1GkqPGJTjj0pD5iaBeP7XgeK+7/c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZY1o7ndkkJqLdKESA7qXprqqgsdOFbeZj6hdoew6R6Lk2SsUlDvvR/QtV3v8nIEz3
+         +JYzt+49ABFHpC5VRUCBvutA+5Od1jCAhBx8jLaerDAvtD655TWuZRUBrjTzcNN6Vy
+         WTSammJgiPWO73gkBSxDS968IugW9xgfbgaWAhuU=
+Date:   Wed, 10 Aug 2022 18:19:40 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Arend van Spriel <aspriel@gmail.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com, Johannes Berg <johannes@sipsolutions.net>,
+        Dan Williams <dan.j.williams@intel.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         linux-bluetooth@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -47,28 +43,52 @@ Cc:     Dan Williams <dan.j.williams@intel.com>,
         chromeos-bluetooth-upstreaming@chromium.org,
         Won Chung <wonchung@google.com>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 10 Aug 2022 18:03:37 +0200
-In-Reply-To: <20220810085753.v5.1.I5622b2a92dca4d2703a0f747e24f3ef19303e6df@changeid>
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v5 3/5] Bluetooth: Add support for hci devcoredump
+Message-ID: <YvPanELgAAbzGdE5@kroah.com>
 References: <20220810085753.v5.1.I5622b2a92dca4d2703a0f747e24f3ef19303e6df@changeid>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
+ <20220810085753.v5.3.Iaf638bb9f885f5880ab1b4e7ae2f73dd53a54661@changeid>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220810085753.v5.3.Iaf638bb9f885f5880ab1b4e7ae2f73dd53a54661@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 2022-08-10 at 09:00 -0700, Manish Mandlik wrote:
-> This patch adds the specification for /sys/devices/.../coredump_disabled
-> attribute which allows the userspace to enable/disable devcoredump for a
-> particular device and drivers can use it to enable/disable functionality
-> accordingly. It is available when the CONFIG_DEV_COREDUMP is enabled and
-> driver has implemented the .coredump() callback.
->=20
+On Wed, Aug 10, 2022 at 09:00:36AM -0700, Manish Mandlik wrote:
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2510,14 +2510,23 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+>  	INIT_WORK(&hdev->tx_work, hci_tx_work);
+>  	INIT_WORK(&hdev->power_on, hci_power_on);
+>  	INIT_WORK(&hdev->error_reset, hci_error_reset);
+> +#ifdef CONFIG_DEV_COREDUMP
+> +	INIT_WORK(&hdev->dump.dump_rx, hci_devcoredump_rx);
+> +#endif
+>  
+>  	hci_cmd_sync_init(hdev);
+>  
+>  	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+> +#ifdef CONFIG_DEV_COREDUMP
+> +	INIT_DELAYED_WORK(&hdev->dump.dump_timeout, hci_devcoredump_timeout);
+> +#endif
+>  
+>  	skb_queue_head_init(&hdev->rx_q);
+>  	skb_queue_head_init(&hdev->cmd_q);
+>  	skb_queue_head_init(&hdev->raw_q);
+> +#ifdef CONFIG_DEV_COREDUMP
+> +	skb_queue_head_init(&hdev->dump.dump_q);
+> +#endif
 
-It would be nice to say _why_? What problem does this solve? You could
-just create the dump and discard it, instead, for example?
+Putting #ifdef in .c files is messy, why not put all of this behind a
+function that you properly handle in a .h file instead?
 
-johannes
+thanks,
+
+greg k-h
