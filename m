@@ -2,94 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 590F3C25B06
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Aug 2022 22:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63167C25B08
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Aug 2022 00:17:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbiHIWAe (ORCPT
+        id S229727AbiHJARQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Aug 2022 18:00:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
+        Tue, 9 Aug 2022 20:17:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiHIWAS (ORCPT
+        with ESMTP id S229475AbiHJARP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Aug 2022 18:00:18 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5245121
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 15:00:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3937860FB6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 22:00:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9E36BC433C1;
-        Tue,  9 Aug 2022 22:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660082415;
-        bh=X+MO6VdxVjdQOFr40fbQmwi3sAby5Yo9D77H0LPciyI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tBxpKMBiCHcfJK12fjDx3rXsnHMZu/+6EBvmt5ON1ZrtPTsKbUq3gLzfX8tAGyb45
-         uU8yXzdBSnIvhqdBBF5B7czEFNeRwMG+0BUYi7mCAybkEccZxWbCiA2ymzcJJVaNgv
-         CCxjQ2X1pB7X374pFB0tjMDDiD+1lArxyCUiX0pV4ee1gHL7Qq/IioOUtVwvcF77l/
-         gnPrlGJRk+jz+HCLmn8dns7/xs/Mw3Gq9Q6M+2dsDj0ii6ZLOx2xXrORV9uEjkTe7Q
-         CpWSrAQVTBORVZHQOivTmdSyQZj9VpNfk0ugiAyXCHJ9ZBgc2o4jOzO5dFr+DaU31Y
-         1X3cjeClAf1Hg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 83F91C43142;
-        Tue,  9 Aug 2022 22:00:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 9 Aug 2022 20:17:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B34247D787
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Aug 2022 17:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660090633;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hWwaUHjBysXWhHJ+eod4q2ogYoDzJ4P57FOFOXiREtk=;
+        b=HyxAY64GXnH9CfsFkZQg0JItCxvaX5LlS98hi3IWooCRBK2b/uBWAo2RRAwrj69J9T4mCu
+        /aTl+vXdGXnv35AOhdiWTjc6t1xgndaYeP7625qGXU9e28VeZDlLywgmXeRUiBO1226BDd
+        +aSM5nTZskJNoAgJDtBLiAm6V5FLZUQ=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-591-s-pyHa_cMDi1IOwlnhxQvg-1; Tue, 09 Aug 2022 20:17:12 -0400
+X-MC-Unique: s-pyHa_cMDi1IOwlnhxQvg-1
+Received: by mail-qk1-f197.google.com with SMTP id i15-20020a05620a404f00b006b55998179bso11344003qko.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Aug 2022 17:17:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=hWwaUHjBysXWhHJ+eod4q2ogYoDzJ4P57FOFOXiREtk=;
+        b=UV1rTo/TCq4i3EYCylU+0DdOmQF1usNY6qN0XDbCpszz9UUc2labJ35nu0Jprb3xhq
+         C39P+Tz6HaxPIz6W9qZqis9xdADyG2GXI38zzUUJhRHRZron6WXotAeHM2SBUm4dLUGK
+         zJsQbqmOFJytHBejZqwvje9B+nAZphOwbGGE7wmfl+70Bg8L9yWoVxVNQuwWexOd+GqP
+         Vg67hKYSl3Q+bn3ndG6wdLgKQsTl4lvYyYS/lFZkXI7Hshrj8qxehnf7o0bZNlv2iIwN
+         t89+R8/WK/OGZD8FVkfnYhVZ3qRT2mGuBjBOMS5jWasiOIxn/mp1sJCEbUHEAyWcPgNk
+         mDOA==
+X-Gm-Message-State: ACgBeo3PjZtXowCqwvIdmbaTgveRjWaYCg30HPq86yG7tVU8r+V2oW90
+        y9tXiVYlXkkuWL0zIdzFKDHHsGsAOSddJDgkYhQXinMnVk2hERfbeldUhYmn4EmyvxmPSZzm8bF
+        TVq3TxUIfRBKBeAzHm9aX81ZxD2nlVemqYsscs+k5j2EC
+X-Received: by 2002:a0c:e0cc:0:b0:474:94d4:53e with SMTP id x12-20020a0ce0cc000000b0047494d4053emr21898134qvk.2.1660090632157;
+        Tue, 09 Aug 2022 17:17:12 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR65oSYaxdMQK1e3z5h5nEqt9Sgaho3HpLyfWhDFN2BziT6eJUv59emy46T6uE93XY9XUBsqOtkCCMMXbfgRTkI=
+X-Received: by 2002:a0c:e0cc:0:b0:474:94d4:53e with SMTP id
+ x12-20020a0ce0cc000000b0047494d4053emr21898122qvk.2.1660090631911; Tue, 09
+ Aug 2022 17:17:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v7 0/9] Clean-up stale/unused hci_request.c code
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166008241553.11039.8770757425299965789.git-patchwork-notify@kernel.org>
-Date:   Tue, 09 Aug 2022 22:00:15 +0000
-References: <20220805234236.704986-1-brian.gix@intel.com>
-In-Reply-To: <20220805234236.704986-1-brian.gix@intel.com>
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com
+References: <3a3904c4-1bf9-ef1b-3d03-b5c3e1e2f8c5@desertmonitor.com>
+In-Reply-To: <3a3904c4-1bf9-ef1b-3d03-b5c3e1e2f8c5@desertmonitor.com>
+From:   Alexander Aring <aahringo@redhat.com>
+Date:   Tue, 9 Aug 2022 20:17:01 -0400
+Message-ID: <CAK-6q+gBUHaR5njKHJJnONW41duVafMA-6R8jKMtN=7M1mg6rA@mail.gmail.com>
+Subject: Re: 6LoWPAN (IPv6 over BLE) neighbor discovery
+To:     Philipp Blum <info@desertmonitor.com>
+Cc:     linux-wpan - ML <linux-wpan@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi,
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Tue, Aug 9, 2022 at 4:24 PM Philipp Blum <info@desertmonitor.com> wrote:
+>
+> Hey,
+>
+> I am currently working on a demonstration for the W3C TPAC next month.
+> Just wanted to get an update on this topic, since RIOT uses it in IPv6
+> over BLE.
+>
 
-On Fri,  5 Aug 2022 16:42:27 -0700 you wrote:
-> This will be a growing patch-set of conversions and dead-code removal
-> towards the goal of retiring hci_request.c
-> 
-> The patch sets will be split amoung the work queues and delayed work
-> queues as initialized in hci_request_setup(), with the ultimate goal of
-> eliminating hci_request.c entirely.
-> 
-> [...]
+Which neighbor discovery are you talking about? Can you be more
+specific here? I am not aware that any 6LoWPAN implementation uses any
+optimized in-kernel IPv6 neighbor discovery for any low power/lossy
+network, we are still using the default IPv6 one which should probably
+still work if the other side supports it. In 802.15.4 we tweaked it a
+little bit to support the short address into the address option as
+RFC4944 describes it [0] that autoconfiguration can use it.
 
-Here is the summary with links:
-  - [v7,1/9] Bluetooth: Convert le_scan_disable timeout to hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/2bf8edacd155
-  - [v7,2/9] Bluetooth: Rework le_scan_restart for hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/89f043b2c6d5
-  - [v7,3/9] Bluetooth: Delete unused hci_req_stop_discovery()
-    https://git.kernel.org/bluetooth/bluetooth-next/c/eed7aab6c517
-  - [v7,4/9] Bluetooth: Convert SCO configure_datapath to hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/71172654bff2
-  - [v7,5/9] Bluetooth: Move Adv Instance timer to hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8c59889a6b5c
-  - [v7,6/9] Bluetooth: Delete unreferenced hci_request code
-    https://git.kernel.org/bluetooth/bluetooth-next/c/3edf244f8c71
-  - [v7,7/9] Bluetooth: move hci_get_random_address() to hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/c7eb26d1285c
-  - [v7,8/9] Bluetooth: convert hci_update_adv_data to hci_sync
-    https://git.kernel.org/bluetooth/bluetooth-next/c/9ec46ac996f5
-  - [v7,9/9] Bluetooth: Convert hci_abort_conn to hci_sync
-    (no matching commit)
+I added linux-bluetooth in cc.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+- Alex
 
+[0] https://www.rfc-editor.org/rfc/rfc4944#section-8
 
