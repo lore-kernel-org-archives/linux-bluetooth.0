@@ -2,167 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F2E9C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Aug 2022 19:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A3FC00140
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Aug 2022 20:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232579AbiHJT6x (ORCPT
+        id S231804AbiHJUFJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Aug 2022 15:58:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53512 "EHLO
+        Wed, 10 Aug 2022 16:05:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232343AbiHJT6u (ORCPT
+        with ESMTP id S230209AbiHJUFG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Aug 2022 15:58:50 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A59B84EF5;
-        Wed, 10 Aug 2022 12:58:49 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id x21so20472523edd.3;
-        Wed, 10 Aug 2022 12:58:49 -0700 (PDT)
+        Wed, 10 Aug 2022 16:05:06 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59BEC82758
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Aug 2022 13:05:03 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id y13so29592085ejp.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Aug 2022 13:05:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=nDY+MzOA939XxE3jhJSlYqnecUbFSkw44Nyv5TZ/3Nw=;
-        b=RHpKXefMdCvcSaxJs90WPqeb12bzBuMW5gtTTAlZPM2Oc2CILkvKgc6tmPaGk8f/6C
-         f3zwx4oAyE8s6Y/f8Uvof6iUci6SmxyqWr1Xo6YzuQigUTiAg5eR+/LWXMYFWsGwb/s4
-         OZDP1+AB+V6cN3QS2JK4edGftTkshf1SwdnbJXaUDcVRbWlY7aoPDArpL7d+SvPJZCQu
-         W2t1rbHeG48sKQhJ/9CTQx09yTMsdWeN4DmhBpI7hA2TxPxtOO1MlgQSraEWlQ2MSeNE
-         /f3v+kr1CoGIsFnvYF9/9yYFCFGxzO51rhD7/ZKJlKb9xSLjzbl+iBdC3/pJoUarrVmM
-         vvFw==
+        bh=j2yXZtpc2gAAB+hLG3fQpBT6is9hlYEWV8RVU1jKRW0=;
+        b=UjgXcDnfjjCvHDN8JSwbZIhJEgzgzY59fVdMMnh3gW3HgERZh/ZU2Qzxq94+/fP+3P
+         xcH8owGdim1tQYL0kcCtZ+Zux1RLYEr8n4pLxxh0xj9wHHfol1JvJOeYE4Qybkw3io5G
+         RU5DFAs6zNnplZTMA9v1vewPaMMvjAPjGbuifTh/jAD8ot7E75QrAx0B7uft0tcJUm43
+         4wQBPdxkASeBmb2/ByHaakygtCJtmatPlBawAmor5AM0DX4RXRanYmnL2xlpCRVVTa/v
+         X1CzMqf8i8iIS6Gjqq97SlxthssC5C14UijBWXppCZ3emOupPSEgYZpx04FeOhkhGBR0
+         CJ5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=nDY+MzOA939XxE3jhJSlYqnecUbFSkw44Nyv5TZ/3Nw=;
-        b=rs+HVQkAl2w/ltO8E1FXT4bqs0QmsIVDUWlq/M9m+8HBF7MzULQpbL5t6Igqi94Isj
-         K+F1tdwQlrXuDeN5BK/PeV+AV+EcRpA2RORwGDqVbnDgAF6CSE4F9oVPfdbYpp85oSx7
-         nMt2To9MY9vp423q9/MHNpRIsCD8JjrgfDLtIe+Mnof4ZjbGT2cvyDNXQ9F6xS9zr+ke
-         ckhMdfAiFvVQV9kVzIv0KkvDaHO968Zw8i9SL7lZyrPZIu1AGlPMlEP4Mxbo52tjkHpz
-         iNVz6pROVxKDOShMe6PkKiEl2ulY6vt2aiEl4qgCkqh+5mDSHvqzmn7uwFDKzpMkE6En
-         Svdw==
-X-Gm-Message-State: ACgBeo1bLQmqbXk20vASUX1pwh6aAbitFGWGpOkZXKk0Jhmib4wQo/IM
-        KaPoPCyD5CH1TxrcaaAeFWjJ/hf4ta+NUKznj+Q=
-X-Google-Smtp-Source: AA6agR6oTDXuk8G8UR8BAfpgCXfdDaIOs5Qg1RTFNKTBvFlSiv67uBG6zv/ijDDk+/1sCuqlzTTCp58GDgf8k4PAjbA=
-X-Received: by 2002:aa7:d88a:0:b0:440:916e:706d with SMTP id
- u10-20020aa7d88a000000b00440916e706dmr15619429edq.167.1660161527720; Wed, 10
- Aug 2022 12:58:47 -0700 (PDT)
+        bh=j2yXZtpc2gAAB+hLG3fQpBT6is9hlYEWV8RVU1jKRW0=;
+        b=YHK882eDuBIvHjYcdyxp8CQ7GPsklts5HvVdwce0F+u4bkRnCyrqJCJcpedbQ76XoC
+         YW8a2rL0ZVCpoSpU8MHWzBG4H2Zn6L6C6PhtxCk6Prw7HdxyV50h3ITdGNq1lT09Itij
+         hMjZYLZ3VNpf7UUreBEnpDdTasQje80PzZONUDA7XcdSQFZZiIXNo9hrfiv3pkp8Wshs
+         bP1fsZVXRgJcfYETRelMETODXot9yM+61K7aiCMlW/Rm0LL7Oj2AoLE190XA9++yNgdc
+         eN+Fvcb2zUYoa87WCnnssHj6qfsBaJtfrIS6FS3OE1aLsDlKgQWtp4PwfewhX/z4XYc7
+         181g==
+X-Gm-Message-State: ACgBeo2QD8mSVm/wRdUpc+5xoxgkrC+YYYyUymoyf+FvuwFhs0IIitkM
+        B8vyQW2sGEnETdckwzD7+ygqZanPO56sS1+6jvhcXEZ/oLk=
+X-Google-Smtp-Source: AA6agR6bBXJVHcSmyVFY5AjoRriqxymSKOlL1sKgOyk08uP9vlU88wh6okqv4kjy6nurJmlynuc5ioM0YacziL2M6S0=
+X-Received: by 2002:a17:907:a40d:b0:733:17c1:a246 with SMTP id
+ sg13-20020a170907a40d00b0073317c1a246mr2369876ejc.132.1660161901871; Wed, 10
+ Aug 2022 13:05:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220810164627.1.Id730b98f188a504d9835b96ddcbc83d49a70bb36@changeid>
-In-Reply-To: <20220810164627.1.Id730b98f188a504d9835b96ddcbc83d49a70bb36@changeid>
+References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
+ <CGME20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab@eucas1p1.samsung.com>
+ <20220711233535.3134546-2-luiz.dentz@gmail.com> <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
+ <CABBYNZLsR0KT1-OVVjnUzLp0+U0eHGi0PNqKbfntp_5AHNDawA@mail.gmail.com> <03f9bea9-77fb-2b57-43d0-c4b819c2560a@samsung.com>
+In-Reply-To: <03f9bea9-77fb-2b57-43d0-c4b819c2560a@samsung.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 10 Aug 2022 12:58:36 -0700
-Message-ID: <CABBYNZLhhdKLqYu-5OWQcHs22aeEJw0tSjVNhgpMCj_ctH+Ldg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Honor name resolve evt regardless of discov state
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Ying Hsu <yinghsu@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Date:   Wed, 10 Aug 2022 13:04:50 -0700
+Message-ID: <CABBYNZ+vRqqCBVTgQJ-UZ+gd2ceFebQF94NDdYcN4Xmyk+GWTA@mail.gmail.com>
+Subject: Re: [PATCH v7 2/7] Bluetooth: Add initial implementation of CIS connections
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Marek,
 
-On Wed, Aug 10, 2022 at 1:47 AM Archie Pusaka <apusaka@google.com> wrote:
+On Wed, Aug 10, 2022 at 7:18 AM Marek Szyprowski
+<m.szyprowski@samsung.com> wrote:
 >
-> From: Archie Pusaka <apusaka@chromium.org>
+> Hi Luiz,
 >
-> Currently, we don't update the name resolving cache when receiving
-> a name resolve event if the discovery phase is not in the resolving
-> stage.
+> On 09.08.2022 21:24, Luiz Augusto von Dentz wrote:
+> > On Tue, Aug 9, 2022 at 1:55 AM Marek Szyprowski
+> > <m.szyprowski@samsung.com>  wrote:
+> >> On 12.07.2022 01:35, Luiz Augusto von Dentz wrote:
+> >>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+> >>>
+> >>> This adds the initial implementation of CIS connections and introduces
+> >>> the ISO packets/links.
+> >>>
+> >>> == Central: Set CIG Parameters, create a CIS and Setup Data Path ==
+> >>>
+> >>>> tools/isotest -s <address>
+> >>> < HCI Command: LE Extended Create... (0x08|0x0043) plen 26
+> >>> ...
+> >>>> HCI Event: Command Status (0x0f) plen 4
+> >>>         LE Extended Create Connection (0x08|0x0043) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>> HCI Event: LE Meta Event (0x3e) plen 31
+> >>>         LE Enhanced Connection Complete (0x0a)
+> >>>         ...
+> >>> < HCI Command: LE Create Connected... (0x08|0x0064) plen 5
+> >>> ...
+> >>>> HCI Event: Command Status (0x0f) plen 4
+> >>>         LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>> HCI Event: LE Meta Event (0x3e) plen 29
+> >>>         LE Connected Isochronous Stream Established (0x19)
+> >>>         ...
+> >>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+> >>> ...
+> >>>> HCI Event: Command Complete (0x0e) plen 6
+> >>>         LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>           Handle: 257
+> >>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+> >>> ...
+> >>>> HCI Event: Command Complete (0x0e) plen 6
+> >>>         LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>           Handle: 257
+> >>>
+> >>> == Peripheral: Accept CIS and Setup Data Path ==
+> >>>
+> >>>> tools/isotest -d
+> >>>    HCI Event: LE Meta Event (0x3e) plen 7
+> >>>         LE Connected Isochronous Stream Request (0x1a)
+> >>> ...
+> >>> < HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
+> >>> ...
+> >>>> HCI Event: LE Meta Event (0x3e) plen 29
+> >>>         LE Connected Isochronous Stream Established (0x19)
+> >>> ...
+> >>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+> >>> ...
+> >>>> HCI Event: Command Complete (0x0e) plen 6
+> >>>         LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>           Handle: 257
+> >>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+> >>> ...
+> >>>> HCI Event: Command Complete (0x0e) plen 6
+> >>>         LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+> >>>           Status: Success (0x00)
+> >>>           Handle: 257
+> >>>
+> >>> Signed-off-by: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+> >> This patch landed recently in linux-next as commit 26afbd826ee3
+> >> ("Bluetooth: Add initial implementation of CIS connections").
+> >> Unfortunately it causes a regression on my test systems. On almost all
+> >> I've observed that calling a simple 'hcitool scan' command in a shell
+> >> fails in an unexpected way:
+> >>
+> >> $ hcitool scan
+> >> *** stack smashing detected ***: <unknown> terminated
+> >> Aborted
+> > Not really sure how it would be related to ISO changes though, have
+> > you even enabled ISO sockets UUID? Perhaps check if there is something
+> > on dmesg indicating what is going on since I tried here and that
+> > doesn't seem to cause any problem:
+> >
+> > tools/hcitool scan
+> > Scanning ...
+> >
+> > Perhaps it is a combination of using old userspace tools with new
+> > kernel, but then again these changes should affect something like
+> > hcitool.
 >
-> However, if the user connect to a device while we are still resolving
-> remote name for another device, discovery will be stopped, and because
-> we are no longer in the discovery resolving phase, the corresponding
-> remote name event will be ignored, and thus the device being resolved
-> will stuck in NAME_PENDING state.
->
-> If discovery is then restarted and then stopped, this will cause us to
-> try cancelling the name resolve of the same device again, which is
-> incorrect and might upset the controller.
+> Indeed my userspace is old, but still, the kernel changes shouldn't make
+> it to crash. I didn't change anything in userspace since ages, so I
+> assume that ISO sockets UUIDs are not enabled. Maybe it is somehow
+> architecture related or specific? It looks that only ARM 32bit userspace
+> apps crashes. I've just checked 64bit userspace on ARM64 (RPi4) and it
+> works fine with that commit.
 
-Please add the Fixes tag.
+That would be the first time it happens to me that a change in kernel
+would crash the userspace in such odd fashion, btw perhaps run with
+valgrind so it generates a backtrace of where it would be crashing,
+well if that is reproducible with valgrind.
 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Ying Hsu <yinghsu@chromium.org>
->
-> ---
-> The following steps are performed:
->     (1) Prepare 2 classic peer devices that needs RNR. Put device A
->         closer to DUT and device B (much) farther from DUT.
->     (2) Remove all cache and previous connection from DUT
->     (3) Put both peers into pairing mode, then start scanning on DUT
->     (4) After ~8 sec, turn off peer B.
->     *This is done so DUT can discover peer B (discovery time is 10s),
->     but it hasn't started RNR. Peer is turned off to buy us the max
->     time in the RNR phase (5s).
->     (5) Immediately as device A is shown on UI, click to connect.
->     *We thus know that the DUT is in the RNR phase and trying to
->     resolve the name of peer B when we initiate connection to peer A.
->     (6) Forget peer A.
->     (7) Restart scan and stop scan.
->     *Before the CL, stop scan is broken because we will try to cancel
->     a nonexistent RNR
->     (8) Restart scan again. Observe DUT can scan normally.
->
->
->  net/bluetooth/hci_event.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 395c6479456f..95e145e278c9 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2453,6 +2453,16 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
->             !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
->                 mgmt_device_connected(hdev, conn, name, name_len);
->
-> +       e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
-> +
-> +       if (e) {
-> +               list_del(&e->list);
-> +
-> +               e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
-> +               mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
-> +                                name, name_len);
-> +       }
-> +
->         if (discov->state == DISCOVERY_STOPPED)
->                 return;
->
-> @@ -2462,7 +2472,6 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
->         if (discov->state != DISCOVERY_RESOLVING)
->                 return;
->
-> -       e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
->         /* If the device was not found in a list of found devices names of which
->          * are pending. there is no need to continue resolving a next name as it
->          * will be done upon receiving another Remote Name Request Complete
-> @@ -2470,12 +2479,6 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
->         if (!e)
->                 return;
->
-> -       list_del(&e->list);
-> -
-> -       e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
-> -       mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
-> -                        name, name_len);
-> -
->         if (hci_resolve_next_name(hdev))
->                 return;
->
+> Best regards
 > --
-> 2.37.1.595.g718a3a8f04-goog
+> Marek Szyprowski, PhD
+> Samsung R&D Institute Poland
 >
 
 
