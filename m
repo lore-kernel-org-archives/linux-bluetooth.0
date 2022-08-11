@@ -2,116 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B0FC00140
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 00:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 016BFC00140
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 00:49:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233163AbiHKArt (ORCPT
+        id S233207AbiHKAtY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Aug 2022 20:47:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58216 "EHLO
+        Wed, 10 Aug 2022 20:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232999AbiHKArs (ORCPT
+        with ESMTP id S230239AbiHKAtW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Aug 2022 20:47:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A2C0844DD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Aug 2022 17:47:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C93C7B81247
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 00:47:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 559EFC433C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 00:47:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660178865;
-        bh=FCLQv0C7+1B66Mizpe5nTwX5ebeDHhfl79KjMLYTo7E=;
-        h=From:To:Subject:Date:From;
-        b=f4jAXiWSLTo1l/QRsWaOH/53RNSj3Yhmjl9P3rHW6h+oTwD2/eAh1Zh0sLomWrkLo
-         TjBy+puHIOjJy4IiXJh7pk1mqDG1lEOqgWBTNg4vQWqOCkjYPpWR6NKWlzPBErJ/bJ
-         Qy6hWajjjd+lELzZOMZ6Wi3NqGWuJHsN3fmYbyInJu+q5lnf/uUBIKClEMDzpX9N+I
-         4VYY57j3ILD8aEzOACic7P37TzzftWf31ydG1UK8uZWZVxR0Po8LrwuDxX+sO8tVT5
-         Hjbidn6exXJ07FwqZ8Pnzn2aYHWLeRnwiR8YZj8Uc/f9QngomOsVuN4Gf/UuEYZIzY
-         POOSdME9g3N4A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 42914C433E9; Thu, 11 Aug 2022 00:47:45 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216352] New: [BISECTED] 250 ms system suspend performance
- regression
-Date:   Thu, 11 Aug 2022 00:47:45 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lenb@kernel.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-216352-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 10 Aug 2022 20:49:22 -0400
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055D4844DD;
+        Wed, 10 Aug 2022 17:49:14 -0700 (PDT)
+X-UUID: e7f7311ac8394fe8b8034fa10d0a6d13-20220811
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=J02Otlqm9jVMozONgqtzLnRRp+2ot0UG4yvdPeLI0N4=;
+        b=IP6G91uzxN+WNAGA60ai7YDH1rL6k3a1zKloseVNhmyHYVXdYqSeMSflVw2j528KZ2d6SswRWdRukAAPRRhjL7OPx0YEXCKvxEqE51n4zpFCSJrtC4+2P0qCYOuAKSvrryYIIVqQI5tBHmJbp1g74v7/02q8FYUWVG1aGxAGHXk=;
+X-CID-UNFAMILIAR: 1
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.9,REQID:df0c4343-2110-4181-a37a-1fd0a846f845,OB:0,LO
+        B:0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Release
+        _Ham,ACTION:release,TS:105
+X-CID-INFO: VERSION:1.1.9,REQID:df0c4343-2110-4181-a37a-1fd0a846f845,OB:0,LOB:
+        0,IP:0,URL:5,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Spam_GS98
+        1B3D,ACTION:quarantine,TS:105
+X-CID-META: VersionHash:3d8acc9,CLOUDID:1fcd519c-da39-4e3b-a854-56c7d2111b46,C
+        OID:510a9701587b,Recheck:0,SF:28|16|19|48,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0
+X-UUID: e7f7311ac8394fe8b8034fa10d0a6d13-20220811
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1779104499; Thu, 11 Aug 2022 08:49:10 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.792.15; Thu, 11 Aug 2022 08:49:08 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 11 Aug 2022 08:49:08 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <mcchou@chromium.org>,
+        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Jing Cai <jing.cai@mediatek.com>
+Subject: [PATCH v5] Bluetooth: btusb: mediatek: fix WMT failure during runtime suspend
+Date:   Thu, 11 Aug 2022 08:49:07 +0800
+Message-ID: <6675f56fc8b0910f17ec506d534cf5330ff04733.1660177086.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216352
+From: Sean Wang <sean.wang@mediatek.com>
 
-            Bug ID: 216352
-           Summary: [BISECTED] 250 ms system suspend performance
-                    regression
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.19
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: lenb@kernel.org
-        Regression: No
+WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
+needs constantly polling control pipe until the host received the WMT
+event, thus, we should require to specifically acquire PM counter on the
+USB to prevent the interface from entering auto suspended while WMT
+cmd/event in progress.
 
-My skylake laptop suspends with median performance of 427 ms
-up through 5.19-rc8.
+Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek
+ MT7668U USB devices")
+Co-developed-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Jing Cai <jing.cai@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+v2:
+1. move usb_autopm_[get, put]_interface to btusb_mtk_hci_wmt_sync whenever
+wmt cmd is invoked.
+2. add the explanation why we needed the specific
+usb_autopm_[get, put]_interface there.
 
-After this commit, median performance slows to 684 ms in 5.19.0.
+v3: correct the version and there is no logic changed
+v4: fix GitLint fail due to Title exceeds max length
+v5: rebase to fix patches does not apply
+---
+ drivers/bluetooth/btusb.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-ef61b6ea154464fefd8a6712d7a3b43b445c3d4a is the first bad commit
-commit ef61b6ea154464fefd8a6712d7a3b43b445c3d4a
-Author: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon Jul 25 15:34:21 2022 -0700
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30dd443f395f..70d61bb4a053 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2480,15 +2480,29 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 
+ 	set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
+ 
++	/* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
++	 * it needs constantly polling control pipe until the host received the
++	 * WMT event, thus, we should require to specifically acquire PM counter
++	 * on the USB to prevent the interface from entering auto suspended
++	 * while WMT cmd/event in progress.
++	 */
++	err = usb_autopm_get_interface(data->intf);
++	if (err < 0)
++		goto err_free_wc;
++
+ 	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
+ 
+ 	if (err < 0) {
+ 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
++		usb_autopm_put_interface(data->intf);
+ 		goto err_free_wc;
+ 	}
+ 
+ 	/* Submit control IN URB on demand to process the WMT event */
+ 	err = btusb_mtk_submit_wmt_recv_urb(hdev);
++
++	usb_autopm_put_interface(data->intf);
++
+ 	if (err < 0)
+ 		goto err_free_wc;
+ 
+-- 
+2.25.1
 
-    Bluetooth: Always set event mask on suspend
-
-    When suspending, always set the event mask once disconnects are
-    successful. Otherwise, if wakeup is disallowed, the event mask is not
-    set before suspend continues and can result in an early wakeup.
-
-    Fixes: 182ee45da083 ("Bluetooth: hci_sync: Rework hci_suspend_notifier")
-    Cc: stable@vger.kernel.org
-    Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
- net/bluetooth/hci_sync.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
