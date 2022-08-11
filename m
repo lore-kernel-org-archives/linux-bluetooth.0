@@ -2,175 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7817DC19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 09:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 214FAC19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 10:10:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234138AbiHKJqg (ORCPT
+        id S234845AbiHKKKI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 05:46:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55334 "EHLO
+        Thu, 11 Aug 2022 06:10:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233028AbiHKJqe (ORCPT
+        with ESMTP id S234738AbiHKKJv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 05:46:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2208C79A45
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 02:46:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1660211193;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wpGpSji8gBrXT5CEn6I+LR4cIjiEl5zj4ICp8/ctfA0=;
-        b=HttTp4amC18yr1DAs7OrKM1hd7X0+Kw4RtfytX7Yy8gnh4Jg/Dy7GBwFiEYvccVbfpqi0J
-        2zXHxTkMx+RtSwFQ7pFsh94HSEaJjMoXRNPX1WGu8xbWH/YN/Rflt93l/+WEtfgwZoQbzi
-        h2oyE2mYn+S//STkcEc/D0WId02Uow4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-614-x_y2rmYEPQaz6SNYxAT8JQ-1; Thu, 11 Aug 2022 05:46:32 -0400
-X-MC-Unique: x_y2rmYEPQaz6SNYxAT8JQ-1
-Received: by mail-ej1-f69.google.com with SMTP id hr32-20020a1709073fa000b00730a39f36ddso5252487ejc.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 02:46:31 -0700 (PDT)
+        Thu, 11 Aug 2022 06:09:51 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D39910B2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 03:09:45 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-10cf9f5b500so21008286fac.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 03:09:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=4I9znO+/Dp6Wk5rvWxV0aQKQ2TGjmVbskQ/NBmAc3kU=;
+        b=Q1uD3b2eQMxG45gkVsU25KJylW4S28P4y87Ju9xukjqUaIsdVEzFmxNcbLW5kHOQx5
+         c+YIpiAQn0OAI5LHQXr0WDIMQu0jPfzJNDf0q5D8imiH1vrwttzRy8DBydZUaUhiL3NN
+         WctjcWdU+pXp+ugC1Xxqtc3uLiVKx4eNNeUFjqeVCKDKPIyNbJFEw0olsQP7+UdU2sml
+         5JY1tyMPe2AMaFNs5NJ4vG0kfg2ZacZy0pElynGPlFmxObap7VnuaJePu49mDbh2PO63
+         5Aw24Gig+c+RZ0o+I+VCatIS2iY2G5dUG7XxeaV3UlUHxeCDtwvXtUL7JAakgunNykdY
+         ULCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc;
-        bh=wpGpSji8gBrXT5CEn6I+LR4cIjiEl5zj4ICp8/ctfA0=;
-        b=ZMihzbJiheI02L4gQI4uX+VJuuA73xlMXlTZEO/10PbNVzy2FU8TBWO5jPrcBizMAv
-         YmEoAxyT3q2NW4lzx8wb4y3EYYtWKPsXIPZA6m1uiHx1VyEGFYorokxdEP/FOWjnILbC
-         wE7oFuI39dT4vNyMdVRM828N0qfP7IofkBFJPe0I57KxCuKYATHDfSmyXCa1bh6b6SwA
-         hYzATW70fcu8gkBLyYAUaVXs/223Wf/XAnCiCc37hh8sy8SrIXXBjZEuYjuGC/AKiJoO
-         0qfvBryt58vj/WHxj7haTueMwz5b60qN5sIhZDYpxG4uIiIQdYCZ5HPx5oiGirKUxvTb
-         QuDA==
-X-Gm-Message-State: ACgBeo1VKU932Lkhv7LPp2XE4ndUF10hC9lVHbcgByqSW5dC8BnBqa8z
-        a7C/wf1piF44G3mXzzbvGoFgga5TxdwjsPdpkbsnm8ZBH4Wg18MnlD0kgYPnErhca5IzOgOiePa
-        e5t6fXbeZal1a0YvNuN7C6+UaY4M7
-X-Received: by 2002:a17:907:2c44:b0:731:85d9:786e with SMTP id hf4-20020a1709072c4400b0073185d9786emr10100022ejc.102.1660211191077;
-        Thu, 11 Aug 2022 02:46:31 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR7Fl6YqVMzFLUemyPIKrf7zMCiGLb3O/b0wMQ73HM1yz3tBhozOm4xiI4edvCjGj00XMZ76Aw==
-X-Received: by 2002:a17:907:2c44:b0:731:85d9:786e with SMTP id hf4-20020a1709072c4400b0073185d9786emr10100013ejc.102.1660211190868;
-        Thu, 11 Aug 2022 02:46:30 -0700 (PDT)
-Received: from redhat.com ([2.52.152.113])
-        by smtp.gmail.com with ESMTPSA id y2-20020aa7d502000000b00440ced0e117sm5334992edq.58.2022.08.11.02.46.28
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=4I9znO+/Dp6Wk5rvWxV0aQKQ2TGjmVbskQ/NBmAc3kU=;
+        b=Gsxn2fm4qd2Y2WK++VPXJeaZHTu0DmhW1Yxx34Gp+GsJG1fNiaBnEyJBSRQxau9x0V
+         TTeKt91DgS7XaROZVt2c/wdio/NaNlQeqKvMXEtoALao4t/wDqeHd1jv+PROd+8quWge
+         rbLvWCzHaE26vlMH5jNnWW0xAk/KcdspMslXVniddQSz+nNapvJx3fV3qe30iKQhubHl
+         jRkmWXRV1gKxjpevSUC7YYNDLo5c+sg6JecWnL3Qe5GlH12ULmSiH5fOCC86VQ8IRgRK
+         lZ7WZqYQyESu9PGysRi5WrqTYcGo469bi7ui9g6IHOkBKDxqrjsXasVIvXfL7nrgBh3o
+         VjXA==
+X-Gm-Message-State: ACgBeo2N/m9Cqr+130p0DxEcGgVmIUrMw9iwA2Pr/mmN4Zz4E6ePWkRZ
+        9DTg4ALhrwCD6BKNREilMwI+ytT3V1o=
+X-Google-Smtp-Source: AA6agR5IiecC86kCjA/z5KicIHU4/rXo0IrXpGSBkI4zQWEt/3MUHb6GHnh2DOLkKgBO/Cdf9ByRFw==
+X-Received: by 2002:a05:6870:45a6:b0:116:8aef:46b2 with SMTP id y38-20020a05687045a600b001168aef46b2mr3202609oao.285.1660212584488;
+        Thu, 11 Aug 2022 03:09:44 -0700 (PDT)
+Received: from [172.17.0.2] ([13.85.7.138])
+        by smtp.gmail.com with ESMTPSA id g8-20020a9d6b08000000b0063709cb78cbsm1104276otp.49.2022.08.11.03.09.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 02:46:30 -0700 (PDT)
-Date:   Thu, 11 Aug 2022 05:46:27 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Hulk Robot <hulkci@huawei.com>,
-        Yang Yingliang <yangyingliang@huawei.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: virtio_bt: fix device removal
-Message-ID: <20220811094542.268519-1-mst@redhat.com>
+        Thu, 11 Aug 2022 03:09:43 -0700 (PDT)
+Message-ID: <62f4d567.9d0a0220.71d10.415e@mx.google.com>
+Date:   Thu, 11 Aug 2022 03:09:43 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0880846169859376767=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, mst@redhat.com
+Subject: RE: [v3] Bluetooth: virtio_bt: fix device removal
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220811094542.268519-1-mst@redhat.com>
+References: <20220811094542.268519-1-mst@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Device removal is clearly out of virtio spec: it attempts to remove
-unused buffers from a VQ before invoking device reset. To fix, make
-open/close NOPs and do all cleanup/setup in probe/remove.
+--===============0880846169859376767==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-NB: This is a hacky way to handle this - virtbt_{open,close} as NOP is
-not really what a driver is supposed to be doing. These are transport
-enable/disable callbacks from the BT core towards the driver. It maps to
-a device being enabled/disabled by something like bluetoothd for
-example. So if disabled, users expect that no resources/queues are in
-use.  It does work with all other transports like USB, SDIO, UART etc.
-There should be no buffer used if the device is powered off. We also
-don’t have any USB URBs in-flight if the transport is not active.
+This is automated email and please do not reply to this email!
 
-The way to implement a proper fix would be using vq reset if supported,
-or even using a full device reset.
+Dear submitter,
 
-The cost of the hack is a single skb wasted on an unused bt device.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=666822
 
-NB2: with this fix in place driver still suffers from a race condition
-if an interrupt triggers while device is being reset.  To fix, in the
-virtbt_close() callback we should deactivate all interrupts.  To be
-fixed.
+---Test result---
 
-squashed fixup: bluetooth: virtio_bt: fix an error code in probe()
+Test Summary:
+CheckPatch                    PASS      1.28 seconds
+GitLint                       FAIL      0.72 seconds
+SubjectPrefix                 PASS      0.59 seconds
+BuildKernel                   PASS      38.37 seconds
+BuildKernel32                 PASS      34.59 seconds
+Incremental Build with patchesPASS      48.74 seconds
+TestRunner: Setup             PASS      566.46 seconds
+TestRunner: l2cap-tester      PASS      19.52 seconds
+TestRunner: bnep-tester       PASS      7.72 seconds
+TestRunner: mgmt-tester       PASS      116.56 seconds
+TestRunner: rfcomm-tester     PASS      11.25 seconds
+TestRunner: sco-tester        PASS      11.05 seconds
+TestRunner: smp-tester        PASS      11.04 seconds
+TestRunner: userchan-tester   PASS      7.86 seconds
 
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20220811080943.198245-1-mst@redhat.com>
+Details
+##############################
+Test: GitLint - FAIL - 0.72 seconds
+Run gitlint with rule in .gitlint
+[v3] Bluetooth: virtio_bt: fix device removal
+36: B3 Line contains hard tab characters (\t): "	tkeaked commit log to make lines shorter"
+38: B3 Line contains hard tab characters (\t): "	fixed error handling"
+
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-changes from v2:
-	tkeaked commit log to make lines shorter
-changes from v1:
-	fixed error handling
 
- drivers/bluetooth/virtio_bt.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 67c21263f9e0..f6d699fed139 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -50,8 +50,11 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt)
- 
- static int virtbt_open(struct hci_dev *hdev)
- {
--	struct virtio_bluetooth *vbt = hci_get_drvdata(hdev);
-+	return 0;
-+}
- 
-+static int virtbt_open_vdev(struct virtio_bluetooth *vbt)
-+{
- 	if (virtbt_add_inbuf(vbt) < 0)
- 		return -EIO;
- 
-@@ -61,7 +64,11 @@ static int virtbt_open(struct hci_dev *hdev)
- 
- static int virtbt_close(struct hci_dev *hdev)
- {
--	struct virtio_bluetooth *vbt = hci_get_drvdata(hdev);
-+	return 0;
-+}
-+
-+static int virtbt_close_vdev(struct virtio_bluetooth *vbt)
-+{
- 	int i;
- 
- 	cancel_work_sync(&vbt->rx);
-@@ -354,8 +361,15 @@ static int virtbt_probe(struct virtio_device *vdev)
- 		goto failed;
- 	}
- 
-+	virtio_device_ready(vdev);
-+	err = virtbt_open_vdev(vbt);
-+	if (err)
-+		goto open_failed;
-+
- 	return 0;
- 
-+open_failed:
-+	hci_free_dev(hdev);
- failed:
- 	vdev->config->del_vqs(vdev);
- 	return err;
-@@ -368,6 +382,7 @@ static void virtbt_remove(struct virtio_device *vdev)
- 
- 	hci_unregister_dev(hdev);
- 	virtio_reset_device(vdev);
-+	virtbt_close_vdev(vbt);
- 
- 	hci_free_dev(hdev);
- 	vbt->hdev = NULL;
--- 
-MST
-
+--===============0880846169859376767==--
