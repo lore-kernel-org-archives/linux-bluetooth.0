@@ -2,130 +2,196 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88D5FC19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 11:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED52C19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 11:53:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234810AbiHKL2u (ORCPT
+        id S234946AbiHKLwd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 07:28:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59484 "EHLO
+        Thu, 11 Aug 2022 07:52:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234664AbiHKL2u (ORCPT
+        with ESMTP id S235078AbiHKLwT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 07:28:50 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77CAE65806
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 04:28:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660217329; x=1691753329;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LrifTz9KYmc+apX1OJBFn4zf+n8RvhsHM+fo+76Uyxo=;
-  b=R5qwMXSaS00O1uS+T7kW8jK1DpgKNj/1IrrxWWKDQGOVQdX1OOyGRGPz
-   Gj4U5rXCYmJaW11kh1jlT1hit24O2tMMFQGtjAO9PG597afOX8abDPChy
-   sPwo8on/R3u10GE2+lmmM2BNeQit0/MyedJmyaehqHH7tXNeIdH8FeVyP
-   93znb3ZvDGTFGOi6uj16VhAksfEHPS5QPTNO+4KLRZMiTdgjKNu9LKcLQ
-   W4JPRwhYjUtjmrAVCWqxR4aMOOF2zdaOR9V1Bwts1HkCdTlEiD63ww0tB
-   +LohXDdEpPPIg1cv2QNs48cMGQdUdQPzLmWg1csSLAf5XBZrbF2bp7a3U
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10435"; a="291322016"
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="291322016"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2022 04:28:49 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,228,1654585200"; 
-   d="scan'208";a="581635445"
-Received: from lkp-server02.sh.intel.com (HELO cfab306db114) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 11 Aug 2022 04:28:47 -0700
-Received: from kbuild by cfab306db114 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oM6Mp-00008Z-0E;
-        Thu, 11 Aug 2022 11:28:47 +0000
-Date:   Thu, 11 Aug 2022 19:28:26 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 84a0a27ea39a9caed74d80a78666a91a9ea5e12b
-Message-ID: <62f4e7da.BplhCnLAy/u3pigz%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 11 Aug 2022 07:52:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 83AB995E77
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 04:52:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1660218737;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BHGYpPVOToJJW83BwikwQkKAUWoo3Emiqyb5NZjYFwU=;
+        b=WbJVkwFz5rhQ6HGDwzc8ToCsHVlooQrs43OI1xUOFzGkwvfKdthe2lS1MXsCoDrRzWp0xR
+        FwQpRGjffA3IIw5WesU8/Zn2S0OK2HHo7FhZc1KyUxBlZrpTM1KO07K3TExUG15SRUa/bP
+        6sjFHL9T3gG7ihQQWeRtop7shfoh4e4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-651-WovKcL9qM8O3erjNvztQ6w-1; Thu, 11 Aug 2022 07:52:14 -0400
+X-MC-Unique: WovKcL9qM8O3erjNvztQ6w-1
+Received: by mail-ej1-f72.google.com with SMTP id gb41-20020a170907962900b00730961131a7so5399701ejc.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 04:52:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=BHGYpPVOToJJW83BwikwQkKAUWoo3Emiqyb5NZjYFwU=;
+        b=XYSUezFrtSqSETzqLoGLqxXHbbObSTdmyDbxc0vAlMOyz8/hgUfN+/BxnmOrW6orJS
+         Z6LpAi7B/a/j0vZViCaFR590HMCA/HshRG8qYFCtfdBC/4cgTnNKKminCI137v+lBsQ6
+         A6cINg74C5YKDSw9QKYYHwIhKlYdbgebdwE4zrkzkbTRiFyUwfSh2pNkqwiSp+bwVH1y
+         KrGUrtTFoXp7bNPvdftYjt99fU38kk4RDwlfx5HnKed7v4SiP7Dim0zgadsc2uqcnrZp
+         esV+feLVxLuB8R+roAFGw+OIlFHhD+Z7eUSHePWHgclwI8LzKSknBurjFu9KTbwZrvaR
+         IEsg==
+X-Gm-Message-State: ACgBeo13YP9UQk/sfDbtXFAequqrNwFLwPgnIMylaq0eRIcDDm0nQEGv
+        kTtBdB+11j0WMa87zVCuY9upodk9Gh2UfWkr89SXko9MRP1UJStjmki+Nm5I8kitotO2N7Jzx7L
+        Hgc4iApRh3LcACCC40b4JOl5LvNZ0
+X-Received: by 2002:a17:906:d7a9:b0:731:2189:4f58 with SMTP id pk9-20020a170906d7a900b0073121894f58mr18015573ejb.471.1660218732815;
+        Thu, 11 Aug 2022 04:52:12 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7pW+wfNPjyic5s9NfSTYkUOmWkOIvVTV3xaAsa6JoVtqiVDU1xphRC7xUwvAPKSlmSPuUKvw==
+X-Received: by 2002:a17:906:d7a9:b0:731:2189:4f58 with SMTP id pk9-20020a170906d7a900b0073121894f58mr18015557ejb.471.1660218732575;
+        Thu, 11 Aug 2022 04:52:12 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c1e:bf00:d69d:5353:dba5:ee81? (2001-1c00-0c1e-bf00-d69d-5353-dba5-ee81.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:d69d:5353:dba5:ee81])
+        by smtp.gmail.com with ESMTPSA id cf6-20020a0564020b8600b00442d5054a51sm1870300edb.87.2022.08.11.04.52.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Aug 2022 04:52:11 -0700 (PDT)
+Message-ID: <065a9f83-e99f-1540-528a-83eb0203e206@redhat.com>
+Date:   Thu, 11 Aug 2022 13:52:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH] Bluetooth: hci_event: Fix vendor (unknown) opcode status
+ handling
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+References: <20220807205740.777363-1-hdegoede@redhat.com>
+ <CABBYNZLwKJcEoaHzihV92LhvPAAOB7p8vfX9rc=8Z_U61Zjt2A@mail.gmail.com>
+ <CABBYNZ+kUVT5K_+jiGn6eU=yOde+3Fmq6KHPmyawgbZMCseh1A@mail.gmail.com>
+From:   Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <CABBYNZ+kUVT5K_+jiGn6eU=yOde+3Fmq6KHPmyawgbZMCseh1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 84a0a27ea39a9caed74d80a78666a91a9ea5e12b  Bluetooth: hci_event: Fix vendor (unknown) opcode status handling
+Hi Luiz,
 
-elapsed time: 713m
+On 8/11/22 00:26, Luiz Augusto von Dentz wrote:
+> Hi Hans,
+> 
+> On Mon, Aug 8, 2022 at 12:58 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Hans,
+>>
+>> On Sun, Aug 7, 2022 at 1:57 PM Hans de Goede <hdegoede@redhat.com> wrote:
+>>>
+>>> Commit c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to
+>>> handle Command Complete") was (presumably) meant to only refactor things
+>>> without any functional changes.
+>>>
+>>> But it does have one undesirable side-effect, before *status would always
+>>> be set to skb->data[0] and it might be overridden by some of the opcode
+>>> specific handling. While now it always set by the opcode specific handlers.
+>>> This means that if the opcode is not known *status does not get set any
+>>> more at all!
+>>>
+>>> This behavior change has broken bluetooth support for BCM4343A0 HCIs,
+>>> the hci_bcm.c code tries to configure UART attached HCIs at a higher
+>>> baudraute using vendor specific opcodes. The BCM4343A0 does not
+>>> support this and this used to simply fail:
+>>>
+>>> [   25.646442] Bluetooth: hci0: BCM: failed to write clock (-56)
+>>> [   25.646481] Bluetooth: hci0: Failed to set baudrate
+>>>
+>>> After which things would continue with the initial baudraute. But now
+>>> that hci_cmd_complete_evt() no longer sets status for unknown opcodes
+>>> *status is left at 0. This causes the hci_bcm.c code to think the baudraute
+>>> has been changed on the HCI side and to also adjust the UART baudrate,
+>>> after which communication with the HCI is broken, leading to:
+>>>
+>>> [   28.579042] Bluetooth: hci0: command 0x0c03 tx timeout
+>>> [   36.961601] Bluetooth: hci0: BCM: Reset failed (-110)
+>>>
+>>> And non working bluetooth. Fix this by restoring the previous
+>>> default "*status = skb->data[0]" handling for unknown opcodes.
+>>>
+>>> Fixes: c8992cffbe74 ("Bluetooth: hci_event: Use of a function table to handle Command Complete")
+>>> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+>>> ---
+>>>  net/bluetooth/hci_event.c | 7 +++++++
+>>>  1 file changed, 7 insertions(+)
+>>>
+>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+>>> index af17dfb20e01..fda31d558ded 100644
+>>> --- a/net/bluetooth/hci_event.c
+>>> +++ b/net/bluetooth/hci_event.c
+>>> @@ -3996,6 +3996,13 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, void *data,
+>>>                         break;
+>>>                 }
+>>>         }
+>>> +       if (i == ARRAY_SIZE(hci_cc_table)) {
+>>> +               /* Unknown opcode, assume byte 0 contains the status, so
+>>> +                * that e.g. __hci_cmd_sync() properly returns errors
+>>> +                * for vendor specific commands send by HCI drivers.
+>>> +                */
+>>> +               *status = skb->data[0];
+>>> +       }
+>>
+>> The format of return parameters in command is not defined by the spec:
+>>
+>> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
+>> page 2189:
+>>
+>> Return_Parameters:
+>> Size: Depends on command
+>>
+>> This is the return parameter(s) for the command specified in the
+>> Command_Opcode event parameter. See each command’s definition for
+>> the list of return parameters associated with that command.
+>>
+>> So assuming the status is the first by is not quite right, although
+>> for the standard ones that seems to be valid, I think the best way to
+>> resolve this would have been to check if it a vendor command and then
+>> have the driver handle it or perhaps have some means for the driver to
+>> register it vendor_cc_table, we can perhaps have this as a workaround
+>> for now and only really change how we parse the cc for vendor commands
+>> if a vendor decide not to have a status as first parameter but Id
+>> probably leave a comment that quoting the spec that reminds us this
+>> code may need changing.
+> 
+> Are you still planning to send updates for this, I consider this quite
+> urgent given that it can break support with some vendors.
 
-configs tested: 53
-configs skipped: 2
+Right, sorry for being a bit slow. I will prepare + email a version 2
+adding a comment that byte 0 being the status is not guaranteed with
+vendor commands right away.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Regards,
 
-gcc tested configs:
-um                             i386_defconfig
-um                           x86_64_defconfig
-i386                                defconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-m68k                             allyesconfig
-x86_64                              defconfig
-i386                             allyesconfig
-i386                          randconfig-a001
-x86_64                           allyesconfig
-x86_64                               rhel-8.3
-i386                          randconfig-a003
-arm                                 defconfig
-x86_64                        randconfig-a004
-i386                          randconfig-a005
-x86_64                        randconfig-a002
-riscv                randconfig-r042-20220810
-powerpc                           allnoconfig
-x86_64                        randconfig-a013
-x86_64                          rhel-8.3-func
-x86_64                        randconfig-a011
-x86_64                         rhel-8.3-kunit
-arc                  randconfig-r043-20220810
-x86_64                        randconfig-a006
-s390                 randconfig-r044-20220810
-x86_64                    rhel-8.3-kselftests
-i386                          randconfig-a014
-arm                              allyesconfig
-x86_64                        randconfig-a015
-powerpc                          allmodconfig
-x86_64                           rhel-8.3-syz
-i386                          randconfig-a012
-mips                             allyesconfig
-arm64                            allyesconfig
-x86_64                           rhel-8.3-kvm
-i386                          randconfig-a016
-sh                               allmodconfig
-ia64                             allmodconfig
+Hans
 
-clang tested configs:
-i386                          randconfig-a002
-i386                          randconfig-a004
-hexagon              randconfig-r041-20220810
-i386                          randconfig-a006
-x86_64                        randconfig-a001
-i386                          randconfig-a013
-x86_64                        randconfig-a016
-i386                          randconfig-a015
-x86_64                        randconfig-a003
-x86_64                        randconfig-a012
-hexagon              randconfig-r045-20220810
-x86_64                        randconfig-a005
-i386                          randconfig-a011
-x86_64                        randconfig-a014
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+
+> 
+>>>         handle_cmd_cnt_and_timer(hdev, ev->ncmd);
+>>>
+>>> --
+>>> 2.37.1
+>>>
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+> 
+> 
+> 
+
