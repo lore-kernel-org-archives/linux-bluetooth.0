@@ -2,199 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D9EC19F2A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 17:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E7EC25B06
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 18:53:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236719AbiHKRWx (ORCPT
+        id S230095AbiHKSxU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 13:22:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53466 "EHLO
+        Thu, 11 Aug 2022 14:53:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236159AbiHKRWP (ORCPT
+        with ESMTP id S236035AbiHKSxT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 13:22:15 -0400
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 999DEAE45;
-        Thu, 11 Aug 2022 10:21:09 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id k26so34672484ejx.5;
-        Thu, 11 Aug 2022 10:21:09 -0700 (PDT)
+        Thu, 11 Aug 2022 14:53:19 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EEB49E10A;
+        Thu, 11 Aug 2022 11:53:17 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id p10so22276081wru.8;
+        Thu, 11 Aug 2022 11:53:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=kZuTb0XGOTxegdvIxstiuNGagHtnJca7Yl4Fn6HCR2U=;
-        b=SP2yV5p++9LMug3fjfrGVmsKvDQ9rh4ZPjL2VNIGKsJ2jUqgQ5DT0/GHk8W+fm4i9H
-         LKtDRuC5tWIM7YEhAtMPAQsE7ItZ7+WUMJi913Y4fr45Ii7+gzOLcDEX1lRH4SldcXss
-         M3qD6lb1grRoNCUQuvbd/DRosE6jCviS31yhVRhVBGP0j6yBK/5rl4Cr2TSzjOq29Frg
-         uC+aTXP5zI2WUQpP7N9D+VCfovB6opEPWXw5WELmLVEMFBy83H2Bg2ZwvCJhfTCLsV1L
-         wBueyUvKzX1/qrbRL22LZPS687iLH8jheOEQGSOELaSqfvvdHID9ed0YhUweIxEq++L7
-         rkRw==
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc;
+        bh=os3g0edKIMTDU2FvQTzWGxtvkNImM/E4AAN0AbFTqTw=;
+        b=MrG+FtNnbmMga73Hd/PQqg2BumDSlAE16w4U9knvpnIhukagSl/JS2/Sj87gDZILKg
+         8yxldD8JZXGYLBv8WFXQMfedTg3X8NetJdz0VNQLK64ChlYb+ShVQDspNq2l2qoqzdGa
+         W/EAqg5YU1REGjYCrslVvYSWn8ihw3UkF1romEI4vd1wcWJXKUNXoRcyAKHTr+3KmWbT
+         T1vFtqQyOLNlWSfSLbtjQuwz9LIx/ihNjUvo/f+15HsMkboLO6G8Kf+hNOW6FKi1YAad
+         /HmmXqf7zW9t3EeX+Xkg+kI+Lf1DSoiE+33Xs/kY2kW0xrVJ12+AC5cpkch3GDyZayjZ
+         CGXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=kZuTb0XGOTxegdvIxstiuNGagHtnJca7Yl4Fn6HCR2U=;
-        b=dMmmr/Xjy9k59D/BdqSoMigvGcdqlfQ68S7slxoT0ZJzb1un+baTX5IBf8oSOkBGbZ
-         182GFG+tls8U1sCRoItSEzq41Esmm0H8TUmNxEkYTUOd+Nd29Vxahmz0+7NPa1hi+IKQ
-         w7ae69D+nBTQRscGhvHqRFrZ1UvjK9cVWVKm52xzqy4cRrxs+qLstdpvBCZD6zKJyjpo
-         VagB2ehx+qXtMRTwA+KvmMGEW0aFtI3sJdoHhaNDWu3OVd36ukEIWTdUFEy2v/FE56qH
-         o9lm/PEINhB66/n+23TRUJyYwQLJUEKn3+rO7T6UORGmWRIL1yQyDG490wWpKDTreDMY
-         YejQ==
-X-Gm-Message-State: ACgBeo2FjgSYZqZF4iYLt45KFtUZSPuLEoJUmKHaLCIPc87CEyHd/IbD
-        s0EgQ3SCtqM2AuyaMwC6AZI/4yaL1ttK0ygUim4B+bUMCQwsiQ==
-X-Google-Smtp-Source: AA6agR52eKD7sHKzXtCUmoyL7gdAJGg4UEwh6k+z0wcVc/BRVJFEw3GI5tA0pxbTraxn+f68wUQdk+cGkuWT/hPug1E=
-X-Received: by 2002:a17:907:a40d:b0:733:17c1:a246 with SMTP id
- sg13-20020a170907a40d00b0073317c1a246mr77077ejc.132.1660238467916; Thu, 11
- Aug 2022 10:21:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220810164627.1.Id730b98f188a504d9835b96ddcbc83d49a70bb36@changeid>
- <CABBYNZLhhdKLqYu-5OWQcHs22aeEJw0tSjVNhgpMCj_ctH+Ldg@mail.gmail.com> <CAJQfnxGOcALAOGQb57bMKfU9qe1jBKXFgnPJhHcoVtSGaVk0zQ@mail.gmail.com>
-In-Reply-To: <CAJQfnxGOcALAOGQb57bMKfU9qe1jBKXFgnPJhHcoVtSGaVk0zQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 11 Aug 2022 10:20:56 -0700
-Message-ID: <CABBYNZJhGgwOSGAUWMcs_aP6uxx5XtTXp2nx_7mobS=vQKt+wQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Honor name resolve evt regardless of discov state
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc;
+        bh=os3g0edKIMTDU2FvQTzWGxtvkNImM/E4AAN0AbFTqTw=;
+        b=RH82arE98mausTHZDsueLz4/CcRREMiHe1IUswRjO89njTnMVZJx045KMhxrmGrqxB
+         Lda75U0Y1S52gW2QH1nZ8e5GMMsb3kIHEfYWgbGVPz2KuD0Hl3Ktu5RxOfPqCqdDZEIs
+         IpDSsdJVuHaP6TVPJxX1Ca/TlhPUqW4MoFLtSFV2NsKQ1pFIKF6/goD4RemUKEoynxIL
+         ur1M5MHxlI+0DR3Cv288/LgY9ARs/DXLWUUv6Q3l3XpGf6awxkw8AMf9wqYxSRBDzZ4L
+         oBze4OnWVBxqMzYYHThpQTJxMpCguM3QZz/6cjO96Q7JZU+Vp1EYwX6RoykiO5O+hvJk
+         py9w==
+X-Gm-Message-State: ACgBeo21D8K7LmAAeqUDDzn5qSHgAnIzxas/h6BaxSlzMienyJV68gGu
+        Xae82eRjQL46VJSvlzEa17c=
+X-Google-Smtp-Source: AA6agR7V0H2RXHPWo9CnZkJvbm8Y5dMdsA/qj59j5RUNvq+GycirdFrtyJ+5HwPDPw4etBnpeFE16g==
+X-Received: by 2002:a5d:548a:0:b0:220:785d:38eb with SMTP id h10-20020a5d548a000000b00220785d38ebmr224065wrv.56.1660243995580;
+        Thu, 11 Aug 2022 11:53:15 -0700 (PDT)
+Received: from debian ([2405:201:8005:8149:e5c9:c0ac:4d82:e94b])
+        by smtp.gmail.com with ESMTPSA id j42-20020a05600c1c2a00b003a30c3d0c9csm8131285wms.8.2022.08.11.11.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Aug 2022 11:53:15 -0700 (PDT)
+Date:   Thu, 11 Aug 2022 19:53:04 +0100
+From:   "Sudip Mukherjee (Codethink)" <sudipm.mukherjee@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Ying Hsu <yinghsu@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Paolo Abeni <pabeni@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-next@vger.kernel.org,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        linux-mips@vger.kernel.org
+Subject: build failure of next-20220811 due to 332f1795ca20 ("Bluetooth:
+ L2CAP: Fix l2cap_global_chan_by_psm regression")
+Message-ID: <YvVQEDs75pxSgxjM@debian>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi All,
 
-On Thu, Aug 11, 2022 at 12:00 AM Archie Pusaka <apusaka@google.com> wrote:
->
-> Hi Luiz,
->
-> On Thu, 11 Aug 2022 at 03:58, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Archie,
-> >
-> > On Wed, Aug 10, 2022 at 1:47 AM Archie Pusaka <apusaka@google.com> wrote:
-> > >
-> > > From: Archie Pusaka <apusaka@chromium.org>
-> > >
-> > > Currently, we don't update the name resolving cache when receiving
-> > > a name resolve event if the discovery phase is not in the resolving
-> > > stage.
-> > >
-> > > However, if the user connect to a device while we are still resolving
-> > > remote name for another device, discovery will be stopped, and because
-> > > we are no longer in the discovery resolving phase, the corresponding
-> > > remote name event will be ignored, and thus the device being resolved
-> > > will stuck in NAME_PENDING state.
-> > >
-> > > If discovery is then restarted and then stopped, this will cause us to
-> > > try cancelling the name resolve of the same device again, which is
-> > > incorrect and might upset the controller.
-> >
-> > Please add the Fixes tag.
->
-> Unfortunately I don't know when was the issue introduced, I don't even
-> know whether this is a recent issue or an old one.
-> Looking back, this part of the code has stayed this way since 2012.
-> Do I still need to add the fixes tag? If so, does it have to be accurate?
+Not sure if it has been reported, builds of csky and mips allmodconfig
+failed to build next-20220811 with gcc-12.
 
-Hmm I thought this was related to some recent changes of RNR, we will
-need to trace back with git blame, note it important to have the fixes
-tag so we can add this change to stable kernels and if that is really
-since 2012 that have this bug it probably even more important since it
-might be applied to more stable versions.
+mips error is:
 
-> >
-> > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > > Reviewed-by: Ying Hsu <yinghsu@chromium.org>
-> > >
-> > > ---
-> > > The following steps are performed:
-> > >     (1) Prepare 2 classic peer devices that needs RNR. Put device A
-> > >         closer to DUT and device B (much) farther from DUT.
-> > >     (2) Remove all cache and previous connection from DUT
-> > >     (3) Put both peers into pairing mode, then start scanning on DUT
-> > >     (4) After ~8 sec, turn off peer B.
-> > >     *This is done so DUT can discover peer B (discovery time is 10s),
-> > >     but it hasn't started RNR. Peer is turned off to buy us the max
-> > >     time in the RNR phase (5s).
-> > >     (5) Immediately as device A is shown on UI, click to connect.
-> > >     *We thus know that the DUT is in the RNR phase and trying to
-> > >     resolve the name of peer B when we initiate connection to peer A.
-> > >     (6) Forget peer A.
-> > >     (7) Restart scan and stop scan.
-> > >     *Before the CL, stop scan is broken because we will try to cancel
-> > >     a nonexistent RNR
-> > >     (8) Restart scan again. Observe DUT can scan normally.
-> > >
-> > >
-> > >  net/bluetooth/hci_event.c | 17 ++++++++++-------
-> > >  1 file changed, 10 insertions(+), 7 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index 395c6479456f..95e145e278c9 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -2453,6 +2453,16 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
-> > >             !test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
-> > >                 mgmt_device_connected(hdev, conn, name, name_len);
-> > >
-> > > +       e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
-> > > +
-> > > +       if (e) {
-> > > +               list_del(&e->list);
-> > > +
-> > > +               e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
-> > > +               mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
-> > > +                                name, name_len);
-> > > +       }
-> > > +
-> > >         if (discov->state == DISCOVERY_STOPPED)
-> > >                 return;
-> > >
-> > > @@ -2462,7 +2472,6 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
-> > >         if (discov->state != DISCOVERY_RESOLVING)
-> > >                 return;
-> > >
-> > > -       e = hci_inquiry_cache_lookup_resolve(hdev, bdaddr, NAME_PENDING);
-> > >         /* If the device was not found in a list of found devices names of which
-> > >          * are pending. there is no need to continue resolving a next name as it
-> > >          * will be done upon receiving another Remote Name Request Complete
-> > > @@ -2470,12 +2479,6 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
-> > >         if (!e)
-> > >                 return;
-> > >
-> > > -       list_del(&e->list);
-> > > -
-> > > -       e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
-> > > -       mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
-> > > -                        name, name_len);
-> > > -
-> > >         if (hci_resolve_next_name(hdev))
-> > >                 return;
-> > >
-> > > --
-> > > 2.37.1.595.g718a3a8f04-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
-> Thanks,
-> Archie
+In function 'memcmp',
+    inlined from 'bacmp' at ./include/net/bluetooth/bluetooth.h:347:9,
+    inlined from 'l2cap_global_chan_by_psm' at net/bluetooth/l2cap_core.c:2003:15:
+./include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+   44 | #define __underlying_memcmp     __builtin_memcmp
+      |                                 ^
+./include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
+  420 |         return __underlying_memcmp(p, q, size);
+      |                ^~~~~~~~~~~~~~~~~~~
+In function 'memcmp',
+    inlined from 'bacmp' at ./include/net/bluetooth/bluetooth.h:347:9,
+    inlined from 'l2cap_global_chan_by_psm' at net/bluetooth/l2cap_core.c:2004:15:
+./include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+   44 | #define __underlying_memcmp     __builtin_memcmp
+      |                                 ^
+./include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
+  420 |         return __underlying_memcmp(p, q, size);
+      |                ^~~~~~~~~~~~~~~~~~~
 
 
+csky error is:
 
--- 
-Luiz Augusto von Dentz
+In file included from net/bluetooth/l2cap_core.c:37:
+In function 'bacmp',
+    inlined from 'l2cap_global_chan_by_psm' at net/bluetooth/l2cap_core.c:2003:15:
+./include/net/bluetooth/bluetooth.h:347:16: error: 'memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+  347 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In function 'bacmp',
+    inlined from 'l2cap_global_chan_by_psm' at net/bluetooth/l2cap_core.c:2004:15:
+./include/net/bluetooth/bluetooth.h:347:16: error: 'memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+  347 |         return memcmp(ba1, ba2, sizeof(bdaddr_t));
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+git bisect pointed to 332f1795ca20 ("Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression").
+And, reverting that commit has fixed the build failure.
+
+I will be happy to test any patch or provide any extra log if needed.
+
+--
+Regards
+Sudip
