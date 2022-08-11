@@ -2,50 +2,53 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41A84C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA79C25B0C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:21:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237435AbiHKQKI (ORCPT
+        id S237747AbiHKQV2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 12:10:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
+        Thu, 11 Aug 2022 12:21:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236420AbiHKQJ2 (ORCPT
+        with ESMTP id S237932AbiHKQVB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 12:09:28 -0400
+        Thu, 11 Aug 2022 12:21:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C15CBC82F;
-        Thu, 11 Aug 2022 08:54:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D62DB02BB;
+        Thu, 11 Aug 2022 09:03:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DD5C861307;
-        Thu, 11 Aug 2022 15:54:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63619C433D6;
-        Thu, 11 Aug 2022 15:54:54 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 374156133A;
+        Thu, 11 Aug 2022 16:03:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CD5DC433B5;
+        Thu, 11 Aug 2022 16:03:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660233296;
-        bh=maXF7ZC6cfIX8ykFNKxGKIZyclT9pJwRfys2ve5K0aU=;
+        s=k20201202; t=1660233800;
+        bh=vXfoFootITy+FkfYy6TFNfHiQJDgV05om3bAiEd/0iU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fRv/uM+LKntc/QYbITHPg0gthbUDbO3bnv5ZbyngDFekwdZF1VhKY/qrGXUPF7u/E
-         IYNPB3O/8iwf2FELMLVqWm8jEWxZTbM5cOmw2IHOgW7TvqCr2EFowQvB3TYrW2mgrN
-         NImaZL8ZsYApZlVYNxV1B9BGjzeMeYS0LVE0vmsnNCh80KIsvKmCcbS/OBOSxlbCVQ
-         W2qv4wxgeGKbUojXtmUeEiB6/5BPpuoc39bw8ZpDllH49DnOB6CW0pkMpOh1nODeGS
-         ue6bVNk+E+AnCyWPwtSB1Ze0TS7zC77Ua6CEsEhRb4a7tjHkNE4kKLwhvWfgM0df60
-         oQ6Vs3zGvU6bA==
+        b=OZP/dmANU5QZwZvd/joT2YZFRQVgB3lJbqvwjLgJXsLpDVa/X69nU9bEuvoXzQnMb
+         SDSP01MS0oJ58fg+Nwxlw1h4EGp87mzreppVWKzmgcaQiypprNAOASqE5UN4uMxpnP
+         lXvna7qeTOpfedg5zu+ekD+iJrNtzt8Nu2REQpi8p/Xe4XbP3iF5Mq7JZXJAo0YHwp
+         KRzabf/2r5VOxenFPk90/y9JxqVpd69mFRvgrNoXs+ZHNX7mnnic8svKzUBLuUIrO9
+         DbkUyrINXcZMDW9qey/X7aLsOhRqZt3Bu7NbmjwMQP3xlltGKBiNqoPCG5RqRit8O4
+         3gjteKigoNqQg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+Cc:     Tamas Koczka <poprdi@google.com>,
+        Aleksandr Nogikh <nogikh@google.com>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.18 80/93] Bluetooth: mgmt: Fix using hci_conn_abort
-Date:   Thu, 11 Aug 2022 11:42:14 -0400
-Message-Id: <20220811154237.1531313-80-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 58/69] Bluetooth: Collect kcov coverage from hci_rx_work
+Date:   Thu, 11 Aug 2022 11:56:07 -0400
+Message-Id: <20220811155632.1536867-58-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220811154237.1531313-1-sashal@kernel.org>
-References: <20220811154237.1531313-1-sashal@kernel.org>
+In-Reply-To: <20220811155632.1536867-1-sashal@kernel.org>
+References: <20220811155632.1536867-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,109 +57,59 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Tamas Koczka <poprdi@google.com>
 
-[ Upstream commit 1f7435c8f6558a94f75b408a74140bdcbd0f6dd1 ]
+[ Upstream commit 9f30de9e0343da05ac621b5817e9b1ce303c6310 ]
 
-This fixes using hci_conn_abort instead of using hci_conn_abort_sync.
+Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_stop()
+calls, so remote KCOV coverage is collected while processing the rx_q
+queue which is the main incoming Bluetooth packet queue.
 
+Coverage is associated with the thread which created the packet skb.
+
+The collected extra coverage helps kernel fuzzing efforts in finding
+vulnerabilities.
+
+This change only has effect if the kernel is compiled with CONFIG_KCOV,
+otherwise kcov_ functions don't do anything.
+
+Signed-off-by: Tamas Koczka <poprdi@google.com>
+Tested-by: Aleksandr Nogikh <nogikh@google.com>
+Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci_sync.h |  2 ++
- net/bluetooth/hci_sync.c         |  3 +--
- net/bluetooth/mgmt.c             | 38 +++++++++++++++++++++++++++++---
- 3 files changed, 38 insertions(+), 5 deletions(-)
+ net/bluetooth/hci_core.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 2492e3b46a8f..544e949b5dbf 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -105,4 +105,6 @@ int hci_resume_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cdca53732304..f4ce6efe3b72 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -29,6 +29,7 @@
+ #include <linux/rfkill.h>
+ #include <linux/debugfs.h>
+ #include <linux/crypto.h>
++#include <linux/kcov.h>
+ #include <linux/property.h>
+ #include <linux/suspend.h>
+ #include <linux/wait.h>
+@@ -5100,7 +5101,14 @@ static void hci_rx_work(struct work_struct *work)
  
- struct hci_conn;
+ 	BT_DBG("%s", hdev->name);
  
-+int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason);
+-	while ((skb = skb_dequeue(&hdev->rx_q))) {
++	/* The kcov_remote functions used for collecting packet parsing
++	 * coverage information from this background thread and associate
++	 * the coverage with the syscall's thread which originally injected
++	 * the packet. This helps fuzzing the kernel.
++	 */
++	for (; (skb = skb_dequeue(&hdev->rx_q)); kcov_remote_stop()) {
++		kcov_remote_start_common(skb_get_kcov_handle(skb));
 +
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 5c352db71819..fc6b91669327 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4404,8 +4404,7 @@ static int hci_reject_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- }
+ 		/* Send copy to monitor */
+ 		hci_send_to_monitor(hdev, skb);
  
--static int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
--			       u8 reason)
-+int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- {
- 	int err;
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ae758ab1b558..5b5bee52e835 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2528,6 +2528,37 @@ static int device_unpaired(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			  skip_sk);
- }
- 
-+static void unpair_device_complete(struct hci_dev *hdev, void *data, int err)
-+{
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_unpair_device *cp = cmd->param;
-+
-+	if (!err)
-+		device_unpaired(hdev, &cp->addr.bdaddr, cp->addr.type, cmd->sk);
-+
-+	cmd->cmd_complete(cmd, err);
-+	mgmt_pending_free(cmd);
-+}
-+
-+static int unpair_device_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_unpair_device *cp = cmd->param;
-+	struct hci_conn *conn;
-+
-+	if (cp->addr.type == BDADDR_BREDR)
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-+					       &cp->addr.bdaddr);
-+	else
-+		conn = hci_conn_hash_lookup_le(hdev, &cp->addr.bdaddr,
-+					       le_addr_type(cp->addr.type));
-+
-+	if (!conn)
-+		return 0;
-+
-+	return hci_abort_conn_sync(hdev, conn, HCI_ERROR_REMOTE_USER_TERM);
-+}
-+
- static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 			 u16 len)
- {
-@@ -2638,7 +2669,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		goto unlock;
- 	}
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_UNPAIR_DEVICE, hdev, cp,
-+	cmd = mgmt_pending_new(sk, MGMT_OP_UNPAIR_DEVICE, hdev, cp,
- 			       sizeof(*cp));
- 	if (!cmd) {
- 		err = -ENOMEM;
-@@ -2647,9 +2678,10 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	cmd->cmd_complete = addr_cmd_complete;
- 
--	err = hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+	err = hci_cmd_sync_queue(hdev, unpair_device_sync, cmd,
-+				 unpair_device_complete);
- 	if (err < 0)
--		mgmt_pending_remove(cmd);
-+		mgmt_pending_free(cmd);
- 
- unlock:
- 	hci_dev_unlock(hdev);
 -- 
 2.35.1
 
