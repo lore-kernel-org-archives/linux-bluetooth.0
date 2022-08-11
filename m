@@ -2,80 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 574E4C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 20:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE697C19F2A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 21:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235678AbiHKUhK (ORCPT
+        id S235580AbiHKVD0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 16:37:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42492 "EHLO
+        Thu, 11 Aug 2022 17:03:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiHKUhI (ORCPT
+        with ESMTP id S234075AbiHKVDY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 16:37:08 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EF8C95AF7;
-        Thu, 11 Aug 2022 13:37:08 -0700 (PDT)
+        Thu, 11 Aug 2022 17:03:24 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB0271723
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 14:03:23 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id A0FFECE2210;
-        Thu, 11 Aug 2022 20:37:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53367C433C1;
-        Thu, 11 Aug 2022 20:37:04 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B78761316
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 21:03:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74DADC433B5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 21:03:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660250224;
-        bh=iAHSIcwc9lbNY2SNrS1flvARRGdNR3L+I0y3PoflCcI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=HMjG+IDKqiprCA8C+eGLm7H7/UfNH7v7if4AvU6pWjH8Zo5AXbGeyAmrCYLv/FjJU
-         btx354rFfR3j4/k4qFoanNIdC198ZccrwpuH8cijfn5l0iWk5eHSvz/vWcTl2eqLrj
-         Vx0MBtPgwt163EyamiO2U0jbNZbIEnIa61fV7lHisOINxgxE6EpzceIe+B04Q20Hpz
-         kJoxm5W9sobbU+QIke9mz3rIp1Qt3161bilb54A01bDeE0lWUsDxohzKYCz98pIoMa
-         ndVaG0UJFntMQhdI78IeHdzCw9HinC6CyTbfK7EfyiOHZ/yZj4QGYbhrqqqMOuVpGC
-         CN/HHmR/Pyslw==
-Date:   Thu, 11 Aug 2022 13:37:03 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "Sudip Mukherjee (Codethink)" <sudipm.mukherjee@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        linux-next@vger.kernel.org,
-        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-        linux-mips@vger.kernel.org
-Subject: Re: build failure of next-20220811 due to 332f1795ca20 ("Bluetooth:
- L2CAP: Fix l2cap_global_chan_by_psm regression")
-Message-ID: <20220811133703.30fb948e@kernel.org>
-In-Reply-To: <CABBYNZKxM5Z2CUah1EB2uUDs=gEgDbrK0B9gbxeoyvtL6g=4+w@mail.gmail.com>
-References: <YvVQEDs75pxSgxjM@debian>
-        <20220811124637.4cdb84f1@kernel.org>
-        <CABBYNZKxM5Z2CUah1EB2uUDs=gEgDbrK0B9gbxeoyvtL6g=4+w@mail.gmail.com>
+        s=k20201202; t=1660251802;
+        bh=WJgt+YwTKm3orxFYbESNImuyLQy+fPGNeo/UP513Xo4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=CCrbOS+RtyxoJqZ9HoeyC16oTrjd3WGuZo0mpp7IW2vdNl9EQoeLTfN+izF3fW401
+         a1487gesERlL3eBpNw6zbahnKzRp38W9fAerYmf+NWfrnHDjkvHJFXCLh5JF10skSD
+         FpXksdiH4cqFY/4dELMF9ZhwcSiKZ5O8zFdxAf6ry2Al/1B18gudT2w5H6bJFKsEj+
+         2PgKeoOg34zmp6IGGjAui+PwbJsakF/pTfjpMcXrk0/BJ6Cf9enojqzwFphtl7IL7s
+         gDc3FOPrER8vqM2WNxsEQOD49KdlW9P/4sllT3UimPjn6TE6L2ZQ3F97yx0SNjD++y
+         BjzWc68eLedFw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 5D751C433E4; Thu, 11 Aug 2022 21:03:22 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216352] [BISECTED] 250 ms system suspend performance regression
+Date:   Thu, 11 Aug 2022 21:03:22 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216352-62941-agImlnZFPi@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216352-62941@https.bugzilla.kernel.org/>
+References: <bug-216352-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 11 Aug 2022 13:20:52 -0700 Luiz Augusto von Dentz wrote:
-> > +static inline int ba_is_any(const bdaddr_t *ba)
-> > +{
-> > +       return memchr_inv(ba, sizeof(*ba), 0);
-> > +}  
-> 
-> So we can't use something like BDADDR_ANY to compare? Anyway afaik
-> these were already present before the patch so I do wonder what had
-> trigger it show now or perhaps it was being suppressed before and
-> since we change it now start showing again?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216352
 
-Yeah, I mentioned that in my previous reply as well, a quick grep
-counts 70 instances, IDK what makes the l2cap code different :S
-Then again I don't know how the compiler deals with passing a pointer
-to a constant to an inline function.... so I figured memchr_inv()
-could help us avoid hitting compiler bugs.
+--- Comment #4 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+(In reply to Len Brown from comment #3)
+> Comparing the attached sleepgraph output of 5.19 to 5.19-rc8...
+>=20
+> acpi_ps_execute_method(PCI.XHC._PS0) plus
+> msleep 120
+> msleep 40
+> msleep 40
+> msleep 10
+>=20
+> have, as a group, shifted left from the suspend phase,
+> where they used to overlap with other tasks,
+> into the suspend_prepare phase, where they are the
+> slowest operation.
+
+We can probably return to the way it was if we detect the event mask needs
+updating or not by checking if there is any connections, anyway if you atte=
+mpt
+to suspend while there is a bluetooth connection this extra latency would
+probably reappear since in that case we need to update the event mask in or=
+der
+to not wakeup the system by events such Disconnect Complete, not sure if th=
+is
+is acceptable or perhaps the root cause is that notifiers are serialized so
+while these commands are pending it prevents other notifiers to be run?
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
