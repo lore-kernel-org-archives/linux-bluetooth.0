@@ -2,53 +2,53 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3AEEC25B06
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 378B2C25B0D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:32:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238210AbiHKQ1y (ORCPT
+        id S238472AbiHKQcb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 12:27:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44592 "EHLO
+        Thu, 11 Aug 2022 12:32:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238090AbiHKQ0c (ORCPT
+        with ESMTP id S238505AbiHKQaF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 12:26:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9B229A953;
-        Thu, 11 Aug 2022 09:08:02 -0700 (PDT)
+        Thu, 11 Aug 2022 12:30:05 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9914DB56EF;
+        Thu, 11 Aug 2022 09:09:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6822FB821A0;
-        Thu, 11 Aug 2022 16:08:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFA6C433C1;
-        Thu, 11 Aug 2022 16:07:58 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 36E816144D;
+        Thu, 11 Aug 2022 16:09:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A4E5C433B5;
+        Thu, 11 Aug 2022 16:09:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660234080;
-        bh=Uy+4mh7fq5s/fkmzB0vZON08Xp1y4tR+XeLs68k/4ZE=;
+        s=k20201202; t=1660234173;
+        bh=MmYKNfMEFjoJY8J/61fcKI9hw6iqnOw64iIDCkSxvlM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rKGMx557PRQ8VUNtlP0T1tdMLyFYPZzo2oxwTU5jqv8dk4UvOZ0+5ugf4rI2yEGAY
-         WP5q3nYAU4cCRHBWEbnSZLHVY22dt+CZiwZi8zvTUTOVIJy73PaHefa6Z/erYjpgvy
-         /9dZ/TOGRe/etS6elHwV2unApoGSUhaMhivHuj9k0waTkrY3+K4sqkO0REQmiqvC9j
-         OqMrlv1jLxu2iuDBmCGePfk4asmnaIMiMBJLj8Wr10Y9SuR+cY3hXH7Nwghx+3B4gX
-         ZPALuizdwPvTKF96vFXA7u2aW4530Ezxy5rF79TJdHH7UgDQKYhG+0sLcAITwuf2GX
-         SLzR3y00dtOZg==
+        b=CHXacPQ+hbRsQ9kUOE8RgElRTQELSPAs9xHUUWYvY2UzP+e0oBJBgSDFvsW8wMngD
+         lv/oeByXUAcW4/d4IBb1Tg7bdZByFrqBDBmcYOlXMatxgv6j3h45eVclb3sdpNtemc
+         w4ppfN49tAjqv75lNioobCeg7s1MJxCs1UCYY9/FeZrJIbbj89GzGvXw3wOvW7/JV/
+         p2Uj7Av20obGIHV03iVERH4zd3wUQ7dymJqD1+gKQkj/IX1LCwRixki2VwJPCdpuFV
+         3f0W4LV8NXg0OhWCksSZ++cmcKp62BDHR74MKe9W4Jhn+wDXu3KNVTQe3urZFJpSvb
+         +fQZK1u0crAVw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tamas Koczka <poprdi@google.com>,
-        Aleksandr Nogikh <nogikh@google.com>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+Cc:     Xiaohui Zhang <xiaohuizhang@ruc.edu.cn>,
+        Zeal Robot <zealci@zte.com.cn>,
+        Minghao Chi <chi.minghao@zte.com.cn>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 39/46] Bluetooth: Collect kcov coverage from hci_rx_work
-Date:   Thu, 11 Aug 2022 12:04:03 -0400
-Message-Id: <20220811160421.1539956-39-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 21/25] Bluetooth: use memset avoid memory leaks
+Date:   Thu, 11 Aug 2022 12:08:16 -0400
+Message-Id: <20220811160826.1541971-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220811160421.1539956-1-sashal@kernel.org>
-References: <20220811160421.1539956-1-sashal@kernel.org>
+In-Reply-To: <20220811160826.1541971-1-sashal@kernel.org>
+References: <20220811160826.1541971-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -57,59 +57,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tamas Koczka <poprdi@google.com>
+From: Xiaohui Zhang <xiaohuizhang@ruc.edu.cn>
 
-[ Upstream commit 9f30de9e0343da05ac621b5817e9b1ce303c6310 ]
+[ Upstream commit d3715b2333e9a21692ba16ef8645eda584a9515d ]
 
-Annotate hci_rx_work() with kcov_remote_start() and kcov_remote_stop()
-calls, so remote KCOV coverage is collected while processing the rx_q
-queue which is the main incoming Bluetooth packet queue.
+Use memset to initialize structs to prevent memory leaks
+in l2cap_ecred_connect
 
-Coverage is associated with the thread which created the packet skb.
-
-The collected extra coverage helps kernel fuzzing efforts in finding
-vulnerabilities.
-
-This change only has effect if the kernel is compiled with CONFIG_KCOV,
-otherwise kcov_ functions don't do anything.
-
-Signed-off-by: Tamas Koczka <poprdi@google.com>
-Tested-by: Aleksandr Nogikh <nogikh@google.com>
-Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Minghao Chi (CGEL ZTE) <chi.minghao@zte.com.cn>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_core.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2cb0cf035476..2661a2a7937b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -29,6 +29,7 @@
- #include <linux/rfkill.h>
- #include <linux/debugfs.h>
- #include <linux/crypto.h>
-+#include <linux/kcov.h>
- #include <linux/property.h>
- #include <linux/suspend.h>
- #include <linux/wait.h>
-@@ -4909,7 +4910,14 @@ static void hci_rx_work(struct work_struct *work)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 959a16b13303..aef4d172c0d5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1298,6 +1298,7 @@ static void l2cap_le_connect(struct l2cap_chan *chan)
  
- 	BT_DBG("%s", hdev->name);
+ 	l2cap_le_flowctl_init(chan, 0);
  
--	while ((skb = skb_dequeue(&hdev->rx_q))) {
-+	/* The kcov_remote functions used for collecting packet parsing
-+	 * coverage information from this background thread and associate
-+	 * the coverage with the syscall's thread which originally injected
-+	 * the packet. This helps fuzzing the kernel.
-+	 */
-+	for (; (skb = skb_dequeue(&hdev->rx_q)); kcov_remote_stop()) {
-+		kcov_remote_start_common(skb_get_kcov_handle(skb));
-+
- 		/* Send copy to monitor */
- 		hci_send_to_monitor(hdev, skb);
- 
++	memset(&req, 0, sizeof(req));
+ 	req.psm     = chan->psm;
+ 	req.scid    = cpu_to_le16(chan->scid);
+ 	req.mtu     = cpu_to_le16(chan->imtu);
 -- 
 2.35.1
 
