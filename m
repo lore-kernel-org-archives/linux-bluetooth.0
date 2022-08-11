@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A3BC25B0C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD221C25B0C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Aug 2022 16:27:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237736AbiHKQV1 (ORCPT
+        id S238266AbiHKQ1w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Aug 2022 12:21:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58852 "EHLO
+        Thu, 11 Aug 2022 12:27:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237920AbiHKQVA (ORCPT
+        with ESMTP id S238086AbiHKQ0b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Aug 2022 12:21:00 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E579BB;
-        Thu, 11 Aug 2022 09:03:18 -0700 (PDT)
+        Thu, 11 Aug 2022 12:26:31 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEB879F746;
+        Thu, 11 Aug 2022 09:07:58 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9FFFC60F39;
-        Thu, 11 Aug 2022 16:03:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8F4DC433D7;
-        Thu, 11 Aug 2022 16:03:15 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6C1E16141C;
+        Thu, 11 Aug 2022 16:07:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDFC3C433C1;
+        Thu, 11 Aug 2022 16:07:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660233797;
-        bh=NHZkDWIppWCFgepKcwAm4NLb/+JS8+8akS4caoN3QDM=;
+        s=k20201202; t=1660234077;
+        bh=NkubZo0iuIEQ73DnsM8xDQ7qZoOJxp9SYFv4homoy7M=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cKHuBsDr23Xbk9p8gvi1QuMMCjehUg7sUiUrH4n+/KxYI9s/dqnihbOaWSSef2EET
-         cM8IguDXRa038jdbqG6IqtTCQE0f2gXRkmI1IzrnW+FMe34L0bSjnTeqgQb6VFHIfL
-         /6raXlNZuBfWj6T8Ip9eHJ9GHf1JKyHOnVj/ZE1mUyoEOd/BzFTacK0fjMhweUcILg
-         /abir0BuL6CHyMe7poO9oNz7aOGEW7PNqoIpdlurWtE7yF7TyTwcFwPwDgOMvvwXO2
-         rkt+jQwF4BaOu+pqXMnhE3EeP0utalLgAF4GQhtwPmtM4v4ko3uRRTqOP8h1WJjb/4
-         MpJFOQBfA48ng==
+        b=JikCspoQKL1PqVRzOY5hZr9Q5oeE+U/f/VIYFjqqDfmP7fiBdDEIKGG0IgVYqps9L
+         vwEmSYp3mjVSkMA+UgbQ3uP751hv0cEfTLqgSpdQx07bl4ngeLT/3CpPsL7s+JBV1H
+         8my/9s+23e0E098p04fYlqibhuag3FtM3+bDgdhA+EekRo6Ua93/pHC1QpcSHZewOG
+         L+F3JQkQ+AnCTr9gWOIPHoxp/JG5hsPvRfEj5rVoP2kdGe/PVI4cocHVy199P5tIVq
+         BkHatS0HOmKzoyWvh0I6XF7LHS8qNA9/o4uaR5Ck+ouqQ6ksuHLqS4snbFLaG7/xwG
+         GuydMMxu/kIJg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
@@ -40,12 +40,12 @@ Cc:     Ahmad Fatoum <a.fatoum@pengutronix.de>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 57/69] Bluetooth: hci_bcm: Add BCM4349B1 variant
-Date:   Thu, 11 Aug 2022 11:56:06 -0400
-Message-Id: <20220811155632.1536867-57-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 38/46] Bluetooth: hci_bcm: Add BCM4349B1 variant
+Date:   Thu, 11 Aug 2022 12:04:02 -0400
+Message-Id: <20220811160421.1539956-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220811155632.1536867-1-sashal@kernel.org>
-References: <20220811155632.1536867-1-sashal@kernel.org>
+In-Reply-To: <20220811160421.1539956-1-sashal@kernel.org>
+References: <20220811160421.1539956-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+)
 
 diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-index d9ceca7a7935..a18f289d7346 100644
+index 1b9743b7f2ef..d263eac784da 100644
 --- a/drivers/bluetooth/btbcm.c
 +++ b/drivers/bluetooth/btbcm.c
-@@ -453,6 +453,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
+@@ -401,6 +401,8 @@ static const struct bcm_subver_table bcm_uart_subver_table[] = {
  	{ 0x6606, "BCM4345C5"	},	/* 003.006.006 */
  	{ 0x230f, "BCM4356A2"	},	/* 001.003.015 */
  	{ 0x220e, "BCM20702A1"  },	/* 001.002.014 */
@@ -89,10 +89,10 @@ index d9ceca7a7935..a18f289d7346 100644
  	{ 0x6106, "BCM4359C0"	},	/* 003.001.006 */
  	{ 0x4106, "BCM4335A0"	},	/* 002.001.006 */
 diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index 7abf99f0ee39..b47a31bd2e9b 100644
+index 259a643377c2..574f84708859 100644
 --- a/drivers/bluetooth/hci_bcm.c
 +++ b/drivers/bluetooth/hci_bcm.c
-@@ -1515,6 +1515,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+@@ -1489,6 +1489,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
  	{ .compatible = "brcm,bcm4345c5" },
  	{ .compatible = "brcm,bcm4330-bt" },
  	{ .compatible = "brcm,bcm43438-bt", .data = &bcm43438_device_data },
