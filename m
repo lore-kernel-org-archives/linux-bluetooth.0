@@ -2,229 +2,190 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E2DC00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Aug 2022 12:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4317EC00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Aug 2022 18:08:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237853AbiHLMdx (ORCPT
+        id S239135AbiHLSIv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Aug 2022 08:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48226 "EHLO
+        Fri, 12 Aug 2022 14:08:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229739AbiHLMdw (ORCPT
+        with ESMTP id S238865AbiHLSIu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Aug 2022 08:33:52 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19415AA4D2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 05:33:51 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220812123349euoutp011d6f62b8218827d58c2aa49f0eed0ef3~KmP4JamQe0540505405euoutp01R
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 12:33:49 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220812123349euoutp011d6f62b8218827d58c2aa49f0eed0ef3~KmP4JamQe0540505405euoutp01R
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1660307629;
-        bh=hego0GX04vKxA4IkBlOi9+x4/gSomDQJK+HigYPIKhI=;
-        h=Date:Subject:To:Cc:From:In-Reply-To:References:From;
-        b=RzutNwRO0wXiT6wsNDdjwsFi0YO5NZTELJ+OIXsmOhXlPVVzyV+J4ohOPBp0EnHCr
-         alJnNwynUIUb+GgoZfXDrV38WPJnWj78oSHXW2owM1OjtLDprJTe8FrzGSIXW6hC4h
-         VXxLPgA6jlHCYubIHcfZ49UR/pDNJQJwbaVPbmmI=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220812123349eucas1p1f685477424ee9312831fca685033a514~KmP3-bwy90444504445eucas1p1o;
-        Fri, 12 Aug 2022 12:33:49 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id E7.BE.09664.DA846F26; Fri, 12
-        Aug 2022 13:33:49 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220812123348eucas1p10a9fae0f49e7ee3f4788a965ffcc64c2~KmP3pgkXp0444504445eucas1p1n;
-        Fri, 12 Aug 2022 12:33:48 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220812123348eusmtrp24b719c8a7966c26f4f4f2db83a790226~KmP3o8zdy0591705917eusmtrp2_;
-        Fri, 12 Aug 2022 12:33:48 +0000 (GMT)
-X-AuditID: cbfec7f2-d97ff700000025c0-5c-62f648ad4473
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 5C.7C.09095.CA846F26; Fri, 12
-        Aug 2022 13:33:48 +0100 (BST)
-Received: from [106.210.134.192] (unknown [106.210.134.192]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220812123348eusmtip282eb85047beefa40b065de64d458035e~KmP3aCjqo1993119931eusmtip2K;
-        Fri, 12 Aug 2022 12:33:48 +0000 (GMT)
-Message-ID: <92a47171-f69b-5bf9-6e8c-70fc3e9e6eee@samsung.com>
-Date:   Fri, 12 Aug 2022 14:33:48 +0200
+        Fri, 12 Aug 2022 14:08:50 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F62B287F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 11:08:49 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id z6so2326212lfu.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 11:08:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=33TnQ81T2VdsnhMA79M0fVoW35zOzD91LpU/CW8o2lc=;
+        b=Mf6brwJtVqh4+hKLwlIIi/x6EyyMElRPjgRcz40Ybe5Sl924cR6zjKXgxrWdvjcUNh
+         Z8s4Kx3z5wek5GXEI4drviH5242/RSdHvSycFJ1DEHXRh9Fjsm+1Bi7CX5l7ZZYbT5J0
+         o4uSaAoPLjOw8Q+7laCeE+/ZcJ/ari4hYNgfmIujWA2tEzYwQNDRyEWCjPNMQAPu2Mpv
+         /QC4luSGCTX1hhv3J/h+UhS198xe28Vj/oc9/1Cma4RxJjitx4VkdQ4+jAjjcR+gkOxb
+         GKbJevXHi0GJ3hy12fyblAbwN21ln+5x7phJ3/XxvKEfWjiBQ15vuDhxp+XJJCyQflkI
+         ScyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=33TnQ81T2VdsnhMA79M0fVoW35zOzD91LpU/CW8o2lc=;
+        b=ZRT4va+c/H2KvZN52yF7b/CUEvbpZjl0WP2YXwN8hqsrcbxThZR/TJM7c6Tr6WrGxo
+         6XpRa2OR15FFJpIvldHZC4slt7ddoTFdojJ6OcNNRdNXU83fGSB2ilALjIkU8BWR2puS
+         CCvJwMQZrIeDZNY7LK9p+NjBxaSvO4/GQUFyLMrQvGW1bkddYzYvJVU9cxFXJ8m8gYfm
+         DyiKaFGMUYVl8mwrHdgKv7pN+J/mxcG1MdoPlBDz2Mit9J6o6AyHrG+/c6T7kDUr0ado
+         jy8z+CQeHWB8JEwnEGP0Isd3m+E4CEEJAAWmLonKu1KQPMm6pnR4O7fn+g7K4lfha9pl
+         CoZA==
+X-Gm-Message-State: ACgBeo0ZZcsNU2gC/cvvXf1x2r5bKiomvrRuLFNdl/HHB0V7O0JfZWu/
+        zC6cZ3pJniBb5iqFquItK3YVkmL0+s0b3OQyfekwi2PhUXgFk7X4v/8=
+X-Google-Smtp-Source: AA6agR5Sbp/VFbEBOamqdTRGRtiABMFnqJ/d0Bhq+tioHvt3jdepeAPRd5DOsg2VRts5iDKpF8hO/+Brk8vFEWO54aE=
+X-Received: by 2002:a05:6512:3fa8:b0:48c:ffd1:625d with SMTP id
+ x40-20020a0565123fa800b0048cffd1625dmr1513096lfa.251.1660327727317; Fri, 12
+ Aug 2022 11:08:47 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
-        Gecko/20100101 Thunderbird/91.12.0
-Subject: Re: [PATCH v7 2/7] Bluetooth: Add initial implementation of CIS
- connections
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From:   Marek Szyprowski <m.szyprowski@samsung.com>
-In-Reply-To: <CABBYNZ+vRqqCBVTgQJ-UZ+gd2ceFebQF94NDdYcN4Xmyk+GWTA@mail.gmail.com>
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPIsWRmVeSWpSXmKPExsWy7djPc7prPb4lGSz5zmMx51ofs8XTz1NY
-        HZg8ds66y+7xeZNcAFMUl01Kak5mWWqRvl0CV8bHFceZCvapVfz+M4e9gfG9bBcjJ4eEgInE
-        hyuNrCC2kMAKRomTN9y7GLmA7C+MEmcP32OCSHxmlNjynxWmYeXeN2wQ8eWMEs2X4yAaPjJK
-        9Gx9xAKS4BWwk7jVu5oZxGYRUJX4sLWfHSIuKHFy5hOwGlGBZIln/xeDxYUFwiS+X/8FZjML
-        iEvcejIfaDEHh4iAocS3CzEQYXeJ/fO/grWyAYW73naB3cApECjx89xlNogaeYntb+cwQ9w5
-        l0Pi0GNxCNtFYsXPB1BxYYlXx7ewQ9gyEv93QqySEMiX+DvDGCJcIXHt9RqocmuJO+d+sYGU
-        MAtoSqzfpQ8RdpS4ufsiC0Qnn8SNt4IQB/BJTNo2nRkizCvR0SYEUa0mMev4OridBy9cYp7A
-        qDQLKURmIfl8FpJXZiHsXcDIsopRPLW0ODc9tdgwL7Vcrzgxt7g0L10vOT93EyMwTZz+d/zT
-        Dsa5rz7qHWJk4mA8xCjBwawkwlu26HOSEG9KYmVValF+fFFpTmrxIUZpDhYlcd7kzA2JQgLp
-        iSWp2ampBalFMFkmDk6pBiZb5moGptqzRxVfPPSY+3BxrZfD/XD+OMmZRR/Ns86FcB+/wnXt
-        WITANQ2J0GuPmfmv7rNfIuJwdPIjjZT2/XMuWqzaOGl+tOlaC//QbetTfqlu7dm/u9vlvS7r
-        1basqtkHqk7EtAVrZaSY6HBYCeju2pgf7nEy88ylX7v95d8XrxU88l8idYmr6Lm3oU0BAevK
-        ZztcdT7J4Jrsc59NUePCeXFW9X/LbwQGZ5ZPPbkrUzRy0clGmW875TNPP2/+cvTjc8ZErkOi
-        d870RjqlHVs5xeimwAv7/ReKlA9efcHlavzW8N1/Rb0aE6kzYi93TIrzLzvU/TTd9dx5kZln
-        7rpNYujo8rH+F3XN4Z/An6tKLMUZiYZazEXFiQB6hrijggMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpnkeLIzCtJLcpLzFFi42I5/e/4Pd01Ht+SDD4cN7WYc62P2eLp5yms
-        DkweO2fdZff4vEkugClKz6Yov7QkVSEjv7jEVina0MJIz9DSQs/IxFLP0Ng81srIVEnfziYl
-        NSezLLVI3y5BL+PjiuNMBfvUKn7/mcPewPhetouRk0NCwERi5d43bF2MXBxCAksZJd48ncwG
-        kZCRODmtgRXCFpb4c60Lqug9o8TW/dvAErwCdhK3elczg9gsAqoSH7b2s0PEBSVOznzCAmKL
-        CiRLLDi0FMwWFgiT+H79F1gNs4C4xK0n85m6GDk4RAQMJb5diIEIu0vsn/8VrFxIYCezxPG7
-        USA2G1BJ19susNs4BQIlfp67zAZRbybRtbWLEcKWl9j+dg7zBEahWUiumIVk2ywkLbOQtCxg
-        ZFnFKJJaWpybnltsqFecmFtcmpeul5yfu4kRGCPbjv3cvINx3quPeocYmTgYDzFKcDArifCW
-        LfqcJMSbklhZlVqUH19UmpNafIjRFBgUE5mlRJPzgVGaVxJvaGZgamhiZmlgamlmrCTO61nQ
-        kSgkkJ5YkpqdmlqQWgTTx8TBKdXAxLM5wn/mpKXq3laiuRryDauXnjI2EXxv5jonLzFpWsvK
-        fVv367a5Bt/y3/zNOiDoWsROYaYsGf9NJSv39D4WWZ6095rr8UC1mPd3/HQLTPf/3vzO+2vd
-        1ORj3odFj6W2GjXPDMvZ9K73YO/PWq8F095Pqb8+Ny2tvuY4X8MurxKGQql9LxW+c81VtDP6
-        UrNB5E2ylvOPvP8TTRfcWdVzLv5CwrYp80N8Hm+fMu3ZOg2GkJB3l7mFdOZOjn9f+Oqc7VaR
-        amZ9p1JN1eS9+nEFLoIvla2Oej6NC3gy9cbq44tLs+84zCvbdjyn/7rnjK8Nru/v1D/omNSf
-        OUkhIbHy32d56YnSn097vV+R5ny6X4mlOCPRUIu5qDgRABipkooaAwAA
-X-CMS-MailID: 20220812123348eucas1p10a9fae0f49e7ee3f4788a965ffcc64c2
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab
-References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
-        <CGME20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab@eucas1p1.samsung.com>
-        <20220711233535.3134546-2-luiz.dentz@gmail.com>
-        <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
-        <CABBYNZLsR0KT1-OVVjnUzLp0+U0eHGi0PNqKbfntp_5AHNDawA@mail.gmail.com>
-        <03f9bea9-77fb-2b57-43d0-c4b819c2560a@samsung.com>
-        <CABBYNZ+vRqqCBVTgQJ-UZ+gd2ceFebQF94NDdYcN4Xmyk+GWTA@mail.gmail.com>
+References: <20220812055249.8037-1-palmer@rivosinc.com> <62f5fda0.050a0220.ebb71.24fe@mx.google.com>
+In-Reply-To: <62f5fda0.050a0220.ebb71.24fe@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 12 Aug 2022 11:08:35 -0700
+Message-ID: <CABBYNZJ-E=FsayEzmpaYMDm5wz-Toba7fPrXHnqd56vEH84fTQ@mail.gmail.com>
+Subject: Re: Bluetooth: L2CAP: Elide a string overflow warning
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     palmer@rivosinc.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Palmer,
 
-On 10.08.2022 22:04, Luiz Augusto von Dentz wrote:
-> Hi Marek,
+On Fri, Aug 12, 2022 at 12:19 AM <bluez.test.bot@gmail.com> wrote:
 >
-> On Wed, Aug 10, 2022 at 7:18 AM Marek Szyprowski
-> <m.szyprowski@samsung.com> wrote:
->> Hi Luiz,
->>
->> On 09.08.2022 21:24, Luiz Augusto von Dentz wrote:
->>> On Tue, Aug 9, 2022 at 1:55 AM Marek Szyprowski
->>> <m.szyprowski@samsung.com>  wrote:
->>>> On 12.07.2022 01:35, Luiz Augusto von Dentz wrote:
->>>>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
->>>>>
->>>>> This adds the initial implementation of CIS connections and introduces
->>>>> the ISO packets/links.
->>>>>
->>>>> == Central: Set CIG Parameters, create a CIS and Setup Data Path ==
->>>>>
->>>>>> tools/isotest -s <address>
->>>>> < HCI Command: LE Extended Create... (0x08|0x0043) plen 26
->>>>> ...
->>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>          LE Extended Create Connection (0x08|0x0043) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>> HCI Event: LE Meta Event (0x3e) plen 31
->>>>>          LE Enhanced Connection Complete (0x0a)
->>>>>          ...
->>>>> < HCI Command: LE Create Connected... (0x08|0x0064) plen 5
->>>>> ...
->>>>>> HCI Event: Command Status (0x0f) plen 4
->>>>>          LE Create Connected Isochronous Stream (0x08|0x0064) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>> HCI Event: LE Meta Event (0x3e) plen 29
->>>>>          LE Connected Isochronous Stream Established (0x19)
->>>>>          ...
->>>>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
->>>>> ...
->>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>            Handle: 257
->>>>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
->>>>> ...
->>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>            Handle: 257
->>>>>
->>>>> == Peripheral: Accept CIS and Setup Data Path ==
->>>>>
->>>>>> tools/isotest -d
->>>>>     HCI Event: LE Meta Event (0x3e) plen 7
->>>>>          LE Connected Isochronous Stream Request (0x1a)
->>>>> ...
->>>>> < HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
->>>>> ...
->>>>>> HCI Event: LE Meta Event (0x3e) plen 29
->>>>>          LE Connected Isochronous Stream Established (0x19)
->>>>> ...
->>>>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
->>>>> ...
->>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>            Handle: 257
->>>>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
->>>>> ...
->>>>>> HCI Event: Command Complete (0x0e) plen 6
->>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
->>>>>            Status: Success (0x00)
->>>>>            Handle: 257
->>>>>
->>>>> Signed-off-by: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
->>>> This patch landed recently in linux-next as commit 26afbd826ee3
->>>> ("Bluetooth: Add initial implementation of CIS connections").
->>>> Unfortunately it causes a regression on my test systems. On almost all
->>>> I've observed that calling a simple 'hcitool scan' command in a shell
->>>> fails in an unexpected way:
->>>>
->>>> $ hcitool scan
->>>> *** stack smashing detected ***: <unknown> terminated
->>>> Aborted
->>> Not really sure how it would be related to ISO changes though, have
->>> you even enabled ISO sockets UUID? Perhaps check if there is something
->>> on dmesg indicating what is going on since I tried here and that
->>> doesn't seem to cause any problem:
->>>
->>> tools/hcitool scan
->>> Scanning ...
->>>
->>> Perhaps it is a combination of using old userspace tools with new
->>> kernel, but then again these changes should affect something like
->>> hcitool.
->> Indeed my userspace is old, but still, the kernel changes shouldn't make
->> it to crash. I didn't change anything in userspace since ages, so I
->> assume that ISO sockets UUIDs are not enabled. Maybe it is somehow
->> architecture related or specific? It looks that only ARM 32bit userspace
->> apps crashes. I've just checked 64bit userspace on ARM64 (RPi4) and it
->> works fine with that commit.
-> That would be the first time it happens to me that a change in kernel
-> would crash the userspace in such odd fashion, btw perhaps run with
-> valgrind so it generates a backtrace of where it would be crashing,
-> well if that is reproducible with valgrind.
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667062
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      1.60 seconds
+> GitLint                       FAIL      1.01 seconds
+> SubjectPrefix                 PASS      0.84 seconds
+> BuildKernel                   PASS      41.49 seconds
+> BuildKernel32                 PASS      34.89 seconds
+> Incremental Build with patchesPASS      50.21 seconds
+> TestRunner: Setup             PASS      605.56 seconds
+> TestRunner: l2cap-tester      PASS      20.02 seconds
+> TestRunner: bnep-tester       PASS      8.10 seconds
+> TestRunner: mgmt-tester       PASS      122.17 seconds
+> TestRunner: rfcomm-tester     PASS      11.73 seconds
+> TestRunner: sco-tester        PASS      11.48 seconds
+> TestRunner: smp-tester        PASS      12.14 seconds
+> TestRunner: userchan-tester   PASS      8.96 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL - 1.60 seconds
+> Run checkpatch.pl script with rule in .checkpatch.conf
+> Bluetooth: L2CAP: Elide a string overflow warning\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+> #88:
+> In file included from /scratch/merges/ko-linux-next/linux/include/linux/string.h:253,
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #95:
+>                  from /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:31:
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #98:
+>     inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2003:15:
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #99:
+> /scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #102:
+> /scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #107:
+>     inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2004:15:
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #108:
+> /scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
+>
+> WARNING:USE_RELATIVE_PATH: use relative pathname instead of absolute in changelog text
+> #111:
+> /scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
+>
+> total: 0 errors, 8 warnings, 0 checks, 18 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12941909.patch has style problems, please review.
+>
+> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+> ##############################
+> Test: GitLint - FAIL - 1.01 seconds
+> Run gitlint with rule in .gitlint
+> Bluetooth: L2CAP: Elide a string overflow warning
+> 9: B1 Line exceeds max length (85>80): "In file included from /scratch/merges/ko-linux-next/linux/include/linux/string.h:253,"
+> 10: B1 Line exceeds max length (84>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/bitmap.h:11,"
+> 11: B1 Line exceeds max length (85>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/cpumask.h:12,"
+> 12: B1 Line exceeds max length (91>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/mm_types_task.h:14,"
+> 13: B1 Line exceeds max length (85>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/mm_types.h:5,"
+> 14: B1 Line exceeds max length (84>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/buildid.h:5,"
+> 15: B1 Line exceeds max length (84>80): "                 from /scratch/merges/ko-linux-next/linux/include/linux/module.h:14,"
+> 16: B1 Line exceeds max length (88>80): "                 from /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:31:"
+> 18: B1 Line exceeds max length (104>80): "    inlined from 'bacmp' at /scratch/merges/ko-linux-next/linux/include/net/bluetooth/bluetooth.h:347:9,"
+> 19: B1 Line exceeds max length (118>80): "    inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2003:15:"
+> 20: B1 Line exceeds max length (167>80): "/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]"
+> 23: B1 Line exceeds max length (124>80): "/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'"
+> 27: B1 Line exceeds max length (104>80): "    inlined from 'bacmp' at /scratch/merges/ko-linux-next/linux/include/net/bluetooth/bluetooth.h:347:9,"
+> 28: B1 Line exceeds max length (118>80): "    inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2004:15:"
+> 29: B1 Line exceeds max length (167>80): "/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]"
+> 32: B1 Line exceeds max length (124>80): "/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'"
 
-Well, its not that easy. I've checked and Debian doesn't provide a 
-valgrind package for the buster/armel arch, which I use on my test 
-systems (for some historical reasons). Building everything from the 
-source will take some time, though. I will try to do this after getting 
-back from my holidays after 24th Aug.
+How about we attempt to fix the root cause in bacmp:
 
+diff --git a/include/net/bluetooth/bluetooth.h
+b/include/net/bluetooth/bluetooth.h
+index e72f3b247b5e..415a5f3afc98 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -344,6 +344,9 @@ static inline bool bdaddr_type_is_le(u8 type)
+ /* Copy, swap, convert BD Address */
+ static inline int bacmp(const bdaddr_t *ba1, const bdaddr_t *ba2)
+ {
++       if (!ba1 || !ba2)
++               return -EINVAL;
++
+        return memcmp(ba1, ba2, sizeof(bdaddr_t));
+ }
+ static inline void bacpy(bdaddr_t *dst, const bdaddr_t *src)
 
-Best regards
+We could alternatively make it compare the pointer first so in case
+both are NULL it returns 0 but since memcmp itself causes warnings if
+NULL is passed I guess it safe to assume NULL pointers shall be
+considered considered invalid, that said perhaps the problem is if one
+would consider -EINVAL a return of memcmp so returning negative values
+becomes ambiguous but the original intent of bacmp was to compare
+bluetooth addresses so users normally don't check what the error
+actually means and instead just use its return as a bool.
+
 -- 
-Marek Szyprowski, PhD
-Samsung R&D Institute Poland
-
+Luiz Augusto von Dentz
