@@ -2,132 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C179C00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Aug 2022 05:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EB0C00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Aug 2022 06:10:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236992AbiHLFyx (ORCPT
+        id S235319AbiHLGKF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Aug 2022 01:54:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57132 "EHLO
+        Fri, 12 Aug 2022 02:10:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236835AbiHLFyw (ORCPT
+        with ESMTP id S234931AbiHLGKC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Aug 2022 01:54:52 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19ABBA222B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 22:54:51 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id m2so18815006pls.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Aug 2022 22:54:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=to:from:cc:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:to:cc;
-        bh=HEmnO6gKg/Ny8un1UXhsJJIoNDtb7QUrGLbN/Rj+U2s=;
-        b=S6h2JsqkYWxvS7jC1PPYrCoWtVa1c7jhqkVfdgVTRawsQeU2o7qd8syCitbKL3Igry
-         a2vspnYwiX6atjvhYOj/vgZm9OOs8OD2WVJ/uQMFT1JSzXM/f6+wpg5tjONYx5mXVrYk
-         QMx5u3F0tiwy+Pgj/g0dpXjvsnBKPsStW07oA+hI2mlUWmshJ9YYA8VYd58ZYpT9Sff+
-         soe+nCeH5MvE3QIats2gqq3natPebdib/4PCZ+ZVA3LIKmcaYBq9+ZZ0aGOcCufe2Zbk
-         1agEwVe66MkKDSIryjo+6X+jlL2BoyUqn4gP4pMrGcv3ahE2DIJVIeuNibm5w0pb9rjy
-         ysqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:cc:content-transfer-encoding:mime-version:message-id:date
-         :subject:x-gm-message-state:from:to:cc;
-        bh=HEmnO6gKg/Ny8un1UXhsJJIoNDtb7QUrGLbN/Rj+U2s=;
-        b=Kdj7NdGfZ9ALTgmUEirKGtxNwL5S9DyZDSq2PEN176s92l42hsqHH8YW7iXrrvYfuX
-         JE9o8K68+enPDaNFm8EgqKeo4gTVidsX2ivGrMrZi/0F5+FDA7uEq8SaMsPBsKP+fxfH
-         2Gz4kskdPkLUIE6b/uBks5Nuh5Q70GLjG2DzswstgqOOU98+IkcLBMx45gcPWPzJsKzw
-         8f0aNgLXacaYO9hueEfjAjAID1XYkbTbR7mf05wNRqJQGfjdM1UWxEL5YCtRmF/ug0dd
-         Gx51GeBrtPn00UwehlqieTJF1W1HyhKx4g+pAH6Wx6s6kWw1ZzeOfH65qf5CU3mX66+6
-         v+gQ==
-X-Gm-Message-State: ACgBeo1QvnEykodfGOv94VzoYDR5KdxjbhLMc1lABzCNJqkcpeqir32V
-        pQvR9QGIAR0GMoBj8p49Mxbv3w==
-X-Google-Smtp-Source: AA6agR6wDPIXSDkF+CszeF/rMBh6TQvpmXARS1enqN+Ysw0cl5HOZUKV33pVKo+76S2g+k+swpD2Cg==
-X-Received: by 2002:a17:902:b607:b0:170:c7fc:388a with SMTP id b7-20020a170902b60700b00170c7fc388amr2474205pls.29.1660283690611;
-        Thu, 11 Aug 2022 22:54:50 -0700 (PDT)
-Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net. [76.210.143.223])
-        by smtp.gmail.com with ESMTPSA id z185-20020a6333c2000000b0041aeb36088asm659096pgz.16.2022.08.11.22.54.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Aug 2022 22:54:50 -0700 (PDT)
-Subject: [PATCH] Bluetooth: L2CAP: Elide a string overflow warning
-Date:   Thu, 11 Aug 2022 22:52:49 -0700
-Message-Id: <20220812055249.8037-1-palmer@rivosinc.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 12 Aug 2022 02:10:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17D3A4B2F;
+        Thu, 11 Aug 2022 23:10:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2F721B81A6B;
+        Fri, 12 Aug 2022 06:10:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AFACC433C1;
+        Fri, 12 Aug 2022 06:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1660284598;
+        bh=8sV3XZOg58DpG6LIkEH130HfyjeZTPgBQd2AwBSjxwI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=OcfHnH9qRK3vponWPY9s9bHFoHxiz60ojylon1FIGI5uXm6pBZPPhra71d3Zxr72F
+         vHEDalz9cXMB8o2HAtw/pRHp1H4E5OHxWflCpAxV9sgrtC4NoT2eWyW6C+3ufmKQkJ
+         /bptqaQHLnlP9R49xdU2ygOrndH1soH/TsSVBtg4=
+Date:   Fri, 12 Aug 2022 08:09:55 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Johannes Berg <johannes@sipsolutions.net>,
+        Arend van Spriel <aspriel@gmail.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com, Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        linux-bluetooth@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Won Chung <wonchung@google.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 1/5] sysfs: Add attribute info for
+ /sys/devices/.../coredump_disabled
+Message-ID: <YvXusxxBZ+cHvzqz@kroah.com>
+References: <20220810085753.v5.1.I5622b2a92dca4d2703a0f747e24f3ef19303e6df@changeid>
+ <bfc5f964d8dadd6378f2da5b3b6ef4bc9fb847c2.camel@sipsolutions.net>
+ <YvPbGms7bzFuWTJg@kroah.com>
+ <CAGPPCLAV=mnMcteCnqFT5zdbWdZuFQRv6-oxC3qAnLh8_8H61Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Cc:     luiz.dentz@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux@rivosinc.com,
-        Palmer Dabbelt <palmer@rivosinc.com>
-From:   Palmer Dabbelt <palmer@rivosinc.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGPPCLAV=mnMcteCnqFT5zdbWdZuFQRv6-oxC3qAnLh8_8H61Q@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Palmer Dabbelt <palmer@rivosinc.com>
+On Thu, Aug 11, 2022 at 04:21:54PM -0700, Manish Mandlik wrote:
+> On Wed, Aug 10, 2022 at 9:21 AM Greg Kroah-Hartman <
+> gregkh@linuxfoundation.org> wrote:
+> 
+> > On Wed, Aug 10, 2022 at 06:03:37PM +0200, Johannes Berg wrote:
+> > > On Wed, 2022-08-10 at 09:00 -0700, Manish Mandlik wrote:
+> > > > This patch adds the specification for
+> > /sys/devices/.../coredump_disabled
+> > > > attribute which allows the userspace to enable/disable devcoredump for
+> > a
+> > > > particular device and drivers can use it to enable/disable
+> > functionality
+> > > > accordingly. It is available when the CONFIG_DEV_COREDUMP is enabled
+> > and
+> > > > driver has implemented the .coredump() callback.
+> > > >
+> > >
+> > > It would be nice to say _why_? What problem does this solve? You could
+> > > just create the dump and discard it, instead, for example?
+> >
+> > Agreed, I do not understand the need for this at all.
+> >
+> 
+> The existing /sys/class/devcoredump/disabled (devcd) switch has two
+> limitations - it disables dev_coredump for everyone who's using it;
 
-Without this I get a string op warning related to copying from a
-possibly NULL pointer.  I think the warning is spurious, but it's
-tripping up allmodconfig.
+Which is good and is the design of the thing.
 
-In file included from /scratch/merges/ko-linux-next/linux/include/linux/string.h:253,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/bitmap.h:11,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/cpumask.h:12,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/mm_types_task.h:14,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/mm_types.h:5,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/buildid.h:5,
-                 from /scratch/merges/ko-linux-next/linux/include/linux/module.h:14,
-                 from /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:31:
-In function 'memcmp',
-    inlined from 'bacmp' at /scratch/merges/ko-linux-next/linux/include/net/bluetooth/bluetooth.h:347:9,
-    inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2003:15:
-/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
-   44 | #define __underlying_memcmp     __builtin_memcmp
-      |                                 ^
-/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
-  420 |         return __underlying_memcmp(p, q, size);
-      |                ^~~~~~~~~~~~~~~~~~~
-In function 'memcmp',
-    inlined from 'bacmp' at /scratch/merges/ko-linux-next/linux/include/net/bluetooth/bluetooth.h:347:9,
-    inlined from 'l2cap_global_chan_by_psm' at /scratch/merges/ko-linux-next/linux/net/bluetooth/l2cap_core.c:2004:15:
-/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:44:33: error: '__builtin_memcmp' specified bound 6 exceeds source size 0 [-Werror=stringop-overread]
-   44 | #define __underlying_memcmp     __builtin_memcmp
-      |                                 ^
-/scratch/merges/ko-linux-next/linux/include/linux/fortify-string.h:420:16: note: in expansion of macro '__underlying_memcmp'
-  420 |         return __underlying_memcmp(p, q, size);
-      |                ^~~~~~~~~~~~~~~~~~~
-cc1: all warnings being treated as errors
+> and
+> drivers don't have visibility if devcd is disabled or not, so, the
+> dev_coredump API simply lets drivers collect the coredump from a device but
+> then later discards it if devcd is disabled.
 
-Signed-off-by: Palmer Dabbelt <palmer@rivosinc.com>
----
- net/bluetooth/l2cap_core.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+Why would a driver care?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cbe0cae73434..be7f47e52119 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2000,11 +2000,13 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 			}
- 
- 			/* Closest match */
--			src_any = !bacmp(&c->src, BDADDR_ANY);
--			dst_any = !bacmp(&c->dst, BDADDR_ANY);
--			if ((src_match && dst_any) || (src_any && dst_match) ||
--			    (src_any && dst_any))
--				c1 = c;
-+			if (c) {
-+				src_any = !bacmp(&c->src, BDADDR_ANY);
-+				dst_any = !bacmp(&c->dst, BDADDR_ANY);
-+				if ((src_match && dst_any) || (src_any && dst_match) ||
-+				    (src_any && dst_any))
-+					c1 = c;
-+			}
- 		}
- 	}
- 
--- 
-2.34.1
+> Now that there are more subsystems using the base dev_coredump API, having
+> a granular control will make it easier to selectively disable dev_coredump
+> only for a particular device. For ChromeOS, this is useful to allow drivers
+> to develop coredump functionality and deploy it without affecting other
+> drivers with stable devcoredump implementations (example, we've had some
+> devcoredumps that take 12s to run and we only want to enable it on test
+> builds because it has lots of PII). The drivers can use this flag to
+> refrain from collecting or triggering coredump when undesirable.
 
+This feels odd.  You have various out-of-tree drivers that take too long
+when they crash to make a dump and it causes some unknown issue
+elsewhere?
+
+I don't really understand, sorry.
+
+If you need something for development of a system, that's one thing, but
+this feels like you are adding fine-grained tweaks that no one in a real
+system would ever use.
+
+What is broken with the current system of "on/off" that does not work
+for you now?  Why would a normal user only want to turn this on for one
+driver and not another?
+
+thanks,
+
+greg k-h
