@@ -2,90 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF121C25B08
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 Aug 2022 07:31:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C642EC19F2D
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 Aug 2022 09:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233812AbiHMHb2 (ORCPT
+        id S239002AbiHMJjY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 13 Aug 2022 03:31:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
+        Sat, 13 Aug 2022 05:39:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238461AbiHMHbZ (ORCPT
+        with ESMTP id S235278AbiHMJjW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 13 Aug 2022 03:31:25 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF3183BDD
-        for <linux-bluetooth@vger.kernel.org>; Sat, 13 Aug 2022 00:31:23 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id 123so4563953ybv.7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 13 Aug 2022 00:31:23 -0700 (PDT)
+        Sat, 13 Aug 2022 05:39:22 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D78E43E7D;
+        Sat, 13 Aug 2022 02:39:21 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id f14so2459766qkm.0;
+        Sat, 13 Aug 2022 02:39:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=0o+izfVZjXN3pdahlXpbkj1dX4aHv6voSVsqXVYNcIU=;
-        b=BFgWL0b/A2u/3KSbHPDS1arX31NnSM63HQVnHmca3V8GBvbTWk8qQvTlsG0fwGDcFG
-         vL5mFP16FFf+unBDQtptwDluc1zDdU8ipku56HTxeyULcjUEFy8WJ64bhUVIB/IhSGNn
-         sJ+1UjL2asGN3OBQ7sQ7k1VUQCT7xIwzz8QmbqoufkCq+oRTpNbV+B+PAlETC3ILQKUV
-         pSn18hGjCS7txZYwfva0K5vSz+vCPZXcs7Zwn+t/2zharhdzspDk3C3oQUa1g3JgvKjW
-         NTzE7uv3NfSfavpDYa6efr2rmAv9eE83RNiKPKpIHJgIunA5RNMUpCF9oXJxodZZqVzX
-         JQpw==
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc;
+        bh=CrxjDuqE2UjjJ9WlFn43jgqWvWNKAxG2M8agFXX6Qi4=;
+        b=nYk7+UMBZh+gPr21y7hILBqx/y7J2y2yrErkyKuKEgKsWaZYnbuQuWUrQxSrx8Oz4S
+         8pzNh1QtE/NwkGl+lusv2oJ0+2aLByTGYjiZlmLW3NcQtecdtcR17ceKiMKDyr7654no
+         2+aHhBB88RSRXqk2l7qSKtWSohnikYtQfhWLYLpLDJChh5WW/+8/s2bSvD1Mbm5CDAcE
+         4IeSJfq8c0ajeY6pWWYSnMFyGqV3FZwVNP2Waz/4reaYpcVa74wXfv4xZqTs69UJO0iR
+         KVFPbbYeDX88/anZmqjI/uAAWk9KgsX1ECz27vBGnkLlECKXqOwMrLedFdbXSAc7EcQf
+         iOkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=0o+izfVZjXN3pdahlXpbkj1dX4aHv6voSVsqXVYNcIU=;
-        b=076fpYS2aNBk8lmcTKG2/uUlM6Dj/JqpUKUPocylhZAMrlA47JXqCIqGIGGe8v7jtN
-         ONmh8Hq9QCV/X6YN8aynBjdaP0HVITH+nJRV4xHPtYZcE2/xQ2h8J3LhLF/y5hPMa7Qo
-         cPnKRM751zff36nVJ/oTTo3Cr8e1VlMGbwttk2k7I+cvSKHn95VNPrU4ji1A9pF1O+j8
-         Iy5tsceQeaBhCipW65omw6w6EY25h/WvonRmbTry7jtmm6lKuESR5GBCV+Lcrodf/l6K
-         O1F4pXAMfDvUGOq9EJqnaJMAUsaLMaC2jgl1PLrxzbw2KZJBuPShzvm2J496BEZnSqQD
-         lNhg==
-X-Gm-Message-State: ACgBeo1lKDHvC4xe1PjKmYEs55VPjdWeBcZI+WcZfnoFW7TrhTAOIpxr
-        rrwKlmh2MixVBw11Aa+eesGpgbk/YsqU35rJ/2Bj+lvlTNga3w==
-X-Google-Smtp-Source: AA6agR5r0NzkRJTh2WZzl/pUH2x4zMroksIXtlxlGWM6JDhE+xXZKDymNTLQpryUnEezKGhOoQYqYG6kiaStO14M8Eg=
-X-Received: by 2002:a5b:845:0:b0:683:6ed7:b3b6 with SMTP id
- v5-20020a5b0845000000b006836ed7b3b6mr3991553ybq.183.1660375882507; Sat, 13
- Aug 2022 00:31:22 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
+         :x-gm-message-state:from:to:cc;
+        bh=CrxjDuqE2UjjJ9WlFn43jgqWvWNKAxG2M8agFXX6Qi4=;
+        b=dd3nebHG6PD5frUKMcqIwNuYbhLPhfgIJw57YJxtzjVVlu5FFZB95bBW8tQO0Ny0JX
+         UhQ5iXk3YVAOc1hQ7kX2e97D6LOafGbzuOFBscop5RgYbpCRpcOYp9xVRLBNv+8oDNtz
+         +qD9U3GD6HSzzkXx8sOtESMhjt1lLQXxpjC3Yp0eClp3EwEhm2pnunk+i/Hf1do4TIvu
+         pvgr7IvvfWIF1643IxVxy5zWwEhHEijKF0AZ8sVu4rch/fSMaijRAOTFRgl7BI71jwda
+         P0y6ta2qYp/z7E2PT+IMJpt9rL042Aa2aJ+FDy/fFZt1HcgZ/9UhuYlNyGz2DTFp9lP/
+         mZIg==
+X-Gm-Message-State: ACgBeo0t9CfzeLNFiK/uaxcIYAxFjaaphtq/9x/qGPaEHLr5blQr6Y4e
+        fwYSE9Q4x5Ey1OtxEaUR7Ps=
+X-Google-Smtp-Source: AA6agR4Inl4zGlgxZN1ZGSWrOWXQa8p0Y5ggQzUhmfsRnNB5ziyM/ek0ED9Hs93dqzLjW88YqXDWBg==
+X-Received: by 2002:a05:620a:25d0:b0:6b8:9dec:6c12 with SMTP id y16-20020a05620a25d000b006b89dec6c12mr5584774qko.634.1660383560724;
+        Sat, 13 Aug 2022 02:39:20 -0700 (PDT)
+Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id bm39-20020a05620a19a700b006b949afa980sm3789020qkb.56.2022.08.13.02.39.16
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 13 Aug 2022 02:39:19 -0700 (PDT)
+From:   Arend van Spriel <aspriel@gmail.com>
+To:     "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        Manish Mandlik <mmandlik@google.com>
+CC:     Johannes Berg <johannes@sipsolutions.net>, <marcel@holtmann.org>,
+        <luiz.dentz@gmail.com>, Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        <linux-bluetooth@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Won Chung <wonchung@google.com>,
+        "Abhishek Pandit-Subedi" <abhishekpandit@chromium.org>,
+        <linux-kernel@vger.kernel.org>
+Date:   Sat, 13 Aug 2022 11:39:15 +0200
+Message-ID: <18296926db8.279b.9696ff82abe5fb6502268bdc3b0467d4@gmail.com>
+In-Reply-To: <YvXusxxBZ+cHvzqz@kroah.com>
+References: <20220810085753.v5.1.I5622b2a92dca4d2703a0f747e24f3ef19303e6df@changeid>
+ <bfc5f964d8dadd6378f2da5b3b6ef4bc9fb847c2.camel@sipsolutions.net>
+ <YvPbGms7bzFuWTJg@kroah.com>
+ <CAGPPCLAV=mnMcteCnqFT5zdbWdZuFQRv6-oxC3qAnLh8_8H61Q@mail.gmail.com>
+ <YvXusxxBZ+cHvzqz@kroah.com>
+User-Agent: AquaMail/1.38.0 (build: 103800177)
+Subject: Re: [PATCH v5 1/5] sysfs: Add attribute info for /sys/devices/.../coredump_disabled
 MIME-Version: 1.0
-References: <20220812223939.530428-1-luiz.dentz@gmail.com> <62f6dcd1.050a0220.5ebd8.1241@mx.google.com>
- <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
-In-Reply-To: <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
-From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Date:   Sat, 13 Aug 2022 08:30:46 +0100
-Message-ID: <CADVatmN_wx=KJ=C0QGMz5ZLoVECjF9kKJa1X8ay4XWwuszeo=A@mail.gmail.com>
-Subject: Re: Bluetooth: L2CAP: Fix build errors in some archs
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Palmer Dabbelt <palmer@rivosinc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+On August 12, 2022 8:09:59 AM Greg Kroah-Hartman 
+<gregkh@linuxfoundation.org> wrote:
 
-On Sat, Aug 13, 2022 at 12:12 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+> On Thu, Aug 11, 2022 at 04:21:54PM -0700, Manish Mandlik wrote:
+>> On Wed, Aug 10, 2022 at 9:21 AM Greg Kroah-Hartman <
+>> gregkh@linuxfoundation.org> wrote:
+>>
+>>> On Wed, Aug 10, 2022 at 06:03:37PM +0200, Johannes Berg wrote:
+>>>> On Wed, 2022-08-10 at 09:00 -0700, Manish Mandlik wrote:
+>>>>> This patch adds the specification for
+>>> /sys/devices/.../coredump_disabled
+>>>>> attribute which allows the userspace to enable/disable devcoredump for
+>>> a
+>>>>> particular device and drivers can use it to enable/disable
+>>> functionality
+>>>>> accordingly. It is available when the CONFIG_DEV_COREDUMP is enabled
+>>> and
+>>>>> driver has implemented the .coredump() callback.
+>>>>
+>>>> It would be nice to say _why_? What problem does this solve? You could
+>>>> just create the dump and discard it, instead, for example?
+>>>
+>>> Agreed, I do not understand the need for this at all.
+>>
+>> The existing /sys/class/devcoredump/disabled (devcd) switch has two
+>> limitations - it disables dev_coredump for everyone who's using it;
 >
-> Hi Palmer, Sudip,
+> Which is good and is the design of the thing.
 >
-> On Fri, Aug 12, 2022 at 4:05 PM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667285
+>> and
+>> drivers don't have visibility if devcd is disabled or not, so, the
+>> dev_coredump API simply lets drivers collect the coredump from a device but
+>> then later discards it if devcd is disabled.
 >
-> Could you guys try with the above change, I think the culprit is
-> actually setting c = NULL which triggers some compiler to think it may
-> be passed to bacmp.
+> Why would a driver care?
+>
+>> Now that there are more subsystems using the base dev_coredump API, having
+>> a granular control will make it easier to selectively disable dev_coredump
+>> only for a particular device. For ChromeOS, this is useful to allow drivers
+>> to develop coredump functionality and deploy it without affecting other
+>> drivers with stable devcoredump implementations (example, we've had some
+>> devcoredumps that take 12s to run and we only want to enable it on test
+>> builds because it has lots of PII). The drivers can use this flag to
+>> refrain from collecting or triggering coredump when undesirable.
+>
+> This feels odd.  You have various out-of-tree drivers that take too long
+> when they crash to make a dump and it causes some unknown issue
+> elsewhere?
 
-I get "No patches to display" on that link.
+If you have drivers taking 12s for coredump you could/should consider doing 
+it asynchronous, eg. schedule a worker for it. The coredump callback has 
+void return type so it would be fairly easy.
+
+Regards,
+Arend
 
 
--- 
-Regards
-Sudip
