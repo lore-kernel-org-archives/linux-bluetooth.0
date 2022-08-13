@@ -2,103 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57781C00140
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 Aug 2022 00:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF121C25B08
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 13 Aug 2022 07:31:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234590AbiHMACT (ORCPT
+        id S233812AbiHMHb2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Aug 2022 20:02:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33024 "EHLO
+        Sat, 13 Aug 2022 03:31:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbiHMACS (ORCPT
+        with ESMTP id S238461AbiHMHbZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Aug 2022 20:02:18 -0400
-Received: from mail-oa1-x2f.google.com (mail-oa1-x2f.google.com [IPv6:2001:4860:4864:20::2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4AFE81B05
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 17:02:17 -0700 (PDT)
-Received: by mail-oa1-x2f.google.com with SMTP id 586e51a60fabf-10dc1b16c12so2563410fac.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Aug 2022 17:02:17 -0700 (PDT)
+        Sat, 13 Aug 2022 03:31:25 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF3183BDD
+        for <linux-bluetooth@vger.kernel.org>; Sat, 13 Aug 2022 00:31:23 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id 123so4563953ybv.7
+        for <linux-bluetooth@vger.kernel.org>; Sat, 13 Aug 2022 00:31:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=eiX7bEqfjPqCWqY4+7XIl+wA0zskvdKH8VgB/e6tiTk=;
-        b=Qa2RHcCE1p0FJWVKUmrsVgXjbr2TnkqK80VYXHTDXPK0MTfYfWRV/2SjdweGC+wOgl
-         BwtMOzjqqwTHpO2bH163x9rufSgJFQQq8XZDgpAq5taTTIS+edyMEWJqj4RYQEAh+sh1
-         m0eyQomewhoa2IypfmIxEYbTkIXNkFvgAixIFZ9PAaUsSbjOLBAZGR/96+QyNVc3XnMC
-         pH8M50CB7WxjvKVcDAgrP/zUn2pkyXRjg6a+4HFQ5bmXIVteb7CBZo5200GflmOKEIOi
-         MuXfvLI6xBUoBMhpqaohDdV6qu7gVwWDu9wdpnYiDXJ+frkBOEYgBHyqLUMDlBsiHbon
-         02Dw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=0o+izfVZjXN3pdahlXpbkj1dX4aHv6voSVsqXVYNcIU=;
+        b=BFgWL0b/A2u/3KSbHPDS1arX31NnSM63HQVnHmca3V8GBvbTWk8qQvTlsG0fwGDcFG
+         vL5mFP16FFf+unBDQtptwDluc1zDdU8ipku56HTxeyULcjUEFy8WJ64bhUVIB/IhSGNn
+         sJ+1UjL2asGN3OBQ7sQ7k1VUQCT7xIwzz8QmbqoufkCq+oRTpNbV+B+PAlETC3ILQKUV
+         pSn18hGjCS7txZYwfva0K5vSz+vCPZXcs7Zwn+t/2zharhdzspDk3C3oQUa1g3JgvKjW
+         NTzE7uv3NfSfavpDYa6efr2rmAv9eE83RNiKPKpIHJgIunA5RNMUpCF9oXJxodZZqVzX
+         JQpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=eiX7bEqfjPqCWqY4+7XIl+wA0zskvdKH8VgB/e6tiTk=;
-        b=LFVn5wTqZpcz/aW/R1VyjaUKwUBJrwGZCNkICqMZHmcaPeqMmatkWetl4wOOtaZOLc
-         BtkBlXa8Mrhi5ONmhijgKWgrU7ak+jX9y9FLNgaKj0Iv42TpKQVX7B2kyTHKXeA17gx7
-         NOW48asl1fMU6ZKJGiE+wgV/b3FOZ8O/QMuTE5KZexyJPL3rWhCJZpKyNkgWNDCSHjqC
-         eN1SDjaC0LcrW9z3qK2t9h5QuJcnoeBrKOOZIlsPiQV/701MAB1iFhMi0FJ4FzctwNh6
-         IolM7ZrFqZu6tGEs6NFHOb7OjbMPa+3IwKHvFfIQn8lJsaY+LQokGRJJZgGCBKzQSCo4
-         F+Pg==
-X-Gm-Message-State: ACgBeo2DxXp4K7KQ1oMJ0bJaBkd6/HlvWtalzv9n7Zsw85f8RiYwPEDW
-        V5bm2/U7mv+gPM8n4Jh6eUxl43QxOugNYg==
-X-Google-Smtp-Source: AA6agR6gcsTPc89afE69sTEfHa6mJ9zENhd8NKwxkYCTaVAVOZe0MYZkFme/6Ag79lyDwG4CQ7AL7w==
-X-Received: by 2002:a05:6870:9686:b0:113:5b33:9478 with SMTP id o6-20020a056870968600b001135b339478mr2695882oaq.133.1660348936374;
-        Fri, 12 Aug 2022 17:02:16 -0700 (PDT)
-Received: from [172.17.0.2] ([20.225.215.152])
-        by smtp.gmail.com with ESMTPSA id f23-20020a056830205700b00636e9a0cce5sm633786otp.60.2022.08.12.17.02.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Aug 2022 17:02:16 -0700 (PDT)
-Message-ID: <62f6ea08.050a0220.ae57c.2e2e@mx.google.com>
-Date:   Fri, 12 Aug 2022 17:02:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7150039050270024201=="
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=0o+izfVZjXN3pdahlXpbkj1dX4aHv6voSVsqXVYNcIU=;
+        b=076fpYS2aNBk8lmcTKG2/uUlM6Dj/JqpUKUPocylhZAMrlA47JXqCIqGIGGe8v7jtN
+         ONmh8Hq9QCV/X6YN8aynBjdaP0HVITH+nJRV4xHPtYZcE2/xQ2h8J3LhLF/y5hPMa7Qo
+         cPnKRM751zff36nVJ/oTTo3Cr8e1VlMGbwttk2k7I+cvSKHn95VNPrU4ji1A9pF1O+j8
+         Iy5tsceQeaBhCipW65omw6w6EY25h/WvonRmbTry7jtmm6lKuESR5GBCV+Lcrodf/l6K
+         O1F4pXAMfDvUGOq9EJqnaJMAUsaLMaC2jgl1PLrxzbw2KZJBuPShzvm2J496BEZnSqQD
+         lNhg==
+X-Gm-Message-State: ACgBeo1lKDHvC4xe1PjKmYEs55VPjdWeBcZI+WcZfnoFW7TrhTAOIpxr
+        rrwKlmh2MixVBw11Aa+eesGpgbk/YsqU35rJ/2Bj+lvlTNga3w==
+X-Google-Smtp-Source: AA6agR5r0NzkRJTh2WZzl/pUH2x4zMroksIXtlxlGWM6JDhE+xXZKDymNTLQpryUnEezKGhOoQYqYG6kiaStO14M8Eg=
+X-Received: by 2002:a5b:845:0:b0:683:6ed7:b3b6 with SMTP id
+ v5-20020a5b0845000000b006836ed7b3b6mr3991553ybq.183.1660375882507; Sat, 13
+ Aug 2022 00:31:22 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] Bluetooth: L2CAP: Fix build errors in some archs
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220812231329.540559-1-luiz.dentz@gmail.com>
-References: <20220812231329.540559-1-luiz.dentz@gmail.com>
+References: <20220812223939.530428-1-luiz.dentz@gmail.com> <62f6dcd1.050a0220.5ebd8.1241@mx.google.com>
+ <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
+In-Reply-To: <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
+From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Date:   Sat, 13 Aug 2022 08:30:46 +0100
+Message-ID: <CADVatmN_wx=KJ=C0QGMz5ZLoVECjF9kKJa1X8ay4XWwuszeo=A@mail.gmail.com>
+Subject: Re: Bluetooth: L2CAP: Fix build errors in some archs
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Palmer Dabbelt <palmer@rivosinc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7150039050270024201==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Luiz,
 
-This is automated email and please do not reply to this email!
+On Sat, Aug 13, 2022 at 12:12 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Palmer, Sudip,
+>
+> On Fri, Aug 12, 2022 at 4:05 PM <bluez.test.bot@gmail.com> wrote:
+> >
+> > This is automated email and please do not reply to this email!
+> >
+> > Dear submitter,
+> >
+> > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > This is a CI test results with your patch series:
+> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667285
+>
+> Could you guys try with the above change, I think the culprit is
+> actually setting c = NULL which triggers some compiler to think it may
+> be passed to bacmp.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667289
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.43 seconds
-GitLint                       PASS      0.74 seconds
-SubjectPrefix                 PASS      0.73 seconds
-BuildKernel                   PASS      37.55 seconds
-BuildKernel32                 PASS      31.88 seconds
-Incremental Build with patchesPASS      44.12 seconds
-TestRunner: Setup             PASS      547.06 seconds
-TestRunner: l2cap-tester      PASS      18.38 seconds
-TestRunner: bnep-tester       PASS      7.13 seconds
-TestRunner: mgmt-tester       PASS      110.56 seconds
-TestRunner: rfcomm-tester     PASS      10.81 seconds
-TestRunner: sco-tester        PASS      10.81 seconds
-TestRunner: smp-tester        PASS      11.11 seconds
-TestRunner: userchan-tester   PASS      8.05 seconds
+I get "No patches to display" on that link.
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7150039050270024201==--
+-- 
+Regards
+Sudip
