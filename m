@@ -2,315 +2,181 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34806C00140
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 01:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD63C00140
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 02:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233999AbiHPBYg (ORCPT
+        id S229806AbiHPCuq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Aug 2022 21:24:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53786 "EHLO
+        Mon, 15 Aug 2022 22:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244983AbiHPBYI (ORCPT
+        with ESMTP id S231497AbiHPCuZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Aug 2022 21:24:08 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5ADED9EAE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 14:14:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1660598044; x=1692134044;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nRbLuHTMLXU4Eh0hEA5B7DFFKo/UqKUzcnRlGUJClIw=;
-  b=IIsiTO4zst2mKZXCCA8CHOsEPzDCQvBq1we0AJDbyo1V12SCw/e9F2wQ
-   CxsGCGPhAcvF+2PWxlriuUht34L5eq1++MFkoM05lYaZOkm2an2cjGAs+
-   YWaoLybsudaJH3BTV1Cjts0LJXOqy2f9tXBfpNzg3odmhwNQCxV3FmdXR
-   LO8nTQwJSKL6CS0wxTM4gT28RhMbGkBPuE1xo9svmlOtNeaExheFJxZ2F
-   119NtMJLINxfiRPkbNFoxuWtc+sj7QqlfIIJCKHLhrp5mZrYSvQlqQVVA
-   fWrm0SqkYz7MyMHJo8TFHELUg+jF41bCpp+vmUtsqorvN9Xmx725YhQ/M
-   g==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10440"; a="293331010"
-X-IronPort-AV: E=Sophos;i="5.93,239,1654585200"; 
-   d="scan'208";a="293331010"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 14:14:04 -0700
-X-IronPort-AV: E=Sophos;i="5.93,239,1654585200"; 
-   d="scan'208";a="635630088"
-Received: from mrholmes-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.137.20])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2022 14:14:03 -0700
-From:   Brian Gix <brian.gix@intel.com>
+        Mon, 15 Aug 2022 22:50:25 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9319C2BB5CD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 16:18:54 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id z187so7852168pfb.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 16:18:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc;
+        bh=TzZmD3GbRQlajNIhZamfR7nU43gU0yqKwmRroEkX7tM=;
+        b=Jrgt0B6XI/fvheVJOD4E/cnEb0PavV4oVUDir2YXkgege9qmOwPSuGu1NGnUaPb5hR
+         82gctYFV0F69wPkZK+/bQiniXVsu6yS1ecLfBLhNG+outrm+iG0G71td6y00bFT8WSfR
+         pap8RPV0w7BbOyl0jtTdm2o1yilFyrDNotVkecYjumFMHQTJT1L3vRNG2f8a148Fa3qf
+         gqB3/pBl8fzje2ciaXVGxJmyqqOzkFHOSAAKTvhuc4Y9TdbCVNwVaTJRUy/gltr1lQHQ
+         08I1IJ+7YKdNJNIfp8vtbfUwfIoXw4V8V4a5mzWVoWSFPQyr2W5qkQhI+CngpGmilwAQ
+         iFTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=TzZmD3GbRQlajNIhZamfR7nU43gU0yqKwmRroEkX7tM=;
+        b=FMfXyezMeUCKNXAofPOchi7991tQkHaUHW2TrUD6Ln7NWaTe/OALdUGO5A5yzWPNE5
+         Ubbya1AfrhtHmVpGVtLAus1uaCku/AsvtCp9nJvt68XHRRKbB5GKJp7HyfhaqJAfV/RZ
+         aegDhDIB4QktaKxiuzaQKV5SOiK8B+zWELo0emJEE6dQqVDEoMjTxYgUw0S3rlTXEQsT
+         WIsGsdI3sWrap9zmhgQxJLbI/OI3boJMl7qckuD+gW1CsjcENlX5wf3jVC+/Iprbrj0p
+         lGNZgGph0bo9wchIRA6Z3A1Ckwhsl6rsL6CPcWFw5xJeWFXkRVuo0owMFCGk/Tbe2Kdh
+         8CaA==
+X-Gm-Message-State: ACgBeo35crJlps3EixdPryy3oYsIlgzzkpxL1N+EluyfiPueuecUj/Pv
+        RiBd6QxeVecWKn2KaPca9oZ2XuSqInTSDw==
+X-Google-Smtp-Source: AA6agR4Z8Luun1hsB8T6w277RYZMmjakuFivEJ9arfGJO7xiTT7nLyNjG4qo6wrMu3qeveuxOHuTLg==
+X-Received: by 2002:a05:6a00:1907:b0:534:f847:b495 with SMTP id y7-20020a056a00190700b00534f847b495mr5202237pfi.47.1660605533339;
+        Mon, 15 Aug 2022 16:18:53 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d2-20020a631d02000000b0041b823d4179sm6256007pgd.22.2022.08.15.16.18.51
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Aug 2022 16:18:52 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH] Bluetooth: Move hci_abort_conn to hci_conn.c
-Date:   Mon, 15 Aug 2022 14:13:49 -0700
-Message-Id: <20220815211349.879531-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.37.1
+Subject: [PATCH] Bluetooth: MGMT: Fix Get Device Flags
+Date:   Mon, 15 Aug 2022 16:18:48 -0700
+Message-Id: <20220815231848.1252347-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hci_abort_conn() is a wrapper around a number of DISCONNECT and
-CREATE_CONN_CANCEL commands that was being invoked from hci_request
-request queues, which are now deprecated. There are two versions:
-hci_abort_conn() which can be invoked from the hci_event thread, and
-hci_abort_conn_sync() which can be evoked within a hci_sync cmd chain.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Brian Gix <brian.gix@intel.com>
+Get Device Flags don't check if device does actually use an RPA in which
+case it shall only set HCI_CONN_FLAG_REMOTE_WAKEUP if LL Privacy is
+enabled.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         | 76 ++++++++++++++++++++++++++
- net/bluetooth/hci_request.c      | 93 --------------------------------
- net/bluetooth/hci_request.h      |  1 -
- net/bluetooth/mgmt.c             | 16 +++++-
- 5 files changed, 92 insertions(+), 95 deletions(-)
+ net/bluetooth/mgmt.c | 73 ++++++++++++++++++++++++++------------------
+ 1 file changed, 43 insertions(+), 30 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e7862903187d..932153e68864 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -2075,6 +2075,7 @@ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
- void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
- 				  bdaddr_t *bdaddr, u8 addr_type);
- 
-+int hci_abort_conn(struct hci_conn *conn, u8 reason);
- u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
- void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __le64 rand,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 337e74d0f8b1..7a59c4487050 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -2760,3 +2760,79 @@ u32 hci_conn_get_phy(struct hci_conn *conn)
- 
- 	return phys;
- }
-+
-+int hci_abort_conn(struct hci_conn *conn, u8 reason)
-+{
-+	int r = 0;
-+
-+	switch (conn->state) {
-+	case BT_CONNECTED:
-+	case BT_CONFIG:
-+		if (conn->type == AMP_LINK) {
-+			struct hci_cp_disconn_phy_link cp;
-+
-+			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
-+			cp.reason = reason;
-+			r = hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
-+					 sizeof(cp), &cp);
-+		} else {
-+			struct hci_cp_disconnect dc;
-+
-+			dc.handle = cpu_to_le16(conn->handle);
-+			dc.reason = reason;
-+			r = hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT,
-+					 sizeof(dc), &dc);
-+		}
-+
-+		conn->state = BT_DISCONN;
-+
-+		break;
-+	case BT_CONNECT:
-+		if (conn->type == LE_LINK) {
-+			if (test_bit(HCI_CONN_SCANNING, &conn->flags))
-+				break;
-+			r = hci_send_cmd(conn->hdev,
-+					 HCI_OP_LE_CREATE_CONN_CANCEL, 0, NULL);
-+		} else if (conn->type == ACL_LINK) {
-+			if (conn->hdev->hci_ver < BLUETOOTH_VER_1_2)
-+				break;
-+			r = hci_send_cmd(conn->hdev,
-+					 HCI_OP_CREATE_CONN_CANCEL,
-+					 6, &conn->dst);
-+		}
-+		break;
-+	case BT_CONNECT2:
-+		if (conn->type == ACL_LINK) {
-+			struct hci_cp_reject_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+			rej.reason = reason;
-+
-+			r = hci_send_cmd(conn->hdev,
-+					 HCI_OP_REJECT_CONN_REQ,
-+					 sizeof(rej), &rej);
-+		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
-+			struct hci_cp_reject_sync_conn_req rej;
-+
-+			bacpy(&rej.bdaddr, &conn->dst);
-+
-+			/* SCO rejection has its own limited set of
-+			 * allowed error values (0x0D-0x0F) which isn't
-+			 * compatible with most values passed to this
-+			 * function. To be safe hard-code one of the
-+			 * values that's suitable for SCO.
-+			 */
-+			rej.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
-+
-+			r = hci_send_cmd(conn->hdev,
-+					 HCI_OP_REJECT_SYNC_CONN_REQ,
-+					 sizeof(rej), &rej);
-+		}
-+		break;
-+	default:
-+		conn->state = BT_CLOSED;
-+		break;
-+	}
-+
-+	return r;
-+}
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 2e19a271d7a1..5a0296a4352e 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -909,99 +909,6 @@ static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
- 	hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, rpa);
- }
- 
--static void __hci_abort_conn(struct hci_request *req, struct hci_conn *conn,
--			     u8 reason)
--{
--	switch (conn->state) {
--	case BT_CONNECTED:
--	case BT_CONFIG:
--		if (conn->type == AMP_LINK) {
--			struct hci_cp_disconn_phy_link cp;
--
--			cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
--			cp.reason = reason;
--			hci_req_add(req, HCI_OP_DISCONN_PHY_LINK, sizeof(cp),
--				    &cp);
--		} else {
--			struct hci_cp_disconnect dc;
--
--			dc.handle = cpu_to_le16(conn->handle);
--			dc.reason = reason;
--			hci_req_add(req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
--		}
--
--		conn->state = BT_DISCONN;
--
--		break;
--	case BT_CONNECT:
--		if (conn->type == LE_LINK) {
--			if (test_bit(HCI_CONN_SCANNING, &conn->flags))
--				break;
--			hci_req_add(req, HCI_OP_LE_CREATE_CONN_CANCEL,
--				    0, NULL);
--		} else if (conn->type == ACL_LINK) {
--			if (req->hdev->hci_ver < BLUETOOTH_VER_1_2)
--				break;
--			hci_req_add(req, HCI_OP_CREATE_CONN_CANCEL,
--				    6, &conn->dst);
--		}
--		break;
--	case BT_CONNECT2:
--		if (conn->type == ACL_LINK) {
--			struct hci_cp_reject_conn_req rej;
--
--			bacpy(&rej.bdaddr, &conn->dst);
--			rej.reason = reason;
--
--			hci_req_add(req, HCI_OP_REJECT_CONN_REQ,
--				    sizeof(rej), &rej);
--		} else if (conn->type == SCO_LINK || conn->type == ESCO_LINK) {
--			struct hci_cp_reject_sync_conn_req rej;
--
--			bacpy(&rej.bdaddr, &conn->dst);
--
--			/* SCO rejection has its own limited set of
--			 * allowed error values (0x0D-0x0F) which isn't
--			 * compatible with most values passed to this
--			 * function. To be safe hard-code one of the
--			 * values that's suitable for SCO.
--			 */
--			rej.reason = HCI_ERROR_REJ_LIMITED_RESOURCES;
--
--			hci_req_add(req, HCI_OP_REJECT_SYNC_CONN_REQ,
--				    sizeof(rej), &rej);
--		}
--		break;
--	default:
--		conn->state = BT_CLOSED;
--		break;
--	}
--}
--
--static void abort_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
--{
--	if (status)
--		bt_dev_dbg(hdev, "Failed to abort connection: status 0x%2.2x", status);
--}
--
--int hci_abort_conn(struct hci_conn *conn, u8 reason)
--{
--	struct hci_request req;
--	int err;
--
--	hci_req_init(&req, conn->hdev);
--
--	__hci_abort_conn(&req, conn, reason);
--
--	err = hci_req_run(&req, abort_conn_complete);
--	if (err && err != -ENODATA) {
--		bt_dev_err(conn->hdev, "failed to run HCI request: err %d", err);
--		return err;
--	}
--
--	return 0;
--}
--
- void hci_request_setup(struct hci_dev *hdev)
- {
- 	INIT_DELAYED_WORK(&hdev->interleave_scan, interleave_scan_work);
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 7e1de871fca4..b9c5a9823837 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -73,6 +73,5 @@ void hci_req_add_le_passive_scan(struct hci_request *req);
- 
- void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
- 
--int hci_abort_conn(struct hci_conn *conn, u8 reason);
- void hci_request_setup(struct hci_dev *hdev);
- void hci_request_cancel_all(struct hci_dev *hdev);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index df20e15a05da..11c274fdcbcd 100644
+index df20e15a05da..1cd7d6572892 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3185,6 +3185,19 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	return err;
+@@ -4546,6 +4546,22 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 			       MGMT_STATUS_NOT_SUPPORTED);
  }
  
-+static int abort_conn_sync(struct hci_dev *hdev, void *data)
++static u32 get_params_flags(struct hci_dev *hdev,
++			    struct hci_conn_params *params)
 +{
-+	struct hci_conn *conn;
-+	__u8 handle = (__u8) PTR_ERR(data);
++	u32 flags = hdev->conn_flags;
 +
-+	conn = hci_conn_hash_lookup_big(hdev, handle);
++	/* Devices using RPAs can only be programmed in the acceptlist if
++	 * LL Privacy has been enable otherwise they cannot mark
++	 * HCI_CONN_FLAG_REMOTE_WAKEUP.
++	 */
++	if ((flags & HCI_CONN_FLAG_REMOTE_WAKEUP) && !use_ll_privacy(hdev) &&
++	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type))
++		flags &= ~HCI_CONN_FLAG_REMOTE_WAKEUP;
 +
-+	if (!conn)
-+		return 0;
-+
-+	return hci_abort_conn_sync(hdev, conn, HCI_ERROR_REMOTE_USER_TERM);
++	return flags;
 +}
 +
- static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 			      u16 len)
+ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			    u16 data_len)
  {
-@@ -3235,7 +3248,8 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 					      le_addr_type(addr->type));
+@@ -4577,10 +4593,10 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	} else {
+ 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+ 						le_addr_type(cp->addr.type));
+-
+ 		if (!params)
+ 			goto done;
  
- 	if (conn->conn_reason == CONN_REASON_PAIR_DEVICE)
--		hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
-+		hci_cmd_sync_queue(hdev, abort_conn_sync, ERR_PTR(conn->handle),
-+				   NULL);
++		supported_flags = get_params_flags(hdev, params);
+ 		current_flags = params->flags;
+ 	}
  
+@@ -4648,38 +4664,35 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
+ 				    &cp->addr.bdaddr, cp->addr.type);
+ 		}
+-	} else {
+-		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
+-						le_addr_type(cp->addr.type));
+-		if (params) {
+-			/* Devices using RPAs can only be programmed in the
+-			 * acceptlist LL Privacy has been enable otherwise they
+-			 * cannot mark HCI_CONN_FLAG_REMOTE_WAKEUP.
+-			 */
+-			if ((current_flags & HCI_CONN_FLAG_REMOTE_WAKEUP) &&
+-			    !use_ll_privacy(hdev) &&
+-			    hci_find_irk_by_addr(hdev, &params->addr,
+-						 params->addr_type)) {
+-				bt_dev_warn(hdev,
+-					    "Cannot set wakeable for RPA");
+-				goto unlock;
+-			}
+ 
+-			params->flags = current_flags;
+-			status = MGMT_STATUS_SUCCESS;
+-
+-			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
+-			 * has been set.
+-			 */
+-			if (params->flags & HCI_CONN_FLAG_DEVICE_PRIVACY)
+-				hci_update_passive_scan(hdev);
+-		} else {
+-			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
+-				    &cp->addr.bdaddr,
+-				    le_addr_type(cp->addr.type));
+-		}
++		goto unlock;
+ 	}
+ 
++	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
++					le_addr_type(cp->addr.type));
++	if (!params) {
++		bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
++			    &cp->addr.bdaddr, le_addr_type(cp->addr.type));
++		goto unlock;
++	}
++
++	supported_flags = get_params_flags(hdev, params);
++
++	if ((supported_flags | current_flags) != supported_flags) {
++		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
++			    current_flags, supported_flags);
++		goto unlock;
++	}
++
++	params->flags = current_flags;
++	status = MGMT_STATUS_SUCCESS;
++
++	/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
++	 * has been set.
++	 */
++	if (params->flags & HCI_CONN_FLAG_DEVICE_PRIVACY)
++		hci_update_passive_scan(hdev);
++
  unlock:
  	hci_dev_unlock(hdev);
+ 
 -- 
-2.37.1
+2.37.2
 
