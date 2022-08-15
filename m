@@ -2,81 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FEBC25B06
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Aug 2022 20:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCED8C00140
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Aug 2022 03:13:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230382AbiHNUww (ORCPT
+        id S238945AbiHODNr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 14 Aug 2022 16:52:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36734 "EHLO
+        Sun, 14 Aug 2022 23:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbiHNUwv (ORCPT
+        with ESMTP id S232701AbiHODNq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 14 Aug 2022 16:52:51 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F261A18385
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Aug 2022 13:52:48 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A8CAEB80B52
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Aug 2022 20:52:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4E902C43152
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Aug 2022 20:52:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660510366;
-        bh=vNqGquQNRUxvmjPTWOIDEpstmOUkwELTXg3oO6/XCfU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qdPABwFv94Pok6aF96SE3Z79wXlZVJ58v+RtrwxZ19Pt/CRmUR2fsBdkMX7NdgB/n
-         nBjdFhG+7/augEuqBqyNY6UunEVAgZMo2rWXDxfb8pqsALkjfpSwCSwv2q3+73A4le
-         7gL17VjzuvQgR8jpUKWNoMovCUHPaqf7CygLwOUAwX6aOaBCPbXj3zJg9vr7Taey5d
-         ElZMIQVnbvtUOoElKyj01fZZYcagkF2y5aO53xCI9TltwZnSBYGERAuKMVcXsfJ72f
-         Qnbm73IGmtE7OuXj2uePufexwtcCj27pCtnebVLTAdfhq5ued98Et2uyyjH/mhSk8T
-         eFxmKnqw29/Iw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 4112BC433E9; Sun, 14 Aug 2022 20:52:46 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215768] Kernel 5.17 can't suspend while bluetooth is enabled.
-Date:   Sun, 14 Aug 2022 20:52:45 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: Krzysztof.Krason@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215768-62941-tmrzWr0io2@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215768-62941@https.bugzilla.kernel.org/>
-References: <bug-215768-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sun, 14 Aug 2022 23:13:46 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5696913E9E
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Aug 2022 20:13:45 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id r69so5568370pgr.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Aug 2022 20:13:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=D7WubgfLGh4Txwp4GSb0Ehoc6LqsJZj/Z/4ejrIVpus=;
+        b=RSy/HsWnM93ELa2iCKW8e9Bqe9wdxXKc/N34rV4Z6i6cCoczMyjeHP+BLVJQzbiwTp
+         xft7uLWF93I2VTKYqki6Idt7QYhwhd8l+w08HU7i6hb/5tm6P4WhEmDpR+5LHrQBNj3l
+         f6bLGnof4Nk/k1Z4MQx8oYtUikz+/VwRvpKDp+16V32UGUsoGQ/jgJtJatBYbZ0dYdAA
+         Kr6Kd76J3DzBA8uNV3ExctGaNPdfizL1rlyAC5F28taZybAeSD4Oq2QgwUWWnQenuAUE
+         GBj4aBTU9O7XjV/JsUjo+apiKtTxo7fPITNakozFNAj9tuoNr8kqD5pRKxYmpJnAhx7X
+         t28w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=D7WubgfLGh4Txwp4GSb0Ehoc6LqsJZj/Z/4ejrIVpus=;
+        b=nLCOSbqgW7zWhddyJqnnz56aC+Vvwqdpn63ohbtx0mRCl+Yi3MJwf6eoUT0KHqVQli
+         bfL26xYDwYvaVmdvID1E24jByB9DoPWz5IFUPNRUFH2TEPZia7M7EfwTXOLnG19HddCG
+         3OXCujQlt+FhcCcZBpx2yaWVZsMxKlcQpwxMf5nhl2jwRemtRNd7THeacmpS/QVAe8kP
+         WiAfQQ6JrLdRSDDkeZdA6kdKKWOGXty5nFN/lXpLp1jZfd4PqYG8O59qQx6d3ydyfvGC
+         V8i1Z7xjzSfNyQA5nDFtCuYrTvPtx6mGZ9OoObqq3BZmZuseXwW8xOy5p86ZeleHi8P+
+         Tzxw==
+X-Gm-Message-State: ACgBeo1S38tz7qNSbJKRx0MtC75LNWGTMkPvAs2XNxk/HtjZLQpSTs6q
+        xhFRDb+MAH+gB2vy+5JaKLU=
+X-Google-Smtp-Source: AA6agR7Nes8J6UkcMkl5tPm7rj+dUjXgJVnV22IR08mbeJc2Ci2+eBLNKMhKWEmaNzeFEaLezX8WUA==
+X-Received: by 2002:a05:6a00:1709:b0:52e:677b:702b with SMTP id h9-20020a056a00170900b0052e677b702bmr14484918pfc.19.1660533224809;
+        Sun, 14 Aug 2022 20:13:44 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id s23-20020a170902a51700b0016bf4428586sm6039085plq.208.2022.08.14.20.13.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Aug 2022 20:13:44 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: ye.xingchen@zte.com.cn
+To:     luiz.dentz@gmail.com
+Cc:     marcel@holtmann.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org,
+        ye xingchen <ye.xingchen@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH linux-next] Bluetooth: hci_conn:Use kzalloc instead of kmalloc/memset
+Date:   Mon, 15 Aug 2022 03:13:32 +0000
+Message-Id: <20220815031332.64190-1-ye.xingchen@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
+From: ye xingchen <ye.xingchen@zte.com.cn>
 
---- Comment #37 from Krzysztof.Krason@gmail.com ---
-In my case it also doesn't reconnect to BT devices, I need to manually conn=
-ect
-to them after resume (5.18.12 - the fix for resume worked for me since 5.18=
-.5,
-but with the reconnection issue)
+From the coccinelle check:
 
---=20
-You may reply to this email to add a comment.
+./net/bluetooth/hci_conn.c
+WARNING  kzalloc should be used for d, instead of kmalloc/memset
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Use kzalloc rather than duplicating its implementation, which
+makes code simple and easy to understand.
+
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: ye xingchen <ye.xingchen@zte.com.cn>
+---
+ net/bluetooth/hci_conn.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 337e74d0f8b1..184c790af045 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -824,11 +824,10 @@ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
+ 
+ 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
+ 
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+ 
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->bis = bis;
+ 
+@@ -861,11 +860,10 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
+ 
+ 	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
+ 
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+ 
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->sync_handle = sync_handle;
+ 
+@@ -2034,7 +2032,7 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ 	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
+ 		return -EBUSY;
+ 
+-	cp = kmalloc(sizeof(*cp), GFP_KERNEL);
++	cp = kzalloc(sizeof(*cp), GFP_KERNEL);
+ 	if (!cp) {
+ 		hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+ 		return -ENOMEM;
+@@ -2046,7 +2044,6 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ 	else
+ 		dst_type = ADDR_LE_DEV_RANDOM;
+ 
+-	memset(cp, 0, sizeof(*cp));
+ 	cp->sid = sid;
+ 	cp->addr_type = dst_type;
+ 	bacpy(&cp->addr, dst);
+-- 
+2.25.1
