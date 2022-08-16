@@ -2,103 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD926C32772
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 06:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51613C2BB41
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 06:47:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbiHPGoq (ORCPT
+        id S230411AbiHPGrc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Aug 2022 02:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53154 "EHLO
+        Tue, 16 Aug 2022 02:47:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230236AbiHPGoU (ORCPT
+        with ESMTP id S229809AbiHPGrR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Aug 2022 02:44:20 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12DB2643AC
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 20:19:26 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id b7so7047836qvq.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 20:19:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=MzyaWEwiic8Xb0oi7vkqbfnlJP7SFgYVScMDaWJdY9A=;
-        b=g1HsPnI1coJGE43+JQA3WzWikYOy0xmpAP97DuKez5wP/n7Dk4IcWE5ggAhJ9mm11L
-         vjvw4rZtkzOfTg7pFceSAxyrtfyqM4/ONHo3G0ofC2BfxAvyInwx7HscNCFKw+MgoRIn
-         +HjYUApyB7j4vQ17fFqOghryIrZ3kJMpL1WgIhFUBvw7yFjI0+IaPxGq0KK4+IfulGex
-         92QAoU7C2ohIOpZinLXAJTMoAQJT/xFmRda9U3kB0un7yojkbdFdub1ChrglFI26G7RQ
-         b3t2etx2EWHao2SEb22nEDkyShD3Ao7CVYCFzHSvwsy4B5fZlOiV/BUKYYokTiDyaC42
-         +6kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=MzyaWEwiic8Xb0oi7vkqbfnlJP7SFgYVScMDaWJdY9A=;
-        b=h459TumyailSpB3vYbOBpBlKVdBCQDOAKhcIwCmE3X72ujjB/wA4gPJPNhIjrp+zpp
-         1fGMb+YmigSfKkxkrpDyzLcGoP23AGk2E35q9gA8UmhfsODoQNsY7dVxCuN619ERd8k0
-         nDjj+RH83MyzEZlCTZh3NBjfzQ2xvJSrCL4DwIwqXbL/nL+kkCdg02z0cW+gPHTZdkLq
-         jnYJH8L59oeaoJlIzZTJJJ27JcxsWxhr50JhpiMAJ6WWiXw21RkZxbv4JZVp1RcMb6nH
-         xmp6ILil2TXPTIfDGliQ+8pvNMQT4Wyonp86lkU5IOneB2fZ/mbDql88BR2PObP/cbeg
-         /sRQ==
-X-Gm-Message-State: ACgBeo1CEJHRHNe8bh7JVXsCWWQDGD0IvQr3lhlB+kDizawSLUEeWdER
-        LiJWq0zXL5VlvY0YXOqkOPkjH9WCZDA=
-X-Google-Smtp-Source: AA6agR4bDKNw6KpSM6E52d4/WLsxMnJpx5gBwmfCFoaDJlU6hbxogNgkWFiX+lcSZhUyQhlJ1ZoCXg==
-X-Received: by 2002:a05:6214:d6c:b0:476:94f5:aa7b with SMTP id 12-20020a0562140d6c00b0047694f5aa7bmr16501205qvs.92.1660619963887;
-        Mon, 15 Aug 2022 20:19:23 -0700 (PDT)
-Received: from [172.17.0.2] ([20.10.13.106])
-        by smtp.gmail.com with ESMTPSA id c11-20020ac853cb000000b0034455ff76ddsm5508623qtq.34.2022.08.15.20.19.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Aug 2022 20:19:23 -0700 (PDT)
-Message-ID: <62fb0cbb.c80a0220.71b13.9613@mx.google.com>
-Date:   Mon, 15 Aug 2022 20:19:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7704419531808919724=="
+        Tue, 16 Aug 2022 02:47:17 -0400
+Received: from endrift.com (endrift.com [173.255.198.10])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA6C13F339
+        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Aug 2022 18:49:34 -0700 (PDT)
+Received: from [192.168.0.22] (unknown [50.106.20.54])
+        by endrift.com (Postfix) with ESMTPSA id CB01CA176;
+        Mon, 15 Aug 2022 18:49:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=endrift.com; s=2020;
+        t=1660614574; bh=D6l9v4SCkxOFCmHxvon49KLHY+sl1oGS0FN/viPlM+E=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=LB/vEmjtdGDuU+fl9JnftKCgVG93460gSqj3PEYJOfK2882rssfnbuKIzV9Fe5cyF
+         SFk5KU4c1yLm3jf+VpN+uYclLTlC9JCDBle0AO3HbksPs5IUVpZvVk5o+Svs9im6a3
+         r08eOnr7YUdJqcwflEspZWV00sNU8eyGuO37fmz+qnsIk0NIcTZSJiRqPy0q4HAXpU
+         bvePG/G8Ko7VAtLsnpqqG2QHP/DGUA+d4thRbgMIiBA5DY652dOlbP8HVMBWo4rXna
+         imm3yOHntC2ThIpftda3t5oRKDn64AfcjyjqyqVuVOeAMZDGF9HPdXbpc+r8IFprvs
+         L0W9grPtWsg2Q==
+Message-ID: <be49af1f-f08a-7e26-42e5-98fe83077488@endrift.com>
+Date:   Mon, 15 Aug 2022 18:49:32 -0700
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: MGMT: Fix Get Device Flags
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220815231848.1252347-1-luiz.dentz@gmail.com>
-References: <20220815231848.1252347-1-luiz.dentz@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.12.0
+Subject: Re: [PATCH BlueZ] hog-lib: Increase maximum report map size
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20220803225716.1287921-1-vi@endrift.com>
+ <CABBYNZKcAZeDqjeHzTfqmvKS3Tbur-rRi6+uPL4x4t8MnWp5ug@mail.gmail.com>
+ <c0f52a2d-19ff-acb2-92ac-cec87819a2cf@endrift.com>
+ <CABBYNZLtWN7oWBRc-YjV6baCPpkh_J-2mUMO83A_3y=Xtn==dw@mail.gmail.com>
+ <dbeb83e5-9986-ca5d-e71f-cdaa579794bb@endrift.com>
+ <CABBYNZLHFAj4LwaMTEvCmysF2D__xrhJT9ORY-qmm_XYcGjjtQ@mail.gmail.com>
+ <CABBYNZKbCcz7p+EaNpWZkuX77BJ-DsoT=BRUQGwJjAhTesLhXA@mail.gmail.com>
+From:   Vicki Pfau <vi@endrift.com>
+In-Reply-To: <CABBYNZKbCcz7p+EaNpWZkuX77BJ-DsoT=BRUQGwJjAhTesLhXA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7704419531808919724==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On 8/15/22 11:09, Luiz Augusto von Dentz wrote:
+> Hi Vicki,
+> 
+> On Wed, Aug 10, 2022 at 1:13 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Vicki,
+>>
+>> On Tue, Aug 9, 2022 at 7:02 PM Vicki Pfau <vi@endrift.com> wrote:
+>>>
+>>>
+>>>
+>>> On 8/3/22 17:16, Luiz Augusto von Dentz wrote:
+>>>> Hi Vicki,
+>>>>
+>>>> On Wed, Aug 3, 2022 at 5:05 PM Vicki Pfau <vi@endrift.com> wrote:
+>>>>>
+>>>>>
+>>>>>
+>>>>> On 8/3/22 16:55, Luiz Augusto von Dentz wrote:
+>>>>>> Hi Vicki,
+>>>>>>
+>>>>>> On Wed, Aug 3, 2022 at 4:07 PM Vicki Pfau <vi@endrift.com> wrote:
+>>>>>>>
+>>>>>>> Though a 512 byte report map size seems plenty large, there exist some devices
+>>>>>>> (e.g. Brydge W-Touch) that send larger reports. There is no protocol-defined
+>>>>>>> maximum size so doubling the maximum size is safe, and should hopefully fix
+>>>>>>> most real-world failures.
+>>>>>>> ---
+>>>>>>>  profiles/input/hog-lib.c | 2 +-
+>>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>>>>
+>>>>>>> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+>>>>>>> index 4a9c60185..9f3eb428c 100644
+>>>>>>> --- a/profiles/input/hog-lib.c
+>>>>>>> +++ b/profiles/input/hog-lib.c
+>>>>>>> @@ -64,7 +64,7 @@
+>>>>>>>  #define HOG_PROTO_MODE_BOOT    0
+>>>>>>>  #define HOG_PROTO_MODE_REPORT  1
+>>>>>>>
+>>>>>>> -#define HOG_REPORT_MAP_MAX_SIZE        512
+>>>>>>> +#define HOG_REPORT_MAP_MAX_SIZE        1024
+>>>>>>>  #define HID_INFO_SIZE                  4
+>>>>>>>  #define ATT_NOTIFICATION_HEADER_SIZE   3
+>>>>>>
+>>>>>> Afaik 512 is the maximum length an attribute can have even when using
+>>>>>> read long procedure:
+>>>>>>
+>>>>>> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 3, Part F
+>>>>>> page 1416:
+>>>>>>
+>>>>>> The maximum length of an attribute value shall be 512 octets.
+>>>>>>
+>>>>>> And
+>>>>>>
+>>>>>> BLUETOOTH SPECIFICATION
+>>>>>> HID Service Specification
+>>>>>> Page 16 of 26
+>>>>>>
+>>>>>> 2.6.1 Report Map Characteristic Behavior
+>>>>>> The GATT Read Characteristic Value or Read Long Characteristic Values sub-
+>>>>>> procedures are used to read the Report Map characteristic value.
+>>>>>> The length of the Report Map characteristic value is limited to 512 octets.
+>>>>>>
+>>>>>> So I believe the device is not compliant and very likely needs to have
+>>>>>> multiple instances of HID Service instead of combining everything in a
+>>>>>> single instance.
+>>>>>>
+>>>>>>> --
+>>>>>>> 2.37.1
+>>>>>>>
+>>>>>>
+>>>>>>
+>>>>>
+>>>>> Ah, that's strange. I looked through the spec but didn't see those. That said, while the device may be non-compliant, the device is on the market and I doubt I could get them to update the firmware as a random third party. It works on Windows, so clearly Windows doesn't have a problem with its noncompliance. So this raises the question, how should Linux handle non-compliant hardware, especially when it could easily be made to work just by bending the rules in this one instance? I can absolutely change the commit message since it's erroneous, but the question then comes down to how should it be handled at all.
+>>>>
+>>>> While I agree this could be worked around it is probably worth
+>>>> checking with the manufacturer if it is aware of the problem because
+>>>> even if we were to allow reading past 512 bytes offset in the future
+>>>> there may be qualification tests enforcing not to do so, besides
+>>>> versions up to BlueZ 5.65 would still not work anyway so I thing
+>>>> letting the manufacturer know there is a problem with their
+>>>> implementation is actually worth a shot here.
+>>>>
+>>> Brydge replied with the standard tech support "this is only supported on Windows, so there probably won't be a firmware update" reply, despite its noncompliance. And since I doubt Windows will add a change to limit it, well, that kind of limits our options here to either "enforce compliance and break non-compliant hardware" or "figure out a way to bend the rules". Given that BlueZ, upon expanding the maximum size, does successfully read the overly-long report map (it does use the read blob with offset message to get the last several bytes), it does work as intended if we ignore that specific rule. Though obviously that's up to the bluetooth maintainers to solve, so at this point I'm just tossing my two cents at it.
+>>
+>> Well we can do what Windows is doing but let's have it documented
+>> then, we could as well scalate this with Bluetooth SIG since the
+>> manufacturer seem to be intentionally creating interoperability
+>> problems with a standard service, but that would likely take a lot
+>> more time and most likely will need to be resolved by introducing a
+>> test that enforces that HoG client don't attempt to read past 512
+>> bytes offset.
 
-Dear submitter,
+Is the client the device or the computer? Because the computer does successfully read past 512 bytes, and I believe it's needed for this device.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667828
+>>
+>> Btw, if there is no limitation on how big the report map can get in
+>> HID, I'd leave it up to the kernel to figure out if that is acceptable
+>> or not, so I'd remove the 1024.
 
----Test result---
+That makes sense. I can look into how to arbitrarily size that buffer.
 
-Test Summary:
-CheckPatch                    PASS      1.77 seconds
-GitLint                       PASS      1.07 seconds
-SubjectPrefix                 PASS      0.92 seconds
-BuildKernel                   PASS      42.76 seconds
-BuildKernel32                 PASS      36.14 seconds
-Incremental Build with patchesPASS      51.00 seconds
-TestRunner: Setup             PASS      597.67 seconds
-TestRunner: l2cap-tester      PASS      20.85 seconds
-TestRunner: bnep-tester       PASS      8.15 seconds
-TestRunner: mgmt-tester       PASS      121.94 seconds
-TestRunner: rfcomm-tester     PASS      11.83 seconds
-TestRunner: sco-tester        PASS      11.84 seconds
-TestRunner: smp-tester        PASS      11.49 seconds
-TestRunner: userchan-tester   PASS      8.24 seconds
+> 
+> Are you still planning to update this change? Btw, how about Android,
+> does it handle such devices?
+> 
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7704419531808919724==--
+Ah sorry, your reply was somewhat open ended and I didn't realize you wanted me to specifically look into this. As for Android, I have no idea. I can try pairing the trackpad with an Android device and seeing what happens, but I don't have anything with modern Android as it's not my day-to-day phone OS.
