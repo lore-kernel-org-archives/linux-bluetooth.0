@@ -2,93 +2,196 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11F86C25B0E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 15:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0A3C25B0E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 16:18:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235991AbiHPP7H (ORCPT
+        id S235819AbiHPQSK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Aug 2022 11:59:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54906 "EHLO
+        Tue, 16 Aug 2022 12:18:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236025AbiHPP6i (ORCPT
+        with ESMTP id S231324AbiHPQSJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Aug 2022 11:58:38 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 358A6F590
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 08:56:02 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id o2so8516370iof.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 08:56:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc;
-        bh=VDWcb8XRKIxB9Y0Rg9LiVx/tZDH5X4h0oxOhW6Z4NkM=;
-        b=j73nuWxrj8fSLsS+NFCZKdr5Lwj/hqeLOKhnJidyN2Q8HwQd20KMZ7y3JUxlt4BGZB
-         +NCO3KP9+QH3TsHWZzxZD0iTfiYbYua8qmSZqCNI8xh8SgqFuC4yn4g+LWrKcsfuZP2q
-         TnYWH4NcZvVmhfPcN6Yt+J6HxT2Vv+ZFXPP2f191uY3+4GUJ/2a6lHhh/djFVUumEORr
-         cxBp6lGMkHvJvv1R0F00t1n7gbGlkFBOEH0M5on1JkDBIESWa5Tnj2ZzDZhAA7/h9XV1
-         rGVGKkIvvR/kB+i8glR2Uy7Xo7yhz8tFvUx4Igf18jv9RkvISzQspTIhEFYtMQeAqeuN
-         KTIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=VDWcb8XRKIxB9Y0Rg9LiVx/tZDH5X4h0oxOhW6Z4NkM=;
-        b=tZiAsWhsUUicyizzEc0hNq0JE2OWRMmSRbQ4LjXSNIdSJGxSozc1yltaEhgHgGLI9J
-         gbsfpj/otAx6IcTSNgrXA6iausk/LjtLo902Nw/v3UnTdW5f0foQxt6Bok7CY0xw9s9y
-         /Y67hlec9iMxW65Qrse5lk8U084KmmZYQvfTq1+91eISfbi2czqlKPD55HElytDtZesl
-         a5RDyulJE5qqk1bAFsnOTeikeUQa95e8p+hkmPGLRnvUX1LfbHVmSwL6jtnI2wuR6AkD
-         f/zOhWQYBONlmkJRn11w4RxeaqB/52SIM3ZwafoRfoQ0bBe7ECCdtq/5Dp5H8563mSAr
-         CtxA==
-X-Gm-Message-State: ACgBeo20hVpD0I1BRuugP9stY5AMdcl/dyAHGb6gLskwA95bOyk0Jg7Q
-        jPJwgos1QhNHEKpN48DlvoCEP+8rQUI=
-X-Google-Smtp-Source: AA6agR4RRh76ZiXm0rfLQBssADESzGcHRjOMPh5i9lWT4VqCRrXdTreQDc+tp8zTY4wC2cfJEvx4XA==
-X-Received: by 2002:a05:6638:2195:b0:342:9d4c:b598 with SMTP id s21-20020a056638219500b003429d4cb598mr9353549jaj.61.1660665361440;
-        Tue, 16 Aug 2022 08:56:01 -0700 (PDT)
-Received: from [172.17.0.2] ([40.122.125.225])
-        by smtp.gmail.com with ESMTPSA id r19-20020a056638301300b003434bced7a2sm4530949jak.39.2022.08.16.08.56.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 08:56:00 -0700 (PDT)
-Message-ID: <62fbbe10.050a0220.2e174.42b1@mx.google.com>
-Date:   Tue, 16 Aug 2022 08:56:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0483232238716551308=="
+        Tue, 16 Aug 2022 12:18:09 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1191F78215
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 09:18:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660666685; x=1692202685;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eHZMvTWHfkMF8DkHs8ZLyvMuv8nwHv6ZLWyTtYMzKZ0=;
+  b=GEZT4SkHu/SmU7bRCW6ZmwA4IjqWjZTw+0iEDZw/mkjaWaG1Thr+yc4t
+   OuO+MqbTlwwazgrdQP5iH8Zoeyj5b5FibOwqaCHBkhtpTBr24ua9P6lcD
+   JhaMJbfFuy8glx7cmAG3DDmrq4c2gSQdhSFuT52C/5J2Jk9bfQkFpAPJO
+   FIl2/3DYLEWBbcn2b1V5Ix2kcDOaXu2dDiArj0v6480CpxWX9pTm7eECa
+   vJPGXeJix6Q2wEEesWfNM2+RIbP9gmXbR+P37Hy7gs/QoRgpocw24B+rG
+   pgo6VREexDJ59Ohgh/om1qPyUMtH/MPFpMCLDQxx1OR0cFGCUkD1ZZVY0
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="272033746"
+X-IronPort-AV: E=Sophos;i="5.93,241,1654585200"; 
+   d="scan'208";a="272033746"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 09:18:04 -0700
+X-IronPort-AV: E=Sophos;i="5.93,241,1654585200"; 
+   d="scan'208";a="557760671"
+Received: from frperuch-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.23.122])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 09:18:04 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH] Bluetooth: Normalize HCI_OP_READ_ENC_KEY_SIZE cmdcmplt
+Date:   Tue, 16 Aug 2022 09:17:56 -0700
+Message-Id: <20220816161756.997539-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-Subject: RE: [v2] Bluetooth: Move hci_abort_conn to hci_conn.c
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-In-Reply-To: <20220816152606.973841-1-brian.gix@intel.com>
-References: <20220816152606.973841-1-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0483232238716551308==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The HCI_OP_READ_ENC_KEY_SIZE command is converted from using the
+deprecated hci_request mechanism to use hci_send_cmd, with an
+accompanying hci_cc_read_enc_key_size to handle it's return response.
 
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-error: patch failed: net/bluetooth/hci_request.c:909
-error: net/bluetooth/hci_request.c: patch does not apply
-error: patch failed: net/bluetooth/hci_request.h:73
-error: net/bluetooth/hci_request.h: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_event.c | 92 +++++++++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 47 deletions(-)
 
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 938abe6352bf..a0c3583b29bb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -712,6 +712,47 @@ static u8 hci_cc_read_local_version(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
++				     struct sk_buff *skb)
++{
++	struct hci_rp_read_enc_key_size *rp = data;
++	struct hci_conn *conn;
++	u16 handle;
++	u8 status = rp->status;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", status);
++
++	handle = le16_to_cpu(rp->handle);
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!conn) {
++		status = 0xFF;
++		goto done;
++	}
++
++	/* While unexpected, the read_enc_key_size command may fail. The most
++	 * secure approach is to then assume the key size is 0 to force a
++	 * disconnection.
++	 */
++	if (status) {
++		bt_dev_err(hdev, "failed to read key size for handle %u",
++			   handle);
++		conn->enc_key_size = 0;
++	} else {
++		conn->enc_key_size = rp->key_size;
++		status = 0;
++	}
++
++	hci_encrypt_cfm(conn, 0);
++
++done:
++	hci_dev_unlock(hdev);
++
++	return status;
++}
++
+ static u8 hci_cc_read_local_commands(struct hci_dev *hdev, void *data,
+ 				     struct sk_buff *skb)
+ {
+@@ -3534,47 +3575,6 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+-				       u16 opcode, struct sk_buff *skb)
+-{
+-	const struct hci_rp_read_enc_key_size *rp;
+-	struct hci_conn *conn;
+-	u16 handle;
+-
+-	BT_DBG("%s status 0x%02x", hdev->name, status);
+-
+-	if (!skb || skb->len < sizeof(*rp)) {
+-		bt_dev_err(hdev, "invalid read key size response");
+-		return;
+-	}
+-
+-	rp = (void *)skb->data;
+-	handle = le16_to_cpu(rp->handle);
+-
+-	hci_dev_lock(hdev);
+-
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (!conn)
+-		goto unlock;
+-
+-	/* While unexpected, the read_enc_key_size command may fail. The most
+-	 * secure approach is to then assume the key size is 0 to force a
+-	 * disconnection.
+-	 */
+-	if (rp->status) {
+-		bt_dev_err(hdev, "failed to read key size for handle %u",
+-			   handle);
+-		conn->enc_key_size = 0;
+-	} else {
+-		conn->enc_key_size = rp->key_size;
+-	}
+-
+-	hci_encrypt_cfm(conn, 0);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
+-}
+-
+ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 				   struct sk_buff *skb)
+ {
+@@ -3639,7 +3639,6 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 	/* Try reading the encryption key size for encrypted ACL links */
+ 	if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
+ 		struct hci_cp_read_enc_key_size cp;
+-		struct hci_request req;
+ 
+ 		/* Only send HCI_Read_Encryption_Key_Size if the
+ 		 * controller really supports it. If it doesn't, assume
+@@ -3650,12 +3649,9 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 			goto notify;
+ 		}
+ 
+-		hci_req_init(&req, hdev);
+-
+ 		cp.handle = cpu_to_le16(conn->handle);
+-		hci_req_add(&req, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
+-
+-		if (hci_req_run_skb(&req, read_enc_key_size_complete)) {
++		if (hci_send_cmd(hdev, HCI_OP_READ_ENC_KEY_SIZE,
++				 sizeof(cp), &cp)) {
+ 			bt_dev_err(hdev, "sending read key size failed");
+ 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
+ 			goto notify;
+@@ -4037,6 +4033,8 @@ static const struct hci_cc {
+ 	       sizeof(struct hci_rp_read_local_amp_info)),
+ 	HCI_CC(HCI_OP_READ_CLOCK, hci_cc_read_clock,
+ 	       sizeof(struct hci_rp_read_clock)),
++	HCI_CC(HCI_OP_READ_ENC_KEY_SIZE, hci_cc_read_enc_key_size,
++	       sizeof(struct hci_rp_read_enc_key_size)),
+ 	HCI_CC(HCI_OP_READ_INQ_RSP_TX_POWER, hci_cc_read_inq_rsp_tx_power,
+ 	       sizeof(struct hci_rp_read_inq_rsp_tx_power)),
+ 	HCI_CC(HCI_OP_READ_DEF_ERR_DATA_REPORTING,
+-- 
+2.37.1
 
---===============0483232238716551308==--
