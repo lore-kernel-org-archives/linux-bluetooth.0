@@ -2,225 +2,196 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C5FDC32772
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 18:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AFF4C25B0E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 19:04:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236507AbiHPSbl (ORCPT
+        id S236491AbiHPTEm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Aug 2022 14:31:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57448 "EHLO
+        Tue, 16 Aug 2022 15:04:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236499AbiHPSbg (ORCPT
+        with ESMTP id S236114AbiHPTEl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Aug 2022 14:31:36 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E6E57E18
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 11:31:34 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id bx38so11346958ljb.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 11:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc;
-        bh=veKrb3uU4qV+Ha6yxxeAeb1+OfQ3l2xSgID393fxLJ8=;
-        b=g5bG+fZyHw3OORSkjacFJ43EPT1e8XDhvxBAsDhaqt/ttKhef0lnDpRVyOZTFVM0ro
-         V2mtxH3OLReaktn3Ppf6zThi8A+ECeJcEhSv700SDWrmh1z/ro4/yaHGP2513LE1moRc
-         mWlj8JZxEVAXh52o4OWqDbl1JPGSWRPqaeqYdl4djsTXeI/35wJDdBNz2OhQ/yZOEDa9
-         sreLjG2zBRlgfazP5xu8eGHug9AJ/TZgBISvwz/FoV4QdB90aWMTAXiLYxUbkbFC+kSs
-         cuivADgB2JGaPKyuWgXJys7iL4HPjyrpM5Akj4yvHELiYkBtCzTK4Lp1kF6pryG0c2dH
-         wJOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc;
-        bh=veKrb3uU4qV+Ha6yxxeAeb1+OfQ3l2xSgID393fxLJ8=;
-        b=yTgWnj+SZnTnlov8Iol+MTL94ILjmB8jOGF2kUpqPBzk8y1dAvSvIeELw45gfg4/PW
-         FuJB9ttUc4SZaO5FBUOHn+WvZ3Rnq647rZxQx8vQH9yxwlG+eYnmbuZK52b5qSEMwwJ7
-         lByEV73LTEQZ+YFjQel64miBnQ/ASml94TGABEfZuuix2vPHcHUws3VGEcbEeXanvvcV
-         PIivoqC1ivGwBM+3YHcVkHJQsBv7CmKTnDI95N7I5A8xnS1Z0mCAliFGi9q0Js2Ruuek
-         a1Xpipf/tqoTyykasbw9OrlwxiAsaRXXMH1F/wkKuDHQb5mFeqgGNalMTlzOXcNBVOdD
-         HL6A==
-X-Gm-Message-State: ACgBeo3M+kPr9/tij7m1T26ZLldJCc8Nl5J3y7YBg5/rFJiNmHtAHbnM
-        TXLB//k/erK5L9QpYz+j5stcm1M+j+Gbm8nTTxUfHaRq5hTDXQ==
-X-Google-Smtp-Source: AA6agR4tanPd2NWJMlOAAvQ4rbhVl5jVDfoawNA6pAIFSTNCT/xRv8nhdkxU0rJA/jbscswJxG1yWBxAi545aiP9yXQ=
-X-Received: by 2002:a2e:8e90:0:b0:260:201:765b with SMTP id
- z16-20020a2e8e90000000b002600201765bmr6984620ljk.432.1660674692684; Tue, 16
- Aug 2022 11:31:32 -0700 (PDT)
+        Tue, 16 Aug 2022 15:04:41 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573BF5D11B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 12:04:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1660676680; x=1692212680;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OYCG6APw2zW1Dw8v8EZcws1ZS3zMh17pmygHWx45glc=;
+  b=I3C1bso3yiTc5G5bK5mG5+iPR+sk66mlshAk2PFYI8V5PSqsXyWna/Rb
+   BzgJJg/l2xvcC53IgtfJu2hPxJx9M7FgbblqxHUgd9u9QR6R2a7QK2Ae1
+   9zdIzSJo85cCJNzKcqCfFDSO78y83qBFlMjtk9Z9Tz3bX+HoQcHuqYUSc
+   fAXcX5irSSIfx8Z7L1sOxVk76hNRDKfi6cYfAMYW1TJvqTX2CQXNoBWr5
+   LO6pE8N9rPys3oBM1hjcmwM33jS3H0IJBphHIbaGM/FeUuD/GBv4apYEJ
+   zmT1nlBIINnT+fQlJOW6o2xxQ8POCRHRHMSTX3qnn0lFSz1b5SuGEdKOr
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10441"; a="378596888"
+X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
+   d="scan'208";a="378596888"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 12:04:40 -0700
+X-IronPort-AV: E=Sophos;i="5.93,242,1654585200"; 
+   d="scan'208";a="640152224"
+Received: from frperuch-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.23.122])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2022 12:04:39 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH v2] Bluetooth: Normalize HCI_OP_READ_ENC_KEY_SIZE cmdcmplt
+Date:   Tue, 16 Aug 2022 12:04:34 -0700
+Message-Id: <20220816190434.1015206-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.1
 MIME-Version: 1.0
-References: <20220803225716.1287921-1-vi@endrift.com> <CABBYNZKcAZeDqjeHzTfqmvKS3Tbur-rRi6+uPL4x4t8MnWp5ug@mail.gmail.com>
- <c0f52a2d-19ff-acb2-92ac-cec87819a2cf@endrift.com> <CABBYNZLtWN7oWBRc-YjV6baCPpkh_J-2mUMO83A_3y=Xtn==dw@mail.gmail.com>
- <dbeb83e5-9986-ca5d-e71f-cdaa579794bb@endrift.com> <CABBYNZLHFAj4LwaMTEvCmysF2D__xrhJT9ORY-qmm_XYcGjjtQ@mail.gmail.com>
- <CABBYNZKbCcz7p+EaNpWZkuX77BJ-DsoT=BRUQGwJjAhTesLhXA@mail.gmail.com> <be49af1f-f08a-7e26-42e5-98fe83077488@endrift.com>
-In-Reply-To: <be49af1f-f08a-7e26-42e5-98fe83077488@endrift.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 16 Aug 2022 11:31:20 -0700
-Message-ID: <CABBYNZLqjUpkCArjqHad4OKxT3PAow0T8+vP+tOvCtJbSG2p3g@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] hog-lib: Increase maximum report map size
-To:     Vicki Pfau <vi@endrift.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Vicki,
+The HCI_OP_READ_ENC_KEY_SIZE command is converted from using the
+deprecated hci_request mechanism to use hci_send_cmd, with an
+accompanying hci_cc_read_enc_key_size to handle it's return response.
 
-On Mon, Aug 15, 2022 at 6:49 PM Vicki Pfau <vi@endrift.com> wrote:
->
-> Hi,
->
-> On 8/15/22 11:09, Luiz Augusto von Dentz wrote:
-> > Hi Vicki,
-> >
-> > On Wed, Aug 10, 2022 at 1:13 PM Luiz Augusto von Dentz
-> > <luiz.dentz@gmail.com> wrote:
-> >>
-> >> Hi Vicki,
-> >>
-> >> On Tue, Aug 9, 2022 at 7:02 PM Vicki Pfau <vi@endrift.com> wrote:
-> >>>
-> >>>
-> >>>
-> >>> On 8/3/22 17:16, Luiz Augusto von Dentz wrote:
-> >>>> Hi Vicki,
-> >>>>
-> >>>> On Wed, Aug 3, 2022 at 5:05 PM Vicki Pfau <vi@endrift.com> wrote:
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> On 8/3/22 16:55, Luiz Augusto von Dentz wrote:
-> >>>>>> Hi Vicki,
-> >>>>>>
-> >>>>>> On Wed, Aug 3, 2022 at 4:07 PM Vicki Pfau <vi@endrift.com> wrote:
-> >>>>>>>
-> >>>>>>> Though a 512 byte report map size seems plenty large, there exist=
- some devices
-> >>>>>>> (e.g. Brydge W-Touch) that send larger reports. There is no proto=
-col-defined
-> >>>>>>> maximum size so doubling the maximum size is safe, and should hop=
-efully fix
-> >>>>>>> most real-world failures.
-> >>>>>>> ---
-> >>>>>>>  profiles/input/hog-lib.c | 2 +-
-> >>>>>>>  1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>>>>
-> >>>>>>> diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-> >>>>>>> index 4a9c60185..9f3eb428c 100644
-> >>>>>>> --- a/profiles/input/hog-lib.c
-> >>>>>>> +++ b/profiles/input/hog-lib.c
-> >>>>>>> @@ -64,7 +64,7 @@
-> >>>>>>>  #define HOG_PROTO_MODE_BOOT    0
-> >>>>>>>  #define HOG_PROTO_MODE_REPORT  1
-> >>>>>>>
-> >>>>>>> -#define HOG_REPORT_MAP_MAX_SIZE        512
-> >>>>>>> +#define HOG_REPORT_MAP_MAX_SIZE        1024
-> >>>>>>>  #define HID_INFO_SIZE                  4
-> >>>>>>>  #define ATT_NOTIFICATION_HEADER_SIZE   3
-> >>>>>>
-> >>>>>> Afaik 512 is the maximum length an attribute can have even when us=
-ing
-> >>>>>> read long procedure:
-> >>>>>>
-> >>>>>> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 3, Part F
-> >>>>>> page 1416:
-> >>>>>>
-> >>>>>> The maximum length of an attribute value shall be 512 octets.
-> >>>>>>
-> >>>>>> And
-> >>>>>>
-> >>>>>> BLUETOOTH SPECIFICATION
-> >>>>>> HID Service Specification
-> >>>>>> Page 16 of 26
-> >>>>>>
-> >>>>>> 2.6.1 Report Map Characteristic Behavior
-> >>>>>> The GATT Read Characteristic Value or Read Long Characteristic Val=
-ues sub-
-> >>>>>> procedures are used to read the Report Map characteristic value.
-> >>>>>> The length of the Report Map characteristic value is limited to 51=
-2 octets.
-> >>>>>>
-> >>>>>> So I believe the device is not compliant and very likely needs to =
-have
-> >>>>>> multiple instances of HID Service instead of combining everything =
-in a
-> >>>>>> single instance.
-> >>>>>>
-> >>>>>>> --
-> >>>>>>> 2.37.1
-> >>>>>>>
-> >>>>>>
-> >>>>>>
-> >>>>>
-> >>>>> Ah, that's strange. I looked through the spec but didn't see those.=
- That said, while the device may be non-compliant, the device is on the mar=
-ket and I doubt I could get them to update the firmware as a random third p=
-arty. It works on Windows, so clearly Windows doesn't have a problem with i=
-ts noncompliance. So this raises the question, how should Linux handle non-=
-compliant hardware, especially when it could easily be made to work just by=
- bending the rules in this one instance? I can absolutely change the commit=
- message since it's erroneous, but the question then comes down to how shou=
-ld it be handled at all.
-> >>>>
-> >>>> While I agree this could be worked around it is probably worth
-> >>>> checking with the manufacturer if it is aware of the problem because
-> >>>> even if we were to allow reading past 512 bytes offset in the future
-> >>>> there may be qualification tests enforcing not to do so, besides
-> >>>> versions up to BlueZ 5.65 would still not work anyway so I thing
-> >>>> letting the manufacturer know there is a problem with their
-> >>>> implementation is actually worth a shot here.
-> >>>>
-> >>> Brydge replied with the standard tech support "this is only supported=
- on Windows, so there probably won't be a firmware update" reply, despite i=
-ts noncompliance. And since I doubt Windows will add a change to limit it, =
-well, that kind of limits our options here to either "enforce compliance an=
-d break non-compliant hardware" or "figure out a way to bend the rules". Gi=
-ven that BlueZ, upon expanding the maximum size, does successfully read the=
- overly-long report map (it does use the read blob with offset message to g=
-et the last several bytes), it does work as intended if we ignore that spec=
-ific rule. Though obviously that's up to the bluetooth maintainers to solve=
-, so at this point I'm just tossing my two cents at it.
-> >>
-> >> Well we can do what Windows is doing but let's have it documented
-> >> then, we could as well scalate this with Bluetooth SIG since the
-> >> manufacturer seem to be intentionally creating interoperability
-> >> problems with a standard service, but that would likely take a lot
-> >> more time and most likely will need to be resolved by introducing a
-> >> test that enforces that HoG client don't attempt to read past 512
-> >> bytes offset.
->
-> Is the client the device or the computer? Because the computer does succe=
-ssfully read past 512 bytes, and I believe it's needed for this device.
->
-> >>
-> >> Btw, if there is no limitation on how big the report map can get in
-> >> HID, I'd leave it up to the kernel to figure out if that is acceptable
-> >> or not, so I'd remove the 1024.
->
-> That makes sense. I can look into how to arbitrarily size that buffer.
->
-> >
-> > Are you still planning to update this change? Btw, how about Android,
-> > does it handle such devices?
-> >
->
-> Ah sorry, your reply was somewhat open ended and I didn't realize you wan=
-ted me to specifically look into this. As for Android, I have no idea. I ca=
-n try pairing the trackpad with an Android device and seeing what happens, =
-but I don't have anything with modern Android as it's not my day-to-day pho=
-ne OS.
+Signed-off-by: Brian Gix <brian.gix@intel.com>
+---
+ net/bluetooth/hci_event.c | 92 +++++++++++++++++++--------------------
+ 1 file changed, 45 insertions(+), 47 deletions(-)
 
-Well iOS would do as well, what Im after is if that is in fact never
-enforced by other major OS, I do see there have been some tickets
-created about that already so Im trying to get some response, please
-forward this to the manufactures:
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 938abe6352bf..2feb5af30d35 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -712,6 +712,47 @@ static u8 hci_cc_read_local_version(struct hci_dev *hdev, void *data,
+ 	return rp->status;
+ }
+ 
++static u8 hci_cc_read_enc_key_size(struct hci_dev *hdev, void *data,
++				   struct sk_buff *skb)
++{
++	struct hci_rp_read_enc_key_size *rp = data;
++	struct hci_conn *conn;
++	u16 handle;
++	u8 status = rp->status;
++
++	bt_dev_dbg(hdev, "status 0x%2.2x", status);
++
++	handle = le16_to_cpu(rp->handle);
++
++	hci_dev_lock(hdev);
++
++	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!conn) {
++		status = 0xFF;
++		goto done;
++	}
++
++	/* While unexpected, the read_enc_key_size command may fail. The most
++	 * secure approach is to then assume the key size is 0 to force a
++	 * disconnection.
++	 */
++	if (status) {
++		bt_dev_err(hdev, "failed to read key size for handle %u",
++			   handle);
++		conn->enc_key_size = 0;
++	} else {
++		conn->enc_key_size = rp->key_size;
++		status = 0;
++	}
++
++	hci_encrypt_cfm(conn, 0);
++
++done:
++	hci_dev_unlock(hdev);
++
++	return status;
++}
++
+ static u8 hci_cc_read_local_commands(struct hci_dev *hdev, void *data,
+ 				     struct sk_buff *skb)
+ {
+@@ -3534,47 +3575,6 @@ static void hci_remote_name_evt(struct hci_dev *hdev, void *data,
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static void read_enc_key_size_complete(struct hci_dev *hdev, u8 status,
+-				       u16 opcode, struct sk_buff *skb)
+-{
+-	const struct hci_rp_read_enc_key_size *rp;
+-	struct hci_conn *conn;
+-	u16 handle;
+-
+-	BT_DBG("%s status 0x%02x", hdev->name, status);
+-
+-	if (!skb || skb->len < sizeof(*rp)) {
+-		bt_dev_err(hdev, "invalid read key size response");
+-		return;
+-	}
+-
+-	rp = (void *)skb->data;
+-	handle = le16_to_cpu(rp->handle);
+-
+-	hci_dev_lock(hdev);
+-
+-	conn = hci_conn_hash_lookup_handle(hdev, handle);
+-	if (!conn)
+-		goto unlock;
+-
+-	/* While unexpected, the read_enc_key_size command may fail. The most
+-	 * secure approach is to then assume the key size is 0 to force a
+-	 * disconnection.
+-	 */
+-	if (rp->status) {
+-		bt_dev_err(hdev, "failed to read key size for handle %u",
+-			   handle);
+-		conn->enc_key_size = 0;
+-	} else {
+-		conn->enc_key_size = rp->key_size;
+-	}
+-
+-	hci_encrypt_cfm(conn, 0);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
+-}
+-
+ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 				   struct sk_buff *skb)
+ {
+@@ -3639,7 +3639,6 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 	/* Try reading the encryption key size for encrypted ACL links */
+ 	if (!ev->status && ev->encrypt && conn->type == ACL_LINK) {
+ 		struct hci_cp_read_enc_key_size cp;
+-		struct hci_request req;
+ 
+ 		/* Only send HCI_Read_Encryption_Key_Size if the
+ 		 * controller really supports it. If it doesn't, assume
+@@ -3650,12 +3649,9 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, void *data,
+ 			goto notify;
+ 		}
+ 
+-		hci_req_init(&req, hdev);
+-
+ 		cp.handle = cpu_to_le16(conn->handle);
+-		hci_req_add(&req, HCI_OP_READ_ENC_KEY_SIZE, sizeof(cp), &cp);
+-
+-		if (hci_req_run_skb(&req, read_enc_key_size_complete)) {
++		if (hci_send_cmd(hdev, HCI_OP_READ_ENC_KEY_SIZE,
++				 sizeof(cp), &cp)) {
+ 			bt_dev_err(hdev, "sending read key size failed");
+ 			conn->enc_key_size = HCI_LINK_KEY_SIZE;
+ 			goto notify;
+@@ -4037,6 +4033,8 @@ static const struct hci_cc {
+ 	       sizeof(struct hci_rp_read_local_amp_info)),
+ 	HCI_CC(HCI_OP_READ_CLOCK, hci_cc_read_clock,
+ 	       sizeof(struct hci_rp_read_clock)),
++	HCI_CC(HCI_OP_READ_ENC_KEY_SIZE, hci_cc_read_enc_key_size,
++	       sizeof(struct hci_rp_read_enc_key_size)),
+ 	HCI_CC(HCI_OP_READ_INQ_RSP_TX_POWER, hci_cc_read_inq_rsp_tx_power,
+ 	       sizeof(struct hci_rp_read_inq_rsp_tx_power)),
+ 	HCI_CC(HCI_OP_READ_DEF_ERR_DATA_REPORTING,
+-- 
+2.37.1
 
-https://www.bluetooth.org/errata/errata_view.cfm?errata_id=3D17495
-
-In the meantime there is yet another device that appear to have similar pro=
-blem:
-
-https://github.com/bluez/bluez/pull/376
-
---=20
-Luiz Augusto von Dentz
