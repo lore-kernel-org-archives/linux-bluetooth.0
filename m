@@ -2,121 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5151C2BB41
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 22:05:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B993CC25B0E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 23:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237676AbiHPWF5 (ORCPT
+        id S236851AbiHPXNz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Aug 2022 18:05:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40786 "EHLO
+        Tue, 16 Aug 2022 19:13:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233253AbiHPWF4 (ORCPT
+        with ESMTP id S235578AbiHPXNy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Aug 2022 18:05:56 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D65D72FF8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 15:05:56 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id gp7so10878237pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 15:05:56 -0700 (PDT)
+        Tue, 16 Aug 2022 19:13:54 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DC1C3334E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 16:13:53 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id s31-20020a17090a2f2200b001faaf9d92easo262920pjd.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 16:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc;
-        bh=0lZb1xai1JnBrrL7n4wa12Nq8PJJQDPpg+w/LzhBQd8=;
-        b=Dt0hzi8q/SRl0entoADATZTNBZz0aHGxZMnTlnEts04p0FtnnaPOPbzW62bQZxaJBk
-         HJCl7dlfDeML52leXE8Sx6YQiY3aMkKt3q+1WYcxbf6XSnX1my939SDI4GTYB5ygulVw
-         9P2dtYA4YkIxZTmHhQrO++4BSQFrAEBkRPkmaADHPIaXlPdPJu4oXpbRFu6V8P5qeRn0
-         GT7qOzsdzb3msarj4qdUGNz58tfF4DA0KsR5HjkW/vZB6kLlzu37Tv4NEu2ixAAnHiFt
-         2GNO1968tjDjF31NRNs1afZ0UB3n+9YRKNFNKNEoeCU1dZvaHkwXcsHjiJHnf2DbVQXf
-         7gXQ==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=7XnaFraax8PyYgmwXiph6gai7onIH+AVrb33iTBX+aE=;
+        b=C04EhIiTjUbJA/npn2H9HvXIMwweAnZQ/ypEOdI8KBIzPNLsuOovCtZeyQ8h6+lP+S
+         A6DJPICWUcv/QRW1r4Jt7AepmXPIMS/4vmah96q5NKOQfxGmAZeeBP2LWiFKzaGoPiSW
+         4xv5KRkcLXr3E2ylpasEm1T941+bS18oUsjcTBMlwOnsFrAWfUr5iabt9RMOReuGraCB
+         xkPJGoElnBouIsEAxB5/qxzSHmlBIJhHtbJrRTWqsaUmczV1lIhg5tL+xvUw83VGpVAY
+         8LoXRwRjXVPZ7mV4wA445o2DMIh7Io0UVYG96vt7QDyl/PqiGYnZxOUjw1loG5z2WRiZ
+         O1Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=0lZb1xai1JnBrrL7n4wa12Nq8PJJQDPpg+w/LzhBQd8=;
-        b=N3aSliTtDWEnIYpXXTEStjbl9wkkj7KoNs6zR+BinNLlOLWBxNdVjkTprrCKcgRoUQ
-         TqGkxWEmQhb3iM+lzwZDuhyI/pJX6g6ZDrfYgtmGZupuN+5zJMMaxtkNcnbMV5ZQ4JWY
-         KCr9Cf+IWaTCzqt4IxjTjkZvYQVpMx+FV1CaCnlfqVD72DdwmaB3DNeIOC7txRcz5zKc
-         TisUrhj1awQy6VMOTsiIlEKM2zf0b20pEQUHlnL11ZW3z4h/S6vLqf+J4uJKzE7qZQop
-         vTX9vTDgxFtL16OgYPOcEhjpZ1Y2lFEEO48Yddj7pTDUNh7Dcv6d0BeFjmbbqUwKKU1l
-         eQkg==
-X-Gm-Message-State: ACgBeo3SJoQN1z7wZwL6TBEm0z+/vShYSRLtGemqCZqOJP0NJr2ZBo/2
-        e70Qrrlix0FvTYDDIoR3rttdJWh4J/30H4f9
-X-Google-Smtp-Source: AA6agR7By9LCHWOsFkjnDTp6gahH/+hyo0XoWCS+9Io+YyLOT0I2DrXmA4UhilcvscEdv7TUo7RL3Q==
-X-Received: by 2002:a17:90b:3e88:b0:1f5:6029:1bf7 with SMTP id rj8-20020a17090b3e8800b001f560291bf7mr637908pjb.155.1660687555170;
-        Tue, 16 Aug 2022 15:05:55 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a20-20020aa79714000000b0052d2cd99490sm8954286pfg.5.2022.08.16.15.05.53
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=7XnaFraax8PyYgmwXiph6gai7onIH+AVrb33iTBX+aE=;
+        b=sDqjqDnNK/YIgddd+FFjz6NGT9hnHEkCkTInQEuIMtp6clIE7NIVWCIFuHdIjBoqCq
+         uVzuYSJCgrMxQzu3qvNxRJvekqr5SoSoXoz3HST/3UOwjv+NyvzoNuaI628z2cKcTH6b
+         bkcIxJwwhyG1Xk0LXEG+9fK5bK2ACQwLKMfbuZDHj11CSBkvPQQFfcfsSTo9Mw4M8KII
+         /cE8N6ts4Wribm5ZobvXkQHrMLYSDBx2tcHU4rZxjCuVTlyn9EblKXeEZczbppC3e3W3
+         /GGDWYIRWtSOPxj4frLEiqxcjVfLBOi9pS4oZJ1rF7pJH16Zn0OUDSN3Q6WEbTMtYwpW
+         eH0g==
+X-Gm-Message-State: ACgBeo0wrcT7AMrZNntFWxbD+v3WxdXCeUgBF/8C9oRHZyhxP93BBK/W
+        kHIajsDjep6Qv7SkeHE1tNMKDFdowSQ=
+X-Google-Smtp-Source: AA6agR6ZydGjm4+JSWUFVRS3SI6syQJlC7++A37JK3nZLpv4bmkLGroV21qlB+UmkpF8gC6zlkauXw==
+X-Received: by 2002:a17:903:25d2:b0:16e:e1c9:e0eb with SMTP id jc18-20020a17090325d200b0016ee1c9e0ebmr23388611plb.92.1660691632470;
+        Tue, 16 Aug 2022 16:13:52 -0700 (PDT)
+Received: from [172.17.0.2] ([20.253.252.12])
+        by smtp.gmail.com with ESMTPSA id a8-20020aa79708000000b0052e6c058bccsm8918784pfg.61.2022.08.16.16.13.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Aug 2022 15:05:54 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 2/2] hog-lib: Fix scan-build error
-Date:   Tue, 16 Aug 2022 15:05:48 -0700
-Message-Id: <20220816220548.1555673-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.2
+        Tue, 16 Aug 2022 16:13:52 -0700 (PDT)
+Message-ID: <62fc24b0.a70a0220.b7101.ef6f@mx.google.com>
+Date:   Tue, 16 Aug 2022 16:13:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3827120077932144213=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/2] hog-lib: Don't restrict Report MAP size
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20220816220548.1555673-1-luiz.dentz@gmail.com>
 References: <20220816220548.1555673-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3827120077932144213==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This fixes the following errors:
-profiles/input/hog-lib.c:600:19: warning: Access to field 'handle'
-results in a dereference of a null pointer (loaded from variable 'chr')
-        report->handle = chr->handle;
-                         ^~~~~~~~~~~
-profiles/input/hog-lib.c:637:11: warning: Access to field 'value_handle'
-results in a dereference of a null pointer (loaded from variable 'chr')
-                start = chr->value_handle + 1;
-                        ^~~~~~~~~~~~~~~~~
-profiles/input/hog-lib.c:1240:11: warning: Access to field 'value_handle'
-results in a dereference of a null pointer (loaded from variable 'chr')
-                start = chr->value_handle + 1;
-                        ^~~~~~~~~~~~~~~~~
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=668224
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.39 seconds
+GitLint                       PASS      0.92 seconds
+Prep - Setup ELL              PASS      32.69 seconds
+Build - Prep                  PASS      0.70 seconds
+Build - Configure             PASS      10.39 seconds
+Build - Make                  PASS      991.54 seconds
+Make Check                    PASS      12.29 seconds
+Make Check w/Valgrind         PASS      345.94 seconds
+Make Distcheck                PASS      295.42 seconds
+Build w/ext ELL - Configure   PASS      10.63 seconds
+Build w/ext ELL - Make        PASS      98.58 seconds
+Incremental Build w/ patches  PASS      234.28 seconds
+Scan Build                    PASS      617.84 seconds
+
+
+
 ---
- profiles/input/hog-lib.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index ace233d3ce8b..021db386f3b7 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -590,6 +590,9 @@ static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
- 	struct report *report;
- 	GSList *l;
- 
-+	if (!chr)
-+		return NULL;
-+
- 	/* Skip if report already exists */
- 	l = g_slist_find_custom(hog->reports, chr, report_chrc_cmp);
- 	if (l)
-@@ -630,6 +633,9 @@ static void external_service_char_cb(uint8_t status, GSList *chars,
- 		chr = l->data;
- 		next = l->next ? l->next->data : NULL;
- 
-+		if (!chr)
-+			continue;
-+
- 		DBG("0x%04x UUID: %s properties: %02x",
- 				chr->handle, chr->uuid, chr->properties);
- 
-@@ -1232,6 +1238,9 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 		chr = l->data;
- 		next = l->next ? l->next->data : NULL;
- 
-+		if (!chr)
-+			continue;
-+
- 		DBG("0x%04x UUID: %s properties: %02x",
- 				chr->handle, chr->uuid, chr->properties);
- 
--- 
-2.37.2
 
+--===============3827120077932144213==--
