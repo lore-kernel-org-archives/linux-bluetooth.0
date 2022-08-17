@@ -2,77 +2,216 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E64EC32772
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Aug 2022 23:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A0B7C25B08
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Aug 2022 06:58:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237631AbiHPXU3 (ORCPT
+        id S231136AbiHQG6d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Aug 2022 19:20:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39702 "EHLO
+        Wed, 17 Aug 2022 02:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237437AbiHPXUU (ORCPT
+        with ESMTP id S229578AbiHQG6b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Aug 2022 19:20:20 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A222773925
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 16:20:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 440D8B81B47
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Aug 2022 23:20:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E576AC43470;
-        Tue, 16 Aug 2022 23:20:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660692015;
-        bh=+1Slv/E4uV54cVz/BoLGKdffbhH9mPhCVf+cV642dLQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=YrMLjwNzG2S4zT7hcuGCDgnlF5zQ3IUQ3X6lZqchN2EluaG517ffW97+dykOirmEV
-         wGWmK1y3D23u5n2FN/Lw1wxGCDQPgQ6QIZguwUFikvcF3fnuyjXK0or4gwvo+47QTs
-         b6AkHLBPW5Qq/aeZUDoXbo8FLVJt+54W8gPRKyVCbuoFKAvgB8VT219ETJOWHWaXuw
-         ytVlFbTuMsUvfbBg1Zt7/fD8+AOHx0XcQRNv1DloIXo9NOnNf8BgHRIGF2bXY55OG3
-         l956iTiMGNUmuiE/Ial/hT/dW16YcjcqcooO3piRXzseh5e91FiTlj95gdS+olaS1k
-         zsnmxYBRYvCmg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C851CE2A055;
-        Tue, 16 Aug 2022 23:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 17 Aug 2022 02:58:31 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 34D3372B76;
+        Tue, 16 Aug 2022 23:58:25 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 27H6w0n65013321, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 27H6w0n65013321
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+        Wed, 17 Aug 2022 14:58:00 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 17 Aug 2022 14:58:12 +0800
+Received: from localhost.localdomain (172.21.132.192) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 17 Aug 2022 14:58:12 +0800
+From:   <hildawu@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <apusaka@chromium.org>, <yinghsu@chromium.org>,
+        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
+        <kidman@realtek.com>
+Subject: [PATCH] Bluetooth: btusb: Workaround for spotty SCO quality
+Date:   Wed, 17 Aug 2022 14:58:07 +0800
+Message-ID: <20220817065807.21824-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] adapter: Check flags are supported
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166069201581.20856.16721151067322364096.git-patchwork-notify@kernel.org>
-Date:   Tue, 16 Aug 2022 23:20:15 +0000
-References: <20220815232006.1252933-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220815232006.1252933-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.192]
+X-ClientProxiedBy: RTEXH36504.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: trusted connection
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/17/2022 06:34:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzgvMTcgpFekyCAwMToyMjowMA==?=
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+From: Hilda Wu <hildawu@realtek.com>
 
-This patch was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+When streaming HFP, once a few minutes a brief pause in audio can be
+heard on some platform with Realtek Bluetooth. When the issue occurs,
+the system will see the SCO packet for unknown connection handle messages.
 
-On Mon, 15 Aug 2022 16:20:06 -0700 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This makes sure the flags are supported before attempting to set it.
-> ---
->  src/adapter.c | 4 +++-
->  src/device.c  | 5 +++++
->  src/device.h  | 1 +
->  3 files changed, 9 insertions(+), 1 deletion(-)
+Note: This issue affects (e)SCO only, does not affect ACLs.
+Because the duplicate packet causing the problem only occurs in Realtek BT.
+This is to filter out duplicate packet for avoiding influence.
 
-Here is the summary with links:
-  - [BlueZ] adapter: Check flags are supported
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=c47730b2d563
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
+---
+ drivers/bluetooth/btrtl.c | 28 ++++++++++++++++++++++++++++
+ drivers/bluetooth/btrtl.h | 29 +++++++++++++++++++++++++++++
+ drivers/bluetooth/btusb.c | 14 ++++++++++++++
+ 3 files changed, 71 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index fb52313a1d45..15223b3ed94d 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -781,6 +781,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 	case CHIP_ID_8852C:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
++		btrealtek_set_flag(hdev, REALTEK_WBS_FILTER);
+ 		hci_set_aosp_capable(hdev);
+ 		break;
+ 	default:
+@@ -937,6 +938,33 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+ }
+ EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
+ 
++int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *p, int len,
++			u16 wMaxPacketSize)
++{
++	u8 *prev;
++
++	if (pos >= HCI_SCO_HDR_SIZE && pos >= wMaxPacketSize &&
++	    len == wMaxPacketSize && !(pos % wMaxPacketSize) &&
++	    wMaxPacketSize >= 10 && p[0] == data[0] && p[1] == data[1]) {
++		prev = data + (pos - wMaxPacketSize);
++
++		/* Detect the sco data of usb isoc pkt duplication. */
++		if (!memcmp(p + 2, prev + 2, 8))
++			return -EILSEQ;
++
++		if (wMaxPacketSize >= 12 &&
++		    p[2] == prev[6] && p[3] == prev[7] &&
++		    p[4] == prev[4] && p[5] == prev[5] &&
++		    p[6] == prev[10] && p[7] == prev[11] &&
++		    p[8] == prev[8] && p[9] == prev[9]) {
++			return -EILSEQ;
++		}
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(btrtl_usb_recv_isoc);
++
+ MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
+ MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
+ MODULE_VERSION(VERSION);
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index 2c441bda390a..84c0d17377bf 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -47,6 +47,27 @@ struct rtl_vendor_config {
+ 	struct rtl_vendor_config_entry entry[];
+ } __packed;
+ 
++enum {
++	REALTEK_WBS_FILTER,
++
++	__REALTEK_NUM_FLAGS,
++};
++
++struct btrealtek_data {
++	DECLARE_BITMAP(flags, __REALTEK_NUM_FLAGS);
++};
++
++#define btrealtek_set_flag(hdev, nr)					\
++	do {								\
++		struct btrealtek_data *realtek = hci_get_priv((hdev));	\
++		set_bit((nr), realtek->flags);				\
++	} while (0)
++
++#define btrealtek_get_flag(hdev)						\
++	(((struct btrealtek_data *)hci_get_priv(hdev))->flags)
++
++#define btrealtek_test_flag(hdev, nr)	test_bit((nr), btrealtek_get_flag(hdev))
++
+ #if IS_ENABLED(CONFIG_BT_RTL)
+ 
+ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+@@ -62,6 +83,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+ 			    struct btrtl_device_info *btrtl_dev,
+ 			    unsigned int *controller_baudrate,
+ 			    u32 *device_baudrate, bool *flow_control);
++int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
++				u16 wMaxPacketSize);
+ 
+ #else
+ 
+@@ -105,4 +128,10 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
+ 	return -ENOENT;
+ }
+ 
++static inline int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
++					u16 wMaxPacketSize)
++{
++	return -EOPNOTSUPP;
++}
++
+ #endif
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30dd443f395f..1578cf2a7469 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -956,6 +956,7 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+ 	struct sk_buff *skb;
+ 	unsigned long flags;
+ 	int err = 0;
++	u16 wMaxPacketSize = le16_to_cpu(data->isoc_rx_ep->wMaxPacketSize);
+ 
+ 	spin_lock_irqsave(&data->rxlock, flags);
+ 	skb = data->sco_skb;
+@@ -975,6 +976,19 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+ 		}
+ 
+ 		len = min_t(uint, hci_skb_expect(skb), count);
++
++		/* Gaps in audio could be heard while streaming WBS using USB
++		 * alt settings 3 on some platforms, since this is only used
++		 * with RTK chips so let vendor function detect it.
++		 */
++		if (test_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags) &&
++			btrealtek_test_flag(data->hdev, REALTEK_WBS_FILTER)) {
++			err = btrtl_usb_recv_isoc(skb->len, skb->data, buffer,
++							len, wMaxPacketSize);
++			if (err)
++				break;
++		}
++
+ 		skb_put_data(skb, buffer, len);
+ 
+ 		count -= len;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.17.1
 
