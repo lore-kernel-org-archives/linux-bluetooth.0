@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 559B2C32772
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Aug 2022 23:42:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52CF0C3F6B0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Aug 2022 23:42:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242486AbiHQXmD (ORCPT
+        id S242179AbiHQXmF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Aug 2022 19:42:03 -0400
+        Wed, 17 Aug 2022 19:42:05 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242473AbiHQXmC (ORCPT
+        with ESMTP id S242483AbiHQXmC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 17 Aug 2022 19:42:02 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CE9698A41
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 16:41:59 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id h4so46182qtj.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 16:41:59 -0700 (PDT)
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4998A1C6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 16:42:02 -0700 (PDT)
+Received: by mail-qk1-x72f.google.com with SMTP id f4so42573qkl.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 16:42:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc;
-        bh=HcZbzWIaS3ZBAoKQ8WtTSxdAa3N97Uesw92CvXSMVJ0=;
-        b=liC/Tp4UwLqbQvPlhJqPR/7zqVEx+a9OVI74XDcG9DCyzCFbOa/F4bpN+b9tOyQLNq
-         d48Qk9NqS/XsKIc9bY1EG4WzSHL5I1Og8k4zKCKgbUBP/wV2D9dWEc/ngwAlKnqFRhny
-         h2aTLadUhIRmp8LULLMEx4OQ0/ucHQhwFdXIbN5JMVF55k/pH6I4YQG2hAhT3jXhC0L0
-         VnHq8+J/B1QkwmCXoDzktG839sxJ6GVzqgI1CLtpna3eGy6EUUToLbS0AInfrno7n38g
-         VowLpWleLpd3Cdw+9YaJ5Jep1hwjREKgHvnfsa/W8QZLO27i93Icgd0AXRyW/HMDLP0J
-         rBjg==
+        bh=vSA+HPWsuSD7qUqFUVcG0/msermoFukwlhbj3ey3Egc=;
+        b=nw8WZwsdbo+/w83igskhTnF6G1CAGc2kma7sZ6WF9ouepEe/YR/usYZGhA8nFunAdS
+         d7/V+vk1UyKA+t0SfR7qwM3UI9qHqFriBT0y2HIF8S9ucikBEqXSTwcFOazx377Cegir
+         UgoI4nPaPyrNGuwflBemu5IWX+kY2BBFrgW3Pvep/CA3U+CyGPKjaE6SsK7Hkjqwm6Bu
+         mVIO7BanC4UuebHVSsY4dlauyrvHLXuUnhn3VS5EyAosfbiqN9TB9vNNzdS7LBz7gGQ6
+         v8L3o1p5ZvME5KV1BZmJgzA9oHe3SbmsaXT458B+EKWl/be7lV/JGuJPZatTh1AkvQji
+         v1aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=HcZbzWIaS3ZBAoKQ8WtTSxdAa3N97Uesw92CvXSMVJ0=;
-        b=R2HTI89zAaIXG6cCXr3k2lS5wDxgslU6hf7jxWVkbNlGXdzesJniTVoyRODSMmKc+U
-         gROnF5bZeuA+JMf8YViL9xgLJABHcIFk4RTYBsDob15wHm+aweG7+hnR9yBox5fumTBd
-         qrRdM39kmDi6msS+dGQQdIP2qcIVBkhr524qN3z337AxUETI9Fv3WDfOGT4c/+52Uo6V
-         iNFRXMeZySkVAKv5ONy84IivCKd20UkyWDp0zBiLfj+9q25uQr1drXwS6YVU8XDRdZNA
-         K+yll6dXLoJAX5bd34COIGLsMoRZn1Y7APymmVfwHxJJGyEaqlxldxCHi4Ab7CIbjATB
-         ULTA==
-X-Gm-Message-State: ACgBeo1meHPEM57SlId3n6pA2wfZMma5emZLUAxLLi8rd7ucMbBAZawV
-        5oJxr8SUdRa5qlDEMeekZQs6NPsZUEzAd5kX
-X-Google-Smtp-Source: AA6agR5UyT7QJ8qdb82pypGRgrRyNz5kiooSqJixtRW8hVVtgDPI8AsMn6bUhRskpRVgQm2oWxkhng==
-X-Received: by 2002:a05:622a:1aa3:b0:344:60fc:6686 with SMTP id s35-20020a05622a1aa300b0034460fc6686mr592028qtc.116.1660779717788;
-        Wed, 17 Aug 2022 16:41:57 -0700 (PDT)
+        bh=vSA+HPWsuSD7qUqFUVcG0/msermoFukwlhbj3ey3Egc=;
+        b=ugkLe7rBtcmO7N0WI4LHdkzXMj1IDV+kK03UczISnaZN/88IRLw4gXqGVIbZKjN42F
+         7heezkkpXT5Rda74dck5ODa0iwFwOSM6NzqMVykpcOnF5VUEkefNxK9wJiwpp9uTPsxN
+         oOS2nYYPvBP8vOUiuHuf0IoEYC4TmGIjkH8GLniHm7ettBq3vV0s2C/M+ZWGdUI+YGhS
+         T+BgwHbtjxbDEO9C0bpUkUn5riH/wadetFLlFWMXJtrhUdrT6dikTgnuz2usUOk8Z63d
+         hTyHt42Yq7G43vZ9HSpDhL2RpDEDeuM2GeB4m4SBYQdfIX1ZuMpO/zVw/8D6Ti1HIi+p
+         kiYQ==
+X-Gm-Message-State: ACgBeo1djxCVkvnAf8oGziuDd2/S5ICUptsO84qKOFrhJuCGz/JKiaBA
+        ME1htKwaSEqrfJrhwd88WYSD0u7X8LkPBGAc
+X-Google-Smtp-Source: AA6agR5namdMPBQRSb+1JBXq5dDJBG5VYuHHoiQaSUmREbqFddlWiBPfrv6vP8J5fjTFqS+OERuKSA==
+X-Received: by 2002:a05:620a:2710:b0:6b8:d418:f495 with SMTP id b16-20020a05620a271000b006b8d418f495mr327764qkp.675.1660779720700;
+        Wed, 17 Aug 2022 16:42:00 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id r25-20020ae9d619000000b006bb2f555ba4sm189637qkk.41.2022.08.17.16.41.56
+        by smtp.gmail.com with ESMTPSA id r25-20020ae9d619000000b006bb2f555ba4sm189637qkk.41.2022.08.17.16.41.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Aug 2022 16:41:57 -0700 (PDT)
+        Wed, 17 Aug 2022 16:42:00 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 5/9] shared: Add definition for LC3 codec
-Date:   Wed, 17 Aug 2022 16:41:42 -0700
-Message-Id: <20220817234146.224081-6-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 7/9] test/simple-endpoint: Add support for LC3 endpoints
+Date:   Wed, 17 Aug 2022 16:41:44 -0700
+Message-Id: <20220817234146.224081-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220817234146.224081-1-luiz.dentz@gmail.com>
 References: <20220817234146.224081-1-luiz.dentz@gmail.com>
@@ -66,144 +66,53 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the definition for LC3 codec capabilities and configuration.
+This adds support for LC3 sink/source endpoints.
 ---
- Makefile.am      |   2 +-
- src/shared/lc3.h | 112 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/lc3.h
+ test/simple-endpoint | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/Makefile.am b/Makefile.am
-index 92758ca55816..960bf21bc726 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -231,7 +231,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/gap.h src/shared/gap.c \
- 			src/shared/log.h src/shared/log.c \
- 			src/shared/bap.h src/shared/bap.c src/shared/ascs.h \
--			src/shared/tty.h
-+			src/shared/lc3.h src/shared/tty.h
+diff --git a/test/simple-endpoint b/test/simple-endpoint
+index 59ca189ce50e..463f124d1b6e 100755
+--- a/test/simple-endpoint
++++ b/test/simple-endpoint
+@@ -18,6 +18,8 @@ A2DP_SINK_UUID = "0000110B-0000-1000-8000-00805F9B34FB"
+ HFP_AG_UUID = "0000111F-0000-1000-8000-00805F9B34FB"
+ HFP_HF_UUID = "0000111E-0000-1000-8000-00805F9B34FB"
+ HSP_AG_UUID = "00001112-0000-1000-8000-00805F9B34FB"
++PAC_SINK_UUID = "00008f96-0000-1000-8000-00805F9B34FB"
++PAC_SOURCE_UUID = "00008f98-0000-1000-8000-00805F9B34FB"
  
- if READLINE
- shared_sources += src/shared/shell.c src/shared/shell.h
-diff --git a/src/shared/lc3.h b/src/shared/lc3.h
-new file mode 100644
-index 000000000000..33e8107e39e6
---- /dev/null
-+++ b/src/shared/lc3.h
-@@ -0,0 +1,112 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ */
+ SBC_CODEC = dbus.Byte(0x00)
+ #Channel Modes: Mono DualChannel Stereo JointStereo
+@@ -41,6 +43,11 @@ MP3_CAPABILITIES = dbus.Array([dbus.Byte(0x3f), dbus.Byte(0x07), dbus.Byte(0xff)
+ # JointStereo 44.1Khz Layer: 3 Bit Rate: VBR Format: RFC-2250
+ MP3_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x02), dbus.Byte(0x00), dbus.Byte(0x80)])
+ 
++LC3_CODEC = dbus.Byte(0x06)
++#Bits per sample: 16
++#Bit Rate: 96kbps
++LC3_CAPABILITIES = dbus.Array([dbus.Byte(16), dbus.Byte(96)])
 +
-+#define LTV(_type, _bytes...) \
-+	{ \
-+		.len = 1 + sizeof((uint8_t []) { _bytes }), \
-+		.type = _type, \
-+		.data = { _bytes }, \
-+	}
-+
-+#define LC3_ID			0x06
-+
-+#define LC3_BASE		0x01
-+
-+#define LC3_FREQ		(LC3_BASE)
-+#define LC3_FREQ_8KHZ		BIT(0)
-+#define LC3_FREQ_11KHZ		BIT(1)
-+#define LC3_FREQ_16KHZ		BIT(2)
-+#define LC3_FREQ_22KHZ		BIT(3)
-+#define LC3_FREQ_24KHZ		BIT(4)
-+#define LC3_FREQ_32KHZ		BIT(5)
-+#define LC3_FREQ_44KHZ		BIT(6)
-+#define LC3_FREQ_48KHZ		BIT(7)
-+#define LC3_FREQ_ANY		(LC3_FREQ_8KHZ | \
-+					LC3_FREQ_11KHZ | \
-+					LC3_FREQ_16KHZ | \
-+					LC3_FREQ_22KHZ | \
-+					LC3_FREQ_24KHZ | \
-+					LC3_FREQ_32KHZ | \
-+					LC3_FREQ_44KHZ | \
-+					LC3_FREQ_48KHZ)
-+
-+#define LC3_DURATION		(LC3_BASE + 1)
-+#define LC3_DURATION_7_5	BIT(0)
-+#define LC3_DURATION_10		BIT(1)
-+#define LC3_DURATION_ANY	(LC3_DURATION_7_5 | LC3_DURATION_10)
-+#define LC3_DURATION_PREFER_7_5	BIT(4)
-+#define LC3_DURATION_PREFER_10	BIT(5)
-+
-+
-+#define LC3_CHAN_COUNT		(LC3_BASE + 2)
-+#define LC3_CHAN_COUNT_SUPPORT	BIT(0)
-+
-+#define LC3_FRAME_LEN		(LC3_BASE + 3)
-+
-+#define LC3_FRAME_COUNT		(LC3_BASE + 4)
-+
-+#define LC3_CAPABILITIES(_freq, _duration, _chan_count, _len_min, _len_max) \
-+	{ \
-+		LTV(LC3_FREQ, _freq), \
-+		LTV(LC3_DURATION, _duration), \
-+		LTV(LC3_CHAN_COUNT, _chan_count), \
-+		LTV(LC3_FRAME_LEN, _len_min, _len_min >> 8, \
-+				_len_max, _len_max >> 8), \
-+	}
-+
-+#define LC3_CONFIG_BASE		0x01
-+
-+#define LC3_CONFIG_FREQ		(LC3_CONFIG_BASE)
-+#define LC3_CONFIG_FREQ_8KHZ	0x01
-+#define LC3_CONFIG_FREQ_11KHZ	0x02
-+#define LC3_CONFIG_FREQ_16KHZ	0x03
-+#define LC3_CONFIG_FREQ_22KHZ	0x04
-+#define LC3_CONFIG_FREQ_24KHZ	0x05
-+#define LC3_CONFIG_FREQ_32KHZ	0x06
-+#define LC3_CONFIG_FREQ_44KHZ	0x07
-+#define LC3_CONFIG_FREQ_48KHZ	0x08
-+
-+#define LC3_CONFIG_DURATION	(LC3_CONFIG_BASE + 1)
-+#define LC3_CONFIG_DURATION_7_5	0x00
-+#define LC3_CONFIG_DURATION_10	0x01
-+
-+#define LC3_CONFIG_CHAN_ALLOC	(LC3_CONFIG_BASE + 2)
-+
-+#define LC3_CONFIG_FRAME_LEN	(LC3_CONFIG_BASE + 3)
-+
-+#define LC3_CONFIG(_freq, _duration, _len) \
-+	{ \
-+		LTV(LC3_CONFIG_FREQ, _freq), \
-+		LTV(LC3_CONFIG_DURATION, _duration), \
-+		LTV(LC3_CONFIG_FRAME_LEN, _len, _len >> 8), \
-+	}
-+
-+#define LC3_CONFIG_8KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_8KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_11KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_11KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_16KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_16KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_22KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_22KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_24KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_24KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_32KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_32KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_44KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_44KHZ, _duration, _len)
-+
-+#define LC3_CONFIG_48KHZ(_duration, _len) \
-+	LC3_CONFIG(LC3_CONFIG_FREQ_48KHZ, _duration, _len)
+ PCM_CODEC = dbus.Byte(0x00)
+ PCM_CONFIGURATION = dbus.Array([], signature="ay")
+ 
+@@ -131,6 +138,16 @@ if __name__ == '__main__':
+ 							"Codec" : CVSD_CODEC,
+ 							"Capabilities" :  PCM_CONFIGURATION })
+ 			endpoint.default_configuration(dbus.Array([]))
++		if sys.argv[2] == "lc3sink":
++			properties = dbus.Dictionary({ "UUID" : PAC_SINK_UUID,
++							"Codec" : LC3_CODEC,
++							"Capabilities" :
++                                                        LC3_CAPABILITIES })
++		if sys.argv[2] == "lc3source":
++			properties = dbus.Dictionary({ "UUID" : PAC_SOURCE_UUID,
++							"Codec" : LC3_CODEC,
++							"Capabilities" :
++                                                        LC3_CAPABILITIES })
+ 
+ 	print(properties)
+ 
 -- 
 2.37.2
 
