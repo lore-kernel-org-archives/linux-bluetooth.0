@@ -2,140 +2,249 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14443C25B08
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Aug 2022 00:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C50C00140
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Aug 2022 03:51:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242418AbiHRAWf (ORCPT
+        id S238701AbiHRDvD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Aug 2022 20:22:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42784 "EHLO
+        Wed, 17 Aug 2022 23:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231491AbiHRAWe (ORCPT
+        with ESMTP id S237518AbiHRDvC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Aug 2022 20:22:34 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459B0A59A3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 17:22:33 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id w6-20020a056e02190600b002e74e05fdc2so135012ilu.21
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 17:22:33 -0700 (PDT)
+        Wed, 17 Aug 2022 23:51:02 -0400
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF01D57
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 20:50:59 -0700 (PDT)
+Received: by mail-qt1-x833.google.com with SMTP id s11so329218qtx.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Aug 2022 20:50:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=mN1g6zkVn8/Ag9SlB7BHBny0P3P9Q2nY+7uHMPZ/CAY=;
+        b=o/ky8Os7K4R3wcXUGkPL+x3PsGC5d6taa3nhIc4T5St+J2C8CmxBwO50BGded7dIpF
+         lXRHcCddb20h+U/gyiGAVZ8NCmtbRKudDfx9HxCM7Pbz/EdxL0CzFEWw/S6chuHsPxtr
+         N/NZCJDPeyIXbpgLUoKdTF4aJvjB23NXVa2x0U/RsHp+pyCEyq7Kvt1/l+O2X+iAMz/b
+         x5JjKmrhANjg0giIS1JrXhQp/dpozNP0nY1rN31VK+B3t3ib2XskdUJTBpvko1qSUSHS
+         gaRYZRP1yhGf4fTr1GyuHQ0tkpZAX8Bd6BoGNj/oBT/tVy/tzJzJI1QJHjWv3Hq00ds9
+         /4YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=ZIKDpbFX642X5vnYdY8s/VU8pIu2Qztp1WXjfE8cGUc=;
-        b=fpMyLV1Ha2f/g5jGWlBcM8wfsA/W3tIim1LWIyTru3cR0ZWCcUJyHbX5FV6U9TWk6y
-         DKmICmUKZnsdM9pRCnX1pzetu3MhpTkEdQ3MMEhAKqANFuuwW0QbZtczb2jCR+Tuf6qW
-         l7fpSJOgRpZeFbILbdKjwTXeXbf1cytqhQ1I/9dKZBd9J7vlv9/XaamD4Ugcyl3eaTL/
-         UWYXBrMOpHuA8/dvWdWhT70BmMqDVnUCjee5vfZpGlXRJwRHzhDAxxpt1q9aCwDhfOCM
-         ahLhlyP9f2JCGHRunEtN7j10NpTCf/vV9T4DYMDRQi/AxQxF85heuqDz1KaN/A736wmy
-         +Zew==
-X-Gm-Message-State: ACgBeo3WLYXOEYqehfNwkAbg8WWRgLF8soz+u7naWwNBEg0UvOGfBZwO
-        zQqg+v4tQ0vnrEUuWD60oZswq/BsJxhmu8KJMm2dLFSm7vqN
-X-Google-Smtp-Source: AA6agR4dqDdT8a8bAUZPqzCu/s3zdYXTuiryDyfGOnBSSuQKpJ2csgAad08EpHMiyf6tBUj2GyPW7FRB+8zjzh6lmVrTD/LOk/hf
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=mN1g6zkVn8/Ag9SlB7BHBny0P3P9Q2nY+7uHMPZ/CAY=;
+        b=LanotrjRowz+osMftmBF1f+Bc2Nvsp+cUR0bYEgCDcYZ0jDO/mGF6BdIl2jCZVgD32
+         FCs+rYnIWY0RBLRKd+vJNRK1mGz9VDrCj/5jX+jfBBBzvRhBijyo+i5+D7ZzK3qumwpT
+         BFUC66PwK/Th6vXMPfnqornZGHlVw1RZ87bdmX1sYHyS3+Z5fzTUnM+KlCtrrgpd+mD9
+         xbwiu2H8mHyx58vou/DNZjz2Stp9STqZXJRau+JgZw5xXmMWiitnVssOUzSdNySyOyNZ
+         S2iUwqcvj7ANdHiHgJy/IVf6rjutybEA8rcGU2BrEBGgDOI9S4NnOFoy8sW5os0ak6aD
+         kvvg==
+X-Gm-Message-State: ACgBeo37meVSBVYAY6qLict5RWC+ozBXLAjopu5Eh2pWiO2zLGkwKy3i
+        CGPH+qNhftx7aEiJY/zpGCW9j3w9k0w2ug==
+X-Google-Smtp-Source: AA6agR6RLH1+QSfgJrF966Bwydda0QxK5GYQBGc+7SKaigUUz61rrjWGc8gd9vSjk0C4bpcSCN/rOA==
+X-Received: by 2002:ac8:5e13:0:b0:344:734f:c354 with SMTP id h19-20020ac85e13000000b00344734fc354mr1109453qtx.189.1660794658736;
+        Wed, 17 Aug 2022 20:50:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.119.35.163])
+        by smtp.gmail.com with ESMTPSA id q15-20020ac8450f000000b003447ee0a6bfsm256769qtn.17.2022.08.17.20.50.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Aug 2022 20:50:58 -0700 (PDT)
+Message-ID: <62fdb722.c80a0220.b417b.0692@mx.google.com>
+Date:   Wed, 17 Aug 2022 20:50:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2981133124921367987=="
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:158a:b0:2d5:12f0:4dce with SMTP id
- m10-20020a056e02158a00b002d512f04dcemr294460ilu.159.1660782152641; Wed, 17
- Aug 2022 17:22:32 -0700 (PDT)
-Date:   Wed, 17 Aug 2022 17:22:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000041f5bc05e678fa9f@google.com>
-Subject: [syzbot] WARNING in __cancel_work
-From:   syzbot <syzbot+10e37d0d88cbc2ea19e4@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Initial BAP support
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220817234146.224081-2-luiz.dentz@gmail.com>
+References: <20220817234146.224081-2-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============2981133124921367987==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    7ebfc85e2cd7 Merge tag 'net-6.0-rc1' of git://git.kernel.o..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=176e9685080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=20bc0b329895d963
-dashboard link: https://syzkaller.appspot.com/bug?extid=10e37d0d88cbc2ea19e4
-compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13537803080000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e68315080000
+Dear submitter,
 
-Bisection is inconclusive: the issue happens on the oldest tested release.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=668569
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1639b2a5080000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1539b2a5080000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1139b2a5080000
+---Test result---
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+10e37d0d88cbc2ea19e4@syzkaller.appspotmail.com
+Test Summary:
+CheckPatch                    FAIL      22.27 seconds
+GitLint                       PASS      9.44 seconds
+Prep - Setup ELL              PASS      32.78 seconds
+Build - Prep                  PASS      0.90 seconds
+Build - Configure             PASS      11.01 seconds
+Build - Make                  PASS      976.97 seconds
+Make Check                    PASS      13.21 seconds
+Make Check w/Valgrind         PASS      348.16 seconds
+Make Distcheck                PASS      303.38 seconds
+Build w/ext ELL - Configure   PASS      11.01 seconds
+Build w/ext ELL - Make        PASS      100.58 seconds
+Incremental Build w/ patches  PASS      1072.20 seconds
+Scan Build                    WARNING   1121.57 seconds
 
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 1 PID: 3621 at lib/debugobjects.c:505 debug_print_object lib/debugobjects.c:502 [inline]
-WARNING: CPU: 1 PID: 3621 at lib/debugobjects.c:505 debug_object_assert_init+0x1fa/0x250 lib/debugobjects.c:892
-Modules linked in:
-CPU: 1 PID: 3621 Comm: syz-executor370 Not tainted 5.19.0-syzkaller-13930-g7ebfc85e2cd7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
-RIP: 0010:debug_print_object lib/debugobjects.c:502 [inline]
-RIP: 0010:debug_object_assert_init+0x1fa/0x250 lib/debugobjects.c:892
-Code: e8 db 3a a3 fd 4c 8b 45 00 48 c7 c7 c0 5e 0a 8b 48 c7 c6 c0 5b 0a 8b 48 c7 c2 60 60 0a 8b 31 c9 49 89 d9 31 c0 e8 86 73 17 fd <0f> 0b ff 05 da a3 eb 09 48 83 c5 38 48 89 e8 48 c1 e8 03 42 80 3c
-RSP: 0018:ffffc90003d5f8d8 EFLAGS: 00010046
-RAX: e412196666895900 RBX: 0000000000000000 RCX: ffff88801fda3b00
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: ffffffff8aafbf60 R08: ffffffff816d56dd R09: ffffed1017364f14
-R10: ffffed1017364f14 R11: 1ffff11017364f13 R12: dffffc0000000000
-R13: ffff8880253f3200 R14: 0000000000000002 R15: ffffffff91a40048
-FS:  0000555556182300(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045b630 CR3: 0000000070ee9000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_timer_assert_init kernel/time/timer.c:792 [inline]
- debug_assert_init kernel/time/timer.c:837 [inline]
- del_timer+0xa5/0x3d0 kernel/time/timer.c:1257
- try_to_grab_pending+0x150/0x820 kernel/workqueue.c:1275
- __cancel_work+0xb8/0x380 kernel/workqueue.c:3250
- l2cap_clear_timer include/net/bluetooth/l2cap.h:884 [inline]
- l2cap_chan_del+0x41c/0x610 net/bluetooth/l2cap_core.c:688
- l2cap_sock_shutdown+0x39f/0x860 net/bluetooth/l2cap_sock.c:1377
- l2cap_sock_release+0x68/0x1c0 net/bluetooth/l2cap_sock.c:1420
- __sock_release net/socket.c:650 [inline]
- sock_close+0xd7/0x260 net/socket.c:1365
- __fput+0x3b9/0x820 fs/file_table.c:320
- task_work_run+0x146/0x1c0 kernel/task_work.c:177
- ptrace_notify+0x29a/0x340 kernel/signal.c:2353
- ptrace_report_syscall include/linux/ptrace.h:420 [inline]
- ptrace_report_syscall_exit include/linux/ptrace.h:482 [inline]
- syscall_exit_work+0x8c/0xe0 kernel/entry/common.c:249
- syscall_exit_to_user_mode_prepare+0x6b/0xc0 kernel/entry/common.c:276
- __syscall_exit_to_user_mode_work kernel/entry/common.c:281 [inline]
- syscall_exit_to_user_mode+0xa/0x60 kernel/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f4b18cac08b
-Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-RSP: 002b:00007ffe515692a0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 00007f4b18cac08b
-RDX: ffffffffffffffb8 RSI: 0000000020000000 RDI: 0000000000000004
-RBP: 0000000000000003 R08: 0000000000000000 R09: 000000ff00000001
-R10: 0000000000000004 R11: 0000000000000293 R12: 00005555561822b8
-R13: 0000000000000009 R14: 00007ffe51569310 R15: 0000000000000003
- </TASK>
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,3/9] shared/bap: Add initial code for handling BAP
+ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
+#331: FILE: src/shared/bap.c:19:
++ *  License along with this library; if not, write to the Free Software$
+
+ERROR:FSF_MAILING_ADDRESS: Do not include the paragraph about writing to the Free Software Foundation's mailing address from the sample GPL notice. The FSF has changed addresses in the past, and may do so again. Linux already includes a copy of the GPL.
+#332: FILE: src/shared/bap.c:20:
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA$
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1707: FILE: src/shared/bap.c:1395:
++		/* Fallthrough */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1713: FILE: src/shared/bap.c:1401:
++		/* Fallthrough */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1726: FILE: src/shared/bap.c:1414:
++		/* Fallthrough */
+
+WARNING:PREFER_FALLTHROUGH: Prefer 'fallthrough;' over fallthrough comment
+#1732: FILE: src/shared/bap.c:1420:
++		/* Fallthrough */
+
+WARNING:BRACES: braces {} are not necessary for single statement blocks
+#2523: FILE: src/shared/bap.c:2211:
++		for (i = 0; i < hdr->num; i++) {
++			ret = handler->func(ascs, bap, &iov, rsp);
++		}
+
+ERROR:SPACING: space required before the open parenthesis '('
+#4434: FILE: src/shared/bap.c:4122:
++			switch(lpac->type) {
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#5114: FILE: src/shared/bap.h:16:
++#define __packed __attribute__((packed))
+
+WARNING:SPACING: Unnecessary space before function pointer arguments
+#5221: FILE: src/shared/bap.h:123:
++	int (*select) (struct bt_bap_pac *pac, struct bt_bap_pac_qos *qos,
+
+WARNING:SPACING: Unnecessary space before function pointer arguments
+#5224: FILE: src/shared/bap.h:126:
++	int (*config) (struct bt_bap_stream *stream, struct iovec *cfg,
+
+WARNING:SPACING: Unnecessary space before function pointer arguments
+#5227: FILE: src/shared/bap.h:129:
++	void (*clear) (struct bt_bap_stream *stream, void *user_data);
+
+/github/workspace/src/12946591.patch total: 3 errors, 9 warnings, 5252 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12946591.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+[BlueZ,4/9] profiles: Add initial code for bap plugin
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#599: FILE: profiles/audio/bap.c:471:
++						{ "properties", "a{sv}" } ),
+
+ERROR:INITIALISED_STATIC: do not initialise statics to 0
+#1406: FILE: profiles/audio/bap.c:1278:
++static unsigned int bap_id = 0;
+
+WARNING:SPACING: Unnecessary space before function pointer arguments
+#2332: FILE: profiles/audio/transport.c:116:
++	void			(*set_state) (struct media_transport *transport,
+
+/github/workspace/src/12946588.patch total: 2 errors, 1 warnings, 2814 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12946588.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+[BlueZ,8/9] client/player: Add support for PACS endpoints
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#631: FILE: client/player.c:1886:
++					GDBUS_ARGS({ "cfg", "ay" } ),
+
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#634: FILE: client/player.c:1889:
++					GDBUS_ARGS({ "properties", "a{sv}" } ),
+
+ERROR:SPACING: space prohibited before that close parenthesis ')'
+#635: FILE: client/player.c:1890:
++					GDBUS_ARGS({ "properties", "a{sv}" } ),
+
+/github/workspace/src/12946590.patch total: 3 errors, 0 warnings, 799 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12946590.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: Scan Build - WARNING
+Desc: Run Scan Build with patches
+Output:
+*****************************************************************************
+The bugs reported by the scan-build may or may not be caused by your patches.
+Please check the list and fix the bugs if they are caused by your patch.
+*****************************************************************************
+client/player.c:1757:25: warning: Dereference of null pointer
+        iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
+                               ^~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+profiles/audio/media.c:1450:6: warning: 8th function call argument is an uninitialized value
+        if (media_endpoint_create(adapter, sender, path, uuid, delay_reporting,
+            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+profiles/audio/media.c:2996:3: warning: Use of memory after it is freed
+                release_endpoint(adapter->endpoints->data);
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+profiles/audio/media.c:2999:3: warning: Use of memory after it is freed
+                media_player_destroy(adapter->players->data);
+                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3 warnings generated.
+src/shared/bap.c:1217:9: warning: Use of memory after it is freed
+        link = queue_find(stream->links, match_stream_io, io);
+               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+1 warning generated.
+
+
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+
+--===============2981133124921367987==--
