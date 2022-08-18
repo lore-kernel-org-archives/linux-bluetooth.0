@@ -2,135 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC74C00140
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Aug 2022 22:04:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57180C3F6B0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Aug 2022 22:08:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345767AbiHRWEQ (ORCPT
+        id S1345161AbiHRWIK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Aug 2022 18:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38128 "EHLO
+        Thu, 18 Aug 2022 18:08:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345587AbiHRWEM (ORCPT
+        with ESMTP id S1344516AbiHRWHy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Aug 2022 18:04:12 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CD6B481DA
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 15:04:04 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id i19so3820429lfr.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 15:04:04 -0700 (PDT)
+        Thu, 18 Aug 2022 18:07:54 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF2AD31FA;
+        Thu, 18 Aug 2022 15:07:29 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id l1so3323965lfk.8;
+        Thu, 18 Aug 2022 15:07:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=o5W9ga+m72zrs6XJfsXJecGYV8URqMBFcn+EaoXHwvY=;
-        b=oBKdSXxI6lwSIhwTgHrToFvXXLazr5oOu6Kytt0A9NvctG+71XRSoXzcdBKszRDKuQ
-         BY162JVJiM2k19MK7fgxEiHSODSPW4Jy89lLA9qV+hBej3OTQ+HnBTHlGPXdlCa/gG32
-         QTVyBf8DsSq0TeInkh0p13YV+3wXw/7eee3SPvpWeUkRntrSs8gGVgifCRR9wWEAb9Al
-         fTKIVHk9GVZFTc9XCGpJJXbGfjXXeioJYDV20WmD8e7fgUxSf+Dc03PTroY9u1H3PFEs
-         COBXI55EEqYQdgSMjXo2EdsDsjut4+VXWSmpcnV4DtLbqGWLhZ5TauzN+x4nMsG3pz3x
-         W7cw==
+        bh=+yl8RAHKGrw9azpH8jGfAjFkV6Z6RsFEnaQjPufoQPA=;
+        b=cN5F6QslIcwGT6/dfOprpGCV5dVAvcXHysxqBMyCu/jmn57/4WS3DHrGdVXI6SXOHu
+         hhL3jZlaLj8fyM01SYuKS9X32lbjuW54Daytwq5HFx6qxt/BG4EHMa2h/UCPIPblr9k8
+         KuWrUaf7wjcFeCgqgPByTJWiaaLE/bJxw86UF2zZjvaEoq8LbnmYoyZ29BSKiuBX1zVf
+         TETkMEfA54mFwyYTTIv3oHNXGdx+1hVAb65da6BvzL5WrxMy1aMjhpsfDcHyyyW8hStZ
+         yJ7DfNnDgxxcHmm0yMz/Mknw2krIkZGBmcOB2mJDtsibIm1+p9wvFVEAOrNjCaT8Emha
+         q5eA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=o5W9ga+m72zrs6XJfsXJecGYV8URqMBFcn+EaoXHwvY=;
-        b=BjL9KBfPIfSKazOh/Ef6HtXGTh/TJELfJApvYJhOtUnoZdu4wyo/8lyRG7e8LGAR4f
-         OIsVmsI12AnxsmJYYrzjOYYfWzyAsd9BgkTTKYWuOkpleSJrW8UnAyaMMG7vhzlCZjlY
-         r2u4CRqdni2hNUCKVlKrRilnHuY3PQolmAN5vlswEJHQL/8+5eirAZuWeugciOKJBrsU
-         Yltl7HNKAtAvwGTY8MxcVs8fn6Qjor3nbU2i3U8qwQRfQbjKQTfKm+OdHQEF30ejwtWs
-         jo0l77TWtz2dabfCHRneoZpMOs7m+XuLt8Fg46/035bvJU2GNE0Cq73dh7RAw2ly8itp
-         YqCw==
-X-Gm-Message-State: ACgBeo1G+wkFgY9QP8GFyRlNxAOpOI9W75NnFYDJUACv2ABuR/5LHmpQ
-        ZFKIJrG10aiWHE3d5nGiV1IATFRy2VfrUO3S+1Q869id
-X-Google-Smtp-Source: AA6agR7aUjehtP7WZ7xfdQHWlECTm2H5nWZUkMsu/xa5dU8P+03iqvjh0oY+mORaVn5fxRsMsqjqIVeJC2ulg2OQYhY=
-X-Received: by 2002:ac2:47f1:0:b0:48a:ea6e:b8fd with SMTP id
- b17-20020ac247f1000000b0048aea6eb8fdmr1467707lfp.26.1660860242021; Thu, 18
- Aug 2022 15:04:02 -0700 (PDT)
+        bh=+yl8RAHKGrw9azpH8jGfAjFkV6Z6RsFEnaQjPufoQPA=;
+        b=md5DtfKp6ZL8+oy43rbhrLBZZgwZjiQXgwtwcrLGtMfb5SPw1g14rD87d2IC76Ojf/
+         Nxxa1a51eVwSZOFhDW5W2l9xq5kRXf3Qvobwz1C3PgcjDiPp/i/Jodhfy0Lu6yrR8fEy
+         tljUGpxITC0CT8Hbjcw+A50pXsNiJjDdr3g4YkmPOxaAAn7S9S7OX4T3RqTkrFmR4vHS
+         PNyKFPzvYQ9v+QdjOgEDgNGC9DEhRlucPeu4qB6yF/mlO7lcqd7ZPbFHbv9IChrPRhh2
+         +36QJkBEdKK85g/p3eg6+YXrdJNmCF6cDNSXmiBqYbFP1Mf0Q30LBcd25VFyl/mdtWdI
+         l3Ig==
+X-Gm-Message-State: ACgBeo0LeofyOahOPMtF8nATpooeskulyHztwVnPtcI4c0/0jPulU/cR
+        FzUfXu2aMgt3UiKHULACq9ewZERebV/sHQc9f4I=
+X-Google-Smtp-Source: AA6agR5I5SyNWeoIXRkrTr0mrCf8ys41KVuUPF4EqcfpqkG4wwaLuV3zQu72gC/MnSVKrWrwH4LSr6pBwfbmAJlBagI=
+X-Received: by 2002:a05:6512:3fa8:b0:48c:ffd1:625d with SMTP id
+ x40-20020a0565123fa800b0048cffd1625dmr1378923lfa.251.1660860446956; Thu, 18
+ Aug 2022 15:07:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220812223939.530428-1-luiz.dentz@gmail.com> <62f6dcd1.050a0220.5ebd8.1241@mx.google.com>
- <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
- <CADVatmN_wx=KJ=C0QGMz5ZLoVECjF9kKJa1X8ay4XWwuszeo=A@mail.gmail.com>
- <CABBYNZL93Q+Mmdk3GOUGt5TLyBN6KwzLGTw81iHHkMPvR0iQaw@mail.gmail.com>
- <CADVatmOyd8gUqWMx-5CmbKnAdmppk2sGkG=+mh=W4aN1wS6VFQ@mail.gmail.com>
- <CABBYNZKBRKVWQ9DFFTU0_nBGZg7va8mpPZ_TwDXtBigt2E06_w@mail.gmail.com> <CADVatmPsMi+YjS3D=EpeVHWkM79bZgSfTSyejvCP0-VcXAd19w@mail.gmail.com>
-In-Reply-To: <CADVatmPsMi+YjS3D=EpeVHWkM79bZgSfTSyejvCP0-VcXAd19w@mail.gmail.com>
+References: <20220818210207.8323-1-wsa+renesas@sang-engineering.com>
+In-Reply-To: <20220818210207.8323-1-wsa+renesas@sang-engineering.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 18 Aug 2022 15:03:50 -0700
-Message-ID: <CABBYNZJryfRZVuJrb902HAXQ9+jFoeYLRVYqB-t_rUUkOXATsQ@mail.gmail.com>
-Subject: Re: Bluetooth: L2CAP: Fix build errors in some archs
-To:     Sudip Mukherjee <sudipm.mukherjee@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Palmer Dabbelt <palmer@rivosinc.com>
+Date:   Thu, 18 Aug 2022 15:07:15 -0700
+Message-ID: <CABBYNZ+Z=3kiA1jSiGH1KQCG6SHSDPp6MCA1pqU8CjtGRNYqqQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: move from strlcpy with unused retval to strscpy
+To:     Wolfram Sang <wsa+renesas@sang-engineering.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sudip,
+Hi Wolfram,
 
-On Thu, Aug 18, 2022 at 2:29 PM Sudip Mukherjee
-<sudipm.mukherjee@gmail.com> wrote:
+On Thu, Aug 18, 2022 at 2:05 PM Wolfram Sang
+<wsa+renesas@sang-engineering.com> wrote:
 >
-> On Mon, Aug 15, 2022 at 6:55 PM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Sudip,
-> >
-> > On Sun, Aug 14, 2022 at 3:48 AM Sudip Mukherjee
-> > <sudipm.mukherjee@gmail.com> wrote:
-> > >
-> > > Hi Luiz,
-> > >
-> > > On Sat, Aug 13, 2022 at 8:32 PM Luiz Augusto von Dentz
-> > > <luiz.dentz@gmail.com> wrote:
-> > > >
-> > > > Hi Sudip,
-> > > >
-> > > > On Sat, Aug 13, 2022 at 12:31 AM Sudip Mukherjee
-> > > > <sudipm.mukherjee@gmail.com> wrote:
-> > > > >
-> > > > > Hi Luiz,
-> > > > >
-> > > > > On Sat, Aug 13, 2022 at 12:12 AM Luiz Augusto von Dentz
-> > > > > <luiz.dentz@gmail.com> wrote:
-> > > > > >
-> > > > > > Hi Palmer, Sudip,
-> > > > > >
-> > > > > > On Fri, Aug 12, 2022 at 4:05 PM <bluez.test.bot@gmail.com> wrote:
-> > > > > > >
-> > > > > > > This is automated email and please do not reply to this email!
-> > > > > > >
-> > > > > > > Dear submitter,
-> > > > > > >
-> > > > > > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > > > > > This is a CI test results with your patch series:
-> > > > > > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667285
-> > > > > >
-> > > > > > Could you guys try with the above change, I think the culprit is
-> > > > > > actually setting c = NULL which triggers some compiler to think it may
-> > > > > > be passed to bacmp.
-> > > > >
-> > > > > I get "No patches to display" on that link.
-> > > >
-> > > > That is probably because Ive send a v2:
-> > >
-> > > I have not tested your patch as the build failure is not present with
-> > > the bluetooth master branch. Please let me know if this was the wrong
-> > > branch.
-> >
-> > And you can't apply on top of the tree that you are able to reproduce?
+> Follow the advice of the below link and prefer 'strscpy' in this
+> subsystem. Conversion is 1:1 because the return value is not used.
+> Generated by a coccinelle script.
+
+The link below doesn't seem to work.
+
+> Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
+> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
+> ---
+>  net/bluetooth/hidp/core.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 >
-> I can see its already in linux-next and I don't see those build
-> failures on next-20220818.
-
-Alright, I will send a pull request including it later this week just
-in case it reappears for some reason.
-
+> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+> index 5940744a8cd8..cc20e706c639 100644
+> --- a/net/bluetooth/hidp/core.c
+> +++ b/net/bluetooth/hidp/core.c
+> @@ -83,14 +83,14 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
+>                 ci->product = session->input->id.product;
+>                 ci->version = session->input->id.version;
+>                 if (session->input->name)
+> -                       strlcpy(ci->name, session->input->name, 128);
+> +                       strscpy(ci->name, session->input->name, 128);
+>                 else
+> -                       strlcpy(ci->name, "HID Boot Device", 128);
+> +                       strscpy(ci->name, "HID Boot Device", 128);
+>         } else if (session->hid) {
+>                 ci->vendor  = session->hid->vendor;
+>                 ci->product = session->hid->product;
+>                 ci->version = session->hid->version;
+> -               strlcpy(ci->name, session->hid->name, 128);
+> +               strscpy(ci->name, session->hid->name, 128);
+>         }
+>  }
 >
 > --
-> Regards
-> Sudip
-
+> 2.35.1
+>
 
 
 -- 
