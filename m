@@ -2,111 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883E4C3F6B0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Aug 2022 22:10:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EFFC00140
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Aug 2022 02:44:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243965AbiHRWKC (ORCPT
+        id S244872AbiHSCo2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Aug 2022 18:10:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53694 "EHLO
+        Thu, 18 Aug 2022 22:44:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232990AbiHRWKB (ORCPT
+        with ESMTP id S241552AbiHSCo1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Aug 2022 18:10:01 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E882B74DD4;
-        Thu, 18 Aug 2022 15:09:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=rhe9mRJIjYEKwxbWZZXiWC3KccVlD0FV8SeE2CPzCxk=; b=emHQbCQYIBaojp9O77oJuGSh9t
-        Ha3atEwW9Ozs6ZJi5gNsPgvfANBMXT3YLiX5ddzwgNr/M2fpl6MWDycLqRR8lwYM/IeEbpgeNDaRx
-        ZB7DEXdXrcJyTZ/NQI9wfnMtB1Hq2oDOL2X6DUh0A3JuevdWF1NGZN0JtJuWhT9lTs7mYMwCmJPKv
-        gkfeIONW84YV0a+MQmoE1qgTfGtMtH0lVbCE6DkQ9fP7/c6UT6+0IzECvJpaQ/9Jd2UIwGrwXfxSO
-        jr3tvRYeCw0SOjLF5SrbpJHjbr3bxpWiwugWRQB7FcM2LXZKLY28nSn6e4dtckefAEG+mktoc3miB
-        kggujMOQ==;
-Received: from [2601:1c0:6280:3f0::a6b3]
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1oOni5-00AGgL-RJ; Thu, 18 Aug 2022 22:09:54 +0000
-Message-ID: <c323f4ed-1083-8eb6-95ba-10b0def2c936@infradead.org>
-Date:   Thu, 18 Aug 2022 15:09:52 -0700
+        Thu, 18 Aug 2022 22:44:27 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C693E5465B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 19:44:25 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id f16-20020a6b6210000000b006889725d748so1918130iog.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 19:44:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc;
+        bh=OWj7n2QWAJaSzd48INs7TkxSAJ8MfTiVRRNOpTq3BK0=;
+        b=Y5aBCfSdUWeOkB1D6O7YKr8CfybdYHHybPVxAJF2P4ZGRSiW+nNJQjK8twS7UQfT2k
+         xJsJj9XKAQCikvhKnxzirvworZeOm1vsUeCH3BPQ1b7eNga2AdkCYCk2btZeuUiWGIrO
+         yMzMMTLPhJ+8rOY4FGrFES8Bc6qOK6+X/XlJNTSW9aLwoApzhq4jbymaqcrv5EKPquuy
+         5j5P/BG0c7n7neadUB64tNiqr5fzs2baNzaioxIj2EkzrKnRWXzrxuhIT0I0H+0ps9Uq
+         BwZ73Ogu3iXNO4hoyBCqeL3PSixp2r3iaajKhi/APSXI43tFBdfjrc9j9gDelU/DLTRL
+         MnAA==
+X-Gm-Message-State: ACgBeo2jE7clqCqe4MawI0GoAxkLRjzrnUqP7U1ZrGJIlx4fyVvlbc1N
+        np/7HUI/KLPgseEdFFuWK7DzA41aaUTFbRIHCVEvPUKNpD57
+X-Google-Smtp-Source: AA6agR6Hf8+BW+gFiAzr1Trd5069lUZpfjDMP9HrUQrtnHoABNQyqDI1+E2syvPYkxF5CH38gg6VNd4bVyNFsGaUntY4UyP0H3T3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH] Bluetooth: move from strlcpy with unused retval to
- strscpy
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-References: <20220818210207.8323-1-wsa+renesas@sang-engineering.com>
- <CABBYNZ+Z=3kiA1jSiGH1KQCG6SHSDPp6MCA1pqU8CjtGRNYqqQ@mail.gmail.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <CABBYNZ+Z=3kiA1jSiGH1KQCG6SHSDPp6MCA1pqU8CjtGRNYqqQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6638:1683:b0:345:9e65:cd07 with SMTP id
+ f3-20020a056638168300b003459e65cd07mr2603311jat.128.1660877065034; Thu, 18
+ Aug 2022 19:44:25 -0700 (PDT)
+Date:   Thu, 18 Aug 2022 19:44:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007a222005e68f139f@google.com>
+Subject: [syzbot] WARNING: ODEBUG bug in __cancel_work
+From:   syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    6c8f479764eb Add linux-next specific files for 20220809
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1193703d080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a5ae8cfa8d7075d1
+dashboard link: https://syzkaller.appspot.com/bug?extid=83672956c7aa6af698b3
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b620f3080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b1a0d080000
+
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12371a0d080000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=11371a0d080000
+console output: https://syzkaller.appspot.com/x/log.txt?x=16371a0d080000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
+WARNING: CPU: 0 PID: 3607 at lib/debugobjects.c:509 debug_print_object+0x16e/0x250 lib/debugobjects.c:509
+Modules linked in:
+CPU: 0 PID: 3607 Comm: syz-executor235 Not tainted 5.19.0-next-20220809-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
+RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:509
+Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 60 09 49 8a 4c 89 ee 48 c7 c7 00 fd 48 8a e8 73 ac 38 05 <0f> 0b 83 05 35 41 dd 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
+RSP: 0018:ffffc900039ef8a0 EFLAGS: 00010082
+RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
+RDX: ffff88807f355880 RSI: ffffffff8161f1f8 RDI: fffff5200073df06
+RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff89eeff60
+R13: ffffffff8a4903c0 R14: ffffffff816b23c0 R15: 1ffff9200073df1f
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ff196b876a8 CR3: 00000000261c8000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ debug_object_assert_init lib/debugobjects.c:899 [inline]
+ debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:870
+ debug_timer_assert_init kernel/time/timer.c:792 [inline]
+ debug_assert_init kernel/time/timer.c:837 [inline]
+ del_timer+0x6d/0x110 kernel/time/timer.c:1257
+ try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1275
+ __cancel_work+0x7c/0x340 kernel/workqueue.c:3250
+ l2cap_clear_timer include/net/bluetooth/l2cap.h:884 [inline]
+ l2cap_chan_del+0x565/0xa60 net/bluetooth/l2cap_core.c:688
+ l2cap_conn_del+0x3c0/0x7b0 net/bluetooth/l2cap_core.c:1922
+ l2cap_disconn_cfm net/bluetooth/l2cap_core.c:8213 [inline]
+ l2cap_disconn_cfm+0x8c/0xc0 net/bluetooth/l2cap_core.c:8206
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1779 [inline]
+ hci_conn_hash_flush+0x122/0x260 net/bluetooth/hci_conn.c:2366
+ hci_dev_close_sync+0x55d/0x1130 net/bluetooth/hci_sync.c:4476
+ hci_dev_do_close+0x2d/0x70 net/bluetooth/hci_core.c:554
+ hci_unregister_dev+0x17f/0x4e0 net/bluetooth/hci_core.c:2682
+ vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
+ __fput+0x277/0x9d0 fs/file_table.c:320
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:177
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xc39/0x2b60 kernel/exit.c:813
+ do_group_exit+0xd0/0x2a0 kernel/exit.c:943
+ __do_sys_exit_group kernel/exit.c:954 [inline]
+ __se_sys_exit_group kernel/exit.c:952 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:952
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fbef442f629
+Code: Unable to access opcode bytes at RIP 0x7fbef442f5ff.
+RSP: 002b:00007ffc6284d478 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 00007fbef44ba390 RCX: 00007fbef442f629
+RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
+RBP: 0000000000000001 R08: ffffffffffffffb8 R09: 000000fff44b4e00
+R10: 0000000000000004 R11: 0000000000000246 R12: 00007fbef44ba390
+R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
+ </TASK>
 
 
-On 8/18/22 15:07, Luiz Augusto von Dentz wrote:
-> Hi Wolfram,
-> 
-> On Thu, Aug 18, 2022 at 2:05 PM Wolfram Sang
-> <wsa+renesas@sang-engineering.com> wrote:
->>
->> Follow the advice of the below link and prefer 'strscpy' in this
->> subsystem. Conversion is 1:1 because the return value is not used.
->> Generated by a coccinelle script.
-> 
-> The link below doesn't seem to work.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Works for me.
-
->> Link: https://lore.kernel.org/r/CAHk-=wgfRnXz0W3D37d01q3JFkr_i_uTL=V6A6G1oUZcprmknw@mail.gmail.com/
->> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
->> ---
->>  net/bluetooth/hidp/core.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
->> index 5940744a8cd8..cc20e706c639 100644
->> --- a/net/bluetooth/hidp/core.c
->> +++ b/net/bluetooth/hidp/core.c
->> @@ -83,14 +83,14 @@ static void hidp_copy_session(struct hidp_session *session, struct hidp_conninfo
->>                 ci->product = session->input->id.product;
->>                 ci->version = session->input->id.version;
->>                 if (session->input->name)
->> -                       strlcpy(ci->name, session->input->name, 128);
->> +                       strscpy(ci->name, session->input->name, 128);
->>                 else
->> -                       strlcpy(ci->name, "HID Boot Device", 128);
->> +                       strscpy(ci->name, "HID Boot Device", 128);
->>         } else if (session->hid) {
->>                 ci->vendor  = session->hid->vendor;
->>                 ci->product = session->hid->product;
->>                 ci->version = session->hid->version;
->> -               strlcpy(ci->name, session->hid->name, 128);
->> +               strscpy(ci->name, session->hid->name, 128);
->>         }
->>  }
->>
->> --
->> 2.35.1
->>
-> 
-> 
-
--- 
-~Randy
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
