@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CE08C32773
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Aug 2022 16:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13548C28B2B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Aug 2022 18:39:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354281AbiHSQ4x (ORCPT
+        id S1350835AbiHSSjE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Aug 2022 12:56:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39308 "EHLO
+        Fri, 19 Aug 2022 14:39:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354487AbiHSQzY (ORCPT
+        with ESMTP id S1350829AbiHSSjD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Aug 2022 12:55:24 -0400
+        Fri, 19 Aug 2022 14:39:03 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803794E62D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 09:16:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0C997D76
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 11:39:02 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ED3B361639
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 16:15:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D66EC433C1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 16:15:30 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2674960F18
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 18:39:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7C374C433D6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 18:39:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1660925730;
-        bh=a+tjk8kcncF95d33LlVXribjD8hNgmGAgkg9Q9emIps=;
-        h=From:To:Subject:Date:From;
-        b=EnXrEIHWrTaw2PcWC93P/5/fFCROlRXKCCrJs5zrzaqL/RRmmMEpY9n249vvRfQGl
-         YDCINbXLa3rKq0Y3E/abaV4BMG8Qt8aB38MgypubDO2e8/UCjtp4FXm8ww3lKCKKN1
-         yMNF+z5DufbS3IJEllyfqEhrvZsTkiylobKJytKqFda8sm2UhmsnhLHBTM6DbWAVmC
-         A0JOkYrH/lAXn8gNbCrinPpgBLAl5ECMvM+8RNp/ZGZ/fTFtggGOrnC0DiPdpi8W97
-         9c/prgaoqADMggq74H5QVa4Z5yA6Gex+lrUM/PlkzPwKGqVPX9rNfa4DsZmkk58NqC
-         Vb1EZqbRmhC+w==
+        s=k20201202; t=1660934341;
+        bh=YUeKUdwSHcanwnhqluArk3QaYIVQfaemRZ/7WUDRTLU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=BsRDv1MAfVf6lAaKIbeYFTuiCznp0TpsZKAOG56keK7+v4YeEXbqvmwqm9bwlmByb
+         wmn4wgTNXhXH9i/QhrB18lfc0qtbS/mn2bejxZvQbHBF9TjS09G6Csv+LAsPzCr38H
+         YQkH60ayvsfQGh+QW54pKZq4kP2KnL16Wr2vLnRq/SyccTfDBuC3rsP6mrgKbB0PYL
+         0a0QFiUqu07gcGBz00gQ64KAx/P8Y1PwGNF1py+Xf5hi6FztGBhN1IlgbYf1AMj2oc
+         +QKri7IdWtaG/39+8WYLVJssnwLzV4HKxLqXf8KmvCdM/umbD2E6/4W2Dj6HdDfKDp
+         iyQLYhEDrofbA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 417EFC433E6; Fri, 19 Aug 2022 16:15:30 +0000 (UTC)
+        id 5C32AC433E4; Fri, 19 Aug 2022 18:39:01 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216382] New: [bisected][regression] mediatek bluetooth
- 13d3:3563 (mt7921e) doesn't work with audio devices.
-Date:   Fri, 19 Aug 2022 16:15:30 +0000
+Subject: [Bug 216382] [bisected][regression] mediatek bluetooth 13d3:3563
+ (mt7921e) doesn't work with audio devices.
+Date:   Fri, 19 Aug 2022 18:39:01 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
+X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: arek.rusi@gmail.com
+X-Bugzilla-Who: luiz.dentz@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-216382-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216382-62941-OMfP46GOtA@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216382-62941@https.bugzilla.kernel.org/>
+References: <bug-216382-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -69,47 +69,16 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216382
 
-            Bug ID: 216382
-           Summary: [bisected][regression] mediatek bluetooth 13d3:3563
-                    (mt7921e) doesn't work with audio devices.
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.0-rc1
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: arek.rusi@gmail.com
-        Regression: No
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-After update to new 6.0rc1 I can't use any bt-earphones.=20=20
-I've checked in bluetoothctl: devices are still connected but none of
-endpoint/transport entries are creates.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-XB1S gamepad works without any issues.
-
-bisecting result:
----
-26afbd826ee326e63a334c37fd45e82e50a615ec is the first bad commit
-commit 26afbd826ee326e63a334c37fd45e82e50a615ec
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Mon Jul 29 18:15:43 2019 +0300
-
-    Bluetooth: Add initial implementation of CIS connections
-
-    This adds the initial implementation of CIS connections and introduces
-    the ISO packets/links.
----
-
-can't revert this commit.=20
-
-*Aditionally, I've tried this kernel on second machine with AX210 wifi/bt c=
-ombo
-and issue doesn't appear. So I assume problem is limited to mediatek module.
+--- Comment #1 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+I suspect this could be due some HCI command during initialization, could y=
+ou
+please collect the HCI using btmon?
 
 --=20
 You may reply to this email to add a comment.
