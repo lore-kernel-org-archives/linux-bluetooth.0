@@ -2,146 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EFFC00140
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Aug 2022 02:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D33C25B0E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Aug 2022 07:28:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244872AbiHSCo2 (ORCPT
+        id S1347032AbiHSH2q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Aug 2022 22:44:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46504 "EHLO
+        Fri, 19 Aug 2022 03:28:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241552AbiHSCo1 (ORCPT
+        with ESMTP id S1347035AbiHSH2p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Aug 2022 22:44:27 -0400
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C693E5465B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 19:44:25 -0700 (PDT)
-Received: by mail-io1-f72.google.com with SMTP id f16-20020a6b6210000000b006889725d748so1918130iog.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Aug 2022 19:44:25 -0700 (PDT)
+        Fri, 19 Aug 2022 03:28:45 -0400
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2767966A5D
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 00:28:42 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-3376851fe13so67116427b3.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Aug 2022 00:28:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=6hQTf/rUqfUoApaKhZbvOqKuIZGyo3ccMInHQdDuWyc=;
+        b=MpU0F/NONeMp38YPz16+O2IOQtaL8/RZa0CAXtYzqS8ZPARHrKelv2kHhHDU8u1K9j
+         MbgaSmO5dx6Ht4IWiA0A9EGN87EdrXhLJalyFmgsC+JXG5NYWcRpDiGgqrdrY7v0BM+8
+         43YTJDl97QGX0C6C6i/kXFCTQQkzlWvBJu/o+F0suTw6JsKAkcMRgL/GcTrpelo1xOp8
+         iVGo1BjQjHBFCIWZzht0n5xs411CsU7z8fepqi2ORiH62QBNriXQSlmsBVwuwjOs4mUT
+         Ckejncvl6w++Ar0y/5TcFX492xVbhVVtuKJRRdeFfYNMW8FGuGrG9cnCvFSpE0oMLFUM
+         3hSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc;
-        bh=OWj7n2QWAJaSzd48INs7TkxSAJ8MfTiVRRNOpTq3BK0=;
-        b=Y5aBCfSdUWeOkB1D6O7YKr8CfybdYHHybPVxAJF2P4ZGRSiW+nNJQjK8twS7UQfT2k
-         xJsJj9XKAQCikvhKnxzirvworZeOm1vsUeCH3BPQ1b7eNga2AdkCYCk2btZeuUiWGIrO
-         yMzMMTLPhJ+8rOY4FGrFES8Bc6qOK6+X/XlJNTSW9aLwoApzhq4jbymaqcrv5EKPquuy
-         5j5P/BG0c7n7neadUB64tNiqr5fzs2baNzaioxIj2EkzrKnRWXzrxuhIT0I0H+0ps9Uq
-         BwZ73Ogu3iXNO4hoyBCqeL3PSixp2r3iaajKhi/APSXI43tFBdfjrc9j9gDelU/DLTRL
-         MnAA==
-X-Gm-Message-State: ACgBeo2jE7clqCqe4MawI0GoAxkLRjzrnUqP7U1ZrGJIlx4fyVvlbc1N
-        np/7HUI/KLPgseEdFFuWK7DzA41aaUTFbRIHCVEvPUKNpD57
-X-Google-Smtp-Source: AA6agR6Hf8+BW+gFiAzr1Trd5069lUZpfjDMP9HrUQrtnHoABNQyqDI1+E2syvPYkxF5CH38gg6VNd4bVyNFsGaUntY4UyP0H3T3
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=6hQTf/rUqfUoApaKhZbvOqKuIZGyo3ccMInHQdDuWyc=;
+        b=MBB1fvYLbV1yHCcxz6BdRdfNfg/OwLH485jWUjXmSg01LhFVHVNH+FeNTkk4Q9pEp3
+         ic1fRRLlcN/qDV9ZgHaCv9jLLWuRYnQTYvyAkf3MPpK1rhHapIYuEoMDVTKCmmhJ2AlL
+         6RfHsvdBH1gySFtmlKJS26E/2t/ZhsVee6BF/MT8PJaPJz9cPk5kt5wqjo/GntS1lzx8
+         bmD5whSSlde//dA6NW3nwCniXe0rUnTSOR8HrsFMvZAujGEq4tn4BFQrIXJaaC2F25Cj
+         CD+pAGOcxZ3LWxX1zhxf6zvwWmr7TRe2QX6FVKZQJwmwM9zzTx4OmHkWosCnlwV+ESEM
+         MDJQ==
+X-Gm-Message-State: ACgBeo1ig+vX4IRYQTZTvfaz2quzWu4eFOLiwrYx5HR67k6Zp/zdv1ts
+        PKrRDZtyK/4O+H794sMzDh1alcXOh2LIumT3jvk=
+X-Google-Smtp-Source: AA6agR5fS2TlALyH6JCeZjnKb8KweLOE9Vgjrk8txRpDxwnm+WEc6cSNkLGZQ2uJg2lVnjkY053g9BYdQcWuZLLCMgk=
+X-Received: by 2002:a81:7783:0:b0:338:7f4a:fd7b with SMTP id
+ s125-20020a817783000000b003387f4afd7bmr268580ywc.478.1660894121095; Fri, 19
+ Aug 2022 00:28:41 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1683:b0:345:9e65:cd07 with SMTP id
- f3-20020a056638168300b003459e65cd07mr2603311jat.128.1660877065034; Thu, 18
- Aug 2022 19:44:25 -0700 (PDT)
-Date:   Thu, 18 Aug 2022 19:44:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007a222005e68f139f@google.com>
-Subject: [syzbot] WARNING: ODEBUG bug in __cancel_work
-From:   syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
+References: <20220812223939.530428-1-luiz.dentz@gmail.com> <62f6dcd1.050a0220.5ebd8.1241@mx.google.com>
+ <CABBYNZLOxE17vp3FOWR2hABjoCD8M62YLa6_LDdaQeJ=nrnusA@mail.gmail.com>
+ <CADVatmN_wx=KJ=C0QGMz5ZLoVECjF9kKJa1X8ay4XWwuszeo=A@mail.gmail.com>
+ <CABBYNZL93Q+Mmdk3GOUGt5TLyBN6KwzLGTw81iHHkMPvR0iQaw@mail.gmail.com>
+ <CADVatmOyd8gUqWMx-5CmbKnAdmppk2sGkG=+mh=W4aN1wS6VFQ@mail.gmail.com>
+ <CABBYNZKBRKVWQ9DFFTU0_nBGZg7va8mpPZ_TwDXtBigt2E06_w@mail.gmail.com>
+ <CADVatmPsMi+YjS3D=EpeVHWkM79bZgSfTSyejvCP0-VcXAd19w@mail.gmail.com> <CABBYNZJryfRZVuJrb902HAXQ9+jFoeYLRVYqB-t_rUUkOXATsQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJryfRZVuJrb902HAXQ9+jFoeYLRVYqB-t_rUUkOXATsQ@mail.gmail.com>
+From:   Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+Date:   Fri, 19 Aug 2022 08:28:05 +0100
+Message-ID: <CADVatmM7PKfFoSiTSHR0=+ZvWJoEdu8saztpCEXCFxqDweHgJA@mail.gmail.com>
+Subject: Re: Bluetooth: L2CAP: Fix build errors in some archs
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Palmer Dabbelt <palmer@rivosinc.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu, Aug 18, 2022 at 11:04 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Sudip,
+>
+> On Thu, Aug 18, 2022 at 2:29 PM Sudip Mukherjee
+> <sudipm.mukherjee@gmail.com> wrote:
+> >
+> > On Mon, Aug 15, 2022 at 6:55 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Sudip,
+> > >
+> > > On Sun, Aug 14, 2022 at 3:48 AM Sudip Mukherjee
+> > > <sudipm.mukherjee@gmail.com> wrote:
+> > > >
+> > > > Hi Luiz,
+> > > >
+> > > > On Sat, Aug 13, 2022 at 8:32 PM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Sudip,
+> > > > >
+> > > > > On Sat, Aug 13, 2022 at 12:31 AM Sudip Mukherjee
+> > > > > <sudipm.mukherjee@gmail.com> wrote:
+> > > > > >
+> > > > > > Hi Luiz,
+> > > > > >
+> > > > > > On Sat, Aug 13, 2022 at 12:12 AM Luiz Augusto von Dentz
+> > > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > > >
+> > > > > > > Hi Palmer, Sudip,
+> > > > > > >
+> > > > > > > On Fri, Aug 12, 2022 at 4:05 PM <bluez.test.bot@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > This is automated email and please do not reply to this email!
+> > > > > > > >
+> > > > > > > > Dear submitter,
+> > > > > > > >
+> > > > > > > > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > > > > > > > This is a CI test results with your patch series:
+> > > > > > > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=667285
+> > > > > > >
+> > > > > > > Could you guys try with the above change, I think the culprit is
+> > > > > > > actually setting c = NULL which triggers some compiler to think it may
+> > > > > > > be passed to bacmp.
+> > > > > >
+> > > > > > I get "No patches to display" on that link.
+> > > > >
+> > > > > That is probably because Ive send a v2:
+> > > >
+> > > > I have not tested your patch as the build failure is not present with
+> > > > the bluetooth master branch. Please let me know if this was the wrong
+> > > > branch.
+> > >
+> > > And you can't apply on top of the tree that you are able to reproduce?
+> >
+> > I can see its already in linux-next and I don't see those build
+> > failures on next-20220818.
+>
+> Alright, I will send a pull request including it later this week just
+> in case it reappears for some reason.
 
-syzbot found the following issue on:
-
-HEAD commit:    6c8f479764eb Add linux-next specific files for 20220809
-git tree:       linux-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1193703d080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a5ae8cfa8d7075d1
-dashboard link: https://syzkaller.appspot.com/bug?extid=83672956c7aa6af698b3
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b620f3080000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127b1a0d080000
-
-Bisection is inconclusive: the issue happens on the oldest tested release.
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12371a0d080000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11371a0d080000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16371a0d080000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 0 PID: 3607 at lib/debugobjects.c:509 debug_print_object+0x16e/0x250 lib/debugobjects.c:509
-Modules linked in:
-CPU: 0 PID: 3607 Comm: syz-executor235 Not tainted 5.19.0-next-20220809-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 07/22/2022
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:509
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 60 09 49 8a 4c 89 ee 48 c7 c7 00 fd 48 8a e8 73 ac 38 05 <0f> 0b 83 05 35 41 dd 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc900039ef8a0 EFLAGS: 00010082
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: ffff88807f355880 RSI: ffffffff8161f1f8 RDI: fffff5200073df06
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: ffffffff89eeff60
-R13: ffffffff8a4903c0 R14: ffffffff816b23c0 R15: 1ffff9200073df1f
-FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff196b876a8 CR3: 00000000261c8000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init lib/debugobjects.c:899 [inline]
- debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:870
- debug_timer_assert_init kernel/time/timer.c:792 [inline]
- debug_assert_init kernel/time/timer.c:837 [inline]
- del_timer+0x6d/0x110 kernel/time/timer.c:1257
- try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1275
- __cancel_work+0x7c/0x340 kernel/workqueue.c:3250
- l2cap_clear_timer include/net/bluetooth/l2cap.h:884 [inline]
- l2cap_chan_del+0x565/0xa60 net/bluetooth/l2cap_core.c:688
- l2cap_conn_del+0x3c0/0x7b0 net/bluetooth/l2cap_core.c:1922
- l2cap_disconn_cfm net/bluetooth/l2cap_core.c:8213 [inline]
- l2cap_disconn_cfm+0x8c/0xc0 net/bluetooth/l2cap_core.c:8206
- hci_disconn_cfm include/net/bluetooth/hci_core.h:1779 [inline]
- hci_conn_hash_flush+0x122/0x260 net/bluetooth/hci_conn.c:2366
- hci_dev_close_sync+0x55d/0x1130 net/bluetooth/hci_sync.c:4476
- hci_dev_do_close+0x2d/0x70 net/bluetooth/hci_core.c:554
- hci_unregister_dev+0x17f/0x4e0 net/bluetooth/hci_core.c:2682
- vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
- __fput+0x277/0x9d0 fs/file_table.c:320
- task_work_run+0xdd/0x1a0 kernel/task_work.c:177
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xc39/0x2b60 kernel/exit.c:813
- do_group_exit+0xd0/0x2a0 kernel/exit.c:943
- __do_sys_exit_group kernel/exit.c:954 [inline]
- __se_sys_exit_group kernel/exit.c:952 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:952
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fbef442f629
-Code: Unable to access opcode bytes at RIP 0x7fbef442f5ff.
-RSP: 002b:00007ffc6284d478 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00007fbef44ba390 RCX: 00007fbef442f629
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000001
-RBP: 0000000000000001 R08: ffffffffffffffb8 R09: 000000fff44b4e00
-R10: 0000000000000004 R11: 0000000000000246 R12: 00007fbef44ba390
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
- </TASK>
+Just to be clear, the build failure is still there on the mainline
+branch from Linus. But next-20220818, which has the fixes does not
+show the build failure. So, it will be needed for Linus tree.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+-- 
+Regards
+Sudip
