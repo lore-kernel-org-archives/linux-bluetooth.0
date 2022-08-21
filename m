@@ -2,85 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47758C00140
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Aug 2022 16:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFCAC00140
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Aug 2022 17:11:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231573AbiHUQFg (ORCPT
+        id S230133AbiHURLb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Aug 2022 12:05:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32832 "EHLO
+        Sun, 21 Aug 2022 13:11:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbiHUQFf (ORCPT
+        with ESMTP id S229491AbiHURLb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Aug 2022 12:05:35 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D26BDFA7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 09:05:33 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id o14-20020a17090a0a0e00b001fabfd3369cso9082864pjo.5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 09:05:33 -0700 (PDT)
+        Sun, 21 Aug 2022 13:11:31 -0400
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5698721E06
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 10:11:30 -0700 (PDT)
+Received: by mail-qv1-xf29.google.com with SMTP id c5so6231959qvt.11
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 10:11:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc;
-        bh=XXxKGTkclPLjZhgu6hyySCx3gnBCEkTHxXOS24p1d1U=;
-        b=KjK8yLyrRQ7v1w13DwKLv5eoL31Y4jMit7uYxyRWtjFq0399ioTPXgjgWJVCu8gU4z
-         41KQbHMQUPlqkywiw+ze0ihjBh8C2Lrs3RSeju9v9LMqpKUXIWsAL4UFB1J+eTx5+Xe5
-         sKh61Bfja5T3IhipKvAesfct2HaVfeXc+sG8iSidODszI63HrVN0z/6Ds+jec/WHj78s
-         haBICd8s6c99xDlg9JVfdtpwInifZCcPOh0GEYRPkMAWo4iBFUzua9kuK6eUhU1TY9UZ
-         ROnaNtRQJjqVwRNcIERFqDp7QV+RsbHkpi3u/qCMe5OmEsLYbpe8WBleSmilBDOJ3yu+
-         fg/Q==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=r5eMnvfD5RjUnHbUeyia/w2ybXI0hGG1XTC0xJvT2Zg=;
+        b=gP/CoAScudnY3zPLpg5W8N/SNPjVxdJAwQI85fWkATH4uI7URgdvV4kjV5PBxifvIh
+         b0gMlCSxL27vZuOo5qPnSl4TKHxP3Xht4/t312kD9TgMrJjAizYbWtmj6nWjE5hs4Y6H
+         2l7cWdysA3dw3GIPT5EdY2BwQ31b4D8UqOrdSTINQ4qHePGfiIhl+DLUwZgmIx0IGYVu
+         /yKR4d26/X7vvOa3kbPYPM2d/1m4KOrhjLoc/Sq6aZTQzzm7ia5XDO3UuRwW8ERyqgHh
+         +VdfpA47fkn6NH4rZEZTP8a7fE8YOuVAJrhx81VnivGaTmRKuK9FYlwX/vNC8BSN3A1N
+         zUIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc;
-        bh=XXxKGTkclPLjZhgu6hyySCx3gnBCEkTHxXOS24p1d1U=;
-        b=Nhz8+sVMYfQ6X1WnHvkVSi9Z4s/D05AL91sau/03OSVSAtXumNRvgAWTA1WTOO3+oU
-         +pN5zEaKi5NHOAbI/+cXVsFNHAQ2yU6vJ8SjmnRNDu7INTYa09r2hk0qrGkDzotVSwX7
-         zx9F+qDqbwr7uF9RSXoOHG1fAeM3H5P+o13kstILB+pjnpMunylR2AQtSy4WKG8UufHI
-         OvGLvwEJ26IczH/qgDkHy9c5XkuOK0ZzX4do/iwHwAwImNjM5BZTj37D3ALZZpjE6JT2
-         063EI3AuzKh65w1g+LhABS0rMn0bcGTuDt+4YgD16AIM1PmA4Nt8CYvZG8IORwGLAR4B
-         M65g==
-X-Gm-Message-State: ACgBeo0ggvMRXmXg8hQtFi6FM4OJwzs8IuMJnUIfQcJJVboXQfxUsTLw
-        84KhYQy1eV066HvzmABprfwYA0CQxcnxaw==
-X-Google-Smtp-Source: AA6agR5kjegiVQ01ujGmBY/z0h4FPFiw2a9FJ8uVUf5r0bb4ytFtVFEHghvgSrP4fx3P+hFnSZc25w==
-X-Received: by 2002:a17:902:db0e:b0:172:b666:f475 with SMTP id m14-20020a170902db0e00b00172b666f475mr15242891plx.58.1661097932879;
-        Sun, 21 Aug 2022 09:05:32 -0700 (PDT)
-Received: from localhost.localdomain ([137.97.86.182])
-        by smtp.gmail.com with ESMTPSA id s8-20020a63f048000000b004297b8cd589sm5826187pgj.21.2022.08.21.09.05.30
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=r5eMnvfD5RjUnHbUeyia/w2ybXI0hGG1XTC0xJvT2Zg=;
+        b=Nqn8EsbkUDJSVNhr2//yTQRSrN4IQra3dqrUJ6z1SxRHfd7UDgBeSK3L2VRb3BYE/W
+         vOiVrk9l/xKjHW1SdPO7tB1EFO3UCpRfvsi3q6xFRi5UEEdArB8CkJ3ZeI+0F6KKhnEx
+         oj3bCrqhQTI/a9DlUbHUMNctVREbA6UyXBLqGUdmrFNS+tDkVDR52c7e6GEMo+CPDa2+
+         zq8Ts6G86Kv1ZOUNQa9vQt2bh2rTFcX+gZaUCnI8Pe58/feNck2BOuvR05LJ6+TFbQ8I
+         LJncumWSKWi2KlPc0FHrL/mU9JA+Nb0ImUjFhEycu7GzHqD0z676hU2+CWsdc3n+EiMk
+         kqdg==
+X-Gm-Message-State: ACgBeo1m5q5sre5k78O57/1VQrYp7dgFgMTiieqOMFAWRh3LbhUjbf8j
+        zx5ogFGMS1o3rcf+szldqkX690X+LRVAzQ==
+X-Google-Smtp-Source: AA6agR4l6Ux0emCAuaUi6W3M5jSXEppyCo6o70g3n+8cUNI+yBTe9IH4qTQ0pmDdkX2Lc0dJTZWLJw==
+X-Received: by 2002:a05:6214:d66:b0:496:d9c0:3134 with SMTP id 6-20020a0562140d6600b00496d9c03134mr3969911qvs.109.1661101889343;
+        Sun, 21 Aug 2022 10:11:29 -0700 (PDT)
+Received: from [172.17.0.2] ([52.191.197.6])
+        by smtp.gmail.com with ESMTPSA id ay34-20020a05620a17a200b006bb83e2e65fsm8910667qkb.42.2022.08.21.10.11.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Aug 2022 09:05:32 -0700 (PDT)
-From:   darkhz <kmachanwenw@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     darkhz <kmachanwenw@gmail.com>
-Subject: [PATCH] shared/util: Correct UUID for Microphone Control
-Date:   Sun, 21 Aug 2022 21:32:48 +0530
-Message-Id: <20220821160248.3481431-1-kmachanwenw@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Sun, 21 Aug 2022 10:11:28 -0700 (PDT)
+Message-ID: <63026740.050a0220.e1032.489c@mx.google.com>
+Date:   Sun, 21 Aug 2022 10:11:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1349076945368201417=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, kmachanwenw@gmail.com
+Subject: RE: shared/util: Correct UUID for Microphone Control
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220821160248.3481431-1-kmachanwenw@gmail.com>
+References: <20220821160248.3481431-1-kmachanwenw@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-According to the Bluetooth product specification list, the allocated
-UUID for "Microphone Control" is 0x184D, not 0x184C.
+--===============1349076945368201417==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=669554
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.41 seconds
+GitLint                       PASS      1.00 seconds
+Prep - Setup ELL              PASS      26.83 seconds
+Build - Prep                  PASS      0.93 seconds
+Build - Configure             PASS      8.56 seconds
+Build - Make                  PASS      867.08 seconds
+Make Check                    PASS      12.21 seconds
+Make Check w/Valgrind         PASS      287.66 seconds
+Make Distcheck                PASS      240.80 seconds
+Build w/ext ELL - Configure   PASS      8.78 seconds
+Build w/ext ELL - Make        PASS      82.39 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      510.53 seconds
+
+
+
 ---
- src/shared/util.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index b74a005ce..e1e56459a 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -338,7 +338,7 @@ static const struct {
- 	{ 0x1849, "Generic Media Control"			},
- 	{ 0x184b, "Telephony Bearer"				},
- 	{ 0x184c, "Generic Telephony Bearer"			},
--	{ 0x184c, "Microphone Control"				},
-+	{ 0x184d, "Microphone Control"				},
- 	{ 0x184e, "Audio Stream Control"			},
- 	{ 0x184f, "Broadcast Audio Scan"			},
- 	{ 0x1850, "Published Audio Capabilities"		},
--- 
-2.37.1
 
+--===============1349076945368201417==--
