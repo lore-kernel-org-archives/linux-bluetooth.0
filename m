@@ -2,91 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 888F4C28D13
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 22:27:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3AFC28D13
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 22:40:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237514AbiHVW1z (ORCPT
+        id S237884AbiHVWkT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Aug 2022 18:27:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
+        Mon, 22 Aug 2022 18:40:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232461AbiHVW1y (ORCPT
+        with ESMTP id S229819AbiHVWkR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Aug 2022 18:27:54 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EFE940BEB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:27:54 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 12so10668284pga.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:27:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc;
-        bh=wl/eoyqwJrYswHfasGffVmbVpHOzDDqpKIcXHlC9ar0=;
-        b=jhIIuXj11Zl+Q98SgTJazU4/EDaKIjBLlUc7qtedkSqUYwCd+niWrOFIgIrkix15Jv
-         YXGzhOzLFlLaYqp8VPJ6FWaQQ15jy93f3xc70J87ab1zqorN17rrLyjl2LCWpByWebmx
-         hxgAcZdHHIkAvaDh45IPu0LYNvwqyHyT2HlnjBCA202MQH+SHH1S6/6fU0hj50jSeq91
-         838a2OFrG8cT5to+IvQjzLEGiZRhmg3l0e+Z8ovR1kcVnhmhsuehzZDmqLfjWF+ZLyHf
-         SVuij/8Zm3KzNzfszkDUIUc4kaCrHAO54YEe92+ibnSuufdLTcWNRqxbXFHs88f7NczK
-         ZocQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=wl/eoyqwJrYswHfasGffVmbVpHOzDDqpKIcXHlC9ar0=;
-        b=vW+lemEXIgBeE8kbcNErGZcU40wqwxMVfM/ULqcQ92OCHi5asa36BHNgOTEEhCcXLJ
-         y5nKGSntaAS702c3i0Q4R7O5R/KHd4TOCOxNXBfvXPsGAjg3trKv+o6rgtS9qKKP4KQj
-         UWoO6KO5goVRN5LN77BcAv+FLrfysauNVxkhbP0Ene2/bF7kQN3YQffpDHw6pHM6z4Ev
-         87r1IV9CF2OiWrCP7NizC/9ibPTFdvJ1KtVII7RoGXFfVdEv1LFe9ZhSQYYcU+Mv/D9D
-         ub8Bm1zWeVilt4DEplSEZjW6MikPj76KDEwg4i5OFQ2AsRKbiLkiyoY2LVMtdVkvlmef
-         e1fg==
-X-Gm-Message-State: ACgBeo1ms4SEbPYsj6cxamGdbpCk0mLehYPlePEo0UdReeSQCyBI1El2
-        3GJH4OHoYocux93dvpcLRKyD/2gRyPs=
-X-Google-Smtp-Source: AA6agR4bSaT50Gsu6jGTE4ImgVOxS8FVLfZ1tyR+V6FtqRQZmjuMYAePTcfEZVQ1OK62IWZyMthudA==
-X-Received: by 2002:a63:1e5f:0:b0:419:d6bf:b9d7 with SMTP id p31-20020a631e5f000000b00419d6bfb9d7mr18805687pgm.593.1661207273572;
-        Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.66.21.25])
-        by smtp.gmail.com with ESMTPSA id u1-20020a17090341c100b0016d9b101413sm8900298ple.200.2022.08.22.15.27.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
-Message-ID: <630402e9.170a0220.63f9c.0570@mx.google.com>
-Date:   Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1459466613830109478=="
+        Mon, 22 Aug 2022 18:40:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5143450719
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:40:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E21336135F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 22:40:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 491D5C433D6;
+        Mon, 22 Aug 2022 22:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661208015;
+        bh=NuVrfbRzOsSQRrd1eKQsLZpf2nkuaLw7spTeE5zQkdc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=SXCwSU38eAgYEuXO3Zac75+IK/PDHOYu5ChAdSf+wQZHwnGDgUuWv0yc+Pkwj/DtP
+         4V3+F0/k4hE425nTgzpOP4qwu+SBDzk9ku6b8gT7S/0sEqX5R1roGw93RhupVvyH6V
+         bsaH0X4vhJRLDM8Kw5HiXf6rWRgmg9mBjB+/Hm3qfGKIUIIMBDyzB3593C6gnoEVuT
+         ePDd7puuAYbDfZYmenKo9t3PIEDgp8lXezNmg+RV8cohqeRVlLfm5Fi//xNNNcigx5
+         U55p5WrtfJ5XZ3GqHaj+or7OpuKuKuzahBPyhjiNzqd2mQSbSCgh3+HEqM/Vy+lu5Z
+         Jhbx4EGEjXq5Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 240F0E2A03C;
+        Mon, 22 Aug 2022 22:40:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Subject: RE: [BlueZ,1/2] bthost: Add destroy callback to bthost_add_iso_hook
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-In-Reply-To: <20220822220025.541691-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 1/2] bthost: Add destroy callback to bthost_add_iso_hook
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166120801512.10027.17903736832508528637.git-patchwork-notify@kernel.org>
+Date:   Mon, 22 Aug 2022 22:40:15 +0000
 References: <20220822220025.541691-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220822220025.541691-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1459466613830109478==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is an automated email and please do not reply to this email.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear Submitter,
+On Mon, 22 Aug 2022 15:00:24 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds a destroy callback to bthost_add_iso_hook so its user can
+> detect when the hook is freed when the connection is disconnected.
+> ---
+>  emulator/bthost.c  | 8 +++++++-
+>  emulator/bthost.h  | 3 ++-
+>  tools/iso-tester.c | 2 +-
+>  3 files changed, 10 insertions(+), 3 deletions(-)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Here is the summary with links:
+  - [BlueZ,1/2] bthost: Add destroy callback to bthost_add_iso_hook
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5bf220eb3b86
+  - [BlueZ,2/2] iso-tester: Make use of bthost_add_iso_hook destroy callback
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=081897da74f0
 
------ Output -----
-error: patch failed: tools/iso-tester.c:1167
-error: tools/iso-tester.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---===============1459466613830109478==--
