@@ -2,87 +2,66 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D1C3C00140
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 02:01:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8FBC32774
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 02:33:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232305AbiHVCBj (ORCPT
+        id S231872AbiHVCdL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Aug 2022 22:01:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42904 "EHLO
+        Sun, 21 Aug 2022 22:33:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232303AbiHVCBh (ORCPT
+        with ESMTP id S232072AbiHVCdI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Aug 2022 22:01:37 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084E1220EA
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 19:01:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B2F3EB80E72
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 02:01:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6787EC433D7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 02:01:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661133694;
-        bh=yp5zKOYfXhz6hSkIxc6aCHiCk0c/O+wfAyFSzN5epm8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=PxXaG4JG1MK6/WAtqFJSbcKDcDyiNSynREW6UjHloHT/T/JeHGeymXA2K+wgqgtYE
-         N9zQB4OHACnGTwErUj4lZjH7BT9caOSRQ1YRy5LzHRJWgMvdDEibdVglNeCipTSRMM
-         d7H7tE7Vy9f655GMmLSG3z/41PJ1syoZam7u/JipiYelPfmH37DHNfoJMUiWHiZCAl
-         7/aef/vkEej+laPsjJtIlbilAft3dXaAhxf2wm50PcYGlsVQVNBUfyseG4Z1RXKmUl
-         v3JP9qgfFDqa2MG76Ghx/kxnu8n+Lt1nPc77bDxraKkOAkQPWdZaimXVZULduVfs7Q
-         /ZzyQgjXk074A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 594BBC433E9; Mon, 22 Aug 2022 02:01:34 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
+        Sun, 21 Aug 2022 22:33:08 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D5223156
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Aug 2022 19:33:06 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjp.ie; s=key1;
+        t=1661135584;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=U9QwhyOc9y/8tJVF9wA4cQnW03q5qtqDDiW1VE/V6yc=;
+        b=MENcWjtHctpk2Zt2cFReD8KygjYsh54IgaPUJfpOZaRTUZoJlSIi9UcO4zhn5IrAfqoP2M
+        DVUBViAGDBuIvlE5tFtKgbBY1lBcTb2U+D1wAH5tN7C8RHqKYefRqQpf3Q1mXWVd9jpJW3
+        j/5iqLUTS5FZEJusTQlXKnrqnW/aP8U=
+From:   Ronan Pigott <ronan@rjp.ie>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216389] net/bluetooth/l2cap_core.c fails bounds check with GCC
- 12.2
-Date:   Mon, 22 Aug 2022 02:01:34 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: ANSWERED
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216389-62941-r05py1LfUk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216389-62941@https.bugzilla.kernel.org/>
-References: <bug-216389-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ] zsh: drop no more arguments message
+Date:   Sun, 21 Aug 2022 19:32:43 -0700
+Message-Id: <20220822023242.18162-1-ronan@rjp.ie>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: rjp.ie
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216389
+This usage of the _message as a completion function is invalid, and
+will result in an error if invoked by _arguments when the user has a
+format style set for completion messages.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+We can just drop this message, since it is not necessary.
+---
+ completion/zsh/_bluetoothctl | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |ANSWERED
+diff --git a/completion/zsh/_bluetoothctl b/completion/zsh/_bluetoothctl
+index bf35e503e..610ca2b8d 100644
+--- a/completion/zsh/_bluetoothctl
++++ b/completion/zsh/_bluetoothctl
+@@ -68,8 +68,7 @@ _bluetoothctl() {
+ 		'(info)'{-m,--monitor}'[Enable monitor output]' \
+ 		+ 'command' \
+ 		'(info):command:->command' \
+-		'(info):: :->argument' \
+-		': :_message "no more arguments"'
++		'(info):: :->argument'
+ 
+ 	if [[ $state == "command" ]]; then
+ 		_describe -t commands 'command' all_commands
+-- 
+2.37.2
 
---- Comment #1 from Artem S. Tashkinov (aros@gmx.com) ---
-This will be fixed eventually, might have already been fixed in 6.0-rc2.
-
-Removing -Werror will fix it as well.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
