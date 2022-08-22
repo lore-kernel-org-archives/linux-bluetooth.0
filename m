@@ -2,179 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D79BBC32792
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 22:00:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 888F4C28D13
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 22:27:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238304AbiHVWAt (ORCPT
+        id S237514AbiHVW1z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Aug 2022 18:00:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54274 "EHLO
+        Mon, 22 Aug 2022 18:27:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238410AbiHVWAa (ORCPT
+        with ESMTP id S232461AbiHVW1y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Aug 2022 18:00:30 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4E23DF02
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:00:29 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id 67so3462698pfv.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:00:29 -0700 (PDT)
+        Mon, 22 Aug 2022 18:27:54 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EFE940BEB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:27:54 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 12so10668284pga.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 15:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc;
-        bh=dYzd8NEDrTcViGbZChBLrmOKkaPZn79AwL2dNI2eXbM=;
-        b=iv6qdkkf4Uqyn3nltbPdxKa1v3fDErh5cbSMOoFqh+/VthISHGrgMTzketesc97BAW
-         KyZiW8g4ufb4SBrswZ2234Fr2ek5jAVyG/VsSQMxYkt3y8alDiTYPiGJH4RvSTTHuIvA
-         ZC2DjgaqL4clUmMHM75c6iYOrdvpIfqBLm/rI2fKWeTbzcWd2vyeIJmUz5SOiHFRxOQi
-         4E5zHzY0bQxVsnVVqPEdoMY8PuDw/FwBNiLoJmeCw3XQllxjSWsjnp7XevRKkUrmtMuW
-         2HGAiML/z9CZKeStiifYVoCL7bCE/YiQhDCJs6XHy3zS84aQk64W5u9S1a3QybopxFPY
-         Khag==
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:from:to:cc;
+        bh=wl/eoyqwJrYswHfasGffVmbVpHOzDDqpKIcXHlC9ar0=;
+        b=jhIIuXj11Zl+Q98SgTJazU4/EDaKIjBLlUc7qtedkSqUYwCd+niWrOFIgIrkix15Jv
+         YXGzhOzLFlLaYqp8VPJ6FWaQQ15jy93f3xc70J87ab1zqorN17rrLyjl2LCWpByWebmx
+         hxgAcZdHHIkAvaDh45IPu0LYNvwqyHyT2HlnjBCA202MQH+SHH1S6/6fU0hj50jSeq91
+         838a2OFrG8cT5to+IvQjzLEGiZRhmg3l0e+Z8ovR1kcVnhmhsuehzZDmqLfjWF+ZLyHf
+         SVuij/8Zm3KzNzfszkDUIUc4kaCrHAO54YEe92+ibnSuufdLTcWNRqxbXFHs88f7NczK
+         ZocQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=dYzd8NEDrTcViGbZChBLrmOKkaPZn79AwL2dNI2eXbM=;
-        b=H55c4y/NdQdWe59czoJH2ppYzUZhmjOoWNgAnJ9j6rQQd+KITXY3mmJUY38S9utnrI
-         4eWusyHqTzbAjtemFNIrBgo40UtEVVKN4v52Y6mcBACEL6IT/Wa2Eh2l0oB4Mryet0L+
-         KmZTELMIZVvjaBsqYigCkP5zkP73d8Y2NwBrVdBqYR1cC+lDIRAkQOvW5hOVNNH7jhZy
-         9FK7jxxJFxmgC5XOxe6cTOs3XxQN57mCpMUIMg9DAxk5plaU4shxxicWH5RZhQhRBnaB
-         iUoJYOsW7gVgluyPhGwX/6E0g8KIH+baS3xK/np+2AdObapTHzXfUAdTDAJXjYjYQ6/T
-         BESQ==
-X-Gm-Message-State: ACgBeo2h+klA2w6bTC6z8OOxqgIRBpXeWhDCTWk5EVD8O3B8X8ybXC0z
-        +KcgwbSRL1Y/jzKZnjC2tB54ckzurd4=
-X-Google-Smtp-Source: AA6agR5lkYATaEm3jBGq9swnzDA2dpvkxa4PCzWbjwO9GiEch5m9UVr7LboyHCO/jNUH7URtc+hkbw==
-X-Received: by 2002:a05:6a00:1995:b0:52d:5c39:3f61 with SMTP id d21-20020a056a00199500b0052d5c393f61mr22560755pfl.83.1661205628528;
-        Mon, 22 Aug 2022 15:00:28 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z12-20020aa79e4c000000b00535e950aa28sm8364751pfq.131.2022.08.22.15.00.27
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=wl/eoyqwJrYswHfasGffVmbVpHOzDDqpKIcXHlC9ar0=;
+        b=vW+lemEXIgBeE8kbcNErGZcU40wqwxMVfM/ULqcQ92OCHi5asa36BHNgOTEEhCcXLJ
+         y5nKGSntaAS702c3i0Q4R7O5R/KHd4TOCOxNXBfvXPsGAjg3trKv+o6rgtS9qKKP4KQj
+         UWoO6KO5goVRN5LN77BcAv+FLrfysauNVxkhbP0Ene2/bF7kQN3YQffpDHw6pHM6z4Ev
+         87r1IV9CF2OiWrCP7NizC/9ibPTFdvJ1KtVII7RoGXFfVdEv1LFe9ZhSQYYcU+Mv/D9D
+         ub8Bm1zWeVilt4DEplSEZjW6MikPj76KDEwg4i5OFQ2AsRKbiLkiyoY2LVMtdVkvlmef
+         e1fg==
+X-Gm-Message-State: ACgBeo1ms4SEbPYsj6cxamGdbpCk0mLehYPlePEo0UdReeSQCyBI1El2
+        3GJH4OHoYocux93dvpcLRKyD/2gRyPs=
+X-Google-Smtp-Source: AA6agR4bSaT50Gsu6jGTE4ImgVOxS8FVLfZ1tyR+V6FtqRQZmjuMYAePTcfEZVQ1OK62IWZyMthudA==
+X-Received: by 2002:a63:1e5f:0:b0:419:d6bf:b9d7 with SMTP id p31-20020a631e5f000000b00419d6bfb9d7mr18805687pgm.593.1661207273572;
+        Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
+Received: from [172.17.0.2] ([20.66.21.25])
+        by smtp.gmail.com with ESMTPSA id u1-20020a17090341c100b0016d9b101413sm8900298ple.200.2022.08.22.15.27.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Aug 2022 15:00:27 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] iso-tester: Make use of bthost_add_iso_hook destroy callback
-Date:   Mon, 22 Aug 2022 15:00:25 -0700
-Message-Id: <20220822220025.541691-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.2
+        Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
+Message-ID: <630402e9.170a0220.63f9c.0570@mx.google.com>
+Date:   Mon, 22 Aug 2022 15:27:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1459466613830109478=="
+MIME-Version: 1.0
+Subject: RE: [BlueZ,1/2] bthost: Add destroy callback to bthost_add_iso_hook
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 In-Reply-To: <20220822220025.541691-1-luiz.dentz@gmail.com>
 References: <20220822220025.541691-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1459466613830109478==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes use of bthost_add_iso_hook to track when an ISO connection
-has been disconnected and then set its handle to 0x0000 which is then
-checked when the socket HUP to confirm the remote has properly
-disconnected (e.g. received Disconnected Complete).
+This is an automated email and please do not reply to this email.
+
+Dear Submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+
+----- Output -----
+error: patch failed: tools/iso-tester.c:1167
+error: tools/iso-tester.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
+
+
+Please resolve the issue and submit the patches again.
+
+
 ---
- tools/iso-tester.c | 52 +++++++++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 21 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/iso-tester.c b/tools/iso-tester.c
-index 8c935b9220dd..269fbe2d6c62 100644
---- a/tools/iso-tester.c
-+++ b/tools/iso-tester.c
-@@ -676,13 +676,42 @@ static void client_connectable_complete(uint16_t opcode, uint8_t status,
- 	}
- }
- 
-+static void bthost_recv_data(const void *buf, uint16_t len, void *user_data)
-+{
-+	struct test_data *data = user_data;
-+	const struct iso_client_data *isodata = data->test_data;
-+
-+	tester_print("Client received %u bytes of data", len);
-+
-+	if (isodata->send && (isodata->send->iov_len != len ||
-+			memcmp(isodata->send->iov_base, buf, len))) {
-+		if (!isodata->recv->iov_base)
-+			tester_test_failed();
-+	} else
-+		tester_test_passed();
-+}
-+
-+static void bthost_iso_disconnected(void *user_data)
-+{
-+	struct test_data *data = user_data;
-+
-+	tester_print("ISO handle 0x%04x disconnected", data->handle);
-+
-+	data->handle = 0x0000;
-+}
-+
- static void iso_new_conn(uint16_t handle, void *user_data)
- {
- 	struct test_data *data = user_data;
-+	struct bthost *host;
- 
- 	tester_print("New client connection with handle 0x%04x", handle);
- 
- 	data->handle = handle;
-+
-+	host = hciemu_client_get_host(data->hciemu);
-+	bthost_add_iso_hook(host, data->handle, bthost_recv_data, data,
-+				bthost_iso_disconnected);
- }
- 
- static void acl_new_conn(uint16_t handle, void *user_data)
-@@ -722,7 +751,7 @@ static void setup_powered_callback(uint8_t status, uint16_t length,
- 		if (!isodata)
- 			continue;
- 
--		if (isodata->send || isodata->recv)
-+		if (isodata->send || isodata->recv || isodata->disconnect)
- 			bthost_set_iso_cb(host, iso_new_conn, data);
- 
- 		if (isodata->bcast) {
-@@ -1110,25 +1139,9 @@ static void iso_recv(struct test_data *data, GIOChannel *io)
- 	data->io_id[0] = g_io_add_watch(io, G_IO_IN, iso_recv_data, data);
- }
- 
--static void bthost_recv_data(const void *buf, uint16_t len, void *user_data)
--{
--	struct test_data *data = user_data;
--	const struct iso_client_data *isodata = data->test_data;
--
--	tester_print("Client received %u bytes of data", len);
--
--	if (isodata->send && (isodata->send->iov_len != len ||
--			memcmp(isodata->send->iov_base, buf, len))) {
--		if (!isodata->recv->iov_base)
--			tester_test_failed();
--	} else
--		tester_test_passed();
--}
--
- static void iso_send(struct test_data *data, GIOChannel *io)
- {
- 	const struct iso_client_data *isodata = data->test_data;
--	struct bthost *host;
- 	ssize_t ret;
- 	int sk;
- 
-@@ -1136,9 +1149,6 @@ static void iso_send(struct test_data *data, GIOChannel *io)
- 
- 	tester_print("Writing %zu bytes of data", isodata->send->iov_len);
- 
--	host = hciemu_client_get_host(data->hciemu);
--	bthost_add_iso_hook(host, data->handle, bthost_recv_data, data, NULL);
--
- 	ret = writev(sk, isodata->send, 1);
- 	if (ret < 0 || isodata->send->iov_len != (size_t) ret) {
- 		tester_warn("Failed to write %zu bytes: %s (%d)",
-@@ -1167,7 +1177,7 @@ static gboolean iso_disconnected(GIOChannel *io, GIOCondition cond,
- 
- 	data->io_id[0] = 0;
- 
--	if (cond & G_IO_HUP) {
-+	if ((cond & G_IO_HUP) && !data->handle) {
- 		tester_print("Successfully disconnected");
- 
- 		if (data->reconnect) {
--- 
-2.37.2
 
+--===============1459466613830109478==--
