@@ -2,83 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8A1C28D13
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 11:42:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 172A9C3F6B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Aug 2022 12:05:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232632AbiHVLmW (ORCPT
+        id S234944AbiHVMFx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Aug 2022 07:42:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40392 "EHLO
+        Mon, 22 Aug 2022 08:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232214AbiHVLmV (ORCPT
+        with ESMTP id S234927AbiHVMFw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Aug 2022 07:42:21 -0400
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCEB33A3A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 04:42:18 -0700 (PDT)
-X-QQ-mid: bizesmtp90t1661168533tgunjzkb
-Received: from localhost ( [119.253.45.138])
-        by bizesmtp.qq.com (ESMTP) with SMTP id 0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Aug 2022 19:42:13 +0800 (CST)
-X-QQ-SSF: 01400000007000K0Z000B00A0000000
-X-QQ-FEAT: 2ebHyxEhYm042sYQ55J/3wC4+/DbmODJyYVHhxOUqjY6qI6Nc8Q3b2OZZ0Zq4
-        CGOtOKOKtyy8qhoZclUOXx2YRTjC7kV6EZ1YOKGgLK9Hk+SjzCFM76gKPv4Db2zNwtRysav
-        kpjBSvUYjDf9kBJVEX0AOYnqlTOxT26JPjlBBLHWFRimHNPjmrr5d4LgPk2C0Syw1qKe88I
-        gfml7k7ZjHy1zNzhEbeygokWXFERv1fkMYnUHvdUjjeVo5YFsnBtx+nJawRB8Ys12AmYkuR
-        hdln6hiXWzx0Qku8Pv/BW/vCyqOlUoEJkE6GQgUu8jro77NMQvxPm5uU/T5UoeOlmI3kDGM
-        F32BoHUyWL0CpTFI9P1PFITfGR5Ix/9FVpVpQ7V1DB/csh34iA=
-X-QQ-GoodBg: 2
-Date:   Mon, 22 Aug 2022 19:42:12 +0800
-From:   Jiaquan He <jiaquan.he@9amtech.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] test/test-mesh: Fix python warning
-Message-ID: <CEE786764994BC33+20220822114212.GA5807@ixamedge-b4f804>
+        Mon, 22 Aug 2022 08:05:52 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418F23055F;
+        Mon, 22 Aug 2022 05:05:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1661169951; x=1692705951;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=811smr8o+N31DwICHQUYadnBAo8HWEZEZAetsUCixYw=;
+  b=JrOi1R93xCxsqlc90K6HT+HRn3QpDOvP9cxi1p9dApflISUcB5sHHvE4
+   S1FEu1bB8obgvOJzTUXMTfc53AWB4UCrf/X+Y5dNDoe1c9YtKYaebmSpx
+   TipYYak/a5cbgZs2fGDNPzzL2uBt40p8UoEuLN+DyAg9dXiv6+BUXNIUB
+   4z0mna/FzUHo90+KAQJeOqP2l465nbynStDDvcWUv9pY9ggJM2r/SwO6v
+   EySwpMOhBBjBRtHk6u5lkAIfDiv2UOMOu9oZ/nsaHlouEzh1t02kfU3ZZ
+   zsbVrbxmfWXf8nvLb0Gw9cIIVwut7k0jIe+uaG+EjPgLyo9Ox/hAr+Q1Z
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10446"; a="357376894"
+X-IronPort-AV: E=Sophos;i="5.93,254,1654585200"; 
+   d="scan'208";a="357376894"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Aug 2022 05:05:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,254,1654585200"; 
+   d="scan'208";a="784828428"
+Received: from lkp-server01.sh.intel.com (HELO 44b6dac04a33) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 22 Aug 2022 05:05:49 -0700
+Received: from kbuild by 44b6dac04a33 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oQ6Bg-0005JP-2R;
+        Mon, 22 Aug 2022 12:05:48 +0000
+Date:   Mon, 22 Aug 2022 20:04:57 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        Linux Memory Management List <linux-mm@kvack.org>
+Subject: [linux-next:pending-fixes] BUILD SUCCESS
+ 72d0e40cc07e06e5b11ddcf74ba68f7e04eacb16
+Message-ID: <630370e9.lrkhEwYdtnOT++I7%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:9amtech.com:qybglogicsvr:qybglogicsvr6
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes inconsistent use of tabs and spaces in indentation and
-removes unused import.
----
- test/test-mesh | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git pending-fixes
+branch HEAD: 72d0e40cc07e06e5b11ddcf74ba68f7e04eacb16  Merge branch 'for-linux-next-fixes' of git://anongit.freedesktop.org/drm/drm-misc
 
-diff --git a/test/test-mesh b/test/test-mesh
-index fbf2476bf..f49ddeec6 100755
---- a/test/test-mesh
-+++ b/test/test-mesh
-@@ -97,7 +97,6 @@ import struct
- import fcntl
- import os
- import numpy
--import random
- import dbus
- import dbus.service
- import dbus.exceptions
-@@ -113,7 +112,7 @@ except ImportError:
- from dbus.mainloop.glib import DBusGMainLoop
- 
- try:
--  from termcolor import colored, cprint
-+  from termcolor import colored
-   set_error = lambda x: colored('!' + x, 'red', attrs=['bold'])
-   set_cyan = lambda x: colored(x, 'cyan', attrs=['bold'])
-   set_green = lambda x: colored(x, 'green', attrs=['bold'])
-@@ -771,7 +770,7 @@ class Menu():
- 			return
- 		if len(cmds) > 1:
- 			for cmd in cmds:
--			     print(set_cyan(cmd + '?'))
-+				print(set_cyan(cmd + '?'))
- 			return
- 
- 		self.menu.get(cmds[0]).func()
+Unverified Warning (likely false positive, please contact us if interested):
+
+drivers/usb/dwc3/dwc3-qcom.c:313:25: warning: variable 'hcd' set but not used [-Wunused-but-set-variable]
+include/net/bluetooth/bluetooth.h:347:16: warning: 'memcmp' specified bound 6 exceeds source size 0 [-Wstringop-overread]
+
+Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- ia64-allmodconfig
+|   `-- drivers-usb-dwc3-dwc3-qcom.c:warning:variable-hcd-set-but-not-used
+|-- openrisc-buildonly-randconfig-r006-20220821
+|   `-- include-net-bluetooth-bluetooth.h:warning:memcmp-specified-bound-exceeds-source-size
+|-- openrisc-randconfig-r021-20220821
+|   `-- include-net-bluetooth-bluetooth.h:warning:memcmp-specified-bound-exceeds-source-size
+`-- sparc64-buildonly-randconfig-r003-20220822
+    `-- drivers-usb-dwc3-dwc3-qcom.c:warning:variable-hcd-set-but-not-used
+
+elapsed time: 723m
+
+configs tested: 63
+configs skipped: 2
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+um                             i386_defconfig
+um                           x86_64_defconfig
+i386                 randconfig-a014-20220822
+i386                 randconfig-a013-20220822
+i386                 randconfig-a011-20220822
+arm                                 defconfig
+i386                 randconfig-a012-20220822
+arc                               allnoconfig
+x86_64                          rhel-8.3-func
+alpha                             allnoconfig
+x86_64                         rhel-8.3-kunit
+i386                 randconfig-a015-20220822
+arm                              allyesconfig
+x86_64                           rhel-8.3-kvm
+x86_64                              defconfig
+riscv                             allnoconfig
+x86_64                               rhel-8.3
+x86_64               randconfig-a012-20220822
+x86_64                    rhel-8.3-kselftests
+i386                 randconfig-a016-20220822
+x86_64               randconfig-a013-20220822
+x86_64                           rhel-8.3-syz
+i386                          randconfig-a001
+arc                  randconfig-r043-20220821
+csky                              allnoconfig
+x86_64               randconfig-a011-20220822
+arm64                            allyesconfig
+arc                  randconfig-r043-20220822
+riscv                randconfig-r042-20220822
+i386                          randconfig-a003
+x86_64               randconfig-a016-20220822
+x86_64               randconfig-a014-20220822
+i386                          randconfig-a005
+x86_64                           allyesconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+m68k                             allyesconfig
+s390                 randconfig-r044-20220822
+m68k                             allmodconfig
+x86_64               randconfig-a015-20220822
+powerpc                          allmodconfig
+mips                             allyesconfig
+powerpc                           allnoconfig
+sh                               allmodconfig
+ia64                             allmodconfig
+i386                                defconfig
+i386                             allyesconfig
+
+clang tested configs:
+x86_64               randconfig-a002-20220822
+x86_64               randconfig-a005-20220822
+x86_64               randconfig-a004-20220822
+x86_64               randconfig-a003-20220822
+hexagon              randconfig-r041-20220822
+x86_64               randconfig-a001-20220822
+hexagon              randconfig-r045-20220822
+x86_64               randconfig-a006-20220822
+i386                          randconfig-a002
+riscv                randconfig-r042-20220821
+i386                          randconfig-a004
+hexagon              randconfig-r045-20220821
+hexagon              randconfig-r041-20220821
+s390                 randconfig-r044-20220821
+i386                          randconfig-a006
+x86_64                          rhel-8.3-rust
+
 -- 
-2.17.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
