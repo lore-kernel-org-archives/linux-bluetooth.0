@@ -2,115 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3542FC32789
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Aug 2022 19:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DECC32772
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Aug 2022 20:27:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231335AbiHWTBo (ORCPT
+        id S230304AbiHWU13 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Aug 2022 15:01:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51812 "EHLO
+        Tue, 23 Aug 2022 16:27:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234451AbiHWTAq (ORCPT
+        with ESMTP id S230209AbiHWU1O (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Aug 2022 15:00:46 -0400
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06C6D0775
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 10:31:47 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-334ab1f0247so248375597b3.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 10:31:46 -0700 (PDT)
+        Tue, 23 Aug 2022 16:27:14 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3116F74CC8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 12:59:54 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id e19so13751653pju.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 12:59:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc;
-        bh=yn+6KcdSjUbj8fiFrESi6rWr7GFxzW1P62BNa1n26Qc=;
-        b=F/wa38ebtnf6p2G0h4tuwd4+Sps4tiDURiBiKdXCMXN0BonVuffQnbmF2ngVoFUeNq
-         sZMTmw2BfxcEQxOHlXBQ2Nua7KD8YrGY3NvW+AI+gJLcEKiVwaspfOAd325ipIr/vA49
-         aGCaGenMMvARROjfSTQp42c1/uWMk8EKyQMMr/hfZDZNnZ2Q00YWjn1lecnMCWt/F6mL
-         7zpFm4Sm5+LIeHu28AKvBRv5nrxkSLZJZVy+l9OvJ8jFTM03t8ZR8GBcf8nob4daHrFl
-         /urUEQPGewGxUBoqQ1N/lQ+qjGs0Mft37H3Ik/zajGXixMbr/o8JLIhd4F4pjSuXIgmQ
-         hRvQ==
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=NV3zYNsZs+FTfXjcTABH2HnMUzE5xJZekcPCzWxW39s=;
+        b=TFp+RO1l85qx9y4ty6XJLePsLRqZGkIJsKsJ091hDlQIjoqSwljf5Y3+lq84JAROwC
+         xLCcx+bwsHhD4myqDC0FXYB0+/gqKmA8RDPUQZmmVrhpUzPCdezlLpJ/HUiUpcd1NKnq
+         C9Tus7DhuoVk4rJHk8/e0ZuMkIppU5QL9mB49opQODCe8t8dmUsRReSOj2wKchKrTgit
+         srgh5QmH73JWvlCHIhgfsQ0U4ZpvsrEF2D6pcilqSACDLUvT5XA222VKgZYKokjHWEqT
+         8UamDYaPArBuMEL5vIFPHmWZPVkO6UgkX33uud6Jnf1O78x/IZ9SHvm/KmDEj8Hq2bNb
+         Hefw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc;
-        bh=yn+6KcdSjUbj8fiFrESi6rWr7GFxzW1P62BNa1n26Qc=;
-        b=cKhP5keZk+zsKYyDXrK5CV9VeTWu6PQmu+wZaM0mtYhtmK+DYwKKyE1mzCmlQmxM8d
-         XrttMXz+FsOV0rlNgbChwBgNO/K9ahig2mIkSGeU0ygVUltVfctIXXhxsDhQ2Bz120+a
-         +Co/vuGaJbbBj8sQ8p2raJxMRvDs7omVcCgRckIPHIXn4gA20uSAvwMxIlNV4mN8yEbn
-         aRDqqGC74zmZnlb0azwmqt85jmqSc+wwdg636+l8c9Ul0V8p/rhy/ZWuvOxtXucBE/7b
-         LBhppLr7eBDZdrPqSy9moNRFpVI1WhJyEU2RcPYg2WNB6EUuixYrNk8W+p6vq1rNNrlD
-         U7Eg==
-X-Gm-Message-State: ACgBeo2EQ1EdhiGE/brQ57+OYQxLyoSL9yS5m/6TCwWIiasfuzMUpW0/
-        lNfaLkEX+sIubaAHYLKvniiE3CVkH/Y/6hQJuKbfnhJq+kSCfXqME3cbIzSel/9mBlbgCONSghY
-        FzQtpshu2nbgAW/GtDJeav/aewLBE02pQE3SpTMV2GHyJDGtAnK0ozOr4PgZ8ZVOOgIaKYdT+KH
-        6x
-X-Google-Smtp-Source: AA6agR4PMULbgfNA1eniMg787393QqeoXOqpgtEpbM22gXlXqm78mqE1N/r/LLOqc91THCOKSROADhGgb8DC
-X-Received: from jiangzp-glinux-dev.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:4c52])
- (user=jiangzp job=sendgmr) by 2002:a25:e401:0:b0:694:db13:aead with SMTP id
- b1-20020a25e401000000b00694db13aeadmr21148400ybh.149.1661275694093; Tue, 23
- Aug 2022 10:28:14 -0700 (PDT)
-Date:   Tue, 23 Aug 2022 10:28:08 -0700
-In-Reply-To: <20220823172808.3477638-1-jiangzp@google.com>
-Message-Id: <20220823102800.kernel.v3.1.I1d10fc551cadae988dcf2fc66ad8c9eec2d7026b@changeid>
-Mime-Version: 1.0
-References: <20220823172808.3477638-1-jiangzp@google.com>
-X-Mailer: git-send-email 2.37.1.595.g718a3a8f04-goog
-Subject: [kernel PATCH v3 1/1] Bluetooth: hci_sync: hold hdev->lock when
- cleanup hci_conn
-From:   Zhengping Jiang <jiangzp@google.com>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Zhengping Jiang <jiangzp@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=NV3zYNsZs+FTfXjcTABH2HnMUzE5xJZekcPCzWxW39s=;
+        b=Xqji5mgXnH1u6wtH7HFGz8hnVjwDt2VCpmTdx+EUax0Zg5yXqXje0B14k7BMhSgIlv
+         OnmoH05QXPkMENVce9c7HqLNN4gl6aC6FKWFUEviiQmm5HFsJ40nZCu2acxrprWsdZFs
+         uiaS+MPxEKyc/pOr007Zdp+1b+aRPaYFOogjELk/l1ZrvOP1Ea3ouTHat9X1rv2GhGI+
+         aNDIFud2ZbfDlXpyifc2o8RZE3CDnAraEQwrbuRt+kAxScyj6uI0Y1sn7+elqLkR8C6h
+         0m87uS+N575Gxm6C/iQu1b03F9zHPoz9BIByzY844vQ+zZHMwNU87UzkHRaxyKzXdIam
+         VhEQ==
+X-Gm-Message-State: ACgBeo22RQAEfS6tForuxc1Cr2YC722A29nt65LgXAz3FYI0oaVn5Mda
+        GmKjerkZSdUlGj+h6DzoCOpDJJx1soUCog==
+X-Google-Smtp-Source: AA6agR6WNXpAeAgpKvUF5o6JyDqcfMlslN7/KoNclhkAT0g74/qWwSXhFTLg/ghg6qC0DBhhuci72Q==
+X-Received: by 2002:a17:902:f64f:b0:172:a790:320a with SMTP id m15-20020a170902f64f00b00172a790320amr25568359plg.149.1661284793474;
+        Tue, 23 Aug 2022 12:59:53 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.180.89])
+        by smtp.gmail.com with ESMTPSA id r35-20020a63fc63000000b0041bfa382dfesm9510328pgk.67.2022.08.23.12.59.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Aug 2022 12:59:53 -0700 (PDT)
+Message-ID: <630531b9.630a0220.3794c.1636@mx.google.com>
+Date:   Tue, 23 Aug 2022 12:59:53 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1440162200455913048=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
+Subject: RE: Bluetooth: hci_sync: hold hdev->lock when cleanup hci_conn
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220823102800.kernel.v3.1.I1d10fc551cadae988dcf2fc66ad8c9eec2d7026b@changeid>
+References: <20220823102800.kernel.v3.1.I1d10fc551cadae988dcf2fc66ad8c9eec2d7026b@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When disconnecting all devices, hci_conn_failed is used to cleanup
-hci_conn object when the hci_conn object cannot be aborted.
-The function hci_conn_failed requires the caller holds hdev->lock.
+--===============1440162200455913048==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 9b3628d79b46f ("Bluetooth: hci_sync: Cleanup hci_conn if it cannot be aborted")
-Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=670367
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.90 seconds
+GitLint                       PASS      0.50 seconds
+SubjectPrefix                 PASS      0.31 seconds
+BuildKernel                   PASS      41.03 seconds
+BuildKernel32                 PASS      37.01 seconds
+Incremental Build with patchesPASS      52.46 seconds
+TestRunner: Setup             PASS      590.16 seconds
+TestRunner: l2cap-tester      PASS      19.08 seconds
+TestRunner: bnep-tester       PASS      7.51 seconds
+TestRunner: mgmt-tester       PASS      122.65 seconds
+TestRunner: rfcomm-tester     PASS      12.16 seconds
+TestRunner: sco-tester        PASS      11.78 seconds
+TestRunner: smp-tester        PASS      11.16 seconds
+TestRunner: userchan-tester   PASS      7.64 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-Changes in v3:
-- Remove an empty line in commit message between Fixes and SoB
 
-Changes in v2:
-- Update commit message
-
-Changes in v1:
-- Hold hdev->lock for hci_conn_failed
-
- net/bluetooth/hci_sync.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 74a0cd5d0b37f..e08c0503027d8 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5034,9 +5034,11 @@ int hci_abort_conn_sync(struct hci_dev *hdev, struct hci_conn *conn, u8 reason)
- 		/* Cleanup hci_conn object if it cannot be cancelled as it
- 		 * likelly means the controller and host stack are out of sync.
- 		 */
--		if (err)
-+		if (err) {
-+			hci_dev_lock(hdev);
- 			hci_conn_failed(conn, err);
--
-+			hci_dev_unlock(hdev);
-+		}
- 		return err;
- 	case BT_CONNECT2:
- 		return hci_reject_conn_sync(hdev, conn, reason);
--- 
-2.37.1.595.g718a3a8f04-goog
-
+--===============1440162200455913048==--
