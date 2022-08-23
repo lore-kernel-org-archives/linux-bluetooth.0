@@ -2,99 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42078C32772
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Aug 2022 15:32:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 313EBC32772
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Aug 2022 18:56:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241137AbiHWPcT (ORCPT
+        id S232750AbiHWS4g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Aug 2022 11:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57154 "EHLO
+        Tue, 23 Aug 2022 14:56:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239296AbiHWPcC (ORCPT
+        with ESMTP id S232798AbiHWS4N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Aug 2022 11:32:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B3F250D88
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 04:17:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1661253432;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9vFwWtlaXBJfhkm+20Q4BimLsKsx1b4GpBGhXdNHVUg=;
-        b=RNtXynllRVysYO2sjwjsBDsxX9p++HJlxLp2W1lPoJl72mu7/93SG1oLWYUt8sHb8Q+i+V
-        yQ+LCxaohtM8HjYkJ61Q2FrrNkK0FeoAjAjhFZK5k9vFFQEehNpUaJsucilnfY8pb+biBU
-        F/KOkzDQS14pTCYzCTn+fjv8Sbjkhv0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-533-4av-clwwNAGbcMzzr5XUZg-1; Tue, 23 Aug 2022 07:06:52 -0400
-X-MC-Unique: 4av-clwwNAGbcMzzr5XUZg-1
-Received: by mail-wm1-f71.google.com with SMTP id r10-20020a1c440a000000b003a538a648a9so7793352wma.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 04:06:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc;
-        bh=9vFwWtlaXBJfhkm+20Q4BimLsKsx1b4GpBGhXdNHVUg=;
-        b=HMqLFsPPBLQvCyQDMMsC5Zm3LSTDy357hjqwS/35mqdmxRPCoRkl024vyxqDNWVSoh
-         Nqk6PCTFJzolYCtx3c2XmNKmMckN2oDa5dzgK8ZoODkxztOkQNjIE0ZhQoCCxpImUVr6
-         8lJJlDtwWTAZMCKbxhDef4ZJGsT6JCKkyPdGMPYEWdOT0lJD6v25o+LyxYQH5gizQB0U
-         GiSA19xVAjWwoktpPOHZpdbE6flcwH1VBdNLQ6hOWK9Lzqda0UMkgfwaKxcWCQdmefTI
-         puvdpS8ZBxD5qY1Yg9oBfCSnl6dVhrAFMc9qxR1QzeN6AYhGvOakiUvg5j1/rikIJfWQ
-         Hp9w==
-X-Gm-Message-State: ACgBeo20K3o/XgakK4MCBiZYDchA66k9YH5ZxueUn3UVfqXoypFx88hv
-        Eax/eQm9ZB6ESAcM9i/EIc9sTifGfpP07K8yLZQBW1Lj2ujHryP3/Wb3gjMZk7uLwagks7KHSYL
-        +No5CRlhRGOWLcGdvKovCXsONzrUo
-X-Received: by 2002:a05:600c:384f:b0:3a6:603c:4338 with SMTP id s15-20020a05600c384f00b003a6603c4338mr1822493wmr.192.1661252811619;
-        Tue, 23 Aug 2022 04:06:51 -0700 (PDT)
-X-Google-Smtp-Source: AA6agR5DCT0OQblrn5cXEd8HIrkGgjZmmi8yFbjusnd23J8AN0pMS1n6Obdq1k352nw99irqcnP1SQ==
-X-Received: by 2002:a05:600c:384f:b0:3a6:603c:4338 with SMTP id s15-20020a05600c384f00b003a6603c4338mr1822481wmr.192.1661252811386;
-        Tue, 23 Aug 2022 04:06:51 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-97-176.dyn.eolo.it. [146.241.97.176])
-        by smtp.gmail.com with ESMTPSA id i6-20020a5d4386000000b0022159d92004sm8043071wrq.82.2022.08.23.04.06.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Aug 2022 04:06:50 -0700 (PDT)
-Message-ID: <6e47d3d9f8cc73c6baf26d2b5f320d51f67d9a04.camel@redhat.com>
-Subject: Re: [kernel PATCH v2 1/1] Bluetooth: hci_sync: hold hdev->lock when
- cleanup hci_conn
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Zhengping Jiang <jiangzp@google.com>,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Date:   Tue, 23 Aug 2022 13:06:49 +0200
-In-Reply-To: <20220822214430.kernel.v2.1.I1d10fc551cadae988dcf2fc66ad8c9eec2d7026b@changeid>
-References: <20220823044434.3402413-1-jiangzp@google.com>
-         <20220822214430.kernel.v2.1.I1d10fc551cadae988dcf2fc66ad8c9eec2d7026b@changeid>
+        Tue, 23 Aug 2022 14:56:13 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CFC98A5E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 10:23:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 66A39B81FF0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 17:22:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1928AC4314C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Aug 2022 17:22:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661275371;
+        bh=4qL2Yvuezy+m4fDXohFJScNAUAo7gSNDC7CS6ZDu1L8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Si6pnU7sLU3aNm8QeSm3OFygp7t36pKUC1pPnb8CTq1xVJgQDgEsRWAsACcKk+US/
+         h7HD4KracNA9Kap6FhtQ3ZJImYbI6EmSkLUP3sdVQ8xlFRBM/0sUfwJJh2Cki1EVhd
+         mL+U15K8NpXDWQORkqYsqzVOu0bnYBQ46ojbriONEqZA/8X2kSoUXmsEeOlj34XSa0
+         s6SL7bBDrQl/NBwf3+BQOJZvJ5cwn0uvCfhz/Sej3bI0iO73fD20PFyq+8tvaEGFDS
+         mZZer+nbScq+a+V/fGx8LW0OJtY7BiwwZgyTxpfTpnoSeg4RREPhf+E2llRFpxmDfJ
+         KRKFzf47Y+Uhg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 003CAC433E9; Tue, 23 Aug 2022 17:22:50 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216389] net/bluetooth/l2cap_core.c fails bounds check with GCC
+ 12.2
+Date:   Tue, 23 Aug 2022 17:22:50 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luiz.dentz@gmail.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: ANSWERED
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-216389-62941-6A4KUSQIXx@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216389-62941@https.bugzilla.kernel.org/>
+References: <bug-216389-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 2022-08-22 at 21:44 -0700, Zhengping Jiang wrote:
-> When disconnecting all devices, hci_conn_failed is used to cleanup
-> hci_conn object when the hci_conn object cannot be aborted.
-> The function hci_conn_failed requires the caller holds hdev->lock.
-> 
-> Fixes: 9b3628d79b46f ("Bluetooth: hci_sync: Cleanup hci_conn if it cannot be aborted")
-> 
-> Signed-off-by: Zhengping Jiang <jiangzp@google.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216389
 
-For the records, you should avoid empty lines between the 'fixes' tag
-and your SoB.
+Luiz Von Dentz (luiz.dentz@gmail.com) changed:
 
-Cheers,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |luiz.dentz@gmail.com
 
-Paolo
+--- Comment #3 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
+The following patch should fix it:
 
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t/commit/?id=3D1d71d9223e4143d3638f60c7bb291844c237556c
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
