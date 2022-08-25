@@ -2,125 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BA0EECAAA2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 21:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB2E9ECAAA2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 22:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233925AbiHYVcv (ORCPT
+        id S232482AbiHYWni (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Aug 2022 17:32:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51890 "EHLO
+        Thu, 25 Aug 2022 18:43:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232541AbiHYVcu (ORCPT
+        with ESMTP id S243981AbiHYWng (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Aug 2022 17:32:50 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197BEA1D54
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 14:32:50 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id t5so2389315pjs.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 14:32:50 -0700 (PDT)
+        Thu, 25 Aug 2022 18:43:36 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A2A0C6B60
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 15:43:33 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id w19so42264657ejc.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 15:43:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=j/+kun0PLOGIh7mR+LGiVWJNEACol//aV1+Zhj/BKD0=;
-        b=fqRbc4WMKqx0j4WkOgcdBsQkTcX1pI0SE9NFLRYq54EfN0mGVSqSVz+24rczt4v3lp
-         RLhj2fxeX9obEg+eZ+1awp3CzOCUhXF0nnbhCgLLICq2ypR1UJLWU7Kicp8tQAYyf8QS
-         6nSBApyfQW+JzI+NyUQQYi8Fs6JuAKocqtHsKemCqnKM1DbaOSOndKzMrneZBy2U6cDg
-         2STW9IWrJTrpGTkevjT+ovMfvDQ8FMJtV+u4lJ2c4ez1YB8bopGOimtT8r+uFQtLB/03
-         jn6gZypXbJmOuJP5Ky+OFzQsv0HwqdKVTe9rCWOednCKXzAz4NQqy66agssibYwfpt0i
-         WoGg==
+        d=balfug.com; s=gm;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=BjT8hRfQ7izuh4D1WYligk8wTQyrhZzfhom7KTiNQuo=;
+        b=mDh43DmZqaka1sbgKzyUAIflP049W3mt4vxnWIz4WvJo0Rf0KoZJ/br+va+lCTj1wO
+         Ho2w0BiO8UGXzM/X8zuiayvu5RY9AqFojQiSBXkY3V9+gG7rS7ctnLHKJPSA22r8Qwvw
+         Pj7Cw1/AtS4zQ/AN11r7m6HerImNpimhd0MP2zVd/TDKsDG86XJqidU4pnmEjokUCLTJ
+         xRZyIr1ns3oLEiU7B78S7t2wDknYexhZDdpK6mcu00TU6MfZYWXTV7naSPiKgMN/LAMz
+         V/IpHzd02AGMOisvJtRTbi2cNBECc3zv5SIw3k8dfpDruMeVGm2V7uppqvHOeAnDxUBB
+         DIgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=j/+kun0PLOGIh7mR+LGiVWJNEACol//aV1+Zhj/BKD0=;
-        b=s4umj7Qf0EzjhJ6WsDQq2cIAgtfNHQKS676QDuyqxX0ahNk5NiJA9FuKL7Lri35P5V
-         BfKK6k+owlshrGfu4L4DDnAPTdeo8B9hHXdkcyMMQuW93rDS9yg3MinrnqwMV9/T952V
-         5rjDd9MI3y62SmmISMefXPm6VsQulDx9BXwEgw0bWWVd9McN/jbk0sheVv9VPnSDC5PD
-         ++8MCKSn9msfZ7WKk7zaC187u//x5LMgID1Dyq5U52X482UaO9ZkDPbni2qzUtiXdKDe
-         AtMJ3+f2HHBIK8gc6uwam+RVNG3oHL95AKwDApiRRg0goBCDUadb6AodX2Wo7VvlqOJO
-         bqDQ==
-X-Gm-Message-State: ACgBeo1ZrgWoMQqwtIZTUxVtIoMxRKQoFcEsBXMc9Th6Yhuy8HtPzbSZ
-        EQrOG3+Ksq1wI328+WvXklHOn7LWerc=
-X-Google-Smtp-Source: AA6agR4nToh/p1RAMod0Flu0+yRFqqIupyeaw1Zr9NpObu4gBW/WoJ0n+W5X9A6baiw+urzgj40axw==
-X-Received: by 2002:a17:90b:3b46:b0:1fb:5993:f893 with SMTP id ot6-20020a17090b3b4600b001fb5993f893mr969124pjb.229.1661463169386;
-        Thu, 25 Aug 2022 14:32:49 -0700 (PDT)
-Received: from [172.17.0.2] ([20.228.84.94])
-        by smtp.gmail.com with ESMTPSA id t2-20020a1709027fc200b001708e1a10a3sm36577plb.94.2022.08.25.14.32.48
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=BjT8hRfQ7izuh4D1WYligk8wTQyrhZzfhom7KTiNQuo=;
+        b=4axPyWv5FP+ieDXLN6X9ylJL4gnKQ8wlVozbC2SMyTKKvjTxipOJ91LBrryeaxjAj5
+         fojZDe+3lZ7RwZQp9D2YjeBxSpFaPx4HJJwRpGBKlWSJNiQ1tDpJgy4o7nCGskWneeoT
+         dWE9rGAAZ04W+piRnCkUBX9PPMudxr7AipSFD2rFF8Q9MU1pnYLiXFQY2vxd2ydeUq1k
+         m880m3WHfNXPyC0g/IpJXNQ1w5SN3OQcMCYHYh4PSMvYM8GbxadJLCRvuDT3P4cVj7+9
+         OfHm1HzxbWpsdSWqC+wyEcLGp5lPk7eFS828XXj915gcH90b5G+kJVfVPmdu4jGoQ6vr
+         yOXg==
+X-Gm-Message-State: ACgBeo0PLFfh+4f+z84f9ComS+EWc09pxDbCkoHx5IYo3ASrrakzJAd2
+        WDQ0e5pXcskFOtI584ya5lqfUsihh0FllKpl6D5BXg==
+X-Google-Smtp-Source: AA6agR4/7s7jq/v0Qr12IvcUGeWGwtrlzjkdJsfSfGnq2bZtiRaYoP7YA0jeyPIhLDTNvQONHIumtg==
+X-Received: by 2002:a17:907:6e89:b0:73d:a846:c29e with SMTP id sh9-20020a1709076e8900b0073da846c29emr3641758ejc.577.1661467411612;
+        Thu, 25 Aug 2022 15:43:31 -0700 (PDT)
+Received: from localhost.localdomain (20014C4E198D65010944FE0C94C0B856.dsl.pool.telekom.hu. [2001:4c4e:198d:6501:944:fe0c:94c0:b856])
+        by smtp.gmail.com with ESMTPSA id i2-20020aa7c702000000b0043cb1a83c9fsm357529edq.71.2022.08.25.15.43.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 14:32:49 -0700 (PDT)
-Message-ID: <6307ea81.170a0220.5ed43.014c@mx.google.com>
-Date:   Thu, 25 Aug 2022 14:32:49 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2136794159260412720=="
+        Thu, 25 Aug 2022 15:43:31 -0700 (PDT)
+From:   Szabolcs Sipos <labuwx@balfug.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szabolcs Sipos <labuwx@balfug.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: btusb: RTL8761BUV consistent naming
+Date:   Fri, 26 Aug 2022 00:42:07 +0200
+Message-Id: <20220825224208.343700-1-labuwx@balfug.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ceggers@arri.de
-Subject: RE: client: Add missing return statement in error path
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220825203903.3526-1-ceggers@arri.de>
-References: <20220825203903.3526-1-ceggers@arri.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2136794159260412720==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Based on photos available from the FCC, all currently supported RTL8761B
+series USB dongles have the same chip: RTL8761BUV.
 
-This is automated email and please do not reply to this email!
+rtl8761bu is often used to refer to this chip.
+rtl8761b sometimes refers to this chip, and other times to its
+UART variant (RTL8761BTV).
 
-Dear submitter,
++----------------+---------+---------+---------------+
+|     Dongle     | USB VID | USB PID |    FCC ID     |
++----------------+---------+---------+---------------+
+| ASUS USB-BT500 | 0x0b05  | 0x190e  | MSQ-USBBTJB00 |
+| TP-Link UB500  | 0x2357  | 0x0604  | 2AXJ4UB500    |
+| EDUP EP-B3519  |         |         | 2AHRD-EPB3519 |
+| EDUP EP-B3536  |         |         | 2AHRDEP-B3536 |
+| UGREEN CM390   |         |         | 2AQI5-CM390   |
++----------------+---------+---------+---------------+
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=671219
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.70 seconds
-GitLint                       PASS      0.48 seconds
-Prep - Setup ELL              PASS      33.47 seconds
-Build - Prep                  PASS      0.82 seconds
-Build - Configure             PASS      10.61 seconds
-Build - Make                  PASS      1162.23 seconds
-Make Check                    PASS      12.57 seconds
-Make Check w/Valgrind         PASS      354.24 seconds
-Make Distcheck                PASS      297.11 seconds
-Build w/ext ELL - Configure   PASS      10.59 seconds
-Build w/ext ELL - Make        PASS      104.71 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      646.48 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-client: Add missing return statement in error path
-WARNING:UNKNOWN_COMMIT_ID: Unknown commit id '936ad5ef7b56', maybe rebased or not pulled?
-#108: 
-Fixes: 936ad5ef7b56 ("client: Quit when done with command")
-
-/github/workspace/src/12955220.patch total: 0 errors, 1 warnings, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12955220.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Szabolcs Sipos <labuwx@balfug.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30dd443f395f..ecedaee1d965 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -519,17 +519,13 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0bda, 0xb009), .driver_info = BTUSB_REALTEK },
+ 	{ USB_DEVICE(0x2ff8, 0xb011), .driver_info = BTUSB_REALTEK },
+ 
+-	/* Additional Realtek 8761B Bluetooth devices */
++	/* Additional Realtek 8761BUV Bluetooth devices */
+ 	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-
+-	/* Additional Realtek 8761BU Bluetooth devices */
+ 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
+ 	  					     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x2550, 0x8761), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-
+-	/* Additional Realtek 8761BUV Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0x8771), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 
+-- 
+2.37.2
 
---===============2136794159260412720==--
