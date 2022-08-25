@@ -2,100 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F12ECAAA3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 23:11:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A40FDECAAA3
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 23:46:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243827AbiHYXLE (ORCPT
+        id S244022AbiHYXqG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Aug 2022 19:11:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48766 "EHLO
+        Thu, 25 Aug 2022 19:46:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231422AbiHYXLC (ORCPT
+        with ESMTP id S232409AbiHYXqF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Aug 2022 19:11:02 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BBE2ED7E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 16:11:01 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id m5so19503655lfj.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 16:11:01 -0700 (PDT)
+        Thu, 25 Aug 2022 19:46:05 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF0CABBA78;
+        Thu, 25 Aug 2022 16:46:02 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id x63-20020a17090a6c4500b001fabbf8debfso6775325pjj.4;
+        Thu, 25 Aug 2022 16:46:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=U9Sv02WeVhm2c+EOXR+LhbpcjXkIe1UUAJfdlQLHF/c=;
-        b=IzrxgtTC3eIyF9MOhKRGnZ7lUQ+jIamxcZZUF0/EMxl1nobu3Q5LFaC9Ojfjg5OXkh
-         EC5vcF+KD8la+XEGSWUyQVloNNVypKu/35el4VuBEKxucAJUUotAcCw1qmCadQQTT+W8
-         d5VIewsrL1pBkvHXTegdyKEFYvCyAK5KmrZJUq/FnDmy2miMeGbHGKILPt/eMfkOu5z1
-         yn5ytvldPJd4rqkJt48RDDYYqzXWnT7iYALZyP0mODkRzQVSngWA/CHAxKo0cYMPW3Ei
-         3FClcM1ITCJrlvxd3CAmwIkAunlVKxDi/6n0dxPzSSJrTOImx7fCr83ipE4OEAeBLZHw
-         Jy0g==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc;
+        bh=1cZ0KNdJZbHkEaF8BRja8MmJEhhYj88L6EqS/Hy6vPQ=;
+        b=AEolXUquh8s9hnRxq51QZGCwfR/8O3+HwNqDVXD77uol163+lGggr2G3ixcCxwSyB7
+         oFVxo0PAh8YFLchcsS4p3yiq/qRKwaAiNSXgr7mRRrSs5y8r6CzZNEwaWGX7/EmgVHuz
+         msajF/H9RWCw5lg0TvMM87uK3JY6dC0YImFLjyjjxqDRB/N4H9A5cxYkXkw4JtiTJul3
+         hW8SCk4tzT+v3/DHEGQvarhWnX4W9GD2vPxeT1NM9XsaDow/U5iQP9c/Waa7KWZ/8gUj
+         c98RWLiFcPo1dcQZQPHjG4oFq9gUMZk2VVb+54SJFUEiftXPN2Qp0PdteC4c6iYWPpdh
+         9AhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=U9Sv02WeVhm2c+EOXR+LhbpcjXkIe1UUAJfdlQLHF/c=;
-        b=LTYH1h7m8MYxLIHryj+yGNza1XuiKw1j9GZ23PyWIeVWmjqqZX3lhlEHpwqoSMJBrw
-         53yX48Skc9NFav0xk7KGnKykTxjO14yysDkQTakf/Emd2v5+LOL5gKdv11aPXJp1ZyOs
-         Ba4ueufSdrWnm1Mg8JiVVGry5DuDsACFngkXxxwimUJRfv49VC1PObJ68ovZYt+b6VCC
-         D/RUJe/1WhTRnOAUEPCBWkuyrHNBCdAdvNuRbqLFTFmX1OAxjYaa/t+CF16yFQveJvtP
-         zMHybTybmAJN6sZ4CGIrN29IcFfBwgOsxkHqP/7nQyCbY08vt53CNSHLqaBOQJ4MrgBC
-         b5jA==
-X-Gm-Message-State: ACgBeo0FYqjpQHnN18YhOoGoU+kxAId47OlEv/AL0UfBvbG8N22trbgj
-        7FlXB++jP0hx7ANiJmSBep7qk11YIuzKzXRwkMCq0QI5
-X-Google-Smtp-Source: AA6agR68GCyx9x74g8JL8xcxj9oemjPnuSDx0q42HD9aJA52A+mt54Y5tobQvmnpJ4ktCdO98xgaGllkgaAf85zEaWI=
-X-Received: by 2002:a05:6512:3d0c:b0:492:d277:6627 with SMTP id
- d12-20020a0565123d0c00b00492d2776627mr1566632lfv.251.1661469059771; Thu, 25
- Aug 2022 16:10:59 -0700 (PDT)
-MIME-Version: 1.0
-References: <db39101f70c945026e76d7b49ee358d9a2330358.camel@hadess.net>
- <6422b1f3f94e959917f919af20a2aa43b4c13a89.camel@hadess.net> <CABBYNZ+TKBSHr67Avm+g-_ce8bKE17OSp9xMayJk_y--MsAuDQ@mail.gmail.com>
-In-Reply-To: <CABBYNZ+TKBSHr67Avm+g-_ce8bKE17OSp9xMayJk_y--MsAuDQ@mail.gmail.com>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc;
+        bh=1cZ0KNdJZbHkEaF8BRja8MmJEhhYj88L6EqS/Hy6vPQ=;
+        b=EPGyAvb0fqTX7w3xs9Gp6zaI1KnD7AQZ4qR4OJDGoxSfgLlWI4GV0S/1Qn7G+gEg61
+         lut6pbVQ3K2p7SqRR8Wbrdqa76IEetqUeF2SZmFrdxY4kYyc8iooTxKPoLl8390YTW1T
+         by0VhQ1G72pcH6TXgOqZQCq6DQ3UVSwl3w7fLyIARbMc5P6vh6Biumk5K+ZTA5BXu4tb
+         A9GhVCnoCckSLH2rBddtFNA4SstKniasO3Ki+Oudh9Sf7M73R2dqzS2+fJ60rWhdM5QK
+         bRMK/Z1JOXKWMu17tQabanKgkHDWcY5C1XQwNGMEJL8nuynXVbVYXaHp5Sr/+URK4tyJ
+         Wu8A==
+X-Gm-Message-State: ACgBeo121EsCN9uYHexBXJB2KzJ3JRRhxKKRmqeOjse8gBV0s30GETxh
+        zZgy/2zPyw1gVS6iuBINXWq+78Z5Z8U=
+X-Google-Smtp-Source: AA6agR6NJJBzjfT7aEZrUMuvh60JeXmjHVWBVI73OTtGQVT/FUYzwQx1lzotGpmkna6oBAuHExqG4w==
+X-Received: by 2002:a17:902:e5c2:b0:172:f66b:c760 with SMTP id u2-20020a170902e5c200b00172f66bc760mr1354990plf.92.1661471162006;
+        Thu, 25 Aug 2022 16:46:02 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id g187-20020a6252c4000000b0052dc5c14ee2sm193829pfb.194.2022.08.25.16.46.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Aug 2022 16:46:01 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 25 Aug 2022 16:10:48 -0700
-Message-ID: <CABBYNZKpB2p5mh8q6he21MM1m3qapwYccsEgUa9q5OrbjRnZzQ@mail.gmail.com>
-Subject: Re: [PATCH] adapter: Implement PowerState property
-To:     Bastien Nocera <hadess@hadess.net>,
-        Archie Pusaka <apusaka@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-08-25
+Date:   Thu, 25 Aug 2022 16:45:59 -0700
+Message-Id: <20220825234559.1837409-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie and Bastien,
+The following changes since commit 4c612826bec1441214816827979b62f84a097e91:
 
-On Thu, Aug 25, 2022 at 4:06 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bastien,
->
-> On Thu, Aug 25, 2022 at 8:32 AM Bastien Nocera <hadess@hadess.net> wrote:
-> >
-> > On Thu, 2022-08-25 at 15:26 +0200, Bastien Nocera wrote:
-> > > This property should allow any program to show the transitional
-> > > state,
-> > > not just the one that requested the change, and will also show
-> > > transitional states that were the results of other system changes,
-> > > like
-> > > rfkill changes.
-> >
-> > Looks like the bot doesn't like where I put those comments.
-> >
-> > If anyone can comment on the API I used, and I'll iterate the actual
-> > implementation. I'd like the API to be settled by the time GNOME 43
-> > ships, so we can rely on it there.
->
-> I wonder what are you actually after with these changes, in most cases
-> I'd say the changes shall just be queued, anyway perhaps the problem
-> was something related to:
->
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=ede7b915980fbc80eff80aa189c35ca016956c61
+  Merge tag 'net-6.0-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2022-08-25 14:03:58 -0700)
 
-Btw, I think this shows that perhaps it would be best practice to
-create a github issue when there are bugs for Gnome/Chrome OS so we
-can properly use the Fixes: tag to close them which makes it easier
-for downstream to find out if a similar issue was fixed and attempt to
-reuse the same fix.
+are available in the Git repository at:
 
--- 
-Luiz Augusto von Dentz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-08-25
+
+for you to fetch changes up to 2da8eb834b775a9d1acea6214d3e4a78ac841e6e:
+
+  Bluetooth: hci_sync: hold hdev->lock when cleanup hci_conn (2022-08-25 16:26:19 -0700)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix handling of duplicate connection handle
+ - Fix handling of HCI vendor opcode
+ - Fix suspend performance regression
+ - Fix build errors
+ - Fix not handling shutdown condition on ISO sockets
+ - Fix double free issue
+
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: hci_event: Fix checking conn for le_conn_complete_evt
+
+Hans de Goede (1):
+      Bluetooth: hci_event: Fix vendor (unknown) opcode status handling
+
+Luiz Augusto von Dentz (4):
+      Bluetooth: hci_sync: Fix suspend performance regression
+      Bluetooth: L2CAP: Fix build errors in some archs
+      Bluetooth: MGMT: Fix Get Device Flags
+      Bluetooth: ISO: Fix not handling shutdown condition
+
+Tetsuo Handa (1):
+      Bluetooth: hci_sync: fix double mgmt_pending_free() in remove_adv_monitor()
+
+Wolfram Sang (1):
+      Bluetooth: move from strlcpy with unused retval to strscpy
+
+Zhengping Jiang (1):
+      Bluetooth: hci_sync: hold hdev->lock when cleanup hci_conn
+
+ net/bluetooth/hci_event.c  | 13 ++++++++-
+ net/bluetooth/hci_sync.c   | 30 +++++++++++--------
+ net/bluetooth/hidp/core.c  |  6 ++--
+ net/bluetooth/iso.c        | 35 +++++++++++++++-------
+ net/bluetooth/l2cap_core.c | 10 +++----
+ net/bluetooth/mgmt.c       | 72 +++++++++++++++++++++++++++-------------------
+ 6 files changed, 105 insertions(+), 61 deletions(-)
