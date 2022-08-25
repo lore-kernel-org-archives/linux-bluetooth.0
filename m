@@ -2,116 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5194FECAAA0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 20:39:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B2FBECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 21:09:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243575AbiHYUja (ORCPT
+        id S241530AbiHYVJE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Aug 2022 16:39:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59800 "EHLO
+        Thu, 25 Aug 2022 17:09:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243883AbiHYUjR (ORCPT
+        with ESMTP id S240501AbiHYVJD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Aug 2022 16:39:17 -0400
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-eopbgr80115.outbound.protection.outlook.com [40.107.8.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C112BBD14D
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 13:39:13 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LI5sDNeFr8vOkcLwzbFEmSw9g1704io62qAxf5VTRaaXchlKzcwoyLfuoUwNlJui642O8qyFVVLSYtArK+bDxyCYgMeVgPfmL3C57P2cIcHQIY/DNe/VQH+K8Xbk+sJJIHX/klezDZ2fFWV/fwfEQyVlhvVSa+JhU6ZrwUlZCiJ6NDqaQK2BCkeyZNVjarAFJURXBAnQvvw8Hbil+sDy+T589qqbMn+QclO7UYEPnfAR2OSESe5pcAQr5CEmPe6QvdXloPY51DeTwIaQYjMS7QV5LCNsZJXtqi1ImF6tKAwVPO6j/vFpm+Kc9VYXt0vcc1BHLhe8m7QEFhWS9NZF2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f4yZH33TfayQ3CfKxML6b8q4PQRDGTdME5dt4lUkDMM=;
- b=l3YLAd32C5yO5dI2HLwzQsKI57qdRSs2pOPrVpZ9l6zulLq8KVUhodKYLvjVoblCJar5/LWVAUa2f+vK7XDy0ZGyEhmKdi4UeyEApT7PKfFbwCV29mYMBw1GcbcaO2ubDNWOq3zRg4ej1j6/LPeAV8ZhBnpeXusaHMqaOYr+pgiK8dWa3Ui7QjVRtSXBy8PsF7t6hB70rQU1PnwWyoAEl/XBAqaxUE2z/CycOIBEHH/CP0LOEvs31uiBN5hNddRTt/lJNfDsmmsG8ZGkri65LIyAyOIW7rzlNR6g5CTLSaBz1dvmzySqKkNxaJywd3egd9z687sEhjvTGEAoMRoZYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
- 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
- dmarc=none action=none header.from=arri.de; dkim=none (message not signed);
- arc=none
+        Thu, 25 Aug 2022 17:09:03 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FB8A656A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 14:09:02 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id i77so16996887ioa.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 14:09:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=arrigroup.onmicrosoft.com; s=selector1-arrigroup-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f4yZH33TfayQ3CfKxML6b8q4PQRDGTdME5dt4lUkDMM=;
- b=cRNVQVpBHxMJPmZs7fQ1t1R66Mm9vGtg/U3g8/MZdvnlAPYAJcYg6Ew3c5PvjLjsRomDj52+ch55+7sxn28ie6zO6U7oBSggWn7BXJzHkm/pfhtN/BFpaVcCQOVoqjIwopN+xUosmiCz74uIzfmuOIoztyIuzbJHGU+tKAMkdE4=
-Received: from GV3P280CA0066.SWEP280.PROD.OUTLOOK.COM (2603:10a6:150:a::9) by
- AS8PR07MB7128.eurprd07.prod.outlook.com (2603:10a6:20b:25a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5588.3; Thu, 25 Aug
- 2022 20:39:11 +0000
-Received: from HE1EUR02FT067.eop-EUR02.prod.protection.outlook.com
- (2603:10a6:150:a:cafe::3f) by GV3P280CA0066.outlook.office365.com
- (2603:10a6:150:a::9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5566.15 via Frontend
- Transport; Thu, 25 Aug 2022 20:39:11 +0000
-X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
- smtp.mailfrom=arri.de; dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=arri.de;
-Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
- designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
- client-ip=217.111.95.7; helo=mta.arri.de;
-Received: from mta.arri.de (217.111.95.7) by
- HE1EUR02FT067.mail.protection.outlook.com (10.152.11.207) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5566.15 via Frontend Transport; Thu, 25 Aug 2022 20:39:10 +0000
-Received: from N95HX1G2.arri.de (192.168.54.11) by mta.arri.de (10.10.18.5)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 25 Aug
- 2022 22:39:10 +0200
-From:   Christian Eggers <ceggers@arri.de>
-To:     <linux-bluetooth@vger.kernel.org>
-CC:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Christian Eggers <ceggers@arri.de>
-Subject: [PATCH] client: Add missing return statement in error path
-Date:   Thu, 25 Aug 2022 22:39:03 +0200
-Message-ID: <20220825203903.3526-1-ceggers@arri.de>
-X-Mailer: git-send-email 2.35.3
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc;
+        bh=efshHXP9gUX/Rn2HlD2fKyMPwbh7W1J65YmfnAc5BPk=;
+        b=E2RzTGX33BG9Hf6a1lmpICDPAhZIXT3B6JZwUveL0PO7wr8sJvNIJkAXcwexXKtqTL
+         np86gAzO1AR5dOu0Ucgash3S2IdXj0sqKUPVtYygCKdLPrky5A70G+Dc9kdYZ/0hXYTv
+         Gbm8iRVFmHIFRf3/iebhpu/ecEWLDp1estyzHAPD/uRkxdKtAQJsQYKko1OYVwvC4e4y
+         pJmrTj3H5uxD9YXAGBux7iCCkrgL9sA3H1l1aFTLyLtiBz7LLfcJ3yQQ5k/JceYYhMZg
+         ddt/NrP+6Y4jAyamUFBdpOwjc5VbmYdvwTJXk4zCB2KQDvGPRVMlaScn9vwxS+VmmJbq
+         w1lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc;
+        bh=efshHXP9gUX/Rn2HlD2fKyMPwbh7W1J65YmfnAc5BPk=;
+        b=aJkqmU287EdLMMc+xgf5LP+mUb+/Yxgw4nI2q8lrH74l/6smFPU1A8Mi9jNq1N8lJF
+         daTjOBEdlznHy+PPcEUDJgOZRE2K0p635gHlDdpDwwIxAQKSUV2AInvWSY1RhgQ5toFy
+         ZX0UPLo5vvaC+/Nt7D9zFRIrTQ/ODPHKk54RHnrit3CvROxZPE9xaIM/bsC2AGNv9IH3
+         n/PF2l1tvUWepDDG3dND96NIDeXwgNKiHFhrWH/RkGrB9f4Uh6ESfdnxgTIsRLxxao1x
+         AuD3pBtMqUbtVZLOZ4hcmq/lHspdn71j9Hq89nbrRoxnE4G2VSjK4fk8xm8/2C4G3OaW
+         WSzw==
+X-Gm-Message-State: ACgBeo0KgUsc9kahxnBXdzIy/L1xtxbEOjNvcwyUNA5uZtP4o6r6rBNc
+        LMQ7cCkWZrawwy44ChfN57zfUCp32J2hkQ==
+X-Google-Smtp-Source: AA6agR5O2luzSoqfykxSpAX+GBfV4MPHIivdO0GjoNYrdv1VPUf7OSH1lDDjdCdg+5VfmZSZw3FMew==
+X-Received: by 2002:a05:6638:13d2:b0:346:e0b8:ba2b with SMTP id i18-20020a05663813d200b00346e0b8ba2bmr2770406jaj.268.1661461741443;
+        Thu, 25 Aug 2022 14:09:01 -0700 (PDT)
+Received: from [172.17.0.2] ([40.77.105.81])
+        by smtp.gmail.com with ESMTPSA id q1-20020a056638344100b0034347c6183esm163243jav.92.2022.08.25.14.09.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 25 Aug 2022 14:09:01 -0700 (PDT)
+Message-ID: <6307e4ed.050a0220.cbc81.04b4@mx.google.com>
+Date:   Thu, 25 Aug 2022 14:09:01 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3763367485982185162=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [192.168.54.11]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d905db8b-8765-4c31-2a1e-08da86d9dd8f
-X-MS-TrafficTypeDiagnostic: AS8PR07MB7128:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 3XwsiTYdQnW7bB3d/z/+NDW+7BFBvd29kDRXXwBUO7xi+oUq/evak9flaGlylRIlDWrOw1nCA3B0YdI7XhCRcWlb9WutTT12pJ5eqvBRAmY7gIDNqxIxxF74WneafA3z/9KkzH6FX/bGIiQQtwacgMrtvnVd+he9GOTNh+GMtT2QuMjRkT8CnxwYyY40JUl8bkPpajR9t64h2mIHAt8oURnofZ7fB73ZaEORJIsykvWY+ew05U9AnuAg0ekwplgq1+jyO3jFSYQ8Gr2nn03f9VszCSLDuG40/z+Haf3ZYCekJARyKzDg0WJBQOl3M/xpEKV30Ya9SuaUd3au6G346AqJxej1lVGEi9COpyhl97V7N/GrtwB/z9Ij70hFFzBuet0QjhcPCEOk/GGdVJnYlXsfS4wdDaQHtFLXD0KyLmqA76XsCC7eLOjMsbCWAxOk8PJlQiD7lXx1BrGf4E0Ie25LQXM/y0d1nRvkNsEDvAacx52F8wyc+lihE666tlYyKHP6uuq57lQ7n+1nt05iN2UO9jf89ahZM6wu2dr5BNPdftXsEE5Kn7MLAiy7G7JbwDD9voM7JKDQCJO62A5ny3yu6lsYNwUolAjm3H39d4NpFpnryjdFYNVzcVrLTgTbtSaCa2SPFHTw3+vLt8yRy7vFsLI9bUp8U1YgZSghL7z4bqmLFB4jOcPo9afVNzel/VMPGem9IcA3YwhQ9ZidwHYb9fJPj2CxtN4yrn+Gb49LLmbAhdRQl6xsw097hMRvJ5YUk+n6ty3bz5lWpgWEjg==
-X-Forefront-Antispam-Report: CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230016)(4636009)(396003)(39860400002)(136003)(376002)(346002)(36840700001)(46966006)(5660300002)(6666004)(478600001)(26005)(41300700001)(1076003)(7696005)(107886003)(83380400001)(426003)(47076005)(82310400005)(2906002)(16526019)(4744005)(8936002)(40480700001)(2616005)(54906003)(186003)(6916009)(316002)(336012)(356005)(8676002)(4326008)(82740400003)(70586007)(70206006)(86362001)(81166007)(36860700001)(36756003)(36900700001);DIR:OUT;SFP:1102;
-X-OriginatorOrg: arri.de
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Aug 2022 20:39:10.8765
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d905db8b-8765-4c31-2a1e-08da86d9dd8f
-X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
-X-MS-Exchange-CrossTenant-AuthSource: HE1EUR02FT067.eop-EUR02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB7128
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] gatt-api: Add error code ReadValue/WriteValue
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220825200758.1645136-1-luiz.dentz@gmail.com>
+References: <20220825200758.1645136-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Client will SEGFAULT if default_ctrl==NULL
+--===============3763367485982185162==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Fixes: 936ad5ef7b56 ("client: Quit when done with command")
-Signed-off-by: Christian Eggers <ceggers@arri.de>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=671211
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.27 seconds
+GitLint                       PASS      1.61 seconds
+Prep - Setup ELL              PASS      26.73 seconds
+Build - Prep                  PASS      0.73 seconds
+Build - Configure             PASS      8.39 seconds
+Build - Make                  PASS      969.49 seconds
+Make Check                    PASS      11.87 seconds
+Make Check w/Valgrind         PASS      286.82 seconds
+Make Distcheck                PASS      235.16 seconds
+Build w/ext ELL - Configure   PASS      8.64 seconds
+Build w/ext ELL - Make        PASS      82.00 seconds
+Incremental Build w/ patches  PASS      194.44 seconds
+Scan Build                    WARNING   491.96 seconds
+
+Details
+##############################
+Test: Scan Build - WARNING
+Desc: Run Scan Build with patches
+Output:
+*****************************************************************************
+The bugs reported by the scan-build may or may not be caused by your patches.
+Please check the list and fix the bugs if they are caused by your patch.
+*****************************************************************************
+src/gatt-database.c:1138:10: warning: Value stored to 'bits' during its initialization is never read
+        uint8_t bits[] = { BT_GATT_CHRC_CLI_FEAT_ROBUST_CACHING,
+                ^~~~     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gatt-database.c:3535:14: warning: Value stored to 'iface' during its initialization is never read
+        const char *iface = g_dbus_proxy_get_interface(proxy);
+                    ^~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gatt-database.c:3536:14: warning: Value stored to 'path' during its initialization is never read
+        const char *path = g_dbus_proxy_get_path(proxy);
+                    ^~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3 warnings generated.
+
+
+
+
 ---
- client/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/main.c b/client/main.c
-index 88c7ad799888..754157b169c6 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -2546,7 +2546,7 @@ static void cmd_advertise(int argc, char *argv[])
- 
- 	if (!default_ctrl || !default_ctrl->ad_proxy) {
- 		bt_shell_printf("LEAdvertisingManager not found\n");
--		bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
- 	}
- 
- 	if (enable == TRUE)
--- 
-2.35.3
 
+--===============3763367485982185162==--
