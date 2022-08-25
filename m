@@ -2,120 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C74DECAAA2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 22:43:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABBE9ECAAA2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Aug 2022 23:06:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243975AbiHYWnq (ORCPT
+        id S237680AbiHYXGe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Aug 2022 18:43:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59412 "EHLO
+        Thu, 25 Aug 2022 19:06:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243489AbiHYWnn (ORCPT
+        with ESMTP id S229990AbiHYXGc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Aug 2022 18:43:43 -0400
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB53CC6B53
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 15:43:40 -0700 (PDT)
-Received: by mail-ed1-x531.google.com with SMTP id z8so141694edb.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 15:43:40 -0700 (PDT)
+        Thu, 25 Aug 2022 19:06:32 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95695AC269
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 16:06:29 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id m5so19492513lfj.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Aug 2022 16:06:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=balfug.com; s=gm;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc;
-        bh=qHBRNjLQO+fTuSN5fkgAMVOPdbNt+emprPz8tTnQjyY=;
-        b=O4UTbQ8SFax9TaiplcN7GgB5UzuOvNTwOTsK7SBU68+NkCZQcCQBnkLFfwckNexR4t
-         k/yjST8y0+midTKeabpDc/oHmyb1HM0DUOmaTc94msibXEL/difjzNhtjAWwz/1yV1yI
-         BzOCtG2+KnI3a7IM/WgZpAQw5ujqxZSG6aV9PrnussqXuj8kdU5ZaYI8nsJR3GBnKKrA
-         ump+D+e/DrLZfF3nIYZzdWd6SM4dbjHJ++sDCQnY0YWEzHVYWw0wW08phtq3a5X8IoYx
-         mon96Cs6e55YtsyIOS5qDIWPOxLukwfyl92Gvq3qwANMpjJNe/u0P1Q5OISPzEtRYtPu
-         4xQg==
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc;
+        bh=YjSutSfQLPTSJkfTJCo7/0dczplHjBlUMeDJAi+0FrM=;
+        b=km8I0QHqM3AIrh4uNA4tR0QT0/A8bydKsQYDIz4HWWjw9AqIf9tPBEIE4P6A/0ZQ9a
+         406FW88QVSpoIO+I5VnrjX73LngYcMSXXNBGXqAmH1cqEjBr0088WAh7xD8q/0skeFmk
+         giG0zmLcdqFkA6IBrCqGgBjbMHN+tTv1e6wNPFncBtoGl4wh5+xBEzdk/iHNuBy0Z51N
+         8cbfZNnlhXYV6zKqY7sez2o3PeJfSK41DYQB9iG1JndSwlP9IEkNTd9UZsuxVKX4FyTV
+         wrRAQrVHWiVLyXXA2XJ81ckHjLRlYoco5shkl8hdWlz4DtuUxOEf5WisctTOlFqWIXPi
+         r1yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc;
-        bh=qHBRNjLQO+fTuSN5fkgAMVOPdbNt+emprPz8tTnQjyY=;
-        b=QyYTEtPUoxbe2SBnDgme0bSRddK9ICKz0oPif/aReZbmzvtIDaxIO58vjP0eL0XmDb
-         a6xDTW/5zzU/IURVbrewbhKRZYb5nUZbJ8Vne9K0YbXKBbawDlSi0SXGf2hnlbN3Ppws
-         UJhSvbNJkM0VKOTB2F89T9VBBMuk1ezACbNxSR79phlTzEIGVM+1VWmINwPrVeoWSKSB
-         RII1u+Ie90ikAmcpqAxy4B4jwxAbKKTlTSlz8IkS7dB9KmMCdoGRSOkAmB0UOtci7VUh
-         +KNswfQ6XsQpHvVjq/3iefj6W6LUsFezxCOK0jUUEW3f+jRqqTMBq7w33mE+6ZIDJgxs
-         pTNA==
-X-Gm-Message-State: ACgBeo2PNwD+KNEo9GwSCsxx7RtjPI+SEsTHHI9bYROi5jboH5uPfyaC
-        MrzTbX56/BNj2cP0MwSRvn7Kko6GmlbBMnx71Cpeug==
-X-Google-Smtp-Source: AA6agR6I828Vg1tmwrNDsZMZ182b3qTLPeA21GD7WMdDXjTIchau04EevrIBfuBnluvqLTScsjR60g==
-X-Received: by 2002:a05:6402:2499:b0:440:942a:40c2 with SMTP id q25-20020a056402249900b00440942a40c2mr4952533eda.37.1661467418799;
-        Thu, 25 Aug 2022 15:43:38 -0700 (PDT)
-Received: from localhost.localdomain (20014C4E198D65010944FE0C94C0B856.dsl.pool.telekom.hu. [2001:4c4e:198d:6501:944:fe0c:94c0:b856])
-        by smtp.gmail.com with ESMTPSA id i2-20020aa7c702000000b0043cb1a83c9fsm357529edq.71.2022.08.25.15.43.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 25 Aug 2022 15:43:38 -0700 (PDT)
-From:   Szabolcs Sipos <labuwx@balfug.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Szabolcs Sipos <labuwx@balfug.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: btusb: Add RTL8761BUV device (Edimax BT-8500)
-Date:   Fri, 26 Aug 2022 00:42:08 +0200
-Message-Id: <20220825224208.343700-2-labuwx@balfug.com>
-X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220825224208.343700-1-labuwx@balfug.com>
-References: <20220825224208.343700-1-labuwx@balfug.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc;
+        bh=YjSutSfQLPTSJkfTJCo7/0dczplHjBlUMeDJAi+0FrM=;
+        b=7tw49ilqVDJHHh7wLdABS+hUQwKNCR/z/fi/Obbhodn0r71vhDngHT+2elhm9EABf7
+         6bW1NOGYRUWa7LJDlcjub1uUuWnLF4Jlzh7PeWqMLXrPyadPb8wv93JQMBllZP9t0pji
+         zSYXifzsiEKUGEmjOj82Adn/6rU66LTPoJ8jlgXdq1WV2kztm58dB41n77dmxvGV2y2c
+         30LYdxFBhEiwpaIkO5Zi/hQ0NTgUtY0EceWp1zwqZ7+pxe8+hFkFL4X0nKwQJsOpaacX
+         CIn8wBnaAwrirO/G47QU8jHd4g+0wG/gMNUKK8j390zFJtpGfxJt5A6iJJITn0HLNs6d
+         VU+Q==
+X-Gm-Message-State: ACgBeo2at84JHIbSjHsF+1r5GWHO3hPw6Y2GKcKnBqWI89FtCamRMkiS
+        H9VW1EpqUCnjXq0VOJimDf2iTbYeFxXcrGGOYxODA4MP2zc=
+X-Google-Smtp-Source: AA6agR5n9r9bH3E+B8OMFtj+K8n6POVnzFsBfHtmrkFfLveCEMuKepwfY9q51vSqMVnj+UNsnUc2y4XJhx3+hHpnMfE=
+X-Received: by 2002:a05:6512:2621:b0:47f:d228:bdeb with SMTP id
+ bt33-20020a056512262100b0047fd228bdebmr1623861lfb.121.1661468787853; Thu, 25
+ Aug 2022 16:06:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <db39101f70c945026e76d7b49ee358d9a2330358.camel@hadess.net> <6422b1f3f94e959917f919af20a2aa43b4c13a89.camel@hadess.net>
+In-Reply-To: <6422b1f3f94e959917f919af20a2aa43b4c13a89.camel@hadess.net>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 25 Aug 2022 16:06:15 -0700
+Message-ID: <CABBYNZ+TKBSHr67Avm+g-_ce8bKE17OSp9xMayJk_y--MsAuDQ@mail.gmail.com>
+Subject: Re: [PATCH] adapter: Implement PowerState property
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=7392 ProdID=c611 Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=Edimax Bluetooth Adapter
-S:  SerialNumber=XXXXXXXXXXXX
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Hi Bastien,
 
-Signed-off-by: Szabolcs Sipos <labuwx@balfug.com>
----
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Aug 25, 2022 at 8:32 AM Bastien Nocera <hadess@hadess.net> wrote:
+>
+> On Thu, 2022-08-25 at 15:26 +0200, Bastien Nocera wrote:
+> > This property should allow any program to show the transitional
+> > state,
+> > not just the one that requested the change, and will also show
+> > transitional states that were the results of other system changes,
+> > like
+> > rfkill changes.
+>
+> Looks like the bot doesn't like where I put those comments.
+>
+> If anyone can comment on the API I used, and I'll iterate the actual
+> implementation. I'd like the API to be settled by the time GNOME 43
+> ships, so we can rely on it there.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ecedaee1d965..87d377212214 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -528,6 +528,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0x8771), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x7392, 0xc611), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Additional Realtek 8821AE Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
+I wonder what are you actually after with these changes, in most cases
+I'd say the changes shall just be queued, anyway perhaps the problem
+was something related to:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=ede7b915980fbc80eff80aa189c35ca016956c61
+
 -- 
-2.37.2
-
+Luiz Augusto von Dentz
