@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E53C0502A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Aug 2022 23:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74370C0502C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Aug 2022 23:20:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345500AbiHZXUw (ORCPT
+        id S1345504AbiHZXUy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Aug 2022 19:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51752 "EHLO
+        Fri, 26 Aug 2022 19:20:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345208AbiHZXUp (ORCPT
+        with ESMTP id S1345509AbiHZXUs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Aug 2022 19:20:45 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7167EBC83D
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 16:20:44 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id t129so2899375pfb.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 16:20:44 -0700 (PDT)
+        Fri, 26 Aug 2022 19:20:48 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D17BD8E04
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 16:20:47 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id 142so2893126pfu.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 16:20:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc;
-        bh=vSA+HPWsuSD7qUqFUVcG0/msermoFukwlhbj3ey3Egc=;
-        b=pc9Wut6zC16JuKQ7UQRlMekB0MUdz7AZCPUicoxXiBHwgbTIMrDnw6imCAZZCP/Usx
-         5FFYleB673IczW8z+us4vGTGJUj4BTKlD585x3k7/7BAQK6gsSPl8DNAvtXJ2vsnxdqe
-         5FqpQkftGwJ8u8UeODMVRad1bslqWQhKv4YkTyDqsR32mAVEVIF2EbSChGQKXM1MRc9A
-         UIpUd/4MjygoARn/Rt8zX+7LH4L/4rUHia3f5R3COvMKruwjbmLyJwl1UjJRpO8b0g/X
-         8HnHDs64wLys1OdS1S4ugpdVSiEkCzGSAcNh4Jk26af80sOALXRCWCK3CHyW3f54qv+G
-         9+nA==
+        bh=uKZN+WtU9c3IVIhReF07AEB77DEg2H9OvDD5FkV5cdU=;
+        b=JKiF2BKdma8LDzpetxmzfhxm9vuch3kjq15vo4jSwK+rk+FfYUXi1ZBy/9FUzu4aka
+         oGml0Fa1rgky6lODvc+Ee0gkbSLL7KRyPtaozmZPaeJELYdKOcWynKj8mWZqKi7j1a+y
+         R/ohjnYLquWlutuwbQdjEZ3V4Q8I//fC+wAb2gSaXC7a0AMjdo+cjncDjqEHze6nEsAz
+         OA5SF5/leOL7TWcv1RBU7wtU16voLAPK3OYxz6WCZXO1SgZhaFW+R74MaTHZ336XD+vE
+         w1svRqs7Xi3d1hYhDjq9eTYBCuT9ER1xrtmKgXCJAiBU+cFE6Iz/MAj3WUb3oEiSL6g8
+         9veA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=vSA+HPWsuSD7qUqFUVcG0/msermoFukwlhbj3ey3Egc=;
-        b=KO18jDsGjueru4gnoPDIA3Tat/msy6V/0X27nvgqEitcbsMqkhs2q5A84kWDV9uDeE
-         yQBmrW174yTagshI6OX9qoYpXyrH6iVYcq1FDQJZyUdMU+/XRywLHYFLQt1gGpdwKEzd
-         g9/KCcEf11oeTg0DF4nTg1YFx2/UP4jN1uNkFbi1ZCDm0Xqu5H2eim19u+EBTkJ8XjRb
-         uTl805Z5jn3sKBCIoXx8bRM9ryLJp7gmGopUaxdxMmnW9QEJMdppqKROscu95g9Olt7T
-         asfIAqDErNf9WRxvetMDYh1sA5F2pBLidYNOPWIcF/G5SC3qCFY9/OE0znNgh/gxunoG
-         M/Bw==
-X-Gm-Message-State: ACgBeo3j3ZywUb6ekuruI9V7Wh+/JR9k6WTsleRQ1DjMol9OpNvVIRGD
-        swaD1hThoMRghbLep0OI+7UGvuOjvnQ=
-X-Google-Smtp-Source: AA6agR5zajPu0GqAp3pseDCkOAus8zUTI+RGvHFD0TaWVfH2B99cNppiPEmpjE6AArYYg381G+ku1g==
-X-Received: by 2002:a05:6a00:1404:b0:537:2330:18d1 with SMTP id l4-20020a056a00140400b00537233018d1mr5977417pfu.39.1661556043394;
-        Fri, 26 Aug 2022 16:20:43 -0700 (PDT)
+        bh=uKZN+WtU9c3IVIhReF07AEB77DEg2H9OvDD5FkV5cdU=;
+        b=ACj2ScCfL+wheQLUDlIP0UsNyavkt/YFJV1YOursf3zqt30rtkYzg2H7mrq211YknO
+         5IpKUPl3ubdvMmhh+20jrGOCA0jLscIX4rV+BZavt98W5+9CeHqpn9AsPIS4urpIfXGO
+         DfnmfJRqPjetP3FxjlL+J8azWJWCqGi0GypJ76pnajrkSt8Fi1ZicDC0cDVLTT9zuMsJ
+         yJ5eQOvVlwEUayode2IXb8+QCnQzElWvPHwyQzbdbe1sZimAaMccj2QYz+QILvTvnifB
+         sV+y6X9aUYGQ1y6Rc2xv9e9X+9jcvPphefoi2gimysgyvtL1fZWDcpaPIA4+O3KnCUzj
+         b2Dg==
+X-Gm-Message-State: ACgBeo1S6bPE37rNfg1DXB0oT3cCghBP5ZXEe1hEPv7wTLB377w+4/g3
+        qWqSR++lq8NYsArrFwhITcnezq+Itkc=
+X-Google-Smtp-Source: AA6agR6Jv/gvnoSNionIjk01Zw98N9tV2Z/eIKVwtQG3l8z5tQUtkjUZLUJ6VgU8n2WHLMJ1w7jmDA==
+X-Received: by 2002:a63:931e:0:b0:42b:6394:f5b with SMTP id b30-20020a63931e000000b0042b63940f5bmr4954960pge.602.1661556046229;
+        Fri, 26 Aug 2022 16:20:46 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n15-20020aa7984f000000b0053645475a6dsm2312338pfq.66.2022.08.26.16.20.42
+        by smtp.gmail.com with ESMTPSA id n15-20020aa7984f000000b0053645475a6dsm2312338pfq.66.2022.08.26.16.20.44
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Aug 2022 16:20:42 -0700 (PDT)
+        Fri, 26 Aug 2022 16:20:45 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 7/9] test/simple-endpoint: Add support for LC3 endpoints
-Date:   Fri, 26 Aug 2022 16:20:29 -0700
-Message-Id: <20220826232031.20391-8-luiz.dentz@gmail.com>
+Subject: [PATCH v2 9/9] client/player: Use QoS interval on transport.send
+Date:   Fri, 26 Aug 2022 16:20:31 -0700
+Message-Id: <20220826232031.20391-10-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220826232031.20391-1-luiz.dentz@gmail.com>
 References: <20220826232031.20391-1-luiz.dentz@gmail.com>
@@ -66,53 +66,134 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for LC3 sink/source endpoints.
+This makes use of QoS interval when sending a file.
 ---
- test/simple-endpoint | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ client/player.c          | 69 ++++++++++++++++++++++++++++++++++++++--
+ tools/bluetooth-player.c |  1 -
+ 2 files changed, 67 insertions(+), 3 deletions(-)
 
-diff --git a/test/simple-endpoint b/test/simple-endpoint
-index 59ca189ce50e..463f124d1b6e 100755
---- a/test/simple-endpoint
-+++ b/test/simple-endpoint
-@@ -18,6 +18,8 @@ A2DP_SINK_UUID = "0000110B-0000-1000-8000-00805F9B34FB"
- HFP_AG_UUID = "0000111F-0000-1000-8000-00805F9B34FB"
- HFP_HF_UUID = "0000111E-0000-1000-8000-00805F9B34FB"
- HSP_AG_UUID = "00001112-0000-1000-8000-00805F9B34FB"
-+PAC_SINK_UUID = "00008f96-0000-1000-8000-00805F9B34FB"
-+PAC_SOURCE_UUID = "00008f98-0000-1000-8000-00805F9B34FB"
+diff --git a/client/player.c b/client/player.c
+index 4ba1a72ecfd5..99b036b8c3ec 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -2981,9 +2981,56 @@ static int open_file(const char *filename, int flags)
+ 	return fd;
+ }
  
- SBC_CODEC = dbus.Byte(0x00)
- #Channel Modes: Mono DualChannel Stereo JointStereo
-@@ -41,6 +43,11 @@ MP3_CAPABILITIES = dbus.Array([dbus.Byte(0x3f), dbus.Byte(0x07), dbus.Byte(0xff)
- # JointStereo 44.1Khz Layer: 3 Bit Rate: VBR Format: RFC-2250
- MP3_CONFIGURATION = dbus.Array([dbus.Byte(0x21), dbus.Byte(0x02), dbus.Byte(0x00), dbus.Byte(0x80)])
- 
-+LC3_CODEC = dbus.Byte(0x06)
-+#Bits per sample: 16
-+#Bit Rate: 96kbps
-+LC3_CAPABILITIES = dbus.Array([dbus.Byte(16), dbus.Byte(96)])
+-static int transport_send(struct transport *transport, int fd)
++#define NSEC_USEC(_t) (_t / 1000L)
++#define SEC_USEC(_t)  (_t  * 1000000L)
++#define TS_USEC(_ts)  (SEC_USEC((_ts)->tv_sec) + NSEC_USEC((_ts)->tv_nsec))
 +
- PCM_CODEC = dbus.Byte(0x00)
- PCM_CONFIGURATION = dbus.Array([], signature="ay")
++static void send_wait(struct timespec *t_start, uint32_t us)
+ {
++	struct timespec t_now;
++	struct timespec t_diff;
++	int64_t delta_us;
++
++	/* Skip sleep at start */
++	if (!us)
++		return;
++
++	if (clock_gettime(CLOCK_MONOTONIC, &t_now) < 0) {
++		bt_shell_printf("clock_gettime: %s (%d)", strerror(errno),
++								errno);
++		return;
++	}
++
++	t_diff.tv_sec = t_now.tv_sec - t_start->tv_sec;
++	t_diff.tv_nsec = t_now.tv_nsec - t_start->tv_nsec;
++
++	delta_us = us - TS_USEC(&t_diff);
++
++	if (delta_us < 0) {
++		bt_shell_printf("Send is behind: %zd us - skip sleep",
++							delta_us);
++		delta_us = 1000;
++	}
++
++	usleep(delta_us);
++
++	if (clock_gettime(CLOCK_MONOTONIC, t_start) < 0)
++		bt_shell_printf("clock_gettime: %s (%d)", strerror(errno),
++								errno);
++}
++
++static int transport_send(struct transport *transport, int fd,
++					struct bt_iso_qos *qos)
++{
++	struct timespec t_start;
+ 	uint8_t *buf;
++	uint32_t num = 0;
++
++	if (qos && clock_gettime(CLOCK_MONOTONIC, &t_start) < 0) {
++		bt_shell_printf("clock_gettime: %s (%d)", strerror(errno),
++								errno);
++		return -errno;
++	}
  
-@@ -131,6 +138,16 @@ if __name__ == '__main__':
- 							"Codec" : CVSD_CODEC,
- 							"Capabilities" :  PCM_CONFIGURATION })
- 			endpoint.default_configuration(dbus.Array([]))
-+		if sys.argv[2] == "lc3sink":
-+			properties = dbus.Dictionary({ "UUID" : PAC_SINK_UUID,
-+							"Codec" : LC3_CODEC,
-+							"Capabilities" :
-+                                                        LC3_CAPABILITIES })
-+		if sys.argv[2] == "lc3source":
-+			properties = dbus.Dictionary({ "UUID" : PAC_SOURCE_UUID,
-+							"Codec" : LC3_CODEC,
-+							"Capabilities" :
-+                                                        LC3_CAPABILITIES })
+ 	buf = malloc(transport->mtu[1]);
+ 	if (!buf) {
+@@ -2991,6 +3038,10 @@ static int transport_send(struct transport *transport, int fd)
+ 		return -ENOMEM;
+ 	}
  
- 	print(properties)
++	/* num of packets = latency (ms) / interval (us) */
++	if (qos)
++		num = (qos->out.latency * 1000 / qos->out.interval);
++
+ 	for (transport->seq = 0; ; transport->seq++) {
+ 		ssize_t ret;
+ 		int queued;
+@@ -3016,6 +3067,11 @@ static int transport_send(struct transport *transport, int fd)
+ 		bt_shell_printf("[seq %d] send: %zd bytes "
+ 				"(TIOCOUTQ %d bytes)\n",
+ 				transport->seq, ret, queued);
++
++		if (qos) {
++			if (transport->seq && !((transport->seq + 1) % num))
++				send_wait(&t_start, num * qos->out.interval);
++		}
+ 	}
  
+ 	free(buf);
+@@ -3026,6 +3082,8 @@ static void cmd_send_transport(int argc, char *argv[])
+ 	GDBusProxy *proxy;
+ 	struct transport *transport;
+ 	int fd, err;
++	struct bt_iso_qos qos;
++	socklen_t len;
+ 
+ 	proxy = g_dbus_proxy_lookup(transports, NULL, argv[1],
+ 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
+@@ -3049,7 +3107,14 @@ static void cmd_send_transport(int argc, char *argv[])
+ 
+ 	bt_shell_printf("Sending ...\n");
+ 
+-	err = transport_send(transport, fd);
++	/* Read QoS if available */
++	memset(&qos, 0, sizeof(qos));
++	len = sizeof(qos);
++	if (getsockopt(transport->sk, SOL_BLUETOOTH, BT_ISO_QOS, &qos,
++							&len) < 0)
++		err = transport_send(transport, fd, NULL);
++	else
++		err = transport_send(transport, fd, &qos);
+ 
+ 	close(fd);
+ 
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index b6cdd161ee8c..eba104d09fdb 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -36,7 +36,6 @@
+ #define PROMPT_ON	COLOR_BLUE "[bluetooth]" COLOR_OFF "# "
+ #define PROMPT_OFF	"[bluetooth]# "
+ 
+-
+ static DBusConnection *dbus_conn;
+ 
+ static void connect_handler(DBusConnection *connection, void *user_data)
 -- 
 2.37.2
 
