@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D308C0502C
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Aug 2022 00:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31EE8C0502A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Aug 2022 00:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345096AbiH0AFz (ORCPT
+        id S1345132AbiH0AF7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Aug 2022 20:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55286 "EHLO
+        Fri, 26 Aug 2022 20:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231629AbiH0AFx (ORCPT
+        with ESMTP id S1344716AbiH0AF4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Aug 2022 20:05:53 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B621E42ED
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 17:05:50 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id 199so2922380pfz.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 17:05:50 -0700 (PDT)
+        Fri, 26 Aug 2022 20:05:56 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A53E68D9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 17:05:54 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id f12so2721825plb.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Aug 2022 17:05:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc;
-        bh=Yoe4noJuNjEWlWGOqPX3R0F/FXc8Ptn+t64/XmAnJP8=;
-        b=eGby75WMFGLrfPTT1iyG5M9fScqltZSbBjS5sAPeT6kQ5GCKkL549fXevh0ag31gJ0
-         G3qdvlG2Mx5L62U/g6UaFZInOb7Vd+UTnnYbAbl7BuOSNGVAFRDFyCNjoi8G2DY/b40u
-         svdxklfvbvXDydjNFFVJcgVkmqL6n5wYKWUFIf1RJx85Cft/FmSP99juAc4YMa9H9RBn
-         ytZPid0ogrw8DSFHe6/dG1zbOGHe0VSmj3ZT25lZxFyOHhYnCafKjOU8RXF16eYkjVWE
-         tOVX0GTJcRg6kIPYhx5Cv2HYX/rBO5UISPC/6QtpJC/PhgtnWXEI98C36jeHe3RBGe0n
-         RMHg==
+        bh=wxssbqhgwnyyI4qNQteNJ+xFtAj5pt6svn+tuRUJqHc=;
+        b=VcKMJZtw7i2DlkphGsb2DgtL4K2Tp2h6c6rmnCn7RGeM3BOTlGhQ0dD5pQ5F6V+fBx
+         1255kSmJt4MBdTzQFOPMDGoOd077qkK2oY4rV/XvQC7tc5Xarlsb/SjVK55pCcOJlT6K
+         /NMaM+2C3CcbJrihlW+v07wl8wFy+gFVVMbjeVoGD4iaHucCiYkQove0qI2BYOluXMqN
+         QfQJXABWTiLGuHOONN2aruECxz2LUpuf89jUu9lCHWiCznNBdLYgTWFuL9M7feUWUfd5
+         s5apaOzpY4cVfN1e3FvX05WQd+dr9plE35zUGYA3KJTcVwdZpS3+Pcg4hw9cchEqs3IK
+         vtWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=Yoe4noJuNjEWlWGOqPX3R0F/FXc8Ptn+t64/XmAnJP8=;
-        b=IJHRGGWMfQD30WPyAVOCgXZIxAys7kEuP97RcudW7BIMRFM09XYk4FIfU3urIRK0IE
-         dlCQ/qDyWnXfRUQAeMWedIxfg88TpMT5vAKCOloqP407csGruBYd7w3X7SqZmDfwQfWz
-         1lkXurVzyFSfsDANjbNeXfFEAu501XSqN7LA3/wx+fCFs+nQS/qrBAkXjMAeX93AWgZK
-         Y0/N2zZHZDZT0bCeN+fRRDLnHQsd3Ol4WXYhqUN1SSZHdnZ9PUMJqc9XR1T54I/n+liO
-         ZRNZITBJ70voV1XxHCnvnig9qC4/S8ixQk7aypF2PsCRBCY7fkPz0ps6uMIffHI58Z/T
-         3BQw==
-X-Gm-Message-State: ACgBeo0hQwTDlrEQ6dQhwmrjqS1riALW9fV/+eX3BAs2585wEmjKJDKE
-        BIqYIL8AVVgZynfuIHDz5qKwDESiq1I=
-X-Google-Smtp-Source: AA6agR5xsUUeUoLPzB1TRkdLecc87RHkF+qkxPSVbhReVNihzAWJLnyCGHJc995FYf0bmkp29DUeFw==
-X-Received: by 2002:a63:ee55:0:b0:429:88cf:78df with SMTP id n21-20020a63ee55000000b0042988cf78dfmr5075799pgk.301.1661558748082;
-        Fri, 26 Aug 2022 17:05:48 -0700 (PDT)
+        bh=wxssbqhgwnyyI4qNQteNJ+xFtAj5pt6svn+tuRUJqHc=;
+        b=keJmJy/Hb1dPc4F7zoIOS93jRAw5HY115qi377zQxm1Fvu3//aoInRGKTzzP/ILCX9
+         KF3q5DKBUowcWOGZzELL9DNrMqHNYLMlgEiuFRbi09lfNLFFe5Vr+ueD2GRuJiH7o9Xj
+         EX5KNHhT+osNP3Yb/JwG4uRIBE4DlmeXyQMqNq84TwoYSZWFi8ENhr2y5ojjXJ1uyQ3i
+         Cm23vz6m0O9htq6NbnlzWC+ici09li730WmJlJGfQL/1CU3JDxwOKYnVYAUDqZ5v2G6G
+         XhKUfSyS8TFxdHq8uZTiumfBWBkhUy/SCaGI9HGanVVl/Ro/m0vm5OsT7Rs/dJn52iSf
+         fgxw==
+X-Gm-Message-State: ACgBeo1Bif+1VuNaJqEBczQtbKzR+h1R6bR+nMZ9CVzswByHKttQ2iJO
+        Y6GFHx+r8x7MYMMVtLz3f6It1YPC7Yg=
+X-Google-Smtp-Source: AA6agR5V7Jzjt2DuNta9k2aQzygQ+65xnsfbFGB+CFYDzENp+f9oYI371PNYC++lD1HY+UV9NmljVA==
+X-Received: by 2002:a17:90b:19d8:b0:1fb:c116:a1e8 with SMTP id nm24-20020a17090b19d800b001fbc116a1e8mr6785252pjb.109.1661558753325;
+        Fri, 26 Aug 2022 17:05:53 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id o1-20020a17090a168100b001fa8b909ef0sm2249487pja.7.2022.08.26.17.05.46
+        by smtp.gmail.com with ESMTPSA id o1-20020a17090a168100b001fa8b909ef0sm2249487pja.7.2022.08.26.17.05.52
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Aug 2022 17:05:47 -0700 (PDT)
+        Fri, 26 Aug 2022 17:05:52 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 04/11] profiles: Add initial code for bap plugin
-Date:   Fri, 26 Aug 2022 17:05:33 -0700
-Message-Id: <20220827000540.113414-5-luiz.dentz@gmail.com>
+Subject: [PATCH v3 08/11] client/player: Add support for PACS endpoints
+Date:   Fri, 26 Aug 2022 17:05:37 -0700
+Message-Id: <20220827000540.113414-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.2
 In-Reply-To: <20220827000540.113414-1-luiz.dentz@gmail.com>
 References: <20220827000540.113414-1-luiz.dentz@gmail.com>
@@ -66,2914 +66,842 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds initial code for bap plugin which handles Basic Audio
-Profile, Publish Audio Capabilities Service and Audio Stream Control
-Service.
+This adds support for PAC_SINK and PAC_SOURCE endpoints as well as LC3
+presets.
 ---
- Makefile.plugins           |    5 +
- configure.ac               |    4 +
- profiles/audio/bap.c       | 1324 ++++++++++++++++++++++++++++++++++++
- profiles/audio/media.c     |  678 ++++++++++++++++--
- profiles/audio/transport.c |  552 ++++++++++++++-
- profiles/audio/transport.h |    3 +-
- 6 files changed, 2518 insertions(+), 48 deletions(-)
- create mode 100644 profiles/audio/bap.c
+ client/player.c          | 619 +++++++++++++++++++++++++++++++++------
+ tools/bluetooth-player.c |   2 +-
+ 2 files changed, 532 insertions(+), 89 deletions(-)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 7693c767f785..213ed99edf2d 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -116,3 +116,8 @@ plugins_sixaxis_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version
- plugins_sixaxis_la_LIBADD = $(UDEV_LIBS)
- plugins_sixaxis_la_CFLAGS = $(AM_CFLAGS) -fvisibility=hidden
- endif
-+
-+if BAP
-+builtin_modules += bap
-+builtin_sources += profiles/audio/bap.c
-+endif
-diff --git a/configure.ac b/configure.ac
-index 91fd194116f4..1f76915b4349 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -195,6 +195,10 @@ AC_ARG_ENABLE(health, AS_HELP_STRING([--enable-health],
- 		[enable health profiles]), [enable_health=${enableval}])
- AM_CONDITIONAL(HEALTH, test "${enable_health}" = "yes")
+diff --git a/client/player.c b/client/player.c
+index 0c59db648ff1..4ba1a72ecfd5 100644
+--- a/client/player.c
++++ b/client/player.c
+@@ -33,6 +33,7 @@
+ #include "lib/uuid.h"
  
-+AC_ARG_ENABLE(bap, AS_HELP_STRING([--disable-bap],
-+		[disable BAP profile]), [enable_bap=${enableval}])
-+AM_CONDITIONAL(BAP, test "${enable_bap}" != "no")
+ #include "profiles/audio/a2dp-codecs.h"
++#include "src/shared/lc3.h"
+ 
+ #include "src/shared/util.h"
+ #include "src/shared/shell.h"
+@@ -64,6 +65,8 @@ struct endpoint {
+ 	uint8_t codec;
+ 	struct iovec *caps;
+ 	bool auto_accept;
++	uint8_t cig;
++	uint8_t cis;
+ 	char *transport;
+ 	DBusMessage *msg;
+ };
+@@ -1148,7 +1151,7 @@ struct codec_capabilities {
+ 
+ #define data(args...) ((const unsigned char[]) { args })
+ 
+-#define SBC_DATA(args...) \
++#define CODEC_DATA(args...) \
+ 	{ \
+ 		.iov_base = (void *)data(args), \
+ 		.iov_len = sizeof(data(args)), \
+@@ -1161,6 +1164,13 @@ struct codec_capabilities {
+ 		.data = _data, \
+ 	}
+ 
++#define LC3_DATA(_freq, _duration, _chan_count, _len_min, _len_max) \
++	CODEC_DATA(0x03, LC3_FREQ, _freq, _freq >> 8, \
++		   0x02, LC3_DURATION, _duration, \
++		   0x02, LC3_CHAN_COUNT, _chan_count, \
++		   0x05, LC3_FRAME_LEN, _len_min, _len_min >> 8, _len_max, \
++		   _len_max >> 8)
 +
- AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
- 		[disable Bluetooth tools]), [enable_tools=${enableval}])
- AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
-diff --git a/profiles/audio/bap.c b/profiles/audio/bap.c
-new file mode 100644
-index 000000000000..01ac03026259
---- /dev/null
-+++ b/profiles/audio/bap.c
-@@ -0,0 +1,1324 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
+ static const struct capabilities {
+ 	const char *uuid;
+ 	uint8_t codec_id;
+@@ -1175,7 +1185,7 @@ static const struct capabilities {
+ 	 * Bitpool Range: 2-64
+ 	 */
+ 	CODEC_CAPABILITIES(A2DP_SOURCE_UUID, A2DP_CODEC_SBC,
+-					SBC_DATA(0xff, 0xff, 2, 64)),
++					CODEC_DATA(0xff, 0xff, 2, 64)),
+ 	/* A2DP SBC Sink:
+ 	 *
+ 	 * Channel Modes: Mono DualChannel Stereo JointStereo
+@@ -1185,13 +1195,45 @@ static const struct capabilities {
+ 	 * Bitpool Range: 2-64
+ 	 */
+ 	CODEC_CAPABILITIES(A2DP_SINK_UUID, A2DP_CODEC_SBC,
+-					SBC_DATA(0xff, 0xff, 2, 64)),
++					CODEC_DATA(0xff, 0xff, 2, 64)),
++	/* PAC LC3 Sink:
++	 *
++	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
++	 * Duration: 7.5 ms 10 ms
++	 * Channel count: 3
++	 * Frame length: 30-240
++	 */
++	CODEC_CAPABILITIES(PAC_SINK_UUID, LC3_ID,
++					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
++						3u, 30, 240)),
++	/* PAC LC3 Source:
++	 *
++	 * Frequencies: 8Khz 11Khz 16Khz 22Khz 24Khz 32Khz 44.1Khz 48Khz
++	 * Duration: 7.5 ms 10 ms
++	 * Channel count: 3
++	 * Frame length: 30-240
++	 */
++	CODEC_CAPABILITIES(PAC_SOURCE_UUID, LC3_ID,
++					LC3_DATA(LC3_FREQ_ANY, LC3_DURATION_ANY,
++						3u, 30, 240)),
++};
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++struct codec_qos {
++	uint32_t interval;
++	uint8_t  framing;
++	char *phy;
++	uint16_t sdu;
++	uint8_t  rtn;
++	uint16_t latency;
++	uint32_t delay;
+ };
+ 
+ struct codec_preset {
+ 	const char *name;
+ 	const struct iovec data;
++	const struct codec_qos qos;
+ 	bool is_default;
++	uint8_t latency;
+ };
+ 
+ #define SBC_PRESET(_name, _data) \
+@@ -1216,32 +1258,212 @@ static struct codec_preset sbc_presets[] = {
+ 	 * mono, and 512kb/s for two-channel modes.
+ 	 */
+ 	SBC_PRESET("MQ_MONO_44_1",
+-		SBC_DATA(0x28, 0x15, 2, SBC_BITPOOL_MQ_MONO_44100)),
++		CODEC_DATA(0x28, 0x15, 2, SBC_BITPOOL_MQ_MONO_44100)),
+ 	SBC_PRESET("MQ_MONO_48",
+-		SBC_DATA(0x18, 0x15, 2, SBC_BITPOOL_MQ_MONO_48000)),
++		CODEC_DATA(0x18, 0x15, 2, SBC_BITPOOL_MQ_MONO_48000)),
+ 	SBC_PRESET("MQ_STEREO_44_1",
+-		SBC_DATA(0x21, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_44100)),
++		CODEC_DATA(0x21, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_44100)),
+ 	SBC_PRESET("MQ_STEREO_48",
+-		SBC_DATA(0x11, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_48000)),
++		CODEC_DATA(0x11, 0x15, 2, SBC_BITPOOL_MQ_JOINT_STEREO_48000)),
+ 	SBC_PRESET("HQ_MONO_44_1",
+-		SBC_DATA(0x28, 0x15, 2, SBC_BITPOOL_HQ_MONO_44100)),
++		CODEC_DATA(0x28, 0x15, 2, SBC_BITPOOL_HQ_MONO_44100)),
+ 	SBC_PRESET("HQ_MONO_48",
+-		SBC_DATA(0x18, 0x15, 2, SBC_BITPOOL_HQ_MONO_48000)),
++		CODEC_DATA(0x18, 0x15, 2, SBC_BITPOOL_HQ_MONO_48000)),
+ 	SBC_DEFAULT_PRESET("HQ_STEREO_44_1",
+-		SBC_DATA(0x21, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_44100)),
++		CODEC_DATA(0x21, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_44100)),
+ 	SBC_PRESET("HQ_STEREO_48",
+-		SBC_DATA(0x11, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_48000)),
++		CODEC_DATA(0x11, 0x15, 2, SBC_BITPOOL_HQ_JOINT_STEREO_48000)),
+ 	/* Higher bitrates not recommended by A2DP spec, it dual channel to
+ 	 * avoid going above 53 bitpool:
+ 	 *
+ 	 * https://habr.com/en/post/456476/
+ 	 * https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/1092
+ 	 */
+-	SBC_PRESET("XQ_DUAL_44_1", SBC_DATA(0x24, 0x15, 2, 43)),
+-	SBC_PRESET("XQ_DUAL_48", SBC_DATA(0x14, 0x15, 2, 39)),
++	SBC_PRESET("XQ_DUAL_44_1", CODEC_DATA(0x24, 0x15, 2, 43)),
++	SBC_PRESET("XQ_DUAL_48", CODEC_DATA(0x14, 0x15, 2, 39)),
+ 	/* Ultra high bitpool that fits in 512 kbps mandatory bitrate */
+-	SBC_PRESET("UQ_STEREO_44_1", SBC_DATA(0x21, 0x15, 2, 64)),
+-	SBC_PRESET("UQ_STEREO_48", SBC_DATA(0x11, 0x15, 2, 58)),
++	SBC_PRESET("UQ_STEREO_44_1", CODEC_DATA(0x21, 0x15, 2, 64)),
++	SBC_PRESET("UQ_STEREO_48", CODEC_DATA(0x11, 0x15, 2, 58)),
++};
 +
-+#define _GNU_SOURCE
++#define QOS_CONFIG(_interval, _framing, _phy, _sdu, _rtn, _latency, _delay) \
++	{ \
++		.interval = _interval, \
++		.framing = _framing, \
++		.phy = _phy, \
++		.sdu = _sdu, \
++		.rtn = _rtn, \
++		.latency = _latency, \
++		.delay = _delay, \
++	}
 +
-+#include <ctype.h>
-+#include <stdbool.h>
-+#include <stdlib.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <poll.h>
-+#include <errno.h>
++#define QOS_UNFRAMED(_interval, _phy, _sdu, _rtn, _latency, _delay) \
++	QOS_CONFIG(_interval, 0x00, _phy, _sdu, _rtn, _latency, _delay)
 +
-+#include <glib.h>
++#define QOS_FRAMED(_interval, _phy, _sdu, _rtn, _latency, _delay) \
++	QOS_CONFIG(_interval, 0x01, _phy, _sdu, _rtn, _latency, _delay)
 +
-+#include "gdbus/gdbus.h"
++#define QOS_UNFRAMED_1M(_interval, _sdu, _rtn, _latency, _delay) \
++	QOS_UNFRAMED(_interval, "1M", _sdu, _rtn, _latency, _delay) \
 +
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+#include "lib/sdp.h"
-+#include "lib/uuid.h"
++#define QOS_FRAMED_1M(_interval, _sdu, _rtn, _latency, _delay) \
++	QOS_FRAMED(_interval, "1M", _sdu, _rtn, _latency, _delay) \
 +
-+#include "src/dbus-common.h"
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/bap.h"
++#define QOS_UNFRAMED_2M(_interval, _sdu, _rtn, _latency, _delay) \
++	QOS_UNFRAMED(_interval, "2M", _sdu, _rtn, _latency, _delay) \
 +
-+#include "btio/btio.h"
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/gatt-database.h"
-+#include "src/device.h"
-+#include "src/profile.h"
-+#include "src/service.h"
-+#include "src/log.h"
-+#include "src/error.h"
++#define QOS_FRAMED_2M(_interval, _sdu, _rtn, _latency, _delay) \
++	QOS_FRAMED(_interval, "2M", _sdu, _rtn, _latency, _delay) \
 +
-+#define PACS_UUID_STR "00001850-0000-1000-8000-00805f9b34fb"
-+#define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
++#define LC3_7_5_UNFRAMED(_sdu, _rtn, _latency, _delay) \
++	QOS_UNFRAMED(7500u, "2M", _sdu, _rtn, _latency, _delay)
 +
-+struct bap_ep {
-+	char *path;
-+	struct bap_data *data;
-+	struct bt_bap_pac *lpac;
-+	struct bt_bap_pac *rpac;
-+	struct bt_bap_stream *stream;
-+	GIOChannel *io;
-+	unsigned int io_id;
-+	bool recreate;
++#define LC3_7_5_FRAMED(_sdu, _rtn, _latency, _delay) \
++	QOS_FRAMED(7500u, "2M", _sdu, _rtn, _latency, _delay)
++
++#define LC3_10_UNFRAMED(_sdu, _rtn, _latency, _delay) \
++	QOS_UNFRAMED_2M(10000u, _sdu, _rtn, _latency, _delay)
++
++#define LC3_10_FRAMED(_sdu, _rtn, _latency, _delay) \
++	QOS_FRAMED_2M(10000u, _sdu, _rtn, _latency, _delay)
++
++#define LC3_PRESET_DATA(_freq, _duration, _len) \
++	CODEC_DATA(0x02, LC3_CONFIG_FREQ, _freq, \
++		   0x02, LC3_CONFIG_DURATION, _duration, \
++		   0x03, LC3_CONFIG_FRAME_LEN, _len, _len >> 8)
++
++#define LC3_PRESET_8KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_8KHZ, _duration, _len)
++
++#define LC3_PRESET_11KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_11KHZ, _duration, _len)
++
++#define LC3_PRESET_16KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_16KHZ, _duration, _len)
++
++#define LC3_PRESET_22KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_22KHZ, _duration, _len)
++
++#define LC3_PRESET_24KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_24KHZ, _duration, _len)
++
++#define LC3_PRESET_32KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_32KHZ, _duration, _len)
++
++#define LC3_PRESET_44KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_44KHZ, _duration, _len)
++
++#define LC3_PRESET_48KHZ(_duration, _len) \
++	LC3_PRESET_DATA(LC3_CONFIG_FREQ_48KHZ, _duration, _len)
++
++#define LC3_PRESET_LL(_name, _data, _qos) \
++	{ \
++		.name = _name, \
++		.data = _data, \
++		.qos = _qos, \
++		.latency = 0x01, \
++	}
++
++#define LC3_PRESET(_name, _data, _qos) \
++	{ \
++		.name = _name, \
++		.data = _data, \
++		.qos = _qos, \
++		.latency = 0x02, \
++	}
++
++#define LC3_PRESET_HR(_name, _data, _qos) \
++	{ \
++		.name = _name, \
++		.data = _data, \
++		.qos = _qos, \
++		.latency = 0x03, \
++	}
++
++#define LC3_DEFAULT_PRESET(_name, _data, _qos) \
++	{ \
++		.name = _name, \
++		.data = _data, \
++		.is_default = true, \
++		.qos = _qos, \
++		.latency = 0x02, \
++	}
++
++static struct codec_preset lc3_presets[] = {
++	/* Table 4.43: QoS configuration support setting requirements */
++	LC3_PRESET("8_1_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_7_5, 26u),
++			LC3_7_5_UNFRAMED(26u, 2u, 8u, 40000u)),
++	LC3_PRESET("8_2_1",
++			LC3_PRESET_8KHZ(LC3_CONFIG_DURATION_10, 30u),
++			LC3_10_UNFRAMED(30u, 2u, 10u, 40000u)),
++	LC3_PRESET("16_1_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_7_5, 30u),
++			LC3_7_5_UNFRAMED(30u, 2u, 8u, 40000u)),
++	LC3_DEFAULT_PRESET("16_2_1",
++			LC3_PRESET_16KHZ(LC3_CONFIG_DURATION_10, 40u),
++			LC3_10_UNFRAMED(40u, 2u, 10u, 40000u)),
++	LC3_PRESET("24_1_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_7_5, 45u),
++			LC3_7_5_UNFRAMED(45u, 2u, 8u, 40000u)),
++	LC3_PRESET("24_2_1",
++			LC3_PRESET_24KHZ(LC3_CONFIG_DURATION_10, 60u),
++			LC3_10_UNFRAMED(60u, 2u, 10u, 40000u)),
++	LC3_PRESET("32_1_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_7_5, 60u),
++			LC3_7_5_UNFRAMED(60u, 2u, 8u, 40000u)),
++	LC3_PRESET("32_2_1",
++			LC3_PRESET_32KHZ(LC3_CONFIG_DURATION_10, 80u),
++			LC3_10_UNFRAMED(80u, 2u, 10u, 40000u)),
++	LC3_PRESET("44_1_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 98u, 5u, 24u, 40000u)),
++	LC3_PRESET("44_2_1",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 5u, 31u, 40000u)),
++	LC3_PRESET("48_1_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 5u, 15u, 40000u)),
++	LC3_PRESET("48_2_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 5u, 20u, 40000u)),
++	LC3_PRESET("48_3_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 5u, 15u, 40000u)),
++	LC3_PRESET("48_4_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 5u, 20u, 40000u)),
++	LC3_PRESET("48_5_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 5u, 15u, 40000u)),
++	LC3_PRESET("48_6_1",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 5u, 20u, 40000u)),
++	/* QoS Configuration settings for high reliability audio data */
++	LC3_PRESET_HR("44_1_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_7_5, 98u),
++			QOS_FRAMED_2M(8163u, 98u, 23u, 54u, 40000u)),
++	LC3_PRESET_HR("44_2_2",
++			LC3_PRESET_44KHZ(LC3_CONFIG_DURATION_10, 130u),
++			QOS_FRAMED_2M(10884u, 130u, 23u, 71u, 40000u)),
++	LC3_PRESET_HR("48_1_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 75u),
++			LC3_7_5_UNFRAMED(75u, 23u, 45u, 40000u)),
++	LC3_PRESET_HR("48_2_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 100u),
++			LC3_10_UNFRAMED(100u, 23u, 60u, 40000u)),
++	LC3_PRESET_HR("48_3_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 90u),
++			LC3_7_5_UNFRAMED(90u, 23u, 45u, 40000u)),
++	LC3_PRESET_HR("48_4_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 120u),
++			LC3_10_UNFRAMED(120u, 23u, 60u, 40000u)),
++	LC3_PRESET_HR("48_5_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_7_5, 117u),
++			LC3_7_5_UNFRAMED(117u, 23u, 45u, 40000u)),
++	LC3_PRESET_HR("48_6_2",
++			LC3_PRESET_48KHZ(LC3_CONFIG_DURATION_10, 155u),
++			LC3_10_UNFRAMED(155u, 23u, 60u, 40000u)),
+ };
+ 
+ #define PRESET(_uuid, _presets) \
+@@ -1258,6 +1480,8 @@ static const struct preset {
+ } presets[] = {
+ 	PRESET(A2DP_SOURCE_UUID, sbc_presets),
+ 	PRESET(A2DP_SINK_UUID, sbc_presets),
++	PRESET(PAC_SINK_UUID, lc3_presets),
++	PRESET(PAC_SOURCE_UUID, lc3_presets),
+ };
+ 
+ static struct codec_preset *find_preset(const char *uuid, const char *name)
+@@ -1400,10 +1624,7 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
+ 	}
+ 
+ 	p = find_preset(ep->uuid, NULL);
+-	if (!p)
+-		NULL;
+-
+-	if (p->data.iov_base) {
++	if (!p) {
+ 		reply = g_dbus_create_error(msg, "org.bluez.Error.Rejected",
+ 								NULL);
+ 		return reply;
+@@ -1419,6 +1640,190 @@ static DBusMessage *endpoint_select_configuration(DBusConnection *conn,
+ 	return reply;
+ }
+ 
++struct endpoint_config {
++	GDBusProxy *proxy;
++	struct endpoint *ep;
 +	struct iovec *caps;
-+	struct iovec *metadata;
-+	struct bt_bap_qos qos;
-+	unsigned int id;
-+	DBusMessage *msg;
++	uint8_t target_latency;
++	const struct codec_qos *qos;
 +};
 +
-+struct bap_data {
-+	struct btd_device *device;
-+	struct btd_service *service;
-+	struct bt_bap *bap;
-+	unsigned int ready_id;
-+	unsigned int state_id;
-+	unsigned int pac_id;
-+	struct queue *srcs;
-+	struct queue *snks;
-+	struct queue *streams;
-+	GIOChannel *listen_io;
-+};
-+
-+static struct queue *sessions;
-+
-+static void bap_debug(const char *str, void *user_data)
++static void append_properties(DBusMessageIter *iter,
++						struct endpoint_config *cfg)
 +{
-+	DBG_IDX(0xffff, "%s", str);
-+}
++	DBusMessageIter dict;
++	struct codec_qos *qos = (void *)cfg->qos;
++	const char *key = "Capabilities";
 +
-+static void ep_unregister(void *data)
-+{
-+	struct bap_ep *ep = data;
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
 +
-+	DBG("ep %p path %s", ep, ep->path);
++	bt_shell_printf("Capabilities: ");
++	bt_shell_hexdump(cfg->caps->iov_base, cfg->caps->iov_len);
 +
-+	g_dbus_unregister_interface(btd_get_dbus_connection(), ep->path,
-+						MEDIA_ENDPOINT_INTERFACE);
-+}
++	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
++					DBUS_TYPE_BYTE, &cfg->caps->iov_base,
++					cfg->caps->iov_len);
 +
-+static void bap_data_free(struct bap_data *data)
-+{
-+	if (data->listen_io) {
-+		g_io_channel_shutdown(data->listen_io, TRUE, NULL);
-+		g_io_channel_unref(data->listen_io);
++	if (!qos)
++		goto done;
++
++	if (cfg->target_latency) {
++		bt_shell_printf("TargetLatency 0x%02x\n", qos->interval);
++		g_dbus_dict_append_entry(&dict, "TargetLatency",
++					DBUS_TYPE_BYTE, &cfg->target_latency);
 +	}
 +
-+	if (data->service) {
-+		btd_service_set_user_data(data->service, NULL);
-+		bt_bap_set_user_data(data->bap, NULL);
++	if (cfg->ep->cig != BT_ISO_QOS_CIG_UNSET) {
++		bt_shell_printf("CIG 0x%2.2x\n", cfg->ep->cig);
++		g_dbus_dict_append_entry(&dict, "CIG", DBUS_TYPE_BYTE,
++							&cfg->ep->cig);
 +	}
 +
-+	queue_destroy(data->snks, ep_unregister);
-+	queue_destroy(data->srcs, ep_unregister);
-+	queue_destroy(data->streams, NULL);
-+	bt_bap_ready_unregister(data->bap, data->ready_id);
-+	bt_bap_state_unregister(data->bap, data->state_id);
-+	bt_bap_pac_unregister(data->pac_id);
-+	bt_bap_unref(data->bap);
-+	free(data);
-+}
-+
-+static void bap_data_remove(struct bap_data *data)
-+{
-+	DBG("data %p", data);
-+
-+	if (!queue_remove(sessions, data))
-+		return;
-+
-+	bap_data_free(data);
-+
-+	if (queue_isempty(sessions)) {
-+		queue_destroy(sessions, NULL);
-+		sessions = NULL;
-+	}
-+}
-+
-+static void bap_remove(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bap_data *data;
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	data = btd_service_get_user_data(service);
-+	if (!data) {
-+		error("BAP service not handled by profile");
-+		return;
++	if (cfg->ep->cis != BT_ISO_QOS_CIS_UNSET) {
++		bt_shell_printf("CIS 0x%2.2x\n", cfg->ep->cis);
++		g_dbus_dict_append_entry(&dict, "CIS", DBUS_TYPE_BYTE,
++							&cfg->ep->cis);
 +	}
 +
-+	bap_data_remove(data);
++	bt_shell_printf("Interval %u\n", qos->interval);
++
++	g_dbus_dict_append_entry(&dict, "Interval", DBUS_TYPE_UINT32,
++						&qos->interval);
++
++	bt_shell_printf("Framing %s\n", qos->framing ? "true" : "false");
++
++	g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BOOLEAN,
++						&qos->framing);
++
++	bt_shell_printf("PHY %s\n", qos->phy);
++
++	g_dbus_dict_append_entry(&dict, "PHY", DBUS_TYPE_STRING, &qos->phy);
++
++	bt_shell_printf("SDU %u\n", cfg->qos->sdu);
++
++	g_dbus_dict_append_entry(&dict, "SDU", DBUS_TYPE_UINT16, &qos->sdu);
++
++	bt_shell_printf("Retransmissions %u\n", qos->rtn);
++
++	g_dbus_dict_append_entry(&dict, "Retransmissions", DBUS_TYPE_BYTE,
++						&qos->rtn);
++
++	bt_shell_printf("Latency %u\n", qos->latency);
++
++	g_dbus_dict_append_entry(&dict, "Latency", DBUS_TYPE_UINT16,
++						&qos->latency);
++
++	bt_shell_printf("Delay %u\n", qos->delay);
++
++	g_dbus_dict_append_entry(&dict, "Delay", DBUS_TYPE_UINT32,
++						&qos->delay);
++
++done:
++	dbus_message_iter_close_container(iter, &dict);
 +}
 +
-+static gboolean get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
++static struct iovec *iov_append(struct iovec **iov, const void *data,
++							size_t len)
 +{
-+	struct bap_ep *ep = data;
-+	const char *uuid;
-+
-+	if (queue_find(ep->data->snks, NULL, ep))
-+		uuid = PAC_SINK_UUID;
-+	else
-+		uuid = PAC_SOURCE_UUID;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_codec(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bap_ep *ep = data;
-+	uint8_t codec;
-+
-+	bt_bap_pac_get_codec(ep->rpac, &codec, NULL, NULL);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &codec);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_capabilities(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bap_ep *ep = data;
-+	DBusMessageIter array;
-+	struct iovec *d;
-+
-+	bt_bap_pac_get_codec(ep->rpac, NULL, &d, NULL);
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&d->iov_base, d->iov_len);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_device(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct bap_ep *ep = data;
-+	const char *path;
-+
-+	path = device_get_path(ep->data->device);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable ep_properties[] = {
-+	{ "UUID", "s", get_uuid, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Codec", "y", get_codec, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Capabilities", "ay", get_capabilities, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ "Device", "o", get_device, NULL, NULL,
-+					G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-+	{ }
-+};
-+
-+static int parse_array(DBusMessageIter *iter, struct iovec **iov)
-+{
-+	DBusMessageIter array;
-+
-+	if (!iov)
-+		return 0;
-+
-+	if (!(*iov))
++	if (!*iov) {
 +		*iov = new0(struct iovec, 1);
-+
-+	dbus_message_iter_recurse(iter, &array);
-+	dbus_message_iter_get_fixed_array(&array, &(*iov)->iov_base,
-+						(int *)&(*iov)->iov_len);
-+	return 0;
-+}
-+
-+static int parse_properties(DBusMessageIter *props, struct iovec **caps,
-+				struct iovec **metadata, struct bt_bap_qos *qos)
-+{
-+	const char *key;
-+
-+	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		int var;
-+
-+		dbus_message_iter_recurse(props, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+
-+		if (!strcasecmp(key, "Capabilities")) {
-+			if (var != DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			if (parse_array(&value, caps))
-+				goto fail;
-+		} else if (!strcasecmp(key, "Metadata")) {
-+			if (var != DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			if (parse_array(&value, metadata))
-+				goto fail;
-+		} else if (!strcasecmp(key, "CIG")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->cig_id);
-+		} else if (!strcasecmp(key, "CIS")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->cis_id);
-+		} else if (!strcasecmp(key, "Interval")) {
-+			if (var != DBUS_TYPE_UINT32)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->interval);
-+		} else if (!strcasecmp(key, "Framing")) {
-+			dbus_bool_t val;
-+
-+			if (var != DBUS_TYPE_BOOLEAN)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &val);
-+
-+			qos->framing = val;
-+		} else if (!strcasecmp(key, "PHY")) {
-+			const char *str;
-+
-+			if (var != DBUS_TYPE_STRING)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &str);
-+
-+			if (!strcasecmp(str, "1M"))
-+				qos->phy = 0x01;
-+			else if (!strcasecmp(str, "2M"))
-+				qos->phy = 0x02;
-+			else
-+				goto fail;
-+		} else if (!strcasecmp(key, "SDU")) {
-+			if (var != DBUS_TYPE_UINT16)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->sdu);
-+		} else if (!strcasecmp(key, "Retransmissions")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->rtn);
-+		} else if (!strcasecmp(key, "Latency")) {
-+			if (var != DBUS_TYPE_UINT16)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->latency);
-+		} else if (!strcasecmp(key, "Delay")) {
-+			if (var != DBUS_TYPE_UINT32)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->delay);
-+		} else if (!strcasecmp(key, "TargetLatency")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value,
-+							&qos->target_latency);
-+		}
-+
-+		dbus_message_iter_next(props);
++		(*iov)->iov_base = new0(uint8_t, UINT8_MAX);
 +	}
 +
-+	return 0;
-+
-+fail:
-+	DBG("Failed parsing %s", key);
-+
-+	if (*caps) {
-+		free(*caps);
-+		*caps = NULL;
++	if (data && len) {
++		memcpy((*iov)->iov_base + (*iov)->iov_len, data, len);
++		(*iov)->iov_len += len;
 +	}
 +
-+	return -EINVAL;
++	return *iov;
 +}
 +
-+static void qos_cb(struct bt_bap_stream *stream, uint8_t code, uint8_t reason,
-+					void *user_data)
++static DBusMessage *endpoint_select_properties_reply(struct endpoint *ep,
++						DBusMessage *msg,
++						struct codec_preset *preset)
 +{
-+	struct bap_ep *ep = user_data;
++	DBusMessage *reply;
++	DBusMessageIter iter;
++	struct endpoint_config *cfg;
++
++	reply = dbus_message_new_method_return(msg);
++	if (!reply)
++		return NULL;
++
++	cfg = new0(struct endpoint_config, 1);
++	cfg->ep = ep;
++
++	/* Copy capabilities */
++	iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
++	cfg->target_latency = preset->latency;
++
++	if (preset->qos.phy)
++		/* Set QoS parameters */
++		cfg->qos = &preset->qos;
++
++	dbus_message_iter_init_append(reply, &iter);
++
++	append_properties(&iter, cfg);
++
++	free(cfg);
++
++	return reply;
++}
++
++static void select_properties_response(const char *input, void *user_data)
++{
++	struct endpoint *ep = user_data;
++	struct codec_preset *p;
 +	DBusMessage *reply;
 +
-+	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
++	p = find_preset(ep->uuid, input);
++	if (p) {
++		reply = endpoint_select_properties_reply(ep, ep->msg, p);
++		goto done;
++	}
 +
-+	if (!ep->msg)
-+		return;
++	bt_shell_printf("Preset %s not found\n", input);
++	reply = g_dbus_create_error(ep->msg, "org.bluez.Error.Rejected", NULL);
 +
-+	if (!code)
-+		reply = dbus_message_new_method_return(ep->msg);
-+	else
-+		reply = btd_error_failed(ep->msg, "Unable to configure");
-+
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+
++done:
++	g_dbus_send_message(dbus_conn, reply);
 +	dbus_message_unref(ep->msg);
 +	ep->msg = NULL;
 +}
 +
-+static void config_cb(struct bt_bap_stream *stream,
-+					uint8_t code, uint8_t reason,
-+					void *user_data)
++static DBusMessage *endpoint_select_properties(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+	struct bap_ep *ep = user_data;
++	struct endpoint *ep = user_data;
++	struct codec_preset *p;
++	DBusMessageIter args;
 +	DBusMessage *reply;
-+
-+	DBG("stream %p code 0x%02x reason 0x%02x", stream, code, reason);
-+
-+	ep->id = 0;
-+
-+	if (!code)
-+		return;
-+
-+	if (!ep->msg)
-+		return;
-+
-+	reply = btd_error_failed(ep->msg, "Unable to configure");
-+	g_dbus_send_message(btd_get_dbus_connection(), reply);
-+
-+	dbus_message_unref(ep->msg);
-+	ep->msg = NULL;
-+}
-+
-+static void bap_io_close(struct bap_ep *ep)
-+{
-+	int fd;
-+
-+	if (ep->io_id) {
-+		g_source_remove(ep->io_id);
-+		ep->io_id = 0;
-+	}
-+
-+	if (!ep->io)
-+		return;
-+
-+
-+	DBG("ep %p", ep);
-+
-+	fd = g_io_channel_unix_get_fd(ep->io);
-+	close(fd);
-+
-+	g_io_channel_unref(ep->io);
-+	ep->io = NULL;
-+}
-+
-+static DBusMessage *set_configuration(DBusConnection *conn, DBusMessage *msg,
-+								void *data)
-+{
-+	struct bap_ep *ep = data;
-+	const char *path;
-+	DBusMessageIter args, props;
-+
-+	if (ep->msg)
-+		return btd_error_busy(msg);
 +
 +	dbus_message_iter_init(msg, &args);
 +
-+	dbus_message_iter_get_basic(&args, &path);
-+	dbus_message_iter_next(&args);
++	bt_shell_printf("Endpoint: SelectProperties\n");
++	print_iter("\t", "Properties", &args);
 +
-+	dbus_message_iter_recurse(&args, &props);
-+	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
-+		return btd_error_invalid_args(msg);
-+
-+	/* Disconnect IO if connecting since QoS is going to be reconfigured */
-+	if (bt_bap_stream_io_is_connecting(ep->stream, NULL)) {
-+		bap_io_close(ep);
-+		bt_bap_stream_io_connecting(ep->stream, -1);
-+	}
-+
-+	/* Mark CIG and CIS to be auto assigned */
-+	ep->qos.cig_id = BT_ISO_QOS_CIG_UNSET;
-+	ep->qos.cis_id = BT_ISO_QOS_CIS_UNSET;
-+
-+	if (parse_properties(&props, &ep->caps, &ep->metadata, &ep->qos) < 0) {
-+		DBG("Unable to parse properties");
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	/* TODO: Check if stream capabilities match add support for Latency
-+	 * and PHY.
-+	 */
-+	if (ep->stream)
-+		ep->id = bt_bap_stream_config(ep->stream, &ep->qos, ep->caps,
-+						config_cb, ep);
-+	else
-+		ep->stream = bt_bap_config(ep->data->bap, ep->lpac, ep->rpac,
-+						&ep->qos, ep->caps,
-+						config_cb, ep);
-+
-+	if (!ep->stream) {
-+		DBG("Unable to config stream");
-+		free(ep->caps);
-+		ep->caps = NULL;
-+		return btd_error_invalid_args(msg);
-+	}
-+
-+	bt_bap_stream_set_user_data(ep->stream, ep->path);
-+	ep->msg = dbus_message_ref(msg);
-+
-+	return NULL;
-+}
-+
-+static const GDBusMethodTable ep_methods[] = {
-+	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("SetConfiguration",
-+					GDBUS_ARGS({ "endpoint", "o" },
-+						{ "properties", "a{sv}" } ),
-+					NULL, set_configuration) },
-+	{ },
-+};
-+
-+static void ep_free(void *data)
-+{
-+	struct bap_ep *ep = data;
-+
-+	if (ep->id)
-+		bt_bap_stream_cancel(ep->stream, ep->id);
-+
-+	bap_io_close(ep);
-+
-+	free(ep->caps);
-+	free(ep->path);
-+	free(ep);
-+}
-+
-+static struct bap_ep *ep_register(struct btd_service *service,
-+					struct bt_bap_pac *lpac,
-+					struct bt_bap_pac *rpac)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bap_data *data = btd_service_get_user_data(service);
-+	struct bap_ep *ep;
-+	struct queue *queue;
-+	int i, err;
-+	const char *suffix;
-+
-+	switch (bt_bap_pac_get_type(rpac)) {
-+	case BT_BAP_SINK:
-+		queue = data->snks;
-+		i = queue_length(data->snks);
-+		suffix = "sink";
-+		break;
-+	case BT_BAP_SOURCE:
-+		queue = data->srcs;
-+		i = queue_length(data->srcs);
-+		suffix = "source";
-+		break;
-+	default:
++	if (!ep->auto_accept) {
++		ep->msg = dbus_message_ref(msg);
++		bt_shell_prompt_input("Endpoint", "Enter preset/configuration:",
++					select_properties_response, ep);
 +		return NULL;
 +	}
 +
-+	ep = new0(struct bap_ep, 1);
-+	ep->data = data;
-+	ep->lpac = lpac;
-+	ep->rpac = rpac;
++	p = find_preset(ep->uuid, NULL);
++	if (!p)
++		NULL;
 +
-+	err = asprintf(&ep->path, "%s/pac_%s%d", device_get_path(device),
-+		       suffix, i);
-+	if (err < 0) {
-+		error("Could not allocate path for remote pac %s/pac%d",
-+				device_get_path(device), i);
-+		free(ep);
++	reply = endpoint_select_properties_reply(ep, msg, p);
++	if (!reply)
 +		return NULL;
-+	}
 +
-+	if (g_dbus_register_interface(btd_get_dbus_connection(),
-+				ep->path, MEDIA_ENDPOINT_INTERFACE,
-+				ep_methods, NULL, ep_properties,
-+				ep, ep_free) == FALSE) {
-+		error("Could not register remote ep %s", ep->path);
-+		ep_free(ep);
-+		return NULL;
-+	}
++	bt_shell_printf("Auto Accepting using %s...\n", p->name);
 +
-+	DBG("ep %p lpac %p rpac %p path %s", ep, ep->lpac, ep->rpac, ep->path);
-+
-+	queue_push_tail(queue, ep);
-+
-+	return ep;
++	return reply;
 +}
 +
-+static void select_cb(struct bt_bap_pac *pac, int err, struct iovec *caps,
-+				struct iovec *metadata, struct bt_bap_qos *qos,
-+				void *user_data)
+ static DBusMessage *endpoint_clear_configuration(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -1478,7 +1883,12 @@ static const GDBusMethodTable endpoint_methods[] = {
+ 					NULL, endpoint_set_configuration) },
+ 	{ GDBUS_ASYNC_METHOD("SelectConfiguration",
+ 					GDBUS_ARGS({ "caps", "ay" } ),
+-					NULL, endpoint_select_configuration) },
++					GDBUS_ARGS({ "cfg", "ay" } ),
++					endpoint_select_configuration) },
++	{ GDBUS_ASYNC_METHOD("SelectProperties",
++					GDBUS_ARGS({ "properties", "a{sv}" } ),
++					GDBUS_ARGS({ "properties", "a{sv}" } ),
++					endpoint_select_properties) },
+ 	{ GDBUS_ASYNC_METHOD("ClearConfiguration",
+ 					GDBUS_ARGS({ "transport", "o" } ),
+ 					NULL, endpoint_clear_configuration) },
+@@ -1625,18 +2035,64 @@ fail:
+ 
+ }
+ 
++static void endpoint_cis(const char *input, void *user_data)
 +{
-+	struct bap_ep *ep = user_data;
-+
-+	if (err) {
-+		error("err %d", err);
-+		return;
-+	}
-+
-+	ep->caps = caps;
-+	ep->metadata = metadata;
-+	ep->qos = *qos;
-+
-+	/* TODO: Check if stream capabilities match add support for Latency
-+	 * and PHY.
-+	 */
-+	if (ep->stream)
-+		ep->id = bt_bap_stream_config(ep->stream, &ep->qos, ep->caps,
-+						config_cb, ep);
-+	else
-+		ep->stream = bt_bap_config(ep->data->bap, ep->lpac, ep->rpac,
-+						&ep->qos, ep->caps,
-+						config_cb, ep);
-+
-+	if (!ep->stream) {
-+		DBG("Unable to config stream");
-+		free(ep->caps);
-+		ep->caps = NULL;
-+	}
-+
-+	bt_bap_stream_set_user_data(ep->stream, ep->path);
-+}
-+
-+static bool pac_found(struct bt_bap_pac *lpac, struct bt_bap_pac *rpac,
-+							void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_ep *ep;
-+
-+	DBG("lpac %p rpac %p", lpac, rpac);
-+
-+	ep = ep_register(service, lpac, rpac);
-+	if (!ep) {
-+		error("Unable to register endpoint for pac %p", rpac);
-+		return true;
-+	}
-+
-+	/* TODO: Cache LRU? */
-+	if (btd_service_is_initiator(service))
-+		bt_bap_select(lpac, rpac, select_cb, ep);
-+
-+	return true;
-+}
-+
-+static void bap_ready(struct bt_bap *bap, void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+
-+	DBG("bap %p", bap);
-+
-+	bt_bap_foreach_pac(bap, BT_BAP_SOURCE, pac_found, service);
-+	bt_bap_foreach_pac(bap, BT_BAP_SINK, pac_found, service);
-+}
-+
-+static bool match_ep_by_stream(const void *data, const void *user_data)
-+{
-+	const struct bap_ep *ep = data;
-+	const struct bt_bap_stream *stream = user_data;
-+
-+	return ep->stream == stream;
-+}
-+
-+static struct bap_ep *bap_find_ep_by_stream(struct bap_data *data,
-+					struct bt_bap_stream *stream)
-+{
-+	struct bap_ep *ep;
-+
-+	ep = queue_find(data->snks, match_ep_by_stream, stream);
-+	if (ep)
-+		return ep;
-+
-+	return queue_find(data->srcs, match_ep_by_stream, stream);
-+}
-+
-+static void iso_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	struct bt_bap_stream *stream = user_data;
-+	int fd;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		bt_bap_stream_set_io(stream, -1);
-+		return;
-+	}
-+
-+	DBG("ISO connected");
-+
-+	fd = g_io_channel_unix_get_fd(chan);
-+
-+	if (bt_bap_stream_set_io(stream, fd)) {
-+		g_io_channel_set_close_on_unref(chan, FALSE);
-+		return;
-+	}
-+
-+	error("Unable to set IO");
-+	bt_bap_stream_set_io(stream, -1);
-+}
-+
-+static void bap_iso_qos(struct bt_bap_qos *qos, struct bt_iso_io_qos *io)
-+{
-+	if (!qos)
-+		return;
-+
-+	io->interval = qos->interval;
-+	io->latency = qos->latency;
-+	io->sdu = qos->sdu;
-+	io->phy = qos->phy;
-+	io->rtn = qos->rtn;
-+}
-+
-+static bool match_stream_qos(const void *data, const void *user_data)
-+{
-+	const struct bt_bap_stream *stream = data;
-+	const struct bt_iso_qos *iso_qos = user_data;
-+	struct bt_bap_qos *qos;
-+
-+	qos = bt_bap_stream_get_qos((void *)stream);
-+
-+	if (iso_qos->cig != qos->cig_id)
-+		return false;
-+
-+	return iso_qos->cis == qos->cis_id;
-+}
-+
-+static void iso_confirm_cb(GIOChannel *io, void *user_data)
-+{
-+	struct bap_data *data = user_data;
-+	struct bt_bap_stream *stream;
-+	struct bt_iso_qos qos;
-+	char address[18];
-+	GError *err = NULL;
-+
-+	bt_io_get(io, &err,
-+			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_QOS, &qos,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	DBG("ISO: incoming connect from %s (CIG 0x%02x CIS 0x%02x)",
-+					address, qos.cig, qos.cis);
-+
-+	stream = queue_remove_if(data->streams, match_stream_qos, &qos);
-+	if (!stream) {
-+		error("No matching stream found");
-+		goto drop;
-+	}
-+
-+	if (!bt_io_accept(io, iso_connect_cb, stream, NULL, &err)) {
-+		error("bt_io_accept: %s", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	return;
-+
-+drop:
-+	g_io_channel_shutdown(io, TRUE, NULL);
-+}
-+
-+static void bap_accept_io(struct bap_data *data, struct bt_bap_stream *stream,
-+							int fd, int defer)
-+{
-+	char c;
-+	struct pollfd pfd;
-+	socklen_t len;
-+
-+	if (fd < 0 || defer)
-+		return;
-+
-+	/* Check if socket has DEFER_SETUP set */
-+	len = sizeof(defer);
-+	if (getsockopt(fd, SOL_BLUETOOTH, BT_DEFER_SETUP, &defer, &len) < 0)
-+		/* Ignore errors since the fd may be connected already */
-+		return;
-+
-+	if (!defer)
-+		return;
-+
-+	DBG("stream %p fd %d defer %s", stream, fd, defer ? "true" : "false");
-+
-+	memset(&pfd, 0, sizeof(pfd));
-+	pfd.fd = fd;
-+	pfd.events = POLLOUT;
-+
-+	if (poll(&pfd, 1, 0) < 0) {
-+		error("poll: %s (%d)", strerror(errno), errno);
-+		goto fail;
-+	}
-+
-+	if (!(pfd.revents & POLLOUT)) {
-+		if (read(fd, &c, 1) < 0) {
-+			error("read: %s (%d)", strerror(errno), errno);
-+			goto fail;
-+		}
-+	}
-+
-+	return;
-+
-+fail:
-+	close(fd);
-+}
-+
-+static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
-+				struct bt_bap_stream *stream, int defer);
-+
-+static gboolean bap_io_recreate(void *user_data)
-+{
-+	struct bap_ep *ep = user_data;
-+
-+	DBG("ep %p", ep);
-+
-+	ep->io_id = 0;
-+
-+	bap_create_io(ep->data, ep, ep->stream, true);
-+
-+	return FALSE;
-+}
-+
-+static gboolean bap_io_disconnected(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct bap_ep *ep = user_data;
-+
-+	DBG("ep %p recreate %s", ep, ep->recreate ? "true" : "false");
-+
-+	ep->io_id = 0;
-+
-+	bap_io_close(ep);
-+
-+	/* Check if connecting recreate IO */
-+	if (ep->recreate) {
-+		ep->recreate = false;
-+		ep->io_id = g_idle_add(bap_io_recreate, ep);
-+	}
-+
-+	return FALSE;
-+}
-+
-+static void bap_connect_io_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	struct bap_ep *ep = user_data;
-+
-+	if (!ep->stream)
-+		return;
-+
-+	iso_connect_cb(chan, err, ep->stream);
-+}
-+
-+static void bap_connect_io(struct bap_data *data, struct bap_ep *ep,
-+				struct bt_bap_stream *stream,
-+				struct bt_iso_qos *qos, int defer)
-+{
-+	struct btd_adapter *adapter = device_get_adapter(data->device);
-+	GIOChannel *io;
-+	GError *err = NULL;
-+	int fd;
-+
-+	/* If IO already set skip creating it again */
-+	if (bt_bap_stream_get_io(stream))
-+		return;
-+
-+	if (bt_bap_stream_io_is_connecting(stream, &fd)) {
-+		bap_accept_io(data, stream, fd, defer);
-+		return;
-+	}
-+
-+	/* If IO channel still up wait for it to be disconnected and then
-+	 * recreate.
-+	 */
-+	if (ep->io) {
-+		ep->recreate = true;
-+		return;
-+	}
-+
-+	if (ep->io_id) {
-+		g_source_remove(ep->io_id);
-+		ep->io_id = 0;
-+	}
-+
-+	DBG("ep %p stream %p defer %s", ep, stream, defer ? "true" : "false");
-+
-+	io = bt_io_connect(bap_connect_io_cb, ep, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR,
-+				btd_adapter_get_address(adapter),
-+				BT_IO_OPT_DEST_BDADDR,
-+				device_get_address(ep->data->device),
-+				BT_IO_OPT_DEST_TYPE,
-+				device_get_le_address_type(ep->data->device),
-+				BT_IO_OPT_MODE, BT_IO_MODE_ISO,
-+				BT_IO_OPT_QOS, qos,
-+				BT_IO_OPT_DEFER_TIMEOUT, defer,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		return;
-+	}
-+
-+	ep->io_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+						bap_io_disconnected, ep);
-+
-+	ep->io = io;
-+
-+	bt_bap_stream_io_connecting(stream, g_io_channel_unix_get_fd(io));
-+}
-+
-+static void bap_listen_io(struct bap_data *data, struct bt_bap_stream *stream,
-+						struct bt_iso_qos *qos)
-+{
-+	struct btd_adapter *adapter = device_get_adapter(data->device);
-+	GIOChannel *io;
-+	GError *err = NULL;
-+
-+	DBG("stream %p", stream);
-+
-+	/* If IO already set skip creating it again */
-+	if (bt_bap_stream_get_io(stream) || data->listen_io)
-+		return;
-+
-+	io = bt_io_listen(NULL, iso_confirm_cb, data, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR,
-+				btd_adapter_get_address(adapter),
-+				BT_IO_OPT_DEST_BDADDR,
-+				device_get_address(data->device),
-+				BT_IO_OPT_DEST_TYPE,
-+				device_get_le_address_type(data->device),
-+				BT_IO_OPT_MODE, BT_IO_MODE_ISO,
-+				BT_IO_OPT_QOS, qos,
-+				BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		return;
-+	}
-+
-+	data->listen_io = io;
-+}
-+
-+static void bap_create_io(struct bap_data *data, struct bap_ep *ep,
-+				struct bt_bap_stream *stream, int defer)
-+{
-+	struct bt_bap_qos *qos[2] = {};
-+	struct bt_iso_qos iso_qos;
-+
-+	DBG("ep %p stream %p defer %s", ep, stream, defer ? "true" : "false");
-+
-+	if (!data->streams)
-+		data->streams = queue_new();
-+
-+	if (!queue_find(data->streams, NULL, stream))
-+		queue_push_tail(data->streams, stream);
-+
-+	if (!bt_bap_stream_io_get_qos(stream, &qos[0], &qos[1])) {
-+		error("bt_bap_stream_get_qos_links: failed");
-+		return;
-+	}
-+
-+	memset(&iso_qos, 0, sizeof(iso_qos));
-+	iso_qos.cig = qos[0] ? qos[0]->cig_id : qos[1]->cig_id;
-+	iso_qos.cis = qos[0] ? qos[0]->cis_id : qos[1]->cis_id;
-+
-+	bap_iso_qos(qos[0], &iso_qos.in);
-+	bap_iso_qos(qos[1], &iso_qos.out);
-+
-+	if (ep)
-+		bap_connect_io(data, ep, stream, &iso_qos, defer);
-+	else
-+		bap_listen_io(data, stream, &iso_qos);
-+}
-+
-+static void bap_state(struct bt_bap_stream *stream, uint8_t old_state,
-+				uint8_t new_state, void *user_data)
-+{
-+	struct bap_data *data = user_data;
-+	struct bap_ep *ep;
-+
-+	DBG("stream %p: %s(%u) -> %s(%u)", stream,
-+			bt_bap_stream_statestr(old_state), old_state,
-+			bt_bap_stream_statestr(new_state), new_state);
-+
-+	if (new_state == old_state)
-+		return;
-+
-+	ep = bap_find_ep_by_stream(data, stream);
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_IDLE:
-+		/* Release stream if idle */
-+		if (ep)
-+			bap_io_close(ep);
-+		else
-+			queue_remove(data->streams, stream);
-+		break;
-+	case BT_BAP_STREAM_STATE_CONFIG:
-+		if (ep && !ep->id) {
-+			bap_create_io(data, ep, stream, true);
-+			if (!ep->io) {
-+				error("Unable to create io");
-+				bt_bap_stream_release(stream, NULL, NULL);
-+				return;
-+			}
-+
-+
-+			/* Wait QoS response to respond */
-+			ep->id = bt_bap_stream_qos(stream, &ep->qos, qos_cb,
-+									ep);
-+			if (!ep->id) {
-+				error("Failed to Configure QoS");
-+				bt_bap_stream_release(stream, NULL, NULL);
-+			}
-+		}
-+		break;
-+	case BT_BAP_STREAM_STATE_QOS:
-+		bap_create_io(data, ep, stream, true);
-+		break;
-+	case BT_BAP_STREAM_STATE_ENABLING:
-+		if (ep)
-+			bap_create_io(data, ep, stream, false);
-+		break;
-+	}
-+}
-+
-+static void pac_added(struct bt_bap_pac *pac, void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_data *data;
-+
-+	DBG("pac %p", pac);
-+
-+	if (btd_service_get_state(service) != BTD_SERVICE_STATE_CONNECTED)
-+		return;
-+
-+	data = btd_service_get_user_data(service);
-+
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SOURCE, pac_found, service);
-+	bt_bap_foreach_pac(data->bap, BT_BAP_SINK, pac_found, service);
-+}
-+
-+static bool ep_match_rpac(const void *data, const void *match_data)
-+{
-+	const struct bap_ep *ep = data;
-+	const struct bt_bap_pac *pac = match_data;
-+
-+	return ep->rpac == pac;
-+}
-+
-+static void pac_removed(struct bt_bap_pac *pac, void *user_data)
-+{
-+	struct btd_service *service = user_data;
-+	struct bap_data *data;
-+	struct queue *queue;
-+	struct bap_ep *ep;
-+
-+	DBG("pac %p", pac);
-+
-+	if (btd_service_get_state(service) != BTD_SERVICE_STATE_CONNECTED)
-+		return;
-+
-+	data = btd_service_get_user_data(service);
-+
-+	switch (bt_bap_pac_get_type(pac)) {
-+	case BT_BAP_SINK:
-+		queue = data->srcs;
-+		break;
-+	case BT_BAP_SOURCE:
-+		queue = data->snks;
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	ep = queue_remove_if(queue, ep_match_rpac, pac);
-+	if (!ep)
-+		return;
-+
-+	ep_unregister(ep);
-+}
-+
-+static struct bap_data *bap_data_new(struct btd_device *device)
-+{
-+	struct bap_data *data;
-+
-+	data = new0(struct bap_data, 1);
-+	data->device = device;
-+	data->srcs = queue_new();
-+	data->snks = queue_new();
-+
-+	return data;
-+}
-+
-+static void bap_data_add(struct bap_data *data)
-+{
-+	DBG("data %p", data);
-+
-+	if (queue_find(sessions, NULL, data)) {
-+		error("data %p already added", data);
-+		return;
-+	}
-+
-+	bt_bap_set_debug(data->bap, bap_debug, NULL, NULL);
-+
-+	if (!sessions)
-+		sessions = queue_new();
-+
-+	queue_push_tail(sessions, data);
-+
-+	if (data->service)
-+		btd_service_set_user_data(data->service, data);
-+}
-+
-+static bool match_data(const void *data, const void *match_data)
-+{
-+	const struct bap_data *bdata = data;
-+	const struct bt_bap *bap = match_data;
-+
-+	return bdata->bap == bap;
-+}
-+
-+static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
-+							void *user_data)
-+{
-+	struct bap_data *data = user_data;
-+	struct bap_ep *ep;
-+	GIOChannel *io;
-+
-+	if (!state)
-+		return;
-+
-+	ep = bap_find_ep_by_stream(data, stream);
-+	if (!ep)
-+		return;
-+
-+	ep->recreate = false;
-+
-+	if (!ep->io) {
-+		io = g_io_channel_unix_new(fd);
-+		ep->io = io;
-+	} else
-+		io = ep->io;
-+
-+	g_io_channel_set_close_on_unref(io, FALSE);
-+
-+	/* Attempt to get CIG/CIS if they have not been set */
-+	if (ep->qos.cig_id == BT_ISO_QOS_CIG_UNSET ||
-+				ep->qos.cis_id == BT_ISO_QOS_CIS_UNSET) {
-+		struct bt_iso_qos qos;
-+		GError *err = NULL;
-+
-+		if (!bt_io_get(io, &err, BT_IO_OPT_QOS, &qos,
-+					BT_IO_OPT_INVALID)) {
-+			error("%s", err->message);
-+			g_error_free(err);
-+			g_io_channel_unref(io);
-+			return;
++	struct endpoint *ep = user_data;
++	char *endptr = NULL;
++	int value;
++
++	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
++		ep->cis = BT_ISO_QOS_CIS_UNSET;
++	} else {
++		value = strtol(input, &endptr, 0);
++
++		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
++			bt_shell_printf("Invalid argument: %s\n", input);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +		}
 +
-+		ep->qos.cig_id = qos.cig;
-+		ep->qos.cis_id = qos.cis;
++		ep->cis = value;
 +	}
 +
-+	DBG("stream %p fd %d: CIG 0x%02x CIS 0x%02x", stream, fd,
-+					ep->qos.cig_id, ep->qos.cis_id);
++	endpoint_register(ep);
 +}
 +
-+static void bap_attached(struct bt_bap *bap, void *user_data)
++static void endpoint_cig(const char *input, void *user_data)
 +{
-+	struct bap_data *data;
-+	struct bt_att *att;
-+	struct btd_device *device;
++	struct endpoint *ep = user_data;
++	char *endptr = NULL;
++	int value;
 +
-+	DBG("%p", bap);
++	if (!strcasecmp(input, "a") || !strcasecmp(input, "auto")) {
++		ep->cig = BT_ISO_QOS_CIG_UNSET;
++	} else {
++		value = strtol(input, &endptr, 0);
 +
-+	data = queue_find(sessions, match_data, bap);
-+	if (data)
-+		return;
++		if (!endptr || *endptr != '\0' || value > UINT8_MAX) {
++			bt_shell_printf("Invalid argument: %s\n", input);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
 +
-+	att = bt_bap_get_att(bap);
-+	if (!att)
-+		return;
-+
-+	device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
-+	if (!device) {
-+		error("Unable to find device");
-+		return;
++		ep->cig = value;
 +	}
 +
-+	data = bap_data_new(device);
-+	data->bap = bap;
-+
-+	bap_data_add(data);
-+
-+	data->state_id = bt_bap_state_register(data->bap, bap_state,
-+						bap_connecting, data, NULL);
++	bt_shell_prompt_input(ep->path, "CIS (auto/value):", endpoint_cis, ep);
 +}
 +
-+static void bap_detached(struct bt_bap *bap, void *user_data)
-+{
-+	struct bap_data *data;
-+
-+	DBG("%p", bap);
-+
-+	data = queue_find(sessions, match_data, bap);
-+	if (!data) {
-+		error("Unable to find bap session");
-+		return;
-+	}
-+
-+	/* If there is a service it means there is PACS thus we can keep
-+	 * instance allocated.
-+	 */
-+	if (data->service)
-+		return;
-+
-+	bap_data_remove(data);
-+}
-+
-+static int bap_probe(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+	struct bap_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET)) {
-+		error("BAP requires ISO Socket which is not enabled");
-+		return -ENOTSUP;
-+	}
-+
-+	/* Ignore, if we were probed for this device already */
-+	if (data) {
-+		error("Profile probed twice for the same device!");
-+		return -EINVAL;
-+	}
-+
-+	data = bap_data_new(device);
-+	data->service = service;
-+
-+	data->bap = bt_bap_new(btd_gatt_database_get_db(database),
-+					btd_device_get_gatt_db(device));
-+	if (!data->bap) {
-+		error("Unable to create BAP instance");
-+		free(data);
-+		return -EINVAL;
-+	}
-+
-+	bap_data_add(data);
-+
-+	data->ready_id = bt_bap_ready_register(data->bap, bap_ready, service,
-+								NULL);
-+	data->state_id = bt_bap_state_register(data->bap, bap_state,
-+						bap_connecting, data, NULL);
-+	data->pac_id = bt_bap_pac_register(pac_added, pac_removed, service,
-+								NULL);
-+
-+	bt_bap_set_user_data(data->bap, service);
-+
-+	return 0;
-+}
-+
-+static int bap_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct bap_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (!data) {
-+		error("BAP service not handled by profile");
-+		return -EINVAL;
-+	}
-+
-+	if (!bt_bap_attach(data->bap, client)) {
-+		error("BAP unable to attach");
-+		return -EINVAL;
-+	}
-+
-+	btd_service_connecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static bool ep_remove(const void *data, const void *match_data)
-+{
-+	ep_unregister((void *)data);
-+
-+	return true;
-+}
-+
-+static int bap_disconnect(struct btd_service *service)
-+{
-+	struct bap_data *data = btd_service_get_user_data(service);
-+
-+	queue_remove_all(data->snks, ep_remove, NULL, NULL);
-+	queue_remove_all(data->srcs, ep_remove, NULL, NULL);
-+
-+	bt_bap_detach(data->bap);
-+
-+	btd_service_disconnecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static struct btd_profile bap_profile = {
-+	.name		= "bap",
-+	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.remote_uuid	= PACS_UUID_STR,
-+	.device_probe	= bap_probe,
-+	.device_remove	= bap_remove,
-+	.accept		= bap_accept,
-+	.disconnect	= bap_disconnect,
-+};
-+
-+static unsigned int bap_id = 0;
-+
-+static int bap_init(void)
-+{
-+	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-+		warn("D-Bus experimental not enabled");
-+		return -ENOTSUP;
-+	}
-+
-+	btd_profile_register(&bap_profile);
-+	bap_id = bt_bap_register(bap_attached, bap_detached, NULL);
-+
-+	return 0;
-+}
-+
-+static void bap_exit(void)
-+{
-+	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
-+		btd_profile_unregister(&bap_profile);
-+		bt_bap_unregister(bap_id);
-+	}
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(bap, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+							bap_init, bap_exit)
-diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-index c5d8ab14ef49..ff3fa197b284 100644
---- a/profiles/audio/media.c
-+++ b/profiles/audio/media.c
-@@ -31,12 +31,16 @@
- #include "src/device.h"
- #include "src/dbus-common.h"
- #include "src/profile.h"
-+#include "src/service.h"
+ static void endpoint_auto_accept(const char *input, void *user_data)
+ {
+ 	struct endpoint *ep = user_data;
  
- #include "src/uuid-helper.h"
- #include "src/log.h"
- #include "src/error.h"
-+#include "src/gatt-database.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
-+#include "src/shared/att.h"
-+#include "src/shared/bap.h"
- 
- #include "avdtp.h"
- #include "media.h"
-@@ -81,10 +85,14 @@ struct endpoint_request {
- 
- struct media_endpoint {
- 	struct a2dp_sep		*sep;
-+	struct bt_bap_pac	*pac;
-+	void			*stream;
- 	char			*sender;	/* Endpoint DBus bus id */
- 	char			*path;		/* Endpoint object path */
- 	char			*uuid;		/* Endpoint property UUID */
- 	uint8_t			codec;		/* Endpoint codec */
-+	bool			delay_reporting;/* Endpoint delay_reporting */
-+	struct bt_bap_pac_qos	qos;		/* Endpoint qos */
- 	uint8_t			*capabilities;	/* Endpoint property capabilities */
- 	size_t			size;		/* Endpoint capabilities size */
- 	guint			hs_watch;
-@@ -161,6 +169,12 @@ static void media_endpoint_destroy(struct media_endpoint *endpoint)
- 
- 	g_slist_free_full(endpoint->transports,
- 				(GDestroyNotify) media_transport_destroy);
-+	endpoint->transports = NULL;
-+
-+	if (endpoint->pac) {
-+		bt_bap_remove_pac(endpoint->pac);
-+		endpoint->pac = NULL;
+-	if (!strcasecmp(input, "y") || !strcasecmp(input, "yes"))
++	if (!strcasecmp(input, "y") || !strcasecmp(input, "yes")) {
+ 		ep->auto_accept = true;
+-	else if (!strcasecmp(input, "n") || !strcasecmp(input, "no"))
++	} else if (!strcasecmp(input, "n") || !strcasecmp(input, "no")) {
+ 		ep->auto_accept = false;
+-	else
++	} else {
+ 		bt_shell_printf("Invalid input for Auto Accept\n");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
  
- 	g_dbus_remove_watch(btd_get_dbus_connection(), endpoint->watch);
- 	g_free(endpoint->capabilities);
-@@ -286,6 +300,7 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
- 	struct endpoint_request *request = user_data;
- 	struct media_endpoint *endpoint = request->endpoint;
- 	DBusMessage *reply;
-+	DBusMessageIter args, props;
- 	DBusError err;
- 	gboolean value;
- 	void *ret = NULL;
-@@ -318,7 +333,7 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
+-	endpoint_register(ep);
++	bt_shell_prompt_input(ep->path, "CIG (auto/value):", endpoint_cig, ep);
+ }
+ 
+ static void endpoint_set_capabilities(const char *input, void *user_data)
+@@ -1694,22 +2150,6 @@ static const struct capabilities *find_capabilities(const char *uuid,
+ 	return NULL;
+ }
+ 
+-static struct iovec *iov_append(struct iovec **iov, const void *data,
+-							size_t len)
+-{
+-	if (!*iov) {
+-		*iov = new0(struct iovec, 1);
+-		(*iov)->iov_base = new0(uint8_t, UINT8_MAX);
+-	}
+-
+-	if (data && len) {
+-		memcpy((*iov)->iov_base + (*iov)->iov_len, data, len);
+-		(*iov)->iov_len += len;
+-	}
+-
+-	return *iov;
+-}
+-
+ static void cmd_register_endpoint(int argc, char *argv[])
+ {
+ 	struct endpoint *ep;
+@@ -1799,31 +2239,14 @@ static void cmd_unregister_endpoint(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+ }
+ 
+-struct endpoint_config {
+-	GDBusProxy *proxy;
+-	struct endpoint *ep;
+-	struct iovec *caps;
+-};
+-
+ static void config_endpoint_setup(DBusMessageIter *iter, void *user_data)
+ {
+ 	struct endpoint_config *cfg = user_data;
+-	DBusMessageIter dict;
+-	const char *key = "Capabilities";
+ 
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH,
+ 					&cfg->ep->path);
+ 
+-	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
+-
+-	bt_shell_printf("Capabilities: ");
+-	bt_shell_hexdump(cfg->caps->iov_base, cfg->caps->iov_len);
+-
+-	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
+-					DBUS_TYPE_BYTE, &cfg->caps->iov_base,
+-					cfg->caps->iov_len);
+-
+-	dbus_message_iter_close_container(iter, &dict);
++	append_properties(iter, cfg);
+ }
+ 
+ static void config_endpoint_reply(DBusMessage *message, void *user_data)
+@@ -1906,6 +2329,9 @@ static void cmd_config_endpoint(int argc, char *argv[])
+ 		iov_append(&cfg->caps, preset->data.iov_base,
+ 						preset->data.iov_len);
+ 
++		/* Set QoS parameters */
++		cfg->qos = &preset->qos;
++
+ 		endpoint_set_config(cfg);
+ 		return;
  	}
+@@ -2362,7 +2788,7 @@ static void transport_property_changed(GDBusProxy *proxy, const char *name,
+ 		return;
  
- 	if (dbus_message_is_method_call(request->msg, MEDIA_ENDPOINT_INTERFACE,
--				"SelectConfiguration")) {
-+						"SelectConfiguration")) {
- 		DBusMessageIter args, array;
- 		uint8_t *configuration;
+ 	if (ep->auto_accept) {
+-		bt_shell_printf("Auto Accepting...\n");
++		bt_shell_printf("Auto Acquiring...\n");
+ 		if (!g_dbus_proxy_method_call(proxy, "Acquire", NULL,
+ 						acquire_reply, proxy, NULL))
+ 			bt_shell_printf("Failed acquire transport\n");
+@@ -2431,6 +2857,15 @@ static void cmd_show_transport(int argc, char *argv[])
+ 	print_property(proxy, "Volume");
+ 	print_property(proxy, "Endpoint");
  
-@@ -330,7 +345,14 @@ static void endpoint_reply(DBusPendingCall *call, void *user_data)
- 
- 		ret = configuration;
- 		goto done;
--	} else  if (!dbus_message_get_args(reply, &err, DBUS_TYPE_INVALID)) {
-+	} else if (dbus_message_is_method_call(request->msg,
-+						MEDIA_ENDPOINT_INTERFACE,
-+						"SelectProperties")) {
-+		dbus_message_iter_init(reply, &args);
-+		dbus_message_iter_recurse(&args, &props);
-+		ret = &props;
-+		goto done;
-+	} else if (!dbus_message_get_args(reply, &err, DBUS_TYPE_INVALID)) {
- 		error("Wrong reply signature: %s", err.message);
- 		dbus_error_free(&err);
- 		goto done;
-@@ -496,7 +518,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
- 
- 	transport = media_transport_create(device,
- 					a2dp_setup_remote_path(data->setup),
--					configuration, size, endpoint);
-+					configuration, size, endpoint, NULL);
- 	if (transport == NULL)
- 		return FALSE;
- 
-@@ -671,32 +693,474 @@ static void a2dp_destroy_endpoint(void *user_data)
- 	release_endpoint(endpoint);
++	print_property(proxy, "Interval");
++	print_property(proxy, "Framing");
++	print_property(proxy, "SDU");
++	print_property(proxy, "Retransmissions");
++	print_property(proxy, "Latency");
++	print_property(proxy, "Location");
++	print_property(proxy, "Metadata");
++	print_property(proxy, "Links");
++
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
--static gboolean endpoint_init_a2dp_source(struct media_endpoint *endpoint,
--						gboolean delay_reporting,
--						int *err)
-+static bool endpoint_init_a2dp_source(struct media_endpoint *endpoint, int *err)
+@@ -2450,23 +2885,27 @@ static struct transport *find_transport(GDBusProxy *proxy)
+ static void cmd_acquire_transport(int argc, char *argv[])
  {
- 	endpoint->sep = a2dp_add_sep(endpoint->adapter->btd_adapter,
- 					AVDTP_SEP_TYPE_SOURCE, endpoint->codec,
--					delay_reporting, &a2dp_endpoint,
--					endpoint, a2dp_destroy_endpoint, err);
-+					endpoint->delay_reporting,
-+					&a2dp_endpoint, endpoint,
-+					a2dp_destroy_endpoint, err);
- 	if (endpoint->sep == NULL)
--		return FALSE;
-+		return false;
+ 	GDBusProxy *proxy;
++	int i;
  
--	return TRUE;
-+	return true;
- }
- 
--static gboolean endpoint_init_a2dp_sink(struct media_endpoint *endpoint,
--						gboolean delay_reporting,
--						int *err)
-+static bool endpoint_init_a2dp_sink(struct media_endpoint *endpoint, int *err)
- {
- 	endpoint->sep = a2dp_add_sep(endpoint->adapter->btd_adapter,
- 					AVDTP_SEP_TYPE_SINK, endpoint->codec,
--					delay_reporting, &a2dp_endpoint,
--					endpoint, a2dp_destroy_endpoint, err);
-+					endpoint->delay_reporting,
-+					&a2dp_endpoint, endpoint,
-+					a2dp_destroy_endpoint, err);
- 	if (endpoint->sep == NULL)
--		return FALSE;
-+		return false;
- 
--	return TRUE;
-+	return true;
-+}
-+
-+struct pac_select_data {
-+	struct bt_bap_pac *pac;
-+	bt_bap_pac_select_t cb;
-+	void *user_data;
-+};
-+
-+static int parse_array(DBusMessageIter *iter, struct iovec **iov)
-+{
-+	DBusMessageIter array;
-+
-+	if (!iov)
-+		return 0;
-+
-+	if (!(*iov))
-+		*iov = new0(struct iovec, 1);
-+
-+	dbus_message_iter_recurse(iter, &array);
-+	dbus_message_iter_get_fixed_array(&array, &(*iov)->iov_base,
-+						(int *)&(*iov)->iov_len);
-+	return 0;
-+}
-+
-+static int parse_select_properties(DBusMessageIter *props, struct iovec **caps,
-+					struct iovec **metadata,
-+					struct bt_bap_qos *qos)
-+{
-+	const char *key;
-+
-+	while (dbus_message_iter_get_arg_type(props) == DBUS_TYPE_DICT_ENTRY) {
-+		DBusMessageIter value, entry;
-+		int var;
-+
-+		dbus_message_iter_recurse(props, &entry);
-+		dbus_message_iter_get_basic(&entry, &key);
-+
-+		dbus_message_iter_next(&entry);
-+		dbus_message_iter_recurse(&entry, &value);
-+
-+		var = dbus_message_iter_get_arg_type(&value);
-+
-+		if (!strcasecmp(key, "Capabilities")) {
-+			if (var != DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			if (parse_array(&value, caps))
-+				goto fail;
-+		} else if (!strcasecmp(key, "Metadata")) {
-+			if (var != DBUS_TYPE_ARRAY)
-+				goto fail;
-+
-+			if (parse_array(&value, metadata))
-+				goto fail;
-+		} else if (!strcasecmp(key, "CIG")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->cig_id);
-+		} else if (!strcasecmp(key, "CIS")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->cis_id);
-+		} else if (!strcasecmp(key, "Interval")) {
-+			if (var != DBUS_TYPE_UINT32)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->interval);
-+		} else if (!strcasecmp(key, "Framing")) {
-+			dbus_bool_t val;
-+
-+			if (var != DBUS_TYPE_BOOLEAN)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &val);
-+
-+			qos->framing = val;
-+		} else if (!strcasecmp(key, "PHY")) {
-+			const char *str;
-+
-+			if (var != DBUS_TYPE_STRING)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &str);
-+
-+			if (!strcasecmp(str, "1M"))
-+				qos->phy = 0x01;
-+			else if (!strcasecmp(str, "2M"))
-+				qos->phy = 0x02;
-+			else
-+				goto fail;
-+		} else if (!strcasecmp(key, "SDU")) {
-+			if (var != DBUS_TYPE_UINT16)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->sdu);
-+		} else if (!strcasecmp(key, "Retransmissions")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->rtn);
-+		} else if (!strcasecmp(key, "Latency")) {
-+			if (var != DBUS_TYPE_UINT16)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->latency);
-+		} else if (!strcasecmp(key, "Delay")) {
-+			if (var != DBUS_TYPE_UINT32)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value, &qos->delay);
-+		} else if (!strcasecmp(key, "TargetLatency")) {
-+			if (var != DBUS_TYPE_BYTE)
-+				goto fail;
-+
-+			dbus_message_iter_get_basic(&value,
-+							&qos->target_latency);
+-	proxy = g_dbus_proxy_lookup(transports, NULL, argv[1],
++	for (i = 1; i < argc; i++) {
++		proxy = g_dbus_proxy_lookup(transports, NULL, argv[i],
+ 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
+-	if (!proxy) {
+-		bt_shell_printf("Transport %s not found\n", argv[1]);
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
++		if (!proxy) {
++			bt_shell_printf("Transport %s not found\n", argv[i]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +		}
-+
-+		dbus_message_iter_next(props);
-+	}
-+
-+	return 0;
-+
-+fail:
-+	DBG("Failed parsing %s", key);
-+
-+	if (*caps) {
-+		free(*caps);
-+		*caps = NULL;
-+	}
-+
-+	return -EINVAL;
-+}
-+
-+static void pac_select_cb(struct media_endpoint *endpoint, void *ret, int size,
-+							void *user_data)
-+{
-+	struct pac_select_data *data = user_data;
-+	DBusMessageIter *iter = ret;
-+	int err;
-+	struct iovec *caps = NULL, *metadata = NULL;
-+	struct bt_bap_qos qos;
-+
-+	if (!ret) {
-+		err = -EPERM;
-+		goto done;
-+	}
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_DICT_ENTRY) {
-+		DBG("Unexpected argument type: %c != %c",
-+			    dbus_message_iter_get_arg_type(iter),
-+			    DBUS_TYPE_DICT_ENTRY);
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	memset(&qos, 0, sizeof(qos));
-+
-+	/* Mark CIG and CIS to be auto assigned */
-+	qos.cig_id = BT_ISO_QOS_CIG_UNSET;
-+	qos.cis_id = BT_ISO_QOS_CIS_UNSET;
-+
-+	err = parse_select_properties(iter, &caps, &metadata, &qos);
-+	if (err < 0)
-+		DBG("Unable to parse properties");
-+
-+done:
-+	data->cb(data->pac, err, caps, metadata, &qos, data->user_data);
-+}
-+
-+static int pac_select(struct bt_bap_pac *pac, struct bt_bap_pac_qos *qos,
-+			struct iovec *caps, struct iovec *metadata,
-+			bt_bap_pac_select_t cb, void *cb_data, void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	struct pac_select_data *data;
-+	DBusMessage *msg;
-+	DBusMessageIter iter, dict;
-+	const char *key = "Capabilities";
-+
-+	if (!caps)
-+		return -EINVAL;
-+
-+	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-+						MEDIA_ENDPOINT_INTERFACE,
-+						"SelectProperties");
-+	if (msg == NULL) {
-+		error("Couldn't allocate D-Bus message");
-+		return -ENOMEM;
-+	}
-+
-+	data = new0(struct pac_select_data, 1);
-+	data->pac = pac;
-+	data->cb = cb;
-+	data->user_data = cb_data;
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
-+
-+	g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-+					DBUS_TYPE_BYTE, &caps->iov_base,
-+					caps->iov_len);
-+
-+	if (metadata) {
-+		key = "Metadata";
-+		g_dbus_dict_append_basic_array(&dict, DBUS_TYPE_STRING, &key,
-+						DBUS_TYPE_BYTE,
-+						&metadata->iov_base,
-+						metadata->iov_len);
-+	}
-+
-+	if (qos && qos->phy) {
-+		g_dbus_dict_append_entry(&dict, "Framing", DBUS_TYPE_BYTE,
-+							&qos->framing);
-+
-+		g_dbus_dict_append_entry(&dict, "PHY", DBUS_TYPE_BYTE,
-+							&qos->phy);
-+
-+		g_dbus_dict_append_entry(&dict, "Latency", DBUS_TYPE_UINT16,
-+							&qos->latency);
-+
-+		g_dbus_dict_append_entry(&dict, "MinimumDelay",
-+					DBUS_TYPE_UINT32, &qos->pd_min);
-+
-+		g_dbus_dict_append_entry(&dict, "MaximumDelay",
-+					DBUS_TYPE_UINT32, &qos->pd_max);
-+
-+		g_dbus_dict_append_entry(&dict, "PreferredMinimumDelay",
-+					DBUS_TYPE_UINT32, &qos->ppd_min);
-+
-+		g_dbus_dict_append_entry(&dict, "PreferredMaximumDelay",
-+					DBUS_TYPE_UINT32, &qos->ppd_min);
-+	}
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	return media_endpoint_async_call(msg, endpoint, NULL, pac_select_cb,
-+								data, free);
-+}
-+
-+struct pac_config_data {
-+	struct bt_bap_stream *stream;
-+	bt_bap_pac_config_t cb;
-+	void *user_data;
-+};
-+
-+static int transport_cmp(gconstpointer data, gconstpointer user_data)
-+{
-+	const struct media_transport *transport = data;
-+	const char *path = user_data;
-+
-+	if (g_str_has_prefix(media_transport_get_path((void *)transport), path))
-+		return 0;
-+
-+	return -1;
-+}
-+
-+static struct media_transport *find_transport(struct media_endpoint *endpoint,
-+						const char *path)
-+{
-+	GSList *match;
-+
-+	if (!path)
-+		return NULL;
-+
-+	match = g_slist_find_custom(endpoint->transports, path, transport_cmp);
-+	if (match == NULL)
-+		return NULL;
-+
-+	return match->data;
-+}
-+
-+static void pac_config_cb(struct media_endpoint *endpoint, void *ret, int size,
-+							void *user_data)
-+{
-+	struct pac_config_data *data = user_data;
-+	gboolean *ret_value = ret;
-+
-+	if (ret_value)
-+		endpoint->stream = data->stream;
-+
-+	data->cb(data->stream, ret_value ? 0 : -EINVAL);
-+}
-+
-+static int pac_config(struct bt_bap_stream *stream, struct iovec *cfg,
-+			struct bt_bap_qos *qos, bt_bap_pac_config_t cb,
-+			void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+	DBusConnection *conn = btd_get_dbus_connection();
-+	struct pac_config_data *data;
-+	struct media_transport *transport;
-+	DBusMessage *msg;
-+	DBusMessageIter iter;
-+	const char *path;
-+
-+	path = bt_bap_stream_get_user_data(stream);
-+
-+	DBG("endpoint %p path %s", endpoint, path);
-+
-+	transport = find_transport(endpoint, path);
-+	if (!transport) {
-+		struct bt_bap *bap = bt_bap_stream_get_session(stream);
-+		struct btd_service *service = bt_bap_get_user_data(bap);
-+		struct btd_device *device;
-+
-+		if (service)
-+			device = btd_service_get_device(service);
-+		else {
-+			struct bt_att *att = bt_bap_get_att(bap);
-+			int fd = bt_att_get_fd(att);
-+
-+			device = btd_adapter_find_device_by_fd(fd);
+ 
+-	if (find_transport(proxy)) {
+-		bt_shell_printf("Transport %s already acquired\n", argv[1]);
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
++		if (find_transport(proxy)) {
++			bt_shell_printf("Transport %s already acquired\n",
++					argv[i]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +		}
-+
-+		if (!device) {
-+			error("Unable to find device");
-+			return -EINVAL;
-+		}
-+
-+		transport = media_transport_create(device, path, cfg->iov_base,
-+							cfg->iov_len, endpoint,
-+							stream);
-+		if (!transport)
-+			return -EINVAL;
-+
-+		path = media_transport_get_path(transport);
-+		bt_bap_stream_set_user_data(stream, (void *)path);
-+	}
-+
-+	msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-+						MEDIA_ENDPOINT_INTERFACE,
-+						"SetConfiguration");
-+	if (msg == NULL) {
-+		error("Couldn't allocate D-Bus message");
-+		media_transport_destroy(transport);
-+		return FALSE;
-+	}
-+
-+	data = new0(struct pac_config_data, 1);
-+	data->stream = stream;
-+	data->cb = cb;
-+	data->user_data = user_data;
-+
-+	endpoint->transports = g_slist_append(endpoint->transports, transport);
-+
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	path = media_transport_get_path(transport);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	g_dbus_get_properties(conn, path, "org.bluez.MediaTransport1", &iter);
-+
-+	return media_endpoint_async_call(msg, endpoint, transport,
-+					pac_config_cb, data, free);
-+}
-+
-+static void pac_clear(struct bt_bap_stream *stream, void *user_data)
-+{
-+	struct media_endpoint *endpoint = user_data;
-+
-+	endpoint->stream = NULL;
-+
-+	while (endpoint->transports != NULL)
-+		clear_configuration(endpoint, endpoint->transports->data);
-+}
-+
-+static struct bt_bap_pac_ops pac_ops = {
-+	.select = pac_select,
-+	.config = pac_config,
-+	.clear = pac_clear,
-+};
-+
-+static void bap_debug(const char *str, void *user_data)
-+{
-+	DBG("%s", str);
-+}
-+
-+static bool endpoint_init_pac(struct media_endpoint *endpoint, uint8_t type,
-+								int *err)
-+{
-+	struct btd_gatt_database *database;
-+	struct gatt_db *db;
-+	struct iovec data;
-+	char *name;
-+
-+	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-+		warn("D-Bus experimental not enabled");
-+		*err = -ENOTSUP;
-+		return false;
-+	}
-+
-+	database = btd_adapter_get_database(endpoint->adapter->btd_adapter);
-+	if (!database) {
-+		error("Adapter database not found");
-+		return false;
-+	}
-+
-+	if (!bap_print_cc(endpoint->capabilities, endpoint->size, bap_debug,
-+								NULL)) {
-+		error("Unable to parse endpoint capabilities");
-+		return false;
-+	}
-+
-+	db = btd_gatt_database_get_db(database);
-+
-+	data.iov_base = endpoint->capabilities;
-+	data.iov_len = endpoint->size;
-+
-+	/* TODO: Add support for metadata */
-+
-+	if (asprintf(&name, "%s:%s", endpoint->sender, endpoint->path) < 0) {
-+		error("Could not allocate name for pac %s:%s",
-+				endpoint->sender, endpoint->path);
-+		return false;
-+	}
-+
-+	endpoint->pac = bt_bap_add_pac(db, name, type, endpoint->codec,
-+					&endpoint->qos, &data, NULL);
-+	if (!endpoint->pac) {
-+		error("Unable to create PAC");
-+		return false;
-+	}
-+
-+	bt_bap_pac_set_ops(endpoint->pac, &pac_ops, endpoint);
-+
-+	DBG("PAC %s registered", name);
-+
-+	free(name);
-+
-+	return true;
-+}
-+
-+static bool endpoint_init_pac_sink(struct media_endpoint *endpoint, int *err)
-+{
-+	return endpoint_init_pac(endpoint, BT_BAP_SINK, err);
-+}
-+
-+static bool endpoint_init_pac_source(struct media_endpoint *endpoint, int *err)
-+{
-+	return endpoint_init_pac(endpoint, BT_BAP_SOURCE, err);
- }
  
- static bool endpoint_properties_exists(const char *uuid,
-@@ -781,24 +1245,55 @@ static bool endpoint_properties_get(const char *uuid,
- 	return true;
- }
- 
--static struct media_endpoint *media_endpoint_create(struct media_adapter *adapter,
-+static bool endpoint_supported(void)
-+{
-+	return true;
-+}
-+
-+static bool experimental_endpoint_supported(void)
-+{
-+	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
-+}
-+
-+static struct media_endpoint_init {
-+	const char *uuid;
-+	bool (*func)(struct media_endpoint *endpoint, int *err);
-+	bool (*supported)(void);
-+} init_table[] = {
-+	{ A2DP_SOURCE_UUID, endpoint_init_a2dp_source, endpoint_supported },
-+	{ A2DP_SINK_UUID, endpoint_init_a2dp_sink, endpoint_supported },
-+	{ PAC_SINK_UUID, endpoint_init_pac_sink,
-+				experimental_endpoint_supported },
-+	{ PAC_SOURCE_UUID, endpoint_init_pac_source,
-+				experimental_endpoint_supported },
-+};
-+
-+static struct media_endpoint *
-+media_endpoint_create(struct media_adapter *adapter,
- 						const char *sender,
- 						const char *path,
- 						const char *uuid,
- 						gboolean delay_reporting,
- 						uint8_t codec,
-+						struct bt_bap_pac_qos *qos,
- 						uint8_t *capabilities,
- 						int size,
- 						int *err)
- {
- 	struct media_endpoint *endpoint;
--	gboolean succeeded;
-+	struct media_endpoint_init *init;
-+	size_t i;
-+	bool succeeded = false;
- 
- 	endpoint = g_new0(struct media_endpoint, 1);
- 	endpoint->sender = g_strdup(sender);
- 	endpoint->path = g_strdup(path);
- 	endpoint->uuid = g_strdup(uuid);
- 	endpoint->codec = codec;
-+	endpoint->delay_reporting = delay_reporting;
-+
-+	if (qos)
-+		endpoint->qos = *qos;
- 
- 	if (size > 0) {
- 		endpoint->capabilities = g_new(uint8_t, size);
-@@ -808,26 +1303,17 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
- 
- 	endpoint->adapter = adapter;
- 
--	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0)
--		succeeded = endpoint_init_a2dp_source(endpoint,
--							delay_reporting, err);
--	else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0)
--		succeeded = endpoint_init_a2dp_sink(endpoint,
--							delay_reporting, err);
--	else if (strcasecmp(uuid, HFP_AG_UUID) == 0 ||
--					strcasecmp(uuid, HSP_AG_UUID) == 0)
--		succeeded = TRUE;
--	else if (strcasecmp(uuid, HFP_HS_UUID) == 0 ||
--					strcasecmp(uuid, HSP_HS_UUID) == 0)
--		succeeded = TRUE;
--	else {
--		succeeded = FALSE;
-+	for (i = 0; i < ARRAY_SIZE(init_table); i++) {
-+		init = &init_table[i];
- 
--		if (err)
--			*err = -EINVAL;
-+		if (!strcasecmp(init->uuid, uuid)) {
-+			succeeded = init->func(endpoint, err);
-+			break;
+-	if (!g_dbus_proxy_method_call(proxy, "Acquire", NULL,
+-					acquire_reply, proxy, NULL)) {
+-		bt_shell_printf("Failed acquire transport\n");
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		if (!g_dbus_proxy_method_call(proxy, "Acquire", NULL,
++						acquire_reply, proxy, NULL)) {
++			bt_shell_printf("Failed acquire transport\n");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +		}
  	}
  
- 	if (!succeeded) {
-+		error("Unable initialize endpoint for UUID %s", uuid);
- 		media_endpoint_destroy(endpoint);
- 		return NULL;
- 	}
-@@ -853,6 +1339,7 @@ static struct media_endpoint *media_endpoint_create(struct media_adapter *adapte
- 
- static int parse_properties(DBusMessageIter *props, const char **uuid,
- 				gboolean *delay_reporting, uint8_t *codec,
-+				struct bt_bap_pac_qos *qos,
- 				uint8_t **capabilities, int *size)
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -2496,25 +2935,29 @@ static void release_reply(DBusMessage *message, void *user_data)
+ static void cmd_release_transport(int argc, char *argv[])
  {
- 	gboolean has_uuid = FALSE;
-@@ -893,6 +1380,34 @@ static int parse_properties(DBusMessageIter *props, const char **uuid,
- 			dbus_message_iter_recurse(&value, &array);
- 			dbus_message_iter_get_fixed_array(&array, capabilities,
- 							size);
-+		} else if (strcasecmp(key, "Framing") == 0) {
-+			if (var != DBUS_TYPE_BYTE)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->framing);
-+		} else if (strcasecmp(key, "PHY") == 0) {
-+			if (var != DBUS_TYPE_BYTE)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->phy);
-+		} else if (strcasecmp(key, "RTN") == 0) {
-+			if (var != DBUS_TYPE_BYTE)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->rtn);
-+		} else if (strcasecmp(key, "MinimumDelay") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->pd_min);
-+		} else if (strcasecmp(key, "MaximumDelay") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->pd_max);
-+		} else if (strcasecmp(key, "PreferredMinimumDelay") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->pd_min);
-+		} else if (strcasecmp(key, "PreferredMaximumDelay") == 0) {
-+			if (var != DBUS_TYPE_UINT16)
-+				return -EINVAL;
-+			dbus_message_iter_get_basic(&value, &qos->pd_max);
- 		}
+ 	GDBusProxy *proxy;
+-	struct transport *transport;
++	int i;
  
- 		dbus_message_iter_next(props);
-@@ -908,7 +1423,8 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
- 	DBusMessageIter args, props;
- 	const char *sender, *path, *uuid;
- 	gboolean delay_reporting = FALSE;
--	uint8_t codec;
-+	uint8_t codec = 0;
-+	struct bt_bap_pac_qos qos = {};
- 	uint8_t *capabilities;
- 	int size = 0;
- 	int err;
-@@ -927,12 +1443,13 @@ static DBusMessage *register_endpoint(DBusConnection *conn, DBusMessage *msg,
- 	if (dbus_message_iter_get_arg_type(&props) != DBUS_TYPE_DICT_ENTRY)
- 		return btd_error_invalid_args(msg);
+-	proxy = g_dbus_proxy_lookup(transports, NULL, argv[1],
++	for (i = 1; i < argc; i++) {
++		struct transport *transport;
++
++		proxy = g_dbus_proxy_lookup(transports, NULL, argv[i],
+ 					BLUEZ_MEDIA_TRANSPORT_INTERFACE);
+-	if (!proxy) {
+-		bt_shell_printf("Transport %s not found\n", argv[1]);
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
++		if (!proxy) {
++			bt_shell_printf("Transport %s not found\n", argv[1]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
  
--	if (parse_properties(&props, &uuid, &delay_reporting, &codec,
-+	if (parse_properties(&props, &uuid, &delay_reporting, &codec, &qos,
- 						&capabilities, &size) < 0)
- 		return btd_error_invalid_args(msg);
+-	transport = find_transport(proxy);
+-	if (!transport) {
+-		bt_shell_printf("Transport %s not acquired\n", argv[1]);
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+-	}
++		transport = find_transport(proxy);
++		if (!transport) {
++			bt_shell_printf("Transport %s not acquired\n", argv[i]);
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
  
- 	if (media_endpoint_create(adapter, sender, path, uuid, delay_reporting,
--				codec, capabilities, size, &err) == NULL) {
-+					codec, &qos, capabilities, size,
-+					&err) == NULL) {
- 		if (err == -EPROTONOSUPPORT)
- 			return btd_error_not_supported(msg);
- 		else
-@@ -1958,6 +2475,7 @@ static void app_register_endpoint(void *data, void *user_data)
- 	const char *uuid;
- 	gboolean delay_reporting = FALSE;
- 	uint8_t codec;
-+	struct bt_bap_pac_qos qos;
- 	uint8_t *capabilities = NULL;
- 	int size = 0;
- 	DBusMessageIter iter, array;
-@@ -2002,9 +2520,60 @@ static void app_register_endpoint(void *data, void *user_data)
- 		dbus_message_iter_get_fixed_array(&array, &capabilities, &size);
+-	if (!g_dbus_proxy_method_call(proxy, "Release", NULL,
++		if (!g_dbus_proxy_method_call(proxy, "Release", NULL,
+ 					release_reply, transport, NULL)) {
+-		bt_shell_printf("Failed release transport\n");
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++			bt_shell_printf("Failed release transport\n");
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
  	}
  
-+	/* Parse QoS preferences */
-+	memset(&qos, 0, sizeof(qos));
-+	if (g_dbus_proxy_get_property(proxy, "Framing", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.framing);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "PHY", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_BYTE)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.phy);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "Latency", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT16)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.latency);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "MinimumDelay", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.pd_min);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "MaximumDelay", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.pd_max);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "PreferredMinimumDelay", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.ppd_min);
-+	}
-+
-+	if (g_dbus_proxy_get_property(proxy, "PreferredMaximumDelay", &iter)) {
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_UINT32)
-+			goto fail;
-+
-+		dbus_message_iter_get_basic(&iter, &qos.ppd_min);
-+	}
-+
- 	endpoint = media_endpoint_create(app->adapter, app->sender, path, uuid,
--					delay_reporting, codec, capabilities,
--					size, &app->err);
-+						delay_reporting, codec, &qos,
-+						capabilities, size, &app->err);
- 	if (!endpoint) {
- 		error("Unable to register endpoint %s:%s: %s", app->sender,
- 						path, strerror(-app->err));
-@@ -2390,6 +2959,33 @@ static const GDBusMethodTable media_methods[] = {
- 	{ },
- };
- 
-+static gboolean supported_uuids(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	DBusMessageIter entry;
-+	size_t i;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+				DBUS_TYPE_STRING_AS_STRING, &entry);
-+
-+	for (i = 0; i < ARRAY_SIZE(init_table); i++) {
-+		struct media_endpoint_init *init = &init_table[i];
-+
-+		if (init->supported())
-+			dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
-+							&init->uuid);
-+	}
-+
-+	dbus_message_iter_close_container(iter, &entry);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable media_properties[] = {
-+	{ "SupportedUUIDs", "as", supported_uuids },
-+	{ }
-+};
-+
- static void path_free(void *data)
- {
- 	struct media_adapter *adapter = data;
-@@ -2419,7 +3015,7 @@ int media_register(struct btd_adapter *btd_adapter)
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					adapter_get_path(btd_adapter),
- 					MEDIA_INTERFACE,
--					media_methods, NULL, NULL,
-+					media_methods, NULL, media_properties,
- 					adapter, path_free)) {
- 		error("D-Bus failed to register %s path",
- 						adapter_get_path(btd_adapter));
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 5848e4019650..47db2a8026b2 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -23,6 +23,7 @@
- #include "lib/uuid.h"
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+@@ -2707,10 +3150,10 @@ static const struct bt_shell_menu transport_menu = {
+ 	{ "show",        "<transport>", cmd_show_transport,
+ 						"Transport information",
+ 						transport_generator },
+-	{ "acquire",     "<transport>",	cmd_acquire_transport,
++	{ "acquire",     "<transport> [transport1...]", cmd_acquire_transport,
+ 						"Acquire Transport",
+ 						transport_generator },
+-	{ "release",     "<transport>",	cmd_release_transport,
++	{ "release",     "<transport> [transport1...]", cmd_release_transport,
+ 						"Release Transport",
+ 						transport_generator },
+ 	{ "send",        "<transport> <filename>", cmd_send_transport,
+diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
+index 497d975e9d7c..b6cdd161ee8c 100644
+--- a/tools/bluetooth-player.c
++++ b/tools/bluetooth-player.c
+@@ -26,7 +26,6 @@
+ #include <glib.h>
  
  #include "gdbus/gdbus.h"
-+#include "btio/btio.h"
+-
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
  
- #include "src/adapter.h"
- #include "src/device.h"
-@@ -30,7 +31,9 @@
+@@ -37,6 +36,7 @@
+ #define PROMPT_ON	COLOR_BLUE "[bluetooth]" COLOR_OFF "# "
+ #define PROMPT_OFF	"[bluetooth]# "
  
- #include "src/log.h"
- #include "src/error.h"
-+#include "src/shared/util.h"
- #include "src/shared/queue.h"
-+#include "src/shared/bap.h"
++
+ static DBusConnection *dbus_conn;
  
- #include "avdtp.h"
- #include "media.h"
-@@ -76,6 +79,19 @@ struct a2dp_transport {
- 	int8_t			volume;
- };
- 
-+struct bap_transport {
-+	struct bt_bap_stream	*stream;
-+	unsigned int		state_id;
-+	bool			linked;
-+	uint32_t		interval;
-+	uint8_t			framing;
-+	uint8_t			phy;
-+	uint16_t		sdu;
-+	uint8_t			rtn;
-+	uint16_t		latency;
-+	uint32_t		delay;
-+};
-+
- struct media_transport {
- 	char			*path;		/* Transport object path */
- 	struct btd_device	*device;	/* Transport device */
-@@ -97,6 +113,8 @@ struct media_transport {
- 					struct media_owner *owner);
- 	void			(*cancel) (struct media_transport *transport,
- 								guint id);
-+	void			(*set_state) (struct media_transport *transport,
-+						transport_state_t state);
- 	GDestroyNotify		destroy;
- 	void			*data;
- };
-@@ -134,6 +152,29 @@ static gboolean state_in_use(transport_state_t state)
- 	return FALSE;
- }
- 
-+static struct media_transport *
-+find_transport_by_bap_stream(const struct bt_bap_stream *stream)
-+{
-+	GSList *l;
-+
-+	for (l = transports; l; l = g_slist_next(l)) {
-+		struct media_transport *transport = l->data;
-+		const char *uuid = media_endpoint_get_uuid(transport->endpoint);
-+		struct bap_transport *bap;
-+
-+		if (strcasecmp(uuid, PAC_SINK_UUID) &&
-+				strcasecmp(uuid, PAC_SOURCE_UUID))
-+			continue;
-+
-+		bap = transport->data;
-+
-+		if (bap->stream == stream)
-+			return transport;
-+	}
-+
-+	return NULL;
-+}
-+
- static void transport_set_state(struct media_transport *transport,
- 							transport_state_t state)
- {
-@@ -155,6 +196,10 @@ static void transport_set_state(struct media_transport *transport,
- 						transport->path,
- 						MEDIA_TRANSPORT_INTERFACE,
- 						"State");
-+
-+	/* Update transport specific data */
-+	if (transport->set_state)
-+		transport->set_state(transport, state);
- }
- 
- void media_transport_destroy(struct media_transport *transport)
-@@ -240,6 +285,9 @@ static void media_transport_remove_owner(struct media_transport *transport)
- {
- 	struct media_owner *owner = transport->owner;
- 
-+	if (!transport->owner)
-+		return;
-+
- 	DBG("Transport %s Owner %s", transport->path, owner->name);
- 
- 	/* Reply if owner has a pending request */
-@@ -597,7 +645,8 @@ static gboolean get_state(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
--static gboolean delay_exists(const GDBusPropertyTable *property, void *data)
-+static gboolean delay_reporting_exists(const GDBusPropertyTable *property,
-+							void *data)
- {
- 	struct media_transport *transport = data;
- 	struct a2dp_transport *a2dp = transport->data;
-@@ -605,7 +654,7 @@ static gboolean delay_exists(const GDBusPropertyTable *property, void *data)
- 	return a2dp->delay != 0;
- }
- 
--static gboolean get_delay(const GDBusPropertyTable *property,
-+static gboolean get_delay_reporting(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
- 	struct media_transport *transport = data;
-@@ -709,19 +758,181 @@ static const GDBusMethodTable transport_methods[] = {
- 	{ },
- };
- 
--static const GDBusPropertyTable transport_properties[] = {
-+static const GDBusPropertyTable a2dp_properties[] = {
- 	{ "Device", "o", get_device },
- 	{ "UUID", "s", get_uuid },
- 	{ "Codec", "y", get_codec },
- 	{ "Configuration", "ay", get_configuration },
- 	{ "State", "s", get_state },
--	{ "Delay", "q", get_delay, NULL, delay_exists },
-+	{ "Delay", "q", get_delay_reporting, NULL, delay_reporting_exists },
- 	{ "Volume", "q", get_volume, set_volume, volume_exists },
- 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists,
- 				G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
- 	{ }
- };
- 
-+static gboolean get_interval(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &bap->interval);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_framing(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	dbus_bool_t val = bap->framing;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN, &val);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_sdu(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &bap->sdu);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_retransmissions(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_BYTE, &bap->rtn);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_latency(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &bap->latency);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_delay(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &bap->delay);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_location(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	uint32_t location = bt_bap_stream_get_location(bap->stream);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT32, &location);
-+
-+	return TRUE;
-+}
-+
-+static gboolean get_metadata(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	struct iovec *meta = bt_bap_stream_get_metadata(bap->stream);
-+	DBusMessageIter array;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	if (meta)
-+		dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+							&meta->iov_base,
-+							meta->iov_len);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
-+static gboolean links_exists(const GDBusPropertyTable *property, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+
-+	return bap->linked;
-+}
-+
-+static void append_links(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	DBusMessageIter *array = user_data;
-+	struct media_transport *transport;
-+
-+	transport = find_transport_by_bap_stream(stream);
-+	if (!transport) {
-+		error("Unable to find transport");
-+		return;
-+	}
-+
-+	dbus_message_iter_append_basic(array, DBUS_TYPE_OBJECT_PATH,
-+					&transport->path);
-+}
-+
-+static gboolean get_links(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
-+	DBusMessageIter array;
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_OBJECT_PATH_AS_STRING,
-+					&array);
-+
-+	queue_foreach(links, append_links, &array);
-+
-+	dbus_message_iter_close_container(iter, &array);
-+
-+	return TRUE;
-+}
-+
-+static const GDBusPropertyTable bap_properties[] = {
-+	{ "Device", "o", get_device },
-+	{ "UUID", "s", get_uuid },
-+	{ "Codec", "y", get_codec },
-+	{ "Configuration", "ay", get_configuration },
-+	{ "State", "s", get_state },
-+	{ "Interval", "u", get_interval },
-+	{ "Framing", "b", get_framing },
-+	{ "SDU", "q", get_sdu },
-+	{ "Retransmissions", "y", get_retransmissions },
-+	{ "Latency", "q", get_latency },
-+	{ "Delay", "u", get_delay },
-+	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
-+	{ "Location", "u", get_location },
-+	{ "Metadata", "ay", get_metadata },
-+	{ "Links", "ao", get_links, NULL, links_exists },
-+	{ }
-+};
-+
- static void destroy_a2dp(void *data)
- {
- 	struct a2dp_transport *a2dp = data;
-@@ -842,15 +1053,337 @@ static int media_transport_init_sink(struct media_transport *transport)
- 	return 0;
- }
- 
-+static void bap_enable_complete(struct bt_bap_stream *stream,
-+					uint8_t code, uint8_t reason,
-+					void *user_data)
-+{
-+	struct media_owner *owner = user_data;
-+
-+	if (code)
-+		media_transport_remove_owner(owner->transport);
-+}
-+
-+static gboolean resume_complete(void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct media_owner *owner = transport->owner;
-+
-+	if (!owner)
-+		return FALSE;
-+
-+	if (transport->fd < 0) {
-+		media_transport_remove_owner(transport);
-+		return FALSE;
-+	}
-+
-+	if (owner->pending) {
-+		gboolean ret;
-+
-+		ret = g_dbus_send_reply(btd_get_dbus_connection(),
-+					owner->pending->msg,
-+					DBUS_TYPE_UNIX_FD, &transport->fd,
-+					DBUS_TYPE_UINT16, &transport->imtu,
-+					DBUS_TYPE_UINT16, &transport->omtu,
-+						DBUS_TYPE_INVALID);
-+		if (!ret) {
-+			media_transport_remove_owner(transport);
-+			return FALSE;
-+		}
-+	}
-+
-+	media_owner_remove(owner);
-+
-+	transport_set_state(transport, TRANSPORT_STATE_ACTIVE);
-+
-+	return FALSE;
-+}
-+
-+static void bap_update_links(const struct media_transport *transport);
-+
-+static bool match_link_transport(const void *data, const void *user_data)
-+{
-+	const struct bt_bap_stream *stream = data;
-+	const struct media_transport *transport;
-+
-+	transport = find_transport_by_bap_stream(stream);
-+	if (!transport)
-+		return false;
-+
-+	bap_update_links(transport);
-+
-+	return true;
-+}
-+
-+static void bap_update_links(const struct media_transport *transport)
-+{
-+	struct bap_transport *bap = transport->data;
-+	struct queue *links = bt_bap_stream_io_get_links(bap->stream);
-+
-+	if (bap->linked == !queue_isempty(links))
-+		return;
-+
-+	bap->linked = !queue_isempty(links);
-+
-+	/* Check if the links transport has been create yet */
-+	if (bap->linked && !queue_find(links, match_link_transport, NULL)) {
-+		bap->linked = false;
-+		return;
-+	}
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(), transport->path,
-+						MEDIA_TRANSPORT_INTERFACE,
-+						"Links");
-+
-+	DBG("stream %p linked %s", bap->stream, bap->linked ? "true" : "false");
-+}
-+
-+static guint resume_bap(struct media_transport *transport,
-+				struct media_owner *owner)
-+{
-+	struct bap_transport *bap = transport->data;
-+	guint id;
-+
-+	if (!bap->stream)
-+		return 0;
-+
-+	bap_update_links(transport);
-+
-+	switch (bt_bap_stream_get_state(bap->stream)) {
-+	case BT_BAP_STREAM_STATE_ENABLING:
-+		bap_enable_complete(bap->stream, 0x00, 0x00, owner);
-+		if (owner->pending)
-+			return owner->pending->id;
-+		return 0;
-+	case BT_BAP_STREAM_STATE_STREAMING:
-+		return g_idle_add(resume_complete, transport);
-+	}
-+
-+	id = bt_bap_stream_enable(bap->stream, bap->linked, NULL,
-+					bap_enable_complete, owner);
-+	if (!id)
-+		return 0;
-+
-+	if (transport->state == TRANSPORT_STATE_IDLE)
-+		transport_set_state(transport, TRANSPORT_STATE_REQUESTING);
-+
-+	return id;
-+}
-+
-+static void bap_stop_complete(struct bt_bap_stream *stream,
-+					uint8_t code, uint8_t reason,
-+					void *user_data)
-+{
-+	struct media_owner *owner = user_data;
-+	struct media_request *req = owner->pending;
-+	struct media_transport *transport = owner->transport;
-+
-+	/* Release always succeeds */
-+	if (req) {
-+		req->id = 0;
-+		media_request_reply(req, 0);
-+		media_owner_remove(owner);
-+	}
-+
-+	transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+	media_transport_remove_owner(transport);
-+}
-+
-+static void bap_disable_complete(struct bt_bap_stream *stream,
-+					uint8_t code, uint8_t reason,
-+					void *user_data)
-+{
-+	bap_stop_complete(stream, code, reason, user_data);
-+}
-+
-+static guint suspend_bap(struct media_transport *transport,
-+				struct media_owner *owner)
-+{
-+	struct bap_transport *bap = transport->data;
-+	bt_bap_stream_func_t func = NULL;
-+
-+	if (!bap->stream)
-+		return 0;
-+
-+	if (owner)
-+		func = bap_disable_complete;
-+	else
-+		transport_set_state(transport, TRANSPORT_STATE_IDLE);
-+
-+	bap_update_links(transport);
-+
-+	return bt_bap_stream_disable(bap->stream, bap->linked, func, owner);
-+}
-+
-+static void cancel_bap(struct media_transport *transport, guint id)
-+{
-+	struct bap_transport *bap = transport->data;
-+
-+	if (!bap->stream)
-+		return;
-+
-+	bt_bap_stream_cancel(bap->stream, id);
-+}
-+
-+static void link_set_state(void *data, void *user_data)
-+{
-+	struct bt_bap_stream *stream = data;
-+	transport_state_t state = PTR_TO_UINT(user_data);
-+	struct media_transport *transport;
-+
-+	transport = find_transport_by_bap_stream(stream);
-+	if (!transport) {
-+		error("Unable to find transport");
-+		return;
-+	}
-+
-+	transport_set_state(transport, state);
-+}
-+
-+static void set_state_bap(struct media_transport *transport,
-+					transport_state_t state)
-+{
-+	struct bap_transport *bap = transport->data;
-+
-+	if (!bap->linked)
-+		return;
-+
-+	/* Update links */
-+	queue_foreach(bt_bap_stream_io_get_links(bap->stream), link_set_state,
-+							UINT_TO_PTR(state));
-+}
-+
-+static void bap_state_changed(struct bt_bap_stream *stream, uint8_t old_state,
-+				uint8_t new_state, void *user_data)
-+{
-+	struct media_transport *transport = user_data;
-+	struct bap_transport *bap = transport->data;
-+	struct media_owner *owner = transport->owner;
-+	struct io *io;
-+	GIOChannel *chan;
-+	GError *err = NULL;
-+	int fd;
-+	uint16_t imtu, omtu;
-+
-+	if (bap->stream != stream)
-+		return;
-+
-+	DBG("stream %p: %s(%u) -> %s(%u)", stream,
-+			bt_bap_stream_statestr(old_state), old_state,
-+			bt_bap_stream_statestr(new_state), new_state);
-+
-+	switch (new_state) {
-+	case BT_BAP_STREAM_STATE_IDLE:
-+	case BT_BAP_STREAM_STATE_CONFIG:
-+	case BT_BAP_STREAM_STATE_QOS:
-+		/* If a request is pending wait it to complete */
-+		if (owner && owner->pending)
-+			return;
-+		transport_update_playing(transport, FALSE);
-+		return;
-+	case BT_BAP_STREAM_STATE_DISABLING:
-+		return;
-+	case BT_BAP_STREAM_STATE_ENABLING:
-+		if (!bt_bap_stream_get_io(stream))
-+			return;
-+		break;
-+	case BT_BAP_STREAM_STATE_STREAMING:
-+		break;
-+	}
-+
-+	io = bt_bap_stream_get_io(stream);
-+	if (!io) {
-+		error("Unable to get stream IO");
-+		/* TODO: Fail if IO has not been established */
-+		goto done;
-+	}
-+
-+	fd = io_get_fd(io);
-+	if (fd < 0) {
-+		error("Unable to get IO fd");
-+		goto done;
-+	}
-+
-+	chan = g_io_channel_unix_new(fd);
-+
-+	if (!bt_io_get(chan, &err, BT_IO_OPT_OMTU, &omtu,
-+					BT_IO_OPT_IMTU, &imtu,
-+					BT_IO_OPT_INVALID)) {
-+		error("%s", err->message);
-+		goto done;
-+	}
-+
-+	g_io_channel_unref(chan);
-+
-+	media_transport_set_fd(transport, fd, imtu, omtu);
-+	transport_update_playing(transport, TRUE);
-+
-+done:
-+	resume_complete(transport);
-+}
-+
-+static void bap_connecting(struct bt_bap_stream *stream, bool state, int fd,
-+							void *user_data)
-+{
-+	struct media_transport *transport = user_data;
-+	struct bap_transport *bap = transport->data;
-+
-+	if (bap->stream != stream)
-+		return;
-+
-+	bap_update_links(transport);
-+}
-+
-+static void free_bap(void *data)
-+{
-+	struct bap_transport *bap = data;
-+
-+	bt_bap_state_unregister(bt_bap_stream_get_session(bap->stream),
-+							bap->state_id);
-+	free(bap);
-+}
-+
-+static int media_transport_init_bap(struct media_transport *transport,
-+							void *stream)
-+{
-+	struct bt_bap_qos *qos;
-+	struct bap_transport *bap;
-+
-+	qos = bt_bap_stream_get_qos(stream);
-+
-+	bap = new0(struct bap_transport, 1);
-+	bap->stream = stream;
-+	bap->interval = qos->interval;
-+	bap->framing = qos->framing;
-+	bap->phy = qos->phy;
-+	bap->rtn = qos->rtn;
-+	bap->latency = qos->latency;
-+	bap->delay = qos->delay;
-+	bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
-+						bap_state_changed,
-+						bap_connecting,
-+						transport, NULL);
-+
-+	transport->data = bap;
-+	transport->resume = resume_bap;
-+	transport->suspend = suspend_bap;
-+	transport->cancel = cancel_bap;
-+	transport->set_state = set_state_bap;
-+	transport->destroy = free_bap;
-+
-+	return 0;
-+}
-+
- struct media_transport *media_transport_create(struct btd_device *device,
- 						const char *remote_endpoint,
- 						uint8_t *configuration,
--						size_t size, void *data)
-+						size_t size, void *data,
-+						void *stream)
- {
- 	struct media_endpoint *endpoint = data;
- 	struct media_transport *transport;
- 	const char *uuid;
- 	static int fd = 0;
-+	const GDBusPropertyTable *properties;
- 
- 	transport = g_new0(struct media_transport, 1);
- 	transport->device = device;
-@@ -868,15 +1401,22 @@ struct media_transport *media_transport_create(struct btd_device *device,
- 	if (strcasecmp(uuid, A2DP_SOURCE_UUID) == 0) {
- 		if (media_transport_init_source(transport) < 0)
- 			goto fail;
-+		properties = a2dp_properties;
- 	} else if (strcasecmp(uuid, A2DP_SINK_UUID) == 0) {
- 		if (media_transport_init_sink(transport) < 0)
- 			goto fail;
-+		properties = a2dp_properties;
-+	} else if (!strcasecmp(uuid, PAC_SINK_UUID) ||
-+				!strcasecmp(uuid, PAC_SOURCE_UUID)) {
-+		if (media_transport_init_bap(transport, stream) < 0)
-+			goto fail;
-+		properties = bap_properties;
- 	} else
- 		goto fail;
- 
- 	if (g_dbus_register_interface(btd_get_dbus_connection(),
- 				transport->path, MEDIA_TRANSPORT_INTERFACE,
--				transport_methods, NULL, transport_properties,
-+				transport_methods, NULL, properties,
- 				transport, media_transport_free) == FALSE) {
- 		error("Could not register transport %s", transport->path);
- 		goto fail;
-diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
-index 51a67ea74f46..102fc3cf1153 100644
---- a/profiles/audio/transport.h
-+++ b/profiles/audio/transport.h
-@@ -14,7 +14,8 @@ struct media_transport;
- struct media_transport *media_transport_create(struct btd_device *device,
- 						const char *remote_endpoint,
- 						uint8_t *configuration,
--						size_t size, void *data);
-+						size_t size, void *data,
-+						void *stream);
- 
- void media_transport_destroy(struct media_transport *transport);
- const char *media_transport_get_path(struct media_transport *transport);
+ static void connect_handler(DBusConnection *connection, void *user_data)
 -- 
 2.37.2
 
