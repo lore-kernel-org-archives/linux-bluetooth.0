@@ -2,147 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84720ECAAD2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Aug 2022 22:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E779CECAAD2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Aug 2022 22:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229826AbiH2Waz (ORCPT
+        id S229530AbiH2W4S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Aug 2022 18:30:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41102 "EHLO
+        Mon, 29 Aug 2022 18:56:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229721AbiH2Wax (ORCPT
+        with ESMTP id S229499AbiH2W4R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Aug 2022 18:30:53 -0400
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 234D565579
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 15:30:50 -0700 (PDT)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-11f0fa892aeso4413289fac.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 15:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=025FWm/Lhu7iabC9EfbOsTVReX4WjqKIYoPyUOhMHcw=;
-        b=mKvuD0jqqjUV4Mh4ym/+Fuj6wMj4JW/Ijd/s84xeukK8f54LOi1aaqOYPntldGgqEO
-         Nkxmnx6CJjarGuxHJeuaqLzg9lLVvF5a0hBexjIhuBClEA+7Y38z7Ol+5G+FguXBvlqF
-         GNzQMbzQGLaw5P0uXv9FXn8mXgKPO+3z/XRv0HwedfTtejpDKtDYK1EfupGMUZ4NRuEj
-         YfnLN6L8F3GrpmDI2Frlr3S+Chu0Sh3S9yNeZn/7UpQT0haQ5x89scof8bl33lt2ygPn
-         R4nFlfGVz+j9bVbU8qcQvpayC64I6tLaO4YGLAiFAgZ/XGFEWwdjcmkduNBsv5Mrh1zX
-         kAtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=025FWm/Lhu7iabC9EfbOsTVReX4WjqKIYoPyUOhMHcw=;
-        b=8ErACyawG1+tgQV1CC32pUJZIb5VCSbgJ2fC/PGWHVQiWTeizrjbLrttFkSIUDDRXT
-         b7cCDZbUBQki6Veml8OpFZQyURlNPXqaQXuHgYwOrjBI3DKjDjvTgL1qR9vAgnDSfgcl
-         5Fd7LnkO+j4yTqfxSte2s34JBHbLL+kC7F1fgErhJG/F8yy+SrHHS2DREXPuSAO8/71E
-         ksEI5ks1d8PiEYrH6Niiqw+ZERGl5TyUvoXhYjmFWY58UoeT345nxkGtNlkhks69YNKl
-         B0w8pW7dG3+k8tjuPZkvhc35basMPbfHLlWn6AnTCIK81s+CzXEPZ1qrkPbZZlRT92FE
-         sLCA==
-X-Gm-Message-State: ACgBeo2eq1IFSwSEMm1s2xGonqJxWqVUTH196YIVzac78banYgDqeVGs
-        bFivr1sj8QVV4AqXxs5698M42i4dsWI=
-X-Google-Smtp-Source: AA6agR5Kmup4y7EdrC9/qIOZC2SU6aYQuybtCeRQd8g7rCqizpL0FokeWIQzBAZxBLWm6dqhpEn7Iw==
-X-Received: by 2002:a05:6808:1304:b0:345:52b3:4b42 with SMTP id y4-20020a056808130400b0034552b34b42mr8350145oiv.145.1661812248936;
-        Mon, 29 Aug 2022 15:30:48 -0700 (PDT)
-Received: from [172.17.0.2] ([23.102.155.61])
-        by smtp.gmail.com with ESMTPSA id d12-20020a05680813cc00b003448fac8b00sm5489706oiw.29.2022.08.29.15.30.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Aug 2022 15:30:48 -0700 (PDT)
-Message-ID: <630d3e18.050a0220.70648.ec30@mx.google.com>
-Date:   Mon, 29 Aug 2022 15:30:48 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7196335430059527182=="
+        Mon, 29 Aug 2022 18:56:17 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD3C015FD5;
+        Mon, 29 Aug 2022 15:56:08 -0700 (PDT)
+X-UUID: 2fcd28232bc342e4a7afac1817c5ff61-20220830
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=+yvoj/4B+nCFvKI5wRjHfIXDDi4JJmZCKOW9oG2xHBA=;
+        b=eDmIOqdtxPrnokeJ0UUTtfdjLmWBJB5BzAwqI+1ZbtM0V3l9lniDRuPtaZ4r92nBOOst6uutgXvDOyokf/QAu3i8DbfvecACbbw7qHDHCUlDuuLmg94mWFmSsX18YRES3w/k620VU4+CkhGKllNtzWyu8gQyp6rX44vaCAHrxJQ=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.10,REQID:ea8ac647-6bd5-41f8-93fc-5feb191adc2f,OB:10,
+        LOB:0,IP:0,URL:0,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Relea
+        se_Ham,ACTION:release,TS:100
+X-CID-INFO: VERSION:1.1.10,REQID:ea8ac647-6bd5-41f8-93fc-5feb191adc2f,OB:10,LO
+        B:0,IP:0,URL:0,TC:0,Content:0,EDM:0,RT:0,SF:100,FILE:0,BULK:0,RULE:Spam_GS
+        981B3D,ACTION:quarantine,TS:100
+X-CID-META: VersionHash:84eae18,CLOUDID:30517720-1c20-48a5-82a0-25f9c331906d,C
+        OID:278089ba2d78,Recheck:0,SF:28|17|19|48,TC:nil,Content:0,EDM:-3,IP:nil,U
+        RL:11|1,File:nil,Bulk:40,QS:nil,BEC:nil,COL:0
+X-UUID: 2fcd28232bc342e4a7afac1817c5ff61-20220830
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 973737403; Tue, 30 Aug 2022 06:56:02 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.792.15; Tue, 30 Aug 2022 06:55:59 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.792.15 via Frontend Transport; Tue, 30 Aug 2022 06:55:59 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <mcchou@chromium.org>,
+        <shawnku@google.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, "Chris Lu" <chris.lu@mediatek.com>
+Subject: [PATCH] Bluetooth: btusb: Add a new PID/VID 13d3/3578 for MT7921
+Date:   Tue, 30 Aug 2022 06:55:58 +0800
+Message-ID: <575471871695aaae73ebc15eee73411ee53f4bb4.1661596165.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] shell: Set empty argument if optarg is NULL
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220829213738.779598-1-luiz.dentz@gmail.com>
-References: <20220829213738.779598-1-luiz.dentz@gmail.com>
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7196335430059527182==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Chris Lu <chris.lu@mediatek.com>
 
-This is automated email and please do not reply to this email!
+Add VID 13D3 & PID 3578 for MediaTek MT7921 USB Bluetooth chip.
 
-Dear submitter,
+The information in /sys/kernel/debug/usb/devices about the Bluetooth
+device is listed as the below.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=672191
+T:  Bus=03 Lev=01 Prnt=01 Port=07 Cnt=03 Dev#=  5 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=13d3 ProdID=3578 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.26 seconds
-GitLint                       PASS      1.52 seconds
-Prep - Setup ELL              PASS      32.33 seconds
-Build - Prep                  PASS      0.79 seconds
-Build - Configure             PASS      10.36 seconds
-Build - Make                  PASS      958.09 seconds
-Make Check                    PASS      13.15 seconds
-Make Check w/Valgrind         PASS      348.11 seconds
-Make Distcheck                PASS      292.00 seconds
-Build w/ext ELL - Configure   PASS      10.67 seconds
-Build w/ext ELL - Make        PASS      100.25 seconds
-Incremental Build w/ patches  PASS      237.25 seconds
-Scan Build                    WARNING   643.54 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,2/2] client: Add -e/--endpoint option to auto register endpoints
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#216: FILE: client/player.c:625:
-+		GDBusProxy *proxy = l->data;
-+		print_player(proxy, NULL);
-
-/github/workspace/src/12958474.patch total: 0 errors, 1 warnings, 185 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12958474.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-client/player.c:1758:25: warning: Dereference of null pointer
-        iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
-                               ^~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-src/shared/shell.c:1135:19: warning: Null pointer passed to 1st parameter expecting 'nonnull'
-                        data.timeout = atoi(optarg);
-                                       ^~~~~~~~~~~~
-src/shared/shell.c:1155:13: warning: Access to field 'options' results in a dereference of a null pointer (loaded from variable 'opt')
-                        if (c != opt->options[index - offset].val) {
-                                 ^~~~~~~~~~~~
-2 warnings generated.
-
-
-
-
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Chris Lu <chris.lu@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30dd443f395f..20bd085664bf 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -481,6 +481,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x13d3, 0x3567), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x13d3, 0x3578), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+-- 
+2.25.1
 
---===============7196335430059527182==--
