@@ -2,103 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10955ECAAD5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Aug 2022 13:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C84AECAAD2
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Aug 2022 14:58:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbiH2NcN (ORCPT
+        id S229498AbiH2O6u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Aug 2022 09:32:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50714 "EHLO
+        Mon, 29 Aug 2022 10:58:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbiH2NcL (ORCPT
+        with ESMTP id S229453AbiH2O6t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Aug 2022 09:32:11 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB4F5A8AE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 06:32:10 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id w18so5980624qki.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 06:32:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=5o7ndiYkStUph5QCK0hAlmN5kRBaciWQKhAVF8swbeY=;
-        b=oQghaspNqoaA32g3oVNcWHg+SPRiHzlTCeh0F+nLO9Cn0HGQnlqoubDceq7OVDNdpW
-         DOXCHmj4pdT9mQcdhFPhvd2gjFpCDch0AkUc4BEpFI7t+k/eh/pJXocEuTiXe0qHFU8G
-         rKCwnWVVwoAJiA4ysElqiG9cPFMNcNgXt7hsSj1aaZXbrl61Opy0JuNb1Zf0Ikhs6l5S
-         IfO5fvH1ShGA44dbSiHgsBVBLNa5ix2d3VnITf4pgKq578GGhUfsLUg7eF4aOBCfqWL5
-         ulOa1Xw9q53u6nqHvA/55Bdajc2jrqZhIsaLR/lgZk9FbSxgG40y1bjkZzHv06jqAfBz
-         eUVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=5o7ndiYkStUph5QCK0hAlmN5kRBaciWQKhAVF8swbeY=;
-        b=MLel5p/PurgD9FhvjmLeR3ZTl1i0HXsvUH4ND8Rq5RjSDPg6DbmxqWGOWTE5fis/kw
-         9nxgcJteWwjMne/J3aaG+JGnZWl5Xwh9cZtoJgEZaWzQhZyuixPb8prfWlMHa2nBtphx
-         l4ojN49iBdR+e/ibn7281+lNvSqw/Oa30B6ovg9T/Z3u7j2yGcmjk/H+ny2DuMDB+Q6r
-         swTqBZ+x/OevO/Kk7ohRKshbqq7bV3TiaxcClfuW2qNpUQhiYHksiA46w78z1miwzWbz
-         0Xu40zJohUtYMZfTCNOb4nEhQIaTeUfpqWwaJVV1T1ILc25qm4vYSM0NPgkLKf0Ocx90
-         eNpA==
-X-Gm-Message-State: ACgBeo2OMl3q0fxVuiHfT0bfy4wKrG+SvQLQkqf61G+Qa3hclYr+720/
-        lBXZvA3PLFhISBX8uR8vFSl5ZKk/O7M=
-X-Google-Smtp-Source: AA6agR5wKj6sUHe1bL31IHeeH4e5k3QbRy13AmW8EZf/o5G/NmbOIV68WPJylZlC201vxzuLrrooMw==
-X-Received: by 2002:a05:620a:2611:b0:6bb:9ef6:efbe with SMTP id z17-20020a05620a261100b006bb9ef6efbemr8248283qko.550.1661779929379;
-        Mon, 29 Aug 2022 06:32:09 -0700 (PDT)
-Received: from [172.17.0.2] ([137.117.58.89])
-        by smtp.gmail.com with ESMTPSA id dm41-20020a05620a1d6900b006ba9b2167a2sm5849745qkb.16.2022.08.29.06.32.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Aug 2022 06:32:09 -0700 (PDT)
-Message-ID: <630cbfd9.050a0220.b25d.bb6f@mx.google.com>
-Date:   Mon, 29 Aug 2022 06:32:09 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5627672515011680842=="
+        Mon, 29 Aug 2022 10:58:49 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFA8986C33
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 07:58:46 -0700 (PDT)
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 27TEwGpj081025;
+        Mon, 29 Aug 2022 23:58:16 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Mon, 29 Aug 2022 23:58:16 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 27TEwFNw081022
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 29 Aug 2022 23:58:15 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <376d3dd4-725a-a212-2701-09a80b7d3915@I-love.SAKURA.ne.jp>
+Date:   Mon, 29 Aug 2022 23:58:12 +0900
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, max.chou@realtek.com
-Subject: RE: [1/1] Bluetooth: btusb: Add Realtek RTL8852C support ID 0x13D3:0x3592
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220829114507.1024-1-max.chou@realtek.com>
-References: <20220829114507.1024-1-max.chou@realtek.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: [PATCH] Bluetooth: hci_{ldisc,serdev}: check percpu_init_rwsem()
+ failure
+Content-Language: en-US
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Ronald Tschalar <ronald@innovation.ch>,
+        Lukas Wunner <lukas@wunner.de>
+References: <000000000000bd19720591aac025@google.com>
+ <0000000000003a22d605934b6722@google.com>
+Cc:     syzbot <syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com>,
+        syzkaller-bugs@googlegroups.com,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <0000000000003a22d605934b6722@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5627672515011680842==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot is reporting NULL pointer dereference at hci_uart_tty_close() [1],
+for rcu_sync_enter() is called without rcu_sync_init() due to
+hci_uart_tty_open() ignoring percpu_init_rwsem() failure.
 
-This is automated email and please do not reply to this email!
+While we are at it, fix that hci_uart_register_device() ignores
+percpu_init_rwsem() failure and hci_uart_unregister_device() does not
+call percpu_free_rwsem().
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=672002
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.62 seconds
-GitLint                       PASS      0.98 seconds
-SubjectPrefix                 PASS      0.88 seconds
-BuildKernel                   PASS      34.04 seconds
-BuildKernel32                 PASS      30.25 seconds
-Incremental Build with patchesPASS      42.85 seconds
-TestRunner: Setup             PASS      498.43 seconds
-TestRunner: l2cap-tester      PASS      17.88 seconds
-TestRunner: bnep-tester       PASS      6.85 seconds
-TestRunner: mgmt-tester       PASS      105.02 seconds
-TestRunner: rfcomm-tester     PASS      10.23 seconds
-TestRunner: sco-tester        PASS      10.05 seconds
-TestRunner: smp-tester        PASS      10.06 seconds
-TestRunner: userchan-tester   PASS      7.04 seconds
-
-
-
+Link: https://syzkaller.appspot.com/bug?extid=576dfca25381fb6fbc5f [1]
+Reported-by: syzbot <syzbot+576dfca25381fb6fbc5f@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Fixes: 67d2f8781b9f00d1 ("Bluetooth: hci_ldisc: Allow sleeping while proto locks are held.")
+Fixes: d73e172816652772 ("Bluetooth: hci_serdev: Init hci_uart proto_lock to avoid oops")
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_ldisc.c  |  7 +++++--
+ drivers/bluetooth/hci_serdev.c | 10 +++++++---
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index f537673ede17..865112e96ff9 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -493,6 +493,11 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 		BT_ERR("Can't allocate control structure");
+ 		return -ENFILE;
+ 	}
++	if (percpu_init_rwsem(&hu->proto_lock)) {
++		BT_ERR("Can't allocate semaphore structure");
++		kfree(hu);
++		return -ENOMEM;
++	}
+ 
+ 	tty->disc_data = hu;
+ 	hu->tty = tty;
+@@ -505,8 +510,6 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
+ 	INIT_WORK(&hu->write_work, hci_uart_write_work);
+ 
+-	percpu_init_rwsem(&hu->proto_lock);
+-
+ 	/* Flush any pending characters in the driver */
+ 	tty_driver_flush_buffer(tty);
+ 
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index c0e5f42ec6b7..f16fd79bc02b 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -310,11 +310,12 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 
+ 	serdev_device_set_client_ops(hu->serdev, &hci_serdev_client_ops);
+ 
++	if (percpu_init_rwsem(&hu->proto_lock))
++		return -ENOMEM;
++
+ 	err = serdev_device_open(hu->serdev);
+ 	if (err)
+-		return err;
+-
+-	percpu_init_rwsem(&hu->proto_lock);
++		goto err_rwsem;
+ 
+ 	err = p->open(hu);
+ 	if (err)
+@@ -389,6 +390,8 @@ int hci_uart_register_device(struct hci_uart *hu,
+ 	p->close(hu);
+ err_open:
+ 	serdev_device_close(hu->serdev);
++err_rwsem:
++	percpu_free_rwsem(&hu->proto_lock);
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_register_device);
+@@ -410,5 +413,6 @@ void hci_uart_unregister_device(struct hci_uart *hu)
+ 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 		serdev_device_close(hu->serdev);
+ 	}
++	percpu_free_rwsem(&hu->proto_lock);
+ }
+ EXPORT_SYMBOL_GPL(hci_uart_unregister_device);
+-- 
+2.18.4
 
---===============5627672515011680842==--
