@@ -2,126 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BB3ECAAD1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 06:48:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9792EECAAD4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 13:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbiH3GsG (ORCPT
+        id S229987AbiH3NsE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Aug 2022 02:48:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
+        Tue, 30 Aug 2022 09:48:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229490AbiH3GsF (ORCPT
+        with ESMTP id S229874AbiH3Nri (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Aug 2022 02:48:05 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6C05F9BC;
-        Mon, 29 Aug 2022 23:48:04 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q3so6968383pjg.3;
-        Mon, 29 Aug 2022 23:48:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc;
-        bh=2aS+r6wBK2+PSFlnqjheNWbHldCaQpTeaw4a46KMjuY=;
-        b=Ec33OGxGF5muwLz9d5fYWvaXj8xKc/P3EUrO9wXigYQz1+9rKaJMM7TFHm+3VEYr2M
-         ugFiXyff0U78kzi1mcYpzJ3LHuquSeRyi37b6sWqQpIgGGZyKSYgGw7fxqJ15Plq/FpF
-         mJCN1i/Ru/LkzdIdMX1Z8F3RPw2io63rk63qDJKmJMb1iLKvn83Iz/TRa8g4IDzBh5k6
-         6Wp2wFNBXbtWGyaFdIbakIPB0mpVz/szIaL/B+c7KTUCv9WbwQGi60AuonSI/H6PK/XG
-         OyXgcWWhwtX08IQTaDSwFZsKcVnnErb/ucBIJcBblgeWZxP5EFQyEz9kLdxFSPJ6VccE
-         gpwg==
+        Tue, 30 Aug 2022 09:47:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87D9811F186
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 06:45:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1661867104;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=4TQ3D3Ecv0JVJq75Mysm7I94dQGdbTCqUokREWAuRr0=;
+        b=BHyByNsBKJTchSpkig9vd3eFeHb5eLRtnQK6warfWLuT2LUEurq9xuUNJFtHjhpWZHX6bJ
+        +Y/pxvCKtNqOd/ULpc028vzWrckyC3Kd5uW/JhJd4bKBgYWpWzxgbXxQVN2Rhlo9DWOueO
+        7EepWdIxBtV2FVklJ2tmLX3XN4XuK/E=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-562-_ihsjzN5OtKrl4Kf6zB5TA-1; Tue, 30 Aug 2022 09:45:03 -0400
+X-MC-Unique: _ihsjzN5OtKrl4Kf6zB5TA-1
+Received: by mail-wr1-f71.google.com with SMTP id r7-20020adfbb07000000b00225b9579132so1758287wrg.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 06:45:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc;
-        bh=2aS+r6wBK2+PSFlnqjheNWbHldCaQpTeaw4a46KMjuY=;
-        b=S2eSKrcOUEmIxTa54alUtt+lyuqv7H0BhlPc7ufxihP8Ky7ePD+Zsw0hM5WTx8wSzg
-         K1DP7NS1WuuZks01I7RnRDF8Oge7wtUmGOi3pz51p0gQ5NKVzBDYoL+PHyT8BbkoPxx5
-         whhDF88AcKcGbREnIQtu5jEAdwYgh7SZqoDTLyfi22f9yQ8vxMMFfuksbQNMWJelmMQK
-         Hf99mvoBFHofvCcOI9pQCjbpuqsKs786ZqHM4U73qpVl6vCgGB8InXZPTjxFIjvf+0y+
-         BzNri6KtJNE5IpRTfaUsq8Kp5cHRAouZnpd4c0OuMQidO6MTwWAvWg65lWICnMPUjT6C
-         b3Qw==
-X-Gm-Message-State: ACgBeo3c5uoBN/TazTfGLklXL+J4bHjVGWa+H1/h97z5RGd9q9N9dujz
-        7GocND56FE8wOdpSELITjPo=
-X-Google-Smtp-Source: AA6agR4y+h3j8Zxspgln0iqljpUhmCF3YrxmMLFKGWzuqj8ctfETOHMFax9+eFwP7FgoHlLeuKKZiw==
-X-Received: by 2002:a17:90b:1644:b0:1fb:ab0c:c5bf with SMTP id il4-20020a17090b164400b001fbab0cc5bfmr22200885pjb.27.1661842083872;
-        Mon, 29 Aug 2022 23:48:03 -0700 (PDT)
-Received: from [192.168.0.131] (198-27-223-25.fiber.dynamic.sonic.net. [198.27.223.25])
-        by smtp.gmail.com with ESMTPSA id 142-20020a621594000000b00534bb955b36sm8475723pfv.29.2022.08.29.23.48.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Aug 2022 23:48:03 -0700 (PDT)
-Message-ID: <f53dfd70-f8b3-8401-3f5a-d738b2f242e1@gmail.com>
-Date:   Mon, 29 Aug 2022 23:48:01 -0700
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=4TQ3D3Ecv0JVJq75Mysm7I94dQGdbTCqUokREWAuRr0=;
+        b=639YBbkU4Pvg9SNseMUUr3oh/D50NgwYft+9a3uvOeeOP/gqMoJS5pgRq3rZLPJj5G
+         WGTjFMFl0LOmMtREkuHXkcxmg2GuD+aUx3Ms4a52V/PGiire0C97xOGX6olNKWpq1Cav
+         loJB241tgE5Cw+DQXbmBVZBw+O4d8Mg5znDtl7C6QfLQUUjLBW0Tvzlzx2l+vHH/ofCd
+         uo5FyjFUHJYNTUDk7IuqYEtzzv4Mvni0wgS1WCjjC+99T2ykbHj5eLfGTaWUWwV8BOEU
+         /xD4xUJz2AbDzuEhA6s6vDKKZct9/4tfSZJb1t1cPXM2zSWZISKErGWlOta2MZuwAj+t
+         Pbow==
+X-Gm-Message-State: ACgBeo1rAqS8divhyh1VkIkykS0vQOZ9xf8WZ5znejqsTEjF52CocN5A
+        iSmKLLiSFduKujJG3qSq928HZkK/rU3tprykZeQTtRlAh5lIAULt5rvFivL07EiNvpjAtU7JTbQ
+        dDENrCq/Exw1rFQnBsHPAz82K2N8B
+X-Received: by 2002:a05:600c:ace:b0:3a5:b495:854d with SMTP id c14-20020a05600c0ace00b003a5b495854dmr9620576wmr.86.1661867102647;
+        Tue, 30 Aug 2022 06:45:02 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR7kE0OkvnuES7vDthBiH8iXuZiew08diUgUfwuPstZZgb2cSBtaApqD4FeCYJF2b3SOm8jHEg==
+X-Received: by 2002:a05:600c:ace:b0:3a5:b495:854d with SMTP id c14-20020a05600c0ace00b003a5b495854dmr9620557wmr.86.1661867102326;
+        Tue, 30 Aug 2022 06:45:02 -0700 (PDT)
+Received: from redhat.com ([2.55.191.225])
+        by smtp.gmail.com with ESMTPSA id r8-20020a5d6948000000b00226a5187528sm9535421wrw.48.2022.08.30.06.45.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Aug 2022 06:45:01 -0700 (PDT)
+Date:   Tue, 30 Aug 2022 09:44:58 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Igor Skalkin <igor.skalkin@opensynergy.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        mgo@opensynergy.com
+Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
+Message-ID: <20220830094441-mutt-send-email-mst@kernel.org>
+References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
+ <20220807185846-mutt-send-email-mst@kernel.org>
+ <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
+ <20220808081054-mutt-send-email-mst@kernel.org>
+ <20220811035817-mutt-send-email-mst@kernel.org>
+ <CABBYNZKZGxbt=jdpBL77x1mCeTPdDE-p-Pt8JjZN+KoRgR3Ohw@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: possible deadlock in rfcomm_sk_state_change
-Content-Language: en-US
-To:     Jiacheng Xu <578001344xu@gmail.com>
-Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        johan.hedberg@gmail.com, David Miller <davem@davemloft.net>,
-        luiz.dentz@gmail.com, Paolo Abeni <pabeni@redhat.com>
-References: <CAO4S-me4hoy0W6GASU3tOFF16+eaotxPbw+kqyc6vuxtxJyDZg@mail.gmail.com>
- <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-In-Reply-To: <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABBYNZKZGxbt=jdpBL77x1mCeTPdDE-p-Pt8JjZN+KoRgR3Ohw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-+cc Bluetooth and Networking maintainers
-
-Hi Jiacheng,
-
-On 28/8/22 04:03, Jiacheng Xu wrote:
-> Hi,
+On Thu, Aug 11, 2022 at 10:02:31AM -0700, Luiz Augusto von Dentz wrote:
+> Hi Michael,
 > 
-> I believe the deadlock is more than possible but actually real.
-> I got a poc that could stably trigger the deadlock.
+> On Thu, Aug 11, 2022 at 1:00 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Mon, Aug 08, 2022 at 08:16:11AM -0400, Michael S. Tsirkin wrote:
+> > > On Mon, Aug 08, 2022 at 02:04:43PM +0200, Igor Skalkin wrote:
+> > > > On 8/8/22 01:00, Michael S. Tsirkin wrote:
+> > > >
+> > > >     On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
+> > > >
+> > > >         According to specification [1], "For the device-specific configuration
+> > > >         space, the driver MUST use 8 bit wide accesses for 8 bit wide fields,
+> > > >         16 bit wide and aligned accesses for 16 bit wide fields and 32 bit wide
+> > > >         and aligned accesses for 32 and 64 bit wide fields.".
+> > > >
+> > > >         Current version of the configuration structure:
+> > > >
+> > > >             struct virtio_bt_config {
+> > > >                 __u8  type;
+> > > >                 __u16 vendor;
+> > > >                 __u16 msft_opcode;
+> > > >             } __attribute__((packed));
+> > > >
+> > > >         has both 16bit fields non-aligned.
+> > > >
+> > > >         This commit fixes it.
+> > > >
+> > > >         [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/v1/query?url=https%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1%2fvirtio%2dv1.1.pdf&umid=d1786ace-e8ea-40e8-9665-96c0949174e5&auth=53c7c7de28b92dfd96e93d9dd61a23e634d2fbec-39b15885ceebe9fda9357320aec1ccbac416a470
+> > > >
+> > > >         Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
+> > > >
+> > > >     This is all true enough, but the problem is
+> > > >     1. changing uapi like this can't be done, will break userspace
+> > > >     2. the driver has more issues and no one seems to want to
+> > > >        maintain it.
+> > > >     I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
+> > > >     to merge it for this release.
+> > > >
+> > > > This is very sad. We already use this driver in our projects.
+> > >
+> > > Really?  Can you step up to maintain it? Then we can fix the issues
+> > > and it won't be broken.
+> >
+> > Just a reminder that I'm waiting for a response on that.
+> > I just don't know enough about bluetooth.
 > 
-> poc: https://drive.google.com/file/d/1PjqvMtHsrrGM1MIRGKl_zJGR-teAMMQy/view?usp=sharing
+> Just a heads up that Marcel is on vacation, he did mention that he had
+> done some work to update virtio_bt thus why I didn't apply any of the
+> changes yet.
+
+Any update? when does Marcel return?
+
+> > --
+> > MST
+> >
 > 
-> Description/Root cause:
-> In rfcomm_sock_shutdown(), lock_sock() is called when releasing and
-> shutting down socket.
-> However, lock_sock() has to be called once more when the sk_state is
-> changed because the
-> lock is not always held when rfcomm_sk_state_change() is called. One
-> such call stack is:
 > 
->    rfcomm_sock_shutdown():
->      lock_sock();
->      __rfcomm_sock_close():
->        rfcomm_dlc_close():
->          __rfcomm_dlc_close():
->            rfcomm_dlc_lock();
->            rfcomm_sk_state_change():
->              lock_sock();
-> 
-> Besides the recursive deadlock, there is also an
-> issue of a lock hierarchy inversion between rfcomm_dlc_lock() and
-> lock_sock() if the socket is locked in rfcomm_sk_state_change().
+> -- 
+> Luiz Augusto von Dentz
 
-
-Thanks for the poc and for following the trail all the way to the root 
-cause - this was a known issue and I didn't realize the patch wasn't 
-applied.
-
->  > Reference: 
-https://lore.kernel.org/all/20211004180734.434511-1-desmondcheongzx@gmail.com/
-> 
-
-Fwiw, I tested the patch again with syzbot. It still applies cleanly to 
-the head of bluetooth-next and seems to address the root cause.
-
-Any thoughts from the maintainers on this issue and the proposed fix?
-
-Best,
-Desmond
