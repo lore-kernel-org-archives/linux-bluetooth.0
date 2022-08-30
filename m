@@ -2,69 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B98ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 14:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 707E6ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 14:48:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230296AbiH3OIy (ORCPT
+        id S230081AbiH3Or7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Aug 2022 10:08:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45238 "EHLO
+        Tue, 30 Aug 2022 10:47:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229850AbiH3OIx (ORCPT
+        with ESMTP id S229978AbiH3Or6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Aug 2022 10:08:53 -0400
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E084D6B66E;
-        Tue, 30 Aug 2022 07:08:51 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id k6-20020a05600c1c8600b003a54ecc62f6so6215782wms.5;
-        Tue, 30 Aug 2022 07:08:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=y8NRn56TTNghGF267n9YhDLoRC0D+RKLzmBK9wVjOtc=;
-        b=pOMRqM6He7s3vzVohn3MDfxZtYu5fFgYKqU8WsUBlLAf3iKoSSYLgdxCSVMrmFmB/N
-         +5dmTERwu3gvxPimjo/k0tbCqbMWExLd5u+VnDZlekNWwVoHRRq8+M1EME22j4ozynWs
-         sEENdBsF4+N/81AUBeKGBZ4PnhjrxTk6cfv3a1gumm50YrRKDho9Pae1pFtY4BYdicRW
-         MdXXH4cJIghykeL2O19r33cLB4nEddpFB5T5hoRICTyQoRJad2Iaqf/crWEL9SG9YqUq
-         ZNRGvvO3YBtZGEwuWt72pGTysUC4oUPwA7bsDYuE+Pi0k2dSeooxH8Bi9wPmHumGclPD
-         FCJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=y8NRn56TTNghGF267n9YhDLoRC0D+RKLzmBK9wVjOtc=;
-        b=JT9NHZ6/XG3unWUnHPQGYnrvhKZFBrwtOv4wMH3zB5Uyf194nj8PwTYm5o19K9koNN
-         NoSaUE9odT9F8ZH61ttWXjhOG6j20t9LMlxI+ewuJkItkJNo/wQafCe7cb676rchdmvv
-         yc6IuKk/0H6fEIWUuYV9SeVyfT3HvcKm40XUhWKHC+BGYOSa/FXM1IgtXnPwcIVbYHj7
-         97hM/WZdVW7RdmCKDoGio19gGSn5RWVX0rGAfcr3WS98otV6AVRDb/TTae0RDBh6jeT4
-         PEyLRBCBp5507yt0NM7SVVPlzTy8mPAmqGx77mmn/RhMbgJtkIxTb1EaSt6N23yOiZZX
-         o5zA==
-X-Gm-Message-State: ACgBeo2KiXo3M4Q3h48ZDzJN6tcF1EUwLhe3h1w+uqGC/658sQ1DlNuy
-        shZIKh2qkJ0ZeDbt8ohLT7vEkLhA4+GSQsscluk=
-X-Google-Smtp-Source: AA6agR5nsFK6ujOw2YPzLMclmkfXMZvvDGTRj+t3d9VLtjZXsOQ4PTDb8eJ9Ht0wuApnxWtm91zGhRRS2Q4ACxeoScg=
-X-Received: by 2002:a05:600c:3488:b0:3a8:52f7:b869 with SMTP id
- a8-20020a05600c348800b003a852f7b869mr1524842wmq.36.1661868530379; Tue, 30 Aug
- 2022 07:08:50 -0700 (PDT)
+        Tue, 30 Aug 2022 10:47:58 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2430CAC43
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 07:47:55 -0700 (PDT)
+Received: from localhost.localdomain (67.227.121.78.rev.sfr.net [78.121.227.67])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: fdanis)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 626D46601D85
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 15:47:54 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1661870874;
+        bh=yBLLzM38LyUdbeZVO1SWqH9gshr9zWyT818gF127xvg=;
+        h=From:To:Subject:Date:From;
+        b=RjiQawwcgU6Zj1QsvxilveC1qWmBHvVMG2ZKUDrrx5Fn0zhpip4HNEhbCaMy0YkzW
+         f3hx/vecD5agWAzNWUktyjEGfkdqk3KoiqeLjaKaUwg/6d/tm2b67UntitTRy/h5eX
+         xAC2c2ZhTt0lraOuR71RxfV0jtOZNQFmZvnQhBFgB4gNzivPPFljtc6gQyy1eUV2C2
+         1ZoWwS+QAckbod2olVtxEF2O5OPEJFGWbfMDKdOJTSUOWxTODm4AmXtLktjd+2SWj3
+         bwTZszqVZZ+6RFzsTS6R4roFi7vrvaJMzM8uKk5oNOz1XbzsyPNFwfTRm3NNlO9nx3
+         u9onaH7iZePzA==
+From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
+        <frederic.danis@collabora.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 0/3] profiles: Add remote endpoint path to SelectProperties
+Date:   Tue, 30 Aug 2022 16:47:31 +0200
+Message-Id: <20220830144734.55263-1-frederic.danis@collabora.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <00000000000016512d05e76bd837@google.com>
-In-Reply-To: <00000000000016512d05e76bd837@google.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 30 Aug 2022 22:08:38 +0800
-Message-ID: <CAJhGHyDPN0CWZD8PxFHoB66f6QBNFGx8Lwz9EG-kSB8Q2yriQw@mail.gmail.com>
-Subject: Re: [syzbot] upstream test error: WARNING in __queue_work
-To:     syzbot <syzbot+243b7d89777f90f7613b@syzkaller.appspotmail.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com, Tejun Heo <tj@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-CC: BLUETOOTH SUBSYSTEM
+The SelectProperties method is only called on the central (initiator)
+device. But there's no information related to the remote device for which
+is call is done.
+These commits allow the audio server to link this call method to the
+appropriate remote endpoint.
 
-It seems that hci_cmd_timeout() queues a work to a destroyed workqueue.
+Changes in V2:
+- Set endpoint part of the dictionary properties
+- Pass rpac to select function instead of DBus specific path
+- Add a new commit to keep consistency after fixing previous
+  patch for a checkpatch warning
+
+Frédéric Danis (3):
+  profiles: Add remote endpoint path to SelectProperties
+  doc: Add remote endpoint path to SelectProperties
+  profiles: Fix function definition style
+
+ doc/media-api.txt      |  6 ++++--
+ profiles/audio/bap.c   |  2 ++
+ profiles/audio/media.c | 15 ++++++++++++---
+ src/shared/bap.c       | 12 +++++++++++-
+ src/shared/bap.h       | 11 +++++++----
+ 5 files changed, 36 insertions(+), 10 deletions(-)
+
+-- 
+2.25.1
+
