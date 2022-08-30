@@ -2,104 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB45EECAAD5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 03:45:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BB3ECAAD1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 06:48:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229731AbiH3Dpl (ORCPT
+        id S230003AbiH3GsG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Aug 2022 23:45:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
+        Tue, 30 Aug 2022 02:48:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230189AbiH3DpK (ORCPT
+        with ESMTP id S229490AbiH3GsF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Aug 2022 23:45:10 -0400
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D560D72
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 20:44:47 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id d18-20020a9d72d2000000b0063934f06268so7288150otk.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Aug 2022 20:44:47 -0700 (PDT)
+        Tue, 30 Aug 2022 02:48:05 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F6C05F9BC;
+        Mon, 29 Aug 2022 23:48:04 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id q3so6968383pjg.3;
+        Mon, 29 Aug 2022 23:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc;
-        bh=HG4A5Got2WGDRD4E4UKrQc6x81EfUmJdMcNk1WUvotw=;
-        b=IW6c+TJaXq8lCIj5NKptzBpP+FUJ6TwuKGhvoD0UweP6oYf1pgz+yRnCQokCDLnKe+
-         shccpH/0oo1hqw9p/sP7m8D3JE2pZcUlHsa4/QTOsoeLmGRGrw30nwRz2WUZFl7MGEB1
-         IzYe8Xn9dmn6YRN5IIbIaGvzVrpLz5RxEEccsw2xza5XsO6ljNXKyoVGg7/YKVRlTDXm
-         Sn8kpKKMvF84VgokuP9pHmFYBehrXoXmZX/MQizL+ryHVDUtmtki6cqcuGspDwahKAfm
-         EL2knm+/XMtofnCaoi3QjLijk88UFTMac7juRErg9ievb8J0xnz1amXspbog6MSvetmH
-         fX3w==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc;
+        bh=2aS+r6wBK2+PSFlnqjheNWbHldCaQpTeaw4a46KMjuY=;
+        b=Ec33OGxGF5muwLz9d5fYWvaXj8xKc/P3EUrO9wXigYQz1+9rKaJMM7TFHm+3VEYr2M
+         ugFiXyff0U78kzi1mcYpzJ3LHuquSeRyi37b6sWqQpIgGGZyKSYgGw7fxqJ15Plq/FpF
+         mJCN1i/Ru/LkzdIdMX1Z8F3RPw2io63rk63qDJKmJMb1iLKvn83Iz/TRa8g4IDzBh5k6
+         6Wp2wFNBXbtWGyaFdIbakIPB0mpVz/szIaL/B+c7KTUCv9WbwQGi60AuonSI/H6PK/XG
+         OyXgcWWhwtX08IQTaDSwFZsKcVnnErb/ucBIJcBblgeWZxP5EFQyEz9kLdxFSPJ6VccE
+         gpwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc;
-        bh=HG4A5Got2WGDRD4E4UKrQc6x81EfUmJdMcNk1WUvotw=;
-        b=dfe9QSKtTFpAysvuR2jKrDpFZ5+fjgvUGzmO8F6GxYUaldkqPdPtMOqIS7x0c7guQj
-         yE6mOiUgqz9viTx4PxUoEX9faAfovBLp2ktNMJZuy8S9u/gn+t+BaMkXvSmsWW3mihnh
-         7InF8QDUhLFGTewFOawVaKVwC43uMrX92xWbake5yhsvlBasGCvX7mf9Uh1Ohtr51F10
-         dvpR9oUc4/w8L9LLjaYY4P3UozzhsVpVNrbnoWEXwA9oFjXFcnQpJyIOx2O2LliaxtmW
-         X07U1TqKkRoo6lEfSvNgqLRzM3iT2DT5Oxremv3auhRFtw6/shvQCoZUl7ePGIUA7eE1
-         YRKw==
-X-Gm-Message-State: ACgBeo0zc+MkAZMLgi0NPwTBbcB4jM8XhABMdfp1xK/sehMjPy4QMNNI
-        RYNVWNDGDRrbFK2v6tjKSOVmxgCtsvs=
-X-Google-Smtp-Source: AA6agR7GyJq4PQO4Wau0RtK7zS08evNVqXUIw/f3OuRGq7e6DmWzOQJBcELLbMMOmZ6+a3Q9z6MSCg==
-X-Received: by 2002:a05:6830:6385:b0:61d:357:2077 with SMTP id ch5-20020a056830638500b0061d03572077mr7678293otb.359.1661831086589;
-        Mon, 29 Aug 2022 20:44:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.225.176.141])
-        by smtp.gmail.com with ESMTPSA id e20-20020a4ab994000000b00441c26f8fadsm6080704oop.12.2022.08.29.20.44.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Aug 2022 20:44:46 -0700 (PDT)
-Message-ID: <630d87ae.4a0a0220.efd17.fc61@mx.google.com>
-Date:   Mon, 29 Aug 2022 20:44:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1074565701279190571=="
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc;
+        bh=2aS+r6wBK2+PSFlnqjheNWbHldCaQpTeaw4a46KMjuY=;
+        b=S2eSKrcOUEmIxTa54alUtt+lyuqv7H0BhlPc7ufxihP8Ky7ePD+Zsw0hM5WTx8wSzg
+         K1DP7NS1WuuZks01I7RnRDF8Oge7wtUmGOi3pz51p0gQ5NKVzBDYoL+PHyT8BbkoPxx5
+         whhDF88AcKcGbREnIQtu5jEAdwYgh7SZqoDTLyfi22f9yQ8vxMMFfuksbQNMWJelmMQK
+         Hf99mvoBFHofvCcOI9pQCjbpuqsKs786ZqHM4U73qpVl6vCgGB8InXZPTjxFIjvf+0y+
+         BzNri6KtJNE5IpRTfaUsq8Kp5cHRAouZnpd4c0OuMQidO6MTwWAvWg65lWICnMPUjT6C
+         b3Qw==
+X-Gm-Message-State: ACgBeo3c5uoBN/TazTfGLklXL+J4bHjVGWa+H1/h97z5RGd9q9N9dujz
+        7GocND56FE8wOdpSELITjPo=
+X-Google-Smtp-Source: AA6agR4y+h3j8Zxspgln0iqljpUhmCF3YrxmMLFKGWzuqj8ctfETOHMFax9+eFwP7FgoHlLeuKKZiw==
+X-Received: by 2002:a17:90b:1644:b0:1fb:ab0c:c5bf with SMTP id il4-20020a17090b164400b001fbab0cc5bfmr22200885pjb.27.1661842083872;
+        Mon, 29 Aug 2022 23:48:03 -0700 (PDT)
+Received: from [192.168.0.131] (198-27-223-25.fiber.dynamic.sonic.net. [198.27.223.25])
+        by smtp.gmail.com with ESMTPSA id 142-20020a621594000000b00534bb955b36sm8475723pfv.29.2022.08.29.23.48.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Aug 2022 23:48:03 -0700 (PDT)
+Message-ID: <f53dfd70-f8b3-8401-3f5a-d738b2f242e1@gmail.com>
+Date:   Mon, 29 Aug 2022 23:48:01 -0700
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
-Subject: RE: Bluetooth: Call shutdown for HCI_USER_CHANNEL
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220829195805.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
-References: <20220829195805.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: possible deadlock in rfcomm_sk_state_change
+Content-Language: en-US
+To:     Jiacheng Xu <578001344xu@gmail.com>
+Cc:     netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, David Miller <davem@davemloft.net>,
+        luiz.dentz@gmail.com, Paolo Abeni <pabeni@redhat.com>
+References: <CAO4S-me4hoy0W6GASU3tOFF16+eaotxPbw+kqyc6vuxtxJyDZg@mail.gmail.com>
+ <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com>
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+In-Reply-To: <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1074565701279190571==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
++cc Bluetooth and Networking maintainers
 
-This is automated email and please do not reply to this email!
+Hi Jiacheng,
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=672250
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.82 seconds
-GitLint                       PASS      0.76 seconds
-SubjectPrefix                 PASS      0.61 seconds
-BuildKernel                   PASS      40.97 seconds
-BuildKernel32                 PASS      34.06 seconds
-Incremental Build with patchesPASS      51.14 seconds
-TestRunner: Setup             PASS      570.93 seconds
-TestRunner: l2cap-tester      PASS      18.81 seconds
-TestRunner: iso-tester        PASS      18.14 seconds
-TestRunner: bnep-tester       PASS      7.05 seconds
-TestRunner: mgmt-tester       PASS      113.87 seconds
-TestRunner: rfcomm-tester     PASS      11.04 seconds
-TestRunner: sco-tester        PASS      10.56 seconds
-TestRunner: smp-tester        PASS      10.38 seconds
-TestRunner: userchan-tester   PASS      7.54 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
+On 28/8/22 04:03, Jiacheng Xu wrote:
+> Hi,
+> 
+> I believe the deadlock is more than possible but actually real.
+> I got a poc that could stably trigger the deadlock.
+> 
+> poc: https://drive.google.com/file/d/1PjqvMtHsrrGM1MIRGKl_zJGR-teAMMQy/view?usp=sharing
+> 
+> Description/Root cause:
+> In rfcomm_sock_shutdown(), lock_sock() is called when releasing and
+> shutting down socket.
+> However, lock_sock() has to be called once more when the sk_state is
+> changed because the
+> lock is not always held when rfcomm_sk_state_change() is called. One
+> such call stack is:
+> 
+>    rfcomm_sock_shutdown():
+>      lock_sock();
+>      __rfcomm_sock_close():
+>        rfcomm_dlc_close():
+>          __rfcomm_dlc_close():
+>            rfcomm_dlc_lock();
+>            rfcomm_sk_state_change():
+>              lock_sock();
+> 
+> Besides the recursive deadlock, there is also an
+> issue of a lock hierarchy inversion between rfcomm_dlc_lock() and
+> lock_sock() if the socket is locked in rfcomm_sk_state_change().
 
 
---===============1074565701279190571==--
+Thanks for the poc and for following the trail all the way to the root 
+cause - this was a known issue and I didn't realize the patch wasn't 
+applied.
+
+>  > Reference: 
+https://lore.kernel.org/all/20211004180734.434511-1-desmondcheongzx@gmail.com/
+> 
+
+Fwiw, I tested the patch again with syzbot. It still applies cleanly to 
+the head of bluetooth-next and seems to address the root cause.
+
+Any thoughts from the maintainers on this issue and the proposed fix?
+
+Best,
+Desmond
