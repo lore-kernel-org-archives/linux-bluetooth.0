@@ -2,57 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EF2ECAAD1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 17:45:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F59ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 19:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231455AbiH3RpU (ORCPT
+        id S231720AbiH3TZm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Aug 2022 13:45:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32788 "EHLO
+        Tue, 30 Aug 2022 15:25:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231510AbiH3Rot (ORCPT
+        with ESMTP id S231709AbiH3TZY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Aug 2022 13:44:49 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9434CB2760;
-        Tue, 30 Aug 2022 10:41:34 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id v26so6295559lfd.10;
-        Tue, 30 Aug 2022 10:41:34 -0700 (PDT)
+        Tue, 30 Aug 2022 15:25:24 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E93E47D787;
+        Tue, 30 Aug 2022 12:23:41 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id bq23so16904589lfb.7;
+        Tue, 30 Aug 2022 12:23:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc;
-        bh=fqPF+MWfeg/k3XnE3nr5+5+Bm3YtEGzavSRsoFVY5bU=;
-        b=JGt/Sl5KZiypaJtO/ZevExJngm47fE7Lp/B4DfxkKe2QnPOs5oHE+w7R9CsOAhlYBB
-         TfyA3Md/yoShK6WcrVQd/UURiBX9kMI1AFYb0AJ2ua5hQ4JSD6EVoLlrECUv9NgMv5Xo
-         8sGwMvQm14FkIry4dvSfLvNeUU/cCw0oEPFnjBFCQWFXZufUD2BGfotKoOAWq1XVe6ih
-         e6VG53UH980nqhEDJVsXWknMcFOyWzPpctD1ErQ6/mzg3LaOJRMliMLUA0m44nQmwb3M
-         XVWvVNZ9+JQSgV/xbKvoxjpb14rdqGFET6NyMMkkc1BqR7DmefC/4SYx1yOg3SEpMNHJ
-         VBMw==
+        bh=PofCDqq1/P6k1Jn4y9ZY/hH9ZV66RzTw5eiKc3y6V2I=;
+        b=dPArg/S1a5fJ8tPg31l2B55zSCu+K+g5akN0VMJWu7fJIwhOcW2KYWU7wLFuLysusJ
+         H1DIL1HVNbmxB9DQ9q8CCUlav5EsGYwD4/j6FzTeFVEDYOBb5JlA3PGAw3wIQFrV3U4n
+         YlVjhJw7k97BFNY9IFOyPVoH8Unl/qNIKrUtePUN1Gh4p4Teg1nzGAUVK+CGBVC0MorR
+         5m5XdvXnTJhK1kJ7fdUWuwpOXHm2QEh8JgWRD5XuzKv7EjLAIGeCdXi6UnK6xtUgTbZP
+         9BYRpn/Bg8l8jCeD/2VeCRYSdo+OYDTMdjuB0CrE5nMxFm9gDrZG+63sVUSQ6WIg4hpF
+         eq9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc;
-        bh=fqPF+MWfeg/k3XnE3nr5+5+Bm3YtEGzavSRsoFVY5bU=;
-        b=5G14WZNY959ir8mPM8ZB0w7/N2FBfWrP/JP2XFp/Bfv91jg+w5g4tw9NQ8fOqP5+IE
-         sHq4ynOFkcE1b51s5tvfNsbmDJtUW1x9pfEvYRZPWRQ5Ftsm4H228PXnOlj9n7bLCM/8
-         fI7kmL3QO1WY3wOsFzmOa3rLlyVNh4dYfuDgREjfpa/+V8M658G3iDmTvkFvhb2GqYGo
-         KxNpFGM9WYDW4RdRAmvk4XwN2llNj5fJcnYCM0WAtGtGRO5BoBhPuHoGVs/hv0uU+g5P
-         dYvsQur5/XTaf+Gh4ibL5qT2JewEAeKUhRl+erO3jt04Et5UUVDyYu3hSsS0OSk7B25z
-         nG9w==
-X-Gm-Message-State: ACgBeo1Ykj4PCW95H3w2IDWMGk1mrL//4rM+liSql7pO432+FnRYVLgK
-        4PoJ4umbhsv/SfVonSX184YNcIOfu1NJN1G10+0=
-X-Google-Smtp-Source: AA6agR7sHG4w93xAS6KYapqGyUBnhNmV4MRbk0BLnzFoBmM7S5TDHo9WUpNk4qfGndrsF/+tJZcqmc7POhPosTXqoWw=
-X-Received: by 2002:a05:6512:2621:b0:47f:d228:bdeb with SMTP id
- bt33-20020a056512262100b0047fd228bdebmr7618563lfb.121.1661881291091; Tue, 30
- Aug 2022 10:41:31 -0700 (PDT)
+        bh=PofCDqq1/P6k1Jn4y9ZY/hH9ZV66RzTw5eiKc3y6V2I=;
+        b=DzI3r5M04I6I9AbjkJoAb5dgZamfgdSPVkas81AZyAab4w6ZdSnZ1eQVXouSJ/2osD
+         i28pzbV3oNwJhllzO5fV+YUsqmCxXHX5cL+6TkV/IRGRmuw8V1sAtLkp1qHJKuHiMjhF
+         UU+0wyvhoOniF2XkHH3pFpk9dFTg0KElcHeZntdJZCVbdgLXLNe43WiJgchiRz7sCx7X
+         XcyBqOILFXO1Fw7fyv7nPClmkaJGQOz+Md8OSC4ZNcxI+a++Z/dd9tVDB1G+lPR1vAPY
+         /BKYxyJtL7ZwBQwqqeyKzUSxkHv850GJFnWs6fmOzyeOA7UZYrlWUiYyo57oED3EuxAM
+         w7Gw==
+X-Gm-Message-State: ACgBeo2ZLpYbjYXMGI9HMxy4IU0rTYUeT/V/FCiDaWlkQ8RmVS/ZzTkz
+        WC5O6psir1Qa6CXzfRRy0DoVj3YmLOTALy2Ebis=
+X-Google-Smtp-Source: AA6agR4SGoPeOqG3H6+/IqX3usnWitUxXya7RJa19u8/Z8QK2EQwDD9pb/Bihiuzq6jPnFFwBhCvbRGGKdGrYQUcbok=
+X-Received: by 2002:a05:6512:1ce:b0:494:81fc:e755 with SMTP id
+ f14-20020a05651201ce00b0049481fce755mr815471lfp.106.1661887417943; Tue, 30
+ Aug 2022 12:23:37 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAO4S-me4hoy0W6GASU3tOFF16+eaotxPbw+kqyc6vuxtxJyDZg@mail.gmail.com>
- <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com> <f53dfd70-f8b3-8401-3f5a-d738b2f242e1@gmail.com>
-In-Reply-To: <f53dfd70-f8b3-8401-3f5a-d738b2f242e1@gmail.com>
+ <CAO4S-mfTNEKCs8ZQcT09wDzxX8MfidmbTVzaFMD3oG4i7Ytynw@mail.gmail.com>
+ <f53dfd70-f8b3-8401-3f5a-d738b2f242e1@gmail.com> <CABBYNZLZv_Y6E-rFc3kKFk+PqwNkWAzneAw=cUTEY4yW-cTs1Q@mail.gmail.com>
+In-Reply-To: <CABBYNZLZv_Y6E-rFc3kKFk+PqwNkWAzneAw=cUTEY4yW-cTs1Q@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 30 Aug 2022 10:41:19 -0700
-Message-ID: <CABBYNZLZv_Y6E-rFc3kKFk+PqwNkWAzneAw=cUTEY4yW-cTs1Q@mail.gmail.com>
+Date:   Tue, 30 Aug 2022 12:23:26 -0700
+Message-ID: <CABBYNZJxzA0U5bL6d0KtAkZw6yfUSNcpaH3Oh=xZFZdER8FCog@mail.gmail.com>
 Subject: Re: possible deadlock in rfcomm_sk_state_change
 To:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
 Cc:     Jiacheng Xu <578001344xu@gmail.com>,
@@ -72,64 +73,78 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Desmond,
 
-On Mon, Aug 29, 2022 at 11:48 PM Desmond Cheong Zhi Xi
-<desmondcheongzx@gmail.com> wrote:
+On Tue, Aug 30, 2022 at 10:41 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> +cc Bluetooth and Networking maintainers
+> Hi Desmond,
 >
-> Hi Jiacheng,
->
-> On 28/8/22 04:03, Jiacheng Xu wrote:
-> > Hi,
+> On Mon, Aug 29, 2022 at 11:48 PM Desmond Cheong Zhi Xi
+> <desmondcheongzx@gmail.com> wrote:
 > >
-> > I believe the deadlock is more than possible but actually real.
-> > I got a poc that could stably trigger the deadlock.
+> > +cc Bluetooth and Networking maintainers
 > >
-> > poc: https://drive.google.com/file/d/1PjqvMtHsrrGM1MIRGKl_zJGR-teAMMQy/view?usp=sharing
+> > Hi Jiacheng,
 > >
-> > Description/Root cause:
-> > In rfcomm_sock_shutdown(), lock_sock() is called when releasing and
-> > shutting down socket.
-> > However, lock_sock() has to be called once more when the sk_state is
-> > changed because the
-> > lock is not always held when rfcomm_sk_state_change() is called. One
-> > such call stack is:
+> > On 28/8/22 04:03, Jiacheng Xu wrote:
+> > > Hi,
+> > >
+> > > I believe the deadlock is more than possible but actually real.
+> > > I got a poc that could stably trigger the deadlock.
+> > >
+> > > poc: https://drive.google.com/file/d/1PjqvMtHsrrGM1MIRGKl_zJGR-teAMMQy/view?usp=sharing
+> > >
+> > > Description/Root cause:
+> > > In rfcomm_sock_shutdown(), lock_sock() is called when releasing and
+> > > shutting down socket.
+> > > However, lock_sock() has to be called once more when the sk_state is
+> > > changed because the
+> > > lock is not always held when rfcomm_sk_state_change() is called. One
+> > > such call stack is:
+> > >
+> > >    rfcomm_sock_shutdown():
+> > >      lock_sock();
+> > >      __rfcomm_sock_close():
+> > >        rfcomm_dlc_close():
+> > >          __rfcomm_dlc_close():
+> > >            rfcomm_dlc_lock();
+> > >            rfcomm_sk_state_change():
+> > >              lock_sock();
+> > >
+> > > Besides the recursive deadlock, there is also an
+> > > issue of a lock hierarchy inversion between rfcomm_dlc_lock() and
+> > > lock_sock() if the socket is locked in rfcomm_sk_state_change().
 > >
-> >    rfcomm_sock_shutdown():
-> >      lock_sock();
-> >      __rfcomm_sock_close():
-> >        rfcomm_dlc_close():
-> >          __rfcomm_dlc_close():
-> >            rfcomm_dlc_lock();
-> >            rfcomm_sk_state_change():
-> >              lock_sock();
 > >
-> > Besides the recursive deadlock, there is also an
-> > issue of a lock hierarchy inversion between rfcomm_dlc_lock() and
-> > lock_sock() if the socket is locked in rfcomm_sk_state_change().
->
->
-> Thanks for the poc and for following the trail all the way to the root
-> cause - this was a known issue and I didn't realize the patch wasn't
-> applied.
->
-> >  > Reference:
-> https://lore.kernel.org/all/20211004180734.434511-1-desmondcheongzx@gmail.com/
+> > Thanks for the poc and for following the trail all the way to the root
+> > cause - this was a known issue and I didn't realize the patch wasn't
+> > applied.
 > >
+> > >  > Reference:
+> > https://lore.kernel.org/all/20211004180734.434511-1-desmondcheongzx@gmail.com/
+> > >
+> >
+> > Fwiw, I tested the patch again with syzbot. It still applies cleanly to
+> > the head of bluetooth-next and seems to address the root cause.
+> >
+> > Any thoughts from the maintainers on this issue and the proposed fix?
 >
-> Fwiw, I tested the patch again with syzbot. It still applies cleanly to
-> the head of bluetooth-next and seems to address the root cause.
->
-> Any thoughts from the maintainers on this issue and the proposed fix?
+> We probably need to introduce a test to rfcomm-tester to reproduce
+> this sort of problem, I also would like to avoid introducing a work
+> just to trigger a state change since we don't have such problem on the
+> likes of L2CAP socket so perhaps we need to rework the code a little
+> bit to avoid the locking problems.
 
-We probably need to introduce a test to rfcomm-tester to reproduce
-this sort of problem, I also would like to avoid introducing a work
-just to trigger a state change since we don't have such problem on the
-likes of L2CAP socket so perhaps we need to rework the code a little
-bit to avoid the locking problems.
+It looks like for L2CAP we use lock_sock_nested on teardown, we don't
+have the exact same behavior in RFCOMM but I think that might be worth
+a try if we can use that instead of introducing yet another work item.
 
-> Best,
-> Desmond
+> > Best,
+> > Desmond
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
 
 
