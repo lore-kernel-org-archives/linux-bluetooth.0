@@ -2,62 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06116ECAAD4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 21:42:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6423ECAAD4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Aug 2022 22:00:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231591AbiH3VmY (ORCPT
+        id S231906AbiH3WAW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Aug 2022 17:42:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43032 "EHLO
+        Tue, 30 Aug 2022 18:00:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231567AbiH3VmX (ORCPT
+        with ESMTP id S231741AbiH3V7s (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Aug 2022 17:42:23 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BC225590
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 14:42:21 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id w28so9647409qtc.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 14:42:21 -0700 (PDT)
+        Tue, 30 Aug 2022 17:59:48 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F53061129
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 14:55:39 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id x14so5302133qvr.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Aug 2022 14:55:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc;
-        bh=S3Xb8HQrFNZ6Qkf2GrFXhxzTLlBqF/OcAM4ZbE2n9I0=;
-        b=ZoRDPHa7Rs9lIY1j93YkCf/LcgnV0hmVp3TAo+P2W/4uWf3qXRnioJywmrhwOc7DS6
-         ntBnDh9I8qfUE68BUlbW12bqIDNTkJI0JeYdyCp01CcI9L1yYdqkgycOOJBrfjd0oWFK
-         sz48ho6YrS8uJZwyKCfeojakN+/EJYt8WB5LxfscuQ3A+Gc0aOkty4wcmY3aT0Jb67rP
-         YuFSiXfx+5MdP4M3sQN3y65ndPWBNada+X+hPhvL84pdTVFKWIp/U4yi3DYqmPPYucNZ
-         58wXMihjmzIs/VrsdtRK64K1ekzxDMYZqjno3cadpGpjFPapAVZ7W78MQ6JQ0/L/0eA6
-         5aAA==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc;
+        bh=TucAG9rZhLPFUqqSZyFxm7GU+bmlAjsdmyZ0/Tfa2uA=;
+        b=cPbsCO+7rmlvgOIADR8DqGb2ALwCbYCcHxyAV5FToS/AQT3+nFDJ0RDxmlP8Ivmh1t
+         DNo/tE7kBZt9fMkaciKAREBbL69T1/LQpbis3CNomX1mNK/L8fDNKb55ToNGp6sUyTIP
+         k9V5/8dBuoo8JR5NyTJWIjG2bE+l0C89R06Mmryweza+MwxuBXT/4UE7m9fueTvLOwq9
+         U+AsGZ9no3uEh3itQI7ObxyOh9TpCGy0dspxbP9le0swOObRwl97lR/IqG4WwZkEFZt0
+         y2rHkb7FoIFeUcZ3zps1QFPrEirUAPQRGl+mXpOwRREWDBbCRkg58uGtNsACpbQuLgRF
+         KlRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc;
-        bh=S3Xb8HQrFNZ6Qkf2GrFXhxzTLlBqF/OcAM4ZbE2n9I0=;
-        b=j/AKHU8XZIyi/cZqBhfwsFRBnnZBBDyjbX55nCJn8Grjncp2jIyLJ7XuZtdM7AYAHF
-         0uHY3HgLGT4lkaBku2Drvc2hojISFpziKwk9s+igSm2EHFg28XVtpf4xfulP7mvj6MBQ
-         2gqJpcqJOpejbGcKxJsb3rOxcgqeBgTYtq5grzGmCFbj4NJLR3BQE7qfGm8rp+nsEsvU
-         sO99WcHB4a7C982nMMxMl/u1j+eLGLuMpkIauhUlKTzYPRVloRUDlHz0YomwiAI4Kdl2
-         f6M37QBS0qfhrIH5b8Cz+mgsrm4G0etwm4Zn3hy4PAeAy+J0EEDND3Fk08bcnkETsKa9
-         ST/g==
-X-Gm-Message-State: ACgBeo0ZpNB/C5cYRalHzR+g1jLrjjn8Cl6l0blCaDtLJBvRE7WEDhEI
-        qkSHtLMfSnly1kKasQd8/WSZeKPsSGg=
-X-Google-Smtp-Source: AA6agR5/THLJr0P6W7ZcEdEVynuhYYYWDMbGqK40TlctaAzNi5cIG/UjxV4zS32PcHI4S6lHrPKw4A==
-X-Received: by 2002:ac8:4e4c:0:b0:344:8819:9a7b with SMTP id e12-20020ac84e4c000000b0034488199a7bmr16326919qtw.368.1661895740026;
-        Tue, 30 Aug 2022 14:42:20 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=TucAG9rZhLPFUqqSZyFxm7GU+bmlAjsdmyZ0/Tfa2uA=;
+        b=KfTu29aHvPbA/ojJ+nqvr+iZCL4RDErdRtLbom2CIBElMHu2I4AFOoXthlXcJ0NMtN
+         ulEjdrUfiJTStOXgOtA2maGiDBnZK7VMmHOqEXSPKwIihsmlmwVsNnsYTyhwx4A6WxRJ
+         M3hfkSRqJQF9A3pP/hI+BkK5KcUa9Sgx/WEjopWVJlnhltoUA2lBkmJZSehuATp7o/M4
+         AWPfzUw83jKQEmWYhCMEp4gCO7xvKpjBoTqrFn3Xm3TprhBEp92qLoSaKBwndo5+InQj
+         e4wvTuqhWhR83ZKE4yoDxI2UAHGJ7aGYCXXKYve1ai2qAhwZhQfAKeWJXouEXSzru19Q
+         BnrQ==
+X-Gm-Message-State: ACgBeo0Q/XJfS+9B4pAUxN+AIarflkEETwbBpT419UOpUCSegb91vcQU
+        mSCOkzsSt+MEc2n3T5fCh8PS0ExJcrc=
+X-Google-Smtp-Source: AA6agR4taO09WxzPXNVZLMDQ4hweSbVzkIDgeCd5zmEPK6m2fdZt+oXVKFyTYzcwQdSaRdtCJIvl7g==
+X-Received: by 2002:a05:6214:21e4:b0:499:3a0:47fd with SMTP id p4-20020a05621421e400b0049903a047fdmr9626444qvj.61.1661896486559;
+        Tue, 30 Aug 2022 14:54:46 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id fz18-20020a05622a5a9200b0031eb393aa45sm7529050qtb.40.2022.08.30.14.42.18
+        by smtp.gmail.com with ESMTPSA id y6-20020ae9f406000000b006baef6daa45sm8644289qkl.119.2022.08.30.14.54.45
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Aug 2022 14:42:19 -0700 (PDT)
+        Tue, 30 Aug 2022 14:54:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] shared/shell: Fix scan-build error
-Date:   Tue, 30 Aug 2022 14:42:15 -0700
-Message-Id: <20220830214215.1137276-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] media: Fix registering PAC endpoints if ISO socket are not supported
+Date:   Tue, 30 Aug 2022 14:54:44 -0700
+Message-Id: <20220830215444.1141653-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220830214215.1137276-1-luiz.dentz@gmail.com>
-References: <20220830214215.1137276-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -66,39 +64,70 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following error:
-
-src/shared/shell.c:1135:19: warning: Null pointer passed to 1st
-parameter expecting 'nonnull'
-                        data.timeout = atoi(optarg);
-                                       ^~~~~~~~~~~~
+If adapter don't support ISO sockets the PAC UUIDs shall not be allowed
+to be registered as they depend on ISO sockets to work properly.
 ---
- src/shared/shell.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ profiles/audio/media.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/src/shared/shell.c b/src/shared/shell.c
-index 4658819a4bde..46ba8112cfb0 100644
---- a/src/shared/shell.c
-+++ b/src/shared/shell.c
-@@ -1101,6 +1101,7 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 	struct option options[256];
- 	char optstr[256];
- 	size_t offset;
-+	char *endptr = NULL;
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index 85278a6d9be4..a7fa85d60310 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -1254,20 +1254,23 @@ static bool endpoint_properties_get(const char *uuid,
+ 	return true;
+ }
  
- 	offset = sizeof(main_options) / sizeof(struct option);
+-static bool endpoint_supported(void)
++static bool endpoint_supported(struct btd_adapter *adapter)
+ {
+ 	return true;
+ }
  
-@@ -1132,7 +1133,9 @@ void bt_shell_init(int argc, char **argv, const struct bt_shell_opt *opt)
- 			data.mode = 1;
- 			goto done;
- 		case 't':
--			data.timeout = atoi(optarg);
-+			data.timeout = strtol(optarg, &endptr, 0);
-+			if (!endptr || *endptr != '\0')
-+				printf("Unable to parse timeout\n");
+-static bool experimental_endpoint_supported(void)
++static bool experimental_endpoint_supported(struct btd_adapter *adapter)
+ {
++	if (!btd_adapter_has_exp_feature(adapter, EXP_FEAT_ISO_SOCKET))
++		return false;
++
+ 	return g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
+ }
+ 
+ static struct media_endpoint_init {
+ 	const char *uuid;
+ 	bool (*func)(struct media_endpoint *endpoint, int *err);
+-	bool (*supported)(void);
++	bool (*supported)(struct btd_adapter *adapter);
+ } init_table[] = {
+ 	{ A2DP_SOURCE_UUID, endpoint_init_a2dp_source, endpoint_supported },
+ 	{ A2DP_SINK_UUID, endpoint_init_a2dp_sink, endpoint_supported },
+@@ -1315,6 +1318,9 @@ media_endpoint_create(struct media_adapter *adapter,
+ 	for (i = 0; i < ARRAY_SIZE(init_table); i++) {
+ 		init = &init_table[i];
+ 
++		if (!init->supported(adapter->btd_adapter))
++			continue;
++
+ 		if (!strcasecmp(init->uuid, uuid)) {
+ 			succeeded = init->func(endpoint, err);
  			break;
- 		case 'z':
- 			data.zsh = 1;
+@@ -2971,6 +2977,7 @@ static const GDBusMethodTable media_methods[] = {
+ static gboolean supported_uuids(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
++	struct media_adapter *adapter = data;
+ 	DBusMessageIter entry;
+ 	size_t i;
+ 
+@@ -2980,7 +2987,7 @@ static gboolean supported_uuids(const GDBusPropertyTable *property,
+ 	for (i = 0; i < ARRAY_SIZE(init_table); i++) {
+ 		struct media_endpoint_init *init = &init_table[i];
+ 
+-		if (init->supported())
++		if (init->supported(adapter->btd_adapter))
+ 			dbus_message_iter_append_basic(&entry, DBUS_TYPE_STRING,
+ 							&init->uuid);
+ 	}
 -- 
 2.37.2
 
