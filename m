@@ -2,149 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF601ECAAD1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Aug 2022 23:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC5D4ECAAD4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Aug 2022 23:17:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231394AbiHaXQk (ORCPT
+        id S232664AbiHaXRz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Aug 2022 19:16:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36376 "EHLO
+        Wed, 31 Aug 2022 19:17:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232804AbiHaXQQ (ORCPT
+        with ESMTP id S232576AbiHaXRy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Aug 2022 19:16:16 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05676B10;
-        Wed, 31 Aug 2022 16:15:32 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B092261CA0;
-        Wed, 31 Aug 2022 23:15:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C49AC43470;
-        Wed, 31 Aug 2022 23:15:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1661987731;
-        bh=t5oLcB72prq3YZIUNqEPd41rqmg1WT6c81QZ9d4pP+M=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=JJdmPXPkEb5KAKQK58RkRFZHp1vv/m8fBIUnjEflCbguv06gYYw1DSVpEI4f0D7LM
-         LXXQQgdNq4P0FbaVyafoFtrcaIQLnD/++c5UNeRYMmc4t73njQZZL20AgSOIeJFgkl
-         XLEJKnXc+LaBQJ9J4jRoy8xd+K6eDrET6XciWkxycpjYIuPhO9V2HKLiUroeCWzcnl
-         RnAXqbsSYpLUfHnofp6UwdE7NP/4msYxuOssnMpjz+Wb6HwCkhNh5+1YdJxysz0NXi
-         iPXyG/3KN5lwEdy5hl7ZTeLBvAqmFegAYlF2bwsnsmFYev69JvgoHFapHfFH6jNkA9
-         27YJmjiBu7Zbw==
-Received: by mail-wm1-f54.google.com with SMTP id k17so8119249wmr.2;
-        Wed, 31 Aug 2022 16:15:31 -0700 (PDT)
-X-Gm-Message-State: ACgBeo22+/pZNAmKBSY/RRf2Z4RE2GxIbxseFJ8NANd3+KG3QFZo5OwA
-        ylGYzciK19WVmI3PryXoJr+dILwCCwO1ZM7YMTE=
-X-Google-Smtp-Source: AA6agR47KiLpOQ7NE1BygeJXvnbTMo/oeCM40gdLvUbCGWvJBjgiyVkpD3aAMowLLny9he+rPkeYkuNhYvm0xzcjn34=
-X-Received: by 2002:a1c:7408:0:b0:3a5:c9c1:f226 with SMTP id
- p8-20020a1c7408000000b003a5c9c1f226mr3264966wmc.47.1661987729340; Wed, 31 Aug
- 2022 16:15:29 -0700 (PDT)
+        Wed, 31 Aug 2022 19:17:54 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 135A6A6AD5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 16:17:46 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id y127so15898879pfy.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 16:17:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=bUEHQJcauDadGHTubhll2v7o3uKYYJLbaQaw3xgrC3w=;
+        b=FU5vp0bDUp3RBE8zBarVchv3Xt5sZ8uM7tgDRdew/Q0kxVEFkMgRwBswrwWU9mVgA8
+         Yc7DYET7g9aSK0am/QPHL+deCCsIi2wxav6MiSIjA6k0LxBIYS30Ue8caYVpfUCXkYch
+         NVvlqc2VOWsRMs30yiBsBet+7KynYeGQQfHY6X5/ZRbmAviAMVCO9VPXTiOa7TZ9OPFi
+         Jj0Ubz8w/OfLMaKryy/V+ZOdWTWG0izwYQGTdKE3InYRQyk/tK2XoBu2FAFal29RbKP4
+         4FCOIyOshzEqSBUEdkdXdAtOTYpn0f3T7GOveLmc64lwSvaZnF6OUVExyR1BPTTRp7Nz
+         qfZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=bUEHQJcauDadGHTubhll2v7o3uKYYJLbaQaw3xgrC3w=;
+        b=C8+uz1vLW/leG3nvNtikh5m6GSUp5zhN//E8LJFxQXwlv4Kx8klZsn1X8Th4h8DMTC
+         AxpxGrJMvfdrDHDqqIDippQbl83jBSl07HlwpKzm3acs5SeWdCIldQPZEWzk5GG2dR3q
+         6UfwcvCp0uFGFtTmEFuB5oxhBHry/2hCKQLnaqeqg3+UAeu3PwXkwOFNnWqMDa18eEva
+         VHpcvt3aMGjUF3ZeNIYq5jncXEywHR5CWFvU6YnILaPkCP31soiqSeMGVcE4fWtjqkV6
+         ixOo3aUl7ZtSkE75R+3tt6TC2fMQtIq65jYjO/QEFlQXnSTSUxtwqEMuUO+peae/vgWe
+         mfiw==
+X-Gm-Message-State: ACgBeo3vi10iVUQBUq0JFl5x/KpJQqni+2t4SDk5FIgNO41zEvTbzCbI
+        tOXGba9y2cmoDOrpwjVAmJtp4mgCqZrbEA==
+X-Google-Smtp-Source: AA6agR5OBZ5s+8rq2fnvfoScdbr8dh5bslYROHlqDyTktk2EuI3P6d6WhWHtaDX7mi1/v6/2+jOwIA==
+X-Received: by 2002:a63:2b8e:0:b0:41d:6d37:b259 with SMTP id r136-20020a632b8e000000b0041d6d37b259mr23354043pgr.208.1661987865712;
+        Wed, 31 Aug 2022 16:17:45 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.131.33])
+        by smtp.gmail.com with ESMTPSA id n23-20020a17090aab9700b001fd66d5c42csm1838950pjq.49.2022.08.31.16.17.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Aug 2022 16:17:44 -0700 (PDT)
+Message-ID: <630fec18.170a0220.c16d7.3d81@mx.google.com>
+Date:   Wed, 31 Aug 2022 16:17:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2418267910548403855=="
 MIME-Version: 1.0
-References: <6675f56fc8b0910f17ec506d534cf5330ff04733.1660177086.git.objelf@gmail.com>
-In-Reply-To: <6675f56fc8b0910f17ec506d534cf5330ff04733.1660177086.git.objelf@gmail.com>
-From:   Sean Wang <sean.wang@kernel.org>
-Date:   Wed, 31 Aug 2022 16:15:17 -0700
-X-Gmail-Original-Message-ID: <CAGp9LzrzfAO0_Tejjg=NLBbq-TLC7JV=e05m9t97X1wbgxZ8+w@mail.gmail.com>
-Message-ID: <CAGp9LzrzfAO0_Tejjg=NLBbq-TLC7JV=e05m9t97X1wbgxZ8+w@mail.gmail.com>
-Subject: Re: [PATCH v5] Bluetooth: btusb: mediatek: fix WMT failure during
- runtime suspend
-To:     luiz.dentz@gmail.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        =?UTF-8?B?U2VhbiBXYW5nICjnjovlv5fkupgp?= <sean.wang@mediatek.com>,
-        Soul Huang <Soul.Huang@mediatek.com>,
-        YN Chen <YN.Chen@mediatek.com>,
-        Leon Yen <Leon.Yen@mediatek.com>,
-        Eric-SY Chang <Eric-SY.Chang@mediatek.com>,
-        Deren Wu <Deren.Wu@mediatek.com>, KM Lin <km.lin@mediatek.com>,
-        Robin Chiu <robin.chiu@mediatek.com>, Eddie.Chen@mediatek.com,
-        CH Yeh <ch.yeh@mediatek.com>, Posh Sun <posh.sun@mediatek.com>,
-        ted.huang@mediatek.com, Stella Chang <Stella.Chang@mediatek.com>,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, abhishekpandit@google.com,
-        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        "moderated list:ARM/Mediatek SoC support" 
-        <linux-mediatek@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>,
-        Jing Cai <jing.cai@mediatek.com>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: Add mesh testing support
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220831214821.274797-2-brian.gix@intel.com>
+References: <20220831214821.274797-2-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============2418267910548403855==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If the patch looks good to you, could you help apply the patch to
-bluetooth.git? It can fix the issue present in the stable kernel, I
-would like to backport it earlier once it appears in the Linus tree.
+This is automated email and please do not reply to this email!
 
-Sean
+Dear submitter,
 
-On Wed, Aug 10, 2022 at 5:59 PM <sean.wang@mediatek.com> wrote:
->
-> From: Sean Wang <sean.wang@mediatek.com>
->
-> WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
-> needs constantly polling control pipe until the host received the WMT
-> event, thus, we should require to specifically acquire PM counter on the
-> USB to prevent the interface from entering auto suspended while WMT
-> cmd/event in progress.
->
-> Fixes: a1c49c434e15 ("Bluetooth: btusb: Add protocol support for MediaTek
->  MT7668U USB devices")
-> Co-developed-by: Jing Cai <jing.cai@mediatek.com>
-> Signed-off-by: Jing Cai <jing.cai@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
-> v2:
-> 1. move usb_autopm_[get, put]_interface to btusb_mtk_hci_wmt_sync whenever
-> wmt cmd is invoked.
-> 2. add the explanation why we needed the specific
-> usb_autopm_[get, put]_interface there.
->
-> v3: correct the version and there is no logic changed
-> v4: fix GitLint fail due to Title exceeds max length
-> v5: rebase to fix patches does not apply
-> ---
->  drivers/bluetooth/btusb.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 30dd443f395f..70d61bb4a053 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2480,15 +2480,29 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
->
->         set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
->
-> +       /* WMT cmd/event doesn't follow up the generic HCI cmd/event handling,
-> +        * it needs constantly polling control pipe until the host received the
-> +        * WMT event, thus, we should require to specifically acquire PM counter
-> +        * on the USB to prevent the interface from entering auto suspended
-> +        * while WMT cmd/event in progress.
-> +        */
-> +       err = usb_autopm_get_interface(data->intf);
-> +       if (err < 0)
-> +               goto err_free_wc;
-> +
->         err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
->
->         if (err < 0) {
->                 clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
-> +               usb_autopm_put_interface(data->intf);
->                 goto err_free_wc;
->         }
->
->         /* Submit control IN URB on demand to process the WMT event */
->         err = btusb_mtk_submit_wmt_recv_urb(hdev);
-> +
-> +       usb_autopm_put_interface(data->intf);
-> +
->         if (err < 0)
->                 goto err_free_wc;
->
-> --
-> 2.25.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=672980
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      2.87 seconds
+GitLint                       PASS      0.96 seconds
+Prep - Setup ELL              PASS      31.96 seconds
+Build - Prep                  PASS      0.66 seconds
+Build - Configure             PASS      10.04 seconds
+Build - Make                  PASS      981.55 seconds
+Make Check                    PASS      12.52 seconds
+Make Check w/Valgrind         PASS      347.96 seconds
+Make Distcheck                PASS      292.35 seconds
+Build w/ext ELL - Configure   PASS      10.16 seconds
+Build w/ext ELL - Make        PASS      101.38 seconds
+Incremental Build w/ patches  PASS      238.65 seconds
+Scan Build                    PASS      784.56 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,v3,2/2] tools: Add mesh-tester to test Kernel mesh support
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#362: FILE: tools/mesh-tester.c:252:
++			sizeof(set_exp_feat_param_mesh), set_exp_feat_param_mesh,
+
+WARNING:LONG_LINE: line length of 83 exceeds 80 columns
+#502: FILE: tools/mesh-tester.c:392:
++			sizeof(set_exp_feat_param_debug), set_exp_feat_param_debug,
+
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#592: FILE: tools/mesh-tester.c:482:
++					test_pre_setup, test_setup, func, NULL, \
+
+WARNING:LONG_LINE: line length of 83 exceeds 80 columns
+#593: FILE: tools/mesh-tester.c:483:
++					test_post_teardown, timeout, user, free); \
+
+WARNING:BLOCK_COMMENT_STYLE: Block comments should align the * on each line
+#728: FILE: tools/mesh-tester.c:618:
++/* Read HCI commands in the expect_hci_list and add it to the queue
++*/
+
+ERROR:SWITCH_CASE_INDENT_LEVEL: switch and case should be at the same indent
+#1040: FILE: tools/mesh-tester.c:930:
++	switch (opcode) {
++		case BT_HCI_CMD_WRITE_SCAN_ENABLE:
++		case BT_HCI_CMD_LE_SET_ADV_ENABLE:
++		case BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE:
+[...]
++		case BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE:
+[...]
++		default:
+
+WARNING:BLOCK_COMMENT_STYLE: Block comments use a trailing */ on a separate line
+#1249: FILE: tools/mesh-tester.c:1139:
++		 * for a callback. */
+
+WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+#1441: FILE: tools/mesh-tester.c:1331:
++			sizeof(set_exp_feat_param_mesh), set_exp_feat_param_mesh,
+
+/github/workspace/src/12961464.patch total: 1 errors, 7 warnings, 1474 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12961464.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2418267910548403855==--
