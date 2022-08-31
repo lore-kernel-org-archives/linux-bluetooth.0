@@ -2,127 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B239ECAAD1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Aug 2022 23:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F6F7ECAAD1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 31 Aug 2022 23:30:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232757AbiHaXSn (ORCPT
+        id S231768AbiHaXaS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Aug 2022 19:18:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
+        Wed, 31 Aug 2022 19:30:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230168AbiHaXSa (ORCPT
+        with ESMTP id S230168AbiHaXaR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Aug 2022 19:18:30 -0400
-Received: from smtp.github.com (out-26.smtp.github.com [192.30.252.209])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5491A9C8E5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 16:18:29 -0700 (PDT)
-Received: from github.com (hubbernetes-node-0fa589c.ash1-iad.github.net [10.56.200.62])
-        by smtp.github.com (Postfix) with ESMTPA id 7C9DF5E09FF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 16:18:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1661987908;
-        bh=9nxJjR7UU7zOHJqFiXhmtb8n03BpM66VK0Q8o/zybTE=;
-        h=Date:From:To:Subject:From;
-        b=rFGp3jkyjh8IW3Y3VxRdbD8qq5gvpxKPwD0aqr9LxBKOQlb00KNlRVr7SbWjaMZhl
-         A3QEjfVtWqgLw7zfi/WWAHbXy7bbvey422mZiDHh1XbCos2gKmna2E5plXwQg7ME03
-         Aqk9MC5CM3n6jXj4POBgIo8XX/PuvT6Js+f1awuM=
-Date:   Wed, 31 Aug 2022 16:18:28 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/d04b64-49b8c5@github.com>
-Subject: [bluez/bluez] d8febc: client/player: Fix checkpatch warning
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Wed, 31 Aug 2022 19:30:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 600E479EDA;
+        Wed, 31 Aug 2022 16:30:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id EBF6461CA4;
+        Wed, 31 Aug 2022 23:30:15 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 470A5C433D7;
+        Wed, 31 Aug 2022 23:30:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1661988615;
+        bh=CbM8i5pqI5d7io1Cbk/QR8oz21S+sd2XFL/3nw9UKWQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=GiI2HLi61IqdwaTwp3vtqAs8kGFLHSfn34VaFUiBEuhSTfgFVOmi7PlXlTRTOzJZx
+         O9UnjDkNawmBQIGLQlT/gjZz95rdBixXCbTUCZbvtJpki0cNAuMIDrIsp14QGdqn0Z
+         0ClbugYQpF3y1y1TiZJm9Oncx9Kj3tMQVmqcVp673O/oPOGb5rS7M+xXhevya+zPCc
+         T11Ii/xawFGJXgWzO0X5P3mVc1DJBqhaxFlnCrOI0O//SAmN30m+DXbSdDHYcqGjH9
+         cPXm9ajOtH74XsqwzA+IKbhOyZPqm1MmiceqYZGiR0fwOfHMhepuGKJXW7tE7CWZO/
+         GtuxAPY3wsP3w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 28B3EE924D6;
+        Wed, 31 Aug 2022 23:30:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v5] Bluetooth: btusb: mediatek: fix WMT failure during runtime
+ suspend
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166198861515.30343.13576995414925272614.git-patchwork-notify@kernel.org>
+Date:   Wed, 31 Aug 2022 23:30:15 +0000
+References: <6675f56fc8b0910f17ec506d534cf5330ff04733.1660177086.git.objelf@gmail.com>
+In-Reply-To: <6675f56fc8b0910f17ec506d534cf5330ff04733.1660177086.git.objelf@gmail.com>
+To:     Sean Wang <sean.wang@mediatek.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        jing.cai@mediatek.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: d8febc76a43fa104457d8167379787949fff8f89
-      https://github.com/bluez/bluez/commit/d8febc76a43fa104457d8167379787949fff8f89
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-08-30 (Tue, 30 Aug 2022)
+Hello:
 
-  Changed paths:
-    M client/player.c
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  client/player: Fix checkpatch warning
+On Thu, 11 Aug 2022 08:49:07 +0800 you wrote:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
+> WMT cmd/event doesn't follow up the generic HCI cmd/event handling, it
+> needs constantly polling control pipe until the host received the WMT
+> event, thus, we should require to specifically acquire PM counter on the
+> USB to prevent the interface from entering auto suspended while WMT
+> cmd/event in progress.
+> 
+> [...]
 
-This fixes the following checkpatch warning:
+Here is the summary with links:
+  - [v5] Bluetooth: btusb: mediatek: fix WMT failure during runtime suspend
+    https://git.kernel.org/bluetooth/bluetooth-next/c/177978b29426
 
-WARNING:LINE_SPACING: Missing a blank line after declarations
-216: FILE: client/player.c:625:
-+               GDBusProxy *proxy = l->data;
-+               print_player(proxy, NULL);
-
-
-  Commit: f8c3a38e4fe943eaed677a295663426cb7241e0e
-      https://github.com/bluez/bluez/commit/f8c3a38e4fe943eaed677a295663426cb7241e0e
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-08-30 (Tue, 30 Aug 2022)
-
-  Changed paths:
-    M src/shared/shell.c
-
-  Log Message:
-  -----------
-  shared/shell: Fix scan-build error
-
-This fixes the following error:
-
-src/shared/shell.c:1135:19: warning: Null pointer passed to 1st
-parameter expecting 'nonnull'
-                        data.timeout = atoi(optarg);
-                                       ^~~~~~~~~~~~
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-  Commit: a84aa0e6e5e7cd94804386eaf09d430d1cf8e692
-      https://github.com/bluez/bluez/commit/a84aa0e6e5e7cd94804386eaf09d430d1cf8e692
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-08-30 (Tue, 30 Aug 2022)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  media: Fix registering PAC endpoints if ISO socket are not supported
-
-If adapter don't support ISO sockets the PAC UUIDs shall not be allowed
-to be registered as they depend on ISO sockets to work properly.
-
-
-  Commit: 49b8c5901584eab77af40f8ad19779747b4506d6
-      https://github.com/bluez/bluez/commit/49b8c5901584eab77af40f8ad19779747b4506d6
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-08-31 (Wed, 31 Aug 2022)
-
-  Changed paths:
-    M profiles/audio/media.c
-
-  Log Message:
-  -----------
-  media: Fix scan-build warnings
-
-This fixes the following warnings:
-
-profiles/audio/media.c:1465:6: warning: 8th function call argument
-is an uninitialized value
-        if (media_endpoint_create(adapter, sender, path, uuid, delay_reporting,
-            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:3012:3: warning: Use of memory after it is freed
-                release_endpoint(adapter->endpoints->data);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-profiles/audio/media.c:3015:3: warning: Use of memory after it is freed
-                media_player_destroy(adapter->players->data);
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-Compare: https://github.com/bluez/bluez/compare/d04b64003d9d...49b8c5901584
