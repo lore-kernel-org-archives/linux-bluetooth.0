@@ -2,125 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18378ECAAD2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 21:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1F7ECAAD2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 21:07:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235050AbiIAVDr (ORCPT
+        id S234971AbiIAVHb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Sep 2022 17:03:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38072 "EHLO
+        Thu, 1 Sep 2022 17:07:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235055AbiIAVDn (ORCPT
+        with ESMTP id S231326AbiIAVHa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Sep 2022 17:03:43 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DB8246
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 14:03:41 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id d1so87129qvs.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Sep 2022 14:03:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=BzSv8X2/Qs9qSpV+7tDGS7qJ+RTGMWVmzRftZbXnLDs=;
-        b=Myj0MbMQlf7O0Dzsyoy/7hTSLrnmmchwWKlNo8qGahNkuL+zXfy2uVxE1LjbRyzIug
-         hYNb7ccq0t+YHgs04To/M3SPYLQi8TdxMICfEg+UZPYaEaX68ImkdU4dRrW8bpPeBBnW
-         6LIug7EpDfVRxXtGtOjHBNGW04DEsSBeNO/vVTAxHXioYUXhKMoMiL/rokWEe190DGt/
-         tISmIgNWd++yu7ZgEIEcz1lOSUHoVs0oE8sYaYmsP5tlkxv3ftynNXglfuJjG8vC5eJg
-         HInHrZ/WkCKJtERKyvLr87Bm9A0x11BIrxCwgEVK1B1mZBk1A29x6iNYJiKQTakMG4tA
-         sLyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=BzSv8X2/Qs9qSpV+7tDGS7qJ+RTGMWVmzRftZbXnLDs=;
-        b=6dGBWgMmtQ2PTOT1gXGUauknl8+vMR6TOrgXNtbAghTJKh9CNH8DeVlyEfI/a0B0Ij
-         HalXSwuy9j1g8e1eXeNXvGCpIxVv2w2sMf1VPzB+Yz642+fOFUZxyKW8NCxjfgb+34vC
-         3zmk+78kwbRUtaux52nU0kMowmsowpLgRLqjnX/hl6QhfLUqS05jsTRpSAQF0t11mwZ3
-         Z5rxqwOkKcWgByrwt+7dffNDdiAXOk3HRPFKHoVpFoxouuJ09P5RCWBRXBQJ+rudMKhz
-         3daIrWWgh0Gy/5wuwZjrI31Gg0obEyviE1J2wGUMGsxKSani6JBoHUF1Awn+Ba4DWbnK
-         wxGg==
-X-Gm-Message-State: ACgBeo0KqjAmgokrsM3EZvzybtrdGqGBPTgLMb5sjJlzahOAPeif6UUH
-        5Gm0EbI33bi0tVOYrW83eriDhpMWx4DMaA==
-X-Google-Smtp-Source: AA6agR718uvumHFVNubhZPRGrlmI5FgSngHQ2fDJffRT2DddwyX9WT4rpXSbf2O25s8c/sqWD274Dg==
-X-Received: by 2002:a05:6214:2b0b:b0:497:30dc:4c33 with SMTP id jx11-20020a0562142b0b00b0049730dc4c33mr26547239qvb.80.1662066220840;
-        Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
-Received: from [172.17.0.2] ([52.179.12.27])
-        by smtp.gmail.com with ESMTPSA id i7-20020a05620a404700b006a6ebde4799sm12592232qko.90.2022.09.01.14.03.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
-Message-ID: <63111e2c.050a0220.9379d.aee3@mx.google.com>
-Date:   Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4071076239178692723=="
+        Thu, 1 Sep 2022 17:07:30 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 344A97B291
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 14:07:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662066449; x=1693602449;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cHd5b5ltfjOadtLJIyeuaCdABdvIpSn1/sVZ4x2Cb8g=;
+  b=RgfmZiawl+l03XBkuWTBbMVhKlm7fEXpQyStZywwUHGCHRuCgCiHiyZj
+   mxo7xrAqPrH1uA0RE1E1ID51Ndj0ENtHiz0qiuR9QbQ5pjyBx70IXzt1w
+   OFEnYe0rLUO6axBlLBkQX+1t/O0aoyfqD2wqin8crvnd8WaJjI5/xcqNF
+   4z5BP4mH7RVooZB+lw7x37ne3aVAIhWZczohRLFz03/Xv3LkfoVgjewF4
+   Dl5W35OfFKGCJ+MEJD17yzAeu6B9Ma6SdXRIfDasb1rrbkEUgkOo9rkNc
+   LIjHTKEPtg2oAHLociYoGO9ujTwNdgDYdg9tCY4bS5OxKKfISJWPEPbSP
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="294568833"
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="294568833"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 14:07:29 -0700
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="674047798"
+Received: from mkounkel-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.37.120])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 14:07:28 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH BlueZ v2] mgmt-tester: Adds turning on Mesh Experimental feature
+Date:   Thu,  1 Sep 2022 14:07:22 -0700
+Message-Id: <20220901210722.73044-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [BlueZ] mgmt-tester: Adds turning on Mesh Experimental feature
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220901200501.27858-1-brian.gix@intel.com>
-References: <20220901200501.27858-1-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4071076239178692723==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=673378
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.59 seconds
-GitLint                       PASS      1.02 seconds
-Prep - Setup ELL              PASS      27.08 seconds
-Build - Prep                  PASS      0.82 seconds
-Build - Configure             PASS      8.70 seconds
-Build - Make                  PASS      836.98 seconds
-Make Check                    PASS      11.87 seconds
-Make Check w/Valgrind         PASS      288.51 seconds
-Make Distcheck                PASS      237.00 seconds
-Build w/ext ELL - Configure   PASS      8.72 seconds
-Build w/ext ELL - Make        PASS      83.60 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      506.60 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] mgmt-tester: Adds turning on Mesh Experimental feature
-WARNING:LONG_LINE: line length of 101 exceeds 80 columns
-#132: FILE: tools/mgmt-tester.c:7424:
-+			tester_warn("Invalid cmd response parameter size %d %d", length, expect_len);
-
-/github/workspace/src/12963192.patch total: 0 errors, 1 warnings, 75 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12963192.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Turns on experimental Mesh feature, and expects it in report when
+querying which experimental features are supported and have been
+enabled.
 ---
-Regards,
-Linux Bluetooth
+ tools/mgmt-tester.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 02ddfd844..5747ab84b 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -221,6 +221,32 @@ static void read_info_callback(uint8_t status, uint16_t length,
+ 	bthost_notify_ready(bthost, tester_pre_setup_complete);
+ }
+ 
++static const uint8_t set_exp_feat_param_mesh[] = {
++	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f, 0x05, 0xbf, /* UUID - Mesh */
++	0x8d, 0x4d, 0x03, 0x7a, 0xd7, 0x63, 0xe4, 0x2c,
++	0x01,						/* Action - enable */
++};
++
++static void mesh_exp_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_print("Mesh feature could not be enabled");
++		return;
++	}
++
++	tester_print("Mesh feature is enabled");
++}
++
++static void mesh_exp_feature(struct test_data *data, uint16_t index)
++{
++	tester_print("Enabling Mesh feature");
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, index,
++		  sizeof(set_exp_feat_param_mesh), set_exp_feat_param_mesh,
++		  mesh_exp_callback, NULL, NULL);
++}
++
+ static void index_added_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -233,6 +259,10 @@ static void index_added_callback(uint16_t index, uint16_t length,
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_READ_INFO, data->mgmt_index, 0, NULL,
+ 					read_info_callback, NULL, NULL);
++
++	tester_warn("Enable management Mesh interface");
++	mesh_exp_feature(data, data->mgmt_index);
++
+ }
+ 
+ static void index_removed_callback(uint16_t index, uint16_t length,
+@@ -388,6 +418,7 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 
+ 	if (test && test->setup_le_states)
+ 		hciemu_set_central_le_states(data->hciemu, test->le_states);
++
+ }
+ 
+ static void test_pre_setup(const void *test_data)
+@@ -7390,7 +7421,8 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 			expect_param = test->expect_func(&expect_len);
+ 
+ 		if (length != expect_len) {
+-			tester_warn("Invalid cmd response parameter size");
++			tester_warn("Invalid cmd response parameter size %d %d",
++					length, expect_len);
+ 			tester_test_failed();
+ 			return;
+ 		}
+@@ -9858,7 +9890,7 @@ static const struct generic_data set_dev_flags_fail_3 = {
+ };
+ 
+ static const uint8_t read_exp_feat_param_success[] = {
+-	0x04, 0x00,				/* Feature Count */
++	0x05, 0x00,				/* Feature Count */
+ 	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,	/* UUID - Simultaneous */
+ 	0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,	/* Central Peripheral */
+ 	0xb5, 0x10, 0x1b, 0x67,
+@@ -9875,6 +9907,10 @@ static const uint8_t read_exp_feat_param_success[] = {
+ 	0x85, 0x98, 0x6a, 0x49, 0xe0, 0x05,
+ 	0x88, 0xf1, 0xba, 0x6f,
+ 	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f,	/* UUID - Mesh support */
++	0x05, 0xbf, 0x8d, 0x4d, 0x03, 0x7a,
++	0xd7, 0x63, 0xe4, 0x2c,
++	0x01, 0x00, 0x00, 0x00,			/* Flags */
+ };
+ 
+ static const struct generic_data read_exp_feat_success = {
+-- 
+2.37.2
 
---===============4071076239178692723==--
