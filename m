@@ -2,94 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55EA4ECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 18:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D19C7ECAAD1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 18:25:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234210AbiIASRN (ORCPT
+        id S231589AbiIASZr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Sep 2022 14:17:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41618 "EHLO
+        Thu, 1 Sep 2022 14:25:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234112AbiIASRI (ORCPT
+        with ESMTP id S229514AbiIASZq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Sep 2022 14:17:08 -0400
-X-Greylist: delayed 391 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 01 Sep 2022 11:17:05 PDT
-Received: from b224-2.smtp-out.eu-central-1.amazonses.com (b224-2.smtp-out.eu-central-1.amazonses.com [69.169.224.2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC4A7A745
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 11:17:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=b4y2oqd7fm2lugxzudc3kdvc4wctgrpv; d=ubports.com; t=1662055832;
-        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-        bh=u2epQu66JMSZ2WSj/RR3SsXoVF1FXgny9XIgc2laMro=;
-        b=SW79U1jePjG+mEg2p+pH4jfqEsfyPlT3P92DoPxKhFVNACc+Lw+4DyrdxONywBR/
-        Rq9B3e+4CMO6toBXWF/0KuUWSOetrGCcBOg9wYxYklKNHapTNLcT9hC+gc5xxv34d0f
-        E4vQaiJ9PnU5Xuz1iPlq+kRrWnTeT2g0tYqYZcJv0CMLJzQIEOFu6y1IFire3qFHSxH
-        R7UXnSN3dgfrPTM4EgTYebpKoKFmDjSJ/iXcD3SPqm/odpb/2865zTIdsZQtfAOf3v6
-        nhzr1lAR7kVEdyrq9b5HCZIoZV3bGgPLRKu2XtkEGsrfJKKDFYijxqUrWDpkPCvjgeL
-        DJkW6oHEfw==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=54ecsf3zk7z4mwxwwox7z7bg6e5gwjsz; d=amazonses.com; t=1662055832;
-        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Feedback-ID;
-        bh=u2epQu66JMSZ2WSj/RR3SsXoVF1FXgny9XIgc2laMro=;
-        b=SZBDeo8xwaxwqUCWpPNLc81Ss/ewLftQ7GDjwyj84h1sDvGhhe201/Mq12TX3DPB
-        YUmr2EVfNQP4CofVXdRhgqIjfJsNt3cIRzVuwTFYyRfHklhj8voB4FLlBG+iVpgOeM3
-        0N9DJyk52J8Z/2jhRfWS4bGQemepF2hN57ZKOL8E=
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ubports.com; s=mail;
-        t=1662055831; bh=u2epQu66JMSZ2WSj/RR3SsXoVF1FXgny9XIgc2laMro=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=rh4tFv6OJH+FfoClGGzR3kBB7XebrRHUGKsJQFQIEZ09AgMu/8Q+uRDYllM/CNq+/
-         ut1IPrGfqdEqj2iyXTRqXwvSQvFJY6z+ZPWsWNBMdRiViZemlLMPzzZgnUIfDnfpSV
-         BOR4eWwE0i8zkglkylhdAVl6brnLHF/Ur3pjNty8Q1rl6AG+dJz+IF/dKO0A0vT4Qd
-         ProvFVkGtDPQMs4I7ot3CQVU+gHIf6wcmPWmDv1PG8Y9obkMdh7XtVnP3OkHA25psU
-         8VRERL30f9FQevSYg6uCc2wNY1hE+7H3tenQ5Y6GLNymtvuiXfKEodUgxTRmsqZ2aJ
-         22Ugl+EF8zRmA==
-Message-ID: <01070182fa3f5ac6-66cb5385-fab0-4916-9e97-bdf54ef3a3f6-000000@eu-central-1.amazonses.com>
-Date:   Thu, 1 Sep 2022 18:10:32 +0000
+        Thu, 1 Sep 2022 14:25:46 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 779F03AE5F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 11:25:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662056745; x=1693592745;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=/Gd5OHkFpGgmPftdR/J34+T4MyzeM4uQWhHflynTUko=;
+  b=KrI+G8oAlKnhEW9pWLSq1tplenoruxAnFK2I9G4a+XJh4HCc/5pNppDP
+   jTe+6BFRFuKimXvSJPZS7YiodQHf3NW9sA0ETk5nZyAZiaGsL1QZw2tJO
+   W4RGrQYhSqZrkgb+jd4qm1UQHZ162mLIehcKIaE7lpCB3/lnDpKQrPxe8
+   Gt5nP89eHfXE2RmumsSIHf8sj3BWu44QlCfV7A6ldCx2cL/CFHrih11eK
+   rAC4eVbeB0gTvSchdDi49VecN9j9SHGsF3Z+mkCYutSe4gLityNjUydSm
+   +9Any8w5akASP/RO1UYa4ccdOZY6NPYxWJ21WGCcukHz4G2mvNi7Q0uGu
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10457"; a="295803457"
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="295803457"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 11:25:45 -0700
+X-IronPort-AV: E=Sophos;i="5.93,281,1654585200"; 
+   d="scan'208";a="940962376"
+Received: from ghonawax-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.58.197])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Sep 2022 11:25:45 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, luiz.dentz@gmail.com, brian.gix@intel.com
+Subject: [PATCH v6 0/2] Add Mesh functionality to net/bluetooth
+Date:   Thu,  1 Sep 2022 11:25:25 -0700
+Message-Id: <20220901182528.13487-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Subject: Re: [PATCH] plugins: Do not try to autopair with Nissan Connect
- devices
-Content-Language: de-DE
-To:     Bastien Nocera <hadess@hadess.net>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-References: <01070182f561c630-852e0333-6f04-448b-b064-46a2f000e860-000000@eu-central-1.amazonses.com>
- <CABBYNZJGc2Y3UULighw95un9mb8khLM2dfTOB3jRV8D3ksVDXg@mail.gmail.com>
- <1ef5e51d2103b6f02826777ebf5415f74018e317.camel@hadess.net>
-From:   Florian Leeber <florian@ubports.com>
-In-Reply-To: <1ef5e51d2103b6f02826777ebf5415f74018e317.camel@hadess.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Feedback-ID: 1.eu-central-1.U71sxic/3tmi0U3T+Ze2hDyqoN46zyPgdCO+zEPT6YQ=:AmazonSES
-X-SES-Outgoing: 2022.09.01-69.169.224.2
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Am 01.09.2022 um 12:46 schrieb Bastien Nocera:
-> On Wed, 2022-08-31 at 13:18 -0700, Luiz Augusto von Dentz wrote:
->> Hi Florian,
->>
->> On Wed, Aug 31, 2022 at 12:44 PM Florian Leeber <florian@ubports.com>
->> wrote:
->> gs as default). 
-> FWIW, gnome-bluetooth has its own database on top of bluez, which we
-> prefer to the code in bluez. I'd be happy getting rid of it.
->
-> Loads of devices that need pairing despite their class and Bluetooth
-> version, and devices that need special handling like the Navman GPS
-> that expects a non-numerical PIN.
->
-> The database:
-> https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin-code-database.xml
-> The code to parse it:
-> https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin.c
+Housekeeping and implementation
 
-Oh my, this escalated quickly ;) - tbh implementing this as a fully 
-fledged config-based feature might be over my head. I am not proficient 
-with the Bluez code at all, and my main work currently is being the OTA 
-release manager for Ubuntu Touch. I could only work on this with some 
-support to get the basics established.
+v2: Add checking for Packet Ownership when querying Tx queue state
+    Add cleanup of Tx queue when MGMT socket closes
 
-Thanks for the hint with the database, we did not know about this.
+v3: Fix CI complaints
 
+v4: More indent clean-ups and proper var types
+
+v5: Conform to the ADV Instance mechanism, and make fully compatible
+    with Extended Advertising mechanism.
+
+v6: Paired with BlueZ user space unit tests (tools/mesh-tester)
+
+Brian Gix (2):
+  Bluetooth: Implement support for Mesh
+  Bluetooth: Add experimental wrapper for MGMT based mesh
+
+ include/net/bluetooth/bluetooth.h |   1 +
+ include/net/bluetooth/hci.h       |   4 +
+ include/net/bluetooth/hci_core.h  |  16 +-
+ include/net/bluetooth/mgmt.h      |  52 +++
+ net/bluetooth/hci_core.c          |  13 +-
+ net/bluetooth/hci_event.c         |  61 ++--
+ net/bluetooth/hci_sock.c          |   1 +
+ net/bluetooth/hci_sync.c          |  87 ++++-
+ net/bluetooth/mgmt.c              | 589 +++++++++++++++++++++++++++++-
+ net/bluetooth/mgmt_util.c         |  74 ++++
+ net/bluetooth/mgmt_util.h         |  18 +
+ 11 files changed, 864 insertions(+), 52 deletions(-)
+
+-- 
+2.37.2
 
