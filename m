@@ -2,34 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3115C64991
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 10:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F3BECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 11:07:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231700AbiIAKqp convert rfc822-to-8bit (ORCPT
+        id S234479AbiIALHw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Sep 2022 06:46:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39314 "EHLO
+        Thu, 1 Sep 2022 07:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233486AbiIAKqm (ORCPT
+        with ESMTP id S234116AbiIALH2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Sep 2022 06:46:42 -0400
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C86CF8259
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 03:46:41 -0700 (PDT)
+        Thu, 1 Sep 2022 07:07:28 -0400
+Received: from relay11.mail.gandi.net (relay11.mail.gandi.net [217.70.178.231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0E4138CBF
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 04:07:23 -0700 (PDT)
 Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id DD0B12000D;
-        Thu,  1 Sep 2022 10:46:38 +0000 (UTC)
-Message-ID: <1ef5e51d2103b6f02826777ebf5415f74018e317.camel@hadess.net>
-Subject: Re: [PATCH] plugins: Do not try to autopair with Nissan Connect
- devices
+        by mail.gandi.net (Postfix) with ESMTPSA id DE862100002
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 11:07:21 +0000 (UTC)
+Message-ID: <b331a0db8894953b4eea704990b4048fdb3e9eae.camel@hadess.net>
+Subject: Re: [PATCH BlueZ v6 1/6] adapter: Keep track of whether the adapter
+ is rfkill'ed
 From:   Bastien Nocera <hadess@hadess.net>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Florian Leeber <florian@ubports.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Thu, 01 Sep 2022 12:46:33 +0200
-In-Reply-To: <CABBYNZJGc2Y3UULighw95un9mb8khLM2dfTOB3jRV8D3ksVDXg@mail.gmail.com>
-References: <01070182f561c630-852e0333-6f04-448b-b064-46a2f000e860-000000@eu-central-1.amazonses.com>
-         <CABBYNZJGc2Y3UULighw95un9mb8khLM2dfTOB3jRV8D3ksVDXg@mail.gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Date:   Thu, 01 Sep 2022 13:07:15 +0200
+In-Reply-To: <20220901104331.174588-1-hadess@hadess.net>
+References: <20220901104331.174588-1-hadess@hadess.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8BIT
 User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
@@ -38,63 +35,20 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 2022-08-31 at 13:18 -0700, Luiz Augusto von Dentz wrote:
-> Hi Florian,
-> 
-> On Wed, Aug 31, 2022 at 12:44 PM Florian Leeber <florian@ubports.com>
-> wrote:
-> > 
-> > It seems that Nissan Connect carkits a) do not use 0000 but 1234 as
-> > default code
-> > but also b) the autopair plugin is not allowed to make a second
-> > attempt
-> > to pair.
-> > Let´s try to not use the autopairing at all for those devices.
-> > ---
-> >   plugins/autopair.c | 3 +++
-> >   1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/plugins/autopair.c b/plugins/autopair.c
-> > index 0b09e89..6bf07e3 100644
-> > --- a/plugins/autopair.c
-> > +++ b/plugins/autopair.c
-> > @@ -66,6 +66,9 @@ static ssize_t autopair_pincb(struct btd_adapter
-> > *adapter,
-> >          /* The iCade shouldn't use random PINs like normal
-> > keyboards */
-> >          if (strstr(name, "iCade") != NULL)
-> >                  return 0;
-> > +       /* Nissan Connect carkits use PIN 1234 but refuse a retry
-> > */
-> > +       if (strstr(name, "NISSAN CONNECT") != NULL)
-> > +               return 0;
-> 
-> Well this is already starting to grow which imo defeats the purpose
-> of
-> hardcoding directly on the code so perhaps we could have a section
-> e.g. [Autopair] where one can enter device names that shall not use
-> defaults PINs, or may an entry where one can add its own specific PIN
-> sequence for a given device name including none:
-> 
-> [Autopair]
-> PIN=0000,1234
-> # The iCade shouldn't use random PINs like normal keyboards
-> iCade=
-> # Nissan Connect carkits use PIN 1234 but it refuses retries
-> NISSAN CONNECT=1234
-> 
-> With this the logic is check if there is an entry for the device name
-> and then use as PIN otherwise use the PIN entry (if not defined use
-> the current settings as default).
+On Thu, 2022-09-01 at 12:43 +0200, Bastien Nocera wrote:
+> diff --git a/src/rfkill.c b/src/rfkill.c
+> index 2099c5ac5..511e351b8 100644
+> --- a/src/rfkill.c
+> +++ b/src/rfkill.c
+> @@ -55,12 +55,73 @@ struct rfkill_event {
+>  };
+>  #define RFKILL_EVENT_SIZE_V1    8
+>  
+> +int rfkill_get_blocked(uint16_t index)
+> +{
+> +       struct rfkill_event event = { 0 };
+> +       int fd;
+> +       ssize_t len;
+> +       int blocked = -1;
 
-FWIW, gnome-bluetooth has its own database on top of bluez, which we
-prefer to the code in bluez. I'd be happy getting rid of it.
-
-Loads of devices that need pairing despite their class and Bluetooth
-version, and devices that need special handling like the Navman GPS
-that expects a non-numerical PIN.
-
-The database:
-https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin-code-database.xml
-The code to parse it:
-https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin.c
+I simplified this code in v7 (as well as fixing indentation problems).
