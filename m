@@ -2,102 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD3B5ECAAD1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 03:28:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FE4ECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 07:48:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbiIAD2C (ORCPT
+        id S234029AbiIAHr5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 31 Aug 2022 23:28:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50660 "EHLO
+        Thu, 1 Sep 2022 03:47:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiIAD2B (ORCPT
+        with ESMTP id S231443AbiIAHrS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 31 Aug 2022 23:28:01 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 115C96150
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 20:28:00 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id f14so12366466qkm.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 31 Aug 2022 20:28:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=+dhva4o40EuE1l9eqFMD/8NG+nYr6KG78E3LJilfxzo=;
-        b=hRnoZYUjO7DFRLiw5f8F34Qwvj7lFzzXh9uVqrRhwSDab8zi1bggWeeLqAUF3w8dur
-         c3SpjCxKgaeBRe2Pc5JCItPr3T834qnKDkvaL6MH6kT7K7bzofPkJx4a2LMBJ28+MPn3
-         OCdPWVz5GW7I2blMOYiOZW8rPI/n2FTAI+Jg67fT5XEg2rXj2zFFcIQkFGjKgB0KZsxM
-         4wGlxqxCwTBEpAC4KiFHfRSgv8/4A6Veb7w/nNnK+SbnOnFWd4Sj5Mndiwsfe7zccvbs
-         BR4l2TfaPqsSuwvKBYnPoAhBDgMFsCLGpVSS5oIBz8mvQk5xirWiEFnhpj3zNSp4aY8j
-         VRyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=+dhva4o40EuE1l9eqFMD/8NG+nYr6KG78E3LJilfxzo=;
-        b=PkfR7oQF5wKTWEhuJ/JVjNWwo4E4EieH7Jh3LgJyP0d8CjBkXeVyh1datHYZxDdXWu
-         SKwF55hZld30TdbFSwT2VkEzBCQYXFxuwyRuiXMeHcLtN2DP5JIkLbgbR3r/0/dXUlnR
-         3PJvCgNmkdexjBzBj/OWPaFqth3BS9KsSIhw0ZtJwlbbIx6zmU7fC2lgUcsP2xpdYahd
-         Nl4tZL07TvmkeVM4L86rbt9T/Sgdr65tIZC3dCStWd5XbFCD7RSHGVIz03S+PttD3Dir
-         cc1m/Tj+xaUepwu82uMXLXCSE0Fu1CNkNH21hV5gn/8Gdt7F0EDnOiNxjxLFqfmEBUZd
-         +s2g==
-X-Gm-Message-State: ACgBeo35Qf/12+KAsvynZorhZ+svhfItgXJ5lxLWbIgUFMsNJcrKpfSa
-        Yr8iAr1lvJ4ZqOOiWzplGyNt4oCZF/1ILA==
-X-Google-Smtp-Source: AA6agR76EGGPe3OabsbTiHgup1s0oBVh6E6KoObut1kAy+zi45ZBUZlTPD3TbqUyc6fVScvL8ov34w==
-X-Received: by 2002:a05:620a:1a07:b0:6bc:3aa1:90fb with SMTP id bk7-20020a05620a1a0700b006bc3aa190fbmr18055251qkb.292.1662002878970;
-        Wed, 31 Aug 2022 20:27:58 -0700 (PDT)
-Received: from [172.17.0.2] ([104.211.0.151])
-        by smtp.gmail.com with ESMTPSA id z198-20020a3765cf000000b006b8619a67f4sm10572149qkb.34.2022.08.31.20.27.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Aug 2022 20:27:58 -0700 (PDT)
-Message-ID: <631026be.370a0220.f7596.fe92@mx.google.com>
-Date:   Wed, 31 Aug 2022 20:27:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1043069314355351197=="
+        Thu, 1 Sep 2022 03:47:18 -0400
+Received: from sender-of-o50.zoho.in (sender-of-o50.zoho.in [103.117.158.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF1092BB1C;
+        Thu,  1 Sep 2022 00:45:17 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1662018254; cv=none; 
+        d=zohomail.in; s=zohoarc; 
+        b=OUKwXP06JyBShM0lVsZPEn9hR711amw+fz7BzyMHNv+CA6wjwCeqrzftloTPy/wSzC3vZOULQMrRPd+5E82myqlzXLXOH/hhNZBpXwBdMgAg/frz8GqdwZMzpVJ/gVEoywhVnFuorGF304VXQJbIU779B/lgyFseVCI6vGeddmk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.in; s=zohoarc; 
+        t=1662018254; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=8Q6F9jaqQPy3UvEI+uLKzcrDWPbXthbhfdMMNG359bA=; 
+        b=bjWI49foavIJeD6uevNVqQPz0ia0JMQ9TVI9M+oIouuI1u/Mx3NpJPsLg3rAwVvYknwvfD9JmXH5P9iZAMIYmSy8TixqmQml7Nnnn60i3A82n9GMklx8cEpQ5j2TP8qaesl32ZpjzE8r6RLGiV4gWuvB2ryi5nfYZ6GGZZkYZc4=
+ARC-Authentication-Results: i=1; mx.zohomail.in;
+        dkim=pass  header.i=siddh.me;
+        spf=pass  smtp.mailfrom=code@siddh.me;
+        dmarc=pass header.from=<code@siddh.me>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1662018254;
+        s=zmail; d=siddh.me; i=code@siddh.me;
+        h=Date:Date:From:From:To:To:Cc:Cc:Message-ID:In-Reply-To:References:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+        bh=8Q6F9jaqQPy3UvEI+uLKzcrDWPbXthbhfdMMNG359bA=;
+        b=HO+/5qlCThvhSpkPO7jaqXBcg4oK7HVn+cF7eM7qyAEEUvK7yF5rF4+Y5FlsMQhW
+        +trjtNIMumt8CV+05NWs7S5ubf0EIPP2VSQFyns8TmnapPIEmTwpuGlqGzV4f0841ul
+        g0gRo5Dk51jfuhtITVoLetrIJ3VRfmnlQXGdLaTY=
+Received: from mail.zoho.in by mx.zoho.in
+        with SMTP id 1662018242963613.3045038319508; Thu, 1 Sep 2022 13:14:02 +0530 (IST)
+Date:   Thu, 01 Sep 2022 13:14:02 +0530
+From:   Siddh Raman Pant <code@siddh.me>
+To:     "Elliott, Robert (Servers)" <elliott@hpe.com>
+Cc:     "palmer@rivosinc.com" <palmer@rivosinc.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux@rivosinc.com" <linux@rivosinc.com>,
+        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
+        "marcel@holtmann.org" <marcel@holtmann.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>
+Message-ID: <182f801c979.751199c4530197.7043811006670900472@siddh.me>
+In-Reply-To: <MW5PR84MB184223FFE931E4B121AF7AC0AB769@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+References: <20220812055249.8037-1-palmer@rivosinc.com>
+ <20220825110108.157350-1-code@siddh.me> <MW5PR84MB184223FFE931E4B121AF7AC0AB769@MW5PR84MB1842.NAMPRD84.PROD.OUTLOOK.COM>
+Subject: RE: [PATCH] Bluetooth: L2CAP: Elide a string overflow warning
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: Add mesh testing support
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220831235932.290032-2-brian.gix@intel.com>
-References: <20220831235932.290032-2-brian.gix@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Importance: Medium
+User-Agent: Zoho Mail
+X-Mailer: Zoho Mail
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1043069314355351197==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, 30 Aug 2022 01:21:58 +0530  Elliott, Robert (Servers)  wrote:
+> > -----Original Message-----
+> > From: Siddh Raman Pant code@siddh.me>
+> > Sent: Thursday, August 25, 2022 6:01 AM
+> > To: palmer@rivosinc.com
+> > Cc: davem@davemloft.net; edumazet@google.com; johan.hedberg@gmail.com;
+> > kuba@kernel.org; linux-bluetooth@vger.kernel.org; linux-
+> > kernel@vger.kernel.org; linux@rivosinc.com; luiz.dentz@gmail.com;
+> > marcel@holtmann.org; netdev@vger.kernel.org; pabeni@redhat.com
+> > Subject: Re: [PATCH] Bluetooth: L2CAP: Elide a string overflow warning
+> > 
+> > On Fri, 12 Aug 2022 11:22:49 +0530  Palmer Dabbelt  wrote:
+> > > From: Palmer Dabbelt palmer@rivosinc.com>
+> > >
+> > > Without this I get a string op warning related to copying from a
+> > > possibly NULL pointer.  I think the warning is spurious, but it's
+> > > tripping up allmodconfig.
+> > 
+> > I think it is not spurious, and is due to the following commit:
+> > d0be8347c623 ("Bluetooth: L2CAP: Fix use-after-free caused by l2cap_chan_put")
+> 
+> That commit was OK - it added an "if (!c) continue" to handle if
+> the value c is changed to NULL.
+>  
+> > The following commit fixes a similar problem (added the NULL check on line
+> > 1996):
+> > 332f1795ca20 ("Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm regression")
+> 
+> That commit wiped out the "if (!c) continue" path escape clause
+> from the previous patch, introducing a path back to code that
+> doesn't check for NULL:
 
-This is automated email and please do not reply to this email!
+You are correct, thanks for clarifying. Sorry for getting it reversed.
 
-Dear submitter,
+So I think this patch can be modified to just introduce back the escape
+clause rather than having an extra indentation.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=672998
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      4.62 seconds
-GitLint                       PASS      2.24 seconds
-Prep - Setup ELL              PASS      31.12 seconds
-Build - Prep                  PASS      0.88 seconds
-Build - Configure             PASS      10.05 seconds
-Build - Make                  PASS      950.81 seconds
-Make Check                    PASS      12.98 seconds
-Make Check w/Valgrind         PASS      334.75 seconds
-Make Distcheck                PASS      277.41 seconds
-Build w/ext ELL - Configure   PASS      10.23 seconds
-Build w/ext ELL - Make        PASS      97.15 seconds
-Incremental Build w/ patches  PASS      231.34 seconds
-Scan Build                    PASS      746.78 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1043069314355351197==--
+Thanks,
+Siddh
