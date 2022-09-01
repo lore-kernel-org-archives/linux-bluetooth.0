@@ -2,86 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E56ECAAD2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 20:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18378ECAAD2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 21:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234824AbiIAUKP convert rfc822-to-8bit (ORCPT
+        id S235050AbiIAVDr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Sep 2022 16:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41326 "EHLO
+        Thu, 1 Sep 2022 17:03:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbiIAUKN (ORCPT
+        with ESMTP id S235055AbiIAVDn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Sep 2022 16:10:13 -0400
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C45791C92E
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 13:10:09 -0700 (PDT)
-Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id DD0831C0005;
-        Thu,  1 Sep 2022 20:10:07 +0000 (UTC)
-Message-ID: <507eb017ee07075386127b40a35765513cf8de4b.camel@hadess.net>
-Subject: Re: [PATCH BlueZ v7 1/6] adapter: Keep track of whether the adapter
- is rfkill'ed
-From:   Bastien Nocera <hadess@hadess.net>
-To:     patchwork-bot+bluetooth@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org
-Date:   Thu, 01 Sep 2022 22:10:07 +0200
-In-Reply-To: <166205821606.5769.2196808396648976031.git-patchwork-notify@kernel.org>
-References: <20220901110719.176944-1-hadess@hadess.net>
-         <166205821606.5769.2196808396648976031.git-patchwork-notify@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
-User-Agent: Evolution 3.44.4 (3.44.4-1.fc36) 
+        Thu, 1 Sep 2022 17:03:43 -0400
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1DB8246
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 14:03:41 -0700 (PDT)
+Received: by mail-qv1-xf35.google.com with SMTP id d1so87129qvs.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Sep 2022 14:03:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=BzSv8X2/Qs9qSpV+7tDGS7qJ+RTGMWVmzRftZbXnLDs=;
+        b=Myj0MbMQlf7O0Dzsyoy/7hTSLrnmmchwWKlNo8qGahNkuL+zXfy2uVxE1LjbRyzIug
+         hYNb7ccq0t+YHgs04To/M3SPYLQi8TdxMICfEg+UZPYaEaX68ImkdU4dRrW8bpPeBBnW
+         6LIug7EpDfVRxXtGtOjHBNGW04DEsSBeNO/vVTAxHXioYUXhKMoMiL/rokWEe190DGt/
+         tISmIgNWd++yu7ZgEIEcz1lOSUHoVs0oE8sYaYmsP5tlkxv3ftynNXglfuJjG8vC5eJg
+         HInHrZ/WkCKJtERKyvLr87Bm9A0x11BIrxCwgEVK1B1mZBk1A29x6iNYJiKQTakMG4tA
+         sLyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=BzSv8X2/Qs9qSpV+7tDGS7qJ+RTGMWVmzRftZbXnLDs=;
+        b=6dGBWgMmtQ2PTOT1gXGUauknl8+vMR6TOrgXNtbAghTJKh9CNH8DeVlyEfI/a0B0Ij
+         HalXSwuy9j1g8e1eXeNXvGCpIxVv2w2sMf1VPzB+Yz642+fOFUZxyKW8NCxjfgb+34vC
+         3zmk+78kwbRUtaux52nU0kMowmsowpLgRLqjnX/hl6QhfLUqS05jsTRpSAQF0t11mwZ3
+         Z5rxqwOkKcWgByrwt+7dffNDdiAXOk3HRPFKHoVpFoxouuJ09P5RCWBRXBQJ+rudMKhz
+         3daIrWWgh0Gy/5wuwZjrI31Gg0obEyviE1J2wGUMGsxKSani6JBoHUF1Awn+Ba4DWbnK
+         wxGg==
+X-Gm-Message-State: ACgBeo0KqjAmgokrsM3EZvzybtrdGqGBPTgLMb5sjJlzahOAPeif6UUH
+        5Gm0EbI33bi0tVOYrW83eriDhpMWx4DMaA==
+X-Google-Smtp-Source: AA6agR718uvumHFVNubhZPRGrlmI5FgSngHQ2fDJffRT2DddwyX9WT4rpXSbf2O25s8c/sqWD274Dg==
+X-Received: by 2002:a05:6214:2b0b:b0:497:30dc:4c33 with SMTP id jx11-20020a0562142b0b00b0049730dc4c33mr26547239qvb.80.1662066220840;
+        Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
+Received: from [172.17.0.2] ([52.179.12.27])
+        by smtp.gmail.com with ESMTPSA id i7-20020a05620a404700b006a6ebde4799sm12592232qko.90.2022.09.01.14.03.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
+Message-ID: <63111e2c.050a0220.9379d.aee3@mx.google.com>
+Date:   Thu, 01 Sep 2022 14:03:40 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4071076239178692723=="
 MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: [BlueZ] mgmt-tester: Adds turning on Mesh Experimental feature
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220901200501.27858-1-brian.gix@intel.com>
+References: <20220901200501.27858-1-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2022-09-01 at 18:50 +0000, patchwork-bot+bluetooth@kernel.org
-wrote:
-> Hello:
-> 
-> This series was applied to bluetooth/bluez.git (master)
-> by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-> 
-> On Thu,  1 Sep 2022 13:07:14 +0200 you wrote:
-> > Instead of only replying to D-Bus requests with an error saying the
-> > adapter is blocked, keep track of the rfkill being enabled or
-> > disabled
-> > so we know the rfkill state of the adapter at all times.
-> > ---
-> >  src/adapter.c | 25 +++++++++++++--
-> >  src/adapter.h |  1 +
-> >  src/btd.h     |  1 +
-> >  src/rfkill.c  | 89 ++++++++++++++++++++++++++++++++++++++---------
-> > ----
-> >  4 files changed, 91 insertions(+), 25 deletions(-)
-> 
-> Here is the summary with links:
->   - [BlueZ,v7,1/6] adapter: Keep track of whether the adapter is
-> rfkill'ed
->    
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=abf5ba6b80ad
->   - [BlueZ,v7,2/6] adapter: Implement PowerState property
->    
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=58021a665b7f
->   - [BlueZ,v7,3/6] client: Print the PowerState property
->    
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=48992da64f52
->   - [BlueZ,v7,4/6] adapter-api: Add PowerState property documentation
->    
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=6e49216ad47d
->   - [BlueZ,v7,5/6] adapter: Fix typo in function name
->    
-> https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=61f4f2895882
->   - [BlueZ,v7,6/6] adapter: Remove experimental flag for PowerState
->     (no matching commit)
-> 
-> You are awesome, thank you!
+--===============4071076239178692723==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Sweet, thanks!
+This is automated email and please do not reply to this email!
 
-The links are missing "commit/" in the URL though, so should be:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/commit/?id=abf5ba6b80ad
-not:
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=abf5ba6b80ad
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=673378
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.59 seconds
+GitLint                       PASS      1.02 seconds
+Prep - Setup ELL              PASS      27.08 seconds
+Build - Prep                  PASS      0.82 seconds
+Build - Configure             PASS      8.70 seconds
+Build - Make                  PASS      836.98 seconds
+Make Check                    PASS      11.87 seconds
+Make Check w/Valgrind         PASS      288.51 seconds
+Make Distcheck                PASS      237.00 seconds
+Build w/ext ELL - Configure   PASS      8.72 seconds
+Build w/ext ELL - Make        PASS      83.60 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      506.60 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ] mgmt-tester: Adds turning on Mesh Experimental feature
+WARNING:LONG_LINE: line length of 101 exceeds 80 columns
+#132: FILE: tools/mgmt-tester.c:7424:
++			tester_warn("Invalid cmd response parameter size %d %d", length, expect_len);
+
+/github/workspace/src/12963192.patch total: 0 errors, 1 warnings, 75 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12963192.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4071076239178692723==--
