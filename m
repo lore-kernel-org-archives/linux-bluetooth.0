@@ -2,103 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B22ECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Sep 2022 23:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C54ECAAD2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Sep 2022 00:27:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233901AbiIAX5E (ORCPT
+        id S234068AbiIBA1W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Sep 2022 19:57:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44934 "EHLO
+        Thu, 1 Sep 2022 20:27:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233383AbiIAX5D (ORCPT
+        with ESMTP id S232199AbiIBA1V (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Sep 2022 19:57:03 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063E86C747
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 16:57:02 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id q7so1009209lfu.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Sep 2022 16:57:01 -0700 (PDT)
+        Thu, 1 Sep 2022 20:27:21 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EDD395ADE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Sep 2022 17:27:20 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id z3-20020a17090abd8300b001fd803e34f1so4004470pjr.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Sep 2022 17:27:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc;
-        bh=dgTzRK/VqQMj3ZrBHwtt1T24KxQHKgnaXZqsUrvpkeA=;
-        b=JCpHuh+Bw7iiLTkbiShfNw51dfnp4cqWTOZ29W4TTeyidO5kcut7b/RwWGXgY7DeHK
-         q+xMVKh5fPzx9fcBu0CFfaeCtjK7GvOmDjydC98lR0+Zu7h5qdIL49k3qRMr8/CrBgRw
-         rB8U5SPiV2xoMgHyPaZcjo6AD/CZQmVsX+8DliXTHDkMNtUvnh7w9pLuVpZajf23xlWk
-         MGCSyyRcliSOqgZiYqmP1RTNNu4f8gj2PANxruMoanOFIShFVucSLWSGog1l9L94bHwe
-         8SAPIGNzJ7qT8liuzXVoSlc24AUXg380N0Clx8iZvIcUJG3dGWrhpvEDg5G3I3bEpHkt
-         FAww==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc;
+        bh=sNx64mG9XeE6HyPYXQSn8k/iXLoWHAOBZBM7roZm538=;
+        b=kKn0jsNP13YF+/i6SaAjZUtRzdQ+C6ZJVlLYgB4wlRwwX7Ry7X+f8kamLuddVVFXb9
+         nTyM+/JqU7v+r93wAsdvbdhqP7FzabXzHsdg1FPlXYZH2cvYwkPFzxXWrc4IMfgtJlun
+         MLHjVOSgwRoAjXnHI3Q5/V/9pnMWSY3YE94MJWCvMmkp3mrIhnY4FfVMQ7D53wdQxuIv
+         q/v0Ofu4mPTvP2/0hkbZO5TqOMsjgvZHDqEk8IK3ZeWmjgyzC7lbEMzG49sX3OMhTcCb
+         K9pVCLmFvwPwm2QBrKhHMuNONvWqexMDDxZyQAvjF9BYNCcowUpng879dZXttx6bfbCs
+         9kTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc;
-        bh=dgTzRK/VqQMj3ZrBHwtt1T24KxQHKgnaXZqsUrvpkeA=;
-        b=q4h1OlaovpwG92xC4pmimD/4kh1Tu7/eNwm9Z+qKeOnwNY9lKkWLS8zRmaGZ7Izakx
-         +tJ1tujNNcWbtkXboJi2M3r8OUgdgBtvuAEjtoA6lXN2OpuOEKUGHtrahsST1F7CChW4
-         SO0MOTaXOa8XE/46yv23XNq5AEMSL7bkaqG0NvQfa6W0MF4vPlQSBliVY+DFzWtFNdRW
-         fHtk3dosuE9ZQMd3YRWslYQHmzEat/o9qv1yhNBoe171EHbthDtX+1TM+pEq0R7Dro17
-         Wx7XK+YMk+bPI4qkpCIPMXvqbkR2I/W7TjIddT2XBRS+Pgk3HACjfcwHe9SWwcKNgcA5
-         TnZQ==
-X-Gm-Message-State: ACgBeo1a31gPLG0ms6SN5OOGVIYSmUBmjR9HZXmJbYEhdfTk447jyIvP
-        +8rhDbifck9rJMu1z/SLp2YdY8vsCxwwI/EL3FQ=
-X-Google-Smtp-Source: AA6agR6yz7lUN+DZlo7lBtZs24mQPIaoECeREzJEx/v2c4S79R3PGDUHV+vdWYarfAk892tRTPLCvPVdUC4vB6ZIK3o=
-X-Received: by 2002:a05:6512:1ce:b0:494:81fc:e755 with SMTP id
- f14-20020a05651201ce00b0049481fce755mr3827699lfp.106.1662076620056; Thu, 01
- Sep 2022 16:57:00 -0700 (PDT)
-MIME-Version: 1.0
-References: <01070182f561c630-852e0333-6f04-448b-b064-46a2f000e860-000000@eu-central-1.amazonses.com>
- <CABBYNZJGc2Y3UULighw95un9mb8khLM2dfTOB3jRV8D3ksVDXg@mail.gmail.com>
- <1ef5e51d2103b6f02826777ebf5415f74018e317.camel@hadess.net> <01070182fa3f5ac6-66cb5385-fab0-4916-9e97-bdf54ef3a3f6-000000@eu-central-1.amazonses.com>
-In-Reply-To: <01070182fa3f5ac6-66cb5385-fab0-4916-9e97-bdf54ef3a3f6-000000@eu-central-1.amazonses.com>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc;
+        bh=sNx64mG9XeE6HyPYXQSn8k/iXLoWHAOBZBM7roZm538=;
+        b=t7GhA0O1vabfbEDTStwvFwghj/3EtvpPXRGRIkXEGOrHlfMjE2WuXJKvtTQkMJUwW5
+         0+NlRPDWHEHCwKfwzBv6eaLRc/eZIfoShT+BQPjHCayzoKHkKEHtZYWa8rJUiXzHTodL
+         TKc2KUBhJncBGzcw6bqOKJ6ny4CgI1noeE+KJvqWW/Jf8iZwnJrP3Lsg01oJRDL+WYun
+         a7ba/O/nE/1GfLxGR7SsLfxiq8uw7c0Jt78hugvMptCkyKJeDkmrbIjE8s2/XT9PMUOW
+         2bpl7wmrphfqJHFekIsN07drClv5gVHmRXZjW31xaa3nRuFEWTm7nCq9W0IzkMsyMQo9
+         Hwnw==
+X-Gm-Message-State: ACgBeo1a3zsJe/1zRje3621xkR0mMV0Oco2ctq0dwVuyv4BZFrIGvb9G
+        IkaxB4oekK90k8MDRk0HTR31zjEk80A=
+X-Google-Smtp-Source: AA6agR4bFOM2b6mrOHKLnA7TOF0OGa93TgrbaLROfy0cgRGMJEW5mrvGPPZSFD7cPeWhue9sDikB5A==
+X-Received: by 2002:a17:90a:e655:b0:1fe:4ec3:aba with SMTP id ep21-20020a17090ae65500b001fe4ec30abamr1823100pjb.182.1662078439154;
+        Thu, 01 Sep 2022 17:27:19 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id l10-20020a63da4a000000b0042c0ffa0e62sm137154pgj.47.2022.09.01.17.27.18
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Sep 2022 17:27:18 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 1 Sep 2022 16:56:48 -0700
-Message-ID: <CABBYNZ+An68giBXb=6c-W3+-8tpvSHsWtV_GGJMXMQwUWbhh-w@mail.gmail.com>
-Subject: Re: [PATCH] plugins: Do not try to autopair with Nissan Connect devices
-To:     Florian Leeber <florian@ubports.com>
-Cc:     Bastien Nocera <hadess@hadess.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_sync: Fix hci_read_buffer_size_sync
+Date:   Thu,  1 Sep 2022 17:27:17 -0700
+Message-Id: <20220902002717.1823748-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Florian,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Sep 1, 2022 at 11:10 AM Florian Leeber <florian@ubports.com> wrote:
->
-> Am 01.09.2022 um 12:46 schrieb Bastien Nocera:
-> > On Wed, 2022-08-31 at 13:18 -0700, Luiz Augusto von Dentz wrote:
-> >> Hi Florian,
-> >>
-> >> On Wed, Aug 31, 2022 at 12:44 PM Florian Leeber <florian@ubports.com>
-> >> wrote:
-> >> gs as default).
-> > FWIW, gnome-bluetooth has its own database on top of bluez, which we
-> > prefer to the code in bluez. I'd be happy getting rid of it.
-> >
-> > Loads of devices that need pairing despite their class and Bluetooth
-> > version, and devices that need special handling like the Navman GPS
-> > that expects a non-numerical PIN.
-> >
-> > The database:
-> > https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin-code-database.xml
-> > The code to parse it:
-> > https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/blob/master/lib/pin.c
->
-> Oh my, this escalated quickly ;) - tbh implementing this as a fully
-> fledged config-based feature might be over my head. I am not proficient
-> with the Bluez code at all, and my main work currently is being the OTA
-> release manager for Ubuntu Touch. I could only work on this with some
-> support to get the basics established.
->
-> Thanks for the hint with the database, we did not know about this.
+hci_read_buffer_size_sync shall not use HCI_OP_LE_READ_BUFFER_SIZE_V2
+sinze that is LE specific, instead it is hci_le_read_buffer_size_sync
+version that shall use it.
 
-Can't you solve the problem in the agent thought? Or does the current
-logic make the pairing fail right away?
+Link: https://bugzilla.kernel.org/show_bug.cgi?id=216382
+Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_sync.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
->
-
-
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index fa433896ddc7..41b6d19c70b0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3339,12 +3339,6 @@ static const struct hci_init_stage amp_init2[] = {
+ /* Read Buffer Size (ACL mtu, max pkt, etc.) */
+ static int hci_read_buffer_size_sync(struct hci_dev *hdev)
+ {
+-	/* Use Read LE Buffer Size V2 if supported */
+-	if (hdev->commands[41] & 0x20)
+-		return __hci_cmd_sync_status(hdev,
+-					     HCI_OP_LE_READ_BUFFER_SIZE_V2,
+-					     0, NULL, HCI_CMD_TIMEOUT);
+-
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_BUFFER_SIZE,
+ 				     0, NULL, HCI_CMD_TIMEOUT);
+ }
+@@ -3558,6 +3552,12 @@ static const struct hci_init_stage hci_init2[] = {
+ /* Read LE Buffer Size */
+ static int hci_le_read_buffer_size_sync(struct hci_dev *hdev)
+ {
++	/* Use Read LE Buffer Size V2 if supported */
++	if (hdev->commands[41] & 0x20)
++		return __hci_cmd_sync_status(hdev,
++					     HCI_OP_LE_READ_BUFFER_SIZE_V2,
++					     0, NULL, HCI_CMD_TIMEOUT);
++
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_READ_BUFFER_SIZE,
+ 				     0, NULL, HCI_CMD_TIMEOUT);
+ }
 -- 
-Luiz Augusto von Dentz
+2.37.2
+
