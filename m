@@ -2,124 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5756C38145
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Sep 2022 15:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75400C38145
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  3 Sep 2022 16:12:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231341AbiICPdT (ORCPT
+        id S229929AbiICQM3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 3 Sep 2022 11:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36616 "EHLO
+        Sat, 3 Sep 2022 12:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230050AbiICPdR (ORCPT
+        with ESMTP id S229806AbiICQM2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 3 Sep 2022 11:33:17 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120FE5AC50
-        for <linux-bluetooth@vger.kernel.org>; Sat,  3 Sep 2022 08:33:15 -0700 (PDT)
-Received: from fsav111.sakura.ne.jp (fsav111.sakura.ne.jp [27.133.134.238])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 283FX3dJ008352;
-        Sun, 4 Sep 2022 00:33:03 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav111.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp);
- Sun, 04 Sep 2022 00:33:03 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav111.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 283FX33B008349
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 4 Sep 2022 00:33:03 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <b7d8d14f-6ef9-a2c0-0a7c-cdbdf6f12551@I-love.SAKURA.ne.jp>
-Date:   Sun, 4 Sep 2022 00:32:56 +0900
+        Sat, 3 Sep 2022 12:12:28 -0400
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0FA5726A
+        for <linux-bluetooth@vger.kernel.org>; Sat,  3 Sep 2022 09:12:28 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-11f34610d4aso12020227fac.9
+        for <linux-bluetooth@vger.kernel.org>; Sat, 03 Sep 2022 09:12:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=pKix8NoX8ZN/pF5fHMrlypgAI2z+kkLx/hw9HTAg9EA=;
+        b=BeTxq/4jqrQ2jY5mz40Edb7RWAGeukIfiB3TqJklvSf5nZTYZbehk/tvigvEai0DzM
+         PDsbUA9+1cC79fWIuafprrv3l8xdzuzpoh09z0vsdz1t6vGSvJUuWro/8FUdW+BsFCV/
+         w0LNhMmHCZMkxFwMX45lI512vKTnaoyWtnJgKv5uzUPrM3ljd2+JG+wQkKtFsyMy1Ee+
+         jHc0PQxObTmOT0Sub+m5TEQ7tBY5TfCuAixtNQiPf35d8ZH4CiMwpT18nOpuYryCyZSS
+         z70zfamaUU9XlKcONDS+hgzCmjiFEimyQOFD3mPN6+nGA8TMEzsE4cy/phDU7oJwtV7u
+         ckXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=pKix8NoX8ZN/pF5fHMrlypgAI2z+kkLx/hw9HTAg9EA=;
+        b=TRSDzQCSyBZguZynP9VYF95J5C4S+cw/9xcchDXfpKQp9lZfdwBZRl/6DGZfZj+f1M
+         +ibfmpt5gsX+BR8BE4PFQWa+r5L1hCJRY8UDmLiQOOMWerEvYwuhOGMg9fnWkshtdzEC
+         NkAvsyBLiaLrRkhSw0a4LxTbAi/zLfZ12/R/GVX8H8B7Q8bH3XVRcPnGPqnSfUoyPSQr
+         otN4vN73mROO15rAdrTQWFHusGjtV/EnxyvVOVt4bHgeAF2s9RKADVM3o8knqmI5YYSs
+         ZYQs3D8pVMBhmi+WQUnPNCvqHflh9qvEsEzBEeGdOkdMCGa6kWD7Ip2em/KF76z0uah0
+         uDGg==
+X-Gm-Message-State: ACgBeo3DRxGf2qVtqii/nChzR8KlcxNclVaTvpn6h1Ci5Q/QoPXRsFq+
+        CQM7UOnkwMOVx9azPhPwv7X3Q06BccQ=
+X-Google-Smtp-Source: AA6agR6POfTmbcFQF2rBCHJ81BePe/aOOU5fOTC2TeB969NXJsg0A7PqJBzbaGbsoW27UX1eMgs9tQ==
+X-Received: by 2002:a05:6870:a9a5:b0:125:6123:3c64 with SMTP id ep37-20020a056870a9a500b0012561233c64mr3518103oab.283.1662221547138;
+        Sat, 03 Sep 2022 09:12:27 -0700 (PDT)
+Received: from [172.17.0.2] ([20.114.116.162])
+        by smtp.gmail.com with ESMTPSA id be36-20020a05687058a400b000f5e89a9c60sm2866903oab.3.2022.09.03.09.12.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 03 Sep 2022 09:12:26 -0700 (PDT)
+Message-ID: <63137cea.050a0220.c184.bf2b@mx.google.com>
+Date:   Sat, 03 Sep 2022 09:12:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2562116144941003725=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-Subject: [PATCH] Bluetooth: L2CAP: initialize delayed works at
- l2cap_chan_create()
-Content-Language: en-US
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <0000000000007a222005e68f139f@google.com>
-Cc:     linux-bluetooth@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <0000000000007a222005e68f139f@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, penguin-kernel@I-love.SAKURA.ne.jp
+Subject: RE: Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <b7d8d14f-6ef9-a2c0-0a7c-cdbdf6f12551@I-love.SAKURA.ne.jp>
+References: <b7d8d14f-6ef9-a2c0-0a7c-cdbdf6f12551@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot is reporting cancel_delayed_work() without INIT_DELAYED_WORK() at
-l2cap_chan_del() [1], for CONF_NOT_COMPLETE flag (which meant to prevent
-l2cap_chan_del() from calling cancel_delayed_work()) is cleared by timer
-which fires before l2cap_chan_del() is called by closing file descriptor
-created by socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_L2CAP).
+--===============2562116144941003725==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-l2cap_bredr_sig_cmd(L2CAP_CONF_REQ) and l2cap_bredr_sig_cmd(L2CAP_CONF_RSP)
-are calling l2cap_ertm_init(chan), and they call l2cap_chan_ready() (which
-clears CONF_NOT_COMPLETE flag) only when l2cap_ertm_init(chan) succeeded.
+This is automated email and please do not reply to this email!
 
-l2cap_sock_init() does not call l2cap_ertm_init(chan), and it instead sets
-CONF_NOT_COMPLETE flag by calling l2cap_chan_set_defaults(). However, when
-connect() is requested, "command 0x0409 tx timeout" happens after 2 seconds
- from connect() request, and CONF_NOT_COMPLETE flag is cleared after 4
-seconds from connect() request, for l2cap_conn_start() from
-l2cap_info_timeout() callback scheduled by
+Dear submitter,
 
-  schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=673830
 
-in l2cap_connect() is calling l2cap_chan_ready().
+---Test result---
 
-Fix this problem by initializing delayed works used by L2CAP_MODE_ERTM
-mode as soon as l2cap_chan_create() allocates a channel, like I did in
+Test Summary:
+CheckPatch                    FAIL      1.92 seconds
+GitLint                       PASS      0.77 seconds
+SubjectPrefix                 PASS      0.62 seconds
+BuildKernel                   PASS      46.71 seconds
+BuildKernel32                 PASS      41.98 seconds
+Incremental Build with patchesPASS      60.74 seconds
+TestRunner: Setup             PASS      695.46 seconds
+TestRunner: l2cap-tester      PASS      21.77 seconds
+TestRunner: iso-tester        PASS      22.27 seconds
+TestRunner: bnep-tester       PASS      8.61 seconds
+TestRunner: mgmt-tester       PASS      136.49 seconds
+TestRunner: rfcomm-tester     PASS      12.60 seconds
+TestRunner: sco-tester        PASS      12.50 seconds
+TestRunner: smp-tester        PASS      12.46 seconds
+TestRunner: userchan-tester   PASS      9.00 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.92 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()\ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: unsaf ("ace/src' is owned by someone else)")'
+#84: 
 commit be8597239379f0f5 ("Bluetooth: initialize skb_queue_head at
 l2cap_chan_create()").
 
-Link: https://syzkaller.appspot.com/bug?extid=83672956c7aa6af698b3 [1]
-Reported-by: syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+total: 1 errors, 0 warnings, 0 checks, 28 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12964990.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- net/bluetooth/l2cap_core.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2c9de67daadc..770891f68703 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -61,6 +61,9 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
- 
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		     struct sk_buff_head *skbs, u8 event);
-+static void l2cap_retrans_timeout(struct work_struct *work);
-+static void l2cap_monitor_timeout(struct work_struct *work);
-+static void l2cap_ack_timeout(struct work_struct *work);
- 
- static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
- {
-@@ -476,6 +479,9 @@ struct l2cap_chan *l2cap_chan_create(void)
- 	write_unlock(&chan_list_lock);
- 
- 	INIT_DELAYED_WORK(&chan->chan_timer, l2cap_chan_timeout);
-+	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
-+	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
-+	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
- 
- 	chan->state = BT_OPEN;
- 
-@@ -3320,10 +3326,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
- 	chan->rx_state = L2CAP_RX_STATE_RECV;
- 	chan->tx_state = L2CAP_TX_STATE_XMIT;
- 
--	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
--	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
--	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
--
- 	skb_queue_head_init(&chan->srej_q);
- 
- 	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
--- 
-2.34.1
 
+--===============2562116144941003725==--
