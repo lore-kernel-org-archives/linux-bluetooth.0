@@ -2,79 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F50FECAAD5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Sep 2022 13:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EDDECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Sep 2022 20:11:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236987AbiIENu2 (ORCPT
+        id S231547AbiIEUL0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Sep 2022 09:50:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59460 "EHLO
+        Mon, 5 Sep 2022 16:11:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238242AbiIENu0 (ORCPT
+        with ESMTP id S229616AbiIEULY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Sep 2022 09:50:26 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DD9A26ACD;
-        Mon,  5 Sep 2022 06:50:20 -0700 (PDT)
+        Mon, 5 Sep 2022 16:11:24 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED2DD5F23E
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Sep 2022 13:11:21 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 175C161286;
-        Mon,  5 Sep 2022 13:50:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 68B3DC43143;
-        Mon,  5 Sep 2022 13:50:19 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AF863B815DA
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Sep 2022 20:11:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C3D6C43150
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Sep 2022 20:11:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662385819;
-        bh=0vgDGvw3E8r0rRG6HeP7R+P65BHkKRE2Hq/zH45bn9k=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=EpiBpGoePYQQzgILObCXeRBb2ggTjF5ZUAYcBcCj1WMk8jxjwVao57H3fWzVVeHCs
-         PgtGeeBluNhMeqgueOSi+HvSpm5hyN2gi5SjaCW9HfqHVnM7tXYAZWzFsk4Jmwrpns
-         C1u4v5mP0f1ywFaSnoRX6CIHAtdy8lSDFCM1cHCo0OFjPtEGwplGPaOcrdaHItro5g
-         sKplO5wwRf1yssku61yY/gOUcVDa3dIKunmihsc5oXpQgkffYdvt6HZlkPNfHEQYqZ
-         lSsxbyRGMLjGxE/nAAnI4PlBeUU1NLyUj15b6uehsKq3pnSBS3JBEZqttW3t3ZUv2n
-         vXG7+sTP19dbA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 555B4C04E59;
-        Mon,  5 Sep 2022 13:50:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        s=k20201202; t=1662408679;
+        bh=lF+Pbm6zoKR6opfsyR0oRLAUngjQ7EhxHywhDEBTHAc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=h0PqRAJ3M4xgWWPAL3acL2RXp8yU6LPN0O41rCemoR6SqeAjj5d7b8Nwf7GHuuaT1
+         ZYvebawVpI6ELDHnQ5SD9rKiMc50m2LGKnuuvsCpOw9z8TGLyRxOIGMhVr2FThQ2FY
+         SVRWAv+BOITTtFO0eptlOQXVYsTGeiTihdww1Bcx9jGmZdySnJMYu8ZACavp2IwoKT
+         kLsjkox4Dq8bWPhAfTIXilAebxxo6JD91osQyuUa4uFavPMZruHT6GqQLU/AsiVk0r
+         /0/Kx4txmUQ0McXL9wXJ0XwF9XneD/IWjRp8CzaxoabR0hFVwYdPHjEi1FEhz8z5fP
+         5jUlQjFvDp07A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 4D0CFC433E4; Mon,  5 Sep 2022 20:11:19 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215768] Kernel 5.17 can't suspend while bluetooth is enabled.
+Date:   Mon, 05 Sep 2022 20:11:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: mike@it-loops.com
+X-Bugzilla-Status: RESOLVED
+X-Bugzilla-Resolution: CODE_FIX
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215768-62941-psOcZLRcj9@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215768-62941@https.bugzilla.kernel.org/>
+References: <bug-215768-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2022-09-02
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166238581934.6349.6215414948226277032.git-patchwork-notify@kernel.org>
-Date:   Mon, 05 Sep 2022 13:50:19 +0000
-References: <20220902220404.2013285-1-luiz.dentz@gmail.com>
-In-Reply-To: <20220902220404.2013285-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215768
 
-This pull request was applied to netdev/net.git (master)
-by David S. Miller <davem@davemloft.net>:
+--- Comment #41 from Michael Guntsche (mike@it-loops.com) ---
+Hi,=20
 
-On Fri,  2 Sep 2022 15:04:04 -0700 you wrote:
-> The following changes since commit e7506d344bf180096a86ec393515861fb5245915:
-> 
->   Merge tag 'rxrpc-fixes-20220901' of git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs (2022-09-02 12:45:32 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-09-02
-> 
-> [...]
+this worked for me in 5.19.3 but stopped working in 5.19.5 again. With 5.19=
+.3 I
+could go into standby with my BT headphones connected, with 5.19.5 and 6.0-=
+rc3
+the machine does not go to standby.
 
-Here is the summary with links:
-  - pull request: bluetooth 2022-09-02
-    https://git.kernel.org/netdev/net/c/beb432528c79
+--=20
+You may reply to this email to add a comment.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+You are receiving this mail because:
+You are the assignee for the bug.=
