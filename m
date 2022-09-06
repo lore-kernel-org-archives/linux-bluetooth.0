@@ -2,78 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32BE8C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Sep 2022 20:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 009BCC38145
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Sep 2022 20:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230459AbiIFUUw (ORCPT
+        id S231418AbiIFUVY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Sep 2022 16:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60134 "EHLO
+        Tue, 6 Sep 2022 16:21:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbiIFUUT (ORCPT
+        with ESMTP id S231186AbiIFUVB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Sep 2022 16:20:19 -0400
-Received: from smtp.github.com (out-22.smtp.github.com [192.30.252.205])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 910593CBC1
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 13:19:11 -0700 (PDT)
-Received: from github.com (hubbernetes-node-ab5c4a7.ac4-iad.github.net [10.52.222.38])
-        by smtp.github.com (Postfix) with ESMTPA id C0AD7720D0F
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 13:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1662495550;
-        bh=tjENKaGmKZj/b2alKFTyfZHxJrwPzFDSySQadmunXZA=;
-        h=Date:From:To:Subject:From;
-        b=nN1LsKwEDrHn3wrLm7S5EGwDP5dCpzJfnVNW7cIPgCmhExc+hYILwes/illfCa8ax
-         AIVv/Rgm75CqtA+HU+8uZW07AJgMis4NgwrImhINVZGaQNsax4lIR54YJLQncO8vwk
-         pB6EH+XG2l4iav4tS3yUr+2+/uR+HnI+LFs8y9oc=
-Date:   Tue, 06 Sep 2022 13:19:10 -0700
-From:   Luiz Augusto von Dentz <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/c96629-4c8a6b@github.com>
-Subject: [bluez/bluez] 3d3b1c: rfcomm-tester: Use latest Bluetooth version
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Tue, 6 Sep 2022 16:21:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 338506365
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 13:20:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B3851B81A3F
+        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 20:20:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 724D1C433C1;
+        Tue,  6 Sep 2022 20:20:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662495615;
+        bh=BDJYmHpse8YGz5WDV5X1eZOiesMqYwI8alYyCbDsE70=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Ar33rjJXu52rrV+/SKO6S9ZJM30fksBd9LjNiw6ovwfBLo/ygb+U9ASFYhJ+OYMBB
+         8jUVrWN7JoCCwsdAoJgJQ7ubRFJSBPZg8In1b659Gn+BkrsnnL8+7tjM19YFAX3vpF
+         i/oZKZkHk9jaObS6sE0cvfl0uc3eMHAEJgEF7Gv2Bbb4pwI31GjdJlvbhMWV0825wE
+         Bp3bH2B+5A+rVj8L0yp5b6uId54SERjxWXPmgd4ODhNBKkR41cSw1E7TZLjYwLs2sT
+         kT9RbKVOa2nL2ShFachHHC3dbZ+vAtw+OPj6UKGSgY/dzpr7g4HXN5VEmjf+/mSAFm
+         AcnVaRTX43/IQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 48ED5C73FE9;
+        Tue,  6 Sep 2022 20:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] rfcomm-tester: Use latest Bluetooth version
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166249561529.28899.8499652131121293542.git-patchwork-notify@kernel.org>
+Date:   Tue, 06 Sep 2022 20:20:15 +0000
+References: <20220902205702.1955891-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220902205702.1955891-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 3d3b1ceab9cbd7c03ba2496ec2d2e0cb951b1db2
-      https://github.com/bluez/bluez/commit/3d3b1ceab9cbd7c03ba2496ec2d2e0cb951b1db2
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-09-02 (Fri, 02 Sep 2022)
+Hello:
 
-  Changed paths:
-    M tools/rfcomm-tester.c
+This patch was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-  Log Message:
-  -----------
-  rfcomm-tester: Use latest Bluetooth version
+On Fri,  2 Sep 2022 13:57:02 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This makes rfcomm-tester use the latest Bluetooth supported by the
+> emulator which is useful the detect regression related to ACL data
+> transfer.
+> ---
+>  tools/rfcomm-tester.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This makes rfcomm-tester use the latest Bluetooth supported by the
-emulator which is useful the detect regression related to ACL data
-transfer.
+Here is the summary with links:
+  - [BlueZ] rfcomm-tester: Use latest Bluetooth version
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=3d3b1ceab9cb
 
-
-  Commit: 4c8a6ba5ec7fb82e77710c69f14f774aa4c348a9
-      https://github.com/bluez/bluez/commit/4c8a6ba5ec7fb82e77710c69f14f774aa4c348a9
-  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-  Date:   2022-09-06 (Tue, 06 Sep 2022)
-
-  Changed paths:
-    M src/shared/bap.c
-
-  Log Message:
-  -----------
-  shared/bap: Fix not unregistering disconnect callback
-
-bt_bap_detach shall always unregister the disconnect callback otherwise
-the session pointer may still be accessible.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Compare: https://github.com/bluez/bluez/compare/c96629bedbae...4c8a6ba5ec7f
