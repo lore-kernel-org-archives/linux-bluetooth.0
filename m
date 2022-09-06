@@ -2,85 +2,70 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D59ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Sep 2022 08:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FCB7ECAAD5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Sep 2022 15:26:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232983AbiIFIFd (ORCPT
+        id S233281AbiIFP0X (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Sep 2022 04:05:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46532 "EHLO
+        Tue, 6 Sep 2022 11:26:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231569AbiIFIFb (ORCPT
+        with ESMTP id S238555AbiIFP0B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Sep 2022 04:05:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B52419BC
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 01:05:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F31FF61241
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 08:05:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61DB7C433B5
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Sep 2022 08:05:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662451528;
-        bh=VxIO1zDtGYeAeQXFUWKT4aJn34Dx9vqGmz0m1WeWzPk=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=krtoqP4+1E00RKxA0D9JCdiKn5ZfRg82OqEgRdAwGNZGkbpir49t3oLypvZOP78Tr
-         OaPdB3wXXwxwByQnC8vQUl1fzNQSh9xNIXwM4INMwp8GFqnaDWSee7xf3S7NPfGa7s
-         CEwDWQVdKt4BiEr0PIfmXpkdXpH0JUNo5J6cpHy02svvO7ZvHQqQa5ycYKVV7KSMCx
-         HsJ4tyUDjE0i5DBEqxuxRHa9iUSGpPbWTpx1Tx0I7Z4dRY8nCG28RiBObtEgsg2lAJ
-         CPuSg3j63XpEEolapt7webXzwxQmDuGsmFcMakz8smiYGw6VwUV2fxfHnpHb7OpqJE
-         JwKrd/kt2/bJg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 46007C433E7; Tue,  6 Sep 2022 08:05:28 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209659] Intel USB AX201 bluetooth (8087:0026) device is gone
- after system resume
-Date:   Tue, 06 Sep 2022 08:05:28 +0000
-X-Bugzilla-Reason: CC AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: pawelwod@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-209659-62941-pjaqEglK9r@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209659-62941@https.bugzilla.kernel.org/>
-References: <bug-209659-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Tue, 6 Sep 2022 11:26:01 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D0DBFC54;
+        Tue,  6 Sep 2022 07:37:25 -0700 (PDT)
+Received: from kwepemi500013.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4MMSX93cNPz1P6mT;
+        Tue,  6 Sep 2022 22:32:25 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by kwepemi500013.china.huawei.com
+ (7.221.188.120) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 6 Sep
+ 2022 22:36:12 +0800
+From:   Zheng Yongjun <zhengyongjun3@huawei.com>
+To:     <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+Subject: [PATCH -next] Bluetooth: btbcm: add missing of_node_put() in btbcm_get_board_name()
+Date:   Tue, 6 Sep 2022 14:34:12 +0000
+Message-ID: <20220906143412.123134-1-zhengyongjun3@huawei.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.112.208]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemi500013.china.huawei.com (7.221.188.120)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209659
+After using 'root' returned by of_find_node_by_path(), of_node_put()
+need be called to decrease the refcount.
 
---- Comment #6 from Pawel Wodkowski (pawelwod@gmail.com) ---
-They officially admitted that Intel don't GF about that issue.
+Fixes: 63fac3343b99 ("Bluetooth: btbcm: Support per-board firmware variants")
+Signed-off-by: Zheng Yongjun <zhengyongjun3@huawei.com>
+---
+ drivers/bluetooth/btbcm.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Official suggested "workarounds" can be found here:
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index 3006e2a0f37e..a85f3c62b08a 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -504,8 +504,10 @@ static const char *btbcm_get_board_name(struct device *dev)
+ 	if (!root)
+ 		return NULL;
 
-https://community.intel.com/t5/Wireless/AX201-Bluetooth-dead-after-sleep-S3=
--and-resume-continue/m-p/1412902/emcs_t/S2h8ZW1haWx8dG9waWNfc3Vic2NyaXB0aW9=
-ufEw3UEFKTFJFU1U0VjI2fDE0MTI5MDJ8U1VCU0NSSVBUSU9OU3xoSw#M43083
+-	if (of_property_read_string_index(root, "compatible", 0, &tmp))
++	if (of_property_read_string_index(root, "compatible", 0, &tmp)) {
++		of_node_put(root);
+ 		return NULL;
++	}
 
---=20
-You may reply to this email to add a comment.
+ 	/* get rid of any '/' in the compatible string */
+ 	len = strlen(tmp) + 1;
+--
+2.17.1
 
-You are receiving this mail because:
-You are on the CC list for the bug.
-You are the assignee for the bug.=
