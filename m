@@ -2,240 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 746A6C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 20:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DA64C38145
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 22:16:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229535AbiIGUw0 (ORCPT
+        id S229516AbiIGWQq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 16:52:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
+        Wed, 7 Sep 2022 18:16:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbiIGUwQ (ORCPT
+        with ESMTP id S229495AbiIGWQp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 16:52:16 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13C94A80C
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 13:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662583934; x=1694119934;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XDvvGDHCBBZI9rKLcSHoNR3978Pm1dQgjLrnQPCxnEg=;
-  b=Kjma28k5hPcLf6cy5/N+g5oJh7D3XKo8cjWRztrsTBQRuW+g7ZSgVtKJ
-   qJetUTfG0lbFpdXyehoIkfueWO0/apDHz13d/SAl8z+fZcysfpX9K9AVQ
-   pBMnfKYh6RTK86gR23DIsX9n9lTtP5Z5SnpUVNfxCh1qcfp9+6SZb8RHi
-   /hrDubp1Y+ZnlUty8IciJC7rVxnMEGyZZptjMkI0qIhtQkMm0ppTcHcWD
-   BIVZzq9OU+KwTeivchp/C5jdu0quZN/ePMz8OwOoSNWWBGaZWuvLOApwz
-   A80JQxhxaQfFf/iYRaGNOPta9Efktu2sTBxNmqwp3t0vb2lW2GM7p5FTf
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10463"; a="360957740"
-X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
-   d="scan'208";a="360957740"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 13:52:14 -0700
-X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
-   d="scan'208";a="644781755"
-Received: from jsanch3-desk4.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.92.69])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 13:52:13 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 2/2] monitor: Add mesh MGMT cmds/events to btmon parser
-Date:   Wed,  7 Sep 2022 13:52:05 -0700
-Message-Id: <20220907205205.49729-2-brian.gix@intel.com>
-X-Mailer: git-send-email 2.37.2
+        Wed, 7 Sep 2022 18:16:45 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75960985AB
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 15:16:43 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id h22so11574819qtu.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Sep 2022 15:16:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=H9NDw90l+zdWvx9mhWLfK7JgLDusDlzEO1/jfNT9+EM=;
+        b=UTWgP6j3rLHb7ioTJuhEXHR526RuahD6HJrNvqrgcBAy+FkpJly9MMz9uwE5Ov6ZO2
+         NdBXfN/NlAAaDx+WG6dnpBgembSnvrTY4hpUH3KLo0SzFdsqutxKeafuNulkDVR2c7VM
+         ow1Hdbpa6tPjPXIDG2pFtGOgNNFmRo6Q598JInoPlUCSzBRbxunjdztYy6epylR0qD3S
+         xWKSo28W6PNJWQrGt8aaX9pGhAi3s37O5TOXM62nYcXBgzP9ZdeAZErdoNjJGrkkxHsQ
+         SaL/I77Ttrq5XmupnxQ1/cWfjQ8TkQ9lKLWNZ0N71ccdWuZrJTRBr40F3UhjDZ1X4p+Y
+         q3Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=H9NDw90l+zdWvx9mhWLfK7JgLDusDlzEO1/jfNT9+EM=;
+        b=MkPT1pZqYFdx92jlR2WEqvz9H8UXuV/XFhiU47Q/pdWXlEEtFpxMSPoEpJ5KxbTsYY
+         97mi48Lv1m4FNaeojJcEd55qnytIVjkJQa+XnuJOzPdtP1no828QbXxmHMxs08kW7ztN
+         hKV6DXYGeUEkO5jenpgFt8UP/Z+WMzLHf/tIeRi7B7eypFvQYXx0MeCEitcQplcWcMFv
+         5vtUohTIwyjSX6FkDdKLGC0vLVfKz51hKqFxyUayLhzI1NNJrB2KVDWkIlyrD2koRirQ
+         yG9UWbxce+DodPqud85hX+8wm1WQD1tioilkR2gOLhyJRmeDi0JAPnQdp/k7w36bauk2
+         Hykw==
+X-Gm-Message-State: ACgBeo0K/jATjsQO9Q6vBGmSxc/uvpwTB9t34iUvsSNTAajmc641SE8o
+        CJbba+08OcULpAsXTwua9q6VRhS3W1M=
+X-Google-Smtp-Source: AA6agR7Kus0DHgkyFPZrFTHFxg6zEXrZjUNxoLGzVMPvCUHHox/jZLGQRIh/Vz/Q5hJ5nKLULXX83Q==
+X-Received: by 2002:a05:622a:510:b0:343:6a9b:d877 with SMTP id l16-20020a05622a051000b003436a9bd877mr5199919qtx.677.1662589002429;
+        Wed, 07 Sep 2022 15:16:42 -0700 (PDT)
+Received: from [172.17.0.2] ([20.115.119.131])
+        by smtp.gmail.com with ESMTPSA id f8-20020ac81348000000b00343681ee2e2sm12966162qtj.35.2022.09.07.15.16.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 15:16:41 -0700 (PDT)
+Message-ID: <63191849.c80a0220.9f1a5.e24a@mx.google.com>
+Date:   Wed, 07 Sep 2022 15:16:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============9108301349007694825=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: [BlueZ,v2,1/2] monitor: Add ADV Monitor events to btmon parser
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20220907205205.49729-1-brian.gix@intel.com>
 References: <20220907205205.49729-1-brian.gix@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Sample Output:
+--===============9108301349007694825==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=674993
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      3.41 seconds
+GitLint                       FAIL      2.03 seconds
+Prep - Setup ELL              PASS      34.30 seconds
+Build - Prep                  PASS      1.09 seconds
+Build - Configure             PASS      10.75 seconds
+Build - Make                  PASS      1120.88 seconds
+Make Check                    PASS      12.83 seconds
+Make Check w/Valgrind         PASS      349.08 seconds
+Make Distcheck                PASS      304.88 seconds
+Build w/ext ELL - Configure   PASS      10.82 seconds
+Build w/ext ELL - Make        PASS      107.26 seconds
+Incremental Build w/ patches  PASS      256.04 seconds
+Scan Build                    PASS      707.92 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,v2,2/2] monitor: Add mesh MGMT cmds/events to btmon parser
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#68: 
 @ MGMT Command: Read Mesh Features (0x0058) plen 0                                      {0x0002} [hci0] 6.849795
-@ MGMT Event: Command Complete (0x0001) plen 7                                          {0x0002} [hci0] 6.849800
-      Read Mesh Features (0x0058) plen 4
-        Status: Success (0x00)
-        Index: 0
-        Max Handles: 3
-        Used Handles: 0
 
-@ MGMT Command: Set Mesh Receiver (0x0057) plen 9                                       {0x0002} [hci0] 6.871462
-        Enable: 1
-        Window: 4096
-        Period: 4096
-        Num AD Types: 3
-          AD Type: 42
-          AD Type: 43
-          AD Type: 41
-@ MGMT Event: Command Complete (0x0001) plen 3                                          {0x0002} [hci0] 6.871505
-      Set Mesh Receiver (0x0057) plen 0
-        Status: Success (0x00)
+/github/workspace/src/12969379.patch total: 0 errors, 1 warnings, 135 lines checked
 
-@ MGMT Command: Mesh Send (0x0059) plen 43                                             {0x0002} [hci0] 11.865613
-        Address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Addr Type: 2
-        Instant: 0x0000000000000000
-        Delay: 0
-        Count: 1
-        Data Length: 24
-        Data: : 172b01002dda0c2491537ae2000000009de2120a725038b2
-@ MGMT Event: Command Complete (0x0001) plen 4                                         {0x0002} [hci0] 11.865626
-      Mesh Send (0x0059) plen 1
-        Status: Success (0x00)
-        Handle: 3
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-@ MGMT Event: Mesh Packet Complete (0x0032) plen 1                                     {0x0001} [hci0] 11.911088
-        Handle: 3
+/github/workspace/src/12969379.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[BlueZ,v2,2/2] monitor: Add mesh MGMT cmds/events to btmon parser
+4: B1 Line exceeds max length (112>80): "@ MGMT Command: Read Mesh Features (0x0058) plen 0                                      {0x0002} [hci0] 6.849795"
+5: B1 Line exceeds max length (112>80): "@ MGMT Event: Command Complete (0x0001) plen 7                                          {0x0002} [hci0] 6.849800"
+12: B1 Line exceeds max length (112>80): "@ MGMT Command: Set Mesh Receiver (0x0057) plen 9                                       {0x0002} [hci0] 6.871462"
+20: B1 Line exceeds max length (112>80): "@ MGMT Event: Command Complete (0x0001) plen 3                                          {0x0002} [hci0] 6.871505"
+24: B1 Line exceeds max length (112>80): "@ MGMT Command: Mesh Send (0x0059) plen 43                                             {0x0002} [hci0] 11.865613"
+32: B1 Line exceeds max length (112>80): "@ MGMT Event: Command Complete (0x0001) plen 4                                         {0x0002} [hci0] 11.865626"
+37: B1 Line exceeds max length (112>80): "@ MGMT Event: Mesh Packet Complete (0x0032) plen 1                                     {0x0001} [hci0] 11.911088"
+
+
+
+
 ---
- monitor/packet.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 4c4f53dee..7544a7e68 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -14191,6 +14191,74 @@ static void mgmt_remove_adv_monitor_patterns_rsp(const void *data,
- 	print_field("Handle: %d", handle);
- }
- 
-+static void mgmt_set_mesh_receiver_cmd(const void *data, uint16_t size)
-+{
-+	uint8_t enable = get_u8(data);
-+	uint16_t window = get_le16(data + 1);
-+	uint16_t period = get_le16(data + 3);
-+	uint8_t num_ad_types = get_u8(data + 5);
-+	const uint8_t *ad_types = data + 6;
-+
-+	print_field("Enable: %d", enable);
-+	print_field("Window: %d", window);
-+	print_field("Period: %d", period);
-+	print_field("Num AD Types: %d", num_ad_types);
-+	size -= 6;
-+
-+	while (size--)
-+		print_field("  AD Type: %d", *ad_types++);
-+}
-+
-+static void mgmt_read_mesh_features_rsp(const void *data, uint16_t size)
-+{
-+	uint16_t index = get_le16(data);
-+	uint8_t max_handles = get_u8(data + 2);
-+	uint8_t used_handles = get_u8(data + 3);
-+	const uint8_t *handles = data + 4;
-+
-+	print_field("Index: %d", index);
-+	print_field("Max Handles: %d", max_handles);
-+	print_field("Used Handles: %d", used_handles);
-+	size -= 4;
-+
-+	while (size--)
-+		print_field("  Used Handle: %d", *handles++);
-+}
-+
-+static void mgmt_mesh_send_cmd(const void *data, uint16_t size)
-+{
-+	const uint8_t *addr = data;
-+	uint8_t addr_type = get_u8(data + 6);
-+	uint64_t instant = get_le64(data + 7);
-+	uint16_t delay = get_le16(data + 15);
-+	uint8_t cnt = get_u8(data + 17);
-+	uint8_t adv_data_len = get_u8(data + 18);
-+
-+	data += 19;
-+	size -= 19;
-+	print_bdaddr(addr);
-+	print_field("Addr Type: %d", addr_type);
-+	print_field("Instant: 0x%16.16" PRIx64, instant);
-+	print_field("Delay: %d", delay);
-+	print_field("Count: %d", cnt);
-+	print_field("Data Length: %d", adv_data_len);
-+	print_hex_field("Data: ", data, size);
-+}
-+
-+static void mgmt_mesh_send_rsp(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
-+static void mgmt_mesh_send_cancel_cmd(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -14448,6 +14516,18 @@ static const struct mgmt_data mgmt_command_table[] = {
- 				mgmt_add_adv_monitor_patterns_rssi_cmd, 8,
- 									false,
- 				mgmt_add_adv_monitor_patterns_rsp, 2, true},
-+	{ 0x0057, "Set Mesh Receiver",
-+				mgmt_set_mesh_receiver_cmd, 6, false,
-+				mgmt_null_rsp, 0, true},
-+	{ 0x0058, "Read Mesh Features",
-+				mgmt_null_cmd, 0, true,
-+				mgmt_read_mesh_features_rsp, 4, false},
-+	{ 0x0059, "Mesh Send",
-+				mgmt_mesh_send_cmd, 19, false,
-+				mgmt_mesh_send_rsp, 1, true},
-+	{ 0x0056, "Mesh Send Cancel",
-+				mgmt_mesh_send_cancel_cmd, 1, true,
-+				mgmt_null_rsp, 0, true},
- 	{ }
- };
- 
-@@ -14945,6 +15025,33 @@ static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
- 	print_field("Addr Type: %d", addr_type);
- }
- 
-+static void mgmt_mesh_device_found_evt(const void *data, uint16_t size)
-+{
-+	const uint8_t *addr = data;
-+	uint8_t addr_type = get_u8(data + 6);
-+	int8_t rssi = get_s8(data + 7);
-+	uint64_t instant = get_le64(data + 8);
-+	uint32_t flags = get_le32(data + 16);
-+	uint16_t eir_len = get_le16(data + 20);
-+	const uint8_t *eir_data = data + 22;
-+
-+	print_bdaddr(addr);
-+	print_field("Addr Type: %d", addr_type);
-+	print_field("RSSI: %d", rssi);
-+	print_field("Instant: 0x%16.16" PRIx64, instant);
-+	mgmt_print_device_flags(flags);
-+	print_field("EIR Length: %d", eir_len);
-+	size -= 22;
-+	print_hex_field("EIR Data: ", eir_data, size);
-+}
-+
-+static void mgmt_mesh_packet_cmplt_evt(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -15038,6 +15145,10 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_adv_monitor_device_found_evt, 16, false },
- 	{ 0x0030, "ADV Monitor Device Lost",
- 			mgmt_adv_monitor_device_lost_evt, 9, true },
-+	{ 0x0031, "Mesh Device Found",
-+			mgmt_mesh_device_found_evt, 22, false },
-+	{ 0x0032, "Mesh Packet Complete",
-+			mgmt_mesh_packet_cmplt_evt, 1, true },
- 	{ }
- };
- 
--- 
-2.37.2
 
+--===============9108301349007694825==--
