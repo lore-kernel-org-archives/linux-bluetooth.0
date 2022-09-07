@@ -2,110 +2,237 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BECBDC38145
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 20:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 746A6C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 20:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229768AbiIGUwZ (ORCPT
+        id S229535AbiIGUw0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 16:52:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57352 "EHLO
+        Wed, 7 Sep 2022 16:52:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbiIGUwO (ORCPT
+        with ESMTP id S229569AbiIGUwQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 16:52:14 -0400
+        Wed, 7 Sep 2022 16:52:16 -0400
 Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1094E3F331
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13C94A80C
         for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 13:52:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1662583934; x=1694119934;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=G6OdsRHP+3kOTxVVdUG3dUj23mWDAiTMUTG/hynC+5Y=;
-  b=Ot5bqUr+26bMNDEbc2GD9AqIlxyr41Qwx/vOmQ2gd09Uq368pvF7w04I
-   PkoLuBZH8HL7ZWdJyEu/IaSud9ojnqLunF60TpdgBrhlcHIX217zwhtrB
-   +QldHRKaD2/Q163s5MbBrTMsnegsuEnjUsdDZYbejJbxYnt6/Hhd6cwoM
-   dXioJbg72wrMPHrMaq2jPO09CCgcORBFjxR09SqNlB8s/skY/o44kjhsx
-   dHAiL0fp8veeK6EMlJ4DsMtLQ+pwLTGG7AJr9c9cCECpgFzWLtiZHlrBO
-   D0pfTwrcuuUKgo0fyfPakMBEK/ly4rx5lrmp52tsGe8ErMCG5K54i2YA9
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XDvvGDHCBBZI9rKLcSHoNR3978Pm1dQgjLrnQPCxnEg=;
+  b=Kjma28k5hPcLf6cy5/N+g5oJh7D3XKo8cjWRztrsTBQRuW+g7ZSgVtKJ
+   qJetUTfG0lbFpdXyehoIkfueWO0/apDHz13d/SAl8z+fZcysfpX9K9AVQ
+   pBMnfKYh6RTK86gR23DIsX9n9lTtP5Z5SnpUVNfxCh1qcfp9+6SZb8RHi
+   /hrDubp1Y+ZnlUty8IciJC7rVxnMEGyZZptjMkI0qIhtQkMm0ppTcHcWD
+   BIVZzq9OU+KwTeivchp/C5jdu0quZN/ePMz8OwOoSNWWBGaZWuvLOApwz
+   A80JQxhxaQfFf/iYRaGNOPta9Efktu2sTBxNmqwp3t0vb2lW2GM7p5FTf
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10463"; a="360957737"
+X-IronPort-AV: E=McAfee;i="6500,9779,10463"; a="360957740"
 X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
-   d="scan'208";a="360957737"
+   d="scan'208";a="360957740"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 13:52:13 -0700
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 13:52:14 -0700
 X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
-   d="scan'208";a="644781752"
+   d="scan'208";a="644781755"
 Received: from jsanch3-desk4.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.92.69])
   by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 13:52:13 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v2 1/2] monitor: Add ADV Monitor events to btmon parser
-Date:   Wed,  7 Sep 2022 13:52:04 -0700
-Message-Id: <20220907205205.49729-1-brian.gix@intel.com>
+Subject: [PATCH BlueZ v2 2/2] monitor: Add mesh MGMT cmds/events to btmon parser
+Date:   Wed,  7 Sep 2022 13:52:05 -0700
+Message-Id: <20220907205205.49729-2-brian.gix@intel.com>
 X-Mailer: git-send-email 2.37.2
+In-Reply-To: <20220907205205.49729-1-brian.gix@intel.com>
+References: <20220907205205.49729-1-brian.gix@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add missing ADV Monitor MGMT events
+Sample Output:
+@ MGMT Command: Read Mesh Features (0x0058) plen 0                                      {0x0002} [hci0] 6.849795
+@ MGMT Event: Command Complete (0x0001) plen 7                                          {0x0002} [hci0] 6.849800
+      Read Mesh Features (0x0058) plen 4
+        Status: Success (0x00)
+        Index: 0
+        Max Handles: 3
+        Used Handles: 0
+
+@ MGMT Command: Set Mesh Receiver (0x0057) plen 9                                       {0x0002} [hci0] 6.871462
+        Enable: 1
+        Window: 4096
+        Period: 4096
+        Num AD Types: 3
+          AD Type: 42
+          AD Type: 43
+          AD Type: 41
+@ MGMT Event: Command Complete (0x0001) plen 3                                          {0x0002} [hci0] 6.871505
+      Set Mesh Receiver (0x0057) plen 0
+        Status: Success (0x00)
+
+@ MGMT Command: Mesh Send (0x0059) plen 43                                             {0x0002} [hci0] 11.865613
+        Address: 00:00:00:00:00:00 (OUI 00-00-00)
+        Addr Type: 2
+        Instant: 0x0000000000000000
+        Delay: 0
+        Count: 1
+        Data Length: 24
+        Data: : 172b01002dda0c2491537ae2000000009de2120a725038b2
+@ MGMT Event: Command Complete (0x0001) plen 4                                         {0x0002} [hci0] 11.865626
+      Mesh Send (0x0059) plen 1
+        Status: Success (0x00)
+        Handle: 3
+
+@ MGMT Event: Mesh Packet Complete (0x0032) plen 1                                     {0x0001} [hci0] 11.911088
+        Handle: 3
 ---
- monitor/packet.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ monitor/packet.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
 
 diff --git a/monitor/packet.c b/monitor/packet.c
-index 46587e087..4c4f53dee 100644
+index 4c4f53dee..7544a7e68 100644
 --- a/monitor/packet.c
 +++ b/monitor/packet.c
-@@ -14914,6 +14914,37 @@ static void mgmt_controller_resume_evt(const void *data, uint16_t size)
- 	mgmt_print_address(data, addr_type);
+@@ -14191,6 +14191,74 @@ static void mgmt_remove_adv_monitor_patterns_rsp(const void *data,
+ 	print_field("Handle: %d", handle);
  }
  
-+static void mgmt_adv_monitor_device_found_evt(const void *data, uint16_t size)
++static void mgmt_set_mesh_receiver_cmd(const void *data, uint16_t size)
 +{
-+	uint8_t handle = get_le16(data);
-+	const uint8_t *addr = data + 2;
-+	uint8_t addr_type = get_u8(data + 8);
-+	int8_t rssi = get_s8(data + 9);
-+	uint32_t flags = get_le32(data + 10);
-+	uint16_t ad_data_len = get_le16(data + 14);
-+	const uint8_t *ad_data = data + 16;
++	uint8_t enable = get_u8(data);
++	uint16_t window = get_le16(data + 1);
++	uint16_t period = get_le16(data + 3);
++	uint8_t num_ad_types = get_u8(data + 5);
++	const uint8_t *ad_types = data + 6;
++
++	print_field("Enable: %d", enable);
++	print_field("Window: %d", window);
++	print_field("Period: %d", period);
++	print_field("Num AD Types: %d", num_ad_types);
++	size -= 6;
++
++	while (size--)
++		print_field("  AD Type: %d", *ad_types++);
++}
++
++static void mgmt_read_mesh_features_rsp(const void *data, uint16_t size)
++{
++	uint16_t index = get_le16(data);
++	uint8_t max_handles = get_u8(data + 2);
++	uint8_t used_handles = get_u8(data + 3);
++	const uint8_t *handles = data + 4;
++
++	print_field("Index: %d", index);
++	print_field("Max Handles: %d", max_handles);
++	print_field("Used Handles: %d", used_handles);
++	size -= 4;
++
++	while (size--)
++		print_field("  Used Handle: %d", *handles++);
++}
++
++static void mgmt_mesh_send_cmd(const void *data, uint16_t size)
++{
++	const uint8_t *addr = data;
++	uint8_t addr_type = get_u8(data + 6);
++	uint64_t instant = get_le64(data + 7);
++	uint16_t delay = get_le16(data + 15);
++	uint8_t cnt = get_u8(data + 17);
++	uint8_t adv_data_len = get_u8(data + 18);
++
++	data += 19;
++	size -= 19;
++	print_bdaddr(addr);
++	print_field("Addr Type: %d", addr_type);
++	print_field("Instant: 0x%16.16" PRIx64, instant);
++	print_field("Delay: %d", delay);
++	print_field("Count: %d", cnt);
++	print_field("Data Length: %d", adv_data_len);
++	print_hex_field("Data: ", data, size);
++}
++
++static void mgmt_mesh_send_rsp(const void *data, uint16_t size)
++{
++	uint8_t handle = get_u8(data);
 +
 +	print_field("Handle: %d", handle);
++}
++
++static void mgmt_mesh_send_cancel_cmd(const void *data, uint16_t size)
++{
++	uint8_t handle = get_u8(data);
++
++	print_field("Handle: %d", handle);
++}
++
+ struct mgmt_data {
+ 	uint16_t opcode;
+ 	const char *str;
+@@ -14448,6 +14516,18 @@ static const struct mgmt_data mgmt_command_table[] = {
+ 				mgmt_add_adv_monitor_patterns_rssi_cmd, 8,
+ 									false,
+ 				mgmt_add_adv_monitor_patterns_rsp, 2, true},
++	{ 0x0057, "Set Mesh Receiver",
++				mgmt_set_mesh_receiver_cmd, 6, false,
++				mgmt_null_rsp, 0, true},
++	{ 0x0058, "Read Mesh Features",
++				mgmt_null_cmd, 0, true,
++				mgmt_read_mesh_features_rsp, 4, false},
++	{ 0x0059, "Mesh Send",
++				mgmt_mesh_send_cmd, 19, false,
++				mgmt_mesh_send_rsp, 1, true},
++	{ 0x0056, "Mesh Send Cancel",
++				mgmt_mesh_send_cancel_cmd, 1, true,
++				mgmt_null_rsp, 0, true},
+ 	{ }
+ };
+ 
+@@ -14945,6 +15025,33 @@ static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
+ 	print_field("Addr Type: %d", addr_type);
+ }
+ 
++static void mgmt_mesh_device_found_evt(const void *data, uint16_t size)
++{
++	const uint8_t *addr = data;
++	uint8_t addr_type = get_u8(data + 6);
++	int8_t rssi = get_s8(data + 7);
++	uint64_t instant = get_le64(data + 8);
++	uint32_t flags = get_le32(data + 16);
++	uint16_t eir_len = get_le16(data + 20);
++	const uint8_t *eir_data = data + 22;
++
 +	print_bdaddr(addr);
 +	print_field("Addr Type: %d", addr_type);
 +	print_field("RSSI: %d", rssi);
++	print_field("Instant: 0x%16.16" PRIx64, instant);
 +	mgmt_print_device_flags(flags);
-+	print_field("AD Data Len: %d", ad_data_len);
-+	size -= 16;
-+	print_hex_field("AD Data: ", ad_data, size);
++	print_field("EIR Length: %d", eir_len);
++	size -= 22;
++	print_hex_field("EIR Data: ", eir_data, size);
 +}
 +
-+static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
++static void mgmt_mesh_packet_cmplt_evt(const void *data, uint16_t size)
 +{
-+	uint8_t handle = get_le16(data);
-+	const uint8_t *addr = data + 2;
-+	uint8_t addr_type = get_u8(data + 8);
++	uint8_t handle = get_u8(data);
 +
 +	print_field("Handle: %d", handle);
-+	print_bdaddr(addr);
-+	print_field("Addr Type: %d", addr_type);
 +}
 +
  static const struct mgmt_data mgmt_event_table[] = {
  	{ 0x0001, "Command Complete",
  			mgmt_command_complete_evt, 3, false },
-@@ -15003,6 +15034,10 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_controller_suspend_evt, 1, true },
- 	{ 0x002e, "Controller Resumed",
- 			mgmt_controller_resume_evt, 8, true },
-+	{ 0x002f, "ADV Monitor Device Found",
-+			mgmt_adv_monitor_device_found_evt, 16, false },
-+	{ 0x0030, "ADV Monitor Device Lost",
-+			mgmt_adv_monitor_device_lost_evt, 9, true },
+@@ -15038,6 +15145,10 @@ static const struct mgmt_data mgmt_event_table[] = {
+ 			mgmt_adv_monitor_device_found_evt, 16, false },
+ 	{ 0x0030, "ADV Monitor Device Lost",
+ 			mgmt_adv_monitor_device_lost_evt, 9, true },
++	{ 0x0031, "Mesh Device Found",
++			mgmt_mesh_device_found_evt, 22, false },
++	{ 0x0032, "Mesh Packet Complete",
++			mgmt_mesh_packet_cmplt_evt, 1, true },
  	{ }
  };
  
