@@ -2,152 +2,182 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F9EC38145
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 18:19:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC4DC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 18:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbiIGSTP (ORCPT
+        id S229614AbiIGStl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 14:19:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54752 "EHLO
+        Wed, 7 Sep 2022 14:49:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiIGSTN (ORCPT
+        with ESMTP id S229494AbiIGStk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 14:19:13 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B30B14E2
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 11:19:11 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id j6so11107404qkl.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Sep 2022 11:19:11 -0700 (PDT)
+        Wed, 7 Sep 2022 14:49:40 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8162110FF7;
+        Wed,  7 Sep 2022 11:49:37 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id u18so11544934lfo.8;
+        Wed, 07 Sep 2022 11:49:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=5jSbObFAC3h2Ft3Eu/dKXrhc8qHFK9rnOMvEL4NTtPc=;
-        b=KEyysZmfJ4zo3zAjAMQIneSo9TPnFGi3Y3tfW/3TWXLgLo+V+lzwPXHzabofMntRuH
-         gTw/xwSzd0x2cUlZepga3Idl/NsWytY9YwpaVEu3q7SounGnGS33PvFF+pvROzeMds2I
-         hl2wj40fKd37hIW6350pmyp+UKNmLKXdmZgoJFxFplY/YRxGMJGJIkPc7sAmh6q/noZi
-         YxAHwn78d8P18CsDqBK0nJAhIc2MNYXusM6b0Sw3CJFKU+Wq0CCF1ad3q1NfkS4Crdlf
-         FcinVg+zbsyQSo15La4w9czT+YDAhLH7F3pA1jiiZteOA5tshrCWRW+N22ZvpSVMoK8b
-         dnqw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=e1NUouMJlIfWMvB5ibq4JexkhbmTjQYF/xGpsCOOr/o=;
+        b=oR31toyYyjza92H/8CT1gsP6E4qzxP8L6MxN6LddFykYpGXX4xgTYsWf/02AjAtYk/
+         TzCodJ39Nh3UcAuI+J3uiS1we7PglvytuwksgSJjze9J6O/TFKofPy8pnjHJ1nzAHmFm
+         XNtc04wKyaEr9ELEYtZf7xp8YQdYjtMs0JzmypI0xA3mXdT8LiYJWsQdRWpere86d2I4
+         oow8QJW6dr0QvBSjIMvHbcjgV7BIMlmtO6l6D1+VkI09KGlr5Vdqy9UBhlJ5W8nSoRqU
+         NB+OlfZuEk+HreYLyz0QwrsIeo2ZZ02B9Iy+ORDQjRcwwOIMrJxFOxoFjsxSnTq+EMcU
+         gE8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=5jSbObFAC3h2Ft3Eu/dKXrhc8qHFK9rnOMvEL4NTtPc=;
-        b=8Iuom9mcCxfFMjrXYmFBISJ/sIaeW4UgAvzmcihhn0hUZuMrhV8EcyKKag78PFighU
-         KG0nVfPQS8U2R/l5gjAkJg/ZkyWRIaE8yv0puoU1SgIdx/eB3bNbCoIbTC9svuJ27TDZ
-         xA4D/Q39Gd/mA0mxm81EsulDCtuQWOsxpr5tcrif0em6k49G7grpFw76q0FIjIGTWMoH
-         dXztn1N+BUgwoyofGZHDdE7F52XPjtmk2Pna20Sdd1nnHmSa78/6Zy1+GHb87XJ5h9ZI
-         yY+nJMG4XK+A1j+brdZgcpcfz7mKpn1o4LTMs18CunvxEh+uabd6wnF5snO26bUOb6Fj
-         dG+w==
-X-Gm-Message-State: ACgBeo1jKHwKKH54o8Kq4iFmIuf3LKsxcncwzgzICAJMucEoNTpzMqEK
-        vVTw2trVqf2AXHVUE1FBlbkjnOJgefU=
-X-Google-Smtp-Source: AA6agR7vwwo94WXw9dU40LUtYnomMZtq1S76S/p571WUST2NMiIEpxlsDie1U0Tlk0GPm1C4/8ODmQ==
-X-Received: by 2002:a05:620a:bc5:b0:6b6:64e9:2617 with SMTP id s5-20020a05620a0bc500b006b664e92617mr3540231qki.378.1662574750254;
-        Wed, 07 Sep 2022 11:19:10 -0700 (PDT)
-Received: from [172.17.0.2] ([20.242.102.61])
-        by smtp.gmail.com with ESMTPSA id w17-20020a05620a445100b006b8fb2a1145sm15273272qkp.124.2022.09.07.11.19.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Sep 2022 11:19:10 -0700 (PDT)
-Message-ID: <6318e09e.050a0220.93abd.47d8@mx.google.com>
-Date:   Wed, 07 Sep 2022 11:19:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0313679658171589615=="
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=e1NUouMJlIfWMvB5ibq4JexkhbmTjQYF/xGpsCOOr/o=;
+        b=a4um3zD+T/rdJiDKYgkcFGWbVsRjLF+q1Lrm9LGYXFm53cbXBD/1q5ZN/NwyiP1oI0
+         Y6blS+3JoSh15XhkD8fDx13WTJdMdq0kMfTAx+x40zzT8TZRL10y3gvoK82AfttkOTCn
+         4aSugxAd2UTLma+qwy02l5I3jQoqOvbQghRL6UD1jj3BvnVJKdUqyzAGPSeBjAS/6sc/
+         zbhHPWd3Z9PFG1yj3Yy6QI058XJ7W+l7bPfOUUUcTaPJAt+ZExtJSMKqj7YIfq2tkcwn
+         9MSOaPe7kwgtYVDj2IATCNkqLEsm4DK/HbtoGLZ1soU+iOxzh/R+OTZVt0DH19Mk9M9R
+         46PQ==
+X-Gm-Message-State: ACgBeo29gfWKJqOMXDcWkL6VMNDrkJXs4Oura4n1kV8YauEiLuVk09ts
+        04GN53WxXvc67icR+i+VlkRh0wGYdFG2ux0uhjk=
+X-Google-Smtp-Source: AA6agR6/hLB2K7ccUe4nRjiLDMnjHHC5/CsLQq94MfUg5Gx9td3rC2XzZVcuuM5UwWGWEsK/7uTzPCABXn7AYQRt8lY=
+X-Received: by 2002:a05:6512:3d24:b0:494:95d0:5c02 with SMTP id
+ d36-20020a0565123d2400b0049495d05c02mr1682420lfv.198.1662576575720; Wed, 07
+ Sep 2022 11:49:35 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sven@svenpeter.dev
-Subject: RE: Broadcom/Apple Bluetooth driver for Apple Silicon
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220907170935.11757-2-sven@svenpeter.dev>
-References: <20220907170935.11757-2-sven@svenpeter.dev>
+References: <20220907170935.11757-1-sven@svenpeter.dev> <20220907170935.11757-4-sven@svenpeter.dev>
+In-Reply-To: <20220907170935.11757-4-sven@svenpeter.dev>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 7 Sep 2022 11:49:23 -0700
+Message-ID: <CABBYNZLWc=2y0aVRc+_k_XzfJeEJkJ_ebaViqUybvaDY49p2_g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] Bluetooth: hci_event: Add quirk to ignore byte in
+ LE Extended Adv Report
+To:     Sven Peter <sven@svenpeter.dev>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0313679658171589615==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Sven,
 
-This is automated email and please do not reply to this email!
+On Wed, Sep 7, 2022 at 10:10 AM Sven Peter <sven@svenpeter.dev> wrote:
+>
+> Broadcom controllers present on Apple Silicon devices use the upper
+> 8 bits of the event type in the LE Extended Advertising Report for
+> the channel on which the frame has been received.
+> Add a quirk to drop the upper byte to ensure that the advertising
+> results are parsed correctly.
+>
+> The following excerpt from a btmon trace shows a report received on
+> channel 37 by these controllers:
+>
+> > HCI Event: LE Meta Event (0x3e) plen 55
+>       LE Extended Advertising Report (0x0d)
+>         Num reports: 1
+>         Entry 0
+>           Event type: 0x2513
+>             Props: 0x0013
+>               Connectable
+>               Scannable
+>               Use legacy advertising PDUs
+>             Data status: Complete
+>             Reserved (0x2500)
+>           Legacy PDU Type: Reserved (0x2513)
+>           Address type: Public (0x00)
+>           Address: XX:XX:XX:XX:XX:XX (Shenzhen Jingxun Software [...])
+>           Primary PHY: LE 1M
+>           Secondary PHY: No packets
+>           SID: no ADI field (0xff)
+>           TX power: 127 dBm
+>           RSSI: -76 dBm (0xb4)
+>           Periodic advertising interval: 0.00 msec (0x0000)
+>           Direct address type: Public (0x00)
+>           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
+>           Data length: 0x1d
+>           [...]
+>         Flags: 0x18
+>           Simultaneous LE and BR/EDR (Controller)
+>           Simultaneous LE and BR/EDR (Host)
+>         Company: Harman International Industries, Inc. (87)
+>           Data: [...]
+>         Service Data (UUID 0xfddf):
+>         Name (complete): JBL Flip 5
+>
+> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+> ---
+> changes from v1:
+>   - adjusted the commit message a bit to make checkpatch happy
+>
+>  include/net/bluetooth/hci.h | 11 +++++++++++
+>  net/bluetooth/hci_event.c   |  4 ++++
+>  2 files changed, 15 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index cf29511b25a8..62539c1a6bf2 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -263,6 +263,17 @@ enum {
+>          * during the hdev->setup vendor callback.
+>          */
+>         HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
+> +
+> +       /*
+> +        * When this quirk is set, the upper 8 bits of the evt_type field of
+> +        * the LE Extended Advertising Report events are discarded.
+> +        * Some Broadcom controllers found in Apple machines put the channel
+> +        * the report was received on into these reserved bits.
+> +        *
+> +        * This quirk can be set before hci_register_dev is called or
+> +        * during the hdev->setup vendor callback.
+> +        */
+> +       HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
+>  };
+>
+>  /* HCI device flags */
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 485c814cf44a..b50d05211f0d 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -6471,6 +6471,10 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
+>                         break;
+>
+>                 evt_type = __le16_to_cpu(info->type);
+> +               if (test_bit(HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
+> +                            &hdev->quirks))
+> +                       evt_type &= 0xff;
+> +
 
-Dear submitter,
+Don't think we really need to quirk in order to mask the reserved
+bits, according to the 5.3 spec only bits 0-6 are actually valid, that
+said the usage of the upper byte is sort of non-standard so I don't
+know what is broadcom/apple thinking that they could use like this,
+instead this should probably be placed in a vendor command or even add
+as part of the data itself with a vendor type.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=674956
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      2.08 seconds
-GitLint                       FAIL      2.87 seconds
-SubjectPrefix                 FAIL      1.69 seconds
-BuildKernel                   PASS      34.57 seconds
-BuildKernel32                 PASS      30.39 seconds
-Incremental Build with patchesPASS      112.15 seconds
-TestRunner: Setup             PASS      502.59 seconds
-TestRunner: l2cap-tester      PASS      17.04 seconds
-TestRunner: iso-tester        PASS      15.74 seconds
-TestRunner: bnep-tester       PASS      6.33 seconds
-TestRunner: mgmt-tester       PASS      100.03 seconds
-TestRunner: rfcomm-tester     PASS      9.84 seconds
-TestRunner: sco-tester        PASS      9.41 seconds
-TestRunner: smp-tester        PASS      9.38 seconds
-TestRunner: userchan-tester   PASS      6.45 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 2.08 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[v2,1/5] dt-bindings: net: Add generic Bluetooth controller\Traceback (most recent call last):
-  File "scripts/spdxcheck.py", line 6, in <module>
-    from ply import lex, yacc
-ModuleNotFoundError: No module named 'ply'
-WARNING:FILE_PATH_CHANGES: added, moved or deleted file(s), does MAINTAINERS need updating?
-#136: 
-new file mode 100644
-
-WARNING:DT_SPLIT_BINDING_PATCH: DT binding docs and includes should be a separate patch. See: Documentation/devicetree/bindings/submitting-patches.rst
-
-WARNING:DT_SPLIT_BINDING_PATCH: DT binding docs and includes should be a separate patch. See: Documentation/devicetree/bindings/submitting-patches.rst
-
-total: 0 errors, 3 warnings, 64 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12969309.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>                 legacy_evt_type = ext_evt_type_to_legacy(hdev, evt_type);
+>                 if (legacy_evt_type != LE_ADV_INVALID) {
+>                         process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
+> --
+> 2.25.1
+>
 
 
-##############################
-Test: GitLint - FAIL - 2.87 seconds
-Run gitlint with rule in .gitlint
-[v2,1/5] dt-bindings: net: Add generic Bluetooth controller
-23: B1 Line exceeds max length (83>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth-controller.yaml"
-
-[v2,2/5] dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
-18: B1 Line exceeds max length (85>80): " create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml"
-
-[v2,3/5] Bluetooth: hci_event: Add quirk to ignore byte in LE Extended Adv Report
-1: T1 Title exceeds max length (81>80): "[v2,3/5] Bluetooth: hci_event: Add quirk to ignore byte in LE Extended Adv Report"
-
-
-##############################
-Test: SubjectPrefix - FAIL - 1.69 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-"Bluetooth: " is not specified in the subject
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0313679658171589615==--
+-- 
+Luiz Augusto von Dentz
