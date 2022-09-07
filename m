@@ -2,92 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8954FC38145
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 10:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D4FC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 17:09:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230353AbiIGKZC (ORCPT
+        id S230044AbiIGRJw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 06:25:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34848 "EHLO
+        Wed, 7 Sep 2022 13:09:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230382AbiIGKYx (ORCPT
+        with ESMTP id S229445AbiIGRJu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 06:24:53 -0400
-Received: from embla.dev.snart.me (embla.dev.snart.me [13.210.127.0])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A833C28
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 03:24:46 -0700 (PDT)
-Received: from embla.dev.snart.me (localhost [IPv6:::1])
-        by embla.dev.snart.me (Postfix) with ESMTP id 765267E742
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 10:24:44 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 embla.dev.snart.me 765267E742
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=dev.snart.me;
-        s=default; t=1662546284;
-        bh=QZiAk8mNdEWJIhuZDvrBppDqc3D4ay64WARRsowkC/I=;
-        h=Date:From:Subject:Reply-To:References:To:In-Reply-To:From;
-        b=NjqjnVLSw2+MKMVI2Ro1Bl9LwtkeX9MSEQZRnL/2QQZoDX80ReEeN8m6h3e7y8p2E
-         fVMYfoEuNIWTJcoDzshSPAp7tCqdFc4OVs0UmFCY8rm5DTnwDlqSXSXW7UEDU5uPnJ
-         OHsIqxFnYW7lRX7OqUvwaiIzrpfCACiw0lSLzrD+fjpb+aDvTLNAOfevxfMLb85xSC
-         vCNaOXLQtgo4z76qxPbC08ZLyJWQQmkHLsGA4rQ0IL9gXy9vtqRYGcgV6p0XUJ2sVs
-         /7YC6f88guWlxYTWERjsuPuI7i9z5pP2FDCVaYhqeH0FcrW4PnQqQlwfz9W4BmdvKK
-         DEwuuaXnDQepmP4gRLPo9p7GSgmVMrpp2y4/M+tBdto0DN7cT3FDXGrvGNKjMCaY2G
-         ZDrA0SGSba5yH0OamGD+Fg8GKJj/JVnIQVv5E6A7le9BkPmvoZE8PuwpWqNrNeyxRr
-         kiTeblifMA0+Y5m7nrrT+364Lmqb0tPiAbe+/moxEZrlYeI6LG7IjdEhldgfjdCGct
-         A5Jo7MdgHJrAB9odM75QtpWSqCmFifuX9NzaMY837jEF7zNLUQ3KKqzPEPXkCJVBRU
-         5GfrWQ1S8fh5s6Qqq9MX9AjsdYYqzaL7kElxGx369EaOyulZv2aKcSq9uSCXuO4s4u
-         a8E6cSxPt14KmF4U0WGr/tyM=
-Received: from [IPV6:2001:8004:16c0:710:ce3:b706:6364:5765] ([2001:8004:16c0:710:ce3:b706:6364:5765])
-        by embla.dev.snart.me with ESMTPSA
-        id OKseGGxxGGPbQQAA8KYfjw
-        (envelope-from <dxdt@dev.snart.me>)
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Sep 2022 10:24:44 +0000
-Message-ID: <8a76a301-3c01-e8f1-802b-9154324ddb3b@dev.snart.me>
-Date:   Wed, 7 Sep 2022 18:24:42 +0800
+        Wed, 7 Sep 2022 13:09:50 -0400
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1723AB3E;
+        Wed,  7 Sep 2022 10:09:47 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.west.internal (Postfix) with ESMTP id AF6883200805;
+        Wed,  7 Sep 2022 13:09:43 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Wed, 07 Sep 2022 13:09:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-transfer-encoding:date:date:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to; s=fm2; t=1662570583; x=1662656983; bh=lEMgyuskMd
+        HHSxUE4iU5Q9az2x12J7mJ4G0YEW9bdmY=; b=6DdqzQcWCUDxwh08S9lzK0/F3/
+        2T4RE5qzIZGJmTYC/BMZRp4yprwzfDorrdR6aGj7WLZqZ309f0JVA9tvMYzNdSti
+        DGyMzqkzCehl1khYrIWhQuKquRyPMfSaVyIHq9VG0GUTp1w07Twmxp4RbdhdkcuX
+        rnyfdPu+6mYOkcCbeEaq5gXeTL44E5KgPv56xvOAOOJp4N7y9T0Nck6U7Vi3sKqB
+        7AhvaVN8Y0CE3J+Qj4g4zg2C8XOOorU0+Or4CYTrX+vhGgbvSBHhLvtiCKBVah1i
+        Q8TO+i/K4J/aLZMo96fD7AOgNibf6P1+4Q257fwpgvtkbMc6CkuWL3HVEhPA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+        1662570583; x=1662656983; bh=lEMgyuskMdHHSxUE4iU5Q9az2x12J7mJ4G0
+        YEW9bdmY=; b=1xyVMiCf/OS3T6kbat1VPmsNuBWqnWvuMY05PBBxzFePRrkIW+H
+        DPYJPyTVGWGfCHmzMfmC0eezzk1tdd8o5Jaw1+yTqampY0OiPAHJ+EygSgFyc4eT
+        vaiyOjUyaWZxSLqNzAZ2PCZz96WP2Vf42jpWnb/Y5lbg45Zk5OTUhcwNsjLWpuln
+        lNSwhxUtLqtjzVxOYZf+9Y054QQZXOvn+bGFKL1Dxe458X04RLHXdm3d/jTN87Ey
+        beiNT024ky8y3mXi9tDmov6+/Zwnh2B95oGGsAGKjMkKA0iICy2ABUxbpKePg8rC
+        CA5YdX/WQsZZRRptsUB7F+rABNTnNYd6v3g==
+X-ME-Sender: <xms:VtAYY0Dgw1jmikCM9R2W3EmOj3BcSIsQbOYQvuzDlvPyztERjaH_wg>
+    <xme:VtAYY2gX1knX2Do8O6baN2Ho4_2VOV8awORVpxvyjPo77tqDAztY3-EpMDFQZV_ab
+    oWJZCySPepuTulEDqA>
+X-ME-Received: <xmr:VtAYY3m_b4Su6M3qVwvoVB9mQdsc9Op5l2wS1tkFoPTnycpAsCSNcw-lL4mXDcbyeiHRL6EmAgrzixVZq4WY5Fx4NZmd57xP_OOoHbDF0tf4jdhhHtnu-uk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedttddguddutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuvhgvnhcu
+    rfgvthgvrhcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrfgrthhtvg
+    hrnhepgfegudffudelfeeugedtjeeugeehueffudevveegveektdfhueehueeufeelheev
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
+X-ME-Proxy: <xmx:VtAYY6yoCoD1eaLJHNOVLnZ9Bv_wYUTeOujxDM7vBAZjG4HTjYiLuQ>
+    <xmx:VtAYY5Qd6PrPh_22--TkK7QQ1RtJVbKvoGLxXoLB3WlNjCWMWF5m3w>
+    <xmx:VtAYY1YsvnwDQYodwF7cNNzrzP5MYRgBsHHyDTwAVsQ7KnLy3Fp-Pg>
+    <xmx:V9AYY6BJTNJ6kioNeMu14tXHSdvm8MPK4kHpl0BoNRHahGHQ4Mb_NQ>
+Feedback-ID: i51094778:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 7 Sep 2022 13:09:39 -0400 (EDT)
+From:   Sven Peter <sven@svenpeter.dev>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Sven Peter <sven@svenpeter.dev>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/5] Broadcom/Apple Bluetooth driver for Apple Silicon
+Date:   Wed,  7 Sep 2022 19:09:30 +0200
+Message-Id: <20220907170935.11757-1-sven@svenpeter.dev>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.1
-From:   David Timber <dxdt@dev.snart.me>
-Subject: How to block media sink endpoint
-Content-Language: en-US
-Reply-To: David Timber <dxdt@dev.snart.me>
-References: <e0ffe840-e4f1-502a-4b61-bbe57de5de6d@dev.snart.me>
-To:     linux-bluetooth@vger.kernel.org
-Autocrypt: addr=dxdt@dev.snart.me; keydata=
- xjMEYmJg1hYJKwYBBAHaRw8BAQdAf5E+ri1XLtjqYbZdHOyc8oS+1/XJ5bSlbx5WHXmVBZzN
- IERhdmlkIFRpbWJlciA8ZHhkdEBkZXYuc25hcnQubWU+wpQEExYKADwWIQQn/Jn96EMUaIoF
- X+T/ldyyrZpWaAUCYmJg1gIbAwULCQgHAgMiAgEGFQoJCAsCBBYCAwECHgcCF4AACgkQ/5Xc
- sq2aVmjJZwD8COjPlUwccrlRvbNQ6f87DWchtYO0o8W2DNRM3RLps0EA/jEhIbRV6AsyC8jr
- 30Ut3aJ3/mO/6G4sLj7OvkEEBH0MzjgEYmJg1hIKKwYBBAGXVQEFAQEHQFpgtIgaByv9lIEY
- EmpavMO0pYjtu7TMJynwdnGYkN9LAwEIB8J4BBgWCgAgFiEEJ/yZ/ehDFGiKBV/k/5Xcsq2a
- VmgFAmJiYNYCGwwACgkQ/5Xcsq2aVmhFCwEA0kM9VyYB4bLCM7+SuXUUH+5Ec99Nj4RXxFad
- Key9GuwA/2BZK6bNyrLSfEk2JDRoskqf7OIL0wa6JOD5SrBnMe8E
-In-Reply-To: <e0ffe840-e4f1-502a-4b61-bbe57de5de6d@dev.snart.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-DQpJJ20gdHJ5aW5nIHRvIGRpc2FibGUvYmxvY2sgbWVkaWEgZW5kcG9pbnQgc28gdGhhdCBt
-eSBsYXB0b3Agd29uJ3QgYmUgDQp1c2VkIGFzIGEgbWVkaWEgc2luayBieSBBbmRyb2lkIGRl
-dmljZXMuIEkgb2NjYXNpb25hbGx5IHVzZSBCbHVldG9vdGggDQpmb3IgdHJhbnNmZXJyaW5n
-IHNtYWxsIGZpbGVzIGZybyBhbmQgdG8gQW5kcm9pZCBkZXZpY2VzLiBXaGVuZXZlciBhIA0K
-QW5kcm9pZCBkZXZpY2UgY29ubmVjdCB0byBteSBsYXB0b3AsIGl0IGF1dG9tYXRpY2FsbHkg
-ZW5hYmxlcyAiTWVkaWEgDQphdWRpbyIgYWdhaW4uIElmIHRoZSBwaG9uZSB3YXMgcGxheWlu
-ZyBtdXNpYywgdGhlIGxhcHRvcCBiZWNvbWVzIHRoZSBuZXcgDQptZWRpYSBzaW5rIGFuZCB0
-aGUgbGFwdG9wIHNwZWFrZXJzIHN0YXJ0IGJsYXN0aW5nIG11c2ljIDooIFdoYXQgYSANCmhv
-cnJpYmxlIGlkaW90LXByb29mIGRlc2lnbi4NCg0KR29vZ2xlIGRvZXNuJ3QgZXZlciBsaXN0
-ZW4gdG8gYW55b25lLCBzbyBJIGZpZ3VyZWQgaXQncyBlYXNpZXIgdG8gZmluZCBhIA0Kc29s
-dXRpb24gYnkgY29uZmlndXJpbmcgbXkgTGludXggbWFjaGluZXMuDQoNCmJsdWV0b290aGQg
-b3V0cHV0Og0KDQogICAgRW5kcG9pbnQgcmVnaXN0ZXJlZDogc2VuZGVyPToxLjc4IHBhdGg9
-L01lZGlhRW5kcG9pbnQvQTJEUFNpbmsvYXB0eF9oZA0KICAgIEVuZHBvaW50IHJlZ2lzdGVy
-ZWQ6IHNlbmRlcj06MS43OCBwYXRoPS9NZWRpYUVuZHBvaW50L0EyRFBTaW5rL2FwdHgNCiAg
-ICBFbmRwb2ludCByZWdpc3RlcmVkOiBzZW5kZXI9OjEuNzggcGF0aD0vTWVkaWFFbmRwb2lu
-dC9BMkRQU2luay9zYmMNCiAgICBFbmRwb2ludCByZWdpc3RlcmVkOiBzZW5kZXI9OjEuNzgg
-cGF0aD0vTWVkaWFFbmRwb2ludC9BMkRQU2luay9zYmNfeHENCg0KQW5kIGJsdWV0b290aGN0
-bCBzaG93czoNCg0KICAgIFVVSUQ6IEF1ZGlvIFNpbmsgKDAwMDAxMTBiLTAwMDAtMTAwMC04
-MDAwLTAwODA1ZjliMzRmYikNCg0KSSBkb24ndCB0aGluayBBdWRpbyBiYWNrLWVuZHMoQUxT
-QSwgUEEsIFBXKSBhcmUgbm90IGludm9sdmVkIGluIHRoaXMgDQpkZXZpY2Ugc291cmNlLWxh
-cHRvcCBzaW5rIHNldCB1cC4gSG93IGRvIEkgcHJldmVudCBteSBsYXB0b3AgZnJvbSBiZWlu
-ZyANCnVzZWQgYXMgYW4gQTJEUFNpbmsgZW5kcG9pbnQ/IE9yIGlmIEkgY2FuIGp1c3QgYmxh
-Y2tsaXN0IGEgY2VydGFpbiANCmtlcm5lbCBtb2R1bGUsIHRoYXQnZCBiZSBqdXN0IGZpbmUu
-DQoNCg==
+Hi,
+
+v1: https://lore.kernel.org/asahi/20220801103633.27772-1-sven@svenpeter.dev/
+
+Here's v2 of the Apple/Broadcom Bluetooth series. Most changes from
+v1 are only related to the device tree bindings. Other than that I fixed
+a few minor bugs and adjusted some commit messages to make checkpatch
+happier.
+
+
+Best,
+
+
+Sven
+
+Sven Peter (5):
+  dt-bindings: net: Add generic Bluetooth controller
+  dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+  Bluetooth: hci_event: Add quirk to ignore byte in LE Extended Adv
+    Report
+  Bluetooth: Add quirk to disable extended scanning
+  Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCI boards
+
+ .../bindings/net/bluetooth-controller.yaml    |   30 +
+ .../devicetree/bindings/net/bluetooth.txt     |    5 -
+ .../bindings/net/brcm,bcm4377-bluetooth.yaml  |   78 +
+ .../bindings/net/qualcomm-bluetooth.yaml      |    4 +-
+ .../bindings/soc/qcom/qcom,wcnss.yaml         |    8 +-
+ MAINTAINERS                                   |    2 +
+ drivers/bluetooth/Kconfig                     |   12 +
+ drivers/bluetooth/Makefile                    |    1 +
+ drivers/bluetooth/hci_bcm4377.c               | 2515 +++++++++++++++++
+ include/net/bluetooth/hci.h                   |   21 +
+ include/net/bluetooth/hci_core.h              |    4 +-
+ net/bluetooth/hci_event.c                     |    4 +
+ 12 files changed, 2671 insertions(+), 13 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+ delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+ create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+ create mode 100644 drivers/bluetooth/hci_bcm4377.c
+
+-- 
+2.25.1
+
