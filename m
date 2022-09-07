@@ -2,206 +2,134 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2290C38145
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 19:21:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA565C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 19:34:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbiIGTVc (ORCPT
+        id S229885AbiIGTeh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 15:21:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33418 "EHLO
+        Wed, 7 Sep 2022 15:34:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbiIGTVc (ORCPT
+        with ESMTP id S229829AbiIGTef (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 15:21:32 -0400
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A104C00C8;
-        Wed,  7 Sep 2022 12:21:30 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.west.internal (Postfix) with ESMTP id AEBCB3200313;
-        Wed,  7 Sep 2022 15:21:25 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute2.internal (MEProxy); Wed, 07 Sep 2022 15:21:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1662578485; x=1662664885; bh=EL
-        eTSyZ4zS0CBGPjQv/fZw6BU0AoLOYg41xHNc0d8ug=; b=VO3xqacvYeGbmBrro6
-        LigXmEI2UuSPXqWSPRAsdZNiqFE2u56ms9g86HZ4Lzbh8nXVpT8wHrO0vtv5qfk7
-        WGJRHuFptgivh1Er2O83epogU2B3N+n7xW/ZnVQYSIYSVumhXgZfmwmsjWpZ57AP
-        V1O3SYoakxkD4KyLuvHZThrgJpL5jirCBcibIqPNCeetmLrsMTLfkqfaYdijJcc3
-        pgK3tqbKIJem2bCoruC0lL7Lj5WK8Zsh1EcOPX1oztZwYRx+xfA3UUVt5pudN8zu
-        UyQqyTXI1oVKVpe0JEhTXw3HFRwd41O/zFuw0rNReYqyRFdheH2CtgoyL1kF/YJH
-        Ly6A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1662578485; x=1662664885; bh=ELeTSyZ4zS0CBGPjQv/fZw6BU0Ao
-        LOYg41xHNc0d8ug=; b=JuHAfxwxwCza2HmKYm4TMH116CNKDtQyFVBpgDf11z4E
-        EHRBlVgF5L9InrdUrFZKI+ouiIzvLxhM3C6kzQ05S9H06hnq5sx+YzPSgJCLOHaZ
-        LRgUna1HljdtWwtc0y2yZHeXvIsAig5pp617K6H697f9ZtZVwTVaFPHHbeB4iF9Z
-        KL4q7GzcaclYUXqnhugi3GNFrGKyBFY22aR+Xx9P4dB9WXRm+cr+utRbraW3eo8v
-        /mKHSI0PWO2iwdFV6Ho+OQUqs4DehTjL4haKMPGFe+qynhtN9rkxBoIj6ChPYNI6
-        USaWKpZuxOwcQLgHoWJb6bEiK3ABkjxkhujsrJT1WA==
-X-ME-Sender: <xms:M-8YYzyH_W0LY1pllZF-du9MwGaqox9TE23wyLu8UGWPbbf2SLiaLw>
-    <xme:M-8YY7SYuJcYz66oAnTG7-IOev7syFifw6kZAITV8v1ITrxMbYYiFI14EQCbMQiXi
-    5ZVPz4GRzUZY8i0QQg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedttddgudefjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfu
-    vhgvnhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtf
-    frrghtthgvrhhnpeelvefggeffheevtdeivefhkeehfeettdejteduveeiheevveeilefg
-    hfeiveeiueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
-X-ME-Proxy: <xmx:M-8YY9UUG0iUvcodQL8KqTiSumQj-kpnMEqCxaXd9voljlSVE30rjw>
-    <xmx:M-8YY9iofjdbz0hC-Aj5SoRVor_JfKTLK77nkQiSfy3UwrpY0FV2Tw>
-    <xmx:M-8YY1C4A6Birg4HlhsVmdMxHZZ8BOFrZ1wgE0rMZlzGHJeqe3bSPQ>
-    <xmx:Ne8YY9YtcPMkuAriURAAUjT5UOmsVzCgtOA6jnLN3xyNuWca0grfIA>
-Feedback-ID: i51094778:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 60126A6007C; Wed,  7 Sep 2022 15:21:23 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-927-gf4c98c8499-fm-20220826.002-gf4c98c84
-Mime-Version: 1.0
-Message-Id: <220ab728-ed5b-415d-ab15-47a7153e8e5c@www.fastmail.com>
-In-Reply-To: <CABBYNZLWc=2y0aVRc+_k_XzfJeEJkJ_ebaViqUybvaDY49p2_g@mail.gmail.com>
-References: <20220907170935.11757-1-sven@svenpeter.dev>
- <20220907170935.11757-4-sven@svenpeter.dev>
- <CABBYNZLWc=2y0aVRc+_k_XzfJeEJkJ_ebaViqUybvaDY49p2_g@mail.gmail.com>
-Date:   Wed, 07 Sep 2022 21:21:02 +0200
-From:   "Sven Peter" <sven@svenpeter.dev>
-To:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc:     "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Hector Martin" <marcan@marcan.st>,
-        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 3/5] Bluetooth: hci_event: Add quirk to ignore byte in LE
- Extended Adv Report
-Content-Type: text/plain
+        Wed, 7 Sep 2022 15:34:35 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D1365F93
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 12:34:32 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id f11so10011947lfa.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Sep 2022 12:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=zLTuqGQmkHrVFNbYO2qAqwZRMIgrGmRiklMvtT+NRa8=;
+        b=oSJ4FjVZHLSFQd+HSGpDpZ6UYJFU2Gi9ycjbtnl+MtP0994XWD3JkNaE6f3trNQ21s
+         1WAlUr+Rk3WekndA0TH5OF5sN9CyjDgv28ziLSNDGHRs8smKhrLQ0W2BqEmDkRQ22Qd+
+         RPWNSGJn1IX1kH5BqdbPBHMLgSH5uxgSjP4OLnoVQ1F6r1XrQJJhCP2g4IeHLkw2u32t
+         1HhXHgY6i8+Mzvscznb+hcXINS0fnYEooLxBUS5lsz4LbR4V7hfEQwxSqiulB4IC9OCs
+         /neaMr+ZB9ozrJ1fsRsy04ZVM6/FLTulxXpqr7MGmsI488N+7p1YzoohdvxEJ4VZBLh+
+         8p8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=zLTuqGQmkHrVFNbYO2qAqwZRMIgrGmRiklMvtT+NRa8=;
+        b=N2b/pBI+Xm358v1JIXBJpvB81OFyaMYha9gOabZE8eXD/DuTceCBY84IWCqjLiVwds
+         9NZE6+GQYECHMKanTgenYpB8+BvN+knyeN6JhzcAUyTH+D2nccXOAChwmeN1bqzG+xsy
+         6NAne9vNjTQ6Msta7YaQg3GaHJ5M9joU0QTAg5noFvno0jmuo59f/rPEV7xPxrNuLIUm
+         WGckO+BWBqJ6UmOyAwTOwC1QXhKdai5NidLiRMlr5u3js5PGy9R2sIrp87LKlM/GKNeW
+         IaU494ZcTOxKUeKx9y1bSmEuiu+WEuQXl+oz1KWrhpFhsrlGuz8yE8s91Q9ucLgnJTBj
+         ORdA==
+X-Gm-Message-State: ACgBeo195u4/ejZTons4i+mU10BbygHJZOGtsr523wA5UfDB1Xb4kK+m
+        OXcrYdJBerwtACzvC8dOAtlnP/Yv6SIjRzTQnQ4NOZXkGGE=
+X-Google-Smtp-Source: AA6agR6XHIHS6WtqXxjTFHxY15kUQlTQZ1idJ7vEYCNPRpPmEywFfLbrKxZOwasyXQBl+PvgC88tEzqnewITTGYarvQ=
+X-Received: by 2002:a05:6512:3d24:b0:494:95d0:5c02 with SMTP id
+ d36-20020a0565123d2400b0049495d05c02mr1737892lfv.198.1662579270363; Wed, 07
+ Sep 2022 12:34:30 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220907191450.38262-1-brian.gix@intel.com>
+In-Reply-To: <20220907191450.38262-1-brian.gix@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 7 Sep 2022 12:34:18 -0700
+Message-ID: <CABBYNZLp=g_SX6DgWuvu3QUr3LBtu=JN3ZhsxA1FuneWaiZ7yQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] Bluetooth: Add ADV Monitor events to btmon parser
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Brian,
 
-On Wed, Sep 7, 2022, at 20:49, Luiz Augusto von Dentz wrote:
-> Hi Sven,
+On Wed, Sep 7, 2022 at 12:15 PM Brian Gix <brian.gix@intel.com> wrote:
 >
-> On Wed, Sep 7, 2022 at 10:10 AM Sven Peter <sven@svenpeter.dev> wrote:
->>
->> Broadcom controllers present on Apple Silicon devices use the upper
->> 8 bits of the event type in the LE Extended Advertising Report for
->> the channel on which the frame has been received.
->> Add a quirk to drop the upper byte to ensure that the advertising
->> results are parsed correctly.
->>
->> The following excerpt from a btmon trace shows a report received on
->> channel 37 by these controllers:
->>
->> > HCI Event: LE Meta Event (0x3e) plen 55
->>       LE Extended Advertising Report (0x0d)
->>         Num reports: 1
->>         Entry 0
->>           Event type: 0x2513
->>             Props: 0x0013
->>               Connectable
->>               Scannable
->>               Use legacy advertising PDUs
->>             Data status: Complete
->>             Reserved (0x2500)
->>           Legacy PDU Type: Reserved (0x2513)
->>           Address type: Public (0x00)
->>           Address: XX:XX:XX:XX:XX:XX (Shenzhen Jingxun Software [...])
->>           Primary PHY: LE 1M
->>           Secondary PHY: No packets
->>           SID: no ADI field (0xff)
->>           TX power: 127 dBm
->>           RSSI: -76 dBm (0xb4)
->>           Periodic advertising interval: 0.00 msec (0x0000)
->>           Direct address type: Public (0x00)
->>           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->>           Data length: 0x1d
->>           [...]
->>         Flags: 0x18
->>           Simultaneous LE and BR/EDR (Controller)
->>           Simultaneous LE and BR/EDR (Host)
->>         Company: Harman International Industries, Inc. (87)
->>           Data: [...]
->>         Service Data (UUID 0xfddf):
->>         Name (complete): JBL Flip 5
->>
->> Signed-off-by: Sven Peter <sven@svenpeter.dev>
->> ---
->> changes from v1:
->>   - adjusted the commit message a bit to make checkpatch happy
->>
->>  include/net/bluetooth/hci.h | 11 +++++++++++
->>  net/bluetooth/hci_event.c   |  4 ++++
->>  2 files changed, 15 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index cf29511b25a8..62539c1a6bf2 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -263,6 +263,17 @@ enum {
->>          * during the hdev->setup vendor callback.
->>          */
->>         HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
->> +
->> +       /*
->> +        * When this quirk is set, the upper 8 bits of the evt_type field of
->> +        * the LE Extended Advertising Report events are discarded.
->> +        * Some Broadcom controllers found in Apple machines put the channel
->> +        * the report was received on into these reserved bits.
->> +        *
->> +        * This quirk can be set before hci_register_dev is called or
->> +        * during the hdev->setup vendor callback.
->> +        */
->> +       HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
->>  };
->>
->>  /* HCI device flags */
->> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->> index 485c814cf44a..b50d05211f0d 100644
->> --- a/net/bluetooth/hci_event.c
->> +++ b/net/bluetooth/hci_event.c
->> @@ -6471,6 +6471,10 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
->>                         break;
->>
->>                 evt_type = __le16_to_cpu(info->type);
->> +               if (test_bit(HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
->> +                            &hdev->quirks))
->> +                       evt_type &= 0xff;
->> +
+> Signed-off-by: Brian Gix <brian.gix@intel.com>
+
+We don't use signed-off-by in userspace, also it would be great to
+have a sample output of these changes in the patch description.
+
+> ---
+>  monitor/packet.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
 >
-> Don't think we really need to quirk in order to mask the reserved
-> bits, according to the 5.3 spec only bits 0-6 are actually valid, that
-> said the usage of the upper byte is sort of non-standard so I don't
-> know what is broadcom/apple thinking that they could use like this,
-> instead this should probably be placed in a vendor command or even add
-> as part of the data itself with a vendor type.
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index 46587e087..7447e1565 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -14914,6 +14914,37 @@ static void mgmt_controller_resume_evt(const void *data, uint16_t size)
+>         mgmt_print_address(data, addr_type);
+>  }
+>
+> +static void mgmt_adv_monitor_device_found_evt(const void *data, uint16_t size)
+> +{
+> +       uint8_t handle = get_le16(data);
+> +       const uint8_t *addr = data + 2;
+> +       uint8_t addr_type = get_u8(data + 8);
+> +       int8_t rssi = get_s8(data + 9);
+> +       uint32_t flags = get_le32(data + 10);
+> +       uint16_t ad_data_len = get_le16(data + 14);
+> +       const uint8_t *ad_data = data + 16;
+> +
+> +       print_field("Handle: %d", handle);
+> +       print_bdaddr(addr);
+> +       print_field("Addr Type: %d", addr_type);
+> +       print_field("RSSI: %d", rssi);
+> +       mgmt_print_device_flags(flags);
+> +       print_field("AD Data Len: %d", ad_data_len);
+> +       size -= 16;
+> +       print_hex_field("AD Data: ", ad_data, size);
+> +}
+> +
+> +static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
+> +{
+> +       uint8_t handle = get_le16(data);
+> +       const uint8_t *addr = data + 2;
+> +       uint8_t addr_type = get_u8(data + 8);
+> +
+> +       print_field("Handle: %d", handle);
+> +       print_bdaddr(addr);
+> +       print_field("Addr Type: %d", addr_type);
+> +}
+> +
+>  static const struct mgmt_data mgmt_event_table[] = {
+>         { 0x0001, "Command Complete",
+>                         mgmt_command_complete_evt, 3, false },
+> @@ -15003,6 +15034,10 @@ static const struct mgmt_data mgmt_event_table[] = {
+>                         mgmt_controller_suspend_evt, 1, true },
+>         { 0x002e, "Controller Resumed",
+>                         mgmt_controller_resume_evt, 8, true },
+> +       { 0x002f, "ADV Monitor Device Found",
+> +                       mgmt_adv_monitor_device_found_evt, 16, false },
+> +       { 0x0030, "Controller Resumed",
+> +                       mgmt_adv_monitor_device_lost_evt, 9, true },
+>         { }
+>  };
+>
+> --
+> 2.37.2
+>
 
-Sure, I'll just mask them unconditionally then for v3.
 
-I originally thought it was a strange bug in their firmware but
-then I found their btmon-like tool called "PacketLogger" which
-actually decodes that byte and shows it in the UI as "Channel".
-It seems to be intentional :/
-
-
-
-Best,
-
-Sven
+-- 
+Luiz Augusto von Dentz
