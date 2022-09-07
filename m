@@ -2,182 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC4DC54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 18:49:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BC2C38145
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 19:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbiIGStl (ORCPT
+        id S229583AbiIGTIB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 14:49:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43688 "EHLO
+        Wed, 7 Sep 2022 15:08:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbiIGStk (ORCPT
+        with ESMTP id S229567AbiIGTH3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 14:49:40 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8162110FF7;
-        Wed,  7 Sep 2022 11:49:37 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id u18so11544934lfo.8;
-        Wed, 07 Sep 2022 11:49:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=e1NUouMJlIfWMvB5ibq4JexkhbmTjQYF/xGpsCOOr/o=;
-        b=oR31toyYyjza92H/8CT1gsP6E4qzxP8L6MxN6LddFykYpGXX4xgTYsWf/02AjAtYk/
-         TzCodJ39Nh3UcAuI+J3uiS1we7PglvytuwksgSJjze9J6O/TFKofPy8pnjHJ1nzAHmFm
-         XNtc04wKyaEr9ELEYtZf7xp8YQdYjtMs0JzmypI0xA3mXdT8LiYJWsQdRWpere86d2I4
-         oow8QJW6dr0QvBSjIMvHbcjgV7BIMlmtO6l6D1+VkI09KGlr5Vdqy9UBhlJ5W8nSoRqU
-         NB+OlfZuEk+HreYLyz0QwrsIeo2ZZ02B9Iy+ORDQjRcwwOIMrJxFOxoFjsxSnTq+EMcU
-         gE8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=e1NUouMJlIfWMvB5ibq4JexkhbmTjQYF/xGpsCOOr/o=;
-        b=a4um3zD+T/rdJiDKYgkcFGWbVsRjLF+q1Lrm9LGYXFm53cbXBD/1q5ZN/NwyiP1oI0
-         Y6blS+3JoSh15XhkD8fDx13WTJdMdq0kMfTAx+x40zzT8TZRL10y3gvoK82AfttkOTCn
-         4aSugxAd2UTLma+qwy02l5I3jQoqOvbQghRL6UD1jj3BvnVJKdUqyzAGPSeBjAS/6sc/
-         zbhHPWd3Z9PFG1yj3Yy6QI058XJ7W+l7bPfOUUUcTaPJAt+ZExtJSMKqj7YIfq2tkcwn
-         9MSOaPe7kwgtYVDj2IATCNkqLEsm4DK/HbtoGLZ1soU+iOxzh/R+OTZVt0DH19Mk9M9R
-         46PQ==
-X-Gm-Message-State: ACgBeo29gfWKJqOMXDcWkL6VMNDrkJXs4Oura4n1kV8YauEiLuVk09ts
-        04GN53WxXvc67icR+i+VlkRh0wGYdFG2ux0uhjk=
-X-Google-Smtp-Source: AA6agR6/hLB2K7ccUe4nRjiLDMnjHHC5/CsLQq94MfUg5Gx9td3rC2XzZVcuuM5UwWGWEsK/7uTzPCABXn7AYQRt8lY=
-X-Received: by 2002:a05:6512:3d24:b0:494:95d0:5c02 with SMTP id
- d36-20020a0565123d2400b0049495d05c02mr1682420lfv.198.1662576575720; Wed, 07
- Sep 2022 11:49:35 -0700 (PDT)
+        Wed, 7 Sep 2022 15:07:29 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB587B1B99
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 12:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662577648; x=1694113648;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3/ER42hmf9qupIO4y4TraL1zS8BTy6uURJyiJY0NT9c=;
+  b=ATG1+KSBa7QKeZIkjJ/+RFY9IbhuIs4kkJroZRVrS3s3IWyBbOahxoFB
+   ecmwwga6NRDqovwygCaUL1Q5CrKvdRglXj4HQT0ayxgElJHkJknX2hBne
+   q0TAiVetwmbsFNkQd5RilD3ABffxiPu3KHof9y33SsLXpduYmDTDc5s+l
+   Pl7Q7GtkLJrk0D6bt44UesvoXjgBcmRLr/SA87B9doRuBUKXhxQKaCZzV
+   /XXl2aGGtXDgmTC3ujMxQ80hkNsO2ggrNS3JsDmiQwkKsq72twWvE7wQH
+   HdRU39BH3aQCFdP+FoU6yElccNbGzOjmUX76kzeaZYxpXid58aanzoTq4
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10463"; a="295707156"
+X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
+   d="scan'208";a="295707156"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 12:07:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,297,1654585200"; 
+   d="scan'208";a="647754259"
+Received: from lkp-server02.sh.intel.com (HELO 95dfd251caa2) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 07 Sep 2022 12:07:26 -0700
+Received: from kbuild by 95dfd251caa2 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oW0OT-0006sZ-2h;
+        Wed, 07 Sep 2022 19:07:25 +0000
+Date:   Thu, 08 Sep 2022 03:07:06 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ c1631dbc00c1e432713396aaa10d8bd825822db0
+Message-ID: <6318ebda.RL3uPpza8l5W7xH2%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <20220907170935.11757-1-sven@svenpeter.dev> <20220907170935.11757-4-sven@svenpeter.dev>
-In-Reply-To: <20220907170935.11757-4-sven@svenpeter.dev>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 7 Sep 2022 11:49:23 -0700
-Message-ID: <CABBYNZLWc=2y0aVRc+_k_XzfJeEJkJ_ebaViqUybvaDY49p2_g@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] Bluetooth: hci_event: Add quirk to ignore byte in
- LE Extended Adv Report
-To:     Sven Peter <sven@svenpeter.dev>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Hector Martin <marcan@marcan.st>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        asahi@lists.linux.dev,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sven,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: c1631dbc00c1e432713396aaa10d8bd825822db0  Bluetooth: hci_sync: Fix hci_read_buffer_size_sync
 
-On Wed, Sep 7, 2022 at 10:10 AM Sven Peter <sven@svenpeter.dev> wrote:
->
-> Broadcom controllers present on Apple Silicon devices use the upper
-> 8 bits of the event type in the LE Extended Advertising Report for
-> the channel on which the frame has been received.
-> Add a quirk to drop the upper byte to ensure that the advertising
-> results are parsed correctly.
->
-> The following excerpt from a btmon trace shows a report received on
-> channel 37 by these controllers:
->
-> > HCI Event: LE Meta Event (0x3e) plen 55
->       LE Extended Advertising Report (0x0d)
->         Num reports: 1
->         Entry 0
->           Event type: 0x2513
->             Props: 0x0013
->               Connectable
->               Scannable
->               Use legacy advertising PDUs
->             Data status: Complete
->             Reserved (0x2500)
->           Legacy PDU Type: Reserved (0x2513)
->           Address type: Public (0x00)
->           Address: XX:XX:XX:XX:XX:XX (Shenzhen Jingxun Software [...])
->           Primary PHY: LE 1M
->           Secondary PHY: No packets
->           SID: no ADI field (0xff)
->           TX power: 127 dBm
->           RSSI: -76 dBm (0xb4)
->           Periodic advertising interval: 0.00 msec (0x0000)
->           Direct address type: Public (0x00)
->           Direct address: 00:00:00:00:00:00 (OUI 00-00-00)
->           Data length: 0x1d
->           [...]
->         Flags: 0x18
->           Simultaneous LE and BR/EDR (Controller)
->           Simultaneous LE and BR/EDR (Host)
->         Company: Harman International Industries, Inc. (87)
->           Data: [...]
->         Service Data (UUID 0xfddf):
->         Name (complete): JBL Flip 5
->
-> Signed-off-by: Sven Peter <sven@svenpeter.dev>
-> ---
-> changes from v1:
->   - adjusted the commit message a bit to make checkpatch happy
->
->  include/net/bluetooth/hci.h | 11 +++++++++++
->  net/bluetooth/hci_event.c   |  4 ++++
->  2 files changed, 15 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index cf29511b25a8..62539c1a6bf2 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -263,6 +263,17 @@ enum {
->          * during the hdev->setup vendor callback.
->          */
->         HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
-> +
-> +       /*
-> +        * When this quirk is set, the upper 8 bits of the evt_type field of
-> +        * the LE Extended Advertising Report events are discarded.
-> +        * Some Broadcom controllers found in Apple machines put the channel
-> +        * the report was received on into these reserved bits.
-> +        *
-> +        * This quirk can be set before hci_register_dev is called or
-> +        * during the hdev->setup vendor callback.
-> +        */
-> +       HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
->  };
->
->  /* HCI device flags */
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 485c814cf44a..b50d05211f0d 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -6471,6 +6471,10 @@ static void hci_le_ext_adv_report_evt(struct hci_dev *hdev, void *data,
->                         break;
->
->                 evt_type = __le16_to_cpu(info->type);
-> +               if (test_bit(HCI_QUIRK_FIXUP_LE_EXT_ADV_REPORT_EVT_TYPE,
-> +                            &hdev->quirks))
-> +                       evt_type &= 0xff;
-> +
+elapsed time: 1333m
 
-Don't think we really need to quirk in order to mask the reserved
-bits, according to the 5.3 spec only bits 0-6 are actually valid, that
-said the usage of the upper byte is sort of non-standard so I don't
-know what is broadcom/apple thinking that they could use like this,
-instead this should probably be placed in a vendor command or even add
-as part of the data itself with a vendor type.
+configs tested: 47
+configs skipped: 2
 
->                 legacy_evt_type = ext_evt_type_to_legacy(hdev, evt_type);
->                 if (legacy_evt_type != LE_ADV_INVALID) {
->                         process_adv_report(hdev, legacy_evt_type, &info->bdaddr,
-> --
-> 2.25.1
->
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
+gcc tested configs:
+um                             i386_defconfig
+um                           x86_64_defconfig
+arc                  randconfig-r043-20220906
+riscv                randconfig-r042-20220906
+s390                 randconfig-r044-20220906
+powerpc                           allnoconfig
+alpha                            allyesconfig
+arc                              allyesconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+i386                                defconfig
+x86_64                              defconfig
+sh                               allmodconfig
+x86_64                               rhel-8.3
+i386                             allyesconfig
+x86_64                          rhel-8.3-func
+x86_64                        randconfig-a015
+mips                             allyesconfig
+x86_64                         rhel-8.3-kunit
+x86_64                           allyesconfig
+powerpc                          allmodconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                        randconfig-a002
+x86_64                           rhel-8.3-kvm
+x86_64                        randconfig-a006
+i386                          randconfig-a014
+x86_64                        randconfig-a004
+i386                          randconfig-a012
+i386                          randconfig-a016
+i386                          randconfig-a003
+i386                          randconfig-a001
+arm                                 defconfig
+arm                              allyesconfig
+arm64                            allyesconfig
+x86_64                           rhel-8.3-syz
+ia64                             allmodconfig
+
+clang tested configs:
+hexagon              randconfig-r041-20220906
+hexagon              randconfig-r045-20220906
+x86_64                        randconfig-a016
+x86_64                        randconfig-a001
+i386                          randconfig-a013
+i386                          randconfig-a015
+x86_64                        randconfig-a003
+i386                          randconfig-a011
+x86_64                        randconfig-a005
+i386                          randconfig-a002
+i386                          randconfig-a004
 
 -- 
-Luiz Augusto von Dentz
+0-DAY CI Kernel Test Service
+https://01.org/lkp
