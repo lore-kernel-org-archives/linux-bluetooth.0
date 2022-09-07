@@ -2,240 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C245C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 22:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 459E4ECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 23:22:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229612AbiIGWon (ORCPT
+        id S229889AbiIGXWg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 18:44:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32778 "EHLO
+        Wed, 7 Sep 2022 19:22:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbiIGWom (ORCPT
+        with ESMTP id S229609AbiIGXWf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 18:44:42 -0400
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE15C12769
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 15:44:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662590680; x=1694126680;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=BL01XrIVVjMpyQG+ZUhKoOWcTgQryr21+syJkw1Ho3A=;
-  b=SNBF/88OLaYkspnhZot27rJc9DQskIDjmbGc0UqUznrNEylPtoGUCcMq
-   bj1TwwsKtadkZf4o3xkFE+FVhNWBsTqUzIVqDDnrr1sdpBHkZ2p2HFW04
-   oXCFWakzPbFdAUKJKJjmWumw4OFOJCRy2np3xtXlx1uakyb6o9WVMVTPS
-   X8EE3aNENy3wSek2OO1vl/NLvLKD8xP7to0zuSDRvX/wytGmNDYGpiJWK
-   T0Dnx3BN9JhQUUCequ8Q/z4U8/xAE5k2EWskABtRVIAi4RHCEmpc6RlnR
-   rw3xuwkvdSFY5/SJUDmnTEhh1M4i1MN8WXsnhN1IVIuzdQpTpy0mwzr3P
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10463"; a="323203513"
-X-IronPort-AV: E=Sophos;i="5.93,298,1654585200"; 
-   d="scan'208";a="323203513"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 15:44:24 -0700
-X-IronPort-AV: E=Sophos;i="5.93,298,1654585200"; 
-   d="scan'208";a="943091014"
-Received: from jsanch3-desk4.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.92.69])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2022 15:44:24 -0700
-From:   Brian Gix <brian.gix@intel.com>
+        Wed, 7 Sep 2022 19:22:35 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E346F9E0C2
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Sep 2022 16:22:34 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id r17so2578692pgr.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Sep 2022 16:22:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date;
+        bh=k8Xtps4ZdAE3VhEKw8jsuRmLjTJAgNC/3l4zoVX7kLw=;
+        b=g9mipdVlqj89UoMbKU4H2ODk8uD9ogDrwWpQ3aqRu2/jlf5OopRsIaaPtmqkS7gVUd
+         bRMZoC6kcKJg62iWqP5z1eK+zsNhrw4X/nOilCHtcVq1grkCohdoJ/DBzZGB3GiS//kv
+         XuDqSeovlVIVXhmRta5Ul3czl98iRgb12AXjuwS01BzXgJneUOwRGUTQsfL9hvm8pC6X
+         kYfWTw/oAZGwzxORD3a5072axBsmlNJgjcrM7HuE+uiQIAiwPfeM2illZIlccBQvJaKB
+         TeGH3oT5sImCVPz1v3y8oQxCqRiQJGRykC0AS9YCUL2fk7KZWYgKd6UoNFOeSOtGEPQ6
+         T/3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=k8Xtps4ZdAE3VhEKw8jsuRmLjTJAgNC/3l4zoVX7kLw=;
+        b=hG8+iBbw/27R4kCowyUYUCM9vH+Dzmo+dQH625VvLPvc5Duj1hirmD4Aqz3bj4xQff
+         HHz9gDkVOdKFe3aC4vYqW3GQG11XfjZfZtvk4EpGmwnxzPIOdKETmZUCCMSdb6t2NhyB
+         bTdquwo3OwRKjOjVVvYtIDOLIGblq2ylBLL2YXGsZyUR2XbYto6OtWI1GHMDuKjKDmoM
+         fMPevFZET4EW6C3AvIXv26RLhEJRJMCbDRmZKhT+JU1zDjsM1zgDfs0k6vAGoeAnifSc
+         J8f2jNZVO1UBHgDDjbwP+AEqjzhyHdIHweqYWovCYgXqtfB+NgyWOXB2TlSOsRCWVegE
+         O1dw==
+X-Gm-Message-State: ACgBeo2Il6JEmW3mDzjFMeTI2CVabI65DrL8TrZuz7NMt/UHOtitl43e
+        QiMtFeApOjLBoK79ecNBqIAB/OWyzus15Q==
+X-Google-Smtp-Source: AA6agR4VTou7Bq6ScNmu+3xJNGQoQLb2itBou2+jlwUgYxR2LNGOvGcaD+RbT6qdjfBCfwAlYs9FmQ==
+X-Received: by 2002:a63:5522:0:b0:42b:976d:dcd4 with SMTP id j34-20020a635522000000b0042b976ddcd4mr5152573pgb.421.1662592953824;
+        Wed, 07 Sep 2022 16:22:33 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id x11-20020a170902ec8b00b00176b63535adsm7241789plg.260.2022.09.07.16.22.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Sep 2022 16:22:33 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v3 2/2] monitor: Add mesh MGMT cmds/events to btmon parser
-Date:   Wed,  7 Sep 2022 15:44:16 -0700
-Message-Id: <20220907224416.62115-2-brian.gix@intel.com>
+Subject: [PATCH v2 1/2] Bluetooth: MGMT: Fix Set PHY Configuration command
+Date:   Wed,  7 Sep 2022 16:22:31 -0700
+Message-Id: <20220907232232.3248525-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.2
-In-Reply-To: <20220907224416.62115-1-brian.gix@intel.com>
-References: <20220907224416.62115-1-brian.gix@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Sample Output:
-@ MGMT Command: Read Mesh Features (0x0058) plen 0
-@ MGMT Event: Command Complete (0x0001) plen 7
-      Read Mesh Features (0x0058) plen 4
-        Status: Success (0x00)
-        Index: 0
-        Max Handles: 3
-        Used Handles: 0
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-@ MGMT Command: Set Mesh Receiver (0x0057) plen 9
-        Enable: 1
-        Window: 4096
-        Period: 4096
-        Num AD Types: 3
-          AD Type: 42
-          AD Type: 43
-          AD Type: 41
-@ MGMT Event: Command Complete (0x0001) plen 3
-      Set Mesh Receiver (0x0057) plen 0
-        Status: Success (0x00)
+The command shall accept any subset that is considered configurable but
+instead it was only accepting the exact match causing errors such as:
 
-@ MGMT Command: Mesh Send (0x0059) plen 43
-        Address: 00:00:00:00:00:00 (OUI 00-00-00)
-        Addr Type: 2
-        Instant: 0x0000000000000000
-        Delay: 0
-        Count: 1
-        Data Length: 24
-        Data: : 172b01002dda0c2491537ae2000000009de2120a725038b2
-@ MGMT Event: Command Complete (0x0001) plen 4
-      Mesh Send (0x0059) plen 1
-        Status: Success (0x00)
-        Handle: 3
+[mgmt]# phy
+Supported phys: BR1M1SLOT BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT
+EDR2M5SLOT EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE1MTX LE1MRX LE2MTX
+LE2MRX LECODEDTX LECODEDRX
+Configurable phys: BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT EDR2M5SLOT
+EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE2MTX LE2MRX LECODEDTX LECODEDRX
+Selected phys: BR1M1SLOT BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT
+EDR2M5SLOT EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE1MTX LE1MRX
+[mgmt]# phy BR1M3SLOT BR1M5SLOT EDR2M1SLOT EDR2M3SLOT EDR2M5SLOT
+EDR3M1SLOT EDR3M3SLOT EDR3M5SLOT LE2MTX LE2MRX
+Could not set PHY Configuration with status 0x0d (Invalid Parameters)
 
-@ MGMT Event: Mesh Packet Complete (0x0032) plen 1
-        Handle: 3
+Fixes: 0314f2867fa0 ("Bluetooth: Implement Set PHY Confguration command")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- monitor/packet.c | 111 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
+ net/bluetooth/mgmt.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 4c4f53dee..7544a7e68 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -14191,6 +14191,74 @@ static void mgmt_remove_adv_monitor_patterns_rsp(const void *data,
- 	print_field("Handle: %d", handle);
- }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4c421ebac669..34443db21e44 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4020,8 +4020,8 @@ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
+ 	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
+ 		cp_phy.all_phys |= 0x02;
  
-+static void mgmt_set_mesh_receiver_cmd(const void *data, uint16_t size)
-+{
-+	uint8_t enable = get_u8(data);
-+	uint16_t window = get_le16(data + 1);
-+	uint16_t period = get_le16(data + 3);
-+	uint8_t num_ad_types = get_u8(data + 5);
-+	const uint8_t *ad_types = data + 6;
-+
-+	print_field("Enable: %d", enable);
-+	print_field("Window: %d", window);
-+	print_field("Period: %d", period);
-+	print_field("Num AD Types: %d", num_ad_types);
-+	size -= 6;
-+
-+	while (size--)
-+		print_field("  AD Type: %d", *ad_types++);
-+}
-+
-+static void mgmt_read_mesh_features_rsp(const void *data, uint16_t size)
-+{
-+	uint16_t index = get_le16(data);
-+	uint8_t max_handles = get_u8(data + 2);
-+	uint8_t used_handles = get_u8(data + 3);
-+	const uint8_t *handles = data + 4;
-+
-+	print_field("Index: %d", index);
-+	print_field("Max Handles: %d", max_handles);
-+	print_field("Used Handles: %d", used_handles);
-+	size -= 4;
-+
-+	while (size--)
-+		print_field("  Used Handle: %d", *handles++);
-+}
-+
-+static void mgmt_mesh_send_cmd(const void *data, uint16_t size)
-+{
-+	const uint8_t *addr = data;
-+	uint8_t addr_type = get_u8(data + 6);
-+	uint64_t instant = get_le64(data + 7);
-+	uint16_t delay = get_le16(data + 15);
-+	uint8_t cnt = get_u8(data + 17);
-+	uint8_t adv_data_len = get_u8(data + 18);
-+
-+	data += 19;
-+	size -= 19;
-+	print_bdaddr(addr);
-+	print_field("Addr Type: %d", addr_type);
-+	print_field("Instant: 0x%16.16" PRIx64, instant);
-+	print_field("Delay: %d", delay);
-+	print_field("Count: %d", cnt);
-+	print_field("Data Length: %d", adv_data_len);
-+	print_hex_field("Data: ", data, size);
-+}
-+
-+static void mgmt_mesh_send_rsp(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
-+static void mgmt_mesh_send_cancel_cmd(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- struct mgmt_data {
- 	uint16_t opcode;
- 	const char *str;
-@@ -14448,6 +14516,18 @@ static const struct mgmt_data mgmt_command_table[] = {
- 				mgmt_add_adv_monitor_patterns_rssi_cmd, 8,
- 									false,
- 				mgmt_add_adv_monitor_patterns_rsp, 2, true},
-+	{ 0x0057, "Set Mesh Receiver",
-+				mgmt_set_mesh_receiver_cmd, 6, false,
-+				mgmt_null_rsp, 0, true},
-+	{ 0x0058, "Read Mesh Features",
-+				mgmt_null_cmd, 0, true,
-+				mgmt_read_mesh_features_rsp, 4, false},
-+	{ 0x0059, "Mesh Send",
-+				mgmt_mesh_send_cmd, 19, false,
-+				mgmt_mesh_send_rsp, 1, true},
-+	{ 0x0056, "Mesh Send Cancel",
-+				mgmt_mesh_send_cancel_cmd, 1, true,
-+				mgmt_null_rsp, 0, true},
- 	{ }
- };
+-	if (selected_phys & MGMT_PHY_LE_1M_TX)
+-		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
++	/* 1M PHY shall always be supported */
++	cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
  
-@@ -14945,6 +15025,33 @@ static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
- 	print_field("Addr Type: %d", addr_type);
- }
+ 	if (selected_phys & MGMT_PHY_LE_2M_TX)
+ 		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
+@@ -4029,8 +4029,8 @@ static int set_default_phy_sync(struct hci_dev *hdev, void *data)
+ 	if (selected_phys & MGMT_PHY_LE_CODED_TX)
+ 		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
  
-+static void mgmt_mesh_device_found_evt(const void *data, uint16_t size)
-+{
-+	const uint8_t *addr = data;
-+	uint8_t addr_type = get_u8(data + 6);
-+	int8_t rssi = get_s8(data + 7);
-+	uint64_t instant = get_le64(data + 8);
-+	uint32_t flags = get_le32(data + 16);
-+	uint16_t eir_len = get_le16(data + 20);
-+	const uint8_t *eir_data = data + 22;
-+
-+	print_bdaddr(addr);
-+	print_field("Addr Type: %d", addr_type);
-+	print_field("RSSI: %d", rssi);
-+	print_field("Instant: 0x%16.16" PRIx64, instant);
-+	mgmt_print_device_flags(flags);
-+	print_field("EIR Length: %d", eir_len);
-+	size -= 22;
-+	print_hex_field("EIR Data: ", eir_data, size);
-+}
-+
-+static void mgmt_mesh_packet_cmplt_evt(const void *data, uint16_t size)
-+{
-+	uint8_t handle = get_u8(data);
-+
-+	print_field("Handle: %d", handle);
-+}
-+
- static const struct mgmt_data mgmt_event_table[] = {
- 	{ 0x0001, "Command Complete",
- 			mgmt_command_complete_evt, 3, false },
-@@ -15038,6 +15145,10 @@ static const struct mgmt_data mgmt_event_table[] = {
- 			mgmt_adv_monitor_device_found_evt, 16, false },
- 	{ 0x0030, "ADV Monitor Device Lost",
- 			mgmt_adv_monitor_device_lost_evt, 9, true },
-+	{ 0x0031, "Mesh Device Found",
-+			mgmt_mesh_device_found_evt, 22, false },
-+	{ 0x0032, "Mesh Packet Complete",
-+			mgmt_mesh_packet_cmplt_evt, 1, true },
- 	{ }
- };
+-	if (selected_phys & MGMT_PHY_LE_1M_RX)
+-		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
++	/* 1M PHY shall always be supported */
++	cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
  
+ 	if (selected_phys & MGMT_PHY_LE_2M_RX)
+ 		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
+@@ -4049,14 +4049,13 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ {
+ 	struct mgmt_cp_set_phy_configuration *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	u32 selected_phys, configurable_phys, supported_phys, unconfigure_phys;
++	u32 selected_phys, supported_phys;
+ 	u16 pkt_type = (HCI_DH1 | HCI_DM1);
+ 	bool changed = false;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+ 
+-	configurable_phys = get_configurable_phys(hdev);
+ 	supported_phys = get_supported_phys(hdev);
+ 	selected_phys = __le32_to_cpu(cp->selected_phys);
+ 
+@@ -4065,13 +4064,6 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 				       MGMT_OP_SET_PHY_CONFIGURATION,
+ 				       MGMT_STATUS_INVALID_PARAMS);
+ 
+-	unconfigure_phys = supported_phys & ~configurable_phys;
+-
+-	if ((selected_phys & unconfigure_phys) != unconfigure_phys)
+-		return mgmt_cmd_status(sk, hdev->id,
+-				       MGMT_OP_SET_PHY_CONFIGURATION,
+-				       MGMT_STATUS_INVALID_PARAMS);
+-
+ 	if (selected_phys == get_selected_phys(hdev))
+ 		return mgmt_cmd_complete(sk, hdev->id,
+ 					 MGMT_OP_SET_PHY_CONFIGURATION,
 -- 
 2.37.2
 
