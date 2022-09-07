@@ -2,133 +2,209 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D4FC54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 17:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A917C6FA86
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Sep 2022 17:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230044AbiIGRJw (ORCPT
+        id S230119AbiIGRKD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Sep 2022 13:09:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
+        Wed, 7 Sep 2022 13:10:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiIGRJu (ORCPT
+        with ESMTP id S229891AbiIGRKA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Sep 2022 13:09:50 -0400
+        Wed, 7 Sep 2022 13:10:00 -0400
 Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1723AB3E;
-        Wed,  7 Sep 2022 10:09:47 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.west.internal (Postfix) with ESMTP id AF6883200805;
-        Wed,  7 Sep 2022 13:09:43 -0400 (EDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407DA7DF41;
+        Wed,  7 Sep 2022 10:09:57 -0700 (PDT)
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+        by mailout.west.internal (Postfix) with ESMTP id D0B5E320092A;
+        Wed,  7 Sep 2022 13:09:54 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 07 Sep 2022 13:09:45 -0400
+  by compute1.internal (MEProxy); Wed, 07 Sep 2022 13:09:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
          h=cc:cc:content-transfer-encoding:date:date:from:from
-        :in-reply-to:message-id:mime-version:reply-to:sender:subject
-        :subject:to:to; s=fm2; t=1662570583; x=1662656983; bh=lEMgyuskMd
-        HHSxUE4iU5Q9az2x12J7mJ4G0YEW9bdmY=; b=6DdqzQcWCUDxwh08S9lzK0/F3/
-        2T4RE5qzIZGJmTYC/BMZRp4yprwzfDorrdR6aGj7WLZqZ309f0JVA9tvMYzNdSti
-        DGyMzqkzCehl1khYrIWhQuKquRyPMfSaVyIHq9VG0GUTp1w07Twmxp4RbdhdkcuX
-        rnyfdPu+6mYOkcCbeEaq5gXeTL44E5KgPv56xvOAOOJp4N7y9T0Nck6U7Vi3sKqB
-        7AhvaVN8Y0CE3J+Qj4g4zg2C8XOOorU0+Or4CYTrX+vhGgbvSBHhLvtiCKBVah1i
-        Q8TO+i/K4J/aLZMo96fD7AOgNibf6P1+4Q257fwpgvtkbMc6CkuWL3HVEhPA==
+        :in-reply-to:in-reply-to:message-id:mime-version:references
+        :reply-to:sender:subject:subject:to:to; s=fm2; t=1662570594; x=
+        1662656994; bh=mQPO/JkIQlhcGyNGHSuGKse2NAHa3zF6V4qeVXZn3pM=; b=Y
+        bDRHkXv+wTeiJCioXZkw0owpvglq9ql4AL5vQKRLdghTGZZY260+eSD4CjtRbJEn
+        Ul9LIxjAt3LRktI7XKxCVf1vH1EP2zTFrj7oyB/BoH78v8s6v3FPUBpsYbfAFFnQ
+        a1H4hEuzh51DKpYfGoiHzZnzo/RTFgJRxHh6Gb2JUWM6ig5xCjC7qfgdTbEs/mem
+        NrJ9b+vB1nSM+et7lO5pwCUNn+UmHPtCODCYvfBPYxLU8B5VbL7urZhvZPqSYR4b
+        PZQmbjoqK/wZpyJPfmBkLLh67P+V3tvMER+TTUFKQx5/EvuwLICqjSZApSRmPAia
+        8FZl3PgpzIV4ZM9ZQI9hQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
-        :feedback-id:feedback-id:from:from:in-reply-to:message-id
-        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-        1662570583; x=1662656983; bh=lEMgyuskMdHHSxUE4iU5Q9az2x12J7mJ4G0
-        YEW9bdmY=; b=1xyVMiCf/OS3T6kbat1VPmsNuBWqnWvuMY05PBBxzFePRrkIW+H
-        DPYJPyTVGWGfCHmzMfmC0eezzk1tdd8o5Jaw1+yTqampY0OiPAHJ+EygSgFyc4eT
-        vaiyOjUyaWZxSLqNzAZ2PCZz96WP2Vf42jpWnb/Y5lbg45Zk5OTUhcwNsjLWpuln
-        lNSwhxUtLqtjzVxOYZf+9Y054QQZXOvn+bGFKL1Dxe458X04RLHXdm3d/jTN87Ey
-        beiNT024ky8y3mXi9tDmov6+/Zwnh2B95oGGsAGKjMkKA0iICy2ABUxbpKePg8rC
-        CA5YdX/WQsZZRRptsUB7F+rABNTnNYd6v3g==
-X-ME-Sender: <xms:VtAYY0Dgw1jmikCM9R2W3EmOj3BcSIsQbOYQvuzDlvPyztERjaH_wg>
-    <xme:VtAYY2gX1knX2Do8O6baN2Ho4_2VOV8awORVpxvyjPo77tqDAztY3-EpMDFQZV_ab
-    oWJZCySPepuTulEDqA>
-X-ME-Received: <xmr:VtAYY3m_b4Su6M3qVwvoVB9mQdsc9Op5l2wS1tkFoPTnycpAsCSNcw-lL4mXDcbyeiHRL6EmAgrzixVZq4WY5Fx4NZmd57xP_OOoHbDF0tf4jdhhHtnu-uk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedttddguddutdcutefuodetggdotefrod
+        :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+        :message-id:mime-version:references:reply-to:sender:subject
+        :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+        :x-sasl-enc; s=fm2; t=1662570594; x=1662656994; bh=mQPO/JkIQlhcG
+        yNGHSuGKse2NAHa3zF6V4qeVXZn3pM=; b=q73qQ4UJqO387R6XuVQIZr88BLcWl
+        YT1Sk71IvtS3qVNVEQsg2ilOcEJ6opu4KfjAIFrkfQ8sCwFfdiTMHx+pTvNOVG7J
+        lGV3MQWRXP1ChfZBaQoDKuzW7lvI32eqmBxXVJS/DYTXV4evHuRT6dBDzzWcQM2e
+        z+5MGOqanK8aCGHTgFSilYB7baj8GWOMbHefEoBP4EtgsbFLBuggCQhheOJ6kTqG
+        G2wXdtRoe3WLoao4eYnL9lWsqT03OxoGeCsL8Tauknq3qkUE+gJ526hs5fcOSSo+
+        lQM+jcM718ce7Zyr2v1IrL+b22BWYh7vBTV3+VzQMzQbohbqA8RfpcM+A==
+X-ME-Sender: <xms:YtAYY7qDgo-W3T7hLc4w7f3SENffKJ5-XcFCuG0JHaSY1PDnTRuajQ>
+    <xme:YtAYY1pOWWAh4kysY4SODOip_iWF70wF0aEjokIDFNMWB10kNu_vOpn_uZtuORV9a
+    0ktfuwY6XaJ4T6zbnE>
+X-ME-Received: <xmr:YtAYY4OQw4Am9od-_dfd9c0SL_cxW1FmTy2kwQFNyyYlDF-g84ykV_CVDgdvzUvWAccXG1VB3EQX8oRyWN-bg8jp44uTdYO8qcGxP2kVIA9JB6HJwHk8u68>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedttddguddtlecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
     necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuvhgvnhcu
-    rfgvthgvrhcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrfgrthhtvg
-    hrnhepgfegudffudelfeeugedtjeeugeehueffudevveegveektdfhueehueeufeelheev
-    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
-    curfgrrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
-X-ME-Proxy: <xmx:VtAYY6yoCoD1eaLJHNOVLnZ9Bv_wYUTeOujxDM7vBAZjG4HTjYiLuQ>
-    <xmx:VtAYY5Qd6PrPh_22--TkK7QQ1RtJVbKvoGLxXoLB3WlNjCWMWF5m3w>
-    <xmx:VtAYY1YsvnwDQYodwF7cNNzrzP5MYRgBsHHyDTwAVsQ7KnLy3Fp-Pg>
-    <xmx:V9AYY6BJTNJ6kioNeMu14tXHSdvm8MPK4kHpl0BoNRHahGHQ4Mb_NQ>
+    enucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpefuvhgv
+    nhcurfgvthgvrhcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrfgrth
+    htvghrnhephfeufffgffegtdefhfefueejfefghfelkeetuddvffeigeffuedvjeegudel
+    ieelnecuffhomhgrihhnpeguvghvihgtvghtrhgvvgdrohhrghenucevlhhushhtvghruf
+    hiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgvthgv
+    rhdruggvvh
+X-ME-Proxy: <xmx:YtAYY-6lwZ4EwP14A53eLjPPD67VW4vKFb-tOzVynAUWOYaZWsoUhw>
+    <xmx:YtAYY64-MytbABzHbmNyM681eTeo08phGSxomlnvi2DE0duPuLcWcQ>
+    <xmx:YtAYY2igcJzozOtfz67UztFWgDXipWX9KXMzO5HL-tlti_9cIwirSw>
+    <xmx:YtAYY2oYhIUZKS9vU0k0IyOKxCTkqucq27zwInHeso3ZW9OumBr4yw>
 Feedback-ID: i51094778:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 7 Sep 2022 13:09:39 -0400 (EDT)
+ 7 Sep 2022 13:09:51 -0400 (EDT)
 From:   Sven Peter <sven@svenpeter.dev>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
 Cc:     Sven Peter <sven@svenpeter.dev>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Dumazet <edumazet@google.com>,
         Jakub Kicinski <kuba@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
         Paolo Abeni <pabeni@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
         Hector Martin <marcan@marcan.st>,
         Alyssa Rosenzweig <alyssa@rosenzweig.io>,
         asahi@lists.linux.dev, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/5] Broadcom/Apple Bluetooth driver for Apple Silicon
-Date:   Wed,  7 Sep 2022 19:09:30 +0200
-Message-Id: <20220907170935.11757-1-sven@svenpeter.dev>
+Subject: [PATCH v2 2/5] dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+Date:   Wed,  7 Sep 2022 19:09:32 +0200
+Message-Id: <20220907170935.11757-3-sven@svenpeter.dev>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+In-Reply-To: <20220907170935.11757-1-sven@svenpeter.dev>
+References: <20220907170935.11757-1-sven@svenpeter.dev>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+These chips are combined Wi-Fi/Bluetooth radios which expose a
+PCI subfunction for the Bluetooth part.
+They are found in Apple machines such as the x86 models with the T2
+chip or the arm64 models with the M1 or M2 chips.
 
-v1: https://lore.kernel.org/asahi/20220801103633.27772-1-sven@svenpeter.dev/
+Signed-off-by: Sven Peter <sven@svenpeter.dev>
+---
+changes from v1:
+  - added apple,* pattern to brcm,board-type
+  - s/PCI/PCIe/
+  - fixed 1st reg cell inside the example to not contain the bus number
 
-Here's v2 of the Apple/Broadcom Bluetooth series. Most changes from
-v1 are only related to the device tree bindings. Other than that I fixed
-a few minor bugs and adjusted some commit messages to make checkpatch
-happier.
-
-
-Best,
-
-
-Sven
-
-Sven Peter (5):
-  dt-bindings: net: Add generic Bluetooth controller
-  dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
-  Bluetooth: hci_event: Add quirk to ignore byte in LE Extended Adv
-    Report
-  Bluetooth: Add quirk to disable extended scanning
-  Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCI boards
-
- .../bindings/net/bluetooth-controller.yaml    |   30 +
- .../devicetree/bindings/net/bluetooth.txt     |    5 -
- .../bindings/net/brcm,bcm4377-bluetooth.yaml  |   78 +
- .../bindings/net/qualcomm-bluetooth.yaml      |    4 +-
- .../bindings/soc/qcom/qcom,wcnss.yaml         |    8 +-
- MAINTAINERS                                   |    2 +
- drivers/bluetooth/Kconfig                     |   12 +
- drivers/bluetooth/Makefile                    |    1 +
- drivers/bluetooth/hci_bcm4377.c               | 2515 +++++++++++++++++
- include/net/bluetooth/hci.h                   |   21 +
- include/net/bluetooth/hci_core.h              |    4 +-
- net/bluetooth/hci_event.c                     |    4 +
- 12 files changed, 2671 insertions(+), 13 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/net/bluetooth-controller.yaml
- delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+.../bindings/net/brcm,bcm4377-bluetooth.yaml  | 78 +++++++++++++++++++
+ MAINTAINERS                                   |  1 +
+ 2 files changed, 79 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
- create mode 100644 drivers/bluetooth/hci_bcm4377.c
 
+diff --git a/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+new file mode 100644
+index 000000000000..fb851f8e6bcb
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+@@ -0,0 +1,78 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/brcm,bcm4377-bluetooth.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Broadcom BCM4377 family PCIe Bluetooth Chips
++
++allOf:
++  - $ref: bluetooth-controller.yaml#
++
++maintainers:
++  - Sven Peter <sven@svenpeter.dev>
++
++description:
++  This binding describes Broadcom BCM4377 family PCIe-attached bluetooth chips
++  usually found in Apple machines. The Wi-Fi part of the chip is described in
++  bindings/net/wireless/brcm,bcm4329-fmac.yaml.
++
++properties:
++  compatible:
++    enum:
++      - pci14e4,5fa0 # BCM4377
++      - pci14e4,5f69 # BCM4378
++      - pci14e4,5f71 # BCM4387
++
++  reg:
++    description: PCI device identifier.
++
++  brcm,board-type:
++    $ref: /schemas/types.yaml#/definitions/string
++    description: Board type of the Bluetooth chip. This is used to decouple
++      the overall system board from the Bluetooth module and used to construct
++      firmware and calibration data filenames.
++      On Apple platforms, this should be the Apple module-instance codename
++      prefixed by "apple,", e.g. "apple,atlantisb".
++    pattern: '^apple,.*'
++
++  brcm,taurus-cal-blob:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: A per-device calibration blob for the Bluetooth radio. This
++      should be filled in by the bootloader from platform configuration
++      data, if necessary, and will be uploaded to the device.
++      This blob is used if the chip stepping of the Bluetooth module does not
++      support beamforming.
++
++  brcm,taurus-bf-cal-blob:
++    $ref: /schemas/types.yaml#/definitions/uint8-array
++    description: A per-device calibration blob for the Bluetooth radio. This
++      should be filled in by the bootloader from platform configuration
++      data, if necessary, and will be uploaded to the device.
++      This blob is used if the chip stepping of the Bluetooth module supports
++      beamforming.
++
++  local-bd-address: true
++
++required:
++  - compatible
++  - reg
++  - local-bd-address
++  - brcm,board-type
++
++additionalProperties: false
++
++examples:
++  - |
++    pcie {
++      #address-cells = <3>;
++      #size-cells = <2>;
++
++      bluetooth@0,1 {
++        compatible = "pci14e4,5f69";
++        reg = <0x100 0x0 0x0 0x0 0x0>;
++        brcm,board-type = "apple,honshu";
++        /* To be filled by the bootloader */
++        local-bd-address = [00 00 00 00 00 00];
++      };
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8a5012ba6ff9..5cc9c2da1140 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1875,6 +1875,7 @@ F:	Documentation/devicetree/bindings/interrupt-controller/apple,*
+ F:	Documentation/devicetree/bindings/iommu/apple,dart.yaml
+ F:	Documentation/devicetree/bindings/iommu/apple,sart.yaml
+ F:	Documentation/devicetree/bindings/mailbox/apple,mailbox.yaml
++F:	Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+ F:	Documentation/devicetree/bindings/nvme/apple,nvme-ans.yaml
+ F:	Documentation/devicetree/bindings/nvmem/apple,efuses.yaml
+ F:	Documentation/devicetree/bindings/pci/apple,pcie.yaml
 -- 
 2.25.1
 
