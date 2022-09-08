@@ -2,91 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BEDC54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 21:21:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B09CC38145
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 21:40:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229658AbiIHVVj (ORCPT
+        id S229587AbiIHVkU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Sep 2022 17:21:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49036 "EHLO
+        Thu, 8 Sep 2022 17:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiIHVVi (ORCPT
+        with ESMTP id S229536AbiIHVkS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Sep 2022 17:21:38 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE78513E9C
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 14:21:37 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id t70so12105007pgc.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Sep 2022 14:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date;
-        bh=uZIzmuvhSCygugDShmUo3/ffm1op0ZfZWD1Mt8rYNQk=;
-        b=koQVxZeTw+2LPUYzZOse91pDsCIjCx2M9+0LBbE5iJr9KKMVrwXCWKsZ7JCovKocZj
-         tVhJMny0kYtA+UKf5OcSktbGi5Ly54EB/7hJ1DiLtnF1ILTqUE2JZp1mSpnj+8wzIAY9
-         j6U8C5gHUhN5mj7sD9Bx+7devRmm6+S/PkeFVgZn0Pxsvxn3vAyTKbV+ZQgqQPAp6Nmw
-         ++i3qYdIFwSJRcnRZWzFXjVWbknzws6bv2b55JQxiegqk6EURHvp6l+EB3Q2cOw8KxCy
-         6iYqtCI6xrOz6ruHgI3vWnXvaY5C2N7d+3Kx14miF+pBW2yKaBHB3duNN2nBPUcEhMa9
-         qDiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=uZIzmuvhSCygugDShmUo3/ffm1op0ZfZWD1Mt8rYNQk=;
-        b=4S6Ta78FLbgZSm8t+w0CeqH+YjAuLffYb8gy+cqx0kACWuBy9iI7h8Y3oslEhG27E9
-         8USey/cfC+pbPA4xiVJVRuv0/q7s0OpbB6ObWf1Exj/GO/9pTNQq0TF0l5NJuNV/92go
-         8SSa0gajejoCWvRhELjs8YUoV+AKlECHMK7rFKJ7jBeNkhHQ7moYGnRtVessNwldNF2+
-         XONrE6zUPXeexqsL3Bqf9euc2cRYQbIIZu4SfVSn+k/TrihGospWpEZJ9+MDr2Wh/e+M
-         L1BE8+xfB9/zgEIgUjXqqIgfPcwxgHCXabklyPEU+xxNKCcn3/w0KC+k3jo/v+VttE2a
-         OEuA==
-X-Gm-Message-State: ACgBeo2VH02ihuvfSCcr0hq2QHK16HbyMWjSwDPmpD19jfnUyDHqmMsx
-        C5TivyjgFc2+Trq7LDFZ4EHfS9to2Ygsag==
-X-Google-Smtp-Source: AA6agR5PNHJfmAWrjrXUTyisacgT6J4E8myN9NEPOAHmHT9ednPfg9nHeGNgWnXkFI/Z/7eFcNiIVA==
-X-Received: by 2002:a63:4b5e:0:b0:41d:e04b:4515 with SMTP id k30-20020a634b5e000000b0041de04b4515mr9196125pgl.100.1662672096723;
-        Thu, 08 Sep 2022 14:21:36 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b16-20020a170902e95000b0017541ecdcfesm14906222pll.229.2022.09.08.14.21.35
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 14:21:36 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix HCIGETDEVINFO regression
-Date:   Thu,  8 Sep 2022 14:21:35 -0700
-Message-Id: <20220908212135.3543626-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.2
+        Thu, 8 Sep 2022 17:40:18 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F9D99877A
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 14:40:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D90A0B8227A
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 21:40:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 98537C433D7;
+        Thu,  8 Sep 2022 21:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1662673215;
+        bh=IKG+cBaM78CEZgC0NiceIXBIhwEWoC22HXfR/QpGZGw=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=pHqqfJ3hHlNmIUnWSNtkNt0KBRCHjxRlxG4zxnpkqakAQUl+P1eahFDRfxnAIeAjy
+         6KZ/4Cz8dnzgzIKKHPTT8oYhbeKwyIYEt+yRcFlI/QQOYyNdC0t9boZLfkvIhj37g+
+         gzfkYLX9B8lxRCgWnhHZ87iirdIhtN2UXMnzBHprMyyLac6w2O+mYyr6UEztdS4Dqi
+         SdxXBhPYMsyLO63myFozD4aR+XFLQbaqu2D7WofjInuBxOL9XDYFsFTVJRlBngvlfy
+         rmShrO7Bi8dRk8hLc4Yzj7XGMB/uXp0jNvB7jHX7VqChW20YIcSoCbGIuwk33uBrnp
+         ymzpV5Ahfl8og==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72653C4166F;
+        Thu,  8 Sep 2022 21:40:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ v4 1/2] monitor: Add ADV Monitor events to btmon parser
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166267321543.740.1461457254146198906.git-patchwork-notify@kernel.org>
+Date:   Thu, 08 Sep 2022 21:40:15 +0000
+References: <20220908145555.161258-1-brian.gix@intel.com>
+In-Reply-To: <20220908145555.161258-1-brian.gix@intel.com>
+To:     Brian Gix <brian.gix@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+        apusaka@google.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-Recent changes breaks HCIGETDEVINFO since it changes the size of
-hci_dev_info.
+This series was applied to bluetooth/bluez.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_sock.h | 2 --
- 1 file changed, 2 deletions(-)
+On Thu,  8 Sep 2022 07:55:54 -0700 you wrote:
+> Add missing ADV Monitor MGMT events
+> ---
+>  monitor/packet.c | 35 +++++++++++++++++++++++++++++++++++
+>  1 file changed, 35 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
-index 0520e21ab698..9949870f7d78 100644
---- a/include/net/bluetooth/hci_sock.h
-+++ b/include/net/bluetooth/hci_sock.h
-@@ -124,8 +124,6 @@ struct hci_dev_info {
- 	__u16 acl_pkts;
- 	__u16 sco_mtu;
- 	__u16 sco_pkts;
--	__u16 iso_mtu;
--	__u16 iso_pkts;
- 
- 	struct hci_dev_stats stat;
- };
+Here is the summary with links:
+  - [BlueZ,v4,1/2] monitor: Add ADV Monitor events to btmon parser
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=0940cba00348
+  - [BlueZ,v4,2/2] monitor: Add mesh MGMT cmds/events to btmon parser
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9d8fd3c28bbf
+
+You are awesome, thank you!
 -- 
-2.37.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
