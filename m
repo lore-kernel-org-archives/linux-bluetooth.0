@@ -2,124 +2,315 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0CEBC38145
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 08:31:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5264C6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 10:26:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbiIHIb3 (ORCPT
+        id S230488AbiIHK0L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Sep 2022 04:31:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54476 "EHLO
+        Thu, 8 Sep 2022 06:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229505AbiIHIb1 (ORCPT
+        with ESMTP id S230404AbiIHK0J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Sep 2022 04:31:27 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 844BD5A176
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 01:31:26 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id z30-20020a05660217de00b00688bd42dc1dso10873875iox.15
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Sep 2022 01:31:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=tmob1Pwx3g7IXf8kuVys20j3kfq72jNaVH4vG9pNamI=;
-        b=uBEg9vooK5KNcSHM0ydnMr8lWjS6rx4J2BEF1hp6ecrEaGXkrW6WHbe/Zkg27Mg/Wm
-         bDaLr/wHzOrK0W6IdL5iD8OidtfepZ3PCt9Gxh0m3REaI8OaC3IH+HoHINmZQdVHot/e
-         tgpoMuFBft1muYcrKBlDPAVg+iATyzBreEfYLGWHyNvtB1WG/IJ5C5WbAOl5RSv/tTvP
-         EGJJEK9INkKAGohrmRPZXyFzBElmYJ01M/I5iTw811wJtaRqtlPAdcIkX0dogBz7Ghy+
-         7E9XNFgDrl+69mvG6O4a+5APzPYFzlafQkl0rmbtRw0qfPNij1fUyHrTix7kUphtxSq5
-         mRlA==
-X-Gm-Message-State: ACgBeo3TjloPtx91AAqHx7asARAM9YJb6nHjyKfV3n1qOffycCrNfyfn
-        tAZCHrzpeJoK/Q6PtPHWs/Q+uwjk07B8F4E83v5CScJw5Jjs
-X-Google-Smtp-Source: AA6agR4RyaQZMb0LT52K4J1w2Rh2S6e8XRPB1RjIvWa0mWOqyYR4CkJey2RmksPuRtZZgU0/givQVnJIleHFCKC7PaJf7Q2dp00O
+        Thu, 8 Sep 2022 06:26:09 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362DB7CAA9
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 03:26:00 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220908102544euoutp0157d8de85cfaa541a591eefdfd0ee6c0a~S26wOGYi-2302123021euoutp01V
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 10:25:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220908102544euoutp0157d8de85cfaa541a591eefdfd0ee6c0a~S26wOGYi-2302123021euoutp01V
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1662632744;
+        bh=T0b9YebozlOlUSD3qOJoRghrz3LdWHP8TO1O8MIt5iI=;
+        h=Date:Subject:From:To:Cc:In-Reply-To:References:From;
+        b=uThYPMKAjmvuIyEDYzpovkD+lYwfCV7mw2Hxsw7qXofRWuAa1aGDE8ZmT5lfvKVlI
+         mCfMrujjFBpDOovfM0QU6rIplfS37AXp2X0urA7NlmB3jgrilkvc90/KfJtxorQiSn
+         P0zcnBk29OkLMW1HEkbKwoidhILoT5fItz+LjX/8=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220908102539eucas1p1bc9c5529d158a7b5acd2cc3138ed7e72~S26rS7EXZ2886928869eucas1p1I;
+        Thu,  8 Sep 2022 10:25:39 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 6C.74.07817.323C9136; Thu,  8
+        Sep 2022 11:25:39 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220908102538eucas1p1a92bc3a47ef168118e38e7e9ec0cf1a6~S26q09v0e2890228902eucas1p1Q;
+        Thu,  8 Sep 2022 10:25:38 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220908102538eusmtrp2b62e4afcb1de8950d04d93fccb8c5fe9~S26q0Z0wA2734127341eusmtrp2g;
+        Thu,  8 Sep 2022 10:25:38 +0000 (GMT)
+X-AuditID: cbfec7f4-8abff70000011e89-a8-6319c323ea78
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id BF.5A.10862.223C9136; Thu,  8
+        Sep 2022 11:25:38 +0100 (BST)
+Received: from [106.210.134.192] (unknown [106.210.134.192]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220908102538eusmtip12471e3bf60275d8150a117988d8355d6~S26qjQQNo1335913359eusmtip1b;
+        Thu,  8 Sep 2022 10:25:38 +0000 (GMT)
+Message-ID: <4263c3ba-036b-ae67-ab29-166325ce6aba@samsung.com>
+Date:   Thu, 8 Sep 2022 12:25:38 +0200
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4303:b0:34c:143b:d394 with SMTP id
- bt3-20020a056638430300b0034c143bd394mr4082777jab.21.1662625885923; Thu, 08
- Sep 2022 01:31:25 -0700 (PDT)
-Date:   Thu, 08 Sep 2022 01:31:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000532e0e05e826413c@google.com>
-Subject: [syzbot] WARNING: ODEBUG bug in mgmt_index_removed
-From:   syzbot <syzbot+844c7bf1b1aa4119c5de@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0)
+        Gecko/20100101 Thunderbird/91.13.0
+Subject: Re: [PATCH v7 2/7] Bluetooth: Add initial implementation of CIS
+ connections
+Content-Language: en-US
+From:   Marek Szyprowski <m.szyprowski@samsung.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <41717010-b7a5-40e4-39d7-722fb6d18eae@samsung.com>
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrKIsWRmVeSWpSXmKPExsWy7djP87rKhyWTDY7sYbOYc62P2eLp5yms
+        DkweO2fdZff4vEkugCmKyyYlNSezLLVI3y6BK2Pnz1PMBdudK35uW8TYwHjTvIuRk0NCwERi
+        5cSJjF2MXBxCAisYJS53TWEDSQgJfGGUmLNSESLxmVGitXMXK0zH1gtLmCASy4ESuxrZIZyP
+        jBJfnl1gB6niFbCT+HPpIiOIzSKgIvH88042iLigxMmZT1hAbFGBZIlZx46B1QgLhEl8v/4L
+        rJdZQFzi1pP5TCA2m4ChRNfbLqBeDg4RIPvbhRiIEneJ/fO/go3hFLCXWPt/AjNEXF6ieets
+        ZpB7JATmckh8+QAxX0LARWLG1UtsELawxKvjW9ghbBmJ/zvnM0E0tDNKLPh9H8qZwCjR8PwW
+        VLe1xJ1zv8CuYBbQlFi/Sx8i7Chxc/dFFpCwhACfxI23ghBH8ElM2jadGSLMK9HRJgRRrSYx
+        6/g6uLUHL1xinsCoNAspVGYh+X4WkndmIexdwMiyilE8tbQ4Nz212CgvtVyvODG3uDQvXS85
+        P3cTIzBlnP53/MsOxuWvPuodYmTiYDzEKMHBrCTCK7pWIlmINyWxsiq1KD++qDQntfgQozQH
+        i5I4b3LmhkQhgfTEktTs1NSC1CKYLBMHp1QDE+O7eI43mfXTLr+0cmx/9NFlnfKqk8lnz54r
+        2sByao3S1aijdQZHfSLzz5fPDD9rvdlty0HXlQcW+LmzFKXuSYv7NPWendQNQcuY2MJMUZls
+        0csyFyYl8vzeuHL9vFvu9c+c5z7d8Oe8j9jU/9V7fmi8vvGsRZsnsWD2IZYInoZtv2M27Lq8
+        aMWdEJZTV7Z4sl1OqeuYz5pbxtEQ+LXLVqHMpiz9nPvsot++Mo9uP2USSb/RHsR7JixG6M83
+        AW+Or/fa1AvSBZxm5BxZKn0nuU506SwPvoz+CobnJw1lOifkTtrCdY3xSHTKY3GW82wrvybd
+        1Z/hcL/X9PpC7c3flNpfLLS4rrYjbOr1/m1zTiqxFGckGmoxFxUnAgB8S1nxiAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupgkeLIzCtJLcpLzFFi42I5/e/4XV2lw5LJBufWKFvMudbHbPH08xRW
+        ByaPnbPusnt83iQXwBSlZ1OUX1qSqpCRX1xiqxRtaGGkZ2hpoWdkYqlnaGwea2VkqqRvZ5OS
+        mpNZllqkb5egl7Hz5ynmgu3OFT+3LWJsYLxp3sXIySEhYCKx9cISpi5GLg4hgaWMEpe/bWeC
+        SMhInJzWwAphC0v8udbFBlH0nlHiRd8fFpAEr4CdxJ9LFxlBbBYBFYnnn3eyQcQFJU7OfAJW
+        IyqQLLGk4T7YIGGBMInv13+xg9jMAuISt57MB1vGJmAo0fUWZAEHhwiQ/e1CDESJu8T++V9Z
+        IPYuZpGY0/UKbCangL3E2v8TmCGKzCS6tnYxQtjyEs1bZzNPYBSaheSMWUjWzULSMgtJywJG
+        llWMIqmlxbnpucVGesWJucWleel6yfm5mxiBUbLt2M8tOxhXvvqod4iRiYPxEKMEB7OSCK/o
+        WolkId6UxMqq1KL8+KLSnNTiQ4ymwLCYyCwlmpwPjNO8knhDMwNTQxMzSwNTSzNjJXFez4KO
+        RCGB9MSS1OzU1ILUIpg+Jg5OqQYmtscnsv10Ze54XU24uinzvPbEh/zrTydG9ahO/2kzgWVd
+        y7Y6/T1nk/flM+rMSEiedJVlMcfcc5dX6v/wf2kh3XhT11si+eHUg18engzfX7G9T8bwjIaO
+        /4eXhvUalkv2vCx7+93dnotrSsr9H3k2Ve1rQmcrc/y0q+fuuvaYN97ze619+sZtJzsyjp97
+        lvn5fEzeVqPX4jNSrnXll14yZTco6fsr/5r1X63riu9Rh489u75p916pA/dNrnFZGNxqPS+V
+        t9cyfuLm4G/HfjLtfiUkEXDH7+eT+BsCDJvTL07TN7Jl/j1F6aL35ll7lX4GBdqcbkiZ/lN7
+        Rk/IpIhVO9pn3XGJ9Hlj99oqM4P/lhJLcUaioRZzUXEiAAjHmN4bAwAA
+X-CMS-MailID: 20220908102538eucas1p1a92bc3a47ef168118e38e7e9ec0cf1a6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab
+References: <20220711233535.3134546-1-luiz.dentz@gmail.com>
+        <CGME20220809085500eucas1p18cb2752164ca55832787e7d3843f48ab@eucas1p1.samsung.com>
+        <20220711233535.3134546-2-luiz.dentz@gmail.com>
+        <749ed578-bc9d-b699-3602-bee444fff9bb@samsung.com>
+        <CABBYNZLsR0KT1-OVVjnUzLp0+U0eHGi0PNqKbfntp_5AHNDawA@mail.gmail.com>
+        <03f9bea9-77fb-2b57-43d0-c4b819c2560a@samsung.com>
+        <CABBYNZ+vRqqCBVTgQJ-UZ+gd2ceFebQF94NDdYcN4Xmyk+GWTA@mail.gmail.com>
+        <92a47171-f69b-5bf9-6e8c-70fc3e9e6eee@samsung.com>
+        <41717010-b7a5-40e4-39d7-722fb6d18eae@samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Hi All,
 
-syzbot found the following issue on:
+On 16.08.2022 17:24, Marek Szyprowski wrote:
+> On 12.08.2022 14:33, Marek Szyprowski wrote:
+>> On 10.08.2022 22:04, Luiz Augusto von Dentz wrote:
+>>> On Wed, Aug 10, 2022 at 7:18 AM Marek Szyprowski
+>>> <m.szyprowski@samsung.com> wrote:
+>>>> On 09.08.2022 21:24, Luiz Augusto von Dentz wrote:
+>>>>> On Tue, Aug 9, 2022 at 1:55 AM Marek Szyprowski
+>>>>> <m.szyprowski@samsung.com>  wrote:
+>>>>>> On 12.07.2022 01:35, Luiz Augusto von Dentz wrote:
+>>>>>>> From: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+>>>>>>>
+>>>>>>> This adds the initial implementation of CIS connections and 
+>>>>>>> introduces
+>>>>>>> the ISO packets/links.
+>>>>>>>
+>>>>>>> == Central: Set CIG Parameters, create a CIS and Setup Data Path ==
+>>>>>>>
+>>>>>>>> tools/isotest -s <address>
+>>>>>>> < HCI Command: LE Extended Create... (0x08|0x0043) plen 26
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Status (0x0f) plen 4
+>>>>>>>          LE Extended Create Connection (0x08|0x0043) ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>> HCI Event: LE Meta Event (0x3e) plen 31
+>>>>>>>          LE Enhanced Connection Complete (0x0a)
+>>>>>>>          ...
+>>>>>>> < HCI Command: LE Create Connected... (0x08|0x0064) plen 5
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Status (0x0f) plen 4
+>>>>>>>          LE Create Connected Isochronous Stream (0x08|0x0064) 
+>>>>>>> ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>> HCI Event: LE Meta Event (0x3e) plen 29
+>>>>>>>          LE Connected Isochronous Stream Established (0x19)
+>>>>>>>          ...
+>>>>>>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Complete (0x0e) plen 6
+>>>>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>            Handle: 257
+>>>>>>> < HCI Command: LE Setup Isochronou.. (0x08|0x006e) plen 13
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Complete (0x0e) plen 6
+>>>>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>            Handle: 257
+>>>>>>>
+>>>>>>> == Peripheral: Accept CIS and Setup Data Path ==
+>>>>>>>
+>>>>>>>> tools/isotest -d
+>>>>>>>     HCI Event: LE Meta Event (0x3e) plen 7
+>>>>>>>          LE Connected Isochronous Stream Request (0x1a)
+>>>>>>> ...
+>>>>>>> < HCI Command: LE Accept Co.. (0x08|0x0066) plen 2
+>>>>>>> ...
+>>>>>>>> HCI Event: LE Meta Event (0x3e) plen 29
+>>>>>>>          LE Connected Isochronous Stream Established (0x19)
+>>>>>>> ...
+>>>>>>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Complete (0x0e) plen 6
+>>>>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>            Handle: 257
+>>>>>>> < HCI Command: LE Setup Is.. (0x08|0x006e) plen 13
+>>>>>>> ...
+>>>>>>>> HCI Event: Command Complete (0x0e) plen 6
+>>>>>>>          LE Setup Isochronous Data Path (0x08|0x006e) ncmd 1
+>>>>>>>            Status: Success (0x00)
+>>>>>>>            Handle: 257
+>>>>>>>
+>>>>>>> Signed-off-by: Luiz Augusto von Dentz<luiz.von.dentz@intel.com>
+>>>>>> This patch landed recently in linux-next as commit 26afbd826ee3
+>>>>>> ("Bluetooth: Add initial implementation of CIS connections").
+>>>>>> Unfortunately it causes a regression on my test systems. On 
+>>>>>> almost all
+>>>>>> I've observed that calling a simple 'hcitool scan' command in a 
+>>>>>> shell
+>>>>>> fails in an unexpected way:
+>>>>>>
+>>>>>> $ hcitool scan
+>>>>>> *** stack smashing detected ***: <unknown> terminated
+>>>>>> Aborted
+>>>>> Not really sure how it would be related to ISO changes though, have
+>>>>> you even enabled ISO sockets UUID? Perhaps check if there is 
+>>>>> something
+>>>>> on dmesg indicating what is going on since I tried here and that
+>>>>> doesn't seem to cause any problem:
+>>>>>
+>>>>> tools/hcitool scan
+>>>>> Scanning ...
+>>>>>
+>>>>> Perhaps it is a combination of using old userspace tools with new
+>>>>> kernel, but then again these changes should affect something like
+>>>>> hcitool.
+>>>> Indeed my userspace is old, but still, the kernel changes shouldn't 
+>>>> make
+>>>> it to crash. I didn't change anything in userspace since ages, so I
+>>>> assume that ISO sockets UUIDs are not enabled. Maybe it is somehow
+>>>> architecture related or specific? It looks that only ARM 32bit 
+>>>> userspace
+>>>> apps crashes. I've just checked 64bit userspace on ARM64 (RPi4) and it
+>>>> works fine with that commit.
+>>> That would be the first time it happens to me that a change in kernel
+>>> would crash the userspace in such odd fashion, btw perhaps run with
+>>> valgrind so it generates a backtrace of where it would be crashing,
+>>> well if that is reproducible with valgrind.
+>>
+>> Well, its not that easy. I've checked and Debian doesn't provide a 
+>> valgrind package for the buster/armel arch, which I use on my test 
+>> systems (for some historical reasons). Building everything from the 
+>> source will take some time, though. I will try to do this after 
+>> getting back from my holidays after 24th Aug.
+>
+> Unfortunately my holidays trip didn't start, so I had a chance to play 
+> a bit with this issue.
+>
+> Valgrind doesn't really provide any useful information here:
+>
+> $ valgrind hcitool scan
+> ==1391== Memcheck, a memory error detector
+> ==1391== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+> ==1391== Using Valgrind-3.14.0 and LibVEX; rerun with -h for copyright 
+> info
+> ==1391== Command: hcitool scan
+> ==1391==
+> *** stack smashing detected ***: <unknown> terminated
+> ==1391==
+> ==1391== Process terminating with default action of signal 6 (SIGABRT)
+> ==1391==    at 0x48EB6AC: raise (raise.c:51)
+> ==1391==    by 0x48D6283: abort (abort.c:79)
+> ==1391==    by 0x4928E3B: __libc_message (libc_fatal.c:181)
+> ==1391==    by 0x49ACFE3: __fortify_fail_abort (fortify_fail.c:33)
+> ==1391==    by 0x49ACFA7: __stack_chk_fail (stack_chk_fail.c:29)
+> ==1391==    by 0x117DFB: ??? (in /usr/bin/hcitool)
+> ==1391==
+> ==1391== HEAP SUMMARY:
+> ==1391==     in use at exit: 132 bytes in 1 blocks
+> ==1391==   total heap usage: 1 allocs, 0 frees, 132 bytes allocated
+> ==1391==
+> ==1391== LEAK SUMMARY:
+> ==1391==    definitely lost: 0 bytes in 0 blocks
+> ==1391==    indirectly lost: 0 bytes in 0 blocks
+> ==1391==      possibly lost: 0 bytes in 0 blocks
+> ==1391==    still reachable: 132 bytes in 1 blocks
+> ==1391==         suppressed: 0 bytes in 0 blocks
+> ==1391== Rerun with --leak-check=full to see details of leaked memory
+> ==1391==
+> ==1391== For counts of detected and suppressed errors, rerun with: -v
+> ==1391== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+> Aborted
+>
+>
+> I've also checked the ARM 32bit 'armhf' userspace abi on vanilla 
+> Raspberry Pi OS Lite 32-bit image (from April 4th 2022). The issue is 
+> same:
+>
+> $ hcitool scan
+> *** stack smashing detected ***: terminated
+> Aborted
+>
+> It is enough to boot that image with init=/bin/bash and run 'hcitool 
+> scan' to reproduce the issue...
+>
 
-HEAD commit:    e47eb90a0a9a Add linux-next specific files for 20220901
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=13fad8f5080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7933882276523081
-dashboard link: https://syzkaller.appspot.com/bug?extid=844c7bf1b1aa4119c5de
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+I've had some time to analyze this issue further and I've finally found 
+which change is responsible for this issue. It is caused by the 
+following chunk:
 
-Unfortunately, I don't have any reproducer for this issue yet.
+diff --git a/include/net/bluetooth/hci_sock.h 
+b/include/net/bluetooth/hci_sock.h
+index 9949870f7d78..0520e21ab698 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -124,6 +124,8 @@ struct hci_dev_info {
+         __u16 acl_pkts;
+         __u16 sco_mtu;
+         __u16 sco_pkts;
++       __u16 iso_mtu;
++       __u16 iso_pkts;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+844c7bf1b1aa4119c5de@syzkaller.appspotmail.com
+         struct hci_dev_stats stat;
+  };
 
-------------[ cut here ]------------
-ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
-WARNING: CPU: 1 PID: 4347 at lib/debugobjects.c:509 debug_print_object+0x16e/0x250 lib/debugobjects.c:509
-Modules linked in:
-CPU: 1 PID: 4347 Comm: syz-executor.1 Not tainted 6.0.0-rc3-next-20220901-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/26/2022
-RIP: 0010:debug_print_object+0x16e/0x250 lib/debugobjects.c:509
-Code: ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 af 00 00 00 48 8b 14 dd 00 46 49 8a 4c 89 ee 48 c7 c7 a0 39 49 8a e8 36 a5 3a 05 <0f> 0b 83 05 b5 56 dc 09 01 48 83 c4 18 5b 5d 41 5c 41 5d 41 5e c3
-RSP: 0018:ffffc900148279c0 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: 0000000000040000 RSI: ffffffff81620448 RDI: fffff52002904f2a
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000080000000 R11: 203a47554245444f R12: ffffffff89ef0860
-R13: ffffffff8a494060 R14: ffffffff816b41b0 R15: 1ffff92002904f43
-FS:  00007f431bb46700(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000300 CR3: 0000000027d81000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- debug_object_assert_init lib/debugobjects.c:899 [inline]
- debug_object_assert_init+0x1f4/0x2e0 lib/debugobjects.c:870
- debug_timer_assert_init kernel/time/timer.c:792 [inline]
- debug_assert_init kernel/time/timer.c:837 [inline]
- del_timer+0x6d/0x110 kernel/time/timer.c:1257
- try_to_grab_pending+0x6d/0xd0 kernel/workqueue.c:1275
- __cancel_work_timer+0xa6/0x570 kernel/workqueue.c:3119
- mgmt_index_removed+0x218/0x340 net/bluetooth/mgmt.c:8964
- hci_sock_bind+0x472/0x1760 net/bluetooth/hci_sock.c:1218
- __sys_bind+0x1e9/0x250 net/socket.c:1776
- __do_sys_bind net/socket.c:1787 [inline]
- __se_sys_bind net/socket.c:1785 [inline]
- __x64_sys_bind+0x6f/0xb0 net/socket.c:1785
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f431aa89279
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f431bb46168 EFLAGS: 00000246 ORIG_RAX: 0000000000000031
-RAX: ffffffffffffffda RBX: 00007f431ab9bf80 RCX: 00007f431aa89279
-RDX: 0000000000000006 RSI: 0000000020000300 RDI: 0000000000000004
-RBP: 00007f431aae32e9 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffce33d94af R14: 00007f431bb46300 R15: 0000000000022000
- </TASK>
+It looks that this is an ABI break for some old userspace tools. I've 
+confirmed this by applying only the above chunk on top of v5.19-rc1 and 
+running my tests. 'hcitool scan' crashes in such case.
+
+I've also removed that chunk from the v6.0-rc1 release and surprisingly 
+I found that it is not used by the bluetooth code! Kernel compiled 
+successfully. Is that change intentional? Or is it just a leftover from 
+the development process that accidentally made its way into final patch?
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Best regards
+-- 
+Marek Szyprowski, PhD
+Samsung R&D Institute Poland
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
