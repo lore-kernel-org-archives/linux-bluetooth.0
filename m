@@ -2,109 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58435C6FA86
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 11:35:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09076C38145
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 14:56:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231218AbiIHLfY (ORCPT
+        id S232579AbiIHO4V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Sep 2022 07:35:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38234 "EHLO
+        Thu, 8 Sep 2022 10:56:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231387AbiIHLfG (ORCPT
+        with ESMTP id S232719AbiIHO4T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Sep 2022 07:35:06 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F2F3D5A7
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 04:35:02 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id by6so19501699ljb.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Sep 2022 04:35:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date;
-        bh=rGbehmmbFjGdP39Tva2lX3JsZ3RKZXRTihQXkTFVj0Y=;
-        b=u6D+fKJ2Lhfyp6EpZaftp621lBz6Wd859kwOBiqFQ3lUxvV9CWJbk8wOUpHBKAnWOJ
-         Ay19wrgdZbZWV7IS7+EwTdDnyzs1gQo+vI4ToLdDyGdhHkq1VlOwt7MAYkg9PE1lU6qo
-         F16V9/sqUWF0TWbcg/8py5MBiAGP+i7UlE06Zvuba3U2XsCSkq0BGs6XNK1XPEcmncx3
-         j5w4fQ2F/4zInUlUf2dTKh4Myma9gGm+JZNaFR8GdOtrtDQwJ1WGRKxb5AUbN+YFwZap
-         w16k9HfAxB5IseMpsnbuKf1KdTr3ZczXUc4GMFHag3eMo9Kbo/zinntSpaM1kmLh/0h9
-         UmPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=rGbehmmbFjGdP39Tva2lX3JsZ3RKZXRTihQXkTFVj0Y=;
-        b=F1MxJFR03jddBk5H4sgiDdLttj1zCGACrn69aqbiI+61Ozgf9kXlZc7dyGacvpHbtf
-         FcXnpHQoiO5q8zRqjsn/xNnDugbGgTr9LyzXWMGLq6gCOf+oJKIcVOWSxk+mLzke4JAs
-         7nXIo6bFuR4Y6a5hCmpKuZmsNN5PWm4PoDP13B267l7//p+U5zUPkUlofs3tHliVpgDG
-         wdMuq+23N1+RcSGPfvmi3J0u2/I/rnBiTQEldg8qOpnkj43CkfTz1y5mc1cs7SNv4+hP
-         0aYeJlb5kQLOHX8sAkG6kqbOCNNcGJoKlYDfHGJLeNCSZ4QD95LyI+n9pIDgZjIeSxmn
-         5JQw==
-X-Gm-Message-State: ACgBeo3ZQ0d+CN2EnZz1M4CYsTzT91JkYx8+iiJc/rRWtPB79xcWp7wO
-        OTuqIwqIG0Bp7ELjCD5+5HfCfQ==
-X-Google-Smtp-Source: AA6agR4ui+DsaI/rx9G71gnDc6YAJvWKPoB3zCyZaJ1nLjK+vVvOPNBMn6vOY0NTUCUZDxAiUFpecw==
-X-Received: by 2002:a05:651c:1a26:b0:269:15ee:809a with SMTP id by38-20020a05651c1a2600b0026915ee809amr2203010ljb.307.1662636900510;
-        Thu, 08 Sep 2022 04:35:00 -0700 (PDT)
-Received: from [192.168.0.21] (78-11-189-27.static.ip.netia.com.pl. [78.11.189.27])
-        by smtp.gmail.com with ESMTPSA id v25-20020a05651203b900b00497aae401f8sm770409lfp.184.2022.09.08.04.34.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Sep 2022 04:34:59 -0700 (PDT)
-Message-ID: <d0dacbf4-3768-7bbf-77a5-957bb37cd2b7@linaro.org>
-Date:   Thu, 8 Sep 2022 13:34:58 +0200
+        Thu, 8 Sep 2022 10:56:19 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE71811C167
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 07:56:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1662648978; x=1694184978;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VpfVlbLRViwzi351CibEnuWXKZLSUBKzJMwwq9x59i8=;
+  b=Li9Y1LWmY2Q7Dc7UAXDJEpT5UyoJGOGeatB1x5hzHoBR9U2y+sFYbjUk
+   gmbeS0brsLORrwp/9JX0X+P7xN8itgmlS4XWIDQS9vmhTVAcPB+W+ZI+X
+   TmYdXr8FFtJDZ9F0GmMZviKAs1Hkv9UiUc0vv0bYM/cAN7Iz0AsdKGMNQ
+   ioTsIz9CXXwJGJPZoXfhSt0Mti6PjZ/w/a6/eqIi5laH8gEYcjkfPvbfp
+   SynzIzl0lqgOomjHfOJhjmyPduQUAZ5asOzA5n1gqLMFl8wMfhqWqSp0C
+   7EDAQrFC1ahwTVGE7xDjp9pM5GFGDSSaeHWVid8mULuesuEcXb13XAw44
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10464"; a="358930140"
+X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
+   d="scan'208";a="358930140"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 07:56:18 -0700
+X-IronPort-AV: E=Sophos;i="5.93,300,1654585200"; 
+   d="scan'208";a="718596088"
+Received: from jfisch2-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.78.123])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2022 07:56:18 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, apusaka@google.com
+Subject: [PATCH BlueZ v4 1/2] monitor: Add ADV Monitor events to btmon parser
+Date:   Thu,  8 Sep 2022 07:55:54 -0700
+Message-Id: <20220908145555.161258-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v2 2/5] dt-bindings: net: Add Broadcom BCM4377 family PCIe
- Bluetooth
-Content-Language: en-US
-To:     =?UTF-8?Q?Martin_Povi=c5=a1er?= <povik@cutebit.org>
-Cc:     Sven Peter <sven@svenpeter.dev>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        asahi@lists.linux.dev, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220907170935.11757-1-sven@svenpeter.dev>
- <20220907170935.11757-3-sven@svenpeter.dev>
- <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
- <E53D41D9-1675-42EB-BC76-3453043FCB6E@cutebit.org>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <E53D41D9-1675-42EB-BC76-3453043FCB6E@cutebit.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 08/09/2022 13:29, Martin Povišer wrote:
->>> + brcm,taurus-cal-blob:
->>> + $ref: /schemas/types.yaml#/definitions/uint8-array
->>> + description: A per-device calibration blob for the Bluetooth radio. This
->>> + should be filled in by the bootloader from platform configuration
->>> + data, if necessary, and will be uploaded to the device.
->>> + This blob is used if the chip stepping of the Bluetooth module does not
->>> + support beamforming.
->>
->> Isn't it:
->> s/beamforming/beam forming/
->> ?
-> 
-> Doesn’t seem like it:
-> https://www.google.com/search?hl=en&q=beam%20forming
+Add missing ADV Monitor MGMT events
+---
+ monitor/packet.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-OK, thanks :)
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 46587e087..4f2172bdf 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -14914,6 +14914,37 @@ static void mgmt_controller_resume_evt(const void *data, uint16_t size)
+ 	mgmt_print_address(data, addr_type);
+ }
+ 
++static void mgmt_adv_monitor_device_found_evt(const void *data, uint16_t size)
++{
++	uint16_t handle = get_le16(data);
++	const uint8_t *addr = data + 2;
++	uint8_t addr_type = get_u8(data + 8);
++	int8_t rssi = get_s8(data + 9);
++	uint32_t flags = get_le32(data + 10);
++	uint16_t ad_data_len = get_le16(data + 14);
++	const uint8_t *ad_data = data + 16;
++
++	print_field("Handle: %d", handle);
++	print_bdaddr(addr);
++	print_field("Addr Type: %d", addr_type);
++	print_field("RSSI: %d", rssi);
++	mgmt_print_device_flags(flags);
++	print_field("AD Data Len: %d", ad_data_len);
++	size -= 16;
++	print_hex_field("AD Data", ad_data, size);
++}
++
++static void mgmt_adv_monitor_device_lost_evt(const void *data, uint16_t size)
++{
++	uint16_t handle = get_le16(data);
++	const uint8_t *addr = data + 2;
++	uint8_t addr_type = get_u8(data + 8);
++
++	print_field("Handle: %d", handle);
++	print_bdaddr(addr);
++	print_field("Addr Type: %d", addr_type);
++}
++
+ static const struct mgmt_data mgmt_event_table[] = {
+ 	{ 0x0001, "Command Complete",
+ 			mgmt_command_complete_evt, 3, false },
+@@ -15003,6 +15034,10 @@ static const struct mgmt_data mgmt_event_table[] = {
+ 			mgmt_controller_suspend_evt, 1, true },
+ 	{ 0x002e, "Controller Resumed",
+ 			mgmt_controller_resume_evt, 8, true },
++	{ 0x002f, "ADV Monitor Device Found",
++			mgmt_adv_monitor_device_found_evt, 16, false },
++	{ 0x0030, "ADV Monitor Device Lost",
++			mgmt_adv_monitor_device_lost_evt, 9, true },
+ 	{ }
+ };
+ 
+-- 
+2.37.2
 
-
-Best regards,
-Krzysztof
