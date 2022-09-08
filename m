@@ -2,102 +2,150 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3935C6FA86
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 16:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9722C38145
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Sep 2022 16:40:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbiIHQOl (ORCPT
+        id S229943AbiIHQkv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Sep 2022 12:14:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59254 "EHLO
+        Thu, 8 Sep 2022 12:40:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231953AbiIHQOK (ORCPT
+        with ESMTP id S230474AbiIHQku (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Sep 2022 12:14:10 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF6B3E9015
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 09:14:05 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id l5so13268784qtv.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Sep 2022 09:14:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=nC75F2/bN1p2MI1Zxzkicjub9U0tJEFfGLM+8LcjI84=;
-        b=Ao+XwRlZZvzonSgytsV/4CMRnkDceQXHWFDKGn5S8IB6XmqPjitOVGoATstWC6xDsB
-         B00yOKm60FwquR6eHEQxqlfhtKfi0mngqo0RjmnLLZuwHvtzslevNAGFOVnT6ipbSd4P
-         hop6p7LvXc1RNhaXyc31mJsDJMGOPSK1qmu9UxV5sE+A56xYdbR6J6H92YBNIaNoIH6A
-         BzbyzWbDS3tKDBpKAFUPX42B9+kcZjdqRBUnszs/8Uo16D2HwFiljtlcNVy8ZOcXaolR
-         kE6KX6x5NAW6RUYGr5NUZHaztbijAO1uOHXsju6xabicyl11cNWblXEzdeMH+OmXS38U
-         0zsA==
+        Thu, 8 Sep 2022 12:40:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53DC8F3426
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Sep 2022 09:40:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1662655247;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pkfsc+Qd/gwYAug2VWPkSKKYrJX5Z5R+zOqDD2izm4g=;
+        b=CN0WctdZCN9KIa1PXewYuTDwMMsEkFiaB/EB3ScffMXiFnO2B06FL51uCSc1hWaVUl8Y7l
+        KHThGe/JcBdUW8qOkB/TBVWIQG+IPPaN+meojzfCZ8QVpKwkrVfqD7UuLBYajZt9pVPczh
+        JQNBoNW7o1uuJyR89krM7QKUMGP4EL8=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-373-meGcHBO4PAenpuopQEQQcA-1; Thu, 08 Sep 2022 12:40:46 -0400
+X-MC-Unique: meGcHBO4PAenpuopQEQQcA-1
+Received: by mail-qt1-f200.google.com with SMTP id fy12-20020a05622a5a0c00b00344569022f7so14944409qtb.17
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Sep 2022 09:40:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=nC75F2/bN1p2MI1Zxzkicjub9U0tJEFfGLM+8LcjI84=;
-        b=htWsvKAL6xw7t1z/PKM2gJiwmexehcwXP3RJXtMxZsioD6K3JOQL79u/RB7Vx3Ll9z
-         ubtAtfxU2fv0Pv7pwXFe4Upsw3qq4PFfp7g5VWAzVgE2sRFFQpwJSSOQwOH3oiSwjh6g
-         7/kjoPK2KKCH2cpscxemZX7c4ItZ3oUw1bkeWXWhHFTROFp8rxdWVIM5KZ8uolZDqG4c
-         hMguPhbMeaaXyN6iY7owoamXdzkMz8kbYS20juu6nqmh5bPHZUniKsEaNQIiKx9Ev0x0
-         dmnv8OfNxXoGf1VPPCRzehaCweT0RxxoyLie7fqSIrCqJgS4xzblydqCa5BHm741KzfX
-         XrnA==
-X-Gm-Message-State: ACgBeo2TuFbCKyNYtdLjjo8DtLOAinc2BM9ZndmAzwrJ7Zvv4qSyU7d9
-        blbuXGrf3ywgSotNqicyAJ1DMqB1mJoM9Q==
-X-Google-Smtp-Source: AA6agR6cRPPTrgwwHoFWtZtUVOElFtDINY0OUssmuqEbdOXGaFz2nADKVwk/UDFGxIJwweCk/0iPVA==
-X-Received: by 2002:ac8:5c51:0:b0:344:5510:be77 with SMTP id j17-20020ac85c51000000b003445510be77mr8853070qtj.84.1662653644867;
-        Thu, 08 Sep 2022 09:14:04 -0700 (PDT)
-Received: from [172.17.0.2] ([13.82.95.18])
-        by smtp.gmail.com with ESMTPSA id j2-20020a05620a410200b006b9ab3364ffsm18197816qko.11.2022.09.08.09.14.04
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=pkfsc+Qd/gwYAug2VWPkSKKYrJX5Z5R+zOqDD2izm4g=;
+        b=ui19032SKTMj6aZ4LQ2cSvswYl7E/H7p984PE6aj1zHh5FZPdYw/PLcmeAyFse7GFP
+         iuYXVLJrSAG2vR9P3pJwPuv5kWxM5EnMWfK1sTLRIb/CH9NUrO3IKRkGM+jYHTjMENev
+         ZD13abc26sPg+ONbJitrr6a/1CMk82GxyE79Dhct21qZzPouTVHJ+GqWHwi2f9/cjHvG
+         tZwjvBEyLsxWGTnAguBCPgOzdnq1N3lkvkUZsi0gf4uvMeLsQ5e8nneKjLms5P5DHc37
+         zKnWH9mIFYQKMUGRsMZ3lGEKOTexFUetJXY9f5WowOM6uzKtIqgX9iGzQtzDbf5F08Hk
+         lAxQ==
+X-Gm-Message-State: ACgBeo0iF9hfniaT1J5CIXF4Z3IZsEaN9zZ9T9OOOlM2deb/25Ba7sRH
+        c8aLoK5FMRWohX1w0niNxllaAdJngJcMAhIVphFMvhpZGQdJKdL4ILx/tn8PzBTZosaV8/dJSc9
+        oF5bvUSATqYm8I6EcAodRUKZznTYD
+X-Received: by 2002:a05:620a:14aa:b0:6cb:e3a2:311b with SMTP id x10-20020a05620a14aa00b006cbe3a2311bmr904223qkj.266.1662655245504;
+        Thu, 08 Sep 2022 09:40:45 -0700 (PDT)
+X-Google-Smtp-Source: AA6agR53cNBgQZY4hEhzYVT/VkqEs1YXNR9ifPFn0pnI+C10iK7Hb4Aw/802twYiNtloEdpZjdtoJg==
+X-Received: by 2002:a05:620a:14aa:b0:6cb:e3a2:311b with SMTP id x10-20020a05620a14aa00b006cbe3a2311bmr904197qkj.266.1662655245128;
+        Thu, 08 Sep 2022 09:40:45 -0700 (PDT)
+Received: from redhat.com ([45.144.113.243])
+        by smtp.gmail.com with ESMTPSA id v38-20020a05622a18a600b0035a7070e909sm701989qtc.38.2022.09.08.09.40.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Sep 2022 09:14:04 -0700 (PDT)
-Message-ID: <631a14cc.050a0220.efcb8.efdd@mx.google.com>
-Date:   Thu, 08 Sep 2022 09:14:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2385528679091604491=="
+        Thu, 08 Sep 2022 09:40:44 -0700 (PDT)
+Date:   Thu, 8 Sep 2022 12:40:35 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Igor Skalkin <igor.skalkin@opensynergy.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        mgo@opensynergy.com
+Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
+Message-ID: <20220908123911-mutt-send-email-mst@kernel.org>
+References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
+ <20220807185846-mutt-send-email-mst@kernel.org>
+ <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
+ <20220808081054-mutt-send-email-mst@kernel.org>
+ <20220811035817-mutt-send-email-mst@kernel.org>
+ <CABBYNZKZGxbt=jdpBL77x1mCeTPdDE-p-Pt8JjZN+KoRgR3Ohw@mail.gmail.com>
+ <20220830094441-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [BlueZ,v4,1/2] monitor: Add ADV Monitor events to btmon parser
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220908145555.161258-1-brian.gix@intel.com>
-References: <20220908145555.161258-1-brian.gix@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220830094441-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2385528679091604491==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Aug 30, 2022 at 09:45:02AM -0400, Michael S. Tsirkin wrote:
+> On Thu, Aug 11, 2022 at 10:02:31AM -0700, Luiz Augusto von Dentz wrote:
+> > Hi Michael,
+> > 
+> > On Thu, Aug 11, 2022 at 1:00 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Mon, Aug 08, 2022 at 08:16:11AM -0400, Michael S. Tsirkin wrote:
+> > > > On Mon, Aug 08, 2022 at 02:04:43PM +0200, Igor Skalkin wrote:
+> > > > > On 8/8/22 01:00, Michael S. Tsirkin wrote:
+> > > > >
+> > > > >     On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
+> > > > >
+> > > > >         According to specification [1], "For the device-specific configuration
+> > > > >         space, the driver MUST use 8 bit wide accesses for 8 bit wide fields,
+> > > > >         16 bit wide and aligned accesses for 16 bit wide fields and 32 bit wide
+> > > > >         and aligned accesses for 32 and 64 bit wide fields.".
+> > > > >
+> > > > >         Current version of the configuration structure:
+> > > > >
+> > > > >             struct virtio_bt_config {
+> > > > >                 __u8  type;
+> > > > >                 __u16 vendor;
+> > > > >                 __u16 msft_opcode;
+> > > > >             } __attribute__((packed));
+> > > > >
+> > > > >         has both 16bit fields non-aligned.
+> > > > >
+> > > > >         This commit fixes it.
+> > > > >
+> > > > >         [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/v1/query?url=https%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1%2fvirtio%2dv1.1.pdf&umid=d1786ace-e8ea-40e8-9665-96c0949174e5&auth=53c7c7de28b92dfd96e93d9dd61a23e634d2fbec-39b15885ceebe9fda9357320aec1ccbac416a470
+> > > > >
+> > > > >         Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
+> > > > >
+> > > > >     This is all true enough, but the problem is
+> > > > >     1. changing uapi like this can't be done, will break userspace
+> > > > >     2. the driver has more issues and no one seems to want to
+> > > > >        maintain it.
+> > > > >     I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
+> > > > >     to merge it for this release.
+> > > > >
+> > > > > This is very sad. We already use this driver in our projects.
+> > > >
+> > > > Really?  Can you step up to maintain it? Then we can fix the issues
+> > > > and it won't be broken.
+> > >
+> > > Just a reminder that I'm waiting for a response on that.
+> > > I just don't know enough about bluetooth.
+> > 
+> > Just a heads up that Marcel is on vacation, he did mention that he had
+> > done some work to update virtio_bt thus why I didn't apply any of the
+> > changes yet.
+> 
+> Any update? when does Marcel return?
 
-This is automated email and please do not reply to this email!
 
-Dear submitter,
+Annnnnnd ... this is falling between the chairs again?
+Guys if anyone wants to use this driver it needs a maintainer.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=675287
+> > > --
+> > > MST
+> > >
+> > 
+> > 
+> > -- 
+> > Luiz Augusto von Dentz
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.03 seconds
-GitLint                       PASS      1.96 seconds
-Prep - Setup ELL              PASS      27.49 seconds
-Build - Prep                  PASS      0.85 seconds
-Build - Configure             PASS      8.75 seconds
-Build - Make                  PASS      995.15 seconds
-Make Check                    PASS      11.86 seconds
-Make Check w/Valgrind         PASS      295.52 seconds
-Make Distcheck                PASS      245.99 seconds
-Build w/ext ELL - Configure   PASS      8.84 seconds
-Build w/ext ELL - Make        PASS      86.53 seconds
-Incremental Build w/ patches  PASS      204.14 seconds
-Scan Build                    PASS      571.23 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2385528679091604491==--
