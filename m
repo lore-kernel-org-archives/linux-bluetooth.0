@@ -2,79 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5BDC6FA8D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Sep 2022 19:30:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E5EECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Sep 2022 20:15:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiIITay (ORCPT
+        id S231936AbiIIUPt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Sep 2022 15:30:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46120 "EHLO
+        Fri, 9 Sep 2022 16:15:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231330AbiIITa3 (ORCPT
+        with ESMTP id S230058AbiIIUPr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Sep 2022 15:30:29 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E992A97D67
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Sep 2022 12:30:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 54541B8261C
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Sep 2022 19:30:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EE0A6C433D6;
-        Fri,  9 Sep 2022 19:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662751817;
-        bh=V0sG0+3Ej6SwEWZ0wmaNCkQbBqEFDeFO+HfeDNSZKbY=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=d9BVJwSB/Cldo80fc4Np5v8UbIJvHHkpOStH3Y3R3TzrW2cfvq0Y5rS+eOVhq9hhF
-         n70l0sw/AOMKF4bTl9JW8cIWc+GbJrS5Ycl2Q65lTJONFJqXGvOteiQpcH0M4o5Vvx
-         G8Q5CdcpYhieq6CFQXS0Jgb4eTGgP24NIM2uXtQHnBGenBf+N5P/o0UdXB75XgtRjB
-         vwRkTvRA+gN1F4B5jwGyAoPJDaJNLYw8N8ZDXVl77I24q5a6zxoYX+dd5SpHiictTo
-         pqnrS70jdiweCpXM5Y1GD3dWHJEVu9Uj4dDooHpL2/0SRzt30jSRoyz2BaM8C1lUlF
-         fVAI4IW46cNLw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0B62C73FE7;
-        Fri,  9 Sep 2022 19:30:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Fri, 9 Sep 2022 16:15:47 -0400
+X-Greylist: delayed 906 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 09 Sep 2022 13:15:45 PDT
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E53D476A
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Sep 2022 13:15:45 -0700 (PDT)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.96)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1oWkB2-0000SW-2e;
+        Fri, 09 Sep 2022 22:00:36 +0200
+Date:   Fri, 9 Sep 2022 21:00:30 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     linux-mediatek@lists.infradead.org, linux-bluetooth@vger.kernel.org
+Cc:     Matthias Brugger <matthias.bgg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: btusb: Add a new VID/PID 0e8d/0608 for MT7921
+Message-ID: <YxubXl/fxmBBDjVp@makrotopia.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1] Bluetooth: btintel: Mark Intel controller to support
- LE_STATES quirk
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166275181684.14413.17881202405230639284.git-patchwork-notify@kernel.org>
-Date:   Fri, 09 Sep 2022 19:30:16 +0000
-References: <20220907071945.9925-1-kiran.k@intel.com>
-In-Reply-To: <20220907071945.9925-1-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
-        ravishankar.srivatsa@intel.com, tedd.an@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Add a new PID/VID 0e8d/0608 for MT7921K chip found on AMD RZ608 module.
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+From /sys/kernel/debug/usb/devices:
+T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
+D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0e8d ProdID=0608 Rev= 1.00
+S:  Manufacturer=MediaTek Inc.
+S:  Product=Wireless_Device
+S:  SerialNumber=000000000
+C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
 
-On Wed,  7 Sep 2022 12:49:45 +0530 you wrote:
-> HarrrisonPeak, CyclonePeak, SnowFieldPeak and SandyPeak controllers
-> are marked to support HCI_QUIRK_LE_STATES.
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> ---
->  drivers/bluetooth/btintel.c | 17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Here is the summary with links:
-  - [v1] Bluetooth: btintel: Mark Intel controller to support LE_STATES quirk
-    https://git.kernel.org/bluetooth/bluetooth-next/c/dd0a1794f433
-
-You are awesome, thank you!
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 15caa646953893..c8d1975ca39c02 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -481,6 +481,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* MediaTek MT7922A Bluetooth devices */
+ 	{ USB_DEVICE(0x0489, 0xe0d8), .driver_info = BTUSB_MEDIATEK |
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.37.2
 
