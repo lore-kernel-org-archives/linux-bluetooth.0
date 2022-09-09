@@ -2,105 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02E5EECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Sep 2022 20:15:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8F2ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Sep 2022 20:16:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiIIUPt (ORCPT
+        id S232018AbiIIUQs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Sep 2022 16:15:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33630 "EHLO
+        Fri, 9 Sep 2022 16:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbiIIUPr (ORCPT
+        with ESMTP id S232000AbiIIUQp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Sep 2022 16:15:47 -0400
-X-Greylist: delayed 906 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 09 Sep 2022 13:15:45 PDT
-Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E53D476A
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Sep 2022 13:15:45 -0700 (PDT)
-Received: from local
-        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-         (Exim 4.96)
-        (envelope-from <daniel@makrotopia.org>)
-        id 1oWkB2-0000SW-2e;
-        Fri, 09 Sep 2022 22:00:36 +0200
-Date:   Fri, 9 Sep 2022 21:00:30 +0100
-From:   Daniel Golle <daniel@makrotopia.org>
-To:     linux-mediatek@lists.infradead.org, linux-bluetooth@vger.kernel.org
-Cc:     Matthias Brugger <matthias.bgg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH] Bluetooth: btusb: Add a new VID/PID 0e8d/0608 for MT7921
-Message-ID: <YxubXl/fxmBBDjVp@makrotopia.org>
+        Fri, 9 Sep 2022 16:16:45 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D88B9122384;
+        Fri,  9 Sep 2022 13:16:44 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id iw17so2837781plb.0;
+        Fri, 09 Sep 2022 13:16:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date;
+        bh=9VcEOS6tYLKIyOQMQW0PNupq+2esyo3BxlMVIMYy3Es=;
+        b=goNX8ojnJkZ7wZ953PokHx25OK65eCiCsZEOFSuYyEvSNaASosD9UIFvl6jryTbyUn
+         cHQ5Dt7TYgPGDrlwus3gAIrmxkxwUlIodi94Ioay9uOc8ny/3FxB0+klzXQnaaYEpYNx
+         OQ+7S1Wp64x+ulKJ6J+JOgZtuchNr6mtnh7LkZG9Gsx4L0sIdYyG0guoPh4g/qw6eT43
+         wtrNQ6o+Mdk9vEDsLmdhK5Rdgq2CnWj6dE60LvGIBft1s1IoeCiFCt14TaxEybdYl3qA
+         twW6AefXXgN1g3i9p9rDPCzEx22RSZwOpKwYbSHuXw54D71vUqjjZTbvf43I7wUxpLxT
+         QYtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=9VcEOS6tYLKIyOQMQW0PNupq+2esyo3BxlMVIMYy3Es=;
+        b=hhqd+bIb/UVVc2iHKSi34rSF/T2B66e0Z2lwNSbs6YbR8ReTJkxadRS6W7hZrYoKq3
+         w2YFdLrjg8/8cpesK7HIpHh2btWVZYUimLfCfmyx7Ns2K+pyUVo+yJsM273hNNEL3FxB
+         nR5qz62bhJ5TpRvt2i+f9lR8ppKFUHBDhTabz0IYF/AbBBO8kOOR6dNUibyxmxULbjjH
+         bfI2Gu8EK2AAz6p2GyZX4B6TQUaTmhTTsyZxWoMYHT/WJGzI5hRMg/ISyVX56fgNpaSJ
+         k7s/+UJrRVnaX3E3KamNxumoU57+YMto4+x/6djtnwKL4cHI3Rb3t/uyPIN6Oc9UYypM
+         AAwA==
+X-Gm-Message-State: ACgBeo3Qz1OQpAs4JyLFgTviz0jQV/XyrK8TVcdH3Dl6s4cAUbpAk2XE
+        RdTl/CvM2AYCcr1YF22wl0Hh7tgHW9XAqQ==
+X-Google-Smtp-Source: AA6agR4OibZJpiqzs7z/LQj2JCypTsO+jgnlq788FbbcRxXqsfvD2fBwkwmKM90B0D1Ny1GJfETGcQ==
+X-Received: by 2002:a17:90b:17c7:b0:202:95a2:e30f with SMTP id me7-20020a17090b17c700b0020295a2e30fmr2921283pjb.28.1662754604276;
+        Fri, 09 Sep 2022 13:16:44 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id e12-20020a170902784c00b0016c78f9f024sm867987pln.104.2022.09.09.13.16.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Sep 2022 13:16:43 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2022-09-09
+Date:   Fri,  9 Sep 2022 13:16:42 -0700
+Message-Id: <20220909201642.3810565-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add a new PID/VID 0e8d/0608 for MT7921K chip found on AMD RZ608 module.
+The following changes since commit 64ae13ed478428135cddc2f1113dff162d8112d4:
 
-From /sys/kernel/debug/usb/devices:
-T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0e8d ProdID=0608 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+  net: core: fix flow symmetric hash (2022-09-09 12:48:00 +0100)
 
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+are available in the Git repository at:
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 15caa646953893..c8d1975ca39c02 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -481,6 +481,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0e8d, 0x0608), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* MediaTek MT7922A Bluetooth devices */
- 	{ USB_DEVICE(0x0489, 0xe0d8), .driver_info = BTUSB_MEDIATEK |
--- 
-2.37.2
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-09-09
 
+for you to fetch changes up to 35e60f1aadf6c02d77fdf42180fbf205aec7e8fc:
+
+  Bluetooth: Fix HCIGETDEVINFO regression (2022-09-09 12:25:18 -0700)
+
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ -Fix HCIGETDEVINFO regression
+
+----------------------------------------------------------------
+Luiz Augusto von Dentz (1):
+      Bluetooth: Fix HCIGETDEVINFO regression
+
+ include/net/bluetooth/hci_sock.h | 2 --
+ 1 file changed, 2 deletions(-)
