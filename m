@@ -2,135 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D030CC6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Sep 2022 08:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEE93ECAAD5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Sep 2022 11:18:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229505AbiIJIXu (ORCPT
+        id S229585AbiIJLSk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 10 Sep 2022 04:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52988 "EHLO
+        Sat, 10 Sep 2022 07:18:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbiIJIXt (ORCPT
+        with ESMTP id S229488AbiIJLSh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 10 Sep 2022 04:23:49 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC07089820
-        for <linux-bluetooth@vger.kernel.org>; Sat, 10 Sep 2022 01:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662798228; x=1694334228;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=MSSyQK4WwFfQQJ2ncGOlWZ9SWiCgMDhOGEJ3TItINuw=;
-  b=OszadBrLocwI5iWYBIMTkO56OiDgmffgqvZrnncvfOOLdLaj7vNdbc3Y
-   3lacmtKWO3o+XeJXnwkbZ+6eO9+5uoCcmJHrZvQhnTtlW/mUJAS4hC7/c
-   d/cL6MGn6kZCPHd9oInr2barRQGi4b6AsY1KG/ObGLuofHLeJ+AmP3RLh
-   FWgoHcoQ09NnAQ+b6mSRXsfnAyvpACtOr256TVCjFca+ZyOTc5HGJsRSJ
-   1D3jrOUXUaqYnKxsusIzwDzT74XTGfuWduBeejC8TjSuiu/ipBmIVcugy
-   6ODiPS/IF0dWYCoRqfctDKbRXJ0dbCC9oS9BlH7wiNTFYrgutCeFqAzVE
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10465"; a="284642305"
-X-IronPort-AV: E=Sophos;i="5.93,305,1654585200"; 
-   d="scan'208";a="284642305"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2022 01:23:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,305,1654585200"; 
-   d="scan'208";a="944045985"
-Received: from lkp-server02.sh.intel.com (HELO b2938d2e5c5a) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 10 Sep 2022 01:23:47 -0700
-Received: from kbuild by b2938d2e5c5a with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oWvmE-0002J9-1K;
-        Sat, 10 Sep 2022 08:23:46 +0000
-Date:   Sat, 10 Sep 2022 16:22:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- dd0a1794f4334ddbf9b7c5e7d642aaffff38c69b
-Message-ID: <631c4961.uKb5x4uLMTZzF2qu%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 10 Sep 2022 07:18:37 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49E718364;
+        Sat, 10 Sep 2022 04:18:35 -0700 (PDT)
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 28ABINqv016377;
+        Sat, 10 Sep 2022 20:18:23 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Sat, 10 Sep 2022 20:18:23 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 28ABIM1R016371
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 10 Sep 2022 20:18:23 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <d2d763e3-0dc8-03df-45ba-8d5c4a25acda@I-love.SAKURA.ne.jp>
+Date:   Sat, 10 Sep 2022 20:18:22 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.1
+Subject: Re: [syzbot] WARNING: ODEBUG bug in mgmt_index_removed
+Content-Language: en-US
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <000000000000532e0e05e826413c@google.com>
+Cc:     syzbot <syzbot+844c7bf1b1aa4119c5de@syzkaller.appspotmail.com>,
+        linux-bluetooth@vger.kernel.org, syzkaller-bugs@googlegroups.com
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <000000000000532e0e05e826413c@google.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: dd0a1794f4334ddbf9b7c5e7d642aaffff38c69b  Bluetooth: btintel: Mark Intel controller to support LE_STATES quirk
+I guess that, since hci_pi(sk)->hdev = hdev in hci_sock_bind() does not check whether a hdev
+is already associated with some sk, it is possible that multiple sk are bound to the same hdev.
+As a result, lock_sock(sk) is not sufficient for serializing access to hdev, and
+hci_dev_lock(hdev) is needed when calling mgmt_index_*(hdev) functions.
 
-elapsed time: 728m
+If my guess above is correct, I think that what syzbot is telling us is that, due to lack of
+serialization via hci_dev_lock(hdev), setting of HCI_MGMT flag from mgmt_init_hdev() from
+hci_mgmt_cmd() from hci_sock_sendmsg() is racing with testing of HCI_MGMT flag from
+mgmt_index_removed() from hci_sock_bind().
 
-configs tested: 58
-configs skipped: 2
+I suggest you to explicitly use lockdep_assert_held() in Bluethooth code for clarifying what
+locks need to be held, instead of continue using racy operations like hci_dev_test_and_set_flag()
+without holding appropriate locks.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
 
-gcc tested configs:
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-powerpc                           allnoconfig
-i386                                defconfig
-x86_64                           allyesconfig
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-sh                               allmodconfig
-m68k                             allyesconfig
-powerpc                          allmodconfig
-mips                             allyesconfig
-x86_64                        randconfig-a015
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-arc                  randconfig-r043-20220908
-i386                             allyesconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-arc                  randconfig-r043-20220907
-x86_64                          rhel-8.3-func
-s390                 randconfig-r044-20220908
-x86_64                         rhel-8.3-kunit
-i386                          randconfig-a005
-riscv                randconfig-r042-20220908
-x86_64                    rhel-8.3-kselftests
-arm                                 defconfig
-x86_64                           rhel-8.3-syz
-x86_64                           rhel-8.3-kvm
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-x86_64                        randconfig-a002
-arm64                            allyesconfig
-arm                              allyesconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-ia64                             allmodconfig
 
-clang tested configs:
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a012
-hexagon              randconfig-r041-20220907
-hexagon              randconfig-r041-20220908
-riscv                randconfig-r042-20220907
-hexagon              randconfig-r045-20220908
-i386                          randconfig-a002
-hexagon              randconfig-r045-20220907
-s390                 randconfig-r044-20220907
-i386                          randconfig-a004
-i386                          randconfig-a006
-i386                          randconfig-a013
-i386                          randconfig-a011
-i386                          randconfig-a015
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
+hci_unregister_dev() {
+  if (!test_bit(HCI_INIT, &hdev->flags) &&
+      !hci_dev_test_flag(hdev, HCI_SETUP) &&
+      !hci_dev_test_flag(hdev, HCI_CONFIG)) {
+    hci_dev_lock(hdev);
+    mgmt_index_removed(hdev) {
+      if (!hci_dev_test_flag(hdev, HCI_MGMT))
+        return;
+      cancel_delayed_work_sync(&hdev->discov_off);
+    }
+    hci_dev_unlock(hdev);
+  }
+}
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+hci_sock_sendmsg() {
+  lock_sock(sk);
+  mutex_lock(&mgmt_chan_list_lock);
+  chan = __hci_mgmt_chan_find(hci_pi(sk)->channel);
+  if (chan)
+    err = hci_mgmt_cmd(chan, sk, skb) {
+      if (hdev && chan->hdev_init) // chan->hdev_init == mgmt_init_hdev
+        chan->hdev_init(sk, hdev) {
+          if (hci_dev_test_and_set_flag(hdev, HCI_MGMT)) // Missing hci_dev_lock(hdev)
+            return;
+          INIT_DELAYED_WORK(&hdev->discov_off, discov_off);
+        }
+      err = handler->func(sk, hdev, cp, len) { // handler->func() == set_external_config or set_public_address
+        hci_dev_lock(hdev);
+        mgmt_index_removed(hdev) {
+          if (!hci_dev_test_flag(hdev, HCI_MGMT))
+            return;
+          cancel_delayed_work_sync(&hdev->discov_off);
+        }
+        hci_dev_unlock(hdev);
+      }
+    }
+  else
+    err = -EINVAL;
+  mutex_unlock(&mgmt_chan_list_lock);
+  release_sock(sk);
+}
+
+hci_sock_bind() {
+  lock_sock(sk);
+  mgmt_index_removed(hdev) {
+    if (!hci_dev_test_flag(hdev, HCI_MGMT)) // Missing hci_dev_lock(hdev)
+      return;
+    cancel_delayed_work_sync(&hdev->discov_off); // ODEBUG complains missing INIT_DELAYED_WORK()
+  }
+  release_sock(sk);
+}
+
+
