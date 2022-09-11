@@ -2,175 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 602E7ECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 10 Sep 2022 21:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9BCECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Sep 2022 15:42:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbiIJVSH (ORCPT
+        id S229531AbiIKPmm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 10 Sep 2022 17:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56322 "EHLO
+        Sun, 11 Sep 2022 11:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbiIJVRf (ORCPT
+        with ESMTP id S229522AbiIKPml (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 10 Sep 2022 17:17:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70BE34D162;
-        Sat, 10 Sep 2022 14:17:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 192D9B80943;
-        Sat, 10 Sep 2022 21:16:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 873D9C433D7;
-        Sat, 10 Sep 2022 21:16:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1662844617;
-        bh=wmRTbkNoy8Zu27AllxgCCaSC6UIUZ/PeINE7D8BHCA8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y/dWPOt4QhdpWtNPi0fcM5EmC5O3yLFBT2O0usbocPi0pPPP2s4uW4g8KMYqBDjYX
-         TotoZ87uC57xtPiORu1slIwA5IA8XhttO7cKzfOBonzSTpAFruc10c4UnObpsTYbv5
-         LEj26N2AqOPqeCJDUBRPZ+KWFrFmzX9mDW0wc1FL9nJhkXoETHz4PjK7IJUw84mXyW
-         IcRlD0hS9QbchQSVzLUOyFr4jwPC76h8S0eodIo05v5Vm4Iw6cagQnwMKyRwvX3jpT
-         aMmaWCx4CBPygumDxqu0PCtz/ymKmyHtu2zXTNq+9+LY0ECDGC1RWT76c1OOepLhbL
-         djo+tif60lEDg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.19 18/38] Bluetooth: MGMT: Fix Get Device Flags
-Date:   Sat, 10 Sep 2022 17:16:03 -0400
-Message-Id: <20220910211623.69825-18-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220910211623.69825-1-sashal@kernel.org>
-References: <20220910211623.69825-1-sashal@kernel.org>
+        Sun, 11 Sep 2022 11:42:41 -0400
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54916348
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Sep 2022 08:42:40 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id o123so6630364vsc.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Sep 2022 08:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=foxdogstudios-com.20210112.gappssmtp.com; s=20210112;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :from:to:cc:subject:date;
+        bh=6x1wHSCicuV7iaAZJLjAByjqQhgogB5Bf/Ei/pyFzrI=;
+        b=q2hF5mcOkk29lNAMk/DBCl2IjSeN8KjDVs+/9SLWYsihYpAAC/x40xy9FF8hHZFC9y
+         rAU2ktrI6aFIr7Q5d8q18m+eoetvo5zSQzX3VSK573zn8KfTFJzc9DM5iULta01o9F6S
+         0mKxDVNqY43wy1mFCzVmDGMZY5IZOPGwdikvfgG7RlyeY9qrUisP6He4kcK+Q+Mg2I7j
+         tGppJTo4UZpDyooTGG8vTbDdOiZ9VUKRTOTrJDEy3CAX336LrsYA0e8ECV+H7rPjBqaW
+         d4xw0vSmzVhNgcCdr9Rwxw0U9dtBaa0NR4amoQm5GzsmTYlOHz1zVLs7Q5XsswRKcHtj
+         MuDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
+         :x-gm-message-state:from:to:cc:subject:date;
+        bh=6x1wHSCicuV7iaAZJLjAByjqQhgogB5Bf/Ei/pyFzrI=;
+        b=qJQbi+Fuqd0IOcOJ52qkxZmbpju147MZWde8Lv7sE5t2oTtqqGH1oRN2ryb/FqkMTA
+         OAVDUB0bV8B3ImPEwaCsKyFfTPDpxcykYtMAQnkTfhINIifmfa8OkPbAC6dF0rHSGCgP
+         XNSyeeKVTC0G8zWbPcwNWy0CjyQjIgb9RPzAilR2T3YJOpCCNvEA+dWn7WxUdQC0TbH/
+         sILQLbD/31XPrH3JtPtgZDhAlk7DS4BAp7RsdPjvDRrFOfb7GF+f/tvavvHX59MtlXnA
+         YfNttfTDjuVP5y0Tyj3riCodZPpY1KKKF4CPWP2un8P5Jed3dXjVn+qyAtIxXEvNDh9r
+         aZBA==
+X-Gm-Message-State: ACgBeo0xWWuTtBC8cheOpWIRSWikZToWj644PZjkjWrQU4YY8vf5UiH8
+        mQ6OvQb7usQVNXHdsg7OiURDNin3C1rXAt0FKPfFERs9FUg=
+X-Google-Smtp-Source: AA6agR4yqtWkuY1b3zTqerwvGl1L0Y6qApKWe0sNhv9Uk2IhWDsPEBJN03CxqG7Kjn8yRvEj2W7F3TCVLqpxxz6wGto=
+X-Received: by 2002:a67:ec04:0:b0:398:7ed6:2464 with SMTP id
+ d4-20020a67ec04000000b003987ed62464mr667395vso.5.1662910959827; Sun, 11 Sep
+ 2022 08:42:39 -0700 (PDT)
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+References: <CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com>
+ <24e95c8b-dc05-0d00-50bb-58b71c5baf94@molgen.mpg.de> <CAD+dNTuRThoa2OSzQ27tENB29GJ4oD0j3D+P4k42HzopEeTJMw@mail.gmail.com>
+In-Reply-To: <CAD+dNTuRThoa2OSzQ27tENB29GJ4oD0j3D+P4k42HzopEeTJMw@mail.gmail.com>
+From:   Peter Sutton <peter@foxdogstudios.com>
+Date:   Sun, 11 Sep 2022 16:42:28 +0100
+Message-ID: <CAD+dNTsqBEjzG7BinKtxveH9faJqss89WPufbSsaB5FZRDgOPA@mail.gmail.com>
+Subject: Re: [Bug] [Deadlock] Kernel thread deadlock in rfcomm socket release
+ when connect interrupted
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Just following this up. Is there anything I can do to help fix this?
+Running a custom kernel is a real pain. I've been running with the
+commit revert and upgrading with Arch Linux kernel releases with no
+issue.
 
-[ Upstream commit 23b72814da1a094b4c065e0bb598249f310c5577 ]
+Thanks,
 
-Get Device Flags don't check if device does actually use an RPA in which
-case it shall only set HCI_CONN_FLAG_REMOTE_WAKEUP if LL Privacy is
-enabled.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/mgmt.c | 71 ++++++++++++++++++++++++++------------------
- 1 file changed, 42 insertions(+), 29 deletions(-)
+Pete.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index cbdf0e2bc5ae0..d0fb74b0db1d5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4420,6 +4420,22 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
- 			       MGMT_STATUS_NOT_SUPPORTED);
- }
- 
-+static u32 get_params_flags(struct hci_dev *hdev,
-+			    struct hci_conn_params *params)
-+{
-+	u32 flags = hdev->conn_flags;
-+
-+	/* Devices using RPAs can only be programmed in the acceptlist if
-+	 * LL Privacy has been enable otherwise they cannot mark
-+	 * HCI_CONN_FLAG_REMOTE_WAKEUP.
-+	 */
-+	if ((flags & HCI_CONN_FLAG_REMOTE_WAKEUP) && !use_ll_privacy(hdev) &&
-+	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type))
-+		flags &= ~HCI_CONN_FLAG_REMOTE_WAKEUP;
-+
-+	return flags;
-+}
-+
- static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 data_len)
- {
-@@ -4451,10 +4467,10 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	} else {
- 		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
- 						le_addr_type(cp->addr.type));
--
- 		if (!params)
- 			goto done;
- 
-+		supported_flags = get_params_flags(hdev, params);
- 		current_flags = params->flags;
- 	}
- 
-@@ -4523,38 +4539,35 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 			bt_dev_warn(hdev, "No such BR/EDR device %pMR (0x%x)",
- 				    &cp->addr.bdaddr, cp->addr.type);
- 		}
--	} else {
--		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
--						le_addr_type(cp->addr.type));
--		if (params) {
--			/* Devices using RPAs can only be programmed in the
--			 * acceptlist LL Privacy has been enable otherwise they
--			 * cannot mark HCI_CONN_FLAG_REMOTE_WAKEUP.
--			 */
--			if ((current_flags & HCI_CONN_FLAG_REMOTE_WAKEUP) &&
--			    !use_ll_privacy(hdev) &&
--			    hci_find_irk_by_addr(hdev, &params->addr,
--						 params->addr_type)) {
--				bt_dev_warn(hdev,
--					    "Cannot set wakeable for RPA");
--				goto unlock;
--			}
- 
--			params->flags = current_flags;
--			status = MGMT_STATUS_SUCCESS;
-+		goto unlock;
-+	}
- 
--			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
--			 * has been set.
--			 */
--			if (params->flags & HCI_CONN_FLAG_DEVICE_PRIVACY)
--				hci_update_passive_scan(hdev);
--		} else {
--			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
--				    &cp->addr.bdaddr,
--				    le_addr_type(cp->addr.type));
--		}
-+	params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
-+					le_addr_type(cp->addr.type));
-+	if (!params) {
-+		bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
-+			    &cp->addr.bdaddr, le_addr_type(cp->addr.type));
-+		goto unlock;
-+	}
-+
-+	supported_flags = get_params_flags(hdev, params);
-+
-+	if ((supported_flags | current_flags) != supported_flags) {
-+		bt_dev_warn(hdev, "Bad flag given (0x%x) vs supported (0x%0x)",
-+			    current_flags, supported_flags);
-+		goto unlock;
- 	}
- 
-+	params->flags = current_flags;
-+	status = MGMT_STATUS_SUCCESS;
-+
-+	/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
-+	 * has been set.
-+	 */
-+	if (params->flags & HCI_CONN_FLAG_DEVICE_PRIVACY)
-+		hci_update_passive_scan(hdev);
-+
- unlock:
- 	hci_dev_unlock(hdev);
- 
--- 
-2.35.1
-
+On Mon, 30 May 2022 at 12:44, Peter Sutton <peter@foxdogstudios.com> wrote:
+>
+> Commit b7ce436a5d798bc59e71797952566608a4b4626b is the probable cause.
+> I compiled a custom Arch Linux kernel package [1] and the bug was
+> present. Reverting the commit fixed the bug. Below is the reply I was
+> writing before Matt found the suspect commit and I tested with the
+> custom kernel.
+>
+> > What hardware is that?
+>
+> $ dmesg | grep iwlwifi
+> Me: Intel(R) Dual Band Wireless AC 8260, REV=0x204
+> Matt: Intel(R) Dual Band Wireless AC 8265, REV=0x230
+>
+> We both get:
+>
+> $ lsusb | grep Bluetooth
+> Me & Matt: Bus 001 Device 006: ID 8087:0a2b Intel Corp. Bluetooth
+> wireless interface
+>
+> > As a lot of patches are also applied to the stable series, do you know,
+> > if this is a regression? Does it work with Linux 5.15(.0) or 5.10?
+>
+> Bug is present on current Arch Linux LTS kernel:
+>
+> $ uname -a
+> Linux taffer 5.15.43-1-lts #1 SMP Wed, 25 May 2022 14:08:34 +0000
+> x86_64 GNU/Linux
+>
+> Matt tested on 5.10.115 and the bug is not present. So I guess it's a
+> regression. Anecdotally, we encountered this behaviour 1 yr ago
+> (difficult to say exactly), then it went away but came back about 1 or
+> 2 months ago. All of this is on Arch Linux, I update about once a
+> week.
+>
+> [1] https://wiki.archlinux.org/title/Kernel/Arch_Build_System
