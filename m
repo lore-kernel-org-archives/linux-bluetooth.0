@@ -2,108 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E9BCECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Sep 2022 15:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D72ECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 11 Sep 2022 16:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229531AbiIKPmm (ORCPT
+        id S229781AbiIKQW1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 11 Sep 2022 11:42:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
+        Sun, 11 Sep 2022 12:22:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiIKPml (ORCPT
+        with ESMTP id S229816AbiIKQWU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 11 Sep 2022 11:42:41 -0400
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54916348
-        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Sep 2022 08:42:40 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id o123so6630364vsc.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Sep 2022 08:42:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=foxdogstudios-com.20210112.gappssmtp.com; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date;
-        bh=6x1wHSCicuV7iaAZJLjAByjqQhgogB5Bf/Ei/pyFzrI=;
-        b=q2hF5mcOkk29lNAMk/DBCl2IjSeN8KjDVs+/9SLWYsihYpAAC/x40xy9FF8hHZFC9y
-         rAU2ktrI6aFIr7Q5d8q18m+eoetvo5zSQzX3VSK573zn8KfTFJzc9DM5iULta01o9F6S
-         0mKxDVNqY43wy1mFCzVmDGMZY5IZOPGwdikvfgG7RlyeY9qrUisP6He4kcK+Q+Mg2I7j
-         tGppJTo4UZpDyooTGG8vTbDdOiZ9VUKRTOTrJDEy3CAX336LrsYA0e8ECV+H7rPjBqaW
-         d4xw0vSmzVhNgcCdr9Rwxw0U9dtBaa0NR4amoQm5GzsmTYlOHz1zVLs7Q5XsswRKcHtj
-         MuDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date;
-        bh=6x1wHSCicuV7iaAZJLjAByjqQhgogB5Bf/Ei/pyFzrI=;
-        b=qJQbi+Fuqd0IOcOJ52qkxZmbpju147MZWde8Lv7sE5t2oTtqqGH1oRN2ryb/FqkMTA
-         OAVDUB0bV8B3ImPEwaCsKyFfTPDpxcykYtMAQnkTfhINIifmfa8OkPbAC6dF0rHSGCgP
-         XNSyeeKVTC0G8zWbPcwNWy0CjyQjIgb9RPzAilR2T3YJOpCCNvEA+dWn7WxUdQC0TbH/
-         sILQLbD/31XPrH3JtPtgZDhAlk7DS4BAp7RsdPjvDRrFOfb7GF+f/tvavvHX59MtlXnA
-         YfNttfTDjuVP5y0Tyj3riCodZPpY1KKKF4CPWP2un8P5Jed3dXjVn+qyAtIxXEvNDh9r
-         aZBA==
-X-Gm-Message-State: ACgBeo0xWWuTtBC8cheOpWIRSWikZToWj644PZjkjWrQU4YY8vf5UiH8
-        mQ6OvQb7usQVNXHdsg7OiURDNin3C1rXAt0FKPfFERs9FUg=
-X-Google-Smtp-Source: AA6agR4yqtWkuY1b3zTqerwvGl1L0Y6qApKWe0sNhv9Uk2IhWDsPEBJN03CxqG7Kjn8yRvEj2W7F3TCVLqpxxz6wGto=
-X-Received: by 2002:a67:ec04:0:b0:398:7ed6:2464 with SMTP id
- d4-20020a67ec04000000b003987ed62464mr667395vso.5.1662910959827; Sun, 11 Sep
- 2022 08:42:39 -0700 (PDT)
+        Sun, 11 Sep 2022 12:22:20 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58DD11573C
+        for <linux-bluetooth@vger.kernel.org>; Sun, 11 Sep 2022 09:22:04 -0700 (PDT)
+Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 28BGLoL3041722;
+        Mon, 12 Sep 2022 01:21:50 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
+ Mon, 12 Sep 2022 01:21:50 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 28BGLj2T041708
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 12 Sep 2022 01:21:50 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <f6de02d1-dcda-0383-739d-27484b4d5c63@I-love.SAKURA.ne.jp>
+Date:   Mon, 12 Sep 2022 01:21:42 +0900
 MIME-Version: 1.0
-References: <CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com>
- <24e95c8b-dc05-0d00-50bb-58b71c5baf94@molgen.mpg.de> <CAD+dNTuRThoa2OSzQ27tENB29GJ4oD0j3D+P4k42HzopEeTJMw@mail.gmail.com>
-In-Reply-To: <CAD+dNTuRThoa2OSzQ27tENB29GJ4oD0j3D+P4k42HzopEeTJMw@mail.gmail.com>
-From:   Peter Sutton <peter@foxdogstudios.com>
-Date:   Sun, 11 Sep 2022 16:42:28 +0100
-Message-ID: <CAD+dNTsqBEjzG7BinKtxveH9faJqss89WPufbSsaB5FZRDgOPA@mail.gmail.com>
-Subject: Re: [Bug] [Deadlock] Kernel thread deadlock in rfcomm socket release
- when connect interrupted
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: [PATCH] Bluetooth: avoid hci_dev_test_and_set_flag() in
+ mgmt_init_hdev()
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     syzbot <syzbot+844c7bf1b1aa4119c5de@syzkaller.appspotmail.com>,
+        linux-bluetooth@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <000000000000532e0e05e826413c@google.com>
+ <d2d763e3-0dc8-03df-45ba-8d5c4a25acda@I-love.SAKURA.ne.jp>
+In-Reply-To: <d2d763e3-0dc8-03df-45ba-8d5c4a25acda@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Just following this up. Is there anything I can do to help fix this?
-Running a custom kernel is a real pain. I've been running with the
-commit revert and upgrading with Arch Linux kernel releases with no
-issue.
+syzbot is again reporting attempt to cancel uninitialized work
+at mgmt_index_removed() [1], for setting of HCI_MGMT flag from
+mgmt_init_hdev() from hci_mgmt_cmd() from hci_sock_sendmsg() can
+race with testing of HCI_MGMT flag from mgmt_index_removed() from
+hci_sock_bind() due to lack of serialization via hci_dev_lock().
 
-Thanks,
+Since mgmt_init_hdev() is called with mgmt_chan_list_lock held, we can
+safely split hci_dev_test_and_set_flag() into hci_dev_test_flag() and
+hci_dev_set_flag(). Thus, in order to close this race, set HCI_MGMT flag
+after INIT_DELAYED_WORK() completed.
 
+This is a local fix based on mgmt_chan_list_lock. Lack of serialization
+via hci_dev_lock() might be causing different race conditions somewhere
+else. But a global fix based on hci_dev_lock() should deserve a future
+patch.
 
-Pete.
+Link: https://syzkaller.appspot.com/bug?extid=844c7bf1b1aa4119c5de
+Reported-by: syzbot+844c7bf1b1aa4119c5de@syzkaller.appspotmail.com
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Fixes: 3f2893d3c142986a ("Bluetooth: don't try to cancel uninitialized works at mgmt_index_removed()")
+---
+ net/bluetooth/mgmt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Mon, 30 May 2022 at 12:44, Peter Sutton <peter@foxdogstudios.com> wrote:
->
-> Commit b7ce436a5d798bc59e71797952566608a4b4626b is the probable cause.
-> I compiled a custom Arch Linux kernel package [1] and the bug was
-> present. Reverting the commit fixed the bug. Below is the reply I was
-> writing before Matt found the suspect commit and I tested with the
-> custom kernel.
->
-> > What hardware is that?
->
-> $ dmesg | grep iwlwifi
-> Me: Intel(R) Dual Band Wireless AC 8260, REV=0x204
-> Matt: Intel(R) Dual Band Wireless AC 8265, REV=0x230
->
-> We both get:
->
-> $ lsusb | grep Bluetooth
-> Me & Matt: Bus 001 Device 006: ID 8087:0a2b Intel Corp. Bluetooth
-> wireless interface
->
-> > As a lot of patches are also applied to the stable series, do you know,
-> > if this is a regression? Does it work with Linux 5.15(.0) or 5.10?
->
-> Bug is present on current Arch Linux LTS kernel:
->
-> $ uname -a
-> Linux taffer 5.15.43-1-lts #1 SMP Wed, 25 May 2022 14:08:34 +0000
-> x86_64 GNU/Linux
->
-> Matt tested on 5.10.115 and the bug is not present. So I guess it's a
-> regression. Anecdotally, we encountered this behaviour 1 yr ago
-> (difficult to say exactly), then it went away but came back about 1 or
-> 2 months ago. All of this is on Arch Linux, I update about once a
-> week.
->
-> [1] https://wiki.archlinux.org/title/Kernel/Arch_Build_System
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 72e6595a71cc..3d1cd0666968 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1050,7 +1050,7 @@ static void discov_off(struct work_struct *work)
+ 
+ static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
+ {
+-	if (hci_dev_test_and_set_flag(hdev, HCI_MGMT))
++	if (hci_dev_test_flag(hdev, HCI_MGMT))
+ 		return;
+ 
+ 	BT_INFO("MGMT ver %d.%d", MGMT_VERSION, MGMT_REVISION);
+@@ -1065,6 +1065,8 @@ static void mgmt_init_hdev(struct sock *sk, struct hci_dev *hdev)
+ 	 * it
+ 	 */
+ 	hci_dev_clear_flag(hdev, HCI_BONDABLE);
++
++	hci_dev_set_flag(hdev, HCI_MGMT);
+ }
+ 
+ static int read_controller_info(struct sock *sk, struct hci_dev *hdev,
+-- 
+2.18.4
+
