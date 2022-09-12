@@ -2,263 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DDD4C6FA86
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 12:45:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5742ECAAD5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 12:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229610AbiILMpt (ORCPT
+        id S229785AbiILMpq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Sep 2022 08:45:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51214 "EHLO
+        Mon, 12 Sep 2022 08:45:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbiILMpn (ORCPT
+        with ESMTP id S229588AbiILMpl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Sep 2022 08:45:43 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A629F167F3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 05:45:42 -0700 (PDT)
+        Mon, 12 Sep 2022 08:45:41 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00D411A3E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 05:45:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1662986742; x=1694522742;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kBQRHwmj5jBLZDQZaifMfbtxMnVSmpvncYMBxNKp0GQ=;
-  b=hzMt+yPwAqroy0BcAZ/tj0TvXgL1u2xsJswW5rOyBzJc3+kH4qOpQH7p
-   SJkNwmezEWGsmVIpo5ewyg3kpPssehRz7Z3Ils1hoSCgdWqdOm14/3h/V
-   BzNiMHpgDW3cXqGaan4zPOM6Uj4XrXNrQDbD/yvS7PxVnBDMHpBX2R+18
-   GpuXw241N/rIOHMpLWjJ8DDuOTc0Xjqti0p3KaH31zEHqBLRkUZH/m0nv
-   1lisjkBmerGPzz+tAyGUfzhXoUXaQbYcC+HZp1uUiaDfjVQUOukQwfqjq
-   XcyMqSV5YJq3vI/IT2UrakJNZv1n72vNPTajBZ1/z3HrCmwZjJ33sUnrx
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10468"; a="284875210"
+  t=1662986735; x=1694522735;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3CMCkOA8mGHb3oteDds4/fDrBfneJWig0Km/3eOThVQ=;
+  b=WGRpLKrZE5flJV4MN3yxdSZvQGQrtpIC+0WOaUiLkf+qF6iIqmS4GWy8
+   8CWNhu8T3C+5QF9UDOAt+05n0uqwVCFF+NY0p+n67zI31i26HR5EOMM92
+   pP//L+HeD4zVhTeEI/CYfL0CNkYMH2M1cmzDRkcmzXU2kUIoP8RkQ3ZOj
+   l+j3DdNGuKOxEKz3hytjIt+lcU8SjEQV2HcJq8swzCfpY0fDUORsp5RPi
+   8vZyyVMzgrvfshq30PPL/EKNL2TeycguQ2ARJLGYJltFePI9Qgd6l+2D5
+   kgoj4D23HCNPJKsVorGWKPgOWSQRQpP30l+0rYDjbfUEy+mUNlxePtvLw
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10468"; a="297855572"
 X-IronPort-AV: E=Sophos;i="5.93,310,1654585200"; 
-   d="scan'208";a="284875210"
+   d="scan'208";a="297855572"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2022 05:45:42 -0700
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2022 05:45:21 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,310,1654585200"; 
-   d="scan'208";a="758382854"
+   d="scan'208";a="758382770"
 Received: from bsblt022.iind.intel.com ([10.224.186.21])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Sep 2022 05:45:40 -0700
+  by fmsmga001.fm.intel.com with ESMTP; 12 Sep 2022 05:45:20 -0700
 From:   Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ 4/4] monitor/att: Add decoding support for Volume Control Serice
-Date:   Mon, 12 Sep 2022 18:16:57 +0530
-Message-Id: <20220912124657.404551-5-sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ 0/4] Volume Control Profile
+Date:   Mon, 12 Sep 2022 18:16:53 +0530
+Message-Id: <20220912124657.404551-1-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220912124657.404551-1-sathish.narasimman@intel.com>
-References: <20220912124657.404551-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds decoding support for VCS attributes
+Initial Development of Volment Control profile and its service
+Volume Control Service.
 
-> ACL Data RX: Handle 3585 flags 0x02 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x0017 Type: Volume State (0x2b7d)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 8
-      ATT: Read Response (0x0b) len 3
-        Value: 000000
-        Handle: 0x0017 Type: Volume State (0x2b7d)
-            Volume Setting: 0
-            Not Muted: 0
-            Change Counter: 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 3585 Address: 49:71:FC:C0:66:C6 (Resolvable)
-        Count: 1
-> ACL Data RX: Handle 3585 flags 0x02 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x001c Type: Volume Flags (0x2b7f)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 6
-      ATT: Read Response (0x0b) len 1
-        Value: 01
-        Handle: 0x001c Type: Volume Flags (0x2b7f)
-            Volume Falg: 1
----
- monitor/att.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 159 insertions(+)
+Sathish Narasimman (4):
+  lib/uuid: Add VCS UUIDs
+  shared/vcp: Add initial code for handling VCP
+  profiles: Add initial code for vcp plugin
+  monitor/att: Add decoding support for Volume Control Serice
 
-diff --git a/monitor/att.c b/monitor/att.c
-index b7470f7a2ff4..3c1ff2e2aaa0 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -1590,6 +1590,162 @@ static void pac_context_notify(const struct l2cap_frame *frame)
- 	print_pac_context(frame);
- }
- 
-+static void print_vcs_state(const struct l2cap_frame *frame)
-+{
-+	uint8_t vol_set, mute, chng_ctr;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &vol_set)) {
-+		print_text(COLOR_ERROR, "Volume Settings: invalid size");
-+		goto done;
-+	}
-+	print_field("    Volume Setting: %u", vol_set);
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &mute)) {
-+		print_text(COLOR_ERROR, "Mute Filed: invalid size");
-+		goto done;
-+	}
-+
-+	switch (mute) {
-+	case 0x00:
-+		print_field("    Not Muted: %u", mute);
-+		break;
-+	case 0x01:
-+		print_field("    Muted: %u", mute);
-+		break;
-+	default:
-+		print_field("    Unknown Mute Value: %u", mute);
-+		break;
-+	}
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &chng_ctr)) {
-+		print_text(COLOR_ERROR, "Change Counter: invalid size");
-+		goto done;
-+	}
-+	print_field("    Change Counter: %u", chng_ctr);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void vol_state_read(const struct l2cap_frame *frame)
-+{
-+	print_vcs_state(frame);
-+}
-+
-+static void vol_state_notify(const struct l2cap_frame *frame)
-+{
-+	print_vcs_state(frame);
-+}
-+
-+static bool vcs_config_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    Change Counter"))
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool vcs_absolute_cmd(const struct l2cap_frame *frame)
-+{
-+	if (!l2cap_frame_print_u8((void *)frame, "    Change Counter"))
-+		return false;
-+
-+	if (!l2cap_frame_print_u8((void *)frame, "    Volume Setting"))
-+		return false;
-+
-+	return true;
-+}
-+
-+#define ASE_CMD(_op, _desc, _func) \
-+[_op] = { \
-+	.desc = _desc, \
-+	.func = _func, \
-+}
-+
-+struct vcs_cmd {
-+	const char *desc;
-+	bool (*func)(const struct l2cap_frame *frame);
-+} vcs_cmd_table[] = {
-+	/* Opcode = 0x00 (Relative Volume Down) */
-+	ASE_CMD(0x00, "Relative Volume Down", vcs_config_cmd),
-+	/* Opcode = 0x01 (Relative Volume Up) */
-+	ASE_CMD(0x01, "Relative Volume Up", vcs_config_cmd),
-+	/* Opcode = 0x02 (Unmute/Relative Volume Down) */
-+	ASE_CMD(0x02, "Unmute/Relative Volume Down", vcs_config_cmd),
-+	/* Opcode = 0x03 (Unmute/Relative Volume Up) */
-+	ASE_CMD(0x03, "Unmute/Relative Volume Up", vcs_config_cmd),
-+	/* Opcode = 0x04 (Set Absolute Volume) */
-+	ASE_CMD(0x04, "Set Absolute Volume", vcs_absolute_cmd),
-+	/* Opcode = 0x05 (Unmute) */
-+	ASE_CMD(0x05, "Unmute", vcs_config_cmd),
-+	/* Opcode = 0x06 (Mute) */
-+	ASE_CMD(0x06, "Mute", vcs_config_cmd),
-+};
-+
-+static struct vcs_cmd *vcs_get_cmd(uint8_t op)
-+{
-+	if (op > ARRAY_SIZE(vcs_cmd_table))
-+		return NULL;
-+
-+	return &vcs_cmd_table[op];
-+}
-+
-+static void print_vcs_cmd(const struct l2cap_frame *frame)
-+{
-+	uint8_t op;
-+	struct vcs_cmd *cmd;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &op)) {
-+		print_text(COLOR_ERROR, "opcode: invalid size");
-+		goto done;
-+	}
-+
-+	cmd = vcs_get_cmd(op);
-+	if (!cmd) {
-+		print_field("    Opcode: Reserved (0x%2.2x)", op);
-+		goto done;
-+	}
-+
-+	print_field("    Opcode: %s (0x%2.2x)", cmd->desc, op);
-+	if (!cmd->func(frame))
-+		print_field("    Unknown Opcode");
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void vol_cp_write(const struct l2cap_frame *frame)
-+{
-+	print_vcs_cmd(frame);
-+}
-+
-+static void print_vcs_flag(const struct l2cap_frame *frame)
-+{
-+	uint8_t vol_flag;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, &vol_flag)) {
-+		print_text(COLOR_ERROR, "Volume Flag: invalid size");
-+		goto done;
-+	}
-+	print_field("    Volume Falg: %u", vol_flag);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void vol_flag_read(const struct l2cap_frame *frame)
-+{
-+	print_vcs_flag(frame);
-+}
-+
-+static void vol_flag_notify(const struct l2cap_frame *frame)
-+{
-+	print_vcs_flag(frame);
-+}
-+
- #define GATT_HANDLER(_uuid, _read, _write, _notify) \
- { \
- 	.uuid = { \
-@@ -1617,6 +1773,9 @@ struct gatt_handler {
- 	GATT_HANDLER(0x2bcc, pac_loc_read, NULL, pac_loc_notify),
- 	GATT_HANDLER(0x2bcd, pac_context_read, NULL, pac_context_notify),
- 	GATT_HANDLER(0x2bce, pac_context_read, NULL, pac_context_notify),
-+	GATT_HANDLER(0x2b7d, vol_state_read, NULL, vol_state_notify),
-+	GATT_HANDLER(0x2b7e, NULL, vol_cp_write, NULL),
-+	GATT_HANDLER(0x2b7f, vol_flag_read, NULL, vol_flag_notify),
- };
- 
- static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
+ Makefile.am          |    1 +
+ Makefile.plugins     |    5 +
+ configure.ac         |    4 +
+ lib/uuid.h           |    7 +
+ monitor/att.c        |  159 +++++++
+ profiles/audio/vcp.c |  312 +++++++++++++
+ src/shared/vcp.c     | 1033 ++++++++++++++++++++++++++++++++++++++++++
+ src/shared/vcp.h     |   58 +++
+ 8 files changed, 1579 insertions(+)
+ create mode 100644 profiles/audio/vcp.c
+ create mode 100644 src/shared/vcp.c
+ create mode 100644 src/shared/vcp.h
+
 -- 
 2.25.1
 
