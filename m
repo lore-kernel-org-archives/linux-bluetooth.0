@@ -2,194 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B17BC6FA83
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 21:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACC1C6FA83
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 21:43:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbiILVMa (ORCPT
+        id S229959AbiILVnD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Sep 2022 17:12:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41682 "EHLO
+        Mon, 12 Sep 2022 17:43:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbiILVM3 (ORCPT
+        with ESMTP id S229683AbiILVnB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Sep 2022 17:12:29 -0400
-Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930A040565;
-        Mon, 12 Sep 2022 14:12:28 -0700 (PDT)
-Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-1280590722dso26857805fac.1;
-        Mon, 12 Sep 2022 14:12:28 -0700 (PDT)
+        Mon, 12 Sep 2022 17:43:01 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C22524C61F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 14:43:00 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id q9-20020a17090a178900b0020265d92ae3so13628456pja.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 14:43:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date;
+        bh=D0gGQfO3n93NHdjjAX94lSRbxVz2oHLGRDAcUgu8gcc=;
+        b=l/rqiTFOAtREJKzNd3ppVvcuoXapuFD2sWI+2Cw5oX8Bs1wmb6nQ+tjqGHdq00HvFh
+         TphbZlDQKeINxqBsTYC6y3dW3y6G0wsiXSn1SdKxxEBb9IxliFUQBTB7eGMKLY8LMkMb
+         Aw0szI6ik2HCMqvM4sVp7JiB5pLIQ9LK2jDLTwjUc6GvMM8JMpuRzs8A8dt3jCsjVGAc
+         jHXD4zQwWLqkIsaEzeW9ag6qDGYGCeCK99fmTCidfdLXNvjhQUHzJSeh3vDyrFSYslL3
+         pIkaEnroHgsmjmADvi+NRKFiSA+0hMVWWrRp/DqCORrF0kDftAOkhhh4+SlnKnxn5NAn
+         1Aow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=Nip0DqpF4pFkRZH+cZCKwsl/yHMaJf5IoaaXn/QNxSk=;
-        b=EA4/lT4fZgdAFSZckHI4+WzZzlAqPld7jfIcIyfTEF5Vyuc32sAKeWzHVFNTIym76C
-         OQ7zXTyo5JRzQq6CkpbNUU95A2SSV4aFMcXfh8TX0Jb18nC+T4hBZHetMBOAspQKZW1b
-         aVyCwH9j0+W+mwTvKuCzFOCn5WqaoIyLORwU+z+EreHtcdZIBbs2ZTYwF2EEHDQ/yknO
-         B2zQYzsCSkCcrmpKc08gf9QnIR/sf9YW6VXYkH2lg/gv9gaUJRoRtxmukjQ5wAKRx84I
-         pfu9ndrNScM0AHoBzNH4ldagIbL9dAuwomLLcI/Lj9Nh8G/gOi9Hs+nH7yGT0mzT4nDT
-         7HFw==
-X-Gm-Message-State: ACgBeo0KbgysU3Sm/SoPNiErJpp9BLKWj4Ba+qm7T7pdgCSxMtBTFECU
-        XkNi7cLhZFOG7tnLPL/mtQ==
-X-Google-Smtp-Source: AA6agR7BL/CQtAyYvQvcr+vIkRvAqs7VKLr+Xu8UpOBsWQGAV67Cg2TMBwDDp3CR4aFgS7C2yCTYNw==
-X-Received: by 2002:a05:6808:1996:b0:34f:c809:e298 with SMTP id bj22-20020a056808199600b0034fc809e298mr128276oib.184.1663017147764;
-        Mon, 12 Sep 2022 14:12:27 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id c186-20020acab3c3000000b0034484c532c7sm4421093oif.32.2022.09.12.14.12.26
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=D0gGQfO3n93NHdjjAX94lSRbxVz2oHLGRDAcUgu8gcc=;
+        b=Udo2wlRbJsbIo8AOcfxeehvwQkrnnokvz88WAVixTpbmDCLIQd8cV/ZT6OItI/lvhQ
+         XG7w6b3PhhX2UjIlsFxQKe4EUYO0Jxmgkgc82UtElHupQ/sZX4hAAXqbzz/k35fwrdqk
+         dSDNZzpPN6rENdYC/AmwvF8Sp00l5alQBWtGZJlRK7qKg9AHSTmQfuKWsj2nPOw1e5O2
+         NJ+SyY3+yadBeCQeSEHTpxzFFnkV2UgM70DYrARPHb8d9uLcTpm97QvXhiZnEZ5V9Dbu
+         Inf7ITI77zAWc/kelC6MRai5ZnbkZC9P/+3fqRJxo451jGPArLtcGHSF7G2PstRHrIqT
+         Vpig==
+X-Gm-Message-State: ACgBeo1LA9Fa7lBnAg+zx6kK1GuOq2M7rrFnzUAQie641AnC92tRY6BC
+        qWYsD37YkTdrIKXSS6VqB3dDqO3hk68=
+X-Google-Smtp-Source: AA6agR4tgcxenAI1MSJkf4liSzwD+SLCAEyv/8R7Dn40tzardNrjcRpe0MJihnlsd3MbwYh207dx0A==
+X-Received: by 2002:a17:902:ab17:b0:177:e928:8cb2 with SMTP id ik23-20020a170902ab1700b00177e9288cb2mr24804292plb.62.1663018979669;
+        Mon, 12 Sep 2022 14:42:59 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s9-20020a170902ea0900b0015e8d4eb26esm6596372plg.184.2022.09.12.14.42.58
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 14:12:27 -0700 (PDT)
-Received: (nullmailer pid 1872059 invoked by uid 1000);
-        Mon, 12 Sep 2022 21:12:26 -0000
-Date:   Mon, 12 Sep 2022 16:12:26 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Sven Peter <sven@svenpeter.dev>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Hector Martin <marcan@marcan.st>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        asahi@lists.linux.dev, netdev@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/5] dt-bindings: net: Add Broadcom BCM4377 family
- PCIe Bluetooth
-Message-ID: <20220912211226.GA1847448-robh@kernel.org>
-References: <20220907170935.11757-1-sven@svenpeter.dev>
- <20220907170935.11757-3-sven@svenpeter.dev>
- <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
+        Mon, 12 Sep 2022 14:42:58 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] shared/bap: Fix attempting to disable stream when it is idle
+Date:   Mon, 12 Sep 2022 14:42:57 -0700
+Message-Id: <20220912214257.173804-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Sep 08, 2022 at 01:19:17PM +0200, Krzysztof Kozlowski wrote:
-> On 07/09/2022 19:09, Sven Peter wrote:
-> > These chips are combined Wi-Fi/Bluetooth radios which expose a
-> > PCI subfunction for the Bluetooth part.
-> > They are found in Apple machines such as the x86 models with the T2
-> > chip or the arm64 models with the M1 or M2 chips.
-> > 
-> > Signed-off-by: Sven Peter <sven@svenpeter.dev>
-> > ---
-> > changes from v1:
-> >   - added apple,* pattern to brcm,board-type
-> >   - s/PCI/PCIe/
-> >   - fixed 1st reg cell inside the example to not contain the bus number
-> > 
-> > .../bindings/net/brcm,bcm4377-bluetooth.yaml  | 78 +++++++++++++++++++
-> >  MAINTAINERS                                   |  1 +
-> >  2 files changed, 79 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
-> > new file mode 100644
-> > index 000000000000..fb851f8e6bcb
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
-> > @@ -0,0 +1,78 @@
-> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/brcm,bcm4377-bluetooth.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Broadcom BCM4377 family PCIe Bluetooth Chips
-> > +
-> > +allOf:
-> > +  - $ref: bluetooth-controller.yaml#
-> 
-> Put it before properties (so after description).
-> 
-> > +
-> > +maintainers:
-> > +  - Sven Peter <sven@svenpeter.dev>
-> > +
-> > +description:
-> > +  This binding describes Broadcom BCM4377 family PCIe-attached bluetooth chips
-> > +  usually found in Apple machines. The Wi-Fi part of the chip is described in
-> > +  bindings/net/wireless/brcm,bcm4329-fmac.yaml.
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - pci14e4,5fa0 # BCM4377
-> > +      - pci14e4,5f69 # BCM4378
-> > +      - pci14e4,5f71 # BCM4387
-> > +
-> > +  reg:
-> > +    description: PCI device identifier.
-> 
-> maxItems: X
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-And drop the description.
+If the stream is already in idle state do not attempt to disable it
+again.
+---
+ src/shared/bap.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-> 
-> > +
-> > +  brcm,board-type:
-> > +    $ref: /schemas/types.yaml#/definitions/string
-> > +    description: Board type of the Bluetooth chip. This is used to decouple
-> > +      the overall system board from the Bluetooth module and used to construct
-> > +      firmware and calibration data filenames.
-> > +      On Apple platforms, this should be the Apple module-instance codename
-> > +      prefixed by "apple,", e.g. "apple,atlantisb".
-> > +    pattern: '^apple,.*'
-> > +
-> > +  brcm,taurus-cal-blob:
-> > +    $ref: /schemas/types.yaml#/definitions/uint8-array
-> > +    description: A per-device calibration blob for the Bluetooth radio. This
-> > +      should be filled in by the bootloader from platform configuration
-> > +      data, if necessary, and will be uploaded to the device.
-> > +      This blob is used if the chip stepping of the Bluetooth module does not
-> > +      support beamforming.
-> 
-> Isn't it:
-> s/beamforming/beam forming/
-> ?
-> 
-> > +
-> > +  brcm,taurus-bf-cal-blob:
-> > +    $ref: /schemas/types.yaml#/definitions/uint8-array
-> > +    description: A per-device calibration blob for the Bluetooth radio. This
-> > +      should be filled in by the bootloader from platform configuration
-> > +      data, if necessary, and will be uploaded to the device.
-> > +      This blob is used if the chip stepping of the Bluetooth module supports
-> > +      beamforming.
-> 
-> Same here.
-> 
-> > +
-> > +  local-bd-address: true
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - local-bd-address
-> > +  - brcm,board-type
-> > +
-> > +additionalProperties: false
-> > +
-> > +examples:
-> > +  - |
-> > +    pcie {
-> > +      #address-cells = <3>;
-> > +      #size-cells = <2>;
-> > +
-> > +      bluetooth@0,1 {
-> 
-> The unit address seems to be different than reg.
+diff --git a/src/shared/bap.c b/src/shared/bap.c
+index c5f1134d8d8a..7b23a33474bd 100644
+--- a/src/shared/bap.c
++++ b/src/shared/bap.c
+@@ -1050,13 +1050,15 @@ static void bap_stream_free(void *data)
+ 	free(stream);
+ }
+ 
+-static void bap_ep_detach(struct bt_bap_endpoint *ep)
++static void bap_stream_detach(struct bt_bap_stream *stream)
+ {
+-	struct bt_bap_stream *stream = ep->stream;
++	struct bt_bap_endpoint *ep = stream->ep;
+ 
+-	if (!stream)
++	if (!ep)
+ 		return;
+ 
++	DBG(stream->bap, "stream %p ep %p", stream, ep);
++
+ 	queue_remove(stream->bap->streams, stream);
+ 	bap_stream_clear_cfm(stream);
+ 
+@@ -1281,7 +1283,7 @@ static void bap_stream_state_changed(struct bt_bap_stream *stream)
+ 	/* Post notification updates */
+ 	switch (stream->ep->state) {
+ 	case BT_ASCS_ASE_STATE_IDLE:
+-		bap_ep_detach(stream->ep);
++		bap_stream_detach(stream);
+ 		break;
+ 	case BT_ASCS_ASE_STATE_QOS:
+ 		break;
+@@ -1838,7 +1840,8 @@ static uint8_t stream_disable(struct bt_bap_stream *stream, struct iovec *rsp)
+ {
+ 	DBG(stream->bap, "stream %p", stream);
+ 
+-	if (!stream || stream->ep->state == BT_BAP_STREAM_STATE_QOS)
++	if (!stream || stream->ep->state == BT_BAP_STREAM_STATE_QOS ||
++			stream->ep->state == BT_BAP_STREAM_STATE_IDLE)
+ 		return 0;
+ 
+ 	ascs_ase_rsp_success(rsp, stream->ep->id);
+-- 
+2.37.3
 
-Right, this says dev 0, func 1.
-
-dtc can check this, but IIRC it would need 'device_type = "pci";' 
-in the parent. So please add that, and verify you get a warning.
-
-Rob
