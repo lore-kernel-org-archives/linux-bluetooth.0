@@ -2,227 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB19C6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 14:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B17BC6FA83
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Sep 2022 21:12:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbiILOEQ (ORCPT
+        id S229533AbiILVMa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Sep 2022 10:04:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58570 "EHLO
+        Mon, 12 Sep 2022 17:12:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229901AbiILOEP (ORCPT
+        with ESMTP id S229588AbiILVM3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Sep 2022 10:04:15 -0400
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EE47326FE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 07:04:14 -0700 (PDT)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-127dca21a7dso23592204fac.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Sep 2022 07:04:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=V/QIXxkQeoj0l2HpxB1xcj5ov2TE5fq8uF024zW6JdQ=;
-        b=KuJN4nR5mHGpEZ+4ku+Yi7mFK27mmrECnhyXlarAr75YVdG28VYQp+xqiYgSvdT7nK
-         s7bkzu02Ki4LyHAKcyIYFJuO3t88dP9FL3s+9lHhPJonR5ZIbJE4oOd3XqJh5xqaCRR8
-         TbRgkesCg/9pIHLdpmZ4dQ7/C+yjLzfbuAyP8wUdeGFRvZJPy+/8ai8F+tgW7h/ahBbS
-         DfOp05d9j4Iz/6/p8D+tqxMYEzERJhOKnwl9/4FZqS4quLZu4UlrkUv7LXbK43vJ4nKi
-         qcoWm43+bHI5q0u2oiXeBy6+MrKGQWSg44+LhJHAFPxIR8CC1jLUJHUCGACksA62eSQr
-         oHKA==
+        Mon, 12 Sep 2022 17:12:29 -0400
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930A040565;
+        Mon, 12 Sep 2022 14:12:28 -0700 (PDT)
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-1280590722dso26857805fac.1;
+        Mon, 12 Sep 2022 14:12:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=V/QIXxkQeoj0l2HpxB1xcj5ov2TE5fq8uF024zW6JdQ=;
-        b=MqjRBVgDN8SSthdKdlZ9Yt4VwskpQTGj/T4aROCHxxV9ZPNJq0QXEUeU+pQj7m53Bf
-         0QV1p5Sjszb+M1GKtSnXOAhmXCFuV9itGsTRsa6w25vHAlhN9H3ypDVsynitXxD4H8oH
-         S5BQQBLp4UiVokmfZocxQJ3fOPgtKsl9MdtPFdqaZTIhB9pJeGdvvr4U5YWM+dg9VQEW
-         iqEoqLTQ8zXNyqAEsFs4H689hNzatj7cxQ7Qdt0mYzkTF9d84CLM5oyjkXZf5t6rFH5C
-         7cjlZHCH/LvbmOlIhFJwgzD7FWbTlEL6A7Y+Q8OExRcEpRUpGsCj+xgu8gGcGlmKiwma
-         bHqQ==
-X-Gm-Message-State: ACgBeo22S5ezhNh4w/GoMxoAnysEiABFwpmhlJnC3QaP6Fe/NH2dO5VR
-        tOLjnplLHI/Oxrp0awSoY+VjbdFkDWQ=
-X-Google-Smtp-Source: AA6agR6atlVBwRrzBOPvMfB9ci6r+4msZn8FjLMz+ipPHOzvDLRHSYgnyYy10tbJfwNIKxw1BQZdVw==
-X-Received: by 2002:a05:6808:f89:b0:344:cab1:14e9 with SMTP id o9-20020a0568080f8900b00344cab114e9mr9414180oiw.82.1662991452941;
-        Mon, 12 Sep 2022 07:04:12 -0700 (PDT)
-Received: from [172.17.0.2] ([70.37.99.212])
-        by smtp.gmail.com with ESMTPSA id p43-20020a05687056ab00b0010bf07976c9sm5599988oao.41.2022.09.12.07.04.11
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=Nip0DqpF4pFkRZH+cZCKwsl/yHMaJf5IoaaXn/QNxSk=;
+        b=EA4/lT4fZgdAFSZckHI4+WzZzlAqPld7jfIcIyfTEF5Vyuc32sAKeWzHVFNTIym76C
+         OQ7zXTyo5JRzQq6CkpbNUU95A2SSV4aFMcXfh8TX0Jb18nC+T4hBZHetMBOAspQKZW1b
+         aVyCwH9j0+W+mwTvKuCzFOCn5WqaoIyLORwU+z+EreHtcdZIBbs2ZTYwF2EEHDQ/yknO
+         B2zQYzsCSkCcrmpKc08gf9QnIR/sf9YW6VXYkH2lg/gv9gaUJRoRtxmukjQ5wAKRx84I
+         pfu9ndrNScM0AHoBzNH4ldagIbL9dAuwomLLcI/Lj9Nh8G/gOi9Hs+nH7yGT0mzT4nDT
+         7HFw==
+X-Gm-Message-State: ACgBeo0KbgysU3Sm/SoPNiErJpp9BLKWj4Ba+qm7T7pdgCSxMtBTFECU
+        XkNi7cLhZFOG7tnLPL/mtQ==
+X-Google-Smtp-Source: AA6agR7BL/CQtAyYvQvcr+vIkRvAqs7VKLr+Xu8UpOBsWQGAV67Cg2TMBwDDp3CR4aFgS7C2yCTYNw==
+X-Received: by 2002:a05:6808:1996:b0:34f:c809:e298 with SMTP id bj22-20020a056808199600b0034fc809e298mr128276oib.184.1663017147764;
+        Mon, 12 Sep 2022 14:12:27 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id c186-20020acab3c3000000b0034484c532c7sm4421093oif.32.2022.09.12.14.12.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Sep 2022 07:04:12 -0700 (PDT)
-Message-ID: <631f3c5c.050a0220.3a4e9.d86a@mx.google.com>
-Date:   Mon, 12 Sep 2022 07:04:12 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9052300305721752183=="
+        Mon, 12 Sep 2022 14:12:27 -0700 (PDT)
+Received: (nullmailer pid 1872059 invoked by uid 1000);
+        Mon, 12 Sep 2022 21:12:26 -0000
+Date:   Mon, 12 Sep 2022 16:12:26 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Sven Peter <sven@svenpeter.dev>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] dt-bindings: net: Add Broadcom BCM4377 family
+ PCIe Bluetooth
+Message-ID: <20220912211226.GA1847448-robh@kernel.org>
+References: <20220907170935.11757-1-sven@svenpeter.dev>
+ <20220907170935.11757-3-sven@svenpeter.dev>
+ <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
-Subject: RE: Volume Control Profile
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220912124657.404551-2-sathish.narasimman@intel.com>
-References: <20220912124657.404551-2-sathish.narasimman@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============9052300305721752183==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, Sep 08, 2022 at 01:19:17PM +0200, Krzysztof Kozlowski wrote:
+> On 07/09/2022 19:09, Sven Peter wrote:
+> > These chips are combined Wi-Fi/Bluetooth radios which expose a
+> > PCI subfunction for the Bluetooth part.
+> > They are found in Apple machines such as the x86 models with the T2
+> > chip or the arm64 models with the M1 or M2 chips.
+> > 
+> > Signed-off-by: Sven Peter <sven@svenpeter.dev>
+> > ---
+> > changes from v1:
+> >   - added apple,* pattern to brcm,board-type
+> >   - s/PCI/PCIe/
+> >   - fixed 1st reg cell inside the example to not contain the bus number
+> > 
+> > .../bindings/net/brcm,bcm4377-bluetooth.yaml  | 78 +++++++++++++++++++
+> >  MAINTAINERS                                   |  1 +
+> >  2 files changed, 79 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+> > new file mode 100644
+> > index 000000000000..fb851f8e6bcb
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/brcm,bcm4377-bluetooth.yaml
+> > @@ -0,0 +1,78 @@
+> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/brcm,bcm4377-bluetooth.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: Broadcom BCM4377 family PCIe Bluetooth Chips
+> > +
+> > +allOf:
+> > +  - $ref: bluetooth-controller.yaml#
+> 
+> Put it before properties (so after description).
+> 
+> > +
+> > +maintainers:
+> > +  - Sven Peter <sven@svenpeter.dev>
+> > +
+> > +description:
+> > +  This binding describes Broadcom BCM4377 family PCIe-attached bluetooth chips
+> > +  usually found in Apple machines. The Wi-Fi part of the chip is described in
+> > +  bindings/net/wireless/brcm,bcm4329-fmac.yaml.
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - pci14e4,5fa0 # BCM4377
+> > +      - pci14e4,5f69 # BCM4378
+> > +      - pci14e4,5f71 # BCM4387
+> > +
+> > +  reg:
+> > +    description: PCI device identifier.
+> 
+> maxItems: X
 
-This is automated email and please do not reply to this email!
+And drop the description.
 
-Dear submitter,
+> 
+> > +
+> > +  brcm,board-type:
+> > +    $ref: /schemas/types.yaml#/definitions/string
+> > +    description: Board type of the Bluetooth chip. This is used to decouple
+> > +      the overall system board from the Bluetooth module and used to construct
+> > +      firmware and calibration data filenames.
+> > +      On Apple platforms, this should be the Apple module-instance codename
+> > +      prefixed by "apple,", e.g. "apple,atlantisb".
+> > +    pattern: '^apple,.*'
+> > +
+> > +  brcm,taurus-cal-blob:
+> > +    $ref: /schemas/types.yaml#/definitions/uint8-array
+> > +    description: A per-device calibration blob for the Bluetooth radio. This
+> > +      should be filled in by the bootloader from platform configuration
+> > +      data, if necessary, and will be uploaded to the device.
+> > +      This blob is used if the chip stepping of the Bluetooth module does not
+> > +      support beamforming.
+> 
+> Isn't it:
+> s/beamforming/beam forming/
+> ?
+> 
+> > +
+> > +  brcm,taurus-bf-cal-blob:
+> > +    $ref: /schemas/types.yaml#/definitions/uint8-array
+> > +    description: A per-device calibration blob for the Bluetooth radio. This
+> > +      should be filled in by the bootloader from platform configuration
+> > +      data, if necessary, and will be uploaded to the device.
+> > +      This blob is used if the chip stepping of the Bluetooth module supports
+> > +      beamforming.
+> 
+> Same here.
+> 
+> > +
+> > +  local-bd-address: true
+> > +
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +  - local-bd-address
+> > +  - brcm,board-type
+> > +
+> > +additionalProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    pcie {
+> > +      #address-cells = <3>;
+> > +      #size-cells = <2>;
+> > +
+> > +      bluetooth@0,1 {
+> 
+> The unit address seems to be different than reg.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676220
+Right, this says dev 0, func 1.
 
----Test result---
+dtc can check this, but IIRC it would need 'device_type = "pci";' 
+in the parent. So please add that, and verify you get a warning.
 
-Test Summary:
-CheckPatch                    FAIL      5.79 seconds
-GitLint                       PASS      3.00 seconds
-Prep - Setup ELL              PASS      31.92 seconds
-Build - Prep                  PASS      0.90 seconds
-Build - Configure             PASS      9.87 seconds
-Build - Make                  PASS      1165.82 seconds
-Make Check                    PASS      12.98 seconds
-Make Check w/Valgrind         PASS      355.07 seconds
-Make Distcheck                PASS      306.75 seconds
-Build w/ext ELL - Configure   PASS      10.50 seconds
-Build w/ext ELL - Make        PASS      107.90 seconds
-Incremental Build w/ patches  PASS      510.36 seconds
-Scan Build                    WARNING   1238.26 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,2/4] shared/vcp: Add initial code for handling VCP
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#393: FILE: src/shared/vcp.c:302:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#425: FILE: src/shared/vcp.c:334:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#458: FILE: src/shared/vcp.c:367:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#491: FILE: src/shared/vcp.c:400:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#523: FILE: src/shared/vcp.c:432:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#555: FILE: src/shared/vcp.c:464:
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-
-WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-#1051: FILE: src/shared/vcp.c:960:
-+						value_handle, vcp_vstate_register,
-
-WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-#1080: FILE: src/shared/vcp.c:989:
-+						value_handle, vcp_vflag_register,
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#1146: FILE: src/shared/vcp.h:16:
-+#define __packed __attribute__((packed))
-
-/github/workspace/src/12973630.patch total: 0 errors, 9 warnings, 1098 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12973630.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-[BlueZ,3/4] profiles: Add initial code for vcp plugin
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#395: FILE: profiles/audio/vcp.c:288:
-+static unsigned int vcp_id = 0;
-
-/github/workspace/src/12973633.patch total: 1 errors, 0 warnings, 330 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12973633.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-src/shared/vcp.c:288:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:294:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-src/shared/vcp.c:320:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:326:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-src/shared/vcp.c:352:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:358:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-src/shared/vcp.c:385:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:391:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-src/shared/vcp.c:418:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:424:29: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (req->change_counter != vstate->counter) {
-                                   ^~~~~~~~~~~~~~~
-src/shared/vcp.c:450:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:456:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-src/shared/vcp.c:482:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-        vstate = vdb->vcs->vstate;
-                 ^~~~~~~~
-src/shared/vcp.c:488:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-        if (*change_counter != vstate->counter) {
-                               ^~~~~~~~~~~~~~~
-14 warnings generated.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============9052300305721752183==--
+Rob
