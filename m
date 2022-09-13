@@ -2,112 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B45C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 23:12:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC06ECAAD8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 23:32:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229607AbiIMXMC (ORCPT
+        id S229456AbiIMXcD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Sep 2022 19:12:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54318 "EHLO
+        Tue, 13 Sep 2022 19:32:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiIMXMC (ORCPT
+        with ESMTP id S229459AbiIMXcC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Sep 2022 19:12:02 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A4070E47
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:12:00 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id j6-20020a17090a694600b00200bba67dadso12737750pjm.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:12:00 -0700 (PDT)
+        Tue, 13 Sep 2022 19:32:02 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D0171BD7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:32:00 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id c2so13390914plo.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:32:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=EBs6c/rDd5/uOSpMoD+z4WbttoOQcO+F/g20BgLpb24=;
-        b=av8j3vxKC5uEhwNfQkyBWvQT3ugVMw3rDhBw1VsgtmtyHkE7GCtTdc2uI0i/1Z6ky7
-         BVAUZwEKpta4AnPV3hOTzgbrc0psECt14aG1Z9KKvcTdWmAej02dBLJJcpgwL5XlVCtk
-         rL+bEzyaZmD+HTKb69vrUCV4QFfcVZOyKPm9bVWAFWytYDcfDfrkZUDrf//QKBpsXkhM
-         TTJzxLRZrSK3XsykoUDDRm4Qg+JujNSJvGK8O4jtwqMLgqHb5hzmh2MTyJTJO0nRQQfb
-         wxnkVOke30LbWKB6tVBjNUwwT8uPzcaZ1ZzBqKmpKjnKrxBNgWIcTTuvtc/hlG+H6iic
-         IYwg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date;
+        bh=Sth9s6jFuAgyrkcRmgl3qDDWKNFIt5yzW79ugW82O8E=;
+        b=b1TAbHUvUSmMva7ETzGd/2dJOh1gjLOnBBiy53mS4RC5YIDyvk5XynEEZimYjcDQeb
+         5rlAQBe6s0hptP3ECuD0mJKyql7DzKq4MDut8LI20Nz2CFQXp+dH+31sOzdxOsxmtZEM
+         O7isnHd9ZIdfPmIg3UvZgINU9PE4w9SLYu/emKrO23fNdSiSiWSSMt8OtzL6LXR/Vkd0
+         pWM3u4/kLdEoA/ljeFycPmD6+083QkUDHWOcamqQAAfVJeOQtgmrP2QvBSzlaF0PwvuP
+         Sis7LvXBCpj2pa5CmKC1JXktp4bp81aKbTfpWDirz3PXQ9wIrIA/Hk25uq/CBwAWBnTB
+         smJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=EBs6c/rDd5/uOSpMoD+z4WbttoOQcO+F/g20BgLpb24=;
-        b=4a9D0BIeDB04VBHRcHLB0XxvOiWbiY6QOl1xb8WTmKt57Xf7ZK4uijsKu7r/jd5evH
-         M565zf9UEdyLofLwcyPbAcmaXN+lenRfvj5t703K4wAkKVUexRGBY2Y5yzVJ0Npj0FlF
-         G8Fos6BYEbq6JmGaakP8cgQRmz4D0peSwbqdmhkLM4fHeL74qPwpmyn4xBAb4b56n7d1
-         ekdQOLFc7TQ0tkoLIVixm2rc80TPcQ1eqfCVQjtL4SCUh7s4aqcUYh/K9jy7a3l0veNv
-         oHrGnPxdWlu0Mh8oVQR041AqiJ0zWuz0dyd2b6HivSyywCxGxiqlDmLCFSxzIMeID971
-         d1jg==
-X-Gm-Message-State: ACrzQf36IkT9pFoPh2Jk6WjE0NVqFAo/xnHsfrvGrFgquPC2RkpDvcBQ
-        LYFJpRgVJyOBYc2styAheGBWPGSQ17g=
-X-Google-Smtp-Source: AMsMyM5gDD7vPfHyx/tZY8nmKEWNT6zPyRkk59/BZV9OLQY4NehRl7obQdSsr0G8FfnbMwM5zkzpPQ==
-X-Received: by 2002:a17:90a:318f:b0:1fa:a374:f565 with SMTP id j15-20020a17090a318f00b001faa374f565mr1596352pjb.146.1663110719688;
-        Tue, 13 Sep 2022 16:11:59 -0700 (PDT)
-Received: from [172.17.0.2] ([20.228.80.126])
-        by smtp.gmail.com with ESMTPSA id f11-20020a170902684b00b0016f057b88c9sm9007822pln.26.2022.09.13.16.11.58
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=Sth9s6jFuAgyrkcRmgl3qDDWKNFIt5yzW79ugW82O8E=;
+        b=ohFSbnAl5rkGSzSkOdLZgedQl+7cbILLZL3kzwBHvd6m14Pf2cvdUFTuoN9BghitVn
+         wSUUgLs3Xg4uMKThPxZnT3w97WJSGqa0A5xvtM450q44JT44irgjFpBPcVUjPTltdqf4
+         s9dLffU/Rcgfode4EfCkkWQhCtwdkKcXKNn82Vsxnhg949hNkwwIqAQQEkjW7qQ/f+Fa
+         YyAqdsZUxdYEF0dquIOf63wg15bDKxApfDjHcVFuDmc1sUBEuzN+nWzfqjO+lCMlKBFe
+         4KxNHEeB5ix3QgiKXicukaZzoP9P149JiJEVeEaas73i7H2qU3SSXMFt6fPP8cdvaG2U
+         l2kA==
+X-Gm-Message-State: ACrzQf0yArHDz1yqLFWFGJZYBWwuBvY2Iekd1f8SPh20b+7c9jcERFwz
+        6CMw0lyTd+PbhqK5X4tfCpbbR2RyHVzS/acs
+X-Google-Smtp-Source: AMsMyM4QxuRv+9qfrAnU34/SN0HLN2WfSM/+CahAeeIh4j/iUmeopxmtOyxH9fhBwt6oLXvgclYc5w==
+X-Received: by 2002:a17:90a:8b92:b0:202:c361:9dba with SMTP id z18-20020a17090a8b9200b00202c3619dbamr1655341pjn.62.1663111918942;
+        Tue, 13 Sep 2022 16:31:58 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id n18-20020a170903111200b00174d4fabe76sm9010599plh.214.2022.09.13.16.31.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Sep 2022 16:11:59 -0700 (PDT)
-Message-ID: <63210e3f.170a0220.7dfaf.038b@mx.google.com>
-Date:   Tue, 13 Sep 2022 16:11:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3819566134973533406=="
+        Tue, 13 Sep 2022 16:31:58 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
+Date:   Tue, 13 Sep 2022 16:31:57 -0700
+Message-Id: <20220913233157.526041-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, jiangzp@google.com
-Subject: RE: Bluetooth: hci_sync: allow advertising during active scan without privacy
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220913150420.kernel.v1.1.I54824fdfb8de716a1d7d9eccecbbfb6e45b116a8@changeid>
-References: <20220913150420.kernel.v1.1.I54824fdfb8de716a1d7d9eccecbbfb6e45b116a8@changeid>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3819566134973533406==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Due to change to switch to use lock_sock inside rfcomm_sk_state_change
+the socket shutdown/release procedure can cause a deadlock:
 
-Dear submitter,
+    rfcomm_sock_shutdown():
+      lock_sock();
+      __rfcomm_sock_close():
+        rfcomm_dlc_close():
+          __rfcomm_dlc_close():
+            rfcomm_dlc_lock();
+            rfcomm_sk_state_change():
+              lock_sock();
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676705
+To fix this when the call __rfcomm_sock_close is now done without
+holding the lock_sock since rfcomm_dlc_lock exists to protect
+the dlc data there is no need to use lock_sock in that code path.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.94 seconds
-GitLint                       FAIL      0.47 seconds
-SubjectPrefix                 PASS      0.31 seconds
-BuildKernel                   PASS      40.55 seconds
-BuildKernel32                 PASS      35.44 seconds
-Incremental Build with patchesPASS      52.30 seconds
-TestRunner: Setup             PASS      604.47 seconds
-TestRunner: l2cap-tester      PASS      19.00 seconds
-TestRunner: iso-tester        PASS      18.39 seconds
-TestRunner: bnep-tester       PASS      7.23 seconds
-TestRunner: mgmt-tester       PASS      115.07 seconds
-TestRunner: rfcomm-tester     PASS      11.59 seconds
-TestRunner: sco-tester        PASS      10.92 seconds
-TestRunner: smp-tester        PASS      10.75 seconds
-TestRunner: userchan-tester   PASS      7.73 seconds
-
-Details
-##############################
-Test: GitLint - FAIL - 0.47 seconds
-Run gitlint with rule in .gitlint
-[kernel,v1,1/1] Bluetooth: hci_sync: allow advertising during active scan without privacy
-1: T1 Title exceeds max length (89>80): "[kernel,v1,1/1] Bluetooth: hci_sync: allow advertising during active scan without privacy"
-
-
-
-
+Link: https://lore.kernel.org/all/CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com/
+Fixes: b7ce436a5d79 ("Bluetooth: switch to lock_sock in RFCOMM")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/rfcomm/sock.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 4bf4ea6cbb5e..21e24da4847f 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -902,7 +902,10 @@ static int rfcomm_sock_shutdown(struct socket *sock, int how)
+ 	lock_sock(sk);
+ 	if (!sk->sk_shutdown) {
+ 		sk->sk_shutdown = SHUTDOWN_MASK;
++
++		release_sock(sk);
+ 		__rfcomm_sock_close(sk);
++		lock_sock(sk);
+ 
+ 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
+ 		    !(current->flags & PF_EXITING))
+-- 
+2.37.3
 
---===============3819566134973533406==--
