@@ -2,194 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 219E8C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 10:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F43C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 10:57:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbiIMKDj (ORCPT
+        id S231799AbiIMK5M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Sep 2022 06:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51534 "EHLO
+        Tue, 13 Sep 2022 06:57:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38220 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbiIMKDW (ORCPT
+        with ESMTP id S230400AbiIMK5J (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Sep 2022 06:03:22 -0400
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 457535E642;
-        Tue, 13 Sep 2022 03:03:15 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 28DA2UUB0014153, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36504.realtek.com.tw[172.21.6.27])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 28DA2UUB0014153
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-        Tue, 13 Sep 2022 18:02:30 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36504.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 13 Sep 2022 18:02:51 +0800
-Received: from localhost.localdomain (172.21.132.192) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Tue, 13 Sep 2022 18:02:50 +0800
-From:   <hildawu@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <apusaka@chromium.org>, <yinghsu@chromium.org>,
-        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
-        <kidman@realtek.com>
-Subject: [PATCH v2 2/3] Bluetooth: btusb: Workaround for spotty SCO quality
-Date:   Tue, 13 Sep 2022 18:02:43 +0800
-Message-ID: <20220913100244.23660-3-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220913100244.23660-1-hildawu@realtek.com>
-References: <20220913100244.23660-1-hildawu@realtek.com>
+        Tue, 13 Sep 2022 06:57:09 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0355F104;
+        Tue, 13 Sep 2022 03:57:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663066628; x=1694602628;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=11l4HL2ZNwzx83esXqcj5RkTzUWCjv48wB1HSJzPoHY=;
+  b=GW0UjShIQ2AMIW24MNI2aHLFJqN543fiz/OZYTpQp3D0gku6YpKilBk7
+   M8GoaHskPjD7oK/eOVrXM2XG40T/2AVg4VWOFVWYlxPbKgXV8eHdCYrO/
+   u6Gahay9Nn4ANB4ZoCqxjPRgHiPyds+5JmEBJZvmcVsGdzTdL8CTpuKbh
+   GrQrKBrlyZzUG/6OX5EyinQIkin6JwrXkoUfAvci4x7694duMzLKLnouF
+   yxT1MR12oApXvmw3zjK1y+eaDZspwP+lbag6wE1xNgJ6953o41MB4jyUr
+   pCc6RS1J46ri7q+Quz+fzacfB6wMVmK8PJoJ3fTHq2I1YxjvDH0rMdQoa
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10468"; a="277839559"
+X-IronPort-AV: E=Sophos;i="5.93,312,1654585200"; 
+   d="scan'208";a="277839559"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2022 03:57:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,312,1654585200"; 
+   d="scan'208";a="861511474"
+Received: from lkp-server02.sh.intel.com (HELO 4011df4f4fd3) ([10.239.97.151])
+  by fmsmga006.fm.intel.com with ESMTP; 13 Sep 2022 03:57:01 -0700
+Received: from kbuild by 4011df4f4fd3 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oY3bB-0003WI-0V;
+        Tue, 13 Sep 2022 10:57:01 +0000
+Date:   Tue, 13 Sep 2022 18:56:32 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        sean.wang@mediatek.com, Soul.Huang@mediatek.com,
+        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
+        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
+        km.lin@mediatek.com, robin.chiu@mediatek.com,
+        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
+        posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        shawnku@google.com, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Jing Cai <jing.cai@mediatek.com>
+Subject: Re: [PATCH 4/4] Bluetooth: btusb: mediatek: add MediaTek devcoredump
+ support
+Message-ID: <202209131807.OuwXBmKi-lkp@intel.com>
+References: <540fc6d93481e72e18b51f82f022ab34d57d5caa.1663020936.git.objelf@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.192]
-X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/13/2022 08:01:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzkvMTMgpFekyCAwNzozMzowMA==?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36504.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <540fc6d93481e72e18b51f82f022ab34d57d5caa.1663020936.git.objelf@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hilda Wu <hildawu@realtek.com>
+Hi,
 
-When streaming HFP, once a few minutes a brief pause in audio can be
-heard on some platform with Realtek Bluetooth. When the issue occurs,
-the system will see the SCO packet for unknown connection handle messages.
+Thank you for the patch! Yet something to improve:
 
-Note: This issue affects (e)SCO only, does not affect ACLs.
-Because the duplicate packet causing the problem only occurs in Realtek BT.
-This is to filter out duplicate packet for avoiding influence.
+[auto build test ERROR on bluetooth/master]
+[also build test ERROR on bluetooth-next/master linus/master v6.0-rc5 next-20220912]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
----
-Changes in v2:
- - Seperate commits for functions
----
----
- drivers/bluetooth/btrtl.c | 28 ++++++++++++++++++++++++++++
- drivers/bluetooth/btrtl.h |  8 ++++++++
- drivers/bluetooth/btusb.c | 14 ++++++++++++++
- 3 files changed, 50 insertions(+)
+url:    https://github.com/intel-lab-lkp/linux/commits/sean-wang-mediatek-com/Bluetooth-btusb-mediatek-use-readx_poll_timeout-instead-of-open-coding/20220913-062200
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+config: i386-randconfig-a016-20220912 (https://download.01.org/0day-ci/archive/20220913/202209131807.OuwXBmKi-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/d478461e2fd5fdd8d505c00c7864a421170a54bb
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review sean-wang-mediatek-com/Bluetooth-btusb-mediatek-use-readx_poll_timeout-instead-of-open-coding/20220913-062200
+        git checkout d478461e2fd5fdd8d505c00c7864a421170a54bb
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash drivers/bluetooth/
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index fb52313a1d45..15223b3ed94d 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -781,6 +781,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
- 	case CHIP_ID_8852C:
- 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
-+		btrealtek_set_flag(hdev, REALTEK_WBS_FILTER);
- 		hci_set_aosp_capable(hdev);
- 		break;
- 	default:
-@@ -937,6 +938,33 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
- }
- EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
- 
-+int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *p, int len,
-+			u16 wMaxPacketSize)
-+{
-+	u8 *prev;
-+
-+	if (pos >= HCI_SCO_HDR_SIZE && pos >= wMaxPacketSize &&
-+	    len == wMaxPacketSize && !(pos % wMaxPacketSize) &&
-+	    wMaxPacketSize >= 10 && p[0] == data[0] && p[1] == data[1]) {
-+		prev = data + (pos - wMaxPacketSize);
-+
-+		/* Detect the sco data of usb isoc pkt duplication. */
-+		if (!memcmp(p + 2, prev + 2, 8))
-+			return -EILSEQ;
-+
-+		if (wMaxPacketSize >= 12 &&
-+		    p[2] == prev[6] && p[3] == prev[7] &&
-+		    p[4] == prev[4] && p[5] == prev[5] &&
-+		    p[6] == prev[10] && p[7] == prev[11] &&
-+		    p[8] == prev[8] && p[9] == prev[9]) {
-+			return -EILSEQ;
-+		}
-+	}
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btrtl_usb_recv_isoc);
-+
- MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
- MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index e2c99684799a..79e93a8b229f 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -84,6 +84,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
- 			    struct btrtl_device_info *btrtl_dev,
- 			    unsigned int *controller_baudrate,
- 			    u32 *device_baudrate, bool *flow_control);
-+int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-+				u16 wMaxPacketSize);
- 
- #else
- 
-@@ -127,4 +129,10 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
- 	return -ENOENT;
- }
- 
-+static inline int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-+				  u16 wMaxPacketSize)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4c3aed89ff05..8e595e03655a 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -961,6 +961,7 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
- 	struct sk_buff *skb;
- 	unsigned long flags;
- 	int err = 0;
-+	u16 wMaxPacketSize = le16_to_cpu(data->isoc_rx_ep->wMaxPacketSize);
- 
- 	spin_lock_irqsave(&data->rxlock, flags);
- 	skb = data->sco_skb;
-@@ -980,6 +981,19 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
- 		}
- 
- 		len = min_t(uint, hci_skb_expect(skb), count);
-+
-+		/* Gaps in audio could be heard while streaming WBS using USB
-+		 * alt settings 3 on some platforms, since this is only used
-+		 * with RTK chips so let vendor function detect it.
-+		 */
-+		if (test_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags) &&
-+			btrealtek_test_flag(data->hdev, REALTEK_WBS_FILTER)) {
-+			err = btrtl_usb_recv_isoc(skb->len, skb->data, buffer,
-+							len, wMaxPacketSize);
-+			if (err)
-+				break;
-+		}
-+
- 		skb_put_data(skb, buffer, len);
- 
- 		count -= len;
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> drivers/bluetooth/btmtk.c:111:7: error: use of undeclared identifier 'HCI_DEVCOREDUMP_ACTIVE'; did you mean 'BTMTK_COREDUMP_ACTIVE'?
+           case HCI_DEVCOREDUMP_ACTIVE:
+                ^~~~~~~~~~~~~~~~~~~~~~
+                BTMTK_COREDUMP_ACTIVE
+   drivers/bluetooth/btmtk.c:27:2: note: 'BTMTK_COREDUMP_ACTIVE' declared here
+           BTMTK_COREDUMP_ACTIVE,
+           ^
+>> drivers/bluetooth/btmtk.c:114:7: error: use of undeclared identifier 'HCI_DEVCOREDUMP_TIMEOUT'
+           case HCI_DEVCOREDUMP_TIMEOUT:
+                ^
+>> drivers/bluetooth/btmtk.c:115:7: error: use of undeclared identifier 'HCI_DEVCOREDUMP_ABORT'
+           case HCI_DEVCOREDUMP_ABORT:
+                ^
+>> drivers/bluetooth/btmtk.c:116:7: error: use of undeclared identifier 'HCI_DEVCOREDUMP_DONE'
+           case HCI_DEVCOREDUMP_DONE:
+                ^
+>> drivers/bluetooth/btmtk.c:376:2: error: implicit declaration of function 'hci_devcoredump_register' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+           hci_devcoredump_register(hdev, btmtk_coredump, btmtk_coredump_hdr,
+           ^
+>> drivers/bluetooth/btmtk.c:393:9: error: implicit declaration of function 'hci_devcoredump_init' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+                   err = hci_devcoredump_init(hdev, 1024000);
+                         ^
+>> drivers/bluetooth/btmtk.c:397:32: error: no member named 'dump' in 'struct hci_dev'
+                   schedule_delayed_work(&hdev->dump.dump_timeout,
+                                          ~~~~  ^
+>> drivers/bluetooth/btmtk.c:402:9: error: implicit declaration of function 'hci_devcoredump_append' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+                   err = hci_devcoredump_append(hdev, skb);
+                         ^
+   drivers/bluetooth/btmtk.c:402:9: note: did you mean 'hci_devcoredump_init'?
+   drivers/bluetooth/btmtk.c:393:9: note: 'hci_devcoredump_init' declared here
+                   err = hci_devcoredump_init(hdev, 1024000);
+                         ^
+>> drivers/bluetooth/btmtk.c:409:4: error: implicit declaration of function 'hci_devcoredump_complete' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
+                           hci_devcoredump_complete(hdev);
+                           ^
+   drivers/bluetooth/btmtk.c:409:4: note: did you mean 'hci_devcoredump_append'?
+   drivers/bluetooth/btmtk.c:402:9: note: 'hci_devcoredump_append' declared here
+                   err = hci_devcoredump_append(hdev, skb);
+                         ^
+   9 errors generated.
+
+
+vim +111 drivers/bluetooth/btmtk.c
+
+   107	
+   108	static void btmtk_coredump_notify(struct hci_dev *hdev, int state)
+   109	{
+   110		switch (state) {
+ > 111		case HCI_DEVCOREDUMP_ACTIVE:
+   112			coredump_info.state = BTMTK_COREDUMP_ACTIVE;
+   113			break;
+ > 114		case HCI_DEVCOREDUMP_TIMEOUT:
+ > 115		case HCI_DEVCOREDUMP_ABORT:
+ > 116		case HCI_DEVCOREDUMP_DONE:
+   117			coredump_info.state = BTMTK_COREDUMP_INIT;
+   118			btmtk_reset_sync(coredump_info.hdev);
+   119			break;
+   120		}
+   121	}
+   122	
+
 -- 
-2.17.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
