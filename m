@@ -2,121 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5854C6FA8A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 10:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788FFC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 11:11:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiIMK5N (ORCPT
+        id S231207AbiIMLLP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Sep 2022 06:57:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38342 "EHLO
+        Tue, 13 Sep 2022 07:11:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231247AbiIMK5J (ORCPT
+        with ESMTP id S230376AbiIMLLO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Sep 2022 06:57:09 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777F35F107;
-        Tue, 13 Sep 2022 03:57:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663066628; x=1694602628;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zjp/S/AcGVNBiOd4qsqoHOGHjb2vjSK71vPXyphH3wA=;
-  b=INteE/SjZNd7WpnPZE2+ykdeZsaeF4sYcRj5jc7OGPf2fihiVDwesxAU
-   FGi2sM11Oquv5dAfR04rd9QzHe6kii1uiTXThec4Zp0Brs/O09wxhZic0
-   7oMmrOe9u5C5gn5GzZH/YyzbBfu/SHF/QccrzlLZJnbHzwPrgBpW5+HD1
-   M/MzYUi4m8+Nvf4rYr+c5x4Fms55S5WqcgTYXxQczglpa3+xvcoNLfu7Z
-   5dxDtq3v3VSJfCm6ewtVBsa+LVRkzb/pu0Pfj84gIXt72HRrfaQWucyD7
-   CgebGIFOCfshxAWX4R5ynNGAdtGwedDbEVLAX++DYl7IjnSzvtpR4klaO
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10468"; a="277839564"
-X-IronPort-AV: E=Sophos;i="5.93,312,1654585200"; 
-   d="scan'208";a="277839564"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Sep 2022 03:57:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,312,1654585200"; 
-   d="scan'208";a="742124384"
-Received: from lkp-server02.sh.intel.com (HELO 4011df4f4fd3) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 13 Sep 2022 03:57:01 -0700
-Received: from kbuild by 4011df4f4fd3 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oY3bB-0003WB-0K;
-        Tue, 13 Sep 2022 10:57:01 +0000
-Date:   Tue, 13 Sep 2022 18:56:30 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     sean.wang@mediatek.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     kbuild-all@lists.01.org, sean.wang@mediatek.com,
-        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
-        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
-        Deren.Wu@mediatek.com, km.lin@mediatek.com,
-        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
-        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
-        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
-        abhishekpandit@google.com, michaelfsun@google.com,
-        abhishekpandit@chromium.org, mcchou@chromium.org,
-        shawnku@google.com, linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Jing Cai <jing.cai@mediatek.com>
-Subject: Re: [PATCH 4/4] Bluetooth: btusb: mediatek: add MediaTek devcoredump
- support
-Message-ID: <202209131812.1EOjfRYn-lkp@intel.com>
-References: <540fc6d93481e72e18b51f82f022ab34d57d5caa.1663020936.git.objelf@gmail.com>
+        Tue, 13 Sep 2022 07:11:14 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7BE4F1B6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 04:11:13 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id y15so6025972ilq.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 04:11:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=AtL4nH42b1YDkXam35FwAVT8wGD9yLpZUCvbIDRzBOA=;
+        b=EJeCOgwGK8KsJY6u3JD7unQpLsvkIfV7amvOsJM4kaCwYBN/FAj3UeISUmRQur7X8J
+         lwnN4RMisj18qRvuCP073mi9gAewdCdg4FfQPh0nPXJFhhZbVfbVBxvZdvpiECMGU3mn
+         2ZlmR39kU5NNr2scl83HX5RAQ5WIAXnAh0UTd9Vmh1GsDtB+VP592E3gcHbndnZBgRGE
+         8bLBa/rAdWaATE6t5wMrlZaWFjL02gjVuwHFKSy53n7yGE7WAXkl7DsZcMvWhzP42yib
+         VSq3lj7xtyIWYJH96EBLgxdIdSXdk48HVt1dhJYBbSinrTs/0rNb9C0BulZKuieMWqLT
+         XWsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=AtL4nH42b1YDkXam35FwAVT8wGD9yLpZUCvbIDRzBOA=;
+        b=u/qcS7kXIgOTOUaGtfna2l8QcKLhUkIF5lWukkL5d9rKQFqX7BUUOW91wVGDuRgyda
+         AvQ7AcjZXTYef4DuB9UD9Pygmq1ldDdG2dtQrsuKvA5YC/ERyQGUIykTqzAn7Cl6gSAw
+         cRho32tU3/npcDw0BnFDQCM0mrF1H8SN5dgvYVTp2/fkUI529+ssj1w9d+YghZUbr7GU
+         D+eVNkEQg2nNg44ny6WJkA5XOifhShwKR7eLlPnSE5eC+RYTZmRIR4px9bnDxwHEHkVP
+         /ifjtDEYpJM7evnkjZVcU10WPMrIIpPNhZ5RJnx7bxkETH/KMS4rWzBAALiXuV2SXVHw
+         HHrA==
+X-Gm-Message-State: ACgBeo2SCvm/i3KHWwPizvcodt0rW7N0K6gW67bUfJuQSVMvnpzJqMFW
+        NohxqiyQ39Un2h69RaaBdZkBSl0hWZc=
+X-Google-Smtp-Source: AA6agR7GZzZl3iQz20nntRlox0LMpvbI1eUSKybraJcTis6FNhSZS5ZgwYBVO81Ij4ofIvQdKXsN2Q==
+X-Received: by 2002:a05:6e02:dc3:b0:2ea:d7a4:a5f with SMTP id l3-20020a056e020dc300b002ead7a40a5fmr12044672ilj.308.1663067472035;
+        Tue, 13 Sep 2022 04:11:12 -0700 (PDT)
+Received: from [172.17.0.2] ([168.61.147.86])
+        by smtp.gmail.com with ESMTPSA id v16-20020a92cd50000000b002e900a19516sm4934569ilq.38.2022.09.13.04.11.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Sep 2022 04:11:11 -0700 (PDT)
+Message-ID: <6320654f.920a0220.76fde.42f0@mx.google.com>
+Date:   Tue, 13 Sep 2022 04:11:11 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4839441262261072539=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <540fc6d93481e72e18b51f82f022ab34d57d5caa.1663020936.git.objelf@gmail.com>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hildawu@realtek.com
+Subject: RE: Bluetooth: Add btrealtek data struct and improve SCO sound quality of RTK chips
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220913100244.23660-2-hildawu@realtek.com>
+References: <20220913100244.23660-2-hildawu@realtek.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============4839441262261072539==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Thank you for the patch! Perhaps something to improve:
+This is automated email and please do not reply to this email!
 
-[auto build test WARNING on bluetooth/master]
-[also build test WARNING on bluetooth-next/master linus/master v6.0-rc5 next-20220912]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Dear submitter,
 
-url:    https://github.com/intel-lab-lkp/linux/commits/sean-wang-mediatek-com/Bluetooth-btusb-mediatek-use-readx_poll_timeout-instead-of-open-coding/20220913-062200
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-config: m68k-randconfig-r033-20220911 (https://download.01.org/0day-ci/archive/20220913/202209131812.1EOjfRYn-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/d478461e2fd5fdd8d505c00c7864a421170a54bb
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review sean-wang-mediatek-com/Bluetooth-btusb-mediatek-use-readx_poll_timeout-instead-of-open-coding/20220913-062200
-        git checkout d478461e2fd5fdd8d505c00c7864a421170a54bb
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash drivers/
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676514
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+---Test result---
 
-All warnings (new ones prefixed by >>):
+Test Summary:
+CheckPatch                    PASS      5.12 seconds
+GitLint                       FAIL      2.46 seconds
+SubjectPrefix                 PASS      1.94 seconds
+BuildKernel                   PASS      34.34 seconds
+BuildKernel32                 PASS      30.14 seconds
+Incremental Build with patchesPASS      56.77 seconds
+TestRunner: Setup             PASS      501.76 seconds
+TestRunner: l2cap-tester      PASS      16.63 seconds
+TestRunner: iso-tester        PASS      15.66 seconds
+TestRunner: bnep-tester       PASS      6.21 seconds
+TestRunner: mgmt-tester       PASS      100.91 seconds
+TestRunner: rfcomm-tester     PASS      9.78 seconds
+TestRunner: sco-tester        PASS      9.30 seconds
+TestRunner: smp-tester        PASS      9.38 seconds
+TestRunner: userchan-tester   PASS      6.41 seconds
 
-   In file included from drivers/bluetooth/btusb.c:28:
->> drivers/bluetooth/btmtk.h:172:6: warning: no previous prototype for 'btmtk_register_coredump' [-Wmissing-prototypes]
-     172 | void btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, const char *name,
-         |      ^~~~~~~~~~~~~~~~~~~~~~~
+Details
+##############################
+Test: GitLint - FAIL - 2.46 seconds
+Run gitlint with rule in .gitlint
+[v2,3/3] Bluetooth: btsub: Ignore zero length of USB packets on ALT 6 for the specific chip model of Realtek devices
+1: T1 Title exceeds max length (116>80): "[v2,3/3] Bluetooth: btsub: Ignore zero length of USB packets on ALT 6 for the specific chip model of Realtek devices"
 
 
-vim +/btmtk_register_coredump +172 drivers/bluetooth/btmtk.h
 
-   171	
- > 172	void btmtk_register_coredump(struct hci_dev *hdev, u32 dev_id, const char *name,
-   173				     u32 fw_version)
-   174	{
-   175	}
-   176	
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4839441262261072539==--
