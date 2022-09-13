@@ -2,165 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6A2ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 23:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D72CC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Sep 2022 23:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229729AbiIMXdy (ORCPT
+        id S229834AbiIMXfT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Sep 2022 19:33:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50888 "EHLO
+        Tue, 13 Sep 2022 19:35:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbiIMXdx (ORCPT
+        with ESMTP id S229838AbiIMXfQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Sep 2022 19:33:53 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ED3571BD9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:33:52 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d82so13177706pfd.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Sep 2022 16:33:52 -0700 (PDT)
+        Tue, 13 Sep 2022 19:35:16 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C4E248CC;
+        Tue, 13 Sep 2022 16:35:15 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id q21so22595901lfo.0;
+        Tue, 13 Sep 2022 16:35:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date;
-        bh=cO4S3HGMCW2bmXO2A1nH9xumywBS+ZKXPEO1bh8+Hic=;
-        b=n7af0qC04QCSg7XfEE9wufuFvoxRTCLNTBngQ/eAoO6ljfGQT1VbFQ5GIPwo16ehwH
-         L+HQlFnvkFmsPiBRd2MXDXtxeKOzG7GyEODArpNAeyw2cqLfW1buQF1uYFRbshOKPbE0
-         opI8upANrvtw0f/vz6BQAZpy/bY4qGYactfafRfyuWQJVLr9p6I8xuTl2ipmjMg8rUfj
-         6jAyk2wpRRSo0Na2afZPL+nDC7WJfLH0Ci48CowKvWzRemehOb6j17XjF5ctEkoOyiUA
-         12OdfHwBQahb3JrJ//FTZDusF/ewmMt2x2Yxzq3EURAy1U54VNGTdoKGRJuxvnnUpInK
-         bvkg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=bVO5S1zqxCUqEffUTNU9S9hb7fEK6sMCdeDDGuu+tF4=;
+        b=LLIi2I6hGcC1og6iBhKeCPdObNijf2mtxrvlHGUtk5kkENdn5W40sZo3L1OUbgwNRC
+         N6xTVIHWe8v1/kVgOlzZTeh75XFxGK3+5O8MES7PUd561EjnipbQkTS2ZABO4YAMYevc
+         A8JfD/jpYpG5PFg1YH6yywv4atNiwMyJORaTRaD2/QMF1rfokygCEZsn/1acanRK8aBa
+         xgplgm/gBT7rlOwElBcqttKrUibV9vxvdbRYZvk5MKCGhQJglwGpG9hjbpWjyOks9rDW
+         nZjnlr6/lreUfkloJom+fAu/0uDi88VzCIIYj2W/1YES2Az7lUHfv8TjV/WQjUfpLz2B
+         dIcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date;
-        bh=cO4S3HGMCW2bmXO2A1nH9xumywBS+ZKXPEO1bh8+Hic=;
-        b=Pkx/BqvyNFO839fIsOcnMtyRvk7E0SH/6dQZnOynfi5Gi93IjwNtzJtc/5elttYTpt
-         rE/bPTRsb9aFoh6HKRQzhlU6N909uh5cjE9c8alv9XHRmCSByx/RtviHaBgMLpICjv3y
-         BMeVPdePoyZ2xSS4BVv4rHbQwuHatxRM6chvOkfpPecaVeE5LYDRFRvBi+D6+uYeq3Mf
-         Da4I5ipwahVP/P1qQRGh9MsRiCnG0wBQQ42ya0F/mZ+HyNlzALikr95dClbbjtOIDCan
-         +GjK+w1jcBJ/L6w57atyfP1fVch4aQou9W7UPTL718QPcf+fuY8aaVmg3f2EN/wGStUs
-         GhRA==
-X-Gm-Message-State: ACgBeo1STbr82bEe25JijN58oNqajeEuOymNKy/Lc42KmJqP9e9VHN3/
-        hiT9WB+O/9elLQVozZOiaOcYYKzhp9N5QYLY
-X-Google-Smtp-Source: AA6agR5br7pwJITOw4NNB3e3ZsHM0ELW5oNL3PXEw/mIf1F25UwtbOc7Q9IX4IEmTzAuav9F3WCzDA==
-X-Received: by 2002:a63:e055:0:b0:438:cd8e:f263 with SMTP id n21-20020a63e055000000b00438cd8ef263mr14431373pgj.378.1663112031335;
-        Tue, 13 Sep 2022 16:33:51 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id ce9-20020a17090aff0900b001f1f5e812e9sm7963245pjb.20.2022.09.13.16.33.50
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Sep 2022 16:33:50 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] rfcomm-tester: Add test to close socket while connecting
-Date:   Tue, 13 Sep 2022 16:33:49 -0700
-Message-Id: <20220913233349.526675-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=bVO5S1zqxCUqEffUTNU9S9hb7fEK6sMCdeDDGuu+tF4=;
+        b=7XWIGYM/qf/7PaKJr7duuHZpE3bfUXxMZTLAgYWYhkvORFQDkZr348+yBOxfuOFmqq
+         yaSXa8NXMBjbvr9MklxPWg1OWUchmsSiTDts583BIrerpWdvHmvp03MVaJ9jI49wd76M
+         QymjlA+4vMT7Cq/wzTyJcFYuGNG9R5rcp/2BFMum2TppIv+NZWynaSc2qEw2wCr2p+Xz
+         X1K56paQb0FZTlfLitZSc5AICMnaHfy573mcxa8SLG+yIK9Mj16CDWWhGG14++/fQKl5
+         KPkYnwQnkSDZVQFIU1GAL0DyqsSwLeiPIdmQBLzt0tAaQIvNNgsopWQfkqX9depZ169P
+         fR/A==
+X-Gm-Message-State: ACgBeo1ebuie5ofOJRgDTgRpGVLgfYOJnLaYAh3LcNAnGekzocF2XNmc
+        /fhRgsCin5P9hcJBmcWuQwSbw/RVwSCSdubD11X5xrJc3xorDQ==
+X-Google-Smtp-Source: AA6agR7DM93EKmXg5btQfskEOqxJWN4grRXJjLusdHfbZ7eBUCBF/vWHr0IwRClqz+sx5WNL1PXyUrNLvbGZf2jjbVQ=
+X-Received: by 2002:ac2:5cb9:0:b0:498:eb6f:740d with SMTP id
+ e25-20020ac25cb9000000b00498eb6f740dmr8791526lfq.106.1663112113269; Tue, 13
+ Sep 2022 16:35:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220909201642.3810565-1-luiz.dentz@gmail.com>
+In-Reply-To: <20220909201642.3810565-1-luiz.dentz@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 13 Sep 2022 16:35:01 -0700
+Message-ID: <CABBYNZKHUbqYyevHRZ=6rLA0GAE20mLRHAj9JnFNuRn7VHrEeA@mail.gmail.com>
+Subject: Re: pull request: bluetooth 2022-09-09
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Jakub,
 
-This adds Basic RFCOMM Socket Client - Close test which attempt to close
-socket while connecting.
----
- tools/rfcomm-tester.c | 43 ++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 38 insertions(+), 5 deletions(-)
+On Fri, Sep 9, 2022 at 1:16 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> The following changes since commit 64ae13ed478428135cddc2f1113dff162d8112d4:
+>
+>   net: core: fix flow symmetric hash (2022-09-09 12:48:00 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-09-09
+>
+> for you to fetch changes up to 35e60f1aadf6c02d77fdf42180fbf205aec7e8fc:
+>
+>   Bluetooth: Fix HCIGETDEVINFO regression (2022-09-09 12:25:18 -0700)
+>
+> ----------------------------------------------------------------
+> bluetooth pull request for net:
+>
+>  -Fix HCIGETDEVINFO regression
+>
+> ----------------------------------------------------------------
+> Luiz Augusto von Dentz (1):
+>       Bluetooth: Fix HCIGETDEVINFO regression
+>
+>  include/net/bluetooth/hci_sock.h | 2 --
+>  1 file changed, 2 deletions(-)
 
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-index d594ebf345ce..a9adf7f0f52d 100644
---- a/tools/rfcomm-tester.c
-+++ b/tools/rfcomm-tester.c
-@@ -47,6 +47,7 @@ struct test_data {
- struct rfcomm_client_data {
- 	uint8_t server_channel;
- 	uint8_t client_channel;
-+	bool close;
- 	int expected_connect_err;
- 	const uint8_t *send_data;
- 	const uint8_t *read_data;
-@@ -297,6 +298,12 @@ const struct rfcomm_client_data connect_success = {
- 	.client_channel = 0x0c
- };
- 
-+const struct rfcomm_client_data connect_close = {
-+	.server_channel = 0x0c,
-+	.client_channel = 0x0c,
-+	.close = true
-+};
-+
- const uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
- 
- const struct rfcomm_client_data connect_send_success = {
-@@ -519,6 +526,8 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return false;
- 	}
- 
-+	data->io = NULL;
-+
- 	if (err < 0)
- 		tester_test_failed();
- 	else
-@@ -527,6 +536,20 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- 	return false;
- }
- 
-+static gboolean rc_close_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	data->io_id = 0;
-+
-+	tester_print("Closed");
-+
-+	tester_test_passed();
-+
-+	return false;
-+}
-+
- static void client_hook_func(const void *data, uint16_t len,
- 							void *user_data)
- {
-@@ -627,13 +650,20 @@ static void test_connect(const void *test_data)
- 	}
- 
- 	io = g_io_channel_unix_new(sk);
--	g_io_channel_set_close_on_unref(io, TRUE);
--
--	data->io_id = g_io_add_watch(io, G_IO_OUT, rc_connect_cb, NULL);
--
--	g_io_channel_unref(io);
- 
- 	tester_print("Connect in progress %d", sk);
-+
-+	if (cli->close) {
-+		data->io_id = g_io_add_watch(io, G_IO_NVAL, rc_close_cb, NULL);
-+		close(sk);
-+		tester_print("Close socket %d", sk);
-+	} else {
-+		g_io_channel_set_close_on_unref(io, TRUE);
-+		data->io_id = g_io_add_watch(io, G_IO_OUT, rc_connect_cb,
-+						NULL);
-+	}
-+
-+	g_io_channel_unref(io);
- }
- 
- static gboolean server_received_data(GIOChannel *io, GIOCondition cond,
-@@ -815,6 +845,9 @@ int main(int argc, char *argv[])
- 				test_connect);
- 	test_rfcomm("Basic RFCOMM Socket Client - Conn Refused",
- 			&connect_nval, setup_powered_client, test_connect);
-+	test_rfcomm("Basic RFCOMM Socket Client - Close",
-+				&connect_close, setup_powered_client,
-+				test_connect);
- 	test_rfcomm("Basic RFCOMM Socket Server - Success", &listen_success,
- 					setup_powered_server, test_server);
- 	test_rfcomm("Basic RFCOMM Socket Server - Write Success",
+Looks like this still hasn't been applied, is there any problem that
+needs to be fixed?
+
+
+
 -- 
-2.37.3
-
+Luiz Augusto von Dentz
