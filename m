@@ -2,219 +2,208 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD4C2ECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 21:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B85E0C6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 21:37:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229498AbiINVEs (ORCPT
+        id S229617AbiINVhg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 17:04:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55986 "EHLO
+        Wed, 14 Sep 2022 17:37:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbiINVEo (ORCPT
+        with ESMTP id S229473AbiINVhf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 17:04:44 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E177813D49
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 14:04:41 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 9so18876560ljr.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 14:04:41 -0700 (PDT)
+        Wed, 14 Sep 2022 17:37:35 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E437557E0E;
+        Wed, 14 Sep 2022 14:37:33 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id k10so27240838lfm.4;
+        Wed, 14 Sep 2022 14:37:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date;
-        bh=gbm1KyFa7fz0eZaRli9QsGM9n9nS9UEydnER8kTQrkU=;
-        b=Cw9ww9DKzjQVIxxJgKk6BZwKRtVZ6pR80aghT/JP+6CMOnNMWtbqBJg3BT8EUstVUH
-         jNypvgwJ+3deVOFZzfCG4GI38ejEI/x84y3P7plNp5jprn37XvoLxo//9JkfNUzozoHj
-         B1r4nav2lJ6WRB7Lk7K9+Cq7el2fkyTtstiP9WNkNIlMeHDmA0Mt3BqYn9P/2+KwU4Hf
-         jIr1LnKKZWbEwQJXP76mD4K/O2CTIaKq0iHy5NBspYhTvwC+etG4h6Yaqp8CmVKCzuRq
-         3n8xuundvdb7PRWZkJP8cNX1suInsCCK+ugNwGb/7Co0nNU0/kepHwu6ViMLmPJBZShi
-         /mMQ==
+        bh=chB+Lu6UnHCHH080s7HW8NVlIEEyU+gPJTweSWX9ogs=;
+        b=DQJ4rFtaPOZtzkgXxaNeKhheSHyPdrX3QivtYFhtE0SG1c9EuFaew8+AeNrLGvVAKY
+         SPOLd+MKlbV5O0NBkmsopNkp22E8NArHlCmijGu8SlHnt4ul5/5E9ZhfpHHbkKsabOA+
+         1OsFlGct2Au8/7PEEV0lcfAq/weCFOY6CP9istc/i5/zwTCyVC3Ivyw7ntB+jgsbBAA8
+         V2jxgGdMYQlZod1pbm575N+526WaIn+CIgga/LKwJxvwBXmdfnBQ/5Umc0wg+t3Jc2CB
+         uAPFCGCy+rIpUO25ZMgMP//89QcUNXHt+lL0MlnOmxeNQ4T1LGpmgDf+h0tppVsFT/u6
+         o7lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gbm1KyFa7fz0eZaRli9QsGM9n9nS9UEydnER8kTQrkU=;
-        b=yFHVvKH94n5p4SvON6RJQ35tOKyw8qbY1nvIkuXYhbmxCqDgjd9jY8wGL/opW0wC8k
-         ERoIAukO1Fk2QXro5oP6hRtnsKpBTML1BTqLzrYFVCPAaD5CGmt7+aMYrf9WiuW7+frZ
-         l0RhDhr/MqcqFxPtAYKZYRRp89CgJEUbiyFK38W9AcS9JZfeEGkNzaPlyq1GuE+csOzA
-         ov/77DNqp7yscpoAbQkXe1TcgA6cJK9T6McmJHwL/x+yxzB+pltW7oRHnjpaRqbu5jDp
-         H8lKYrx8jd1BJftOLDxtmU2xUzjHUhgDvI+tPmzcayXjcesKDy/yVmTLT6pf83je4WNT
-         QY9Q==
-X-Gm-Message-State: ACgBeo23/oNrg2wTmWfRKkkiZjJ2QROuyb9EY/zz9DpYEYCsnr24KCwB
-        3010OiwHRWS2M6o7snfoakGBrJ2OZBAyI5n8ilPLaByP73o=
-X-Google-Smtp-Source: AA6agR5JsvcSiIYk7tDqtUdsC7FUVMtsgl2/T+tc/3tg5+1FIKclYfrdpxpmBIVI3ZndwFQ02Qq9LMKfU3N6ENE2KxY=
-X-Received: by 2002:a2e:804a:0:b0:26b:66d3:4d51 with SMTP id
- p10-20020a2e804a000000b0026b66d34d51mr10531624ljg.293.1663189479644; Wed, 14
- Sep 2022 14:04:39 -0700 (PDT)
+        bh=chB+Lu6UnHCHH080s7HW8NVlIEEyU+gPJTweSWX9ogs=;
+        b=21PCi9rhSIB6KwfgAcNjvA/eoPIZp5yuhB4WAScR4vUTRzoOPLc212uPUTbNvSMihP
+         6PsmsAR1YIeVVgPTKFN9T6EhDLbpEY1lqMxI7DqBUVa4/RXdgmJhgPg6+5zhfI8sSc6j
+         1uoWW8MSgGs/X4sciwKmnXUfUca0g7e0vEwW41PkrAsqDjO3FYtbk11uy9cRb8BsZDv3
+         48OHkon2i5OxGcsk2JQ4OGdR4DJZEjqAfQpNJo3E9gQnt8KDuVjsB9l7CF4dLkfJ5vYh
+         QEOCPCiQzbOyd/xEq1rY1xwRde3JlNJx4DL7Gdmyx1c5fAdGjRNnmYvDrQW2YJJba5jx
+         ++bg==
+X-Gm-Message-State: ACgBeo0t1oHDDjO+g1wzBQY6lzjUH2GImywhkm+8wQ5VhzBmn+J1suEU
+        XNQiODdM2wAceC58izAb+ipQ/0omXU97mbhktOU=
+X-Google-Smtp-Source: AA6agR5eHNF9+/sozTIKo93t+FLVStOkqBL3q/bankcDHJXL21KqhuKdWDn52VHK91fa5zMqeDQ6M5EwXgBdziUjLcc=
+X-Received: by 2002:a05:6512:b81:b0:494:78cc:ca9c with SMTP id
+ b1-20020a0565120b8100b0049478ccca9cmr12073587lfv.564.1663191452188; Wed, 14
+ Sep 2022 14:37:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220912124657.404551-2-sathish.narasimman@intel.com> <631f3c5c.050a0220.3a4e9.d86a@mx.google.com>
-In-Reply-To: <631f3c5c.050a0220.3a4e9.d86a@mx.google.com>
+References: <20220913100244.23660-1-hildawu@realtek.com> <20220913100244.23660-3-hildawu@realtek.com>
+In-Reply-To: <20220913100244.23660-3-hildawu@realtek.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Sep 2022 14:04:28 -0700
-Message-ID: <CABBYNZKbMvToE1S4JAJz80SLpW8a9jFzw+u3KQMTdmC0wtrK+g@mail.gmail.com>
-Subject: Re: Volume Control Profile
-To:     linux-bluetooth@vger.kernel.org
-Cc:     sathish.narasimman@intel.com
+Date:   Wed, 14 Sep 2022 14:37:20 -0700
+Message-ID: <CABBYNZKCEs_2Jb1tPncekgxGtjkNkgew4hzdKktoQhvPkuR1Lw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] Bluetooth: btusb: Workaround for spotty SCO quality
+To:     hildawu@realtek.com
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        apusaka@chromium.org, yinghsu@chromium.org, max.chou@realtek.com,
+        alex_lu@realsil.com.cn, kidman@realtek.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+Hi Hilda,
 
-On Mon, Sep 12, 2022 at 7:08 AM <bluez.test.bot@gmail.com> wrote:
+On Tue, Sep 13, 2022 at 3:02 AM <hildawu@realtek.com> wrote:
 >
-> This is automated email and please do not reply to this email!
+> From: Hilda Wu <hildawu@realtek.com>
 >
-> Dear submitter,
+> When streaming HFP, once a few minutes a brief pause in audio can be
+> heard on some platform with Realtek Bluetooth. When the issue occurs,
+> the system will see the SCO packet for unknown connection handle messages.
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676220
+> Note: This issue affects (e)SCO only, does not affect ACLs.
+> Because the duplicate packet causing the problem only occurs in Realtek BT.
+> This is to filter out duplicate packet for avoiding influence.
 >
-> ---Test result---
+> Signed-off-by: Hilda Wu <hildawu@realtek.com>
+> ---
+> Changes in v2:
+>  - Seperate commits for functions
+> ---
+> ---
+>  drivers/bluetooth/btrtl.c | 28 ++++++++++++++++++++++++++++
+>  drivers/bluetooth/btrtl.h |  8 ++++++++
+>  drivers/bluetooth/btusb.c | 14 ++++++++++++++
+>  3 files changed, 50 insertions(+)
 >
-> Test Summary:
-> CheckPatch                    FAIL      5.79 seconds
-> GitLint                       PASS      3.00 seconds
-> Prep - Setup ELL              PASS      31.92 seconds
-> Build - Prep                  PASS      0.90 seconds
-> Build - Configure             PASS      9.87 seconds
-> Build - Make                  PASS      1165.82 seconds
-> Make Check                    PASS      12.98 seconds
-> Make Check w/Valgrind         PASS      355.07 seconds
-> Make Distcheck                PASS      306.75 seconds
-> Build w/ext ELL - Configure   PASS      10.50 seconds
-> Build w/ext ELL - Make        PASS      107.90 seconds
-> Incremental Build w/ patches  PASS      510.36 seconds
-> Scan Build                    WARNING   1238.26 seconds
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index fb52313a1d45..15223b3ed94d 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -781,6 +781,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+>         case CHIP_ID_8852C:
+>                 set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+>                 set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+> +               btrealtek_set_flag(hdev, REALTEK_WBS_FILTER);
+>                 hci_set_aosp_capable(hdev);
+>                 break;
+>         default:
+> @@ -937,6 +938,33 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+>  }
+>  EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
 >
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> [BlueZ,2/4] shared/vcp: Add initial code for handling VCP
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #393: FILE: src/shared/vcp.c:302:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #425: FILE: src/shared/vcp.c:334:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #458: FILE: src/shared/vcp.c:367:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #491: FILE: src/shared/vcp.c:400:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #523: FILE: src/shared/vcp.c:432:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> #555: FILE: src/shared/vcp.c:464:
-> +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
->
-> WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-> #1051: FILE: src/shared/vcp.c:960:
-> +                                               value_handle, vcp_vstate_register,
->
-> WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-> #1080: FILE: src/shared/vcp.c:989:
-> +                                               value_handle, vcp_vflag_register,
->
-> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-> #1146: FILE: src/shared/vcp.h:16:
-> +#define __packed __attribute__((packed))
->
-> /github/workspace/src/12973630.patch total: 0 errors, 9 warnings, 1098 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12973630.patch has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
-> [BlueZ,3/4] profiles: Add initial code for vcp plugin
-> ERROR:INITIALISED_STATIC: do not initialise statics to 0
-> #395: FILE: profiles/audio/vcp.c:288:
-> +static unsigned int vcp_id = 0;
->
-> /github/workspace/src/12973633.patch total: 1 errors, 0 warnings, 330 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12973633.patch has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: Scan Build - WARNING
-> Desc: Run Scan Build with patches
-> Output:
-> *****************************************************************************
-> The bugs reported by the scan-build may or may not be caused by your patches.
-> Please check the list and fix the bugs if they are caused by your patch.
-> *****************************************************************************
-> src/shared/vcp.c:288:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:294:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:320:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:326:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:352:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:358:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:385:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:391:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:418:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:424:29: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (req->change_counter != vstate->counter) {
->                                    ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:450:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:456:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> src/shared/vcp.c:482:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
->         vstate = vdb->vcs->vstate;
->                  ^~~~~~~~
-> src/shared/vcp.c:488:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
->         if (*change_counter != vstate->counter) {
->                                ^~~~~~~~~~~~~~~
-> 14 warnings generated.
+> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *p, int len,
+> +                       u16 wMaxPacketSize)
+> +{
+> +       u8 *prev;
+> +
+> +       if (pos >= HCI_SCO_HDR_SIZE && pos >= wMaxPacketSize &&
+> +           len == wMaxPacketSize && !(pos % wMaxPacketSize) &&
+> +           wMaxPacketSize >= 10 && p[0] == data[0] && p[1] == data[1]) {
+> +               prev = data + (pos - wMaxPacketSize);
 
-Would you please fix the above problems, also Id reorder the patches
-so the monitor changes can be applied before the others.
+Is this attempting to access before the skb-->data in case
+wMaxPacketSize is bigger than pos? Anyway I'm not really following the
+reasoning you are comparing the data like that, depending on the codec
+there could be frames that match exactly but doesn't necessarily means
+they are duplicated.
+
+> +
+> +               /* Detect the sco data of usb isoc pkt duplication. */
+> +               if (!memcmp(p + 2, prev + 2, 8))
+> +                       return -EILSEQ;
+> +
+> +               if (wMaxPacketSize >= 12 &&
+> +                   p[2] == prev[6] && p[3] == prev[7] &&
+> +                   p[4] == prev[4] && p[5] == prev[5] &&
+> +                   p[6] == prev[10] && p[7] == prev[11] &&
+> +                   p[8] == prev[8] && p[9] == prev[9]) {
+> +                       return -EILSEQ;
+> +               }
+> +       }
+> +
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(btrtl_usb_recv_isoc);
+> +
+>  MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
+>  MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
+>  MODULE_VERSION(VERSION);
+> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+> index e2c99684799a..79e93a8b229f 100644
+> --- a/drivers/bluetooth/btrtl.h
+> +++ b/drivers/bluetooth/btrtl.h
+> @@ -84,6 +84,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
+>                             struct btrtl_device_info *btrtl_dev,
+>                             unsigned int *controller_baudrate,
+>                             u32 *device_baudrate, bool *flow_control);
+> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
+> +                               u16 wMaxPacketSize);
+>
+>  #else
+>
+> @@ -127,4 +129,10 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
+>         return -ENOENT;
+>  }
+>
+> +static inline int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
+> +                                 u16 wMaxPacketSize)
+> +{
+> +       return -EOPNOTSUPP;
+> +}
+> +
+>  #endif
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 4c3aed89ff05..8e595e03655a 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -961,6 +961,7 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+>         struct sk_buff *skb;
+>         unsigned long flags;
+>         int err = 0;
+> +       u16 wMaxPacketSize = le16_to_cpu(data->isoc_rx_ep->wMaxPacketSize);
+>
+>         spin_lock_irqsave(&data->rxlock, flags);
+>         skb = data->sco_skb;
+> @@ -980,6 +981,19 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+>                 }
+>
+>                 len = min_t(uint, hci_skb_expect(skb), count);
+> +
+> +               /* Gaps in audio could be heard while streaming WBS using USB
+> +                * alt settings 3 on some platforms, since this is only used
+> +                * with RTK chips so let vendor function detect it.
+> +                */
+> +               if (test_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags) &&
+> +                       btrealtek_test_flag(data->hdev, REALTEK_WBS_FILTER)) {
+> +                       err = btrtl_usb_recv_isoc(skb->len, skb->data, buffer,
+> +                                                       len, wMaxPacketSize);
+> +                       if (err)
+> +                               break;
+> +               }
+
+If we really need to do this then we need a way for vendors to replace
+btus_recv_isoc with the vendor function.
+
+>                 skb_put_data(skb, buffer, len);
+>
+>                 count -= len;
+> --
+> 2.17.1
+>
+
 
 -- 
 Luiz Augusto von Dentz
