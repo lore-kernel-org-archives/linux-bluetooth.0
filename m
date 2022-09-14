@@ -2,107 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C385C6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 18:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55CB4C6FA8B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 20:10:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229528AbiINS5s (ORCPT
+        id S229685AbiINUK1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 14:57:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40096 "EHLO
+        Wed, 14 Sep 2022 16:10:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbiINS5q (ORCPT
+        with ESMTP id S229765AbiINUKS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 14:57:46 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D79314D809
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 11:57:45 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id f14so25715290lfg.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 11:57:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=gPfbkeIYaVopJrRsNVDJhc0yLj8eY4j3MAgfbBt+sxE=;
-        b=OPLlLZS7KRNbONLlitB5/O7utZowHBbpt5AZ/lAR+kM/ZWUnKNSFQPtQb7pDsq8bIM
-         Ji7QnYghtoeb+7B7PGhLfo1llBDas8Xw+wlikbxvSl2TYAGLh9xb0Ry/ZRaD1D3TaNMf
-         6KVzJAp6OhLVhR8bnfKLCVPja+vsGgOQ+d4aazFl17+zqR2AZ1dRU9ci3Sllylg8zhf7
-         12LW9d/YmBPsX7AizdMr0MrDdv26iTzKwpR4Np8ntJGgnW0WuTNzlwiyqiR7aAk4ATGg
-         kdpV1JMd7mRB9RctNDy885oM1xZVq8zVBuq2+14bgaDAxUULu+NX/TaMZDIfaSLmoPmF
-         edJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gPfbkeIYaVopJrRsNVDJhc0yLj8eY4j3MAgfbBt+sxE=;
-        b=DUQ0PE4jHv+iNhdNJaX7y+qWoFMWTC/UtNpc9pIElc6PKa5TxZS8h3ZXI8uttcUfGd
-         /fHcd0wtgXADHde3Pe8Ia4QihuaFtX4rUMNyS5+HyMs85DZoWpeRR18Fg3GegHiyt3fv
-         LO2YJLlfbri5uyh7hFOmpHwc1G/Ch6NQOBwyz9L5tVqBQOkcITAeNErTZyrb1uKvsODX
-         tTqssuFzyiUBmDgBN91SmPsv0IR5NR4vKKK3W60gX8gBl07wd/YA8CPKIl6eAfch7jvJ
-         /9K255ilaYVrm34jb9HkHlIBGsOF/Hr85RNK8vldNijszvYXkF5qgPDH7lIm8EL4gF90
-         rFoA==
-X-Gm-Message-State: ACrzQf1R5pfUnNsE9eix5pxDEgahZcAjorMfJzc7UvqYDB0r8X/IJGpV
-        FJPlCJyOlnAGLDqqUk5iu4r7zAjCATscFHnYiAraGn4HsdHsSg==
-X-Google-Smtp-Source: AMsMyM7gjnU3PEOBc+LUo3qrlwLaOUqq3ehximM6YPm9NVHMn5Bg6LSyBnm7eZFDw7BgQJjgOnQFtRzE4PhsgW24RYA=
-X-Received: by 2002:a19:6555:0:b0:49e:7d52:a4ca with SMTP id
- c21-20020a196555000000b0049e7d52a4camr377014lfj.198.1663181863391; Wed, 14
- Sep 2022 11:57:43 -0700 (PDT)
+        Wed, 14 Sep 2022 16:10:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84D831D9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 13:10:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 561C361ED8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 20:10:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B24B1C433D7;
+        Wed, 14 Sep 2022 20:10:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663186215;
+        bh=WFz/KE//pR0ciZQ+uAMNg+tlBpJuFEjb2tCFRLPahrM=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=R0TMfT/rzaGndP51AwP9mgBKgaveGXvS410LWOnI+qCBEnTCzjjgu9EC2cGdt6AwF
+         a7m+W3l9Vi5SdjZIfG4SqNeVWFAsVmrBstdzGzHT8UIHecDg8ZkWq5Od0pDlytkPsS
+         77sBqiGqPZW3c5PJq9+cZQGxX8zMCoAgFdkSZhtlgyAlQzvzBZtQ5mCKBnEUCqdJuW
+         e7sfZuQFr7MPnhQYoW32I9fmiFTVKjLf8KCA1cj2U62OsFi94sSsDEQ+txp9SvxdxY
+         UcfAy3dpJpRnDVGYsHnsiUbdv8wgKT/M1jttsNChmY/MrfS9Ncx3SNSOW0ZTyKp4BW
+         PDadDhs5nsVeA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 99E3CC73FEB;
+        Wed, 14 Sep 2022 20:10:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220913233157.526041-1-luiz.dentz@gmail.com> <63211c98.a70a0220.fc7d7.e5ba@mx.google.com>
-In-Reply-To: <63211c98.a70a0220.fc7d7.e5ba@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Sep 2022 11:57:31 -0700
-Message-ID: <CABBYNZ+d3QuemepkKGL8yS4TRyzXh8EcH=K4LkTkKLkfWfR51A@mail.gmail.com>
-Subject: Re: Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        Peter Sutton <peter@foxdogstudios.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: btusb: Add a new VID/PID 0e8d/0608 for MT7921
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166318621561.18930.13956663237311044921.git-patchwork-notify@kernel.org>
+Date:   Wed, 14 Sep 2022 20:10:15 +0000
+References: <YxubXl/fxmBBDjVp@makrotopia.org>
+In-Reply-To: <YxubXl/fxmBBDjVp@makrotopia.org>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     linux-mediatek@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, matthias.bgg@gmail.com,
+        luiz.dentz@gmail.com, johan.hedberg@gmail.com, marcel@holtmann.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hello:
 
-On Tue, Sep 13, 2022 at 5:13 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676714
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.92 seconds
-> GitLint                       FAIL      0.47 seconds
-> SubjectPrefix                 PASS      0.31 seconds
-> BuildKernel                   PASS      45.45 seconds
-> BuildKernel32                 PASS      40.12 seconds
-> Incremental Build with patchesPASS      59.47 seconds
-> TestRunner: Setup             PASS      667.48 seconds
-> TestRunner: l2cap-tester      PASS      20.48 seconds
-> TestRunner: iso-tester        PASS      20.45 seconds
-> TestRunner: bnep-tester       PASS      7.74 seconds
-> TestRunner: mgmt-tester       PASS      127.19 seconds
-> TestRunner: rfcomm-tester     PASS      12.53 seconds
-> TestRunner: sco-tester        PASS      11.90 seconds
-> TestRunner: smp-tester        PASS      11.79 seconds
-> TestRunner: userchan-tester   PASS      8.35 seconds
->
-> Details
-> ##############################
-> Test: GitLint - FAIL - 0.47 seconds
-> Run gitlint with rule in .gitlint
-> Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
-> 21: B1 Line exceeds max length (101>80): "Link: https://lore.kernel.org/all/CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com/"
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Let me know if this fixes the problems you are are having, note that I
-did add a test for rfcomm-tester to verify the deadlock is fixed:
+On Fri, 9 Sep 2022 21:00:30 +0100 you wrote:
+> Add a new PID/VID 0e8d/0608 for MT7921K chip found on AMD RZ608 module.
+> 
+> From /sys/kernel/debug/usb/devices:
+> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  3 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0e8d ProdID=0608 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> 
+> [...]
 
-https://patchwork.kernel.org/project/bluetooth/patch/20220913233349.526675-1-luiz.dentz@gmail.com/
+Here is the summary with links:
+  - Bluetooth: btusb: Add a new VID/PID 0e8d/0608 for MT7921
+    https://git.kernel.org/bluetooth/bluetooth-next/c/be55622ce673
 
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
