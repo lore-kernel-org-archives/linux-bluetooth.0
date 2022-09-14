@@ -2,87 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C59ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 13:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C385C6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 18:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229906AbiINNNm (ORCPT
+        id S229528AbiINS5s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 09:13:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
+        Wed, 14 Sep 2022 14:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbiINNNk (ORCPT
+        with ESMTP id S229617AbiINS5q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 09:13:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4097350071
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 06:13:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id E5823B81B41
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 13:13:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 94048C433D7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 13:13:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663161216;
-        bh=1y8E1hMEtC/YqCpFniMBPcv1vnG05A4hrtUsbCUpkJ0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=OgP3nbjK4agXA8416VDHTKhqyH+o2bDXWPiTjht4QaAjhwzlJkcMdJrzZnKI8TgP5
-         sW81wKCKmPu0UEqj0c8t5hkBBnH+dB2AJ1T4pajDoLLmnkBGphim3kS2+EzIoTh3YM
-         nv0hIDlJGLoi15MIHEhkd8qjlT6HbS/5HkOw4HnBi5KkQVY6Is951u9i9fHJYoawEL
-         +LesPsfQ6EyE8yR0r9kKij0Dqv37usfPlNZ4iq2Y5IA/d+/rCxkdCS6pJ7jIKMqpWb
-         Gq3yKP9HoytzUkKA53Jyg99LTJUCL6hcezHRQW4eyEECOjVQlZZhIvoSv1G06Qa7VR
-         wlkUillBHUCGA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 855B0C433E7; Wed, 14 Sep 2022 13:13:36 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215197] Memory leaks show up when using Edimax Wi-Fi N150
- Bluetooth/Wireless USB Adapter (RTL8XXXU)
-Date:   Wed, 14 Sep 2022 13:13:36 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: network-wireless
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: erhard_f@mailbox.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.isobsolete attachments.created
-Message-ID: <bug-215197-62941-fEdLwOCmUZ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215197-62941@https.bugzilla.kernel.org/>
-References: <bug-215197-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 14 Sep 2022 14:57:46 -0400
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D79314D809
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 11:57:45 -0700 (PDT)
+Received: by mail-lf1-x136.google.com with SMTP id f14so25715290lfg.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Sep 2022 11:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=gPfbkeIYaVopJrRsNVDJhc0yLj8eY4j3MAgfbBt+sxE=;
+        b=OPLlLZS7KRNbONLlitB5/O7utZowHBbpt5AZ/lAR+kM/ZWUnKNSFQPtQb7pDsq8bIM
+         Ji7QnYghtoeb+7B7PGhLfo1llBDas8Xw+wlikbxvSl2TYAGLh9xb0Ry/ZRaD1D3TaNMf
+         6KVzJAp6OhLVhR8bnfKLCVPja+vsGgOQ+d4aazFl17+zqR2AZ1dRU9ci3Sllylg8zhf7
+         12LW9d/YmBPsX7AizdMr0MrDdv26iTzKwpR4Np8ntJGgnW0WuTNzlwiyqiR7aAk4ATGg
+         kdpV1JMd7mRB9RctNDy885oM1xZVq8zVBuq2+14bgaDAxUULu+NX/TaMZDIfaSLmoPmF
+         edJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=gPfbkeIYaVopJrRsNVDJhc0yLj8eY4j3MAgfbBt+sxE=;
+        b=DUQ0PE4jHv+iNhdNJaX7y+qWoFMWTC/UtNpc9pIElc6PKa5TxZS8h3ZXI8uttcUfGd
+         /fHcd0wtgXADHde3Pe8Ia4QihuaFtX4rUMNyS5+HyMs85DZoWpeRR18Fg3GegHiyt3fv
+         LO2YJLlfbri5uyh7hFOmpHwc1G/Ch6NQOBwyz9L5tVqBQOkcITAeNErTZyrb1uKvsODX
+         tTqssuFzyiUBmDgBN91SmPsv0IR5NR4vKKK3W60gX8gBl07wd/YA8CPKIl6eAfch7jvJ
+         /9K255ilaYVrm34jb9HkHlIBGsOF/Hr85RNK8vldNijszvYXkF5qgPDH7lIm8EL4gF90
+         rFoA==
+X-Gm-Message-State: ACrzQf1R5pfUnNsE9eix5pxDEgahZcAjorMfJzc7UvqYDB0r8X/IJGpV
+        FJPlCJyOlnAGLDqqUk5iu4r7zAjCATscFHnYiAraGn4HsdHsSg==
+X-Google-Smtp-Source: AMsMyM7gjnU3PEOBc+LUo3qrlwLaOUqq3ehximM6YPm9NVHMn5Bg6LSyBnm7eZFDw7BgQJjgOnQFtRzE4PhsgW24RYA=
+X-Received: by 2002:a19:6555:0:b0:49e:7d52:a4ca with SMTP id
+ c21-20020a196555000000b0049e7d52a4camr377014lfj.198.1663181863391; Wed, 14
+ Sep 2022 11:57:43 -0700 (PDT)
 MIME-Version: 1.0
+References: <20220913233157.526041-1-luiz.dentz@gmail.com> <63211c98.a70a0220.fc7d7.e5ba@mx.google.com>
+In-Reply-To: <63211c98.a70a0220.fc7d7.e5ba@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 14 Sep 2022 11:57:31 -0700
+Message-ID: <CABBYNZ+d3QuemepkKGL8yS4TRyzXh8EcH=K4LkTkKLkfWfR51A@mail.gmail.com>
+Subject: Re: Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
+        Peter Sutton <peter@foxdogstudios.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215197
+Hi,
 
-Erhard F. (erhard_f@mailbox.org) changed:
+On Tue, Sep 13, 2022 at 5:13 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676714
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.92 seconds
+> GitLint                       FAIL      0.47 seconds
+> SubjectPrefix                 PASS      0.31 seconds
+> BuildKernel                   PASS      45.45 seconds
+> BuildKernel32                 PASS      40.12 seconds
+> Incremental Build with patchesPASS      59.47 seconds
+> TestRunner: Setup             PASS      667.48 seconds
+> TestRunner: l2cap-tester      PASS      20.48 seconds
+> TestRunner: iso-tester        PASS      20.45 seconds
+> TestRunner: bnep-tester       PASS      7.74 seconds
+> TestRunner: mgmt-tester       PASS      127.19 seconds
+> TestRunner: rfcomm-tester     PASS      12.53 seconds
+> TestRunner: sco-tester        PASS      11.90 seconds
+> TestRunner: smp-tester        PASS      11.79 seconds
+> TestRunner: userchan-tester   PASS      8.35 seconds
+>
+> Details
+> ##############################
+> Test: GitLint - FAIL - 0.47 seconds
+> Run gitlint with rule in .gitlint
+> Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
+> 21: B1 Line exceeds max length (101>80): "Link: https://lore.kernel.org/all/CAD+dNTsbuU4w+Y_P7o+VEN7BYCAbZuwZx2+tH+OTzCdcZF82YA@mail.gmail.com/"
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
- Attachment #299829|0                           |1
-        is obsolete|                            |
+Let me know if this fixes the problems you are are having, note that I
+did add a test for rfcomm-tester to verify the deadlock is fixed:
 
---- Comment #7 from Erhard F. (erhard_f@mailbox.org) ---
-Created attachment 301809
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D301809&action=3Dedit
-kernel dmesg (6.0-r43, AMD FX-8370)
+https://patchwork.kernel.org/project/bluetooth/patch/20220913233349.526675-1-luiz.dentz@gmail.com/
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+Luiz Augusto von Dentz
