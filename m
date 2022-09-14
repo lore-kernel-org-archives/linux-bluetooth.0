@@ -2,60 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7DB6C6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 22:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19788C6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 22:59:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbiINWpb (ORCPT
+        id S229631AbiINW75 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 18:45:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54756 "EHLO
+        Wed, 14 Sep 2022 18:59:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiINWpb (ORCPT
+        with ESMTP id S229539AbiINW74 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 18:45:31 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED58925C59;
-        Wed, 14 Sep 2022 15:45:27 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id f9so26773307lfr.3;
-        Wed, 14 Sep 2022 15:45:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=zFF2lCYlEtGBcqj2aYJNGrAsisA/ypCs1g/YrKPkZYA=;
-        b=L7Da3Ihe9ysWH419HKN8UZD8WdHltmVwGyORUc/Xf8VEyR8J4EXkaKfbz2ivXiXnwG
-         102SNzJS1UljweZ6+J5Qof8DmYtntbvIh2+wlbDYZLtF9CuNxnqFjdkhE6A6ksiEotcH
-         83ml9SovYJF+xHAIjLOwTax8fRAtcgUmzPMD95Z6Awfbi8g2bIW4NGtUNEgPK370UhCr
-         tVE92vKagUCv0OBs88rf6t8WkpsPi2Bvd57oHLOny4W4Svz8FARLLEGxoeqoRTLUfn7N
-         0xXFRfZqDtj+cxKR3FCGe62YMoO3d/Y4DxBjt5zVeC/gsCQsS03zliwt5zYZP5pqnRy4
-         CyWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=zFF2lCYlEtGBcqj2aYJNGrAsisA/ypCs1g/YrKPkZYA=;
-        b=xD6qWkW0/DhLg/GBpPW9HhSF2qVhkkJuyCpt9uXiggrsQSiRl6YP2fm5FT8/gM5fMH
-         F10X6n/gEyVv9IMpe/Ne8b+vf+nlf1/OyJkmiAH1lUi6Hon/7aLE2qt/AZ4iS2VA62XZ
-         p6ngS/j1nWXl0WyotUNo1eRGY+cHmAhZJyl3BrofeRhTUQpa45stERbGmdsutGbXD0Nr
-         6cuiG5gz7wzm7okrd763XALurNTt5nHE4bhVSLGo+Bxt6foSgjb/yGhMogBSEWFI7Tve
-         LoGKZgeR8fGEk2QcvnmZkAhTxgWxo4HsFMuYmuPr1MqKtGZuXOj2YF0ZnFVL22w81bcj
-         OX3w==
-X-Gm-Message-State: ACrzQf32uksbsWwehy7erEZwuswCiZ56k6Bzx8RUXXH3U9Knu27ecUF0
-        UQJs7VbPTb7+lJAmsZRB2qYoO9mxKlf95O41dg8=
-X-Google-Smtp-Source: AMsMyM6SCeXeYYoK1cu55dFuBxWNFB6ruywGaz6zlJkrpy1QCR8r2NmbIuQhd4neJWcbDuAgQ8Zh+vkDiNTz5D/FfOs=
-X-Received: by 2002:a19:6555:0:b0:49e:7d52:a4ca with SMTP id
- c21-20020a196555000000b0049e7d52a4camr643616lfj.198.1663195526049; Wed, 14
- Sep 2022 15:45:26 -0700 (PDT)
+        Wed, 14 Sep 2022 18:59:56 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C6313D6F;
+        Wed, 14 Sep 2022 15:59:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D8CA1B81D01;
+        Wed, 14 Sep 2022 22:59:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7998BC433C1;
+        Wed, 14 Sep 2022 22:59:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663196392;
+        bh=oWqqdyBXsokNJ3n9bzT2vkSRtqN+2pGUWbS5nYnQsTg=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=WpA7MwY3qrlIOvQJuzLzBuUA0PTGT9Lnje7tnXMz3DteGiR1yFr8oPSS1l4qf9Akr
+         UzUsjPljRzimjKGqUdTNGUtywUef0Bz9EZhHQYgOt1YyXB5dQ1+hq9jNM3dSO6/hop
+         Uo4/a8KV2ySCM1korX2pji1Eaz8L6hq1yL27ztqg2hLAiue7aOgaSmqL5n91DV+kmP
+         56k5gVZDiF7f+jbQ7LfiX71LEVZWfWLEFbQK2Yf4VZXvuI4quEwcFOqipgsrYhAmAJ
+         +0auUWHy1k+ksil4SS5MtvBmgB9pOgg67AVs0XXE1O/OW4haDwKsvARseas6eRwAQK
+         XMMrPzi1sLjtQ==
+Received: by mail-wm1-f43.google.com with SMTP id o5so8593638wms.1;
+        Wed, 14 Sep 2022 15:59:52 -0700 (PDT)
+X-Gm-Message-State: ACgBeo3B2+Dj+IBhIFO0KOi3kw6N8x2XUDiSe/FihtWzClYU2ppGPW0o
+        WLHvzEfJbfi4K9pyguuueC7i3/AgxE0TTF/56eU=
+X-Google-Smtp-Source: AA6agR7qaHmVQJjOn3ABWhUEKPyB5dmh5/6FOPhCQ93FD/FBWSx3finiKnKlWC/6fdcKkqMYciv4HAmIrP/+z1PjHoo=
+X-Received: by 2002:a05:600c:22d3:b0:3a8:424d:f386 with SMTP id
+ 19-20020a05600c22d300b003a8424df386mr4636751wmg.57.1663196390712; Wed, 14 Sep
+ 2022 15:59:50 -0700 (PDT)
 MIME-Version: 1.0
 References: <43b68b1f48c20b1dfcd7e6663c3dcb38e4e0648c.1663020936.git.objelf@gmail.com>
- <a432abf4cf95e93783864b27bafa53d45bdd5212.1663020936.git.objelf@gmail.com>
-In-Reply-To: <a432abf4cf95e93783864b27bafa53d45bdd5212.1663020936.git.objelf@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Sep 2022 15:45:14 -0700
-Message-ID: <CABBYNZ+Z+BApMOPEgVBxf6j0sTYFE0tH6Eab-hQW8FKVFqfvqA@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: btusb: mediatek: reset the device as WMT failed
-To:     sean.wang@mediatek.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+ <8c734b83-aa2a-83a6-cb12-28e36ace2bbb@collabora.com>
+In-Reply-To: <8c734b83-aa2a-83a6-cb12-28e36ace2bbb@collabora.com>
+From:   Sean Wang <sean.wang@kernel.org>
+Date:   Wed, 14 Sep 2022 15:59:38 -0700
+X-Gmail-Original-Message-ID: <CAGp9Lzq5LrDi0qgOOWFXtGJObYEyxsMz=M_UBObwstBc9p+1=g@mail.gmail.com>
+Message-ID: <CAGp9Lzq5LrDi0qgOOWFXtGJObYEyxsMz=M_UBObwstBc9p+1=g@mail.gmail.com>
+Subject: Re: [PATCH 1/4] Bluetooth: btusb: mediatek: use readx_poll_timeout
+ instead of open coding
+To:     AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+Cc:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
         Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
         Deren.Wu@mediatek.com, km.lin@mediatek.com,
@@ -72,47 +71,86 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+HI Angelo,
 
-On Mon, Sep 12, 2022 at 3:18 PM <sean.wang@mediatek.com> wrote:
+On Tue, Sep 13, 2022 at 1:04 AM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
 >
-> From: Sean Wang <sean.wang@mediatek.com>
+> Il 13/09/22 00:18, sean.wang@mediatek.com ha scritto:
+> > From: Sean Wang <sean.wang@mediatek.com>
+> >
+> > Use readx_poll_timeout instead of open coding to poll the hardware reset
+> > status until it is done.
+> >
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 >
-> Reset the BT device whenever the driver detected any WMT failure happened
-> to recover such kind of system-level error as soon as possible.
+> Hello Sean, thanks for the patch!
+> However, there's something to improve...
 >
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> ---
->  drivers/bluetooth/btusb.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> > ---
+> >   drivers/bluetooth/btusb.c | 32 ++++++++++++++++++--------------
+> >   1 file changed, 18 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index c3daba17de7f..4dc9cae3e937 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
 >
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 653f57a98233..dc86726c8271 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2576,6 +2576,10 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
->         data->evt_skb = NULL;
->  err_free_wc:
->         kfree(wc);
-> +
-> +       if (err < 0)
-> +               btmtk_reset_sync(hdev);
-
-Doesn't reset itself can fail?
-
->         return err;
-
-It would probably be better to reset on error at the caller IMO, also
-in case it fails during firmware upload does reset even work? Also it
-would probably have been better to have its own file for vendor
-specific commands like this and use btmtk_ prefix as well.
-
->  }
+> ..snip..
 >
-> --
-> 2.25.1
+> > @@ -2910,18 +2918,14 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+> >       btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
+> >       btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+> >
+> > -     /* Poll the register until reset is completed */
+> > -     do {
+> > -             btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
+> > -             if (val & MTK_BT_RST_DONE) {
+> > -                     bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+> > -                     break;
+> > -             }
+> > +     err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
+> > +                              val & MTK_BT_RST_DONE,
+> > +                              100000, 1000000);
+>
+> I agree with using readx_poll_timeout() instead of open coding the same, but
+> there's a catch: this macro uses usleep_range(), which is meant to be used
+> for sleeping less than ~20ms.
+>
+> Even the kerneldoc at include/linux/iopoll.h advertises that:
+>
+>   * @sleep_us: Maximum time to sleep between reads in us (0
+>   *            tight-loops).  Should be less than ~20ms since usleep_range
+>   *            is used (see Documentation/timers/timers-howto.rst).
+>
+> So, if there's any reason for which you can't sleep for less than 100ms
+> per iteration, I'm afraid that you can't use readx_poll_timeout()...
+> ...otherwise, please change sleep_us to 20000 and keep the timeout at 1 sec.
 >
 
+It should be able to be done with polling in 20ms until 1 sec expires
+or it is done. It increases some cost in the bus transaction
+interacting with the device, but it seemed fine for me because the
+code path is cold, it is only working in the device reset which should
+rarely happen, and only involves when it is really necessary. That is
+a nice catch. I was trying not to break the existing logic
+but overlooked the requirements of the API.
 
--- 
-Luiz Augusto von Dentz
+    Sean
+
+> Regards,
+> Angelo
+>
+> > +     if (err < 0)
+> > +             bt_dev_err(hdev, "Reset timeout");
+> >
+> > -             bt_dev_dbg(hdev, "Polling Bluetooth Reset CR");
+> > -             retry++;
+> > -             msleep(MTK_BT_RESET_WAIT_MS);
+> > -     } while (retry < MTK_BT_RESET_NUM_TRIES);
+> > +     if (val & MTK_BT_RST_DONE)
+> > +             bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+> >
+> >       btusb_mtk_id_get(data, 0x70010200, &val);
+> >       if (!val)
+>
