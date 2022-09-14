@@ -2,208 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B85E0C6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 21:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D761DECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Sep 2022 22:34:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229617AbiINVhg (ORCPT
+        id S229650AbiINWe1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 17:37:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
+        Wed, 14 Sep 2022 18:34:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229473AbiINVhf (ORCPT
+        with ESMTP id S229629AbiINWeZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 17:37:35 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E437557E0E;
-        Wed, 14 Sep 2022 14:37:33 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id k10so27240838lfm.4;
-        Wed, 14 Sep 2022 14:37:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=chB+Lu6UnHCHH080s7HW8NVlIEEyU+gPJTweSWX9ogs=;
-        b=DQJ4rFtaPOZtzkgXxaNeKhheSHyPdrX3QivtYFhtE0SG1c9EuFaew8+AeNrLGvVAKY
-         SPOLd+MKlbV5O0NBkmsopNkp22E8NArHlCmijGu8SlHnt4ul5/5E9ZhfpHHbkKsabOA+
-         1OsFlGct2Au8/7PEEV0lcfAq/weCFOY6CP9istc/i5/zwTCyVC3Ivyw7ntB+jgsbBAA8
-         V2jxgGdMYQlZod1pbm575N+526WaIn+CIgga/LKwJxvwBXmdfnBQ/5Umc0wg+t3Jc2CB
-         uAPFCGCy+rIpUO25ZMgMP//89QcUNXHt+lL0MlnOmxeNQ4T1LGpmgDf+h0tppVsFT/u6
-         o7lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=chB+Lu6UnHCHH080s7HW8NVlIEEyU+gPJTweSWX9ogs=;
-        b=21PCi9rhSIB6KwfgAcNjvA/eoPIZp5yuhB4WAScR4vUTRzoOPLc212uPUTbNvSMihP
-         6PsmsAR1YIeVVgPTKFN9T6EhDLbpEY1lqMxI7DqBUVa4/RXdgmJhgPg6+5zhfI8sSc6j
-         1uoWW8MSgGs/X4sciwKmnXUfUca0g7e0vEwW41PkrAsqDjO3FYtbk11uy9cRb8BsZDv3
-         48OHkon2i5OxGcsk2JQ4OGdR4DJZEjqAfQpNJo3E9gQnt8KDuVjsB9l7CF4dLkfJ5vYh
-         QEOCPCiQzbOyd/xEq1rY1xwRde3JlNJx4DL7Gdmyx1c5fAdGjRNnmYvDrQW2YJJba5jx
-         ++bg==
-X-Gm-Message-State: ACgBeo0t1oHDDjO+g1wzBQY6lzjUH2GImywhkm+8wQ5VhzBmn+J1suEU
-        XNQiODdM2wAceC58izAb+ipQ/0omXU97mbhktOU=
-X-Google-Smtp-Source: AA6agR5eHNF9+/sozTIKo93t+FLVStOkqBL3q/bankcDHJXL21KqhuKdWDn52VHK91fa5zMqeDQ6M5EwXgBdziUjLcc=
-X-Received: by 2002:a05:6512:b81:b0:494:78cc:ca9c with SMTP id
- b1-20020a0565120b8100b0049478ccca9cmr12073587lfv.564.1663191452188; Wed, 14
- Sep 2022 14:37:32 -0700 (PDT)
+        Wed, 14 Sep 2022 18:34:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 648AE785A8;
+        Wed, 14 Sep 2022 15:34:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F372361F58;
+        Wed, 14 Sep 2022 22:34:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B612C43470;
+        Wed, 14 Sep 2022 22:34:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663194863;
+        bh=5JNKrPYbxMNe6Hm6rld4fqMiyupR+bHOxvW1ZOcAvpc=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=ZpMMMiJhnoxLtZk9rLxTeIYajMlKz7VBGEy3QpDuF7nVa6PlEKsuJxKPQuiVFSNIe
+         2TL608GGg6RlAB+RVg9htWN6DLNLY0C8kYNgVWficw8w9va44x9+nixDlNGGE6VEUj
+         CgTeUOeyHZEvCBdK4fWbqW5wShEJm8m6V3IceuUiBhl/DRm3NdZS4HtftobWb7Cdq6
+         pDs/LY04D4o9OTkU1CbqBpP0GF9IEXDTSBnKUrKvliZeHx29e0aKM7eFA4m6FHE4jG
+         LfwYzLZWN2Czly7GEs1V2+PbLXtaOGjku1O812e0H1xoneOV2emKaKIX5b5zMSMyub
+         C4i3WX0QThW4w==
+Received: by mail-wm1-f50.google.com with SMTP id r66-20020a1c4445000000b003b494ffc00bso3980105wma.0;
+        Wed, 14 Sep 2022 15:34:23 -0700 (PDT)
+X-Gm-Message-State: ACgBeo1NIiQjCz2NweMa/N1MqYuhZG+GEOuJNtnVcYm8Urpsy3QS0BlO
+        aMtBpcLfV5U0hSCLwdzpGTNZlhkd/t+L0AsAVas=
+X-Google-Smtp-Source: AA6agR7ru2g7GnIe25Ah1O05C3vLxOEHyNPJD5VFnOAgGP94sW4ihHDOIPwLKc/bBXA4Vqh3EO+xnXJtdy7eYprJF0Y=
+X-Received: by 2002:a7b:c84c:0:b0:3b3:3faa:10c3 with SMTP id
+ c12-20020a7bc84c000000b003b33faa10c3mr4601516wml.94.1663194861556; Wed, 14
+ Sep 2022 15:34:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220913100244.23660-1-hildawu@realtek.com> <20220913100244.23660-3-hildawu@realtek.com>
-In-Reply-To: <20220913100244.23660-3-hildawu@realtek.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Sep 2022 14:37:20 -0700
-Message-ID: <CABBYNZKCEs_2Jb1tPncekgxGtjkNkgew4hzdKktoQhvPkuR1Lw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] Bluetooth: btusb: Workaround for spotty SCO quality
-To:     hildawu@realtek.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        apusaka@chromium.org, yinghsu@chromium.org, max.chou@realtek.com,
-        alex_lu@realsil.com.cn, kidman@realtek.com
+References: <43b68b1f48c20b1dfcd7e6663c3dcb38e4e0648c.1663020936.git.objelf@gmail.com>
+ <a432abf4cf95e93783864b27bafa53d45bdd5212.1663020936.git.objelf@gmail.com> <07016e51-a5b5-a350-cad2-b9fcebfe3706@collabora.com>
+In-Reply-To: <07016e51-a5b5-a350-cad2-b9fcebfe3706@collabora.com>
+From:   Sean Wang <sean.wang@kernel.org>
+Date:   Wed, 14 Sep 2022 15:34:09 -0700
+X-Gmail-Original-Message-ID: <CAGp9Lzr7hruZ3LXD_bAVb_xy8v5YXptVpye9tEpO=aF18r_4Cw@mail.gmail.com>
+Message-ID: <CAGp9Lzr7hruZ3LXD_bAVb_xy8v5YXptVpye9tEpO=aF18r_4Cw@mail.gmail.com>
+Subject: Re: [PATCH 3/4] Bluetooth: btusb: mediatek: reset the device as WMT failed
+To:     AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+Cc:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        shawnku@google.com, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hilda,
+Hi, Angelo
 
-On Tue, Sep 13, 2022 at 3:02 AM <hildawu@realtek.com> wrote:
+On Tue, Sep 13, 2022 at 1:23 AM AngeloGioacchino Del Regno
+<angelogioacchino.delregno@collabora.com> wrote:
 >
-> From: Hilda Wu <hildawu@realtek.com>
+> Il 13/09/22 00:18, sean.wang@mediatek.com ha scritto:
+> > From: Sean Wang <sean.wang@mediatek.com>
+> >
+> > Reset the BT device whenever the driver detected any WMT failure happened
+> > to recover such kind of system-level error as soon as possible.
+> >
+> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 >
-> When streaming HFP, once a few minutes a brief pause in audio can be
-> heard on some platform with Realtek Bluetooth. When the issue occurs,
-> the system will see the SCO packet for unknown connection handle messages.
->
-> Note: This issue affects (e)SCO only, does not affect ACLs.
-> Because the duplicate packet causing the problem only occurs in Realtek BT.
-> This is to filter out duplicate packet for avoiding influence.
->
-> Signed-off-by: Hilda Wu <hildawu@realtek.com>
-> ---
-> Changes in v2:
->  - Seperate commits for functions
-> ---
-> ---
->  drivers/bluetooth/btrtl.c | 28 ++++++++++++++++++++++++++++
->  drivers/bluetooth/btrtl.h |  8 ++++++++
->  drivers/bluetooth/btusb.c | 14 ++++++++++++++
->  3 files changed, 50 insertions(+)
->
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index fb52313a1d45..15223b3ed94d 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -781,6 +781,7 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
->         case CHIP_ID_8852C:
->                 set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
->                 set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
-> +               btrealtek_set_flag(hdev, REALTEK_WBS_FILTER);
->                 hci_set_aosp_capable(hdev);
->                 break;
->         default:
-> @@ -937,6 +938,33 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
->  }
->  EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
->
-> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *p, int len,
-> +                       u16 wMaxPacketSize)
-> +{
-> +       u8 *prev;
-> +
-> +       if (pos >= HCI_SCO_HDR_SIZE && pos >= wMaxPacketSize &&
-> +           len == wMaxPacketSize && !(pos % wMaxPacketSize) &&
-> +           wMaxPacketSize >= 10 && p[0] == data[0] && p[1] == data[1]) {
-> +               prev = data + (pos - wMaxPacketSize);
+> This looks like a fix, so you probably want a Fixes tag for backport.
 
-Is this attempting to access before the skb-->data in case
-wMaxPacketSize is bigger than pos? Anyway I'm not really following the
-reasoning you are comparing the data like that, depending on the codec
-there could be frames that match exactly but doesn't necessarily means
-they are duplicated.
+I didn't add the fix tag because there is not a previous patch that
+had issues the patch needs to fix.
 
-> +
-> +               /* Detect the sco data of usb isoc pkt duplication. */
-> +               if (!memcmp(p + 2, prev + 2, 8))
-> +                       return -EILSEQ;
-> +
-> +               if (wMaxPacketSize >= 12 &&
-> +                   p[2] == prev[6] && p[3] == prev[7] &&
-> +                   p[4] == prev[4] && p[5] == prev[5] &&
-> +                   p[6] == prev[10] && p[7] == prev[11] &&
-> +                   p[8] == prev[8] && p[9] == prev[9]) {
-> +                       return -EILSEQ;
-> +               }
-> +       }
-> +
-> +       return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btrtl_usb_recv_isoc);
-> +
->  MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
->  MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
->  MODULE_VERSION(VERSION);
-> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-> index e2c99684799a..79e93a8b229f 100644
-> --- a/drivers/bluetooth/btrtl.h
-> +++ b/drivers/bluetooth/btrtl.h
-> @@ -84,6 +84,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
->                             struct btrtl_device_info *btrtl_dev,
->                             unsigned int *controller_baudrate,
->                             u32 *device_baudrate, bool *flow_control);
-> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-> +                               u16 wMaxPacketSize);
->
->  #else
->
-> @@ -127,4 +129,10 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
->         return -ENOENT;
->  }
->
-> +static inline int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-> +                                 u16 wMaxPacketSize)
-> +{
-> +       return -EOPNOTSUPP;
-> +}
-> +
->  #endif
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 4c3aed89ff05..8e595e03655a 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -961,6 +961,7 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
->         struct sk_buff *skb;
->         unsigned long flags;
->         int err = 0;
-> +       u16 wMaxPacketSize = le16_to_cpu(data->isoc_rx_ep->wMaxPacketSize);
->
->         spin_lock_irqsave(&data->rxlock, flags);
->         skb = data->sco_skb;
-> @@ -980,6 +981,19 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
->                 }
->
->                 len = min_t(uint, hci_skb_expect(skb), count);
-> +
-> +               /* Gaps in audio could be heard while streaming WBS using USB
-> +                * alt settings 3 on some platforms, since this is only used
-> +                * with RTK chips so let vendor function detect it.
-> +                */
-> +               if (test_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags) &&
-> +                       btrealtek_test_flag(data->hdev, REALTEK_WBS_FILTER)) {
-> +                       err = btrtl_usb_recv_isoc(skb->len, skb->data, buffer,
-> +                                                       len, wMaxPacketSize);
-> +                       if (err)
-> +                               break;
-> +               }
+It would be looking more like an enhancement patch for me to fix up
+the potential issue happening in the firmware where the existing
+driver cannot detect and recover in time with .cmd_timeout callback
+but actually, the kind of potential issue in firmware I was worried
+about in the firmware didn't happen or being reported so far.
 
-If we really need to do this then we need a way for vendors to replace
-btus_recv_isoc with the vendor function.
+   Sean
 
->                 skb_put_data(skb, buffer, len);
 >
->                 count -= len;
-> --
-> 2.17.1
+> Regards,
+> Angelo
 >
-
-
--- 
-Luiz Augusto von Dentz
+> > ---
+> >   drivers/bluetooth/btusb.c | 4 ++++
+> >   1 file changed, 4 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 653f57a98233..dc86726c8271 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -2576,6 +2576,10 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+> >       data->evt_skb = NULL;
+> >   err_free_wc:
+> >       kfree(wc);
+> > +
+> > +     if (err < 0)
+> > +             btmtk_reset_sync(hdev);
+> > +
+> >       return err;
+> >   }
+> >
+>
