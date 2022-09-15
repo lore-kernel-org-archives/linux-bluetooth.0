@@ -2,228 +2,413 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7C95ECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Sep 2022 09:58:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 867FFECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Sep 2022 09:58:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229933AbiIOJ6M (ORCPT
+        id S229536AbiIOJ6I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 15 Sep 2022 05:58:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42574 "EHLO
+        Thu, 15 Sep 2022 05:58:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42450 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbiIOJ5h (ORCPT
+        with ESMTP id S229728AbiIOJ5g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 15 Sep 2022 05:57:37 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 038579C228
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 02:53:24 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id p69so20136923yba.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 02:53:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=dWKFLfMRTgfQu9bSpTr/rzHVqKoEmBUXIEoSuOHE3Ak=;
-        b=RcEK4m87RefXG575cYTY/p7pvh+1P1mhoLuFljIhjSB8Si5HnS1eIyeXCSBoPMHauD
-         +jBTXZUS9aALk1A2SWsRAP5dtRWOBERt78/SOrS8RHB108nkmjOeMduknBFUk1IudZJy
-         NrC78jhhjA2+c8jeplBSi8CsrlQcjQjYukccL/Y3IOeHqn4TaEm77hg5dWzgvLuBvn8U
-         CDAAt08m6thAjNco07pA2fpvVJnMghB68VbM29i4qaSj1cRVRoT6Vg3qVGQJRwohx/tf
-         pEzVEBBEJgCqfF0UFPcOo4IUr4U2hU8hseAU/7zPeevjZezQmeOFObHGnjl1M0FbAaHX
-         yqBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=dWKFLfMRTgfQu9bSpTr/rzHVqKoEmBUXIEoSuOHE3Ak=;
-        b=eu7P0P0z+dWHRoit53eWIt9HjYHrdRmUyvxMJv7rFon9GxA1R85qsa9Es4Og2sOcdA
-         DsINNDBdgoh0NzQpvhMO8W+rb1TiactcuQuegOn7faiwY4AAKETvq6Qcxw6OZQMuvGFC
-         a4w62UIOj14xGSTl+ICqAx4mEP8HoM/skCm243F8nMx4UJadtdf15W9sjVls/IyJpbJ1
-         b/I/G+V97eTMSpNN1ENyVtkq/0vmIIk1ZsBwpQ627ZHXyjhfUa/1dqg1iBe+45ewbncM
-         soD5UUV5dKCBD76DQ3ZUqmtW3FlwD7ABKFrU0QTuCnTW4wZxAkhE0WGoLfucDyWyCk9t
-         uXAg==
-X-Gm-Message-State: ACgBeo0giDchih+VVVdFvISoq6YWUqGLEQGFfzSaBQVbiXTbTdQk7miI
-        ORyfp5yCwBNOcDLXCSimiaw8yEPwpKAgoFdokAB9QthZJfY=
-X-Google-Smtp-Source: AA6agR5uCKkUeoTfoVpjPuEcgAhLhu8An2GLwd64jIwTMbQBSqY2WcZNCnE/E2URyjhJIUXiRS33MBsG/IKnTO/gePA=
-X-Received: by 2002:a05:6902:1245:b0:6ae:325e:166a with SMTP id
- t5-20020a056902124500b006ae325e166amr30401206ybu.206.1663235603795; Thu, 15
- Sep 2022 02:53:23 -0700 (PDT)
+        Thu, 15 Sep 2022 05:57:36 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C789D64B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 02:53:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663235596; x=1694771596;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0lYuQvPFb3/vWBRfmfsL+RYMmcVMs9a/xNkc+wwWHrY=;
+  b=VfO7w/hg1L+z8CoBu9xjffYMp55JoaeNiG37XR7s/wyDjD+7wsLvQw2V
+   m2k+lppwD8TJpgBOPeZ+9SiIjYqrlWzDfBhOKMi6grQr6nUY7uEN4tR8u
+   jq6sgERYvjzfK7aMugKBVcqge6RkO5lH6vDFKBMNi8KnivudPAt3rsNOF
+   Wi0d8SJl6QsrlrpnIFjAUuljIfu/DkqeI3n8AkPRTJJGHXxQ71tFEWGSO
+   Px0Rp67UZDldVKUwdMYBaMq13TpEOMVc2XpjL3z2fV7ftoWoOIp0Hr/Kg
+   /Xkvoct1FuCgFUjbW9hfJ+g29OruO1sxMharjFq1m8+ZwqoG/hn2JGs8j
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="285709673"
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="285709673"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 02:52:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="945886006"
+Received: from bsblt022.iind.intel.com ([10.224.186.21])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Sep 2022 02:52:42 -0700
+From:   Sathish Narasimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ v2 3/4] profiles: Add initial code for vcp plugin
+Date:   Thu, 15 Sep 2022 15:24:11 +0530
+Message-Id: <20220915095412.462210-3-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220915095412.462210-1-sathish.narasimman@intel.com>
+References: <20220915095412.462210-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
-References: <20220912124657.404551-2-sathish.narasimman@intel.com>
- <631f3c5c.050a0220.3a4e9.d86a@mx.google.com> <CABBYNZKbMvToE1S4JAJz80SLpW8a9jFzw+u3KQMTdmC0wtrK+g@mail.gmail.com>
-In-Reply-To: <CABBYNZKbMvToE1S4JAJz80SLpW8a9jFzw+u3KQMTdmC0wtrK+g@mail.gmail.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Thu, 15 Sep 2022 15:23:12 +0530
-Message-ID: <CAOVXEJKL5d04tm3Yi=4vCyDjUmri-9Unne+aW7YVk967Fe_fjw@mail.gmail.com>
-Subject: Re: Volume Control Profile
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz
+This adds initial code for vcp plugin which handles Volume Control
+Profile and Volume Control Service.
+---
+ Makefile.plugins     |   5 +
+ configure.ac         |   4 +
+ profiles/audio/vcp.c | 312 +++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 321 insertions(+)
+ create mode 100644 profiles/audio/vcp.c
 
-Updated v2 of the patch.
-Please review
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 213ed99edf2d..a3654980f86d 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -121,3 +121,8 @@ if BAP
+ builtin_modules += bap
+ builtin_sources += profiles/audio/bap.c
+ endif
++
++if VCP
++builtin_modules += vcp
++builtin_sources += profiles/audio/vcp.c
++endif
+diff --git a/configure.ac b/configure.ac
+index 1f76915b4349..79645e6917cc 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -199,6 +199,10 @@ AC_ARG_ENABLE(bap, AS_HELP_STRING([--disable-bap],
+ 		[disable BAP profile]), [enable_bap=${enableval}])
+ AM_CONDITIONAL(BAP, test "${enable_bap}" != "no")
+ 
++AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
++		[disable VCP profile]), [enable_vcp=${enableval}])
++AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
++
+ AC_ARG_ENABLE(tools, AS_HELP_STRING([--disable-tools],
+ 		[disable Bluetooth tools]), [enable_tools=${enableval}])
+ AM_CONDITIONAL(TOOLS, test "${enable_tools}" != "no")
+diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
+new file mode 100644
+index 000000000000..34950d4070f2
+--- /dev/null
++++ b/profiles/audio/vcp.c
+@@ -0,0 +1,312 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++
++#include <ctype.h>
++#include <stdbool.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <sys/types.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <errno.h>
++
++#include <glib.h>
++
++#include "gdbus/gdbus.h"
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++#include "lib/sdp.h"
++#include "lib/uuid.h"
++
++#include "src/dbus-common.h"
++#include "src/shared/util.h"
++#include "src/shared/att.h"
++#include "src/shared/queue.h"
++#include "src/shared/gatt-db.h"
++#include "src/shared/gatt-client.h"
++#include "src/shared/gatt-server.h"
++#include "src/shared/vcp.h"
++
++#include "btio/btio.h"
++#include "src/plugin.h"
++#include "src/adapter.h"
++#include "src/gatt-database.h"
++#include "src/device.h"
++#include "src/profile.h"
++#include "src/service.h"
++#include "src/log.h"
++#include "src/error.h"
++
++#define VCS_UUID_STR "00001844-0000-1000-8000-00805f9b34fb"
++#define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
++
++struct vcp_data {
++	struct btd_device *device;
++	struct btd_service *service;
++	struct bt_vcp *vcp;
++};
++
++static struct queue *sessions;
++
++static int vcp_disconnect(struct btd_service *service)
++{
++	DBG("");
++	return 0;
++}
++
++static struct vcp_data *vcp_data_new(struct btd_device *device)
++{
++	struct vcp_data *data;
++
++	data = new0(struct vcp_data, 1);
++	data->device = device;
++
++	return data;
++}
++
++static void vcp_data_add(struct vcp_data *data)
++{
++	DBG("data %p", data);
++
++	if (queue_find(sessions, NULL, data)) {
++		error("data %p already added", data);
++		return;
++	}
++
++	if (!sessions)
++		sessions = queue_new();
++
++	queue_push_tail(sessions, data);
++
++	if (data->service)
++		btd_service_set_user_data(data->service, data);
++}
++
++static bool match_data(const void *data, const void *match_data)
++{
++	const struct vcp_data *vdata = data;
++	const struct bt_vcp *vcp = match_data;
++
++	return vdata->vcp == vcp;
++}
++
++static void vcp_data_free(struct vcp_data *data)
++{
++	if (data->service) {
++		btd_service_set_user_data(data->service, NULL);
++		bt_vcp_set_user_data(data->vcp, NULL);
++	}
++
++	bt_vcp_unref(data->vcp);
++	free(data);
++}
++
++static void vcp_data_remove(struct vcp_data *data)
++{
++	DBG("data %p", data);
++
++	if (!queue_remove(sessions, data))
++		return;
++
++	vcp_data_free(data);
++
++	if (queue_isempty(sessions)) {
++		queue_destroy(sessions, NULL);
++		sessions = NULL;
++	}
++}
++
++static void vcp_detached(struct bt_vcp *vcp, void *user_data)
++{
++	struct vcp_data *data;
++
++	DBG("%p", vcp);
++
++	data = queue_find(sessions, match_data, vcp);
++	if (!data) {
++		error("Unable to find vcp session");
++		return;
++	}
++
++	vcp_data_remove(data);
++}
++
++static void vcp_attached(struct bt_vcp *vcp, void *user_data)
++{
++	struct vcp_data *data;
++	struct bt_att *att;
++	struct btd_device *device;
++
++	DBG("%p", vcp);
++
++	data = queue_find(sessions, match_data, vcp);
++	if (data)
++		return;
++
++	att = bt_vcp_get_att(vcp);
++	if (!att)
++		return;
++
++	device = btd_adapter_find_device_by_fd(bt_att_get_fd(att));
++	if (!device) {
++		error("Unable to find device");
++		return;
++	}
++
++	data = vcp_data_new(device);
++	data->vcp = vcp;
++
++	vcp_data_add(data);
++
++}
++
++static int vcp_probe(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++	struct vcp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	/* Ignore, if we were probed for this device already */
++	if (data) {
++		error("Profile probed twice for the same device!");
++		return -EINVAL;
++	}
++
++	data = vcp_data_new(device);
++	data->service = service;
++
++	data->vcp = bt_vcp_new(btd_gatt_database_get_db(database),
++					btd_device_get_gatt_db(device));
++	if (!data->vcp) {
++		error("Unable to create VCP instance");
++		free(data);
++		return -EINVAL;
++	}
++
++	vcp_data_add(data);
++
++	bt_vcp_set_user_data(data->vcp, service);
++
++	return 0;
++}
++
++static void vcp_remove(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct vcp_data *data;
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	data = btd_service_get_user_data(service);
++	if (!data) {
++		error("VCP service not handled by profile");
++		return;
++	}
++
++	vcp_data_remove(data);
++}
++
++static int vcp_accept(struct btd_service *service)
++{
++	struct btd_device *device = btd_service_get_device(service);
++	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
++	struct vcp_data *data = btd_service_get_user_data(service);
++	char addr[18];
++
++	ba2str(device_get_address(device), addr);
++	DBG("%s", addr);
++
++	if (!data) {
++		error("VCP service not handled by profile");
++		return -EINVAL;
++	}
++
++	if (!bt_vcp_attach(data->vcp, client)) {
++		error("VCP unable to attach");
++		return -EINVAL;
++	}
++
++	btd_service_connecting_complete(service, 0);
++
++	return 0;
++}
++
++static int vcp_server_probe(struct btd_profile *p,
++				  struct btd_adapter *adapter)
++{
++	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
++
++	DBG("VCP path %s", adapter_get_path(adapter));
++
++	bt_vcp_add_db(btd_gatt_database_get_db(database));
++
++	return 0;
++}
++
++static void vcp_server_remove(struct btd_profile *p,
++					struct btd_adapter *adapter)
++{
++	DBG("VCP remove Adapter");
++}
++
++static struct btd_profile vcp_profile = {
++	.name		= "vcp",
++	.priority	= BTD_PROFILE_PRIORITY_MEDIUM,
++	.remote_uuid	= VCS_UUID_STR,
++
++	.device_probe	= vcp_probe,
++	.device_remove	= vcp_remove,
++
++	.accept		= vcp_accept,
++	.disconnect	= vcp_disconnect,
++
++	.adapter_probe = vcp_server_probe,
++	.adapter_remove = vcp_server_remove,
++};
++
++static unsigned int vcp_id = 0;
++
++static int vcp_init(void)
++{
++	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
++		warn("D-Bus experimental not enabled");
++		return -ENOTSUP;
++	}
++
++	btd_profile_register(&vcp_profile);
++	vcp_id = bt_vcp_register(vcp_attached, vcp_detached, NULL);
++
++	return 0;
++}
++
++static void vcp_exit(void)
++{
++	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL) {
++		btd_profile_unregister(&vcp_profile);
++		bt_vcp_unregister(vcp_id);
++	}
++}
++
++BLUETOOTH_PLUGIN_DEFINE(vcp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
++							vcp_init, vcp_exit)
+-- 
+2.25.1
 
-On Thu, Sep 15, 2022 at 3:18 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sathish,
->
-> On Mon, Sep 12, 2022 at 7:08 AM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=676220
-> >
-> > ---Test result---
-> >
-> > Test Summary:
-> > CheckPatch                    FAIL      5.79 seconds
-> > GitLint                       PASS      3.00 seconds
-> > Prep - Setup ELL              PASS      31.92 seconds
-> > Build - Prep                  PASS      0.90 seconds
-> > Build - Configure             PASS      9.87 seconds
-> > Build - Make                  PASS      1165.82 seconds
-> > Make Check                    PASS      12.98 seconds
-> > Make Check w/Valgrind         PASS      355.07 seconds
-> > Make Distcheck                PASS      306.75 seconds
-> > Build w/ext ELL - Configure   PASS      10.50 seconds
-> > Build w/ext ELL - Make        PASS      107.90 seconds
-> > Incremental Build w/ patches  PASS      510.36 seconds
-> > Scan Build                    WARNING   1238.26 seconds
-> >
-> > Details
-> > ##############################
-> > Test: CheckPatch - FAIL
-> > Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> > Output:
-> > [BlueZ,2/4] shared/vcp: Add initial code for handling VCP
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #393: FILE: src/shared/vcp.c:302:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #425: FILE: src/shared/vcp.c:334:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #458: FILE: src/shared/vcp.c:367:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #491: FILE: src/shared/vcp.c:400:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #523: FILE: src/shared/vcp.c:432:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-> > #555: FILE: src/shared/vcp.c:464:
-> > +       gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate, sizeof(struct vol_state),
-> >
-> > WARNING:LONG_LINE: line length of 82 exceeds 80 columns
-> > #1051: FILE: src/shared/vcp.c:960:
-> > +                                               value_handle, vcp_vstate_register,
-> >
-> > WARNING:LONG_LINE: line length of 81 exceeds 80 columns
-> > #1080: FILE: src/shared/vcp.c:989:
-> > +                                               value_handle, vcp_vflag_register,
-> >
-> > WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-> > #1146: FILE: src/shared/vcp.h:16:
-> > +#define __packed __attribute__((packed))
-> >
-> > /github/workspace/src/12973630.patch total: 0 errors, 9 warnings, 1098 lines checked
-> >
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> >
-> > /github/workspace/src/12973630.patch has style problems, please review.
-> >
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> >
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> >
-> > [BlueZ,3/4] profiles: Add initial code for vcp plugin
-> > ERROR:INITIALISED_STATIC: do not initialise statics to 0
-> > #395: FILE: profiles/audio/vcp.c:288:
-> > +static unsigned int vcp_id = 0;
-> >
-> > /github/workspace/src/12973633.patch total: 1 errors, 0 warnings, 330 lines checked
-> >
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> >
-> > /github/workspace/src/12973633.patch has style problems, please review.
-> >
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> >
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> >
-> >
-> > ##############################
-> > Test: Scan Build - WARNING
-> > Desc: Run Scan Build with patches
-> > Output:
-> > *****************************************************************************
-> > The bugs reported by the scan-build may or may not be caused by your patches.
-> > Please check the list and fix the bugs if they are caused by your patch.
-> > *****************************************************************************
-> > src/shared/vcp.c:288:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:294:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:320:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:326:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:352:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:358:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:385:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:391:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:418:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:424:29: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (req->change_counter != vstate->counter) {
-> >                                    ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:450:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:456:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:482:11: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         vstate = vdb->vcs->vstate;
-> >                  ^~~~~~~~
-> > src/shared/vcp.c:488:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > 14 warnings generated.
->
-> Would you please fix the above problems, also Id reorder the patches
-> so the monitor changes can be applied before the others.
->
-> --
-> Luiz Augusto von Dentz
