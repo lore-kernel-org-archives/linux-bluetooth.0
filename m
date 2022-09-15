@@ -2,149 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8ADFECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Sep 2022 01:57:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9892C6FA86
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Sep 2022 09:12:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbiIOB5j (ORCPT
+        id S229835AbiIOJMA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Sep 2022 21:57:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49074 "EHLO
+        Thu, 15 Sep 2022 05:12:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiIOB5i (ORCPT
+        with ESMTP id S229772AbiIOJL6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Sep 2022 21:57:38 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988F28E472;
-        Wed, 14 Sep 2022 18:57:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4BFFAB81D63;
-        Thu, 15 Sep 2022 01:57:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F36AC433D6;
-        Thu, 15 Sep 2022 01:57:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663207055;
-        bh=aoSRSTCag8l0MVvAawlhHyEVLuGR7v1VAyAi5bDVdV0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=pN9YnBUGFwz4p4F0zvwLmYf/rW/NWhUuGFlUjRSaDtid21lXc6Upb5MqPOu5abrxy
-         A1/1lTkaYiI4L7BHqggJU6AQ3/k5EjG/LIQLUH7OqXC4TZxGCPrYsiuKR7yjnr6u8d
-         XFBC3F77ft5J1SB9Ip5tzQSaA4k2HVTPeQFYnETLpRWKWYZ9OEOf/PNscYfyhCcrsJ
-         epTcMieYUBQY5+6dHyqpvYszTUG8Q/EhK9C4WdHn942wZ9/yJCtsLiam+Ok7vIF/o7
-         QD0z7ZGQ2xD7tukqFGIJy7lGQI3nkIryNAOdV0etGyGpq8tmYWjhp3Lyn6zQ0IOQM1
-         JKtOYb6gbQF6w==
-Received: by mail-wm1-f44.google.com with SMTP id ay36so3306225wmb.0;
-        Wed, 14 Sep 2022 18:57:34 -0700 (PDT)
-X-Gm-Message-State: ACgBeo2d8CMMIixMFwMt9NYVpalE6hHnaioTvX1bWgBS9eMO5aikKpj+
-        p9whArlwnwqUTUGdeEBpvuZlqnLPZxy6R8G/i1M=
-X-Google-Smtp-Source: AA6agR5buy/tXnCUXXG3a+BHycJDxuOdO5maD2LttOCF+4xw0zjN1zk3rj4LnQ1oaVye1Z0dlKBUprQ6WPEnuG7yhtw=
-X-Received: by 2002:a05:600c:4e15:b0:3b4:a621:b54e with SMTP id
- b21-20020a05600c4e1500b003b4a621b54emr3312685wmq.47.1663207053256; Wed, 14
- Sep 2022 18:57:33 -0700 (PDT)
+        Thu, 15 Sep 2022 05:11:58 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C7D98A44
+        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 02:11:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663233117; x=1694769117;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lEIA4rjVi3QwksNHFtO/tRqQTysTvVksh+rNROV+dPY=;
+  b=SAzGYb4dSYOYwqPl24/Uf4eXRCNR87uPk3TNLxcAG/eQ5wMaqlTs4VQ9
+   ohcNUA2RBwrt5tUeKBGKGLYnmoSx/BhFP4iHpRyge5SXWPYjjkZP9hW90
+   eEfTpvq6ZpMRCo2ZCeBYWSGwtUWkGPsPBxMTbwsylUiPKzYE6kwAPl7Vi
+   FcMWip8tBTyCPAxksXwLVDK+HDnZY6Fa0rmns+Wp7nMv8yiKZ1oFb45SG
+   P+CKYzCd1kOmvL/R7JdNmMGzdXm8U2qNlMwRMX/uWHFQsmp5zXSRwzx0r
+   /qr1zfQAG9+FC2904xcEno5WxZTSs/xOOTrBT/jRJ2/8lTiXoqo9fg4wR
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10470"; a="384953308"
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="384953308"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Sep 2022 02:11:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,317,1654585200"; 
+   d="scan'208";a="759560386"
+Received: from lkp-server02.sh.intel.com (HELO 41300c7200ea) ([10.239.97.151])
+  by fmsmga001.fm.intel.com with ESMTP; 15 Sep 2022 02:11:47 -0700
+Received: from kbuild by 41300c7200ea with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oYkuR-0000G3-10;
+        Thu, 15 Sep 2022 09:11:47 +0000
+Date:   Thu, 15 Sep 2022 17:11:25 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 9afc675edeeb34d281675f1d5a217d27c5a1a3db
+Message-ID: <6322ec3d.YjItPucVuDVDFcZp%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <43b68b1f48c20b1dfcd7e6663c3dcb38e4e0648c.1663020936.git.objelf@gmail.com>
- <a432abf4cf95e93783864b27bafa53d45bdd5212.1663020936.git.objelf@gmail.com> <CABBYNZ+Z+BApMOPEgVBxf6j0sTYFE0tH6Eab-hQW8FKVFqfvqA@mail.gmail.com>
-In-Reply-To: <CABBYNZ+Z+BApMOPEgVBxf6j0sTYFE0tH6Eab-hQW8FKVFqfvqA@mail.gmail.com>
-From:   Sean Wang <sean.wang@kernel.org>
-Date:   Wed, 14 Sep 2022 18:57:21 -0700
-X-Gmail-Original-Message-ID: <CAGp9LzrjmKDF_3+Km05eLVkr9ZHKhfMWjVxx=7GvsfRmWNp2dQ@mail.gmail.com>
-Message-ID: <CAGp9LzrjmKDF_3+Km05eLVkr9ZHKhfMWjVxx=7GvsfRmWNp2dQ@mail.gmail.com>
-Subject: Re: [PATCH 3/4] Bluetooth: btusb: mediatek: reset the device as WMT failed
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     sean.wang@mediatek.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
-        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
-        abhishekpandit@google.com, michaelfsun@google.com,
-        abhishekpandit@chromium.org, mcchou@chromium.org,
-        shawnku@google.com, linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 9afc675edeeb34d281675f1d5a217d27c5a1a3db  Bluetooth: hci_sync: allow advertise when scan without RPA
 
-On Wed, Sep 14, 2022 at 3:46 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sean,
->
-> On Mon, Sep 12, 2022 at 3:18 PM <sean.wang@mediatek.com> wrote:
-> >
-> > From: Sean Wang <sean.wang@mediatek.com>
-> >
-> > Reset the BT device whenever the driver detected any WMT failure happened
-> > to recover such kind of system-level error as soon as possible.
-> >
-> > Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> > ---
-> >  drivers/bluetooth/btusb.c | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 653f57a98233..dc86726c8271 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2576,6 +2576,10 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
-> >         data->evt_skb = NULL;
-> >  err_free_wc:
-> >         kfree(wc);
-> > +
-> > +       if (err < 0)
-> > +               btmtk_reset_sync(hdev);
->
-> Doesn't reset itself can fail?
+elapsed time: 720m
 
-The reset is supposed not to fail so there is no return value is
-designated in the function
+configs tested: 58
+configs skipped: 2
 
->
-> >         return err;
->
-> It would probably be better to reset on error at the caller IMO, also
-> in case it fails during firmware upload does reset even work? Also it
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-The reset is supposed to work even without the firmware uploaded but I
-need to have further confirmation with fw folks to ensure this point.
-Anyway, I will try to move the reset on the error at the caller or
-based on the context in the next version because I thought again that
-will also help
-working out a patch to recover any error present at firmware
-initialization that the driver currently cannot handle and the patch
-cannot cover.
+gcc tested configs:
+x86_64                        randconfig-a004
+um                           x86_64_defconfig
+x86_64                        randconfig-a002
+arc                  randconfig-r043-20220914
+um                             i386_defconfig
+arc                                 defconfig
+s390                             allmodconfig
+x86_64                        randconfig-a006
+alpha                               defconfig
+s390                                defconfig
+i386                          randconfig-a001
+x86_64                              defconfig
+x86_64                               rhel-8.3
+arm                                 defconfig
+s390                             allyesconfig
+i386                                defconfig
+m68k                             allmodconfig
+x86_64                           allyesconfig
+i386                          randconfig-a003
+arc                              allyesconfig
+i386                          randconfig-a005
+alpha                            allyesconfig
+m68k                             allyesconfig
+arm                              allyesconfig
+powerpc                           allnoconfig
+arm64                            allyesconfig
+i386                          randconfig-a014
+i386                          randconfig-a012
+x86_64                          rhel-8.3-func
+i386                             allyesconfig
+x86_64                         rhel-8.3-kunit
+i386                          randconfig-a016
+powerpc                          allmodconfig
+x86_64                           rhel-8.3-kvm
+sh                               allmodconfig
+mips                             allyesconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                           rhel-8.3-syz
+x86_64                        randconfig-a013
+ia64                             allmodconfig
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
 
-> would probably have been better to have its own file for vendor
-> specific commands like this and use btmtk_ prefix as well.
+clang tested configs:
+hexagon              randconfig-r041-20220914
+x86_64                        randconfig-a005
+x86_64                        randconfig-a001
+hexagon              randconfig-r045-20220914
+x86_64                        randconfig-a003
+riscv                randconfig-r042-20220914
+s390                 randconfig-r044-20220914
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+i386                          randconfig-a013
+i386                          randconfig-a011
+i386                          randconfig-a015
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
 
-I had tried to move btusb_mtk_hci_wmt_sync to btmtk.c to allow it to
-be reused by all mtk bluetooth drivers but some reason stopped me from
-doing that.
-that is btusb_mtk_hci_wmt_sync has the reference to the data bundled
-with btusb.c and it seemed a bit harder for me to split out from
-btusb.c for the moment,
-such as btusb data->flag the function will refer to and is shared by
-all vendors, so I still temporarily leave the vendor-specific commands
-there.
-I think that would be easy to do if btusb.c can support a pointer in
-struct btusb_data pointed to the vendor-specific data area where I can
-put the flag and other
-vendor-specific stuff the btmtk.c needed there.
-
-             Sean
->
-> >  }
-> >
-> > --
-> > 2.25.1
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
