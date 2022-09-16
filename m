@@ -2,205 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95619C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Sep 2022 05:02:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4FCC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Sep 2022 09:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229581AbiIPFCl (ORCPT
+        id S229688AbiIPJvu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Sep 2022 01:02:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59542 "EHLO
+        Fri, 16 Sep 2022 05:51:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiIPFCe (ORCPT
+        with ESMTP id S229990AbiIPJvt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Sep 2022 01:02:34 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93F2A6396
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 22:02:32 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id b136so30910021yba.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 15 Sep 2022 22:02:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=8zmQUnLSgMhAmcMNyTSH1FjfiKWd1kLPQ9TrccufX8c=;
-        b=bXYC4KXv40xFm5DjYlTkRlaAfQ87P+EsXsP/EfJKijvniHZxGQCM6uwzCEY/fOHX5b
-         AflQe0x5EqFVER41XU0FA88OCuLgU7OE9h90DM6/IZSMA6406ER85xir/kup9arbgHSN
-         WRPXpEyqupT1h2BwWR/CrKAyKb/ycgBIDsyyPo8LsAe0Dw5Vef4JpcIWVCz/8n83dssn
-         TYvn0FqZnRl9Sek+K39iuWPAA7b5h+HhMIYrX3BtKiNFGNliIg1PN6ESfoGrApq7CWNV
-         kjARKbbSagxpbvLLmUXyMfSt0Hz1aJxTHFWsbpQN77sesRojpeteOgSQWtVjhhDoFMI+
-         WLqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=8zmQUnLSgMhAmcMNyTSH1FjfiKWd1kLPQ9TrccufX8c=;
-        b=rp2C0bry0ZwR3vHZEQ+Ps+g0CE2lMLKnzLu4w4CFMRfHSHu1w9f0HQ5ceXqu63aOgp
-         8PlvhXzmUqjq1mZM+g7lsFuscKv75Cd4bXURUuqUvQDKddWuwJHZv6MssIYvw2HWpLGa
-         6+Uwp624/dpVQJjEctYb+FeWIad+n87n/GnL3qxCSvu4gLxLIU5f+2RVBwb5e5DK0KEt
-         P9qD+oqrMUnvzg13Gu7qGWYjCP04M8+WENJk6uJEX8oao+OCkgkoapI4XRaGCCPMvO5O
-         Xi1AqHGKo8hqQZwHrgALRq6dNCot8qx8kdONL4+/mYQsVOry77ezYX9pY/sWkcTOmZVL
-         LA0Q==
-X-Gm-Message-State: ACrzQf3dr2/yOZLqSyaYJtiMsjkOSHtsRPs3YNONFCIBQ63RJ5ojCFzC
-        GtakKtt/uQIEsu5NVYmM2ML52i4qYQwMDUaRtV98KndU48o=
-X-Google-Smtp-Source: AMsMyM40rNdQutPHGpxIrZur2BPRNao4EzmSFgcNGzC6BYOt737tvFDTck1iBinBCfe1KEQCHAnMtiFLcOtRfZ0V6K0=
-X-Received: by 2002:a25:ab85:0:b0:6af:faae:55a2 with SMTP id
- v5-20020a25ab85000000b006affaae55a2mr2705757ybi.43.1663304551656; Thu, 15 Sep
- 2022 22:02:31 -0700 (PDT)
+        Fri, 16 Sep 2022 05:51:49 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2B79BCAD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Sep 2022 02:51:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663321908; x=1694857908;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=dkAV4CLaMwHSZvjMABZIi3qBIKWwff4CD2ir2FwebsE=;
+  b=RsxYyVo5+cSZ3X9aCFisZPmELP+Nd6GntNDcwAC0uZNuN1hIOrTdHwDz
+   pZBqt/1RPtAvNMA3PPj2YQHYIjRQPsI+fzvF4+ZSt7ls2/QEzcpfLTnsR
+   ZXp5Bjnmj5zom6JVUAxyFViOB4i+ri13qBPMziz3EulGEHW5JO8VGEdmz
+   x/lnEa5ZLuTG1HXhlHoSs1AkVhArp96fakt3wtr3dOFYl/7jGm2HTziun
+   hocEHAnzyIphE9WoVaSa3HeelcYVnzOpZEEYq1Wszhzg+J6/iK7STukBa
+   d6IV4KNdXP+zcL2rYOlrk5nwi3o6Qx+rjF0AQ6+RI92DRyMYGVGwdn045
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10471"; a="279337444"
+X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
+   d="scan'208";a="279337444"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2022 02:51:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,320,1654585200"; 
+   d="scan'208";a="568776410"
+Received: from lkp-server02.sh.intel.com (HELO 41300c7200ea) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 16 Sep 2022 02:51:46 -0700
+Received: from kbuild by 41300c7200ea with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oZ80g-0001fO-0T;
+        Fri, 16 Sep 2022 09:51:46 +0000
+Date:   Fri, 16 Sep 2022 17:51:06 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 812e92b824c1db16c9519f8624d48a9901a0d38f
+Message-ID: <6324470a.dRETZVm2dA2Vr76r%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <20220915095412.462210-1-sathish.narasimman@intel.com>
- <63230e51.050a0220.6c72d.5248@mx.google.com> <CABBYNZJaGkWt4zSZyFhsDTGG-_vBSTmwzzrtnbiP6M_fvJyUXA@mail.gmail.com>
-In-Reply-To: <CABBYNZJaGkWt4zSZyFhsDTGG-_vBSTmwzzrtnbiP6M_fvJyUXA@mail.gmail.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Fri, 16 Sep 2022 10:32:20 +0530
-Message-ID: <CAOVXEJ+Y2Ao6+tHt3eE+y6neJzqUZ07Y3JeOXnn9myUa3Kv7zA@mail.gmail.com>
-Subject: Re: [BlueZ,v2,1/4] lib/uuid: Add VCS UUIDs
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 812e92b824c1db16c9519f8624d48a9901a0d38f  Bluetooth: RFCOMM: Fix possible deadlock on socket shutdown/release
 
-On Fri, Sep 16, 2022 at 2:37 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sathish,
->
-> On Thu, Sep 15, 2022 at 4:41 AM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=677268
-> >
-> > ---Test result---
-> >
-> > Test Summary:
-> > CheckPatch                    FAIL      4.02 seconds
-> > GitLint                       PASS      1.89 seconds
-> > Prep - Setup ELL              PASS      33.60 seconds
-> > Build - Prep                  PASS      0.77 seconds
-> > Build - Configure             PASS      10.44 seconds
-> > Build - Make                  PASS      1169.04 seconds
-> > Make Check                    PASS      12.60 seconds
-> > Make Check w/Valgrind         PASS      356.41 seconds
-> > Make Distcheck                PASS      304.10 seconds
-> > Build w/ext ELL - Configure   PASS      11.04 seconds
-> > Build w/ext ELL - Make        PASS      108.76 seconds
-> > Incremental Build w/ patches  PASS      511.45 seconds
-> > Scan Build                    WARNING   1239.48 seconds
-> >
-> > Details
-> > ##############################
-> > Test: CheckPatch - FAIL
-> > Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> > Output:
-> > [BlueZ,v2,2/4] shared/vcp: Add initial code for handling VCP
-> > WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-> > #1154: FILE: src/shared/vcp.h:16:
-> > +#define __packed __attribute__((packed))
-> >
-> > /github/workspace/src/12977204.patch total: 0 errors, 1 warnings, 1106 lines checked
-> >
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> >
-> > /github/workspace/src/12977204.patch has style problems, please review.
-> >
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> >
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> >
-> > [BlueZ,v2,3/4] profiles: Add initial code for vcp plugin
-> > ERROR:INITIALISED_STATIC: do not initialise statics to 0
-> > #395: FILE: profiles/audio/vcp.c:288:
-> > +static unsigned int vcp_id = 0;
-> >
-> > /github/workspace/src/12977206.patch total: 1 errors, 0 warnings, 330 lines checked
-> >
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> >
-> > /github/workspace/src/12977206.patch has style problems, please review.
-> >
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> >
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> >
-> >
-> > ##############################
-> > Test: Scan Build - WARNING
-> > Desc: Run Scan Build with patches
-> > Output:
-> > *****************************************************************************
-> > The bugs reported by the scan-build may or may not be caused by your patches.
-> > Please check the list and fix the bugs if they are caused by your patch.
-> > *****************************************************************************
-> > src/shared/vcp.c:285:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:294:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:318:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:327:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:351:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:360:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:385:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:394:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:419:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:428:29: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (req->change_counter != vstate->counter) {
-> >                                    ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:452:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:461:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > src/shared/vcp.c:485:15: warning: Access to field 'vcs' results in a dereference of a null pointer (loaded from variable 'vdb')
-> >         if (!vdb && !vdb->vcs)
-> >                      ^~~~~~~~
-> > src/shared/vcp.c:494:25: warning: Access to field 'counter' results in a dereference of a null pointer (loaded from variable 'vstate')
-> >         if (*change_counter != vstate->counter) {
-> >                                ^~~~~~~~~~~~~~~
-> > 14 warnings generated.
->
-> Lets have these warnings fixed so vstate needs to be checked.
-Thanks for the review. Will Update for sure.
-Is there a way I can run Checkpatch.pl locally?
->
-> >
-> >
-> >
-> > ---
-> > Regards,
-> > Linux Bluetooth
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+elapsed time: 720m
 
-Sathish N
+configs tested: 58
+configs skipped: 2
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+um                           x86_64_defconfig
+um                             i386_defconfig
+arc                                 defconfig
+arc                  randconfig-r043-20220915
+alpha                               defconfig
+m68k                             allyesconfig
+x86_64                              defconfig
+m68k                             allmodconfig
+riscv                randconfig-r042-20220915
+arc                              allyesconfig
+s390                 randconfig-r044-20220915
+alpha                            allyesconfig
+i386                                defconfig
+x86_64                               rhel-8.3
+s390                             allmodconfig
+x86_64                        randconfig-a002
+x86_64                           allyesconfig
+s390                                defconfig
+powerpc                           allnoconfig
+i386                          randconfig-a001
+x86_64                        randconfig-a013
+i386                          randconfig-a003
+powerpc                          allmodconfig
+x86_64                        randconfig-a006
+x86_64                        randconfig-a011
+i386                          randconfig-a005
+i386                          randconfig-a014
+x86_64                          rhel-8.3-func
+x86_64                        randconfig-a015
+x86_64                        randconfig-a004
+x86_64                         rhel-8.3-kunit
+arm                                 defconfig
+x86_64                    rhel-8.3-kselftests
+i386                          randconfig-a012
+x86_64                           rhel-8.3-syz
+mips                             allyesconfig
+x86_64                           rhel-8.3-kvm
+i386                          randconfig-a016
+s390                             allyesconfig
+sh                               allmodconfig
+i386                             allyesconfig
+arm                              allyesconfig
+arm64                            allyesconfig
+ia64                             allmodconfig
+
+clang tested configs:
+hexagon              randconfig-r045-20220915
+hexagon              randconfig-r041-20220915
+x86_64                        randconfig-a001
+i386                          randconfig-a013
+i386                          randconfig-a002
+x86_64                        randconfig-a016
+x86_64                        randconfig-a003
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+i386                          randconfig-a011
+i386                          randconfig-a006
+x86_64                        randconfig-a014
+x86_64                        randconfig-a005
+i386                          randconfig-a015
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
