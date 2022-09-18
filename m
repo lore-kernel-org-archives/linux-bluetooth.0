@@ -2,104 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 311E9C32771
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Sep 2022 07:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7632C32771
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Sep 2022 07:46:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbiIRHPd (ORCPT
+        id S229494AbiIRHqY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Sep 2022 03:15:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56708 "EHLO
+        Sun, 18 Sep 2022 03:46:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiIRHPc (ORCPT
+        with ESMTP id S229447AbiIRHqX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Sep 2022 03:15:32 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F581E3F6
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Sep 2022 00:15:31 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id jm11so25207835plb.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Sep 2022 00:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=CFNQ2pofU3Ep29hs/7y1c6/q4/iA/l1q4gEcyssCkc4=;
-        b=QTO/NqlgfIJ6r7VzskiAeSQBdPa2j+JwqQ9xQNdVML//wJdd5MHczWD2qF/zmk8gDt
-         6QRoR2AVaAu14Q06/9qBfNEW6ZNm5YX6E9fMs9VclA27lKm2ajtGE6EO/90rb7npB9t3
-         h/AS1K6SqDtxI/9uuDKBHjJQw817TYrAaU1FZtjTOgQoctnT3VlxXnrzabt1f/qfvV7i
-         LOlGg+qOLWle6878kH8bb3TzrlOIr/x8FYMfLHdQ3rNP+gAVTVxMgD33p1gB/8sRv4L/
-         b5Frtq7WpudX/ZsS6RxdNTyrUA9aPdrzFjOAUVj+XYnamgUrqhJ2UDbOT6OcDe5bnB6u
-         4gww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=CFNQ2pofU3Ep29hs/7y1c6/q4/iA/l1q4gEcyssCkc4=;
-        b=E3Oe9YGL5SZpshBHPswmWvyM+DTsjLXLKHeSmRnGf03YDEhFaxcZpbbPaz9MCrq/23
-         XhxLZc/DFnury2xLIBIUhOA0gktcJvhdeLBSNuZG9XffW7UYu5HxyOlW/lEAXrAfuX2F
-         EgylVwkrSo5Wn7sSOy1ihR3WiMqzsH3zONse4fm6fYWi3qQcEgoELJ1w6fWsstwgCvwg
-         Wp4TnC3uI19pn+DHA3B0Yrc0SqbcrE0HokCc5ziN0dpMShQsChkN2xxzTZQKakImJEL5
-         uFJzf9a5znrKDg/Y3irE7GjEzTDwUCFmUNWcOCOWLM6SgSI1X7cd9Ydk67GkoPaX1WIH
-         HHwQ==
-X-Gm-Message-State: ACrzQf3Ex54sXjfhhLqD6oi0VBD4TukShjzeO2INkjmiWFVKSup7mmBp
-        3Qf5pQ5qTJy8dHq1nrOkRg201cPf9+k=
-X-Google-Smtp-Source: AMsMyM5HQI2LncB5fZV/XdyqldA54r7CKl0CGwFmJdtqh37QU2OG8MtZfBddgsjbNop0X73K0pYghg==
-X-Received: by 2002:a17:90b:1e47:b0:200:b9b4:ba0f with SMTP id pi7-20020a17090b1e4700b00200b9b4ba0fmr24736974pjb.245.1663485329884;
-        Sun, 18 Sep 2022 00:15:29 -0700 (PDT)
-Received: from [172.17.0.2] ([20.230.254.179])
-        by smtp.gmail.com with ESMTPSA id g12-20020aa79f0c000000b005380c555ba1sm18215564pfr.13.2022.09.18.00.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 18 Sep 2022 00:15:29 -0700 (PDT)
-Message-ID: <6326c591.a70a0220.17d2d.02f1@mx.google.com>
-Date:   Sun, 18 Sep 2022 00:15:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8158418930385492321=="
+        Sun, 18 Sep 2022 03:46:23 -0400
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0D32528A
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Sep 2022 00:46:21 -0700 (PDT)
+Received: from [192.168.0.2] (ip5f5aef17.dynamic.kabel-deutschland.de [95.90.239.23])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 5ECC761EA1929;
+        Sun, 18 Sep 2022 09:46:20 +0200 (CEST)
+Message-ID: <4e39349e-fc2f-f245-9a8c-56c59121e284@molgen.mpg.de>
+Date:   Sun, 18 Sep 2022 09:46:19 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wiagn233@outlook.com
-Subject: RE: Bluetooth: btusb: Add more device IDs for WCN6855
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <OS3P286MB2597907F01F1935AF89ED52D984A9@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.2
+Subject: Re: [PATCH] Bluetooth: btusb: Add more device IDs for WCN6855
+To:     Shengyu Qu <wiagn233@outlook.com>
+Cc:     linux-bluetooth@vger.kernel.org
 References: <OS3P286MB2597907F01F1935AF89ED52D984A9@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
+ <1ace324d-f2ac-f59c-3d21-8d4ebe2fb148@molgen.mpg.de>
+ <TY3P286MB2611180EF41ADA1FB154F5EF984A9@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Content-Language: en-US
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <TY3P286MB2611180EF41ADA1FB154F5EF984A9@TY3P286MB2611.JPNP286.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8158418930385492321==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=677926
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.34 seconds
-GitLint                       PASS      0.47 seconds
-SubjectPrefix                 PASS      0.24 seconds
-BuildKernel                   PASS      33.65 seconds
-BuildKernel32                 PASS      29.63 seconds
-Incremental Build with patchesPASS      45.92 seconds
-TestRunner: Setup             PASS      499.00 seconds
-TestRunner: l2cap-tester      PASS      16.49 seconds
-TestRunner: iso-tester        PASS      15.30 seconds
-TestRunner: bnep-tester       PASS      5.91 seconds
-TestRunner: mgmt-tester       PASS      99.59 seconds
-TestRunner: rfcomm-tester     PASS      9.83 seconds
-TestRunner: sco-tester        PASS      8.96 seconds
-TestRunner: smp-tester        PASS      9.22 seconds
-TestRunner: userchan-tester   PASS      6.19 seconds
+Dear Shengyu,
 
 
+Am 18.09.22 um 09:13 schrieb Shengyu Qu:
+> Thanks for your advice. Driver version is 1.0.0.1205 (Windows 10 driver).
+> Should I resend a patch with modified commit message?
 
----
-Regards,
-Linux Bluetooth
+Yes, a v2 would be wonderful.
+
+     git commit --amend
+     git format-patch -v 2 …
 
 
---===============8158418930385492321==--
+Kind regards,
+
+Paul
