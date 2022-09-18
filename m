@@ -2,332 +2,206 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E73ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Sep 2022 01:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96C72C32771
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Sep 2022 06:40:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229627AbiIQBr4 (ORCPT
+        id S229496AbiIRGkx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Sep 2022 21:47:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52254 "EHLO
+        Sun, 18 Sep 2022 02:40:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiIQBrz (ORCPT
+        with ESMTP id S229479AbiIRGkw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Sep 2022 21:47:55 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 941B0A261A;
-        Fri, 16 Sep 2022 18:47:53 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id d64-20020a17090a6f4600b00202ce056566so1398789pjk.4;
-        Fri, 16 Sep 2022 18:47:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
-        bh=p4qLwPQbh2y3xerrbhSEmHTu5O5lnkqyFzO1RkekXek=;
-        b=MPWkXn48PM0IzJIvCyzY9PfHGikAAuWK/FYuekd7Ag8JoaO1rkHfvtA78QJGZ2iLzS
-         ijKNvuHRK7DHG2D4cQ9NpaKteLVmq1LaQZ6so9uO2pJfeWmoRgNiip40ONtsBpHTRT7L
-         n5oH0iH0CJ3kWX0mZ9n8U3mBmt266B7mWeho35FDq2KARQAZipDJizTKndgLUym2wbq6
-         r41PA2QcXPXQL8JAPuo80IJ/WQdUOU0ug+SAJKj9LrsEzfSO+uGuThwbBujnSPW81Hx5
-         89eow/VH8YCcsJrqSVoSDfX8QlpdudEzrluH1J8SWlgvi6mGTtxoEKYrPbkV5rdXOCUi
-         s5HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=p4qLwPQbh2y3xerrbhSEmHTu5O5lnkqyFzO1RkekXek=;
-        b=7pdUvRSCEhvQ5J4aQYQuAipDZjrzcXAdFgJjUfW9bEpEf4z5tZeFim1l5pli4veGFx
-         G+xGm6GniGCwWaIRTwOzBeYkDpo+xqZUldIEk6M01AJSl1XJRienMSDSMQnhNrPEP/Yz
-         dkOSs3dSjYOumSmAVZObHNP90yjriXc6kAVCn0IOnROUhyvuWUaHZiDFTTFYSHBEjhGW
-         FeL+I0pqbwo7Ard2QzNFc0ARjO3FXalCrrND8UCPbcCYXFdHBKtnqT89HVEVof9CO7Fj
-         thWJpsEn5V0eLoK4Re1LlggTbOSozRaKXZ4aSOvZSE26kSLMn0XApP1L9A+cXG26Mg68
-         wz3Q==
-X-Gm-Message-State: ACrzQf3IOchfX+4gjEQoCD9d6MGaYuWOHPdxGSnTxzh/od/uQCwX1M7d
-        ixPbB9z3TmJ+PcvCezQjTwo=
-X-Google-Smtp-Source: AMsMyM4P9uyIwQ5pVUd4iSM3nWnuGI0wBkbfJ9XjQgRG6IdPdTtiqG0zu/bkTrBLrHQ7BjdG1s9T6w==
-X-Received: by 2002:a17:902:720c:b0:172:a1ff:8c21 with SMTP id ba12-20020a170902720c00b00172a1ff8c21mr2530330plb.159.1663379272897;
-        Fri, 16 Sep 2022 18:47:52 -0700 (PDT)
-Received: from localhost ([36.112.182.114])
-        by smtp.gmail.com with ESMTPSA id w6-20020a170902e88600b0017824e7065fsm13712731plg.180.2022.09.16.18.47.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Sep 2022 18:47:52 -0700 (PDT)
-From:   Hawkins Jiawei <yin31149@gmail.com>
-To:     syzbot+e653e3f67251b6139aaa@syzkaller.appspotmail.com
-Cc:     gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org,
-        rafael@kernel.org, syzkaller-bugs@googlegroups.com,
-        soenke.huster@eknoes.de, linux-bluetooth@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, 18801353760@163.com,
-        yin31149@gmail.com
-Subject: Re: [syzbot] BUG: corrupted list in kobject_add_internal (4)
-Date:   Sat, 17 Sep 2022 09:47:40 +0800
-Message-Id: <20220917014739.5624-1-yin31149@gmail.com>
+        Sun, 18 Sep 2022 02:40:52 -0400
+Received: from JPN01-TYC-obe.outbound.protection.outlook.com (mail-tycjpn01olkn2074.outbound.protection.outlook.com [40.92.99.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EA61D0F1
+        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Sep 2022 23:40:50 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m4sCPhhTw7yN//WA314WoPU5hNz9Tkr8iNfCsCgAtSRpKE0+uTFIQYHTnLHk/UcP8wzArplbE9mvUPLL8MMshA0L+MraqV5FSjP8wwqxlUTWUM+ZM4TdW21kTYQyLFTF/SnxU7SU/mrIC574A5xH/C8JYi6DGbiHdOnWTO1jXETnc+71PREaTHQe/sqSksG5BR04Y4g2k9xAjS4Uuytn9WvsK58fmy3krHs0H8wKsj2anO5bHHP8muLr+ONWCfn4pDpGsmmqn54g54lvUzrAt+fuxG3/UoEK8d9JZetVhGBtRAKEqM8E1RHmNU7y0JFmh1J1/0Y6FALaqDfCbM2zKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZCGSHCZXJoQSbW/6v/Jus5CtQUYtVsGdDiVZxx6w9Vg=;
+ b=bS7b8zdyZKYyN9EwalA2UpfOinSl9hyWUD9SJdJo0YyMFT/6sGPA/rqGPfNhENl59L6o9KOCfgZa3PxIv4AFKphmtftOQXbRjcxbLoopmAD2bk9cMOPZ+/0g5mBVXFxbNmOxg+0hSe3tJ0xAOoSEf1YTS9GvSscdwkIHmoxKsOod0gHUZdRg0jusNGrvoAjsNSGyt/roGvzLe/H3inRAKTZJOZgDJtYTrzSPJU/a1PG14BP6Q2pNvvfGYCmFCKEtKhg+iluZwK9jmcEk+LShyL4Mav9wD5+6PJhyfFXPuhJ7dicy6iXW0nQBnTKMYxSXJU5gwKrI/bQkPx6EmraD8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZCGSHCZXJoQSbW/6v/Jus5CtQUYtVsGdDiVZxx6w9Vg=;
+ b=Nx7xj7B4Kr+bcyzetiu9YdA0g9ulTv/3A32gijLc9m4D8vygp4mY5Kx+zhhuiw4HNp/tyHbppFZ2YaBlxqBbk2yuUcXwuE+gCjBRpcrH8+FvMXfZHXzQorxyA8WwmrB0NFf28rZ5YVbdpRDQkzSoSGlG5Zolu73R2nLFoG2g5WcDBKYORFCsTKBl8De1BqhJsa8UCoae123MY1vPnBbWfWIiBmcvgc0IVlKyCE8WP8EWRMzvplJmjeb55aQBHjruObBCJ529a3ua2u54MvdJQO4TLu1C4gAeUvm76IzCcw6nIBXAWzFhmC6gU7AQVScQbqbjRDsXsXnRHGdxCTZu6g==
+Received: from OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM (2603:1096:604:1f9::12)
+ by TY3P286MB2628.JPNP286.PROD.OUTLOOK.COM (2603:1096:400:23f::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.15; Sun, 18 Sep
+ 2022 06:40:48 +0000
+Received: from OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::76e9:5242:9641:12e9]) by OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM
+ ([fe80::76e9:5242:9641:12e9%6]) with mapi id 15.20.5632.018; Sun, 18 Sep 2022
+ 06:40:48 +0000
+From:   Shengyu Qu <wiagn233@outlook.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Shengyu Qu <wiagn233@outlook.com>
+Subject: [PATCH] Bluetooth: btusb: Add more device IDs for WCN6855
+Date:   Sun, 18 Sep 2022 14:38:45 +0800
+Message-ID: <OS3P286MB2597907F01F1935AF89ED52D984A9@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <0000000000008a7a3f05e8ad02f6@google.com>
-References: <0000000000008a7a3f05e8ad02f6@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [vOwLPhgzC9RI4GxpPk6admm/tAMCDArn]
+X-ClientProxiedBy: TYCPR01CA0154.jpnprd01.prod.outlook.com
+ (2603:1096:400:2b1::14) To OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM
+ (2603:1096:604:1f9::12)
+X-Microsoft-Original-Message-ID: <20220918063845.2196-1-wiagn233@outlook.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: OS3P286MB2597:EE_|TY3P286MB2628:EE_
+X-MS-Office365-Filtering-Correlation-Id: aeb8f1d9-e91e-423f-5043-08da9940b8b7
+X-MS-Exchange-SLBlob-MailProps: Cq7lScuPrnqwZHg0HfSFdi9a7pamOgV9+D/g6kCHnOwnWKkFMerO8Hux0XlcgZwlC9PMXFWUwUHpcn6nzgRPsOSeeQpfIUqHVUgtsGqVEti6729q5wcK6omXpsZxrGIk1uQJCg8XliVTyeAQ5Zv1l1xl4ZE7Wz/v/OCfQ8e8/g4dtVYSZTYp6JYiU10cVt8mhHVNibNTdy13gM7e9PD3q0lgGjTRSzjHpM3cgqnaGVE2buvAKJsUQ0D6qSG7KZkk/zVX7Lhjxev0WqNR4R361BSkkQDAMY/kUSQiBAHh4bgAG3FIewotfHmBrrKQw+Yn8VEjXWRNTeSEnjA5tvuQBUzybAJoqv/7f3x8wb6U28ttVup1VW51/5Ft16ZBwxgG9cq47Cuw2wwewkNY8daaHJk0ZlhCgJz9u0Yt/fUBtkuLw+9DceK1ZfgWZWdyVeXEIyQFgdis9CtXGnmk6xJnE5XsqNUmOBQvECGZ5IiIX3724w/TwHHhDjFhtMzrhZL95uxzAizO91mnVM2w41v85zsPoCG5wqJ3UMsmdlb7J5NM7eglIM7m7Lm/0zgUAS/M33j978DG4eyhGvtEKL0RcuiigaYloAd/mZBwJC9zyLR+2AyMhh1hRyjzsUrXngYq0i0kiogKVXQ0q9DOJM3svGFeYk4ByLy/ujirjfjDZFNak/ByjTSp7c/Uww17ky0aIerEbW8pbs6CzLwMfgYDFF59xPnob+c0TSTIc1IklaChEZpy9aiBH8tXSAvG0qo7N5XxGflLAx0=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GpCYPRaRmeSI0WwM39hHM3ffaSYbzH+HwZPkHNQYy8BOhwCDly6c3sThK8zrYcCusjpwWpw80zwLfivFbxOr+y3Ytc9TB7POqmi9yx0Q7dvSQ6R4mj+QfI5VdPFkZBoPCAqNbXDEmlJH5X0/J6KuOx7Ws0B6vW5l+F/lTxDq7pQEbYSWtC2YQw9+TklR9iKm9wpBCJKUmQruV2KDTIeto9mtsBs7oiADz0QD2Po3SzX8cuP3xZFlcjZYbxKQOk5rBNv2QGJtkzyIUAioN3YvQAjXLmUElmcfK+O2RVApTjmyRFCnvyfDXKSOaHyCS+wMdC8cSQEre6z9yO7ZUkMAehD/kk152/rusBVbyGGpagEg//CYze4ONrItIATDrn8MZtKCRs7FwPlKuXt/6gRQ04qA4OfEDse/0lM5Qr2cLKDzgKH+cYC2B87u2b+uZoX0wPnizWqb27blpO+YfnJPlnr4oZ4DY2FeJlOVP71BKnZzcc4JF9En/Q/Fm2jOLltP+3+7SqN7nNxLTIcPw4I8s1CLXRgqbzs/Zf0kh9VCnVPUBz5uvZB2rqNGB9UG96mFzDQYmzADw8qf6JMfKM70DlSDCYc2D0O0oMOL0PW59Z0s2sdMhzaLVkUdzr1WWPEyCvCIyfbb51V/OGku9wBmCw==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AE1xc8k06uDjB+txO3mIO1TiiPmu1WaUU4QWXanIBnDeYH2DWJOecPUXfJpY?=
+ =?us-ascii?Q?BN93iZs8G10SfrjQhtOQA0pQf6umkO6vVvW/1Iysn63bsnYwzFD1CCU1xLX1?=
+ =?us-ascii?Q?lhWMsn8Kw49JWqcpqm5Vo/+nKFxblFcq7oLlr6zlw5ttxkR6vGp/9RkhnI6K?=
+ =?us-ascii?Q?RnEl3dCOmppIN5Kh65+7+jLJxqK+VXbp/iNq7P/E567znAQOmc794MrQys8/?=
+ =?us-ascii?Q?ux9d8pSjFTEHA0yV5kH5VSF7DL3SzWTKkFyv09fQQRqYpX9ALXTH7Q0SXPIb?=
+ =?us-ascii?Q?wza8o7lkfc7/Rk2Fb63uMswhGZ+4dZDnu8QMddahvgCddL+sckOPrvBePkas?=
+ =?us-ascii?Q?x6lFRWJZpUA8Z8Ph7L8mJ2xf8CxGECmsqq91LLLm4fC/qHqZ1zbuxzEVXNxB?=
+ =?us-ascii?Q?Wrqv0nufeRHYSk3gOhrOQi9fjLkYBKOC/Np+xq6JYBB1UHjrauzTLkFRCalO?=
+ =?us-ascii?Q?vr2JRAt4bgeENTOMwWMbDswkLXri1LRB1/6XtWgzFBbxe/ZD4CEu+qvFmMCq?=
+ =?us-ascii?Q?VBoc74pg6en4yk/GC2s4lJR1qehUSSc+bzeSbhDJnHrcbyYs7nkswbC6F/Si?=
+ =?us-ascii?Q?+pmoZekCCfoMVe9t6P3vnnUJ7iYPHjvG2C7daRbRkFY3BKX3CNXtYJZJrYE9?=
+ =?us-ascii?Q?eW+wiFhuo1W0YaCLHyJmDdZ0fcXFDicAdJDePxkPteHcigM0LCgl7OCxW1FT?=
+ =?us-ascii?Q?oWYxfFC/UcBGAFxIoUmYf7xL/YCIR3hTlMMz2XuecBztRIYwmbs5iMeYV7Gk?=
+ =?us-ascii?Q?mxZeFA5Zsr3PBlFnpRXFBTniY5sYmOPkKMhd3EH/wvyt5r8PZf+QyOWPbCvU?=
+ =?us-ascii?Q?Cv6wSNfzhM2+xIV8KKAFK5k3R//WE6vtF5Mgq9+x6LZWMRZmaXrlvy+3y5Qy?=
+ =?us-ascii?Q?8Gyy0m0r6P5eXATeXTwTkg/pwEWTqk+853vIgx7E4uEXRQM/8l4alGGlOQJ+?=
+ =?us-ascii?Q?0GrNr3yTZ64q2TsYk+AG8TxC14OcOftzZWWNACgn0EdRWrbq2gEEKydq7scW?=
+ =?us-ascii?Q?LEUqMNjTKm9uSab7B5tvKnTTtfyJf92tk5V/RtTENoEZxrQk3R+SQHsyvWKi?=
+ =?us-ascii?Q?T4kK63quVPpD4pDvqHDgrOUXadZXkIpoOFnRVeFHoJhJi4icx+flcWpM3KB2?=
+ =?us-ascii?Q?nDNSl2wfvffi1/hClhv99fktm6JVs1vUDajUu7Dg9+O4Mc2jNvS3idq169lt?=
+ =?us-ascii?Q?LEfgtGEgoy4ePL6R81RCpN3f3H4phU3RGGm5WQ05rbCzitf6cgakNBRRuRob?=
+ =?us-ascii?Q?EgUhoqUeT15Ai4fJPac2Qvp997O5G2SjHiABJ2EkEw=3D=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aeb8f1d9-e91e-423f-5043-08da9940b8b7
+X-MS-Exchange-CrossTenant-AuthSource: OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Sep 2022 06:40:48.4823
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY3P286MB2628
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Add IDs to usb_device_id table for WCN6855.
+IDs are extracted from Windows driver of Lenovo
+Thinkpad T14 Gen 2.
 
-On Fri, 26 Aug 2022 08:27:06, AM Sönke Huster <soenke.huster@eknoes.de> wrote:
->Hi Luiz,
->
->On 25.08.22 20:58, Luiz Augusto von Dentz wrote:
->> Hi Sönke,
->> 
->> On Thu, Aug 25, 2022 at 8:08 AM Sönke Huster <soenke.huster@eknoes.de> wrote:
->>>
->>> Hi,
->>>
->>>
->>>
->>> While fuzzing I found several crashes similar to the following:
->>>
->>>
->>>         [    5.345731] sysfs: cannot create duplicate filename '/devices/virtual/bluetooth/hci0/hci0:0'
->>>
->>>         [...]
->>>
->>>         [    5.430464] BUG: KASAN: use-after-free in klist_add_tail+0x1bd/0x200
->>>
->>>         [    5.430464] Write of size 8 at addr ffff88800bfcc468 by task kworker/u3:1/43
->>>
->>>         [    5.430464]
->>>
->>>         [    5.430464] CPU: 0 PID: 43 Comm: kworker/u3:1 Not tainted 5.19.0-12855-g13f222680b8f #2
->>>
->>>         [    5.430464] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
->>>
->>>         [    5.430464] Workqueue: hci0 hci_rx_work
->>>
->>>         [    5.430464] Call Trace:
->>>
->>>         [    5.430464]  <TASK>
->>>
->>>         [    5.430464]  dump_stack_lvl+0x45/0x5d
->>>
->>>         [    5.430464]  print_report.cold+0x5e/0x5e5
->>>
->>>         [    5.430464]  kasan_report+0xb1/0x1c0
->>>
->>>         [    5.430464]  klist_add_tail+0x1bd/0x200
->>>
->>>         [    5.430464]  device_add+0xa6b/0x1b80
->>>
->>>         [    5.430464]  hci_conn_add_sysfs+0x91/0x110
->>>
->>>         [    5.430464]  le_conn_complete_evt+0x117f/0x17d0
->>>
->>>         [    5.430464]  hci_le_conn_complete_evt+0x226/0x2c0
->>>
->>>         [    5.430464]  hci_le_meta_evt+0x2c0/0x4a0
->>>
->>>         [    5.430464]  hci_event_packet+0x636/0xf60
->>>
->>>         [    5.430464]  hci_rx_work+0xa8c/0x1000
->>>
->>>         [    5.430464]  process_one_work+0x8df/0x1530
->>>
->>>         [    5.430464]  worker_thread+0x575/0x11a0
->>>
->>>         [    5.430464]  kthread+0x29d/0x340
->>>
->>>         [    5.430464]  ret_from_fork+0x22/0x30
->>>
->>>         [    5.430464]  </TASK>
->>>
->>>         [    5.430464]
->>>
->>>         [    5.430464] Allocated by task 44:
->>>
->>>         [    5.430464]  kasan_save_stack+0x1e/0x40
->>>
->>>         [    5.430464]  __kasan_kmalloc+0x81/0xa0
->>>
->>>         [    5.430464]  device_add+0xcae/0x1b80
->>>
->>>         [    5.430464]  hci_conn_add_sysfs+0x91/0x110
->>>
->>>         [    5.430464]  le_conn_complete_evt+0x117f/0x17d0
->>>
->>>         [    5.430464]  hci_le_conn_complete_evt+0x226/0x2c0
->>>
->>>         [    5.430464]  hci_le_meta_evt+0x2c0/0x4a0
->>>
->>>         [    5.430464]  hci_event_packet+0x636/0xf60
->>>
->>>         [    5.430464]  hci_rx_work+0xa8c/0x1000
->>>
->>>         [    5.430464]  process_one_work+0x8df/0x1530
->>>
->>>         [    5.430464]  worker_thread+0x575/0x11a0
->>>
->>>         [    5.430464]  kthread+0x29d/0x340
->>>
->>>         [    5.430464]  ret_from_fork+0x22/0x30
->>>
->>>         [    5.430464]
->>>
->>>         [    5.430464] Freed by task 43:
->>>
->>>         [    5.430464]  kasan_save_stack+0x1e/0x40
->>>
->>>         [    5.430464]  kasan_set_track+0x21/0x30
->>>
->>>         [    5.430464]  kasan_set_free_info+0x20/0x40
->>>
->>>         [    5.430464]  __kasan_slab_free+0x108/0x190
->>>
->>>         [    5.430464]  kfree+0xa9/0x360
->>>
->>>         [    5.430464]  device_add+0x33a/0x1b80
->>>
->>>         [    5.430464]  hci_conn_add_sysfs+0x91/0x110
->>>
->>>         [    5.430464]  hci_le_cis_estabilished_evt+0x517/0xa70
->>>
->>>         [    5.430464]  hci_le_meta_evt+0x2c0/0x4a0
->>>
->>>         [    5.430464]  hci_event_packet+0x636/0xf60
->>>
->>>         [    5.430464]  hci_rx_work+0xa8c/0x1000
->>>
->>>         [    5.430464]  process_one_work+0x8df/0x1530
->>>
->>>         [    5.430464]  worker_thread+0x575/0x11a0
->>>
->>>         [    5.430464]  kthread+0x29d/0x340
->>>
->>>         [    5.430464]  ret_from_fork+0x22/0x30
->>>
->>>
->>>
->>> I think I fixed a similar issue in d5ebaa7c5f6f ("Bluetooth: hci_event: Ignore multiple conn complete events"). Here, the problem was that multiple connection complete events for the same handle called hci_conn_add_sysfs multiple times, but if it is called with an existing connection conn->dev->p is freed.
->>>
->>> This is because device_add is called - its documentation contains this sentence: "Do not call this routine or device_register() more than once for any device structure".
->>>
->>>
->>>
->>> This here is similar: First, an hci_le_conn_complete_evt creates a new connection.
->>>
->>> Afterwards, an hci_le_cis_estabilished_evt with the same handle finds that connection, and tries to add it to sysfs again, freeing conn->dev->p. Now, an event that might use that connection such as here the hci_le_conn_complete_evt triggers a use after free.
->>>
+Signed-off-by: Shengyu Qu <wiagn233@outlook.com>
+---
+ drivers/bluetooth/btusb.c | 84 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 84 insertions(+)
 
-Syzkaller reports a bug as follows [1]:
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:33!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-[...]
-Call Trace:
- <TASK>
- __list_add include/linux/list.h:69 [inline]
- list_add_tail include/linux/list.h:102 [inline]
- kobj_kset_join lib/kobject.c:164 [inline]
- kobject_add_internal+0x18f/0x8f0 lib/kobject.c:214
- kobject_add_varg lib/kobject.c:358 [inline]
- kobject_add+0x150/0x1c0 lib/kobject.c:410
- device_add+0x368/0x1e90 drivers/base/core.c:3452
- hci_conn_add_sysfs+0x9b/0x1b0 net/bluetooth/hci_sysfs.c:53
- hci_le_cis_estabilished_evt+0x57c/0xae0 net/bluetooth/hci_event.c:6799
- hci_le_meta_evt+0x2b8/0x510 net/bluetooth/hci_event.c:7110
- hci_event_func net/bluetooth/hci_event.c:7440 [inline]
- hci_event_packet+0x63d/0xfd0 net/bluetooth/hci_event.c:7495
- hci_rx_work+0xae7/0x1230 net/bluetooth/hci_core.c:4007
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 15caa6469538..adf68affaead 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -316,6 +316,90 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0d0), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9108), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9109), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9208), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9209), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9308), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9408), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9508), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9509), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9608), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9609), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x10ab, 0x9f09), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3022), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0c7), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0c9), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0ca), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0cb), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0ce), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0de), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0df), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0e1), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0ea), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0ec), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3023), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3024), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3a22), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3a24), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3a26), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x04ca, 0x3a27), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* QCA WCN785x chipset */
+ 	{ USB_DEVICE(0x0cf3, 0xe700), .driver_info = BTUSB_QCA_WCN6855 |
+-- 
+2.25.1
 
-I think they are the same problems:
-A hci_le_conn_complete_evt creates a new connection, and calls
-hci_conn_add_sysfs(). Then hci_le_cis_estabilished_evt with the same handle
-finds that connection, and will also calls hci_conn_add_sysfs(), which maybe
-triggering corrupted list bug.
-
-Link: https://syzkaller.appspot.com/bug?id=da3246e2d33afdb92d66bc166a0934c5b146404a [1]
-
->>>
->>>
->>> I bisected this bug and it was introduced with  26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections").
->>>
->>>
->>>
->>> The same happens with hci_le_create_big_complete_evt: Here, multiple events trigger the following bug:
->>>
->>>
->>>
->>>         [    6.898080] BUG: kernel NULL pointer dereference, address: 0000000000000058
->>>
->>>         [    6.898081] #PF: supervisor read access in kernel mode
->>>
->>>         [    6.898083] #PF: error_code(0x0000) - not-present page
->>>
->>>         [    6.898085] Oops: 0000 [#1] PREEMPT SMP NOPTI
->>>
->>>         [    6.898090] Workqueue: hci0 hci_rx_work
->>>
->>>         [    6.898092] RIP: 0010:klist_next+0x12/0x160
->>>
->>>         [    6.898128] Call Trace:
->>>
->>>         [    6.898129]  <TASK>
->>>
->>>         [    6.898130]  ? bt_link_release+0x20/0x20
->>>
->>>         [    6.898133]  device_find_child+0x37/0xa0
->>>
->>>         [    6.898136]  hci_conn_del_sysfs+0x71/0xa0
->>>
->>>         [    6.898138]  hci_conn_cleanup+0x17a/0x2c0
->>>
->>>         [    6.898141]  hci_conn_del+0x14a/0x240
->>>
->>>         [    6.898144]  hci_le_create_big_complete_evt+0x3d8/0x470
->>>
->>>         [    6.898146]  ? hci_le_remote_feat_complete_evt+0x3e0/0x3e0
->>>
->>>         [    6.898148]  hci_le_meta_evt+0x155/0x230
->>>
->>>         [    6.898150]  hci_event_packet+0x328/0x820
->>>
->>>         [    6.898152]  ? hci_conn_drop+0x100/0x100
->>>
->>>         [    6.898155]  hci_rx_work+0x725/0xb70
->>>
->>>         [    6.898157]  process_one_work+0x2a6/0x5d0
->>>
->>>         [    6.898160]  worker_thread+0x4a/0x3e0
->>>
->>>         [    6.898162]  ? process_one_work+0x5d0/0x5d0
->>>
->>>         [    6.898164]  kthread+0xed/0x120
->>>
->>>         [    6.898165]  ? kthread_complete_and_exit+0x20/0x20
->>>
->>>         [    6.898167]  ret_from_fork+0x22/0x30
->>>
->>>         [    6.898170]  </TASK>
->>>
->>>
->>>
->>> I bisected this bug and it was introduced with eca0ae4aea66 ("Bluetooth: Add initial implementation of BIS connections").
->>>
->>>
->>>
->>> I am not really sure how to solve that. As far as I understand, previously we simply set an unused handle as connection handle, and checked for that before setting the correct handle and adding it to sysfs. But here, adding it to sysfs seems to happen in a different function and the handle is already set.
->> 
->> We should probably check if link-type, if it is an ISO link it shall
->> not be created via Connection Complete events and they have their own
->> events to create that.
->> 
->
->But then the problem of duplicate hci_le_cis_estabilished_evt / hci_le_create_big_complete_evt still exists, isn't it? For example if the connection is created through a hci_le_cis_req_evt, and afterwards two hci_le_cis_estabilished_evt arrive, the second event calls hci_conn_add_sysfs a second time which frees parts of the device structure.
->
->>> Best
->>> Sönke
-I wonder that if we need both two patches? Because they
-seems to be used to patch different bugs?
