@@ -2,142 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C59AECAAD3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 09:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6991C6FA90
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 15:16:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbiISJgr (ORCPT
+        id S229901AbiISPQw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Sep 2022 05:36:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53812 "EHLO
+        Mon, 19 Sep 2022 11:16:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229916AbiISJgc (ORCPT
+        with ESMTP id S229592AbiISPQc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Sep 2022 05:36:32 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3503813D4D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 02:36:31 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id ge9so15697539pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 02:36:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=Di/buVUxAsG/rU9O5qSjHNKso2t3dgCAPbjnrGL1pN4=;
-        b=X3bOgx/BhuoQSHKtZyNMHy0wvqPNIZWKOWhrT1l4lNHkKdzTXkq+igJxMtaiOjLMl8
-         9EAVC/AABNjYglM85kegaJbiDe2YUARD9zW5zgQbK/vNlNXOP8yuzrAT4SVr9C9VMEfI
-         H6hXgHAhjEQeUDP7Hhl443wy+xTFfYDi1LMRadreSxjphjVQXt9dUPzyV0+iW6w4Q+S+
-         vwVHSv9aGQj1Mceb0rkAr6FrrK2xImci863C/LyKrbJtl7pHK+G9ZHsOqI9IkHb/zBwL
-         LHpKm5YTbIBDcIiqYVzefrl9rZQyr0QL1AJ38UI+ziM+N0eN/HX+OFr9Xqm7CmBeHcW6
-         5JuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=Di/buVUxAsG/rU9O5qSjHNKso2t3dgCAPbjnrGL1pN4=;
-        b=e71XCxNjGQYeRHfaWZ8EfJMc5vLkwHq1RMzwvoViucPLT+fr/56eg9fhjOrmAKoDbl
-         K4RRU/+rE0ZvWJfY44yB9qQuPQEdkb2JL8cuIvDMiYbl3cPBZRb/DokkRzEe2qomdbgN
-         PvuPGXfn/lgVK03j4xXinhmYYP8cJj42MIb547MjGqWdYhIMpvApjYOO0aK+V/DySice
-         0sEC8mdYA6sG25qZ+YJXphH8rZroVNGiBVsNu2GRZc+5ZrsD2GgtVAxRbXDpAbi1yjjD
-         vg7NaifX9eJForEH0lFU27tw2YWTBMfTy3mldBG0XZLZ27duovZtS+3OidYidZFWOTXA
-         iHyw==
-X-Gm-Message-State: ACrzQf2/iQsXaU68y5IIRygA6gYd6/iL59q1kASfAy+jIDWEsinDF2Oz
-        itH3YRVcAx3irIMw/w9wLXVdoDD3CM8=
-X-Google-Smtp-Source: AMsMyM5xWHav+FjFtYtEBjjrKiOOtqNiTNBxnzNBA8CaKEM5icUXPsiYMvnXI4gdwXi6WmWLzba3yw==
-X-Received: by 2002:a17:903:110d:b0:178:2a53:c7ff with SMTP id n13-20020a170903110d00b001782a53c7ffmr12072140plh.89.1663580190336;
-        Mon, 19 Sep 2022 02:36:30 -0700 (PDT)
-Received: from [172.17.0.2] ([20.66.42.240])
-        by smtp.gmail.com with ESMTPSA id o3-20020a17090a678300b001fb47692333sm6197890pjj.23.2022.09.19.02.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Sep 2022 02:36:29 -0700 (PDT)
-Message-ID: <6328381d.170a0220.5327e.a238@mx.google.com>
-Date:   Mon, 19 Sep 2022 02:36:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2050202094581325027=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
-Subject: RE: [BlueZ,v3,1/3] shared/vcp: Add initial code for handling VCP
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220919080722.562080-1-sathish.narasimman@intel.com>
-References: <20220919080722.562080-1-sathish.narasimman@intel.com>
+        Mon, 19 Sep 2022 11:16:32 -0400
+Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F6B38696;
+        Mon, 19 Sep 2022 08:15:47 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 11DFC58012A;
+        Mon, 19 Sep 2022 11:15:46 -0400 (EDT)
+Received: from imap47 ([10.202.2.97])
+  by compute2.internal (MEProxy); Mon, 19 Sep 2022 11:15:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm2; t=1663600546; x=1663607746; bh=V2
+        NHp03LEGFatOiT5SjFLIfjK3Dfgn5PwWj8407qQ9U=; b=sL0wAf4fnlz910F4Vz
+        odUFag9auWhR/JyQhsLSE2hhs2iaOmseZ2lH4k1AI6HmHq43B6Os0UKYrwZtTeOX
+        3s6ldQyHOblUK8qk1b+gAXaPyQlPiQkA4uwasunUQ2yj1TUlzVnEwEbVHsx00zRE
+        kM3JXx7k+m6N2TPkCtLZ6VKUb7mu1xgy9r/LIog9I7rdaHflnXmE8FYjKJiCsRxO
+        Uh4ZPnTHM6MahoycLN32BjqQSsl9MubT1fF8Yyl42/N5Gg+LUbNxudFDwthhbdk8
+        Z4Wm3tGF+eRhPigVD+N9/sS5/nutzPX0rC5gxa4njw9m1geXcFCOono28a5UAs7H
+        MiJA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm2; t=1663600546; x=1663607746; bh=V2NHp03LEGFatOiT5SjFLIfjK3Df
+        gn5PwWj8407qQ9U=; b=0T3K43FVWjJFjss+Dr0RpPQff86JEiZ/mtijgFEbUr/l
+        V1wb621rNSwI4xv7bWmNSm3tVuNlCf1JR8T49wMQJtNMmbmGIxrPwPrpEbAdrp6+
+        XssX+ZjvHat2nIGd+3gCBFOkNmK4JZW0369RrKyfF4khiD8NzXoybiJM3g2QqiLA
+        6hWugCya3tqgP/uFNzfKAHFe0vakoFK9nS96AFLXQsnjquOyaNNMc/f/pMNVNBZ6
+        orD0qmkHv/0GjynpRJAvkXhTW+m8MRFmrgfhFuk/YN2Wnd1S8I/+sbvznRorZbUy
+        NO431d1qd1FTaT9qoiKMeckANp7jhSiq3JiJuRLkig==
+X-ME-Sender: <xms:n4coY4w3oVzkvr77PB1H4fmBb40ZfQZy2NPF_wgQPMfKT_UHaIdYBg>
+    <xme:n4coY8SKki3oKPC9hfhlcZPz5VA3fXj7KTW57FsLva5PyKbe-mf9IPkv4NNRGtd0Y
+    SAbxqDZb8ytBlKk-FI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedvjedgkeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedfufhv
+    vghnucfrvghtvghrfdcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrf
+    grthhtvghrnhepfeegudfghfejvdffgffgkeetuddtteeuheduiedtgfdufedvudeitddv
+    leeivdfgnecuffhomhgrihhnpeguvghvihgtvghtrhgvvgdrohhrghenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgv
+    thgvrhdruggvvh
+X-ME-Proxy: <xmx:n4coY6WFIew5Sc41BNZQRbuHJ6iDGtkghtY6vE2WG9w9A2UjvI4pnA>
+    <xmx:n4coY2iRVzdGAhuC6fa-__H6wK_f2H5UR-DQhjwLL0c0IMnCDFe5Xw>
+    <xmx:n4coY6AdELWjRb6eLemIUP2tTRNz8fz4-rgm_i1QEoe-z4Jsf_HbeA>
+    <xmx:oocoY04cLhYi_fAbiGr4SEo2BotTLrK9LYGTnOoJWrSydn28MXNgNQ>
+Feedback-ID: i51094778:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id C7BA1A6007C; Mon, 19 Sep 2022 11:15:43 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-935-ge4ccd4c47b-fm-20220914.001-ge4ccd4c4
+Mime-Version: 1.0
+Message-Id: <c7c1e2a8-2293-4060-b17f-dcfce98ee219@app.fastmail.com>
+In-Reply-To: <35722313-6585-1748-6821-aebe0859ef6e@linaro.org>
+References: <20220907170935.11757-1-sven@svenpeter.dev>
+ <20220907170935.11757-2-sven@svenpeter.dev>
+ <35722313-6585-1748-6821-aebe0859ef6e@linaro.org>
+Date:   Mon, 19 Sep 2022 17:15:43 +0200
+From:   "Sven Peter" <sven@svenpeter.dev>
+To:     "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Rob Herring" <robh+dt@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Hector Martin" <marcan@marcan.st>,
+        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Andy Gross" <agross@kernel.org>,
+        "Bjorn Andersson" <bjorn.andersson@linaro.org>,
+        "Konrad Dybcio" <konrad.dybcio@somainline.org>,
+        "Balakrishna Godavarthi" <bgodavar@codeaurora.org>,
+        "Rocky Liao" <rjliao@codeaurora.org>, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] dt-bindings: net: Add generic Bluetooth controller
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2050202094581325027==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Thu, Sep 8, 2022, at 13:16, Krzysztof Kozlowski wrote:
+> On 07/09/2022 19:09, Sven Peter wrote:
+>> 
+>> Bluetooth controllers share the common local-bd-address property.
+>> Add a generic YAML schema to replace bluetooth.txt for those.
+>> 
+>> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+>> ---
+>> changes from v1:
+>>   - removed blueetooth.txt instead of just replacing it with a
+>>     deprecation note
+>>   - replaced references to bluetooth.txt
+>> 
+>> checkpatch complains here because it thinks I do to many things at once,
+>> I think it's better to replace bluetooth.txt in single commit though.
+>> Let me know if you prefer this to be split into multiple commits
+>> instead.
+>> 
+>> .../bindings/net/bluetooth-controller.yaml    | 30 +++++++++++++++++++
+>
+> I propose to keep it in net/bluetooth subdirectory. In next patch you
+> can move there other files.
 
-Dear submitter,
+Sure, I can also already move net/qualcomm-bluetooth.yaml to the new
+subdirectory since I need to touch it in this commit anyway.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=678079
+>
+>>  .../devicetree/bindings/net/bluetooth.txt     |  5 ----
+>>  .../bindings/net/qualcomm-bluetooth.yaml      |  4 +--
+>>  .../bindings/soc/qcom/qcom,wcnss.yaml         |  8 ++---
+>>  4 files changed, 35 insertions(+), 12 deletions(-)
+>>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>>  delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+>> 
+>> diff --git a/Documentation/devicetree/bindings/net/bluetooth-controller.yaml b/Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>> new file mode 100644
+>> index 000000000000..0ea8a20e30f9
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/bluetooth-controller.yaml
+>> @@ -0,0 +1,30 @@
+>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/bluetooth-controller.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Bluetooth Controller Generic Binding
+>> +
+>> +maintainers:
+>> +  - Marcel Holtmann <marcel@holtmann.org>
+>> +  - Johan Hedberg <johan.hedberg@gmail.com>
+>> +  - Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+>> +
+>> +properties:
+>> +  $nodename:
+>> +    pattern: "^bluetooth(@.*)?$"
+>> +
+>> +  local-bd-address:
+>> +    $ref: /schemas/types.yaml#/definitions/uint8-array
+>> +    minItems: 6
+>
+> No need for minitems.
 
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.51 seconds
-GitLint                       PASS      1.42 seconds
-Prep - Setup ELL              PASS      34.86 seconds
-Build - Prep                  PASS      0.89 seconds
-Build - Configure             PASS      10.66 seconds
-Build - Make                  PASS      1181.14 seconds
-Make Check                    PASS      12.57 seconds
-Make Check w/Valgrind         PASS      368.00 seconds
-Make Distcheck                PASS      317.23 seconds
-Build w/ext ELL - Configure   PASS      11.08 seconds
-Build w/ext ELL - Make        PASS      110.20 seconds
-Incremental Build w/ patches  PASS      392.00 seconds
-Scan Build                    PASS      806.14 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,v3,1/3] shared/vcp: Add initial code for handling VCP
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#1215: FILE: src/shared/vcp.h:16:
-+#define __packed __attribute__((packed))
-
-/github/workspace/src/12979747.patch total: 0 errors, 1 warnings, 1169 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12979747.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-[BlueZ,v3,2/3] profiles: Add initial code for vcp plugin
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#395: FILE: profiles/audio/vcp.c:288:
-+static unsigned int vcp_id = 0;
-
-/github/workspace/src/12979749.patch total: 1 errors, 0 warnings, 330 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12979749.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Ok, dropped.
 
 
+Best,
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============2050202094581325027==--
+Sven
