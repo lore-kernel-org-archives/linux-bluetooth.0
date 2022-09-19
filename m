@@ -2,1251 +2,263 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F94AC6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 08:06:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5115CC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 08:06:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229815AbiISIGI (ORCPT
+        id S229833AbiISIGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Sep 2022 04:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47364 "EHLO
+        Mon, 19 Sep 2022 04:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbiISIFw (ORCPT
+        with ESMTP id S229865AbiISIF4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Sep 2022 04:05:52 -0400
+        Mon, 19 Sep 2022 04:05:56 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93090B7F6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 01:05:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FB8813DF3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 01:05:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663574750; x=1695110750;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=DMlFZNTR0plVopfNR7Y3JDodYK3vB1kCsQPfd/fJ2qw=;
-  b=gD6j+4ZNrLnJOk4UobWgIY2xhChHBkPJ4LPpEiWY5AgBVoGdbHm7vx7c
-   rJcIIiEmWHNhYcnZJLwzlRm5fU2g9Qn+YNxiOq5XK18TC3Gprcq/RCw8H
-   aqFB7ODbwol+bWBvKkwVMBYn/KfYQPJ98QmbSMEGu98Mx5DNaiHXUX7xk
-   axysOw2cqFAzP9g6fvHUkGzy1cK7SkZ59RfX4mZkoSH4pJ89BbbTNSQhv
-   6jVW+cg/1RK3AD4d0btvi4GHKPyCJ1UWku4TysWQA3I0cl+VOPAWn/WQc
-   y0WyUUWKWW66IK/Fpu5/FIL48n5KLGLOexuu0iezmqg9kIFRhpgKNre8J
+  t=1663574755; x=1695110755;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kBQRHwmj5jBLZDQZaifMfbtxMnVSmpvncYMBxNKp0GQ=;
+  b=EHGKgfWJhrXBAhw92Qx31hh6V5GyuAhxOWdKinvKJFxlZvXWSEbfenYm
+   U42btk3bbXDOWKyncmY1SVw+HHBskYjWXSfa4S7KSINhjlphh8PhLHw6i
+   ZH/VQOWsXrdiURm9PNKYpQ8SMJi9Xhfe2XwyLg5ef4kIEvVPvKhZGlj+N
+   QvaGwwbdzspBY39PDry74SBFT1hRENvH1YEj42j8zSa94AuUJQVVM1Cp4
+   UWSipWhhfSE6ejf/c4ZkJNT5F/V0r1C5XEFNQxNEhfeKWXAwEfCkaoypk
+   f2wterU8djpsgLDjNtVhlKcCoFHNVH4bdyfht3izjLZHP1sKm2c0xGgBZ
    A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10474"; a="279718267"
+X-IronPort-AV: E=McAfee;i="6500,9779,10474"; a="279718280"
 X-IronPort-AV: E=Sophos;i="5.93,327,1654585200"; 
-   d="scan'208";a="279718267"
+   d="scan'208";a="279718280"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2022 01:05:50 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Sep 2022 01:05:54 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.93,327,1654585200"; 
-   d="scan'208";a="947113933"
+   d="scan'208";a="947113966"
 Received: from bsblt022.iind.intel.com ([10.224.186.21])
-  by fmsmga005.fm.intel.com with ESMTP; 19 Sep 2022 01:05:48 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 19 Sep 2022 01:05:53 -0700
 From:   Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ v3 1/3] shared/vcp: Add initial code for handling VCP
-Date:   Mon, 19 Sep 2022 13:37:20 +0530
-Message-Id: <20220919080722.562080-1-sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ v3 3/3] monitor/att: Add decoding support for Volume Control Serice
+Date:   Mon, 19 Sep 2022 13:37:22 +0530
+Message-Id: <20220919080722.562080-3-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220919080722.562080-1-sathish.narasimman@intel.com>
+References: <20220919080722.562080-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds initial code for Volume Control Profile.
----
- Makefile.am      |    1 +
- src/shared/vcp.c | 1104 ++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/vcp.h |   58 +++
- 3 files changed, 1163 insertions(+)
- create mode 100644 src/shared/vcp.c
- create mode 100644 src/shared/vcp.h
+This adds decoding support for VCS attributes
 
-diff --git a/Makefile.am b/Makefile.am
-index 960bf21bc726..27715c73d76f 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -231,6 +231,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/gap.h src/shared/gap.c \
- 			src/shared/log.h src/shared/log.c \
- 			src/shared/bap.h src/shared/bap.c src/shared/ascs.h \
-+			src/shared/vcp.c src/shared/vcp.h \
- 			src/shared/lc3.h src/shared/tty.h
+> ACL Data RX: Handle 3585 flags 0x02 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x0017 Type: Volume State (0x2b7d)
+< ACL Data TX: Handle 3585 flags 0x00 dlen 8
+      ATT: Read Response (0x0b) len 3
+        Value: 000000
+        Handle: 0x0017 Type: Volume State (0x2b7d)
+            Volume Setting: 0
+            Not Muted: 0
+            Change Counter: 0
+> HCI Event: Number of Completed Packets (0x13) plen 5
+        Num handles: 1
+        Handle: 3585 Address: 49:71:FC:C0:66:C6 (Resolvable)
+        Count: 1
+> ACL Data RX: Handle 3585 flags 0x02 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x001c Type: Volume Flags (0x2b7f)
+< ACL Data TX: Handle 3585 flags 0x00 dlen 6
+      ATT: Read Response (0x0b) len 1
+        Value: 01
+        Handle: 0x001c Type: Volume Flags (0x2b7f)
+            Volume Falg: 1
+---
+ monitor/att.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 159 insertions(+)
+
+diff --git a/monitor/att.c b/monitor/att.c
+index b7470f7a2ff4..3c1ff2e2aaa0 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -1590,6 +1590,162 @@ static void pac_context_notify(const struct l2cap_frame *frame)
+ 	print_pac_context(frame);
+ }
  
- if READLINE
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-new file mode 100644
-index 000000000000..944483c60622
---- /dev/null
-+++ b/src/shared/vcp.c
-@@ -0,0 +1,1104 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2022  Intel Corporation. All rights reserved.
-+ *
-+ */
-+
-+#define _GNU_SOURCE
-+#include <inttypes.h>
-+#include <string.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <unistd.h>
-+#include <errno.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
-+
-+#include "src/shared/queue.h"
-+#include "src/shared/util.h"
-+#include "src/shared/timeout.h"
-+#include "src/shared/att.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/vcp.h"
-+#include "src/log.h"
-+
-+#define VCP_STEP_SIZE 1
-+
-+/* Apllication Error Code */
-+#define BT_ATT_ERROR_INVALID_CHANGE_COUNTER	0x80
-+#define BT_ATT_ERROR_OPCODE_NOT_SUPPORTED	0x81
-+
-+struct bt_vcp_db {
-+	struct gatt_db *db;
-+	struct bt_vcs *vcs;
-+};
-+
-+typedef void (*vcp_func_t)(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
-+					const uint8_t *value, uint16_t length,
-+					void *user_data);
-+
-+struct bt_vcp_pending {
-+	unsigned int id;
-+	struct bt_vcp *vcp;
-+	vcp_func_t func;
-+	void *user_data;
-+};
-+
-+struct bt_vcs_param {
-+	uint8_t	op;
-+	uint8_t	change_counter;
-+} __packed;
-+
-+struct bt_vcs_ab_vol {
-+	uint8_t	change_counter;
-+	uint8_t	vol_set;
-+} __packed;
-+
-+struct bt_vcp_cb {
-+	unsigned int id;
-+	bt_vcp_func_t attached;
-+	bt_vcp_func_t detached;
-+	void *user_data;
-+};
-+
-+typedef void (*vcp_notify_t)(struct bt_vcp *vcp, uint16_t value_handle,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data);
-+
-+struct bt_vcp_notify {
-+	unsigned int id;
-+	struct bt_vcp *vcp;
-+	vcp_notify_t func;
-+	void *user_data;
-+};
-+
-+struct bt_vcp {
-+	int ref_count;
-+	struct bt_vcp_db *ldb;
-+	struct bt_vcp_db *rdb;
-+	struct bt_gatt_client *client;
-+	struct bt_att *att;
-+	unsigned int vstate_id;
-+	unsigned int vflag_id;
-+
-+	struct queue *pending;
-+
-+	void *debug_data;
-+	void *user_data;
-+};
-+
-+#define RESET_VOLUME_SETTING 0x00
-+#define USERSET_VOLUME_SETTING 0x01
-+
-+/* Contains local bt_vcp_db */
-+struct vol_state {
-+	uint8_t	vol_set;
-+	uint8_t	mute;
-+	uint8_t counter;
-+} __packed;
-+
-+struct bt_vcs {
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t vol_flag;
-+	struct gatt_db_attribute *service;
-+	struct gatt_db_attribute *vs;
-+	struct gatt_db_attribute *vs_ccc;
-+	struct gatt_db_attribute *vol_cp;
-+	struct gatt_db_attribute *vf;
-+	struct gatt_db_attribute *vf_ccc;
-+};
-+
-+static struct queue *vcp_db;
-+static struct queue *vcp_cbs;
-+static struct queue *sessions;
-+
-+static void *iov_pull_mem(struct iovec *iov, size_t len)
++static void print_vcs_state(const struct l2cap_frame *frame)
 +{
-+	void *data = iov->iov_base;
++	uint8_t vol_set, mute, chng_ctr;
 +
-+	if (iov->iov_len < len)
-+		return NULL;
++	if (!l2cap_frame_get_u8((void *)frame, &vol_set)) {
++		print_text(COLOR_ERROR, "Volume Settings: invalid size");
++		goto done;
++	}
++	print_field("    Volume Setting: %u", vol_set);
 +
-+	iov->iov_base += len;
-+	iov->iov_len -= len;
-+
-+	return data;
-+}
-+
-+static struct bt_vcp_db *vcp_get_vdb(struct bt_vcp *vcp)
-+{
-+	if (!vcp)
-+		return NULL;
-+
-+	if (vcp->ldb)
-+		return vcp->ldb;
-+
-+	return NULL;
-+}
-+
-+static struct vol_state *vdb_get_vstate(struct bt_vcp_db *vdb)
-+{
-+	if (!vdb->vcs)
-+		return NULL;
-+
-+	if (vdb->vcs->vstate)
-+		return vdb->vcs->vstate;
-+
-+	return NULL;
-+}
-+
-+static struct bt_vcs *vcp_get_vcs(struct bt_vcp *vcp)
-+{
-+	if (!vcp)
-+		return NULL;
-+
-+	if (vcp->rdb->vcs)
-+		return vcp->rdb->vcs;
-+
-+	vcp->rdb->vcs = new0(struct bt_vcs, 1);
-+	vcp->rdb->vcs->vdb = vcp->rdb;
-+
-+	return vcp->rdb->vcs;
-+}
-+
-+static void vcp_detached(void *data, void *user_data)
-+{
-+	struct bt_vcp_cb *cb = data;
-+	struct bt_vcp *vcp = user_data;
-+
-+	cb->detached(vcp, cb->user_data);
-+}
-+
-+void bt_vcp_detach(struct bt_vcp *vcp)
-+{
-+	if (!queue_remove(sessions, vcp))
-+		return;
-+
-+	bt_gatt_client_unref(vcp->client);
-+	vcp->client = NULL;
-+
-+	queue_foreach(vcp_cbs, vcp_detached, vcp);
-+}
-+
-+static void vcp_db_free(void *data)
-+{
-+	struct bt_vcp_db *vdb = data;
-+
-+	if (!vdb)
-+		return;
-+
-+	gatt_db_unref(vdb->db);
-+
-+	free(vdb->vcs);
-+	free(vdb);
-+}
-+
-+static void vcp_free(void *data)
-+{
-+	struct bt_vcp *vcp = data;
-+
-+	bt_vcp_detach(vcp);
-+
-+	vcp_db_free(vcp->rdb);
-+
-+	queue_destroy(vcp->pending, NULL);
-+
-+	free(vcp);
-+}
-+bool bt_vcp_set_user_data(struct bt_vcp *vcp, void *user_data)
-+{
-+	if (!vcp)
-+		return false;
-+
-+	vcp->user_data = user_data;
-+
-+	return true;
-+}
-+
-+static bool vcp_db_match(const void *data, const void *match_data)
-+{
-+	const struct bt_vcp_db *vdb = data;
-+	const struct gatt_db *db = match_data;
-+
-+	return (vdb->db == db);
-+}
-+
-+struct bt_att *bt_vcp_get_att(struct bt_vcp *vcp)
-+{
-+	if (!vcp)
-+		return NULL;
-+
-+	if (vcp->att)
-+		return vcp->att;
-+
-+	return bt_gatt_client_get_att(vcp->client);
-+}
-+
-+struct bt_vcp *bt_vcp_ref(struct bt_vcp *vcp)
-+{
-+	if (!vcp)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&vcp->ref_count, 1);
-+
-+	return vcp;
-+}
-+
-+void bt_vcp_unref(struct bt_vcp *vcp)
-+{
-+	if (!vcp)
-+		return;
-+
-+	if (__sync_sub_and_fetch(&vcp->ref_count, 1))
-+		return;
-+
-+	vcp_free(vcp);
-+}
-+
-+static void vcp_disconnected(int err, void *user_data)
-+{
-+	struct bt_vcp *vcp = user_data;
-+
-+	DBG("vcp %p disconnected err %d", vcp, err);
-+
-+	bt_vcp_detach(vcp);
-+}
-+
-+static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
-+{
-+	const struct queue_entry *entry;
-+	struct bt_vcp *vcp;
-+
-+	for (entry = queue_get_entries(sessions); entry; entry = entry->next) {
-+		struct bt_vcp *vcp = entry->data;
-+
-+		if (att == bt_vcp_get_att(vcp))
-+			return vcp;
++	if (!l2cap_frame_get_u8((void *)frame, &mute)) {
++		print_text(COLOR_ERROR, "Mute Filed: invalid size");
++		goto done;
 +	}
 +
-+	vcp = bt_vcp_new(db, NULL);
-+	vcp->att = att;
-+
-+	bt_att_register_disconnect(att, vcp_disconnected, vcp, NULL);
-+
-+	bt_vcp_attach(vcp, NULL);
-+
-+	return vcp;
-+
-+}
-+
-+static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VSTATE not availalbe");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VCP database not availalbe!!!!");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VCP database not availalbe!!!!");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->mute = 0x00;
-+	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VSTATE not availalbe");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->mute = 0x00;
-+	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	struct bt_vcs_ab_vol *req;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VSTATE not availalbe");
-+		return 0;
-+	}
-+
-+	req = iov_pull_mem(iov, sizeof(*req));
-+	if (!req)
-+		return 0;
-+
-+	if (req->change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->vol_set = req->vol_set;
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_unmute(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VSTATE not availalbe");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->mute = 0x00;
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
-+				 sizeof(struct vol_state),
-+				 bt_vcp_get_att(vcp));
-+	return 0;
-+}
-+
-+static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+				struct iovec *iov)
-+{
-+	struct bt_vcp_db *vdb;
-+	struct vol_state *vstate;
-+	uint8_t	*change_counter;
-+
-+	DBG("");
-+
-+	vdb = vcp_get_vdb(vcp);
-+	if (!vdb) {
-+		DBG("error: VDB not availalbe");
-+		return 0;
-+	}
-+
-+	vstate = vdb_get_vstate(vdb);
-+	if (!vstate) {
-+		DBG("error: VSTATE not availalbe");
-+		return 0;
-+	}
-+
-+	change_counter = iov_pull_mem(iov, sizeof(*change_counter));
-+	if (!change_counter)
-+		return 0;
-+
-+	if (*change_counter != vstate->counter) {
-+		DBG("Change Counter Mismatch Volume not decremented!");
-+		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
-+	}
-+
-+	vstate->mute = 0x01;
-+	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
-+
-+	return 0;
-+}
-+
-+#define	BT_VCS_REL_VOL_DOWN		0x00
-+#define	BT_VCS_REL_VOL_UP		0x01
-+#define	BT_VCS_UNMUTE_REL_VOL_DOWN	0x02
-+#define	BT_VCS_UNMUTE_REL_VOL_UP	0x03
-+#define	BT_VCS_SET_ABSOLUTE_VOL		0x04
-+#define	BT_VCS_UNMUTE			0x05
-+#define	BT_VCS_MUTE			0x06
-+
-+#define VCS_OP(_str, _op, _size, _func) \
-+	{ \
-+		.str = _str, \
-+		.op = _op, \
-+		.size = _size, \
-+		.func = _func, \
-+	}
-+
-+struct vcs_op_handler {
-+	const char *str;
-+	uint8_t	op;
-+	size_t	size;
-+	uint8_t	(*func)(struct bt_vcs *vcs, struct bt_vcp *vcp,
-+			struct iovec *iov);
-+} vcp_handlers[] = {
-+	VCS_OP("Relative Volume Down", BT_VCS_REL_VOL_DOWN,
-+		sizeof(uint8_t), vcs_rel_vol_down),
-+	VCS_OP("Relative Volume Up", BT_VCS_REL_VOL_UP,
-+		sizeof(uint8_t), vcs_rel_vol_up),
-+	VCS_OP("Unmute - Relative Volume Down", BT_VCS_UNMUTE_REL_VOL_DOWN,
-+		sizeof(uint8_t), vcs_unmute_rel_vol_down),
-+	VCS_OP("Unmute - Relative Volume Up", BT_VCS_UNMUTE_REL_VOL_UP,
-+		sizeof(uint8_t), vcs_unmute_rel_vol_up),
-+	VCS_OP("Set Absolute Volume", BT_VCS_SET_ABSOLUTE_VOL,
-+		sizeof(struct bt_vcs_ab_vol), vcs_set_absolute_vol),
-+	VCS_OP("UnMute", BT_VCS_UNMUTE,
-+		sizeof(uint8_t), vcs_unmute),
-+	VCS_OP("Mute", BT_VCS_MUTE,
-+		sizeof(uint8_t), vcs_mute),
-+	{}
-+};
-+
-+static void vcs_cp_write(struct gatt_db_attribute *attrib,
-+				unsigned int id, uint16_t offset,
-+				const uint8_t *value, size_t len,
-+				uint8_t opcode, struct bt_att *att,
-+				void *user_data)
-+{
-+	struct bt_vcs *vcs = user_data;
-+	struct bt_vcp *vcp = vcp_get_session(att, vcs->vdb->db);
-+	struct iovec iov = {
-+		.iov_base = (void *) value,
-+		.iov_len = len,
-+	};
-+	uint8_t	*vcp_op;
-+	struct vcs_op_handler *handler;
-+	uint8_t ret = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
-+
-+	DBG("");
-+	if (offset) {
-+		DBG("invalid offset %d", offset);
-+		ret = BT_ATT_ERROR_INVALID_OFFSET;
-+		goto respond;
-+	}
-+
-+	if (len < sizeof(*vcp_op)) {
-+		DBG("invalid len %ld < %ld sizeof(*param)", len,
-+							sizeof(*vcp_op));
-+		ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
-+		goto respond;
-+	}
-+
-+	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
-+
-+	DBG("vcp_op: %x", *vcp_op);
-+
-+	for (handler = vcp_handlers; handler && handler->str; handler++) {
-+		if (handler->op != *vcp_op)
-+			continue;
-+
-+		if (iov.iov_len < handler->size) {
-+			DBG("invalid len %ld < %ld handler->size", len,
-+			    handler->size);
-+			ret = BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
-+			goto respond;
-+		}
-+
++	switch (mute) {
++	case 0x00:
++		print_field("    Not Muted: %u", mute);
++		break;
++	case 0x01:
++		print_field("    Muted: %u", mute);
++		break;
++	default:
++		print_field("    Unknown Mute Value: %u", mute);
 +		break;
 +	}
 +
-+	if (handler && handler->str) {
-+		DBG("%s", handler->str);
-+
-+		ret = handler->func(vcs, vcp, &iov);
-+	} else {
-+		DBG("Unknown opcode 0x%02x", *vcp_op);
-+		ret = BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
-+	}
-+
-+respond:
-+	gatt_db_attribute_write_result(attrib, id, ret);
-+}
-+
-+static void vcs_state_read(struct gatt_db_attribute *attrib,
-+				unsigned int id, uint16_t offset,
-+				uint8_t opcode, struct bt_att *att,
-+				void *user_data)
-+{
-+	struct bt_vcs *vcs = user_data;
-+	struct iovec iov;
-+
-+	DBG("");
-+
-+	iov.iov_base = vcs->vstate;
-+	iov.iov_len = sizeof(*vcs->vstate);
-+
-+	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-+							iov.iov_len);
-+}
-+
-+static void vcs_flag_read(struct gatt_db_attribute *attrib,
-+				unsigned int id, uint16_t offset,
-+				uint8_t opcode, struct bt_att *att,
-+				void *user_data)
-+{
-+	struct bt_vcs *vcs = user_data;
-+	struct iovec iov;
-+
-+	DBG("vf: %x", vcs->vol_flag);
-+
-+	iov.iov_base = &vcs->vol_flag;
-+	iov.iov_len = sizeof(vcs->vol_flag);
-+
-+	gatt_db_attribute_read_result(attrib, id, 0, iov.iov_base,
-+							iov.iov_len);
-+}
-+
-+static struct bt_vcs *vcs_new(struct gatt_db *db)
-+{
-+	struct bt_vcs *vcs;
-+	struct vol_state *vstate;
-+	bt_uuid_t uuid;
-+
-+	if (!db)
-+		return NULL;
-+
-+	vcs = new0(struct bt_vcs, 1);
-+
-+	vstate = new0(struct vol_state, 1);
-+
-+	vcs->vstate = vstate;
-+	vcs->vol_flag = USERSET_VOLUME_SETTING;
-+
-+	/* Populate DB with VCS attributes */
-+	bt_uuid16_create(&uuid, VCS_UUID);
-+	vcs->service = gatt_db_add_service(db, &uuid, true, 9);
-+
-+	bt_uuid16_create(&uuid, VOL_STATE_CHRC_UUID);
-+	vcs->vs = gatt_db_service_add_characteristic(vcs->service,
-+					&uuid,
-+					BT_ATT_PERM_READ,
-+					BT_GATT_CHRC_PROP_READ |
-+					BT_GATT_CHRC_PROP_NOTIFY,
-+					vcs_state_read, NULL,
-+					vcs);
-+
-+	vcs->vs_ccc = gatt_db_service_add_ccc(vcs->service,
-+					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+	bt_uuid16_create(&uuid, VOL_CP_CHRC_UUID);
-+	vcs->vol_cp = gatt_db_service_add_characteristic(vcs->service,
-+					&uuid,
-+					BT_ATT_PERM_WRITE,
-+					BT_GATT_CHRC_PROP_WRITE,
-+					NULL, vcs_cp_write,
-+					vcs);
-+
-+	bt_uuid16_create(&uuid, VOL_FLAG_CHRC_UUID);
-+	vcs->vf = gatt_db_service_add_characteristic(vcs->service,
-+					&uuid,
-+					BT_ATT_PERM_READ,
-+					BT_GATT_CHRC_PROP_READ |
-+					BT_GATT_CHRC_PROP_NOTIFY,
-+					vcs_flag_read, NULL,
-+					vcs);
-+
-+	vcs->vf_ccc = gatt_db_service_add_ccc(vcs->service,
-+					BT_ATT_PERM_READ | BT_ATT_PERM_WRITE);
-+
-+
-+	gatt_db_service_set_active(vcs->service, true);
-+
-+	return vcs;
-+}
-+
-+static struct bt_vcp_db *vcp_db_new(struct gatt_db *db)
-+{
-+	struct bt_vcp_db *vdb;
-+
-+	if (!db)
-+		return NULL;
-+
-+	vdb = new0(struct bt_vcp_db, 1);
-+	vdb->db = gatt_db_ref(db);
-+
-+	if (!vcp_db)
-+		vcp_db = queue_new();
-+
-+	vdb->vcs = vcs_new(db);
-+	vdb->vcs->vdb = vdb;
-+
-+	queue_push_tail(vcp_db, vdb);
-+
-+	return vdb;
-+}
-+
-+static struct bt_vcp_db *vcp_get_db(struct gatt_db *db)
-+{
-+	struct bt_vcp_db *vdb;
-+
-+	vdb = queue_find(vcp_db, vcp_db_match, db);
-+	if (vdb)
-+		return vdb;
-+
-+	return vcp_db_new(db);
-+}
-+
-+void bt_vcp_add_db(struct gatt_db *db)
-+{
-+	vcp_db_new(db);
-+}
-+
-+unsigned int bt_vcp_register(bt_vcp_func_t attached, bt_vcp_func_t detached,
-+							void *user_data)
-+{
-+	struct bt_vcp_cb *cb;
-+	static unsigned int id;
-+
-+	if (!attached && !detached)
-+		return 0;
-+
-+	if (!vcp_cbs)
-+		vcp_cbs = queue_new();
-+
-+	cb = new0(struct bt_vcp_cb, 1);
-+	cb->id = ++id ? id : ++id;
-+	cb->attached = attached;
-+	cb->detached = detached;
-+	cb->user_data = user_data;
-+
-+	queue_push_tail(vcp_cbs, cb);
-+
-+	return cb->id;
-+}
-+
-+static bool match_id(const void *data, const void *match_data)
-+{
-+	const struct bt_vcp_cb *cb = data;
-+	unsigned int id = PTR_TO_UINT(match_data);
-+
-+	return (cb->id == id);
-+}
-+
-+bool bt_vcp_unregister(unsigned int id)
-+{
-+	struct bt_vcp_cb *cb;
-+
-+	cb = queue_remove_if(vcp_cbs, match_id, UINT_TO_PTR(id));
-+	if (!cb)
-+		return false;
-+
-+	free(cb);
-+
-+	return true;
-+}
-+
-+struct bt_vcp *bt_vcp_new(struct gatt_db *ldb, struct gatt_db *rdb)
-+{
-+	struct bt_vcp *vcp;
-+	struct bt_vcp_db *vdb;
-+
-+	if (!ldb)
-+		return NULL;
-+
-+	vdb = vcp_get_db(ldb);
-+	if (!vdb)
-+		return NULL;
-+
-+	vcp = new0(struct bt_vcp, 1);
-+	vcp->ldb = vdb;
-+	vcp->pending = queue_new();
-+
-+	if (!rdb)
++	if (!l2cap_frame_get_u8((void *)frame, &chng_ctr)) {
++		print_text(COLOR_ERROR, "Change Counter: invalid size");
 +		goto done;
-+
-+	vdb = new0(struct bt_vcp_db, 1);
-+	vdb->db = gatt_db_ref(rdb);
-+
-+	vcp->rdb = vdb;
++	}
++	print_field("    Change Counter: %u", chng_ctr);
 +
 +done:
-+	bt_vcp_ref(vcp);
-+
-+	return vcp;
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
 +}
 +
-+static void vcp_vstate_register(uint16_t att_ecode, void *user_data)
++static void vol_state_read(const struct l2cap_frame *frame)
 +{
-+	DBG("");
-+	if (att_ecode)
-+		DBG("VCS register failed: 0x%04x", att_ecode);
++	print_vcs_state(frame);
 +}
 +
-+static void vcp_vflag_register(uint16_t att_ecode, void *user_data)
++static void vol_state_notify(const struct l2cap_frame *frame)
 +{
-+	DBG("");
-+	if (att_ecode)
-+		DBG("VCS register failed: 0x%04x", att_ecode);
++	print_vcs_state(frame);
 +}
 +
-+static void vcp_vstate_notify(uint16_t value_handle, const uint8_t *value,
-+				uint16_t length, void *user_data)
++static bool vcs_config_cmd(const struct l2cap_frame *frame)
 +{
-+	struct vol_state vstate;
-+
-+	memcpy(&vstate, value, sizeof(struct vol_state));
-+
-+	DBG("Vol Settings 0x%x", vstate.vol_set);
-+	DBG("Mute Status 0x%x", vstate.mute);
-+	DBG("Vol Counter 0x%x", vstate.counter);
-+}
-+
-+static void vcp_vflag_notify(uint16_t value_handle, const uint8_t *value,
-+				uint16_t length, void *user_data)
-+{
-+	uint8_t vflag;
-+
-+	memcpy(&vflag, value, sizeof(vflag));
-+
-+	DBG("Vol Flag 0x%x", vflag);
-+}
-+
-+static void read_vol_flag(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data)
-+{
-+	uint8_t *vol_flag;
-+	struct iovec iov = {
-+		.iov_base = (void *) value,
-+		.iov_len = length,
-+	};
-+
-+	if (!success) {
-+		DBG("Unable to read VCP Vol State: error 0x%02x", att_ecode);
-+		return;
-+	}
-+
-+	vol_flag = iov_pull_mem(&iov, sizeof(*vol_flag));
-+	if (!vol_flag) {
-+		DBG("Unable to get Vol State");
-+		return;
-+	}
-+
-+	DBG("Vol Flag:%x", *vol_flag);
-+}
-+
-+static void read_vol_state(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data)
-+{
-+	struct vol_state *vs;
-+	struct iovec iov = {
-+		.iov_base = (void *) value,
-+		.iov_len = length,
-+	};
-+
-+	if (!success) {
-+		DBG("Unable to read VCP Vol State: error 0x%02x", att_ecode);
-+		return;
-+	}
-+
-+	vs = iov_pull_mem(&iov, sizeof(*vs));
-+	if (!vs) {
-+		DBG("Unable to get Vol State");
-+		return;
-+	}
-+
-+	DBG("Vol Set:%x", vs->vol_set);
-+	DBG("Vol Mute:%x", vs->mute);
-+	DBG("Vol Counter:%x", vs->counter);
-+
-+}
-+
-+static void vcp_pending_destroy(void *data)
-+{
-+	struct bt_vcp_pending *pending = data;
-+	struct bt_vcp *vcp = pending->vcp;
-+
-+	if (queue_remove_if(vcp->pending, NULL, pending))
-+		free(pending);
-+}
-+
-+static void vcp_pending_complete(bool success, uint8_t att_ecode,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data)
-+{
-+	struct bt_vcp_pending *pending = user_data;
-+
-+	if (pending->func)
-+		pending->func(pending->vcp, success, att_ecode, value, length,
-+						pending->user_data);
-+}
-+
-+static void vcp_read_value(struct bt_vcp *vcp, uint16_t value_handle,
-+				vcp_func_t func, void *user_data)
-+{
-+	struct bt_vcp_pending *pending;
-+
-+	pending = new0(struct bt_vcp_pending, 1);
-+	pending->vcp = vcp;
-+	pending->func = func;
-+	pending->user_data = user_data;
-+
-+	pending->id = bt_gatt_client_read_value(vcp->client, value_handle,
-+						vcp_pending_complete, pending,
-+						vcp_pending_destroy);
-+	if (!pending->id) {
-+		DBG("Unable to send Read request");
-+		free(pending);
-+		return;
-+	}
-+
-+	queue_push_tail(vcp->pending, pending);
-+}
-+
-+static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
-+{
-+	struct bt_vcp *vcp = user_data;
-+	uint16_t value_handle;
-+	bt_uuid_t uuid, uuid_vstate, uuid_cp, uuid_vflag;
-+	struct bt_vcs *vcs;
-+
-+	DBG("");
-+	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
-+						NULL, NULL, &uuid))
-+		return;
-+
-+	bt_uuid16_create(&uuid_vstate, VOL_STATE_CHRC_UUID);
-+	bt_uuid16_create(&uuid_cp, VOL_CP_CHRC_UUID);
-+	bt_uuid16_create(&uuid_vflag, VOL_FLAG_CHRC_UUID);
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_vstate)) {
-+		DBG("VCS Volume state found: handle 0x%04x", value_handle);
-+
-+		vcs = vcp_get_vcs(vcp);
-+		if (!vcs || vcs->vs)
-+			return;
-+
-+		vcs->vs = attr;
-+
-+		vcp_read_value(vcp, value_handle, read_vol_state, vcp);
-+		vcp->vstate_id = bt_gatt_client_register_notify(vcp->client,
-+						value_handle,
-+						vcp_vstate_register,
-+						vcp_vstate_notify, vcp, NULL);
-+
-+		return;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_cp)) {
-+		DBG("VCS Volume CP found: handle 0x%04x", value_handle);
-+
-+		vcs = vcp_get_vcs(vcp);
-+		if (!vcs || vcs->vol_cp)
-+			return;
-+
-+		vcs->vol_cp = attr;
-+
-+		return;
-+	}
-+
-+	if (!bt_uuid_cmp(&uuid, &uuid_vflag)) {
-+		DBG("VCS Vol Flaf found: handle 0x%04x", value_handle);
-+
-+		vcs = vcp_get_vcs(vcp);
-+		if (!vcs || vcs->vf)
-+			return;
-+
-+		vcs->vf = attr;
-+
-+		vcp_read_value(vcp, value_handle, read_vol_flag, vcp);
-+		vcp->vflag_id = bt_gatt_client_register_notify(vcp->client,
-+						value_handle,
-+						vcp_vflag_register,
-+						vcp_vflag_notify, vcp, NULL);
-+	}
-+
-+}
-+
-+static void foreach_vcs_service(struct gatt_db_attribute *attr,
-+						void *user_data)
-+{
-+	struct bt_vcp *vcp = user_data;
-+	struct bt_vcs *vcs = vcp_get_vcs(vcp);
-+
-+	DBG("");
-+	vcs->service = attr;
-+
-+	gatt_db_service_set_claimed(attr, true);
-+
-+	gatt_db_service_foreach_char(attr, foreach_vcs_char, vcp);
-+}
-+
-+bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
-+{
-+	bt_uuid_t uuid;
-+
-+	if (!sessions)
-+		sessions = queue_new();
-+
-+	queue_push_tail(sessions, vcp);
-+
-+	if (!client)
-+		return true;
-+
-+	if (vcp->client)
++	if (!l2cap_frame_print_u8((void *)frame, "    Change Counter"))
 +		return false;
-+
-+	vcp->client = bt_gatt_client_clone(client);
-+	if (!vcp->client)
-+		return false;
-+
-+	bt_uuid16_create(&uuid, VCS_UUID);
-+	gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vcs_service, vcp);
 +
 +	return true;
 +}
 +
-diff --git a/src/shared/vcp.h b/src/shared/vcp.h
-new file mode 100644
-index 000000000000..456ad8041162
---- /dev/null
-+++ b/src/shared/vcp.h
-@@ -0,0 +1,58 @@
-+/* SPDX-License-Identifier: LGPL-2.1-or-later */
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ */
++static bool vcs_absolute_cmd(const struct l2cap_frame *frame)
++{
++	if (!l2cap_frame_print_u8((void *)frame, "    Change Counter"))
++		return false;
 +
-+#include <stdbool.h>
-+#include <inttypes.h>
++	if (!l2cap_frame_print_u8((void *)frame, "    Volume Setting"))
++		return false;
 +
-+#include "src/shared/io.h"
++	return true;
++}
 +
-+#ifndef __packed
-+#define __packed __attribute__((packed))
-+#endif
++#define ASE_CMD(_op, _desc, _func) \
++[_op] = { \
++	.desc = _desc, \
++	.func = _func, \
++}
 +
-+#define BT_VCP_RENDERER			0x01
-+#define	BT_VCP_CONTROLLER		0x02
++struct vcs_cmd {
++	const char *desc;
++	bool (*func)(const struct l2cap_frame *frame);
++} vcs_cmd_table[] = {
++	/* Opcode = 0x00 (Relative Volume Down) */
++	ASE_CMD(0x00, "Relative Volume Down", vcs_config_cmd),
++	/* Opcode = 0x01 (Relative Volume Up) */
++	ASE_CMD(0x01, "Relative Volume Up", vcs_config_cmd),
++	/* Opcode = 0x02 (Unmute/Relative Volume Down) */
++	ASE_CMD(0x02, "Unmute/Relative Volume Down", vcs_config_cmd),
++	/* Opcode = 0x03 (Unmute/Relative Volume Up) */
++	ASE_CMD(0x03, "Unmute/Relative Volume Up", vcs_config_cmd),
++	/* Opcode = 0x04 (Set Absolute Volume) */
++	ASE_CMD(0x04, "Set Absolute Volume", vcs_absolute_cmd),
++	/* Opcode = 0x05 (Unmute) */
++	ASE_CMD(0x05, "Unmute", vcs_config_cmd),
++	/* Opcode = 0x06 (Mute) */
++	ASE_CMD(0x06, "Mute", vcs_config_cmd),
++};
 +
-+#define BT_VCP_RELATIVE_VOL_DOWN	0x00
-+#define BT_VCP_RELATIVE_VOL_UP		0x01
-+#define BT_VCP_UNMUTE_RELATIVE_VOL_DOWN	0x02
-+#define BT_VCP_UNMUTE_RELATIVE_VOL_UP	0x03
-+#define BT_VCP_SET_ABOSULTE_VOL		0x04
-+#define BT_VCP_UNMUTE			0x05
-+#define BT_VCP_MUTE			0x06
++static struct vcs_cmd *vcs_get_cmd(uint8_t op)
++{
++	if (op > ARRAY_SIZE(vcs_cmd_table))
++		return NULL;
 +
-+#ifndef MAX
-+#define MAX(a, b) ((a) > (b) ? (a) : (b))
-+#endif
++	return &vcs_cmd_table[op];
++}
 +
-+#ifndef MIN
-+#define MIN(a, b) ((a) < (b) ? (a) : (b))
-+#endif
++static void print_vcs_cmd(const struct l2cap_frame *frame)
++{
++	uint8_t op;
++	struct vcs_cmd *cmd;
 +
-+struct bt_vcp;
++	if (!l2cap_frame_get_u8((void *)frame, &op)) {
++		print_text(COLOR_ERROR, "opcode: invalid size");
++		goto done;
++	}
 +
-+typedef void (*bt_vcp_func_t)(struct bt_vcp *vcp, void *user_data);
++	cmd = vcs_get_cmd(op);
++	if (!cmd) {
++		print_field("    Opcode: Reserved (0x%2.2x)", op);
++		goto done;
++	}
 +
-+struct bt_vcp *bt_vcp_ref(struct bt_vcp *vcp);
-+void bt_vcp_unref(struct bt_vcp *vcp);
++	print_field("    Opcode: %s (0x%2.2x)", cmd->desc, op);
++	if (!cmd->func(frame))
++		print_field("    Unknown Opcode");
 +
-+void bt_vcp_add_db(struct gatt_db *db);
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
 +
-+bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client);
-+void bt_vcp_detach(struct bt_vcp *vcp);
++static void vol_cp_write(const struct l2cap_frame *frame)
++{
++	print_vcs_cmd(frame);
++}
 +
-+struct bt_att *bt_vcp_get_att(struct bt_vcp *vcp);
++static void print_vcs_flag(const struct l2cap_frame *frame)
++{
++	uint8_t vol_flag;
 +
-+bool bt_vcp_set_user_data(struct bt_vcp *vcp, void *user_data);
++	if (!l2cap_frame_get_u8((void *)frame, &vol_flag)) {
++		print_text(COLOR_ERROR, "Volume Flag: invalid size");
++		goto done;
++	}
++	print_field("    Volume Falg: %u", vol_flag);
 +
-+/* Session related function */
-+unsigned int bt_vcp_register(bt_vcp_func_t added, bt_vcp_func_t removed,
-+							void *user_data);
-+bool bt_vcp_unregister(unsigned int id);
-+struct bt_vcp *bt_vcp_new(struct gatt_db *ldb, struct gatt_db *rdb);
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void vol_flag_read(const struct l2cap_frame *frame)
++{
++	print_vcs_flag(frame);
++}
++
++static void vol_flag_notify(const struct l2cap_frame *frame)
++{
++	print_vcs_flag(frame);
++}
++
+ #define GATT_HANDLER(_uuid, _read, _write, _notify) \
+ { \
+ 	.uuid = { \
+@@ -1617,6 +1773,9 @@ struct gatt_handler {
+ 	GATT_HANDLER(0x2bcc, pac_loc_read, NULL, pac_loc_notify),
+ 	GATT_HANDLER(0x2bcd, pac_context_read, NULL, pac_context_notify),
+ 	GATT_HANDLER(0x2bce, pac_context_read, NULL, pac_context_notify),
++	GATT_HANDLER(0x2b7d, vol_state_read, NULL, vol_state_notify),
++	GATT_HANDLER(0x2b7e, NULL, vol_cp_write, NULL),
++	GATT_HANDLER(0x2b7f, vol_flag_read, NULL, vol_flag_notify),
+ };
+ 
+ static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
 -- 
 2.25.1
 
