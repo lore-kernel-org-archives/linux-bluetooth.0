@@ -2,112 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 495A8C6FA86
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 16:56:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB1DAECAAD3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 17:30:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230101AbiISQ43 (ORCPT
+        id S231217AbiISRaW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Sep 2022 12:56:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37880 "EHLO
+        Mon, 19 Sep 2022 13:30:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230110AbiISQ4T (ORCPT
+        with ESMTP id S230083AbiISRaU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Sep 2022 12:56:19 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0A62D1D8;
-        Mon, 19 Sep 2022 09:56:16 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id F2EBF5C03F5;
-        Mon, 19 Sep 2022 12:56:15 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute2.internal (MEProxy); Mon, 19 Sep 2022 12:56:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1663606575; x=1663692975; bh=Lt
-        Q0DLuSXvYNpp6h6u8UcE3CM907DFTu5M1mUT8X5J8=; b=hQD3O5xw7mveu5YLDL
-        vmdvFfjUn7VEveiuegGdwWh+IVhRKde7r4yf7YkDU1P1WHMXDC1Lc2bHnQu24jL7
-        Se+/jGA6JvdexhWgsr84V/iYjwWNEV2TQ4qGfXX5bbwDAs+rJQx7fAKIkDinAZz9
-        rUhKhCSngkW8hPez5UknVLx2tXU1RJ/DOapmGUxN94yVoUcOVXOpldyra+P9RmZD
-        eVpiKeLkZQ8Tc4kc1WwasnTFCKU4JjIHJtOC60NOBmclnCplNUqAUKYhfmADzpFh
-        eQZo0ksA2QX4EZ7Dgiwy1K2/lpxYITwy7aaW+FizGyb3LplKe34dE23yUod3KQVg
-        +rwA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1663606575; x=1663692975; bh=LtQ0DLuSXvYNpp6h6u8UcE3CM907
-        DFTu5M1mUT8X5J8=; b=PW5Q+G5BpLu8W+HJM+9RogC1e1vTA+z0Skq59YfcwDC4
-        PMQMk56C9srehJ8ibVpy72D96OTkGB4Wok1T8Y+qXqafsnjD9WgfOaMKoXDEEHyV
-        Ao6k1I9jVXfsZtNndIAkxcoWEUCK+wyWpJPwptqJ6bAjteiq+Fc+0IexaHmey8X3
-        asoavoAQTUMHLqosDiAvhWZm34eTW0q3G80k+s384W6pGNVHnIE6NOKCw0Vo7sBm
-        vxg5q/Ei//fcnnWHHWJYABK1d8d6uGvmnHZd5Na/Pok+9vZZjmdZvo2A5j4uEfqj
-        px9Rnqp4IHcLjdOgmcMQ/AT3K8S7ZONassas9nAiWg==
-X-ME-Sender: <xms:L58oY7x92uJP0wA96kefexThi9fP_avH7-Ezt9-cATFmXQ6IAreoKA>
-    <xme:L58oYzSNRB0ye8viq0m1rVY6IRGXmT8CQZYO3c2I03sOIi5RGFkZpBn9XEyde4uWR
-    y-tCvNgKmnt4l_IP0Y>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedvjedguddtlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfu
-    vhgvnhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtf
-    frrghtthgvrhhnpeekleekudelvddvhfefhfelgffffefgvdehjeegjefhheejjefgffef
-    ieejtdetjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
-    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshhvvghnsehsvhgvnhhpvghtvghr
-    rdguvghv
-X-ME-Proxy: <xmx:L58oY1UvXUj5_qinYbzuqFXjoZ-DlplIiIqHdM7VT107cwqSkqfptw>
-    <xmx:L58oY1jxciWTPHI6Cl3UAAdsj187O-gD0e9YnRXI8GggNgQR2-1-sg>
-    <xmx:L58oY9CWKUDPLDfKLg2Ynzlrsupyg3jqts01hStBxaMoSNt00iCMBA>
-    <xmx:L58oY1YUZAM0sebk1OEOBf3sZoDr55IneDB877oKpz2YP_qByVadBQ>
-Feedback-ID: i51094778:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id A7601A6007C; Mon, 19 Sep 2022 12:56:15 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-935-ge4ccd4c47b-fm-20220914.001-ge4ccd4c4
-Mime-Version: 1.0
-Message-Id: <4910f728-843a-4546-8aa8-69d5faadc92f@app.fastmail.com>
-In-Reply-To: <20220919164834.62739-1-sven@svenpeter.dev>
-References: <20220919164834.62739-1-sven@svenpeter.dev>
-Date:   Mon, 19 Sep 2022 18:55:55 +0200
-From:   "Sven Peter" <sven@svenpeter.dev>
-To:     "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Hector Martin" <marcan@marcan.st>,
-        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/7] Broadcom/Apple Bluetooth driver for Apple Silicon
-Content-Type: text/plain
+        Mon, 19 Sep 2022 13:30:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E8E71CFC1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 10:30:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5BCE2615F8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 17:30:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BEB28C433D7;
+        Mon, 19 Sep 2022 17:30:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663608616;
+        bh=48ePgsw+46qV4yHihCNPg91nmcMTeUltXkR0/3095ss=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=mM/9cihfPC68it6iHfYwkWeVts5CeCe+xTC3ddKbPtV8SkE0rTuBkbhNMeWX93NCq
+         IzwIDRp3psWdUEE/X1McCtclgRPB9k7mMcKNEMTJicr1UzFQF2GbgaSfy7wrUavTU1
+         9y1W/pLQ5pciJs1Eg0Cw6ZL56wRpX/thHOQO/vMQHxdb5DVf4jPZSdVw87yIbO+7l+
+         ejC3bhBwoTyZUOZQ//78EXnyu4HbXJnnY+Cu8t61TvkcGlDdgbTXy00jcpmJuXIa+P
+         DI4k4ytoQ1nGFaL8aPiVWcWfhbcEYgrgFO4JbupCJoQMufu6qMC4sqMmSKGQVpd/hh
+         HToBrup1mZ1Rw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 94F72E21ED4;
+        Mon, 19 Sep 2022 17:30:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: use hdev->workqueue when queuing
+ hdev->{cmd,ncmd}_timer works
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166360861658.29822.12630760382749336060.git-patchwork-notify@kernel.org>
+Date:   Mon, 19 Sep 2022 17:30:16 +0000
+References: <733e6931-aa66-5295-d8a8-49063b7347f1@I-love.SAKURA.ne.jp>
+In-Reply-To: <733e6931-aa66-5295-d8a8-49063b7347f1@I-love.SAKURA.ne.jp>
+To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        schspa@gmail.com,
+        syzbot+243b7d89777f90f7613b@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com, jiangshanlai@gmail.com,
+        tj@kernel.org, linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 19, 2022, at 18:48, Sven Peter wrote:
-> Hi,
->
-> v1: https://lore.kernel.org/asahi/20220801103633.27772-1-sven@svenpeter.dev/
-> v2: https://lore.kernel.org/asahi/20220907170935.11757-1-sven@svenpeter.dev/
->
-> Here's v3 of the Apple/Broadcom Bluetooth series. Again most changes are
-> to the device tree bindings. I've also included the changes to the dts files
-> that I forgot for the last two versions.
->
-> Additionally I had to introduce another quirk since these controllers also claim
-> to support MWS Pattern Configuration but then simply disallow that command. This
+Hello:
 
-Apologies! This was supposed to be "MWS Transport Layer Configuration" instead
-of "MWS Pattern Configuration". I just miscounted bits originally and
-forgot to update the cover letter. The actual commit has the correct name
-though.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Fri, 2 Sep 2022 20:23:48 +0900 you wrote:
+> syzbot is reporting attempt to schedule hdev->cmd_work work from system_wq
+> WQ into hdev->workqueue WQ which is under draining operation [1], for
+> commit c8efcc2589464ac7 ("workqueue: allow chained queueing during
+> destruction") does not allow such operation.
+> 
+> The check introduced by commit 877afadad2dce8aa ("Bluetooth: When HCI work
+> queue is drained, only queue chained work") was incomplete.
+> 
+> [...]
+
+Here is the summary with links:
+  - Bluetooth: use hdev->workqueue when queuing hdev->{cmd,ncmd}_timer works
+    https://git.kernel.org/bluetooth/bluetooth-next/c/deee93d13d38
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Sven
