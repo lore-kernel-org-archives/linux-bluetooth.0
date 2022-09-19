@@ -2,156 +2,147 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097CBC54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 15:17:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB37ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 16:49:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbiISPRb (ORCPT
+        id S230085AbiISQtg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Sep 2022 11:17:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36522 "EHLO
+        Mon, 19 Sep 2022 12:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbiISPQg (ORCPT
+        with ESMTP id S230054AbiISQte (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Sep 2022 11:16:36 -0400
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2262251D;
-        Mon, 19 Sep 2022 08:15:56 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 56C0F5C03AB;
-        Mon, 19 Sep 2022 11:15:55 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute2.internal (MEProxy); Mon, 19 Sep 2022 11:15:55 -0400
+        Mon, 19 Sep 2022 12:49:34 -0400
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C823E9C;
+        Mon, 19 Sep 2022 09:49:32 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.nyi.internal (Postfix) with ESMTP id 46B275C03E7;
+        Mon, 19 Sep 2022 12:49:29 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Mon, 19 Sep 2022 12:49:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm2; t=1663600555; x=1663686955; bh=IJ
-        MTW8UozEq4kXWzkrXIWScQVhLfZvAbgQQvmEGIG9A=; b=rBDuNZWtZkpL26YBye
-        R9OYq1BLfrYeOYvCcL9kc0+qk+sPyDcIpUEpkvHFzFSr589NM20dKE5ogc82EOQN
-        NSRU72xWJn1Q+rP6qx2T71WWZWwqN71h9Hmx7v4UDCy3WJPruUzt0S9hyPSDXWST
-        HPJwno5DLvwTuBGwfYDxlzEmaa8Y49N1qaz1gLPINx4DM468YrLgvbweoN4Iqps3
-        bs8493F5Ew6D2jwAaxoQ/KkAOx+HGoPP2TBlU+Fy3K6fiME58ZxKZ05lgm7IZTVL
-        Orj3qWn9vBe4ZQ0zI7p2WU41lAUUr/h4hcu+LQX5DI89KCX4SfPKtTUwrbdmjlgI
-        Vkuw==
+         h=cc:cc:content-transfer-encoding:date:date:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to; s=fm2; t=1663606169; x=1663692569; bh=rvgpBluXZT
+        aqb3vna+uXxT40xAPq8i61oRknfT3+QiA=; b=k1ff9CnKfVsS4VBMjTqgBD4j3A
+        UOLsHp2MPoE5fmyt0z9n6+RoCn0MmiSG/YSvY5HhOISkFjHCewYpCOJBgkshDEHD
+        enmX86JToHyUpTX4Fa1IKtoWTimfTTIQsfwycclE7ZF0BwuYnKme9lDMMQJpvA0n
+        h1j687PK2gaYht9qGgyiAoAdZjG4yE4MB+99h+QUH6tcKI9H1uaQNDdrCgWjTumZ
+        aWJxD3bjWt2X00Ld9JfwpsmPm0OOLDVkQZpzZW63kJEk5YnCIRh9TWQHLW4n91rG
+        RFcbZ3ZrE3SAr1nup2dPpDjogOZ7fm1dWOQzc2meg60rTN28xFwcTsgE1XCQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm2; t=1663600555; x=1663686955; bh=IJMTW8UozEq4kXWzkrXIWScQVhLf
-        ZvAbgQQvmEGIG9A=; b=DcfEDWGC8jagbQAcl82nUeQWb0OMJXs6T+nwyOe4t2z1
-        K7JQPEQNg9kdjcR8UuDKyg7vYp55XLINXBxs1KZ5+eE9ME5KInwDcDjiPDnjKL9L
-        rcgA4rIoJ0hbPh3tWekVxC0mvuF8XTiJDCOONNkdo1UD3Bvt9ArBRxPhIJyFoOrc
-        0yv87BlfSYSP8WBuEx7UzXpXsOlQem6534nT/f386hdZGdi8YJL2tcajeVwIYfRP
-        4kW1cpDiZP5IM611Bn5VIorwp35DXuWhrjnxglM+rj0X1H0GhSaGh7TOdv0SalPH
-        Hle5FsuVPnFCgbEgfaWIdI4+wmOw09J7Tj4P5CGATA==
-X-ME-Sender: <xms:q4coY8PN0Bbq0gtDpb0q4fd90zXSlUC7mNrJEENwFlkARhJKuW42Ow>
-    <xme:q4coYy_qfmHIB9GVDwuYCspP4JGJnstGJzQT96fnLmWWErvMJRbaSHvQlEOJ1QPag
-    PKxlzodzHOtK41YC0s>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedvjedgkeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedfufhv
-    vghnucfrvghtvghrfdcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrf
-    grthhtvghrnhepleevgfegffehvedtieevhfekheeftedtjeetudevieehveevieelgffh
-    ieevieeunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshhvvghnsehsvhgvnhhpvghtvghrrdguvghv
-X-ME-Proxy: <xmx:q4coYzRIJCZZy1uzO7npOzBGCO1nT7rw-BYE57EJeTYuO1x_UF7Wbw>
-    <xmx:q4coY0viJMOUqmqNV4sxc0TC4z6WDn5uDvduok3V_Izr0017CRBDFg>
-    <xmx:q4coY0eAax0YQ3mdRKElwCvfRfKrVN_c7bZJZMyqqQVP407DH9MkMw>
-    <xmx:q4coY4_kwPdlrKn9W6E4CfwYOS2xkPMXHC2QQx2jyXU6cC6sFUIqog>
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+        1663606169; x=1663692569; bh=rvgpBluXZTaqb3vna+uXxT40xAPq8i61oRk
+        nfT3+QiA=; b=W+b6OIYTxMsmoRsH9ArlYD2aTT7HrtURx/WHqUAA2Kgjuitw0Iw
+        nKccfgoSmQ0gXx9aFuHrq85zmU4AjIDn5MCRk9VVVnO6vPvsjLXhO2om8zCmBBHL
+        UReNvnsG6ynCjWc3Slu971dR6WAYxWnMOpo5uhFReUQR7QHdIELFvtUFoOE6u/b5
+        3/J+wiuu5w73B9I3pmtwNtVkJAqpDZGGwwBmlBMknjZ6v2rn1j7rYmFARqIyhM1z
+        EIGvX6CCd+fUcS9kfT6lKLF6lTb9MKvLwHaGM26OnAu+837PmqClDhHfZcKAAYa9
+        MfymZbfeAgx9g0JgN9XVhe0O/UmeuSrgTSQ==
+X-ME-Sender: <xms:mJ0oY0iANcMMWK2y9a13EsaayPrqDnHueHs1npaN1Zpw4ORY1UAUyw>
+    <xme:mJ0oY9BqXinZY8_1p4Ufd1g06UEz1CDLTm9b7UGjGrGpAy1hT5cqloneNwrJOgbtY
+    jzr7Li9x1mf45HDoVM>
+X-ME-Received: <xmr:mJ0oY8GySkBhq7srD9YXjKB7qs0xcs9L-fSMc5kdHTj6OuetBJG9OrBbUgi0vbNzubxsTWWldsX0y3zhxifud3nqueFSp_6U4PQi4l4OwaEHvKIFmhR9gyk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrfedvjedguddtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuvhgvnhcu
+    rfgvthgvrhcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrfgrthhtvg
+    hrnhepgfegudffudelfeeugedtjeeugeehueffudevveegveektdfhueehueeufeelheev
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
+X-ME-Proxy: <xmx:mJ0oY1TuNuk8xtwnw6tW2a1beaaNcxvKRvqL5aWr_5NmDbeLsvN5NA>
+    <xmx:mJ0oYxy2NnB40sXLpZ6pDdWW9_jV3taDz_7oJYhY8X9GkPQJyEpaZQ>
+    <xmx:mJ0oYz5On5nutPy78fikvvmdCzAzN0OtvWOKhzFsuC6L0SSg3N4exw>
+    <xmx:mZ0oY-j_lP21-bk-pDhx2M70EZMjQ1qPXJNNfBiuh_yKj70AtncKLQ>
 Feedback-ID: i51094778:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 1FAB0A6007C; Mon, 19 Sep 2022 11:15:55 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-935-ge4ccd4c47b-fm-20220914.001-ge4ccd4c4
-Mime-Version: 1.0
-Message-Id: <581df839-87d6-4076-8d83-5f3174852a61@app.fastmail.com>
-In-Reply-To: <CAL_JsqL96Er9JuDajHWtf=i7bvzrf7PLzk-G-Qm4wTxTr5BStg@mail.gmail.com>
-References: <20220907170935.11757-1-sven@svenpeter.dev>
- <20220907170935.11757-3-sven@svenpeter.dev>
- <bcb799ea-d58e-70dc-c5c2-daaff1b19bf5@linaro.org>
- <20220912211226.GA1847448-robh@kernel.org>
- <CAL_JsqL96Er9JuDajHWtf=i7bvzrf7PLzk-G-Qm4wTxTr5BStg@mail.gmail.com>
-Date:   Mon, 19 Sep 2022 17:15:54 +0200
-From:   "Sven Peter" <sven@svenpeter.dev>
-To:     "Rob Herring" <robh@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>
-Cc:     "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 19 Sep 2022 12:49:25 -0400 (EDT)
+From:   Sven Peter <sven@svenpeter.dev>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Sven Peter <sven@svenpeter.dev>,
         "David S. Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Hector Martin" <marcan@marcan.st>,
-        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
-        netdev <netdev@vger.kernel.org>, devicetree@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2 2/5] dt-bindings: net: Add Broadcom BCM4377 family PCIe
- Bluetooth
-Content-Type: text/plain
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/7] Broadcom/Apple Bluetooth driver for Apple Silicon
+Date:   Mon, 19 Sep 2022 18:48:27 +0200
+Message-Id: <20220919164834.62739-1-sven@svenpeter.dev>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi,
+
+v1: https://lore.kernel.org/asahi/20220801103633.27772-1-sven@svenpeter.dev/
+v2: https://lore.kernel.org/asahi/20220907170935.11757-1-sven@svenpeter.dev/
+
+Here's v3 of the Apple/Broadcom Bluetooth series. Again most changes are
+to the device tree bindings. I've also included the changes to the dts files
+that I forgot for the last two versions.
+
+Additionally I had to introduce another quirk since these controllers also claim
+to support MWS Pattern Configuration but then simply disallow that command. This
+used to be silently ignored by the bluetooth core but fails during setup
+now since b82a26d8633cc89367fac75beb3ec33061bea44a.
 
 
-On Thu, Sep 15, 2022, at 15:09, Rob Herring wrote:
-> On Mon, Sep 12, 2022 at 4:12 PM Rob Herring <robh@kernel.org> wrote:
->>
->> On Thu, Sep 08, 2022 at 01:19:17PM +0200, Krzysztof Kozlowski wrote:
->> > On 07/09/2022 19:09, Sven Peter wrote:
->> > > These chips are combined Wi-Fi/Bluetooth radios which expose a
->> > > PCI subfunction for the Bluetooth part.
->> > > They are found in Apple machines such as the x86 models with the T2
->> > > chip or the arm64 models with the M1 or M2 chips.
->> > >
->> > > Signed-off-by: Sven Peter <sven@svenpeter.dev>
->> > > ---
->
->> > > +examples:
->> > > +  - |
->> > > +    pcie {
->> > > +      #address-cells = <3>;
->> > > +      #size-cells = <2>;
->> > > +
->> > > +      bluetooth@0,1 {
->> >
->> > The unit address seems to be different than reg.
->>
->> Right, this says dev 0, func 1.
->
-> Actually, the reg value of 0x100 is correct. func is bits 8-10. dev
-> starts in bit 11.
-
-Yup, if I write the example as
-
-  - |
-    pcie@a0000000 {
-      #address-cells = <3>;
-      #size-cells = <2>;
-      reg = <0xa0000000 0x1000000>;
-      device_type = "pci";
-      ranges = <0x43000000 0x6 0xa0000000 0xa0000000 0x0 0x20000000>;
-
-      bluetooth@0,1 {
-        compatible = "pci14e4,5f69";
-        reg = <0x100 0x0 0x0 0x0 0x0>;
-        brcm,board-type = "apple,honshu";
-        /* To be filled by the bootloader */
-        local-bd-address = [00 00 00 00 00 00];
-      };
-    };
-
-
-then no warnings appear. If I instead use "bluetooth@0,2" I get the following
-warning:
-
-Warning (pci_device_reg): /example-0/pcie@a0000000/bluetooth@0,2: PCI unit address format error, expected "0,1"
-
+Best,
 
 
 Sven
+
+Sven Peter (7):
+  dt-bindings: net: Add generic Bluetooth controller
+  dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+  arm64: dts: apple: t8103: Add Bluetooth controller
+  Bluetooth: hci_event: Ignore reserved bits in LE Extended Adv Report
+  Bluetooth: Add quirk to disable extended scanning
+  Bluetooth: Add quirk to disable MWS Pattern Configuration
+  Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCIe boards
+
+ .../devicetree/bindings/net/bluetooth.txt     |    5 -
+ .../net/bluetooth/bluetooth-controller.yaml   |   29 +
+ .../net/bluetooth/brcm,bcm4377-bluetooth.yaml |   81 +
+ .../{ => bluetooth}/qualcomm-bluetooth.yaml   |    6 +-
+ .../bindings/soc/qcom/qcom,wcnss.yaml         |    8 +-
+ MAINTAINERS                                   |    2 +
+ arch/arm64/boot/dts/apple/t8103-j274.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j293.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j313.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j456.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j457.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-jxxx.dtsi     |    8 +
+ drivers/bluetooth/Kconfig                     |   12 +
+ drivers/bluetooth/Makefile                    |    1 +
+ drivers/bluetooth/hci_bcm4377.c               | 2513 +++++++++++++++++
+ include/net/bluetooth/hci.h                   |   21 +
+ include/net/bluetooth/hci_core.h              |    4 +-
+ net/bluetooth/hci_event.c                     |    2 +-
+ net/bluetooth/hci_sync.c                      |    2 +
+ 19 files changed, 2699 insertions(+), 15 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml
+ rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)
+ create mode 100644 drivers/bluetooth/hci_bcm4377.c
+
+-- 
+2.25.1
+
