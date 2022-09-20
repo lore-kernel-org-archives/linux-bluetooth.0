@@ -2,69 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9D7C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Sep 2022 21:03:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F376C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Sep 2022 21:30:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbiITVDc (ORCPT
+        id S230283AbiITVaV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Sep 2022 17:03:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35248 "EHLO
+        Tue, 20 Sep 2022 17:30:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbiITVDb (ORCPT
+        with ESMTP id S230243AbiITVaT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Sep 2022 17:03:31 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065AB45F7E;
-        Tue, 20 Sep 2022 14:03:30 -0700 (PDT)
+        Tue, 20 Sep 2022 17:30:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182114BA58;
+        Tue, 20 Sep 2022 14:30:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9A1BE62679;
-        Tue, 20 Sep 2022 21:03:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7661C433D6;
-        Tue, 20 Sep 2022 21:03:28 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C9FD3B82B9B;
+        Tue, 20 Sep 2022 21:30:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 68E13C433D7;
+        Tue, 20 Sep 2022 21:30:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1663707809;
-        bh=o7S1h7jTsysuNYnR5ZE6hpSrFWBQ+QPB2QoDEmdRnlk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=ookGtPWY1t+ynqmFW/SsJ8tAriZBY2bSZd7tSGW9OAuovMimPWZ4A90Yctqe9qIpa
-         L7PaQRVeWiP9xMMQnzdJIXmDqFgyEc9NBs4yiM+3OUlIPoXtWTg4ApAEGfJjwZ8TTs
-         LMQWXzZtvLvNWVwy+6Yaw9PciyZu0xRGWmtBNKdIfKGx0NWyw7t18Jvjjf+evl2XoF
-         qdh2EpzvU7kVrLmXLJPLpElm4MUVyYnDiJ2iDSH6vrRz4Ys5O3mGz1258Ph6NDOd+X
-         VRhNaB1011ZM/l6JEVsRZBr9/+Flr6u4u6XuZx7gmMo+6z0dtdIk2dhdm/j+sr69I/
-         x2mvvNuwEu/gQ==
-Date:   Tue, 20 Sep 2022 14:03:27 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>
-Subject: Re: pull request: bluetooth 2022-09-09
-Message-ID: <20220920140327.5eda455d@kernel.org>
-In-Reply-To: <CABBYNZLhMRbvhhb-9Ho-qVarC+KLiFyxiaypHWW=NPqHXYTU0w@mail.gmail.com>
-References: <20220909201642.3810565-1-luiz.dentz@gmail.com>
-        <CABBYNZKHUbqYyevHRZ=6rLA0GAE20mLRHAj9JnFNuRn7VHrEeA@mail.gmail.com>
-        <20220919180419.0caa435a@kernel.org>
-        <CABBYNZLhMRbvhhb-9Ho-qVarC+KLiFyxiaypHWW=NPqHXYTU0w@mail.gmail.com>
+        s=k20201202; t=1663709415;
+        bh=Jm3126vXhfIsC58fqrhyhGZZqRop69HORFNnvtncmdQ=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=eOPA9ycDlfzZB5EYfP27Fta6cptc3+fqMe1x5VkqdR0r86AipLiA+cOiq/suzYWxC
+         fg8Elx0UOYBF1OARWPaGzKXB9JqPqW5yBT8PNUDYOzkDvJOLNv1TRQEvK88HkxxLhH
+         ovjdtls9bZzNUhKC+4klS5z0JuxsBdAsbp7OvjcDlnpB7kVglPI+A2SJMpcBZU/bOn
+         TgS3iPhcN8DwAwWi4INbmwQvV+wvND6IMoqNPNiq4A6hVa0RUePoIythp5ET3J89hp
+         ig+lRiokAFi05rk+kG6YpUwYFcX2xOOhAUADAwUep5tAfoyFJCt6QlMu4lUrj468Q6
+         15GsW+dVUae2g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A2EAE21EE2;
+        Tue, 20 Sep 2022 21:30:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: MGMT: fix zalloc-simple.cocci warnings
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166370941529.2704.13729564732821603933.git-patchwork-notify@kernel.org>
+Date:   Tue, 20 Sep 2022 21:30:15 +0000
+References: <20220920031958.3092-1-hanyihao@vivo.com>
+In-Reply-To: <20220920031958.3092-1-hanyihao@vivo.com>
+To:     Yihao Han <hanyihao@vivo.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 20 Sep 2022 13:56:45 -0700 Luiz Augusto von Dentz wrote:
-> > > Looks like this still hasn't been applied, is there any problem that
-> > > needs to be fixed?  
-> >
-> > Sorry about the delay, we were all traveling to Linux Plumbers.
-> > Pulling now.
-> >
-> > Any reason why struct hci_dev_info is not under include/uapi ?  
-> 
-> None of Bluetooth APIs are there, at some point I was discussing with
-> Marcel that we should probably fix that so we can properly expose
-> headers to userspace as right now this depends on bluez library which
-> is something we want to deprecate.
+Hello:
 
-It'd be great if for no other reason just to make it very clear 
-that the structures are uAPI during review.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 19 Sep 2022 20:19:58 -0700 you wrote:
+> Use zeroing allocator rather than allocator followed by memset with 0
+> 
+> Generated by: scripts/coccinelle/api/alloc/zalloc-simple.cocci
+> 
+> Signed-off-by: Yihao Han <hanyihao@vivo.com>
+> ---
+>  net/bluetooth/mgmt.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+
+Here is the summary with links:
+  - Bluetooth: MGMT: fix zalloc-simple.cocci warnings
+    https://git.kernel.org/bluetooth/bluetooth-next/c/239491111238
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
