@@ -2,118 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7EB0ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Sep 2022 22:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85BB0C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Sep 2022 01:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229728AbiISWoR (ORCPT
+        id S229473AbiITBEZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Sep 2022 18:44:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37456 "EHLO
+        Mon, 19 Sep 2022 21:04:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbiISWoR (ORCPT
+        with ESMTP id S229838AbiITBEY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Sep 2022 18:44:17 -0400
-Received: from smtp.github.com (out-25.smtp.github.com [192.30.252.208])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 846374F691
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 15:44:16 -0700 (PDT)
-Received: from github.com (hubbernetes-node-0c60bd8.ash1-iad.github.net [10.56.15.45])
-        by smtp.github.com (Postfix) with ESMTPA id C899E840474
-        for <linux-bluetooth@vger.kernel.org>; Mon, 19 Sep 2022 15:44:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1663627455;
-        bh=lk5hTgvDsYkI45TCEhIn9mnNHa7dKc043WuUUMpNomU=;
-        h=Date:From:To:Subject:From;
-        b=Cvwcn7RaCQfkQzanUasMD2JDAB6mvtZmVvux+Ee7sFSyZd42SHlJaBuNiEuH9nhB6
-         BeKROh8wgJ7vJvmnzV7ASy4Qk+QhwkOPwmqe2mr2mOctet0vnUA2MAA7LRGkWnLS5D
-         nmTtCKafi0t+iS/ou/ryjuI2/527iC9OoQcm1i64=
-Date:   Mon, 19 Sep 2022 15:44:15 -0700
-From:   Sathish Narasimman <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/f6ac08-115514@github.com>
-Subject: [bluez/bluez] b8a113: shared/vcp: Add initial code for handling VCP
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
+        Mon, 19 Sep 2022 21:04:24 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F684D175;
+        Mon, 19 Sep 2022 18:04:23 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3CD5BB80688;
+        Tue, 20 Sep 2022 01:04:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B609EC433C1;
+        Tue, 20 Sep 2022 01:04:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1663635860;
+        bh=YbrG0hzTV2LscuzIOXmDkkz4qntnvSBburuiMoqon0s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=SYQ9/q3mQEp1CfaSu8njNVbpkC9TqIFrDXQuDdx9iOzYkFERdsbFwFTiI0CvI16N4
+         OermtCCN0ubKs7VIcpwxRcT6DGdpTPKjcXvuOAu5Upbf3p08lBD2oEubPglr2d+xVp
+         0lpjNjAJfq3n5L/o3qzLDh6GWvGrbruJGv3YHzMgial3JM1cVKWO4/NrBSMj3bvfOE
+         aM4rdgweoG8W743q5g60ujmCit17keN5sz63VV5WpK1J6SJsqmNuePWvcXQAPBOn2H
+         QMZWq370ibowbohk4GNpKKbq/sfs/XQ5tFaSnh8wlLoj0EKOSTSnoxRyGjs/Ru7Emw
+         yuprbg1Qs+Xow==
+Date:   Mon, 19 Sep 2022 18:04:19 -0700
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth 2022-09-09
+Message-ID: <20220919180419.0caa435a@kernel.org>
+In-Reply-To: <CABBYNZKHUbqYyevHRZ=6rLA0GAE20mLRHAj9JnFNuRn7VHrEeA@mail.gmail.com>
+References: <20220909201642.3810565-1-luiz.dentz@gmail.com>
+        <CABBYNZKHUbqYyevHRZ=6rLA0GAE20mLRHAj9JnFNuRn7VHrEeA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: b8a113ecbabcae1c6192bdb9b9ab6f352056c5bf
-      https://github.com/bluez/bluez/commit/b8a113ecbabcae1c6192bdb9b9ab6f352056c5bf
-  Author: Sathish Narasimman <sathish.narasimman@intel.com>
-  Date:   2022-09-19 (Mon, 19 Sep 2022)
+On Tue, 13 Sep 2022 16:35:01 -0700 Luiz Augusto von Dentz wrote:
+> On Fri, Sep 9, 2022 at 1:16 PM Luiz Augusto von Dentz wrote:
+> >
+> > The following changes since commit 64ae13ed478428135cddc2f1113dff162d8112d4:
+> >
+> >   net: core: fix flow symmetric hash (2022-09-09 12:48:00 +0100)
+> >
+> > are available in the Git repository at:
+> >
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-09-09
+> >
+> > for you to fetch changes up to 35e60f1aadf6c02d77fdf42180fbf205aec7e8fc:
+> >
+> >   Bluetooth: Fix HCIGETDEVINFO regression (2022-09-09 12:25:18 -0700)
+> >
+> > ----------------------------------------------------------------
+> > bluetooth pull request for net:
+> >
+> >  -Fix HCIGETDEVINFO regression
+> 
+> Looks like this still hasn't been applied, is there any problem that
+> needs to be fixed?
 
-  Changed paths:
-    M Makefile.am
-    A src/shared/vcp.c
-    A src/shared/vcp.h
+Sorry about the delay, we were all traveling to Linux Plumbers.
+Pulling now.
 
-  Log Message:
-  -----------
-  shared/vcp: Add initial code for handling VCP
-
-This adds initial code for Volume Control Profile.
-
-
-  Commit: a96ede87c63f1c4a397240841e1f460fbbc288b3
-      https://github.com/bluez/bluez/commit/a96ede87c63f1c4a397240841e1f460fbbc288b3
-  Author: Sathish Narasimman <sathish.narasimman@intel.com>
-  Date:   2022-09-19 (Mon, 19 Sep 2022)
-
-  Changed paths:
-    M Makefile.plugins
-    M configure.ac
-    A profiles/audio/vcp.c
-
-  Log Message:
-  -----------
-  profiles: Add initial code for vcp plugin
-
-This adds initial code for vcp plugin which handles Volume Control
-Profile and Volume Control Service.
-
-
-  Commit: 115514d85a17dcc03da4f784c9d65c1e98491296
-      https://github.com/bluez/bluez/commit/115514d85a17dcc03da4f784c9d65c1e98491296
-  Author: Sathish Narasimman <sathish.narasimman@intel.com>
-  Date:   2022-09-19 (Mon, 19 Sep 2022)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Add decoding support for Volume Control Serice
-
-This adds decoding support for VCS attributes
-
-> ACL Data RX: Handle 3585 flags 0x02 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x0017 Type: Volume State (0x2b7d)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 8
-      ATT: Read Response (0x0b) len 3
-        Value: 000000
-        Handle: 0x0017 Type: Volume State (0x2b7d)
-            Volume Setting: 0
-            Not Muted: 0
-            Change Counter: 0
-> HCI Event: Number of Completed Packets (0x13) plen 5
-        Num handles: 1
-        Handle: 3585 Address: 49:71:FC:C0:66:C6 (Resolvable)
-        Count: 1
-> ACL Data RX: Handle 3585 flags 0x02 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x001c Type: Volume Flags (0x2b7f)
-< ACL Data TX: Handle 3585 flags 0x00 dlen 6
-      ATT: Read Response (0x0b) len 1
-        Value: 01
-        Handle: 0x001c Type: Volume Flags (0x2b7f)
-            Volume Falg: 1
-
-
-Compare: https://github.com/bluez/bluez/compare/f6ac0886f08e...115514d85a17
+Any reason why struct hci_dev_info is not under include/uapi ?
