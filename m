@@ -2,676 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B83ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 10:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BF4C32771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 11:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229821AbiIUK0N (ORCPT
+        id S229562AbiIULRi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Sep 2022 06:26:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59204 "EHLO
+        Wed, 21 Sep 2022 07:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230088AbiIUK0H (ORCPT
+        with ESMTP id S229498AbiIULRh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Sep 2022 06:26:07 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4468A1D2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 03:26:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663755962; x=1695291962;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=/plOX4wdNj9YNVUvG9rD2OnTNSL1uOjPH9IYZ3X+Hu8=;
-  b=lYY0P3yehq4EAdLpnfWJHmX01S8kM1YbKNG+Wh1feIobJmQeqHSpV4ef
-   +cIVJrxQOcCxzYZGMtUL5mlUlP+9nxnjxRb60vvqiIMm4TcYElRQ3gZ25
-   kKxssCkAO6Rh3SHRiujFg1BYPc23gXIBGsxykq/SE+RwWj8RxJIMt5pSj
-   bxYvF78oOQ2DgglaYT5RetkmqT1TZqGTYlA0iGolPRqV3kIyOl+OT6wdV
-   ybLOBJAr27p+pMh9Sai6l7cbge98JNH8Axm/mWgOhw4kd1B7OGFdavwBv
-   3ot78CMOPTGpSB1vII6h1eTWpg0Ew4aSn/S0kJM6gYW25McwEDJEQ37f2
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="279688478"
-X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
-   d="scan'208";a="279688478"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2022 03:26:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
-   d="scan'208";a="948090215"
-Received: from bsblt022.iind.intel.com ([10.224.186.21])
-  by fmsmga005.fm.intel.com with ESMTP; 21 Sep 2022 03:26:00 -0700
-From:   Sathish Narasimman <sathish.narasimman@intel.com>
+        Wed, 21 Sep 2022 07:17:37 -0400
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2072.outbound.protection.outlook.com [40.92.89.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E84C474DF
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 04:17:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iRrufS0PwTIxbP+Bne5WHr7UbmMRgt+UG17AVYzqwqsTCZxSSw4C3Po0uv35X16spB9hAnn3ZLFIzZ4tsgUbmCsLU1VqcG63HVRJkhQqvZSPjEdOiHwYbPUAsaEfHEqQuct0kFa+pgPD8/ld2DXbW8SxTwtpNxQD1q5iSKnMMVV6tEoDEF5rCUoViE9TCUGSZVL9H/xV0myiA4EsxUTVwXRaf7jhViQLT4yr6JhHu367C7yRGWQAclCMu7q+UeEtIXRVs6qPJ4BhvihmzwTHH9MmmibG/39PEJMxGMHZPQ7XtV5NSQsGrcyBE4fH5Tgj4VeL0A68qARVjWlMoClamA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=un/6I1sRvo0IXfChoTh3yl4ieXK02BsG7ppods++toE=;
+ b=oAUGaGvj1fNBNw45lWPL119ZdRatFg5f3vjGJ9nXgilqIo/D8ljZUyyvJyfq7mG1hH1kZZBU4E9FxTxJp/QF7ES89lPplIXmgtpzYv6I5hRry3D0hn7t4lcIQ+0gSoNZAx6xBjCNQ5naXX3rtcmRdBMS0Izo69yGHkpTHaBrTNJT3nt9bX+x6vBZ6/RpcfPsr28sMDSPBygQsbhiP4Q2BcI1djqJ3gj64uT5Ic9BvoqKYCj2v3N4ofGttItnCXTw7+1qyEtZTTnFDebXD5gAOKl/IdjcVGqhf0B1b98cNwM0Y6Opg+n9CdgWO9YPgEdAKjnda6+xVkX2IqD7OASqMg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=un/6I1sRvo0IXfChoTh3yl4ieXK02BsG7ppods++toE=;
+ b=lw0gnn3wmo0BlvYb8gBOkoblDQyTvMNIj9f9uRtCvNt+EdaF4y3FWPWHsvbSt3US2lvYuBEgXIQVrKlTUHZgF+Isc2Vc3fqqwJtbGVVTP0HrhfC0Jcv7wriO+8f5PSGXsb8NiqdQlr/4h87yteM2udSKUfvpyWVaGsXJ7EtdUa8HrkM9fM2X4eBdkWVnFjdJrwmFa0DRUMJTG0kioJWwqLZfKVVe0TYv2Sx3+8K1xzgHGAJ916H+Rk0Td1uh67PTDpIy1xTymhf+dPWzfyg4Yna/5h5vBK/Zhne6u6ZjKqeKviDnSv4p0YvyvNvyvD5BFk6LHWGMo/KAgX5CREcGqw==
+Received: from VI1PR09MB4239.eurprd09.prod.outlook.com (2603:10a6:800:12f::23)
+ by PR3PR09MB5361.eurprd09.prod.outlook.com (2603:10a6:102:178::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.18; Wed, 21 Sep
+ 2022 11:17:34 +0000
+Received: from VI1PR09MB4239.eurprd09.prod.outlook.com
+ ([fe80::adeb:7a9b:9960:27bf]) by VI1PR09MB4239.eurprd09.prod.outlook.com
+ ([fe80::adeb:7a9b:9960:27bf%2]) with mapi id 15.20.5632.021; Wed, 21 Sep 2022
+ 11:17:34 +0000
+From:   Isak Westin <isak.westin@hotmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ v2 1/2] shared/vcp: Add bt_vcp_set_debug
-Date:   Wed, 21 Sep 2022 15:57:31 +0530
-Message-Id: <20220921102732.688081-1-sathish.narasimman@intel.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
+Cc:     Isak Westin <isak.westin@hotmail.com>
+Subject: [PATCH BlueZ v2 1/3] mesh: Add interface output filter
+Date:   Wed, 21 Sep 2022 13:16:28 +0200
+Message-ID: <VI1PR09MB42395F76D2702B0C26F326C2E34F9@VI1PR09MB4239.eurprd09.prod.outlook.com>
+X-Mailer: git-send-email 2.20.1
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN:  [Yqm0oVuzcWaAYLyiIkJlT0Gx/Ae0Wjh1]
+X-ClientProxiedBy: ZRAP278CA0017.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::27) To VI1PR09MB4239.eurprd09.prod.outlook.com
+ (2603:10a6:800:12f::23)
+X-Microsoft-Original-Message-ID: <20220921111630.23589-1-isak.westin@hotmail.com>
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VI1PR09MB4239:EE_|PR3PR09MB5361:EE_
+X-MS-Office365-Filtering-Correlation-Id: 60599494-9dd3-4faa-bb7b-08da9bc2e1fb
+X-MS-Exchange-SLBlob-MailProps: ZILSnhm0P3lUkjXuSDdeTQka1McTh6g4T9kseV1SDoA75ob2ERencravVQwr6+olSKJ23MJOXZJ0b66FXNNpoEUs+fN1kv/rLUFiXylS/EKYTISaRLwAJqKVTuJZ4MItWZDatfyUo/Wr9+AI5TFO9TFJ1Mga+QMERXXpwcW5QId8ZCr45exJYQAey3GhtkRLOaKUyNAqzbdKr4d1WT+xkE7JWw9S8KwyhMNy7KV02WXqcYTIHOm25LI7JE1JpvNMhykG7BNiq11B7M16EFNud6IQ/CBb9Y4ijMzw3VBOMmVwAcRK/d7pydi8rxAb/9wltb8Dyj3HmCWQDvIAvNdezj8jq29/42MrSMO+2f3BoJL0f5xMzOE8F/DdgrnDOx67yyTwSQwpOCk9vGRk2cM8UPFc6QjoRRdk2L8wzPLvCI05jc+w1Pp0KOyih0zvqjM/SVGAnu1zUr4uI6feuv7gwY7MVC3gmHZ6imMn2no/lT0/VdA1lhb7ch0z8tU/e/Hil2/slwR9iHkkpe5Hn6btmfru67B8EVPOTTl3oGH+GSCCSLRpm4fxy0RtRzJQE7+L0tskBbJuen4FyyjA3P+wkIWhLP8BRlposGfPZCfzB2Ik/2ob82EGPaxbDEm4KS6bRp58m8Wnu5A/ycF0LZOmmh+bFQirsVOuN5dldypLICqdEDQfreax0l3aiJRhBwrKbHiUygtx9PcywaHiu66wBRfdrrAUBD8q5HQhzt66pCRWD+T7CZWvCnpYYmN08d+Er2hWgOnyMvHuss+8aFZSgJ6b0I0fTTW/
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: pP41nbAvmoFxSfvQ9aL4+pcFwju8LdVwPngG6rjLACN4Vx+TnZ6bN2oBboy7BFO3XvzV2QOW8UdqLGdu20okAKSh6H0y32w5Y2X+2FYYhDgWj8SH4nCofXswnQbrkDktQm8jzkRZkh44ZiQIi0UXrk0GCGpbw/RQecRrdsgOixw53YmRBkCAMOBIg1yBuN5PxaZPmu/YRaEpL2QGZ9dkvpYGkWgoJhbjyL8zvFFF/jvi/GfjKNQqBHVzK+MOYFM50sBN+BV8nbR76oBUIj2UnoJzEfc0puJq7WFcg+7AtHPyttoi0HLwOHSpHv0D9cNQa9MCaZH02fR49UO8DDw9awX8rMaqEKbPsVH+t2nQkrefCvn34cSJreTCK1Z9K/oQpLaeEB/Xg3ciu4kE4Q/YnT9ElXJ/rj3iS2lnO5rGFOZMzOAzXVBuI2KsQJT6j6KA/REteOYTzFXkjEfTctdtzrV+k3TY2C4vEuqWAw6Nh+xURauF3Oy7ES7oR6c4+2RJ1SZLzn7xXV4kLIZAFH6sBL2T3kJDpb+h4ufMiCxRrU/jDDDIgx5BXcASc7QP74j+siZgqHXYyWohn1yOtPTv5D29moXzi+6Pi/GWpgY9jghVoOBs2wAFuJAqjaDDkeu1IRrKE/3fIuJ+cOWTuwMEKQ==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?otPLk82a9kcsUjfp5ha3LJj8tl0EEQT5vp8orWhxP68AlD67VtIV4guKF2Ec?=
+ =?us-ascii?Q?4my726Jeo9JVdEKCkwuh7QVzc9fb9aTkhMCxUaWMAaZjEo0SW5MTQ5wSiplz?=
+ =?us-ascii?Q?1e2tAYVC3dF8KQtEawsR7FJZz3hkeIo+Mtf9ovCE7hj2trhuFvgq6WS9mTon?=
+ =?us-ascii?Q?//r0AfeRo4mk1BNkTS2L5dCJReWJDEx0oelDuUjGznjf7WoT4D3ze2qCZol5?=
+ =?us-ascii?Q?Bh2eyHuEQYQLou6X83NPVpxNP1hyqRJYFAO3nrONuoGQa86An/y+M3w8hsZh?=
+ =?us-ascii?Q?DqdlaUqyqMdXq770McRMPiK4Y3dMBD603KHv12MmS+I79+wkOuHBmyVwCmI9?=
+ =?us-ascii?Q?sbBb14rRcS0fThHvZykeu5gcv9LnNIEP47kTyQU73091rNclvQ8RdbErCUvt?=
+ =?us-ascii?Q?f9RcUPvjPalYyHQ77s9lxXzm5P2Lh0lL++GQUC9BosmLqDW+aoo/RBC5fxs7?=
+ =?us-ascii?Q?eSm6ccuV0aALFIs0J8UTFLQZlDPF2E8H4zoxPjNqxNVUX+uNL6Xc2YLZ7FQV?=
+ =?us-ascii?Q?NLK/BjPwokjgYhgWnDC3aJ5Pglm4kaRsszz70FBuG08PwM0bWinzjWPvCksp?=
+ =?us-ascii?Q?0ikGmOgvCzNgt3mA1VSDSLPN9u8R+mEn+VjO1AqNkmh9CrxbtuPCC+LovMS5?=
+ =?us-ascii?Q?3IZ5sgBohYHq6BonfWQ4JG+NK7kEclHxQEgLGah+JIW2CFAo3s/gJB5Slhxb?=
+ =?us-ascii?Q?TdHUmZJYmVtJkVlsJPj931p7pyE5UrCnLlObeVJsWD9HzCODP2KJ4G99FiIT?=
+ =?us-ascii?Q?JGK2Q8NmAkG2y6QrVgADfw/qtU2Jw6xcC5lVsmRy3CqWRyUgiXoWHBK9A2RE?=
+ =?us-ascii?Q?u+1p2hDK5mkF7KY+V3jcewv+PFXOllZi4eQNO4t2yLJPwtH1LYGjtB3FY4St?=
+ =?us-ascii?Q?1Q9vidSTy1gqJmUgl24v7qtSUgOpzryC5LExM/dh+jDNDO1XRAEumUDKwgjQ?=
+ =?us-ascii?Q?rRnlHWs6JqBDtkWLFJMcNFoZRUTjH5SSvceP4/iYVupd9LM6krCHONmZZJKa?=
+ =?us-ascii?Q?lTNe7XLLy+S1Z7Y4wc65QMQixfMciIhPsAAMGVodYivlHwPoGQAji56BnWNt?=
+ =?us-ascii?Q?Z2TAe2QqTpsnpEopDlBtYHD4KpiLr1qHO63fHZOKecJ8+iLTdqHCSmxPIm9u?=
+ =?us-ascii?Q?0+lPbkk0IE0OpFeyVI5MhQeZqUhs0vWzBbLzUm+KoSLdHdCT1Ro8tYuNkLj2?=
+ =?us-ascii?Q?0EwQV2bVmYmMGEgegn06A1oA81qBh7U+Y+ITP8InZ2/diCwluvzTaoM238nU?=
+ =?us-ascii?Q?uGkkIfb5dZLsoDlA9//TACLGT0cJdSuPYgkMKRJ1wA=3D=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-64da6.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 60599494-9dd3-4faa-bb7b-08da9bc2e1fb
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR09MB4239.eurprd09.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2022 11:17:34.6803
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR09MB5361
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for bt_vcp_set_debug and replace the exisiting DBG.
+According to the mesh profile (3.4.5.2), if TTL is set to 1 for an
+outgoing message, that message shall be dropped.
 ---
- src/shared/vcp.c | 238 ++++++++++++++++++++++++++++++-----------------
- src/shared/vcp.h |   5 +
- 2 files changed, 156 insertions(+), 87 deletions(-)
+ mesh/net.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/src/shared/vcp.c b/src/shared/vcp.c
-index 4f8dc37e3c3e..5459cf892a7d 100644
---- a/src/shared/vcp.c
-+++ b/src/shared/vcp.c
-@@ -26,7 +26,9 @@
- #include "src/shared/gatt-server.h"
- #include "src/shared/gatt-client.h"
- #include "src/shared/vcp.h"
--#include "src/log.h"
-+
-+#define DBG(_vcp, fmt, arg...) \
-+	vcp_debug(_vcp, "%s:%s() " fmt, __FILE__, __func__, ## arg)
+diff --git a/mesh/net.c b/mesh/net.c
+index e8e6d3a61..699469284 100644
+--- a/mesh/net.c
++++ b/mesh/net.c
+@@ -3067,6 +3067,13 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
+ 	uint8_t segO = (hdr >> SEGO_HDR_SHIFT) & SEG_MASK;
+ 	uint8_t segN = (hdr >> SEGN_HDR_SHIFT) & SEG_MASK;
  
- #define VCP_STEP_SIZE 1
- 
-@@ -87,8 +89,11 @@ struct bt_vcp {
- 	unsigned int vstate_id;
- 	unsigned int vflag_id;
- 
-+	struct queue *notify;
- 	struct queue *pending;
- 
-+	bt_vcp_debug_func_t debug_func;
-+	bt_vcp_destroy_func_t debug_destroy;
- 	void *debug_data;
- 	void *user_data;
- };
-@@ -262,11 +267,23 @@ void bt_vcp_unref(struct bt_vcp *vcp)
- 	vcp_free(vcp);
- }
- 
-+static void vcp_debug(struct bt_vcp *vcp, const char *format, ...)
-+{
-+	va_list ap;
-+
-+	if (!vcp || !format || !vcp->debug_func)
++	/*
++	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
++	 * If TTL is set to 1, message shall be dropped.
++	 */
++	if (ttl == 1)
 +		return;
 +
-+	va_start(ap, format);
-+	util_debug_va(vcp->debug_func, vcp->debug_data, format, ap);
-+	va_end(ap);
-+}
+ 	/* TODO: Only used for current POLLed segments to LPNs */
+ 
+ 	l_debug("SEQ: %6.6x", seq + segO);
+@@ -3135,6 +3142,13 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
+ 			(dst >= net->src_addr && dst <= net->last_addr))
+ 		return true;
+ 
++	/*
++	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
++	 * If TTL is set to 1, message shall be dropped.
++	 */
++	if (ttl == 1)
++		return true;
 +
- static void vcp_disconnected(int err, void *user_data)
- {
- 	struct bt_vcp *vcp = user_data;
+ 	/* Setup OTA Network send */
+ 	payload = mesh_sar_new(msg_len);
+ 	memcpy(payload->buf, msg, msg_len);
+@@ -3206,6 +3220,13 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
+ 	uint8_t pkt_len;
+ 	uint8_t pkt[30];
  
--	DBG("vcp %p disconnected err %d", vcp, err);
-+	DBG(vcp, "vcp %p disconnected err %d", vcp, err);
- 
- 	bt_vcp_detach(vcp);
- }
-@@ -301,17 +318,17 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "Volume Down");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VSTATE not availalbe");
-+		DBG(vcp, "error: VSTATE not available");
- 		return 0;
- 	}
- 
-@@ -320,7 +337,7 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -340,17 +357,17 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "Volume Up");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VCP database not availalbe!!!!");
-+		DBG(vcp, "error: VCP database not available");
- 		return 0;
- 	}
- 
-@@ -359,7 +376,7 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -379,17 +396,17 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "Un Mute and Volume Down");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VCP database not availalbe!!!!");
-+		DBG(vcp, "error: VCP database not available");
- 		return 0;
- 	}
- 
-@@ -398,7 +415,7 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -419,17 +436,17 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "UN Mute and Volume Up");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VSTATE not availalbe");
-+		DBG(vcp, "error: VSTATE not available");
- 		return 0;
- 	}
- 
-@@ -438,7 +455,7 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -459,17 +476,17 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	struct bt_vcs_ab_vol *req;
- 
--	DBG("");
-+	DBG(vcp, "Set Absolute Volume");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VSTATE not availalbe");
-+		DBG(vcp, "error: VSTATE not available");
- 		return 0;
- 	}
- 
-@@ -478,7 +495,7 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (req->change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -498,17 +515,17 @@ static uint8_t vcs_unmute(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "Un Mute");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VSTATE not availalbe");
-+		DBG(vcp, "error: VSTATE not available");
- 		return 0;
- 	}
- 
-@@ -517,7 +534,7 @@ static uint8_t vcs_unmute(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -537,17 +554,17 @@ static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 	struct vol_state *vstate;
- 	uint8_t	*change_counter;
- 
--	DBG("");
-+	DBG(vcp, "MUTE");
- 
- 	vdb = vcp_get_vdb(vcp);
- 	if (!vdb) {
--		DBG("error: VDB not availalbe");
-+		DBG(vcp, "error: VDB not available");
- 		return 0;
- 	}
- 
- 	vstate = vdb_get_vstate(vdb);
- 	if (!vstate) {
--		DBG("error: VSTATE not availalbe");
-+		DBG(vcp, "error: VSTATE not available");
- 		return 0;
- 	}
- 
-@@ -556,7 +573,7 @@ static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
- 		return 0;
- 
- 	if (*change_counter != vstate->counter) {
--		DBG("Change Counter Mismatch Volume not decremented!");
-+		DBG(vcp, "Change Counter Mismatch Volume not decremented!");
- 		return BT_ATT_ERROR_INVALID_CHANGE_COUNTER;
- 	}
- 
-@@ -622,16 +639,16 @@ static void vcs_cp_write(struct gatt_db_attribute *attrib,
- 	struct vcs_op_handler *handler;
- 	uint8_t ret = BT_ATT_ERROR_REQUEST_NOT_SUPPORTED;
- 
--	DBG("");
-+	DBG(vcp, "VCP Control Point Write");
- 
- 	if (offset) {
--		DBG("invalid offset %d", offset);
-+		DBG(vcp, "invalid offset %d", offset);
- 		ret = BT_ATT_ERROR_INVALID_OFFSET;
- 		goto respond;
- 	}
- 
- 	if (len < sizeof(*vcp_op)) {
--		DBG("invalid len %ld < %ld sizeof(*param)", len,
-+		DBG(vcp, "invalid len %ld < %ld sizeof(*param)", len,
- 							sizeof(*vcp_op));
- 		ret = BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN;
- 		goto respond;
-@@ -639,14 +656,12 @@ static void vcs_cp_write(struct gatt_db_attribute *attrib,
- 
- 	vcp_op = iov_pull_mem(&iov, sizeof(*vcp_op));
- 
--	DBG("op: %x", *vcp_op);
--
- 	for (handler = vcp_handlers; handler && handler->str; handler++) {
- 		if (handler->op != *vcp_op)
- 			continue;
- 
- 		if (iov.iov_len < handler->size) {
--			DBG("invalid len %ld < %ld handler->size", len,
-+			DBG(vcp, "invalid len %ld < %ld handler->size", len,
- 			    handler->size);
- 			ret = BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
- 			goto respond;
-@@ -656,11 +671,11 @@ static void vcs_cp_write(struct gatt_db_attribute *attrib,
- 	}
- 
- 	if (handler && handler->str) {
--		DBG("%s", handler->str);
-+		DBG(vcp, "%s", handler->str);
- 
- 		ret = handler->func(vcs, vcp, &iov);
- 	} else {
--		DBG("Unknown opcode 0x%02x", *vcp_op);
-+		DBG(vcp, "Unknown opcode 0x%02x", *vcp_op);
- 		ret = BT_ATT_ERROR_OPCODE_NOT_SUPPORTED;
- 	}
- 
-@@ -676,8 +691,6 @@ static void vcs_state_read(struct gatt_db_attribute *attrib,
- 	struct bt_vcs *vcs = user_data;
- 	struct iovec iov;
- 
--	DBG("");
--
- 	iov.iov_base = vcs->vstate;
- 	iov.iov_len = sizeof(*vcs->vstate);
- 
-@@ -693,8 +706,6 @@ static void vcs_flag_read(struct gatt_db_attribute *attrib,
- 	struct bt_vcs *vcs = user_data;
- 	struct iovec iov;
- 
--	DBG("vf: %x", vcs->vol_flag);
--
- 	iov.iov_base = &vcs->vol_flag;
- 	iov.iov_len = sizeof(vcs->vol_flag);
- 
-@@ -797,6 +808,22 @@ void bt_vcp_add_db(struct gatt_db *db)
- 	vcp_db_new(db);
- }
- 
-+bool bt_vcp_set_debug(struct bt_vcp *vcp, bt_vcp_debug_func_t func,
-+			void *user_data, bt_vcp_destroy_func_t destroy)
-+{
-+	if (!vcp)
-+		return false;
++	/*
++	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
++	 * If TTL is set to 1, message shall be dropped.
++	 */
++	if (ttl == 1)
++		return;
 +
-+	if (vcp->debug_destroy)
-+		vcp->debug_destroy(vcp->debug_data);
-+
-+	vcp->debug_func = func;
-+	vcp->debug_destroy = destroy;
-+	vcp->debug_data = user_data;
-+
-+	return true;
-+}
-+
- unsigned int bt_vcp_register(bt_vcp_func_t attached, bt_vcp_func_t detached,
- 							void *user_data)
- {
-@@ -871,40 +898,28 @@ done:
- 	return vcp;
- }
- 
--static void vcp_vstate_register(uint16_t att_ecode, void *user_data)
--{
--	DBG("");
--	if (att_ecode)
--		DBG("VCS register failed: 0x%04x", att_ecode);
--}
--
--static void vcp_vflag_register(uint16_t att_ecode, void *user_data)
--{
--	DBG("");
--	if (att_ecode)
--		DBG("VCS register failed: 0x%04x", att_ecode);
--}
--
--static void vcp_vstate_notify(uint16_t value_handle, const uint8_t *value,
--				uint16_t length, void *user_data)
-+static void vcp_vstate_notify(struct bt_vcp *vcp, uint16_t value_handle,
-+				const uint8_t *value, uint16_t length,
-+				void *user_data)
- {
- 	struct vol_state vstate;
- 
- 	memcpy(&vstate, value, sizeof(struct vol_state));
- 
--	DBG("Vol Settings 0x%x", vstate.vol_set);
--	DBG("Mute Status 0x%x", vstate.mute);
--	DBG("Vol Counter 0x%x", vstate.counter);
-+	DBG(vcp, "Vol Settings 0x%x", vstate.vol_set);
-+	DBG(vcp, "Mute Status 0x%x", vstate.mute);
-+	DBG(vcp, "Vol Counter 0x%x", vstate.counter);
- }
- 
--static void vcp_vflag_notify(uint16_t value_handle, const uint8_t *value,
--				uint16_t length, void *user_data)
-+static void vcp_vflag_notify(struct bt_vcp *vcp, uint16_t value_handle,
-+			     const uint8_t *value, uint16_t length,
-+			     void *user_data)
- {
- 	uint8_t vflag;
- 
- 	memcpy(&vflag, value, sizeof(vflag));
- 
--	DBG("Vol Flag 0x%x", vflag);
-+	DBG(vcp, "Vol Flag 0x%x", vflag);
- }
- 
- static void read_vol_flag(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
-@@ -918,17 +933,17 @@ static void read_vol_flag(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
- 	};
- 
- 	if (!success) {
--		DBG("Unable to read VCP Vol State: error 0x%02x", att_ecode);
-+		DBG(vcp, "Unable to read Vol Flag: error 0x%02x", att_ecode);
+ 	hdr = NET_OP_SEG_ACKNOWLEDGE << OPCODE_HDR_SHIFT;
+ 	hdr |= rly << RELAY_HDR_SHIFT;
+ 	hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
+@@ -3264,6 +3285,13 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
+ 	if (*msg & 0xc0 || (9 + msg_len + 8 > 29))
  		return;
- 	}
  
- 	vol_flag = iov_pull_mem(&iov, sizeof(*vol_flag));
- 	if (!vol_flag) {
--		DBG("Unable to get Vol State");
-+		DBG(vcp, "Unable to get Vol Flag");
- 		return;
- 	}
- 
--	DBG("Vol Flag:%x", *vol_flag);
-+	DBG(vcp, "Vol Flag:%x", *vol_flag);
- }
- 
- static void read_vol_state(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
-@@ -942,19 +957,19 @@ static void read_vol_state(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
- 	};
- 
- 	if (!success) {
--		DBG("Unable to read VCP Vol State: error 0x%02x", att_ecode);
-+		DBG(vcp, "Unable to read Vol State: error 0x%02x", att_ecode);
- 		return;
- 	}
- 
- 	vs = iov_pull_mem(&iov, sizeof(*vs));
- 	if (!vs) {
--		DBG("Unable to get Vol State");
-+		DBG(vcp, "Unable to get Vol State");
- 		return;
- 	}
- 
--	DBG("Vol Set:%x", vs->vol_set);
--	DBG("Vol Mute:%x", vs->mute);
--	DBG("Vol Counter:%x", vs->counter);
-+	DBG(vcp, "Vol Set:%x", vs->vol_set);
-+	DBG(vcp, "Vol Mute:%x", vs->mute);
-+	DBG(vcp, "Vol Counter:%x", vs->counter);
- }
- 
- static void vcp_pending_destroy(void *data)
-@@ -991,7 +1006,7 @@ static void vcp_read_value(struct bt_vcp *vcp, uint16_t value_handle,
- 						vcp_pending_complete, pending,
- 						vcp_pending_destroy);
- 	if (!pending->id) {
--		DBG("Unable to send Read request");
-+		DBG(vcp, "Unable to send Read request");
- 		free(pending);
- 		return;
- 	}
-@@ -999,6 +1014,60 @@ static void vcp_read_value(struct bt_vcp *vcp, uint16_t value_handle,
- 	queue_push_tail(vcp->pending, pending);
- }
- 
-+static void vcp_register(uint16_t att_ecode, void *user_data)
-+{
-+	struct bt_vcp_notify *notify = user_data;
++	/*
++	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
++	 * If TTL is set to 1, message shall be dropped.
++	 */
++	if (ttl == 1)
++		return;
 +
-+	if (att_ecode)
-+		DBG(notify->vcp, "VCP register failed: 0x%04x", att_ecode);
-+}
-+
-+static void vcp_notify(uint16_t value_handle, const uint8_t *value,
-+				uint16_t length, void *user_data)
-+{
-+	struct bt_vcp_notify *notify = user_data;
-+
-+	if (notify->func)
-+		notify->func(notify->vcp, value_handle, value, length,
-+						notify->user_data);
-+}
-+
-+static void vcp_notify_destroy(void *data)
-+{
-+	struct bt_vcp_notify *notify = data;
-+	struct bt_vcp *vcp = notify->vcp;
-+
-+	if (queue_remove_if(vcp->notify, NULL, notify))
-+		free(notify);
-+}
-+
-+static unsigned int vcp_register_notify(struct bt_vcp *vcp,
-+					uint16_t value_handle,
-+					vcp_notify_t func,
-+					void *user_data)
-+{
-+	struct bt_vcp_notify *notify;
-+
-+	notify = new0(struct bt_vcp_notify, 1);
-+	notify->vcp = vcp;
-+	notify->func = func;
-+	notify->user_data = user_data;
-+
-+	notify->id = bt_gatt_client_register_notify(vcp->client,
-+						value_handle, vcp_register,
-+						vcp_notify, notify,
-+						vcp_notify_destroy);
-+	if (!notify->id) {
-+		DBG(vcp, "Unable to register for notifications");
-+		free(notify);
-+		return 0;
-+	}
-+
-+	queue_push_tail(vcp->notify, notify);
-+
-+	return notify->id;
-+}
-+
- static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- {
- 	struct bt_vcp *vcp = user_data;
-@@ -1006,7 +1075,6 @@ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- 	bt_uuid_t uuid, uuid_vstate, uuid_cp, uuid_vflag;
- 	struct bt_vcs *vcs;
- 
--	DBG("");
- 	if (!gatt_db_attribute_get_char_data(attr, NULL, &value_handle,
- 						NULL, NULL, &uuid))
- 		return;
-@@ -1016,7 +1084,7 @@ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- 	bt_uuid16_create(&uuid_vflag, VOL_FLAG_CHRC_UUID);
- 
- 	if (!bt_uuid_cmp(&uuid, &uuid_vstate)) {
--		DBG("VCS Volume state found: handle 0x%04x", value_handle);
-+		DBG(vcp, "VCS Vol state found: handle 0x%04x", value_handle);
- 
- 		vcs = vcp_get_vcs(vcp);
- 		if (!vcs || vcs->vs)
-@@ -1025,16 +1093,15 @@ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- 		vcs->vs = attr;
- 
- 		vcp_read_value(vcp, value_handle, read_vol_state, vcp);
--		vcp->vstate_id = bt_gatt_client_register_notify(vcp->client,
--						value_handle,
--						vcp_vstate_register,
--						vcp_vstate_notify, vcp, NULL);
-+
-+		vcp->vstate_id = vcp_register_notify(vcp, value_handle,
-+						     vcp_vstate_notify, NULL);
- 
- 		return;
- 	}
- 
- 	if (!bt_uuid_cmp(&uuid, &uuid_cp)) {
--		DBG("VCS Volume CP found: handle 0x%04x", value_handle);
-+		DBG(vcp, "VCS Volume CP found: handle 0x%04x", value_handle);
- 
- 		vcs = vcp_get_vcs(vcp);
- 		if (!vcs || vcs->vol_cp)
-@@ -1046,7 +1113,7 @@ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- 	}
- 
- 	if (!bt_uuid_cmp(&uuid, &uuid_vflag)) {
--		DBG("VCS Vol Flaf found: handle 0x%04x", value_handle);
-+		DBG(vcp, "VCS Vol Flag found: handle 0x%04x", value_handle);
- 
- 		vcs = vcp_get_vcs(vcp);
- 		if (!vcs || vcs->vf)
-@@ -1055,12 +1122,10 @@ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
- 		vcs->vf = attr;
- 
- 		vcp_read_value(vcp, value_handle, read_vol_flag, vcp);
--		vcp->vflag_id = bt_gatt_client_register_notify(vcp->client,
--						value_handle,
--						vcp_vflag_register,
--						vcp_vflag_notify, vcp, NULL);
--	}
-+		vcp->vflag_id = vcp_register_notify(vcp, value_handle,
-+						    vcp_vflag_notify, NULL);
- 
-+	}
- }
- 
- static void foreach_vcs_service(struct gatt_db_attribute *attr,
-@@ -1069,7 +1134,6 @@ static void foreach_vcs_service(struct gatt_db_attribute *attr,
- 	struct bt_vcp *vcp = user_data;
- 	struct bt_vcs *vcs = vcp_get_vcs(vcp);
- 
--	DBG("");
- 	vcs->service = attr;
- 
- 	gatt_db_service_set_claimed(attr, true);
-diff --git a/src/shared/vcp.h b/src/shared/vcp.h
-index 1a999c7776fd..26db5732d19b 100644
---- a/src/shared/vcp.h
-+++ b/src/shared/vcp.h
-@@ -33,6 +33,8 @@
- 
- struct bt_vcp;
- 
-+typedef void (*bt_vcp_destroy_func_t)(void *user_data);
-+typedef void (*bt_vcp_debug_func_t)(const char *str, void *user_data);
- typedef void (*bt_vcp_func_t)(struct bt_vcp *vcp, void *user_data);
- 
- struct bt_vcp *bt_vcp_ref(struct bt_vcp *vcp);
-@@ -43,6 +45,9 @@ void bt_vcp_add_db(struct gatt_db *db);
- bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client);
- void bt_vcp_detach(struct bt_vcp *vcp);
- 
-+bool bt_vcp_set_debug(struct bt_vcp *vcp, bt_vcp_debug_func_t cb,
-+			void *user_data, bt_vcp_destroy_func_t destroy);
-+
- struct bt_att *bt_vcp_get_att(struct bt_vcp *vcp);
- 
- bool bt_vcp_set_user_data(struct bt_vcp *vcp, void *user_data);
+ 	/* Enqueue for Friend if forwardable and from us */
+ 	if (!net_key_id && src >= net->src_addr && src <= net->last_addr) {
+ 		uint32_t hdr = msg[0] << OPCODE_HDR_SHIFT;
 -- 
-2.25.1
+2.20.1
 
