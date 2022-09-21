@@ -2,120 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE712C32771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 03:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4192ECAAD8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 05:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbiIUDxu (ORCPT
+        id S229774AbiIUFuj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Sep 2022 23:53:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37590 "EHLO
+        Wed, 21 Sep 2022 01:50:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231464AbiIUDxd (ORCPT
+        with ESMTP id S229599AbiIUFuh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Sep 2022 23:53:33 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23857EFC3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Sep 2022 20:53:28 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id t62so6437248oie.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Sep 2022 20:53:28 -0700 (PDT)
+        Wed, 21 Sep 2022 01:50:37 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 419D77E033
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Sep 2022 22:50:36 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g1-20020a17090a708100b00203c1c66ae3so1119422pjk.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Sep 2022 22:50:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=O9eT6ua78q1k3SO1nb+CC1o09pBgwAsar7lws4WMQ7c=;
-        b=aCQ1MMJPXVbp3RmHCGPCep/5WI6tBnUwtEGndII47L3gs8bjPLkltlBzvjy1rhyvFN
-         361d49NPfK+B9dlmNczpHad3adNQ+ys2cRI339VWg0x05sdJeadNpslit0QZ+ArQHOmi
-         4orkZn+cwKoXEu3RbZGxu+vaHqKU15VP5nbAU/05JSCFhTuIca/CJ/dbymDTUZED/Bsz
-         sSHQzqpnuqACfC9AfljO1HKZkV/HP5UkbTIdHPVgZkyD+KMFwg5Zc+6pOUwCW2Dipu7Y
-         /0o5X97ZnPn9yyOwRsPcatoA2eKx9UfvwOZB1ZXAmQIPzpMVdWiaK0yU5JYmaNsqdXQF
-         CN1w==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date;
+        bh=GUsGWfFjCkkYsZi2T7tEP8EOmCJsERhGD1rIFTAC9ZY=;
+        b=jAZADw4rSApjIKIYgI3rFD3HMNngYtZlPtD9Hrs7uJ1wTOhPgGSOuVTMWB6m8gfW4j
+         t/+iMlI+NsR0WmPtr5aeGByPr8nyX31fWNBUYoXK5vj3a0T3sg3xHS7vfjZGzI2yW5Vb
+         9JGeBNdAw3D0MX95z4qXjuARktMCZwrBfg66S30FJl7EdJmariQxaA6856rwaQnHPPRF
+         pBf6j8JAMbTskgYm7OmcUexVdxgv6e83AnFmBQEJyNz8KnSCGoUFud2YpIcfIqx1uUFL
+         j+ExxKGGyZU1Iq0WYmVdNSLbeola4N/MYJrCA+eQuRzWUqsRWI5ieVasqNd1WFiRoms6
+         u+KQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=O9eT6ua78q1k3SO1nb+CC1o09pBgwAsar7lws4WMQ7c=;
-        b=VzX5xSOolgizz+h4uMHQzCQBLHI4bYL+KTbSVOOMmElbk0ez/beR8dhgj3BD4SHVaq
-         F8+kWd/6j0QuZpfW9mp+lNqlQCg/6o+VqHqQzuGKBT1BixDfTbPo+7dSvnoto2v4i+93
-         8BmN3qpDdhGz0XX3ryNMjerkQh2OqoDHPyiQKOasib1yrk/GhOqjJr/bILQab2iAGFz/
-         r29dWnW0/bxOGa5ydM2yKR5U+SjQXTNBAy2uJFKGLCTCZbqo8ths+SGBmgy9J1z5pmuQ
-         uPmiqxLd4MxLEA/UzkgA7Sgkuh41jIxzDuistVYE4qRjiFKWjsteHoNvRy6l6bHWTDpD
-         E+fw==
-X-Gm-Message-State: ACrzQf1JzmQ1YkRD4fByENWGUyT6Q4A4Bhi5H9Yz51mUA5Ee8PKCTMER
-        uXbhp/6AtUkqH4UMd/gkVg8AQkAEKQ90ag==
-X-Google-Smtp-Source: AMsMyM5mWx1zwWdlMDyuXGyE1Ru201hA8bCaqjOOzIdoQ5yDr75Yn7AD4gX5ob/hDBw8vz6gjKExtA==
-X-Received: by 2002:a05:6808:1a21:b0:350:61ee:832f with SMTP id bk33-20020a0568081a2100b0035061ee832fmr3179363oib.10.1663732408055;
-        Tue, 20 Sep 2022 20:53:28 -0700 (PDT)
-Received: from [172.17.0.2] ([23.98.145.112])
-        by smtp.gmail.com with ESMTPSA id q185-20020a4a33c2000000b0044ae10c5974sm617957ooq.34.2022.09.20.20.53.27
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=GUsGWfFjCkkYsZi2T7tEP8EOmCJsERhGD1rIFTAC9ZY=;
+        b=iIseHgFLOlfm2SavMJeVEJMJ6GL1r6m/e2Z0QajwMU5kVFyPPdF1b7tbkMvdnaEOSE
+         mZjdjyM56CIEr9hpBMBzErkRKOSd/WrNTPqDVSmMm1cVFf5HqA9tI2L2mRq0TMIUhHSI
+         72CsE9NlybyjBiAJi89CbdDn3R9pm5JrT8REtU/SozhtEsl8bSddaklEDSQejfUfRYNo
+         IaSR9x23YA90aPRz0UHuZq66ogf8DSBPXiGQc+glwnrkBuhrT8YYcIg6StFmru8QCPGF
+         v/RZomdP5pHItvldVLh7t4mzvuNzcf62cOEVPW3H76dCOn9EZC0HF5ossApq0DfM4ygk
+         nJFw==
+X-Gm-Message-State: ACrzQf0oZFHI/D4tjXvk6XRpVHy12AkPCnLSa2KTb1EocLIElLOkLtc7
+        8ypWzDiViGbYgqRMGsmvhI4BfbkKAIjHGetF
+X-Google-Smtp-Source: AMsMyM65FhrRbZVwPQUbO/4JYXyP2Tgzn0JV5SKlqogiPJkXDBdfepTxWjFpRaEDF1ntj5hncxa4iQ==
+X-Received: by 2002:a17:903:22c9:b0:178:18a1:d170 with SMTP id y9-20020a17090322c900b0017818a1d170mr3238346plg.2.1663739435574;
+        Tue, 20 Sep 2022 22:50:35 -0700 (PDT)
+Received: from localhost ([36.112.86.8])
+        by smtp.gmail.com with ESMTPSA id u16-20020a632350000000b004277f43b736sm925172pgm.92.2022.09.20.22.50.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Sep 2022 20:53:27 -0700 (PDT)
-Message-ID: <632a8ab7.4a0a0220.a2d79.2969@mx.google.com>
-Date:   Tue, 20 Sep 2022 20:53:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5199925744736239723=="
+        Tue, 20 Sep 2022 22:50:35 -0700 (PDT)
+From:   Hawkins Jiawei <yin31149@gmail.com>
+To:     luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org,
+        Hawkins Jiawei <yin31149@gmail.com>
+Subject: Re: [PATCH 1/2] Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
+Date:   Wed, 21 Sep 2022 13:50:26 +0800
+Message-Id: <20220921055026.380196-1-yin31149@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220919175700.1649726-1-luiz.dentz@gmail.com>
+References: <20220919175700.1649726-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ] tools/ioctl-tester - Add ioctl-tester
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220921011302.663171-1-hj.tedd.an@gmail.com>
-References: <20220921011302.663171-1-hj.tedd.an@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5199925744736239723==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> device_add shall not be called multiple times as stated in its
+> documentation:
+> 
+>  'Do not call this routine or device_register() more than once for
+>  any device structure'
+> 
+> Syzkaller reports a bug as follows [1]:
+> ------------[ cut here ]------------
+> kernel BUG at lib/list_debug.c:33!
+> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+> [...]
+> Call Trace:
+>  <TASK>
+>  __list_add include/linux/list.h:69 [inline]
+>  list_add_tail include/linux/list.h:102 [inline]
+>  kobj_kset_join lib/kobject.c:164 [inline]
+>  kobject_add_internal+0x18f/0x8f0 lib/kobject.c:214
+>  kobject_add_varg lib/kobject.c:358 [inline]
+>  kobject_add+0x150/0x1c0 lib/kobject.c:410
+>  device_add+0x368/0x1e90 drivers/base/core.c:3452
+>  hci_conn_add_sysfs+0x9b/0x1b0 net/bluetooth/hci_sysfs.c:53
+>  hci_le_cis_estabilished_evt+0x57c/0xae0 net/bluetooth/hci_event.c:6799
+>  hci_le_meta_evt+0x2b8/0x510 net/bluetooth/hci_event.c:7110
+>  hci_event_func net/bluetooth/hci_event.c:7440 [inline]
+>  hci_event_packet+0x63d/0xfd0 net/bluetooth/hci_event.c:7495
+>  hci_rx_work+0xae7/0x1230 net/bluetooth/hci_core.c:4007
+>  process_one_work+0x991/0x1610 kernel/workqueue.c:2289
+>  worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+>  kthread+0x2e4/0x3a0 kernel/kthread.c:376
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+>  </TASK>
+> 
+> Link: https://syzkaller.appspot.com/bug?id=da3246e2d33afdb92d66bc166a0934c5b146404a
+I tried the reproducer from syzkaller, and it didn't trigger any issues.
+And I also tryied multiple HCI_LE_CIS_Estabilished events, still normal.
 
-This is automated email and please do not reply to this email!
+Test-by: Hawkins Jiawei <yin31149@gmail.com>
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=678840
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.16 seconds
-GitLint                       PASS      0.78 seconds
-Prep - Setup ELL              PASS      33.10 seconds
-Build - Prep                  PASS      0.93 seconds
-Build - Configure             PASS      10.37 seconds
-Build - Make                  PASS      1118.93 seconds
-Make Check                    PASS      12.50 seconds
-Make Check w/Valgrind         PASS      349.69 seconds
-Make Distcheck                PASS      291.85 seconds
-Build w/ext ELL - Configure   PASS      10.42 seconds
-Build w/ext ELL - Make        PASS      106.25 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    WARNING   735.25 seconds
-
-Details
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-tools/ioctl-tester.c:561:17: error: initializer element is not a compile-time constant
-        .conn_info = { conn_info_1 },
-                       ^~~~~~~~~~~
-tools/ioctl-tester.c:572:17: error: initializer element is not a compile-time constant
-        .conn_info = { conn_info_1 },
-                       ^~~~~~~~~~~
-2 errors generated.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5199925744736239723==--
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+>  net/bluetooth/hci_sysfs.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> index 4e3e0451b08c..08542dfc2dc5 100644
+> --- a/net/bluetooth/hci_sysfs.c
+> +++ b/net/bluetooth/hci_sysfs.c
+> @@ -48,6 +48,9 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+>  
+>  	BT_DBG("conn %p", conn);
+>  
+> +	if (device_is_registered(&conn->dev))
+> +		return;
+> +
+>  	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+>  
+>  	if (device_add(&conn->dev) < 0) {
+> -- 
+> 2.37.3
