@@ -2,95 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CD53ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 08:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1943FECAAD8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 08:40:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229966AbiIUIkh (ORCPT
+        id S230484AbiIUIkk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Sep 2022 04:40:37 -0400
+        Wed, 21 Sep 2022 04:40:40 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230484AbiIUIkg (ORCPT
+        with ESMTP id S230389AbiIUIki (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Sep 2022 04:40:36 -0400
+        Wed, 21 Sep 2022 04:40:38 -0400
 Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2034.outbound.protection.outlook.com [40.92.89.34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBCBF696D5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 01:40:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 062735C361
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 01:40:36 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ww0NCLrTt0Pxp2v/PrHg7q1jkWVvPsd9d3jBrRbVWhi0hsDVkIuehCopKBqrLPjwDfXIKvtR237q3WbpKtFv86kQTM1bjqyFLbfCHmCFwjM5Mv3JGtgjVoWlpCht0evMpzQwKFvbf1dcXwAvbXfUpefzetrnuuHV7f7DWrOsgskr7ngopKzjF8SBMNVlOMJkdiYXZxytJ7jxtOQS7eCqFCbiUnL8ofA0A+/SMQUMuZbXgPhDA1kreRfimyYHcO9+uqzSGj2uih4xt7Z9frzODQZO6+A7efU6BJWCrMdlOTh18uJD6hkRvdQUq5Q45Sqi/8GZsC2M3gf2nAjpgsHCSw==
+ b=bCk7Nk5cmSvDjYqPm2ctL0Adl+D/tMFJPOrkTIGZkMTPsJ3er29VkYqSER478ANvbzmwvjzVOQEhO7CXJ6JDRJp8DXzUOrmtxpYz0JPh3mnUDLk8uGdq9Q6/u3174NIXwVqcbNqdNp6ZQKOhalhXr7mKtwS02nMIO2+z+r5aJtQNkzdsFoGt35V9y/H0m1/Er0ghz2Lelr2MBcHiwaALWpotv1aQObLGoL0cnkp5C06DNo6m98mM+WSR3ZE+QmUzWGyusU4cMgFvUZ3ru5tFqkFzrRVeBic6nQ96lBMgvmzrb1mKKsjKp5gkJuhroDgLLZpDObie2LU47GP8WU+Guw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=un/6I1sRvo0IXfChoTh3yl4ieXK02BsG7ppods++toE=;
- b=YM7IcsJNMYEDb7GLZGp0VobXPzINnntqlgMaC+jwTjy0d3GehDwpL6DNYAAU8oHQ9NtOq4BoKVnVn/Y82koBx038lexj9OTh7IWUODqZVTna/ll6usviTNLcgZR2snSiqcysPGIZbYoBy7NoAkvNS26T7M9e7zPs+1DLELbYpbOnnrwqZVJjpTLxhTGNyoSvL6emSWLDqF4iqksqHSYOEwwtq137CpSOqMq/YDMrnzWYGCJGrfGj4C5mwMTZBsYfuOYmR1uTp7qU1X/i/UxBsoMMd6pNy3eVbDUD+ksNbkkC0veGz106Tms1r14KXYDDi+QUleOrElz7RqT/00WYfg==
+ bh=P5uXjaZQyRXarP7Y9PMiCenglPfrhPY5jGIkOCQa1Sw=;
+ b=nSO+djKVtU0D4gSk6Zg1pN95livmz0qX95SBlG1jEydIZW5Lrr3XRSR3dfBeJ9ggOG7d/YQSbmobBDbVYEPneUzH5vRlDEQahn3zNaFYgnzzDp7fhOd5WYy4SZk+F7Z+HXLXlwLtuPGmT8coKFj6zX47ZW6x0nSsfyyQlohsLN73EfrM1Q/5WqDy9Hmm/yU22yHexkokgNtXH8tmbLeY01QlyjlBMs9Stl8dy6AYkhr/MYaOAACpMFMipug5xkxV0DFhS5nWBiQn65vKeKmybhvTeTJOBE3EBGJ+oreXM7Y0loQv8LaHNBTMfGFCy5SjtP0vbIdE0MycWgJad6BueA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=un/6I1sRvo0IXfChoTh3yl4ieXK02BsG7ppods++toE=;
- b=gtzb5TWhRDWjx4gVOFKjUDYOx61E0CmFjp0RYnqHS60O2Afwv6wpGtaUxDUvwm3NN/l2sA5FZ4D/fY0jctRqD+a1XPvByRPiM2Qv0UuO0GpYiI34OGWjVwEv7+S3rcWtLoCfG/EdCJKaT8utu9AgPmFd1Cc97v28unoXEwpfCZNoyD87R/LN0bJqXCR8rMaO2qkXHXCt7asK4tmRn50KbaG37q6x/6vGNw2bAmb4bxWjat7kh0oxaTmT0UGrDnCEgC+71NtnJgYYt+rvqkd7jz/QgCFsWQCuY8+FUYU4h1C52RzC9ao8278LvXOn+hhDwsUuBXVRNUDKjyCVk+l7NA==
+ bh=P5uXjaZQyRXarP7Y9PMiCenglPfrhPY5jGIkOCQa1Sw=;
+ b=rr6KhmxWocalCSDd+LEzxiWXs//rdu9VSGJC9Ifv7S3ZgPBo6u8rn4iiwgFk1r6bIqcrs4NQwOMfLsrKsYSRFF33nudaOXqVnk/D4cWIJdIBlSE1XYxoZqr+ewqlteEwYg2zeTK/uEgzf07aGAGQSmSL0sOQWBOqOsN436ZneveuCq+aOJ1kmWRwk/l/WLHqSnBl3IttZfVppPeGXBfISnlNvP7KgRMeHNhrXOn7pkPVVR6+mV+GxxdSGQ5ZWp7WCsCeTOirw75FCDJB7Sel/EQicnjRK6ZusN1W8A0goqek3p1XG5+R3YBdkwmtfY1hRHGwQbuixSE3jv1u1//WFQ==
 Received: from VI1PR09MB4239.eurprd09.prod.outlook.com (2603:10a6:800:12f::23)
  by DU0PR09MB5693.eurprd09.prod.outlook.com (2603:10a6:10:31e::17) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5632.18; Wed, 21 Sep
- 2022 08:40:30 +0000
+ 2022 08:40:33 +0000
 Received: from VI1PR09MB4239.eurprd09.prod.outlook.com
  ([fe80::adeb:7a9b:9960:27bf]) by VI1PR09MB4239.eurprd09.prod.outlook.com
  ([fe80::adeb:7a9b:9960:27bf%2]) with mapi id 15.20.5632.021; Wed, 21 Sep 2022
- 08:40:30 +0000
+ 08:40:33 +0000
 From:   Isak Westin <isak.westin@hotmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Isak Westin <isak.westin@hotmail.com>
-Subject: [PATCH BlueZ 1/3] mesh: Add interface output filter
-Date:   Wed, 21 Sep 2022 10:39:39 +0200
-Message-ID: <VI1PR09MB4239AE3033F3ACDF7CFFDAAFE34F9@VI1PR09MB4239.eurprd09.prod.outlook.com>
+Subject: [PATCH BlueZ 2/3] mesh: Do not accept publication for unbound appkey
+Date:   Wed, 21 Sep 2022 10:39:40 +0200
+Message-ID: <VI1PR09MB423909FF18D8749A57DA443FE34F9@VI1PR09MB4239.eurprd09.prod.outlook.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220921083941.8461-1-isak.westin@hotmail.com>
 References: <20220921083941.8461-1-isak.westin@hotmail.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN:  [1ihb61WIv7VrE2i9Sdq7jI91vEfMEoNV]
+X-TMN:  [KaF+parQ2TQjhVyNfNH0rXyHutcJhi+K]
 X-ClientProxiedBy: ZRAP278CA0008.CHEP278.PROD.OUTLOOK.COM
  (2603:10a6:910:10::18) To VI1PR09MB4239.eurprd09.prod.outlook.com
  (2603:10a6:800:12f::23)
-X-Microsoft-Original-Message-ID: <20220921083941.8461-2-isak.westin@hotmail.com>
+X-Microsoft-Original-Message-ID: <20220921083941.8461-3-isak.westin@hotmail.com>
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: VI1PR09MB4239:EE_|DU0PR09MB5693:EE_
-X-MS-Office365-Filtering-Correlation-Id: 61b54d40-629b-4eff-f267-08da9bacf091
-X-MS-Exchange-SLBlob-MailProps: ZILSnhm0P3lUkjXuSDdeTQka1McTh6g4vrkncgELSGOl+nsBWSpgF0aUWAm9RHfFnKkBoweprBXRfAR4Sw8neEjjxbQWZ8wq1dv2N28OweOpxqncPBkibsXhSGbO34O4C+P/GhK6UJQiQBgVsn3Gaq+BWCZhOn9QI5r/LnBXPWUSk7HtNDPJbm6cpWj40D1RRgnXns4c/Jm/BgL7On1tDYN/1hAdUXckdFSq5D1MYqvs+lVbHfXDI1bUAGcZhQFE836IUXXM1cJE2RKiJdA1VN6qo641mfFac/+74nX19J+mujclCWTsUwHXvVG3MyOiklquFrJjGtZByMpkeuMYZi6dg3wj98lDQMYXQI4E0UStRrVAIjqZcI+BKHS1i9vIeh9lNROFFv3aIINqr12LPPaWDs/ShAhh8lcdua2+DMeycrlxtOWIv9n8bYlbl5WKe20hhO+Sduolb41ga3kZa8yEs0T21vbq9rlxVwmYxzrinEhZBmfSUg/D8rDqm5oS+l4aBQ6usUzUbf5jA2RqmDl2s+pmd+Lqk5G+8YPirf1z+kqHMRL5gGxi4/kNF3lQ2XxLjy5/NjMmtQ7UADsTpfoHORcnIZh5nwc+b1+95fQ1FxntCCQsXGRtsYtaI/VM1P7/2rMWh9A9wBkthuMUIN6fj+pc8OcaFdnodPk9wFyw/nlzaY8xTK7z/qOuY/u5TpCVFtA2X0qXykBJnM5QpDnWE3BYGiHcYOm5cYgIF2UuusJUOqMfhaTmpOYFg3Leqcvw1GMoaB2tX/txDU0MEiWwvNAn1a1q
+X-MS-Office365-Filtering-Correlation-Id: 00cc7ee8-d28b-4714-63d7-08da9bacf27d
+X-MS-Exchange-SLBlob-MailProps: ZILSnhm0P3lUkjXuSDdeTQka1McTh6g4uhRitKZOWH7RZPMTNYfuYHzfo8yhypC+gnyecp/34vCveu7mx3G/5X43Reui07lZuyTEPtvPjyd52ZDcstIurPvlfvD2GQTXu+tF0aI2rcz9NJVcd0SKyw5OfyMMrstRIaZLThQ1GnBTch/GCc9IIxpPHZTm12yDhegIgTxOUBZZlp7X019G6vc9DzUpkFWvRkrPvN1QXAmMv+cD/t8Gg4GpV5c3yPUgPF8c/JLWj6vO3kPCikgeZCXFXNEDFCKZPeaCDQgbK0eTmUeqlwBYNxxjWXQqf/aUhE+w0DWYSTtFMjR1c22CjzipApY0zCmk9Q3ukjYww6A8flpviTLtp5tN4PzQQkZR5WSYmsxvjaqakt3oQDY7ux4+IgWBk8deZ7BKvx6c7ea/Hc4mVKXgHr+Pu0h0WJe4EtpGIcwDqep4dYdWzHW+bdimxWkBdWl+BAlBylKfDJ0R3qjv/P9SLv+ESul2w/ZKn+m2y1krnYstQgHEKicMjkFvhOf27rQS1UF2jK/fLs5NKbS71qEJgaEBk9Mi2WqjrNVQG0n2lT2+KwueHz3LRRlVz1suXoLA2cmHUTxQeflxfpJsXr7YDAmkX2OGQc89vqoreEDyD8Yox6wscvTumTMrZP2oZpeDnmvnYs9Tdz1WiJ8edlUdJuaMMRxahPcLbtcn+9P0c+RJ/aTKbehZOsltUXfEUhWNWnD0L+JkfAEoJ785Iv6P7wSIXWvrXz/1Mk1rTuwsHIezUc2fM7/WD8BTeVCj5CAu
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zBbn+PKpApo1QdbVi9H9aMDBWxlIgJP/U+sSO3BcwwVl4gC+rGLwbVEq44YN7COKIkcQdWY7x1JwuCuYxOsUSt7CT9t6Xnx2/QJHkH/0CE5rxB57iNbAuuuaJBUEPgAYDfpRqDbKoe83LouKIBXz0uOzh8tzuEfohWkIgowvqhlBEFhq5CGhFOOyv8WtiKva6d78pnmYAMBx0vXVS8eTwOkbZiDfs/3SyvbmZ4OCnwAlx2gfSAlZF39TZNtdirtQzDSAQoef+4TXO6AIdAzKomAZAsORhAjBLy5ueRoCoRIJ5sIquS4pjQ8b9ggihtmIlK4PTu1t7P/8uWWA9eGI9IPZypWhG1SI8QaUuO7PkyAXChZJKhur/i3R6XiXCbCut3gO9ZtvG4I8cEapStC3+K0o6EvYmXDTQsJ3Pm/uMLerZD/w1LKHfSWIqruDF9QBnrwTSKMVzpt6k/D6m0Blb//DYRIFs2zi0rbLVKexALgNPzCp7Xs90lbz579Hr8WatF/4tSWETxcARB0Bl0kow91xGmzBqTm2bjh/TjqM4DUS2ZKMlhDTQgdUUkk9A2EWTRp0LMjAjYuP1Lg4ov6t0lf+k0sBHtwNQ7tHeWYN8/yzcC8O4cM6fiDKBZ/Zs46OdRrVZkVW03Vq53FeyweaGg==
+X-Microsoft-Antispam-Message-Info: G5Db6SPM0SbRoNXXgkQylvc5JfvULprLl8ON22G43RzTi/qRRDfaU7byvl5On1JdLLutKGGmwTqHrZJdYltPJAisEyg5RTov5sGnoGj1Z9Z8OVIP+sEWfoAmYBABScDS5PmgyqZplE/Q1ftm/dyvNYuLpu4WMDsdlXu0mDjsMfyeJ1VBomguJWVF19Aqf1F8p+AW7mO5GbudS4prHtiYOmXyd31ihcpWmA4+yDSOSgtx10EGND5MJSoKCRqQ/SHJEa/eRXBw8laqZqlkfZTc/NwnQP2zCIoBOpXsjMPDLFnyR0OS0meXp7C9mk3uhbLgMCOpezEKQTH2T39DswYQ3FeSNfbI+QIfRw3oWUevO0h52QT/0RYi1hi2ayQngF+efknUpmY65cug+cghIZ5DzQJ+u740iqq2RK15YxnS9ilcJ3PJqmK420pxJh2KIY9jEaGHNPJlZoEn6C6YzIZ4eDRYKhADncMPc1rknyyH0EgHRmVbg7ZDedufzsLe6HovFWYiC4lZYJ3kV3haLFr+iczzwFtPfm8q2qmoK0+MS2HsAr9Tf8iAOnvGHVyRbPxZeX8PMcwG6aAf6ErGuccSs7jugmu05jyDIDRjcyMAKTOcmskIn8UU4pdYE+2pT/pd7IQTpUC8l1edzY6vIuxfDw==
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TOucNtS/XKktZZUx3NgCoiiXYm0W0vvqC/89Azd5tlGXpE/Yor88QnJpzqSN?=
- =?us-ascii?Q?9+h3yhgqo5SJDTvAmNB7GpSCE48puZD5fLVZMP1noPn0wO68jSuqSC8sPkqP?=
- =?us-ascii?Q?aqDX94lxJMIzCL5uS/UFo49rV1ZXQvc4HJCqP99juQJckoHoym8i7WKVePtg?=
- =?us-ascii?Q?bl4IXsc5eY45qRv2ABb6R2BFVWn7QR5/YMQVx80JvERRNxyLygKve03FDQXv?=
- =?us-ascii?Q?Wk/fT5JvwzjRSHFlR9miU0wFivMJH7tr4xhEIv4Jnmn2smcitU/av0ih0aLw?=
- =?us-ascii?Q?fCblphO4m1YgORGMdEPjU1v3pipRHkrGtIwbwRYi7M3o+jvuLPEde0VsGgOV?=
- =?us-ascii?Q?rTmmlE6TRpFdGHU+Ec6b/uqYyEDZPuFMMpgUdi6wtorxF8KTVjqU8e4VELIy?=
- =?us-ascii?Q?rG/8Qehg8icoMmB0TM804Hw7ZogkzjVdzM17njW2pgH8MFtgIpl22ylzgYuo?=
- =?us-ascii?Q?9gpj3DN+zHwvFOeWnqYMFl0EDzke1ec8HG310p1lcacZE+eODwTXl5KcXyNu?=
- =?us-ascii?Q?XJrZvRHr1mcUyQc0bbH0XCKlnNIImsRcS3jMr4kUjSZh/TG0qKXOLg2a3i0V?=
- =?us-ascii?Q?y3uuGUslzeJen8eDl5beFzY3x4GONTc2XFdzNbsnyRLvXzeiaJybGfBLO/MB?=
- =?us-ascii?Q?3jUq8EeHkVeDeJZDmjrh2wjtD3b8gippK3UZOciuVK9wdwf1g+p99TOalhy8?=
- =?us-ascii?Q?TSYzFB34b6YA189HZrc4yd7e5DKHHX6LzAakaB6lnOZUMijw5mlffWcl8PxV?=
- =?us-ascii?Q?L0QDt/lx3F5+3/xT/OwfLTYc2Lp7/E3QajLLSgrS3yOWy0CZb4TQo07patQt?=
- =?us-ascii?Q?o10BlPNH2Hg6xJRD0QEQnU5zUo7c+TmgH8esChlQznf+aQA8wU8yk6EZGGta?=
- =?us-ascii?Q?HTF+ugaAUSvFFj0h4pTcmUctpe12GoMXcBZnW268h3+rnPhyF9TnRZzUv6u/?=
- =?us-ascii?Q?hJKX3vUfTkRO68oIyetAo8fnboR8wig5FT2OvfmLo3hXjdbpO08j8uTRzzwN?=
- =?us-ascii?Q?xXfYt9csXLQ2/6PO+2yWtgAfWho3vYDxLbRzIDVhV8+WNN7mg/xoCMO5KxXo?=
- =?us-ascii?Q?xqNuRoJr56CyMJD6DRXAjOIAzaZwKQAXXKMC78USc2xTnm56L0744pyWgzMG?=
- =?us-ascii?Q?qa1eUnvzir1e616KKEqkxepNfeDRs2vZpcqtQ1Ld0x911oNEMdqq6wawaEwO?=
- =?us-ascii?Q?LrPS4HQGnXFrf4H5rFzesjxlXkHyxQ2urjr77iBX1ZtBWYBd5SrwgRGa9IVZ?=
- =?us-ascii?Q?+yxGOCcRQ5GuGu4KhvsBsXcmj868Q1Jm64dDT67YEQ=3D=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?s7C/uLqNWLfPL3/QM4TrGZRy9TPWki8kGXGrSx3d3HXshuTgeIM7YeHCrjxd?=
+ =?us-ascii?Q?ljmMKBaUjW5B4ootv+sbxw4Rivwzg9lJ+qcd/NV6fCdfoyPl7ra+JGaCAOdI?=
+ =?us-ascii?Q?K7F5WAh5MxZ+Ybx2XKLhcTe9QkgsFkHmvwhX9tvd9NN0+LgEJHgzcA0hkaDl?=
+ =?us-ascii?Q?etDNxeiGSYDmG0K5wY1LivYa7q6jK82BLf+vyySvg9FMxxQ3pJCZXmERsx3j?=
+ =?us-ascii?Q?iA2KWt5w1LpD1O3OUvzkDTPnrY5S/N2/aQzmJQg7SeyatFltHTXgj0YeDmhU?=
+ =?us-ascii?Q?HCmkGJf4gnmrjx/OZBvgJIkfBM7BAd8zQixYxhye1rBYk5xRbRg9fL75422b?=
+ =?us-ascii?Q?i6524zpTRsYp9xddV8ypcmBMb4SLXHeWBktfnpUxvItFKR+Md4MiLR3Swa5W?=
+ =?us-ascii?Q?9mVHunccDPEJWELzaxMDZTt5tMmCh36/4M6Nm6YlFxug9VJLZQTS0SP2+3Yt?=
+ =?us-ascii?Q?mTLSC3ojlZ9MdShCbtKXnKoS3hku0+iwTJTubXNOoaxhRKDb/ry6Onw9JU1J?=
+ =?us-ascii?Q?bPzOTYTyGMJLMm0Oc27q3xM8cLp8/F+UnJ4c+O4lI9NAf1g4CFiiDqymidp4?=
+ =?us-ascii?Q?+wn52W1PM+asmuolvc6l+dRjvSObNzDVrl64uIxDqwaxVUkEkd44vffXDxcS?=
+ =?us-ascii?Q?hlTUrsFK7xUHNZqACzzwk9Y2mLYnYBHeb58gB1zKq+cpuNHEpwvRNIzARM29?=
+ =?us-ascii?Q?Mms4eptex1//d1DN/5FQOKSDbQxMISWjLw2T6Rqhl+pvUV2aH5UeksJDGV7e?=
+ =?us-ascii?Q?ekLyJyQrTFdv4S/PJBtab8IfyxqAuETFLBvIm43WUa338q7G2K0Af8PDj0EA?=
+ =?us-ascii?Q?UJStPVVmbC9+I5lb1FDEjE7Tp652JE1/wl5OTf/Yu4aps21gaRbV+KJmOHgD?=
+ =?us-ascii?Q?JeO7BbVPH9t0n6PVvALb1JHNAGPALJXplkKR9t4nMf6oSjfVEdgzK4B+xeA0?=
+ =?us-ascii?Q?JIV7h2i6gfXgSoZJa2MHm8JI+uXXwXLpagaZ1NWWNBc7BcIDfVwbBEPuECbc?=
+ =?us-ascii?Q?EPhHvi2Xz4XcRIa6F7nfAkkcienWROKbKWiT1bfuyHgknW/GwfibafAzxs4h?=
+ =?us-ascii?Q?grXmZtyg1+6q63L0VTekh65oRMB7K0LAkXBqM7gSGn9Qld4VgoR7TYGUGonN?=
+ =?us-ascii?Q?gGq/oQxwkHpD0D8uoCK9e8DYC9jHTc/ipsBOWhrhoj5M/KXViPfwXIIFoWAB?=
+ =?us-ascii?Q?rTbeeqrYUEntu3EGPfH1MSwa5ekxOAZEUivHCwCFJuqWSgKE3yvAIfXxwZnZ?=
+ =?us-ascii?Q?GzwAKj7kTBe45p4UoUOrePpZoX6d1/+GSQ2uheucxg=3D=3D?=
 X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-64da6.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 61b54d40-629b-4eff-f267-08da9bacf091
+X-MS-Exchange-CrossTenant-Network-Message-Id: 00cc7ee8-d28b-4714-63d7-08da9bacf27d
 X-MS-Exchange-CrossTenant-AuthSource: VI1PR09MB4239.eurprd09.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2022 08:40:30.1310
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2022 08:40:33.3673
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -100,72 +100,26 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-According to the mesh profile (3.4.5.2), if TTL is set to 1 for an
-outgoing message, that message shall be dropped.
+If a user tries to configure publication of a model with an appkey that
+is not bound to that model, an error should be returned.
 ---
- mesh/net.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ mesh/model.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/mesh/net.c b/mesh/net.c
-index e8e6d3a61..699469284 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -3067,6 +3067,13 @@ void mesh_net_send_seg(struct mesh_net *net, uint32_t net_key_id,
- 	uint8_t segO = (hdr >> SEGO_HDR_SHIFT) & SEG_MASK;
- 	uint8_t segN = (hdr >> SEGN_HDR_SHIFT) & SEG_MASK;
+diff --git a/mesh/model.c b/mesh/model.c
+index 82078ed85..46ead30ac 100644
+--- a/mesh/model.c
++++ b/mesh/model.c
+@@ -1063,7 +1063,8 @@ int mesh_model_pub_set(struct mesh_node *node, uint16_t addr, uint32_t id,
+ 	if (!mod->pub_enabled || (mod->cbs && !(mod->cbs->pub)))
+ 		return MESH_STATUS_INVALID_PUB_PARAM;
  
-+	/*
-+	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-+	 * If TTL is set to 1, message shall be dropped.
-+	 */
-+	if (ttl == 1)
-+		return;
-+
- 	/* TODO: Only used for current POLLed segments to LPNs */
+-	if (!appkey_have_key(node_get_net(node), idx))
++	if (!appkey_have_key(node_get_net(node), idx) ||
++											!has_binding(mod->bindings, idx))
+ 		return MESH_STATUS_INVALID_APPKEY;
  
- 	l_debug("SEQ: %6.6x", seq + segO);
-@@ -3135,6 +3142,13 @@ bool mesh_net_app_send(struct mesh_net *net, bool frnd_cred, uint16_t src,
- 			(dst >= net->src_addr && dst <= net->last_addr))
- 		return true;
- 
-+	/*
-+	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-+	 * If TTL is set to 1, message shall be dropped.
-+	 */
-+	if (ttl == 1)
-+		return true;
-+
- 	/* Setup OTA Network send */
- 	payload = mesh_sar_new(msg_len);
- 	memcpy(payload->buf, msg, msg_len);
-@@ -3206,6 +3220,13 @@ void mesh_net_ack_send(struct mesh_net *net, uint32_t net_key_id,
- 	uint8_t pkt_len;
- 	uint8_t pkt[30];
- 
-+	/*
-+	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-+	 * If TTL is set to 1, message shall be dropped.
-+	 */
-+	if (ttl == 1)
-+		return;
-+
- 	hdr = NET_OP_SEG_ACKNOWLEDGE << OPCODE_HDR_SHIFT;
- 	hdr |= rly << RELAY_HDR_SHIFT;
- 	hdr |= (seqZero & SEQ_ZERO_MASK) << SEQ_ZERO_HDR_SHIFT;
-@@ -3264,6 +3285,13 @@ void mesh_net_transport_send(struct mesh_net *net, uint32_t net_key_id,
- 	if (*msg & 0xc0 || (9 + msg_len + 8 > 29))
- 		return;
- 
-+	/*
-+	 * MshPRFv1.0.1 section 3.4.5.2, Interface output filter:
-+	 * If TTL is set to 1, message shall be dropped.
-+	 */
-+	if (ttl == 1)
-+		return;
-+
- 	/* Enqueue for Friend if forwardable and from us */
- 	if (!net_key_id && src >= net->src_addr && src <= net->last_addr) {
- 		uint32_t hdr = msg[0] << OPCODE_HDR_SHIFT;
+ 	/*
 -- 
 2.20.1
 
