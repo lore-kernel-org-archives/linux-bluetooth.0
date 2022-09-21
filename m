@@ -2,102 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C862ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 11:21:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8C9C6FA90
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 11:40:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229512AbiIULVl (ORCPT
+        id S229891AbiIULkZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Sep 2022 07:21:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
+        Wed, 21 Sep 2022 07:40:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229599AbiIULVh (ORCPT
+        with ESMTP id S229686AbiIULkX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Sep 2022 07:21:37 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4046FA3F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 04:21:37 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id d64so4585356oia.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 04:21:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=YkzQ5PRJbZYoC3NVke9rit92Ryk7vvOpIfkUHxfNC+8=;
-        b=d4Y1+kV+fiGZWhjZdGddTiJLiBOAWvRXpuxAAXhKobpe8Rhmc++nJUlha2uQ229g5o
-         Aofx5tfpDy/KQXArcL3/2GsErH7Z7pGdqGoO33uNdRj+QnGAWd0PCDEztUBiOYcmOG72
-         TSspjbMGWYOzrKPNSYS2pDXjFhtg0Jz/wEm9gdtdLT2OPYYbpiyew3lDoe9PTY7DW2P6
-         IqRiNgzBn2hglxxEYV0aMn/K/Q2+0QAKgmh4oXEgS6xRNVJhTZPhiD/EEXYKm5rVoRCb
-         SRxJLxYpVkxp3mFfUzx1QVTU2mtee7P4IaterolnNaD/LMQUsEeeM5zB9MbLKSvpuFQ0
-         tkoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=YkzQ5PRJbZYoC3NVke9rit92Ryk7vvOpIfkUHxfNC+8=;
-        b=VtTjKKnRc2ATpocD3XUFgS+ZDgC2EeuM+tR17e1YQBg/oI3yh/oNlc/jKA7QUZsMrd
-         msySJTBcKmObcWl/BoTn495QNqPhw1R56gL+7L1k9PyC4lcqIhOjCoo5tEeOxf4hFfzO
-         eQ81x3QVaWJZIhDEPZwvj1NFNEV0vEAVXx9JsMgQSZi+tYAxZ3fuOYwGVwBdYORixsa9
-         9y2X55XedvnI/nnCUbNLUuKmkkdpGV6JFbklafUkK9eGJ+FTBAR/6VUkfrjJM76UqaJB
-         NAnuDN0SolXz/kNQlWSlZbYLWKCY09UWcLrGW5XdqJWbQ5mjstQ9We1FmZYjPaf8ysc8
-         fr7g==
-X-Gm-Message-State: ACrzQf3VrmrzgWFuwocA2Ti/IaYVZPNH/SqiVNcpU7hX4oFFKRjifVMs
-        ThAcZPOFHrLJ62NA6ZMym5O1JD/u4PnMVQ==
-X-Google-Smtp-Source: AMsMyM4y9YkKRTXoRLpgclun02C42zrO9jI9Nbu+EbahEov4iWT1oNepD8fxg0+l4W8X+AVHLbEGdQ==
-X-Received: by 2002:aca:1119:0:b0:34f:d61d:698d with SMTP id 25-20020aca1119000000b0034fd61d698dmr3599842oir.277.1663759296335;
-        Wed, 21 Sep 2022 04:21:36 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.234.34])
-        by smtp.gmail.com with ESMTPSA id 26-20020aca0f1a000000b0034f937c50fasm1029664oip.49.2022.09.21.04.21.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 04:21:35 -0700 (PDT)
-Message-ID: <632af3bf.ca0a0220.efc7f.4008@mx.google.com>
-Date:   Wed, 21 Sep 2022 04:21:35 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4668985394932054545=="
+        Wed, 21 Sep 2022 07:40:23 -0400
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C67E48CA9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 04:40:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663760422; x=1695296422;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=46I649uAwLdPY0xQkNEEKho15BLBocer2cEgIw5tSXU=;
+  b=fbI785DcFP2dzvuANw5rtepu9pMouwDy55T4awQoiLxqiEb3ewa2K949
+   XiMP/seI0h4VMgovKNSZWhG4v8wOqjTi/ogjikt+ilqOS/Tio0IYAQGs7
+   7Gu9b78QqgaqmKxDmI+PTMikHPmh8sugjv0Oj6PTg422HdsB5sz9e0wNE
+   Z3AD1lowBie0WxLm4tGFbws8edj7M0S1r90yXEzKG0ITWs7HneGRwIGEj
+   PZmSJOA8p7PXJEv5SW49TM8cSt1i4aTor7KYjAVMsCvxSJlnVI0XRXzeu
+   RucDpsarW9IwtRBbLJm17NuLW0YJkemH6MQD1sphlzHy+LuNBq/IpbZSV
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10476"; a="300814598"
+X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
+   d="scan'208";a="300814598"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2022 04:40:21 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.93,333,1654585200"; 
+   d="scan'208";a="570501823"
+Received: from lkp-server01.sh.intel.com (HELO c0a60f19fe7e) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 21 Sep 2022 04:40:20 -0700
+Received: from kbuild by c0a60f19fe7e with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oay5T-0003Zl-26;
+        Wed, 21 Sep 2022 11:40:19 +0000
+Date:   Wed, 21 Sep 2022 19:40:05 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ bb20da18ce936adda6b48aea79a8797c8eee479f
+Message-ID: <632af815.DrI/vjf3/P8HAb++%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
-Subject: RE: [BlueZ,v2,1/2] shared/vcp: Add bt_vcp_set_debug
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220921102732.688081-1-sathish.narasimman@intel.com>
-References: <20220921102732.688081-1-sathish.narasimman@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4668985394932054545==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: bb20da18ce936adda6b48aea79a8797c8eee479f  Bluetooth: MGMT: fix zalloc-simple.cocci warnings
 
-This is automated email and please do not reply to this email!
+elapsed time: 726m
 
-Dear submitter,
+configs tested: 58
+configs skipped: 2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=679002
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+gcc tested configs:
+um                           x86_64_defconfig
+um                             i386_defconfig
+s390                             allmodconfig
+alpha                               defconfig
+arc                                 defconfig
+s390                                defconfig
+s390                             allyesconfig
+i386                                defconfig
+powerpc                           allnoconfig
+powerpc                          allmodconfig
+arc                  randconfig-r043-20220921
+riscv                randconfig-r042-20220921
+mips                             allyesconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+s390                 randconfig-r044-20220921
+alpha                            allyesconfig
+i386                             allyesconfig
+sh                               allmodconfig
+m68k                             allyesconfig
+x86_64                        randconfig-a013
+x86_64                        randconfig-a011
+x86_64                        randconfig-a015
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+x86_64                        randconfig-a006
+i386                          randconfig-a001
+i386                          randconfig-a003
+x86_64                              defconfig
+i386                          randconfig-a005
+x86_64                               rhel-8.3
+arm                                 defconfig
+x86_64                           allyesconfig
+i386                          randconfig-a014
+arm                              allyesconfig
+x86_64                          rhel-8.3-func
+arm64                            allyesconfig
+i386                          randconfig-a012
+x86_64                         rhel-8.3-kunit
+i386                          randconfig-a016
+x86_64                           rhel-8.3-kvm
+x86_64                    rhel-8.3-kselftests
+x86_64                           rhel-8.3-syz
+ia64                             allmodconfig
 
-Test Summary:
-CheckPatch                    PASS      2.56 seconds
-GitLint                       PASS      1.58 seconds
-Prep - Setup ELL              PASS      32.59 seconds
-Build - Prep                  PASS      0.93 seconds
-Build - Configure             PASS      10.18 seconds
-Build - Make                  PASS      1064.68 seconds
-Make Check                    PASS      12.77 seconds
-Make Check w/Valgrind         PASS      352.92 seconds
-Make Distcheck                PASS      298.91 seconds
-Build w/ext ELL - Configure   PASS      10.47 seconds
-Build w/ext ELL - Make        PASS      106.23 seconds
-Incremental Build w/ patches  PASS      251.04 seconds
-Scan Build                    PASS      686.01 seconds
+clang tested configs:
+hexagon              randconfig-r041-20220921
+hexagon              randconfig-r045-20220921
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+x86_64                        randconfig-a005
+i386                          randconfig-a002
+i386                          randconfig-a004
+i386                          randconfig-a006
+i386                          randconfig-a013
+i386                          randconfig-a011
+i386                          randconfig-a015
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4668985394932054545==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
