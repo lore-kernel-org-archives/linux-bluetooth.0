@@ -2,63 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8143AECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 21:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BEE7C32771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Sep 2022 21:50:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbiIUVrD (ORCPT
+        id S230246AbiIUVuq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Sep 2022 17:47:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50058 "EHLO
+        Wed, 21 Sep 2022 17:50:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229877AbiIUVrC (ORCPT
+        with ESMTP id S229498AbiIUVup (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Sep 2022 17:47:02 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB4E9A6AFF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 14:47:01 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id r23so7237913pgr.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 14:47:01 -0700 (PDT)
+        Wed, 21 Sep 2022 17:50:45 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F96AA1D0E
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 14:50:44 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id q35-20020a17090a752600b002038d8a68fbso210667pjk.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Sep 2022 14:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date;
-        bh=6W9MrSFw3Dj8LODmWhYflLLrYCpPux4iXSGDv9dO1HI=;
-        b=OFFHg43n4qQXqU+nTjmRZSeWCxlW8N3qECUsa9mGZSNdmqN/0NjxHsmvdKKIiHA9wX
-         VEi5af7NHiwDcpJE0xOWEqteaCQ+IQgPSaJVLS+o3IQ+esrwYabGdXhQ9bI0GLhXr1pu
-         rsdyC/2ZeqK20XSOzcPg1YCTiDznbSpjuKYDjIJTh7dnGsqQ34GAB7JsMEJIbBzZWepi
-         YxG7YvAKCNdEWyd0EMiyQOX5bteBwQqpVU38GxmUtFQiB+NMc6jh+hlyjLpjZ7QbFC0V
-         M2f70Q5l873nrdX31ust9ne0QKTMPLrT8GnSGdq7OTJBHUC001xNcKFupJM/2fQfB733
-         FH3g==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date;
+        bh=qlKvWp0Os9aiXZyYfv0kVK3MbkzSRbQQj0/fdk6t3Eo=;
+        b=Po89RPGGB0VMkLrMPND4baeH0t8OY/N7R/chuJ7epyn3bmOXthfe+Z4gIv3SjXoJSE
+         p2JjcLZTjRfnz0BF6Fl9qnvxmrSO+LJFHGjE87h01UAyKlz0tyS+tFIJ5gegDejEGh1w
+         eqjd4BU8m6HJErZLsm3gXcIScA9dME9Y8XCdoHa7fqcLAggh9b4eLBWp97VOmOJlPzku
+         sjtZXvUhvd/BcPmQxNUNaYaUyYH1xeKDEhqeHewjyVAscXHookQa25rj4te2o37Q9bOq
+         MEHjTctWgqpDsknfmmm2qlUTr05688eNnQyPDbJR71z2s1fMMaLST9fZB0P8sD7wEXxW
+         KWxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=6W9MrSFw3Dj8LODmWhYflLLrYCpPux4iXSGDv9dO1HI=;
-        b=SIp8yfrIXST2kV6ZHOXGv1spJ7daZ4LfpaP59aFRRUmlbfDzxpMZMVP2TEbI6K8WiF
-         sOW76wjivC52ZJ9ckcIZFMqxNCo1vmeHD4GK2IScX9nKtNzhD6prYRU2zwSxJDriV+7S
-         grqdP3Z0LEhyjY7F8ImCQZuIhBvD4KoHcxoQ+SjvAP1mOFW+bQzCpcAwSElw3T8J4eFa
-         RnnJyuaaJnpTzNTR28veX7aLlsIB9TEJCu/qwwHoEh5sXTdAuUkpUdpITQaCCFebIkfh
-         yVejVaEmv7/3nso2AVChoEvo8ZvYyEkZaWZJHCvG5lIjrWJFELtqt3qjoyfrbpGyw2xJ
-         QGuA==
-X-Gm-Message-State: ACrzQf1JixK0RjWihd/o9Bh6bkMoaVRvbFnELS+RERnY3UjlA7l1m5I6
-        aPO6MQtbqE2tfDP9el8baB+FFmoMBiU=
-X-Google-Smtp-Source: AMsMyM6/6EDPmgVes5IXggWr1C2n0ib6bpo66tCh2pnvPLvWD0F/91AHRVHF4biui3tsGO1wNeTx0A==
-X-Received: by 2002:a63:243:0:b0:43c:75c:d92a with SMTP id 64-20020a630243000000b0043c075cd92amr195269pgc.497.1663796820823;
-        Wed, 21 Sep 2022 14:47:00 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=qlKvWp0Os9aiXZyYfv0kVK3MbkzSRbQQj0/fdk6t3Eo=;
+        b=pXut4e3Wcm6T94tgXp8WXCd755uhuToRyJS02tCr6eaCMdTS92vBYaXnqNtVw7jOYh
+         qFjZ2zMz6hdm7nhr9dTTcYnbs3a3IQmygRCK4yzj+aS12m0ssV3vHPuN/FIB4Q3s4uZr
+         tlp2Xb+731kRBE44QWatLTVKWimgtF/tCHS2/+Ey+xtyyGS7sCNFrFPTuDmoVMLoXOLu
+         qilhLKdjVtBGNAUj/s4bBjQ6mdbqqGiB/9u9MO/UuO626QL7ypJ0P843/xzwSCF9539L
+         zXrxaZXweXIwHo3fE35e5bPrqifVsxiSOdwFkw+tGaimEJyI+9QKwuFDS7jybYNSInQ4
+         hXyg==
+X-Gm-Message-State: ACrzQf2g/NmIpuxN7MxL2xHhIj5sftTxCDzzyM5VfmbS1hwktcsd8tuH
+        5hNj16RowlThEbEyulcKVWyZ3Pxp+8s=
+X-Google-Smtp-Source: AMsMyM7VPS9TDmQHJY98HMEUMXuzVrdU31si7S3MI4IcbFxMRElQN9LG0as/aPhkjwiytn5o0rUFBA==
+X-Received: by 2002:a17:902:6549:b0:178:12e9:8d7b with SMTP id d9-20020a170902654900b0017812e98d7bmr139865pln.14.1663797042905;
+        Wed, 21 Sep 2022 14:50:42 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id t11-20020a170902e84b00b001782a6fbcacsm2506526plg.101.2022.09.21.14.46.59
+        by smtp.gmail.com with ESMTPSA id t9-20020a655549000000b00434ea8956f6sm2426487pgr.3.2022.09.21.14.50.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Sep 2022 14:47:00 -0700 (PDT)
+        Wed, 21 Sep 2022 14:50:42 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] client/gatt: Fix notification enabled/disabled output
-Date:   Wed, 21 Sep 2022 14:46:56 -0700
-Message-Id: <20220921214656.2241730-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] gatt: Fix scan-build warnings
+Date:   Wed, 21 Sep 2022 14:50:41 -0700
+Message-Id: <20220921215041.2243423-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20220921214656.2241730-1-luiz.dentz@gmail.com>
-References: <20220921214656.2241730-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,35 +64,35 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When notifications are enabled/disable the output was not print a new
-line.
----
- client/gatt.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This fixes the following warnings:
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 4c1efaf75ac8..efd736b2359a 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -2518,7 +2518,7 @@ static DBusMessage *chrc_start_notify(DBusConnection *conn, DBusMessage *msg,
+src/gatt-database.c:3541:14: warning: Value stored to 'iface' during
+its initialization is never read [deadcode.DeadStores]
+        const char *iface = g_dbus_proxy_get_interface(proxy);
+                    ^~~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+src/gatt-database.c:3542:14: warning: Value stored to 'path' during
+its initialization is never read [deadcode.DeadStores]
+        const char *path = g_dbus_proxy_get_path(proxy);
+                    ^~~~   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+ src/gatt-database.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index a212dfc4e694..c72f4a4d5c54 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -3538,8 +3538,8 @@ static void register_characteristic(void *data, void *user_data)
+ {
+ 	struct gatt_app *app = user_data;
+ 	GDBusProxy *proxy = data;
+-	const char *iface = g_dbus_proxy_get_interface(proxy);
+-	const char *path = g_dbus_proxy_get_path(proxy);
++	const char *iface;
++	const char *path;
  
- 	chrc->notifying = true;
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s (%s) notifications "
--			"enabled", chrc->path, bt_uuidstr_to_str(chrc->uuid));
-+			"enabled\n", chrc->path, bt_uuidstr_to_str(chrc->uuid));
- 	g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
- 							"Notifying");
- 
-@@ -2538,7 +2538,8 @@ static DBusMessage *chrc_stop_notify(DBusConnection *conn, DBusMessage *msg,
- 
- 	chrc->notifying = false;
- 	bt_shell_printf("[" COLORED_CHG "] Attribute %s (%s) notifications "
--			"disabled", chrc->path, bt_uuidstr_to_str(chrc->uuid));
-+			"disabled\n", chrc->path,
-+			bt_uuidstr_to_str(chrc->uuid));
- 	g_dbus_emit_property_changed(conn, chrc->path, CHRC_INTERFACE,
- 							"Notifying");
- 
+ 	if (app->failed)
+ 		return;
 -- 
 2.37.3
 
