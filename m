@@ -2,960 +2,208 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95411C6FA8B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 21:40:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E96C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 22:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbiIVVk4 (ORCPT
+        id S230317AbiIVWZK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Sep 2022 17:40:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39568 "EHLO
+        Thu, 22 Sep 2022 18:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231308AbiIVVkw (ORCPT
+        with ESMTP id S231646AbiIVWYv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Sep 2022 17:40:52 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DDBB108096
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 14:40:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663882850; x=1695418850;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/Eaa21aF0mkLd8UlvLINSRz+v3XZUnLkcusJdRyqO6M=;
-  b=V9BqpKUm1NbB2uCxibfmOxIEG7VTkKuqb3LQSD5tyX3pGMNKTyyReYiN
-   GQ+IMe1IGP+pM/zlqyAZ+srkPGu/Lvi7fTSgEWF6k/nAbtZmxeLtpqrE4
-   BvrvIDkl5wYtKvRPsEu5UBF4GMh02ujxKxilQ+K3geKqyJWsNKfFtNoEQ
-   CTynWtyGe0zklcm/XM0zHtNpzi4uBouWvIDPXCsZvTzlLZbDr6dJbw/BZ
-   /cnBcUTheG4LMtl2v23mkhH3zX0y6v329mkscqhHUjLF2DAeofBrT0pbh
-   zBzimtCJZLBhtrTAXLHIjDhxuP6KVYHmK9IX1K83hFQGApS3Bjn0RxIQx
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="280807340"
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="280807340"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 14:40:49 -0700
-X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="795272490"
-Received: from avarhadk-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.213.161.147])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 14:40:49 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ v3 2/2] mesh: Add new kernel MGMT based IO transport
-Date:   Thu, 22 Sep 2022 14:40:39 -0700
-Message-Id: <20220922214039.611611-3-brian.gix@intel.com>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20220922214039.611611-1-brian.gix@intel.com>
-References: <20220922214039.611611-1-brian.gix@intel.com>
+        Thu, 22 Sep 2022 18:24:51 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F366DF698
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 15:24:14 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id i15so7885753qvp.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 15:24:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=fxGP9I39Ol3kbxG44Szv+vq/fgkxUScrDP8RRUqhY28=;
+        b=UL7sr59spEXWkcaSbPRcPgtz44wpY+6Zb+a3Uo50wpGXO1b8C6j0aw7glyMHYKGCzl
+         7addB1mjgftA4J+9Bs32xtzmdZx7wkEjucoUG+iMB5CLFLDBS/11b4ZwuxABC16PgH3p
+         OEgAO2eY42s+rEsINkFTA1utuiwMm4VhRVk0WpaLx/w3ZpEqeva0n5wnBY2dT6KuTgQp
+         k5aXqbeenppyO9L+JDvGRxBmkdfTenxtlJQLsnLrYOWnSqqhoSCuRjLVsbHU4bnTbkNZ
+         I5aXel6XDZ22V0OnDpXplRv1sxUOgV/CuvcgRDIA/75wkP5TA1tusacbcdWvJ5PAqY+W
+         ANuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=fxGP9I39Ol3kbxG44Szv+vq/fgkxUScrDP8RRUqhY28=;
+        b=UqMQNKU5/3kVGMdAZ0wQccyvJaq/wKlrOYqbpaLv2suPqGkX30x0kzmxeepVjvp84B
+         o9aRyy/krZFJZOALGXVDdo1QRMJ82n14hmhXyEzILCsL7mzlp0PM98JPoAiSkkvxMQtM
+         eg2mQ6ys7bWS0A7bhd5pXi6Wymh9JIktJiFFvVVun+SiGV0aM/uwwaAIppv+2aVH6R1x
+         /tPOLexcnJtyuI6caM6dc4J+TYSkjMCX2nxJU6qvdwcKGJH89k5k5rFEmvHf8MPZV5n/
+         Ixbsvle+Cec4nwkJCBTVc2Gq8IdM2tLb2UPU8sm6ljrE8ff7P7Qwyh1ASo6VwOjtyTkd
+         MrAg==
+X-Gm-Message-State: ACrzQf0vPGD7j2X0IsEcQ8S9OHQY6FF7/allnKPM1HaJqVPHcoWc8CoH
+        E8kdM7squ/mVPGKHkQMWUWbBZkD06JI=
+X-Google-Smtp-Source: AMsMyM5rPbX/+z7WLBbP6H64QdHG0nW4O+D2i4ESVrXx529J/kvQ9Aeev9v+06uPULWYciXRohU/uA==
+X-Received: by 2002:a05:6214:c2a:b0:4ad:67d:c25a with SMTP id a10-20020a0562140c2a00b004ad067dc25amr4627792qvd.125.1663885452910;
+        Thu, 22 Sep 2022 15:24:12 -0700 (PDT)
+Received: from [172.17.0.2] ([13.92.168.102])
+        by smtp.gmail.com with ESMTPSA id v10-20020ac8748a000000b0034355a352d1sm4085576qtq.92.2022.09.22.15.24.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Sep 2022 15:24:12 -0700 (PDT)
+Message-ID: <632ce08c.c80a0220.68368.0ce0@mx.google.com>
+Date:   Thu, 22 Sep 2022 15:24:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2365927961907017881=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: Mesh demon switched to using kernel Mesh MGMT
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220922213822.600692-2-brian.gix@intel.com>
+References: <20220922213822.600692-2-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-1. Re-structures MGMT handling such that it is used to detect kernel
-   support of the mesh MGMT opcodes and events before selecting between
-   using MGMT or the legacy raw HCI socket method.
+--===============2365927961907017881==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-2. Re-structures main() to allow command line to prefer MGMT over HCI or
-   visa versa, plus optionally pass an explicte controller.
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9Njc5NjE3CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBGQUlMICAgICAgMy4zNCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAyLjAyIHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDI2LjgxIHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuNzggc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC41
+NyBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMDcuNTYg
+c2Vjb25kcwpNYWtlIENoZWNrICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTA4Mi43OSBz
+ZWNvbmRzCk1ha2UgQ2hlY2sgdy9WYWxncmluZCAgICAgICAgIEZBSUwgICAgICA4NC40OCBzZWNv
+bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMS4zMiBzZWNvbmRz
+CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA4LjczIHNlY29uZHMKQnVp
+bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDM4LjkwIHNlY29uZHMKSW5jcmVt
+ZW50YWwgQnVpbGQgdy8gcGF0Y2hlcyAgRkFJTCAgICAgIDE0OC4zOSBzZWNvbmRzClNjYW4gQnVp
+bGQgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA1MjQuMzQgc2Vjb25kcwoKRGV0YWlscwoj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZBSUwKRGVz
+YzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0IHdpdGggcnVsZSBpbiAuY2hlY2twYXRjaC5jb25m
+Ck91dHB1dDoKW0JsdWVaLHYyLDIvMl0gbWVzaDogQWRkIG5ldyBrZXJuZWwgTUdNVCBiYXNlZCBJ
+TyB0cmFuc3BvcnQKV0FSTklORzpMRUFESU5HX1NQQUNFOiBwbGVhc2UsIG5vIHNwYWNlcyBhdCB0
+aGUgc3RhcnQgb2YgYSBsaW5lCiM2OTg6IEZJTEU6IG1lc2gvbWVzaC1tZ210LmM6MzY6CisgICAg
+ICAgMHg3NiwgMHg2ZSwgMHhmMywgMHhlOCwgMHgyNCwgMHg1ZiwgMHgwNSwgMHhiZiwgLyogVVVJ
+RCAtIE1lc2ggKi8kCgpXQVJOSU5HOkxFQURJTkdfU1BBQ0U6IHBsZWFzZSwgbm8gc3BhY2VzIGF0
+IHRoZSBzdGFydCBvZiBhIGxpbmUKIzY5OTogRklMRTogbWVzaC9tZXNoLW1nbXQuYzozNzoKKyAg
+ICAgICAweDhkLCAweDRkLCAweDAzLCAweDdhLCAweGQ3LCAweDYzLCAweGU0LCAweDJjLCQKCldB
+Uk5JTkc6TEVBRElOR19TUEFDRTogcGxlYXNlLCBubyBzcGFjZXMgYXQgdGhlIHN0YXJ0IG9mIGEg
+bGluZQojNzAwOiBGSUxFOiBtZXNoL21lc2gtbWdtdC5jOjM4OgorICAgICAgIDB4MDEsICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC8qIEFjdGlvbiAtIGVuYWJsZSAq
+LyQKCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjk4NTgyNi5wYXRjaCB0b3RhbDogMCBlcnJvcnMs
+IDMgd2FybmluZ3MsIDgwNiBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUgcmVw
+b3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5pY2Fs
+bHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1pbnBs
+YWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjLzEyOTg1ODI2LnBhdGNoIGhhcyBzdHlsZSBwcm9i
+bGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09NTUlU
+X01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMgTUlT
+U0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9UQUcgU1BMSVRfU1RSSU5H
+IFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxzZSBw
+b3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+IENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVaIHNvdXJj
+ZSB0cmVlCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKA
+mToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjQ3MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBz
+aXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJks
+IHJldHJ5aW5nIHdpdGhvdXQKMTI0NzAgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltd
+KQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBlcnJvcjogbWVz
+aC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyNyB8ICNpbmNs
+dWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+
+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01ha2VmaWxlOjc0
+OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1bmZp
+bmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDQ1MTogYWxsXSBFcnJvciAyCgoK
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgLSBGQUlMCkRl
+c2M6IFJ1biAnbWFrZSBjaGVjaycKT3V0cHV0Ogp1bml0L3Rlc3QtYXZkdHAuYzogSW4gZnVuY3Rp
+b24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6IHZhcmlhYmxlIHRy
+YWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25t
+ZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGludCBhcmdjLCBjaGFy
+ICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6IEluIGZ1bmN0aW9u
+IOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2YXJpYWJsZSB0cmFj
+a2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVu
+dHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
+YXJndltdKQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBlcnJv
+cjogbWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyNyB8
+ICNpbmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+fn5+
+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01ha2Vm
+aWxlOjc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTE1
+ODg6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6
+IE1ha2UgQ2hlY2sgdy9WYWxncmluZCAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJyB3aXRo
+IFZhbGdyaW5kCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFp
+buKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjQ3MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2lu
+ZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPi
+gJksIHJldHJ5aW5nIHdpdGhvdXQKMTI0NzAgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
+dltdKQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBlcnJvcjog
+bWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyNyB8ICNp
+bmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+
+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01ha2VmaWxl
+Ojc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1
+bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDQ1MTogYWxsXSBFcnJvciAy
+CgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgRGlzdGNoZWNrIC0g
+RkFJTApEZXNjOiBSdW4gZGlzdGNoZWNrIHRvIGNoZWNrIHRoZSBkaXN0cmlidXRpb24KT3V0cHV0
+OgptYWtlWzJdOiAqKiogTm8gcnVsZSB0byBtYWtlIHRhcmdldCAnbWVzaC9tZXNoLWlvLW1nbXQu
+aCcsIG5lZWRlZCBieSAnZGlzdGRpci1hbScuICBTdG9wLgptYWtlWzFdOiAqKiogW01ha2VmaWxl
+OjExNDIxOiBkaXN0ZGlyXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTE0OTc6IGRpc3Rd
+IEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgdy9l
+eHQgRUxMIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZVogc291cmNlIHdpdGggJy0tZW5h
+YmxlLWV4dGVybmFsLWVsbCcgY29uZmlndXJhdGlvbgpPdXRwdXQ6Cm1lc2gvbWVzaC1pby5jOjI3
+OjEwOiBmYXRhbCBlcnJvcjogbWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRp
+cmVjdG9yeQogICAyNyB8ICNpbmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAg
+ICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtl
+WzFdOiAqKiogW01ha2VmaWxlOjc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2VbMV06
+ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6
+NDQ1MTogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6
+IEluY3JlbWVudGFsIEJ1aWxkIHcvIHBhdGNoZXMgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFsIGJ1
+aWxkIHBlciBwYXRjaCBpbiB0aGUgc2VyaWVzCk91dHB1dDoKbWVzaC9tZXNoLWlvLmM6Mjc6MTA6
+IGZhdGFsIGVycm9yOiBtZXNoL21lc2gtaW8tbWdtdC5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0
+b3J5CiAgIDI3IHwgI2luY2x1ZGUgIm1lc2gvbWVzaC1pby1tZ210LmgiCiAgICAgIHwgICAgICAg
+ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCm1ha2VbMV06
+ICoqKiBbTWFrZWZpbGU6NzQ5MTogbWVzaC9tZXNoLWlvLm9dIEVycm9yIDEKbWFrZVsxXTogKioq
+IFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0NDUx
+OiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogU2Nh
+biBCdWlsZCAtIEZBSUwKRGVzYzogUnVuIFNjYW4gQnVpbGQgd2l0aCBwYXRjaGVzCk91dHB1dDoK
+dG9vbHMvYnRwY2xpZW50LmM6MjQ5NDozOiB3YXJuaW5nOiBWYWx1ZSBzdG9yZWQgdG8gJ3JlcGx5
+JyBpcyBuZXZlciByZWFkCiAgICAgICAgICAgICAgICByZXBseSA9IGxfZGJ1c19tZXNzYWdlX25l
+d19lcnJvcihhZy5wZW5kaW5nX3JlcSwKICAgICAgICAgICAgICAgIF4gICAgICAgfn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgoxIHdhcm5pbmcgZ2VuZXJhdGVkLgpJbiBm
+aWxlIGluY2x1ZGVkIGZyb20gdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6MjA6CkluIGZpbGUgaW5j
+bHVkZWQgZnJvbSAuL21lc2gvY3J5cHRvLmM6MTg6CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAuL2Vs
+bC9lbGwuaDoxOgouL2VsbC91dGlsLmg6MTg3Ojk6IHdhcm5pbmc6IDFzdCBmdW5jdGlvbiBjYWxs
+IGFyZ3VtZW50IGlzIGFuIHVuaW5pdGlhbGl6ZWQgdmFsdWUKICAgICAgICByZXR1cm4gTF9CRTMy
+X1RPX0NQVShMX0dFVF9VTkFMSUdORUQoKGNvbnN0IHVpbnQzMl90ICopIHB0cikpOwogICAgICAg
+ICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn4KLi9lbGwvdXRpbC5oOjg5OjI4OiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3JvICdMX0JF
+MzJfVE9fQ1BVJwojZGVmaW5lIExfQkUzMl9UT19DUFUodmFsKSBic3dhcF8zMih2YWwpCiAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KL3Vzci9pbmNsdWRlL2J5dGVzd2Fw
+Lmg6MzQ6MjE6IG5vdGU6IGV4cGFuZGVkIGZyb20gbWFjcm8gJ2Jzd2FwXzMyJwojZGVmaW5lIGJz
+d2FwXzMyKHgpIF9fYnN3YXBfMzIgKHgpCiAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+fn5+
+fn4KdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6OTY1OjExOiB3YXJuaW5nOiBUaGUgbGVmdCBleHBy
+ZXNzaW9uIG9mIHRoZSBjb21wb3VuZCBhc3NpZ25tZW50IGlzIGFuIHVuaW5pdGlhbGl6ZWQgdmFs
+dWUuIFRoZSBjb21wdXRlZCB2YWx1ZSB3aWxsIGFsc28gYmUgZ2FyYmFnZQogICAgICAgICAgICAg
+ICAga2V5X2FpZCB8PSBLRVlfSURfQUtGOwogICAgICAgICAgICAgICAgfn5+fn5+fiBeCnVuaXQv
+dGVzdC1tZXNoLWNyeXB0by5jOjEwMDg6Mjogd2FybmluZzogNHRoIGZ1bmN0aW9uIGNhbGwgYXJn
+dW1lbnQgaXMgYW4gdW5pbml0aWFsaXplZCB2YWx1ZQogICAgICAgIHZlcmlmeV91aW50OCgiTklE
+IiwgMCwga2V5cy0+bmV0X25pZCwgbmlkKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+
+fn5+fn5+fn5+fn5+fn5+fn5+fn4KdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6MTI4OTo2OiB3YXJu
+aW5nOiBCcmFuY2ggY29uZGl0aW9uIGV2YWx1YXRlcyB0byBhIGdhcmJhZ2UgdmFsdWUKICAgICAg
+ICBpZiAoY3RsKSB7CiAgICAgICAgICAgIF5+fgp1bml0L3Rlc3QtbWVzaC1jcnlwdG8uYzoxNTA5
+Ojc6IHdhcm5pbmc6IEJyYW5jaCBjb25kaXRpb24gZXZhbHVhdGVzIHRvIGEgZ2FyYmFnZSB2YWx1
+ZQogICAgICAgICAgICAgICAgaWYgKG5ldF9jdGwpIHsKICAgICAgICAgICAgICAgICAgICBefn5+
+fn5+CnVuaXQvdGVzdC1tZXNoLWNyeXB0by5jOjE3NjM6Mjogd2FybmluZzogMXN0IGZ1bmN0aW9u
+IGNhbGwgYXJndW1lbnQgaXMgYW4gdW5pbml0aWFsaXplZCB2YWx1ZQogICAgICAgIGxfcHV0X2Jl
+NjQoY21hY190bXAsIGNtYWMpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CjYg
+d2FybmluZ3MgZ2VuZXJhdGVkLgptZXNoL21lc2gtaW8uYzoyNzoxMDogZmF0YWwgZXJyb3I6IG1l
+c2gvbWVzaC1pby1tZ210Lmg6IE5vIHN1Y2ggZmlsZSBvciBkaXJlY3RvcnkKICAgMjcgfCAjaW5j
+bHVkZSAibWVzaC9tZXNoLWlvLW1nbXQuaCIKICAgICAgfCAgICAgICAgICBefn5+fn5+fn5+fn5+
+fn5+fn5+fn4KY29tcGlsYXRpb24gdGVybWluYXRlZC4KbWFrZVsxXTogKioqIFtNYWtlZmlsZTo3
+NDkxOiBtZXNoL21lc2gtaW8ub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQ0NTE6IGFs
+bF0gRXJyb3IgMgoKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-3. Adds mesh-io-mgmt as a transport.
----
- Makefile.mesh          |   9 +-
- mesh/main.c            |  39 ++++++++-
- mesh/mesh-io-api.h     |  11 ++-
- mesh/mesh-io-generic.c |  47 +++--------
- mesh/mesh-io-unit.c    |  13 ++-
- mesh/mesh-io.c         | 188 ++++++++++++++++++++++++++++++-----------
- mesh/mesh-io.h         |   4 +-
- mesh/mesh-mgmt.c       | 164 +++++++++++++++++++++++++++--------
- mesh/mesh-mgmt.h       |  12 ++-
- mesh/mesh.c            |   6 +-
- mesh/mesh.h            |   2 +-
- 11 files changed, 354 insertions(+), 141 deletions(-)
-
-diff --git a/Makefile.mesh b/Makefile.mesh
-index fc28b0557..3047f362b 100644
---- a/Makefile.mesh
-+++ b/Makefile.mesh
-@@ -13,12 +13,11 @@ endif
- mesh_sources = mesh/mesh.h mesh/mesh.c \
- 				mesh/net-keys.h mesh/net-keys.c \
- 				mesh/mesh-io.h mesh/mesh-io.c \
--				mesh/mesh-mgmt.c mesh/mesh-mgmt.h \
-+				mesh/mesh-mgmt.h  mesh/mesh-mgmt.c \
- 				mesh/error.h mesh/mesh-io-api.h \
--				mesh/mesh-io-generic.h \
--				mesh/mesh-io-generic.c \
--				mesh/mesh-io-unit.h \
--				mesh/mesh-io-unit.c \
-+				mesh/mesh-io-unit.h mesh/mesh-io-unit.c \
-+				mesh/mesh-io-mgmt.h mesh/mesh-io-mgmt.c \
-+				mesh/mesh-io-generic.h mesh/mesh-io-generic.c \
- 				mesh/net.h mesh/net.c \
- 				mesh/crypto.h mesh/crypto.c \
- 				mesh/friend.h mesh/friend.c \
-diff --git a/mesh/main.c b/mesh/main.c
-index dd99c3085..619b17d88 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -123,6 +123,12 @@ static void disconnect_callback(void *user_data)
- 	l_main_quit();
- }
- 
-+static void kill_to(struct l_timeout *timeout, void *user_data)
-+{
-+	l_timeout_remove(timeout);
-+	l_main_quit();
-+}
-+
- static void signal_handler(uint32_t signo, void *user_data)
- {
- 	static bool terminated;
-@@ -131,13 +137,38 @@ static void signal_handler(uint32_t signo, void *user_data)
- 		return;
- 
- 	l_info("Terminating");
--	l_main_quit();
-+	mesh_cleanup(true);
-+	l_timeout_create(1, kill_to, NULL, NULL);
- 	terminated = true;
- }
- 
- static bool parse_io(const char *optarg, enum mesh_io_type *type, void **opts)
- {
--	if (strstr(optarg, "generic") == optarg) {
-+	if (strstr(optarg, "auto") == optarg) {
-+		int *index = l_new(int, 1);
-+
-+		*type = MESH_IO_TYPE_AUTO;
-+		*opts = index;
-+
-+		optarg += strlen("auto");
-+		if (!*optarg) {
-+			*index = MGMT_INDEX_NONE;
-+			return true;
-+		}
-+
-+		if (*optarg != ':')
-+			return false;
-+
-+		optarg++;
-+
-+		if (sscanf(optarg, "hci%d", index) == 1)
-+			return true;
-+
-+		if (sscanf(optarg, "%d", index) == 1)
-+			return true;
-+
-+		return false;
-+	} else if (strstr(optarg, "generic") == optarg) {
- 		int *index = l_new(int, 1);
- 
- 		*type = MESH_IO_TYPE_GENERIC;
-@@ -251,7 +282,7 @@ int main(int argc, char *argv[])
- 	}
- 
- 	if (!io)
--		io = l_strdup_printf("generic");
-+		io = l_strdup_printf("auto");
- 
- 	if (!parse_io(io, &io_type, &io_opts)) {
- 		l_error("Invalid io: %s", io);
-@@ -295,7 +326,7 @@ done:
- 	l_free(io);
- 	l_free(io_opts);
- 
--	mesh_cleanup();
-+	mesh_cleanup(false);
- 	l_dbus_destroy(dbus);
- 	l_main_exit();
- 
-diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
-index 61f79f224..21c505cd0 100644
---- a/mesh/mesh-io-api.h
-+++ b/mesh/mesh-io-api.h
-@@ -10,8 +10,7 @@
- 
- struct mesh_io_private;
- 
--typedef bool (*mesh_io_init_t)(struct mesh_io *io, void *opts,
--				mesh_io_ready_func_t cb, void *user_data);
-+typedef bool (*mesh_io_init_t)(struct mesh_io *io, void *opts, void *user_data);
- typedef bool (*mesh_io_destroy_t)(struct mesh_io *io);
- typedef bool (*mesh_io_caps_t)(struct mesh_io *io, struct mesh_io_caps *caps);
- typedef bool (*mesh_io_send_t)(struct mesh_io *io,
-@@ -36,9 +35,13 @@ struct mesh_io_api {
- };
- 
- struct mesh_io {
--	enum mesh_io_type		type;
--	const struct mesh_io_api	*api;
-+	int				index;
-+	int				favored_index;
-+	mesh_io_ready_func_t		ready;
-+	struct l_queue			*rx_regs;
- 	struct mesh_io_private		*pvt;
-+	void				*user_data;
-+	const struct mesh_io_api	*api;
- };
- 
- struct mesh_io_table {
-diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
-index 2d7ef261e..827128ec8 100644
---- a/mesh/mesh-io-generic.c
-+++ b/mesh/mesh-io-generic.c
-@@ -19,6 +19,7 @@
- 
- #include "monitor/bt.h"
- #include "src/shared/hci.h"
-+#include "src/shared/mgmt.h"
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
- 
-@@ -29,14 +30,12 @@
- #include "mesh/mesh-io-generic.h"
- 
- struct mesh_io_private {
-+	struct mesh_io *io;
- 	struct bt_hci *hci;
--	void *user_data;
--	mesh_io_ready_func_t ready_callback;
- 	struct l_timeout *tx_timeout;
- 	struct l_queue *rx_regs;
- 	struct l_queue *tx_pkts;
- 	struct tx_pkt *tx;
--	uint16_t index;
- 	uint16_t interval;
- 	bool sending;
- 	bool active;
-@@ -385,16 +384,13 @@ static void hci_init(void *user_data)
- {
- 	struct mesh_io *io = user_data;
- 	bool result = true;
--	bool restarted = false;
- 
--	if (io->pvt->hci) {
--		restarted = true;
-+	if (io->pvt->hci)
- 		bt_hci_unref(io->pvt->hci);
--	}
- 
--	io->pvt->hci = bt_hci_new_user_channel(io->pvt->index);
-+	io->pvt->hci = bt_hci_new_user_channel(io->index);
- 	if (!io->pvt->hci) {
--		l_error("Failed to start mesh io (hci %u): %s", io->pvt->index,
-+		l_error("Failed to start mesh io (hci %u): %s", io->index,
- 							strerror(errno));
- 		result = false;
- 	}
-@@ -405,47 +401,26 @@ static void hci_init(void *user_data)
- 		bt_hci_register(io->pvt->hci, BT_HCI_EVT_LE_META_EVENT,
- 						event_callback, io, NULL);
- 
--		l_debug("Started mesh on hci %u", io->pvt->index);
-+		l_debug("Started mesh on hci %u", io->index);
- 
--		if (restarted)
--			restart_scan(io->pvt);
-+		restart_scan(io->pvt);
- 	}
- 
--	if (io->pvt->ready_callback)
--		io->pvt->ready_callback(io->pvt->user_data, result);
-+	if (io->ready)
-+		io->ready(io->user_data, result);
- }
- 
--static void read_info(int index, void *user_data)
--{
--	struct mesh_io *io = user_data;
--
--	if (io->pvt->index != MGMT_INDEX_NONE &&
--					index != io->pvt->index) {
--		l_debug("Ignore index %d", index);
--		return;
--	}
--
--	io->pvt->index = index;
--	hci_init(io);
--}
--
--static bool dev_init(struct mesh_io *io, void *opts,
--				mesh_io_ready_func_t cb, void *user_data)
-+static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
- {
- 	if (!io || io->pvt)
- 		return false;
- 
- 	io->pvt = l_new(struct mesh_io_private, 1);
--	io->pvt->index = *(int *)opts;
- 
- 	io->pvt->rx_regs = l_queue_new();
- 	io->pvt->tx_pkts = l_queue_new();
- 
--	io->pvt->ready_callback = cb;
--	io->pvt->user_data = user_data;
--
--	if (io->pvt->index == MGMT_INDEX_NONE)
--		return mesh_mgmt_list(read_info, io);
-+	io->pvt->io = io;
- 
- 	l_idle_oneshot(hci_init, io, NULL);
- 
-diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
-index bf3f808e4..f4f619803 100644
---- a/mesh/mesh-io-unit.c
-+++ b/mesh/mesh-io-unit.c
-@@ -25,13 +25,13 @@
- #include "mesh/dbus.h"
- #include "mesh/mesh-io.h"
- #include "mesh/mesh-io-api.h"
--#include "mesh/mesh-io-generic.h"
-+#include "mesh/mesh-io-unit.h"
- 
- struct mesh_io_private {
-+	struct mesh_io *io;
- 	struct l_io *sio;
- 	void *user_data;
- 	char *unique_name;
--	mesh_io_ready_func_t ready_callback;
- 	struct l_timeout *tx_timeout;
- 	struct l_queue *rx_regs;
- 	struct l_queue *tx_pkts;
-@@ -203,14 +203,13 @@ static void unit_up(void *user_data)
- 
- 	l_debug("Started io-unit");
- 
--	if (pvt->ready_callback)
--		pvt->ready_callback(pvt->user_data, true);
-+	if (pvt->io && pvt->io->ready)
-+		pvt->io->ready(pvt->user_data, true);
- 
- 	l_timeout_create_ms(1, get_name, pvt, NULL);
- }
- 
--static bool unit_init(struct mesh_io *io, void *opt,
--				mesh_io_ready_func_t cb, void *user_data)
-+static bool unit_init(struct mesh_io *io, void *opt, void *user_data)
- {
- 	struct mesh_io_private *pvt;
- 	char *sk_path;
-@@ -247,7 +246,7 @@ static bool unit_init(struct mesh_io *io, void *opt,
- 	pvt->rx_regs = l_queue_new();
- 	pvt->tx_pkts = l_queue_new();
- 
--	pvt->ready_callback = cb;
-+	pvt->io = io;
- 	pvt->user_data = user_data;
- 
- 	io->pvt = pvt;
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-index 96891313a..32e6e2521 100644
---- a/mesh/mesh-io.c
-+++ b/mesh/mesh-io.c
-@@ -15,95 +15,160 @@
- #include <ell/ell.h>
- 
- #include "lib/bluetooth.h"
-+#include "lib/mgmt.h"
-+#include "src/shared/mgmt.h"
- 
- #include "mesh/mesh-defs.h"
-+#include "mesh/mesh-mgmt.h"
- #include "mesh/mesh-io.h"
- #include "mesh/mesh-io-api.h"
- 
- /* List of Mesh-IO Type headers */
-+#include "mesh/mesh-io-mgmt.h"
- #include "mesh/mesh-io-generic.h"
- #include "mesh/mesh-io-unit.h"
- 
-+struct mesh_io_reg {
-+	mesh_io_recv_func_t cb;
-+	void *user_data;
-+	uint8_t len;
-+	uint8_t filter[];
-+} packed;
-+
- /* List of Supported Mesh-IO Types */
- static const struct mesh_io_table table[] = {
--	{MESH_IO_TYPE_GENERIC, &mesh_io_generic},
-+	{MESH_IO_TYPE_MGMT,	&mesh_io_mgmt},
-+	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic},
- 	{MESH_IO_TYPE_UNIT_TEST, &mesh_io_unit},
- };
- 
--static struct l_queue *io_list;
-+static struct mesh_io *default_io;
- 
--static bool match_by_io(const void *a, const void *b)
-+static const struct mesh_io_api *io_api(enum mesh_io_type type)
- {
--	return a == b;
-+	uint16_t i;
-+
-+	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
-+		if (table[i].type == type)
-+			return table[i].api;
-+	}
-+
-+	return NULL;
- }
- 
--static bool match_by_type(const void *a, const void *b)
-+static void refresh_rx(void *a, void *b)
- {
--	const struct mesh_io *io = a;
--	const enum mesh_io_type type = L_PTR_TO_UINT(b);
-+	struct mesh_io_reg *rx_reg = a;
-+	struct mesh_io *io = b;
- 
--	return io->type == type;
-+	if (io->api && io->api->reg)
-+		io->api->reg(io, rx_reg->filter, rx_reg->len, rx_reg->cb,
-+							rx_reg->user_data);
- }
- 
--struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
--				mesh_io_ready_func_t cb, void *user_data)
-+static void ctl_alert(int index, bool up, bool pwr, bool mesh, void *user_data)
- {
-+	enum mesh_io_type type = L_PTR_TO_UINT(user_data);
- 	const struct mesh_io_api *api = NULL;
--	struct mesh_io *io;
--	uint16_t i;
- 
--	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
--		if (table[i].type == type) {
--			api = table[i].api;
--			break;
--		}
--	}
--
--	io = l_queue_find(io_list, match_by_type, L_UINT_TO_PTR(type));
-+	l_warn("up:%d pwr: %d mesh: %d", up, pwr, mesh);
- 
--	if (!api || !api->init || io)
--		return NULL;
-+	/* If specific IO controller requested, honor it */
-+	if (default_io->favored_index != MGMT_INDEX_NONE &&
-+					default_io->favored_index != index)
-+		return;
- 
--	io = l_new(struct mesh_io, 1);
-+	if (!up && default_io->index == index) {
-+		/* Our controller has disappeared */
-+		if (default_io->api && default_io->api->destroy) {
-+			default_io->api->destroy(default_io);
-+			default_io->api = NULL;
-+		}
- 
--	io->type = type;
--	io->api = api;
-+		/* Re-enumerate controllers */
-+		mesh_mgmt_list(ctl_alert, user_data);
-+		return;
-+	}
- 
--	if (!api->init(io, opts, cb, user_data))
--		goto fail;
-+	/* If we already have an API, keep using it */
-+	if (!up || default_io->api)
-+		return;
- 
--	if (!io_list)
--		io_list = l_queue_new();
-+	if (mesh && type != MESH_IO_TYPE_GENERIC)
-+		api = io_api(MESH_IO_TYPE_MGMT);
- 
--	if (l_queue_push_head(io_list, io))
--		return io;
-+	else if (!pwr)
-+		api = io_api(MESH_IO_TYPE_GENERIC);
- 
--fail:
--	if (api->destroy)
--		api->destroy(io);
-+	if (api) {
-+		default_io->index = index;
-+		default_io->api = api;
-+		api->init(default_io, &index, default_io->user_data);
- 
--	l_free(io);
--	return NULL;
-+		l_queue_foreach(default_io->rx_regs, refresh_rx, default_io);
-+	}
- }
- 
--void mesh_io_destroy(struct mesh_io *io)
-+static void free_io(struct mesh_io *io)
- {
--	io = l_queue_remove_if(io_list, match_by_io, io);
- 
- 	if (io && io->api && io->api->destroy)
- 		io->api->destroy(io);
- 
-+	l_queue_destroy(io->rx_regs, l_free);
-+	io->rx_regs = NULL;
- 	l_free(io);
-+	l_warn("Destroy %p", io);
-+}
-+
-+struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
-+				mesh_io_ready_func_t cb, void *user_data)
-+{
-+	const struct mesh_io_api *api = NULL;
- 
--	if (l_queue_isempty(io_list)) {
--		l_queue_destroy(io_list, NULL);
--		io_list = NULL;
-+	/* Only allow one IO */
-+	if (default_io)
-+		return NULL;
-+
-+	default_io = l_new(struct mesh_io, 1);
-+	default_io->ready = cb;
-+	default_io->user_data = user_data;
-+	default_io->favored_index = *(int *) opts;
-+	default_io->rx_regs = l_queue_new();
-+
-+	if (type >= MESH_IO_TYPE_AUTO) {
-+		if (!mesh_mgmt_list(ctl_alert, L_UINT_TO_PTR(type)))
-+			goto fail;
-+
-+		return default_io;
- 	}
-+
-+	api = io_api(type);
-+
-+	if (!api || !api->init)
-+		goto fail;
-+
-+	default_io->api = api;
-+
-+	if (!api->init(default_io, &default_io->favored_index, user_data))
-+		goto fail;
-+
-+	return default_io;
-+
-+fail:
-+	free_io(default_io);
-+	default_io = NULL;
-+	return NULL;
-+}
-+
-+void mesh_io_destroy(struct mesh_io *io)
-+{
- }
- 
- bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
- {
--	io = l_queue_find(io_list, match_by_io, io);
-+	if (io != default_io)
-+		return false;
- 
- 	if (io && io->api && io->api->caps)
- 		return io->api->caps(io, caps);
-@@ -115,7 +180,17 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 				uint8_t len, mesh_io_recv_func_t cb,
- 				void *user_data)
- {
--	io = l_queue_find(io_list, match_by_io, io);
-+	struct mesh_io_reg *rx_reg;
-+
-+	if (io != default_io)
-+		return false;
-+
-+	rx_reg = l_malloc(sizeof(struct mesh_io_reg) + len);
-+	rx_reg->cb = cb;
-+	rx_reg->len = len;
-+	rx_reg->user_data = user_data;
-+	memcpy(rx_reg->filter, filter, len);
-+	l_queue_push_head(io->rx_regs, rx_reg);
- 
- 	if (io && io->api && io->api->reg)
- 		return io->api->reg(io, filter, len, cb, user_data);
-@@ -123,10 +198,24 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 	return false;
- }
- 
-+static bool by_filter(const void *a, const void *b)
-+{
-+	const struct mesh_io_reg *rx_reg = a;
-+	const uint8_t *filter = b;
-+
-+	return rx_reg->filter[0] == filter[0];
-+}
-+
- bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
- 								uint8_t len)
- {
--	io = l_queue_find(io_list, match_by_io, io);
-+	struct mesh_io_reg *rx_reg;
-+
-+	if (io != default_io)
-+		return false;
-+
-+	rx_reg = l_queue_remove_if(io->rx_regs, by_filter, filter);
-+	l_free(rx_reg);
- 
- 	if (io && io->api && io->api->dereg)
- 		return io->api->dereg(io, filter, len);
-@@ -137,10 +226,11 @@ bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
- bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
- 					const uint8_t *data, uint16_t len)
- {
--	io = l_queue_find(io_list, match_by_io, io);
-+	if (io && io != default_io)
-+		return false;
- 
- 	if (!io)
--		io = l_queue_peek_head(io_list);
-+		io = default_io;
- 
- 	if (io && io->api && io->api->send)
- 		return io->api->send(io, info, data, len);
-@@ -151,7 +241,11 @@ bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
- bool mesh_io_send_cancel(struct mesh_io *io, const uint8_t *pattern,
- 								uint8_t len)
- {
--	io = l_queue_find(io_list, match_by_io, io);
-+	if (io && io != default_io)
-+		return false;
-+
-+	if (!io)
-+		io = default_io;
- 
- 	if (io && io->api && io->api->cancel)
- 		return io->api->cancel(io, pattern, len);
-diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
-index 80ef3fa3e..9dd946cdf 100644
---- a/mesh/mesh-io.h
-+++ b/mesh/mesh-io.h
-@@ -14,8 +14,10 @@ struct mesh_io;
- 
- enum mesh_io_type {
- 	MESH_IO_TYPE_NONE = 0,
-+	MESH_IO_TYPE_UNIT_TEST,
-+	MESH_IO_TYPE_AUTO, /* If MGMT required, add after here */
-+	MESH_IO_TYPE_MGMT,
- 	MESH_IO_TYPE_GENERIC,
--	MESH_IO_TYPE_UNIT_TEST
- };
- 
- enum mesh_io_timing_type {
-diff --git a/mesh/mesh-mgmt.c b/mesh/mesh-mgmt.c
-index 754093dbc..d37aeb5ac 100644
---- a/mesh/mesh-mgmt.c
-+++ b/mesh/mesh-mgmt.c
-@@ -12,35 +12,78 @@
- #include <config.h>
- #endif
- 
-+#include <ell/ell.h>
-+
- #include "lib/bluetooth.h"
- #include "lib/mgmt.h"
- #include "src/shared/mgmt.h"
- 
--#include "ell/queue.h"
--#include "ell/log.h"
--#include "ell/util.h"
--
- #include "mesh/mesh-mgmt.h"
- 
--struct read_info_reg {
--	mesh_mgmt_read_info_func_t cb;
--	void *user_data;
-+struct mesh_controler {
-+	int	index;
-+	bool	mesh_support;
-+	bool	powered;
- };
- 
--struct read_info_req {
--	int index;
--	struct mesh_io *io;
-+static mesh_mgmt_read_info_func_t ctl_info;
-+static struct mgmt *mgmt_mesh;
-+static struct l_queue *ctl_list;
-+static void *list_user_data;
-+static bool mesh_detected;
-+
-+static const uint8_t set_exp_feat_param_mesh[] = {
-+	0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f, 0x05, 0xbf, /* UUID - Mesh */
-+	0x8d, 0x4d, 0x03, 0x7a, 0xd7, 0x63, 0xe4, 0x2c,
-+	0x01,                                           /* Action - enable */
- };
- 
--static struct mgmt *mgmt_mesh;
--static struct l_queue *read_info_regs;
-+static bool by_index(const void *a, const void *b)
-+{
-+	const struct mesh_controler *ctl = a;
-+	int index = L_PTR_TO_UINT(b);
-+
-+	return ctl->index == index;
-+}
- 
--static void process_read_info_req(void *data, void *user_data)
-+static void index_removed(uint16_t index, uint16_t length, const void *param,
-+							void *user_data);
-+static void features_cb(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
- {
--	struct read_info_reg *reg = data;
- 	int index = L_PTR_TO_UINT(user_data);
-+	struct mesh_controler *ctl;
-+
- 
--	reg->cb(index, reg->user_data);
-+	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
-+	if (!ctl)
-+		return;
-+
-+	l_debug("Status: %d, Length: %d", status, length);
-+	if (status != MGMT_STATUS_NOT_SUPPORTED &&
-+					status != MGMT_STATUS_UNKNOWN_COMMAND) {
-+		ctl->mesh_support = true;
-+		if (!mesh_detected) {
-+			mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
-+					MGMT_INDEX_NONE, index_removed,
-+					NULL, NULL);
-+		}
-+		mesh_detected = true;
-+	} else
-+		l_debug("Kernel mesh not supported for hci%u", index);
-+
-+	if (ctl_info)
-+		ctl_info(index, true, ctl->powered, ctl->mesh_support,
-+							list_user_data);
-+}
-+
-+static void set_exp_mesh_cb(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	int index = L_PTR_TO_UINT(user_data);
-+
-+	mesh_mgmt_send(MGMT_OP_MESH_READ_FEATURES, index, 0, NULL,
-+				features_cb, L_UINT_TO_PTR(index), NULL);
- }
- 
- static void read_info_cb(uint8_t status, uint16_t length,
-@@ -49,12 +92,25 @@ static void read_info_cb(uint8_t status, uint16_t length,
- 	int index = L_PTR_TO_UINT(user_data);
- 	const struct mgmt_rp_read_info *rp = param;
- 	uint32_t current_settings, supported_settings;
-+	struct mesh_controler *ctl;
- 
- 	l_debug("hci %u status 0x%02x", index, status);
- 
-+	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
-+	if (!ctl)
-+		return;
-+
- 	if (status != MGMT_STATUS_SUCCESS) {
-+		ctl = l_queue_remove_if(ctl_list, by_index,
-+						L_UINT_TO_PTR(index));
- 		l_error("Failed to read info for hci index %u: %s (0x%02x)",
- 				index, mgmt_errstr(status), status);
-+
-+		l_warn("Hci dev %d removal detected", index);
-+		if (ctl && ctl_info)
-+			ctl_info(index, false, false, false, list_user_data);
-+
-+		l_free(ctl);
- 		return;
- 	}
- 
-@@ -69,23 +125,36 @@ static void read_info_cb(uint8_t status, uint16_t length,
- 	l_debug("settings: supp %8.8x curr %8.8x",
- 					supported_settings, current_settings);
- 
--	if (current_settings & MGMT_SETTING_POWERED) {
--		l_info("Controller hci %u is in use", index);
--		return;
--	}
--
- 	if (!(supported_settings & MGMT_SETTING_LE)) {
- 		l_info("Controller hci %u does not support LE", index);
-+		l_queue_remove(ctl_list, ctl);
-+		l_free(ctl);
- 		return;
- 	}
- 
--	l_queue_foreach(read_info_regs, process_read_info_req,
--							L_UINT_TO_PTR(index));
-+	if (current_settings & MGMT_SETTING_POWERED)
-+		ctl->powered = true;
-+
-+	mesh_mgmt_send(MGMT_OP_SET_EXP_FEATURE, index,
-+			sizeof(set_exp_feat_param_mesh),
-+			set_exp_feat_param_mesh,
-+			set_exp_mesh_cb, L_UINT_TO_PTR(index), NULL);
- }
- 
- static void index_added(uint16_t index, uint16_t length, const void *param,
- 							void *user_data)
- {
-+	struct mesh_controler *ctl = l_queue_find(ctl_list, by_index,
-+							L_UINT_TO_PTR(index));
-+
-+	if (!ctl) {
-+		ctl = l_new(struct mesh_controler, 1);
-+		ctl->index = index;
-+		l_queue_push_head(ctl_list, ctl);
-+	} else {
-+		ctl->mesh_support = ctl->powered = false;
-+	}
-+
- 	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
- 				read_info_cb, L_UINT_TO_PTR(index), NULL);
- }
-@@ -93,7 +162,9 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
- static void index_removed(uint16_t index, uint16_t length, const void *param,
- 							void *user_data)
- {
--	l_warn("Hci dev %4.4x removed", index);
-+	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
-+				read_info_cb, L_UINT_TO_PTR(index), NULL);
-+
- }
- 
- static void read_index_list_cb(uint8_t status, uint16_t length,
-@@ -133,8 +204,8 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
- 
- static bool mesh_mgmt_init(void)
- {
--	if (!read_info_regs)
--		read_info_regs = l_queue_new();
-+	if (!ctl_list)
-+		ctl_list = l_queue_new();
- 
- 	if (!mgmt_mesh) {
- 		mgmt_mesh = mgmt_new_default();
-@@ -146,8 +217,6 @@ static bool mesh_mgmt_init(void)
- 
- 		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_ADDED,
- 				MGMT_INDEX_NONE, index_added, NULL, NULL);
--		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
--				MGMT_INDEX_NONE, index_removed, NULL, NULL);
- 	}
- 
- 	return true;
-@@ -155,16 +224,11 @@ static bool mesh_mgmt_init(void)
- 
- bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
- {
--	struct read_info_reg *reg;
--
- 	if (!mesh_mgmt_init())
- 		return false;
- 
--	reg = l_new(struct read_info_reg, 1);
--	reg->cb = cb;
--	reg->user_data = user_data;
--
--	l_queue_push_tail(read_info_regs, reg);
-+	ctl_info = cb;
-+	list_user_data = user_data;
- 
- 	/* Use MGMT to find a candidate controller */
- 	l_debug("send read index_list");
-@@ -175,3 +239,35 @@ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
- 
- 	return true;
- }
-+
-+void mesh_mgmt_destroy(void)
-+{
-+	mgmt_unref(mgmt_mesh);
-+	mgmt_mesh = NULL;
-+	ctl_info = NULL;
-+	list_user_data = NULL;
-+	l_queue_destroy(ctl_list, l_free);
-+	ctl_list = NULL;
-+}
-+
-+unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
-+				uint16_t length, const void *param,
-+				mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy)
-+{
-+	return mgmt_send_timeout(mgmt_mesh, opcode, index, length, param,
-+					callback, user_data, destroy, 0);
-+}
-+
-+unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
-+				mgmt_notify_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy)
-+{
-+	return mgmt_register(mgmt_mesh, event, index, callback,
-+						user_data, destroy);
-+}
-+
-+bool mesh_mgmt_unregister(unsigned int id)
-+{
-+	return mgmt_unregister(mgmt_mesh, id);
-+}
-diff --git a/mesh/mesh-mgmt.h b/mesh/mesh-mgmt.h
-index 90ac14e73..a3cd72faf 100644
---- a/mesh/mesh-mgmt.h
-+++ b/mesh/mesh-mgmt.h
-@@ -9,6 +9,16 @@
-  */
- #include <stdbool.h>
- 
--typedef void (*mesh_mgmt_read_info_func_t)(int index, void *user_data);
-+typedef void (*mesh_mgmt_read_info_func_t)(int index, bool added, bool powered,
-+						bool mesh, void *user_data);
- 
- bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data);
-+unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
-+				uint16_t length, const void *param,
-+				mgmt_request_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy);
-+unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
-+				mgmt_notify_func_t callback,
-+				void *user_data, mgmt_destroy_func_t destroy);
-+bool mesh_mgmt_unregister(unsigned int id);
-+void mesh_mgmt_destroy(void);
-diff --git a/mesh/mesh.c b/mesh/mesh.c
-index 62d650328..91cf25175 100644
---- a/mesh/mesh.c
-+++ b/mesh/mesh.c
-@@ -324,11 +324,15 @@ static void free_pending_join_call(bool failed)
- 	join_pending = NULL;
- }
- 
--void mesh_cleanup(void)
-+void mesh_cleanup(bool signaled)
- {
- 	struct l_dbus_message *reply;
- 
- 	mesh_io_destroy(mesh.io);
-+	mesh.io = NULL;
-+
-+	if (signaled)
-+		return;
- 
- 	if (join_pending) {
- 
-diff --git a/mesh/mesh.h b/mesh/mesh.h
-index 0f77ebc58..c30a8d1f0 100644
---- a/mesh/mesh.h
-+++ b/mesh/mesh.h
-@@ -28,7 +28,7 @@ typedef void (*prov_rx_cb_t)(void *user_data, const uint8_t *data,
- bool mesh_init(const char *config_dir, const char *mesh_conf_fname,
- 					enum mesh_io_type type, void *opts,
- 					mesh_ready_func_t cb, void *user_data);
--void mesh_cleanup(void);
-+void mesh_cleanup(bool signaled);
- bool mesh_dbus_init(struct l_dbus *dbus);
- 
- const char *mesh_status_str(uint8_t err);
--- 
-2.37.3
-
+--===============2365927961907017881==--
