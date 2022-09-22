@@ -2,48 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3724AC6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 20:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F1BC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 20:39:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbiIVUjG (ORCPT
+        id S229905AbiIVUjI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Sep 2022 16:39:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39026 "EHLO
+        Thu, 22 Sep 2022 16:39:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229720AbiIVUjE (ORCPT
+        with ESMTP id S229876AbiIVUjH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Sep 2022 16:39:04 -0400
+        Thu, 22 Sep 2022 16:39:07 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60717FE07F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 13:39:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F04B1103C0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 13:39:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1663879143; x=1695415143;
+  t=1663879144; x=1695415144;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=b/n/8iEJviVM8NPDM9ArBf+7Tz/j/bFgnOkCPJQPIGA=;
-  b=PY5l7qnGdQnW9nkJimcyF6rIKL3dy8jE7ghexlR49u/u/Afqgue3HIM0
-   hhEElBDD9oeAcUkWr3pPZc2SM++q/ZSOfOvekfpuZYqNG9M3LRraglqhT
-   sXhMU2icyuWZD3wA/vfc5L4TqbbpdSUQH32nraRAy3NXDD13jmQWVoJdv
-   WaQVTH2Ee48Zj7pMWgq45k7wO95gDzws9Tia9oCoKzpopL9B7fM/fvQZq
-   /gPseqPb+JWA6x6OYS2VUzj4R9JLioF5lJ0Y3iIyVTJzOutWuuPmfTnhl
-   GKbE6I7zb4At2Ve6orUiRZ8NwgksDQblP1rMbKa8qUjy2EO1zTc+nyaz4
+  bh=uSCWd4R4+IGAyuJwgOOMbgtu6XJWJTKNhE/twQVwaPM=;
+  b=Qk9YjKLSZsBimSIbEIbOyXFSt1f+vno3o+W1qZeDRysiYRrt4gKtwH0F
+   QvUEih8D0p95jGFZ7xvR3P59m4rwx7dwXo/FsMoUfMIjL3CtysxrUoh5i
+   qBY0XeBiUrDBd19efcOj/S+aPqfbYYPO0SIlEXMZPu3gK6POIpWiOhk4g
+   ZMBGqUx05NnxLhIAxTOSP0McKRdErte9e7vM86NYVk4Szj/4aT8qBHkaT
+   ViUQ6k0/2cmFz8w9buqF171m17C6dpMt2/h82Y4ZPhU2bscdlJ2TPC0wP
+   eO2z4K0QVPAgK8L/NN2qbw/Z2Sy9BbhHFsW/cU4mOjkbd3fDo3wnzlpQH
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="301303193"
+X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="301303198"
 X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="301303193"
+   d="scan'208";a="301303198"
 Received: from fmsmga006.fm.intel.com ([10.253.24.20])
   by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 13:39:00 -0700
 X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
-   d="scan'208";a="865028664"
+   d="scan'208";a="865028680"
 Received: from mobl2.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.23.53])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 13:38:59 -0700
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 13:39:00 -0700
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, inga.stotland@intel.com
-Subject: [PATCH BlueZ 1/4] mgmt: Add support for Mesh in the kernel
-Date:   Thu, 22 Sep 2022 13:38:49 -0700
-Message-Id: <20220922203852.494315-2-brian.gix@intel.com>
+Subject: [PATCH BlueZ 4/4] mesh: Add new kernel MGMT based IO transport
+Date:   Thu, 22 Sep 2022 13:38:52 -0700
+Message-Id: <20220922203852.494315-5-brian.gix@intel.com>
 X-Mailer: git-send-email 2.37.3
 In-Reply-To: <20220922203852.494315-1-brian.gix@intel.com>
 References: <20220922203852.494315-1-brian.gix@intel.com>
@@ -53,243 +53,909 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-These commands and events allow User space apps to test for Mesh
-support, and request incoming mesh packets be delivered and request
-outbound mesh packets to be sent. This is the basis for sharing
-one controller between the legacy bluetoothd daemon and the mesh
-bluetooth-meshd daemon.
----
- doc/mgmt-api.txt | 192 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 157 insertions(+), 35 deletions(-)
+1. Re-structures MGMT handling such that it is used to detect kernel
+   support of the mesh MGMT opcodes and events before selecting between
+   using MGMT or the legacy raw HCI socket method.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 23ea42228..90d612ed8 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -3861,45 +3861,132 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
- 				Invalid Parameters
+2. Re-structures main() to allow command line to prefer MGMT over HCI or
+   visa versa, plus optionally pass an explicte controller.
+
+3. Adds mesh-io-mgmt as a transport.
+---
+ Makefile.mesh          |   9 +-
+ mesh/main.c            |  39 ++++++++-
+ mesh/mesh-io-api.h     |  11 ++-
+ mesh/mesh-io-generic.c |  47 +++--------
+ mesh/mesh-io-unit.c    |  13 ++-
+ mesh/mesh-io.c         | 188 ++++++++++++++++++++++++++++++-----------
+ mesh/mesh-io.h         |   4 +-
+ mesh/mesh-mgmt.c       | 164 +++++++++++++++++++++++++++--------
+ mesh/mesh-mgmt.h       |  12 ++-
+ mesh/mesh.c            |   6 +-
+ mesh/mesh.h            |   2 +-
+ 11 files changed, 354 insertions(+), 141 deletions(-)
+
+diff --git a/Makefile.mesh b/Makefile.mesh
+index fc28b0557..3047f362b 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -13,12 +13,11 @@ endif
+ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/net-keys.h mesh/net-keys.c \
+ 				mesh/mesh-io.h mesh/mesh-io.c \
+-				mesh/mesh-mgmt.c mesh/mesh-mgmt.h \
++				mesh/mesh-mgmt.h  mesh/mesh-mgmt.c \
+ 				mesh/error.h mesh/mesh-io-api.h \
+-				mesh/mesh-io-generic.h \
+-				mesh/mesh-io-generic.c \
+-				mesh/mesh-io-unit.h \
+-				mesh/mesh-io-unit.c \
++				mesh/mesh-io-unit.h mesh/mesh-io-unit.c \
++				mesh/mesh-io-mgmt.h mesh/mesh-io-mgmt.c \
++				mesh/mesh-io-generic.h mesh/mesh-io-generic.c \
+ 				mesh/net.h mesh/net.c \
+ 				mesh/crypto.h mesh/crypto.c \
+ 				mesh/friend.h mesh/friend.c \
+diff --git a/mesh/main.c b/mesh/main.c
+index dd99c3085..619b17d88 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -123,6 +123,12 @@ static void disconnect_callback(void *user_data)
+ 	l_main_quit();
+ }
  
++static void kill_to(struct l_timeout *timeout, void *user_data)
++{
++	l_timeout_remove(timeout);
++	l_main_quit();
++}
++
+ static void signal_handler(uint32_t signo, void *user_data)
+ {
+ 	static bool terminated;
+@@ -131,13 +137,38 @@ static void signal_handler(uint32_t signo, void *user_data)
+ 		return;
  
--Set Quality Report Command
--==========================
-+Set Mesh Receiver Command
-+=========================
+ 	l_info("Terminating");
+-	l_main_quit();
++	mesh_cleanup(true);
++	l_timeout_create(1, kill_to, NULL, NULL);
+ 	terminated = true;
+ }
  
- 	Command Code:		0x0057
- 	Controller Index:	<controller id>
--	Command Parameters:	Quality_Report (1 Octet)
--	Return Parameters:	Current_Settings (4 Octets)
-+	Command Parameters:	Enable (1 Octets)
-+				Window (2 Octets)
-+				Period (2 Octets)
-+				Num AD Types (1 Octets)
-+				AD Types { }
+ static bool parse_io(const char *optarg, enum mesh_io_type *type, void **opts)
+ {
+-	if (strstr(optarg, "generic") == optarg) {
++	if (strstr(optarg, "auto") == optarg) {
++		int *index = l_new(int, 1);
++
++		*type = MESH_IO_TYPE_AUTO;
++		*opts = index;
++
++		optarg += strlen("auto");
++		if (!*optarg) {
++			*index = MGMT_INDEX_NONE;
++			return true;
++		}
++
++		if (*optarg != ':')
++			return false;
++
++		optarg++;
++
++		if (sscanf(optarg, "hci%d", index) == 1)
++			return true;
++
++		if (sscanf(optarg, "%d", index) == 1)
++			return true;
++
++		return false;
++	} else if (strstr(optarg, "generic") == optarg) {
+ 		int *index = l_new(int, 1);
  
--	This command is used to enable and disable the controller's quality
--	report feature. The allowed values for the Quality_Report command
--	parameter are 0x00 and 0x01. All other values will return Invalid
--	Parameters.
-+	This command Enables or Disables Mesh Receiving. When enabled passive
-+	scanning remains enabled for this controller.
-+
-+	The Window/Period values are used to set the Scan Parameters when no
-+	other scanning is being done.
-+
-+	Num AD Types and AD Types parameter, filter Advertising and Scan
-+	responses by AD type. Reponses that do not contain at least one of the
-+	requested AD types will be ignored. Otherwise they will be delivered
-+	with the Mesh Device Found event.
-+
-+	Possible errors:	Failed
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Read Mesh Features Command
-+==========================
-+
-+	Command Code:		0x0058
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Index (2 Octets)
-+				Max Handles (1 Octets)
-+				Used Handles (1 Octets)
-+				Handle { }
+ 		*type = MESH_IO_TYPE_GENERIC;
+@@ -251,7 +282,7 @@ int main(int argc, char *argv[])
+ 	}
  
--	The value 0x00 disables the Quality Report, and the value 0x01
--	enables the Quality Report feature.
-+	This command is used to both verify that Outbound Mesh packet
-+	support is enabled, and to indicate the number of packets that
-+	can and are simultaneously queued.
+ 	if (!io)
+-		io = l_strdup_printf("generic");
++		io = l_strdup_printf("auto");
  
--	This command is only available for the controllers that support
--	either AOSP Bluetooth quality report or Intel telemetry event.
--	It is supported if the supported_settings indicate support for it.
-+	Index identifies the HCI Controller that this information is valid for.
+ 	if (!parse_io(io, &io_type, &io_opts)) {
+ 		l_error("Invalid io: %s", io);
+@@ -295,7 +326,7 @@ done:
+ 	l_free(io);
+ 	l_free(io_opts);
  
--	This command requires to use a valid controller index. Otherwise,
--	an Invalid Index status will be returned.
-+	Max Handles indicates the maximum number of packets that may be queued.
+-	mesh_cleanup();
++	mesh_cleanup(false);
+ 	l_dbus_destroy(dbus);
+ 	l_main_exit();
  
--	The command is sent to the controller to enable/disable the quality
--	report feature, and generates a Command Complete event on success.
--	If the controller failed to execute the action, a Failed status will
--	be returned.
-+	Used Handles indicates the number of packets awaiting transmission.
+diff --git a/mesh/mesh-io-api.h b/mesh/mesh-io-api.h
+index 61f79f224..21c505cd0 100644
+--- a/mesh/mesh-io-api.h
++++ b/mesh/mesh-io-api.h
+@@ -10,8 +10,7 @@
  
--	The quality report state is maintained by the kernel over the adapter
--	power cycle. When the adapter is powered off, the quality report
--	feature is disabled by the kernel. When the adapter is powered on, it
--	is enabled again by the kernel if it was enabled before.
-+	Handle is an array of the currently outstanding packets.
+ struct mesh_io_private;
  
- 	Possible errors:	Failed
--				Invalid Index
-+				No Resources
- 				Invalid Parameters
--				Not Supported
+-typedef bool (*mesh_io_init_t)(struct mesh_io *io, void *opts,
+-				mesh_io_ready_func_t cb, void *user_data);
++typedef bool (*mesh_io_init_t)(struct mesh_io *io, void *opts, void *user_data);
+ typedef bool (*mesh_io_destroy_t)(struct mesh_io *io);
+ typedef bool (*mesh_io_caps_t)(struct mesh_io *io, struct mesh_io_caps *caps);
+ typedef bool (*mesh_io_send_t)(struct mesh_io *io,
+@@ -36,9 +35,13 @@ struct mesh_io_api {
+ };
  
+ struct mesh_io {
+-	enum mesh_io_type		type;
+-	const struct mesh_io_api	*api;
++	int				index;
++	int				favored_index;
++	mesh_io_ready_func_t		ready;
++	struct l_queue			*rx_regs;
+ 	struct mesh_io_private		*pvt;
++	void				*user_data;
++	const struct mesh_io_api	*api;
+ };
  
-+Transmit Mesh Packet Command
-+============================
-+
-+	Command Code:		0x0059
-+	Controller Index:	<controller id>
-+	Command Parameters:	Addr (6 octets)
-+				Addr Type (1 Octets)
-+				Instant (8 Octets)
-+				Delay (2 Octets)
-+				Count (1 Octets)
-+				Data Length (1 Octets)
-+				Data (variable)
-+
-+	Return Parameters:	Handle (1 Octets)
-+
-+	This command sends a Mesh Packet as a NONCONN LE Advertisement.
-+
-+	The Addr + Addr Type parameters specifify the address to use in the
-+	outbound advertising packet. If BD_ADDR_ANY and LE_RANDOM is set, the
-+	kernel will create a single use non-resolvable address.
-+
-+	The Instant parameter is used in combination with the Delay
-+	parameter, to finely time the sending of the Advertising packet. It
-+	should be set to the Instant value tag of a received incoming
-+	Mesh Device Found Event. It is only useful in POLL-RESPONSE situations
-+	where a response must be sent within a negotiated time window. The value
-+	of the Instant parameter should not be interpreted by the host, and
-+	only has meaning to the controller.
-+
-+	The Delay parameter, if 0x0000, will cause the packet to be sent
-+	at the earliest opportunity. If non-Zero, and the controller supports
-+	delayed delivery, the Instant and Delay parameters will be used
-+	to delay the outbound packet. While the Instant is not defined, the
-+	Delay is specified in milliseconds.
-+
-+	The Count parameter must be sent to a non-Zero value indicating the
-+	number of times this packet will be sent before transmission completes.
-+	If the Delay parameter is non-Zero, then Count must be 1 only.
-+
-+	The Data parameter is an octet array of the AD Type and Mesh Packet.
-+
-+	This command will return immediately, and if it succeeds, will generate
-+	a Mesh Packet Transmission Complete event when after the packet has been
-+	sent.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Cancel Transmit Mesh Packet Command
-+===================================
-+
-+	Command Code:		0x005A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Handle (1 Octets)
-+
-+	This command may be used to cancel an outbound transmission request.
-+
-+	The Handle parameter is the returned handle from a successful Transmit
-+	Mesh Packet request. If Zero is specified as the handle, all outstanding
-+	send requests are canceled.
-+
-+	For each mesh packet canceled, the Mesh Packet Transmission Complete
-+	event will be generated, regardless of whether the packet was sent
-+	successfully.
-+
-+	Possible errors:	Failed
-+				Invalid Parameters
-+
- Command Complete Event
- ======================
+ struct mesh_io_table {
+diff --git a/mesh/mesh-io-generic.c b/mesh/mesh-io-generic.c
+index 2d7ef261e..827128ec8 100644
+--- a/mesh/mesh-io-generic.c
++++ b/mesh/mesh-io-generic.c
+@@ -19,6 +19,7 @@
  
-@@ -5022,20 +5109,55 @@ Advertisement Monitor Device Lost Event
- 	This event will be sent to all management sockets.
+ #include "monitor/bt.h"
+ #include "src/shared/hci.h"
++#include "src/shared/mgmt.h"
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
  
+@@ -29,14 +30,12 @@
+ #include "mesh/mesh-io-generic.h"
  
--Quality Report Event
--====================
-+Mesh Device Found Event
-+=======================
+ struct mesh_io_private {
++	struct mesh_io *io;
+ 	struct bt_hci *hci;
+-	void *user_data;
+-	mesh_io_ready_func_t ready_callback;
+ 	struct l_timeout *tx_timeout;
+ 	struct l_queue *rx_regs;
+ 	struct l_queue *tx_pkts;
+ 	struct tx_pkt *tx;
+-	uint16_t index;
+ 	uint16_t interval;
+ 	bool sending;
+ 	bool active;
+@@ -385,16 +384,13 @@ static void hci_init(void *user_data)
+ {
+ 	struct mesh_io *io = user_data;
+ 	bool result = true;
+-	bool restarted = false;
  
- 	Event code:		0x0031
- 	Controller Index:	<controller_id>
--	Event Parameters:	Quality_Spec (1 Octet)
--				Report_Len (2 Octets)
--				Report (0-65535 Octets)
-+	Event Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				RSSI (1 Octet)
-+				Instant (8 Octets)
-+				Flags (4 Octets)
-+				AD_Data_Length (2 Octets)
-+				AD_Data (0-65535 Octets)
+-	if (io->pvt->hci) {
+-		restarted = true;
++	if (io->pvt->hci)
+ 		bt_hci_unref(io->pvt->hci);
+-	}
  
--	This event carries the Bluetooth quality report sent by the
--	controller.
-+	This event indicates that the controller has received an Advertisement
-+	or Scan Result containing an AD Type matching the Mesh scan set.
-+
-+	The address of the sending device is returned, and must be a valid LE
-+	Address_Type.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The RSSI field is a signed octet, and is the RSSI reported by the
-+	receiving controller.
-+
-+	The Instant field is 64 bit value that represents the instant in time
-+	the packet was received. It's value is not intended to be interpretted
-+	by the host, and is only useful if the host wants to make a timed
-+	response to the received packet. (i.e. a Poll/Response)
-+
-+	AD_Length and AD_Data contains the Info structure of Advertising and
-+	Scan rsults. To receive this event, AD filters must be requested with
-+	the Set Mesh Receiver command command, specifying which AD Types to
-+	return. All AD structures will be received in this event if any of the
-+	filtered AD Types are present.
-+
-+	This event will be sent to all management sockets.
-+
-+
-+Mesh Packet Transmit Complete Event
-+===================================
-+
-+	Event code:		0x0032
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Handle (1 Octets)
+-	io->pvt->hci = bt_hci_new_user_channel(io->pvt->index);
++	io->pvt->hci = bt_hci_new_user_channel(io->index);
+ 	if (!io->pvt->hci) {
+-		l_error("Failed to start mesh io (hci %u): %s", io->pvt->index,
++		l_error("Failed to start mesh io (hci %u): %s", io->index,
+ 							strerror(errno));
+ 		result = false;
+ 	}
+@@ -405,47 +401,26 @@ static void hci_init(void *user_data)
+ 		bt_hci_register(io->pvt->hci, BT_HCI_EVT_LE_META_EVENT,
+ 						event_callback, io, NULL);
  
--	Possible values for the Quality_Spec parameter:
--		0	AOSP Bluetooth Quality Report Event
--		1	Intel Telemetry Event
-+	This event indicates that a requested outbound Mesh packet has
-+	completed and no longer occupies a transmit slot.
+-		l_debug("Started mesh on hci %u", io->pvt->index);
++		l_debug("Started mesh on hci %u", io->index);
  
- 	This event will be sent to all management sockets.
+-		if (restarted)
+-			restart_scan(io->pvt);
++		restart_scan(io->pvt);
+ 	}
+ 
+-	if (io->pvt->ready_callback)
+-		io->pvt->ready_callback(io->pvt->user_data, result);
++	if (io->ready)
++		io->ready(io->user_data, result);
+ }
+ 
+-static void read_info(int index, void *user_data)
+-{
+-	struct mesh_io *io = user_data;
+-
+-	if (io->pvt->index != MGMT_INDEX_NONE &&
+-					index != io->pvt->index) {
+-		l_debug("Ignore index %d", index);
+-		return;
+-	}
+-
+-	io->pvt->index = index;
+-	hci_init(io);
+-}
+-
+-static bool dev_init(struct mesh_io *io, void *opts,
+-				mesh_io_ready_func_t cb, void *user_data)
++static bool dev_init(struct mesh_io *io, void *opts, void *user_data)
+ {
+ 	if (!io || io->pvt)
+ 		return false;
+ 
+ 	io->pvt = l_new(struct mesh_io_private, 1);
+-	io->pvt->index = *(int *)opts;
+ 
+ 	io->pvt->rx_regs = l_queue_new();
+ 	io->pvt->tx_pkts = l_queue_new();
+ 
+-	io->pvt->ready_callback = cb;
+-	io->pvt->user_data = user_data;
+-
+-	if (io->pvt->index == MGMT_INDEX_NONE)
+-		return mesh_mgmt_list(read_info, io);
++	io->pvt->io = io;
+ 
+ 	l_idle_oneshot(hci_init, io, NULL);
+ 
+diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
+index bf3f808e4..f4f619803 100644
+--- a/mesh/mesh-io-unit.c
++++ b/mesh/mesh-io-unit.c
+@@ -25,13 +25,13 @@
+ #include "mesh/dbus.h"
+ #include "mesh/mesh-io.h"
+ #include "mesh/mesh-io-api.h"
+-#include "mesh/mesh-io-generic.h"
++#include "mesh/mesh-io-unit.h"
+ 
+ struct mesh_io_private {
++	struct mesh_io *io;
+ 	struct l_io *sio;
+ 	void *user_data;
+ 	char *unique_name;
+-	mesh_io_ready_func_t ready_callback;
+ 	struct l_timeout *tx_timeout;
+ 	struct l_queue *rx_regs;
+ 	struct l_queue *tx_pkts;
+@@ -203,14 +203,13 @@ static void unit_up(void *user_data)
+ 
+ 	l_debug("Started io-unit");
+ 
+-	if (pvt->ready_callback)
+-		pvt->ready_callback(pvt->user_data, true);
++	if (pvt->io && pvt->io->ready)
++		pvt->io->ready(pvt->user_data, true);
+ 
+ 	l_timeout_create_ms(1, get_name, pvt, NULL);
+ }
+ 
+-static bool unit_init(struct mesh_io *io, void *opt,
+-				mesh_io_ready_func_t cb, void *user_data)
++static bool unit_init(struct mesh_io *io, void *opt, void *user_data)
+ {
+ 	struct mesh_io_private *pvt;
+ 	char *sk_path;
+@@ -247,7 +246,7 @@ static bool unit_init(struct mesh_io *io, void *opt,
+ 	pvt->rx_regs = l_queue_new();
+ 	pvt->tx_pkts = l_queue_new();
+ 
+-	pvt->ready_callback = cb;
++	pvt->io = io;
+ 	pvt->user_data = user_data;
+ 
+ 	io->pvt = pvt;
+diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
+index 96891313a..32e6e2521 100644
+--- a/mesh/mesh-io.c
++++ b/mesh/mesh-io.c
+@@ -15,95 +15,160 @@
+ #include <ell/ell.h>
+ 
+ #include "lib/bluetooth.h"
++#include "lib/mgmt.h"
++#include "src/shared/mgmt.h"
+ 
+ #include "mesh/mesh-defs.h"
++#include "mesh/mesh-mgmt.h"
+ #include "mesh/mesh-io.h"
+ #include "mesh/mesh-io-api.h"
+ 
+ /* List of Mesh-IO Type headers */
++#include "mesh/mesh-io-mgmt.h"
+ #include "mesh/mesh-io-generic.h"
+ #include "mesh/mesh-io-unit.h"
+ 
++struct mesh_io_reg {
++	mesh_io_recv_func_t cb;
++	void *user_data;
++	uint8_t len;
++	uint8_t filter[];
++} packed;
++
+ /* List of Supported Mesh-IO Types */
+ static const struct mesh_io_table table[] = {
+-	{MESH_IO_TYPE_GENERIC, &mesh_io_generic},
++	{MESH_IO_TYPE_MGMT,	&mesh_io_mgmt},
++	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic},
+ 	{MESH_IO_TYPE_UNIT_TEST, &mesh_io_unit},
+ };
+ 
+-static struct l_queue *io_list;
++static struct mesh_io *default_io;
+ 
+-static bool match_by_io(const void *a, const void *b)
++static const struct mesh_io_api *io_api(enum mesh_io_type type)
+ {
+-	return a == b;
++	uint16_t i;
++
++	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
++		if (table[i].type == type)
++			return table[i].api;
++	}
++
++	return NULL;
+ }
+ 
+-static bool match_by_type(const void *a, const void *b)
++static void refresh_rx(void *a, void *b)
+ {
+-	const struct mesh_io *io = a;
+-	const enum mesh_io_type type = L_PTR_TO_UINT(b);
++	struct mesh_io_reg *rx_reg = a;
++	struct mesh_io *io = b;
+ 
+-	return io->type == type;
++	if (io->api && io->api->reg)
++		io->api->reg(io, rx_reg->filter, rx_reg->len, rx_reg->cb,
++							rx_reg->user_data);
+ }
+ 
+-struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
+-				mesh_io_ready_func_t cb, void *user_data)
++static void ctl_alert(int index, bool up, bool pwr, bool mesh, void *user_data)
+ {
++	enum mesh_io_type type = L_PTR_TO_UINT(user_data);
+ 	const struct mesh_io_api *api = NULL;
+-	struct mesh_io *io;
+-	uint16_t i;
+ 
+-	for (i = 0; i < L_ARRAY_SIZE(table); i++) {
+-		if (table[i].type == type) {
+-			api = table[i].api;
+-			break;
+-		}
+-	}
+-
+-	io = l_queue_find(io_list, match_by_type, L_UINT_TO_PTR(type));
++	l_warn("up:%d pwr: %d mesh: %d", up, pwr, mesh);
+ 
+-	if (!api || !api->init || io)
+-		return NULL;
++	/* If specific IO controller requested, honor it */
++	if (default_io->favored_index != MGMT_INDEX_NONE &&
++					default_io->favored_index != index)
++		return;
+ 
+-	io = l_new(struct mesh_io, 1);
++	if (!up && default_io->index == index) {
++		/* Our controller has disappeared */
++		if (default_io->api && default_io->api->destroy) {
++			default_io->api->destroy(default_io);
++			default_io->api = NULL;
++		}
+ 
+-	io->type = type;
+-	io->api = api;
++		/* Re-enumerate controllers */
++		mesh_mgmt_list(ctl_alert, user_data);
++		return;
++	}
+ 
+-	if (!api->init(io, opts, cb, user_data))
+-		goto fail;
++	/* If we already have an API, keep using it */
++	if (!up || default_io->api)
++		return;
+ 
+-	if (!io_list)
+-		io_list = l_queue_new();
++	if (mesh && type != MESH_IO_TYPE_GENERIC)
++		api = io_api(MESH_IO_TYPE_MGMT);
+ 
+-	if (l_queue_push_head(io_list, io))
+-		return io;
++	else if (!pwr)
++		api = io_api(MESH_IO_TYPE_GENERIC);
+ 
+-fail:
+-	if (api->destroy)
+-		api->destroy(io);
++	if (api) {
++		default_io->index = index;
++		default_io->api = api;
++		api->init(default_io, &index, default_io->user_data);
+ 
+-	l_free(io);
+-	return NULL;
++		l_queue_foreach(default_io->rx_regs, refresh_rx, default_io);
++	}
+ }
+ 
+-void mesh_io_destroy(struct mesh_io *io)
++static void free_io(struct mesh_io *io)
+ {
+-	io = l_queue_remove_if(io_list, match_by_io, io);
+ 
+ 	if (io && io->api && io->api->destroy)
+ 		io->api->destroy(io);
+ 
++	l_queue_destroy(io->rx_regs, l_free);
++	io->rx_regs = NULL;
+ 	l_free(io);
++	l_warn("Destroy %p", io);
++}
++
++struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
++				mesh_io_ready_func_t cb, void *user_data)
++{
++	const struct mesh_io_api *api = NULL;
+ 
+-	if (l_queue_isempty(io_list)) {
+-		l_queue_destroy(io_list, NULL);
+-		io_list = NULL;
++	/* Only allow one IO */
++	if (default_io)
++		return NULL;
++
++	default_io = l_new(struct mesh_io, 1);
++	default_io->ready = cb;
++	default_io->user_data = user_data;
++	default_io->favored_index = *(int *) opts;
++	default_io->rx_regs = l_queue_new();
++
++	if (type >= MESH_IO_TYPE_AUTO) {
++		if (!mesh_mgmt_list(ctl_alert, L_UINT_TO_PTR(type)))
++			goto fail;
++
++		return default_io;
+ 	}
++
++	api = io_api(type);
++
++	if (!api || !api->init)
++		goto fail;
++
++	default_io->api = api;
++
++	if (!api->init(default_io, &default_io->favored_index, user_data))
++		goto fail;
++
++	return default_io;
++
++fail:
++	free_io(default_io);
++	default_io = NULL;
++	return NULL;
++}
++
++void mesh_io_destroy(struct mesh_io *io)
++{
+ }
+ 
+ bool mesh_io_get_caps(struct mesh_io *io, struct mesh_io_caps *caps)
+ {
+-	io = l_queue_find(io_list, match_by_io, io);
++	if (io != default_io)
++		return false;
+ 
+ 	if (io && io->api && io->api->caps)
+ 		return io->api->caps(io, caps);
+@@ -115,7 +180,17 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
+ 				uint8_t len, mesh_io_recv_func_t cb,
+ 				void *user_data)
+ {
+-	io = l_queue_find(io_list, match_by_io, io);
++	struct mesh_io_reg *rx_reg;
++
++	if (io != default_io)
++		return false;
++
++	rx_reg = l_malloc(sizeof(struct mesh_io_reg) + len);
++	rx_reg->cb = cb;
++	rx_reg->len = len;
++	rx_reg->user_data = user_data;
++	memcpy(rx_reg->filter, filter, len);
++	l_queue_push_head(io->rx_regs, rx_reg);
+ 
+ 	if (io && io->api && io->api->reg)
+ 		return io->api->reg(io, filter, len, cb, user_data);
+@@ -123,10 +198,24 @@ bool mesh_io_register_recv_cb(struct mesh_io *io, const uint8_t *filter,
+ 	return false;
+ }
+ 
++static bool by_filter(const void *a, const void *b)
++{
++	const struct mesh_io_reg *rx_reg = a;
++	const uint8_t *filter = b;
++
++	return rx_reg->filter[0] == filter[0];
++}
++
+ bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
+ 								uint8_t len)
+ {
+-	io = l_queue_find(io_list, match_by_io, io);
++	struct mesh_io_reg *rx_reg;
++
++	if (io != default_io)
++		return false;
++
++	rx_reg = l_queue_remove_if(io->rx_regs, by_filter, filter);
++	l_free(rx_reg);
+ 
+ 	if (io && io->api && io->api->dereg)
+ 		return io->api->dereg(io, filter, len);
+@@ -137,10 +226,11 @@ bool mesh_io_deregister_recv_cb(struct mesh_io *io, const uint8_t *filter,
+ bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
+ 					const uint8_t *data, uint16_t len)
+ {
+-	io = l_queue_find(io_list, match_by_io, io);
++	if (io && io != default_io)
++		return false;
+ 
+ 	if (!io)
+-		io = l_queue_peek_head(io_list);
++		io = default_io;
+ 
+ 	if (io && io->api && io->api->send)
+ 		return io->api->send(io, info, data, len);
+@@ -151,7 +241,11 @@ bool mesh_io_send(struct mesh_io *io, struct mesh_io_send_info *info,
+ bool mesh_io_send_cancel(struct mesh_io *io, const uint8_t *pattern,
+ 								uint8_t len)
+ {
+-	io = l_queue_find(io_list, match_by_io, io);
++	if (io && io != default_io)
++		return false;
++
++	if (!io)
++		io = default_io;
+ 
+ 	if (io && io->api && io->api->cancel)
+ 		return io->api->cancel(io, pattern, len);
+diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
+index 80ef3fa3e..9dd946cdf 100644
+--- a/mesh/mesh-io.h
++++ b/mesh/mesh-io.h
+@@ -14,8 +14,10 @@ struct mesh_io;
+ 
+ enum mesh_io_type {
+ 	MESH_IO_TYPE_NONE = 0,
++	MESH_IO_TYPE_UNIT_TEST,
++	MESH_IO_TYPE_AUTO, /* If MGMT required, add after here */
++	MESH_IO_TYPE_MGMT,
+ 	MESH_IO_TYPE_GENERIC,
+-	MESH_IO_TYPE_UNIT_TEST
+ };
+ 
+ enum mesh_io_timing_type {
+diff --git a/mesh/mesh-mgmt.c b/mesh/mesh-mgmt.c
+index 754093dbc..32254613b 100644
+--- a/mesh/mesh-mgmt.c
++++ b/mesh/mesh-mgmt.c
+@@ -12,35 +12,78 @@
+ #include <config.h>
+ #endif
+ 
++#include <ell/ell.h>
++
+ #include "lib/bluetooth.h"
+ #include "lib/mgmt.h"
+ #include "src/shared/mgmt.h"
+ 
+-#include "ell/queue.h"
+-#include "ell/log.h"
+-#include "ell/util.h"
+-
+ #include "mesh/mesh-mgmt.h"
+ 
+-struct read_info_reg {
+-	mesh_mgmt_read_info_func_t cb;
+-	void *user_data;
++struct mesh_controler {
++	int	index;
++	bool	mesh_support;
++	bool	powered;
+ };
+ 
+-struct read_info_req {
+-	int index;
+-	struct mesh_io *io;
++static mesh_mgmt_read_info_func_t ctl_info;
++static struct mgmt *mgmt_mesh;
++static struct l_queue *ctl_list;
++static void *list_user_data;
++static bool mesh_detected;
++
++static const uint8_t set_exp_feat_param_mesh[] = {
++       0x76, 0x6e, 0xf3, 0xe8, 0x24, 0x5f, 0x05, 0xbf, /* UUID - Mesh */
++       0x8d, 0x4d, 0x03, 0x7a, 0xd7, 0x63, 0xe4, 0x2c,
++       0x01,                                           /* Action - enable */
+ };
+ 
+-static struct mgmt *mgmt_mesh;
+-static struct l_queue *read_info_regs;
++static bool by_index(const void *a, const void *b)
++{
++	const struct mesh_controler *ctl = a;
++	int index = L_PTR_TO_UINT(b);
++
++	return ctl->index == index;
++}
+ 
+-static void process_read_info_req(void *data, void *user_data)
++static void index_removed(uint16_t index, uint16_t length, const void *param,
++							void *user_data);
++static void features_cb(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
+ {
+-	struct read_info_reg *reg = data;
+ 	int index = L_PTR_TO_UINT(user_data);
++	struct mesh_controler *ctl;
++
+ 
+-	reg->cb(index, reg->user_data);
++	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
++	if (!ctl)
++		return;
++
++	l_debug("Status: %d, Length: %d", status, length);
++	if (status != MGMT_STATUS_NOT_SUPPORTED &&
++					status != MGMT_STATUS_UNKNOWN_COMMAND) {
++		ctl->mesh_support = true;
++		if (!mesh_detected) {
++			mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
++					MGMT_INDEX_NONE, index_removed,
++					NULL, NULL);
++		}
++		mesh_detected = true;
++	} else
++		l_debug("Kernel mesh not supported for hci%u", index);
++
++	if (ctl_info)
++		ctl_info(index, true, ctl->powered, ctl->mesh_support,
++							list_user_data);
++}
++
++static void set_exp_mesh_cb(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	int index = L_PTR_TO_UINT(user_data);
++
++	mesh_mgmt_send(MGMT_OP_MESH_READ_FEATURES, index, 0, NULL,
++				features_cb, L_UINT_TO_PTR(index), NULL);
+ }
+ 
+ static void read_info_cb(uint8_t status, uint16_t length,
+@@ -49,12 +92,25 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 	int index = L_PTR_TO_UINT(user_data);
+ 	const struct mgmt_rp_read_info *rp = param;
+ 	uint32_t current_settings, supported_settings;
++	struct mesh_controler *ctl;
+ 
+ 	l_debug("hci %u status 0x%02x", index, status);
+ 
++	ctl = l_queue_find(ctl_list, by_index, L_UINT_TO_PTR(index));
++	if (!ctl)
++		return;
++
+ 	if (status != MGMT_STATUS_SUCCESS) {
++		ctl = l_queue_remove_if(ctl_list, by_index,
++						L_UINT_TO_PTR(index));
+ 		l_error("Failed to read info for hci index %u: %s (0x%02x)",
+ 				index, mgmt_errstr(status), status);
++
++		l_warn("Hci dev %d removal detected", index);
++		if (ctl && ctl_info)
++			ctl_info(index, false, false, false, list_user_data);
++
++		l_free(ctl);
+ 		return;
+ 	}
+ 
+@@ -69,23 +125,36 @@ static void read_info_cb(uint8_t status, uint16_t length,
+ 	l_debug("settings: supp %8.8x curr %8.8x",
+ 					supported_settings, current_settings);
+ 
+-	if (current_settings & MGMT_SETTING_POWERED) {
+-		l_info("Controller hci %u is in use", index);
+-		return;
+-	}
+-
+ 	if (!(supported_settings & MGMT_SETTING_LE)) {
+ 		l_info("Controller hci %u does not support LE", index);
++		l_queue_remove(ctl_list, ctl);
++		l_free(ctl);
+ 		return;
+ 	}
+ 
+-	l_queue_foreach(read_info_regs, process_read_info_req,
+-							L_UINT_TO_PTR(index));
++	if (current_settings & MGMT_SETTING_POWERED)
++		ctl->powered = true;
++
++	mesh_mgmt_send(MGMT_OP_SET_EXP_FEATURE, index,
++			sizeof(set_exp_feat_param_mesh),
++			set_exp_feat_param_mesh,
++			set_exp_mesh_cb, L_UINT_TO_PTR(index), NULL);
+ }
+ 
+ static void index_added(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
++	struct mesh_controler *ctl = l_queue_find(ctl_list, by_index,
++							L_UINT_TO_PTR(index));
++
++	if (!ctl) {
++		ctl = l_new(struct mesh_controler, 1);
++		ctl->index = index;
++		l_queue_push_head(ctl_list, ctl);
++	} else {
++		ctl->mesh_support = ctl->powered = false;
++	}
++
+ 	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
+ 				read_info_cb, L_UINT_TO_PTR(index), NULL);
+ }
+@@ -93,7 +162,9 @@ static void index_added(uint16_t index, uint16_t length, const void *param,
+ static void index_removed(uint16_t index, uint16_t length, const void *param,
+ 							void *user_data)
+ {
+-	l_warn("Hci dev %4.4x removed", index);
++	mgmt_send(mgmt_mesh, MGMT_OP_READ_INFO, index, 0, NULL,
++				read_info_cb, L_UINT_TO_PTR(index), NULL);
++
+ }
+ 
+ static void read_index_list_cb(uint8_t status, uint16_t length,
+@@ -133,8 +204,8 @@ static void read_index_list_cb(uint8_t status, uint16_t length,
+ 
+ static bool mesh_mgmt_init(void)
+ {
+-	if (!read_info_regs)
+-		read_info_regs = l_queue_new();
++	if (!ctl_list)
++		ctl_list = l_queue_new();
+ 
+ 	if (!mgmt_mesh) {
+ 		mgmt_mesh = mgmt_new_default();
+@@ -146,8 +217,6 @@ static bool mesh_mgmt_init(void)
+ 
+ 		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_ADDED,
+ 				MGMT_INDEX_NONE, index_added, NULL, NULL);
+-		mgmt_register(mgmt_mesh, MGMT_EV_INDEX_REMOVED,
+-				MGMT_INDEX_NONE, index_removed, NULL, NULL);
+ 	}
+ 
+ 	return true;
+@@ -155,16 +224,11 @@ static bool mesh_mgmt_init(void)
+ 
+ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
+ {
+-	struct read_info_reg *reg;
+-
+ 	if (!mesh_mgmt_init())
+ 		return false;
+ 
+-	reg = l_new(struct read_info_reg, 1);
+-	reg->cb = cb;
+-	reg->user_data = user_data;
+-
+-	l_queue_push_tail(read_info_regs, reg);
++	ctl_info = cb;
++	list_user_data = user_data;
+ 
+ 	/* Use MGMT to find a candidate controller */
+ 	l_debug("send read index_list");
+@@ -175,3 +239,35 @@ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data)
+ 
+ 	return true;
+ }
++
++void mesh_mgmt_destroy(void)
++{
++	mgmt_unref(mgmt_mesh);
++	mgmt_mesh = NULL;
++	ctl_info = NULL;
++	list_user_data = NULL;
++	l_queue_destroy(ctl_list, l_free);
++	ctl_list = NULL;
++}
++
++unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_send_timeout(mgmt_mesh, opcode, index, length, param,
++					callback, user_data, destroy, 0);
++}
++
++unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
++				mgmt_notify_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy)
++{
++	return mgmt_register(mgmt_mesh, event, index, callback,
++						user_data, destroy);
++}
++
++bool mesh_mgmt_unregister(unsigned int id)
++{
++	return mgmt_unregister(mgmt_mesh, id);
++}
+diff --git a/mesh/mesh-mgmt.h b/mesh/mesh-mgmt.h
+index 90ac14e73..a3cd72faf 100644
+--- a/mesh/mesh-mgmt.h
++++ b/mesh/mesh-mgmt.h
+@@ -9,6 +9,16 @@
+  */
+ #include <stdbool.h>
+ 
+-typedef void (*mesh_mgmt_read_info_func_t)(int index, void *user_data);
++typedef void (*mesh_mgmt_read_info_func_t)(int index, bool added, bool powered,
++						bool mesh, void *user_data);
+ 
+ bool mesh_mgmt_list(mesh_mgmt_read_info_func_t cb, void *user_data);
++unsigned int mesh_mgmt_send(uint16_t opcode, uint16_t index,
++				uint16_t length, const void *param,
++				mgmt_request_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy);
++unsigned int mesh_mgmt_register(uint16_t event, uint16_t index,
++				mgmt_notify_func_t callback,
++				void *user_data, mgmt_destroy_func_t destroy);
++bool mesh_mgmt_unregister(unsigned int id);
++void mesh_mgmt_destroy(void);
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index 62d650328..91cf25175 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -324,11 +324,15 @@ static void free_pending_join_call(bool failed)
+ 	join_pending = NULL;
+ }
+ 
+-void mesh_cleanup(void)
++void mesh_cleanup(bool signaled)
+ {
+ 	struct l_dbus_message *reply;
+ 
+ 	mesh_io_destroy(mesh.io);
++	mesh.io = NULL;
++
++	if (signaled)
++		return;
+ 
+ 	if (join_pending) {
+ 
+diff --git a/mesh/mesh.h b/mesh/mesh.h
+index 0f77ebc58..c30a8d1f0 100644
+--- a/mesh/mesh.h
++++ b/mesh/mesh.h
+@@ -28,7 +28,7 @@ typedef void (*prov_rx_cb_t)(void *user_data, const uint8_t *data,
+ bool mesh_init(const char *config_dir, const char *mesh_conf_fname,
+ 					enum mesh_io_type type, void *opts,
+ 					mesh_ready_func_t cb, void *user_data);
+-void mesh_cleanup(void);
++void mesh_cleanup(bool signaled);
+ bool mesh_dbus_init(struct l_dbus *dbus);
+ 
+ const char *mesh_status_str(uint8_t err);
 -- 
 2.37.3
 
