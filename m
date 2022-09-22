@@ -2,242 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D28C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 21:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1010BECAAD8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Sep 2022 21:38:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229604AbiIVVcL (ORCPT
+        id S231167AbiIVVim (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Sep 2022 17:32:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57038 "EHLO
+        Thu, 22 Sep 2022 17:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229512AbiIVVcK (ORCPT
+        with ESMTP id S229635AbiIVVie (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Sep 2022 17:32:10 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6EB10E5DC
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 14:32:06 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id i15so7807672qvp.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 14:32:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=g/KKyHnTzvYxLj1U367qWuKUtmw/Yix/kSoUDyK7KcY=;
-        b=HRvGqnQKiaohvstGDPmHKCWCDhClT8M5aDsE3Xpf9Bh5XiZwU4IwRyf8Y8NZLE4oRL
-         MeB86m4hykg2tSbNxrGpHqxkT7/3lhDSd+wfBeLRWrbk5mhhvtEGZ1bBP9dmXGmHS184
-         O4Keuu1q3zq+y+6YbM91bstkREjRDZS27Cf006mjtbnrrCfrAjBBUM2wIVyNm3MUFuzX
-         QKc6YgbdsJQrHr26v1OflAGPzHrfGHNDQmnN+haP9KKE5cNlpj/qRXEUhy8Y9cW8xn2r
-         ptkXBnRV57MnqlH36lIFe+rLAiH/7iEcTNBYtP78irTgbPoz5B5BNN6xzRlapJqLA2oh
-         R0sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=g/KKyHnTzvYxLj1U367qWuKUtmw/Yix/kSoUDyK7KcY=;
-        b=LXn4CI/DJIYVMA0KBOIEWW8O98swiyBuvO2144UHsYpdQ+spF7Ipz1kkoG1JXEaAnk
-         kV4WcVPzv3Ol6sM8fpQEGnU3F+f3fBrgXFqUshmujYhd8ahIPfjpo5knfytlu4BhLd4v
-         C6av0qJTbdUfpO5pasQFRj2ONAXZHzjhGhnQt3Nq0/uxtUU0Xi+Dqx6rvpBQOCjJaKEU
-         4IAnG81Uq7XeqB6IevNUTrbzNmAAg6KNELPChHch0d8LXhI2F+ZQLoPfzQFT5QhRc6rE
-         kRSnvZ/Z4yplH3bvosob+8muirz7w1J8gYuIUwPdYmzwJbITR5LzE4jsb8pjBvhV8hPD
-         OWOQ==
-X-Gm-Message-State: ACrzQf2h3UWSjbJTUr8/wdtDd1XyN94/qQT2/UJd00k4PD6ulMPJWVJC
-        980AJqmabkZaVCk9rqERxvbrlV7BDdO8Lw==
-X-Google-Smtp-Source: AMsMyM71dPaFRuhoIMuAf+qdGWN4+ML/wkM7pepdjyKrQaPSqDdyiB19Nt9rXbcO1rdOfZ3xM9k94A==
-X-Received: by 2002:a05:6214:27e4:b0:4ac:a631:f551 with SMTP id jt4-20020a05621427e400b004aca631f551mr4367963qvb.12.1663882325302;
-        Thu, 22 Sep 2022 14:32:05 -0700 (PDT)
-Received: from [172.17.0.2] ([40.87.70.125])
-        by smtp.gmail.com with ESMTPSA id x7-20020a05620a098700b006bc56c063fcsm4317328qkx.62.2022.09.22.14.32.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 14:32:04 -0700 (PDT)
-Message-ID: <632cd454.050a0220.f27c3.0ec3@mx.google.com>
-Date:   Thu, 22 Sep 2022 14:32:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4357343765384346108=="
+        Thu, 22 Sep 2022 17:38:34 -0400
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0D7110251A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 14:38:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1663882713; x=1695418713;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ok1lcbu9fsT5h2DP2GDafj5x/VKi69vP91yY3jP7KmI=;
+  b=kGeZkUqDDSRnnt8ox93duuL1fbQiJXqvmm8sZjusL/VibGYi7mGok0YG
+   Dconyes6GYhZwcNLULsZMqjslnLfL8dY16Fhbug5Amu9qoQwhq9tlJLl6
+   iZP1Lo+c+0QLsJe/76E9NLeOwFIr/8+13CWz/8VXpXgkdxXw2it1GkNlx
+   WLlmDlsX3TR772qKXsx1qPNhkc2MOrZG5H2uKgWZrxtiwsFtQY+WT3sjV
+   IyP80+MWL2FxFRh3NB9+3hRNHLAx0ZFj5MMxouDCQpxOSUWJKdFRErm4T
+   vuA1WXdWduE8A/iZbWNjmOWGnfJ4DUIFwSHxEjgujocw/olmpCqzGYxd0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10478"; a="364450477"
+X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
+   d="scan'208";a="364450477"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 14:38:33 -0700
+X-IronPort-AV: E=Sophos;i="5.93,337,1654585200"; 
+   d="scan'208";a="571141900"
+Received: from avarhadk-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.213.161.147])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2022 14:38:32 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, inga.stotland@intel.com
+Subject: [PATCH BlueZ v2 0/2] Mesh demon switched to using kernel Mesh MGMT
+Date:   Thu, 22 Sep 2022 14:38:20 -0700
+Message-Id: <20220922213822.600692-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: Mesh demon switched to using kernel Mesh MGMT
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220922203852.494315-2-brian.gix@intel.com>
-References: <20220922203852.494315-2-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4357343765384346108==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+This patchset enables the mesh daemon (bluetooth-meshd) to use the new
+MGMT mesh opcodes and events to send and receive Mesh packets. By
+default, the daemon attempts to enable the experimental mesh
+functionality, and query the kernel for active mesh support before then
+enumerating the available controllers and selecting ojne that works.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9Njc5NjAxCgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgNi4xMyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAzLjk5IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDI3LjY1IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuODYgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOS4w
-MSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMTEuMDAg
-c2Vjb25kcwpNYWtlIENoZWNrICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTEzNi45NSBz
-ZWNvbmRzCk1ha2UgQ2hlY2sgdy9WYWxncmluZCAgICAgICAgIEZBSUwgICAgICA4NS42NiBzZWNv
-bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMS42MiBzZWNvbmRz
-CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA4Ljk4IHNlY29uZHMKQnVp
-bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDM5LjgzIHNlY29uZHMKSW5jcmVt
-ZW50YWwgQnVpbGQgdy8gcGF0Y2hlcyAgRkFJTCAgICAgIDM1NC41OCBzZWNvbmRzClNjYW4gQnVp
-bGQgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA2MzMuMTAgc2Vjb25kcwoKRGV0YWlscwoj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZBSUwKRGVz
-YzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0IHdpdGggcnVsZSBpbiAuY2hlY2twYXRjaC5jb25m
-Ck91dHB1dDoKW0JsdWVaLDEvNF0gbWdtdDogQWRkIHN1cHBvcnQgZm9yIE1lc2ggaW4gdGhlIGtl
-cm5lbApXQVJOSU5HOlJFUEVBVEVEX1dPUkQ6IFBvc3NpYmxlIHJlcGVhdGVkIHdvcmQ6ICdjb21t
-YW5kJwojMjgyOiBGSUxFOiBkb2MvbWdtdC1hcGkudHh0OjUxNDY6CisJdGhlIFNldCBNZXNoIFJl
-Y2VpdmVyIGNvbW1hbmQgY29tbWFuZCwgc3BlY2lmeWluZyB3aGljaCBBRCBUeXBlcyB0bwoKL2dp
-dGh1Yi93b3Jrc3BhY2Uvc3JjLzEyOTg1Nzg5LnBhdGNoIHRvdGFsOiAwIGVycm9ycywgMSB3YXJu
-aW5ncywgMjIyIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBk
-ZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252
-ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgov
-Z2l0aHViL3dvcmtzcGFjZS9zcmMvMTI5ODU3ODkucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FH
-RSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJ
-R05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5G
-X1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZl
-cywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCltCbHVlWiwzLzRdIG1lc2g6IEltcHJvdmUgUEItQURWIHRp
-bWluZyBmb3IgcmVsaWFiaWxpdHkKV0FSTklORzpUWVBPX1NQRUxMSU5HOiAnZGVwZW5kYW50JyBt
-YXkgYmUgbWlzc3BlbGxlZCAtIHBlcmhhcHMgJ2RlcGVuZGVudCc/CiM2NjogCkJlY2F1c2UgcHJv
-dmlzaW9uaW5nIGlzIG5vdCBzcGVlZCBkZXBlbmRhbnQsIFRpbWluZyBvbiBvdXRib3VuZCBQQi1B
-RFYKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIF5eXl5eXl5eXgoKL2dpdGh1Yi93
-b3Jrc3BhY2Uvc3JjLzEyOTg1Nzg4LnBhdGNoIHRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywg
-MzMgbGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMs
-IGNoZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8g
-dGhlIHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCi9naXRodWIv
-d29ya3NwYWNlL3NyYy8xMjk4NTc4OC5wYXRjaCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBM
-RVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYg
-UFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NU
-UlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVh
-c2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGlu
-IE1BSU5UQUlORVJTLgoKW0JsdWVaLDQvNF0gbWVzaDogQWRkIG5ldyBrZXJuZWwgTUdNVCBiYXNl
-ZCBJTyB0cmFuc3BvcnQKV0FSTklORzpMRUFESU5HX1NQQUNFOiBwbGVhc2UsIG5vIHNwYWNlcyBh
-dCB0aGUgc3RhcnQgb2YgYSBsaW5lCiM2OTg6IEZJTEU6IG1lc2gvbWVzaC1tZ210LmM6MzY6Cisg
-ICAgICAgMHg3NiwgMHg2ZSwgMHhmMywgMHhlOCwgMHgyNCwgMHg1ZiwgMHgwNSwgMHhiZiwgLyog
-VVVJRCAtIE1lc2ggKi8kCgpXQVJOSU5HOkxFQURJTkdfU1BBQ0U6IHBsZWFzZSwgbm8gc3BhY2Vz
-IGF0IHRoZSBzdGFydCBvZiBhIGxpbmUKIzY5OTogRklMRTogbWVzaC9tZXNoLW1nbXQuYzozNzoK
-KyAgICAgICAweDhkLCAweDRkLCAweDAzLCAweDdhLCAweGQ3LCAweDYzLCAweGU0LCAweDJjLCQK
-CldBUk5JTkc6TEVBRElOR19TUEFDRTogcGxlYXNlLCBubyBzcGFjZXMgYXQgdGhlIHN0YXJ0IG9m
-IGEgbGluZQojNzAwOiBGSUxFOiBtZXNoL21lc2gtbWdtdC5jOjM4OgorICAgICAgIDB4MDEsICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC8qIEFjdGlvbiAtIGVuYWJs
-ZSAqLyQKCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjk4NTc5MC5wYXRjaCB0b3RhbDogMCBlcnJv
-cnMsIDMgd2FybmluZ3MsIDgwNiBsaW5lcyBjaGVja2VkCgpOT1RFOiBGb3Igc29tZSBvZiB0aGUg
-cmVwb3J0ZWQgZGVmZWN0cywgY2hlY2twYXRjaCBtYXkgYmUgYWJsZSB0bwogICAgICBtZWNoYW5p
-Y2FsbHkgY29udmVydCB0byB0aGUgdHlwaWNhbCBzdHlsZSB1c2luZyAtLWZpeCBvciAtLWZpeC1p
-bnBsYWNlLgoKL2dpdGh1Yi93b3Jrc3BhY2Uvc3JjLzEyOTg1NzkwLnBhdGNoIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4KCk5PVEU6IElnbm9yZWQgbWVzc2FnZSB0eXBlczogQ09N
-TUlUX01FU1NBR0UgQ09NUExFWF9NQUNSTyBDT05TVF9TVFJVQ1QgRklMRV9QQVRIX0NIQU5HRVMg
-TUlTU0lOR19TSUdOX09GRiBQUkVGRVJfUEFDS0VEIFNQRFhfTElDRU5TRV9UQUcgU1BMSVRfU1RS
-SU5HIFNTQ0FORl9UT19LU1RSVE8KCk5PVEU6IElmIGFueSBvZiB0aGUgZXJyb3JzIGFyZSBmYWxz
-ZSBwb3NpdGl2ZXMsIHBsZWFzZSByZXBvcnQKICAgICAgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwg
-c2VlIENIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVaIHNv
-dXJjZSB0cmVlCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFp
-buKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjQ3MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2lu
-ZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPi
-gJksIHJldHJ5aW5nIHdpdGhvdXQKMTI0NzAgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJn
-dltdKQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBlcnJvcjog
-bWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyNyB8ICNp
-bmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+fn5+fn5+
-fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01ha2VmaWxl
-Ojc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZvciB1
-bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDQ1MTogYWxsXSBFcnJvciAy
-CgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgLSBGQUlM
-CkRlc2M6IFJ1biAnbWFrZSBjaGVjaycKT3V0cHV0Ogp1bml0L3Rlc3QtYXZkdHAuYzogSW4gZnVu
-Y3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2ZHRwLmM6NzY2OjU6IG5vdGU6IHZhcmlhYmxl
-IHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3Np
-Z25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDc2NiB8IGludCBtYWluKGludCBhcmdjLCBj
-aGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2cmNwLmM6IEluIGZ1bmN0
-aW9uIOKAmG1haW7igJk6CnVuaXQvdGVzdC1hdnJjcC5jOjk4OTo1OiBub3RlOiB2YXJpYWJsZSB0
-cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdu
-bWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKICA5ODkgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hh
-ciAqYXJndltdKQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBl
-cnJvcjogbWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAy
-NyB8ICNpbmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01h
-a2VmaWxlOjc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6
-MTE1ODg6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRl
-c3Q6IE1ha2UgQ2hlY2sgdy9WYWxncmluZCAtIEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJyB3
-aXRoIFZhbGdyaW5kCk91dHB1dDoKdG9vbHMvbWdtdC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCY
-bWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjQ3MDo1OiBub3RlOiB2YXJpYWJsZSB0cmFj
-a2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVu
-dHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTI0NzAgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAq
-YXJndltdKQogICAgICB8ICAgICBefn5+Cm1lc2gvbWVzaC1pby5jOjI3OjEwOiBmYXRhbCBlcnJv
-cjogbWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9yIGRpcmVjdG9yeQogICAyNyB8
-ICNpbmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8ICAgICAgICAgIF5+fn5+fn5+
-fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgptYWtlWzFdOiAqKiogW01ha2Vm
-aWxlOjc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBXYWl0aW5nIGZv
-ciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDQ1MTogYWxsXSBFcnJv
-ciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgRGlzdGNoZWNr
-IC0gRkFJTApEZXNjOiBSdW4gZGlzdGNoZWNrIHRvIGNoZWNrIHRoZSBkaXN0cmlidXRpb24KT3V0
-cHV0OgptYWtlWzJdOiAqKiogTm8gcnVsZSB0byBtYWtlIHRhcmdldCAnbWVzaC9tZXNoLWlvLW1n
-bXQuaCcsIG5lZWRlZCBieSAnZGlzdGRpci1hbScuICBTdG9wLgptYWtlWzFdOiAqKiogW01ha2Vm
-aWxlOjExNDIxOiBkaXN0ZGlyXSBFcnJvciAyCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTE0OTc6IGRp
-c3RdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQg
-dy9leHQgRUxMIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgQmx1ZVogc291cmNlIHdpdGggJy0t
-ZW5hYmxlLWV4dGVybmFsLWVsbCcgY29uZmlndXJhdGlvbgpPdXRwdXQ6Cm1lc2gvbWVzaC1pby5j
-OjI3OjEwOiBmYXRhbCBlcnJvcjogbWVzaC9tZXNoLWlvLW1nbXQuaDogTm8gc3VjaCBmaWxlIG9y
-IGRpcmVjdG9yeQogICAyNyB8ICNpbmNsdWRlICJtZXNoL21lc2gtaW8tbWdtdC5oIgogICAgICB8
-ICAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjb21waWxhdGlvbiB0ZXJtaW5hdGVkLgpt
-YWtlWzFdOiAqKiogW01ha2VmaWxlOjc0OTE6IG1lc2gvbWVzaC1pby5vXSBFcnJvciAxCm1ha2Vb
-MV06ICoqKiBXYWl0aW5nIGZvciB1bmZpbmlzaGVkIGpvYnMuLi4uCm1ha2U6ICoqKiBbTWFrZWZp
-bGU6NDQ1MTogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRl
-c3Q6IEluY3JlbWVudGFsIEJ1aWxkIHcvIHBhdGNoZXMgLSBGQUlMCkRlc2M6IEluY3JlbWVudGFs
-IGJ1aWxkIHBlciBwYXRjaCBpbiB0aGUgc2VyaWVzCk91dHB1dDoKbWVzaC9tZXNoLWlvLmM6Mjc6
-MTA6IGZhdGFsIGVycm9yOiBtZXNoL21lc2gtaW8tbWdtdC5oOiBObyBzdWNoIGZpbGUgb3IgZGly
-ZWN0b3J5CiAgIDI3IHwgI2luY2x1ZGUgIm1lc2gvbWVzaC1pby1tZ210LmgiCiAgICAgIHwgICAg
-ICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCm1ha2Vb
-MV06ICoqKiBbTWFrZWZpbGU6NzQ5MTogbWVzaC9tZXNoLWlvLm9dIEVycm9yIDEKbWFrZVsxXTog
-KioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4uLi4KbWFrZTogKioqIFtNYWtlZmlsZTo0
-NDUxOiBhbGxdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDog
-U2NhbiBCdWlsZCAtIEZBSUwKRGVzYzogUnVuIFNjYW4gQnVpbGQgd2l0aCBwYXRjaGVzCk91dHB1
-dDoKdG9vbHMvYnRwY2xpZW50LmM6MjQ5NDozOiB3YXJuaW5nOiBWYWx1ZSBzdG9yZWQgdG8gJ3Jl
-cGx5JyBpcyBuZXZlciByZWFkCiAgICAgICAgICAgICAgICByZXBseSA9IGxfZGJ1c19tZXNzYWdl
-X25ld19lcnJvcihhZy5wZW5kaW5nX3JlcSwKICAgICAgICAgICAgICAgIF4gICAgICAgfn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgoxIHdhcm5pbmcgZ2VuZXJhdGVkLgpJ
-biBmaWxlIGluY2x1ZGVkIGZyb20gdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6MjA6CkluIGZpbGUg
-aW5jbHVkZWQgZnJvbSAuL21lc2gvY3J5cHRvLmM6MTg6CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAu
-L2VsbC9lbGwuaDoxOgouL2VsbC91dGlsLmg6MTg3Ojk6IHdhcm5pbmc6IDFzdCBmdW5jdGlvbiBj
-YWxsIGFyZ3VtZW50IGlzIGFuIHVuaW5pdGlhbGl6ZWQgdmFsdWUKICAgICAgICByZXR1cm4gTF9C
-RTMyX1RPX0NQVShMX0dFVF9VTkFMSUdORUQoKGNvbnN0IHVpbnQzMl90ICopIHB0cikpOwogICAg
-ICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn4KLi9lbGwvdXRpbC5oOjg5OjI4OiBub3RlOiBleHBhbmRlZCBmcm9tIG1hY3JvICdM
-X0JFMzJfVE9fQ1BVJwojZGVmaW5lIExfQkUzMl9UT19DUFUodmFsKSBic3dhcF8zMih2YWwpCiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIF5+fn5+fn5+fn5+fn4KL3Vzci9pbmNsdWRlL2J5dGVz
-d2FwLmg6MzQ6MjE6IG5vdGU6IGV4cGFuZGVkIGZyb20gbWFjcm8gJ2Jzd2FwXzMyJwojZGVmaW5l
-IGJzd2FwXzMyKHgpIF9fYnN3YXBfMzIgKHgpCiAgICAgICAgICAgICAgICAgICAgXn5+fn5+fn5+
-fn5+fn4KdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6OTY1OjExOiB3YXJuaW5nOiBUaGUgbGVmdCBl
-eHByZXNzaW9uIG9mIHRoZSBjb21wb3VuZCBhc3NpZ25tZW50IGlzIGFuIHVuaW5pdGlhbGl6ZWQg
-dmFsdWUuIFRoZSBjb21wdXRlZCB2YWx1ZSB3aWxsIGFsc28gYmUgZ2FyYmFnZQogICAgICAgICAg
-ICAgICAga2V5X2FpZCB8PSBLRVlfSURfQUtGOwogICAgICAgICAgICAgICAgfn5+fn5+fiBeCnVu
-aXQvdGVzdC1tZXNoLWNyeXB0by5jOjEwMDg6Mjogd2FybmluZzogNHRoIGZ1bmN0aW9uIGNhbGwg
-YXJndW1lbnQgaXMgYW4gdW5pbml0aWFsaXplZCB2YWx1ZQogICAgICAgIHZlcmlmeV91aW50OCgi
-TklEIiwgMCwga2V5cy0+bmV0X25pZCwgbmlkKTsKICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KdW5pdC90ZXN0LW1lc2gtY3J5cHRvLmM6MTI4OTo2OiB3
-YXJuaW5nOiBCcmFuY2ggY29uZGl0aW9uIGV2YWx1YXRlcyB0byBhIGdhcmJhZ2UgdmFsdWUKICAg
-ICAgICBpZiAoY3RsKSB7CiAgICAgICAgICAgIF5+fgp1bml0L3Rlc3QtbWVzaC1jcnlwdG8uYzox
-NTA5Ojc6IHdhcm5pbmc6IEJyYW5jaCBjb25kaXRpb24gZXZhbHVhdGVzIHRvIGEgZ2FyYmFnZSB2
-YWx1ZQogICAgICAgICAgICAgICAgaWYgKG5ldF9jdGwpIHsKICAgICAgICAgICAgICAgICAgICBe
-fn5+fn5+CnVuaXQvdGVzdC1tZXNoLWNyeXB0by5jOjE3NjM6Mjogd2FybmluZzogMXN0IGZ1bmN0
-aW9uIGNhbGwgYXJndW1lbnQgaXMgYW4gdW5pbml0aWFsaXplZCB2YWx1ZQogICAgICAgIGxfcHV0
-X2JlNjQoY21hY190bXAsIGNtYWMpOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-CjYgd2FybmluZ3MgZ2VuZXJhdGVkLgpzcmMvYWR2ZXJ0aXNpbmcuYzo4OTg6Mjogd2FybmluZzog
-TnVsbCBwb2ludGVyIHBhc3NlZCB0byAybmQgcGFyYW1ldGVyIGV4cGVjdGluZyAnbm9ubnVsbCcK
-ICAgICAgICBtZW1jcHkoY3AtPmRhdGEgKyBhZHZfZGF0YV9sZW4sIHNjYW5fcnNwLCBzY2FuX3Jz
-cF9sZW4pOwogICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KMSB3YXJuaW5nIGdlbmVyYXRlZC4KbWVzaC9tZXNoLWlvLmM6Mjc6MTA6
-IGZhdGFsIGVycm9yOiBtZXNoL21lc2gtaW8tbWdtdC5oOiBObyBzdWNoIGZpbGUgb3IgZGlyZWN0
-b3J5CiAgIDI3IHwgI2luY2x1ZGUgIm1lc2gvbWVzaC1pby1tZ210LmgiCiAgICAgIHwgICAgICAg
-ICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNvbXBpbGF0aW9uIHRlcm1pbmF0ZWQuCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6NzQ5MTogbWVzaC9tZXNoLWlvLm9dIEVycm9yIDEKbWFrZTogKioqIFtN
-YWtlZmlsZTo0NDUxOiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9v
-dGgKCg==
+If no kernel support is found, it will continue to use a raw HCI socket
+for mesh support.
 
---===============4357343765384346108==--
+v2: Fix whitespace and spelling
+
+Brian Gix (2):
+  mesh: Improve PB-ADV timing for reliability
+  mesh: Add new kernel MGMT based IO transport
+
+ Makefile.mesh          |   9 +-
+ mesh/main.c            |  39 ++++++++-
+ mesh/mesh-io-api.h     |  11 ++-
+ mesh/mesh-io-generic.c |  47 +++--------
+ mesh/mesh-io-unit.c    |  13 ++-
+ mesh/mesh-io.c         | 188 ++++++++++++++++++++++++++++++-----------
+ mesh/mesh-io.h         |   4 +-
+ mesh/mesh-mgmt.c       | 164 +++++++++++++++++++++++++++--------
+ mesh/mesh-mgmt.h       |  12 ++-
+ mesh/mesh.c            |   6 +-
+ mesh/mesh.h            |   2 +-
+ mesh/pb-adv.c          |   9 +-
+ 12 files changed, 360 insertions(+), 144 deletions(-)
+
+-- 
+2.37.3
+
