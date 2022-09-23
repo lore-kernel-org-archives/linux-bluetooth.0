@@ -2,163 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31898ECAAD8
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Sep 2022 06:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3F8C6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Sep 2022 10:25:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbiIWGqu (ORCPT
+        id S229512AbiIWKY6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Sep 2022 02:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49834 "EHLO
+        Fri, 23 Sep 2022 06:24:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229995AbiIWGqp (ORCPT
+        with ESMTP id S229436AbiIWKYm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Sep 2022 02:46:45 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22A612872E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 23:46:43 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id ay9so7908839qtb.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Sep 2022 23:46:43 -0700 (PDT)
+        Fri, 23 Sep 2022 06:24:42 -0400
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2108.outbound.protection.outlook.com [40.107.105.108])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8383193E2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Sep 2022 03:24:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UsWE2lk9oUaD4NsL1RsruyKCXKbtwvj4v7r2Fls1ZKwEpj84/GXM5dX4YKBdO/YXGD4upLwbD+XF4oK5dv7ylpejIicNpt0h5JOxiM5v9+/JjcvqqFoqKvRVlEicYxW9Ro481pWPWI9u4nYR6oScegOEPWfZX/ldfd4onS0vIRB6kBp2W+iKIiSe5GMySwJpcUhEMU1qd0ZkftcCLUUZmbCk/WEp1gEPrczSRw9NHBeQR9UVHlHcDLJXe1/c95T9P+WIUOgcA9nBVjEeDtOgMvDnw9Q8sAQXsql86K/B1V59yMyWPiFh+bWzsIe65y1LTcq/81fs8PJ50PSFkjhb+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LjltFy7Pf+umznXX/J22+PumsEM8NMnVudQlpc0d9q4=;
+ b=NmG8SEj8g5lLvMd3iFRKsoC0HlGG+TdKkrPMfQAFpCDuTaV9h3jnSWD5DM5q32HcnFSPYpI3GYz5SroMcjyIQLO9yhbbRSNI65u48lvI0WOEb04sScHYCFRlqseVfgehpA1xOzNb06iKcksQWtiPlCnMmI5npv2aYrFuSvHxWMUOGvxLqBJTRPR3qANCI9jLt578J4v/qJ1E3+Iq//2OHnsQzK8x2I7dacC65giKFOwh6Cr1/rF1YLKE/e39cPfgGMzxPRCoFpPXccheRxu4eP3nBnU1CKcPHjl7ulWFNj/tlEoMVP34eQx9c1sLmZqdZqGz4cbiZOe/EtCN3L1rOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=none action=none header.from=arri.de; dkim=none (message not signed);
+ arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=S7TgDxeJ4PFaSYX7HSn4tFOgB52lJgCxGYUS1dJKkKI=;
-        b=geChas31PCMknpjsJ5Wslck2yOwuPUT6sNDSKlNFYfjBms287rrLOjbWhx94NqGPEQ
-         /hW+Pf14aWefMoKYJhPKw4r+AAw010q096TDwTu5FvohNhEYe7DWdAb1hOPgYnNud0Mi
-         jpF/gBSYiEN4rsVR8wKHLWkv3YrDcgOZlBJ4vn3x0xXjdMfWpOH2e8oyFf7waPuHx6K+
-         IrSYP2qNzBB+xyg/YdPqrhaIoUZMcjAo/HK79ehivggIid1zDobAwkjYQ+xOzCoOE/p+
-         9IZZnDYXoeGJq7Dnr/UmUggqoCGHb4Ki4BsuMvo0FJucCj4gw3L4yU6mm/8cWAA42MTD
-         1Rnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=S7TgDxeJ4PFaSYX7HSn4tFOgB52lJgCxGYUS1dJKkKI=;
-        b=cmNqgVwEpFKs1Hu1pVK6dbFJrdcPHY43iyJ3TtUAq0dnXQFIoQZBb7KAndW9BVIWx0
-         g2hLfhrbkM7MxqvwVwxkUJLhgdtRXhf09Gu2Gyqw3fbhloef4Qc64eZzqRIOSrYlGTeK
-         p7GVV2WIipFbUqXWlnWEVae6XI2QjhTSRL2rLRBm+SdwaAVwA22zHd1ONQ8BQQYJ+xZv
-         hs5/8luAZzT/bUwouLQ698VbrA1YuEctTjeVrkmHgeTHHQJ11tiOMqsYeFlrsg69x+2v
-         HPUcxlc2/KAfYdTJmtGhB5F4T1kPOJtowsZaKpuuzinr61GW+nZaloO9yxk1O/QkXQUt
-         FcuQ==
-X-Gm-Message-State: ACrzQf1dG5vbubRI/yJxgfDgpfnv+TLNDQlLiJayl3yvTtCdChtfUDkO
-        6kBZXsbGorrYaj1YWGiuIi3N5wyQZkk=
-X-Google-Smtp-Source: AMsMyM5Hsch8PJz+oAhEx79AhPQ2/9iAVDgF4z6W0J8h7AvB18DdXYUc2dNz9mw8T28mvppM4I2wsA==
-X-Received: by 2002:a05:622a:149:b0:35d:287:8a3e with SMTP id v9-20020a05622a014900b0035d02878a3emr5899570qtw.641.1663915602759;
-        Thu, 22 Sep 2022 23:46:42 -0700 (PDT)
-Received: from [172.17.0.2] ([20.120.18.148])
-        by smtp.gmail.com with ESMTPSA id i10-20020ac8764a000000b0035badb499c7sm5225575qtr.21.2022.09.22.23.46.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Sep 2022 23:46:42 -0700 (PDT)
-Message-ID: <632d5652.c80a0220.3482c.3bac@mx.google.com>
-Date:   Thu, 22 Sep 2022 23:46:42 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============9169417009614600795=="
+ d=arrigroup.onmicrosoft.com; s=selector1-arrigroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LjltFy7Pf+umznXX/J22+PumsEM8NMnVudQlpc0d9q4=;
+ b=GrNb3g1g9n/Z/0lls1FuVv9hg2oFjK8O2fJcrg9GPO6HpGlKxXKi8quTykPlYJuExPjnJBmqLpSDxZjhfJR+oVTib4qD040xRARg2JRJXH+YWpy9QmtfztZZOhe7np8tsqKuk/24yaeE4pTw3HNB7I9blwHGicZnbcntnPemfcI=
+Received: from DB9PR06CA0018.eurprd06.prod.outlook.com (2603:10a6:10:1db::23)
+ by AM9PR07MB7234.eurprd07.prod.outlook.com (2603:10a6:20b:2c7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.9; Fri, 23 Sep
+ 2022 10:24:36 +0000
+Received: from DB5EUR02FT021.eop-EUR02.prod.protection.outlook.com
+ (2603:10a6:10:1db:cafe::2f) by DB9PR06CA0018.outlook.office365.com
+ (2603:10a6:10:1db::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5654.20 via Frontend
+ Transport; Fri, 23 Sep 2022 10:24:36 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ DB5EUR02FT021.mail.protection.outlook.com (10.13.58.64) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5654.14 via Frontend Transport; Fri, 23 Sep 2022 10:24:34 +0000
+Received: from N95HX1G2.arri.de (192.168.54.71) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 23 Sep
+ 2022 12:24:34 +0200
+From:   Christian Eggers <ceggers@arri.de>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Christian Eggers <ceggers@arri.de>
+Subject: [PATCH BlueZ 0/9] properties_changed: check for NULL iterator
+Date:   Fri, 23 Sep 2022 12:24:12 +0200
+Message-ID: <20220923102421.10336-1-ceggers@arri.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: [v6,1/3] Bluetooth: Add support for hci devcoredump
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220922221037.v6.1.I44a65858f594107d3688087dfbdf669fac450b52@changeid>
-References: <20220922221037.v6.1.I44a65858f594107d3688087dfbdf669fac450b52@changeid>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [192.168.54.71]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB5EUR02FT021:EE_|AM9PR07MB7234:EE_
+X-MS-Office365-Filtering-Correlation-Id: 787a2f0f-9ec7-4490-81e3-08da9d4dcfc6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TEn/oUjIF5Viyp1XtwLm013nDkkZReOWeSmFhd8gGPXhaGz6rgKupaF06H36m93xWr1jOEEIT0mXZ9DJEWEN+It1sCCodcbhxzZAuvr2v9QVfio29GPW3c6UQ74zM/wEEUxQPuOarNn02j1S9n2O3RFzzncSJiD0Pr+ArhObJ1UBvX+vMkEeQ7w/Vp1bPgvK5uvnA4tjWIhrqW5l8PPNTxeVMdFdLuqn2RsFhFoTW4OQE8+y98U3UVJHs2A78hL7VjYlV8e4Q9x1NHeEITpgomCnL0FkH8D4t3gvKKlDDgvMzgO4UloGKuMDIZnq+w10/TceuOAkdsSGeFSrKgVdyGLX1ZhiXKEeeaRfbN/21+gPsmJcF4kcpY3hZcfwlzDutiG3DLAJ5fqs8Ijd1FwlzqyHKsq+AAPy+50BFeoaL1QV5hDzO103VgSFHtcZTbbkgFO2L/Vq96bde8YylTPUq6wDHARjpgxoMzgDlsQQiSzY6CeZ9Ap6OGjpWvx/m2Q72JAj/qTPX6YIBMJvPf8uBR/d0cexA6/EYJkRu/ySMHWo/i/21h5QR5JZlz1fpIMjdDZHIdtkpf0lV1sNHCn2Dcc2+rGOoW+8u/c+YtW5MFjHksljrSZj/KsQY8lvyipGEgdyYb6NGJk2VsNEbV+RN9ysjvWz1hE+vFdm+ji9nW2547FeQ9vbfRmc+kb+STUpJ8Mgmoj1f9s6CnCHUwsfoyuu1UWBmqQDX5ENyaDHyCEnN/PkPt84/YibFQ4Mo/qcLhrHP2dcDCwzoF6AcTDBhw==
+X-Forefront-Antispam-Report: CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199015)(46966006)(36840700001)(336012)(426003)(316002)(5660300002)(1076003)(16526019)(8936002)(7696005)(186003)(70586007)(83380400001)(81166007)(2616005)(41300700001)(478600001)(36756003)(2906002)(47076005)(82740400003)(86362001)(36860700001)(6666004)(107886003)(8676002)(4326008)(356005)(40480700001)(6916009)(26005)(82310400005)(70206006)(36900700001);DIR:OUT;SFP:1102;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2022 10:24:34.9501
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 787a2f0f-9ec7-4490-81e3-08da9d4dcfc6
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: DB5EUR02FT021.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR07MB7234
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============9169417009614600795==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The org.freedesktop.DBus.Properties.PropertiesChanged signal allows
+sending "invalidated_properties" (only property names without values).
+In this case the property_changed callbacks are called with NULL iterator
+by gdbus/client.c::properties_changed():
 
-This is automated email and please do not reply to this email!
+...
+proxy->prop_func(..., ..., iter=NULL, ...)
+...
 
-Dear submitter,
+Christian Eggers (9):
+  advertising: parse_secondary: fix loop condition
+  advertising: parse_secondary: fix mask value
+  advertising: parse_secondary: check for NULL iterator
+  advertising: parse_min_interval: reset min_interval if iter is NULL
+  advertising: parse_[min|max]_interval: reset value if iter is NULL
+  advertising: parse_tx_power: reset value if iter is NULL
+  client/gatt: proxy_property_changed: check for NULL iterator
+  gatt: proxy_property_changed: check for NULL iterator
+  battery: provided_battery_property_changed_cb: check for NULL iterator
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=679707
+ client/gatt.c       |  5 +++++
+ src/advertising.c   | 22 +++++++++++++++++-----
+ src/battery.c       | 10 ++++++----
+ src/gatt-database.c | 20 +++++++++++---------
+ 4 files changed, 39 insertions(+), 18 deletions(-)
 
----Test result---
+-- 
+2.35.3
 
-Test Summary:
-CheckPatch                    FAIL      3.05 seconds
-GitLint                       PASS      3.12 seconds
-SubjectPrefix                 PASS      2.73 seconds
-BuildKernel                   PASS      35.48 seconds
-BuildKernel32                 PASS      31.81 seconds
-Incremental Build with patchesPASS      63.14 seconds
-TestRunner: Setup             PASS      527.04 seconds
-TestRunner: l2cap-tester      PASS      17.42 seconds
-TestRunner: iso-tester        PASS      16.74 seconds
-TestRunner: bnep-tester       PASS      6.62 seconds
-TestRunner: mgmt-tester       PASS      105.17 seconds
-TestRunner: rfcomm-tester     PASS      10.40 seconds
-TestRunner: sco-tester        PASS      9.85 seconds
-TestRunner: smp-tester        PASS      9.89 seconds
-TestRunner: userchan-tester   PASS      6.81 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 3.05 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[v6,1/3] Bluetooth: Add support for hci devcoredump\Traceback (most recent call last):
-  File "scripts/spdxcheck.py", line 6, in <module>
-    from ply import lex, yacc
-ModuleNotFoundError: No module named 'ply'
-Traceback (most recent call last):
-  File "scripts/spdxcheck.py", line 6, in <module>
-    from ply import lex, yacc
-ModuleNotFoundError: No module named 'ply'
-WARNING:FILE_PATH_CHANGES: added, moved or deleted file(s), does MAINTAINERS need updating?
-#146: 
-new file mode 100644
-
-WARNING:SPLIT_STRING: quoted string split across lines
-#622: FILE: net/bluetooth/coredump.c:300:
-+				    "Devcoredump complete with size %u "
-+				    "(expect %zu)",
-
-WARNING:SPLIT_STRING: quoted string split across lines
-#641: FILE: net/bluetooth/coredump.c:319:
-+				    "Devcoredump aborted with size %u "
-+				    "(expect %zu)",
-
-WARNING:OOM_MESSAGE: Possible unnecessary 'out of memory' message
-#735: FILE: net/bluetooth/coredump.c:413:
-+	if (!skb) {
-+		bt_dev_err(hdev, "Failed to allocate devcoredump init");
-
-WARNING:OOM_MESSAGE: Possible unnecessary 'out of memory' message
-#778: FILE: net/bluetooth/coredump.c:456:
-+	if (!skb) {
-+		bt_dev_err(hdev, "Failed to allocate devcoredump pattern");
-
-WARNING:OOM_MESSAGE: Possible unnecessary 'out of memory' message
-#804: FILE: net/bluetooth/coredump.c:482:
-+	if (!skb) {
-+		bt_dev_err(hdev, "Failed to allocate devcoredump complete");
-
-WARNING:OOM_MESSAGE: Possible unnecessary 'out of memory' message
-#826: FILE: net/bluetooth/coredump.c:504:
-+	if (!skb) {
-+		bt_dev_err(hdev, "Failed to allocate devcoredump abort");
-
-total: 0 errors, 7 warnings, 0 checks, 685 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12986135.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============9169417009614600795==--
