@@ -2,111 +2,98 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F0C5C07E9D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Sep 2022 15:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7549CC54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Sep 2022 15:45:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230044AbiIXPFA (ORCPT
+        id S232628AbiIYPpE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Sep 2022 11:05:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49684 "EHLO
+        Sun, 25 Sep 2022 11:45:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229669AbiIXPE5 (ORCPT
+        with ESMTP id S232535AbiIYPpD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Sep 2022 11:04:57 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D9A205CE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Sep 2022 08:04:56 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id c11so1723088qtw.8
-        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Sep 2022 08:04:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=3kzT3CKZ1SmKqAl5QeFIvuRppkiHWkMTLzEJ/E1NAU4=;
-        b=gjmanheu6eJJaMirJ+E0ZreBnlABc3IGPjuuEqOl5/yJ6Y4D/jkBwVkauioiJWGRHD
-         rGJDUWLBuR6RjOL4BFi3jGmW9/QZnU/WVxi6DxgMsKtvPvXfwp7iBndediG45eogdAVZ
-         1D7NTJwYDrTbn6aHsviZiGnPcLUxvpFfoepralk4WgZBNXk8cU+n1hHcxiKpd8arlI7g
-         ir9uuN3vfkLRgJVMoVEIwtC5D7LW+3uv2b5/8pS8wbiDB5I/VU+wYcxbC8rsFa4Bvzvd
-         PAS2zDJrMtdc5r3boQvjAhOuebL0xSGHZHGHXjz2q40u0g8NN5u6CpBFsVVB2EnpHP2C
-         lPmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=3kzT3CKZ1SmKqAl5QeFIvuRppkiHWkMTLzEJ/E1NAU4=;
-        b=RsE2MI7wGnF/Z0it1gjYQoSR7RuTQG18NBl19dgAK/WYJFgY4eBoJDxTfc+7JHmrZd
-         20jL05SiPiutOjM6XMI+LuXza848X9l/kTCUoQomaibmegZgp3DmA1MLPb0n2WYqBBFz
-         6YryNnW7sAVUryQ4Pwtw07RLHLtckEy4u2/WW+Cd4gJ+RBQhz7yAvVYNdyJiC7t09AMY
-         C2mEyEcKDoge5J9PhV8Q3glA94enKHPYVHV7k08H5v/tLQ+8TRttbd/ipTDY83Y8ycRu
-         l13u6TNMYIvGVObjj1PrpyUgtWAOH1BYVn1bbFrnjLjOpDWHa/309C8nnPmeOgp8aztX
-         Gr7g==
-X-Gm-Message-State: ACrzQf0xUpMWZuv4vlqTAMq/XyNGUdp7SmEbAlOihdWoo7QuqddyISwa
-        iQDWPBIEQx+crSrv9l0EUqtKIIstKHY=
-X-Google-Smtp-Source: AMsMyM62DoG2AfYHIBHFdTrWCX2Lu5+R+y30yTELjmongtgK77i/28CwFK4XsqhAxBwyg1NjVLqvvg==
-X-Received: by 2002:ac8:7fcd:0:b0:35c:c2ad:bc78 with SMTP id b13-20020ac87fcd000000b0035cc2adbc78mr11493101qtk.671.1664031895193;
-        Sat, 24 Sep 2022 08:04:55 -0700 (PDT)
-Received: from [172.17.0.2] ([20.25.73.239])
-        by smtp.gmail.com with ESMTPSA id bj36-20020a05620a192400b006ceb8f36302sm8196710qkb.71.2022.09.24.08.04.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Sep 2022 08:04:55 -0700 (PDT)
-Message-ID: <632f1c97.050a0220.44105.ca6a@mx.google.com>
-Date:   Sat, 24 Sep 2022 08:04:55 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8368335523250587579=="
+        Sun, 25 Sep 2022 11:45:03 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0B581A234;
+        Sun, 25 Sep 2022 08:45:01 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6F092B81244;
+        Sun, 25 Sep 2022 15:45:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 046CAC43470;
+        Sun, 25 Sep 2022 15:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664120699;
+        bh=56m/znKoTqndib5n/0vCAB2QHcSxXEmvepAWYlZLhWk=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=QQLd9wkzmzjg2Y9MYtxD7yTDj0m/R13xWOkIr4gOzrwcYyNlUgMPBz2WoG2Iifo6M
+         b4rdth7ywIDrJBzjsGx9/3pA892Nu7JSCiwCt00ttI8lC+zO65TZzIhIu9/0a6S5gL
+         luaMcuQf8AoQvud3q4Tbgl3bMH5wv5HyXF8xhFoNXrB6eXEHWBU6BDndY/uRlGq0dB
+         Tx3OeBlCcX1n2uFAEL7a/yV2Ri7rcV+PJqI3gxvZMc8gkrraex+SULO0JGse3zdmqq
+         79WH+Y7L+Dg3RWKZiO3+urVehnbcfloeJgVSb3+wXu5djvw+S8c4Z0KZATiWO5cAfz
+         F+pYCgtLhrm3w==
+Received: by mail-vs1-f50.google.com with SMTP id d187so4431864vsd.6;
+        Sun, 25 Sep 2022 08:44:58 -0700 (PDT)
+X-Gm-Message-State: ACrzQf01Z999lfLO0f+iVso7Hb0sxNvAbXXkDhX/zG1Tatsc1eMYwksT
+        ERnUJU6IB1ErqncNhMRX3jWtz4pDkZD2Qt5kLQ==
+X-Google-Smtp-Source: AMsMyM7/3q9FshtDglD88xmTCGAJX/8emrrdhymK14qX1nCmQ86CE+9eL8oqG7N/RaB47ay+Ukfhad/Do05B2gOjn7g=
+X-Received: by 2002:a67:c18a:0:b0:398:4c72:cafb with SMTP id
+ h10-20020a67c18a000000b003984c72cafbmr6274564vsj.53.1664120697844; Sun, 25
+ Sep 2022 08:44:57 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luca@z3ntu.xyz
-Subject: RE: [v3] dt-bindings: bluetooth: broadcom: add BCM43430A0 & BCM43430A1
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220924142154.14217-1-luca@z3ntu.xyz>
-References: <20220924142154.14217-1-luca@z3ntu.xyz>
+References: <20220919164834.62739-1-sven@svenpeter.dev> <20220919164834.62739-3-sven@svenpeter.dev>
+In-Reply-To: <20220919164834.62739-3-sven@svenpeter.dev>
+From:   Rob Herring <robh+dt@kernel.org>
+Date:   Sun, 25 Sep 2022 10:44:46 -0500
+X-Gmail-Original-Message-ID: <CAL_Jsq+32LpvsFC+sCVsqzncgokYRd+oXUQYirumr-boz_RwKQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+32LpvsFC+sCVsqzncgokYRd+oXUQYirumr-boz_RwKQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/7] dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+To:     Sven Peter <sven@svenpeter.dev>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev <netdev@vger.kernel.org>,
+        devicetree@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8368335523250587579==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Sep 19, 2022 at 11:49 AM Sven Peter <sven@svenpeter.dev> wrote:
+>
+> These chips are combined Wi-Fi/Bluetooth radios which expose a
+> PCI subfunction for the Bluetooth part.
+> They are found in Apple machines such as the x86 models with the T2
+> chip or the arm64 models with the M1 or M2 chips.
+>
+> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+> ---
+> changes from v2:
+>   - extended example to include parent pcie node to make
+>     node name validation work
+>   - moved to bluetooth/ subdirectory
+>   - added maxItems to reg and dropped description
+>   - moved bluetooth-controller.yaml reference after description
+>
+> changes from v1:
+>   - added apple,* pattern to brcm,board-type
+>   - s/PCI/PCIe/
+>   - fixed 1st reg cell inside the example to not contain the bus number
+>
+>  .../net/bluetooth/brcm,bcm4377-bluetooth.yaml | 81 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 82 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=680145
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.68 seconds
-GitLint                       PASS      1.07 seconds
-SubjectPrefix                 FAIL      0.90 seconds
-BuildKernel                   PASS      34.77 seconds
-BuildKernel32                 PASS      31.30 seconds
-Incremental Build with patchesPASS      45.59 seconds
-TestRunner: Setup             PASS      513.04 seconds
-TestRunner: l2cap-tester      PASS      17.24 seconds
-TestRunner: iso-tester        PASS      16.11 seconds
-TestRunner: bnep-tester       PASS      6.59 seconds
-TestRunner: mgmt-tester       PASS      104.39 seconds
-TestRunner: rfcomm-tester     PASS      10.43 seconds
-TestRunner: sco-tester        PASS      9.81 seconds
-TestRunner: ioctl-tester      PASS      11.00 seconds
-TestRunner: smp-tester        PASS      9.94 seconds
-TestRunner: userchan-tester   PASS      6.86 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL - 0.90 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8368335523250587579==--
+Reviewed-by: Rob Herring <robh@kernel.org>
