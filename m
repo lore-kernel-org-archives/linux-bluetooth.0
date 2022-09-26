@@ -2,100 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EF7C6FA8E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 19:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3BF4C32771
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 20:20:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229696AbiIZTUz (ORCPT
+        id S230476AbiIZUUU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 15:20:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
+        Mon, 26 Sep 2022 16:20:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiIZTUv (ORCPT
+        with ESMTP id S230475AbiIZUUS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 15:20:51 -0400
-Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EA27A75F;
-        Mon, 26 Sep 2022 12:20:44 -0700 (PDT)
-Received: by mail-oi1-f182.google.com with SMTP id q10so1905571oib.5;
-        Mon, 26 Sep 2022 12:20:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
-        bh=ADvJyP56wHbSxc129KlmBq1wxQ11OvIcsy3rVQbt0AM=;
-        b=nqjRtNZqxGxiKH8/Xu17bmfWvVB1qS/y7iOcVZmO6A/mbfE3roDELudxzC53BWeDyf
-         6fEOxKyGx17CgPL2wIbCSufIWMvLRViyl0RQqkxAWsAVS20UxNxP+YOrojLrNSFLM444
-         BEWj+zeNBH/sIzx+/egPMqjRQHX9vl4i+6NJAAxK17TxiCoFGg/MGcjG+tooeWfWRYqt
-         7SHZavJ+PebWAEXZZ38c9rE74cQ73HUOKvrr6LJNTGSQk9T2rRPPR+G72X5lL7Hb+/ku
-         L5jJrzB2pyGjR4IhxkzS0JeKUD9+m50ptYP3TywX63fKuEHiOoe0schopIG6yy1WdQkd
-         GjrQ==
-X-Gm-Message-State: ACrzQf2aJKLdRtfBXfZIGX6TVT4c6Ay4XI17uhRb48wTxwd2IQxJit/B
-        Yh+YFb6I8eWZH9sZ+hn8/skoWC7NqA==
-X-Google-Smtp-Source: AMsMyM4ROdDjV6GTDIC7rGrPJZId6RQc+iAMicuKSsRckR/ihD7ZKbUwPWuDfXhBc1jE8xBvdfnQGQ==
-X-Received: by 2002:aca:aa97:0:b0:34d:83f5:4a5 with SMTP id t145-20020acaaa97000000b0034d83f504a5mr144441oie.146.1664220043920;
-        Mon, 26 Sep 2022 12:20:43 -0700 (PDT)
-Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id t9-20020a05683022e900b0061c9f9c54e4sm8144004otc.80.2022.09.26.12.20.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 12:20:43 -0700 (PDT)
-Received: (nullmailer pid 2629975 invoked by uid 1000);
-        Mon, 26 Sep 2022 19:20:42 -0000
-Date:   Mon, 26 Sep 2022 14:20:42 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Sven Peter <sven@svenpeter.dev>
-Cc:     linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
-        Konrad Dybcio <konrad.dybcio@somainline.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        linux-bluetooth@vger.kernel.org, Hector Martin <marcan@marcan.st>,
-        linux-arm-kernel@lists.infradead.org,
-        Andy Gross <agross@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Eric Dumazet <edumazet@google.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
-        asahi@lists.linux.dev,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH v3 1/7] dt-bindings: net: Add generic Bluetooth controller
-Message-ID: <20220926192042.GA2629908-robh@kernel.org>
-References: <20220919164834.62739-1-sven@svenpeter.dev>
- <20220919164834.62739-2-sven@svenpeter.dev>
+        Mon, 26 Sep 2022 16:20:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50EF14BA6B
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A4180612B8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 20:20:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 13EC8C433B5;
+        Mon, 26 Sep 2022 20:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664223616;
+        bh=kD7qJ7RrkD4KTL+HsUXRLnbPKOKHKXPpNl2jTGfSs/8=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=uD1liidcBB4/zOWyaQduwyUSTs9vaGsoldXMFAATUb/T782rfXNiiAP0Jgr4AeExd
+         W/jd6pBy9bPVGOtcj7AKAqbvYGQ8JNCRNDWStwe82oUn52IDMQ+FilkwiXKk1llMej
+         bmDmgbN864+SLznuZy+JHmlSjD8mrckg64Slhbcz5VC5AiK1BB/fCVhtBejdB7p/3z
+         qgjG73G+5nEi+hjbqXtEdUqBCVRHcKIEyOGKFxbXHJWYh5N0+0+3/jVUQoRygdQsiA
+         5gO1M8O4nQ6wXeVA+vldm5xOnf79j+k27CknW5vmVgfNZfqEolE8axA+WLQxK9wPEU
+         Uw12tBkTPp9EQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5A71C070C8;
+        Mon, 26 Sep 2022 20:20:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220919164834.62739-2-sven@svenpeter.dev>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ 0/4] Mesh: Fix heartbeat publication/subscription
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166422361593.9012.15598409160746667095.git-patchwork-notify@kernel.org>
+Date:   Mon, 26 Sep 2022 20:20:15 +0000
+References: <20220926130110.2146-1-isak.westin@loytec.com>
+In-Reply-To: <20220926130110.2146-1-isak.westin@loytec.com>
+To:     Isak Westin <isak.westin@loytec.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 19 Sep 2022 18:48:28 +0200, Sven Peter wrote:
-> Bluetooth controllers share the common local-bd-address property.
-> Add a generic YAML schema to replace bluetooth.txt for those.
-> 
-> Signed-off-by: Sven Peter <sven@svenpeter.dev>
-> ---
-> changes from v2:
->   - added new bluetooth subdirectory and moved files there
->   - removed minItems from local-bd-address
->   - dropped bjorn.andersson@linaro.org, bgodavar@codeaurora.org and
->     rjliao@codeaurora.org due to bouncing emails from the CC list
-> 
-> changes from v1:
->   - removed blueetooth.txt instead of just replacing it with a
->     deprecation note
->   - replaced references to bluetooth.txt
-> 
->  .../devicetree/bindings/net/bluetooth.txt     |  5 ----
->  .../net/bluetooth/bluetooth-controller.yaml   | 29 +++++++++++++++++++
->  .../{ => bluetooth}/qualcomm-bluetooth.yaml   |  6 ++--
->  .../bindings/soc/qcom/qcom,wcnss.yaml         |  8 ++---
->  4 files changed, 35 insertions(+), 13 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml
->  rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)
-> 
+Hello:
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+This series was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@intel.com>:
+
+On Mon, 26 Sep 2022 15:01:06 +0200 you wrote:
+> Hi,
+> 
+> These patches include some fixes to the heartbeat publication and subscription procedures.
+> Found during following PTS tests:
+> - MESH/NODE/CFG/HBS/*
+> - MESH/NODE/CFG/HBP/*
+> 
+> [...]
+
+Here is the summary with links:
+  - [BlueZ,1/4] mesh: Correct u32 to u8 log transformation
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=5b569e3d14a3
+  - [BlueZ,2/4] mesh: Reply to HB pub set with same fields
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=1ef221ca0205
+  - [BlueZ,3/4] mesh: Correct HB sub state updates
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=902389f3e7a3
+  - [BlueZ,4/4] mesh: Clear HB sub status field if disabled
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=d763bfa4d089
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
