@@ -2,167 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCD1C07E9D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 20:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A53EBC6FA82
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 20:48:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229781AbiIZUUw (ORCPT
+        id S230491AbiIZUsD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 16:20:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41752 "EHLO
+        Mon, 26 Sep 2022 16:48:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiIZUUu (ORCPT
+        with ESMTP id S229711AbiIZUsB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 16:20:50 -0400
-Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521AE48E8D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:47 -0700 (PDT)
-Received: from github.com (hubbernetes-node-62aa549.va3-iad.github.net [10.48.201.74])
-        by smtp.github.com (Postfix) with ESMTPA id 2A8D5E0DD4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1664223647;
-        bh=QUdQtK6Jvp0N8BcsPCx1vqN9afXEQaN8YWjHAnudx6o=;
-        h=Date:From:To:Subject:From;
-        b=QfFz75Yfifr2IsZvoQtTK+g1DCCwi8dLO1wbYGbyfCOhSSnOQaGTuu1VJZaIj26g1
-         qKabeWsLBApsbWaIcq5wt4stYNx1udEi/T8QxABYOtci4+OUOlrBMe4Q8uDzMxeVO9
-         Mm4kBjNH0GyHjZN09Otz209HdGtWo+BIGdRdC/Sw=
-Date:   Mon, 26 Sep 2022 13:20:47 -0700
-From:   Isak Westin <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/7738e9-d763bf@github.com>
-Subject: [bluez/bluez] 491be4: mesh: Improve PB-ADV timing for reliability
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Mon, 26 Sep 2022 16:48:01 -0400
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE030A6C6A;
+        Mon, 26 Sep 2022 13:47:59 -0700 (PDT)
+Received: by mail-io1-f54.google.com with SMTP id p202so6246982iod.6;
+        Mon, 26 Sep 2022 13:47:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date;
+        bh=faa5y7qBR+UreIMx8m63IdwyTJaEPpyMFVUYsgBqw10=;
+        b=iD+KSdS9wJ0+tBHuKR3iPyul3DGyZ7cSsdx9WiLUoPpUnzpuSp9f4CgWfGLPTr0+aq
+         BWNPp2hHs0Wy4CUHPCaRNJJmGfkA4ZxsdlY47mvPWk4ICJEWuquvn9igcawiv8LMsBgL
+         AtZVH5xTtTOBqmsHr4J0ELev9dZ4s1ZHUJcPnW1pBnIKWhcSO3hB5NbABRXdZR5ctDck
+         J8Dkwu+123wLlgLDauLTN8fM8QPpckJ7+3tsj7oGPd3cUycRQwE0+8bV7Ds7jqYIvHWa
+         /HGs+IJa4O2QQluDeRoRkWsak1R4/5PHjNbmOUUIfVggR4SoAjqqWnyhOBWZgso509kp
+         5igQ==
+X-Gm-Message-State: ACrzQf0HAzwntkcy2b/9uPJ9Ik70B/Uwn8m6p0FI79JWbGn6muwYyVUE
+        6Pa2I2Ah4bebHhQxcsnndwI=
+X-Google-Smtp-Source: AMsMyM6O6zaf+mSCDHfYhOS6FFRft1h0I2XNvK2d8x/7KIMcdO0Q6CEYIKgagoctq1u/jQXoPwdbWg==
+X-Received: by 2002:a05:6638:3821:b0:35a:1973:ae9 with SMTP id i33-20020a056638382100b0035a19730ae9mr11897859jav.313.1664225279054;
+        Mon, 26 Sep 2022 13:47:59 -0700 (PDT)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id c14-20020a023b0e000000b0035a8d644a31sm7336423jaa.117.2022.09.26.13.47.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 13:47:58 -0700 (PDT)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+Cc:     syzkaller@googlegroups.com, Sungwoo Kim <iam@sung-woo.kim>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: L2CAP: fix an illegal state transition from BT_DISCONN
+Date:   Mon, 26 Sep 2022 16:46:58 -0400
+Message-Id: <20220926204657.3147968-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 491be481a91c39d31f7908da8a2beea60237646e
-      https://github.com/bluez/bluez/commit/491be481a91c39d31f7908da8a2beea60237646e
-  Author: Brian Gix <brian.gix@intel.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
+Prevent an illegal state transition from BT_DISCONN to BT_CONFIG.
+L2CAP_CONN_RSP and L2CAP_CREATE_CHAN_RSP events should be ignored
+for BT_DISCONN state according to the Bluetooth Core v5.3 p.1096.
+It is found by BTFuzz, a modified version of syzkaller.
 
-  Changed paths:
-    M mesh/pb-adv.c
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+---
+ net/bluetooth/l2cap_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-  Log Message:
-  -----------
-  mesh: Improve PB-ADV timing for reliability
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2c9de67da..a15d64b13 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4307,6 +4307,9 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+ 		}
+ 	}
+ 
++	if (chan->state == BT_DISCONN)
++		goto unlock;
++
+ 	err = 0;
+ 
+ 	l2cap_chan_lock(chan);
+-- 
+2.25.1
 
-Because provisioning is not speed dependent, Timing on outbound PB-ADV
-packets have been modified to be less likely missed by remote controlers
-with looser timing capabilities.
-
-
-  Commit: 9966cb8b6999a5f54fc13acbd7e1526512a84342
-      https://github.com/bluez/bluez/commit/9966cb8b6999a5f54fc13acbd7e1526512a84342
-  Author: Brian Gix <brian.gix@intel.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M Makefile.mesh
-    M mesh/main.c
-    M mesh/mesh-io-api.h
-    M mesh/mesh-io-generic.c
-    A mesh/mesh-io-mgmt.c
-    A mesh/mesh-io-mgmt.h
-    M mesh/mesh-io-unit.c
-    M mesh/mesh-io.c
-    M mesh/mesh-io.h
-    M mesh/mesh-mgmt.c
-    M mesh/mesh-mgmt.h
-    M mesh/mesh.c
-    M mesh/mesh.h
-
-  Log Message:
-  -----------
-  mesh: Add new kernel MGMT based IO transport
-
-1. Re-structures MGMT handling such that it is used to detect kernel
-   support of the mesh MGMT opcodes and events before selecting between
-   using MGMT or the legacy raw HCI socket method.
-
-2. Re-structures main() to allow command line to prefer MGMT over HCI or
-   visa versa, plus optionally pass an explicte controller.
-
-3. Adds mesh-io-mgmt as a transport.
-
-
-  Commit: 5b569e3d14a38247c69a16d80c5f7c8b77482505
-      https://github.com/bluez/bluez/commit/5b569e3d14a38247c69a16d80c5f7c8b77482505
-  Author: Isak Westin <isak.westin@loytec.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M mesh/cfgmod-server.c
-
-  Log Message:
-  -----------
-  mesh: Correct u32 to u8 log transformation
-
-Fixed the log transformation to correctly follow the value mapping
-defined in the mesh profile (section 4.1.2).
-
-
-  Commit: 1ef221ca020581575a3775ec60c0a28e384081be
-      https://github.com/bluez/bluez/commit/1ef221ca020581575a3775ec60c0a28e384081be
-  Author: Isak Westin <isak.westin@loytec.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M mesh/cfgmod-server.c
-
-  Log Message:
-  -----------
-  mesh: Reply to HB pub set with same fields
-
-If a Config Heartbeat Publication Set message is unsuccessfully
-processed, the fields in the status reply should be the same as in the
-original message. See MshPRFv1.0.1 section 4.4.1.2.15.
-
-
-  Commit: 902389f3e7a33e5730d7e2318b1f1868170dc092
-      https://github.com/bluez/bluez/commit/902389f3e7a33e5730d7e2318b1f1868170dc092
-  Author: Isak Westin <isak.westin@loytec.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M mesh/cfgmod-server.c
-    M mesh/net.c
-
-  Log Message:
-  -----------
-  mesh: Correct HB sub state updates
-
-If heartbeat subscription is disabled, all fields should be set to zero
-but collected data should be preserved. If HB subscription is enabled,
-the collected data should be reset (which includes Min Hops = 0x7f).
-HB subscription is disabled by setting any of the following fields to
-zero: Source, destination or period log.
-HB subscription is enabled by setting all the same fields to valid values.
-
-
-  Commit: d763bfa4d0892b4b3b004577491d2493a999648e
-      https://github.com/bluez/bluez/commit/d763bfa4d0892b4b3b004577491d2493a999648e
-  Author: Isak Westin <isak.westin@loytec.com>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M mesh/cfgmod-server.c
-
-  Log Message:
-  -----------
-  mesh: Clear HB sub status field if disabled
-
-When replying to a HB subscription get message, and the current state of
-source or destination fields is zero (which means that HB subscription
-is disabled), all fields in the status reply should be zero.
-
-
-Compare: https://github.com/bluez/bluez/compare/7738e9ac416b...d763bfa4d089
