@@ -2,82 +2,167 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BFECC32771
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 20:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DCD1C07E9D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 20:20:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230484AbiIZUU0 (ORCPT
+        id S229781AbiIZUUw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 16:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40256 "EHLO
+        Mon, 26 Sep 2022 16:20:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbiIZUUW (ORCPT
+        with ESMTP id S229509AbiIZUUu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 16:20:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67533F337
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6F082B80B96
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 20:20:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1FB32C43470;
-        Mon, 26 Sep 2022 20:20:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664223616;
-        bh=jRNO+hZkgpcg5CSl0IV0yQZTvQxse2sooOMpOu0XAxQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=Ri+hg1HOE9xrcyU9U4vzqxFKKlAvy1g7ldxj78ZP8bxcKafsuBaAzMWhKsDYcjClV
-         kKxjze83lwsh4G2pzumtpOxskvx+MDeNl1rL4jxNM0yCetoI+o3q5w5JVGRt2UYD3T
-         zETnG50ocNDR3xBzHy+07L6M61W7hVuc/ec4WJBwtPrQfW/eVZfHC4i1xVFjfn/Jqc
-         2L7j831KOoEhSiOivShpx6tIIXTW+L5VYwa5D3Ngpuz5rKP0g1vl0z9JrJiuuFw5vx
-         Q5MA/OLDucn90PL3vKCiU0YZJevNesZZ7f/evtK7FN+i6dtdzFmtYQ4YpX+gt4H4+X
-         gHRpmYPU1KgbA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F12BCE21EC4;
-        Mon, 26 Sep 2022 20:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ v5 0/2] Mesh demon switched to using kernel Mesh MGMT
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166422361598.9012.17342942678830979726.git-patchwork-notify@kernel.org>
-Date:   Mon, 26 Sep 2022 20:20:15 +0000
-References: <20220923180018.815614-1-brian.gix@intel.com>
-In-Reply-To: <20220923180018.815614-1-brian.gix@intel.com>
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        inga.stotland@intel.com
+        Mon, 26 Sep 2022 16:20:50 -0400
+Received: from out-19.smtp.github.com (out-19.smtp.github.com [192.30.252.202])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521AE48E8D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:47 -0700 (PDT)
+Received: from github.com (hubbernetes-node-62aa549.va3-iad.github.net [10.48.201.74])
+        by smtp.github.com (Postfix) with ESMTPA id 2A8D5E0DD4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 13:20:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1664223647;
+        bh=QUdQtK6Jvp0N8BcsPCx1vqN9afXEQaN8YWjHAnudx6o=;
+        h=Date:From:To:Subject:From;
+        b=QfFz75Yfifr2IsZvoQtTK+g1DCCwi8dLO1wbYGbyfCOhSSnOQaGTuu1VJZaIj26g1
+         qKabeWsLBApsbWaIcq5wt4stYNx1udEi/T8QxABYOtci4+OUOlrBMe4Q8uDzMxeVO9
+         Mm4kBjNH0GyHjZN09Otz209HdGtWo+BIGdRdC/Sw=
+Date:   Mon, 26 Sep 2022 13:20:47 -0700
+From:   Isak Westin <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/7738e9-d763bf@github.com>
+Subject: [bluez/bluez] 491be4: mesh: Improve PB-ADV timing for reliability
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: 491be481a91c39d31f7908da8a2beea60237646e
+      https://github.com/bluez/bluez/commit/491be481a91c39d31f7908da8a2beea60237646e
+  Author: Brian Gix <brian.gix@intel.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
 
-This series was applied to bluetooth/bluez.git (master)
-by Brian Gix <brian.gix@intel.com>:
+  Changed paths:
+    M mesh/pb-adv.c
 
-On Fri, 23 Sep 2022 11:00:16 -0700 you wrote:
-> This patchset enables the mesh daemon (bluetooth-meshd) to use the new
-> MGMT mesh opcodes and events to send and receive Mesh packets. By
-> default, the daemon attempts to enable the experimental mesh
-> functionality, and query the kernel for active mesh support before then
-> enumerating the available controllers and selecting ojne that works.
-> 
-> If no kernel support is found, it will continue to use a raw HCI socket
-> for mesh support.
-> 
-> [...]
+  Log Message:
+  -----------
+  mesh: Improve PB-ADV timing for reliability
 
-Here is the summary with links:
-  - [BlueZ,v5,1/2] mesh: Improve PB-ADV timing for reliability
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=491be481a91c
-  - [BlueZ,v5,2/2] mesh: Add new kernel MGMT based IO transport
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=9966cb8b6999
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Because provisioning is not speed dependent, Timing on outbound PB-ADV
+packets have been modified to be less likely missed by remote controlers
+with looser timing capabilities.
 
 
+  Commit: 9966cb8b6999a5f54fc13acbd7e1526512a84342
+      https://github.com/bluez/bluez/commit/9966cb8b6999a5f54fc13acbd7e1526512a84342
+  Author: Brian Gix <brian.gix@intel.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
+
+  Changed paths:
+    M Makefile.mesh
+    M mesh/main.c
+    M mesh/mesh-io-api.h
+    M mesh/mesh-io-generic.c
+    A mesh/mesh-io-mgmt.c
+    A mesh/mesh-io-mgmt.h
+    M mesh/mesh-io-unit.c
+    M mesh/mesh-io.c
+    M mesh/mesh-io.h
+    M mesh/mesh-mgmt.c
+    M mesh/mesh-mgmt.h
+    M mesh/mesh.c
+    M mesh/mesh.h
+
+  Log Message:
+  -----------
+  mesh: Add new kernel MGMT based IO transport
+
+1. Re-structures MGMT handling such that it is used to detect kernel
+   support of the mesh MGMT opcodes and events before selecting between
+   using MGMT or the legacy raw HCI socket method.
+
+2. Re-structures main() to allow command line to prefer MGMT over HCI or
+   visa versa, plus optionally pass an explicte controller.
+
+3. Adds mesh-io-mgmt as a transport.
+
+
+  Commit: 5b569e3d14a38247c69a16d80c5f7c8b77482505
+      https://github.com/bluez/bluez/commit/5b569e3d14a38247c69a16d80c5f7c8b77482505
+  Author: Isak Westin <isak.westin@loytec.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
+
+  Changed paths:
+    M mesh/cfgmod-server.c
+
+  Log Message:
+  -----------
+  mesh: Correct u32 to u8 log transformation
+
+Fixed the log transformation to correctly follow the value mapping
+defined in the mesh profile (section 4.1.2).
+
+
+  Commit: 1ef221ca020581575a3775ec60c0a28e384081be
+      https://github.com/bluez/bluez/commit/1ef221ca020581575a3775ec60c0a28e384081be
+  Author: Isak Westin <isak.westin@loytec.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
+
+  Changed paths:
+    M mesh/cfgmod-server.c
+
+  Log Message:
+  -----------
+  mesh: Reply to HB pub set with same fields
+
+If a Config Heartbeat Publication Set message is unsuccessfully
+processed, the fields in the status reply should be the same as in the
+original message. See MshPRFv1.0.1 section 4.4.1.2.15.
+
+
+  Commit: 902389f3e7a33e5730d7e2318b1f1868170dc092
+      https://github.com/bluez/bluez/commit/902389f3e7a33e5730d7e2318b1f1868170dc092
+  Author: Isak Westin <isak.westin@loytec.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
+
+  Changed paths:
+    M mesh/cfgmod-server.c
+    M mesh/net.c
+
+  Log Message:
+  -----------
+  mesh: Correct HB sub state updates
+
+If heartbeat subscription is disabled, all fields should be set to zero
+but collected data should be preserved. If HB subscription is enabled,
+the collected data should be reset (which includes Min Hops = 0x7f).
+HB subscription is disabled by setting any of the following fields to
+zero: Source, destination or period log.
+HB subscription is enabled by setting all the same fields to valid values.
+
+
+  Commit: d763bfa4d0892b4b3b004577491d2493a999648e
+      https://github.com/bluez/bluez/commit/d763bfa4d0892b4b3b004577491d2493a999648e
+  Author: Isak Westin <isak.westin@loytec.com>
+  Date:   2022-09-26 (Mon, 26 Sep 2022)
+
+  Changed paths:
+    M mesh/cfgmod-server.c
+
+  Log Message:
+  -----------
+  mesh: Clear HB sub status field if disabled
+
+When replying to a HB subscription get message, and the current state of
+source or destination fields is zero (which means that HB subscription
+is disabled), all fields in the status reply should be zero.
+
+
+Compare: https://github.com/bluez/bluez/compare/7738e9ac416b...d763bfa4d089
