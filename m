@@ -2,111 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC479C07E9D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 18:28:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EF7C6FA8E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 19:20:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbiIZS2J (ORCPT
+        id S229696AbiIZTUz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 14:28:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
+        Mon, 26 Sep 2022 15:20:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229754AbiIZS1g (ORCPT
+        with ESMTP id S229711AbiIZTUv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 14:27:36 -0400
-Received: from smtp.github.com (out-17.smtp.github.com [192.30.252.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5CBB1402A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 11:26:53 -0700 (PDT)
-Received: from github.com (hubbernetes-node-239f8e3.va3-iad.github.net [10.48.209.77])
-        by smtp.github.com (Postfix) with ESMTPA id 7FAA15C0675
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 11:26:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1664216812;
-        bh=vHp2eu1s4yNQv/x1jKNOl4FG4enxrKNS/fMA0Tmqq5w=;
-        h=Date:From:To:Subject:From;
-        b=pzFNn0StwFlT/xjDRNtMMU7h0NaPMyaqXyQEIdLHzyCh+FiwDbhwhlpI1CM22FfaB
-         UaNymPRQrZlAo7oxNQ/M1x6TxebJtwABSUlgTCsgNNCJIk5bKcCXKxYwYoOZg2SEcy
-         W4xlqE0pxYDXXPpTm8S6ih+ZpGdePjndbeqm+mlY=
-Date:   Mon, 26 Sep 2022 11:26:52 -0700
-From:   hexchain <noreply@github.com>
-To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/6c7120-7738e9@github.com>
-Subject: [bluez/bluez] 7b07f1: client/player: fix printf format string
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+        Mon, 26 Sep 2022 15:20:51 -0400
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EA27A75F;
+        Mon, 26 Sep 2022 12:20:44 -0700 (PDT)
+Received: by mail-oi1-f182.google.com with SMTP id q10so1905571oib.5;
+        Mon, 26 Sep 2022 12:20:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date;
+        bh=ADvJyP56wHbSxc129KlmBq1wxQ11OvIcsy3rVQbt0AM=;
+        b=nqjRtNZqxGxiKH8/Xu17bmfWvVB1qS/y7iOcVZmO6A/mbfE3roDELudxzC53BWeDyf
+         6fEOxKyGx17CgPL2wIbCSufIWMvLRViyl0RQqkxAWsAVS20UxNxP+YOrojLrNSFLM444
+         BEWj+zeNBH/sIzx+/egPMqjRQHX9vl4i+6NJAAxK17TxiCoFGg/MGcjG+tooeWfWRYqt
+         7SHZavJ+PebWAEXZZ38c9rE74cQ73HUOKvrr6LJNTGSQk9T2rRPPR+G72X5lL7Hb+/ku
+         L5jJrzB2pyGjR4IhxkzS0JeKUD9+m50ptYP3TywX63fKuEHiOoe0schopIG6yy1WdQkd
+         GjrQ==
+X-Gm-Message-State: ACrzQf2aJKLdRtfBXfZIGX6TVT4c6Ay4XI17uhRb48wTxwd2IQxJit/B
+        Yh+YFb6I8eWZH9sZ+hn8/skoWC7NqA==
+X-Google-Smtp-Source: AMsMyM4ROdDjV6GTDIC7rGrPJZId6RQc+iAMicuKSsRckR/ihD7ZKbUwPWuDfXhBc1jE8xBvdfnQGQ==
+X-Received: by 2002:aca:aa97:0:b0:34d:83f5:4a5 with SMTP id t145-20020acaaa97000000b0034d83f504a5mr144441oie.146.1664220043920;
+        Mon, 26 Sep 2022 12:20:43 -0700 (PDT)
+Received: from robh.at.kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id t9-20020a05683022e900b0061c9f9c54e4sm8144004otc.80.2022.09.26.12.20.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 12:20:43 -0700 (PDT)
+Received: (nullmailer pid 2629975 invoked by uid 1000);
+        Mon, 26 Sep 2022 19:20:42 -0000
+Date:   Mon, 26 Sep 2022 14:20:42 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Sven Peter <sven@svenpeter.dev>
+Cc:     linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        Jakub Kicinski <kuba@kernel.org>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        Konrad Dybcio <konrad.dybcio@somainline.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        linux-bluetooth@vger.kernel.org, Hector Martin <marcan@marcan.st>,
+        linux-arm-kernel@lists.infradead.org,
+        Andy Gross <agross@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Eric Dumazet <edumazet@google.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        asahi@lists.linux.dev,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v3 1/7] dt-bindings: net: Add generic Bluetooth controller
+Message-ID: <20220926192042.GA2629908-robh@kernel.org>
+References: <20220919164834.62739-1-sven@svenpeter.dev>
+ <20220919164834.62739-2-sven@svenpeter.dev>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220919164834.62739-2-sven@svenpeter.dev>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 7b07f1f980598cf54c91642e6583613bd6185eb1
-      https://github.com/bluez/bluez/commit/7b07f1f980598cf54c91642e6583613bd6185eb1
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
+On Mon, 19 Sep 2022 18:48:28 +0200, Sven Peter wrote:
+> Bluetooth controllers share the common local-bd-address property.
+> Add a generic YAML schema to replace bluetooth.txt for those.
+> 
+> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+> ---
+> changes from v2:
+>   - added new bluetooth subdirectory and moved files there
+>   - removed minItems from local-bd-address
+>   - dropped bjorn.andersson@linaro.org, bgodavar@codeaurora.org and
+>     rjliao@codeaurora.org due to bouncing emails from the CC list
+> 
+> changes from v1:
+>   - removed blueetooth.txt instead of just replacing it with a
+>     deprecation note
+>   - replaced references to bluetooth.txt
+> 
+>  .../devicetree/bindings/net/bluetooth.txt     |  5 ----
+>  .../net/bluetooth/bluetooth-controller.yaml   | 29 +++++++++++++++++++
+>  .../{ => bluetooth}/qualcomm-bluetooth.yaml   |  6 ++--
+>  .../bindings/soc/qcom/qcom,wcnss.yaml         |  8 ++---
+>  4 files changed, 35 insertions(+), 13 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml
+>  rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)
+> 
 
-  Changed paths:
-    M client/player.c
-
-  Log Message:
-  -----------
-  client/player: fix printf format string
-
-Use macros from inttypes.h for correct printf format specifier for
-int64_t
-
-
-  Commit: fa8411cf37a3955e187824cc84235dd6ae76524d
-      https://github.com/bluez/bluez/commit/fa8411cf37a3955e187824cc84235dd6ae76524d
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M monitor/analyze.c
-    M monitor/packet.c
-
-  Log Message:
-  -----------
-  monitor: fix printf format strings
-
-time_t is 64 bit (long long) on many 32 bit platforms (e.g. ARM) now
-
-
-  Commit: e01e89179d4ef8016f5593674834084ca549ca2a
-      https://github.com/bluez/bluez/commit/e01e89179d4ef8016f5593674834084ca549ca2a
-  Author: Christian Eggers <ceggers@arri.de>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M tools/l2test.c
-    M tools/rctest.c
-
-  Log Message:
-  -----------
-  tools: fix printf format strings
-
-time_t is 64 bit (long long) on many 32 bit platforms (e.g. ARM) now
-
-
-  Commit: 7738e9ac416b8dd9aa8f3209b75554f85836c5f0
-      https://github.com/bluez/bluez/commit/7738e9ac416b8dd9aa8f3209b75554f85836c5f0
-  Author: Haochen Tong <i@hexchain.org>
-  Date:   2022-09-26 (Mon, 26 Sep 2022)
-
-  Changed paths:
-    M tools/mpris-proxy.c
-
-  Log Message:
-  -----------
-  tools/mpris-proxy: unregister object path if player registration fails
-
-The `owner' string, passed as user data, is freed if the player fails
-registration, but the object path still exists. Upon program exiting,
-the lingering path will be enumerated and the attached user data will be
-freed again.
-
-
-Compare: https://github.com/bluez/bluez/compare/6c712030567b...7738e9ac416b
+Reviewed-by: Rob Herring <robh@kernel.org>
