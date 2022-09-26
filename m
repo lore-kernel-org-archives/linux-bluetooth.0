@@ -2,102 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AC1C32771
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 16:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 647DCC32771
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 16:59:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbiIZQ6H (ORCPT
+        id S230026AbiIZQ7L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 12:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40410 "EHLO
+        Mon, 26 Sep 2022 12:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230092AbiIZQ5w (ORCPT
+        with ESMTP id S230018AbiIZQ6y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 12:57:52 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A12C54668
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 08:54:05 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d11so6619796pll.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 08:54:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=9dA2q93Py0ZODP0TMAaBQp1gLdJ2hCsmQf04ujEZ9TM=;
-        b=DAauvrH19D6REotTcUcpDkklAnUH8OGDtp2Oyf4z9qLAu3F390GUKyjOGriU2GTWUp
-         exL7QnRh04icM+EF9aVZOjxQ/ZbV9HC6zmxUw3adhpXEVWBXtAMj8mYCwO0RqLYn+lf6
-         Y6XfnT3dMgtXLMSufpBjq8CYYaCVuvfoWaan9zpuaSmeCdJdV30eILc/vsqbBiI2Cw6T
-         pH6T3bRPU3WnldQKHIXU3h41DR/1FTqeSmh5Y0BNk23EUE10+VjcvA91wVdFjW9o3N1C
-         3Zj1qB73ZBzpJ+n2+GQoV4FWOUAHzdYtW5uFqdBHPrDxt87pYNOt4IPoriORg5VZ8S8b
-         9svQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=9dA2q93Py0ZODP0TMAaBQp1gLdJ2hCsmQf04ujEZ9TM=;
-        b=2DpSuHd+f2qKyOwgb1ac8Hf+Mc/l0ZtqBZiXJHx0qBmwnJLS9jJ1aYg6DIIJQiEgCB
-         6MBMu7IDOQ3j/8gLiBBUsOnQg+IsUP39+r57+ru/JWDYUKNRdxV1gjE5qlbiT/q6MWqH
-         fJy/CoIEGLUx9+wWlLv1ULj8/Y8ITInV5xwMj3pmZtbB1WFCBYePuzqr3jTXN3e97nOH
-         0HsbBVS9ZTQTqAMsTXvXQUdWRmT46UQ+3+ohr0gCNJPzyE2jEB21JkYNaKNQhLaZEPoM
-         c4deGLn23/lGd8rN0Cs7SBDMuhNvuInGSBWRS7M5SXEZ4Ib7t9vzPASskwgdSfpWCC6n
-         WWAw==
-X-Gm-Message-State: ACrzQf2ZylZ2CwSeOiYQ9b2l/Zz+WdmZDAjEoe5i/v2T0d0mGkSULbxp
-        VdoSKxbRLEiYZD2XW+OGCTVHnAN821vHrw==
-X-Google-Smtp-Source: AMsMyM5OD95neDb6rggedyaLqCFocW4saIGaDVnTY0wlE3toShiLHTW5rMPG2pdXF9mNYvO67xWfHg==
-X-Received: by 2002:a17:90b:1c07:b0:202:ff6e:6015 with SMTP id oc7-20020a17090b1c0700b00202ff6e6015mr26139799pjb.210.1664207644762;
-        Mon, 26 Sep 2022 08:54:04 -0700 (PDT)
-Received: from [172.17.0.2] ([138.91.166.165])
-        by smtp.gmail.com with ESMTPSA id f1-20020a170902684100b00173cfb184c0sm11417485pln.32.2022.09.26.08.54.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 08:54:04 -0700 (PDT)
-Message-ID: <6331cb1c.170a0220.2d0e6.4cbd@mx.google.com>
-Date:   Mon, 26 Sep 2022 08:54:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8062655555653478485=="
+        Mon, 26 Sep 2022 12:58:54 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69F5E77E80
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 08:55:51 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ED56560E89
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 15:55:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C52EC433D6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 15:55:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664207750;
+        bh=Jn+2ZNMxYrg+yx7/fac8UkwKZJEeKXTweYRA41TNx+w=;
+        h=From:To:Subject:Date:From;
+        b=NuvJK/YSC/kypKMwpt3ZJcF6lf8CnK58ZXy6j3H6daP/4993zehlLvBtF5FAV5LIU
+         gf4fe2XbilLF+jwVQnzY4c7iJIiZWYCEA+HQV1yjHuV5WnhP+PZRp1nWi2n7qxglml
+         5UZpwG6sIqXfACXc7FRj4Htp6E2G1Zx+qiOJeDv+qsCKJGKKH/xSfnN3gS6aMoszzw
+         kqgxZO02oA82nZCGkkQTPu895zkTYQAwAssV0TgzeVgdhoRt7aV5vhfTczAiEcuT+U
+         lDzW24HW9fuemsPKNeV5StQkqjHepbVZzn/nXmlanv21rLwu7uWHCb5L+W+TA0L+BP
+         DGwKElojZgccg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3FB3FC433E4; Mon, 26 Sep 2022 15:55:50 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216532] New: openSUSE Tumbleweed, AX210, bluetooth, connection
+ fails
+Date:   Mon, 26 Sep 2022 15:55:49 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: epistemepromeneur@free.fr
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-216532-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, isak.westin@loytec.com
-Subject: RE: Mesh: Fix heartbeat publication/subscription
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220926130110.2146-2-isak.westin@loytec.com>
-References: <20220926130110.2146-2-isak.westin@loytec.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8062655555653478485==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216532
 
-This is automated email and please do not reply to this email!
+            Bug ID: 216532
+           Summary: openSUSE Tumbleweed, AX210, bluetooth, connection
+                    fails
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.19.10
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: epistemepromeneur@free.fr
+        Regression: No
 
-Dear submitter,
+MB Asus B250M
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=680522
+Wi-Fi/Bluetooth card : EDUP LOVE EP-9651GS (chipset Intel AX210), Bluetooth=
+ 5.3
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.06 seconds
-GitLint                       PASS      2.07 seconds
-Prep - Setup ELL              PASS      35.30 seconds
-Build - Prep                  PASS      0.83 seconds
-Build - Configure             PASS      10.94 seconds
-Build - Make                  PASS      1231.41 seconds
-Make Check                    PASS      13.40 seconds
-Make Check w/Valgrind         PASS      380.05 seconds
-Make Distcheck                PASS      324.29 seconds
-Build w/ext ELL - Configure   PASS      11.27 seconds
-Build w/ext ELL - Make        PASS      115.80 seconds
-Incremental Build w/ patches  PASS      538.07 seconds
-Scan Build                    PASS      738.03 seconds
+Samsung S7, android 8.0, Bluetooth 4
 
 
 
----
-Regards,
-Linux Bluetooth
+openSUSE Tumbleweed
+
+kernel 5.19.10
+
+Firmware date : 20220902 (date of the package "firmware all")
 
 
---===============8062655555653478485==--
+
+I don't use Wi-Fi. Just for a backup solution. I checked Wi-Fi works well.
+
+
+
+At the PC, just disconnect the smartphone after pairing.
+
+Wait 5 mn or more.
+
+At the PC, connect the smartphone. The connection fails.
+
+
+
+I did some experiments with Clearlinux and Fedora. With the two OS, I can
+reproduce the problem.
+
+
+
+More info :
+
+At the smartphone, I connect the PC. The connection succeeds.
+
+At the PC, I disconnect then reconnect the smartphone. The connection succe=
+eds.
+
+At the PC disconnect the smartphone.
+
+Wait for 5 mn or more.
+
+At the PC connect the smartphone. The connection fails.
+
+
+
+Thanks in advance
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
