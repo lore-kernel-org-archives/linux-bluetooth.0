@@ -2,95 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 641F0C32771
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 22:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A986C32771
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 22:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230493AbiIZWGz (ORCPT
+        id S229897AbiIZWkk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 18:06:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39320 "EHLO
+        Mon, 26 Sep 2022 18:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230002AbiIZWGk (ORCPT
+        with ESMTP id S229912AbiIZWkb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 18:06:40 -0400
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EAA05A16E;
-        Mon, 26 Sep 2022 15:06:38 -0700 (PDT)
-Received: by mail-il1-f182.google.com with SMTP id a2so4242585iln.13;
-        Mon, 26 Sep 2022 15:06:38 -0700 (PDT)
+        Mon, 26 Sep 2022 18:40:31 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A2851427;
+        Mon, 26 Sep 2022 15:40:29 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id c7so9031510ljm.12;
+        Mon, 26 Sep 2022 15:40:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=y72XdXz6R5ZX/ARjJcZ26pw4EoyPBrU9yVa6+CTk8aU=;
+        b=MUbphOcrpdLt5Iomx0drL3eOcQehL/fsyiEdAkz7QzmABbebFY7hoTuj00cvws+kQb
+         xdkQ7b5thEBkfj+yxxLT2UtP/Jlkz1uhSvDSgbkTR7NPFW8LG0NmyQB4gr/YmngT3CdE
+         oZKo3e09DksH1ZBc0B/lYsVvf8l99rwiHoHE8K1DPOU7wP3qn+38DPYtARw/uDpIqJws
+         kFyEkWHl4TFB/zConA/M2BLF+dxBVsC4VCgis8TNOSaH/XoKG5FdqRt3bdUfptxQY+pp
+         5AkIxUrWdYm8oOS3DNXwumRi/Pp1I+3aXZ1ig1ad9KVWTsr23F5TzvcRMaWzoXMl/wNY
+         RzUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=l96haFyrXxNTE1u1owFXDxJUOTDMZwvAkT0nT31cjps=;
-        b=l4xnb/r/YWDspzyK5mtU8kiVDBAglOiWxQeSOFV8mtsUIPzp0RFe1pBroSjAf6u/hq
-         PI/cfsWHJn7eW7LKThT8YwyR4KjbdsSFoWPMrhKtVZK77dDvXGWi2x8A2qRs+OUMabIA
-         lK31XRnwf3pnDiK0LJBJaoH+v05CjlG9vO6OLyge/fPj9AeXktmqmTvjfWseIxnI4zZD
-         nhwef14RlZN8+Y9Niw/DaICcsWlfA29/qB2m9wnIZwO7Y4iVX8C1T5kJtG6pQeXbCRGc
-         FIJPp0wdwWOwcdlmBkSDRj1TfmYCgnW0/Enz0SRYDwEv0CNPSG8dSbh8mfjLaUcOUqi0
-         vXGQ==
-X-Gm-Message-State: ACrzQf2I5JS1Nq4QParzpo+gVTpf1YsPWZEjtRe3vVFRjZ21mTud5Bdd
-        VJ7/arIEkzAOVK47v1i5gXM=
-X-Google-Smtp-Source: AMsMyM78bs8n3LoZHbCbdd8YueYP7TNZGVDaVL1FukYZZipfjUCZ1G4r9bgOBDFSz/rHewjDKFcIOg==
-X-Received: by 2002:a05:6e02:1645:b0:2f8:3545:5470 with SMTP id v5-20020a056e02164500b002f835455470mr5100167ilu.245.1664229997262;
-        Mon, 26 Sep 2022 15:06:37 -0700 (PDT)
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id a65-20020a021644000000b0034af3f3f9c0sm7471223jaa.118.2022.09.26.15.06.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Sep 2022 15:06:36 -0700 (PDT)
-From:   Sungwoo Kim <iam@sung-woo.kim>
-To:     luiz.dentz@gmail.com
-Cc:     davem@davemloft.net, edumazet@google.com, iam@sung-woo.kim,
-        johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller@googlegroups.com
-Subject: Re: [PATCH] Bluetooth: L2CAP: fix an illegal state transition from BT_DISCONN
-Date:   Mon, 26 Sep 2022 18:02:13 -0400
-Message-Id: <20220926220212.3170191-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CABBYNZLdvOzTwnHp4GX9PiXVMr2SDjD1NCXLRJw1_XLvSuZyjw@mail.gmail.com>
-References: <CABBYNZLdvOzTwnHp4GX9PiXVMr2SDjD1NCXLRJw1_XLvSuZyjw@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=y72XdXz6R5ZX/ARjJcZ26pw4EoyPBrU9yVa6+CTk8aU=;
+        b=EoJ5o9IGyFaPCDv8AiHT9Y8DU+TRtrLfuVdfF5pyVLQwREwbnefB/aUxJG+wxvoe+L
+         0NVmhABjjBDi6YSPsZpaIs9T3YEpaZwZWh5lolzgNPg9L5H7/nkbyuoEn7YzqEZMjaZK
+         oVUX6uKlhwOxveeTO0frxgDtp6z01o/jUOiyCrw1Lsr7qgGRZcGipzXT+KlU4qePPFZx
+         zcTnKS+aCP+mm5ehNfU1ZWw8AuA7kkzsGmEkAAl/diMjyBMvz0Gfwcny/mjeYNDJcVTk
+         lpPGR4B38hxzRCHerD4p6hB83tI0neSYilspJxmj2gxLDI5hn5bdsksjT8DzGAKzW7AD
+         SYyg==
+X-Gm-Message-State: ACrzQf2Ffzuj/BhwGCmIP7jZAJ7D5E3Ax3N2ztvCUbC25d4U15AyvldZ
+        uLWQG+Jz2UJKTdjjeexZbubH9oOlg5yBU5jyVm8=
+X-Google-Smtp-Source: AMsMyM5W3/lV0mq0BREkCl59rHi1NZjUjoS6a/j3YY+f9eMLjaOBimG9gR98iWI/mtzQCNT2AD7QEJIr4upKEDPk1AI=
+X-Received: by 2002:a2e:a884:0:b0:25d:d8a2:d18c with SMTP id
+ m4-20020a2ea884000000b0025dd8a2d18cmr7917320ljq.305.1664232027695; Mon, 26
+ Sep 2022 15:40:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABBYNZLdvOzTwnHp4GX9PiXVMr2SDjD1NCXLRJw1_XLvSuZyjw@mail.gmail.com>
+ <20220926220212.3170191-1-iam@sung-woo.kim>
+In-Reply-To: <20220926220212.3170191-1-iam@sung-woo.kim>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 26 Sep 2022 15:40:15 -0700
+Message-ID: <CABBYNZ+C_N=vSE6oUn2rDHq5EHCFtAAjtohbcpjMtKwwgqpqUQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: L2CAP: fix an illegal state transition from BT_DISCONN
+To:     Sungwoo Kim <iam@sung-woo.kim>
+Cc:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
----
- net/bluetooth/l2cap_core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Hi Kim,
+
+On Mon, Sep 26, 2022 at 3:06 PM Sungwoo Kim <iam@sung-woo.kim> wrote:
+>
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> ---
+>  net/bluetooth/l2cap_core.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2c9de67da..029de9f35 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4294,13 +4294,13 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+>         mutex_lock(&conn->chan_lock);
+>
+>         if (scid) {
+> -               chan = __l2cap_get_chan_by_scid(conn, scid);
+> +               chan = l2cap_get_chan_by_scid(conn, scid);
+>                 if (!chan) {
+>                         err = -EBADSLT;
+>                         goto unlock;
+>                 }
+>         } else {
+> -               chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
+> +               chan = l2cap_get_chan_by_ident(conn, cmd->ident);
+>                 if (!chan) {
+>                         err = -EBADSLT;
+>                         goto unlock;
+> @@ -4336,6 +4336,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+>         }
+>
+>         l2cap_chan_unlock(chan);
+> +       l2cap_chan_put(chan);
+>
+>  unlock:
+>         mutex_unlock(&conn->chan_lock);
+> --
+> 2.25.1
+
+Not quite right, we cannot lock conn->chan_lock since the likes of
+l2cap_get_chan_by_scid will also attempt to lock it:
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2c9de67da..029de9f35 100644
+index 770891f68703..4726d8979276 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4294,13 +4294,13 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	mutex_lock(&conn->chan_lock);
- 
- 	if (scid) {
--		chan = __l2cap_get_chan_by_scid(conn, scid);
-+		chan = l2cap_get_chan_by_scid(conn, scid);
- 		if (!chan) {
- 			err = -EBADSLT;
- 			goto unlock;
- 		}
- 	} else {
--		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
-+		chan = l2cap_get_chan_by_ident(conn, cmd->ident);
- 		if (!chan) {
- 			err = -EBADSLT;
- 			goto unlock;
-@@ -4336,6 +4336,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	}
- 
- 	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
- 
- unlock:
- 	mutex_unlock(&conn->chan_lock);
--- 
-2.25.1
+@@ -4293,26 +4293,18 @@ static int l2cap_connect_create_rsp(struct
+l2cap_conn *conn,
+        BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
+               dcid, scid, result, status);
 
+-       mutex_lock(&conn->chan_lock);
+-
+        if (scid) {
+-               chan = __l2cap_get_chan_by_scid(conn, scid);
+-               if (!chan) {
+-                       err = -EBADSLT;
+-                       goto unlock;
+-               }
++               chan = l2cap_get_chan_by_scid(conn, scid);
++               if (!chan)
++                       return -EBADSLT;
+        } else {
+-               chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
+-               if (!chan) {
+-                       err = -EBADSLT;
+-                       goto unlock;
+-               }
++               chan = l2cap_get_chan_by_ident(conn, cmd->ident);
++               if (!chan)
++                       return -EBADSLT;
+        }
+
+        err = 0;
+
+-       l2cap_chan_lock(chan);
+-
+        switch (result) {
+        case L2CAP_CR_SUCCESS:
+                l2cap_state_change(chan, BT_CONFIG);
+@@ -4338,9 +4330,7 @@ static int l2cap_connect_create_rsp(struct
+l2cap_conn *conn,
+        }
+
+        l2cap_chan_unlock(chan);
+-
+-unlock:
+-       mutex_unlock(&conn->chan_lock);
++       l2cap_chan_put(chan);
+
+        return err;
+ }
+
+
+-- 
+Luiz Augusto von Dentz
