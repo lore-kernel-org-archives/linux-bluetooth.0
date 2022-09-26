@@ -2,163 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A986C32771
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 22:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B44ECC32771
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Sep 2022 22:51:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbiIZWkk (ORCPT
+        id S229436AbiIZWvM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 18:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59304 "EHLO
+        Mon, 26 Sep 2022 18:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229912AbiIZWkb (ORCPT
+        with ESMTP id S229457AbiIZWvL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 18:40:31 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83A2851427;
-        Mon, 26 Sep 2022 15:40:29 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id c7so9031510ljm.12;
-        Mon, 26 Sep 2022 15:40:29 -0700 (PDT)
+        Mon, 26 Sep 2022 18:51:11 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 698796E8AE
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 15:51:10 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id g1-20020a17090a708100b00203c1c66ae3so8404501pjk.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 15:51:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=y72XdXz6R5ZX/ARjJcZ26pw4EoyPBrU9yVa6+CTk8aU=;
-        b=MUbphOcrpdLt5Iomx0drL3eOcQehL/fsyiEdAkz7QzmABbebFY7hoTuj00cvws+kQb
-         xdkQ7b5thEBkfj+yxxLT2UtP/Jlkz1uhSvDSgbkTR7NPFW8LG0NmyQB4gr/YmngT3CdE
-         oZKo3e09DksH1ZBc0B/lYsVvf8l99rwiHoHE8K1DPOU7wP3qn+38DPYtARw/uDpIqJws
-         kFyEkWHl4TFB/zConA/M2BLF+dxBVsC4VCgis8TNOSaH/XoKG5FdqRt3bdUfptxQY+pp
-         5AkIxUrWdYm8oOS3DNXwumRi/Pp1I+3aXZ1ig1ad9KVWTsr23F5TzvcRMaWzoXMl/wNY
-         RzUw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date;
+        bh=lJQf3wss80NTmbHPj2kDj0gPnd5RVcmdUggFI+pXuCo=;
+        b=fQKkpytWhiRJtApDsZ9FaOwsUXzmcmOkheEtBeVGXKELelEmVdh9x35ozb0h27GGN1
+         Xi8MaWjEDQAYgynKA4MyX2eos2qNkavvlTE1uRDlNILmMoBIQ5wDlQ3mC226NTwUDGpc
+         ODSIK4iWqc9Dpr2dpxMocJ0GiiKJZc4TqjpgekT9iIKq5aRJR/UljINr2mXx754y1nqi
+         oHf0X2Unf8/G2gphws4wQQbj5XJyUR9EvSqXLsdKqDwJLZvnjLrlptJT8qLmhVWTRJu5
+         y+9iYMNV/8qvS4mcJYJTDrRq28fti3kQdo91tZuEWwk5fs6EJMtFs2uq3gtj+w8JqhT2
+         j1XA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=y72XdXz6R5ZX/ARjJcZ26pw4EoyPBrU9yVa6+CTk8aU=;
-        b=EoJ5o9IGyFaPCDv8AiHT9Y8DU+TRtrLfuVdfF5pyVLQwREwbnefB/aUxJG+wxvoe+L
-         0NVmhABjjBDi6YSPsZpaIs9T3YEpaZwZWh5lolzgNPg9L5H7/nkbyuoEn7YzqEZMjaZK
-         oVUX6uKlhwOxveeTO0frxgDtp6z01o/jUOiyCrw1Lsr7qgGRZcGipzXT+KlU4qePPFZx
-         zcTnKS+aCP+mm5ehNfU1ZWw8AuA7kkzsGmEkAAl/diMjyBMvz0Gfwcny/mjeYNDJcVTk
-         lpPGR4B38hxzRCHerD4p6hB83tI0neSYilspJxmj2gxLDI5hn5bdsksjT8DzGAKzW7AD
-         SYyg==
-X-Gm-Message-State: ACrzQf2Ffzuj/BhwGCmIP7jZAJ7D5E3Ax3N2ztvCUbC25d4U15AyvldZ
-        uLWQG+Jz2UJKTdjjeexZbubH9oOlg5yBU5jyVm8=
-X-Google-Smtp-Source: AMsMyM5W3/lV0mq0BREkCl59rHi1NZjUjoS6a/j3YY+f9eMLjaOBimG9gR98iWI/mtzQCNT2AD7QEJIr4upKEDPk1AI=
-X-Received: by 2002:a2e:a884:0:b0:25d:d8a2:d18c with SMTP id
- m4-20020a2ea884000000b0025dd8a2d18cmr7917320ljq.305.1664232027695; Mon, 26
- Sep 2022 15:40:27 -0700 (PDT)
-MIME-Version: 1.0
-References: <CABBYNZLdvOzTwnHp4GX9PiXVMr2SDjD1NCXLRJw1_XLvSuZyjw@mail.gmail.com>
- <20220926220212.3170191-1-iam@sung-woo.kim>
-In-Reply-To: <20220926220212.3170191-1-iam@sung-woo.kim>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date;
+        bh=lJQf3wss80NTmbHPj2kDj0gPnd5RVcmdUggFI+pXuCo=;
+        b=do/Pxd7PZHecjyQU4kHdchYgOgn6eGVGiGv2J3+KFvGYgKdmX4uGWOQKmmSHEzgK3T
+         DreP5RcLxpU+DoCdTcelvWzT+ziBLuDIf3d2VkGLUav9EXm3SI4wyZ1EmrvtxGVtOYU9
+         MmydMOOu7h25DBIO64bcK0V5G7b6aHt/LjOVOTNzHKYcNztzK7Cx0m2EsyNLZWrpQNBT
+         AhV4xcQbzEP/kTL4ErMI+KbJ5yZHh9fPbeusGoGvGCgfnkbzfVyjNE81SngCSyCbujWO
+         e55ZyXKA+dbikyX35k/arzNAkDbFtX9YOm3J4DbxhbK7PcwBGB/xeRPR+mhzPIyBBoIi
+         fpcw==
+X-Gm-Message-State: ACrzQf2rgEp6xlo5t9vgkTt6ElkHwY5WTF+j4WElp3upVVtnOCfPy164
+        jClHJ6R3HBMc02aTMMe2AmSlu8CjYHVlIw==
+X-Google-Smtp-Source: AMsMyM4JdRucD9yGZo17ZofTvtcgf7kUDpWduH0IBD04C46L5Ifp2+2sFsIyPpVP4sk4QrjGEW96rg==
+X-Received: by 2002:a17:90b:4f8d:b0:203:747c:7b7e with SMTP id qe13-20020a17090b4f8d00b00203747c7b7emr1085630pjb.98.1664232669424;
+        Mon, 26 Sep 2022 15:51:09 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id n16-20020a170902d2d000b0016f1319d2a7sm11907332plc.297.2022.09.26.15.51.08
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 15:51:08 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 26 Sep 2022 15:40:15 -0700
-Message-ID: <CABBYNZ+C_N=vSE6oUn2rDHq5EHCFtAAjtohbcpjMtKwwgqpqUQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: L2CAP: fix an illegal state transition from BT_DISCONN
-To:     Sungwoo Kim <iam@sung-woo.kim>
-Cc:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, marcel@holtmann.org,
-        netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_core: Fix not handling link timeouts propertly
+Date:   Mon, 26 Sep 2022 15:51:07 -0700
+Message-Id: <20220926225107.3226470-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kim,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Sep 26, 2022 at 3:06 PM Sungwoo Kim <iam@sung-woo.kim> wrote:
->
-> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
-> ---
->  net/bluetooth/l2cap_core.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 2c9de67da..029de9f35 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -4294,13 +4294,13 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
->         mutex_lock(&conn->chan_lock);
->
->         if (scid) {
-> -               chan = __l2cap_get_chan_by_scid(conn, scid);
-> +               chan = l2cap_get_chan_by_scid(conn, scid);
->                 if (!chan) {
->                         err = -EBADSLT;
->                         goto unlock;
->                 }
->         } else {
-> -               chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
-> +               chan = l2cap_get_chan_by_ident(conn, cmd->ident);
->                 if (!chan) {
->                         err = -EBADSLT;
->                         goto unlock;
-> @@ -4336,6 +4336,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
->         }
->
->         l2cap_chan_unlock(chan);
-> +       l2cap_chan_put(chan);
->
->  unlock:
->         mutex_unlock(&conn->chan_lock);
-> --
-> 2.25.1
+Change that introduced the use of __check_timeout did not account for
+link types properly, it always assumes ACL_LINK is used thus causing
+hdev->acl_last_tx to be used even in case of LE_LINK and then again
+uses ACL_LINK with hci_link_tx_to.
 
-Not quite right, we cannot lock conn->chan_lock since the likes of
-l2cap_get_chan_by_scid will also attempt to lock it:
+To fix this __check_timeout now takes the link type as parameter and
+then procedure to use the right last_tx based on the link type and pass
+it to hci_link_tx_to.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 770891f68703..4726d8979276 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4293,26 +4293,18 @@ static int l2cap_connect_create_rsp(struct
-l2cap_conn *conn,
-        BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
-               dcid, scid, result, status);
+Fixes: 1b1d29e51499 ("Bluetooth: Make use of __check_timeout on hci_sched_le")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c | 34 +++++++++++++++++++++++-----------
+ 1 file changed, 23 insertions(+), 11 deletions(-)
 
--       mutex_lock(&conn->chan_lock);
--
-        if (scid) {
--               chan = __l2cap_get_chan_by_scid(conn, scid);
--               if (!chan) {
--                       err = -EBADSLT;
--                       goto unlock;
--               }
-+               chan = l2cap_get_chan_by_scid(conn, scid);
-+               if (!chan)
-+                       return -EBADSLT;
-        } else {
--               chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
--               if (!chan) {
--                       err = -EBADSLT;
--                       goto unlock;
--               }
-+               chan = l2cap_get_chan_by_ident(conn, cmd->ident);
-+               if (!chan)
-+                       return -EBADSLT;
-        }
-
-        err = 0;
-
--       l2cap_chan_lock(chan);
--
-        switch (result) {
-        case L2CAP_CR_SUCCESS:
-                l2cap_state_change(chan, BT_CONFIG);
-@@ -4338,9 +4330,7 @@ static int l2cap_connect_create_rsp(struct
-l2cap_conn *conn,
-        }
-
-        l2cap_chan_unlock(chan);
--
--unlock:
--       mutex_unlock(&conn->chan_lock);
-+       l2cap_chan_put(chan);
-
-        return err;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 66c7cdba0d32..063fbb8e07ca 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3485,15 +3485,27 @@ static inline int __get_blocks(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return DIV_ROUND_UP(skb->len - HCI_ACL_HDR_SIZE, hdev->block_len);
  }
-
-
+ 
+-static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
++static void __check_timeout(struct hci_dev *hdev, unsigned int cnt, u8 type)
+ {
+-	if (!hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
+-		/* ACL tx timeout must be longer than maximum
+-		 * link supervision timeout (40.9 seconds) */
+-		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
+-				       HCI_ACL_TX_TIMEOUT))
+-			hci_link_tx_to(hdev, ACL_LINK);
++	unsigned long last_tx;
++
++	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
++		return;
++
++	switch (type) {
++	case LE_LINK:
++		last_tx = hdev->le_last_tx;
++		break;
++	default:
++		last_tx = hdev->acl_last_tx;
++		break;
+ 	}
++
++	/* tx timeout must be longer than maximum link supervision timeout
++	 * (40.9 seconds)
++	 */
++	if (!cnt && time_after(jiffies, last_tx + HCI_ACL_TX_TIMEOUT))
++		hci_link_tx_to(hdev, type);
+ }
+ 
+ /* Schedule SCO */
+@@ -3551,7 +3563,7 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+ 	struct sk_buff *skb;
+ 	int quote;
+ 
+-	__check_timeout(hdev, cnt);
++	__check_timeout(hdev, cnt, ACL_LINK);
+ 
+ 	while (hdev->acl_cnt &&
+ 	       (chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+@@ -3594,8 +3606,6 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+ 	int quote;
+ 	u8 type;
+ 
+-	__check_timeout(hdev, cnt);
+-
+ 	BT_DBG("%s", hdev->name);
+ 
+ 	if (hdev->dev_type == HCI_AMP)
+@@ -3603,6 +3613,8 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+ 	else
+ 		type = ACL_LINK;
+ 
++	__check_timeout(hdev, cnt, type);
++
+ 	while (hdev->block_cnt > 0 &&
+ 	       (chan = hci_chan_sent(hdev, type, &quote))) {
+ 		u32 priority = (skb_peek(&chan->data_q))->priority;
+@@ -3676,7 +3688,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+ 
+ 	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
+ 
+-	__check_timeout(hdev, cnt);
++	__check_timeout(hdev, cnt, LE_LINK);
+ 
+ 	tmp = cnt;
+ 	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
 -- 
-Luiz Augusto von Dentz
+2.37.3
+
