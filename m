@@ -2,167 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356E2C6FA83
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 20:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265B7C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 21:10:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232453AbiI0USf (ORCPT
+        id S232071AbiI0VKK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Sep 2022 16:18:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37938 "EHLO
+        Tue, 27 Sep 2022 17:10:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232943AbiI0USB (ORCPT
+        with ESMTP id S231587AbiI0VKJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Sep 2022 16:18:01 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D745819286
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 13:17:23 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id x23-20020a634857000000b0043c700f6441so6165951pgk.21
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 13:17:23 -0700 (PDT)
+        Tue, 27 Sep 2022 17:10:09 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2171C6A40
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 14:10:08 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id v1so5756504ilq.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 14:10:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=F72lE+m5jUyXJTZtAHspzg4fSLtIEdJfsL6DV7/dUu4=;
-        b=Mn8MbU84gVPCY9rdXSLA84U8EL0aqabNS24qrZWJ2AnahzfD2GFj4FE4Z0n05/O/Zt
-         V/aIs40HUCDBjONjB/LyF+BOhm2UoyobiRZGpXu8lr1esxucb3JZeu+8OKc2pVc2hh+x
-         UbnmqFSEJ68jJdDpoYY6FLvV3Seo1t7Gv9OPvEIWZJuj7+TsSj0WhD3vvSxJxaBFJcr0
-         ld8bUZgzL82VhOu3rnVqg118AzBJEQHny195aliXzFCnm2SSzbP2u1ixIV6zu1pdNmo5
-         8zrLlDxN1AZsVn+LXYQQ7GgkBbtgIuNb5lkEruA8D7OJ2ywQrsl3f6gNazJf9QttXIYO
-         gHbA==
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=JJigQu9zjnijBJJPdoADdZKVkwl+vwGwqtbR0HwRFlQ=;
+        b=K4aX1Oai3MT9h+rzwnNt8I+WOkC8EysP5s/eVfhrD0Ob4XWIrIORPhKEMPteYWk7NC
+         cxhbMk1jVDwJgxRylR1G4ErGh5d2cpcbrtl0URO0FO52+KQSmNFiV4ajMvfxoQKUMYaG
+         HxM/0Sjj6g5t5Mv8Cs2k83dx5DGIZHnNd8ZofmoY8DtWJAkYhmI9nsDmH/JrG5qaUyp1
+         pUsWSFAOcL5d98y5r92MtIBYOjF0kutF4Xour6ctOmaaC+DdeL1FbRGTSTLoYG+jPzRD
+         Ce95nrBu5COvZXq5BQDWAi9DDLguNlaSEYSce2zslWhksn7N+mZSuglDICdraGgqNB4w
+         pIlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=F72lE+m5jUyXJTZtAHspzg4fSLtIEdJfsL6DV7/dUu4=;
-        b=D0hoDPMDUDgOlTFaWaLzOUM7Bzfsp090tRxTwTkV+Q9OvuvpNNxOm9dAMX3TT+Q2n1
-         Lg7PTMGQp/THnUrd6Z9KF9Udr9Fucto5SjSruCdYqLfEtjvBcH60XbtOESUC24GVnZ2N
-         h+5sOvvgymgfKnxKHxuhbTwJ2zuN43yROaFQKiEa71iZujB3Oj6Ujbh9jJeWVcfKnq6/
-         /O4WF5hnFJjlea7u7LWMfMGXkbNvpQLpw/35yzX6NDBKuurmvt/RzVoRYIc7u4Fewy7F
-         HNS7ylulcuAfZyqAno/Y5uD38SmXxrhXdloY/ur9u0oAaHvsEWk/OBPXsMkwYeBQI89n
-         rrSw==
-X-Gm-Message-State: ACrzQf230O58RLHO0vHwyOaXnT1lv0+k74BMcsTrRAaBawr0onquqx+F
-        LoxNmvy4pbLqFvKL8X0u67ZL8LqFScsqHzs5dAMD1XleexwLcia/ufecPVBE5bbNa5KhNfmzZu3
-        Xo9XEdZj9PDSWhv1LcuMZ2MDTDaj8Wf7XnFrDNczc4sHC8Vo82aKystiopWkizZOghqjJxW2IKo
-        UavAw4JZGdVSsGvc/FM/8=
-X-Google-Smtp-Source: AMsMyM4YN8OcX/N4kLK/55u37LO9rUT0u12bu6lrEYV/DZXomjgyk3g5okkp2Zpf8VEXOnvAkp4pZZsMv5Jul6oz+V5raQ==
-X-Received: from abps.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:9b4])
- (user=abhishekpandit job=sendgmr) by 2002:aa7:9e0d:0:b0:540:94a7:9051 with
- SMTP id y13-20020aa79e0d000000b0054094a79051mr31047543pfq.59.1664309843219;
- Tue, 27 Sep 2022 13:17:23 -0700 (PDT)
-Date:   Tue, 27 Sep 2022 13:17:20 -0700
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20220927131717.v3.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
-Subject: [PATCH v3] Bluetooth: Call shutdown for HCI_USER_CHANNEL
-From:   Abhishek Pandit-Subedi <abhishekpandit@google.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=JJigQu9zjnijBJJPdoADdZKVkwl+vwGwqtbR0HwRFlQ=;
+        b=7JYekLWmVRR2NaXlmR4mZjySJ486GmVUWsvE8cZihZ48Ok8oKP3+/ZVf4qyvGd4eHX
+         5UoDZW7pgQX+mQlYQ+6f3v7uEHigfyrFyCNCxx6as7OEKyNznN3jprBNlr5idI6Xgc6Y
+         7n7LIiKCEKK4wgmEFnsCUNEBGaUskO+mAFPdYQh3XrzXwEWycO1+32NVyO04eSWGXvmY
+         3ewlP+eOWmE0NhHpiXeu537fJnLnPXWvI2F2MQxbF92CQRDnPrtwTbl11Q32QTUW1gjI
+         ZI2b/U40jflPPiBLlie1QVMbmHMG4QkOVWwJSmsFonTBmctGJ88Fye3kaW4t5lB6uGL2
+         xqeg==
+X-Gm-Message-State: ACrzQf2wSXiLI6DftwweQqJvHLQQdT1npDwL4YXprzhcp6UAoDUfa9Eg
+        oXSSyTeHq/w66NFNEKPCSRivEFGZ3FU=
+X-Google-Smtp-Source: AMsMyM5NF5a0saRhZfUNj+ROFVJFvq5VzExyFCcZAz1DEusutjE+QHzmcK2q/Q0UGXgxsEvKAfFsHw==
+X-Received: by 2002:a05:6e02:1645:b0:2f8:3545:5470 with SMTP id v5-20020a056e02164500b002f835455470mr7504776ilu.245.1664313007457;
+        Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
+Received: from [172.17.0.2] ([40.69.174.250])
+        by smtp.gmail.com with ESMTPSA id n1-20020a056638264100b0034af3f3f9c0sm1008656jat.118.2022.09.27.14.10.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
+Message-ID: <633366af.050a0220.7368c.14ee@mx.google.com>
+Date:   Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5847527822593035103=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
+Subject: RE: [v3] Bluetooth: Call shutdown for HCI_USER_CHANNEL
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220927131717.v3.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
+References: <20220927131717.v3.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+--===============5847527822593035103==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Some drivers depend on shutdown being called for proper operation.
-Unset HCI_USER_CHANNEL and call the full close routine since shutdown is
-complementary to setup.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=681203
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.51 seconds
+GitLint                       PASS      0.80 seconds
+SubjectPrefix                 PASS      0.65 seconds
+BuildKernel                   PASS      33.70 seconds
+BuildKernel32                 PASS      29.38 seconds
+Incremental Build with patchesPASS      42.26 seconds
+TestRunner: Setup             PASS      498.42 seconds
+TestRunner: l2cap-tester      PASS      16.50 seconds
+TestRunner: iso-tester        PASS      15.38 seconds
+TestRunner: bnep-tester       PASS      6.09 seconds
+TestRunner: mgmt-tester       PASS      99.33 seconds
+TestRunner: rfcomm-tester     PASS      9.83 seconds
+TestRunner: sco-tester        PASS      9.19 seconds
+TestRunner: ioctl-tester      PASS      10.31 seconds
+TestRunner: smp-tester        PASS      9.30 seconds
+TestRunner: userchan-tester   PASS      6.28 seconds
+
+
+
 ---
-
-Using hci_qca, we can get the controller into a bad state simply by
-trying to bind to userchannel twice (open+bind+close, then open+bind).
-Without running the shutdown routine, the device seems to get into a bad
-state. A similar bug also occurs with btmtksdio (using MT7921).
-
-This change properly runs the shutdown routine, which should be
-complementary to setup. The reason it unsets the HCI_USER_CHANNEL flag
-is that some drivers have complex operations in their shutdown routine
-(including sending hci packets) and we need to support the normal data
-path for them (including cmd_timeout + recovery mechanisms).
-
-Note for v2: I've gotten a chance to test this on more devices
-and figure out why it wasn't working before in v1. I found two problems:
-I had a signal pending (SIGTERM) that was messing things up in the
-socket release function and the HCI_USER_CHANNEL flag was preventing
-hci_sync from operating properly during shutdown on Intel chipsets
-(which use the sync functions to send a reset command + other commands
-sometimes).
-
-This was tested with hci_qca (QCA6174-A-3), btmtksdio (MT7921-SDIO)
-and btusb (with AX200).
+Regards,
+Linux Bluetooth
 
 
-Changes in v3:
-- Added hci_dev_shutdown to wrap disabling and re-enabling flag.
-
-Changes in v2:
-- Clear HCI_USER_CHANNEL flag at start of close and restore at end.
-- Add comment explaning why we need to clear flag and run shutdown.
-
- net/bluetooth/hci_sync.c | 33 ++++++++++++++++++++++++++-------
- 1 file changed, 26 insertions(+), 7 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 422f7c6911d9..15c75ef4c271 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -4727,6 +4727,31 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
- 	BT_DBG("All LE pending actions cleared");
- }
- 
-+static int hci_dev_shutdown(struct hci_dev *hdev)
-+{
-+	int err = 0;
-+	/* Similar to how we first do setup and then set the exclusive access
-+	 * bit for userspace, we must first unset userchannel and then clean up.
-+	 * Otherwise, the kernel can't properly use the hci channel to clean up
-+	 * the controller (some shutdown routines require sending additional
-+	 * commands to the controller for example).
-+	 */
-+	bool was_userchannel =
-+		hci_dev_test_and_clear_flag(hdev, HCI_USER_CHANNEL);
-+
-+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+	    test_bit(HCI_UP, &hdev->flags)) {
-+		/* Execute vendor specific shutdown routine */
-+		if (hdev->shutdown)
-+			err = hdev->shutdown(hdev);
-+	}
-+
-+	if (was_userchannel)
-+		hci_dev_set_flag(hdev, HCI_USER_CHANNEL);
-+
-+	return err;
-+}
-+
- int hci_dev_close_sync(struct hci_dev *hdev)
- {
- 	bool auto_off;
-@@ -4746,13 +4771,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 		hdev->adv_instance_timeout = 0;
- 	}
- 
--	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
--	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--	    test_bit(HCI_UP, &hdev->flags)) {
--		/* Execute vendor specific shutdown routine */
--		if (hdev->shutdown)
--			err = hdev->shutdown(hdev);
--	}
-+	err = hci_dev_shutdown(hdev);
- 
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		cancel_delayed_work_sync(&hdev->cmd_timer);
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
-
+--===============5847527822593035103==--
