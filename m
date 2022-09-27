@@ -2,197 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDBDC32771
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 00:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CC8C32771
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 00:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231136AbiI0AKu (ORCPT
+        id S230107AbiI0AUK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 20:10:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48348 "EHLO
+        Mon, 26 Sep 2022 20:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbiI0AKt (ORCPT
+        with ESMTP id S229982AbiI0AUF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 20:10:49 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD169A1D2F;
-        Mon, 26 Sep 2022 17:10:47 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id d42so13432217lfv.0;
-        Mon, 26 Sep 2022 17:10:47 -0700 (PDT)
+        Mon, 26 Sep 2022 20:20:05 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A825667169
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 17:20:03 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id e68so8273757pfe.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 17:20:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=IUJ883vXpIy8HsSMOZN5r8Aa/v8we/1OUC9VvaE/vgg=;
-        b=kdKOfVJjqcfbjmysbn8RvscGiIHxfnNSdIs/2eWi+aYJZeiV14hDxAtKmUV9CUTIn5
-         Y+pImzu5BSsDPFmCaB2u/67WiDF58Hi/te8MS2eWoxZIZj2tafwR7ZBH8I3dJZ0iGger
-         Cock4M9KkcCk7UhfsmKTfNOMXbs5YbAL4xmsbZTEfF1wi3GJS3BKTEaVSupek2epMyNR
-         3MGPPPRpCQSeUoDWBs4cOQNTPezP2FgvvgPK0ncL2pqaINu80v748yDhogEkH8I5ntBl
-         axRAW4zXq4+YWV1ici67mjtAQXxnp8OWFDJ7a3a13N0tcRYtwIZiZyufXYpZJ+CeD1sb
-         T+mw==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=bAWF8FtWaERrKQyhW+ZtTRbEpnIFnQlsDlekqZMyJak=;
+        b=lOcSh0rQHxTwJ60TDwB8sMoakN7p25w2AjsIxJzGtI9emH30xPh2HvzbJoKOJ0GTAd
+         bT9PdT6fKjzSexUnxfKirQVirc7aII8j4AlGJ5dbRc46sYwl+1B4R3lldHEiAPjMOi5j
+         EyGmhA0kJ1adpHV0+oD/Au1yYT1ptrC58bskkruuMs75uDUuf+0Z8L+nGcANm0lPyJbv
+         44OVBaoykFr0skiITbDI/H2Um+/DOyvSjRtRixWIqIFbPol+ltfUHJQiJctciMIYx+U/
+         mjp3F1rJ7s1JCqVqljlL/ECUHq0RqmZSz1GvTzahq2k9eJxR0fD1250m4b1GsSJvWAsJ
+         iQpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=IUJ883vXpIy8HsSMOZN5r8Aa/v8we/1OUC9VvaE/vgg=;
-        b=zk2Kn8f4iOFJXOKDX+cEuTn/JfLyGhU/hS8UJwPP2dYhFUzub3vtjAti6rjDWjl3+p
-         e3KMgFEltBqOXj1DkooChNF/BiewLxdSBoZJEhm8LLDgDyyeHMMAl6nru0lbhI4xMpHP
-         mtQYU8bUL9IylND1Xt7zjeKnUNvmpIs00BwxVG4qgsJ3m8kQ2G9jNW2SOgTgKV/ba3SQ
-         gOITxExqbkNT0YrTzbJQNzQbLbB76yDFXxvqW/UtC+2EZBiKxKeZQGQXy6auRcHOK5ex
-         yVqloiRbMB2RgcktwC+PmO+sMau8BFqHtlbW+sL5YtbbSi1EILqUqx7/quT6W/dm1/U9
-         O5jQ==
-X-Gm-Message-State: ACrzQf3qQtuhoveLD2wy50/XnM28aD1tPBxRjAID/0hvsf04V8FtaAff
-        Kt9XJkZsysZAklhtjcoM8bykbLjzRL/ae/eijn8=
-X-Google-Smtp-Source: AMsMyM5t2yMQz8YtpKBdLJnPDLccM1eNIwYgD1UwuR8cz1Q6SJGukjwtllwx6Lx4SuqcfIbmuGo049BDiixWKIsTf14=
-X-Received: by 2002:a05:6512:b97:b0:497:5c43:2d61 with SMTP id
- b23-20020a0565120b9700b004975c432d61mr9093348lfv.251.1664237445949; Mon, 26
- Sep 2022 17:10:45 -0700 (PDT)
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=bAWF8FtWaERrKQyhW+ZtTRbEpnIFnQlsDlekqZMyJak=;
+        b=lzTOyG0o2QKtFWo/DttBns6DrsRIn4HaWkXCbZIS2KA4dIXYGnFxSU3a2UFPLwz/0H
+         BthxGL2L3TbGM3lvHR4lG410XVCZLCOCcGX0XZgPT39P30UbgCW3CK3KpaVZm1ZFCa4V
+         WyTmJET0Bmsx2O2174T0f/oFxUfZZ/z/iDOmsjL5euaODkRcP9Whw2uU9+itGAnPCSiW
+         w5ACw3FNeMBOIxFBjIasyJUy+nstbhbAUo6owoP5ymyLxAA/fdzBOCpI4sPPhPWWhb2k
+         xZGhS2XvMNr7oJamnHZSRlWIV6/nUIxeIqOESulUHgfr11ze+G+upfPjwt+2EpQbHqEI
+         c+0Q==
+X-Gm-Message-State: ACrzQf2kMWNIXHK/NadSFyWfAkvnpag0I5sRgctbySi0RSkG7NKpcOwt
+        Kk+minUQl/kDYsPUmpvevDvJrMjedLM=
+X-Google-Smtp-Source: AMsMyM5bcQgRqpBwbfyampM9c0flIu56T3FTY5oDv3Wcw2bIm2++lpOdLAS6PIe9waJP88PANdpFAA==
+X-Received: by 2002:a63:5d18:0:b0:439:61d0:7487 with SMTP id r24-20020a635d18000000b0043961d07487mr21703642pgb.268.1664238002659;
+        Mon, 26 Sep 2022 17:20:02 -0700 (PDT)
+Received: from [172.17.0.2] ([20.66.86.219])
+        by smtp.gmail.com with ESMTPSA id l2-20020a17090a070200b00200b12f2bf3sm27581pjl.51.2022.09.26.17.20.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Sep 2022 17:20:02 -0700 (PDT)
+Message-ID: <633241b2.170a0220.d3ceb.0128@mx.google.com>
+Date:   Mon, 26 Sep 2022 17:20:02 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0451951035859748914=="
 MIME-Version: 1.0
-References: <20220926164358.v2.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
-In-Reply-To: <20220926164358.v2.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 26 Sep 2022 17:10:34 -0700
-Message-ID: <CABBYNZJNrnmw6uUwQekqz1zQnG++kAHDqGfHJOxO082g+1Y1kw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Call shutdown for HCI_USER_CHANNEL
-To:     Abhishek Pandit-Subedi <abhishekpandit@google.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
+Subject: RE: Bluetooth: Prevent double register of suspend
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220926163057.1.Ia168b651a69b253059f2bbaa60b98083e619545c@changeid>
+References: <20220926163057.1.Ia168b651a69b253059f2bbaa60b98083e619545c@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhishek,
+--===============0451951035859748914==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 26, 2022 at 4:44 PM Abhishek Pandit-Subedi
-<abhishekpandit@google.com> wrote:
->
-> From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->
-> Some drivers depend on shutdown being called for proper operation.
-> Unset HCI_USER_CHANNEL and call the full close routine since shutdown is
-> complementary to setup.
->
-> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
->
-> Using hci_qca, we can get the controller into a bad state simply by
-> trying to bind to userchannel twice (open+bind+close, then open+bind).
-> Without running the shutdown routine, the device seems to get into a bad
-> state. A similar bug also occurs with btmtksdio (using MT7921).
->
-> This change properly runs the shutdown routine, which should be
-> complementary to setup. The reason it unsets the HCI_USER_CHANNEL flag
-> is that some drivers have complex operations in their shutdown routine
-> (including sending hci packets) and we need to support the normal data
-> path for them (including cmd_timeout + recovery mechanisms).
->
-> Note for v2: I've gotten a chance to test this on more devices
-> and figure out why it wasn't working before in v1. I found two problems:
-> I had a signal pending (SIGTERM) that was messing things up in the
-> socket release function and the HCI_USER_CHANNEL flag was preventing
-> hci_sync from operating properly during shutdown on Intel chipsets
-> (which use the sync functions to send a reset command + other commands
-> sometimes).
->
-> This was tested with hci_qca (QCA6174-A-3), btmtksdio (MT7921-SDIO)
-> and btusb (with AX200).
->
->
-> Changes in v2:
-> - Clear HCI_USER_CHANNEL flag at start of close and restore at end.
-> - Add comment explaning why we need to clear flag and run shutdown.
->
->  net/bluetooth/hci_sync.c | 19 ++++++++++++++++---
->  1 file changed, 16 insertions(+), 3 deletions(-)
->
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index 422f7c6911d9..f9591fcefb8d 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -4731,9 +4731,18 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->  {
->         bool auto_off;
->         int err = 0;
-> +       bool was_userchannel;
->
->         bt_dev_dbg(hdev, "");
->
-> +       /* Similar to how we first do setup and then set the exclusive access
-> +        * bit for userspace, we must first unset userchannel and then clean up.
-> +        * Otherwise, the kernel can't properly use the hci channel to clean up
-> +        * the controller (some shutdown routines require sending additional
-> +        * commands to the controller for example).
-> +        */
-> +       was_userchannel = hci_dev_test_and_clear_flag(hdev, HCI_USER_CHANNEL);
-> +
->         cancel_delayed_work(&hdev->power_off);
->         cancel_delayed_work(&hdev->ncmd_timer);
->         cancel_delayed_work(&hdev->le_scan_disable);
-> @@ -4747,7 +4756,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->         }
->
->         if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
->             test_bit(HCI_UP, &hdev->flags)) {
->                 /* Execute vendor specific shutdown routine */
->                 if (hdev->shutdown)
+This is automated email and please do not reply to this email!
 
-I guess the idea here is that shutdown can be run without the
-HCI_USER_CHANNEL flag since the hdev is closing we don't expect any
-traffic from socket/user channel? In that case I'd probably suggest
-having this on its own function e.g. hci_dev_shutdown which can have
-the logic of resetting the flag and restoring at the end. Also it is
-probably a good idea to have some test mimicking this behavior on
-userchan-tester so we do not accidentally break it.
+Dear submitter,
 
-> @@ -4756,6 +4764,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->
->         if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
->                 cancel_delayed_work_sync(&hdev->cmd_timer);
-> +               if (was_userchannel)
-> +                       hci_dev_set_flag(hdev, HCI_USER_CHANNEL);
->                 return err;
->         }
->
-> @@ -4795,7 +4805,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->         auto_off = hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF);
->
->         if (!auto_off && hdev->dev_type == HCI_PRIMARY &&
-> -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> +           !was_userchannel &&
->             hci_dev_test_flag(hdev, HCI_MGMT))
->                 __mgmt_power_off(hdev);
->
-> @@ -4808,7 +4818,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->
->         hci_sock_dev_event(hdev, HCI_DEV_DOWN);
->
-> -       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> +       if (!was_userchannel)
->                 aosp_do_close(hdev);
->                 msft_do_close(hdev);
->         }
-> @@ -4858,6 +4868,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
->         memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
->         bacpy(&hdev->random_addr, BDADDR_ANY);
->
-> +       if (was_userchannel)
-> +               hci_dev_set_flag(hdev, HCI_USER_CHANNEL);
-> +
->         hci_dev_put(hdev);
->         return err;
->  }
-> --
-> 2.37.3.998.g577e59143f-goog
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=680770
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.16 seconds
+GitLint                       PASS      0.47 seconds
+SubjectPrefix                 PASS      0.31 seconds
+BuildKernel                   PASS      48.10 seconds
+BuildKernel32                 PASS      41.63 seconds
+Incremental Build with patchesPASS      59.24 seconds
+TestRunner: Setup             PASS      700.91 seconds
+TestRunner: l2cap-tester      PASS      21.04 seconds
+TestRunner: iso-tester        PASS      21.89 seconds
+TestRunner: bnep-tester       PASS      8.31 seconds
+TestRunner: mgmt-tester       PASS      136.48 seconds
+TestRunner: rfcomm-tester     PASS      13.33 seconds
+TestRunner: sco-tester        PASS      12.64 seconds
+TestRunner: ioctl-tester      PASS      13.88 seconds
+TestRunner: smp-tester        PASS      12.32 seconds
+TestRunner: userchan-tester   PASS      9.08 seconds
 
 
--- 
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0451951035859748914==--
