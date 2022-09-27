@@ -2,105 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 265B7C54EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 21:10:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30592C54EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 21:40:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232071AbiI0VKK (ORCPT
+        id S231496AbiI0Vkm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Sep 2022 17:10:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51328 "EHLO
+        Tue, 27 Sep 2022 17:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbiI0VKJ (ORCPT
+        with ESMTP id S230283AbiI0Vkj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Sep 2022 17:10:09 -0400
-Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2171C6A40
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 14:10:08 -0700 (PDT)
-Received: by mail-il1-x12f.google.com with SMTP id v1so5756504ilq.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 14:10:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=JJigQu9zjnijBJJPdoADdZKVkwl+vwGwqtbR0HwRFlQ=;
-        b=K4aX1Oai3MT9h+rzwnNt8I+WOkC8EysP5s/eVfhrD0Ob4XWIrIORPhKEMPteYWk7NC
-         cxhbMk1jVDwJgxRylR1G4ErGh5d2cpcbrtl0URO0FO52+KQSmNFiV4ajMvfxoQKUMYaG
-         HxM/0Sjj6g5t5Mv8Cs2k83dx5DGIZHnNd8ZofmoY8DtWJAkYhmI9nsDmH/JrG5qaUyp1
-         pUsWSFAOcL5d98y5r92MtIBYOjF0kutF4Xour6ctOmaaC+DdeL1FbRGTSTLoYG+jPzRD
-         Ce95nrBu5COvZXq5BQDWAi9DDLguNlaSEYSce2zslWhksn7N+mZSuglDICdraGgqNB4w
-         pIlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=JJigQu9zjnijBJJPdoADdZKVkwl+vwGwqtbR0HwRFlQ=;
-        b=7JYekLWmVRR2NaXlmR4mZjySJ486GmVUWsvE8cZihZ48Ok8oKP3+/ZVf4qyvGd4eHX
-         5UoDZW7pgQX+mQlYQ+6f3v7uEHigfyrFyCNCxx6as7OEKyNznN3jprBNlr5idI6Xgc6Y
-         7n7LIiKCEKK4wgmEFnsCUNEBGaUskO+mAFPdYQh3XrzXwEWycO1+32NVyO04eSWGXvmY
-         3ewlP+eOWmE0NhHpiXeu537fJnLnPXWvI2F2MQxbF92CQRDnPrtwTbl11Q32QTUW1gjI
-         ZI2b/U40jflPPiBLlie1QVMbmHMG4QkOVWwJSmsFonTBmctGJ88Fye3kaW4t5lB6uGL2
-         xqeg==
-X-Gm-Message-State: ACrzQf2wSXiLI6DftwweQqJvHLQQdT1npDwL4YXprzhcp6UAoDUfa9Eg
-        oXSSyTeHq/w66NFNEKPCSRivEFGZ3FU=
-X-Google-Smtp-Source: AMsMyM5NF5a0saRhZfUNj+ROFVJFvq5VzExyFCcZAz1DEusutjE+QHzmcK2q/Q0UGXgxsEvKAfFsHw==
-X-Received: by 2002:a05:6e02:1645:b0:2f8:3545:5470 with SMTP id v5-20020a056e02164500b002f835455470mr7504776ilu.245.1664313007457;
-        Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
-Received: from [172.17.0.2] ([40.69.174.250])
-        by smtp.gmail.com with ESMTPSA id n1-20020a056638264100b0034af3f3f9c0sm1008656jat.118.2022.09.27.14.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
-Message-ID: <633366af.050a0220.7368c.14ee@mx.google.com>
-Date:   Tue, 27 Sep 2022 14:10:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5847527822593035103=="
+        Tue, 27 Sep 2022 17:40:39 -0400
+Received: from relay12.mail.gandi.net (relay12.mail.gandi.net [IPv6:2001:4b98:dc4:8::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82A5C42AC0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 14:40:37 -0700 (PDT)
+Received: (Authenticated sender: david@beinder.at)
+        by mail.gandi.net (Postfix) with ESMTPSA id B26DE200002;
+        Tue, 27 Sep 2022 21:40:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=beinder.at; s=gm1;
+        t=1664314836;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=62/P9GafbAKMBLYOB9Q+s+PkUfeNdTj/8LGCNLYzpQc=;
+        b=fiGJWD2vtLdOKFjgtNtGRC5P37n7+39ofaiZStfbahybDiR2Fh1xpu0zCS8TOAwqil0DzV
+        yv3yhK4cjXmbXhjRc2Fr6FgGllM8Y/HS6U7A1JFKkBxrI/RVW6G2Fw99qoRhP097/eCU3t
+        yc6oEA6Gc28SNrqh2ZDl6GogU1ew13SmLp37g0FBsUjgZjm/qZTwZ5uSfO6Wj4XhSW2j55
+        CmEiSH9pJ17eLw8VezHsC7WgJ/r84PpvL1xvXZBvzLr52cDl3ZgbShnODS9uf8fYLAS0Q0
+        ADjDCuJn/NTzadP4yowpgB5LxQ2UL32hzpIpDsh+hDvFx2kZobOJk/z7Qe3g5A==
+Message-ID: <c7271a1e-05d8-5806-398a-7141194d3697@beinder.at>
+Date:   Tue, 27 Sep 2022 23:40:34 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhishekpandit@google.com
-Subject: RE: [v3] Bluetooth: Call shutdown for HCI_USER_CHANNEL
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220927131717.v3.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
-References: <20220927131717.v3.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH] Bluetooth: hci_core: Fix not handling link timeouts
+ propertly
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <20220926225107.3226470-1-luiz.dentz@gmail.com>
+From:   David Beinder <david@beinder.at>
+In-Reply-To: <20220926225107.3226470-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5847527822593035103==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2022-09-27 00:51, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> Change that introduced the use of __check_timeout did not account for
+> link types properly, it always assumes ACL_LINK is used thus causing
+> hdev->acl_last_tx to be used even in case of LE_LINK and then again
+> uses ACL_LINK with hci_link_tx_to.
+>
+> To fix this __check_timeout now takes the link type as parameter and
+> then procedure to use the right last_tx based on the link type and pass
+> it to hci_link_tx_to.
+>
+> Fixes: 1b1d29e51499 ("Bluetooth: Make use of __check_timeout on hci_sched_le")
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+Tested-by: David Beinder <david@beinder.at>
 
-Dear submitter,
+Patch tested on 5.10.136-cip14 (sunxi / armv7l), with a RTL8821CU 
+adapter in LE-only mode. Spurious "link tx timeout" errors during LE 
+data transfers are now gone.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=681203
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.51 seconds
-GitLint                       PASS      0.80 seconds
-SubjectPrefix                 PASS      0.65 seconds
-BuildKernel                   PASS      33.70 seconds
-BuildKernel32                 PASS      29.38 seconds
-Incremental Build with patchesPASS      42.26 seconds
-TestRunner: Setup             PASS      498.42 seconds
-TestRunner: l2cap-tester      PASS      16.50 seconds
-TestRunner: iso-tester        PASS      15.38 seconds
-TestRunner: bnep-tester       PASS      6.09 seconds
-TestRunner: mgmt-tester       PASS      99.33 seconds
-TestRunner: rfcomm-tester     PASS      9.83 seconds
-TestRunner: sco-tester        PASS      9.19 seconds
-TestRunner: ioctl-tester      PASS      10.31 seconds
-TestRunner: smp-tester        PASS      9.30 seconds
-TestRunner: userchan-tester   PASS      6.28 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5847527822593035103==--
+> ---
+>   net/bluetooth/hci_core.c | 34 +++++++++++++++++++++++-----------
+>   1 file changed, 23 insertions(+), 11 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 66c7cdba0d32..063fbb8e07ca 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3485,15 +3485,27 @@ static inline int __get_blocks(struct hci_dev *hdev, struct sk_buff *skb)
+>   	return DIV_ROUND_UP(skb->len - HCI_ACL_HDR_SIZE, hdev->block_len);
+>   }
+>   
+> -static void __check_timeout(struct hci_dev *hdev, unsigned int cnt)
+> +static void __check_timeout(struct hci_dev *hdev, unsigned int cnt, u8 type)
+>   {
+> -	if (!hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
+> -		/* ACL tx timeout must be longer than maximum
+> -		 * link supervision timeout (40.9 seconds) */
+> -		if (!cnt && time_after(jiffies, hdev->acl_last_tx +
+> -				       HCI_ACL_TX_TIMEOUT))
+> -			hci_link_tx_to(hdev, ACL_LINK);
+> +	unsigned long last_tx;
+> +
+> +	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
+> +		return;
+> +
+> +	switch (type) {
+> +	case LE_LINK:
+> +		last_tx = hdev->le_last_tx;
+> +		break;
+> +	default:
+> +		last_tx = hdev->acl_last_tx;
+> +		break;
+>   	}
+> +
+> +	/* tx timeout must be longer than maximum link supervision timeout
+> +	 * (40.9 seconds)
+> +	 */
+> +	if (!cnt && time_after(jiffies, last_tx + HCI_ACL_TX_TIMEOUT))
+> +		hci_link_tx_to(hdev, type);
+>   }
+>   
+>   /* Schedule SCO */
+> @@ -3551,7 +3563,7 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
+>   	struct sk_buff *skb;
+>   	int quote;
+>   
+> -	__check_timeout(hdev, cnt);
+> +	__check_timeout(hdev, cnt, ACL_LINK);
+>   
+>   	while (hdev->acl_cnt &&
+>   	       (chan = hci_chan_sent(hdev, ACL_LINK, &quote))) {
+> @@ -3594,8 +3606,6 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+>   	int quote;
+>   	u8 type;
+>   
+> -	__check_timeout(hdev, cnt);
+> -
+>   	BT_DBG("%s", hdev->name);
+>   
+>   	if (hdev->dev_type == HCI_AMP)
+> @@ -3603,6 +3613,8 @@ static void hci_sched_acl_blk(struct hci_dev *hdev)
+>   	else
+>   		type = ACL_LINK;
+>   
+> +	__check_timeout(hdev, cnt, type);
+> +
+>   	while (hdev->block_cnt > 0 &&
+>   	       (chan = hci_chan_sent(hdev, type, &quote))) {
+>   		u32 priority = (skb_peek(&chan->data_q))->priority;
+> @@ -3676,7 +3688,7 @@ static void hci_sched_le(struct hci_dev *hdev)
+>   
+>   	cnt = hdev->le_pkts ? hdev->le_cnt : hdev->acl_cnt;
+>   
+> -	__check_timeout(hdev, cnt);
+> +	__check_timeout(hdev, cnt, LE_LINK);
+>   
+>   	tmp = cnt;
+>   	while (cnt && (chan = hci_chan_sent(hdev, LE_LINK, &quote))) {
