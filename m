@@ -2,202 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53B65C6FA82
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 00:21:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FB6C07E9D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Sep 2022 02:58:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229832AbiI0AVO (ORCPT
+        id S230455AbiI0C6U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 26 Sep 2022 20:21:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59816 "EHLO
+        Mon, 26 Sep 2022 22:58:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiI0AVN (ORCPT
+        with ESMTP id S230505AbiI0C5t (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 26 Sep 2022 20:21:13 -0400
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2090EA4BB3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 17:21:12 -0700 (PDT)
-Received: by mail-ua1-x932.google.com with SMTP id bu4so3023943uab.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 17:21:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=3IzVwXkFM8Cc1CGnFjsCxlD0U12h7ddTKb7YMIGDc+Y=;
-        b=FHoiLztvWMF2A1g4txzIdEL8uHEeoKzqCsBlgtAgbqcWGbO5eT2RPRqkzg/7gbb20f
-         tOFCAJQaaqyQIlps2L+scQhcMYoE0k4wEopripmBH+HTk/McETsoRzXzxDCD9Qhe5ArK
-         vh36l184zkhDCUcQWVbeNV3PymI6FIw/4yDq0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=3IzVwXkFM8Cc1CGnFjsCxlD0U12h7ddTKb7YMIGDc+Y=;
-        b=bxokL1K9UhDdWRMCGh0JthSeNuvLuiaMNGw8Ib1Ck44qvq9DOrY0JGgsUyAWkJAWgD
-         mcKCxPPnp3VIi7vMXWR0Xl45cAhkq2QX0ihPwL2iuVIX9aIeMCjNNugbYzQ8rI/lqwiE
-         Z/Ie4sPpqo8HRdty4sseiEfiS32BiTNQw3hDAG7gip25BFGv4QMaQ4Jh9IrxEX07eRHQ
-         CqhxBeTzyA4ESjndTWprTxZzIhEiMqJg3kbrwFuUOjKhmBNmEjb2wXOpd5ZcGuQZGYJ+
-         KrAKk6DPhytUOa1Hk3QtbmvR1bS4tP3QBFdHZlpBPyJXrpURTyyPA7mNJlPEEtjH0el1
-         YpyA==
-X-Gm-Message-State: ACrzQf09dyK157dmEvTauyL0oqNcqwy3LmHXau3INqhh63dUJoxJqPZu
-        rq5ij37d0LxqDaHTJvQ8G8uc9NRNiEOcyqMY4PrmZA==
-X-Google-Smtp-Source: AMsMyM5HvOsn1v+eePDF4Fh51/AiOugSGswCtVOk8JZnG8Qh6wALbwk7vMMHMk1LElPBz+Gcw2Y3fSK00/ks4QD5fqg=
-X-Received: by 2002:ab0:7697:0:b0:3d0:26e9:fc3 with SMTP id
- v23-20020ab07697000000b003d026e90fc3mr1057414uaq.85.1664238071188; Mon, 26
- Sep 2022 17:21:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220926164358.v2.1.Ic8eabc8ed89a07c3d52726dd017539069faac6c4@changeid>
- <CABBYNZJNrnmw6uUwQekqz1zQnG++kAHDqGfHJOxO082g+1Y1kw@mail.gmail.com>
-In-Reply-To: <CABBYNZJNrnmw6uUwQekqz1zQnG++kAHDqGfHJOxO082g+1Y1kw@mail.gmail.com>
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Date:   Mon, 26 Sep 2022 17:20:59 -0700
-Message-ID: <CANFp7mW9tO9gEE2L7WGBNsoi9uyP1-k2t-OWnF3Qz=h0TW8WuQ@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Call shutdown for HCI_USER_CHANNEL
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
+        Mon, 26 Sep 2022 22:57:49 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8423FAC7A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 26 Sep 2022 19:53:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 6FD7ACE16B6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 02:53:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1AD2AC4314A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 02:53:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664247197;
+        bh=6V86AVXCcZJ6EvN+wPL91RTkiw56dz6GsvKJCGkp4RE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Fl6KPD5sEpg1/rxhyC3Q7HerMQQ76cn7kt0qmwAf2P2ClkeBfTrL+scV/Q7pNn3Mj
+         vitvDRgOpTNd9J7T/V1bK4uMUOxwuLDcivsIh3r3jjW+EyQoZkI3EUQrMRQkGv3DTo
+         6Hag8tBFMP4yR9H3/OuUel4NwMbVLJ/jghZLtQWBWQJEn0RNme1i7jJeh5q6lfMES0
+         HaL7ClCLrtxccKDZ9YN5ZUXG6eIRDRRSA7pAgH1nYYOfr4rSsDj+y7NdkWG0ZoqqqX
+         /j/Hm7R25fSaNmJzKFlO75NmAMBb2wEw8WyghYB82MItv1HyuehiuLkaqZqwiTjTRv
+         GK40yFr+Wb7yw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 08BBCC433E6; Tue, 27 Sep 2022 02:53:17 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Tue, 27 Sep 2022 02:53:15 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: patrick.blesi@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215167-62941-w0S7VcLVoR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Sep 26, 2022 at 5:10 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Abhishek,
->
-> On Mon, Sep 26, 2022 at 4:44 PM Abhishek Pandit-Subedi
-> <abhishekpandit@google.com> wrote:
-> >
-> > From: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> >
-> > Some drivers depend on shutdown being called for proper operation.
-> > Unset HCI_USER_CHANNEL and call the full close routine since shutdown is
-> > complementary to setup.
-> >
-> > Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > ---
-> >
-> > Using hci_qca, we can get the controller into a bad state simply by
-> > trying to bind to userchannel twice (open+bind+close, then open+bind).
-> > Without running the shutdown routine, the device seems to get into a bad
-> > state. A similar bug also occurs with btmtksdio (using MT7921).
-> >
-> > This change properly runs the shutdown routine, which should be
-> > complementary to setup. The reason it unsets the HCI_USER_CHANNEL flag
-> > is that some drivers have complex operations in their shutdown routine
-> > (including sending hci packets) and we need to support the normal data
-> > path for them (including cmd_timeout + recovery mechanisms).
-> >
-> > Note for v2: I've gotten a chance to test this on more devices
-> > and figure out why it wasn't working before in v1. I found two problems:
-> > I had a signal pending (SIGTERM) that was messing things up in the
-> > socket release function and the HCI_USER_CHANNEL flag was preventing
-> > hci_sync from operating properly during shutdown on Intel chipsets
-> > (which use the sync functions to send a reset command + other commands
-> > sometimes).
-> >
-> > This was tested with hci_qca (QCA6174-A-3), btmtksdio (MT7921-SDIO)
-> > and btusb (with AX200).
-> >
-> >
-> > Changes in v2:
-> > - Clear HCI_USER_CHANNEL flag at start of close and restore at end.
-> > - Add comment explaning why we need to clear flag and run shutdown.
-> >
-> >  net/bluetooth/hci_sync.c | 19 ++++++++++++++++---
-> >  1 file changed, 16 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index 422f7c6911d9..f9591fcefb8d 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -4731,9 +4731,18 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >  {
-> >         bool auto_off;
-> >         int err = 0;
-> > +       bool was_userchannel;
-> >
-> >         bt_dev_dbg(hdev, "");
-> >
-> > +       /* Similar to how we first do setup and then set the exclusive access
-> > +        * bit for userspace, we must first unset userchannel and then clean up.
-> > +        * Otherwise, the kernel can't properly use the hci channel to clean up
-> > +        * the controller (some shutdown routines require sending additional
-> > +        * commands to the controller for example).
-> > +        */
-> > +       was_userchannel = hci_dev_test_and_clear_flag(hdev, HCI_USER_CHANNEL);
-> > +
-> >         cancel_delayed_work(&hdev->power_off);
-> >         cancel_delayed_work(&hdev->ncmd_timer);
-> >         cancel_delayed_work(&hdev->le_scan_disable);
-> > @@ -4747,7 +4756,6 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >         }
-> >
-> >         if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> > -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> >             test_bit(HCI_UP, &hdev->flags)) {
-> >                 /* Execute vendor specific shutdown routine */
-> >                 if (hdev->shutdown)
->
-> I guess the idea here is that shutdown can be run without the
-> HCI_USER_CHANNEL flag since the hdev is closing we don't expect any
-> traffic from socket/user channel? In that case I'd probably suggest
-> having this on its own function e.g. hci_dev_shutdown which can have
-> the logic of resetting the flag and restoring at the end. Also it is
-> probably a good idea to have some test mimicking this behavior on
-> userchan-tester so we do not accidentally break it.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-Yup, that sounds reasonable. I'll look into userchan-tester before
-sending up a v3.
+Patrick Blesi (patrick.blesi@gmail.com) changed:
 
->
-> > @@ -4756,6 +4764,8 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >
-> >         if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
-> >                 cancel_delayed_work_sync(&hdev->cmd_timer);
-> > +               if (was_userchannel)
-> > +                       hci_dev_set_flag(hdev, HCI_USER_CHANNEL);
-> >                 return err;
-> >         }
-> >
-> > @@ -4795,7 +4805,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >         auto_off = hci_dev_test_and_clear_flag(hdev, HCI_AUTO_OFF);
-> >
-> >         if (!auto_off && hdev->dev_type == HCI_PRIMARY &&
-> > -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> > +           !was_userchannel &&
-> >             hci_dev_test_flag(hdev, HCI_MGMT))
-> >                 __mgmt_power_off(hdev);
-> >
-> > @@ -4808,7 +4818,7 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >
-> >         hci_sock_dev_event(hdev, HCI_DEV_DOWN);
-> >
-> > -       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> > +       if (!was_userchannel)
-> >                 aosp_do_close(hdev);
-> >                 msft_do_close(hdev);
-> >         }
-> > @@ -4858,6 +4868,9 @@ int hci_dev_close_sync(struct hci_dev *hdev)
-> >         memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
-> >         bacpy(&hdev->random_addr, BDADDR_ANY);
-> >
-> > +       if (was_userchannel)
-> > +               hci_dev_set_flag(hdev, HCI_USER_CHANNEL);
-> > +
-> >         hci_dev_put(hdev);
-> >         return err;
-> >  }
-> > --
-> > 2.37.3.998.g577e59143f-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |patrick.blesi@gmail.com
+
+--- Comment #41 from Patrick Blesi (patrick.blesi@gmail.com) ---
+I am experiencing the same problem with 5.15.67 for USB Device
+USB_DEVICE(0x8087, 0x0aaa).
+
+~ $ uname -a
+Linux a0d7b954-ssh 5.15.67 #1 SMP Tue Sep 13 13:54:38 UTC 2022 x86_64 Linux
+
+~ $ lsusb
+Bus 001 Device 001: ID 1d6b:0002
+Bus 001 Device 003: ID 1043:8012
+Bus 002 Device 001: ID 1d6b:0003
+Bus 001 Device 002: ID 8087:0aaa
+
+~ $ dmesg | grep -i bluetooth
+[    0.454719] Bluetooth: Core ver 2.22
+[    0.454904] NET: Registered PF_BLUETOOTH protocol family
+[    0.455504] Bluetooth: HCI device and connection manager initialized
+[    0.455896] Bluetooth: HCI socket layer initialized
+[    0.456392] Bluetooth: L2CAP socket layer initialized
+[    0.456894] Bluetooth: SCO socket layer initialized
+[    4.452912] Bluetooth: hci0: Reading Intel version command failed (-110)
+[    4.452955] Bluetooth: hci0: command 0xfc05 tx timeout
+[    4.498402] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[    4.498405] Bluetooth: BNEP filters: protocol multicast
+[    4.498409] Bluetooth: BNEP socket layer initialized
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
