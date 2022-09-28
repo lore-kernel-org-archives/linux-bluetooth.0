@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29EB4C32771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Sep 2022 03:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1126DC32771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Sep 2022 04:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232524AbiI1Dbo (ORCPT
+        id S229736AbiI1Exz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Sep 2022 23:31:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41956 "EHLO
+        Wed, 28 Sep 2022 00:53:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232586AbiI1DbU (ORCPT
+        with ESMTP id S230305AbiI1Exy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Sep 2022 23:31:20 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DBF15E674
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 20:30:57 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id r8-20020a17090a560800b00205eaaba073so561495pjf.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 20:30:57 -0700 (PDT)
+        Wed, 28 Sep 2022 00:53:54 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7E19AE848
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 21:53:51 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id a5-20020a17090aa50500b002008eeb040eso2554467pjq.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Sep 2022 21:53:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date;
-        bh=HwestEX78EVZWySyknmdp9DODm6MZTMTuWTcSGcPQKQ=;
-        b=WujRc2u+K0V5t3hbTWth+rqH16BfK4Ii2aGpRWY7AbPTxd3UTz+qcX4OQ58ue6fwDu
-         F3+CNdXWtGfRpoI2XYaN9F2AyaWPxEM7ym+e9WlbQoAHLgxVEvAcp2KyxSnEYf0Rmd/T
-         TerlOqNhG39l3PnBp8ZE6Hw0fJpYwiXd2EUT8KeWCKGEZbFEU+wU+1w+AoVrG/2F49vR
-         DENCp9XOYSqUkfcfRriJw6ARxw1xqxADG6MAMkpCoXV9CCjIrBdHLiaFODau0uq5KGzr
-         OMXZxacZBG55gcW5eUkWJp89cTqtr/j3KEns8+AW+ZCdqcdDyo+kyJXowEzAeVtbTNt7
-         APyg==
+        bh=z0VmNoS4IqSO2wjmPc/8fNttFTA1tRb7id0xvRwawHI=;
+        b=CPsrIazJN6eAvpAMUal3Mvq49moM7zEMvAEX3hBtrLXo/ZqV1kRHvkI2b2JtbztCqz
+         3vlfgDOzalNCE3eime8LnEpKR9+P7xdSNskjpjS7YcUq49i52qqqlR2NJxl1tnKXNtpV
+         yPOzlUA4DtJH9GUhL8gWf6tToudtmPD7WwlgOxmvXNBVDCOrVgljg5T7xBkZX2gcjT6o
+         tWdnajcnuq+k40uRqsnjNXPM38iFhzyfARTRpHokWBtiUfFgp8x49QRIOsW72MdytOTk
+         T0QxqoFjdCYTKgH7vDMeYhglKUgR96ugYaQi0+lARG7VBPubUT6DgEg6Qyw5vjx2WmEE
+         NtHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=HwestEX78EVZWySyknmdp9DODm6MZTMTuWTcSGcPQKQ=;
-        b=bCADrGYs44B4uS/FnAGExn9uR69gYbihpWP3D7T44jwLeBtIUA25Ztm92h+BLftW4H
-         qt8VgaPwJZ8OH2/bcQY1UnHn77RgMy6leceGVhG60Mlu6PUdoTz8cKdlrA+elADVQpbx
-         6yca4TzUKay7Gaangit2N54PcvFQezwL9jFE0uNrquCDQn7vphAE+/SEd1dCQJjleKvM
-         yvKfFfjP4HbP3o1sRv7CjOWPXjgYyYtYvbxaEfHs3xKBCIuSYf5qzUvZ4iCe245dSaGM
-         SoS5b5X+3DaHS1b7MreHeyLj0WpjEi5omOekJ3n5NAx/uXEU5D4vfLaJqX439BtH60yj
-         bm+g==
-X-Gm-Message-State: ACrzQf3jGIp8w2Rn7GNegxUS4lWTnLC+gwNEKenmmXaBfg+/kqc0bsgH
-        dXw6Zyz3Dr5gFeRJ8l5ODhPXwG94aZE=
-X-Google-Smtp-Source: AMsMyM7Ivns4Jaq1d7exuvQCFWMIXy0G+Q31Ld+gxdKqcrtKXwc4IbU3bkPQyr46xbXRqFAy5iN8oA==
-X-Received: by 2002:a17:902:d2c5:b0:176:d0b0:bf53 with SMTP id n5-20020a170902d2c500b00176d0b0bf53mr30508642plc.88.1664335855921;
-        Tue, 27 Sep 2022 20:30:55 -0700 (PDT)
+        bh=z0VmNoS4IqSO2wjmPc/8fNttFTA1tRb7id0xvRwawHI=;
+        b=Dg8sNdFmS/vTPT4X/bTQcjiHKP4jufgVNdz+RHv+hOid3L9o/nXv1+TDszvL4SmvkD
+         BckA36onRhTcuWzyZTfteRtvZJbA8HNH5ZJCShctkDi0YkU8HrGrvcjqlebK7T1+zIAX
+         P5fQbMEoetDYWlUQcphXOAbR7XFEc4KDhl7c/9lD6nKZg4ojzaWIQ5gpF1lUNYE7JICl
+         rbslBV84ME3gGoZ5JMlJHOXwQpO8szbKed0xaoyuzqyObGvLL/8If8pFH5yzSACk+PT/
+         4Gm6zbwEpl788uze97luUw7m886i6VnsZy0UWtylokyQwT0AJftEKCBmkZYTOAw95d7E
+         EzKw==
+X-Gm-Message-State: ACrzQf2CBEQplPN9L2U0k1N0m6HX4gzI5jeRxlCqWCrLxkS3BMdX39Wm
+        olu8m6bkvavsJ1GxjytYJ8hoGZa97GE=
+X-Google-Smtp-Source: AMsMyM6MRHZZaM2XgijawBbj3lFCH51mVW6J2iOJdDdW8gW6+wz1fQIFwo3uFk82+MDnVc5zGwmsnA==
+X-Received: by 2002:a17:903:234c:b0:178:1a7c:28a5 with SMTP id c12-20020a170903234c00b001781a7c28a5mr29581093plh.32.1664340831284;
+        Tue, 27 Sep 2022 21:53:51 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a80:cc40:b354:2fc2:b868:bbb7])
-        by smtp.gmail.com with ESMTPSA id y11-20020a17090a784b00b00205f2a54815sm216294pjl.25.2022.09.27.20.30.55
+        by smtp.gmail.com with ESMTPSA id b4-20020a17090a990400b00200aff02e90sm459321pjp.18.2022.09.27.21.53.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Sep 2022 20:30:55 -0700 (PDT)
+        Tue, 27 Sep 2022 21:53:50 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH] doc: test patch - DO NOT MERGE
-Date:   Tue, 27 Sep 2022 20:30:53 -0700
-Message-Id: <20220928033053.202032-1-hj.tedd.an@gmail.com>
+Subject: [PATCH v2] Bluetooth: doc: test patch - DO NOT MERGE
+Date:   Tue, 27 Sep 2022 21:53:48 -0700
+Message-Id: <20220928045348.210835-1-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -68,22 +68,19 @@ This is the test patch and do not merge.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- README | 2 ++
+ COPYING | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/README b/README
-index 669ac7c32292..9bed96411fa0 100644
---- a/README
-+++ b/README
-@@ -1,6 +1,8 @@
- Linux kernel
- ============
+diff --git a/COPYING b/COPYING
+index a635a38ef940..9960087a95d8 100644
+--- a/COPYING
++++ b/COPYING
+@@ -18,3 +18,5 @@ In addition, other licenses may also apply. Please see:
+ for more details.
  
-+IGNORE THIS PATCH AND DO NOT MERGE
+ All contributions to the Linux Kernel are subject to this COPYING file.
 +
- There are several guides for kernel developers and users. These guides can
- be rendered in a number of formats, like HTML and PDF. Please read
- Documentation/admin-guide/README.rst first.
++TEST LINE. DO NOT MERGE
 -- 
 2.34.1
 
