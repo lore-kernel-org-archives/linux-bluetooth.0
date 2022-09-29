@@ -2,117 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD8BC32771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Sep 2022 22:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B3EC32771
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Sep 2022 00:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233190AbiI1W2I (ORCPT
+        id S233645AbiI2Atn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Sep 2022 18:28:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49960 "EHLO
+        Wed, 28 Sep 2022 20:49:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231577AbiI1W2H (ORCPT
+        with ESMTP id S232494AbiI2Atl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Sep 2022 18:28:07 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6C7F684C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Sep 2022 15:28:06 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id m18so3302031qvo.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Sep 2022 15:28:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=Vl5OEx5Yo9Ty49vScbvwWTeqCz+qN5miuuHqVVylDE8=;
-        b=kGMiPTwVZA3l9fcH2zIcxxyijfzPa3gueSyd8ZgMOZHaYDPRrkdw5+YH7IiPaSRgpi
-         ldjkSmZZ7NK2t2/aBseqzm/wqIt7VspDAplCm+G3R0HB9DM9/wFeA2sgHtEkbu91Dbzs
-         BuMfXgiWD/bG2ya1d/tVLwcNIXLaLmtmsHOCSblRthbCaaMSRM7dRN2wyuK/wJylPwNb
-         Pqu2eO3UP9/u5+4xC8EmshQAIDliUsGCZOej77UV3mDcbStiygA2He/zac7mcnskEA9a
-         RCugJJDIj3MlMNGw/fXGnKsIh1uSwgbyL1jNThmU32A0+lXU7iTjVtWB8AXBvoEKLyBg
-         FZaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=Vl5OEx5Yo9Ty49vScbvwWTeqCz+qN5miuuHqVVylDE8=;
-        b=PsvuvUv55YPt6JaKq+Rgr1m/EWgN/xQz9J74vxnlp1taOAOjxvQQxk1MzYRgHnYHOJ
-         KCU/0nCdUU0mN1IKmsRaUFIxPOd+pKu5CdwfgEW/7oMJZSjSWjU+9DbjQBGpU9ynTLDn
-         UWXLkWrF2q6/1SMCHcCDNuR99Zasg54TijRPUJC7VSEVrpVnvtAJpo2LLHH3UUXQLGeL
-         vEtw+FYpJf45BeCDUBiYn2dKqocOyAlPDwvzdbtBydhqdYs2jYjW8KuYeD9aq4jD+Em0
-         D4bzDVRlKjKGeEPHxg3SihRB8Q6yx5IIr9gymUGIdNRMiptim/fO6ztRMOgODYumEnwb
-         YNew==
-X-Gm-Message-State: ACrzQf3rXFYVGloq4OQppDO+tcROpSX6ADbTZEzrBKWWkfDmUtcayKC4
-        RfUlPCXAJr5Soe63UqpibedMiyqjb6gv5A==
-X-Google-Smtp-Source: AMsMyM7zfuj1GGs5FMeB14h/r1NN4XE7gGaVM7TiMKJw+EBJs/GcuVrA2M5ItE1L4O5HjkKNQyCKLA==
-X-Received: by 2002:a05:6214:230f:b0:4af:6ed2:9ee5 with SMTP id gc15-20020a056214230f00b004af6ed29ee5mr273526qvb.90.1664404085295;
-        Wed, 28 Sep 2022 15:28:05 -0700 (PDT)
-Received: from [172.17.0.2] ([20.168.215.179])
-        by smtp.gmail.com with ESMTPSA id q30-20020a05620a2a5e00b006bbe6e89bdcsm4505764qkp.31.2022.09.28.15.28.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Sep 2022 15:28:04 -0700 (PDT)
-Message-ID: <6334ca74.050a0220.2ae97.f386@mx.google.com>
-Date:   Wed, 28 Sep 2022 15:28:04 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7600599319750581193=="
+        Wed, 28 Sep 2022 20:49:41 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 055F638A8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Sep 2022 17:49:39 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B2213B8229C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 00:49:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6611DC4314D
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 00:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664412576;
+        bh=lHNldNW4hDkT8SDU/wTdHe4YyUxY977NIH+5ePwDDzk=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=gJfSq4BtHahvKEj84bUDdS9G9cXAu24JQ6I+jYBAlS5OTDmiJSbr4uwD1Er9gH4Ov
+         0jhtXnhiIok2wX0uzviOd6LUeTTXYkGRNk/OJsbcwZsTnR7+MQzJ3hp7crcwYXOQa6
+         O+Lho8WvM9x3pmXyTwWVnizNyE+64hnDfmcnFWg0OwUOMUQFY262/kH0ZFsVvlO2QS
+         9GcYCh/4ZdfzVuaxpN8jeZcKJojvO7qwns2ue/FWqvvdcyzHlFEU+eKVV7BI6Hb65P
+         BLlDpWHQAbHDlMXOh12MxO+wXBkr7vohHH2EIbOO14MWZ1phzaeSClaNQcJV+sPpMR
+         kaZfH4q43we0g==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 59127C433E4; Thu, 29 Sep 2022 00:49:36 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
+Date:   Thu, 29 Sep 2022 00:49:35 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: patrick.blesi@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215167-62941-WCuaHSs7Vl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
+References: <bug-215167-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client/player: Fix attempting to acquire already acquired transport
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220928212649.3824261-1-luiz.dentz@gmail.com>
-References: <20220928212649.3824261-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7600599319750581193==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
-This is automated email and please do not reply to this email!
+--- Comment #42 from Patrick Blesi (patrick.blesi@gmail.com) ---
+(In reply to Patrick Blesi from comment #41)
+> I am experiencing the same problem with 5.15.67 for USB Device
+> USB_DEVICE(0x8087, 0x0aaa).
+>=20
+> ~ $ uname -a
+> Linux a0d7b954-ssh 5.15.67 #1 SMP Tue Sep 13 13:54:38 UTC 2022 x86_64 Lin=
+ux
+>=20
+> ~ $ lsusb
+> Bus 001 Device 001: ID 1d6b:0002
+> Bus 001 Device 003: ID 1043:8012
+> Bus 002 Device 001: ID 1d6b:0003
+> Bus 001 Device 002: ID 8087:0aaa
+>=20
+> ~ $ dmesg | grep -i bluetooth
+> [    0.454719] Bluetooth: Core ver 2.22
+> [    0.454904] NET: Registered PF_BLUETOOTH protocol family
+> [    0.455504] Bluetooth: HCI device and connection manager initialized
+> [    0.455896] Bluetooth: HCI socket layer initialized
+> [    0.456392] Bluetooth: L2CAP socket layer initialized
+> [    0.456894] Bluetooth: SCO socket layer initialized
+> [    4.452912] Bluetooth: hci0: Reading Intel version command failed (-11=
+0)
+> [    4.452955] Bluetooth: hci0: command 0xfc05 tx timeout
+> [    4.498402] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+> [    4.498405] Bluetooth: BNEP filters: protocol multicast
+> [    4.498409] Bluetooth: BNEP socket layer initialized
 
-Dear submitter,
+This was actually a red herring. The issue was manifested by not connecting=
+ my
+Bluetooth PCI devices as a passthrough to my lxd virtual machine. To resolv=
+e I
+removed the Bluetooth USB device (0x8087, 0x0aaa) and added the PCI control=
+ler
+and shared RAM PCI controller in the same iommu group.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=681654
+00:14.0 USB controller: Intel Corporation Cannon Point-LP USB 3.1 xHCI
+Controller (rev 30)=20
+00:14.2 RAM memory: Intel Corporation Cannon Point-LP Shared SRAM (rev 30)
 
----Test result---
+--=20
+You may reply to this email to add a comment.
 
-Test Summary:
-CheckPatch                    PASS      1.78 seconds
-GitLint                       PASS      1.07 seconds
-Prep - Setup ELL              PASS      27.06 seconds
-Build - Prep                  PASS      0.86 seconds
-Build - Configure             PASS      8.89 seconds
-Build - Make                  PASS      982.74 seconds
-Make Check                    PASS      12.12 seconds
-Make Check w/Valgrind         PASS      295.34 seconds
-Make Distcheck                PASS      245.68 seconds
-Build w/ext ELL - Configure   PASS      8.86 seconds
-Build w/ext ELL - Make        PASS      85.98 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    WARNING   521.33 seconds
-
-Details
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-client/player.c:1756:25: warning: Dereference of null pointer
-        iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
-                               ^~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7600599319750581193==--
+You are receiving this mail because:
+You are the assignee for the bug.=
