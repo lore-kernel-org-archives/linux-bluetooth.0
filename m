@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67989C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Sep 2022 23:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD0F2C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 00:00:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229875AbiI2X7y (ORCPT
+        id S229660AbiI3AAD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Sep 2022 19:59:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39360 "EHLO
+        Thu, 29 Sep 2022 20:00:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiI2X7t (ORCPT
+        with ESMTP id S229575AbiI3AAB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Sep 2022 19:59:49 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803FE1A225
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 16:59:45 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id s9so1901609qkg.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 16:59:45 -0700 (PDT)
+        Thu, 29 Sep 2022 20:00:01 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48BE6E9A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 16:59:59 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id ay9so1804525qtb.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 16:59:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
          :message-id:from:to:cc:subject:date;
-        bh=fEJZ2BcjnqNukgVielhzYJN98KbquaN4NTCINnDpwVQ=;
-        b=nwgWXOy73zcwf+eEVsmypTm6lzykWQaHqRJRG7vTyx8TEzSQ/lYn8sCxx+KfI8K7Cw
-         8B24rQnSKRcBtw4yiF1/iGHb1+gwhtyrRPZHKN/EK40nu8zZ+HdShuAPcSG5y1zXrHX0
-         uhEZrUldiEABoE+tVStvyHyuZHIrEk/qiOu0shgTh9ZcAJojgqF52Oy6E7Bb2SJpPlR0
-         bmRlOmKuB9AIyTtkmrWrQO1bB+N0YH5ZbIvsJOlhDG1AXtXMaW2vBruzfMZvo5Ksn3Tk
-         keFCG8IibnRori8y6KO27KRXwWhIjb6XY+/ykPPCBkKC5z57YZcWIZ1BdFEXiP3FhCyU
-         RdAQ==
+        bh=bKHj45SEybWcb/0bz83Qdgbgo+HcJD/ZCZa6UZ4rYZA=;
+        b=VNe17onQjowt+WGtX8hiCxI0T5I0AVV3fc4S2skgiHEUvnb6qHJ6sY3876LvBW9wXT
+         v5jJVkq3SjwF05exM3ImlrcvJI7ILtcRrfR85uc03Z7bAjdF0nsAOrgWqGvSqXAjK0kL
+         BT4ou3Boesgi6s6gzgbhtfg4BwmwDIaTtQq5a0mPznepI6+8IPZC28IIwge4XMrpjNkX
+         OxyMaf2CXF7urOoFOgr0+IqRbk9r7Kmkvzx2brKcsQJJO8Dz3WavrPq6gENZamWGwvQN
+         ErNWecJ4k+JO2uJhLs4K1Y8/BJ2X4tlD7hhticYsmXuS+m/czKw+hQAOEaWm6OE4wDPs
+         +oLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=fEJZ2BcjnqNukgVielhzYJN98KbquaN4NTCINnDpwVQ=;
-        b=cibg3uyw8xALoyFcHm7xTT2cHcXjR2Z9oVYnJ9OvCssNdK/YGUJjK/hHWOKJuQtbc6
-         VS6a4+7EYCCPVUmg00cLkski1Qkod/qT0zzHNjd5+wtWH1+4a4C4+rP4tcFEjLUmbZGy
-         XADh8J2K7D537h/NcSspwT7lFpdIgi0b93ORHcDqVJRUhWpFNlPU1Ns0deLhrJt8qQk+
-         pqMzkd7bvTOHxOQB21xeGFNp0Uel05c7q9uKa5tTkDkIxaELgn37zF5wNtDALCvYDv8x
-         MHiNawyet28HLP0XmFKfr7g2SFUfquAkoO39VSTBs+l7pgkH2/jJv87gxP5QwqNPlnZk
-         gClQ==
-X-Gm-Message-State: ACrzQf1eBEO+snPDS4VPLl0zUHrt0NmcCj8D28PDGbaHjgen92MJgBfZ
-        8vxtp7R56oUvBMzLAv9xLNimTPKTjYRLVQ==
-X-Google-Smtp-Source: AMsMyM7ljZd0xGioKO3pkbvrreEVhS06nc22F8Un+VYtz0Zooc4lGYTOgV8K+OpFSnGOU/Fs4B/YYQ==
-X-Received: by 2002:a05:620a:271b:b0:6cd:fd1f:7472 with SMTP id b27-20020a05620a271b00b006cdfd1f7472mr4235899qkp.142.1664495984634;
-        Thu, 29 Sep 2022 16:59:44 -0700 (PDT)
+        bh=bKHj45SEybWcb/0bz83Qdgbgo+HcJD/ZCZa6UZ4rYZA=;
+        b=DmvosyF5dZy/b+Gb5rddWSJEUqGywClc5oF5SIK8dEOovG4X2rWfpp2t2kki9ZUmxT
+         w0BIqi/OtIC4wa+PJs2RABE5skt5zW0lyc9HE22m8MvieiBR4+Ab9cFliVvkQipNcSQL
+         8d/fNwIiPNKSk815KOD+YRGNW/QYZqfrHoH8BMxOJCjUyKA2MWfxsl0jLuiCqBs3pvgQ
+         4hxgLLxjQVEFvdTuukjuMTvNXYpEF9otbSafyI/XtHnTcmmyMsX2ixoXIi8Q+ug39tfT
+         G6EzowFduRbVCZQ0MUPwHiGG52jIrYzSCPXRgviK6p8p9vYvlJQxI3rJlG1AW1L5nPog
+         phjg==
+X-Gm-Message-State: ACrzQf0Rkuy+dlK1M8+wJ0KNIamyT8Bb8032Sc2bp6YNcXYCkBuewYFk
+        LMBjnVnmKieTD3gm9jBu6V0zsAtG78iKPA==
+X-Google-Smtp-Source: AMsMyM7wHm0m/9A6exZIbHerrlPud9PX4vnES5G1cwYaGoutQSFHPcqqbhIH/Z89ky/LN67qkPuzQg==
+X-Received: by 2002:a05:622a:13c7:b0:35b:ba86:17b1 with SMTP id p7-20020a05622a13c700b0035bba8617b1mr4680723qtk.33.1664495997994;
+        Thu, 29 Sep 2022 16:59:57 -0700 (PDT)
 Received: from [172.17.0.2] ([20.1.206.241])
-        by smtp.gmail.com with ESMTPSA id de20-20020a05620a371400b006bbb07ebd83sm1167347qkb.108.2022.09.29.16.59.43
+        by smtp.gmail.com with ESMTPSA id ez8-20020a05622a4c8800b00341a807ed21sm465925qtb.72.2022.09.29.16.59.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 16:59:44 -0700 (PDT)
-Message-ID: <63363170.050a0220.9a402.35c1@mx.google.com>
-Date:   Thu, 29 Sep 2022 16:59:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8094829426470034938=="
+        Thu, 29 Sep 2022 16:59:57 -0700 (PDT)
+Message-ID: <6336317d.050a0220.41cdb.1409@mx.google.com>
+Date:   Thu, 29 Sep 2022 16:59:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1628801924227128385=="
 MIME-Version: 1.0
-Subject: RE: plugins: Do not try to autopair with Nissan Connect devices
+Subject: RE: properties_changed: check for NULL iterator
 Reply-To: linux-bluetooth@vger.kernel.org
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, florian@ubports.com
-In-Reply-To: <01070182f561c630-852e0333-6f04-448b-b064-46a2f000e860-000000@eu-central-1.amazonses.com>
-References: <01070182f561c630-852e0333-6f04-448b-b064-46a2f000e860-000000@eu-central-1.amazonses.com>
+To:     linux-bluetooth@vger.kernel.org, ceggers@arri.de
+In-Reply-To: <20220923145602.25872-2-ceggers@arri.de>
+References: <20220923145602.25872-2-ceggers@arri.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8094829426470034938==
+--===============1628801924227128385==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -76,8 +76,8 @@ Thank you for submitting the patches to the linux bluetooth mailing list.
 While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
 ----- Output -----
-error: patch failed: plugins/autopair.c:66
-error: plugins/autopair.c: patch does not apply
+error: patch failed: src/advertising.c:1055
+error: src/advertising.c: patch does not apply
 hint: Use 'git am --show-current-patch' to see the failed patch
 
 
@@ -89,4 +89,4 @@ Regards,
 Linux Bluetooth
 
 
---===============8094829426470034938==--
+--===============1628801924227128385==--
