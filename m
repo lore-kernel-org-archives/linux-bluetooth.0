@@ -2,34 +2,34 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E19C43217
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Sep 2022 11:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 308CCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Sep 2022 11:44:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235410AbiI2Lov (ORCPT
+        id S235419AbiI2Low (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Sep 2022 07:44:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44976 "EHLO
+        Thu, 29 Sep 2022 07:44:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235369AbiI2Lor (ORCPT
+        with ESMTP id S235383AbiI2Lor (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 29 Sep 2022 07:44:47 -0400
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D656E326E0;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D61D8303FE;
         Thu, 29 Sep 2022 04:44:42 -0700 (PDT)
 Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 28TBi7iQ5024875, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 28TBi7iQ5024875
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 28TBi5vY5024861, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36504.realtek.com.tw[172.21.6.27])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 28TBi5vY5024861
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-        Thu, 29 Sep 2022 19:44:07 +0800
+        Thu, 29 Sep 2022 19:44:05 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ RTEXH36504.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.31; Thu, 29 Sep 2022 19:44:33 +0800
+ 15.1.2375.7; Thu, 29 Sep 2022 19:44:31 +0800
 Received: from localhost.localdomain (172.21.132.192) by
  RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Thu, 29 Sep 2022 19:44:32 +0800
+ 15.1.2375.7; Thu, 29 Sep 2022 19:44:30 +0800
 From:   <hildawu@realtek.com>
 To:     <marcel@holtmann.org>
 CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
@@ -37,12 +37,10 @@ CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
         <apusaka@chromium.org>, <yinghsu@chromium.org>,
         <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
         <kidman@realtek.com>
-Subject: [PATCH v3 3/3] Bluetooth:btsub:Ignore zero length of USB packets on ALT 6 for specific chip
-Date:   Thu, 29 Sep 2022 19:44:26 +0800
-Message-ID: <20220929114426.4413-4-hildawu@realtek.com>
+Subject: [PATCH v3 0/3] Bluetooth: Add btrealtek data struct and improve SCO sound quality of RTK chips
+Date:   Thu, 29 Sep 2022 19:44:23 +0800
+Message-ID: <20220929114426.4413-1-hildawu@realtek.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20220929114426.4413-1-hildawu@realtek.com>
-References: <20220929114426.4413-1-hildawu@realtek.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [172.21.132.192]
@@ -59,119 +57,51 @@ X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
 X-KSE-Antivirus-Interceptor-Info: scan successful
 X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzkvMjkgpFekyCAwODo1NjowMA==?=
 X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-ServerInfo: RTEXH36504.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Hilda Wu <hildawu@realtek.com>
 
-For USB ALT 6 settings some Realtek chips need to transmit mSBC data
-continuously without the zero length of USB packets.
-In this commit, create BTUSB_ALT6_CONTINUOUS_TX to manage the behavior.
-Therefore, create REALTEK_ALT6_CONTINUOUS_TX_CHIP to manage the specific
-chip model for the behavior.
+Add btrealtek data struct and use definition of vendor flags to manage the
+specific chip.
 
-Signed-off-by: Max Chou <max.chou@realtek.com>
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+The Bluetooth: btusb: Workaround for spotty SCO quality patch is for
+filter out duplicate packet for avoiding spotty SCO quality.
+- The comparison of btrtl_usb_recv_isoc here is for invalid handle,
+the invalid handle shouldn't appear.
+So we try to find out the rule and filter out this.
+
+The Bluetooth: btsub: Ignore zero length of USB packets on ALT 6 patch is
+for some Realtek chips need to transmit mSBC data continuously without the
+zero length of USB packets.
+
 ---
-Changes in V3
+Changes in v3:
+ - Use the vendor function to replace btus_recv_isoc.
  - For ignore_usb_alt6_packet_flow, manage the common flag by the vendor private flag.
----
----
- drivers/bluetooth/btrtl.c |  7 +++++++
- drivers/bluetooth/btusb.c | 25 +++++++++++++++++++++++--
- 2 files changed, 30 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 272f90621a10..7159427c530e 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -781,6 +781,13 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
- 	case CHIP_ID_8852C:
- 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
- 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
-+
-+		/* RTL8852C needs to transmit mSBC data continuously without
-+		 * the zero length of USB packets for the ALT 6 supported chips
-+		 */
-+		if (btrtl_dev->project_id == CHIP_ID_8852C)
-+			btrealtek_set_flag(hdev, REALTEK_ALT6_CONTINUOUS_TX_CHIP);
-+
- 		hci_set_aosp_capable(hdev);
- 		break;
- 	default:
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7583059e3b2c..076cfee1ad57 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -626,6 +626,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- #define BTUSB_TX_WAIT_VND_EVT	13
- #define BTUSB_WAKEUP_AUTOSUSPEND	14
- #define BTUSB_USE_ALT3_FOR_WBS	15
-+#define BTUSB_ALT6_CONTINUOUS_TX	16
- 
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -1271,11 +1272,17 @@ static void btusb_isoc_complete(struct urb *urb)
- static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len,
- 					       int mtu, struct btusb_data *data)
- {
--	int i, offset = 0;
-+	int i = 0, offset = 0;
- 	unsigned int interval;
- 
- 	BT_DBG("len %d mtu %d", len, mtu);
- 
-+	/* For mSBC ALT 6 settings some chips need to transmit the data
-+	 * continuously without the zero length of USB packets.
-+	 */
-+	if (test_bit(BTUSB_ALT6_CONTINUOUS_TX, &data->flags))
-+		goto ignore_usb_alt6_packet_flow;
-+
- 	/* For mSBC ALT 6 setting the host will send the packet at continuous
- 	 * flow. As per core spec 5, vol 4, part B, table 2.1. For ALT setting
- 	 * 6 the HCI PACKET INTERVAL should be 7.5ms for every usb packets.
-@@ -1295,6 +1302,7 @@ static inline void __fill_isoc_descriptor_msbc(struct urb *urb, int len,
- 		urb->iso_frame_desc[i].length = offset;
- 	}
- 
-+ignore_usb_alt6_packet_flow:
- 	if (len && i < BTUSB_MAX_ISOC_FRAMES) {
- 		urb->iso_frame_desc[i].offset = offset;
- 		urb->iso_frame_desc[i].length = len;
-@@ -2381,6 +2389,19 @@ static int btusb_recv_isoc_realtek(struct btusb_data *data, void *buffer,
- 	return err;
- }
- 
-+static int btusb_setup_realtek(struct hci_dev *hdev)
-+{
-+	struct btusb_data *data = hci_get_drvdata(hdev);
-+	int ret;
-+
-+	ret = btrtl_setup_realtek(hdev);
-+
-+	if (btrealtek_test_flag(data->hdev, REALTEK_ALT6_CONTINUOUS_TX_CHIP))
-+		set_bit(BTUSB_ALT6_CONTINUOUS_TX, &data->flags);
-+
-+	return ret;
-+}
-+
- /* UHW CR mapping */
- #define MTK_BT_MISC		0x70002510
- #define MTK_BT_SUBSYS_RST	0x70002610
-@@ -3983,7 +4004,7 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
- 	    (id->driver_info & BTUSB_REALTEK)) {
--		hdev->setup = btrtl_setup_realtek;
-+		hdev->setup = btusb_setup_realtek;
- 		hdev->shutdown = btrtl_shutdown_realtek;
- 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
- 
+Changes in v2:
+ - Set the proper priv_size to hci_alloc_dev_priv().
+ - Separate commits for functions.
+---
+Thank you for your review and suggestions.
+
+Hilda Wu (3):
+  Bluetooth: btrtl: Add btrealtek data struct
+  Bluetooth: btusb: Workaround for spotty SCO quality
+  Bluetooth:btsub:Ignore zero length of USB packets on ALT 6 for
+    specific chip
+
+ drivers/bluetooth/btrtl.c |  34 ++++++++++++
+ drivers/bluetooth/btrtl.h |  29 +++++++++++
+ drivers/bluetooth/btusb.c | 105 ++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 165 insertions(+), 3 deletions(-)
+
 -- 
 2.17.1
 
