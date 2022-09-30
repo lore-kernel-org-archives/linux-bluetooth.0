@@ -2,97 +2,159 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 057CCC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 00:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D73AC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 00:24:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229642AbiI3ABX (ORCPT
+        id S229842AbiI3AYH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Sep 2022 20:01:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
+        Thu, 29 Sep 2022 20:24:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229534AbiI3ABW (ORCPT
+        with ESMTP id S229501AbiI3AYG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Sep 2022 20:01:22 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDFCDF8FA1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 17:01:19 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id 3so1907242qka.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 17:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=ah0pvzW8jZUz5TT7USlGdFH1rsxy6NYL/FTGx5jmOSY=;
-        b=oRDFDIpaQi1h87QMfsoQyTpwsMbLfDR7ed5spVFUF4ElyqhExV/iX1jtBYgXQOWbyh
-         sa4Cz3srPB9nEETWq2wX/YigGMxY5wn6FF6pQ1bPSHZHhVv3w9OPRgrLCupMRv31Aiot
-         HszVlquwgDUyYaA3Dw78fCH7tDd5UdpQlG5SMq2Z70fQQMGp3F0ftlzOb2ry45VXPTUS
-         jtie1cgtZUR8Xp7H4YiB/1d9mpO0UT+dvLGm8xnBHseusFJyVMcBT0LZCtInHVLtRPYV
-         LnCM+7eb1HVAFvAPxG+UfMQizsDNNQbWmqH/ud3BXOiIqDFVPnr1LFqVnjPiyHs92iSG
-         RT0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=ah0pvzW8jZUz5TT7USlGdFH1rsxy6NYL/FTGx5jmOSY=;
-        b=hfTi88TWSsK3rnt1XdCEZfRJBo6P/7Qt1EuXAPkH1/s5JFb1s0EXZ0HbBNg6ouXBjm
-         Oqp/ne4nAmP/y2vY3m7i5l+YOlH6RTa3+KjgBb3awAdAli1s1drP2I+grd5o9sg9hcKA
-         kpHyoQ3HfTazyl999iSQjyddc1XEMiUySNb0ua6O2YvSLyBUHkF+0I2FuVQM9BJNZWVf
-         Z9kVW5XrVxDm+rgWyT8ZBaBFh+NJWUOnWd4AAXvxdWXBXy/6aRV5Yy9q9cX7zzKKTotv
-         gECTbELyr0PLwZciasz2jgtYZ7S7waKKjWIfWqAS/d9UDsvXB19LNS8MukJSxGbrGCic
-         ktQg==
-X-Gm-Message-State: ACrzQf1Ipta3tIp5hIgEU+pzZ7EjE1uTRKS28CpqCvku+WuV1kc2y/ZL
-        n/2nKa3Oiuz2/jaVoqGr44qHr4RL36UK1w==
-X-Google-Smtp-Source: AMsMyM52OqnWPoYLtUrbXkwqhuVM7DSpDGIkeZojv+6sCfHX/7jGg2/p+IN6giCccvIsjrOxaLTEAg==
-X-Received: by 2002:a05:620a:1aa3:b0:6ce:3c85:d9d7 with SMTP id bl35-20020a05620a1aa300b006ce3c85d9d7mr4197201qkb.225.1664496078857;
-        Thu, 29 Sep 2022 17:01:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.1.128.176])
-        by smtp.gmail.com with ESMTPSA id de20-20020a05620a371400b006bbb07ebd83sm1172149qkb.108.2022.09.29.17.01.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 17:01:18 -0700 (PDT)
-Message-ID: <633631ce.050a0220.9a402.3601@mx.google.com>
-Date:   Thu, 29 Sep 2022 17:01:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8173355273232467717=="
+        Thu, 29 Sep 2022 20:24:06 -0400
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26315200B2E;
+        Thu, 29 Sep 2022 17:23:57 -0700 (PDT)
+X-UUID: a8772344360241b6b4c6a4df4788465d-20220930
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=TOYIIvxicO818E1VEDhSTvjwuN1c+K3AzOWctLwWPd4=;
+        b=n4b1WQuqoOPGb8hYd+w7W3i5zKxGZPkCiShnAshiqmjLs+BJmpTPfbFMfSXUJIu3XqbEcgmGUS1Go9l4KlCP3tkI1mWSIi146p24oimO+k9cCXjlYp0DMqGW648LSaGRnsliUL0qIEolOgjaMgEyrhW70tKdPICDhDm97RNSVg0=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.11,REQID:a9d98777-5c12-41e5-a51e-851c545b0912,IP:0,U
+        RL:0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+        :release,TS:95
+X-CID-INFO: VERSION:1.1.11,REQID:a9d98777-5c12-41e5-a51e-851c545b0912,IP:0,URL
+        :0,TC:0,Content:0,EDM:0,RT:0,SF:95,FILE:0,BULK:0,RULE:Spam_GS981B3D,ACTION
+        :quarantine,TS:95
+X-CID-META: VersionHash:39a5ff1,CLOUDID:78567e07-1cee-4c38-b21b-a45f9682fdc0,B
+        ulkID:2209300823551UDSB940,BulkQuantity:0,Recheck:0,SF:38|28|17|19|48|823|
+        824,TC:nil,Content:0,EDM:-3,IP:nil,URL:11|1,File:nil,Bulk:nil,QS:nil,BEC:n
+        il,COL:0
+X-UUID: a8772344360241b6b4c6a4df4788465d-20220930
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1601397071; Fri, 30 Sep 2022 08:23:53 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs11n1.mediatek.inc (172.21.101.185) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.792.15; Fri, 30 Sep 2022 08:23:51 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.792.15 via Frontend Transport; Fri, 30 Sep 2022 08:23:51 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <sean.wang@mediatek.com>, <Soul.Huang@mediatek.com>,
+        <YN.Chen@mediatek.com>, <Leon.Yen@mediatek.com>,
+        <Eric-SY.Chang@mediatek.com>, <Deren.Wu@mediatek.com>,
+        <km.lin@mediatek.com>, <robin.chiu@mediatek.com>,
+        <Eddie.Chen@mediatek.com>, <ch.yeh@mediatek.com>,
+        <posh.sun@mediatek.com>, <ted.huang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <abhishekpandit@google.com>,
+        <michaelfsun@google.com>, <abhishekpandit@chromium.org>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
+Date:   Fri, 30 Sep 2022 08:23:47 +0800
+Message-ID: <ab8958da839ecadc0ebff9f0a221ef49a2e5a4cc.1664497281.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-Subject: RE: [v4,03/18] Bluetooth: RFCOMM: remove define-only RFCOMM_TTY_MAGIC ex-magic-number
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, nabijaczleweli@nabijaczleweli.xyz
-In-Reply-To: <f6d375201dfd99416ea03b49b3dd40af56c1537e.1663280877.git.nabijaczleweli@nabijaczleweli.xyz>
-References: <f6d375201dfd99416ea03b49b3dd40af56c1537e.1663280877.git.nabijaczleweli@nabijaczleweli.xyz>
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8173355273232467717==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Sean Wang <sean.wang@mediatek.com>
 
-This is an automated email and please do not reply to this email.
+Use readx_poll_timeout instead of open coding to poll the hardware reset
+status until it is done.
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-error: patch failed: Documentation/process/magic-number.rst:78
-error: Documentation/process/magic-number.rst: patch does not apply
-error: patch failed: Documentation/translations/it_IT/process/magic-number.rst:84
-error: Documentation/translations/it_IT/process/magic-number.rst: patch does not apply
-error: patch failed: Documentation/translations/zh_CN/process/magic-number.rst:67
-error: Documentation/translations/zh_CN/process/magic-number.rst: patch does not apply
-error: patch failed: Documentation/translations/zh_TW/process/magic-number.rst:70
-error: Documentation/translations/zh_TW/process/magic-number.rst: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-
-Please resolve the issue and submit the patches again.
-
-
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
-Regards,
-Linux Bluetooth
+The patch is built and tested on the top of the patches
+[v6,1/3] Bluetooth: Add support for hci devcoredump
+[v6,2/3] Bluetooth: btusb: Add btusb devcoredump support
+[v6,3/3] Bluetooth: btintel: Add Intel devcoredump support
+which are contributed from Manish Mandlik
 
+v2: use 20ms as the unit to poll according to the requirement of
+    readx_poll_timeout
+---
+ drivers/bluetooth/btusb.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
---===============8173355273232467717==--
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 4eb79e88f1d9..9ef0dc648573 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2361,8 +2361,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ #define MTK_EP_RST_OPT		0x74011890
+ #define MTK_EP_RST_IN_OUT_OPT	0x00010001
+ #define MTK_BT_RST_DONE		0x00000100
+-#define MTK_BT_RESET_WAIT_MS	100
+-#define MTK_BT_RESET_NUM_TRIES	10
+ 
+ static void btusb_mtk_wmt_recv(struct urb *urb)
+ {
+@@ -2733,6 +2731,16 @@ static int btusb_mtk_id_get(struct btusb_data *data, u32 reg, u32 *id)
+ 	return btusb_mtk_reg_read(data, reg, id);
+ }
+ 
++static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	u32 val = 0;
++
++	btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
++
++	return val;
++}
++
+ static int btusb_mtk_setup(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -2922,7 +2930,7 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	u32 val;
+-	int err, retry = 0;
++	int err;
+ 
+ 	/* It's MediaTek specific bluetooth reset mechanism via USB */
+ 	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+@@ -2953,18 +2961,14 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+ 	btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
+ 	btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+ 
+-	/* Poll the register until reset is completed */
+-	do {
+-		btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
+-		if (val & MTK_BT_RST_DONE) {
+-			bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+-			break;
+-		}
++	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
++				 val & MTK_BT_RST_DONE,
++				 20000, 1000000);
++	if (err < 0)
++		bt_dev_err(hdev, "Reset timeout");
+ 
+-		bt_dev_dbg(hdev, "Polling Bluetooth Reset CR");
+-		retry++;
+-		msleep(MTK_BT_RESET_WAIT_MS);
+-	} while (retry < MTK_BT_RESET_NUM_TRIES);
++	if (val & MTK_BT_RST_DONE)
++		bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+ 
+ 	btusb_mtk_id_get(data, 0x70010200, &val);
+ 	if (!val)
+-- 
+2.25.1
+
