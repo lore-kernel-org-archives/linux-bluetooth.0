@@ -2,197 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50AE9C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 04:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 804DFC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 08:48:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229643AbiI3EBn (ORCPT
+        id S231197AbiI3Ise (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 00:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39058 "EHLO
+        Fri, 30 Sep 2022 04:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229620AbiI3EBk (ORCPT
+        with ESMTP id S230476AbiI3Is3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 00:01:40 -0400
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6187C139BE9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 21:01:32 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id g130so3563278oia.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Sep 2022 21:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=tV/euOuk7iI7CiQbuTpLPOrg8tKLXb9wzDUirBmNkvc=;
-        b=MsR6ZxHr4Iqju6JxGlXPs2ijhECMerDSyWkm7lydZzGbS3zpG+h6ik1FaSWWnM4XJd
-         RhYJD6F+BE+fd/sohmDb9l/14S6vU1SuOOiZJ1dUTwym3JCgILkXol50Gi859Jq+Xqvo
-         oTVkLtzZwa7jwao2D7H3hzPzkF5VXjbSk/KrENN9VyRJ4HywxsSLL2GTZZi31ZUrck7T
-         cuJHNXZBwXSzkbXM5IVJaq7b5Gjqq7bn3/AY1Vo7/FdPthVvPdKcNrabILmQx7apkwGd
-         kNTjEQbEGDUe2XdWDNuOTDvN2fCYZ1zUmDDiKALmE2tWtVCR0FCrg3mS8OVrRoljkPz0
-         Y2Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=tV/euOuk7iI7CiQbuTpLPOrg8tKLXb9wzDUirBmNkvc=;
-        b=uhkjuS6/+6izEVSVcUi/KE9NYFIWv2IjMseHhLjyyUgXqn5uY0DnZmt/2fn3Q9mjmr
-         nAXImOwpgSkzcWEsgdDeXU/+MnAeyhwd+K062csxh8MWG+CZmqHEWLFdpwqrjtzfj9qy
-         jhSRuyk9C5pdnBhjlIeAR9ibzmdY1EPsgLAdiSwrJwoZHPRVsYUCjvEP/+v3nbHvzvAc
-         aZdJ2pRh65uzu3nEW//39SepUUGBD9QRRNNHBUQ4vyljJ3EAU4SHu2b4UCFnUB07y+SZ
-         dBkQ931v/IIETGxSIw3qQoY6HMqz+7jovqD92A6gbTDEStT483x6AbA48h0b9XEgz1du
-         /BmQ==
-X-Gm-Message-State: ACrzQf3zs66e1/mTpIPyH0xa8txzmRWPeQtTli3QRBrPMCXeJNbdofr4
-        oMAQxgU3aWzyZ0pji/nDEXI8WxW2aDI=
-X-Google-Smtp-Source: AMsMyM6AG3QhKihKGqCkKYFFdZSV8ShyOtZTZyp/JbZ2JErYaoWhPJ7+zkZUdb40VhPi+HXohzqLSQ==
-X-Received: by 2002:a05:6808:1b2a:b0:350:e5c0:59f9 with SMTP id bx42-20020a0568081b2a00b00350e5c059f9mr3135266oib.189.1664510491363;
-        Thu, 29 Sep 2022 21:01:31 -0700 (PDT)
-Received: from [172.17.0.2] ([20.165.71.148])
-        by smtp.gmail.com with ESMTPSA id r185-20020acadac2000000b0035173c2fddasm275675oig.51.2022.09.29.21.01.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Sep 2022 21:01:30 -0700 (PDT)
-Message-ID: <63366a1a.ca0a0220.2c6bb.0fbf@mx.google.com>
-Date:   Thu, 29 Sep 2022 21:01:30 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7818370084361876101=="
+        Fri, 30 Sep 2022 04:48:29 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B82E41E458F;
+        Fri, 30 Sep 2022 01:48:27 -0700 (PDT)
+Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (No client certificate requested)
+        (Authenticated sender: kholk11)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 1C77C66022C7;
+        Fri, 30 Sep 2022 09:48:25 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1664527706;
+        bh=wsKfSJrwiuKBEua7WnzhXWyeBCqlNxfAGcDYOglaauI=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=fmo7+zM31CXYHFt2Ogbexh0ZdseiYh04XEFwEGq69ByT2cPNe9ImKgQEut7CEovCO
+         q8U9mFhttpC9Q5tEVX2huPEdLXaHyMMf7K9Nb/Rqf1p2VOCQ1bxkWD0JTc/tgLiDiw
+         PDLnODzXOhhsViquydywBacYIa10kepPVMDtSFjnmT228EXhn67KkvxSNVWqE6LI1X
+         0T0s8lv6AuDmzUeBsLr3i5Oa7PBNwHDb657kmXAPw9j344NiqEpJ2tdN4bCxsR5qdc
+         ZIkzdn2VpWsARVWOtDWXKANPYFyfexrND8sBjERN3WwCzuw/pnzgxjWiq/9GSPlxwd
+         IjSegHSqxNraw==
+Message-ID: <58a119b4-78a7-8254-b986-e1dd6b515e23@collabora.com>
+Date:   Fri, 30 Sep 2022 10:48:22 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sean.wang@mediatek.com
-Subject: RE: [v2,1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout instead of open coding
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <ab8958da839ecadc0ebff9f0a221ef49a2e5a4cc.1664497281.git.objelf@gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH v2 1/3] Bluetooth: btusb: mediatek: use readx_poll_timeout
+ instead of open coding
+Content-Language: en-US
+To:     sean.wang@mediatek.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Stella.Chang@mediatek.com, Tom.Chou@mediatek.com,
+        steve.lee@mediatek.com, jsiuda@google.com, frankgor@google.com,
+        abhishekpandit@google.com, michaelfsun@google.com,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        shawnku@google.com, linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <ab8958da839ecadc0ebff9f0a221ef49a2e5a4cc.1664497281.git.objelf@gmail.com>
+From:   AngeloGioacchino Del Regno 
+        <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <ab8958da839ecadc0ebff9f0a221ef49a2e5a4cc.1664497281.git.objelf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7818370084361876101==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Il 30/09/22 02:23, sean.wang@mediatek.com ha scritto:
+> From: Sean Wang <sean.wang@mediatek.com>
+> 
+> Use readx_poll_timeout instead of open coding to poll the hardware reset
+> status until it is done.
+> 
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> ---
+> The patch is built and tested on the top of the patches
+> [v6,1/3] Bluetooth: Add support for hci devcoredump
+> [v6,2/3] Bluetooth: btusb: Add btusb devcoredump support
+> [v6,3/3] Bluetooth: btintel: Add Intel devcoredump support
+> which are contributed from Manish Mandlik
+> 
+> v2: use 20ms as the unit to poll according to the requirement of
+>      readx_poll_timeout
+> ---
+>   drivers/bluetooth/btusb.c | 32 ++++++++++++++++++--------------
+>   1 file changed, 18 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 4eb79e88f1d9..9ef0dc648573 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2361,8 +2361,6 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+>   #define MTK_EP_RST_OPT		0x74011890
+>   #define MTK_EP_RST_IN_OUT_OPT	0x00010001
+>   #define MTK_BT_RST_DONE		0x00000100
+> -#define MTK_BT_RESET_WAIT_MS	100
+> -#define MTK_BT_RESET_NUM_TRIES	10
+>   
+>   static void btusb_mtk_wmt_recv(struct urb *urb)
+>   {
+> @@ -2733,6 +2731,16 @@ static int btusb_mtk_id_get(struct btusb_data *data, u32 reg, u32 *id)
+>   	return btusb_mtk_reg_read(data, reg, id);
+>   }
+>   
+> +static u32 btusb_mtk_reset_done(struct hci_dev *hdev)
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjgyMDg4CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgNC42NCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIEZB
-SUwgICAgICAwLjczIHNlY29uZHMKU3ViamVjdFByZWZpeCAgICAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDEuOTEgc2Vjb25kcwpCdWlsZEtlcm5lbCAgICAgICAgICAgICAgICAgICBGQUlMICAgICAg
-MzQuMDIgc2Vjb25kcwpCdWlsZEtlcm5lbDMyICAgICAgICAgICAgICAgICBGQUlMICAgICAgMzAu
-OTIgc2Vjb25kcwpJbmNyZW1lbnRhbCBCdWlsZCB3aXRoIHBhdGNoZXNFUlJPUiAgICAgMC4yOSBz
-ZWNvbmRzClRlc3RSdW5uZXI6IFNldHVwICAgICAgICAgICAgIFBBU1MgICAgICA1MTQuMDIgc2Vj
-b25kcwpUZXN0UnVubmVyOiBsMmNhcC10ZXN0ZXIgICAgICBQQVNTICAgICAgMTcuMjAgc2Vjb25k
-cwpUZXN0UnVubmVyOiBpc28tdGVzdGVyICAgICAgICBQQVNTICAgICAgMTYuMjAgc2Vjb25kcwpU
-ZXN0UnVubmVyOiBibmVwLXRlc3RlciAgICAgICBQQVNTICAgICAgNi40OSBzZWNvbmRzClRlc3RS
-dW5uZXI6IG1nbXQtdGVzdGVyICAgICAgIFBBU1MgICAgICAxMDQuNTcgc2Vjb25kcwpUZXN0UnVu
-bmVyOiByZmNvbW0tdGVzdGVyICAgICBQQVNTICAgICAgMTAuMjIgc2Vjb25kcwpUZXN0UnVubmVy
-OiBzY28tdGVzdGVyICAgICAgICBQQVNTICAgICAgOS43NCBzZWNvbmRzClRlc3RSdW5uZXI6IGlv
-Y3RsLXRlc3RlciAgICAgIFBBU1MgICAgICAxMS4wNCBzZWNvbmRzClRlc3RSdW5uZXI6IHNtcC10
-ZXN0ZXIgICAgICAgIFBBU1MgICAgICA5LjczIHNlY29uZHMKVGVzdFJ1bm5lcjogdXNlcmNoYW4t
-dGVzdGVyICAgUEFTUyAgICAgIDYuODAgc2Vjb25kcwoKRGV0YWlscwojIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIEZBSUwgLSAwLjczIHNlY29uZHMKUnVuIGdp
-dGxpbnQgd2l0aCBydWxlIGluIC5naXRsaW50Clt2MiwxLzNdIEJsdWV0b290aDogYnR1c2I6IG1l
-ZGlhdGVrOiB1c2UgcmVhZHhfcG9sbF90aW1lb3V0IGluc3RlYWQgb2Ygb3BlbiBjb2RpbmcKMTog
-VDEgVGl0bGUgZXhjZWVkcyBtYXggbGVuZ3RoICg4Mj44MCk6ICJbdjIsMS8zXSBCbHVldG9vdGg6
-IGJ0dXNiOiBtZWRpYXRlazogdXNlIHJlYWR4X3BvbGxfdGltZW91dCBpbnN0ZWFkIG9mIG9wZW4g
-Y29kaW5nIgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZEtlcm5l
-bCAtIEZBSUwgLSAzNC4wMiBzZWNvbmRzCkJ1aWxkIEtlcm5lbCB3aXRoIG1pbmltYWwgY29uZmln
-dXJhdGlvbiBzdXBwb3J0cyBCbHVldG9vdGgKZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuYzogSW4g
-ZnVuY3Rpb24g4oCYYnRtdGtfY29yZWR1bXBfbm90aWZ54oCZOgpkcml2ZXJzL2JsdWV0b290aC9i
-dG10ay5jOjExMTo3OiBlcnJvcjog4oCYSENJX0RFVkNPUkVEVU1QX0FDVElWReKAmSB1bmRlY2xh
-cmVkIChmaXJzdCB1c2UgaW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhCVE1US19D
-T1JFRFVNUF9BQ1RJVkXigJk/CiAgMTExIHwgIGNhc2UgSENJX0RFVkNPUkVEVU1QX0FDVElWRToK
-ICAgICAgfCAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgIHwgICAgICAgQlRNVEtf
-Q09SRURVTVBfQUNUSVZFCmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6MTExOjc6IG5vdGU6IGVh
-Y2ggdW5kZWNsYXJlZCBpZGVudGlmaWVyIGlzIHJlcG9ydGVkIG9ubHkgb25jZSBmb3IgZWFjaCBm
-dW5jdGlvbiBpdCBhcHBlYXJzIGluCmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6MTE0Ojc6IGVy
-cm9yOiDigJhIQ0lfREVWQ09SRURVTVBfVElNRU9VVOKAmSB1bmRlY2xhcmVkIChmaXJzdCB1c2Ug
-aW4gdGhpcyBmdW5jdGlvbik7IGRpZCB5b3UgbWVhbiDigJhIQ0lfRElTQ09OTl9USU1FT1VU4oCZ
-PwogIDExNCB8ICBjYXNlIEhDSV9ERVZDT1JFRFVNUF9USU1FT1VUOgogICAgICB8ICAgICAgIF5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgIHwgICAgICAgSENJX0RJU0NPTk5fVElNRU9VVApk
-cml2ZXJzL2JsdWV0b290aC9idG10ay5jOjExNTo3OiBlcnJvcjog4oCYSENJX0RFVkNPUkVEVU1Q
-X0FCT1JU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKQogIDExNSB8
-ICBjYXNlIEhDSV9ERVZDT1JFRFVNUF9BQk9SVDoKICAgICAgfCAgICAgICBefn5+fn5+fn5+fn5+
-fn5+fn5+fn4KZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuYzoxMTY6NzogZXJyb3I6IOKAmEhDSV9E
-RVZDT1JFRFVNUF9ET05F4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9u
-KQogIDExNiB8ICBjYXNlIEhDSV9ERVZDT1JFRFVNUF9ET05FOgogICAgICB8ICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+CmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6IEluIGZ1bmN0aW9uIOKA
-mGJ0bXRrX3JlZ2lzdGVyX2NvcmVkdW1w4oCZOgpkcml2ZXJzL2JsdWV0b290aC9idG10ay5jOjM3
-NjoyOiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYaGNpX2RldmNv
-cmVkdW1wX3JlZ2lzdGVy4oCZIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9u
-XQogIDM3NiB8ICBoY2lfZGV2Y29yZWR1bXBfcmVnaXN0ZXIoaGRldiwgYnRtdGtfY29yZWR1bXAs
-IGJ0bXRrX2NvcmVkdW1wX2hkciwKICAgICAgfCAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmRy
-aXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6IEluIGZ1bmN0aW9uIOKAmGJ0bXRrX3Byb2Nlc3NfY29y
-ZWR1bXDigJk6CmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6MzkzOjk6IGVycm9yOiBpbXBsaWNp
-dCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJhoY2lfZGV2Y29yZWR1bXBfaW5pdOKAmSBbLVdl
-cnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlvbl0KICAzOTMgfCAgIGVyciA9IGhjaV9k
-ZXZjb3JlZHVtcF9pbml0KGhkZXYsIDEwMjQwMDApOwogICAgICB8ICAgICAgICAgXn5+fn5+fn5+
-fn5+fn5+fn5+fn4KZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuYzozOTc6MzA6IGVycm9yOiDigJhz
-dHJ1Y3QgaGNpX2RlduKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmGR1bXDigJkKICAzOTcgfCAg
-IHNjaGVkdWxlX2RlbGF5ZWRfd29yaygmaGRldi0+ZHVtcC5kdW1wX3RpbWVvdXQsCiAgICAgIHwg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBefgpkcml2ZXJzL2JsdWV0b290aC9idG10ay5j
-OjQwMjo5OiBlcnJvcjogaW1wbGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYaGNpX2Rl
-dmNvcmVkdW1wX2FwcGVuZOKAmSBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNsYXJhdGlv
-bl0KICA0MDIgfCAgIGVyciA9IGhjaV9kZXZjb3JlZHVtcF9hcHBlbmQoaGRldiwgc2tiKTsKICAg
-ICAgfCAgICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KZHJpdmVycy9ibHVldG9vdGgvYnRt
-dGsuYzo0MDk6NDogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0aW9uIOKAmGhj
-aV9kZXZjb3JlZHVtcF9jb21wbGV0ZeKAmSBbLVdlcnJvcj1pbXBsaWNpdC1mdW5jdGlvbi1kZWNs
-YXJhdGlvbl0KICA0MDkgfCAgICBoY2lfZGV2Y29yZWR1bXBfY29tcGxldGUoaGRldik7CiAgICAg
-IHwgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogc29tZSB3YXJuaW5ncyBiZWluZyB0
-cmVhdGVkIGFzIGVycm9ycwptYWtlWzJdOiAqKiogW3NjcmlwdHMvTWFrZWZpbGUuYnVpbGQ6MjQ5
-OiBkcml2ZXJzL2JsdWV0b290aC9idG10ay5vXSBFcnJvciAxCm1ha2VbMV06ICoqKiBbc2NyaXB0
-cy9NYWtlZmlsZS5idWlsZDo0NjU6IGRyaXZlcnMvYmx1ZXRvb3RoXSBFcnJvciAyCm1ha2U6ICoq
-KiBbTWFrZWZpbGU6MTg1NTogZHJpdmVyc10gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIwpUZXN0OiBCdWlsZEtlcm5lbDMyIC0gRkFJTCAtIDMwLjkyIHNlY29uZHMKQnVp
-bGQgMzJiaXQgS2VybmVsIHdpdGggbWluaW1hbCBjb25maWd1cmF0aW9uIHN1cHBvcnRzIEJsdWV0
-b290aApkcml2ZXJzL2JsdWV0b290aC9idG10ay5jOiBJbiBmdW5jdGlvbiDigJhidG10a19jb3Jl
-ZHVtcF9ub3RpZnnigJk6CmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6MTExOjc6IGVycm9yOiDi
-gJhIQ0lfREVWQ09SRURVTVBfQUNUSVZF4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlz
-IGZ1bmN0aW9uKTsgZGlkIHlvdSBtZWFuIOKAmEJUTVRLX0NPUkVEVU1QX0FDVElWReKAmT8KICAx
-MTEgfCAgY2FzZSBIQ0lfREVWQ09SRURVTVBfQUNUSVZFOgogICAgICB8ICAgICAgIF5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KICAgICAgfCAgICAgICBCVE1US19DT1JFRFVNUF9BQ1RJVkUKZHJpdmVy
-cy9ibHVldG9vdGgvYnRtdGsuYzoxMTE6Nzogbm90ZTogZWFjaCB1bmRlY2xhcmVkIGlkZW50aWZp
-ZXIgaXMgcmVwb3J0ZWQgb25seSBvbmNlIGZvciBlYWNoIGZ1bmN0aW9uIGl0IGFwcGVhcnMgaW4K
-ZHJpdmVycy9ibHVldG9vdGgvYnRtdGsuYzoxMTQ6NzogZXJyb3I6IOKAmEhDSV9ERVZDT1JFRFVN
-UF9USU1FT1VU4oCZIHVuZGVjbGFyZWQgKGZpcnN0IHVzZSBpbiB0aGlzIGZ1bmN0aW9uKTsgZGlk
-IHlvdSBtZWFuIOKAmEhDSV9ESVNDT05OX1RJTUVPVVTigJk/CiAgMTE0IHwgIGNhc2UgSENJX0RF
-VkNPUkVEVU1QX1RJTUVPVVQ6CiAgICAgIHwgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4K
-ICAgICAgfCAgICAgICBIQ0lfRElTQ09OTl9USU1FT1VUCmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRr
-LmM6MTE1Ojc6IGVycm9yOiDigJhIQ0lfREVWQ09SRURVTVBfQUJPUlTigJkgdW5kZWNsYXJlZCAo
-Zmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCiAgMTE1IHwgIGNhc2UgSENJX0RFVkNPUkVEVU1Q
-X0FCT1JUOgogICAgICB8ICAgICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+fgpkcml2ZXJzL2JsdWV0
-b290aC9idG10ay5jOjExNjo3OiBlcnJvcjog4oCYSENJX0RFVkNPUkVEVU1QX0RPTkXigJkgdW5k
-ZWNsYXJlZCAoZmlyc3QgdXNlIGluIHRoaXMgZnVuY3Rpb24pCiAgMTE2IHwgIGNhc2UgSENJX0RF
-VkNPUkVEVU1QX0RPTkU6CiAgICAgIHwgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn4KZHJpdmVy
-cy9ibHVldG9vdGgvYnRtdGsuYzogSW4gZnVuY3Rpb24g4oCYYnRtdGtfcmVnaXN0ZXJfY29yZWR1
-bXDigJk6CmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6Mzc2OjI6IGVycm9yOiBpbXBsaWNpdCBk
-ZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJhoY2lfZGV2Y29yZWR1bXBfcmVnaXN0ZXLigJkgWy1X
-ZXJyb3I9aW1wbGljaXQtZnVuY3Rpb24tZGVjbGFyYXRpb25dCiAgMzc2IHwgIGhjaV9kZXZjb3Jl
-ZHVtcF9yZWdpc3RlcihoZGV2LCBidG10a19jb3JlZHVtcCwgYnRtdGtfY29yZWR1bXBfaGRyLAog
-ICAgICB8ICBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn4KZHJpdmVycy9ibHVldG9vdGgvYnRtdGsu
-YzogSW4gZnVuY3Rpb24g4oCYYnRtdGtfcHJvY2Vzc19jb3JlZHVtcOKAmToKZHJpdmVycy9ibHVl
-dG9vdGgvYnRtdGsuYzozOTM6OTogZXJyb3I6IGltcGxpY2l0IGRlY2xhcmF0aW9uIG9mIGZ1bmN0
-aW9uIOKAmGhjaV9kZXZjb3JlZHVtcF9pbml04oCZIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9u
-LWRlY2xhcmF0aW9uXQogIDM5MyB8ICAgZXJyID0gaGNpX2RldmNvcmVkdW1wX2luaXQoaGRldiwg
-MTAyNDAwMCk7CiAgICAgIHwgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgpkcml2ZXJzL2Js
-dWV0b290aC9idG10ay5jOjM5NzozMDogZXJyb3I6IOKAmHN0cnVjdCBoY2lfZGV24oCZIGhhcyBu
-byBtZW1iZXIgbmFtZWQg4oCYZHVtcOKAmQogIDM5NyB8ICAgc2NoZWR1bGVfZGVsYXllZF93b3Jr
-KCZoZGV2LT5kdW1wLmR1bXBfdGltZW91dCwKICAgICAgfCAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF5+CmRyaXZlcnMvYmx1ZXRvb3RoL2J0bXRrLmM6NDAyOjk6IGVycm9yOiBpbXBsaWNp
-dCBkZWNsYXJhdGlvbiBvZiBmdW5jdGlvbiDigJhoY2lfZGV2Y29yZWR1bXBfYXBwZW5k4oCZIFst
-V2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogIDQwMiB8ICAgZXJyID0gaGNp
-X2RldmNvcmVkdW1wX2FwcGVuZChoZGV2LCBza2IpOwogICAgICB8ICAgICAgICAgXn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fgpkcml2ZXJzL2JsdWV0b290aC9idG10ay5jOjQwOTo0OiBlcnJvcjogaW1w
-bGljaXQgZGVjbGFyYXRpb24gb2YgZnVuY3Rpb24g4oCYaGNpX2RldmNvcmVkdW1wX2NvbXBsZXRl
-4oCZIFstV2Vycm9yPWltcGxpY2l0LWZ1bmN0aW9uLWRlY2xhcmF0aW9uXQogIDQwOSB8ICAgIGhj
-aV9kZXZjb3JlZHVtcF9jb21wbGV0ZShoZGV2KTsKICAgICAgfCAgICBefn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn4KY2MxOiBzb21lIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2Vb
-Ml06ICoqKiBbc2NyaXB0cy9NYWtlZmlsZS5idWlsZDoyNDk6IGRyaXZlcnMvYmx1ZXRvb3RoL2J0
-bXRrLm9dIEVycm9yIDEKbWFrZVsyXTogKioqIFdhaXRpbmcgZm9yIHVuZmluaXNoZWQgam9icy4u
-Li4KbWFrZVsxXTogKioqIFtzY3JpcHRzL01ha2VmaWxlLmJ1aWxkOjQ2NTogZHJpdmVycy9ibHVl
-dG9vdGhdIEVycm9yIDIKbWFrZTogKioqIFtNYWtlZmlsZToxODU1OiBkcml2ZXJzXSBFcnJvciAy
-CgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEluY3JlbWVudGFsIEJ1aWxk
-IHdpdGggcGF0Y2hlcyAtIFNLSVBQRUQgLSAwLjI5IHNlY29uZHMKSW5jcmVtZW50YWwgYnVpbGQg
-cGVyIHBhdGNoIGluIHRoZSBzZXJpZXMKYnVpbGRrZXJuZWwgZmFpbGVkCgoKCi0tLQpSZWdhcmRz
-LApMaW51eCBCbHVldG9vdGgKCg==
+I'm sorry for not noticing that in v1, but...
 
---===============7818370084361876101==--
+...If you call this function "btusb_mtk_reset_done"...
+
+> +{
+> +	struct btusb_data *data = hci_get_drvdata(hdev);
+> +	u32 val = 0;
+> +
+> +	btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
+> +
+> +	return val;
+
+...you shouldn't return the value of the entire MTK_BT_MISC register,
+otherwise you should call this "btusb_mtk_read_bt_misc_reg".
+
+I think that here, you should do
+
+	return val & MTK_BT_RST_DONE;
+
+and then, for the readx_poll_timeout, you simply check if this function
+returned 1, like:
+
+	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val, val,
+				 20000, 1000000);
+
+> +}
+> +
+>   static int btusb_mtk_setup(struct hci_dev *hdev)
+>   {
+>   	struct btusb_data *data = hci_get_drvdata(hdev);
+> @@ -2922,7 +2930,7 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+>   {
+>   	struct btusb_data *data = hci_get_drvdata(hdev);
+>   	u32 val;
+> -	int err, retry = 0;
+> +	int err;
+>   
+>   	/* It's MediaTek specific bluetooth reset mechanism via USB */
+>   	if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
+> @@ -2953,18 +2961,14 @@ static void btusb_mtk_cmd_timeout(struct hci_dev *hdev)
+>   	btusb_mtk_uhw_reg_write(data, MTK_BT_SUBSYS_RST, 0);
+>   	btusb_mtk_uhw_reg_read(data, MTK_BT_SUBSYS_RST, &val);
+>   
+> -	/* Poll the register until reset is completed */
+> -	do {
+> -		btusb_mtk_uhw_reg_read(data, MTK_BT_MISC, &val);
+> -		if (val & MTK_BT_RST_DONE) {
+> -			bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+> -			break;
+> -		}
+> +	err = readx_poll_timeout(btusb_mtk_reset_done, hdev, val,
+> +				 val & MTK_BT_RST_DONE,
+> +				 20000, 1000000);
+> +	if (err < 0)
+> +		bt_dev_err(hdev, "Reset timeout");
+>   
+> -		bt_dev_dbg(hdev, "Polling Bluetooth Reset CR");
+> -		retry++;
+> -		msleep(MTK_BT_RESET_WAIT_MS);
+> -	} while (retry < MTK_BT_RESET_NUM_TRIES);
+> +	if (val & MTK_BT_RST_DONE)
+
+You're already checking `if (err < 0)`, so this check is redundant.
+If the polling didn't return a timeout, the register value contains
+MTK_BT_RST_DONE for sure, so you can safely remove this check.
+
+> +		bt_dev_dbg(hdev, "Bluetooth Reset Successfully");
+>   
+
+Regards,
+Angelo
+
+
