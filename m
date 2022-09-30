@@ -2,98 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC4EC43217
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 14:07:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB18CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 14:44:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231713AbiI3OHG (ORCPT
+        id S231405AbiI3Oo4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 10:07:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34604 "EHLO
+        Fri, 30 Sep 2022 10:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231495AbiI3OHD (ORCPT
+        with ESMTP id S230482AbiI3Oov (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 10:07:03 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C8C1170B10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:07:02 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id x32-20020a17090a38a300b00209dced49cfso1786742pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:07:02 -0700 (PDT)
+        Fri, 30 Sep 2022 10:44:51 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 447002DFC
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:44:48 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id 3so4383572pga.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:44:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=compal-corp-partner-google-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date;
-        bh=+hT6l0vmVy5od+v5UuxLD9ZYrrtPqYO3JFvSm3Cvcoc=;
-        b=7PWn/nPcIjVXw4r8UwlZ0MKfApxufPV4Bg+dJfddx/bevFffF9sBZj27Rs/5QQBbnL
-         31wlV27+Mm5xyD5CvSoWfJNp3wN6bnySincwZv4J3LfQ3FZQmiuB1O+vM9xw7odiSGD/
-         iYrM0PnnQLZBMTo8ej9nU6nvcHiSh5FSi8b3C0/zViAx3y72bnnSg8+Rb/POyMMuXuXJ
-         NbLK4PdgUpQDjZ1P0GoRaDYN4TmlSkTaeMvEMXbkY05c3I2zJdIbp1zZgRFnB47RgjqS
-         yB7rip8skWpnttO0OzaBTxKlv/M/Spv9rpdJhGkJSUJ6P6c81hCHbhmYGam4gwBt4DYj
-         20Ug==
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=ufKkfqZQib3gbHIjLUf1Rc98aoDBSxC631h5d1bRcZM=;
+        b=bI2AGnnvkaoDdp5Js3WOfGvJt7wQYFR4iDrVMf3kLdkHb08Wo8Z7BzB/D3fozJEXO9
+         GeylWn30suSIwIgbNnwVzc9j3IAXzD/6L6QDZDDk6mKvVW8xJPUGHC/n07HMUex0iL3p
+         vgBsWbJfpprATSIv3qnMCFYax4YOgel949CibfrAfqHit72IYLSkUezcP2k4Dt9cg21q
+         EINGFLj7HJ2I+IAItjCHVSmNdE5kmWL8eNY9SgX6ytQd/NgdvAVG4MXym1yqidlalD/k
+         CnB20LmekjGoi8LtkvstNYDKrJPH7pyFuP5byf8OLBtTxmVmAqBvhdKoj/UzrGFGc2FF
+         X11Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date;
-        bh=+hT6l0vmVy5od+v5UuxLD9ZYrrtPqYO3JFvSm3Cvcoc=;
-        b=tW5ExnJ4xMHCs6DqUloCb0joAMw0yKOiaJQfzFjOypiuYBoQTEdDpb8AD5BqI0O/SR
-         m/IWlpC+TIECHghJpDlNvNSgUNW4z6qTgMmRdnhjFDlIi8MqwabSj/T/0fzN2B5yRRmC
-         aL54Qif66yLPwpyakxcGuDHfH7eqcVC6X6JwNd2shD7Szr3KyN8L7/KQx30FJal03eoh
-         RgViXqqoGwWF5urnGZpBggYwFXVyWXPiBUxLKEDSji4Ip3jRz/SuPARgu3uJuiGIpXbS
-         fLKeOgouO1T8sAbV2bHNPuqV3IMRTtg92X1ydAGPWzCmjuJPN4ABxv0G5jThSQcR0G0T
-         xBPQ==
-X-Gm-Message-State: ACrzQf1L0sUl3/W10aL9d0Nh8yF18abMFfzQ4ZRbZq5thMVc2gqbixyc
-        E2PuadBrnNWN/5ODb3Mr9Yv6kA==
-X-Google-Smtp-Source: AMsMyM5SnRCv7+z1Jl9Ftw77yWF2+28jks/ob9Meu6is1z9lC64bJ1drXzcJHfFk8RfZs4Ck+wmRbQ==
-X-Received: by 2002:a17:902:6943:b0:178:4751:a76b with SMTP id k3-20020a170902694300b001784751a76bmr8799422plt.37.1664546821243;
-        Fri, 30 Sep 2022 07:07:01 -0700 (PDT)
-Received: from localhost.localdomain (118-167-215-236.dynamic-ip.hinet.net. [118.167.215.236])
-        by smtp.gmail.com with ESMTPSA id p9-20020a1709027ec900b00176ba091cd3sm1897742plb.196.2022.09.30.07.06.59
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=ufKkfqZQib3gbHIjLUf1Rc98aoDBSxC631h5d1bRcZM=;
+        b=qoPMdNplkvCgJJTbOfI5XbEUh5pvPr7NcUkQUNikmRTi4uYFcLNwDk46oovmAO/+yK
+         0s1ELa1wbCi6p/EQbR2KstjHN3FzRfTseISDDQs5B34eTdlg7xWMH6XzJhaGieG5y1lB
+         XmLlAuCiDoZiglJFopMI8yaUo6LNl2Ek5TMgQzoKRcub+hlY8lN+IqUOnvGacpOrg+S0
+         sbLA++JCkmGpqdJYFZ913lacmqRdCMrd1nKyum+MYslf9GfS1vRuNxegtoGWOdliM2KB
+         +Zx8UP+1NDfV5e/U194L8kkSWpVRQKfa9J4q69JHtMnu48szAbpeX4J+XkoAqeDCZ+US
+         Ea+Q==
+X-Gm-Message-State: ACrzQf0oKe0kRKIkngA8Yb8h/nG62W1ElqppQQtU6kGHBvq3rjrtCK+G
+        +AdMZLsS+Xj6YecEBwr+LQEaBr/XQgg=
+X-Google-Smtp-Source: AMsMyM5jYb78OZehsodR47HNqNUI+Uk8wXvhMWCVAYvMwwJCnTVuhktJYi72bBP/czLOLAf4NNmteg==
+X-Received: by 2002:a63:5658:0:b0:43c:dac:9e24 with SMTP id g24-20020a635658000000b0043c0dac9e24mr7762929pgm.562.1664549086535;
+        Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
+Received: from [172.17.0.2] ([20.253.200.79])
+        by smtp.gmail.com with ESMTPSA id s2-20020a17090a764200b0020087d7e778sm5419391pjl.37.2022.09.30.07.44.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 07:07:00 -0700 (PDT)
-From:   Ajye Huang <ajye_huang@compal.corp-partner.google.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Ajye Huang <ajye_huang@compal.corp-partner.google.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up
-Date:   Fri, 30 Sep 2022 22:06:55 +0800
-Message-Id: <20220930140655.2723164-1-ajye_huang@compal.corp-partner.google.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
+Message-ID: <633700de.170a0220.a01fe.9218@mx.google.com>
+Date:   Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5161959980282123563=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org,
+        ajye_huang@compal.corp-partner.google.com
+Subject: RE: [v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220930140655.2723164-1-ajye_huang@compal.corp-partner.google.com>
+References: <20220930140655.2723164-1-ajye_huang@compal.corp-partner.google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When "hciconfig hci0 up" command is used to bluetooth ON, but
-the bluetooth UI icon in settings still not be turned ON.
+--===============5161959980282123563==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=682277
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.86 seconds
+GitLint                       FAIL      0.50 seconds
+SubjectPrefix                 FAIL      0.35 seconds
+BuildKernel                   PASS      43.87 seconds
+BuildKernel32                 PASS      40.11 seconds
+Incremental Build with patchesPASS      56.96 seconds
+TestRunner: Setup             PASS      661.93 seconds
+TestRunner: l2cap-tester      PASS      20.78 seconds
+TestRunner: iso-tester        PASS      21.56 seconds
+TestRunner: bnep-tester       PASS      8.22 seconds
+TestRunner: mgmt-tester       PASS      130.75 seconds
+TestRunner: rfcomm-tester     PASS      12.63 seconds
+TestRunner: sco-tester        PASS      11.80 seconds
+TestRunner: ioctl-tester      PASS      13.50 seconds
+TestRunner: smp-tester        PASS      11.82 seconds
+TestRunner: userchan-tester   PASS      8.27 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.86 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+[v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#92: 
 Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")
-Add back mgmt_power_on(hdev, ret) into function hci_dev_do_open(struct hci_dev *hdev)
-in hci_core.c
 
-Signed-off-by: Ajye Huang <ajye_huang@compal.corp-partner.google.com>
+ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: unsaf ("ace/src' is owned by someone else)")'
+#92: 
+Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")
+
+total: 1 errors, 1 warnings, 0 checks, 7 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12995489.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL - 0.50 seconds
+Run gitlint with rule in .gitlint
+[v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up
+6: B1 Line exceeds max length (89>80): "Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")"
+7: B1 Line exceeds max length (85>80): "Add back mgmt_power_on(hdev, ret) into function hci_dev_do_open(struct hci_dev *hdev)"
+
+
+##############################
+Test: SubjectPrefix - FAIL - 0.35 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- net/bluetooth/hci_core.c | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0540555b3704..5061845c8fc2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -481,6 +481,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 	hci_req_sync_lock(hdev);
- 
- 	ret = hci_dev_open_sync(hdev);
-+	mgmt_power_on(hdev, ret);
- 
- 	hci_req_sync_unlock(hdev);
- 	return ret;
--- 
-2.25.1
 
+--===============5161959980282123563==--
