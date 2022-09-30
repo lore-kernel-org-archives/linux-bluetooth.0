@@ -2,114 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D5CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 09:59:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0EDC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 10:00:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbiI3J7D (ORCPT
+        id S231528AbiI3J77 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 05:59:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41854 "EHLO
+        Fri, 30 Sep 2022 05:59:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231406AbiI3J65 (ORCPT
+        with ESMTP id S231377AbiI3J7x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 05:58:57 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1EB187354
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 02:58:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664531937; x=1696067937;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=weArQEE1+BAZ7Td37iXcT7Dn5h69cCu0jphqGbByJuE=;
-  b=QIbXcoGuP7BNOPMzlsSk+MtAdIzlCVni0SCDUlMhx2ImXyxDObXQvB9s
-   J1yuJQTwPC/S4z/M5/FNgNCinnH5ugB46FX0hrItB7/nPWDbY7tUNrGjh
-   iuwx9w+79/cbhON8yQSmsP1wN5DW6z+D04vn6Jj2fTlOGtKnoorOqnBiM
-   c9moCiuSEPMkWNyQKw5ISbURDc5Nxs6lZvvyRl+aGzCO8e/olc9xeB+v3
-   KzqFdQ6RtUxRi1DFfdHwhFdogfSJ6X86YSDVZW/nPTxaO+8dOVPauRX9B
-   ajOB6+goUiNApm3ySGkGj2kVj3x5MEB4cQQGllccq/YZHQ9nqE702tmLK
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="299756640"
-X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="299756640"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Sep 2022 02:58:56 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10485"; a="711743764"
-X-IronPort-AV: E=Sophos;i="5.93,358,1654585200"; 
-   d="scan'208";a="711743764"
-Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
-  by FMSMGA003.fm.intel.com with ESMTP; 30 Sep 2022 02:58:55 -0700
-From:   Sathish Narasimman <sathish.narasimman@intel.com>
+        Fri, 30 Sep 2022 05:59:53 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6651459BD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 02:59:46 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D580A62286
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 09:59:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 44791C433D7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 09:59:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1664531985;
+        bh=sRGmxLf96RGxqCen+WDvX54eNobOklWTfBKQVHeg4iw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=KZV9tKSOvfigfhu5qBI7nTXH6fRFTJ72UchXEdS8sexakc0IKh4omOUfjO8i5xE/V
+         Woh4qCGXPql1wNxcfK4ZemIhaTPfLAWWtecl1gLIEZluDq7no3Z/qhETrwMKRkJcWo
+         bQ25wp23b5G0xSH4ofMH5HJyw2krLYCePlB/MjZTWnE6xmLypk3X9nu60Tuh2Syytz
+         YzyPbxh97PXWkSDnJM7jFxdG49CvYv4i5ncO8Dhx7KoixTKB+gEafW2Q0g9J60GoVA
+         wnIiMW7EOIZ93YStACmfMxiwnsGTptt0hKWSMrvzY//d505wotMmwkH2FQ9FXevjDW
+         4h7MTVBw37yyA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 2FBDFC433E6; Fri, 30 Sep 2022 09:59:45 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH 3/3] profiles: Register callback function to update volume
-Date:   Sat,  1 Oct 2022 00:19:54 +0530
-Message-Id: <20220930184954.108937-3-sathish.narasimman@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220930184954.108937-1-sathish.narasimman@intel.com>
-References: <20220930184954.108937-1-sathish.narasimman@intel.com>
+Subject: [Bug 216532] openSUSE Tumbleweed, AX210, bluetooth, connection fails
+Date:   Fri, 30 Sep 2022 09:59:45 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: epistemepromeneur@free.fr
+X-Bugzilla-Status: NEEDINFO
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-216532-62941-qgKUUjaLEH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216532-62941@https.bugzilla.kernel.org/>
+References: <bug-216532-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Callback function has to be registered to call
-media_transport_update_device_volume to change transport volume.
----
- profiles/audio/vcp.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216532
 
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index b42b0a4f79dd..4b790b03c032 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -50,6 +50,7 @@
- #include "src/service.h"
- #include "src/log.h"
- #include "src/error.h"
-+#include "transport.h"
- 
- #define VCS_UUID_STR "00001844-0000-1000-8000-00805f9b34fb"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
-@@ -83,6 +84,20 @@ static struct vcp_data *vcp_data_new(struct btd_device *device)
- 	return data;
- }
- 
-+static void vr_set_volume(struct bt_vcp *vcp, int8_t volume, void *data)
-+{
-+	struct vcp_data *user_data = data;
-+	struct btd_device *device = user_data->device;
-+
-+	DBG("set volume");
-+
-+	media_transport_update_device_volume(device, volume);
-+}
-+
-+static struct bt_vcp_vr_ops vcp_vr_ops = {
-+	.set_volume	= vr_set_volume,
-+};
-+
- static void vcp_data_add(struct vcp_data *data)
- {
- 	DBG("data %p", data);
-@@ -94,6 +109,7 @@ static void vcp_data_add(struct vcp_data *data)
- 
- 	bt_vcp_set_debug(data->vcp, vcp_debug, NULL, NULL);
- 
-+	bt_vcp_vr_set_ops(data->vcp, &vcp_vr_ops, data);
- 	if (!sessions)
- 		sessions = queue_new();
- 
-@@ -178,6 +194,7 @@ static void vcp_attached(struct bt_vcp *vcp, void *user_data)
- 	data->vcp = vcp;
- 
- 	vcp_data_add(data);
-+
- }
- 
- static int vcp_probe(struct btd_service *service)
--- 
-2.25.1
+--- Comment #5 from epistemepromeneur@free.fr ---
+bluetoothctl show
+Controller F0:B6:1E:FE:FB:F4 (public)
+Name: grincheux
+Alias: grincheux
+Class: 0x007c0104
+Powered: yes
+Discoverable: no
+DiscoverableTimeout: 0x000000b4
+Pairable: yes
+UUID: Message Notification Se.. (00001133-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control (0000110e-0000-1000-8000-00805f9b34fb)
+UUID: OBEX Object Push (00001105-0000-1000-8000-00805f9b34fb)
+UUID: Message Access Server (00001132-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information (00001200-0000-1000-8000-00805f9b34fb)
+UUID: IrMC Sync (00001104-0000-1000-8000-00805f9b34fb)
+UUID: Vendor specific (00005005-0000-1000-8000-0002ee000001)
+UUID: Headset (00001108-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: Phonebook Access Server (0000112f-0000-1000-8000-00805f9b34fb)
+UUID: Device Information (0000180a-0000-1000-8000-00805f9b34fb)
+UUID: Audio Sink (0000110b-0000-1000-8000-00805f9b34fb)
+UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
+UUID: Handsfree Audio Gateway (0000111f-0000-1000-8000-00805f9b34fb)
+UUID: Audio Source (0000110a-0000-1000-8000-00805f9b34fb)
+UUID: OBEX File Transfer (00001106-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v1D6Bp0246d0541
+Discovering: no
+Roles: central
+Roles: peripheral
+Advertising Features:
+ActiveInstances: 0x00 (0)
+SupportedInstances: 0x0c (12)
+SupportedIncludes: tx-power
+SupportedIncludes: appearance
+SupportedIncludes: local-name
+SupportedSecondaryChannels: 1M
+SupportedSecondaryChannels: 2M
+SupportedSecondaryChannels: Coded
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
