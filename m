@@ -2,144 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB18CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 14:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13BDC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 16:09:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231405AbiI3Oo4 (ORCPT
+        id S230512AbiI3QJt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 10:44:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49346 "EHLO
+        Fri, 30 Sep 2022 12:09:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230482AbiI3Oov (ORCPT
+        with ESMTP id S231237AbiI3QJq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 10:44:51 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 447002DFC
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:44:48 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 3so4383572pga.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 07:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=ufKkfqZQib3gbHIjLUf1Rc98aoDBSxC631h5d1bRcZM=;
-        b=bI2AGnnvkaoDdp5Js3WOfGvJt7wQYFR4iDrVMf3kLdkHb08Wo8Z7BzB/D3fozJEXO9
-         GeylWn30suSIwIgbNnwVzc9j3IAXzD/6L6QDZDDk6mKvVW8xJPUGHC/n07HMUex0iL3p
-         vgBsWbJfpprATSIv3qnMCFYax4YOgel949CibfrAfqHit72IYLSkUezcP2k4Dt9cg21q
-         EINGFLj7HJ2I+IAItjCHVSmNdE5kmWL8eNY9SgX6ytQd/NgdvAVG4MXym1yqidlalD/k
-         CnB20LmekjGoi8LtkvstNYDKrJPH7pyFuP5byf8OLBtTxmVmAqBvhdKoj/UzrGFGc2FF
-         X11Q==
+        Fri, 30 Sep 2022 12:09:46 -0400
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA7A23BDE;
+        Fri, 30 Sep 2022 09:09:44 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id j7so2413970ilu.7;
+        Fri, 30 Sep 2022 09:09:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=ufKkfqZQib3gbHIjLUf1Rc98aoDBSxC631h5d1bRcZM=;
-        b=qoPMdNplkvCgJJTbOfI5XbEUh5pvPr7NcUkQUNikmRTi4uYFcLNwDk46oovmAO/+yK
-         0s1ELa1wbCi6p/EQbR2KstjHN3FzRfTseISDDQs5B34eTdlg7xWMH6XzJhaGieG5y1lB
-         XmLlAuCiDoZiglJFopMI8yaUo6LNl2Ek5TMgQzoKRcub+hlY8lN+IqUOnvGacpOrg+S0
-         sbLA++JCkmGpqdJYFZ913lacmqRdCMrd1nKyum+MYslf9GfS1vRuNxegtoGWOdliM2KB
-         +Zx8UP+1NDfV5e/U194L8kkSWpVRQKfa9J4q69JHtMnu48szAbpeX4J+XkoAqeDCZ+US
-         Ea+Q==
-X-Gm-Message-State: ACrzQf0oKe0kRKIkngA8Yb8h/nG62W1ElqppQQtU6kGHBvq3rjrtCK+G
-        +AdMZLsS+Xj6YecEBwr+LQEaBr/XQgg=
-X-Google-Smtp-Source: AMsMyM5jYb78OZehsodR47HNqNUI+Uk8wXvhMWCVAYvMwwJCnTVuhktJYi72bBP/czLOLAf4NNmteg==
-X-Received: by 2002:a63:5658:0:b0:43c:dac:9e24 with SMTP id g24-20020a635658000000b0043c0dac9e24mr7762929pgm.562.1664549086535;
-        Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.253.200.79])
-        by smtp.gmail.com with ESMTPSA id s2-20020a17090a764200b0020087d7e778sm5419391pjl.37.2022.09.30.07.44.45
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date;
+        bh=zNh+fWMDwTGcr2BpFoXyyeGxIhB+H3qzeZZ4m5l8+ik=;
+        b=xUAxd5m1BXT4Co8TGgACxwuigyj0I04zKdSaziqHAUuksQrLTryIVcQ73jmOqQtlcN
+         tiPFfGbZkFPOQo0i7qajAwZJ27AMpwjCU8RL11UY0tDd0dNdWlKf4Xrxap7IUMj3jxxp
+         LT8xhZEEgldXUC8Cq2rXmKI3WpMkU8kpKzFuB9QbzLlyEpNBj/JAbd0TtoRC3kxLvPwL
+         q0Abfq1M3g5DWY3Ck4JHb22vwhiS2XVlO92lanqYzZJTW6ak4a27JMLWXkD05GHw5wiE
+         vnDDwpkmDlDCB3Pv0YSy3n/aaDc1yernkWdQSSo2d+SuxpIyfTOHBVpxgcbqGPQG8jEb
+         4UGQ==
+X-Gm-Message-State: ACrzQf2jX9TkHk87GSUxxCs5Gzj9Ak5m46orCDFh1kO7Cp47ydat0Aoq
+        ZDOWMqE/i8LKVLZAoa9DBj6bl7G70yOcDQ==
+X-Google-Smtp-Source: AMsMyM4XZqM+H4sFt9W42XxbCHGm2rvfwNtl0tYFBEHkkLEsQpr9NWkvLNuxXb8XcAAC9ks1dHsaBg==
+X-Received: by 2002:a05:6e02:148c:b0:2f7:5790:7c3c with SMTP id n12-20020a056e02148c00b002f757907c3cmr4630125ilk.150.1664554183826;
+        Fri, 30 Sep 2022 09:09:43 -0700 (PDT)
+Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
+        by smtp.googlemail.com with ESMTPSA id t2-20020a056e02060200b002eae6cf8898sm1093832ils.30.2022.09.30.09.09.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
-Message-ID: <633700de.170a0220.a01fe.9218@mx.google.com>
-Date:   Fri, 30 Sep 2022 07:44:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5161959980282123563=="
+        Fri, 30 Sep 2022 09:09:43 -0700 (PDT)
+From:   Sungwoo Kim <iam@sung-woo.kim>
+To:     luiz.dentz@gmail.com
+Cc:     davem@davemloft.net, edumazet@google.com, iam@sung-woo.kim,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller@googlegroups.com
+Subject: Re: KASAN: use-after-free in __mutex_lock
+Date:   Fri, 30 Sep 2022 12:08:44 -0400
+Message-Id: <20220930160843.818893-1-iam@sung-woo.kim>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CABBYNZKSnFJkyMoHn-TU1VJQz3WNNt0pC8Nvzdxb3-4-RtcQGw@mail.gmail.com>
+References: <CABBYNZKSnFJkyMoHn-TU1VJQz3WNNt0pC8Nvzdxb3-4-RtcQGw@mail.gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org,
-        ajye_huang@compal.corp-partner.google.com
-Subject: RE: [v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20220930140655.2723164-1-ajye_huang@compal.corp-partner.google.com>
-References: <20220930140655.2723164-1-ajye_huang@compal.corp-partner.google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5161959980282123563==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Dentz,
+How about to use l2cap_get_chan_by_scid because it looks resposible to
+handle ref_cnt.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=682277
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.86 seconds
-GitLint                       FAIL      0.50 seconds
-SubjectPrefix                 FAIL      0.35 seconds
-BuildKernel                   PASS      43.87 seconds
-BuildKernel32                 PASS      40.11 seconds
-Incremental Build with patchesPASS      56.96 seconds
-TestRunner: Setup             PASS      661.93 seconds
-TestRunner: l2cap-tester      PASS      20.78 seconds
-TestRunner: iso-tester        PASS      21.56 seconds
-TestRunner: bnep-tester       PASS      8.22 seconds
-TestRunner: mgmt-tester       PASS      130.75 seconds
-TestRunner: rfcomm-tester     PASS      12.63 seconds
-TestRunner: sco-tester        PASS      11.80 seconds
-TestRunner: ioctl-tester      PASS      13.50 seconds
-TestRunner: smp-tester        PASS      11.82 seconds
-TestRunner: userchan-tester   PASS      8.27 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.86 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-[v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#92: 
-Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")
-
-ERROR:GIT_COMMIT_ID: Please use git commit description style 'commit <12+ chars of sha1> ("<title line>")' - ie: 'commit fatal: unsaf ("ace/src' is owned by someone else)")'
-#92: 
-Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")
-
-total: 1 errors, 1 warnings, 0 checks, 7 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12995489.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL - 0.50 seconds
-Run gitlint with rule in .gitlint
-[v1] bluetooth: Fix the bluetooth icon status after running hciconfig hci0 up
-6: B1 Line exceeds max length (89>80): "Refer to commit 2ff13894cfb8 ("Bluetooth: Perform HCI update for power on synchronously")"
-7: B1 Line exceeds max length (85>80): "Add back mgmt_power_on(hdev, ret) into function hci_dev_do_open(struct hci_dev *hdev)"
-
-
-##############################
-Test: SubjectPrefix - FAIL - 0.35 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-
-
-
+Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/l2cap_core.c | 24 +++++++-----------------
+ 1 file changed, 7 insertions(+), 17 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 2c9de67da..d3a074cbc 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4291,26 +4291,18 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+ 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
+ 	       dcid, scid, result, status);
+ 
+-	mutex_lock(&conn->chan_lock);
+-
+ 	if (scid) {
+-		chan = __l2cap_get_chan_by_scid(conn, scid);
+-		if (!chan) {
+-			err = -EBADSLT;
+-			goto unlock;
+-		}
++		chan = l2cap_get_chan_by_scid(conn, scid);
++		if (!chan)
++			return -EBADSLT;
+ 	} else {
+-		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
+-		if (!chan) {
+-			err = -EBADSLT;
+-			goto unlock;
+-		}
++		chan = l2cap_get_chan_by_ident(conn, cmd->ident);
++		if (!chan)
++			return -EBADSLT;
+ 	}
+ 
+ 	err = 0;
+ 
+-	l2cap_chan_lock(chan);
+-
+ 	switch (result) {
+ 	case L2CAP_CR_SUCCESS:
+ 		l2cap_state_change(chan, BT_CONFIG);
+@@ -4336,9 +4328,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+ 	}
+ 
+ 	l2cap_chan_unlock(chan);
+-
+-unlock:
+-	mutex_unlock(&conn->chan_lock);
++	l2cap_chan_put(chan);
+ 
+ 	return err;
+ }
+-- 
+2.25.1
 
---===============5161959980282123563==--
