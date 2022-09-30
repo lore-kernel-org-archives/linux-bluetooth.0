@@ -2,344 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F7DFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 17:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC7C0C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 19:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbiI3R6j (ORCPT
+        id S229539AbiI3TKi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 13:58:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36774 "EHLO
+        Fri, 30 Sep 2022 15:10:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231921AbiI3R6i (ORCPT
+        with ESMTP id S229971AbiI3TKh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 13:58:38 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E1F1E2FD3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:58:36 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id t16so5593659ljh.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:58:36 -0700 (PDT)
+        Fri, 30 Sep 2022 15:10:37 -0400
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2139.outbound.protection.outlook.com [40.107.20.139])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DC2B4D242
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 12:10:32 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZHA/tEQHtKSn5iCKi5vKpM8sCX2aSsOpw7QzASi1eCeeTcuxRB8sHCWG+/BgbcqrfOBKHE8gj1Kv48I+W38jdkkye5k1Ia87AUQB0lDjtQxatIMEn1us/QPjk9iN6X1/6GndfmfuPN20HdrHaK5u5tnV7y6fVOWzXc94g/GenmcL57UYiBKF4rGfHS4SacF2GEZ5ZQwMAJH2mcg8lTYE79jeDLv7Zw7JbnvAYvF/zr9KiDLj7Iw6BJwdXzNrP3UEwtX1e1BIPW7aH1VrnCzlfhdUWlcehFVtI1VE875rMWX9egpSfyWJa8CtoJjELLjIK3A/5LLJTpGmtHF86xwZ0A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ALJfyLaMBZ8H3gHKfvqo6T3TOuXC6rsG/MBUiL28T0E=;
+ b=Nkre7MRu7MKw8I4zmfWkQhCbbvFppLf1kqhWQXTnCBuKrK1WFR6QI4Y6v0SAeifdFEVDUAMsWqtWs93W2vRICJl0RfveGDJUuSJkbIUnYAcB9l3kTIFSQ6hMcA+DtSO2DVVC1hFPEpMrHUMo8fAeJzA0f30Ic7+o1rsugFmP1Ki8jry9S4wnmmSMz/VzAGn5K1YlMDTlkyNBDrD1bZEwiT3eSVFS+9SfgPaBhZD9Pdc7/+VfjA4iHe7GQV2sQpkX52aDc6vt9wafjx7auNOqfAPbaHn3CMeOUIb3BsRo/OemTDZKGZasz2Ivwdgsel0xepdhFDNkB2f4XajS3gfUaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=none action=none header.from=arri.de; dkim=none (message not signed);
+ arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=dWZgRko0gLE8cOeql5P8m+YMOVHhrMSUx5dyNPswITc=;
-        b=PRkJCLRi9TW3Gu91WQJ+TJfer56ekAcUbiuRb7GE79mRFXWqW6A6LujQV3jE1y+sIe
-         2NhFiF+Tn2qqkgw4g+HMKEpfsIbTq/aicDRHvw3mP56rs1203jwvxZisBXOwkYUSyNj+
-         EtnEYBANd8xc+DE+MfxQum0r7btQnA4c/w+oNEylMsg7OloxW9nwrxipCX9U1ga5Yys5
-         d9Yv9tdJfM9E0/SwcX7wRXY+Dw6yoQj3T/5tXWjGoxNOaj7S3dPFtutnvilKVonBlz4w
-         CUz7SS44ELGkj6l6YzafnohjvSzrBSCzgdXAOtKDGDPEJ72kSr7a/rlATlmqNx8Vyei5
-         3Pcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=dWZgRko0gLE8cOeql5P8m+YMOVHhrMSUx5dyNPswITc=;
-        b=mq6lDx63o5g/hpufjzQNTCtX/0JFG2j4gPHvI1RDgOpQ/tmKXGAwDU+/yg/a/Nbe4w
-         tqPdAYLznKM3Z6GH9l05I5Rm9ffilyCmrMW9oyKjBamUDMkzDyjnAR+VQUrA+HEJQALC
-         6EfqG33d3OKy1ENoO6f4dZjbiuzHtHMBb5R6t7+uRYb/evGzPK3fp/ontXMWdT6fiOn9
-         2QyZous+nkFDfJkNdT5HHvIzJvawjCaeXUwEUSeCMR28f6jMs5+9otFxWLi3Wm9fwt1y
-         Zm3rxRS20iZfdtLjYh3sB2TOgOS7l2D7KVUTEb7xTff8BFBJVRtRoNoMYDomsHaI72CF
-         B0SQ==
-X-Gm-Message-State: ACrzQf3BsxRMJWF2b/g5S6adwcdLthPYfzA6zUz7CvD0LZuEaU0eYPoZ
-        y4WnDtRf3lD5S/SiwB8/feFEfCRKnD7YIil32oQ=
-X-Google-Smtp-Source: AMsMyM5aujwthYxISrYZ9vcJnBeDDblgErlyG2AaGzx9AAKp8/WPxtuByoPsIRIsIOb7RAh3LqBlVBUmRH5rkJtE9xM=
-X-Received: by 2002:a05:651c:546:b0:26c:698f:a4a2 with SMTP id
- q6-20020a05651c054600b0026c698fa4a2mr3433551ljp.161.1664560714482; Fri, 30
- Sep 2022 10:58:34 -0700 (PDT)
+ d=arrigroup.onmicrosoft.com; s=selector1-arrigroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ALJfyLaMBZ8H3gHKfvqo6T3TOuXC6rsG/MBUiL28T0E=;
+ b=aI/SyG/hth0/7hbDjDGmhBSlPh/+bWP2IvIBCqr2DCti4ATX0PtQDKs8lS3+ACUvTlrK4ArxKHJb/JPvTyxNBk+fd7Ddd7KQqLWtICCDT7Imp9K34YeHNCDmNZdKHRnJtAN3zijrwcF30a2IdgxD48uJTzJMPHYJbJAKJBIbBoM=
+Received: from GVX0EPF000013DB.SWEP280.PROD.OUTLOOK.COM (2603:10a6:144:1::14)
+ by DB8PR07MB6347.eurprd07.prod.outlook.com (2603:10a6:10:134::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.17; Fri, 30 Sep
+ 2022 19:10:30 +0000
+Received: from HE1EUR02FT101.eop-EUR02.prod.protection.outlook.com
+ (2a01:111:f400:7e05::202) by GVX0EPF000013DB.outlook.office365.com
+ (2603:1026:900:2::3) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5676.22 via Frontend
+ Transport; Fri, 30 Sep 2022 19:10:30 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ HE1EUR02FT101.mail.protection.outlook.com (10.152.11.135) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5676.17 via Frontend Transport; Fri, 30 Sep 2022 19:10:29 +0000
+Received: from n95hx1g2.localnet (192.168.54.45) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 30 Sep
+ 2022 21:10:29 +0200
+From:   Christian Eggers <ceggers@arri.de>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: bluetoothctl: Connecting to a GATT service using BR/EDR
+Date:   Fri, 30 Sep 2022 21:10:28 +0200
+Message-ID: <1906152.PYKUYFuaPT@n95hx1g2>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
 MIME-Version: 1.0
-References: <20220930184954.108937-1-sathish.narasimman@intel.com>
-In-Reply-To: <20220930184954.108937-1-sathish.narasimman@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 30 Sep 2022 10:58:22 -0700
-Message-ID: <CABBYNZ+X_Le6tm9+pMTwz=bJnUeQwdMbg+o+S_HvsSkoEz2SZQ@mail.gmail.com>
-Subject: Re: [PATCH 1/3] audio/transport: seprate a2dp and bap transport to
- update volume
-To:     Sathish Narasimman <sathish.narasimman@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [192.168.54.45]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: HE1EUR02FT101:EE_|DB8PR07MB6347:EE_
+X-MS-Office365-Filtering-Correlation-Id: 070d5804-8e41-4e6b-1b20-08daa31770db
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2WhTy7Tij6PHVzXDc6/lfN1pSG+ZF6iHKvZ9se5f5bUInJm8RVFF+bsmf2QNqjewX9RazAX1o3hKKIQNOlZdPjA2ZXV1Wcx9i99Ueb49tUPta1YeXc31VRQYdx+21MsL71J+Fp29TxEsh1dBdn4KT9XDOP8uFPrvO76/mgf61ihCnPMXL5sKkC2e3101UErdt4tpGYgQvlHEakWCSfaPlxtSxIVrQiGNjvjnAjD7fQXsdAb2NM/LelAbP4fV2iCkb9nKAJv916BlazyCvdC16PU6KhHh2N/bSC4gWPtzEeqiFziNJn/MMloW3Th/449nj+i86NUvTBLY57hzkra+WO0vRTEdpruxZEYLvAPi8xht7IntCETOwfY0ujWUKZS872HJ14yeZzh6oSnwOA0v18GIxFo8CVKaxtyYUx3/vhP31ClyKZV4JZ1v5WgbObK/0p0HytjEbB9ZI0g6uOf0+4YvJxcSUuBIVgPhjatbhvFvK61eQ3VfyonKJXeH6LEB0DM/6I2Ao5ob3MfctLP7as0QFDfffQ/3M7kJOdHFriE1YRX1xZr2/wqQmU4oFtBTpTVI56HLBi191MFgSYYvufdkoOkWVhfj1cKRXCqSDjiGX97xR5H4Oia1WZa1wNFygfEk6BH0OpgLPtpWp/8VgS8beY4YnfsmZQFMigCwTtzbRTWEf1abvlPdJaoj67XIeugdBJRSUVNviF88yPrxNNGlUFtQUX7ebDiAp+peANDeXi91i7mvE4w6QxH3flQJWQAspZXVmx5qw7780xKhgA==
+X-Forefront-Antispam-Report: CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(39860400002)(136003)(396003)(376002)(451199015)(36840700001)(46966006)(316002)(478600001)(6916009)(36916002)(41300700001)(8676002)(336012)(9686003)(86362001)(70206006)(70586007)(5660300002)(26005)(2906002)(47076005)(82740400003)(16526019)(186003)(40480700001)(426003)(8936002)(36860700001)(81166007)(82310400005)(356005)(33716001)(9576002)(36900700001);DIR:OUT;SFP:1102;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Sep 2022 19:10:29.8548
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 070d5804-8e41-4e6b-1b20-08daa31770db
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: HE1EUR02FT101.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR07MB6347
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+I am trying to connect to a GATT server using bluetoothctl.
 
-On Fri, Sep 30, 2022 at 3:14 AM Sathish Narasimman
-<sathish.narasimman@intel.com> wrote:
->
-> Identify BAP and a2dp transport to update the transport volume.
-> Also add properties volume for bap_transport.
-> ---
->  profiles/audio/media.c     |   2 +-
->  profiles/audio/transport.c | 120 ++++++++++++++++++++++++++++++++++---
->  profiles/audio/transport.h |   7 ++-
->  3 files changed, 117 insertions(+), 12 deletions(-)
->
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index c9328ab9bd6e..0e3c7cbbaf2c 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -523,7 +523,7 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
->                 return FALSE;
->
->         init_volume = media_player_get_device_volume(device);
-> -       media_transport_update_volume(transport, init_volume);
-> +       media_a2dp_transport_update_volume(transport, init_volume);
->
->         msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
->                                                 MEDIA_ENDPOINT_INTERFACE,
-> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> index 41339da51e17..a606d45eb628 100644
-> --- a/profiles/audio/transport.c
-> +++ b/profiles/audio/transport.c
-> @@ -91,6 +91,7 @@ struct bap_transport {
->         uint8_t                 rtn;
->         uint16_t                latency;
->         uint32_t                delay;
-> +       int8_t                  volume;
->  };
->
->  struct media_transport {
-> @@ -709,7 +710,8 @@ static gboolean get_delay_reporting(const GDBusPropertyTable *property,
->         return TRUE;
->  }
->
-> -static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
-> +static gboolean volume_a2dp_exists(const GDBusPropertyTable *property,
-> +                                       void *data)
->  {
->         struct media_transport *transport = data;
->         struct a2dp_transport *a2dp = transport->data;
-> @@ -717,7 +719,8 @@ static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
->         return a2dp->volume >= 0;
->  }
->
-> -static gboolean get_volume(const GDBusPropertyTable *property,
-> +
-> +static gboolean get_a2dp_volume(const GDBusPropertyTable *property,
->                                         DBusMessageIter *iter, void *data)
->  {
->         struct media_transport *transport = data;
-> @@ -729,7 +732,7 @@ static gboolean get_volume(const GDBusPropertyTable *property,
->         return TRUE;
->  }
->
-> -static void set_volume(const GDBusPropertyTable *property,
-> +static void set_a2dp_volume(const GDBusPropertyTable *property,
->                         DBusMessageIter *iter, GDBusPendingPropertySet id,
->                         void *data)
->  {
-> @@ -769,6 +772,58 @@ error:
->                                         "Invalid arguments in method call");
->  }
->
-> +static gboolean volume_bap_exists(const GDBusPropertyTable *property,
-> +                                       void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       return bap->volume >= 0;
-> +}
-> +
-> +static gboolean get_bap_volume(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +       uint16_t volume = (uint16_t)bap->volume;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &volume);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static void set_bap_volume(const GDBusPropertyTable *property,
-> +                          DBusMessageIter *iter, GDBusPendingPropertySet id,
-> +                          void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +       uint16_t arg;
-> +       int8_t volume;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
-> +               goto error;
-> +
-> +       dbus_message_iter_get_basic(iter, &arg);
-> +       if (arg > INT8_MAX)
-> +               goto error;
-> +
-> +       g_dbus_pending_property_success(id);
-> +
-> +       volume = (int8_t)arg;
-> +       if (bap->volume == volume)
-> +               return;
-> +
-> +       /*TODO vcp_send_volume */
-> +       return;
-> +
-> +error:
-> +       g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
-> +                                       "Invalid arguments in method call");
-> +}
-> +
-> +
->  static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
->  {
->         struct media_transport *transport = data;
-> @@ -809,7 +864,8 @@ static const GDBusPropertyTable a2dp_properties[] = {
->         { "Configuration", "ay", get_configuration },
->         { "State", "s", get_state },
->         { "Delay", "q", get_delay_reporting, NULL, delay_reporting_exists },
-> -       { "Volume", "q", get_volume, set_volume, volume_exists },
-> +       { "Volume", "q", get_a2dp_volume, set_a2dp_volume,
-> +                                       volume_a2dp_exists },
->         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists,
->                                 G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
->         { }
-> @@ -970,6 +1026,7 @@ static const GDBusPropertyTable bap_properties[] = {
->         { "Retransmissions", "y", get_retransmissions },
->         { "Latency", "q", get_latency },
->         { "Delay", "u", get_delay },
-> +       { "Volume", "q", get_bap_volume, set_bap_volume, volume_bap_exists },
->         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
->         { "Location", "u", get_location },
->         { "Metadata", "ay", get_metadata },
-> @@ -1403,6 +1460,7 @@ static int media_transport_init_bap(struct media_transport *transport,
->         bap->rtn = qos->rtn;
->         bap->latency = qos->latency;
->         bap->delay = qos->delay;
-> +       bap->volume = 127;
->         bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
->                                                 bap_state_changed,
->                                                 bap_connecting,
-> @@ -1502,14 +1560,22 @@ struct btd_device *media_transport_get_dev(struct media_transport *transport)
->         return transport->device;
->  }
->
-> -int8_t media_transport_get_volume(struct media_transport *transport)
-> +int8_t media_a2dp_transport_get_volume(struct media_transport *transport)
->  {
->         struct a2dp_transport *a2dp = transport->data;
-> +
->         return a2dp->volume;
->  }
->
-> -void media_transport_update_volume(struct media_transport *transport,
-> -                                                               int8_t volume)
-> +int8_t media_bap_transport_get_volume(struct media_transport *transport)
-> +{
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       return bap->volume;
-> +}
-> +
-> +void media_a2dp_transport_update_volume(struct media_transport *transport,
-> +                                       int8_t volume)
->  {
->         struct a2dp_transport *a2dp = transport->data;
->
-> @@ -1527,6 +1593,25 @@ void media_transport_update_volume(struct media_transport *transport,
->                                         MEDIA_TRANSPORT_INTERFACE, "Volume");
->  }
->
-> +void media_bap_transport_update_volume(struct media_transport *transport,
-> +                                                               int8_t volume)
-> +{
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       if (volume < 0)
-> +               return;
-> +
-> +       /* Check if volume really changed */
-> +       if (bap->volume == volume)
-> +               return;
-> +
-> +       bap->volume = volume;
-> +
-> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> +                                       transport->path,
-> +                                       MEDIA_TRANSPORT_INTERFACE, "Volume");
-> +}
-> +
->  int8_t media_transport_get_device_volume(struct btd_device *dev)
->  {
->         GSList *l;
-> @@ -1537,12 +1622,21 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
->         /* Attempt to locate the transport to get its volume */
->         for (l = transports; l; l = l->next) {
->                 struct media_transport *transport = l->data;
-> +               const char *uuid = media_endpoint_get_uuid(transport->endpoint);
-> +
-> +               /* Locate BAP Transport */
-> +               if (!strcasecmp(uuid, PAC_SINK_UUID) &&
-> +                               !strcasecmp(uuid, PAC_SOURCE_UUID)) {
-> +
-> +                       return media_bap_transport_get_volume(transport);
-> +               }
-> +
->                 if (transport->device != dev)
->                         continue;
->
->                 /* Volume is A2DP only */
->                 if (media_endpoint_get_sep(transport->endpoint))
-> -                       return media_transport_get_volume(transport);
-> +                       return media_a2dp_transport_get_volume(transport);
->         }
->
->         /* If transport volume doesn't exists use device_volume */
-> @@ -1560,12 +1654,20 @@ void media_transport_update_device_volume(struct btd_device *dev,
->         /* Attempt to locate the transport to set its volume */
->         for (l = transports; l; l = l->next) {
->                 struct media_transport *transport = l->data;
-> +               const char *uuid = media_endpoint_get_uuid(transport->endpoint);
-> +
-> +               /* Locate BAP Transport */
-> +               if (!strcasecmp(uuid, PAC_SINK_UUID)) {
-> +                       media_bap_transport_update_volume(transport, volume);
-> +                       return;
-> +               }
-> +
->                 if (transport->device != dev)
->                         continue;
->
->                 /* Volume is A2DP only */
->                 if (media_endpoint_get_sep(transport->endpoint)) {
-> -                       media_transport_update_volume(transport, volume);
-> +                       media_a2dp_transport_update_volume(transport, volume);
->                         return;
->                 }
->         }
-> diff --git a/profiles/audio/transport.h b/profiles/audio/transport.h
-> index 102fc3cf1153..3cbefa5d7bee 100644
-> --- a/profiles/audio/transport.h
-> +++ b/profiles/audio/transport.h
-> @@ -20,10 +20,13 @@ struct media_transport *media_transport_create(struct btd_device *device,
->  void media_transport_destroy(struct media_transport *transport);
->  const char *media_transport_get_path(struct media_transport *transport);
->  struct btd_device *media_transport_get_dev(struct media_transport *transport);
-> -int8_t media_transport_get_volume(struct media_transport *transport);
-> +int8_t media_a2dp_transport_get_volume(struct media_transport *transport);
-> +int8_t media_bap_transport_get_volume(struct media_transport *transport);
->  void media_transport_update_delay(struct media_transport *transport,
->                                                         uint16_t delay);
-> -void media_transport_update_volume(struct media_transport *transport,
-> +void media_a2dp_transport_update_volume(struct media_transport *transport,
-> +                                                               int8_t volume);
-
-Not really following what you need to introduce dedicated functions
-foreach? The prototype is the same and we could just introduce
-callbacks that access the respective data internally, like we do for
-suspend/resume.
-
-> +void media_bap_transport_update_volume(struct media_transport *transport,
->                                                                 int8_t volume);
->  void transport_get_properties(struct media_transport *transport,
->                                                         DBusMessageIter *iter);
-> --
-> 2.25.1
->
+HW: dual mode adapters (server+client)
+SW: bluez-5.65
 
 
--- 
-Luiz Augusto von Dentz
+1st try: "simply connect" (BR/EDR + LE enabled)
+-------------------------------------
+[bluetooth]# connect 5C:F3:70:A3:94:E7
+Attempting to connect to 5C:F3:70:A3:94:E7
+[CHG] Device 5C:F3:70:A3:94:E7 TxPower: 0
+[CHG] Device 5C:F3:70:A3:94:E7 Modalias: usb:v1D6Bp0246d0541
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001823-0000-1000-8000-00805f9b34fb  <-- HTTP Proxy Service
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
+[CHG] Device 72:DF:6C:03:4A:6A RSSI: -81
+[CHG] Device 5C:F3:70:A3:94:E7 ServicesResolved: yes
+Failed to connect: org.bluez.Error.NotAvailable br-connection-profile-unavailable
+[CHG] Device 5C:F3:70:A3:94:E7 ServicesResolved: no
+[CHG] Device 5C:F3:70:A3:94:E7 Connected: no
+
+ok, it looks I need a profile for making a BR/EDR connection ...
+
+
+2nd try: register profile beforehand (BR/EDR + LE enabled)
+-------------------------------------
+[bluetooth]# menu gatt
+[bluetooth]# register-application 00001823-0000-1000-8000-00805f9b34fb
+Application registered
+[bluetooth]# menu back
+[bluetooth]# connect 5C:F3:70:A3:94:E7
+Attempting to connect to 5C:F3:70:A3:94:E7
+[CHG] Device 5C:F3:70:A3:94:E7 Connected: yes
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001200-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001800-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001801-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 0000180a-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 UUIDs: 00001823-0000-1000-8000-00805f9b34fb
+[CHG] Device 5C:F3:70:A3:94:E7 ServicesResolved: yes
+Failed to connect: org.bluez.Error.Failed br-connection-not-supported
+[CHG] Device 5C:F3:70:A3:94:E7 ServicesResolved: no
+[CHG] Device 5C:F3:70:A3:94:E7 Connected: no
+
+Unfortunately the created GATT profile doesn't provide a connect() method ...
+
+
+What is the intended procedure for connecting to a GATT server over
+a BR/EDR link? The "connect" command works fine after disabling BR/EDR
+using btmgmt, but this is not what I wanted.
+
+regards,
+Christian
+
+
+
