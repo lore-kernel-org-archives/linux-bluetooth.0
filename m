@@ -2,43 +2,43 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D32FFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 10:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA851C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 10:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231539AbiI3KAl (ORCPT
+        id S230480AbiI3KCe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 06:00:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48074 "EHLO
+        Fri, 30 Sep 2022 06:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231558AbiI3KA0 (ORCPT
+        with ESMTP id S229700AbiI3KCQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 06:00:26 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FE68CB46B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 03:00:15 -0700 (PDT)
+        Fri, 30 Sep 2022 06:02:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8C0F1ED21A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 03:01:48 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6322AB82795
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:00:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 265CEC433C1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:00:12 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D9C276205F
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:01:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 46491C433C1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Sep 2022 10:01:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664532012;
-        bh=bfh/8cn/t2gZM0R5rf28ML4sPqA74cv+G8q6HR0rWJc=;
+        s=k20201202; t=1664532107;
+        bh=D063tozisPP7HZBfvZxk52LngT8IM0EppQr+eP88vsI=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=A7MA86hrkBnfxTpCMYGOnsTZ4b4xlpVbvLbtRNSxTF6e3u124S5UxEmSlmvUk11HQ
-         FlvqbOP0OfFlzsg35VTqGrG097rg+opnYQs0BqtJRYCbC8Bt0ZPkqRk0xLBD6X+rIn
-         OFTRLwMyW8OXSXlt/qzZV2YZ6A9Tw++bG/AQJtPxCX9qa7uIP8caZ3NfkRz26VZzjU
-         Ja/MEl7o/qYbxXXvSzc+CDaOCKVTGBKe6ETPYytv24LjHcux/hXXK6f663sDx5yw3W
-         MBWxgRt6zLZ1Tu5owF3idENaWVoDNQy4PbEgosWeFkGeYVp4ZhAsXP6qLLq2TZ5S+z
-         eDA2RxPcbJW5g==
+        b=dBov4osSQNN8xFuSD9cKVNkb4q8Qc3NNU9yCMDMT9q2YdPMISFp3RJarn/HJA7SXB
+         egmje1v0Pb4WNc+PIPs2WyawN3tjmgCQfAilQ0BmBGktjTJfPVcpV2sds0ZZQ9JjZh
+         yejgznuJ0kKNJuBVmZKsRE9N5hFstGDcJYNihfaoprv7UcZuMTuPtTffC77mRpKY7g
+         KciaKrIy0+ANqsHTCP/cxPNPlDlOVCDkBWc9jyQ74NgsFcz3qUvxM6PlrTinaZKa85
+         6flb4WzvaTeoF1DE+IxrS8E0s3d4h6QcPt2sHcmVPcakPbjQZrNe7yG6sI7JUUbho0
+         lEACMBtwoEXMA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 135BEC433E6; Fri, 30 Sep 2022 10:00:12 +0000 (UTC)
+        id 354E5C433E6; Fri, 30 Sep 2022 10:01:47 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 216532] openSUSE Tumbleweed, AX210, bluetooth, connection fails
-Date:   Fri, 30 Sep 2022 10:00:11 +0000
+Date:   Fri, 30 Sep 2022 10:01:47 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -54,7 +54,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216532-62941-2UN8hkU8pM@https.bugzilla.kernel.org/>
+Message-ID: <bug-216532-62941-gjUsdiO5WM@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-216532-62941@https.bugzilla.kernel.org/>
 References: <bug-216532-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -68,37 +68,12 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D216532
 
---- Comment #6 from epistemepromeneur@free.fr ---
-bluetoothctl info 90:06:28:B6:B1:B6
-Device 90:06:28:B6:B1:B6 (public)
-Name: Samsung Galaxy S7 Argent
-Alias: Samsung Galaxy S7 Argent
-Class: 0x005a020c
-Icon: phone
-Paired: yes
-Bonded: yes
-Trusted: yes
-Blocked: no
-Connected: no
-LegacyPairing: no
-UUID: OBEX Object Push (00001105-0000-1000-8000-00805f9b34fb)
-UUID: OBEX File Transfer (00001106-0000-1000-8000-00805f9b34fb)
-UUID: Audio Source (0000110a-0000-1000-8000-00805f9b34fb)
-UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-UUID: A/V Remote Control (0000110e-0000-1000-8000-00805f9b34fb)
-UUID: Headset AG (00001112-0000-1000-8000-00805f9b34fb)
-UUID: PANU (00001115-0000-1000-8000-00805f9b34fb)
-UUID: NAP (00001116-0000-1000-8000-00805f9b34fb)
-UUID: Handsfree Audio Gateway (0000111f-0000-1000-8000-00805f9b34fb)
-UUID: SIM Access (0000112d-0000-1000-8000-00805f9b34fb)
-UUID: Phonebook Access Server (0000112f-0000-1000-8000-00805f9b34fb)
-UUID: Message Access Server (00001132-0000-1000-8000-00805f9b34fb)
-UUID: PnP Information (00001200-0000-1000-8000-00805f9b34fb)
-UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
-UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-UUID: Vendor specific (a23d00bc-217c-123b-9c00-fc44577136ee)
-Modalias: bluetooth:v0075p0100d0201
-Affected by Policy: no
+--- Comment #7 from epistemepromeneur@free.fr ---
+At the PC, I connect the smartphone
+
+bluetoothctl connect 90:06:28:B6:B1:B6
+Attempting to connect to 90:06:28:B6:B1:B6
+Failed to connect: org.bluez.Error.Failed le-connection-abort-by-local
 
 --=20
 You may reply to this email to add a comment.
