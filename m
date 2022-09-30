@@ -2,119 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A13BDC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 16:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1CA3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Sep 2022 17:46:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230512AbiI3QJt (ORCPT
+        id S231657AbiI3Rq6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Sep 2022 12:09:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33266 "EHLO
+        Fri, 30 Sep 2022 13:46:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbiI3QJq (ORCPT
+        with ESMTP id S230198AbiI3Rq4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Sep 2022 12:09:46 -0400
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BA7A23BDE;
-        Fri, 30 Sep 2022 09:09:44 -0700 (PDT)
-Received: by mail-il1-f172.google.com with SMTP id j7so2413970ilu.7;
-        Fri, 30 Sep 2022 09:09:44 -0700 (PDT)
+        Fri, 30 Sep 2022 13:46:56 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFA51739E0;
+        Fri, 30 Sep 2022 10:46:54 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id f21so1021464lfm.9;
+        Fri, 30 Sep 2022 10:46:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=PMgFczjI5lITGvvybViAzGzLZhgfUg66njHzJimv/LI=;
+        b=Nh9WyItHvE2pZgrzjzfFUOah/OxRC1kVqE1Xt8InKsUnIstm7mvUzN3aQ6N4NtqVM2
+         A3eiEQWs8PMBXY+U+DKg9cvCY+eC5c3zDh/50VmNw59wJ3hXH5SJJwWVfJzKapsizvdJ
+         Qb8ifISVrq/WCw07mUWwmpbp+Ana2mTNqX5pGf5qgQkPABiLJQ8uR8jhf/NQ1JN16Xu/
+         uhkY3GJi/fgrVlqEaRn5fclHDobo/CiyIpcvMItPPGIHfGrdANf7nTo7ibZpjcX/WojP
+         oc1LKjW/OPVD1+SoMnCmpl0JDNks0sNf3Ty9pK/ETbGTaoDfkqISCKpmzq1eirhHPD1Q
+         W6jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date;
-        bh=zNh+fWMDwTGcr2BpFoXyyeGxIhB+H3qzeZZ4m5l8+ik=;
-        b=xUAxd5m1BXT4Co8TGgACxwuigyj0I04zKdSaziqHAUuksQrLTryIVcQ73jmOqQtlcN
-         tiPFfGbZkFPOQo0i7qajAwZJ27AMpwjCU8RL11UY0tDd0dNdWlKf4Xrxap7IUMj3jxxp
-         LT8xhZEEgldXUC8Cq2rXmKI3WpMkU8kpKzFuB9QbzLlyEpNBj/JAbd0TtoRC3kxLvPwL
-         q0Abfq1M3g5DWY3Ck4JHb22vwhiS2XVlO92lanqYzZJTW6ak4a27JMLWXkD05GHw5wiE
-         vnDDwpkmDlDCB3Pv0YSy3n/aaDc1yernkWdQSSo2d+SuxpIyfTOHBVpxgcbqGPQG8jEb
-         4UGQ==
-X-Gm-Message-State: ACrzQf2jX9TkHk87GSUxxCs5Gzj9Ak5m46orCDFh1kO7Cp47ydat0Aoq
-        ZDOWMqE/i8LKVLZAoa9DBj6bl7G70yOcDQ==
-X-Google-Smtp-Source: AMsMyM4XZqM+H4sFt9W42XxbCHGm2rvfwNtl0tYFBEHkkLEsQpr9NWkvLNuxXb8XcAAC9ks1dHsaBg==
-X-Received: by 2002:a05:6e02:148c:b0:2f7:5790:7c3c with SMTP id n12-20020a056e02148c00b002f757907c3cmr4630125ilk.150.1664554183826;
-        Fri, 30 Sep 2022 09:09:43 -0700 (PDT)
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id t2-20020a056e02060200b002eae6cf8898sm1093832ils.30.2022.09.30.09.09.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Sep 2022 09:09:43 -0700 (PDT)
-From:   Sungwoo Kim <iam@sung-woo.kim>
-To:     luiz.dentz@gmail.com
-Cc:     davem@davemloft.net, edumazet@google.com, iam@sung-woo.kim,
-        johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller@googlegroups.com
-Subject: Re: KASAN: use-after-free in __mutex_lock
-Date:   Fri, 30 Sep 2022 12:08:44 -0400
-Message-Id: <20220930160843.818893-1-iam@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CABBYNZKSnFJkyMoHn-TU1VJQz3WNNt0pC8Nvzdxb3-4-RtcQGw@mail.gmail.com>
-References: <CABBYNZKSnFJkyMoHn-TU1VJQz3WNNt0pC8Nvzdxb3-4-RtcQGw@mail.gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=PMgFczjI5lITGvvybViAzGzLZhgfUg66njHzJimv/LI=;
+        b=1s4iPfHsf5UWoexJ0FIBA/93r6DAmgKQ8HBCa+MwZLpMjQU9HSF7GaoTEawdRfy+Hj
+         2Rq09c7rJFCkxO09i5GabkZLeC8J+VDoaz53sp7F7m6xG9kFS+2fEJl4fYXffUJbcjqm
+         aphZo8xrKHcTW0EbWuHlaBXTq056Qql70errxx2X1ziBxce07xZ8C0Xgm4ZPUuRvNRme
+         ceHyLVbdaR3AsL2/mrdMn39DaHiRrjCoJwiqFAIgNqrP3By4eCaNuFubh8pZ3mm7z0Ol
+         A+TNGlqruq70sTo9HV65VkEJGX4uS29E3fDz4Dle7Eak6W75BcrX1gIbHdeyCJ5mRHp6
+         961A==
+X-Gm-Message-State: ACrzQf1DlkAY72GXLWdnc1W4spiTtAteaOAYC4/bKIET/Vux7DCAnf7F
+        vk/UKCQNQZ8G+PHduax+0z1TTg15aEYvzn/daBE=
+X-Google-Smtp-Source: AMsMyM60Sn37g1vsWtCfPmp5oKqpbppdcXL2K1TH09KGjw/kR39OBVCSYQX54yR2TsXM9pxJFVe2w3UdE3LsIEO9x8o=
+X-Received: by 2002:ac2:5cb9:0:b0:498:eb6f:740d with SMTP id
+ e25-20020ac25cb9000000b00498eb6f740dmr3441812lfq.106.1664560013017; Fri, 30
+ Sep 2022 10:46:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABBYNZKSnFJkyMoHn-TU1VJQz3WNNt0pC8Nvzdxb3-4-RtcQGw@mail.gmail.com>
+ <20220930160843.818893-1-iam@sung-woo.kim>
+In-Reply-To: <20220930160843.818893-1-iam@sung-woo.kim>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 30 Sep 2022 10:46:41 -0700
+Message-ID: <CABBYNZLyCzQ_RUJKUi8dpZorPjUsyCxXcZ-ScmMHWx0a86Ra5w@mail.gmail.com>
+Subject: Re: KASAN: use-after-free in __mutex_lock
+To:     Sungwoo Kim <iam@sung-woo.kim>
+Cc:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, marcel@holtmann.org,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dentz,
-How about to use l2cap_get_chan_by_scid because it looks resposible to
-handle ref_cnt.
+Hi Kim,
 
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
----
- net/bluetooth/l2cap_core.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+On Fri, Sep 30, 2022 at 9:09 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
+>
+> Hi Dentz,
+> How about to use l2cap_get_chan_by_scid because it looks resposible to
+> handle ref_cnt.
+>
+> Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
+> ---
+>  net/bluetooth/l2cap_core.c | 24 +++++++-----------------
+>  1 file changed, 7 insertions(+), 17 deletions(-)
+>
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 2c9de67da..d3a074cbc 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -4291,26 +4291,18 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+>         BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
+>                dcid, scid, result, status);
+>
+> -       mutex_lock(&conn->chan_lock);
+> -
+>         if (scid) {
+> -               chan = __l2cap_get_chan_by_scid(conn, scid);
+> -               if (!chan) {
+> -                       err = -EBADSLT;
+> -                       goto unlock;
+> -               }
+> +               chan = l2cap_get_chan_by_scid(conn, scid);
+> +               if (!chan)
+> +                       return -EBADSLT;
+>         } else {
+> -               chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
+> -               if (!chan) {
+> -                       err = -EBADSLT;
+> -                       goto unlock;
+> -               }
+> +               chan = l2cap_get_chan_by_ident(conn, cmd->ident);
+> +               if (!chan)
+> +                       return -EBADSLT;
+>         }
+>
+>         err = 0;
+>
+> -       l2cap_chan_lock(chan);
+> -
+>         switch (result) {
+>         case L2CAP_CR_SUCCESS:
+>                 l2cap_state_change(chan, BT_CONFIG);
+> @@ -4336,9 +4328,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+>         }
+>
+>         l2cap_chan_unlock(chan);
+> -
+> -unlock:
+> -       mutex_unlock(&conn->chan_lock);
+> +       l2cap_chan_put(chan);
+>
+>         return err;
+>  }
+> --
+> 2.25.1
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 2c9de67da..d3a074cbc 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4291,26 +4291,18 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	BT_DBG("dcid 0x%4.4x scid 0x%4.4x result 0x%2.2x status 0x%2.2x",
- 	       dcid, scid, result, status);
- 
--	mutex_lock(&conn->chan_lock);
--
- 	if (scid) {
--		chan = __l2cap_get_chan_by_scid(conn, scid);
--		if (!chan) {
--			err = -EBADSLT;
--			goto unlock;
--		}
-+		chan = l2cap_get_chan_by_scid(conn, scid);
-+		if (!chan)
-+			return -EBADSLT;
- 	} else {
--		chan = __l2cap_get_chan_by_ident(conn, cmd->ident);
--		if (!chan) {
--			err = -EBADSLT;
--			goto unlock;
--		}
-+		chan = l2cap_get_chan_by_ident(conn, cmd->ident);
-+		if (!chan)
-+			return -EBADSLT;
- 	}
- 
- 	err = 0;
- 
--	l2cap_chan_lock(chan);
--
- 	switch (result) {
- 	case L2CAP_CR_SUCCESS:
- 		l2cap_state_change(chan, BT_CONFIG);
-@@ -4336,9 +4328,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	}
- 
- 	l2cap_chan_unlock(chan);
--
--unlock:
--	mutex_unlock(&conn->chan_lock);
-+	l2cap_chan_put(chan);
- 
- 	return err;
- }
+Ive sent a fix yesterday:
+
+https://patchwork.kernel.org/project/bluetooth/patch/20220929203241.4140795-1-luiz.dentz@gmail.com/
+
+Both are sorta similar but the one above end up causing less code
+changes which might be easier to backport.
+
 -- 
-2.25.1
-
+Luiz Augusto von Dentz
