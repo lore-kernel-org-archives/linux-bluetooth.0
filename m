@@ -2,177 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D41C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 07:31:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D842EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 08:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbiJCHbm (ORCPT
+        id S231825AbiJCIFR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Oct 2022 03:31:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
+        Mon, 3 Oct 2022 04:05:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231328AbiJCHaC (ORCPT
+        with ESMTP id S231994AbiJCIEq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Oct 2022 03:30:02 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963DAB4B2
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 00:20:15 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id j1-20020a056e02154100b002f9abf53769so2494455ilu.23
-        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Oct 2022 00:20:15 -0700 (PDT)
+        Mon, 3 Oct 2022 04:04:46 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A4D643324
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 00:40:33 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id i9so2977249qvu.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Oct 2022 00:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date;
+        bh=y2RRGEE3GrWdVB+IcxpBpXUuSz9viwfydm9uleNMwyM=;
+        b=jWI9Vr3J2StuF/qtRkVbL6pM6OSw9ih3bO9mp8o3M7LvboT03QGhsiQ8Usl1cc5sXz
+         6JXDOvHxLkLNTqopl42k+b6p0qkdwjs9ECCiI53G8IuaTHbZe2Cs1jTllrj5RRdlcXmt
+         I6IuK4MbxIVvlR1L+5Nbrwf29j6uHyAs85vcHo1FijnWqwet6uk2ZERxYQTT/T+B1R8A
+         8EjulT2Bj5G409Pk5HsSB4GKpAlFeYMhYkyNZ9KKjPAhL9ejPiaeLOq8eLBCIRx2ccRm
+         YlPCRhzlvhvu51yp5NScxN92WCBykVTXVD/lhMR/PpKB5rkJ6rAJCnq8F0Wnhq4OBpJ6
+         slTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=CkqP2d1fPEgRUJDcFTqNFXZTppAl/lOomNbbZEWiEns=;
-        b=mm1Ltx5VC70MapRKvPA/ZN8P75aUfNhVrJ1c4YGfAQb76LbzXkyTZ/yPr+gi6kHWVW
-         m9ruN+zurEvfZCuiSFvSEq4gChtvibAABL1qJevMwTaav4bd95pVorL46EyKJbAYu250
-         hvaqboXANyfFr4LAIjeiGgH/iWeNEj5hh3G3O7F4RYKd8WJM462zQEKU2GDGd0gU5X2J
-         sZ1ykihdodcwCGeoQyX2/JbrQRy+8Z+TgMfY2nCk7d9Zi3a81seSNN6q5Mhq+RoZt5lx
-         EyOKVeZjcMLQ44Y/0tRFI5upgYZW5wGSp3TJXsnjHswz4xHj7bKXz2Ryg1ZoDfRgcURU
-         H3DA==
-X-Gm-Message-State: ACrzQf1LJUzpZ+sDzeY7mFTeEcoDZ3PXjnP/l3p+VKnk7CsDbcZ3hDDA
-        GxTc6f8+eer0qHw5rCOTljUTYOiFqrvwESyENYvpzQt7Cqe3
-X-Google-Smtp-Source: AMsMyM5C3CEbYW69hFAqUOIWkUAdFOh3SKHNxgqGN6gazoXYeXn0GqNq8xfW7R6MjfTxL/bu1rewfTuvWeLkN8RaPDihJ6A3u5LH
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date;
+        bh=y2RRGEE3GrWdVB+IcxpBpXUuSz9viwfydm9uleNMwyM=;
+        b=B60ZaR8vwQrJ67+4eYCDYAlsMfiEMdyLSwC1LllFU31SUZp4Dsw7xhqB6XOpleoXMB
+         mb9DtsNK9RXhKJWiImQY+qVQQvkAeEl2hlbUxedGt+/5HX4/bOWqvJ6y5/48AGWSJdV7
+         ADp9q/TUupnuHEBVmlol79+yXszfhT3/Woy70POd/BMVoOmg+NRbqLCBunWW1Cs+FMP5
+         E1qk/6tp6qegu4iO0P+8AaZ3avE19xihE8muMQwdIepaRg0mYkKyn/wr5vIwMx5o0Dgo
+         JRi+Op9aQU8TbF2tsUrK83vRXXf2QJkBRT4N09mj7EAiMrIRpZBfsvwu7nWDgDxtEBYV
+         +1Jw==
+X-Gm-Message-State: ACrzQf3OUQpMObZXLEaipGd/h79ZuJxcxUz+6RnSpqPQOAa1h3nKfitC
+        U/P1a2q4aZ4Vi1i6xiODORfKsJ8ksT2VPQ==
+X-Google-Smtp-Source: AMsMyM4juF7inBHcsn/tJmEZz5NbsVKUb3tslrgJxYaVlS81gN2JmYPBOS0DHmA3srJKclFWBfAejQ==
+X-Received: by 2002:a0c:8c4f:0:b0:4ac:94fa:a587 with SMTP id o15-20020a0c8c4f000000b004ac94faa587mr15163202qvb.40.1664782327368;
+        Mon, 03 Oct 2022 00:32:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.163.144.31])
+        by smtp.gmail.com with ESMTPSA id z10-20020ac87caa000000b0035d43eb67bcsm8665949qtv.91.2022.10.03.00.32.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Oct 2022 00:32:07 -0700 (PDT)
+Message-ID: <633a8ff7.c80a0220.2df53.e4b0@mx.google.com>
+Date:   Mon, 03 Oct 2022 00:32:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8313174645120193046=="
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd03:0:b0:2f9:463e:279d with SMTP id
- z3-20020a92cd03000000b002f9463e279dmr7178837iln.223.1664781518584; Mon, 03
- Oct 2022 00:18:38 -0700 (PDT)
-Date:   Mon, 03 Oct 2022 00:18:38 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000b46aa05ea1c2721@google.com>
-Subject: [syzbot] possible deadlock in discov_off
-From:   syzbot <syzbot+f047480b1e906b46a3f4@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
+Subject: RE: [v1] btusb: Avoid reset of ISOC endpoint alt settings to zero
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221003064836.11414-1-kiran.k@intel.com>
+References: <20221003064836.11414-1-kiran.k@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+--===============8313174645120193046==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-syzbot found the following issue on:
+This is automated email and please do not reply to this email!
 
-HEAD commit:    c3e0e1e23c70 Merge tag 'irq_urgent_for_v6.0' of git://git...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14471d38880000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=755695d26ad09807
-dashboard link: https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Dear submitter,
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=682688
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/67576e43d5c7/disk-c3e0e1e2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/e568fb42b955/vmlinux-c3e0e1e2.xz
+---Test result---
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f047480b1e906b46a3f4@syzkaller.appspotmail.com
+Test Summary:
+CheckPatch                    PASS      1.79 seconds
+GitLint                       PASS      1.02 seconds
+SubjectPrefix                 FAIL      0.86 seconds
+BuildKernel                   PASS      44.01 seconds
+BuildKernel32                 PASS      37.35 seconds
+Incremental Build with patchesPASS      52.88 seconds
+TestRunner: Setup             PASS      611.23 seconds
+TestRunner: l2cap-tester      PASS      19.50 seconds
+TestRunner: iso-tester        PASS      19.65 seconds
+TestRunner: bnep-tester       PASS      7.79 seconds
+TestRunner: mgmt-tester       PASS      119.75 seconds
+TestRunner: rfcomm-tester     PASS      12.14 seconds
+TestRunner: sco-tester        PASS      11.26 seconds
+TestRunner: ioctl-tester      PASS      12.80 seconds
+TestRunner: smp-tester        PASS      11.21 seconds
+TestRunner: userchan-tester   PASS      7.94 seconds
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.0.0-rc7-syzkaller-00081-gc3e0e1e23c70 #0 Not tainted
-------------------------------------------------------
-kworker/u5:5/3650 is trying to acquire lock:
-ffff88807606c078 (&hdev->lock){+.+.}-{3:3}, at: discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.86 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
 
-but task is already holding lock:
-ffffc90003f5fda8 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}:
-       __flush_work+0x105/0xae0 kernel/workqueue.c:3069
-       __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3160
-       mgmt_index_removed+0x218/0x340 net/bluetooth/mgmt.c:8952
-       hci_unregister_dev+0x34f/0x4e0 net/bluetooth/hci_core.c:2688
-       vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
-       __fput+0x277/0x9d0 fs/file_table.c:320
-       task_work_run+0xdd/0x1a0 kernel/task_work.c:177
-       exit_task_work include/linux/task_work.h:38 [inline]
-       do_exit+0xad5/0x29b0 kernel/exit.c:795
-       do_group_exit+0xd2/0x2f0 kernel/exit.c:925
-       get_signal+0x238c/0x2610 kernel/signal.c:2857
-       arch_do_signal_or_restart+0x82/0x2300 arch/x86/kernel/signal.c:869
-       exit_to_user_mode_loop kernel/entry/common.c:166 [inline]
-       exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:201
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
-       syscall_exit_to_user_mode+0x19/0x50 kernel/entry/common.c:294
-       do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
-       entry_SYSCALL_64_after_hwframe+0x63/0xcd
-
--> #0 (&hdev->lock){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3095 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3214 [inline]
-       validate_chain kernel/locking/lockdep.c:3829 [inline]
-       __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5053
-       lock_acquire kernel/locking/lockdep.c:5666 [inline]
-       lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
-       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
-       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
-       discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
-       process_one_work+0x991/0x1610 kernel/workqueue.c:2289
-       worker_thread+0x665/0x1080 kernel/workqueue.c:2436
-       kthread+0x2e4/0x3a0 kernel/kthread.c:376
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock((work_completion)(&(&hdev->discov_off)->work));
-                               lock(&hdev->lock);
-                               lock((work_completion)(&(&hdev->discov_off)->work));
-  lock(&hdev->lock);
-
- *** DEADLOCK ***
-
-2 locks held by kworker/u5:5/3650:
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
- #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
- #1: ffffc90003f5fda8 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
-
-stack backtrace:
-CPU: 0 PID: 3650 Comm: kworker/u5:5 Not tainted 6.0.0-rc7-syzkaller-00081-gc3e0e1e23c70 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/22/2022
-Workqueue: hci0 discov_off
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2175
- check_prev_add kernel/locking/lockdep.c:3095 [inline]
- check_prevs_add kernel/locking/lockdep.c:3214 [inline]
- validate_chain kernel/locking/lockdep.c:3829 [inline]
- __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5053
- lock_acquire kernel/locking/lockdep.c:5666 [inline]
- lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
- __mutex_lock_common kernel/locking/mutex.c:603 [inline]
- __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
- discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
 
 
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Regards,
+Linux Bluetooth
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+--===============8313174645120193046==--
