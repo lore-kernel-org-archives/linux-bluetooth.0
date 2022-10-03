@@ -2,98 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B19A5C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 10:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC36DC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 14:33:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbiJCKyy (ORCPT
+        id S229981AbiJCOdn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Oct 2022 06:54:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58816 "EHLO
+        Mon, 3 Oct 2022 10:33:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229538AbiJCKyv (ORCPT
+        with ESMTP id S230001AbiJCOdl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Oct 2022 06:54:51 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E358D1260A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 03:54:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F0AD3B8105A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 10:54:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AEBDFC433B5
-        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 10:54:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664794484;
-        bh=Tymf4dqap0ZGfPXEv3jH8bx/q7ZX3DKCafXUKlwTCCs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=tPBMvVIUtms+m6q6/WuCsfOapRaShqSa42z5p6idVs934VRNw0RH6/8gB8AyaU4ez
-         2qAZCXRstgvzvz0uQXMTFfp7p81+QC4ItFBe0bxfiWFOqVuuIcjI2gtn5j/PhnJaJZ
-         4ez6WcfmH0yXxj52JzDj8fo0T5CjheW7VNYxmZ0dcPinYMlgM9oFDoHHMDhoSR32Bz
-         wNcesH2N8U8YInDO/MsFGSQcTFJuPYsBRnpt1y5AUloqLraER9fIJC3BKbE9ssVEXk
-         FytBjUmEgV8dO5taHVIyMh7OhZEp6gTASNQl2NJSBx5TsC2ecKwHoKgfxpBWT3aIrI
-         K5TDUiQRxMCtA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 9BADBC433EA; Mon,  3 Oct 2022 10:54:44 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215725] Basilisk X Hyperspeed Bluetooth LE mouse fail to
- connect under 5.17 with Opcode 0x2043 failure
-Date:   Mon, 03 Oct 2022 10:54:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215725-62941-dSiUd4ETFs@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215725-62941@https.bugzilla.kernel.org/>
-References: <bug-215725-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 3 Oct 2022 10:33:41 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.73])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C964481D6
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 07:33:39 -0700 (PDT)
+Received: from evilbit.green-communications.fr ([92.154.77.116]) by
+ mrelayeu.kundenserver.de (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis)
+ id 1MHoZM-1oSfDC2YJa-00EvIn; Mon, 03 Oct 2022 16:33:36 +0200
+From:   Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [RFC PATCH] Bluetooth: Add a workaround for SCO over USB HCI design defect
+Date:   Mon,  3 Oct 2022 16:25:58 +0200
+Message-Id: <20221003142558.17914-1-nicolas.cavallari@green-communications.fr>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:SwjEmG3MMXAwmEZ4DK7NTvF88aIq/pRfwfvzr9ET54E3kHzcSrd
+ r7Hd9jCa2n3hIsPVFzNBqoy38MR+69+fGw+ornDaZ6Mj5tQhYyTRTB1MCcvcfUbrlVT/4o+
+ BcwkwtISoz2+Ks5h/NWjIZEViNnczGzxylZAY49ddqhZVJEf9r1DsX05Eqcy1SmOoNOIxcc
+ UvswZfP8qQhcXv3/yuxAw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:g5AHpQHCaOs=:LW/7rVZ9Hwp0ngyguf/TRR
+ gSp1+bgOZt212rGHgTSMtT4aRqPwL1931YIRzJKgAA21TGZi/ZAN69m60kDq1AnpGqCYluW4t
+ 3vUEVIsYQJlXogQJQ8QFnlklo0nnL7iwtFMv4+bSShQVbIc2hHV99upqokxI/K1sg2IaIc/No
+ NLOPSvzOuduhBTcOwZ1bwF08h1CBXM61Is+EKT8eI2iosP14Us+phR6rvHAWh4lnchG9XjeFZ
+ wJK6aSzYrAwx+0R+L01YNbJla7fLFzK5hnzgVKaTeMQcVWVRYglMvAfhnDCEzTaBjyygSSE84
+ npnlbzeB5LTVvjQU9C6u9KqIMQ+Oz5W7zsv7vLzLA2gw0dZEG2JfIoBEkZR6/Mq1LyGJ7Yv1T
+ Cmybbb+R3aOLW2hpwvhLa/Blk7+WqWfWOjKZTJrdQHZkwt1d/aYe/bR/kaVyar8MDlYlwhMLw
+ 98YCwNaFsyz87WUkmwteNUmZRikDQVunEpxGb/mEkI+h9NRU25QQLbIFl40l8MhWRQ6HMa7lA
+ drJDPAoy/aACAI5FL9T1KUR1LNiOXhfYsoh3JflZ2oP4mLKeN8eNBEq82BLR9KTDEvx1bAezF
+ vFVKjr5PF5Yr8oLxKhW087x4vXt0z//DyaCUecO5YnmnnWSSYYzc1ID+KPXraOa0ly+GVQO0Z
+ OIoosbzqnmulnTVv3rjlnr4TWGMNwpWJ9WuPhoWYdDoGjg7ezSre2eymiPCdm1jnl23RnWw3h
+ 6bM62mIIAWlm/+QtKlHVcwHiVw1+GYDla9xS0ORiBdfVhdeu/zZ9ZgvG5mu/sIJ9qdoBsH0m9
+ Ru0JwXkALMAuPZikNtnz0ut/vLcokXnu8vOdVvx+iLZ97bil2I=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215725
+The USB interface between the host and the bluetooth adapter used for
+SCO packets uses an USB isochronous endpoint with a fragmentation scheme
+that does not tolerate errors.  Except USB isochronous transfers do
+not provide a reliable stream with guaranteed delivery (There is no
+retry on error, see USB spec v2.0 5.6 and 8.5.5).
 
-Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
+To fragment a packet, the bluetooth HCI simply split it in parts and
+transfer them as-is.  The receiver is expected to reconstruct the packet
+by assuming the first fragment contains the header and parsing its size
+field.  There is no error detection either.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |pmenzel+bugzilla.kernel.org
-                   |                            |@molgen.mpg.de
+If a fragment is lost, the end result is that the kernel is no longer
+synchronized and will pass malformed data to the upper layers, since it
+has no way to tell if the first fragment is an actual first fragment or
+a continuation fragment.  Resynchronization can only happen by luck and
+requires an unbounded amount of time.
 
---- Comment #5 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
- ---
-(In reply to Winston Wu from comment #4)
-> Hi it seems that the problem no longer presents after 5.17.3 or so=E2=80=
-=A6=20
+The typical symptom for a HSP/HFP bluetooth headset is that the
+microphone stops working and dmesg contains piles of rate-limited
+"Bluetooth: hci0: SCO packet for unknown connection handle XXXX"
+errors for an undeterminate amount of time, until the kernel accidently
+resynchronize.
 
-Thank you for reporting back. If you have time, it=E2=80=99d be great if yo=
-u could
-figure out the exact commit. Otherwise, it=E2=80=99d be great if you closed=
- the
-issue/bug report.
+A workaround is to ask the upper layer to prevalidate the first fragment
+header.  This is not possible with user channels so this workaround is
+disabled in this case.
 
-PS: If you reply via email, please do not quote/cite the original email, as=
- the
-quote is not hidden in the Bugzilla comment, making it hard to read.
+Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+---
+ drivers/bluetooth/btusb.c        |  7 +++++--
+ include/net/bluetooth/hci_core.h | 20 ++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 2 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 15caa6469538..f6256af98233 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -980,9 +980,12 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (skb->len == HCI_SCO_HDR_SIZE) {
+ 			/* Complete SCO header */
+-			hci_skb_expect(skb) = hci_sco_hdr(skb)->dlen;
++			struct hci_sco_hdr *hdr = hci_sco_hdr(skb);
+ 
+-			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
++			hci_skb_expect(skb) = hdr->dlen;
++
++			if (skb_tailroom(skb) < hci_skb_expect(skb) ||
++			    !hci_conn_prevalidate_sco_hdr(data->hdev, hdr)) {
+ 				kfree_skb(skb);
+ 				skb = NULL;
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e7862903187d..d589b54e89e6 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1286,6 +1286,26 @@ static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
+ 	return NULL;
+ }
+ 
++static inline bool hci_conn_prevalidate_sco_hdr(struct hci_dev *hdev,
++						struct hci_sco_hdr *hdr)
++{
++	__u16 handle;
++
++	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
++		// Can't validate, userspace controls everything.
++		return true;
++
++	handle = hci_handle(__le16_to_cpu(hdr->handle));
++
++	switch (hci_conn_lookup_type(hdev, handle)) {
++	case SCO_LINK:
++	case ESCO_LINK:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ int hci_disconnect(struct hci_conn *conn, __u8 reason);
+ bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
+ void hci_sco_setup(struct hci_conn *conn, __u8 status);
+-- 
+2.37.2
 
-You are receiving this mail because:
-You are the assignee for the bug.=
