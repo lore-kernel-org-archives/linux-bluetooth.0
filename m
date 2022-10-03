@@ -2,86 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CABC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 06:40:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D41C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 Oct 2022 07:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbiJCGkD (ORCPT
+        id S231322AbiJCHbm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 3 Oct 2022 02:40:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
+        Mon, 3 Oct 2022 03:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229602AbiJCGj5 (ORCPT
+        with ESMTP id S231328AbiJCHaC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 3 Oct 2022 02:39:57 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E91727677
-        for <linux-bluetooth@vger.kernel.org>; Sun,  2 Oct 2022 23:39:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1664779191; x=1696315191;
-  h=from:to:cc:subject:date:message-id;
-  bh=zKbCsV8FsK7XyhtNsIia4tqJ6rL2B+znEEbn6dzgKUk=;
-  b=edV42xKPyALKGBCfAYm6j44HJUwKMsZuOf5l9qcLYExtjcRSuoxiKhsh
-   RNicQHYpmZhF50gVTdH+2QbVzNDuoqu4O66JcEJXguPu8GwCR2mATRrK+
-   kJgYaR09szKpjd+E00h1rEUg6FW3DhDW6WpxqkYzpOaaHEYNoDiOPjAMM
-   FiIGVZHkttixLH886jui/ZFKFjIqymq1IxXdwgKHrEOyXO8qOSdSSnrQD
-   GeKm91UVRYJE939NqmlC0c7ddHOjx4ZEfi7iX58F0DXgHQLOuJv0sKCus
-   rQjjxBrNWSwPF/A3pLFzyeBMv60ryocADFtfVxq7Hl+pKlyUvM5DRs9Vh
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10488"; a="388850894"
-X-IronPort-AV: E=Sophos;i="5.93,364,1654585200"; 
-   d="scan'208";a="388850894"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Oct 2022 23:39:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10488"; a="618627097"
-X-IronPort-AV: E=Sophos;i="5.93,364,1654585200"; 
-   d="scan'208";a="618627097"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga007.jf.intel.com with ESMTP; 02 Oct 2022 23:39:48 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com,
-        Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v1] btusb: Avoid reset of ISOC endpoint alt settings to zero
-Date:   Mon,  3 Oct 2022 12:18:36 +0530
-Message-Id: <20221003064836.11414-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 3 Oct 2022 03:30:02 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963DAB4B2
+        for <linux-bluetooth@vger.kernel.org>; Mon,  3 Oct 2022 00:20:15 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id j1-20020a056e02154100b002f9abf53769so2494455ilu.23
+        for <linux-bluetooth@vger.kernel.org>; Mon, 03 Oct 2022 00:20:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=CkqP2d1fPEgRUJDcFTqNFXZTppAl/lOomNbbZEWiEns=;
+        b=mm1Ltx5VC70MapRKvPA/ZN8P75aUfNhVrJ1c4YGfAQb76LbzXkyTZ/yPr+gi6kHWVW
+         m9ruN+zurEvfZCuiSFvSEq4gChtvibAABL1qJevMwTaav4bd95pVorL46EyKJbAYu250
+         hvaqboXANyfFr4LAIjeiGgH/iWeNEj5hh3G3O7F4RYKd8WJM462zQEKU2GDGd0gU5X2J
+         sZ1ykihdodcwCGeoQyX2/JbrQRy+8Z+TgMfY2nCk7d9Zi3a81seSNN6q5Mhq+RoZt5lx
+         EyOKVeZjcMLQ44Y/0tRFI5upgYZW5wGSp3TJXsnjHswz4xHj7bKXz2Ryg1ZoDfRgcURU
+         H3DA==
+X-Gm-Message-State: ACrzQf1LJUzpZ+sDzeY7mFTeEcoDZ3PXjnP/l3p+VKnk7CsDbcZ3hDDA
+        GxTc6f8+eer0qHw5rCOTljUTYOiFqrvwESyENYvpzQt7Cqe3
+X-Google-Smtp-Source: AMsMyM5C3CEbYW69hFAqUOIWkUAdFOh3SKHNxgqGN6gazoXYeXn0GqNq8xfW7R6MjfTxL/bu1rewfTuvWeLkN8RaPDihJ6A3u5LH
+MIME-Version: 1.0
+X-Received: by 2002:a92:cd03:0:b0:2f9:463e:279d with SMTP id
+ z3-20020a92cd03000000b002f9463e279dmr7178837iln.223.1664781518584; Mon, 03
+ Oct 2022 00:18:38 -0700 (PDT)
+Date:   Mon, 03 Oct 2022 00:18:38 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000b46aa05ea1c2721@google.com>
+Subject: [syzbot] possible deadlock in discov_off
+From:   syzbot <syzbot+f047480b1e906b46a3f4@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+Hello,
 
-In case of suspend/resume and HCI_RESET (BT On and Off),
-ISOC endpoint set to alt setting 0 when no SCO connection exists.
-This patch shall avoid resetting of ISOC endpoint to alt setting to 0.
+syzbot found the following issue on:
 
-Signed-off-by: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
+HEAD commit:    c3e0e1e23c70 Merge tag 'irq_urgent_for_v6.0' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14471d38880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=755695d26ad09807
+dashboard link: https://syzkaller.appspot.com/bug?extid=f047480b1e906b46a3f4
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/67576e43d5c7/disk-c3e0e1e2.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e568fb42b955/vmlinux-c3e0e1e2.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f047480b1e906b46a3f4@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.0.0-rc7-syzkaller-00081-gc3e0e1e23c70 #0 Not tainted
+------------------------------------------------------
+kworker/u5:5/3650 is trying to acquire lock:
+ffff88807606c078 (&hdev->lock){+.+.}-{3:3}, at: discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
+
+but task is already holding lock:
+ffffc90003f5fda8 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}:
+       __flush_work+0x105/0xae0 kernel/workqueue.c:3069
+       __cancel_work_timer+0x3f9/0x570 kernel/workqueue.c:3160
+       mgmt_index_removed+0x218/0x340 net/bluetooth/mgmt.c:8952
+       hci_unregister_dev+0x34f/0x4e0 net/bluetooth/hci_core.c:2688
+       vhci_release+0x7c/0xf0 drivers/bluetooth/hci_vhci.c:568
+       __fput+0x277/0x9d0 fs/file_table.c:320
+       task_work_run+0xdd/0x1a0 kernel/task_work.c:177
+       exit_task_work include/linux/task_work.h:38 [inline]
+       do_exit+0xad5/0x29b0 kernel/exit.c:795
+       do_group_exit+0xd2/0x2f0 kernel/exit.c:925
+       get_signal+0x238c/0x2610 kernel/signal.c:2857
+       arch_do_signal_or_restart+0x82/0x2300 arch/x86/kernel/signal.c:869
+       exit_to_user_mode_loop kernel/entry/common.c:166 [inline]
+       exit_to_user_mode_prepare+0x15f/0x250 kernel/entry/common.c:201
+       __syscall_exit_to_user_mode_work kernel/entry/common.c:283 [inline]
+       syscall_exit_to_user_mode+0x19/0x50 kernel/entry/common.c:294
+       do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+       entry_SYSCALL_64_after_hwframe+0x63/0xcd
+
+-> #0 (&hdev->lock){+.+.}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3095 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3214 [inline]
+       validate_chain kernel/locking/lockdep.c:3829 [inline]
+       __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5053
+       lock_acquire kernel/locking/lockdep.c:5666 [inline]
+       lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
+       __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+       __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+       discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
+       process_one_work+0x991/0x1610 kernel/workqueue.c:2289
+       worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+       kthread+0x2e4/0x3a0 kernel/kthread.c:376
+       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock((work_completion)(&(&hdev->discov_off)->work));
+                               lock(&hdev->lock);
+                               lock((work_completion)(&(&hdev->discov_off)->work));
+  lock(&hdev->lock);
+
+ *** DEADLOCK ***
+
+2 locks held by kworker/u5:5/3650:
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:34 [inline]
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: arch_atomic_long_set include/linux/atomic/atomic-long.h:41 [inline]
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:1280 [inline]
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:636 [inline]
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:663 [inline]
+ #0: ffff88807a95e938 ((wq_completion)hci0){+.+.}-{0:0}, at: process_one_work+0x87a/0x1610 kernel/workqueue.c:2260
+ #1: ffffc90003f5fda8 ((work_completion)(&(&hdev->discov_off)->work)){+.+.}-{0:0}, at: process_one_work+0x8ae/0x1610 kernel/workqueue.c:2264
+
+stack backtrace:
+CPU: 0 PID: 3650 Comm: kworker/u5:5 Not tainted 6.0.0-rc7-syzkaller-00081-gc3e0e1e23c70 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/22/2022
+Workqueue: hci0 discov_off
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ check_noncircular+0x25f/0x2e0 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3095 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3214 [inline]
+ validate_chain kernel/locking/lockdep.c:3829 [inline]
+ __lock_acquire+0x2a43/0x56d0 kernel/locking/lockdep.c:5053
+ lock_acquire kernel/locking/lockdep.c:5666 [inline]
+ lock_acquire+0x1ab/0x570 kernel/locking/lockdep.c:5631
+ __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+ __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+ discov_off+0x88/0x1a0 net/bluetooth/mgmt.c:1033
+ process_one_work+0x991/0x1610 kernel/workqueue.c:2289
+ worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+ kthread+0x2e4/0x3a0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+ </TASK>
+
+
 ---
- drivers/bluetooth/btusb.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 271963805a38..ebfec6d8573f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1981,10 +1981,11 @@ static void btusb_work(struct work_struct *work)
- 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
- 			bt_dev_err(hdev, "set USB alt:(%d) failed!", new_alts);
- 	} else {
--		clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
- 		usb_kill_anchored_urbs(&data->isoc_anchor);
- 
--		__set_isoc_interface(hdev, 0);
-+		if (test_and_clear_bit(BTUSB_ISOC_RUNNING, &data->flags))
-+			__set_isoc_interface(hdev, 0);
-+
- 		if (test_and_clear_bit(BTUSB_DID_ISO_RESUME, &data->flags))
- 			usb_autopm_put_interface(data->isoc ? data->isoc : data->intf);
- 	}
--- 
-2.17.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
