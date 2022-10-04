@@ -2,181 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 782CBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Oct 2022 08:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3045C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 Oct 2022 08:33:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbiJDIZ6 (ORCPT
+        id S230168AbiJDIdN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 Oct 2022 04:25:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32930 "EHLO
+        Tue, 4 Oct 2022 04:33:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230153AbiJDIZ5 (ORCPT
+        with ESMTP id S229899AbiJDIdK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 Oct 2022 04:25:57 -0400
-Received: from voyager.loytec.com (voyager.loytec.com [88.198.4.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A77832252E
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Oct 2022 01:25:55 -0700 (PDT)
-Received: from 212-17-98-152.static.upcbusiness.at ([212.17.98.152] helo=lexx.office.loytec.com)
-        by voyager.loytec.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <isak.westin@loytec.com>)
-        id 1ofdFR-0002H7-Jx
-        for linux-bluetooth@vger.kernel.org; Tue, 04 Oct 2022 10:25:53 +0200
-Received: from loytec-dev-vm.delta.corp ([10.101.25.21])
-        by lexx.office.loytec.com (8.15.2/8.15.2/Some OS 1.2.3-4.5) with ESMTP id 2948PkTd2433476;
-        Tue, 4 Oct 2022 10:25:51 +0200
-From:   Isak Westin <isak.westin@loytec.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Isak Westin <isak.westin@loytec.com>
-Subject: [PATCH BlueZ 4/4] mesh: Always relay messages from Low Power nodes
-Date:   Tue,  4 Oct 2022 10:25:30 +0200
-Message-Id: <20221004082530.25719-5-isak.westin@loytec.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221004082530.25719-1-isak.westin@loytec.com>
-References: <20221004082530.25719-1-isak.westin@loytec.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 212.17.98.152
-X-SA-Exim-Mail-From: isak.westin@loytec.com
-X-SA-Exim-Scanned: No (on voyager.loytec.com); SAEximRunCond expanded to false
+        Tue, 4 Oct 2022 04:33:10 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC212B18A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Oct 2022 01:33:09 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id p12-20020a170902e74c00b00177f3be2825so9936306plf.17
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Oct 2022 01:33:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=mUw8UBadLiHi3J/pZlzSALpv6ewLMu8s9SQXK+Sa/QU=;
+        b=OJ4t71dNLGl8TZgKvNooAVw9sze/VDQ4M+L7N7BHrpAPRsP49A2qBRtDwMPvWi89Tk
+         ecoaPtFqBthqfpCLK/lKDYlLt44b8CYPJfzG6bmr4E0rJo0CO11LMbMMwJ2xcO+Nwsiy
+         ML1ujtbNpcd95wfeKxckFUEC26cq1njyR8KpnhlMF7YskZTfsRo4FBdpCcli7Pi2Qk/m
+         DW40OkFmkUF6HCVvRzSpNLuid3FJkbX8ZBGjELhGCQ5LZdDx/j3R+yuhTXKYZMuqFhQS
+         D2pBtOPJXhzzwclGy2l94YumVWaaVcOVdyzHnhUU/SAnFCxQlKIh9VOxD/dPk6Z6EGkh
+         sRng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=mUw8UBadLiHi3J/pZlzSALpv6ewLMu8s9SQXK+Sa/QU=;
+        b=dY3qLZwUTYBqJRXr1sshJtGk4dEdNMkvO3zVW1ejA05q2C0G6oBfN6BV2D4VIWryF0
+         boo5l3kPnLY4kYULyB+ijcx6+wigCk5HaVJZ9f/5ZHsVzl4/XMYwa1G2S8Taa5+a19eu
+         xqUm67K5WDHzC9IRajfDIBalcSUHrN32qaz4o/Qp5j7DZFGOKlOF+igIrEawQjURfRKu
+         LzaT2bK3HmbIDbPLGVnoDnVRNWRU0I/+pqfxbQQn8esZ0AR8NftFcPYc7ViMVTrn9lSN
+         mI+q4dZJO2Lqhc+hmOrjqASiEuKwcK7L7qnekewGvz2H6Xbm8U2bs0FhhqdN9CD3Nw8C
+         AbNA==
+X-Gm-Message-State: ACrzQf0BQWW0+zyjYfjXu1ezxa8H4sH4EAHb5tsUOmrf4eiKoUOwT5/R
+        omilPrCB1oeAigvb/SFvaBULlGvV60hRzU7iaagTtiCZ7AhEWH9O6yn5kpBUL4X/JE4qC9ynIfy
+        UCs1NVA5+aLSP9R2sDpfK1PjlNtOM67+sEuun6IRvYx3fEieUChtLE/eYMcTyL2LzjWgVFiz8s5
+        in
+X-Google-Smtp-Source: AMsMyM5huMghpuYio6zUoq3FwJTD9YdendfJWEgnilY/ykjUO/lpy44+gwvOp/rReo1Nje2YYzM8Deru1MIr
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:e06f:8778:ebde:592c])
+ (user=apusaka job=sendgmr) by 2002:a63:1348:0:b0:440:5c6e:aedf with SMTP id
+ 8-20020a631348000000b004405c6eaedfmr20589308pgt.613.1664872389114; Tue, 04
+ Oct 2022 01:33:09 -0700 (PDT)
+Date:   Tue,  4 Oct 2022 16:32:34 +0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221004163224.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
+Subject: [PATCH] Bluetooth: btusb: Introduce generic USB reset
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@google.com>,
+        Ying Hsu <yinghsu@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If we receive a message from one of our Low Power nodes, which is
-encrypted using frendship credentials and where the destination is not
-us, we must relay that message using master credentials.
-See MshPRFv1.0.1 section 3.6.6.2.
+From: Archie Pusaka <apusaka@chromium.org>
+
+On cmd_timeout and there is no reset_gpio, reset the USB port as a
+last resort.
+
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
+Reviewed-by: Ying Hsu <yinghsu@chromium.org>
+
 ---
- mesh/net.c | 47 ++++++++++++++++++++++++++++++++++++-----------
- 1 file changed, 36 insertions(+), 11 deletions(-)
 
-diff --git a/mesh/net.c b/mesh/net.c
-index 577121f30..a1b586a0b 100644
---- a/mesh/net.c
-+++ b/mesh/net.c
-@@ -1763,7 +1763,8 @@ not_for_friend:
- 	return true;
- }
+ drivers/bluetooth/btusb.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 271963805a38..11040124ef79 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -696,6 +696,19 @@ struct btusb_data {
+ 	unsigned cmd_timeout_cnt;
+ };
  
--static uint16_t key_id_to_net_idx(struct mesh_net *net, uint32_t net_key_id)
-+static uint16_t key_id_to_net_idx(struct mesh_net *net,
-+				uint32_t net_key_id, bool *frnd)
- {
- 	struct mesh_subnet *subnet;
- 	struct mesh_friend *friend;
-@@ -1771,6 +1772,9 @@ static uint16_t key_id_to_net_idx(struct mesh_net *net, uint32_t net_key_id)
- 	if (!net)
- 		return NET_IDX_INVALID;
- 
-+	if (frnd)
-+		*frnd = false;
++static void generic_usb_reset(struct hci_dev *hdev, struct btusb_data *data)
++{
++	int err;
 +
- 	subnet = l_queue_find(net->subnets, match_key_id,
- 						L_UINT_TO_PTR(net_key_id));
- 
-@@ -1780,8 +1784,12 @@ static uint16_t key_id_to_net_idx(struct mesh_net *net, uint32_t net_key_id)
- 	friend = l_queue_find(net->friends, match_friend_key_id,
- 						L_UINT_TO_PTR(net_key_id));
- 
--	if (friend)
-+	if (friend) {
-+		if (frnd)
-+			*frnd = true;
++	bt_dev_err(hdev, "Resetting usb device.");
++	/* This is not an unbalanced PM reference since the device will reset */
++	err = usb_autopm_get_interface(data->intf);
++	if (!err)
++		usb_queue_reset_device(data->intf);
++	else
++		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
++}
 +
- 		return friend->net_idx;
-+	}
- 
- 	friend = l_queue_find(net->negotiations, match_friend_key_id,
- 						L_UINT_TO_PTR(net_key_id));
-@@ -2078,7 +2086,7 @@ static bool ctl_received(struct mesh_net *net, uint32_t net_key_id,
- 			return false;
- 
- 		print_packet("Rx-NET_OP_FRND_REQUEST", pkt, len);
--		net_idx = key_id_to_net_idx(net, net_key_id);
-+		net_idx = key_id_to_net_idx(net, net_key_id, NULL);
- 		friend_request(net, net_idx, src, pkt[0], pkt[1],
- 				l_get_be32(pkt + 1) & 0xffffff,
- 				l_get_be16(pkt + 5), pkt[7],
-@@ -2269,7 +2277,8 @@ static void send_msg_pkt(struct mesh_net *net, uint8_t cnt, uint16_t interval,
- }
- 
- static enum _relay_advice packet_received(void *user_data,
--				uint32_t net_key_id, uint32_t iv_index,
-+				uint32_t net_key_id, uint16_t net_idx,
-+				bool frnd, uint32_t iv_index,
- 				const void *data, uint8_t size, int8_t rssi)
+ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
  {
- 	struct mesh_net *net = user_data;
-@@ -2278,16 +2287,11 @@ static enum _relay_advice packet_received(void *user_data,
- 	uint8_t net_ttl, key_aid, net_segO, net_segN, net_opcode;
- 	uint32_t net_seq, cache_cookie;
- 	uint16_t net_src, net_dst, net_seqZero;
--	uint16_t net_idx;
- 	uint8_t packet[31];
- 	bool net_ctl, net_segmented, net_szmic, net_relay;
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -705,7 +718,7 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+ 		return;
  
- 	memcpy(packet + 2, data, size);
- 
--	net_idx = key_id_to_net_idx(net, net_key_id);
--	if (net_idx == NET_IDX_INVALID)
--		return RELAY_NONE;
--
- 	print_packet("RX: Network [clr] :", packet + 2, size);
- 
- 	if (!mesh_crypto_packet_parse(packet + 2, size, &net_ctl, &net_ttl,
-@@ -2389,6 +2393,13 @@ static enum _relay_advice packet_received(void *user_data,
- 			return RELAY_DISALLOWED;
+ 	if (!reset_gpio) {
+-		bt_dev_err(hdev, "No way to reset. Ignoring and continuing");
++		generic_usb_reset(hdev, data);
+ 		return;
  	}
  
-+	/*
-+	 * Messages that are encrypted with friendship credentials
-+	 * should *always* be relayed
-+	 */
-+	if (frnd)
-+		return RELAY_ALWAYS;
-+
- 	/* If relay not enable, or no more hops allowed */
- 	if (!net->relay.enable || net_ttl < 0x02)
- 		return RELAY_NONE;
-@@ -2414,7 +2425,9 @@ static void net_rx(void *net_ptr, void *user_data)
- 	uint8_t *out;
- 	size_t out_size;
- 	uint32_t net_key_id;
-+	uint16_t net_idx;
- 	int8_t rssi = 0;
-+	bool frnd;
- 	bool ivi_net = !!(net->iv_index & 1);
- 	bool ivi_pkt = !!(data->data[0] & 0x80);
+@@ -736,7 +749,7 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
+ 		return;
  
-@@ -2438,9 +2451,21 @@ static void net_rx(void *net_ptr, void *user_data)
- 		rssi = data->info->rssi;
+ 	if (!reset_gpio) {
+-		bt_dev_err(hdev, "No gpio to reset Realtek device, ignoring");
++		generic_usb_reset(hdev, data);
+ 		return;
  	}
  
--	relay_advice = packet_received(net, net_key_id, iv_index, out, out_size,
--									rssi);
-+	net_idx = key_id_to_net_idx(net, net_key_id, &frnd);
-+
-+	if (net_idx == NET_IDX_INVALID)
-+		return;
-+
-+	relay_advice = packet_received(net, net_key_id, net_idx, frnd,
-+						iv_index, out, out_size, rssi);
- 	if (relay_advice > data->relay_advice) {
-+		/*
-+		 * If packet was encrypted with friendship credentials,
-+		 * relay it using master credentials
-+		 */
-+		if (frnd && !mesh_net_get_key(net, false, net_idx, &net_key_id))
-+			return;
-+
- 		data->iv_index = iv_index;
- 		data->relay_advice = relay_advice;
- 		data->net_key_id = net_key_id;
+@@ -761,7 +774,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	struct gpio_desc *reset_gpio = data->reset_gpio;
+-	int err;
+ 
+ 	if (++data->cmd_timeout_cnt < 5)
+ 		return;
+@@ -787,13 +799,7 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+ 		return;
+ 	}
+ 
+-	bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
+-	/* This is not an unbalanced PM reference since the device will reset */
+-	err = usb_autopm_get_interface(data->intf);
+-	if (!err)
+-		usb_queue_reset_device(data->intf);
+-	else
+-		bt_dev_err(hdev, "Failed usb_autopm_get_interface with %d", err);
++	generic_usb_reset(hdev, data);
+ }
+ 
+ static inline void btusb_free_frags(struct btusb_data *data)
 -- 
-2.20.1
-
-
-
-
+2.38.0.rc1.362.ged0d419d3c-goog
 
