@@ -2,113 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C2FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 09:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D8EAC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 09:25:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229514AbiJEJTV (ORCPT
+        id S229463AbiJEJZN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 05:19:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51700 "EHLO
+        Wed, 5 Oct 2022 05:25:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbiJEJTU (ORCPT
+        with ESMTP id S229453AbiJEJZM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 05:19:20 -0400
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7BB656A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 02:19:19 -0700 (PDT)
-Received: by mail-oo1-xc2c.google.com with SMTP id d22-20020a4a5216000000b0047f740d5847so1163004oob.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Oct 2022 02:19:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=umkKlpCWJ7eiUXwONOj1ulEJlrhnG5OW2poM3HB8+Jw=;
-        b=TXo3ha/Au0Mqj8YNOgO3YvYhQlEHyNz8g1qnTmHOqC1XwwUtnIVTy9HiLD5g/SCM5e
-         3DMo1tX3Q79zcM1Bl1yHKpi0wqcxhHjUFBaSKv3uYMfb30sh4H9+1gfEq/rIhWBXg1Aw
-         trgHJTY3aGaIV+ev2wendg/Iqjwhyb398EkU124ikfcmYU4x04PsuaQdN4yceOF+UsL+
-         bCR6oAj95ABCqA5AcXvkRiaQHZAp97K+LG8VBBHXwpxMp0KjIjy8VgmAmrm/w/jcF5sO
-         ImxnEdTnXGxEAt0RUgHmA2o/66NbsbtvvI8XU/jA9bapjdKvhGsoD+wOYUikznf6d7uM
-         Narg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=umkKlpCWJ7eiUXwONOj1ulEJlrhnG5OW2poM3HB8+Jw=;
-        b=LsmHAbsyt7QBtaPpGknQCo6d6ZhDbk/FsEwbcyhEHDyCvT7fi3LM7ceRKjRZYXlcOV
-         rJ8DEWOHZS9GVC4ooevLhpKtdTA/4imZ4upqXtYuome8Vt6bzqEugUY1ehZQVZXX7+rU
-         tTobPBMicXPJLdyqNADYxaCaCtxv2ZJ5R0y6VfMbFuPMMm2L9j1mBAHIPG8onINxbimX
-         4JQVzPg9gGYSH/xAAo1B2DbqHmTeWXxmhqr6/3IVB/vqXN5VmMXxJqvqfmx4CmOXmx98
-         xyyKwgkla2aMCB9nYZ3NRDM4/HmLu04HCYdUo1lkEipYy6nyg497whxV6B0EMycWIWJU
-         XFVA==
-X-Gm-Message-State: ACrzQf31CiUT6jnrecNXV3eca4GRuZWzD6b8Aq70hOTWGefnCo2zsao6
-        +i9aTUQ78wuUWd+hAx2pC5QkJVU9bU0=
-X-Google-Smtp-Source: AMsMyM4SsUz5+jEPoofWOxNxvbC5OUpeLQwTLp0agXbha91coP1HWo7PFnULJOf4Pyyk3IsAk9ywow==
-X-Received: by 2002:a05:6830:10a:b0:656:a5fe:d7b4 with SMTP id i10-20020a056830010a00b00656a5fed7b4mr11628072otp.275.1664961558340;
-        Wed, 05 Oct 2022 02:19:18 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.61.98])
-        by smtp.gmail.com with ESMTPSA id a18-20020a544e12000000b00339befdfad0sm4002106oiy.50.2022.10.05.02.19.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 02:19:18 -0700 (PDT)
-Message-ID: <633d4c16.540a0220.78492.b49d@mx.google.com>
-Date:   Wed, 05 Oct 2022 02:19:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7544297312603836201=="
+        Wed, 5 Oct 2022 05:25:12 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [217.72.192.74])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D03C186E9
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 02:25:10 -0700 (PDT)
+Received: from [192.168.0.243] ([151.127.53.97]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MC2wN-1oTeht0IKD-00COc1; Wed, 05 Oct 2022 11:25:08 +0200
+Message-ID: <2e7025f4-e63c-070a-08e0-a1fb2469ee49@green-communications.fr>
+Date:   Wed, 5 Oct 2022 11:25:01 +0200
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hildawu@realtek.com
-Subject: RE: Bluetooth: Add btrealtek data struct and improve SCO sound quality of RTK chips
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221005084331.1001-2-hildawu@realtek.com>
-References: <20221005084331.1001-2-hildawu@realtek.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.0
+Subject: Re: [PATCH] Bluetooth: Work around SCO over USB HCI design defect
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+References: <20221004145351.13066-1-nicolas.cavallari@green-communications.fr>
+ <CABBYNZJwti_jYq2ctGfgAeh3OS5ed7WqxwBhPhoxrL51Cciy2w@mail.gmail.com>
+Content-Language: fr, en-US
+From:   Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+In-Reply-To: <CABBYNZJwti_jYq2ctGfgAeh3OS5ed7WqxwBhPhoxrL51Cciy2w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:YkOrtBntXcJzOX0Zy8PENSu654ENjI50ZW/oo9sEBItFpg3wCZI
+ mfV3O494TpKNSf/Gy9L8QXeglzlSF4rruBiC/i24T3Mxb/aXULQsEDsdwcVEhSKfXIDEeNg
+ 7IRV9cKgnaI7YkihpC0AYARBEUtb7qzzQX5Kc0fZlHPRB7mbHHdJxcUR1TSlMqwOZYvd6wj
+ /QBXxGok3pwQB0aSjSzGA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:c3OMEzfxFs8=:v5/Dv4+1wCjCp589GGHga1
+ 74+5td5MDFSCyYjQqHoT3m6sRa+0wdZZzkdg9L9gJY94HsZ8nKr3zvzfJYQcl4+149Q5PPO4H
+ EzZ03QTW7yWrkBw2s3oBtgjBwJVAEBDkkZe2CfLhHKSyeZ10TcPDS1UcvJZ+eZp61W1TMmc0m
+ fWol+2V7CK0ghqed4DoWxkPuVcRdRiMgp7HRAJOLM212pGcSeJD8F3G6pOsgw6Hu1Fn9DxmFI
+ QG6vYo0S9TCzn8nqXVDrjiBHQN6PQ8BQ97Nrx3/+D2eNYkQVI8lk8wV5zNQe8JvMfIUwmd2VT
+ r4G9L5Pzx6IlqZVDiXpKvELo0ntkycboCYPyYwm/Dehfe0onj2u0/0XI6KlGc79skLlHf7A3G
+ 4vhaGeXbAGk3Zc0USfX23CTh1PRgjRT5mZz+n3ChVhzmXjpBiGvYaAOrKMQcF5IKrCCnCslVl
+ 9NS+mPRsPN8tuxEQ1EhymnFL6gxljWZUPuE+gHYy1Wr56cOdBnsmVWL0GtEvz8a/2OLY7F6jo
+ WqSvzZI0As7abXKE3MfZhhkoZBSksnAeKsw+2ZHooYShkVsJKvFb2lry1Dz7bHNQXbZuBE5uu
+ XEXMnVZoF3yKIgPQAuhVEbyKlUYduJykSJAM6D4UDIpwyUaCRaYCCpg2MS+BaLFneGgYq4yzC
+ fsuw0GR4I5fAeqJJk+JMxyzHL26xRIfSeESGjp5pInnoF3R4JHA/dWQaSWW1FiC/7sHCNjgyO
+ /4MgYMZt3Tgv8o2UgnaXmRm+zaxvtsQrOSlfqfWxt63N7Aaed3Bn4bt/Af2jIf+ukuMzzfVvl
+ 94k7NbxzCYTWj4QLAemoJWzOct5adjbAPoHFTtmS2TBu8RvdOg=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7544297312603836201==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 05/10/2022 01:46, Luiz Augusto von Dentz wrote:
+> Hi Nicolas,
+> 
+> On Tue, Oct 4, 2022 at 7:54 AM Nicolas Cavallari
+> <nicolas.cavallari@green-communications.fr> wrote:
+>>
+>> The USB interface between the host and the bluetooth adapter used for
+>> SCO packets uses an USB isochronous endpoint with a fragmentation scheme
+>> that does not tolerate errors.  Except USB isochronous transfers do
+>> not provide a reliable stream with guaranteed delivery. (There is no
+>> retry on error, see USB spec v2.0 5.6 and 8.5.5.)
+>>
+>> To fragment a packet, the bluetooth HCI simply splits it in parts and
+>> transfer them as-is.  The receiver is expected to reconstruct the packet
+>> by assuming the first fragment contains the header and parsing its size
+>> field.  There is no error detection either.
+>>
+>> If a fragment is lost, the end result is that the kernel is no longer
+>> synchronized and will pass malformed data to the upper layers, since it
+>> has no way to tell if the first fragment is an actual first fragment or
+>> a continuation fragment.  Resynchronization can only happen by luck and
+>> requires an unbounded amount of time.
+>>
+>> The typical symptom for a HSP/HFP bluetooth headset is that the
+>> microphone stops working and dmesg contains piles of rate-limited
+>> "Bluetooth: hci0: SCO packet for unknown connection handle XXXX"
+>> errors for an indeterminate amount of time, until the kernel accidentally
+>> resynchronize.
+>>
+>> A workaround is to ask the upper layer to prevalidate the first fragment
+>> header.  This is not possible with user channels so this workaround is
+>> disabled in this case.
+>>
+>> This problem is the most severe when using an ath3k adapter on an i.MX 6
+>> board, where packet loss occur regularly, possibly because it is an USB1
+>> device connected on an USB2 hub and this is a special case requiring
+>> split transactions.
+> 
+> Interesting, but does this actually make it work if with the packet losses?
 
-This is automated email and please do not reply to this email!
+All userspace hsp/hfp implementations have packet loss concealment, I 
+think, so they can tolerate losing one or two packets there and there. 
+In any case it is much more usable than before. Without this patch, the 
+number of packet lost is in the 10-1000 range and it is much harder to 
+conceal that.
 
-Dear submitter,
+With this patch, given this sequence 01230123, if the first fragment (0) 
+is lost, then only one packet is lost. If anything else than the first 
+fragment, say (2) is lost, then 0130 is forwarded to the upper layer and 
+  the remaining 123 is dropped.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683169
+With my ath3k I see that dropped fragments are replaced by zero-length 
+fragments. I have a patch that treats zero-length fragments as an error 
+and drops the current packet when it occurs, but I can't be certain that 
+this won't cause any regression for other adapters, so didn't submit it.
 
----Test result---
+>> [...]
+>>
+>> +static inline bool hci_conn_prevalidate_sco_hdr(struct hci_dev *hdev,
+>> +                                               struct hci_sco_hdr *hdr)
+>> +{
+>> +       __u16 handle;
+>> +
+>> +       if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
+>> +               // Can't validate, userspace controls everything.
+>> +               return true;
+>> +
+>> +       handle = hci_handle(__le16_to_cpu(hdr->handle));
+>> +
+>> +       switch (hci_conn_lookup_type(hdev, handle)) {
+>> +       case SCO_LINK:
+>> +       case ESCO_LINK:
+>> +               return true;
+>> +       default:
+>> +               return false;
+>> +       }
+>> +}
+> 
+> Don't really like to have this in hci_core.h, it is sort of messy
+> already beside this is probably too specific to USB so I'd go with
+> something like btusb_validate_sco_handle and add a comment explaining
+> why this is necessary.
 
-Test Summary:
-CheckPatch                    PASS      3.08 seconds
-GitLint                       FAIL      1.68 seconds
-SubjectPrefix                 PASS      1.21 seconds
-BuildKernel                   PASS      39.08 seconds
-BuildKernel32                 PASS      35.06 seconds
-Incremental Build with patchesPASS      58.68 seconds
-TestRunner: Setup             PASS      581.82 seconds
-TestRunner: l2cap-tester      PASS      19.08 seconds
-TestRunner: iso-tester        PASS      19.65 seconds
-TestRunner: bnep-tester       PASS      7.43 seconds
-TestRunner: mgmt-tester       PASS      118.61 seconds
-TestRunner: rfcomm-tester     PASS      11.81 seconds
-TestRunner: sco-tester        PASS      10.97 seconds
-TestRunner: ioctl-tester      PASS      12.64 seconds
-TestRunner: smp-tester        PASS      10.99 seconds
-TestRunner: userchan-tester   PASS      7.79 seconds
+Will move that into btusb.c then.
 
-Details
-##############################
-Test: GitLint - FAIL - 1.68 seconds
-Run gitlint with rule in .gitlint
-[v4,2/2] Bluetooth: btusb: Ignore zero length of USB packets on ALT 6 for specific chip
-1: T1 Title exceeds max length (87>80): "[v4,2/2] Bluetooth: btusb: Ignore zero length of USB packets on ALT 6 for specific chip"
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7544297312603836201==--
