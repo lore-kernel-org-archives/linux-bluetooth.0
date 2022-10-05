@@ -2,30 +2,30 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA6DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 08:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBF84C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 08:43:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229994AbiJEInx (ORCPT
+        id S230082AbiJEIny (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 04:43:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48016 "EHLO
+        Wed, 5 Oct 2022 04:43:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229814AbiJEInt (ORCPT
+        with ESMTP id S229530AbiJEInt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 5 Oct 2022 04:43:49 -0400
 Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7BA1A754A2;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8CAC774DCD;
         Wed,  5 Oct 2022 01:43:47 -0700 (PDT)
 Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 2958h9fL5022996, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36504.realtek.com.tw[172.21.6.27])
-        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 2958h9fL5022996
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 2958h9Zz9022992, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 2958h9Zz9022992
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
         Wed, 5 Oct 2022 16:43:09 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36504.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 5 Oct 2022 16:43:37 +0800
+ 15.1.2375.31; Wed, 5 Oct 2022 16:43:36 +0800
 Received: from localhost.localdomain (172.21.132.192) by
  RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -37,12 +37,10 @@ CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
         <apusaka@chromium.org>, <yinghsu@chromium.org>,
         <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
         <kidman@realtek.com>
-Subject: [PATCH v4 1/2] Bluetooth: btrtl: Add btrealtek data struct
-Date:   Wed, 5 Oct 2022 16:43:30 +0800
-Message-ID: <20221005084331.1001-2-hildawu@realtek.com>
+Subject: [PATCH v4 0/2] Bluetooth: Add btrealtek data struct and improve SCO sound quality of RTK chips
+Date:   Wed, 5 Oct 2022 16:43:29 +0800
+Message-ID: <20221005084331.1001-1-hildawu@realtek.com>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20221005084331.1001-1-hildawu@realtek.com>
-References: <20221005084331.1001-1-hildawu@realtek.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [172.21.132.192]
@@ -59,84 +57,48 @@ X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
 X-KSE-Antivirus-Interceptor-Info: scan successful
 X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzEwLzUgpFekyCAwMjo1OTowMA==?=
 X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36504.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Hilda Wu <hildawu@realtek.com>
 
-This patch adds a data structure for btrealtek object, and the
-definition of vendor behavior flags. It also adds macros to set/test/get
-the flags.
+Add btrealtek data struct and use definition of vendor flags to manage
+the specific chip.
 
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+The Bluetooth: btusb: Ignore zero length of USB packets on ALT 6 for
+specific chip need to transmit mSBC data continuously without the
+zero length of USB packets.
+
 ---
 Changes in v4:
  - Since the original 0002 patch has no dependency with this 0001 patch.
-   So let the 0002 patch submit another.
+   So let the 0002 patch submit independent.
 
 Changes in v3:
- - Update private flag.
+ - Use the vendor function to replace btus_recv_isoc.
+ - For ignore_usb_alt6_packet_flow, manage the common flag by the vendor private flag.
 
 Changes in v2:
  - Set the proper priv_size to hci_alloc_dev_priv().
  - Separate commits for functions.
 ---
----
- drivers/bluetooth/btrtl.h | 21 +++++++++++++++++++++
- drivers/bluetooth/btusb.c |  3 +++
- 2 files changed, 24 insertions(+)
+Thank you for your review and suggestions.
 
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index 2c441bda390a..ebf0101c959b 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -47,6 +47,27 @@ struct rtl_vendor_config {
- 	struct rtl_vendor_config_entry entry[];
- } __packed;
- 
-+enum {
-+	REALTEK_ALT6_CONTINUOUS_TX_CHIP,
-+
-+	__REALTEK_NUM_FLAGS,
-+};
-+
-+struct btrealtek_data {
-+	DECLARE_BITMAP(flags, __REALTEK_NUM_FLAGS);
-+};
-+
-+#define btrealtek_set_flag(hdev, nr)					\
-+	do {								\
-+		struct btrealtek_data *realtek = hci_get_priv((hdev));	\
-+		set_bit((nr), realtek->flags);				\
-+	} while (0)
-+
-+#define btrealtek_get_flag(hdev)					\
-+	(((struct btrealtek_data *)hci_get_priv(hdev))->flags)
-+
-+#define btrealtek_test_flag(hdev, nr)	test_bit((nr), btrealtek_get_flag(hdev))
-+
- #if IS_ENABLED(CONFIG_BT_RTL)
- 
- struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 271963805a38..4243936c0583 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3755,6 +3755,9 @@ static int btusb_probe(struct usb_interface *intf,
- 		/* Override the rx handlers */
- 		data->recv_event = btusb_recv_event_intel;
- 		data->recv_bulk = btusb_recv_bulk_intel;
-+	} else if (id->driver_info & BTUSB_REALTEK) {
-+		/* Allocate extra space for Realtek device */
-+		priv_size += sizeof(struct btrealtek_data);
- 	}
- 
- 	data->recv_acl = hci_recv_frame;
+Hilda Wu (2):
+  Bluetooth: btrtl: Add btrealtek data struct
+  Bluetooth: btsub: Ignore zero length of USB packets on ALT 6 for
+    specific chip
+
+ drivers/bluetooth/btrtl.c |  7 +++++++
+ drivers/bluetooth/btrtl.h | 21 +++++++++++++++++++++
+ drivers/bluetooth/btusb.c | 28 ++++++++++++++++++++++++++--
+ 3 files changed, 54 insertions(+), 2 deletions(-)
+
 -- 
 2.17.1
 
