@@ -2,85 +2,200 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D148C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 05:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC347C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 06:44:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229871AbiJEFbf (ORCPT
+        id S229724AbiJEGoG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 01:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51148 "EHLO
+        Wed, 5 Oct 2022 02:44:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiJEFbe (ORCPT
+        with ESMTP id S229608AbiJEGoF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 01:31:34 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 420A3659FA
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Oct 2022 22:31:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D5A66155F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 05:31:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 05A5EC433C1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 05:31:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1664947892;
-        bh=ZEvwCP8NnfTOxRnSmt3fDY6zI4R9umCFfIY/R2Yusfo=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ZOD+reDpEstbQ4MzwSf+DIL0cNvJEJn+IHd9+Tu/q3Nvywv8NNHGOE8dLq5xQMkHg
-         vPU74jPA+X2bHNWD6OkK63iZc6YOx/PNR2ULtsE722UQ2zp5KNGCdRhyFEIbupn137
-         46XHzLo4GvaoGmN2wo9y36qSd33W3RszzWw1x7U4ZQWxW/+uEmyhovGBnqszRSzMES
-         ds3gR9Tni0/YhqENjPQQQO9M5ae2vKXxC5/XxqEwRkwtzWK+JCCabGKWH+hnUmVwkG
-         h/RVuReEhJrJlxRVS3IObvmUdsB2B1mZP+GpF08AeNWtJfBF17YTvlLXS2x15mog8l
-         Y4WrohqKMSSoQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D9DF9C433E6; Wed,  5 Oct 2022 05:31:31 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216532] openSUSE Tumbleweed, AX210, bluetooth, connection fails
-Date:   Wed, 05 Oct 2022 05:31:31 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: epistemepromeneur@free.fr
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: CODE_FIX
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-216532-62941-uOn7exOo5F@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216532-62941@https.bugzilla.kernel.org/>
-References: <bug-216532-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 5 Oct 2022 02:44:05 -0400
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4852065256
+        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Oct 2022 23:44:04 -0700 (PDT)
+Received: by mail-qt1-x830.google.com with SMTP id a25so491694qtw.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Oct 2022 23:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date;
+        bh=gY5AbX7M1j37Hq5yd7r3xMcaFoABrkHiHudnF2ZVA9g=;
+        b=Ot0HusIhlbu/R0cyE0zYoUJOHdl4uPBd89Eeeha2fz8nbt0ivP+7WZWih5tGSLWpBi
+         vP8XUJEqmuXC0wfB+ZUKzpDAAB4iDHpwRmVa1XJv2XdktllTDH+0RkLfRpl24Df8lo0L
+         2iRFWPfo26MXWs5k52UDJzRNOobaI91y8yeppJoQi4hHaOTT6Ja/rl0kERA9HSvqu65D
+         RSKwffM18bxRFuhLhY2EewGHzf+v2MR6KLpFb3I9B5B1M2dYaCRr4hNfC68QwkPZ14Bu
+         13Ifm5ycCzUYQ5ey/ZEWyF5qZH4d/39Chv37EosODK4Ebgtvt40jtIWdHmHmewOzDi6L
+         /2xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date;
+        bh=gY5AbX7M1j37Hq5yd7r3xMcaFoABrkHiHudnF2ZVA9g=;
+        b=gGX8/vlSYXqEtlNDNwmNw+KVVHjQDRrScS3D5k0REgGdzvmKXT0vohbt5+opdyDmk5
+         wQlv2W6iWpYjeo5Q/cDSp2e3q8HtupTiE3aGE8B3fAJb1fepalsotXTYA3mB/pSGr31v
+         /kYjtFUm8gVIe/m/WQ03gz714sm4idPJlq5xChMo2h7vZiHi+FQl7NKyaBpHxcSfipFi
+         q0EdZ2+a4pQrH3010YTiMM+11hwEJfzz+GEkJC5eT/Ig1jufOMOnNuyApETVW5F2Qb6Z
+         SlkZpYjp+H0AvsaNuhUaCc6oOjneq7h/vXD1CfAMDx9rVtwuHBt+KLEKktbKlb+jOzqK
+         PRSA==
+X-Gm-Message-State: ACrzQf0tPMjhOzxiCQh+dzx1zgjiYh46bCFY92cVmFJOm0HuF0sjVCxL
+        c9i1criotm/AFbFDkrRfu1qGZ7OBas6vx6M90DSfow==
+X-Google-Smtp-Source: AMsMyM7+GfuU/rU6V/eza86++pTvyFdHgcHHBJYc3OaM2SElYiMFMyR4/dnQUNQWbxzM6MzY1uJDNmd7ABEhOY646Mw=
+X-Received: by 2002:ac8:588c:0:b0:35b:b351:f470 with SMTP id
+ t12-20020ac8588c000000b0035bb351f470mr22778816qta.42.1664952243143; Tue, 04
+ Oct 2022 23:44:03 -0700 (PDT)
 MIME-Version: 1.0
+References: <20221004163224.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
+ <CABBYNZ+M5KqVvzOT4LjVR2ZzF1cxCxYtJnMLS89ke48FyErjzg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+M5KqVvzOT4LjVR2ZzF1cxCxYtJnMLS89ke48FyErjzg@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Wed, 5 Oct 2022 14:43:51 +0800
+Message-ID: <CAJQfnxF9iMeO+CR3p5hbVP=2wDMzp-6DgOCzyMNXPYH_8gYXuw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Introduce generic USB reset
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@google.com>,
+        Ying Hsu <yinghsu@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216532
+Hi Luiz,
 
-epistemepromeneur@free.fr changed:
+On Wed, 5 Oct 2022 at 04:53, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Tue, Oct 4, 2022 at 1:33 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > On cmd_timeout and there is no reset_gpio, reset the USB port as a
+> > last resort.
+> >
+> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
+> > Reviewed-by: Ying Hsu <yinghsu@chromium.org>
+> >
+> > ---
+> >
+> >  drivers/bluetooth/btusb.c | 26 ++++++++++++++++----------
+> >  1 file changed, 16 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 271963805a38..11040124ef79 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -696,6 +696,19 @@ struct btusb_data {
+> >         unsigned cmd_timeout_cnt;
+> >  };
+> >
+> > +static void generic_usb_reset(struct hci_dev *hdev, struct btusb_data *data)
+> > +{
+> > +       int err;
+> > +
+> > +       bt_dev_err(hdev, "Resetting usb device.");
+> > +       /* This is not an unbalanced PM reference since the device will reset */
+> > +       err = usb_autopm_get_interface(data->intf);
+> > +       if (!err)
+> > +               usb_queue_reset_device(data->intf);
+> > +       else
+> > +               bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
+>
+> Lets just have one line printed if it fails:
+>
+> err = usb_autopm_get_interface(data->intf);
+> if (err) {
+>         bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
+>         return;
+> }
+>
+> bt_dev_err(hdev, "Resetting usb device.");
+> usb_queue_reset_device(data->intf);
+>
+OK, will update
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEEDINFO                    |RESOLVED
-         Resolution|---                         |CODE_FIX
+> > +}
+> > +
+> >  static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+> >  {
+> >         struct btusb_data *data = hci_get_drvdata(hdev);
+> > @@ -705,7 +718,7 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
+> >                 return;
+> >
+> >         if (!reset_gpio) {
+> > -               bt_dev_err(hdev, "No way to reset. Ignoring and continuing");
+> > +               generic_usb_reset(hdev, data);
+>
+> Lets call it btusb_reset since this is specific for the data->intf,
+> btw is this safe, or perhaps we want to refactor this to have it
+> callback based so each vendor can add it own specific hdev->reset
+> callback hardware reset with btusb_reset serving as default callback?
 
---- Comment #12 from epistemepromeneur@free.fr ---
-There is some progress. with the kernel 5.19.12, at the PC i can connect the
-smartphone
+OK. I think this is safe at least for now, since resetting btusb is
+probably better than just giving up doing nothing.
+But I can add hdev->reset if that is desirable.
 
---=20
-You may reply to this email to add a comment.
+> Also the logic of btusb_intel_cmd_timeout should probably be put
+> inside btintel.c and I don't think we need the gpio_desc reference to
+> be inside the btusb_data since we can call gpiod_get_optional during
+> the reset phase and immediately do gpiod_put after done using it.
+>
+I am not familiar with this part.
+Perhaps it's better for this to be managed by another patch, since it
+is not the focus of this patch?
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+> >                 return;
+> >         }
+> >
+> > @@ -736,7 +749,7 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
+> >                 return;
+> >
+> >         if (!reset_gpio) {
+> > -               bt_dev_err(hdev, "No gpio to reset Realtek device, ignoring");
+> > +               generic_usb_reset(hdev, data);
+> >                 return;
+> >         }
+> >
+> > @@ -761,7 +774,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+> >  {
+> >         struct btusb_data *data = hci_get_drvdata(hdev);
+> >         struct gpio_desc *reset_gpio = data->reset_gpio;
+> > -       int err;
+> >
+> >         if (++data->cmd_timeout_cnt < 5)
+> >                 return;
+> > @@ -787,13 +799,7 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
+> >                 return;
+> >         }
+> >
+> > -       bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
+> > -       /* This is not an unbalanced PM reference since the device will reset */
+> > -       err = usb_autopm_get_interface(data->intf);
+> > -       if (!err)
+> > -               usb_queue_reset_device(data->intf);
+> > -       else
+> > -               bt_dev_err(hdev, "Failed usb_autopm_get_interface with %d", err);
+> > +       generic_usb_reset(hdev, data);
+> >  }
+> >
+> >  static inline void btusb_free_frags(struct btusb_data *data)
+> > --
+> > 2.38.0.rc1.362.ged0d419d3c-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+Cheers,
+Archie
