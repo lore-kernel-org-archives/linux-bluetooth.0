@@ -2,200 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC347C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 06:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0ABC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 07:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229724AbiJEGoG (ORCPT
+        id S229605AbiJEHKC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 02:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
+        Wed, 5 Oct 2022 03:10:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiJEGoF (ORCPT
+        with ESMTP id S229495AbiJEHJ6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 02:44:05 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4852065256
-        for <linux-bluetooth@vger.kernel.org>; Tue,  4 Oct 2022 23:44:04 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id a25so491694qtw.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 04 Oct 2022 23:44:04 -0700 (PDT)
+        Wed, 5 Oct 2022 03:09:58 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC11BCE2D
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 00:09:55 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id h4-20020a5b02c4000000b006bc192d672bso15485067ybp.22
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Oct 2022 00:09:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date;
-        bh=gY5AbX7M1j37Hq5yd7r3xMcaFoABrkHiHudnF2ZVA9g=;
-        b=Ot0HusIhlbu/R0cyE0zYoUJOHdl4uPBd89Eeeha2fz8nbt0ivP+7WZWih5tGSLWpBi
-         vP8XUJEqmuXC0wfB+ZUKzpDAAB4iDHpwRmVa1XJv2XdktllTDH+0RkLfRpl24Df8lo0L
-         2iRFWPfo26MXWs5k52UDJzRNOobaI91y8yeppJoQi4hHaOTT6Ja/rl0kERA9HSvqu65D
-         RSKwffM18bxRFuhLhY2EewGHzf+v2MR6KLpFb3I9B5B1M2dYaCRr4hNfC68QwkPZ14Bu
-         13Ifm5ycCzUYQ5ey/ZEWyF5qZH4d/39Chv37EosODK4Ebgtvt40jtIWdHmHmewOzDi6L
-         /2xA==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date;
+        bh=0kv7LZbwVvvTCY0FDOB7BWqbGQ4uCTTTGBzanUoZ/5c=;
+        b=FxjCN8MEoO/P7TtrDCci6qecuNe+mYvoZwwIqXh+ZFVTP9pYumPENqeRRVX1V57FGt
+         VmIhuBShQ85+xuhfo0OJnvaY6jh6xm1uotVlGCTndMdcs7UCmW1WAr0h4F70uMgWMuHH
+         k3Nk+0Q+JLMBV1jELcfeZ78+i74EuDU/xV6DFKsThsGjRsnecnMWhQS44hlzs+JMVg8x
+         9C6f7nQYTmLbYrhnzMUnkSV/gp2YYiGbRQULv4uG6DMgfHXzMUFsn/AVzv7c/JJdPDPv
+         L818cWJ9KOkXTuoXzFyaVhbpFcknI8CnlKiAI7vw+KTQPs6JtDBYUwqXOMHPg2V1MIwK
+         mMMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date;
-        bh=gY5AbX7M1j37Hq5yd7r3xMcaFoABrkHiHudnF2ZVA9g=;
-        b=gGX8/vlSYXqEtlNDNwmNw+KVVHjQDRrScS3D5k0REgGdzvmKXT0vohbt5+opdyDmk5
-         wQlv2W6iWpYjeo5Q/cDSp2e3q8HtupTiE3aGE8B3fAJb1fepalsotXTYA3mB/pSGr31v
-         /kYjtFUm8gVIe/m/WQ03gz714sm4idPJlq5xChMo2h7vZiHi+FQl7NKyaBpHxcSfipFi
-         q0EdZ2+a4pQrH3010YTiMM+11hwEJfzz+GEkJC5eT/Ig1jufOMOnNuyApETVW5F2Qb6Z
-         SlkZpYjp+H0AvsaNuhUaCc6oOjneq7h/vXD1CfAMDx9rVtwuHBt+KLEKktbKlb+jOzqK
-         PRSA==
-X-Gm-Message-State: ACrzQf0tPMjhOzxiCQh+dzx1zgjiYh46bCFY92cVmFJOm0HuF0sjVCxL
-        c9i1criotm/AFbFDkrRfu1qGZ7OBas6vx6M90DSfow==
-X-Google-Smtp-Source: AMsMyM7+GfuU/rU6V/eza86++pTvyFdHgcHHBJYc3OaM2SElYiMFMyR4/dnQUNQWbxzM6MzY1uJDNmd7ABEhOY646Mw=
-X-Received: by 2002:ac8:588c:0:b0:35b:b351:f470 with SMTP id
- t12-20020ac8588c000000b0035bb351f470mr22778816qta.42.1664952243143; Tue, 04
- Oct 2022 23:44:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221004163224.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
- <CABBYNZ+M5KqVvzOT4LjVR2ZzF1cxCxYtJnMLS89ke48FyErjzg@mail.gmail.com>
-In-Reply-To: <CABBYNZ+M5KqVvzOT4LjVR2ZzF1cxCxYtJnMLS89ke48FyErjzg@mail.gmail.com>
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date;
+        bh=0kv7LZbwVvvTCY0FDOB7BWqbGQ4uCTTTGBzanUoZ/5c=;
+        b=d2bXhtRvrRMNZG97WmiUPMG56aC8cVjhRSFjp236gTVoLczIaUuIVAAHHdlD0v+Het
+         5q205UuGAWk7NY5gBFkJ1Q2LCjha7l/4ynt7G1bPeSiK9SBWr7nr69fpVDaCcMyjncLo
+         aVHf74ktRuxah11WpsPmsu+QjnoHONJzqm3IF0tIDiQorHhAHDAQF2H5ffCXiZu5S92a
+         8HXmp6o1BRftfPfmhmR+W+gZX7E76j+aHxsQXMwLQ6tI5z0+cJTqro/9L41w+eyegsOK
+         L7Ht5yNqD698vU6qzWVPN8Azp9iQ5aP+dTeZakf0+09S57uSLo7Hbb7ngL6lOOYVwlx4
+         3dlg==
+X-Gm-Message-State: ACrzQf0KqNNSzefHb6oMWTrC+K5L9m7MOO5cSh1q2kqEha96Ro2FfObh
+        LRzeQFhCdyPWxok+oHhWfVfw1GRp2uAJCssILBv13p85D6OqAWb3Gdm/ioyRq/iOuVX9NqFU6cv
+        5CsAn4OxzWdmkxADZGmWVISEsB1LNUo4qMT87PuHopAjob7yoL12NgxgV/u8hVdmD2Aa+HG2pBP
+        rW
+X-Google-Smtp-Source: AMsMyM5G6SbVAJC0wRlFyL/5sIT96s+VNQjdmgANHz/PRa0/bVmVUatteDEjIeuOfCNl1UZWWA+w/88KYR5e
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:499:ff69:2084:388d])
+ (user=apusaka job=sendgmr) by 2002:a05:6902:1083:b0:6b1:4a11:9cf5 with SMTP
+ id v3-20020a056902108300b006b14a119cf5mr29727673ybu.537.1664953794404; Wed,
+ 05 Oct 2022 00:09:54 -0700 (PDT)
+Date:   Wed,  5 Oct 2022 15:09:47 +0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
+Message-ID: <20221005150934.1.Ife932473db2eec6f0bc54226c3328e5fa8c5f97b@changeid>
+Subject: [PATCH] Bluetooth: hci_sync: cancel cmd_timer if hci_open failed
 From:   Archie Pusaka <apusaka@google.com>
-Date:   Wed, 5 Oct 2022 14:43:51 +0800
-Message-ID: <CAJQfnxF9iMeO+CR3p5hbVP=2wDMzp-6DgOCzyMNXPYH_8gYXuw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Introduce generic USB reset
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
         Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-        Ying Hsu <yinghsu@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Archie Pusaka <apusaka@chromium.org>
 
-On Wed, 5 Oct 2022 at 04:53, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Tue, Oct 4, 2022 at 1:33 AM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > From: Archie Pusaka <apusaka@chromium.org>
-> >
-> > On cmd_timeout and there is no reset_gpio, reset the USB port as a
-> > last resort.
-> >
-> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
-> > Reviewed-by: Ying Hsu <yinghsu@chromium.org>
-> >
-> > ---
-> >
-> >  drivers/bluetooth/btusb.c | 26 ++++++++++++++++----------
-> >  1 file changed, 16 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 271963805a38..11040124ef79 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -696,6 +696,19 @@ struct btusb_data {
-> >         unsigned cmd_timeout_cnt;
-> >  };
-> >
-> > +static void generic_usb_reset(struct hci_dev *hdev, struct btusb_data *data)
-> > +{
-> > +       int err;
-> > +
-> > +       bt_dev_err(hdev, "Resetting usb device.");
-> > +       /* This is not an unbalanced PM reference since the device will reset */
-> > +       err = usb_autopm_get_interface(data->intf);
-> > +       if (!err)
-> > +               usb_queue_reset_device(data->intf);
-> > +       else
-> > +               bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
->
-> Lets just have one line printed if it fails:
->
-> err = usb_autopm_get_interface(data->intf);
-> if (err) {
->         bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
->         return;
-> }
->
-> bt_dev_err(hdev, "Resetting usb device.");
-> usb_queue_reset_device(data->intf);
->
-OK, will update
+If a command is already sent, we take care of freeing it, but we
+also need to cancel the timeout as well.
 
-> > +}
-> > +
-> >  static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
-> >  {
-> >         struct btusb_data *data = hci_get_drvdata(hdev);
-> > @@ -705,7 +718,7 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
-> >                 return;
-> >
-> >         if (!reset_gpio) {
-> > -               bt_dev_err(hdev, "No way to reset. Ignoring and continuing");
-> > +               generic_usb_reset(hdev, data);
->
-> Lets call it btusb_reset since this is specific for the data->intf,
-> btw is this safe, or perhaps we want to refactor this to have it
-> callback based so each vendor can add it own specific hdev->reset
-> callback hardware reset with btusb_reset serving as default callback?
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
 
-OK. I think this is safe at least for now, since resetting btusb is
-probably better than just giving up doing nothing.
-But I can add hdev->reset if that is desirable.
+---
 
-> Also the logic of btusb_intel_cmd_timeout should probably be put
-> inside btintel.c and I don't think we need the gpio_desc reference to
-> be inside the btusb_data since we can call gpiod_get_optional during
-> the reset phase and immediately do gpiod_put after done using it.
->
-I am not familiar with this part.
-Perhaps it's better for this to be managed by another patch, since it
-is not the focus of this patch?
+ net/bluetooth/hci_sync.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> >                 return;
-> >         }
-> >
-> > @@ -736,7 +749,7 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
-> >                 return;
-> >
-> >         if (!reset_gpio) {
-> > -               bt_dev_err(hdev, "No gpio to reset Realtek device, ignoring");
-> > +               generic_usb_reset(hdev, data);
-> >                 return;
-> >         }
-> >
-> > @@ -761,7 +774,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
-> >  {
-> >         struct btusb_data *data = hci_get_drvdata(hdev);
-> >         struct gpio_desc *reset_gpio = data->reset_gpio;
-> > -       int err;
-> >
-> >         if (++data->cmd_timeout_cnt < 5)
-> >                 return;
-> > @@ -787,13 +799,7 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
-> >                 return;
-> >         }
-> >
-> > -       bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
-> > -       /* This is not an unbalanced PM reference since the device will reset */
-> > -       err = usb_autopm_get_interface(data->intf);
-> > -       if (!err)
-> > -               usb_queue_reset_device(data->intf);
-> > -       else
-> > -               bt_dev_err(hdev, "Failed usb_autopm_get_interface with %d", err);
-> > +       generic_usb_reset(hdev, data);
-> >  }
-> >
-> >  static inline void btusb_free_frags(struct btusb_data *data)
-> > --
-> > 2.38.0.rc1.362.ged0d419d3c-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 76c3107c9f91..a011065220e4 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4696,6 +4696,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+ 			hdev->flush(hdev);
+ 
+ 		if (hdev->sent_cmd) {
++			cancel_delayed_work_sync(&hdev->cmd_timer);
+ 			kfree_skb(hdev->sent_cmd);
+ 			hdev->sent_cmd = NULL;
+ 		}
+-- 
+2.38.0.rc1.362.ged0d419d3c-goog
 
-Cheers,
-Archie
