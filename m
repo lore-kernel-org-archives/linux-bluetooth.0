@@ -2,310 +2,151 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E708C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 14:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA8ECC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 15:07:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230123AbiJEOuX (ORCPT
+        id S230232AbiJEPHI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 10:50:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38286 "EHLO
+        Wed, 5 Oct 2022 11:07:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230116AbiJEOuW (ORCPT
+        with ESMTP id S229772AbiJEPHH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 10:50:22 -0400
-Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E2F2FFE0;
-        Wed,  5 Oct 2022 07:50:19 -0700 (PDT)
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id CA3CB61EA192D;
-        Wed,  5 Oct 2022 16:50:16 +0200 (CEST)
-Message-ID: <f12d72f5-9c68-c23e-de15-77fe08823cbd@molgen.mpg.de>
-Date:   Wed, 5 Oct 2022 16:50:16 +0200
+        Wed, 5 Oct 2022 11:07:07 -0400
+Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD3A63F1E
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 08:07:04 -0700 (PDT)
+Received: from evilbit.green-communications.fr ([92.154.77.116]) by
+ mrelayeu.kundenserver.de (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis)
+ id 1M3VAI-1ogeDX3KBW-000Ycm; Wed, 05 Oct 2022 17:07:01 +0200
+From:   Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: Work around SCO over USB HCI design defect
+Date:   Wed,  5 Oct 2022 17:06:21 +0200
+Message-Id: <20221005150621.20771-1-nicolas.cavallari@green-communications.fr>
+X-Mailer: git-send-email 2.37.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.3.1
-Subject: Re: [PATCH v3] Bluetooth: btusb: Workaround for spotty SCO quality
-Content-Language: en-US
-To:     hildawu@realtek.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        apusaka@chromium.org, yinghsu@chromium.org, max.chou@realtek.com,
-        alex_lu@realsil.com.cn, kidman@realtek.com
-References: <20221005124936.2390-1-hildawu@realtek.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20221005124936.2390-1-hildawu@realtek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:rpplxXzr8J3LWZir6nsrOegkWaeMyURcPwdf3tEEsILi5hofr0M
+ GdlwYBDlpV3Pmskc/u9NSTG+QPC5057GXWsAob141YqFTwOeMkaZrw58My8OjNFrsWxpCmV
+ ekNCoYWA8ak6w9ikr9p8N6GannlPQ/zzGrZ2Bpc0YZOD4KVP6t0ZvSjAFo8QjkimlohxQFD
+ 8Q6nY8UMqbBQeimH72FCA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:JN2/sP06x7o=:hWM9O5BZpOECFk8Oql5Umy
+ DSML9XrnMM71b5rvUJDbQ1iL8U8TNB6Q1NqBhc3Fn+2bBsiard0+sA1sqbASRXUZZOilJDxNE
+ UV23IF0OwhgjZwOVLAaRcXEqFPUS2yeilPULcC7+IhNLxj3EPPsqk33cMs1stlDSwZISe0gqf
+ 9Swc2GEvlbO2ReKBkHyWQcG+rvX18xTHmU5Mx1LGXIkqzoMJ0FKxH46/rQBUx143FiRASKqE2
+ hYu6aKfRotOs7jskaRTGi862oOBSZjYXpXMQFXBkaVoFglVBvAnEgBFu8CN31nlqB6Go137LA
+ qJrYku3453z7XdazuSmAGWlHfXV8Z6ni6NeHwNQFlB3BwhDYdj5ZiJ9H8W1ufboiwY0tADRdC
+ SN//0k61R+fkD+bjkP5icx7VOlnOVCHnYfyLPKeJiJz9ztMGx0TkludeAex56CQep9UYh/NRT
+ LcJ+LpsFU2qRdnK6hWWmAtDiTbz//mawV/UBQPavS83OncuZI3CNtHsDqXiv4A1GWbozSACsG
+ dEPMZAaDXZljsNrahMXu0UANfnKwA1bmQtfpPUmKxV4dyfhjZ99aFocUGcd11AYSj+a4crOMy
+ CzxX8cF3eyQ0Wva/b4BOHNg3CGVPSC4SfXeSs1mdcTox2iSYniMj6GEn8NGa0nrhmxCB7nfw3
+ vQgIL99o1jCfxadg1ASTLL8e9FG8iRPeK0MtNqkXRv0+396Op1Fs07IamKr7Oi1HXZ88MyMkx
+ mgbIEDNIUNmcfhr06UjTiBq9AFOxoH9jD99Nit7V0w5/CDKfiIokZ71SIEBveD877dARHEBgO
+ 8O0DHYA1dJRYmYAJwJm1wA9ulsSU57Ljnl9mrvlP8Exrz09cso=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Hilda,
+The USB interface between the host and the bluetooth adapter used for
+SCO packets uses an USB isochronous endpoint with a fragmentation scheme
+that does not tolerate errors.  Except USB isochronous transfers do
+not provide a reliable stream with guaranteed delivery. (There is no
+retry on error, see USB spec v2.0 5.6 and 8.5.5.)
 
+To fragment a packet, the bluetooth HCI simply splits it in parts and
+transfer them as-is.  The receiver is expected to reconstruct the packet
+by assuming the first fragment contains the header and parsing its size
+field.  There is no error detection either.
 
-Thank you for the patch. For the summary/title, you could make it a 
-statement: Work around spotty SCO quality
+If a fragment is lost, the end result is that the kernel is no longer
+synchronized and will pass malformed data to the upper layers, since it
+has no way to tell if the first fragment is an actual first fragment or
+a continuation fragment.  Resynchronization can only happen by luck and
+requires an unbounded amount of time.
 
+The typical symptom for a HSP/HFP bluetooth headset is that the
+microphone stops working and dmesg contains piles of rate-limited
+"Bluetooth: hci0: SCO packet for unknown connection handle XXXX"
+errors for an indeterminate amount of time, until the kernel accidentally
+resynchronize.
 
-Am 05.10.22 um 14:49 schrieb hildawu@realtek.com:
-> From: Hilda Wu <hildawu@realtek.com>
-> 
-> When streaming HFP, once a few minutes a brief pause in audio can be
+A workaround is to ask the upper layer to prevalidate the first fragment
+header.  This is not possible with user channels so this workaround is
+disabled in this case.
 
-every few minutes
+This problem is the most severe when using an ath3k adapter on an i.MX 6
+board, where packet loss occur regularly, possibly because it is an USB1
+device connected on an USB2 hub and this is a special case requiring
+split transactions.
 
-> heard on some platform with Realtek Bluetooth. When the issue occurs,
+Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
 
-platform*s*
+---
+v3: put everything in btusb.c with a comment
+v2 (mistakenly sent without 'v2' in title): fix typos in commit description
+    and expand it
 
-Can you please also mention/document a concrete product example?
+ drivers/bluetooth/btusb.c | 35 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
 
-> the system will see the SCO packet for unknown connection handle messages.
-> 
-> Note: This issue affects (e)SCO only, does not affect ACLs.
-> Because the duplicate packet causing the problem only occurs in Realtek BT.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 15caa6469538..fbf450883601 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -948,6 +948,34 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 	return err;
+ }
+ 
++static bool btusb_validate_sco_handle(struct hci_dev *hdev,
++				      struct hci_sco_hdr *hdr)
++{
++	__u16 handle;
++
++	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
++		// Can't validate, userspace controls everything.
++		return true;
++
++	/*
++	 * USB isochronous transfers are not designed to be reliable and may
++	 * lose fragments.  When this happens, the next first fragment
++	 * encountered might actually be a continuation fragment.
++	 * Validate the handle to detect it and drop it, or else the upper
++	 * layer will get garbage for a while.
++	 */
++
++	handle = hci_handle(__le16_to_cpu(hdr->handle));
++
++	switch (hci_conn_lookup_type(hdev, handle)) {
++	case SCO_LINK:
++	case ESCO_LINK:
++		return true;
++	default:
++		return false;
++	}
++}
++
+ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -980,9 +1008,12 @@ static int btusb_recv_isoc(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (skb->len == HCI_SCO_HDR_SIZE) {
+ 			/* Complete SCO header */
+-			hci_skb_expect(skb) = hci_sco_hdr(skb)->dlen;
++			struct hci_sco_hdr *hdr = hci_sco_hdr(skb);
+ 
+-			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
++			hci_skb_expect(skb) = hdr->dlen;
++
++			if (skb_tailroom(skb) < hci_skb_expect(skb) ||
++			    !btusb_validate_sco_handle(data->hdev, hdr)) {
+ 				kfree_skb(skb);
+ 				skb = NULL;
+ 
+-- 
+2.37.2
 
-This semes only half a sentence.
-
-> This is to filter out duplicate packet for avoiding influence.
-
-packet*s*?
-
-> Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
-> Signed-off-by: Hilda Wu <hildawu@realtek.com>
-> ---
-> The btmon trace should give a better idea of what we're filtering.
-> The following excerpts are part of SCO packets in the HCI log:
-> 
-> Packet; Timestamp    ; Item             ; Payload;
-> 23327    ;131.399466000; HCI SCO Data IN    ; 0B 00 48 8C A3 55 4F 8A D5 56 E9 35 56 37 8D 55 87 53 55 59 66 D5 57 1D B5 54 00 01 08 AD 00 00 E0 10 00 00 00 85 C6 D5 60 E9 B5 52 94 6D 54 E4 9B 55 B1 B6 D5 62 91 B5 57 84 6D 56 E4 5B 55 75 C6 D5 51 2D B5 53 9A 6D 54 A5 1B;
-> 23328    ; 131.399648000; HCI SCO Data OUT  ; 0B 00 48 01 C8 AD 00 00 AA DB BA AA A9 72 B4 D9 5D AF 14 53 0C 75 B0 A6 F3 8A 51 B3 54 17 B1 A6 D5 62 C5 D5 6B 35 29 8D C5 1C 56 4C 24 96 9B 8D B5 D7 1A B2 8D BC DA 3B 8C 46 AE 1D 4D A4 04 01 F8 AD 00 00 3D EC BB A9 98 8B 28;
-> 23329    ; 131.409467000; HCI SCO Data IN    ; 0B 00 48 55 55 C6 D5 62 29 B5 57 B2 6D 54 00 01 38 AD 00 00 E0 10 00 00 00 0B 00 D5 62 55 C6 57 B2 29 B5 00 01 6D 54 00 00 38 AD 00 00 E0 10 00 00 00 92 36 D5 5A ED B5 58 6C 6D 55 B3 1B 55 6B 26 D5 52 D1 B5 54 23 6D 56 82 DB;
-> 23330    ; 131.409629000; HCI SCO Data OUT  ; 0B 00 48 6D 5B BE DB 89 34 66 E9 FA 99 A6 6E E5 6D 9F 1A 1C 57 D2 66 92 63 98 99 A9 3B 8A 6C 3E 5B 5A 34 A4 96 E2 21 21 8C F8 88 0F 3D E0 52 48 85 18 00 01 08 AD 00 00 0C EB BA A9 A8 28 CA 9A D0 3C 33 45 4A F9 90 FB CA 4B 39;
-> 23331    ; 131.429464000; HCI SCO Data IN    ; 55 AB 36 D5 48 A9 B5 56 AA 6D 56 D2 DB 55 75 36 D5 56 2D B5 57 5B 6D 54 00 0B 00 48 01 C8 AD 00 00 E0 10 00 00 00 5E C6 D5 56 E1 B5 56 43 6D 55 CA DB 55 7D C6 D5 5B 31 B5;
-> 
-> We handle is HCI SCO Data IN packets.
-> The packet 23327 was a normal HCI SCO Data IN packet.
-> The packet 23329 was the abnormal HCI SCO Data IN packet.
-> The packet 23331 was the invalid connection handle affected by the
-> packet 23329 abnormal HCI SCO Data IN packet.
-> 
-> So we expect to filter is the packet 23329 SCO data IN packet case.
-> As you can see the packet 23329 packet's connection handle (0x0B 00)
-> and length (0x48) is normal.
-> This btmon trace is SCO packets in USB alternate setting 3, payload
-> length is 72 bytes, so it is consist of three data packets.
-> After our investigation, we found that the anomaly is due to the
-> intermediate composition data.
-> So we estimate and find out its abnormal rule to filter it.
-> Filtering out the abnormal packet and then it will not affect the
-> system parsing of the conenction handle subsequent.
-> Let the invalid connection handle not occur, avoid the spotty SCO
-> quality.
-
-I think the description above could go into the commit message.
-
-
-Kinde regards,
-
-Paul
-
-
-> 
-> Changes in v3:
->   - Use the vendor function to replace btus_recv_isoc
->   - Additional info: The comparison of btrtl_usb_recv_isoc here is
->     for invalid handle, the invalid handle shouldn't appear.
->     So we try to find out the rule and filter out this.
-> 
-> Changes in v2:
->   - Seperate commits for functions
-> ---
-> ---
->   drivers/bluetooth/btrtl.c | 27 ++++++++++++++
->   drivers/bluetooth/btrtl.h |  8 ++++
->   drivers/bluetooth/btusb.c | 77 ++++++++++++++++++++++++++++++++++++++-
->   3 files changed, 111 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> index fb52313a1d45..272f90621a10 100644
-> --- a/drivers/bluetooth/btrtl.c
-> +++ b/drivers/bluetooth/btrtl.c
-> @@ -937,6 +937,33 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
->   }
->   EXPORT_SYMBOL_GPL(btrtl_get_uart_settings);
->   
-> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *p, int len,
-> +			u16 wMaxPacketSize)
-> +{
-> +	u8 *prev;
-> +
-> +	if (pos >= HCI_SCO_HDR_SIZE && pos >= wMaxPacketSize &&
-> +	    len == wMaxPacketSize && !(pos % wMaxPacketSize) &&
-> +	    wMaxPacketSize >= 10 && p[0] == data[0] && p[1] == data[1]) {
-> +		prev = data + (pos - wMaxPacketSize);
-> +
-> +		/* Detect the sco data of usb isoc pkt duplication. */
-> +		if (!memcmp(p + 2, prev + 2, 8))
-> +			return -EILSEQ;
-> +
-> +		if (wMaxPacketSize >= 12 &&
-> +		    p[2] == prev[6] && p[3] == prev[7] &&
-> +		    p[4] == prev[4] && p[5] == prev[5] &&
-> +		    p[6] == prev[10] && p[7] == prev[11] &&
-> +		    p[8] == prev[8] && p[9] == prev[9]) {
-> +			return -EILSEQ;
-> +		}
-> +	}
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btrtl_usb_recv_isoc);
-> +
->   MODULE_AUTHOR("Daniel Drake <drake@endlessm.com>");
->   MODULE_DESCRIPTION("Bluetooth support for Realtek devices ver " VERSION);
->   MODULE_VERSION(VERSION);
-> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-> index 2c441bda390a..1a23a99536a0 100644
-> --- a/drivers/bluetooth/btrtl.h
-> +++ b/drivers/bluetooth/btrtl.h
-> @@ -62,6 +62,8 @@ int btrtl_get_uart_settings(struct hci_dev *hdev,
->   			    struct btrtl_device_info *btrtl_dev,
->   			    unsigned int *controller_baudrate,
->   			    u32 *device_baudrate, bool *flow_control);
-> +int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-> +				u16 wMaxPacketSize);
->   
->   #else
->   
-> @@ -105,4 +107,10 @@ static inline int btrtl_get_uart_settings(struct hci_dev *hdev,
->   	return -ENOENT;
->   }
->   
-> +static inline int btrtl_usb_recv_isoc(u16 pos, u8 *data, u8 *buffer, int len,
-> +				u16 wMaxPacketSize)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
->   #endif
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 271963805a38..704e38e6d7d1 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -689,6 +689,7 @@ struct btusb_data {
->   	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
->   	int (*recv_acl)(struct hci_dev *hdev, struct sk_buff *skb);
->   	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
-> +	int (*recv_isoc)(struct btusb_data *data, void *buffer, int count);
->   
->   	int (*setup_on_usb)(struct hci_dev *hdev);
->   
-> @@ -1245,7 +1246,7 @@ static void btusb_isoc_complete(struct urb *urb)
->   
->   			hdev->stat.byte_rx += length;
->   
-> -			if (btusb_recv_isoc(data, urb->transfer_buffer + offset,
-> +			if (data->recv_isoc(data, urb->transfer_buffer + offset,
->   					    length) < 0) {
->   				bt_dev_err(hdev, "corrupted SCO packet");
->   				hdev->stat.err_rx++;
-> @@ -2315,6 +2316,77 @@ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
->   	return -EILSEQ;
->   }
->   
-> +static int btusb_recv_isoc_realtek(struct btusb_data *data, void *buffer,
-> +				   int count)
-> +{
-> +	struct sk_buff *skb;
-> +	unsigned long flags;
-> +	int err = 0;
-> +	u16 wMaxPacketSize = le16_to_cpu(data->isoc_rx_ep->wMaxPacketSize);
-> +
-> +	spin_lock_irqsave(&data->rxlock, flags);
-> +	skb = data->sco_skb;
-> +
-> +	while (count) {
-> +		int len;
-> +
-> +		if (!skb) {
-> +			skb = bt_skb_alloc(HCI_MAX_SCO_SIZE, GFP_ATOMIC);
-> +			if (!skb) {
-> +				err = -ENOMEM;
-> +				break;
-> +			}
-> +
-> +			hci_skb_pkt_type(skb) = HCI_SCODATA_PKT;
-> +			hci_skb_expect(skb) = HCI_SCO_HDR_SIZE;
-> +		}
-> +
-> +		len = min_t(uint, hci_skb_expect(skb), count);
-> +
-> +		/* Gaps in audio could be heard while streaming WBS using USB
-> +		 * alt settings 3 on some platforms, since this is only used
-> +		 * with RTK chips so let vendor function detect it.
-> +		 */
-> +		if (!btusb_find_altsetting(data, 6) &&
-> +			test_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags)) {
-> +			err = btrtl_usb_recv_isoc(skb->len, skb->data, buffer,
-> +							len, wMaxPacketSize);
-> +			if (err)
-> +				break;
-> +		}
-> +
-> +		skb_put_data(skb, buffer, len);
-> +
-> +		count -= len;
-> +		buffer += len;
-> +		hci_skb_expect(skb) -= len;
-> +
-> +		if (skb->len == HCI_SCO_HDR_SIZE) {
-> +			/* Complete SCO header */
-> +			hci_skb_expect(skb) = hci_sco_hdr(skb)->dlen;
-> +
-> +			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
-> +				kfree_skb(skb);
-> +				skb = NULL;
-> +
-> +				err = -EILSEQ;
-> +				break;
-> +			}
-> +		}
-> +
-> +		if (!hci_skb_expect(skb)) {
-> +			/* Complete frame */
-> +			hci_recv_frame(data->hdev, skb);
-> +			skb = NULL;
-> +		}
-> +	}
-> +
-> +	data->sco_skb = skb;
-> +	spin_unlock_irqrestore(&data->rxlock, flags);
-> +
-> +	return err;
-> +}
-> +
->   /* UHW CR mapping */
->   #define MTK_BT_MISC		0x70002510
->   #define MTK_BT_SUBSYS_RST	0x70002610
-> @@ -3747,6 +3819,7 @@ static int btusb_probe(struct usb_interface *intf,
->   
->   	data->recv_event = hci_recv_frame;
->   	data->recv_bulk = btusb_recv_bulk;
-> +	data->recv_isoc = btusb_recv_isoc;
->   
->   	if (id->driver_info & BTUSB_INTEL_COMBINED) {
->   		/* Allocate extra space for Intel device */
-> @@ -3917,6 +3990,8 @@ static int btusb_probe(struct usb_interface *intf,
->   		hdev->shutdown = btrtl_shutdown_realtek;
->   		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
->   
-> +		data->recv_isoc = btusb_recv_isoc_realtek;
-> +
->   		/* Realtek devices need to set remote wakeup on auto-suspend */
->   		set_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags);
->   		set_bit(BTUSB_USE_ALT3_FOR_WBS, &data->flags);
