@@ -2,98 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA00C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 20:43:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7D8C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 21:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbiJEUnS (ORCPT
+        id S229915AbiJEVAU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 16:43:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58414 "EHLO
+        Wed, 5 Oct 2022 17:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231169AbiJEUnQ (ORCPT
+        with ESMTP id S229840AbiJEVAS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 16:43:16 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE26B6AA0F
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 13:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665002595; x=1696538595;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=JAmhBbgVnN+P9UT9XPZJ/VWEAIUVj6QteoZVuMbxOL8=;
-  b=itQVh6F5GtGbXCe66Jb0eJYqZL2+JHb/qVqII8O5rSVKiJPK06W1EHeb
-   echNzym4Pc/je3zoU79RA0n2l3E3TpzfO0RVGgiXDbMVdbYjk/dl6Be+0
-   nbcjAEZjU6AjJue5h6aABP9ow+1r3yXzPwf28UvOEPLCarxiXx/WsZ/Y6
-   sIwMXSA2NU9A4GswS8npN5PhNLHPQ8qgLd9QaqPw4DTy7rG/RcHEmLL2T
-   DK4udz57btBfu7wl10pGz/IJ6ydZFHlBPejyQCa9eqnR/PEDjiyBzo5rm
-   DivTQX51sUmX0CodhRWYZ/dqbvHYQffTQqU44aNToEeCtYtLKvcUj9m/T
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10491"; a="300866593"
-X-IronPort-AV: E=Sophos;i="5.95,161,1661842800"; 
-   d="scan'208";a="300866593"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2022 13:43:15 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10491"; a="575559238"
-X-IronPort-AV: E=Sophos;i="5.95,161,1661842800"; 
-   d="scan'208";a="575559238"
-Received: from orparaju-mobl2.amr.corp.intel.com (HELO istotlan-mobl1.intel.com) ([10.212.143.27])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2022 13:43:15 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Fix mesh to work with MESH_IO_TYPE_UNIT_TEST
-Date:   Wed,  5 Oct 2022 13:43:09 -0700
-Message-Id: <20221005204309.65983-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.37.3
+        Wed, 5 Oct 2022 17:00:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BD4080EB9
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 14:00:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CC33B616F4
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 21:00:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3F24FC433C1;
+        Wed,  5 Oct 2022 21:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665003616;
+        bh=yrXWMLwEy7dgFzxLx1CfybWZCtDvtDY/EXNo+T55ebc=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=eHa67jvzNv5yE81oRpIqnA49NsQKMOIIfm612AB8p/ibbDIn+Qb4c8r9M5QWYaTuH
+         4bWNQPwzol+Ksgia4CwxmlEi9K/EgVNdjNtqS0x7hxW3ARyXrSq/MVFEPsSLgH9RTF
+         Xgcg2qru7aFW068717prkOt+o3gIZCHTcTm9q7J5FR5EEm77ow5Jqt2H7lOboDzbMD
+         zlvNd+FJ8iSqaCQ596M/O6KhHX0E1gyXLLLXLg9+J637H1Oc15ZR4vWPTDX9q/G99B
+         Io99pF16ZV0Tdaiw4G+4zRN/PM0l7c3IFv4tvZ+RVvkABbFPREGjpVpKCJao43++A3
+         G6ih/2rm+k5Lg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 17FB6E49FA7;
+        Wed,  5 Oct 2022 21:00:16 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH BlueZ] mesh: Fix mesh to work with MESH_IO_TYPE_UNIT_TEST
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166500361608.18591.2059211841297674651.git-patchwork-notify@kernel.org>
+Date:   Wed, 05 Oct 2022 21:00:16 +0000
+References: <20221005204309.65983-1-inga.stotland@intel.com>
+In-Reply-To: <20221005204309.65983-1-inga.stotland@intel.com>
+To:     Inga Stotland <inga.stotland@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes mesh io flow for MESH_IO_TYPE_UNIT_TEST which
-got broken after:
-commit 9966cb8b6999a5f54fc13acbd7e1526512a84342
-("mesh: Add new kernel MGMT based IO transport")
----
- mesh/main.c    | 8 +++++++-
- mesh/mesh-io.c | 2 +-
- 2 files changed, 8 insertions(+), 2 deletions(-)
+Hello:
 
-diff --git a/mesh/main.c b/mesh/main.c
-index 619b17d88..3bca020a0 100644
---- a/mesh/main.c
-+++ b/mesh/main.c
-@@ -137,8 +137,14 @@ static void signal_handler(uint32_t signo, void *user_data)
- 		return;
- 
- 	l_info("Terminating");
-+
- 	mesh_cleanup(true);
--	l_timeout_create(1, kill_to, NULL, NULL);
-+
-+	if (io_type != MESH_IO_TYPE_UNIT_TEST)
-+		l_timeout_create(1, kill_to, NULL, NULL);
-+	else
-+		l_main_quit();
-+
- 	terminated = true;
- }
- 
-diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
-index ae6a82ee4..233f4b328 100644
---- a/mesh/mesh-io.c
-+++ b/mesh/mesh-io.c
-@@ -151,7 +151,7 @@ struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
- 
- 	default_io->api = api;
- 
--	if (!api->init(default_io, &default_io->favored_index, user_data))
-+	if (!api->init(default_io, opts, user_data))
- 		goto fail;
- 
- 	return default_io;
+This patch was applied to bluetooth/bluez.git (master)
+by Brian Gix <brian.gix@intel.com>:
+
+On Wed,  5 Oct 2022 13:43:09 -0700 you wrote:
+> This fixes mesh io flow for MESH_IO_TYPE_UNIT_TEST which
+> got broken after:
+> commit 9966cb8b6999a5f54fc13acbd7e1526512a84342
+> ("mesh: Add new kernel MGMT based IO transport")
+> ---
+>  mesh/main.c    | 8 +++++++-
+>  mesh/mesh-io.c | 2 +-
+>  2 files changed, 8 insertions(+), 2 deletions(-)
+
+Here is the summary with links:
+  - [BlueZ] mesh: Fix mesh to work with MESH_IO_TYPE_UNIT_TEST
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=e71e1103abc6
+
+You are awesome, thank you!
 -- 
-2.37.3
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
