@@ -2,105 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9ACCC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 07:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA6DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 Oct 2022 08:43:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229926AbiJEHfb (ORCPT
+        id S229994AbiJEInx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 Oct 2022 03:35:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48928 "EHLO
+        Wed, 5 Oct 2022 04:43:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiJEHfU (ORCPT
+        with ESMTP id S229814AbiJEInt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 Oct 2022 03:35:20 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4EAB52448
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 Oct 2022 00:35:16 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id a17so7462662ilq.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 Oct 2022 00:35:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date;
-        bh=Z8h6QYuDJB8FaSYROzM1i4//hht76EolphpDeZc/7Nw=;
-        b=U4CbTwS0Jj0RISZXYjJ6Dvo+6xbeC1HPdNnT2mW0h12WLYx+yW20y5wQmdfFp7qKk5
-         9vJWzTsfh9gkYsQSWCvwoJMZ/45YJ4szxOl+R3FwKnUo+EIJsYNBdqQE2GhsgvS9fJlm
-         WLjEhnssoErp31UfFnjp9bOXu5rBJFFe2iDNri4c5BgBLDqLhNOZ9mRjvUwpK2Kln9ed
-         oSxASiWylUlEWudPltgi4lcuamdOOJ3ejUetSgvvAZw/XWr/bV22Rz8sSNGYZuRl9c5J
-         e9ybs6F5Jpog3J0dtpFxFKJsMoexAe+7M9Z8NJ4xnPiJqeXdX504EErwbcCIWTwRb3bQ
-         TqgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date;
-        bh=Z8h6QYuDJB8FaSYROzM1i4//hht76EolphpDeZc/7Nw=;
-        b=arnqCBfvpzr1YFe7V5hJKvNs4L032tlD7Ibty5lvstQnYPyTwGZKxLyrq/iiPhkDYT
-         LzaM6B/89t7wPggZmKFxpWnqLizVFSZvZaBIMB01n/3TdYESeo+aaM9fXAHeteTEcfhI
-         u8DD5Ch54QGZIznGm+7YO6JWaUYzxD53yukY4JVWPpuoQjQo4PrmksEfw8EEOURFF912
-         WvG2BCx6X+Jo573bcG+OF1r3LHSFui1rShHliA5LqM9GAkeaqj4v48pOG64AG2fl2wTu
-         yy5c+PabnD2I87/fCrSXyqAbGxuTSUq3v+oT/FcCuZlhrB2GYjJnwGKwGj/qu/f81AjB
-         oChg==
-X-Gm-Message-State: ACrzQf2vyQrdQkopxUpHaUJgI9cAi5CGwbs1gDHghMsEN6vSOt7/rQLN
-        rEgwSWKQm4pofzr/Ue8TbQ9p/6R4lzQ=
-X-Google-Smtp-Source: AMsMyM6gy+9gHWiSnmC6t788K4ayrPpWhc5hzDHLqrtzk40VeTz26Kq2FCW8IoSEt6YeFdoL1R5S3A==
-X-Received: by 2002:a05:6e02:1446:b0:2f9:8ce9:8da with SMTP id p6-20020a056e02144600b002f98ce908damr8518335ilo.196.1664955314926;
-        Wed, 05 Oct 2022 00:35:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.12.235.219])
-        by smtp.gmail.com with ESMTPSA id q15-20020a02cf0f000000b0036345b91f4asm2076777jar.23.2022.10.05.00.35.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Oct 2022 00:35:14 -0700 (PDT)
-Message-ID: <633d33b2.020a0220.568a4.2915@mx.google.com>
-Date:   Wed, 05 Oct 2022 00:35:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7405961456928130815=="
+        Wed, 5 Oct 2022 04:43:49 -0400
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7BA1A754A2;
+        Wed,  5 Oct 2022 01:43:47 -0700 (PDT)
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 2958h9fL5022996, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36504.realtek.com.tw[172.21.6.27])
+        by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 2958h9fL5022996
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
+        Wed, 5 Oct 2022 16:43:09 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36504.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 5 Oct 2022 16:43:37 +0800
+Received: from localhost.localdomain (172.21.132.192) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Wed, 5 Oct 2022 16:43:36 +0800
+From:   <hildawu@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <apusaka@chromium.org>, <yinghsu@chromium.org>,
+        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
+        <kidman@realtek.com>
+Subject: [PATCH v4 1/2] Bluetooth: btrtl: Add btrealtek data struct
+Date:   Wed, 5 Oct 2022 16:43:30 +0800
+Message-ID: <20221005084331.1001-2-hildawu@realtek.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20221005084331.1001-1-hildawu@realtek.com>
+References: <20221005084331.1001-1-hildawu@realtek.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: Bluetooth: hci_sync: cancel cmd_timer if hci_open failed
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221005150934.1.Ife932473db2eec6f0bc54226c3328e5fa8c5f97b@changeid>
-References: <20221005150934.1.Ife932473db2eec6f0bc54226c3328e5fa8c5f97b@changeid>
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.192]
+X-ClientProxiedBy: RTEXH36505.realtek.com.tw (172.21.6.25) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: trusted connection
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 10/05/2022 03:37:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIyLzEwLzUgpFekyCAwMjo1OTowMA==?=
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-ServerInfo: RTEXH36504.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7405961456928130815==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Hilda Wu <hildawu@realtek.com>
 
-This is automated email and please do not reply to this email!
+This patch adds a data structure for btrealtek object, and the
+definition of vendor behavior flags. It also adds macros to set/test/get
+the flags.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683158
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.38 seconds
-GitLint                       PASS      0.79 seconds
-SubjectPrefix                 PASS      0.69 seconds
-BuildKernel                   PASS      49.88 seconds
-BuildKernel32                 PASS      41.45 seconds
-Incremental Build with patchesPASS      54.45 seconds
-TestRunner: Setup             PASS      731.82 seconds
-TestRunner: l2cap-tester      PASS      17.16 seconds
-TestRunner: iso-tester        PASS      16.55 seconds
-TestRunner: bnep-tester       PASS      6.21 seconds
-TestRunner: mgmt-tester       PASS      106.64 seconds
-TestRunner: rfcomm-tester     PASS      10.10 seconds
-TestRunner: sco-tester        PASS      9.29 seconds
-TestRunner: ioctl-tester      PASS      10.61 seconds
-TestRunner: smp-tester        PASS      9.48 seconds
-TestRunner: userchan-tester   PASS      6.49 seconds
-
-
-
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
-Regards,
-Linux Bluetooth
+Changes in v4:
+ - Since the original 0002 patch has no dependency with this 0001 patch.
+   So let the 0002 patch submit another.
 
+Changes in v3:
+ - Update private flag.
 
---===============7405961456928130815==--
+Changes in v2:
+ - Set the proper priv_size to hci_alloc_dev_priv().
+ - Separate commits for functions.
+---
+---
+ drivers/bluetooth/btrtl.h | 21 +++++++++++++++++++++
+ drivers/bluetooth/btusb.c |  3 +++
+ 2 files changed, 24 insertions(+)
+
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index 2c441bda390a..ebf0101c959b 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -47,6 +47,27 @@ struct rtl_vendor_config {
+ 	struct rtl_vendor_config_entry entry[];
+ } __packed;
+ 
++enum {
++	REALTEK_ALT6_CONTINUOUS_TX_CHIP,
++
++	__REALTEK_NUM_FLAGS,
++};
++
++struct btrealtek_data {
++	DECLARE_BITMAP(flags, __REALTEK_NUM_FLAGS);
++};
++
++#define btrealtek_set_flag(hdev, nr)					\
++	do {								\
++		struct btrealtek_data *realtek = hci_get_priv((hdev));	\
++		set_bit((nr), realtek->flags);				\
++	} while (0)
++
++#define btrealtek_get_flag(hdev)					\
++	(((struct btrealtek_data *)hci_get_priv(hdev))->flags)
++
++#define btrealtek_test_flag(hdev, nr)	test_bit((nr), btrealtek_get_flag(hdev))
++
+ #if IS_ENABLED(CONFIG_BT_RTL)
+ 
+ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 271963805a38..4243936c0583 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3755,6 +3755,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 		/* Override the rx handlers */
+ 		data->recv_event = btusb_recv_event_intel;
+ 		data->recv_bulk = btusb_recv_bulk_intel;
++	} else if (id->driver_info & BTUSB_REALTEK) {
++		/* Allocate extra space for Realtek device */
++		priv_size += sizeof(struct btrealtek_data);
+ 	}
+ 
+ 	data->recv_acl = hci_recv_frame;
+-- 
+2.17.1
+
