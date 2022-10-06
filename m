@@ -2,72 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D23C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Oct 2022 15:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30683C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Oct 2022 16:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbiJFPAK (ORCPT
+        id S229815AbiJFQWN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Oct 2022 11:00:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49212 "EHLO
+        Thu, 6 Oct 2022 12:22:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231809AbiJFO77 (ORCPT
+        with ESMTP id S229540AbiJFQWL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Oct 2022 10:59:59 -0400
-Received: from voyager.loytec.com (voyager.loytec.com [88.198.4.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C74BC1EADC
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 07:59:54 -0700 (PDT)
-Received: from 212-17-98-152.static.upcbusiness.at ([212.17.98.152] helo=lexx.office.loytec.com)
-        by voyager.loytec.com with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <isak.westin@loytec.com>)
-        id 1ogSLo-0006rb-0t
-        for linux-bluetooth@vger.kernel.org; Thu, 06 Oct 2022 16:59:52 +0200
-Received: from loytec-dev-vm.delta.corp ([10.101.25.21])
-        by lexx.office.loytec.com (8.15.2/8.15.2/Some OS 1.2.3-4.5) with ESMTP id 296ExnRD4163430;
-        Thu, 6 Oct 2022 16:59:49 +0200
-From:   Isak Westin <isak.westin@loytec.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Isak Westin <isak.westin@loytec.com>
-Subject: [PATCH BlueZ 1/6] mesh: Update Key Refresh flag after provision
-Date:   Thu,  6 Oct 2022 16:59:22 +0200
-Message-Id: <20221006145927.32731-2-isak.westin@loytec.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20221006145927.32731-1-isak.westin@loytec.com>
-References: <20221006145927.32731-1-isak.westin@loytec.com>
+        Thu, 6 Oct 2022 12:22:11 -0400
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CAEB0B3F
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 09:22:10 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1326637be6eso2719657fac.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Oct 2022 09:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=TwquJrFmP8v69zmi0EOTqyoG/84qtHa+65O7hUgzNA8=;
+        b=SZCliZDnnsIW6rRCmbIpLk5qBrwl5x6tfXPZ+s7ntVXJbP1/W2u6HqLZ391cmwPvhh
+         qiQvSBI+sYrJIM+KU588LYwurVpMClfgVUusqhdKaZubo6ory4K0Zm61hxwtzRaHwM7B
+         gPr6ZIKmvL45+MzgMoZyampR1929O6VS5jAu/+w/5Y+WSIOvENnSP/yqSQ2jy3nBS9Tc
+         OUSse1WlrH5b8LnlWZu7XDk5WjAGvzuCtnohV9f9o+/H66skmMqGvx286UMxN/OvXAS8
+         aMMmr8GA9lWc2wDWtfxXWK8NloHi9/oIBHfQ60WkV10h9hpFqBo0cHR2ktovWkgANU8A
+         +nlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TwquJrFmP8v69zmi0EOTqyoG/84qtHa+65O7hUgzNA8=;
+        b=m5kcPL3JCnaP+UQNUBMfG1PlGWJhbOiDJsBSuRV2cVZu2tNSe3tVU1VSShBb4rM4qL
+         KkjCa/g80qopHlwxa5h1XSIY6h1GGIfLrVik4+o3RxaUqfjNK6gw3dRGQ+Egof5CIs6t
+         iCT+K6ul1MrBqfd2rHbF5w2G/yUgZswTZPU+WkDueCTokO1WQ+VmczsNarJ6v7+P9Gpz
+         CHXMEkeoqHRegUg7Ajo6eMVS0q4pEXwgOLwkqZ6mzSQ1q03eJlldYfwW/zOIaX65d+VT
+         1Ly3sWjJFUBWwjqx7hbBOj/a9XKdhYK+hy/kOkgB3vkIizmoszIZdO9hNAsxX1D72NNm
+         hD5A==
+X-Gm-Message-State: ACrzQf0BW/PiQxeYbQZ9GYdSx60s/tePRZYzZ1qs0OHL7cb08Hm1kVBZ
+        nICVh1bF3dKifrbDu6jAOQEcji0edZ8=
+X-Google-Smtp-Source: AMsMyM7SL2wqG5tEETAL4GRNiphGkHhs4e1KtunV3DjR0IxkMYMwtsJT5TaYnSKkRszpAUwu1hT6Ig==
+X-Received: by 2002:a05:6870:e248:b0:12d:27b0:db9e with SMTP id d8-20020a056870e24800b0012d27b0db9emr280529oac.28.1665073329483;
+        Thu, 06 Oct 2022 09:22:09 -0700 (PDT)
+Received: from [172.17.0.2] ([13.66.5.129])
+        by smtp.gmail.com with ESMTPSA id m18-20020a056870889200b0012d939eb0bfsm6742921oam.34.2022.10.06.09.22.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 09:22:09 -0700 (PDT)
+Message-ID: <633f00b1.050a0220.96b53.62bc@mx.google.com>
+Date:   Thu, 06 Oct 2022 09:22:09 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1248933080820003736=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 212.17.98.152
-X-SA-Exim-Mail-From: isak.westin@loytec.com
-X-SA-Exim-Scanned: No (on voyager.loytec.com); SAEximRunCond expanded to false
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, isak.westin@loytec.com
+Subject: RE: Mesh: Fixes for PTS issues
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221006145927.32731-2-isak.westin@loytec.com>
+References: <20221006145927.32731-2-isak.westin@loytec.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The Key Refresh flag in the Secure Network beacon is now correctly
-updated based on provisioning data after being successfully provisioned.
+--===============1248933080820003736==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683513
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      6.47 seconds
+GitLint                       PASS      4.32 seconds
+Prep - Setup ELL              PASS      27.73 seconds
+Build - Prep                  PASS      0.73 seconds
+Build - Configure             PASS      8.76 seconds
+Build - Make                  PASS      867.47 seconds
+Make Check                    PASS      11.56 seconds
+Make Check w/Valgrind         PASS      295.55 seconds
+Make Distcheck                PASS      242.61 seconds
+Build w/ext ELL - Configure   PASS      8.79 seconds
+Build w/ext ELL - Make        PASS      85.61 seconds
+Incremental Build w/ patches  PASS      602.70 seconds
+Scan Build                    PASS      518.24 seconds
+
+
+
 ---
- mesh/node.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/mesh/node.c b/mesh/node.c
-index e81aa82fe..cf4ed140e 100644
---- a/mesh/node.c
-+++ b/mesh/node.c
-@@ -1270,8 +1270,8 @@ static bool add_local_node(struct mesh_node *node, uint16_t unicast, bool kr,
- 							MESH_STATUS_SUCCESS)
- 			return false;
- 
--		if (!mesh_config_net_key_set_phase(node->cfg, net_key_idx,
--							KEY_REFRESH_PHASE_TWO))
-+		if (mesh_net_key_refresh_phase_set(node->net, net_key_idx,
-+				KEY_REFRESH_PHASE_TWO) != MESH_STATUS_SUCCESS)
- 			return false;
- 	}
- 
--- 
-2.20.1
+Regards,
+Linux Bluetooth
 
 
-
-
-
+--===============1248933080820003736==--
