@@ -2,196 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CE3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Oct 2022 09:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 587A6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 Oct 2022 10:25:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231339AbiJFJJn (ORCPT
+        id S229630AbiJFKZb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Oct 2022 05:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51078 "EHLO
+        Thu, 6 Oct 2022 06:25:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231328AbiJFJJk (ORCPT
+        with ESMTP id S229594AbiJFKZ2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Oct 2022 05:09:40 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715CACFE
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 02:09:37 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-349423f04dbso13088237b3.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Oct 2022 02:09:37 -0700 (PDT)
+        Thu, 6 Oct 2022 06:25:28 -0400
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A42D87FBE
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 03:25:27 -0700 (PDT)
+Received: by mail-oi1-x229.google.com with SMTP id n83so1495958oif.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Oct 2022 03:25:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date;
-        bh=W6dnd6MUybWhVHYUHQ8d7S6D4UzG0vGs7tI9w8WKSPw=;
-        b=SSpzU+3wLTsbRTZVM5yu2Enu8uvoYL9bqFOuq1fID5Ck3vddYC9Fn2fSzvLKbenMUx
-         fuF4R6M5SBRsLSABcNeCV9rpYF62Ev+3xv/A+pnTFcZsv2lxVRPguNBfm5QCC6EMr7E7
-         H2vr6MX5XTebP3D0H5ofNAwLXJkTUMjqS54djUwpy0stP3+jl9ypp6h1ipVNdaNPtss1
-         SpAiACIC768tO0rIonQB/nhoOdlTl9Bl9YlCeF4YPv6cVlA7MjUcyKgelLElupjTIX2q
-         KiDfZ6dzGys/MZJ8FBdi91HZBLTjIe20tkGm6j4flwNHexG6NHjuhpLIIUgDGpxwmrpg
-         3Rag==
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=K0B2vFIS3AoJOgPi2tJr/Unx2fMO2PXxopf6rVxsb7Q=;
+        b=d/RO00f9B4u5mf7zvVskt9gFkkdryOPzHU1Qbp6orlzmcpaMJ+KCIURnf+zcoWnUif
+         DIvVWbnwLPTN1WHE/HhbLWrNQ0XuhuHIuBY/GYT/ilySLD5rePyoVC+I++75irIZ4Zm0
+         BM/hoD5e42W3f2QB967Slvgz1ueoO5akV6RCvynGnUbVM0TW+rwdnI/qEby79JQp/xKA
+         qC70eJFPhp3tjJkJJ2O19seetjS2ztFx0reQ1QsDOjmATNRUGWFAgvFF6CcMfx2Xg2I4
+         SyDnwZt4Bwh4p/L5gMjCYKzwrvD2ZHU9rFyaMiOyoXOWPp5yWDN3+ehGv1oY4qpSpbYM
+         Dx0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date;
-        bh=W6dnd6MUybWhVHYUHQ8d7S6D4UzG0vGs7tI9w8WKSPw=;
-        b=VbZFpMx96+fLpBWq22V2ACHwJh83q92IgILsIvczGUB7evpsxxwFFaqn+d1RyRORCT
-         1Y+eQZecUTKOobO7iLnUjT8HFluilWNzKoZPvqcmobc4T3DlE64jFlRE5jLgpmV5CP9b
-         1rpachpix0wdU5AMOW02+4NwZDuc9TrVXbrMJsRu210fCY+O6KdIutQGZKfbNr/UU0S8
-         ijeZBy1FRQVSZDiMelywp3DiHxskZRwVlg3O29GjVN7TC/vD3jd0IsSC/w4HMDbkMNvd
-         W85G9Gwj64zVD6tZ0pa7eeukzIahzfD8/XW+7JhfG8C769L/uBBpSZp7xw3jinpk3teQ
-         CIQA==
-X-Gm-Message-State: ACrzQf1l2ayGB0+c4xvVFkgdWF+YUJBzn50P44F7tpzgiTHV6CsVwd9I
-        PtTZab5rgAcZA9B5rFkQju7F4UlVlyBFUYQhGab+YHW3edb9sQUECUREak+AEVGcIKe57BjCLFv
-        CMSEaOthQz9/tkOCWgznOW0Ys4xg18l8IBkjGvRrf9SlBrngldZyFAValBrSRc45Fg8FJ3XPn/g
-        VM
-X-Google-Smtp-Source: AMsMyM7BSEaT9DRaVmFt6QmDrsflEMyuH9+JhiEkNuJR/D+9w0X/VRjRUTm1V5JxJGcr0IWCFKhdt8ZK2Am/
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:17:1fb9:e3c:c40d:dd12])
- (user=apusaka job=sendgmr) by 2002:a25:bc83:0:b0:6bc:a6d2:5216 with SMTP id
- e3-20020a25bc83000000b006bca6d25216mr3841415ybk.204.1665047376628; Thu, 06
- Oct 2022 02:09:36 -0700 (PDT)
-Date:   Thu,  6 Oct 2022 17:09:31 +0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.38.0.rc1.362.ged0d419d3c-goog
-Message-ID: <20221006170915.v3.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
-Subject: [PATCH v3] Bluetooth: btusb: Introduce generic USB reset
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@google.com>,
-        Ying Hsu <yinghsu@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K0B2vFIS3AoJOgPi2tJr/Unx2fMO2PXxopf6rVxsb7Q=;
+        b=uozFzAPrPnGf4sL6SWo7uar+QVaS7y2QnK8F98Z6AzNXyrVHdGZD0iLjUtAXo6NFRd
+         10xbDKVhQHzV90uvoFwWdZ5D5g0/4Rp53tnLbdXP1k3Hsl/ak81xOBieHKQkW/DAfmp7
+         hNTPW1kOnv/yPz1C6nBUi1GOuOPZ+/R9TlGhmpbocgKcr7uYxsLv/xxhlKXfPR6fopIl
+         N9fwlgdGzBys+sQJ6W9XXdXjwcYj6kiXxaIAQqW9+4E6YgYVz69X7hDg3Wtyo5AMNZrV
+         2Ihi51DdScT2aBhb3RfckfTOBp5rsFS+YxaGg2IukuPeyNQmx5zCkC1bl96NKkNkjQ1b
+         epVQ==
+X-Gm-Message-State: ACrzQf1hrDybzXy5NFlOgLTE8fIctSvChkGakGx6ArVD7KTA/ttxoWAr
+        wYwPZmvQhV+sqmjThgg6763lmfGVXnc=
+X-Google-Smtp-Source: AMsMyM5QUH0xBuPmCaNeGI5lYU8EMRS+VVAeszKTrpHBSBwU48gc54BoiYmhUZgf82OtY5F9LjRlZA==
+X-Received: by 2002:a05:6808:1186:b0:351:99bf:876c with SMTP id j6-20020a056808118600b0035199bf876cmr2027830oil.54.1665051926533;
+        Thu, 06 Oct 2022 03:25:26 -0700 (PDT)
+Received: from [172.17.0.2] ([40.84.232.25])
+        by smtp.gmail.com with ESMTPSA id v14-20020a056870424e00b0011e73536301sm3933116oac.52.2022.10.06.03.25.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Oct 2022 03:25:26 -0700 (PDT)
+Message-ID: <633ead16.050a0220.66692.d3ff@mx.google.com>
+Date:   Thu, 06 Oct 2022 03:25:26 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0790277253039120905=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [v3] Bluetooth: btusb: Introduce generic USB reset
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221006170915.v3.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
+References: <20221006170915.v3.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============0790277253039120905==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On cmd_timeout with no reset_gpio, reset the USB port as a last
-resort.
+This is automated email and please do not reply to this email!
 
-This patch changes the behavior of btusb_intel_cmd_timeout and
-btusb_rtl_cmd_timeout.
+Dear submitter,
 
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@google.com>
-Reviewed-by: Ying Hsu <yinghsu@chromium.org>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683424
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.60 seconds
+GitLint                       FAIL      0.75 seconds
+SubjectPrefix                 PASS      0.60 seconds
+BuildKernel                   PASS      46.72 seconds
+BuildKernel32                 PASS      42.25 seconds
+Incremental Build with patchesPASS      60.62 seconds
+TestRunner: Setup             PASS      680.50 seconds
+TestRunner: l2cap-tester      PASS      21.32 seconds
+TestRunner: iso-tester        PASS      22.32 seconds
+TestRunner: bnep-tester       PASS      8.30 seconds
+TestRunner: mgmt-tester       PASS      133.38 seconds
+TestRunner: rfcomm-tester     PASS      13.11 seconds
+TestRunner: sco-tester        PASS      12.01 seconds
+TestRunner: ioctl-tester      PASS      14.13 seconds
+TestRunner: mesh-tester       PASS      10.04 seconds
+TestRunner: smp-tester        PASS      12.03 seconds
+TestRunner: userchan-tester   PASS      8.82 seconds
+
+Details
+##############################
+Test: GitLint - FAIL - 0.75 seconds
+Run gitlint with rule in .gitlint
+[v3] Bluetooth: btusb: Introduce generic USB reset
+18: B1 Line exceeds max length (87>80): "ERR kernel: [  716.929206] Bluetooth: hci_cmd_timeout() hci0: command 0x0000 tx timeout"
+19: B1 Line exceeds max length (109>80): "ERR kernel: [  716.929218] Bluetooth: btusb_rtl_cmd_timeout() hci0: No gpio to reset Realtek device, ignoring"
+22: B1 Line exceeds max length (87>80): "ERR kernel: [  225.270048] Bluetooth: hci_cmd_timeout() hci0: command 0x0000 tx timeout"
+23: B1 Line exceeds max length (89>80): "ERR kernel: [  225.270060] Bluetooth: btusb_rtl_cmd_timeout() hci0: Resetting usb device."
+24: B1 Line exceeds max length (88>80): "INFO kernel: [  225.386613] usb 3-3: reset full-speed USB device number 3 using xhci_hcd"
+
+
+
 
 ---
-Tested by not cancelling cmd_timer when handing hci event.
-Before the patch:
-ERR kernel: [  716.929206] Bluetooth: hci_cmd_timeout() hci0: command 0x0000 tx timeout
-ERR kernel: [  716.929218] Bluetooth: btusb_rtl_cmd_timeout() hci0: No gpio to reset Realtek device, ignoring
+Regards,
+Linux Bluetooth
 
-After the patch:
-ERR kernel: [  225.270048] Bluetooth: hci_cmd_timeout() hci0: command 0x0000 tx timeout
-ERR kernel: [  225.270060] Bluetooth: btusb_rtl_cmd_timeout() hci0: Resetting usb device.
-INFO kernel: [  225.386613] usb 3-3: reset full-speed USB device number 3 using xhci_hcd
 
-Changes in v3:
-* introduce hdev->reset to override the generic reset function
-
-Changes in v2:
-* Update commit message
-
- drivers/bluetooth/btusb.c        | 35 +++++++++++++++++++++++---------
- include/net/bluetooth/hci_core.h |  1 +
- 2 files changed, 26 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 271963805a38..e6add3604214 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -696,6 +696,28 @@ struct btusb_data {
- 	unsigned cmd_timeout_cnt;
- };
- 
-+static void btusb_reset(struct hci_dev *hdev)
-+{
-+	struct btusb_data *data;
-+	int err;
-+
-+	if (hdev->reset) {
-+		hdev->reset(hdev);
-+		return;
-+	}
-+
-+	data = hci_get_drvdata(hdev);
-+	/* This is not an unbalanced PM reference since the device will reset */
-+	err = usb_autopm_get_interface(data->intf);
-+	if (err) {
-+		bt_dev_err(hdev, "Failed usb_autopm_get_interface: %d", err);
-+		return;
-+	}
-+
-+	bt_dev_err(hdev, "Resetting usb device.");
-+	usb_queue_reset_device(data->intf);
-+}
-+
- static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -705,7 +727,7 @@ static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
- 		return;
- 
- 	if (!reset_gpio) {
--		bt_dev_err(hdev, "No way to reset. Ignoring and continuing");
-+		btusb_reset(hdev);
- 		return;
- 	}
- 
-@@ -736,7 +758,7 @@ static void btusb_rtl_cmd_timeout(struct hci_dev *hdev)
- 		return;
- 
- 	if (!reset_gpio) {
--		bt_dev_err(hdev, "No gpio to reset Realtek device, ignoring");
-+		btusb_reset(hdev);
- 		return;
- 	}
- 
-@@ -761,7 +783,6 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
- 	struct gpio_desc *reset_gpio = data->reset_gpio;
--	int err;
- 
- 	if (++data->cmd_timeout_cnt < 5)
- 		return;
-@@ -787,13 +808,7 @@ static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
- 		return;
- 	}
- 
--	bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
--	/* This is not an unbalanced PM reference since the device will reset */
--	err = usb_autopm_get_interface(data->intf);
--	if (!err)
--		usb_queue_reset_device(data->intf);
--	else
--		bt_dev_err(hdev, "Failed usb_autopm_get_interface with %d", err);
-+	btusb_reset(hdev);
- }
- 
- static inline void btusb_free_frags(struct btusb_data *data)
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c54bc71254af..55a40f5606c3 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -659,6 +659,7 @@ struct hci_dev {
- 	int (*set_diag)(struct hci_dev *hdev, bool enable);
- 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
- 	void (*cmd_timeout)(struct hci_dev *hdev);
-+	void (*reset)(struct hci_dev *hdev);
- 	bool (*wakeup)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
- 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
--- 
-2.38.0.rc1.362.ged0d419d3c-goog
-
+--===============0790277253039120905==--
