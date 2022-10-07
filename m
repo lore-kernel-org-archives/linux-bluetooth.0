@@ -2,52 +2,56 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 086D3C433FE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B549FC43217
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 19:40:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbiJGTkb (ORCPT
+        id S230211AbiJGTkd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 15:40:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40750 "EHLO
+        Fri, 7 Oct 2022 15:40:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbiJGTkV (ORCPT
+        with ESMTP id S230120AbiJGTkV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 7 Oct 2022 15:40:21 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11200C5883
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 12:40:18 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7A9C5884;
+        Fri,  7 Oct 2022 12:40:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AC41EB80A08
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 19:40:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E05BC43470;
+        by ams.source.kernel.org (Postfix) with ESMTPS id C3141B8242F;
+        Fri,  7 Oct 2022 19:40:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7404AC433C1;
         Fri,  7 Oct 2022 19:40:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1665171615;
-        bh=h6ErnxmASr3UMatEFWypQkq3elXVotN207nMeagP/L8=;
+        bh=r9RHj3JVPBS4Nf+3GLxt7M35xPV1N2v79wn2NXG965A=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=QM5mq9waTMk5936VK62RdlBMZrjmPAxoJ2bC0dN+R+rr/ruWdUbUUXr1HzJs2cfSh
-         SRvtEmf1zGKKrYiNZ9snczR1HF7GraFK685E+t3UY6X0i+CgmBfo63vPJj809vdMMp
-         3LFbpgGBtvQkxAl6Ulyz7yELx3hQ6VRNQV8kalwhE7YDDP9RncDLZrV4vpNgI5lcjF
-         A9swCcqdZfwWxvNMPBP13syTWA+EmMW01YyjPki1NWfbI5W5czFb7lBrGz1kHLZg3E
-         ZEOBZ/U+Tk0NKE7O1D9vPu7wMgtRW508aFsza0mMzAoq1HjqW+vSoEvxfls5fxOOwI
-         JlxQ5wr4lsrbg==
+        b=HvbuGLetDWkC33XsRwMefBZV+Pj7QfhvBC34nCLcoA0RM5EcAoC2sN2/parqe7gIi
+         RxZm7uGkApeVjaagp+jCFKpzdFSKb88vdnh8GpJo5P+6sJMlliYjgM0hrsePVO2mWv
+         wOyv42VtjkUEs1lFjqe0gI8Nk6KKnFC8BTW1mcfZFHUBnHXBYK1NUBWpJyrCur+YSe
+         gAxefidF4PUnSkqH6HwMIdVmtMIzmg04u0XaKufsJy28FT2T7/DXLUac427StXLD0C
+         I6ll7oQxod2TOQ3qGw4gDoyrmW3Hksi8x73VtsFELDIrhlXkvrLUdzsLeOg/Yo/QDX
+         yfbblcCtplZeA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4D3ECE43EFD;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58AE1E2A05D;
         Fri,  7 Oct 2022 19:40:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3] Bluetooth: Work around SCO over USB HCI design defect
+Subject: Re: [PATCH v3] Bluetooth: btusb: Introduce generic USB reset
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166517161531.22886.6151689482591354404.git-patchwork-notify@kernel.org>
+Message-Id: <166517161535.22886.13424048980960656308.git-patchwork-notify@kernel.org>
 Date:   Fri, 07 Oct 2022 19:40:15 +0000
-References: <20221005150621.20771-1-nicolas.cavallari@green-communications.fr>
-In-Reply-To: <20221005150621.20771-1-nicolas.cavallari@green-communications.fr>
-To:     Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org
+References: <20221006170915.v3.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
+In-Reply-To: <20221006170915.v3.1.I46e98b47be875d0b9abff2d19417c612077d1909@changeid>
+To:     Archie Pusaka <apusaka@google.com>
+Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, chromeos-bluetooth-upstreaming@chromium.org,
+        apusaka@chromium.org, abhishekpandit@google.com,
+        yinghsu@chromium.org, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, johan.hedberg@gmail.com, pabeni@redhat.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -57,23 +61,20 @@ Hello:
 This patch was applied to bluetooth/bluetooth-next.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Wed,  5 Oct 2022 17:06:21 +0200 you wrote:
-> The USB interface between the host and the bluetooth adapter used for
-> SCO packets uses an USB isochronous endpoint with a fragmentation scheme
-> that does not tolerate errors.  Except USB isochronous transfers do
-> not provide a reliable stream with guaranteed delivery. (There is no
-> retry on error, see USB spec v2.0 5.6 and 8.5.5.)
+On Thu,  6 Oct 2022 17:09:31 +0800 you wrote:
+> From: Archie Pusaka <apusaka@chromium.org>
 > 
-> To fragment a packet, the bluetooth HCI simply splits it in parts and
-> transfer them as-is.  The receiver is expected to reconstruct the packet
-> by assuming the first fragment contains the header and parsing its size
-> field.  There is no error detection either.
+> On cmd_timeout with no reset_gpio, reset the USB port as a last
+> resort.
+> 
+> This patch changes the behavior of btusb_intel_cmd_timeout and
+> btusb_rtl_cmd_timeout.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3] Bluetooth: Work around SCO over USB HCI design defect
-    https://git.kernel.org/bluetooth/bluetooth-next/c/7df90b55ae9a
+  - [v3] Bluetooth: btusb: Introduce generic USB reset
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b9c747ff82b4
 
 You are awesome, thank you!
 -- 
