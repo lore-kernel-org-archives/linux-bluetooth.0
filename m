@@ -2,235 +2,445 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D353C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 06:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A9FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 06:11:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbiJGGLd (ORCPT
+        id S229620AbiJGGLi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 02:11:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
+        Fri, 7 Oct 2022 02:11:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiJGGLc (ORCPT
+        with ESMTP id S229551AbiJGGLh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 02:11:32 -0400
+        Fri, 7 Oct 2022 02:11:37 -0400
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627B9B97B6
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 23:11:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7B0B97B6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 23:11:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665123091; x=1696659091;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+Ul5rN+cUjKv49XK3Z0TXqDvLqwQsUVcwp1r9xEzuoo=;
-  b=BeKdsv3IEOQpuzYBVPjp8qk4OsiuCpgr0Q+qwv656ZbjEBwGcdMUCOgj
-   2aOHoXKQtvC2EOh8muze6/ftQqjWT4xgzPU67tX4oU3V0+C8cvS8LeiUg
-   Oh7AdXDF/0QQhhVKolKnmD10ajXa5OvPHEjmQgdSBozWOkPNAiCHSG2Ob
-   1Mzu3i2WAol0DImncof9+l8yt3kbQZ9eRpYmiMtRCptbriFUh8DvRnrgH
-   uZr1s4vlyQhufsT3A/Ng+cFwltDFYQG+1Tb+66FV6c7X1la0zjzMAHxE8
-   7BkoMPG1FX8C1nCvfYhawROS/NtaJ9CM5nESAgQbwObmOTSQWbijmaw0D
+  t=1665123096; x=1696659096;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=NnWy9ySSBrEEXEGgo6v6sDc2YbcWd8NFsmoMjr16Dkw=;
+  b=epTw86AL3uwOgDf1rL60V+btNnJLtaHPn11sNozRoyj/5f18b4Nh+YoU
+   umt6wxH+HhINia3zsTzbbaPmzWjyDHBYBm0VBsU5CxsV8ItROPBrH6OB7
+   N6KXN7QTTSmDwzceP5HqNLz+IT1uaY+OP3rw/IR6L4Jb6WX6x2CA+9Eyu
+   IKo+HCWLos+lQ7EiU0BcK1glZLBxZbBtpvr6XdIthkPvsOftoUH92T2L4
+   YRtKJtG4+gLE2JooxNlZhB4XeNShQul2cPOC2Ru1FMpXTqWE0vC6TW3Pc
+   is7h881/kDcgEwSpysF5ZGn3OPetx9Er7TJObdh1ryZ6LVasYibZbMwj3
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="284027965"
+X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="284027973"
 X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="284027965"
+   d="scan'208";a="284027973"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2022 23:11:31 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2022 23:11:36 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="714135115"
+X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="714135130"
 X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="714135115"
+   d="scan'208";a="714135130"
 Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Oct 2022 23:11:29 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 06 Oct 2022 23:11:34 -0700
 From:   Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ v2 1/3] audio/transport: Add volume callback to BAP transport
-Date:   Fri,  7 Oct 2022 11:42:21 +0530
-Message-Id: <20221007061223.46114-1-sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ v2 2/3] shared/vcp: Add callback to update media volume
+Date:   Fri,  7 Oct 2022 11:42:22 +0530
+Message-Id: <20221007061223.46114-2-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20221007061223.46114-1-sathish.narasimman@intel.com>
+References: <20221007061223.46114-1-sathish.narasimman@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Initialize set_volume and get_volume to BAP transport and update the
-volume when media_transport_update_device_volume is called.
+Add support for callback functions to update media transport volume.
+Fix to register debug functions. Also invoke vcp_attached function the
+right place. Fix check for existing session if available and attach.
 ---
- profiles/audio/transport.c | 98 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 98 insertions(+)
+ src/shared/vcp.c | 139 +++++++++++++++++++++++++++++++++++++++++------
+ src/shared/vcp.h |   7 +++
+ 2 files changed, 130 insertions(+), 16 deletions(-)
 
-diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-index 41339da51e17..46b936c965bf 100644
---- a/profiles/audio/transport.c
-+++ b/profiles/audio/transport.c
-@@ -91,6 +91,7 @@ struct bap_transport {
- 	uint8_t			rtn;
- 	uint16_t		latency;
- 	uint32_t		delay;
-+	int8_t			volume;
+diff --git a/src/shared/vcp.c b/src/shared/vcp.c
+index 5459cf892a7d..8e1964234338 100644
+--- a/src/shared/vcp.c
++++ b/src/shared/vcp.c
+@@ -41,6 +41,11 @@ struct bt_vcp_db {
+ 	struct bt_vcs *vcs;
  };
  
- struct media_transport {
-@@ -116,6 +117,9 @@ struct media_transport {
- 								guint id);
- 	void			(*set_state) (struct media_transport *transport,
- 						transport_state_t state);
-+	void			(*set_vol)(struct media_transport *transport,
-+						int8_t volume);
-+	int8_t			(*get_vol)(struct media_transport *transport);
- 	GDestroyNotify		destroy;
- 	void			*data;
++struct ev_cb {
++	const struct bt_vcp_vr_ops *ops;
++	void *data;
++};
++
+ typedef void (*vcp_func_t)(struct bt_vcp *vcp, bool success, uint8_t att_ecode,
+ 					const uint8_t *value, uint16_t length,
+ 					void *user_data);
+@@ -89,11 +94,16 @@ struct bt_vcp {
+ 	unsigned int vstate_id;
+ 	unsigned int vflag_id;
+ 
++	unsigned int disconn_id;
+ 	struct queue *notify;
+ 	struct queue *pending;
+ 
+ 	bt_vcp_debug_func_t debug_func;
+ 	bt_vcp_destroy_func_t debug_destroy;
++
++	struct bt_vcp_vr_ops *ops;
++	struct ev_cb *cb;
++
+ 	void *debug_data;
+ 	void *user_data;
  };
-@@ -717,6 +721,7 @@ static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
- 	return a2dp->volume >= 0;
- }
+@@ -124,6 +134,18 @@ static struct queue *vcp_db;
+ static struct queue *vcp_cbs;
+ static struct queue *sessions;
  
-+
- static gboolean get_volume(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *data)
- {
-@@ -769,6 +774,58 @@ error:
- 					"Invalid arguments in method call");
- }
- 
-+static gboolean volume_bap_exists(const GDBusPropertyTable *property,
-+					void *data)
++static void vcp_debug(struct bt_vcp *vcp, const char *format, ...)
 +{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
++	va_list ap;
 +
-+	return bap->volume >= 0;
-+}
-+
-+static gboolean get_bap_volume(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	uint16_t volume = (uint16_t)bap->volume;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &volume);
-+
-+	return TRUE;
-+}
-+
-+static void set_bap_volume(const GDBusPropertyTable *property,
-+			   DBusMessageIter *iter, GDBusPendingPropertySet id,
-+			   void *data)
-+{
-+	struct media_transport *transport = data;
-+	struct bap_transport *bap = transport->data;
-+	uint16_t arg;
-+	int8_t volume;
-+
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
-+		goto error;
-+
-+	dbus_message_iter_get_basic(iter, &arg);
-+	if (arg > INT8_MAX)
-+		goto error;
-+
-+	g_dbus_pending_property_success(id);
-+
-+	volume = (int8_t)arg;
-+	if (bap->volume == volume)
++	if (!vcp || !format || !vcp->debug_func)
 +		return;
 +
-+	/*TODO vcp_send_volume */
-+	return;
-+
-+error:
-+	g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
++	va_start(ap, format);
++	util_debug_va(vcp->debug_func, vcp->debug_data, format, ap);
++	va_end(ap);
 +}
 +
-+
- static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
+ static void *iov_pull_mem(struct iovec *iov, size_t len)
  {
- 	struct media_transport *transport = data;
-@@ -970,6 +1027,7 @@ static const GDBusPropertyTable bap_properties[] = {
- 	{ "Retransmissions", "y", get_retransmissions },
- 	{ "Latency", "q", get_latency },
- 	{ "Delay", "u", get_delay },
-+	{ "Volume", "q", get_bap_volume, set_bap_volume, volume_bap_exists },
- 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
- 	{ "Location", "u", get_location },
- 	{ "Metadata", "ay", get_metadata },
-@@ -1387,6 +1445,31 @@ static void free_bap(void *data)
- 	free(bap);
+ 	void *data = iov->iov_base;
+@@ -183,12 +205,17 @@ static void vcp_detached(void *data, void *user_data)
+ 
+ void bt_vcp_detach(struct bt_vcp *vcp)
+ {
++	DBG(vcp, "%p", vcp);
++
+ 	if (!queue_remove(sessions, vcp))
+ 		return;
+ 
+ 	bt_gatt_client_unref(vcp->client);
+ 	vcp->client = NULL;
+ 
++	bt_att_unregister_disconnect(vcp->att, vcp->disconn_id);
++	vcp->att = NULL;
++
+ 	queue_foreach(vcp_cbs, vcp_detached, vcp);
  }
  
-+static void set_volume_bap(struct media_transport *transport, int8_t volume)
-+{
-+	struct bap_transport *bap = transport->data;
-+
-+	if (volume < 0)
-+		return;
-+
-+	/* Check if volume really changed */
-+	if (bap->volume == volume)
-+		return;
-+
-+	bap->volume = volume;
-+
-+	g_dbus_emit_property_changed(btd_get_dbus_connection(),
-+					transport->path,
-+					MEDIA_TRANSPORT_INTERFACE, "Volume");
-+}
-+
-+static int8_t get_volume_bap(struct media_transport *transport)
-+{
-+	struct bap_transport *bap = transport->data;
-+
-+	return bap->volume;
-+}
-+
- static int media_transport_init_bap(struct media_transport *transport,
- 							void *stream)
- {
-@@ -1403,6 +1486,7 @@ static int media_transport_init_bap(struct media_transport *transport,
- 	bap->rtn = qos->rtn;
- 	bap->latency = qos->latency;
- 	bap->delay = qos->delay;
-+	bap->volume = 127;
- 	bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
- 						bap_state_changed,
- 						bap_connecting,
-@@ -1413,6 +1497,8 @@ static int media_transport_init_bap(struct media_transport *transport,
- 	transport->suspend = suspend_bap;
- 	transport->cancel = cancel_bap;
- 	transport->set_state = set_state_bap;
-+	transport->set_vol = set_volume_bap;
-+	transport->get_vol = get_volume_bap;
- 	transport->destroy = free_bap;
+@@ -267,24 +294,14 @@ void bt_vcp_unref(struct bt_vcp *vcp)
+ 	vcp_free(vcp);
+ }
  
+-static void vcp_debug(struct bt_vcp *vcp, const char *format, ...)
+-{
+-	va_list ap;
+-
+-	if (!vcp || !format || !vcp->debug_func)
+-		return;
+-
+-	va_start(ap, format);
+-	util_debug_va(vcp->debug_func, vcp->debug_data, format, ap);
+-	va_end(ap);
+-}
+-
+ static void vcp_disconnected(int err, void *user_data)
+ {
+ 	struct bt_vcp *vcp = user_data;
+ 
+ 	DBG(vcp, "vcp %p disconnected err %d", vcp, err);
+ 
++	vcp->disconn_id = 0;
++
+ 	bt_vcp_detach(vcp);
+ }
+ 
+@@ -303,12 +320,9 @@ static struct bt_vcp *vcp_get_session(struct bt_att *att, struct gatt_db *db)
+ 	vcp = bt_vcp_new(db, NULL);
+ 	vcp->att = att;
+ 
+-	bt_att_register_disconnect(att, vcp_disconnected, vcp, NULL);
+-
+ 	bt_vcp_attach(vcp, NULL);
+ 
+ 	return vcp;
+-
+ }
+ 
+ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+@@ -317,6 +331,7 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "Volume Down");
+ 
+@@ -344,6 +359,9 @@ static uint8_t vcs_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -356,6 +374,7 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "Volume Up");
+ 
+@@ -383,6 +402,9 @@ static uint8_t vcs_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -395,6 +417,7 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "Un Mute and Volume Down");
+ 
+@@ -423,6 +446,9 @@ static uint8_t vcs_unmute_rel_vol_down(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->vol_set = MAX((vstate->vol_set - VCP_STEP_SIZE), 0);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -435,6 +461,7 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "UN Mute and Volume Up");
+ 
+@@ -463,6 +490,9 @@ static uint8_t vcs_unmute_rel_vol_up(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->vol_set = MIN((vstate->vol_set + VCP_STEP_SIZE), 255);
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -475,6 +505,7 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	struct bt_vcs_ab_vol *req;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "Set Absolute Volume");
+ 
+@@ -502,6 +533,9 @@ static uint8_t vcs_set_absolute_vol(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->vol_set = req->vol_set;
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -514,6 +548,7 @@ static uint8_t vcs_unmute(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "Un Mute");
+ 
+@@ -541,6 +576,9 @@ static uint8_t vcs_unmute(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->mute = 0x00;
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, vstate->vol_set, cb->data);
++
+ 	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
+ 				 sizeof(struct vol_state),
+ 				 bt_vcp_get_att(vcp));
+@@ -553,6 +591,7 @@ static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	struct bt_vcp_db *vdb;
+ 	struct vol_state *vstate;
+ 	uint8_t	*change_counter;
++	struct ev_cb *cb =  vcp->cb;
+ 
+ 	DBG(vcp, "MUTE");
+ 
+@@ -580,6 +619,13 @@ static uint8_t vcs_mute(struct bt_vcs *vcs, struct bt_vcp *vcp,
+ 	vstate->mute = 0x01;
+ 	vstate->counter = -~vstate->counter; /*Increment Change Counter*/
+ 
++	if (cb && cb->ops && cb->ops->set_volume)
++		cb->ops->set_volume(vcp, 0, cb->data);
++
++	gatt_db_attribute_notify(vdb->vcs->vs, (void *)vstate,
++					sizeof(struct vol_state),
++					bt_vcp_get_att(vcp));
++
  	return 0;
-@@ -1537,6 +1623,11 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
- 	/* Attempt to locate the transport to get its volume */
- 	for (l = transports; l; l = l->next) {
- 		struct media_transport *transport = l->data;
-+
-+		/* Get BAP transport volume */
-+		if (transport->get_vol)
-+			return transport->get_vol(transport);
-+
- 		if (transport->device != dev)
- 			continue;
+ }
  
-@@ -1560,6 +1651,13 @@ void media_transport_update_device_volume(struct btd_device *dev,
- 	/* Attempt to locate the transport to set its volume */
- 	for (l = transports; l; l = l->next) {
- 		struct media_transport *transport = l->data;
+@@ -689,8 +735,10 @@ static void vcs_state_read(struct gatt_db_attribute *attrib,
+ 				void *user_data)
+ {
+ 	struct bt_vcs *vcs = user_data;
++	struct bt_vcp *vcp = vcp_get_session(att, vcs->vdb->db);
+ 	struct iovec iov;
+ 
++	DBG(vcp, "VCP State Read");
+ 	iov.iov_base = vcs->vstate;
+ 	iov.iov_len = sizeof(*vcs->vstate);
+ 
+@@ -704,8 +752,10 @@ static void vcs_flag_read(struct gatt_db_attribute *attrib,
+ 				void *user_data)
+ {
+ 	struct bt_vcs *vcs = user_data;
++	struct bt_vcp *vcp = vcp_get_session(att, vcs->vdb->db);
+ 	struct iovec iov;
+ 
++	DBG(vcp, "VCP Flag Read");
+ 	iov.iov_base = &vcs->vol_flag;
+ 	iov.iov_len = sizeof(vcs->vol_flag);
+ 
+@@ -868,6 +918,14 @@ bool bt_vcp_unregister(unsigned int id)
+ 	return true;
+ }
+ 
++static void vcp_attached(void *data, void *user_data)
++{
++	struct bt_vcp_cb *cb = data;
++	struct bt_vcp *vcp = user_data;
 +
-+		/* Set BAP transport volume */
-+		if (transport->set_vol) {
-+			transport->set_vol(transport, volume);
++	cb->attached(vcp, cb->user_data);
++}
++
+ struct bt_vcp *bt_vcp_new(struct gatt_db *ldb, struct gatt_db *rdb)
+ {
+ 	struct bt_vcp *vcp;
+@@ -1068,6 +1126,26 @@ static unsigned int vcp_register_notify(struct bt_vcp *vcp,
+ 	return notify->id;
+ }
+ 
++bool bt_vcp_vr_set_ops(struct bt_vcp *vcp, struct bt_vcp_vr_ops *ops,
++			void *data)
++{
++	struct ev_cb *cb;
++
++	if (!vcp)
++		return false;
++
++	if (vcp->cb)
++		free(vcp->cb);
++
++	cb = new0(struct ev_cb, 1);
++	cb->ops = ops;
++	cb->data = data;
++
++	vcp->cb = cb;
++
++	return true;
++}
++
+ static void foreach_vcs_char(struct gatt_db_attribute *attr, void *user_data)
+ {
+ 	struct bt_vcp *vcp = user_data;
+@@ -1141,25 +1219,54 @@ static void foreach_vcs_service(struct gatt_db_attribute *attr,
+ 	gatt_db_service_foreach_char(attr, foreach_vcs_char, vcp);
+ }
+ 
++static void vcp_attach_att(struct bt_vcp *vcp, struct bt_att *att)
++{
++	if (vcp->disconn_id) {
++		if (att == bt_vcp_get_att(vcp))
 +			return;
-+		}
++		bt_att_unregister_disconnect(vcp->att, vcp->disconn_id);
++	}
 +
- 		if (transport->device != dev)
- 			continue;
++	vcp->disconn_id = bt_att_register_disconnect(vcp->att,
++							vcp_disconnected,
++							vcp, NULL);
++}
++
+ bool bt_vcp_attach(struct bt_vcp *vcp, struct bt_gatt_client *client)
+ {
+ 	bt_uuid_t uuid;
  
++	if (queue_find(sessions, NULL, vcp)) {
++		/* If instance already been set but there is no client proceed
++		 * to clone it otherwise considered it already attached.
++		 */
++		if (client && !vcp->client)
++			goto clone;
++		return true;
++	}
++
+ 	if (!sessions)
+ 		sessions = queue_new();
+ 
+ 	queue_push_tail(sessions, vcp);
+ 
+-	if (!client)
++	queue_foreach(vcp_cbs, vcp_attached, vcp);
++
++	if (!client) {
++		vcp_attach_att(vcp, vcp->att);
+ 		return true;
++	}
+ 
+ 	if (vcp->client)
+ 		return false;
+ 
++clone:
+ 	vcp->client = bt_gatt_client_clone(client);
+ 	if (!vcp->client)
+ 		return false;
+ 
++	vcp_attach_att(vcp, bt_gatt_client_get_att(client));
++
+ 	bt_uuid16_create(&uuid, VCS_UUID);
+ 	gatt_db_foreach_service(vcp->ldb->db, &uuid, foreach_vcs_service, vcp);
+ 
+diff --git a/src/shared/vcp.h b/src/shared/vcp.h
+index 26db5732d19b..7d70aefe0089 100644
+--- a/src/shared/vcp.h
++++ b/src/shared/vcp.h
+@@ -33,6 +33,13 @@
+ 
+ struct bt_vcp;
+ 
++struct bt_vcp_vr_ops {
++	void (*set_volume)(struct bt_vcp *vcp, int8_t volume, void *data);
++};
++
++bool bt_vcp_vr_set_ops(struct bt_vcp *vcp, struct bt_vcp_vr_ops *ops,
++			void *data);
++
+ typedef void (*bt_vcp_destroy_func_t)(void *user_data);
+ typedef void (*bt_vcp_debug_func_t)(const char *str, void *user_data);
+ typedef void (*bt_vcp_func_t)(struct bt_vcp *vcp, void *user_data);
 -- 
 2.25.1
 
