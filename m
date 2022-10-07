@@ -2,199 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8CDC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 19:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C24F7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 19:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbiJGTeC (ORCPT
+        id S230140AbiJGTk2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 15:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50166 "EHLO
+        Fri, 7 Oct 2022 15:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229544AbiJGTeB (ORCPT
+        with ESMTP id S230134AbiJGTkU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 15:34:01 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 133D4BC60E;
-        Fri,  7 Oct 2022 12:34:00 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id bn8so6835873ljb.6;
-        Fri, 07 Oct 2022 12:33:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QtS1o7ZM2YgF2GXs993wWNlA4xjsIHvbfmEx/5K+0ys=;
-        b=oLTsLLIRHa469/sp9g8M1izhVH+XprkuZfwEtpM/f9oh1eYN2SwLDcg6eMofGrXOD0
-         VLT2WBQTfMTyxOgADXIUAMSl/3qFuO/s7LVI8HhBNn98euIVTHg6fDISKWI8It2aDpSo
-         idm4S4jLWnAsC3EvbIbFYhAJ7pZEGdR6KXZTS/+MuvbqR9KDDPFL1DkBgltwCQxVd/A0
-         NTohnClC2E2TVqREVhAVZKvW/ij/XOq4Ig/eN2yXr3K8rljOQ9STQ+fhIAdnLHqrm4D1
-         kQpE8nCkFctC3k5YMvkIFJb7nIPu7kPhsSudRWHP24/s6EtDlaCGhNETDVgC6CWCA1vt
-         OjRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QtS1o7ZM2YgF2GXs993wWNlA4xjsIHvbfmEx/5K+0ys=;
-        b=XeKJplLH41IP+DhwNTM+AyjgmZi4ONMPFDlyRXdcsOXEATSUnGxIET2M4I3fPMhIDo
-         0lY8RPjttivgg84k7gUmtBoaR3Z06GN0Ncf//chWHgb/yv5ykCldPYyFLffkUzyEMH3u
-         AxHLb3m7grZd19Qn2gVmPIaQpx7gwXSBem7pVPNIJVs2t7pRYiFOezekwml5hXHqUe9e
-         y9AzFY8ev82nrFX2GXmjcS08OIThsP88H2+OkSkAHxhvWbmrbsMQuV7wn4RD2zhsXaXU
-         hpXDufYKkGZTevF+ZfsuNhU9acSnPPTWf2FPtNyEJR4NrvDu3vKkkP5Xdz6/SCnwxldS
-         kTCA==
-X-Gm-Message-State: ACrzQf3BoqqdPt/wc5hyUREtV0dKTxf2e8pL8WsR2PtIjM5D9+TAbcJd
-        ejmZib6hNNbrKRc7qrZBNemEGqWUipiF5asS8fY=
-X-Google-Smtp-Source: AMsMyM5Y8hz2zCDNOF7AQDInxjpA7Mjg4A4qiKR79VFmU44L6j9VrLmUPF9kKQRokpDMciv1XCfLdhs1mHDCpUiaJ8I=
-X-Received: by 2002:a2e:b74f:0:b0:26c:426c:60fc with SMTP id
- k15-20020a2eb74f000000b0026c426c60fcmr2353785ljo.432.1665171238234; Fri, 07
- Oct 2022 12:33:58 -0700 (PDT)
+        Fri, 7 Oct 2022 15:40:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25284BC62F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 12:40:16 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 00BDB61DD0
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 19:40:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5C6C3C433D7;
+        Fri,  7 Oct 2022 19:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665171615;
+        bh=vT3vqAnmVCmDJ4eT0whsad1jf8cEAnWsjM2dj5fy4Uw=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=Uu8e85ZrvBHJK+yUnNjFSnzmHpIhMeg0DuKbf304hg1mbp4UM6znUOorQ260IOFcf
+         E2VEgoprOasrkAZYp5uYvadjHSwqSmCcBehJU8nBkbVf/eWMzBTpvnBEDIKjTAWndm
+         /3EGuaWafVrucwNJKvGMSmSZMS8ASWcVPcgNOW+VMJe/g9SoV5iXhPtV+BIwUahzT6
+         +KJHHv7ODSr2h5vyB0WSEIRQ6DCrpfoc5VMj560Qlo9ch6yZNLeJBXYCMD4frDcDyt
+         ZadDjt/iTY3cUUTVXJkqqV5IEXrRzPK3L/5NSH3Cm4fDPrc4JQF+8rSBVTmfEAuLnA
+         eePpNgN4gQgEA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 42605E2A05C;
+        Fri,  7 Oct 2022 19:40:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
- <20220807185846-mutt-send-email-mst@kernel.org> <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
- <20221007090223-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221007090223-mutt-send-email-mst@kernel.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 7 Oct 2022 12:33:46 -0700
-Message-ID: <CABBYNZKfLOxrTAVLRSH+hOwaB5RYkGdjbtfabufUcgR3oy897A@mail.gmail.com>
-Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Igor Skalkin <igor.skalkin@opensynergy.com>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth@vger.kernel.org, mgo@opensynergy.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1] btusb: Avoid reset of ISOC endpoint alt settings to zero
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166517161526.22886.9789637113576630246.git-patchwork-notify@kernel.org>
+Date:   Fri, 07 Oct 2022 19:40:15 +0000
+References: <20221003064836.11414-1-kiran.k@intel.com>
+In-Reply-To: <20221003064836.11414-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michael,
+Hello:
 
-On Fri, Oct 7, 2022 at 6:03 AM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Aug 08, 2022 at 02:04:43PM +0200, Igor Skalkin wrote:
-> > On 8/8/22 01:00, Michael S. Tsirkin wrote:
-> >
-> >     On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
-> >
-> >         According to specification [1], "For the device-specific config=
-uration
-> >         space, the driver MUST use 8 bit wide accesses for 8 bit wide f=
-ields,
-> >         16 bit wide and aligned accesses for 16 bit wide fields and 32 =
-bit wide
-> >         and aligned accesses for 32 and 64 bit wide fields.".
-> >
-> >         Current version of the configuration structure:
-> >
-> >             struct virtio_bt_config {
-> >                 __u8  type;
-> >                 __u16 vendor;
-> >                 __u16 msft_opcode;
-> >             } __attribute__((packed));
-> >
-> >         has both 16bit fields non-aligned.
-> >
-> >         This commit fixes it.
-> >
-> >         [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/v1/=
-query?url=3Dhttps%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1%2f=
-virtio%2dv1.1.pdf&umid=3Dd1786ace-e8ea-40e8-9665-96c0949174e5&auth=3D53c7c7=
-de28b92dfd96e93d9dd61a23e634d2fbec-39b15885ceebe9fda9357320aec1ccbac416a470
-> >
-> >         Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
-> >
-> >     This is all true enough, but the problem is
-> >     1. changing uapi like this can't be done, will break userspace
-> >     2. the driver has more issues and no one seems to want to
-> >        maintain it.
-> >     I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
-> >     to merge it for this release.
-> >
-> > This is very sad. We already use this driver in our projects.
->
-> Ping. If we still have no maintainer I'm marking it broken, users
-> should at least be warned.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Please resend.
+On Mon,  3 Oct 2022 12:18:36 +0530 you wrote:
+> From: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+> 
+> In case of suspend/resume and HCI_RESET (BT On and Off),
+> ISOC endpoint set to alt setting 0 when no SCO connection exists.
+> This patch shall avoid resetting of ISOC endpoint to alt setting to 0.
+> 
+> Signed-off-by: Chethan Tumkur Narayan <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> 
+> [...]
 
->
-> > Our virtio bluetooth device has two backends - HCI_USER socket backend =
-for one
-> > platform and uart backend for the other, and works well (after applying=
- your
-> > "[PATCH] Bluetooth: virtio_bt: fix device remove") patch, so this "devi=
-ce
-> > removal" problem can probably be considered solved .
-> > We could help with the rest of the problems you listed that can be solv=
-ed
-> > (specification, QEMU support).
-> > And the only problem that is difficult to solve (because of the need to=
- change
-> > UAPI header files) is just this one with unaligned configuration fields=
-.
-> > At the moment, it does not reproduce, because without VIRTIO_BT_F_VND_H=
-CI
-> > (Indicates vendor command support) feature negotiated, the driver does =
-not
-> > read the non-aligned configuration fields.
-> >
-> > So, what would you advise us to do? Continuing to use the "marked broke=
-n"
-> > driver, start writing a specification for a new from scratch, better on=
-e?
-> > Or is there any way to bring this one back to life?
-> >
-> >
-> >
-> >         ---
-> >          include/uapi/linux/virtio_bt.h | 2 +-
-> >          1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> >         diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/linu=
-x/virtio_bt.h
-> >         index a7bd48daa9a9..adc03709cc4f 100644
-> >         --- a/include/uapi/linux/virtio_bt.h
-> >         +++ b/include/uapi/linux/virtio_bt.h
-> >         @@ -23,9 +23,9 @@ enum virtio_bt_config_vendor {
-> >          };
-> >
-> >          struct virtio_bt_config {
-> >         -       __u8  type;
-> >                 __u16 vendor;
-> >                 __u16 msft_opcode;
-> >         +       __u8  type;
-> >          } __attribute__((packed));
-> >
-> >          #endif /* _UAPI_LINUX_VIRTIO_BT_H */
-> >         --
-> >         2.34.1
-> >
-> > --
-> >
-> > Best regards,
-> >
-> > Igor Skalkin
-> > Software Engineer
-> >
-> > OpenSynergy GmbH
-> > Rotherstr. 20, 10245 Berlin
-> >
-> > igor.skalkin@opensynergy.com
-> > www.opensynergy.com
-> >
-> > registered: Amtsgericht Charlottenburg, HRB 108616B
-> > General Management: Rolf Morich, Stefaan Sonck Thiebaut
-> >
-> >
-> > Please mind our privacy notice pursuant to Art. 13 GDPR. // Unsere Hinw=
-eise zum
-> > Datenschutz gem. Art. 13 DSGVO finden Sie hier.
->
+Here is the summary with links:
+  - [v1] btusb: Avoid reset of ISOC endpoint alt settings to zero
+    https://git.kernel.org/bluetooth/bluetooth-next/c/ed9fc1335a21
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---=20
-Luiz Augusto von Dentz
