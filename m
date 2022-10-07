@@ -2,103 +2,235 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DA3C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 00:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D353C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 06:11:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbiJGAWT (ORCPT
+        id S229561AbiJGGLd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 Oct 2022 20:22:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55394 "EHLO
+        Fri, 7 Oct 2022 02:11:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbiJGAWS (ORCPT
+        with ESMTP id S229500AbiJGGLc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 Oct 2022 20:22:18 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75B7C510A
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 17:22:17 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id a25so2000328qtw.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 06 Oct 2022 17:22:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xh0KCxBZnFmVfLH0MF/BL5MOIVCol/odPyfKKs28rEA=;
-        b=ThWgOzIgF+Fe6p2b0SyXzeiDrdYhtRvuBCj/jSzzBKBUohhBGntSlynWu2AjIL2pr4
-         f2gVjftzBm2QBGx/b/PbR1WGIHVoevv/JpiMeikerJq2hW6ghH4ow+94ASR1dAYwPGP/
-         OxoBT6Mp8l986qhpUm8/y02y4OYdUKOT3JIXywnNxRU7uuJnvLO0WQcavKEA8mocLPrA
-         5YZAfoh1BXddKp51il1USht5FK0HZPRxbMIp34p+UAJoWVHhWVtz8Xq2rDLl3WySYpT9
-         VIkJCqjEblQUi5fk6g53TKE4wSJqz1rcHdmsLUrPbJOrhEX7mk/lGDgASYaEbj8H+DGm
-         7sBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xh0KCxBZnFmVfLH0MF/BL5MOIVCol/odPyfKKs28rEA=;
-        b=ZbOI996ovGxznlLw2ztuFI7XPNq4iQsLzNNZxZnIXNkM+IDVXGnP82i9N5lhua2wn4
-         EDl25Vt1zfofEP+rKj/5Tk/rRxXyi41ILCiC9ySdlDQ+p/EwIj3xlsgZdmK2RZDZ4aLv
-         CVpKX4ptfF+giN1i7AA/NzEb2VWGu1vNpL5+GvTCb5WM844rQLclSzo+tJ7vmOSlXgn7
-         pcwrOAkNrgETEm6geo8fhKmILYkE+l+r2+56IlRGd69leu5uzOlo80425up5OJ317+BH
-         lB2qsKksjB6urzxhjBCyN0mOVw9wbzT+YB4yWY5SL4G5wZo17w+q+RPK2AJHF6BK0Rb9
-         1BUg==
-X-Gm-Message-State: ACrzQf1m0gJNxIaPoV/L4Y9aLdMy47GZMSCkq909e3ALwdvj66FnN/eG
-        kwh26DyRZXj0Hm9IFroGvmRhV1X5j74=
-X-Google-Smtp-Source: AMsMyM7GIAaH6yEk/83JyNlHjp+0SfJOYeh7DrzseAg8ojEjNXh6vAPwe2oYgdboD1Io3RaHrEfk4Q==
-X-Received: by 2002:a05:622a:1182:b0:35c:c062:ec0a with SMTP id m2-20020a05622a118200b0035cc062ec0amr2522025qtk.654.1665102136770;
-        Thu, 06 Oct 2022 17:22:16 -0700 (PDT)
-Received: from [172.17.0.2] ([20.122.110.87])
-        by smtp.gmail.com with ESMTPSA id bl21-20020a05620a1a9500b006cf38fd659asm417181qkb.103.2022.10.06.17.22.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Oct 2022 17:22:16 -0700 (PDT)
-Message-ID: <633f7138.050a0220.b1e0d.0ed2@mx.google.com>
-Date:   Thu, 06 Oct 2022 17:22:16 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2296197321577520220=="
+        Fri, 7 Oct 2022 02:11:32 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 627B9B97B6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 23:11:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1665123091; x=1696659091;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+Ul5rN+cUjKv49XK3Z0TXqDvLqwQsUVcwp1r9xEzuoo=;
+  b=BeKdsv3IEOQpuzYBVPjp8qk4OsiuCpgr0Q+qwv656ZbjEBwGcdMUCOgj
+   2aOHoXKQtvC2EOh8muze6/ftQqjWT4xgzPU67tX4oU3V0+C8cvS8LeiUg
+   Oh7AdXDF/0QQhhVKolKnmD10ajXa5OvPHEjmQgdSBozWOkPNAiCHSG2Ob
+   1Mzu3i2WAol0DImncof9+l8yt3kbQZ9eRpYmiMtRCptbriFUh8DvRnrgH
+   uZr1s4vlyQhufsT3A/Ng+cFwltDFYQG+1Tb+66FV6c7X1la0zjzMAHxE8
+   7BkoMPG1FX8C1nCvfYhawROS/NtaJ9CM5nESAgQbwObmOTSQWbijmaw0D
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="284027965"
+X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
+   d="scan'208";a="284027965"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2022 23:11:31 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="714135115"
+X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
+   d="scan'208";a="714135115"
+Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
+  by FMSMGA003.fm.intel.com with ESMTP; 06 Oct 2022 23:11:29 -0700
+From:   Sathish Narasimman <sathish.narasimman@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
+Subject: [PATCH BlueZ v2 1/3] audio/transport: Add volume callback to BAP transport
+Date:   Fri,  7 Oct 2022 11:42:21 +0530
+Message-Id: <20221007061223.46114-1-sathish.narasimman@intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [BlueZ] tools: mgmt-tester - Test for HCI cmd after static addr set
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221006225326.641765-1-brian.gix@intel.com>
-References: <20221006225326.641765-1-brian.gix@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2296197321577520220==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683610
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.44 seconds
-GitLint                       PASS      1.03 seconds
-Prep - Setup ELL              PASS      31.87 seconds
-Build - Prep                  PASS      1.06 seconds
-Build - Configure             PASS      10.08 seconds
-Build - Make                  PASS      1052.67 seconds
-Make Check                    PASS      12.72 seconds
-Make Check w/Valgrind         PASS      348.11 seconds
-Make Distcheck                PASS      286.74 seconds
-Build w/ext ELL - Configure   PASS      10.59 seconds
-Build w/ext ELL - Make        PASS      104.76 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      655.40 seconds
-
-
-
+Initialize set_volume and get_volume to BAP transport and update the
+volume when media_transport_update_device_volume is called.
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/transport.c | 98 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
 
+diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
+index 41339da51e17..46b936c965bf 100644
+--- a/profiles/audio/transport.c
++++ b/profiles/audio/transport.c
+@@ -91,6 +91,7 @@ struct bap_transport {
+ 	uint8_t			rtn;
+ 	uint16_t		latency;
+ 	uint32_t		delay;
++	int8_t			volume;
+ };
+ 
+ struct media_transport {
+@@ -116,6 +117,9 @@ struct media_transport {
+ 								guint id);
+ 	void			(*set_state) (struct media_transport *transport,
+ 						transport_state_t state);
++	void			(*set_vol)(struct media_transport *transport,
++						int8_t volume);
++	int8_t			(*get_vol)(struct media_transport *transport);
+ 	GDestroyNotify		destroy;
+ 	void			*data;
+ };
+@@ -717,6 +721,7 @@ static gboolean volume_exists(const GDBusPropertyTable *property, void *data)
+ 	return a2dp->volume >= 0;
+ }
+ 
++
+ static gboolean get_volume(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *data)
+ {
+@@ -769,6 +774,58 @@ error:
+ 					"Invalid arguments in method call");
+ }
+ 
++static gboolean volume_bap_exists(const GDBusPropertyTable *property,
++					void *data)
++{
++	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
++
++	return bap->volume >= 0;
++}
++
++static gboolean get_bap_volume(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
++	uint16_t volume = (uint16_t)bap->volume;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &volume);
++
++	return TRUE;
++}
++
++static void set_bap_volume(const GDBusPropertyTable *property,
++			   DBusMessageIter *iter, GDBusPendingPropertySet id,
++			   void *data)
++{
++	struct media_transport *transport = data;
++	struct bap_transport *bap = transport->data;
++	uint16_t arg;
++	int8_t volume;
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
++		goto error;
++
++	dbus_message_iter_get_basic(iter, &arg);
++	if (arg > INT8_MAX)
++		goto error;
++
++	g_dbus_pending_property_success(id);
++
++	volume = (int8_t)arg;
++	if (bap->volume == volume)
++		return;
++
++	/*TODO vcp_send_volume */
++	return;
++
++error:
++	g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++}
++
++
+ static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
+ {
+ 	struct media_transport *transport = data;
+@@ -970,6 +1027,7 @@ static const GDBusPropertyTable bap_properties[] = {
+ 	{ "Retransmissions", "y", get_retransmissions },
+ 	{ "Latency", "q", get_latency },
+ 	{ "Delay", "u", get_delay },
++	{ "Volume", "q", get_bap_volume, set_bap_volume, volume_bap_exists },
+ 	{ "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
+ 	{ "Location", "u", get_location },
+ 	{ "Metadata", "ay", get_metadata },
+@@ -1387,6 +1445,31 @@ static void free_bap(void *data)
+ 	free(bap);
+ }
+ 
++static void set_volume_bap(struct media_transport *transport, int8_t volume)
++{
++	struct bap_transport *bap = transport->data;
++
++	if (volume < 0)
++		return;
++
++	/* Check if volume really changed */
++	if (bap->volume == volume)
++		return;
++
++	bap->volume = volume;
++
++	g_dbus_emit_property_changed(btd_get_dbus_connection(),
++					transport->path,
++					MEDIA_TRANSPORT_INTERFACE, "Volume");
++}
++
++static int8_t get_volume_bap(struct media_transport *transport)
++{
++	struct bap_transport *bap = transport->data;
++
++	return bap->volume;
++}
++
+ static int media_transport_init_bap(struct media_transport *transport,
+ 							void *stream)
+ {
+@@ -1403,6 +1486,7 @@ static int media_transport_init_bap(struct media_transport *transport,
+ 	bap->rtn = qos->rtn;
+ 	bap->latency = qos->latency;
+ 	bap->delay = qos->delay;
++	bap->volume = 127;
+ 	bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
+ 						bap_state_changed,
+ 						bap_connecting,
+@@ -1413,6 +1497,8 @@ static int media_transport_init_bap(struct media_transport *transport,
+ 	transport->suspend = suspend_bap;
+ 	transport->cancel = cancel_bap;
+ 	transport->set_state = set_state_bap;
++	transport->set_vol = set_volume_bap;
++	transport->get_vol = get_volume_bap;
+ 	transport->destroy = free_bap;
+ 
+ 	return 0;
+@@ -1537,6 +1623,11 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
+ 	/* Attempt to locate the transport to get its volume */
+ 	for (l = transports; l; l = l->next) {
+ 		struct media_transport *transport = l->data;
++
++		/* Get BAP transport volume */
++		if (transport->get_vol)
++			return transport->get_vol(transport);
++
+ 		if (transport->device != dev)
+ 			continue;
+ 
+@@ -1560,6 +1651,13 @@ void media_transport_update_device_volume(struct btd_device *dev,
+ 	/* Attempt to locate the transport to set its volume */
+ 	for (l = transports; l; l = l->next) {
+ 		struct media_transport *transport = l->data;
++
++		/* Set BAP transport volume */
++		if (transport->set_vol) {
++			transport->set_vol(transport, volume);
++			return;
++		}
++
+ 		if (transport->device != dev)
+ 			continue;
+ 
+-- 
+2.25.1
 
---===============2296197321577520220==--
