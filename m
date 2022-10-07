@@ -2,50 +2,50 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4902C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 17:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 717D7C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 17:27:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbiJGR1R (ORCPT
+        id S229513AbiJGR11 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 13:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52530 "EHLO
+        Fri, 7 Oct 2022 13:27:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbiJGR1Q (ORCPT
+        with ESMTP id S229556AbiJGR10 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 13:27:16 -0400
+        Fri, 7 Oct 2022 13:27:26 -0400
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2ED5CC838
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 10:27:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 289463B711
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 10:27:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665163635; x=1696699635;
+  t=1665163646; x=1696699646;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
   bh=jwd0dT8DgPzOyvb0ouzJt1hKZ4xUfTiNsDMLr0rJhNk=;
-  b=URtXsXcJ19UGnV3zDceCsYmfHcH0hz6VYHzxbFNctq/j5IP3GOldAg6U
-   VNsINJXJhMmb1122bh48k5WeQ9RlUAcnQ4oj0cCEURx3eQL7wjYWV+WfW
-   AuHqVvKrFnxFp/EGH4mS9jvMdNiGTVGXxi+lG5TcNeCkMkGO32kBX42yX
-   LgTbWb7TL28ElVB9ONdTLXpU7SAPT6G5DP4yC30PgKzBD+c84b58bvr6L
-   Pj6H0hN0xrM20yiWmDWYsFUZulL5S4EvWxLFeVMYZtmVbgaE/azN6dmLV
-   aA439bFdxa3TuJ11pAodyoAUfY19A1TS6laYFCEjlexC2Ihymw7qDkS3J
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="301388888"
+  b=T5v5ksFa0vBHQMI3N5ZeiC1dlRINUOAi1PV0+0E/XSRWRVebDVUz28nr
+   +PfFF4liDd3yD/S7iEYdDaBj51I4vOKfmioeWfSb/ER1dvSAafPARA8JM
+   d45sTXTyNBjDgnlSBiBOZ1ycQZWZjFOvGgqsYHpl2qjIJFOBVXzmyfWNu
+   bx7BCRU2A/NuAoFKbLofgKrJ7dszBONbjqrlYs0ZizpfUW9WzITwb4xs4
+   lmGkFEIzodIjsKPZcYoXboheJmbO9TnYmZV3906B6XKa6armmmXst9FvV
+   RMD+zCXoyKjUUplBNy+tnpYMfCEamh4Y6L42Y+JfPjXG2ZEnQEeuAzlxp
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="301388894"
 X-IronPort-AV: E=Sophos;i="5.95,167,1661842800"; 
-   d="scan'208";a="301388888"
+   d="scan'208";a="301388894"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 10:27:14 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2022 10:27:18 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="658410268"
+X-IronPort-AV: E=McAfee;i="6500,9779,10493"; a="658410299"
 X-IronPort-AV: E=Sophos;i="5.95,167,1661842800"; 
-   d="scan'208";a="658410268"
+   d="scan'208";a="658410299"
 Received: from tester-latitude-7480.iind.intel.com ([10.224.186.120])
-  by orsmga001.jf.intel.com with ESMTP; 07 Oct 2022 10:27:13 -0700
+  by orsmga001.jf.intel.com with ESMTP; 07 Oct 2022 10:27:16 -0700
 From:   Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-Subject: [PATCH BlueZ 1/1] shared/bap: Fix handling memory overwrite during ASE Enable Operation
-Date:   Fri,  7 Oct 2022 23:15:16 +0530
-Message-Id: <20221007174516.22335-2-abhay.maheshbhai.maheta@intel.com>
+Subject: [PATCH BlueZ v2 1/1] shared/bap: Fixing memory overwrite during ASE Enable Operation
+Date:   Fri,  7 Oct 2022 23:15:17 +0530
+Message-Id: <20221007174516.22335-3-abhay.maheshbhai.maheta@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221007174516.22335-1-abhay.maheshbhai.maheta@intel.com>
 References: <20221007174516.22335-1-abhay.maheshbhai.maheta@intel.com>
