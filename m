@@ -2,114 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9251EC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 06:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE11C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 07:35:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229629AbiJGGLp (ORCPT
+        id S229598AbiJGHfU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 02:11:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55536 "EHLO
+        Fri, 7 Oct 2022 03:35:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbiJGGLj (ORCPT
+        with ESMTP id S229543AbiJGHfT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 02:11:39 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41673112A95
-        for <linux-bluetooth@vger.kernel.org>; Thu,  6 Oct 2022 23:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665123098; x=1696659098;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=weArQEE1+BAZ7Td37iXcT7Dn5h69cCu0jphqGbByJuE=;
-  b=m9G0DkS9GQRC7i8uE0wOv8o9au/Iq0IbE/0ycoOL/SktSGyKQMuDcG8w
-   vEVEhkxusVRl7pqiTLzMdBfbsVzGaOvioja6huWZdIQJ7sVo/rr0KhVSl
-   eOvSHiZUhack5TxLEbLs60Z9aOdeM0l7eSimtkDV1eYTjAUM4PdZnONcw
-   amdZYq3tQGU6708V5W+nSi3UK9Mze2h6tOsb7b94GFwxPJ6Mxn+suH4Ea
-   TmVa+5vzaNboTwe9+J0nQ5GJ3lR/ocel+xKRIN1ySDZOdKowxeuEvZ/jG
-   SpRr8qDeq8UvmPDflNevnu4EW9JTbT23WlqeFfouvHOyb+9a4J9OHX9kQ
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="284027979"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="284027979"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Oct 2022 23:11:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10492"; a="714135136"
-X-IronPort-AV: E=Sophos;i="5.95,166,1661842800"; 
-   d="scan'208";a="714135136"
-Received: from intel-latitude-e5450.iind.intel.com ([10.224.186.32])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Oct 2022 23:11:37 -0700
-From:   Sathish Narasimman <sathish.narasimman@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH BlueZ v2 3/3] profiles: Register callback function to update volume
-Date:   Fri,  7 Oct 2022 11:42:23 +0530
-Message-Id: <20221007061223.46114-3-sathish.narasimman@intel.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 7 Oct 2022 03:35:19 -0400
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F3E4C02F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 00:35:17 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id s206so3956438pgs.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Oct 2022 00:35:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YhzLtpLRsZO8+wb5fgI6HiADNZv4hZ1vks0q33USATw=;
+        b=OKXagF15cdHVA7JEebUj5zl3NRtAnnssPFLlqWps/3qvGpa9rfqIqZrhRYAtTUGckV
+         i8U9ngzZNLuVFls2M4ZkHCXBuyNJHA3s811YzRDK1bPDrwbXAWsCO7ICC5z8MymN8UCV
+         KdlABQFWmr8MNZx3XmsMG3CQQr37ZUISbXwanqqMe/xCCBZqBo+EKAMhazJWRRvYJt60
+         O49R9VY4tbZgTfWhatVsWaynaLIITKwfyNSDxOmK2HKMliF2EvXkrpsSn3EP71mFmSec
+         uw4S+MXrQYoz5WC7w7iZx+zMXfdyDv2da0Rzi54GrOjySEvFO+QGxsMelEG3q9x4+xZD
+         oW9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YhzLtpLRsZO8+wb5fgI6HiADNZv4hZ1vks0q33USATw=;
+        b=dtde1908q8r0hj3ptf8kNVOfmcOtX8+EGDr9UIcFGH9tJrw7IiUnng5uz5vSHQSl3r
+         Rio9Y2iozgQmuybPRdd7BPC8c72my7Lo42x7QoSlDfFowZSD/GwRkffhhg0WgePL12rH
+         0yqwfX1rrtlYnfJbStjfa65KYyZf8V1+rcwddLI9Z4ZHTOa9Yyq/wQezdVTnXuhcBqio
+         EBl/Q7pw3ZJ0HFg/kkpl0E4iiFeGANKrye5ciE4jdAU6TcuOrwvBEErmId+4PaNKUiiF
+         B+dcj3NTu33bbdO4pMxkUkn8e5tfTrfNpwmr8S9xT/BEdNRJTmB59XLs7WE57JSJw3xe
+         IfhQ==
+X-Gm-Message-State: ACrzQf3zgjqopQtc9D3ZPsUigZeZ+MB0TpsNPCDhYG7O5UrR5aY3AFB8
+        VVWFEs/4aaWH3RyEfX+l3RQ3gJWtZ/VqlA==
+X-Google-Smtp-Source: AMsMyM6DzeUDzOD/zZoPQ56EISCcvLV4WPofo30d4ZMX6u6Be4qqRd50ah0EAqx7tBEIBx1N9PCe5w==
+X-Received: by 2002:a63:515d:0:b0:42a:cf33:4320 with SMTP id r29-20020a63515d000000b0042acf334320mr3302707pgl.21.1665128116702;
+        Fri, 07 Oct 2022 00:35:16 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.36.111])
+        by smtp.gmail.com with ESMTPSA id l4-20020a635704000000b0045dc85c4a5fsm928857pgb.44.2022.10.07.00.35.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Oct 2022 00:35:16 -0700 (PDT)
+Message-ID: <633fd6b4.630a0220.c2ace.1c2b@mx.google.com>
+Date:   Fri, 07 Oct 2022 00:35:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5818719328687165241=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sathish.narasimman@intel.com
+Subject: RE: [BlueZ,v2,1/3] audio/transport: Add volume callback to BAP transport
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20221007061223.46114-1-sathish.narasimman@intel.com>
 References: <20221007061223.46114-1-sathish.narasimman@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Callback function has to be registered to call
-media_transport_update_device_volume to change transport volume.
+--===============5818719328687165241==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=683646
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.41 seconds
+GitLint                       PASS      1.40 seconds
+Prep - Setup ELL              PASS      31.92 seconds
+Build - Prep                  PASS      0.66 seconds
+Build - Configure             PASS      10.33 seconds
+Build - Make                  PASS      963.09 seconds
+Make Check                    PASS      13.13 seconds
+Make Check w/Valgrind         PASS      347.55 seconds
+Make Distcheck                PASS      292.36 seconds
+Build w/ext ELL - Configure   PASS      10.51 seconds
+Build w/ext ELL - Make        PASS      101.36 seconds
+Incremental Build w/ patches  PASS      359.03 seconds
+Scan Build                    PASS      624.27 seconds
+
+
+
 ---
- profiles/audio/vcp.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/vcp.c b/profiles/audio/vcp.c
-index b42b0a4f79dd..4b790b03c032 100644
---- a/profiles/audio/vcp.c
-+++ b/profiles/audio/vcp.c
-@@ -50,6 +50,7 @@
- #include "src/service.h"
- #include "src/log.h"
- #include "src/error.h"
-+#include "transport.h"
- 
- #define VCS_UUID_STR "00001844-0000-1000-8000-00805f9b34fb"
- #define MEDIA_ENDPOINT_INTERFACE "org.bluez.MediaEndpoint1"
-@@ -83,6 +84,20 @@ static struct vcp_data *vcp_data_new(struct btd_device *device)
- 	return data;
- }
- 
-+static void vr_set_volume(struct bt_vcp *vcp, int8_t volume, void *data)
-+{
-+	struct vcp_data *user_data = data;
-+	struct btd_device *device = user_data->device;
-+
-+	DBG("set volume");
-+
-+	media_transport_update_device_volume(device, volume);
-+}
-+
-+static struct bt_vcp_vr_ops vcp_vr_ops = {
-+	.set_volume	= vr_set_volume,
-+};
-+
- static void vcp_data_add(struct vcp_data *data)
- {
- 	DBG("data %p", data);
-@@ -94,6 +109,7 @@ static void vcp_data_add(struct vcp_data *data)
- 
- 	bt_vcp_set_debug(data->vcp, vcp_debug, NULL, NULL);
- 
-+	bt_vcp_vr_set_ops(data->vcp, &vcp_vr_ops, data);
- 	if (!sessions)
- 		sessions = queue_new();
- 
-@@ -178,6 +194,7 @@ static void vcp_attached(struct bt_vcp *vcp, void *user_data)
- 	data->vcp = vcp;
- 
- 	vcp_data_add(data);
-+
- }
- 
- static int vcp_probe(struct btd_service *service)
--- 
-2.25.1
 
+--===============5818719328687165241==--
