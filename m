@@ -2,72 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EFEC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B33DC433FE
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 Oct 2022 15:10:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230007AbiJGPKZ (ORCPT
+        id S229768AbiJGPK0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 11:10:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33056 "EHLO
+        Fri, 7 Oct 2022 11:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230015AbiJGPKS (ORCPT
+        with ESMTP id S229973AbiJGPKV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 11:10:18 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB81860482
+        Fri, 7 Oct 2022 11:10:21 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4905C62A85
         for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 08:10:17 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A415CB8238F
+        by ams.source.kernel.org (Postfix) with ESMTPS id AD016B82390
         for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 15:10:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AADCC433B5;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 746AEC43142;
         Fri,  7 Oct 2022 15:10:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1665155415;
-        bh=xtTl/VKt60kXXdjjoInktjJNQVdRFP8ByeFONEwHJtI=;
+        bh=QdQI01W3OqOsin2O2A2BUUm1NvOrhBroBVJ8BWt5huo=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=hnvjhXuPpxsaY4oKk3JqVzQrX313XTnsE9lQmWqLqymJNzQ9PLl1sRhjV+ZjWNMqk
-         0LtgtBiKEkKZJ358tp0xExvUDyrMUCcKNnU1UpKGGgB4r3azfFYSPlFmSkcVlV5YLF
-         JS0KQUCJhC/qXIBxxVuKOZ2oTj7PvUktBxZPEwbqmpt3iCT0JuBJsXIlcKAUtMV4Jk
-         8rpKsUCys/VXriJIgtzmZuwek+msbBy5NiHUH3qqV28Lp4vAOZ3lKGBbRVVN5bKpyd
-         qBH+WTFYT9GNl6ksWAGRw9TRbJqX+IcDP46jCvZskwBI+FQ2+IW3MKbSLibimNz1Ke
-         oDMjTjyoUAQOQ==
+        b=Fu41G+VXZU8icFdIkCi8qbALTKu+W1KwwlTsYqCvIsVj4fJKUUg/FInOJhuMR968E
+         I9cmixpG1UAGeA+SAU2ZLs0JzbF9egelwZ+JIfKXy4aJzgLjh3zmJYC1lxtQQAyh0m
+         ER+p/E2+v5P4BtqUZarPC1yGraQLcLk7+ApVl3kAG0u2tGXr0bkBcsSp1i0irtR5CE
+         T16dZUbMvYzgezvgJU9zdX5PTeEbmxVrsJXFM/WzuEOQC4uarEtMJRS+gI0VZ6yAz8
+         uOBC7qRIt5lTvb6LNbkKYEKQsfMAKGa4fbl3DeU2fayA1I6q14kYuPundGW/6cwp7H
+         IKqJAWd/BOSrg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 50532E21ED6;
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58DA0E43EFE;
         Fri,  7 Oct 2022 15:10:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ] tools: mgmt-tester - Test for HCI cmd after static addr
- set
+Subject: Re: [PATCH BlueZ 0/6] Mesh: Fixes for PTS issues
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166515541532.23839.8956223510106185835.git-patchwork-notify@kernel.org>
+Message-Id: <166515541536.23839.11183936309410126652.git-patchwork-notify@kernel.org>
 Date:   Fri, 07 Oct 2022 15:10:15 +0000
-References: <20221006225326.641765-1-brian.gix@intel.com>
-In-Reply-To: <20221006225326.641765-1-brian.gix@intel.com>
-To:     Gix@ci.codeaurora.org, Brian <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        tedd.an@intel.com
+References: <20221006145927.32731-1-isak.westin@loytec.com>
+In-Reply-To: <20221006145927.32731-1-isak.westin@loytec.com>
+To:     Isak Westin <isak.westin@loytec.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluez.git (master)
+This series was applied to bluetooth/bluez.git (master)
 by Brian Gix <brian.gix@intel.com>:
 
-On Thu,  6 Oct 2022 15:53:26 -0700 you wrote:
-> This change checks for the expected HCI command after Static Address
-> change requested.
-> ---
->  tools/mgmt-tester.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+On Thu,  6 Oct 2022 16:59:21 +0200 you wrote:
+> Hi,
+> 
+> Here is the last patch set with fixes for issues found during PTS
+> testing. This covers following tests:
+>  - MESH/NODE/PROV/*
+>  - MESH/NODE/TNPT/*
+>  - MESH/NODE/RLY/*
+> 
+> [...]
 
 Here is the summary with links:
-  - [BlueZ] tools: mgmt-tester - Test for HCI cmd after static addr set
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=fc598fa12c08
+  - [BlueZ,1/6] mesh: Update Key Refresh flag after provision
+    (no matching commit)
+  - [BlueZ,2/6] mesh: provisionee: Handle unknown PDUs
+    (no matching commit)
+  - [BlueZ,3/6] mesh: provisionee: Handle failed provisioning
+    (no matching commit)
+  - [BlueZ,4/6] mesh: provisionee: Check prov start parameters
+    (no matching commit)
+  - [BlueZ,5/6] mesh: Keep canceled SAR data for at least 10 sec
+    (no matching commit)
+  - [BlueZ,6/6] mesh: Fix msg cache ring buffer
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=dabf32b313c1
 
 You are awesome, thank you!
 -- 
