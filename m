@@ -2,64 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D571C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Oct 2022 01:11:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1EEC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  8 Oct 2022 01:14:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229507AbiJHBLj (ORCPT
+        id S229606AbiJHBOP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 Oct 2022 21:11:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33002 "EHLO
+        Fri, 7 Oct 2022 21:14:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229509AbiJHBLg (ORCPT
+        with ESMTP id S229494AbiJHBOO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 7 Oct 2022 21:11:36 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4871DB48A9
-        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 18:11:34 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id b2so5934440plc.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Oct 2022 18:11:34 -0700 (PDT)
+        Fri, 7 Oct 2022 21:14:14 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DB4EB48A9
+        for <linux-bluetooth@vger.kernel.org>; Fri,  7 Oct 2022 18:14:13 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id a5-20020a17090aa50500b002008eeb040eso7942571pjq.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 07 Oct 2022 18:14:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/dDCoGNmc7mSsDOR4zzwwci8uBmu2b0a+9pHPilQw+E=;
-        b=EzS9r/IGyM97zKDltAkAr33qOF0JlWrk1ALG3bqu+8o3kI6TOUvfWmtsfXGW5447wu
-         LPaJHyTq/na9z6mCwNGTfrrt7ZdUisZviaTMkiiHVJ8YhidKBeDwIPV341nd32E9f06F
-         tednfhdIyr5jFROVQF6FVLuib4yT4clNkCxnYCrQIH8KScuDJ0JDXSevjYhSPflhMSp0
-         KzjdYgsT9v2zHRUeG34dTxPyn0eRhV0QbYPgSgntov/k50W/0wBcwiLOqbsLFvsnD/oi
-         32kstApR1yMlRzoFC5I+CKlMDMJCeICL8Jn/sXbdEZgHFgc1nQHDwBX40fFF2dlLwZdh
-         XTAw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aWZTAG1Eih+DouCQoHVwsrrhAQjYzIpkDznjhxpWO28=;
+        b=SIC34xdGXg5QTnUb9/7diDr+rrIyWICcLB1XV0idxDpadqx0RF29pq20cv8uVLMirs
+         y3/kGzNpGDtHJ/bAcUHS/YI6TdlfdTMiG8zzu8DvbjSZTCKrEYWYN6XjQPdAjhLNXTgF
+         qOa2bPVCEVMwhQYHU398zpTUJWe+YCsxVgIhA9HVmUQg67Ij7WFewMdVCmLINTMpRCIq
+         0d2/A0s1yuP8MmE43i5TtdG+0sTae4u8+RvUC4qEQjab2OkfeF4yqAZQjnDdoQsCwljz
+         jvz+jxLbz5auLaI/cOcY5lDeShfeqMDv95C1gFVHtwH5LgT0Eld2I7tGBqlrjdozKlYa
+         SFUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/dDCoGNmc7mSsDOR4zzwwci8uBmu2b0a+9pHPilQw+E=;
-        b=M9nfwQsFxb6gqfqocBtPpNfafDAkzewghfU4X+WbZbTgFBWsihtT9aVqFzW/KTEXVA
-         knANXmzztI1vqXMrJ1DF/PcZ+HG196Qufmi2/lVfWz8SnHaHnrLbudsjrM+jLesThDcB
-         vBT1kKx4VOr5kEoBeOnfe2Y3dFjjPqvCpkI5PTnWMQD/Fr61FzhRC3llBay6k9nV66Rw
-         xeqMxF2i6B38ujEM53i7JFGwev7vvt9J8vTX7m++ECMUfrX/QpBt3Tz4/tL5CO8+0NDV
-         tfQMvt/dSwqu4zvgrY3EH/o7389GzdkWLRNtvqAOYrJAlc/DjB/ongSq2BkL4Dx8D0uq
-         nB1w==
-X-Gm-Message-State: ACrzQf10t7tgrRge31ezeqhvlerP26DjtYDHTecSXxj1LE9E2M0DIGth
-        L3DhdApP25rFlUAX/VlnSotHnPjHekLYTw==
-X-Google-Smtp-Source: AMsMyM5mVJoqYu1repIV0RkFI91KJr89Z7qvgHWDwfm9y+J3iet60lNDsweygrUqYNmoM5mBWXAPZQ==
-X-Received: by 2002:a17:90b:400f:b0:20a:9965:ef08 with SMTP id ie15-20020a17090b400f00b0020a9965ef08mr8442608pjb.155.1665191493244;
-        Fri, 07 Oct 2022 18:11:33 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aWZTAG1Eih+DouCQoHVwsrrhAQjYzIpkDznjhxpWO28=;
+        b=NfUpGB+uS3mSYcYJ/LAIkdaEI5lhoxRJLR8LVLJt4p/VtBoBKxGS+eeUrqoUPNfJCM
+         TrNTTTm1gnhXkYuKFMWnVDqWGoQsFdidb0atYPWxEb25+pzAXKDBUiysPqIjjSToGwqj
+         cYoq51VQgT86StIkc9dWDtDl1ZMVpdFti1l9hVUPSf3vLlrTUTkUsr924ynIgKAr7Bhi
+         HcG0XUyBDPcZvDdgPptKUP0bMZA0kgEVWXIkBVUVh4bIhSsNFzON6rFuQRIiVdWhJUS/
+         gQR9aKmUKiZMWlbVU6kTB7995AUyHOgZPuOu781MGFui6rguKPHEdMf4a4Gw4SVvEYjm
+         Mg/A==
+X-Gm-Message-State: ACrzQf0GNPjc0yUcRJ4GaJ+FFvwbFG2bcsj8V0+04q/kd/GjtanF6aMP
+        cIOuKLxwAiWgS742VZuTe2bJIZtJRkGNcQ==
+X-Google-Smtp-Source: AMsMyM4qGzsRZbW+N//zRbWQDuVfvW5/2njjM/9R5srev+y0aBbLT7URlogRphjcnVGTdpfKvuMe+Q==
+X-Received: by 2002:a17:902:7786:b0:178:48c0:a083 with SMTP id o6-20020a170902778600b0017848c0a083mr7763119pll.125.1665191651864;
+        Fri, 07 Oct 2022 18:14:11 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h187-20020a62dec4000000b0056158a41d74sm2234123pfg.58.2022.10.07.18.11.31
+        by smtp.gmail.com with ESMTPSA id 131-20020a621989000000b00561969ea721sm2291938pfz.147.2022.10.07.18.14.10
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Oct 2022 18:11:32 -0700 (PDT)
+        Fri, 07 Oct 2022 18:14:11 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: hci_sync: Fix not able to set force_static_address
-Date:   Fri,  7 Oct 2022 18:11:29 -0700
-Message-Id: <20221008011129.1906898-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] btdev: Add support for setting bdaddr
+Date:   Fri,  7 Oct 2022 18:14:08 -0700
+Message-Id: <20221008011410.1907549-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221008011129.1906898-1-luiz.dentz@gmail.com>
-References: <20221008011129.1906898-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -68,28 +64,47 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-force_static_address shall be writable while hdev is initing but is not
-considered powered yet since the static address is written only when
-powered.
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This adds btdev_set_bdaddr so it is possible to set an arbritrary
+address.
 ---
- net/bluetooth/hci_debugfs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ emulator/btdev.c | 10 ++++++++++
+ emulator/btdev.h |  2 ++
+ 2 files changed, 12 insertions(+)
 
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 3f401ec5bb0c..b7f682922a16 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -757,7 +757,7 @@ static ssize_t force_static_address_write(struct file *file,
- 	bool enable;
- 	int err;
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 3fdfb64a9eba..549f93645684 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -6960,6 +6960,16 @@ const uint8_t *btdev_get_bdaddr(struct btdev *btdev)
+ 	return btdev->bdaddr;
+ }
  
--	if (test_bit(HCI_UP, &hdev->flags))
-+	if (hdev_is_powered(hdev))
- 		return -EBUSY;
++bool btdev_set_bdaddr(struct btdev *btdev, const uint8_t *bdaddr)
++{
++	if (!btdev || !bdaddr)
++		return false;
++
++	memcpy(btdev->bdaddr, bdaddr, sizeof(btdev->bdaddr));
++
++	return true;
++}
++
+ uint8_t *btdev_get_features(struct btdev *btdev)
+ {
+ 	return btdev->features;
+diff --git a/emulator/btdev.h b/emulator/btdev.h
+index 228bf205cf4b..cad5f699f801 100644
+--- a/emulator/btdev.h
++++ b/emulator/btdev.h
+@@ -72,6 +72,8 @@ bool btdev_set_debug(struct btdev *btdev, btdev_debug_func_t callback,
+ 			void *user_data, btdev_destroy_func_t destroy);
  
- 	err = kstrtobool_from_user(user_buf, count, &enable);
+ const uint8_t *btdev_get_bdaddr(struct btdev *btdev);
++bool btdev_set_bdaddr(struct btdev *btdev, const uint8_t *bdaddr);
++
+ uint8_t *btdev_get_features(struct btdev *btdev);
+ 
+ uint8_t btdev_get_scan_enable(struct btdev *btdev);
 -- 
 2.37.3
 
