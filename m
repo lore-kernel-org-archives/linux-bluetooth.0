@@ -2,51 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40693C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C16B8C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:46:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232215AbiJIXmO (ORCPT
+        id S231387AbiJIXqb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 19:42:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42706 "EHLO
+        Sun, 9 Oct 2022 19:46:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230381AbiJIXld (ORCPT
+        with ESMTP id S231358AbiJIXpx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 19:41:33 -0400
+        Sun, 9 Oct 2022 19:45:53 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A8F57BFA;
-        Sun,  9 Oct 2022 16:13:59 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EAC85B04A;
+        Sun,  9 Oct 2022 16:16:57 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5476EB80DF1;
-        Sun,  9 Oct 2022 22:25:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95668C433D7;
-        Sun,  9 Oct 2022 22:25:26 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1AE1BB80DDC;
+        Sun,  9 Oct 2022 22:26:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61AF2C433D7;
+        Sun,  9 Oct 2022 22:26:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354328;
-        bh=/BleCwNH4q+MxKT7DR0P99zio7f8ZwEn9aOrqdQJuJE=;
+        s=k20201202; t=1665354390;
+        bh=y6mb1eubaJp0f29iWdCtN2LvaUKIi3ax1uLB3dwiWUQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sn0idvksEfh52fJ6cewDV9UlIooQyfTWyR4xjJGYkdN41qZuNCXh3H6gX49forGt8
-         uuiblFHUdBNDvUvbJJNsp0iymyQIJcSp6iGlwnnsrIHBSklPFU9k/tyxaHXPo1VAtS
-         7E1mU2DFGgu9c6apo0Ltw0OHFS6SM4L6OqWLrgiKvebtN6SZgfeAOelYpdPgSXOGQG
-         XpVw2rB5sihp+tN6hHfTZFLCqYH1HdwOhtVZa3wAHX+p1vGxVe1tV916wVfF0fNfmH
-         ppi3NX5HFtoLo50wxc1029/8l+pxfvhXf71cITR3QLVgvrkvvjLEMWDdZaXeF8reNE
-         AQ6V/TbzNONQg==
+        b=a5ar6f2SRpQc5NRJdH5WpxFTK1ge9lBHVDwOk9nauJuZAT3CnrZhDCDzfIYeoB3TM
+         WuhrNBE5iSSEwVT1VQgALX8vc6qjxS8LEJbw07ojcKr3Jo9zSqvDHmLlfAJappk8Ru
+         sIFVcyimUygt1pJ0iGHcT8gCBbiVfy19JU35aDoAsH0TLUbgg/0/v2ASAfWHTtBmKR
+         sc8TSInLSgXlOrDyMN4njmG50HPku+GOhnTmc8PuGGQgNy8ugsq1FSRudc6P6WQ2tY
+         DPMfFtoQ2dyJwou3HYK9SgpGrhhyrC1Dwd2g5vlNz+3UBtKuxtwe5dEfC+AQhfCYXp
+         Xbxc58b5e/xkw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Hawkins Jiawei <yin31149@gmail.com>,
+Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 15/25] Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-Date:   Sun,  9 Oct 2022 18:24:20 -0400
-Message-Id: <20221009222436.1219411-15-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 11/23] Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
+Date:   Sun,  9 Oct 2022 18:25:41 -0400
+Message-Id: <20221009222557.1219968-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009222436.1219411-1-sashal@kernel.org>
-References: <20221009222436.1219411-1-sashal@kernel.org>
+In-Reply-To: <20221009222557.1219968-1-sashal@kernel.org>
+References: <20221009222557.1219968-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -55,64 +56,80 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-[ Upstream commit 448a496f760664d3e2e79466aa1787e6abc922b5 ]
+[ Upstream commit 2d2cb3066f2c90cd8ca540b36ba7a55e7f2406e0 ]
 
-device_add shall not be called multiple times as stated in its
-documentation:
+syzbot is reporting cancel_delayed_work() without INIT_DELAYED_WORK() at
+l2cap_chan_del() [1], for CONF_NOT_COMPLETE flag (which meant to prevent
+l2cap_chan_del() from calling cancel_delayed_work()) is cleared by timer
+which fires before l2cap_chan_del() is called by closing file descriptor
+created by socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_L2CAP).
 
- 'Do not call this routine or device_register() more than once for
- any device structure'
+l2cap_bredr_sig_cmd(L2CAP_CONF_REQ) and l2cap_bredr_sig_cmd(L2CAP_CONF_RSP)
+are calling l2cap_ertm_init(chan), and they call l2cap_chan_ready() (which
+clears CONF_NOT_COMPLETE flag) only when l2cap_ertm_init(chan) succeeded.
 
-Syzkaller reports a bug as follows [1]:
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:33!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-[...]
-Call Trace:
- <TASK>
- __list_add include/linux/list.h:69 [inline]
- list_add_tail include/linux/list.h:102 [inline]
- kobj_kset_join lib/kobject.c:164 [inline]
- kobject_add_internal+0x18f/0x8f0 lib/kobject.c:214
- kobject_add_varg lib/kobject.c:358 [inline]
- kobject_add+0x150/0x1c0 lib/kobject.c:410
- device_add+0x368/0x1e90 drivers/base/core.c:3452
- hci_conn_add_sysfs+0x9b/0x1b0 net/bluetooth/hci_sysfs.c:53
- hci_le_cis_estabilished_evt+0x57c/0xae0 net/bluetooth/hci_event.c:6799
- hci_le_meta_evt+0x2b8/0x510 net/bluetooth/hci_event.c:7110
- hci_event_func net/bluetooth/hci_event.c:7440 [inline]
- hci_event_packet+0x63d/0xfd0 net/bluetooth/hci_event.c:7495
- hci_rx_work+0xae7/0x1230 net/bluetooth/hci_core.c:4007
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
+l2cap_sock_init() does not call l2cap_ertm_init(chan), and it instead sets
+CONF_NOT_COMPLETE flag by calling l2cap_chan_set_defaults(). However, when
+connect() is requested, "command 0x0409 tx timeout" happens after 2 seconds
+ from connect() request, and CONF_NOT_COMPLETE flag is cleared after 4
+seconds from connect() request, for l2cap_conn_start() from
+l2cap_info_timeout() callback scheduled by
 
-Link: https://syzkaller.appspot.com/bug?id=da3246e2d33afdb92d66bc166a0934c5b146404a
+  schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
+
+in l2cap_connect() is calling l2cap_chan_ready().
+
+Fix this problem by initializing delayed works used by L2CAP_MODE_ERTM
+mode as soon as l2cap_chan_create() allocates a channel, like I did in
+commit be8597239379f0f5 ("Bluetooth: initialize skb_queue_head at
+l2cap_chan_create()").
+
+Link: https://syzkaller.appspot.com/bug?extid=83672956c7aa6af698b3 [1]
+Reported-by: syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Hawkins Jiawei <yin31149@gmail.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_sysfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/bluetooth/l2cap_core.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index b69d88b88d2e..ccd2c377bf83 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -48,6 +48,9 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e45a12378bd1..75a76353525c 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -63,6 +63,9 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
  
- 	BT_DBG("conn %p", conn);
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		     struct sk_buff_head *skbs, u8 event);
++static void l2cap_retrans_timeout(struct work_struct *work);
++static void l2cap_monitor_timeout(struct work_struct *work);
++static void l2cap_ack_timeout(struct work_struct *work);
  
-+	if (device_is_registered(&conn->dev))
-+		return;
-+
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+ static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
+ {
+@@ -470,6 +473,9 @@ struct l2cap_chan *l2cap_chan_create(void)
+ 	write_unlock(&chan_list_lock);
  
- 	if (device_add(&conn->dev) < 0) {
+ 	INIT_DELAYED_WORK(&chan->chan_timer, l2cap_chan_timeout);
++	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
++	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
++	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
+ 
+ 	chan->state = BT_OPEN;
+ 
+@@ -3154,10 +3160,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
+ 	chan->rx_state = L2CAP_RX_STATE_RECV;
+ 	chan->tx_state = L2CAP_TX_STATE_XMIT;
+ 
+-	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
+-	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
+-	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
+-
+ 	skb_queue_head_init(&chan->srej_q);
+ 
+ 	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
 -- 
 2.35.1
 
