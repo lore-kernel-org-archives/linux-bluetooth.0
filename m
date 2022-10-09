@@ -2,51 +2,51 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76B46C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08677C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231886AbiJIWZI (ORCPT
+        id S231923AbiJIW0A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 18:25:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
+        Sun, 9 Oct 2022 18:26:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231807AbiJIWXo (ORCPT
+        with ESMTP id S231878AbiJIWX4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 18:23:44 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D3553AE6B;
-        Sun,  9 Oct 2022 15:18:02 -0700 (PDT)
+        Sun, 9 Oct 2022 18:23:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8CE33C15B;
+        Sun,  9 Oct 2022 15:18:10 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DE84FB80D33;
-        Sun,  9 Oct 2022 22:14:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36845C433D6;
-        Sun,  9 Oct 2022 22:14:01 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 052D660A1A;
+        Sun,  9 Oct 2022 22:17:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA55C433D7;
+        Sun,  9 Oct 2022 22:17:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665353642;
-        bh=a00U9GHBoFljlewPFnHrOgja+rsegUW3jaFRMRIvNCM=;
+        s=k20201202; t=1665353836;
+        bh=td0Bgb5k/mqBqt6ZeCIVd7jIB7tIe/i82PmDKrXTogw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QbaErLL/2kY/GdBfHngu74VrIpogmWdT25+bdZAxynEJyo9Cz4VUdtIi/LnVAjt3H
-         0dLKyUvoOepAgnevPIjjhnNeuhjXll74gRL0oro17vVfPSXAR/kZbw9WvDYPiETUil
-         j2LtHsOHS/Zwhff/OJJo9aCdf41/suo3p/V3jIjMbJEeZNQ2wc6MgTt4pmU8IYiVEp
-         9+UotFJieoMjgMX/Aezjf5o5BmGoZdYBq8xudEUI4os9sM08nP6crGQeBVTVBBDOPj
-         csQl+Utot9mRcPHGBZw5CXJ/j+lrHxaqzGiQ9qS5HrIGHM2RU5CHTQIAkPFHsFXe8I
-         SVtsYwKurQ3TQ==
+        b=CaYOfvUhbDWj0tM4VSsr7CyzziK5yYrACxUlA25587vhRG0QakfIv49jsmYJN+PyZ
+         UFzFaixBoQRjsenQSgKLgrKoQAFuML9pbqvpFj6AqNRjLY2vHmwCVmpSG+RyIYgZbA
+         ius77TookVbzMoZJ2q67+/VRiXcbaO/hmGaf+7k9Pox28Bip/8PtMulR+oemRb0ULS
+         jYyUjNPzGHxzLJJPqgpBgi8IvlAPOo1mvcDMIcnXyF6l1EHz6l4TEkt9HsZARlYylf
+         JFJqrd33qjaxoKbxsomh9+FOYryIp+fE+7Koi6JfoQTzO07+HINdSIhftYpY9m87H3
+         TXDXC3LUPkuXA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sungwoo Kim <iam@sung-woo.kim>,
+Cc:     Kiran K <kiran.k@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.0 71/77] Bluetooth: L2CAP: Fix user-after-free
-Date:   Sun,  9 Oct 2022 18:07:48 -0400
-Message-Id: <20221009220754.1214186-71-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.19 35/73] Bluetooth: btintel: Mark Intel controller to support LE_STATES quirk
+Date:   Sun,  9 Oct 2022 18:14:13 -0400
+Message-Id: <20221009221453.1216158-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009220754.1214186-1-sashal@kernel.org>
-References: <20221009220754.1214186-1-sashal@kernel.org>
+In-Reply-To: <20221009221453.1216158-1-sashal@kernel.org>
+References: <20221009221453.1216158-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -55,59 +55,71 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Kiran K <kiran.k@intel.com>
 
-[ Upstream commit 35fcbc4243aad7e7d020b7c1dfb14bb888b20a4f ]
+[ Upstream commit dd0a1794f4334ddbf9b7c5e7d642aaffff38c69b ]
 
-This uses l2cap_chan_hold_unless_zero() after calling
-__l2cap_get_chan_blah() to prevent the following trace:
+HarrrisonPeak, CyclonePeak, SnowFieldPeak and SandyPeak controllers
+are marked to support HCI_QUIRK_LE_STATES.
 
-Bluetooth: l2cap_core.c:static void l2cap_chan_destroy(struct kref
-*kref)
-Bluetooth: chan 0000000023c4974d
-Bluetooth: parent 00000000ae861c08
-==================================================================
-BUG: KASAN: use-after-free in __mutex_waiter_is_first
-kernel/locking/mutex.c:191 [inline]
-BUG: KASAN: use-after-free in __mutex_lock_common
-kernel/locking/mutex.c:671 [inline]
-BUG: KASAN: use-after-free in __mutex_lock+0x278/0x400
-kernel/locking/mutex.c:729
-Read of size 8 at addr ffff888006a49b08 by task kworker/u3:2/389
-
-Link: https://lore.kernel.org/lkml/20220622082716.478486-1-lee.jones@linaro.org
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Sungwoo Kim <iam@sung-woo.kim>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ drivers/bluetooth/btintel.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 770891f68703..1f34b82ca0ec 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4309,6 +4309,12 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 		}
- 	}
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 818681c89db8..d44a96667517 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2439,15 +2439,20 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 					       INTEL_ROM_LEGACY_NO_WBS_SUPPORT))
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
++			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
++				set_bit(HCI_QUIRK_VALID_LE_STATES,
++					&hdev->quirks);
  
-+	chan = l2cap_chan_hold_unless_zero(chan);
-+	if (!chan) {
-+		err = -EBADSLT;
-+		goto unlock;
-+	}
-+
- 	err = 0;
+ 			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+-		case 0x0c:      /* WsP */
+ 		case 0x11:      /* JfP */
+ 		case 0x12:      /* ThP */
+ 		case 0x13:      /* HrP */
+ 		case 0x14:      /* CcP */
++			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++			fallthrough;
++		case 0x0c:	/* WsP */
+ 			/* Apply the device specific HCI quirks
+ 			 *
+ 			 * All Legacy bootloader devices support WBS
+@@ -2455,11 +2460,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 			set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 				&hdev->quirks);
  
- 	l2cap_chan_lock(chan);
-@@ -4338,6 +4344,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
- 	}
+-			/* Valid LE States quirk for JfP/ThP familiy */
+-			if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-				set_bit(HCI_QUIRK_VALID_LE_STATES,
+-					&hdev->quirks);
+-
+ 			/* Setup MSFT Extension support */
+ 			btintel_set_msft_opcode(hdev, ver.hw_variant);
  
- 	l2cap_chan_unlock(chan);
-+	l2cap_chan_put(chan);
+@@ -2530,9 +2530,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		 */
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
  
- unlock:
- 	mutex_unlock(&conn->chan_lock);
+-		/* Valid LE States quirk for JfP/ThP familiy */
+-		if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		/* Set Valid LE States quirk */
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 
+ 		/* Setup MSFT Extension support */
+ 		btintel_set_msft_opcode(hdev, ver.hw_variant);
 -- 
 2.35.1
 
