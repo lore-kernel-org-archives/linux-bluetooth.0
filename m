@@ -2,52 +2,51 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C16B8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A546CC43217
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:55:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231387AbiJIXqb (ORCPT
+        id S231543AbiJIXz1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 19:46:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42886 "EHLO
+        Sun, 9 Oct 2022 19:55:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231358AbiJIXpx (ORCPT
+        with ESMTP id S231493AbiJIXzB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 19:45:53 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EAC85B04A;
-        Sun,  9 Oct 2022 16:16:57 -0700 (PDT)
+        Sun, 9 Oct 2022 19:55:01 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E78BB6565A;
+        Sun,  9 Oct 2022 16:25:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1AE1BB80DDC;
-        Sun,  9 Oct 2022 22:26:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61AF2C433D7;
-        Sun,  9 Oct 2022 22:26:29 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9CD69B80DD7;
+        Sun,  9 Oct 2022 22:10:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5728AC433D7;
+        Sun,  9 Oct 2022 22:10:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354390;
-        bh=y6mb1eubaJp0f29iWdCtN2LvaUKIi3ax1uLB3dwiWUQ=;
+        s=k20201202; t=1665353453;
+        bh=td0Bgb5k/mqBqt6ZeCIVd7jIB7tIe/i82PmDKrXTogw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=a5ar6f2SRpQc5NRJdH5WpxFTK1ge9lBHVDwOk9nauJuZAT3CnrZhDCDzfIYeoB3TM
-         WuhrNBE5iSSEwVT1VQgALX8vc6qjxS8LEJbw07ojcKr3Jo9zSqvDHmLlfAJappk8Ru
-         sIFVcyimUygt1pJ0iGHcT8gCBbiVfy19JU35aDoAsH0TLUbgg/0/v2ASAfWHTtBmKR
-         sc8TSInLSgXlOrDyMN4njmG50HPku+GOhnTmc8PuGGQgNy8ugsq1FSRudc6P6WQ2tY
-         DPMfFtoQ2dyJwou3HYK9SgpGrhhyrC1Dwd2g5vlNz+3UBtKuxtwe5dEfC+AQhfCYXp
-         Xbxc58b5e/xkw==
+        b=o06Vqj26ZXuH6/axRtPFB3oNbnFzVqeXXndmkAe8/0coE37y9mVU6lCuCOYyQTCxv
+         NbKrChgLDxqa+z8yPOtl51xwYtfH7HcXI+1uEPFzzzMpULGv/bnPwInwTxkmdsNMU/
+         AM9TZwhTpj4jTHSnBlRiBxhmCD+mRSeTpi5IyYOkjpBaUWkhu+EWjauOcA4InAh7aF
+         FMOFbsa+ai0bxB607PHEp5w2fWbcXBdpd7b2oGNPEgxGKQGyI/f4uj0hFv9AVZOrJx
+         PuO+FEwMJRTiX2kdslC1FcRi8jF+u04Aif1TM78nwigOtsSgoPspf1/jxQqmgPUT55
+         JMUYO44tkToMA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>,
+Cc:     Kiran K <kiran.k@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 11/23] Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
-Date:   Sun,  9 Oct 2022 18:25:41 -0400
-Message-Id: <20221009222557.1219968-11-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.0 38/77] Bluetooth: btintel: Mark Intel controller to support LE_STATES quirk
+Date:   Sun,  9 Oct 2022 18:07:15 -0400
+Message-Id: <20221009220754.1214186-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009222557.1219968-1-sashal@kernel.org>
-References: <20221009222557.1219968-1-sashal@kernel.org>
+In-Reply-To: <20221009220754.1214186-1-sashal@kernel.org>
+References: <20221009220754.1214186-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -56,80 +55,71 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+From: Kiran K <kiran.k@intel.com>
 
-[ Upstream commit 2d2cb3066f2c90cd8ca540b36ba7a55e7f2406e0 ]
+[ Upstream commit dd0a1794f4334ddbf9b7c5e7d642aaffff38c69b ]
 
-syzbot is reporting cancel_delayed_work() without INIT_DELAYED_WORK() at
-l2cap_chan_del() [1], for CONF_NOT_COMPLETE flag (which meant to prevent
-l2cap_chan_del() from calling cancel_delayed_work()) is cleared by timer
-which fires before l2cap_chan_del() is called by closing file descriptor
-created by socket(AF_BLUETOOTH, SOCK_STREAM, BTPROTO_L2CAP).
+HarrrisonPeak, CyclonePeak, SnowFieldPeak and SandyPeak controllers
+are marked to support HCI_QUIRK_LE_STATES.
 
-l2cap_bredr_sig_cmd(L2CAP_CONF_REQ) and l2cap_bredr_sig_cmd(L2CAP_CONF_RSP)
-are calling l2cap_ertm_init(chan), and they call l2cap_chan_ready() (which
-clears CONF_NOT_COMPLETE flag) only when l2cap_ertm_init(chan) succeeded.
-
-l2cap_sock_init() does not call l2cap_ertm_init(chan), and it instead sets
-CONF_NOT_COMPLETE flag by calling l2cap_chan_set_defaults(). However, when
-connect() is requested, "command 0x0409 tx timeout" happens after 2 seconds
- from connect() request, and CONF_NOT_COMPLETE flag is cleared after 4
-seconds from connect() request, for l2cap_conn_start() from
-l2cap_info_timeout() callback scheduled by
-
-  schedule_delayed_work(&conn->info_timer, L2CAP_INFO_TIMEOUT);
-
-in l2cap_connect() is calling l2cap_chan_ready().
-
-Fix this problem by initializing delayed works used by L2CAP_MODE_ERTM
-mode as soon as l2cap_chan_create() allocates a channel, like I did in
-commit be8597239379f0f5 ("Bluetooth: initialize skb_queue_head at
-l2cap_chan_create()").
-
-Link: https://syzkaller.appspot.com/bug?extid=83672956c7aa6af698b3 [1]
-Reported-by: syzbot <syzbot+83672956c7aa6af698b3@syzkaller.appspotmail.com>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_core.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/bluetooth/btintel.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e45a12378bd1..75a76353525c 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -63,6 +63,9 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 818681c89db8..d44a96667517 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2439,15 +2439,20 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 					       INTEL_ROM_LEGACY_NO_WBS_SUPPORT))
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
++			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
++				set_bit(HCI_QUIRK_VALID_LE_STATES,
++					&hdev->quirks);
  
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		     struct sk_buff_head *skbs, u8 event);
-+static void l2cap_retrans_timeout(struct work_struct *work);
-+static void l2cap_monitor_timeout(struct work_struct *work);
-+static void l2cap_ack_timeout(struct work_struct *work);
+ 			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+-		case 0x0c:      /* WsP */
+ 		case 0x11:      /* JfP */
+ 		case 0x12:      /* ThP */
+ 		case 0x13:      /* HrP */
+ 		case 0x14:      /* CcP */
++			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++			fallthrough;
++		case 0x0c:	/* WsP */
+ 			/* Apply the device specific HCI quirks
+ 			 *
+ 			 * All Legacy bootloader devices support WBS
+@@ -2455,11 +2460,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 			set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 				&hdev->quirks);
  
- static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
- {
-@@ -470,6 +473,9 @@ struct l2cap_chan *l2cap_chan_create(void)
- 	write_unlock(&chan_list_lock);
- 
- 	INIT_DELAYED_WORK(&chan->chan_timer, l2cap_chan_timeout);
-+	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
-+	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
-+	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
- 
- 	chan->state = BT_OPEN;
- 
-@@ -3154,10 +3160,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
- 	chan->rx_state = L2CAP_RX_STATE_RECV;
- 	chan->tx_state = L2CAP_TX_STATE_XMIT;
- 
--	INIT_DELAYED_WORK(&chan->retrans_timer, l2cap_retrans_timeout);
--	INIT_DELAYED_WORK(&chan->monitor_timer, l2cap_monitor_timeout);
--	INIT_DELAYED_WORK(&chan->ack_timer, l2cap_ack_timeout);
+-			/* Valid LE States quirk for JfP/ThP familiy */
+-			if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-				set_bit(HCI_QUIRK_VALID_LE_STATES,
+-					&hdev->quirks);
 -
- 	skb_queue_head_init(&chan->srej_q);
+ 			/* Setup MSFT Extension support */
+ 			btintel_set_msft_opcode(hdev, ver.hw_variant);
  
- 	err = l2cap_seq_list_init(&chan->srej_list, chan->tx_win);
+@@ -2530,9 +2530,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		 */
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+-		/* Valid LE States quirk for JfP/ThP familiy */
+-		if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		/* Set Valid LE States quirk */
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 
+ 		/* Setup MSFT Extension support */
+ 		btintel_set_msft_opcode(hdev, ver.hw_variant);
 -- 
 2.35.1
 
