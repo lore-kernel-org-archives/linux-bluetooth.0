@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6229EC43219
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 577E1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233506AbiJIWuL (ORCPT
+        id S233615AbiJIWu0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 18:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58162 "EHLO
+        Sun, 9 Oct 2022 18:50:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233482AbiJIWtL (ORCPT
+        with ESMTP id S233463AbiJIWtJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 18:49:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88F631658A;
-        Sun,  9 Oct 2022 15:25:37 -0700 (PDT)
+        Sun, 9 Oct 2022 18:49:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A423AB17;
+        Sun,  9 Oct 2022 15:25:08 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A2C66B80DDE;
-        Sun,  9 Oct 2022 22:23:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED452C433D7;
-        Sun,  9 Oct 2022 22:23:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1F1C360C95;
+        Sun,  9 Oct 2022 22:25:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF7FC433B5;
+        Sun,  9 Oct 2022 22:25:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354218;
-        bh=QKNgzoxYek1Ubv+lLGCk5GbVzg63S5k1MsO7eIVpwu4=;
+        s=k20201202; t=1665354307;
+        bh=rNP+Al6u5YeMGaU/bAoWFB6k46B24myAjYk+sEp9nMk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TlU3Qo+9ijmjbh/XKh6deXoNO58G5RCBCp+8P0nkgf0SpU+IJUvtPgJZiblLyyvrX
-         dVMe0GolL7uYH6WQB4b30xzQVJibUuTynV4EYxDqsdHk5a4MlXCCKoXEn/OGjNh4AH
-         eBzoNeKDjR+Rbuylx0H9EhOt5t9KLT2NZqqoo5sO2N/QY8rl6r1z/96GM3jtak5aOz
-         vsnbWM+86uq1GKkgrYWwl82WoyQXqqua5Urwp2aJt2qVYsud9FgiQjPZ+d+fKOpzof
-         vwM85Iquy2J8EIUA7rvHT3/jdXpLr9Jn5884EEBXKenxfL1eHTZcpa9F8IuuafHM3j
-         RvbE0NTwonEUA==
+        b=j/InbRKTTXSC/j9PYj3nX8vcXdH1TUjTrpU4/O03YTQDFg/EFeetCyj39eetBsORz
+         PiHl/yCjZWYpIXX9ndCoVFRW/UyZFIGXRD6nq/wUPs8SR4Y5+46llu7hkHRR3bNt9z
+         oKFLdxoJok2LzSukXViCDxLeQU+Kvxtn9F9ZNLinAPEVX9yyw+dCb983+DccmNYitl
+         JF2OV1yhUyhyrcjJ8aN6yf4sm/yUf26/aaUcBrKiOLuVvFo0u6iX2+EsEjcQEMzeQZ
+         an9Vsm53SHGGbXotTrqxlhlD5o4XVNCzlcMYxVMFndWnRq/bo+xklFMsCVImqjSRMP
+         CBYD5IWfkjO5g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
@@ -42,12 +42,12 @@ Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 13/29] Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
-Date:   Sun,  9 Oct 2022 18:22:48 -0400
-Message-Id: <20221009222304.1218873-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 11/25] Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
+Date:   Sun,  9 Oct 2022 18:24:16 -0400
+Message-Id: <20221009222436.1219411-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009222304.1218873-1-sashal@kernel.org>
-References: <20221009222304.1218873-1-sashal@kernel.org>
+In-Reply-To: <20221009222436.1219411-1-sashal@kernel.org>
+References: <20221009222436.1219411-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -96,10 +96,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3682d2e1cd7d..442432f89be1 100644
+index 65d20bdff023..7c280fcdcaa0 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -60,6 +60,9 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
+@@ -63,6 +63,9 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
  
  static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
  		     struct sk_buff_head *skbs, u8 event);
@@ -109,7 +109,7 @@ index 3682d2e1cd7d..442432f89be1 100644
  
  static inline u8 bdaddr_type(u8 link_type, u8 bdaddr_type)
  {
-@@ -475,6 +478,9 @@ struct l2cap_chan *l2cap_chan_create(void)
+@@ -470,6 +473,9 @@ struct l2cap_chan *l2cap_chan_create(void)
  	write_unlock(&chan_list_lock);
  
  	INIT_DELAYED_WORK(&chan->chan_timer, l2cap_chan_timeout);
@@ -119,7 +119,7 @@ index 3682d2e1cd7d..442432f89be1 100644
  
  	chan->state = BT_OPEN;
  
-@@ -3163,10 +3169,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
+@@ -3154,10 +3160,6 @@ int l2cap_ertm_init(struct l2cap_chan *chan)
  	chan->rx_state = L2CAP_RX_STATE_RECV;
  	chan->tx_state = L2CAP_TX_STATE_XMIT;
  
