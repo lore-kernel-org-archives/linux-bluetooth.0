@@ -2,48 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A3CC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:40:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0DBC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:40:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232795AbiJIWk3 (ORCPT
+        id S233049AbiJIWkb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 18:40:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53592 "EHLO
+        Sun, 9 Oct 2022 18:40:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233243AbiJIWiz (ORCPT
+        with ESMTP id S233186AbiJIWii (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 18:38:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E915141522;
-        Sun,  9 Oct 2022 15:21:34 -0700 (PDT)
+        Sun, 9 Oct 2022 18:38:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0D1B40BF1;
+        Sun,  9 Oct 2022 15:21:13 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 130BA60AF8;
-        Sun,  9 Oct 2022 22:20:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F93BC43143;
-        Sun,  9 Oct 2022 22:20:52 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CEDB9B80DCD;
+        Sun,  9 Oct 2022 22:20:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9468FC4347C;
+        Sun,  9 Oct 2022 22:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354053;
-        bh=Qq/nS/EG95y0I/Z0ahk81L6aZDYvt5NYsst/VyPOYko=;
+        s=k20201202; t=1665354013;
+        bh=giqT9MYoDXKQ+baoc0Lp9B7z0xLRE2QZ8nR3HVgVdV0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=olA+b3l1w+FM/iR7NeOV19lfx5JjQ9TQjCsnh2YgRo/4XDQJ2DQsN9olih+PH3A3G
-         b/GJrQPgTRZBDGT11GEqYyPjcHnHzEKFw3RA9UX3+MzhiOhEYkAU11bt/1LkP/jGp8
-         r2G5woiTfN//cll5q56KEztojb35ac4R0nI5mpmS07+07nZUVIvNjOmFRsTHE46+M7
-         lmkZl66Ir1UOxmCcUQMVPXAIJjc8j5UL5x3I27FkGETRqe8ToGxFP00Ems+TiDoYVf
-         iCcdQvupJAMXJYVRTtWbDE/cRW+sc03GAN9YV943a6kzmoVrvbfnVBwaIRBG/aZ6WG
-         ItX3np6P0f/xg==
+        b=T94w5KEVQMxoqkeTdzoC6Ss4Pm4SCbZGavo/yn3Qbu4rd//qd4zZFnLY5Xi+QXTXh
+         VfIM/jvfPZ2H4flhDRh2bip1sNVlFDRnwlE5dyFXOA+9pwnfOFYKcIUBFQIv/Hmzgx
+         OjUN7mf7kXG0CHj+P9VJETUU2IRZCDJ0F6XD0ZVeSGZOV+m2CVIeuuM6ZPcpMLR8Oi
+         1/h5TjBjeNeCQxiW7SZSNQDvixCUfe1Ss3J3rMHlF/gGf6vLQaIzGuVQueX6/n/yfD
+         yKEtaRemMwCjrcaUQ3maM9VGHTMubhLiKx/2xrCMALsJiexCmIiDqVMPWCSwrZZPrN
+         hInirz2gMJQ7Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Hawkins Jiawei <yin31149@gmail.com>,
+Cc:     Kiran K <kiran.k@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 34/46] Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-Date:   Sun,  9 Oct 2022 18:18:59 -0400
-Message-Id: <20221009221912.1217372-34-sashal@kernel.org>
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 21/46] Bluetooth: btintel: Mark Intel controller to support LE_STATES quirk
+Date:   Sun,  9 Oct 2022 18:18:46 -0400
+Message-Id: <20221009221912.1217372-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20221009221912.1217372-1-sashal@kernel.org>
 References: <20221009221912.1217372-1-sashal@kernel.org>
@@ -55,64 +55,71 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Kiran K <kiran.k@intel.com>
 
-[ Upstream commit 448a496f760664d3e2e79466aa1787e6abc922b5 ]
+[ Upstream commit dd0a1794f4334ddbf9b7c5e7d642aaffff38c69b ]
 
-device_add shall not be called multiple times as stated in its
-documentation:
+HarrrisonPeak, CyclonePeak, SnowFieldPeak and SandyPeak controllers
+are marked to support HCI_QUIRK_LE_STATES.
 
- 'Do not call this routine or device_register() more than once for
- any device structure'
-
-Syzkaller reports a bug as follows [1]:
-------------[ cut here ]------------
-kernel BUG at lib/list_debug.c:33!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN
-[...]
-Call Trace:
- <TASK>
- __list_add include/linux/list.h:69 [inline]
- list_add_tail include/linux/list.h:102 [inline]
- kobj_kset_join lib/kobject.c:164 [inline]
- kobject_add_internal+0x18f/0x8f0 lib/kobject.c:214
- kobject_add_varg lib/kobject.c:358 [inline]
- kobject_add+0x150/0x1c0 lib/kobject.c:410
- device_add+0x368/0x1e90 drivers/base/core.c:3452
- hci_conn_add_sysfs+0x9b/0x1b0 net/bluetooth/hci_sysfs.c:53
- hci_le_cis_estabilished_evt+0x57c/0xae0 net/bluetooth/hci_event.c:6799
- hci_le_meta_evt+0x2b8/0x510 net/bluetooth/hci_event.c:7110
- hci_event_func net/bluetooth/hci_event.c:7440 [inline]
- hci_event_packet+0x63d/0xfd0 net/bluetooth/hci_event.c:7495
- hci_rx_work+0xae7/0x1230 net/bluetooth/hci_core.c:4007
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e4/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
- </TASK>
-
-Link: https://syzkaller.appspot.com/bug?id=da3246e2d33afdb92d66bc166a0934c5b146404a
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Tested-by: Hawkins Jiawei <yin31149@gmail.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_sysfs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/btintel.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 4e3e0451b08c..08542dfc2dc5 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -48,6 +48,9 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index d122cc973917..de3d851d85e7 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2274,15 +2274,20 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 					       INTEL_ROM_LEGACY_NO_WBS_SUPPORT))
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
++			if (ver.hw_variant == 0x08 && ver.fw_variant == 0x22)
++				set_bit(HCI_QUIRK_VALID_LE_STATES,
++					&hdev->quirks);
  
- 	BT_DBG("conn %p", conn);
+ 			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+-		case 0x0c:      /* WsP */
+ 		case 0x11:      /* JfP */
+ 		case 0x12:      /* ThP */
+ 		case 0x13:      /* HrP */
+ 		case 0x14:      /* CcP */
++			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++			fallthrough;
++		case 0x0c:	/* WsP */
+ 			/* Apply the device specific HCI quirks
+ 			 *
+ 			 * All Legacy bootloader devices support WBS
+@@ -2290,11 +2295,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 			set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 				&hdev->quirks);
  
-+	if (device_is_registered(&conn->dev))
-+		return;
-+
- 	dev_set_name(&conn->dev, "%s:%d", hdev->name, conn->handle);
+-			/* Valid LE States quirk for JfP/ThP familiy */
+-			if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-				set_bit(HCI_QUIRK_VALID_LE_STATES,
+-					&hdev->quirks);
+-
+ 			/* Setup MSFT Extension support */
+ 			btintel_set_msft_opcode(hdev, ver.hw_variant);
  
- 	if (device_add(&conn->dev) < 0) {
+@@ -2361,9 +2361,8 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		 */
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+-		/* Valid LE States quirk for JfP/ThP familiy */
+-		if (ver.hw_variant == 0x11 || ver.hw_variant == 0x12)
+-			set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		/* Set Valid LE States quirk */
++		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 
+ 		/* Setup MSFT Extension support */
+ 		btintel_set_msft_opcode(hdev, ver.hw_variant);
 -- 
 2.35.1
 
