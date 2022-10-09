@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2252C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40693C43219
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 23:42:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232004AbiJIXjx (ORCPT
+        id S232215AbiJIXmO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 19:39:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60748 "EHLO
+        Sun, 9 Oct 2022 19:42:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231460AbiJIXj2 (ORCPT
+        with ESMTP id S230381AbiJIXld (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 19:39:28 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8461564EA;
-        Sun,  9 Oct 2022 16:12:12 -0700 (PDT)
+        Sun, 9 Oct 2022 19:41:33 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34A8F57BFA;
+        Sun,  9 Oct 2022 16:13:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0F21AB80DF4;
-        Sun,  9 Oct 2022 22:27:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 651BFC433D6;
-        Sun,  9 Oct 2022 22:27:49 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5476EB80DF1;
+        Sun,  9 Oct 2022 22:25:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95668C433D7;
+        Sun,  9 Oct 2022 22:25:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354470;
-        bh=52nmRZeL7C7bPE7/IWT/n7ZtPwpOmsvK1hGhDod0Wuo=;
+        s=k20201202; t=1665354328;
+        bh=/BleCwNH4q+MxKT7DR0P99zio7f8ZwEn9aOrqdQJuJE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aGKJb6p87V8NgQmlVwiozSWtJmJqIs7bIf5dB1XKCp7puTHAyVI+iqE/f2qIXgqNF
-         EBVGV0q5TQiC4Us5FbfPW6ohaj3Q09Ac1i9bJkbgKiHX/mDoVPORRUoQQsOOLu90bN
-         Q2n0IdvlcjRkB5URhmcFHpM/JBxh6q8K8Mxli7OmOxBoVgwFeM3b1PHJXVzqPBWLwP
-         MfVeZcmbUsNxhQChojgkUtXS2YKDxcotr7bEPU4NkjEpoidCyYeap70nv174ax84pO
-         znGC0igS/MaaocbK9sqjkQqPX13PDwI6vT+G/Z4z7bGcu3CmWMmTg7csrHu4ET9xAU
-         h/DBG3Nhi4TDg==
+        b=sn0idvksEfh52fJ6cewDV9UlIooQyfTWyR4xjJGYkdN41qZuNCXh3H6gX49forGt8
+         uuiblFHUdBNDvUvbJJNsp0iymyQIJcSp6iGlwnnsrIHBSklPFU9k/tyxaHXPo1VAtS
+         7E1mU2DFGgu9c6apo0Ltw0OHFS6SM4L6OqWLrgiKvebtN6SZgfeAOelYpdPgSXOGQG
+         XpVw2rB5sihp+tN6hHfTZFLCqYH1HdwOhtVZa3wAHX+p1vGxVe1tV916wVfF0fNfmH
+         ppi3NX5HFtoLo50wxc1029/8l+pxfvhXf71cITR3QLVgvrkvvjLEMWDdZaXeF8reNE
+         AQ6V/TbzNONQg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
@@ -41,12 +41,12 @@ Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 12/16] Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-Date:   Sun,  9 Oct 2022 18:27:08 -0400
-Message-Id: <20221009222713.1220394-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 15/25] Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
+Date:   Sun,  9 Oct 2022 18:24:20 -0400
+Message-Id: <20221009222436.1219411-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009222713.1220394-1-sashal@kernel.org>
-References: <20221009222713.1220394-1-sashal@kernel.org>
+In-Reply-To: <20221009222436.1219411-1-sashal@kernel.org>
+References: <20221009222436.1219411-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -100,10 +100,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index cb7d06bb0243..37ec675b7bee 100644
+index b69d88b88d2e..ccd2c377bf83 100644
 --- a/net/bluetooth/hci_sysfs.c
 +++ b/net/bluetooth/hci_sysfs.c
-@@ -47,6 +47,9 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
+@@ -48,6 +48,9 @@ void hci_conn_add_sysfs(struct hci_conn *conn)
  
  	BT_DBG("conn %p", conn);
  
