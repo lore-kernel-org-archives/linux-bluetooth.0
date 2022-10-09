@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37614C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:55:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D80EC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  9 Oct 2022 22:55:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233732AbiJIWzv (ORCPT
+        id S233755AbiJIWzy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 9 Oct 2022 18:55:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58810 "EHLO
+        Sun, 9 Oct 2022 18:55:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233627AbiJIWwf (ORCPT
+        with ESMTP id S233945AbiJIWyX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 9 Oct 2022 18:52:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70C548EBE;
-        Sun,  9 Oct 2022 15:28:25 -0700 (PDT)
+        Sun, 9 Oct 2022 18:54:23 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D4CF3DF11;
+        Sun,  9 Oct 2022 15:29:29 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A268260DBB;
-        Sun,  9 Oct 2022 22:24:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5B64C433B5;
-        Sun,  9 Oct 2022 22:24:18 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AF2EC60DDD;
+        Sun,  9 Oct 2022 22:27:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B776FC433B5;
+        Sun,  9 Oct 2022 22:27:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665354260;
-        bh=maJ8fNNyCcC99rqyWAvsYKYOT4uvsH7Am3h5FOC+4NU=;
+        s=k20201202; t=1665354476;
+        bh=5Iqm60SwyyyRfJTCk22dEZia1Xh8h760FMFhJi50/Ik=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pAQ4YlrKyVpRsvzhre8HvpITg1PKAknMnVuTle+0Abu0NA5s0CLAFzzbRHi/2/2Zm
-         iWvSNeB8+3HODu66g12+x/jk7iTDUWgRzmDM1C3ANwPdeMwOJkn50UieYzWo9rnXzN
-         FHHogZrqIfsZU5XQ0UmK+1HCT8BXLZ8Uu8eezTNm4tb3Nt0UcQmLTCs+zD5wOhQENt
-         +DIdU506dWMwY+skKxIkURWiZVcAGKZRfzvhdjbXcJRTBH4B4Ovm3BBqeLF2QyfGCO
-         9YW/RHfyeaa6L2Uffrb2ZiFVVpI1ObCqWD7GTeyyLBrIkrBnYAZwD8j5c5r3gxUNlt
-         2c3KmNfihwKlg==
+        b=tKhTgPc6WWfaRldFG1Yk0pDt+oUTQugUyAL6V0n1yjX+mMuWoPqFY7J1jDsiZ4rJl
+         TLkAHmxbiNJ2GGXUWEIuLglrgduq7e7nR4PZJL0+o0sAoMxwAItHJjKz7f1720ogIC
+         oOaN3x2tMKTup1J1rFWjnflPD/AN2xLJUjdT+P2PVQDlKoFLmCDyDtnToY/8mEanon
+         tjna9fUUg7k1KIYF2RCXXa7nsK7+TVnAFzRYdy/rZrsfvXvxw4XMQj9pP8APrldsZY
+         nblTMVdpkYSEdnf7uE9ou/W/o1MdqlB1zHrJtDNYjjnxl6e8TA4GrBmKkfHTv0f8+w
+         XJQmjiJ9fBLNQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
@@ -41,12 +41,12 @@ Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 27/29] Bluetooth: L2CAP: Fix user-after-free
-Date:   Sun,  9 Oct 2022 18:23:02 -0400
-Message-Id: <20221009222304.1218873-27-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 15/16] Bluetooth: L2CAP: Fix user-after-free
+Date:   Sun,  9 Oct 2022 18:27:11 -0400
+Message-Id: <20221009222713.1220394-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20221009222304.1218873-1-sashal@kernel.org>
-References: <20221009222304.1218873-1-sashal@kernel.org>
+In-Reply-To: <20221009222713.1220394-1-sashal@kernel.org>
+References: <20221009222713.1220394-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -84,10 +84,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 7 insertions(+)
 
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 442432f89be1..2d28b4e49b7a 100644
+index 42df17fa7f16..ec04a7ea5537 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -4066,6 +4066,12 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+@@ -4039,6 +4039,12 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
  		}
  	}
  
@@ -100,7 +100,7 @@ index 442432f89be1..2d28b4e49b7a 100644
  	err = 0;
  
  	l2cap_chan_lock(chan);
-@@ -4095,6 +4101,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
+@@ -4068,6 +4074,7 @@ static int l2cap_connect_create_rsp(struct l2cap_conn *conn,
  	}
  
  	l2cap_chan_unlock(chan);
