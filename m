@@ -2,117 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D8EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 21:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E471C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 21:19:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229677AbiJJVNS (ORCPT
+        id S229574AbiJJVTF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Oct 2022 17:13:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49556 "EHLO
+        Mon, 10 Oct 2022 17:19:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229675AbiJJVNR (ORCPT
+        with ESMTP id S229475AbiJJVTE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Oct 2022 17:13:17 -0400
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D44B06DFBB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 14:13:16 -0700 (PDT)
-Received: by mail-il1-x130.google.com with SMTP id g13so6273810ile.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 14:13:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ubtpV2CoP0ltCPIrXpsz31+lei7JJ9Wj82r5uHIsyKE=;
-        b=IPPt2siiJ9xVcmF3MQ0pobXAANJjPmhGTV9eT0Q7p2Osh84DphdsefNExYfZ2yYmmd
-         BtiKWmEFJTD8MUKOJRR6E2VjKv0vgw5ffJF+cauIX6Bwi5Igb9BKRrY+hTRDY9Zn/zA5
-         tkNZw2V+DbhhC1pl4P2S97hqsLmTwzz6Yw66H9ZhS4rCHIYx/5sIOT1t2CdSoTABCq8G
-         9XQRoRuK+kP64oBIlSbW7tHBx3Qwf4PUzwW/SHVMnl/FZVJHawpmCOiTVmIfP7nXi56y
-         22Ic2x7HA23tPK4ySuH7jo8hj6SRo93wfhB+oc26jwOVG/nTCeRTwtpIdeFHbhhVaPlT
-         TsCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ubtpV2CoP0ltCPIrXpsz31+lei7JJ9Wj82r5uHIsyKE=;
-        b=VsBxf26LesmpOxDpeME6RLKZhuz5jl0wJEunHfEZaNLfx5yk2Truxn1ZYl3hK4s9uk
-         XB7V79uyeQI+E+s5jeqycz7CFWfTX7vt72HcOybISmSt6AEUezc5+Tm9n3YOmyIFsJWc
-         roinBWWDxMv5PgvXhkT3bNgaYK1F41Is6sh2HFelkjo/6OXt5RyVQF8yg1xWLokGUoJO
-         /GDRjBn5qMfZu25z9hIQoon9eiguAySjjFFkKaiz/Gqb68J+EM1nh2z60e5gW94wbKDC
-         k6sIpeGkbD+6NhTBcSEUwKcKZTIH6S5BBU3N63Mqnmdljm4Cnkgw6Tq9LrvgFNbY9hH6
-         IYFA==
-X-Gm-Message-State: ACrzQf0n4q5EWb2W6+PJJo3BJw1DG5PNVD6we2HKY3NTRhmbN5fVggQY
-        QXACLm+d0QWkULjeipq1o95x9xhI7Pc=
-X-Google-Smtp-Source: AMsMyM7Z30ZKToMKx+W3Jp3N9U/iEjwIb9e1X1YU7xtrOdiSe5FSNqDBsfIkaM6KyrPpBSnoCT4UmA==
-X-Received: by 2002:a05:6e02:1a2c:b0:2f2:3529:1a07 with SMTP id g12-20020a056e021a2c00b002f235291a07mr10245484ile.200.1665436395995;
-        Mon, 10 Oct 2022 14:13:15 -0700 (PDT)
-Received: from [172.17.0.2] ([40.69.172.65])
-        by smtp.gmail.com with ESMTPSA id p14-20020a02b00e000000b003633eb91999sm4287427jah.155.2022.10.10.14.13.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Oct 2022 14:13:15 -0700 (PDT)
-Message-ID: <63448aeb.020a0220.c3987.4386@mx.google.com>
-Date:   Mon, 10 Oct 2022 14:13:15 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7224867214203715379=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
-Subject: RE: [1/2] Bluetooth: hci_sync: Fix not setting static address
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221010203522.1251151-1-brian.gix@intel.com>
-References: <20221010203522.1251151-1-brian.gix@intel.com>
+        Mon, 10 Oct 2022 17:19:04 -0400
+Received: from smtp.github.com (out-21.smtp.github.com [192.30.252.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18877961F
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 14:19:02 -0700 (PDT)
+Received: from github.com (hubbernetes-node-5478a13.ac4-iad.github.net [10.52.207.50])
+        by smtp.github.com (Postfix) with ESMTPA id 377A5520F94
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 14:19:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1665436742;
+        bh=de1p0LFQbMnJWqXJqPoX1+eXrum7h/VECC3xEWyLnKE=;
+        h=Date:From:To:Subject:From;
+        b=mx8zmnDJiqEYJBbsTeQ9eiBLbDwZTbl5h0F2NkROCkdOruJsq550Ds4D+4/cze/v2
+         380QFJsaI9llWMOm83TFPleZBu1ht7gGWepE28D7jBvzrnuscWIe5h85pDHpaB3GJW
+         S6ZWor7aABYf575ardBZk2It0NChuLykb3ZDr5fU=
+Date:   Mon, 10 Oct 2022 14:19:02 -0700
+From:   Luiz Augusto von Dentz <noreply@github.com>
+To:     linux-bluetooth@vger.kernel.org
+Message-ID: <bluez/bluez/push/refs/heads/master/3da439-906585@github.com>
+Subject: [bluez/bluez] c94cdb: btdev: Add support for setting bdaddr
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7224867214203715379==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: c94cdbc6d73ffd818d862975895d48dd01361234
+      https://github.com/bluez/bluez/commit/c94cdbc6d73ffd818d862975895d48dd01361234
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-10-10 (Mon, 10 Oct 2022)
 
-This is automated email and please do not reply to this email!
+  Changed paths:
+    M emulator/btdev.c
+    M emulator/btdev.h
 
-Dear submitter,
+  Log Message:
+  -----------
+  btdev: Add support for setting bdaddr
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=684318
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.59 seconds
-GitLint                       PASS      1.52 seconds
-SubjectPrefix                 PASS      1.31 seconds
-BuildKernel                   PASS      34.07 seconds
-BuildKernel32                 PASS      31.07 seconds
-Incremental Build with patchesPASS      51.01 seconds
-TestRunner: Setup             PASS      511.19 seconds
-TestRunner: l2cap-tester      PASS      17.17 seconds
-TestRunner: iso-tester        PASS      16.48 seconds
-TestRunner: bnep-tester       PASS      6.24 seconds
-TestRunner: mgmt-tester       FAIL      108.40 seconds
-TestRunner: rfcomm-tester     PASS      10.01 seconds
-TestRunner: sco-tester        PASS      9.54 seconds
-TestRunner: ioctl-tester      PASS      10.59 seconds
-TestRunner: mesh-tester       PASS      7.67 seconds
-TestRunner: smp-tester        PASS      9.43 seconds
-TestRunner: userchan-tester   PASS      6.46 seconds
-
-Details
-##############################
-Test: TestRunner: mgmt-tester - FAIL - 108.40 seconds
-Run test-runner with mgmt-tester
-Total: 494, Passed: 492 (99.6%), Failed: 2, Not Run: 0
-
-Failed Test Cases
-Set Static Address - Success 1                       Timed out    2.669 seconds
-Set Static Address - Success 2                       Timed out    2.002 seconds
+This adds btdev_set_bdaddr so it is possible to set an arbritrary
+address.
 
 
+  Commit: c2bf15137410c92f346ff8031bdfaa756fb8b16e
+      https://github.com/bluez/bluez/commit/c2bf15137410c92f346ff8031bdfaa756fb8b16e
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-10-10 (Mon, 10 Oct 2022)
 
----
-Regards,
-Linux Bluetooth
+  Changed paths:
+    M emulator/vhci.c
+    M emulator/vhci.h
+
+  Log Message:
+  -----------
+  vhci: Add function to interact with force_static_address
+
+This adds functions that can be used to set debugfs
+force_static_address.
 
 
---===============7224867214203715379==--
+  Commit: 9065853fe5c70db2b9ca42fd40b027746e85f56d
+      https://github.com/bluez/bluez/commit/9065853fe5c70db2b9ca42fd40b027746e85f56d
+  Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  Date:   2022-10-10 (Mon, 10 Oct 2022)
+
+  Changed paths:
+    M tools/mgmt-tester.c
+
+  Log Message:
+  -----------
+  mgmt-tester: Fix Set Static Address tests
+
+Set Static Address tests needs to power after setting the address since
+the programming of the address using the HCI command only happens during
+power on procedure.
+
+
+Compare: https://github.com/bluez/bluez/compare/3da439ae3c76...9065853fe5c7
