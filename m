@@ -2,78 +2,134 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A99D2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 20:28:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F32C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 20:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229786AbiJJU2k (ORCPT
+        id S230341AbiJJUhN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Oct 2022 16:28:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56626 "EHLO
+        Mon, 10 Oct 2022 16:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229793AbiJJU2Q (ORCPT
+        with ESMTP id S229958AbiJJUgg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Oct 2022 16:28:16 -0400
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 10 Oct 2022 13:26:41 PDT
-Received: from o6.sgmail.github.com (o6.sgmail.github.com [192.254.113.101])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AD47E32F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 13:26:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        h=from:subject:mime-version:content-type:content-transfer-encoding:to:
-        cc;
-        s=smtpapi; bh=E64VtMCat4pokZr4KvgcqFGgyxiqbW9diflAPgktFys=;
-        b=x+BtmSZRFwFT/hVROffYy0sEfs9/d0hdkOFdGpDU2f39m4N+1efz0BLfSrSKYzjYXnOP
-        iWs70sMXj3EYFZqf3bweUmvoKLwUG2XfFSPUfv+Xp5milH4E6A4J5otvc+TzEkxua0BW4T
-        jC1cs+wZenfsA8m/5kYGfVxnV0ytQyy9c=
-Received: by filterdrecv-7c78485bb8-w7bmg with SMTP id filterdrecv-7c78485bb8-w7bmg-1-63447F43-53
-        2022-10-10 20:23:31.220298648 +0000 UTC m=+1118315.490977699
-Received: from smtp.github.com (unknown)
-        by geopod-ismtpd-3-5 (SG)
-        with ESMTP id aS4yfKZUTcC8louUNOT6aQ
-        for <linux-bluetooth@vger.kernel.org>;
-        Mon, 10 Oct 2022 20:23:31.214 +0000 (UTC)
-Received: from github.com (hubbernetes-node-910725f.ash1-iad.github.net [10.56.211.51])
-        by smtp.github.com (Postfix) with ESMTPA id 02C975E04D5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 13:22:50 -0700 (PDT)
-Date:   Mon, 10 Oct 2022 20:23:31 +0000 (UTC)
-From:   Abhay <noreply@github.com>
-Message-ID: <bluez/bluez/push/refs/heads/master/dabf32-3da439@github.com>
-Subject: [bluez/bluez] 3da439: shared/bap: Fixing memory overwrite during ASE
- Ena...
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
-X-SG-EID: =?us-ascii?Q?wY6IQVjVwytEPOaatj6miTTVbtG1QvhTe3IAnAG=2FU50wLSf8mPjX4zYsbDQ5l1?=
- =?us-ascii?Q?QqUcl1oIRvBZvxD1xZ8tvMkz8rx8ODOyIZHxm1y?=
- =?us-ascii?Q?Os0HQ7w9Jj22kOCyv99CRBYNCtnsZ685zXIW6LO?=
- =?us-ascii?Q?P8V7pFam2974fdsu8uhX=2F+gy4KpVqgDrMQV4Amb?=
- =?us-ascii?Q?J15yFAGGiRh7LLe2wrYaRFqBsBTNe+h5sgenC5S?=
- =?us-ascii?Q?En8PUXF+EbmjidRXoFpd1=2F3M9eYJzSel5owN7i?=
+        Mon, 10 Oct 2022 16:36:36 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD137EFFA
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 13:35:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1665434130; x=1696970130;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=pgXwzFPx2tJhStAb9dugB7qWHfF5mmuTgdrd5/SwxlE=;
+  b=n8YDUpah3/WLTexGufTd2zaw8fOlT2Bc8YAjgYnGzyVgrtqJksCpYBdE
+   ZpW1PROEtjdrXv8CU32afpAgSjCJ7mGWRMyvZDfZ4Kpy2xS6PCpS+LfVW
+   jSOI/VPKuE17RPUSjzY4HFJNnCLla6KvwXa/egMqkwCRDEunqEuZu/MIf
+   Veg/lJMTirGCfJ+EZlkpQXRe7ekoJ4+JGGGWBS+nxJHcOCCm+5NqPwT4Z
+   Fc18iGXRcmRieoeO8uxTK/SRcBHi8XKr83IwG6hukLXG7au25izDAaMa5
+   lGR4NNcj5D2WwXmev3fnRDi8EbLAFgfNSk829fVp+H2sNMwdSm1infOEf
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10496"; a="330802908"
+X-IronPort-AV: E=Sophos;i="5.95,173,1661842800"; 
+   d="scan'208";a="330802908"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2022 13:35:30 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10496"; a="730696017"
+X-IronPort-AV: E=Sophos;i="5.95,173,1661842800"; 
+   d="scan'208";a="730696017"
+Received: from yvasudev-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.135.7])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Oct 2022 13:35:29 -0700
+From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-X-Entity-ID: /f+S0XqulHHajbNb6hGdxg==
+Cc:     luiz.dentz@gmail.com, brian.gix@intel.com,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: [PATCH 1/2] Bluetooth: hci_sync: Fix not setting static address
+Date:   Mon, 10 Oct 2022 13:35:21 -0700
+Message-Id: <20221010203522.1251151-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: 3da439ae3c76e5008d007c2c41f6e7e1828b7321
-      https://github.com/bluez/bluez/commit/3da439ae3c76e5008d007c2c41f6e7e1828b7321
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2022-10-10 (Mon, 10 Oct 2022)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M src/shared/bap.c
+This attempts to program the address stored in hdev->static_addr after
+the init sequence has been complete:
 
-  Log Message:
-  -----------
-  shared/bap: Fixing memory overwrite during ASE Enable Operation
+@ MGMT Command: Set Static A.. (0x002b) plen 6
+        Address: C0:55:44:33:22:11 (Static)
+@ MGMT Event: Command Complete (0x0001) plen 7
+      Set Static Address (0x002b) plen 4
+        Status: Success (0x00)
+        Current settings: 0x00008200
+          Low Energy
+          Static Address
+@ MGMT Event: New Settings (0x0006) plen 4
+        Current settings: 0x00008200
+          Low Energy
+          Static Address
+< HCI Command: LE Set Random.. (0x08|0x0005) plen 6
+        Address: C0:55:44:33:22:11 (Static)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Random Address (0x08|0x0005) ncmd 1
+        Status: Success (0x00)
+@ MGMT Event: Command Complete (0x0001) plen 7
+      Set Powered (0x0005) plen 4
+        Status: Success (0x00)
+        Current settings: 0x00008201
+          Powered
+          Low Energy
+          Static Address
+@ MGMT Event: New Settings (0x0006) plen 4
+        Current settings: 0x00008201
+          Powered
+          Low Energy
+          Static Address
 
-This fixes memory overwrite during ASE Enable operation handling.
-It avoids crashing of bluetoothd if metadata of more than sizeo of
-size_t is received.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Tested-by: Brian Gix <brian.gix@intel.com>
+---
+ net/bluetooth/hci_sync.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-This also fixes storing metadata to stream structure.
-
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 76c3107c9f91..b53bb0ee9d39 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3054,6 +3054,7 @@ int hci_update_name_sync(struct hci_dev *hdev)
+  * Enable Authentication
+  * lmp_bredr_capable(Set Fast Connectable -> Set Scan Type -> Set Class ->
+  * Set Name -> Set EIR)
++ * HCI_FORCE_STATIC_ADDR | BDADDR_ANY && !HCI_BREDR_ENABLED (Set Static Address)
+  */
+ int hci_powered_update_sync(struct hci_dev *hdev)
+ {
+@@ -3093,6 +3094,23 @@ int hci_powered_update_sync(struct hci_dev *hdev)
+ 		hci_update_eir_sync(hdev);
+ 	}
+ 
++	/* If forcing static address is in use or there is no public
++	 * address use the static address as random address (but skip
++	 * the HCI command if the current random address is already the
++	 * static one.
++	 *
++	 * In case BR/EDR has been disabled on a dual-mode controller
++	 * and a static address has been configured, then use that
++	 * address instead of the public BR/EDR address.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
++	    (!bacmp(&hdev->bdaddr, BDADDR_ANY) &&
++	    !hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))) {
++		if (bacmp(&hdev->static_addr, BDADDR_ANY))
++			return hci_set_random_addr_sync(hdev,
++							&hdev->static_addr);
++	}
++
+ 	return 0;
+ }
+ 
+-- 
+2.37.3
 
