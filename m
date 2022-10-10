@@ -2,46 +2,46 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 495DDC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 07:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDB6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 10 Oct 2022 11:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232311AbiJJH1M (ORCPT
+        id S231517AbiJJLxl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 10 Oct 2022 03:27:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40618 "EHLO
+        Mon, 10 Oct 2022 07:53:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232307AbiJJH0g (ORCPT
+        with ESMTP id S229691AbiJJLxk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 10 Oct 2022 03:26:36 -0400
-Received: from mail-il1-x146.google.com (mail-il1-x146.google.com [IPv6:2607:f8b0:4864:20::146])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D971A5C9EB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 00:21:00 -0700 (PDT)
-Received: by mail-il1-x146.google.com with SMTP id n14-20020a056e02100e00b002f9e283e850so8194462ilj.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 00:21:00 -0700 (PDT)
+        Mon, 10 Oct 2022 07:53:40 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9B86BD4E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 04:53:38 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id z4-20020a921a44000000b002f8da436b83so8464295ill.19
+        for <linux-bluetooth@vger.kernel.org>; Mon, 10 Oct 2022 04:53:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=S4y88EBd/vb8yCVMWvZjcrFkdCPY7+pJqcZy7NSMsxM=;
-        b=ysQm153IjemksD6OQXXR+JhkL4ll+f177hFIOTJRBbOwsZNtJ0NQmjR+oiwMHv/5K8
-         ze4axqNcs6+XgwJ+JYQ17Jfs/84keL6oO/bU+xMN9fPs8sxqKe2dQl+kxbdunKGRnO6N
-         p1jJwYlLnL9aoSdx6zyCRoZycabMyd8mDwQBqwzN1MLUfaehGGqCNZ5MM5AQt0HCTtoL
-         41PFHEqd+8gyoXhLYZoh5119+8hwHAzPHzDCpwgtDMYBrhM4R+H6lOSE1Qwgo9M/FT7D
-         KZaYD7X6qUFIf2IhI5G8UL3ocmgF64G5j7SpClbiYDlo9FgshCgyARoC8EU29/oZ7y2t
-         Oayw==
-X-Gm-Message-State: ACrzQf2XQh05/bn7IVBsDseWgYNYW4My02Wl6Q2n4UQ/oCg+IDNZh4bf
-        WWdnU5ONsMHP5KxSg0J2BPVa5ld7cbeJqO4wEhggD9LBFOVS
-X-Google-Smtp-Source: AMsMyM7JOI3f+i2seYtu1aj5A8mpcpBQHsPGt4XiIQVb8yYLpB93xI6kd2YA0zv3NxaVXycPD3QNfNfl+zG+NuZC7VYpaqK5y+gP
+        bh=XyjpbSAV9zKFghDaVuv2lfxXp4N8SwMG2j7ltj68tRw=;
+        b=0jcE3NAIKTf0GtLQjfdhUUaukJIIv2FHD5daqAi+DF10/ghmdR2VhHUZyLFsfdzoOu
+         Ct87xrA8L/ISAIujsvM2IpNEpFTSM6wNwFZ/NuPzbHDGYP+fLNDwRwMRJla7na3XdBCX
+         WBQoOHt4gkzhwKPP15pYVj8t1HcLyjz9pYXpF2/ESZEOjk3wjVfD0M5q7o1ThpiCtTRH
+         RPZ2DKjXZkI4DlNjSBaupmHXiq0GSKVVpkAyawGCn3REUR4pr0N3XSePqC7AtD3y0Cxp
+         bvor2dK83VG2xnv+j4IkFDtISpeLjRoqU5rcozOUHlrSkTO93g6tFTlrHLt6hWG085Zw
+         Mgkw==
+X-Gm-Message-State: ACrzQf0qncpYCCtmKEqPpMBTg4wCDHqBAO9qJbf99wenKGlV29VV8q/h
+        XfOMcQk210LMXCG2HkmIRfKdm7uIIwGgELG8YELr2ub/V1KJ
+X-Google-Smtp-Source: AMsMyM7YC7B4VX7kiFXdOMB7a29pZkwCkVNt5qw1UaWzqk9goLssAvIK1o6tAUVhb0bl2dRgcmGacK8A2UQC9IvsPMT2re3V7X3L
 MIME-Version: 1.0
-X-Received: by 2002:a5e:c902:0:b0:6bc:22b7:200a with SMTP id
- z2-20020a5ec902000000b006bc22b7200amr2024601iol.126.1665386324995; Mon, 10
- Oct 2022 00:18:44 -0700 (PDT)
-Date:   Mon, 10 Oct 2022 00:18:44 -0700
+X-Received: by 2002:a05:6638:419f:b0:35a:286e:6bdb with SMTP id
+ az31-20020a056638419f00b0035a286e6bdbmr9105823jab.295.1665402817676; Mon, 10
+ Oct 2022 04:53:37 -0700 (PDT)
+Date:   Mon, 10 Oct 2022 04:53:37 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000050b5f305eaa8f82d@google.com>
-Subject: [syzbot] possible deadlock in hci_conn_hash_flush
-From:   syzbot <syzbot+76a9cc07a77bc3e48ef7@syzkaller.appspotmail.com>
+Message-ID: <0000000000005b100405eaaccf89@google.com>
+Subject: [syzbot] possible deadlock in sco_sock_timeout
+From:   syzbot <syzbot+10c46e34f156f51a28ad@syzkaller.appspotmail.com>
 To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
         kuba@kernel.org, linux-bluetooth@vger.kernel.org,
         linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
@@ -58,9 +58,9 @@ syzbot found the following issue on:
 
 HEAD commit:    bbed346d5a96 Merge branch 'for-next/core' into for-kernelci
 git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1247bf82880000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1188403a880000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=3a4a45d2d827c1e
-dashboard link: https://syzkaller.appspot.com/bug?extid=76a9cc07a77bc3e48ef7
+dashboard link: https://syzkaller.appspot.com/bug?extid=10c46e34f156f51a28ad
 compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
 userspace arch: arm64
 
@@ -71,25 +71,41 @@ disk image: https://storage.googleapis.com/syzbot-assets/e8e91bc79312/disk-bbed3
 vmlinux: https://storage.googleapis.com/syzbot-assets/c1cb3fb3b77e/vmlinux-bbed346d.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+76a9cc07a77bc3e48ef7@syzkaller.appspotmail.com
+Reported-by: syzbot+10c46e34f156f51a28ad@syzkaller.appspotmail.com
 
 ======================================================
 WARNING: possible circular locking dependency detected
 6.0.0-rc7-syzkaller-18095-gbbed346d5a96 #0 Not tainted
 ------------------------------------------------------
-syz-executor.1/24281 is trying to acquire lock:
-ffff000130804770 ((work_completion)(&(&conn->timeout_work)->work)){+.+.}-{0:0}, at: __flush_work+0x74/0x144 kernel/workqueue.c:3069
+kworker/1:2/31873 is trying to acquire lock:
+ffff000115941130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1712 [inline]
+ffff000115941130 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at: sco_sock_timeout+0x88/0x1b8 net/bluetooth/sco.c:97
 
 but task is already holding lock:
-ffff80000d832b98 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1776 [inline]
-ffff80000d832b98 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0x64/0x148 net/bluetooth/hci_conn.c:2366
+ffff8000149abd80 ((work_completion)(&(&conn->timeout_work)->work)){+.+.}-{0:0}, at: process_one_work+0x29c/0x504 kernel/workqueue.c:2264
 
 which lock already depends on the new lock.
 
 
 the existing dependency chain (in reverse order) is:
 
--> #3 (hci_cb_list_lock){+.+.}-{3:3}:
+-> #3 ((work_completion)(&(&conn->timeout_work)->work)){+.+.}-{0:0}:
+       __flush_work+0x9c/0x144 kernel/workqueue.c:3069
+       __cancel_work_timer+0x1c4/0x2ac kernel/workqueue.c:3160
+       cancel_delayed_work_sync+0x24/0x38 kernel/workqueue.c:3301
+       sco_conn_del+0x140/0x234 net/bluetooth/sco.c:205
+       sco_disconn_cfm+0x64/0xa8 net/bluetooth/sco.c:1379
+       hci_disconn_cfm include/net/bluetooth/hci_core.h:1779 [inline]
+       hci_conn_hash_flush+0x88/0x148 net/bluetooth/hci_conn.c:2366
+       hci_dev_close_sync+0x48c/0x9e0 net/bluetooth/hci_sync.c:4476
+       hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+       hci_error_reset+0xac/0x154 net/bluetooth/hci_core.c:1050
+       process_one_work+0x2d8/0x504 kernel/workqueue.c:2289
+       worker_thread+0x340/0x610 kernel/workqueue.c:2436
+       kthread+0x12c/0x158 kernel/kthread.c:376
+       ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
+
+-> #2 (hci_cb_list_lock){+.+.}-{3:3}:
        __mutex_lock_common+0xd4/0xca8 kernel/locking/mutex.c:603
        __mutex_lock kernel/locking/mutex.c:747 [inline]
        mutex_lock_nested+0x38/0x44 kernel/locking/mutex.c:799
@@ -103,20 +119,16 @@ the existing dependency chain (in reverse order) is:
        kthread+0x12c/0x158 kernel/kthread.c:376
        ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
 
--> #2 (&hdev->lock){+.+.}-{3:3}:
+-> #1 (&hdev->lock){+.+.}-{3:3}:
        __mutex_lock_common+0xd4/0xca8 kernel/locking/mutex.c:603
        __mutex_lock kernel/locking/mutex.c:747 [inline]
        mutex_lock_nested+0x38/0x44 kernel/locking/mutex.c:799
        sco_sock_connect+0x104/0x220 net/bluetooth/sco.c:593
-       __sys_connect_file+0xc8/0xd0 net/socket.c:1976
-       io_connect+0xc8/0x21c io_uring/net.c:1277
-       io_issue_sqe+0x1c0/0x508 io_uring/io_uring.c:1577
-       io_queue_sqe io_uring/io_uring.c:1755 [inline]
-       io_submit_sqe io_uring/io_uring.c:2013 [inline]
-       io_submit_sqes+0x18c/0x454 io_uring/io_uring.c:2124
-       __do_sys_io_uring_enter+0x16c/0x8b8 io_uring/io_uring.c:3057
-       __se_sys_io_uring_enter io_uring/io_uring.c:2987 [inline]
-       __arm64_sys_io_uring_enter+0x30/0x40 io_uring/io_uring.c:2987
+       __sys_connect_file net/socket.c:1976 [inline]
+       __sys_connect+0x184/0x190 net/socket.c:1993
+       __do_sys_connect net/socket.c:2003 [inline]
+       __se_sys_connect net/socket.c:2000 [inline]
+       __arm64_sys_connect+0x28/0x3c net/socket.c:2000
        __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
        invoke_syscall arch/arm64/kernel/syscall.c:52 [inline]
        el0_svc_common+0x138/0x220 arch/arm64/kernel/syscall.c:142
@@ -125,7 +137,12 @@ the existing dependency chain (in reverse order) is:
        el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:654
        el0t_64_sync+0x18c/0x190 arch/arm64/kernel/entry.S:581
 
--> #1 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
+-> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3095 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3214 [inline]
+       validate_chain kernel/locking/lockdep.c:3829 [inline]
+       __lock_acquire+0x1530/0x30a4 kernel/locking/lockdep.c:5053
+       lock_acquire+0x100/0x1f8 kernel/locking/lockdep.c:5666
        lock_sock_nested+0x70/0xd8 net/core/sock.c:3393
        lock_sock include/net/sock.h:1712 [inline]
        sco_sock_timeout+0x88/0x1b8 net/bluetooth/sco.c:97
@@ -134,65 +151,30 @@ the existing dependency chain (in reverse order) is:
        kthread+0x12c/0x158 kernel/kthread.c:376
        ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
 
--> #0 ((work_completion)(&(&conn->timeout_work)->work)){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3095 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3214 [inline]
-       validate_chain kernel/locking/lockdep.c:3829 [inline]
-       __lock_acquire+0x1530/0x30a4 kernel/locking/lockdep.c:5053
-       lock_acquire+0x100/0x1f8 kernel/locking/lockdep.c:5666
-       __flush_work+0x9c/0x144 kernel/workqueue.c:3069
-       __cancel_work_timer+0x1c4/0x2ac kernel/workqueue.c:3160
-       cancel_delayed_work_sync+0x24/0x38 kernel/workqueue.c:3301
-       sco_conn_del+0x140/0x234 net/bluetooth/sco.c:205
-       sco_disconn_cfm+0x64/0xa8 net/bluetooth/sco.c:1379
-       hci_disconn_cfm include/net/bluetooth/hci_core.h:1779 [inline]
-       hci_conn_hash_flush+0x88/0x148 net/bluetooth/hci_conn.c:2366
-       hci_dev_close_sync+0x48c/0x9e0 net/bluetooth/hci_sync.c:4476
-       hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
-       hci_rfkill_set_block+0x98/0x198 net/bluetooth/hci_core.c:947
-       rfkill_set_block+0xb4/0x1f8 net/rfkill/core.c:345
-       rfkill_fop_write+0x358/0x3f8 net/rfkill/core.c:1286
-       do_iter_write+0x1f0/0x560 fs/read_write.c:857
-       vfs_writev fs/read_write.c:928 [inline]
-       do_writev+0x12c/0x234 fs/read_write.c:971
-       __do_sys_writev fs/read_write.c:1044 [inline]
-       __se_sys_writev fs/read_write.c:1041 [inline]
-       __arm64_sys_writev+0x28/0x38 fs/read_write.c:1041
-       __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
-       invoke_syscall arch/arm64/kernel/syscall.c:52 [inline]
-       el0_svc_common+0x138/0x220 arch/arm64/kernel/syscall.c:142
-       do_el0_svc+0x48/0x164 arch/arm64/kernel/syscall.c:206
-       el0_svc+0x58/0x150 arch/arm64/kernel/entry-common.c:636
-       el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:654
-       el0t_64_sync+0x18c/0x190 arch/arm64/kernel/entry.S:581
-
 other info that might help us debug this:
 
 Chain exists of:
-  (work_completion)(&(&conn->timeout_work)->work) --> &hdev->lock --> hci_cb_list_lock
+  sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> hci_cb_list_lock --> (work_completion)(&(&conn->timeout_work)->work)
 
  Possible unsafe locking scenario:
 
        CPU0                    CPU1
        ----                    ----
-  lock(hci_cb_list_lock);
-                               lock(&hdev->lock);
-                               lock(hci_cb_list_lock);
   lock((work_completion)(&(&conn->timeout_work)->work));
+                               lock(hci_cb_list_lock);
+                               lock((work_completion)(&(&conn->timeout_work)->work));
+  lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
 
  *** DEADLOCK ***
 
-4 locks held by syz-executor.1/24281:
- #0: ffff80000d893400 (rfkill_global_mutex){+.+.}-{3:3}, at: rfkill_fop_write+0x18c/0x3f8 net/rfkill/core.c:1278
- #1: ffff00010c626fd0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_dev_do_close net/bluetooth/hci_core.c:552 [inline]
- #1: ffff00010c626fd0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_rfkill_set_block+0x90/0x198 net/bluetooth/hci_core.c:947
- #2: ffff00010c626078 (&hdev->lock){+.+.}-{3:3}, at: hci_dev_close_sync+0x200/0x9e0 net/bluetooth/hci_sync.c:4463
- #3: ffff80000d832b98 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_disconn_cfm include/net/bluetooth/hci_core.h:1776 [inline]
- #3: ffff80000d832b98 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_conn_hash_flush+0x64/0x148 net/bluetooth/hci_conn.c:2366
+2 locks held by kworker/1:2/31873:
+ #0: ffff0000c0010738 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x270/0x504 kernel/workqueue.c:2262
+ #1: ffff8000149abd80 ((work_completion)(&(&conn->timeout_work)->work)){+.+.}-{0:0}, at: process_one_work+0x29c/0x504 kernel/workqueue.c:2264
 
 stack backtrace:
-CPU: 1 PID: 24281 Comm: syz-executor.1 Not tainted 6.0.0-rc7-syzkaller-18095-gbbed346d5a96 #0
+CPU: 1 PID: 31873 Comm: kworker/1:2 Not tainted 6.0.0-rc7-syzkaller-18095-gbbed346d5a96 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/30/2022
+Workqueue: events sco_sock_timeout
 Call trace:
  dump_backtrace+0x1c4/0x1f0 arch/arm64/kernel/stacktrace.c:156
  show_stack+0x2c/0x54 arch/arm64/kernel/stacktrace.c:163
@@ -206,32 +188,13 @@ Call trace:
  validate_chain kernel/locking/lockdep.c:3829 [inline]
  __lock_acquire+0x1530/0x30a4 kernel/locking/lockdep.c:5053
  lock_acquire+0x100/0x1f8 kernel/locking/lockdep.c:5666
- __flush_work+0x9c/0x144 kernel/workqueue.c:3069
- __cancel_work_timer+0x1c4/0x2ac kernel/workqueue.c:3160
- cancel_delayed_work_sync+0x24/0x38 kernel/workqueue.c:3301
- sco_conn_del+0x140/0x234 net/bluetooth/sco.c:205
- sco_disconn_cfm+0x64/0xa8 net/bluetooth/sco.c:1379
- hci_disconn_cfm include/net/bluetooth/hci_core.h:1779 [inline]
- hci_conn_hash_flush+0x88/0x148 net/bluetooth/hci_conn.c:2366
- hci_dev_close_sync+0x48c/0x9e0 net/bluetooth/hci_sync.c:4476
- hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
- hci_rfkill_set_block+0x98/0x198 net/bluetooth/hci_core.c:947
- rfkill_set_block+0xb4/0x1f8 net/rfkill/core.c:345
- rfkill_fop_write+0x358/0x3f8 net/rfkill/core.c:1286
- do_iter_write+0x1f0/0x560 fs/read_write.c:857
- vfs_writev fs/read_write.c:928 [inline]
- do_writev+0x12c/0x234 fs/read_write.c:971
- __do_sys_writev fs/read_write.c:1044 [inline]
- __se_sys_writev fs/read_write.c:1041 [inline]
- __arm64_sys_writev+0x28/0x38 fs/read_write.c:1041
- __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
- invoke_syscall arch/arm64/kernel/syscall.c:52 [inline]
- el0_svc_common+0x138/0x220 arch/arm64/kernel/syscall.c:142
- do_el0_svc+0x48/0x164 arch/arm64/kernel/syscall.c:206
- el0_svc+0x58/0x150 arch/arm64/kernel/entry-common.c:636
- el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:654
- el0t_64_sync+0x18c/0x190 arch/arm64/kernel/entry.S:581
-rfkill: input handler enabled
+ lock_sock_nested+0x70/0xd8 net/core/sock.c:3393
+ lock_sock include/net/sock.h:1712 [inline]
+ sco_sock_timeout+0x88/0x1b8 net/bluetooth/sco.c:97
+ process_one_work+0x2d8/0x504 kernel/workqueue.c:2289
+ worker_thread+0x340/0x610 kernel/workqueue.c:2436
+ kthread+0x12c/0x158 kernel/kthread.c:376
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
 
 
 ---
