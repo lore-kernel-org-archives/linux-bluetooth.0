@@ -2,306 +2,228 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 872BBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Oct 2022 19:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C8D4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Oct 2022 19:36:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbiJKT2S (ORCPT
+        id S229519AbiJKTgr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Oct 2022 15:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59312 "EHLO
+        Tue, 11 Oct 2022 15:36:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbiJKT2R (ORCPT
+        with ESMTP id S229484AbiJKTgq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Oct 2022 15:28:17 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7286E8769C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 12:28:16 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id x18so9533368ljm.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 12:28:16 -0700 (PDT)
+        Tue, 11 Oct 2022 15:36:46 -0400
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C3E7814E9;
+        Tue, 11 Oct 2022 12:36:45 -0700 (PDT)
+Received: by mail-lj1-x22e.google.com with SMTP id s10so18140912ljp.5;
+        Tue, 11 Oct 2022 12:36:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qxXDG+RmTHpJS9lWYni8h23VwXV4sYIHbsSa/uC6mKc=;
-        b=FoBbooQVnkfME9/Z94J+vOJOuijyZO+OZufCFH2oerbdkcdW1mVp3TyyljPYLR5KFJ
-         pDYxIyn56rXNQ4vQ+DEzJojwKPLNEz0WIApbYt+zZjarJOvtJOF5KVXArswdRoscAlkt
-         cf/o1G/VjETvxBmC6WzD/ooxZhGZnipcI648X5taHENVL0vQ9fARwhtdx+Z0H6Ae+E+2
-         Ugop/R0Gg3P0yleWEQuNM3ihdA5khPyTA6IBLAhKQaVFKnV3Hsl6U/ufPY6a95be5i+b
-         fG/nyUfg/0Ie+mYSJ2wuIAK93nMOQkQgJQJwhBh9+1Vmys2L33MKaf50Zux/MhEe1yFS
-         tSYQ==
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=a2I8otcqoVQjYNYDGvUGwP30DEIINxDXT7uwZdeQKk4=;
+        b=G0YZBqSE4a25/7HFxTyY8WwaSIiyWXVquLoPlSW1ihrLHtaugKwH2KKJe52cuc65qX
+         cWXSLB0Z7+WBc5HXK9bmf0iIu5QhYschPBpxuVctJVGaLtGONk3y3GYx0kiLNFhe6SMc
+         nO9NkMlEqqLnU9rI3MHwXNDbnf2ckgvdkOo8XaoNNFilWfxNhvL8dOYkHqfA0woVF+wS
+         DbfWJQzdpHQV9XKG1rx3sMExPF0dUOAMsgzmknNLXG3+rpv2D8GUL4PADNkrMeRHSdxF
+         0v8dz6d6gUVNOo2EbQGHFT2cvy5CAoORdS8oyPvU+8eLiOojqeFNubdtL98GQ4QCGr4g
+         b27Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qxXDG+RmTHpJS9lWYni8h23VwXV4sYIHbsSa/uC6mKc=;
-        b=f6Ghkpm0iRRQjmKi0KEpETtyCta42Nhl0n0q+10UapJPVVYYodcgeZUBjYcnbJW0Ks
-         E2Siwt/RTTN8Jx1hG88V3xxx0sfe8g2HN9bay/vIbYbWqv3PNIO+bYgZhxTSyVLHsP7+
-         lbpB+okwDn2FHwQT0ASiikCVldovs6Squ447CyC7Mv3aNS3WEOqaWIXbV2c5OvbrylTB
-         Vu4kHwJv1x/umh+0+bxaWSn6DyUkl6KYQq7mAFMRe/BY/aUACHb7f8whaxLE+bwS1XVm
-         34TLnEIM9tGsHckfgt0vZaYXuhk0z3I6jpjmU2PpDyR3KUBIMDrkjLNnojnWGvnDtm8q
-         NgOw==
-X-Gm-Message-State: ACrzQf3Jyb9b6xXU9ETAn9D3owiZAg7ICQPnbG9oFfQXpF9IVqcpYxN/
-        FW8T/OTFb7o8wP4jexqP84W9J3oMeA1VQqt6P2E=
-X-Google-Smtp-Source: AMsMyM7pgzEEmuwUkqo27r11KYDfrvZjgDp2Pcmwiox7/Q+c6SX752iD227wLWK5NTM3rR8bYR5F5wMWmFYm871wcI0=
-X-Received: by 2002:a2e:834b:0:b0:26d:e1f8:1453 with SMTP id
- l11-20020a2e834b000000b0026de1f81453mr8764706ljh.65.1665516494469; Tue, 11
- Oct 2022 12:28:14 -0700 (PDT)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a2I8otcqoVQjYNYDGvUGwP30DEIINxDXT7uwZdeQKk4=;
+        b=3GNXKmALqUNS68H4q3894kGLwuCorVAhqBPiDcjMux76S8TU5EvM+ltIQQAboqC1+M
+         s+7D27guuASFs9p/zEeUvd+q3r3gDSHy1+6H2c4TmiWkDdZ0ZVwAa+Cpuo8eSiC1tsuj
+         LJqLSAX02PxSLhT4xf1KTUY2YwmtpD9Zu0ZXcED2aSKo1kNP2r1US0QdlBOrrRyzB9M8
+         pzn3QmsFVPZR3rirbXPLaN2NhCRqyMBU+CFcXoI1tetni2w9ybEyIrAitmdEvMbXv5VG
+         VinAtc40bimKtzik2hTCEKy8Lb0FN5ySInVuEPYewh99aAwRV8Lb0rPe33hUVM2doZRB
+         l+/g==
+X-Gm-Message-State: ACrzQf2GNi2F1ShY/sNh6j/sbwHu77caTj5LPoqYGYFEks1mnsOjRO7e
+        fUnXFJ81bsCYLskAGEMfu5t+YwmjTf9cAQHgk80=
+X-Google-Smtp-Source: AMsMyM5b7urvgo9/FMLZjMUFRHPKwO378LHKodF07M2AdfyYAEK8otuHL0M+ndeDz/CFje5d3dtAItLadbKKDUHiYzA=
+X-Received: by 2002:a2e:9d81:0:b0:266:a1d7:74b4 with SMTP id
+ c1-20020a2e9d81000000b00266a1d774b4mr9013743ljj.423.1665517003260; Tue, 11
+ Oct 2022 12:36:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221011113116.70514-1-sathish.narasimman@intel.com>
-In-Reply-To: <20221011113116.70514-1-sathish.narasimman@intel.com>
+References: <20220807221152.38948-1-Igor.Skalkin@opensynergy.com>
+ <20220807185846-mutt-send-email-mst@kernel.org> <02222fcb-eaba-617a-c51c-f939678e3d74@opensynergy.com>
+ <20221007090223-mutt-send-email-mst@kernel.org> <CABBYNZKfLOxrTAVLRSH+hOwaB5RYkGdjbtfabufUcgR3oy897A@mail.gmail.com>
+ <d41ec1d3-e262-3be6-17f2-a9495c55b868@opensynergy.com>
+In-Reply-To: <d41ec1d3-e262-3be6-17f2-a9495c55b868@opensynergy.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 11 Oct 2022 12:28:02 -0700
-Message-ID: <CABBYNZJpebSE=hke9V6-FY4gc6AMS6_mVxiMnh7HhK7kHjDSGA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/3] audio/transport: Adding volume callback to
- media transport
-To:     Sathish Narasimman <sathish.narasimman@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
+Date:   Tue, 11 Oct 2022 12:36:31 -0700
+Message-ID: <CABBYNZKH2njHBdHWjxQhoiUbVPR-bYAFYJHFYO28YhLayrAVoQ@mail.gmail.com>
+Subject: Re: [PATCH] virtio_bt: Fix alignment in configuration struct
+To:     Igor Skalkin <igor.skalkin@opensynergy.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, mgo@opensynergy.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sathish,
+Hi Igor,
 
-On Tue, Oct 11, 2022 at 4:38 AM Sathish Narasimman
-<sathish.narasimman@intel.com> wrote:
+On Tue, Oct 11, 2022 at 5:23 AM Igor Skalkin
+<igor.skalkin@opensynergy.com> wrote:
 >
-> Initialize set_volume and get_volume to media transport and update the
-> volume when media_transport_update_device_volume is called.
-> ---
->  profiles/audio/transport.c | 126 +++++++++++++++++++++++++++++++++++--
->  1 file changed, 120 insertions(+), 6 deletions(-)
+> Hi Luiz,
 >
-> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> index 41339da51e17..a1445cba7993 100644
-> --- a/profiles/audio/transport.c
-> +++ b/profiles/audio/transport.c
-> @@ -91,6 +91,7 @@ struct bap_transport {
->         uint8_t                 rtn;
->         uint16_t                latency;
->         uint32_t                delay;
-> +       int8_t                  volume;
->  };
->
->  struct media_transport {
-> @@ -116,6 +117,9 @@ struct media_transport {
->                                                                 guint id);
->         void                    (*set_state) (struct media_transport *transport,
->                                                 transport_state_t state);
-> +       void                    (*set_volume) (struct media_transport *transp,
-> +                                               int8_t volume);
-> +       int8_t                  (*get_volume) (struct media_transport *transp);
->         GDestroyNotify          destroy;
->         void                    *data;
->  };
-> @@ -769,6 +773,58 @@ error:
->                                         "Invalid arguments in method call");
->  }
->
-> +static gboolean volume_bap_exists(const GDBusPropertyTable *property,
-> +                                       void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       return bap->volume >= 0;
-> +}
-> +
-> +static gboolean get_bap_volume(const GDBusPropertyTable *property,
-> +                                       DBusMessageIter *iter, void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +       uint16_t volume = (uint16_t)bap->volume;
-> +
-> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &volume);
-> +
-> +       return TRUE;
-> +}
-> +
-> +static void set_bap_volume(const GDBusPropertyTable *property,
-> +                          DBusMessageIter *iter, GDBusPendingPropertySet id,
-> +                          void *data)
-> +{
-> +       struct media_transport *transport = data;
-> +       struct bap_transport *bap = transport->data;
-> +       uint16_t arg;
-> +       int8_t volume;
-> +
-> +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
-> +               goto error;
-> +
-> +       dbus_message_iter_get_basic(iter, &arg);
-> +       if (arg > INT8_MAX)
-> +               goto error;
-> +
-> +       g_dbus_pending_property_success(id);
-> +
-> +       volume = (int8_t)arg;
-> +       if (bap->volume == volume)
-> +               return;
-> +
-> +       /*TODO vcp_send_volume */
+> Current version of this patch is wrong [q]changing uapi like this can't
+> be done, will break userspace[/q], next version is in process, will be
+> sent in few days.
 
-What is this TODO item for? Can we complete it right now? Afaik we
-should be able to handle local changes and notify it to remote peers
-or that is not how VCP works?
+Thanks for the update, I will wait for the next version then.
 
-> +       return;
-> +
-> +error:
-> +       g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
-> +                                       "Invalid arguments in method call");
-> +}
-> +
-> +
->  static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
->  {
->         struct media_transport *transport = data;
-> @@ -970,6 +1026,7 @@ static const GDBusPropertyTable bap_properties[] = {
->         { "Retransmissions", "y", get_retransmissions },
->         { "Latency", "q", get_latency },
->         { "Delay", "u", get_delay },
-> +       { "Volume", "q", get_bap_volume, set_bap_volume, volume_bap_exists },
-
-Now that we have set_volume/get_volume as callbacks these could be
-changed to use them instead of having dedicated callback like abouve,
-something like:
-
-https://gist.github.com/Vudentz/19edcf96735567c1f7437a5e1dee7e04
-
->         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
->         { "Location", "u", get_location },
->         { "Metadata", "ay", get_metadata },
-> @@ -1048,6 +1105,31 @@ static void source_state_changed(struct btd_service *service,
->                 transport_update_playing(transport, FALSE);
->  }
+> Best regards,
+> Igor
+> On 10/7/22 21:33, Luiz Augusto von Dentz wrote:
+> > Hi Michael,
+> >
+> > On Fri, Oct 7, 2022 at 6:03 AM Michael S. Tsirkin <mst@redhat.com> wrot=
+e:
+> >>
+> >> On Mon, Aug 08, 2022 at 02:04:43PM +0200, Igor Skalkin wrote:
+> >>> On 8/8/22 01:00, Michael S. Tsirkin wrote:
+> >>>
+> >>>      On Mon, Aug 08, 2022 at 12:11:52AM +0200, Igor Skalkin wrote:
+> >>>
+> >>>          According to specification [1], "For the device-specific con=
+figuration
+> >>>          space, the driver MUST use 8 bit wide accesses for 8 bit wid=
+e fields,
+> >>>          16 bit wide and aligned accesses for 16 bit wide fields and =
+32 bit wide
+> >>>          and aligned accesses for 32 and 64 bit wide fields.".
+> >>>
+> >>>          Current version of the configuration structure:
+> >>>
+> >>>              struct virtio_bt_config {
+> >>>                  __u8  type;
+> >>>                  __u16 vendor;
+> >>>                  __u16 msft_opcode;
+> >>>              } __attribute__((packed));
+> >>>
+> >>>          has both 16bit fields non-aligned.
+> >>>
+> >>>          This commit fixes it.
+> >>>
+> >>>          [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/=
+v1/query?url=3Dhttps%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1=
+%2fvirtio%2dv1.1.pdf&umid=3Db1110db2-819d-4f27-b35e-18ac23ce0ab4&auth=3D53c=
+7c7de28b92dfd96e93d9dd61a23e634d2fbec-2c53002097633a932e7d67b899e6bf6999cdc=
+899
+> >>>
+> >>>          Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
+> >>>
+> >>>      This is all true enough, but the problem is
+> >>>      1. changing uapi like this can't be done, will break userspace
+> >>>      2. the driver has more issues and no one seems to want to
+> >>>         maintain it.
+> >>>      I posted a patch "Bluetooth: virtio_bt: mark broken" and intend
+> >>>      to merge it for this release.
+> >>>
+> >>> This is very sad. We already use this driver in our projects.
+> >>
+> >> Ping. If we still have no maintainer I'm marking it broken, users
+> >> should at least be warned.
+> >
+> > Please resend.
+> >
+> >>
+> >>> Our virtio bluetooth device has two backends - HCI_USER socket backen=
+d for one
+> >>> platform and uart backend for the other, and works well (after applyi=
+ng your
+> >>> "[PATCH] Bluetooth: virtio_bt: fix device remove") patch, so this "de=
+vice
+> >>> removal" problem can probably be considered solved .
+> >>> We could help with the rest of the problems you listed that can be so=
+lved
+> >>> (specification, QEMU support).
+> >>> And the only problem that is difficult to solve (because of the need =
+to change
+> >>> UAPI header files) is just this one with unaligned configuration fiel=
+ds.
+> >>> At the moment, it does not reproduce, because without VIRTIO_BT_F_VND=
+_HCI
+> >>> (Indicates vendor command support) feature negotiated, the driver doe=
+s not
+> >>> read the non-aligned configuration fields.
+> >>>
+> >>> So, what would you advise us to do? Continuing to use the "marked bro=
+ken"
+> >>> driver, start writing a specification for a new from scratch, better =
+one?
+> >>> Or is there any way to bring this one back to life?
+> >>>
+> >>>
+> >>>
+> >>>          ---
+> >>>           include/uapi/linux/virtio_bt.h | 2 +-
+> >>>           1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>>          diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/l=
+inux/virtio_bt.h
+> >>>          index a7bd48daa9a9..adc03709cc4f 100644
+> >>>          --- a/include/uapi/linux/virtio_bt.h
+> >>>          +++ b/include/uapi/linux/virtio_bt.h
+> >>>          @@ -23,9 +23,9 @@ enum virtio_bt_config_vendor {
+> >>>           };
+> >>>
+> >>>           struct virtio_bt_config {
+> >>>          -       __u8  type;
+> >>>                  __u16 vendor;
+> >>>                  __u16 msft_opcode;
+> >>>          +       __u8  type;
+> >>>           } __attribute__((packed));
+> >>>
+> >>>           #endif /* _UAPI_LINUX_VIRTIO_BT_H */
+> >>>          --
+> >>>          2.34.1
+> >>>
+> >>> --
+> >>>
+> >>> Best regards,
+> >>>
+> >>> Igor Skalkin
+> >>> Software Engineer
+> >>>
+> >>> OpenSynergy GmbH
+> >>> Rotherstr. 20, 10245 Berlin
+> >>>
+> >>> igor.skalkin@opensynergy.com
+> >>> www.opensynergy.com
+> >>>
+> >>> registered: Amtsgericht Charlottenburg, HRB 108616B
+> >>> General Management: Rolf Morich, Stefaan Sonck Thiebaut
+> >>>
+> >>>
+> >>> Please mind our privacy notice pursuant to Art. 13 GDPR. // Unsere Hi=
+nweise zum
+> >>> Datenschutz gem. Art. 13 DSGVO finden Sie hier.
+> >>
+> >
+> >
 >
-> +static int8_t get_volume_a2dp(struct media_transport *transport)
-> +{
-> +       struct a2dp_transport *a2dp = transport->data;
-> +
-> +       return a2dp->volume;
-> +}
-> +
-> +static void set_volume_a2dp(struct media_transport *transport, int8_t volume)
-> +{
-> +       struct a2dp_transport *a2dp = transport->data;
-> +
-> +       if (volume < 0)
-> +               return;
-> +
-> +       /* Check if volume really changed */
-> +       if (a2dp->volume == volume)
-> +               return;
-> +
-> +       a2dp->volume = volume;
-> +
-> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> +                                       transport->path,
-> +                                       MEDIA_TRANSPORT_INTERFACE, "Volume");
-> +}
-> +
->  static int media_transport_init_source(struct media_transport *transport)
->  {
->         struct btd_service *service;
-> @@ -1061,6 +1143,8 @@ static int media_transport_init_source(struct media_transport *transport)
->
->         transport->resume = resume_a2dp;
->         transport->suspend = suspend_a2dp;
-> +       transport->set_volume = set_volume_a2dp;
-> +       transport->get_volume = get_volume_a2dp;
->         transport->cancel = cancel_a2dp;
->         transport->data = a2dp;
->         transport->destroy = destroy_a2dp;
-> @@ -1387,6 +1471,31 @@ static void free_bap(void *data)
->         free(bap);
->  }
->
-> +static void set_volume_bap(struct media_transport *transport, int8_t volume)
-> +{
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       if (volume < 0)
-> +               return;
-> +
-> +       /* Check if volume really changed */
-> +       if (bap->volume == volume)
-> +               return;
-> +
-> +       bap->volume = volume;
-> +
-> +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> +                                       transport->path,
-> +                                       MEDIA_TRANSPORT_INTERFACE, "Volume");
-> +}
-> +
-> +static int8_t get_volume_bap(struct media_transport *transport)
-> +{
-> +       struct bap_transport *bap = transport->data;
-> +
-> +       return bap->volume;
-> +}
-> +
->  static int media_transport_init_bap(struct media_transport *transport,
->                                                         void *stream)
->  {
-> @@ -1403,6 +1512,7 @@ static int media_transport_init_bap(struct media_transport *transport,
->         bap->rtn = qos->rtn;
->         bap->latency = qos->latency;
->         bap->delay = qos->delay;
-> +       bap->volume = 127;
->         bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
->                                                 bap_state_changed,
->                                                 bap_connecting,
-> @@ -1413,6 +1523,8 @@ static int media_transport_init_bap(struct media_transport *transport,
->         transport->suspend = suspend_bap;
->         transport->cancel = cancel_bap;
->         transport->set_state = set_state_bap;
-> +       transport->set_volume = set_volume_bap;
-> +       transport->get_volume = get_volume_bap;
->         transport->destroy = free_bap;
->
->         return 0;
-> @@ -1537,12 +1649,13 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
->         /* Attempt to locate the transport to get its volume */
->         for (l = transports; l; l = l->next) {
->                 struct media_transport *transport = l->data;
-> +
->                 if (transport->device != dev)
->                         continue;
->
-> -               /* Volume is A2DP only */
-> -               if (media_endpoint_get_sep(transport->endpoint))
-> -                       return media_transport_get_volume(transport);
-> +               /* Get transport volume */
-> +               if (transport->get_volume)
-> +                       return transport->get_volume(transport);
->         }
->
->         /* If transport volume doesn't exists use device_volume */
-> @@ -1560,12 +1673,13 @@ void media_transport_update_device_volume(struct btd_device *dev,
->         /* Attempt to locate the transport to set its volume */
->         for (l = transports; l; l = l->next) {
->                 struct media_transport *transport = l->data;
-> +
->                 if (transport->device != dev)
->                         continue;
->
-> -               /* Volume is A2DP only */
-> -               if (media_endpoint_get_sep(transport->endpoint)) {
-> -                       media_transport_update_volume(transport, volume);
-> +               /* Set transport volume */
-> +               if (transport->set_volume) {
-> +                       transport->set_volume(transport, volume);
->                         return;
->                 }
->         }
-> --
-> 2.25.1
->
+> Please mind our privacy notice<https://www.opensynergy.com/datenschutzerk=
+laerung/privacy-notice-for-business-partners-pursuant-to-article-13-of-the-=
+general-data-protection-regulation-gdpr/> pursuant to Art. 13 GDPR. // Unse=
+re Hinweise zum Datenschutz gem. Art. 13 DSGVO finden Sie hier.<https://www=
+.opensynergy.com/de/datenschutzerklaerung/datenschutzhinweise-fuer-geschaef=
+tspartner-gem-art-13-dsgvo/>
 
 
--- 
+
+--=20
 Luiz Augusto von Dentz
