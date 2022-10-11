@@ -2,103 +2,156 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02634C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Oct 2022 15:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C7CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 Oct 2022 19:26:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230099AbiJKPd2 (ORCPT
+        id S230072AbiJKT0D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 Oct 2022 11:33:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35358 "EHLO
+        Tue, 11 Oct 2022 15:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231590AbiJKPcs (ORCPT
+        with ESMTP id S229595AbiJKT0A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 Oct 2022 11:32:48 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B06AEB3B3C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 08:22:25 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id q9so13070878pgq.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 08:22:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=UhFhl+S8MelDuY5YVWiIJxgubDB0Zf5ST6oJZkzOYtg=;
-        b=MoDRDv/G2xnv0vkJmBg7uvPunFdi5+X2PeV1va7aNNbfayX8FouRzaAjyKGE3AANn2
-         4n3QBovyWwYPreOaGecw2UnrzwfFufnX+gDFrX+t0ofX38yACrJ8QPtxswPQ9S8s+PzK
-         mtXokUHMxUbBkKbiqywuUIRgASvP0JXr4kg11zwF7rPKpbHMRBwkGUhGvCn9MpDoee99
-         opikDAlN4PJp0AeU+Hb/OOBIDkvs31cN0bhws4/+wzEXx4v2h3OswiaK7CgApbkZJQD1
-         XWJ963+40/COjFdOX5L9xoAQEbHEuN8VM20UZqA7Ngs2oMElPrYs0463jki0D1QHRTuX
-         qmXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UhFhl+S8MelDuY5YVWiIJxgubDB0Zf5ST6oJZkzOYtg=;
-        b=DPQm//fn949PW6WaFR4mhK1yigoJ55WqYq08Qownfnshl7pxt5C+e69yxjT8yu7Ncb
-         fDMi/bbfWAwbX0ehUOvCgUWvX4YUBa+u9H2bLp6FFxkWbjFeCgjNzzh25SQUYEe1bfTC
-         qMALbhfKRtMeokR5T1fpaG3mvMVrDx5rMZ4tmFQ0eLTXUOvoM42Ji0Qj/s3s7ocbrz/a
-         o5qvutyUSBCiYJvzJ1XbZziOMW888eGs+A7/rYH/Eidd/fE+3Jgp8CxIUXKci9tvwVtX
-         LjtqyJHqaiCGCEZ4gz5EJIbsSsqWeC+jA3L/9X/JW5bPBCtS07bFfCO0rkekHKt9tKch
-         zFmA==
-X-Gm-Message-State: ACrzQf2WmMaOs6jPuhph23T2Xr4uwbFfffslLsonR8N2EFx1Mo0pF9Vb
-        NGD3qZ7Jov9bt0UAbuaR0tHwYU5J3Kw=
-X-Google-Smtp-Source: AMsMyM6z+W5vQYrPfljR5P5IrJF6KVCHwa0NUDMLv1RnCTl8sRHeKDFWGHeBIHBi/SHriuqWMCwZ7A==
-X-Received: by 2002:aa7:88d6:0:b0:563:9fe9:5da8 with SMTP id k22-20020aa788d6000000b005639fe95da8mr6157335pff.74.1665501742009;
-        Tue, 11 Oct 2022 08:22:22 -0700 (PDT)
-Received: from [172.17.0.2] ([20.245.155.123])
-        by smtp.gmail.com with ESMTPSA id f13-20020a170902f38d00b00172fc5b0764sm8648837ple.270.2022.10.11.08.22.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Oct 2022 08:22:21 -0700 (PDT)
-Message-ID: <63458a2d.170a0220.646dc.e7de@mx.google.com>
-Date:   Tue, 11 Oct 2022 08:22:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5282328818321565329=="
+        Tue, 11 Oct 2022 15:26:00 -0400
+Received: from meesny.iki.fi (meesny.iki.fi [IPv6:2001:67c:2b0:1c1::201])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9407F75486
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 12:25:59 -0700 (PDT)
+Received: from monolith.lan (91-152-121-49.elisa-laajakaista.fi [91.152.121.49])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by meesny.iki.fi (Postfix) with ESMTPSA id 0E0B42024C;
+        Tue, 11 Oct 2022 22:25:53 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1665516353;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LyMi5E4dTvBBBn+MCoiLCuT/rwJZSoFTa3yyi9YQ6d4=;
+        b=wq6iExBE0mqMV84L/DRFlNssitX6R7Ns/LoS9oX/QWyEU4XBbDWU4xfU1S2ORaN6O/6w4m
+        al48KxmDkxPd8tZFcWcHH74FVoHvtrydVTjEJAoZofCKtc/OyqMoQOI09DYckUrNg5UHSV
+        DibJ9BEIkbRWxNZ2L+ildqAFrcu1Pwg=
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH v2 1/2] Bluetooth: hci_conn: Fix CIS connection dst_type handling
+Date:   Tue, 11 Oct 2022 22:25:33 +0300
+Message-Id: <20221011192534.16281-1-pav@iki.fi>
+X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20221009174216.17533-1-pav@iki.fi>
+References: <20221009174216.17533-1-pav@iki.fi>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, isak.westin@loytec.com
-Subject: RE: [BlueZ,v3] mesh: Keep cancelled SAR data for at least 10 sec
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221011140612.2478-1-isak.westin@loytec.com>
-References: <20221011140612.2478-1-isak.westin@loytec.com>
+Content-Transfer-Encoding: 8bit
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1665516353; a=rsa-sha256; cv=none;
+        b=YYulz5YWGg8aX1iyLlDUbSI+YYrAghHQ1E/oQUw5PHTAeRi8ubE6X8qPUO7wpidOBRFHYT
+        ulX+dVXpTSXZsd6QvyCQXts9ja1SQGXofuumlZWIpCgZLD9QrsCUoF2u1YJWxBrmSgsZO8
+        VR22gS9e5LwXTg2ZIXvZzP+aXjz7mPw=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1665516353;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=LyMi5E4dTvBBBn+MCoiLCuT/rwJZSoFTa3yyi9YQ6d4=;
+        b=V8lnM5ZMkjGTYXiuwBOAcQt4W221g+yjhSo2ywaU/DxzYZteIIxVp4e1YDbmlkY3sbTdJr
+        359T5ZBtZnlp5OjI5YvTMkzqoLUGjKzdsQ+7LbNOIkFcViSzTK1SyklfiO0Pnrv0031bOZ
+        7uWXkFNu5wkhEGtN+gHYdlLo2mBO4UE=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5282328818321565329==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_connect_cis and iso_connect_cis call hci_bind_cis inconsistently
+with dst_type being either ISO socket address type or the HCI type, but
+these values cannot be mixed like this. Fix this by using only the HCI
+type.
 
-This is automated email and please do not reply to this email!
+CIS connection dst_type was also not initialized in hci_bind_cis, even
+though it is used in hci_conn_hash_lookup_cis to find existing
+connections.  Set the value in hci_bind_cis, so that existing CIS
+connections are found e.g. when doing deferred socket connections, also
+when dst_type is not 0 (ADDR_LE_DEV_PUBLIC).
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=684527
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.73 seconds
-GitLint                       PASS      0.52 seconds
-Prep - Setup ELL              PASS      35.00 seconds
-Build - Prep                  PASS      0.73 seconds
-Build - Configure             PASS      11.49 seconds
-Build - Make                  PASS      1046.65 seconds
-Make Check                    PASS      12.63 seconds
-Make Check w/Valgrind         PASS      375.77 seconds
-Make Distcheck                PASS      322.10 seconds
-Build w/ext ELL - Configure   PASS      11.91 seconds
-Build w/ext ELL - Make        PASS      108.72 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      661.18 seconds
-
-
-
+Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
+Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
-Regards,
-Linux Bluetooth
 
+Notes:
+    v2:
+    * do address type conversions in iso.c
+    * do the same for BIS for consistency (separate patch)
 
---===============5282328818321565329==--
+ net/bluetooth/hci_conn.c |  7 +------
+ net/bluetooth/iso.c      | 14 ++++++++++++--
+ 2 files changed, 13 insertions(+), 8 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 9777e7b109ee..f1263cdd71dd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1697,6 +1697,7 @@ struct hci_conn *hci_bind_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 		if (!cis)
+ 			return ERR_PTR(-ENOMEM);
+ 		cis->cleanup = cis_cleanup;
++		cis->dst_type = dst_type;
+ 	}
+ 
+ 	if (cis->state == BT_CONNECTED)
+@@ -2076,12 +2077,6 @@ struct hci_conn *hci_connect_cis(struct hci_dev *hdev, bdaddr_t *dst,
+ 	struct hci_conn *le;
+ 	struct hci_conn *cis;
+ 
+-	/* Convert from ISO socket address type to HCI address type  */
+-	if (dst_type == BDADDR_LE_PUBLIC)
+-		dst_type = ADDR_LE_DEV_PUBLIC;
+-	else
+-		dst_type = ADDR_LE_DEV_RANDOM;
+-
+ 	if (hci_dev_test_flag(hdev, HCI_ADVERTISING))
+ 		le = hci_connect_le(hdev, dst, dst_type, false,
+ 				    BT_SECURITY_LOW,
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 613039ba5dbf..f825857db6d0 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -235,6 +235,14 @@ static int iso_chan_add(struct iso_conn *conn, struct sock *sk,
+ 	return err;
+ }
+ 
++static inline u8 le_addr_type(u8 bdaddr_type)
++{
++	if (bdaddr_type == BDADDR_LE_PUBLIC)
++		return ADDR_LE_DEV_PUBLIC;
++	else
++		return ADDR_LE_DEV_RANDOM;
++}
++
+ static int iso_connect_bis(struct sock *sk)
+ {
+ 	struct iso_conn *conn;
+@@ -328,14 +336,16 @@ static int iso_connect_cis(struct sock *sk)
+ 	/* Just bind if DEFER_SETUP has been set */
+ 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		hcon = hci_bind_cis(hdev, &iso_pi(sk)->dst,
+-				    iso_pi(sk)->dst_type, &iso_pi(sk)->qos);
++				    le_addr_type(iso_pi(sk)->dst_type),
++				    &iso_pi(sk)->qos);
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto done;
+ 		}
+ 	} else {
+ 		hcon = hci_connect_cis(hdev, &iso_pi(sk)->dst,
+-				       iso_pi(sk)->dst_type, &iso_pi(sk)->qos);
++				       le_addr_type(iso_pi(sk)->dst_type),
++				       &iso_pi(sk)->qos);
+ 		if (IS_ERR(hcon)) {
+ 			err = PTR_ERR(hcon);
+ 			goto done;
+-- 
+2.37.3
+
