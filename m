@@ -2,79 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7902C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Oct 2022 07:52:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9409DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Oct 2022 08:22:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229790AbiJLHwR (ORCPT
+        id S229552AbiJLIWL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Oct 2022 03:52:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33144 "EHLO
+        Wed, 12 Oct 2022 04:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229766AbiJLHwO (ORCPT
+        with ESMTP id S229475AbiJLIV6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Oct 2022 03:52:14 -0400
-X-Greylist: delayed 401 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 12 Oct 2022 00:52:12 PDT
-Received: from giacobini.uberspace.de (giacobini.uberspace.de [185.26.156.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50CEA9C2DD
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Oct 2022 00:52:12 -0700 (PDT)
-Received: (qmail 18606 invoked by uid 990); 12 Oct 2022 07:45:29 -0000
-Authentication-Results: giacobini.uberspace.de;
-        auth=pass (plain)
-From:   Soenke Huster <soenke.huster@eknoes.de>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Soenke Huster <soenke.huster@eknoes.de>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 RESEND] Bluetooth: virtio_bt: Use skb_put to set length
-Date:   Wed, 12 Oct 2022 09:45:06 +0200
-Message-Id: <20221012074507.8157-1-soenke.huster@eknoes.de>
-X-Mailer: git-send-email 2.38.0
-In-Reply-To: <20220727070541.6450-1-soenke.huster@eknoes.de>
-References: <20220727070541.6450-1-soenke.huster@eknoes.de>
+        Wed, 12 Oct 2022 04:21:58 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DBFD6347
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Oct 2022 01:21:55 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id q1so6617051pgl.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Oct 2022 01:21:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=CWbmULRyUou7+WQyIkDi8xA0H+vT3AkVahOi+jAi7gk=;
+        b=dMWJTeQTzUXStwT1Mq56KQONI0ByTtDAfl2bApQmcyOjhHKbULAMcvLNRp9p6OM8CB
+         J6ZmqZfc4MQV2dk+Qc7ncVN5qMvnQqgMgWnCkP0Dr6FnJ4S5CM7rFyqqv3yD1q0vZvtu
+         Tmqu5+L0XOg/XzrA20wJ4RGLnCUKG1T/pfRKXjSsPcZ2ES5U6yO/3+NENm8v5j3ITD/V
+         twbCKTvfAjjEkuzWcvT2fFeBHj2mwEcRxMN0fLPSToX6+oy01vBoePwNNyzua5r6lQS9
+         viEBztSS17ameW58zCu8DBgQKrRM/zm6FRNAR83VlqcnD2lS6aR1qOBv5+LIRfPXvgEV
+         eYFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CWbmULRyUou7+WQyIkDi8xA0H+vT3AkVahOi+jAi7gk=;
+        b=z/+m0zn0hOLsdJMZ5pVL8bKuJOWf+F5ImYGD6EMVfVg16+VyvShvxZThj0oG6TFDDR
+         sM+zVNRXwD8g6xPJMXKxTA/vXmTLQ/3THYB/ZlRL2kA+q8MXnXlk1TAUO5RxDN9PcEOA
+         k8+s8Bc7nrFE8uqjt+1uR8Lm/BJ3kd3NtHXVRy71yIwQ+EbxP+EFLX563W0qslNjFmLO
+         oSLm77GYPiYbAJLk67yZqN8bR+gkU/a28V/qdIA+4qssWB5NPE9PWQ1QtnlAfu8h1stz
+         V++CypOpdllYn9EQ2s5d0z2sWXo7jnc+2Q3ofnHQLabv/TWudF4YFzj/NDo3UhdXYxZo
+         RBoA==
+X-Gm-Message-State: ACrzQf1jetzEHGVRWaKp6yWhJxLCphIKe3NDKlCWbMjvPmUlNfQotsrh
+        z29aSCMvAs1BoQ3GsOTzsUDrSyv12mY=
+X-Google-Smtp-Source: AMsMyM5orcalSaFPUK2KYLl4Wb0IrzhgiyPb1BPYkdkgLGXuaUMDXJjfx3Y/pf1KphzKbbu0B9P8DA==
+X-Received: by 2002:a63:9043:0:b0:458:6003:30ee with SMTP id a64-20020a639043000000b00458600330eemr25339898pge.231.1665562914333;
+        Wed, 12 Oct 2022 01:21:54 -0700 (PDT)
+Received: from [172.17.0.2] ([20.253.188.117])
+        by smtp.gmail.com with ESMTPSA id q31-20020a17090a752200b001fd76f7a0d1sm876662pjk.54.2022.10.12.01.21.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Oct 2022 01:21:54 -0700 (PDT)
+Message-ID: <63467922.170a0220.4746f.1820@mx.google.com>
+Date:   Wed, 12 Oct 2022 01:21:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8974137047333288130=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Bar: /
-X-Rspamd-Report: BAYES_HAM(-2.823088) R_MISSING_CHARSET(0.5) MIME_GOOD(-0.1) MID_CONTAINS_FROM(1) SUSPICIOUS_RECIPS(1.5)
-X-Rspamd-Score: 0.076911
-Received: from unknown (HELO unkown) (::1)
-        by giacobini.uberspace.de (Haraka/2.8.28) with ESMTPSA; Wed, 12 Oct 2022 09:45:29 +0200
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, soenke.huster@eknoes.de
+Subject: RE: [v2,RESEND] Bluetooth: virtio_bt: Use skb_put to set length
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221012074507.8157-1-soenke.huster@eknoes.de>
+References: <20221012074507.8157-1-soenke.huster@eknoes.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-By using skb_put we ensure that skb->tail is set
-correctly. Currently, skb->tail is always zero, which
-leads to errors, such as the following page fault in
-rfcomm_recv_frame:
+--===============8974137047333288130==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-    BUG: unable to handle page fault for address: ffffed1021de29ff
-    #PF: supervisor read access in kernel mode
-    #PF: error_code(0x0000) - not-present page
-    RIP: 0010:rfcomm_run+0x831/0x4040 (net/bluetooth/rfcomm/core.c:1751)
+This is automated email and please do not reply to this email!
 
-Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=684698
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.97 seconds
+GitLint                       PASS      0.50 seconds
+SubjectPrefix                 PASS      0.31 seconds
+BuildKernel                   PASS      47.90 seconds
+BuildKernel32                 PASS      42.79 seconds
+Incremental Build with patchesPASS      62.39 seconds
+TestRunner: Setup             PASS      702.33 seconds
+TestRunner: l2cap-tester      PASS      21.62 seconds
+TestRunner: iso-tester        PASS      22.65 seconds
+TestRunner: bnep-tester       PASS      8.55 seconds
+TestRunner: mgmt-tester       PASS      137.07 seconds
+TestRunner: rfcomm-tester     PASS      13.42 seconds
+TestRunner: sco-tester        PASS      12.48 seconds
+TestRunner: ioctl-tester      PASS      14.80 seconds
+TestRunner: mesh-tester       PASS      10.57 seconds
+TestRunner: smp-tester        PASS      12.28 seconds
+TestRunner: userchan-tester   PASS      8.83 seconds
+
+
+
 ---
-v2: Add Fixes tag
- drivers/bluetooth/virtio_bt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-index 67c21263f9e0..fd281d439505 100644
---- a/drivers/bluetooth/virtio_bt.c
-+++ b/drivers/bluetooth/virtio_bt.c
-@@ -219,7 +219,7 @@ static void virtbt_rx_work(struct work_struct *work)
- 	if (!skb)
- 		return;
- 
--	skb->len = len;
-+	skb_put(skb, len);
- 	virtbt_rx_handle(vbt, skb);
- 
- 	if (virtbt_add_inbuf(vbt) < 0)
--- 
-2.36.1
+Regards,
+Linux Bluetooth
 
 
+--===============8974137047333288130==--
