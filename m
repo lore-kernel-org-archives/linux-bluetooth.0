@@ -2,320 +2,303 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956B0C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Oct 2022 05:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE02C43217
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 Oct 2022 07:06:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbiJLFml (ORCPT
+        id S229563AbiJLHGP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 Oct 2022 01:42:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43896 "EHLO
+        Wed, 12 Oct 2022 03:06:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiJLFmk (ORCPT
+        with ESMTP id S229527AbiJLHGL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 Oct 2022 01:42:40 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DC0180F6B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 22:42:39 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id u71so7160900pgd.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 Oct 2022 22:42:39 -0700 (PDT)
+        Wed, 12 Oct 2022 03:06:11 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82E9461716
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Oct 2022 00:06:09 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id ot12so36093022ejb.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 Oct 2022 00:06:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BDMpuNRYFLWr6LJJJfBkitOOUNnjHtr0ESlw6pD76Cs=;
-        b=OENIjVtQZSiFaMgqDl6E36+evzUy2K/aBaOk+JzlGBigq9Yd1+9qSdyUuXjEBnCaUV
-         /DnsrE/Xi8bAeUps8w8MGVHNa2Aw1m54wxr2mNf199iTW+CdTExeJPoFI4qQ/+YfSAv+
-         pJrsxT8J+A/wEYaNsUU4PBsBw76PJrYNRUL/OT3Qda7nyaL/AXGngbuYhHiY40E+z6eT
-         x3Xgya7iFopVdmqip0LY/FG90eje80LCYNarXAbKMT0NQUnV+fXeMDtcXdDGGZu54vtN
-         SKxKqO83ZVxKd6W25kkmxnByMOf8X9JGJsqsGOl/qln0VTecupa9MeDzebp28sVlApWM
-         yj3w==
+        bh=3FHxfaX0nUvU3yM6pdGDpraNdXFnmAEzWTxDZP6zVag=;
+        b=cffGMndeYEmELAI2l1vym18F2hWFwe93SbDFuJNsK2tN3mDwPR4EZnrhV1EDQ86JlF
+         oPPORGk/wOJ7GRnpblMJkW2fkc0Vpg83lyYrsWp3r68N1G9QuMe1hcVtSq8663uWEo6W
+         O6WlojTohjO6nTAaeSN416a8SyCidZa0xF2KWz/I5aPvDQ04a2K1xSP0zZz3llF3nOMI
+         MLHfW9ve+SZ+/llayySwVf41keulS2jXW30hXifWIztGNZhu1k/f+JysM8z9J62ouCAs
+         oTL55ao3P7wTCsYgZCR/k8UO78YseOVW2NJJjczVUOaS9pZgTOmuzCBnYo8Ok6O7rOgp
+         G7cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BDMpuNRYFLWr6LJJJfBkitOOUNnjHtr0ESlw6pD76Cs=;
-        b=A0+z6PHo+ww5s1q6c9TL2TuWFwVJuWbUCiNoM/d1zISnAOGIQ1umosk6w6IZCLF5l1
-         FE5zs8b/Qr0eQVGOLjAAJ6EDzrLD89U9wncK0XuPk3qrvHHr87zCHBiqrrXQ3qF+xhqK
-         Vn2t4cwBpDWjbLO28HYCBBCIs8Xc0j9Qnah31uHAWryvv+uswoAXIt+TDv+iSTGflOZq
-         b3B5ZTeal/Vn+aDkZLY0v4wV5h9VGw0QoRy9/mIS3It6buPviXy7YALExAulgAEGrmMe
-         Dp2UPVT+Ejxy966CMR8Xii3ujloUuA5W1Zow3k88mlM21k33SIresIl7wwGxxH5R5wsI
-         3ACA==
-X-Gm-Message-State: ACrzQf1zdL4FYBdicyZ60aU7P8W+2fIlTqANSItfBWXczhVCMs/sbyi4
-        VezxDEZudF/g2h1u/N7p8Ws4aYxNnvYdSA6R/3YwmzMOYy0=
-X-Google-Smtp-Source: AMsMyM493+o23mWxPTkm0otbDIXFUCDbpZpykUw/dWFbuy0JtODW/DH8yCAFJGUH1REP+bcQIp9CL94R609qsLkMj6w=
-X-Received: by 2002:aa7:8687:0:b0:560:3299:a6c0 with SMTP id
- d7-20020aa78687000000b005603299a6c0mr28893585pfo.81.1665553358594; Tue, 11
- Oct 2022 22:42:38 -0700 (PDT)
+        bh=3FHxfaX0nUvU3yM6pdGDpraNdXFnmAEzWTxDZP6zVag=;
+        b=wyNbJXzNEDJ8RxbrVlSyx2Rgwbkjcg+/tJwSuWizMhHi/yTs0wJBNrhD7ztDSJWv/2
+         +EcwkSqO9mqzNArePWKT3F77EUIZ+O2CWBpvohwIqdJNEzplYTYo0oTlSirqCfrNI7db
+         aK2/1q+ZOhe0h1/2YV1NJXKhc2inV1I3uRDUfdd9w8OrcHG3ek8B6iOZTwbI5PAF1hHe
+         /FrsOyLGsj+86guOIgjtinZI0YSmgdkXa1QIb8jRm7/mWvFguei/CbcvwlSazk/CpCrh
+         2sXP4BVAeIS/yubLH8COryFfnMkh0xuK2vUys1t9V+mEqVrEFSjOWkKhhwrhPFPZ4Dcl
+         lQfQ==
+X-Gm-Message-State: ACrzQf2OeWuBP60h4eHnkfFlawPYA8+8fzfv4i+hqKEAtUe6bIr+BN3Y
+        gY+9zNhksTTyXVllTQTFCeKoqDQ2EsWrkh+g6+NRAw==
+X-Google-Smtp-Source: AMsMyM6Xi8F6DTgp4ZKvWbVbWHa1cM1s8X+vpij+0T/1ie3OxzN9LtD5fqXK74DtrKVmQ1uJyfPyoOMlh7NiSF/8Kdk=
+X-Received: by 2002:a17:907:7d8e:b0:78d:ed30:643b with SMTP id
+ oz14-20020a1709077d8e00b0078ded30643bmr2862275ejc.253.1665558367879; Wed, 12
+ Oct 2022 00:06:07 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221011113116.70514-1-sathish.narasimman@intel.com> <CABBYNZJpebSE=hke9V6-FY4gc6AMS6_mVxiMnh7HhK7kHjDSGA@mail.gmail.com>
-In-Reply-To: <CABBYNZJpebSE=hke9V6-FY4gc6AMS6_mVxiMnh7HhK7kHjDSGA@mail.gmail.com>
-From:   Sathish Narasimman <nsathish41@gmail.com>
-Date:   Wed, 12 Oct 2022 11:12:26 +0530
-Message-ID: <CAOVXEJJCxMFwwTzN=uVSc9XsmqtjHtz8bD6bQVdLV=EUwyQ+uA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v3 1/3] audio/transport: Adding volume callback to
- media transport
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Sathish Narasimman <sathish.narasimman@intel.com>,
-        linux-bluetooth@vger.kernel.org
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Wed, 12 Oct 2022 12:35:56 +0530
+Message-ID: <CA+G9fYui6--jhN1CFH6fXNK81sHNYgosTs2hyybFqPxFRvndpg@mail.gmail.com>
+Subject: BUG: sleeping function called from invalid context at kernel/locking/mutex.c:580
+To:     open list <linux-kernel@vger.kernel.org>,
+        rcu <rcu@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
+        lkft-triage@lists.linaro.org, regressions@lists.linux.dev,
+        Netdev <netdev@vger.kernel.org>
+Cc:     "Paul E. McKenney" <paulmck@kernel.org>,
+        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Nicolas Dechesne <nicolas.dechesne@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz
+Following kernel deadlock warnings and BUG noticed on arm64 Qcom db845c dev=
+ice
+While booting Linux next 20221012 tag kernel Image and kselftest configs.
 
-On Wed, Oct 12, 2022 at 1:28 AM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Sathish,
->
-> On Tue, Oct 11, 2022 at 4:38 AM Sathish Narasimman
-> <sathish.narasimman@intel.com> wrote:
-> >
-> > Initialize set_volume and get_volume to media transport and update the
-> > volume when media_transport_update_device_volume is called.
-> > ---
-> >  profiles/audio/transport.c | 126 +++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 120 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> > index 41339da51e17..a1445cba7993 100644
-> > --- a/profiles/audio/transport.c
-> > +++ b/profiles/audio/transport.c
-> > @@ -91,6 +91,7 @@ struct bap_transport {
-> >         uint8_t                 rtn;
-> >         uint16_t                latency;
-> >         uint32_t                delay;
-> > +       int8_t                  volume;
-> >  };
-> >
-> >  struct media_transport {
-> > @@ -116,6 +117,9 @@ struct media_transport {
-> >                                                                 guint id);
-> >         void                    (*set_state) (struct media_transport *transport,
-> >                                                 transport_state_t state);
-> > +       void                    (*set_volume) (struct media_transport *transp,
-> > +                                               int8_t volume);
-> > +       int8_t                  (*get_volume) (struct media_transport *transp);
-> >         GDestroyNotify          destroy;
-> >         void                    *data;
-> >  };
-> > @@ -769,6 +773,58 @@ error:
-> >                                         "Invalid arguments in method call");
-> >  }
-> >
-> > +static gboolean volume_bap_exists(const GDBusPropertyTable *property,
-> > +                                       void *data)
-> > +{
-> > +       struct media_transport *transport = data;
-> > +       struct bap_transport *bap = transport->data;
-> > +
-> > +       return bap->volume >= 0;
-> > +}
-> > +
-> > +static gboolean get_bap_volume(const GDBusPropertyTable *property,
-> > +                                       DBusMessageIter *iter, void *data)
-> > +{
-> > +       struct media_transport *transport = data;
-> > +       struct bap_transport *bap = transport->data;
-> > +       uint16_t volume = (uint16_t)bap->volume;
-> > +
-> > +       dbus_message_iter_append_basic(iter, DBUS_TYPE_UINT16, &volume);
-> > +
-> > +       return TRUE;
-> > +}
-> > +
-> > +static void set_bap_volume(const GDBusPropertyTable *property,
-> > +                          DBusMessageIter *iter, GDBusPendingPropertySet id,
-> > +                          void *data)
-> > +{
-> > +       struct media_transport *transport = data;
-> > +       struct bap_transport *bap = transport->data;
-> > +       uint16_t arg;
-> > +       int8_t volume;
-> > +
-> > +       if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_UINT16)
-> > +               goto error;
-> > +
-> > +       dbus_message_iter_get_basic(iter, &arg);
-> > +       if (arg > INT8_MAX)
-> > +               goto error;
-> > +
-> > +       g_dbus_pending_property_success(id);
-> > +
-> > +       volume = (int8_t)arg;
-> > +       if (bap->volume == volume)
-> > +               return;
-> > +
-> > +       /*TODO vcp_send_volume */
->
-> What is this TODO item for? Can we complete it right now? Afaik we
-> should be able to handle local changes and notify it to remote peers
-> or that is not how VCP works?
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-The TODO part is for VCP Client. At present only VCP Server is implemented.
-Whenever there is a change in volume locally we have to notify to the remote
-peer in case of server Role(Volume renderer).
+[   18.690573] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[   18.695938] WARNING: possible recursive locking detected
+[   18.701307] 6.0.0-next-20221012 #1 Not tainted
+[   18.705804] --------------------------------------------
+[   18.711168] kworker/u16:5/256 is trying to acquire lock:
+[   18.716544] ffff58730911e4f8 (&irq_desc_lock_class){-.-.}-{2:2},
+at: __irq_get_desc_lock+0x64/0xa4
+[   18.725629]
+[   18.725629] but task is already holding lock:
+[   18.731519] ffff5873071c64f8 (&irq_desc_lock_class){-.-.}-{2:2},
+at: __irq_get_desc_lock+0x64/0xa4
+[   18.733233] remoteproc remoteproc0: remote processor
+remoteproc-adsp is now up
+[   18.740563]
+[   18.740563] other info that might help us debug this:
+[   18.740566]  Possible unsafe locking scenario:
+[   18.740566]
+[   18.740569]        CPU0
+[   18.740571]        ----
+[   18.740573]   lock(&irq_desc_lock_class);
+[   18.740579]   lock(&irq_desc_lock_class);
+[   18.740585]
+[   18.740585]  *** DEADLOCK ***
+[   18.740585]
+[   18.740587]  May be due to missing lock nesting notation
+[   18.740587]
+[   18.757926] cfg80211: Loading compiled-in X.509 certificates for
+regulatory database
+[   18.760420] 6 locks held by kworker/u16:5/256:
+[   18.760424]  #0: ffff587300032938
+((wq_completion)events_unbound){+.+.}-{0:0}, at:
+process_one_work+0x1e8/0x6d4
+[   18.793798] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[   18.794138]  #1: ffff800009a1bdd0
+(deferred_probe_work){+.+.}-{0:0}, at: process_one_work+0x1e8/0x6d4
+[   18.815528]  #2: ffff5873019e68f8 (&dev->mutex){....}-{3:3}, at:
+__device_attach+0x44/0x200
+[   18.833287]  #3: ffffdd47e98f1cf0 (cpu_hotplug_lock){++++}-{0:0},
+at: cpus_read_lock+0x18/0x24
+M[K[  *** ] (2 of 2) A start j[   18.842012]  #4: ffff587301248518
+(subsys mutex#8){+.ob is running for=C3=A2=E2=82=AC=C2=A6n to /usr/lib/rfsa=
+ (9s / no
+limit)
+[   18.857511]  #5: ffff5873071c64f8
+(&irq_desc_lock_class){-.-.}-{2:2}, at: __irq_get_desc_lock+0x64/0xa4
+[   18.871877]
+[   18.871877] stack backtrace:
+[   18.876286] CPU: 4 PID: 256 Comm: kworker/u16:5 Not tainted
+6.0.0-next-20221012 #1
+[   18.883936] Hardware name: Thundercomm Dragonboard 845c (DT)
+[   18.889655] Workqueue: events_unbound deferred_probe_work_func
+[   18.895566] Call trace:
+[   18.898046]  dump_backtrace+0xe4/0x140
+[   18.901847]  show_stack+0x30/0x60
+[   18.905203]  dump_stack_lvl+0x8c/0xb8
+[   18.908918]  dump_stack+0x18/0x34
+[   18.912274]  __lock_acquire+0x1154/0x2040
+[   18.916330]  lock_acquire.part.0+0xe8/0x24c
+[   18.920568]  lock_acquire+0x84/0xa0
+[   18.924102]  _raw_spin_lock_irqsave+0x70/0xb0
+[   18.928523]  __irq_get_desc_lock+0x64/0xa4
+[   18.928532]  enable_irq+0x40/0xb0
+[   18.928542]  lmh_enable_interrupt+0x3c/0x50 [lmh]
+Coldplug All udev De[   18.94080vices.
+[   18.952775]  __irq_startup+0x88/0xbc
+[K[   18.957451]  irq_startup+0x84/0x180
+[   18.961243]  __enable_irq+0x88/0xa0
+[   18.964776]  enable_irq+0x54/0xb0
+[   18.968140]  qcom_cpufreq_ready+0x2c/0x3c
+[   18.972200]  cpufreq_online+0x2f4/0xb24
+[   18.976083]  cpufreq_add_dev+0xdc/0x100
+[   18.979964]  subsys_interface_register+0x134/0x14c
+[   18.984819]  cpufreq_register_driver+0x16c/0x2e0
+[   18.989488]  qcom_cpufreq_hw_driver_probe+0xdc/0x150
+[   18.994510]  platform_probe+0x70/0x100
+[   18.998311]  really_probe+0xd4/0x3f4
+[   19.001936]  __driver_probe_device+0x8c/0x1a0
+[   19.006347]  driver_probe_device+0x4c/0x13c
+[   19.010584]  __device_attach_driver+0xd8/0x180
+[   19.015081]  bus_for_each_drv+0x88/0xe0
+[   19.018966]  __device_attach+0xb4/0x200
+[   19.022845]  device_initial_probe+0x28/0x40
+[   19.027081]  bus_probe_device+0xa8/0xb0
+[   19.030965]  deferred_probe_work_func+0xc0/0x120
+[   19.035637]  process_one_work+0x280/0x6d4
+[   19.039695]  worker_thread+0x7c/0x430
+[   19.043407]  kthread+0x110/0x114
+[   19.046677]  ret_from_fork+0x10/0x20
+[   19.108471] cpu cpu4: EM: created perf domain
+         Starting Wait for udev To =C3=A2=E2=82=AC=C2=A6plete Device Initia=
+lization.
+[   19.125768] remoteproc remoteproc1: remote processor
+remoteproc-cdsp is now up
+[   19.138140] xhci_hcd 0000:01:00.0: Adding to iommu group 6
+[   19.150419] coresight stm0: STM32 initialized
+[   19.254272] ath10k_snoc 18800000.wifi: Adding to iommu group 10
+[   19.372948] ath10k_snoc 18800000.wifi: supply vdd-3.3-ch1 not
+found, using dummy regulator
+[   19.472640] geni_spi 880000.spi: FIFO mode disabled, but couldn't
+get DMA, fall back to FIFO mode
+[   19.485178] gpi 800000.dma-controller: Adding to iommu group 11
+[  OK  ] Reached target [0;1;39mHardware activated USB gadget.
+[   19.528153] i2c 16-0010: Fixing up cyclic dependency with acb3000.camss
+[   19.559810] i2c 10-003b: Fixing up cyclic dependency with hdmi-out
+[   19.575396] gpi a00000.dma-controller: Adding to iommu group 12
+[   19.590779] qcom-venus aa00000.video-codec: Adding to iommu group 13
+[   19.608167] qcom-venus aa00000.video-codec: non legacy binding
+[   19.618073] remoteproc remoteproc2: 4080000.remoteproc is available
+[   19.629950] qcom-camss acb3000.camss: Adding to iommu group 14
+[   19.630180] Bluetooth: Core ver 2.22
+[   19.639713] NET: Registered PF_BLUETOOTH protocol family
+[   19.645247] Bluetooth: HCI device and connection manager initialized
+[   19.651711] Bluetooth: HCI socket layer initialized
+[   19.656813] Bluetooth: L2CAP socket layer initialized
+[   19.661960] Bluetooth: SCO socket layer initialized
+[   19.743786] adreno 5000000.gpu: Adding to iommu group 15
+[   19.764896] Bluetooth: HCI UART driver ver 2.3
+[   19.769470] Bluetooth: HCI UART protocol H4 registered
+[   19.778004] msm-mdss ae00000.mdss: Adding to iommu group 16
+[   19.783005] Bluetooth: HCI UART protocol LL registered
+[   19.809993] Bluetooth: HCI UART protocol Broadcom registered
+[   19.819508] Bluetooth: HCI UART protocol QCA registered
+[   19.829474] Bluetooth: HCI UART protocol Marvell registered
+[   19.858355] EXT4-fs (sde9): mounted filesystem with ordered data
+mode. Quota mode: none.
+[   19.893331] platform ae94000.dsi: Fixing up cyclic dependency with 10-00=
+3b
+[  OK  ] Finished Mount DSP partition to /usr/lib/rfsa.
+[   19.917937] platform ae94000.dsi: Fixing up cyclic dependency with
+ae01000.display-controller
+[  OK  ] Reached target Local File Systems.
+[  OK  ] Listening on Load/Save RF =C3=A2=E2=82=AC=C2=A6itch Status /dev/rf=
+kill Watch.
+[   19.950987] BUG: sleeping function called from invalid context at
+kernel/locking/mutex.c:580
+[   19.959591] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
+258, name: kworker/u16:7
+[   19.968096] preempt_count: 100, expected: 0
+[   19.972374] RCU nest depth: 0, expected: 0
+[   19.976562] INFO: lockdep is turned off.
+[   19.980574] CPU: 0 PID: 258 Comm: kworker/u16:7 Not tainted
+6.0.0-next-20221012 #1
+[   19.988245] Hardware name: Thundercomm Dragonboard 845c (DT)
+[   19.993986] Workqueue: events_unbound async_run_entry_fn
+[   19.999395] Call trace:
+[   20.001886]  dump_backtrace+0xe4/0x140
+[   20.005700]  show_stack+0x30/0x60
+[   20.009069]  dump_stack_lvl+0x8c/0xb8
+[   20.012798]  dump_stack+0x18/0x34
+[   20.016169]  __might_resched+0x1c4/0x240
+[   20.020155]  __might_sleep+0x58/0xb0
+[   20.020802] rtc-pm8xxx c440000.spmi:pmic@0:rtc@6000: registered as rtc0
+[   20.023766]  __mutex_lock+0x54/0x424
+[   20.023778]  mutex_lock_nested+0x50/0x6c
+[   20.030501] rtc-pm8xxx c440000.spmi:pmic@0:rtc@6000: setting system
+clock to 1970-01-01T00:00:30 UTC (30)
+[   20.033086] input: pm8941_pwrkey as
+/devices/platform/soc@0/c440000.spmi/spmi-0/0-00/c440000.spmi:pmic@0:pon@80=
+0/c440000.spmi:pmic@0:pon@800:pwrkey/input/input1
+[   20.034047]  lpg_brightness_single_set+0x48/0x9c [leds_qcom_lpg]
+[   20.034132] systemd-journald[295]: Time jumped backwards, rotating.
+[   20.074723]  led_set_brightness_nosleep+0x54/0x80
+[   20.079509]  led_heartbeat_function+0x88/0x180
+[   20.084024]  call_timer_fn+0xc0/0x3c4
+[   20.087751]  __run_timers.part.0+0x220/0x27c
+[   20.092085]  run_timer_softirq+0x44/0x80
+[   20.096073]  __do_softirq+0x1e4/0x62c
+[   20.099793]  ____do_softirq+0x18/0x24
+[   20.103520]  call_on_irq_stack+0x2c/0x58
+[   20.107511]  do_softirq_own_stack+0x24/0x3c
+[   20.111757]  __irq_exit_rcu+0x168/0x1a0
+[   20.115661]  irq_exit_rcu+0x18/0x40
+[   20.119203]  el1_interrupt+0x38/0x64
+[   20.122838]  el1h_64_irq_handler+0x18/0x2c
+[   20.127002]  el1h_64_irq+0x64/0x68
+[   20.130465]  arch_counter_get_cntvct+0x14/0x30
+[   20.134979]  __delay+0xa4/0x110
+[   20.138179]  __const_udelay+0x34/0x44
+[   20.141900]  qcom_geni_serial_poll_bit+0xc4/0x104
+[   20.146675]  qcom_geni_serial_stop_rx+0xc0/0x190
+[   20.151367]  qcom_geni_serial_set_termios+0x4c/0x360
+[   20.156410]  uart_change_speed+0x60/0x130
+[   20.160479]  uart_set_termios+0x90/0x190
+[   20.164460]  tty_set_termios+0x194/0x240
+[   20.168447]  ttyport_open+0x144/0x180
+[   20.172169]  serdev_device_open+0x38/0xe4
+[   20.176248]  hci_uart_register_device+0x68/0x3ac [hci_uart]
+[   20.181957]  qca_serdev_probe+0x2f4/0x530 [hci_uart]
+[   20.186753] input: pm8941_resin as
+/devices/platform/soc@0/c440000.spmi/spmi-0/0-00/c440000.spmi:pmic@0:pon@80=
+0/c440000.spmi:pmic@0:pon@800:resin/input/input2
+[   20.187003]  serdev_drv_probe+0x44/0x90
+[   20.187016]  really_probe+0xd4/0x3f4
+[   20.208885]  __driver_probe_device+0x8c/0x1a0
+[   20.213311]  driver_probe_device+0x4c/0x13c
+[   20.217555]  __driver_attach_async_helper+0x64/0x110
+[   20.222594]  async_run_entry_fn+0x40/0x180
+[   20.226759]  process_one_work+0x280/0x6d4
+[   20.230837]  worker_thread+0x7c/0x430
+[   20.234557]  kthread+0x110/0x114
+[   20.237849]  ret_from_fork+0x10/0x20
 
->
-> > +       return;
-> > +
-> > +error:
-> > +       g_dbus_pending_property_error(id, ERROR_INTERFACE ".InvalidArguments",
-> > +                                       "Invalid arguments in method call");
-> > +}
-> > +
-> > +
-> >  static gboolean endpoint_exists(const GDBusPropertyTable *property, void *data)
-> >  {
-> >         struct media_transport *transport = data;
-> > @@ -970,6 +1026,7 @@ static const GDBusPropertyTable bap_properties[] = {
-> >         { "Retransmissions", "y", get_retransmissions },
-> >         { "Latency", "q", get_latency },
-> >         { "Delay", "u", get_delay },
-> > +       { "Volume", "q", get_bap_volume, set_bap_volume, volume_bap_exists },
->
-> Now that we have set_volume/get_volume as callbacks these could be
-> changed to use them instead of having dedicated callback like abouve,
-> something like:
->
-> https://gist.github.com/Vudentz/19edcf96735567c1f7437a5e1dee7e04
->
-will check and update
-> >         { "Endpoint", "o", get_endpoint, NULL, endpoint_exists },
-> >         { "Location", "u", get_location },
-> >         { "Metadata", "ay", get_metadata },
-> > @@ -1048,6 +1105,31 @@ static void source_state_changed(struct btd_service *service,
-> >                 transport_update_playing(transport, FALSE);
-> >  }
-> >
-> > +static int8_t get_volume_a2dp(struct media_transport *transport)
-> > +{
-> > +       struct a2dp_transport *a2dp = transport->data;
-> > +
-> > +       return a2dp->volume;
-> > +}
-> > +
-> > +static void set_volume_a2dp(struct media_transport *transport, int8_t volume)
-> > +{
-> > +       struct a2dp_transport *a2dp = transport->data;
-> > +
-> > +       if (volume < 0)
-> > +               return;
-> > +
-> > +       /* Check if volume really changed */
-> > +       if (a2dp->volume == volume)
-> > +               return;
-> > +
-> > +       a2dp->volume = volume;
-> > +
-> > +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> > +                                       transport->path,
-> > +                                       MEDIA_TRANSPORT_INTERFACE, "Volume");
-> > +}
-> > +
-> >  static int media_transport_init_source(struct media_transport *transport)
-> >  {
-> >         struct btd_service *service;
-> > @@ -1061,6 +1143,8 @@ static int media_transport_init_source(struct media_transport *transport)
-> >
-> >         transport->resume = resume_a2dp;
-> >         transport->suspend = suspend_a2dp;
-> > +       transport->set_volume = set_volume_a2dp;
-> > +       transport->get_volume = get_volume_a2dp;
-> >         transport->cancel = cancel_a2dp;
-> >         transport->data = a2dp;
-> >         transport->destroy = destroy_a2dp;
-> > @@ -1387,6 +1471,31 @@ static void free_bap(void *data)
-> >         free(bap);
-> >  }
-> >
-> > +static void set_volume_bap(struct media_transport *transport, int8_t volume)
-> > +{
-> > +       struct bap_transport *bap = transport->data;
-> > +
-> > +       if (volume < 0)
-> > +               return;
-> > +
-> > +       /* Check if volume really changed */
-> > +       if (bap->volume == volume)
-> > +               return;
-> > +
-> > +       bap->volume = volume;
-> > +
-> > +       g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> > +                                       transport->path,
-> > +                                       MEDIA_TRANSPORT_INTERFACE, "Volume");
-> > +}
-> > +
-> > +static int8_t get_volume_bap(struct media_transport *transport)
-> > +{
-> > +       struct bap_transport *bap = transport->data;
-> > +
-> > +       return bap->volume;
-> > +}
-> > +
-> >  static int media_transport_init_bap(struct media_transport *transport,
-> >                                                         void *stream)
-> >  {
-> > @@ -1403,6 +1512,7 @@ static int media_transport_init_bap(struct media_transport *transport,
-> >         bap->rtn = qos->rtn;
-> >         bap->latency = qos->latency;
-> >         bap->delay = qos->delay;
-> > +       bap->volume = 127;
-> >         bap->state_id = bt_bap_state_register(bt_bap_stream_get_session(stream),
-> >                                                 bap_state_changed,
-> >                                                 bap_connecting,
-> > @@ -1413,6 +1523,8 @@ static int media_transport_init_bap(struct media_transport *transport,
-> >         transport->suspend = suspend_bap;
-> >         transport->cancel = cancel_bap;
-> >         transport->set_state = set_state_bap;
-> > +       transport->set_volume = set_volume_bap;
-> > +       transport->get_volume = get_volume_bap;
-> >         transport->destroy = free_bap;
-> >
-> >         return 0;
-> > @@ -1537,12 +1649,13 @@ int8_t media_transport_get_device_volume(struct btd_device *dev)
-> >         /* Attempt to locate the transport to get its volume */
-> >         for (l = transports; l; l = l->next) {
-> >                 struct media_transport *transport = l->data;
-> > +
-> >                 if (transport->device != dev)
-> >                         continue;
-> >
-> > -               /* Volume is A2DP only */
-> > -               if (media_endpoint_get_sep(transport->endpoint))
-> > -                       return media_transport_get_volume(transport);
-> > +               /* Get transport volume */
-> > +               if (transport->get_volume)
-> > +                       return transport->get_volume(transport);
-> >         }
-> >
-> >         /* If transport volume doesn't exists use device_volume */
-> > @@ -1560,12 +1673,13 @@ void media_transport_update_device_volume(struct btd_device *dev,
-> >         /* Attempt to locate the transport to set its volume */
-> >         for (l = transports; l; l = l->next) {
-> >                 struct media_transport *transport = l->data;
-> > +
-> >                 if (transport->device != dev)
-> >                         continue;
-> >
-> > -               /* Volume is A2DP only */
-> > -               if (media_endpoint_get_sep(transport->endpoint)) {
-> > -                       media_transport_update_volume(transport, volume);
-> > +               /* Set transport volume */
-> > +               if (transport->set_volume) {
-> > +                       transport->set_volume(transport, volume);
-> >                         return;
-> >                 }
-> >         }
-> > --
-> > 2.25.1
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+Full boot log link,
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20221012=
+/testrun/12361480/suite/log-parser-boot/test/check-kernel-bug/log
+ - https://lkft.validation.linaro.org/scheduler/job/5660839#L3720
 
-Sathish N
+
+metadata:
+  git_ref: master
+  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+  git_sha: f843795727e4f5612c612cd178db1557978da742
+  git_describe: next-20221012
+  kernel_version: 6.0.0
+  kernel-config: https://builds.tuxbuild.com/2G10hEBW0Cdgh2jzrxvNzlRXdec/co=
+nfig
+  build-url: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next/-/pipel=
+ines/664367901
+  artifact-location: https://builds.tuxbuild.com/2G10hEBW0Cdgh2jzrxvNzlRXde=
+c
+  toolchain: gcc-11
+  System.map: https://builds.tuxbuild.com/2G10hEBW0Cdgh2jzrxvNzlRXdec/Syste=
+m.map
+  vmlinux.xz: https://builds.tuxbuild.com/2G10hEBW0Cdgh2jzrxvNzlRXdec/vmlin=
+ux.xz
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
