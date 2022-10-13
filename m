@@ -2,105 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09EFC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Oct 2022 19:44:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 641CBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Oct 2022 19:50:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229491AbiJMTow (ORCPT
+        id S229843AbiJMTu1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Oct 2022 15:44:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46172 "EHLO
+        Thu, 13 Oct 2022 15:50:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229679AbiJMTot (ORCPT
+        with ESMTP id S229832AbiJMTuX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Oct 2022 15:44:49 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1BC819285
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 12:44:47 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 32920CE22FF
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 19:44:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 62ECCC433D7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 19:44:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665690284;
-        bh=8lwV5Xqa5kCTcHuVYjRYmEuUTSYyMvCjwY4HiHQ13Mc=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=EUvf+Onl4Qo0xUDAvVDq1j4FqtabR5rvlR9MZqm1BnrVP35rqxmp3iHkp0/03uKGm
-         UvFEFgpwZEGjtDt6GkReE34/dWPI+LKneSIYq16yP0uKvP+Hyc42LNSIu7hRzV2hVp
-         +W8BgshnWhJ84e3YLmZiUKESTPVFahM7y0wbdHgxE8VM/VEVSmfIPsdrfVc8EJcGH6
-         tniVYat7Sle9xX2PNzJ416jCjxWP1xNAa5uJJonI07M/DywBjffx81oSSIqcB/BZ/q
-         6T85Qmp3YTGCZqK8w+H7ZZTSpMYicgn426n0YpdgbvPPaW1apWWl1pp9kiX4/ZScw2
-         orSjZHLDT5mPQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 43E54C433E6; Thu, 13 Oct 2022 19:44:44 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216580] Jabra Elite 75t (ear buds):Unable to connect and use
- (`hci0: Opcode 0x 401 failed: -16`)
-Date:   Thu, 13 Oct 2022 19:44:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luiz.dentz@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-216580-62941-mXpEmuDDsk@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216580-62941@https.bugzilla.kernel.org/>
-References: <bug-216580-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 13 Oct 2022 15:50:23 -0400
+Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4ADB60CBE
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 12:50:17 -0700 (PDT)
+Received: by mail-il1-x129.google.com with SMTP id o13so1515657ilc.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 12:50:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WJtUgMyknP4m6ys7U3PstctWgnf/qk6Z7L91/ntX78Y=;
+        b=WwkyeeUjwcHXf2Vy1OXp7GfUN1jTId+7Svgh+SNa0GwV2l4+49ATkI9Y+pXz3w4dZZ
+         bKI1zGvMjRq0Hu9tRXndWR2X84VisTSzl32ySRyuVa5936+YEcBi7pcTvYyVOMa0PAo3
+         PGBGwYeWRwafPuJGf8JxofTX1gUQENo4G/MYI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WJtUgMyknP4m6ys7U3PstctWgnf/qk6Z7L91/ntX78Y=;
+        b=J81+PhRHv7iN+nVUKkcg1UHl60HZ84uqZoW7i1qIhCHtznutQ2u9u10im49UdLoNEz
+         DWjkzhdbTEtdgQ0TsjtxYVqB9lhx2Jka37OiVHdFJ8M72LC0EpvXjxvhVIUugGGWjrCf
+         yWZmLzgQnpFRHuP+fXo5qKJUWDsn9Y/lLtIdZGsMGhn64O8bzt7mNlGfWbzO1UChesLN
+         Ju+KKcPq3Go7gyK/Dj3DXgFwHbTF9rcMtutHRQhiQcbkMQMYhpbIx1d9v2KaCxH6+XXV
+         43jCLLT39nJp2HrWjRz0eQX09AduwchZarliM86knA+oT+6PMQbbTOEHvbMvSYS9oxLS
+         SyRw==
+X-Gm-Message-State: ACrzQf1jTPTrQd7Z/M1/+juQnbscJit0Cnw1diXKD4DrqPdAIBwGL5h4
+        qKun9mwELQy/1/eH4UTkuOU7lxoOTtg6kg==
+X-Google-Smtp-Source: AMsMyM7lvMIch7u+CSSvr4aiO2Kb9grrpoWlHGADoAvjJtjDhqNPId/axnO4uvfzhHRdAFDnCZvtVw==
+X-Received: by 2002:a05:6e02:1bc4:b0:2fc:2d47:9abf with SMTP id x4-20020a056e021bc400b002fc2d479abfmr809263ilv.246.1665690617052;
+        Thu, 13 Oct 2022 12:50:17 -0700 (PDT)
+Received: from localhost (30.23.70.34.bc.googleusercontent.com. [34.70.23.30])
+        by smtp.gmail.com with UTF8SMTPSA id q27-20020a02b05b000000b00363c852c779sm308754jah.61.2022.10.13.12.50.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 13 Oct 2022 12:50:16 -0700 (PDT)
+Date:   Thu, 13 Oct 2022 19:50:13 +0000
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanimir Varbanov <svarbanov@mm-sol.com>,
+        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH v1 00/15] create power sequencing subsystem
+Message-ID: <Y0hr9XTGAg8Q6K6y@google.com>
+References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216580
+Hi Dmitry,
 
-Luiz Von Dentz (luiz.dentz@gmail.com) changed:
+Do you still plan to refresh this series?
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |luiz.dentz@gmail.com
+I know there have been multiple attempts to get something similar
+landed in the past 10 year or so. Your series didn't seem to get
+much pushback from maintainers, might be worth sending a refresh :)
 
---- Comment #3 from Luiz Von Dentz (luiz.dentz@gmail.com) ---
-This looks suspicious:
+Thanks
 
-< HCI Command: Microsoft SW RF Kill (0x3f|0x003f) plen 0=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
-                                        #844 [hci0] 226.575196
-> HCI Event: Command Complete (0x0e) plen 4=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20
->                                         #845 [hci0] 226.576116
-      Microsoft SW RF Kill (0x3f|0x003f) ncmd 1
-        Status: Success (0x00)
+Matthias
 
-Which comes from:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/tree/drivers/bluetooth/btintel.c#n2600
-
-The problem is that after sending RFKILL we need to reset again in order for
-the firmware to become operation again as explained bellow:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/tree/drivers/bluetooth/btintel.c#n2361
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+On Wed, Oct 06, 2021 at 06:53:52AM +0300, Dmitry Baryshkov wrote:
+> This is a proposed power sequencer subsystem. This is a
+> generification of the MMC pwrseq code. The subsystem tries to abstract
+> the idea of complex power-up/power-down/reset of the devices.
+> 
+> The primary set of devices that promted me to create this patchset is
+> the Qualcomm BT+WiFi family of chips. They reside on serial+platform
+> or serial + SDIO interfaces (older generations) or on serial+PCIe (newer
+> generations).  They require a set of external voltage regulators to be
+> powered on and (some of them) have separate WiFi and Bluetooth enable
+> GPIOs.
+> 
+> The major drawback for now is the lack of proper PCIe integration
+> At this moment support for PCIe is hacked up to be able to test the
+> PCIe part of qca6390. Proper PCIe support would require automatically
+> powering up the devices before the scan basing on the proper device
+> structure in the device tree. This two last patches are noted as WIP and
+> are included into the patchset for the purpose of testing WiFi on newer
+> chips (like qca6390/qca6391).
+> 
+> Changes since RFC v2:
+>  - Add documentation for the pwrseq code. Document data structures,
+>    macros and exported functions.
+>  - Export of_pwrseq_xlate_onecell()
+>  - Add separate pwrseq_set_drvdata() function to follow the typical API
+>    design
+>  - Remove pwrseq_get_optional()/devm_pwrseq_get_optional()
+>  - Moved code to handle old mmc-pwrseq binding to the MMC patch
+>  - Split of_pwrseq_xlate_onecell() support to a separate patch
+> 
+> Changes since RFC v1:
+>  - Provider pwrseq fallback support
+>  - Implement fallback support in pwrseq_qca.
+>  - Mmove susclk handling to pwrseq_qca.
+>  - Significantly simplify hci_qca.c changes, by dropping all legacy
+>    code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
+>    parts of the chip.
+> 
+> 
+> 
+> 
+> _______________________________________________
+> ath10k mailing list
+> ath10k@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/ath10k
