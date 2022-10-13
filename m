@@ -2,159 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BAFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Oct 2022 08:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B62AC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 Oct 2022 12:28:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbiJMIXw (ORCPT
+        id S229646AbiJMM2V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 Oct 2022 04:23:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57848 "EHLO
+        Thu, 13 Oct 2022 08:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbiJMIXt (ORCPT
+        with ESMTP id S229516AbiJMM2U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 Oct 2022 04:23:49 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670D0150486
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 01:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665649427; x=1697185427;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ieTvjGoZ+bgI8vmet7lO4Nv7IeXtZNos36QDNHol/yk=;
-  b=X1Vm59Hrp/KHH2vt6G2OUErZrPS9b/ZekBMD0/L1KCNbEbvP7KzkQeJQ
-   RIeab00pQii6iMqnbnNa+bWo5+3vOg6g/hWI6ATnA8L78R7D2T+9UPbpZ
-   xe1U52h6rrdCN4DTKpF7rrZsboOJMhIJEq2MzAW4GS4HyQuurV1v0OBCY
-   EOBcgfIL4a4iaoNDQoIyTgGzgOWiE6YZv9c0GR5Z7XMNJhOI1+q6z2GSB
-   pNTWAmfMAezsvXs6oUjW+v4aH5OX1uXEZW+TrsN5uH2UKjnn7O82SIV4M
-   yPIhSWV2sv3qQZKMaW6oJVQNEcYLYf6j/qRQslyzZH6U0+BoQZVhcZtBH
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10498"; a="302633598"
-X-IronPort-AV: E=Sophos;i="5.95,180,1661842800"; 
-   d="scan'208";a="302633598"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2022 01:23:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10498"; a="956078282"
-X-IronPort-AV: E=Sophos;i="5.95,180,1661842800"; 
-   d="scan'208";a="956078282"
-Received: from lkp-server01.sh.intel.com (HELO 2af0a69ca4e0) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 13 Oct 2022 01:23:45 -0700
-Received: from kbuild by 2af0a69ca4e0 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oitVI-0004tD-1q;
-        Thu, 13 Oct 2022 08:23:44 +0000
-Date:   Thu, 13 Oct 2022 16:22:54 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 6ab8872f1976e3b00ec5280f19355a462298503a
-Message-ID: <6347cade.QF2VKpm91DNgowjm%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 13 Oct 2022 08:28:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB29911B2D6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 05:28:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 491D0B81E20
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 12:28:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB066C43147
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 Oct 2022 12:28:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665664096;
+        bh=QhZqgpxH7ri5QLbBPQwGXw9C5tDesEen4c2QSP1o5MI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=Rw7pb3iwUzeUZqCHwzEveEBq8+ELPqiV4luz4sHwaf+SkWIFg73bw6sRQgmg+QhFQ
+         wPAhI/sApLcWpBpoE2iPSLfRQSJ8zIMb5ckqvc4dPGdG/0r0kn162gV6ur86397iqi
+         HOxA3rhafv7gErDRwLZlZoonXiBR6pE/1zAcKkHjI5Z6PkyUbmQKkHcy1r8ksRxMNY
+         /UEKfMBjO3Bkr7cFKNHCw9ACYb7jieRGLXM7/tVGEltUatJ0atMFjigq53rZdxfLBw
+         WdwdKnEHHUCqGqqy9YYPalCg18nQKBq6I1w9U65yW/h1yyBtkHjFwqON9eia/dfIxp
+         7F6lPDdapSovg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id DA635C433E6; Thu, 13 Oct 2022 12:28:15 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
+ after each reboot
+Date:   Thu, 13 Oct 2022 12:28:15 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209745-62941-NJnXyqnEsK@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
+References: <bug-209745-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 6ab8872f1976e3b00ec5280f19355a462298503a  Bluetooth: virtio_bt: Use skb_put to set length
+https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
 
-elapsed time: 724m
+--- Comment #32 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de=
+) ---
+According to Patchwork, version 2 of that patch [1] was committed as commit
+ab345b04433da6191f5cecfc036c9419ce05011e. I only see that commit in the tag
+`next-20220722` though.
 
-configs tested: 81
-configs skipped: 5
+Searching for the string, it turns out, this is commit 0900b1c62f43, part of
+next-20220728 and successors, and part of v6.0-rc1, so in current mainline
+release 6.0.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+The people with the Logitech mouse problem, could you please test that vers=
+ion?
 
-gcc tested configs:
-um                             i386_defconfig
-um                           x86_64_defconfig
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-i386                                defconfig
-x86_64                           rhel-8.3-syz
-x86_64                              defconfig
-x86_64                               rhel-8.3
-arc                                 defconfig
-alpha                               defconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-s390                             allmodconfig
-x86_64                        randconfig-a002
-arm                                 defconfig
-x86_64                           allyesconfig
-i386                          randconfig-a005
-x86_64                          rhel-8.3-func
-x86_64                        randconfig-a006
-x86_64                    rhel-8.3-kselftests
-x86_64                        randconfig-a004
-s390                                defconfig
-i386                          randconfig-a014
-riscv                randconfig-r042-20221012
-i386                          randconfig-a012
-s390                 randconfig-r044-20221012
-i386                             allyesconfig
-i386                          randconfig-a016
-powerpc                           allnoconfig
-s390                             allyesconfig
-powerpc                          allmodconfig
-mips                             allyesconfig
-arc                  randconfig-r043-20221012
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-arm                              allyesconfig
-arm64                            allyesconfig
-sh                               allmodconfig
-x86_64                        randconfig-a015
-ia64                             allmodconfig
-m68k                             allyesconfig
-m68k                             allmodconfig
-alpha                            allyesconfig
-arc                              allyesconfig
-mips                         bigsur_defconfig
-sh                           se7780_defconfig
-arm                             ezx_defconfig
-ia64                        generic_defconfig
-powerpc                 mpc837x_mds_defconfig
-arm                        multi_v7_defconfig
-arc                     haps_hs_smp_defconfig
-sh                          kfr2r09_defconfig
-nios2                               defconfig
-loongarch                 loongson3_defconfig
-arm                        mini2440_defconfig
-powerpc                     stx_gp3_defconfig
-arm                         lpc18xx_defconfig
-powerpc                  storcenter_defconfig
-powerpc                 linkstation_defconfig
-csky                              allnoconfig
-alpha                             allnoconfig
-arc                               allnoconfig
-riscv                             allnoconfig
-arm                       omap2plus_defconfig
-sparc                               defconfig
-powerpc                     tqm8541_defconfig
-arm                        spear6xx_defconfig
+[1]:
+https://patchwork.kernel.org/project/bluetooth/patch/20220714181224.3793757=
+-1-luiz.dentz@gmail.com/
 
-clang tested configs:
-i386                          randconfig-a002
-i386                          randconfig-a013
-x86_64                        randconfig-a001
-i386                          randconfig-a006
-x86_64                        randconfig-a003
-i386                          randconfig-a015
-i386                          randconfig-a004
-x86_64                        randconfig-a005
-i386                          randconfig-a011
-hexagon              randconfig-r041-20221012
-hexagon              randconfig-r045-20221012
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
+--=20
+You may reply to this email to add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+You are receiving this mail because:
+You are the assignee for the bug.=
