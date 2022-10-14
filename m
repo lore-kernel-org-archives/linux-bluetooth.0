@@ -2,187 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D93DC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Oct 2022 18:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96545C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 Oct 2022 20:20:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231146AbiJNS5Y (ORCPT
+        id S231326AbiJNUUH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 Oct 2022 14:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49360 "EHLO
+        Fri, 14 Oct 2022 16:20:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230158AbiJNS5X (ORCPT
+        with ESMTP id S231337AbiJNUUD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 Oct 2022 14:57:23 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 229291D3748
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Oct 2022 11:57:23 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id g28so5718104pfk.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Oct 2022 11:57:23 -0700 (PDT)
+        Fri, 14 Oct 2022 16:20:03 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1021286C8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Oct 2022 13:19:59 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id l1-20020a17090a72c100b0020a6949a66aso5762765pjk.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 Oct 2022 13:19:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RX30rg6WmboD9/oaN/9GsKnM75vpU7IW8psSf4cD6g0=;
-        b=iRcQg/dKXDqtd8PoaQuczupOa+QvlOh/sxZREVYHfc+/ZbXEHZD3msz9bwUezOxQrt
-         jrUJdrKRdPcc/gB5yp/rEFjglkZAy/T0eGg24hlVBf6B62caUNUQDuGLSYI1B9XLV9XG
-         flaFzpo9laV/p4VC5yuFbnKmtZe/qvdrbR3jbbZm5BZ0OaV9Y7GkWC45S1YkDg1Qa8KG
-         0+dIdvl3p801YheyX6arrdSTn/9luxdcFZzSwtqgTBhWjIhneu5Nx1rbhzeddgXTYmZD
-         JGPG3jZzkgfm3/m+B4r+0CvGpxqi8nffLOjasGtS1eXbemP2LH5Q1JCV7EA4ugXL8k2L
-         lrpw==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=G9Im6Z9+bf/pm2LlXzgDUX2h+L9laDVyj/AXVc6SQh4=;
+        b=WtzUPsi1TVdnasyh7EWBVvlnuZNg/vH+JQaZxlbdU4xu0q650+mClXgGj4wiSKzgcD
+         2TZVLV4zwiCdKmh1BH0kcnwraoeTkKmgJMa4tPALHlMrW6SzPyFhsL8+h6HhVux1wAg5
+         b2y0Js+z1phvNU+CVKX+0NQ2IxYQLs4wsZPXp7YbUqsj3BYDRS/ERdy/8rRdfxor9oFI
+         MxuJxO+m3Q31P5OzauPEIfWk4vAvO74lNt2aEgdTEPwaj43EfjmZ947lPafONtuvSDDX
+         JMF9IiB2O+TqG6pJH9Dc5jRITaZbZb5/3YiIkh0HDcrl6TXDYS8An1IlATrm1JoOp5sP
+         MpGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RX30rg6WmboD9/oaN/9GsKnM75vpU7IW8psSf4cD6g0=;
-        b=iAgBuOBVkCaz0e5hZ3G1T22UyM6BORyiaMs8hqD0wy9HPaIFmg+ilsbTxtIxmtYgFh
-         NKwaf9JQhSZAnAYDHb5OXU9KeeGNEn4/Vvmup0zB4SnygZj9pZZ+a2RDSBw0c8dTBOzZ
-         8L+U48gJBdOAl38CJyI5Wag3dhC/OMNQM/WJ1KYhI4474bvt/uYAb2nh62kaIUX9xmzG
-         A2W45rVc3J08Kho/m8DeDtlh7odmJYkpJHMYeNKlpT96yCJr0ULZ8yzUGP2PzZHMGBxJ
-         4f2WVplvLIu86WjElGe8xuOjGprXTatxJ9dyTn7sFMZspmbm69cNodtZ+SwTCXV37Jxu
-         FkmA==
-X-Gm-Message-State: ACrzQf3prosbf/GcteSpYY2hJr8Vr67C/B8mvZM/9Z3WrUn3RRww/I6G
-        pzn3Rbqov4+LDiqbdANvln1C23O20tY=
-X-Google-Smtp-Source: AMsMyM7WAGi5b3iTme407FSSgiGVNuhsXcmsDUqbNu6etJCHB2BGpHNe9JxNOmQoHyQiD2nUiem+CQ==
-X-Received: by 2002:a65:6bca:0:b0:420:712f:ab98 with SMTP id e10-20020a656bca000000b00420712fab98mr5679580pgw.350.1665773842394;
-        Fri, 14 Oct 2022 11:57:22 -0700 (PDT)
-Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a80:cc40:ab40:7d71:fa07:4ac4])
-        by smtp.gmail.com with ESMTPSA id p4-20020a637f44000000b0043954df3162sm1740730pgn.10.2022.10.14.11.57.21
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G9Im6Z9+bf/pm2LlXzgDUX2h+L9laDVyj/AXVc6SQh4=;
+        b=dGLKO20XGlsjq+yVLRAz7p3yIQdPx6jlv/DRH0bwo+Bd5qM6j+ctM34qOlJQ4mTU1Q
+         y+0CsX8liFzgfzdGZT+NnX+7CSjiGYXbfs3Yaz0WCGFYVQkEU4BSIteFbB4tDhETbHKh
+         DiHp8GwViRa1Uzn6z1BWVqDuN0bEKmbKhOwq/SlF6pY71Ph543w2RGZJ+fhaJfdqCszy
+         S8paNliFMnDYWw/xdgzNOwzdi+s+Od2kU/7uHnnuWa5eaLBzobsj+gOgaQ+zWjyijA82
+         nJHXNH6EEDF+pU6/JHbrKWVVUXnzu5VGV3Xo6TfQEcHPJxRP5ypeyOfzRE/mYLYq6zCy
+         rtDg==
+X-Gm-Message-State: ACrzQf11/vZGNANlRSnEoOocWKdQFGs1Gq2HtEAgBY4SwvxoyNK4kRb5
+        J1YScq8Lbdn5fbDLYqA7RKXYVmGWhyQ=
+X-Google-Smtp-Source: AMsMyM6fI/PmY6mXyQuI8zyztBavyuGCeQOwXI0alYmwJKxBbXk1WeQl4MfZpMdZBIlVYO34HdkX0g==
+X-Received: by 2002:a17:90b:4c04:b0:20d:4ef6:aacc with SMTP id na4-20020a17090b4c0400b0020d4ef6aaccmr19463182pjb.199.1665778798635;
+        Fri, 14 Oct 2022 13:19:58 -0700 (PDT)
+Received: from [172.17.0.2] ([20.66.102.168])
+        by smtp.gmail.com with ESMTPSA id r2-20020a17090aa08200b0020b7de675a4sm1826885pjp.41.2022.10.14.13.19.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Oct 2022 11:57:21 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2] monitor: Fix incorrect vendor name for vendor cmd and evt
-Date:   Fri, 14 Oct 2022 11:57:20 -0700
-Message-Id: <20221014185720.1132417-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Fri, 14 Oct 2022 13:19:58 -0700 (PDT)
+Message-ID: <6349c46e.170a0220.8cae2.3c9e@mx.google.com>
+Date:   Fri, 14 Oct 2022 13:19:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3253123992764616455=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,v2] monitor: Fix incorrect vendor name for vendor cmd and evt
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221014185720.1132417-1-hj.tedd.an@gmail.com>
+References: <20221014185720.1132417-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+--===============3253123992764616455==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch fixes the issue that the vendor name for all vendor HCI
-command and event are display as Microsoft.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=685453
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.80 seconds
+GitLint                       PASS      0.49 seconds
+Prep - Setup ELL              PASS      36.16 seconds
+Build - Prep                  PASS      0.92 seconds
+Build - Configure             PASS      12.32 seconds
+Build - Make                  PASS      1245.81 seconds
+Make Check                    PASS      13.27 seconds
+Make Check w/Valgrind         PASS      389.89 seconds
+Make Distcheck                PASS      332.00 seconds
+Build w/ext ELL - Configure   PASS      11.34 seconds
+Build w/ext ELL - Make        PASS      117.60 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      807.95 seconds
+
+
+
 ---
- monitor/packet.c | 46 +++++++++++++++++++++++++++++++---------------
- 1 file changed, 31 insertions(+), 15 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 692012029..c4e5182f0 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -9821,7 +9821,7 @@ static const char *get_supported_command(int bit)
- 	return NULL;
- }
- 
--static const char *current_vendor_str(void)
-+static const char *current_vendor_str(uint16_t ocf)
- {
- 	uint16_t manufacturer, msft_opcode;
- 
-@@ -9833,7 +9833,8 @@ static const char *current_vendor_str(void)
- 		msft_opcode = BT_HCI_CMD_NOP;
- 	}
- 
--	if (msft_opcode != BT_HCI_CMD_NOP)
-+	if (msft_opcode != BT_HCI_CMD_NOP &&
-+				cmd_opcode_ocf(msft_opcode) == ocf)
- 		return "Microsoft";
- 
- 	switch (manufacturer) {
-@@ -9877,22 +9878,16 @@ static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
- static const struct vendor_evt *current_vendor_evt(const void *data,
- 							int *consumed_size)
- {
--	uint16_t manufacturer, msft_opcode;
-+	uint16_t manufacturer;
- 	uint8_t evt = *((const uint8_t *) data);
- 
- 	/* A regular vendor event consumes 1 byte. */
- 	*consumed_size = 1;
- 
--	if (index_current < MAX_INDEX) {
-+	if (index_current < MAX_INDEX)
- 		manufacturer = index_list[index_current].manufacturer;
--		msft_opcode = index_list[index_current].msft_opcode;
--	} else {
-+	else
- 		manufacturer = fallback_manufacturer;
--		msft_opcode = BT_HCI_CMD_NOP;
--	}
--
--	if (msft_opcode != BT_HCI_CMD_NOP)
--		return NULL;
- 
- 	switch (manufacturer) {
- 	case 2:
-@@ -9904,6 +9899,27 @@ static const struct vendor_evt *current_vendor_evt(const void *data,
- 	return NULL;
- }
- 
-+static const char *current_vendor_evt_str(void)
-+{
-+	uint16_t manufacturer;
-+
-+	if (index_current < MAX_INDEX)
-+		manufacturer = index_list[index_current].manufacturer;
-+	else
-+		manufacturer = fallback_manufacturer;
-+
-+	switch (manufacturer) {
-+	case 2:
-+		return "Intel";
-+	case 15:
-+		return "Broadcom";
-+	case 93:
-+		return "Realtek";
-+	}
-+
-+	return NULL;
-+}
-+
- static void inquiry_complete_evt(uint16_t index, const void *data, uint8_t size)
- {
- 	const struct bt_hci_evt_inquiry_complete *evt = data;
-@@ -10084,7 +10100,7 @@ static void cmd_complete_evt(uint16_t index, const void *data, uint8_t size)
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
-@@ -10176,7 +10192,7 @@ static void cmd_status_evt(uint16_t index, const void *data, uint8_t size)
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
-@@ -11618,7 +11634,7 @@ static void vendor_evt(uint16_t index, const void *data, uint8_t size)
- 	const struct vendor_evt *vnd = current_vendor_evt(data, &consumed_size);
- 
- 	if (vnd) {
--		const char *str = current_vendor_str();
-+		const char *str = current_vendor_evt_str();
- 
- 		if (str) {
- 			snprintf(vendor_str, sizeof(vendor_str),
-@@ -12020,7 +12036,7 @@ void packet_hci_command(struct timeval *tv, struct ucred *cred, uint16_t index,
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
--- 
-2.34.1
 
+--===============3253123992764616455==--
