@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4695FC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Oct 2022 19:12:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADC9AC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Oct 2022 19:44:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbiJOTMl (ORCPT
+        id S229660AbiJOToD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Oct 2022 15:12:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
+        Sat, 15 Oct 2022 15:44:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiJOTMk (ORCPT
+        with ESMTP id S229567AbiJOToB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Oct 2022 15:12:40 -0400
+        Sat, 15 Oct 2022 15:44:01 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4BC47B99
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 12:12:37 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3C04B0D0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 12:44:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E898609E9
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:12:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63AC8C4315D
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:12:36 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 562A9608C3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:44:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B7960C4FF0E
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:43:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665861156;
-        bh=w5kajXdBMPTRFrTmz6AyBTIhI2PTu+2rMMciAoYVZto=;
+        s=k20201202; t=1665863039;
+        bh=tip6bajTAMch7u9kM834eLMAyhiSmx2QofXectcAhdk=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=d/Kec8hD1NWkSX20v3kJUyRcAutAe+o+CnJF2dwlAB8lSgOuH72XbyzXdaM98nDnq
-         4Gg+xT/vFbCUlzYKS+5x1+4qyoqDFkoD0IJWao81ZJ2V5dyMdHWhetwGALH+S2qgNW
-         go9264gmrevp/hqiV0WM7+Add4xMIJraKxSeGRLmnpgbVF6EBwy8xR5Wx/Dtl4u6nN
-         W6tCCO52OpoEZuMr2d/ccJn2r4RG8rKWUY1HA3/tcFiz1HkVaq2Kp3KYRHtockB73j
-         /o4e1OiE5JHy1vYlInf7hdug9wkxA96l9/boJZxxOV5oWUu6EUUZR9RmAcZxmIkIYj
-         FlIBmVUVtzTWA==
+        b=C4/FjOp1Q6CTTCFKIY8JTQp9ngurl7RHaeU1P7VOuofhUr6BNgdRUxJuAq8cU4jAq
+         BQHLWjIzkZCRsK3hQeIfGgBJmwNhuEAtLRB3YVAnaoLzkSCf9SxT5FYUTUGYF990zY
+         c4A1X93HhBI23amSTrCM9jDHSap8gLSeQk3o3cHRwQALMnAo2euumi05/ItF50z+oI
+         Vf1hP+uIl9sauyfhg/ugVOtXLF3rFjdL2sHR4KDFy1H+PAXfVWQVARystzDS1pLthw
+         0CK+u2CfsvfdYyyq9hmA5ppcgdeyokPzFEOO0P73+UtfdbwoCBQh1ZlK2iq3e2XTM0
+         f4SY5zsmifG6g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 55F38C433EA; Sat, 15 Oct 2022 19:12:36 +0000 (UTC)
+        id AB45FC433E4; Sat, 15 Oct 2022 19:43:59 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Sat, 15 Oct 2022 19:12:33 +0000
+Date:   Sat, 15 Oct 2022 19:43:56 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,14 +48,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: ostroffjh@users.sourceforge.net
+X-Bugzilla-Who: swyterzone@gmail.com
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-7H0KpPInxa@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-QCiVT5iJA0@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,20 +69,19 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #237 from Jack (ostroffjh@users.sourceforge.net) ---
-I"m working my way through the pages on reporting a regression.  I'm running
-Gentoo, with the gentoo-sources kernel source.  This is not pure vanilla, b=
-ut
-as far as I can tell, no patches related to this problem.  Can someone conf=
-irm
-that I really  need to compile from a git clone of the vanilla sources to d=
-o a
-proper bisect worth posting?  Will a regression bug be accepted prior to
-confirming with pure vanilla sources?
+--- Comment #238 from Swyter (swyterzone@gmail.com) ---
+Last time I bisected a regression in the kernel I just used the official Ar=
+ch
+Linux one as base, I think you should be able a downstream kernel just fine.
 
-In my case, 5.19.10 and 5.19.14 work fine, but 6.0.0 and 6.0.1 fail, and I'm
-compiling 6.0.2 right now, just to test, although I don't expect any magical
-fix.
+If you have a second computer in the same LAN and can access the regressed
+computer via SSH you can automate the bisection, compiling and rebooting wi=
+th a
+handy Bash script like this one for a different problem, you'll need to tai=
+lor
+it to this Bluetooth issue, hope that helps:
+https://gist.github.com/Swyter/8b67b96075de02b9111e834de0ce5f8a#file-_auto_=
+bisecter-sh
 
 --=20
 You may reply to this email to add a comment.
