@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B095C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Oct 2022 18:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4695FC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 Oct 2022 19:12:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229519AbiJOSpo (ORCPT
+        id S229554AbiJOTMl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 15 Oct 2022 14:45:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36702 "EHLO
+        Sat, 15 Oct 2022 15:12:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiJOSpn (ORCPT
+        with ESMTP id S229463AbiJOTMk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 15 Oct 2022 14:45:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2102E30F62
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 11:45:42 -0700 (PDT)
+        Sat, 15 Oct 2022 15:12:40 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B4BC47B99
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 12:12:37 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id A6707601D0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 18:45:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EC9DBC433D7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 18:45:40 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E898609E9
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:12:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 63AC8C4315D
+        for <linux-bluetooth@vger.kernel.org>; Sat, 15 Oct 2022 19:12:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665859541;
-        bh=NQRfhiqegqF7V9Tcvb99UVV+SJKnLZ9rSEd5EH5N59A=;
+        s=k20201202; t=1665861156;
+        bh=w5kajXdBMPTRFrTmz6AyBTIhI2PTu+2rMMciAoYVZto=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=T1tkgpgDIzS6lEtG4Mfcgcso4eYCArMpJhIKeA4KJQd5kKZLeTjn4dBM+FMu9zsLE
-         /CQjIPfdvoRlcvcvEYfKuLeH2ouFzG8rqNnq9RfVcP7gVPlJBzFWWmI7DuypoykMkd
-         y4s7xt8C3v8nV6z0iXYaZSLEbVvfa88/1EBr06E+Qd8AiabFQGPb0bP31K22DBnWHl
-         DxJZtYXSRhRCXZrdNSuLM3LmQkX/xkg6Pd6UEd2JbmFkmuwd3Ajm+gH0D7aOvSTiN7
-         nwYIa7lGVPYgmPCOiL8uJJNGygANN+ZQS3lm4FrJIZ2IT7JyJXk6KeBhPNJizjpZee
-         tt1SJfyGEMKkw==
+        b=d/Kec8hD1NWkSX20v3kJUyRcAutAe+o+CnJF2dwlAB8lSgOuH72XbyzXdaM98nDnq
+         4Gg+xT/vFbCUlzYKS+5x1+4qyoqDFkoD0IJWao81ZJ2V5dyMdHWhetwGALH+S2qgNW
+         go9264gmrevp/hqiV0WM7+Add4xMIJraKxSeGRLmnpgbVF6EBwy8xR5Wx/Dtl4u6nN
+         W6tCCO52OpoEZuMr2d/ccJn2r4RG8rKWUY1HA3/tcFiz1HkVaq2Kp3KYRHtockB73j
+         /o4e1OiE5JHy1vYlInf7hdug9wkxA96l9/boJZxxOV5oWUu6EUUZR9RmAcZxmIkIYj
+         FlIBmVUVtzTWA==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D7733C433E9; Sat, 15 Oct 2022 18:45:40 +0000 (UTC)
+        id 55F38C433EA; Sat, 15 Oct 2022 19:12:36 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 205821] ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth
- Dongle (HCI mode)
-Date:   Sat, 15 Oct 2022 18:45:40 +0000
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sat, 15 Oct 2022 19:12:33 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -49,15 +49,15 @@ X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
 X-Bugzilla-Who: ostroffjh@users.sourceforge.net
-X-Bugzilla-Status: NEW
+X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-205821-62941-GT0upI3Xnr@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-205821-62941@https.bugzilla.kernel.org/>
-References: <bug-205821-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-7H0KpPInxa@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -67,17 +67,22 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D205821
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-Jack (ostroffjh@users.sourceforge.net) changed:
+--- Comment #237 from Jack (ostroffjh@users.sourceforge.net) ---
+I"m working my way through the pages on reporting a regression.  I'm running
+Gentoo, with the gentoo-sources kernel source.  This is not pure vanilla, b=
+ut
+as far as I can tell, no patches related to this problem.  Can someone conf=
+irm
+that I really  need to compile from a git clone of the vanilla sources to d=
+o a
+proper bisect worth posting?  Will a regression bug be accepted prior to
+confirming with pure vanilla sources?
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |ostroffjh@users.sourceforge
-                   |                            |.net
-
---- Comment #7 from Jack (ostroffjh@users.sourceforge.net) ---
-Is this just a duplicate of 60824?
+In my case, 5.19.10 and 5.19.14 work fine, but 6.0.0 and 6.0.1 fail, and I'm
+compiling 6.0.2 right now, just to test, although I don't expect any magical
+fix.
 
 --=20
 You may reply to this email to add a comment.
