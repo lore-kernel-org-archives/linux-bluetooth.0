@@ -2,78 +2,73 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B01C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 02:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7943C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 03:06:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230482AbiJQCgX (ORCPT
+        id S231775AbiJQDGM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Oct 2022 22:36:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47434 "EHLO
+        Sun, 16 Oct 2022 23:06:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230483AbiJQCgW (ORCPT
+        with ESMTP id S231766AbiJQDGI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Oct 2022 22:36:22 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A6E459B8
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Oct 2022 19:36:21 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4135AB80E5A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 02:36:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E596BC4314D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 02:36:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1665974178;
-        bh=gsn3pkBuh4kBj3hBZKb0Zh6og80P9zEzeSCa4hDO2bU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=dbQIBY/9iQRaSVkrIZLdhEor14SZj9yuNkBqhkl+GZqlPPSEKWfFnMplfxPzJjUCM
-         KrnLpVJsa8q4wI0ayc8VGEbwNuG0c+vLCGOB0fkEGo5KZ8jJqTN2CBoSIX0IR34jWX
-         5Z8F6kZfjvvAvEOjuSC+lWZcb/R+xhVKS0kBHkIIQf/N+AxbCNHnH+nmBj1Q0LLY11
-         n2REWmLfvYPnYDamxIt6cbSIvHQauTZzTHTmGEsLNddMuI5Z6By3LNkKYNoN7e/B6u
-         cPT/4nCHv0qEh1BtaZuz/eAicEF2fCOI8OAAq7QYEhdQqqlMHDSdGwRp5Hu2OR+9/e
-         TH2O6fS/ZCALA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D69E1C05F8D; Mon, 17 Oct 2022 02:36:18 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
- after each reboot
-Date:   Mon, 17 Oct 2022 02:36:18 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hyperair@ubuntu.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-209745-62941-UK8baQcYo8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
-References: <bug-209745-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sun, 16 Oct 2022 23:06:08 -0400
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2534AD6C;
+        Sun, 16 Oct 2022 20:06:06 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=jiapeng.chong@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0VSGQCyZ_1665975958;
+Received: from localhost(mailfrom:jiapeng.chong@linux.alibaba.com fp:SMTPD_---0VSGQCyZ_1665975958)
+          by smtp.aliyun-inc.com;
+          Mon, 17 Oct 2022 11:06:03 +0800
+From:   Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jiapeng Chong <jiapeng.chong@linux.alibaba.com>,
+        Abaci Robot <abaci@linux.alibaba.com>
+Subject: [PATCH] net: bluetooth: Use kzalloc instead of kmalloc/memset
+Date:   Mon, 17 Oct 2022 11:04:21 +0800
+Message-Id: <20221017030421.69108-1-jiapeng.chong@linux.alibaba.com>
+X-Mailer: git-send-email 2.20.1.7.g153144c
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
+Use kzalloc rather than duplicating its implementation, which makes code
+simple and easy to understand.
 
---- Comment #33 from Chow Loong Jin (hyperair@ubuntu.com) ---
-Just tried running v6.0.1, same issue.
+./net/bluetooth/hci_conn.c:2038:6-13: WARNING: kzalloc should be used for cp, instead of kmalloc/memset.
 
---=20
-You may reply to this email to add a comment.
+Link: https://bugzilla.openanolis.cn/show_bug.cgi?id=2406
+Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+---
+ net/bluetooth/hci_conn.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 5d6ee5075642..495de21d52cd 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -2035,13 +2035,12 @@ int hci_pa_create_sync(struct hci_dev *hdev, bdaddr_t *dst, __u8 dst_type,
+ 	if (hci_dev_test_and_set_flag(hdev, HCI_PA_SYNC))
+ 		return -EBUSY;
+ 
+-	cp = kmalloc(sizeof(*cp), GFP_KERNEL);
++	cp = kzalloc(sizeof(*cp), GFP_KERNEL);
+ 	if (!cp) {
+ 		hci_dev_clear_flag(hdev, HCI_PA_SYNC);
+ 		return -ENOMEM;
+ 	}
+ 
+-	memset(cp, 0, sizeof(*cp));
+ 	cp->sid = sid;
+ 	cp->addr_type = dst_type;
+ 	bacpy(&cp->addr, dst);
+-- 
+2.20.1.7.g153144c
+
