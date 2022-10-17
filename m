@@ -2,140 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D99BBC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 02:21:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B01C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 02:36:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230136AbiJQCVX (ORCPT
+        id S230482AbiJQCgX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 16 Oct 2022 22:21:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43538 "EHLO
+        Sun, 16 Oct 2022 22:36:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbiJQCVW (ORCPT
+        with ESMTP id S230483AbiJQCgW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 16 Oct 2022 22:21:22 -0400
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590BF2C66A
-        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Oct 2022 19:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1665973281; x=1697509281;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dSdxKaLTrrYG6PPfDQmk0PA1+5j6GPhZU2BVeLgPSDQ=;
-  b=VFm1WhWPuP9Nvq+JcDBo54jbpuUgREN7cYFI7oX7gykcgCJHKoRAH0M+
-   u5qax6EQAyYH/YIl3CIb8ewdS3tfqh0AgbmAVODmPLmCFmvnZegDZVkvQ
-   HyuRP6Bkc9w7/MfRQw3V2AcJC+oUq0pZUe07ABTKrKpmgyHWpVq6qtdaW
-   iT5GZzriDgwfvZmkdU7/kFkW0M4PwCql6knPpJ1zXxNBDlsDe75OJiCoK
-   706G9eOoOj/DLiqP84GgadmJ9HeCSOZKkrw/MAiVQM8vgKhqYvsjaJZoe
-   bwNyW92ny7ypsdeya/CCnvTG5A0aOKpzbTiyIVaJ0XnpsputOBZTVl6/x
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="369878435"
-X-IronPort-AV: E=Sophos;i="5.95,190,1661842800"; 
-   d="scan'208";a="369878435"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2022 19:21:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10502"; a="717330580"
-X-IronPort-AV: E=Sophos;i="5.95,190,1661842800"; 
-   d="scan'208";a="717330580"
-Received: from lkp-server02.sh.intel.com (HELO 8556ec0e0fdc) ([10.239.97.151])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Oct 2022 19:21:19 -0700
-Received: from kbuild by 8556ec0e0fdc with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1okFkk-00003m-2T;
-        Mon, 17 Oct 2022 02:21:18 +0000
-Date:   Mon, 17 Oct 2022 10:21:17 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 9fe208c7117dd3d00a13d1a54aad108e2af6ad17
-Message-ID: <634cbc1d.81IHucDa7Ab1hHKo%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sun, 16 Oct 2022 22:36:22 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A6E459B8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 16 Oct 2022 19:36:21 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 4135AB80E5A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 02:36:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E596BC4314D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 02:36:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1665974178;
+        bh=gsn3pkBuh4kBj3hBZKb0Zh6og80P9zEzeSCa4hDO2bU=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=dbQIBY/9iQRaSVkrIZLdhEor14SZj9yuNkBqhkl+GZqlPPSEKWfFnMplfxPzJjUCM
+         KrnLpVJsa8q4wI0ayc8VGEbwNuG0c+vLCGOB0fkEGo5KZ8jJqTN2CBoSIX0IR34jWX
+         5Z8F6kZfjvvAvEOjuSC+lWZcb/R+xhVKS0kBHkIIQf/N+AxbCNHnH+nmBj1Q0LLY11
+         n2REWmLfvYPnYDamxIt6cbSIvHQauTZzTHTmGEsLNddMuI5Z6By3LNkKYNoN7e/B6u
+         cPT/4nCHv0qEh1BtaZuz/eAicEF2fCOI8OAAq7QYEhdQqqlMHDSdGwRp5Hu2OR+9/e
+         TH2O6fS/ZCALA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id D69E1C05F8D; Mon, 17 Oct 2022 02:36:18 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 209745] Bluetooth connection to Logitech MX Master 2S lost
+ after each reboot
+Date:   Mon, 17 Oct 2022 02:36:18 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hyperair@ubuntu.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-209745-62941-UK8baQcYo8@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-209745-62941@https.bugzilla.kernel.org/>
+References: <bug-209745-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 9fe208c7117dd3d00a13d1a54aad108e2af6ad17  Bluetooth: hci_qca: only assign wakeup with serial port support
+https://bugzilla.kernel.org/show_bug.cgi?id=3D209745
 
-elapsed time: 4536m
+--- Comment #33 from Chow Loong Jin (hyperair@ubuntu.com) ---
+Just tried running v6.0.1, same issue.
 
-configs tested: 62
-configs skipped: 2
+--=20
+You may reply to this email to add a comment.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-um                             i386_defconfig
-um                           x86_64_defconfig
-arc                                 defconfig
-s390                             allmodconfig
-alpha                               defconfig
-s390                                defconfig
-s390                             allyesconfig
-x86_64                          rhel-8.3-func
-x86_64                    rhel-8.3-kselftests
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-mips                             allyesconfig
-x86_64                              defconfig
-i386                                defconfig
-sh                               allmodconfig
-x86_64                        randconfig-a002
-x86_64                           rhel-8.3-kvm
-riscv                randconfig-r042-20221012
-x86_64                         rhel-8.3-kunit
-x86_64                        randconfig-a004
-x86_64                           rhel-8.3-syz
-arc                  randconfig-r043-20221012
-x86_64                               rhel-8.3
-m68k                             allmodconfig
-x86_64                        randconfig-a006
-m68k                             allyesconfig
-s390                 randconfig-r044-20221012
-alpha                            allyesconfig
-arc                              allyesconfig
-i386                          randconfig-a001
-i386                             allyesconfig
-i386                          randconfig-a003
-x86_64                           allyesconfig
-i386                          randconfig-a005
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-arm                                 defconfig
-x86_64                        randconfig-a015
-arm64                            allyesconfig
-arm                              allyesconfig
-ia64                             allmodconfig
-i386                          randconfig-a014
-i386                          randconfig-a012
-i386                          randconfig-a016
-arc                     haps_hs_smp_defconfig
-powerpc                     tqm8548_defconfig
-openrisc                         alldefconfig
-openrisc                    or1ksim_defconfig
-
-clang tested configs:
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-hexagon              randconfig-r041-20221012
-hexagon              randconfig-r045-20221012
-x86_64                        randconfig-a005
-i386                          randconfig-a002
-i386                          randconfig-a004
-i386                          randconfig-a006
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-i386                          randconfig-a013
-i386                          randconfig-a015
-i386                          randconfig-a011
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+You are receiving this mail because:
+You are the assignee for the bug.=
