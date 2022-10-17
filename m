@@ -2,538 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FF8C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 13:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83832C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 Oct 2022 14:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbiJQNf2 (ORCPT
+        id S231367AbiJQO4K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Oct 2022 09:35:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51336 "EHLO
+        Mon, 17 Oct 2022 10:56:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229832AbiJQNf1 (ORCPT
+        with ESMTP id S231218AbiJQOy4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Oct 2022 09:35:27 -0400
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD7D732BA8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 06:35:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666013725; x=1697549725;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=pwI4bdUw13ZaMEiPYPsLtkG+QMCVHUljFgHe1WOP+VA=;
-  b=g6oVGY1LBNNhEAxtqklaE+ztu9isxQB5LTtS7hz4fOLXXoC6i1V/1G86
-   r/RR/wq0A9cRXum8rRrnDs+grfAUKKOinUntaodAvoEehTsBx2jATaSan
-   TYdZhx4pdLNI7oPgHfAG4RaBcTIn226WMd8O2G9jH85eBibpBoWXgU2YW
-   3QBmJhOI33UoTboviepzjKc/yswhatrB8LlDdHHppeqRiKhuGwM3q5zuP
-   kA0+SJSvk0VAt6keNDhpTiSTVgt3JQrfkt7i/wFk2SLwvLo33BZQdElDx
-   fBGocvhGZnD4dKzG33Et7XhjKFwqZEYONALyyexQ1Ai9kM0uUaDYU+X3u
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="285522196"
-X-IronPort-AV: E=Sophos;i="5.95,191,1661842800"; 
-   d="scan'208";a="285522196"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 06:35:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="957336397"
-X-IronPort-AV: E=Sophos;i="5.95,191,1661842800"; 
-   d="scan'208";a="957336397"
-Received: from bsbdt.iind.intel.com ([10.224.186.26])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Oct 2022 06:35:07 -0700
-From:   Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-Subject: [PATCH BlueZ v2 3/4] profiles: Add initial code for mcp plugin
-Date:   Mon, 17 Oct 2022 19:04:39 +0530
-Message-Id: <20221017133440.321139-4-abhay.maheshbhai.maheta@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221017133440.321139-1-abhay.maheshbhai.maheta@intel.com>
-References: <20221017133440.321139-1-abhay.maheshbhai.maheta@intel.com>
+        Mon, 17 Oct 2022 10:54:56 -0400
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2095.outbound.protection.outlook.com [40.107.21.95])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727D249B69
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 07:54:08 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Oo+7xYTjWUX8czZjcbMwF4s1lcLuDi3I5GJjwZzq3xFgl5GLs/zp2ZM2v7mCh+3fbM2L6fgvmN9zYlXCONcwIlVcf+/d6BdKacrLjk/vSyN8IVhOwXV5vFcbaY12fLhDDmHH9I/DDXVQWuuXVaHEdjCPv1VcfpcsW6p4dChFswSCkYnMt9jFrMwZ8mrv45r4yRZKZdBwsjynTMDnRZ63rvbY3WHFA1hhyukXtqe4sCbXgoUHh6WmhJ9eDNypYX800FnQJw2ZtgKUtk11oqV+QMSjWDdW0KctNE54tMSoBaEAfXwhSyj7NUyV6FXFAzW3G/KyvJS3g4CURxoBadgFbg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0ygO2TWO7BGxRW8w4DoHOsvHuUdOSZbY4g7/Wdq+Hv0=;
+ b=VTbSMfb0dsia1ZGDvR0T6ozOXRe1iYl5erFVZviJyzUjXCIgU/swaFOAG8YwmRcTxXEN/nSzcOvbJpHPm/LDTf5n2JS4QgWiLsQgfOS8q/4bBQbaR9z0IWVEwjcKR8nUIDORMCvDDqFxztxmoA16FPcWYFsx6TKoYwKe5IwpoV8hLKqqaqaitMObOZm5Q8Ng/8nOUXKW6IPYmxpUKQ3cT8y0nSCEI1zhqRdKCvc+olRBhfTTpJpIf8xS2Yd6xh4GWrKg31sp3LzpvOKPHSwPNBPDBx9vlzzK5MpfGN0lYUuVdYtUB1ECfvAkHQ9qnZhp1LRIJc1dWMbe4prdZ+xnDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=fail (sender ip is
+ 217.111.95.7) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=arri.de;
+ dmarc=none action=none header.from=arri.de; dkim=none (message not signed);
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=arrigroup.onmicrosoft.com; s=selector1-arrigroup-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0ygO2TWO7BGxRW8w4DoHOsvHuUdOSZbY4g7/Wdq+Hv0=;
+ b=eO5/3qr013mYDEBWYDyjGaLZojVJ5mTPdxWfs0iRmTiMq6ajb5DXtEaDezVy4aAQU6Gnb9LesPArpEQ1Cr0SrTinPu6vndvAwdMFMPiGUEeqGwtwwKgqqiqDKGt8lPs2AlT6Ud28op3dIh2H+JgaHorsLcnH25iE4v8clfhkyf0=
+Received: from AS8P251CA0011.EURP251.PROD.OUTLOOK.COM (2603:10a6:20b:2f2::31)
+ by AS8PR07MB8325.eurprd07.prod.outlook.com (2603:10a6:20b:440::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.32; Mon, 17 Oct
+ 2022 14:54:05 +0000
+Received: from AM0EUR02FT017.eop-EUR02.prod.protection.outlook.com
+ (2603:10a6:20b:2f2:cafe::1c) by AS8P251CA0011.outlook.office365.com
+ (2603:10a6:20b:2f2::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5723.26 via Frontend
+ Transport; Mon, 17 Oct 2022 14:54:05 +0000
+X-MS-Exchange-Authentication-Results: spf=fail (sender IP is 217.111.95.7)
+ smtp.mailfrom=arri.de; dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=arri.de;
+Received-SPF: Fail (protection.outlook.com: domain of arri.de does not
+ designate 217.111.95.7 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.111.95.7; helo=mta.arri.de;
+Received: from mta.arri.de (217.111.95.7) by
+ AM0EUR02FT017.mail.protection.outlook.com (10.13.54.134) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5723.20 via Frontend Transport; Mon, 17 Oct 2022 14:54:05 +0000
+Received: from n95hx1g2.localnet (192.168.54.96) by mta.arri.de (10.10.18.5)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.32; Mon, 17 Oct
+ 2022 16:54:04 +0200
+From:   Christian Eggers <ceggers@arri.de>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: Support for Data Length Extension (DLE)?
+Date:   Mon, 17 Oct 2022 16:54:04 +0200
+Message-ID: <2264504.ElGaqSPkdT@n95hx1g2>
+Organization: Arnold & Richter Cine Technik GmbH & Co. Betriebs KG
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Originating-IP: [192.168.54.96]
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0EUR02FT017:EE_|AS8PR07MB8325:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b3d229d-ec17-4163-0a72-08dab04f6fe0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Hhxe/D3dC1h/gGos9urtcdcKHUK2pcZI33G4q62MW8dg2lQtgrNdJct8zMlUqSGAl2s7MHSFU4nrPr2YPp7/nBieEX3S0asJFqqJPURlbd9jHrexzsXFKkRRhMHrdCq0cXn6S6abTTqWiw3dUFjEyHggOmgX5Y4YnLSYJbelgaw/q/1yR9bWzVsxEacd2bREhPRoGn/8OI3sTCyHsGO0euzErv7DS2Ytp3ZMLwDszJX9XjmQL0AoufxJ0xD0nOwXMc+fCPn2/N20C4BJrCgaNrNqYgtFrXrqivbb0JJJ3KvUHcpO1UhNJ6nYit+uxMrVX7+gr7Gnee+hERy+ITpUHDu39mTjZag4BE+HXWowIWMCI7f/DFI+EkUDRG5lLF7WOAHu7ZPePesRWs0oNNXNo0FsP4tSCNKyJ47Jt/EDuZJa0OKrWcddZm5bQt9sPdFaZh1qXgxLs2g70sLZs5lazS9LMokXfUY0xAvhcoBd9ueiyDN6Be2i2uaY/24QcWq3jqu5xaPFNFEzVLk+PtraSi4XDCbi0dGLE8+y7A3FDnAsgzTgUFJPYZ/+sQSNooLZY97Iz23c2Zrl7xkNqFKu13vNQVdm3c0Q00+2SkNbB15FmCwLVBj6ldaZaurFbquXi/btvsJ5n46MvlaNkRJoSS8VK/DFtliaQYD5AGz4hb8IfKwgYbFpHyGq09RfdBP9H3R8k2wph/xXA50X9z5CI9BXlC2pm20c+iuYnlDLjxJeglURh7u6yOK/zis35MGOQlM1uFVUaPE/Vb1K+yOY5w==
+X-Forefront-Antispam-Report: CIP:217.111.95.7;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mta.arri.de;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(136003)(346002)(39860400002)(396003)(451199015)(36840700001)(46966006)(186003)(40480700001)(26005)(36916002)(9686003)(82740400003)(336012)(2906002)(426003)(47076005)(16526019)(8676002)(8936002)(33716001)(41300700001)(70206006)(70586007)(86362001)(9576002)(356005)(81166007)(316002)(82310400005)(5660300002)(6916009)(478600001)(36860700001)(83380400001)(36900700001);DIR:OUT;SFP:1102;
+X-OriginatorOrg: arri.de
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2022 14:54:05.1736
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b3d229d-ec17-4163-0a72-08dab04f6fe0
+X-MS-Exchange-CrossTenant-Id: e6a73a5a-614d-4c51-b3e3-53b660a9433a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e6a73a5a-614d-4c51-b3e3-53b660a9433a;Ip=[217.111.95.7];Helo=[mta.arri.de]
+X-MS-Exchange-CrossTenant-AuthSource: AM0EUR02FT017.eop-EUR02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB8325
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds initial code for mcp plugin which handles Media Control Profile
-and Generic Media Control Service for Client Role.
-The plugin exposes dbus methods for media control operations
-like play, pause which can be invoked using player menu
-in bluetoothctl.
----
- Makefile.plugins     |   5 +
- configure.ac         |   4 +
- profiles/audio/mcp.c | 430 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 439 insertions(+)
- create mode 100644 profiles/audio/mcp.c
+When monitoring a Bluetooth connection between two Linux systems
+(kernel 5.14 / 5.15 + bluez-5.65), I noticed the following:
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index a3654980f..20cac384e 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -122,6 +122,11 @@ builtin_modules += bap
- builtin_sources += profiles/audio/bap.c
- endif
- 
-+if MCP
-+builtin_modules += mcp
-+builtin_sources += profiles/audio/mcp.c
-+endif
-+
- if VCP
- builtin_modules += vcp
- builtin_sources += profiles/audio/vcp.c
-diff --git a/configure.ac b/configure.ac
-index 79645e691..363a222a7 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -199,6 +199,10 @@ AC_ARG_ENABLE(bap, AS_HELP_STRING([--disable-bap],
- 		[disable BAP profile]), [enable_bap=${enableval}])
- AM_CONDITIONAL(BAP, test "${enable_bap}" != "no")
- 
-+AC_ARG_ENABLE(mcp, AS_HELP_STRING([--disable-mcp],
-+        [disable MCP profile]), [enable_mcp=${enableval}])
-+AM_CONDITIONAL(MCP, test "${enable_mcp}" != "no")
-+
- AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
- 		[disable VCP profile]), [enable_vcp=${enableval}])
- AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-new file mode 100644
-index 000000000..4632cfe11
---- /dev/null
-+++ b/profiles/audio/mcp.c
-@@ -0,0 +1,430 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+
-+#include <ctype.h>
-+#include <stdbool.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+
-+#include <glib.h>
-+
-+#include "gdbus/gdbus.h"
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+#include "lib/sdp.h"
-+#include "lib/uuid.h"
-+
-+#include "src/dbus-common.h"
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/mcp.h"
-+#include "src/shared/mcs.h"
-+
-+#include "btio/btio.h"
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/gatt-database.h"
-+#include "src/device.h"
-+#include "src/profile.h"
-+#include "src/service.h"
-+#include "src/log.h"
-+#include "src/error.h"
-+#include "player.h"
-+
-+#define GMCS_UUID_STR "00001849-0000-1000-8000-00805f9b34fb"
-+
-+struct mcp_data {
-+	struct btd_device *device;
-+	struct btd_service *service;
-+	struct bt_mcp *mcp;
-+	unsigned int state_id;
-+
-+	struct media_player *mp;
-+};
-+
-+static void mcp_debug(const char *str, void *user_data)
-+{
-+	DBG_IDX(0xffff, "%s", str);
-+}
-+
-+static char *name2utf8(const uint8_t *name, uint16_t len)
-+{
-+	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
-+	int i;
-+
-+	if (g_utf8_validate((const char *) name, len, NULL))
-+		return g_strndup((char *) name, len);
-+
-+	len = MIN(len, sizeof(utf8_name) - 1);
-+
-+	memset(utf8_name, 0, sizeof(utf8_name));
-+	strncpy(utf8_name, (char *) name, len);
-+
-+	/* Assume ASCII, and replace all non-ASCII with spaces */
-+	for (i = 0; utf8_name[i] != '\0'; i++) {
-+		if (!isascii(utf8_name[i]))
-+			utf8_name[i] = ' ';
-+	}
-+
-+	/* Remove leading and trailing whitespace characters */
-+	g_strstrip(utf8_name);
-+
-+	return g_strdup(utf8_name);
-+}
-+
-+static const char *mcp_status_val_to_string(uint8_t status)
-+{
-+	switch (status) {
-+	case BT_MCS_STATUS_PLAYING:
-+		return "playing";
-+	case BT_MCS_STATUS_PAUSED:
-+		return "paused";
-+	case BT_MCS_STATUS_INACTIVE:
-+		return "stopped";
-+	case BT_MCS_STATUS_SEEKING:
-+		/* TODO: find a way for fwd/rvs seeking, probably by storing
-+		 * control point operation sent before
-+		 */
-+		return "forward-seek";
-+	default:
-+		return "error";
-+	}
-+}
-+
-+static struct mcp_data *mcp_data_new(struct btd_device *device)
-+{
-+	struct mcp_data *data;
-+
-+	data = new0(struct mcp_data, 1);
-+	data->device = device;
-+
-+	return data;
-+}
-+
-+static void cb_player_name(struct bt_mcp *mcp,  const uint8_t *value,
-+					uint16_t length)
-+{
-+	char *name;
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	name = name2utf8(value, length);
-+	DBG("Media Player Name %s", (const char *)name);
-+
-+	media_player_set_name(mp, name);
-+
-+	g_free(name);
-+}
-+
-+void cb_track_changed(struct bt_mcp *mcp)
-+{
-+	DBG("Track Changed");
-+	/* Since track changed has happened
-+	 * track title notification is expected
-+	 */
-+}
-+
-+void cb_track_title(struct bt_mcp *mcp, const uint8_t *value,
-+					uint16_t length)
-+{
-+	char *name;
-+	uint16_t len;
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	name = name2utf8(value, length);
-+	len = strlen(name);
-+
-+	DBG("Track Title %s", (const char *)name);
-+
-+	media_player_set_metadata(mp, NULL, "Title", name, len);
-+	media_player_metadata_changed(mp);
-+
-+	g_free(name);
-+}
-+
-+void cb_track_duration(struct bt_mcp *mcp, int32_t duration)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+	unsigned char buf[10];
-+
-+	/* MCP defines duration is int32 but api takes it as uint32 */
-+	sprintf(buf, "%d", duration);
-+	media_player_set_metadata(mp, NULL, "Duration", buf, sizeof(buf));
-+	media_player_metadata_changed(mp);
-+}
-+
-+void cb_track_position(struct bt_mcp *mcp, int32_t duration)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	/* MCP defines duration is int32 but api takes it as uint32 */
-+	media_player_set_position(mp, duration);
-+}
-+
-+void cb_media_state(struct bt_mcp *mcp, uint8_t status)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	media_player_set_status(mp, mcp_status_val_to_string(status));
-+}
-+
-+static const struct bt_mcp_event_callback cbs = {
-+	.player_name			= &cb_player_name,
-+	.track_changed			= &cb_track_changed,
-+	.track_title			= &cb_track_title,
-+	.track_duration			= &cb_track_duration,
-+	.track_position			= &cb_track_position,
-+	.playback_speed			= NULL,
-+	.seeking_speed			= NULL,
-+	.play_order				= NULL,
-+	.play_order_supported	= NULL,
-+	.media_state			= &cb_media_state,
-+	.content_control_id		= NULL,
-+};
-+
-+static int ct_play(struct media_player *mp, void *user_data)
-+{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_play(mcp);
-+}
-+
-+static int ct_pause(struct media_player *mp, void *user_data)
-+{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_pause(mcp);
-+}
-+
-+static int ct_stop(struct media_player *mp, void *user_data)
-+{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_stop(mcp);
-+}
-+
-+static const struct media_player_callback ct_cbs = {
-+	.set_setting	= NULL,
-+	.play		= &ct_play,
-+	.pause		= &ct_pause,
-+	.stop		= &ct_stop,
-+	.next		= NULL,
-+	.previous	= NULL,
-+	.fast_forward	= NULL,
-+	.rewind		= NULL,
-+	.press		= NULL,
-+	.hold		= NULL,
-+	.release	= NULL,
-+	.list_items	= NULL,
-+	.change_folder	= NULL,
-+	.search		= NULL,
-+	.play_item	= NULL,
-+	.add_to_nowplaying = NULL,
-+	.total_items = NULL,
-+};
-+
-+static int mcp_probe(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	/* Ignore, if we were probed for this device already */
-+	if (data) {
-+		error("Profile probed twice for the same device!");
-+		return -EINVAL;
-+	}
-+
-+	data = mcp_data_new(device);
-+	data->service = service;
-+
-+	data->mcp = bt_mcp_new(btd_gatt_database_get_db(database),
-+					btd_device_get_gatt_db(device));
-+
-+	bt_mcp_set_debug(data->mcp, mcp_debug, NULL, NULL);
-+	btd_service_set_user_data(service, data);
-+
-+	return 0;
-+}
-+
-+static void mcp_data_free(struct mcp_data *data)
-+{
-+	DBG("");
-+
-+	if (data->service) {
-+		btd_service_set_user_data(data->service, NULL);
-+		bt_mcp_set_user_data(data->mcp, NULL);
-+	}
-+
-+	if (data->mp) {
-+		media_player_destroy(data->mp);
-+		data->mp = NULL;
-+	}
-+
-+	bt_mcp_unref(data->mcp);
-+	free(data);
-+}
-+
-+static void mcp_data_remove(struct mcp_data *data)
-+{
-+	DBG("data %p", data);
-+
-+	mcp_data_free(data);
-+}
-+
-+static void mcp_remove(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct mcp_data *data;
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	data = btd_service_get_user_data(service);
-+	if (!data) {
-+		error("MCP service not handled by profile");
-+		return;
-+	}
-+
-+	mcp_data_remove(data);
-+}
-+
-+static int mcp_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	bt_mcp_attach(data->mcp, client);
-+
-+	data->mp = media_player_controller_create(device_get_path(device), 0);
-+	if (data->mp == NULL) {
-+		DBG("Unable to create Media Player");
-+		return -EINVAL;
-+	}
-+
-+	media_player_set_callbacks(data->mp, &ct_cbs, data->mcp);
-+
-+	bt_mcp_set_user_data(data->mcp, data->mp);
-+	bt_mcp_set_event_callbacks(data->mcp, &cbs, data->mp);
-+	btd_service_connecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int mcp_connect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	return 0;
-+}
-+
-+static int mcp_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (data->mp) {
-+		media_player_destroy(data->mp);
-+		data->mp = NULL;
-+	}
-+
-+	bt_mcp_detach(data->mcp);
-+
-+	btd_service_disconnecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int media_control_server_probe(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+
-+	bt_mcp_register(btd_gatt_database_get_db(database));
-+
-+	return 0;
-+}
-+
-+static void media_control_server_remove(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+
-+}
-+
-+static struct btd_profile mcp_profile = {
-+	.name			= "mcp",
-+	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.remote_uuid	= GMCS_UUID_STR,
-+	.device_probe	= mcp_probe,
-+	.device_remove	= mcp_remove,
-+	.accept			= mcp_accept,
-+	.connect		= mcp_connect,
-+	.disconnect		= mcp_disconnect,
-+
-+	.adapter_probe	= media_control_server_probe,
-+	.adapter_remove = media_control_server_remove,
-+};
-+
-+static int mcp_init(void)
-+{
-+	DBG("");
-+
-+	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-+		warn("D-Bus experimental not enabled");
-+		return -ENOTSUP;
-+	}
-+
-+	btd_profile_register(&mcp_profile);
-+	return 0;
-+}
-+
-+static void mcp_exit(void)
-+{
-+	DBG("");
-+
-+	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)
-+		btd_profile_unregister(&mcp_profile);
-+}
-+
-+BLUETOOTH_PLUGIN_DEFINE(mcp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+							mcp_init, mcp_exit)
--- 
-2.25.1
+> HCI Event: LE Meta Event (0x3e) plen 12                                                                                                                          #21108 [hci0] 1650.255887
+      LE Read Remote Used Features (0x04)
+        Status: Success (0x00)
+        Handle: 25 Address: 00:1A:7D:F0:21:40 (OUI 00-1A-7D)
+        Features: 0xbd 0x5f 0x66 0x00 0x00 0x00 0x00 0x00
+...
+          LE Data Packet Length Extension
+...
+
+> ACL Data RX: Handle 25 flags 0x02 dlen 18                                                                                                                        #21109 [hci0] 1650.300224
+      LE L2CAP: LE Connection Request (0x14) ident 1 len 10
+        PSM: 128 (0x0080)
+        Source CID: 64
+        MTU: 672
+        MPS: 23
+        Credits: 30
+< ACL Data TX: Handle 25 flags 0x00 dlen 18                                                                                                                        #21110 [hci0] 1650.300431
+      LE L2CAP: LE Connection Response (0x15) ident 1 len 10
+        Destination CID: 64
+        MTU: 672
+        MPS: 23
+        Credits: 30
+        Result: Connection successful (0x0000)
+...
+> HCI Event: LE Meta Event (0x3e) plen 11                                                                                                                          #21113 [hci0] 1650.345822
+      LE Data Length Change (0x07)
+        Handle: 25 Address: 00:1A:7D:F0:21:40 (OUI 00-1A-7D)
+        Max TX octets: 251
+        Max TX time: 2120
+        Max RX octets: 251
+        Max RX time: 2120
+
+I can't find that HCI_EV_LE_DATA_LEN_CHANGE is implemented anywhere in the kernel nor in bluez userspace.
+So why do I get this event? Is it generated by controller firmware itself?
+
+I think that both adapters support DLE. Is there there already support for using it with Linux?
+
+regards
+Christian
+
+
 
