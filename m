@@ -2,129 +2,90 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0BBC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 20:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3958C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 21:28:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbiJRUuF (ORCPT
+        id S229907AbiJRV2G (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 16:50:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
+        Tue, 18 Oct 2022 17:28:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229925AbiJRUty (ORCPT
+        with ESMTP id S229956AbiJRV2E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 16:49:54 -0400
-Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0937F3A6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:49:43 -0700 (PDT)
-Received: from github.com (hubbernetes-node-45b6459.ash1-iad.github.net [10.56.201.101])
-        by smtp.github.com (Postfix) with ESMTPA id 186C09007B7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:49:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
-        s=pf2014; t=1666126182;
-        bh=MHs61tKqcqRWtDUY5CCjEQkKaoB8zUAvna/w+XfRm40=;
-        h=Date:From:To:Subject:From;
-        b=Oi5wYEH2g57O1VbQK7O3sgtn8ERpQPZ+C83tfRnSct23U2uQ/M53Rd45GHhm/p1cM
-         BN0mP3AyFQ9O1JzAtizPi3HoKQCARInX9JMFwnphf1wsr5jwShjNvpkiidsfbPTMFG
-         RcgvC7at6jFzy394H5aM1mOVCNNg5YrQYsEvGMjA=
-Date:   Tue, 18 Oct 2022 13:49:42 -0700
-From:   Abhay <noreply@github.com>
+        Tue, 18 Oct 2022 17:28:04 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F401B56E9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 14:28:03 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id y1so15353082pfr.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 14:28:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3TjJI4Z5mKo0WkCCYEBgGhDf/q6wdCtS3DVL2EEYvvw=;
+        b=QbzCJbou7ORjRu05AFnVOQgOXfOL0TXO7Rimh4lL7MX9d0Us1gniOiDraWEtAxZza1
+         g33BT3Js+getxIZYU2BvvUHsHQTFwhlx3B5Di9YWmVpxwfLZ4Rm+G3xz4wn4rfyDHz68
+         yEm7m23OcmCXi6kMaAI2iQZ0HfX10TOiRqQBL8jkN5lY24dPC5fPC0WNBuC6AGgEe54w
+         7Z089ZRsUfLo4hU0sN10qyx1bL6JfYcnAHISFo8aWmwzrfDW0oVvlujztQPXwuSD24VC
+         8lkn53alGngSdOdIci/q/4Hr5pzOPQSMIGy68EDkdG+NKzUgKDsyDchK2m+641tR46IN
+         wvAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3TjJI4Z5mKo0WkCCYEBgGhDf/q6wdCtS3DVL2EEYvvw=;
+        b=Cc+JNwnSrb1cAI7n9zZpbfOOh+QgMPCX8GMz4CtaESyuYhxiqRdZLICnUWNVg7oV4I
+         tCe8L2zk7w/MWL8mEGxnK/rx5j8q40MpNUfZWKlyxcapgiiTJOpkbN4y1ZwOkB8OTimz
+         29NK/JAsP9Z6+dZH+Orv+v/RhvqKYrdQDJQ6f0zT3i1imskxUkeo0byMJBEmwq8S2p8P
+         gk75rZDSlXrx83DDYjpnTawS08OWk1g7gZ6pjDx29I3GXNhSKqICcHJFBJsoSPNuugR6
+         H3NsF7ycoupbzfLXVv779bNnB8GzOEkNHfBzTvUrsHEZXbMwBLPV/zaAA8kMdBft/3Wt
+         jUfQ==
+X-Gm-Message-State: ACrzQf3bJ8YQgKXZ66rWDlVV55SF6cmKHMKmkQ1z7H2TvrDuzLEF+fWC
+        zodoSSO3BnRrCbYJQA09lC5rQZifuKg=
+X-Google-Smtp-Source: AMsMyM5Pr/W47VjpEYkiZeRduEXR2YmUEgk+XugWstKgAxRltKO83yGAKoFFbQE0IiXEaRY3PrUb5w==
+X-Received: by 2002:a65:42c7:0:b0:462:7158:c863 with SMTP id l7-20020a6542c7000000b004627158c863mr4396553pgp.590.1666128482380;
+        Tue, 18 Oct 2022 14:28:02 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id n9-20020a170903110900b0017f7c4e260fsm9230653plh.150.2022.10.18.14.28.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Oct 2022 14:28:01 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <bluez/bluez/push/refs/heads/master/1096a9-07fd4b@github.com>
-Subject: [bluez/bluez] d3a204: lib/uuid: Add GMCS UUIDs
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
-X-Auto-Response-Suppress: All
+Subject: [PATCH BlueZ 1/2] settings: Fix scan-build warning
+Date:   Tue, 18 Oct 2022 14:27:59 -0700
+Message-Id: <20221018212800.3967256-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  Branch: refs/heads/master
-  Home:   https://github.com/bluez/bluez
-  Commit: d3a204b8a2c08d554faab5ad5bb8581620c457bb
-      https://github.com/bluez/bluez/commit/d3a204b8a2c08d554faab5ad5bb8581620c457bb
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2022-10-18 (Tue, 18 Oct 2022)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-  Changed paths:
-    M lib/uuid.h
+This fixes the following warning:
 
-  Log Message:
-  -----------
-  lib/uuid: Add GMCS UUIDs
+src/settings.c:281:7: warning: Branch condition evaluates to a garbage
+value [core.uninitialized.Branch]
+                if (ret) {
+                    ^~~
+---
+ src/settings.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-This adds GMCS UUIDs which will be used by Media Control Profile.
+diff --git a/src/settings.c b/src/settings.c
+index 0f053000610b..85534f2c7aca 100644
+--- a/src/settings.c
++++ b/src/settings.c
+@@ -269,6 +269,7 @@ static int gatt_db_load(struct gatt_db *db, GKeyFile *key_file, char **keys)
+ 							&primary, &uuid);
+ 
+ 			bt_uuid_to_string(&uuid, uuid_str, sizeof(uuid_str));
++			ret = 0;
+ 		} else if (g_str_equal(type, GATT_INCLUDE_UUID_STR)) {
+ 			ret = load_incl(db, *handle, value, current_service);
+ 		} else if (g_str_equal(type, GATT_CHARAC_UUID_STR)) {
+-- 
+2.37.3
 
-
-  Commit: 3973147aa8e424bd2ab78304b54d914208d560d1
-      https://github.com/bluez/bluez/commit/3973147aa8e424bd2ab78304b54d914208d560d1
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2022-10-18 (Tue, 18 Oct 2022)
-
-  Changed paths:
-    M Makefile.am
-    A src/shared/mcp.c
-    A src/shared/mcp.h
-    A src/shared/mcs.h
-
-  Log Message:
-  -----------
-  shared/mcp: Add initial code for handling MCP
-
-This adds initial code for Media Control Profile for Client Role.
-
-
-  Commit: 123e1ee1ce063af2e28ed7153627081710aa75af
-      https://github.com/bluez/bluez/commit/123e1ee1ce063af2e28ed7153627081710aa75af
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2022-10-18 (Tue, 18 Oct 2022)
-
-  Changed paths:
-    M Makefile.plugins
-    M configure.ac
-    A profiles/audio/mcp.c
-
-  Log Message:
-  -----------
-  profiles: Add initial code for mcp plugin
-
-This adds initial code for mcp plugin which handles Media Control Profile
-and Generic Media Control Service for Client Role.
-The plugin exposes dbus methods for media control operations
-like play, pause which can be invoked using player menu
-in bluetoothctl.
-
-
-  Commit: 07fd4b948251f0613df230ca365b8440808c5a5c
-      https://github.com/bluez/bluez/commit/07fd4b948251f0613df230ca365b8440808c5a5c
-  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-  Date:   2022-10-18 (Tue, 18 Oct 2022)
-
-  Changed paths:
-    M monitor/att.c
-
-  Log Message:
-  -----------
-  monitor/att: Add decoding support for GMCS
-
-This adds decoding support for GMCS attributes.
-
-< ACL Data TX: Handle 3585 flags 0x00 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
-> ACL Data RX: Handle 3585 flags 0x02 dlen 9
-      ATT: Read Response (0x0b) len 4
-        Value: 33180000
-        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
-              Supported Opcodes: 0x00001833
-                Play (0x00000001)
-                Pause (0x00000002)
-                Stop (0x00000010)
-                Move Relative (0x00000020)
-                Previous Track (0x00000800)
-                Next Track (0x00001000)
-
-
-Compare: https://github.com/bluez/bluez/compare/1096a99cadfa...07fd4b948251
