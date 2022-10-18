@@ -2,123 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D835C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 22:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42406C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 22:37:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230000AbiJRWCo (ORCPT
+        id S229682AbiJRWhV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 18:02:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54652 "EHLO
+        Tue, 18 Oct 2022 18:37:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbiJRWCn (ORCPT
+        with ESMTP id S229535AbiJRWhT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 18:02:43 -0400
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C897EBE525
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 15:02:42 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id o20-20020a05600c4fd400b003b4a516c479so13332253wmq.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 15:02:42 -0700 (PDT)
+        Tue, 18 Oct 2022 18:37:19 -0400
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42E6456033
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 15:37:19 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1326637be6eso18548930fac.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 15:37:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mJICzRHpo/InYiWtJTb9YBEZ99DH0FQgMyLbWgRHe6E=;
-        b=ptHyTeeTr+MqF19rUyiyqHrnTwxRsIVb7e2HLXR1bjGBUcgRiS65umxizwlDHfZOLt
-         j9/FRNF9wkfixcQ6kE9ak2ak7vvdzxTTEPDvKkJDgrF/jCMM/msDEo+OYgFoXiBPFg6x
-         5QYqz1ryo9qEy8rcCIndMSEZAZUDt4cxLnNVqRRsyaur2+nm8jFTEfdp0SK2duLYOXb6
-         UM/lvAH9e2936bLqF54VGxJq4GeRpbhPkkxMu9+Wpl7PJ4fMcGpQyR9hTXWbCB9dbCAI
-         AuSGgLY3fADV4jR5wTKqodtByiZQ0bSiyl/EreEKllu4H2nWZxyBAPLEeFWOBJPdr1GN
-         xOyw==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=4D+7RJVexvulSWlDgUGqIspE7M9/K1WMePCYTA+o/qw=;
+        b=F7my78Fpw1j1Fjyh6VLVvDb+y6Uh8oklCfZ5iNXLwF5L5jjZoW68nC2qzKZ9u8Co4X
+         Y7hXrvjjwIJJX9eOYMafD/UcK1zsJWP180TBgntIPsvUmGP78DWefZdEdcRvmtqS7qF8
+         ghhz6O4GxmLAslPhwybUSb2tdmb/F5wTNXDUOVvhoy6VC1VbuzOucxmfM/3ul/dnwg9F
+         MJJIec4XeNmaTWSDB9fFzWUQTOXNKl7/C67Pygi7N0Mr0XfvsCkGoeYbZkqhVAMRaYOc
+         RiNQXSHQHQB1uy6eKUlmi0Q5MVnlTr+FTztJtaWpMy8l9Vv0nYdVIOYWq0zwHkRt6cIS
+         a8nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mJICzRHpo/InYiWtJTb9YBEZ99DH0FQgMyLbWgRHe6E=;
-        b=04gOGCW8/KsKpUU4cgqlwh2jdSPEtQlXQfOZtaG+f6I3DRuFyVROFWqHNEzf/+u0TV
-         qzALkRy8vjwSCXBObTCXStXSK6pwbEsZGfSs/AQBoV9FoXp6r81gA6746QxGLW5UpoDW
-         bfLge1TOIyQMfMHO4zRGvgpWCMz82YqsVHP7n/FT9loZOS4Wdnz9cGecv+3abrI5e1GI
-         j4/+I+5LsgE7M+v+zf6b7F0YMQb7iyfkE/fFMiEtYOMZhm2MZEAeZZxygNtkB7HHDkEt
-         D00L2S45P1prCvxS5ILzzTL4ihxBz4bj4/OpEzBKst/xZHs6Fhk35mPMQ/rhuLBUtruv
-         99bQ==
-X-Gm-Message-State: ACrzQf2cfcCdtVJ6xb7Ybh+TjquJzz3G0WE3ZlJ5iW62rgrUo57iGlkj
-        xcFsM7TEJZYMX89jl5vNnuU=
-X-Google-Smtp-Source: AMsMyM5e6FtpWzQykNvs3Gf6Vm3T8YuyV1hM0I5TmQJFJjk+nOKfSVzcTMbDRJP/j77olgthhwUJEA==
-X-Received: by 2002:a05:600c:4e8a:b0:3c6:de26:9d6e with SMTP id f10-20020a05600c4e8a00b003c6de269d6emr3503034wmq.117.1666130561220;
-        Tue, 18 Oct 2022 15:02:41 -0700 (PDT)
-Received: from [192.168.1.8] (67.227.121.78.rev.sfr.net. [78.121.227.67])
-        by smtp.gmail.com with ESMTPSA id g5-20020a5d4885000000b0022e55f40bc7sm11892846wrq.82.2022.10.18.15.02.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Oct 2022 15:02:40 -0700 (PDT)
-Message-ID: <28551f84-eff3-74fa-b17c-cfa16b027280@gmail.com>
-Date:   Wed, 19 Oct 2022 00:02:40 +0200
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4D+7RJVexvulSWlDgUGqIspE7M9/K1WMePCYTA+o/qw=;
+        b=vXYncnwHFhrTN0QmYGzGtS4/Cy49G8psKP/hj7G3YwzfDEAk3Zi0ams7RBzyO1euZq
+         UyUT6fD3r7k1KSwMc02dqACJ+wpTJbTTtpfX+ytukbUCEQa1SraFXRJQcUyORwyzdbRS
+         nMYDkDfNvhVzm7ymz10SEGz6wn4GcwUBBD5J/8uCXnLJpiRv63yMl/v0XayWRdrgO5jv
+         w44ramIl39y/AXqWP0Rp937AloGolLaPcf0WwRhdweTCLXOi+cFpBrGEtFbPv2m6D34J
+         meDdSplADu1vtW7lH6cD6TdYLYMAyLKg9khtyTWJn3aA/GWwXluXz1ZGKfXIc2EF/Yhs
+         alaQ==
+X-Gm-Message-State: ACrzQf3/U/W6+AmsNh4oHgvwAcqMGdSr4YYscPkst506d28u+WjSLjtY
+        Ff5bF3Tr5PVrtnLkONSabf7t+AZF/9Y=
+X-Google-Smtp-Source: AMsMyM6dWXJDSrGpOnclv562MgXAd4gZnm4LdfripIGH9U5/+grxgAhiOjbD2JZ6P7dkRd2Nfu4mKw==
+X-Received: by 2002:a05:6870:6111:b0:132:af5e:36c3 with SMTP id s17-20020a056870611100b00132af5e36c3mr3041550oae.68.1666132638348;
+        Tue, 18 Oct 2022 15:37:18 -0700 (PDT)
+Received: from [172.17.0.2] ([20.97.115.250])
+        by smtp.gmail.com with ESMTPSA id v81-20020aca6154000000b0034fc91dbd7bsm5990503oib.58.2022.10.18.15.37.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 Oct 2022 15:37:17 -0700 (PDT)
+Message-ID: <634f2a9d.ca0a0220.3651.71ab@mx.google.com>
+Date:   Tue, 18 Oct 2022 15:37:17 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5552242516796262941=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.2.2
-Subject: Re: [PATCH] Bluetooth: hci_conn: Fix not restoring ISO buffer count
- on disconnect
-Content-Language: fr
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <20221017224147.3629459-1-luiz.dentz@gmail.com>
-From:   =?UTF-8?Q?Fr=c3=a9d=c3=a9ric_Danis?= <frederic.danis.oss@gmail.com>
-In-Reply-To: <20221017224147.3629459-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] settings: Fix scan-build warning
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221018212800.3967256-1-luiz.dentz@gmail.com>
+References: <20221018212800.3967256-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+--===============5552242516796262941==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I tested this patch and I'm not able to reproduce the issue after 
-applying it.
+This is automated email and please do not reply to this email!
 
-Tested-by: Frédéric Danis <frederic.danis@collabora.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=686460
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.22 seconds
+GitLint                       PASS      1.56 seconds
+Prep - Setup ELL              PASS      32.57 seconds
+Build - Prep                  PASS      0.82 seconds
+Build - Configure             PASS      10.55 seconds
+Build - Make                  PASS      992.64 seconds
+Make Check                    PASS      12.63 seconds
+Make Check w/Valgrind         PASS      351.85 seconds
+Make Distcheck                PASS      293.36 seconds
+Build w/ext ELL - Configure   PASS      10.54 seconds
+Build w/ext ELL - Make        PASS      103.89 seconds
+Incremental Build w/ patches  PASS      248.67 seconds
+Scan Build                    PASS      631.14 seconds
 
 
-Le 18/10/2022 à 00:41, Luiz Augusto von Dentz a écrit :
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> When disconnecting an ISO link the controller may not generate
-> HCI_EV_NUM_COMP_PKTS for unacked packets which needs to be restored in
-> hci_conn_del otherwise the host would assume they are still in use and
-> would not be able to use all the buffers available.
-> 
-> Fixes: 26afbd826ee3 ("Bluetooth: Add initial implementation of CIS connections")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->   net/bluetooth/hci_conn.c | 11 +++++++++++
->   1 file changed, 11 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 5d6ee5075642..df914f521c9d 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1067,10 +1067,21 @@ int hci_conn_del(struct hci_conn *conn)
->   			hdev->acl_cnt += conn->sent;
->   	} else {
->   		struct hci_conn *acl = conn->link;
-> +
->   		if (acl) {
->   			acl->link = NULL;
->   			hci_conn_drop(acl);
->   		}
-> +
-> +		/* Unacked ISO frames */
-> +		if (conn->type == ISO_LINK) {
-> +			if (hdev->iso_pkts)
-> +				hdev->iso_cnt += conn->sent;
-> +			else if (hdev->le_pkts)
-> +				hdev->le_cnt += conn->sent;
-> +			else
-> +				hdev->acl_cnt += conn->sent;
-> +		}
->   	}
->   
->   	if (conn->amp_mgr)
 
--- 
-Frédéric Danis                       Embedded Linux Consultant
-frederic.danis.oss@gmail.com
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5552242516796262941==--
