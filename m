@@ -2,94 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CA3C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 19:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63024C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 20:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbiJRTy3 (ORCPT
+        id S229993AbiJRUAV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 15:54:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52218 "EHLO
+        Tue, 18 Oct 2022 16:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbiJRTyO (ORCPT
+        with ESMTP id S229957AbiJRUAU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 15:54:14 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9FB488DCB
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 12:54:07 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id gf8so14999713pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 12:54:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FRAORO5bjzmMCkw/3BMvRZjW/8GO7OWivNtU0BCd2EY=;
-        b=EPrnR1xOGfalA9FdJ08/tUZu7olGOlayGFlJ5qvTu/0g8TlWmW6180X/xFpYkTEV4p
-         YEWFn1nZ9Vq2/UP4GnCwPWVe/umYz0zpYn8pc3T3jkHQELrvo0Eu4C+UUDth4ueJ9+c9
-         +RX8E/mXrJzITQqAVUUMpAt7bsn4AmCrddSj7FMOQAf70lDAUquJJt0vUoIQiIIPkZTV
-         F44QMKsRJyiI8gi+D6O5Zk5Ni9NNHdeZtrKdgjgA6LmvvmbTUysOcdkqnhm/wJfTBYDK
-         9ZxaRtCBv+0RsaroNFv9iItv6bHE5vQ43NU9ZgKgSLrn+jRQr1h6TJQCewEhukhpkV0n
-         2qCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FRAORO5bjzmMCkw/3BMvRZjW/8GO7OWivNtU0BCd2EY=;
-        b=dbwd20nyb9zu5dXIqA5w0tAqAIS8oi5dl/OuqqbJD6mnYPHYRw5STc7K7S9sYAOJK6
-         oVpypPVKfqu1YsVjTts1U9zj52nGJnkOBRWOLaV6OllIkFE2Utu87AdtY8cUtKP2FfUZ
-         B6PEHa4bwSnZKXab+DcBj0lTqpIfttdHLXcCOXPIh/2/cOJr+na034XNNwP9Xb77kNcR
-         cAXQg7BS6kF9Ufaut3YI9ki5SqqM5fdURfCTCnv4upo8IuHCd9PzI6yglOxkx4bZq3uI
-         TJcKLASNOTe6LJrXKSymaDlbEG3NEJW9JUbgsJ7rwgWWELAJOtrTiUAslDEHwOA905Q0
-         uIiQ==
-X-Gm-Message-State: ACrzQf39jFZhrIoLTa+z37cxp3FWmLdbx6DaJqDRwjIq67tbB0O38/i8
-        IDdj2yLvXkMuvwJg1qFtAEDPULOiOdw=
-X-Google-Smtp-Source: AMsMyM6XyblbvK4Jld3KV3oUWm+bVEwfZUwTVVH/hrrPD7+tc1w8Z+RbW+hWHHUSlEjGKANIyzsMDA==
-X-Received: by 2002:a17:902:c952:b0:183:6e51:4fa with SMTP id i18-20020a170902c95200b001836e5104famr4928937pla.42.1666122845804;
-        Tue, 18 Oct 2022 12:54:05 -0700 (PDT)
-Received: from [172.17.0.2] ([20.237.181.221])
-        by smtp.gmail.com with ESMTPSA id p4-20020a637f44000000b0043954df3162sm8251825pgn.10.2022.10.18.12.54.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 12:54:05 -0700 (PDT)
-Message-ID: <634f045d.630a0220.5e841.f646@mx.google.com>
-Date:   Tue, 18 Oct 2022 12:54:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8098594344187936585=="
+        Tue, 18 Oct 2022 16:00:20 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C130B7E81B;
+        Tue, 18 Oct 2022 13:00:19 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 7AB3FB82102;
+        Tue, 18 Oct 2022 20:00:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 310DEC433D6;
+        Tue, 18 Oct 2022 20:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666123217;
+        bh=TtckORe7oVJmfBtYEFHgrR0/5B+0GsZkTwJZYIqMLWE=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=lDYCjzQWaKxoOKyCD+JaoeInAS7OuaUUNfDQiA1yP6x4kSW7laFxmmm/VMFcMTIFG
+         hq4Hm/nZwaU+qSb3s3lYkdtCk6d+dEdXxp8OkVkd4jucmUZEoUw/mE65eX2O7APM6V
+         UaeNHrmEFMETE8g3RwXtxJ3whc0G6Tdc+cBc5jjWMCz13obe1YbzgZlJe/ss58jXFj
+         vnVIaXN4ak7W05PsV0ZjNeuUkrf54M6adCQuLKFny0e6ffLApMavKevXiAMbPzJ+k0
+         SrZfLud4P37m9ybSTM61CVkjDbmQVQPN65A0z7Hr3beqgE3ekLTJ6VBYTPhTn0hJiR
+         19hbVhUgwN98g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1B04AE21ED4;
+        Tue, 18 Oct 2022 20:00:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Subject: RE: virtio_bt: Fix alignment in configuration struct
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, igor.skalkin@opensynergy.com
-In-Reply-To: <20221018191911.589564-2-Igor.Skalkin@opensynergy.com>
-References: <20221018191911.589564-2-Igor.Skalkin@opensynergy.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] Bluetooth: L2CAP: Fix memory leak in vhci_write
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166612321710.1440.974554274337472086.git-patchwork-notify@kernel.org>
+Date:   Tue, 18 Oct 2022 20:00:17 +0000
+References: <20221018021851.2900-1-yin31149@gmail.com>
+In-Reply-To: <20221018021851.2900-1-yin31149@gmail.com>
+To:     Hawkins Jiawei <yin31149@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, 18801353760@163.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.von.dentz@intel.com, netdev@vger.kernel.org,
+        syzbot+8f819e36e01022991cfa@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8098594344187936585==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is an automated email and please do not reply to this email.
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear Submitter,
+On Tue, 18 Oct 2022 10:18:51 +0800 you wrote:
+> Syzkaller reports a memory leak as follows:
+> ====================================
+> BUG: memory leak
+> unreferenced object 0xffff88810d81ac00 (size 240):
+>   [...]
+>   hex dump (first 32 bytes):
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff838733d9>] __alloc_skb+0x1f9/0x270 net/core/skbuff.c:418
+>     [<ffffffff833f742f>] alloc_skb include/linux/skbuff.h:1257 [inline]
+>     [<ffffffff833f742f>] bt_skb_alloc include/net/bluetooth/bluetooth.h:469 [inline]
+>     [<ffffffff833f742f>] vhci_get_user drivers/bluetooth/hci_vhci.c:391 [inline]
+>     [<ffffffff833f742f>] vhci_write+0x5f/0x230 drivers/bluetooth/hci_vhci.c:511
+>     [<ffffffff815e398d>] call_write_iter include/linux/fs.h:2192 [inline]
+>     [<ffffffff815e398d>] new_sync_write fs/read_write.c:491 [inline]
+>     [<ffffffff815e398d>] vfs_write+0x42d/0x540 fs/read_write.c:578
+>     [<ffffffff815e3cdd>] ksys_write+0x9d/0x160 fs/read_write.c:631
+>     [<ffffffff845e0645>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>     [<ffffffff845e0645>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>     [<ffffffff84600087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> ====================================
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Here is the summary with links:
+  - [v2] Bluetooth: L2CAP: Fix memory leak in vhci_write
+    https://git.kernel.org/bluetooth/bluetooth-next/c/97097c85c088
 
------ Output -----
-error: patch failed: drivers/bluetooth/virtio_bt.c:306
-error: drivers/bluetooth/virtio_bt.c: patch does not apply
-error: patch failed: include/uapi/linux/virtio_bt.h:9
-error: include/uapi/linux/virtio_bt.h: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-
-Please resolve the issue and submit the patches again.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============8098594344187936585==--
