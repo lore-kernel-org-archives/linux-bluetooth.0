@@ -2,50 +2,50 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73FBEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 04:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E36D2C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 04:38:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbiJREix (ORCPT
+        id S229725AbiJREiz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 00:38:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52474 "EHLO
+        Tue, 18 Oct 2022 00:38:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbiJREiv (ORCPT
+        with ESMTP id S229895AbiJREix (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 00:38:51 -0400
+        Tue, 18 Oct 2022 00:38:53 -0400
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F9CA02D2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 21:38:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67553A02DF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 21:38:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666067930; x=1697603930;
+  t=1666067932; x=1697603932;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=N55/Oir4zOlGqXoTgc9T3T0GGUb43fyBGZiRheDgkJ8=;
-  b=bMZr5jgD3WRbM2cllKm7+7M5/y9sboGCmqkRgUQ3lMqFvV3cMgipXUp0
-   gCzFpJWdT3AGfHe+RtkNvKZy1ZIIEgb1KhM2GWhHbw/CWuF3rYdLNJ+y9
-   ElAZWbPUylDOnViHROjdMCZiPVXyNhzCkRmX6+JYfjAdqk6z+Mm0NT1+b
-   9msegKullfL1S3Jjm8H3EnYnht/2FjZLpi6q8MOpA6YOIfpnpnFCPrp1q
-   Zz9joi5dCHe5ZpntColTLModX22Xx17ea7wDnUnnOSEtivbeXT7i2eghk
-   ifESHltoLfPgiiFR3nG0g6ncBYCwj8bOf2F+qd+y9NseMOMYMX2FMyLcQ
+  bh=ic0z+lCR/WMmhpze3jCEnItcONdGcq+pyqBcAO8MJlI=;
+  b=cpk3/h4BBAx0OtjQYNF3XIgngx6jnHOVdaRll6zG5xg/yFvpib3muWPQ
+   +69iw2ZqeyZJhNJ+NQ2rC3FVIS8TyLv7tKjDX5DfkDS9ywaYD3N0vHUJr
+   UcFhDHNQz2djjs2yFRLHWhc4xvEeLMvsU7oAUzU4cvysdvdiom5z1FXFV
+   YgeN8jMjicnO5ymq3DBfVNpkjavRMPjcRahOJ02h8OR3wIsrxXVF1WP4c
+   BGyK08egDo2IaiYpKSfTUhOT1QI5Mw7hPCa4pvLYYmepGuOvncCg+fNhK
+   pLfvIcptkTiG3V1UXx/GVl9Mwl5YKif8ibEMsx/d7V52f9jCDmAAa48u8
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="307079225"
+X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="307079226"
 X-IronPort-AV: E=Sophos;i="5.95,193,1661842800"; 
-   d="scan'208";a="307079225"
+   d="scan'208";a="307079226"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 21:38:50 -0700
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 21:38:51 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="957608044"
+X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="957608048"
 X-IronPort-AV: E=Sophos;i="5.95,193,1661842800"; 
-   d="scan'208";a="957608044"
+   d="scan'208";a="957608048"
 Received: from bsbdt.iind.intel.com ([10.224.186.26])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Oct 2022 21:38:48 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 17 Oct 2022 21:38:50 -0700
 From:   Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-Subject: [PATCH BlueZ v3 3/4] profiles: Add initial code for mcp plugin
-Date:   Tue, 18 Oct 2022 10:08:30 +0530
-Message-Id: <20221018043831.342821-4-abhay.maheshbhai.maheta@intel.com>
+Subject: [PATCH BlueZ v3 4/4] monitor/att: Add decoding support for GMCS
+Date:   Tue, 18 Oct 2022 10:08:31 +0530
+Message-Id: <20221018043831.342821-5-abhay.maheshbhai.maheta@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221018043831.342821-1-abhay.maheshbhai.maheta@intel.com>
 References: <20221018043831.342821-1-abhay.maheshbhai.maheta@intel.com>
@@ -55,126 +55,51 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds initial code for mcp plugin which handles Media Control Profile
-and Generic Media Control Service for Client Role.
-The plugin exposes dbus methods for media control operations
-like play, pause which can be invoked using player menu
-in bluetoothctl.
----
- Makefile.plugins     |   5 +
- configure.ac         |   4 +
- profiles/audio/mcp.c | 430 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 439 insertions(+)
- create mode 100644 profiles/audio/mcp.c
+This adds decoding support for GMCS attributes.
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index a3654980f..20cac384e 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -122,6 +122,11 @@ builtin_modules += bap
- builtin_sources += profiles/audio/bap.c
- endif
+< ACL Data TX: Handle 3585 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
+> ACL Data RX: Handle 3585 flags 0x02 dlen 9
+      ATT: Read Response (0x0b) len 4
+        Value: 33180000
+        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
+              Supported Opcodes: 0x00001833
+                Play (0x00000001)
+                Pause (0x00000002)
+                Stop (0x00000010)
+                Move Relative (0x00000020)
+                Previous Track (0x00000800)
+                Next Track (0x00001000)
+---
+ monitor/att.c | 513 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 513 insertions(+)
+
+diff --git a/monitor/att.c b/monitor/att.c
+index f5fc32cb0..491f196bf 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -14,6 +14,7 @@
+ #endif
  
-+if MCP
-+builtin_modules += mcp
-+builtin_sources += profiles/audio/mcp.c
-+endif
-+
- if VCP
- builtin_modules += vcp
- builtin_sources += profiles/audio/vcp.c
-diff --git a/configure.ac b/configure.ac
-index 79645e691..363a222a7 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -199,6 +199,10 @@ AC_ARG_ENABLE(bap, AS_HELP_STRING([--disable-bap],
- 		[disable BAP profile]), [enable_bap=${enableval}])
- AM_CONDITIONAL(BAP, test "${enable_bap}" != "no")
- 
-+AC_ARG_ENABLE(mcp, AS_HELP_STRING([--disable-mcp],
-+        [disable MCP profile]), [enable_mcp=${enableval}])
-+AM_CONDITIONAL(MCP, test "${enable_mcp}" != "no")
-+
- AC_ARG_ENABLE(vcp, AS_HELP_STRING([--disable-vcp],
- 		[disable VCP profile]), [enable_vcp=${enableval}])
- AM_CONDITIONAL(VCP, test "${enable_vcp}" != "no")
-diff --git a/profiles/audio/mcp.c b/profiles/audio/mcp.c
-new file mode 100644
-index 000000000..f3ea330f9
---- /dev/null
-+++ b/profiles/audio/mcp.c
-@@ -0,0 +1,430 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2020  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+
+ #define _GNU_SOURCE
 +#include <ctype.h>
-+#include <stdbool.h>
-+#include <stdlib.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <errno.h>
-+
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -22,6 +23,8 @@
+ #include <errno.h>
+ #include <linux/limits.h>
+ 
 +#include <glib.h>
 +
-+#include "gdbus/gdbus.h"
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+#include "lib/sdp.h"
-+#include "lib/uuid.h"
-+
-+#include "src/dbus-common.h"
-+#include "src/shared/util.h"
-+#include "src/shared/att.h"
-+#include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
-+#include "src/shared/gatt-client.h"
-+#include "src/shared/gatt-server.h"
-+#include "src/shared/mcp.h"
-+#include "src/shared/mcs.h"
-+
-+#include "btio/btio.h"
-+#include "src/plugin.h"
-+#include "src/adapter.h"
-+#include "src/gatt-database.h"
-+#include "src/device.h"
-+#include "src/profile.h"
-+#include "src/service.h"
-+#include "src/log.h"
-+#include "src/error.h"
-+#include "player.h"
-+
-+#define GMCS_UUID_STR "00001849-0000-1000-8000-00805f9b34fb"
-+
-+struct mcp_data {
-+	struct btd_device *device;
-+	struct btd_service *service;
-+	struct bt_mcp *mcp;
-+	unsigned int state_id;
-+
-+	struct media_player *mp;
-+};
-+
-+static void mcp_debug(const char *str, void *user_data)
-+{
-+	DBG_IDX(0xffff, "%s", str);
-+}
-+
+ #include "lib/bluetooth.h"
+ #include "lib/uuid.h"
+ #include "lib/hci.h"
+@@ -1746,6 +1749,499 @@ static void vol_flag_notify(const struct l2cap_frame *frame)
+ 	print_vcs_flag(frame);
+ }
+ 
 +static char *name2utf8(const uint8_t *name, uint16_t len)
 +{
 +	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
@@ -200,340 +125,501 @@ index 000000000..f3ea330f9
 +	return g_strdup(utf8_name);
 +}
 +
-+static const char *mcp_status_val_to_string(uint8_t status)
++static void print_mp_name(const struct l2cap_frame *frame)
 +{
-+	switch (status) {
-+	case BT_MCS_STATUS_PLAYING:
-+		return "playing";
-+	case BT_MCS_STATUS_PAUSED:
-+		return "paused";
-+	case BT_MCS_STATUS_INACTIVE:
-+		return "stopped";
-+	case BT_MCS_STATUS_SEEKING:
-+		/* TODO: find a way for fwd/rvs seeking, probably by storing
-+		 * control point operation sent before
-+		 */
-+		return "forward-seek";
++	char *name;
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Media Player Name: %s", name);
++}
++
++static void mp_name_read(const struct l2cap_frame *frame)
++{
++	print_mp_name(frame);
++}
++
++static void mp_name_notify(const struct l2cap_frame *frame)
++{
++	print_mp_name(frame);
++}
++
++static void print_track_changed(const struct l2cap_frame *frame)
++{
++	print_field("  Track Changed");
++}
++
++static void track_changed_notify(const struct l2cap_frame *frame)
++{
++	print_track_changed(frame);
++}
++
++static void print_track_title(const struct l2cap_frame *frame)
++{
++	char *name;
++
++	name = name2utf8((uint8_t *)frame->data, frame->size);
++
++	print_field("  Track Title: %s", name);
++}
++
++static void track_title_read(const struct l2cap_frame *frame)
++{
++	print_track_title(frame);
++}
++
++static void track_title_notify(const struct l2cap_frame *frame)
++{
++	print_track_title(frame);
++}
++
++static void print_track_duration(const struct l2cap_frame *frame)
++{
++	int32_t duration;
++
++	if (!l2cap_frame_get_le32((void *)frame, (uint32_t *)&duration)) {
++		print_text(COLOR_ERROR, "  Track Duration: invalid size");
++		goto done;
++	}
++
++	print_field("  Track Duration: %u", duration);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void track_duration_read(const struct l2cap_frame *frame)
++{
++	print_track_duration(frame);
++}
++
++static void track_duration_notify(const struct l2cap_frame *frame)
++{
++	print_track_duration(frame);
++}
++
++static void print_track_position(const struct l2cap_frame *frame)
++{
++	int32_t position;
++
++	if (!l2cap_frame_get_le32((void *)frame, (uint32_t *)&position)) {
++		print_text(COLOR_ERROR, "  Track Position: invalid size");
++		goto done;
++	}
++
++	print_field("  Track Position: %u", position);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void track_position_read(const struct l2cap_frame *frame)
++{
++	print_track_position(frame);
++}
++
++static void track_position_write(const struct l2cap_frame *frame)
++{
++	print_track_position(frame);
++}
++
++static void track_position_notify(const struct l2cap_frame *frame)
++{
++	print_track_position(frame);
++}
++
++static void print_playback_speed(const struct l2cap_frame *frame)
++{
++	int8_t playback_speed;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&playback_speed)) {
++		print_text(COLOR_ERROR, "  Playback Speed: invalid size");
++		goto done;
++	}
++
++	print_field("  Playback Speed: %u", playback_speed);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void playback_speed_read(const struct l2cap_frame *frame)
++{
++	print_playback_speed(frame);
++}
++
++static void playback_speed_write(const struct l2cap_frame *frame)
++{
++	print_playback_speed(frame);
++}
++
++static void playback_speed_notify(const struct l2cap_frame *frame)
++{
++	print_playback_speed(frame);
++}
++
++static void print_seeking_speed(const struct l2cap_frame *frame)
++{
++	int8_t seeking_speed;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&seeking_speed)) {
++		print_text(COLOR_ERROR, "  Seeking Speed: invalid size");
++		goto done;
++	}
++
++	print_field("  Seeking Speed: %u", seeking_speed);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void seeking_speed_read(const struct l2cap_frame *frame)
++{
++	print_seeking_speed(frame);
++}
++
++static void seeking_speed_notify(const struct l2cap_frame *frame)
++{
++	print_seeking_speed(frame);
++}
++
++static const char *play_order_str(uint8_t order)
++{
++	switch (order) {
++	case 0x01:
++		return "Single once";
++	case 0x02:
++		return "Single repeat";
++	case 0x03:
++		return "In order once";
++	case 0x04:
++		return "In order repeat";
++	case 0x05:
++		return "Oldest once";
++	case 0x06:
++		return "Oldest repeat";
++	case 0x07:
++		return "Newest once";
++	case 0x08:
++		return "Newest repeat";
++	case 0x09:
++		return "Shuffle once";
++	case 0x0A:
++		return "Shuffle repeat";
 +	default:
-+		return "error";
++		return "RFU";
 +	}
 +}
 +
-+static struct mcp_data *mcp_data_new(struct btd_device *device)
++static void print_playing_order(const struct l2cap_frame *frame)
 +{
-+	struct mcp_data *data;
++	int8_t playing_order;
 +
-+	data = new0(struct mcp_data, 1);
-+	data->device = device;
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&playing_order)) {
++		print_text(COLOR_ERROR, "  Playing Order: invalid size");
++		goto done;
++	}
 +
-+	return data;
++	print_field("  Playing Order: %s", play_order_str(playing_order));
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
 +}
 +
-+static void cb_player_name(struct bt_mcp *mcp,  const uint8_t *value,
-+					uint16_t length)
++static void playing_order_read(const struct l2cap_frame *frame)
 +{
-+	char *name;
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	name = name2utf8(value, length);
-+	DBG("Media Player Name %s", (const char *)name);
-+
-+	media_player_set_name(mp, name);
-+
-+	g_free(name);
++	print_playing_order(frame);
 +}
 +
-+static void cb_track_changed(struct bt_mcp *mcp)
++static void playing_order_write(const struct l2cap_frame *frame)
 +{
-+	DBG("Track Changed");
-+	/* Since track changed has happened
-+	 * track title notification is expected
-+	 */
++	print_playing_order(frame);
 +}
 +
-+static void cb_track_title(struct bt_mcp *mcp, const uint8_t *value,
-+					uint16_t length)
++static void playing_order_notify(const struct l2cap_frame *frame)
 +{
-+	char *name;
-+	uint16_t len;
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	name = name2utf8(value, length);
-+	len = strlen(name);
-+
-+	DBG("Track Title %s", (const char *)name);
-+
-+	media_player_set_metadata(mp, NULL, "Title", name, len);
-+	media_player_metadata_changed(mp);
-+
-+	g_free(name);
++	print_playing_order(frame);
 +}
 +
-+static void cb_track_duration(struct bt_mcp *mcp, int32_t duration)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+	unsigned char buf[10];
-+
-+	/* MCP defines duration is int32 but api takes it as uint32 */
-+	sprintf((char *)buf, "%d", duration);
-+	media_player_set_metadata(mp, NULL, "Duration", buf, sizeof(buf));
-+	media_player_metadata_changed(mp);
-+}
-+
-+static void cb_track_position(struct bt_mcp *mcp, int32_t duration)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	/* MCP defines duration is int32 but api takes it as uint32 */
-+	media_player_set_position(mp, duration);
-+}
-+
-+static void cb_media_state(struct bt_mcp *mcp, uint8_t status)
-+{
-+	struct media_player *mp = bt_mcp_get_user_data(mcp);
-+
-+	media_player_set_status(mp, mcp_status_val_to_string(status));
-+}
-+
-+static const struct bt_mcp_event_callback cbs = {
-+	.player_name			= &cb_player_name,
-+	.track_changed			= &cb_track_changed,
-+	.track_title			= &cb_track_title,
-+	.track_duration			= &cb_track_duration,
-+	.track_position			= &cb_track_position,
-+	.playback_speed			= NULL,
-+	.seeking_speed			= NULL,
-+	.play_order				= NULL,
-+	.play_order_supported	= NULL,
-+	.media_state			= &cb_media_state,
-+	.content_control_id		= NULL,
++static const struct bitfield_data playing_orders_table[] = {
++	{  0, "Single once (0x0001)"	    },
++	{  1, "Single repeat (0x0002)"		},
++	{  2, "In order once (0x0004)"		},
++	{  3, "In Order Repeat (0x0008)"	},
++	{  4, "Oldest once (0x0010)"		},
++	{  5, "Oldest repeat (0x0020)"		},
++	{  6, "Newest once (0x0040)"		},
++	{  7, "Newest repeat (0x0080)"	    },
++	{  8, "Shuffle once (0x0100)"		},
++	{  9, "Shuffle repeat (0x0200)"		},
++	{  10, "RFU (0x0400)"			    },
++	{  11, "RFU (0x0800)"		        },
++	{  12, "RFU (0x1000)"				},
++	{  13, "RFU (0x2000)"				},
++	{  14, "RFU (0x4000)"				},
++	{  15, "RFU (0x8000)"				},
++	{ }
 +};
 +
-+static int ct_play(struct media_player *mp, void *user_data)
++static void print_playing_orders_supported(const struct l2cap_frame *frame)
 +{
-+	struct bt_mcp *mcp = user_data;
++	uint16_t supported_orders;
++	uint16_t mask;
 +
-+	return bt_mcp_play(mcp);
++	if (!l2cap_frame_get_le16((void *)frame, &supported_orders)) {
++		print_text(COLOR_ERROR,
++				"    Supported Playing Orders: invalid size");
++		goto done;
++	}
++
++	print_field("      Supported Playing Orders: 0x%4.4x",
++				supported_orders);
++
++	mask = print_bitfield(8, supported_orders, playing_orders_table);
++	if (mask)
++		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%4.4x)",
++								mask);
++
++done:
++	if (frame->size)
++		print_hex_field("    Data", frame->data, frame->size);
 +}
 +
-+static int ct_pause(struct media_player *mp, void *user_data)
++static void playing_orders_supported_read(const struct l2cap_frame *frame)
 +{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_pause(mcp);
++	print_playing_orders_supported(frame);
 +}
 +
-+static int ct_stop(struct media_player *mp, void *user_data)
++static const char *media_state_str(uint8_t state)
 +{
-+	struct bt_mcp *mcp = user_data;
-+
-+	return bt_mcp_stop(mcp);
++	switch (state) {
++	case 0x00:
++		return "Inactive";
++	case 0x01:
++		return "Playing";
++	case 0x02:
++		return "Paused";
++	case 0x03:
++		return "Seeking";
++	default:
++		return "RFU";
++	}
 +}
 +
-+static const struct media_player_callback ct_cbs = {
-+	.set_setting	= NULL,
-+	.play		= &ct_play,
-+	.pause		= &ct_pause,
-+	.stop		= &ct_stop,
-+	.next		= NULL,
-+	.previous	= NULL,
-+	.fast_forward	= NULL,
-+	.rewind		= NULL,
-+	.press		= NULL,
-+	.hold		= NULL,
-+	.release	= NULL,
-+	.list_items	= NULL,
-+	.change_folder	= NULL,
-+	.search		= NULL,
-+	.play_item	= NULL,
-+	.add_to_nowplaying = NULL,
-+	.total_items = NULL,
++static void print_media_state(const struct l2cap_frame *frame)
++{
++	int8_t state;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&state)) {
++		print_text(COLOR_ERROR, "  Media State: invalid size");
++		goto done;
++	}
++
++	print_field("  Media State: %s", media_state_str(state));
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void media_state_read(const struct l2cap_frame *frame)
++{
++	print_media_state(frame);
++}
++
++static void media_state_notify(const struct l2cap_frame *frame)
++{
++	print_media_state(frame);
++}
++
++struct media_cp_opcode {
++	uint8_t opcode;
++	const char *opcode_str;
++} media_cp_opcode_table[] = {
++	{0x01,	"Play"},
++	{0x02,	"Pause"},
++	{0x03,	"Fast Rewind"},
++	{0x04,	"Fast Forward"},
++	{0x05,	"Stop"},
++	{0x10,	"Move Relative"},
++	{0x20,	"Previous Segment"},
++	{0x21,	"Next Segment"},
++	{0x22,	"First Segment"},
++	{0x23,	"Last Segment"},
++	{0x24,	"Goto Segment"},
++	{0x30,	"Previous Track"},
++	{0x31,	"Next Track"},
++	{0x32,	"First Track"},
++	{0x33,	"Last Track"},
++	{0x34,	"Goto Track"},
++	{0x40,	"Previous Group"},
++	{0x41,	"Next Group"},
++	{0x42,	"First Group"},
++	{0x43,	"Last Group"},
++	{0x44,	"Goto Group"},
 +};
 +
-+static int mcp_probe(struct btd_service *service)
++static const char *cp_opcode_str(uint8_t opcode)
 +{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
++	size_t i;
 +
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
++	for (i = 0; i < ARRAY_SIZE(media_cp_opcode_table); i++) {
++		const char *str = media_cp_opcode_table[i].opcode_str;
 +
-+	/* Ignore, if we were probed for this device already */
-+	if (data) {
-+		error("Profile probed twice for the same device!");
-+		return -EINVAL;
++		if (opcode == media_cp_opcode_table[i].opcode)
++			return str;
 +	}
 +
-+	data = mcp_data_new(device);
-+	data->service = service;
-+
-+	data->mcp = bt_mcp_new(btd_gatt_database_get_db(database),
-+					btd_device_get_gatt_db(device));
-+
-+	bt_mcp_set_debug(data->mcp, mcp_debug, NULL, NULL);
-+	btd_service_set_user_data(service, data);
-+
-+	return 0;
++	return "RFU";
 +}
 +
-+static void mcp_data_free(struct mcp_data *data)
++static void print_media_cp(const struct l2cap_frame *frame)
 +{
-+	DBG("");
++	int8_t opcode;
 +
-+	if (data->service) {
-+		btd_service_set_user_data(data->service, NULL);
-+		bt_mcp_set_user_data(data->mcp, NULL);
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&opcode)) {
++		print_text(COLOR_ERROR, "  Media Control Point: invalid size");
++		goto done;
 +	}
 +
-+	if (data->mp) {
-+		media_player_destroy(data->mp);
-+		data->mp = NULL;
-+	}
++	print_field("  Media Control Point: %s", cp_opcode_str(opcode));
 +
-+	bt_mcp_unref(data->mcp);
-+	free(data);
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
 +}
 +
-+static void mcp_data_remove(struct mcp_data *data)
++static void media_cp_write(const struct l2cap_frame *frame)
 +{
-+	DBG("data %p", data);
-+
-+	mcp_data_free(data);
++	print_media_cp(frame);
 +}
 +
-+static void mcp_remove(struct btd_service *service)
++static void media_cp_notify(const struct l2cap_frame *frame)
 +{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct mcp_data *data;
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	data = btd_service_get_user_data(service);
-+	if (!data) {
-+		error("MCP service not handled by profile");
-+		return;
-+	}
-+
-+	mcp_data_remove(data);
++	print_media_cp(frame);
 +}
 +
-+static int mcp_accept(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct bt_gatt_client *client = btd_device_get_gatt_client(device);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	bt_mcp_attach(data->mcp, client);
-+
-+	data->mp = media_player_controller_create(device_get_path(device), 0);
-+	if (data->mp == NULL) {
-+		DBG("Unable to create Media Player");
-+		return -EINVAL;
-+	}
-+
-+	media_player_set_callbacks(data->mp, &ct_cbs, data->mcp);
-+
-+	bt_mcp_set_user_data(data->mcp, data->mp);
-+	bt_mcp_set_event_callbacks(data->mcp, &cbs, data->mp);
-+	btd_service_connecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int mcp_connect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	return 0;
-+}
-+
-+static int mcp_disconnect(struct btd_service *service)
-+{
-+	struct btd_device *device = btd_service_get_device(service);
-+	struct mcp_data *data = btd_service_get_user_data(service);
-+	char addr[18];
-+
-+	ba2str(device_get_address(device), addr);
-+	DBG("%s", addr);
-+
-+	if (data->mp) {
-+		media_player_destroy(data->mp);
-+		data->mp = NULL;
-+	}
-+
-+	bt_mcp_detach(data->mcp);
-+
-+	btd_service_disconnecting_complete(service, 0);
-+
-+	return 0;
-+}
-+
-+static int media_control_server_probe(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+	struct btd_gatt_database *database = btd_adapter_get_database(adapter);
-+
-+	bt_mcp_register(btd_gatt_database_get_db(database));
-+
-+	return 0;
-+}
-+
-+static void media_control_server_remove(struct btd_profile *p,
-+						struct btd_adapter *adapter)
-+{
-+
-+}
-+
-+static struct btd_profile mcp_profile = {
-+	.name			= "mcp",
-+	.priority		= BTD_PROFILE_PRIORITY_MEDIUM,
-+	.remote_uuid	= GMCS_UUID_STR,
-+	.device_probe	= mcp_probe,
-+	.device_remove	= mcp_remove,
-+	.accept			= mcp_accept,
-+	.connect		= mcp_connect,
-+	.disconnect		= mcp_disconnect,
-+
-+	.adapter_probe	= media_control_server_probe,
-+	.adapter_remove = media_control_server_remove,
++static const struct bitfield_data supported_opcodes_table[] = {
++	{0, "Play (0x00000001)"				},
++	{1, "Pause (0x00000002)"			},
++	{2, "Fast Rewind	(0x00000004)"	},
++	{3, "Fast Forward (0x00000008)"		},
++	{4, "Stop (0x00000010)"				},
++	{5, "Move Relative (0x00000020)"	},
++	{6, "Previous Segment (0x00000040)"	},
++	{7, "Next Segment (0x00000080)"		},
++	{8, "First Segment (0x00000100)"	},
++	{9, "Last Segment (0x00000200)"		},
++	{10, "Goto Segment (0x00000400)"	},
++	{11, "Previous Track (0x00000800)"	},
++	{12, "Next Track (0x00001000)"		},
++	{13, "First Track (0x00002000)"		},
++	{14, "Last Track (0x00004000)"		},
++	{15, "Goto Track (0x00008000)"		},
++	{16, "Previous Group (0x00010000)"	},
++	{17, "Next Group (0x00020000)"		},
++	{18, "First Group (0x00040000)"		},
++	{19, "Last Group (0x00080000)"		},
++	{20, "Goto Group (0x00100000)"		},
++	{21, "RFU (0x00200000)"				},
++	{22, "RFU (0x00400000)"				},
++	{23, "RFU (0x00800000)"				},
++	{24, "RFU (0x01000000)"				},
++	{25, "RFU (0x02000000)"				},
++	{26, "RFU (0x04000000)"				},
++	{27, "RFU (0x08000000)"				},
++	{28, "RFU (0x10000000)"				},
++	{29, "RFU (0x20000000)"				},
++	{30, "RFU (0x40000000)"				},
++	{31, "RFU (0x80000000)"				},
++	{ }
 +};
 +
-+static int mcp_init(void)
++static void print_media_cp_op_supported(const struct l2cap_frame *frame)
 +{
-+	DBG("");
++	uint32_t supported_opcodes;
++	uint32_t mask;
 +
-+	if (!(g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)) {
-+		warn("D-Bus experimental not enabled");
-+		return -ENOTSUP;
++	if (!l2cap_frame_get_le32((void *)frame, &supported_opcodes)) {
++		print_text(COLOR_ERROR, "    value: invalid size");
++		goto done;
 +	}
 +
-+	btd_profile_register(&mcp_profile);
-+	return 0;
++	print_field("      Supported Opcodes: 0x%8.8x", supported_opcodes);
++
++	mask = print_bitfield(8, supported_opcodes, supported_opcodes_table);
++	if (mask)
++		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%4.4x)",
++								mask);
++
++done:
++	if (frame->size)
++		print_hex_field("    Data", frame->data, frame->size);
 +}
 +
-+static void mcp_exit(void)
++static void media_cp_op_supported_read(const struct l2cap_frame *frame)
 +{
-+	DBG("");
-+
-+	if (g_dbus_get_flags() & G_DBUS_FLAG_ENABLE_EXPERIMENTAL)
-+		btd_profile_unregister(&mcp_profile);
++	print_media_cp_op_supported(frame);
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(mcp, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+							mcp_init, mcp_exit)
++static void media_cp_op_supported_notify(const struct l2cap_frame *frame)
++{
++	print_media_cp_op_supported(frame);
++}
++
++static void print_content_control_id(const struct l2cap_frame *frame)
++{
++	int8_t ccid;
++
++	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&ccid)) {
++		print_text(COLOR_ERROR, "  Content Control ID: invalid size");
++		goto done;
++	}
++
++	print_field("  Content Control ID: 0x%2.2x", ccid);
++
++done:
++	if (frame->size)
++		print_hex_field("  Data", frame->data, frame->size);
++}
++
++static void content_control_id_read(const struct l2cap_frame *frame)
++{
++	print_content_control_id(frame);
++}
++
+ #define GATT_HANDLER(_uuid, _read, _write, _notify) \
+ { \
+ 	.uuid = { \
+@@ -1776,6 +2272,23 @@ struct gatt_handler {
+ 	GATT_HANDLER(0x2b7d, vol_state_read, NULL, vol_state_notify),
+ 	GATT_HANDLER(0x2b7e, NULL, vol_cp_write, NULL),
+ 	GATT_HANDLER(0x2b7f, vol_flag_read, NULL, vol_flag_notify),
++	GATT_HANDLER(0x2b93, mp_name_read, NULL, mp_name_notify),
++	GATT_HANDLER(0x2b96, NULL, NULL, track_changed_notify),
++	GATT_HANDLER(0x2b97, track_title_read, NULL, track_title_notify),
++	GATT_HANDLER(0x2b98, track_duration_read, NULL, track_duration_notify),
++	GATT_HANDLER(0x2b99, track_position_read, track_position_write,
++					track_position_notify),
++	GATT_HANDLER(0x2b9a, playback_speed_read, playback_speed_write,
++					playback_speed_notify),
++	GATT_HANDLER(0x2b9b, seeking_speed_read, NULL, seeking_speed_notify),
++	GATT_HANDLER(0x2ba1, playing_order_read, playing_order_write,
++					playing_order_notify),
++	GATT_HANDLER(0x2ba2, playing_orders_supported_read, NULL, NULL),
++	GATT_HANDLER(0x2ba3, media_state_read, NULL, media_state_notify),
++	GATT_HANDLER(0x2ba4, NULL, media_cp_write, media_cp_notify),
++	GATT_HANDLER(0x2ba5, media_cp_op_supported_read, NULL,
++					media_cp_op_supported_notify),
++	GATT_HANDLER(0x2bba, content_control_id_read, NULL, NULL),
+ };
+ 
+ static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
 -- 
 2.25.1
 
