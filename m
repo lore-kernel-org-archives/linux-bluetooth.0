@@ -2,624 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E36D2C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 04:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC84C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 05:57:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229725AbiJREiz (ORCPT
+        id S229871AbiJRF5s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 00:38:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52518 "EHLO
+        Tue, 18 Oct 2022 01:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229895AbiJREix (ORCPT
+        with ESMTP id S229990AbiJRF5r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 00:38:53 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67553A02DF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 21:38:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666067932; x=1697603932;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ic0z+lCR/WMmhpze3jCEnItcONdGcq+pyqBcAO8MJlI=;
-  b=cpk3/h4BBAx0OtjQYNF3XIgngx6jnHOVdaRll6zG5xg/yFvpib3muWPQ
-   +69iw2ZqeyZJhNJ+NQ2rC3FVIS8TyLv7tKjDX5DfkDS9ywaYD3N0vHUJr
-   UcFhDHNQz2djjs2yFRLHWhc4xvEeLMvsU7oAUzU4cvysdvdiom5z1FXFV
-   YgeN8jMjicnO5ymq3DBfVNpkjavRMPjcRahOJ02h8OR3wIsrxXVF1WP4c
-   BGyK08egDo2IaiYpKSfTUhOT1QI5Mw7hPCa4pvLYYmepGuOvncCg+fNhK
-   pLfvIcptkTiG3V1UXx/GVl9Mwl5YKif8ibEMsx/d7V52f9jCDmAAa48u8
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="307079226"
-X-IronPort-AV: E=Sophos;i="5.95,193,1661842800"; 
-   d="scan'208";a="307079226"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2022 21:38:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10503"; a="957608048"
-X-IronPort-AV: E=Sophos;i="5.95,193,1661842800"; 
-   d="scan'208";a="957608048"
-Received: from bsbdt.iind.intel.com ([10.224.186.26])
-  by fmsmga005.fm.intel.com with ESMTP; 17 Oct 2022 21:38:50 -0700
-From:   Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
-Subject: [PATCH BlueZ v3 4/4] monitor/att: Add decoding support for GMCS
-Date:   Tue, 18 Oct 2022 10:08:31 +0530
-Message-Id: <20221018043831.342821-5-abhay.maheshbhai.maheta@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221018043831.342821-1-abhay.maheshbhai.maheta@intel.com>
-References: <20221018043831.342821-1-abhay.maheshbhai.maheta@intel.com>
+        Tue, 18 Oct 2022 01:57:47 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A0637A75E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 22:57:45 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id u71so12447962pgd.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 22:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=UiOrV1tp5kPODEJ+KU+BCJQj/7nuOVA6umbM4+n8E5E=;
+        b=kKP2dxLBYGqW2RHWiEbukA9DT0kSr4UpenjPjnp3Ucma0CAdq5Lzl2Vn3qdOusxABq
+         O3rqfE3YGoq0HOTfSklZCyhcRJyubdogDaQ3MkuqRlXVbRA/yPNuQOy5Kc3h0iV2jEh+
+         dI9p840FyymwscjtoFHL4tHoNWwjt0GjJxeGnl528ArgrI2nBTem+P0Cs7/O+RtsxZzG
+         tLtBkPHEmTsiz4wJKkgp78RuPd/fapqn0IyIkulAV/GOg5oQ+1xgqMyxDzCXrjEZeQgI
+         EjILnmZCz8ZbuqRq36io7pzFxp5ulaGv8n9JYj91j13RpEAxsyJad7MN00yJqEDmcJVG
+         e6aw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UiOrV1tp5kPODEJ+KU+BCJQj/7nuOVA6umbM4+n8E5E=;
+        b=YhCY4MSROY0ZzD72LuXo5oTWugI77x3Uh5N40kllExcKe5gMb5woBvxCZP2A2YDKiH
+         FBteIcAh3Q+Xmk+CFf+OqgKmqu6pOKj1hRbGZBCJ7lzmeEEpQHxVNG+QuF+2kj4A0D03
+         QlqSdou1kg6SbLmO1L/f2DUTKRHzGtQWomsvPsFzyr2eI6goh/TTbU42PUq2il6k8Z1h
+         K7qCMsGwgp6mKoezNnjV0m5H4smg7Htg7zzCiRq+bFYrOVtUTokplFpQYgHMaq5MFlj1
+         Sl4LEi9xOgiR8g1TZGb1bQmOMBa90R5Xpog7zWn+hjzO5YmL0BBy7bGzbNosLI5dNOf1
+         YWmQ==
+X-Gm-Message-State: ACrzQf043PWFI/lJuhA4qLWPUK2raqQH2Ali3irRkgeBGjRGqIatS1gd
+        Gk+Xhu9gQJoKc5K3jLgxVA/YlrkfJzM=
+X-Google-Smtp-Source: AMsMyM6v4zJpFbkcd2WYZHH5dNpnWQOS175wpTF7YRyHVCFSnqf+XRMVoOB5KBMC+cbfLLIYEkLuHg==
+X-Received: by 2002:a63:4426:0:b0:464:4e1d:80e3 with SMTP id r38-20020a634426000000b004644e1d80e3mr1350208pga.106.1666072664722;
+        Mon, 17 Oct 2022 22:57:44 -0700 (PDT)
+Received: from [172.17.0.2] ([20.245.58.124])
+        by smtp.gmail.com with ESMTPSA id m4-20020a170902f64400b00176b84eb29asm7554931plg.301.2022.10.17.22.57.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Oct 2022 22:57:44 -0700 (PDT)
+Message-ID: <634e4058.170a0220.1eb9a.e583@mx.google.com>
+Date:   Mon, 17 Oct 2022 22:57:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2763416975088214346=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, abhay.maheshbhai.maheta@intel.com
+Subject: RE: Media Control Profile Client
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221018043831.342821-2-abhay.maheshbhai.maheta@intel.com>
+References: <20221018043831.342821-2-abhay.maheshbhai.maheta@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds decoding support for GMCS attributes.
+--===============2763416975088214346==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-< ACL Data TX: Handle 3585 flags 0x00 dlen 7
-      ATT: Read Request (0x0a) len 2
-        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
-> ACL Data RX: Handle 3585 flags 0x02 dlen 9
-      ATT: Read Response (0x0b) len 4
-        Value: 33180000
-        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
-              Supported Opcodes: 0x00001833
-                Play (0x00000001)
-                Pause (0x00000002)
-                Stop (0x00000010)
-                Move Relative (0x00000020)
-                Previous Track (0x00000800)
-                Next Track (0x00001000)
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=686077
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      5.01 seconds
+GitLint                       PASS      2.26 seconds
+Prep - Setup ELL              PASS      31.91 seconds
+Build - Prep                  PASS      0.84 seconds
+Build - Configure             PASS      10.04 seconds
+Build - Make                  PASS      1158.38 seconds
+Make Check                    PASS      12.30 seconds
+Make Check w/Valgrind         PASS      334.76 seconds
+Make Distcheck                FAIL      13.08 seconds
+Build w/ext ELL - Configure   PASS      9.88 seconds
+Build w/ext ELL - Make        PASS      102.37 seconds
+Incremental Build w/ patches  PASS      488.91 seconds
+Scan Build                    PASS      1179.75 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ,v3,2/4] shared/mcp: Add initial code for handling MCP
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#1533: FILE: src/shared/mcp.h:14:
++#define __packed __attribute__((packed))
+
+/github/workspace/src/13009893.patch total: 0 errors, 1 warnings, 1552 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/13009893.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: Make Distcheck - FAIL
+Desc: Run distcheck to check the distribution
+Output:
+make[2]: *** No rule to make target 'shared/mcs.h', needed by 'distdir-am'.  Stop.
+make[1]: *** [Makefile:11483: distdir] Error 2
+make: *** [Makefile:11559: dist] Error 2
+
+
+
+
 ---
- monitor/att.c | 513 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 513 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/att.c b/monitor/att.c
-index f5fc32cb0..491f196bf 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -14,6 +14,7 @@
- #endif
- 
- #define _GNU_SOURCE
-+#include <ctype.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -22,6 +23,8 @@
- #include <errno.h>
- #include <linux/limits.h>
- 
-+#include <glib.h>
-+
- #include "lib/bluetooth.h"
- #include "lib/uuid.h"
- #include "lib/hci.h"
-@@ -1746,6 +1749,499 @@ static void vol_flag_notify(const struct l2cap_frame *frame)
- 	print_vcs_flag(frame);
- }
- 
-+static char *name2utf8(const uint8_t *name, uint16_t len)
-+{
-+	char utf8_name[HCI_MAX_NAME_LENGTH + 2];
-+	int i;
-+
-+	if (g_utf8_validate((const char *) name, len, NULL))
-+		return g_strndup((char *) name, len);
-+
-+	len = MIN(len, sizeof(utf8_name) - 1);
-+
-+	memset(utf8_name, 0, sizeof(utf8_name));
-+	strncpy(utf8_name, (char *) name, len);
-+
-+	/* Assume ASCII, and replace all non-ASCII with spaces */
-+	for (i = 0; utf8_name[i] != '\0'; i++) {
-+		if (!isascii(utf8_name[i]))
-+			utf8_name[i] = ' ';
-+	}
-+
-+	/* Remove leading and trailing whitespace characters */
-+	g_strstrip(utf8_name);
-+
-+	return g_strdup(utf8_name);
-+}
-+
-+static void print_mp_name(const struct l2cap_frame *frame)
-+{
-+	char *name;
-+
-+	name = name2utf8((uint8_t *)frame->data, frame->size);
-+
-+	print_field("  Media Player Name: %s", name);
-+}
-+
-+static void mp_name_read(const struct l2cap_frame *frame)
-+{
-+	print_mp_name(frame);
-+}
-+
-+static void mp_name_notify(const struct l2cap_frame *frame)
-+{
-+	print_mp_name(frame);
-+}
-+
-+static void print_track_changed(const struct l2cap_frame *frame)
-+{
-+	print_field("  Track Changed");
-+}
-+
-+static void track_changed_notify(const struct l2cap_frame *frame)
-+{
-+	print_track_changed(frame);
-+}
-+
-+static void print_track_title(const struct l2cap_frame *frame)
-+{
-+	char *name;
-+
-+	name = name2utf8((uint8_t *)frame->data, frame->size);
-+
-+	print_field("  Track Title: %s", name);
-+}
-+
-+static void track_title_read(const struct l2cap_frame *frame)
-+{
-+	print_track_title(frame);
-+}
-+
-+static void track_title_notify(const struct l2cap_frame *frame)
-+{
-+	print_track_title(frame);
-+}
-+
-+static void print_track_duration(const struct l2cap_frame *frame)
-+{
-+	int32_t duration;
-+
-+	if (!l2cap_frame_get_le32((void *)frame, (uint32_t *)&duration)) {
-+		print_text(COLOR_ERROR, "  Track Duration: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Track Duration: %u", duration);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void track_duration_read(const struct l2cap_frame *frame)
-+{
-+	print_track_duration(frame);
-+}
-+
-+static void track_duration_notify(const struct l2cap_frame *frame)
-+{
-+	print_track_duration(frame);
-+}
-+
-+static void print_track_position(const struct l2cap_frame *frame)
-+{
-+	int32_t position;
-+
-+	if (!l2cap_frame_get_le32((void *)frame, (uint32_t *)&position)) {
-+		print_text(COLOR_ERROR, "  Track Position: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Track Position: %u", position);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void track_position_read(const struct l2cap_frame *frame)
-+{
-+	print_track_position(frame);
-+}
-+
-+static void track_position_write(const struct l2cap_frame *frame)
-+{
-+	print_track_position(frame);
-+}
-+
-+static void track_position_notify(const struct l2cap_frame *frame)
-+{
-+	print_track_position(frame);
-+}
-+
-+static void print_playback_speed(const struct l2cap_frame *frame)
-+{
-+	int8_t playback_speed;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&playback_speed)) {
-+		print_text(COLOR_ERROR, "  Playback Speed: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Playback Speed: %u", playback_speed);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void playback_speed_read(const struct l2cap_frame *frame)
-+{
-+	print_playback_speed(frame);
-+}
-+
-+static void playback_speed_write(const struct l2cap_frame *frame)
-+{
-+	print_playback_speed(frame);
-+}
-+
-+static void playback_speed_notify(const struct l2cap_frame *frame)
-+{
-+	print_playback_speed(frame);
-+}
-+
-+static void print_seeking_speed(const struct l2cap_frame *frame)
-+{
-+	int8_t seeking_speed;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&seeking_speed)) {
-+		print_text(COLOR_ERROR, "  Seeking Speed: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Seeking Speed: %u", seeking_speed);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void seeking_speed_read(const struct l2cap_frame *frame)
-+{
-+	print_seeking_speed(frame);
-+}
-+
-+static void seeking_speed_notify(const struct l2cap_frame *frame)
-+{
-+	print_seeking_speed(frame);
-+}
-+
-+static const char *play_order_str(uint8_t order)
-+{
-+	switch (order) {
-+	case 0x01:
-+		return "Single once";
-+	case 0x02:
-+		return "Single repeat";
-+	case 0x03:
-+		return "In order once";
-+	case 0x04:
-+		return "In order repeat";
-+	case 0x05:
-+		return "Oldest once";
-+	case 0x06:
-+		return "Oldest repeat";
-+	case 0x07:
-+		return "Newest once";
-+	case 0x08:
-+		return "Newest repeat";
-+	case 0x09:
-+		return "Shuffle once";
-+	case 0x0A:
-+		return "Shuffle repeat";
-+	default:
-+		return "RFU";
-+	}
-+}
-+
-+static void print_playing_order(const struct l2cap_frame *frame)
-+{
-+	int8_t playing_order;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&playing_order)) {
-+		print_text(COLOR_ERROR, "  Playing Order: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Playing Order: %s", play_order_str(playing_order));
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void playing_order_read(const struct l2cap_frame *frame)
-+{
-+	print_playing_order(frame);
-+}
-+
-+static void playing_order_write(const struct l2cap_frame *frame)
-+{
-+	print_playing_order(frame);
-+}
-+
-+static void playing_order_notify(const struct l2cap_frame *frame)
-+{
-+	print_playing_order(frame);
-+}
-+
-+static const struct bitfield_data playing_orders_table[] = {
-+	{  0, "Single once (0x0001)"	    },
-+	{  1, "Single repeat (0x0002)"		},
-+	{  2, "In order once (0x0004)"		},
-+	{  3, "In Order Repeat (0x0008)"	},
-+	{  4, "Oldest once (0x0010)"		},
-+	{  5, "Oldest repeat (0x0020)"		},
-+	{  6, "Newest once (0x0040)"		},
-+	{  7, "Newest repeat (0x0080)"	    },
-+	{  8, "Shuffle once (0x0100)"		},
-+	{  9, "Shuffle repeat (0x0200)"		},
-+	{  10, "RFU (0x0400)"			    },
-+	{  11, "RFU (0x0800)"		        },
-+	{  12, "RFU (0x1000)"				},
-+	{  13, "RFU (0x2000)"				},
-+	{  14, "RFU (0x4000)"				},
-+	{  15, "RFU (0x8000)"				},
-+	{ }
-+};
-+
-+static void print_playing_orders_supported(const struct l2cap_frame *frame)
-+{
-+	uint16_t supported_orders;
-+	uint16_t mask;
-+
-+	if (!l2cap_frame_get_le16((void *)frame, &supported_orders)) {
-+		print_text(COLOR_ERROR,
-+				"    Supported Playing Orders: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("      Supported Playing Orders: 0x%4.4x",
-+				supported_orders);
-+
-+	mask = print_bitfield(8, supported_orders, playing_orders_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%4.4x)",
-+								mask);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("    Data", frame->data, frame->size);
-+}
-+
-+static void playing_orders_supported_read(const struct l2cap_frame *frame)
-+{
-+	print_playing_orders_supported(frame);
-+}
-+
-+static const char *media_state_str(uint8_t state)
-+{
-+	switch (state) {
-+	case 0x00:
-+		return "Inactive";
-+	case 0x01:
-+		return "Playing";
-+	case 0x02:
-+		return "Paused";
-+	case 0x03:
-+		return "Seeking";
-+	default:
-+		return "RFU";
-+	}
-+}
-+
-+static void print_media_state(const struct l2cap_frame *frame)
-+{
-+	int8_t state;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&state)) {
-+		print_text(COLOR_ERROR, "  Media State: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Media State: %s", media_state_str(state));
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void media_state_read(const struct l2cap_frame *frame)
-+{
-+	print_media_state(frame);
-+}
-+
-+static void media_state_notify(const struct l2cap_frame *frame)
-+{
-+	print_media_state(frame);
-+}
-+
-+struct media_cp_opcode {
-+	uint8_t opcode;
-+	const char *opcode_str;
-+} media_cp_opcode_table[] = {
-+	{0x01,	"Play"},
-+	{0x02,	"Pause"},
-+	{0x03,	"Fast Rewind"},
-+	{0x04,	"Fast Forward"},
-+	{0x05,	"Stop"},
-+	{0x10,	"Move Relative"},
-+	{0x20,	"Previous Segment"},
-+	{0x21,	"Next Segment"},
-+	{0x22,	"First Segment"},
-+	{0x23,	"Last Segment"},
-+	{0x24,	"Goto Segment"},
-+	{0x30,	"Previous Track"},
-+	{0x31,	"Next Track"},
-+	{0x32,	"First Track"},
-+	{0x33,	"Last Track"},
-+	{0x34,	"Goto Track"},
-+	{0x40,	"Previous Group"},
-+	{0x41,	"Next Group"},
-+	{0x42,	"First Group"},
-+	{0x43,	"Last Group"},
-+	{0x44,	"Goto Group"},
-+};
-+
-+static const char *cp_opcode_str(uint8_t opcode)
-+{
-+	size_t i;
-+
-+	for (i = 0; i < ARRAY_SIZE(media_cp_opcode_table); i++) {
-+		const char *str = media_cp_opcode_table[i].opcode_str;
-+
-+		if (opcode == media_cp_opcode_table[i].opcode)
-+			return str;
-+	}
-+
-+	return "RFU";
-+}
-+
-+static void print_media_cp(const struct l2cap_frame *frame)
-+{
-+	int8_t opcode;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&opcode)) {
-+		print_text(COLOR_ERROR, "  Media Control Point: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Media Control Point: %s", cp_opcode_str(opcode));
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void media_cp_write(const struct l2cap_frame *frame)
-+{
-+	print_media_cp(frame);
-+}
-+
-+static void media_cp_notify(const struct l2cap_frame *frame)
-+{
-+	print_media_cp(frame);
-+}
-+
-+static const struct bitfield_data supported_opcodes_table[] = {
-+	{0, "Play (0x00000001)"				},
-+	{1, "Pause (0x00000002)"			},
-+	{2, "Fast Rewind	(0x00000004)"	},
-+	{3, "Fast Forward (0x00000008)"		},
-+	{4, "Stop (0x00000010)"				},
-+	{5, "Move Relative (0x00000020)"	},
-+	{6, "Previous Segment (0x00000040)"	},
-+	{7, "Next Segment (0x00000080)"		},
-+	{8, "First Segment (0x00000100)"	},
-+	{9, "Last Segment (0x00000200)"		},
-+	{10, "Goto Segment (0x00000400)"	},
-+	{11, "Previous Track (0x00000800)"	},
-+	{12, "Next Track (0x00001000)"		},
-+	{13, "First Track (0x00002000)"		},
-+	{14, "Last Track (0x00004000)"		},
-+	{15, "Goto Track (0x00008000)"		},
-+	{16, "Previous Group (0x00010000)"	},
-+	{17, "Next Group (0x00020000)"		},
-+	{18, "First Group (0x00040000)"		},
-+	{19, "Last Group (0x00080000)"		},
-+	{20, "Goto Group (0x00100000)"		},
-+	{21, "RFU (0x00200000)"				},
-+	{22, "RFU (0x00400000)"				},
-+	{23, "RFU (0x00800000)"				},
-+	{24, "RFU (0x01000000)"				},
-+	{25, "RFU (0x02000000)"				},
-+	{26, "RFU (0x04000000)"				},
-+	{27, "RFU (0x08000000)"				},
-+	{28, "RFU (0x10000000)"				},
-+	{29, "RFU (0x20000000)"				},
-+	{30, "RFU (0x40000000)"				},
-+	{31, "RFU (0x80000000)"				},
-+	{ }
-+};
-+
-+static void print_media_cp_op_supported(const struct l2cap_frame *frame)
-+{
-+	uint32_t supported_opcodes;
-+	uint32_t mask;
-+
-+	if (!l2cap_frame_get_le32((void *)frame, &supported_opcodes)) {
-+		print_text(COLOR_ERROR, "    value: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("      Supported Opcodes: 0x%8.8x", supported_opcodes);
-+
-+	mask = print_bitfield(8, supported_opcodes, supported_opcodes_table);
-+	if (mask)
-+		print_text(COLOR_WHITE_BG, "    Unknown fields (0x%4.4x)",
-+								mask);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("    Data", frame->data, frame->size);
-+}
-+
-+static void media_cp_op_supported_read(const struct l2cap_frame *frame)
-+{
-+	print_media_cp_op_supported(frame);
-+}
-+
-+static void media_cp_op_supported_notify(const struct l2cap_frame *frame)
-+{
-+	print_media_cp_op_supported(frame);
-+}
-+
-+static void print_content_control_id(const struct l2cap_frame *frame)
-+{
-+	int8_t ccid;
-+
-+	if (!l2cap_frame_get_u8((void *)frame, (uint8_t *)&ccid)) {
-+		print_text(COLOR_ERROR, "  Content Control ID: invalid size");
-+		goto done;
-+	}
-+
-+	print_field("  Content Control ID: 0x%2.2x", ccid);
-+
-+done:
-+	if (frame->size)
-+		print_hex_field("  Data", frame->data, frame->size);
-+}
-+
-+static void content_control_id_read(const struct l2cap_frame *frame)
-+{
-+	print_content_control_id(frame);
-+}
-+
- #define GATT_HANDLER(_uuid, _read, _write, _notify) \
- { \
- 	.uuid = { \
-@@ -1776,6 +2272,23 @@ struct gatt_handler {
- 	GATT_HANDLER(0x2b7d, vol_state_read, NULL, vol_state_notify),
- 	GATT_HANDLER(0x2b7e, NULL, vol_cp_write, NULL),
- 	GATT_HANDLER(0x2b7f, vol_flag_read, NULL, vol_flag_notify),
-+	GATT_HANDLER(0x2b93, mp_name_read, NULL, mp_name_notify),
-+	GATT_HANDLER(0x2b96, NULL, NULL, track_changed_notify),
-+	GATT_HANDLER(0x2b97, track_title_read, NULL, track_title_notify),
-+	GATT_HANDLER(0x2b98, track_duration_read, NULL, track_duration_notify),
-+	GATT_HANDLER(0x2b99, track_position_read, track_position_write,
-+					track_position_notify),
-+	GATT_HANDLER(0x2b9a, playback_speed_read, playback_speed_write,
-+					playback_speed_notify),
-+	GATT_HANDLER(0x2b9b, seeking_speed_read, NULL, seeking_speed_notify),
-+	GATT_HANDLER(0x2ba1, playing_order_read, playing_order_write,
-+					playing_order_notify),
-+	GATT_HANDLER(0x2ba2, playing_orders_supported_read, NULL, NULL),
-+	GATT_HANDLER(0x2ba3, media_state_read, NULL, media_state_notify),
-+	GATT_HANDLER(0x2ba4, NULL, media_cp_write, media_cp_notify),
-+	GATT_HANDLER(0x2ba5, media_cp_op_supported_read, NULL,
-+					media_cp_op_supported_notify),
-+	GATT_HANDLER(0x2bba, content_control_id_read, NULL, NULL),
- };
- 
- static struct gatt_handler *get_handler(struct gatt_db_attribute *attr)
--- 
-2.25.1
 
+--===============2763416975088214346==--
