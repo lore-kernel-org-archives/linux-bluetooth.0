@@ -2,97 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5111C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 20:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0BBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 20:50:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbiJRUbg (ORCPT
+        id S229660AbiJRUuF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 16:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42028 "EHLO
+        Tue, 18 Oct 2022 16:50:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229610AbiJRUb2 (ORCPT
+        with ESMTP id S229925AbiJRUty (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 16:31:28 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5BA6B64E
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:31:26 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id r14so24631674lfm.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:31:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UDPB3Q6dSE9ijvVfoNnjvYPTT4vjLzhzpnvMtyDXCP4=;
-        b=p/gy3gmyVdt5byNX1LDEMcFgHR2BKKNN8U13Rl0zGMsgshw/Beq9O97ZrzYxx/2JcZ
-         ar/Jl/GiEvAZy9F873zQBF9RgNm8NX3G3uAJGOv8aiuCXdYarWRRn1e6u5t3CY1i+1rh
-         gpnngKU7ErtArzXc+Nmyc6FXO9EnL4623dTUgv8f0z4Bz2/flZFyNKvrzkd5Z7J/31SM
-         u9dRVgq5p47aD6aEwxvG8qUovJHgckr0musrb3M97RZnUQIIUpjwNkhibu+cfK8XG2bK
-         Kx31eRgt+kvQ5NA6ag7pM23syBoVTExmDr+2GSN+5SbIc07oyCX0dAbVn3fBf/RuOvFl
-         Yprw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UDPB3Q6dSE9ijvVfoNnjvYPTT4vjLzhzpnvMtyDXCP4=;
-        b=fhteE+P8QJGN7YM52qMkE9hBIiyTzTCQ+VPqud1vfzLtelDbt4J5pPpOqf/A1FtEdc
-         mMHiNCZn82v7uEUEjKOYs5lqmKf7NJrwO2q3Q4f8LCVeNK7bFGgzTdC947uucCJXMTM2
-         jqPHvT/81rFGZs78epRyBZpoVlWJtovmNL1Ez7lvq+Sx9lPDj7ch9mNjRsd8Tf3eRQ1T
-         yEBXr7H+HwoT6sIiwQNevnPdKSrpkyDdK5WWKStrr0jb63l+aiOUOEeteQSU8NBqGy8Q
-         ZhK5NwqCERNXyQMOdOxGBYAQRjOQCtN6tKndV+S/sqLtKFfDfTSo01uX7tKTHHsLxYCm
-         nPxQ==
-X-Gm-Message-State: ACrzQf0lKU55k7odQqmqkNgkAv2fnscTjAHQIuaaDkD/HswYLNh5opzO
-        XDXjbua6Er3gqkbIzz1ukhr4ZLBKslSaYBqniIpPZXca
-X-Google-Smtp-Source: AMsMyM6oMmZJF4u8au7+QWG4g+LO++YOqXBOnwDSvrsUNbrHsNFYRhcRw+qWGq9lYf42mCSZ0FaufQrN+qYTvJKLrXQ=
-X-Received: by 2002:a05:6512:483:b0:4a2:6905:dfae with SMTP id
- v3-20020a056512048300b004a26905dfaemr1638148lfq.57.1666125084064; Tue, 18 Oct
- 2022 13:31:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221018191911.589564-2-Igor.Skalkin@opensynergy.com> <634f045d.630a0220.5e841.f646@mx.google.com>
-In-Reply-To: <634f045d.630a0220.5e841.f646@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 18 Oct 2022 13:31:12 -0700
-Message-ID: <CABBYNZKo9pDLhReauaNDiCrQb_VvjecNc9u6y4NZCtg4q4gV-Q@mail.gmail.com>
-Subject: Re: virtio_bt: Fix alignment in configuration struct
+        Tue, 18 Oct 2022 16:49:54 -0400
+Received: from out-28.smtp.github.com (out-28.smtp.github.com [192.30.252.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0937F3A6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:49:43 -0700 (PDT)
+Received: from github.com (hubbernetes-node-45b6459.ash1-iad.github.net [10.56.201.101])
+        by smtp.github.com (Postfix) with ESMTPA id 186C09007B7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 13:49:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=github.com;
+        s=pf2014; t=1666126182;
+        bh=MHs61tKqcqRWtDUY5CCjEQkKaoB8zUAvna/w+XfRm40=;
+        h=Date:From:To:Subject:From;
+        b=Oi5wYEH2g57O1VbQK7O3sgtn8ERpQPZ+C83tfRnSct23U2uQ/M53Rd45GHhm/p1cM
+         BN0mP3AyFQ9O1JzAtizPi3HoKQCARInX9JMFwnphf1wsr5jwShjNvpkiidsfbPTMFG
+         RcgvC7at6jFzy394H5aM1mOVCNNg5YrQYsEvGMjA=
+Date:   Tue, 18 Oct 2022 13:49:42 -0700
+From:   Abhay <noreply@github.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     igor.skalkin@opensynergy.com
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <bluez/bluez/push/refs/heads/master/1096a9-07fd4b@github.com>
+Subject: [bluez/bluez] d3a204: lib/uuid: Add GMCS UUIDs
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-GitHub-Recipient-Address: linux-bluetooth@vger.kernel.org
+X-Auto-Response-Suppress: All
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Igor,
+  Branch: refs/heads/master
+  Home:   https://github.com/bluez/bluez
+  Commit: d3a204b8a2c08d554faab5ad5bb8581620c457bb
+      https://github.com/bluez/bluez/commit/d3a204b8a2c08d554faab5ad5bb8581620c457bb
+  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+  Date:   2022-10-18 (Tue, 18 Oct 2022)
 
-On Tue, Oct 18, 2022 at 12:58 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is an automated email and please do not reply to this email.
->
-> Dear Submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
->
-> ----- Output -----
-> error: patch failed: drivers/bluetooth/virtio_bt.c:306
-> error: drivers/bluetooth/virtio_bt.c: patch does not apply
-> error: patch failed: include/uapi/linux/virtio_bt.h:9
-> error: include/uapi/linux/virtio_bt.h: patch does not apply
-> hint: Use 'git am --show-current-patch' to see the failed patch
->
->
-> Please resolve the issue and submit the patches again.
+  Changed paths:
+    M lib/uuid.h
 
-This is very likely due to your mail server changing the format of the
-patch, you can use gmail to send the email like you did previously,
-that doesn't affect the commit author which is what needs to match the
-Signed-off-by.
+  Log Message:
+  -----------
+  lib/uuid: Add GMCS UUIDs
 
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+This adds GMCS UUIDs which will be used by Media Control Profile.
 
 
--- 
-Luiz Augusto von Dentz
+  Commit: 3973147aa8e424bd2ab78304b54d914208d560d1
+      https://github.com/bluez/bluez/commit/3973147aa8e424bd2ab78304b54d914208d560d1
+  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+  Date:   2022-10-18 (Tue, 18 Oct 2022)
+
+  Changed paths:
+    M Makefile.am
+    A src/shared/mcp.c
+    A src/shared/mcp.h
+    A src/shared/mcs.h
+
+  Log Message:
+  -----------
+  shared/mcp: Add initial code for handling MCP
+
+This adds initial code for Media Control Profile for Client Role.
+
+
+  Commit: 123e1ee1ce063af2e28ed7153627081710aa75af
+      https://github.com/bluez/bluez/commit/123e1ee1ce063af2e28ed7153627081710aa75af
+  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+  Date:   2022-10-18 (Tue, 18 Oct 2022)
+
+  Changed paths:
+    M Makefile.plugins
+    M configure.ac
+    A profiles/audio/mcp.c
+
+  Log Message:
+  -----------
+  profiles: Add initial code for mcp plugin
+
+This adds initial code for mcp plugin which handles Media Control Profile
+and Generic Media Control Service for Client Role.
+The plugin exposes dbus methods for media control operations
+like play, pause which can be invoked using player menu
+in bluetoothctl.
+
+
+  Commit: 07fd4b948251f0613df230ca365b8440808c5a5c
+      https://github.com/bluez/bluez/commit/07fd4b948251f0613df230ca365b8440808c5a5c
+  Author: Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
+  Date:   2022-10-18 (Tue, 18 Oct 2022)
+
+  Changed paths:
+    M monitor/att.c
+
+  Log Message:
+  -----------
+  monitor/att: Add decoding support for GMCS
+
+This adds decoding support for GMCS attributes.
+
+< ACL Data TX: Handle 3585 flags 0x00 dlen 7
+      ATT: Read Request (0x0a) len 2
+        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
+> ACL Data RX: Handle 3585 flags 0x02 dlen 9
+      ATT: Read Response (0x0b) len 4
+        Value: 33180000
+        Handle: 0x0056 Type: Media Control Point Opcodes Supported (0x2ba5)
+              Supported Opcodes: 0x00001833
+                Play (0x00000001)
+                Pause (0x00000002)
+                Stop (0x00000010)
+                Move Relative (0x00000020)
+                Previous Track (0x00000800)
+                Next Track (0x00001000)
+
+
+Compare: https://github.com/bluez/bluez/compare/1096a99cadfa...07fd4b948251
