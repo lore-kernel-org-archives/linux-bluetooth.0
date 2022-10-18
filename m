@@ -2,154 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E88C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 02:21:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2C1C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 Oct 2022 03:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230026AbiJRCV6 (ORCPT
+        id S231297AbiJRDmU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 Oct 2022 22:21:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43542 "EHLO
+        Mon, 17 Oct 2022 23:42:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiJRCV5 (ORCPT
+        with ESMTP id S230044AbiJRDmA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 Oct 2022 22:21:57 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F6FA8D0CB;
-        Mon, 17 Oct 2022 19:21:48 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id i6so12467917pli.12;
-        Mon, 17 Oct 2022 19:21:48 -0700 (PDT)
+        Mon, 17 Oct 2022 23:42:00 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDE35F7D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 20:38:05 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id 204so12892855pfx.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 17 Oct 2022 20:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xQe6WDAOYHq4a+xfdiJbwfTzKRbnd4s6fpLl3pLZwHY=;
-        b=V5hcJVkrAsENglV9EVi00qDhW6ik0sjdL0tWfmnBI0IlkBwsWfWxJGPli2xhRJIGlI
-         bPeBEdW27XAsJW+Y7cTSLwK/Y2mraw7s9Vq1Ewzup49cXCzeZDPIK+3Ztg+JJk5vB2kK
-         4JgB936N2XKc/fw4JFFh+zOj7Yx0syn2KQ7lq2waPuhywowqKjemRoiyH8u2/QyAsM1k
-         dAA7zEeIAx4OQNTWMi0F8GsClmmNyJhE/UICuQoNXYBJdLxUHAsdVbAVBVtPgXzj8IBu
-         Xozns9wxsChPOeO6y/NpZt0JcFCs537Veit/oXRK0Af2/BK59fJ5EMhVqmGYpxvIXQT0
-         3Bcw==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hsHn14SvVu3n5RW+wVCKi+A1WyZ8hJwk8/88MIiQa2s=;
+        b=qKi4rMzWQIMfk50SJmIdFux39wYIgh7x3pqQp5Y0kVoPrvo8Nf0/nYjtYXh/Tl64Wg
+         gs67R1n3HlbVceYLz97i/3jGg7z9PmSoh5OZqB5kiG/IBnH4tt5tCFo3BQ9H4rsZAuxf
+         yAZxBvs+sb3cSrj8t17ffDzeLWO5B/kJkjtq2e6KvxLq5TDcrrzQTjquZI4REvLkwp3G
+         6vEaAPhFwxsDQthxq+ACEUe3Cm77H92slLNcCrV867UjVPcXd6KdeKtKc+emlkIn8Bl9
+         GfzOANT/qg0b/sTnHKXkTKcOLZIDSbi43zwtfDtibMsKrvXs74+MobyBzp6ljsmqz6wI
+         yKmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xQe6WDAOYHq4a+xfdiJbwfTzKRbnd4s6fpLl3pLZwHY=;
-        b=a6ZOCNu60jsAw3fsFzQz3y9Y1x49kKiJJxjKMvRA+dWyH+rOxiD4dd+nWr9EUTlciw
-         /6R4VWhI5boEF9dfF4mgLjH1ZSb42oKCzRRWssqGvpiD9JYDRx38K143I4indKk6G3xb
-         bIj9EygKKTmTuoHfmMCG9Xx1VWLrt3fC+Z8guHfOmXXM4FiCaRB5C4PgcKRNr35kVukh
-         yQsCplZIewPeLSfUX+yU89Q1UAso2w7m+lAvA7KjXFceeoQVeCP8gy7qHkkSVi2eTKvk
-         STqkZUmZ5pJLGkUNhY3j7EUHJZqKZfyenbZRQiw8l6XYg2BwTWFJ8g9WAwBCMA70cl2Q
-         LfZA==
-X-Gm-Message-State: ACrzQf1RGpSfkDUcVh2oCz2HE1Imojr6J/I1hdo6ick4r+3zYRrzdrUQ
-        vuXzPa5Tpdy7wzpFqny1Abo=
-X-Google-Smtp-Source: AMsMyM5nGoVqHZecaVai5tDSmuhi5LMeSC/3uKzGbl3iSmPz6klUuDKSctRlkoeQpd2jPYuB8JSEFg==
-X-Received: by 2002:a17:90b:3b50:b0:20d:93f3:9c8d with SMTP id ot16-20020a17090b3b5000b0020d93f39c8dmr34106749pjb.150.1666059706442;
-        Mon, 17 Oct 2022 19:21:46 -0700 (PDT)
-Received: from localhost ([159.226.94.113])
-        by smtp.gmail.com with ESMTPSA id w18-20020a170902e89200b0017c37a5a2fdsm7303815plg.216.2022.10.17.19.21.45
+        bh=hsHn14SvVu3n5RW+wVCKi+A1WyZ8hJwk8/88MIiQa2s=;
+        b=0Aapxna9/VtVaJqdEmx42dN6nyqXQkkHaaHTe2PI4sw82KeeiUwGMe4usT75rQfBCm
+         pJtcl+7eiXYcFdjsQPoIPjhGcwDr49LjzO3ZR3CJc4pBZOsvQWOAZUnew5gvPFsy1pKP
+         VlFta3GfcLc/IzCr2BWi11PTdLt5BX6EZxsNEFeV3qzhE+z5gkl6jC3Tt/qFpwIwIUq9
+         NFGYh2Lqbze1vNa12vWjoeWZPC/GIn2GAUa/RflePKQYKCTSpkimZ8jwvBaf1BxsC0uu
+         dxRyf6NWa8//5qPx0ZWGF2MEnJcawg3EivIN1bHn9vxlh8mfMEDK6HkybcAomQnbqKvt
+         ClRQ==
+X-Gm-Message-State: ACrzQf2mjebhuc0CnUZgE+ZFbmtg9V4yWKGfcgBSoRHs3aV9V0FqvopQ
+        sI/UJJYpm6CQvf06IN5x+w9/Nj7aKSI=
+X-Google-Smtp-Source: AMsMyM7BLQuPVV0a9Jh0LNWwtYf6vDJvAtp0nI9dHz5La7hx+VMhXHUa96W+yCBfLcCt83NWxszpMw==
+X-Received: by 2002:a63:5b05:0:b0:460:a6a:ec38 with SMTP id p5-20020a635b05000000b004600a6aec38mr885774pgb.485.1666064284590;
+        Mon, 17 Oct 2022 20:38:04 -0700 (PDT)
+Received: from [172.17.0.2] ([20.228.70.207])
+        by smtp.gmail.com with ESMTPSA id q29-20020aa7983d000000b005625d5ae760sm8143348pfl.11.2022.10.17.20.38.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Oct 2022 19:21:45 -0700 (PDT)
-From:   Hawkins Jiawei <yin31149@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     18801353760@163.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com,
-        netdev@vger.kernel.org,
-        syzbot+8f819e36e01022991cfa@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, yin31149@gmail.com
-Subject: [PATCH v2] Bluetooth: L2CAP: Fix memory leak in vhci_write
-Date:   Tue, 18 Oct 2022 10:18:51 +0800
-Message-Id: <20221018021851.2900-1-yin31149@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Mon, 17 Oct 2022 20:38:04 -0700 (PDT)
+Message-ID: <634e1f9c.a70a0220.19636.ea53@mx.google.com>
+Date:   Mon, 17 Oct 2022 20:38:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6337841691629528948=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,v2] doc: test patch - DO NOT MERGE
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20220928045439.210967-1-hj.tedd.an@gmail.com>
+References: <20220928045439.210967-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzkaller reports a memory leak as follows:
-====================================
-BUG: memory leak
-unreferenced object 0xffff88810d81ac00 (size 240):
-  [...]
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-  backtrace:
-    [<ffffffff838733d9>] __alloc_skb+0x1f9/0x270 net/core/skbuff.c:418
-    [<ffffffff833f742f>] alloc_skb include/linux/skbuff.h:1257 [inline]
-    [<ffffffff833f742f>] bt_skb_alloc include/net/bluetooth/bluetooth.h:469 [inline]
-    [<ffffffff833f742f>] vhci_get_user drivers/bluetooth/hci_vhci.c:391 [inline]
-    [<ffffffff833f742f>] vhci_write+0x5f/0x230 drivers/bluetooth/hci_vhci.c:511
-    [<ffffffff815e398d>] call_write_iter include/linux/fs.h:2192 [inline]
-    [<ffffffff815e398d>] new_sync_write fs/read_write.c:491 [inline]
-    [<ffffffff815e398d>] vfs_write+0x42d/0x540 fs/read_write.c:578
-    [<ffffffff815e3cdd>] ksys_write+0x9d/0x160 fs/read_write.c:631
-    [<ffffffff845e0645>] do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-    [<ffffffff845e0645>] do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-    [<ffffffff84600087>] entry_SYSCALL_64_after_hwframe+0x63/0xcd
-====================================
+--===============6337841691629528948==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-HCI core will uses hci_rx_work() to process frame, which is queued to
-the hdev->rx_q tail in hci_recv_frame() by HCI driver.
+This is automated email and please do not reply to this email!
 
-Yet the problem is that, HCI core may not free the skb after handling
-ACL data packets. To be more specific, when start fragment does not
-contain the L2CAP length, HCI core just copies skb into conn->rx_skb and
-finishes frame process in l2cap_recv_acldata(), without freeing the skb,
-which triggers the above memory leak.
+Dear submitter,
 
-This patch solves it by releasing the relative skb, after processing
-the above case in l2cap_recv_acldata().
-[Thanks Luiz Augusto von Dentz for his suggestion on using break]
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=681301
 
-Fixes: 4d7ea8ee90e4 ("Bluetooth: L2CAP: Fix handling fragmented length")
-Link: https://lore.kernel.org/all/0000000000000d0b1905e6aaef64@google.com/
-Reported-and-tested-by: syzbot+8f819e36e01022991cfa@syzkaller.appspotmail.com
-Signed-off-by: Hawkins Jiawei <yin31149@gmail.com>
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.62 seconds
+GitLint                       PASS      0.45 seconds
+Prep - Setup ELL              PASS      30.93 seconds
+Build - Prep                  PASS      0.76 seconds
+Build - Configure             PASS      9.55 seconds
+Build - Make                  PASS      1153.33 seconds
+Make Check                    PASS      12.66 seconds
+Make Check w/Valgrind         PASS      346.53 seconds
+Make Distcheck                PASS      276.50 seconds
+Build w/ext ELL - Configure   PASS      9.70 seconds
+Build w/ext ELL - Make        PASS      99.18 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      638.59 seconds
+
+
+
 ---
-v2:
-  - refactor the commit message on the problem description
-  - refactor the goto drop with break, suggested by
-Luiz Augusto von Dentz
+Regards,
+Linux Bluetooth
 
-v1:
-  https://lore.kernel.org/all/20221017074432.12177-1-yin31149@gmail.com/
 
- net/bluetooth/l2cap_core.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1f34b82ca0ec..f0fb234c2e54 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -8426,9 +8426,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 		 * expected length.
- 		 */
- 		if (skb->len < L2CAP_LEN_SIZE) {
--			if (l2cap_recv_frag(conn, skb, conn->mtu) < 0)
--				goto drop;
--			return;
-+			l2cap_recv_frag(conn, skb, conn->mtu);
-+			break;
- 		}
- 
- 		len = get_unaligned_le16(skb->data) + L2CAP_HDR_SIZE;
-@@ -8472,7 +8471,7 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
- 
- 			/* Header still could not be read just continue */
- 			if (conn->rx_skb->len < L2CAP_LEN_SIZE)
--				return;
-+				break;
- 		}
- 
- 		if (skb->len > conn->rx_len) {
--- 
-2.25.1
-
+--===============6337841691629528948==--
