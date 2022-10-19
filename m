@@ -2,103 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17206C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Oct 2022 00:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5C4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Oct 2022 06:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229864AbiJSAvt (ORCPT
+        id S229974AbiJSGDn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 Oct 2022 20:51:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
+        Wed, 19 Oct 2022 02:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiJSAvn (ORCPT
+        with ESMTP id S229932AbiJSGDg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 Oct 2022 20:51:43 -0400
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 123D0C96F0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 17:51:35 -0700 (PDT)
-Received: by mail-oi1-x230.google.com with SMTP id j188so17560305oih.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 17:51:35 -0700 (PDT)
+        Wed, 19 Oct 2022 02:03:36 -0400
+Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50825C351
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 23:03:34 -0700 (PDT)
+Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-35befab86a4so158001537b3.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 23:03:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=61OOgXrtpX965FTbS9r+OT2a55TPQ1Uu6d7nG7BIhTQ=;
-        b=HaB4udL9llpMIZ/AhyoJLHBo9/0bhKo4269CsiU2eP+lTxONKujsSpfRcTN9VCBg9H
-         1pJKUTeZ4ORk/dagFXwgeqkx/7oaPmplv1rIzSbq55jxF8PVBv9CM4BZs/YowQ8Hombg
-         +Fow28ufBgFePlatO5lcQYAoiueD+6smQ9bWKfibGF6p1bIEJVe3AagdYL7RjImKTmBf
-         NlK8yvDmT8z4IlfWRuA0KRUirnOyNJrgswX0r3wFYZDQWfXnMSgKPvjzctQ9XbjWpaNp
-         J5ssVJJH6NPSsEIDpGgdYJZs6MrpXKVLHY7ituI1o6s90u2Hw4Ph+FEYfmMDluy40lmE
-         DlcQ==
+        d=linaro.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=s5DB7EnWinUCVvHnFkWiifLYJ7ZYVSrywNKSXQZJdFI=;
+        b=zVYtNmW6565ZCEXxTkDChTvQvHXVZBJgGadsGALKU3QKMGV7PrXldFeksaQiPFFwos
+         gOa5LHUXC9ENeji5ixZomlslrjXs7gRNn5sa4/rC/7oX9vcohhS7XlO8sDMJLXWscr+q
+         bF06XsYuYWzUbcYRDjzfQO7njw5hC0lUkvvqRBtzHG+VCf+kO0dojSk2HwepiWXgSYBP
+         78G6I41n+j4b5oQ86dSQb0agTuBmkZQLAXpLW2ShZuHRDidswcSNmuHVA4Q/JlRHChj1
+         CVLKFFo1MbwWbp2VHMZdc2bMjhHGPyCYYpL8L1H7itzUSN66IyZ5++j9CAcdb550Y7AK
+         nt/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=61OOgXrtpX965FTbS9r+OT2a55TPQ1Uu6d7nG7BIhTQ=;
-        b=bJc96aBP+tX3wUzNFar3UszzH6NeIfgy1VcMg416+KECOarVALlaUCxeYxV8CiWfns
-         qz/7V7qUEtPVHtxhnR/fmp9xkVk25qjBMxSRSL0PqfrzvGiPx9z4kj8OiCvI+SK0VSAf
-         a+fkmGjuOTL3qvt/doE1IDaGGN5NQOXkAu0KeHUX1Z9Mr8x7W11x4ZlPLRIuSKmo2bF/
-         EKjPGa3jFeTEcsdN8xLre6YAljB+mUrEbxdzkK4s8BhGnPjFlxA0dxbbYdbT5LAfp3Jg
-         F5LJ29P4s+nig69/S70qye8tWARoNGiXPNHkLTDsYlUyUBfiwJ756fzgaa3S5tks6OUf
-         ng7w==
-X-Gm-Message-State: ACrzQf3mxJhLlSOr8RDFMjsl5mEm/PUmmqH8jHyk9lxdg8Sru2ICkEly
-        xX/4MXikifU0KuSSrsRy6A1BAaAwPiI=
-X-Google-Smtp-Source: AMsMyM5x9Sw5exAYx7FJUlKd+stfWVvVZIY1oZWUtfqOwuAzhZOG0UeSjgoyUu9mEzzW/N/AnKpjMg==
-X-Received: by 2002:a05:6808:e8c:b0:354:2751:69ae with SMTP id k12-20020a0568080e8c00b00354275169aemr16702809oil.228.1666140694272;
-        Tue, 18 Oct 2022 17:51:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.165.69.64])
-        by smtp.gmail.com with ESMTPSA id y3-20020a056870418300b0011f400edb17sm7003229oac.4.2022.10.18.17.51.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Oct 2022 17:51:33 -0700 (PDT)
-Message-ID: <634f4a15.050a0220.55d0e.be44@mx.google.com>
-Date:   Tue, 18 Oct 2022 17:51:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2174703043462435175=="
+        bh=s5DB7EnWinUCVvHnFkWiifLYJ7ZYVSrywNKSXQZJdFI=;
+        b=slH8U5STjG2RxzRlF51Vm6XesjctvJ/8DaysWlnAC5XXLq4mKcn00r0N0zP5RqbPZ5
+         y27UW36ePW6HjXAPz0JNblyileJUTQtCMtgULTK70kZ7XkVYpcvA7TWAHA+EtszElACa
+         CKxUHUfsgQw5+vZ7HoRkyTJtzp6pQmrDazQf5l4H2DDIU8kH1hGUr0XrhLjpMmNHSNFw
+         tCxNCYlWdXhA8TK51hT/fb2I4cZGOkCVi23u27P5eZ83PWuw5O1Hrf3EW7R9vCDxCkX9
+         WorwwGK3MukbjD6yGMjgVKXEOLm4PSPiPBzJUVSZXGO2UO6fUvsF86cOdDA8srfN0euk
+         DLGA==
+X-Gm-Message-State: ACrzQf1RRSdP4qUH8u3tv3mmRj6aOmJgOrV7YxmZtSl1yzxU1B72ShAN
+        gXz4FhO9lGJWTwI3kHsT/TZur33pUH53HSHeL80Qsw==
+X-Google-Smtp-Source: AMsMyM6pJW+QkixNplXOsyqax6puLF7anBgDILMTra0UqNAILCFqM+RlWPnUCA7ntqHj/xXFKBs5j8LsVWWer2PZbHY=
+X-Received: by 2002:a81:4881:0:b0:361:5080:91fe with SMTP id
+ v123-20020a814881000000b00361508091femr5409889ywa.485.1666159413839; Tue, 18
+ Oct 2022 23:03:33 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,v2,1/3] settings: Fix scan-build warning
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221018234600.3990980-1-luiz.dentz@gmail.com>
-References: <20221018234600.3990980-1-luiz.dentz@gmail.com>
+References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org> <Y0hr9XTGAg8Q6K6y@google.com>
+In-Reply-To: <Y0hr9XTGAg8Q6K6y@google.com>
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date:   Wed, 19 Oct 2022 09:03:22 +0300
+Message-ID: <CAA8EJppuGbDGb1D-yf2WL77U1bqx1QQStQeDArWmGFCUiOtnww@mail.gmail.com>
+Subject: Re: [PATCH v1 00/15] create power sequencing subsystem
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanimir Varbanov <svarbanov@mm-sol.com>,
+        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2174703043462435175==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Ho,
 
-This is automated email and please do not reply to this email!
+On Thu, 13 Oct 2022 at 22:50, Matthias Kaehlcke <mka@chromium.org> wrote:
+> Do you still plan to refresh this series?
+>
+> I know there have been multiple attempts to get something similar
+> landed in the past 10 year or so. Your series didn't seem to get
+> much pushback from maintainers, might be worth sending a refresh :)
 
-Dear submitter,
+Yes, I hope to return to it eventually. I just had no time for it lately.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=686498
+> On Wed, Oct 06, 2021 at 06:53:52AM +0300, Dmitry Baryshkov wrote:
+> > This is a proposed power sequencer subsystem. This is a
+> > generification of the MMC pwrseq code. The subsystem tries to abstract
+> > the idea of complex power-up/power-down/reset of the devices.
+> >
+> > The primary set of devices that promted me to create this patchset is
+> > the Qualcomm BT+WiFi family of chips. They reside on serial+platform
+> > or serial + SDIO interfaces (older generations) or on serial+PCIe (newer
+> > generations).  They require a set of external voltage regulators to be
+> > powered on and (some of them) have separate WiFi and Bluetooth enable
+> > GPIOs.
+> >
+> > The major drawback for now is the lack of proper PCIe integration
+> > At this moment support for PCIe is hacked up to be able to test the
+> > PCIe part of qca6390. Proper PCIe support would require automatically
+> > powering up the devices before the scan basing on the proper device
+> > structure in the device tree. This two last patches are noted as WIP and
+> > are included into the patchset for the purpose of testing WiFi on newer
+> > chips (like qca6390/qca6391).
+> >
+> > Changes since RFC v2:
+> >  - Add documentation for the pwrseq code. Document data structures,
+> >    macros and exported functions.
+> >  - Export of_pwrseq_xlate_onecell()
+> >  - Add separate pwrseq_set_drvdata() function to follow the typical API
+> >    design
+> >  - Remove pwrseq_get_optional()/devm_pwrseq_get_optional()
+> >  - Moved code to handle old mmc-pwrseq binding to the MMC patch
+> >  - Split of_pwrseq_xlate_onecell() support to a separate patch
+> >
+> > Changes since RFC v1:
+> >  - Provider pwrseq fallback support
+> >  - Implement fallback support in pwrseq_qca.
+> >  - Mmove susclk handling to pwrseq_qca.
+> >  - Significantly simplify hci_qca.c changes, by dropping all legacy
+> >    code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
+> >    parts of the chip.
+> >
+> >
+> >
+> >
+> > _______________________________________________
+> > ath10k mailing list
+> > ath10k@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/ath10k
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.39 seconds
-GitLint                       PASS      2.35 seconds
-Prep - Setup ELL              PASS      34.58 seconds
-Build - Prep                  PASS      1.00 seconds
-Build - Configure             PASS      11.02 seconds
-Build - Make                  PASS      1177.12 seconds
-Make Check                    PASS      13.47 seconds
-Make Check w/Valgrind         PASS      370.82 seconds
-Make Distcheck                PASS      311.71 seconds
-Build w/ext ELL - Configure   PASS      11.27 seconds
-Build w/ext ELL - Make        PASS      112.47 seconds
-Incremental Build w/ patches  PASS      397.01 seconds
-Scan Build                    PASS      702.70 seconds
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2174703043462435175==--
+-- 
+With best wishes
+Dmitry
