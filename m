@@ -2,137 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E5C4C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Oct 2022 06:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8475C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 Oct 2022 07:31:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229974AbiJSGDn (ORCPT
+        id S230006AbiJSHbA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Oct 2022 02:03:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
+        Wed, 19 Oct 2022 03:31:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229932AbiJSGDg (ORCPT
+        with ESMTP id S229979AbiJSHa7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Oct 2022 02:03:36 -0400
-Received: from mail-yw1-x112a.google.com (mail-yw1-x112a.google.com [IPv6:2607:f8b0:4864:20::112a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50825C351
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 23:03:34 -0700 (PDT)
-Received: by mail-yw1-x112a.google.com with SMTP id 00721157ae682-35befab86a4so158001537b3.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 Oct 2022 23:03:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=s5DB7EnWinUCVvHnFkWiifLYJ7ZYVSrywNKSXQZJdFI=;
-        b=zVYtNmW6565ZCEXxTkDChTvQvHXVZBJgGadsGALKU3QKMGV7PrXldFeksaQiPFFwos
-         gOa5LHUXC9ENeji5ixZomlslrjXs7gRNn5sa4/rC/7oX9vcohhS7XlO8sDMJLXWscr+q
-         bF06XsYuYWzUbcYRDjzfQO7njw5hC0lUkvvqRBtzHG+VCf+kO0dojSk2HwepiWXgSYBP
-         78G6I41n+j4b5oQ86dSQb0agTuBmkZQLAXpLW2ShZuHRDidswcSNmuHVA4Q/JlRHChj1
-         CVLKFFo1MbwWbp2VHMZdc2bMjhHGPyCYYpL8L1H7itzUSN66IyZ5++j9CAcdb550Y7AK
-         nt/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s5DB7EnWinUCVvHnFkWiifLYJ7ZYVSrywNKSXQZJdFI=;
-        b=slH8U5STjG2RxzRlF51Vm6XesjctvJ/8DaysWlnAC5XXLq4mKcn00r0N0zP5RqbPZ5
-         y27UW36ePW6HjXAPz0JNblyileJUTQtCMtgULTK70kZ7XkVYpcvA7TWAHA+EtszElACa
-         CKxUHUfsgQw5+vZ7HoRkyTJtzp6pQmrDazQf5l4H2DDIU8kH1hGUr0XrhLjpMmNHSNFw
-         tCxNCYlWdXhA8TK51hT/fb2I4cZGOkCVi23u27P5eZ83PWuw5O1Hrf3EW7R9vCDxCkX9
-         WorwwGK3MukbjD6yGMjgVKXEOLm4PSPiPBzJUVSZXGO2UO6fUvsF86cOdDA8srfN0euk
-         DLGA==
-X-Gm-Message-State: ACrzQf1RRSdP4qUH8u3tv3mmRj6aOmJgOrV7YxmZtSl1yzxU1B72ShAN
-        gXz4FhO9lGJWTwI3kHsT/TZur33pUH53HSHeL80Qsw==
-X-Google-Smtp-Source: AMsMyM6pJW+QkixNplXOsyqax6puLF7anBgDILMTra0UqNAILCFqM+RlWPnUCA7ntqHj/xXFKBs5j8LsVWWer2PZbHY=
-X-Received: by 2002:a81:4881:0:b0:361:5080:91fe with SMTP id
- v123-20020a814881000000b00361508091femr5409889ywa.485.1666159413839; Tue, 18
- Oct 2022 23:03:33 -0700 (PDT)
+        Wed, 19 Oct 2022 03:30:59 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 911B076962
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Oct 2022 00:30:57 -0700 (PDT)
+Received: from dggpemm500022.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Msj7r43LSzHv5H;
+        Wed, 19 Oct 2022 15:30:48 +0800 (CST)
+Received: from dggpemm500007.china.huawei.com (7.185.36.183) by
+ dggpemm500022.china.huawei.com (7.185.36.162) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Wed, 19 Oct 2022 15:30:55 +0800
+Received: from huawei.com (10.175.103.91) by dggpemm500007.china.huawei.com
+ (7.185.36.183) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.31; Wed, 19 Oct
+ 2022 15:30:54 +0800
+From:   Yang Yingliang <yangyingliang@huawei.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
+        <yangyingliang@huawei.com>
+Subject: [PATCH] Bluetooth: hci_core: fix error handling in hci_register_dev()
+Date:   Wed, 19 Oct 2022 15:30:08 +0800
+Message-ID: <20221019073008.3398136-1-yangyingliang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org> <Y0hr9XTGAg8Q6K6y@google.com>
-In-Reply-To: <Y0hr9XTGAg8Q6K6y@google.com>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date:   Wed, 19 Oct 2022 09:03:22 +0300
-Message-ID: <CAA8EJppuGbDGb1D-yf2WL77U1bqx1QQStQeDArWmGFCUiOtnww@mail.gmail.com>
-Subject: Re: [PATCH v1 00/15] create power sequencing subsystem
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.103.91]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500007.china.huawei.com (7.185.36.183)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Ho,
+If hci_register_suspend_notifier() returns error, the hdev
+need to be put and deleted and rfkill need be unregistered
+to avoid leaks.
 
-On Thu, 13 Oct 2022 at 22:50, Matthias Kaehlcke <mka@chromium.org> wrote:
-> Do you still plan to refresh this series?
->
-> I know there have been multiple attempts to get something similar
-> landed in the past 10 year or so. Your series didn't seem to get
-> much pushback from maintainers, might be worth sending a refresh :)
+Fixes: 9952d90ea288 ("Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND")
+Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+---
+ net/bluetooth/hci_core.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-Yes, I hope to return to it eventually. I just had no time for it lately.
-
-> On Wed, Oct 06, 2021 at 06:53:52AM +0300, Dmitry Baryshkov wrote:
-> > This is a proposed power sequencer subsystem. This is a
-> > generification of the MMC pwrseq code. The subsystem tries to abstract
-> > the idea of complex power-up/power-down/reset of the devices.
-> >
-> > The primary set of devices that promted me to create this patchset is
-> > the Qualcomm BT+WiFi family of chips. They reside on serial+platform
-> > or serial + SDIO interfaces (older generations) or on serial+PCIe (newer
-> > generations).  They require a set of external voltage regulators to be
-> > powered on and (some of them) have separate WiFi and Bluetooth enable
-> > GPIOs.
-> >
-> > The major drawback for now is the lack of proper PCIe integration
-> > At this moment support for PCIe is hacked up to be able to test the
-> > PCIe part of qca6390. Proper PCIe support would require automatically
-> > powering up the devices before the scan basing on the proper device
-> > structure in the device tree. This two last patches are noted as WIP and
-> > are included into the patchset for the purpose of testing WiFi on newer
-> > chips (like qca6390/qca6391).
-> >
-> > Changes since RFC v2:
-> >  - Add documentation for the pwrseq code. Document data structures,
-> >    macros and exported functions.
-> >  - Export of_pwrseq_xlate_onecell()
-> >  - Add separate pwrseq_set_drvdata() function to follow the typical API
-> >    design
-> >  - Remove pwrseq_get_optional()/devm_pwrseq_get_optional()
-> >  - Moved code to handle old mmc-pwrseq binding to the MMC patch
-> >  - Split of_pwrseq_xlate_onecell() support to a separate patch
-> >
-> > Changes since RFC v1:
-> >  - Provider pwrseq fallback support
-> >  - Implement fallback support in pwrseq_qca.
-> >  - Mmove susclk handling to pwrseq_qca.
-> >  - Significantly simplify hci_qca.c changes, by dropping all legacy
-> >    code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
-> >    parts of the chip.
-> >
-> >
-> >
-> >
-> > _______________________________________________
-> > ath10k mailing list
-> > ath10k@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/ath10k
-
-
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0540555b3704..03b9374f3a97 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2660,7 +2660,7 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	error = hci_register_suspend_notifier(hdev);
+ 	if (error)
+-		goto err_wqueue;
++		goto err_hdev;
+ 
+ 	queue_work(hdev->req_workqueue, &hdev->power_on);
+ 
+@@ -2669,6 +2669,11 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	return id;
+ 
++err_hdev:
++	hci_dev_put(hdev);
++	if (hdev->rfkill)
++		rfkill_unregister(hdev->rfkill);
++	device_del(&hdev->dev);
+ err_wqueue:
+ 	debugfs_remove_recursive(hdev->debugfs);
+ 	destroy_workqueue(hdev->workqueue);
 -- 
-With best wishes
-Dmitry
+2.25.1
+
