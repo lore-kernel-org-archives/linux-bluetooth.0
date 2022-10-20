@@ -2,107 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8096CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Oct 2022 03:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF55C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Oct 2022 21:10:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229543AbiJTDrB (ORCPT
+        id S229787AbiJTVKW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 Oct 2022 23:47:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39766 "EHLO
+        Thu, 20 Oct 2022 17:10:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229711AbiJTDrA (ORCPT
+        with ESMTP id S229779AbiJTVKU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 Oct 2022 23:47:00 -0400
-Received: from mail-oa1-x32.google.com (mail-oa1-x32.google.com [IPv6:2001:4860:4864:20::32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4BE181943
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Oct 2022 20:46:59 -0700 (PDT)
-Received: by mail-oa1-x32.google.com with SMTP id 586e51a60fabf-1324e7a1284so23121498fac.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 Oct 2022 20:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=rhFXyPeN/ymgBDMUIg6fhEZ+LyinTQMNRF0tNYg+gsM=;
-        b=QRINEhDqk47iZxRnbxMRl8gUcG9wXKUXD2b4GAYR9Zr8NZTitQr/iIDxyTn9joakJ8
-         fhfe6BUh6JKQmv0HsP0f/i98wrYCbINbzmCKDVpcO/f7iokO9fhc+IqaoMZFrIM33sEs
-         8kdLFozFKp4kS+vUfv6Nyb4DibgOshV/nzgixr2EPom4bn7HksTNvW76PfjWbhVuAFR0
-         lody2M2mQjt3Xrw4pATy0tGrLNCLo0HNT+XWubyam9L8mHDLy7EK8nTlY18yLHQlX4Hp
-         ItylUnJ6ZN1qgkmhT0NRTbRCZiuhNgOV3kFNNvrK4MC8F0OsouhAO6Il2fAX2xUnyrwd
-         GjbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rhFXyPeN/ymgBDMUIg6fhEZ+LyinTQMNRF0tNYg+gsM=;
-        b=vVFwJXy6IQE30VhZQSFSC1prSokw+BXpdcWR6XUZIY2pKUAfQ0qdhN+IZGD2RSxn/B
-         Eu6X4dgHCXR5/dEphr7cuFKFqlY1CI+OKY7oH7JFO9EYpNOx+5m32tav53KuLCT7oQu9
-         w7avPp81Y27H38W5uyjyG83/2sz0l83RMK5WVrxtLYIEZ27aQGe6mV4D5O1qSwHM8It5
-         rRMYKccdvPSpgv893ezrvqfotnYUx8H+PyXhitmvLcGUQ0IzdFYCJ8MvJ4LEZPGfark0
-         3mgEJRA+sQYZ+URsMlKMsYZhIe4c7kPEmiUfLDRuprITDwGuOn0SMQGZX8rcNu7uIy7t
-         aj5g==
-X-Gm-Message-State: ACrzQf2dek1Uazd8h5U9m6BDpIqlwwrTm7f+kku8ZuK5dTOO6YA3PO4y
-        wws0e26maF5KxD4DO5W2kED+EV4pNmg=
-X-Google-Smtp-Source: AMsMyM6PTKnE8PlquPDQv4xIyXb7GJYbYa3m7eTVFgQPk7XQJZs3gyuUfpYJ6ab6PcFzlI+4GMJQvA==
-X-Received: by 2002:a05:6870:c68b:b0:127:36e4:d437 with SMTP id cv11-20020a056870c68b00b0012736e4d437mr7413061oab.40.1666237618440;
-        Wed, 19 Oct 2022 20:46:58 -0700 (PDT)
-Received: from [172.17.0.2] ([20.165.71.166])
-        by smtp.gmail.com with ESMTPSA id s4-20020a056870248400b00136cfb02a94sm8342055oaq.7.2022.10.19.20.46.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Oct 2022 20:46:58 -0700 (PDT)
-Message-ID: <6350c4b2.050a0220.3189.1f84@mx.google.com>
-Date:   Wed, 19 Oct 2022 20:46:58 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7229798453504415142=="
+        Thu, 20 Oct 2022 17:10:20 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ECC08E710
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 14:10:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DF4AC61D1E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 21:10:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 48A78C433B5;
+        Thu, 20 Oct 2022 21:10:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666300217;
+        bh=BHNuUzdH/DmsNCi51meQV9s4WBKSi869Ii+9wFpBgl0=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=clwnkARszRNj3z+n/PeQcZ3i9TK+QpuGdlqFGFZoumCTvdiNqt5UA7C04GS2kQJs3
+         LUHyAqb6icAL0PiQ4ErIg8jHsvwfXuO9SkYRB3S4wAypJMV/nPzEDhRN7unSPqX9Eg
+         TKVTKqY3TAPGXeHcTSyGJuBLLiU8pkEbVytLl5LMMx659bF8UI70B0AbYlzEkpES3y
+         jZSiE7cgrSzGtteGQROcVtC8yGrGpLUXQcCtVy4iZvEVlUmhYxmA0TzRENUbOTry0f
+         uDSNstcItN13UA9e3FX4AUyZnca/fDS48opkPTGpaUn3jSZaiEPksUCJ+CLu/hQhQ8
+         pXqDrtcLAlmAg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26039E270E2;
+        Thu, 20 Oct 2022 21:10:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yangyingliang@huawei.com
-Subject: RE: [v3] Bluetooth: hci_core: fix error handling in hci_register_dev()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221020021656.2092938-1-yangyingliang@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3] Bluetooth: hci_core: fix error handling in
+ hci_register_dev()
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166630021715.31243.1085904526366100161.git-patchwork-notify@kernel.org>
+Date:   Thu, 20 Oct 2022 21:10:17 +0000
 References: <20221020021656.2092938-1-yangyingliang@huawei.com>
+In-Reply-To: <20221020021656.2092938-1-yangyingliang@huawei.com>
+To:     Yang Yingliang <yangyingliang@huawei.com>
+Cc:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        luiz.von.dentz@intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7229798453504415142==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello:
 
-This is automated email and please do not reply to this email!
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-Dear submitter,
+On Thu, 20 Oct 2022 10:16:56 +0800 you wrote:
+> If hci_register_suspend_notifier() returns error, the hdev and rfkill
+> are leaked. We could disregard the error and print a warning message
+> instead to avoid leaks, as it just means we won't be handing suspend
+> requests.
+> 
+> Fixes: 9952d90ea288 ("Bluetooth: Handle PM_SUSPEND_PREPARE and PM_POST_SUSPEND")
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> 
+> [...]
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=686951
+Here is the summary with links:
+  - [v3] Bluetooth: hci_core: fix error handling in hci_register_dev()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/f334dabe7dae
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.41 seconds
-GitLint                       PASS      1.02 seconds
-SubjectPrefix                 PASS      0.69 seconds
-BuildKernel                   PASS      42.72 seconds
-BuildKernel32                 PASS      37.57 seconds
-Incremental Build with patchesPASS      58.28 seconds
-TestRunner: Setup             PASS      625.48 seconds
-TestRunner: l2cap-tester      PASS      19.61 seconds
-TestRunner: iso-tester        PASS      21.09 seconds
-TestRunner: bnep-tester       PASS      7.99 seconds
-TestRunner: mgmt-tester       PASS      122.80 seconds
-TestRunner: rfcomm-tester     PASS      12.63 seconds
-TestRunner: sco-tester        PASS      11.65 seconds
-TestRunner: ioctl-tester      PASS      12.91 seconds
-TestRunner: mesh-tester       PASS      10.05 seconds
-TestRunner: smp-tester        PASS      11.33 seconds
-TestRunner: userchan-tester   PASS      8.13 seconds
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7229798453504415142==--
