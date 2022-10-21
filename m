@@ -2,185 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0D5AC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Oct 2022 09:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43FB7C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Oct 2022 13:58:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230108AbiJUJwL (ORCPT
+        id S231270AbiJUN6T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 Oct 2022 05:52:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54860 "EHLO
+        Fri, 21 Oct 2022 09:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbiJUJwK (ORCPT
+        with ESMTP id S229788AbiJUN6Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 Oct 2022 05:52:10 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1203724E39E
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 02:52:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666345930; x=1697881930;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=kZ0SHU7O08hc8nj4a/OYiEJsfWHuobhJIxOo+ZpZG/U=;
-  b=Qx82PFByP8KbYPPct8s7CpnJneAvlfwZIjITSizIIkFHVlCgdlBgiZi+
-   3qcprpLhUsgMSULGs3encvT/Dl9q5aHPLBwVqP/YaqAJg5ZpuGz+CnRW4
-   aXLWYURxf1c1Jqs9P/tmBUy1VMDdWPcwSgVORdpqDCKR2zIIEan3VAZnA
-   svI3q2vWGFpEtvrQkjLvURaOLNT87X7VZkrTRMbk1GwuqtDH5ZH++rJJM
-   SGV24FTnNov+rx87x9AWNziQJBCYKvGOZ5Oya3c0KEin29m0UANewc0fS
-   km2uh7z1JYVgwVqZ6Ualpw7a9cm0YVEf96N3RtX21XgRcV8K5H4vwXl0C
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="304577560"
-X-IronPort-AV: E=Sophos;i="5.95,200,1661842800"; 
-   d="scan'208";a="304577560"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Oct 2022 02:52:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10506"; a="608286017"
-X-IronPort-AV: E=Sophos;i="5.95,200,1661842800"; 
-   d="scan'208";a="608286017"
-Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 21 Oct 2022 02:51:58 -0700
-Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oloh4-0002UD-0x;
-        Fri, 21 Oct 2022 09:51:58 +0000
-Date:   Fri, 21 Oct 2022 17:50:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- f334dabe7dae4b890926601d743d2ce337883880
-Message-ID: <63526b81.21CiC2tnZKdifa2r%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 21 Oct 2022 09:58:16 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EBD62793EB
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 06:58:13 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E4C8661EAD
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 13:58:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5AACFC433B5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 13:58:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666360692;
+        bh=XH61df99vtxOnntH60dhvp3nZ+V+GXIY7yooTJeagwc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=JhEPpU3cREkJsr545A1om+g+Sa3Qyy2Kh72sHrFeGSU4ro/tuFMR/n/Uvp4a5/Q3c
+         GMk6Xlq27rFCKrSUyNJKEPY/4zSySM5cw22tly/yyqkLzxdbJrgbxX1eXHx+1HWHb7
+         SKqLI0D9dCpdiPSpIea2DYFmzFhuIejW+Adputj/bYYDs7O9xnmVIQUrZ9NDQ9BZye
+         BRPaVmxRDdYipJzMW13DZVDSBviDw1ag+Mlj7AEo6R7ixcaVB2JRR2HzXlQY6yquBK
+         r+730uXoix9vmZnl5OW5PxVVxXFsF0Mci5vS4vzPYZwPJhsd33TT5L7vVw6ectYxde
+         vteD2gbuT8zvA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 4126DC433E4; Fri, 21 Oct 2022 13:58:12 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216580] Jabra Elite 75t (ear buds):Unable to connect and use
+ (`hci0: Opcode 0x 401 failed: -16`)
+Date:   Fri, 21 Oct 2022 13:58:11 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc attachments.created
+Message-ID: <bug-216580-62941-dOwptnnyop@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-216580-62941@https.bugzilla.kernel.org/>
+References: <bug-216580-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: f334dabe7dae4b890926601d743d2ce337883880  Bluetooth: hci_core: fix error handling in hci_register_dev()
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216580
 
-elapsed time: 720m
+Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de) changed:
 
-configs tested: 107
-configs skipped: 3
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |pmenzel+bugzilla.kernel.org
+                   |                            |@molgen.mpg.de
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #5 from Paul Menzel (pmenzel+bugzilla.kernel.org@molgen.mpg.de)=
+ ---
+Created attachment 303066
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303066&action=3Dedit
+`sudo btmon -w /dev/shm/20221021-linux-6.1-rc1+-ge35184f32151-with-patch.lo=
+g`
 
-gcc tested configs:
-um                             i386_defconfig
-um                           x86_64_defconfig
-arc                                 defconfig
-alpha                               defconfig
-powerpc                           allnoconfig
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-i386                                defconfig
-x86_64                           rhel-8.3-kvm
-s390                                defconfig
-s390                             allmodconfig
-sh                               allmodconfig
-x86_64                              defconfig
-i386                          randconfig-a001
-i386                          randconfig-a003
-x86_64                          rhel-8.3-func
-x86_64                               rhel-8.3
-s390                             allyesconfig
-mips                             allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                        randconfig-a013
-x86_64                           allyesconfig
-powerpc                          allmodconfig
-x86_64                        randconfig-a011
-x86_64                        randconfig-a004
-i386                          randconfig-a005
-x86_64                        randconfig-a015
-x86_64                        randconfig-a002
-x86_64                        randconfig-a006
-arc                  randconfig-r043-20221020
-alpha                            allyesconfig
-arc                              allyesconfig
-i386                             allyesconfig
-s390                 randconfig-r044-20221020
-arc                  randconfig-r043-20221018
-riscv                randconfig-r042-20221020
-riscv                randconfig-r042-20221018
-s390                 randconfig-r044-20221018
-m68k                             allyesconfig
-m68k                             allmodconfig
-arm                                 defconfig
-arm64                            allyesconfig
-arm                              allyesconfig
-m68k                            q40_defconfig
-powerpc                     tqm8541_defconfig
-arm                           stm32_defconfig
-powerpc                      chrp32_defconfig
-i386                          randconfig-c001
-i386                          randconfig-a012
-i386                          randconfig-a014
-i386                          randconfig-a016
-openrisc                         alldefconfig
-powerpc                       holly_defconfig
-sh                ecovec24-romimage_defconfig
-arm                      footbridge_defconfig
-sh                     magicpanelr2_defconfig
-arm                          gemini_defconfig
-mips                  maltasmvp_eva_defconfig
-m68k                         apollo_defconfig
-arc                        vdk_hs38_defconfig
-sh                           se7712_defconfig
-mips                      loongson3_defconfig
-xtensa                generic_kc705_defconfig
-nios2                            alldefconfig
-i386                          debian-10.3-kvm
-i386                        debian-10.3-kunit
-i386                         debian-10.3-func
+I tested this on a different system, Dell XPS 13 9360, with the Qualcomm
+Atheros Communications QCA1x4 Bluetooth 4.0 (0cf3:e300), and Debian
+sid/unstable with KDE Plasma 5.25/5.26 and *bluez* 5.65-1+b1. Please find t=
+he
+`btmon` output attached.
 
-clang tested configs:
-i386                          randconfig-a002
-x86_64                        randconfig-a014
-i386                          randconfig-a004
-x86_64                        randconfig-a016
-x86_64                        randconfig-a012
-hexagon              randconfig-r041-20221020
-i386                          randconfig-a006
-x86_64                        randconfig-a005
-x86_64                        randconfig-a001
-hexagon              randconfig-r045-20221020
-x86_64                        randconfig-a003
-i386                 randconfig-a011-20221017
-i386                 randconfig-a013-20221017
-i386                 randconfig-a012-20221017
-hexagon              randconfig-r041-20221018
-i386                 randconfig-a014-20221017
-hexagon              randconfig-r045-20221018
-i386                 randconfig-a016-20221017
-i386                 randconfig-a015-20221017
-mips                          ath79_defconfig
-arm                         shannon_defconfig
-mips                     cu1830-neo_defconfig
-arm                       mainstone_defconfig
-arm                  colibri_pxa300_defconfig
-powerpc                     tqm8560_defconfig
-powerpc                     kmeter1_defconfig
-mips                       lemote2f_defconfig
-powerpc                    socrates_defconfig
-arm                         orion5x_defconfig
-arm                        magician_defconfig
-s390                 randconfig-r044-20221019
-hexagon              randconfig-r045-20221019
-riscv                randconfig-r042-20221019
-hexagon              randconfig-r041-20221019
-powerpc                 mpc8560_ads_defconfig
-mips                           rs90_defconfig
-x86_64                        randconfig-k001
-arm                          ep93xx_defconfig
-powerpc                 mpc836x_rdk_defconfig
-mips                          ath25_defconfig
+--=20
+You may reply to this email to add a comment.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+You are receiving this mail because:
+You are the assignee for the bug.=
