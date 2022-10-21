@@ -2,88 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51A8BC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 Oct 2022 22:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2B5AC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 Oct 2022 00:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229501AbiJTW6L (ORCPT
+        id S229841AbiJUANL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 Oct 2022 18:58:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57660 "EHLO
+        Thu, 20 Oct 2022 20:13:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbiJTW6I (ORCPT
+        with ESMTP id S229770AbiJUANE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 Oct 2022 18:58:08 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C50E2224A8A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 15:58:07 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id a6-20020a17090abe0600b0020d7c0c6650so4968637pjs.0
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 15:58:07 -0700 (PDT)
+        Thu, 20 Oct 2022 20:13:04 -0400
+Received: from mail-ot1-x330.google.com (mail-ot1-x330.google.com [IPv6:2607:f8b0:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81DD21826CC
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 17:12:58 -0700 (PDT)
+Received: by mail-ot1-x330.google.com with SMTP id r13-20020a056830418d00b0065601df69c0so862710otu.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 Oct 2022 17:12:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ExdYjNCXcG+fesSjNwNca8v+0SEwW6z7wb0173HsGuU=;
-        b=gICNczzEWDaEtjQN6n21gzB8jQAPiFbLOwSbPbPg9kEgiccVo5RusUq+REky58nYqP
-         vem0tuwKrgtQQ1NgX23abbEQ0XHMalUEffOGwPcRlvCx9wQ+SW3SKOImT7DrePM0xyiX
-         afP4qwuw60M5zy39lJoxC0VRt30xMZGomLc/09vYrlSEZgg6c96Fn1VlYOWboPqFBNOO
-         YfLi+tz/4+tzRSeIhwBdxBR4aKsbFDc1JhEq6xpL4+v5JoJ/V6k/DYOpPqYqfWS/O7zH
-         tz/2LCKARVqLZE9YpJ4qnp3js5RTbVCozpy3PnwQcxIq2uB3j58D0IMN41Q1mDCQQOVJ
-         45SA==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SraBV+rf2fyK5JrFl9LLUJBUHN1/t00QHn4E5vsfh98=;
+        b=IPv9ntvv8zJdXNebaFiYvkgJpC2mIVrnTBbLR649FpmmMLfLmB0Zg+JTOIV7e5Hb39
+         DszftJZ0erf8LZkxBk20GXqBy4q5oi3J5MO1nR7PtCQDcLNgfgrmoreuGek5yS9OkUmS
+         aio5Aqq1rsiSwlTpXWwWHLg2AA74g02iOTAo5wtdn8jxEs/JAY+NmlDADO4zaiHzTBzD
+         raXwpTTTkaymDgPme3/j6zLRKwq5KDwfBz/zTWA9+ZiBIE6pSHarm0XU2EnS0mihdBOU
+         UVwu83pQ2eU+o5HBmCHjbGLpTbZnd8pdyAc0wzIGqkf9wPp4sZqa6gwGt8C/WDyL02AS
+         blTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ExdYjNCXcG+fesSjNwNca8v+0SEwW6z7wb0173HsGuU=;
-        b=p/7hj6Ih5ymAAPH7zzzbiRjO3P8ntzN77029PAwHxLwTJ0o2whwuXcZfBAOOrw9O8F
-         Ki8kvJjuRHuKleLfeFMs+ZqfJ3LSBqFov2jHvdOZl0tIe2zi4i0t/eQJtqg4PRgwk+5p
-         HhekZv1R9yU0TN13NclOklg3Op9QRYnrA44fznOwQwQYy9ahLVBm0Lp4aHM5rxZCgFqP
-         YL2G93eDZI69CULOzc7E7f7YkvJBhQSV9LE8TxlIQjfJ2oMkYW1wvM3edEvD95XaAgrZ
-         f+5lv4mO3YAvLTAZwiKFuAWQf/6JVv1fGZxMD14gV7NLT2X0yoP8hmQi9zljkSPO9Wxo
-         ZmVA==
-X-Gm-Message-State: ACrzQf2M+OwXrf8vyRufZ11ChyDnWJ25zJ2f4QlVSyge8upgWSvgM0Dm
-        NwWsGaxN6X4J9osA1zITaNOjAS3v1CY=
-X-Google-Smtp-Source: AMsMyM7OWWcWC4AWjq5sc0vqy+RzmWsUt8nZeJ80BmHQjTyTTiU7lo4qNMht8fkv3aZh3njIMqJpdw==
-X-Received: by 2002:a17:90b:4c92:b0:20b:a13:83c7 with SMTP id my18-20020a17090b4c9200b0020b0a1383c7mr54211387pjb.128.1666306686704;
-        Thu, 20 Oct 2022 15:58:06 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n30-20020aa7985e000000b00563517deaa8sm13775182pfq.117.2022.10.20.15.58.05
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SraBV+rf2fyK5JrFl9LLUJBUHN1/t00QHn4E5vsfh98=;
+        b=vIu7BNjmZxt4sFUJDhzhv/DTPZkvG3mwQ7Zyd6E94nlNLH25p5uXNP0xlrBrawh6xU
+         hTvv07b3qDGOZK56RmowtzlIep93OPdnsAoBeR71yLD7LC4QAQAnop7Yz7Ndwt+/LfJl
+         vYvOdP1AtC7qg3PpZGvzNHXT1E022/Kb6lmn3MbraGCLtk3VJuuzeVNNH2OARXIiiZ5R
+         RpLARrPjy4pB6HCccsgFm4CseWxaslXThN8TaE8eolgQTieoOc8Pe218FY5ZexfKd2es
+         vPhPOaKOZcueObrxsdkIOh8dhESUP+QzqacSMT6MZO0GwMNNMl4j1FWbeAWGRJ1ZoWWf
+         kIyA==
+X-Gm-Message-State: ACrzQf0H6PW+1czYMq/0OUVqLgZrgucsQaQ8u0UHyRh0J+FKgC/2P3Op
+        RlGbnC6JQkf0nHWBW2VwfXEL8fZRHc8=
+X-Google-Smtp-Source: AMsMyM6QK8fltuha0UudiRBhNuF4/RgXlT+0pqLwRDSPEeHrI2Lh4bNPpPgraUbqO3txN3STBmWHYQ==
+X-Received: by 2002:a9d:7ad3:0:b0:661:b172:aa3a with SMTP id m19-20020a9d7ad3000000b00661b172aa3amr8173830otn.285.1666311177578;
+        Thu, 20 Oct 2022 17:12:57 -0700 (PDT)
+Received: from [172.17.0.2] ([20.225.199.50])
+        by smtp.gmail.com with ESMTPSA id eq4-20020a056870a90400b0010d5d5c3fc3sm9616228oab.8.2022.10.20.17.12.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Oct 2022 15:58:05 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client: Fix advertise.data command
-Date:   Thu, 20 Oct 2022 15:58:04 -0700
-Message-Id: <20221020225804.291712-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Thu, 20 Oct 2022 17:12:57 -0700 (PDT)
+Message-ID: <6351e409.050a0220.a005d.7d1b@mx.google.com>
+Date:   Thu, 20 Oct 2022 17:12:57 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4130602643818541372=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] client: Fix advertise.data command
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221020225804.291712-1-luiz.dentz@gmail.com>
+References: <20221020225804.291712-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============4130602643818541372==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-advertise.data when no parameter is given shall print what is set on
-ad.data not the ad.manufacturer which is a different field set by
-advertise.manufacturer.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=687318
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.03 seconds
+GitLint                       PASS      0.71 seconds
+Prep - Setup ELL              PASS      26.94 seconds
+Build - Prep                  PASS      0.68 seconds
+Build - Configure             PASS      8.32 seconds
+Build - Make                  PASS      763.73 seconds
+Make Check                    PASS      11.17 seconds
+Make Check w/Valgrind         PASS      292.39 seconds
+Make Distcheck                PASS      241.02 seconds
+Build w/ext ELL - Configure   PASS      8.40 seconds
+Build w/ext ELL - Make        PASS      85.42 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      489.74 seconds
+
+
+
 ---
- client/advertising.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 097b9437f794..fb9b049fde78 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -760,7 +760,7 @@ void ad_advertise_data(DBusConnection *conn, int argc, char *argv[])
- 	struct ad_data data;
- 
- 	if (argc < 2 || !strlen(argv[1])) {
--		if (ad.manufacturer.data.len) {
-+		if (ad.data.data.len) {
- 			bt_shell_printf("Type: 0x%02x\n", ad.data.type);
- 			bt_shell_hexdump(ad.data.data.data, ad.data.data.len);
- 		}
--- 
-2.37.3
 
+--===============4130602643818541372==--
