@@ -2,103 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B838AC04A95
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Oct 2022 04:50:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D9A2C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 22 Oct 2022 13:18:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229934AbiJVEuC (ORCPT
+        id S229613AbiJVNSD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 22 Oct 2022 00:50:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58474 "EHLO
+        Sat, 22 Oct 2022 09:18:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229940AbiJVEuA (ORCPT
+        with ESMTP id S229520AbiJVNSC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 22 Oct 2022 00:50:00 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE87458E97
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 21:49:57 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id g10so5416245oif.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 21 Oct 2022 21:49:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SJxDTv98wzoURDxuMr6Wxhc8ZEa70x0WNxy3NL9w0BI=;
-        b=JLgGJ5UQxMjYUDbaISCud5RAgRuZArECdGjTUK/FQh7qnegpw8W2bEGwS6k2E63aGo
-         r5MryuwfnnyYez0QJ04jlGJoGy4rKaGDopQufOnI2hf4D9W6jqWmnZcCH6zPFvXFVhOW
-         fgISDChoZ5OT0eo8secNuIUjFrG4rTa6p08M2pQBmgL1yxqmEiSmP4RIOtEY87eJPYdX
-         fGALOQDgQviiUbj59NsuQtiJdeBZObAoLWAl4wd3clIpVGG4UoUDiTSgJ9Q3xHNEFDGz
-         7KgyRqwupdsDeGnay9tQ1xVpgZK4LBFqZxErsGcOLAMODfISNGLIMBDvzY+GXhQRwgnb
-         Xhmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SJxDTv98wzoURDxuMr6Wxhc8ZEa70x0WNxy3NL9w0BI=;
-        b=R6Tj4G9No6CylS593jzSWAiBxUQwOCHufdQcFbbSQd+2PhJ2z6KqCXOdFXSfsAtJcr
-         v41gfmUFGYdRNgy+Ss4IYomgQ7AOWqWnUc8Ai2KO9VoTc0xMPDvwkqUWz/X+Ja42SwdA
-         I5q5FqqXKSxnlQ7bBC2JhoNsihZuOjiCQEP5z/ZF/UyJ8+kCf464nWq6Ul1Fl0WpFpoa
-         AFdEpyPLYF4HE2It9Q/4Exb4zk3BAjtAock+pul7clrSTLY8A1OPw4C0Y32hzq0dndNg
-         f6EsuelnKfx7Fdf3mUqnFlhkEszm9FBQe/YvakSCmMf0m4HKjGWBV4in4q9UB8RbQmm8
-         IZAQ==
-X-Gm-Message-State: ACrzQf0gGjXJi1sGzk0eCQCultjZvArMyom34pj8uOpMkk+MmUT6n+RB
-        lisH6fQQ4dLneMat0+/k8M8XAaZoOkw=
-X-Google-Smtp-Source: AMsMyM5EBdlex089mFkCn4ZWUBMRNf2x9i1oWMVL464jDaVRwz2woB46Kj2cQDtTLial/yLGK3DDJg==
-X-Received: by 2002:a05:6808:1294:b0:355:3ddb:4dc0 with SMTP id a20-20020a056808129400b003553ddb4dc0mr11712336oiw.21.1666414197080;
-        Fri, 21 Oct 2022 21:49:57 -0700 (PDT)
-Received: from [172.17.0.2] ([13.65.102.21])
-        by smtp.gmail.com with ESMTPSA id 123-20020aca0781000000b00354b7120d60sm1873239oih.52.2022.10.21.21.49.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Oct 2022 21:49:56 -0700 (PDT)
-Message-ID: <63537674.ca0a0220.d6add.8fe5@mx.google.com>
-Date:   Fri, 21 Oct 2022 21:49:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7299820192075589441=="
+        Sat, 22 Oct 2022 09:18:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E393253BC6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Oct 2022 06:18:02 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ACB0B60DF6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Oct 2022 13:18:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 05D71C433D6
+        for <linux-bluetooth@vger.kernel.org>; Sat, 22 Oct 2022 13:18:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1666444681;
+        bh=hQnmUz0dj0VOL9YYo+n1V1jXCuUsRbbkWTZqL6wjsdw=;
+        h=From:To:Subject:Date:From;
+        b=jcizucfBSRlzOqreQNxZ0IQsQM2bFhEJhyHYPcXeKjPINg31Z2qH50rrl/S4SZZTw
+         qm/WM1CDerR8XBkJjxiRwSwTxdbcSRS3vt/0fUPPXTS8PdXeOEK/LKd8nW5gKtEy61
+         oBIZKcwzWRnfq+zjel1WG6dXY1st/qZA+ukCOQWySlpWlMVOGAcqSmB1D6aJwWce1W
+         hbtkt/fZDUym3VFvgmsp+q+O2usLn2TBdxPefVVCam35dVPn+Mg5hZQSilkDwnIB+u
+         y0lglorPj5WkFFL6XxINiToNX5NRx2RqS/fADpYZnMt8ViFSNSxDIzecijdZOnqQjQ
+         FEDs6SUopdy9A==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id DE412C433E4; Sat, 22 Oct 2022 13:18:00 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 216615] New: mSBC codec not supported for 0e8d:0616 (MediaTek
+ RZ616)
+Date:   Sat, 22 Oct 2022 13:18:00 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: marelo64@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-216615-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, xiaokeqinhealth@126.com
-Subject: RE: [BlueZ,1/1] monitor: Ellisys: Add iso packet support
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221022031333.4333-1-xiaokeqinhealth@126.com>
-References: <20221022031333.4333-1-xiaokeqinhealth@126.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7299820192075589441==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216615
 
-This is automated email and please do not reply to this email!
+            Bug ID: 216615
+           Summary: mSBC codec not supported for 0e8d:0616 (MediaTek
+                    RZ616)
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.19.0-21-generic
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: marelo64@gmail.com
+        Regression: No
 
-Dear submitter,
+Created attachment 303073
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303073&action=3Dedit
+Logs for multiple relevant commands
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=687755
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.03 seconds
-GitLint                       PASS      0.71 seconds
-Prep - Setup ELL              PASS      27.39 seconds
-Build - Prep                  PASS      0.82 seconds
-Build - Configure             PASS      8.49 seconds
-Build - Make                  PASS      1010.70 seconds
-Make Check                    PASS      11.85 seconds
-Make Check w/Valgrind         PASS      298.46 seconds
-Make Distcheck                PASS      260.13 seconds
-Build w/ext ELL - Configure   PASS      9.76 seconds
-Build w/ext ELL - Make        PASS      101.79 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      555.57 seconds
-
-
+- Ubuntu ticket: https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/=
+2783
+- Pipewire ticket:
+https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/2783
 
 ---
-Regards,
-Linux Bluetooth
 
+While the bluetooth adapter `0e8d:0616` is supposed to support HFP/mSBC
+(detected as such by pipewire), when switching to it, it fails and fall bac=
+k to
+the low quality HFP/CVSD audio codec.
 
---===============7299820192075589441==--
+According to pipewire's dev, it could be an issue with the driver for that
+specific adapter since my headset (Pixel Buds Pro) works well on another
+machine with the exact same software stack (Ubuntu 22.10) but another bluet=
+ooth
+adapter where the Pixel Buds Pro works well with HFP/mSBC.
+
+See logs attached.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
