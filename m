@@ -2,154 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE83C67871
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Oct 2022 22:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57D34C38A2D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 Oct 2022 23:06:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231492AbiJXW4l convert rfc822-to-8bit (ORCPT
+        id S230338AbiJXXGH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 Oct 2022 18:56:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
+        Mon, 24 Oct 2022 19:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232036AbiJXWz5 (ORCPT
+        with ESMTP id S230384AbiJXXFd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 Oct 2022 18:55:57 -0400
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 670CF2D75B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Oct 2022 14:17:27 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id h10so7301032qvq.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Oct 2022 14:17:27 -0700 (PDT)
+        Mon, 24 Oct 2022 19:05:33 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2704928E07C;
+        Mon, 24 Oct 2022 14:26:55 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id be13so18776412lfb.4;
+        Mon, 24 Oct 2022 14:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lpmvn6r7dh60+tXCwg9HVv88NIhkpPaXAz7PN44Ep2g=;
+        b=oa5GbDJ8fcj7npsls3OssMNUVigy+PTewvlQmBBoDoi3MrZ0aMwPLyxD1uf8fqcLZ0
+         MCi6fqWraBirLQPpYixafFBpK2g1WUoP2WdN22To+uCTHC1vAS/YgEMed90lHKp/9il5
+         bVRFf3AVaeYJ41tZ59RxKw9W8Fqx2PVQd74JNxkvseXvdIt2kArF2ENlU+wwKl2TnvP3
+         dqqsLzJF/WYEhjOQgs6+3CHSnzYzifpc4+MQtJkNeYPj5uzU7M3R5+UCaQV2luYlwSl3
+         gWn37ygBR6JXvLYPWcuCBPtUmVgXklWh3qUvimaFuhw0skGPxdBcSCIICJVlNBgT5o59
+         mjPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-disposition:message-id
-         :mime-version:to:subject:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mzM+CwAn5cD3N4rEl83EcVyjqky3hSmdFB9Yzw3TcHY=;
-        b=XjNxf9ncYL85ayAsZ1nMvX8poqzD31aSyf0B+fZPa2DWlJnGmCZ/vTKRGI768iSbUS
-         PdPPNuR5ayTGM3PC9giQb2LzjleFOQRubixu0eOCdpFDx/LpcyuB7NgHjtfVxBw67vQq
-         ngfn3jDyhAscd56gLkIbxinZsAfFry7kwBYpbJU1aF+4VkkE8N29pZDcN8glTAMV7t9t
-         PMNOUovnB0ZGoMZWWgSYGxMGT+Vlon78X1R6wZPv47DEJ4wdgJrmGHkcM8rKH3mS6ktr
-         M4rc2OMSyOqn7MvFyJ5Yq6hkfuvBchdb38J9mt+w9xFZLngfgW/frHomHNxrUbYnkUH2
-         R00w==
-X-Gm-Message-State: ACrzQf2RlmGGWGdJk+CM4jkA7pThAY8LB4ecCEMnWxMbUS4i1NF2J8f7
-        m2+MrMq5w0hFVF0cCqK2PqAOQKXPp1tFsOeK
-X-Google-Smtp-Source: AMsMyM7gqhJ/FmKPb2zuwUrxsIvOaiIyiq+5MYRaHdLd4pFx7HG4dd/j1amDPohwokpFvLlwjqderQ==
-X-Received: by 2002:a05:6214:2467:b0:4ba:f07c:d9f7 with SMTP id im7-20020a056214246700b004baf07cd9f7mr16080215qvb.24.1666645914156;
-        Mon, 24 Oct 2022 14:11:54 -0700 (PDT)
-Received: from ffortso9 (c-73-238-129-126.hsd1.ct.comcast.net. [73.238.129.126])
-        by smtp.gmail.com with ESMTPSA id br17-20020a05620a461100b006e9b3096482sm663962qkb.64.2022.10.24.14.11.53
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 14:11:53 -0700 (PDT)
-Date:   Mon, 24 Oct 2022 17:11:52 -0400
-From:   Jack <ostroffjh@users.sourceforge.net>
-Subject: [Regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle unusable
- again with kernel 6.0
-To:     linux-bluetooth@vger.kernel.org
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lpmvn6r7dh60+tXCwg9HVv88NIhkpPaXAz7PN44Ep2g=;
+        b=l7wTndwJg3QyqM6hPlKfvCsai9iriCOYdWc9HoxIBeghJTsil5iB7Ph7aquZ1D6Di4
+         dfRbhELvp7h9mgcb27NYVzC33f+OgbO6sHGlTFVNY5OKBR/PULoHuLgyX7eJd/jDPHzA
+         Mr2dcMOx/9QTWbaPwZ5GRZMeHIumy/XmrVOVVPg/rTXGeJbCBkBqpUynyDPzEoKXOjCk
+         HOpQ6utDqyoCSEfM+IRVdvXxCfWnhNiO3IG4d3Hw6ZItXUY8fOnin2q5X34gEAaMeKAx
+         yncoMegI/lYnxspAJ8bFy2JyIA6JbwpX0n5sL0MJQPa+LM7nxxaNLHL5slQgJzcWDkSY
+         vMOg==
+X-Gm-Message-State: ACrzQf2B2eI4EYdnOkAHP54GQIFUAersrxXF6oo7grrgCgdKFXhVgrSJ
+        iHKJVrmIbc/fH0hDb3E4F9VC1SZ4uD7wxlPtL/qYOuGlOAM=
+X-Google-Smtp-Source: AMsMyM58SleO86M78mwwRfccBo3+XaYYC7DNfdxs/Vb9MLcUfY0/LU7yG3PKMRSSyl8hmd8G8av3g0pFIat3soaaW8c=
+X-Received: by 2002:a05:651c:4ce:b0:26f:e2fd:57ed with SMTP id
+ e14-20020a05651c04ce00b0026fe2fd57edmr13810523lji.161.1666644876485; Mon, 24
+ Oct 2022 13:54:36 -0700 (PDT)
 MIME-Version: 1.0
-X-Mailer: Balsa 2.6.4
-Message-Id: <RJ4W7HKW.X5Y4H63W.RFY63IY6@7AFBARQQ.HKEIB7DO.6ME2HPJY>
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+References: <20221018191911.589564-1-Igor.Skalkin@opensynergy.com>
+ <20221024134033.30142-1-Igor.Skalkin@opensynergy.com> <20221024134033.30142-2-Igor.Skalkin@opensynergy.com>
+In-Reply-To: <20221024134033.30142-2-Igor.Skalkin@opensynergy.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 24 Oct 2022 13:54:24 -0700
+Message-ID: <CABBYNZKc7Y8JJ-J9+yUvnDTeVwYuqmzEZYpvfzvN0ctKGyj-Ow@mail.gmail.com>
+Subject: Re: [PATCH v4 1/1] virtio_bt: Fix alignment in configuration struct
+To:     Igor Skalkin <Igor.Skalkin@opensynergy.com>
+Cc:     virtualization@lists.linux-foundation.org, mst@redhat.com,
+        marcel@holtmann.org, johan.hedberg@gmail.com, jasowang@redhat.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Cheap USB BT dongles that are bad clones of CSR  "ID 0a12:0001  
-Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)" have had  
-historic problems, due to various bad behaviors.  See [Bug 60824]  
-[PATCH][regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle  
-unusable (https://bugzilla.kernel.org/show_bug.cgi) for more details  
-and background.  The patch in that bug was initially mainlined in 5.9,  
-and underwent several revisions since then.  It has continued to work  
-through all of the 5.19 series, but it does not work with any of the  
-6.0 kernels.
+Hi Igor,
 
-I have made three unsuccessful attempts to git bisect using vanilla  
-sources.  All settled on totally irrelevant commits.  These have all  
-used v6.0-rc1 and v5.19 as the starting bad and good commits.
+On Mon, Oct 24, 2022 at 6:41 AM Igor Skalkin
+<Igor.Skalkin@opensynergy.com> wrote:
+>
+> The current version of the configuration structure has unaligned
+> 16-bit fields, but according to the specification [1], access to
+> the configuration space must be aligned.
+>
+> Add a second, aligned  version of the configuration structure
+> and a new feature bit indicating that this version is being used.
+>
+> [1] https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.pdf
+>
+> Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
+> ---
+>  drivers/bluetooth/virtio_bt.c  | 16 +++++++++++++---
+>  include/uapi/linux/virtio_bt.h |  8 ++++++++
+>  2 files changed, 21 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+> index 67c21263f9e0..35f8041722c8 100644
+> --- a/drivers/bluetooth/virtio_bt.c
+> +++ b/drivers/bluetooth/virtio_bt.c
+> @@ -306,7 +306,12 @@ static int virtbt_probe(struct virtio_device *vdev)
+>         if (virtio_has_feature(vdev, VIRTIO_BT_F_VND_HCI)) {
+>                 __u16 vendor;
+>
+> -               virtio_cread(vdev, struct virtio_bt_config, vendor, &vendor);
+> +               if (virtio_has_feature(vdev, VIRTIO_BT_F_CONFIG_V2))
+> +                       virtio_cread(vdev, struct virtio_bt_config_v2,
+> +                                    vendor, &vendor);
+> +               else
+> +                       virtio_cread(vdev, struct virtio_bt_config,
+> +                                    vendor, &vendor);
+>
+>                 switch (vendor) {
+>                 case VIRTIO_BT_CONFIG_VENDOR_ZEPHYR:
+> @@ -339,8 +344,12 @@ static int virtbt_probe(struct virtio_device *vdev)
+>         if (virtio_has_feature(vdev, VIRTIO_BT_F_MSFT_EXT)) {
+>                 __u16 msft_opcode;
+>
+> -               virtio_cread(vdev, struct virtio_bt_config,
+> -                            msft_opcode, &msft_opcode);
+> +               if (virtio_has_feature(vdev, VIRTIO_BT_F_CONFIG_V2))
+> +                       virtio_cread(vdev, struct virtio_bt_config_v2,
+> +                                    msft_opcode, &msft_opcode);
+> +               else
+> +                       virtio_cread(vdev, struct virtio_bt_config,
+> +                                    msft_opcode, &msft_opcode);
+>
+>                 hci_set_msft_opcode(hdev, msft_opcode);
+>         }
+> @@ -387,6 +396,7 @@ static const unsigned int virtbt_features[] = {
+>         VIRTIO_BT_F_VND_HCI,
+>         VIRTIO_BT_F_MSFT_EXT,
+>         VIRTIO_BT_F_AOSP_EXT,
+> +       VIRTIO_BT_F_CONFIG_V2,
+>  };
 
-Having read all the pages on filing a [REGRESSION} bug, I'm a bit  
-intimidated to file something without sufficient information to be  
-taken seriously, but will do so using this information, if that seems  
-the best course of action.
+So this introduces a new flag which must be checked when attempting to
+config, right? But is this backward compatible? What happens if for
+some reason the userspace doesn't use the new struct are we able to
+detect that?
 
-Thanks for any advice, including requests for additional information.
+>  static struct virtio_driver virtbt_driver = {
+> diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/linux/virtio_bt.h
+> index a7bd48daa9a9..af798f4c9680 100644
+> --- a/include/uapi/linux/virtio_bt.h
+> +++ b/include/uapi/linux/virtio_bt.h
+> @@ -9,6 +9,7 @@
+>  #define VIRTIO_BT_F_VND_HCI    0       /* Indicates vendor command support */
+>  #define VIRTIO_BT_F_MSFT_EXT   1       /* Indicates MSFT vendor support */
+>  #define VIRTIO_BT_F_AOSP_EXT   2       /* Indicates AOSP vendor support */
+> +#define VIRTIO_BT_F_CONFIG_V2  3       /* Use second version configuration */
+>
+>  enum virtio_bt_config_type {
+>         VIRTIO_BT_CONFIG_TYPE_PRIMARY   = 0,
+> @@ -28,4 +29,11 @@ struct virtio_bt_config {
+>         __u16 msft_opcode;
+>  } __attribute__((packed));
+>
+> +struct virtio_bt_config_v2 {
+> +       __u8  type;
+> +       __u8  alignment;
+> +       __u16 vendor;
+> +       __u16 msft_opcode;
+> +};
+> +
+>  #endif /* _UAPI_LINUX_VIRTIO_BT_H */
+> --
+> 2.37.2
+>
 
-Below is the output from 'dmesg | egrep -iC2 "bt|blue" of a typical  
-failed boot.  Note that unplugging and replugging the dongle (sometimes  
-two or more times) will sometimes be successful in having it recognized  
-and usable.
 
-[    2.284192] usb 1-2: New USB device found, idVendor=0a12,  
-idProduct=0001, bcdDevice=88.91
-[    2.284925] usb 1-2: New USB device strings: Mfr=0, Product=2,  
-SerialNumber=0
-[    2.285648] usb 1-2: Product: BT DONGLE10
-[    2.416732] usb 1-8: new high-speed USB device number 3 using  
-xhci_hcd
-[    2.480396] usb 3-2: new low-speed USB device number 3 using xhci_hcd
---
-[    3.809944] [drm] GART: num cpu pages 524288, num gpu pages 524288
-[    3.810893] [drm] PCIE gen 3 link speeds already enabled
-[    3.820930] Bluetooth: Core ver 2.22
-[    3.820951] NET: Registered PF_BLUETOOTH protocol family
-[    3.820955] Bluetooth: HCI device and connection manager initialized
-[    3.820960] Bluetooth: HCI socket layer initialized
-[    3.820964] Bluetooth: L2CAP socket layer initialized
-[    3.820968] Bluetooth: SCO socket layer initialized
-[    3.826636] usbcore: registered new interface driver btusb
-[    3.827192] [drm] PCIE GART of 2048M enabled (table at  
-0x00000000001D6000).
-[    3.827302] radeon 0000:1c:00.0: WB enabled
---
-[    3.827320] radeon 0000:1c:00.0: fence driver on ring 4 use gpu addr  
-0x0000000040000c10
-[    3.827531] radeon 0000:1c:00.0: fence driver on ring 5 use gpu addr  
-0x0000000000075a18
-[    3.828917] Bluetooth: hci0: CSR: Unbranded CSR clone detected;  
-adding workarounds and force-suspending once...
-[    3.828925] Bluetooth: hci0: CSR: Couldn't suspend the device for  
-our Barrot 8041a02 receive-issue workaround
-[    3.828932] Bluetooth: hci0: HCI Delete Stored Link Key command is  
-advertised, but not supported.
-[    3.828936] Bluetooth: hci0: HCI Set Event Filter command not  
-supported.
-[    3.840596] sr 5:0:0:0: Attached scsi CD-ROM sr0
-[    3.843043] usbcore: registered new interface driver snd-usb-audio
---
-[    5.436854] [drm] ib test on ring 5 succeeded
-[    5.943391] [drm] ib test on ring 6 succeeded
-[    5.996684] Bluetooth: hci0: Opcode 0x c5a failed: -110
-[    5.996712] Bluetooth: hci0: command tx timeout
-[    6.125712] EXT4-fs (nvme0n1p2): re-mounted. Quota mode: none.
-[    6.231315] Adding 15728636k swap on /dev/sda2.  Priority:-2  
-extents:1 across:15728636k FS
---
-[    7.866607] amdgpu: Virtual CRAT table created for CPU
-[    7.866630] amdgpu: Topology: Add CPU node
-[    7.957240] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    7.957257] Bluetooth: BNEP filters: protocol multicast
-[    7.957272] Bluetooth: BNEP socket layer initialized
-[    8.611080] RPC: Registered named UNIX socket transport module.
-[    8.611607] RPC: Registered udp transport module.
-
-A successful run produces something like:
-[  107.893971] usb 1-2: New USB device found, idVendor=0a12,  
-idProduct=0001, bcdDevice=88.91
-[  107.893979] usb 1-2: New USB device strings: Mfr=0, Product=2,  
-SerialNumber=0
-[  107.893982] usb 1-2: Product: BT DONGLE10
-[  107.906721] Bluetooth: hci0: CSR: Unbranded CSR clone detected;  
-adding workarounds and force-suspending once...
-[  107.906731] Bluetooth: hci0: CSR: Couldn't suspend the device for  
-our Barrot 8041a02 receive-issue workaround
-[  107.906737] Bluetooth: hci0: HCI Delete Stored Link Key command is  
-advertised, but not supported.
-[  107.906739] Bluetooth: hci0: HCI Read Default Erroneous Data  
-Reporting command is advertised, but not supported.
-[  107.906741] Bluetooth: hci0: HCI Set Event Filter command not  
-supported.
-[  108.050825] Bluetooth: RFCOMM TTY layer initialized
-[  108.050834] Bluetooth: RFCOMM socket layer initialized
-[  108.050842] Bluetooth: RFCOMM ver 1.11
+-- 
+Luiz Augusto von Dentz
