@@ -2,92 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C0EC38A2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 21:13:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC3FC38A2D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 22:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbiJYVNG (ORCPT
+        id S232445AbiJYWKX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Oct 2022 17:13:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58858 "EHLO
+        Tue, 25 Oct 2022 18:10:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230447AbiJYVNE (ORCPT
+        with ESMTP id S232568AbiJYWKJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Oct 2022 17:13:04 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CFC9106A55
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 14:13:03 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id l127so11616005iof.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 14:13:03 -0700 (PDT)
+        Tue, 25 Oct 2022 18:10:09 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F692CE18
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:10:08 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id j21so9223884qkk.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:10:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1j5E6UcwROAS9jfW/Gu/SH25ZzySS6zxIVHIV97uLD8=;
-        b=lt+SQMk/rRguF/jZilDUuCpzTApyT+VTe7+IzGStwjw++s3Iqthkx/efmvyCN2dK+6
-         KVGuilyL04l3QWywWDVKw6v46ogCdqBQ94tZzeijcKzuBW6a9WbPuiKqPBGstQj6pSHu
-         omjjribmfzJGvP+kOp14LEofZHb8tVbfKPwdopy2QorFQtYpyzqcC5XCxM3d390ZgkYU
-         RYUPla46eqgSmiQH2dvFamQ0mej8DAoahe7Nb3bbCZsXLnbXffy83gXaYoorWunAmHJ9
-         WCTNs8JFo3MsI73HbO/AsCF9GqWjf74sdAf6IR4Cev6RK7OntHwUSeKUqAPThw6lhjhd
-         ZrfA==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qS+nBf+2rLkMA5kMswYev6j9Ri0V1BZambcewh32pYk=;
+        b=M5cjsJ6UTuJ3uytEQdZ1M+pM8Z8o3Kl11ZxJgfVm0FLGsuuUJEtuFjSzVo0jo+QlEo
+         EEZfxymVC47UGOF8LLQRdgNqPlk98zS+IyRDJBX4pHiSASbpTEA2KUEkt9XJbrbnpfRo
+         r1UYc8XD6ADJBLjHU4ixHKa1YfBU+Lnt6icCydvWEfty+hvS7lXBEXc67JtlF1noW1+A
+         JFv2MFC0Q6A24NfIyT11CEiuZLP3EP8/DWBOaOUjcHHgrWdbQEbSNj30jn26HZhsmKUP
+         0i1NOZJA4Sj0jxq4lDKp3RkYZ4hTWUz4uysx8n8Xqaq/9FI2SLJUctp51+MCaYXGuHyn
+         WCvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1j5E6UcwROAS9jfW/Gu/SH25ZzySS6zxIVHIV97uLD8=;
-        b=02JbOOY7ETfhNAfA/henYjJ0l5Ls9VB4EPN3MrmkRoxfI4W+gfc7PLjyxiWksK/tZU
-         gNOrKp66du+wcHU/B9XZ+T7icyC9PEZi0Wstehvst+hBW8njRbNQhSzZXfScsiJgNR1E
-         2rI6rmPzOScKoYbtYpVtddXIS6jFLp7nf53E2Dtjkhtr0CSypYKkOyAfw1cq8jzjFElj
-         8KnL9FsaZvwKJjaBQThjKVvtkFmog+51d2XEn1yU5kQbQrcVbasJf7yPueIKDiHrlwJK
-         sj40W35oiQpGuiHlsCzTg+aJUoaQvEaxuR0uBRKig3WYzX0DHLDbCCZPyIh2K4QZ95nu
-         mjQg==
-X-Gm-Message-State: ACrzQf39LeLYhcItbBfXTqKiMyc/Q0gis74ayaJ3+J1xwWPwq18/XjhV
-        fQkXN6u9rcExxQ5CvUG7IAlhKPzgkCs=
-X-Google-Smtp-Source: AMsMyM6C0OVUU1EGpZjukwgx/GTWjIyFNUoxUmBBrqv8YQidM6/zzzrjZqBvDfynGZSdUF/6CPYZ8A==
-X-Received: by 2002:a02:662c:0:b0:363:c768:2b55 with SMTP id k44-20020a02662c000000b00363c7682b55mr26390629jac.5.1666732382410;
-        Tue, 25 Oct 2022 14:13:02 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id w11-20020a02394b000000b003636c046e73sm1253337jae.95.2022.10.25.14.13.01
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qS+nBf+2rLkMA5kMswYev6j9Ri0V1BZambcewh32pYk=;
+        b=XrSlOyhnqEwkfKnzuQ4jEi4cQtlNViQqlULbjTCO9vSR4LQFWKOpKvfdzlU0StQSSz
+         e0XXnPHfNo0MNv8eiFqXn3ZUVmeJQM6Feyvrp1CnmfZsL0VtBAaLC91rYrj2Rc8qXWHN
+         zv/6q0YuD9bgLUY9R+GKqpZRCmHSc/jihOAAahYcg8EHtxCoy4JH+SUVY5V2zEwGrFhv
+         C31Up3ZdzKJmXGXtMeM6CPuRT9iiEmlXld2m75lspQcFsUmu0dWJMMPijZgOqLSQV1oB
+         yyJn/mkGPnn+VltZHFAmyqAzP34NTmrtlTIOdM/O74xbxjB3xi6CLC9qK/Y8XdNRP9Z4
+         p7CA==
+X-Gm-Message-State: ACrzQf2N777wJDW2qcy39ZwHUF1U4gv6vI5P9APWpWyV9MvYmfcH1Usg
+        p7Pgjj+8iQC/AxW0Dn3RXSpMSWc28TGiPQ==
+X-Google-Smtp-Source: AMsMyM756aSnQazsFzCyBiTdLRCbxbZH7J330JB9w4NBgwrApD8nnB1m555IY2NrkYJbJgbRapDveg==
+X-Received: by 2002:a37:bd47:0:b0:6e1:be21:e6e1 with SMTP id n68-20020a37bd47000000b006e1be21e6e1mr28112172qkf.473.1666735807728;
+        Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
+Received: from [172.17.0.2] ([20.7.183.50])
+        by smtp.gmail.com with ESMTPSA id ci25-20020a05622a261900b00397b1c60780sm2173780qtb.61.2022.10.25.15.10.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Oct 2022 14:13:01 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: btusb: Default CONFIG_BT_HCIBTUSB_POLL_SYNC=y
-Date:   Tue, 25 Oct 2022 14:12:58 -0700
-Message-Id: <20221025211258.1385541-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
+Message-ID: <63585ebf.050a0220.bfd96.7c23@mx.google.com>
+Date:   Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6447450814084496875=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [1/2] Bluetooth: btusb: Add CONFIG_BT_HCIBTUSB_POLL_SYNC
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20221025211258.1385541-1-luiz.dentz@gmail.com>
 References: <20221025211258.1385541-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6447450814084496875==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-poll_sync has been proven to fix races of USB data and event endpoints
-so this enables it by default.
+This is automated email and please do not reply to this email!
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=688821
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.50 seconds
+GitLint                       PASS      2.13 seconds
+SubjectPrefix                 PASS      1.78 seconds
+BuildKernel                   PASS      33.64 seconds
+BuildKernel32                 PASS      30.60 seconds
+Incremental Build with patchesPASS      52.41 seconds
+TestRunner: Setup             PASS      505.03 seconds
+TestRunner: l2cap-tester      PASS      17.27 seconds
+TestRunner: iso-tester        PASS      16.03 seconds
+TestRunner: bnep-tester       PASS      6.33 seconds
+TestRunner: mgmt-tester       PASS      103.82 seconds
+TestRunner: rfcomm-tester     PASS      10.11 seconds
+TestRunner: sco-tester        PASS      9.52 seconds
+TestRunner: ioctl-tester      PASS      10.75 seconds
+TestRunner: mesh-tester       PASS      7.77 seconds
+TestRunner: smp-tester        PASS      9.51 seconds
+TestRunner: userchan-tester   PASS      6.61 seconds
+
+
+
 ---
- drivers/bluetooth/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index fc36057d546d..89b4d47b7c79 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -48,6 +48,7 @@ config BT_HCIBTUSB_AUTOSUSPEND
- config BT_HCIBTUSB_POLL_SYNC
- 	bool "Enable USB poll_sync for Bluetooth USB devices by default"
- 	depends on BT_HCIBTUSB
-+	default y
- 	help
- 	  poll_sync synchronizes the USB data and event endpoints by
- 	  prioritizing the later.
--- 
-2.37.3
 
+--===============6447450814084496875==--
