@@ -2,237 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2240C38A2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 20:33:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 829AAFA373E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 21:13:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232864AbiJYUd0 (ORCPT
+        id S231357AbiJYVNF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Oct 2022 16:33:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53338 "EHLO
+        Tue, 25 Oct 2022 17:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232656AbiJYUdZ (ORCPT
+        with ESMTP id S230179AbiJYVNE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Oct 2022 16:33:25 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E284DAC3BF;
-        Tue, 25 Oct 2022 13:33:23 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id fy4so15813489ejc.5;
-        Tue, 25 Oct 2022 13:33:23 -0700 (PDT)
+        Tue, 25 Oct 2022 17:13:04 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DA8D106A56
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 14:13:02 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id r1so1361201ilg.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 14:13:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l5y5N+tuS7DlthYuEPypRk3pQGfy0Smme3GIXM4h1WE=;
-        b=JRyJjxpk4z3Gbl1gd19JgiK3zOtEBNvjSqXeda4YX8f8PBPaEjL0QsAGsmL3AbCI2k
-         Sslxdfkywvl9NEAC+vdOXwmBv/qY8g6cKwn0ijmJ8iCYOow/nXJwk3QtxmcIFkp32By+
-         poZipGbt3EjJYlAUe3mwYPIaMBQLJmMSbWQTygjIcsH+IklwY2q2TccNBpR/k4HWEUPs
-         kMOvxhTvR6aviEf8hslcTAbk3JGmSL23v+B3Hou4FaxFSbkin8dhTarRq14yic2zH6RH
-         y8ueT0UZzxakjdFiv+dp2dCKcluENYpmOT/+bSMCH1wSbbS2OoDV9lLxT1Meb73XXibT
-         ZC6w==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ygM60BjTK/Gp3D6hT+2zvWdUnoEjruIpLetF6G5CN4c=;
+        b=GMrmHZL+v8HAi54XLvlIYuiKB78jSMkQv7J8rSPq4uLhsos0lYxOY8LRggaDsr6BED
+         fSXjrlyImUKZmBLk9+l0jIV0noT7fpUJb0ELhCzfhJVKe4wl/lvNDuMdWY5wtGvFCtmI
+         +0tuz1avJDA4xE3iPJaz2r3MazQro36AZulKDaVwvEpBVQWtE0+T3UK2OLZYAj9GfBwO
+         GcYKGxNJTNjqRqfnyEmLjLwIMTR54EXhCSrRpH7HIuFgTWMhQWATSAfehmTflj6VKcjv
+         Ecpbyek/HQB3Le1tvqKM9pN6OO7hSdAKiM4ARSzqC97mCZWKNnt4CdcE4zPRD6j/0SCD
+         63rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l5y5N+tuS7DlthYuEPypRk3pQGfy0Smme3GIXM4h1WE=;
-        b=PcXxlDfrkC9mx51xEcNGth3E88irJ8Un1XTTdbcahquSObKL8LfrKg11UbMB2M4ZId
-         C44LHFRfDg0EwzMVs8gJodMwowBU8B2O3knGpTFFO4cph64whKE8U8Yh7PmCjrvdC9QK
-         sxIOhb4Uu4dU0YRYTryTPUJhSIs0IQK1E8CLJl48Pn92JQVrfG1cesbiXhGhMjSAxTBC
-         9bDn7rUNvbb+vXdi1qZnVaMFxQjzgdS1r1hhXMmcwC1W3jAVOqR3kUdjeOqbujK0xfb/
-         C82RVm2y1sBBS5wEeY1VOfNMrTQnBMxlixiRoC0hpV2aOd9dK3mVQQScv8hVhc9XP2HK
-         3IMQ==
-X-Gm-Message-State: ACrzQf1xD6JTpWIVd1K9C6fcOv+4OwmpxXqVWEmuaCGwBdWBKwiXaqO5
-        L0I5MLs3efIqvfj2X82bxigW/uwDhDhnmJ3wJbCxrBUp
-X-Google-Smtp-Source: AMsMyM6x0/9ya1/Z1YZG50P7yFVQMxNRJ80Pcg/kcbudNGPlQ3cMBeWYHq7i/e/TcBezYgpsHxs8hJ0I+ba3NQLPs0c=
-X-Received: by 2002:a2e:834b:0:b0:26d:e1f8:1453 with SMTP id
- l11-20020a2e834b000000b0026de1f81453mr13637954ljh.65.1666729991356; Tue, 25
- Oct 2022 13:33:11 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221018191911.589564-1-Igor.Skalkin@opensynergy.com>
- <20221024134033.30142-1-Igor.Skalkin@opensynergy.com> <20221024134033.30142-2-Igor.Skalkin@opensynergy.com>
- <CABBYNZKc7Y8JJ-J9+yUvnDTeVwYuqmzEZYpvfzvN0ctKGyj-Ow@mail.gmail.com> <a0ea56ee-8cf4-c1ef-de15-1bbdb0340da6@opensynergy.com>
-In-Reply-To: <a0ea56ee-8cf4-c1ef-de15-1bbdb0340da6@opensynergy.com>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ygM60BjTK/Gp3D6hT+2zvWdUnoEjruIpLetF6G5CN4c=;
+        b=ADTkowkrQ5FJypCaGOaEsC/EGRFIX5QjLfZXDIu5u+IuL230vDw4crP+Ih/ni/MFVK
+         fYCT9sE6i/Sdki1lya7L2QojFnAVLcqbIIFecaHNgpscM9CHMEtfIsxknaYo3cox6bh/
+         vVponPEdj8rsUD/3CEhX0SV4TJtDzmKkeHBRg8wihW81GE913tXWyOl0Rw9DqVT5kaqX
+         E+uCCwjd3GQbEE8jvVBZ9AbDT+bRlvG5KNkkTgv/w1kIxpS+fbrSt9TJRhXPWo4lltYM
+         M/r9WfmAPyu8OgpQckvBE+UFMuIISBh8KlpK2/aht5XenSSJULKomh+1tgGlY20cnJPO
+         6Q9w==
+X-Gm-Message-State: ACrzQf1W4C4ckZTMR5zWFRKCLA8ZfwcHbpv5TjtbkHccCsitFtmw2wUG
+        ax/CM77uofD48yCrAIkvyZyTj5ixeAA=
+X-Google-Smtp-Source: AMsMyM6DBuaHaS2iVOgcUkBhApddIgPw4T4JrL9da0OeKU0g6jB39FctRVYPgcg3hl1fKjJg74O3jQ==
+X-Received: by 2002:a92:1912:0:b0:2fc:f539:9da9 with SMTP id 18-20020a921912000000b002fcf5399da9mr25546353ilz.262.1666732381126;
+        Tue, 25 Oct 2022 14:13:01 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id w11-20020a02394b000000b003636c046e73sm1253337jae.95.2022.10.25.14.12.59
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Oct 2022 14:13:00 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 25 Oct 2022 13:32:59 -0700
-Message-ID: <CABBYNZJPasDqHKp+1mDY4myU9oLfREcW4gt1eGhst1wyU0Y4ZQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/1] virtio_bt: Fix alignment in configuration struct
-To:     Igor Skalkin <igor.skalkin@opensynergy.com>
-Cc:     virtualization@lists.linux-foundation.org, mst@redhat.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, jasowang@redhat.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: btusb: Add CONFIG_BT_HCIBTUSB_POLL_SYNC
+Date:   Tue, 25 Oct 2022 14:12:57 -0700
+Message-Id: <20221025211258.1385541-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Igor,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Oct 25, 2022 at 1:17 PM Igor Skalkin
-<igor.skalkin@opensynergy.com> wrote:
->
-> Hi Luiz Augusto,
->
-> On 10/24/22 22:54, Luiz Augusto von Dentz wrote:
-> > Hi Igor,
-> >
-> > On Mon, Oct 24, 2022 at 6:41 AM Igor Skalkin
-> > <Igor.Skalkin@opensynergy.com> wrote:
-> >>
-> >> The current version of the configuration structure has unaligned
-> >> 16-bit fields, but according to the specification [1], access to
-> >> the configuration space must be aligned.
-> >>
-> >> Add a second, aligned  version of the configuration structure
-> >> and a new feature bit indicating that this version is being used.
-> >>
-> >> [1] https://ddec1-0-en-ctp.trendmicro.com:443/wis/clicktime/v1/query?u=
-rl=3Dhttps%3a%2f%2fdocs.oasis%2dopen.org%2fvirtio%2fvirtio%2fv1.1%2fvirtio%=
-2dv1.1.pdf&umid=3Ddb3482bc-5b84-4bde-bbb0-41d837955a7a&auth=3D53c7c7de28b92=
-dfd96e93d9dd61a23e634d2fbec-d27a9d4c2c971f9ecc5d00d40d5cd9b45c4b5f63
-> >>
-> >> Signed-off-by: Igor Skalkin <Igor.Skalkin@opensynergy.com>
-> >> ---
-> >>  drivers/bluetooth/virtio_bt.c  | 16 +++++++++++++---
-> >>  include/uapi/linux/virtio_bt.h |  8 ++++++++
-> >>  2 files changed, 21 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_=
-bt.c
-> >> index 67c21263f9e0..35f8041722c8 100644
-> >> --- a/drivers/bluetooth/virtio_bt.c
-> >> +++ b/drivers/bluetooth/virtio_bt.c
-> >> @@ -306,7 +306,12 @@ static int virtbt_probe(struct virtio_device *vde=
-v)
-> >>         if (virtio_has_feature(vdev, VIRTIO_BT_F_VND_HCI)) {
-> >>                 __u16 vendor;
-> >>
-> >> -               virtio_cread(vdev, struct virtio_bt_config, vendor, &v=
-endor);
-> >> +               if (virtio_has_feature(vdev, VIRTIO_BT_F_CONFIG_V2))
-> >> +                       virtio_cread(vdev, struct virtio_bt_config_v2,
-> >> +                                    vendor, &vendor);
-> >> +               else
-> >> +                       virtio_cread(vdev, struct virtio_bt_config,
-> >> +                                    vendor, &vendor);
-> >>
-> >>                 switch (vendor) {
-> >>                 case VIRTIO_BT_CONFIG_VENDOR_ZEPHYR:
-> >> @@ -339,8 +344,12 @@ static int virtbt_probe(struct virtio_device *vde=
-v)
-> >>         if (virtio_has_feature(vdev, VIRTIO_BT_F_MSFT_EXT)) {
-> >>                 __u16 msft_opcode;
-> >>
-> >> -               virtio_cread(vdev, struct virtio_bt_config,
-> >> -                            msft_opcode, &msft_opcode);
-> >> +               if (virtio_has_feature(vdev, VIRTIO_BT_F_CONFIG_V2))
-> >> +                       virtio_cread(vdev, struct virtio_bt_config_v2,
-> >> +                                    msft_opcode, &msft_opcode);
-> >> +               else
-> >> +                       virtio_cread(vdev, struct virtio_bt_config,
-> >> +                                    msft_opcode, &msft_opcode);
-> >>
-> >>                 hci_set_msft_opcode(hdev, msft_opcode);
-> >>         }
-> >> @@ -387,6 +396,7 @@ static const unsigned int virtbt_features[] =3D {
-> >>         VIRTIO_BT_F_VND_HCI,
-> >>         VIRTIO_BT_F_MSFT_EXT,
-> >>         VIRTIO_BT_F_AOSP_EXT,
-> >> +       VIRTIO_BT_F_CONFIG_V2,
-> >>  };
-> >
-> > So this introduces a new flag which must be checked when attempting to
-> > config, right? But is this backward compatible? What happens if for
-> > some reason the userspace doesn't use the new struct are we able to
-> > detect that?
->
-> Yes, it's backwards compatible.
->
-> [q]Each virtio device offers all the features it understands. During
-> device initialization, the driver reads this and tells the device the
-> subset that it accepts. The only way to renegotiate is to reset the devic=
-e.
-> This allows for forwards and backwards compatibility: if the device is
-> enhanced with a new feature bit, older drivers will not write that
-> feature bit back to the device. Similarly, if a driver is enhanced with
-> a feature that the device doesn=E2=80=99t support, it see the new feature=
- is not
-> offered.[/q]
->
-> So, in our case:
->
-> old device - new driver:
-> The device does not offer VIRTIO_BT_F_CONFIG_V2 feature and uses the old
-> configuration structure.
-> The driver also uses the old configuration structure because
-> VIRTIO_BT_F_CONFIG_V2 bit was not negotiated.
->
-> new device - old driver:
-> The device offers this bit, the driver reads it but cannot support it,
-> so it does not write this bit back to the device during feature negotiati=
-on.
-> The device verifies that this bit is not negotiated and continues to use
-> the old configuration structure.
->
->
-> I tested this patch, it
-> a) works fine with a new device that supports VIRTIO_BT_F_CONFIG_V2.
-> b) uses the old configuration structure when working with an old device.
->    Our device does not offer the VIRTIO_BT_F_VND_HCI feature bit, so the
-> driver does not tries to read unaligned "vendor" and "msft_opcode"
-> fields and everything is fine.
-> But, if the VIRTIO_BT_F_VND_HCI feature is set for the device for test
-> purposes, our middle layer asserts unaligned accesses to the
-> configuration space.
+This adds CONFIG_BT_HCIBTUSB_POLL_SYNC which can be used to set the
+default behavior of Bluetooth USB controller with respect to poll
+synchronization of its endpoits.
 
-Great, thanks for the explanation.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/Kconfig | 10 ++++++++++
+ drivers/bluetooth/btusb.c |  3 +++
+ 2 files changed, 13 insertions(+)
 
-> P.S. But, as Michael S. Tsirkin rightly stated, [q]Will a spec patch be
-> forthcoming?[/q], this patch requires a specification update.
-> I could not find any virtio_bt specification, do you have one?
-> That would be great. Otherwise, would you mind if I try to write some
-> initial draft?
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index e30707405455..fc36057d546d 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -45,6 +45,16 @@ config BT_HCIBTUSB_AUTOSUSPEND
+ 	  This can be overridden by passing btusb.enable_autosuspend=[y|n]
+ 	  on the kernel commandline.
+ 
++config BT_HCIBTUSB_POLL_SYNC
++	bool "Enable USB poll_sync for Bluetooth USB devices by default"
++	depends on BT_HCIBTUSB
++	help
++	  poll_sync synchronizes the USB data and event endpoints by
++	  prioritizing the later.
++
++	  Say Y here to enable USB poll_sync for Bluetooth USB devices by
++	  default.
++
+ config BT_HCIBTUSB_BCM
+ 	bool "Broadcom protocol support"
+ 	depends on BT_HCIBTUSB
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30dd443f395f..bf978d3659cb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -32,6 +32,7 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
++static bool enable_poll_sync = IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC);
+ static bool reset = true;
+ 
+ static struct usb_driver btusb_driver;
+@@ -3973,6 +3974,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (enable_autosuspend)
+ 		usb_enable_autosuspend(data->udev);
+ 
++	data->poll_sync = enable_poll_sync;
++
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0)
+ 		goto out_free_dev;
+-- 
+2.37.3
 
-Yep, I don't think we have one so feel free to start one, also while
-at it we could perhaps attempt to write a tester for it so we can test
-it using our CI, assuming virtio works with virtual devices created by
-vhci driver.
-
-> >>  static struct virtio_driver virtbt_driver =3D {
-> >> diff --git a/include/uapi/linux/virtio_bt.h b/include/uapi/linux/virti=
-o_bt.h
-> >> index a7bd48daa9a9..af798f4c9680 100644
-> >> --- a/include/uapi/linux/virtio_bt.h
-> >> +++ b/include/uapi/linux/virtio_bt.h
-> >> @@ -9,6 +9,7 @@
-> >>  #define VIRTIO_BT_F_VND_HCI    0       /* Indicates vendor command su=
-pport */
-> >>  #define VIRTIO_BT_F_MSFT_EXT   1       /* Indicates MSFT vendor suppo=
-rt */
-> >>  #define VIRTIO_BT_F_AOSP_EXT   2       /* Indicates AOSP vendor suppo=
-rt */
-> >> +#define VIRTIO_BT_F_CONFIG_V2  3       /* Use second version configur=
-ation */
-> >>
-> >>  enum virtio_bt_config_type {
-> >>         VIRTIO_BT_CONFIG_TYPE_PRIMARY   =3D 0,
-> >> @@ -28,4 +29,11 @@ struct virtio_bt_config {
-> >>         __u16 msft_opcode;
-> >>  } __attribute__((packed));
-> >>
-> >> +struct virtio_bt_config_v2 {
-> >> +       __u8  type;
-> >> +       __u8  alignment;
-> >> +       __u16 vendor;
-> >> +       __u16 msft_opcode;
-> >> +};
-> >> +
-> >>  #endif /* _UAPI_LINUX_VIRTIO_BT_H */
-> >> --
-> >> 2.37.2
->
-
-
---=20
-Luiz Augusto von Dentz
