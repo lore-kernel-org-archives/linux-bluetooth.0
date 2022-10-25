@@ -2,115 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D85C04A95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 04:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12945C38A2D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 07:02:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbiJYEFL (ORCPT
+        id S231408AbiJYHC5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Oct 2022 00:05:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59948 "EHLO
+        Tue, 25 Oct 2022 03:02:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiJYEFJ (ORCPT
+        with ESMTP id S230318AbiJYHCz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Oct 2022 00:05:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 757FF111F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Oct 2022 21:05:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1666670706;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KGQAN5QfmAdIFxH4zxQ7DPOdP0CTozat81OxKPl1IMM=;
-        b=SMyS4fuuL4lEN0CPibSS8It5eRCEWO9w4FmiG+eBFbg3hExfWNZUz0wA+eD2WgyxdDs2g+
-        sdP6CP+WoDsLI4NIU1BKQ1yHNoxzh2u/bbhDcrfgglTDNdvNNt+4yaeP1A3UC+Dld432Xm
-        gEpBSnwmSsWbXygG7OAyBNUlT1yWvuU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-300-ip6t_w31OECkAWaenNi7Kg-1; Tue, 25 Oct 2022 00:05:04 -0400
-X-MC-Unique: ip6t_w31OECkAWaenNi7Kg-1
-Received: by mail-wr1-f72.google.com with SMTP id m24-20020adfa3d8000000b00236774fd74aso1355259wrb.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 24 Oct 2022 21:05:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KGQAN5QfmAdIFxH4zxQ7DPOdP0CTozat81OxKPl1IMM=;
-        b=3yJThXb2lGtz84qp8dahjFPPP5/0vGcxZofZwXBTPmu62tqBkst9AHPDCYM9/LvSxr
-         6qjd7OgZ6z9sGA26F0piwPh6JWBtYV+1C48h1s54ln/4gvHMN2dKrp8kzdf58ObDiITn
-         kNmKVR8vL62Dl2iaUdhzMhxAelX87VPAbOfRyBDq6jf6gWOLVj8tWbxm1ONQVN8v1lGx
-         PQ4Vm4mj+g/O2vuMONongPTPIlH7WbNPDFVkszQqXuyFt6t+SK62uJ7spZk2PV22ATYW
-         BBKOPq9A2AiAC3Jhr9GaqbbNtjTImBqfiHFb9IcJgItKSI+1FO0deepD3ndUlZQkKmBP
-         QP8g==
-X-Gm-Message-State: ACrzQf0kQ1/FwvGTA9kKw0039Ezp9PrwJKooJXDAHCimT4kcsO9cKPvI
-        DIXPUGcP3lMkXkWc0Fghk4IuY22Z7yteGIk4nLG5eKBfcP5+kjSgTxBwDd3MHLJEQe2CJoBqLFn
-        nLY7SMiQBAv5axP1lCfwPRCGeKbBS
-X-Received: by 2002:a05:600c:1822:b0:3c7:103:f9be with SMTP id n34-20020a05600c182200b003c70103f9bemr22816981wmp.195.1666670703040;
-        Mon, 24 Oct 2022 21:05:03 -0700 (PDT)
-X-Google-Smtp-Source: AMsMyM6GrspV0Rv4ooc27M/ZkGRCgHDhw7hvK7fug9mQV9MrYrQcfzp+yqeg/SM+IxYTvSy/l/z7tw==
-X-Received: by 2002:a05:600c:1822:b0:3c7:103:f9be with SMTP id n34-20020a05600c182200b003c70103f9bemr22816959wmp.195.1666670702802;
-        Mon, 24 Oct 2022 21:05:02 -0700 (PDT)
-Received: from redhat.com ([2.52.24.36])
-        by smtp.gmail.com with ESMTPSA id r7-20020a1c2b07000000b003c6f3e5ba42sm9660282wmr.46.2022.10.24.21.05.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 24 Oct 2022 21:05:02 -0700 (PDT)
-Date:   Tue, 25 Oct 2022 00:04:58 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Igor Skalkin <Igor.Skalkin@opensynergy.com>
-Cc:     virtualization@lists.linux-foundation.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, johan.hedberg@gmail.com, jasowang@redhat.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/1] virtio_bt: Fix alignment in configuration struct
-Message-ID: <20221025000433-mutt-send-email-mst@kernel.org>
-References: <20221018191911.589564-1-Igor.Skalkin@opensynergy.com>
- <20221024134033.30142-1-Igor.Skalkin@opensynergy.com>
+        Tue, 25 Oct 2022 03:02:55 -0400
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9957CB3B02
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 00:02:53 -0700 (PDT)
+Received: from [192.168.0.2] (ip5f5aeef3.dynamic.kabel-deutschland.de [95.90.238.243])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 3408061EA1931;
+        Tue, 25 Oct 2022 09:02:50 +0200 (CEST)
+Message-ID: <ab082d3c-9ba6-b1bd-a895-65ea58cec926@molgen.mpg.de>
+Date:   Tue, 25 Oct 2022 09:02:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221024134033.30142-1-Igor.Skalkin@opensynergy.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.3
+Subject: Re: [Regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle
+ unusable again with kernel 6.0
+To:     Jack <ostroffjh@users.sourceforge.net>
+References: <RJ4W7HKW.X5Y4H63W.RFY63IY6@7AFBARQQ.HKEIB7DO.6ME2HPJY>
+Content-Language: en-US
+Cc:     linux-bluetooth@vger.kernel.org
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <RJ4W7HKW.X5Y4H63W.RFY63IY6@7AFBARQQ.HKEIB7DO.6ME2HPJY>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Oct 24, 2022 at 03:40:32PM +0200, Igor Skalkin wrote:
-> According to specification [1], "For the device-specific configuration
-> space, the driver MUST use 8 bit wide accesses for 8 bit wide fields,
-> 16 bit wide and aligned accesses for 16 bit wide fields and 32 bit wide
-> and aligned accesses for 32 and 64 bit wide fields.".
-> 
-> Current version of the configuration structure has non-aligned 16bit
-> fields.
-> 
-> This patch adds a second, aligned  version of the configuration structure
-> and a new feature bit indicating that this version is being used.
+Dear Jack,
 
 
-subject should be v4 but besides that, ok.
-Will a spec patch be forthcoming?
+Thank you for your work on this driver.
 
-> [1] https://docs.oasis-open.org/virtio/virtio/v1.1/virtio-v1.1.pdf
-> 
-> Changes in v4:
->   v3 was corrupted by our smtp server.
-> Changes in v3:
->   v2 had been sent from the wrong address, fixed.
-> Changes in v2:
->   The first version of this patch just changed the configuration
->   structure in uapi/linux/virtio_bt.h
->   This can not be done, because it will break the userspace, so the
->   second version offers a less radical approach - it introduces a new
->   feature bit and a new configuration structure that both the device
->   and the driver will use if this bit is negotiated.
-> 
-> Igor Skalkin (1):
->   virtio_bt: Fix alignment in configuration struct
-> 
->  drivers/bluetooth/virtio_bt.c  | 16 +++++++++++++---
->  include/uapi/linux/virtio_bt.h |  8 ++++++++
->  2 files changed, 21 insertions(+), 3 deletions(-)
-> 
-> -- 
-> 2.37.2
 
+Am 24.10.22 um 23:11 schrieb Jack:
+> Cheap USB BT dongles that are bad clones of CSR  "ID 0a12:0001 Cambridge 
+> Silicon Radio, Ltd Bluetooth Dongle (HCI mode)" have had historic 
+> problems, due to various bad behaviors.  See [Bug 60824] 
+> [PATCH][regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle 
+> unusable (https://bugzilla.kernel.org/show_bug.cgi) for more details and 
+> background.  The patch in that bug was initially mainlined in 5.9, and 
+> underwent several revisions since then.  It has continued to work 
+> through all of the 5.19 series, but it does not work with any of the 6.0 
+> kernels.
+> 
+> I have made three unsuccessful attempts to git bisect using vanilla 
+> sources.  All settled on totally irrelevant commits.  These have all 
+> used v6.0-rc1 and v5.19 as the starting bad and good commits.
+
+Thank you for trying to bisect the issue. Too bad, it’s inconclusive. 
+Did you or can you please test the commits below, relating to the merges 
+of the Bluetooth trees.
+
+1.  b8c3bf0ed2edf2deaedba5f0bf0bb54c76dee71d
+2.  1d1ab5d39be7590bb2400418877bff43da9e75ec
+3.  2e64fe4624d19bc71212aae434c54874e5c49c5a
+4.  4a934eca7b39df35569f97a070701d6846ce46df
+5.  14202eff214e1e941fefa0366d4c3bc4b1a0d500
+6.  c69ecb0ea4c96b8b191cbaa0b420222a37867655
+7.  6e0e846ee2ab01bc44254e6a0a6a6a0db1cba16d
+8.  5588d628027092e66195097bdf6835ddf64418b3
+
+> Having read all the pages on filing a [REGRESSION} bug, I'm a bit 
+> intimidated to file something without sufficient information to be taken 
+> seriously, but will do so using this information, if that seems the best 
+> course of action.
+
+Having the regression documented is the most important thing, and it 
+will be taken seriously even if the reporter has not fully analyzed or 
+solved it.
+
+[…]
+
+
+Kind regards,
+
+Paul
