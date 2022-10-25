@@ -2,107 +2,203 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BC3FC38A2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 22:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AF60C38A2D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 Oct 2022 22:16:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232445AbiJYWKX (ORCPT
+        id S232445AbiJYWQu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 Oct 2022 18:10:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43214 "EHLO
+        Tue, 25 Oct 2022 18:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232568AbiJYWKJ (ORCPT
+        with ESMTP id S232204AbiJYWQt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 Oct 2022 18:10:09 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4F692CE18
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:10:08 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id j21so9223884qkk.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:10:08 -0700 (PDT)
+        Tue, 25 Oct 2022 18:16:49 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 060E21ADB6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:16:48 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id jo13so8618709plb.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 Oct 2022 15:16:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qS+nBf+2rLkMA5kMswYev6j9Ri0V1BZambcewh32pYk=;
-        b=M5cjsJ6UTuJ3uytEQdZ1M+pM8Z8o3Kl11ZxJgfVm0FLGsuuUJEtuFjSzVo0jo+QlEo
-         EEZfxymVC47UGOF8LLQRdgNqPlk98zS+IyRDJBX4pHiSASbpTEA2KUEkt9XJbrbnpfRo
-         r1UYc8XD6ADJBLjHU4ixHKa1YfBU+Lnt6icCydvWEfty+hvS7lXBEXc67JtlF1noW1+A
-         JFv2MFC0Q6A24NfIyT11CEiuZLP3EP8/DWBOaOUjcHHgrWdbQEbSNj30jn26HZhsmKUP
-         0i1NOZJA4Sj0jxq4lDKp3RkYZ4hTWUz4uysx8n8Xqaq/9FI2SLJUctp51+MCaYXGuHyn
-         WCvg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmU9F13OArWeXWJQWe0dPx4Z+GHsbxDYbzT8MvhbwI8=;
+        b=PqVvAVoXuNS1Se4Gmg04D+TgGG+bu/0KAIjvXlQZxPVkrQ2n+3gjM6rBmVyryTvMAZ
+         Jr7bikz6DU42JEO9KOjB84zlVtNr9zhqCOJ1NE3g6xLgEYPS4ZKflSeso5dbeIjcftFc
+         V/fJelg3KUz+tv3nbX6dxJ65q5bPkNTrcZb6IYSssjx2Fwr+NxTtw9S9kSsKKMo8F9/I
+         j33Xh3ZrjHeOYw4SuE+9JkwUrX0mtiRAQPvao9MbMm8dmDVHdsNm1Li/AWBc+NgrAQhz
+         bbD+E0wiNcaizBlNfKbPxA/8D2TdCjwUwlWU336WrrmE8zknOF3RsN05/N0h9z2AYyaE
+         Ww1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qS+nBf+2rLkMA5kMswYev6j9Ri0V1BZambcewh32pYk=;
-        b=XrSlOyhnqEwkfKnzuQ4jEi4cQtlNViQqlULbjTCO9vSR4LQFWKOpKvfdzlU0StQSSz
-         e0XXnPHfNo0MNv8eiFqXn3ZUVmeJQM6Feyvrp1CnmfZsL0VtBAaLC91rYrj2Rc8qXWHN
-         zv/6q0YuD9bgLUY9R+GKqpZRCmHSc/jihOAAahYcg8EHtxCoy4JH+SUVY5V2zEwGrFhv
-         C31Up3ZdzKJmXGXtMeM6CPuRT9iiEmlXld2m75lspQcFsUmu0dWJMMPijZgOqLSQV1oB
-         yyJn/mkGPnn+VltZHFAmyqAzP34NTmrtlTIOdM/O74xbxjB3xi6CLC9qK/Y8XdNRP9Z4
-         p7CA==
-X-Gm-Message-State: ACrzQf2N777wJDW2qcy39ZwHUF1U4gv6vI5P9APWpWyV9MvYmfcH1Usg
-        p7Pgjj+8iQC/AxW0Dn3RXSpMSWc28TGiPQ==
-X-Google-Smtp-Source: AMsMyM756aSnQazsFzCyBiTdLRCbxbZH7J330JB9w4NBgwrApD8nnB1m555IY2NrkYJbJgbRapDveg==
-X-Received: by 2002:a37:bd47:0:b0:6e1:be21:e6e1 with SMTP id n68-20020a37bd47000000b006e1be21e6e1mr28112172qkf.473.1666735807728;
-        Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
-Received: from [172.17.0.2] ([20.7.183.50])
-        by smtp.gmail.com with ESMTPSA id ci25-20020a05622a261900b00397b1c60780sm2173780qtb.61.2022.10.25.15.10.07
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmU9F13OArWeXWJQWe0dPx4Z+GHsbxDYbzT8MvhbwI8=;
+        b=KaOeEoZjjfOa2K2/tDdLsGrfF3fXSnrzPEmmOvn8DB0ddQJLEg9lqSp4iC1/joxWk8
+         TF75B7FXujDjPWQfxZjmq/OurYo6uTecbXa6FS5y6zUTMAivWd/lsqTJFQCoCJemv96V
+         6+/mvXS2OK4WMoAvX2HI/ZfFqhFFR5Ch1ymTn+VMKqq6x/KMWv1KOh2moWtLVpfroLSn
+         KXRoiu9vMS+7QBVhfjIj1plopMzOGrhVtiJR+55W/KU6qAyGFqzJStsrfaiIAOKq/bfJ
+         zV9qV3GOzW5tD40MB/mB7C4JaB4VcYQhmY2E+ZvWTeJbxtwI9NfOYrvuqiGm3NsKESL3
+         HyAw==
+X-Gm-Message-State: ACrzQf0ezyWWHDcDctQPUQaxf2AcSR/oRvQRy+KH7vArp3NqjN2hHsdf
+        jrVK7OamxnaGuQimEJKOLeMeDUBYwqw=
+X-Google-Smtp-Source: AMsMyM7cge14fT8yplxbB+F64LTpwkXAnN1Iy3BbDUo16rHG7tW6zZjP6FvwyxkoM0IxZvLyxSQOcA==
+X-Received: by 2002:a17:902:ce03:b0:178:3ba6:f731 with SMTP id k3-20020a170902ce0300b001783ba6f731mr40935607plg.115.1666736207076;
+        Tue, 25 Oct 2022 15:16:47 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a80:cc40:7681:15f8:9917:92b7])
+        by smtp.gmail.com with ESMTPSA id c29-20020a056a00009d00b0056b9c2699cesm1852019pfj.46.2022.10.25.15.16.46
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
-Message-ID: <63585ebf.050a0220.bfd96.7c23@mx.google.com>
-Date:   Tue, 25 Oct 2022 15:10:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6447450814084496875=="
+        Tue, 25 Oct 2022 15:16:46 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] doc/ci.config: Add configuration for CI test
+Date:   Tue, 25 Oct 2022 15:16:45 -0700
+Message-Id: <20221025221645.2344340-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [1/2] Bluetooth: btusb: Add CONFIG_BT_HCIBTUSB_POLL_SYNC
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221025211258.1385541-1-luiz.dentz@gmail.com>
-References: <20221025211258.1385541-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6447450814084496875==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=688821
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      3.50 seconds
-GitLint                       PASS      2.13 seconds
-SubjectPrefix                 PASS      1.78 seconds
-BuildKernel                   PASS      33.64 seconds
-BuildKernel32                 PASS      30.60 seconds
-Incremental Build with patchesPASS      52.41 seconds
-TestRunner: Setup             PASS      505.03 seconds
-TestRunner: l2cap-tester      PASS      17.27 seconds
-TestRunner: iso-tester        PASS      16.03 seconds
-TestRunner: bnep-tester       PASS      6.33 seconds
-TestRunner: mgmt-tester       PASS      103.82 seconds
-TestRunner: rfcomm-tester     PASS      10.11 seconds
-TestRunner: sco-tester        PASS      9.52 seconds
-TestRunner: ioctl-tester      PASS      10.75 seconds
-TestRunner: mesh-tester       PASS      7.77 seconds
-TestRunner: smp-tester        PASS      9.51 seconds
-TestRunner: userchan-tester   PASS      6.61 seconds
-
-
-
+This patch adds the bluetooth kernel config file used by CI test, which
+enables all bluetooth features.
 ---
-Regards,
-Linux Bluetooth
+ doc/ci.config | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
+ create mode 100644 doc/ci.config
 
+diff --git a/doc/ci.config b/doc/ci.config
+new file mode 100644
+index 000000000..31e49ba96
+--- /dev/null
++++ b/doc/ci.config
+@@ -0,0 +1,122 @@
++#############################################################
++#                                                           #
++#   This config file is for testing bluetooth build only.   #
++#                                                           #
++#############################################################
++
++CONFIG_VIRTIO=y
++CONFIG_VIRTIO_PCI=y
++
++CONFIG_NET=y
++CONFIG_INET=y
++
++CONFIG_NET_9P=y
++CONFIG_NET_9P_VIRTIO=y
++
++CONFIG_9P_FS=y
++CONFIG_9P_FS_POSIX_ACL=y
++
++CONFIG_GPIOLIB=y
++
++CONFIG_SERIAL_8250=y
++CONFIG_SERIAL_8250_CONSOLE=y
++CONFIG_SERIAL_8250_PCI=y
++CONFIG_SERIAL_8250_NR_UARTS=4
++
++CONFIG_SERIAL_DEV_BUS=y
++
++CONFIG_TMPFS=y
++CONFIG_TMPFS_POSIX_ACL=y
++CONFIG_TMPFS_XATTR=y
++
++CONFIG_DEVTMPFS=y
++CONFIG_DEBUG_FS=y
++
++CONFIG_MMC=y
++
++CONFIG_RPMSG=y
++CONFIG_QCOM_WCNSS_CTRL=y
++
++CONFIG_PCMCIA=y
++
++CONFIG_ISDN_CAPI=y
++
++CONFIG_6LOWPAN=y
++
++CONFIG_LEDS_CLASS=y
++
++CONFIG_USB=y
++
++CONFIG_BT=y
++CONFIG_BT_BREDR=y
++CONFIG_BT_RFCOMM=y
++CONFIG_BT_RFCOMM_TTY=y
++CONFIG_BT_BNEP=y
++CONFIG_BT_BNEP_MC_FILTER=y
++CONFIG_BT_BNEP_PROTO_FILTER=y
++CONFIG_BT_HIDP=y
++CONFIG_BT_LE=y
++CONFIG_BT_MSFTEXT=y
++CONFIG_BT_HS=y
++CONFIG_BT_CMTP=y
++CONFIG_BT_6LOWPAN=y
++CONFIG_BT_LEDS=y
++CONFIG_BT_FEATURE_DEBUG=y
++
++CONFIG_BT_HCIVHCI=y
++
++CONFIG_BT_HCIBTUSB=y
++CONFIG_BT_HCIBTUSB_AUTOSUSPEND=y
++CONFIG_BT_HCIBTUSB_MTK=y
++CONFIG_BT_HCIBCM203X=y
++CONFIG_BT_HCIBPA10X=y
++CONFIG_BT_MRVL=y
++CONFIG_BT_ATH3K=y
++
++CONFIG_BT_HCIUART=y
++CONFIG_BT_HCIUART_SERDEV=y
++CONFIG_BT_HCIUART_H4=y
++CONFIG_BT_HCIUART_BCSP=y
++CONFIG_BT_HCIUART_ATH3K=y
++CONFIG_BT_HCIUART_AG6XX=y
++CONFIG_BT_HCIUART_NOKIA=y
++CONFIG_BT_HCIUART_LL=y
++CONFIG_BT_HCIUART_3WIRE=y
++CONFIG_BT_HCIUART_INTEL=y
++CONFIG_BT_HCIUART_BCM=y
++CONFIG_BT_HCIUART_RTL=y
++CONFIG_BT_HCIUART_QCA=y
++CONFIG_BT_HCIUART_MRVL=y
++CONFIG_BT_MTKUART=y
++
++CONFIG_BT_HCIBFUSB=y
++
++CONFIG_BT_HCIBTSDIO=y
++CONFIG_BT_MRVL_SDIO=y
++CONFIG_BT_MTKSDIO=y
++
++CONFIG_BT_HCIDTL1=y
++CONFIG_BT_HCIBT3C=y
++CONFIG_BT_HCIBLUECARD=y
++
++CONFIG_BT_QCOMSMD=y
++
++CONFIG_BT_VIRTIO=y
++
++CONFIG_CRYPTO_CMAC=y
++CONFIG_CRYPTO_USER_API=y
++CONFIG_CRYPTO_USER_API_HASH=y
++CONFIG_CRYPTO_USER_API_SKCIPHER=y
++
++CONFIG_UNIX=y
++
++CONFIG_UHID=y
++
++CONFIG_LOCKDEP_SUPPORT=y
++CONFIG_DEBUG_SPINLOCK=y
++CONFIG_DEBUG_LOCK_ALLOC=y
++CONFIG_PROVE_LOCKING=y
++CONFIG_LOCKDEP=y
++CONFIG_DEBUG_MUTEXES=y
++
++CONFIG_OF=y
+-- 
+2.34.1
 
---===============6447450814084496875==--
