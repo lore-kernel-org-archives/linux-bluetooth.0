@@ -2,80 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFF46C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 14:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570A6FA3741
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 17:22:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233525AbiJZOkX (ORCPT
+        id S233932AbiJZRWR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Oct 2022 10:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
+        Wed, 26 Oct 2022 13:22:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233569AbiJZOkW (ORCPT
+        with ESMTP id S233785AbiJZRWO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Oct 2022 10:40:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DF1402FA;
-        Wed, 26 Oct 2022 07:40:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 06EB861F37;
-        Wed, 26 Oct 2022 14:40:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 60C98C433C1;
-        Wed, 26 Oct 2022 14:40:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1666795219;
-        bh=ovw2EHwxGGBcPql+kEaMPRZ6w1YaGRMRQ8slwqBuAOA=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jDzWcJr4K7XONdUSfiOx8LJ6oAaTw01b+CTmGxqkvuy36Y3e7oTlSeoQ995TiO/Eu
-         BdE+Fumd1Vzm6bOf5RfvadCSSFx8KYYK5Uy3PxQFi+rUpuLigB8ICYG0eIhfySck+P
-         1k9roNjhx9MN/ZDAyLx2yr6HvdEGx9pjybRTRyGTE7UB+Du4D2FaCOIn058SkwPCgi
-         OYN7qjXmtLBXKfVbbiKVYBw8qYU7gBaYLFQTgCUsouN4RR8er2wEKHymVFEJfx1zJ2
-         7Y27YS/rCUEj5Dc+1BXDECsq6ku88bX7l9IjAyoScDccGEStJBl1p8ily9BupDuUfQ
-         E2kB1w8CALGtg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 43597E45192;
-        Wed, 26 Oct 2022 14:40:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 26 Oct 2022 13:22:14 -0400
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413D29A2AB
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 10:22:11 -0700 (PDT)
+Received: by mail-qk1-x731.google.com with SMTP id d13so11096878qko.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 10:22:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oLlW1kscCZqIaTOlPcJH/jgt0YbKOWqVS01M6qgp7Uw=;
+        b=w/j7e/fNOCN2iVFnKD8fD8BvhEM2bJk4xOdewSXDEFnHOZGff4bZ5IRRwFooNK/vjC
+         RLiABqYXJAOzFl9nB1Ripgvl6j73RDhtXxtZxKy1HUQjPS3roj9630mO1NdwfExyW2+d
+         HXxquLZV361r+bxmEtPw3jUC5jkvTL0RwdZfeF/BIEMyFD2OGfDjeVP8ynKMTEyvvx+F
+         hHREYvY8RKqLJB1wC9fMSMlldzP0FJ6airbjaRnek0EUrBeMRv08K247pG/GijAS5za6
+         K8+QAhtZhWb5xN/OVXIvTs3nJOuGnDqodc1MNQjfwsDZeWnnHRUSNK5VNxWL/P4yUdAd
+         3sLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oLlW1kscCZqIaTOlPcJH/jgt0YbKOWqVS01M6qgp7Uw=;
+        b=v+5KZftys0ApmSHYfFcg3bQcB0Zzb40Ts0fO3CuiZZ8I1JnZ1ykFb/kfrM+GsLE2Ok
+         PI96zoHSzJxgcNLKhHmFEKmgfnOZliHjMfOLky3A/jbDMj7NX3fMeo956eZZdXIRC3Hu
+         Ye3Q2YRIZ2L9CjTg34zX9LPCgjFzHD8N0ughWaop/iG8uH7+2kRJCi36w4N9ghR1f4Wn
+         BrbZjiZzerZGRSagfnVtmt0FZrNQn4GDgcoqkAWoh+GZxiDdxfW6+8MX9kge3oPZs/5F
+         7lJnhGeQrwT4t3Q+Yu90kyvkIu41KaVRxGqoqWINE46+f5XmktXBSfmnvO8v6b9vlUsO
+         NA1g==
+X-Gm-Message-State: ACrzQf2hNKwH7G19z1K0vtC9knHZO12lRVdQKBwiZEmlCkOCPinVUnhF
+        /pqmcofj5TMN4xMbgeWS1eLYbg==
+X-Google-Smtp-Source: AMsMyM6Kf2jYy3iJqZeqVyXShFrqXF8kTcxCcGJu4mG93deokS9fXIamGA2nuPqOdQnS49zUo6CUpQ==
+X-Received: by 2002:ae9:dd04:0:b0:6e0:ae86:b4 with SMTP id r4-20020ae9dd04000000b006e0ae8600b4mr31724032qkf.146.1666804930281;
+        Wed, 26 Oct 2022 10:22:10 -0700 (PDT)
+Received: from [192.168.1.11] ([64.57.193.93])
+        by smtp.gmail.com with ESMTPSA id x22-20020a05620a0ed600b006b61b2cb1d2sm4130569qkm.46.2022.10.26.10.22.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Oct 2022 10:22:09 -0700 (PDT)
+Message-ID: <fe9b34f9-68f8-0d5d-4085-33a227b7c363@linaro.org>
+Date:   Wed, 26 Oct 2022 13:22:07 -0400
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154-next 2022-10-25
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <166679521926.19839.1560136789859081700.git-patchwork-notify@kernel.org>
-Date:   Wed, 26 Oct 2022 14:40:19 +0000
-References: <20221025102029.534025-1-stefan@datenfreihafen.org>
-In-Reply-To: <20221025102029.534025-1-stefan@datenfreihafen.org>
-To:     Stefan Schmidt <stefan@datenfreihafen.org>
-Cc:     davem@davemloft.net, kuba@kernel.org, linux-wpan@vger.kernel.org,
-        alex.aring@gmail.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [RFC 5/5] bluetooth: hci_mrvl: allow waiting for firmware load
+ using notify-device
+Content-Language: en-US
+To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux@ew.tq-group.com
+References: <cover.1666786471.git.matthias.schiffer@ew.tq-group.com>
+ <fa9cdbe5906fdcfcb37dbe682f3f46ce4b2e1b73.1666786471.git.matthias.schiffer@ew.tq-group.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <fa9cdbe5906fdcfcb37dbe682f3f46ce4b2e1b73.1666786471.git.matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (master)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 25 Oct 2022 12:20:29 +0200 you wrote:
-> Hello Dave, Jakub.
+On 26/10/2022 09:15, Matthias Schiffer wrote:
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+>  drivers/bluetooth/hci_mrvl.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 > 
-> An update from ieee802154 for *net-next*
-> 
-> One of the biggest cycles for ieee802154 in a long time. We are landing the
-> first pieces of a big enhancements in managing PAN's. We might have another pull
-> request ready for this cycle later on, but I want to get this one out first.
-> 
-> [...]
+> diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
+> index b7d764e6010f..dc55053574a9 100644
+> --- a/drivers/bluetooth/hci_mrvl.c
+> +++ b/drivers/bluetooth/hci_mrvl.c
+> @@ -12,6 +12,7 @@
+>  #include <linux/skbuff.h>
+>  #include <linux/firmware.h>
+>  #include <linux/module.h>
+> +#include <linux/notify-device.h>
+>  #include <linux/tty.h>
+>  #include <linux/of.h>
+>  #include <linux/of_device.h>
+> @@ -433,9 +434,25 @@ static int mrvl_serdev_probe(struct serdev_device *serdev)
+>  		return -ENOMEM;
+>  
+>  	if (IS_ENABLED(CONFIG_OF)) {
+> +		struct device_node *firmware_ready_node;
+> +		struct device *firmware_ready;
+> +
+>  		mrvldev->info = of_device_get_match_data(&serdev->dev);
+>  		if (!mrvldev->info)
+>  			return -ENODEV;
+> +
+> +		firmware_ready_node = of_parse_phandle(serdev->dev.of_node,
+> +						       "firmware-ready", 0);
 
-Here is the summary with links:
-  - pull-request: ieee802154-next 2022-10-25
-    https://git.kernel.org/netdev/net-next/c/34e0b9452030
+So you want us to go through five patches, find properties and OF-code,
+create in our minds bindings you think about and comment on that
+imaginary bindings.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I think it should work otherwise - send bindings for all of your DT
+properties.
 
+Best regards,
+Krzysztof
 
