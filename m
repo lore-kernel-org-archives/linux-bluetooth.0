@@ -2,92 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 106ABC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 09:17:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E71C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 11:49:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232903AbiJZJRz (ORCPT
+        id S233319AbiJZLtz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Oct 2022 05:17:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42802 "EHLO
+        Wed, 26 Oct 2022 07:49:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbiJZJRy (ORCPT
+        with ESMTP id S233352AbiJZLtx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Oct 2022 05:17:54 -0400
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620849AC21
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 02:17:53 -0700 (PDT)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1oncXm-0005qX-EX; Wed, 26 Oct 2022 11:17:50 +0200
-Message-ID: <818a55d5-ea65-a962-d83d-0186bd666c2d@leemhuis.info>
-Date:   Wed, 26 Oct 2022 11:17:49 +0200
+        Wed, 26 Oct 2022 07:49:53 -0400
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838594C033
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 04:49:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1666784991; x=1698320991;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VglMMkNAidq8/3Z7Sov+gsaTQtiIoOSE1ELayfk0qz0=;
+  b=Bx6wmzmCfOr85gb8IxXBJBvIhDNUYM9d3gi7HxHiaFEq8NUoQr3/a0Oz
+   CYMacgV1XC54FpOVR/jTtcXt8Ek776pzwiVgk6CiaMyyyNAstE8fYrsoG
+   mQgc6cBCJzIksTp4hYfoAgwYAEJQNwyXoEX+F4fIPmw7iQ1hMir9KjHm6
+   oMCCiicdLpadev6IeFi0UxmGLkJ1pIpGq0B0I7wFj2lvEMS+IxCxFnG7g
+   eV/2ecIrHSELBdVOHxG3BXeRmMREyqXJdV5c60lQespk0e89x6QVwl8yd
+   PbsKBQfRI+IXBW7r5LI3/FBKd5mVDwV60LmB0lXsKN0D21moPUZW7SSQk
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10511"; a="306653435"
+X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
+   d="scan'208";a="306653435"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 04:49:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10511"; a="961180841"
+X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
+   d="scan'208";a="961180841"
+Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
+  by fmsmga005.fm.intel.com with ESMTP; 26 Oct 2022 04:49:50 -0700
+Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1oneur-0007Mu-1s;
+        Wed, 26 Oct 2022 11:49:49 +0000
+Date:   Wed, 26 Oct 2022 19:49:48 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 57dc0d471d2765c4b2952da97a90120a9d689a7e
+Message-ID: <63591edc.OiStsThCBHLOE9Bu%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Content-Language: en-US, de-DE
-To:     linux-bluetooth@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <RJ4W7HKW.X5Y4H63W.RFY63IY6@7AFBARQQ.HKEIB7DO.6ME2HPJY>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-Subject: Re: [Regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle
- unusable again with kernel 6.0 #forregzbot
-In-Reply-To: <RJ4W7HKW.X5Y4H63W.RFY63IY6@7AFBARQQ.HKEIB7DO.6ME2HPJY>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1666775873;47c96493;
-X-HE-SMSGID: 1oncXm-0005qX-EX
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[Note: this mail is primarily send for documentation purposes and/or for
-regzbot, my Linux kernel regression tracking bot. That's why I removed
-most or all folks from the list of recipients, but left any that looked
-like a mailing lists. These mails usually contain '#forregzbot' in the
-subject, to make them easy to spot and filter out.]
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 57dc0d471d2765c4b2952da97a90120a9d689a7e  virtio_bt: Fix alignment in configuration struct
 
-[TLDR: I'm adding this regression report to the list of tracked
-regressions; all text from me you find below is based on a few templates
-paragraphs you might have encountered already already in similar form.]
+elapsed time: 724m
 
-Hi, this is your Linux kernel regression tracker.
+configs tested: 76
+configs skipped: 2
 
-On 24.10.22 23:11, Jack wrote:
-> Cheap USB BT dongles that are bad clones of CSR  "ID 0a12:0001 Cambridge
-> Silicon Radio, Ltd Bluetooth Dongle (HCI mode)" have had historic
-> problems, due to various bad behaviors.  See [Bug 60824]
-> [PATCH][regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle
-> unusable (https://bugzilla.kernel.org/show_bug.cgi) for more details and
-> background.  The patch in that bug was initially mainlined in 5.9, and
-> underwent several revisions since then.  It has continued to work
-> through all of the 5.19 series, but it does not work with any of the 6.0
-> kernels.
-> [...]
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Thanks for the report. To be sure below issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, my Linux kernel regression
-tracking bot:
+gcc tested configs:
+arc                                 defconfig
+um                             i386_defconfig
+s390                             allmodconfig
+um                           x86_64_defconfig
+alpha                               defconfig
+s390                                defconfig
+s390                             allyesconfig
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+x86_64                           rhel-8.3-kvm
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+powerpc                           allnoconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+sh                               allmodconfig
+m68k                             allyesconfig
+x86_64                          rhel-8.3-func
+x86_64                              defconfig
+x86_64                    rhel-8.3-kselftests
+i386                                defconfig
+x86_64                               rhel-8.3
+ia64                             allmodconfig
+i386                          randconfig-a014
+i386                             allyesconfig
+arc                  randconfig-r043-20221024
+riscv                randconfig-r042-20221024
+x86_64                        randconfig-a013
+arc                  randconfig-r043-20221023
+x86_64                        randconfig-a011
+s390                 randconfig-r044-20221024
+x86_64                        randconfig-a015
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+x86_64                        randconfig-a006
+arm                                 defconfig
+x86_64                           allyesconfig
+arc                  randconfig-r043-20221025
+arm                              allyesconfig
+arm64                            allyesconfig
+i386                 randconfig-a011-20221024
+i386                 randconfig-a014-20221024
+i386                 randconfig-a015-20221024
+i386                 randconfig-a016-20221024
+i386                 randconfig-a012-20221024
+i386                 randconfig-a013-20221024
+ia64                          tiger_defconfig
+powerpc                   motionpro_defconfig
+sh                         ecovec24_defconfig
+sh                        sh7785lcr_defconfig
+mips                     decstation_defconfig
+arm                         axm55xx_defconfig
+powerpc                       holly_defconfig
+arm                           viper_defconfig
+i386                          randconfig-c001
 
-#regzbot ^introduced 766ae2422b4312
-#regzbot title net: bluetooth: Cambridge Silicon Radio, Ltd Bluetooth
-Dongle unusable again with kernel 6.0
-#regzbot ignore-activity
+clang tested configs:
+i386                          randconfig-a013
+hexagon              randconfig-r045-20221023
+hexagon              randconfig-r041-20221024
+i386                          randconfig-a011
+hexagon              randconfig-r045-20221024
+s390                 randconfig-r044-20221023
+hexagon              randconfig-r041-20221023
+x86_64                        randconfig-a012
+riscv                randconfig-r042-20221023
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+x86_64                        randconfig-a001
+x86_64                        randconfig-a003
+x86_64                        randconfig-a005
+i386                 randconfig-a003-20221024
+i386                 randconfig-a002-20221024
+i386                 randconfig-a004-20221024
+i386                 randconfig-a005-20221024
+i386                 randconfig-a001-20221024
+i386                 randconfig-a006-20221024
 
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply -- ideally with also
-telling regzbot about it, as explained here:
-https://linux-regtracking.leemhuis.info/tracked-regression/
-
-Reminder for developers: When fixing the issue, add 'Link:' tags
-pointing to the report (the mail this one replies to), as explained for
-in the Linux kernel's documentation; above webpage explains why this is
-important for tracked regressions.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-
-P.S.: As the Linux kernel's regression tracker I deal with a lot of
-reports and sometimes miss something important when writing mails like
-this. If that's the case here, don't hesitate to tell me in a public
-reply, it's in everyone's interest to set the public record straight.
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
