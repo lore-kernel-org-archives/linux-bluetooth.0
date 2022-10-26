@@ -2,132 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 570A6FA3741
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 17:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D11C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 19:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233932AbiJZRWR (ORCPT
+        id S234309AbiJZTTt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Oct 2022 13:22:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56578 "EHLO
+        Wed, 26 Oct 2022 15:19:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233785AbiJZRWO (ORCPT
+        with ESMTP id S234049AbiJZTTs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Oct 2022 13:22:14 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 413D29A2AB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 10:22:11 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id d13so11096878qko.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 10:22:11 -0700 (PDT)
+        Wed, 26 Oct 2022 15:19:48 -0400
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4CB512D2F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 12:19:45 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id r12so14540174lfp.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 12:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oLlW1kscCZqIaTOlPcJH/jgt0YbKOWqVS01M6qgp7Uw=;
-        b=w/j7e/fNOCN2iVFnKD8fD8BvhEM2bJk4xOdewSXDEFnHOZGff4bZ5IRRwFooNK/vjC
-         RLiABqYXJAOzFl9nB1Ripgvl6j73RDhtXxtZxKy1HUQjPS3roj9630mO1NdwfExyW2+d
-         HXxquLZV361r+bxmEtPw3jUC5jkvTL0RwdZfeF/BIEMyFD2OGfDjeVP8ynKMTEyvvx+F
-         hHREYvY8RKqLJB1wC9fMSMlldzP0FJ6airbjaRnek0EUrBeMRv08K247pG/GijAS5za6
-         K8+QAhtZhWb5xN/OVXIvTs3nJOuGnDqodc1MNQjfwsDZeWnnHRUSNK5VNxWL/P4yUdAd
-         3sLg==
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UKt5D0VeGh8TwWIsasBQIP8qLwFh76tzqHwK8jC7Thc=;
+        b=VYbD07rYbirgRK+n3zue87uKIPTB/YmTdloQ0C8LO6PC02g7tmMPQMUX2kF/bDXI8c
+         aK8QFKDmZrqmA+/nbu4u6FvRus9Dl8X5afpD0+9iJrYbgLvKt0CPei2KbfbgijjrnwdQ
+         f2tC8xUjrtQWFRqmnXkMFPkR1C3UhmwEZweokYb/aQ1tRrmh+/yMQmaC5VrWuRChCuy8
+         pQCQa5KJR+hRpeQ3Ok52iFpRAF0aMNz2W3F5NP/WtznvyfZn7Nm9Thef7e/f2lcXJXS5
+         dTCG4W8BQEE2RWSmJNDEvKfTcehVvIGTGNy0TnjRou2M+NzfqxBU5Q6Un/YhiZBLDXMU
+         WSTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oLlW1kscCZqIaTOlPcJH/jgt0YbKOWqVS01M6qgp7Uw=;
-        b=v+5KZftys0ApmSHYfFcg3bQcB0Zzb40Ts0fO3CuiZZ8I1JnZ1ykFb/kfrM+GsLE2Ok
-         PI96zoHSzJxgcNLKhHmFEKmgfnOZliHjMfOLky3A/jbDMj7NX3fMeo956eZZdXIRC3Hu
-         Ye3Q2YRIZ2L9CjTg34zX9LPCgjFzHD8N0ughWaop/iG8uH7+2kRJCi36w4N9ghR1f4Wn
-         BrbZjiZzerZGRSagfnVtmt0FZrNQn4GDgcoqkAWoh+GZxiDdxfW6+8MX9kge3oPZs/5F
-         7lJnhGeQrwT4t3Q+Yu90kyvkIu41KaVRxGqoqWINE46+f5XmktXBSfmnvO8v6b9vlUsO
-         NA1g==
-X-Gm-Message-State: ACrzQf2hNKwH7G19z1K0vtC9knHZO12lRVdQKBwiZEmlCkOCPinVUnhF
-        /pqmcofj5TMN4xMbgeWS1eLYbg==
-X-Google-Smtp-Source: AMsMyM6Kf2jYy3iJqZeqVyXShFrqXF8kTcxCcGJu4mG93deokS9fXIamGA2nuPqOdQnS49zUo6CUpQ==
-X-Received: by 2002:ae9:dd04:0:b0:6e0:ae86:b4 with SMTP id r4-20020ae9dd04000000b006e0ae8600b4mr31724032qkf.146.1666804930281;
-        Wed, 26 Oct 2022 10:22:10 -0700 (PDT)
-Received: from [192.168.1.11] ([64.57.193.93])
-        by smtp.gmail.com with ESMTPSA id x22-20020a05620a0ed600b006b61b2cb1d2sm4130569qkm.46.2022.10.26.10.22.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Oct 2022 10:22:09 -0700 (PDT)
-Message-ID: <fe9b34f9-68f8-0d5d-4085-33a227b7c363@linaro.org>
-Date:   Wed, 26 Oct 2022 13:22:07 -0400
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UKt5D0VeGh8TwWIsasBQIP8qLwFh76tzqHwK8jC7Thc=;
+        b=CPJCerZjBj7mSahiS6iSeFkjj1QV2ah39jOHZGWB2r+tPtZBcBFj9w42Wa+WYPt9eo
+         QCWcwMzsiirayZUbH6hWKVAknY3WikOiSknQrqY+VsCHeRDo8qCvfMsxrBucCNF/xiyH
+         R7aPvGlbD6L4RKEsgvFkZKGTB+SCS6GJSwBUbVx8wgz0ocP4quRJW6mTCSNLsoInG+G9
+         b3Cu/N1nqFa2yxQLmarwUBKFOEDdmW5GPpqe/Gq6XPpSZKQbC/TZn+ehAtqOLNbq6/yK
+         aPtbhagWswo2Zly4vF7BzaQ6AOE2ptQ4CE88/n+tVUcZOAKUWzN0OlrfccIH3DW9MpHO
+         Iw+g==
+X-Gm-Message-State: ACrzQf0I5uvfF96nVlDMewMbeBdIIcDk9qMLl1YFole0RBDmVLYgMxaa
+        M8JAZxTaER5yBLoPwjrrnFOGj6PNE6xNT8EugBqfE+dB+TB0cyjG
+X-Google-Smtp-Source: AMsMyM5eCpu8+UCVvdlFKljHdstYfixBBz+0Qa19xmju3MxuasizwEuVQZaHm1hg7vJuZTyffG783ywPdW75fUUOd/0=
+X-Received: by 2002:a05:6512:3b13:b0:4a2:564e:6cea with SMTP id
+ f19-20020a0565123b1300b004a2564e6ceamr16276073lfv.242.1666811983553; Wed, 26
+ Oct 2022 12:19:43 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [RFC 5/5] bluetooth: hci_mrvl: allow waiting for firmware load
- using notify-device
-Content-Language: en-US
-To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        Ganapathi Bhat <ganapathi017@gmail.com>,
-        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
-        Xinming Hu <huxinming820@gmail.com>,
-        Kalle Valo <kvalo@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux@ew.tq-group.com
-References: <cover.1666786471.git.matthias.schiffer@ew.tq-group.com>
- <fa9cdbe5906fdcfcb37dbe682f3f46ce4b2e1b73.1666786471.git.matthias.schiffer@ew.tq-group.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <fa9cdbe5906fdcfcb37dbe682f3f46ce4b2e1b73.1666786471.git.matthias.schiffer@ew.tq-group.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From:   Gabriel Mula <mula.gabriel.fr@gmail.com>
+Date:   Wed, 26 Oct 2022 21:19:07 +0200
+Message-ID: <CADrTX9-1CrAqmjFmsVTGOmutBnzMZ-PRwpwrepnoJzHPu1X5+Q@mail.gmail.com>
+Subject: IMC Networks Bluetooth Radio (13d3:3571 ) Issue
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 26/10/2022 09:15, Matthias Schiffer wrote:
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> ---
->  drivers/bluetooth/hci_mrvl.c | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/hci_mrvl.c b/drivers/bluetooth/hci_mrvl.c
-> index b7d764e6010f..dc55053574a9 100644
-> --- a/drivers/bluetooth/hci_mrvl.c
-> +++ b/drivers/bluetooth/hci_mrvl.c
-> @@ -12,6 +12,7 @@
->  #include <linux/skbuff.h>
->  #include <linux/firmware.h>
->  #include <linux/module.h>
-> +#include <linux/notify-device.h>
->  #include <linux/tty.h>
->  #include <linux/of.h>
->  #include <linux/of_device.h>
-> @@ -433,9 +434,25 @@ static int mrvl_serdev_probe(struct serdev_device *serdev)
->  		return -ENOMEM;
->  
->  	if (IS_ENABLED(CONFIG_OF)) {
-> +		struct device_node *firmware_ready_node;
-> +		struct device *firmware_ready;
-> +
->  		mrvldev->info = of_device_get_match_data(&serdev->dev);
->  		if (!mrvldev->info)
->  			return -ENODEV;
-> +
-> +		firmware_ready_node = of_parse_phandle(serdev->dev.of_node,
-> +						       "firmware-ready", 0);
+Dear all,
+I am writing to report an issue with USB IMC Networks Bluetooth Radio
+(13d3:3571 )
+It is a bluetooth module that can be found inside ASus prime x670-P
+wifi motherboard.
 
-So you want us to go through five patches, find properties and OF-code,
-create in our minds bindings you think about and comment on that
-imaginary bindings.
+On this motherboard there is a Wifi/ble combined card :
+0a:00.0 Network controller [0280]: Realtek Semiconductor Co., Ltd.
+Device [10ec:b852]
+Subsystem: AzureWave Device [1a3b:5471]
+Kernel driver in use: rtw89_8852be
+Kernel modules: rtw_8852be
 
-I think it should work otherwise - send bindings for all of your DT
-properties.
+I am using the driver found here on github :
+https://github.com/lwfinger/rtw89-BT
+I am using archlinux.
 
-Best regards,
-Krzysztof
+The wifi works fine, but the bluetooth can't see any device. (i have
+opened an issue here https://github.com/lwfinger/rtw89-BT/issues/10)
+< lwfinger > have try to add 10ec:b852 to btusb.c device table, i have
+recompile/re-install the driver, but it doesn't help.
 
+If anyone works on that subject, please feel free to contact me,
+I am not aware of kernel development but i will be more than happy to
+help if I can.
+
+Regards,
+
+-- 
+Gabriel Mula
