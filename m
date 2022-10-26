@@ -2,154 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E71C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 11:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9401CC38A2D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 13:16:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233319AbiJZLtz (ORCPT
+        id S233991AbiJZNQg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Oct 2022 07:49:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43274 "EHLO
+        Wed, 26 Oct 2022 09:16:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233352AbiJZLtx (ORCPT
+        with ESMTP id S233390AbiJZNQf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Oct 2022 07:49:53 -0400
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 838594C033
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 04:49:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666784991; x=1698320991;
-  h=date:from:to:cc:subject:message-id:mime-version:
+        Wed, 26 Oct 2022 09:16:35 -0400
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21AA4A99D5;
+        Wed, 26 Oct 2022 06:16:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1666790194; x=1698326194;
+  h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=VglMMkNAidq8/3Z7Sov+gsaTQtiIoOSE1ELayfk0qz0=;
-  b=Bx6wmzmCfOr85gb8IxXBJBvIhDNUYM9d3gi7HxHiaFEq8NUoQr3/a0Oz
-   CYMacgV1XC54FpOVR/jTtcXt8Ek776pzwiVgk6CiaMyyyNAstE8fYrsoG
-   mQgc6cBCJzIksTp4hYfoAgwYAEJQNwyXoEX+F4fIPmw7iQ1hMir9KjHm6
-   oMCCiicdLpadev6IeFi0UxmGLkJ1pIpGq0B0I7wFj2lvEMS+IxCxFnG7g
-   eV/2ecIrHSELBdVOHxG3BXeRmMREyqXJdV5c60lQespk0e89x6QVwl8yd
-   PbsKBQfRI+IXBW7r5LI3/FBKd5mVDwV60LmB0lXsKN0D21moPUZW7SSQk
+  bh=mjFPBPmpLWz/562nklZTla4ladz+0IGVjIOFuv2LArA=;
+  b=g2Yh5SKETTVgbyXjbhuqHF8wiqtjMF3HD/VnrHDKwvzXNmYOJDKFQxw/
+   3u4XyEyUFqjIzr9LsK68QWeHA1zswcujuWJ5/ALwhaaqvcWdeqxVY3pE5
+   1S0ZcUXDUtrKbdf9EfaNk4dAN4tkZe5ch89w0J4F4DeCGExBBX5vyDmcf
+   V2+b5DSxKMaJ9phlsHoyAC+D7mTjnzt/QzDHpweZbj+1UxWhBXBWjgt3A
+   EEL8Sweo/izH6dickrdNPA1t2ng/I78+hLL0y4aIz/v3knfSAimXt6Bj+
+   FJJJVGRn6pu+pJnmZs0clvlRzh3eDVJHl3UTuGJxtwTWbTURlmaEL4wTj
+   g==;
+X-IronPort-AV: E=Sophos;i="5.95,214,1661810400"; 
+   d="scan'208";a="26988467"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 26 Oct 2022 15:16:31 +0200
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Wed, 26 Oct 2022 15:16:31 +0200
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Wed, 26 Oct 2022 15:16:31 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1666790191; x=1698326191;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=mjFPBPmpLWz/562nklZTla4ladz+0IGVjIOFuv2LArA=;
+  b=VkLkxiFpxIRXSvtH9mdheulw/zvTruyrS/vc9L0P69NBK8JYa8AMRgYJ
+   hEHrAkXwDGTMCnRVT3yX3frv80r/tPy4dAIfcw4LCm38awoH0Vhb8HOH7
+   YWwetleT4ujenU/RvxoXQ2C85ybsZxE9caxuoY89vpapB+JyO7UZ1W99U
+   PtlWKjo/aWDCmUwiVMye0cDfpowfV51SzGDFO0X55SBjdxO9w/SHuDvJV
+   M1RBKlZ/FcnataEHlp2nlFDAKxqKcuATaVjAdDKZ0HTFh4LAjsqvh6DQL
+   RlQz/n1KCzIVoVXfO6kMdVolcnzFfap1Mu/4efFQ76vsoduJJfNx5J87C
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10511"; a="306653435"
-X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
-   d="scan'208";a="306653435"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Oct 2022 04:49:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10511"; a="961180841"
-X-IronPort-AV: E=Sophos;i="5.95,214,1661842800"; 
-   d="scan'208";a="961180841"
-Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Oct 2022 04:49:50 -0700
-Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1oneur-0007Mu-1s;
-        Wed, 26 Oct 2022 11:49:49 +0000
-Date:   Wed, 26 Oct 2022 19:49:48 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 57dc0d471d2765c4b2952da97a90120a9d689a7e
-Message-ID: <63591edc.OiStsThCBHLOE9Bu%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+X-IronPort-AV: E=Sophos;i="5.95,214,1661810400"; 
+   d="scan'208";a="26988466"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 26 Oct 2022 15:16:31 +0200
+Received: from localhost.localdomain (SCHIFFERM-M2.tq-net.de [10.121.49.14])
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id BFB01280056;
+        Wed, 26 Oct 2022 15:16:29 +0200 (CEST)
+From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux@ew.tq-group.com,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [RFC 0/5] "notify-device" for cross-driver readiness notification
+Date:   Wed, 26 Oct 2022 15:15:29 +0200
+Message-Id: <cover.1666786471.git.matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 57dc0d471d2765c4b2952da97a90120a9d689a7e  virtio_bt: Fix alignment in configuration struct
+This patch series is obviously missing documentation, MAINTAINERS
+entries, etc., but I'd like to solicit some basic feedback on whether
+this approach makes sense at all before I proceed. If it does, the
+naming is also very much open for bikeshedding - I'm not too happy with
+"notify-device".
 
-elapsed time: 724m
+The basic problem that the notify-device tries to solve is the
+synchronization of firmware loading readiness between the Marvell/NXP
+WLAN and Bluetooth drivers, but it may also be applicable to other
+drivers.
 
-configs tested: 76
-configs skipped: 2
+The WLAN and Bluetooth adapters are handled by separate drivers, and may
+be connected to the CPU using different interfaces (for example SDIO for
+WLAN and UART for Bluetooth). However, both adapters share a single
+firmware that may be uploaded via either interface.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+For the SDIO+UART case, uploading the firmware via SDIO is usually
+preferable, but even when the interface doesn't matter, it seems like a
+good idea to clearly define which driver should handle it. To avoid
+making the Bluetooth driver more complicated than necessary in this case,
+we'd like to defer the probing of the driver until the firmware is ready.
 
-gcc tested configs:
-arc                                 defconfig
-um                             i386_defconfig
-s390                             allmodconfig
-um                           x86_64_defconfig
-alpha                               defconfig
-s390                                defconfig
-s390                             allyesconfig
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-x86_64                           rhel-8.3-kvm
-m68k                             allmodconfig
-arc                              allyesconfig
-alpha                            allyesconfig
-powerpc                           allnoconfig
-mips                             allyesconfig
-powerpc                          allmodconfig
-sh                               allmodconfig
-m68k                             allyesconfig
-x86_64                          rhel-8.3-func
-x86_64                              defconfig
-x86_64                    rhel-8.3-kselftests
-i386                                defconfig
-x86_64                               rhel-8.3
-ia64                             allmodconfig
-i386                          randconfig-a014
-i386                             allyesconfig
-arc                  randconfig-r043-20221024
-riscv                randconfig-r042-20221024
-x86_64                        randconfig-a013
-arc                  randconfig-r043-20221023
-x86_64                        randconfig-a011
-s390                 randconfig-r044-20221024
-x86_64                        randconfig-a015
-x86_64                        randconfig-a004
-x86_64                        randconfig-a002
-x86_64                        randconfig-a006
-arm                                 defconfig
-x86_64                           allyesconfig
-arc                  randconfig-r043-20221025
-arm                              allyesconfig
-arm64                            allyesconfig
-i386                 randconfig-a011-20221024
-i386                 randconfig-a014-20221024
-i386                 randconfig-a015-20221024
-i386                 randconfig-a016-20221024
-i386                 randconfig-a012-20221024
-i386                 randconfig-a013-20221024
-ia64                          tiger_defconfig
-powerpc                   motionpro_defconfig
-sh                         ecovec24_defconfig
-sh                        sh7785lcr_defconfig
-mips                     decstation_defconfig
-arm                         axm55xx_defconfig
-powerpc                       holly_defconfig
-arm                           viper_defconfig
-i386                          randconfig-c001
+For this purpose, we are introducing a notify-device, with the following
+properties:
 
-clang tested configs:
-i386                          randconfig-a013
-hexagon              randconfig-r045-20221023
-hexagon              randconfig-r041-20221024
-i386                          randconfig-a011
-hexagon              randconfig-r045-20221024
-s390                 randconfig-r044-20221023
-hexagon              randconfig-r041-20221023
-x86_64                        randconfig-a012
-riscv                randconfig-r042-20221023
-x86_64                        randconfig-a014
-x86_64                        randconfig-a016
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-i386                 randconfig-a003-20221024
-i386                 randconfig-a002-20221024
-i386                 randconfig-a004-20221024
-i386                 randconfig-a005-20221024
-i386                 randconfig-a001-20221024
-i386                 randconfig-a006-20221024
+- The device is created by a driver as soon as some "readiness
+  condition" is satisfied
+- Creating the device also binds a stub driver, so deferred probes are
+  triggered
+- Looking up the notify device is possible via OF node / phandle reference
+
+This approach avoids a hard dependency between the WLAN and Bluetooth
+driver, and works regardless of the driver load order.
+
+The first patch implementes the notify-device driver itself, and the
+rest shows how the device could be hooked up to the mwifiex and hci_mrvl
+drivers. A device tree making use of the notify-device could look like
+the following:
+
+    &sdhci1 {
+        wifi@1 {
+            compatible = "marvell,sd8987";
+            reg = <1>;
+    
+            wifi_firmware: firmware-notifier {};
+        };
+    };
+
+    &main_uart3 {
+        bluetooth {
+            compatible = "marvell,sd8987-bt";
+            firmware-ready = <&wifi_firmware>;
+        };
+    };
+
+
+Matthias Schiffer (5):
+  misc: introduce notify-device driver
+  wireless: mwifiex: signal firmware readiness using notify-device
+  bluetooth: hci_mrvl: select firmwares to load by match data
+  bluetooth: hci_mrvl: add support for SD8987
+  bluetooth: hci_mrvl: allow waiting for firmware load using
+    notify-device
+
+ drivers/bluetooth/hci_mrvl.c                |  77 ++++++++++++--
+ drivers/misc/Kconfig                        |   4 +
+ drivers/misc/Makefile                       |   1 +
+ drivers/misc/notify-device.c                | 109 ++++++++++++++++++++
+ drivers/net/wireless/marvell/mwifiex/main.c |  14 +++
+ drivers/net/wireless/marvell/mwifiex/main.h |   1 +
+ include/linux/notify-device.h               |  33 ++++++
+ 7 files changed, 228 insertions(+), 11 deletions(-)
+ create mode 100644 drivers/misc/notify-device.c
+ create mode 100644 include/linux/notify-device.h
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+2.25.1
+
