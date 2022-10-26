@@ -2,92 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E76F6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 13:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB42BFA3741
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 Oct 2022 14:38:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233319AbiJZNcW (ORCPT
+        id S234375AbiJZOiD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 Oct 2022 09:32:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41454 "EHLO
+        Wed, 26 Oct 2022 10:38:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232848AbiJZNcU (ORCPT
+        with ESMTP id S234358AbiJZOh4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 Oct 2022 09:32:20 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615C9E4C13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 06:32:19 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id l127so13296642iof.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 26 Oct 2022 06:32:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=FN0MgVXKfBWkhKk9V+q4pI20SX5erzjwChZkDiWfFe8=;
-        b=cwiJilJqaMj0A7XKxamHeeFZbBLCYzAwkow2v/zrOtxUkajGiC/5Me6Ha+bKwlXzzB
-         nVLPEuvh7OycqnnQXKj1cfrracWbCjixMjUYL0VE3NSSlXcKNsuaJHb79HlhXXFFVHQk
-         flKuoo9enQWkJODlH5mHZ5tF3SAnartblIMn8JrgLeey0osToBB6Ed3pkqiDHzr3ecAA
-         xM0ebXIGXB/nnSGCABQ3sdqS3HyM4S3OknmwNlfn5APOvOAX62uEUQpDkMV4JakariEr
-         x42YGUGSUzB4ZKdCBGQRDqdBGMMNidbdNSUwi8N0ItP+ZTyhRVrrZHNqH4s9+oek95ZL
-         JelA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FN0MgVXKfBWkhKk9V+q4pI20SX5erzjwChZkDiWfFe8=;
-        b=UA2X8oRDeXR5GtV2iJoOd7UJGQqRLydlzEAcGy4hYOsKr1ku0eNIz/YUBGjjSYhdg1
-         g8OW6YnDGW/z5FDzPgQw9YzVyr2yrXvNQcCmS59mP67oqe4E3DqaidXqIlCCk3IwwQnj
-         7CE+mu/bsWQkoIiwBSHfNaUFzpeTB1fdAWgf+rUI+fLzAUIHmS+2KN2oVYVEZzIBtfwp
-         4lvoeIG1q6XqzWPKzTLiOGjO704K42UHUbJLGsM8J36w9vfrFbOKv7P/0oJhITyQ9amJ
-         InQHRAM0xwSgmVk9HV+rMU+XJcq0KIL2eqtuzEuDMxmAA4Pq4GOB7T/6DkjbgZYjPukE
-         +1ZA==
-X-Gm-Message-State: ACrzQf1HxP6bVfxwoPRvfZU4ehr/GNptcI8lySnj7kqYEbIHoooXF2xy
-        wv9CjIBEtOPxQy9XOgypqj46Ednm8c4=
-X-Google-Smtp-Source: AMsMyM5P+/ffb2OrkKPeUwiS0NZZjKGFNe+eWvAX3F82e/M5Oy2ZA76Nr5bmWdaZWE7LX+7LJHQ5zA==
-X-Received: by 2002:a05:6638:3285:b0:356:4df5:5d10 with SMTP id f5-20020a056638328500b003564df55d10mr28525911jav.19.1666791138495;
-        Wed, 26 Oct 2022 06:32:18 -0700 (PDT)
-Received: from [172.17.0.2] ([13.89.36.92])
-        by smtp.gmail.com with ESMTPSA id a95-20020a029468000000b00363bd76184esm1991661jai.162.2022.10.26.06.32.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Oct 2022 06:32:18 -0700 (PDT)
-Message-ID: <635936e2.020a0220.12fc5.357d@mx.google.com>
-Date:   Wed, 26 Oct 2022 06:32:18 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1894829104405483821=="
+        Wed, 26 Oct 2022 10:37:56 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63466BA25B;
+        Wed, 26 Oct 2022 07:37:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id AC0E9CE2295;
+        Wed, 26 Oct 2022 14:37:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7462EC433C1;
+        Wed, 26 Oct 2022 14:37:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1666795072;
+        bh=y2U35Pk+CmD/Ks0JVJ0GmzyJIulw6nH1nLCwcfBn04Q=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RuU5wBDipXRYa4nCxyKvqv0eTq2JoVlhhjn5FTT7ZmDJrG8uF2LJt1LAf/00IMyuO
+         BG8py7QRzsNGuuIE9EJScbHsBRmNbQCSiQ/YUqthNMOUTnnUj3LTKjUCbj7slPVU5u
+         xaFztWPUG8uKYghyJAWiJyNg+pqleuh0WkzIY9o0=
+Date:   Wed, 26 Oct 2022 16:37:49 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh+dt@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Sharvari Harisangam <sharvari.harisangam@nxp.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Kalle Valo <kvalo@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux@ew.tq-group.com
+Subject: Re: [RFC 1/5] misc: introduce notify-device driver
+Message-ID: <Y1lGPRvKMbNDs1iK@kroah.com>
+References: <cover.1666786471.git.matthias.schiffer@ew.tq-group.com>
+ <db30127ab4741d4e71b768881197f4791174f545.1666786471.git.matthias.schiffer@ew.tq-group.com>
 MIME-Version: 1.0
-Subject: RE: "notify-device" for cross-driver readiness notification
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, matthias.schiffer@ew.tq-group.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <db30127ab4741d4e71b768881197f4791174f545.1666786471.git.matthias.schiffer@ew.tq-group.com>
-References: <db30127ab4741d4e71b768881197f4791174f545.1666786471.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1894829104405483821==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Wed, Oct 26, 2022 at 03:15:30PM +0200, Matthias Schiffer wrote:
+> A notify-device is a synchronization facility that allows to query
+> "readiness" across drivers, without creating a direct dependency between
+> the driver modules. The notify-device can also be used to trigger deferred
+> probes.
+> 
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+>  drivers/misc/Kconfig          |   4 ++
+>  drivers/misc/Makefile         |   1 +
+>  drivers/misc/notify-device.c  | 109 ++++++++++++++++++++++++++++++++++
+>  include/linux/notify-device.h |  33 ++++++++++
+>  4 files changed, 147 insertions(+)
+>  create mode 100644 drivers/misc/notify-device.c
+>  create mode 100644 include/linux/notify-device.h
+> 
+> diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
+> index 358ad56f6524..63559e9f854c 100644
+> --- a/drivers/misc/Kconfig
+> +++ b/drivers/misc/Kconfig
+> @@ -496,6 +496,10 @@ config VCPU_STALL_DETECTOR
+>  
+>  	  If you do not intend to run this kernel as a guest, say N.
+>  
+> +config NOTIFY_DEVICE
+> +	tristate "Notify device"
+> +	depends on OF
+> +
+>  source "drivers/misc/c2port/Kconfig"
+>  source "drivers/misc/eeprom/Kconfig"
+>  source "drivers/misc/cb710/Kconfig"
+> diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
+> index ac9b3e757ba1..1e8012112b43 100644
+> --- a/drivers/misc/Makefile
+> +++ b/drivers/misc/Makefile
+> @@ -62,3 +62,4 @@ obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
+>  obj-$(CONFIG_OPEN_DICE)		+= open-dice.o
+>  obj-$(CONFIG_GP_PCI1XXXX)	+= mchp_pci1xxxx/
+>  obj-$(CONFIG_VCPU_STALL_DETECTOR)	+= vcpu_stall_detector.o
+> +obj-$(CONFIG_NOTIFY_DEVICE)	+= notify-device.o
+> diff --git a/drivers/misc/notify-device.c b/drivers/misc/notify-device.c
+> new file mode 100644
+> index 000000000000..42e0980394ea
+> --- /dev/null
+> +++ b/drivers/misc/notify-device.c
+> @@ -0,0 +1,109 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +#include <linux/device/class.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/notify-device.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/slab.h>
+> +
+> +static void notify_device_release(struct device *dev)
+> +{
+> +	of_node_put(dev->of_node);
+> +	kfree(dev);
+> +}
+> +
+> +static struct class notify_device_class = {
+> +	.name = "notify-device",
+> +	.owner = THIS_MODULE,
+> +	.dev_release = notify_device_release,
+> +};
+> +
+> +static struct platform_driver notify_device_driver = {
 
-This is an automated email and please do not reply to this email.
+Ick, wait, this is NOT a platform device, nor driver, so it shouldn't be
+either here.  Worst case, it's a virtual device on the virtual bus.
 
-Dear Submitter,
+But why is this a class at all?  Classes are a representation of a type
+of device that userspace can see, how is this anything that userspace
+cares about?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
+Doesn't the device link stuff handle all of this type of "when this
+device is done being probed, now I can" problems?  Why is a whole new
+thing needed?
 
------ Output -----
-error: patch failed: drivers/misc/Makefile:62
-error: drivers/misc/Makefile: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
+thanks,
 
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1894829104405483821==--
+greg k-h
