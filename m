@@ -2,52 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFFC1FA3747
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 15:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 727E3FA3744
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 15:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236044AbiJ0PJQ (ORCPT
+        id S236168AbiJ0PJU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Oct 2022 11:09:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56716 "EHLO
+        Thu, 27 Oct 2022 11:09:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236041AbiJ0PJB (ORCPT
+        with ESMTP id S236119AbiJ0PJD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Oct 2022 11:09:01 -0400
+        Thu, 27 Oct 2022 11:09:03 -0400
 Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA5E18F90C;
-        Thu, 27 Oct 2022 08:08:49 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.west.internal (Postfix) with ESMTP id E7451320094E;
-        Thu, 27 Oct 2022 11:08:47 -0400 (EDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62C6A18F0E9;
+        Thu, 27 Oct 2022 08:09:00 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailout.west.internal (Postfix) with ESMTP id AC2353200958;
+        Thu, 27 Oct 2022 11:08:58 -0400 (EDT)
 Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Thu, 27 Oct 2022 11:08:49 -0400
+  by compute4.internal (MEProxy); Thu, 27 Oct 2022 11:09:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
          h=cc:cc:content-transfer-encoding:date:date:from:from
         :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm3; t=1666883327; x=
-        1666969727; bh=vC4bjdi+ygr9v5m5Yqm8eJBkV8nUrE46VnfGZgrrnXA=; b=j
-        p/zLFzA/S0Ieb51w4yelPFoj8AEpzTsUAhhfN4HhR5OYrebREObf97AiybkW66mw
-        3EBUMm05890NRADJobcavQS6iuybBjAkWd5Pt/TIgW55bozGpec2+uozbRkru/59
-        4a4PMwTPBx7LPGnOhRn+H0Zgi2m1Kgdh6T2zWhImIenBkhLGZCUfPVlrbAzNuI0m
-        HQ0CY22iwGq7owaQUiWc0+7NTsylTQFwzKb0aalJm5y3+vt8xM8WLxcBbFfIQ2Re
-        AkHaEVjOBSCkn4kWxN0URoBrQ9tXMrzqipczdRj6S91u0ZYZAzn5VCHV7GR+sdYX
-        D6s17/Lq7o1Iyjv+FFEWA==
+        :reply-to:sender:subject:subject:to:to; s=fm3; t=1666883338; x=
+        1666969738; bh=cX+kFcwiwR6EWUUl0/qFnNFmlcF+5xuzGwswUuq+WOE=; b=G
+        OZecO8vC3ba9NIX44Gx/xSR6pjA4T7Ci9SkB4EI25pEUxrxDGGkuIYA7giKNkQ7k
+        2BcAcoGPwzuzxX+aU+G7u5kGrAJwawQOItzS28hoJfKFK+VvT7hsBajgU0OiTHvR
+        V8VZ7EcyRMchAo/kTjT4I8N4Tg0Ttlxvaf5HvM2ClPQ+zqYmJrAVeV6beeunDn+t
+        eypv5WzJmL6fOSOP14IWphfWhmgbooRGzM0VvOvgOhmeaP48IFv1ULEPFPuUaH30
+        mRgwxxBtWCW/IXTgBQWYIJ7Iy9r8oU0x28JUSH5nV70TsbVFCnDnauM5o3RdpiW9
+        n0IVcRQKe13d/vjzTBX2A==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
         messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
         :feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
         :message-id:mime-version:references:reply-to:sender:subject
         :subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; t=1666883327; x=1666969727; bh=vC4bjdi+ygr9v
-        5m5Yqm8eJBkV8nUrE46VnfGZgrrnXA=; b=RNSrpmU7GLbZIVCtE1QZW5+WEFrf3
-        Lcu8y7kJ6GVGHl+xqGzuZX6zcb47YYAqw0xQ8nYiwPtx7m6yK3XZ3g5mqrCYzaeq
-        W3Rw/pe1UH7EY6dfFncjA95uox25uaXrCq0TYwPjOCU8IUvVb21D8C+NnjnbflvE
-        gKG1siI+rPUtnXznDP8w86JkAiklEAjOPw5oD1ZY6fjnvbCtARcpXl0zKgZkgo9/
-        MNqaYZH/7UOfPpfgrY36m54a3BedVYvsmizJtEjDEMqLdEi3x2lmsUGCb+lNYX7w
-        L25zKUu53SgBhqpJpF6tMXk/8lkUkFNzip3JOTKObPS1ekWgiuro3XawQ==
-X-ME-Sender: <xms:_p5aYwQQ3Np5jzuzF1IHMvPlxuJ6N-yk-BnVvdc04amBP_tztVuheQ>
-    <xme:_p5aY9yFvGmMvVRC-eK66nMtTNX1dVaI7Y44WZ3i0Fb0PoAxxMwKeL2ClDhKyLcqT
-    jDPxBILpxmbKKCYFqQ>
-X-ME-Received: <xmr:_p5aY93-uIt958-8Vmqqt1N2TorPL5PUt3T5q7TSdXFu0OuRbgFo-CyBzEwwIF_s41dGwFCAqf714g-mGMPIJdvEeIohspsg8M3NcxPHHyfuGR5rKls98aY>
+        :x-sasl-enc; s=fm3; t=1666883338; x=1666969738; bh=cX+kFcwiwR6EW
+        UUl0/qFnNFmlcF+5xuzGwswUuq+WOE=; b=Fu8GtYcLzQVZRQ3juZ700N9zWe0FP
+        kK8IKkF2ptbLfIij1nGcZw6CRp7trVjYb/Ayk7KbBPOPB6cgQKcZuX/Ib5p90EZK
+        U1MZ6Usiohh5kCGIKyqaFc2M+lA17f4gXYvsgu6p7THYtBi/9M61A7G+pEd1LxKN
+        tcJoa6CQFfUXcvuVkmDa2RpmxfeIt+kXQonhdRDYi8GWkr52DO0nlDwnxj1x6sEM
+        103Et26Plm9XwHF9/ISAVeSIxDge7JHkLfRLxcten8FdD1qOGe5hIzjaX4wHdD0x
+        Xgc91y1GKQrwuNX5SvuJyPlTzP0Xz99WZLYXYapSniikKstBTsz5CiG7w==
+X-ME-Sender: <xms:CZ9aY9MjP0nthZFcU8Gnh27cVb5cd5VlY0MpAy-j0qpuOu_ksUhg9Q>
+    <xme:CZ9aY__uizLewsAX3JsIIdjPs3VoWREpECrSzU80reonSbCOCp8Kd8l1iygCMe2uO
+    88pzZItgbOgGKwtZrM>
+X-ME-Received: <xmr:CZ9aY8Q0wqpDPIe6-gidUZoC_IQNLzCFoq5T0pmvh4djyffIQWonSNMkdm2l1j-rAJ4xRQ7zssriXn7YRwAR53RgZzcgcUG1-YTh1SfmCvPYZvgceiDWjuU>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrtdeggdekfecutefuodetggdotefrodftvf
     curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
     uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
@@ -56,13 +56,13 @@ X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrtdeggdekfecutefuodetggdote
     hrnhepjeeiheehkeegvdejhfevkeejgfdutdefhfethedtieffleekieeuudefleekjeeg
     necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshhvvg
     hnsehsvhgvnhhpvghtvghrrdguvghv
-X-ME-Proxy: <xmx:_p5aY0B-XpE_wxv7eH6zE8uyx-8PX51d4IQF2A81eBhGjdhqzcq-UA>
-    <xmx:_p5aY5gF7el4waQ--A3uJOZCzUugsKo1huzV08D9Z47hUs5yyE7Drg>
-    <xmx:_p5aYwqO-AWcWLyFSZoSuCCG5276yBUE8YIl7nOkHvjXjXFPjHWgHg>
-    <xmx:_55aY4RSgjMIuKN6QWtZ92PPCoMeEwumv4K6Z237cc_6yGjv4SRGYg>
+X-ME-Proxy: <xmx:CZ9aY5v7qxHOHDOniluwt0uwNzLJArSfg0-3_rEHD7whu7BI7Xi06Q>
+    <xmx:CZ9aY1cnb6NAYKp-2TxlZEmVlpoz01Mn8UUN9BIZIBMivqwYOFLvyw>
+    <xmx:CZ9aY12GxqowQHAbJTvgySqD6-eFrwMlyIWwPPTRVMtGJmWpSXltBg>
+    <xmx:Cp9aYws-7sM4QUvu6A1uS_GUBR58Dq0C6fQMKrc2zSOe5s8b-q5vIA>
 Feedback-ID: i51094778:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 27 Oct 2022 11:08:44 -0400 (EDT)
+ 27 Oct 2022 11:08:55 -0400 (EDT)
 From:   Sven Peter <sven@svenpeter.dev>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -79,9 +79,9 @@ Cc:     Sven Peter <sven@svenpeter.dev>,
         asahi@lists.linux.dev, netdev@vger.kernel.org,
         devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 3/7] arm64: dts: apple: t8103: Add Bluetooth controller
-Date:   Thu, 27 Oct 2022 17:08:18 +0200
-Message-Id: <20221027150822.26120-4-sven@svenpeter.dev>
+Subject: [PATCH v4 5/7] Bluetooth: Add quirk to disable extended scanning
+Date:   Thu, 27 Oct 2022 17:08:20 +0200
+Message-Id: <20221027150822.26120-6-sven@svenpeter.dev>
 X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 In-Reply-To: <20221027150822.26120-1-sven@svenpeter.dev>
 References: <20221027150822.26120-1-sven@svenpeter.dev>
@@ -91,119 +91,75 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add bluetooth controller nodes and the required brcm,board-type
-properties to be able to select the correct firmware to all board
-device trees.
+Broadcom 4377 controllers found in Apple x86 Macs with the T2 chip
+claim to support extended scanning when querying supported states,
+
+< HCI Command: LE Read Supported St.. (0x08|0x001c) plen 0
+> HCI Event: Command Complete (0x0e) plen 12
+      LE Read Supported States (0x08|0x001c) ncmd 1
+        Status: Success (0x00)
+        States: 0x000003ffffffffff
+[...]
+          LE Set Extended Scan Parameters (Octet 37 - Bit 5)
+          LE Set Extended Scan Enable (Octet 37 - Bit 6)
+[...]
+
+, but then fail to actually implement the extended scanning:
+
+< HCI Command: LE Set Extended Sca.. (0x08|0x0041) plen 8
+        Own address type: Random (0x01)
+        Filter policy: Accept all advertisement (0x00)
+        PHYs: 0x01
+        Entry 0: LE 1M
+          Type: Active (0x01)
+          Interval: 11.250 msec (0x0012)
+          Window: 11.250 msec (0x0012)
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Scan Parameters (0x08|0x0041) ncmd 1
+        Status: Unknown HCI Command (0x01)
 
 Signed-off-by: Sven Peter <sven@svenpeter.dev>
 ---
- arch/arm64/boot/dts/apple/t8103-j274.dts  | 4 ++++
- arch/arm64/boot/dts/apple/t8103-j293.dts  | 4 ++++
- arch/arm64/boot/dts/apple/t8103-j313.dts  | 4 ++++
- arch/arm64/boot/dts/apple/t8103-j456.dts  | 4 ++++
- arch/arm64/boot/dts/apple/t8103-j457.dts  | 4 ++++
- arch/arm64/boot/dts/apple/t8103-jxxx.dtsi | 8 ++++++++
- 6 files changed, 28 insertions(+)
+ include/net/bluetooth/hci.h      | 10 ++++++++++
+ include/net/bluetooth/hci_core.h |  4 +++-
+ 2 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/boot/dts/apple/t8103-j274.dts b/arch/arm64/boot/dts/apple/t8103-j274.dts
-index c1f3ba9c39f6..b52ddc409893 100644
---- a/arch/arm64/boot/dts/apple/t8103-j274.dts
-+++ b/arch/arm64/boot/dts/apple/t8103-j274.dts
-@@ -21,6 +21,10 @@ aliases {
- 	};
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index f4aa7b78a844..8cd89948f961 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -263,6 +263,16 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_BROKEN_ENHANCED_SETUP_SYNC_CONN,
++
++	/*
++	 * When this quirk is set, the HCI_OP_LE_SET_EXT_SCAN_ENABLE command is
++	 * disabled. This is required for some Broadcom controllers which
++	 * erroneously claim to support extended scanning.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_BROKEN_EXT_SCAN,
  };
  
-+&bluetooth0 {
-+	brcm,board-type = "apple,atlantisb";
-+};
-+
- &wifi0 {
- 	brcm,board-type = "apple,atlantisb";
- };
-diff --git a/arch/arm64/boot/dts/apple/t8103-j293.dts b/arch/arm64/boot/dts/apple/t8103-j293.dts
-index ecb10d237a05..151074109a11 100644
---- a/arch/arm64/boot/dts/apple/t8103-j293.dts
-+++ b/arch/arm64/boot/dts/apple/t8103-j293.dts
-@@ -17,6 +17,10 @@ / {
- 	model = "Apple MacBook Pro (13-inch, M1, 2020)";
- };
+ /* HCI device flags */
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c54bc71254af..3cd00be0fcd2 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1689,7 +1689,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
  
-+&bluetooth0 {
-+	brcm,board-type = "apple,honshu";
-+};
+ /* Use ext scanning if set ext scan param and ext scan enable is supported */
+ #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
+-			   ((dev)->commands[37] & 0x40))
++			   ((dev)->commands[37] & 0x40) && \
++			   !test_bit(HCI_QUIRK_BROKEN_EXT_SCAN, &(dev)->quirks))
 +
- &wifi0 {
- 	brcm,board-type = "apple,honshu";
- };
-diff --git a/arch/arm64/boot/dts/apple/t8103-j313.dts b/arch/arm64/boot/dts/apple/t8103-j313.dts
-index df741737b8e6..bc1f865aa790 100644
---- a/arch/arm64/boot/dts/apple/t8103-j313.dts
-+++ b/arch/arm64/boot/dts/apple/t8103-j313.dts
-@@ -17,6 +17,10 @@ / {
- 	model = "Apple MacBook Air (M1, 2020)";
- };
+ /* Use ext create connection if command is supported */
+ #define use_ext_conn(dev) ((dev)->commands[37] & 0x80)
  
-+&bluetooth0 {
-+	brcm,board-type = "apple,shikoku";
-+};
-+
- &wifi0 {
- 	brcm,board-type = "apple,shikoku";
- };
-diff --git a/arch/arm64/boot/dts/apple/t8103-j456.dts b/arch/arm64/boot/dts/apple/t8103-j456.dts
-index 8c6bf9592510..7ea27456f33c 100644
---- a/arch/arm64/boot/dts/apple/t8103-j456.dts
-+++ b/arch/arm64/boot/dts/apple/t8103-j456.dts
-@@ -21,6 +21,10 @@ aliases {
- 	};
- };
- 
-+&bluetooth0 {
-+	brcm,board-type = "apple,capri";
-+};
-+
- &wifi0 {
- 	brcm,board-type = "apple,capri";
- };
-diff --git a/arch/arm64/boot/dts/apple/t8103-j457.dts b/arch/arm64/boot/dts/apple/t8103-j457.dts
-index fe7c0aaf7d62..8ee0ac871426 100644
---- a/arch/arm64/boot/dts/apple/t8103-j457.dts
-+++ b/arch/arm64/boot/dts/apple/t8103-j457.dts
-@@ -21,6 +21,10 @@ aliases {
- 	};
- };
- 
-+&bluetooth0 {
-+	brcm,board-type = "apple,santorini";
-+};
-+
- &wifi0 {
- 	brcm,board-type = "apple,santorini";
- };
-diff --git a/arch/arm64/boot/dts/apple/t8103-jxxx.dtsi b/arch/arm64/boot/dts/apple/t8103-jxxx.dtsi
-index 3d15b8e2a6c1..cc2e04035763 100644
---- a/arch/arm64/boot/dts/apple/t8103-jxxx.dtsi
-+++ b/arch/arm64/boot/dts/apple/t8103-jxxx.dtsi
-@@ -11,6 +11,7 @@
- 
- / {
- 	aliases {
-+		bluetooth0 = &bluetooth0;
- 		serial0 = &serial0;
- 		serial2 = &serial2;
- 		wifi0 = &wifi0;
-@@ -77,4 +78,11 @@ wifi0: network@0,0 {
- 		local-mac-address = [00 00 00 00 00 00];
- 		apple,antenna-sku = "XX";
- 	};
-+
-+	bluetooth0: bluetooth@0,1 {
-+		compatible = "pci14e4,5f69";
-+		reg = <0x10100 0x0 0x0 0x0 0x0>;
-+		/* To be filled by the loader */
-+		local-bd-address = [00 00 00 00 00 00];
-+	};
- };
 -- 
 2.25.1
 
