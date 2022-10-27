@@ -2,107 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28900FA3743
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 12:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD17FA3741
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 15:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235526AbiJ0MGt (ORCPT
+        id S235900AbiJ0PIm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Oct 2022 08:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57978 "EHLO
+        Thu, 27 Oct 2022 11:08:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234869AbiJ0MGs (ORCPT
+        with ESMTP id S235875AbiJ0PIh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Oct 2022 08:06:48 -0400
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CECBF8E99A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 05:06:47 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id y67so1690311oiy.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 05:06:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=mU5sdY3tyACM+tcMqkP8WP2x6N/WMAxlyxjU4RHudRQ=;
-        b=E6U06B1JT+3JeOlWVXTiE3+1Yxy5RCsyjPfIwaSGQNnYRQeLHAP1IzTBQVwBB23pbd
-         QSsjXpJF2SfNJzKQ3t85l3Ze/Pd+lV+R1/Zy/U5mbkVu0Qvn8Bg0z3dJb0X5O3SKxQ1m
-         tMQXCaYZxiWCkUHcK33XUr3XD+PQxxTp+t+0MQpDqg22cOVt+WX+r0QVpxYypiS51GOb
-         VdaUSHlkM/ntGsySpCbADECU+GzqpaW1169/Vg1jJ1GBz96pNnMfGiaEDA1Vc6ltFmq0
-         mBUU4mnC6JK9vvP6qSywkm56bUf+Do6hxmpp2vdTF3b/asHA4IqtmUBE4JsgFJqxbSwY
-         8H9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mU5sdY3tyACM+tcMqkP8WP2x6N/WMAxlyxjU4RHudRQ=;
-        b=F2BEcBIefaALPYG7yMp3L7pgJ6e39VDtQ1o8Vd+JbZpCfGl2Af8i0DhMidD36deYxG
-         nu00ih/pmR8/tyTYQEL6sBLTSPHDoZlNphmh6Ona/6fCe0liTDi/SQJGQmFewT3h47NP
-         7BWJZCYvGIfAyBHiSjISR3mNDostwmTXvWlEbM71y3M1vs5gyKchYEGbIH9dm4c3nN7F
-         pN9nOTBIt/Z6ia3lxsBDiShN4f/iU66EM8bWycY7iJaxqx+p5uBcmRAqzfFYuBiNEKX4
-         61wE3goZ+erlW+rx90O9Kz7hribdLygItFIhzFXWvhmZNNj6vUeH2Tu9ektinQzEVTvf
-         y8gA==
-X-Gm-Message-State: ACrzQf3X20G6DgjeAi8R30KhAijJkO7TYhEAqlgGpn4E1+yVPJNFkQ/B
-        WQBl14sAUHK5va/+Ig8XC3jbomMFlUw=
-X-Google-Smtp-Source: AMsMyM4Eomm8MZhXqRdksEtd7dvPh0/RDemhMqBZlJW8fNv4Spe72du+nusm4doOcFX0bJvia7W4ZA==
-X-Received: by 2002:a05:6808:13cc:b0:359:8e25:127d with SMTP id d12-20020a05680813cc00b003598e25127dmr4617822oiw.177.1666872406995;
-        Thu, 27 Oct 2022 05:06:46 -0700 (PDT)
-Received: from [172.17.0.2] ([20.45.42.155])
-        by smtp.gmail.com with ESMTPSA id q21-20020a9d7c95000000b006618e23df48sm403302otn.39.2022.10.27.05.06.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 05:06:46 -0700 (PDT)
-Message-ID: <635a7456.9d0a0220.a0414.11c9@mx.google.com>
-Date:   Thu, 27 Oct 2022 05:06:46 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7702969617113519205=="
+        Thu, 27 Oct 2022 11:08:37 -0400
+Received: from wout2-smtp.messagingengine.com (wout2-smtp.messagingengine.com [64.147.123.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C006718F0E9;
+        Thu, 27 Oct 2022 08:08:33 -0700 (PDT)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailout.west.internal (Postfix) with ESMTP id D77B232007F9;
+        Thu, 27 Oct 2022 11:08:31 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Thu, 27 Oct 2022 11:08:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-transfer-encoding:date:date:from:from
+        :in-reply-to:message-id:mime-version:reply-to:sender:subject
+        :subject:to:to; s=fm3; t=1666883311; x=1666969711; bh=vC4EJLdx4T
+        Hqc58ycxGM/foR8da3d1iXJ0tw75QGCxM=; b=P4Y9IkypgiQFH2P4QbCJdfibEw
+        sym3gHqN0WnfXFlua3ywxKU52tv24gAQHkiBixMnfw8O+W9aRZHCXe+NgH5g0I6w
+        RWa9HTZinjcSImobmPGJXvFIWa18gv7y/iEyClKj3VHav3S5ZcrGcDEf3rLPZJ//
+        wKMIpJkgQL8xlLh5z9R84M+jKIWVezwXQFCo18xfC3X7u4PODu4C5X0IjghdxXW0
+        qPUAFwuR0WEUEEyNvcCBsgNaojSpm+1a0QpdioYRmypCTYbw1Erz2V3nL0/PiY4t
+        n44/QY75bwlCLRt7PTrEREx/b07a2B3IeqO7E5c+0jspMtPLNShQ03RVBwqA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+        1666883311; x=1666969711; bh=vC4EJLdx4THqc58ycxGM/foR8da3d1iXJ0t
+        w75QGCxM=; b=oTLERddpI5B6yecHwlVQA4APnAUOMqQTVdRSHvmsFIOJ2QJZxBd
+        aXJVIVQW4yCr5CBYu3FuhOknknE5lVWe8gDOOySWUOfE+n2pQHBNoGY7S+CjEiTF
+        BB+T/l4sKsFjMoK+hNDpZoAowH64wP/2FtAsHgDrIXr6M74DYqcvDFaBROmST33Z
+        K9R+27oGvA4FyA0Nj3ZnkxXqvx/VmVTb7gPCwRqw4aih8fwuEj0iO9xt8r44w/nj
+        /TM4l7eRpFK8shYF04EJkghdYn6MW+TlF445rh8rMFHFgFDcocn1EqKpsLcCPjYI
+        KmGCdO1r64hFBpkY4rVuV9O/K66hUu+q/fA==
+X-ME-Sender: <xms:7J5aYzCqjdEffKZIPz13VojvXF_6sCIbJsRnS6H3hdw1VFwdjz3rhA>
+    <xme:7J5aY5iybkyXc-yxoyHq017XEKq6ZiSzCBSN2hBAjmwIGGoXoMk7wAVWCreyfcQfF
+    7lz3ZZJAII7awgXLgk>
+X-ME-Received: <xmr:7J5aY-nyFmsyJiUAlZJYLd7nZeBJOd2-5gUA42WHjppRctgZq-2ABZdKXI8fdsFMp43TQmKdWLM0IAJwsBii3L_NDpOgGXjA96TgqHd3eR5iU2NZm_Ex5DA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrtdeggdekfecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefuvhgvnhcurfgv
+    thgvrhcuoehsvhgvnhesshhvvghnphgvthgvrhdruggvvheqnecuggftrfgrthhtvghrnh
+    epgfegudffudelfeeugedtjeeugeehueffudevveegveektdfhueehueeufeelheevnecu
+    ffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehsvhgvnhesshhvvghnphgvthgvrhdruggvvh
+X-ME-Proxy: <xmx:7J5aY1wvsnjLBTpLMsc0RV8XRxk7GH_KepDE6MBwFsT8cw2WDEbsOg>
+    <xmx:7J5aY4SWfiduWwA0ZDOJE0FFIXCBs69wp05dckwxQpal57ThwBNZFA>
+    <xmx:7J5aY4ZKt0ZEhfPTP234B8wk734AVsdjrovLVS-mU5JpDOg2hF54-A>
+    <xmx:755aYxC3KxmlMAQPPW8-jSRVEAoBEvKxKueYodMNG4luFOZ0nUqUuQ>
+Feedback-ID: i51094778:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 27 Oct 2022 11:08:26 -0400 (EDT)
+From:   Sven Peter <sven@svenpeter.dev>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Sven Peter <sven@svenpeter.dev>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v4 0/7] Broadcom/Apple Bluetooth driver for Apple Silicon
+Date:   Thu, 27 Oct 2022 17:08:15 +0200
+Message-Id: <20221027150822.26120-1-sven@svenpeter.dev>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, quic_zijuhu@quicinc.com
-Subject: RE: [v1] Bluetooth: btusb: Fix enable failure for a CSR BT dongle
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <1666868760-4680-1-git-send-email-quic_zijuhu@quicinc.com>
-References: <1666868760-4680-1-git-send-email-quic_zijuhu@quicinc.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7702969617113519205==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+v1: https://lore.kernel.org/asahi/20220801103633.27772-1-sven@svenpeter.dev/
+v2: https://lore.kernel.org/asahi/20220907170935.11757-1-sven@svenpeter.dev/
+v3: https://lore.kernel.org/asahi/20220919164834.62739-1-sven@svenpeter.dev/
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=689388
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.31 seconds
-GitLint                       PASS      0.79 seconds
-SubjectPrefix                 PASS      0.60 seconds
-BuildKernel                   PASS      40.13 seconds
-BuildKernel32                 PASS      36.08 seconds
-Incremental Build with patchesPASS      54.02 seconds
-TestRunner: Setup             PASS      608.14 seconds
-TestRunner: l2cap-tester      PASS      19.54 seconds
-TestRunner: iso-tester        PASS      19.79 seconds
-TestRunner: bnep-tester       PASS      7.61 seconds
-TestRunner: mgmt-tester       PASS      119.94 seconds
-TestRunner: rfcomm-tester     PASS      11.91 seconds
-TestRunner: sco-tester        PASS      11.06 seconds
-TestRunner: ioctl-tester      PASS      12.73 seconds
-TestRunner: mesh-tester       PASS      9.40 seconds
-TestRunner: smp-tester        PASS      11.09 seconds
-TestRunner: userchan-tester   PASS      7.88 seconds
+Here's v4 of the Apple/Broadcom Bluetooth series. Not many changes this
+time: I rebased on 6.1, added Rob's r-b tags and fixed bcm4377_send_ptb
+for newer firmware versions where that command claims to fail but is
+still sent by macOS.
 
 
-
----
-Regards,
-Linux Bluetooth
+Best,
 
 
---===============7702969617113519205==--
+Sven
+
+Sven Peter (7):
+  dt-bindings: net: Add generic Bluetooth controller
+  dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+  arm64: dts: apple: t8103: Add Bluetooth controller
+  Bluetooth: hci_event: Ignore reserved bits in LE Extended Adv Report
+  Bluetooth: Add quirk to disable extended scanning
+  Bluetooth: Add quirk to disable MWS Transport Configuration
+  Bluetooth: hci_bcm4377: Add new driver for BCM4377 PCIe boards
+
+ .../devicetree/bindings/net/bluetooth.txt     |    5 -
+ .../net/bluetooth/bluetooth-controller.yaml   |   29 +
+ .../net/bluetooth/brcm,bcm4377-bluetooth.yaml |   81 +
+ .../{ => bluetooth}/qualcomm-bluetooth.yaml   |    6 +-
+ .../bindings/soc/qcom/qcom,wcnss.yaml         |    8 +-
+ MAINTAINERS                                   |    2 +
+ arch/arm64/boot/dts/apple/t8103-j274.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j293.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j313.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j456.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-j457.dts      |    4 +
+ arch/arm64/boot/dts/apple/t8103-jxxx.dtsi     |    8 +
+ drivers/bluetooth/Kconfig                     |   12 +
+ drivers/bluetooth/Makefile                    |    1 +
+ drivers/bluetooth/hci_bcm4377.c               | 2514 +++++++++++++++++
+ include/net/bluetooth/hci.h                   |   21 +
+ include/net/bluetooth/hci_core.h              |    4 +-
+ net/bluetooth/hci_event.c                     |    2 +-
+ net/bluetooth/hci_sync.c                      |    2 +
+ 19 files changed, 2700 insertions(+), 15 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/bluetooth.txt
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml
+ create mode 100644 Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml
+ rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)
+ create mode 100644 drivers/bluetooth/hci_bcm4377.c
+
+-- 
+2.25.1
+
