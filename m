@@ -2,191 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4697AFA3742
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 16:48:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE44FA3743
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 19:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235658AbiJ0QsJ (ORCPT
+        id S236484AbiJ0TAE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Oct 2022 12:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48784 "EHLO
+        Thu, 27 Oct 2022 15:00:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiJ0QsI (ORCPT
+        with ESMTP id S236443AbiJ0S7y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Oct 2022 12:48:08 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EF118F0D9;
-        Thu, 27 Oct 2022 09:48:07 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5A340623E3;
-        Thu, 27 Oct 2022 16:48:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63DAFC433C1;
-        Thu, 27 Oct 2022 16:48:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1666889286;
-        bh=/9duMPb6opUA8O93tCBr6BdnBW8rIFtYXrBYG6hdJKI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Aek07/yCA3fhXdaXFgFhCaXDAGxiqfK4GyGnbMj6SFRKMkPhMkB/UX4QHVHZBkMnY
-         0xyk6fiCosGcKWzsX3+dGrDdjdQm185fyVc217ZfgVwEfey9Zr+7ToKZtwL0Xrum1m
-         NlXPYASJNbt1rLouNxzynMHhM0RIgcxRTovqeoXQ=
-Date:   Thu, 27 Oct 2022 18:48:04 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux@ew.tq-group.com
-Subject: Re: [RFC 1/5] misc: introduce notify-device driver
-Message-ID: <Y1q2RKTaw69C7vZT@kroah.com>
-References: <cover.1666786471.git.matthias.schiffer@ew.tq-group.com>
- <db30127ab4741d4e71b768881197f4791174f545.1666786471.git.matthias.schiffer@ew.tq-group.com>
- <Y1lGPRvKMbNDs1iK@kroah.com>
- <ed580c15fbf690acde24679956a9439c1c0a1137.camel@ew.tq-group.com>
+        Thu, 27 Oct 2022 14:59:54 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35EA1A82E;
+        Thu, 27 Oct 2022 11:59:51 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id be13so4131274lfb.4;
+        Thu, 27 Oct 2022 11:59:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=sKKXfxrvWBs1+Hg89OKoS0D5bomkbPpDXug7ZUOTYqo=;
+        b=C3rMcH37E0tC3a2/wwyFQyS/AaPfokgd48lGNu90AbsNzDMT+NQhQjrLkKiqanEm02
+         LVhaBhX+2p5KIH+O95uYRlBM90vO46EKH01y1kX7GLOLRp4rRM9Aga/vTFSSnflfhj6z
+         nfeTf6I8U1OwcchAOsZOlxPeQL6K9R5gGANMk6cx0HKtAchyXIE4dJ2WXyhPLqwqP0A6
+         +1Ccc23QKGwL/rlvAT+d7NDlX5ZN9owv3H0lrKxVdF9TZaedeNFAyINo7RpCcVYAMVDO
+         PrbuSrvK+8jlp7gOWupeCI51j0/2eYkNGkUU9d0KzieC9xPF7Ia1ikhR4rau11UlQh5/
+         8A0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sKKXfxrvWBs1+Hg89OKoS0D5bomkbPpDXug7ZUOTYqo=;
+        b=Mdiemgj9fDRWg30q7hpYJvtMkuBfPAzRl0Jg2bUcvlqiAScksEJ3OGj33suq91gvGd
+         LLpIrr0HLV87M70vF/ToeXxqXRYvJ1vlS9goEVE30IWpuBX194VKBZf06f2V+Pl5m9hq
+         8Vef9DaamnvPKm3pfSOtNart5rJQafcKIUgMy9qbosRLqB4IVBq6rNoYRoPxudP7btsO
+         ABWNewIU8AfUDwf8jbstUWRzuGqA0APz7M6PAhjWqZPQ4ss1ErFWFwk2S+aVGwuz0nS/
+         NL2k+gPvFytLVB2lia7+vKF+Cle6FeJxefUirhFhLwYHQScJQgbGIZj/hGb5HG00U1/C
+         +1ww==
+X-Gm-Message-State: ACrzQf0ClP/nDGYLIt9hf1tgeLKyK9AtUTzdtr9y5VKkVwJ6i/E+qkZF
+        n52xBuLJpOZyWMrT/WifpGoL3TUym+6higG87cw=
+X-Google-Smtp-Source: AMsMyM55BByl/DxbuZBmfmXxteUNIOLPRPgsHlOnNe8MUHvu3Tud4uluqbEsdWFvDVZytpdWa4vy0oC8fK7/fGiHJQ0=
+X-Received: by 2002:a05:6512:483:b0:4a2:6905:dfae with SMTP id
+ v3-20020a056512048300b004a26905dfaemr19431686lfq.57.1666897189900; Thu, 27
+ Oct 2022 11:59:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ed580c15fbf690acde24679956a9439c1c0a1137.camel@ew.tq-group.com>
+References: <20221027150822.26120-1-sven@svenpeter.dev> <20221027150822.26120-7-sven@svenpeter.dev>
+In-Reply-To: <20221027150822.26120-7-sven@svenpeter.dev>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 27 Oct 2022 11:59:38 -0700
+Message-ID: <CABBYNZKJnmfWfvxdgpxNFUGc7jTKP+BGv6CiZc2MsR970L35MA@mail.gmail.com>
+Subject: Re: [PATCH v4 6/7] Bluetooth: Add quirk to disable MWS Transport Configuration
+To:     Sven Peter <sven@svenpeter.dev>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Hector Martin <marcan@marcan.st>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        asahi@lists.linux.dev, netdev@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Oct 27, 2022 at 06:33:33PM +0200, Matthias Schiffer wrote:
-> On Wed, 2022-10-26 at 16:37 +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Oct 26, 2022 at 03:15:30PM +0200, Matthias Schiffer wrote:
-> > > A notify-device is a synchronization facility that allows to query
-> > > "readiness" across drivers, without creating a direct dependency between
-> > > the driver modules. The notify-device can also be used to trigger deferred
-> > > probes.
-> > > 
-> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> > > ---
-> > >  drivers/misc/Kconfig          |   4 ++
-> > >  drivers/misc/Makefile         |   1 +
-> > >  drivers/misc/notify-device.c  | 109 ++++++++++++++++++++++++++++++++++
-> > >  include/linux/notify-device.h |  33 ++++++++++
-> > >  4 files changed, 147 insertions(+)
-> > >  create mode 100644 drivers/misc/notify-device.c
-> > >  create mode 100644 include/linux/notify-device.h
-> > > 
-> > > diff --git a/drivers/misc/Kconfig b/drivers/misc/Kconfig
-> > > index 358ad56f6524..63559e9f854c 100644
-> > > --- a/drivers/misc/Kconfig
-> > > +++ b/drivers/misc/Kconfig
-> > > @@ -496,6 +496,10 @@ config VCPU_STALL_DETECTOR
-> > >  
-> > >  	  If you do not intend to run this kernel as a guest, say N.
-> > >  
-> > > +config NOTIFY_DEVICE
-> > > +	tristate "Notify device"
-> > > +	depends on OF
-> > > +
-> > >  source "drivers/misc/c2port/Kconfig"
-> > >  source "drivers/misc/eeprom/Kconfig"
-> > >  source "drivers/misc/cb710/Kconfig"
-> > > diff --git a/drivers/misc/Makefile b/drivers/misc/Makefile
-> > > index ac9b3e757ba1..1e8012112b43 100644
-> > > --- a/drivers/misc/Makefile
-> > > +++ b/drivers/misc/Makefile
-> > > @@ -62,3 +62,4 @@ obj-$(CONFIG_HI6421V600_IRQ)	+= hi6421v600-irq.o
-> > >  obj-$(CONFIG_OPEN_DICE)		+= open-dice.o
-> > >  obj-$(CONFIG_GP_PCI1XXXX)	+= mchp_pci1xxxx/
-> > >  obj-$(CONFIG_VCPU_STALL_DETECTOR)	+= vcpu_stall_detector.o
-> > > +obj-$(CONFIG_NOTIFY_DEVICE)	+= notify-device.o
-> > > diff --git a/drivers/misc/notify-device.c b/drivers/misc/notify-device.c
-> > > new file mode 100644
-> > > index 000000000000..42e0980394ea
-> > > --- /dev/null
-> > > +++ b/drivers/misc/notify-device.c
-> > > @@ -0,0 +1,109 @@
-> > > +// SPDX-License-Identifier: GPL-2.0-or-later
-> > > +
-> > > +#include <linux/device/class.h>
-> > > +#include <linux/kernel.h>
-> > > +#include <linux/module.h>
-> > > +#include <linux/notify-device.h>
-> > > +#include <linux/platform_device.h>
-> > > +#include <linux/slab.h>
-> > > +
-> > > +static void notify_device_release(struct device *dev)
-> > > +{
-> > > +	of_node_put(dev->of_node);
-> > > +	kfree(dev);
-> > > +}
-> > > +
-> > > +static struct class notify_device_class = {
-> > > +	.name = "notify-device",
-> > > +	.owner = THIS_MODULE,
-> > > +	.dev_release = notify_device_release,
-> > > +};
-> > > +
-> > > +static struct platform_driver notify_device_driver = {
-> 
-> [Pruning the CC list a bit, to avoid clogging people's inboxes]
-> 
-> > 
-> > Ick, wait, this is NOT a platform device, nor driver, so it shouldn't be
-> > either here.  Worst case, it's a virtual device on the virtual bus.
-> 
-> This part of the code is inspired by mac80211_hwsim, which uses a
-> platform driver in a similar way, for a plain struct device. Should
-> this rather use a plain struct device_driver?
+Hi Sven,
 
-It should NOT be using a platform device.
+On Thu, Oct 27, 2022 at 8:09 AM Sven Peter <sven@svenpeter.dev> wrote:
+>
+> Broadcom 4378/4387 controllers found in Apple Silicon Macs claim to
+> support getting MWS Transport Layer Configuration,
+>
+> < HCI Command: Read Local Supported... (0x04|0x0002) plen 0
+> > HCI Event: Command Complete (0x0e) plen 68
+>       Read Local Supported Commands (0x04|0x0002) ncmd 1
+>         Status: Success (0x00)
+> [...]
+>           Get MWS Transport Layer Configuration (Octet 30 - Bit 3)]
+> [...]
+>
+> , but then don't actually allow the required command:
+>
+> > HCI Event: Command Complete (0x0e) plen 15
+>       Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
+>         Status: Command Disallowed (0x0c)
+>         Number of transports: 0
+>         Baud rate list: 0 entries
+>         00 00 00 00 00 00 00 00 00 00
+>
+> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+> ---
+>  include/net/bluetooth/hci.h | 10 ++++++++++
+>  net/bluetooth/hci_sync.c    |  2 ++
+>  2 files changed, 12 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 8cd89948f961..110d6df1299b 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -273,6 +273,16 @@ enum {
+>          * during the hdev->setup vendor callback.
+>          */
+>         HCI_QUIRK_BROKEN_EXT_SCAN,
+> +
+> +       /*
+> +        * When this quirk is set, the HCI_OP_GET_MWS_TRANSPORT_CONFIG command is
+> +        * disabled. This is required for some Broadcom controllers which
+> +        * erroneously claim to support MWS Transport Layer Configuration.
+> +        *
+> +        * This quirk can be set before hci_register_dev is called or
+> +        * during the hdev->setup vendor callback.
+> +        */
+> +       HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
+>  };
+>
+>  /* HCI device flags */
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 76c3107c9f91..91788d356748 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -4260,6 +4260,8 @@ static int hci_get_mws_transport_config_sync(struct hci_dev *hdev)
+>  {
+>         if (!(hdev->commands[30] & 0x08))
+>                 return 0;
+> +       if (test_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks))
+> +               return 0;
 
-Again, a platform device should NEVER be used as a child of a device in
-the tree that is on a discoverable bus.
+Let's add a macro that tests both the command and the quirk so we
+don't have to test them separately.
 
-Use the aux bus code if you don't want to create virtual devices with no
-real bus, that is what it is there for.
+>         return __hci_cmd_sync_status(hdev, HCI_OP_GET_MWS_TRANSPORT_CONFIG,
+>                                      0, NULL, HCI_CMD_TIMEOUT);
+> --
+> 2.25.1
+>
 
-> Also, what's the virtual bus? Grepping the Linux code and documentation
-> didn't turn up anything.
 
-Look at the stuff that ends up in /sys/devices/virtual/  Lots of users
-there.
-
-> > But why is this a class at all?  Classes are a representation of a type
-> > of device that userspace can see, how is this anything that userspace
-> > cares about?
-> 
-> Makes sense, I will remove the class.
-> 
-> > 
-> > Doesn't the device link stuff handle all of this type of "when this
-> > device is done being probed, now I can" problems?  Why is a whole new
-> > thing needed?
-> 
-> The issue here is that (as I understand it) the device link and
-> deferred probing infrastructore only cares about whether the supplier
-> device has been probed successfully.
-> 
-> This is insuffient in the case of the dependency between mwifiex and
-> hci_uart/hci_mrvl that I want to express: mwifiex loads its firmware
-> asynchronously, so finishing the mwifiex probe is too early to retry
-> probing the Bluetooth driver.
-
-Welcome to deferred probing hell :)
-
-> While mwifiex does create a few devices (ieee80211, netdevice) when the
-> firmware has loaded, none of these bind to a driver, so they don't
-> trigger the deferred probes. Using their existence as a condition for
-> allowing the Bluetooth driver to probe also seems ugly too me
-> (ieee80211 currently can't be looked up by OF node, and netdevices can
-> be created and deleted dynamically).
-> 
-> Because of this, I came to the conclusion that creating and binding a
-> device specifically for this purpose is a good solution, as it solves
-> two problems at once:
-> - The driver bind triggers deferred probes
-> - The driver allows to look up the device by OF node
-> 
-> Integrating this with device links might make sense as well, but I
-> haven't looked much into that yet.
-
-Try looking at device links, I think this fits exactly what that solves.
-If not, please figure out why.
-
-thanks,
-
-greg k-h
+-- 
+Luiz Augusto von Dentz
