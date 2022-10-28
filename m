@@ -2,116 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F49FECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 27 Oct 2022 23:25:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC94ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 00:12:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235216AbiJ0XZe (ORCPT
+        id S234235AbiJ1AMX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Oct 2022 19:25:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36096 "EHLO
+        Thu, 27 Oct 2022 20:12:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235092AbiJ0XZc (ORCPT
+        with ESMTP id S234137AbiJ1AMV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Oct 2022 19:25:32 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79E3F7CAA1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 16:25:31 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id 3-20020a17090a0f8300b00212d5cd4e5eso8182241pjz.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 16:25:31 -0700 (PDT)
+        Thu, 27 Oct 2022 20:12:21 -0400
+Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884623FA0C
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 17:12:20 -0700 (PDT)
+Received: by mail-qk1-x733.google.com with SMTP id o2so2465042qkk.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 17:12:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5pQcjZ2AoGE1iTsgc2FGFzyNM0oaVKvF+dWfv0kyF6g=;
-        b=qqx2j4I7jc8g566JCH7Aov1/FhXYmQEJafyWs1Vk507ZlJ2yGgsYuYDSUIz/d8Rdku
-         Mz4Hy1E5yl35cXH99rYZuicRXVWJWk3gaEWUmPRMpTONvFYjsDBc3HmTXa1qo2IA79Qv
-         VP/Nfa/KqrZwjqdLN3akpBWmOVX9HFhVVcj00XdAY30WIewWz1wdEXgDTERPCYft8nPy
-         o2vaeEhtOOXd421zrT6yCeiGn3lF2hR2cXFLgaFaYsXtD3BwcDMLdpveIWmCOHBi/wdF
-         m2a4Wt6xxXuU0DRyiUTyg7fbg5MEcQTizDGbKl9+0xDHJe9cDF2AoUfnZ8z8mnmgn478
-         uJ+A==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=IONdietJPsIAj1V3w1iPti68NvpsI1UX4YWJpbc+fDc=;
+        b=PKRCwR3ZJ4jVz6CjlWIV2jqjt0yKIvbpJko/7pjAa17XQwj1L2jmxjQiyMRVrTGypr
+         fH1wh8UBcHplju9ucqxH+Swj7/F890kFFnO/5cQYyM8zRyZ9B+VdE7gtV8GaBvVDwy7k
+         AdtQiUzCXnYTrdRSvB6mWC2EZKDj1FYG3leE9WfwY2n887S5+ZzR9+2o4E+ROtQIfFZc
+         WL/pX8F2/rMxeBzAQ0o1Nqj2j0meozH16UocINYW91mkr/qjg/Ldm8GeLuUZoZggudNE
+         ARkftz03xA/NKDVGIH7uxX5x9G42u7sPo4+WYYsZK7ZiwIe9n8hEtnZRgDEy709ccpOU
+         Y9LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5pQcjZ2AoGE1iTsgc2FGFzyNM0oaVKvF+dWfv0kyF6g=;
-        b=5rEjhb7IEQbbdYgsUiZHNRjvxzM5JknL1H65+tOXIH5q3fDUZiNBsWBzacX5OVixQQ
-         542bazkeFGDrTEEki6sqqHFRgTtb30gSNAbEA6UotW3vWm1uUepdkQIl1SWVa6pDjLmu
-         ADjfkEy0jWJjfHkgKbD3hZ5MKbA+xJD3b4OrdEqaL4k9lGCDeUD0A36D9rZZvsnSOGL9
-         2/8+ZNksibDowREKjyJsdrixrZewA/BLVEEbk/hWy5Nv/MsYgvDF2Mf5SFUrTbEZXD3S
-         C+Tv+2Z2D+kx4rXwF5DsF7sS8j2X4S2mUDMazFKsZYMZZaLZkaP0qTfQ6JGLU0KH2Bwv
-         ODLA==
-X-Gm-Message-State: ACrzQf3kLUmk1piEiIrHfkOhf2cNmFOQ2319gNUCE4wv0DggAnK4LVYV
-        98Zl3h4RPrXSMJa0cuefnEyndSNLNOM=
-X-Google-Smtp-Source: AMsMyM4S9l6cimsjgqeqGLHwh3/twMUy7CXDzkqSg6rv6CIi53vZWasL3mh5hnAHxibk5TrHYL5hKw==
-X-Received: by 2002:a17:903:4ca:b0:179:d21f:f04b with SMTP id jm10-20020a17090304ca00b00179d21ff04bmr52554172plb.7.1666913129978;
-        Thu, 27 Oct 2022 16:25:29 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 11-20020a170902e9cb00b00186b9196cbesm1695858plk.249.2022.10.27.16.25.28
-        for <linux-bluetooth@vger.kernel.org>
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IONdietJPsIAj1V3w1iPti68NvpsI1UX4YWJpbc+fDc=;
+        b=6C5oPuBu6oHSFP82PdYvuJM59Pz2bYktEkl19HuUcjNTOXO2S1l+fP2jptTBVJvYzM
+         TgPUiDIQA+HTykqwCpaZbiZQCq0wvOHaHfLt96Pk3sWEhn8U435Y2tcLgURKG6WaDGKM
+         zl/xeHhO4qw+bK+GeU8O7BVxCQcSoSGD3YG3hxFXrV4wUyzK/UsV55aSyVz/8sjRi6Z4
+         ZYyc4OurqjNq/FPWLMqg8UfzdWVRhcOAJX8MlL7Dom7mGxpC4vu7F7j3hX9O1X4jZQSC
+         YBLESYo8RdcOM/NvTXyZybCrIVzBV9jTTelj6ekqqBeiORThx5wLI1zcL+H6i11hLpK3
+         5kpg==
+X-Gm-Message-State: ACrzQf2E+9ZtDA0oGbndbBz26VTj1KEmVHuU0DzY73ezuGoah/2OtJAe
+        JI+G8Q7+IUYyLy9M8LncuUKAH5hIurLcsA==
+X-Google-Smtp-Source: AMsMyM4pdeSYkXuQB6LK8hCGABCISfdhZsSwKbvoTfxltQcZuiggHNo1R9ZKzEGFHqFRwpvAF2Qw8w==
+X-Received: by 2002:a05:620a:1725:b0:6ee:e8bc:9594 with SMTP id az37-20020a05620a172500b006eee8bc9594mr37441823qkb.184.1666915939526;
+        Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
+Received: from [172.17.0.2] ([20.14.204.158])
+        by smtp.gmail.com with ESMTPSA id b17-20020ac844d1000000b003a4d5fed8c3sm1585813qto.85.2022.10.27.17.12.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 16:25:29 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
-Date:   Thu, 27 Oct 2022 16:25:28 -0700
-Message-Id: <20221027232528.1996093-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
+Message-ID: <635b1e63.c80a0220.41d1f.6e7f@mx.google.com>
+Date:   Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8900753325840960485=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221027232528.1996093-1-luiz.dentz@gmail.com>
+References: <20221027232528.1996093-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============8900753325840960485==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds CONFIG_BT_LE_L2CAP_ECRED which can be used to enable L2CAP
-Enhanced Credit Flow Control Mode by default, previously it was only
-possible to set it via module parameter (e.g. bluetooth.enable_ecred=1).
+This is automated email and please do not reply to this email!
 
-Since L2CAP ECRED mode is required by the likes of EATT which is
-recommended for LE Audio this enables it by default.
+Dear submitter,
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=689611
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.83 seconds
+GitLint                       PASS      1.05 seconds
+SubjectPrefix                 PASS      0.88 seconds
+BuildKernel                   PASS      34.27 seconds
+BuildKernel32                 PASS      31.02 seconds
+Incremental Build with patchesPASS      46.58 seconds
+TestRunner: Setup             PASS      514.95 seconds
+TestRunner: l2cap-tester      PASS      17.48 seconds
+TestRunner: iso-tester        PASS      16.75 seconds
+TestRunner: bnep-tester       PASS      6.64 seconds
+TestRunner: mgmt-tester       PASS      106.88 seconds
+TestRunner: rfcomm-tester     PASS      10.50 seconds
+TestRunner: sco-tester        PASS      9.95 seconds
+TestRunner: ioctl-tester      PASS      11.37 seconds
+TestRunner: mesh-tester       PASS      8.19 seconds
+TestRunner: smp-tester        PASS      10.02 seconds
+TestRunner: userchan-tester   PASS      6.99 seconds
+
+
+
 ---
- net/bluetooth/Kconfig      | 11 +++++++++++
- net/bluetooth/l2cap_core.c |  2 +-
- 2 files changed, 12 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index ae3bdc6dfc92..da7cac0a1b71 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -78,6 +78,17 @@ config BT_LE
- 	  Bluetooth Low Energy includes support low-energy physical
- 	  layer available with Bluetooth version 4.0 or later.
- 
-+config BT_LE_L2CAP_ECRED
-+	bool "Bluetooth L2CAP Enhanced Credit Flow Control"
-+	depends on BT_LE
-+	default y
-+	help
-+	  Bluetooth Low Energy L2CAP Enhanced Credit Flow Control available with
-+	  Bluetooth version 5.2 or later.
-+
-+	  This can be overridden by passing bluetooth.enable_ecred=[1|0]
-+	  on the kernel commandline.
-+
- config BT_6LOWPAN
- 	tristate "Bluetooth 6LoWPAN support"
- 	depends on BT_LE && 6LOWPAN
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 1fbe087d6ae4..ef725ed41303 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -45,7 +45,7 @@
- #define LE_FLOWCTL_MAX_CREDITS 65535
- 
- bool disable_ertm;
--bool enable_ecred;
-+bool enable_ecred = IS_ENABLED(CONFIG_BT_LE_L2CAP_ECRED);
- 
- static u32 l2cap_feat_mask = L2CAP_FEAT_FIXED_CHAN | L2CAP_FEAT_UCD;
- 
--- 
-2.37.3
 
+--===============8900753325840960485==--
