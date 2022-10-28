@@ -2,142 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB386ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 09:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D6EFA3742
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 15:09:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbiJ1JRf (ORCPT
+        id S229917AbiJ1PJY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Oct 2022 05:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53936 "EHLO
+        Fri, 28 Oct 2022 11:09:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230035AbiJ1JRd (ORCPT
+        with ESMTP id S229740AbiJ1PJW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Oct 2022 05:17:33 -0400
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7F681C5A74
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 02:17:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1666948652; x=1698484652;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=OivfaCnWZsDapgkmEeZJ9GHc49aMUBUWx8qY6VcYNBU=;
-  b=D5R04Kq9fHYx3Zqz8t56xYNhYGHMAwjc8C08bxCriiLm6goMtyTLx5Ui
-   6XRLNWei5co/PwftDFi8LT5FaCibyKlsfS6O5m7/ueHL13PsBg3Jd8m0K
-   SuNykWwP/gXHsyUuTB6eB8Epkev+/MEtx2QfKzGAIns0kvGR7DJfkjVBn
-   1994lMtjEPKoCozoWcYRefPmbO5dv14/kU+RkSih96Oy5/uU+ObYBlV4g
-   9rY6l9uO+4h3Zi1CoAGjbwXjS9m6Y0lpYbaUK3AH9xj3+f80cWZQcFUBI
-   eRVMTs8s/3j8qXfDQlcRJGMeA4fSsoO7HSdB8ur5bJcmUHCNTlv2+suj/
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="288845613"
-X-IronPort-AV: E=Sophos;i="5.95,220,1661842800"; 
-   d="scan'208";a="288845613"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2022 02:17:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10513"; a="701670846"
-X-IronPort-AV: E=Sophos;i="5.95,220,1661842800"; 
-   d="scan'208";a="701670846"
-Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by fmsmga004.fm.intel.com with ESMTP; 28 Oct 2022 02:17:28 -0700
-Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1ooLUW-0009ji-0f;
-        Fri, 28 Oct 2022 09:17:28 +0000
-Date:   Fri, 28 Oct 2022 17:16:53 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- aa02d16d9c085f348ce56b51b58039101746c4aa
-Message-ID: <635b9e05.f6iRyfrbnD29WupM%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Fri, 28 Oct 2022 11:09:22 -0400
+Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B351320B104;
+        Fri, 28 Oct 2022 08:09:21 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 279445C0063;
+        Fri, 28 Oct 2022 11:09:21 -0400 (EDT)
+Received: from imap47 ([10.202.2.97])
+  by compute2.internal (MEProxy); Fri, 28 Oct 2022 11:09:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm3; t=1666969761; x=1667056161; bh=Sy
+        6FI25zRCehPukmtH7/3V5knsC4JumJoR5V84h5kaM=; b=G+cOvYkJUUuGPABiFE
+        zjECEj6bJ8KF8IJsUGHKSG0kkvtJ2VGlxHt/vHL3ot1tcHvmCSHq8Yxsn4jmlio7
+        b87XcMRi/qNN2Hb+sQrrIZ/MprY+gQcSbAB1QGBlp6tKIsdFXVmWzpQXjwkBy+xO
+        4NvUlBVNiARkhbYcP5kRP5B0zXk8MJkJINm4XJm8NEnr4Qzbl7givGBykTZzep89
+        cUxHoMgh2r033YFDu1ONbt6pohcKPJwCy45muRy6CLnu6U5L9/8q6rm0UoXVOE4f
+        JDMshM/hm6kmL+pRMQ9aVtqAhwjY2GOiTOFxCdJtIFMMe1NV8rq+RTaTz7G9SCGw
+        O0AQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm3; t=1666969761; x=1667056161; bh=Sy6FI25zRCehPukmtH7/3V5knsC4
+        JumJoR5V84h5kaM=; b=TsctoJvwFdAcmmgfHHKeVjmT4R7aNkVhe6oQqMfWMVbJ
+        5eenZ0qnr+0i+VeZ4wJBz8Vh/koB0kDeIK1jZa+7vK5IVeaOZdE+MA8+s4RxrBZ+
+        X592De5wmxSVbMZkK3U06Bco6tBH2UULWY+GgRgGJdh0HdjwVinsImTnjLXK3bAJ
+        Kvn9Ot2VuqzkO4U05kBK9GNBs4Ul0H1ednZr4yCjeLd8Qn7ZYGyCGJvEBWRxUmSn
+        ow91pTIwYpEuEIFXibkL7lxzaZ977U4bzMrtl2gCdWegTSLYhVw5uyD2RhX3rB1A
+        3yrcm+/abvZP9pUGBNFqCI2vjfocyFju8Dr4PVuyjQ==
+X-ME-Sender: <xms:n_BbY5q9PM5WcB2nasCymuRAfsH5P_socO5xgz8nev3Qz577tghQMg>
+    <xme:n_BbY7oyIwDdM-bSjSjqj4cCpDS2JGnPeg9RIC0TEUut5aaeH8DTzvXVTGvqiV-xP
+    k58Tbpa6Z9GUzsD3y4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrtdeigdekgecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfuvhgv
+    nhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtffrrg
+    htthgvrhhnpeelvefggeffheevtdeivefhkeehfeettdejteduveeiheevveeilefghfei
+    veeiueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsvhgvnhesshhvvghnphgvthgvrhdruggvvh
+X-ME-Proxy: <xmx:oPBbY2MNaLXplfXAKqaolwa_6NaHLJ0Ptmad9_r4hec89t2_VdM70w>
+    <xmx:oPBbY04RfC88foBNrWOloMJshDEZKbin3RfvfhkZRJoLcpJj_2C5dQ>
+    <xmx:oPBbY442i4NZAMcpqZQCBHKaiD37HPyZZa7a9dcqmIt7_vtzC4goUg>
+    <xmx:ofBbY3TVaZqRl7-HOh0h5ylgzJPy1WpKCeDbgQNMvtPaN1kDZyXdtg>
+Feedback-ID: i51094778:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id EDD5AA6007C; Fri, 28 Oct 2022 11:09:19 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1087-g968661d8e1-fm-20221021.001-g968661d8
+Mime-Version: 1.0
+Message-Id: <587611e4-eb08-4b86-a8e8-aaa10f8efee6@app.fastmail.com>
+In-Reply-To: <CABBYNZKJnmfWfvxdgpxNFUGc7jTKP+BGv6CiZc2MsR970L35MA@mail.gmail.com>
+References: <20221027150822.26120-1-sven@svenpeter.dev>
+ <20221027150822.26120-7-sven@svenpeter.dev>
+ <CABBYNZKJnmfWfvxdgpxNFUGc7jTKP+BGv6CiZc2MsR970L35MA@mail.gmail.com>
+Date:   Fri, 28 Oct 2022 17:08:59 +0200
+From:   "Sven Peter" <sven@svenpeter.dev>
+To:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc:     "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Eric Dumazet" <edumazet@google.com>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        "Paolo Abeni" <pabeni@redhat.com>,
+        "Rob Herring" <robh+dt@kernel.org>,
+        "Hector Martin" <marcan@marcan.st>,
+        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
+        netdev@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 6/7] Bluetooth: Add quirk to disable MWS Transport Configuration
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: aa02d16d9c085f348ce56b51b58039101746c4aa  Bluetooth: btusb: Default CONFIG_BT_HCIBTUSB_POLL_SYNC=y
+Hi Luiz,
 
-elapsed time: 722m
+On Thu, Oct 27, 2022, at 20:59, Luiz Augusto von Dentz wrote:
+> Hi Sven,
+>
+> On Thu, Oct 27, 2022 at 8:09 AM Sven Peter <sven@svenpeter.dev> wrote:
+>>
+>> Broadcom 4378/4387 controllers found in Apple Silicon Macs claim to
+>> support getting MWS Transport Layer Configuration,
+>>
+>> < HCI Command: Read Local Supported... (0x04|0x0002) plen 0
+>> > HCI Event: Command Complete (0x0e) plen 68
+>>       Read Local Supported Commands (0x04|0x0002) ncmd 1
+>>         Status: Success (0x00)
+>> [...]
+>>           Get MWS Transport Layer Configuration (Octet 30 - Bit 3)]
+>> [...]
+>>
+>> , but then don't actually allow the required command:
+>>
+>> > HCI Event: Command Complete (0x0e) plen 15
+>>       Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
+>>         Status: Command Disallowed (0x0c)
+>>         Number of transports: 0
+>>         Baud rate list: 0 entries
+>>         00 00 00 00 00 00 00 00 00 00
+>>
+>> Signed-off-by: Sven Peter <sven@svenpeter.dev>
+>> ---
+>>  include/net/bluetooth/hci.h | 10 ++++++++++
+>>  net/bluetooth/hci_sync.c    |  2 ++
+>>  2 files changed, 12 insertions(+)
+>>
+>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+>> index 8cd89948f961..110d6df1299b 100644
+>> --- a/include/net/bluetooth/hci.h
+>> +++ b/include/net/bluetooth/hci.h
+>> @@ -273,6 +273,16 @@ enum {
+>>          * during the hdev->setup vendor callback.
+>>          */
+>>         HCI_QUIRK_BROKEN_EXT_SCAN,
+>> +
+>> +       /*
+>> +        * When this quirk is set, the HCI_OP_GET_MWS_TRANSPORT_CONFIG command is
+>> +        * disabled. This is required for some Broadcom controllers which
+>> +        * erroneously claim to support MWS Transport Layer Configuration.
+>> +        *
+>> +        * This quirk can be set before hci_register_dev is called or
+>> +        * during the hdev->setup vendor callback.
+>> +        */
+>> +       HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
+>>  };
+>>
+>>  /* HCI device flags */
+>> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+>> index 76c3107c9f91..91788d356748 100644
+>> --- a/net/bluetooth/hci_sync.c
+>> +++ b/net/bluetooth/hci_sync.c
+>> @@ -4260,6 +4260,8 @@ static int hci_get_mws_transport_config_sync(struct hci_dev *hdev)
+>>  {
+>>         if (!(hdev->commands[30] & 0x08))
+>>                 return 0;
+>> +       if (test_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks))
+>> +               return 0;
+>
+> Let's add a macro that tests both the command and the quirk so we
+> don't have to test them separately.
 
-configs tested: 64
-configs skipped: 2
+Sure, I'll add a macro for v5.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
 
-gcc tested configs:
-x86_64                              defconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-arc                                 defconfig
-s390                             allmodconfig
-alpha                               defconfig
-x86_64                          rhel-8.3-func
-x86_64                               rhel-8.3
-x86_64                    rhel-8.3-kselftests
-s390                                defconfig
-x86_64                           allyesconfig
-powerpc                           allnoconfig
-mips                             allyesconfig
-s390                             allyesconfig
-x86_64                         rhel-8.3-kunit
-powerpc                          allmodconfig
-x86_64                           rhel-8.3-kvm
-ia64                             allmodconfig
-x86_64                           rhel-8.3-syz
-sh                               allmodconfig
-i386                                defconfig
-i386                          randconfig-a001
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-alpha                            allyesconfig
-x86_64                        randconfig-a002
-arc                              allyesconfig
-i386                          randconfig-a014
-i386                          randconfig-a003
-i386                          randconfig-a005
-i386                          randconfig-a012
-x86_64                        randconfig-a004
-i386                          randconfig-a016
-arc                  randconfig-r043-20221028
-arm                                 defconfig
-arc                  randconfig-r043-20221027
-m68k                             allmodconfig
-riscv                randconfig-r042-20221028
-s390                 randconfig-r044-20221028
-i386                             allyesconfig
-arm                              allyesconfig
-arm64                            allyesconfig
-m68k                             allyesconfig
-x86_64                        randconfig-a015
-arc                  randconfig-r043-20221026
-s390                 randconfig-r044-20221026
-riscv                randconfig-r042-20221026
+Best,
 
-clang tested configs:
-x86_64                        randconfig-a012
-i386                          randconfig-a013
-x86_64                        randconfig-a014
-i386                          randconfig-a011
-i386                          randconfig-a002
-x86_64                        randconfig-a001
-x86_64                        randconfig-a003
-x86_64                        randconfig-a005
-i386                          randconfig-a006
-hexagon              randconfig-r041-20221027
-i386                          randconfig-a015
-hexagon              randconfig-r041-20221028
-i386                          randconfig-a004
-hexagon              randconfig-r045-20221028
-hexagon              randconfig-r045-20221027
-s390                 randconfig-r044-20221027
-riscv                randconfig-r042-20221027
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Sven
