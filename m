@@ -2,168 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D6EFA3742
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 15:09:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D57ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 19:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiJ1PJY (ORCPT
+        id S229839AbiJ1TEj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Oct 2022 11:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55610 "EHLO
+        Fri, 28 Oct 2022 15:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229740AbiJ1PJW (ORCPT
+        with ESMTP id S229652AbiJ1TEh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Oct 2022 11:09:22 -0400
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B351320B104;
-        Fri, 28 Oct 2022 08:09:21 -0700 (PDT)
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-        by mailout.nyi.internal (Postfix) with ESMTP id 279445C0063;
-        Fri, 28 Oct 2022 11:09:21 -0400 (EDT)
-Received: from imap47 ([10.202.2.97])
-  by compute2.internal (MEProxy); Fri, 28 Oct 2022 11:09:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm3; t=1666969761; x=1667056161; bh=Sy
-        6FI25zRCehPukmtH7/3V5knsC4JumJoR5V84h5kaM=; b=G+cOvYkJUUuGPABiFE
-        zjECEj6bJ8KF8IJsUGHKSG0kkvtJ2VGlxHt/vHL3ot1tcHvmCSHq8Yxsn4jmlio7
-        b87XcMRi/qNN2Hb+sQrrIZ/MprY+gQcSbAB1QGBlp6tKIsdFXVmWzpQXjwkBy+xO
-        4NvUlBVNiARkhbYcP5kRP5B0zXk8MJkJINm4XJm8NEnr4Qzbl7givGBykTZzep89
-        cUxHoMgh2r033YFDu1ONbt6pohcKPJwCy45muRy6CLnu6U5L9/8q6rm0UoXVOE4f
-        JDMshM/hm6kmL+pRMQ9aVtqAhwjY2GOiTOFxCdJtIFMMe1NV8rq+RTaTz7G9SCGw
-        O0AQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1666969761; x=1667056161; bh=Sy6FI25zRCehPukmtH7/3V5knsC4
-        JumJoR5V84h5kaM=; b=TsctoJvwFdAcmmgfHHKeVjmT4R7aNkVhe6oQqMfWMVbJ
-        5eenZ0qnr+0i+VeZ4wJBz8Vh/koB0kDeIK1jZa+7vK5IVeaOZdE+MA8+s4RxrBZ+
-        X592De5wmxSVbMZkK3U06Bco6tBH2UULWY+GgRgGJdh0HdjwVinsImTnjLXK3bAJ
-        Kvn9Ot2VuqzkO4U05kBK9GNBs4Ul0H1ednZr4yCjeLd8Qn7ZYGyCGJvEBWRxUmSn
-        ow91pTIwYpEuEIFXibkL7lxzaZ977U4bzMrtl2gCdWegTSLYhVw5uyD2RhX3rB1A
-        3yrcm+/abvZP9pUGBNFqCI2vjfocyFju8Dr4PVuyjQ==
-X-ME-Sender: <xms:n_BbY5q9PM5WcB2nasCymuRAfsH5P_socO5xgz8nev3Qz577tghQMg>
-    <xme:n_BbY7oyIwDdM-bSjSjqj4cCpDS2JGnPeg9RIC0TEUut5aaeH8DTzvXVTGvqiV-xP
-    k58Tbpa6Z9GUzsD3y4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrtdeigdekgecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfuvhgv
-    nhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtffrrg
-    htthgvrhhnpeelvefggeffheevtdeivefhkeehfeettdejteduveeiheevveeilefghfei
-    veeiueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    hsvhgvnhesshhvvghnphgvthgvrhdruggvvh
-X-ME-Proxy: <xmx:oPBbY2MNaLXplfXAKqaolwa_6NaHLJ0Ptmad9_r4hec89t2_VdM70w>
-    <xmx:oPBbY04RfC88foBNrWOloMJshDEZKbin3RfvfhkZRJoLcpJj_2C5dQ>
-    <xmx:oPBbY442i4NZAMcpqZQCBHKaiD37HPyZZa7a9dcqmIt7_vtzC4goUg>
-    <xmx:ofBbY3TVaZqRl7-HOh0h5ylgzJPy1WpKCeDbgQNMvtPaN1kDZyXdtg>
-Feedback-ID: i51094778:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id EDD5AA6007C; Fri, 28 Oct 2022 11:09:19 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.7.0-alpha0-1087-g968661d8e1-fm-20221021.001-g968661d8
-Mime-Version: 1.0
-Message-Id: <587611e4-eb08-4b86-a8e8-aaa10f8efee6@app.fastmail.com>
-In-Reply-To: <CABBYNZKJnmfWfvxdgpxNFUGc7jTKP+BGv6CiZc2MsR970L35MA@mail.gmail.com>
-References: <20221027150822.26120-1-sven@svenpeter.dev>
- <20221027150822.26120-7-sven@svenpeter.dev>
- <CABBYNZKJnmfWfvxdgpxNFUGc7jTKP+BGv6CiZc2MsR970L35MA@mail.gmail.com>
-Date:   Fri, 28 Oct 2022 17:08:59 +0200
-From:   "Sven Peter" <sven@svenpeter.dev>
-To:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc:     "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
-        "Paolo Abeni" <pabeni@redhat.com>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Hector Martin" <marcan@marcan.st>,
-        "Alyssa Rosenzweig" <alyssa@rosenzweig.io>, asahi@lists.linux.dev,
-        netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 6/7] Bluetooth: Add quirk to disable MWS Transport Configuration
-Content-Type: text/plain
+        Fri, 28 Oct 2022 15:04:37 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47F042DEA
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 12:04:28 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id u2so9523750ljl.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 12:04:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4b9sz4ugHIcdLRQb67EBQwaBMJWvpqxatOEnY5HdOLI=;
+        b=pXV8luEA4PWSU+c6tVmLbQjw8xp2mPq4V2yW24Xd5lefpYNYXtRF+m54trZOedc41X
+         juQ4wb3g1zjTpkENeuhOPsLo0Iy0slN3Zd1cTfNKFveiHEyjz+dN298DgkANuTmN0Uus
+         vdtz2U2cdSWQjgVtuvDmdWeAsOVgGKvagC9HkvOzI7sPkB6aFYv+ilQO/fCSH0Cpte56
+         qz8wMtd9vWP2ie4iSrwlOJk9WhKXX6fvZzbXgcMY8jqlUheiDo6GErqW+u0K5fCAxkje
+         pTl+bbCzivxrW6kknKdJavKYQZFo450APswCxYKERSL1HpRDqAm0R4F6Tlwk+uuCkg1N
+         73FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4b9sz4ugHIcdLRQb67EBQwaBMJWvpqxatOEnY5HdOLI=;
+        b=a72FSWFosfvx3shRw4L4KQ4hJOJxXVwmhO6zeV/70HPKrC9wZwIRCGdy1swF7QygYb
+         CvbCe5zRnOTlYqniZnltqJsv7wmolCtYlzTz92edrLTV/EorqoPqbU5FoDsFu8J6Vgn5
+         Zset9wYNyJSZYU26eJpTAN4612nuywnvqTbekG2BOQ7wkeWhOcdVNLLTM8XT8FRgsfff
+         MhA46ZosOJJIHCHFoU6YfjyPqKBM9Vm9i3WWI7eTrhrRCPx5LtZIIhHKYNQswIAldGMu
+         /QE4+YY/g/gMcfr8ZavJKRBSD/1A8almQm4NC7COVVjptkO51iLVSTwOdqu6zzE4jfhJ
+         pzyw==
+X-Gm-Message-State: ACrzQf3i8BWaa04qhQLx4Pgl/zsV/5WfYNdkOUIgJLy+smFiZAsifyP4
+        RRD1Od2gwmr54OSRqNYcdx4OmWhjd3dpX5fVm8jKTsYO
+X-Google-Smtp-Source: AMsMyM6Ev9loD7xUGVAN+tDAOr9prfqlwAhLmekdY4fEGG9jgzvrsu41ONo0CHdSMSPP6hecZwtoFWmP7QxzGc9DsCg=
+X-Received: by 2002:a2e:a884:0:b0:25d:d8a2:d18c with SMTP id
+ m4-20020a2ea884000000b0025dd8a2d18cmr349028ljq.305.1666983865981; Fri, 28 Oct
+ 2022 12:04:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20221027150822.26120-2-sven@svenpeter.dev> <635aae47.c80a0220.f8596.406a@mx.google.com>
+In-Reply-To: <635aae47.c80a0220.f8596.406a@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 28 Oct 2022 12:04:13 -0700
+Message-ID: <CABBYNZJHUEtT7QPx7rFkS0=CiEqWpDz7=q98p9qPcR-XBdWCEw@mail.gmail.com>
+Subject: Re: Broadcom/Apple Bluetooth driver for Apple Silicon
+To:     linux-bluetooth@vger.kernel.org
+Cc:     sven@svenpeter.dev, Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Tedd,
 
-On Thu, Oct 27, 2022, at 20:59, Luiz Augusto von Dentz wrote:
-> Hi Sven,
+On Thu, Oct 27, 2022 at 9:20 AM <bluez.test.bot@gmail.com> wrote:
 >
-> On Thu, Oct 27, 2022 at 8:09 AM Sven Peter <sven@svenpeter.dev> wrote:
->>
->> Broadcom 4378/4387 controllers found in Apple Silicon Macs claim to
->> support getting MWS Transport Layer Configuration,
->>
->> < HCI Command: Read Local Supported... (0x04|0x0002) plen 0
->> > HCI Event: Command Complete (0x0e) plen 68
->>       Read Local Supported Commands (0x04|0x0002) ncmd 1
->>         Status: Success (0x00)
->> [...]
->>           Get MWS Transport Layer Configuration (Octet 30 - Bit 3)]
->> [...]
->>
->> , but then don't actually allow the required command:
->>
->> > HCI Event: Command Complete (0x0e) plen 15
->>       Get MWS Transport Layer Configuration (0x05|0x000c) ncmd 1
->>         Status: Command Disallowed (0x0c)
->>         Number of transports: 0
->>         Baud rate list: 0 entries
->>         00 00 00 00 00 00 00 00 00 00
->>
->> Signed-off-by: Sven Peter <sven@svenpeter.dev>
->> ---
->>  include/net/bluetooth/hci.h | 10 ++++++++++
->>  net/bluetooth/hci_sync.c    |  2 ++
->>  2 files changed, 12 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index 8cd89948f961..110d6df1299b 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -273,6 +273,16 @@ enum {
->>          * during the hdev->setup vendor callback.
->>          */
->>         HCI_QUIRK_BROKEN_EXT_SCAN,
->> +
->> +       /*
->> +        * When this quirk is set, the HCI_OP_GET_MWS_TRANSPORT_CONFIG command is
->> +        * disabled. This is required for some Broadcom controllers which
->> +        * erroneously claim to support MWS Transport Layer Configuration.
->> +        *
->> +        * This quirk can be set before hci_register_dev is called or
->> +        * during the hdev->setup vendor callback.
->> +        */
->> +       HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG,
->>  };
->>
->>  /* HCI device flags */
->> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
->> index 76c3107c9f91..91788d356748 100644
->> --- a/net/bluetooth/hci_sync.c
->> +++ b/net/bluetooth/hci_sync.c
->> @@ -4260,6 +4260,8 @@ static int hci_get_mws_transport_config_sync(struct hci_dev *hdev)
->>  {
->>         if (!(hdev->commands[30] & 0x08))
->>                 return 0;
->> +       if (test_bit(HCI_QUIRK_BROKEN_MWS_TRANSPORT_CONFIG, &hdev->quirks))
->> +               return 0;
+> This is automated email and please do not reply to this email!
 >
-> Let's add a macro that tests both the command and the quirk so we
-> don't have to test them separately.
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=689494
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      6.26 seconds
+> GitLint                       FAIL      1.97 seconds
+> SubjectPrefix                 FAIL      2.59 seconds
+> BuildKernel                   PASS      33.98 seconds
+> BuildKernel32                 PASS      30.00 seconds
+> Incremental Build with patchesPASS      146.18 seconds
+> TestRunner: Setup             PASS      506.50 seconds
+> TestRunner: l2cap-tester      PASS      17.12 seconds
+> TestRunner: iso-tester        PASS      16.02 seconds
+> TestRunner: bnep-tester       PASS      6.33 seconds
+> TestRunner: mgmt-tester       PASS      103.02 seconds
+> TestRunner: rfcomm-tester     PASS      10.09 seconds
+> TestRunner: sco-tester        PASS      9.42 seconds
+> TestRunner: ioctl-tester      PASS      10.55 seconds
+> TestRunner: mesh-tester       PASS      7.71 seconds
+> TestRunner: smp-tester        PASS      9.46 seconds
+> TestRunner: userchan-tester   PASS      6.54 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL - 6.26 seconds
+> Run checkpatch.pl script with rule in .checkpatch.conf
+> [v4,1/7] dt-bindings: net: Add generic Bluetooth controller\Traceback (most recent call last):
+>   File "scripts/spdxcheck.py", line 6, in <module>
+>     from ply import lex, yacc
 
-Sure, I'll add a macro for v5.
+We might want to fix this to install the ply module.
 
+> ModuleNotFoundError: No module named 'ply'
+> WARNING:FILE_PATH_CHANGES: added, moved or deleted file(s), does MAINTAINERS need updating?
+> #115:
+>  .../{ => bluetooth}/qualcomm-bluetooth.yaml   |  6 ++--
+>
+> WARNING:DT_SPLIT_BINDING_PATCH: DT binding docs and includes should be a separate patch. See: Documentation/devicetree/bindings/submitting-patches.rst
+>
+> WARNING:DT_SPLIT_BINDING_PATCH: DT binding docs and includes should be a separate patch. See: Documentation/devicetree/bindings/submitting-patches.rst
+>
+> total: 0 errors, 3 warnings, 71 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/13022301.patch has style problems, please review.
+>
+> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> [v4,3/7] arm64: dts: apple: t8103: Add Bluetooth controller\WARNING:UNDOCUMENTED_DT_STRING: DT compatible string vendor "pci14e4" appears un-documented -- check ./Documentation/devicetree/bindings/vendor-prefixes.yaml
+> #210: FILE: arch/arm64/boot/dts/apple/t8103-jxxx.dtsi:83:
+> +               compatible = "pci14e4,5f69";
+>
+> total: 0 errors, 1 warnings, 68 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/13022303.patch has style problems, please review.
+>
+> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+> ##############################
+> Test: GitLint - FAIL - 1.97 seconds
+> Run gitlint with rule in .gitlint
+> [v4,1/7] dt-bindings: net: Add generic Bluetooth controller
+> 15: B1 Line exceeds max length (93>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/bluetooth-controller.yaml"
+> 16: B1 Line exceeds max length (91>80): " rename Documentation/devicetree/bindings/net/{ => bluetooth}/qualcomm-bluetooth.yaml (96%)"
+>
+> [v4,2/7] dt-bindings: net: Add Broadcom BCM4377 family PCIe Bluetooth
+> 14: B1 Line exceeds max length (95>80): " create mode 100644 Documentation/devicetree/bindings/net/bluetooth/brcm,bcm4377-bluetooth.yaml"
+>
+>
+> ##############################
+> Test: SubjectPrefix - FAIL - 2.59 seconds
+> Check subject contains "Bluetooth" prefix
+> "Bluetooth: " is not specified in the subject
+> "Bluetooth: " is not specified in the subject
+> "Bluetooth: " is not specified in the subject
 
-Best,
+@Sven you can probably ignore these errors since not all patches are
+bluetooth specific these are probably a false positives.
 
+@Tedd Btw, for new drivers the CI won't be able to build test so I
+wonder if we should have a special Kconfig option that select all the
+drivers so we don't have to keep updating the ci.config everytime a
+new driver is introduced?
 
-Sven
+-- 
+Luiz Augusto von Dentz
