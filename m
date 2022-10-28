@@ -2,87 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4764FA3741
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 23:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227B6C38A02
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 23:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbiJ1XrS (ORCPT
+        id S229562AbiJ1XuV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 28 Oct 2022 19:47:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53600 "EHLO
+        Fri, 28 Oct 2022 19:50:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229905AbiJ1XrQ (ORCPT
+        with ESMTP id S229556AbiJ1XuT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 28 Oct 2022 19:47:16 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC7A71D6A42
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 16:47:15 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id f23so6134833plr.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 16:47:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zmVtj6367OdE/cBtmC/6aSPVpj/jJRKxBa497UFOCEo=;
-        b=jip4If778PxfuvH8jVv5WYsAAWorHgZGV5zptdF1BJUWEMLz7BsF0eVnXo//EeTKF2
-         e4dCuD2D0eOLifWLss9r+P83vqAT2A+cfJJx2mB9Vp1iVQQOoVfzGn+4dBFcO9R2kBx5
-         dyOkn+262shJuTJShV/yOTtJ6i00aDQQYwKu59oKXS4FIwIZG3fDwmOIHycxR1Sxpa7u
-         KcC6gjB5OjdAUUM+ES53uMHD5xJ/o0tI8GvMN/Mmffs1Ia8qwYnoFnVjTJdzTcc+4Z7q
-         50p+Dfg01VPNO0saGotdKBkS8ww8JQDAHPa5l0hVF+k1YN9nn6kQLTz+wn+klXeYvMId
-         BS6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zmVtj6367OdE/cBtmC/6aSPVpj/jJRKxBa497UFOCEo=;
-        b=mphglT/44W/+3+dYCbuDrbVtb0yaulwIo7PID0UNJPeYyrQLV0V9/l1STLZUTYgMVr
-         fQ/jS0n4jdtOlgoxbUteBkx5A3qBKkVun2gbvRbhffW4Wp7dixqGNWktFvVtkOESFmwb
-         HdvwZKkbzKWH+P51X3vrXIut79oFmWETNf1RY+idxVOkc71d62WYUk42+usOTFq+gwXj
-         0jWSwsZkxSse2MYTAq0j9pk1w45lQRVSuqpo+0IINpCHttLXixdbJK66PWrHkWv/2c1P
-         DjEGYx7aGlOdcXpLJBke3BedFp1YLIo8/V4u3yP3e4j0yOh08dIbHIdGHx18bUtphi0p
-         E8WA==
-X-Gm-Message-State: ACrzQf1vHSMqRLA3UOFyJ3mEFV2gqRzfdMKO8PSpi0n5zlNEeiCZrOjb
-        eKL7BcVN5bFmuKw+5Dre3XU5WasUMww=
-X-Google-Smtp-Source: AMsMyM4L3gWhvr8ay954XUF6LiP07pM7sgsjANvjluqzoE/iInhn4l1b9Auzp7r7+PJCrP/SFTks3Q==
-X-Received: by 2002:a17:902:e804:b0:185:5276:7063 with SMTP id u4-20020a170902e80400b0018552767063mr1563122plg.171.1667000834714;
-        Fri, 28 Oct 2022 16:47:14 -0700 (PDT)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h14-20020a17090a9c0e00b00212e9196f6asm15117pjp.21.2022.10.28.16.47.13
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Oct 2022 16:47:13 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] tools/test-runner: Remove bluetooth.enable_ecred
-Date:   Fri, 28 Oct 2022 16:47:12 -0700
-Message-Id: <20221028234712.2213561-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.37.3
+        Fri, 28 Oct 2022 19:50:19 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51ED25B11E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 16:50:18 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id F0E5EB82DD1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 28 Oct 2022 23:50:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AAFC6C433D6;
+        Fri, 28 Oct 2022 23:50:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667001015;
+        bh=CCwQAqpoDLHKOLB+2BoTefD5ebIhhFtnDypgCxgW154=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=EnP+jOaFRf9JUQUnjta5piQVNHC4+rHSso46AY7xzunKS6wr3N54LhVgRdpgvhEWn
+         RegfooD5G7pY4qES/Fl8VbGr+4GUaRmm/y3VV5YiMic2usl6szm3oWtTsZZKsyIEAZ
+         jA1+lDNVz8ce8RoaZTFv8ooyy4cOlRAI4war3ir/XCL2Ao7OxiI0dS6I/2Tt7xiZdk
+         R3h9jh3zKo7x256xGi89i2kGSjyH2zBZs5emmKH2HbgWdebHuKI7JWO7G+cAgx7jzr
+         7KbK/ke42+Y6cvUIaNwYCqWI0BLbKNw73JdLei1i5pLCSE/t73fO9zH1R8zuaxT1ll
+         AMQ+MBzbk6zIA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8FC59C41676;
+        Fri, 28 Oct 2022 23:50:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166700101558.30161.7237012145255361765.git-patchwork-notify@kernel.org>
+Date:   Fri, 28 Oct 2022 23:50:15 +0000
+References: <20221027232528.1996093-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221027232528.1996093-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello:
 
-L2CAP ECRED is now enabled by default by the following kernel change:
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-98f18bb78b7d ("Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED")
----
- tools/test-runner.c | 1 -
- 1 file changed, 1 deletion(-)
+On Thu, 27 Oct 2022 16:25:28 -0700 you wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds CONFIG_BT_LE_L2CAP_ECRED which can be used to enable L2CAP
+> Enhanced Credit Flow Control Mode by default, previously it was only
+> possible to set it via module parameter (e.g. bluetooth.enable_ecred=1).
+> 
+> Since L2CAP ECRED mode is required by the likes of EATT which is
+> recommended for LE Audio this enables it by default.
+> 
+> [...]
 
-diff --git a/tools/test-runner.c b/tools/test-runner.c
-index 560d638e4db2..6660ea8de9bf 100644
---- a/tools/test-runner.c
-+++ b/tools/test-runner.c
-@@ -250,7 +250,6 @@ static void start_qemu(void)
- 				"rootfstype=9p "
- 				"rootflags=trans=virtio,version=9p2000.u "
- 				"acpi=off pci=noacpi noapic quiet ro init=%s "
--				"bluetooth.enable_ecred=1 "
- 				"TESTHOME=%s TESTDBUS=%u TESTDAEMON=%u "
- 				"TESTDBUSSESSION=%u XDG_RUNTIME_DIR=/run/user/0 "
- 				"TESTAUDIO=%u "
+Here is the summary with links:
+  - Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
+    https://git.kernel.org/bluetooth/bluetooth-next/c/98f18bb78b7d
+
+You are awesome, thank you!
 -- 
-2.37.3
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
