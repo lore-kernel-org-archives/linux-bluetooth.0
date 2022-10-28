@@ -2,107 +2,150 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC94ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 00:12:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA30ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 28 Oct 2022 02:57:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234235AbiJ1AMX (ORCPT
+        id S235520AbiJ1C5i (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 27 Oct 2022 20:12:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56870 "EHLO
+        Thu, 27 Oct 2022 22:57:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234137AbiJ1AMV (ORCPT
+        with ESMTP id S234810AbiJ1C5h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 27 Oct 2022 20:12:21 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 884623FA0C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 17:12:20 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id o2so2465042qkk.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 27 Oct 2022 17:12:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=IONdietJPsIAj1V3w1iPti68NvpsI1UX4YWJpbc+fDc=;
-        b=PKRCwR3ZJ4jVz6CjlWIV2jqjt0yKIvbpJko/7pjAa17XQwj1L2jmxjQiyMRVrTGypr
-         fH1wh8UBcHplju9ucqxH+Swj7/F890kFFnO/5cQYyM8zRyZ9B+VdE7gtV8GaBvVDwy7k
-         AdtQiUzCXnYTrdRSvB6mWC2EZKDj1FYG3leE9WfwY2n887S5+ZzR9+2o4E+ROtQIfFZc
-         WL/pX8F2/rMxeBzAQ0o1Nqj2j0meozH16UocINYW91mkr/qjg/Ldm8GeLuUZoZggudNE
-         ARkftz03xA/NKDVGIH7uxX5x9G42u7sPo4+WYYsZK7ZiwIe9n8hEtnZRgDEy709ccpOU
-         Y9LQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IONdietJPsIAj1V3w1iPti68NvpsI1UX4YWJpbc+fDc=;
-        b=6C5oPuBu6oHSFP82PdYvuJM59Pz2bYktEkl19HuUcjNTOXO2S1l+fP2jptTBVJvYzM
-         TgPUiDIQA+HTykqwCpaZbiZQCq0wvOHaHfLt96Pk3sWEhn8U435Y2tcLgURKG6WaDGKM
-         zl/xeHhO4qw+bK+GeU8O7BVxCQcSoSGD3YG3hxFXrV4wUyzK/UsV55aSyVz/8sjRi6Z4
-         ZYyc4OurqjNq/FPWLMqg8UfzdWVRhcOAJX8MlL7Dom7mGxpC4vu7F7j3hX9O1X4jZQSC
-         YBLESYo8RdcOM/NvTXyZybCrIVzBV9jTTelj6ekqqBeiORThx5wLI1zcL+H6i11hLpK3
-         5kpg==
-X-Gm-Message-State: ACrzQf2E+9ZtDA0oGbndbBz26VTj1KEmVHuU0DzY73ezuGoah/2OtJAe
-        JI+G8Q7+IUYyLy9M8LncuUKAH5hIurLcsA==
-X-Google-Smtp-Source: AMsMyM4pdeSYkXuQB6LK8hCGABCISfdhZsSwKbvoTfxltQcZuiggHNo1R9ZKzEGFHqFRwpvAF2Qw8w==
-X-Received: by 2002:a05:620a:1725:b0:6ee:e8bc:9594 with SMTP id az37-20020a05620a172500b006eee8bc9594mr37441823qkb.184.1666915939526;
-        Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.14.204.158])
-        by smtp.gmail.com with ESMTPSA id b17-20020ac844d1000000b003a4d5fed8c3sm1585813qto.85.2022.10.27.17.12.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
-Message-ID: <635b1e63.c80a0220.41d1f.6e7f@mx.google.com>
-Date:   Thu, 27 Oct 2022 17:12:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8900753325840960485=="
+        Thu, 27 Oct 2022 22:57:37 -0400
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBA04C1DA2;
+        Thu, 27 Oct 2022 19:57:35 -0700 (PDT)
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 29S2eLG8031432;
+        Fri, 28 Oct 2022 02:57:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=8boYx5DMpSKCIKsl187S1xKyolTLlB5T0x9Z9MXfnZs=;
+ b=k9dcFmdKKNBRCnfzGIOEDFvbb4KVFdgxN2HYJyAzSI9Whh+fShBAxgrqhoBx1Q7+fIA4
+ 5JimJD8e9erO6OzGEoAPntwsGOMIDJonLCthWM07uwRO5TBJpkXXEGzL4172oTvWqWR1
+ 3xjyTSYJeD1fMz4UIfCYYzdrPhlOmPn00zM77X6P9Jx3Q7rgnWvo9+Fx6OOpehwVs2Jo
+ SO0BXlJ7J7KRwfeLqHtv6WDcgJ1Sq7M8T4SG7RNg64qeqjS8ZLY4xjv5zHfljDpQs0UY
+ p96FgOCle3JOs9FvzbMf6yHGXQOxnI89pxKIMz5nA/wQWkTy9hW5S9pe6/0Acom8Kz54 Pw== 
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3kfahvutrs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Oct 2022 02:57:21 +0000
+Received: from nasanex01a.na.qualcomm.com ([10.52.223.231])
+        by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 29S2vKiu020978
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 28 Oct 2022 02:57:20 GMT
+Received: from [10.249.8.186] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.29; Thu, 27 Oct
+ 2022 19:57:17 -0700
+Message-ID: <8c9bbcde-6dcb-2e31-d3d8-c51d8fe03035@quicinc.com>
+Date:   Fri, 28 Oct 2022 10:57:15 +0800
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221027232528.1996093-1-luiz.dentz@gmail.com>
-References: <20221027232528.1996093-1-luiz.dentz@gmail.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.11.0
+Subject: Re: [PATCH v1] Bluetooth: btusb: Fix enable failure for a CSR BT
+ dongle
+Content-Language: en-US
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <luiz.von.dentz@intel.com>,
+        <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, Zijun Hu <zijuhu@qti.qualcomm.com>
+References: <1666868760-4680-1-git-send-email-quic_zijuhu@quicinc.com>
+ <abb598cd-c849-33b8-34fa-4cedcf185138@molgen.mpg.de>
+From:   quic_zijuhu <quic_zijuhu@quicinc.com>
+In-Reply-To: <abb598cd-c849-33b8-34fa-4cedcf185138@molgen.mpg.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: jlFQDkb_UT7kRVqimgYsBYkuSvIYOhvG
+X-Proofpoint-GUID: jlFQDkb_UT7kRVqimgYsBYkuSvIYOhvG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.895,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-10-27_07,2022-10-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ impostorscore=0 priorityscore=1501 lowpriorityscore=0 mlxlogscore=999
+ spamscore=0 phishscore=0 bulkscore=0 malwarescore=0 clxscore=1011
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2210280017
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8900753325840960485==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 10/27/2022 7:18 PM, Paul Menzel wrote:
+> Dear Zijun,
+> 
+> 
+> Thank you for the patch.
+> 
+> 
+> Am 27.10.22 um 13:06 schrieb Zijun Hu:
+>> From: Zijun Hu <zijuhu@qti.qualcomm.com>
+> 
+> I‘d be more specific in the summary/title. Maybe:
+> 
+> Correct quirk check to include BT 4.0
+> 
+>> A CSR BT dongle fails to be enabled bcz it is not detected as fake
+> 
+> I’d write *because*.
+> 
+>> rightly, fixed by correcting fake detection condition.
+>>
+>> below btmon error log says HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL is not set.
+>>
+>> < HCI Command: Set Event Filter (0x03|0x0005) plen 1        #23 [hci0]
+>>          Type: Clear All Filters (0x00)
+>>> HCI Event: Command Complete (0x0e) plen 4                 #24 [hci0]
+>>        Set Event Filter (0x03|0x0005) ncmd 1
+>>          Status: Invalid HCI Command Parameters (0x12)
+>>
+>> the quirk is not set bcz current fake detection does not mark the dongle
+>> as fake with below version info.
+>>
+>> < HCI Command: Read Local Version In.. (0x04|0x0001) plen 0  #1 [hci0]
+>>> HCI Event: Command Complete (0x0e) plen 12                 #2 [hci0]
+>>        Read Local Version Information (0x04|0x0001) ncmd 1
+>>          Status: Success (0x00)
+>>          HCI version: Bluetooth 4.0 (0x06) - Revision 12576 (0x3120)
+>>          LMP version: Bluetooth 4.0 (0x06) - Subversion 8891 (0x22bb)
+>>          Manufacturer: Cambridge Silicon Radio (10)
+>>
+>> Link: https://bugzilla.kernel.org/show_bug.cgi?id=60824
+>> Signed-off-by: Zijun Hu <zijuhu@qti.qualcomm.com>
+> 
+> Please add a Fixes: tag.
+> 
+> 
+> Kind regards,
+> 
+> Paul
+> 
+> 
+>> ---
+>>   drivers/bluetooth/btusb.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index 420be2ee2acf..727469d073f9 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -2155,7 +2155,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+>>           is_fake = true;
+>>         else if (le16_to_cpu(rp->lmp_subver) <= 0x22bb &&
+>> -         le16_to_cpu(rp->hci_ver) > BLUETOOTH_VER_4_0)
+>> +         le16_to_cpu(rp->hci_ver) >= BLUETOOTH_VER_4_0)
+>>           is_fake = true;
+>>         /* Other clones which beat all the above checks */
 
-This is automated email and please do not reply to this email!
+thank you Paul for your code review.
+i am sorry, please Ignore this wrong fix.
+the enable failure should be  caused that below fix is not be picked up
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=b3cf94c8b6b2f1a2b94825a025db291da2b151fd
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=689611
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.83 seconds
-GitLint                       PASS      1.05 seconds
-SubjectPrefix                 PASS      0.88 seconds
-BuildKernel                   PASS      34.27 seconds
-BuildKernel32                 PASS      31.02 seconds
-Incremental Build with patchesPASS      46.58 seconds
-TestRunner: Setup             PASS      514.95 seconds
-TestRunner: l2cap-tester      PASS      17.48 seconds
-TestRunner: iso-tester        PASS      16.75 seconds
-TestRunner: bnep-tester       PASS      6.64 seconds
-TestRunner: mgmt-tester       PASS      106.88 seconds
-TestRunner: rfcomm-tester     PASS      10.50 seconds
-TestRunner: sco-tester        PASS      9.95 seconds
-TestRunner: ioctl-tester      PASS      11.37 seconds
-TestRunner: mesh-tester       PASS      8.19 seconds
-TestRunner: smp-tester        PASS      10.02 seconds
-TestRunner: userchan-tester   PASS      6.99 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============8900753325840960485==--
