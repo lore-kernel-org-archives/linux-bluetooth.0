@@ -2,107 +2,193 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DDEC38A02
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 18:11:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DACFECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 20:25:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229500AbiJ2SLC (ORCPT
+        id S229636AbiJ2UZa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Oct 2022 14:11:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
+        Sat, 29 Oct 2022 16:25:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJ2SLB (ORCPT
+        with ESMTP id S229565AbiJ2UZ3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Oct 2022 14:11:01 -0400
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B76917AAF
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 11:10:53 -0700 (PDT)
-Received: by mail-oi1-x22e.google.com with SMTP id r83so9298159oih.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 11:10:53 -0700 (PDT)
+        Sat, 29 Oct 2022 16:25:29 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8918E55C79;
+        Sat, 29 Oct 2022 13:25:24 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id o4so10797255wrq.6;
+        Sat, 29 Oct 2022 13:25:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ayaAiY3xidjdZrmLvTsvT+mAIoNMmAeoXs6oow8QFqg=;
-        b=lcL3dWKuaxsDy8jCh6/9gLw9VOhR0LYTukXM81Kt2lEN9kjh8LMJpFEEUuxcoMvz/v
-         iQh0zKobluYJvfaeSsVyN7x4A5InM4ATKrvtY7h7ANtaCz7zepR1llBQdO8Ac16tZgoP
-         smI5W5I+C7WUZpTXzASYZAk0V7QSsj8wJrIrZsce1/1FC1rueL90UctY80szkkIULFi3
-         hh0eMmZbW8yB82bI/oFsYChWsIw7fob3k3AXUkAkyFY27KVaAWcyNGmJrJ+i0W4dTUUn
-         1IRl/Ii6oyVltYnfETjT53k8TqyYengzgxWI4cMRvU8PojFVyM5GHdHDIUo6/nB9lBXN
-         bGJQ==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AjRHZ8fBkg3lgjizFn9B9hytM4UkuoK83SgqmM3ChZE=;
+        b=LGNwBNf8jYxk8Z6LrnZoxsnGAaI9QpTYNSEQdu9SpePwkwCi/RCEaIJjHT5WAmHTTV
+         eg+FHFOcaPOrU3QmPa7jy9i6KTNFiwLPe7F1MN20D4fMOcDkXXyUCj8n/a23gAN+Dwrf
+         ztYqtS1GL96hHrUE8DK/vyrbfkFRXBAIm0V4h2i7YAt/owq4exZd5ercimwyZJJI6R5G
+         JojWm7YiLxbdbtlMPXpUjM26ZK5eMkcgskeH/U0Sv1AMQMTkvUZSnr4nHb+8YOjBstEe
+         hGhN4QaibO7LoL7POEaNQz1dBQc755yJtESpGs92kC0/KGK2WtzUI7q34f8Er94hUaox
+         MhNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ayaAiY3xidjdZrmLvTsvT+mAIoNMmAeoXs6oow8QFqg=;
-        b=yhP6jhaHJWbR1QXI5TwigZR62V+yuUzOdV4TujbW6G8ssgrse4s60Y1DTALDoXDBuk
-         26SX5cuT/m4Q/kvMJswZthMf6aKwNuBhn+cS260JdX1MAp2yuMHwXl4A/yhtK9BrflYr
-         vTBZcxRZ/YmFFAzBAOIcXzgI+0PSr1MQUNaODN/uQ0wgs99eauvb7xti4evw905S4ydI
-         1etsqUrHEiASVwpBF5KfAl6bHdMPPmsZkxlJHm0XxlHEK0rBwsYXxjrKoXjXuUqUzeyl
-         cbT1fQrTJfFEuBt7VmLKL07WAqM0Un+8+vRZhLe3di7rEXLYjJMqz5q3zF+kwVW1isE5
-         PT+A==
-X-Gm-Message-State: ACrzQf0wmbX8EDzMu7MRaVf4E8kb1VoR47Td2JCTjsONY3IXK1O1bxt/
-        qO5wZtlk05tWlZZikKkjcuWcDmleHOE=
-X-Google-Smtp-Source: AMsMyM5l6GyfNahRgLTq/i0vYKaRFr0/WmdDEo5j2nn988H1Kem49XvccZ/diUUpFA/Oy3vWzwQrjg==
-X-Received: by 2002:a05:6808:1186:b0:353:b77a:a481 with SMTP id j6-20020a056808118600b00353b77aa481mr11049046oil.199.1667067052517;
-        Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
-Received: from [172.17.0.2] ([52.171.56.234])
-        by smtp.gmail.com with ESMTPSA id g22-20020a056870341600b0012796e8033dsm888503oah.57.2022.10.29.11.10.52
+        bh=AjRHZ8fBkg3lgjizFn9B9hytM4UkuoK83SgqmM3ChZE=;
+        b=bAe9MvXI/1P+GKyBCQpTa9jg8c5lnOQ0Xknk/IY905S/U6eSS3fhpuSUsXtZgCXhx9
+         SEcOQ94deeCBm0KO6oH+0vaQ1T/k9Tii1KaSBqL9c+HmY8Pu3fIc//j09Bk+oWinTWUX
+         BdEbvKoySQXd2XW0WMsTTY57DdgbrHdvJjWcWo8+8B+c6atfcPgnnxUFv3PB72HCIMi+
+         Dyj5kKrGKaB65PwIBS9WrDAX/Or9xNvx+s97sKf6ZyV8AK1eW/0gNh28G6rdselAwhjd
+         zAhzb8lMgbXUzSSeBin/N4op7R1nHCngw8nMkIrE5wQ/GF3yF3I8EbDlBVmzs2laNVF4
+         7jbg==
+X-Gm-Message-State: ACrzQf0Klmp4uKKPIjR3pEZlwCSmWm77WFN7bNH1sVEpELrF0dZ/J8pS
+        A+b5Gpa+03T9BoCq6PInRbMeDvZrp7O2HpRI
+X-Google-Smtp-Source: AMsMyM63HApAl5EyY21mbT9cgtvC76ltsknlLTRxfDi8U5bfACFANI/uFGLQYE36ILLcSg4KJ3GLYA==
+X-Received: by 2002:adf:e610:0:b0:236:737f:8e5d with SMTP id p16-20020adfe610000000b00236737f8e5dmr3230801wrm.316.1667075122985;
+        Sat, 29 Oct 2022 13:25:22 -0700 (PDT)
+Received: from osgiliath.lan (201.ip-51-68-45.eu. [51.68.45.201])
+        by smtp.gmail.com with ESMTPSA id k3-20020a05600c1c8300b003c6b7f5567csm16654829wms.0.2022.10.29.13.25.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
-Message-ID: <635d6cac.050a0220.cda55.287d@mx.google.com>
-Date:   Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7303743341823327329=="
+        Sat, 29 Oct 2022 13:25:21 -0700 (PDT)
+From:   Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        luiz.von.dentz@intel.com, quic_zijuhu@quicinc.com,
+        hdegoede@redhat.com, swyterzone@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: btusb: Fix Chinese CSR dongles again by re-adding ERR_DATA_REPORTING quirk
+Date:   Sat, 29 Oct 2022 22:24:52 +0200
+Message-Id: <20221029202454.25651-1-swyterzone@gmail.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, wiagn233@outlook.com
-Subject: RE: [RESEND,v3] Bluetooth: btusb: Add more device IDs for WCN6855
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <OS3P286MB2597E5DC0322DE5839B85D7698359@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
-References: <OS3P286MB2597E5DC0322DE5839B85D7698359@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7303743341823327329==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+A patch series by a Qualcomm engineer essentially removed my
+quirk/workaround because they thought it was unnecessary.
 
-This is automated email and please do not reply to this email!
+It wasn't, and it broke everything again:
 
-Dear submitter,
+https://patchwork.kernel.org/project/netdevbpf/list/?series=661703&archive=both&state=*
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690163
+He argues that the quirk is not necessary because the code should check if the dongle
+says if it's supported or not. The problem is that for these Chinese CSR
+clones they say that it would work, but it's a lie. Take a look:
 
----Test result---
+= New Index: 00:00:00:00:00:00 (Primary,USB,hci0)                              [hci0] 11.272194
+= Open Index: 00:00:00:00:00:00                                                [hci0] 11.272384
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0          #1 [hci0] 11.272400
+> HCI Event: Command Complete (0x0e) plen 12                                #2
+> [hci0] 11.276039
+      Read Local Version Information (0x04|0x0001) ncmd 1
+        Status: Success (0x00)
+        HCI version: Bluetooth 5.0 (0x09) - Revision 2064 (0x0810)
+        LMP version: Bluetooth 5.0 (0x09) - Subversion 8978 (0x2312)
+        Manufacturer: Cambridge Silicon Radio (10)
+...
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0           #5 [hci0] 11.648370
+> HCI Event: Command Complete (0x0e) plen 68                               #12
+> [hci0] 11.668030
+      Read Local Supported Commands (0x04|0x0002) ncmd 1
+        Status: Success (0x00)
+        Commands: 163 entries
+          ...
+          Read Default Erroneous Data Reporting (Octet 18 - Bit 2)
+          Write Default Erroneous Data Reporting (Octet 18 - Bit 3)
+          ...
+...
+< HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0  #47 [hci0] 11.748352
+= Close Index: 00:1A:7D:DA:71:XX                                               [hci0] 13.776824
 
-Test Summary:
-CheckPatch                    PASS      1.50 seconds
-GitLint                       PASS      0.83 seconds
-SubjectPrefix                 PASS      0.67 seconds
-BuildKernel                   PASS      39.42 seconds
-BuildKernel32                 PASS      35.36 seconds
-Incremental Build with patchesPASS      51.42 seconds
-TestRunner: Setup             PASS      592.71 seconds
-TestRunner: l2cap-tester      PASS      19.18 seconds
-TestRunner: iso-tester        PASS      18.88 seconds
-TestRunner: bnep-tester       PASS      7.32 seconds
-TestRunner: mgmt-tester       PASS      116.55 seconds
-TestRunner: rfcomm-tester     PASS      11.81 seconds
-TestRunner: sco-tester        PASS      11.01 seconds
-TestRunner: ioctl-tester      PASS      12.45 seconds
-TestRunner: mesh-tester       PASS      9.02 seconds
-TestRunner: smp-tester        PASS      10.79 seconds
-TestRunner: userchan-tester   PASS      7.97 seconds
+So bring it back wholesale.
 
+Fixes: 63b1a7dd3 (Bluetooth: hci_sync: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING)
+Fixes: e168f69008 (Bluetooth: btusb: Remove HCI_QUIRK_BROKEN_ERR_DATA_REPORTING for fake CSR)
+Fixes: 766ae2422b (Bluetooth: hci_sync: Check LMP feature bit instead of quirk)
 
-
+Cc: stable@vger.kernel.org
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: Hans de Goede <hdegoede@redhat.com>
+Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c   |  1 +
+ include/net/bluetooth/hci.h | 11 +++++++++++
+ net/bluetooth/hci_sync.c    |  9 +++++++--
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 3b269060e91f..1360b2163ec5 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2174,6 +2174,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 		 * without these the controller will lock up.
+ 		 */
+ 		set_bit(HCI_QUIRK_BROKEN_STORED_LINK_KEY, &hdev->quirks);
++		set_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_BROKEN_FILTER_CLEAR_ALL, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+ 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index e004ba04a9ae..0fe789f6a653 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -228,6 +228,17 @@ enum {
+ 	 */
+ 	HCI_QUIRK_VALID_LE_STATES,
+ 
++	/* When this quirk is set, then erroneous data reporting
++	 * is ignored. This is mainly due to the fact that the HCI
++	 * Read Default Erroneous Data Reporting command is advertised,
++	 * but not supported; these controllers often reply with unknown
++	 * command and tend to lock up randomly. Needing a hard reset.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
++
+ 	/*
+ 	 * When this quirk is set, then the hci_suspend_notifier is not
+ 	 * registered. This is intended for devices which drop completely
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index bd9eb713b26b..0a7abc817f10 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3798,7 +3798,8 @@ static int hci_read_page_scan_activity_sync(struct hci_dev *hdev)
+ static int hci_read_def_err_data_reporting_sync(struct hci_dev *hdev)
+ {
+ 	if (!(hdev->commands[18] & 0x04) ||
+-	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING))
++	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING) ||
++	    test_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks))
+ 		return 0;
+ 
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_READ_DEF_ERR_DATA_REPORTING,
+@@ -4316,7 +4317,8 @@ static int hci_set_err_data_report_sync(struct hci_dev *hdev)
+ 	bool enabled = hci_dev_test_flag(hdev, HCI_WIDEBAND_SPEECH_ENABLED);
+ 
+ 	if (!(hdev->commands[18] & 0x08) ||
+-	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING))
++	    !(hdev->features[0][6] & LMP_ERR_DATA_REPORTING) ||
++	    test_bit(HCI_QUIRK_BROKEN_ERR_DATA_REPORTING, &hdev->quirks))
+ 		return 0;
+ 
+ 	if (enabled == hdev->err_data_reporting)
+@@ -4475,6 +4477,9 @@ static const struct {
+ 	HCI_QUIRK_BROKEN(STORED_LINK_KEY,
+ 			 "HCI Delete Stored Link Key command is advertised, "
+ 			 "but not supported."),
++	HCI_QUIRK_BROKEN(ERR_DATA_REPORTING,
++			 "HCI Read Default Erroneous Data Reporting command is "
++			 "advertised, but not supported."),
+ 	HCI_QUIRK_BROKEN(READ_TRANSMIT_POWER,
+ 			 "HCI Read Transmit Power Level command is advertised, "
+ 			 "but not supported."),
+-- 
+2.38.1
 
---===============7303743341823327329==--
