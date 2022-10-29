@@ -2,69 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9281DC38A02
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 17:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86DDEC38A02
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 18:11:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbiJ2RmG (ORCPT
+        id S229500AbiJ2SLC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Oct 2022 13:42:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34058 "EHLO
+        Sat, 29 Oct 2022 14:11:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229670AbiJ2RmF (ORCPT
+        with ESMTP id S229441AbiJ2SLB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Oct 2022 13:42:05 -0400
-Received: from mail-oa1-x2a.google.com (mail-oa1-x2a.google.com [IPv6:2001:4860:4864:20::2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53EA44B4B5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 10:42:04 -0700 (PDT)
-Received: by mail-oa1-x2a.google.com with SMTP id 586e51a60fabf-13b6c1c89bdso9586866fac.13
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 10:42:04 -0700 (PDT)
+        Sat, 29 Oct 2022 14:11:01 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B76917AAF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 11:10:53 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id r83so9298159oih.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 11:10:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5kFABbgy0knbTQrBQ9zhhfskBaEnXXVQsL7hay6HtQ=;
-        b=bna6SBawNBH5QGZTRtvuM8i7bY+L4Z2QXOgCpw3QuCdwZLp7vTYP+DkQh2UBgH8fsh
-         ZttdNK+2JexIlXSrIJV1o1jbjSxlLU11l7P3/UeZMls2qTaTEhDMBr0grFv/6ys9pNQp
-         HK1+p5fMS4qY7kv0FRaQ7H0RkwKh89k7G4PfRIz8na3Uy5gr/KM662/229xeYBlFIcE+
-         jQ6uzgXuWf6HLaKAiKuBV3TT1WvuOjWL5FuxuIFgA+kOXk1BxlBlTjJHx4jfGEQGtTKi
-         M748LiM8x5QLE708uY21Bx115mArMm4WCJ85tddcjbP9+b+BXzn6AFjSXn3F70jkN05T
-         kxMQ==
+        bh=ayaAiY3xidjdZrmLvTsvT+mAIoNMmAeoXs6oow8QFqg=;
+        b=lcL3dWKuaxsDy8jCh6/9gLw9VOhR0LYTukXM81Kt2lEN9kjh8LMJpFEEUuxcoMvz/v
+         iQh0zKobluYJvfaeSsVyN7x4A5InM4ATKrvtY7h7ANtaCz7zepR1llBQdO8Ac16tZgoP
+         smI5W5I+C7WUZpTXzASYZAk0V7QSsj8wJrIrZsce1/1FC1rueL90UctY80szkkIULFi3
+         hh0eMmZbW8yB82bI/oFsYChWsIw7fob3k3AXUkAkyFY27KVaAWcyNGmJrJ+i0W4dTUUn
+         1IRl/Ii6oyVltYnfETjT53k8TqyYengzgxWI4cMRvU8PojFVyM5GHdHDIUo6/nB9lBXN
+         bGJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B5kFABbgy0knbTQrBQ9zhhfskBaEnXXVQsL7hay6HtQ=;
-        b=kyUbvsOA5pCr1n2gt/WXg/Yd+WkiP8Vwub4/gxWfZwdfOqXFJyI3eMm4Y01fOCbbL2
-         5FbHQrA9A4gqExvYYUsZAu1OwEcLFJ5expcuv2p1SC6kSFhoGlW5uHxcKEz1SMaZmi7R
-         S4M8nya+jkFcI2TOiPDHC3Jz1atufEV9kq2sdS2IXdDTdcS0T2d4QPb6FkvEo+5wMFse
-         KpEuKZhpQS3k443shOEIlyYjnEy66GMyC1MMZqx9bMa9LmVIsgmAY6NPZAUxJVvbaRio
-         N/RPOJ87VyHdpO/rcecbhqUtTEB8ZoFtJ6AR6My3aLJf81UMuIRc21HkkEsVnHu5Tl59
-         gDKA==
-X-Gm-Message-State: ACrzQf1gM1AwOpUfYDKjW80SJq3XK06G3SGFtBSnFQGrD8nvnH4PiJBL
-        U/yeFG7HKQ7M/bYRMz/AVihZTfzeUrc=
-X-Google-Smtp-Source: AMsMyM5fwqKRXnOQOrW8E7PptiGZDyGLQlGIp5Kg9vnNvkNmiF/OwiB2T6qqeagHhDsDjaYMUfo0pQ==
-X-Received: by 2002:a05:6871:154:b0:136:5e72:d59b with SMTP id z20-20020a056871015400b001365e72d59bmr2768841oab.87.1667065323562;
-        Sat, 29 Oct 2022 10:42:03 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.4.81])
-        by smtp.gmail.com with ESMTPSA id t14-20020a056808158e00b00349a06c581fsm714390oiw.3.2022.10.29.10.42.02
+        bh=ayaAiY3xidjdZrmLvTsvT+mAIoNMmAeoXs6oow8QFqg=;
+        b=yhP6jhaHJWbR1QXI5TwigZR62V+yuUzOdV4TujbW6G8ssgrse4s60Y1DTALDoXDBuk
+         26SX5cuT/m4Q/kvMJswZthMf6aKwNuBhn+cS260JdX1MAp2yuMHwXl4A/yhtK9BrflYr
+         vTBZcxRZ/YmFFAzBAOIcXzgI+0PSr1MQUNaODN/uQ0wgs99eauvb7xti4evw905S4ydI
+         1etsqUrHEiASVwpBF5KfAl6bHdMPPmsZkxlJHm0XxlHEK0rBwsYXxjrKoXjXuUqUzeyl
+         cbT1fQrTJfFEuBt7VmLKL07WAqM0Un+8+vRZhLe3di7rEXLYjJMqz5q3zF+kwVW1isE5
+         PT+A==
+X-Gm-Message-State: ACrzQf0wmbX8EDzMu7MRaVf4E8kb1VoR47Td2JCTjsONY3IXK1O1bxt/
+        qO5wZtlk05tWlZZikKkjcuWcDmleHOE=
+X-Google-Smtp-Source: AMsMyM5l6GyfNahRgLTq/i0vYKaRFr0/WmdDEo5j2nn988H1Kem49XvccZ/diUUpFA/Oy3vWzwQrjg==
+X-Received: by 2002:a05:6808:1186:b0:353:b77a:a481 with SMTP id j6-20020a056808118600b00353b77aa481mr11049046oil.199.1667067052517;
+        Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
+Received: from [172.17.0.2] ([52.171.56.234])
+        by smtp.gmail.com with ESMTPSA id g22-20020a056870341600b0012796e8033dsm888503oah.57.2022.10.29.11.10.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Oct 2022 10:42:03 -0700 (PDT)
-Message-ID: <635d65eb.050a0220.79231.22a9@mx.google.com>
-Date:   Sat, 29 Oct 2022 10:42:03 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4347787766990947980=="
+        Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
+Message-ID: <635d6cac.050a0220.cda55.287d@mx.google.com>
+Date:   Sat, 29 Oct 2022 11:10:52 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7303743341823327329=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, abhay.maheshbhai.maheta@intel.com
-Subject: RE: To add support for Metadata, CID, VID
+To:     linux-bluetooth@vger.kernel.org, wiagn233@outlook.com
+Subject: RE: [RESEND,v3] Bluetooth: btusb: Add more device IDs for WCN6855
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221029170408.175533-2-abhay.maheshbhai.maheta@intel.com>
-References: <20221029170408.175533-2-abhay.maheshbhai.maheta@intel.com>
+In-Reply-To: <OS3P286MB2597E5DC0322DE5839B85D7698359@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
+References: <OS3P286MB2597E5DC0322DE5839B85D7698359@OS3P286MB2597.JPNP286.PROD.OUTLOOK.COM>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4347787766990947980==
+--===============7303743341823327329==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -75,46 +75,28 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690159
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690163
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      5.60 seconds
-GitLint                       PASS      3.64 seconds
-Prep - Setup ELL              PASS      26.71 seconds
-Build - Prep                  PASS      0.68 seconds
-Build - Configure             PASS      8.32 seconds
-Build - Make                  PASS      749.65 seconds
-Make Check                    PASS      11.86 seconds
-Make Check w/Valgrind         PASS      292.31 seconds
-Make Distcheck                PASS      240.14 seconds
-Build w/ext ELL - Configure   PASS      8.38 seconds
-Build w/ext ELL - Make        PASS      85.77 seconds
-Incremental Build w/ patches  PASS      503.62 seconds
-Scan Build                    WARNING   547.38 seconds
-
-Details
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-client/player.c:1770:25: warning: Dereference of null pointer
-        iov_append(&cfg->caps, preset->data.iov_base, preset->data.iov_len);
-                               ^~~~~~~~~~~~~~~~~~~~~
-1 warning generated.
-profiles/audio/media.c:1159:3: warning: Potential leak of memory pointed to by 'metadata'
-                error("Could not allocate name for pac %s:%s",
-                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-./src/log.h:62:2: note: expanded from macro 'error'
-        btd_error(0xffff, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-        ^~~~~~~~~
-1 warning generated.
-
+CheckPatch                    PASS      1.50 seconds
+GitLint                       PASS      0.83 seconds
+SubjectPrefix                 PASS      0.67 seconds
+BuildKernel                   PASS      39.42 seconds
+BuildKernel32                 PASS      35.36 seconds
+Incremental Build with patchesPASS      51.42 seconds
+TestRunner: Setup             PASS      592.71 seconds
+TestRunner: l2cap-tester      PASS      19.18 seconds
+TestRunner: iso-tester        PASS      18.88 seconds
+TestRunner: bnep-tester       PASS      7.32 seconds
+TestRunner: mgmt-tester       PASS      116.55 seconds
+TestRunner: rfcomm-tester     PASS      11.81 seconds
+TestRunner: sco-tester        PASS      11.01 seconds
+TestRunner: ioctl-tester      PASS      12.45 seconds
+TestRunner: mesh-tester       PASS      9.02 seconds
+TestRunner: smp-tester        PASS      10.79 seconds
+TestRunner: userchan-tester   PASS      7.97 seconds
 
 
 
@@ -123,4 +105,4 @@ Regards,
 Linux Bluetooth
 
 
---===============4347787766990947980==--
+--===============7303743341823327329==--
