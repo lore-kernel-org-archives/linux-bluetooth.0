@@ -2,168 +2,79 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97FEC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 20:26:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7EBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 20:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbiJ2U0D (ORCPT
+        id S229772AbiJ2UkF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Oct 2022 16:26:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34266 "EHLO
+        Sat, 29 Oct 2022 16:40:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229819AbiJ2UZy (ORCPT
+        with ESMTP id S229720AbiJ2UkC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Oct 2022 16:25:54 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9E905788C;
-        Sat, 29 Oct 2022 13:25:50 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id m29-20020a05600c3b1d00b003c6bf423c71so8552604wms.0;
-        Sat, 29 Oct 2022 13:25:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TWYKLHUi9DBEWoGp4cSf1c/vBlKmNBjR2+DNGEQs3vI=;
-        b=FqGS9uORdWAWhV+Y/EkpgEng/SMmGlsMBPVwBs4ysX8wAQ1BCQay8ZxiUiOSXtJk6L
-         xtYIdN7tii+tIYIgoOw+ASpg1K3O9wq7pkktgt0A8jKjWUC2KszGsjY3d3PpOTe8DO6o
-         H4NSV2xCtQJ0UKvXTEZBgRspYBBUyey1wo2dGVP8qmx0Tq+7xhL7CQCqoE4yEaOC5Gz2
-         WyFSo6HXtTCNw7sSCJnjPGAGne5Mygb+fbUw5uMHQ8eJ0smpB9sOvkWhUStpOo9rZcyd
-         XPJXtP+e/edCDKyRVpvf38iFY0IkjXuWIaMr8X57FvC1HIH3VdblSVKyAnEu4u0KGS2L
-         Mtjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TWYKLHUi9DBEWoGp4cSf1c/vBlKmNBjR2+DNGEQs3vI=;
-        b=GfouCQ3T7W/RcYExzgAYL3UfESXASdBUj1uOc/GaYKalSQyvtYqRmRlH7Y4iU3ugH0
-         Q4q5QEkO9107YLr1krloCsNRp3xjoZJSp6mWawok0tjeQvhG4av+KrQC70vtMQVbCruW
-         FNYmZXxWGdesTmHFu1p/MYvA48bs14YSGtZTtZ/NhW7qjIBykt05NGfrX9aJ9iDLqgrB
-         3QJWLJ3cb/BfhydCd7hYF+ByQ2Hy0VT4jEsW+vXNr3N4gJoHoHgHGXuNOqsARKMkbbtz
-         KE3tdJJn+o8WXKLw52iTr5MWfL8fr9Hq/JYwMFYCNhhaCtuvBX//t0Zaukdufbr8IVRm
-         9XtA==
-X-Gm-Message-State: ACrzQf1kOsgHJc9Hfmnlzyeicyi6dOS8qNG3tgfXrhVhV9f0a36ZpZiQ
-        qx2IV2GJWRr1v5LTDt5x4S8=
-X-Google-Smtp-Source: AMsMyM7t/LivG7yF8j0MFjRFtVzY9CTTkWYLXaxgKaej/InMieQE7DJ2dO5+g8iNbNXGn+TZMxILcg==
-X-Received: by 2002:a7b:cb87:0:b0:3cf:6af4:c509 with SMTP id m7-20020a7bcb87000000b003cf6af4c509mr550343wmi.140.1667075149168;
-        Sat, 29 Oct 2022 13:25:49 -0700 (PDT)
-Received: from osgiliath.lan (201.ip-51-68-45.eu. [51.68.45.201])
-        by smtp.gmail.com with ESMTPSA id k3-20020a05600c1c8300b003c6b7f5567csm16654829wms.0.2022.10.29.13.25.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Oct 2022 13:25:48 -0700 (PDT)
-From:   Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        luiz.von.dentz@intel.com, quic_zijuhu@quicinc.com,
-        hdegoede@redhat.com, swyterzone@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: btusb: Add a parameter to let users disable the fake CSR force-suspend hack
-Date:   Sat, 29 Oct 2022 22:24:54 +0200
-Message-Id: <20221029202454.25651-3-swyterzone@gmail.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221029202454.25651-1-swyterzone@gmail.com>
-References: <20221029202454.25651-1-swyterzone@gmail.com>
+        Sat, 29 Oct 2022 16:40:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DCA813D09
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 13:39:59 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 7195C60CEF
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 20:39:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D4667C43144
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 20:39:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667075998;
+        bh=0CwTsrUjHapBnaF5K+4YXwxU+tVxirEHgNnXcST80kc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=UwH2Gi0fCNt/gTFpVI5uPcOCiIy/2Hz6F8MzdPSAGRg99GfDt5eJjsx3Z3qk7r4K7
+         RXvPLXYMywuMndtRBBCisfYufz4GIX+ScpEJ/JvtLwDuGOmseTbrAGz0jxe/tsq/Oc
+         VAihIKavz9ZJh+J0BbL1UFJubU/alJ38aGAL+SPjfcVtKbBelZvrQdc896P0JXarBL
+         ntcXUNQxzb0cF85Su22drptuUkyZ4fXQctXPSu3k2GBjr8Ce7csp/FAMIwLpXgwttc
+         tK1ZuSyZGLylDLvdp770liVjgRc3BwEPWo/WF6u8KMPNJoM8Wx4ZaG3IpSN+xTB69W
+         +aOKnd3J2OwtQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id C6A77C433E9; Sat, 29 Oct 2022 20:39:58 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sat, 29 Oct 2022 20:39:56 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: swyterzone@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-Scpfio3AuR@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-A few users have reported that their cloned Chinese dongle doesn't
-work well with the hack Hans de Goede added, that tries this
-off-on mechanism as a way to unfreeze them.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-It's still more than worthwhile to have it, as in the vast majority
-of cases it either completely brings dongles to life or just resets
-them harmlessly as it already happens during normal USB operation.
+--- Comment #243 from Swyter (swyterzone@gmail.com) ---
+Submitted a patch series trying to re-fix this re-mess. We'll see:
+https://patchwork.kernel.org/project/bluetooth/list/?series=3D690177
 
-This is nothing new and the controllers are expected to behave
-correctly. But yeah, go figure. :)
+--=20
+You may reply to this email to add a comment.
 
-For that unhappy minority we can easily handle this edge case by letting
-users disable it via our «btusb.disable_fake_csr_forcesuspend_hack=1» kernel option.
-
-I believe this is the most generic way of doing it, given the constraints
-and by still having a good out-of-the-box experience.
-
-No clone left behind.
-
-Cc: stable@vger.kernel.org
-Cc: Hans de Goede <hdegoede@redhat.com>
-Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
----
- drivers/bluetooth/btusb.c | 31 +++++++++++++++++++------------
- 1 file changed, 19 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8f34bf195bae..d31d4f925463 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -34,6 +34,7 @@ static bool force_scofix;
- static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
- static bool enable_poll_sync = IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC);
- static bool reset = true;
-+static bool disable_fake_csr_forcesuspend_hack;
- 
- static struct usb_driver btusb_driver;
- 
-@@ -2171,7 +2172,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 		is_fake = true;
- 
- 	if (is_fake) {
--		bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; adding workarounds and force-suspending once...");
-+		bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; adding workarounds...");
- 
- 		/* Generally these clones have big discrepancies between
- 		 * advertised features and what's actually supported.
-@@ -2215,21 +2216,24 @@ static int btusb_setup_csr(struct hci_dev *hdev)
- 		 * apply this initialization quirk to every controller that gets here,
- 		 * it should be harmless. The alternative is to not work at all.
- 		 */
--		pm_runtime_allow(&data->udev->dev);
-+		if (!disable_fake_csr_forcesuspend_hack) {
-+			bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; force-suspending once...");
-+			pm_runtime_allow(&data->udev->dev);
- 
--		ret = pm_runtime_suspend(&data->udev->dev);
--		if (ret >= 0)
--			msleep(200);
--		else
--			bt_dev_warn(hdev, "CSR: Couldn't suspend the device for our Barrot 8041a02 receive-issue workaround");
-+			ret = pm_runtime_suspend(&data->udev->dev);
-+			if (ret >= 0)
-+				msleep(200);
-+			else
-+				bt_dev_warn(hdev, "CSR: Couldn't suspend the device for our Barrot 8041a02 receive-issue workaround");
- 
--		pm_runtime_forbid(&data->udev->dev);
-+			pm_runtime_forbid(&data->udev->dev);
- 
--		device_set_wakeup_capable(&data->udev->dev, false);
-+			device_set_wakeup_capable(&data->udev->dev, false);
- 
--		/* Re-enable autosuspend if this was requested */
--		if (enable_autosuspend)
--			usb_enable_autosuspend(data->udev);
-+			/* Re-enable autosuspend if this was requested */
-+			if (enable_autosuspend)
-+				usb_enable_autosuspend(data->udev);
-+		}
- 	}
- 
- 	kfree_skb(skb);
-@@ -4312,6 +4316,9 @@ MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
- module_param(reset, bool, 0644);
- MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
- 
-+module_param(disable_fake_csr_forcesuspend_hack, bool, 0644);
-+MODULE_PARM_DESC(disable_fake_csr_forcesuspend_hack, "Don't indiscriminately force-suspend Chinese-cloned CSR dongles trying to unfreeze them");
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Generic Bluetooth USB driver ver " VERSION);
- MODULE_VERSION(VERSION);
--- 
-2.38.1
-
+You are receiving this mail because:
+You are the assignee for the bug.=
