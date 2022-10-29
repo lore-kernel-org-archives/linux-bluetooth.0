@@ -2,152 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66BF2C38A02
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 11:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E84C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 14:43:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbiJ2L4e (ORCPT
+        id S229520AbiJ2OnM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Oct 2022 07:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54744 "EHLO
+        Sat, 29 Oct 2022 10:43:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229476AbiJ2L4c (ORCPT
+        with ESMTP id S229441AbiJ2OnL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Oct 2022 07:56:32 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197813ECEE
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 04:56:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667044592; x=1698580592;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=WhHiPzCtt6tQJMQzGOerSE2lvyY9QFKpLGy1/crLnR8=;
-  b=VrPCJnMLhYagjtCWUURj3rb+727NycTWqKw1FJABcU15lrwFtbW//Rdm
-   zFbvta+ESSj6bqilT0oZuYM0P87+lDVbScro9LkZfdjw2vVXOA8C957Pm
-   uifJAV+Pz+Bsi2CxL+aOlP7vWGtXLry/MG65KowVnq4sUklp4vgkJib1C
-   UuaCT0tjnZ7B3iqmoFPWyg6RRROpGlDCw7ZMPVpSwyHeEV7xiHrqZbxhI
-   ddIl2Q9gDZ4b5L594pcJE6XstHGj/uKr9twTpBLs5dgFjQ4eo0yu1pa8u
-   mCG+rulb4xtuFEOMt72m/BE96VqH9ZNLiEsRqcKvQI+hxvURvr/7JA6AA
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="308659529"
-X-IronPort-AV: E=Sophos;i="5.95,223,1661842800"; 
-   d="scan'208";a="308659529"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2022 04:56:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10514"; a="962306693"
-X-IronPort-AV: E=Sophos;i="5.95,223,1661842800"; 
-   d="scan'208";a="962306693"
-Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
-  by fmsmga005.fm.intel.com with ESMTP; 29 Oct 2022 04:56:30 -0700
-Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1ookRy-000Azr-0d;
-        Sat, 29 Oct 2022 11:56:30 +0000
-Date:   Sat, 29 Oct 2022 19:56:01 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 98f18bb78b7def72f9c4038ba3944cd53f2009c9
-Message-ID: <635d14d1.jB10aPUu1UOqwgyH%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 29 Oct 2022 10:43:11 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD872AC45
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 07:43:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 004E9B80D28
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 14:43:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AE506C4FEE4
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 14:43:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667054586;
+        bh=bkEsW+7CWX4ObRDqvJS926ZQeEYmC16jSghn2YAURSY=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=je/RlCtTi7VUEPrxYmfF0eIyxB5i8aam0iMPz+CMcCh4KwGlZEeqihmzvDoCMNh0p
+         dLV7BriqyX0pS9/XDQnNxV/viMNaHRIIzm81fmU8A/B1ZPuzQLGFAWj7NsE3AQKnLh
+         Rrt/iLC9EhkKJn9RYgLFI+CMFb1j2wNorddw9kttgEPsF4qK2ckg59uV/C3xR50kjA
+         aEcAJ7zDaKoCx2fN7uVZOwqReuwujok1tlbNYsO6OhI8/Tnuo9K26h70gaOu4SAVMM
+         pgb5FXbUDtplwBtqECyLSxEfPso+qLEVmu1U+g7RvKS7t31bOP18oGBEqBUG4Okyzy
+         EVu6pqU4PAAuA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 9F5D3C433E7; Sat, 29 Oct 2022 14:43:06 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sat, 29 Oct 2022 14:43:03 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: swyterzone@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-be4ZPlD6XL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 98f18bb78b7def72f9c4038ba3944cd53f2009c9  Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-elapsed time: 721m
+--- Comment #242 from Swyter (swyterzone@gmail.com) ---
+I think this patch series by a Qualcomm engineer essentially removed my
+quirk/workaround because, uh, they thought it was unnecessary:
 
-configs tested: 74
-configs skipped: 2
+https://patchwork.kernel.org/project/netdevbpf/list/?series=3D661703&archiv=
+e=3Dboth&state=3D*
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+He argues that the quirk is not necessary because the code should check if =
+the
+dongle says if it's supported or not.
+The problem is that for these Chinese CSR clones they say that it would wor=
+k,
+but it's a lie. Take a look:
 
-gcc tested configs:
-um                             i386_defconfig
-um                           x86_64_defconfig
-arc                                 defconfig
-x86_64                           rhel-8.3-kvm
-i386                                defconfig
-alpha                               defconfig
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-s390                             allmodconfig
-alpha                            allyesconfig
-s390                                defconfig
-i386                          randconfig-a012
-arc                              allyesconfig
-i386                          randconfig-a016
-i386                          randconfig-a001
-m68k                             allyesconfig
-i386                          randconfig-a003
-m68k                             allmodconfig
-i386                          randconfig-a014
-mips                             allyesconfig
-s390                             allyesconfig
-powerpc                           allnoconfig
-powerpc                          allmodconfig
-x86_64                              defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                          rhel-8.3-func
-x86_64                               rhel-8.3
-ia64                             allmodconfig
-x86_64                    rhel-8.3-kselftests
-sh                               allmodconfig
-x86_64                        randconfig-a002
-i386                          randconfig-a005
-x86_64                           allyesconfig
-x86_64                        randconfig-a015
-arm                                 defconfig
-i386                             allyesconfig
-x86_64                        randconfig-a006
-x86_64                        randconfig-a004
-arc                  randconfig-r043-20221029
-arm                              allyesconfig
-arm64                            allyesconfig
-arc                  randconfig-r043-20221028
-s390                 randconfig-r044-20221028
-riscv                randconfig-r042-20221028
-arm                            hisi_defconfig
-xtensa                  cadence_csp_defconfig
-m68k                           virt_defconfig
-powerpc                       holly_defconfig
-arm                          pxa3xx_defconfig
-sh                        dreamcast_defconfig
-powerpc                      ep88xc_defconfig
-powerpc                       ppc64_defconfig
-powerpc                      makalu_defconfig
-arm                           u8500_defconfig
-arm                         lpc18xx_defconfig
-arm                      jornada720_defconfig
-i386                          randconfig-c001
+=3D New Index: 00:00:00:00:00:00 (Primary,USB,hci0)=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+[hci0] 11.272194
+=3D Open Index: 00:00:00:00:00:00=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20
+[hci0] 11.272384
+< HCI Command: Read Local Version Information (0x04|0x0001) plen 0         =
+ #1
+[hci0] 11.272400
+> HCI Event: Command Complete (0x0e) plen 12                               =
+ #2
+> [hci0] 11.276039
+      Read Local Version Information (0x04|0x0001) ncmd 1
+        Status: Success (0x00)
+        HCI version: Bluetooth 5.0 (0x09) - Revision 2064 (0x0810)
+        LMP version: Bluetooth 5.0 (0x09) - Subversion 8978 (0x2312)
+        Manufacturer: Cambridge Silicon Radio (10)
+...
+< HCI Command: Read Local Supported Features (0x04|0x0003) plen 0          =
+ #5
+[hci0] 11.648370
+> HCI Event: Command Complete (0x0e) plen 68                               =
+#12
+> [hci0] 11.668030
+      Read Local Supported Commands (0x04|0x0002) ncmd 1
+        Status: Success (0x00)
+        Commands: 163 entries
+          ...
+          Read Default Erroneous Data Reporting (Octet 18 - Bit 2)
+          Write Default Erroneous Data Reporting (Octet 18 - Bit 3)
+          ...
+...
+< HCI Command: Read Default Erroneous Data Reporting (0x03|0x005a) plen 0  =
+#47
+[hci0] 11.748352
+=3D Close Index: 00:1A:7D:DA:71:XX=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20
+[hci0] 13.776824
 
-clang tested configs:
-i386                          randconfig-a013
-i386                          randconfig-a011
-i386                          randconfig-a015
-i386                          randconfig-a002
-i386                          randconfig-a004
-x86_64                        randconfig-a012
-i386                          randconfig-a006
-x86_64                        randconfig-a005
-x86_64                        randconfig-a014
-x86_64                        randconfig-a001
-x86_64                        randconfig-a016
-x86_64                        randconfig-a003
-hexagon              randconfig-r041-20221029
-riscv                randconfig-r042-20221029
-hexagon              randconfig-r045-20221029
-s390                 randconfig-r044-20221029
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+As you can see in the `btmon` dump our dongle stops responding, it dies aft=
+er
+we ask that. So thanks for deleting my fix, absolutely surreal.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
