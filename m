@@ -2,107 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE5C6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 29 Oct 2022 22:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D78C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Oct 2022 02:00:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229515AbiJ2WH1 (ORCPT
+        id S229531AbiJ3CAI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 29 Oct 2022 18:07:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54412 "EHLO
+        Sat, 29 Oct 2022 22:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbiJ2WH0 (ORCPT
+        with ESMTP id S229500AbiJ3CAG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 29 Oct 2022 18:07:26 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9CE38B0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 15:07:26 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-13bd19c3b68so10005775fac.7
-        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 15:07:26 -0700 (PDT)
+        Sat, 29 Oct 2022 22:00:06 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24FF83686C
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 19:00:03 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id n12so21504065eja.11
+        for <linux-bluetooth@vger.kernel.org>; Sat, 29 Oct 2022 19:00:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=RSwqjysoSY8+Dg8HmWNTCuDQTtHB0p2hvVk0EoggGvU=;
-        b=aw6V3w3pJUorI7iFQCTJT4NaQpzBLBblKYnLcoSX4D59jfajuoI4tYxTOBA69rHpld
-         Vt+99hd+KDQbIs2oHbh3+NuziSnf7fKh2fteeKiY3bdpGWmukvc3kh6g2q5g7mrAi+vx
-         e/dCMcVod6AMJE7GdCKRq20FNVW/fFeLzPBp3Kteo+GegG0zLNvkc5P8eO1+DbmS8dKh
-         C36Ew+JFfBGkq5RZYWe/302RBWQzcu0qwbn+pYOlcISujssDaSRAk3xRk+zbPZ9FUpQd
-         HleKoY8REWY1iZ+dm9Ezznd2zGIEkqahVUGSJ3IZlK+NVQiou5aqEfA2gI7kmdgU6bkZ
-         jceQ==
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=leK64/ux89y2qd9eC9AkgP8DUzFj4kGt1/tsFaeWY7Y=;
+        b=Z3gfszuoWBvFrR8RfR/eGLrQ0angB+CCjpukk9UU/AKb4QBohxASgO/lelnOIBLTLS
+         pswowX4z4CWUEccaz00S0JXqZ8iy/9ps+22Jr3WdxA2b1uK5GCqMkMkssxwrhA4gWTef
+         i9/BA5zaa9E7vvp1gOYh6DUxMNxNgPpyH9metsl8do5JV9BJi5LQbaok4ycuQvYK3g5Y
+         JtBft/3oK/75vph5UrmACpkv30ERLCLwUVwe6xsMkLeZgrbm/EQ5oOI/7s3zRoQf94hQ
+         F/MNT2ZcD/rE13J2qMnHuKF4IC6KVOaf1vw9PdZhD8s/LISLsQB4wrWfmFVVST1k/I+C
+         Iecw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RSwqjysoSY8+Dg8HmWNTCuDQTtHB0p2hvVk0EoggGvU=;
-        b=QQQzUs/HkhAuHaRLp8nXtaWYaEdHRk3xCdoRKdrABdA1q4znuTyfUUzbECGikyceMD
-         z17IVYH8Z6zm63lRt2o+n1nceNdoeOeqlJn2vZxjgPugHw1E1dus960Fac2jQwb7S6Qt
-         uClV+xGrW6kpjfZQZgQIVRxU/1PxFI4NstkWL2behPkcvIlMz1lrxFPUxKdoqu9w8LyE
-         sw2+vvpRYksQNS3Umq9wPh5iiVs1CqI62fF6bhdDLSf9OjMe9ViwYkh4w3gV4aZp8Vrv
-         J+nHZB7XRSk+8zjmZavOqfDMUAN31lAPqfrfn+qeD4eChrubHnGFtMHx2ld/2ZFhlaYk
-         jGHw==
-X-Gm-Message-State: ACrzQf2yWUNaay1TSRXqqM4z/dTGs8K9zcNO1VQe1kEy4MzAoalwnwT3
-        1VL5C8hC8ZgHIZYWn2uXjicosmQZqzw=
-X-Google-Smtp-Source: AMsMyM6H8n4PcVPehPfII917961Y6nKdkqxNgpOm91ZZdfQhxjiNTiK3KErxxG2t2wd5qIsN3A0IQQ==
-X-Received: by 2002:a05:6870:64a1:b0:13c:d09d:79f9 with SMTP id cz33-20020a05687064a100b0013cd09d79f9mr641389oab.112.1667081245413;
-        Sat, 29 Oct 2022 15:07:25 -0700 (PDT)
-Received: from [172.17.0.2] ([20.165.64.185])
-        by smtp.gmail.com with ESMTPSA id b11-20020a056870390b00b0013cd709659dsm177759oap.52.2022.10.29.15.07.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 29 Oct 2022 15:07:25 -0700 (PDT)
-Message-ID: <635da41d.050a0220.7f252.0846@mx.google.com>
-Date:   Sat, 29 Oct 2022 15:07:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4760926345018539037=="
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=leK64/ux89y2qd9eC9AkgP8DUzFj4kGt1/tsFaeWY7Y=;
+        b=v1XwTa/cMjnbIYoXuTiCidpdDJs66CszBNIlyzDBBloGz04sEibnELSzsGR/oReiZE
+         ENSaofHnv5LUJTy3H0mHQm9T3PVTL5caPhzeLJvXa17HM1DHEoLhpzSF0azjjhCB1qfA
+         ewUiZT6218j5omU7nIXtzene3X+LG5EHKlCPSP7zKjrSEDblWBrkspV71TnugluEYl+V
+         /QFqARhxCDOxG1dV4e1+2t9h/MBSV9tcNFY0GozHAxk5IbS9BDHCk/48tM3/G4RcYgYc
+         EGqI5xHotTvq56B3jXvYpFQ9nJ552SBlxxEEjn5zzD3sCfdzx0Ue5cmiZQ/04kdc9bB8
+         /aTw==
+X-Gm-Message-State: ACrzQf03qI8oLiYSedqZXlB6QXGFTtOQiUIFjyKMBJ3A6Ztczg7ewHiG
+        F4b/xGDVQ7sRDAHzMOiOaT7tYEOkurUAIyIzgNm8q00Nwaw=
+X-Google-Smtp-Source: AMsMyM5kpTDFVsUsliYaC7GEI056tLHI5azzfVSqzstf3F6CQskayoGPVWQ1gmqdLxnqhTNrG+YHtG4eS753CvUFwGU=
+X-Received: by 2002:a17:907:3f0c:b0:78e:2090:6924 with SMTP id
+ hq12-20020a1709073f0c00b0078e20906924mr6285252ejc.332.1667095201337; Sat, 29
+ Oct 2022 19:00:01 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, tegongkang@gmail.com
-Subject: RE: [v2] Bluetooth: Use kzalloc instead of kmalloc/memset
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221029214058.25159-1-tegongkang@gmail.com>
-References: <20221029214058.25159-1-tegongkang@gmail.com>
+From:   Sam Spencer <iconictragedy@gmail.com>
+Date:   Sat, 29 Oct 2022 18:59:50 -0700
+Message-ID: <CAP3P_uyeFiVp_aWzQDehRLo5YNMB_5u4CvoAkZusF48wm12+_Q@mail.gmail.com>
+Subject: How can I pair a BT HID device so I can read its input, but not have
+ it mapped to the console
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4760926345018539037==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+I have a home automation project where I would like to use a B&O
+Beoremote One as an input to a Raspberry PI via Bluetooth using Bluez.
 
-This is automated email and please do not reply to this email!
+I can pair and trust the device via bluetoothctl and once connected I
+get a couple of devices at /dev/input/event3, event4, event5.
 
-Dear submitter,
+Using the python evdev module, I can read every key on the remote
+(yay). That gives me enough to be able to write a module to plug into
+openhab etc.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690188
+The problem is that the remote is also being bound as an input device
+for the console. Most of the buttons are not treated as input keys,
+except media playback, arrows, and most annoyingly the power off
+button. Which has the adverse effect of shutting down the RPI. I would
+like to be able to use the remote without any unexpected side effects
+of its input being interpreted by the console.
 
----Test result---
+How can I keep it bound so that I can read the input through
+/dev/input/event*, but not have it bound to the console?
 
-Test Summary:
-CheckPatch                    PASS      1.40 seconds
-GitLint                       PASS      0.89 seconds
-SubjectPrefix                 PASS      0.62 seconds
-BuildKernel                   PASS      41.75 seconds
-BuildKernel32                 PASS      36.54 seconds
-Incremental Build with patchesPASS      56.77 seconds
-TestRunner: Setup             PASS      607.79 seconds
-TestRunner: l2cap-tester      PASS      19.67 seconds
-TestRunner: iso-tester        PASS      19.76 seconds
-TestRunner: bnep-tester       PASS      7.30 seconds
-TestRunner: mgmt-tester       PASS      127.25 seconds
-TestRunner: rfcomm-tester     PASS      13.28 seconds
-TestRunner: sco-tester        PASS      12.15 seconds
-TestRunner: ioctl-tester      PASS      14.10 seconds
-TestRunner: mesh-tester       PASS      9.79 seconds
-TestRunner: smp-tester        PASS      10.80 seconds
-TestRunner: userchan-tester   PASS      7.76 seconds
+Thanks,
 
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4760926345018539037==--
+Sam
