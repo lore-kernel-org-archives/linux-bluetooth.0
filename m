@@ -2,141 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E426EC38A02
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Oct 2022 10:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A712EFA373D
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Oct 2022 10:45:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbiJ3K31 (ORCPT
+        id S229651AbiJ3Kps (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Oct 2022 06:29:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48650 "EHLO
+        Sun, 30 Oct 2022 06:45:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiJ3K30 (ORCPT
+        with ESMTP id S229497AbiJ3Kpr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Oct 2022 06:29:26 -0400
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329CC330;
-        Sun, 30 Oct 2022 03:29:25 -0700 (PDT)
-Received: by mail-ua1-x932.google.com with SMTP id x20so3914381ual.6;
-        Sun, 30 Oct 2022 03:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=siZbDKvkv6GDmhZBqxezDI7PD/3HH95diPO+ZsUwpjo=;
-        b=WNLIgtt5mOTUiknqiJdlxmjsudTixQ6DAzH8tAAbRCcCuFlbkjimnTdUFsMvjISvYP
-         Ar1+bG2UrAuFR3UCINZEhh6oD//Kn6kM4gJk46wfmVb41rPf6oxcBv3wEJ7bnGte32uQ
-         1bdLhC024i/xgeByNLSr03LUw5zpNWN6hVZpSN4OKvEawTg50ft3NEKV4LhWb797cwJI
-         6wJpJCGudYU/gCXs/RVsC3T/VgoPGMcINSriDGTDq1V8IAxfGkZ0XAaMCBzW41FxDe0h
-         N2NENsMt4jpRnzELU1q2a7qNrc3RzPopZMXaa9JXRnmjOhwcqrmO7QKep9WkNNeTxOiK
-         v9oQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=siZbDKvkv6GDmhZBqxezDI7PD/3HH95diPO+ZsUwpjo=;
-        b=E4GSIvIEUMFEk1hxRyzPqLLMyzj1KRpWsFnCoIhxGgDZ7PS5KQa7MDqK8/9f+YG5xF
-         gYR5hs7Yfx8Kvg6oA5lypLot8Lhzty+ild/V5UDoQPADSn5zgY8uSyrZF/L6st7pdV1o
-         4lU178Fxtn0iKHQ9o1GkaVy5yKXIBaOY5gAIzHLCMuY/r7jR7sUXQO/SrY88OBlMZhJf
-         K9NtykBa4I1WJGrT8eNAj2mRSah3E//BTFvGVhsTGiXsTJQsyAHlBFkCZjguB3nXed0w
-         0RnvbfbtJ8Xb0cabjtIiTQUfgKYVdPsRHdmXTAx3Zp/oyUwd0kgA/niTnC17l+a/WjlU
-         1DAA==
-X-Gm-Message-State: ACrzQf0SlaTFouo0ZwFw7FGnU69WHoR0UObvZgjC/vXmIvrA+ocCA0QB
-        oHfFMxluKngNzBKALmcm1H9VbR5ctsO3g2uucF8=
-X-Google-Smtp-Source: AMsMyM5hylRd0xhmbLwKG1AYBixMFt8oW4I0vGo0LFbDby5FFzTk5F1XFtHbFqXgZ3dyrFcNuwRCFB1egWwf5aCXeEc=
-X-Received: by 2002:ab0:76d1:0:b0:407:702d:7b67 with SMTP id
- w17-20020ab076d1000000b00407702d7b67mr2757436uaq.6.1667125764100; Sun, 30 Oct
- 2022 03:29:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <20221029214058.25159-1-tegongkang@gmail.com> <80f39eff-d175-785c-c10f-a31a046ec132@molgen.mpg.de>
-In-Reply-To: <80f39eff-d175-785c-c10f-a31a046ec132@molgen.mpg.de>
-From:   Kang Minchul <tegongkang@gmail.com>
-Date:   Sun, 30 Oct 2022 19:29:13 +0900
-Message-ID: <CA+uqrQDukt7u8Nvbn7RK5K+Lw8PoxO769Nf9CF9UbvM2WshXTw@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Use kzalloc instead of kmalloc/memset
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Sun, 30 Oct 2022 06:45:47 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE0E5215
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 03:45:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8FAC0B80E26
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 10:45:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 109EBC43142
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 10:45:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667126743;
+        bh=O+wKpDC7+g4w0PyjWvOPqtWMbO0nfTHstYC5ZIGsd9A=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=AnxCxyUxl1TAxkdbn43ABTDkalmoCjzeaVX+/KIFIX8rTvGV9+YcIC2vRnBZtsTF+
+         lzvRLgJWq35+T/Ql5wqtUMdSJjMHSAyCt00F5nqC9LZbR2YYlCxOajN0c8XeytHh/c
+         +PAE7lRQeJ6iSTspJeHTsUWUxiGM3nfF9WbwHESTXqQl46t9BtKQU2/NJtIqlCGmqv
+         +AyWSWHkh6HxnPtpDv036wbys+kdD8zu/dv2aBXwRxmOJuYiZhHb7qI1pKppAOfVSi
+         W5Ry4xNjUmoazeukR3e2Jj7RGVHsUr/pwMMryukxtK2z4X1WEqNEDMKU3BVHC5kdTy
+         cYVXZueP2JtQg==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 00CC9C433E4; Sun, 30 Oct 2022 10:45:43 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Sun, 30 Oct 2022 10:45:39 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: justanormaltinkerermihir@duck.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-3BIS0e4jOg@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-> Am 29.10.22 um 23:40 schrieb Kang Minchul:
-> > This commit replace kmalloc + memset to kzalloc
->
-> replace*s*
->
-> (Though starting with =E2=80=9CThis commit =E2=80=A6=E2=80=9D is redundan=
-t.
->
-> > for better code readability and simplicity.
-> >
-> > Following messages are related cocci warnings.
->
-> Maybe: This addresse the cocci warning below.
->
-> > WARNING: kzalloc should be used for d, instead of kmalloc/memset
-> >
-> > Signed-off-by: Kang Minchul <tegongkang@gmail.com>
-> > ---
-> > V1 -> V2: Change subject prefix
-> >
-> >   net/bluetooth/hci_conn.c | 6 ++----
-> >   1 file changed, 2 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> > index 7a59c4487050..287d313aa312 100644
-> > --- a/net/bluetooth/hci_conn.c
-> > +++ b/net/bluetooth/hci_conn.c
-> > @@ -824,11 +824,10 @@ static int hci_le_terminate_big(struct hci_dev *h=
-dev, u8 big, u8 bis)
-> >
-> >       bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
-> >
-> > -     d =3D kmalloc(sizeof(*d), GFP_KERNEL);
-> > +     d =3D kzalloc(sizeof(*d), GFP_KERNEL);
-> >       if (!d)
-> >               return -ENOMEM;
-> >
-> > -     memset(d, 0, sizeof(*d));
-> >       d->big =3D big;
-> >       d->bis =3D bis;
-> >
-> > @@ -861,11 +860,10 @@ static int hci_le_big_terminate(struct hci_dev *h=
-dev, u8 big, u16 sync_handle)
-> >
-> >       bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_han=
-dle);
-> >
-> > -     d =3D kmalloc(sizeof(*d), GFP_KERNEL);
-> > +     d =3D kzalloc(sizeof(*d), GFP_KERNEL);
-> >       if (!d)
-> >               return -ENOMEM;
-> >
-> > -     memset(d, 0, sizeof(*d));
-> >       d->big =3D big;
-> >       d->sync_handle =3D sync_handle;
->
-> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
->
->
-> Kind regards,
->
-> Paul
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-Thank you so much for your feedback!
-Should I amend the previous commit message and resend PATCH v3?
+justanormaltinkerermihir@duck.com changed:
 
-regards,
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |justanormaltinkerermihir@du
+                   |                            |ck.com
 
-Kang Minchul
+--- Comment #244 from justanormaltinkerermihir@duck.com ---
+Recompiled the kernel using the patch, doesn't work for me.
+Here's the dmesg log
+[ 4192.433733] Bluetooth: hci0: CSR: Setting up dongle with HCI ver=3D9 rev=
+=3D0810;
+LMP ver=3D9 subver=3D2312; manufacturer=3D10
+[ 4192.433750] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+workarounds...
+[ 4192.433752] Bluetooth: hci0: CSR: Unbranded CSR clone detected;
+force-suspending once...
+[ 4192.792888] Bluetooth: hci0: HCI Delete Stored Link Key command is
+advertised, but not supported.
+[ 4192.792896] Bluetooth: hci0: HCI Read Transmit Power Level command is
+advertised, but not supported.
+[ 4192.792898] Bluetooth: hci0: HCI Enhanced Setup Synchronous Connection
+command is advertised, but not supported.
+[ 4195.075805] Bluetooth: hci0: command 0x0c5a tx timeout
+[ 4195.075813] Bluetooth: hci0: Opcode 0x c5a failed: -110
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
