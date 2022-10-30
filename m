@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9779AFA373D
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Oct 2022 11:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0487EECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 Oct 2022 12:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229727AbiJ3Lnj (ORCPT
+        id S229738AbiJ3MxH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Oct 2022 07:43:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48702 "EHLO
+        Sun, 30 Oct 2022 08:53:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbiJ3Lng (ORCPT
+        with ESMTP id S229441AbiJ3MxF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Oct 2022 07:43:36 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3620E1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 04:43:35 -0700 (PDT)
+        Sun, 30 Oct 2022 08:53:05 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D12DB7DB
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 05:53:04 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 12E18CE0AF2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 11:43:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3A268C433D7
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 11:43:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1DC11B80DA4
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 12:53:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A1D02C43147
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 12:53:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667130212;
-        bh=dQ9PA94FPvh5WGkcvlfxgy7+v/9t3T+NK5m4xx91Ppw=;
+        s=k20201202; t=1667134381;
+        bh=l9tuE10Y/W0Th3zlqiiOQezG0uWq3Kof6/kzW6TjDfQ=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=pqqCoHeWhxCHEHNft6oU5s2gNp5I8ByRDU3nj2Gcfx8d3K/rSqk/q0xJssZloUseD
-         Vt+/Umg01zgHvqSTf4TPzRCaYnYbxsvEy/wozS5FgAajoPwEj77UaLrN0RFisIijmL
-         qbLo4cr8sXIKoISgu8TSEtLBWJKrayAcdlVVDjZWBM1HPqqEiMiIy4rs7pLDQpFVcc
-         2yejwhUBHtPWCC6L9Py/A/TLJY2iQTDy5Hy0hoDczmOf/3U6zH0jepEbKwx2n7+djC
-         ppgf/Ehz9mdRRjVWXJamsdrLv05y7ylPAuE0GMStd1mHbDeE1362UJCgK6iwQZQA63
-         Qk49lO17lJrIQ==
+        b=V/Caoj50J9OB62v/VAPSHOuKMaNSRry5Bx+Ao6aIbDMACRHgMThIUSU1OvOaRl4La
+         t9V8Wx0ueEa3EUp/i9zIOKtQtuxsEcdPlxdMfHOGAclUirWL7g2oo6MjNiIXoXWsty
+         S+uTwYLtedPUSjFt1Y3zekeN+vfUHqGpg6t0mpNDM/fZaTlWZBows/vUh+GLHtw/yg
+         bNIZ/IJzLb1i+nHM6xesrI7Z4E+b16hSpx+fofxPtGTnZ/IwVuzvy3jIJURXtRsjGt
+         sPsC2icIQCZpxvsWTF0NsQ8TCU6/R0ICQIOk1wLV7dvHj90MdrUtoM+Lnhbxp9w0he
+         HFB8zdz5KNy2g==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 2C624C433E4; Sun, 30 Oct 2022 11:43:32 +0000 (UTC)
+        id 91CA7C433E9; Sun, 30 Oct 2022 12:53:01 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Sun, 30 Oct 2022 11:43:28 +0000
+Date:   Sun, 30 Oct 2022 12:52:58 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,7 +55,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-mpRcojRpM3@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-0CPtb3vwNk@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,15 +69,9 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #246 from justanormaltinkerermihir@duck.com ---
-It seems that patch 3/3 fails to apply due to the line  static bool
-enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC); not being th=
-ere is
-the kernel.org 6.0.6 kernel adding that line makes all the patches apply and
-the module compiles. I have merged all the patches, I can confirm that chan=
-ges
-were made to the btusb.c and other files after applying the first patch. The
-error still remains the same after recompilation
+--- Comment #247 from justanormaltinkerermihir@duck.com ---
+Sorry Swyter! It seems I made a mistake while compiling. I am so sorry, the
+patch works fine. Sorry for wasting your time
 
 --=20
 You may reply to this email to add a comment.
