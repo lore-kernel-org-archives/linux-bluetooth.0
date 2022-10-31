@@ -2,97 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32004ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 21:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38806ECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 22:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229909AbiJaV63 (ORCPT
+        id S229674AbiJaWCR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Oct 2022 17:58:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52152 "EHLO
+        Mon, 31 Oct 2022 18:02:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbiJaV61 (ORCPT
+        with ESMTP id S229476AbiJaWCQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Oct 2022 17:58:27 -0400
-Received: from mx-out.tlen.pl (mx-out.tlen.pl [193.222.135.142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE3D634D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 14:58:22 -0700 (PDT)
-Received: (wp-smtpd smtp.tlen.pl 11469 invoked from network); 31 Oct 2022 22:58:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=o2.pl; s=1024a;
-          t=1667253498; bh=1KcDlAJydwsD6iBxe2zLcIj/QaQqPMYu3avBARGdTDE=;
-          h=Subject:To:Cc:From;
-          b=ml+ldyWhxTB2iNZmeR7Iq+R1NcEIQUPpwnz+1HnyqjMfs/X2Ek9XzC4h8F/779xg4
-           c1qr9v/HpclUStvbjDTCY9RHj+cLy0CxloIEofcx5pRZGwOjadqs2szgK56x3/h4+j
-           ugI2dv/C2PkGp+PUTbQUBHpyobiL3qO3hi7K/cUM=
-Received: from aaew218.neoplus.adsl.tpnet.pl (HELO [192.168.1.22]) (mat.jonczyk@o2.pl@[83.4.126.218])
-          (envelope-sender <mat.jonczyk@o2.pl>)
-          by smtp.tlen.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <brian.gix@intel.com>; 31 Oct 2022 22:58:18 +0100
-Message-ID: <58ab7693-b98a-6714-d6cf-f8e188bae254@o2.pl>
-Date:   Mon, 31 Oct 2022 22:58:17 +0100
+        Mon, 31 Oct 2022 18:02:16 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DE0E140C4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 15:02:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667253735; x=1698789735;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=InEZeZdNqHj6bbfxfSEZhhK1gaslNg5sOEx6GflAtY8=;
+  b=AVEbzPOLTJy0OIjqerHZoUrfk/MyhzEE1/FNSJaZZbCn4dCrNJaSWNHA
+   hQR9WmFbXARh6nEupW1U2v8E8RvP+cYQkJTd7z1NXr8XsF4iUqQayCZoY
+   9suMvXU0YDdXn3Y5FUI6/V8hEDwYX+BdpaT2+YyTZUt1tCPEo3KD3ybUE
+   I/0+tFVBD5jTyMlzMAfy0ASQvM42KN/k9RtnbmwUJcnXfL4uHJ9Y2X4AG
+   /7DmPVtDtLxdMEZxtLyP6MnpDC4s/dXL6VPwtStx3eL1ckFMHk0pNNblK
+   VEaA7E6x18cYTm1mIGP39ERrrjkpzihWBM8yEYUSPsQyJDB8xxXOaohMM
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="296428749"
+X-IronPort-AV: E=Sophos;i="5.95,228,1661842800"; 
+   d="scan'208";a="296428749"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 15:02:14 -0700
+X-IronPort-AV: E=McAfee;i="6500,9779,10517"; a="666981279"
+X-IronPort-AV: E=Sophos;i="5.95,228,1661842800"; 
+   d="scan'208";a="666981279"
+Received: from fsbeena-mobl.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.176.165])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2022 15:02:14 -0700
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, marex@denx.de
+Subject: [RFC] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
+Date:   Mon, 31 Oct 2022 15:02:05 -0700
+Message-Id: <20221031220205.91975-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.1
-Subject: Re: "Bluetooth: hci0: HCI_REQ-0xfcf0" errors in dmesg
-Content-Language: en-GB
-To:     "Gix, Brian" <brian.gix@intel.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-Cc:     "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>
-References: <aac93511-d5e5-7a1b-6b1c-65e008ce068e@o2.pl>
- <CABBYNZKXYaRT_N9YTHX2aKRBRVHhORejT=+LJNvrJgL2QYjSLA@mail.gmail.com>
- <beb8dcdc3aee4c5c833aa382f35995f17e7961a1.camel@intel.com>
-From:   =?UTF-8?Q?Mateusz_Jo=c5=84czyk?= <mat.jonczyk@o2.pl>
-In-Reply-To: <beb8dcdc3aee4c5c833aa382f35995f17e7961a1.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-WP-MailID: 78f8c89d63433d3137dcbe83300b425f
-X-WP-AV: skaner antywirusowy Poczty o2
-X-WP-SPAM: NO 0000000 [QVN0]                               
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-W dniu 31.10.2022 o 22:08, Gix, Brian pisze:
-> On Mon, 2022-10-31 at 13:37 -0700, Luiz Augusto von Dentz wrote:
->> On Mon, Oct 31, 2022 at 1:15 PM Mateusz Jończyk <mat.jonczyk@o2.pl>
->> wrote:
->>> On 6.1.0-rc3, I have been seeing this error message in dmesg:
->>>
->>>         Bluetooth: hci0: HCI_REQ-0xfcf0
->>>
->>> It is printed on every boot, resume from suspend and rfkill unblock
->>> of the Bluetooth device.
->>> The device seems to be functioning normally though (but I have done
->>> limited testing only).
->>>
->>> After some investigation, it turned out to be caused by
->>>         commit dd50a864ffae ("Bluetooth: Delete unreferenced
->>> hci_request code")
->>> which modified hci_req_add() in net/bluetooth/hci_request.c to
->>> always print an error message
->>> when that function is executed.
-[...]
-> This, I suspect, will be an ongoing issue, particularily with Vender
-> Opcodes, which we don't have much direct visability and testing
-> capabilities.  The error gets logged because it is using a deprecated
-> (but still working) mechanism to issue HCI opcodes.
->
-> If I can get the source code path of the call as it is being
-> contructed, I can try making you a patch Mateusz...  But you will
-> probably need to do the testing/verification for me.
+The msft_set_filter_enable() command was using the deprecated
+hci_request mechanism rather than hci_sync. This caused the warning error:
+hci0: HCI_REQ-0xfcf0
 
-Sure, what info would you like me to provide? The MSFT
-Vendor Opcode 0xFCF0 is defined in drivers/bluetooth/btrtl.c, line 725.
+Signed-off-by: Brian Gix <brian.gix@intel.com>
+---
+ net/bluetooth/msft.c | 36 +++++++++++-------------------------
+ 1 file changed, 11 insertions(+), 25 deletions(-)
 
-I'm not sure if I have any additional Bluetooth LE devices around, unfortunately.
-
-Additionally, I think that the error message is a bit cryptic, and perhaps could
-be changed and/or demoted to a notice for kernel 6.1.
-
-Greetings,
-
-Mateusz
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index bee6a4c656be..bf5cee48916c 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -743,17 +743,12 @@ __u64 msft_get_features(struct hci_dev *hdev)
+ }
+ 
+ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+-						       u8 status, u16 opcode,
+-						       struct sk_buff *skb)
++						       void *user_data,
++						       u8 status)
+ {
+-	struct msft_cp_le_set_advertisement_filter_enable *cp;
+-	struct msft_rp_le_set_advertisement_filter_enable *rp;
++	struct msft_cp_le_set_advertisement_filter_enable *cp = user_data;
+ 	struct msft_data *msft = hdev->msft_data;
+ 
+-	rp = (struct msft_rp_le_set_advertisement_filter_enable *)skb->data;
+-	if (skb->len < sizeof(*rp))
+-		return;
+-
+ 	/* Error 0x0C would be returned if the filter enabled status is
+ 	 * already set to whatever we were trying to set.
+ 	 * Although the default state should be disabled, some controller set
+@@ -766,7 +761,6 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	cp = hci_sent_cmd_data(hdev, hdev->msft_opcode);
+ 	msft->filter_enabled = cp->enable;
+ 
+ 	if (status == 0x0C)
+@@ -804,31 +798,23 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
+ 	return msft_remove_monitor_sync(hdev, monitor);
+ }
+ 
+-void msft_req_add_set_filter_enable(struct hci_request *req, bool enable)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	struct msft_cp_le_set_advertisement_filter_enable cp;
+-
+-	cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
+-	cp.enable = enable;
+-
+-	hci_req_add(req, hdev->msft_opcode, sizeof(cp), &cp);
+-}
+-
+ int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
+ {
+-	struct hci_request req;
++	struct msft_cp_le_set_advertisement_filter_enable cp;
+ 	struct msft_data *msft = hdev->msft_data;
+ 	int err;
+ 
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+ 
+-	hci_req_init(&req, hdev);
+-	msft_req_add_set_filter_enable(&req, enable);
+-	err = hci_req_run_skb(&req, msft_le_set_advertisement_filter_enable_cb);
++	cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
++	cp.enable = enable;
++	err = __hci_cmd_sync_status(hdev, hdev->msft_opcode, sizeof(cp), &cp,
++				    HCI_CMD_TIMEOUT);
++
++	msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
+ 
+-	return err;
++	return 0;
+ }
+ 
+ bool msft_curve_validity(struct hci_dev *hdev)
+-- 
+2.38.1
 
