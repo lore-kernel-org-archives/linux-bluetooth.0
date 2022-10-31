@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F305EC38A02
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 11:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 948D5C38A02
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 11:09:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbiJaLBC (ORCPT
+        id S229991AbiJaLJq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Oct 2022 07:01:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49772 "EHLO
+        Mon, 31 Oct 2022 07:09:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229726AbiJaLA7 (ORCPT
+        with ESMTP id S229870AbiJaLJp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Oct 2022 07:00:59 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91D1F65CA
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 04:00:52 -0700 (PDT)
+        Mon, 31 Oct 2022 07:09:45 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B56A8E021
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 04:09:43 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 156AE611B0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 11:00:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E1DCC433D7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 11:00:51 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 35431B815BB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 11:09:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1C72C43470
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 11:09:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667214051;
-        bh=yPkGeVjUhkTdzptF5hDQQybPV5XLmwAhzWLUI/BukoM=;
+        s=k20201202; t=1667214580;
+        bh=oaOxARE5K59owZHn89aUbpMA2pYpaxGoqbqiY6w5MbA=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=JXEWs1apB9L4JMLSKJPmWsZwCD3xWAu1oFIUSpr6ee+RFGLNI6vmxIYmIx8rw3Ka2
-         msr5+Ft9PYj/E1iP975VCh0JwjpKVYkiN63WPAbqvXdML1jNbRMuuKUe3jPmYRSk5N
-         /QIL6BXTuq8T5w+zLiICQ+qDFoZM8rrU35wIfDRylF2HE1DJaA9kWug0UnjzBfgk7h
-         xjNKpTz3S6Q3OT+uR4APJqZj7dvNQub+LiryXBozHEcvh3uOFVQsF+OmfNMHBqYDcF
-         QBcb4+0BcRSh2hm/c4wx+M4fGOKzaES6yjX//FgBO1PnJcXRMd5xhiXjWQ5BoXE+E4
-         +y0BfHvSCP9zg==
+        b=mm99lGMg0GWfj53kq0PWr9L7A3zUTdQ67fGwuFz79pAsNLaVvtk/Gr6NXFd5EO5rU
+         u8cdKvJWMJ9fXf2lX8NeAiSgFdc7hQ+bzksBcRcrIAbblJMSH9C/cvgZDCpV+FC2BP
+         mxGmI0TD7KZ2WPFPrQfKAXnLRZbtrEDij0AlxzR/AHRpIWdAj+BrcaIIDtyPCILnBd
+         V8cPrMP2ULCCGRivOaB52+vyLDEeWF8WWNsW46ht2lGpDDw79b2086+zfdVHjHk5zQ
+         yTtdMqOJ6qI8H6UIyBI1EzQNSK7WMOsYNTiS5NJRyIVg32kBLsraeIwVNzk8K7GOAY
+         mu8Cr2M0NfKMQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 5F4F1C05FCF; Mon, 31 Oct 2022 11:00:51 +0000 (UTC)
+        id C42ACC433E7; Mon, 31 Oct 2022 11:09:40 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Mon, 31 Oct 2022 11:00:47 +0000
+Date:   Mon, 31 Oct 2022 11:09:37 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -55,7 +55,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-TrqDHwnBbi@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-Ex6FZZIsCZ@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,31 +69,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #249 from justanormaltinkerermihir@duck.com ---
-< HCI Command: Read Local Version Information (0x04|0x0001) plen 0=20=20=20=
-=20=20=20=20=20=20=20=20=20=20
-                                                                    #8 [hci=
-0]
-9.481997
-> HCI Event: Command Complete (0x0e) plen 12=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
->                                                                     #9 [h=
-ci0]
-> 9.483762
+--- Comment #250 from justanormaltinkerermihir@duck.com ---
+It seems that my terminal failed to copy the last line of the commands
+correctly so here it fixed:
+
+< HCI Command: Read Local Version In.. (0x04|0x0001) plen 0  #1 [hci0] 9.44=
+8239
+> HCI Event: Command Complete (0x0e) plen 12                 #2 [hci0] 9.45=
+0137
       Read Local Version Information (0x04|0x0001) ncmd 1
         Status: Success (0x00)
         HCI version: Bluetooth 5.0 (0x09) - Revision 2064 (0x0810)
         LMP version: Bluetooth 5.0 (0x09) - Subversion 8978 (0x2312)
+        Manufacturer: Cambridge Silicon Radio (10)
 
- HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20
-                                                                  #18 [hci0]
-9.860418
-> HCI Event: Command Complete (0x0e) plen 68=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
->                                                                    #19 [h=
-ci0]
-> 9.866388
+
+< HCI Command: Read Local Support.. (0x04|0x0002) plen 0  #127 [hci0] 10.18=
+8575
+> HCI Event: Command Complete (0x0e) plen 68              #128 [hci0] 10.19=
+4513
       Read Local Supported Commands (0x04|0x0002) ncmd 1
         Status: Success (0x00)
         Commands: 163 entries
@@ -259,13 +253,13 @@ ci0]
           LE Read Supported States (Octet 28 - Bit 3)
           LE Receiver Test (Octet 28 - Bit 4)
           LE Transmitter Test (Octet 28 - Bit 5)
+          LE Test End (Octet 28 - Bit 6)
 
 
-> HCI Event: Command Complete (0x0e) plen 12=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
->                                                                    #13 [h=
-ci0]
-> 9.856388
+< HCI Command: Read Local Support.. (0x04|0x0003) plen 0  #121 [hci0] 10.18=
+2585
+> HCI Event: Command Complete (0x0e) plen 12              #122 [hci0] 10.18=
+4514
       Read Local Supported Features (0x04|0x0003) ncmd 1
         Status: Success (0x00)
         Features: 0xbf 0x3e 0x4d 0xfa 0xdb 0x3d 0x7b 0xc7
@@ -312,12 +306,7 @@ ci0]
           Inquiry TX Power Level
           Enhanced Power Control
           Extended features
-
-I cannot find the command HCI_Read_Default_-Erroneous_Data_Reporting in the
-btmon log, I don't really know how to use that thing. Also the adapter now
-works fine after applying the patches, I just made a mistake while compiling
-and only compiled the btusb module and not the whole bluetooth module, my b=
-ad.
+          Unknown features (0x4000000000000000)
 
 --=20
 You may reply to this email to add a comment.
