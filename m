@@ -2,123 +2,186 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35FD9C38A02
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 03:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 093FAC38A02
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 05:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbiJaDDk (ORCPT
+        id S230007AbiJaFnP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 Oct 2022 23:03:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60928 "EHLO
+        Mon, 31 Oct 2022 01:43:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiJaDDi (ORCPT
+        with ESMTP id S229835AbiJaFnB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 Oct 2022 23:03:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5E3657D
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 20:03:37 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6CE7B60FBE
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 03:03:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9A9BC433B5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 03:03:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667185416;
-        bh=Y2M6xEUU/93mqFy/5mQZqm5SlmM/SQoI4YUcBJdxcdY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=RF7XdbDuHINbwlGsUQJCuGRnuEy8V00iZqvpcoeDXAND4O489ph/zHF4BTMGKJsrL
-         CwNRW33dPab39PK09RA7jnQF5NFmV796w4Lbj+nmPrMBhOUHTA47IzASCOdzTf+9Vn
-         yDlkZ/olA47PKYfkpfqDebtoPTHklOoU1vJ/wVbxEwilY/FASKZO/a+vyVQIfdfM0/
-         a/ihn/HUWts9WSiP0hNBnFB22ZMGzTwmKJC4tB5rL1ZKcuWNlsF7VrvpRIRZlLDTjb
-         EEZycxbBkLBhf3oYtHIN7MTx99eBat0M/gwPdcq1lfmCwGSMv/4NBFs7WrPQfUSY/b
-         ODQFg2UYc0OAg==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id BC516C433E4; Mon, 31 Oct 2022 03:03:36 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Mon, 31 Oct 2022 03:03:33 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: quic_zijuhu@quicinc.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-o9G8bRzaFZ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 31 Oct 2022 01:43:01 -0400
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0C84BE2C
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 22:42:38 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id z15-20020a5e860f000000b006c09237cc06so7461875ioj.21
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 Oct 2022 22:42:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UzbA52sJDjFIyoI7T1NX6PoWiiHdclyrQvjiX+dCe0w=;
+        b=y7+ZrO0UzLzq798bwFa6gnN6zJiI6booxvN77WNc8uwXHhiALjgBAaKMmAQZMxLtj9
+         KyfuyrekPv4lmSJXmu/4CyTkcZopNAaeHFwYd/zI7k3JdDbig6+FlGk+mG0W+pZCpm1C
+         yW9cPjEY30LuSWdVzf4/murBOjOy2JLlBXOk8zxBYty21ZyytqeDyI/rBqZOPVMuAHpU
+         MdiNAWdA2Ad4ehqOHwF8lxESlD3XokGSE/71rjtpjUg2fzxg15K9/F963TsTswMqiiXu
+         /EZ7jh5db91W0/Hlq5MgH3PpKPmrO9Tc0py6v1hCwfo6mWo11NAmTvfo9b58d0StMul6
+         wkNg==
+X-Gm-Message-State: ACrzQf09Be5ETjeg8lbUE+KSUXpEHeZB2QQ2RN0FPVOEmAzhJ/nQsEMK
+        7Cgr+7Z1BW+DXIcY5yXv7ZeB1xHFRv79xTmEjeIV6sqxw+Pc
+X-Google-Smtp-Source: AMsMyM5sBQZhX8eAVAtYIGSKzXZ0Ll9g1e+TyTHpiJj+GdE8rly+4c0MXh00VtslsI1cuEGyRpToJEPe62h7rE4vVzfbkWwqPiFc
 MIME-Version: 1.0
+X-Received: by 2002:a92:6b0e:0:b0:2ff:df3e:995b with SMTP id
+ g14-20020a926b0e000000b002ffdf3e995bmr5828202ilc.193.1667194957717; Sun, 30
+ Oct 2022 22:42:37 -0700 (PDT)
+Date:   Sun, 30 Oct 2022 22:42:37 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000039e9d105ec4e13ed@google.com>
+Subject: [syzbot] WARNING in cancel_delayed_work_sync
+From:   syzbot <syzbot+dd9906bb8e89b22b1be7@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Hello,
 
---- Comment #248 from Zijun Hu (quic_zijuhu@quicinc.com) ---
-Hi ALL,
-let me summarize my points
+syzbot found the following issue on:
 
-1)For the original 4.0 controller issue shown below, don't need to fix sinc=
-e i
-believe the latest bluetooth-next tree doesn't have this issue.
+HEAD commit:    bbed346d5a96 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=131b44ac880000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3a4a45d2d827c1e
+dashboard link: https://syzkaller.appspot.com/bug?extid=dd9906bb8e89b22b1be7
+compiler:       Debian clang version 13.0.1-++20220126092033+75e33f71c2da-1~exp1~20220126212112.63, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: arm64
 
-< HCI Command: Set Event Filter (0x03|0x0005) plen 1        #23 [hci0] 4.13=
-0423
-        Type: Clear All Filters (0x00)
-> HCI Event: Command Complete (0x0e) plen 4                 #24 [hci0] 4.13=
-3374
+Unfortunately, I don't have any reproducer for this issue yet.
 
-      Set Event Filter (0x03|0x0005) ncmd 1
-        Status: Invalid HCI Command Parameters (0x12)
-< HCI Command: Read Local Version In.. (0x04|0x0001) plen 0  #1 [hci0] 4.07=
-3336
-> HCI Event: Command Complete (0x0e) plen 12                 #2 [hci0] 4.07=
-7324
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e8e91bc79312/disk-bbed346d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c1cb3fb3b77e/vmlinux-bbed346d.xz
 
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 4.0 (0x06) - Revision 12576 (0x3120)
-        LMP version: Bluetooth 4.0 (0x06) - Subversion 8891 (0x22bb)
-        Manufacturer: Cambridge Silicon Radio (10)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dd9906bb8e89b22b1be7@syzkaller.appspotmail.com
 
-2) for the new 5.0 controller error. it is a new 5.0 BT controller. why not=
- to
-fix this BT firmware bug?
-could you please provide btmon log of these HCI commands?
+ODEBUG: assert_init not available (active state 0) object type: timer_list hint: 0x0
+WARNING: CPU: 1 PID: 25883 at lib/debugobjects.c:505 debug_print_object lib/debugobjects.c:502 [inline]
+WARNING: CPU: 1 PID: 25883 at lib/debugobjects.c:505 debug_object_assert_init+0x144/0x198 lib/debugobjects.c:892
+Modules linked in:
+CPU: 1 PID: 25883 Comm: syz-executor.0 Not tainted 6.0.0-rc7-syzkaller-18095-gbbed346d5a96 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/30/2022
+pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : debug_print_object lib/debugobjects.c:502 [inline]
+pc : debug_object_assert_init+0x144/0x198 lib/debugobjects.c:892
+lr : debug_print_object lib/debugobjects.c:502 [inline]
+lr : debug_object_assert_init+0x144/0x198 lib/debugobjects.c:892
+sp : ffff8000157f3ae0
+x29: ffff8000157f3ae0 x28: ffff0000c55b1a80 x27: 0000000000000024
+x26: ffff8000157f3be8 x25: ffff800008134bec x24: ffff0000c55b1a80
+x23: ffff80000efab740 x22: ffff80000d30c000 x21: ffff80000f0a5000
+x20: ffff80000bfff5b8 x19: ffff0000ca0749d0 x18: 00000000000000c0
+x17: 203a657079742074 x16: ffff80000db49158 x15: ffff0000c55b1a80
+x14: 0000000000000000 x13: 00000000ffffffff x12: 0000000000040000
+x11: 0000000000003457 x10: ffff800012a3d000 x9 : db08ffd6148ab200
+x8 : db08ffd6148ab200 x7 : ffff80000819545c x6 : 0000000000000000
+x5 : 0000000000000080 x4 : 0000000000000001 x3 : 0000000000000000
+x2 : 0000000000000000 x1 : 0000000100000000 x0 : 0000000000000054
+Call trace:
+ debug_print_object lib/debugobjects.c:502 [inline]
+ debug_object_assert_init+0x144/0x198 lib/debugobjects.c:892
+ debug_timer_assert_init kernel/time/timer.c:792 [inline]
+ debug_assert_init kernel/time/timer.c:837 [inline]
+ del_timer+0x34/0x1a8 kernel/time/timer.c:1257
+ try_to_grab_pending+0x84/0x54c kernel/workqueue.c:1275
+ __cancel_work_timer+0x74/0x2ac kernel/workqueue.c:3119
+ cancel_delayed_work_sync+0x24/0x38 kernel/workqueue.c:3301
+ mgmt_index_removed+0x158/0x198 net/bluetooth/mgmt.c:8952
+ hci_sock_bind+0x710/0xb1c net/bluetooth/hci_sock.c:1218
+ __sys_bind+0x148/0x1b0 net/socket.c:1776
+ __do_sys_bind net/socket.c:1787 [inline]
+ __se_sys_bind net/socket.c:1785 [inline]
+ __arm64_sys_bind+0x28/0x3c net/socket.c:1785
+ __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:52 [inline]
+ el0_svc_common+0x138/0x220 arch/arm64/kernel/syscall.c:142
+ do_el0_svc+0x48/0x164 arch/arm64/kernel/syscall.c:206
+ el0_svc+0x58/0x150 arch/arm64/kernel/entry-common.c:636
+ el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:654
+ el0t_64_sync+0x18c/0x190 arch/arm64/kernel/entry.S:581
+irq event stamp: 286
+hardirqs last  enabled at (285): [<ffff80000bfc89b4>] __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+hardirqs last  enabled at (285): [<ffff80000bfc89b4>] _raw_spin_unlock_irqrestore+0x48/0x8c kernel/locking/spinlock.c:194
+hardirqs last disabled at (286): [<ffff80000812cb28>] try_to_grab_pending+0xac/0x54c kernel/workqueue.c:1264
+softirqs last  enabled at (264): [<ffff80000b1c7458>] spin_unlock_bh include/linux/spinlock.h:394 [inline]
+softirqs last  enabled at (264): [<ffff80000b1c7458>] lock_sock_nested+0xc0/0xd8 net/core/sock.c:3400
+softirqs last disabled at (262): [<ffff80000b1c7420>] spin_lock_bh include/linux/spinlock.h:354 [inline]
+softirqs last disabled at (262): [<ffff80000b1c7420>] lock_sock_nested+0x88/0xd8 net/core/sock.c:3396
+---[ end trace 0000000000000000 ]---
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 25883 at kernel/workqueue.c:635 set_work_data kernel/workqueue.c:635 [inline]
+WARNING: CPU: 0 PID: 25883 at kernel/workqueue.c:635 clear_work_data kernel/workqueue.c:698 [inline]
+WARNING: CPU: 0 PID: 25883 at kernel/workqueue.c:635 __cancel_work_timer+0x29c/0x2ac kernel/workqueue.c:3162
+Modules linked in:
+CPU: 0 PID: 25883 Comm: syz-executor.0 Tainted: G        W          6.0.0-rc7-syzkaller-18095-gbbed346d5a96 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/30/2022
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : set_work_data kernel/workqueue.c:635 [inline]
+pc : clear_work_data kernel/workqueue.c:698 [inline]
+pc : __cancel_work_timer+0x29c/0x2ac kernel/workqueue.c:3162
+lr : set_work_data kernel/workqueue.c:635 [inline]
+lr : clear_work_data kernel/workqueue.c:698 [inline]
+lr : __cancel_work_timer+0x29c/0x2ac kernel/workqueue.c:3162
+sp : ffff8000157f3bd0
+x29: ffff8000157f3c10 x28: ffff0000c55b1a80 x27: 0000000000000024
+x26: ffff8000157f3be8 x25: ffff800008134bec x24: ffff0000c55b1a80
+x23: ffff000112628600 x22: 0000000000000000 x21: 0000001fffffffc0
+x20: 0000000000000000 x19: ffff0000ca074988 x18: 00000000000000c0
+x17: ffff80000dd0b198 x16: ffff80000db49158 x15: ffff0000c55b1a80
+x14: 0000000000000000 x13: 00000000ffffffff x12: 0000000000040000
+x11: 000000000001dc58 x10: ffff800012a3d000 x9 : ffff80000812e20c
+x8 : 000000000001dc59 x7 : ffff80000813754c x6 : 0000000000000000
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000002
+x2 : 0000000000000008 x1 : 0000000000000000 x0 : 0000000000000000
+Call trace:
+ set_work_data kernel/workqueue.c:635 [inline]
+ clear_work_data kernel/workqueue.c:698 [inline]
+ __cancel_work_timer+0x29c/0x2ac kernel/workqueue.c:3162
+ cancel_delayed_work_sync+0x24/0x38 kernel/workqueue.c:3301
+ mgmt_index_removed+0x158/0x198 net/bluetooth/mgmt.c:8952
+ hci_sock_bind+0x710/0xb1c net/bluetooth/hci_sock.c:1218
+ __sys_bind+0x148/0x1b0 net/socket.c:1776
+ __do_sys_bind net/socket.c:1787 [inline]
+ __se_sys_bind net/socket.c:1785 [inline]
+ __arm64_sys_bind+0x28/0x3c net/socket.c:1785
+ __invoke_syscall arch/arm64/kernel/syscall.c:38 [inline]
+ invoke_syscall arch/arm64/kernel/syscall.c:52 [inline]
+ el0_svc_common+0x138/0x220 arch/arm64/kernel/syscall.c:142
+ do_el0_svc+0x48/0x164 arch/arm64/kernel/syscall.c:206
+ el0_svc+0x58/0x150 arch/arm64/kernel/entry-common.c:636
+ el0t_64_sync_handler+0x84/0xf0 arch/arm64/kernel/entry-common.c:654
+ el0t_64_sync+0x18c/0x190 arch/arm64/kernel/entry.S:581
+irq event stamp: 366
+hardirqs last  enabled at (365): [<ffff80000bfb8138>] __exit_to_kernel_mode arch/arm64/kernel/entry-common.c:84 [inline]
+hardirqs last  enabled at (365): [<ffff80000bfb8138>] exit_to_kernel_mode+0xe8/0x118 arch/arm64/kernel/entry-common.c:94
+hardirqs last disabled at (366): [<ffff80000bfb5fbc>] el1_dbg+0x24/0x5c arch/arm64/kernel/entry-common.c:404
+softirqs last  enabled at (360): [<ffff8000080102e4>] _stext+0x2e4/0x37c
+softirqs last disabled at (289): [<ffff800008017c14>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:79
+---[ end trace 0000000000000000 ]---
 
-HCI_Read_Local_Version_-Information
-HCI_Read_Local_Supported_-Commands
-HCI_Read_Local_Supported_Features
-HCI_Read_Default_-Erroneous_Data_Reporting
 
-[ 4195.075805] Bluetooth: hci0: command 0x0c5a tx timeout
-[ 4195.075813] Bluetooth: hci0: Opcode 0x c5a failed: -110
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> [hci0] 11.276039
-
-      Read Local Version Information (0x04|0x0001) ncmd 1
-        Status: Success (0x00)
-        HCI version: Bluetooth 5.0 (0x09) - Revision 2064 (0x0810)
-        LMP version: Bluetooth 5.0 (0x09) - Subversion 8978 (0x2312)
-        Manufacturer: Cambridge Silicon Radio (10)
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
