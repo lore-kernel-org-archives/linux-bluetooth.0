@@ -2,44 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C76F2ECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 13:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D3AECAAA1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 13:21:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231419AbiJaNLh (ORCPT
+        id S230493AbiJaNVk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Oct 2022 09:11:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56646 "EHLO
+        Mon, 31 Oct 2022 09:21:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229787AbiJaNLf (ORCPT
+        with ESMTP id S229556AbiJaNVi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Oct 2022 09:11:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E599BDFD8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 06:11:33 -0700 (PDT)
+        Mon, 31 Oct 2022 09:21:38 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17CAB658D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 06:21:38 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8239A6121A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:11:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E23F2C43142
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:11:32 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CBB97B8112E
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:21:36 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 78C75C433D6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:21:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667221892;
-        bh=PmfizRn5IwTI3yjohSDLN4fRzO7O1uM8KEM1q90lv5g=;
+        s=k20201202; t=1667222495;
+        bh=Iumn4rCmwpvN0y2c7SO/ylGntX4etShyaM9vehRUp1o=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=GPfSP9tSeomusXxKvCCMDwfD3vqTDxZ+3Y+3IIaNBShkIdls+AD5v5Mq3xBi4MFjj
-         TxippR+BAzPobApQ3zGOjD9RxYxQPJ9C3S7kclAEtb4QltKTEud3Lotp5Vq6HxfoS7
-         rAIjc4b0W0Un0jlGoBDRVHzC6N9k4JkUlEuc6PxgreJ6YX8XMxICXA12mDHUxfBM/6
-         OI1mujXaY8b7I3Xf9gD7wFGNM0f8P5sm10DUw28gI4+Ns22quC/DdkwPBAaPWDL27u
-         eBceOtS4LchGx5izLL2rTubDBEsvxrTZHysBKwAr2hPIxrEUsC1noFkFASTGvO1m65
-         AgnSHvrvvyGAA==
+        b=FVFyDUMk36/p3GYuI22KNFaUblbBWCtEQVutGibyo+4tbMl7Og32CkIRSJ7TGOIPB
+         f0Y/D+WAZfWzCvp5xuKolNyi+oRK18qD1c8kfmA/LV+vnCyWwgAr8qeS77JdkYuo8v
+         vP/5UDNXxG66Rfcjp2tXBLa8j3HHo6N3hQHvXmu8HP1XaRQCGQcuTi0dT/U4fj+2JR
+         kljd130GV5zeepqojRwKnSacRUtZFS2vlNoxMCtpX0248aEnurlroV3wzN9uhfN+Hn
+         38QT9NqhdVNx69ll/nK2ZILYsBPTxajdocrLfmM9P01O99FI7W57EzT27sEjtdK+dV
+         fauKinY6TmeiQ==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id D26ECC433E7; Mon, 31 Oct 2022 13:11:32 +0000 (UTC)
+        id 56DC9C433E7; Mon, 31 Oct 2022 13:21:35 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
  Bluetooth Dongle unusable
-Date:   Mon, 31 Oct 2022 13:11:29 +0000
+Date:   Mon, 31 Oct 2022 13:21:22 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -48,14 +48,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: normal
-X-Bugzilla-Who: justanormaltinkerermihir@duck.com
+X-Bugzilla-Who: quic_zijuhu@quicinc.com
 X-Bugzilla-Status: REOPENED
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-llyPzBUfE2@https.bugzilla.kernel.org/>
+Message-ID: <bug-60824-62941-GpcXVRTPiw@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
 References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -69,14 +69,13 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
---- Comment #253 from justanormaltinkerermihir@duck.com ---
-It just outputs this:
+--- Comment #254 from Zijun Hu (quic_zijuhu@quicinc.com) ---
+Hi justanormaltinkerermihir,
 
-< HCI Command: ogf 0x03, ocf 0x005a, plen 0
-
-
-and dmesg shows this: [  921.174808] Bluetooth: hci0: command 0x0c5a tx tim=
-eout
+you maybe catch bton log of that command by below steps:
+1) open one terminal and run  btmon
+2) open another terminal and run hcitool -i hci0 cmd 03 5a
+3) catch dmesg log for this hci command.
 
 --=20
 You may reply to this email to add a comment.
