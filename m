@@ -2,59 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D876DECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 20:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD246FA3741
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 20:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230124AbiJaUsh (ORCPT
+        id S229912AbiJaU5w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Oct 2022 16:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38906 "EHLO
+        Mon, 31 Oct 2022 16:57:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230155AbiJaUsf (ORCPT
+        with ESMTP id S229739AbiJaU5u (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Oct 2022 16:48:35 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29BCDB10
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:48:34 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id p8so21019195lfu.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:48:34 -0700 (PDT)
+        Mon, 31 Oct 2022 16:57:50 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 094FF12762
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:57:49 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id u2so18265416ljl.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 13:57:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=gmNRX3SLmYrMa7wB4FZHHdqFWFeKVWAsVgygwrr2eeI=;
-        b=DrUCDFWmKhCHxKoGC+sBenaqo8irbjP//1bnDoFVkavKo1JWdKYfVvIxM5V8M9MzNa
-         iO62UQWQVtrqgRIgtaMjLDe/cKuiuTk8R9NjYx7Pvs/ETO5AGGb+lIFLCJgbclmrVob2
-         O+KNV4QoCjzI0iH+kvwUgFRy3cOfCSLJcRRGl0vAgFafDjClhaj0RaXCdQeNskwsuDXO
-         9Oar3RkA2p+NqLYSH3pXPuRegaorhtccooWHYm5tMQYdKB7Vo2HRMGv2PGi0IIB2ZZTi
-         MuuEsG0lk7WWTJp5rhdtPm6i6oR3cWROISpA6DEShG1z0CO4x1hU442Y7IXshwVTU3Uz
-         sZRA==
+        bh=nv+um2iHootXO2ohoNURrDQrq8avbiRP9ra/LyIjPj8=;
+        b=EhPLOh/DhuuH/nSHEn0t1orfBVqYL9hoiDnEiUrDJmNuKI1UduqzXOHFGsZunrv4za
+         mNkaa2jfPCdRcxw5u4bWEMKc+4C0mmNq5Oofcb+d1wpDZ0twxc74djNN8jtoGFj19pta
+         eHQ/ANm4HpQw4mt0yQ41DdIPT6yhwPtSjRRyG7zAsolwi2cjC6VcWA+/Cm9hmglvyzTg
+         ne/fjApyo8ER7JDayBp3N+Jlkpu/5TkdqoE7PdePaLRm87bH/f7xVzp+2JgZulJY8mCO
+         UXLVnywhdqkGuB2ung+itkB75Mp6GTFYTNJFoCU0ddQGd0W6crJG2UQQ2sLE7xnD+eok
+         GsFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gmNRX3SLmYrMa7wB4FZHHdqFWFeKVWAsVgygwrr2eeI=;
-        b=RWP3j2+/VCTn6IO7mrxh9uubSnd6MdyzeQD19Az4ijul7/TY+/AiI1o9LLx8LLtEqa
-         FRtrXOz9nhPvQGTXXsxhexoXsg5Pkz9Brmg1ntIzVl64c9KRaeaAyueaDNmU/ikQzCQo
-         +gxYKrt4QJNcfkJ5LCHBSmBxE2L4Uj5D4weji6D5/5rJdRfe7i4a4H3smj4h2dk24qPL
-         U6CCtWSW3ZT6s4UaCLeh3nVsPedqiDEUir27r2K4VVx2uteTO6ZbGygbjLv7NsZC3Bpp
-         JrvPm498HeJrE2K/0ksGPhSAzaZxB4hvHjGP0A68IC845AO309GiOkqQpb6C0VNJCfOp
-         y+Tw==
-X-Gm-Message-State: ACrzQf1FtYq3RxKz5++9M2JCFmmH7qTmrAUqSJ9GLJuCD59fm9c2SBo3
-        sjezJ4eYeIsDoewpokFDB07u9G6CoiXhFqO1aMeFeKf9mAc=
-X-Google-Smtp-Source: AMsMyM7ffMlTQFRL40Pg6JfpIl+OOgQ3HbX1JtNrVu/wT2XCVQ23d0KBzu9WyB8W/yrmF2jGYY8Xe574twyCwFMhdGc=
-X-Received: by 2002:a05:6512:3f2a:b0:4ae:612b:f47b with SMTP id
- y42-20020a0565123f2a00b004ae612bf47bmr5805043lfa.106.1667249312271; Mon, 31
- Oct 2022 13:48:32 -0700 (PDT)
+        bh=nv+um2iHootXO2ohoNURrDQrq8avbiRP9ra/LyIjPj8=;
+        b=Xhru3w5B1YIb573PfwO9SuNi4cNdmMs3Cn2AhsKQijEzJkfIreOqPWCYCNbRUhgfuy
+         lj9NKU69iH1NVLX3z+YfE4n5+pPHnPkXVxzU7CUzysMwkFvfKiJFF5spUIJVaWR0rMCX
+         5l8TDFYBD9S1A029Vanh63YAv0W1Dq+brhvm8bstvYrA6IWSgFYUZABEcpUAnimMX45Y
+         3TgHvZsPxSHl7SqvPA3T714r/br5nbnDFw9UXjK7OTKMO1DUSN5nWJxQvZQXoWP2p90Z
+         FveeipfU6xyhdYmnz7VQiFy0b6Dl8R5Un081bXMrdhU0FwBulxmM3NBaOsGsTY+FyckE
+         +Egg==
+X-Gm-Message-State: ACrzQf1Il+uH/7oYoDiKTiyIo/BgXURglt6KYMj2Y3KCRadL+ufbgOij
+        VCTEcvSSB40rOuQOljR0MMksCe+EbeQbpBwWUdDaMXY1KNI=
+X-Google-Smtp-Source: AMsMyM63RPWe7kk6TGFn/bH11f9CoYroliRjnVnb0biRaGLxhFjnmNx59KOInfw0zEArdkF68zzer5BwegsEuxNPiJQ=
+X-Received: by 2002:a2e:9208:0:b0:277:46da:16d2 with SMTP id
+ k8-20020a2e9208000000b0027746da16d2mr4819756ljg.161.1667249867312; Mon, 31
+ Oct 2022 13:57:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20221029170408.175533-1-abhay.maheshbhai.maheta@intel.com> <20221029170408.175533-2-abhay.maheshbhai.maheta@intel.com>
-In-Reply-To: <20221029170408.175533-2-abhay.maheshbhai.maheta@intel.com>
+References: <20221029170408.175533-1-abhay.maheshbhai.maheta@intel.com> <20221029170408.175533-5-abhay.maheshbhai.maheta@intel.com>
+In-Reply-To: <20221029170408.175533-5-abhay.maheshbhai.maheta@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 31 Oct 2022 13:48:20 -0700
-Message-ID: <CABBYNZ+VMZ6Fx-J7=VOO8zPtqG-2xksubhs=Ka3seVSQjfVFOg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/5] shared/bap: Fix handling for Company ID and
- Vendor Codec ID
+Date:   Mon, 31 Oct 2022 13:57:35 -0700
+Message-ID: <CABBYNZ+vgDyaAw9oLZpSMs8NXyrttLD7g7AzBYs8pedDRkQRDQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 4/5] media-api: Add CompanyID, VendorCodecID, Metadata
 To:     Abhay Maheta <abhay.maheshbhai.maheta@intel.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -64,59 +63,61 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Abhay,
 
-On Sat, Oct 29, 2022 at 9:53 AM Abhay Maheta
+On Sat, Oct 29, 2022 at 9:54 AM Abhay Maheta
 <abhay.maheshbhai.maheta@intel.com> wrote:
 >
-> This adds fixes for handing for Company ID and Vendor Codec ID
-> while adding PAC record to database and responding to Attribute
-> Read Request for Sink/Source PAC Characteristics.
+> From: "Maheta, Abhay" <abhay.maheshbhai.maheta@intel.com>
+>
+> This adds CompanyID, VendorCodecID, Metadata for RegisterEndpoint method
 > ---
->  src/shared/bap.c | 5 +++++
->  src/shared/bap.h | 2 +-
->  2 files changed, 6 insertions(+), 1 deletion(-)
+>  doc/media-api.txt | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >
-> diff --git a/src/shared/bap.c b/src/shared/bap.c
-> index c3c0d596f..0ae0eba33 100644
-> --- a/src/shared/bap.c
-> +++ b/src/shared/bap.c
-> @@ -416,6 +416,8 @@ static void pac_foreach(void *data, void *user_data)
+> diff --git a/doc/media-api.txt b/doc/media-api.txt
+> index 847f8bee7..ce2b74e53 100644
+> --- a/doc/media-api.txt
+> +++ b/doc/media-api.txt
+> @@ -34,11 +34,29 @@ Methods             void RegisterEndpoint(object endpoint, dict properties)
+>                                         match the profile specification which
+>                                         is indicated by the UUID.
 >
->         p = iov_add(iov, sizeof(*p));
->         p->codec.id = pac->codec.id;
-
-Lets check if the codec.id is 0xff before attempting to assign these
-values, btw since they are le16 we need to use cpu_to_le16 when
-assigning.
-
-> +       p->codec.cid = pac->codec.cid;
-> +       p->codec.vid = pac->codec.vid;
->
->         if (pac->data) {
->                 p->cc_len = pac->data->iov_len;
-> @@ -2415,6 +2417,9 @@ struct bt_bap_pac *bt_bap_add_vendor_pac(struct gatt_db *db,
->         if (!bdb)
->                 return NULL;
->
-> +       if ((id != 0xff) && ((cid != 0U)  || (vid != 0U)))
-> +               return NULL;
+> +                               uint16_t CompanyID:
 > +
->         codec.id = id;
->         codec.cid = cid;
->         codec.vid = vid;
-> diff --git a/src/shared/bap.h b/src/shared/bap.h
-> index 7b9f88c83..923669f32 100644
-> --- a/src/shared/bap.h
-> +++ b/src/shared/bap.h
-> @@ -39,8 +39,8 @@ struct bt_bap_stream;
+> +                                       Assigned number of Company ID that the
+> +                                       endpoint implements. It should be set to
+> +                                       appropriate value when Vendor Specific
+> +                                       Codec is used.
+> +
+> +                               uint16_t VendorCodecID:
+> +
+> +                                       Vendor-specific codec ID that the endpoint
+> +                                       implements. It should be set to appropriate
+> +                                       value when Vendor Specific Codec is used.
+
+I think we can be a less confusing with respect to CodecID, so instead
+of using the special 0xff to determine the endpoint is registering a
+vendor codec we can use the CompanyID directly, so if it is present
+(D-Bus property exists) then codec ID is used a vid and the codec id
+is set to 0x0ff.
+
+We also need to document if CompanyID is BAP only or not, afaik for
+A2DP we do have this information prepended into the Capabilities, but
+I think adding the CompanyID is better so I wouldn't oppose adding
+support for it also in A2DP.
+
+>                                 array{byte} Capabilities:
 >
->  struct bt_bap_codec {
->         uint8_t  id;
-> -       uint16_t vid;
->         uint16_t cid;
-> +       uint16_t vid;
->  } __packed;
+>                                         Capabilities blob, it is used as it is
+>                                         so the size and byte order must match.
 >
->  struct bt_ltv {
+> +                               array{byte} Metadata:
+> +
+> +                                       Metadata blob, it is used as it is
+> +                                       so the size and byte order must match.
+> +
+>                         Possible Errors: org.bluez.Error.InvalidArguments
+>                                          org.bluez.Error.NotSupported - emitted
+>                                          when interface for the end-point is
 > --
 > 2.25.1
 >
