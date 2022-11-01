@@ -2,50 +2,49 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 558FBC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 20:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F94EC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 21:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230208AbiKAUuW (ORCPT
+        id S230216AbiKAVAV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Nov 2022 16:50:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
+        Tue, 1 Nov 2022 17:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbiKAUuU (ORCPT
+        with ESMTP id S230224AbiKAVAS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Nov 2022 16:50:20 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E9118B34
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 13:50:19 -0700 (PDT)
+        Tue, 1 Nov 2022 17:00:18 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB221AF11
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 14:00:18 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 4010ECE1DBC
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 20:50:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 728E3C433D6;
-        Tue,  1 Nov 2022 20:50:16 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 94C59616D3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 21:00:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 09871C433B5;
+        Tue,  1 Nov 2022 21:00:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667335816;
-        bh=Uq3wL6wwXa4KFGHVvKUZdjq3gg5WzjgTgFp0cy8pvuk=;
+        s=k20201202; t=1667336417;
+        bh=5dhjWGGGC5lmfmO5TUvMNOsJf6sA8DyBjrn93pC2J/8=;
         h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=lhx01/Ol2Rgp3harza47b+VVxMjOCSn9jhI8le/2lHv6DJV83fJlzk2ghsdTwQrnS
-         f7ZfiyE/JtkwWsuCxfC9WIN3PxcAe+z9TblDrYHzSnJsjnZYur8Nf044oEumIepmDm
-         xhEkyqQA9ilmmjFXyKqooMDvU9CWcQaPiCodaNBSuYHzUvEWgMASfMBp0bbfqma5H4
-         rRuhN2Ou3JllRF647hqXAw/8MbfGtdZWUI34mVdaiHxYrGm6cOrWg71kaxtcrZrx16
-         dJXickYRlsY4GgU9Y3KWAo1vjO7Mffb86YFiJ5f2SIfSt1rSe5DJhFCCfy5TfJ6OQk
-         Zp+Udc79KJOWg==
+        b=ENUTOMWUOt/Z5eG4ejSb8z4rgNdZpTnhb4okTX4uD1QRRLbYh6jQlWBxJETD5lzNf
+         Nbnxk+JLG+6asE7hlt8OH+2JrcR6m6TMoBLpyIzdfahzXkFLIHIlEWrvN7vpPqUqGv
+         mDE/fJyb0cTz+lwKOVSWMczU4LD0YBnPREBHKvVCR/rnbhKcRdhHKBbrQavdpdW9jQ
+         OLyLQ5jXKsJEOdgXtha3mm315BD3EVOgqxoTh+3C6ReaqtnUOtlx1LOWg/sSEAVsrK
+         9y1pYKeL1FDhs7vzHnW3lksV810KVoI7zZPcF30fYP19Q5dNqjXW3QYGkZ4C49K41P
+         QAhzc1FnZneXw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 557D8E50D71;
-        Tue,  1 Nov 2022 20:50:16 +0000 (UTC)
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5886E270DC;
+        Tue,  1 Nov 2022 21:00:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: L2CAP: Fix attempting to access uninitialized
- memory
+Subject: Re: [PATCH BlueZ] tools/test-runner: Remove bluetooth.enable_ecred
 From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166733581634.15990.15185356562874303701.git-patchwork-notify@kernel.org>
-Date:   Tue, 01 Nov 2022 20:50:16 +0000
-References: <20221031231052.2718430-1-luiz.dentz@gmail.com>
-In-Reply-To: <20221031231052.2718430-1-luiz.dentz@gmail.com>
+Message-Id: <166733641693.20998.1801282842449868147.git-patchwork-notify@kernel.org>
+Date:   Tue, 01 Nov 2022 21:00:16 +0000
+References: <20221028234712.2213561-1-luiz.dentz@gmail.com>
+In-Reply-To: <20221028234712.2213561-1-luiz.dentz@gmail.com>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     linux-bluetooth@vger.kernel.org
 Precedence: bulk
@@ -54,25 +53,22 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluez.git (master)
 by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-On Mon, 31 Oct 2022 16:10:52 -0700 you wrote:
+On Fri, 28 Oct 2022 16:47:12 -0700 you wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> On l2cap_parse_conf_req the variable efs is only initialized if
-> remote_efs has been set.
+> L2CAP ECRED is now enabled by default by the following kernel change:
 > 
-> CVE: CVE-2022-42895
-> CC: stable@vger.kernel.org
-> Reported-by: Tamás Koczka <poprdi@google.com>
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> [...]
+> 98f18bb78b7d ("Bluetooth: Add CONFIG_BT_LE_L2CAP_ECRED")
+> ---
+>  tools/test-runner.c | 1 -
+>  1 file changed, 1 deletion(-)
 
 Here is the summary with links:
-  - Bluetooth: L2CAP: Fix attempting to access uninitialized memory
-    https://git.kernel.org/bluetooth/bluetooth-next/c/34f07dd531a4
+  - [BlueZ] tools/test-runner: Remove bluetooth.enable_ecred
+    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=b3f76b30ec9d
 
 You are awesome, thank you!
 -- 
