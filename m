@@ -2,121 +2,192 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F706C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 13:37:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B124C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 15:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229949AbiKANhr (ORCPT
+        id S231375AbiKAPIi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Nov 2022 09:37:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34854 "EHLO
+        Tue, 1 Nov 2022 11:08:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229929AbiKANhq (ORCPT
+        with ESMTP id S231400AbiKAPIK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Nov 2022 09:37:46 -0400
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 063A01B79B
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 06:37:45 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id 16-20020a9d0490000000b0066938311495so8479303otm.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Nov 2022 06:37:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=E0wzVNxN6aTcwvsmfkOT6wbkQLUHvUS3/kAWGpyoJ2M=;
-        b=l0zvPRxrvX5K4bt4W0ZcuX5t6ZvY7bIJl0Rb7yPYt4wAGv+9MHv7x+Lm7xS51o1Wqm
-         SeOXWNy8dOwCQFlxL7el7aF82qJZQf/PSKnC2JCoSedBdrT6hcZl3ezhr+rkTsC2KQ51
-         5PMSpfWhDcdi6T8lOqGPw72/RZECLTLzCF/QAZApRfIYr2eTa81rtZCskOnMuMnM+pPf
-         SKXbhjkgRkdPy6YxUk1e4gkqQII05g74EJFzazFnKfoT2qdOZeOlIFe3URVFeyNHfNMr
-         t3A5B9vc726QS5kd1bNqApt+zZt4TnAtXTHtD/Puo7uAz+8Q6JKJnoouqOeBDLqK0GD1
-         rI6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=E0wzVNxN6aTcwvsmfkOT6wbkQLUHvUS3/kAWGpyoJ2M=;
-        b=6D8g14jWPWROAioDUr1wTJ9smxtvsUV5nYSPA7H+x/dzvhlGgH8NEkqkmRnvcEU7yi
-         t9XLkI97oVOzak13NJkhK/bg1wnrY9O9Vq4lN5ypdDErcfXZHhIQM4eQfrdI5AnXh1Xu
-         j8pE2KLJmUVP0mrSucVmz3g0IW0mJkCjuDBMHc6+aryrMQYEv4QsQC8j/tqO7bdP+u+h
-         MF8kXp5vk4UCbpuJsMU5is/4Y9WRivYbieqYhOJTzWBFBD6wirshE3HNrzJTuE7XHgbP
-         uiY97KATqLoy5tQtz8k7rJQMdGxWpEngrmO1DsHOWAtnSrtwF15Fjf5iy3gqBxU8Sc6c
-         NRWA==
-X-Gm-Message-State: ACrzQf3Uf45iKb4jFTaK9kkEH7tJSk+JJhmmozdqQkq82BT/J5cd/8Qe
-        PvGYxjseLYKeBjuRTuXsGlnacTIMhR0wcQ==
-X-Google-Smtp-Source: AMsMyM614gyfWBvjlnN6+RQEOvmFBw8qOyzn1etkn8wXdqtsUr9idW6EUhcviOG+kXozlWSXsgJ86A==
-X-Received: by 2002:a9d:5907:0:b0:665:c301:2f1c with SMTP id t7-20020a9d5907000000b00665c3012f1cmr9406662oth.375.1667309864119;
-        Tue, 01 Nov 2022 06:37:44 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.227.139])
-        by smtp.gmail.com with ESMTPSA id e66-20020a4a5545000000b004805e9e9f3dsm3434753oob.1.2022.11.01.06.37.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Nov 2022 06:37:43 -0700 (PDT)
-Message-ID: <63612127.4a0a0220.ee3ae.be5c@mx.google.com>
-Date:   Tue, 01 Nov 2022 06:37:43 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2938725012337894439=="
+        Tue, 1 Nov 2022 11:08:10 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B1621EAC3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 08:01:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1667314890; x=1698850890;
+  h=date:from:to:cc:subject:message-id:mime-version:
+   content-transfer-encoding;
+  bh=bsCRFGJYmUqSPDQAP9cnr1KSgUBrKVe8daQBYP2NVsc=;
+  b=ONTGO2KJr4mqcZ7h9PoIpX5pNMGDO8vl1p4//7FSparUzeKO/YtG1vTT
+   hEYWLiBWaZkuWBhsgvLtuPMIfgQg5h1NLzmrDewcFmh+zyd0U3pj2K780
+   TX7JACQtKFO+uVQ81v3gwGt3Qw2Kpzyf8tIw3ECJABtRzTi+gpE6dpFa7
+   VM9CBHm5aXdFEAbTHgrgk0qM28y2oGu4TJ5/4yS5Jly5R1HvO8WKkH84y
+   e0zwFzgX45ZcjE1JgTd6rKpB/SSm+tb3xoZIAbqJv1dBoYumgdrYb2175
+   +Xh2r4eLU23XwmKWmvmC/5PpXzJ3+3a41vUomOMhxEyURO4xKd8Fl+BoA
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="306770170"
+X-IronPort-AV: E=Sophos;i="5.95,231,1661842800"; 
+   d="scan'208";a="306770170"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2022 08:00:00 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10518"; a="633896781"
+X-IronPort-AV: E=Sophos;i="5.95,231,1661842800"; 
+   d="scan'208";a="633896781"
+Received: from lkp-server02.sh.intel.com (HELO b6d29c1a0365) ([10.239.97.151])
+  by orsmga002.jf.intel.com with ESMTP; 01 Nov 2022 07:59:58 -0700
+Received: from kbuild by b6d29c1a0365 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1opskA-000Dj8-0r;
+        Tue, 01 Nov 2022 14:59:58 +0000
+Date:   Tue, 01 Nov 2022 22:59:24 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 214c507d87cca7098f470c6c59aa77ef8d55826f
+Message-ID: <6361344c.oaJst30KlcnzNXmK%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, marex@denx.de
-Subject: RE: [BlueZ] tools: Make hciattach_* firmware path build-time configurable
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221101115333.18223-1-marex@denx.de>
-References: <20221101115333.18223-1-marex@denx.de>
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2938725012337894439==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 214c507d87cca7098f470c6c59aa77ef8d55826f  Bluetooth: Use kzalloc instead of kmalloc/memset
 
-This is automated email and please do not reply to this email!
+elapsed time: 726m
 
-Dear submitter,
+configs tested: 114
+configs skipped: 2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690839
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
----Test result---
+gcc tested configs:
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64               randconfig-k001-20221031
+x86_64                              defconfig
+x86_64                           allyesconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                    rhel-8.3-kselftests
+i386                             allyesconfig
+i386                                defconfig
+ia64                             allmodconfig
+powerpc                           allnoconfig
+mips                             allyesconfig
+powerpc                          allmodconfig
+sh                               allmodconfig
+sh                              ul2_defconfig
+powerpc                 mpc8540_ads_defconfig
+openrisc                       virt_defconfig
+powerpc                 canyonlands_defconfig
+powerpc                         wii_defconfig
+sh                           sh2007_defconfig
+arm                         lubbock_defconfig
+powerpc                      chrp32_defconfig
+m68k                                defconfig
+arm                            mps2_defconfig
+arm64                            allyesconfig
+arm                                 defconfig
+arm                              allyesconfig
+m68k                             allyesconfig
+m68k                             allmodconfig
+arc                              allyesconfig
+alpha                            allyesconfig
+s390                                defconfig
+s390                             allmodconfig
+arc                                 defconfig
+alpha                               defconfig
+s390                             allyesconfig
+i386                 randconfig-a016-20221031
+i386                 randconfig-a012-20221031
+i386                 randconfig-a015-20221031
+i386                 randconfig-a013-20221031
+i386                 randconfig-a014-20221031
+i386                 randconfig-a011-20221031
+x86_64                           rhel-8.3-kvm
+x86_64                           rhel-8.3-syz
+x86_64                         rhel-8.3-kunit
+um                               alldefconfig
+mips                            ar7_defconfig
+x86_64               randconfig-a016-20221031
+x86_64               randconfig-a011-20221031
+x86_64               randconfig-a013-20221031
+x86_64               randconfig-a012-20221031
+x86_64               randconfig-a014-20221031
+x86_64               randconfig-a015-20221031
+m68k                            q40_defconfig
+xtensa                           alldefconfig
+loongarch                 loongson3_defconfig
+mips                           jazz_defconfig
+arm                           tegra_defconfig
+mips                 decstation_r4k_defconfig
+arm                          lpd270_defconfig
+i386                          randconfig-a012
+i386                          randconfig-a014
+i386                          randconfig-a016
+x86_64                        randconfig-a006
+x86_64                        randconfig-a004
+x86_64                        randconfig-a002
+i386                 randconfig-c001-20221031
+mips                 randconfig-c004-20221031
+arm                        mini2440_defconfig
+powerpc                      mgcoge_defconfig
+powerpc                 mpc834x_itx_defconfig
+mips                       bmips_be_defconfig
+i386                          randconfig-c001
+sparc                             allnoconfig
+xtensa                    smp_lx200_defconfig
+arm                          gemini_defconfig
+sh                 kfr2r09-romimage_defconfig
+xtensa                       common_defconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+riscv                             allnoconfig
+i386                   debian-10.3-kselftests
+i386                              debian-10.3
+nios2                            allyesconfig
+nios2                               defconfig
+parisc                              defconfig
+parisc64                            defconfig
+parisc                           allyesconfig
 
-Test Summary:
-CheckPatch                    PASS      1.01 seconds
-GitLint                       PASS      0.86 seconds
-Prep - Setup ELL              PASS      26.44 seconds
-Build - Prep                  PASS      0.68 seconds
-Build - Configure             PASS      8.16 seconds
-Build - Make                  PASS      723.76 seconds
-Make Check                    PASS      10.90 seconds
-Make Check w/Valgrind         PASS      287.82 seconds
-Make Distcheck                PASS      233.70 seconds
-Build w/ext ELL - Configure   PASS      8.17 seconds
-Build w/ext ELL - Make        PASS      83.94 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    WARNING   476.19 seconds
+clang tested configs:
+riscv                randconfig-r042-20221101
+hexagon              randconfig-r041-20221101
+hexagon              randconfig-r045-20221101
+s390                 randconfig-r044-20221101
+i386                          randconfig-a002
+i386                          randconfig-a006
+i386                          randconfig-a004
+x86_64                        randconfig-a012
+x86_64                        randconfig-a014
+x86_64                        randconfig-a016
+x86_64                        randconfig-a005
+x86_64                        randconfig-a003
+x86_64                        randconfig-a001
+arm                     am200epdkit_defconfig
+arm                       spear13xx_defconfig
+x86_64               randconfig-a005-20221031
+x86_64               randconfig-a006-20221031
+x86_64               randconfig-a004-20221031
+x86_64               randconfig-a001-20221031
+x86_64               randconfig-a003-20221031
+x86_64               randconfig-a002-20221031
+mips                        bcm63xx_defconfig
+powerpc                          allyesconfig
+arm                    vt8500_v6_v7_defconfig
 
-Details
-##############################
-Test: Scan Build - WARNING
-Desc: Run Scan Build with patches
-Output:
-*****************************************************************************
-The bugs reported by the scan-build may or may not be caused by your patches.
-Please check the list and fix the bugs if they are caused by your patch.
-*****************************************************************************
-tools/hciattach_qualcomm.c:218:8: warning: Although the value stored to 'n' is used in the enclosing expression, the value is never actually read from 'n'
-                if ((n = read_hci_event(fd, resp, 100)) < 0) {
-                     ^   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-tools/hciattach_qualcomm.c:253:8: warning: Although the value stored to 'n' is used in the enclosing expression, the value is never actually read from 'n'
-                if ((n = read_hci_event(fd, resp, 100)) < 0) {
-                     ^   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-2 warnings generated.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2938725012337894439==--
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
