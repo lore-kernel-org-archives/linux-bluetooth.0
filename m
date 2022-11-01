@@ -2,159 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 191BAECAAA1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 Oct 2022 23:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84196FA3741
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 00:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229707AbiJaX0I (ORCPT
+        id S229746AbiKAANS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 Oct 2022 19:26:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45078 "EHLO
+        Mon, 31 Oct 2022 20:13:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiJaX0H (ORCPT
+        with ESMTP id S229727AbiKAANR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 Oct 2022 19:26:07 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9692D1116F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 16:26:06 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id bp15so21443911lfb.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 16:26:06 -0700 (PDT)
+        Mon, 31 Oct 2022 20:13:17 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021D6120A7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 17:13:17 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id x16so7036842ilm.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 Oct 2022 17:13:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=TtIuvq1//1lJzVDLh1Y5DuWOGj5ouJ7nmpP7cB1TNSE=;
-        b=mPhu+8JUKj0areUFe5EvclqSmEAafg8f+7mNSjtqWR/sRXToPjSYRT/U8E2v+runqM
-         vE9rm6pyOer6RYb3GFSV9DE75MmiECGtQFWj0mChPM6Imxojrc4oCYCFq3QxqWbU0Mw0
-         slvByUAnsymXoQSv+LSxp6+Vr4JqR3BnwaHBBD8Ec//j3+fPli1GFjalmUa5SyrH3ejZ
-         zLjXRiUYkbD/N+gehPawtBifI7nuwRAeqEzHEfwbeNgpZ5d2HXhJoM+0yFGjGUdGDvZz
-         xGmzO/UQHPKmYz0uvHVqMGLN3oIRkE5t5k7Xo2bHKUHYODAzNWrCICleQTHFn4QwADqV
-         xwHQ==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=k35IYUbXOmmklSJFOCo9mWyupU5Rl95KIFauq2RgGiQ=;
+        b=YRYGKqrnKNOoi73A5iIrJmVlot5c8VJ1h1zkd0tFypoHJch7hJM+7SpVf/eETBVZ+6
+         PUzxv7LYZTMUenkrlJ8Ukdi/gvAy0u+Z8fGyTew+16yf71TrOgubup7UoZzP3IKhWjrD
+         Xj/M+D9ZvGltGNZ9VnQyVs9HT5Zb3Ra+Zt8omrJXcIpdzgmFHx6qNZlnUCcH32fE/zRj
+         x8ANNXHEdDELmOP3uGe7/Nrm1Lq+ViRpjnz8Re1ELdVuj6s2VGs5syUCggtn473m1QYE
+         ixQABqg3epQlSMpaNLRj3ITVK1UcQgjOycHp2y29G5B/7WKazPRNppmpSpGoo64PJXpv
+         A/9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TtIuvq1//1lJzVDLh1Y5DuWOGj5ouJ7nmpP7cB1TNSE=;
-        b=RogMKYGnaK7X6PVnbTnXkhiPEgz72QGg4UKfIW3xxQoCbYDJ3vq6g09v7jzxNkb4ev
-         1SgAwRUKACArJPR4DD38EV/sabMKdLBvl0SWGaENHAnZzr9X4p0mVfhrvyPEHZqogYM3
-         Aj2WTSttqGKuB5uDDv8wIL2mDif+bBjXPQlzMVWFGDmmTJ9vY0+sB1wQEGDhx5K8xekW
-         gFwce7rBnHE/lJ8pwdS0LZCun4EmfC7kyIIqSxfoxtwYyix/xLePRJ6hK5iO+3SShk+v
-         9ZI8CvKAMp+vTQc1muFYuiCSZWfT5IUbwhDmTSYOOsY4yBT7vWiPWRBQ/FaWfzrIHD3g
-         Unow==
-X-Gm-Message-State: ACrzQf1tP1Eo4IQdJrhDuLdIqolYEPmx3U1gZkjX+SYosfwc5ad3YYnx
-        QAYq1ceJ1K0lfiIbJVUL8+NV6dRnBdLyyVFy0FpnHVny9Tc=
-X-Google-Smtp-Source: AMsMyM4zhF+aF0cv/Gmd66O+IPr2LOj+h7EpBQnkKbfC0DXWTBpL1BJHhZ/IFyBCab5fzdsV0GAABQmwP2VRCjnyOoE=
-X-Received: by 2002:a05:6512:483:b0:4a2:6905:dfae with SMTP id
- v3-20020a056512048300b004a26905dfaemr6555455lfq.57.1667258764720; Mon, 31 Oct
- 2022 16:26:04 -0700 (PDT)
+        bh=k35IYUbXOmmklSJFOCo9mWyupU5Rl95KIFauq2RgGiQ=;
+        b=EWvMVpZMPsJOea0ohGeFuPMjhjUpHS12Pc0YoyDouxIKeDcBlsOnmyaKfdXHEQw6u8
+         ennhBPndxx6mrs0FZ5lmfSYGwob5qBwDT+HI5dIdhbARDvUniNbPb5fVFrQfT1nrg5CZ
+         PjfH3cZqlHwpVi12QBK5z+yGJI1YyZ7Vs6SMJGR+ilEtIBwzrDQi5ADAoyk4cK1dUqNF
+         U3WWLQXAHR6LH/OvmeA38YkU60euV1McLeWSH0IDecaCcmTUS/uXO1ZD0X7gJnkWz61V
+         9yvMXskIgdqQFaV17CxRPDGyxZ+/Te5VeknwBlEohvj2Vk0xAXE/ZNJ/iLDwc7Uz0OKM
+         gO3Q==
+X-Gm-Message-State: ACrzQf2yzYOmwiH+g2FnJtPNLze8ODOpRTHCQxn3Av585GoS8bO6kht2
+        xSnh40F7ISDcc5TI++75405Wcl/NKvo=
+X-Google-Smtp-Source: AMsMyM7WxIGfVmX+OK2+8SdMd5u9Iv8+svLBnqLW/3AG/QXHshDh6MgV/OtZV/HPam6m4r+C+4wxgQ==
+X-Received: by 2002:a92:c5c5:0:b0:300:91ca:a237 with SMTP id s5-20020a92c5c5000000b0030091caa237mr7525104ilt.319.1667261596209;
+        Mon, 31 Oct 2022 17:13:16 -0700 (PDT)
+Received: from [172.17.0.2] ([52.173.17.31])
+        by smtp.gmail.com with ESMTPSA id d197-20020a0262ce000000b003753b6452f9sm3199861jac.35.2022.10.31.17.13.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 31 Oct 2022 17:13:16 -0700 (PDT)
+Message-ID: <6360649c.020a0220.ffbe7.5766@mx.google.com>
+Date:   Mon, 31 Oct 2022 17:13:16 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0815403588540234612=="
 MIME-Version: 1.0
-References: <20221031220205.91975-1-brian.gix@intel.com>
-In-Reply-To: <20221031220205.91975-1-brian.gix@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 31 Oct 2022 16:25:53 -0700
-Message-ID: <CABBYNZ+myLec0HOja45=U=QuvkQEyLjRAuacT+Qwbi36v7qOjA@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
-To:     Brian Gix <brian.gix@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, marex@denx.de
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [1/2] Bluetooth: L2CAP: Fix accepting connection request for invalid SPSM
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221031231033.2718204-1-luiz.dentz@gmail.com>
+References: <20221031231033.2718204-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+--===============0815403588540234612==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 31, 2022 at 3:02 PM Brian Gix <brian.gix@intel.com> wrote:
->
-> The msft_set_filter_enable() command was using the deprecated
-> hci_request mechanism rather than hci_sync. This caused the warning error:
-> hci0: HCI_REQ-0xfcf0
->
-> Signed-off-by: Brian Gix <brian.gix@intel.com>
-> ---
->  net/bluetooth/msft.c | 36 +++++++++++-------------------------
->  1 file changed, 11 insertions(+), 25 deletions(-)
->
-> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-> index bee6a4c656be..bf5cee48916c 100644
-> --- a/net/bluetooth/msft.c
-> +++ b/net/bluetooth/msft.c
-> @@ -743,17 +743,12 @@ __u64 msft_get_features(struct hci_dev *hdev)
->  }
->
->  static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
-> -                                                      u8 status, u16 opcode,
-> -                                                      struct sk_buff *skb)
-> +                                                      void *user_data,
-> +                                                      u8 status)
->  {
-> -       struct msft_cp_le_set_advertisement_filter_enable *cp;
-> -       struct msft_rp_le_set_advertisement_filter_enable *rp;
-> +       struct msft_cp_le_set_advertisement_filter_enable *cp = user_data;
->         struct msft_data *msft = hdev->msft_data;
->
-> -       rp = (struct msft_rp_le_set_advertisement_filter_enable *)skb->data;
-> -       if (skb->len < sizeof(*rp))
-> -               return;
-> -
->         /* Error 0x0C would be returned if the filter enabled status is
->          * already set to whatever we were trying to set.
->          * Although the default state should be disabled, some controller set
-> @@ -766,7 +761,6 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
->
->         hci_dev_lock(hdev);
->
-> -       cp = hci_sent_cmd_data(hdev, hdev->msft_opcode);
->         msft->filter_enabled = cp->enable;
->
->         if (status == 0x0C)
-> @@ -804,31 +798,23 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
->         return msft_remove_monitor_sync(hdev, monitor);
->  }
->
-> -void msft_req_add_set_filter_enable(struct hci_request *req, bool enable)
-> -{
-> -       struct hci_dev *hdev = req->hdev;
-> -       struct msft_cp_le_set_advertisement_filter_enable cp;
-> -
-> -       cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
-> -       cp.enable = enable;
-> -
-> -       hci_req_add(req, hdev->msft_opcode, sizeof(cp), &cp);
-> -}
-> -
->  int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
->  {
-> -       struct hci_request req;
-> +       struct msft_cp_le_set_advertisement_filter_enable cp;
->         struct msft_data *msft = hdev->msft_data;
->         int err;
->
->         if (!msft)
->                 return -EOPNOTSUPP;
->
-> -       hci_req_init(&req, hdev);
-> -       msft_req_add_set_filter_enable(&req, enable);
-> -       err = hci_req_run_skb(&req, msft_le_set_advertisement_filter_enable_cb);
-> +       cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
-> +       cp.enable = enable;
-> +       err = __hci_cmd_sync_status(hdev, hdev->msft_opcode, sizeof(cp), &cp,
-> +                                   HCI_CMD_TIMEOUT);
-> +
-> +       msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
+This is automated email and please do not reply to this email!
 
-Except if this function is only supposed to be called for a safe
-context (which can block) we should actually use hci_cmd_sync_queue.
+Dear submitter,
 
->
-> -       return err;
-> +       return 0;
->  }
->
->  bool msft_curve_validity(struct hci_dev *hdev)
-> --
-> 2.38.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690674
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.61 seconds
+GitLint                       PASS      1.53 seconds
+SubjectPrefix                 PASS      1.27 seconds
+BuildKernel                   PASS      33.98 seconds
+BuildKernel32                 PASS      30.91 seconds
+Incremental Build with patchesPASS      52.58 seconds
+TestRunner: Setup             PASS      511.82 seconds
+TestRunner: l2cap-tester      PASS      17.23 seconds
+TestRunner: iso-tester        PASS      16.10 seconds
+TestRunner: bnep-tester       PASS      6.36 seconds
+TestRunner: mgmt-tester       PASS      103.63 seconds
+TestRunner: rfcomm-tester     PASS      10.15 seconds
+TestRunner: sco-tester        PASS      9.48 seconds
+TestRunner: ioctl-tester      PASS      10.63 seconds
+TestRunner: mesh-tester       PASS      7.82 seconds
+TestRunner: smp-tester        PASS      9.52 seconds
+TestRunner: userchan-tester   PASS      6.52 seconds
 
 
--- 
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0815403588540234612==--
