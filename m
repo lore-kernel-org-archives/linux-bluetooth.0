@@ -2,94 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C845C43219
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 21:16:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F69FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Nov 2022 21:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231172AbiKAVQl (ORCPT
+        id S230324AbiKAVW2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Nov 2022 17:16:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34048 "EHLO
+        Tue, 1 Nov 2022 17:22:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230448AbiKAVQG (ORCPT
+        with ESMTP id S230406AbiKAVWF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Nov 2022 17:16:06 -0400
-Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0971F2EC
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 14:15:27 -0700 (PDT)
-Received: from pop-os.home ([86.243.100.34])
-        by smtp.orange.fr with ESMTPA
-        id pyanoKD2rsfCIpybVoWfKn; Tue, 01 Nov 2022 22:15:26 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 01 Nov 2022 22:15:26 +0100
-X-ME-IP: 86.243.100.34
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH 22/30] Bluetooth: hci_debugfs: Use kstrtobool() instead of strtobool()
-Date:   Tue,  1 Nov 2022 22:14:10 +0100
-Message-Id: <b180bd1dea7b7561039f52cdbde6bcbe8688442c.1667336095.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1667336095.git.christophe.jaillet@wanadoo.fr>
-References: <cover.1667336095.git.christophe.jaillet@wanadoo.fr>
+        Tue, 1 Nov 2022 17:22:05 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4449C1DDF6
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Nov 2022 14:21:40 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id e189so2678937iof.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Nov 2022 14:21:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=AxX1Cktp6gphiF4roBan9FbTP4i2T9/txTh51XcmZh8=;
+        b=AC/mo59MEaZTzt8J3eF8HfL2S2HCQYamkZ902rUiFoaPwerUY22IuQbLA3FyJlDjiu
+         Jk4ZaPDAy2QcWcD3RI+g7U2p8VXq15sXp9T6wUN0ZirpuJvjTBQcLnIRHgRnFjaqeUp5
+         WDj02vxR5GRubihTgTPcchF+PwF/PKG9CFTGRhyVyIW/aM46D8LyomGolvslVgsZbydV
+         Rh+db0stuqn3BWbMHPiNTcLCiqEYp3CE1qBpvKAmqVzJJC7jv+Wfq4V4ms5A379BPHyW
+         j8ZYivg7VkJ/czwKayzfGAbR+Fk396dB8KOVOSOaixip9QyOqq8GNT2ygtp63Uyj+9Zd
+         uesw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AxX1Cktp6gphiF4roBan9FbTP4i2T9/txTh51XcmZh8=;
+        b=KTBuZyAXGwxyJ2+U55PBzFke7PRx9Wxkc45ZkwZUIvH2ut2n+5Wf3eYUaL7FiFymQN
+         huvsPC3pNX+f6xXn2vv/KmKUL0h1HQS0qfcVngTjXgdr8sMcVAcw3XcpruVgdwa+lpKK
+         0vQtvq6uZoRsRPP5yqZT/k2QLq8+lqU7mzzJdxeNtZgAX+E4O4E04wB2/WHZ1py2bhpC
+         dcOKMX5bXa3/HaVOFSvUrgq57Ivd9pfAEtTzC4zd6G4yFcUIxeucxzdiZVDQJaW018aF
+         QDi4/cgQjNSdj78M60qES1TI03WjTmvkArx58riOznySQsdrMsXSJNprtmaArr4wSTvB
+         +6yg==
+X-Gm-Message-State: ACrzQf3UwjxQ2U7W4222Q6rwWC60VdnpoRbb/6BokN7ONz5dZ5sziwg1
+        0fkpH+alVSjnQtMYO7xfGcUj03pdcAM=
+X-Google-Smtp-Source: AMsMyM5l9lqQKD5uM2103nOfrKn6AEkZbKx7cHpuccQHMZZAApeJGHGmtH5PuUKVHbsVviVJ4okeEg==
+X-Received: by 2002:a02:3346:0:b0:375:4c11:ee4d with SMTP id k6-20020a023346000000b003754c11ee4dmr10872472jak.207.1667337699491;
+        Tue, 01 Nov 2022 14:21:39 -0700 (PDT)
+Received: from [172.17.0.2] ([52.176.137.117])
+        by smtp.gmail.com with ESMTPSA id g9-20020a025b09000000b00363dfbb145asm4094555jab.30.2022.11.01.14.21.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 01 Nov 2022 14:21:39 -0700 (PDT)
+Message-ID: <63618de3.020a0220.35076.6c44@mx.google.com>
+Date:   Tue, 01 Nov 2022 14:21:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6011425308638644755=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marex@denx.de
+Subject: RE: [BlueZ] tools: Switch hciattach_qualcomm to FAILIF macro completely
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221101202636.143165-1-marex@denx.de>
+References: <20221101202636.143165-1-marex@denx.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-strtobool() is the same as kstrtobool().
-However, the latter is more used within the kernel.
+--===============6011425308638644755==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In order to remove strtobool() and slightly simplify kstrtox.h, switch to
-the other function name.
+This is automated email and please do not reply to this email!
 
-While at it, include the corresponding header file (<linux/kstrtox.h>)
+Dear submitter,
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690948
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.14 seconds
+GitLint                       PASS      0.76 seconds
+Prep - Setup ELL              PASS      26.29 seconds
+Build - Prep                  PASS      0.71 seconds
+Build - Configure             PASS      8.19 seconds
+Build - Make                  PASS      731.42 seconds
+Make Check                    PASS      11.41 seconds
+Make Check w/Valgrind         PASS      289.30 seconds
+Make Distcheck                PASS      237.17 seconds
+Build w/ext ELL - Configure   PASS      8.27 seconds
+Build w/ext ELL - Make        PASS      84.31 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      471.06 seconds
+
+
+
 ---
-This patch is part of a serie that axes all usages of strtobool().
-Each patch can be applied independently from the other ones.
+Regards,
+Linux Bluetooth
 
-The last patch of the serie removes the definition of strtobool().
 
-You may not be in copy of the cover letter. So, if needed, it is available
-at [1].
-
-[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
----
- net/bluetooth/hci_debugfs.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index b7f682922a16..f1ef60ddd4a6 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -22,6 +22,7 @@
- */
- 
- #include <linux/debugfs.h>
-+#include <linux/kstrtox.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -1152,7 +1153,7 @@ static ssize_t force_no_mitm_write(struct file *file,
- 		return -EFAULT;
- 
- 	buf[buf_size] = '\0';
--	if (strtobool(buf, &enable))
-+	if (kstrtobool(buf, &enable))
- 		return -EINVAL;
- 
- 	if (enable == hci_dev_test_flag(hdev, HCI_FORCE_NO_MITM))
--- 
-2.34.1
-
+--===============6011425308638644755==--
