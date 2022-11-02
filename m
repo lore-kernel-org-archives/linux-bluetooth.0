@@ -2,85 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A0E0C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 21:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC71C43219
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 23:59:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231429AbiKBVAU (ORCPT
+        id S230214AbiKBX7c (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Nov 2022 17:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48552 "EHLO
+        Wed, 2 Nov 2022 19:59:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230423AbiKBVAR (ORCPT
+        with ESMTP id S230045AbiKBX7a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Nov 2022 17:00:17 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D593FB4AA;
-        Wed,  2 Nov 2022 14:00:16 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 79DA461C30;
-        Wed,  2 Nov 2022 21:00:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C6BBBC433D7;
-        Wed,  2 Nov 2022 21:00:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1667422815;
-        bh=rIUydBfZ/OIOgcTF4j0Jp0sVduCixsJqQhwy6N9z7Vg=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=O/NgJH9Dpiu5+pYxOaNH1309XAMaVISEQ8B68lj0vpUfHldjZpJpJEKW7WFiEIow8
-         gnunA76cu0/mLVIPOcEvJoBrg719r9r7k7e4aC0KUReAy3wNFTHzdsg/4grNNXzPbM
-         WxI7kVMnjjn34tqDqYFwsQKhZPNFCi+NWU0Jt6hu6+D9+igGtemzcMyqfjp55TN7ro
-         flpWVKc1l2gV1x4mzCNfaVLO8KRmV3iI3vACAP5LxdfVz6FnJ63AKv0p+d9onFj0ef
-         f1e4+c2s6ugkKezMfS/flvqnEF4irYG1J6oO4qMlmC3OTXXrdoGBOq3HBhaneBJuOI
-         cq+biWey9eYXg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AB6BBE270D5;
-        Wed,  2 Nov 2022 21:00:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Wed, 2 Nov 2022 19:59:30 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED5A2AFE;
+        Wed,  2 Nov 2022 16:59:30 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id k7so365277pll.6;
+        Wed, 02 Nov 2022 16:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=iByqjDsI8yxVjMZdPIB03/uaN8B4xJBEg5Q2hHGB0cU=;
+        b=LLsd3G17eaWY1UxRCpi+0/xGUOzYwv3fwRWk/2UOhIAf6OO+bWSOk9yw6b8DZwZESx
+         IA62NLYYpwLINEij7RAURObd/Q4bFNryA/6OEDnyqD5TYU76gd0RGgGW6fy2E2NA/RS/
+         Qbe7JeKW3ApFgrwzEVHOFGq/WnChpgFd2AAtq9f20k3crodAYxjCHRW4UxzEQOUq5ud9
+         +MK39u5egxOnzBHJYiGp4ThhpoCvk1+qIf2VxSS5Zi7ZFgYLaoQylmlXe5yrUhhuXiYU
+         7BMfa0AWn6m9oGtIImfTA2SozvOXQaGfudS59jnlvALb/Vo9AEKmkv7I/ztJSANuZKX9
+         CrDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iByqjDsI8yxVjMZdPIB03/uaN8B4xJBEg5Q2hHGB0cU=;
+        b=rMEk82u4+w8FQ7Z1brBkZnb6hvC5knnF5DLo6HFFsD3ov3EgQMInutZhiIekwYrK5v
+         7vhh6Gn0KXPFlarbFhVw/HvEvEuCs+nvxKJv9FozUqrcV2W2LxMSPd1ePHzEkczgQaJF
+         /2SB3DxbPnbuEDwdpkxnzP/CaKodpDLa+9mhBl/6wkV/70mAnGe+EwguHsZFMnGQZyJp
+         K5b9KosfLyFzAMB6YcR84bMQfCla5IKvCh1MgdqzjrPQRJL9tmrrfVm9ltmTIUX5Z7is
+         DA6x6KErbiYa68ihGH9BbW/TBORHEj0J1jgPGnl9jk7Hs8g1divK4zIHcCLs57vIJtFz
+         SC7A==
+X-Gm-Message-State: ACrzQf12UDo7BR0zEpH2DWnRP54J8YxfeyXsdbzGNBoPCAMfgkvsZ4mL
+        /MUmu6qZkinneMnVLOy3tGvk1uamPXs=
+X-Google-Smtp-Source: AMsMyM4R41P97nKS+jW57b21Q5FJEOt0OxM3zaDBKxbavSfOu9bTDGOtY0eB/Umu2VDZKlafJGKiLw==
+X-Received: by 2002:a17:903:1c2:b0:187:feb:1f31 with SMTP id e2-20020a17090301c200b001870feb1f31mr23657217plh.92.1667433569666;
+        Wed, 02 Nov 2022 16:59:29 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id d13-20020a170902654d00b00172f6726d8esm8852548pln.277.2022.11.02.16.59.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 16:59:28 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull-request: bluetooth 2022-10-02
+Date:   Wed,  2 Nov 2022 16:59:27 -0700
+Message-Id: <20221102235927.3324891-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: broadcom-bluetooth: Add CYW4373A0 DT
- binding
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166742281569.25440.9584575292031556354.git-patchwork-notify@kernel.org>
-Date:   Wed, 02 Nov 2022 21:00:15 +0000
-References: <20221102164705.14538-1-marex@denx.de>
-In-Reply-To: <20221102164705.14538-1-marex@denx.de>
-To:     Marek Vasut <marex@denx.de>
-Cc:     linux-bluetooth@vger.kernel.org, pbrobinson@gmail.com,
-        robh@kernel.org, linus.walleij@linaro.org,
-        hakan.jansson@infineon.com, krzysztof.kozlowski@linaro.org,
-        luiz.von.dentz@intel.com, marcel@holtmann.org, robh+dt@kernel.org,
-        devicetree@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+The following changes since commit ba9169f57090efdee6b13601fced57e123db8777:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+  Merge branch 'misdn-fixes' (2022-11-02 12:34:48 +0000)
 
-On Wed,  2 Nov 2022 17:47:04 +0100 you wrote:
-> CYW4373A0 is a Wi-Fi + Bluetooth combo device from Cypress.
-> This chip is present e.g. on muRata 2AE module. Extend the
-> binding with its DT compatible.
-> 
-> Acked-by: Rob Herring <robh@kernel.org>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Marek Vasut <marex@denx.de>
-> 
-> [...]
+are available in the Git repository at:
 
-Here is the summary with links:
-  - [v2,1/2] dt-bindings: net: broadcom-bluetooth: Add CYW4373A0 DT binding
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0a8d4b84bbd5
-  - [v2,2/2] Bluetooth: hci_bcm: Add CYW4373A0 support
-    https://git.kernel.org/bluetooth/bluetooth-next/c/ce52c2f04177
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2022-10-02
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+for you to fetch changes up to b1a2cd50c0357f243b7435a732b4e62ba3157a2e:
 
+  Bluetooth: L2CAP: Fix attempting to access uninitialized memory (2022-11-02 16:37:00 -0700)
 
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+ - Fix memory leak in hci_vhci driver
+ - Fix handling of skb on virtio_bt driver
+ - Fix accepting connection for invalid L2CAP PSM
+ - Fix attemting to access uninitialized memory
+ - Fix use-after-free in l2cap_reassemble_sdu
+ - Fix use-after-free in l2cap_conn_del
+ - Fix handling of destination address type for CIS
+ - Fix not restoring ISO buffer count on disconnect
+
+----------------------------------------------------------------
+Hawkins Jiawei (1):
+      Bluetooth: L2CAP: Fix memory leak in vhci_write
+
+Luiz Augusto von Dentz (4):
+      Bluetooth: hci_conn: Fix not restoring ISO buffer count on disconnect
+      Bluetooth: L2CAP: Fix accepting connection request for invalid SPSM
+      Bluetooth: L2CAP: Fix l2cap_global_chan_by_psm
+      Bluetooth: L2CAP: Fix attempting to access uninitialized memory
+
+Maxim Mikityanskiy (1):
+      Bluetooth: L2CAP: Fix use-after-free caused by l2cap_reassemble_sdu
+
+Pauli Virtanen (1):
+      Bluetooth: hci_conn: Fix CIS connection dst_type handling
+
+Soenke Huster (1):
+      Bluetooth: virtio_bt: Use skb_put to set length
+
+Zhengchao Shao (1):
+      Bluetooth: L2CAP: fix use-after-free in l2cap_conn_del()
+
+ drivers/bluetooth/virtio_bt.c |  2 +-
+ net/bluetooth/hci_conn.c      | 18 ++++++---
+ net/bluetooth/iso.c           | 14 ++++++-
+ net/bluetooth/l2cap_core.c    | 86 ++++++++++++++++++++++++++++++++++++-------
+ 4 files changed, 98 insertions(+), 22 deletions(-)
