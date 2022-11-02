@@ -2,167 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5F03C43219
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 16:49:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D680C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 17:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232094AbiKBQt3 (ORCPT
+        id S230136AbiKBRdF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Nov 2022 12:49:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52960 "EHLO
+        Wed, 2 Nov 2022 13:33:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231963AbiKBQtL (ORCPT
+        with ESMTP id S230116AbiKBRdC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Nov 2022 12:49:11 -0400
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C3A1EEC8;
-        Wed,  2 Nov 2022 09:47:25 -0700 (PDT)
-Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: marex@denx.de)
-        by phobos.denx.de (Postfix) with ESMTPSA id 4144685072;
-        Wed,  2 Nov 2022 17:47:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-        s=phobos-20191101; t=1667407643;
-        bh=4XK5Cyp7p6i8f2+fuR0IJHEB+iVox8xnrnDJEkhFRW8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d2eHUH0jg9ia1ISjacMN/W263RYlkdx38O8uQcdG4nGv1pBhw7II8FUNN0Zo1vcoP
-         0RbheIh4FolSfPPm6CgnsdRhPSf0S2HMKSzgnh9gbF5JeDvUMwBcEdShMz7yPjAA+q
-         tvQzWwHiWd+thtGh3UonEgso717pjKxD+G07Lboakk/7fN6r6QCi1yDuXer9IC3ZeB
-         7MlMNPLWXE+DniWDnGuMMJaPKESJ+bmc3ecKmJ+mDLJrBsHiQI3+0NbRusKGE2Gc0U
-         p6pTOd43oN2kOEqx9ps3gQumFQIxo2ZWo/ZE2jsZv3H9DgEfy85Ih/19z8FgrHy0dg
-         RPcdEXHrowjGw==
-From:   Marek Vasut <marex@denx.de>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     pbrobinson@gmail.com, Marek Vasut <marex@denx.de>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Hakan Jansson <hakan.jansson@infineon.com>,
-        Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: hci_bcm: Add CYW4373A0 support
-Date:   Wed,  2 Nov 2022 17:47:05 +0100
-Message-Id: <20221102164705.14538-2-marex@denx.de>
-X-Mailer: git-send-email 2.35.1
+        Wed, 2 Nov 2022 13:33:02 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 517E0CE39
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Nov 2022 10:33:01 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id r18so16795843pgr.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Nov 2022 10:33:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=hPvrYeIyYQuSHXDFmtNjQkxhzS6/ceZqEjDTjg/DnC0=;
+        b=G6y5PTiLCDwR1xLQi+P6UswZbbSW3SHcUAn1OK9kOknjJPJ/XF7Mwtkk4MYS+Oq3hE
+         AykQ4Mn8T1LUlpTUNxfyKPL3zZGo2CbUyb8T0OLbwxqIb7DEoLzSWWdtyW/QhHBhIMhv
+         ok+WQSnJNF06v2l3N3F32dQbPlZQtEYpPRJuudoMJs+b/WRGnJcKMq5duVI309l5o/mT
+         mBZkVPnkTIZJ6s0KK/STCNwD0jZvCPDRoWw3+q7hhBuGiP7cwqBXUyTiz+u88I4hFdeV
+         SKkNzW5ik9CWZf28R5CtAbDnuq0VEAaAzNcIF0xo/daw+YQ+hN2SW8TboatlwEgNQmIu
+         kRsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hPvrYeIyYQuSHXDFmtNjQkxhzS6/ceZqEjDTjg/DnC0=;
+        b=7nFnw6MNHRSoh3sDek2ZkeT6AoWHgIJ62N1sHwdb2zDfuAeSzJPO5RJ5ZLumFDJdBZ
+         dEZPyYrRtmu9Se/LVps1rVC2dZSSG0zQnv73+WIWxDRpJRhwbsqChfKLN94H0ON9zYrg
+         VaxsaNEOl9DR5GPOHgqczdyh5Jq68pgSF514KRpHYoezJdIs1DaNY5wRTU58zc/alZGo
+         Ky6MEYJNMUhH8zaebAUBjomkDDJNDUFT6ABGEkCjyajbJx9L6TATijzMd5nwv7ctmLIH
+         xTUr0DeZEM72tM5hHbi3DNXUJ3TIAEsLgH1pBwqUG2VlUTal5jT2W1543FPHQYc2PC80
+         UTKA==
+X-Gm-Message-State: ACrzQf1fBnjqtBmhH2CNyvrZk9AZzWFBpbnJ8FCaSE51a98zuwSC5Hk4
+        AVC3c8JlG2AHQs6SZQRA8JcPIxZxS9dsLQ==
+X-Google-Smtp-Source: AMsMyM7yB98JW+spdsXI3xX9VaWdZm9CpRJ2u8ruFZ6DsikHExwROJxad5AmSzNZhC52xzaEXGFC1A==
+X-Received: by 2002:a05:6a00:190a:b0:56c:123e:3e61 with SMTP id y10-20020a056a00190a00b0056c123e3e61mr26152357pfi.47.1667410380561;
+        Wed, 02 Nov 2022 10:33:00 -0700 (PDT)
+Received: from [172.17.0.2] ([13.93.167.25])
+        by smtp.gmail.com with ESMTPSA id z20-20020a63e114000000b0046fe658a903sm3517550pgh.94.2022.11.02.10.32.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 10:33:00 -0700 (PDT)
+Message-ID: <6362a9cc.630a0220.88da.6f81@mx.google.com>
+Date:   Wed, 02 Nov 2022 10:33:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8227352605660888686=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, marex@denx.de
+Subject: RE: [v2,1/2] dt-bindings: net: broadcom-bluetooth: Add CYW4373A0 DT binding
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20221102164705.14538-1-marex@denx.de>
 References: <20221102164705.14538-1-marex@denx.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: clamav-milter 0.103.6 at phobos.denx.de
-X-Virus-Status: Clean
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-CYW4373A0 is a Wi-Fi + Bluetooth combo device from Cypress.
-This chip is present e.g. on muRata 2AE module.
+--===============8227352605660888686==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This chip has additional quirk where the HCI command 0xfc45, used on
-older chips to switch UART clock from 24 MHz to 48 MHz, to support
-baudrates over 3 Mbdps, is no longer recognized by this newer chip.
-This newer chip can configure the 4 Mbdps baudrate without the need
-to issue HCI command 0xfc45, so add flag to indicate this and do not
-issue the command on this chip to avoid failure to set 4 Mbdps baud
-rate.
+This is automated email and please do not reply to this email!
 
-It is not clear whether there is a way to determine which chip does
-and which chip does not support the HCI command 0xfc45, other than
-trial and error.
+Dear submitter,
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Marek Vasut <marex@denx.de>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=691310
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.85 seconds
+GitLint                       PASS      0.94 seconds
+SubjectPrefix                 FAIL      0.34 seconds
+BuildKernel                   PASS      46.24 seconds
+BuildKernel32                 PASS      41.91 seconds
+Incremental Build with patchesPASS      68.73 seconds
+TestRunner: Setup             PASS      679.47 seconds
+TestRunner: l2cap-tester      PASS      21.71 seconds
+TestRunner: iso-tester        PASS      22.51 seconds
+TestRunner: bnep-tester       PASS      8.52 seconds
+TestRunner: mgmt-tester       PASS      143.45 seconds
+TestRunner: rfcomm-tester     PASS      13.16 seconds
+TestRunner: sco-tester        PASS      12.39 seconds
+TestRunner: ioctl-tester      PASS      14.48 seconds
+TestRunner: mesh-tester       PASS      10.53 seconds
+TestRunner: smp-tester        PASS      12.39 seconds
+TestRunner: userchan-tester   PASS      8.81 seconds
+
+Details
+##############################
+Test: SubjectPrefix - FAIL - 0.34 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
-Cc: Hakan Jansson <hakan.jansson@infineon.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Rob Herring <robh+dt@kernel.org>
-Cc: devicetree@vger.kernel.org
-To: linux-bluetooth@vger.kernel.org
----
-V2: - Rename bcm4373a0_device_data to cyw4373a0_device_data to be
-      consistent with the rest of the device naming
-    - Add RB from Linus
----
- drivers/bluetooth/hci_bcm.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
-index d7e0b75db8a60..2b6c0e1922cb3 100644
---- a/drivers/bluetooth/hci_bcm.c
-+++ b/drivers/bluetooth/hci_bcm.c
-@@ -53,11 +53,13 @@
-  * struct bcm_device_data - device specific data
-  * @no_early_set_baudrate: Disallow set baudrate before driver setup()
-  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
-+ * @no_uart_clock_set: UART clock set command for >3Mbps mode is unavailable
-  * @max_autobaud_speed: max baudrate supported by device in autobaud mode
-  */
- struct bcm_device_data {
- 	bool	no_early_set_baudrate;
- 	bool	drive_rts_on_open;
-+	bool	no_uart_clock_set;
- 	u32	max_autobaud_speed;
- };
- 
-@@ -100,6 +102,7 @@ struct bcm_device_data {
-  * @is_suspended: whether flow control is currently disabled
-  * @no_early_set_baudrate: don't set_baudrate before setup()
-  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
-+ * @no_uart_clock_set: UART clock set command for >3Mbps mode is unavailable
-  * @pcm_int_params: keep the initial PCM configuration
-  * @use_autobaud_mode: start Bluetooth device in autobaud mode
-  * @max_autobaud_speed: max baudrate supported by device in autobaud mode
-@@ -140,6 +143,7 @@ struct bcm_device {
- #endif
- 	bool			no_early_set_baudrate;
- 	bool			drive_rts_on_open;
-+	bool			no_uart_clock_set;
- 	bool			use_autobaud_mode;
- 	u8			pcm_int_params[5];
- 	u32			max_autobaud_speed;
-@@ -172,10 +176,11 @@ static inline void host_set_baudrate(struct hci_uart *hu, unsigned int speed)
- static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
- {
- 	struct hci_dev *hdev = hu->hdev;
-+	struct bcm_data *bcm = hu->priv;
- 	struct sk_buff *skb;
- 	struct bcm_update_uart_baud_rate param;
- 
--	if (speed > 3000000) {
-+	if (speed > 3000000 && !bcm->dev->no_uart_clock_set) {
- 		struct bcm_write_uart_clock_setting clock;
- 
- 		clock.type = BCM_UART_CLOCK_48MHZ;
-@@ -1529,6 +1534,7 @@ static int bcm_serdev_probe(struct serdev_device *serdev)
- 		bcmdev->max_autobaud_speed = data->max_autobaud_speed;
- 		bcmdev->no_early_set_baudrate = data->no_early_set_baudrate;
- 		bcmdev->drive_rts_on_open = data->drive_rts_on_open;
-+		bcmdev->no_uart_clock_set = data->no_uart_clock_set;
- 	}
- 
- 	return hci_uart_register_device(&bcmdev->serdev_hu, &bcm_proto);
-@@ -1550,6 +1556,10 @@ static struct bcm_device_data bcm43438_device_data = {
- 	.drive_rts_on_open = true,
- };
- 
-+static struct bcm_device_data cyw4373a0_device_data = {
-+	.no_uart_clock_set = true,
-+};
-+
- static struct bcm_device_data cyw55572_device_data = {
- 	.max_autobaud_speed = 921600,
- };
-@@ -1566,6 +1576,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
- 	{ .compatible = "brcm,bcm4349-bt", .data = &bcm43438_device_data },
- 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
- 	{ .compatible = "brcm,bcm4335a0" },
-+	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
- 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
- 	{ },
- };
--- 
-2.35.1
 
+--===============8227352605660888686==--
