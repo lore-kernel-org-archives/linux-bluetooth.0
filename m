@@ -2,140 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78583C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 17:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFE1DC43217
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 18:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbiKBR7j (ORCPT
+        id S229772AbiKBSWa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Nov 2022 13:59:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
+        Wed, 2 Nov 2022 14:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230150AbiKBR7i (ORCPT
+        with ESMTP id S231749AbiKBSVy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Nov 2022 13:59:38 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4BF21EEDD
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Nov 2022 10:59:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1667411977; x=1698947977;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=InEZeZdNqHj6bbfxfSEZhhK1gaslNg5sOEx6GflAtY8=;
-  b=KSqEIsy/N+2KQqZIgvhV5yRCb1PVNluDLMztHSDZaNvkq8O+3b6sF4oR
-   RTDb4mvKtH/ZLnc+pALEV6L9VVOrOp4SE+iCac67FMYrNDoQbvuuqVqn+
-   uj3Qsa0Vi5zEAy+nbFwJA5KrTQu+JJrQfxUO91WYD9+qPIZBdXJeBds3M
-   /LR6jS7jmImgXuYLA1HHzbXd/mRJ+u+qZiTNntwk3ZBsvckUamJwdzwVh
-   h3h2UQTSVA6xsSDrUtphKWU/OtiD7peQUx17wM9BEjPJdFoHikdYjqc0t
-   NoM02FeqhBD8Cun7POWr4OoQMEswJZZJ5gCABrDy/1/3MVlmM2n+hvZxj
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="292798251"
-X-IronPort-AV: E=Sophos;i="5.95,234,1661842800"; 
-   d="scan'208";a="292798251"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 10:59:36 -0700
-X-IronPort-AV: E=McAfee;i="6500,9779,10519"; a="963626147"
-X-IronPort-AV: E=Sophos;i="5.95,234,1661842800"; 
-   d="scan'208";a="963626147"
-Received: from xwang-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.69.185])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Nov 2022 10:59:36 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, brian.gix@intel.com, marex@denx.de
-Subject: [PATCH 1/1] Bluetooth: Convert MSFT filter HCI cmd to hci_sync
-Date:   Wed,  2 Nov 2022 10:59:27 -0700
-Message-Id: <20221102175927.401091-2-brian.gix@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20221102175927.401091-1-brian.gix@intel.com>
-References: <20221102175927.401091-1-brian.gix@intel.com>
+        Wed, 2 Nov 2022 14:21:54 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D0E22FC21
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Nov 2022 11:21:33 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id x15so7304208qtv.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Nov 2022 11:21:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=sseegeWh/bRja3a1O2fVn3O+gyiXYngXRzUb8Ni002c=;
+        b=DTQEM9jV1PZum7ulwyqDsU6yXYyccwUEQCpwYUx3bimkbjo+6tU0JmvYSLYZ0HAiXx
+         JkZgQ0VhQYXYXV8fTvEkaQAWkZHv0GX+4YHwHOXKvS/SKCD4RsFNKaJSBX+05npwzvMS
+         bwJ+k7B38YtteicQUZctYypSmsWG9T49f9Srww3yVNg9ba9EswWN0ZFLwV5wQvRoWkBl
+         TiF8rX4spNquCbIjo0NmF5HTqc9dfDEOApiGf3ifmf363ZP3fCyT1Bn4O0e716RmndKH
+         Jku7GrK/d+Oo7yNyJjkBd4w4bMuplh2Dr4x6Q2CsL2TqYJ4ajpV4SZQgn0+CwD2BrVex
+         WuKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sseegeWh/bRja3a1O2fVn3O+gyiXYngXRzUb8Ni002c=;
+        b=OnZVQd6079FWCXw3h2KY/NVSQJUG4dyGgj1JghTsEUqHprsmJuo1oWTtObNVeXVGDe
+         eUKh384DVYAXgWp8/hfCCTi8WEOiuhH/m8dQ1XWuMHhxrhBPL72xAu6XW1lA5DIGwn05
+         Xtp8G1DxsBBRvqI4OPkJvbjjsN/zipaE8YO+WvpdOty6hFnn8PCntBvoa+vshApBYN2n
+         7aeXKyEchnhEZ72hTNypKis0W1k8QFF4wsixLrgakHMNB0O1FUqt/8qN6QmYvgNKecpi
+         5bO3qF6QgMa/f14DGuy+8a9twt0T4jdXz9qMxgqBiUUUIcUlbtIhhvKaPH8geM6eNP/i
+         NqDQ==
+X-Gm-Message-State: ACrzQf24hU/H12EM41BAi9ZB72c6VtH/DpubsHOjVgTth7ziGPduLtWZ
+        AeFGe1dh+2uGPP5DsaQgJVtzPZi7kY422w==
+X-Google-Smtp-Source: AMsMyM47fwZ/DbDUlPIDqGftmWW0N5/2Ec++ZAl1itqEuDmZ5zswgp6Ks2q5g/nDAXWup2a2I0024A==
+X-Received: by 2002:ac8:4e88:0:b0:39c:d4cb:9720 with SMTP id 8-20020ac84e88000000b0039cd4cb9720mr20607454qtp.345.1667413292231;
+        Wed, 02 Nov 2022 11:21:32 -0700 (PDT)
+Received: from [172.17.0.2] ([20.228.173.27])
+        by smtp.gmail.com with ESMTPSA id h22-20020ac85156000000b003a533886612sm3185741qtn.3.2022.11.02.11.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Nov 2022 11:21:32 -0700 (PDT)
+Message-ID: <6362b52c.c80a0220.1cf4b.e3bf@mx.google.com>
+Date:   Wed, 02 Nov 2022 11:21:32 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4299988683398459495=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: Fix MSFT filter enable
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221102175927.401091-2-brian.gix@intel.com>
+References: <20221102175927.401091-2-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The msft_set_filter_enable() command was using the deprecated
-hci_request mechanism rather than hci_sync. This caused the warning error:
-hci0: HCI_REQ-0xfcf0
+--===============4299988683398459495==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Brian Gix <brian.gix@intel.com>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=691340
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      5.77 seconds
+GitLint                       PASS      1.16 seconds
+SubjectPrefix                 PASS      0.88 seconds
+BuildKernel                   PASS      34.04 seconds
+BuildKernel32                 PASS      30.65 seconds
+Incremental Build with patchesPASS      45.09 seconds
+TestRunner: Setup             PASS      506.26 seconds
+TestRunner: l2cap-tester      PASS      17.64 seconds
+TestRunner: iso-tester        PASS      16.55 seconds
+TestRunner: bnep-tester       PASS      6.63 seconds
+TestRunner: mgmt-tester       PASS      105.41 seconds
+TestRunner: rfcomm-tester     PASS      10.50 seconds
+TestRunner: sco-tester        PASS      9.84 seconds
+TestRunner: ioctl-tester      PASS      11.15 seconds
+TestRunner: mesh-tester       PASS      8.20 seconds
+TestRunner: smp-tester        PASS      9.82 seconds
+TestRunner: userchan-tester   PASS      6.85 seconds
+
+
+
 ---
- net/bluetooth/msft.c | 36 +++++++++++-------------------------
- 1 file changed, 11 insertions(+), 25 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index bee6a4c656be..bf5cee48916c 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -743,17 +743,12 @@ __u64 msft_get_features(struct hci_dev *hdev)
- }
- 
- static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
--						       u8 status, u16 opcode,
--						       struct sk_buff *skb)
-+						       void *user_data,
-+						       u8 status)
- {
--	struct msft_cp_le_set_advertisement_filter_enable *cp;
--	struct msft_rp_le_set_advertisement_filter_enable *rp;
-+	struct msft_cp_le_set_advertisement_filter_enable *cp = user_data;
- 	struct msft_data *msft = hdev->msft_data;
- 
--	rp = (struct msft_rp_le_set_advertisement_filter_enable *)skb->data;
--	if (skb->len < sizeof(*rp))
--		return;
--
- 	/* Error 0x0C would be returned if the filter enabled status is
- 	 * already set to whatever we were trying to set.
- 	 * Although the default state should be disabled, some controller set
-@@ -766,7 +761,6 @@ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hdev,
- 
- 	hci_dev_lock(hdev);
- 
--	cp = hci_sent_cmd_data(hdev, hdev->msft_opcode);
- 	msft->filter_enabled = cp->enable;
- 
- 	if (status == 0x0C)
-@@ -804,31 +798,23 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor)
- 	return msft_remove_monitor_sync(hdev, monitor);
- }
- 
--void msft_req_add_set_filter_enable(struct hci_request *req, bool enable)
--{
--	struct hci_dev *hdev = req->hdev;
--	struct msft_cp_le_set_advertisement_filter_enable cp;
--
--	cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
--	cp.enable = enable;
--
--	hci_req_add(req, hdev->msft_opcode, sizeof(cp), &cp);
--}
--
- int msft_set_filter_enable(struct hci_dev *hdev, bool enable)
- {
--	struct hci_request req;
-+	struct msft_cp_le_set_advertisement_filter_enable cp;
- 	struct msft_data *msft = hdev->msft_data;
- 	int err;
- 
- 	if (!msft)
- 		return -EOPNOTSUPP;
- 
--	hci_req_init(&req, hdev);
--	msft_req_add_set_filter_enable(&req, enable);
--	err = hci_req_run_skb(&req, msft_le_set_advertisement_filter_enable_cb);
-+	cp.sub_opcode = MSFT_OP_LE_SET_ADVERTISEMENT_FILTER_ENABLE;
-+	cp.enable = enable;
-+	err = __hci_cmd_sync_status(hdev, hdev->msft_opcode, sizeof(cp), &cp,
-+				    HCI_CMD_TIMEOUT);
-+
-+	msft_le_set_advertisement_filter_enable_cb(hdev, &cp, err);
- 
--	return err;
-+	return 0;
- }
- 
- bool msft_curve_validity(struct hci_dev *hdev)
--- 
-2.38.1
 
+--===============4299988683398459495==--
