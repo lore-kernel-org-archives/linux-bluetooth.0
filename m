@@ -2,103 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3F2C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 11:18:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EC41C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Nov 2022 16:39:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230433AbiKBLSa (ORCPT
+        id S231834AbiKBQja (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Nov 2022 07:18:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54448 "EHLO
+        Wed, 2 Nov 2022 12:39:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230394AbiKBLS3 (ORCPT
+        with ESMTP id S231732AbiKBQiy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Nov 2022 07:18:29 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4023313FA6
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Nov 2022 04:18:28 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id b124so6372784oia.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Nov 2022 04:18:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=V3l0C0Hv4Witx/wJyp/Qo3W+HDIPZdLN5NfZj2QX6KQ=;
-        b=QVbpYu58I15bakYMOEoHZlaa2w9UHfrYDUmQmu+QL7UZe/2q2fLLGYQblLPYHVOhAu
-         kJcVBNFSrSmHF1hyYpV1M71V1WBjrY0xEaO+LX+2qOos2gs0ZiAXCMGM20fBGyqkf/ax
-         0EgyZx3g7rcDyx/qHfvkFZeRAiOgZELdI2vkcb9R8TWbTeqreM6dqIIqD7gjIv2i7EFq
-         vAvbUNrnr8/C81wR0wbKlcxfp4iEUyv4KKQIoN0M9kGzgu0iOmlkNNf/xrT5M7uRHmeC
-         lMg3bNKXw8D0QgzqpH4nPG8NGbg2MVz0N09uRJDoI0SQvMf9bh4S0aKiDI3TKqXiLl0g
-         wF+A==
+        Wed, 2 Nov 2022 12:38:54 -0400
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B3C1C425
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Nov 2022 09:33:36 -0700 (PDT)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-13ae8117023so20871360fac.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Nov 2022 09:33:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V3l0C0Hv4Witx/wJyp/Qo3W+HDIPZdLN5NfZj2QX6KQ=;
-        b=nW2VCJTHdBkpwwlYumSX0F1K3v+ODPZOeOm5gE4yX5tzhLsaVhjOh1rXtPm69/FFmM
-         kLqlEhFo6XqphAtSQXlhGOW7B+o0n0nNW71Raga44CBnjewqjtJcOC9wlULk0JBePgQe
-         JdR+ZjAeSlJCZawd2PzwBfjk6oRH+wphZhbOxrspe9hIVqyDq7VxKB+VRdSL3gKUkQWX
-         kkYI56EDMiNggb3CmwVzcH9Y+PR6uvWZcV7R6KVwR8qTUdFVTxbbrJW8uT7g1PcQUzRt
-         /qsmemvgJ9NIQU6AUCxphm33IGH/YVojaumzH66kFTzb626nWZrQydWYps1l0WQu3S+N
-         wKAw==
-X-Gm-Message-State: ACrzQf2xMjMMYNKkMUulbbH0pb8ppubnkwGkJiiVO7sZVHnPRrbYh2Zc
-        eGGFfNb9xY76vPSTpvpmsrTkW1TdJpU=
-X-Google-Smtp-Source: AMsMyM5EauFjwZ6RiRdbfEJrHjwu+y5Tw05ZhqVb6qeiP8/BHr7Hqq7ucQ+DXbd+PDVQIWGtUOvVrA==
-X-Received: by 2002:aca:ba42:0:b0:354:88fc:81b4 with SMTP id k63-20020acaba42000000b0035488fc81b4mr20968433oif.252.1667387907459;
-        Wed, 02 Nov 2022 04:18:27 -0700 (PDT)
-Received: from [172.17.0.2] ([20.165.64.41])
-        by smtp.gmail.com with ESMTPSA id g13-20020a056870d20d00b0012c21a64a76sm5824635oac.24.2022.11.02.04.18.26
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jIJ9YfDZoexQP0+oYMCU+CJvJ6/e2TbbtINXcDEy98s=;
+        b=xrE8AVkmQ31MOgOQvTifMevbH3nPicbcJPnz9gABpsnl+sNv75zLRyrg+EP7TKSqeu
+         Q6Aw50Ur5dErzK9DWvBhhIrei09GODGCTmpZMZ4Ua6sto9WFUWvwzbViaD7ha8NFGAQN
+         2zxLPYMOb6epjNDW/3N+ZXzoAfT9gaEUA3bQDhRLDbAMpOyYQ3xhiYF8zZVJW/sqbq+9
+         xK4fktF+Hx5joLowkAUz/m+7OkvqIfu0qGfj73FlcBUR1DdYFFZsgAyao87X4QffQeYe
+         pmBE1RoE/lbi6GeVnLibrgRyNHX67tYAZ9hzuIPbBkDJpbdHUKUCRwsjcmM+JS5QxynV
+         KnaA==
+X-Gm-Message-State: ACrzQf3CI3ncs7f6HUVw1HG8sYLUmaDRPbWowGbo/kxMYcqtE70rsypd
+        cpjtRdcYu6vr+qDvcjaaSw==
+X-Google-Smtp-Source: AMsMyM7cBwnhSuweP9eO41SiFqsM+Z9QV91xuOG+tHBTknF5/R+dPI4ILjWidZqnHfRtaa2bb11gEg==
+X-Received: by 2002:a05:6870:3924:b0:13b:747c:9311 with SMTP id b36-20020a056870392400b0013b747c9311mr25375696oap.151.1667406805793;
+        Wed, 02 Nov 2022 09:33:25 -0700 (PDT)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id bo35-20020a05680822a300b0034fd36e95bfsm4643634oib.31.2022.11.02.09.33.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Nov 2022 04:18:26 -0700 (PDT)
-Message-ID: <63625202.050a0220.a2974.53bf@mx.google.com>
-Date:   Wed, 02 Nov 2022 04:18:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5562196278744735820=="
+        Wed, 02 Nov 2022 09:33:25 -0700 (PDT)
+Received: (nullmailer pid 4008127 invoked by uid 1000);
+        Wed, 02 Nov 2022 16:33:27 -0000
+Date:   Wed, 2 Nov 2022 11:33:27 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Marek Vasut <marex@denx.de>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [1/2] dt-bindings: net: broadcom-bluetooth: Add CYW4373A0 DT
+ binding
+Message-ID: <20221102163327.GA4006397-robh@kernel.org>
+References: <20221031204804.195267-1-marex@denx.de>
+ <6360471e.4a0a0220.4aceb.91b7@mx.google.com>
+ <a7485b76-b4aa-a6d6-b509-c6f370380926@denx.de>
+ <CABBYNZLpaT7FCwXrGq8RU4owP74VA7Eo99jceFzVsqqVnYFaHw@mail.gmail.com>
+ <52c65cd1-9631-50a7-aded-7e4a877bbad9@denx.de>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hadess@hadess.net
-Subject: RE: [BlueZ] main.conf: Add comment about LA Audio BAP UUIDs
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221102101224.1463549-1-hadess@hadess.net>
-References: <20221102101224.1463549-1-hadess@hadess.net>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <52c65cd1-9631-50a7-aded-7e4a877bbad9@denx.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5562196278744735820==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Nov 01, 2022 at 11:52:23PM +0100, Marek Vasut wrote:
+> On 11/1/22 23:44, Luiz Augusto von Dentz wrote:
+> > Hi Marek,
+> 
+> Hi,
+> 
+> > On Tue, Nov 1, 2022 at 3:38 PM Marek Vasut <marex@denx.de> wrote:
+> > > 
+> > > On 10/31/22 23:07, bluez.test.bot@gmail.com wrote:
+> > > > This is automated email and please do not reply to this email!
+> > > > 
+> > > > Dear submitter,
+> > > > 
+> > > > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > > > This is a CI test results with your patch series:
+> > > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=690631
+> > > > 
+> > > > ---Test result---
+> > > > 
+> > > > Test Summary:
+> > > > CheckPatch                    PASS      2.99 seconds
+> > > > GitLint                       PASS      1.48 seconds
+> > > > SubjectPrefix                 FAIL      0.58 seconds
+> > > 
+> > > Should the DT bindings really have Bluetooth: prefix/tag too ?
+> > > git log on prior art indicates they shouldn't .
+> > 
+> > If it is meant for bluetooth-next then yes it shall contain it since
+> > the CI does attempt to check its presence, in the other hand we could
+> > perhaps use the prefix [bluetooth] to avoid having the CI run on
+> > patches that are not meant for bluetooth-next but I don't think other
+> > subsystem do require this so it sort of hard to enforce proper
+> > prefixing.
+> 
+> Linux Documentation/devicetree/bindings seems to start with dt-bindings:
+> prefix always, so maybe we should keep it that way ?
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=691153
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      1.03 seconds
-GitLint                       PASS      0.75 seconds
-Prep - Setup ELL              PASS      33.82 seconds
-Build - Prep                  PASS      0.98 seconds
-Build - Configure             PASS      10.66 seconds
-Build - Make                  PASS      1141.01 seconds
-Make Check                    PASS      12.91 seconds
-Make Check w/Valgrind         PASS      365.20 seconds
-Make Distcheck                PASS      304.19 seconds
-Build w/ext ELL - Configure   PASS      10.59 seconds
-Build w/ext ELL - Make        PASS      109.91 seconds
-Incremental Build w/ patches  PASS      0.00 seconds
-Scan Build                    PASS      676.03 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5562196278744735820==--
+Yes.
