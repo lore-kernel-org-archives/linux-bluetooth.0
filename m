@@ -2,76 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72313C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 16:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EC4CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 17:08:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231583AbiKDQNz (ORCPT
+        id S231320AbiKDRI3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Nov 2022 12:13:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
+        Fri, 4 Nov 2022 13:08:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231757AbiKDQNu (ORCPT
+        with ESMTP id S229608AbiKDRI3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Nov 2022 12:13:50 -0400
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F310C1AD85;
-        Fri,  4 Nov 2022 09:13:40 -0700 (PDT)
-Received: by mail-lj1-f169.google.com with SMTP id l8so7018588ljh.13;
-        Fri, 04 Nov 2022 09:13:40 -0700 (PDT)
+        Fri, 4 Nov 2022 13:08:29 -0400
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 968E431F8F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Nov 2022 10:08:27 -0700 (PDT)
+Received: by mail-qv1-xf2b.google.com with SMTP id mi9so3608595qvb.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Nov 2022 10:08:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=/jNIi3NLp/0QE0eLEgGhnlZnXslRxZtVSsauwMnJ52A=;
+        b=TyCMiI4ARMPxd18RVlEv+qm2LWR7zC104Hlivn40qb5lZJslIeDFuCNMNvjneFE/Nj
+         LFwCX5vAwmEX/R8qjGO9x9K9/hgdwoRd2q59WUqMzWoiDvISQjer+tTT1jJ7UfSLA8Vn
+         fR3VeAjk206NeR5DC2lSXJH82ZME8JVM9jplc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T0MZx5H+KKojBozLD9F/surnKXHJHR40WHSVlsC6T2M=;
-        b=JqOPAo4re13aY8QT4ZKKtC+pBI2aSdvzeZDZ0NSLgHTlg4IX2r0eU2lOBl6Sxy6rp8
-         ffyfy8FSt+RTCztcQ9gZayYL/ZiDB8hBtTHcUtKycZXgZm+cpmfm/NDy9KuRRKIdbEXR
-         nMRMf14/kYPFZRBBUTrG4hw1QOSKsLGh5m7zWNigGyJTCg2Yv+k0XaZX9qZT3FSgzFiS
-         97iXfQmNFaVP/U5lj2EWXr9pDrPmoT/8+BoDkTqQZxR37vWoWdY8aH2+des/FKJzH0S4
-         2oNCz4hF7dmZYEglUluEkh98pCtiSlLjSMvBIMl5ELxZa9RRiAQQ47XDXk4+1pnnOwD9
-         RkjQ==
-X-Gm-Message-State: ACrzQf0tpLjDibq740aiq6Xx9UCUnFuj2c5+LcjMS69WF+trS4UHGt6L
-        JzEjbMa/S+NeYVsimNfmbkdidOU/hItg8zTl
-X-Google-Smtp-Source: AMsMyM5bY9p8r2pmpmvpD/ree8hLmcCQMd9H+lHQZKA4DgRyG3EY2fsn25pXTt6wLhM47xSch6X4pQ==
-X-Received: by 2002:a2e:999a:0:b0:277:56a9:4a39 with SMTP id w26-20020a2e999a000000b0027756a94a39mr9954959lji.333.1667578419137;
-        Fri, 04 Nov 2022 09:13:39 -0700 (PDT)
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
-        by smtp.gmail.com with ESMTPSA id q21-20020ac246f5000000b004ac393ecc32sm495567lfo.304.2022.11.04.09.13.38
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/jNIi3NLp/0QE0eLEgGhnlZnXslRxZtVSsauwMnJ52A=;
+        b=UQAc+ao61lAR/3qjTAAV0lCwy3F+DSF/BDV9sJx4Xx5c59KLduzMklrm2kJzIs3ViO
+         dyjL5I0GfxgpUAZwDNg+Y0LPaQD1+n1Euqh9yCdz3ixj4h2CBgHX+WGdyvv65FUYlXd5
+         B4Jfildslnk9bwBWiUqNOxMgpr0zsLSKP0tDVAunQpL3dJgMgc29QYldGZ4WTRph5tV3
+         ZDPjeHzhlp83qUVo1K4uTT3i7me9cNgqMO21KU4KOo+Q2kd4klO9yHT2NYCG9KL5f5wW
+         8HLfGMMMQizIx7eTHKkqwzEvN5zikazWm/1qi36/+ZeQazb7DXIYKo0PpOd2k3xHwene
+         VqsQ==
+X-Gm-Message-State: ACrzQf3jklDoHrb/wvAoz8yiyf842rkznBXW227M738+30B4vGQK3j0r
+        VLo3dqcR87mWCMcMeo/uK2cpvX3etrtI8Q==
+X-Google-Smtp-Source: AMsMyM4yEo7JNZrwgPN2ap15162rV/rf3AOaKg5k5X3h+H1NZnuVV4DW3EZsFGKijIUg6r19hCej2Q==
+X-Received: by 2002:a0c:f0d4:0:b0:4bb:6583:66e6 with SMTP id d20-20020a0cf0d4000000b004bb658366e6mr33526859qvl.123.1667581706533;
+        Fri, 04 Nov 2022 10:08:26 -0700 (PDT)
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com. [209.85.219.178])
+        by smtp.gmail.com with ESMTPSA id f22-20020ac84996000000b0039953dcc480sm2746526qtq.88.2022.11.04.10.08.26
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Nov 2022 09:13:38 -0700 (PDT)
-Received: by mail-lj1-f178.google.com with SMTP id x21so7026817ljg.10;
-        Fri, 04 Nov 2022 09:13:38 -0700 (PDT)
-X-Received: by 2002:a2e:8743:0:b0:277:10a8:3e8f with SMTP id
- q3-20020a2e8743000000b0027710a83e8fmr12867538ljj.423.1667578418373; Fri, 04
- Nov 2022 09:13:38 -0700 (PDT)
+        Fri, 04 Nov 2022 10:08:26 -0700 (PDT)
+Received: by mail-yb1-f178.google.com with SMTP id 131so2138161ybl.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Nov 2022 10:08:25 -0700 (PDT)
+X-Received: by 2002:a81:8241:0:b0:370:5fad:47f0 with SMTP id
+ s62-20020a818241000000b003705fad47f0mr27409344ywf.441.1667581219811; Fri, 04
+ Nov 2022 10:00:19 -0700 (PDT)
 MIME-Version: 1.0
-From:   Sungwoo Kim <iam@sung-woo.kim>
-Date:   Fri, 4 Nov 2022 12:11:08 -0400
-X-Gmail-Original-Message-ID: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
-Message-ID: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
-Subject: L2CAP: Spec violation
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <20221104054053.431922658@goodmis.org>
+In-Reply-To: <20221104054053.431922658@goodmis.org>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Fri, 4 Nov 2022 10:00:03 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whKE5UL+AuCC2wK8oq8D_ueSO_T7-9Acx4POouqVi8ZHg@mail.gmail.com>
+Message-ID: <CAHk-=whKE5UL+AuCC2wK8oq8D_ueSO_T7-9Acx4POouqVi8ZHg@mail.gmail.com>
+Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
+ freeing timers
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu, Nov 3, 2022 at 10:48 PM Steven Rostedt <rostedt@goodmis.org> wrote:
+>
+> Ideally, I would have the first patch go into this rc cycle, which is mostly
+> non functional as it will allow the other patches to come in via the respective
+> subsystems in the next merge window.
 
-Our fuzzer found a BT spec violation, illegal state transition on L2cap.
-Specifically, l2cap_chan::state is transitioned from BT_CONFIG to
-BT_DISCONN by CONFIG_RSP by following trace:
+Ack.
 
-l2cap_config_rsp l2cap_core.c:4498
-l2cap_send_disconn_req l2cap_core.c:4585
-l2cap_state_change l2cap_core.c:1618
+I also wonder if we could do the completely trivially correct
+conversions immediately.
 
-According to the spec 5.3 vol.3 part A 6.1.4, CONFIG_RSP cannot cause
-that transition, i.e., CONFIG -> DISCONN by CONFIG_RSP is illegal.
-It'd be great if we could discuss.
+I'm talking about the scripted ones where it's currently a
+"del_timer_sync()", and the very next action is freeing whatever data
+structure the timer is in (possibly with something like free_irq() in
+between - my point is that there's an unconditional free that is very
+clear and unambiguous), so that there is absolutely no question about
+whether they should use "timer_shutdown_sync()" or not.
 
-Thanks,
-Sungwoo.
+IOW, things like patches 03, 17 and 31, and at least parts others in
+this series.
+
+This series clearly has several much more complex cases that need
+actual real code review, and I think it would help to have the
+completely unambiguous cases out of the way, just to get rid of noise.
+
+So I'd take that first patch, and a scripted set of "this cannot
+change any semantics" patches early.
+
+                Linus
