@@ -2,77 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3406C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 17:56:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92205C4167D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 19:22:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231938AbiKDR4Y (ORCPT
+        id S229826AbiKDTWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Nov 2022 13:56:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59552 "EHLO
+        Fri, 4 Nov 2022 15:22:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231904AbiKDR4X (ORCPT
+        with ESMTP id S229553AbiKDTWh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Nov 2022 13:56:23 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D7F84AF02
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Nov 2022 10:56:21 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id d19-20020a056e020c1300b00300b5a12c44so4289115ile.15
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Nov 2022 10:56:21 -0700 (PDT)
+        Fri, 4 Nov 2022 15:22:37 -0400
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA4114876C;
+        Fri,  4 Nov 2022 12:22:35 -0700 (PDT)
+Received: by mail-oi1-x232.google.com with SMTP id v81so6169446oie.5;
+        Fri, 04 Nov 2022 12:22:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+CrrtBZaWaBIBfDEz9a9BacRZtXiPhURWnCTyiBknKU=;
+        b=f7SabvhELt4tvu58wD/HGUQtx2q3c42bp4689l/poRMwjHONs2y+uJybLQ6btnBic8
+         iSYK/T680hWQ8YubanyiQ/jk4TxtOOSgyzZyzTjBStaumbjkRAc3PTfrEP9z1ET4ppjL
+         os0cjm+F8kyIi27l3gX1TCu+EYDnb6I6sC6rEheSVAEJvEJuF1rkSUHHVYhQ9PjtWNZC
+         /KoHUhscmHo/jN1PCMTUxC8NT4KR3QukfsWt+gbIkumzBVh1p3Sny9bKzJeet5110tpk
+         HzVFo5k5iKj3j88DvNf1ucVPdH/av+bU0vEDu76g9bGVlHfWhJDUhqHlYTifQBH3QuBi
+         oWFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HFLDZrSmrKf3eaUSPUfU/z0D34JmXW5qNTObPr5a3dE=;
-        b=cTWroYLrkuMlgdrZGLi6K+DkUk623nK/S9y2DRSTv+j8hrT6hoR3d3L58J4lUITuC/
-         bOPsHJGyVRH5sRi9ztgvxalXkMOB6o2aDQZtxfbs/HPQ+CWIpwx8LCShoBdqjwun6ng/
-         ZfaSgBrry2XgsZJgG2SmsmfBDWxUstM9kRj4RSlZftGD8Yu/C+oDdwmlreiIRMhnETQc
-         yBX4ZOPn2VpX3THS6grTt52w+R8/8yBmFezLLDR+7xYrgZcCIYKdKecS7s4P6m/N44BL
-         QBMNklWSW2ugNcovpVGaO81mcdtKSMaDTI4GXywlWnEU/EKWYH3fegAnWwXiDKyaOnkQ
-         8rEA==
-X-Gm-Message-State: ACrzQf3/AMVH7N/0zz2nFmPXRWAI1Est+EPvz/ZM1W3pmtYIb4ptzouX
-        BIiT7/rqv7O4SoG0V4l4UZ8+nWtf9YkLgKSKNX5duihPlDyv
-X-Google-Smtp-Source: AMsMyM5jISVm+ThnehVRlGr4SGLsiESwHWORrPJaHVN2Gla1RS8HH7b06ZPnW17OhSwF1wbMM8K1f2L1F/XbPusoit6A69WxSHeM
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+CrrtBZaWaBIBfDEz9a9BacRZtXiPhURWnCTyiBknKU=;
+        b=kpb0AEjnpgyvCrUHBAaaEt+sLn/DmSZLAkavzi4Q/eEzc15S/9bNCI5Se3u8v6GYOc
+         LMEBwFvL+t17AYAC/zT5CQyCoAPzihSm4Z+f8P1+XidK6tGrvehttoqn3BfzMxbugouK
+         PSKRHswn6/DSy9a14G3cW8a6x2FSHZ9NpIxFLoAj4p9+qt6kWACR5cNg8zGgTt50ILSt
+         yQ5Q9tpnypVZEkRlk0ovHOcq2/FeegKRfAO9ZP4FH25aJw1juFgJtODXrnU/LCmiI57b
+         BX+q6wBTzPzHjpnwLsN4RfPXBz95Yj5LclVUebh2mKUqz3RJ8zHiMBOQ7o/uHB0m16/Y
+         WAsw==
+X-Gm-Message-State: ACrzQf0IxZ7/0qN9U151z1H/jqWr6wNonDkyUWLaJ2PzBtzz9DIpdrbB
+        Y96q9w60xSW54rGzRoVyjgo=
+X-Google-Smtp-Source: AMsMyM5j57nGJ6ihP9Jnolnn5vAnBZp3njFzbqkVuO45h5Gs91zBtM7qMBV3ZTA/jEfxwCmFGOBzYQ==
+X-Received: by 2002:aca:2819:0:b0:359:f8a7:c88 with SMTP id 25-20020aca2819000000b00359f8a70c88mr260428oix.278.1667589755023;
+        Fri, 04 Nov 2022 12:22:35 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id n132-20020acabd8a000000b003547a3401e6sm1729901oif.43.2022.11.04.12.22.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Nov 2022 12:22:34 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date:   Fri, 4 Nov 2022 12:22:32 -0700
+From:   Guenter Roeck <linux@roeck-us.net>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     linux-kernel@vger.kernel.org,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
+ freeing timers
+Message-ID: <20221104192232.GA2520396@roeck-us.net>
+References: <20221104054053.431922658@goodmis.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1210:b0:375:4aa6:ff85 with SMTP id
- n16-20020a056638121000b003754aa6ff85mr19651201jas.227.1667584580937; Fri, 04
- Nov 2022 10:56:20 -0700 (PDT)
-Date:   Fri, 04 Nov 2022 10:56:20 -0700
-In-Reply-To: <0000000000000bab2c05e95a81a3@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000946f3005eca8cafe@google.com>
-Subject: Re: [syzbot] BUG: corrupted list in hci_conn_add_sysfs
-From:   syzbot <syzbot+b30ccad4684cce846cef@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, edumazet@google.com,
-        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        luiz.von.dentz@intel.com, marcel@holtmann.org,
-        netdev@vger.kernel.org, pabeni@redhat.com, rafael@kernel.org,
-        syzkaller-bugs@googlegroups.com, yin31149@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221104054053.431922658@goodmis.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+On Fri, Nov 04, 2022 at 01:40:53AM -0400, Steven Rostedt wrote:
+> 
+> Back in April, I posted an RFC patch set to help mitigate a common issue
+> where a timer gets armed just before it is freed, and when the timer
+> goes off, it crashes in the timer code without any evidence of who the
+> culprit was. I got side tracked and never finished up on that patch set.
+> Since this type of crash is still our #1 crash we are seeing in the field,
+> it has become a priority again to finish it.
+> 
+> This is v3 of that patch set. Thomas Gleixner posted an untested version
+> that makes timer->function NULL as the flag that it is shutdown. I took that
+> code, tested it (fixed it up), added more comments, and changed the
+> name to timer_shutdown_sync(). I also converted it to use WARN_ON_ONCE()
+> instead of just WARN_ON() as Linus asked for.
+> 
 
-commit 448a496f760664d3e2e79466aa1787e6abc922b5
-Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Date:   Mon Sep 19 17:56:59 2022 +0000
+Unfortunately the renaming caused some symbol conflicts.
 
-    Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
+Global definition: timer_shutdown
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1052f8fe880000
-start commit:   dc164f4fb00a Merge tag 'for-linus-6.0-rc7' of git://git.ke..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=122d7bd4fc8e0ecb
-dashboard link: https://syzkaller.appspot.com/bug?extid=b30ccad4684cce846cef
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1110db8c880000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13e58aef080000
+  File             Line
+0 time.c            93 static inline void timer_shutdown(struct clock_event_device *evt)
+1 arm_arch_timer.c 690 static __always_inline int timer_shutdown(const int access,
+2 timer-fttmr010.c 105 int (*timer_shutdown)(struct clock_event_device *evt);
+3 timer-sp804.c    158 static inline void timer_shutdown(struct clock_event_device *evt)
+4 timer.h          239 static inline int timer_shutdown(struct timer_list *timer)
 
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Guenter
