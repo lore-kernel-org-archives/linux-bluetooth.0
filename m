@@ -2,114 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F495C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 08:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72313C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 16:13:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229950AbiKDIDc (ORCPT
+        id S231583AbiKDQNz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Nov 2022 04:03:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41082 "EHLO
+        Fri, 4 Nov 2022 12:13:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiKDIDa (ORCPT
+        with ESMTP id S231757AbiKDQNu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Nov 2022 04:03:30 -0400
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 391C12639
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Nov 2022 01:03:27 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-13ba86b5ac0so4800029fac.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Nov 2022 01:03:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=umgpV6lfSdCgSKhjlFTrtnC3ryWFU1MnjsICH5Pq8Xw=;
-        b=kD87VooPYRj/0P0NVNBdZnJ7JUAVulN/mjcoPqjPwdtqiXS7ocOIlPm9A2k6V7D/gU
-         octlaS+uByDFHbTt3tzEyjxwmWMpw3cafK01wWZ2OQdiu2r5P0IJ/ncr1HG3GgJ6kK+d
-         siSyuQ/NzVWNfuHP2qDRfC2Cz80L660mrcAL+kpPfJ7/auDObj0y93HtVxrOVV0HgPrq
-         EJeJ+ZX1BoeHZLEUMlR73l2K1h66esaMNdWGCgaRYX2ZXV9ALI8ygVRHYiyyZXXqSg32
-         UCPhdz6sDxKN4/2Z1AwUUIVJc8ApT6edMI3CODSOP+qMpAcqalI0dp99LC4Ukn7WZZ3o
-         aWxg==
+        Fri, 4 Nov 2022 12:13:50 -0400
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F310C1AD85;
+        Fri,  4 Nov 2022 09:13:40 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id l8so7018588ljh.13;
+        Fri, 04 Nov 2022 09:13:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=umgpV6lfSdCgSKhjlFTrtnC3ryWFU1MnjsICH5Pq8Xw=;
-        b=e6AKsgd5vibqOi285zuhGupAUU9X/GQwZRJrwNQoFnVlo09wFfSe4hlzvqAPnmncbd
-         XkIp0ZX+meW8HLKAzgrrAdWVB5vLYi1/QU6k9kcyxhi84V4ampSOlrZpDfw/chQf5DCC
-         LqnT6dofTJkwt0J8URa9n6m3wO1P0umTrWyeVmuGZ06iJs69DO7+YH428PYbgqfSgti1
-         zURbNDLpeEFiZmh2ap/x2qM5uq4Ln+565xjUpAABcuSqjxrM8AvhzyOHzHuJ8yr+nqOt
-         KFCqngKmr5dP1wGOBVMuOmar9cWeMLKr6cr9gku1bMK4tVvbMjtAqgj853rF0Ws7dT+a
-         ZDcA==
-X-Gm-Message-State: ACrzQf38IYnjr943pQBWXjLWfrrWkhMiyhNt+ZE7m9I2gl9kLn5TmFFE
-        1eQX6uZ1hP+2HLaXkwAofI54aSq9MKs=
-X-Google-Smtp-Source: AMsMyM5MzzKWU9tyf4jmCt9LZRp7uVun/vCq1EOQkTo8JxQsVEIfCmK0aos7F2hqJXIMem9bmmPlzQ==
-X-Received: by 2002:a05:6870:179a:b0:140:74d7:ff5b with SMTP id r26-20020a056870179a00b0014074d7ff5bmr925328oae.131.1667549006409;
-        Fri, 04 Nov 2022 01:03:26 -0700 (PDT)
-Received: from [172.17.0.2] ([20.225.202.163])
-        by smtp.gmail.com with ESMTPSA id g13-20020a056830160d00b0066193df8edasm1209651otr.34.2022.11.04.01.03.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 01:03:26 -0700 (PDT)
-Message-ID: <6364c74e.050a0220.d1c17.5bcd@mx.google.com>
-Date:   Fri, 04 Nov 2022 01:03:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5491290158671125636=="
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T0MZx5H+KKojBozLD9F/surnKXHJHR40WHSVlsC6T2M=;
+        b=JqOPAo4re13aY8QT4ZKKtC+pBI2aSdvzeZDZ0NSLgHTlg4IX2r0eU2lOBl6Sxy6rp8
+         ffyfy8FSt+RTCztcQ9gZayYL/ZiDB8hBtTHcUtKycZXgZm+cpmfm/NDy9KuRRKIdbEXR
+         nMRMf14/kYPFZRBBUTrG4hw1QOSKsLGh5m7zWNigGyJTCg2Yv+k0XaZX9qZT3FSgzFiS
+         97iXfQmNFaVP/U5lj2EWXr9pDrPmoT/8+BoDkTqQZxR37vWoWdY8aH2+des/FKJzH0S4
+         2oNCz4hF7dmZYEglUluEkh98pCtiSlLjSMvBIMl5ELxZa9RRiAQQ47XDXk4+1pnnOwD9
+         RkjQ==
+X-Gm-Message-State: ACrzQf0tpLjDibq740aiq6Xx9UCUnFuj2c5+LcjMS69WF+trS4UHGt6L
+        JzEjbMa/S+NeYVsimNfmbkdidOU/hItg8zTl
+X-Google-Smtp-Source: AMsMyM5bY9p8r2pmpmvpD/ree8hLmcCQMd9H+lHQZKA4DgRyG3EY2fsn25pXTt6wLhM47xSch6X4pQ==
+X-Received: by 2002:a2e:999a:0:b0:277:56a9:4a39 with SMTP id w26-20020a2e999a000000b0027756a94a39mr9954959lji.333.1667578419137;
+        Fri, 04 Nov 2022 09:13:39 -0700 (PDT)
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com. [209.85.208.178])
+        by smtp.gmail.com with ESMTPSA id q21-20020ac246f5000000b004ac393ecc32sm495567lfo.304.2022.11.04.09.13.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Nov 2022 09:13:38 -0700 (PDT)
+Received: by mail-lj1-f178.google.com with SMTP id x21so7026817ljg.10;
+        Fri, 04 Nov 2022 09:13:38 -0700 (PDT)
+X-Received: by 2002:a2e:8743:0:b0:277:10a8:3e8f with SMTP id
+ q3-20020a2e8743000000b0027710a83e8fmr12867538ljj.423.1667578418373; Fri, 04
+ Nov 2022 09:13:38 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v1,1/2] bluetooth: Remove codec id field in vendor codec definition
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221104071810.22720-1-kiran.k@intel.com>
-References: <20221104071810.22720-1-kiran.k@intel.com>
+From:   Sungwoo Kim <iam@sung-woo.kim>
+Date:   Fri, 4 Nov 2022 12:11:08 -0400
+X-Gmail-Original-Message-ID: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
+Message-ID: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
+Subject: L2CAP: Spec violation
+To:     marcel@holtmann.org
+Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5491290158671125636==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+Our fuzzer found a BT spec violation, illegal state transition on L2cap.
+Specifically, l2cap_chan::state is transitioned from BT_CONFIG to
+BT_DISCONN by CONFIG_RSP by following trace:
 
-Dear submitter,
+l2cap_config_rsp l2cap_core.c:4498
+l2cap_send_disconn_req l2cap_core.c:4585
+l2cap_state_change l2cap_core.c:1618
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=691972
+According to the spec 5.3 vol.3 part A 6.1.4, CONFIG_RSP cannot cause
+that transition, i.e., CONFIG -> DISCONN by CONFIG_RSP is illegal.
+It'd be great if we could discuss.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      2.77 seconds
-GitLint                       PASS      1.56 seconds
-SubjectPrefix                 FAIL      1.47 seconds
-BuildKernel                   PASS      34.13 seconds
-BuildKernel32                 PASS      30.32 seconds
-Incremental Build with patchesPASS      50.73 seconds
-TestRunner: Setup             PASS      504.89 seconds
-TestRunner: l2cap-tester      PASS      16.86 seconds
-TestRunner: iso-tester        PASS      16.30 seconds
-TestRunner: bnep-tester       PASS      6.27 seconds
-TestRunner: mgmt-tester       PASS      102.15 seconds
-TestRunner: rfcomm-tester     PASS      10.00 seconds
-TestRunner: sco-tester        PASS      9.37 seconds
-TestRunner: ioctl-tester      PASS      10.59 seconds
-TestRunner: mesh-tester       PASS      7.63 seconds
-TestRunner: smp-tester        PASS      9.48 seconds
-TestRunner: userchan-tester   PASS      6.41 seconds
-
-Details
-##############################
-Test: SubjectPrefix - FAIL - 1.47 seconds
-Check subject contains "Bluetooth" prefix
-"Bluetooth: " is not specified in the subject
-"Bluetooth: " is not specified in the subject
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5491290158671125636==--
+Thanks,
+Sungwoo.
