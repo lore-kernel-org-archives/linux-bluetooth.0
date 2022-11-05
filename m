@@ -2,92 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3DBC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Nov 2022 19:40:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85424C43217
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Nov 2022 21:03:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229603AbiKETkS (ORCPT
+        id S229839AbiKEVDg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 5 Nov 2022 15:40:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37518 "EHLO
+        Sat, 5 Nov 2022 17:03:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229479AbiKETkR (ORCPT
+        with ESMTP id S229453AbiKEVDe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 5 Nov 2022 15:40:17 -0400
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5059EEE2C
-        for <linux-bluetooth@vger.kernel.org>; Sat,  5 Nov 2022 12:40:15 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id e15so5618543qvo.4
-        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Nov 2022 12:40:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=tzkLwBmWvTyTV4ADumu30R+f9n/XZlXTlV5Mq39F2YA=;
-        b=Cum6Qo3m/VE3U4xxlY7+NiZCFtrVKW8s3c1zl2IQWFNf3LmRpSEfrQd80gzExxDBuj
-         LyISzkeXdHDDZUUsGMIoPcMIR0i3NkooPVz4HfycYMSKlFwud/JI9tu0T4wuIZ+0vj79
-         dPEGKDPVayVWm5HUpifgrbfAJqGW+bOUdRLsZORbhqsMVpoABwa0KPztTku1j2Z2EsKD
-         fVo0L11U+bflMQH53MZDz3yu095VSvgG1DflB0bbRqGIzYCFjOm6wEKN093/cXNZlSxy
-         P1OvHX6CfyGqG+8/cek+WnhTbGl45BOzkvHG0Y+WIeFlBvUfvB/55XImZB5y61MuDqKH
-         f+QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tzkLwBmWvTyTV4ADumu30R+f9n/XZlXTlV5Mq39F2YA=;
-        b=hHgJWBeRvP7HZmIrfNgdNSe/gimgW1razaqtxAoVKJTcT7jOCJX//0WQzx6kcUwpov
-         qC6z4ePKaFHJlzqgSfYIcBEEeslPftJxw0sCtQ/xSCFsmL2oa464C7PY9aRuVzZDQchv
-         G54WNeBDCAvJEu5r4R0ya5YqtVKV2/rwSKYEEqT0qrdbjsg1dPu1ggNMrjMGP+lXDFwc
-         V0W+cYfDL5gu0rD0N16KgFMq7udIL5EuQybwhMvTaWRLBjF1wJEkCm3s6Xw34sldnOTv
-         wkA3ALvaNomo3oryxpobYzUx9fQTkqCFCVTmTtCf5TbyddWWzl9nDs7L/WI+redlQCFq
-         mvcQ==
-X-Gm-Message-State: ACrzQf37IhPN3iStjKxDW+j+z4D+1aKdrwuOiMNF6xOCcng+iLYH406D
-        eirv6idrEwmH25hFRgapY7z/HU3IX8GAgg==
-X-Google-Smtp-Source: AMsMyM6iSTTZXca8J5qObYuJ/sW/LDHdzyKkYIbjqdT288kxxInh61f5dsfGmvEEEcq1LYNhV841MQ==
-X-Received: by 2002:a05:6214:e45:b0:4bb:7e1a:9dee with SMTP id o5-20020a0562140e4500b004bb7e1a9deemr38465397qvc.96.1667677214272;
-        Sat, 05 Nov 2022 12:40:14 -0700 (PDT)
-Received: from [172.17.0.2] ([20.7.171.121])
-        by smtp.gmail.com with ESMTPSA id c24-20020a05620a269800b006e2d087fd63sm2508819qkp.63.2022.11.05.12.40.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Nov 2022 12:40:13 -0700 (PDT)
-Message-ID: <6366bc1d.050a0220.b0ddb.40b0@mx.google.com>
-Date:   Sat, 05 Nov 2022 12:40:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4098164622224801643=="
+        Sat, 5 Nov 2022 17:03:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BADDFB2;
+        Sat,  5 Nov 2022 14:03:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 54DF4B808BF;
+        Sat,  5 Nov 2022 21:03:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69FADC433D6;
+        Sat,  5 Nov 2022 21:03:26 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+        dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ek158U/I"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+        t=1667682204;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=eqdLYS8BDcnZ1CTVSLTL2V9mpBrsInljjeWX569KabI=;
+        b=Ek158U/IwAdzp/7JgxH8/niYIDD2c7iDpM/q00frrsf+kptgL3uCiSQ7Xlb7SIQ9YvTtg5
+        hlBVvQrg9GahoQxIsHXxgh/CGzM4sTACdo/WX2PYJwuZbLx0SZ+njeVN3snq9LgpG5MQMr
+        EBxmnADIwq+lyFhZU+rPI7l5k3bHDuo=
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f7ca4808 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Sat, 5 Nov 2022 21:03:23 +0000 (UTC)
+Date:   Sat, 5 Nov 2022 22:03:18 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
+        linux-bluetooth@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [PATCH v4a 00/38] timers: Use timer_shutdown*() before freeing
+ timers
+Message-ID: <Y2bPlllkHo5DUmLY@zx2c4.com>
+References: <20221105060024.598488967@goodmis.org>
+ <CAHk-=wi95dGkg7DiuOZ27gGW+mxJipn9ykB6LHB-HrbbLG6OMQ@mail.gmail.com>
+ <20221105123642.596371c7@rorschach.local.home>
 MIME-Version: 1.0
-Subject: RE: Bluetooth: Fix use-after-free read in hci_cmd_timeout()
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, syoshida@redhat.com
-In-Reply-To: <20221105190446.1324053-1-syoshida@redhat.com>
-References: <20221105190446.1324053-1-syoshida@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221105123642.596371c7@rorschach.local.home>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4098164622224801643==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Sat, Nov 05, 2022 at 12:36:42PM -0400, Steven Rostedt wrote:
+> ----------------------8<------------------------
+> @@
+> identifier ptr, timer, rfield, slab;
+> @@
+> (
+> -	del_timer(&ptr->timer);
+> +	timer_shutdown(&ptr->timer);
+> |
+> -	del_timer_sync(&ptr->timer);
+> +	timer_shutdown_sync(&ptr->timer);
+> )
+>     ...
+> (
+> 	kfree_rcu(ptr, rfield);
+> |
+> 	kmem_cache_free(slab, ptr);
+> |
+> 	kfree(ptr);
+> )
+> ---------------------->8------------------------
 
-This is an automated email and please do not reply to this email.
+Something that might help here is changing the `...` into
+`... when exists` or into `... when != ptr` or similar.
+See this section of the manual:
+https://coccinelle.gitlabpages.inria.fr/website/docs/main_grammar004.html
 
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-error: patch failed: net/bluetooth/hci_sync.c:4696
-error: net/bluetooth/hci_sync.c: patch does not apply
-hint: Use 'git am --show-current-patch' to see the failed patch
-
-
-Please resolve the issue and submit the patches again.
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4098164622224801643==--
+Jason
