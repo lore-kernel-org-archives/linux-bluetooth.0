@@ -2,242 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40019C43219
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Nov 2022 23:34:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 686B5C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Nov 2022 05:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229567AbiKDXeq (ORCPT
+        id S229610AbiKEF1U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Nov 2022 19:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56244 "EHLO
+        Sat, 5 Nov 2022 01:27:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiKDXep (ORCPT
+        with ESMTP id S229581AbiKEF1T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Nov 2022 19:34:45 -0400
-Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F2D26117;
-        Fri,  4 Nov 2022 16:34:43 -0700 (PDT)
-Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-13be3ef361dso7118980fac.12;
-        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
-        b=Jg8jucXtBJP8myrTJM3z0Wltiv65Ikg/KpM2vg9+TBoUW8c9U6W60sIjrbQ9g2FcCc
-         31LubanrKiS7Sxd3jWqCYjN51E7mjzHAKTsl2yG3a+PmWqITk6B5s+HGczlPeMYiJFrb
-         vBZoQtVDG0kLRBI424jNNGG2b2bDrcM9K1WztoTH0rQVEK4L8GAlPvrCSGnj6IlV9xUa
-         XQ46HitYNVXogafALOjhYHs25Hj1J/FbNvVDg+CD68rFnvYhDXkugu2K8l076C7M7TZq
-         Qr6xjmcHk7Gk4pAipfE4FkxiMKzRcyJTcom7FrkAkJoEkKmmujHBgxhv3f/neLNWJFlx
-         4OcQ==
+        Sat, 5 Nov 2022 01:27:19 -0400
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E942E69E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Nov 2022 22:27:18 -0700 (PDT)
+Received: by mail-il1-f200.google.com with SMTP id l4-20020a056e021aa400b00300ad9535c8so5171101ilv.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Nov 2022 22:27:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6hvd6urNEa2bZ2TTknP5YJ+H72Ja2eceUu/0SfBV1dc=;
-        b=X5cKH3F/66QouUPW6NBBA75UrBnbuk/XBDybvyEhkVZT3NRqDW6Lo980Sw/d8jB6Di
-         abIqXu3S+1VtuD2JKDUj7UYYIedXqzmm2arnsEjxHMw1gtiQyC7dzR3xWnI0MMc7xLnX
-         vw3C5ZTMFXSmFhy9oJR19PP6GjG+RyR8KJDp+2tC30j6jNhtZ/T09pLn0AvqWS/89y50
-         IRoQFqpy3DWqRKZWRx8lhC2uDzja2L2B4sQSht5toOqh15uSeejvPcBbaB9KD5wChq08
-         5Vm94hy/LSjNrDn+gU20+9q1akQiy5FaWJFjcTCpynnOVxMj51sTXqh6Kowfzub0pIke
-         jaNg==
-X-Gm-Message-State: ACrzQf0ktMf5+p73LsbFHoq6Ni0Je6tYlC4T/L7ojglKMcwnF/cpa4wf
-        +xVNPPnUNPXjaHRyrepWVHOdREHU5y8=
-X-Google-Smtp-Source: AMsMyM7MF9Q/Pp9YnJEtGj4XwhLtYIPmz5/gJtrzdgqLYVrzm8NOvh6bI3lkPYE6537XupHrGdc+uQ==
-X-Received: by 2002:a05:6870:6717:b0:13d:8222:329e with SMTP id gb23-20020a056870671700b0013d8222329emr7986841oab.128.1667604883046;
-        Fri, 04 Nov 2022 16:34:43 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id w29-20020a056870339d00b0011e37fb5493sm183421oae.30.2022.11.04.16.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Nov 2022 16:34:41 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Fri, 4 Nov 2022 16:34:40 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bluetooth@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [RFC][PATCH v3 00/33] timers: Use timer_shutdown*() before
- freeing timers
-Message-ID: <20221104233440.GA2443898@roeck-us.net>
-References: <20221104054053.431922658@goodmis.org>
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5ASnNDxhoqSLaBjncwLtyuIp6tFD08p3uNjxVPZiJKI=;
+        b=m+ZN/3EVF89OTlJOGwGnYGXHVhwEM6ke8TSrjFNQL+HmcApHvU/0E1xsmN7b0Eh6YJ
+         XLXyucpP+mBBGW1lYtmKpaPYm6wis7Vc3A5Q9z/xU0BzFc+coqS/chfOxuH85dI5efl5
+         xPd0yew3bq9tJ92Oi59fYb9/OPa4nXGmBhYiAQnW8ELbyElQGpq7EkoW/ra0tmRWA4Ll
+         MQW0GovmIJpcDeKHZjzrfG0mUrr/w8IOk3ojrhAO7BVjHIEY23RTm/J0lP/UZrvyXlkY
+         Kpc8EmP/XBNCNNWST6/QWZf/otQC6z+S92wO7yPHeTLQ57SIiaKr66Wg9EU7+4I4F2EB
+         heXA==
+X-Gm-Message-State: ACrzQf0Z4/vbT4TQ73cANhNIxgjnCYg70N0fZLaoABuoHD0s8df42r04
+        CEdTkNqgFv89flKm0i7v2a9rHZVJGUPO82prmeWZxZ+0jr6l
+X-Google-Smtp-Source: AMsMyM6VWI4Vk3WRzJfNJhb6um+SW7Ecd5WwtI1YxMBLKoya+XpAkwf4Adj2jolavy1c/SExku6Efe+lBuQpH9G+Y3dNw75iPtHB
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221104054053.431922658@goodmis.org>
+X-Received: by 2002:a02:a00f:0:b0:375:7166:2dac with SMTP id
+ a15-20020a02a00f000000b0037571662dacmr14017102jah.49.1667626037516; Fri, 04
+ Nov 2022 22:27:17 -0700 (PDT)
+Date:   Fri, 04 Nov 2022 22:27:17 -0700
+In-Reply-To: <00000000000041f5bc05e678fa9f@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000959e6405ecb271a3@google.com>
+Subject: Re: [syzbot] WARNING in __cancel_work
+From:   syzbot <syzbot+10e37d0d88cbc2ea19e4@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, edumazet@google.com, hdanton@sina.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
+        penguin-kernel@I-love.SAKURA.ne.jp,
+        penguin-kernel@i-love.sakura.ne.jp, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Nov 04, 2022 at 01:40:53AM -0400, Steven Rostedt wrote:
-> 
-> Back in April, I posted an RFC patch set to help mitigate a common issue
-> where a timer gets armed just before it is freed, and when the timer
-> goes off, it crashes in the timer code without any evidence of who the
-> culprit was. I got side tracked and never finished up on that patch set.
-> Since this type of crash is still our #1 crash we are seeing in the field,
-> it has become a priority again to finish it.
-> 
+syzbot suspects this issue was fixed by commit:
 
-After applying the patches attached below, everything compiles for me,
-and there are no crashes. There are still various warnings, most in
-networking. I know I need to apply some patch(es) to fix the networking
-warnings, but I didn't entirely understand what exactly to apply, so
-I didn't try.
+commit 2d2cb3066f2c90cd8ca540b36ba7a55e7f2406e0
+Author: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Date:   Sat Sep 3 15:32:56 2022 +0000
 
-Complete logs are at https://kerneltests.org/builders, on the bottom half
-of the page (qemu tests, in the 'testing' column).
+    Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
 
-Guenter
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1469d541880000
+start commit:   7ebfc85e2cd7 Merge tag 'net-6.0-rc1' of git://git.kernel.o..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=20bc0b329895d963
+dashboard link: https://syzkaller.appspot.com/bug?extid=10e37d0d88cbc2ea19e4
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13537803080000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e68315080000
 
----
-Warnings:
+If the result looks correct, please mark the issue as fixed by replying with:
 
-ODEBUG: free active (active state 0) object type: timer_list hint: tcp_write_timer+0x0/0x1d0
-	from tcp_close -> __sk_destruct -> tcp_write_timer
+#syz fix: Bluetooth: L2CAP: initialize delayed works at l2cap_chan_create()
 
-ODEBUG: free active (active state 0) object type: timer_list hint: tcp_keepalive_timer+0x0/0x4c0
-	from tcp_close -> __sk_destruct -> tcp_keepalive_timer -> __del_timer_sync
-
-ODEBUG: free active (active state 0) object type: timer_list hint: blk_rq_timed_out_timer+0x0/0x40
-	blk_free_queue_rcu -> blk_free_queue_rcu -> blk_rq_timed_out_timer
-
----
-Changes applied on top of patch set to fix build errors:
-
-diff --git a/arch/arm/mach-spear/time.c b/arch/arm/mach-spear/time.c
-index e979e2197f8e..5371c824786d 100644
---- a/arch/arm/mach-spear/time.c
-+++ b/arch/arm/mach-spear/time.c
-@@ -90,7 +90,7 @@ static void __init spear_clocksource_init(void)
- 		200, 16, clocksource_mmio_readw_up);
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void spear_timer_shutdown(struct clock_event_device *evt)
- {
- 	u16 val = readw(gpt_base + CR(CLKEVT));
- 
-@@ -101,7 +101,7 @@ static inline void timer_shutdown(struct clock_event_device *evt)
- 
- static int spear_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	return 0;
- }
-@@ -111,7 +111,7 @@ static int spear_set_oneshot(struct clock_event_device *evt)
- 	u16 val;
- 
- 	/* stop the timer */
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	val = readw(gpt_base + CR(CLKEVT));
- 	val |= CTRL_ONE_SHOT;
-@@ -126,7 +126,7 @@ static int spear_set_periodic(struct clock_event_device *evt)
- 	u16 val;
- 
- 	/* stop the timer */
--	timer_shutdown(evt);
-+	spear_timer_shutdown(evt);
- 
- 	period = clk_get_rate(gpt_clk) / HZ;
- 	period >>= CTRL_PRESCALER16;
-diff --git a/drivers/clocksource/arm_arch_timer.c b/drivers/clocksource/arm_arch_timer.c
-index a7ff77550e17..9c3420a0d19d 100644
---- a/drivers/clocksource/arm_arch_timer.c
-+++ b/drivers/clocksource/arm_arch_timer.c
-@@ -687,8 +687,8 @@ static irqreturn_t arch_timer_handler_virt_mem(int irq, void *dev_id)
- 	return timer_handler(ARCH_TIMER_MEM_VIRT_ACCESS, evt);
- }
- 
--static __always_inline int timer_shutdown(const int access,
--					  struct clock_event_device *clk)
-+static __always_inline int arch_timer_shutdown(const int access,
-+					       struct clock_event_device *clk)
- {
- 	unsigned long ctrl;
- 
-@@ -701,22 +701,22 @@ static __always_inline int timer_shutdown(const int access,
- 
- static int arch_timer_shutdown_virt(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_VIRT_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_phys(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_PHYS_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_virt_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_VIRT_ACCESS, clk);
- }
- 
- static int arch_timer_shutdown_phys_mem(struct clock_event_device *clk)
- {
--	return timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
-+	return arch_timer_shutdown(ARCH_TIMER_MEM_PHYS_ACCESS, clk);
- }
- 
- static __always_inline void set_next_event(const int access, unsigned long evt,
-diff --git a/drivers/clocksource/timer-sp804.c b/drivers/clocksource/timer-sp804.c
-index e6a87f4af2b5..a3c38e1343f0 100644
---- a/drivers/clocksource/timer-sp804.c
-+++ b/drivers/clocksource/timer-sp804.c
-@@ -155,14 +155,14 @@ static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
- 	return IRQ_HANDLED;
- }
- 
--static inline void timer_shutdown(struct clock_event_device *evt)
-+static inline void sp804_timer_shutdown(struct clock_event_device *evt)
- {
- 	writel(0, common_clkevt->ctrl);
- }
- 
- static int sp804_shutdown(struct clock_event_device *evt)
- {
--	timer_shutdown(evt);
-+	sp804_timer_shutdown(evt);
- 	return 0;
- }
- 
-@@ -171,7 +171,7 @@ static int sp804_set_periodic(struct clock_event_device *evt)
- 	unsigned long ctrl = TIMER_CTRL_32BIT | TIMER_CTRL_IE |
- 			     TIMER_CTRL_PERIODIC | TIMER_CTRL_ENABLE;
- 
--	timer_shutdown(evt);
-+	sp804_timer_shutdown(evt);
- 	writel(common_clkevt->reload, common_clkevt->load);
- 	writel(ctrl, common_clkevt->ctrl);
- 	return 0;
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
