@@ -2,125 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB424C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Nov 2022 19:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3DBC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Nov 2022 19:40:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229984AbiKETbf (ORCPT
+        id S229603AbiKETkS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 5 Nov 2022 15:31:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35572 "EHLO
+        Sat, 5 Nov 2022 15:40:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiKETbe (ORCPT
+        with ESMTP id S229479AbiKETkR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 5 Nov 2022 15:31:34 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5A2DEF4;
-        Sat,  5 Nov 2022 12:31:33 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id r76so8402035oie.13;
-        Sat, 05 Nov 2022 12:31:33 -0700 (PDT)
+        Sat, 5 Nov 2022 15:40:17 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5059EEE2C
+        for <linux-bluetooth@vger.kernel.org>; Sat,  5 Nov 2022 12:40:15 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id e15so5618543qvo.4
+        for <linux-bluetooth@vger.kernel.org>; Sat, 05 Nov 2022 12:40:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=CTlAHc9k7qwIZyOhFoXagieaQq5pwRyAvyi0mAOE5RE=;
-        b=jURw19XL/xOvCrYwmv2aWUKdeAoWjP9YO+FTg9LO7kNLGP2qrxnNI/DeaM/hhYlqsP
-         YdQYptnzjKsYbbyAKOY5T5QWBhSSLuRj9tx/h3x3Iolz6OENad9xOgpnNTl3bQfF4abr
-         IGnRZ+gwoVhjhy8eDyzb76gdYWeTNG8HbYJzf+upnNf3q7GfCqhXHTbMnctQM+lT4ISN
-         LgN+zILvYp/x3cxyWSBN67VcIOLSthpIiMe3XVQLxJ5DNQbV3DpA0r2y4Xi6Om/6kI/T
-         +bTGJHJtUOpMMkvOkxDlr0Z5JMnZYu43sVpFgzYDCR/HFlqDOFJ8Z5bQFtUlln66Rbqg
-         ggdQ==
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=tzkLwBmWvTyTV4ADumu30R+f9n/XZlXTlV5Mq39F2YA=;
+        b=Cum6Qo3m/VE3U4xxlY7+NiZCFtrVKW8s3c1zl2IQWFNf3LmRpSEfrQd80gzExxDBuj
+         LyISzkeXdHDDZUUsGMIoPcMIR0i3NkooPVz4HfycYMSKlFwud/JI9tu0T4wuIZ+0vj79
+         dPEGKDPVayVWm5HUpifgrbfAJqGW+bOUdRLsZORbhqsMVpoABwa0KPztTku1j2Z2EsKD
+         fVo0L11U+bflMQH53MZDz3yu095VSvgG1DflB0bbRqGIzYCFjOm6wEKN093/cXNZlSxy
+         P1OvHX6CfyGqG+8/cek+WnhTbGl45BOzkvHG0Y+WIeFlBvUfvB/55XImZB5y61MuDqKH
+         f+QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CTlAHc9k7qwIZyOhFoXagieaQq5pwRyAvyi0mAOE5RE=;
-        b=3DN3uBBAdumw9VRPsShfHfGp73Pg4PdCRiFdzkXf4cQLPgUI3pIjIYusLO/xd0R2gR
-         QuYZ/Xws0VAO77AMSHRQ5wdaRFUSGKKMMbqEYFZ6TsA2vhLmtunk+nupZkRZXGmhBvrh
-         5p/+4oEbhaD8swG9EG8Z50T4n2zombjsdIabydzMxcs4gcqc6ipVQB3DWfH2zmRRUnew
-         lcHC11W4wjvOZGZ4rUviAzsPfF/yB4hao89JFEMiYiqIcRGxBMKhy/OoLYq9yy3ebsCP
-         7yNTmvKwlXPW/BFzvIAoM20+n+k2E6sFGEK/6qkWNLkIUBHXqqUNluOhiKCYbpG6Eogm
-         7atw==
-X-Gm-Message-State: ACrzQf11t7q3jaYlAkphgg7NJBD5WOyGhSOhya0Qwt9AX+c3YRUaOnBT
-        nU/fFlMyVx+7ndXLi+M6jec=
-X-Google-Smtp-Source: AMsMyM7VRYR4ja1354r4nOb4sGsFC9SF+e+FSsFCXSIKNyBk3irIl03bXoaveyKZeBBPlTvKUXlEMQ==
-X-Received: by 2002:a05:6808:1708:b0:351:728b:3a03 with SMTP id bc8-20020a056808170800b00351728b3a03mr22106906oib.275.1667676692450;
-        Sat, 05 Nov 2022 12:31:32 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id l14-20020a4ac60e000000b00499499a8e18sm834040ooq.5.2022.11.05.12.31.31
+        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tzkLwBmWvTyTV4ADumu30R+f9n/XZlXTlV5Mq39F2YA=;
+        b=hHgJWBeRvP7HZmIrfNgdNSe/gimgW1razaqtxAoVKJTcT7jOCJX//0WQzx6kcUwpov
+         qC6z4ePKaFHJlzqgSfYIcBEEeslPftJxw0sCtQ/xSCFsmL2oa464C7PY9aRuVzZDQchv
+         G54WNeBDCAvJEu5r4R0ya5YqtVKV2/rwSKYEEqT0qrdbjsg1dPu1ggNMrjMGP+lXDFwc
+         V0W+cYfDL5gu0rD0N16KgFMq7udIL5EuQybwhMvTaWRLBjF1wJEkCm3s6Xw34sldnOTv
+         wkA3ALvaNomo3oryxpobYzUx9fQTkqCFCVTmTtCf5TbyddWWzl9nDs7L/WI+redlQCFq
+         mvcQ==
+X-Gm-Message-State: ACrzQf37IhPN3iStjKxDW+j+z4D+1aKdrwuOiMNF6xOCcng+iLYH406D
+        eirv6idrEwmH25hFRgapY7z/HU3IX8GAgg==
+X-Google-Smtp-Source: AMsMyM6iSTTZXca8J5qObYuJ/sW/LDHdzyKkYIbjqdT288kxxInh61f5dsfGmvEEEcq1LYNhV841MQ==
+X-Received: by 2002:a05:6214:e45:b0:4bb:7e1a:9dee with SMTP id o5-20020a0562140e4500b004bb7e1a9deemr38465397qvc.96.1667677214272;
+        Sat, 05 Nov 2022 12:40:14 -0700 (PDT)
+Received: from [172.17.0.2] ([20.7.171.121])
+        by smtp.gmail.com with ESMTPSA id c24-20020a05620a269800b006e2d087fd63sm2508819qkp.63.2022.11.05.12.40.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 05 Nov 2022 12:31:31 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Date:   Sat, 5 Nov 2022 12:31:29 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     linux-kernel@vger.kernel.org,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>, rcu@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-sh@vger.kernel.org, linux-edac@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        linux-pm@vger.kernel.org, drbd-dev@lists.linbit.com,
-        linux-bluetooth@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linaro-mm-sig@lists.linaro.org, intel-gfx@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-parisc@vger.kernel.org,
-        linux-leds@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [PATCH v4a 00/38] timers: Use timer_shutdown*() before freeing
- timers
-Message-ID: <20221105193129.GA1487775@roeck-us.net>
-References: <20221105060024.598488967@goodmis.org>
+        Sat, 05 Nov 2022 12:40:13 -0700 (PDT)
+Message-ID: <6366bc1d.050a0220.b0ddb.40b0@mx.google.com>
+Date:   Sat, 05 Nov 2022 12:40:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4098164622224801643=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221105060024.598488967@goodmis.org>
+Subject: RE: Bluetooth: Fix use-after-free read in hci_cmd_timeout()
+Reply-To: linux-bluetooth@vger.kernel.org
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, syoshida@redhat.com
+In-Reply-To: <20221105190446.1324053-1-syoshida@redhat.com>
+References: <20221105190446.1324053-1-syoshida@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sat, Nov 05, 2022 at 02:00:24AM -0400, Steven Rostedt wrote:
-> 
-> Back in April, I posted an RFC patch set to help mitigate a common issue
-> where a timer gets armed just before it is freed, and when the timer
-> goes off, it crashes in the timer code without any evidence of who the
-> culprit was. I got side tracked and never finished up on that patch set.
-> Since this type of crash is still our #1 crash we are seeing in the field,
-> it has become a priority again to finish it.
-> 
-> The last version of that patch set is here:
-> 
->   https://lore.kernel.org/all/20221104054053.431922658@goodmis.org/
-> 
-> I'm calling this version 4a as it only has obvious changes were the timer that
-> is being shutdown is in the same function where it will be freed or released,
-> as this series should be "safe" for adding. I'll be calling the other patches
-> 4b for the next merge window.
-> 
+--===============4098164622224801643==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-For the series, as far as my testbed goes:
+This is an automated email and please do not reply to this email.
 
-Build results:
-	total: 152 pass: 152 fail: 0
-Qemu test results:
-	total: 500 pass: 500 fail: 0
+Dear Submitter,
 
-No runtime crashes or warnings observed.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+----- Output -----
+error: patch failed: net/bluetooth/hci_sync.c:4696
+error: net/bluetooth/hci_sync.c: patch does not apply
+hint: Use 'git am --show-current-patch' to see the failed patch
 
-Guenter
 
+Please resolve the issue and submit the patches again.
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4098164622224801643==--
