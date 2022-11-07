@@ -2,115 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F19FC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Nov 2022 06:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A03E4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Nov 2022 10:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231178AbiKGGjS (ORCPT
+        id S231667AbiKGKrI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Nov 2022 01:39:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48784 "EHLO
+        Mon, 7 Nov 2022 05:47:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231373AbiKGGjP (ORCPT
+        with ESMTP id S231616AbiKGKrG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Nov 2022 01:39:15 -0500
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04F876576;
-        Sun,  6 Nov 2022 22:39:14 -0800 (PST)
-Received: by mail-lj1-x22c.google.com with SMTP id d20so14691044ljc.12;
-        Sun, 06 Nov 2022 22:39:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=YhxHSbVpdxUsgd8PqvbbYUKKhoaOXSotkm3CoyNxy14=;
-        b=EYjNnJVCjk8/LdUHzXwZFV0g2SWgE278DLW9zsNC6TTCIBlzwupO9ieIMfGhu7rZ+u
-         mWmJd3ruVLfoZRLQy8FwUkNT+BkB6aR1AGU14+6/9E3FSTMAmjDlr4xFHRJSukWwlLit
-         bd4FwLRBJ4oRAsEDDWqxFVaKGSjsArqjCu0oA3bCvCrszJsJc9zuk0uKpqhSpHclSWgK
-         cbgg6ftj3jrFnrtSRJE8oBEaLbNZeXkScG56D6bLKb1+xHHNRZIXOmaFQoirwSUVxjr8
-         Pdk5w0av0n9fD41u5ACOn8A09kTtiQIsycNYp3hCBYNGeSBOt4vDtb4Mo3LKNM0k9tdk
-         7sTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YhxHSbVpdxUsgd8PqvbbYUKKhoaOXSotkm3CoyNxy14=;
-        b=vVk1ZnC+nYpfU2bVatiP7NL551EfD2UZAvY8Xv/WJPZUyn4Cwl9VogCq/52n2EJvkn
-         AhT/yGKtNHUzATlBH64ea9qS9zRyNRvOUeWNdjtq08lHL1IhH4/grh119IbFRU7s8e6Q
-         3ItC6L8lyjDN69l97ZEuXxev0yVylhR8+2mGf+coJ91lDlUWBB5laA2zGtMg8vEEUmXh
-         o7elYaVPd4ieyshdvshqpvfp95biv6ERYeBxJOouJY1wA/ABEAi/ejMXibgEGcZ1s02z
-         vuygHlK3NIgaKpWmtMBjxH8dW0c1hicdB6pcj08nozdSW5o9ink1/SG+l7adiyDTzZeI
-         yh8w==
-X-Gm-Message-State: ANoB5pn6sJblHUuJ+wMq9LldOJcbyVO9GD1HkBomqMsuVEcpRAXLJ8Iz
-        Dq6PWxGW+5oFFRqLrW5w54JHpr/q0IYB4tHqyKw=
-X-Google-Smtp-Source: AA0mqf5Jrlncit5ydl+cRhKGZZ8pY+GYr8SjNH41rgGyQ7Dc5I/SyQwZ19aqwveKZ+V9c3D/zRRBJY4HSdGwHOXWvTg=
-X-Received: by 2002:a2e:2e12:0:b0:278:acaa:acda with SMTP id
- u18-20020a2e2e12000000b00278acaaacdamr365840lju.305.1667803152130; Sun, 06
- Nov 2022 22:39:12 -0800 (PST)
+        Mon, 7 Nov 2022 05:47:06 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3172F17E33;
+        Mon,  7 Nov 2022 02:47:06 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1667818024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qnhu/C4/dTNGh+9YxTAUPF0AHXOgpdZiA4TofS1TDao=;
+        b=m8gFAB2FYV5B4BIkkbSCrPl5kngI1vwmC89wOqBJ/q73+RRLDUvN8153YBd0ancpYaUudU
+        +fTzmJoLwRrrXw9ulhVtc41yRIMLNrOmB9kVLUOAn2xwOs861TQYPTmwfVqoXOpGOLsPn5
+        hNBacxD9XN6Mi6tXS/NIbwjqzso2C6oqm6/L/mt2cpmfqfHELnCL8o8Pn38Ir7+eD8OVqk
+        Lj3kRr5Ls1MIF7+wsJc3Ym/BQIZf8UhWrd8aE7FpoY/qhjIfIvELeoa8/ZXUqY5eKhjinO
+        ZF4FT08X0F8jeyihKYji9kBCreFY8X9nEznXEcECfWmIcYVRm4zXH9JmYOmiiQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1667818024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qnhu/C4/dTNGh+9YxTAUPF0AHXOgpdZiA4TofS1TDao=;
+        b=bzVvnuX1mysTSSrkmkIGsLumN3FZV+biUwiIDeLZdScudMhEXojJ3c4U7ytkUdHNPdLCjD
+        NbhAMzPLE4OU4lBA==
+To:     Steven Rostedt <rostedt@goodmis.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Anna-Maria Gleixner <anna-maria@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-acpi@vger.kernel.org,
+        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
+        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
+        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
+        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Subject: Re: [GIT PULL] treewide: timers: Use timer_shutdown*() before
+ freeing timers
+In-Reply-To: <20221106223256.4bbdb018@rorschach.local.home>
+References: <20221106223256.4bbdb018@rorschach.local.home>
+Date:   Mon, 07 Nov 2022 11:47:04 +0100
+Message-ID: <87pmdzvy6v.ffs@tglx>
 MIME-Version: 1.0
-References: <0000000000000bab2c05e95a81a3@google.com> <000000000000946f3005eca8cafe@google.com>
- <CACT4Y+bX40TE_rx0SFnixoQVd_vHuGih9mtJA4TB7-dDOeguew@mail.gmail.com>
-In-Reply-To: <CACT4Y+bX40TE_rx0SFnixoQVd_vHuGih9mtJA4TB7-dDOeguew@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 6 Nov 2022 22:39:00 -0800
-Message-ID: <CABBYNZKyjFE_oVFDMj-U9uSax79bMimUCi1JyGBmyR_ufCNAUw@mail.gmail.com>
-Subject: Re: [syzbot] BUG: corrupted list in hci_conn_add_sysfs
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     syzbot <syzbot+b30ccad4684cce846cef@syzkaller.appspotmail.com>,
-        davem@davemloft.net, edumazet@google.com,
-        gregkh@linuxfoundation.org, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com,
-        rafael@kernel.org, syzkaller-bugs@googlegroups.com,
-        yin31149@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Linus,
 
-On Sun, Nov 6, 2022 at 3:25 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+On Sun, Nov 06 2022 at 22:32, Steven Rostedt wrote:
+> As discussed here:
 >
-> On Fri, 4 Nov 2022 at 10:56, syzbot
-> <syzbot+b30ccad4684cce846cef@syzkaller.appspotmail.com> wrote:
-> >
-> > syzbot suspects this issue was fixed by commit:
-> >
-> > commit 448a496f760664d3e2e79466aa1787e6abc922b5
-> > Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > Date:   Mon Sep 19 17:56:59 2022 +0000
-> >
-> >     Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1052f8fe880000
-> > start commit:   dc164f4fb00a Merge tag 'for-linus-6.0-rc7' of git://git.ke..
-> > git tree:       upstream
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=122d7bd4fc8e0ecb
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=b30ccad4684cce846cef
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1110db8c880000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13e58aef080000
-> >
-> > If the result looks correct, please mark the issue as fixed by replying with:
-> >
-> > #syz fix: Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
-> >
-> > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->
->
-> Looks reasonable based on subsystem and the patch:
->
-> #syz fix: Bluetooth: hci_sysfs: Fix attempting to call device_add multiple times
+>   https://lore.kernel.org/all/20221106212427.739928660@goodmis.org/
 
-Looks like I did add a different link when fixing it:
+Please hold off. It's only nits, but tip has documented rules and random
+pull requests are not making them go away.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=448a496f760664d3e2e79466aa1787e6abc922b5
+Thanks,
 
-Or perhaps they are duplicated?
-
-https://syzkaller.appspot.com/bug?id=da3246e2d33afdb92d66bc166a0934c5b146404a
-https://syzkaller.appspot.com/bug?extid=b30ccad4684cce846cef
-
--- 
-Luiz Augusto von Dentz
+        tglx
