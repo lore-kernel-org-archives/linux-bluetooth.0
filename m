@@ -2,84 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A03E4C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Nov 2022 10:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE16C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Nov 2022 18:50:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231667AbiKGKrI (ORCPT
+        id S232465AbiKGSuF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Nov 2022 05:47:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50418 "EHLO
+        Mon, 7 Nov 2022 13:50:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231616AbiKGKrG (ORCPT
+        with ESMTP id S231797AbiKGSuD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Nov 2022 05:47:06 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3172F17E33;
-        Mon,  7 Nov 2022 02:47:06 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1667818024;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qnhu/C4/dTNGh+9YxTAUPF0AHXOgpdZiA4TofS1TDao=;
-        b=m8gFAB2FYV5B4BIkkbSCrPl5kngI1vwmC89wOqBJ/q73+RRLDUvN8153YBd0ancpYaUudU
-        +fTzmJoLwRrrXw9ulhVtc41yRIMLNrOmB9kVLUOAn2xwOs861TQYPTmwfVqoXOpGOLsPn5
-        hNBacxD9XN6Mi6tXS/NIbwjqzso2C6oqm6/L/mt2cpmfqfHELnCL8o8Pn38Ir7+eD8OVqk
-        Lj3kRr5Ls1MIF7+wsJc3Ym/BQIZf8UhWrd8aE7FpoY/qhjIfIvELeoa8/ZXUqY5eKhjinO
-        ZF4FT08X0F8jeyihKYji9kBCreFY8X9nEznXEcECfWmIcYVRm4zXH9JmYOmiiQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1667818024;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qnhu/C4/dTNGh+9YxTAUPF0AHXOgpdZiA4TofS1TDao=;
-        b=bzVvnuX1mysTSSrkmkIGsLumN3FZV+biUwiIDeLZdScudMhEXojJ3c4U7ytkUdHNPdLCjD
-        NbhAMzPLE4OU4lBA==
-To:     Steven Rostedt <rostedt@goodmis.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Anna-Maria Gleixner <anna-maria@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>, linux-sh@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-atm-general@lists.sourceforge.net, netdev@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bluetooth@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        linux-input@vger.kernel.org, linux-leds@vger.kernel.org,
-        linux-media@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        linux-ext4@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        bridge@lists.linux-foundation.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, lvs-devel@vger.kernel.org,
-        linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
-Subject: Re: [GIT PULL] treewide: timers: Use timer_shutdown*() before
- freeing timers
-In-Reply-To: <20221106223256.4bbdb018@rorschach.local.home>
-References: <20221106223256.4bbdb018@rorschach.local.home>
-Date:   Mon, 07 Nov 2022 11:47:04 +0100
-Message-ID: <87pmdzvy6v.ffs@tglx>
+        Mon, 7 Nov 2022 13:50:03 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6705B20BD3;
+        Mon,  7 Nov 2022 10:50:02 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id g12so18020810lfh.3;
+        Mon, 07 Nov 2022 10:50:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qSRge+cZPqxzE/HXN6r0QoczBK8JIfjd/QYAWnu+7PY=;
+        b=XzWANFxDDrK21Vx9+epjiWYQQxEWgy/O55HY2mIlzQi5DIAjkeA+wXQ3Y0Zs4lZSP4
+         EbSpMR7wzMYLqmkSvWmuujVE4nlQ0MoExAlSQxg0dAXnHz0lgFxpkuxVEcb8almi3vfl
+         P+FRw6MzZxy/9zNQRc2uDzxB/TbW6z+6GdCtdE5ufqnqusOi6wzcQNoFHs1NW5lIClmG
+         sCIJ5L0PJreEyMTxdsJiz3EvPli6iatzGapjuKTuW3/B5TMt5SJNzr3w8W5tFm1tMEYk
+         omhT0HM7NN5MGGkV4ErmB6tB3bIIjy/+U20VlBvAoFdaWmaZ75ZqE/4dioBn7krFIfdT
+         8g/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qSRge+cZPqxzE/HXN6r0QoczBK8JIfjd/QYAWnu+7PY=;
+        b=5nfx4u5xAhVPyAp1enPt9WQ8zHLzLZEFxwxokZtirR6uMKBf026IEzld/oAoTDJt9W
+         pNbWSW8lPtUdSc75J5QRLPXOoDQn0KjBuM1f/KL4ZdgIwzirNxmEIsezT8177axPK+jg
+         dj7qlGGnNY9iozPRi5vxa2+IFI56wDoASwP438qHgDU69CqlwfUPqhcNcJ8CktmkB983
+         qvG+Y5xk0Z5YjI272KJ/Ew8OMTvf1FSNlv0c5p8NL1U7ihkqC2c+gChjG/rNcpWx4V1f
+         cISvo/48bawzwrHngfnX87Y8+1XMPGuh+DLfrCV28TYgB8+Q7ZOv8eBbVsWXz/P7H3Dn
+         rwRQ==
+X-Gm-Message-State: ACrzQf3aBZ0Sd2FXwNcrFumdruCSbHXH3NEljj7YgXnGScZS9cR7BF3y
+        gWvZ5kYKBR82+FbMo0mo7+pDJY9hx7d10YY4+FaqIE2B9PU=
+X-Google-Smtp-Source: AMsMyM4LIJdrcjbPnEk6kuDtYSnV2NSHcp6vJdlZgviMDBomkWirIFbhTWp99oyCHAab3LQ4HTwwkHaoTOcrtvGNjXc=
+X-Received: by 2002:a05:6512:3f2a:b0:4ae:612b:f47b with SMTP id
+ y42-20020a0565123f2a00b004ae612bf47bmr17315176lfa.106.1667847000552; Mon, 07
+ Nov 2022 10:50:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20221105190446.1324053-1-syoshida@redhat.com>
+In-Reply-To: <20221105190446.1324053-1-syoshida@redhat.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 7 Nov 2022 10:49:48 -0800
+Message-ID: <CABBYNZLqk_4Xz3RuSq_cEhvyTG+Qz1icVKjvKunufCLLXhh_zg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix use-after-free read in hci_cmd_timeout()
+To:     Shigeru Yoshida <syoshida@redhat.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        syzbot+19a9f729f05272857487@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Linus,
+Hi Shigeru,
 
-On Sun, Nov 06 2022 at 22:32, Steven Rostedt wrote:
-> As discussed here:
+On Sat, Nov 5, 2022 at 12:04 PM Shigeru Yoshida <syoshida@redhat.com> wrote:
 >
->   https://lore.kernel.org/all/20221106212427.739928660@goodmis.org/
+> syzbot reported use-after-free in hci_cmd_timeout() [1].  The scenario
+> for the issue is as follows:
+>
+> Task                                    Workqueue
+> ----------------------------------------------------------------------
+> hci_dev_open_sync
+>   ...
+>   hci_dev_init_sync  <- failed
+>   ...
+>   if (hdev->sent_cmd)
+>     kfree_skb(hdev->sent_cmd)
+>                                         hci_cmd_timeout
+>                                           ...
+>                                           if (hdev->sent_cmd)
+>                                             sent = hdev->sent_cmd->data
+>                                                    ^^ UAF occurred
+>     hdev->sent_cmd = NULL
+>
+> When hci_dev_init_sync() failed, hci_dev_open_sync() frees
+> hdev->send_cmd and set it to NULL.  However, hci_cmd_timeout() can run
+> just after freeing hdev->sent_cmd because hdev->cmd_timer is not
+> canceled.
+>
+> This patch fixes the issue by canceling hdev->cmd_timer before freeing
+> hdev->sent_cmd.
+>
+> Link: https://syzkaller.appspot.com/bug?id=cb23ebfc8f304f510fb717cb783fe8b496c7ffb1 [1]
+> Reported-by: syzbot+19a9f729f05272857487@syzkaller.appspotmail.com
+> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> ---
+>  net/bluetooth/hci_sync.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index 76c3107c9f91..a011065220e4 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -4696,6 +4696,7 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+>                         hdev->flush(hdev);
+>
+>                 if (hdev->sent_cmd) {
+> +                       cancel_delayed_work_sync(&hdev->cmd_timer);
+>                         kfree_skb(hdev->sent_cmd);
+>                         hdev->sent_cmd = NULL;
+>                 }
+> --
+> 2.38.1
 
-Please hold off. It's only nits, but tip has documented rules and random
-pull requests are not making them go away.
+A similar fix has already been applied:
 
-Thanks,
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=64b5c4c8e79c131fe8f135bab5e5dfaa245c5776
 
-        tglx
+
+-- 
+Luiz Augusto von Dentz
