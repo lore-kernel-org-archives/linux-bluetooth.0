@@ -2,107 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C90B7C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 13:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851C2C43217
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 13:59:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234072AbiKHNj6 (ORCPT
+        id S234890AbiKHN7t (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Nov 2022 08:39:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38252 "EHLO
+        Tue, 8 Nov 2022 08:59:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234025AbiKHNj4 (ORCPT
+        with ESMTP id S234842AbiKHN7r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Nov 2022 08:39:56 -0500
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0588327FC6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 05:39:56 -0800 (PST)
-Received: by mail-qt1-x833.google.com with SMTP id s4so8631926qtx.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 05:39:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=39xOSIxefg9wcdI8awZ15R9OhljN2yFqIN6CiLgKMbQ=;
-        b=e9htsokdCCxpMEC3sA1g+80ITNGFjOoRcZe7Da4I8AwUncrYH8e4Rafwu1AuAXpyaE
-         2KZAOsj3YP40iCxwdW3b9G0GnyKnJunaTRw/WVdViuJ9mAHYmWaSA7l+pRhjVBpXEqnU
-         lKfZ8D62nLassNLP1UCfrC8qCqTr2PwKd3/qERN5efOgMDoLDxc0NV4pAm/qiiEHkiyz
-         feKYLlo4ByDw+fBOGWRqAVk27yLNEawdbOsb0tan8H10t/QpydQJn2l8WeauobQwIG6J
-         ee9eFAK5Et6apqp9RoMB5mA84rCrP2/Nbu2MofDqBWegNAOWaufwsxwhXjaijVs7sl5P
-         EQYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=39xOSIxefg9wcdI8awZ15R9OhljN2yFqIN6CiLgKMbQ=;
-        b=jIPTNmnBKOZ+wgvfJAAQF4IZCkpBYMOMqDbiOB21QpXKVNKdhkzSpfdWsSxOexb0i1
-         eoKvwRJ15XhEnWymhsI7LhC0Mk86P+kZ/C/3liySzurT0A8pkhxjGyWekfnXtrbhNjVh
-         4Yj0wWQzXhWf+UN34B5IKSxMrgSLjHh5snzgDwlzZ+BJpsvl21Xy1cPEqtp7i2oBWoEe
-         yNqIh4MhvmFXjQCuUP0rb0UTPMdTiXJxBTrraLjeIrE9Re11FJXsETSEZ1V2YRk85OGG
-         /27TYikbTNjiVeRQOZWcgL1IsKwCt4AWkMHgWZivlwA0FqQZ5dK9fKfQrjxdbEJWcEtv
-         Nw6g==
-X-Gm-Message-State: ACrzQf0UxLLIXDe1Sh4vK/W3JdLZB924NNJ+fYUmTg1S1eti5lsS2qQN
-        BxaBEVJmfq7pz4ssTMDCybDgPY0hAwsJIw==
-X-Google-Smtp-Source: AMsMyM5PCE1WnR0AA7usBS7KU7tJij9YG+50SyVvc5Jp4qAyA+oQeDcwzbMR1OduaFGBD7J4B3KxUQ==
-X-Received: by 2002:ac8:58c4:0:b0:39c:b702:8ec with SMTP id u4-20020ac858c4000000b0039cb70208ecmr860575qta.253.1667914795003;
-        Tue, 08 Nov 2022 05:39:55 -0800 (PST)
-Received: from [172.17.0.2] ([20.185.196.244])
-        by smtp.gmail.com with ESMTPSA id s26-20020a05622a1a9a00b0039a610a04b1sm8325001qtc.37.2022.11.08.05.39.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 05:39:54 -0800 (PST)
-Message-ID: <636a5c2a.050a0220.b13b3.26a4@mx.google.com>
-Date:   Tue, 08 Nov 2022 05:39:54 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7180223290928803092=="
+        Tue, 8 Nov 2022 08:59:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFC9E528A4;
+        Tue,  8 Nov 2022 05:59:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 79D9AB81AFB;
+        Tue,  8 Nov 2022 13:59:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 329FBC43144;
+        Tue,  8 Nov 2022 13:59:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1667915984;
+        bh=gt3e/46Fztc4JQae3Mx8JCLYeah5CxMi8WSozle/3iA=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=fB9gCqxgaOkiVIJZFtjTFtPeciaEpPfvLLIdmkZH6SH0KJCkgub5Pt//FU+Ss+nXJ
+         +cQjPUS7oyqm3M1vGNi10M9nVimW5ZSI9+3eIlcVD1uEg81oJcXFFD2D6xHjJoj1kf
+         Il3pkcKiV2j7kFC/mHFz7qcjraz0mCmMVALpPwkBAsKlLAbWHgT/Nsok1h1exCX1tS
+         aBYEjLlLhXskfflZc22j1kNDcwcjLLtAIHRfxsjvaDw0r0VjMyxNx7VbaYcUkQT4EN
+         4ExPbq8ZpeP2MuN8Zo5BpdpgFEJGe2pL5eS0CWXHBrR7ad01VXXuLPAw5QeScY24Fk
+         uXXiAzNkewt/w==
+Received: by mail-lj1-f175.google.com with SMTP id x21so21204447ljg.10;
+        Tue, 08 Nov 2022 05:59:44 -0800 (PST)
+X-Gm-Message-State: ACrzQf0cslshuUlmJfR8xkNScAr7YGRUmRIyZ7FJoMsFTlh51OqH/KIt
+        CBPSj7EqX6o2UJph7KUz43Orji58uA2jxCXxTw==
+X-Google-Smtp-Source: AMsMyM6v95NHP6D6kjSL3cfj63z3lVhmN0hKNF2Re0ZxrUaTNruCtaNBrEflOi0n2jImuvMyuQALQF+iytz273/QVJo=
+X-Received: by 2002:a05:651c:114a:b0:25d:5ae6:42a4 with SMTP id
+ h10-20020a05651c114a00b0025d5ae642a4mr19189817ljo.255.1667915982102; Tue, 08
+ Nov 2022 05:59:42 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, linux-bluetooth@cyborgize.sg
-Subject: RE: Bluetooth: btusb: Add Realtek 8761BUV support ID 0x2B89:0x8761
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
-References: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
+References: <20221108055531.2176793-1-dominique.martinet@atmark-techno.com> <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
+In-Reply-To: <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
+From:   Rob Herring <robh+dt@kernel.org>
+Date:   Tue, 8 Nov 2022 07:59:33 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqKCb2ZA+CLTVnGBMjp6zu0yw-rSFjWRg2S3hA7S6h-XEA@mail.gmail.com>
+Message-ID: <CAL_JsqKCb2ZA+CLTVnGBMjp6zu0yw-rSFjWRg2S3hA7S6h-XEA@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] dt-bindings: net: h4-bluetooth: add new bindings
+ for hci_h4
+To:     Dominique Martinet <dominique.martinet@atmark-techno.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>, mizo@atmark-techno.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7180223290928803092==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Mon, Nov 7, 2022 at 11:56 PM Dominique Martinet
+<dominique.martinet@atmark-techno.com> wrote:
+>
+> Add devicetree binding to support defining a bluetooth device using the h4
+> uart protocol
 
-This is automated email and please do not reply to this email!
+The protocol is mostly irrelevant to the binding. The binding is for a
+particular device even if the driver is shared.
 
-Dear submitter,
+>
+> This was tested with a NXP wireless+BT AW-XM458 module, but might
+> benefit others as the H4 protocol seems often used.
+>
+> Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
+> ---
+>  .../devicetree/bindings/net/h4-bluetooth.yaml | 49 +++++++++++++++++++
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=693232
+Use the compatible string for the filename.
 
----Test result---
+There's now a pending (in linux-next) net/bluetooth/ directory and a
+bluetooth-controller.yaml schema which you should reference.
 
-Test Summary:
-CheckPatch                    PASS      1.67 seconds
-GitLint                       PASS      1.03 seconds
-SubjectPrefix                 PASS      0.85 seconds
-BuildKernel                   PASS      35.46 seconds
-BuildKernel32                 PASS      31.76 seconds
-Incremental Build with patchesPASS      47.46 seconds
-TestRunner: Setup             PASS      531.28 seconds
-TestRunner: l2cap-tester      PASS      18.04 seconds
-TestRunner: iso-tester        PASS      17.36 seconds
-TestRunner: bnep-tester       PASS      6.75 seconds
-TestRunner: mgmt-tester       PASS      108.29 seconds
-TestRunner: rfcomm-tester     PASS      10.68 seconds
-TestRunner: sco-tester        PASS      9.99 seconds
-TestRunner: ioctl-tester      PASS      11.37 seconds
-TestRunner: mesh-tester       PASS      8.40 seconds
-TestRunner: smp-tester        PASS      10.07 seconds
-TestRunner: userchan-tester   PASS      7.06 seconds
+>  1 file changed, 49 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+>
+> diff --git a/Documentation/devicetree/bindings/net/h4-bluetooth.yaml b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+> new file mode 100644
+> index 000000000000..5d11b89ca386
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+> @@ -0,0 +1,49 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/h4-bluetooth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: H4 Bluetooth
+> +
+> +maintainers:
+> +  - Dominique Martinet <dominique.martinet@atmark-techno.com>
+> +
+> +description:
+> +  H4 is a common bluetooth over uart protocol.
+> +  For example, the AW-XM458 is a WiFi + BT module where the WiFi part is
+> +  connected over PCI (M.2), while BT is connected over serial speaking
+> +  the H4 protocol. Its firmware is sent on the PCI side.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - nxp,aw-xm458-bt
+> +
+> +  max-speed: true
+> +
+> +required:
+> +  - compatible
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    #include <dt-bindings/clock/imx8mp-clock.h>
+> +
+> +    uart1 {
 
+serial {
 
+> +        pinctrl-names = "default";
+> +        pinctrl-0 = <&pinctrl_uart1>;
+> +        assigned-clocks = <&clk IMX8MP_CLK_UART1>;
+> +        assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+> +        status = "okay";
+> +        fsl,dte-mode = <1>;
+> +        fsl,uart-has-rtscts;
 
----
-Regards,
-Linux Bluetooth
+All these properties are irrelevant to the example. Drop.
 
-
---===============7180223290928803092==--
+> +
+> +
+> +        bluetooth {
+> +            compatible = "nxp,aw-xm458-bt";
+> +            max-speed = <3000000>;
+> +        };
+> +    };
+> --
+> 2.35.1
+>
+>
