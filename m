@@ -2,107 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3102C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 12:00:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB020C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 12:54:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233971AbiKHMAc (ORCPT
+        id S234291AbiKHMyT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Nov 2022 07:00:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
+        Tue, 8 Nov 2022 07:54:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233613AbiKHMAa (ORCPT
+        with ESMTP id S234119AbiKHMyR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Nov 2022 07:00:30 -0500
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79591E701
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 04:00:29 -0800 (PST)
-Received: by mail-qv1-xf35.google.com with SMTP id mi9so10052153qvb.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 04:00:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YDCWn530jVhC93+NHzsDVE6RW/pM4nXDlcbnpHb97W0=;
-        b=RnJa4EKUUN0lnfbcz/iPYxUDZhsWNUIXkwJWbGuWlMGip9G6k6ioamTcwfbgGJbjCq
-         HGhBnmVMQyX04+fc2iDf4/aRbY9TzhIJR02y5fpLflb11ZK29kYaAzS1+MUrPF1RjU+z
-         gUBf+HlDn1rzrh7kuoUgluokZn/UvjfeCVJfxNXB2ix6iEtNwpqiHHdKacyIn6ghh+hD
-         HTk5jq0uPxnvhC3jU6+Y+itf1V1L0MSwuBK2IDm8xRrCZ/xJJ4PDc2IaULPylwAIK7Sl
-         JU9csrC42L0SWahaiu+AFe3KIdLvHhtpmuxdtos9A2PSXJnlZwRGZ0mmNQ7TIqHbuB1/
-         8l3w==
+        Tue, 8 Nov 2022 07:54:17 -0500
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6C413F74;
+        Tue,  8 Nov 2022 04:54:16 -0800 (PST)
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-13be3ef361dso16076200fac.12;
+        Tue, 08 Nov 2022 04:54:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YDCWn530jVhC93+NHzsDVE6RW/pM4nXDlcbnpHb97W0=;
-        b=4ymI75zKo5qk42+qIDq78pcWH9ZMsxLD4kt5KRmaY3557jUrAbqzql6uHta3J0Lfw5
-         vRrUIKgpYTBwIQXlhggFkchwWLdXuI0g1NrHdIfKhlv7yZhexa5x9knHfNYeiPRkzxFH
-         qwtTnxpZaqREqiz9TttZE7yKsO7X3MjCtbnFO/SwRqTDWCAQBJOyJtTQBrSeaZ2GI2Dy
-         HyeA4Ca6PAxga1esFzY18T3Tr47IPhk3mIBX5EE7d97zlUeU4jqPM0OoJgEol6JVqw6r
-         mHgC6U93yRcr7+MHBPaR3nl69D1GFn8BKH49Vt21LMl4sEtYFaQDNCAe/Bv/0PspbQMf
-         PQvA==
-X-Gm-Message-State: ACrzQf1ir4Vkl2Jij8LD/kYHexo+MycIgVvbz43aZlCr6fWrYp8J2haf
-        0IRInQ74AziAJpnWvm89bd0daMh3bkYk4g==
-X-Google-Smtp-Source: AMsMyM5vHGBHJJTGlUPjj7nEyGc6v03Vez/8YGUTI+1eUSQ1aTMntjqn7ZlGVGA7eVfoeWYJvVM26A==
-X-Received: by 2002:a05:6214:27c3:b0:4bb:6d7d:982a with SMTP id ge3-20020a05621427c300b004bb6d7d982amr48617031qvb.98.1667908828351;
-        Tue, 08 Nov 2022 04:00:28 -0800 (PST)
-Received: from [172.17.0.2] ([20.163.137.178])
-        by smtp.gmail.com with ESMTPSA id ge17-20020a05622a5c9100b0039cc64bcb53sm8048854qtb.27.2022.11.08.04.00.27
+        h=date:subject:message-id:references:in-reply-to:cc:to:from
+         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=SzZDsYsSktFleiAhrmFxUDwbBhqTEmdM7+gPTdb1QWs=;
+        b=4W0DILLlQHSy+g3VC4lIhwDAPLY6Ny0z7R45gFPWhc0447/Ni1m+hJuDXO0WCzsOuJ
+         XeHT5t9rVqnHf7NjgqR82UP+odQOfWPZsFCF07/UMGVTr+yU1cskgss/2IRHBSc0SbJ7
+         r0nQiNmBS9wsQSOsk/UgCEEvNU5Xu7lAWcsZ7cdjsAsI5ty9R/9JCGK4xqCHiwD3f8E2
+         kZekScapkoBksiNS2aeHY0HWSaEsjB7NzFjHChGPRrbZPhclgUAuZhEQWqd46OtsJXSY
+         lPsdVforgZ83H6fOi/pEtwwHD53ORQRk/FwEdZS2j9olvE0ztHlhlyvT9IF/zsgz+PmC
+         U6kQ==
+X-Gm-Message-State: ACrzQf3LkjhRkc/6EkIoZE1ROzujlvS4uxk54GVZY+nQrPeerZGGnBun
+        /mCMsvPFCrSeif+fDwhebw==
+X-Google-Smtp-Source: AMsMyM580nTfyC5o5WPw6g957OJSRAI/W4Dqx0KuxfxRlUmNItCo2MLFXkiY+y+UQWVEF+C9mIlzcA==
+X-Received: by 2002:a05:6870:e390:b0:13b:d088:bfc with SMTP id x16-20020a056870e39000b0013bd0880bfcmr32193427oad.199.1667912056078;
+        Tue, 08 Nov 2022 04:54:16 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id y23-20020a9d6357000000b00660d9afc216sm4035194otk.17.2022.11.08.04.54.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Nov 2022 04:00:27 -0800 (PST)
-Message-ID: <636a44db.050a0220.1d8f7.155a@mx.google.com>
-Date:   Tue, 08 Nov 2022 04:00:27 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2454171863961073369=="
+        Tue, 08 Nov 2022 04:54:15 -0800 (PST)
+Received: (nullmailer pid 3254923 invoked by uid 1000);
+        Tue, 08 Nov 2022 12:54:14 -0000
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bobo.shaobowang@huawei.com
-Subject: RE: Bluetooth: hci_conn: Fix potential memleak in iso_listen_bis()
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
-References: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
+From:   Rob Herring <robh@kernel.org>
+To:     Dominique Martinet <dominique.martinet@atmark-techno.com>
+Cc:     mizo@atmark-techno.com,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Eric Dumazet <edumazet@google.com>,
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org,
+        netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
+References: <20221108055531.2176793-1-dominique.martinet@atmark-techno.com>
+ <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
+Message-Id: <166791192640.3252604.4671719183528311477.robh@kernel.org>
+Subject: Re: [RFC PATCH 1/2] dt-bindings: net: h4-bluetooth: add new bindings
+ for hci_h4
+Date:   Tue, 08 Nov 2022 06:54:14 -0600
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2454171863961073369==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 
-This is automated email and please do not reply to this email!
+On Tue, 08 Nov 2022 14:55:30 +0900, Dominique Martinet wrote:
+> Add devicetree binding to support defining a bluetooth device using the h4
+> uart protocol
+> 
+> This was tested with a NXP wireless+BT AW-XM458 module, but might
+> benefit others as the H4 protocol seems often used.
+> 
+> Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
+> ---
+>  .../devicetree/bindings/net/h4-bluetooth.yaml | 49 +++++++++++++++++++
+>  1 file changed, 49 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+> 
 
-Dear submitter,
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=693186
+yamllint warnings/errors:
 
----Test result---
+dtschema/dtc warnings/errors:
+fsl,dte-mode: boolean property with value b'\x00\x00\x00\x01'
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/h4-bluetooth.example.dtb: uart1: fsl,dte-mode: b'\x00\x00\x00\x01' is not of type 'object', 'array', 'boolean', 'null'
+	From schema: /usr/local/lib/python3.10/dist-packages/dtschema/schemas/dt-core.yaml
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/h4-bluetooth.example.dtb: uart1: 'anyOf' conditional failed, one must be fixed:
+	'clocks' is a required property
+	'#clock-cells' is a required property
+	From schema: /usr/local/lib/python3.10/dist-packages/dtschema/schemas/clock/clock.yaml
 
-Test Summary:
-CheckPatch                    PASS      1.66 seconds
-GitLint                       PASS      1.05 seconds
-SubjectPrefix                 PASS      0.84 seconds
-BuildKernel                   PASS      34.49 seconds
-BuildKernel32                 PASS      30.67 seconds
-Incremental Build with patchesPASS      47.81 seconds
-TestRunner: Setup             PASS      510.78 seconds
-TestRunner: l2cap-tester      PASS      17.73 seconds
-TestRunner: iso-tester        PASS      16.71 seconds
-TestRunner: bnep-tester       PASS      6.66 seconds
-TestRunner: mgmt-tester       PASS      107.48 seconds
-TestRunner: rfcomm-tester     PASS      10.88 seconds
-TestRunner: sco-tester        PASS      9.90 seconds
-TestRunner: ioctl-tester      PASS      11.26 seconds
-TestRunner: mesh-tester       PASS      8.20 seconds
-TestRunner: smp-tester        PASS      9.91 seconds
-TestRunner: userchan-tester   PASS      6.89 seconds
+doc reference errors (make refcheckdocs):
 
+See https://patchwork.ozlabs.org/patch/
 
+This check can fail if there are any dependencies. The base for a patch
+series is generally the most recent rc1.
 
----
-Regards,
-Linux Bluetooth
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
 
+pip3 install dtschema --upgrade
 
---===============2454171863961073369==--
+Please check and re-submit.
+
