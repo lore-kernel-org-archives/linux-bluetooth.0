@@ -2,180 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA650C43217
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 11:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3102C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 12:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233879AbiKHLhp (ORCPT
+        id S233971AbiKHMAc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Nov 2022 06:37:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44442 "EHLO
+        Tue, 8 Nov 2022 07:00:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233592AbiKHLho (ORCPT
+        with ESMTP id S233613AbiKHMAa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Nov 2022 06:37:44 -0500
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DCF1AF38
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 03:37:42 -0800 (PST)
-Received: by mail-lj1-x229.google.com with SMTP id s24so20652099ljs.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 03:37:42 -0800 (PST)
+        Tue, 8 Nov 2022 07:00:30 -0500
+Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79591E701
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 04:00:29 -0800 (PST)
+Received: by mail-qv1-xf35.google.com with SMTP id mi9so10052153qvb.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 04:00:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/lVzoqt83Ak42kIKiN8LqOfDF7RgMmRJivY7ZIPnKXQ=;
-        b=KbCk9zzDc2wv90rxSwsopGI0FlGUd0PHG+RyDVhJXRh4SJnAEKlKOHAO9WzEyon8/U
-         x8mfPKi9UZIZ9QyvTtebQx0+Gx0ESDxdOVK95xjJ0U2s0YKMlQua3U2+b/ucPREDz8ia
-         OYEVwIEafPl7Sencx2iu54Uzz/81mg7fz8Zm+KNetL+aRMNVH03nrfONnWzdc4Z9Q75h
-         11a45zws/P3tKRV/zIyFERUv6WRx8DqVi6CTX+cBPFYQv9ROPz47OMh6mXx2IIjhTxuU
-         pZ+fSG0PFRhHeZYK5Gx4OQHEQWQ/Nav1ZvRnWCgN7+2C/IddxLnpLb7U11DpCM11lOLJ
-         J9+g==
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YDCWn530jVhC93+NHzsDVE6RW/pM4nXDlcbnpHb97W0=;
+        b=RnJa4EKUUN0lnfbcz/iPYxUDZhsWNUIXkwJWbGuWlMGip9G6k6ioamTcwfbgGJbjCq
+         HGhBnmVMQyX04+fc2iDf4/aRbY9TzhIJR02y5fpLflb11ZK29kYaAzS1+MUrPF1RjU+z
+         gUBf+HlDn1rzrh7kuoUgluokZn/UvjfeCVJfxNXB2ix6iEtNwpqiHHdKacyIn6ghh+hD
+         HTk5jq0uPxnvhC3jU6+Y+itf1V1L0MSwuBK2IDm8xRrCZ/xJJ4PDc2IaULPylwAIK7Sl
+         JU9csrC42L0SWahaiu+AFe3KIdLvHhtpmuxdtos9A2PSXJnlZwRGZ0mmNQ7TIqHbuB1/
+         8l3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/lVzoqt83Ak42kIKiN8LqOfDF7RgMmRJivY7ZIPnKXQ=;
-        b=S6hR6sZv0WnV5q5JGWhgv75lfe6hknX5h+M+V1I/e9fMmboX53/hBoH1o2sXj/I8Er
-         OnaNuKeLnsVFPIO6EqGlsHmmbfw8M8lVDkH6U33kf6T9MuiuVa1AmNli3ANxBW401L6D
-         z7JpCv1Qha89sXkws4rCNiS8/mXh6fIe8wc1fqp5P18cldM5G4ERNa67bJzjQHhKmneD
-         9fNBjQYRR+Rh2sTOm0s93mC+TKKm7mtpucnhuBnT3VnFeTbI83GFC0yjVsi3dFw/TSVj
-         0Umo5/2BiuMXdEXRrf3/6QeSZwuu5M1N9KbcsvqbK9rpVmkHKKY+RuhAINIE2ocrsZ6J
-         XUIw==
-X-Gm-Message-State: ACrzQf2/S+d13yLlvXp3d8JPE5YtDjOqok6vxFQhoegt48INdxwFulsl
-        rc9igTlLs1IOzpGTZ3Wpb2MAAw==
-X-Google-Smtp-Source: AMsMyM5KfVSdGMmsYyYqwDpB8dMs4e5lU9f2Z35qXgpVXEtl8NlkUdlhY05UJ83tg5wczhgiCdWTlg==
-X-Received: by 2002:a05:651c:307:b0:277:113f:3a1e with SMTP id a7-20020a05651c030700b00277113f3a1emr19582705ljp.518.1667907460751;
-        Tue, 08 Nov 2022 03:37:40 -0800 (PST)
-Received: from [192.168.0.20] (088156142199.dynamic-2-waw-k-3-2-0.vectranet.pl. [88.156.142.199])
-        by smtp.gmail.com with ESMTPSA id o4-20020ac25e24000000b0048af4dc964asm1758175lfg.73.2022.11.08.03.37.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Nov 2022 03:37:40 -0800 (PST)
-Message-ID: <6a4f7104-8b6f-7dcd-a7ac-f866956e31d6@linaro.org>
-Date:   Tue, 8 Nov 2022 12:37:39 +0100
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YDCWn530jVhC93+NHzsDVE6RW/pM4nXDlcbnpHb97W0=;
+        b=4ymI75zKo5qk42+qIDq78pcWH9ZMsxLD4kt5KRmaY3557jUrAbqzql6uHta3J0Lfw5
+         vRrUIKgpYTBwIQXlhggFkchwWLdXuI0g1NrHdIfKhlv7yZhexa5x9knHfNYeiPRkzxFH
+         qwtTnxpZaqREqiz9TttZE7yKsO7X3MjCtbnFO/SwRqTDWCAQBJOyJtTQBrSeaZ2GI2Dy
+         HyeA4Ca6PAxga1esFzY18T3Tr47IPhk3mIBX5EE7d97zlUeU4jqPM0OoJgEol6JVqw6r
+         mHgC6U93yRcr7+MHBPaR3nl69D1GFn8BKH49Vt21LMl4sEtYFaQDNCAe/Bv/0PspbQMf
+         PQvA==
+X-Gm-Message-State: ACrzQf1ir4Vkl2Jij8LD/kYHexo+MycIgVvbz43aZlCr6fWrYp8J2haf
+        0IRInQ74AziAJpnWvm89bd0daMh3bkYk4g==
+X-Google-Smtp-Source: AMsMyM5vHGBHJJTGlUPjj7nEyGc6v03Vez/8YGUTI+1eUSQ1aTMntjqn7ZlGVGA7eVfoeWYJvVM26A==
+X-Received: by 2002:a05:6214:27c3:b0:4bb:6d7d:982a with SMTP id ge3-20020a05621427c300b004bb6d7d982amr48617031qvb.98.1667908828351;
+        Tue, 08 Nov 2022 04:00:28 -0800 (PST)
+Received: from [172.17.0.2] ([20.163.137.178])
+        by smtp.gmail.com with ESMTPSA id ge17-20020a05622a5c9100b0039cc64bcb53sm8048854qtb.27.2022.11.08.04.00.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 04:00:27 -0800 (PST)
+Message-ID: <636a44db.050a0220.1d8f7.155a@mx.google.com>
+Date:   Tue, 08 Nov 2022 04:00:27 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2454171863961073369=="
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [RFC PATCH 1/2] dt-bindings: net: h4-bluetooth: add new bindings
- for hci_h4
-Content-Language: en-US
-To:     Dominique Martinet <dominique.martinet@atmark-techno.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>, mizo@atmark-techno.com
-References: <20221108055531.2176793-1-dominique.martinet@atmark-techno.com>
- <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20221108055531.2176793-2-dominique.martinet@atmark-techno.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, bobo.shaobowang@huawei.com
+Subject: RE: Bluetooth: hci_conn: Fix potential memleak in iso_listen_bis()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
+References: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 08/11/2022 06:55, Dominique Martinet wrote:
-> Add devicetree binding to support defining a bluetooth device using the h4
-> uart protocol
-> 
+--===============2454171863961073369==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-subject: drop second redundant "bindings"
+This is automated email and please do not reply to this email!
 
-> This was tested with a NXP wireless+BT AW-XM458 module, but might
-> benefit others as the H4 protocol seems often used.
-> 
-> Signed-off-by: Dominique Martinet <dominique.martinet@atmark-techno.com>
-> ---
->  .../devicetree/bindings/net/h4-bluetooth.yaml | 49 +++++++++++++++++++
->  1 file changed, 49 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/h4-bluetooth.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/h4-bluetooth.yaml b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..5d11b89ca386
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+Dear submitter,
 
-If the schema is for one specific device, then filename matching the
-compatible, so nxp,aw-xm458-bt.yaml... but I understand you want to
-describe here class of devices using H4 Bluetooth? Won't they need their
-own specific properties?
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=693186
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.66 seconds
+GitLint                       PASS      1.05 seconds
+SubjectPrefix                 PASS      0.84 seconds
+BuildKernel                   PASS      34.49 seconds
+BuildKernel32                 PASS      30.67 seconds
+Incremental Build with patchesPASS      47.81 seconds
+TestRunner: Setup             PASS      510.78 seconds
+TestRunner: l2cap-tester      PASS      17.73 seconds
+TestRunner: iso-tester        PASS      16.71 seconds
+TestRunner: bnep-tester       PASS      6.66 seconds
+TestRunner: mgmt-tester       PASS      107.48 seconds
+TestRunner: rfcomm-tester     PASS      10.88 seconds
+TestRunner: sco-tester        PASS      9.90 seconds
+TestRunner: ioctl-tester      PASS      11.26 seconds
+TestRunner: mesh-tester       PASS      8.20 seconds
+TestRunner: smp-tester        PASS      9.91 seconds
+TestRunner: userchan-tester   PASS      6.89 seconds
 
 
-> @@ -0,0 +1,49 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/h4-bluetooth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: H4 Bluetooth
-> +
-> +maintainers:
-> +  - Dominique Martinet <dominique.martinet@atmark-techno.com>
-> +
-> +description:
-> +  H4 is a common bluetooth over uart protocol.
 
-Bluetooth
-UART
+---
+Regards,
+Linux Bluetooth
 
-> +  For example, the AW-XM458 is a WiFi + BT module where the WiFi part is
-> +  connected over PCI (M.2), while BT is connected over serial speaking
-> +  the H4 protocol. Its firmware is sent on the PCI side.
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - nxp,aw-xm458-bt
-> +
-> +  max-speed: true
-> +
-> +required:
-> +  - compatible
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    #include <dt-bindings/clock/imx8mp-clock.h>
-> +
-> +    uart1 {
 
-uart
-
-> +        pinctrl-names = "default";
-> +        pinctrl-0 = <&pinctrl_uart1>;
-> +        assigned-clocks = <&clk IMX8MP_CLK_UART1>;
-> +        assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-
-Drop unrelated properties.
-
-> +        status = "okay";
-
-Drop status.
-
-> +        fsl,dte-mode = <1>;
-> +        fsl,uart-has-rtscts;
-
-Are these two related to this hardware?
-
-> +
-> +
-> +        bluetooth {
-> +            compatible = "nxp,aw-xm458-bt";
-> +            max-speed = <3000000>;
-> +        };
-> +    };
-
-Best regards,
-Krzysztof
-
+--===============2454171863961073369==--
