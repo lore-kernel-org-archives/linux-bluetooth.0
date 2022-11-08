@@ -2,104 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10154C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 23:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4C5C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 23:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230093AbiKHXmF (ORCPT
+        id S229714AbiKHXzA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Nov 2022 18:42:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43780 "EHLO
+        Tue, 8 Nov 2022 18:55:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbiKHXmA (ORCPT
+        with ESMTP id S229554AbiKHXy7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Nov 2022 18:42:00 -0500
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE59156565;
-        Tue,  8 Nov 2022 15:41:59 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id l8so23388849ljh.13;
-        Tue, 08 Nov 2022 15:41:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=eT7O5eQLDvzcmFKSKwK9EoVR3gZts5XZRjZirOo18Eo=;
-        b=LIj/+aGozaURloAOaqWAmoVEXdQCpqeinYmHbcDRz3f3JCiQd1nzoPwn8wPYJ/VsT4
-         Wj3jA3+DjTOUCf0c9PmtjyLztWOq4UVULnAVis7OJCja37TjU+q+BOXuDwMYf+9VWpCz
-         MocMTq617Ocoha4ggogmK/eLLa+8XcM7Axrjjg+jAnCK0/i5/UeCEQLc2cDIoVagbsLC
-         POql4GpimOx9j+2MS384YdDJSNqwbzwEFfA8nuKgkhhmlCibcbKgtyI3NarTpbOOE0Vc
-         vRvLAgAftCt9/Mat1ae1vsH2Wp5J8t0Gek8Ao1KnjynfUdjB7jPP3SFmZDck1eG9DqIo
-         kqTg==
+        Tue, 8 Nov 2022 18:54:59 -0500
+Received: from gw.atmark-techno.com (gw.atmark-techno.com [13.115.124.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C022221826
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 15:54:57 -0800 (PST)
+Received: from gw.atmark-techno.com (localhost [127.0.0.1])
+        by gw.atmark-techno.com (Postfix) with ESMTP id A6BF760138
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 08:54:56 +0900 (JST)
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+        by gw.atmark-techno.com (Postfix) with ESMTPS id 114BA60138
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 08:54:55 +0900 (JST)
+Received: by mail-pl1-f197.google.com with SMTP id n12-20020a170902e54c00b00188515e81a6so12295668plf.23
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 15:54:55 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eT7O5eQLDvzcmFKSKwK9EoVR3gZts5XZRjZirOo18Eo=;
-        b=e2zRLwiWYQo2DF9/c3PP6roxX9bQhwHtvige5P7uVu1MCMyGS50emt4xD6x7BekyuT
-         52wqvd2LmFfakyrLJD2vkdQjH4NRjRVUJIIbJS6/zJcAYEbEnyOfVxTrcV3JaooOts0U
-         PPsklqqJLLGsjxhS33GN/CHjzk2MJvwXjuS3CofYAI0E/u09fMe5ViL9FChX6KqzxG3i
-         K7P1OiblK8dnc1AxmN3pCyM9EiUIykyS0oAUcLT7lY5RxX7hPrjjKQNPZk/bMjV4utHO
-         Zt3Wiy4i2rEDUspuAMmMG8MVOORME6iNtraW0hRPn4am6KZiJkM+n23kt7UmCIOWX0gQ
-         irMw==
-X-Gm-Message-State: ACrzQf0TD9+KadvPaXLXE2uRhRXj0d7jajfPZv8QqWavOLAdDyUJbR0z
-        2ALuHepvh78JGBDr8Fsjj0DEgTBnPEgfTIsHJw0qd0TZZTU=
-X-Google-Smtp-Source: AMsMyM7QtmFUyDVKVR+auY0BKjNsydH3B0PKIE+OAwmDI7DkgaifUG09/juueV9iEgjva8KEGzDdpzkX5xdXUeD6DdI=
-X-Received: by 2002:a2e:8743:0:b0:277:10a8:3e8f with SMTP id
- q3-20020a2e8743000000b0027710a83e8fmr18875031ljj.423.1667950918091; Tue, 08
- Nov 2022 15:41:58 -0800 (PST)
+        bh=KnksoYaM8c4ehrc9G/4XJM9Rzso4aSMZWSvfC6plin4=;
+        b=QHw3Te3xiRry8BiyUWHb79/e6ck15R5nN1t0mxh9N+EyksIxTIUe90Oy+S+yblhN8B
+         /1Ti86XnA1XbFFbaY3KcTq3S6nOu3gqGfXXxuE0uE7XObhc+oEXMV+Cktsdn0WgLTugL
+         VSIFlZiTwzjnSdQUKvVPaaZfowuXrqHh2tK/kXNktOvxL4qx7f/OFw3pgEGk0soL0rSb
+         WIzuySmc/x54L6rtHX6BmW6MN5jxojdwbPRsc3ydA67oKb7fM6FGhlP60GWk46nyZjhH
+         8Q2cFZsJYFrQ5d3r7kH3eHe5XEUdJkU2rjYRe8cgtlpVkGDsm/+Oux5ZixU9WDvlirXF
+         7xDA==
+X-Gm-Message-State: ANoB5pl6cCcC8cfsnwcB617DB3eMShS6EFn2szQNyiwJNEv5S2clcErv
+        GmIVyVVsrQ5eKnsZfb4NQa3vC9GpGVSENLmGtwzGtzVhoz/Ta0gSDIQqCmXfDw+rdRKHxQhG/am
+        cwU0K5Vj/M4n8IeQdqbkzFe2Xj9L0CSzT
+X-Received: by 2002:a17:90a:49c9:b0:217:c5f6:4092 with SMTP id l9-20020a17090a49c900b00217c5f64092mr17169901pjm.33.1667951694111;
+        Tue, 08 Nov 2022 15:54:54 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7lkcyT6KvvbkCMvIGHyAcNSvH+64wkGaI4+wTqhrX3TWqblxAynjwlMg46xqVUO1hbqGJEPw==
+X-Received: by 2002:a17:90a:49c9:b0:217:c5f6:4092 with SMTP id l9-20020a17090a49c900b00217c5f64092mr17169877pjm.33.1667951693797;
+        Tue, 08 Nov 2022 15:54:53 -0800 (PST)
+Received: from pc-zest.atmarktech (162.198.187.35.bc.googleusercontent.com. [35.187.198.162])
+        by smtp.gmail.com with ESMTPSA id c1-20020a170902b68100b00186a2444a43sm7469812pls.27.2022.11.08.15.54.53
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 08 Nov 2022 15:54:53 -0800 (PST)
+Received: from martinet by pc-zest.atmarktech with local (Exim 4.96)
+        (envelope-from <martinet@pc-zest>)
+        id 1osYQe-00C2iT-1F;
+        Wed, 09 Nov 2022 08:54:52 +0900
+Date:   Wed, 9 Nov 2022 08:54:42 +0900
+From:   Dominique Martinet <dominique.martinet@atmark-techno.com>
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S . Miller" <davem@davemloft.net>, mizo@atmark-techno.com
+Subject: Re: [RFC PATCH 1/2] dt-bindings: net: h4-bluetooth: add new bindings
+ for hci_h4
+Message-ID: <Y2rsQowbtvOdmQO9@atmark-techno.com>
 MIME-Version: 1.0
-References: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
-In-Reply-To: <20221108112308.3910185-1-bobo.shaobowang@huawei.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Nov 2022 15:41:46 -0800
-Message-ID: <CABBYNZJxkkrmuq+2LS3PAbhBCdE5oAkMuw_yggsXW=X0j8CCTw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_conn: Fix potential memleak in iso_listen_bis()
-To:     Wang ShaoBo <bobo.shaobowang@huawei.com>
-Cc:     luiz.von.dentz@intel.com, pabeni@redhat.com, liwei391@huawei.com,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqKCb2ZA+CLTVnGBMjp6zu0yw-rSFjWRg2S3hA7S6h-XEA@mail.gmail.com>
+ <6a4f7104-8b6f-7dcd-a7ac-f866956e31d6@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wang,
+Thanks for all the replies!
 
-On Tue, Nov 8, 2022 at 3:24 AM Wang ShaoBo <bobo.shaobowang@huawei.com> wrote:
->
-> When hci_pa_create_sync() failed, hdev should be freed as there
-> was no place to handle its recycling after.
+All remarks make sense, I'll do my homework and send a v2 once extra
+questions have been answered.
 
-The patch itself seems fine but the description is misleading since we
-are not freeing the hdev instead we are jus releasing the reference we
-got.
+Rob Herring wrote on Tue, Nov 08, 2022 at 07:59:33AM -0600:
+> On Mon, Nov 7, 2022 at 11:56 PM Dominique Martinet
+> <dominique.martinet@atmark-techno.com> wrote:
+> > Add devicetree binding to support defining a bluetooth device using the h4
+> > uart protocol
+> 
+> The protocol is mostly irrelevant to the binding. The binding is for a
+> particular device even if the driver is shared.
 
-> Fixes: f764a6c2c1e4 ("Bluetooth: ISO: Add broadcast support")
-> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
-> ---
->  net/bluetooth/iso.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
-> index f825857db6d0..4e3867110dc1 100644
-> --- a/net/bluetooth/iso.c
-> +++ b/net/bluetooth/iso.c
-> @@ -880,6 +880,9 @@ static int iso_listen_bis(struct sock *sk)
->
->         hci_dev_unlock(hdev);
->
-> +       if (err)
-> +               hci_dev_put(hdev);
+This echoes the point below: I wanted to make this a bit more generic
+for other adapters, question at the end of my first reply to Krzysztof
+below.
 
-Not sure why you are not always calling hci_dev_put?
+> There's now a pending (in linux-next) net/bluetooth/ directory and a
+> bluetooth-controller.yaml schema which you should reference.
 
->         return err;
->  }
->
-> --
-> 2.25.1
->
+Will check it out and add that.
 
+Krzysztof Kozlowski wrote on Tue, Nov 08, 2022 at 12:37:39PM +0100:
+> > diff --git a/Documentation/devicetree/bindings/net/h4-bluetooth.yaml b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+> > new file mode 100644
+> > index 000000000000..5d11b89ca386
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/h4-bluetooth.yaml
+> 
+> If the schema is for one specific device, then filename matching the
+> compatible, so nxp,aw-xm458-bt.yaml... but I understand you want to
+> describe here class of devices using H4 Bluetooth? Won't they need their
+> own specific properties?
+
+H4 bluetooth itself has very little configurable elements, from what I
+can see about the device I'm using the actual configuration is done by
+the wifi driver that uploads a "combo" firmware over the PCI side
+(it's based on mwifiex, so for example mrvl/pcieuart8997_combo_v4.bin
+upstream works the same way afaik)
+
+This is a pretty terrible design, as the Bluetooth side cannot actually
+know when the device is ready as the initialization takes place, but
+that means there really aren't any property to give here
+
+(I haven't reproduced during normal boot, but in particular if I run
+bluetoothd before loading the wifi driver, I need to unbind/bind the
+serial device from the hci_uart_h4 driver to recover bluetooth...
+With that in mind it might actually be best to try to coordinate this
+from userspace with btattach after all, and I'd be happy with that if I
+didn't have to fight our init system so much, but as things stand having
+it autoloaded by the kernel is more convenient for us... Which is
+admitedly a weak reason for you all, feel free to tell me this isn't
+viable)
+
+
+Anyway, there probably would be other devices benefiting from this, at
+the very least other cards in the mwifiex family, but I'm doing this as
+a end user so I'm not comfortable adding devices I cannot test.
+
+So with all of this (sorry for the wall of text), should I try to keep
+this generic, or just give up and make it specific to nxp,aw-xm458-bt
+and let whoever adds the next device rename the file?
+
+
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/gpio/gpio.h>
+> > +    #include <dt-bindings/clock/imx8mp-clock.h>
+> > +
+> > +    uart {
+> > +        fsl,dte-mode = <1>;
+> > +        fsl,uart-has-rtscts;
+> 
+> Are these two related to this hardware?
+
+I'd say it's related to my soc rather than the Bluetooth adapter; I
+tried to give a full example but it's unrelated and I'll drop this as
+well.
 
 -- 
-Luiz Augusto von Dentz
+Dominique Martinet
+
+
