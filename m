@@ -2,105 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C2CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 12:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C90B7C4321E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Nov 2022 13:39:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234299AbiKHM7o (ORCPT
+        id S234072AbiKHNj6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Nov 2022 07:59:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42624 "EHLO
+        Tue, 8 Nov 2022 08:39:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234291AbiKHM7k (ORCPT
+        with ESMTP id S234025AbiKHNj4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Nov 2022 07:59:40 -0500
-X-Greylist: delayed 301 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Nov 2022 04:59:38 PST
-Received: from so254-31.mailgun.net (so254-31.mailgun.net [198.61.254.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE842D756
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 04:59:37 -0800 (PST)
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=cyborgize.sg; q=dns/txt;
- s=mailo; t=1667912376; x=1667998776; h=Content-Transfer-Encoding:
- MIME-Version: Message-Id: Date: Subject: Subject: Cc: To: To: From:
- From: Sender: Sender; bh=8C+1x60cHFx8ptFT5ukscAXzWUX6EHT+wW21yOvpskE=;
- b=WnviotCdkUr2QVr2I8Mj69Jq2pnJyNJh8b3wgWb5Lg+dMlXWjVXvE1GvI30aasuYCq8P+DyR
- RbgRq0bP96VNb0jzPwdCn7tnvgIGiaG2fTBhKc+Tc3tj9CCGXXgBaigxRBD9fP+APSTypZ48
- 4ILdkSsLwye8hR7bWveDHEib7Ps=
-X-Mailgun-Sending-Ip: 198.61.254.31
-X-Mailgun-Sid: WyIxYzMxZCIsImxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmciLCI1Nzg5NGMiXQ==
-Received: from cyberarch.. (bb220-255-210-219.singnet.com.sg
- [220.255.210.219]) by 62d140420ffc with SMTP id 636a518ad4231954e23ed2d1;
- Tue, 08 Nov 2022 12:54:34 GMT
-Sender: linux-bluetooth@cyborgize.sg
-From:   Raman Varabets <linux-bluetooth@cyborgize.sg>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Raman Varabets <linux-bluetooth@cyborgize.sg>
-Subject: [PATCH] Bluetooth: btusb: Add Realtek 8761BUV support ID 0x2B89:0x8761
-Date:   Tue,  8 Nov 2022 20:54:13 +0800
-Message-Id: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
-X-Mailer: git-send-email 2.38.1
+        Tue, 8 Nov 2022 08:39:56 -0500
+Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0588327FC6
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Nov 2022 05:39:56 -0800 (PST)
+Received: by mail-qt1-x833.google.com with SMTP id s4so8631926qtx.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Nov 2022 05:39:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=39xOSIxefg9wcdI8awZ15R9OhljN2yFqIN6CiLgKMbQ=;
+        b=e9htsokdCCxpMEC3sA1g+80ITNGFjOoRcZe7Da4I8AwUncrYH8e4Rafwu1AuAXpyaE
+         2KZAOsj3YP40iCxwdW3b9G0GnyKnJunaTRw/WVdViuJ9mAHYmWaSA7l+pRhjVBpXEqnU
+         lKfZ8D62nLassNLP1UCfrC8qCqTr2PwKd3/qERN5efOgMDoLDxc0NV4pAm/qiiEHkiyz
+         feKYLlo4ByDw+fBOGWRqAVk27yLNEawdbOsb0tan8H10t/QpydQJn2l8WeauobQwIG6J
+         ee9eFAK5Et6apqp9RoMB5mA84rCrP2/Nbu2MofDqBWegNAOWaufwsxwhXjaijVs7sl5P
+         EQYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=39xOSIxefg9wcdI8awZ15R9OhljN2yFqIN6CiLgKMbQ=;
+        b=jIPTNmnBKOZ+wgvfJAAQF4IZCkpBYMOMqDbiOB21QpXKVNKdhkzSpfdWsSxOexb0i1
+         eoKvwRJ15XhEnWymhsI7LhC0Mk86P+kZ/C/3liySzurT0A8pkhxjGyWekfnXtrbhNjVh
+         4Yj0wWQzXhWf+UN34B5IKSxMrgSLjHh5snzgDwlzZ+BJpsvl21Xy1cPEqtp7i2oBWoEe
+         yNqIh4MhvmFXjQCuUP0rb0UTPMdTiXJxBTrraLjeIrE9Re11FJXsETSEZ1V2YRk85OGG
+         /27TYikbTNjiVeRQOZWcgL1IsKwCt4AWkMHgWZivlwA0FqQZ5dK9fKfQrjxdbEJWcEtv
+         Nw6g==
+X-Gm-Message-State: ACrzQf0UxLLIXDe1Sh4vK/W3JdLZB924NNJ+fYUmTg1S1eti5lsS2qQN
+        BxaBEVJmfq7pz4ssTMDCybDgPY0hAwsJIw==
+X-Google-Smtp-Source: AMsMyM5PCE1WnR0AA7usBS7KU7tJij9YG+50SyVvc5Jp4qAyA+oQeDcwzbMR1OduaFGBD7J4B3KxUQ==
+X-Received: by 2002:ac8:58c4:0:b0:39c:b702:8ec with SMTP id u4-20020ac858c4000000b0039cb70208ecmr860575qta.253.1667914795003;
+        Tue, 08 Nov 2022 05:39:55 -0800 (PST)
+Received: from [172.17.0.2] ([20.185.196.244])
+        by smtp.gmail.com with ESMTPSA id s26-20020a05622a1a9a00b0039a610a04b1sm8325001qtc.37.2022.11.08.05.39.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Nov 2022 05:39:54 -0800 (PST)
+Message-ID: <636a5c2a.050a0220.b13b3.26a4@mx.google.com>
+Date:   Tue, 08 Nov 2022 05:39:54 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============7180223290928803092=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, linux-bluetooth@cyborgize.sg
+Subject: RE: Bluetooth: btusb: Add Realtek 8761BUV support ID 0x2B89:0x8761
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
+References: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Identifies as "Realtek Bluetooth Radio";
-used in UGREEN CM390 (P/N 80889).
+--===============7180223290928803092==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Device description at /sys/kernel/debug/usb/devices:
+This is automated email and please do not reply to this email!
 
-T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  7 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=2b89 ProdID=8761 Rev= 2.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00E04C239987
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Dear submitter,
 
-Signed-off-by: Raman Varabets <linux-bluetooth@cyborgize.sg>
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=693232
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.67 seconds
+GitLint                       PASS      1.03 seconds
+SubjectPrefix                 PASS      0.85 seconds
+BuildKernel                   PASS      35.46 seconds
+BuildKernel32                 PASS      31.76 seconds
+Incremental Build with patchesPASS      47.46 seconds
+TestRunner: Setup             PASS      531.28 seconds
+TestRunner: l2cap-tester      PASS      18.04 seconds
+TestRunner: iso-tester        PASS      17.36 seconds
+TestRunner: bnep-tester       PASS      6.75 seconds
+TestRunner: mgmt-tester       PASS      108.29 seconds
+TestRunner: rfcomm-tester     PASS      10.68 seconds
+TestRunner: sco-tester        PASS      9.99 seconds
+TestRunner: ioctl-tester      PASS      11.37 seconds
+TestRunner: mesh-tester       PASS      8.40 seconds
+TestRunner: smp-tester        PASS      10.07 seconds
+TestRunner: userchan-tester   PASS      7.06 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 271963805a38..20dc422378b8 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -543,6 +543,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x7392, 0xc611), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x2b89, 0x8761), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
- 
- 	/* Additional Realtek 8821AE Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x17dc), .driver_info = BTUSB_REALTEK },
 
-base-commit: b1a2cd50c0357f243b7435a732b4e62ba3157a2e
--- 
-2.38.1
-
+--===============7180223290928803092==--
