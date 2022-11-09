@@ -2,109 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D47B8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 22:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D333C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 22:29:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232040AbiKIWAJ (ORCPT
+        id S232198AbiKIW3o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Nov 2022 17:00:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56160 "EHLO
+        Wed, 9 Nov 2022 17:29:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbiKIWAG (ORCPT
+        with ESMTP id S232217AbiKIW3i (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Nov 2022 17:00:06 -0500
-Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCBE15824;
-        Wed,  9 Nov 2022 14:00:05 -0800 (PST)
-Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-13bef14ea06so323653fac.3;
-        Wed, 09 Nov 2022 14:00:05 -0800 (PST)
+        Wed, 9 Nov 2022 17:29:38 -0500
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A9C82EF77
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 14:29:34 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id fz10so56491qtb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Nov 2022 14:29:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLY8KpeE8Egd3biw/bjn/d0MZKjfy02OzHvVagQIpyA=;
+        b=Gzz6P4OZ55yVkH+wMdZvOlSQ0AeYLvPt4DjmcRcgFGST732eWvAKvF5kbPzGxzfdHH
+         DuwZE4YxcklTpwS46LN4qPFV9zoNOqUtOxXeJy5M9eWFdJDRPNlT48XvcMeVu/yJgPgM
+         A1xE86PORFjgpUv3T7gyvRIeoNwnanGH5Vcti3UDrKqLsk93hfx1nBcD6TceBgDitF+g
+         kq7SsYspQjzlC5Yzn8Yp5msB9HBoyjAWT2C/MWUTRSEvlDiU/5Py7edas3iqCgZtxQVA
+         WCeE4lK3XGBmH8cpLYPifxcPnUq4GZp+uMiHTuxY+6p5Dc42r6fFseY5YDaIw1KrAmJ8
+         fvYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MBKBlPlYHH+d23qoAhQOq2lKx+b+s6DjJqW2E+tnx78=;
-        b=vF1Ae9NzXfI6JISwGKGv8JwLRALwEyCqkoDFVQAGy+3LcBSoCBU+7VXyx5S8QyPtwR
-         1srm2pvBJ1DEBcM62BB5SfO27jYfmn/biwp0CNuPPo0OmobUJOX2oQZWbLGeFsHTGEDa
-         wBpKXEFQU6B5PKyZFz2Jcs40T0oRcGw+VlLkasZZT7Mcxy3TyQPeQgO7mPQ+KN7HO1qg
-         I1VY56c064WJLyVPhp114NImk9KkZb8oZzKRUFtZqycjCov3z64WWQ2JF0vc8ut4z/L4
-         rC5i4aB7OHpr39YsRcZmPk/q6tW4q/T5EFtY0xAhV4uG459nZIrCl+6emUO3KIlL3PDp
-         TRtg==
-X-Gm-Message-State: ACrzQf0y7tgNg9mFaaIP1cwh8qDSQnoQBkj+VVq0ctazDHhYRwrXUfax
-        fElWXxQx4W8TgNnoqodLeQ==
-X-Google-Smtp-Source: AMsMyM6RtkRPsY/21k9tRFMpIeKt38HsQlzu9nAZrPUmyHUaj27aNg7tYDMULJ1nSDY2kux7Z8WMjg==
-X-Received: by 2002:a05:6870:a2ce:b0:131:a8bc:54db with SMTP id w14-20020a056870a2ce00b00131a8bc54dbmr38331247oak.187.1668031204238;
-        Wed, 09 Nov 2022 14:00:04 -0800 (PST)
-Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
-        by smtp.gmail.com with ESMTPSA id er33-20020a056870c8a100b00131c3d4d38fsm6666398oab.39.2022.11.09.14.00.03
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLY8KpeE8Egd3biw/bjn/d0MZKjfy02OzHvVagQIpyA=;
+        b=d/5XFtAKX/t042Naai7t1cev1aVJkg1kYNTe7kWyXosxg5F4HG09U9PtZ46cBAP46P
+         I1onr64j7AfcHrU2Q9BYxia+9A6JUzI+7JcYZH/KAOILggo4cj+QHPetvkLKC0uAEp5m
+         YN/bZX7Ug2Z81jbvUMz1VkLXmHF0qYdKe3LyTEpUBUTTtn4rgoZXRoy4f/PxQJBWYk8h
+         U38WCgGuo4Inw4eavZd40oWTJ8TcFxtrzcqarGMYRacuXMScIh365nMBeEM5wivWN054
+         raaKp8HDxae1hOqK62yIVecQ5N6CIUXfkAGad6DfXtPw4wDHYI3thUHT9UhPC1fvPnE5
+         ImAQ==
+X-Gm-Message-State: ANoB5pm6XMhN6MQ149l+Xr8z2HD+97EhUHER+TymTBhKW0gqizGijZ0F
+        lvAv5wkkL5mDE4Z1zSGIdIFw2okBL/s=
+X-Google-Smtp-Source: AA0mqf5ojbybmso5i8ceFUf8QbjokqscWXdqN9IcrRmon6vt1bAoGgR32EcbWDduLJS7gDnHzODBJA==
+X-Received: by 2002:a05:622a:144b:b0:3a5:abe2:51c8 with SMTP id v11-20020a05622a144b00b003a5abe251c8mr6856783qtx.433.1668032972865;
+        Wed, 09 Nov 2022 14:29:32 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id q21-20020a37f715000000b006ed61f18651sm11499501qkj.16.2022.11.09.14.29.31
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 14:00:03 -0800 (PST)
-Received: (nullmailer pid 2946725 invoked by uid 1000);
-        Wed, 09 Nov 2022 22:00:05 -0000
-Date:   Wed, 9 Nov 2022 16:00:05 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Dominique Martinet <dominique.martinet@atmark-techno.com>
-Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S . Miller" <davem@davemloft.net>, mizo@atmark-techno.com
-Subject: Re: [RFC PATCH 1/2] dt-bindings: net: h4-bluetooth: add new bindings
- for hci_h4
-Message-ID: <20221109220005.GA2930253-robh@kernel.org>
-References: <CAL_JsqKCb2ZA+CLTVnGBMjp6zu0yw-rSFjWRg2S3hA7S6h-XEA@mail.gmail.com>
- <6a4f7104-8b6f-7dcd-a7ac-f866956e31d6@linaro.org>
- <Y2rsQowbtvOdmQO9@atmark-techno.com>
- <Y2tW8EMmhTpCwitM@atmark-techno.com>
+        Wed, 09 Nov 2022 14:29:32 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/4] shared/util: Add iovec helpers
+Date:   Wed,  9 Nov 2022 14:29:26 -0800
+Message-Id: <20221109222930.1137690-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y2tW8EMmhTpCwitM@atmark-techno.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Nov 09, 2022 at 04:29:52PM +0900, Dominique Martinet wrote:
-> Dominique Martinet wrote on Wed, Nov 09, 2022 at 08:54:42AM +0900:
-> > This is a pretty terrible design, as the Bluetooth side cannot actually
-> > know when the device is ready as the initialization takes place, but
-> > that means there really aren't any property to give here
-> > 
-> > (I haven't reproduced during normal boot, but in particular if I run
-> > bluetoothd before loading the wifi driver, I need to unbind/bind the
-> > serial device from the hci_uart_h4 driver to recover bluetooth...
-> > With that in mind it might actually be best to try to coordinate this
-> > from userspace with btattach after all, and I'd be happy with that if I
-> > didn't have to fight our init system so much, but as things stand having
-> > it autoloaded by the kernel is more convenient for us... Which is
-> > admitedly a weak reason for you all, feel free to tell me this isn't
-> > viable)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Punting the issue to userspace is not a great solution...
+This adds iovec helpers functions.
+---
+ src/shared/util.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/util.h |  6 ++++++
+ 2 files changed, 59 insertions(+)
 
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 0a0308cb0786..228044be459a 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -189,6 +189,59 @@ void util_clear_uid(uint64_t *bitmap, uint8_t id)
+ 	*bitmap &= ~(((uint64_t)1) << (id - 1));
+ }
+ 
++struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt)
++{
++	struct iovec *dup;
++	size_t i;
++
++	if (!iov)
++		return NULL;
++
++	dup = new0(struct iovec, cnt);
++
++	for (i = 0; i < cnt; i++)
++		util_iov_memcpy(&dup[i], iov[i].iov_base, iov[i].iov_len);
++
++	return dup;
++}
++
++int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2)
++{
++	if (!iov1)
++		return 1;
++
++	if (!iov2)
++		return -1;
++
++	if (iov1->iov_len != iov2->iov_len)
++		return iov1->iov_len - iov2->iov_len;
++
++	return memcmp(iov1->iov_base, iov2->iov_base, iov1->iov_len);
++}
++
++void util_iov_memcpy(struct iovec *iov, void *src, size_t len)
++{
++	if (!iov)
++		return;
++
++	iov->iov_base = realloc(iov->iov_base, len);
++	iov->iov_len = len;
++	memcpy(iov->iov_base, src, len);
++}
++
++void util_iov_free(struct iovec *iov, size_t cnt)
++{
++	size_t i;
++
++	if (!iov)
++		return;
++
++	for (i = 0; i < cnt; i++)
++		free(iov[i].iov_base);
++
++	free(iov);
++}
++
+ static const struct {
+ 	uint16_t uuid;
+ 	const char *str;
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 554481e1e1ea..765a4e956636 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -15,6 +15,7 @@
+ #include <byteswap.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/uio.h>
+ 
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+ #define BIT(n)  (1 << (n))
+@@ -109,6 +110,11 @@ ssize_t util_getrandom(void *buf, size_t buflen, unsigned int flags);
+ uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
+ void util_clear_uid(uint64_t *bitmap, uint8_t id);
+ 
++struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt);
++int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2);
++void util_iov_memcpy(struct iovec *iov, void *src, size_t len);
++void util_iov_free(struct iovec *iov, size_t cnt);
++
+ const char *bt_uuid16_to_str(uint16_t uuid);
+ const char *bt_uuid32_to_str(uint32_t uuid);
+ const char *bt_uuid128_to_str(const uint8_t uuid[16]);
+-- 
+2.37.3
 
-> This actually hasn't taken long to bite us: while the driver does work,
-> we get error messages early on before the firmware is loaded.
-> (In hindsight, I probably should have waited a few days before sending
-> this...)
-> 
-> 
-> My current workaround is to return EPROBE_DEFER until we can find a
-> netdev with a known name in the init namespace, but that isn't really
-> something I'd consider upstreamable for obvious reasons (interfaces can
-> be renamed or moved to different namespaces so this is inherently racy
-> and it's just out of place in BT code)
-
-Can't you just try to access the BT h/w in some way and defer when that 
-fails?
-
-Or perhaps use fw_devlink to create a dependency on the wifi node. I'm 
-not sure offhand how exactly you do that with a custom property.
-
-Rob
