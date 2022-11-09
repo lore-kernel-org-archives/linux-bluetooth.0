@@ -2,192 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C336C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 20:49:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF8CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 21:14:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231351AbiKIUti (ORCPT
+        id S231185AbiKIVOn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Nov 2022 15:49:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47174 "EHLO
+        Wed, 9 Nov 2022 16:14:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231666AbiKIUtf (ORCPT
+        with ESMTP id S229635AbiKIVOm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Nov 2022 15:49:35 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F0D62CCA1;
-        Wed,  9 Nov 2022 12:49:34 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id r12so27861670lfp.1;
-        Wed, 09 Nov 2022 12:49:34 -0800 (PST)
+        Wed, 9 Nov 2022 16:14:42 -0500
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5B7A15A37
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 13:14:41 -0800 (PST)
+Received: by mail-wm1-x32a.google.com with SMTP id l39-20020a05600c1d2700b003cf93c8156dso2192948wms.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Nov 2022 13:14:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HMexBlxBxOfaLRccW2JVyrflm9G7r7sk5hRAu9Qd8Xw=;
-        b=lNabaBwBDx8wdVGBNgTi9QC7ZUqI1PcJvBPYkx5jrHBUeWhiNinibODdCdAobmUQsp
-         xX/EDJFbuhFE0m9R3ZyxxJXaocdRM7BwV3OHrhEH4ZSJqWDNDOEU8kAbOzh/Qw7grLtQ
-         2VDPcwgFBJlvk/MF2Lnt+TlB52oW2yPF+Vp1shEB5BicSyRVPfzlC4gUEX28a9jJuS+Y
-         d+T7DDTc2OqSBIJGkr5q0G8dv1mquMEhGbGaEc2Nh8qp8YP5Uy4OV4SOR5jlHVbQa9K6
-         DAoNKZkghLTa/oh6kaqdgzRmhd5vhM3Rdc49nb3dyQ/j38+8IIdKnkLLrf6EU0jumPbf
-         kxFA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TSow1iSgDx9D9KqdJs7nmJay12dkI7I2nKqIj9hVm/c=;
+        b=lf78YKYPxheIEjQmwU9QuUqMyTsW5IytdT0GBuzTPrDDOXYdbFZq9zkNI+dS87icfg
+         Uvx8IuadfuSllmJmI5i9fVNJ1hOT17LSqZpadwcff0Yo/p/qkvhugMBLCqMx3I/AvHzv
+         RyslUglvL/ZGZg78k+HJy3JqUbsfuwcOArFyTwn7UOY21fHIpRlAile+s+uw+F26qIZt
+         XMLCdIDxrkvNjywnVU9Ns+LJnBQvhsjlq4ZHBEheXZY8TnMNmW8E5uSFHl2M3BxfJcAQ
+         Ox4uMKAqvrUPSOp2d7YjsbwYaLSi3lzc+LkijXrR/qMhtlKPIIb9IfPjx7XL9Yp1hfBR
+         dqLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HMexBlxBxOfaLRccW2JVyrflm9G7r7sk5hRAu9Qd8Xw=;
-        b=hmXfG7zO5G3AE1a/88yUfPlcFgRq+ZLpYReqFMqK+apTHNqV6qd9lwK1A0SzgJ99Rr
-         18138jciOMSDPi3MhAtX1xd7hC9pt20/eK8GtspM4Bt5NRGgUBnO2N5dZjC3gM/uodOi
-         2EZP+NF4DYMaSvC0ExRtbtXekGeDdg8EbpOV7VhrCsJ7kHOWVuSRAAUuPNsT2T6gnoRB
-         aM9XvrdZKgLrZTYMSEi2sUo11ZyGKCUp60ovgR35e8BPUcMfQ02guqa/dXp5uIW45zfU
-         6YJa/WwxnxVaJsuToDQKebllhlNN0w3U5U7s81ydlL4g39dEug+II/EXT2an/7z9bljj
-         tT4g==
-X-Gm-Message-State: ACrzQf2u3sovvnXh9m0ioSg6EKeNVaqBlIfXpKCfSzhGpov7SB0dqUG4
-        aiJjWakEh7dHhng7lgqdml3HVS9WU1EDlSlG04A=
-X-Google-Smtp-Source: AMsMyM47rnxNdnhq2uJF1dI0lUZOzuLnsLb7XNFBM3pLXMpIHNfi4zaMlJ30IDlwjmXIXU+3bvfZZXI248olgA0My5A=
-X-Received: by 2002:a19:6554:0:b0:4a2:be5c:688f with SMTP id
- c20-20020a196554000000b004a2be5c688fmr775793lfj.121.1668026972441; Wed, 09
- Nov 2022 12:49:32 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TSow1iSgDx9D9KqdJs7nmJay12dkI7I2nKqIj9hVm/c=;
+        b=D5pOh0tbwEI68+noBxpNIg7WHMK7B5NtAayL69AqWLE+uSzGIyCnUSyzyqWix5tKaS
+         sHxq1NHteYe0dQTYdxrg4nyEYu11cxnSzoOzOlMOnhUaNGF0cfhugWIfr/o100sUDvKY
+         8Av5PwVaxvQ1nhutM57OYdAf2GaeN8BydhTTkX06cwWMb5Cu5bYQDkcyyAFuC0KoFkFb
+         AiCeuHb/9TDrsPjiftoRcdqmB/awdAj7cLcGLZv8hoOd6ZeBEU2mbzw2SkWFEUme9QmW
+         wGgGItvXyek3duonuzHU9GeaCLhxjem0n1muUj7rtdldVoHTiYgYKtvUt5cVN/cHqueP
+         26IQ==
+X-Gm-Message-State: ACrzQf2F7GPWUv+k1MmBIlM8eFX4k5SbzOilqx2kTTkLX4aA1uAfxfqM
+        sItp3AtlC9Qwl769G9xPHyQ=
+X-Google-Smtp-Source: AMsMyM7WR5xZdf/GPv/TGBI1rSifLjiyTJZHocaDqKyFed7YCUPkBTL1RJi4dDDLyAv/oUTgpTKEfw==
+X-Received: by 2002:a05:600c:2044:b0:3cf:570f:db5e with SMTP id p4-20020a05600c204400b003cf570fdb5emr47309248wmg.57.1668028480249;
+        Wed, 09 Nov 2022 13:14:40 -0800 (PST)
+Received: from 168.52.45.77 (201.ip-51-68-45.eu. [51.68.45.201])
+        by smtp.gmail.com with ESMTPSA id bn9-20020a056000060900b00228cd9f6349sm14075767wrb.106.2022.11.09.13.14.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Nov 2022 13:14:39 -0800 (PST)
+Message-ID: <7ea187e5-7c70-db36-1fa8-148507b2e7c5@gmail.com>
+Date:   Wed, 9 Nov 2022 22:14:36 +0100
 MIME-Version: 1.0
-References: <20221029202454.25651-1-swyterzone@gmail.com> <20221029202454.25651-3-swyterzone@gmail.com>
-In-Reply-To: <20221029202454.25651-3-swyterzone@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 9 Nov 2022 12:49:20 -0800
-Message-ID: <CABBYNZKnw+b+KE2=M=gGV+rR_KBJLvrxRrtEc8x12W6PY=LKMw@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: btusb: Add a parameter to let users
- disable the fake CSR force-suspend hack
-To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, luiz.von.dentz@intel.com,
-        quic_zijuhu@quicinc.com, hdegoede@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: nano 6.4
+Subject: Re: [Regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Jack <ostroffjh@users.sourceforge.net>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Hans de Goede <hdegoede@redhat.com>
+References: <76cd4547-a68d-9d52-1d87-8299e29406ff@gmail.com>
+ <LWPL3AC7.RRTERTU2.B5FO44IX@4YQH7VT3.DY2DZPQX.S6LIZ6VV>
+ <CABBYNZKDEjYOW+b1snUsvBgidW37+tPbsidq0pXaOqWKvRC8uQ@mail.gmail.com>
+From:   Swyter <swyterzone@gmail.com>
+In-Reply-To: <CABBYNZKDEjYOW+b1snUsvBgidW37+tPbsidq0pXaOqWKvRC8uQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ismael,
+>> In case it helps any, I have applied Swyter's patch referenced at
+>> comment #243 of the bug referenced above, and it does restore function
+>> to my particular dongle (Gentoo linux, with gentoo-sources kernel
+>> 6.0.6.)  (I believe I provided the git bisect quoted at the top of this
+>> message.)
+>
+> Ive applied the first 2 patches, the third one I'm not so sure I'd
+> like to introduce another module parameter.
 
-On Sat, Oct 29, 2022 at 1:25 PM Ismael Ferreras Morezuelas
-<swyterzone@gmail.com> wrote:
->
-> A few users have reported that their cloned Chinese dongle doesn't
-> work well with the hack Hans de Goede added, that tries this
-> off-on mechanism as a way to unfreeze them.
->
-> It's still more than worthwhile to have it, as in the vast majority
-> of cases it either completely brings dongles to life or just resets
-> them harmlessly as it already happens during normal USB operation.
->
-> This is nothing new and the controllers are expected to behave
-> correctly. But yeah, go figure. :)
->
-> For that unhappy minority we can easily handle this edge case by letting
-> users disable it via our =C2=ABbtusb.disable_fake_csr_forcesuspend_hack=
-=3D1=C2=BB kernel option.
+Thanks for that, Luiz. The module parameter does help a lot and it
+has been requested a few times in the Bugzilla thread.
 
-Don't really like the idea of adding module parameter for device
-specific problem.
+I have been thinking about this problem for a long time.
 
-> I believe this is the most generic way of doing it, given the constraints
-> and by still having a good out-of-the-box experience.
->
-> No clone left behind.
->
-> Cc: stable@vger.kernel.org
-> Cc: Hans de Goede <hdegoede@redhat.com>
-> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
-> ---
->  drivers/bluetooth/btusb.c | 31 +++++++++++++++++++------------
->  1 file changed, 19 insertions(+), 12 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 8f34bf195bae..d31d4f925463 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -34,6 +34,7 @@ static bool force_scofix;
->  static bool enable_autosuspend =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUS=
-PEND);
->  static bool enable_poll_sync =3D IS_ENABLED(CONFIG_BT_HCIBTUSB_POLL_SYNC=
-);
->  static bool reset =3D true;
-> +static bool disable_fake_csr_forcesuspend_hack;
->
->  static struct usb_driver btusb_driver;
->
-> @@ -2171,7 +2172,7 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->                 is_fake =3D true;
->
->         if (is_fake) {
-> -               bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; add=
-ing workarounds and force-suspending once...");
-> +               bt_dev_warn(hdev, "CSR: Unbranded CSR clone detected; add=
-ing workarounds...");
->
->                 /* Generally these clones have big discrepancies between
->                  * advertised features and what's actually supported.
-> @@ -2215,21 +2216,24 @@ static int btusb_setup_csr(struct hci_dev *hdev)
->                  * apply this initialization quirk to every controller th=
-at gets here,
->                  * it should be harmless. The alternative is to not work =
-at all.
->                  */
-> -               pm_runtime_allow(&data->udev->dev);
-> +               if (!disable_fake_csr_forcesuspend_hack) {
-> +                       bt_dev_warn(hdev, "CSR: Unbranded CSR clone detec=
-ted; force-suspending once...");
-> +                       pm_runtime_allow(&data->udev->dev);
->
-> -               ret =3D pm_runtime_suspend(&data->udev->dev);
-> -               if (ret >=3D 0)
-> -                       msleep(200);
-> -               else
-> -                       bt_dev_warn(hdev, "CSR: Couldn't suspend the devi=
-ce for our Barrot 8041a02 receive-issue workaround");
-> +                       ret =3D pm_runtime_suspend(&data->udev->dev);
-> +                       if (ret >=3D 0)
-> +                               msleep(200);
-> +                       else
-> +                               bt_dev_warn(hdev, "CSR: Couldn't suspend =
-the device for our Barrot 8041a02 receive-issue workaround");
+Essentially nulls-out any potential drawback the suspend workaround
+may ever cause. In the past for this we used a very spotty whitelist,
+but we can't really work with that here. When I'm talking about hundreds
+to thousands of dongles in various states of brokenness I mean it.
 
-Is this specific to Barrot 8041a02? Why don't we add a quirk then?
+The generic catch-all-as-best-as-we-can is the best way forward here.
 
-> -               pm_runtime_forbid(&data->udev->dev);
-> +                       pm_runtime_forbid(&data->udev->dev);
->
-> -               device_set_wakeup_capable(&data->udev->dev, false);
-> +                       device_set_wakeup_capable(&data->udev->dev, false=
-);
->
-> -               /* Re-enable autosuspend if this was requested */
-> -               if (enable_autosuspend)
-> -                       usb_enable_autosuspend(data->udev);
-> +                       /* Re-enable autosuspend if this was requested */
-> +                       if (enable_autosuspend)
-> +                               usb_enable_autosuspend(data->udev);
-> +               }
->         }
->
->         kfree_skb(skb);
-> @@ -4312,6 +4316,9 @@ MODULE_PARM_DESC(enable_autosuspend, "Enable USB au=
-tosuspend by default");
->  module_param(reset, bool, 0644);
->  MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
->
-> +module_param(disable_fake_csr_forcesuspend_hack, bool, 0644);
-> +MODULE_PARM_DESC(disable_fake_csr_forcesuspend_hack, "Don't indiscrimina=
-tely force-suspend Chinese-cloned CSR dongles trying to unfreeze them");
-> +
->  MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
->  MODULE_DESCRIPTION("Generic Bluetooth USB driver ver " VERSION);
->  MODULE_VERSION(VERSION);
-> --
-> 2.38.1
->
+Detecting fakes is hard enough, detecting dongles that don't like
+the suspend workaround is essentially impossible. As they all
+share the same identifiers than the ones that do.
 
+Some fakes NEED the suspend workaround to work at all while a *much*
+smaller subset of otherwise identical dongles have trouble with it.
 
---=20
-Luiz Augusto von Dentz
+Thanks to this last-effort parameter we can cover that last mile
+without people having to recompile custom versions of btusb.
+
+My dongle doesn't work? Easy, add this here. Most people won't
+have to bother with this, but that final ~3% would be screwed.
