@@ -2,165 +2,75 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCEA1C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 15:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A8BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 15:55:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231936AbiKIPSI (ORCPT
+        id S230130AbiKIPzq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Nov 2022 10:18:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50968 "EHLO
+        Wed, 9 Nov 2022 10:55:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231922AbiKIPSH (ORCPT
+        with ESMTP id S230109AbiKIPzp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Nov 2022 10:18:07 -0500
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F25841CFF5
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 07:18:05 -0800 (PST)
+        Wed, 9 Nov 2022 10:55:45 -0500
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90544C7B
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 07:55:43 -0800 (PST)
 Received: (Authenticated sender: hadess@hadess.net)
-        by mail.gandi.net (Postfix) with ESMTPSA id 9F2761C000D
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 15:18:04 +0000 (UTC)
+        by mail.gandi.net (Postfix) with ESMTPSA id 20D0DE0008;
+        Wed,  9 Nov 2022 15:55:41 +0000 (UTC)
+Message-ID: <c89bbf14a147ddcecbf52043927cac31e21ee6bf.camel@hadess.net>
+Subject: Re: [BlueZ] main.conf: Add comment about LA Audio BAP UUIDs
 From:   Bastien Nocera <hadess@hadess.net>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ 2/2] hostname: Fallback to transient hostname
-Date:   Wed,  9 Nov 2022 16:17:56 +0100
-Message-Id: <20221109151756.96673-2-hadess@hadess.net>
-X-Mailer: git-send-email 2.37.3
-In-Reply-To: <20221109151756.96673-1-hadess@hadess.net>
-References: <20221109151756.96673-1-hadess@hadess.net>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Wed, 09 Nov 2022 16:55:41 +0100
+In-Reply-To: <CABBYNZKXvcUjyuf1DzjB=NX1xVt8bynZQ9KNrOOYGQMtPt5PKA@mail.gmail.com>
+References: <20221102101224.1463549-1-hadess@hadess.net>
+         <CABBYNZKXvcUjyuf1DzjB=NX1xVt8bynZQ9KNrOOYGQMtPt5PKA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+User-Agent: Evolution 3.46.0 (3.46.0-2.fc37) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-After pretty hostname, and static hostname, also support transient
-hostname as a last resort before 'BlueZ X.XX'.
+On Thu, 2022-11-03 at 13:26 -0700, Luiz Augusto von Dentz wrote:
+> Hi Bastien,
+> 
+> On Wed, Nov 2, 2022 at 3:22 AM Bastien Nocera <hadess@hadess.net>
+> wrote:
+> > 
+> > ---
+> >  src/main.conf | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/src/main.conf b/src/main.conf
+> > index 2796f155e..fbe0a97be 100644
+> > --- a/src/main.conf
+> > +++ b/src/main.conf
+> > @@ -125,6 +125,8 @@
+> >  # 330859bc-7506-492d-9370-9a6f0614037f (BlueZ Experimental
+> > Bluetooth Quality Report)
+> >  # a6695ace-ee7f-4fb9-881a-5fac66c629af (BlueZ Experimental Offload
+> > Codecs)
+> >  # 6fbaf188-05e0-496a-9885-d6ddfdb4e03e (BlueZ Experimental ISO
+> > socket)
+> > +# 00002bcb-0000-1000-8000-00805f9b34fb (BlueZ Experimental LE
+> > Audio BAP source)
+> > +# 00002bc9-0000-1000-8000-00805f9b34fb (BlueZ Experimental LE
+> > Audio BAP sink)
+> >  # Defaults to false.
+> >  #KernelExperimental = false
+> 
+> Not really following, these UUID are actually part of LE Audio
+> standard, they are not experimental, or perhaps you want to document
+> what UUIDs can be registered using MediaEndpoint?
 
-This happens on Fedora's Workstation installation as it calls
-"hostnamectl set-hostname" on startup. In Fedora Silverblue, the default
-hostname is set as fedora in /etc/os-release.
+I got confused because those UUIDs would show up when I set
+"KernelExperimental = true". But that's because those UUIDs in the
+audio plugin are dependent on "ISO socket" support which also gets
+enabled when "KernelExperimental = true" is set.
 
-In both cases, we should fall back to that transient hostname, as bad as
-it could be.
-
-Note that the transient hostname needs to be monitored through the
-kernel directly, as explained in:
-https://www.freedesktop.org/software/systemd/man/org.freedesktop.hostname1.html
----
- plugins/hostname.c | 53 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 51 insertions(+), 2 deletions(-)
-
-diff --git a/plugins/hostname.c b/plugins/hostname.c
-index 14b6450b5..a12afb282 100644
---- a/plugins/hostname.c
-+++ b/plugins/hostname.c
-@@ -16,6 +16,7 @@
- #include <stdint.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/utsname.h>
- 
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
-@@ -44,8 +45,10 @@
- static uint8_t major_class = MAJOR_CLASS_MISCELLANEOUS;
- static uint8_t minor_class = MINOR_CLASS_UNCATEGORIZED;
- 
--static char *pretty_hostname = NULL;
--static char *static_hostname = NULL;
-+static char *pretty_hostname    = NULL;
-+static char *static_hostname    = NULL;
-+static char *transient_hostname = NULL;
-+static guint hostname_id = 0;
- 
- /*
-  * Fallback to static hostname only if empty pretty hostname was already
-@@ -60,6 +63,10 @@ static const char *get_hostname(void)
- 		if (static_hostname &&
- 				g_str_equal(static_hostname, "") == FALSE)
- 			return static_hostname;
-+
-+		if (transient_hostname &&
-+				g_str_equal(transient_hostname, "") == FALSE)
-+			return transient_hostname;
- 	}
- 
- 	return NULL;
-@@ -181,6 +188,32 @@ static void property_changed(GDBusProxy *proxy, const char *name,
- 	}
- }
- 
-+static void read_transient_hostname(void)
-+{
-+	struct utsname u;
-+
-+	if (uname(&u) != 0) {
-+		g_free(transient_hostname);
-+		transient_hostname = NULL;
-+		DBG("failed to read transient hostname");
-+		return;
-+	}
-+
-+	g_free(transient_hostname);
-+	transient_hostname = g_strdup(u.nodename);
-+
-+	DBG("read transient hostname: '%s'", transient_hostname);
-+}
-+
-+static gboolean hostname_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	DBG("transient hostname changed");
-+	read_transient_hostname();
-+	adapter_foreach(update_class, NULL);
-+	return TRUE;
-+}
-+
- static int hostname_probe(struct btd_adapter *adapter)
- {
- 	DBG("");
-@@ -261,9 +294,11 @@ static GDBusProxy *hostname_proxy = NULL;
- static int hostname_init(void)
- {
- 	DBusConnection *conn = btd_get_dbus_connection();
-+	GIOChannel *hostname_io;
- 	int err;
- 
- 	read_dmi_fallback();
-+	read_transient_hostname();
- 
- 	hostname_client = g_dbus_client_new(conn, "org.freedesktop.hostname1",
- 						"/org/freedesktop/hostname1");
-@@ -289,6 +324,14 @@ static int hostname_init(void)
- 		hostname_client = NULL;
- 	}
- 
-+	hostname_io = g_io_channel_new_file("/proc/sys/kernel/hostname", "r", NULL);
-+	if (hostname_io) {
-+		hostname_id = g_io_add_watch(hostname_io, G_IO_ERR, hostname_cb, NULL);
-+		g_io_channel_unref(hostname_io);
-+	} else {
-+		DBG("failed to open /proc/sys/kernel/hostname");
-+	}
-+
- 	return err;
- }
- 
-@@ -306,8 +349,14 @@ static void hostname_exit(void)
- 		hostname_client = NULL;
- 	}
- 
-+	if (hostname_id != 0) {
-+		g_source_remove(hostname_id);
-+		hostname_id = 0;
-+	}
-+
- 	g_free(pretty_hostname);
- 	g_free(static_hostname);
-+	g_free(transient_hostname);
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(hostname, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
--- 
-2.37.3
-
+Feel free to drop.
