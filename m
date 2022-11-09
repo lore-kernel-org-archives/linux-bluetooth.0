@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EFEC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 22:29:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160BCC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 22:29:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232143AbiKIW3y (ORCPT
+        id S232193AbiKIW36 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Nov 2022 17:29:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41762 "EHLO
+        Wed, 9 Nov 2022 17:29:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232191AbiKIW3x (ORCPT
+        with ESMTP id S232197AbiKIW3x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 9 Nov 2022 17:29:53 -0500
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 619C82EF61
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 14:29:51 -0800 (PST)
-Received: by mail-qk1-x730.google.com with SMTP id p18so145651qkg.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Nov 2022 14:29:51 -0800 (PST)
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B37022EF3A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Nov 2022 14:29:52 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id h21so59215qtu.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Nov 2022 14:29:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XLY8KpeE8Egd3biw/bjn/d0MZKjfy02OzHvVagQIpyA=;
-        b=C7vSILYrF7CMoh6vv7kQmWkWsxTQkO4jBm3HdXPNg0xA3PqWWJNZkAURoRsNG0Ko2i
-         UQ0btzHqDBS4u3b7aowwCFfgIh8YL6Bbx+IjiqkmOaMWkjByDucBvqSV/ayCh5yeVeOL
-         FUzhUcz1U3ir4SV6yC2yVBYkAqWvm2wm7Q410ZEHbsHVwHf0f7Faq6FeWPvAveCWQidM
-         dB3jFyYqyh/C98Oqtc3fu+hTfRGRXladlWctBMiVMvrOPQgPFnRwjNt6b5zbMb6imV72
-         NhsIyasFU6UdMrRjM93bvgt71BqByZ9ATnOs48eY4wWu9JNGyt4W0PeLbmdAFq00rRKC
-         ihVA==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VHrC1F4+KBRIi+HxhoVrcBzerWPZKq0dFT3HGWGGLfA=;
+        b=htKzct1qRxf+7iLXdV4PZ0Y4escAYTW6WRx011+9RY0x2tMgSiI2Qw/aSmE/kTQk1+
+         1SKmV/ml0EVbp0w1dv6mfaPANOT3oahPTDXW5itCuYfu99C/3xstuB9GgFZAGtVb6Acr
+         hRHPEIXDJ5Uv2A3pndg7WHGlQiHYVTl+LEKS17jEliqauL5Of/pJ8GHnopuNz9uzZF8J
+         UysHaZD+5iHE/TSn2RMaJjijlz97+/ysH3pERrRKWshsha6SaERFOVrJWF0tI0eh51mg
+         rdYa8cNYnPMHx8gn2HnrigS+2HM8gxSe6/3yHP60vrRu12wgH775F3wIxS2LDNKeZiim
+         vP1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XLY8KpeE8Egd3biw/bjn/d0MZKjfy02OzHvVagQIpyA=;
-        b=pm1X3VIDXl0rOjnvlFqFmFVvLRprK8qx370EjHDmPBx6kUlxU1GA6l8q7TY51U10b1
-         JAp/SWOntThsu57k2h2QAMUU/6VvHkE03AFmxqBcYxmMJhTqSC00+iWsU7yt6z/pnxAF
-         SqBCz+ivpgLFq4m7RWH2l3w0ww0f/XYeUdcdDtRkyYWF92TbPnUBSz5d9T8BT+t6dNle
-         nt6oCSuRDFj/Z/Rjg5oCliUMQAv7Ul+Wqh/clHjGUSS7NnSqBtO8iYWR95q2gKVit5CV
-         EJIkUEYUCfFmAsdX36++yI25owzncuikmAAlcNG3aEnhNHIuopBRtQPS9pbSppRxbQCX
-         sZ0Q==
-X-Gm-Message-State: ACrzQf06ZxRIwvWqXzloIjAv7rHWiVIEB06MNxDaOI5t/mkskXlItQkD
-        NMuVwYW5mkkMYeMzZMXDzTfiKyGkByo=
-X-Google-Smtp-Source: AMsMyM7sqW/Unnpl+RuGX9g1gbyzxkSR2NBD6d1dORi4ILaz/+0v7VrkU6AFl7kShGTk2nfOE5ba6g==
-X-Received: by 2002:a37:e107:0:b0:6fa:4c1a:54ee with SMTP id c7-20020a37e107000000b006fa4c1a54eemr32760634qkm.728.1668032989919;
-        Wed, 09 Nov 2022 14:29:49 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VHrC1F4+KBRIi+HxhoVrcBzerWPZKq0dFT3HGWGGLfA=;
+        b=zksECa2CeJv/qNuXlqtK+kEBIbsmKfITIIEAj31jviUioKqulMXCkAK4Y0ARPx++3T
+         Y/BpZIe2EkWQ8Cdrqj72p9rAuQ3FB5Zh50i8HJHG827TeU0zLORPBx8tUlV9V2FzkXnx
+         iQ5OYwBp7VLexiWYRw6cOM1Hd46ss8T8XO3KaQi9haGzqZmQ6iVF1f7HC7zKSAoL7eKd
+         VcPXcfBdYtnMUACW8eKdUdvdqjZzvvpeXJeF/b0W/8PKxdMsEqkmUbiL/iw4eoxbQSIP
+         TvfbUUm/2pKS8Rixd+DOFPVOin+qfsr6iRyyWJMOPEJGauOdnMNsr4DMHK1bEFNWe9xF
+         CHuA==
+X-Gm-Message-State: ACrzQf0l3UX8qJzWN3kvcjxvhfoWsIxiHJj2JYXMgvOVdeCi9TXORWVY
+        DytlHYiD63BANP+xA/MqoXhXAKIxWuQ=
+X-Google-Smtp-Source: AMsMyM63IL6pE1T/fD5DyQ/81HpCSB1awc50rLOw7hQUqhgn/erzJbXdV2D8X8rv032nKSHsfpatuQ==
+X-Received: by 2002:a05:622a:4ce:b0:3a5:4916:1753 with SMTP id q14-20020a05622a04ce00b003a549161753mr31262151qtx.568.1668032991362;
+        Wed, 09 Nov 2022 14:29:51 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z9-20020a05622a028900b0039bde72b14asm10518732qtw.92.2022.11.09.14.29.48
+        by smtp.gmail.com with ESMTPSA id z9-20020a05622a028900b0039bde72b14asm10518732qtw.92.2022.11.09.14.29.50
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Nov 2022 14:29:49 -0800 (PST)
+        Wed, 09 Nov 2022 14:29:50 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/util: Add iovec helpers
-Date:   Wed,  9 Nov 2022 14:29:44 -0800
-Message-Id: <20221109222947.1137901-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] shared/tester: Add tester_io_set_complete_func
+Date:   Wed,  9 Nov 2022 14:29:45 -0800
+Message-Id: <20221109222947.1137901-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20221109222947.1137901-1-luiz.dentz@gmail.com>
+References: <20221109222947.1137901-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,100 +68,74 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds iovec helpers functions.
+This adds tester_io_set_complete_func which can be used to set a
+callback when all iovec has been sent/received.
 ---
- src/shared/util.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/util.h |  6 ++++++
- 2 files changed, 59 insertions(+)
+ src/shared/tester.c | 16 ++++++++++++++++
+ src/shared/tester.h |  1 +
+ 2 files changed, 17 insertions(+)
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 0a0308cb0786..228044be459a 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -189,6 +189,59 @@ void util_clear_uid(uint64_t *bitmap, uint8_t id)
- 	*bitmap &= ~(((uint64_t)1) << (id - 1));
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index e88dfabdc37c..1feaba48335c 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -89,6 +89,7 @@ struct test_case {
+ 	tester_data_func_t test_func;
+ 	tester_data_func_t teardown_func;
+ 	tester_data_func_t post_teardown_func;
++	tester_data_func_t io_complete_func;
+ 	gdouble start_time;
+ 	gdouble end_time;
+ 	unsigned int timeout;
+@@ -913,6 +914,9 @@ static bool test_io_send(struct io *io, void *user_data)
+ 
+ 	g_assert_cmpint(len, ==, iov->iov_len);
+ 
++	if (!test->iovcnt && test->io_complete_func)
++		test->io_complete_func(test->test_data);
++
+ 	return false;
  }
  
-+struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt)
-+{
-+	struct iovec *dup;
-+	size_t i;
-+
-+	if (!iov)
-+		return NULL;
-+
-+	dup = new0(struct iovec, cnt);
-+
-+	for (i = 0; i < cnt; i++)
-+		util_iov_memcpy(&dup[i], iov[i].iov_base, iov[i].iov_len);
-+
-+	return dup;
-+}
-+
-+int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2)
-+{
-+	if (!iov1)
-+		return 1;
-+
-+	if (!iov2)
-+		return -1;
-+
-+	if (iov1->iov_len != iov2->iov_len)
-+		return iov1->iov_len - iov2->iov_len;
-+
-+	return memcmp(iov1->iov_base, iov2->iov_base, iov1->iov_len);
-+}
-+
-+void util_iov_memcpy(struct iovec *iov, void *src, size_t len)
-+{
-+	if (!iov)
-+		return;
-+
-+	iov->iov_base = realloc(iov->iov_base, len);
-+	iov->iov_len = len;
-+	memcpy(iov->iov_base, src, len);
-+}
-+
-+void util_iov_free(struct iovec *iov, size_t cnt)
-+{
-+	size_t i;
-+
-+	if (!iov)
-+		return;
-+
-+	for (i = 0; i < cnt; i++)
-+		free(iov[i].iov_base);
-+
-+	free(iov);
-+}
-+
- static const struct {
- 	uint16_t uuid;
- 	const char *str;
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 554481e1e1ea..765a4e956636 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -15,6 +15,7 @@
- #include <byteswap.h>
- #include <string.h>
- #include <sys/types.h>
-+#include <sys/uio.h>
+@@ -937,10 +941,15 @@ static bool test_io_recv(struct io *io, void *user_data)
  
- #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
- #define BIT(n)  (1 << (n))
-@@ -109,6 +110,11 @@ ssize_t util_getrandom(void *buf, size_t buflen, unsigned int flags);
- uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
- void util_clear_uid(uint64_t *bitmap, uint8_t id);
+ 	g_assert_cmpint(len, ==, iov->iov_len);
  
-+struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt);
-+int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2);
-+void util_iov_memcpy(struct iovec *iov, void *src, size_t len);
-+void util_iov_free(struct iovec *iov, size_t cnt);
++	if (memcmp(buf, iov->iov_base, len))
++		tester_monitor('!', 0x0004, 0x0000, iov->iov_base, len);
 +
- const char *bt_uuid16_to_str(uint16_t uuid);
- const char *bt_uuid32_to_str(uint32_t uuid);
- const char *bt_uuid128_to_str(const uint8_t uuid[16]);
+ 	g_assert(memcmp(buf, iov->iov_base, len) == 0);
+ 
+ 	if (test->iovcnt)
+ 		io_set_write_handler(io, test_io_send, NULL, NULL);
++	else if (test->io_complete_func)
++		test->io_complete_func(test->test_data);
+ 
+ 	return true;
+ }
+@@ -1004,6 +1013,13 @@ void tester_io_send(void)
+ 		io_set_write_handler(ios[1], test_io_send, NULL, NULL);
+ }
+ 
++void tester_io_set_complete_func(tester_data_func_t func)
++{
++	struct test_case *test = tester_get_test();
++
++	test->io_complete_func = func;
++}
++
+ int tester_run(void)
+ {
+ 	int ret;
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index c28f61e7fd6b..49610185a444 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -78,3 +78,4 @@ void tester_wait(unsigned int seconds, tester_wait_func_t func,
+ 
+ struct io *tester_setup_io(const struct iovec *iov, int iovcnt);
+ void tester_io_send(void);
++void tester_io_set_complete_func(tester_data_func_t func);
 -- 
 2.37.3
 
