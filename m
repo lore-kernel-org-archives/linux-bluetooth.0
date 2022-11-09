@@ -2,153 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB026C43217
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 22:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F27C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Nov 2022 23:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231916AbiKIWjV (ORCPT
+        id S232190AbiKIXLj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Nov 2022 17:39:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44390 "EHLO
+        Wed, 9 Nov 2022 18:11:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbiKIWjU (ORCPT
+        with ESMTP id S232215AbiKIXLQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Nov 2022 17:39:20 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C03CCD13D;
-        Wed,  9 Nov 2022 14:39:19 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id r12so28357648lfp.1;
-        Wed, 09 Nov 2022 14:39:19 -0800 (PST)
+        Wed, 9 Nov 2022 18:11:16 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE0C31F86;
+        Wed,  9 Nov 2022 15:11:01 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id o4so28112464wrq.6;
+        Wed, 09 Nov 2022 15:11:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PvI/yUyITk/smf53vr38dj475/4tnk0u2sD458x+0bk=;
-        b=U9CKhYkGzkPuA8fgmaTsHOtMCEYBcK3ZBV/j2sk1XUPtk3kvtalIepxmf/63m19aFg
-         ucOZlFwpOoi0BU6HeUFYmRQ0HV5W3VYlzMdk6UrVCwa4rAdRiI+U37ss07D9WyIDDdlM
-         3uryCU9NAHUH1MlEMW4hO2yaNBy0ZoQRIeKVW/m3z6O6pHiMAOfwTL5iDYMGnW0VHyED
-         GOwdrSL6Xlauaok+1M/QFu0JR8sIiwr3P9JmAhGI/ySBd+ptbK2g8E7YtIw4VaLoRins
-         Zwq4XI3ZBtlkRkwL6dloRhjR00l1OrzqSBGa8bdfr/13rRIbTr4bxhzuz69hetXjV7sb
-         0Wow==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r9iWguWns0x9A7Db/eP4sWbuE7/7/Te9Q5CWCVNExi4=;
+        b=Mp/JfrVt/MX77ZGRh9Ylnl7eRKBtvjjN9bnK97ag1TAQOd7126qRYh9Vmex58AQHCd
+         RHb917ewG/l3y+LluFupjKrYo9ziFyes+ZBFGI6B6ek94SO7OXLmAmbl9jLYsdUNuSMn
+         BAVec6/SzlqIhSTVCmvFojKfaKmS9tWceWEqAZiqdvR1bWZVZo0gLXgWFmZW11Z7YWfE
+         IzW9RSxb0IG5KU1x+52n9J2lreZMlshaqPLA7LsdvJbeRB8Teq+BDetmQ4YJhhKacjVf
+         x9xxypP3ZUBBEP49ToGgRvSxfsnQ/NvqQwa+5dcOX4heTxphOeT4mOBOIFQbO+JTFwXb
+         NGmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PvI/yUyITk/smf53vr38dj475/4tnk0u2sD458x+0bk=;
-        b=e36Zhh9lI+SzuAyCEPZkOEFyUf2b1n5DnJuhx8Sk0RQpg7OocOxkuBxWeiO7oRkx80
-         xXKa5TAd14+2XD0w+jgiJ3RpM0UeHgapiO9uIcD9XZPsUNBKDPaUvK7BqKgfIExgzzu3
-         e3jcQEAtS43W/L83uxdIIIoZ/+yMRHcy8Yt3YUWI9bFO4xF4zoaMwRc7wE+FDyHWD03y
-         Bo2csUSxIUOoDERiioUdtKeltygc8s6b1eemAcLBcUWz7FshcHKg9GVn/aOF/6gqosav
-         JFEl0p0WsVOjJRZ3OBj1BjzMq9jRe7aJ4aUAbB6ZyN4ErdBmj9seXmqlPApSrVj1k6+G
-         mtaw==
-X-Gm-Message-State: ACrzQf0Skgn3YyGFq0Y9WMiga+xlctzHmt/bzsOK1DXICiORhFTTYJU3
-        5tHf+mnAdZQMtk1ToyUL/B4b22eICEnfzq7P+EQ=
-X-Google-Smtp-Source: AMsMyM5CigGd261vGZLuw3ULv9z8hB2jfeLYPV/I7RGWEIbz3eZDiiSzT5WUc1pN6UJ3OvaWAT4UGSqL2GbMeEFBBn8=
-X-Received: by 2002:a05:6512:2242:b0:4a2:3890:5156 with SMTP id
- i2-20020a056512224200b004a238905156mr855357lfu.106.1668033557940; Wed, 09 Nov
- 2022 14:39:17 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r9iWguWns0x9A7Db/eP4sWbuE7/7/Te9Q5CWCVNExi4=;
+        b=3jwdThbwYLku4EVaTV8p/vYjYw7v7MGL6taVeDS7SKqR0CJz7NOwOqQJnByxrnT993
+         Y2y6aaJqznbi6RazpN6Wi/cD7GrrHgU9cEOe5F90D1iOaYkwb03q3HND8mHXU3fKZGYl
+         dFJnFs4JnaG1IbcpD1EFxmMAcn62qIvxTO7S12Cu4d+uTjaPQUGrxZd+mEkWoOIgFrR7
+         D0lvRqjAE/Byb9VdJvCVITreflGJb/VXSxzLXcjhlIHEDYspmIKPZmMOX7U8vadnevIf
+         dllk+j1qRk7UA5E90w1Pvevszy0j0dWYczrry2eIbNa1oCH35B2dSzd9FYEZffN6040P
+         1RvA==
+X-Gm-Message-State: ACrzQf3ZVTmANdOiN3kRz9a7h14a9Me0zJv0HcN/AS7uC/pS/cPMf9LH
+        GlNkQmrM/PxUrEKK5thZcpM=
+X-Google-Smtp-Source: AMsMyM7Efp2B9p5lVNUTqeUeoSbdshuGBnf/t1RYqbLTUKoRoqG4sbrUv4Z0/p4fqqdSpPH4VkHLUQ==
+X-Received: by 2002:a5d:4d03:0:b0:236:b317:fcf6 with SMTP id z3-20020a5d4d03000000b00236b317fcf6mr38281005wrt.280.1668035460420;
+        Wed, 09 Nov 2022 15:11:00 -0800 (PST)
+Received: from 168.52.45.77 (201.ip-51-68-45.eu. [51.68.45.201])
+        by smtp.gmail.com with ESMTPSA id p33-20020a05600c1da100b003c71358a42dsm3849658wms.18.2022.11.09.15.10.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 09 Nov 2022 15:10:59 -0800 (PST)
+Message-ID: <7ef5b6a3-affb-5298-9a13-c416d5e55ad4@gmail.com>
+Date:   Thu, 10 Nov 2022 00:10:56 +0100
 MIME-Version: 1.0
-References: <20221029202454.25651-1-swyterzone@gmail.com> <20221029202454.25651-3-swyterzone@gmail.com>
- <CABBYNZKnw+b+KE2=M=gGV+rR_KBJLvrxRrtEc8x12W6PY=LKMw@mail.gmail.com> <ac1d556f-fe51-1644-0e49-f7b8cf628969@gmail.com>
-In-Reply-To: <ac1d556f-fe51-1644-0e49-f7b8cf628969@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 9 Nov 2022 14:39:06 -0800
-Message-ID: <CABBYNZJytVc8=A0_33EFRS_pMG6aUKnfFPsGii_2uKu7_zENtQ@mail.gmail.com>
+User-Agent: nano 6.4
 Subject: Re: [PATCH 3/3] Bluetooth: btusb: Add a parameter to let users
  disable the fake CSR force-suspend hack
-To:     Swyter <swyterzone@gmail.com>
+Content-Language: en-US
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
         edumazet@google.com, kuba@kernel.org, luiz.von.dentz@intel.com,
         quic_zijuhu@quicinc.com, hdegoede@redhat.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         netdev@vger.kernel.org, Jack <ostroffjh@users.sourceforge.net>,
         Paul Menzel <pmenzel@molgen.mpg.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+References: <20221029202454.25651-1-swyterzone@gmail.com>
+ <20221029202454.25651-3-swyterzone@gmail.com>
+ <CABBYNZKnw+b+KE2=M=gGV+rR_KBJLvrxRrtEc8x12W6PY=LKMw@mail.gmail.com>
+ <ac1d556f-fe51-1644-0e49-f7b8cf628969@gmail.com>
+ <CABBYNZJytVc8=A0_33EFRS_pMG6aUKnfFPsGii_2uKu7_zENtQ@mail.gmail.com>
+From:   Swyter <swyterzone@gmail.com>
+In-Reply-To: <CABBYNZJytVc8=A0_33EFRS_pMG6aUKnfFPsGii_2uKu7_zENtQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Swyter,
+On 09/11/2022 23:39, Luiz Augusto von Dentz wrote:
+>>> Is this specific to Barrot 8041a02? Why don't we add a quirk then?
+>>>
+>>
+>> We don't know how specific it is, we suspect the getting stuck thing happens with Barrot controllers,
+>> but in this world of lasered-out counterfeit chip IDs you can never be sure. Unless someone decaps them.
+>>
+>> Hans added that name because it's the closest thing we have, but this applies to a lot of chips.
+>> So much that now we do the hack by default, for very good reasons.
+>>
+>> So please reconsider, this closes the gap.
+>>
+>> With this last patch we go from ~+90% to almost ~100%, as the rest of generic quirks we added
+>> don't really hurt; even if a particular dongle only needs a few of the zoo of quirks we set,
+>> it's alright if we vaccinate them against all of these, except some are "allergic"
+>> against this particular "vaccine". Let people skip this one. :-)
+>>
+>> You know how normal BT controllers are utterly and inconsistently broken, now imagine you have a whole host
+>> of vendors reusing a VID/PID/version/subversion, masking as a CSR for bizarre reasons to avoid paying
+>> any USB-IF fees, or whatever. That's what we are fighting against here.
+> 
+> I see, but for suspend in particular, can't we actually handle it
+> somehow? I mean if we can detect the controller is getting stuck and
+> print some information and flip the quirk? Otherwise Im afraid this
+> parameter will end up always being set by distros to avoid suspend
+> problems.
 
-On Wed, Nov 9, 2022 at 1:30 PM Swyter <swyterzone@gmail.com> wrote:
->
-> On 09/11/2022 21:49, Luiz Augusto von Dentz wrote:
-> > Hi Ismael,
-> >
-> > On Sat, Oct 29, 2022 at 1:25 PM Ismael Ferreras Morezuelas
-> > <swyterzone@gmail.com> wrote:
-> >>
-> >> A few users have reported that their cloned Chinese dongle doesn't
-> >> work well with the hack Hans de Goede added, that tries this
-> >> off-on mechanism as a way to unfreeze them.
-> >>
-> >> It's still more than worthwhile to have it, as in the vast majority
-> >> of cases it either completely brings dongles to life or just resets
-> >> them harmlessly as it already happens during normal USB operation.
-> >>
-> >> This is nothing new and the controllers are expected to behave
-> >> correctly. But yeah, go figure. :)
-> >>
-> >> For that unhappy minority we can easily handle this edge case by letti=
-ng
-> >> users disable it via our =C2=ABbtusb.disable_fake_csr_forcesuspend_hac=
-k=3D1=C2=BB kernel option.
-> >
-> > Don't really like the idea of adding module parameter for device
-> > specific problem.
->
-> It's not for a single device, it's for a whole class of unnamed devices
-> that are currently screwed even after all this.
->
->
-> >> -               ret =3D pm_runtime_suspend(&data->udev->dev);
-> >> -               if (ret >=3D 0)
-> >> -                       msleep(200);
-> >> -               else
-> >> -                       bt_dev_warn(hdev, "CSR: Couldn't suspend the d=
-evice for our Barrot 8041a02 receive-issue workaround");
-> >> +                       ret =3D pm_runtime_suspend(&data->udev->dev);
-> >> +                       if (ret >=3D 0)
-> >> +                               msleep(200);
-> >> +                       else
-> >> +                               bt_dev_warn(hdev, "CSR: Couldn't suspe=
-nd the device for our Barrot 8041a02 receive-issue workaround");
-> >
-> > Is this specific to Barrot 8041a02? Why don't we add a quirk then?
-> >
->
-> We don't know how specific it is, we suspect the getting stuck thing happ=
-ens with Barrot controllers,
-> but in this world of lasered-out counterfeit chip IDs you can never be su=
-re. Unless someone decaps them.
->
-> Hans added that name because it's the closest thing we have, but this app=
-lies to a lot of chips.
-> So much that now we do the hack by default, for very good reasons.
->
-> So please reconsider, this closes the gap.
->
-> With this last patch we go from ~+90% to almost ~100%, as the rest of gen=
-eric quirks we added
-> don't really hurt; even if a particular dongle only needs a few of the zo=
-o of quirks we set,
-> it's alright if we vaccinate them against all of these, except some are "=
-allergic"
-> against this particular "vaccine". Let people skip this one. :-)
->
-> You know how normal BT controllers are utterly and inconsistently broken,=
- now imagine you have a whole host
-> of vendors reusing a VID/PID/version/subversion, masking as a CSR for biz=
-arre reasons to avoid paying
-> any USB-IF fees, or whatever. That's what we are fighting against here.
+Maybe, auto-detection is certainly a better way and a potential improvement,
+assuming we cover all the edge cases. Which I'm not too sure about.
 
-I see, but for suspend in particular, can't we actually handle it
-somehow? I mean if we can detect the controller is getting stuck and
-print some information and flip the quirk? Otherwise Im afraid this
-parameter will end up always being set by distros to avoid suspend
-problems.
+The controllers don't get totally stuck, they just act weird and give funky
+HCI responses at certain points if we don't do this, if I remember correctly.
 
---=20
-Luiz Augusto von Dentz
+Unfortunately I can't really justify spending that much time *right now* on
+this hobby project. Distros should *definitely* keep doing the hack by default
+if they want the widest compatibility. This is comparatively a niche issue.
+
+
+But yeah, to sum things up; I'm not sure going back to a whitelist of a
+whitelist is a good idea without a foolproof method. We want the widest
+possible reach by doing it in the most generic way with the smallest
+possible side effects. If we can find a way to blacklist this quirk
+when we are super sure it's going to cause issues I'm all for it.
+
+Right now I think this is an acceptable solution, as long as
+people in charge of distros don't flip these toggles.
+
+Nobody has cared until now, barely any of these devices worked.
+Now that most of them work it would be very funny to see
+them break the majority to fix a few.
+
+With the amount of effort it takes an outsider like me to
+get stuff into the kernel and fight to avoid random reverts
+I don't know if I'd be able to get something as involved as
+that to work in a satisfying, automatic and simple way.
+
+Perfect is the enemy of good, diminishing returns, and all that. ¯\_(ツ)_/¯
