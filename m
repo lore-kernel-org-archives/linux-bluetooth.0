@@ -2,106 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1387C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Nov 2022 15:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAE8BC43217
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Nov 2022 16:45:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234146AbiKKPwt (ORCPT
+        id S233938AbiKKQo7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Nov 2022 10:52:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36146 "EHLO
+        Fri, 11 Nov 2022 11:44:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234121AbiKKPws (ORCPT
+        with ESMTP id S233407AbiKKQo6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Nov 2022 10:52:48 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA506FDB
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Nov 2022 07:52:47 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 3D06BCE2802
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Nov 2022 15:52:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 44FECC43144
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Nov 2022 15:52:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668181963;
-        bh=sO8zSSOkvkvn6S+U+eHbwpLKwp7Nx9Y1y1/jLX26cJU=;
-        h=From:To:Subject:Date:From;
-        b=LzBtP1udsG4Qy4itY4NWvbUknE9qntzCkwVG2wJJ799mFYCb/z+ZM69AvvJjPSs/Q
-         9ebkDvowhtDrTFEvYnl9hadTHqup/Ig7R1DfhteQLs0ApjwvpM2eoz6YSMtpcR1m4Z
-         3W4Em6j/nHZ0aK0C/ggyXVAtI/M6S1t58UdyFfoDMe89VlD3tIddBzBiX0TcrasvSf
-         azDMDI1+vr+uymboD34JUEdydaB1TMCrl0iLm5c4/qKyXYGj9H+eRWVM7C1Mo2DH5R
-         BmRzgMlk0vKaqnEDCHRgCsV5a2b+pnW+cgWFhCDE5idPimG7TiX3rgtHYOivrfzKA9
-         y8lJFu8g6lfNQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 30FD5C433EA; Fri, 11 Nov 2022 15:52:43 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216681] New: Disconnect with [TV] Samsung 6 Series (55)
-Date:   Fri, 11 Nov 2022 15:52:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-216681-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 11 Nov 2022 11:44:58 -0500
+X-Greylist: delayed 1241 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 11 Nov 2022 08:44:56 PST
+Received: from msg-4.mailo.com (msg-4.mailo.com [213.182.54.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55166659B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Nov 2022 08:44:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=mailo.com; s=mailo;
+        t=1668183833; bh=/Xl/HIo/bA+evsaq8DnE04LwbrBrmlhLVkw50rtDhtM=;
+        h=X-EA-Auth:Date:From:To:Cc:Subject:Message-ID:MIME-Version:
+         Content-Type;
+        b=n7KPh4EVxRV/1s0qZhvnYgK/lDzUhSPnlB177nJc907rOdL7sgtSXvfbw/sNy9Jjg
+         /oB4kM8oCzqeLEPwN+tF7XLI8HwoP88gsk+OuAJK2AAFqbCXFjTOIMY3V1J7PlezJH
+         TVRakl92HmQu44G6RXlmsKXwLXjspuv2P2SjJOU0=
+Received: by b-1.in.mailobj.net [192.168.90.11] with ESMTP
+        via ip-206.mailobj.net [213.182.55.206]
+        Fri, 11 Nov 2022 17:23:53 +0100 (CET)
+X-EA-Auth: y26A4/b47mvI+T4pBWOPntJAL2IpHjodAiXkAKUUlM2VT0sQ1jpSq3WzrIiwQtmb/c0ujW+FsdQWFt1siJbKcfQitro45GaR
+Date:   Fri, 11 Nov 2022 21:53:46 +0530
+From:   Deepak R Varma <drv@mailo.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     drv@mailo.com
+Subject: [PATCH] Bluetooth: hci_conn: Use kzalloc for kmalloc+memset
+Message-ID: <Y253EjjM0yvRGl+M@qemulion>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216681
+Use of kzalloc preferred over combination of kmalloc & memset. Issue
+identified using coccicheck.
 
-            Bug ID: 216681
-           Summary: Disconnect with [TV] Samsung 6 Series (55)
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 6.0.2
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: pmenzel+bugzilla.kernel.org@molgen.mpg.de
-        Regression: No
+Signed-off-by: Deepak R Varma <drv@mailo.com>
+---
+ net/bluetooth/hci_conn.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-Created attachment 303157
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303157&action=3Dedit
-`sudo btmon -w /dev/shm/trace.log`
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7a59c4487050..287d313aa312 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -824,11 +824,10 @@ static int hci_le_terminate_big(struct hci_dev *hdev, u8 big, u8 bis)
 
-Using Debian sid/unstable with Linux 6.0.2 on a Dell Latitude E7250 with an
-integrated Intel USB Bluetooth wireless interface (8087:0a2a), connecting t=
-o a
-Samsung TV via Bluetooth everything worked, but after some time playing mus=
-ic
-over it, it just disconnected. Connecting again, the audio was distorted.
+ 	bt_dev_dbg(hdev, "big 0x%2.2x bis 0x%2.2x", big, bis);
 
-I then captured the attached trace. After some time, I restarted PipeWire
-0.3.59, and then after a while, the distortion disappeared. But then it
-disconnected again after a while. Hopefully the trace contains useful
-information to get to the bottom of this.
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
 
---=20
-You may reply to this email to add a comment.
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->bis = bis;
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+@@ -861,11 +860,10 @@ static int hci_le_big_terminate(struct hci_dev *hdev, u8 big, u16 sync_handle)
+
+ 	bt_dev_dbg(hdev, "big 0x%2.2x sync_handle 0x%4.4x", big, sync_handle);
+
+-	d = kmalloc(sizeof(*d), GFP_KERNEL);
++	d = kzalloc(sizeof(*d), GFP_KERNEL);
+ 	if (!d)
+ 		return -ENOMEM;
+
+-	memset(d, 0, sizeof(*d));
+ 	d->big = big;
+ 	d->sync_handle = sync_handle;
+
+--
+2.34.1
+
+
+
