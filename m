@@ -2,91 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C007C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Nov 2022 09:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CC3FC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Nov 2022 10:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234007AbiKLJri (ORCPT
+        id S230365AbiKLK2g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Nov 2022 04:47:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39098 "EHLO
+        Sat, 12 Nov 2022 05:28:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230383AbiKLJrg (ORCPT
+        with ESMTP id S230257AbiKLK2e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Nov 2022 04:47:36 -0500
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7706CF8
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Nov 2022 01:47:34 -0800 (PST)
-Received: by mail-qk1-x72b.google.com with SMTP id z1so4694395qkl.9
-        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Nov 2022 01:47:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=NJCmpVB7QOarxsdf6kC9P2Lw76R+5eD13ezXYHtGHyg=;
-        b=GgpZfdzf37Q04CU1QQGoik4mrDobHBxwLtGgGz/vLlMQc+1+uJh7323bjWhfdnFCx5
-         Utwyt1+WA5EgYmkTif6dSXXc6OVl4CpjxB6S9BYNLuo2sjelC0N45WbjX1pb8EtUe9zf
-         sVmjWUM1wd/9Wnb/yrdfyk2U1KIzB9reQiXSg8oHz34ygCrmGXNaJ6vYCMBXidiP/5zd
-         N/SqTApaeBjgKNJyTiNmL+Yh1WAbxZW1UXKvbzow1Qd1gC1alnQ6DCL/0wTs6CjbFrK+
-         0SfPjHyHH6GsVTRbeJHK3RdPMvDadcqnD2nT8iS2kVbKU+SsJOLvfjmbu54rBItY0j4B
-         zupw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:to:from:reply-to:subject:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NJCmpVB7QOarxsdf6kC9P2Lw76R+5eD13ezXYHtGHyg=;
-        b=H6AWTWikyr+pO0q+jK0ku1+j/BCWehgQbwoMFIVA8bO0riJ70w4IrE/kuqslzGE/N0
-         pz2QakzVyxXsdTk5QH1qppS1OAF14JMdUsjFO6q+LkE5FH4BYK8zTnE9d6+cho3g1aFI
-         /BIv0En0V1xXUN3iMXE67I5YEeyFAtVAqezwmMWRMq8vgAkbZHh6Pote9gGsXne9XNZf
-         r6zQwIAxWNjhWpRffD0VPNstQ7eOgzirRzNK7UtunoDctOK23kOIPFFW1q+7n3By2fKl
-         h//B1STGdcXJnJBxaKtHVStp3ybboKvYvzwgsAN/6zNCf/9f55Hyv7DhB3u8JxIAPwpP
-         dD6g==
-X-Gm-Message-State: ANoB5pnPL/hOqtyvpCKUFp/7FzmrpsjIWSxRxBPpNw5G86xYbA+QRquL
-        b/JDDXjzz1xbAIOMKmhI6DXmC0Nq2acqOg==
-X-Google-Smtp-Source: AA0mqf6EXKKP8j9y+UyCfEnHh+PJhls4J2CnkcLjWSA8gK9B+yu5kVZyoM61dgdV+YBs9tV5srPcSA==
-X-Received: by 2002:a05:620a:1196:b0:6f9:f834:7c45 with SMTP id b22-20020a05620a119600b006f9f8347c45mr4195397qkk.253.1668246453972;
-        Sat, 12 Nov 2022 01:47:33 -0800 (PST)
-Received: from [172.17.0.2] ([172.176.109.253])
-        by smtp.gmail.com with ESMTPSA id o16-20020a05620a2a1000b006fa617ac616sm3038291qkp.49.2022.11.12.01.47.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Nov 2022 01:47:33 -0800 (PST)
-Message-ID: <636f6bb5.050a0220.6b2a1.9951@mx.google.com>
-Date:   Sat, 12 Nov 2022 01:47:33 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============3558242729250637285=="
-MIME-Version: 1.0
-Subject: RE: [-next] Bluetooth: hci_bcm4377: Fix missing pci_disable_device() on error in bcm4377_probe()
-Reply-To: linux-bluetooth@vger.kernel.org
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, yangyingliang@huawei.com
+        Sat, 12 Nov 2022 05:28:34 -0500
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207582618
+        for <linux-bluetooth@vger.kernel.org>; Sat, 12 Nov 2022 02:28:33 -0800 (PST)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+        by mailout.nyi.internal (Postfix) with ESMTP id 8AD735C00DF;
+        Sat, 12 Nov 2022 05:28:32 -0500 (EST)
+Received: from imap47 ([10.202.2.97])
+  by compute2.internal (MEProxy); Sat, 12 Nov 2022 05:28:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svenpeter.dev;
+         h=cc:cc:content-type:date:date:from:from:in-reply-to
+        :in-reply-to:message-id:mime-version:references:reply-to:sender
+        :subject:subject:to:to; s=fm1; t=1668248912; x=1668335312; bh=Ft
+        e2rxiySVM+JOc1hNbK+MPRv06a8DHftjYoXjxIs70=; b=jDuFzzWx3qf1GKRNoW
+        ML/6QjLodvYJYI74a+B0oTUobXL+YNdAhRApC3L2eHigTkxg3gKgXfZJuBCvQ7P9
+        6C0hzh21IPf6+lCKGuyFVVHdmT/2Npv1hXyTkUMUXcCSnx/Jbv1HhwShr5FMLTNU
+        qUIr6jt50hz4XCBZqbB3oM9A51HQ/ZOYHnqFHYNcJu9c5YTde9OAWVZ5MM8cImcB
+        7/jjg0/66dDCp2ijmVc/XQehblcglh/Oa25U1t2Vysqf7KRBbJff5HBpP0iQjatL
+        zbsdo41Bq6vYrPs109usHPnSvYjrMe7qZ/b75kYdOLIqPpGKqFgjsIF97glaqQII
+        jvLw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
+        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
+        :mime-version:references:reply-to:sender:subject:subject:to:to
+        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+        fm1; t=1668248912; x=1668335312; bh=Fte2rxiySVM+JOc1hNbK+MPRv06a
+        8DHftjYoXjxIs70=; b=uFCZOany+NfPA5B9WykctUZCqLezFA6ocS5Lg/BEcpRu
+        AEorQ0L0djWn6L3awhlKccsyB0I2IHsRimAWnMMtXvYP70coAHE6T6Vv19yd1DwO
+        6qvSnTcUP97v86/kljUpx3doYWHTyHYPscwAeEfrqckc+0IcLqYeeCEFJhCIQdeH
+        jdfo4os6Mvj2rSNMVk5vfPWjN0OUPlnE6cuJPtJqSCSDUWu9IKhBRc5zjp/xS5ED
+        EyWrLYSqrFbAvGaxyqSgMzVKF0YEqsSbt7qILIx4DWkNH9fozGNWZa60uhlpt+Zg
+        TKT8VKLNoi0zkOMjrPb5JJ5F9QHLvGVOo9n5eLRFPg==
+X-ME-Sender: <xms:UHVvY132I7gSMD-fpBA_weHJc9ngQB0c5_FAEcCWX9tgfKptXYoeEg>
+    <xme:UHVvY8GPWcJyE5htWPknvIO7lGzHhJPrM6nD0LC4dURMn9Po08Ozcp-JcFOHUofQm
+    1JRYA7btz2NliMOoAU>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvgedrfeekgdduiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdfuvhgv
+    nhcurfgvthgvrhdfuceoshhvvghnsehsvhgvnhhpvghtvghrrdguvghvqeenucggtffrrg
+    htthgvrhhnpeelvefggeffheevtdeivefhkeehfeettdejteduveeiheevveeilefghfei
+    veeiueenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    hsvhgvnhesshhvvghnphgvthgvrhdruggvvh
+X-ME-Proxy: <xmx:UHVvY17zlRJ2uiYFRWIbKt2L3BdUdy-Y7Rx9gZLy7r8gO3nnjGm_9w>
+    <xmx:UHVvYy1_CsZFRpO585HZ7pAz2G79wut8hy8KTVr7zHAYQ37WwcQSWQ>
+    <xmx:UHVvY4FYekAguFxt1eUDrmsagHNDoUElmTMsDYDbmZmLjRA73FYPPA>
+    <xmx:UHVvYzPeXj59DhIL7mb-X9v1zLr6Y-OKWd3TlqII0rew8T6bpSp5fw>
+Feedback-ID: i51094778:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+        id 760E9A6007C; Sat, 12 Nov 2022 05:28:32 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.7.0-alpha0-1115-g8b801eadce-fm-20221102.001-g8b801ead
+Mime-Version: 1.0
+Message-Id: <2d282d22-20be-4e27-b3ef-3048779f939b@app.fastmail.com>
 In-Reply-To: <20221112090437.3591380-1-yangyingliang@huawei.com>
 References: <20221112090437.3591380-1-yangyingliang@huawei.com>
+Date:   Sat, 12 Nov 2022 11:28:10 +0100
+From:   "Sven Peter" <sven@svenpeter.dev>
+To:     "Yang Yingliang" <yangyingliang@huawei.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     luiz.von.dentz@intel.com
+Subject: Re: [PATCH -next] Bluetooth: hci_bcm4377: Fix missing pci_disable_device() on
+ error in bcm4377_probe()
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3558242729250637285==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is an automated email and please do not reply to this email.
-
-Dear Submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-While preparing the CI tests, the patches you submitted couldn't be applied to the current HEAD of the repository.
-
------ Output -----
-error: drivers/bluetooth/hci_bcm4377.c: does not exist in index
-hint: Use 'git am --show-current-patch' to see the failed patch
+Hi,
 
 
-Please resolve the issue and submit the patches again.
+On Sat, Nov 12, 2022, at 10:04, Yang Yingliang wrote:
+> pci_disable_device() need be called while module exiting, switch to use
+> pcim_enable(), pci_disable_device() will be called in pcim_release()
+> after probe() failure.
+>
+> Fixes: ab80b2cec05f ("Bluetooth: hci_bcm4377: Add new driver for 
+> BCM4377 PCIe boards")
+> Signed-off-by: Yang Yingliang <yangyingliang@huawei.com>
+> ---
+
+Good catch, thanks!
+
+Reviewed-by: Sven Peter <sven@svenpeter.dev>
 
 
----
-Regards,
-Linux Bluetooth
+Best,
 
 
---===============3558242729250637285==--
+Sven
