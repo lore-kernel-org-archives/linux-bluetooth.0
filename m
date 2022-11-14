@@ -2,96 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46661C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 06:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02802C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 06:35:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235792AbiKNGcn (ORCPT
+        id S235799AbiKNGe7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Nov 2022 01:32:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40646 "EHLO
+        Mon, 14 Nov 2022 01:34:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235789AbiKNGcm (ORCPT
+        with ESMTP id S235615AbiKNGe7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Nov 2022 01:32:42 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B190115A27
-        for <linux-bluetooth@vger.kernel.org>; Sun, 13 Nov 2022 22:32:41 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 55C5460DE1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 06:32:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A52BCC433D6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 06:32:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668407560;
-        bh=uuk3zJvcnHglL4FonF5xKwhtRN1t62E6aj+C+4CgJGs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=axu5eI64sDBm68Mwno27t5FDXUvEldzBeEA8V/+8x3H0ccDvNefoqVCS85VZZl4zW
-         sj2eHhjHwBlisW9Ueq7nasPrIsywUKtk1Vwn1r49I1QXHmejInW0TQB060xgSOu64n
-         SSVM19NZHSOiGJaMQHq7N7Z09HZGpjYH5FHtS8W8MrY2rgkvstMjWjfL8wN+tQ9Zeo
-         UGzHaLPbezJaYY6f6Rx1rSxcKVl1QCn2F2IznOWA3VsUUQ20qBgaFpRF3upVXkZSpf
-         U40mV8hNiHJDMv7aZ3IFfzIjYCWmRo0vrz2Saj5S+1FeKqigLMUJBpLhUCAsMNHDV0
-         Wc7wN+TLqXeUw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 87D62C433E7; Mon, 14 Nov 2022 06:32:40 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 216686] BUG: kernel NULL pointer dereference, address:
- 0000000000000680
-Date:   Mon, 14 Nov 2022 06:32:40 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: frc.gabriel@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-216686-62941-DshpU8N9mO@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-216686-62941@https.bugzilla.kernel.org/>
-References: <bug-216686-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 14 Nov 2022 01:34:59 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1C8711150;
+        Sun, 13 Nov 2022 22:34:57 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id l11so15855486edb.4;
+        Sun, 13 Nov 2022 22:34:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/7qP7dwxDh5y8RxAZ1reOMhR1IZbWIotT7X6Hnl0pzM=;
+        b=fU6KfdRtqbdJpKPO4Y0gb5xAXBIOxCsCsk2VsqPWm+ExRGdn9htxwFisBsfRv/Hr06
+         f+TtkaFWVzhcwCdSzMXUpvOFge8helqjrR81R11mJJbbN51QUEz16qRI7amJP2iqlZjV
+         u+BvkX5+HEzgMUtrPxIhoWrSOiDA8+2XGrJISAEeBj5gwVSrM1qR5qmAdys4mV6awAx6
+         BE6e1VmIUI6TVa680TGYq39knpGTokRZKwS9IjuCQUtcozYqRsaENoZd3rwhNAb+xc4h
+         kP/hLJqc1WFgtBUfe0vZsvdFd1V8992iZfqql1RC1WBZ3DyQHMjtrXdFT86Mw3lwOBB/
+         NmdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/7qP7dwxDh5y8RxAZ1reOMhR1IZbWIotT7X6Hnl0pzM=;
+        b=bANUWJm1L1uVRMYF7i/KXGAozPD9O+/qdF7nenER2d6ir9mI3Irehu/UDvXgCQ0FbT
+         1Nklw5RXyX8l9328tWlKXj9+9LL/bP/XmxlCTu7Ud5r51oXznNMerknZOUUWfoggcq38
+         FPNOzyVi5LK5E8Cf3BOyg7bkxadOYfFpRz52wzO+ybwpS8qzr/kb0TniYSczT2rpp+LK
+         0r76ZhcEVkQPQ5eR7fG54IDD/pWakmyEBG1TdyWKYRk0lOJgTIJjq09cp3daXuFpiPgi
+         YaIg/Tyx03beuT3D1Z/vqPlRNJ94h3mukWb3JaL+26KWewYQgO4QWMwyyDkHIt+zapGu
+         VEDQ==
+X-Gm-Message-State: ANoB5plUArSUteMD5BJC9m8OLvtpaZ+GCGYKFuUUQkW14rfF7Vl6RsH9
+        uJt22P6DtvPGT9G73Gvu8L2mzdpPV5BIWH53A38=
+X-Google-Smtp-Source: AA0mqf5F5n8n3WobS6RcDh6iIh17AK1lxBK6c8L+ZcIW6mge+Qs1VAcenDiVThyywroci438qz8DhJ+gBt8r5QhO9pI=
+X-Received: by 2002:aa7:d3c1:0:b0:467:30ad:c4ca with SMTP id
+ o1-20020aa7d3c1000000b0046730adc4camr10015519edr.285.1668407696302; Sun, 13
+ Nov 2022 22:34:56 -0800 (PST)
 MIME-Version: 1.0
+From:   Wei Chen <harperchen1110@gmail.com>
+Date:   Mon, 14 Nov 2022 14:34:20 +0800
+Message-ID: <CAO4mrff45MqORA9aKmLqBTU=renMNZRvVg14YAToe9rm1FX_FQ@mail.gmail.com>
+Subject: general protection fault in klist_next
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+        kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216686
+Dear Linux Developer,
 
---- Comment #14 from frc.gabriel@gmail.com ---
-I noticed these messages after a some minutes:
+Recently when using our tool to fuzz kernel, the following crash was
+triggered. A similar patch
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=d5ebaa7c5f6f688959e8d40840b2249ede63b8ed
+is applied but kernel persists.
 
-```
-[  350.120656] note: kworker/u33:1[860] exited with preempt_count 1
-[ 1873.559221] wlp3s0: deauthenticating from e4:bf:fa:cc:15:70 by local cho=
-ice
-(Reason: 3=3DDEAUTH_LEAVING)
-[ 1877.096203] PM: suspend entry (deep)
-[ 1877.106898] Filesystems sync: 0.010 seconds
-[ 1879.113564] Bluetooth: hci0: Opcode 0x c1a failed: -110
-[ 1881.129302] Bluetooth: hci0: Opcode 0x2042 failed: -110
-[ 1881.129327] Bluetooth: hci0: Unable to disable scanning: -110
-[ 1883.145290] Bluetooth: hci0: Opcode 0x 406 failed: -110
-[ 1885.161292] Bluetooth: hci0: Opcode 0x c01 failed: -110
-[ 1887.177319] Bluetooth: hci0: Opcode 0x2042 failed: -110
-[ 1887.177330] Bluetooth: hci0: Unable to disable scanning: -110
-[ 1887.177335] Bluetooth: hci0: disable scanning failed: -110
-[ 1887.177337] Bluetooth: hci0: start background scanning failed: -110
-```
+HEAD commit: 4fe89d07d Linux 6.0
+git tree: upstream
+compiler: clang 12.0.0
+console output:
+https://drive.google.com/file/d/1mXSQ5T1XpV7jcrxa8nM3XMchyWuY8i01/view?usp=share_link
+kernel config: https://drive.google.com/file/d/1ZHRxVTXHL9mENdAPmQYS1DtgbflZ9XsD/view?usp=share_link
+C reproducer: https://drive.google.com/file/d/1iaLcMGNX6pL_x0-3Tag_0Qipdr4FrfMN/view?usp=share_link
+Syz reproducer:
+https://drive.google.com/file/d/15pVBa8YaBuinmQZrxkA1Wx5n8yb4xoo8/view?usp=share_link
 
---=20
-You may reply to this email to add a comment.
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: Wei Chen <harperchen1110@gmail.com>
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+Bluetooth: hci0: hardware error 0x00
+general protection fault, probably for non-canonical address
+0xdffffc000000000b: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+CPU: 0 PID: 51 Comm: kworker/u7:0 Not tainted 6.0.0 #35
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+1.13.0-1ubuntu1.1 04/01/2014
+Workqueue: hci0 hci_error_reset
+RIP: 0010:klist_next+0x4a/0x330 lib/klist.c:377
+Code: 4c 89 e8 48 c1 e8 03 48 89 44 24 08 42 80 3c 20 00 74 08 4c 89
+ef e8 65 77 7d fd 49 8b 5d 00 48 8d 6b 58 48 89 e8 48 c1 e8 03 <42> 80
+3c 20 00 74 08 48 89 ef e8 47 77 7d fd 48 8b 6d 00 4d 8d 75
+RSP: 0018:ffffc90000a979c0 EFLAGS: 00010202
+RAX: 000000000000000b RBX: 0000000000000000 RCX: ffff8880428a2440
+RDX: 0000000000000000 RSI: ffffc90000a97a60 RDI: ffffc90000a97a60
+RBP: 0000000000000058 R08: ffffffff89442273 R09: ffffffff893b7dec
+R10: 0000000000000002 R11: ffff8880428a2440 R12: dffffc0000000000
+R13: ffffc90000a97a60 R14: ffff88801f45c000 R15: ffffffff89442390
+FS:  0000000000000000(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f16fc4ac000 CR3: 0000000018532000 CR4: 0000000000752ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ next_device drivers/base/core.c:3756 [inline]
+ device_find_child+0xb0/0x1c0 drivers/base/core.c:3899
+ hci_conn_del_sysfs+0x8c/0x180 net/bluetooth/hci_sysfs.c:71
+ hci_conn_cleanup+0x599/0x750 net/bluetooth/hci_conn.c:147
+ hci_conn_del+0x2ae/0x3b0 net/bluetooth/hci_conn.c:1022
+ hci_conn_hash_flush+0x1bd/0x240 net/bluetooth/hci_conn.c:2367
+ hci_dev_close_sync+0x742/0xd30 net/bluetooth/hci_sync.c:4476
+ hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+ hci_error_reset+0xdb/0x1d0 net/bluetooth/hci_core.c:1050
+ process_one_work+0x83c/0x11a0 kernel/workqueue.c:2289
+ worker_thread+0xa6c/0x1290 kernel/workqueue.c:2436
+ kthread+0x266/0x300 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:klist_next+0x4a/0x330 lib/klist.c:377
+Code: 4c 89 e8 48 c1 e8 03 48 89 44 24 08 42 80 3c 20 00 74 08 4c 89
+ef e8 65 77 7d fd 49 8b 5d 00 48 8d 6b 58 48 89 e8 48 c1 e8 03 <42> 80
+3c 20 00 74 08 48 89 ef e8 47 77 7d fd 48 8b 6d 00 4d 8d 75
+RSP: 0018:ffffc90000a979c0 EFLAGS: 00010202
+RAX: 000000000000000b RBX: 0000000000000000 RCX: ffff8880428a2440
+RDX: 0000000000000000 RSI: ffffc90000a97a60 RDI: ffffc90000a97a60
+RBP: 0000000000000058 R08: ffffffff89442273 R09: ffffffff893b7dec
+R10: 0000000000000002 R11: ffff8880428a2440 R12: dffffc0000000000
+R13: ffffc90000a97a60 R14: ffff88801f45c000 R15: ffffffff89442390
+FS:  0000000000000000(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f16fc4ac000 CR3: 0000000018532000 CR4: 0000000000752ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+PKRU: 55555554
+----------------
+Code disassembly (best guess):
+   0: 4c 89 e8              mov    %r13,%rax
+   3: 48 c1 e8 03           shr    $0x3,%rax
+   7: 48 89 44 24 08        mov    %rax,0x8(%rsp)
+   c: 42 80 3c 20 00        cmpb   $0x0,(%rax,%r12,1)
+  11: 74 08                 je     0x1b
+  13: 4c 89 ef              mov    %r13,%rdi
+  16: e8 65 77 7d fd        callq  0xfd7d7780
+  1b: 49 8b 5d 00           mov    0x0(%r13),%rbx
+  1f: 48 8d 6b 58           lea    0x58(%rbx),%rbp
+  23: 48 89 e8              mov    %rbp,%rax
+  26: 48 c1 e8 03           shr    $0x3,%rax
+* 2a: 42 80 3c 20 00        cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+  2f: 74 08                 je     0x39
+  31: 48 89 ef              mov    %rbp,%rdi
+  34: e8 47 77 7d fd        callq  0xfd7d7780
+  39: 48 8b 6d 00           mov    0x0(%rbp),%rbp
+  3d: 4d                    rex.WRB
+  3e: 8d                    .byte 0x8d
+  3f: 75                    .byte 0x75
+
+Best,
+Wei
