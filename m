@@ -2,145 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63338C4321E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 08:40:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 729F6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 22:05:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236596AbiKNIkO (ORCPT
+        id S237059AbiKNWFj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Nov 2022 03:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58094 "EHLO
+        Mon, 14 Nov 2022 17:05:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236595AbiKNIkM (ORCPT
+        with ESMTP id S236124AbiKNWFi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Nov 2022 03:40:12 -0500
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 417D51C128;
-        Mon, 14 Nov 2022 00:40:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1668415030;
-    s=strato-dkim-0002; d=gerhold.net;
-    h=In-Reply-To:References:Message-ID:Subject:Cc:To:From:Date:Cc:Date:
-    From:Subject:Sender;
-    bh=Fdzji2ULixgnjflPg6rEtbWAJEIuwOyBu5+qeCT4SJI=;
-    b=n3FbW+IxO87ovNz43XhQO/gO1Pgvy/zAPXjFlydfAlvK9K3/lzSiLhrI5mu8g2zZEO
-    JOYtTR66jszMm8Mezb6Ajb7b98GxbZc0v53NN4btralHMJuwwAzGOS6Y8HQFyykAc0s+
-    mvjK2ac0LV0CnI97UGZ24KbsfEZPSQI0kaY7oR/BDEjIfGIf0tbElIsYi0+jdjKAwG6m
-    qerVQwWmvyCjOX1YjEcUUDEypOy9wLW4mVnJKlmrfkNMLyn5+qDAZG500R7jpGKzHLSt
-    /K/iRsfKhJ+HrdTZ87pFMZveLw2jAQj3Fta4ng3vUT27PiqhBx//So7OHtRvWqpVzUh+
-    Jn7g==
-Authentication-Results: strato.com;
-    dkim=none
-X-RZG-AUTH: ":P3gBZUipdd93FF5ZZvYFPugejmSTVR2nRPhVOQ/OcYgojyw4j34+u261EJF5OxJAhdlWwvqttQ=="
-X-RZG-CLASS-ID: mo00
-Received: from gerhold.net
-    by smtp.strato.de (RZmta 48.2.1 DYNA|AUTH)
-    with ESMTPSA id Yce349yAE8b95Xg
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-    Mon, 14 Nov 2022 09:37:09 +0100 (CET)
-Date:   Mon, 14 Nov 2022 09:36:59 +0100
-From:   Stephan Gerhold <stephan@gerhold.net>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        Paul Menzel <pmenzel@molgen.mpg.de>
-Subject: Re: [PATCH RESEND v2] Bluetooth: btqcomsmd: Fix command timeout
- after setting BD address
-Message-ID: <Y3H+K/6LWVcxdNK/@gerhold.net>
-References: <20221018085431.2913217-1-stephan.gerhold@kernkonzept.com>
+        Mon, 14 Nov 2022 17:05:38 -0500
+Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D828645E;
+        Mon, 14 Nov 2022 14:05:37 -0800 (PST)
+Received: by mail-lf1-x136.google.com with SMTP id p8so21601316lfu.11;
+        Mon, 14 Nov 2022 14:05:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=OvIKu8xYhgEpbqXECsNQ5zYgFCSscSAylV2o5sVbq4A=;
+        b=XvZTor6KuexX5oMvV2vFohasI4/uU0LLUW82V/FUBd+vNsfEJGTDkwTViSioQX3e22
+         vWYwRW1pT5ZOUy1hhvLEu2hudOt3JR12XKgwa8OVyVgAZriz2r6jmFs+75ZAqdJ90dhB
+         aWXYkg7DzAaU7PS/ENvmag5ep/GVEdDNFeFDTF1ADH1NFQuuhB1cd6iOaMYJWIGWKnjo
+         X9HGmHWoEYqOkQdDFZR2IFmVrxaPBQ5PAZKNVCvswtVoqWWHU9aLtZo2qnqrRHWgwuJ3
+         1c1jifWgtzM0pDP2rK9ws/RRkH51Yu45pJtynUG4Zn7O6rppoUkcYKiUMZbtNz8YUyOK
+         YHQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OvIKu8xYhgEpbqXECsNQ5zYgFCSscSAylV2o5sVbq4A=;
+        b=IcYVWUjfRipe2/1d0VIbK+CHP90wC3Mr8hce6tfX1+kTbZbNxYHceHr5W92dVUae/Y
+         dcG9gqzc8KZ32CczZaFt6RVdepLmwBV+qyuQywJlSsfYmg+Dqf2LpuDDMaAdKxKLpaw1
+         ufeD7PylI9Lt6E7+xHn1x0yrfe8N7MNae/AZZtztMzUz1KCQ7vPOBjwnWWvdp00MQlD8
+         7QQH2EyaoYd7lFYWYZr+GO9PvwbTcu7kqpTdDX/oOvIXpD4F66QHScP9QKMGcUjP6rEP
+         0Sj6AGlLD5bN95Dbh5d5UCrRCzevgk7VfIRdux28LB0ebo9V+FzPFjRu0IeNmBllESyW
+         hA8A==
+X-Gm-Message-State: ANoB5pmT+Hi0k2anbJNZ+RlE3EASrta52c3Eb2W8xW5aYoYD7+8+3bkm
+        noOVlmzCtzi6k8GIF+1hYBaxP/XSSMWZCFwd7FE=
+X-Google-Smtp-Source: AA0mqf6UE2R647BTGVfpuE9wrdHjinFcpncPaeNyxnyss9EIMKAtD683t+/1AfAr7s89vGjdPvHGNWy6TMeJKQg3DM8=
+X-Received: by 2002:a19:2d48:0:b0:4a2:2d7b:838 with SMTP id
+ t8-20020a192d48000000b004a22d7b0838mr4410510lft.251.1668463535758; Mon, 14
+ Nov 2022 14:05:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221018085431.2913217-1-stephan.gerhold@kernkonzept.com>
+References: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
+In-Reply-To: <CAJNyHpJ7hbmDK-Tq==L1D3gWB2ac4MTVYynf57JM0GmEN9-i7Q@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 14 Nov 2022 14:05:24 -0800
+Message-ID: <CABBYNZJ-BjuUcriLpNzs95SDqXP+_6-LJZ-t_00Q6ppy8qYg2Q@mail.gmail.com>
+Subject: Re: L2CAP: Spec violation
+To:     Sungwoo Kim <iam@sung-woo.kim>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Kim,
 
-It looks like this patch will get archived again in patchwork end of
-this week. Is there anything I can change to make it acceptable?
+On Fri, Nov 4, 2022 at 9:13 AM Sungwoo Kim <iam@sung-woo.kim> wrote:
+>
+> Hello,
+>
+> Our fuzzer found a BT spec violation, illegal state transition on L2cap.
+> Specifically, l2cap_chan::state is transitioned from BT_CONFIG to
+> BT_DISCONN by CONFIG_RSP by following trace:
+>
+> l2cap_config_rsp l2cap_core.c:4498
+> l2cap_send_disconn_req l2cap_core.c:4585
+> l2cap_state_change l2cap_core.c:1618
+>
+> According to the spec 5.3 vol.3 part A 6.1.4, CONFIG_RSP cannot cause
+> that transition, i.e., CONFIG -> DISCONN by CONFIG_RSP is illegal.
+> It'd be great if we could discuss.
 
-This is a fairly important fix to have Bluetooth working on these
-devices, since it fails to initialize most of the times without it.
+Can you include some btmon traces?
 
-Thanks!
-Stephan
 
-On Tue, Oct 18, 2022 at 10:54:31AM +0200, Stephan Gerhold wrote:
-> On most devices using the btqcomsmd driver (e.g. the DragonBoard 410c
-> and other devices based on the Qualcomm MSM8916/MSM8909/... SoCs)
-> the Bluetooth firmware seems to become unresponsive for a while after
-> setting the BD address. On recent kernel versions (at least 5.17+)
-> this often causes timeouts for subsequent commands, e.g. the HCI reset
-> sent by the Bluetooth core during initialization:
-> 
->     Bluetooth: hci0: Opcode 0x c03 failed: -110
-> 
-> Unfortunately this behavior does not seem to be documented anywhere.
-> Experimentation suggests that the minimum necessary delay to avoid
-> the problem is ~150us. However, to be sure add a sleep for > 1ms
-> in case it is a bit longer on other firmware versions.
-> 
-> Older kernel versions are likely also affected, although perhaps with
-> slightly different errors or less probability. Side effects can easily
-> hide the issue in most cases, e.g. unrelated incoming interrupts that
-> cause the necessary delay.
-> 
-> Fixes: 1511cc750c3d ("Bluetooth: Introduce Qualcomm WCNSS SMD based HCI driver")
-> Signed-off-by: Stephan Gerhold <stephan.gerhold@kernkonzept.com>
-> ---
-> (Unmodified resend of the v2 I sent back in June, it seems to have
->  disappeared from patchwork)
-> 
-> I tested this using a script that reboots repeatedly and checks for the
-> error. With this patch, BT shows up successfully for 100+ consecutive
-> boots. Without this patch it usually fails after 1-5 boots (or even
-> always on some boards).
-> 
-> Changes in v2:
->   - Clarify commit message: Add affected devices and kernel versions
-> ---
->  drivers/bluetooth/btqcomsmd.c | 17 ++++++++++++++++-
->  1 file changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
-> index 2acb719e596f..11c7e04bf394 100644
-> --- a/drivers/bluetooth/btqcomsmd.c
-> +++ b/drivers/bluetooth/btqcomsmd.c
-> @@ -122,6 +122,21 @@ static int btqcomsmd_setup(struct hci_dev *hdev)
->  	return 0;
->  }
->  
-> +static int btqcomsmd_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> +{
-> +	int ret;
-> +
-> +	ret = qca_set_bdaddr_rome(hdev, bdaddr);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* The firmware stops responding for a while after setting the bdaddr,
-> +	 * causing timeouts for subsequent commands. Sleep a bit to avoid this.
-> +	 */
-> +	usleep_range(1000, 10000);
-> +	return 0;
-> +}
-> +
->  static int btqcomsmd_probe(struct platform_device *pdev)
->  {
->  	struct btqcomsmd *btq;
-> @@ -162,7 +177,7 @@ static int btqcomsmd_probe(struct platform_device *pdev)
->  	hdev->close = btqcomsmd_close;
->  	hdev->send = btqcomsmd_send;
->  	hdev->setup = btqcomsmd_setup;
-> -	hdev->set_bdaddr = qca_set_bdaddr_rome;
-> +	hdev->set_bdaddr = btqcomsmd_set_bdaddr;
->  
->  	ret = hci_register_dev(hdev);
->  	if (ret < 0)
-> -- 
-> 2.30.2
-> 
+-- 
+Luiz Augusto von Dentz
