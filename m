@@ -2,107 +2,187 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58958C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 22:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A7FC43217
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 22:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237710AbiKNWKZ (ORCPT
+        id S237853AbiKNWUq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Nov 2022 17:10:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49656 "EHLO
+        Mon, 14 Nov 2022 17:20:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237578AbiKNWKT (ORCPT
+        with ESMTP id S237718AbiKNWUg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Nov 2022 17:10:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5CD917581;
-        Mon, 14 Nov 2022 14:10:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7EE7DB815B3;
-        Mon, 14 Nov 2022 22:10:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 26C73C433D6;
-        Mon, 14 Nov 2022 22:10:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668463816;
-        bh=wEzBH/GNFXbgGcwHZyMcVXP4uLTXuCNxoTu3jXGyENI=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=FfRZT170uzvp+cqpo+IAy2aolV4HQVjNR1pybM1eqhHJJURbYz7Sxwhu+tAffuRb0
-         o4+aYe9ViL3o+90wiVqq0cAxdWQZJpj0YgVOjf93iz4+EgEtnZpXg455cDnDtd4aKX
-         gYfb62rSOWdH5fzE9nvvvn+MzC0YzlDsXxjerws08B49DrwxOn8DH7SZEvat8QWJzv
-         ySNroZZ1IOzQ3MOiAtaHxhF5CUaqqXdqsrT95xuY54Fh6aYsmPZXYbvgQBq+kMGFaj
-         ymJ3ACYuPHqx38uXK57Q/dFlbhRDAPWSc0yvl6heQxZyfZEeMwGHZ2dIwieggNlH59
-         7yqccbT+g4L7A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0D5D4C395FE;
-        Mon, 14 Nov 2022 22:10:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+        Mon, 14 Nov 2022 17:20:36 -0500
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E9461B1CC;
+        Mon, 14 Nov 2022 14:20:18 -0800 (PST)
+Received: by mail-lf1-x130.google.com with SMTP id b3so21666660lfv.2;
+        Mon, 14 Nov 2022 14:20:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bFqmhXmSSyq2QzmFIRJsVIBN0HL5QQrPnWoLFMuamTI=;
+        b=JAxij3zX8stbjUDqWywJX+D7f0SbwDi3FUOUClzzW2YCjVmGUheMuf1hzmpWZ1YQk7
+         CAW4Tvpt6PdM46GoEA6o+oEBWuIatMHAanNhjDo/UE6ZFXl9YrSeJ7Y9lmj0uRN9r5qt
+         Bgk3+Clf+EWYxUNBDu4Rz4IUynJVTJvJZvkUcLHuTnQyXDKTi/Ll4O0qb/wDoT2r5WDQ
+         f5gEKMHLHEVaE8HPIdjz5ha4zNZlXyL1sXHMk+EqZb5mBe+QDNf3ZBJlpU8KWInBS0iE
+         LYWGwoJiFK5OJQ7j9KDDnnS0LO3kdiLzbhSbP0mvh2l9ijco5OGdcbaTI+SFlUlZE4Za
+         EZwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bFqmhXmSSyq2QzmFIRJsVIBN0HL5QQrPnWoLFMuamTI=;
+        b=4taB5ZiamFSLls8M29h1KLpOxMilPImVbVCF+ZR+/m4ywAFQchpNYjS+lMs449PpDG
+         fkjZCbQZa0KzbrlTjeBVPWmETGlwqZ6VSdeiuSPrcOAgXrkx6psNHMY8BZ3I62ES6/V2
+         sfIO28CzYmZDOmh17t195SdA7HwIr349uA/K6mly6DISbFZ3HlKqr0jE6ZhTe8dcKzmW
+         fw9aDxW3c0NTiLhWnrWNyIrqZX1SUL83WC71w+BU/a9FyZp2aGmoqeylst0FXqpOhfHM
+         xHkn+JmT44zmr9tCm736EUPybdmAdhSInvQtcZnzTn+wo41vHdSbVG8bTk2r/Jyywa5G
+         LI3g==
+X-Gm-Message-State: ANoB5pkhBCO69OydkRx84qVwJAXjS4PHk1GNU8/xTF5oWs/oXwvmbs3c
+        ak2y/nfmfkt8uG+lnw0T7RdouHmNAKCd1cVpCvo=
+X-Google-Smtp-Source: AA0mqf5Rz8fA7Nxof9pdF2lt5WIqy9omuV8JN12ArICFnrxa2i6yoFzsNDa5yj68KMEABGLRHuwzj8UQ80kBTQlnG+w=
+X-Received: by 2002:ac2:4d58:0:b0:4a2:efc:a882 with SMTP id
+ 24-20020ac24d58000000b004a20efca882mr5382550lfp.198.1668464416100; Mon, 14
+ Nov 2022 14:20:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek 8761BUV support ID
- 0x2B89:0x8761
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166846381605.12666.5098877185530630246.git-patchwork-notify@kernel.org>
-Date:   Mon, 14 Nov 2022 22:10:16 +0000
-References: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
-In-Reply-To: <20221108125413.216254-1-linux-bluetooth@cyborgize.sg>
-To:     Raman Varabets <linux-bluetooth@cyborgize.sg>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CAO4mrff45MqORA9aKmLqBTU=renMNZRvVg14YAToe9rm1FX_FQ@mail.gmail.com>
+In-Reply-To: <CAO4mrff45MqORA9aKmLqBTU=renMNZRvVg14YAToe9rm1FX_FQ@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 14 Nov 2022 14:20:04 -0800
+Message-ID: <CABBYNZLj34j_=S_xoDFwkqCXw_1fBEKWrr7Xw875iXvD+zXfpQ@mail.gmail.com>
+Subject: Re: general protection fault in klist_next
+To:     Wei Chen <harperchen1110@gmail.com>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net,
+        Eric Dumazet <edumazet@google.com>, kuba@kernel.org,
+        pabeni@redhat.com, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+On Sun, Nov 13, 2022 at 10:34 PM Wei Chen <harperchen1110@gmail.com> wrote:
+>
+> Dear Linux Developer,
+>
+> Recently when using our tool to fuzz kernel, the following crash was
+> triggered. A similar patch
+> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=d5ebaa7c5f6f688959e8d40840b2249ede63b8ed
+> is applied but kernel persists.
+>
+> HEAD commit: 4fe89d07d Linux 6.0
+> git tree: upstream
+> compiler: clang 12.0.0
+> console output:
+> https://drive.google.com/file/d/1mXSQ5T1XpV7jcrxa8nM3XMchyWuY8i01/view?usp=share_link
+> kernel config: https://drive.google.com/file/d/1ZHRxVTXHL9mENdAPmQYS1DtgbflZ9XsD/view?usp=share_link
+> C reproducer: https://drive.google.com/file/d/1iaLcMGNX6pL_x0-3Tag_0Qipdr4FrfMN/view?usp=share_link
+> Syz reproducer:
+> https://drive.google.com/file/d/15pVBa8YaBuinmQZrxkA1Wx5n8yb4xoo8/view?usp=share_link
+>
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: Wei Chen <harperchen1110@gmail.com>
+>
+> Bluetooth: hci0: hardware error 0x00
+> general protection fault, probably for non-canonical address
+> 0xdffffc000000000b: 0000 [#1] PREEMPT SMP KASAN
+> KASAN: null-ptr-deref in range [0x0000000000000058-0x000000000000005f]
+> CPU: 0 PID: 51 Comm: kworker/u7:0 Not tainted 6.0.0 #35
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> 1.13.0-1ubuntu1.1 04/01/2014
+> Workqueue: hci0 hci_error_reset
+> RIP: 0010:klist_next+0x4a/0x330 lib/klist.c:377
+> Code: 4c 89 e8 48 c1 e8 03 48 89 44 24 08 42 80 3c 20 00 74 08 4c 89
+> ef e8 65 77 7d fd 49 8b 5d 00 48 8d 6b 58 48 89 e8 48 c1 e8 03 <42> 80
+> 3c 20 00 74 08 48 89 ef e8 47 77 7d fd 48 8b 6d 00 4d 8d 75
+> RSP: 0018:ffffc90000a979c0 EFLAGS: 00010202
+> RAX: 000000000000000b RBX: 0000000000000000 RCX: ffff8880428a2440
+> RDX: 0000000000000000 RSI: ffffc90000a97a60 RDI: ffffc90000a97a60
+> RBP: 0000000000000058 R08: ffffffff89442273 R09: ffffffff893b7dec
+> R10: 0000000000000002 R11: ffff8880428a2440 R12: dffffc0000000000
+> R13: ffffc90000a97a60 R14: ffff88801f45c000 R15: ffffffff89442390
+> FS:  0000000000000000(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f16fc4ac000 CR3: 0000000018532000 CR4: 0000000000752ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> PKRU: 55555554
+> Call Trace:
+>  <TASK>
+>  next_device drivers/base/core.c:3756 [inline]
+>  device_find_child+0xb0/0x1c0 drivers/base/core.c:3899
+>  hci_conn_del_sysfs+0x8c/0x180 net/bluetooth/hci_sysfs.c:71
 
-On Tue,  8 Nov 2022 20:54:13 +0800 you wrote:
-> Identifies as "Realtek Bluetooth Radio";
-> used in UGREEN CM390 (P/N 80889).
-> 
-> Device description at /sys/kernel/debug/usb/devices:
-> 
-> T:  Bus=01 Lev=02 Prnt=02 Port=01 Cnt=01 Dev#=  7 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=2b89 ProdID=8761 Rev= 2.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00E04C239987
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> [...]
+Well this trace seems to not match what we have in mainline:
 
-Here is the summary with links:
-  - Bluetooth: btusb: Add Realtek 8761BUV support ID 0x2B89:0x8761
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a5f3adc1c2b9
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/hci_sysfs.c#n71
 
-You are awesome, thank you!
+I suspect it is missing:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/net/bluetooth/hci_sysfs.c?id=448a496f760664d3e2e79466aa1787e6abc922b5
+
+We should probably have it sent to stable though.
+
+>  hci_conn_cleanup+0x599/0x750 net/bluetooth/hci_conn.c:147
+>  hci_conn_del+0x2ae/0x3b0 net/bluetooth/hci_conn.c:1022
+>  hci_conn_hash_flush+0x1bd/0x240 net/bluetooth/hci_conn.c:2367
+>  hci_dev_close_sync+0x742/0xd30 net/bluetooth/hci_sync.c:4476
+>  hci_dev_do_close net/bluetooth/hci_core.c:554 [inline]
+>  hci_error_reset+0xdb/0x1d0 net/bluetooth/hci_core.c:1050
+>  process_one_work+0x83c/0x11a0 kernel/workqueue.c:2289
+>  worker_thread+0xa6c/0x1290 kernel/workqueue.c:2436
+>  kthread+0x266/0x300 kernel/kthread.c:376
+>  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:306
+>  </TASK>
+> Modules linked in:
+> ---[ end trace 0000000000000000 ]---
+> RIP: 0010:klist_next+0x4a/0x330 lib/klist.c:377
+> Code: 4c 89 e8 48 c1 e8 03 48 89 44 24 08 42 80 3c 20 00 74 08 4c 89
+> ef e8 65 77 7d fd 49 8b 5d 00 48 8d 6b 58 48 89 e8 48 c1 e8 03 <42> 80
+> 3c 20 00 74 08 48 89 ef e8 47 77 7d fd 48 8b 6d 00 4d 8d 75
+> RSP: 0018:ffffc90000a979c0 EFLAGS: 00010202
+> RAX: 000000000000000b RBX: 0000000000000000 RCX: ffff8880428a2440
+> RDX: 0000000000000000 RSI: ffffc90000a97a60 RDI: ffffc90000a97a60
+> RBP: 0000000000000058 R08: ffffffff89442273 R09: ffffffff893b7dec
+> R10: 0000000000000002 R11: ffff8880428a2440 R12: dffffc0000000000
+> R13: ffffc90000a97a60 R14: ffff88801f45c000 R15: ffffffff89442390
+> FS:  0000000000000000(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f16fc4ac000 CR3: 0000000018532000 CR4: 0000000000752ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> PKRU: 55555554
+> ----------------
+> Code disassembly (best guess):
+>    0: 4c 89 e8              mov    %r13,%rax
+>    3: 48 c1 e8 03           shr    $0x3,%rax
+>    7: 48 89 44 24 08        mov    %rax,0x8(%rsp)
+>    c: 42 80 3c 20 00        cmpb   $0x0,(%rax,%r12,1)
+>   11: 74 08                 je     0x1b
+>   13: 4c 89 ef              mov    %r13,%rdi
+>   16: e8 65 77 7d fd        callq  0xfd7d7780
+>   1b: 49 8b 5d 00           mov    0x0(%r13),%rbx
+>   1f: 48 8d 6b 58           lea    0x58(%rbx),%rbp
+>   23: 48 89 e8              mov    %rbp,%rax
+>   26: 48 c1 e8 03           shr    $0x3,%rax
+> * 2a: 42 80 3c 20 00        cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
+>   2f: 74 08                 je     0x39
+>   31: 48 89 ef              mov    %rbp,%rdi
+>   34: e8 47 77 7d fd        callq  0xfd7d7780
+>   39: 48 8b 6d 00           mov    0x0(%rbp),%rbp
+>   3d: 4d                    rex.WRB
+>   3e: 8d                    .byte 0x8d
+>   3f: 75                    .byte 0x75
+>
+> Best,
+> Wei
+
+
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Luiz Augusto von Dentz
