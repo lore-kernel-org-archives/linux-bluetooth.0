@@ -2,116 +2,229 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D752C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Nov 2022 23:36:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B21C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 00:30:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236205AbiKNXgA (ORCPT
+        id S235592AbiKOAan (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Nov 2022 18:36:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43684 "EHLO
+        Mon, 14 Nov 2022 19:30:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236364AbiKNXf6 (ORCPT
+        with ESMTP id S229484AbiKOAam (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Nov 2022 18:35:58 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D07F9FC8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 15:35:56 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id b3so21897673lfv.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 15:35:56 -0800 (PST)
+        Mon, 14 Nov 2022 19:30:42 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99176D11D
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:41 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id o13so11752091pgu.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v2EXjO0vBMtr6bTqBE9yTKO5/eFLMpO7gBdysgIPEcw=;
-        b=cn9yVZS806GSy0KPkTGYeJbItHm9bJ3X8au0gI/Rce9xyX6IL4fVmMtFA5cOnEibNr
-         KkVHbRHyO07flVqB4aPTyYta1p6N2E3TRqjKAovepdELxGqoY53Sh6Zv9seG8A7asL5O
-         4QGvC25WIHI6pVWIkthz2Rx7vDFyDHyzJlNrhL86Xm/Mi4NVxt0rya/CZ3JN6dBFhf+b
-         RPb+h+xJKXkQD3/u5pPtaGHRkGaCRsVmVwjiGmfjIRoC1KhyWIbKUxmWPAdL/T5+xs40
-         dyMcsBz/Mw5Q4Vdlzmh8THBpoyOB2Ouxopjt9xvdA0DndgIobcJGnrTGntho2CyLB+9W
-         rNsg==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YrZksNtxMwN8zKibp2Oab3a3oHg6YCF87gJfDncnNok=;
+        b=BzDIGm7+HtGWrFW4lhVXwmuOUURhPY0eUc2jwnoctQimeQdj4NmmNcT+lR/dYI4/ei
+         7prx9L3hlRBxvfswPpg3I2HGPy+pnSgBu6XdQFfZu5j5LMj+CO0SeJfdeH+zHDaQNoZw
+         Ttn6qnUM4au1CXZX4y1ZziAdqci0DW1hNT0RFs+EQEwhaGnEN4ejh+ZlGW+gTyZpuUYI
+         Tm8+QSOUgtkraWUPFdmaWVIzlcdZI6Qj/W71usHqGURc+EjLN9MEAjVdJG/FtS7IyZDE
+         Zee0zFUheelz1f9JG5lo/qhxkPHxV8N5UOAdCBi4l4ix5bqBwnoIONE0fcvPEKSQelhV
+         ojJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v2EXjO0vBMtr6bTqBE9yTKO5/eFLMpO7gBdysgIPEcw=;
-        b=wD5kOfkDemoFCb4PboGZkGSVRA53CDqnvdmEMvu/MfqmtGdRTCw3ummoz3uljlyP+j
-         rOzJP1t6YRkHi+KYDFas2fLUaCwaa6ckjA6uKNHVJjLzjRJnfZzT/CTbZHlO3EwPfYNv
-         2cjTkoYzoyXvGAMJYe4FQrkhYmeljCqKsiOTEs5uPrUgKbo99YD+eeFoTCphoOaz1QhW
-         WUV0c2CF5Y7LrHotisqb7OQu7tAIDHzPd3XONSMyRgm07pW+EVChtBMxhNfHeZDVp/ZS
-         G9M6wZbitXCY5kfVj/ykCfjqg1pj6MAKp53/V6BcYZkgo9S3UE48n38J3CIeDcvOMIHd
-         SB9Q==
-X-Gm-Message-State: ANoB5pmeeGHYHpwxzoNq10LpcguW7bjPcPxAXRgRwI18JTCJC7f5CUuu
-        dKTpl91vjl9AuXASQYcYqBzUuh10qrbQC0i+lUw9OFsz
-X-Google-Smtp-Source: AA0mqf6UvSQXMpkB+y3TcrLDINNO6a/fexWIfN6DL2v1QGwxa+YR2FtbR+LMHl0znNte0Tu/Rho1rNYXz2fwGYdh1Sk=
-X-Received: by 2002:a19:8c54:0:b0:494:70b2:26bb with SMTP id
- i20-20020a198c54000000b0049470b226bbmr4576399lfj.26.1668468954497; Mon, 14
- Nov 2022 15:35:54 -0800 (PST)
-MIME-Version: 1.0
-References: <20220901110719.176944-1-hadess@hadess.net> <20220901110719.176944-6-hadess@hadess.net>
- <02bf340b-c908-6ee8-ca78-4203b965f3b5@dressler.it>
-In-Reply-To: <02bf340b-c908-6ee8-ca78-4203b965f3b5@dressler.it>
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YrZksNtxMwN8zKibp2Oab3a3oHg6YCF87gJfDncnNok=;
+        b=xbL9yXOZsBNcmRc483aeF9QaNOaVbtomkpe6d6BkHsKMT5o4Ccu/ekRlmMepNofp+3
+         YjTDV6rV1wv5lrsxpDPmD5kDXTMCKQhcxsjxEm8nSHr+12JPmG0DHNrBCNbZnju2cE07
+         prhmEKu93fwcJnAfzWMn64KMFyVO5sj8b6axIZjVkoqdl73JRk+0iad8mKmHcmok7KGt
+         zG62mIOXCiaZgzySu+Pcoi2CQHwsFUb+Or+YAnGgfBrymPGA/9fkjgCXFIp995GexHZK
+         S8sLNrAXQ6ze9wXx7T7taN7OJgCp2011mq1wv0NbPARODX2flebSeUcRg9EiwHLokkOz
+         N1uQ==
+X-Gm-Message-State: ANoB5pkAnByUVW3vebDkf1qigIXiaageOxXQmhnhXYFF9VMnJnCNbO4W
+        f7/X3G+DK5KovIbDBsCg47fdm/CS97I=
+X-Google-Smtp-Source: AA0mqf4aYXAwGQk3h64ez2YuGJGkgCSc1aOdsNNvQ9vz6uOPNh3o4Fgl8Fzo7DPTomgXi/iUgikasA==
+X-Received: by 2002:a63:6686:0:b0:44c:bfe:9b1c with SMTP id a128-20020a636686000000b0044c0bfe9b1cmr13722585pgc.103.1668472240450;
+        Mon, 14 Nov 2022 16:30:40 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h3-20020a17090a3d0300b0020a28156e11sm10307888pjc.26.2022.11.14.16.30.38
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Nov 2022 16:30:39 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Nov 2022 15:35:42 -0800
-Message-ID: <CABBYNZJgao0tRQwEw9a+LFRzaTX8AwRmAsj+C=XLhoxVTCDg6w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v7 6/6] adapter: Remove experimental flag for PowerState
-To:     =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <jonas@dressler.it>
-Cc:     Bastien Nocera <hadess@hadess.net>,
-        linux-bluetooth@vger.kernel.org, luiz.von.dentz@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/6] monitor/att: Fix not dequeing att_read on error response
+Date:   Mon, 14 Nov 2022 16:30:33 -0800
+Message-Id: <20221115003038.2134340-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jonas,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Nov 13, 2022 at 8:03 AM Jonas Dre=C3=9Fler <jonas@dressler.it> wrot=
-e:
->
-> Hi everyone,
->
-> Can we please apply this one, too? The property being experimental means =
-distros
-> need to downstream patch BlueZ for the feature to work, I'm not sure all =
-packagers
-> are aware of that.
+If a read/read by type fails it needs to be dequeued otherwise it can
+cause the next operation of the same type to return the wrong request
+and possible decoding as if it was a different attribute type.
+---
+ monitor/att.c | 109 +++++++++++++++++++++++++++-----------------------
+ 1 file changed, 58 insertions(+), 51 deletions(-)
 
-Well experimental can be enabled by passing -E to bluetoothd, so it
-can be enabled at runtime, that said we might switch it to stable on
-the next release.
+diff --git a/monitor/att.c b/monitor/att.c
+index efd840d51961..d14cbd165697 100644
+--- a/monitor/att.c
++++ b/monitor/att.c
+@@ -106,27 +106,66 @@ static bool match_read_frame(const void *data, const void *match_data)
+ 	return read->chan == frame->chan;
+ }
+ 
+-static void print_data_list(const char *label, uint8_t length,
+-					const struct l2cap_frame *frame)
++static struct att_read *att_get_read(const struct l2cap_frame *frame)
+ {
+ 	struct packet_conn_data *conn;
+ 	struct att_conn_data *data;
++
++	conn = packet_get_conn_data(frame->handle);
++	if (!conn)
++		return NULL;
++
++	data = conn->data;
++	if (!data)
++		return NULL;
++
++	return queue_remove_if(data->reads, match_read_frame, (void *)frame);
++}
++
++static void print_attribute(struct gatt_db_attribute *attr)
++{
++	uint16_t handle;
++	const bt_uuid_t *uuid;
++	char label[21];
++
++	handle = gatt_db_attribute_get_handle(attr);
++	if (!handle)
++		goto done;
++
++	uuid = gatt_db_attribute_get_type(attr);
++	if (!uuid)
++		goto done;
++
++	switch (uuid->type) {
++	case BT_UUID16:
++		sprintf(label, "Handle: 0x%4.4x Type", handle);
++		print_field("%s: %s (0x%4.4x)", label,
++				bt_uuid16_to_str(uuid->value.u16),
++				uuid->value.u16);
++		return;
++	case BT_UUID128:
++		sprintf(label, "Handle: 0x%4.4x Type", handle);
++		print_uuid(label, &uuid->value.u128, 16);
++		return;
++	case BT_UUID_UNSPEC:
++	case BT_UUID32:
++		break;
++	}
++
++done:
++	print_field("Handle: 0x%4.4x", handle);
++}
++
++static void print_data_list(const char *label, uint8_t length,
++					const struct l2cap_frame *frame)
++{
+ 	struct att_read *read;
+ 	uint8_t count;
+ 
+ 	if (length == 0)
+ 		return;
+ 
+-	conn = packet_get_conn_data(frame->handle);
+-	if (conn) {
+-		data = conn->data;
+-		if (data)
+-			read = queue_remove_if(data->reads, match_read_frame,
+-						(void *)frame);
+-		else
+-			read = NULL;
+-	} else
+-		read = NULL;
++	read = att_get_read(frame);
+ 
+ 	count = frame->size / length;
+ 
+@@ -271,6 +310,12 @@ static void att_error_response(const struct l2cap_frame *frame)
+ 							pdu->request);
+ 	print_field("Handle: 0x%4.4x", le16_to_cpu(pdu->handle));
+ 	print_field("Error: %s (0x%2.2x)", str, pdu->error);
++
++	/* Read/Read By Type may create a read object which needs to be dequeued
++	 * and freed in case the operation fails.
++	 */
++	if (pdu->request == 0x08 || pdu->request == 0x0a)
++		free(att_get_read(frame));
+ }
+ 
+ static const struct bitfield_data chrc_prop_table[] = {
+@@ -2662,36 +2707,6 @@ static struct gatt_db_attribute *get_attribute(const struct l2cap_frame *frame,
+ 	return gatt_db_get_attribute(db, handle);
+ }
+ 
+-static void print_attribute(struct gatt_db_attribute *attr)
+-{
+-	uint16_t handle = gatt_db_attribute_get_handle(attr);
+-	const bt_uuid_t *uuid;
+-	char label[21];
+-
+-	uuid = gatt_db_attribute_get_type(attr);
+-	if (!uuid)
+-		goto done;
+-
+-	switch (uuid->type) {
+-	case BT_UUID16:
+-		sprintf(label, "Handle: 0x%4.4x Type", handle);
+-		print_field("%s: %s (0x%4.4x)", label,
+-				bt_uuid16_to_str(uuid->value.u16),
+-				uuid->value.u16);
+-		return;
+-	case BT_UUID128:
+-		sprintf(label, "Handle: 0x%4.4x Type", handle);
+-		print_uuid(label, &uuid->value.u128, 16);
+-		return;
+-	case BT_UUID_UNSPEC:
+-	case BT_UUID32:
+-		break;
+-	}
+-
+-done:
+-	print_field("Handle: 0x%4.4x", handle);
+-}
+-
+ static void print_handle(const struct l2cap_frame *frame, uint16_t handle,
+ 								bool rsp)
+ {
+@@ -2746,19 +2761,11 @@ static void att_read_req(const struct l2cap_frame *frame)
+ 
+ static void att_read_rsp(const struct l2cap_frame *frame)
+ {
+-	struct packet_conn_data *conn;
+-	struct att_conn_data *data;
+ 	struct att_read *read;
+ 
+ 	print_hex_field("Value", frame->data, frame->size);
+ 
+-	conn = packet_get_conn_data(frame->handle);
+-	if (!conn)
+-		return;
+-
+-	data = conn->data;
+-
+-	read = queue_remove_if(data->reads, match_read_frame, (void *)frame);
++	read = att_get_read(frame);
+ 	if (!read)
+ 		return;
+ 
+-- 
+2.37.3
 
-> FWIW, I can confirm the feature in gnome-shell works after removing the f=
-lag!
->
-> Cheers,
-> Jonas
->
-> On 9/1/22 13:07, Bastien Nocera wrote:
-> > Now that the feature has been tested, that the API is deemed adequate
-> > and the reliability sufficient.
-> > ---
-> >   src/adapter.c | 3 +--
-> >   1 file changed, 1 insertion(+), 2 deletions(-)
-> >
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 8fb2acdc8..841096d7f 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -3864,8 +3864,7 @@ static const GDBusPropertyTable adapter_propertie=
-s[] =3D {
-> >       { "Alias", "s", property_get_alias, property_set_alias },
-> >       { "Class", "u", property_get_class },
-> >       { "Powered", "b", property_get_powered, property_set_powered },
-> > -     { "PowerState", "s", property_get_power_state, NULL, NULL,
-> > -                          G_DBUS_PROPERTY_FLAG_EXPERIMENTAL },
-> > +     { "PowerState", "s", property_get_power_state },
-> >       { "Discoverable", "b", property_get_discoverable,
-> >                                       property_set_discoverable },
-> >       { "DiscoverableTimeout", "u", property_get_discoverable_timeout,
->
-
-
---=20
-Luiz Augusto von Dentz
