@@ -2,124 +2,53 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 044F8C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 05:03:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EBBAC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 06:26:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229592AbiKOFDG (ORCPT
+        id S229908AbiKOG0e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Nov 2022 00:03:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56642 "EHLO
+        Tue, 15 Nov 2022 01:26:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229437AbiKOFDF (ORCPT
+        with ESMTP id S232085AbiKOG0c (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Nov 2022 00:03:05 -0500
-Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 171E72666;
-        Mon, 14 Nov 2022 21:03:04 -0800 (PST)
-Received: by mail-io1-xd31.google.com with SMTP id z3so9875512iof.3;
-        Mon, 14 Nov 2022 21:03:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=njB+FnoSdOLeQ9EyChO1haSbpwpNqat14jd6hJtDJXU=;
-        b=RV9Sg2Ncx5BD9igyPfIqhcmGmAYsqL+RnGMH8Y+0zpn4r5xX/pq28t72AUM7pSUk9u
-         RhignLonjhR2XEhwWcCy4mvb9PevndzK5H+fWUnCkUPBqQ9mtrqiC6kAelW8uIXI9hRf
-         BuHNNgNx34FP7wwapCpuF8MwP4lC0dnK8Xd5Y50zhVye6g7M1Sv2oWBpoJMUQChy/PtE
-         l8gpbaBbOztx02QaAsNzmiI50Awtvcy/DRws91Ew2H6q/r2SpQl2RHT9aiODDCz0HmnP
-         g6gtuHfKCk3/bbQ7J94ZZt791d/XsPPGYehOxUgxLdF7N/qTU3L6/NB3pYYCtAI979Ky
-         x7ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=njB+FnoSdOLeQ9EyChO1haSbpwpNqat14jd6hJtDJXU=;
-        b=feqEPd8AWbsdrPAearOVnhh56yfve+D4MDXxSONoGx5NBVxxBQ2hgKvT3onFo9E2bD
-         Fxo9KuHQjS5yVrfCEIiV+xCW89+j5wPLvZwS/l5ob9UGJNFhmltrbCKGi39MbO82eoxq
-         s/zmfGzlw5NhZu+j9BY81Zz1HlzgLvA+3WK+fnBhPfKZp1Vv8fqb4gnCfp12JExET17+
-         ufR5g3aSywzIsrPO7EKBEHRQHT+9EFe8gYhl3tyN26T2mgPuSTxTuYh8VeRfAmIX+RG2
-         k+917WGt9fXQ/Ek3MCZKJf9YK7rAvpIHwjAgGO+R61L5+W+JPd6VTwbMG+pOsWCLZENn
-         3FIQ==
-X-Gm-Message-State: ANoB5pkcevS21j1VZ3eFXsu7YiOMa/ZKEiV/1FYlpZb3tFwVN8sCnZSd
-        cKw4hTZLb56VpJiCjwxSnzo=
-X-Google-Smtp-Source: AA0mqf5qzeyb3mnolZkAoyCtET79ngSvZfhWvSwvRRtaU/I9QfDQvZt6rY+cDYn2Cb27bPm64VwB4w==
-X-Received: by 2002:a5e:9815:0:b0:6a0:f3aa:fab9 with SMTP id s21-20020a5e9815000000b006a0f3aafab9mr6784624ioj.122.1668488583341;
-        Mon, 14 Nov 2022 21:03:03 -0800 (PST)
-Received: from noodle.cs.purdue.edu (switch-lwsn2133-z1r11.cs.purdue.edu. [128.10.127.250])
-        by smtp.googlemail.com with ESMTPSA id k18-20020a92c9d2000000b00302632f0d20sm1752096ilq.67.2022.11.14.21.03.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 21:03:02 -0800 (PST)
-From:   Sungwoo Kim <happiness.sung.woo@gmail.com>
-X-Google-Original-From: Sungwoo Kim <git@sung-woo.kim>
-To:     luiz.dentz@gmail.com
-Cc:     davem@davemloft.net, edumazet@google.com, iam@sung-woo.kim,
-        johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com
-Subject: Re: L2CAP: Spec violation
-Date:   Tue, 15 Nov 2022 00:02:57 -0500
-Message-Id: <20221115050257.3818178-1-git@sung-woo.kim>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CABBYNZJ-BjuUcriLpNzs95SDqXP+_6-LJZ-t_00Q6ppy8qYg2Q@mail.gmail.com>
-References: <CABBYNZJ-BjuUcriLpNzs95SDqXP+_6-LJZ-t_00Q6ppy8qYg2Q@mail.gmail.com>
+        Tue, 15 Nov 2022 01:26:32 -0500
+X-Greylist: delayed 335 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 14 Nov 2022 22:26:30 PST
+Received: from mta-out1.inet.fi (mta-out1.inet.fi [62.71.2.226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA30D49
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 22:26:30 -0800 (PST)
+Received: from johanna3.inet.fi (unknown [10.16.62.35])
+        by em201-smtpout82.rokki.sonera.fi (Postfix) with ESMTP id 783F055E0;
+        Tue, 15 Nov 2022 08:20:51 +0200 (EET)
+Received: from taipan.pilppa.org (195.165.183.197) by johanna3.inet.fi (9.0.019.26-1)
+        id 63468112029C3C4F; Tue, 15 Nov 2022 08:20:51 +0200
+Received: from mail.pilppa.org (mail.pilppa.org [195.165.183.197])
+Date:   Tue, 15 Nov 2022 08:20:44 +0200 (EET)
+From:   Mika Laitio <lamikr@pilppa.org>
+To:     Swyter <swyterzone@gmail.com>
+cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Jack <ostroffjh@users.sourceforge.net>,
+        linux-bluetooth@vger.kernel.org,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Hans de Goede <hdegoede@redhat.com>
+Subject: Re: [Regression] Cambridge Silicon Radio, Ltd Bluetooth Dongle
+In-Reply-To: <7ea187e5-7c70-db36-1fa8-148507b2e7c5@gmail.com>
+Message-ID: <e382d911-90bc-de3f-9f3-6143ed8a9b75@pilppa.org>
+References: <76cd4547-a68d-9d52-1d87-8299e29406ff@gmail.com> <LWPL3AC7.RRTERTU2.B5FO44IX@4YQH7VT3.DY2DZPQX.S6LIZ6VV> <CABBYNZKDEjYOW+b1snUsvBgidW37+tPbsidq0pXaOqWKvRC8uQ@mail.gmail.com> <7ea187e5-7c70-db36-1fa8-148507b2e7c5@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Sure,
+> Thanks to this last-effort parameter we can cover that last mile
+> without people having to recompile custom versions of btusb.
+>
+> My dongle doesn't work? Easy, add this here. Most people won't
+> have to bother with this, but that final ~3% would be screwed.
 
-btmon trace:
-(...)
+So what is the parameter needed for now? Might help users coming to this 
+bug and finding this thread.
 
-> ACL Data RX: Handle 200 flags 0x00 dlen 1033                                                                                                                                                                          #32 [hci0] 17.083174
-        invalid packet size (12 != 1033)
-        08 00 01 00 02 01 04 00 01 10 ff ff              ............
-@ MGMT Event: Device Connected (0x000b) plen 13                                                                                                                                                                    {0x0002} [hci0] 17.104462
-        BR/EDR Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Flags: 0x00000000
-        Data length: 0
-@ MGMT Event: Device Connected (0x000b) plen 13                                                                                                                                                                    {0x0001} [hci0] 17.104462
-        BR/EDR Address: 10:AA:AA:AA:AA:AA (OUI 10-AA-AA)
-        Flags: 0x00000000
-        Data length: 0
-< ACL Data TX: Handle 200 flags 0x02 dlen 16                                                                                                                                                                            #33 [hci0] 17.149691
-      L2CAP: Connection Response (0x03) ident 1 len 8
-        Destination CID: 64
-        Source CID: 65535
-        Result: Connection pending (0x0001)
-        Status: No further information available (0x0000)
-< ACL Data TX: Handle 200 flags 0x02 dlen 10                                                                                                                                                                            #34 [hci0] 17.154828
-      L2CAP: Information Request (0x0a) ident 2 len 2
-        Type: Extended features supported (0x0002)
-> ACL Data RX: Handle 200 flags 0x00 dlen 2061                                                                                                                                                                          #35 [hci0] 17.145762
-        invalid packet size (16 != 2061)
-        0c 00 01 00 04 01 08 00 40 00 00 00 01 02 00 00  ........@.......
-> ACL Data RX: Handle 200 flags 0x00 dlen 2061                                                                                                                                                                          #36 [hci0] 17.146654
-        invalid packet size (16 != 2061)
-        0c 00 01 00 03 01 08 00 00 00 00 00 00 00 00 00  ................
-> ACL Data RX: Handle 200 flags 0x00 dlen 2061                                                                                                                                                                          #37 [hci0] 17.147190
-        invalid packet size (16 != 2061)
-        0c 00 01 00 04 01 08 00 40 00 00 00 05 00 00 00  ........@.......
-> ACL Data RX: Handle 200 flags 0x00 dlen 1804                                                                                                                                                                          #38 [hci0] 17.148090
-        invalid packet size (15 != 1804)
-        0b 00 01 00 04 01 07 00 40 00 00 00 05 00 00     ........@......
-> ACL Data RX: Handle 200 flags 0x00 dlen 1547                                                                                                                                                                          #39 [hci0] 17.148708
-        invalid packet size (14 != 1547)
-
-(...)
-
-The last ACL data packet invokes:
-l2cap_bredr_sig_cmd
-l2cap_config_rsp
-l2cap_send_disconn_req
-l2cap_state_change_and_error
-Bluetooth: chan 00000000205763be BT_CONFIG -> BT_DISCONN
-
-This is the code and whole log:
-https://gist.github.com/swkim101/82bc694f9427f008c14e91307b3355b6
-
-Thanks.
+Mika
