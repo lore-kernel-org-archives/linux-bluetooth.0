@@ -2,82 +2,131 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37270C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 19:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CA0FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 20:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbiKOTkY (ORCPT
+        id S230498AbiKOU2h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Nov 2022 14:40:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
+        Tue, 15 Nov 2022 15:28:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231374AbiKOTkU (ORCPT
+        with ESMTP id S229495AbiKOU2h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Nov 2022 14:40:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 463D021811
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 11:40:19 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BC308B81B32
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 19:40:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 75AA3C433B5;
-        Tue, 15 Nov 2022 19:40:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1668541216;
-        bh=KZhEvk0SKExAgHD5zOXnDUPGJewXInJMPN0JkXLcj3g=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=tBr2AhzNYbDkG7e4kxNJxnnPNVGr2ZuqnNwHLcdnLCrwlgAlILYSSlkOV3sHz7RBb
-         abZ+IiCcoN+VJz1Vp56Jm3hTbv0+T6FManlTTSVGWYT5H0Aphoa0LJCTOnd7wa0K1K
-         P0zdBZDLI/pJfijr8pxDEKqV2g5w0VJh73/8kf8ZqQTLudRyZtadJKROkZp4qZQKHF
-         qyh5GQE0YJQCykJHj62COc0qTWZXmLsy/8dIzpGI1KF6x4ohAfSSmFP0IC2kCnasCL
-         lHBLAOghBVdRWynu6vCav+2M50lu8wu4BYiA57KHZ6dYMG7beD6NXoKDqMUx2seRTn
-         LS9ahdViMAs3w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4FBB1E21EFD;
-        Tue, 15 Nov 2022 19:40:16 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH BlueZ 1/4] shared/util: Add iovec helpers
-From:   patchwork-bot+bluetooth@kernel.org
-Message-Id: <166854121632.14574.14499500619071398604.git-patchwork-notify@kernel.org>
-Date:   Tue, 15 Nov 2022 19:40:16 +0000
-References: <20221109222947.1137901-1-luiz.dentz@gmail.com>
-In-Reply-To: <20221109222947.1137901-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
+        Tue, 15 Nov 2022 15:28:37 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76BB56259;
+        Tue, 15 Nov 2022 12:28:35 -0800 (PST)
+Message-ID: <20221115195802.415956561@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1668544113;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=N0+DYQIzJQiuGQVL9zG7WmZVX2CclyspM4BrFbhZiQ4=;
+        b=M7ECxDE0fB4Eu8YucLFheDApDFsLZrYtCJcaFO+SOJLCYWeIswLu1kIiaw2A4DwSg7KQPs
+        s1AZ5RzM2N9m/XwTQFVZRuYoLcHvbcSDs9wLQuQ2KBFeaqa0xwsKAtJ6o05zt8Ynmm8FTC
+        njJ7KEfbuFvxFnQikQGBFrUrApiyvVt16OgJmB2MERr5pd4PYGmjjTj8CistfVWbGeYEeL
+        nHhkSE+Dpiknoo1XdNL/jkkiqgZ3mvk0GOI2nSJvddEsPE9sUtqH87wetaMUm9To3RtQ+l
+        H7XWTsjAldnu6cDgr0LFA82ogzpgjCKLWD4GLNmIPijLX000LKEdy3+W72VgOQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1668544113;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc; bh=N0+DYQIzJQiuGQVL9zG7WmZVX2CclyspM4BrFbhZiQ4=;
+        b=fvWTUM9JRU6WBtEcA9FaxJnJobRgfpEAalgfSWHfdnd4NJtaxKu1epQKvYY3Z6S7g+tSVK
+        8M5r+Fg9FZuU48Bg==
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Anna-Maria Behnsen <anna-maria@linutronix.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: [patch 00/15] timers: Provide timer_shutdown[_sync]()
+Date:   Tue, 15 Nov 2022 21:28:32 +0100 (CET)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Tearing down timers can be tedious when there are circular dependencies to
+other things which need to be torn down. A prime example is timer and
+workqueue where the timer schedules work and the work arms the timer.
 
-This series was applied to bluetooth/bluez.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+Steven and the Google Chromebook team ran into such an issue in the
+Bluetooth HCI code.
 
-On Wed,  9 Nov 2022 14:29:44 -0800 you wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds iovec helpers functions.
-> ---
->  src/shared/util.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/util.h |  6 ++++++
->  2 files changed, 59 insertions(+)
+Steven suggested to create a new function del_timer_free() which marks the
+timer as shutdown. Rearm attempts of shutdown timers are discarded and he
+wanted to emit a warning for that case:
 
-Here is the summary with links:
-  - [BlueZ,1/4] shared/util: Add iovec helpers
-    (no matching commit)
-  - [BlueZ,2/4] shared/tester: Add tester_io_set_complete_func
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=918c73acb778
-  - [BlueZ,3/4] shared/bap: Fix crash when canceling requests
-    https://git.kernel.org/pub/scm/bluetooth/bluez.git/?id=7fcd6889fb13
-  - [BlueZ,4/4] unit: Introduce test-bap
-    (no matching commit)
+   https://lore.kernel.org/all/20220407161745.7d6754b3@gandalf.local.home
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+This resulted in a lengthy discussion and suggestions how this should be
+implemented. The patch series went through several iterations and during
+the review of the last version it turned out that this approach is
+suboptimal:
 
+   https://lore.kernel.org/all/20221110064101.429013735@goodmis.org
 
+The warning is not really helpful because it's entirely unclear how it
+should be acted upon. The only way to address such a case is to add 'if
+(in_shutdown)' conditionals all over the place. This is error prone and in
+most cases of teardown like the HCI one which started this discussion not
+required all.
+
+What needs to prevented is that pending work which is drained via
+destroy_workqueue() does not rearm the previously shutdown timer. Nothing
+in that shutdown sequence relies on the timer being functional.
+
+The conclusion was that the semantics of timer_shutdown_sync() should be:
+
+    - timer is not enqueued
+    - timer callback is not running
+    - timer cannot be rearmed
+
+Preventing the rearming of shutdown timers is done by discarding rearm
+attempts silently.
+
+As Steven is short of cycles, I made some spare cycles available and
+reworked the patch series to follow the new semantics and plugged the races
+which were discovered during review.
+
+The patches have been split up into small pieces to make review easier and
+I took the liberty to throw a bunch of overdue cleanups into the picture
+instead of proliferating the existing state further.
+
+The last patch in the series addresses the HCI teardown issue for real.
+
+The series is also available from git:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git timers
+
+Thanks,
+
+	tglx
+---
+ Documentation/RCU/Design/Requirements/Requirements.rst |    2 
+ Documentation/core-api/local_ops.rst                   |    2 
+ Documentation/kernel-hacking/locking.rst               |   13 
+ arch/arm/mach-spear/time.c                             |    8 
+ drivers/bluetooth/hci_qca.c                            |   10 
+ drivers/char/tpm/tpm-dev-common.c                      |    4 
+ drivers/clocksource/arm_arch_timer.c                   |   12 
+ drivers/clocksource/timer-sp804.c                      |    6 
+ drivers/staging/wlan-ng/hfa384x_usb.c                  |    4 
+ drivers/staging/wlan-ng/prism2usb.c                    |    6 
+ include/linux/timer.h                                  |   35 +
+ kernel/time/timer.c                                    |  409 +++++++++++++----
+ net/sunrpc/xprt.c                                      |    2 
+ 13 files changed, 383 insertions(+), 130 deletions(-)
