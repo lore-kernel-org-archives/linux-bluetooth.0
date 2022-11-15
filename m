@@ -2,60 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B21C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 00:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1893C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 00:30:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235592AbiKOAan (ORCPT
+        id S235707AbiKOAao (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Nov 2022 19:30:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37724 "EHLO
+        Mon, 14 Nov 2022 19:30:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiKOAam (ORCPT
+        with ESMTP id S231864AbiKOAan (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Nov 2022 19:30:42 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99176D11D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:41 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id o13so11752091pgu.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:41 -0800 (PST)
+        Mon, 14 Nov 2022 19:30:43 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E0A21CFFB
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:42 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id b1-20020a17090a7ac100b00213fde52d49so12345354pjl.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Nov 2022 16:30:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=YrZksNtxMwN8zKibp2Oab3a3oHg6YCF87gJfDncnNok=;
-        b=BzDIGm7+HtGWrFW4lhVXwmuOUURhPY0eUc2jwnoctQimeQdj4NmmNcT+lR/dYI4/ei
-         7prx9L3hlRBxvfswPpg3I2HGPy+pnSgBu6XdQFfZu5j5LMj+CO0SeJfdeH+zHDaQNoZw
-         Ttn6qnUM4au1CXZX4y1ZziAdqci0DW1hNT0RFs+EQEwhaGnEN4ejh+ZlGW+gTyZpuUYI
-         Tm8+QSOUgtkraWUPFdmaWVIzlcdZI6Qj/W71usHqGURc+EjLN9MEAjVdJG/FtS7IyZDE
-         Zee0zFUheelz1f9JG5lo/qhxkPHxV8N5UOAdCBi4l4ix5bqBwnoIONE0fcvPEKSQelhV
-         ojJQ==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NNiMOLVQp06Z6ykn1e6kwojsIWfRd4etqlKeAPwou0A=;
+        b=j9DRTU6vWZR/1alwXhsTLKC/dSELy02lAqZiJs6F9J3Dkrk048vX7fVBbyH+vb/aPQ
+         MB0+7bw11LnTjO8zBZCiP0j2hXAS0JF61XJIExFTRhWbxdmXbXUuk81j2VmGAAnpuRMd
+         YXSuMl4Vpeh6OKdQua9mzCx9e1xkuam8mmsogHbXsv4iNJjlq3Tdx0UMLei0ClaySiv2
+         AMQBw2BojmL+jXTuo6AiMtHHx2F47HH8JkzekVp62vycgCRnRV8PJdmZMt/7BBbd/pUY
+         53Z0Czfc1xNRV3XjsOeKMNFZ4Oz8ffyCh1aTBpXVllOdVTo43vMUBdb/3lEma8LMNBEu
+         Q6Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YrZksNtxMwN8zKibp2Oab3a3oHg6YCF87gJfDncnNok=;
-        b=xbL9yXOZsBNcmRc483aeF9QaNOaVbtomkpe6d6BkHsKMT5o4Ccu/ekRlmMepNofp+3
-         YjTDV6rV1wv5lrsxpDPmD5kDXTMCKQhcxsjxEm8nSHr+12JPmG0DHNrBCNbZnju2cE07
-         prhmEKu93fwcJnAfzWMn64KMFyVO5sj8b6axIZjVkoqdl73JRk+0iad8mKmHcmok7KGt
-         zG62mIOXCiaZgzySu+Pcoi2CQHwsFUb+Or+YAnGgfBrymPGA/9fkjgCXFIp995GexHZK
-         S8sLNrAXQ6ze9wXx7T7taN7OJgCp2011mq1wv0NbPARODX2flebSeUcRg9EiwHLokkOz
-         N1uQ==
-X-Gm-Message-State: ANoB5pkAnByUVW3vebDkf1qigIXiaageOxXQmhnhXYFF9VMnJnCNbO4W
-        f7/X3G+DK5KovIbDBsCg47fdm/CS97I=
-X-Google-Smtp-Source: AA0mqf4aYXAwGQk3h64ez2YuGJGkgCSc1aOdsNNvQ9vz6uOPNh3o4Fgl8Fzo7DPTomgXi/iUgikasA==
-X-Received: by 2002:a63:6686:0:b0:44c:bfe:9b1c with SMTP id a128-20020a636686000000b0044c0bfe9b1cmr13722585pgc.103.1668472240450;
-        Mon, 14 Nov 2022 16:30:40 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NNiMOLVQp06Z6ykn1e6kwojsIWfRd4etqlKeAPwou0A=;
+        b=r9gU3kDvZnHLqLKrTugWy6oomdEpZAz0r6tSe8KoQWPWExv6M7i0iBTrEcj+gpzLvo
+         BcwVtk1sZG8XhvneaBJyb+EzYte7SPGnSzk/TuNr4Cp/4Juhm9z/TrD8EOCv9PIiL55D
+         1TGl/v8SrHznqTI8MvCNf9n08rQcRp7DJl116uX7Bf/GQ5B/F30vbY3MQyyjQf0PhJLN
+         elUyreIWreQt+JqLrCdCEqxQsPSbdZf7EcsFRsOhahjYC4QKwyWbBvMaPwqdumMYFibs
+         Jn5oWvjFpCgXrmOGQf65Mb54trMWnY0qjFrpgUps5AjlRZAj+v17XaKdrVKnkvwgr5zV
+         v4/w==
+X-Gm-Message-State: ANoB5pkuTv9hATF2P9Enrx4VTDWBUrJBjd0/hciF6jWtWqPp/vwbeq1j
+        DLETwonwnRVMjWtkRyqwc9I9xN6ctVk=
+X-Google-Smtp-Source: AA0mqf41d2Xy9iBefH66nMhNV3uwJZA0uDUJyIFa88FUVLKhIz28QmnVm0IsS+wnytQ6SeILIQBtog==
+X-Received: by 2002:a17:902:da90:b0:186:8518:6c95 with SMTP id j16-20020a170902da9000b0018685186c95mr1550505plx.149.1668472241755;
+        Mon, 14 Nov 2022 16:30:41 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h3-20020a17090a3d0300b0020a28156e11sm10307888pjc.26.2022.11.14.16.30.38
+        by smtp.gmail.com with ESMTPSA id h3-20020a17090a3d0300b0020a28156e11sm10307888pjc.26.2022.11.14.16.30.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Nov 2022 16:30:39 -0800 (PST)
+        Mon, 14 Nov 2022 16:30:41 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/6] monitor/att: Fix not dequeing att_read on error response
-Date:   Mon, 14 Nov 2022 16:30:33 -0800
-Message-Id: <20221115003038.2134340-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] shared/util: Add iovec helpers
+Date:   Mon, 14 Nov 2022 16:30:34 -0800
+Message-Id: <20221115003038.2134340-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.37.3
+In-Reply-To: <20221115003038.2134340-1-luiz.dentz@gmail.com>
+References: <20221115003038.2134340-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -64,167 +68,154 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If a read/read by type fails it needs to be dequeued otherwise it can
-cause the next operation of the same type to return the wrong request
-and possible decoding as if it was a different attribute type.
+This adds iovec helpers functions.
 ---
- monitor/att.c | 109 +++++++++++++++++++++++++++-----------------------
- 1 file changed, 58 insertions(+), 51 deletions(-)
+ src/shared/util.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/util.h |  10 +++++
+ 2 files changed, 113 insertions(+)
 
-diff --git a/monitor/att.c b/monitor/att.c
-index efd840d51961..d14cbd165697 100644
---- a/monitor/att.c
-+++ b/monitor/att.c
-@@ -106,27 +106,66 @@ static bool match_read_frame(const void *data, const void *match_data)
- 	return read->chan == frame->chan;
+diff --git a/src/shared/util.c b/src/shared/util.c
+index 0a0308cb0786..333023e0dcac 100644
+--- a/src/shared/util.c
++++ b/src/shared/util.c
+@@ -189,6 +189,109 @@ void util_clear_uid(uint64_t *bitmap, uint8_t id)
+ 	*bitmap &= ~(((uint64_t)1) << (id - 1));
  }
  
--static void print_data_list(const char *label, uint8_t length,
--					const struct l2cap_frame *frame)
-+static struct att_read *att_get_read(const struct l2cap_frame *frame)
- {
- 	struct packet_conn_data *conn;
- 	struct att_conn_data *data;
++struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt)
++{
++	struct iovec *dup;
++	size_t i;
 +
-+	conn = packet_get_conn_data(frame->handle);
-+	if (!conn)
++	if (!iov)
 +		return NULL;
 +
-+	data = conn->data;
-+	if (!data)
++	dup = new0(struct iovec, cnt);
++
++	for (i = 0; i < cnt; i++)
++		util_iov_memcpy(&dup[i], iov[i].iov_base, iov[i].iov_len);
++
++	return dup;
++}
++
++int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2)
++{
++	if (!iov1)
++		return 1;
++
++	if (!iov2)
++		return -1;
++
++	if (iov1->iov_len != iov2->iov_len)
++		return iov1->iov_len - iov2->iov_len;
++
++	return memcmp(iov1->iov_base, iov2->iov_base, iov1->iov_len);
++}
++
++void util_iov_memcpy(struct iovec *iov, void *src, size_t len)
++{
++	if (!iov)
++		return;
++
++	iov->iov_base = realloc(iov->iov_base, len);
++	iov->iov_len = len;
++	memcpy(iov->iov_base, src, len);
++}
++
++void util_iov_free(struct iovec *iov, size_t cnt)
++{
++	size_t i;
++
++	if (!iov)
++		return;
++
++	for (i = 0; i < cnt; i++)
++		free(iov[i].iov_base);
++
++	free(iov);
++}
++
++void *util_iov_push(struct iovec *iov, size_t len)
++{
++	void *data;
++
++	if (!iov)
 +		return NULL;
 +
-+	return queue_remove_if(data->reads, match_read_frame, (void *)frame);
++	data = iov->iov_base + iov->iov_len;
++	iov->iov_len += len;
++
++	return data;
 +}
 +
-+static void print_attribute(struct gatt_db_attribute *attr)
++void *util_iov_push_mem(struct iovec *iov, size_t len, const void *data)
 +{
-+	uint16_t handle;
-+	const bt_uuid_t *uuid;
-+	char label[21];
++	void *p;
 +
-+	handle = gatt_db_attribute_get_handle(attr);
-+	if (!handle)
-+		goto done;
++	p = util_iov_push(iov, len);
++	if (!p)
++		return NULL;
 +
-+	uuid = gatt_db_attribute_get_type(attr);
-+	if (!uuid)
-+		goto done;
++	memcpy(p, data, len);
 +
-+	switch (uuid->type) {
-+	case BT_UUID16:
-+		sprintf(label, "Handle: 0x%4.4x Type", handle);
-+		print_field("%s: %s (0x%4.4x)", label,
-+				bt_uuid16_to_str(uuid->value.u16),
-+				uuid->value.u16);
-+		return;
-+	case BT_UUID128:
-+		sprintf(label, "Handle: 0x%4.4x Type", handle);
-+		print_uuid(label, &uuid->value.u128, 16);
-+		return;
-+	case BT_UUID_UNSPEC:
-+	case BT_UUID32:
-+		break;
-+	}
-+
-+done:
-+	print_field("Handle: 0x%4.4x", handle);
++	return p;
 +}
 +
-+static void print_data_list(const char *label, uint8_t length,
-+					const struct l2cap_frame *frame)
++void *util_iov_pull(struct iovec *iov, size_t len)
 +{
- 	struct att_read *read;
- 	uint8_t count;
- 
- 	if (length == 0)
- 		return;
- 
--	conn = packet_get_conn_data(frame->handle);
--	if (conn) {
--		data = conn->data;
--		if (data)
--			read = queue_remove_if(data->reads, match_read_frame,
--						(void *)frame);
--		else
--			read = NULL;
--	} else
--		read = NULL;
-+	read = att_get_read(frame);
- 
- 	count = frame->size / length;
- 
-@@ -271,6 +310,12 @@ static void att_error_response(const struct l2cap_frame *frame)
- 							pdu->request);
- 	print_field("Handle: 0x%4.4x", le16_to_cpu(pdu->handle));
- 	print_field("Error: %s (0x%2.2x)", str, pdu->error);
++	if (!iov)
++		return NULL;
 +
-+	/* Read/Read By Type may create a read object which needs to be dequeued
-+	 * and freed in case the operation fails.
-+	 */
-+	if (pdu->request == 0x08 || pdu->request == 0x0a)
-+		free(att_get_read(frame));
- }
++	if (iov->iov_len < len)
++		return NULL;
++
++	iov->iov_base += len;
++	iov->iov_len -= len;
++
++	return iov->iov_base;
++}
++
++void *util_iov_pull_mem(struct iovec *iov, size_t len)
++{
++	void *data = iov->iov_base;
++
++	if (util_iov_pull(iov, len))
++		return data;
++
++	return NULL;
++}
++
+ static const struct {
+ 	uint16_t uuid;
+ 	const char *str;
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 554481e1e1ea..dc84f963588f 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -15,6 +15,7 @@
+ #include <byteswap.h>
+ #include <string.h>
+ #include <sys/types.h>
++#include <sys/uio.h>
  
- static const struct bitfield_data chrc_prop_table[] = {
-@@ -2662,36 +2707,6 @@ static struct gatt_db_attribute *get_attribute(const struct l2cap_frame *frame,
- 	return gatt_db_get_attribute(db, handle);
- }
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
+ #define BIT(n)  (1 << (n))
+@@ -109,6 +110,15 @@ ssize_t util_getrandom(void *buf, size_t buflen, unsigned int flags);
+ uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
+ void util_clear_uid(uint64_t *bitmap, uint8_t id);
  
--static void print_attribute(struct gatt_db_attribute *attr)
--{
--	uint16_t handle = gatt_db_attribute_get_handle(attr);
--	const bt_uuid_t *uuid;
--	char label[21];
--
--	uuid = gatt_db_attribute_get_type(attr);
--	if (!uuid)
--		goto done;
--
--	switch (uuid->type) {
--	case BT_UUID16:
--		sprintf(label, "Handle: 0x%4.4x Type", handle);
--		print_field("%s: %s (0x%4.4x)", label,
--				bt_uuid16_to_str(uuid->value.u16),
--				uuid->value.u16);
--		return;
--	case BT_UUID128:
--		sprintf(label, "Handle: 0x%4.4x Type", handle);
--		print_uuid(label, &uuid->value.u128, 16);
--		return;
--	case BT_UUID_UNSPEC:
--	case BT_UUID32:
--		break;
--	}
--
--done:
--	print_field("Handle: 0x%4.4x", handle);
--}
--
- static void print_handle(const struct l2cap_frame *frame, uint16_t handle,
- 								bool rsp)
- {
-@@ -2746,19 +2761,11 @@ static void att_read_req(const struct l2cap_frame *frame)
- 
- static void att_read_rsp(const struct l2cap_frame *frame)
- {
--	struct packet_conn_data *conn;
--	struct att_conn_data *data;
- 	struct att_read *read;
- 
- 	print_hex_field("Value", frame->data, frame->size);
- 
--	conn = packet_get_conn_data(frame->handle);
--	if (!conn)
--		return;
--
--	data = conn->data;
--
--	read = queue_remove_if(data->reads, match_read_frame, (void *)frame);
-+	read = att_get_read(frame);
- 	if (!read)
- 		return;
- 
++struct iovec *util_iov_dup(const struct iovec *iov, size_t cnt);
++int util_iov_memcmp(const struct iovec *iov1, const struct iovec *iov2);
++void util_iov_memcpy(struct iovec *iov, void *src, size_t len);
++void *util_iov_push(struct iovec *iov, size_t len);
++void *util_iov_push_mem(struct iovec *iov, size_t len, const void *data);
++void *util_iov_pull(struct iovec *iov, size_t len);
++void *util_iov_pull_mem(struct iovec *iov, size_t len);
++void util_iov_free(struct iovec *iov, size_t cnt);
++
+ const char *bt_uuid16_to_str(uint16_t uuid);
+ const char *bt_uuid32_to_str(uint32_t uuid);
+ const char *bt_uuid128_to_str(const uint8_t uuid[16]);
 -- 
 2.37.3
 
