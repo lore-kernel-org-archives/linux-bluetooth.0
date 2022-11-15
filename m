@@ -2,134 +2,181 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56915C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 20:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEAAC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Nov 2022 21:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237977AbiKOUbg (ORCPT
+        id S238326AbiKOVJl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Nov 2022 15:31:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39522 "EHLO
+        Tue, 15 Nov 2022 16:09:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237900AbiKOUaU (ORCPT
+        with ESMTP id S230168AbiKOVJk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Nov 2022 15:30:20 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFDB430F78;
-        Tue, 15 Nov 2022 12:29:00 -0800 (PST)
-Message-ID: <20221115202117.849485477@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1668544138;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=VMt+lAYwXqKzwEHThJOieOqFot6Ei0mDFg2C3AsrckQ=;
-        b=mucQ8oXb0C4aCUY5JIMHL0lQvqrUa82sVbkH31UQxuzVpLZFZOmZrs0aoHSqp8pIGl/3ks
-        XzbBlbaPcq7AdSa8X4h2kftgSOMVq0C5uEW1sgpJkvQoDwU0yqOrm1FD/muU/i1qildMby
-        3Hi4LCjz97NdVP1G1qQmV699Fe2I2dEXIR0EfIxNv/9KwsFNlwjyBEtPCFUJpSvHMhwFrM
-        eA2HUfkCi7ahca5KpV4TI7TeG1Sbh22gIBXFxV3I+KZoNZpmsdlal4ZIax8x/yWtlwdybP
-        FRU/wSK1ulaN4C96T3M46wWFUuj2HoJBfMu/F1M2zALqXL11TdMvSXtouh9STg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1668544138;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=VMt+lAYwXqKzwEHThJOieOqFot6Ei0mDFg2C3AsrckQ=;
-        b=OuvYR8kVkCDqlom60FXFh8tOQHo9j2OPSo2cnx3iin3PXTYDtXFF5m4yF0hgM7KN3NI2NA
-        n/k4I9w9C1CNd/AQ==
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     LKML <linux-kernel@vger.kernel.org>
-Cc:     Linus Torvalds <torvalds@linuxfoundation.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Anna-Maria Behnsen <anna-maria@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Stephen Boyd <sboyd@kernel.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Marc Zyngier <maz@kernel.org>
-Subject: [patch 15/15] Bluetooth: hci_qca: Fix the teardown problem for real
-References: <20221115195802.415956561@linutronix.de>
+        Tue, 15 Nov 2022 16:09:40 -0500
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BADB1FADF
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 13:09:39 -0800 (PST)
+Received: by mail-qk1-x72b.google.com with SMTP id p18so10422448qkg.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 13:09:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=55VZbut00xkGJWNJyMaDuylU3oZYbojWFXG8ZLQYbL4=;
+        b=b/6gXeJYQ5LXBfxtdPH73SOre1xEF0qeErM9EDlN2QJxcQAZUB9pjwM8BJH+IG6FEM
+         E08OvKt+JHF/GJ3R16yAP0uHc5hRxDyawPcH2gZDeYb1kUAvZoiYNRtm+JU/DxkX3UNP
+         IHCwiMRPsfXTKn0b0pXJq6Xx/Asmtz/jWGCZ5ebMQ2ag1TerNmAaLxhOpB7HbiPqnXDu
+         C7/I5tcFo46w3GcqkpS7EE7sU+kK3uyiNrSMjtoYz5MflNIts652AFdY2fISjZqH/Xxk
+         xVpAlWPYz9fWL0ck0XVj/sjUSxS9BVwuo40nzZSml14nuh5LNK04rRQEJAXMjdc6xck0
+         1aJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=55VZbut00xkGJWNJyMaDuylU3oZYbojWFXG8ZLQYbL4=;
+        b=iDc380VoWxGKSjW+NJeHT6g2Vw7l1Jys44zjQI7DLRpJHPqJBGwVvRGJnIJhndkuiG
+         EQjvgpgvFP7mjtDNrNo2icCJhrvSjQ8KUJT1Ji+3uuVOvSBrvA+y683PjOEUJEdO7NGS
+         v7JsZR86R+sh2Je2lOrCFInqdyBpDXmb1nlrZoDF9mVMamOj3qHxUXDs4dwwoiLFYeS3
+         lusiWLIjzQJ9Swneu6QJSA5zUWdh6thXIhUe295YL8fDLInkWq+PzWgI8rf++S8OwKkD
+         f5OVh3vEmj2Z0wJEleYrqLGnFRoOfV0b+wJLi4sYs/Ebzq0odPfAkPOmHnBae8LGAhfr
+         DV6g==
+X-Gm-Message-State: ANoB5pk+3ScIkoVO7sEnSFFF124bPqyLJfjfn8ZMaRIh72lHt/UvM1nO
+        f9z+J4TvW/PMi0PC1czf4YlHLeaTGM5LTQ==
+X-Google-Smtp-Source: AA0mqf5bt4AjV1JZuXdoQyChK9xWtulYq5WIY/lhsgrJWPg3DxlVMSdyu30bdMY+5Ts9a1AtzKxRyA==
+X-Received: by 2002:a05:620a:1094:b0:6fb:4a84:cef2 with SMTP id g20-20020a05620a109400b006fb4a84cef2mr16448811qkk.158.1668546578680;
+        Tue, 15 Nov 2022 13:09:38 -0800 (PST)
+Received: from [172.17.0.2] ([172.174.67.100])
+        by smtp.gmail.com with ESMTPSA id n77-20020a374050000000b006b5cc25535fsm8623157qka.99.2022.11.15.13.09.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 13:09:38 -0800 (PST)
+Message-ID: <63740012.370a0220.aebb6.dbb5@mx.google.com>
+Date:   Tue, 15 Nov 2022 13:09:38 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0747017688285942784=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 15 Nov 2022 21:28:57 +0100 (CET)
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, tglx@linutronix.de
+Subject: RE: timers: Provide timer_shutdown[_sync]()
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221115202117.038937247@linutronix.de>
+References: <20221115202117.038937247@linutronix.de>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-While discussing solutions for the teardown problem which results from
-circular dependencies between timers and workqueues, where timers schedule
-work from their timer callback and workqueues arm the timers from work
-items, it was discovered that the recent fix to the QCA code is incorrect.
+--===============0747017688285942784==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-That commit fixes the obvious problem of using del_timer() instead of
-del_timer_sync() and reorders the teardown calls to
+This is automated email and please do not reply to this email!
 
-   destroy_workqueue(wq);
-   del_timer_sync(t);
+Dear submitter,
 
-This makes it less likely to explode, but it's still broken:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=695686
 
-   destroy_workqueue(wq);
-   /* After this point @wq cannot be touched anymore */
+---Test result---
 
-   ---> timer expires
-         queue_work(wq) <---- Results in a NULl pointer dereference
-			      deep in the work queue core code.
-   del_timer_sync(t);
+Test Summary:
+CheckPatch                    FAIL      20.38 seconds
+GitLint                       FAIL      14.40 seconds
+SubjectPrefix                 FAIL      11.71 seconds
+BuildKernel                   PASS      36.84 seconds
+BuildKernel32                 PASS      32.69 seconds
+Incremental Build with patchesPASS      263.63 seconds
+TestRunner: Setup             PASS      532.30 seconds
+TestRunner: l2cap-tester      PASS      18.21 seconds
+TestRunner: iso-tester        PASS      17.37 seconds
+TestRunner: bnep-tester       PASS      6.79 seconds
+TestRunner: mgmt-tester       PASS      109.81 seconds
+TestRunner: rfcomm-tester     PASS      10.69 seconds
+TestRunner: sco-tester        PASS      10.13 seconds
+TestRunner: ioctl-tester      PASS      11.43 seconds
+TestRunner: mesh-tester       PASS      8.18 seconds
+TestRunner: smp-tester        PASS      10.13 seconds
+TestRunner: userchan-tester   PASS      7.00 seconds
 
-Use the new timer_shutdown_sync() function to ensure that the timers are
-disarmed, no timer callbacks are running and the timers cannot be armed
-again. This restores the original teardown sequence:
+Details
+##############################
+Test: CheckPatch - FAIL - 20.38 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+[10/15] timers: Silently ignore timers with a NULL function\WARNING:TYPO_SPELLING: 'pathes' may be misspelled - perhaps 'paths'?
+#84: 
+In preparation for that replace the warnings in the relevant code pathes
+                                                                  ^^^^^^
 
-   timer_shutdown_sync(t);
-   destroy_workqueue(wq);
+total: 0 errors, 1 warnings, 123 lines checked
 
-which is now correct because the timer core silently ignores potential
-rearming attempts which can happen when destroy_workqueue() drains pending
-work before mopping up the workqueue.
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-Fixes: 72ef98445aca ("Bluetooth: hci_qca: Use del_timer_sync() before freeing")
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org
-Link: https://lore.kernel.org/all/87iljhsftt.ffs@tglx
+/github/workspace/src/13044156.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+[12/15] timers: Add shutdown mechanism to the internal functions\WARNING:TYPO_SPELLING: 'aquisition' may be misspelled - perhaps 'acquisition'?
+#133: FILE: kernel/time/timer.c:1322:
++	 * aquisition. By taking the lock it is ensured that such a newly
+ 	   ^^^^^^^^^^
+
+total: 0 errors, 1 warnings, 137 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/13044158.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL - 14.40 seconds
+Run gitlint with rule in .gitlint
+[02/15] clocksource/drivers/arm_arch_timer: Do not use timer namespace for timer_shutdown() function
+1: T1 Title exceeds max length (100>80): "[02/15] clocksource/drivers/arm_arch_timer: Do not use timer namespace for timer_shutdown() function"
+
+[03/15] clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function
+1: T1 Title exceeds max length (91>80): "[03/15] clocksource/drivers/sp804: Do not use timer namespace for timer_shutdown() function"
+
+[14/15] timers: Update the documentation to reflect on the new timer_shutdown() API
+1: T1 Title exceeds max length (83>80): "[14/15] timers: Update the documentation to reflect on the new timer_shutdown() API"
+13: B3 Line contains hard tab characters (\t): "  	del_timer_sync() returns the number of removal attempts ]"
+
+[15/15] Bluetooth: hci_qca: Fix the teardown problem for real
+21: B3 Line contains hard tab characters (\t): "			      deep in the work queue core code."
+
+
+##############################
+Test: SubjectPrefix - FAIL - 11.71 seconds
+Check subject contains "Bluetooth" prefix
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+"Bluetooth: " is not specified in the subject
+
+
+
 ---
- drivers/bluetooth/hci_qca.c |   10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -696,9 +696,15 @@ static int qca_close(struct hci_uart *hu
- 	skb_queue_purge(&qca->tx_wait_q);
- 	skb_queue_purge(&qca->txq);
- 	skb_queue_purge(&qca->rx_memdump_q);
-+	/*
-+	 * Shut the timers down so they can't be rearmed when
-+	 * destroy_workqueue() drains pending work which in turn might try
-+	 * to arm a timer.  After shutdown rearm attempts are silently
-+	 * ignored by the timer core code.
-+	 */
-+	timer_shutdown_sync(&qca->tx_idle_timer);
-+	timer_shutdown_sync(&qca->wake_retrans_timer);
- 	destroy_workqueue(qca->workqueue);
--	del_timer_sync(&qca->tx_idle_timer);
--	del_timer_sync(&qca->wake_retrans_timer);
- 	qca->hu = NULL;
- 
- 	kfree_skb(qca->rx_skb);
 
+--===============0747017688285942784==--
