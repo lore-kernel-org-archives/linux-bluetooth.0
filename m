@@ -2,166 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DD5C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F275C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:40:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234002AbiKPV2i (ORCPT
+        id S234220AbiKPVkV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Nov 2022 16:28:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39376 "EHLO
+        Wed, 16 Nov 2022 16:40:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233946AbiKPV2g (ORCPT
+        with ESMTP id S234016AbiKPVkR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Nov 2022 16:28:36 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A757B26F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:28:31 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id be13so31702266lfb.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:28:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mOZR/swktbfkYrzvqgzNcV2PJeCytCjBT2cONnEn1QA=;
-        b=c349DGnYJ/qtuh5UzuVyTRiQME+inrbaQuGP2XT+StL3us9zDaUcn+ieyDc5PjLcd4
-         H7DJlzhZtqpGxaPXwPi76hX7GzUFg70HGII35aQMe/nWFpIMqTKp1JiwQkmotanlyc0F
-         AuAVtz2s+3QutXUOHvyLPL1AvyIj7p2TrZKQO9+BLP5+9J/OYiGUlz93Sc9UL1jN6fK3
-         1SqGUQzHblgdVXchLLeSovIzI/RA2SGvwMPc3eNoVCBLcUV4Ka+ViycvSJXecMk6V64C
-         HQoMeOc7RhOJDnrY9x7AbfJd+sklzeikqDD6pscLDuR6mnHTHSkd/YPgjZeTfThHHzXg
-         WC5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mOZR/swktbfkYrzvqgzNcV2PJeCytCjBT2cONnEn1QA=;
-        b=x8KyYJG9rJ4SmEiedw7P4DudxcxFBTCtXD4T950qdxcSapa1l0l8aHHK++QO8Hq7vj
-         FmlHPGaV0mktlpUwuS4tK/fZV+UV87fUZfB6D9F3V/+7xvVuTbr/KSE/v/ZPXTnOexH/
-         6ORbcYZYOnD9V3MgPE/P+gy8vfYiqmWTie9kovz79bts/rvpARVwalWOwz9VXgc1XnwZ
-         DBbksmPzsnrfzSsvjGssvX1WpBWdZv0YSUrvKR708dWvelETkFHaARh0cZW9+WHzeGPZ
-         KExSSTZFWq0ZXJu9n69Sh3M+tYO8+mz3NQUeoTpBMusSWHvDyo31JQY8izZQb7LOH3TI
-         ZfmA==
-X-Gm-Message-State: ANoB5pk63tjE/luQSD5D/LLD+Vffaj5cNeQxikooUwGkrJI13iSJ8MKI
-        TF/9khvQDNCS+sAcS+xYToibh+rP3maC/7Mf+ZmLNHMS5Lk=
-X-Google-Smtp-Source: AA0mqf5sSNx9FGuOc0UfRmusmFdYJI/16tUDiQA9DcJCxWnJ3XY2JvL4nfCOfIsre/v6eHy+/AYbJI8Ln6hQ+Y0pBSg=
-X-Received: by 2002:a19:2d48:0:b0:4a2:2d7b:838 with SMTP id
- t8-20020a192d48000000b004a22d7b0838mr7221325lft.251.1668634109583; Wed, 16
- Nov 2022 13:28:29 -0800 (PST)
+        Wed, 16 Nov 2022 16:40:17 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA87A64D8;
+        Wed, 16 Nov 2022 13:40:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 76FD261FE0;
+        Wed, 16 Nov 2022 21:40:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D9B23C433D7;
+        Wed, 16 Nov 2022 21:40:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1668634815;
+        bh=kj8ADXYtV7/FQq+a3FDgaZPiX27KXWwGGYAGWoz10JI=;
+        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+        b=JQbSArbX7a/8qfmG0JDjqgbuRpQGDufdczmQ7pgvTEsgly4Ln5aVP/P7xDcADT0ws
+         G1HxezspSE4wvnlGXkkdDQFpSaJtVuFfUa6aa1u7Suncb0BvjTxQZFz1r81PydQU74
+         Btd6ykBHl4yfUw5uA/wiIjqgInZ7iYQP8AhwRHXPShmw+9LT/+S3b8/PQ9ip1i7KaA
+         SxBuv73KZGJ7e3uzgiooPH9tv3B5zvGs4OfPMgzfNkMWvyqAkYGp2F6Y1D/CPZjzcG
+         NZsv51HGZL+GYwcH7oQTeF+KW0BPwhiL+4loRT/y5+Uo8fgAlQ2+ORV46YHjEZzu/O
+         BO8c2zQhiXy2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BE447E270D5;
+        Wed, 16 Nov 2022 21:40:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20221116143334.4990-1-abhay.maheshbhai.maheta@intel.com> <6374fbd8.4a0a0220.48530.6d2f@mx.google.com>
-In-Reply-To: <6374fbd8.4a0a0220.48530.6d2f@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 16 Nov 2022 13:28:18 -0800
-Message-ID: <CABBYNZK5m+rvUfSPNMM7qYUHDRBkU-ONXxhLwL-3ofWx7hWXaA@mail.gmail.com>
-Subject: Re: hci_event: handling CIS QoS
-To:     linux-bluetooth@vger.kernel.org
-Cc:     abhay.maheshbhai.maheta@intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] Bluetooth: silence a dmesg error message in hci_request.c
+From:   patchwork-bot+bluetooth@kernel.org
+Message-Id: <166863481577.13601.1517745268400800639.git-patchwork-notify@kernel.org>
+Date:   Wed, 16 Nov 2022 21:40:15 +0000
+References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+In-Reply-To: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+To:     =?utf-8?b?TWF0ZXVzeiBKb8WEY3p5ayA8bWF0LmpvbmN6eWtAbzIucGw+?=@ci.codeaurora.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, brian.gix@intel.com,
+        luiz.von.dentz@intel.com, marcel@holtmann.org,
+        johan.hedberg@gmail.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Abhay,
+Hello:
 
-On Wed, Nov 16, 2022 at 7:11 AM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=696036
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.33 seconds
-> GitLint                       PASS      0.95 seconds
-> SubjectPrefix                 FAIL      0.59 seconds
-> BuildKernel                   PASS      33.54 seconds
-> BuildKernel32                 PASS      31.34 seconds
-> Incremental Build with patchesPASS      45.63 seconds
-> TestRunner: Setup             PASS      513.97 seconds
-> TestRunner: l2cap-tester      PASS      16.64 seconds
-> TestRunner: iso-tester        FAIL      16.78 seconds
-> TestRunner: bnep-tester       PASS      6.58 seconds
-> TestRunner: mgmt-tester       PASS      101.31 seconds
-> TestRunner: rfcomm-tester     PASS      10.44 seconds
-> TestRunner: sco-tester        PASS      9.29 seconds
-> TestRunner: ioctl-tester      PASS      11.12 seconds
-> TestRunner: mesh-tester       PASS      7.99 seconds
-> TestRunner: smp-tester        PASS      9.90 seconds
-> TestRunner: userchan-tester   PASS      6.81 seconds
->
-> Details
-> ##############################
-> Test: SubjectPrefix - FAIL - 0.59 seconds
-> Check subject contains "Bluetooth" prefix
-> "Bluetooth: " is not specified in the subject
->
-> ##############################
-> Test: TestRunner: iso-tester - FAIL - 16.78 seconds
-> Run test-runner with iso-tester
-> Total: 55, Passed: 11 (20.0%), Failed: 44, Not Run: 0
->
-> Failed Test Cases
-> ISO QoS 8_1_1 - Success                              Failed       1.977 seconds
-> ISO QoS 8_2_1 - Success                              Failed       0.152 seconds
-> ISO QoS 16_1_1 - Success                             Failed       0.151 seconds
-> ISO QoS 16_2_1 - Success                             Failed       0.150 seconds
-> ISO QoS 16_2_1 CIG 0x01 - Success                    Failed       0.150 seconds
-> ISO QoS 16_2_1 CIG 0x01 CIS 0x01 - Success           Failed       0.150 seconds
-> ISO QoS 24_1_1 - Success                             Failed       0.149 seconds
-> ISO QoS 24_2_1 - Success                             Failed       0.152 seconds
-> ISO QoS 32_1_1 - Success                             Failed       0.150 seconds
-> ISO QoS 32_2_1 - Success                             Failed       0.150 seconds
-> ISO QoS 44_1_1 - Success                             Failed       0.150 seconds
-> ISO QoS 44_2_1 - Success                             Failed       0.156 seconds
-> ISO QoS 48_1_1 - Success                             Failed       0.151 seconds
-> ISO QoS 48_2_1 - Success                             Failed       0.150 seconds
-> ISO QoS 48_3_1 - Success                             Failed       0.150 seconds
-> ISO QoS 48_4_1 - Success                             Failed       0.149 seconds
-> ISO QoS 48_5_1 - Success                             Failed       0.150 seconds
-> ISO QoS 48_6_1 - Success                             Failed       0.148 seconds
-> ISO QoS 8_1_2 - Success                              Failed       0.150 seconds
-> ISO QoS 8_2_2 - Success                              Failed       0.149 seconds
-> ISO QoS 16_1_2 - Success                             Failed       0.150 seconds
-> ISO QoS 16_2_2 - Success                             Failed       0.150 seconds
-> ISO QoS 24_1_2 - Success                             Failed       0.150 seconds
-> ISO QoS 24_2_2 - Success                             Failed       0.150 seconds
-> ISO QoS 32_1_2 - Success                             Failed       0.148 seconds
-> ISO QoS 32_2_2 - Success                             Failed       0.150 seconds
-> ISO QoS 44_1_2 - Success                             Failed       0.148 seconds
-> ISO QoS 44_2_2 - Success                             Failed       0.150 seconds
-> ISO QoS 48_1_2 - Success                             Failed       0.149 seconds
-> ISO QoS 48_2_2 - Success                             Failed       0.148 seconds
-> ISO QoS 48_3_2 - Success                             Failed       0.150 seconds
-> ISO QoS 48_4_2 - Success                             Failed       0.149 seconds
-> ISO QoS 48_5_2 - Success                             Failed       0.149 seconds
-> ISO QoS 48_6_2 - Success                             Failed       0.151 seconds
-> ISO Connect2 CIG 0x01 - Success                      Failed       0.191 seconds
-> ISO Send - Success                                   Failed       0.153 seconds
-> ISO Receive - Success                                Failed       0.167 seconds
-> ISO Defer Send - Success                             Failed       0.156 seconds
-> ISO 48_2_1 Defer Send - Success                      Failed       0.158 seconds
-> ISO Defer Receive - Success                          Failed       0.154 seconds
-> ISO 48_2_1 Defer Receive - Success                   Failed       0.150 seconds
-> ISO Send and Receive - Success                       Failed       0.157 seconds
-> ISO Disconnect - Success                             Failed       0.162 seconds
-> ISO Reconnect - Success                              Failed       0.163 seconds
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
 
-I suspect we will need to fix the emulator to make these test pass first:
+On Wed, 16 Nov 2022 21:28:56 +0100 you wrote:
+> On kernel 6.1-rcX, I have been getting the following dmesg error message
+> on every boot, resume from suspend and rfkill unblock of the Bluetooth
+> device:
+> 
+> 	Bluetooth: hci0: HCI_REQ-0xfcf0
+> 
+> After some investigation, it turned out to be caused by
+> commit dd50a864ffae ("Bluetooth: Delete unreferenced hci_request code")
+> which modified hci_req_add() in net/bluetooth/hci_request.c to always
+> print an error message when it is executed. In my case, the function was
+> executed by msft_set_filter_enable() in net/bluetooth/msft.c, which
+> provides support for Microsoft vendor opcodes.
+> 
+> [...]
 
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/emulator/btdev.c#n5889
+Here is the summary with links:
+  - Bluetooth: silence a dmesg error message in hci_request.c
+    https://git.kernel.org/bluetooth/bluetooth-next/c/c3fd63f7fe5a
 
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
-
-
+You are awesome, thank you!
 -- 
-Luiz Augusto von Dentz
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
