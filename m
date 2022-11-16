@@ -2,163 +2,103 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE54BC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 06:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F5BBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 06:28:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232613AbiKPGUB (ORCPT
+        id S231483AbiKPG2I (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Nov 2022 01:20:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42988 "EHLO
+        Wed, 16 Nov 2022 01:28:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232570AbiKPGTz (ORCPT
+        with ESMTP id S232087AbiKPG1p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Nov 2022 01:19:55 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6102E15717
-        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 22:19:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1668579594; x=1700115594;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references;
-  bh=Qoc55W22IQjPu1hTENPFauM1mIeCCVubfTKrVTNCr90=;
-  b=iYutA1mmQyB3GCjzbV8aXJx+pDWTN9m+ETLLdAU3uob013vb9OxDFG8Y
-   OhI06t84FLrilzs833WAafk4urTZPyIp9n6Fxt1uAmvPWh/byo/1GxzxB
-   gUMRSSatV5POHJ0dEGdAI+RMNbuckO0/IgBfe3cL4vxclygs3IPeYOp81
-   QfUE6tfkuRtXvgTzBHNgSKmDP2W/AxLvMXEpgcXyv1MYfuch15J5Lsqpe
-   EbzglLhTfAxXJNY4mP39HBNbrm+LttFjJ5XnBf4kZLz4+gACUPdDz59f2
-   YON8DF1b8NNzB3ZsHOca747JhZ9ZdjGa4BcHK0B34E4LFHmCxl+LpmeaD
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="374596320"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="374596320"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Nov 2022 22:19:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10532"; a="702739832"
-X-IronPort-AV: E=Sophos;i="5.96,167,1665471600"; 
-   d="scan'208";a="702739832"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga008.fm.intel.com with ESMTP; 15 Nov 2022 22:19:52 -0800
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 2/2] Bluetooth: Fix support for Read Local Supported Codecs V2
-Date:   Wed, 16 Nov 2022 11:59:18 +0530
-Message-Id: <20221116062918.11879-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20221116062918.11879-1-kiran.k@intel.com>
-References: <20221116062918.11879-1-kiran.k@intel.com>
+        Wed, 16 Nov 2022 01:27:45 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5048A1D0EA
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 22:27:44 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id 4so15586328pli.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 22:27:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=onGJsOC8sQiwsSjz9f9qzt+vQiKXUsdWUJda1GqiPTo=;
+        b=EOSdXsRBGHvFu13w6IF0QsjGZky/dWzPns9XDzBqIsTRLNupkg1lUlgngd+l5lhsl6
+         xZBkfXTJlShqdVkvZp0vJtxnOOU7gsggWgZGzZybe/BB9YadMj2Hs5Ua0blK4bwh/vzK
+         6NCluzNSHTMtixD1JuNG+xKY9YnC+YBzS3lsiofGgCybLFFRz6N6SSTharpxnf64fh04
+         3kBW31crDCLPXzBpZMPYRH/tYLmegTFPL7COpKNcXNVXzTejVORqkjBq1H3f2Rfm2idh
+         TDomu/10q9c/o1GYpt4v/VP7+JQYcxxPvMenQ7anLbIsX3nEU1d3SAScSOA89qH7z8Ho
+         p+qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=onGJsOC8sQiwsSjz9f9qzt+vQiKXUsdWUJda1GqiPTo=;
+        b=pgnCFiL1ICT1B6lYaVjv1bZcwZYiO4On8PaIME3KihFq64y7PaA5Ia0sCVN/hMMGR7
+         oEzE6LIiOIawuaSnKFxt4l0CpmuUU40J6x2uL2RXN4D87miAbg1O0ypeDTuk1sRfiLiY
+         SitFE71de/PYjrmzfERPkur9GuS1mfTfckArVFTLSVRtTpo7U0OyZrV/9zFHiRhdpsYz
+         eg+Bv5K1H0SxahgFvPNoiQxRhOUlNbAe/rvM9GRSiXBgbcZZ5wrdYpVbIenzsUbEjrnB
+         LB3KAuools49FZYB44OCjzzyhnmCuLxykb8TFj2WEvGF+cErkUu6SnEe19Lr73y29J6p
+         itxw==
+X-Gm-Message-State: ANoB5pnkjjwJnIm1P1cfDH7qR1pXsSvwZP4qB3QBZ885tsPER8haW0rx
+        gwl1FtGKHQTNjpCljsHSM863uVLw7ls=
+X-Google-Smtp-Source: AA0mqf7tfA1iFxkm+jbXvUNixwDQUBJ9fIOEd+x7tF8zizuMDp4qKdS4514rYcU7rq/AlUYAfLFfag==
+X-Received: by 2002:a17:902:f549:b0:188:5c0c:7590 with SMTP id h9-20020a170902f54900b001885c0c7590mr7856845plf.65.1668580063487;
+        Tue, 15 Nov 2022 22:27:43 -0800 (PST)
+Received: from [172.17.0.2] ([20.230.159.220])
+        by smtp.gmail.com with ESMTPSA id y10-20020a17090322ca00b00186f81bb3f0sm11209816plg.122.2022.11.15.22.27.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 22:27:43 -0800 (PST)
+Message-ID: <637482df.170a0220.7501d.130f@mx.google.com>
+Date:   Tue, 15 Nov 2022 22:27:43 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5903696575442131835=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,v3] doc: test patch - DO NOT MERGE
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221116052513.57081-1-hj.tedd.an@gmail.com>
+References: <20221116052513.57081-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
+--===============5903696575442131835==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Handling of Read Local Supported Codecs was broken during the
-HCI serialization design change patches.
+This is automated email and please do not reply to this email!
 
-Fixes: d0b137062b2d ("Bluetooth: hci_sync: Rework init stages")
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=695796
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.52 seconds
+GitLint                       PASS      0.35 seconds
+Prep - Setup ELL              PASS      34.32 seconds
+Build - Prep                  PASS      0.91 seconds
+Build - Configure             PASS      10.65 seconds
+Build - Make                  PASS      1096.36 seconds
+Make Check                    PASS      12.62 seconds
+Make Check w/Valgrind         PASS      366.48 seconds
+Make Distcheck                PASS      304.62 seconds
+Build w/ext ELL - Configure   PASS      11.12 seconds
+Build w/ext ELL - Make        PASS      108.32 seconds
+Incremental Build w/ patches  PASS      0.00 seconds
+Scan Build                    PASS      672.43 seconds
+
+
+
 ---
-Notes:
-changes in v2:
-- Fix commit message format
+Regards,
+Linux Bluetooth
 
- net/bluetooth/hci_codec.c | 19 ++++++++++---------
- net/bluetooth/hci_sync.c  | 10 ++++++----
- 2 files changed, 16 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
-index 38201532f58e..3cc135bb1d30 100644
---- a/net/bluetooth/hci_codec.c
-+++ b/net/bluetooth/hci_codec.c
-@@ -72,9 +72,8 @@ static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
- 				continue;
- 			}
- 
--			skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
--					     sizeof(*cmd), cmd,
--					     HCI_CMD_TIMEOUT);
-+			skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
-+						sizeof(*cmd), cmd, 0, HCI_CMD_TIMEOUT, NULL);
- 			if (IS_ERR(skb)) {
- 				bt_dev_err(hdev, "Failed to read codec capabilities (%ld)",
- 					   PTR_ERR(skb));
-@@ -127,8 +126,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 	struct hci_op_read_local_codec_caps caps;
- 	__u8 i;
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
--			     HCI_CMD_TIMEOUT);
-+	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
-+				0, HCI_CMD_TIMEOUT, NULL);
- 
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
-@@ -158,7 +157,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 	for (i = 0; i < std_codecs->num; i++) {
- 		caps.id = std_codecs->codec[i];
- 		caps.direction = 0x00;
--		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
-+		hci_read_codec_capabilities(hdev,
-+					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
- 	}
- 
- 	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
-@@ -178,7 +178,8 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- 		caps.cid = vnd_codecs->codec[i].cid;
- 		caps.vid = vnd_codecs->codec[i].vid;
- 		caps.direction = 0x00;
--		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
-+		hci_read_codec_capabilities(hdev,
-+					    LOCAL_CODEC_ACL_MASK | LOCAL_CODEC_SCO_MASK, &caps);
- 	}
- 
- error:
-@@ -194,8 +195,8 @@ void hci_read_supported_codecs_v2(struct hci_dev *hdev)
- 	struct hci_op_read_local_codec_caps caps;
- 	__u8 i;
- 
--	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
--			     HCI_CMD_TIMEOUT);
-+	skb = __hci_cmd_sync_sk(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
-+				0, HCI_CMD_TIMEOUT, NULL);
- 
- 	if (IS_ERR(skb)) {
- 		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index d36d72352059..9e2d7e4b850c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -12,6 +12,7 @@
- #include <net/bluetooth/mgmt.h>
- 
- #include "hci_request.h"
-+#include "hci_codec.h"
- #include "hci_debugfs.h"
- #include "smp.h"
- #include "eir.h"
-@@ -4257,11 +4258,12 @@ static int hci_set_event_mask_page_2_sync(struct hci_dev *hdev)
- /* Read local codec list if the HCI command is supported */
- static int hci_read_local_codecs_sync(struct hci_dev *hdev)
- {
--	if (!(hdev->commands[29] & 0x20))
--		return 0;
-+	if (hdev->commands[45] & 0x04)
-+		hci_read_supported_codecs_v2(hdev);
-+	else if (hdev->commands[29] & 0x20)
-+		hci_read_supported_codecs(hdev);
- 
--	return __hci_cmd_sync_status(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
--				     HCI_CMD_TIMEOUT);
-+	return 0;
- }
- 
- /* Read local pairing options if the HCI command is supported */
--- 
-2.17.1
-
+--===============5903696575442131835==--
