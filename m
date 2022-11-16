@@ -2,69 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356E7C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 15:37:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31DECC4321E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 16:56:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233642AbiKPPh3 (ORCPT
+        id S237567AbiKPQ4K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Nov 2022 10:37:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51832 "EHLO
+        Wed, 16 Nov 2022 11:56:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233483AbiKPPh1 (ORCPT
+        with ESMTP id S232190AbiKPQzj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Nov 2022 10:37:27 -0500
-X-Greylist: delayed 304 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 16 Nov 2022 07:37:26 PST
-Received: from b224-1.smtp-out.eu-central-1.amazonses.com (b224-1.smtp-out.eu-central-1.amazonses.com [69.169.224.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12DB814D0C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 07:37:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=b4y2oqd7fm2lugxzudc3kdvc4wctgrpv; d=ubports.com; t=1668612739;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:Content-Transfer-Encoding;
-        bh=Prcl+dF4wD4bKTzA61WwEGzktbMoMarSZGc6Xm0sKDk=;
-        b=CNmQdjl7FLRs4WeU2amZMwnkb+rP2We670UUB4Aymzin+kefMjr+u9RDNQ1aGpzF
-        pNUuGzFVaEkv4Vc1ZOOuO62hs5YS/PErM5OJ/tjq5RMcI8frygOYV+LAh9emZsBOfHh
-        gNS4N2Q887G9U2kE305EbI5Pj1qxE8+QfxBxz89guLMs/fJh4iPEMmlQ5+Px3Xc98Xn
-        m4EqIPayM+47O6g53vePxyNaPCod0NDAWYn/xtA6/2wLsrrVdyljtmafJzmgSEiQQn4
-        RqNsrNSMBHND1O5ZA6he6xd87jie0ZwMI+0LD48cfZJSnq+krlxVkWc6Iml8XUwZtPH
-        uIcVEj1SeQ==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-        s=sokbgaaqhfgd6qjht2wmdajpuuanpimv; d=amazonses.com; t=1668612739;
-        h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:Content-Transfer-Encoding:Feedback-ID;
-        bh=Prcl+dF4wD4bKTzA61WwEGzktbMoMarSZGc6Xm0sKDk=;
-        b=l2Bd5bwDNX6qfY0dyT3sSH7c7eBfaY2SaNUyvC3lDMaDVb9js6IwchtdNtZwDoqs
-        IdgjM1gxdFTuJI3D6tTnakRN9qJsqpL+biOybWDDZo+P6Ua0vLri+W9m23LRRQUzqXH
-        I02+prHa2dxfZOijFa+f6zntfkUdHqLWm12azmVI=
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ubports.com; s=mail;
-        t=1668612739; bh=Prcl+dF4wD4bKTzA61WwEGzktbMoMarSZGc6Xm0sKDk=;
-        h=Date:To:From:Subject:From;
-        b=pXdFVRf3+Mtwe2WFlOyJGFCGoeLBqwEpnUkr7VcBhtbHVIh/YmTCtQE3hgIyuAl+M
-         Ulzum1340aA5gThu/M0qBvG+5aq7rrQsSjqkMkc7MP2mkWr/UYDieLLX2WHWnSFll8
-         dmi5Gkj5TZCVQghRueSspDwFjCjF85n48vPXgEfLPkpiKGPypRDyMRzPTsN1OMXOsR
-         kR4eLNZ7Nq/LBgzVd7e5fi4NEtvHReMzMSEywKClqV0JcinJrTRReQ+ebJLZ/UkA4A
-         b78ExRgsD9nuq2DNYald73Xwh7gMf0s5dvZes6tTEfWY+P53AbzwaVp4cxXUC0Plor
-         4Mpi1O9dXzJ0w==
-Message-ID: <010701848111d140-5dd1752f-c89a-47a1-9472-2e5a5a8a740a-000000@eu-central-1.amazonses.com>
-Date:   Wed, 16 Nov 2022 15:32:19 +0000
+        Wed, 16 Nov 2022 11:55:39 -0500
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BA3AB3E;
+        Wed, 16 Nov 2022 08:55:27 -0800 (PST)
+Received: by mail-oi1-f174.google.com with SMTP id q186so19131756oia.9;
+        Wed, 16 Nov 2022 08:55:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kiEBJO/YjcMAZi1EqUusiIE2D8QfFJq7eZwFhwMPZso=;
+        b=XUhd1YZINCqUB9+lROHYSr+aR4vQtsGz9YdpG0pjowKyb8r4RcNe13HUxe0q/9E34p
+         kWJY9YLy4JO5fbk7VYMBZohgKhb9oTXOcNKH4HSpfXWTb3Z7wmpWqUnuaPrWWIxwWga+
+         o/+3+VNM2rYqU1HoYen4IuNca3+H4gMW0SlJRVnLk8bajQm+iqjbRaChf7E0LTbxWdp4
+         CkjkivKlZ90PtxWS2olXw7TodOHAuzYjr7ZFk09wKCzH0NxlJDXsirGSxj0dihFPzx/0
+         Zxar/1QF8VyBVKnID3qDjwVV8H+3UZo67IyPrQmgzAyy31GJ9ki0VC4w30ZKVUSTmeXO
+         eAnQ==
+X-Gm-Message-State: ANoB5plir3BqjLx4WAp13yijubhaDGmqzBBYKC+MQ9ehNYzYWJfegn9w
+        N53zbSGjAWrzO1kwu4CZ/g==
+X-Google-Smtp-Source: AA0mqf64Fje3bdOgJ5mS0w+P3LsDO8E8DUlCW+fnA4tU3JbGCGhrmcJnW4mo3simdTwRehr0cYgx7Q==
+X-Received: by 2002:a05:6808:688:b0:354:e358:ad2c with SMTP id k8-20020a056808068800b00354e358ad2cmr2056255oig.130.1668617725518;
+        Wed, 16 Nov 2022 08:55:25 -0800 (PST)
+Received: from robh_at_kernel.org (66-90-144-107.dyn.grandenetworks.net. [66.90.144.107])
+        by smtp.gmail.com with ESMTPSA id bg2-20020a056808178200b0034fd36e95bfsm6367551oib.31.2022.11.16.08.55.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 08:55:25 -0800 (PST)
+Received: (nullmailer pid 231353 invoked by uid 1000);
+        Wed, 16 Nov 2022 16:55:27 -0000
+Date:   Wed, 16 Nov 2022 10:55:27 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     linux-wireless@vger.kernel.org, devicetree@vger.kernel.org,
+        Pavel Machek <pavel@ucw.cz>, linux-bluetooth@vger.kernel.org,
+        Rob Herring <robh+dt@kernel.org>,
+        Jacek Anaszewski <jacek.anaszewski@gmail.com>,
+        linux-renesas-soc@vger.kernel.org,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        linux-leds@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: leds: Document Bluetooth and WLAN triggers
+Message-ID: <166861772609.231295.14812410099261417331.robh@kernel.org>
 MIME-Version: 1.0
-To:     linux-bluetooth@vger.kernel.org
-Content-Language: de-DE
-From:   Florian Leeber <florian@ubports.com>
-Subject: Bluez <> Pebble smartwatch
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Feedback-ID: 1.eu-central-1.U71sxic/3tmi0U3T+Ze2hDyqoN46zyPgdCO+zEPT6YQ=:AmazonSES
-X-SES-Outgoing: 2022.11.16-69.169.224.1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello All,
 
-does anyone have any experience pairing a Pebble smartwatch with Bluez? 
-It was working kinda well in an Bluez 5.41, but now with 5.53 to which 
-we are upgrading in Ubuntu Touch the pairing process is unsucessful. As 
-I do not own the device debugging is difficult, but some users try now 
-to get a btmon trace.
+On Wed, 09 Nov 2022 15:46:06 +0100, Geert Uytterhoeven wrote:
+> Add the missing trigger patterns for Bluetooth and WLAN activity, which
+> are already in active use.
+> 
+> While at it, move the mmc pattern comment where it belongs, and restore
+> alphabetical sort order.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: bt_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
+> 	'hci0-power' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
+> 	'hci0-power' does not match '^mmc[0-9]+$'
+> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
+> arch/arm64/boot/dts/renesas/r8a774a1-hihope-rzg2m-rev2.dtb: leds: wlan_active_led:linux,default-trigger: 'oneOf' conditional failed, one must be fixed:
+> 	'phy0tx' is not one of ['backlight', 'default-on', 'heartbeat', 'disk-activity', 'ide-disk', 'timer', 'pattern']
+> 	'phy0tx' does not match '^mmc[0-9]+$'
+> 	From schema: Documentation/devicetree/bindings/leds/leds-gpio.yaml
+> ---
+>  Documentation/devicetree/bindings/leds/common.yaml | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
 
-BR Florian
-
+Reviewed-by: Rob Herring <robh@kernel.org>
