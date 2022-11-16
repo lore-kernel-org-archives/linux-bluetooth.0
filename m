@@ -2,101 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A838C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:00:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218C7C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234426AbiKPVAh (ORCPT
+        id S233430AbiKPVGT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Nov 2022 16:00:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41954 "EHLO
+        Wed, 16 Nov 2022 16:06:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238998AbiKPVAQ (ORCPT
+        with ESMTP id S233519AbiKPVFt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Nov 2022 16:00:16 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83E4C6F379
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 12:57:53 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id c1so31540255lfi.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 12:57:53 -0800 (PST)
+        Wed, 16 Nov 2022 16:05:49 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688CE6828D
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:05:00 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id o13so9817796ilc.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:05:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ox/3yJdPHTXA5wAj9i08kmQI0g1IX/dKA8EFYN2yMBk=;
-        b=qir84JHyH1ym/20n+gpMnkP9lj00R1V/n9zAJ56mDmRneB0aUgm9cV5wbeapkepGNg
-         d+lDdAuZTTwIf76tJ7do3gSI+nFJrW5MR2mdDBd9TCl0/Vnw45jqv0pKJdzLKhk1eFWD
-         JHdzYp+6v1NtLpab6RYFZc8YDKIsjXL5d9Rjri8+kQF20wtdYrbysP4KnynF+H/5YFu+
-         ThefvDoaPmHCIBpNgwCPcok4d5EQmqpc7RmanDrc1bfuYcattuzL1AFmiJNclWrhlBNV
-         3tDdzbEykMuMV62HW7iFT842UkYxA63IM6RICh7sLksR/xSy1s2rpLkCa6AMwZD3uGih
-         8yHQ==
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=S5TnVVuL6GVdlXlPnrL11DJaafpUf2KZacQxh7hJyRU=;
+        b=Rrip4ywTeU9/HmJSr38uVIsAU/i5IrSbW/ApVRO+vDJoal35KllbNnCEBEEGcXs3VA
+         zpy+ya0QWo5KvlwEhczec1L67EBotZnoKMx9UZR+HAu8+mPjELW7gP5e3gXGXHWJkIgU
+         E/k4Yo1m6vd7cTcJKETKLYZhN/7sPp20kMMKlRtQq3ox1U2uXAglmb/K7ri5HEn+91kA
+         W6vRL9bMcvgxQl79+8em7zyx8g01ShdLQXsTrwJhh+uJR9cA5Y55zXpxwCnvaAMDO0zm
+         g3j28dlwjryUKJMZqXT7TImwX+g8rM++CSx77JpR3uyLZKVhaGm2wYtkUtsF86wtFRTp
+         egCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ox/3yJdPHTXA5wAj9i08kmQI0g1IX/dKA8EFYN2yMBk=;
-        b=Dk8ylHxiBLmq5moSVACPqUYgOXo3WbfRWnhThc4zakygxnMh+eiCFWMwfkVv1/5yxU
-         jv+ztJlSKMebXYLSMsGSdp7rQaoubjKvZG15kykD1iMl2LJnBVSeHm1a1cnoe1dh/Gw2
-         aaZizruqx2LuXui39SiXTz4uwzaIkl5T3sF4MSi1358/niI4hKvxjc+momgY5uqMUCck
-         0GmsvAXrJujW9/evS35oGDQC3Svf9shki1o0YSBhknr8SocclU478iUdHi34/rdP5mGB
-         BobF8JPTwVp7Y3G6YZGj6lQSBCU6J2P9du+31sXfzFHJzLUKqaG+MEt19LduMfCj9mAy
-         +/jw==
-X-Gm-Message-State: ANoB5pnjveOEapWZJtW0bugju5rp7jd86mvys4TbZ9Tdgp2LR8bN2Spm
-        HbbD9xeZfLCnsjEfLkKjPf4sMFQ4fPVIuIcCEOg+jI4D
-X-Google-Smtp-Source: AA0mqf5IVu7wIiBFITZn8SCY1JCM1+5Ifw7z1J6fw4M804exy7Qh8Vq6xjvM9pfrKduOonHpwOfhtrvLweHbdZxYSCg=
-X-Received: by 2002:a19:8c54:0:b0:494:70b2:26bb with SMTP id
- i20-20020a198c54000000b0049470b226bbmr7416424lfj.26.1668632271852; Wed, 16
- Nov 2022 12:57:51 -0800 (PST)
+        bh=S5TnVVuL6GVdlXlPnrL11DJaafpUf2KZacQxh7hJyRU=;
+        b=5i1qM9goewm5uZFRh/34YIhm/3BOWL4wTK6prIynk5iVwuNhG910Y3PbRmMTtntOlQ
+         KkuwGeSyCekOWRBZNi7ksm3cuKwwHK6/TCPQlemDJZgLxsrj08xF1jg6R1D4BwEJx9cU
+         M9+NTEHfwAdNvjbtefBwHreCjgy4RrDAegcwJpHpC/DUV8+V4DwfcMkjhu8yWbOBTG0W
+         IGmCZarBappQEgJol44dpYOq907nx9uGLI1gyH7MVmRAj/obOyIGfrZhrhQ/l4XK0JnL
+         TDyvvqtv9NAYMFPxKYDaapHuvwKyJ1tE3iERPLUJArBAThINepz9LQNXuS8Laj4P8UQs
+         Wh/Q==
+X-Gm-Message-State: ANoB5plTLngHC+g9e9ecs+aI/J8RrI4f0fWqJtZXBpowj6/rO0npJhoD
+        dwAHAqpX02zVXJq4d5h4rSyH3uzXTo4=
+X-Google-Smtp-Source: AA0mqf4ZhKqrZQyNxQyEcYf5trO2HeJ17TdHvA9aNEPFmpLOywMp8qO4ba2mX9xh4jNv5LNxsPKSaw==
+X-Received: by 2002:a05:6e02:1d8b:b0:302:504e:e289 with SMTP id h11-20020a056e021d8b00b00302504ee289mr9373337ila.129.1668632699257;
+        Wed, 16 Nov 2022 13:04:59 -0800 (PST)
+Received: from [172.17.0.2] ([20.29.87.232])
+        by smtp.gmail.com with ESMTPSA id o3-20020a056e02068300b003025c5868bcsm3994025ils.15.2022.11.16.13.04.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Nov 2022 13:04:59 -0800 (PST)
+Message-ID: <6375507b.050a0220.bea41.6ce2@mx.google.com>
+Date:   Wed, 16 Nov 2022 13:04:59 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============6358846854130046017=="
 MIME-Version: 1.0
-References: <20221104071810.22720-1-kiran.k@intel.com>
-In-Reply-To: <20221104071810.22720-1-kiran.k@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 16 Nov 2022 12:57:40 -0800
-Message-ID: <CABBYNZJsL-pqbK95EOEQOvj=9sTr=aTZL527262eC64SDicGrg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] bluetooth: Remove codec id field in vendor codec definition
-To:     Kiran K <kiran.k@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-        Chethan T N <chethan.tumkur.narayan@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, mat.jonczyk@o2.pl
+Subject: RE: Bluetooth: silence a dmesg error message in hci_request.c
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran, Chethan,
+--===============6358846854130046017==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 4, 2022 at 12:18 AM Kiran K <kiran.k@intel.com> wrote:
->
-> From: Chethan T N <chethan.tumkur.narayan@intel.com>
->
-> As per the specfication vendor codec id is defined.
-> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E page 2127
+This is automated email and please do not reply to this email!
 
-We need the fixes tag, the monitor also seems to be wrong in this
-respect so I will push a fix for it once that is done please add its
-output.
+Dear submitter,
 
-> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> ---
->  include/net/bluetooth/hci.h | 1 -
->  1 file changed, 1 deletion(-)
->
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index e004ba04a9ae..581539cbb856 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1424,7 +1424,6 @@ struct hci_std_codecs_v2 {
->  } __packed;
->
->  struct hci_vnd_codec_v2 {
-> -       __u8    id;
->         __le16  cid;
->         __le16  vid;
->         __u8    transport;
-> --
-> 2.17.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=696145
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.33 seconds
+GitLint                       FAIL      0.82 seconds
+SubjectPrefix                 PASS      0.62 seconds
+BuildKernel                   PASS      34.06 seconds
+BuildKernel32                 PASS      30.56 seconds
+Incremental Build with patchesPASS      45.40 seconds
+TestRunner: Setup             PASS      510.92 seconds
+TestRunner: l2cap-tester      PASS      17.45 seconds
+TestRunner: iso-tester        PASS      16.50 seconds
+TestRunner: bnep-tester       PASS      6.56 seconds
+TestRunner: mgmt-tester       PASS      106.15 seconds
+TestRunner: rfcomm-tester     PASS      10.48 seconds
+TestRunner: sco-tester        PASS      9.87 seconds
+TestRunner: ioctl-tester      PASS      11.07 seconds
+TestRunner: mesh-tester       PASS      7.99 seconds
+TestRunner: smp-tester        PASS      9.72 seconds
+TestRunner: userchan-tester   PASS      6.74 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL - 1.33 seconds
+Run checkpatch.pl script with rule in .checkpatch.conf
+Bluetooth: silence a dmesg error message in hci_request.c\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#78: 
+commit 771c035372a0 ("deprecate the '__deprecated' attribute warnings entirely and for good")
+
+total: 0 errors, 1 warnings, 0 checks, 8 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/13045717.patch has style problems, please review.
+
+NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
 
 
--- 
-Luiz Augusto von Dentz
+##############################
+Test: GitLint - FAIL - 0.82 seconds
+Run gitlint with rule in .gitlint
+Bluetooth: silence a dmesg error message in hci_request.c
+7: B3 Line contains hard tab characters (\t): "	Bluetooth: hci0: HCI_REQ-0xfcf0"
+21: B1 Line exceeds max length (93>80): "commit 771c035372a0 ("deprecate the '__deprecated' attribute warnings entirely and for good")"
+26: B1 Line exceeds max length (92>80): "Link: https://lore.kernel.org/lkml/beb8dcdc3aee4c5c833aa382f35995f17e7961a1.camel@intel.com/"
+
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6358846854130046017==--
