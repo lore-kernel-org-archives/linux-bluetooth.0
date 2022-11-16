@@ -2,156 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 647ACC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 02:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E716DC43217
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 04:35:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230132AbiKPCiq (ORCPT
+        id S231546AbiKPEe6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Nov 2022 21:38:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51942 "EHLO
+        Tue, 15 Nov 2022 23:34:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbiKPCip (ORCPT
+        with ESMTP id S229937AbiKPEe5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Nov 2022 21:38:45 -0500
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01olkn2079.outbound.protection.outlook.com [40.92.53.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528B3B851;
-        Tue, 15 Nov 2022 18:38:44 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k1zNWIhDDylp7ur5BgO56IZE26br67hm5fRDfkZZsB/dl+9eD2Z9Vt0Bq4LUPiuyasmxo/24YoY6jvCHez9jX6xqIvBO56AdSn2diKSCwON3buXItCZbOfqhL0S8IhDj2E14Ji6IWVHEmzNS65Uijk+jg/665Q2J45mt5N/lPmBdejoJpJL+CUZLrMdikiwlohxTjT6R3v9M88qa3wfZRtbGEDcgX/AEv/3pAnBDE5UcOcIjS5GwOX+VxGaGhGq6s6B4Lv3ehaY5jIPqfQJbdwAJE434Num/K79CWY6OG7CuZ7AV4/IHoUlZ0MVPsEeidV/nVTfUQTnzFSkybJWJbA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dPC0PWj25MBZSzwsKsVcmMHSzk2NutVG2pM834wRkrI=;
- b=Yj/ou8PpXod+d2dN3qGpiHeWH0Sh3P5T0CPEtqhJQQcoPFXd2m+3aCePK15UfHKDOwjV8aKz0lzj6RFXt5vJ/I1zgbbLVGxqSldApRec85B/AXClHY85ELdiczpntH37wuQg8HoyGInc2QQa3Kt8CGPcbiPqHaBYry7xkTIReUcZN0PteZbPsTBpaNMl+PBrpB8X2NyP10V+A5X1l9RnC2wxAihZqNJxXJ6N+Eho1IFdvt2Tt+BM4kTz2AAvPD4prF5DmcFZwfqqe+KUuPFGevp8i5ecqIHo09Y7Wnbz8lIa2VbBFwoP0nHMjXJRWKXYwO8FPa/jsLS2jWT48nejWQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dPC0PWj25MBZSzwsKsVcmMHSzk2NutVG2pM834wRkrI=;
- b=eC2ENhlyaWgSmoFVSyV/iBM9yeaVSANVnBJ8jpvVk89YAd225XpPCwdpqCv6hHJPoXsgAEoihPPpSnIJbLylpKARH/6O8Yk3O2HCwx2hucgXYDMBos7vhy/gRuFH11NIMIw3BZOP4IwbFJHG8eWSsG7znVkTpQ6/JmIK4CQ/itlgnhuiAUsr3vRC0P+s+kiD5jbAjmMDL4cNQBEhPTzcya2Pzw8kYt2BfQWdHPkoxpHoKs7agqM1Dur2nI48SdLncZDjtJtBYF6BNNNmoMi4MKGmNpR4IUH4LybJIDEGPLPCW0+/wLOB0YM0DL9yexfvyudvC7pw9tAYJlvDlP7Biw==
-Received: from SI2PR02MB4603.apcprd02.prod.outlook.com (2603:1096:4:10c::14)
- by KL1PR02MB5028.apcprd02.prod.outlook.com (2603:1096:820:72::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5813.15; Wed, 16 Nov
- 2022 02:38:40 +0000
-Received: from SI2PR02MB4603.apcprd02.prod.outlook.com
- ([fe80::11fb:db8f:df36:c049]) by SI2PR02MB4603.apcprd02.prod.outlook.com
- ([fe80::11fb:db8f:df36:c049%8]) with mapi id 15.20.5813.018; Wed, 16 Nov 2022
- 02:38:40 +0000
-From:   jinchuan li <lifangpi@hotmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        972624427@qq.com, ligongwei <ligongwei@kylinos.cn>
-Subject: [PATCH -next] Bluetooth: btusb: Add a new PID/VID 13d3/3549 for RTL8822CU
-Date:   Wed, 16 Nov 2022 10:38:24 +0800
-Message-ID: <SI2PR02MB4603DDABFC0EC1CC323BAF4ADD079@SI2PR02MB4603.apcprd02.prod.outlook.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN:  [EhUlL4l5mle2v/ainhRAOLuUSW/GK78ctfIZEMqu9sY=]
-X-ClientProxiedBy: TYXPR01CA0063.jpnprd01.prod.outlook.com
- (2603:1096:403:a::33) To SI2PR02MB4603.apcprd02.prod.outlook.com
- (2603:1096:4:10c::14)
-X-Microsoft-Original-Message-ID: <20221116023824.227808-1-lifangpi@hotmail.com>
+        Tue, 15 Nov 2022 23:34:57 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6E4A2E68F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 20:34:55 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id 63so12370151iov.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Nov 2022 20:34:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=HKBKwO1ltmXYYde7OwdUTEKRAIPJRM2AlGflITls8Rk=;
+        b=lxP/kjbsjozVo4g15NNK5lfY6OFyGDhy9cypd3hubqkGfKAqqgCf8EizWYYe1Glmn8
+         mDwRmgOiup0wyC1TFxZJaT2o8idcuCvq8rT4aEsavf4MBVx2NIwEI9bKdjZ4j31X/2JW
+         Op6gNyl7cd3KkaoI5td6fqINa9cm8/QTgQ3ogn+KAMZQRbWi3fJh/uuH7CYOHbjsO6Fp
+         dnp+u1E5CLdEmg2DZh8WuZT2GiVaUBCHNo0XeZbCXHa6R2FcqKuEWKoOFakNBYmDgPC4
+         HAKmDtSRByC/CwEkT1hESfWoQsyV8J4FVyT9fSM0kftc5nFcDVHH6DZfU5SzKh5gsqB4
+         BR6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HKBKwO1ltmXYYde7OwdUTEKRAIPJRM2AlGflITls8Rk=;
+        b=pqAw5EcD4jbrYYlf/fNujcgirImLozhNFEwnXKW4/CNbrT6WcNISKSpNlAnXLRmPhR
+         RZrx7h0nRmIg+XqpoE0gqAfISMbhXHb385nj8biCz7FC+HQb9qpEKakd12/L5DHJJu5y
+         3ZkrD5VTWvQeuA/x7Ux1vmWAWmClE9QMtNTRHXJ6WBaHgfqGAnJTJaZxEbID7BEAQST+
+         EgvlmiT0AQ5zqSYwKAtCSsYnDOEECwRTNhEZNPrE4VxmCf9/n7vS2NgW7eS66qfCaor0
+         SL6xv6+ZZVn+5+riAAUIitvRHhI/1QtW3jUKcQVwUb2jS1chi1PBzXgc3y37WtEzRqkU
+         wDPQ==
+X-Gm-Message-State: ANoB5pmzV6zJOwDUH4SJyiqwNvm9DWfUKeL1vM7DFp1dN4a6pHf0Q1/e
+        W9T8NvE/vWSOWXMyr77aRIjx9O2GbZk=
+X-Google-Smtp-Source: AA0mqf4oTnWOM+OyROppC5ii06dgWQIbk9K7fW6jaKTPLhDxRgOLiG7+fZNJJ+z2AlKkXIv/kxMLvw==
+X-Received: by 2002:a05:6602:4188:b0:6d2:da5f:304c with SMTP id bx8-20020a056602418800b006d2da5f304cmr9269448iob.17.1668573294902;
+        Tue, 15 Nov 2022 20:34:54 -0800 (PST)
+Received: from [172.17.0.2] ([20.12.192.208])
+        by smtp.gmail.com with ESMTPSA id a59-20020a029441000000b003712c881d67sm5467177jai.164.2022.11.15.20.34.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Nov 2022 20:34:54 -0800 (PST)
+Message-ID: <6374686e.020a0220.35759.7d5e@mx.google.com>
+Date:   Tue, 15 Nov 2022 20:34:54 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============2343988273446501269=="
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SI2PR02MB4603:EE_|KL1PR02MB5028:EE_
-X-MS-Office365-Filtering-Correlation-Id: f013e288-2c01-4028-e73a-08dac77babab
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: i+SwVAXWSlZktSo8qJYHaUwwvOjEbc9RFENu6iGkVu9SM41WktNU9LPrXAjJkebIZaWTm6+dPedNLRZPvbMs9ES+gakEm5glr12z844PU0NJC8C5yEr/+jsAQfLbJPqsuCtBKUjxaRCGkJnvZa/sH1ismy6KEaY2jNp5vzd9iPp0UPoJ4cLwpYjeLDi7hzlsF8UIq5caNwwtwOLV878YCgxwRCB8fUwRClcB96wXLOecz+fP0zJxVISV7k3FeunSwJqvkal4ggJSFqYFKEq1KTF7oCziizHHwmvoQXqcmNkA39LIw4TgJJ4gUsMH3qvTx+AUWZcFLgXBbo9ZFKapPirAAENsQB7ZfxA+RHQgPpf78x7hAdYvlha2paE2y/Zhh7p2hMSxvaKxQv1FrQq22Hy2pOrOgTLK9BULrEd6ezhI7DBOZm74m91HFvYa6BH08g34wswN9lueaX9fyrkMg6npfqsNE7Mx7AzN8k35nbikB/n3LaYfovrnyNkyK3yiH+SgqbLCemOmfs39oO1e04eRa7XFszsosxuSD698aXcNyvi5qsUrgl4hP10sSfGjHWdnHDP2nL7BQCIbwCALRBVX06ytvO6pL9IuTwHnkWiw9lIOnvEbdERSj8IO5AnVISOZdTq8msfMXXIbKONmSQ==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?C/GWfkPkaYrLhl36n18oDiwHTGCdGRROr/YvbZapXxXEaWAeiI5qpkFjxUZx?=
- =?us-ascii?Q?7IVDhQl1/lQZLCKY4fV0as4ano32CjerECkFQjLG/zPqLjKvXTXaWHY6kHJP?=
- =?us-ascii?Q?91nIUI8E5Xplmx5bxq6C46xNUKaylj1kJ36vPBrLbtf1VzU23zJWJTPHepF9?=
- =?us-ascii?Q?T2HjQnlEyWlhBEfzQt8bDVId5nfC2Ne2hCZH/JGeBcQ+6m8yOFQQw4DM2wS4?=
- =?us-ascii?Q?HEE/hCZOgM1dyWOhYECzRQfjFcIyJQ3oYs9eRZBpocv5gxYcWx92jU5L1Gj4?=
- =?us-ascii?Q?9OK4uSYR4PktmTUYciaT2Po4apemeVkN6H3RssGSOY50pVRUiNAyrH+sCgS7?=
- =?us-ascii?Q?AErQjodk5O1ffsG5m7oHET/G/d1eFt9SQ0NK02d4LBUnvyk5ifFO5qIDUKpQ?=
- =?us-ascii?Q?NaCg9/cBJip8vs0lwnGFZ5MEm4/XRdOkg5a5Fye3lebO/4BZoOiFn+RHlK8g?=
- =?us-ascii?Q?FbIqA+3TTI30eDVXSI31AgzB8WEnbtX3La9DJossO8JU0W2PVLqgzU7uNcCB?=
- =?us-ascii?Q?+rRj1ZVM3Ar/mt53t5vwlyDOhpZYzQoCR4+xzU9c+JXsqPDg/OFM1lk7qCaI?=
- =?us-ascii?Q?bxtFb7tzhcisbrxDfRcENX015pYYas4xQHFQqBUdsmxIe6Xs6WPuZ+1GndxI?=
- =?us-ascii?Q?2R7UFi97FqKHKiEejCiQUYLvD33xQ3cSvXY9xU0yg1oWW5BEbR6nH49cDpv2?=
- =?us-ascii?Q?gudwMgWLrvL52xxmAy7++IOKjdzvRZvkbdvOHRyTwlnqjRd8WigA6BnQteiG?=
- =?us-ascii?Q?ew6aD0UoFMraPb1vwl2k2z7bFjAOY9Z+Pe1FjODEB2fWtX3Pmd5lRQNpD1SD?=
- =?us-ascii?Q?4Da3HBisbZ1VzsHiRb1nSbLEFI2lGoCFf5REWNG3DpE/rEQgo6n0oTkuuJNf?=
- =?us-ascii?Q?wIFS24pA+rMwyWmc0aF8ID+Y0Dj9d42A3jSaCJGomw7xwvgneaAMMPn1cnbu?=
- =?us-ascii?Q?TCaCNxJeLEs1QV4NvChYB8ievDSc/6An/YpAn3OypJZBphZyro+6Spitlazd?=
- =?us-ascii?Q?EoApQYMfm/m2AJUx2hXfAoIWjjbcMnp6+47L3nIMUJx1xBf7TnrMVhuQ+7wz?=
- =?us-ascii?Q?y1JztKuLtjhTiGh38Z0FxTkPyvbmzN42irxqWzi0ZuQSoWWcPljHiqQ79aZL?=
- =?us-ascii?Q?DqCaP/8dkIZuq6qCpSSN9xwsO/FpwJJj6BPm4huz/H9ry4UU18Ws550gWBDg?=
- =?us-ascii?Q?vSOMNXWgcji/KxF/4oxNjI1fFMVTxhxqgMC51S90cXTJ6mvn7wJShfDhZmLH?=
- =?us-ascii?Q?X+5TP2bYEN1Xmztt5TfOBBBnK3OcoqDIrCntwxTl7Q=3D=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-20e34.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: f013e288-2c01-4028-e73a-08dac77babab
-X-MS-Exchange-CrossTenant-AuthSource: SI2PR02MB4603.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2022 02:38:40.8308
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR02MB5028
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, lifangpi@hotmail.com
+Subject: RE: [-next] Bluetooth: btusb: Add a new PID/VID 13d3/3549 for RTL8822CU
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <SI2PR02MB4603DDABFC0EC1CC323BAF4ADD079@SI2PR02MB4603.apcprd02.prod.outlook.com>
+References: <SI2PR02MB4603DDABFC0EC1CC323BAF4ADD079@SI2PR02MB4603.apcprd02.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: ligongwei <ligongwei@kylinos.cn>
+--===============2343988273446501269==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-* /sys/kernel/debug/usb/devices
-T:  Bus=03 Lev=02 Prnt=02 Port=02 Cnt=03 Dev#=  5 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0bda ProdID=b85b Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+This is automated email and please do not reply to this email!
 
-Signed-off-by: ligongwei <ligongwei@kylinos.cn>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=695778
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.41 seconds
+GitLint                       PASS      0.87 seconds
+SubjectPrefix                 PASS      0.66 seconds
+BuildKernel                   PASS      42.27 seconds
+BuildKernel32                 PASS      37.06 seconds
+Incremental Build with patchesPASS      59.56 seconds
+TestRunner: Setup             PASS      609.40 seconds
+TestRunner: l2cap-tester      PASS      19.90 seconds
+TestRunner: iso-tester        PASS      19.40 seconds
+TestRunner: bnep-tester       PASS      7.72 seconds
+TestRunner: mgmt-tester       PASS      121.81 seconds
+TestRunner: rfcomm-tester     PASS      11.99 seconds
+TestRunner: sco-tester        PASS      11.40 seconds
+TestRunner: ioctl-tester      PASS      12.78 seconds
+TestRunner: mesh-tester       PASS      9.26 seconds
+TestRunner: smp-tester        PASS      11.24 seconds
+TestRunner: userchan-tester   PASS      8.09 seconds
+
+
+
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 64a3febb9dec..437d0b53efe7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -498,6 +498,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0bda, 0xc822), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
- 
-+	/* Realtek 8822CU Bluetooth devices */
-+	{ USB_DEVICE(0x13d3, 0x3549), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
-+
- 	/* Realtek 8852AE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0x2852), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
--- 
-2.25.1
 
+--===============2343988273446501269==--
