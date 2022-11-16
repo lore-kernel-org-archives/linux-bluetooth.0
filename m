@@ -2,137 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 218C7C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D49BEC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Nov 2022 21:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233430AbiKPVGT (ORCPT
+        id S233591AbiKPVSm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Nov 2022 16:06:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47234 "EHLO
+        Wed, 16 Nov 2022 16:18:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233519AbiKPVFt (ORCPT
+        with ESMTP id S233277AbiKPVSl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Nov 2022 16:05:49 -0500
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 688CE6828D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:05:00 -0800 (PST)
-Received: by mail-il1-x134.google.com with SMTP id o13so9817796ilc.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:05:00 -0800 (PST)
+        Wed, 16 Nov 2022 16:18:41 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FAACE6A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:18:39 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id u8-20020a17090a5e4800b002106dcdd4a0so3590155pji.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 16 Nov 2022 13:18:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=S5TnVVuL6GVdlXlPnrL11DJaafpUf2KZacQxh7hJyRU=;
-        b=Rrip4ywTeU9/HmJSr38uVIsAU/i5IrSbW/ApVRO+vDJoal35KllbNnCEBEEGcXs3VA
-         zpy+ya0QWo5KvlwEhczec1L67EBotZnoKMx9UZR+HAu8+mPjELW7gP5e3gXGXHWJkIgU
-         E/k4Yo1m6vd7cTcJKETKLYZhN/7sPp20kMMKlRtQq3ox1U2uXAglmb/K7ri5HEn+91kA
-         W6vRL9bMcvgxQl79+8em7zyx8g01ShdLQXsTrwJhh+uJR9cA5Y55zXpxwCnvaAMDO0zm
-         g3j28dlwjryUKJMZqXT7TImwX+g8rM++CSx77JpR3uyLZKVhaGm2wYtkUtsF86wtFRTp
-         egCw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wkc/lBm/VlErz/YrB5ul2/3MtI870A7/6Dj0PqnvpAI=;
+        b=iXNj+5wGQb2UH+e5KJQ53bGQ2FgfSbvhGOXWwzP8j25iWr/ysJkFTNKu710XnbeVxg
+         Qc2jYEW/xM9kwsd2RVUviN+Rgo7AdoacKnYd6tzyEGan5lk7KAMLy5aC0+y2K8FTowZt
+         n1rlCk7RncsfXC6biwvZJIQOhaY/9bBIZFX9APdXlIqW3z6O7YbLf18wseQQcPSSprFk
+         Hl6Mz2hqpYeP36qMwOHi12fvEiVxbwJ2Nmt+EQfHCYvaSj+3vVyYl7ZG/MxJ4zRGhTY+
+         3fhC7WwhrDM1+ADnXYRBzcrIP8sALrL4VJTZuY6bXq77PSnnf9kv06cd3+suN39xKdFn
+         H8UQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=references:in-reply-to:reply-to:subject:to:from:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=S5TnVVuL6GVdlXlPnrL11DJaafpUf2KZacQxh7hJyRU=;
-        b=5i1qM9goewm5uZFRh/34YIhm/3BOWL4wTK6prIynk5iVwuNhG910Y3PbRmMTtntOlQ
-         KkuwGeSyCekOWRBZNi7ksm3cuKwwHK6/TCPQlemDJZgLxsrj08xF1jg6R1D4BwEJx9cU
-         M9+NTEHfwAdNvjbtefBwHreCjgy4RrDAegcwJpHpC/DUV8+V4DwfcMkjhu8yWbOBTG0W
-         IGmCZarBappQEgJol44dpYOq907nx9uGLI1gyH7MVmRAj/obOyIGfrZhrhQ/l4XK0JnL
-         TDyvvqtv9NAYMFPxKYDaapHuvwKyJ1tE3iERPLUJArBAThINepz9LQNXuS8Laj4P8UQs
-         Wh/Q==
-X-Gm-Message-State: ANoB5plTLngHC+g9e9ecs+aI/J8RrI4f0fWqJtZXBpowj6/rO0npJhoD
-        dwAHAqpX02zVXJq4d5h4rSyH3uzXTo4=
-X-Google-Smtp-Source: AA0mqf4ZhKqrZQyNxQyEcYf5trO2HeJ17TdHvA9aNEPFmpLOywMp8qO4ba2mX9xh4jNv5LNxsPKSaw==
-X-Received: by 2002:a05:6e02:1d8b:b0:302:504e:e289 with SMTP id h11-20020a056e021d8b00b00302504ee289mr9373337ila.129.1668632699257;
-        Wed, 16 Nov 2022 13:04:59 -0800 (PST)
-Received: from [172.17.0.2] ([20.29.87.232])
-        by smtp.gmail.com with ESMTPSA id o3-20020a056e02068300b003025c5868bcsm3994025ils.15.2022.11.16.13.04.58
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wkc/lBm/VlErz/YrB5ul2/3MtI870A7/6Dj0PqnvpAI=;
+        b=SJVoYAEMIEcstjHYJQiYLQUikQswTzO853EKp+Hn5LlaTSR0Cly/LgklYFlrJYgR/B
+         9gUlkZkR/L2VoTZ/BzxpJGiQE9gZ/1G+GxcNPqP3YolzCCSDkv3WJs2MrgiLAUDkFdfN
+         IljBAtFY3dE/ftzIt2M2xtTY/0aWttG1WvGijsdyL0rR6SnQSbX/weGc5Wd2LoKb41IU
+         vhQ65FRCk/OVJSCM2Ub0i7Uy3hPYfxPj7TGAqjB4Wlc+F8rvhCEpCpoKMz5CyWmoEFAg
+         OPR/Hl0kePOMcWDF9j6QklhxWIodRudvfUDm8uVSwnTq3dI1HFnegL6oO/SZhy9PN0we
+         XydQ==
+X-Gm-Message-State: ANoB5plNpEhsgCfzV8DZOKPbCvJ4IbVM2qAwlMrCjmlibemF7vItGgeQ
+        qFG6aFA0bUCR39xJZWVJ92A4ZBk8RRw=
+X-Google-Smtp-Source: AA0mqf6Qv1Yd8vad9E7UAqZDYs3HRoTDdir/csQRG52IkKQvk37Jdx8id4RnNG2CWffSpmhP5zz4kQ==
+X-Received: by 2002:a17:902:e0d1:b0:186:738e:5703 with SMTP id e17-20020a170902e0d100b00186738e5703mr10508016pla.136.1668633518162;
+        Wed, 16 Nov 2022 13:18:38 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h13-20020a170902f54d00b00176b3c9693esm12738145plf.299.2022.11.16.13.18.37
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Nov 2022 13:04:59 -0800 (PST)
-Message-ID: <6375507b.050a0220.bea41.6ce2@mx.google.com>
-Date:   Wed, 16 Nov 2022 13:04:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============6358846854130046017=="
+        Wed, 16 Nov 2022 13:18:37 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] monitor: Decode vendor codecs of BT_HCI_CMD_READ_LOCAL_CODECS_V2
+Date:   Wed, 16 Nov 2022 13:18:36 -0800
+Message-Id: <20221116211836.2671441-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.37.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mat.jonczyk@o2.pl
-Subject: RE: Bluetooth: silence a dmesg error message in hci_request.c
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20221116202856.55847-1-mat.jonczyk@o2.pl>
-References: <20221116202856.55847-1-mat.jonczyk@o2.pl>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6358846854130046017==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=696145
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.33 seconds
-GitLint                       FAIL      0.82 seconds
-SubjectPrefix                 PASS      0.62 seconds
-BuildKernel                   PASS      34.06 seconds
-BuildKernel32                 PASS      30.56 seconds
-Incremental Build with patchesPASS      45.40 seconds
-TestRunner: Setup             PASS      510.92 seconds
-TestRunner: l2cap-tester      PASS      17.45 seconds
-TestRunner: iso-tester        PASS      16.50 seconds
-TestRunner: bnep-tester       PASS      6.56 seconds
-TestRunner: mgmt-tester       PASS      106.15 seconds
-TestRunner: rfcomm-tester     PASS      10.48 seconds
-TestRunner: sco-tester        PASS      9.87 seconds
-TestRunner: ioctl-tester      PASS      11.07 seconds
-TestRunner: mesh-tester       PASS      7.99 seconds
-TestRunner: smp-tester        PASS      9.72 seconds
-TestRunner: userchan-tester   PASS      6.74 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL - 1.33 seconds
-Run checkpatch.pl script with rule in .checkpatch.conf
-Bluetooth: silence a dmesg error message in hci_request.c\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#78: 
-commit 771c035372a0 ("deprecate the '__deprecated' attribute warnings entirely and for good")
-
-total: 0 errors, 1 warnings, 0 checks, 8 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/13045717.patch has style problems, please review.
-
-NOTE: Ignored message types: UNKNOWN_COMMIT_ID
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL - 0.82 seconds
-Run gitlint with rule in .gitlint
-Bluetooth: silence a dmesg error message in hci_request.c
-7: B3 Line contains hard tab characters (\t): "	Bluetooth: hci0: HCI_REQ-0xfcf0"
-21: B1 Line exceeds max length (93>80): "commit 771c035372a0 ("deprecate the '__deprecated' attribute warnings entirely and for good")"
-26: B1 Line exceeds max length (92>80): "Link: https://lore.kernel.org/lkml/beb8dcdc3aee4c5c833aa382f35995f17e7961a1.camel@intel.com/"
-
-
-
-
+This attempts to decode the vendor codecs includec in the response of
+BT_HCI_CMD_READ_LOCAL_CODECS_V2.
 ---
-Regards,
-Linux Bluetooth
+ monitor/bt.h     |  6 ++++++
+ monitor/packet.c | 25 +++++++++++++++++++++++++
+ 2 files changed, 31 insertions(+)
 
+diff --git a/monitor/bt.h b/monitor/bt.h
+index 7aa016a0e2a8..97501c7dc939 100644
+--- a/monitor/bt.h
++++ b/monitor/bt.h
+@@ -1787,6 +1787,12 @@ struct bt_hci_rsp_read_local_pairing_options {
+ #define BT_HCI_LOCAL_CODEC_LE_CIS		BIT(2)
+ #define BT_HCI_LOCAL_CODEC_LE_BIS		BIT(3)
+ 
++struct bt_hci_vnd_codec_v2 {
++	uint16_t cid;
++	uint16_t vid;
++	uint8_t  transport;
++} __attribute__ ((packed));
++
+ struct bt_hci_vnd_codec {
+ 	uint8_t  id;
+ 	uint16_t cid;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index dae763e22e61..134cf398a66f 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -6384,6 +6384,20 @@ static void print_list(const void *data, uint8_t size, int num_items,
+ 		print_hex_field("", data, size);
+ }
+ 
++static void print_vnd_codecs_v2(const void *data, int i)
++{
++	const struct bt_hci_vnd_codec_v2 *codec = data;
++	uint8_t mask;
++
++	packet_print_company("  Company ID", le16_to_cpu(codec->cid));
++	print_field("  Vendor Codec ID: 0x%4.4x", le16_to_cpu(codec->vid));
++	print_field("  Logical Transport Type: 0x%02x", codec->transport);
++	mask = print_bitfield(4, codec->transport, codec_transport_table);
++	if (mask)
++		print_text(COLOR_UNKNOWN_SERVICE_CLASS,
++				"  Unknown transport (0x%2.2x)", mask);
++}
++
+ static void read_local_codecs_rsp_v2(uint16_t index, const void *data,
+ 							uint8_t size)
+ {
+@@ -6417,7 +6431,18 @@ static void read_local_codecs_rsp_v2(uint16_t index, const void *data,
+ 
+ 	num_vnd_codecs = rsp->codec[rsp->num_codecs].id;
+ 
++	size -= 1;
++
+ 	print_field("Number of vendor codecs: %d", num_vnd_codecs);
++
++	if (size < num_vnd_codecs * sizeof(*rsp->codec)) {
++		print_field("Invalid number of vendor codecs.");
++		return;
++	}
++
++	print_list(&rsp->codec[rsp->num_codecs] + 1, size, num_vnd_codecs,
++			sizeof(struct bt_hci_vnd_codec_v2),
++			print_vnd_codecs_v2);
+ }
+ 
+ static void print_path_direction(const char *prefix, uint8_t dir)
+-- 
+2.37.3
 
---===============6358846854130046017==--
